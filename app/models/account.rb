@@ -42,6 +42,7 @@ class Account < ActiveRecord::Base
   has_many :all_group_memberships, source: 'group_memberships', through: :all_groups
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: 'EnrollmentTerm', foreign_key: 'root_account_id'
+  has_many :grading_period_groups, inverse_of: :root_account, dependent: :destroy
   has_many :enrollments, -> { where("enrollments.type<>'StudentViewEnrollment'") }, foreign_key: 'root_account_id'
   has_many :all_enrollments, :class_name => 'Enrollment', :foreign_key => 'root_account_id'
   has_many :sub_accounts, -> { where("workflow_state<>'deleted'") }, class_name: 'Account', foreign_key: 'parent_account_id'
@@ -137,7 +138,11 @@ class Account < ActiveRecord::Base
 
   def default_locale(recurse = false)
     result = read_attribute(:default_locale)
-    result ||= parent_account.default_locale(true) if recurse && parent_account
+    if recurse
+      result ||= Rails.cache.fetch(['default_locale', self.global_id].cache_key) do
+        parent_account.default_locale(true) if parent_account
+      end
+    end
     result = nil unless I18n.locale_available?(result)
     result
   end
@@ -221,7 +226,6 @@ class Account < ActiveRecord::Base
   end
 
   def settings=(hash)
-    @invalidate_settings_cache = true
     if hash.is_a?(Hash)
       hash.each do |key, val|
         if account_settings_options && account_settings_options[key.to_sym]
@@ -409,7 +413,10 @@ class Account < ActiveRecord::Base
 
   def settings
     result = self.read_attribute(:settings)
-    return result if result
+    if result
+      @old_settings ||= result.dup
+      return result
+    end
     return write_attribute(:settings, {}) unless frozen?
     {}.freeze
   end
@@ -537,14 +544,25 @@ class Account < ActiveRecord::Base
   def setup_cache_invalidation
     @invalidations = []
     unless self.new_record?
-      @invalidations += ['default_storage_quota', 'current_quota'] if self.try_rescue(:default_storage_quota_changed?)
-      @invalidations << 'default_group_storage_quota' if self.try_rescue(:default_group_storage_quota_changed?)
+      invalidate_all = self.parent_account_id_changed?
+      # apparently, the try_rescues are because these columns don't exist on old migrations
+      @invalidations += ['default_storage_quota', 'current_quota'] if invalidate_all || self.try_rescue(:default_storage_quota_changed?)
+      @invalidations << 'default_group_storage_quota' if invalidate_all || self.try_rescue(:default_group_storage_quota_changed?)
+      @invalidations << 'default_locale' if invalidate_all || self.try_rescue(:default_locale_changed?)
     end
   end
 
   def invalidate_caches_if_changed
     @invalidations ||= []
-    @invalidations += Account.inheritable_settings if @invalidate_settings_cache
+    if self.parent_account_id_changed?
+      @invalidations += Account.inheritable_settings # invalidate all of them
+    elsif @old_settings
+      Account.inheritable_settings.each do |key|
+        @invalidations << key if @old_settings[key] != settings[key] # only invalidate if needed
+      end
+      @old_settings = nil
+    end
+
     if @invalidations.present?
       shard.activate do
         @invalidations.each do |key|
@@ -563,6 +581,11 @@ class Account < ActiveRecord::Base
         keys.each do |key|
           Rails.cache.delete([key, global_id].cache_key)
         end
+      end
+
+      access_keys = keys & [:restrict_student_future_view, :restrict_student_past_view]
+      if access_keys.any?
+        EnrollmentState.invalidate_access_for_accounts([parent_account.id] + account_ids, access_keys)
       end
     end
   end
@@ -1203,7 +1226,7 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def update_all_update_account_associations
+  def self.update_all_update_account_associations
     Account.root_accounts.active.find_each(&:update_account_associations)
   end
 

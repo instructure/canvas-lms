@@ -335,6 +335,32 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       end
     end
 
+    it "should be able to add links to new wiki pages with special characters in title" do
+      title = "this/is a weird-a%% page titlé?"
+
+      get "/courses/#{@course.id}/pages/front-page/edit"
+      wait_for_tiny(f("form.edit-form .edit-content"))
+
+      f('#new_page_link').click
+      expect(f('#new_page_name')).to be_displayed
+      f('#new_page_name').send_keys(title)
+      submit_form("#new_page_drop_down")
+
+      in_frame wiki_page_body_ifr_id do
+        link = f('#tinymce p a')
+        expect(link.text).to eq title
+      end
+
+      expect_new_page_load { f('form.edit-form button.submit').click }
+
+      expect_new_page_load{ f('.user_content a').click }
+
+      # should bring up the creation page for the new page
+
+      new_title = driver.execute_script("return $('#title')[0].value")
+      expect(new_title).to eq title
+    end
+
     it "should change paragraph type to preformatted" do
       text = "<p>This is a sample paragraph</p><p>This is a test</p><p>I E O U A</p>"
       wysiwyg_state_setup(text, html: true)

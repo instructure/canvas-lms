@@ -68,7 +68,7 @@ module Api::V1::DiscussionTopics
     )
 
     opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?
-    json = api_json(topic, user, session, { only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, [:attach, :update, :delete])
+    json = api_json(topic, user, session, { only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, [:attach, :update, :reply, :delete])
     json.merge!(serialize_additional_topic_fields(topic, context, user, opts))
 
     if hold = topic.subscription_hold(user, @context_enrollment, session)
@@ -113,6 +113,7 @@ module Api::V1::DiscussionTopics
       author: user_display_json(topic.user, topic.context),
       html_url: html_url, url: html_url, pinned: !!topic.pinned,
       group_category_id: topic.group_category_id, can_group: topic.can_group?(opts) }
+    fields.merge!({context_code: topic.context_code}) if opts[:include_context_code]
 
     locked_json(fields, topic, user, 'topic', check_policies: true, deep_check_if_needed: true)
     can_view = !fields[:lock_info].is_a?(Hash) || fields[:lock_info][:can_view]

@@ -506,11 +506,7 @@ EOS
 Student appointment sign-up
 EOS
     when 'Appointment Availability'
-      mt(:appointment_availability_description,  <<-EOS)
-*Instructor and Admin only:*
-
-Change to appointment time slots
-EOS
+      t('New appointment timeslots are available for signup')
     when 'Appointment Signups'
       t(:appointment_signups_description, 'New appointment on your calendar')
     when 'Appointment Cancelations'

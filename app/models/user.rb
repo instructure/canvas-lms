@@ -108,7 +108,8 @@ class User < ActiveRecord::Base
   has_many :learning_outcome_results
 
   has_many :submission_comment_participants
-  has_many :submission_comments, -> { preload(submission: [:assignment, :user]) }, through: :submission_comment_participants
+  has_many :submission_comments, -> { published.preload(submission: [:assignment, :user]) },
+    through: :submission_comment_participants
   has_many :collaborators
   has_many :collaborations, -> { preload(:user, :collaborators) }, through: :collaborators
   has_many :assigned_submission_assessments, -> { preload(:user, submission: :assignment) }, class_name: 'AssessmentRequest', foreign_key: 'assessor_id'
@@ -175,10 +176,12 @@ class User < ActiveRecord::Base
   scope :name_like, lambda { |name|
     next none if name.strip.empty?
     scopes = []
-    scopes << unscoped.where(wildcard('users.name', name))
-    scopes << unscoped.where(wildcard('users.short_name', name))
-    scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.sis_user_id', name)).where(pseudonyms: {workflow_state: 'active'})
-    scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.unique_id', name)).where(pseudonyms: {workflow_state: 'active'})
+    all.primary_shard.activate do
+      scopes << unscoped.where(wildcard('users.name', name))
+      scopes << unscoped.where(wildcard('users.short_name', name))
+      scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.sis_user_id', name)).where(pseudonyms: {workflow_state: 'active'})
+      scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.unique_id', name)).where(pseudonyms: {workflow_state: 'active'})
+    end
 
     scopes.map!(&:to_sql)
     self.from("(#{scopes.join("\nUNION\n")}) users")
@@ -1006,11 +1009,19 @@ class User < ActiveRecord::Base
     # check if the user we are given is an admin in one of this user's accounts
     return false unless user
     return true if Account.site_admin.grants_right?(user, sought_right)
-    # what shards do the seeker and target share? only check accounts on those
-    # shards, to avoid too many queries.
-    shards = self.associated_shards & user.associated_shards
-    return false if shards.empty?
-    return self.associated_accounts.shard(shards).any?{|a| a.grants_right?(user, sought_right) }
+    common_shards = associated_shards & user.associated_shards
+    search_method = ->(shard) do
+      associated_accounts.shard(shard).any?{|a| a.grants_right?(user, sought_right) }
+    end
+
+    # search shards the two users have in common first, since they're most likely
+    return true if common_shards.any?(&search_method)
+
+    # now do an exhaustive search, since it's possible to have admin permissions for accounts
+    # you're not associated with
+    return true if (associated_shards - common_shards).any?(&search_method)
+
+    false
   end
 
   set_policy do
@@ -1386,8 +1397,8 @@ class User < ActiveRecord::Base
     preferences[:watched_conversations_intro] = value
   end
 
-  def send_scores_in_emails?
-    preferences[:send_scores_in_emails] == true
+  def send_scores_in_emails?(root_account)
+    preferences[:send_scores_in_emails] == true && root_account.settings[:allow_sending_scores_in_emails] != false
   end
 
   def close_announcement(announcement)

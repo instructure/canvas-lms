@@ -81,6 +81,8 @@ module CC
     def process_learning_outcome(node, item)
       @exported_outcome_ids << item.id
 
+      add_exported_asset(item)
+
       migration_id = CCHelper.create_key(item)
       node.learningOutcome(:identifier=>migration_id) do |out_node|
         out_node.title item.short_description unless item.short_description.blank?

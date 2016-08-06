@@ -154,7 +154,9 @@ define [
 
     markInvitedUsers: ->
       _.each(@model.get('user_ids'), (id) ->
-        @$("#members_list .member.user_" + id).find(":checkbox").attr('checked', true)
+        el = @$("#members_list .member.user_" + id).find(":checkbox")
+        el.attr('checked', true)
+        el.attr('disabled', true)
       )
 
     changeLongRunning: (e) ->

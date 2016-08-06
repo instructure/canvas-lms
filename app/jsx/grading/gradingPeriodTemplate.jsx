@@ -1,12 +1,13 @@
 define([
   'timezone',
   'react',
+  'react-dom',
   'jquery',
   'i18n!external_tools',
   'underscore',
   'jsx/shared/helpers/dateHelper',
   'jquery.instructure_date_and_time'
-], function(tz, React, $, I18n, _, DateHelper) {
+], function(tz, React, ReactDOM, $, I18n, _, DateHelper) {
   const types = React.PropTypes;
 
   const postfixId = (text, { props }) => {
@@ -51,9 +52,9 @@ define([
 
     componentDidMount: function() {
       if (this.isNewGradingPeriod()) {
-        React.findDOMNode(this.refs.title).focus();
+        this.refs.title.focus();
       }
-      let dateField = $(React.findDOMNode(this)).find('.date_field');
+      let dateField = $(ReactDOM.findDOMNode(this)).find('.date_field');
       dateField.datetime_field();
       dateField.on('change', this.onDateChange);
     },

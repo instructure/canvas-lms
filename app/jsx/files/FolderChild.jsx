@@ -47,24 +47,27 @@ define([
     if(this.state.editing) {
       return (
         <form className= 'ef-edit-name-form' onSubmit= {preventDefault(this.saveNameEdit)}>
-          <input
-            type='text'
-            ref='newName'
-            className= 'input-block-level'
-            placeholder= {I18n.t('name', 'Name')}
-            ariaLabel= {I18n.t('folder_name', 'Folder Name')}
-            defaultValue= {this.props.model.displayName()}
-            maxLength='255'
-            onKeyUp= {function (event){ if (event.keyCode === 27) {this.cancelEditingName()} }.bind(this)}
-          />
-          <button
-            type= 'button'
-            className= 'btn btn-link ef-edit-name-cancel'
-            ariaLabel= {I18n.t('cancel', 'Cancel')}
-            onClick= {this.cancelEditingName}
-          >
-            <i className= 'icon-x' />
-          </button>
+          <div className="ic-Input-group">
+
+            <input
+              type='text'
+              ref='newName'
+              className='ic-Input ef-edit-name-form__input'
+              placeholder={I18n.t('name', 'Name')}
+              ariaLabel={I18n.t('folder_name', 'Folder Name')}
+              defaultValue={this.props.model.displayName()}
+              maxLength='255'
+              onKeyUp={function (event){ if (event.keyCode === 27) {this.cancelEditingName()} }.bind(this)}
+            />
+            <button
+              type="button"
+              className="Button ef-edit-name-form__button ef-edit-name-cancel"
+              ariaLabel={I18n.t('cancel', 'Cancel')}
+              onClick={this.cancelEditingName}
+            >
+              <i className='icon-x' />
+            </button>
+          </div>
         </form>
       );
     }else if(this.props.model instanceof Folder) {
@@ -72,14 +75,14 @@ define([
         <a
           ref= 'nameLink'
           href={`${filesEnv.baseUrl}/folder/${this.props.model.urlPath()}`}
-          className= 'media'
+          className= 'ef-name-col__link'
           onClick= {this.checkForAccess}
           params= {{splat: this.props.model.urlPath()}}
         >
-          <span className= 'pull-left'>
+          <span className='ef-big-icon-container'>
             <FilesystemObjectThumbnail model= {this.props.model} />
           </span>
-          <span className= 'media-body'>
+          <span className='ef-name-col__text'>
             {this.props.model.displayName()}
           </span>
         </a>
@@ -89,13 +92,13 @@ define([
         <a
           href={this.props.model.get('url')}
           onClick={preventDefault(this.handleFileLinkClick)}
-          className='media'
+          className='ef-name-col__link'
           ref='nameLink'
         >
-          <span className= 'pull-left'>
+          <span className='ef-big-icon-container'>
             <FilesystemObjectThumbnail model= {this.props.model} />
           </span>
-          <span className= 'media-body'>
+          <span className='ef-name-col__text'>
             {this.props.model.displayName()}
           </span>
         </a>
@@ -149,7 +152,7 @@ define([
           </span>
         </label>
 
-        <div className='ef-name-col ellipsis' role= 'rowheader'>
+        <div className='ef-name-col' role= 'rowheader'>
           { this.renderEditingState() }
         </div>
 

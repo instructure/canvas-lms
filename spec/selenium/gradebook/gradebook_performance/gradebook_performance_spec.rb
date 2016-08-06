@@ -82,13 +82,6 @@ describe "gradebook performance" do
 
       get "/courses/#{@course.id}/gradebook"
       expect(visible_students.count).to eq @course.all_students.count
-
-      # the checkbox should fire an alert rather than changing to not showing concluded
-      f('#gradebook_settings').click
-      expect_fired_alert do
-        f('label[for="show_concluded_enrollments"]').click
-      end
-      expect(visible_students.count).to eq @course.all_students.count
     end
 
     it "shows students sorted by their sortable_name" do
@@ -194,6 +187,8 @@ describe "gradebook performance" do
     end
 
     it "does not include non-graded group assignment in group total" do
+      skip('CNVS-30264 - Broken and throwing false positives, fix with react gradebook')
+      driver.manage.window.maximize
       gc = group_category
       graded_assignment = @course.assignments.create!({
         :title => 'group assignment 1',
@@ -223,9 +218,10 @@ describe "gradebook performance" do
 
       get "/courses/#{@course.id}/gradebook"
       wait_for_ajaximations
-
       expect(f('#gradebook_grid .assignment-group-grade')).to include_text('100%') # otherwise 108%
-      expect(f('#gradebook_grid .total-grade')).to include_text('100%') # otherwise 108%
+      cell = f('#gradebook_grid .total-grade')
+      hover cell
+      expect(cell).to include_text('100%') # otherwise 108%
     end
   end
 end

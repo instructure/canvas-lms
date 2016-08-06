@@ -4,7 +4,8 @@ define [
   'compiled/models/Assignment'
   'compiled/views/assignments/EditHeaderView'
   'helpers/fakeENV'
-], ($, _, Assignment, EditHeaderView, fakeENV) ->
+  'Backbone'
+], ($, _, Assignment, EditHeaderView, fakeENV, Backbone) ->
 
   defaultAssignmentOpts =
     name: 'Test Assignment'
@@ -16,14 +17,18 @@ define [
 
     app = new EditHeaderView
       model: assignment
+      views:
+        'edit_assignment_form': new Backbone.View
 
     app.render()
 
   module 'EditHeaderView',
     setup: ->
       fakeENV.setup()
+      $(document).on 'submit', -> false
     teardown: ->
       fakeENV.teardown()
+      $(document).off 'submit'
 
   test 'renders', ->
     view = editHeaderView()
@@ -35,12 +40,6 @@ define [
 
     view.delete()
     equal cb.called, true, 'onDeleteSuccess was called'
-
-  test 'attaches conditional release editor', ->
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = { assignment: { id: 1 }, jwt: 'foo' }
-    view = editHeaderView()
-    equal 1, view.$conditionalReleaseTarget.children().size()
 
   test 'disables conditional release tab on load when grading type is not_graded', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
@@ -61,19 +60,3 @@ define [
     view = editHeaderView({ grading_type: 'points' })
     view.onGradingTypeUpdate({target: { value: 'not_graded' }})
     equal true, view.$headerTabsCr.tabs('option', 'disabled')
-
-  test 'disables conditional release component on data change', ->
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = { assignment: { id: 1 }, jwt: 'foo' }
-    view = editHeaderView({ grading_type: 'points' })
-    view.onChange()
-    equal false, view.$headerTabsCr.tabs('option', 'disabled')
-    equal false, view.conditionalReleaseEditor.enabled()
-
-  test 'disables conditional release component once', ->
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = { assignment: { id: 1 }, jwt: 'foo' }
-    view = editHeaderView({ grading_type: 'points' })
-    stub = @stub(view.conditionalReleaseEditor, 'setProps')
-    view.onChange()
-    ok stub.calledOnce

@@ -304,13 +304,13 @@ define [
         # upper bound, just as we treated end earlier. (this is so that it can
         # be an inclusive lower bound on the next request)
 
-        newEvents = []
-
+        rendered = new Set
         upperBounds = []
         for key, requestResult of requestResults
           dates = []
           for event in requestResult.events
-            newEvents.push(event)
+            @addEventToCache event
+            rendered.add event.id
             if requestResult.next && event.originalStart
               dates.push(event.originalStart)
           if !_.isEmpty(dates)
@@ -324,14 +324,6 @@ define [
           nextPageDate = fcUtil.clone(_.min(upperBounds))
           end = fcUtil.unwrap(nextPageDate)
 
-        list = @getEventsFromCache(start, end, contexts)
-        datacb(list) if datacb? && list.length > 0
-
-        for event in newEvents
-          @addEventToCache event
-          if @eventInRange(event, start, end)
-            list.push(event)
-
         for context in contexts
           contextInfo = @cache.contexts[context]
           if contextInfo
@@ -340,6 +332,10 @@ define [
             else
               contextInfo.fetchedUndated = true
 
+        list = @getEventsFromCache(start, end, contexts)
+        if datacb? && list.length > 0
+          renderFromCache = list.filter (x) -> not rendered.has x.id
+          datacb(renderFromCache) if renderFromCache.length > 0
         list.nextPageDate = nextPageDate
         list.requestID = options.requestID
         donecb list

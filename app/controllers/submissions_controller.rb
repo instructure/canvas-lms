@@ -333,12 +333,20 @@ class SubmissionsController < ApplicationController
   end
   private :verify_api_call_has_attachment
 
+  def allowed_api_submission_type?(submission_type)
+    valid_for_api = API_SUBMISSION_TYPES.key?(submission_type)
+    allowed_for_assignment = @assignment.submission_types_array.include?(submission_type)
+    basic_lti_launch = (@assignment.submission_types.include?('online') && submission_type == 'basic_lti_launch')
+    valid_for_api && (allowed_for_assignment || basic_lti_launch)
+  end
+  private :allowed_api_submission_type?
+
   def process_api_submission_params
     # Verify submission_type is valid, and allowed by the assignment.
     # This should probably happen for non-api submissions as well, but
     # that'll take some further investigation/testing.
     submission_type = params[:submission][:submission_type]
-    unless API_SUBMISSION_TYPES.key?(submission_type) && @assignment.submission_types_array.include?(submission_type)
+    unless allowed_api_submission_type?(submission_type)
       render(:json => { :message => "Invalid submission[submission_type] given" }, :status => 400)
       return false
     end
@@ -526,7 +534,8 @@ class SubmissionsController < ApplicationController
           :group_comment => params[:submission][:group_comment],
           :hidden => @assignment.muted? && admin_in_context,
           :provisional => provisional,
-          :final => params[:submission][:final]
+          :final => params[:submission][:final],
+          :draft_comment => Canvas::Plugin.value_to_boolean(params[:submission][:draft_comment])
         }
       end
       begin

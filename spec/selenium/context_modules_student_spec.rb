@@ -71,7 +71,6 @@ describe "context modules" do
       # shouldn't show the teacher's "show student progression" button
       expect(f("#content")).not_to contain_css('.module_progressions_link')
 
-      context_modules = ff('.context_module')
       #initial check to make sure everything was setup correctly
       ff('.context_module .progression_container').each do |item|
         expect(item.text.strip).to be_blank
@@ -149,7 +148,7 @@ describe "context modules" do
       expect(f('#module_prerequisites_list')).to be_displayed
     end
 
-    it "should validate that a student can't get to locked external items" do
+    it "should validate that a student can't get to locked external items", priority: "1", test_id: 2624906 do
       external_tool = @course.context_external_tools.create!(:url => "http://example.com/ims/lti",
           :consumer_key => "asdf", :shared_secret => "hjkl", :name => "external tool")
 
@@ -360,7 +359,7 @@ describe "context modules" do
         verify_next_and_previous_buttons_display
       end
 
-      it "should show previous and next buttons for external tools" do
+      it "should show previous and next buttons for external tools", priority: "2", test_id: 2624907 do
         get "/courses/#{@course.id}/modules/items/#{@external_tool_tag.id}"
         verify_next_and_previous_buttons_display
       end
@@ -648,93 +647,107 @@ describe "context modules" do
     end
   end
 
-  it "should fetch locked module prerequisites" do
-    @module = @course.context_modules.create!(:name => "module", :require_sequential_progress => true)
-    @assignment = @course.assignments.create!(:title => "assignment")
-    @assignment2 = @course.assignments.create!(:title => "assignment2")
+  context "module visibility as a student" do
+    before :once do
+      @module = @course.context_modules.create!(name: "module")
+    end
 
-    @tag1 = @module.add_item :id => @assignment.id, :type => 'assignment'
-    @tag2 = @module.add_item :id => @assignment2.id, :type => 'assignment'
+    before :each do
+      user_session(@student)
+    end
 
-    @module.completion_requirements = {@tag1.id => {:type => 'must_view'}, @tag2.id => {:type => 'must_view'}}
-    @module.save!
+    it "should fetch locked module prerequisites" do
+      @module.require_sequential_progress = true
+      @assignment = @course.assignments.create!(title: "assignment")
+      @assignment2 = @course.assignments.create!(title: "assignment2")
 
-    user_session(@student)
+      @tag1 = @module.add_item id: @assignment.id, type: 'assignment'
+      @tag2 = @module.add_item id: @assignment2.id, type: 'assignment'
 
-    get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
+      @module.completion_requirements = {@tag1.id => {type: 'must_view'}, @tag2.id => {type: 'must_view'}}
+      @module.save!
 
-    wait_for_ajaximations
-    expect(f("#module_prerequisites_list")).to be_displayed
-    expect(f(".module_prerequisites_fallback")).to_not be_displayed
-  end
+      get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
 
-  it "should validate that a student can see published and not see unpublished context module", priority: "1", test_id: 126744 do
-    @module = @course.context_modules.create!(name: "module")
-    @module_1 = @course.context_modules.create!(name: "module_1")
-    @module_1.workflow_state = 'unpublished'
-    @module_1.save!
-    user_session(@student)
-    go_to_modules
-    # for a11y there is a hidden header now that gets read as part of the text hence the regex matching
-    expect(f("#context_modules").text).to match(/module\s*module/)
-    expect(f("#context_modules")).not_to include_text "module_1"
-  end
+      wait_for_ajaximations
+      expect(f("#module_prerequisites_list")).to be_displayed
+      expect(f(".module_prerequisites_fallback")).to_not be_displayed
+    end
 
-  it "should unlock module after a given date", priority: "1", test_id: 126746 do
-    mod_lock = @course.context_modules.create! name: 'a_locked_mod', unlock_at: 1.day.ago
-    user_session(@student)
-    go_to_modules
-    expect(fj("#context_module_content_#{mod_lock.id} .unlock_details")).not_to include_text 'Will unlock'
-  end
+    it "should validate that a student can see published and not see unpublished context module", priority: "1", test_id: 126744 do
+      @module_1 = @course.context_modules.create!(name: "module_1")
+      @module_1.workflow_state = 'unpublished'
+      @module_1.save!
+      go_to_modules
+      # for a11y there is a hidden header now that gets read as part of the text hence the regex matching
+      expect(f("#context_modules").text).to match(/module\s*module/)
+      expect(f("#context_modules")).not_to include_text "module_1"
+    end
 
-  it "should mark locked but visible assignments/quizzes/discussions as read" do
-    # setting lock_at in the past will cause assignments/quizzes/discussions to still be visible
-    # they just can't be submitted to anymore
+    it "should unlock module after a given date", priority: "1", test_id: 126746 do
+      @module.unlock_at = 1.day.ago
+      @module.save!
+      go_to_modules
+      expect(fj("#context_module_content_#{@module.id} .unlock_details")).not_to include_text 'Will unlock'
+    end
 
-    mod = @course.context_modules.create!(:name => "module")
+    it "should mark locked but visible assignments/quizzes/discussions as read" do
+      # setting lock_at in the past will cause assignments/quizzes/discussions to still be visible
+      # they just can't be submitted to anymore
 
-    asmt = @course.assignments.create!(:title => "assmt", :lock_at => 1.day.ago)
-    topic_asmt = @course.assignments.create!(:title => "topic assmt", :lock_at => 2.days.ago)
+      asmt = @course.assignments.create!(title: "assmt", lock_at: 1.day.ago)
+      topic_asmt = @course.assignments.create!(title: "topic assmt", lock_at: 2.days.ago)
 
-    topic = @course.discussion_topics.create!(:title => "topic", :assignment => topic_asmt)
-    quiz = @course.quizzes.create!(:title => "quiz", :lock_at => 3.days.ago)
-    quiz.publish!
+      topic = @course.discussion_topics.create!(title: "topic", assignment: topic_asmt)
+      quiz = @course.quizzes.create!(title: "quiz", lock_at: 3.days.ago)
+      quiz.publish!
 
 
-    tag1 = mod.add_item({:id => asmt.id, :type => 'assignment'})
-    tag2 = mod.add_item({:id => topic.id, :type => 'discussion_topic'})
-    tag3 = mod.add_item({:id => quiz.id, :type => 'quiz'})
+      tag1 = @module.add_item({id: asmt.id, type: 'assignment'})
+      tag2 = @module.add_item({id: topic.id, type: 'discussion_topic'})
+      tag3 = @module.add_item({id: quiz.id, type: 'quiz'})
 
-    mod.completion_requirements = {tag1.id => {:type => 'must_view'}, tag2.id => {:type => 'must_view'}, tag3.id => {:type => 'must_view'}}
-    mod.save!
+      @module.completion_requirements = {tag1.id => {type: 'must_view'}, tag2.id => {type: 'must_view'}, tag3.id => {type: 'must_view'}}
+      @module.save!
 
-    user_session(@student)
+      get "/courses/#{@course.id}/assignments/#{asmt.id}"
+      expect(f("#assignment_show")).to include_text("This assignment was locked")
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+      expect(f("#discussion_topic")).to include_text("This topic was locked")
+      get "/courses/#{@course.id}/quizzes/#{quiz.id}"
+      expect(f(".lock_explanation")).to include_text("This quiz was locked")
 
-    get "/courses/#{@course.id}/assignments/#{asmt.id}"
-    expect(f("#assignment_show")).to include_text("This assignment was locked")
-    get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
-    expect(f("#discussion_topic")).to include_text("This topic was locked")
-    get "/courses/#{@course.id}/quizzes/#{quiz.id}"
-    expect(f(".lock_explanation")).to include_text("This quiz was locked")
+      prog = @module.evaluate_for(@student)
+      expect(prog).to be_completed
+      expect(prog.requirements_met.count).to eq 3
+    end
 
-    prog = mod.evaluate_for(@student)
-    expect(prog).to be_completed
-    expect(prog.requirements_met.count).to eq 3
-  end
+    it "does not show past due when due date changed for already submitted quizzes", priority: "2", test_id: 1041397 do
+      quiz = @course.quizzes.create!(title: "test quiz")
+      quiz.publish!
+      tag = @module.add_item({type: 'quiz', id: quiz.id})
+      submission = quiz.generate_submission(@student)
+      submission.workflow_state = 'complete'
+      submission.save!
+      quiz.due_at = Time.zone.now - 2.days
+      quiz.save!
+      go_to_modules
+      # validate that there is no warning icon for past due
+      validate_context_module_item_icon(tag.id, 'no-icon')
+    end
 
-  it "should not lock a page module item on first load" do
-    user_session(@student)
-    page = @course.wiki.wiki_pages.create!(:title => "some page", :body => "some body")
-    page.set_as_front_page!
+    it "should not lock a page module item on first load" do
+      page = @course.wiki.wiki_pages.create!(title: "some page", body: "some body")
+      page.set_as_front_page!
 
-    mod = @course.context_modules.create!(:name => "module")
-    tag = mod.add_item({:id => page.id, :type => 'wiki_page'})
-    mod.require_sequential_progress = true
-    mod.completion_requirements = {tag.id => {:type => 'must_view'}}
-    mod.save!
+      tag = @module.add_item({id: page.id, type: 'wiki_page'})
+      @module.require_sequential_progress = true
+      @module.completion_requirements = {tag.id => {type: 'must_view'}}
+      @module.save!
 
-    get "/courses/#{@course.id}/pages/#{page.url}"
+      get "/courses/#{@course.id}/pages/#{page.url}"
 
-    expect(f('.user_content')).to include_text(page.body)
+      expect(f('.user_content')).to include_text(page.body)
+    end
   end
 end

@@ -32,7 +32,7 @@
       <div class="post-grades-button-placeholder">
         <button id="keyboard-shortcuts" class="Button--icon-action Button--active" type="button">
           <span class="screenreader-only"><%= t('Keyboard Shortcuts') %></span>
-          <i class="icon-info"></i>
+          <i class="icon-keyboard-shortcuts"></i>
         </button>
         <% if @post_grades_tools.count > 1 %>
           <button id="post_grades" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><%= t('Post Grades') %></button>
@@ -117,7 +117,7 @@
           <li><a data-arrange-columns-by="assignment_group" href="#"><label><%= t('Arrange columns by assignment group') %><input type="radio" name="arrange-columns-by" /></label></a></li>
           <li><a href="#"><label><%= t('Show Attendance Columns') %> <input type="checkbox" id="show_attendance" /></label></a></li>
           <li id="include-ungraded-list-item"><a href="#"><label><%= t("Treat Ungraded as 0") %><input type="checkbox" id="include_ungraded_assignments" /></label></a></li>
-          <li><a href="#"><label><%= t("Show Concluded Enrollments") %><input type="checkbox" id="show_concluded_enrollments" /></label></a></li>
+          <li class="<% if @course_is_concluded %>ui-state-disabled<% end %>"><a href="#"><label><%= t("Show Concluded Enrollments") %><input type="checkbox" id="show_concluded_enrollments" /></label></a></li>
           <li><a href="#"><label><%= t("Show Inactive Enrollments") %><input type="checkbox" id="show_inactive_enrollments" /></label></a></li>
         </ul>
       </div>

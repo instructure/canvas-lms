@@ -26,6 +26,8 @@ module CC
       WikiPages::ScopedToUser.new(@course, @user, scope).scope.each do |page|
         next unless export_object?(page)
         begin
+          add_exported_asset(page)
+
           migration_id = CCHelper.create_key(page)
           file_name = "#{page.url}.html"
           relative_path = File.join(CCHelper::WIKI_FOLDER, file_name)

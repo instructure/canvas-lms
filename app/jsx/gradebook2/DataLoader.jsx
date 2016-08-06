@@ -118,5 +118,5 @@ define(['jquery', 'jsx/gradebook2/CheatDepaginator', 'underscore'], ($, cheaterD
     };
   };
 
-  return loadGradebookData;
+  return { loadGradebookData: loadGradebookData, getDataForColumn: getDataForColumn };
 });

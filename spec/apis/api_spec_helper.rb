@@ -131,7 +131,8 @@ end
 def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   path = path.sub(%r{\Ahttps?://[^/]+}, '') # remove protocol+host
   enable_forgery_protection do
-    params_from_with_nesting(method, path).each do |key, value|
+    route_params = params_from_with_nesting(method, path)
+    route_params.each do |key, value|
       expect(params[key].to_s).to eq(value.to_s), lambda{ "Expected value of params[\'#{key}\'] to equal #{value}, actual: #{params[key]}"}
     end
     if @use_basic_auth
@@ -147,7 +148,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
       end
     end
     LoadAccount.stubs(:default_domain_root_account).returns(opts[:domain_root_account]) if opts.has_key?(:domain_root_account)
-    __send__(method, path, params.reject { |k,v| %w(controller action).include?(k.to_s) }.merge(body_params), headers)
+    __send__(method, path, params.reject { |k,v| route_params.keys.include?(k.to_sym) }.merge(body_params), headers)
   end
 end
 

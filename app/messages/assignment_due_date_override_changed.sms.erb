@@ -1,8 +1,8 @@
-<%= t('assignment_due_date_changed', '%{assignment_name}, %{course_name} (%{override}) is now due:', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :override => asset.title) %>
 <% if asset.due_at %>
+  <%= t('%{assignment_name}, %{course_name} (%{override}) is now due', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :override => asset.title) %>
   <%= datetime_string(force_zone(asset.due_at)) %>
 <% else %>
-  <%= t('no_due_date', 'No Due Date') %>
+  <%= t('%{assignment_name}, %{course_name} (%{override}) no longer has a due date', :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name, :override => asset.title) %>
 <% end %>
 
 <%= t('more_info_at_url', 'More info at %{web_address}', :web_address => HostUrl.context_host(asset.assignment.context)) %>

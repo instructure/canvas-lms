@@ -3,11 +3,12 @@ define [
   'underscore'
   'i18n!react_files'
   'react'
+  'react-dom'
   '../modules/customPropTypes'
   '../modules/filesEnv'
   '../utils/omitEmptyValues'
   'compiled/react/shared/utils/withReactElement'
-  ], ($, _, I18n, React, customPropTypes, filesEnv, omitEmptyValues, withReactElement) ->
+  ], ($, _, I18n, React, ReactDOM, customPropTypes, filesEnv, omitEmptyValues, withReactElement) ->
 
   contentOptions = [{
       display:  I18n.t("Choose usage rights..."),
@@ -56,9 +57,9 @@ define [
     # Exposes the selected values to the outside world.
     getValues: ->
       obj =
-        use_justification: @refs.usageRightSelection.getDOMNode().value
-        copyright: @refs.copyright?.getDOMNode()?.value if @state.showTextBox
-        cc_license: @refs.creativeCommons?.getDOMNode()?.value if @state.showCreativeCommonsOptions
+        use_justification: ReactDOM.findDOMNode(@refs.usageRightSelection).value
+        copyright: ReactDOM.findDOMNode(@refs.copyright)?.value if @state.showTextBox
+        cc_license: ReactDOM.findDOMNode(@refs.creativeCommons)?.value if @state.showCreativeCommonsOptions
 
       omitEmptyValues obj
 

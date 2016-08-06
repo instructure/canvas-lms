@@ -51,7 +51,7 @@ describe "speed grader - discussion submissions" do
       expect(f('#main')).to include_text(@first_message)
       expect(f('#main')).not_to include_text(@second_message)
     end
-    f('#gradebook_header a.next').click
+    f('#next-student-button').click
     wait_for_ajax_requests
     in_frame 'speedgrader_iframe' do
       expect(f('#main')).not_to include_text(@first_message)

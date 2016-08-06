@@ -12,7 +12,7 @@
     {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED }}
       <ul id="discussion-edit-header-tabs">
        <li><a href="#discussion-details-tab" id="details_link">{{#t}}Details{{/t}}</a></li>
-       <li><a href="#discussion-conditional-release-tab" id="conditional_release_link">{{#t}}Conditional Content{{/t}}</a></li>
+       <li><a href="#discussion-conditional-release-tab" id="conditional_release_link">{{#t}}Mastery Paths{{/t}}</a></li>
        <span id="discussion-edit-header-spacer"></span>
        {{>  DiscussionTopics/publishedButton }}
       </ul>
@@ -262,7 +262,7 @@
                    value="{{assignment.pointsPossible}}" />
           </div>
             <div id=discussion_point_change_warning class="alert form-column-right">
-                {{#t}}If you change an assignment's points possible you must regrade the assignment.{{/t}}
+                {{#t}}If you change an assignment's points possible, existing grades will be automatically scaled.{{/t}}
             </div>
         </div>
 

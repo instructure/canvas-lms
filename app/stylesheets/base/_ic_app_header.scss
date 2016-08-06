@@ -1,3 +1,5 @@
+@mixin primary-nav-badge-border($border-color) { box-shadow: 0 0 0 2px $border-color; }
+
 @if $use_new_styles {
 
   /// These are editable variables from the theme editor.
@@ -19,7 +21,6 @@
   $ic-subnav-tray-bgd: black;
   $ic-logomark-url: url("/images/svg-icons/svg_canvas_logomark_only.svg");
 
-  @mixin primary-nav-badge-border($border-color) { box-shadow: 0 0 0 2px $border-color; }
 
   .ic-app-header {
     box-sizing: border-box;

@@ -147,7 +147,7 @@ describe "Screenreader Gradebook" do
     click_option '#assignment_select', assignment.name
     f('#assignment_muted_check').click
     wait_for_ajaximations
-    fj('.ui-dialog:visible button').click
+    fj('.ui-dialog:visible [data-action="mute"]').click
     wait_for_ajaximations
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
@@ -166,7 +166,7 @@ describe "Screenreader Gradebook" do
     click_option '#assignment_select', assignment.name
     f('#assignment_muted_check').click
     wait_for_ajaximations
-    fj('.ui-dialog:visible button').click
+    fj('.ui-dialog:visible [data-action="unmute"]').click
     wait_for_ajaximations
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"

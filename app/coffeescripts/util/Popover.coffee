@@ -47,6 +47,9 @@ define [
       @show(triggerEvent)
 
     show: (triggerEvent) ->
+      # when the popover is open, we don't want SR users to be able to navigate to the flash messages
+      $.screenReaderFlashMessageExclusive('')
+
       popoverToHide.hide() while popoverToHide = activePopovers.pop()
       activePopovers.push(this)
       id = "popover-#{idCounter++}"
@@ -69,6 +72,8 @@ define [
             @el.find(':tabbable').first().focus()
           , 100
         )
+
+      document.querySelector('#application').setAttribute('aria-hidden', 'true')
 
       # handle sticking the carat right above where you clicked on the button, bounded by the dialog
       @el.find(".ui-menu-carat").remove()
@@ -93,6 +98,9 @@ define [
       clearInterval @positionInterval
       $(window).unbind 'click', @outsideClickHandler
       @restoreFocus()
+
+      if activePopovers.length == 0
+        document.querySelector('#application').setAttribute('aria-hidden', 'false')
 
     ignoreOutsideClickSelector: '.ui-dialog'
 

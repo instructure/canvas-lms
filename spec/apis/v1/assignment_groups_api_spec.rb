@@ -69,7 +69,7 @@ module AssignmentGroupsApiSpecHelper
     @group1_assignment_today = @course.assignments.create!(:assignment_group => @group1, :due_at => Time.zone.now)
     @group1_assignment_future = @course.assignments.create!(:assignment_group => @group1, :due_at => 3.months.from_now)
     @group2_assignment_today = @course.assignments.create!(:assignment_group => @group2, :due_at => Time.zone.now)
-    gpg = Factories::GradingPeriodGroupHelper.new.create_for_course(@course)
+    gpg = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
     @gp_current = gpg.grading_periods.create!(
       title: 'current',
       weight: 50,
@@ -232,7 +232,7 @@ describe AssignmentGroupsController, type: :request do
     it "should only return visible assignments when differentiated assignments is on" do
       setup_groups
       setup_four_assignments(only_visible_to_overrides: true)
-      @user.enrollments.each(&:delete)
+      @user.enrollments.each(&:destroy_permanently!)
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @user)
       # make a1 and a3 visible

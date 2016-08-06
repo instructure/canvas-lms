@@ -3,6 +3,7 @@ module DataFixup
     def self.columns_hash
       result = ActiveRecord::Base.all_models.map do |model|
         next unless model.superclass == ActiveRecord::Base
+        next unless model.connection.table_exists?(model.table_name)
         next if model.name == 'RemoveQuizDataIds::QuizQuestionDataMigrationARShim'
 
         attributes = model.serialized_attributes.select do |attr, coder|

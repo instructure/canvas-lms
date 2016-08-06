@@ -3,13 +3,12 @@
 
 $subdued-text-color: #696969;
 $darkened-text-color: #4d4d4d;
-@if $use_new_styles {
-  $published-text-color: $ic-color-success;
-  $unpublished-text-color: $ic-font-color--subdued;
-  $published-icon-color: $ic-color-success;
-  $unpublished-icon-color: $ic-font-color--subdued;
-}
-@else {
+
+$published-text-color: $ic-color-success;
+$unpublished-text-color: $ic-font-color--subdued;
+$published-icon-color: $ic-color-success;
+$unpublished-icon-color: $ic-font-color--subdued;
+@if not $use_new_styles {
   $published-text-color: #33802a;
   $unpublished-text-color: $subdued-text-color;
   $published-icon-color: #33802a;
@@ -17,28 +16,24 @@ $darkened-text-color: #4d4d4d;
 }
 
 
-@if $use_new_styles { $border-color: $ic-border-light; }
-@else { $border-color: #c1c7cf; }
+$border-color: $ic-border-light;
+@if not $use_new_styles { $border-color: #c1c7cf; }
 
-@if $use_new_styles { $border-radius: $baseBorderRadius; }
-@else { $border-radius: 3px; }
+$border-radius: $baseBorderRadius;
+@if not $use_new_styles { $border-radius: 3px; }
 
-@if $use_new_styles {
-  $pages-border: 1px solid $ic-border-light;
-  $pages-dashed-border: 1px dashed $ic-border-light;
-  $pages-inner-border: 1px solid $ic-border-light;
-}
-@else {
+$pages-border: 1px solid $ic-border-light;
+$pages-dashed-border: 1px dashed $ic-border-light;
+$pages-inner-border: 1px solid $ic-border-light;
+@if not $use_new_styles {
   $pages-border: 1px solid #c1c7cf;
   $pages-dashed-border: 1px dashed #c1c7cf;
   $pages-inner-border: 1px solid #e1e3e4;
 }
 
-@if $use_new_styles {
-  $index-background: $ic-color-light;
-  $item-background: $lightBackground;
-}
-@else {
+$index-background: $ic-color-light;
+$item-background: $lightBackground;
+@if not $use_new_styles {
   $index-background: #e8ecef;
   $item-background: #ffffff;
 }
@@ -361,8 +356,9 @@ $revision-button-hover-color: $ic-brand-primary;
   .show-content {
     overflow-x: auto;
     @if $use_new_styles {
+      box-sizing: border-box;
       padding: 0 $ic-sp;
-      @include breakpoint(desktop) { padding: 0 $ic-sp*3 0 $ic-sp*2; }
+      @include breakpoint(desktop) { padding: 0 $ic-sp*2 0 $ic-sp; }
     }
     @else {
       padding: 15px 25px;
@@ -441,7 +437,6 @@ $revision-button-hover-color: $ic-brand-primary;
   .show-content {
     @if $use_new_styles {
       @include breakpoint(desktop) {
-        float: left;
         margin-right: $revision-sidebar-width;
       }
     }
@@ -561,6 +556,8 @@ $revision-button-hover-color: $ic-brand-primary;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-size: 12px;
+        color: #333;
       }
     }
     &:not(.selected):hover {

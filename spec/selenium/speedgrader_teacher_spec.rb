@@ -39,7 +39,7 @@ describe "speed grader" do
     it "lists the correct number of students", priority: "2", test_id: 283737 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-      expect(f("#x_of_x_students")).to include_text("1 of 1")
+      expect(f("#x_of_x_students_frd")).to include_text("1/1")
       expect(ff("#students_selectmenu-menu li").count).to eq 1
     end
   end
@@ -76,136 +76,6 @@ describe "speed grader" do
     end
   end
 
-
-
-  it "creates a comment on assignment", priority: "1", test_id: 283754 do
-    #pending("failing because it is dependant on an external kaltura system")
-
-    student_submission
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
-
-    #check media comment
-    f('#add_a_comment .media_comment_link').click
-    expect(f("#audio_record_option")).to be_displayed
-    expect(f("#video_record_option")).to be_displayed
-    close_visible_dialog
-    expect(f("#audio_record_option")).not_to be_displayed
-
-    #check for file upload comment
-    f('#add_attachment').click
-    expect(f('#comment_attachments input')).to be_displayed
-    f('#comment_attachments a').click
-    expect(f("#comment_attachments")).not_to contain_css("input")
-
-    #add comment
-    f('#add_a_comment > textarea').send_keys('grader comment')
-    submit_form('#add_a_comment')
-    expect(f('#comments > .comment')).to be_displayed
-    expect(f('#comments > .comment')).to include_text('grader comment')
-
-    #make sure gradebook link works
-    expect_new_page_load do
-      f('#speed_grader_gradebook_link').click
-    end
-    expect(fj('body.grades')).to be_displayed
-  end
-
-  it "shows comment post time", priority: "1", test_id: 283755 do
-    @submission = student_submission
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
-
-    #add comment
-    f('#add_a_comment > textarea').send_keys('grader comment')
-    submit_form('#add_a_comment')
-    expect(f('#comments > .comment')).to be_displayed
-    @submission.reload
-    @comment = @submission.submission_comments.first
-
-    # immediately from javascript
-    extend TextHelper
-    expected_posted_at = datetime_string(@comment.created_at).gsub(/\s+/, ' ')
-    expect(f('#comments > .comment .posted_at')).to include_text(expected_posted_at)
-
-    # after refresh
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
-    expect(f('#comments > .comment .posted_at')).to include_text(expected_posted_at)
-  end
-
-  it "properly shows avatar images only if avatars are enabled on the account", priority: "1", test_id: 283756 do
-    # enable avatars
-    @account = Account.default
-    @account.enable_service(:avatars)
-    @account.save!
-    expect(@account.service_enabled?(:avatars)).to be_truthy
-
-    student_submission
-
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
-
-    # make sure avatar shows up for current student
-    expect(ff("#avatar_image").length).to eq 1
-    expect(f("#avatar_image")).not_to have_attribute('src', 'blank.png')
-
-    #add comment
-    f('#add_a_comment > textarea').send_keys('grader comment')
-    submit_form('#add_a_comment')
-    expect(f('#comments > .comment')).to be_displayed
-    expect(f('#comments > .comment')).to include_text('grader comment')
-
-    # make sure avatar shows up for user comment
-    expect(ff("#comments > .comment .avatar")[0]).to have_attribute('style', "display: inline\;")
-    # disable avatars
-    @account = Account.default
-    @account.disable_service(:avatars)
-    @account.save!
-    expect(@account.service_enabled?(:avatars)).to be_falsey
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
-
-    expect(f("#content")).not_to contain_css("#avatar_image")
-    expect(ff("#comments > .comment .avatar").length).to eq 1
-    expect(ff("#comments > .comment .avatar")[0]).to have_attribute('style', "display: none\;")
-  end
-
-  it "hides student names and avatar images if Hide student names is checked", priority: "1", test_id: 283757 do
-    # enable avatars
-    @account = Account.default
-    @account.enable_service(:avatars)
-    @account.save!
-    expect(@account.service_enabled?(:avatars)).to be_truthy
-
-    sub = student_submission
-    sub.add_comment(:comment => "ohai teacher")
-
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    expect(f("#avatar_image")).to be_displayed
-
-    f("#settings_link").click
-    f('#hide_student_names').click
-    expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-    wait_for_ajaximations
-
-    expect(f("#avatar_image")).not_to be_displayed
-    expect(f('#students_selectmenu-button .ui-selectmenu-item-header')).to include_text "Student 1"
-
-    expect(f('#comments > .comment')).to include_text('ohai')
-    expect(f("#comments > .comment .avatar")).not_to be_displayed
-    expect(f('#comments > .comment .author_name')).to include_text('Student')
-
-    # add teacher comment
-    f('#add_a_comment > textarea').send_keys('grader comment')
-    submit_form('#add_a_comment')
-    expect(ff('#comments > .comment')).to have_size(2)
-
-    # make sure name and avatar show up for teacher comment
-    expect(ffj("#comments > .comment .avatar:visible").size).to eq 1
-    expect(ff('#comments > .comment .author_name')[1]).to include_text('nobody@example.com')
-  end
-
   it "does not show students in other sections if visibility is limited", priority: "1", test_id: 283758 do
     @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     student_submission
@@ -219,6 +89,9 @@ describe "speed grader" do
   end
 
   it "displays inactive students" do
+    @teacher.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
+    @teacher.save
+
     student_submission(:username => 'inactivestudent@example.com')
     en = @student.student_enrollments.first
     en.deactivate
@@ -228,6 +101,21 @@ describe "speed grader" do
 
     expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
     expect(f('#enrollment_inactive_notice').text).to eq 'Notice: Inactive Student'
+  end
+
+  it "can grade and comment inactive students" do
+    skip "Skipped because this spec fails if not run in foreground\n"\
+      "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
+
+    @teacher.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
+    @teacher.save
+
+    student_submission(:username => 'inactivestudent@example.com')
+    en = @student.student_enrollments.first
+    en.deactivate
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
 
     replace_content f('#grading-box-extended'), "5", tab_out: true
     wait_for_ajaximations
@@ -238,6 +126,23 @@ describe "speed grader" do
     f('#add_a_comment button[type="submit"]').click
     wait_for_ajaximations
     expect(@submission.submission_comments.first.comment).to eq 'srsly'
+    # doesn't get inserted into the menu
+    expect(f('#students_selectmenu')).not_to contain_css('#section-menu')
+  end
+
+  it "displays concluded students" do
+    @teacher.preferences = { gradebook_settings: { @course.id => { 'show_concluded_enrollments' => 'true' } } }
+    @teacher.save
+
+    student_submission(:username => 'inactivestudent@example.com')
+    en = @student.student_enrollments.first
+    en.conclude
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
+    expect(f('#enrollment_concluded_notice').text).to eq 'Notice: Concluded Student'
   end
 
   context "multiple enrollments" do
@@ -336,7 +241,7 @@ describe "speed grader" do
       f("#students_selectmenu-button").click
       hover(f("#section-menu-link"))
       wait_for_ajaximations
-      expect(f("#section-menu .ui-menu")).to include_text("Show all sections")
+      expect(f("#section-menu .ui-menu")).to include_text("Show All Sections")
     end
 
     it "should list all course sections", priority: "2", test_id: "588914" do

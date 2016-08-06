@@ -1,10 +1,11 @@
 define([
   'underscore',
   'react',
+  'react-dom',
   'jsx/files/MoveDialog',
   'compiled/react_files/modules/filesEnv',
   'jquery'
-], function (_, React, MoveDialog, filesEnv, $) {
+], function (_, React, ReactDOM, MoveDialog, filesEnv, $) {
 
   function openMoveDialog (thingsToMove, {contextType, contextId, returnFocusTo, clearSelectedItems, onMove}) {
 
@@ -15,7 +16,7 @@ define([
     const $moveDialog = $('<div>').appendTo(document.body);
 
     const handleClose = () => {
-      React.unmountComponentAtNode($moveDialog[0]);
+      ReactDOM.unmountComponentAtNode($moveDialog[0]);
       $moveDialog.remove();
       $(returnFocusTo).focus();
     };
@@ -24,7 +25,7 @@ define([
       onMove(models) && clearSelectedItems();
     };
 
-    React.render(
+    ReactDOM.render(
       <MoveDialog
         thingsToMove={thingsToMove}
         rootFoldersToShow={(filesEnv.showingAllContexts) ? filesEnv.rootFolders : [rootFolderToShow] }

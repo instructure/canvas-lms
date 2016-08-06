@@ -40,9 +40,9 @@ define([
     const actualContent = TestUtils.findRenderedDOMComponentWithTag(component, "p").getDOMNode().innerText
     const actualHeader = TestUtils.findRenderedDOMComponentWithClass(component, "ic-Action-header__Heading").getDOMNode().innerText;
     const actualLinkText = TestUtils.findRenderedDOMComponentWithTag(component, "a").getDOMNode().innerText
-    const expectedHeader = "No LTIs Configured"
-    const expectedContent = "There are no Configured LTIs that interact with collaborations."
-    const expectedLinkText = "Set some up now"
+    const expectedHeader = "No Collaboration Apps"
+    const expectedContent = "Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Get started by adding a collaboration app."
+    const expectedLinkText = "Learn more about collaborations"
     ok(expectedHeader === actualHeader);
     ok(expectedContent === actualContent);
     ok(expectedLinkText === actualLinkText);
@@ -54,8 +54,8 @@ define([
     let component = TestUtils.renderIntoDocument(<GettingStartedCollaborations {...props}/>);
     const actualContent = TestUtils.findRenderedDOMComponentWithTag(component, "p").getDOMNode().innerText
     const actualHeader = TestUtils.findRenderedDOMComponentWithClass(component, "ic-Action-header__Heading").getDOMNode().innerText;
-    const expectedHeader = "No LTIs Configured"
-    const expectedContent = "You have no LTIs configured to create collaborations with. Talk to your teacher to get some set up."
+    const expectedHeader = "No Collaboration Apps"
+    const expectedContent = "You have no Collaboration apps configured. Talk to your teacher to get some set up."
     ok(expectedHeader === actualHeader);
     ok(expectedContent === actualContent);
     ok(TestUtils.scryRenderedDOMComponentsWithTag(component, "a").length === 0)

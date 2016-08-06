@@ -2,6 +2,7 @@ define([
   'jquery',
   'i18n!react_files',
   'react',
+  'react-dom',
   'page',
   'compiled/react_files/components/Toolbar',
   'compiled/react_files/modules/FocusStore',
@@ -11,17 +12,17 @@ define([
   'classnames',
   'compiled/fn/preventDefault',
   'compiled/models/Folder'
-], function ($, I18n, React, page, Toolbar, FocusStore, openMoveDialog, deleteStuff, UploadButton, classnames, preventDefault, Folder) {
+], function ($, I18n, React, ReactDOM, page, Toolbar, FocusStore, openMoveDialog, deleteStuff, UploadButton, classnames, preventDefault, Folder) {
 
   Toolbar.openPreview = function () {
-    FocusStore.setItemToFocus(this.refs.previewLink.getDOMNode());
+    FocusStore.setItemToFocus(ReactDOM.findDOMNode(this.refs.previewLink));
     const queryString  = $.param(this.props.getPreviewQuery());
     page(`${this.props.getPreviewRoute()}?${queryString}`);
   };
 
   Toolbar.onSubmitSearch = function (event) {
     event.preventDefault();
-    const searchTerm = this.refs.searchTerm.getDOMNode().value;
+    const searchTerm = ReactDOM.findDOMNode(this.refs.searchTerm).value;
     page(`/search?search_term=${searchTerm}`);
   };
 
@@ -124,7 +125,6 @@ define([
       if ((this.props.selectedItems.length === 1) && this.props.selectedItems[0].get('url')) {
         return (
           <a
-            tabIndex= {this.tabIndex}
             className= 'ui-button btn-download'
             href= {this.props.selectedItems[0].get('url')}
             download= {true}
@@ -188,9 +188,6 @@ define([
     var canManage = this.props.userCanManageFilesForContext && !submissionsFolderSelected;
 
     this.showingButtons = this.props.selectedItems.length
-    if(!this.showingButtons || selectedItemIsFolder){
-      this.tabIndex = -1;
-    }
 
     if (this.showingButtons === 1) {
       this.downloadTitle = I18n.t('Download');
@@ -256,7 +253,7 @@ define([
               dataTooltip= ''
               ariaDisabled= {!this.showingButtons || selectedItemIsFolder}
               disabled= {!this.showingButtons || selectedItemIsFolder}
-              tabIndex= {this.tabIndex}
+              tabIndex= {selectedItemIsFolder ? -1 : 0}
             >
               <i className= 'icon-eye' />
             </a>
@@ -278,4 +275,3 @@ define([
 
   return React.createClass(Toolbar);
 });
-

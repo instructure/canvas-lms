@@ -212,6 +212,7 @@ class AccountsController < ApplicationController
         priority_zones: localized_timezones(I18nTimeZone.us_zones),
         timezones: localized_timezones(I18nTimeZone.all)
       },
+      BASE_PATH: request.env['PATH_INFO'].sub(/\/search.*/, '') + '/search',
       ALL_ROLES: Role.account_role_data(@account, @current_user),
       URLS: {
         USER_LISTS_URL: course_user_lists_url("{{ id }}"),

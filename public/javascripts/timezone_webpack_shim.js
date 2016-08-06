@@ -8,7 +8,7 @@ if (typeof ENV != 'undefined'){
   }
   if (ENV && ENV.CONTEXT_TIMEZONE) {
     var contextTimezoneData = reqTz("./" + ENV.CONTEXT_TIMEZONE + ".js");
-    tz.preload(contextTimezoneData, ENV.CONTEXT_TIMEZONE);
+    tz.preload(ENV.CONTEXT_TIMEZONE, contextTimezoneData);
   }
   if (ENV && ENV.BIGEASY_LOCALE) {
     var localeData = reqTz("./" + ENV.BIGEASY_LOCALE + ".js");

@@ -7,6 +7,7 @@ module Canvas
     end
 
     KV_NAMESPACE = "config/canvas".freeze
+    TIMEOUT_INTERVAL = 3.freeze
 
     class << self
       attr_accessor :config, :cache, :fallback_data
@@ -77,6 +78,8 @@ module Canvas
             store_put("#{parent_key}/#{child_key}", value)
           end
         end
+      rescue Timeout::Error
+        return false
       end
 
       def store_get(key)
@@ -84,7 +87,7 @@ module Canvas
           # store all values that we get here to
           # kind-of recover in case of big failure
           @strategic_reserve ||= {}
-          consul_value = Canvas.timeout_protection('consul', {raise_on_timeout: true}) do
+          consul_value = Timeout.timeout(TIMEOUT_INTERVAL) do
             diplomat_get(key)
           end
 
@@ -106,7 +109,7 @@ module Canvas
       end
 
       def store_put(key, value)
-        Canvas.timeout_protection('consul') do
+        Timeout.timeout(TIMEOUT_INTERVAL) do
           Diplomat::Kv.put("#{KV_NAMESPACE}/#{key}", value)
         end
       end

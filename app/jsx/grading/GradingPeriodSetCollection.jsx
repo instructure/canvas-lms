@@ -42,10 +42,6 @@ define([
     return "edit-grading-period-set-" + set.id;
   };
 
-  const setFocus = function(ref) {
-    React.findDOMNode(ref).focus();
-  };
-
   const { bool, string, shape } = React.PropTypes;
 
   let GradingPeriodSetCollection = React.createClass({
@@ -78,7 +74,7 @@ define([
     componentDidUpdate(prevProps, prevState) {
       if (prevState.editSet.id && (prevState.editSet.id !== this.state.editSet.id)) {
         let set = {id: prevState.editSet.id};
-        setFocus(this.refs[getShowGradingPeriodSetRef(set)].refs.editButton);
+        this.refs[getShowGradingPeriodSetRef(set)].refs.editButton.focus();
       }
     },
 
@@ -89,7 +85,7 @@ define([
         enrollmentTerms: this.associateTermsWithSet(set.id, termIDs),
         showNewSetForm: false
       }, () => {
-        React.findDOMNode(this.refs.addSetFormButton).focus();
+        this.refs.addSetFormButton.focus();
       });
     },
 
@@ -242,11 +238,11 @@ define([
     nodeToFocusOnAfterSetDeletion(setID) {
       const index = this.state.sets.findIndex(set => set.id === setID);
       if (index < 1) {
-        return React.findDOMNode(this.refs.addSetFormButton);
+        return this.refs.addSetFormButton;
       } else {
         const setRef = getShowGradingPeriodSetRef(this.state.sets[index - 1]);
         const setToFocus = this.refs[setRef];
-        return React.findDOMNode(setToFocus.refs.title);
+        return setToFocus.refs.title;
       }
     },
 
@@ -274,7 +270,7 @@ define([
 
     closeNewSetForm() {
       this.setState({ showNewSetForm: false }, () => {
-        React.findDOMNode(this.refs.addSetFormButton).focus();
+        this.refs.addSetFormButton.focus();
       });
     },
 

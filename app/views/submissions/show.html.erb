@@ -30,6 +30,11 @@
   </style>
 <% end %>
 
+<% if @assignment.omit_from_final_grade %>
+  <div class="alert alert-info omit-from-final-warning">
+    This assignment does not count towards the final grade.
+  </div>
+<% end %>
   <div class="submission-details-header submission_details">
     <div class="submission-details-header__grade-summary">
       <% if @assignment.muted? %>
@@ -68,7 +73,12 @@
           <% end %>
         <% end %>
       <% end %>
-      <% if @rubric_association && (@submission.user_can_read_grade?(@current_user, session) || can_do(@rubric_association, @current_user, :assess)) %>
+      <% if @rubric_association && (
+           @submission.user_can_read_grade?(@current_user, session) ||
+           can_do(@rubric_association, @current_user, :assess) ||
+           can_do(@assignment.rubric, @current_user, :read)
+         )
+      %>
         <a href="#" class="assess_submission_link rubric" style="font-size: 0.8em;" tabindex='0'><%= t('show_rubric', 'Show Rubric') %></a>
       <% end %>
     </div>
@@ -182,7 +192,7 @@
             <% end %>
             <% @submission.visible_submission_comments.each do |comment| %>
               <% if can_do(comment, @current_user, :read) %>
-              <div class="comment" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
+              <div class="comment <%= 'draft' if comment.draft? %>" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
                 <div class="comment" style="color: #444;">
                   <% if comment.media_comment_id && comment.media_comment_type %>
                     <div class="comment_media">

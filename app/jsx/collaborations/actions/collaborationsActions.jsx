@@ -3,12 +3,13 @@ define([
   'i18n!course_wizard',
   'axios',
   'compiled/str/splitAssetString',
-  'jsx/shared/parseLinkHeader'
-], ($, I18n, axios, splitAssetString, parseLinkHeader) => {
+  'jsx/shared/parseLinkHeader',
+  'page'
+], ($, I18n, axios, splitAssetString, parseLinkHeader, page) => {
   const actions = {}
 
   actions.LIST_COLLABORATIONS_START = 'LIST_COLLABORATIONS_START';
-  actions.listCollaborationsStart = () => ({ type: actions.LIST_COLLABORATIONS_START });
+  actions.listCollaborationsStart = (payload) => ({ type: actions.LIST_COLLABORATIONS_START, payload });
 
   actions.LIST_COLLABORATIONS_SUCCESSFUL = 'LIST_COLLABORATIONS_SUCCESSFUL';
   actions.listCollaborationsSuccessful = (payload) => ({ type: actions.LIST_COLLABORATIONS_SUCCESSFUL, payload});
@@ -52,9 +53,9 @@ define([
   actions.UPDATE_COLLABORATION_FAILED = 'UPDATE_COLLABORATION_FAILED'
   actions.updateCollaborationFailed = (error) => ({ type: actions.UPDATE_COLLABORATION_FAILED, payload: error, error: true })
 
-  actions.getCollaborations = (url) => {
+  actions.getCollaborations = (url, newSearch) => {
     return (dispatch, getState) => {
-      dispatch(actions.listCollaborationsStart());
+      dispatch(actions.listCollaborationsStart(newSearch));
 
       axios.get(url)
         .then((response) => {
@@ -105,7 +106,7 @@ define([
       }})
         .then(({ data }) => {
           dispatch(actions.createCollaborationSuccessful(data))
-          dispatch(actions.getCollaborations(`/api/v1/${context}/${contextId}/collaborations`))
+          page(`/${context}/${contextId}/lti_collaborations`)
         })
         .catch(error => {
           dispatch(actions.createCollaborationFailed(error))
@@ -113,14 +114,15 @@ define([
     }
   }
 
-  actions.updateCollaboration = (context, contextId, contentItems) => {
+  actions.updateCollaboration = (context, contextId, contentItems, collaborationId) => {
     return (dispatch) => {
       dispatch(actions.updateCollaborationStart());
-      let url = `/${context}/${contextId}/collaborations/${contentItems.id}`
+      let url = `/${context}/${contextId}/collaborations/${collaborationId}`
       axios.put(url, { contentItems: JSON.stringify(contentItems) }, { headers: {
         'Accept': 'application/json'
       }})
         .then(({ collaboration }) => {
+          page(`/${context}/${contextId}/lti_collaborations`)
           dispatch(actions.updateCollaborationSuccessful(collaboration))
         })
         .catch(error => {
@@ -133,7 +135,7 @@ define([
     return (dispatch) => {
       let [context, contextId] = splitAssetString(ENV.context_asset_string);
       if (data.service_id) {
-        dispatch(actions.updateCollaboration(context, contextId, data.contentItems));
+        dispatch(actions.updateCollaboration(context, contextId, data.contentItems, data.service_id));
       }
       else {
         dispatch(actions.createCollaboration(context, contextId, data.contentItems));

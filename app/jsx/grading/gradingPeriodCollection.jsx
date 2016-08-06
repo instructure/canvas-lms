@@ -69,7 +69,7 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     componentDidUpdate: function(prevProps, prevState) {
       if (prevState.periods) {
         let removedAGradingPeriod = this.state.periods.length < prevState.periods.length;
-        if (removedAGradingPeriod && this.refs.addPeriodButton) React.findDOMNode(this.refs.addPeriodButton).focus();
+        if (removedAGradingPeriod && this.refs.addPeriodButton) this.refs.addPeriodButton.focus();
       }
     },
 

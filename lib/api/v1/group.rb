@@ -19,6 +19,7 @@
 module Api::V1::Group
   include Api::V1::Json
   include Api::V1::Context
+  include Api::V1::Tab
 
   API_GROUP_JSON_OPTS = {
     :only => %w(id name description is_public join_level group_category_id max_membership),
@@ -60,8 +61,8 @@ module Api::V1::Group
     hash['sis_group_id'] = group.sis_source_id if group.context_type == 'Account' && group.account.grants_any_right?(user, session, :read_sis, :manage_sis)
     hash['sis_import_id'] = group.sis_batch_id if group.context_type == 'Account' && group.account.grants_right?(user, session, :manage_sis)
     hash['has_submission'] = group.submission?
-    hash['concluded'] = group.context.concluded?
-
+    hash['concluded'] = group.context.concluded? || group.context.deleted?
+    hash['tabs'] = tabs_available_json(group, user, session, ['external']) if includes.include?('tabs')
     hash
   end
 

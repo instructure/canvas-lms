@@ -1,10 +1,11 @@
 {
   "name": "react-tokeninput",
-  "version": "0.3.6",
+  "version": "2.1.1",
   "description": "Tokeninput component for React",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "build": "NODE_ENV=production webpack index.js dist/react-tokeninput.js && NODE_ENV=production webpack index.js dist/react-tokeninput.min.js --optimize-minimize",
+    "prepublish": "babel src -d lib && npm run build",
+    "build": "NODE_ENV=production webpack --config webpack.dist.config.js",
     "test": "node_modules/.bin/karma start",
     "dev": "webpack --watch --config example/webpack.config.js"
   },
@@ -19,21 +20,32 @@
   },
   "homepage": "https://github.com/instructure/react-tokeninput",
   "devDependencies": {
-    "babel-core": "^4.7.16",
-    "babel-loader": "^4.2.0",
+    "babel-cli": "^6.9.0",
+    "babel-core": "^6.9.0",
+    "babel-eslint": "^4.1.5",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.5.0",
+    "babel-preset-stage-1": "^6.5.0",
     "chai": "^1.10.0",
-    "karma": "^0.12.24",
+    "eslint": "^1.10.1",
+    "karma": "^0.13.0",
     "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "^0.1.5",
+    "karma-chrome-launcher": "^0.2.1",
     "karma-cli": "0.0.4",
-    "karma-firefox-launcher": "^0.1.3",
+    "karma-firefox-launcher": "^0.1.6",
     "karma-jasmine": "^0.2.3",
-    "karma-mocha": "^0.1.9",
+    "karma-mocha": "^0.2.0",
     "karma-webpack": "^1.3.1",
     "lodash-node": "^2.4.1",
     "mocha": "^2.0.1",
-    "react": "^0.12.0",
-    "webpack": "^1.4.13",
-    "webpack-dev-server": "^1.6.5"
+    "react": "^0.14.0",
+    "react-addons-test-utils": "^0.14.6",
+    "react-dom": "^0.14.0",
+    "webpack": "^1.12.2",
+    "webpack-dev-server": "^1.12.0"
+  },
+  "dependencies": {
+    "classnames": "^2.2.1"
   }
 }

@@ -116,23 +116,10 @@ describe "gradebook2 - concluded courses and enrollments" do
   end
 
   context "concluded course" do
-    before do
+    it "does not allow editing grades", priority: "1", test_id: 210027 do
       @course.complete!
       get "/courses/#{@course.id}/gradebook2"
-    end
 
-    it "should show concluded enrollments in concluded courses by default", priority: "1", test_id: 210021 do
-      expect(ff('.student-name').count).to eq @course.all_students.count
-
-      # the checkbox should fire an alert rather than changing to not showing concluded
-      expect_fired_alert do
-        f('#gradebook_settings').click
-        f('label[for="show_concluded_enrollments"]').click
-      end
-      expect(ff('.student-name').count).to eq @course.all_students.count
-    end
-
-    it "does not allow editing grades", priority: "1", test_id: 210027 do
       cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
       expect(cell.text).to eq '10'
       cell.click

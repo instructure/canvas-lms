@@ -75,3 +75,9 @@ define [
 
     document.getElementById('students_selectmenu').dispatchEvent(event)
     equal(fired, true)
+
+  test "Properly replaces the default ui selectmenu icon with the min-arrow-down icon", ->
+    @testArea.innerHTML = '<span class="ui-selectmenu-icon ui-icon"></span>'
+    @selectMenu.replaceDropdownIcon(@testArea)
+
+    equal(@testArea.innerHTML,'<span class="ui-selectmenu-icon"><i class="icon-mini-arrow-down"></i></span>')

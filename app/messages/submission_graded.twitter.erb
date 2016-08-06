@@ -5,4 +5,6 @@
 
 <%= datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set") %>
 
-<% if asset.score && user.try(:send_scores_in_emails?) %><%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %><% end %><%= t(:score_pending_review, "(pending review)") if asset.pending_review? %>
+<% if asset.score && user.try(:send_scores_in_emails?, asset.assignment.context.root_account) %>
+  <%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>
+<% end %><%= t(:score_pending_review, "(pending review)") if asset.pending_review? %>

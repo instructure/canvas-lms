@@ -397,6 +397,7 @@ describe Course do
     end
 
     def make_date_completed
+      @enrollment.reload
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
@@ -3316,6 +3317,34 @@ describe Course, "section_visibility" do
       expect(@course.users_visible_to(@ta).sort_by(&:id)).to      eql [@teacher, @ta, @student1, @observer]
     end
 
+    it "should return users including inactive when included from all sections" do
+      enrollment = @course.enrollments.where(user: @student2).first
+      enrollment.deactivate
+
+      expect(@course.users_visible_to(@teacher, include: [:inactive])).to include(@student2)
+    end
+
+    it "should not return inactive users when not included from all sections" do
+      enrollment = @course.enrollments.where(user: @student2).first
+      enrollment.deactivate
+
+      expect(@course.users_visible_to(@teacher)).not_to include(@student2)
+    end
+
+    it "should return users including concluded when included from all sections" do
+      enrollment = @course.enrollments.where(user: @student2).first
+      enrollment.conclude
+
+      expect(@course.users_visible_to(@teacher, include: [:completed])).to include(@student2)
+    end
+
+    it "should not return concluded users when not included from all sections" do
+      enrollment = @course.enrollments.where(user: @student2).first
+      enrollment.conclude
+
+      expect(@course.users_visible_to(@teacher)).not_to include(@student2)
+    end
+
     it "should return student view students to account admins" do
       @course.student_view_student
       @admin = account_admin_user
@@ -4343,6 +4372,8 @@ describe Course, 'touch_root_folder_if_necessary' do
       expect { course.broadcast_notifications }.to_not raise_error
     end
   end
+
+  it { is_expected.to have_many(:submission_comments).conditions(-> { published }) }
 end
 
 describe Course, 'invited_count_visible_to' do

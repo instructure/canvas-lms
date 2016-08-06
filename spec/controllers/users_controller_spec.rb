@@ -772,7 +772,7 @@ describe UsersController do
     let!(:student_enrollment) do
       course_with_user('StudentEnrollment', course: test_course, user: student, active_all: true)
     end
-    let(:grading_period_group) { group_helper.create_for_course(test_course) }
+    let(:grading_period_group) { group_helper.legacy_create_for_course(test_course) }
     let(:grading_period) do
       grading_period_group.grading_periods.create!(
         title: "Some Semester",
@@ -800,6 +800,7 @@ describe UsersController do
         expect(json_parse(response.body)).to eq expected_response
 
         grading_period.end_date = 4.months.from_now
+        grading_period.close_date = 4.months.from_now
         grading_period.save!
         get('grades_for_student', grading_period_id: grading_period.id,
           enrollment_id: student_enrollment.id)
@@ -847,6 +848,7 @@ describe UsersController do
         expect(json_parse(response.body)).to eq expected_response
 
         grading_period.end_date = 4.months.from_now
+        grading_period.close_date = 4.months.from_now
         grading_period.save!
         get('grades_for_student', grading_period_id: grading_period.id,
           enrollment_id: student_enrollment.id)
@@ -884,7 +886,7 @@ describe UsersController do
       let(:test_course) { course(active_all: true) }
       let(:student1) { user(active_all: true) }
       let(:student2) { user(active_all: true) }
-      let(:grading_period_group) { group_helper.create_for_course(test_course) }
+      let(:grading_period_group) { group_helper.legacy_create_for_course(test_course) }
       let!(:grading_period) do
         grading_period_group.grading_periods.create!(
           title: "Some Semester",

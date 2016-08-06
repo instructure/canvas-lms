@@ -26,7 +26,7 @@ define([
         filters,
         draftFilters: filters,
         errors: {}
-      }
+      };
     },
 
     componentWillMount() {
@@ -61,7 +61,7 @@ define([
     onApplyFilters() {
       var filters = this.state.draftFilters;
       if (filters.search_term && filters.search_term.length < MIN_SEARCH_LENGTH) {
-        this.setState({errors: {search_term: I18n.t("Search term must be at least %{num} characters", {num: MIN_SEARCH_LENGTH})}})
+        this.setState({errors: {search_term: I18n.t("Search term must be at least %{num} characters", {num: MIN_SEARCH_LENGTH})}});
       } else {
         this.setState({filters, errors: {}}, this.fetchCourses);
       }

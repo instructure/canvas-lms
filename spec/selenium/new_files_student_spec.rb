@@ -116,9 +116,9 @@ describe "better_file_browsing" do
 
       it "should let student access files in restricted folder hidden by link", priority: "1", test_id: 134750 do
         set_item_permissions(:restricted_access, :available_with_link)
-        f('.media-body').click
+        f('.ef-name-col__text').click
         wait_for_ajaximations
-        f('.media-body').click
+        f('.ef-name-col__text').click
         wait_for_ajaximations
         file_preview_url = (driver.current_url).match(/\/files.*/)[0]
         student_goto_files

@@ -10,6 +10,9 @@ define [
       @calendar = $(selector)
       @calendar.fullCalendar(_.defaults(
         height: 185
+        buttonSRText:
+          prev: I18n.t('Previous month')
+          next: I18n.t('Next month')
         header:
           left: "prev"
           center: "title"

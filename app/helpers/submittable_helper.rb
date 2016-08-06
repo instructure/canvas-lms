@@ -44,7 +44,7 @@ module SubmittableHelper
         submittable.save_without_broadcasting!
 
         assignment_params.except!('anonymous_peer_reviews')
-        update_api_assignment(@assignment.reload, assignment_params, @current_user)
+        update_api_assignment(@assignment.reload, assignment_params, @current_user, @context)
 
         submittable.save!
       end

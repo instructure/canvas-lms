@@ -6,7 +6,7 @@ Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
 }
 
 CanvasRails::Application.routes.draw do
-  resources :submission_comments, only: :destroy
+  resources :submission_comments, only: [:update, :destroy]
 
   resources :epub_exports, only: [:index]
 
@@ -339,6 +339,7 @@ CanvasRails::Application.routes.draw do
 
     resources :collaborations
     get 'lti_collaborations' => 'collaborations#lti_index'
+    get 'lti_collaborations/*all' => 'collaborations#lti_index'
     resources :gradebook_uploads
     resources :rubrics
     resources :rubric_associations do
@@ -499,6 +500,7 @@ CanvasRails::Application.routes.draw do
 
     resources :collaborations
     get 'lti_collaborations' => 'collaborations#lti_index'
+    get 'lti_collaborations/*all' => 'collaborations#lti_index'
     get 'calendar' => 'calendars#show2', as: :old_calendar
 
     resources :external_tools do
@@ -511,6 +513,7 @@ CanvasRails::Application.routes.draw do
   end
 
   resources :accounts do
+    get 'search(/:tab)', action: :course_user_search
     get "settings#{full_path_glob}", action: :settings
     get :settings
     get :admin_tools
@@ -904,7 +907,7 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/link_validation', action: :start_link_validation
 
       post 'courses/:course_id/reset_content', :action => :reset_content
-      get  'users/:user_id/courses', action: :user_index
+      get  'users/:user_id/courses', action: :user_index, as: 'user_courses'
     end
 
     scope(controller: :account_notifications) do
@@ -1839,6 +1842,10 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :gradebook_settings) do
       put 'courses/:course_id/gradebook_settings', action: :update, as: :course_gradebook_settings_update
+    end
+
+    scope(controller: :announcements_api) do
+      get 'announcements', action: :index, as: :announcements
     end
   end
 

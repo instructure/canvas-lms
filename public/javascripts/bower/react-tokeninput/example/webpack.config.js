@@ -6,11 +6,10 @@ module.exports = {
     filename: "[name].js"
   },
   debug: true,
-  devtool: '#inline-source-map',
+  devtool: '#source-map',
   module: {
     loaders: [
-      { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader?experimental'}
+      { test: /\.js$/, exclude: /node_modules/, loader: 'babel'}
     ]
   }
 };
-

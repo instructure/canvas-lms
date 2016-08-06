@@ -319,7 +319,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"|"teachers"|"observed_users"|"current_grading_period_scores"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -376,6 +376,9 @@ class CoursesController < ApplicationController
   #   - "observed_users": Optional information to include with each Course.
   #     Will include data for observed users if the current user has an
   #     observer enrollment.
+  #   - "tabs": Optional information to include with each Course.
+  #     Will include the list of tabs configured for each course.  See the
+  #     {api:TabsController#index List available tabs API} for more information.
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -425,7 +428,7 @@ class CoursesController < ApplicationController
   # @API List courses for a user
   # Returns a list of active courses for this user. To view the course list for a user other than yourself, you must be either an observer of that user or an administrator.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"|"current_grading_period_scores"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -476,6 +479,15 @@ class CoursesController < ApplicationController
   #   - "passback_status": Include the grade passback_status
   #   - "favorites": Optional information to include with each Course.
   #     Indicates if the user has marked the course as a favorite course.
+  #   - "teachers": Teacher information to include with each Course.
+  #     Returns an array of hashes containing the {api:Users:UserDisplay UserDisplay} information
+  #     for each teacher in the course.
+  #   - "observed_users": Optional information to include with each Course.
+  #     Will include data for observed users if the current user has an
+  #     observer enrollment.
+  #   - "tabs": Optional information to include with each Course.
+  #     Will include the list of tabs configured for each course.  See the
+  #     {api:TabsController#index List available tabs API} for more information.
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -485,7 +497,7 @@ class CoursesController < ApplicationController
   # @returns [Course]
   def user_index
     @user.shard.activate do
-      render json: courses_for_user(@user)
+      render json: courses_for_user(@user, paginate_url: api_v1_user_courses_url(@user))
     end
   end
 
@@ -1351,6 +1363,7 @@ class CoursesController < ApplicationController
   def fetch_enrollment
     # Use the enrollment we already fetched, if possible
     enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
+    @current_user.reload if @context_enrollment && @context_enrollment.enrollment_state.user_needs_touch # needed to prevent permission caching
 
     # Overwrite with the session enrollment, if one exists, and it's different than the current user's
     if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] &&
@@ -1471,7 +1484,7 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the list action plus:
   #
-  # @argument include[] [String, "all_courses"|"permissions"|"observed_users"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"all_courses"|"permissions"|"observed_users"]
   #   - "all_courses": Also search recently deleted courses.
   #   - "permissions": Include permissions the current user has
   #     for the course.
@@ -1574,6 +1587,7 @@ class CoursesController < ApplicationController
         add_crumb(t('#crumbs.modules', "Modules"))
         load_modules
       when 'syllabus'
+        rce_js_env(:sidebar)
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
         @syllabus_body = api_user_content(@context.syllabus_body, @context)
         @groups = @context.assignment_groups.active.order(:position, AssignmentGroup.best_unicode_collation_key('name')).to_a
@@ -1597,7 +1611,7 @@ class CoursesController < ApplicationController
         @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
       end
 
-      @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :placements => :course_home_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
+      @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :placements => :course_home_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user).to_a
       unless @context.grants_right?(@current_user, session, :manage_content)
         @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
       end
@@ -2423,7 +2437,7 @@ class CoursesController < ApplicationController
     ObserverEnrollment.observed_enrollments_for_courses(courses, user)
   end
 
-  def courses_for_user(user)
+  def courses_for_user(user, paginate_url: api_v1_courses_url)
     include_observed = params.fetch(:include, []).include?("observed_users")
 
     if params[:state]
@@ -2432,7 +2446,7 @@ class CoursesController < ApplicationController
       conditions = states.map do |state|
         Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
       end.compact.join(" OR ")
-      enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user)
+      enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user).to_a
     else
       enrollments = user.cached_current_enrollments(preload_courses: true)
     end
@@ -2465,7 +2479,7 @@ class CoursesController < ApplicationController
 
     Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
-    enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
+    enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
     preloads = [:account]
     preloads << :teachers if includes.include?('teachers')

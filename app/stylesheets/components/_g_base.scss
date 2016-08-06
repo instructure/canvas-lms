@@ -1,11 +1,12 @@
 @import "components/main";
 @import "base/layout";
-@if $use_new_styles { @import "base/ic_app_layout"; }
-@if $use_new_styles {
-  @import "base/ic_app_header";
-} @else {
-  @import "base/#header";
-}
+@import "base/ic_app_layout";
+
+// because these both are entirely wrapped in an @if (not) $use_new_styles {...}
+// only one will be effectively rendered
+@import "base/ic_app_header";
+@import "base/#header"; //remove this line once $use_new_styles is turned on everywhere
+
 @import "base/#left-side";
 @import "base/#right-side";
 @import "base/print";

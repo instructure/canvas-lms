@@ -1376,6 +1376,23 @@ describe Account do
         expect(subaccount.default_storage_quota).to eq 20.megabytes
       end
     end
+
+    it "should inherit from a new parent account's default_storage_quota if parent account changes" do
+      enable_cache do
+        account = account_model
+
+        account.default_storage_quota = 10.megabytes
+        account.save!
+
+        to_be_subaccount = Account.create!
+        expect(to_be_subaccount.default_storage_quota).to eq Account.default_storage_quota
+
+        # should clear caches
+        to_be_subaccount.parent_account = account
+        to_be_subaccount.save!
+        expect(to_be_subaccount.default_storage_quota).to eq 10.megabytes
+      end
+    end
   end
 
   context "inheritable settings" do
@@ -1508,4 +1525,19 @@ describe Account do
     end
   end
 
+  describe "#users_name_like" do
+    context 'sharding' do
+      specs_require_sharding
+
+      it "should work cross-shard" do
+        ActiveRecord::Base.connection.stubs(:use_qualified_names?).returns(true)
+        @shard1.activate do
+          @account = Account.create!
+          @user = user(:name => "silly name")
+          @user.account_users.create(:account => @account)
+        end
+        expect(@account.users_name_like("silly").first).to eq @user
+      end
+    end
+  end
 end

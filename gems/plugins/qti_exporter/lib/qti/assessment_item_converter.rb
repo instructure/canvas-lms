@@ -148,10 +148,13 @@ class AssessmentItemConverter
       if bank =  get_node_att(meta, 'instructureField[name=question_bank]',  'value')
         @question[:question_bank_name] = bank
       end
-      if bank =  get_node_att(meta, 'instructureField[name=question_bank_iden]', 'value')
+      if bank = get_node_att(meta, 'instructureField[name=question_bank_iden]', 'value')
         @question[:question_bank_id] = bank
+        if bb_bank = get_node_att(meta, 'instructureField[name=bb_question_bank_iden]', 'value')
+          @question[:bb_question_bank_id] = bb_bank
+        end
       end
-      if score =  get_node_att(meta, 'instructureField[name=max_score]', 'value')
+      if score = get_node_att(meta, 'instructureField[name=max_score]', 'value')
         @question[:points_possible] = [score.to_f, 0.0].max
       end
       if score = get_node_att(meta, 'instructureField[name=points_possible]', 'value')

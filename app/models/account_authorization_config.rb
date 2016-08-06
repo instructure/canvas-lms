@@ -91,6 +91,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   VALID_AUTH_TYPES = %w[canvas cas clever facebook github google ldap linkedin microsoft openid_connect saml twitter].freeze
   validates_inclusion_of :auth_type, in: VALID_AUTH_TYPES, message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}"
   validates_presence_of :account_id
+  validate :validate_federated_attributes
 
   # create associate model find to accept auth types, and just return the first one of that
   # type
@@ -152,18 +153,108 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   def self.serialization_excludes; [:auth_crypted_password, :auth_password_salt]; end
 
-  def provision_user(unique_id)
+  # allowable attributes for federated_attributes setting; nil means anything
+  # is allowed
+  def self.recognized_federated_attributes
+    [].freeze
+  end
+
+  def settings
+    read_attribute(:settings) || {}
+  end
+
+  def federated_attributes=(value)
+    value = {} unless value.is_a?(Hash)
+    settings_will_change! unless value == federated_attributes
+    settings['federated_attributes'] = value
+  end
+
+  def federated_attributes
+    settings['federated_attributes'] ||= {}
+  end
+
+  def federated_attributes_for_api
+    if jit_provisioning?
+      federated_attributes
+    else
+      result = {}
+      federated_attributes.each do |(canvas_attribute_name, provider_attribute_config)|
+        next if provider_attribute_config['provisioning_only']
+        result[canvas_attribute_name] = provider_attribute_config['attribute']
+      end
+      result
+    end
+  end
+
+  CANVAS_ALLOWED_FEDERATED_ATTRIBUTES = %w{
+    display_name
+    email
+    given_name
+    integration_id
+    locale
+    name
+    sis_user_id
+    sortable_name
+    surname
+    time_zone
+  }.freeze
+
+  def provision_user(unique_id, provider_attributes = {})
     User.transaction(requires_new: true) do
       pseudonym = account.pseudonyms.build
       pseudonym.user = User.create!(name: unique_id, workflow_state: 'registered')
       pseudonym.authentication_provider = self
       pseudonym.unique_id = unique_id
       pseudonym.save!
+      apply_federated_attributes(pseudonym, provider_attributes, purpose: :provisioning)
       pseudonym
     end
   rescue ActiveRecord::RecordNotUnique
     uncached do
       pseudonyms.active.by_unique_id(unique_id).first!
+    end
+  end
+
+  def apply_federated_attributes(pseudonym, provider_attributes, purpose: :login)
+    user = pseudonym.user
+
+    canvas_attributes = translate_provider_attributes(provider_attributes,
+                                                      purpose: purpose)
+    given_name = canvas_attributes.delete('given_name')
+    surname = canvas_attributes.delete('surname')
+    if given_name || surname
+      user.name = "#{given_name} #{surname}"
+      user.sortable_name = if given_name.present? && surname.present?
+                             "#{surname}, #{given_name}"
+                           else
+                             "#{given_name}#{surname}"
+                           end
+    end
+
+    canvas_attributes.each do |(attribute, value)|
+      case attribute
+      when 'sis_user_id', 'integration_id'
+        pseudonym[attribute] = value
+      when 'display_name'
+        user.short_name = value
+      when 'email'
+        cc = user.communication_channels.email.by_path(value).first
+        cc ||= user.communication_channels.email.new(path: value)
+        cc.workflow_state = 'active'
+        cc.save! if cc.changed?
+      else
+        user.send("#{attribute}=", value)
+      end
+    end
+    if pseudonym.changed?
+      unless pseudonym.save
+        Rails.logger.warning("Unable to save federated pseudonym: #{pseudonym.errors}")
+      end
+    end
+    if user.changed?
+      unless user.save
+        Rails.logger.warning("Unable to save federated user: #{user.errors}")
+      end
     end
   end
 
@@ -174,6 +265,52 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   private
+
+  def validate_federated_attributes
+    bad_keys = federated_attributes.keys - CANVAS_ALLOWED_FEDERATED_ATTRIBUTES
+    unless bad_keys.empty?
+      errors.add(:federated_attributes, "#{bad_keys.join(', ')} is not an attribute that can be federated")
+      return
+    end
+
+    # normalize values to { attribute: <attribute>, provisioning_only: true|false }
+    federated_attributes.keys.each do |key|
+      case federated_attributes[key]
+      when String
+        federated_attributes[key] = { 'attribute' => federated_attributes[key], 'provisioning_only' => false }
+      when Hash
+        bad_keys = federated_attributes[key].keys - ['attribute', 'provisioning_only']
+        unless bad_keys.empty?
+          errors.add(:federated_attributes, "unrecognized key #{bad_keys.join(', ')} in #{key} attribute definition")
+          return
+        end
+        federated_attributes[key]['provisioning_only'] =
+            ::Canvas::Plugin.value_to_boolean(federated_attributes[key]['provisioning_only'])
+      else
+        errors.add(:federated_attributes, "invalid attribute definition for #{key}")
+        return
+      end
+    end
+
+    return if self.class.recognized_federated_attributes.nil?
+    bad_values = federated_attributes.values.map { |v| v['attribute'] } - self.class.recognized_federated_attributes
+    unless bad_values.empty?
+      errors.add(:federated_attributes, "#{bad_values.join(', ')} is not a valid attribute")
+    end
+  end
+
+  def translate_provider_attributes(provider_attributes, purpose:)
+    result = {}
+    federated_attributes.each do |(canvas_attribute_name, provider_attribute_config)|
+      next if purpose != :provisioning && provider_attribute_config['provisioning_only']
+      provider_attribute_name = provider_attribute_config['attribute']
+
+      if provider_attributes.key?(provider_attribute_name)
+        result[canvas_attribute_name] = provider_attributes[provider_attribute_name]
+      end
+    end
+    result
+  end
 
   def soft_delete_pseudonyms
     pseudonyms.find_each(&:destroy)

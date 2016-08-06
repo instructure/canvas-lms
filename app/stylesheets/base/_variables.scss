@@ -17,6 +17,11 @@
 // Look in /sass-functions/ for more information on how that is used
 @import "variant_variables";
 
+// this just needs to be defined outside the scope of an @if and before pulling
+// in the account's branding, so that when it is set in the @if $use_high_contrast {...}
+// it remains in scope
+$ic-brand-primary: null;
+
 //================
 // Custom Branding
 //================
@@ -28,9 +33,7 @@
 // But if not (for the css used when there is no custom BrandConfig),
 // this just pulls in 'app/stylesheets/_brand_variables.scss'
 // which is a blank file and does nothing.
-@if $use_new_styles and not $use_high_contrast {
-  @import "brand_variables";
-}
+@import "brand_variables";
 
 //=======================
 // Canvas LMS Color Sheet
@@ -238,10 +241,6 @@ $button--primary-bgd: $ic-brand-button--primary-bgd;
   $button--primary-text: $ic-color-light;
 }
 
-// We don't use any of the Bootstrap glyph icons, But bootstrap's scss expects this variable to be defined.
-$iconSpritePath:  "canvas_does_not_use_boostraps_default_sprit_based_icons_so_this_is_meaningless" !default;
-$iconWhiteSpritePath: $iconSpritePath !default;
-
 //==========================================================
 // Legacy Vendor Variables (please do not touch these files)
 //==========================================================
@@ -257,14 +256,12 @@ $iconWhiteSpritePath: $iconSpritePath !default;
 // their use in Canvas in order to properly phase them out
 // Nothing changes in the legacy UI.
 
-@if $use_new_styles {
-  $lightBackground:               lighten($ic-color-neutral, 8);
-  $wellBackground:                $ic-color-light;
-  $altBG:                         $ic-bg-light-neutral;
-  $borderColor:                   $ic-border-light;
-  $activeBG:                      $ic-bg-light-primary;
-}
-@else {
+$lightBackground:               lighten($ic-color-neutral, 8);
+$wellBackground:                $ic-color-light;
+$altBG:                         $ic-bg-light-neutral;
+$borderColor:                   $ic-border-light;
+$activeBG:                      $ic-bg-light-primary;
+@if not $use_new_styles {
   $lightBackground:               rgb(248, 250, 251);
   $wellBackground:                #e8ecef;
   $altBG:                         #dfe9f0;

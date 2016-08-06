@@ -203,17 +203,30 @@ define [
         { pass: 'pass', complete: 'pass', fail: 'fail', incomplete: 'fail' }[submission.grade] || ''
 
     iconClassFromSubmission = (submission) ->
-        { pass: 'icon-check', complete: 'icon-check', fail: 'icon-x', incomplete: 'icon-x' }[submission.grade] || ''
+      { pass: 'icon-check', complete: 'icon-check', fail: 'icon-x', incomplete: 'icon-x' }[submission.grade] || ''
+
+    checkboxButtonTemplate = (iconClass) ->
+      if _.isEmpty(iconClass)
+        '-'
+      else
+        """
+        <i class="#{htmlEscape iconClass}" role="presentation"></i>
+        """
 
     htmlFromSubmission: (options={}) ->
       cssClass = classFromSubmission(options.submission)
       iconClass = iconClassFromSubmission(options.submission)
+      editable = if options.editable
+        'editable'
+      else
+        ''
       SubmissionCell::cellWrapper("""
-        <a data-value="#{htmlEscape cssClass}"
-           class="gradebook-checkbox gradebook-checkbox-#{htmlEscape cssClass}
-           #{htmlEscape('editable' if options.editable)}" href="#">
-           #{htmlEscape cssClass}</a>
-        <i class="#{htmlEscape iconClass}" role="presentation"></i> """, options)
+        <button
+          data-value="#{htmlEscape cssClass}"
+          class="Button Button--icon-action gradebook-checkbox gradebook-checkbox-#{htmlEscape cssClass} #{htmlEscape(editable)}"
+          type="button"
+          aria-label="#{htmlEscape cssClass}"><span class="screenreader-only">#{htmlEscape cssClass}</span>#{checkboxButtonTemplate(iconClass)}</button>
+        """, options)
 
     @formatter: (row, col, submission, assignment, student) ->
       return SubmissionCell.formatter.apply(this, arguments) unless submission.grade?

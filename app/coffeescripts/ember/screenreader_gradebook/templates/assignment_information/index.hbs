@@ -8,12 +8,18 @@
         <h3 class="assignment_selection">
           <a {{bind-attr href="selectedAssignment.html_url"}}>{{selectedAssignment.name}}</a>
         </h3>
-        {{#if showAssignmentPointsWarning}}
-          <span class="text-error">
-            <a {{bind-attr href="selectedAssignment.html_url"}}>
-              <i class="icon-warning"><span class="screenreader-only">{{#t "warning"}}Warning{{/t}}</span></i> {{#t 'no_points_possible_warning'}}Assignments in this group have no points possible and cannot be included in grade calculation.{{/t}}
-            </a>
-          </span>
+        {{#if omitFromFinalGrade}}
+          <i class="icon-warning"><span class="screenreader-only">{{#t}}Warning{{/t}}</span></i>
+          {{#t}}This assignment does not count toward the final grade.{{/t}}
+        {{else}}
+          {{#if showAssignmentPointsWarning}}
+            <span class="text-error">
+              <a {{bind-attr href="selectedAssignment.html_url"}}>
+                <i class="icon-warning"><span class="screenreader-only">{{#t}}Warning{{/t}}</span></i>
+                {{#t}}Assignments in this group have no points possible and cannot be included in grade calculation.{{/t}}
+              </a>
+            </span>
+          {{/if}}
         {{/if}}
         <div>
           <a {{bind-attr href="speedGraderUrl"}}>{{#t 'assignment_in_speedgrader'}}See this assignment in speedgrader{{/t}}</a>

@@ -136,8 +136,12 @@ define [
 
     initCheckboxes: (preferences) ->
       $('#show_attendance').prop('checked', preferences.showAttendanceColumns)
-      $('#show_concluded_enrollments').prop('checked', preferences.showConcludedEnrollments)
-      $('#show_inactive_enrollments').prop('checked', preferences.showInactiveEnrollments)
+      $('#show_concluded_enrollments').prop('checked', (
+        @options.course_is_concluded || preferences.showConcludedEnrollments)
+      )
+      $('#show_inactive_enrollments').prop('checked', (
+        @options.course_is_concluded || preferences.showInactiveEnrollments)
+      )
 
     initStudentNamesOption: (preferences) ->
       namesHidden = preferences.hideStudentNames
@@ -225,9 +229,6 @@ define [
 
     concludedEnrollmentsChange: () =>
       $showConcludedEnrollments = $('#show_concluded_enrollments')
-      if @options.course_is_concluded
-        $showConcludedEnrollments.prop('checked', true)
-        return alert(I18n.t 'This is a concluded course, so only concluded enrollments are available.')
       userSettings.contextSet 'showConcludedEnrollments', $showConcludedEnrollments.prop('checked')
       StudentEnrollmentsActions.load()
 

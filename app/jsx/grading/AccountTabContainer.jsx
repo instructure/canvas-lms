@@ -1,10 +1,11 @@
 define([
   'react',
+  'react-dom',
   'jsx/grading/gradingStandardCollection',
   'jsx/grading/GradingPeriodSetCollection',
   'jquery',
   'i18n!grading_periods'
-], function(React, GradingStandardCollection, GradingPeriodSetCollection, $, I18n) {
+], function(React, ReactDOM, GradingStandardCollection, GradingPeriodSetCollection, $, I18n) {
   const { bool, string, shape } = React.PropTypes;
 
   let AccountTabContainer = React.createClass({
@@ -21,7 +22,7 @@ define([
     },
 
     componentDidMount: function() {
-      $(React.findDOMNode(this)).children(".ui-tabs-minimal").tabs();
+      $(ReactDOM.findDOMNode(this)).children(".ui-tabs-minimal").tabs();
     },
 
     render: function () {

@@ -47,9 +47,9 @@ describe "account" do
     it "should be able to create a new course when no other courses exist" do
       Account.default.courses.each do |c|
         c.course_account_associations.scope.delete_all
-        c.enrollments.scope.delete_all
+        c.enrollments.each(&:destroy_permanently!)
         c.course_sections.scope.delete_all
-        c.destroy_permanently!
+        c.reload.destroy_permanently!
       end
 
       get "/accounts/#{Account.default.to_param}"
@@ -90,8 +90,8 @@ describe "account" do
       verify_displayed_term_dates(term, {
           :general => ["Jul 1", "Jul 31"],
           :student_enrollment => ["term start", "term end"],
-          :teacher_enrollment => ["term start", "term end"],
-          :ta_enrollment => ["term start", "term end"]
+          :teacher_enrollment => ["whenever", "term end"],
+          :ta_enrollment => ["whenever", "term end"]
       })
     end
 
@@ -106,8 +106,8 @@ describe "account" do
       verify_displayed_term_dates(term, {
           :general => ["whenever", "whenever"],
           :student_enrollment => ["Jul 2", "Jul 30"],
-          :teacher_enrollment => ["term start", "term end"],
-          :ta_enrollment => ["term start", "term end"]
+          :teacher_enrollment => ["whenever", "term end"],
+          :ta_enrollment => ["whenever", "term end"]
       })
     end
 
@@ -123,7 +123,7 @@ describe "account" do
           :general => ["whenever", "whenever"],
           :student_enrollment => ["term start", "term end"],
           :teacher_enrollment => ["Jul 3", "Jul 29"],
-          :ta_enrollment => ["term start", "term end"]
+          :ta_enrollment => ["whenever", "term end"]
       })
     end
 
@@ -138,7 +138,7 @@ describe "account" do
       verify_displayed_term_dates(term, {
           :general => ["whenever", "whenever"],
           :student_enrollment => ["term start", "term end"],
-          :teacher_enrollment => ["term start", "term end"],
+          :teacher_enrollment => ["whenever", "term end"],
           :ta_enrollment => ["Jul 4", "Jul 28"]
       })
     end

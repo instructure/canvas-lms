@@ -1,3 +1,4 @@
+@if not $use_new_styles { //new ui renders ic-typography, oldUI renders this. they are mutually exclusive.
 //
 // Typography
 // --------------------------------------------------
@@ -227,3 +228,4 @@ address {
   font-style: normal;
   line-height: $baseLineHeight;
 }
+}//end @if not $use_new_styles

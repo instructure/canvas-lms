@@ -1,3 +1,4 @@
+@if $use_new_styles {
 /// This is the beginning of fixing typography usage in Canvas. We originally were pulling in a bunch of
 /// bootstrap styles, of which, we'd like to phase out in multiple iterations.
 /// Below is the combination of overwrites and bootstrap styles that were originally in Canvas.
@@ -6,8 +7,6 @@
 /// Repeat - this is a work in progress, iterative approach to handing typography in Canvas.
 /// There's a lot here we don't want, and a lot more we need to re-work, but not all in one go.
 
-
-@import "base/environment"; // pulls in global typography variables set in base/_variables
 
 ///////==============
 /// Global Settings
@@ -591,3 +590,4 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     box-shadow: none;
   }
 }
+}//end @if $use_new_styles

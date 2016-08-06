@@ -30,6 +30,7 @@ define([
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
+  'compiled/jquery.rails_flash_notifications',
   'vendor/jquery.ba-tinypubsub',
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/jquery/fixDialogButtons'
@@ -86,7 +87,9 @@ define([
         rubricEditing.hideCriterionAdd($rubric);
         rubricEditing.updateCriterionPoints($criterion);
         rubricEditing.sizeRatings($criterion);
-        $td.focus();
+        setTimeout(function() {
+          $.screenReaderFlashMessageExclusive(I18n.t("New Rating Created"));
+        }), 100
       }
       return false;
     },

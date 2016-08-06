@@ -28,16 +28,30 @@ class EnrollmentDateBuilder
     @enrollment_dates = []
   end
 
-  def self.preload(enrollments)
+  def self.preload(enrollments, use_cache=true)
+    raise "call #to_a first before preloading enrollment scope" if enrollments.is_a?(ActiveRecord::Relation)
+    # if enrollments is still a relation, we'll be unnecessarily calling the query multiple times
+    # below with `enrollments.empty?` and `enrollments.first`
     return if enrollments.empty?
-    courses_loaded = enrollments.first.association(:course).loaded?
-    ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)unless courses_loaded
+    preload_state(enrollments)
 
-    to_preload = enrollments.reject { |e| fetch(e) }
+    courses_loaded = enrollments.first.association(:course).loaded?
+    ActiveRecord::Associations::Preloader.new.preload(enrollments, :course) unless courses_loaded
+
+    to_preload = use_cache ? enrollments.reject { |e| fetch(e) } : enrollments
     return if to_preload.empty?
     ActiveRecord::Associations::Preloader.new.preload(to_preload, :course_section)
     ActiveRecord::Associations::Preloader.new.preload(to_preload.map(&:course).uniq, :enrollment_term)
     to_preload.each { |e| build(e) }
+  end
+
+  # TODO: other places where we use #preload should be replaced with #preload_state after all the states are created
+  def self.preload_state(enrollments)
+    return if enrollments.empty?
+
+    unless enrollments.first.association(:enrollment_state).loaded?
+      ActiveRecord::Associations::Preloader.new.preload(enrollments, :enrollment_state)
+    end
   end
 
   def self.cache_key(enrollment)

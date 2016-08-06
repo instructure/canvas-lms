@@ -254,4 +254,35 @@ define(['jsx/account_course_user_search/reducers/rootReducer'], (reducer) => {
   });
 
 
+  test('SELECT_TAB action reducer', () => {
+    const initialState = {
+      tabList: {
+        basePath: '/accounts/1/search',
+        tabs: [
+          {
+            title: 'Tab1',
+            path: '/courses',
+            permisssions:  []
+          },
+          {
+            title: 'Tab2',
+            path: '/courses',
+            permisssions:  []
+          }
+        ],
+        selected: 0
+      }
+    };
+    const action = {
+      type: 'SELECT_TAB',
+      payload: {
+        tabIndex: 1
+      }
+    };
+
+    const newState = reducer(initialState, action);
+    equal(newState.tabList.selected, 1, 'sets the selected tab property to 1');
+  });
+
+
 });

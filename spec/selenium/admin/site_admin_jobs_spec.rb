@@ -148,15 +148,8 @@ describe "site admin jobs ui" do
 
       it "should check all popular tags", priority: "2" do
         filter_tags(FlavorTags::ALL)
-        expect(f("#tags-grid")).to include_text("String#reverse")
-        expect(f("#tags-grid")).to include_text("String#capitalize")
-        ff("#tags-grid .slick-row").each do |row|
-          if row.find_element(:css, ".r0").text == "String#reverse"
-            expect(row.find_element(:css, ".r1").text).to eq("2")
-          elsif row.find_element(:css, ".r0").text == "String#capitalize"
-            expect(row.find_element(:css, ".r1").text).to eq("1")
-          end
-        end
+        expect(f("#tags-grid")).to include_text("String#reverse\n2")
+        expect(f("#tags-grid")).to include_text("String#capitalize\n1")
       end
 
       it "should not action if no rows are selected" do

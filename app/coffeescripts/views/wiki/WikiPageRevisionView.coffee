@@ -10,9 +10,6 @@ define [
     className: 'revision clearfix'
     template: template
 
-    attributes:
-      tabindex: 0
-
     events:
       'click .restore-link': 'restore'
       'keydown .restore-link': 'restore'

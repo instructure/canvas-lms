@@ -76,13 +76,17 @@ describe Canvas::LiveEvents do
         submission_id: @quiz_submission.submission.global_id.to_s,
         assignment_id: @quiz_submission.submission.global_assignment_id.to_s,
         grade: @quiz_submission.submission.grade,
-        old_grade: 0,
+        old_grade: '0',
+        score: @quiz_submission.submission.score,
+        old_score: 0,
+        points_possible: 0.0,
+        old_points_possible: 0.0,
         grader_id: nil,
         student_id: @quiz_submission.user.global_id.to_s,
         user_id: @quiz_submission.user.global_id.to_s
       })
 
-      Canvas::LiveEvents.grade_changed(@quiz_submission.submission, 0)
+      Canvas::LiveEvents.grade_changed(@quiz_submission.submission, @quiz_submission.submission.versions.current.model)
     end
 
     it "should set the grader when a teacher grades an assignment" do
@@ -93,7 +97,11 @@ describe Canvas::LiveEvents do
         submission_id: submission.global_id.to_s,
         assignment_id: submission.global_assignment_id.to_s,
         grade: '10',
-        old_grade: 0,
+        old_grade: nil,
+        score: 10,
+        old_score: nil,
+        points_possible: nil,
+        old_points_possible: nil,
         grader_id: @teacher.global_id.to_s,
         student_id: @student.global_id.to_s,
         user_id: @student.global_id.to_s
@@ -101,7 +109,8 @@ describe Canvas::LiveEvents do
 
       submission.grader = @teacher
       submission.grade = '10'
-      Canvas::LiveEvents.grade_changed(submission, 0)
+      submission.score = 10
+      Canvas::LiveEvents.grade_changed(submission, submission.versions.current.model)
     end
 
     it "should include the user_id and assignment_id" do
@@ -114,6 +123,36 @@ describe Canvas::LiveEvents do
           user_id: @student.global_id.to_s
         ))
       Canvas::LiveEvents.grade_changed(submission, 0)
+    end
+
+    it "should include previous score attributes" do
+      course_with_student_submissions submission_points: true
+      submission = @course.assignments.first.submissions.first
+
+      submission.score = 9000
+      LiveEvents.expects(:post_event).with('grade_change',
+        has_entries(
+          score: 9000,
+          old_score: 5
+        ))
+      Canvas::LiveEvents.grade_changed(submission, submission.versions.current.model)
+    end
+
+    it "should include previous points_possible attributes" do
+      course_with_student_submissions
+      assignment = @course.assignments.first
+      assignment.points_possible = 5
+      assignment.save!
+      submission = assignment.submissions.first
+
+      submission.assignment.points_possible = 99
+
+      LiveEvents.expects(:post_event).with('grade_change',
+        has_entries(
+          points_possible: 99,
+          old_points_possible: 5
+        ))
+      Canvas::LiveEvents.grade_changed(submission, submission, assignment.versions.current.model)
     end
   end
 

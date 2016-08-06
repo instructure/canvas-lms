@@ -41,6 +41,8 @@ module CC
     VERSION_1_3 = Gem::Version.new('1.3')
 
     def add_assignment(assignment)
+      add_exported_asset(assignment)
+
       migration_id = CCHelper.create_key(assignment)
 
       lo_folder = File.join(@export_dir, migration_id)

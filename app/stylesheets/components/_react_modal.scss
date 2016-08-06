@@ -115,6 +115,8 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
     form { margin: 0; } // override Canvas default margin on forms
 
     .ReactModal__Layout {
+      max-height: 100%;
+      overflow: auto;
       border-radius: $baseBorderRadius;
       box-shadow: 0 1px 4px 1px rgba($ic-color-dark, 0.95);
 

@@ -1,7 +1,9 @@
 <% sidebar_weighting ||= nil %>
 <% groups = sidebar_weighting || @context.assignment_groups.active %>
+<div role="complementary" aria-label="<%= t('Assignment Weights') %>">
 <% if @context.group_weighting_scheme == "percent" %>
-  <%= before_label 'assignments_weighting', 'Assignments are weighted by group' %>
+  <h2><%= before_label 'assignments_weighting', 'Assignments are weighted by group' %></h2>
+
   <table class="summary">
     <thead>
     <tr>
@@ -31,5 +33,6 @@
     </tbody>
   </table>
 <% else %>
-  <%= t('not_weighted', %{Course assignments are not weighted.}) %>
+  <h2><%= t('not_weighted', 'Course assignments are not weighted.') %></h2>
 <% end %>
+</div>

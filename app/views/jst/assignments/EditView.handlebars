@@ -1,151 +1,170 @@
-{{#if frozen}}
-  <div class="alert alert-info">
-    <i class="icon-warning"></i> {{#t "warnings.assignment_is_frozen"}}Some settings have been administratively locked.{{/t}}
-  </div>
-{{/if}}
-
-<div class="control-group">
-  <div>
-    <label for="assignment_name" class="screenreader-only">{{#t}}Assignment Name{{/t}}</label>
-    <input id="assignment_name"
-      name="name"
-      placeholder="{{#t "assignment_name"}}Assignment Name{{/t}}"
-      value="{{name}}"
-      type="text"
-      maxlength="254"
-      class="input-block-level"
-      {{disabledIfIncludes frozenAttributes "title"}}/>
-  </div>
-</div>
-
-<div class="control-group">
-  {{#ifIncludes frozenAttributes "description"}}
-    <div class="frozen-description user_content">
-      {{convertApiUserContent description}}
+<div id="edit_assignment_wrapper">
+  {{#if frozen}}
+    <div class="alert alert-info">
+      <i class="icon-warning"></i> {{#t "warnings.assignment_is_frozen"}}Some settings have been administratively locked.{{/t}}
     </div>
-  {{else}}
-    <div style="float: right;">
-      <a href="#" class="rte_switch_views_link">
-        {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
-      </a>
-      <a href="#" class="rte_switch_views_link" style="display:none;">
-        {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
-      </a>
-    </div>
-    <div style="clear:both;"></div>
-    <textarea id="assignment_description"
-      name="description"
-      aria-label="{{#t "description"}}Description{{/t}}"
-      {{disabledIfIncludes frozenAttributes "description"}}>
-      {{convertApiUserContent description forEditing=1}}
-    </textarea>
-  {{/ifIncludes}}
-
-</div>
-
-<div class="control-group">
-
-  <div class="form-column-left no-group">
-    <label for="assignment_points_possible">
-      {{#t "points_possible"}}Points{{/t}}
-    </label>
-  </div>
-
-  <div class="form-column-right">
-    <input id="assignment_points_possible"
-      name="points_possible"
-      value="{{pointsPossible}}"
-      type="text"
-      {{disabledIfIncludes frozenAttributes "points_possible"}}/>
-      <div aria-live="polite" role="alert">
-        <div id=point_change_warning class="alert">
-          {{#t}}If you change an assignment's points possible you must regrade the assignment.{{/t}}
-         </div>
-      </div>
-  </div>
-
-</div>
-
-
-<fieldset id="assignment_group_selector" class="control-group">
-</fieldset>
-
-<div id="grading_type_selector"></div>
-
-<div id="graded_assignment_fields"
-  aria-expanded="{{not isNotGraded}}"
-  style="{{hiddenIf isNotGraded}}">
-
-  {{>[assignments/submission_types_form]}}
-
-  {{#unless isLargeRoster}}
-    <fieldset id="group_category_selector"
-      class="control-group"
-      style="{{hiddenIf isExternalTool}}">
-    </fieldset>
-  {{/unless}}
-
-  {{#unless isLargeRoster}}
-    <fieldset id="assignment_peer_reviews_fields"
-      class="control-group"
-      style="{{hiddenIf isExternalTool}}">
-    </fieldset>
-  {{/unless}}
-
-  {{#if postToSISEnabled}}
-    <fieldset>
-      <div class="form-column-left">{{#t}}Post Grades to SIS{{/t}}</div>
-        <div class="form-column-right" style="margin-top: 14px;">
-          <label class="checkbox">
-            {{checkbox "postToSIS"
-              id="assignment_post_to_sis"
-              name="post_to_sis"
-            }}
-            {{#t "post_to_sis"}}Include this assignment's grades when posting to your school's Student Information System{{/t}}
-          </label>
-      </div>
-    </fieldset>
   {{/if}}
 
-  <fieldset>
-    <div class="form-column-left">{{#t}}Moderated Grading{{/t}}</div>
-    <div class="form-column-right" style="margin-top: 14px;">
-      <label class="checkbox">
-        {{checkbox "moderatedGrading"
-          id="assignment_moderated_grading"
-          name="moderated_grading"
-        }}
-        {{#t}}Allow a moderator to review multiple independent grades for selected submissions{{/t}}
+  <div class="control-group">
+    <div>
+      <label for="assignment_name" class="screenreader-only">{{#t}}Assignment Name{{/t}}</label>
+      <input id="assignment_name"
+        name="name"
+        placeholder="{{#t "assignment_name"}}Assignment Name{{/t}}"
+        value="{{name}}"
+        type="text"
+        maxlength="254"
+        class="input-block-level"
+        {{disabledIfIncludes frozenAttributes "title"}}/>
+    </div>
+  </div>
+
+  <div class="control-group">
+    {{#ifIncludes frozenAttributes "description"}}
+      <div class="frozen-description user_content">
+        {{convertApiUserContent description}}
+      </div>
+    {{else}}
+      <div style="float: right;">
+        <a href="#" class="rte_switch_views_link">
+          {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+        </a>
+        <a href="#" class="rte_switch_views_link" style="display:none;">
+          {{#t "#editor.switch_editor_rich_text"}}Rich Content Editor{{/t}}
+        </a>
+      </div>
+      <div style="clear:both;"></div>
+      <textarea id="assignment_description"
+        name="description"
+        aria-label="{{#t "description"}}Description{{/t}}"
+        {{disabledIfIncludes frozenAttributes "description"}}>
+        {{convertApiUserContent description forEditing=1}}
+      </textarea>
+    {{/ifIncludes}}
+
+  </div>
+
+  <div class="control-group">
+
+    <div class="form-column-left no-group">
+      <label for="assignment_points_possible">
+        {{#t "points_possible"}}Points{{/t}}
       </label>
     </div>
+
+    <div class="form-column-right">
+      <input id="assignment_points_possible"
+        name="points_possible"
+        value="{{pointsPossible}}"
+        type="text"
+        {{disabledIfIncludes frozenAttributes "points_possible"}}/>
+        <div aria-live="polite" role="alert">
+          <div id=point_change_warning class="alert">
+            {{#t}}If you change an assignment's points possible, existing grades will be automatically scaled.{{/t}}
+           </div>
+        </div>
+    </div>
+
+  </div>
+
+
+  <fieldset id="assignment_group_selector" class="control-group">
   </fieldset>
 
+  <div id="grading_type_selector"></div>
+
+  <div id="graded_assignment_fields"
+    aria-expanded="{{not isNotGraded}}"
+    style="{{hiddenIf isNotGraded}}">
+
+    {{!--this empty div is in place to push the checkbox to the right of it--}}
+    <div class="form-column-left"></div>
+    <div id="omit-from-final-grade" class="form-column-right" style="margin-top: 14px;">
+      <label class="checkbox">
+        {{checkbox "omitFromFinalGrade"
+          id="assignment_omit_from_final_grade"
+          name="omit_from_final_grade"
+        }}
+        {{#t}}Do not count this assignment towards the final grade{{/t}}
+      </label>
+    </div>
+
+    {{>[assignments/submission_types_form]}}
+
+    {{#unless isLargeRoster}}
+      <fieldset id="group_category_selector"
+        class="control-group"
+        style="{{hiddenIf isExternalTool}}">
+      </fieldset>
+    {{/unless}}
+
+    {{#unless isLargeRoster}}
+      <fieldset id="assignment_peer_reviews_fields"
+        class="control-group"
+        style="{{hiddenIf isExternalTool}}">
+      </fieldset>
+    {{/unless}}
+
+    {{#if postToSISEnabled}}
+      <fieldset>
+        <div class="form-column-left">{{#t}}Post Grades to SIS{{/t}}</div>
+          <div class="form-column-right" style="margin-top: 14px;">
+            <label class="checkbox">
+              {{checkbox "postToSIS"
+                id="assignment_post_to_sis"
+                name="post_to_sis"
+              }}
+              {{#t "post_to_sis"}}Include this assignment's grades when posting to your school's Student Information System{{/t}}
+            </label>
+        </div>
+      </fieldset>
+    {{/if}}
+
+    <fieldset>
+      <div class="form-column-left">{{#t}}Moderated Grading{{/t}}</div>
+      <div class="form-column-right" style="margin-top: 14px;">
+        <label class="checkbox">
+          {{checkbox "moderatedGrading"
+            id="assignment_moderated_grading"
+            name="moderated_grading"
+          }}
+          {{#t}}Allow a moderator to review multiple independent grades for selected submissions{{/t}}
+        </label>
+      </div>
+    </fieldset>
+
+  </div>
+
+  {{#if canFreeze}}
+    <div class="form-column-left"></div>
+    <div class="form-column-right">
+      <fieldset>
+        <label class="checkbox" for="assignment_freeze_on_copy">
+          {{checkbox "freezeOnCopy"
+            id="assignment_freeze_on_copy"
+            name="freeze_on_copy"}}
+            {{#t "freeze_properties"}}Lock assignment properties when copied{{/t}}
+        </label>
+      </fieldset>
+    </div>
+  {{/if}}
+
+  <div id="overrides-wrapper">
+    <div class="form-column-left">
+      {{#t}}Assign{{/t}}
+    </div>
+    <div class="overrides-column-right js-assignment-overrides overrideFormFlex">
+    </div>
+  </div>
 </div>
 
-{{#if canFreeze}}
-  <div class="form-column-left"></div>
-  <div class="form-column-right">
-    <fieldset>
-      <label class="checkbox" for="assignment_freeze_on_copy">
-        {{checkbox "freezeOnCopy"
-          id="assignment_freeze_on_copy"
-          name="freeze_on_copy"}}
-          {{#t "freeze_properties"}}Lock assignment properties when copied{{/t}}
-      </label>
-    </fieldset>
-  </div>
+{{#if conditionalReleaseServiceEnabled}}
+<div id="conditional_release_wrapper" style="display: none">
+  <div id="conditional_release_target" />
+</div>
 {{/if}}
 
-<div id="overrides-wrapper">
-  <div class="form-column-left">
-    {{#t}}Assign{{/t}}
-  </div>
-  <div class="overrides-column-right js-assignment-overrides overrideFormFlex">
-  </div>
-</div>
-
-<div class="form-actions flush" style="padding-left: 10px;">
-
+<div class="form-actions" style="padding-left: 10px;">
   <div style="float: left; min-width: 300px;">
     <label class="checkbox" style="text-align:left;" for="assignment_notify_of_update">
       {{checkbox "notifyOfUpdate"

@@ -41,13 +41,6 @@ def topic_doc
   erb(:topic_doc)
 end
 
-def properties_of_model(json)
-  require 'json'
-  JSON::parse(json)['properties']
-rescue JSON::ParserError
-  nil
-end
-
 def word_wrap(text, col_width=80)
    text.gsub!( /(\S{#{col_width}})(?=\S)/, '\1 ' )
    text.gsub!( /(.{1,#{col_width}})(?:\s+|$)/, "\\1\n" )
@@ -58,9 +51,9 @@ def indent(str, amount = 2, char = ' ')
   str.gsub(/^/, char * amount)
 end
 
-def render_comment(string, wrap = 75)
+def render_comment(string)
   if string
-    indent(word_wrap(string), 2, '/')
+    indent(word_wrap(string), 1, '// ')
   else
     ""
   end
@@ -90,8 +83,13 @@ def render_value(prop)
 end
 
 def render_properties(json)
-  if properties = properties_of_model(json)
-    "{\n" + indent(
+  json = JSON.parse(json)
+  if (properties = json['properties'])
+    result = ''
+    if json['description'].present?
+      result << render_comment(json['description'])
+    end
+    result << "{\n" + indent(
     properties.map do |name, prop|
       render_comment(prop['description']) +
       %{"#{name}": } + render_value(prop)

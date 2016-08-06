@@ -7,18 +7,16 @@ define([
     renderContent() {
       let header, content, link;
       let [context, contextId] = splitAssetString((ENV.PARENT_CONTEXT && ENV.PARENT_CONTEXT.context_asset_string) || ENV.context_asset_string)
-      const url = `/${context}/${contextId}/settings/configurations`;
-
 
       if (this.props.ltiCollaborators.ltiCollaboratorsData.length === 0) {
         if (ENV.current_user_roles.indexOf("teacher") !== -1) {
-          header = I18n.t('No LTIs Configured')
-          content = I18n.t('There are no Configured LTIs that interact with collaborations.')
-          link = <a rel="external" href={url}>{I18n.t('Set some up now')}</a>
+          header = I18n.t('No Collaboration Apps')
+          content = I18n.t('Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Get started by adding a collaboration app.')
+          link = <a rel="external" href='https://community.canvaslms.com/docs/DOC-2627'>{I18n.t('Learn more about collaborations')}</a>
         }
         else{
-          header = I18n.t('No LTIs Configured')
-          content = I18n.t('You have no LTIs configured to create collaborations with. Talk to your teacher to get some set up.')
+          header = I18n.t('No Collaboration Apps')
+          content = I18n.t('You have no Collaboration apps configured. Talk to your teacher to get some set up.')
           link = null
         }
       }

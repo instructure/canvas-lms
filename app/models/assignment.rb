@@ -42,7 +42,8 @@ class Assignment < ActiveRecord::Base
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
     :turnitin_settings, :context, :position, :allowed_extensions,
     :external_tool_tag_attributes, :freeze_on_copy,
-    :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading
+    :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading,
+    :omit_from_final_grade
 
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
@@ -200,6 +201,7 @@ class Assignment < ActiveRecord::Base
     only_visible_to_overrides
     moderated_grading
     grades_published_at
+    omit_from_final_grade
   )
 
   def external_tool?
@@ -313,11 +315,24 @@ class Assignment < ActiveRecord::Base
     true
   end
 
-  def update_student_submissions
+  def update_student_submissions(old_points_possible = nil)
     graded_at = Time.zone.now
     submissions.graded.preload(:user).find_each do |s|
-      if grading_type == 'pass_fail' && ['complete', 'pass'].include?(s.grade)
-        s.score = points_possible
+      if points_possible.to_f > 0 &&
+         old_points_possible.to_f > 0 &&
+         s.score.to_f > 0
+        # Scale existing scores when total possible points changed
+        percentage = points_possible / old_points_possible.to_f
+        s.score = s.score * percentage
+      end
+      if grading_type == 'pass_fail'
+        # If a previously scored assignment just became pass/fail,
+        # update its score to be the max points possible or 0.
+        s.score = if ['complete', 'pass'].include?(s.grade) || score_to_grade(s.score, s.grade) == 'complete'
+            points_possible
+          else
+            0.0
+          end
       end
       s.grade = score_to_grade(s.score, s.grade)
       s.graded_at = graded_at
@@ -332,7 +347,7 @@ class Assignment < ActiveRecord::Base
   # reflect the changes
   def update_submissions_if_details_changed
     if !new_record? && (points_possible_changed? || grading_type_changed? || grading_standard_id_changed?) && !submissions.graded.empty?
-      send_later_if_production(:update_student_submissions)
+      send_later_if_production(:update_student_submissions, points_possible_was)
     end
     true
   end
@@ -1076,7 +1091,7 @@ class Assignment < ActiveRecord::Base
       group.users
         .joins(:enrollments)
         .where(:enrollments => { :course_id => self.context})
-        .merge(Course.instance_exec(&Course.reflections[CANVAS_RAILS4_0 ? :student_enrollments : 'student_enrollments'].scope).only(:where))
+        .merge(Course.instance_exec(&Course.reflections[CANVAS_RAILS4_0 ? :admin_visible_student_enrollments : 'admin_visible_student_enrollments'].scope).only(:where))
         .order("users.id") # this helps with preventing deadlock with other things that touch lots of users
         .uniq
         .to_a
@@ -1172,7 +1187,13 @@ class Assignment < ActiveRecord::Base
     previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
 
     if opts[:provisional]
-      submission.find_or_create_provisional_grade!(scorer: grader, grade: grade, score: score, force_save: true, final: opts[:final])
+      submission.find_or_create_provisional_grade!(grader,
+        grade: grade,
+        score: score,
+        force_save: true,
+        final: opts[:final],
+        graded_anonymously: opts[:graded_anonymously]
+      )
     end
 
     submission
@@ -1246,7 +1267,7 @@ class Assignment < ActiveRecord::Base
       if user
         sub = self.find_or_create_submission(user)
         if opts[:provisional_grader]
-          [sub.find_or_create_provisional_grade!(:scorer => opts[:provisional_grader], :final => opts[:final]), user]
+          [sub.find_or_create_provisional_grade!(opts[:provisional_grader], final: opts[:final]), user]
         else
           [sub, user]
         end
@@ -1451,55 +1472,62 @@ class Assignment < ActiveRecord::Base
   # for group assignments, returns a single "student" for each
   # group's submission.  the students name will be changed to the group's
   # name.  for non-group assignments this just returns all visible users
-  def representatives(user)
-    if grade_as_group?
-      submissions = self.submissions.preload(:user).to_a
-      users_with_submissions = submissions.select(&:has_submission?).map(&:user)
-      users_with_turnitin_data = if turnitin_enabled?
-                                   submissions
-                                   .reject { |s| s.turnitin_data.blank? }
-                                   .map(&:user)
-                                 else
-                                   []
-                                 end
-      # this only includes users with a submission who are unexcused
-      users_who_arent_excused = submissions.reject(&:excused?).map(&:user)
-      reps_and_others = groups_and_ungrouped(user).map { |group_name, group_students|
-        visible_group_students = group_students & visible_students_for_speed_grader(user)
-        candidate_students = visible_group_students & users_who_arent_excused
-        candidate_students = visible_group_students if candidate_students.empty?
+  def representatives(user, includes: [:inactive])
+    return visible_students_for_speed_grader(user, includes: includes) unless grade_as_group?
 
-        representative   = (candidate_students & users_with_turnitin_data).first
-        representative ||= (candidate_students & users_with_submissions).first
-        representative ||= candidate_students.first
-        others = visible_group_students - [representative]
-        next unless representative
+    submissions = self.submissions.preload(:user).to_a
+    users_with_submissions = submissions.select(&:has_submission?).map(&:user)
+    users_with_turnitin_data = if turnitin_enabled?
+                                 submissions.reject { |s| s.turnitin_data.blank? }.map(&:user)
+                               else
+                                 []
+                               end
+    # this only includes users with a submission who are unexcused
+    users_who_arent_excused = submissions.reject(&:excused?).map(&:user)
 
-        representative.readonly!
-        representative.name = group_name
-        representative.sortable_name = group_name
-        representative.short_name = group_name
+    enrollment_state =
+      Hash[self.context.all_accepted_student_enrollments.pluck(:user_id, :workflow_state)]
 
-        [representative, others]
-      }.compact
+    # prefer active over inactive, inactive over everything else
+    enrollment_priority = { 'active' => 1, 'inactive' => 2 }
+    enrollment_priority.default = 100
 
-      sorted_reps_with_others = Canvas::ICU.collate_by(reps_and_others) { |rep, _|
-      rep.sortable_name }
-      if block_given?
-        sorted_reps_with_others.each { |r,o| yield r, o }
-      end
-      sorted_reps_with_others.map &:first
-    else
-      visible_students_for_speed_grader(user)
+    reps_and_others = groups_and_ungrouped(user, includes: includes).map do |group_name, group_students|
+      visible_group_students =
+        group_students & visible_students_for_speed_grader(user, includes: includes)
+
+      candidate_students = visible_group_students & users_who_arent_excused
+      candidate_students = visible_group_students if candidate_students.empty?
+      candidate_students.sort_by! { |s| enrollment_priority[enrollment_state[s.id]] }
+
+      representative   = (candidate_students & users_with_turnitin_data).first
+      representative ||= (candidate_students & users_with_submissions).first
+      representative ||= candidate_students.first
+      others = visible_group_students - [representative]
+      next unless representative
+
+      representative.readonly!
+      representative.name = group_name
+      representative.sortable_name = group_name
+      representative.short_name = group_name
+
+      [representative, others]
+    end.compact
+
+    sorted_reps_with_others =
+      Canvas::ICU.collate_by(reps_and_others) { |rep, _| rep.sortable_name }
+    if block_given?
+      sorted_reps_with_others.each { |r,o| yield r, o }
     end
+    sorted_reps_with_others.map &:first
   end
 
-  def groups_and_ungrouped(user)
+  def groups_and_ungrouped(user, includes: [])
     groups_and_users = group_category.
       groups.active.preload(group_memberships: :user).
       map { |g| [g.name, g.users] }
     users_in_group = groups_and_users.flat_map { |_,users| users }
-    groupless_users = visible_students_for_speed_grader(user) - users_in_group
+    groupless_users = visible_students_for_speed_grader(user, includes: includes) - users_in_group
     phony_groups = groupless_users.map { |u| [u.name, [u]] }
     groups_and_users + phony_groups
   end
@@ -1507,10 +1535,10 @@ class Assignment < ActiveRecord::Base
 
   # using this method instead of students_with_visibility so we
   # can add the includes and students_visible_to/participating_students scopes
-  def visible_students_for_speed_grader(user)
+  def visible_students_for_speed_grader(user, includes: [:inactive])
     @visible_students_for_speed_grader ||= {}
-    @visible_students_for_speed_grader[user.global_id] ||= (
-      student_scope = user ? context.students_visible_to(user, include: :inactive) : context.participating_students
+    @visible_students_for_speed_grader[[user.global_id, includes]] ||= (
+      student_scope = user ? context.students_visible_to(user, include: includes) : context.participating_students
       students_with_visibility(student_scope)
     ).order_by_sortable_name.uniq.to_a
   end

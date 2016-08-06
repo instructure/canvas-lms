@@ -2,7 +2,7 @@
      id="<%= "#{aac.auth_type}_form" if aac.new_record? %>"
      <%= hidden(true) if aac.new_record? %>>
   <div class="grid-row">
-    <div class="col-xs-12 col-lg-8 off-lg-1">
+    <div class="col-xs-12 col-lg-11 off-lg-1">
       <% url = aac.new_record? ? account_authentication_providers_url(account) :
               account_authentication_provider_url(account, aac) %>
 
@@ -11,7 +11,7 @@
                    url: url,
                    html: {
                            id: "#{aac.new_record? ? 'new' : 'edit'}_#{aac.class.sti_name}#{aac.id unless aac.new_record?}",
-                           class: "ic-Form-group ic-Form-group--horizontal"
+                           class: "ic-Form-group ic-Form-group--horizontal authentication_provider_form"
                    }) do |f| %>
       <%= f.hidden_field :auth_type, value: aac.auth_type %>
       <%= f.hidden_field :id %>
@@ -23,6 +23,10 @@
 
         <%= render partial: "#{aac.auth_type}_fields",
                  locals: {aac: aac, presenter: presenter, f: f}%>
+
+        <% if aac.class.recognized_federated_attributes != [] %>
+          <%= render partial: "federated_attributes", locals: { aac: aac, presenter: presenter, f: f } %>
+        <% end %>
 
         <% if presenter.configs.length > 1 %>
           <div class="ic-Form-control">

@@ -44,10 +44,14 @@ DOC
     <button type="submit" class='btn btn-primary'><%= t 'buttons.update_syllabus', "Update Syllabus" %></button>
   </div>
 <% end %>
+
+<h2><%= before_label "Assignments Summary" %></h2>
+
 <div id="syllabusContainer">
   <div id="syllabus_links">
     <a id="toggle_special_dates_in_syllabus">&nbsp;</a>
   </div>
+  <% css_bundle("syllabus") %>
   <table id="syllabus" class="ic-Table--condensed">
     <thead>
       <tr>

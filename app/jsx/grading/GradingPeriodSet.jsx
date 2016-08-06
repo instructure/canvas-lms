@@ -62,10 +62,6 @@ define([
     return !!state.editPeriod.id;
   };
 
-  const setFocus = function(ref) {
-    React.findDOMNode(ref).focus();
-  };
-
   const getShowGradingPeriodRef = function(period) {
     return "show-grading-period-" + period.id;
   };
@@ -124,10 +120,10 @@ define([
 
     componentDidUpdate(prevProps, prevState) {
       if (prevState.newPeriod.period && !this.state.newPeriod.period) {
-        setFocus(this.refs.addPeriodButton);
+        this.refs.addPeriodButton.focus();
       } else if (isEditingPeriod(prevState) && !isEditingPeriod(this.state)) {
         let period = { id: prevState.editPeriod.id };
-        setFocus(this.refs[getShowGradingPeriodRef(period)].refs.editButton);
+        this.refs[getShowGradingPeriodRef(period)].refs.editButton.focus();
       }
     },
 
@@ -159,7 +155,11 @@ define([
 
     termNames() {
       const names = _.pluck(this.setTerms(), "displayName");
-      return I18n.t("Terms: ") + names.join(", ");
+      if (names.length > 0) {
+        return I18n.t("Terms: ") + names.join(", ");
+      } else {
+        return I18n.t("No Associated Terms");
+      }
     },
 
     editSet(e) {
@@ -390,7 +390,6 @@ define([
                         aria-label="Toggle grading period visibility">
                   <i className={"icon-mini-arrow-" + arrow}/>
                 </button>
-                <span className="screenreader-only">{I18n.t("Grading period title")}</span>
                 <h2 ref="title" tabIndex="0" className="GradingPeriodSet__title">
                   {this.props.set.title}
                 </h2>

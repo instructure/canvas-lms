@@ -97,11 +97,17 @@ define([
     const props = sampleProps(true);
     props.model.destroy = function () { return true; };
     sinon.stub(window, 'confirm').returns(true);
-    const itemCogs = React.render(
-      <div>
-        <ItemCog {...props} />
-        <ItemCog {...props} />
-      </div>, $('<div>').appendTo('#fixtures')[0]);
+    const ContainerApp = React.createClass({
+      render () {
+        return (
+          <div>
+            <ItemCog {...props} />
+            <ItemCog {...props} />
+          </div>
+        );
+      }
+    });
+    const itemCogs = React.render(<ContainerApp />, $('#fixtures')[0]);
     const renderedCogs = TestUtils.scryRenderedComponentsWithType(itemCogs, ItemCog)
     Simulate.click(React.findDOMNode(renderedCogs[1].refs.deleteLink));
     equal(document.activeElement, $(React.findDOMNode(renderedCogs[0])).find('.al-trigger')[0], 'the cog has focus');
@@ -113,13 +119,19 @@ define([
     const props = sampleProps(true);
     props.model.destroy = function () { return true; };
     sinon.stub(window, 'confirm').returns(true);
-    const container = React.render(
-      <div>
-        <div className="ef-name-col">
-          <a href="#" className="someFakeLink">Name column header</a>
-        </div>
-        <ItemCog {...props} />
-      </div>, $('<div>').appendTo('#fixtures')[0]);
+    const ContainerApp = React.createClass({
+      render () {
+        return (
+          <div>
+            <div className="ef-name-col">
+              <a href="#" className="someFakeLink">Name column header</a>
+            </div>
+            <ItemCog {...props} />
+          </div>
+        );
+      }
+    });
+    const container = React.render(<ContainerApp />, $('#fixtures')[0]);
     const renderedCog = TestUtils.findRenderedComponentWithType(container, ItemCog);
     Simulate.click(React.findDOMNode(renderedCog.refs.deleteLink));
     equal(document.activeElement, $('.someFakeLink')[0], 'the name column has focus');

@@ -25,7 +25,7 @@
       <li><a href="#options_tab"><%= t('Details') %></a></li>
       <li><a href="#questions_tab"><%= t('Questions') %></a></li>
       <% if ConditionalRelease::Service.enabled_in_context?(@context) then %>
-        <li><a href="#conditional_release_tab"><%= t('Conditional Content') %></a></li>
+        <li><a href="#conditional_release_tab"><%= t('Mastery Paths') %></a></li>
       <% end %>
     </ul>
     <%= render :partial => 'quiz_edit_details' %>

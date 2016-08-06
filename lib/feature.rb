@@ -149,7 +149,6 @@ distinct and easier to identify. Note: Institution branding will be disabled.
 END
       applies_to: 'User',
       state: 'allowed',
-      beta: true,
       autoexpand: true
     },
     'outcome_gradebook' =>
@@ -375,10 +374,11 @@ END
       root_opt_in: true
     },
     'course_user_search' => {
-      display_name: -> { I18n.t('Course and User Search') },
+      display_name: -> { I18n.t('Account Course and User Search') },
       description: -> { I18n.t('Updated UI for searching and displaying users and courses within an account.') },
       applies_to: 'Account',
       state: 'hidden',
+      beta: true,
       development: true,
       root_opt_in: true
     },
@@ -414,7 +414,7 @@ END
     },
     'conditional_release' =>
     {
-      display_name: -> { I18n.t('Conditional Release') },
+      display_name: -> { I18n.t('Mastery Paths') },
       description: -> { I18n.t('Configure individual learning paths for students based on assessment results.') },
       applies_to: 'Course',
       state: 'hidden',
@@ -437,6 +437,14 @@ END
       applies_to: 'Course',
       state: 'hidden',
       development: true,
+      root_opt_in: true
+    },
+    'new_annotations' =>
+    {
+      display_name: -> { I18n.t('New Annotations') },
+      description: -> { I18n.t('Use the new document annotation tool') },
+      applies_to: 'Course',
+      beta: true,
       root_opt_in: true
     }
   )

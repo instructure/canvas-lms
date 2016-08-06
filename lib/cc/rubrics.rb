@@ -52,6 +52,8 @@ module CC
             add_item_to_export(align.learning_outcome, 'learning_outcomes')
           end
 
+          add_exported_asset(rubric)
+
           migration_id = CCHelper.create_key(rubric)
           rubrics_node.rubric(:identifier=>migration_id) do |r_node|
             atts = [:read_only, :title, :reusable, :public, :points_possible,

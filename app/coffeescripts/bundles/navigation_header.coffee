@@ -1,8 +1,9 @@
 require [
   'react',
+  'react-dom',
   'jsx/navigation_header/Navigation',
-], (React, Navigation) ->
+], (React, ReactDOM, Navigation) ->
 
   Nav = React.createElement(Navigation)
-  React.render(Nav, document.getElementById('global_nav_tray_container'))
+  ReactDOM.render(Nav, document.getElementById('global_nav_tray_container'))
 

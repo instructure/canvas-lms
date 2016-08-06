@@ -1,10 +1,9 @@
-var React = require('react');
-var div = React.DOM.div;
-var cx = require('../helpers/classSet');
-var focusManager = require('../helpers/focusManager');
-var isLeavingNode = require('../helpers/isLeavingNode');
+import React, { PropTypes } from 'react';
+import cx from 'classnames';
+import focusManager from '../helpers/focusManager';
+import isLeavingNode from '../helpers/isLeavingNode';
 
-var styles = {
+const styles = {
   overlay: {
     position: 'fixed',
     top: 0,
@@ -18,7 +17,7 @@ var styles = {
   }
 };
 
-var CLASS_NAMES = {
+const CLASS_NAMES = {
   overlay: {
     base: 'ReactTray__Overlay',
     afterOpen: 'ReactTray__Overlay--after-open',
@@ -36,7 +35,8 @@ function isChild(parent, child) {
     return true;
   }
 
-  var node = child;
+  let node = child;
+  /* eslint no-cond-assign:0 */
   while (node = node.parentNode) {
     if (node === parent) {
       return true;
@@ -45,24 +45,34 @@ function isChild(parent, child) {
   return false;
 }
 
-var TrayPortal = React.createClass({
+export default React.createClass({
   displayName: 'TrayPortal',
 
-  getInitialState: function () {
+  propTypes: {
+    className: PropTypes.string,
+    overlayClassName: PropTypes.string,
+    isOpen: PropTypes.bool,
+    onBlur: PropTypes.func,
+    closeOnBlur: PropTypes.bool,
+    closeTimeoutMS: PropTypes.number,
+    children: PropTypes.any
+  },
+
+  getInitialState() {
     return {
       afterOpen: false,
       beforeClose: false
     };
   },
 
-  componentDidMount: function () {
+  componentDidMount() {
     if (this.props.isOpen) {
       this.setFocusAfterRender(true);
       this.open();
     }
   },
 
-  componentWillReceiveProps: function (props) {
+  componentWillReceiveProps(props) {
     if (props.isOpen) {
       this.setFocusAfterRender(true);
       this.open();
@@ -71,48 +81,48 @@ var TrayPortal = React.createClass({
     }
   },
 
-  componentDidUpdate: function () {
+  componentDidUpdate() {
     if (this.focusAfterRender) {
       this.focusContent();
       this.setFocusAfterRender(false);
     }
   },
 
-  setFocusAfterRender: function (focus) {
+  setFocusAfterRender(focus) {
     this.focusAfterRender = focus;
   },
 
-  focusContent: function () {
-    this.refs.content.getDOMNode().focus();
+  focusContent() {
+    this.refs.content.focus();
   },
 
-  handleOverlayClick: function (e) {
-    if (!isChild(this.refs.content.getDOMNode(), e.target)) {
+  handleOverlayClick(e) {
+    if (!isChild(this.refs.content, e.target)) {
       this.props.onBlur();
     }
   },
 
-  handleContentKeyDown: function (e) {
+  handleContentKeyDown(e) {
     // Treat ESC as blur/close
     if (e.keyCode === 27) {
       this.props.onBlur();
     }
 
-    // Treat tabbing away from content as blur/close
-    if (e.keyCode === 9 && isLeavingNode(this.refs.content.getDOMNode(), e)) {
+    // Treat tabbing away from content as blur/close if closeOnBlur
+    if (e.keyCode === 9 && this.props.closeOnBlur && isLeavingNode(this.refs.content, e)) {
       e.preventDefault();
       this.props.onBlur();
     }
   },
-   
-  open: function () {
+
+  open() {
     focusManager.markForFocusLater();
-    this.setState({isOpen: true}, function () {
+    this.setState({isOpen: true}, () => {
       this.setState({afterOpen: true});
-    }.bind(this));
+    });
   },
 
-  close: function () {
+  close() {
     if (this.props.closeTimeoutMS > 0) {
       this.closeWithTimeout();
     } else {
@@ -120,29 +130,29 @@ var TrayPortal = React.createClass({
     }
   },
 
-  closeWithTimeout: function () {
-    this.setState({beforeClose: true}, function () {
+  closeWithTimeout() {
+    this.setState({beforeClose: true}, () => {
       setTimeout(this.closeWithoutTimeout, this.props.closeTimeoutMS);
-    }.bind(this));
+    });
   },
 
-  closeWithoutTimeout: function () {
+  closeWithoutTimeout() {
     this.setState({
       afterOpen: false,
       beforeClose: false
     }, this.afterClose);
   },
 
-  afterClose: function () {
+  afterClose() {
     focusManager.returnFocus();
   },
 
-  shouldBeClosed: function () {
+  shouldBeClosed() {
     return !this.props.isOpen && !this.state.beforeClose;
   },
 
-  buildClassName: function (which) {
-    var className = CLASS_NAMES[which].base;
+  buildClassName(which) {
+    let className = CLASS_NAMES[which].base;
     if (this.state.afterOpen) {
       className += ' ' + CLASS_NAMES[which].afterOpen;
     }
@@ -152,26 +162,30 @@ var TrayPortal = React.createClass({
     return className;
   },
 
-  render: function () {
-    return this.shouldBeClosed() ? div() : (
-      div({
-        ref: 'overlay',
-        style: styles.overlay,
-        className: cx(this.buildClassName('overlay'), this.props.overlayClassName),
-        onClick: this.handleOverlayClick
-      },
-        div({
-          ref: 'content',
-          style: styles.content,
-          className: cx(this.buildClassName('content'), this.props.className),
-          onKeyDown: this.handleContentKeyDown,
-          tabIndex: '-1'
-        },
-          this.props.children
-        )
-      )
+  render() {
+    return this.shouldBeClosed() ? <div/> : (
+      <div
+        ref="overlay"
+        style={styles.overlay}
+        className={cx(
+          this.buildClassName('overlay'),
+          this.props.overlayClassName
+        )}
+        onClick={this.handleOverlayClick}
+      >
+        <div
+          ref="content"
+          style={styles.content}
+          className={cx(
+            this.buildClassName('content'),
+            this.props.className
+          )}
+          onKeyDown={this.handleContentKeyDown}
+          tabIndex="-1"
+        >
+          {this.props.children}
+        </div>
+      </div>
     );
   }
 });
-
-module.exports = TrayPortal;

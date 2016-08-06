@@ -106,6 +106,7 @@ class SplitUsers
 
     def move_records_to_old_user(source_user, user, records)
       move_user_observers(source_user, user, records.where(context_type: 'UserObserver', previous_user_id: user))
+      move_attachments(source_user, user, records.where(context_type: 'Attachment'))
       enrollment_ids = records.where(context_type: 'Enrollment', previous_user_id: user).pluck(:context_id)
       enrollments = Enrollment.where(id: enrollment_ids)
       enrollments.update_all(user_id: user)
@@ -119,6 +120,11 @@ class SplitUsers
     def move_user_observers(source_user, user, records)
       source_user.user_observers.where(id: records.pluck(:context_id)).update_all(user_id: user)
       source_user.user_observees.where(id: records.pluck(:context_id)).update_all(observer_id: user)
+    end
+
+    def move_attachments(source_user, user, records)
+      attachments = source_user.attachments.where(id: records.pluck(:context_id))
+      Attachment.migrate_attachments(source_user, user, attachments)
     end
 
     def update_grades(users, records)
@@ -176,7 +182,8 @@ class SplitUsers
       records.each do |r|
         c = r.context
         next unless c && c.class.columns_hash.key?('workflow_state')
-        c.workflow_state = r.previous_workflow_state
+        c.workflow_state = r.previous_workflow_state unless c.class == Attachment
+        c.file_state = r.previous_workflow_state if c.class == Attachment
         c.save! if c.changed?
       end
     end

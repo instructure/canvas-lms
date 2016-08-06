@@ -96,6 +96,15 @@ describe SectionsController, type: :request do
       expect(json.size).to eq 1
     end
 
+    it "should respect ?per_page=n" do
+      @course2.course_sections.create!(:name => 'Section B')
+      @course2.course_sections.create!(:name => 'Section C')
+      json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
+                      { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' },
+                      { :per_page => 1 })
+      expect(json.size).to eq 1
+    end
+
     it "should return sections but not students if user has :read but not :read_roster, :view_all_grades, or :manage_grades" do
       RoleOverride.create!(:context => Account.default, :permission => 'read_roster', :role => ta_role, :enabled => false)
       RoleOverride.create!(:context => Account.default, :permission => 'view_all_grades', :role => ta_role, :enabled => false)

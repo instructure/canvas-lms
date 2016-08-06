@@ -520,6 +520,18 @@ describe "calendar2" do
         quick_jump_to_date("2016-04-01") # jump to next month
         expect(find('.fc-title')).to include_text("aprilfools") # should still load cached event
       end
+
+      it "doesn't duplicate events when enabling calendars" do
+        time = DateTime.parse("2016-04-01")
+        @course.calendar_events.create! title: 'aprilfools', start_at: time, end_at: time + 5.minutes
+        get "/calendar2?include_contexts=#{@course.asset_string}#view_name=month&view_start=2016-04-01"
+        wait_for_ajaximations
+        expect(ff('.fc-title').count).to eql(1)
+        f(".context-list-toggle-box.group_#{@student.asset_string}").click
+        wait_for_ajaximations
+        expect(ff('.fc-title').count).to eql(1)
+        expect(f('.fc-title')).to include_text("aprilfools") # should still load cached event
+      end
     end
   end
 end

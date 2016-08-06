@@ -25,12 +25,12 @@ module CC
       @course = @manifest.course
       @root_item = nil
     end
-    
+
     def self.create_organizations(manifest, manifest_node)
       r = new(manifest, manifest_node)
       r.create_organizations
     end
-    
+
     def create_organizations
       @manifest_node.organizations do |orgs|
         orgs = orgs
@@ -48,7 +48,7 @@ module CC
         end
       end
     end
-    
+
     def add_module(cm)
       @root_item.item(:identifier=>CCHelper.create_key(cm)) do |module_node|
         module_node.title cm.name

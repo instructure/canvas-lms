@@ -233,7 +233,7 @@ describe "groups" do
       it "should allow group members to add a new folder", priority: "1", test_id: 273625 do
         get files_page
         add_folder
-        expect(ff('.media-body').first.text).to eq 'new folder'
+        expect(ff('.ef-name-col__text').first.text).to eq 'new folder'
       end
 
       it "should allow group members to delete a folder", priority: "1", test_id: 273631 do

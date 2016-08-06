@@ -12,14 +12,16 @@
   js_bundle :assignment_edit
 %>
 
+<% if @assignment.omit_from_final_grade %>
+  <div class="alert alert-info omit-from-final-warning">
+    <%= t("This assignment does not count toward the final grade.") %>
+  </div>
+<% end %>
+
 <% if ConditionalRelease::Service.enabled_in_context?(@context) %>
 <div id="edit_assignment_header-cr" class="header-bar"></div>
 <% else %>
 <div id="edit_assignment_header" class="header-bar"></div>
-<div id="edit_assignment_wrapper">
-  <form id="edit_assignment_form" class="form-horizontal bootstrap-form">
-  </form>
-</div>
 <% end %>
 
 <%= render "groups/add_group_category" %>

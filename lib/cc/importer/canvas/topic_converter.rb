@@ -18,10 +18,11 @@
 module CC::Importer::Canvas
   module TopicConverter
     include CC::Importer
-    
-    def convert_topics
+
+    def convert_topics_and_announcements
       topics = []
-      
+      announcements = []
+
       @manifest.css('resource[type=imsdt_xmlv1p1]').each do |res|
         cc_path = File.join @unzipped_file_path, res.at_css('file')['href']
         cc_id = res['identifier']
@@ -34,12 +35,17 @@ module CC::Importer::Canvas
         end
         cc_doc = open_file_xml(cc_path)
 
-        topics << convert_topic(cc_doc, meta_node, canvas_id || cc_id)
+        topic = convert_topic(cc_doc, meta_node, canvas_id || cc_id)
+        if topic['type'] == 'announcement'
+          announcements << topic
+        else
+          topics << topic
+        end
       end
-      
-      topics
+
+      [topics, announcements]
     end
-    
+
     def convert_topic(cc_doc, meta_doc, mig_id=nil)
       topic = {}
       topic['description'] = get_node_val(cc_doc, 'text')
@@ -71,6 +77,6 @@ module CC::Importer::Canvas
 
       topic
     end
-    
+
   end
 end

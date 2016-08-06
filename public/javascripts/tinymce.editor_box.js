@@ -435,44 +435,44 @@ define([
     var selectedContent = options.selectedContent || selection.getContent();
     var selectedContent = decodeString(selectedContent)
 
+    var linkAttrs = {
+      target: target || '',
+      title: title || '',
+      href: url,
+      'class': classes,
+      id: link_id
+    };
+
+    if (options.dataAttributes && options.dataAttributes['preview-alt']) {
+      linkAttrs['data-preview-alt'] = options.dataAttributes['preview-alt'];
+    }
+
     if($instructureEditorBoxList._getEditor(id).isHidden()) {
       selectionText = defaultText;
       var $div = $("<div><a/></div>");
-      $div.find("a")
-        [link_id ? 'attr' : 'removeAttr']('id', link_id).attr({
-          title: title,
-          href: url,
-          target: target
-        })
-        [classes ? 'attr' : 'removeAttr']('class', classes)
-        .text(selectionText);
+      var $a = $div.find("a");
+      $a.attr(linkAttrs);
+      if (!link_id) {
+        $a.removeAttr('id')
+      }
+      if (!classes) {
+        $a.removeAttr('class')
+      }
+      $a.text(selectionText);
       var link_html = $div.html();
       $(this).replaceSelection(link_html);
     } else if(!selectedContent || selectedContent == "") {
       if(anchor) {
-        $(anchor).attr({
-          href: url,
-          'data-mce-href': url,
-          '_mce_href': url,
-          title: title || '',
-          id: link_id,
-          "class": classes,
-          target: target
-        });
+        linkAttrs['data-mce-href'] = url
+        linkAttrs['_mce_href'] = url
+        $(anchor).attr(linkAttrs);
       } else {
         selectionText = defaultText;
         var $div = $("<div/>");
-        $div.append($("<a/>", {id: link_id, target: target, title: title, href: url, 'class': classes}).text(selectionText));
+        $div.append($("<a/>", linkAttrs).text(selectionText));
         tinyMCE.get(id).execCommand('mceInsertContent', false, $div.html());
       }
     } else {
-      var linkAttrs = {
-        target: (target || ""),
-        title: (title || ""),
-        href: url,
-        "class": classes,
-        "id": link_id
-      };
       EditorCommands.insertLink(id, selectedContent, linkAttrs)
     }
 

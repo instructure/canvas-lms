@@ -20,10 +20,12 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && make \
   && cp sfnt2woff /usr/local/bin \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
-  && gem install bundler --no-document -v 1.11.2 \
+  && gem install bundler --no-document -v 1.12.5 \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 USER docker
+
+RUN mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 WORKDIR /usr/src/app
 
 ENV RAILS_ENV development

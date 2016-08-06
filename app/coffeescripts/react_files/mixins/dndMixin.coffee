@@ -1,12 +1,13 @@
 define [
   'i18n!react_files'
   'react'
+  'react-dom'
   'jsx/files/DragFeedback'
   '../utils/moveStuff'
   'compiled/models/Folder'
   'jquery'
   'underscore'
-], (I18n, React, DragFeedback, moveStuff, Folder, $, _) ->
+], (I18n, React, ReactDOM, DragFeedback, moveStuff, Folder, $, _) ->
 
   dndMixin =
 
@@ -15,7 +16,7 @@ define [
     renderDragFeedback: ({pageX, pageY}) ->
       @dragHolder ||= $('<div>').appendTo(document.body)
       # This should be in JSX, but /o\
-      React.render(React.createElement(DragFeedback, {
+      ReactDOM.render(React.createElement(DragFeedback, {
         pageX: pageX
         pageY: pageY
         itemsToDrag: @itemsToDrag()
@@ -23,7 +24,7 @@ define [
 
     removeDragFeedback: ->
       $(document).off('.MultiDraggableMixin')
-      React.unmountComponentAtNode(@dragHolder[0]) if @dragHolder
+      ReactDOM.unmountComponentAtNode(@dragHolder[0]) if @dragHolder
       @dragHolder = null
 
     onItemDragStart: (event) ->
@@ -70,4 +71,3 @@ define [
       ).done(@clearSelectedItems)
 #      @clearSelectedItems()
 #      callback(event) if callback
-

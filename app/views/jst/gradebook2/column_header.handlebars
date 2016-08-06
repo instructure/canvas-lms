@@ -2,17 +2,21 @@
   {{#if assignment.muted}}
     title="{{#t "this_assignment_is_muted"}}This assignment is muted{{/t}}"
   {{else}}
-    {{#if assignment.invalid}}
-      title="{{#t "zero_point_assignment"}}Assignments in this group have no points possible and cannot be included in grade calculation{{/t}}"
+    {{#if assignment.omit_from_final_grade}}
+      title="{{#t}}This assignment does not count toward the final grade.{{/t}}"
+    {{else}}
+      {{#if assignment.invalid}}
+        title="{{#t "zero_point_assignment"}}Assignments in this group have no points possible and cannot be included in grade calculation{{/t}}"
+      {{/if}}
     {{/if}}
   {{/if}}
   class="assignment-name {{#if assignment.muted}}muted{{/if}}"
   href="{{href}}"
 >
   {{#unless assignment.muted}}
-    {{#if assignment.invalid}}
+    {{#ifAny assignment.omit_from_final_grade assignment.invalid}}
       <i class="icon-warning"></i>
-    {{/if}}
+    {{/ifAny}}
   {{/unless}}
   {{assignment.name}}
 </a>

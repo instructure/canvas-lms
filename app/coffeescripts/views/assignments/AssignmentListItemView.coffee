@@ -87,7 +87,7 @@ define [
           closeTarget: @$el.find('a[id*=manage_link]')
           saveURL: -> "#{ENV.URLS.assignment_sort_base_url}/#{@parentListView.value()}/reorder"
 
-        if @model.postToSISEnabled()
+        if @model.postToSIS() && @model.postToSISEnabled()
           @sisButtonView = new SisButtonView(model: @model)
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)

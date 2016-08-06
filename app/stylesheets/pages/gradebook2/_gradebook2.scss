@@ -368,9 +368,11 @@ $cell_height: 33px;
   }
 }
 
+$gradebook_cell_padding_top: 8px;
+
 .gradebook-cell {
-  padding-top: 8px;
-  height: $cell_height - 8px;
+  padding-top: $gradebook_cell_padding_top;
+  height: $cell_height - $gradebook_cell_padding_top;
   position: relative;
   text-align: center;
   background-repeat: repeat;
@@ -568,22 +570,15 @@ $cell_height: 33px;
   }
 }
 
-$gradebook_checkbox_width: 16px;
+$gradebook_checkbox_size: 16px;
 
 .gradebook-checkbox {
-  @include hide-text;
   display: block;
   position: absolute;
   left: 50%;
   top: 50%;
-  width: $gradebook_checkbox_width;
-  height: $gradebook_checkbox_width;
-  margin-top: -$gradebook_checkbox_width / 2;
-  margin-left: -$gradebook_checkbox_width / 2;
-  & i {
-    text-indent: 0;
-    color: inherit;
-  }
+  margin-top: -($gradebook_checkbox_size / 2) - ( $gradebook_cell_padding_top / 2 );
+  margin-left: -$gradebook_checkbox_size / 2;
 }
 
 #hide_warning {
@@ -730,6 +725,17 @@ $gradebook_checkbox_width: 16px;
     @include gradebook_menu_label(13px);
     cursor:pointer;
   }
+}
+
+.ui-menu .ui-menu-item.ui-state-disabled {
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+.ui-menu-item.ui-state-disabled label {
+  margin-bottom: 0;
+  vertical-align: 0;
 }
 
 .post-grades-menu {

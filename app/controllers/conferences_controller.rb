@@ -182,11 +182,13 @@ class ConferencesController < ApplicationController
       conference.ended_at.nil?
     }
     log_asset_access([ "conferences", @context ], "conferences", "other")
-    scope = @context.users
-    if @context.respond_to?(:participating_typical_users)
-      scope = @context.participating_typical_users
+    if @context.is_a? Course
+      enrollments = @context.typical_current_enrollments.eager_load(:user).where.not(user_id: @current_user.id).order(User.sortable_name_order_by_clause).to_a
+      Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+      @users = enrollments.select(&:active?).map(&:user).uniq
+    else
+      @users = @context.users.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
     end
-    @users = scope.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
     # exposing the initial data as json embedded on page.
     js_env(
       current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),

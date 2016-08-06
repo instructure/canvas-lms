@@ -46,12 +46,11 @@ define([
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment */,
   'compiled/jquery/mediaCommentThumbnail',
+  'compiled/jquery.rails_flash_notifications',
   'vendor/jquery.ba-hashchange' /* hashchange */,
   'vendor/jquery.elastic' /* elastic */,
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/jquery.spin' /* /\.spin/ */,
-  'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
 ], function(studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
 
@@ -112,12 +111,13 @@ define([
       $grade_container = $("#grade_container"),
       $grade = $grade_container.find("input, select"),
       $score = $grade_container.find(".score"),
-      $average_score_wrapper = $("#average_score_wrapper"),
+      $average_score_wrapper = $("#average-score-wrapper"),
       $submission_details = $("#submission_details"),
       $multiple_submissions = $("#multiple_submissions"),
       $submission_late_notice = $("#submission_late_notice"),
       $submission_not_newest_notice = $("#submission_not_newest_notice"),
       $enrollment_inactive_notice = $("#enrollment_inactive_notice"),
+      $enrollment_concluded_notice = $("#enrollment_concluded_notice"),
       $submission_files_container = $("#submission_files_container"),
       $submission_files_list = $("#submission_files_list"),
       $submission_attachment_viewed_at = $("#submission_attachment_viewed_at_container"),
@@ -131,6 +131,8 @@ define([
       $no_annotation_warning = $('#no_annotation_warning'),
       $comment_submitted = $('#comment_submitted'),
       $comment_submitted_message = $('#comment_submitted_message'),
+      $comment_saved = $('#comment_saved'),
+      $comment_saved_message = $('#comment_saved_message'),
       $selectmenu = null,
       browserableCssClasses = /^(image|html|code)$/,
       windowLastHeight = null,
@@ -374,18 +376,12 @@ define([
   header = {
     elements: {
       mute: {
-        icon: $('#mute_link .ui-icon'),
+        icon: $('#mute_link i'),
         label: $('#mute_link .mute_label'),
         link: $('#mute_link'),
         modal: $('#mute_dialog')
       },
-      nav: $gradebook_header.find('.prev, .next'),
-      spinner: new Spinner({
-        length: 2,
-        radius: 3,
-        trail: 25,
-        width: 1
-      }),
+      nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
       settings: {
         form: $('#settings_form'),
         link: $('#settings_link')
@@ -400,7 +396,6 @@ define([
       this.muted = this.elements.mute.link.data('muted');
       this.addEvents();
       this.createModals();
-      this.addSpinner();
       return this;
     },
     addEvents: function(){
@@ -409,9 +404,6 @@ define([
       this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
       this.elements.settings.link.click(this.showSettingsModal.bind(this));
       this.elements.keyinfo.icon.click(this.keyboardShortcutInfoModal.bind(this));
-    },
-    addSpinner: function(){
-      this.elements.mute.link.append(this.elements.spinner.el);
     },
     createModals: function(){
       this.elements.settings.form.dialog({
@@ -447,7 +439,12 @@ define([
 
     toAssignment: function(e){
       e.preventDefault();
-      EG[e.target.getAttribute('class')]();
+      var classes = e.target.getAttribute("class").split(" ");
+      if (_.contains(classes, "prev")) {
+        EG.prev();
+      } else if (_.contains(classes, "next")) {
+        EG.next();
+      }
     },
 
     keyboardShortcutInfoModal: function(e) {
@@ -486,13 +483,6 @@ define([
       return '/courses/' + this.courseId + '/assignments/' + this.assignmentId + '/mute';
     },
 
-    spinMute: function(){
-      this.elements.spinner.spin();
-      $(this.elements.spinner.el)
-        .css({ left: 9, top: 6})
-        .appendTo(this.elements.mute.link);
-    },
-
     toggleMute: function(){
       this.muted = !this.muted;
       var label = this.muted ? I18n.t('unmute_assignment', 'Unmute Assignment') : I18n.t('mute_assignment', 'Mute Assignment'),
@@ -500,29 +490,17 @@ define([
           actions = {
         /* Mute action */
         mute: function(){
-          this.elements.mute.icon.css('visibility', 'hidden');
-          this.spinMute();
+          this.elements.mute.icon.removeClass("icon-unmuted").addClass("icon-muted");
           $.ajaxJSON(this.muteUrl(), 'put', { status: true }, $.proxy(function(res){
-            this.elements.spinner.stop();
             this.elements.mute.label.text(label);
-            this.elements.mute.icon
-              .removeClass('ui-icon-volume-off')
-              .addClass('ui-icon-volume-on')
-              .css('visibility', 'visible');
           }, this));
         },
 
         /* Unmute action */
         unmute: function(){
-          this.elements.mute.icon.css('visibility', 'hidden');
-          this.spinMute();
+          this.elements.mute.icon.removeClass("icon-muted").addClass("icon-unmuted");
           $.ajaxJSON(this.muteUrl(), 'put', { status: false }, $.proxy(function(res){
-            this.elements.spinner.stop();
             this.elements.mute.label.text(label);
-            this.elements.mute.icon
-              .removeClass('ui-icon-volume-on')
-              .addClass('ui-icon-volume-off')
-              .css('visibility', 'visible');
           }, this));
         }
       };
@@ -537,9 +515,12 @@ define([
 
     $(".media_comment_link").click(function(event) {
       event.preventDefault();
+      if ($(".media_comment_link").hasClass('ui-state-disabled')) {
+        return;
+      }
       $("#media_media_recording").show().find(".media_recording").mediaComment('create', 'any', function(id, type) {
         $("#media_media_recording").data('comment_id', id).data('comment_type', type);
-        EG.handleCommentFormSubmit();
+        EG.addSubmissionComment();
       }, function() {
         EG.revertFromFormSubmit();
       }, true);
@@ -563,6 +544,9 @@ define([
       }
       configureRecognition(recognition);
       $(".speech_recognition_link").click(function(){
+        if ($(".speech_recognition_link").hasClass('ui-state-disabled')) {
+          return false;
+        }
         $(speechRecognitionTemplate({
           message: messages.begin
         }))
@@ -596,9 +580,9 @@ define([
             }
           })
         return false;
-      })
+      });
         // show the div that contains the button because it is hidden from browsers that dont support speech
-      .closest('div.speech-recognition').show();
+      $(".speech_recognition_link").closest('div.speech-recognition').show();
 
       function processSpeech($this){
         if ($('#record_button').attr("recording") == "true"){
@@ -849,6 +833,9 @@ define([
   });
 
   function beforeLeavingSpeedgrader() {
+    // Submit any draft comments that need submitting
+    EG.addSubmissionComment(true);
+
     window.opener && window.opener.updateGrades && $.isFunction(window.opener.updateGrades) && window.opener.updateGrades();
 
     var userNamesWithPendingQuizSubmission = $.map(snapshotCache, function(snapshot) {
@@ -1057,12 +1044,12 @@ define([
       if (!jsonData.rubric_association){ return false; }
 
       if ($rubric_full.filter(":visible").length || force === "close") {
-        $("#grading").height("auto").children().show();
+        $("#grading").show().height("auto");
         $rubric_full.fadeOut();
         $(".toggle_full_rubric").focus()
       } else {
         $rubric_full.fadeIn();
-        $("#grading").children().hide();
+        $("#grading").hide();
         this.refreshFullRubric();
         $rubric_full.find('.rubric_title .title').focus()
       }
@@ -1135,6 +1122,13 @@ define([
     },
 
     handleStudentChanged: function(){
+      // Save any draft comments before loading the new student
+      if ($add_a_comment_textarea.hasClass('ui-state-disabled')) {
+        $add_a_comment_textarea.val('');
+      } else {
+        EG.addSubmissionComment(true);
+      }
+
       var id = $selectmenu.jquerySelectMenu().val();
       this.currentStudent = jsonData.studentMap[id] || _.values(jsonData.studentsWithSubmissions)[0];
       document.location.hash = "#" + encodeURIComponent(JSON.stringify({
@@ -1151,10 +1145,11 @@ define([
         $(".speedgrader_alert").hide();
         $submission_not_newest_notice.hide();
         $submission_late_notice.hide();
-        $full_width_container.removeClass("with_enrollment_inactive_notice");
+        $full_width_container.removeClass("with_enrollment_notice");
         $enrollment_inactive_notice.hide();
+        $enrollment_concluded_notice.hide();
 
-        $grade.attr('disabled', true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
+        EG.setGradeReadOnly(true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
         if (ENV.grading_role == 'moderator' && this.currentStudent.submission_state == 'not_graded') {
           this.currentStudent.submission.grade = null; // otherwise it may be tricked into showing the wrong submission_state
         }
@@ -1417,9 +1412,17 @@ define([
       );
     },
 
+    setGradeReadOnly: function(readonly) {
+      if (readonly) {
+        $grade.addClass('ui-state-disabled').attr('readonly', true).attr('aria-disabled', true);
+      } else {
+        $grade.removeClass('ui-state-disabled').removeAttr('aria-disabled').removeAttr('readonly');
+      }
+    },
+
     setReadOnly: function(readonly) {
       if (readonly) {
-        $grade.attr('disabled', true);
+        EG.setGradeReadOnly(true);
         $comments.find(".delete_comment_link").hide();
         $add_a_comment.hide();
       } else {
@@ -1559,7 +1562,6 @@ define([
           hrefValues: ['submissionId', 'attachmentId']
         }).appendTo($submission_files_list)
           .find('a.display_name')
-            .addClass(attachment.mime_class)
             .data('attachment', attachment)
             .click(function(event){
               event.preventDefault();
@@ -1597,15 +1599,32 @@ define([
       $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
 
       $submission_late_notice.showIf(submission['late']);
-      $full_width_container.removeClass("with_enrollment_inactive_notice");
+      $full_width_container.removeClass("with_enrollment_notice");
       $enrollment_inactive_notice.showIf(
         _.any(jsonData.studentMap[this.currentStudent.id].enrollments, function(enrollment) {
           if(enrollment.workflow_state === 'inactive') {
-            $full_width_container.addClass("with_enrollment_inactive_notice");
+            $full_width_container.addClass("with_enrollment_notice");
             return true;
           }
         })
       );
+
+      var isConcluded = EG.isStudentConcluded(this.currentStudent.id);
+      $enrollment_concluded_notice.showIf(isConcluded);
+      SpeedgraderHelpers.setRightBarDisabled(isConcluded);
+      if (isConcluded) {
+        $full_width_container.addClass("with_enrollment_notice");
+      }
+    },
+
+    isStudentConcluded: function(student_id){
+      if (!jsonData.studentMap) {
+        return false;
+      }
+
+      return _.any(jsonData.studentMap[student_id].enrollments, function(enrollment) {
+        return enrollment.workflow_state === 'completed';
+      });
     },
 
     refreshSubmissionsToView: function(){
@@ -1661,12 +1680,12 @@ define([
 
     updateStatsInHeader: function(){
       $x_of_x_students.text(
-        I18n.t('gradee_index_of_total', '%{gradee} %{x} of %{y}', {
-          gradee: gradeeLabel,
+        I18n.t('%{x}/%{y}', {
           x: EG.currentIndex() + 1,
           y: this.totalStudentCount()
         })
       );
+      $("#gradee").text(gradeeLabel);
 
       var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s) {
         return (s.submission_state == 'graded' || s.submission_state == 'not_gradeable');
@@ -1698,7 +1717,7 @@ define([
       }
 
       $grded_so_far.text(
-        I18n.t('portion_graded', '%{x} / %{y} Graded', {
+        I18n.t('portion_graded', '%{x}/%{y}', {
           x: gradedStudents.length,
           y: jsonData.context.students.length
         })
@@ -1752,7 +1771,7 @@ define([
 
     renderLtiLaunch: function($div, urlBase, externalToolUrl) {
       this.emptyIframeHolder()
-      var launchUrl = urlBase + '&url=' + externalToolUrl;
+      var launchUrl = urlBase + '&url=' + encodeURIComponent(externalToolUrl);
       $div.html(
         $.raw('<iframe id="speedgrader_iframe" src="' + htmlEscape(launchUrl) + '" class="tool_launch"></iframe>' )
       ).show();
@@ -1859,49 +1878,119 @@ define([
 
     showDiscussion: function(){
       var hideStudentNames = utils.shouldHideStudentNames();
+      var that = this;
       $comments.html("");
+
+      function renderComment(comment, commentBlank) {
+        // Serialization seems to have changed... not sure if it's changed everywhere, though...
+        if(comment.submission_comment) { comment = comment.submission_comment; }
+        comment.posted_at = $.datetimeString(comment.created_at);
+
+        var hideStudentName = hideStudentNames && jsonData.studentMap[comment.author_id];
+        if (hideStudentName) { comment.author_name = I18n.t('Student'); }
+        var $comment = commentBlank.clone(true).fillTemplateData({ data: comment });
+
+        if (comment.draft === true) {
+          $comment.addClass('draft');
+        } else {
+          $comment.find('.draft-marker').remove();
+          $comment.find('.submit_comment_button').remove();
+        }
+
+        $comment.find('span.comment').html($.raw(htmlEscape(comment.comment).replace(/\n/g, "<br />")));
+        if (comment.avatar_path && !hideStudentName) {
+          $comment.find(".avatar").attr('src', comment.avatar_path).show();
+        }
+
+        if (comment.media_comment_type && comment.media_comment_id) {
+          $comment.find(".play_comment_link").data(comment).show();
+        }
+
+        $.each((comment.cached_attachments || comment.attachments || []), function(){
+          var attachment = this.attachment || this;
+          attachment.comment_id = comment.id;
+          attachment.submitter_id = EG.currentStudent.id;
+          $comment.find(".comment_attachments").append($comment_attachment_blank.clone(true).fillTemplateData({
+            data: attachment,
+            hrefValues: ['comment_id', 'id', 'submitter_id']
+          }).show().find("a").addClass(attachment.mime_class));
+        });
+
+        /* Submit a comment and Delete a comment listeners */
+
+        // this is really poorly decoupled but over in
+        // speed_grader.html.erb these rubricAssessment. variables are
+        // set.  what this is saying is: if I am able to grade this
+        // assignment (I am administrator in the course) or if I wrote
+        // this comment... and if the student isn't concluded
+        var isConcluded = EG.isStudentConcluded(EG.currentStudent.id);
+        var commentIsDeleteableByMe = (ENV.RUBRIC_ASSESSMENT.assessment_type === "grading" ||
+            ENV.RUBRIC_ASSESSMENT.assessor_id === comment.author_id) && !isConcluded;
+        var commentIsPublishableByMe = (comment.draft === true &&
+            parseInt(comment.author_id) === parseInt(ENV.current_user_id)) && !isConcluded;
+
+        $comment.find(".delete_comment_link").click(function(event) {
+          $(this).parents(".comment").confirmDelete({
+            url: "/submission_comments/" + comment.id,
+            message: I18n.t("Are you sure you want to delete this comment?"),
+            success: function(data) {
+              // Let's remove this comment from the client-side cache
+              if (that.currentStudent.submission && that.currentStudent.submission.submission_comments) {
+                var updatedComments = _.reject(
+                  that.currentStudent.submission.submission_comments,
+                  function(item) {
+                    return item.id === comment.id;
+                  }
+                );
+
+                that.currentStudent.submission.submission_comments = updatedComments;
+              }
+
+              // and also remove it from the DOM
+              $(this).slideUp(function() {
+                $(this).remove();
+              });
+            }
+          });
+        }).showIf(commentIsDeleteableByMe);
+
+        $comment.find(".submit_comment_button").click(function(event) {
+          if (confirm(I18n.t('Are you sure you want to submit this comment?'))) {
+            function commentUpdateSucceeded(data) {
+              var $replacementComment = renderComment(data.submission_comment, $comment_blank);
+              $replacementComment.show();
+              $comment.replaceWith($replacementComment);
+            }
+
+            function commentUpdateFailed(jqXHR, textStatus) {
+              $.flashError(I18n.t("Failed to submit draft comment"));
+            }
+
+            var url = '/submission_comments/' + comment.id;
+            var data = {
+              submission_comment: {
+                draft: 'false'
+              }
+            };
+
+            var ajaxOptions = {
+              url: url,
+              data: data,
+              dataType: 'json',
+              type: 'PATCH'
+            };
+
+            $.ajax(ajaxOptions).done(commentUpdateSucceeded).fail(commentUpdateFailed);
+          }
+        }).showIf(commentIsPublishableByMe);
+
+        return $comment;
+      }
+
       if (this.currentStudent.submission && this.currentStudent.submission.submission_comments) {
         $.each(this.currentStudent.submission.submission_comments, function(i, comment){
-          // Serialization seems to have changed... not sure if it's changed everywhere, though...
-          if(comment.submission_comment) { comment = comment.submission_comment; }
-          comment.posted_at = $.datetimeString(comment.created_at);
+          var $comment = renderComment(comment, $comment_blank);
 
-          var hideStudentName = hideStudentNames && jsonData.studentMap[comment.author_id];
-          if (hideStudentName) { comment.author_name = I18n.t('student', "Student"); }
-          var $comment = $comment_blank.clone(true).fillTemplateData({ data: comment });
-          $comment.find('span.comment').html($.raw(htmlEscape(comment.comment).replace(/\n/g, "<br />")));
-          if (comment.avatar_path && !hideStudentName) {
-            $comment.find(".avatar").attr('src', comment.avatar_path).show();
-          }
-          // this is really poorly decoupled but over in speed_grader.html.erb these rubricAssessment. variables are set.
-          // what this is saying is: if I am able to grade this assignment (I am administrator in the course) or if I wrote this comment...
-          var commentIsDeleteableByMe = ENV.RUBRIC_ASSESSMENT.assessment_type === "grading" ||
-                                        ENV.RUBRIC_ASSESSMENT.assessor_id === comment.author_id;
-
-          $comment.find(".delete_comment_link").click(function(event) {
-            $(this).parents(".comment").confirmDelete({
-              url: "/submission_comments/" + comment.id,
-              message: I18n.t('confirms.delete_comment', "Are you sure you want to delete this comment?"),
-              success: function(data) {
-                $(this).slideUp(function() {
-                  $(this).remove();
-                });
-              }
-            });
-          }).showIf(commentIsDeleteableByMe);
-
-          if (comment.media_comment_type && comment.media_comment_id) {
-            $comment.find(".play_comment_link").data(comment).show();
-          }
-          $.each((comment.cached_attachments || comment.attachments || []), function(){
-            var attachment = this.attachment || this;
-            attachment.comment_id = comment.id;
-            attachment.submitter_id = EG.currentStudent.id;
-            $comment.find(".comment_attachments").append($comment_attachment_blank.clone(true).fillTemplateData({
-              data: attachment,
-              hrefValues: ['comment_id', 'id', 'submitter_id']
-            }).show().find("a").addClass(attachment.mime_class));
-          });
           $comments.append($comment.show());
           $comments.find(".play_comment_link").mediaCommentThumbnail('normal');
         });
@@ -1909,7 +1998,12 @@ define([
       $comments.scrollTop(9999999);  //the scrollTop part forces it to scroll down to the bottom so it shows the most recent comment.
     },
 
-    revertFromFormSubmit: function() {
+    revertFromFormSubmit: function(draftComment) {
+        // This is to continue existing behavior of creating finalized comments by default
+        if (draftComment === undefined) {
+          draftComment = false;
+        }
+
         EG.showDiscussion();
         $add_a_comment_textarea.val("");
         // this is really weird but in webkit if you do $add_a_comment_textarea.val("").trigger('keyup') it will not let you
@@ -1922,13 +2016,25 @@ define([
           disableGroupCommentCheckbox();
         }
 
-        $comment_submitted.show();
-        $comment_submitted_message.attr("tabindex",-1).focus();
-        $add_a_comment_submit_button.text(I18n.t('buttons.submit_comment', "Submit Comment"));
+        if (draftComment) {
+          // Show a different message when auto-saving a draft comment
+          $comment_saved.show();
+          $comment_saved_message.attr("tabindex",-1).focus();
+        } else {
+          $comment_submitted.show();
+          $comment_submitted_message.attr("tabindex",-1).focus();
+        }
+        $add_a_comment_submit_button.text(I18n.t('submit', "Submit"));
     },
 
-    handleCommentFormSubmit: function(){
+    addSubmissionComment: function(draftComment){
+      // This is to continue existing behavior of creating finalized comments by default
+      if (draftComment === undefined) {
+        draftComment = false;
+      }
+
       $comment_submitted.hide();
+      $comment_saved.hide();
       if (
         !$.trim($add_a_comment_textarea.val()).length &&
         !$("#media_media_recording").data('comment_id') &&
@@ -1943,7 +2049,8 @@ define([
         'submission[assignment_id]': jsonData.id,
         'submission[user_id]': EG.currentStudent.id,
         'submission[group_comment]': ($("#submission_group_comment").attr('checked') ? "1" : "0"),
-        'submission[comment]': $add_a_comment_textarea.val()
+        'submission[comment]': $add_a_comment_textarea.val(),
+        'submission[draft_comment]': draftComment
       };
       if ($("#media_media_recording").data('comment_id')) {
         $.extend(formData, {
@@ -1962,7 +2069,7 @@ define([
         $.each(submissions, function(){
           EG.setOrUpdateSubmission(this.submission);
         });
-        EG.revertFromFormSubmit();
+        EG.revertFromFormSubmit(draftComment);
         window.setTimeout(function() {
           $rightside_inner.scrollTo($rightside_inner[0].scrollHeight, 500);
         });
@@ -2028,6 +2135,11 @@ define([
     // should only be called from the anonymous function attached so
     // #submit_same_score.
     handleGradeSubmit: function(e, use_existing_score){
+      if (EG.isStudentConcluded(EG.currentStudent.id)) {
+        EG.showGrade();
+        return;
+      }
+
       var url    = $(".update_submission_grade_url").attr('href'),
           method = $(".update_submission_grade_url").attr('title'),
           formData = {
@@ -2065,25 +2177,15 @@ define([
         EG.showGrade();
       });
     },
+
     showGrade: function() {
-      var submission;
-      var grade = EG.currentStudent.submission === undefined ?
-        "" :
-        EG.currentStudent.submission.grade;
+      var submission = EG.currentStudent.submission;
+      var grade = EG.getGradeToShow(submission, ENV.grading_role);
 
-      if (EG.currentStudent.submission !== undefined) {
-        submission = EG.currentStudent.submission;
-        if (submission.excused) {
-          grade = "EX"
-        }
-        else if (submission.grade !== null && !isNaN(parseFloat(submission.grade))) {
-          grade = round(submission.grade, 2);
-        }
-      }
-
-      $grade.val(grade)
-        .attr('disabled', typeof submission != "undefined" &&
-        submission.submission_type === 'online_quiz');
+      $grade.val(grade);
+      EG.setGradeReadOnly((typeof submission != "undefined" &&
+                           submission.submission_type === 'online_quiz') ||
+                          EG.isStudentConcluded(EG.currentStudent.id));
 
       $('#submit_same_score').hide();
       if (typeof submission != "undefined" && submission.score !== null) {
@@ -2116,8 +2218,6 @@ define([
         $query
           .removeClass(submissionStates)
           .addClass(className.raw)
-          .find(".ui-selectmenu-item-footer")
-            .text(className.formatted);
 
         $status = $(".ui-selectmenu-status");
         $statusIcon = $status.find(".speedgrader-selectmenu-icon");
@@ -2151,13 +2251,39 @@ define([
 
     },
 
+    getGradeToShow: function(submission, grading_role) {
+      var grade = '';
+
+      if (submission) {
+        if (submission.excused) {
+          grade = 'EX';
+        } else if (submission.score != null && (grading_role === 'moderator' || grading_role === 'provisional_grader')) {
+          grade = round(submission.score, 2).toString();
+        } else if (submission.grade != null) {
+          if (submission.grade !== '' && !isNaN(submission.grade)) {
+            grade = round(submission.grade, 2).toString();
+          } else {
+            grade = submission.grade;
+          }
+        }
+      }
+
+      return grade;
+    },
+
     initComments: function(){
       $add_a_comment_submit_button.click(function(event) {
         event.preventDefault();
-        EG.handleCommentFormSubmit();
+        if ($add_a_comment_submit_button.hasClass('ui-state-disabled')) {
+          return;
+        }
+        EG.addSubmissionComment();
       });
       $add_attachment.click(function(event) {
         event.preventDefault();
+        if (($add_attachment).hasClass('ui-state-disabled')) {
+          return;
+        }
         var $attachment = $comment_attachment_input_blank.clone(true);
         $attachment.find("input").attr('name', 'attachments[' + fileIndex + '][uploaded_data]');
         fileIndex++;

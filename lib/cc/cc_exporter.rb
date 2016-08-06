@@ -50,6 +50,11 @@ module CC
 
     def export
       begin
+        if for_external_migration? && !@content_export.selective_export?
+          # we already know we're exporting all the data so we can begin the external exports now
+          @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course)
+        end
+
         create_export_dir
         create_zip_file
         if @qti_only_export
@@ -59,6 +64,18 @@ module CC
         end
         @manifest.create_document
         @manifest.close
+
+        if for_external_migration?
+          if @content_export.selective_export?
+            # if it's selective, we have to wait until we've completed the rest of the export
+            # before we really know what we exported. because magic
+            @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course,
+              :selective => true, :exported_assets => @content_export.exported_assets.to_a)
+          end
+          external_content = Canvas::Migration::ExternalContent::Migrator.retrieve_exported_content(@pending_exports)
+          write_external_content(external_content)
+        end
+
         copy_all_to_zip
         @zip_file.close
 
@@ -85,6 +102,18 @@ module CC
       true
     end
 
+    def write_external_content(external_content)
+      return unless external_content.present?
+
+      folder = File.join(@export_dir, CCHelper::EXTERNAL_CONTENT_FOLDER)
+      FileUtils::mkdir_p(folder)
+
+      external_content.each do |service_key, data|
+        path = File.join(folder, "#{service_key}.json")
+        File.write(path, data.to_json)
+      end
+    end
+
     def referenced_files
       @manifest ? @manifest.referenced_files : {}
     end
@@ -105,12 +134,20 @@ module CC
       @content_export ? @content_export.export_object?(obj, asset_type) : true
     end
 
+    def add_exported_asset(obj)
+      @content_export && @content_export.add_exported_asset(obj)
+    end
+
     def export_symbol?(obj)
       @content_export ? @content_export.export_symbol?(obj) : true
     end
 
     def epub_export?
       @content_export ? @content_export.epub_export.present? : nil
+    end
+
+    def for_external_migration?
+      @content_export && !(@qti_only_export || epub_export?)
     end
 
     private

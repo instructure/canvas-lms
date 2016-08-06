@@ -22,6 +22,8 @@ describe GradingPeriodGroup do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:valid_attributes) { { title: "A Title" } }
 
+  let(:account) { Account.default }
+
   # after dev lands in master, re add this title validation
   # it { is_expected.to validate_presence_of(:title) }
   it { is_expected.to belong_to(:course) }
@@ -31,95 +33,66 @@ describe GradingPeriodGroup do
   it { is_expected.to allow_mass_assignment_of(:title) }
 
   describe ".for" do
-    context "given a root account" do
-      let(:root_account) { Account.default }
-      context "given a set with a term" do
-        let(:term) { root_account.enrollment_terms.first }
-        let!(:grading_period_set) do
-          GradingPeriodGroup.create!(valid_attributes) do |set|
-            set.enrollment_terms << term
-          end
-        end
+    context "when given a root account" do
+      it "fetches sets on a root account" do
+        set = account.grading_period_groups.create!(valid_attributes)
+        sets = GradingPeriodGroup.for(account)
+        expect(sets.count).to eql 1
+        expect(sets).to include set
+      end
 
-        it "fetches sets via enrollment terms" do
-          sets = GradingPeriodGroup.for(root_account)
-          expect(sets.count).to eql 1
-          expect(sets).to include grading_period_set
-        end
-
-        context "given a sub account" do
-          let(:sub_account) { root_account.sub_accounts.create! }
-          it "fetches sets on the root account" do
-            sets = GradingPeriodGroup.for(sub_account)
-            expect(sets.count).to eql 1
-            expect(sets).to include grading_period_set
-          end
-        end
+      it "uses the root account when given sub accounts" do
+        set = account.grading_period_groups.create!(valid_attributes)
+        sub_account = account.sub_accounts.create!
+        sets = GradingPeriodGroup.for(sub_account)
+        expect(sets.count).to eql 1
+        expect(sets).to include set
       end
     end
 
-    context "given a course" do
-      let(:course) { root_account.courses.create! }
+    context "when given a course" do
       it "is expected to fail" do
+        course = account.courses.create!
         expect {
           GradingPeriodGroup.for(course)
-        }.to raise_error
+        }.to raise_error(ArgumentError)
       end
     end
   end
 
   describe "validation" do
-    let(:account) { Account.default }
     let(:group) { GradingPeriodGroup.new valid_attributes }
-    let(:enrollment_term) { account.enrollment_terms.create! }
 
-    it "is valid with only an active enrollment term" do
-      group.enrollment_terms << enrollment_term
+    it "is valid with an account" do
+      group = account.grading_period_groups.build(title: "Example Group")
       expect(group).to be_valid
     end
 
     it "is valid with a course" do
       course = Course.create!(account: Account.default)
-      group = course.grading_period_groups.build(title: 'a group on a course')
+      group = course.grading_period_groups.build(title: "Example Group")
       expect(group).to be_valid
     end
 
-    it "is not valid without a course or an enrollment term" do
+    it "is not valid with a sub-account" do
+      sub_account = account.sub_accounts.create!
+      group = sub_account.grading_period_groups.build(title: "Example Group")
       expect(group).not_to be_valid
     end
 
-    it "is not valid with enrollment terms associated with different accounts" do
-      account_1 = account_model
-      account_2 = account_model
-      term_1 = account_1.enrollment_terms.create!
-      term_2 = account_2.enrollment_terms.create!
-      group.enrollment_terms << term_1
-      group.enrollment_terms << term_2
+    it "is not valid with only an enrollment term" do
+      group.enrollment_terms << account.enrollment_terms.create!
       expect(group).not_to be_valid
     end
 
-    it "is valid with only deleted enrollment terms and is deleted" do
-      enrollment_term.destroy
-      group.enrollment_terms << enrollment_term
-      group.workflow_state = 'deleted'
-      expect(group).to be_valid
-    end
-
-    it "is not valid with only deleted enrollment terms and not deleted" do
-      enrollment_term.destroy
-      group.enrollment_terms << enrollment_term
+    it "is not valid without an account or a course" do
       expect(group).not_to be_valid
     end
 
-    it "is not valid with enrollment terms with different accounts and workflow states" do
-      account_1 = account_model
-      account_2 = account_model
-      term_1 = account_1.enrollment_terms.create!
-      term_2 = account_2.enrollment_terms.create!
-      term_2.destroy
-      group.enrollment_terms << term_1
-      group.enrollment_terms << term_2
-      expect(group).not_to be_valid
+    it "is not able to mass-assign the account id" do
+      grading_period_group = GradingPeriodGroup.new(valid_attributes.merge(account_id: account.id))
+      expect(grading_period_group.account_id).to be_nil
+      expect(grading_period_group.root_account).to be_nil
     end
 
     it "is not able to mass-assign the course id" do
@@ -128,54 +101,44 @@ describe GradingPeriodGroup do
       expect(grading_period_group.course_id).to be_nil
       expect(grading_period_group.course).to be_nil
     end
-  end
 
-  describe "#save" do
-    let(:account) { Account.default }
-
-    it "associates with the account of a related enrollment term" do
-      term_1 = account.enrollment_terms.create!
-      term_2 = account.enrollment_terms.create!
-      group = group_helper.create_for_enrollment_term(term_1)
-      group.enrollment_terms = [term_1, term_2]
-      expect(group.reload.account_id).to eql(account.id)
+    it "cannot be created for a soft-deleted account" do
+      account.update_attribute(:workflow_state, 'deleted')
+      group = account.grading_period_groups.build(title: "Example Group")
+      expect(group).not_to be_valid
     end
 
-    it "preserves account_id when dissociating from an enrollment term" do
-      term_1 = account.enrollment_terms.create!
-      term_2 = account.enrollment_terms.create!
-      group = group_helper.create_for_enrollment_term(term_1)
-      group.enrollment_terms = [term_1, term_2]
-      group.destroy
-      expect(group.reload.account_id).to eql(account.id)
+    it "cannot be created for a soft-deleted course" do
+      course = Course.create!(account: Account.default)
+      course.update_attribute(:workflow_state, 'deleted')
+      group = course.grading_period_groups.build(title: "Example Group")
+      expect(group).not_to be_valid
     end
 
-    it "does not associate the account when already associated with a course" do
-      course = account.courses.create!
-      term = account.enrollment_terms.create!
-      group = group_helper.create_for_course(course)
-      group.enrollment_terms << term
-      group.save
-      expect(group.account_id).to be_nil
+    it "can belong to a soft-deleted account when also soft-deleted" do
+      group = group_helper.create_for_account(account)
+      account.update_attribute(:workflow_state, 'deleted')
+      group.reload
+      expect(group).not_to be_valid
+      group.workflow_state = 'deleted'
+      expect(group).to be_valid
     end
 
-    it "deletes orphaned grading period groups" do
-      term_1 = account.enrollment_terms.create!
-      group_1 = group_helper.create_for_enrollment_term(term_1)
-      term_2 = account.enrollment_terms.create!
-      group_2 = GradingPeriodGroup.new valid_attributes
-      group_2.enrollment_terms.concat([term_1, term_2])
-      group_2.save!
-      expect(group_1.reload).to be_deleted
+    it "can belong to a soft-deleted course when also soft-deleted" do
+      course = Course.create!(account: Account.default)
+      group = group_helper.legacy_create_for_course(course)
+      course.update_attribute(:workflow_state, 'deleted')
+      group.reload
+      expect(group).not_to be_valid
+      group.workflow_state = 'deleted'
+      expect(group).to be_valid
     end
   end
 
   describe "#multiple_grading_periods_enabled?" do
-    let(:account) { Account.default }
-
-    context "when associated with an enrollment term" do
+    context "when associated with an account" do
       let(:term) { account.enrollment_terms.create! }
-      let(:group) { group_helper.create_for_enrollment_term(term) }
+      let(:group) { group_helper.create_for_account(account) }
 
       it "returns false if the multiple grading periods feature flag has not been enabled" do
         expect(group.multiple_grading_periods_enabled?).to eq(false)
@@ -189,7 +152,7 @@ describe GradingPeriodGroup do
 
     context "when associated with a course" do
       let(:course) { Course.create!(account: account) }
-      let(:group) { group_helper.create_for_course(course) }
+      let(:group) { group_helper.legacy_create_for_course(course) }
 
       it "returns false if the multiple grading periods feature flag has not been enabled" do
         expect(group.multiple_grading_periods_enabled?).to eq(false)
@@ -203,7 +166,6 @@ describe GradingPeriodGroup do
   end
 
   it_behaves_like "soft deletion" do
-    let(:account) { Account.create! }
     let(:course) { Course.create!(account: account) }
     let(:creation_arguments) { {title: "A title"} }
     subject { course.grading_period_groups }
@@ -213,7 +175,7 @@ describe GradingPeriodGroup do
     let(:account) { Account.default }
     let(:term_1)  { account.enrollment_terms.create! }
     let(:term_2)  { account.enrollment_terms.create! }
-    let(:group)   { group_helper.create_for_enrollment_term(term_1) }
+    let(:group)   { group_helper.create_for_account(account) }
 
     it "removes associations from related enrollment terms" do
       group.enrollment_terms = [term_1, term_2]
@@ -245,11 +207,8 @@ describe GradingPeriodGroup do
         @sub_account = @root_account.sub_accounts.create!
         course_with_teacher(account: @root_account, active_all: true)
         course_with_student(course: @course, active_all: true)
-        root_account_term = @root_account.enrollment_terms.create!
-        sub_account_term = @sub_account.enrollment_terms.create!
-        @root_account_group = group_helper.create_for_enrollment_term(root_account_term)
-        @sub_account_group = group_helper.create_for_enrollment_term(sub_account_term)
-        @course_group = group_helper.create_for_course(@course)
+        @root_account_group = group_helper.create_for_account(@root_account)
+        @course_group = group_helper.legacy_create_for_course(@course)
       end
 
       context "root-account admin" do
@@ -261,16 +220,6 @@ describe GradingPeriodGroup do
         it "can read, create, update, and delete root-account " \
           "grading period groups" do
           expect(@root_account_group.rights_status(@root_account_admin, *permissions)).to eq({
-            read:   true,
-            create: true,
-            update: true,
-            delete: true
-          })
-        end
-
-        it "can read, create, update, and delete sub-account " \
-          "grading period groups" do
-          expect(@sub_account_group.rights_status(@root_account_admin, *permissions)).to eq({
             read:   true,
             create: true,
             update: true,
@@ -306,17 +255,6 @@ describe GradingPeriodGroup do
           })
         end
 
-        it "can read, create, update, and delete sub-account " \
-          "grading period groups" do
-          expect(@sub_account_group.
-            rights_status(@sub_account_admin, *permissions)).to eq({
-            read:   true,
-            create: true,
-            update: true,
-            delete: true
-          })
-        end
-
         it "cannot read, create, update, delete course " \
           "grading period groups, when the course is under a root-account" do
           expect(@course_group.
@@ -341,17 +279,6 @@ describe GradingPeriodGroup do
           })
         end
 
-        it "cannot read, create, update, nor delete sub-account " \
-          "grading period groups" do
-          expect(@sub_account_group.
-            rights_status(@teacher, *permissions)).to eq({
-            read:   false,
-            create: false,
-            update: false,
-            delete: false
-          })
-        end
-
         it "can read, update, and delete but NOT create course " \
           "grading period groups" do
           expect(@course_group.
@@ -369,17 +296,6 @@ describe GradingPeriodGroup do
           expect(@root_account_group.
             rights_status(@student, *permissions)).to eq({
             read:   true,
-            create: false,
-            update: false,
-            delete: false
-          })
-        end
-
-        it "cannot read, create, update, nor delete sub-account " \
-          "grading period groups" do
-          expect(@sub_account_group.
-            rights_status(@student, *permissions)).to eq({
-            read:   false,
             create: false,
             update: false,
             delete: false
@@ -423,11 +339,8 @@ describe GradingPeriodGroup do
         @sub_account = @root_account.sub_accounts.create!
         course_with_teacher(account: @sub_account, active_all: true)
         course_with_student(course: @course, active_all: true)
-        root_account_term = @root_account.enrollment_terms.create!
-        sub_account_term = @sub_account.enrollment_terms.create!
-        @root_account_group = group_helper.create_for_enrollment_term(root_account_term)
-        @sub_account_group = group_helper.create_for_enrollment_term(sub_account_term)
-        @course_group = group_helper.create_for_course(@course)
+        @root_account_group = group_helper.create_for_account(@root_account)
+        @course_group = group_helper.legacy_create_for_course(@course)
       end
 
       context "root-account admin" do
@@ -439,17 +352,6 @@ describe GradingPeriodGroup do
         it "can read, create, update, and delete root-account " \
           "grading period groups" do
           expect(@root_account_group.
-            rights_status(@root_account_admin, *permissions)).to eq({
-            read:   true,
-            create: true,
-            update: true,
-            delete: true
-          })
-        end
-
-        it "can read, create, update, and delete sub-account " \
-          "grading period groups" do
-          expect(@sub_account_group.
             rights_status(@root_account_admin, *permissions)).to eq({
             read:   true,
             create: true,
@@ -486,17 +388,6 @@ describe GradingPeriodGroup do
           })
         end
 
-        it "can read, create, update, and delete sub-account " \
-          "grading period groups" do
-          expect(@sub_account_group.
-            rights_status(@sub_account_admin, *permissions)).to eq({
-            read:   true,
-            create: true,
-            update: true,
-            delete: true
-          })
-        end
-
         it "can read, update, and delete but NOT create course grading " \
           "period groups when the course is under the sub-account" do
           expect(@course_group.
@@ -520,16 +411,6 @@ describe GradingPeriodGroup do
           })
         end
 
-        it "can only read sub-account grading period groups" do
-          expect(@sub_account_group.
-            rights_status(@teacher, *permissions)).to eq({
-            read:   true,
-            create: false,
-            update: false,
-            delete: false
-          })
-        end
-
         it "can read, update and delete but NOT create course " \
           "grading period groups" do
           expect(@course_group.
@@ -545,16 +426,6 @@ describe GradingPeriodGroup do
       context "student" do
         it "can only read root-account grading period groups" do
           expect(@root_account_group.
-            rights_status(@student, *permissions)).to eq({
-            read:   true,
-            create: false,
-            update: false,
-            delete: false
-          })
-        end
-
-        it "can only read sub-account grading period groups" do
-          expect(@sub_account_group.
             rights_status(@student, *permissions)).to eq({
             read:   true,
             create: false,

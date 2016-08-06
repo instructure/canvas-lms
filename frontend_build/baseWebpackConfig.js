@@ -95,7 +95,8 @@ module.exports = {
         include: [
           path.resolve(__dirname, "../app/coffeescript"),
           path.resolve(__dirname, "../spec/coffeescripts"),
-          /gems\/plugins\/.*\/app\/coffeescripts\//
+          /gems\/plugins\/.*\/app\/coffeescripts\//,
+          /gems\/plugins\/.*\/spec_canvas\/coffeescripts\//
         ],
         loaders: [
           "coffee-loader",

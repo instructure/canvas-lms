@@ -1,7 +1,8 @@
 define [
   'i18n!file_rename_form'
   'react'
-], (I18n, React) ->
+  'react-dom'
+], (I18n, React, ReactDOM) ->
 
   FileRenameForm =
     displayName: 'FileRenameForm'
@@ -42,7 +43,7 @@ define [
       @props.onNameConflictResolved({
         file: @state.fileOptions.file
         dup: 'rename'
-        name: @refs.newName.getDOMNode().value
+        name: ReactDOM.findDOMNode(@refs.newName).value
         expandZip: @state.fileOptions.expandZip
       })
 

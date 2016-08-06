@@ -116,7 +116,10 @@ class DiscussionTopicsApiController < ApplicationController
       end
 
       participants = Shard.partition_by_shard(participant_ids) do |shard_ids|
-        User.find(shard_ids)
+        # Preload accounts because they're needed to figure out if a user's avatar should be shown in
+        # AvatarHelper#avatar_url_for_user, which is used by user_display_json. We get an N+1 on the
+        # number of discussion participants if we don't do this.
+        User.where(id: shard_ids).preload({pseudonym: :account}).to_a
       end
 
       include_enrollment_state = params[:include_enrollment_state] && (@context.is_a?(Course) || @context.is_a?(Group)) &&
@@ -126,12 +129,13 @@ class DiscussionTopicsApiController < ApplicationController
         enrollment_context = @context.is_a?(Course) ? @context : @context.context
         all_enrollments = enrollment_context.enrollments.where(:user_id => participants).to_a
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
+        all_enrollments = all_enrollments.group_by(&:user_id)
       end
 
       participant_info = participants.map do |participant|
         json = user_display_json(participant, @context.is_a_context? && @context)
         if include_enrollment_state
-          enrolls = all_enrollments.select{|e| e.user_id == participant.id}
+          enrolls = all_enrollments[participant.id] || []
           json[:isInactive] = enrolls.any? && enrolls.all?(&:inactive?)
         end
 

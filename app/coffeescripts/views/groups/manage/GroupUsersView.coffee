@@ -77,6 +77,7 @@ define [
         @moveUser(e, $target)
 
     moveUser: (e, $target) ->
+      $target.prev().focus()
       @collection.get($target.data('user-id')).save 'group', null
 
     removeLeader: (e) ->

@@ -24,3 +24,14 @@ define [
     equal document.activeElement, $row1.find('.remove_link_row')[0]
     @view.removeLinkRow(null, $row1.find('.remove_link_row'))
     equal document.activeElement, $('#profile_bio')[0]
+
+  test 'focuses the name input when it is available and edit is clicked', ->
+    @fixtures.innerHTML += "<input id='name_input' />"
+    @view = new ProfileShow
+    @view.showEditForm()
+    equal(document.activeElement, $('#name_input')[0])
+
+  test 'focuses the bio text area when the name input is not available and edit is clicked', ->
+    @view = new ProfileShow
+    @view.showEditForm()
+    equal(document.activeElement, $('#profile_bio')[0])

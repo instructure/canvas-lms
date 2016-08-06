@@ -37,10 +37,11 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
           msg = 'make sure the conbined results match the result of all_fingerprints_for'
           expect(fingerprints).to eq(BrandableCSS.all_fingerprints_for(bundle_name).values), msg
 
-          msg = "all variants should outupt the same css if a bundle doesn't pull in
-                 the variables file. If it does, there should be some that are different"
-          unique_fingerprints = fingerprints.map{ |f| f[:combinedChecksum] }.uniq
-          expect(unique_fingerprints.length).to(includes_no_variables ? eq(1): (be > 1), msg)
+          if includes_no_variables
+            msg = "all variants should outupt the same css if a bundle doesn't pull in the variables file"
+            unique_fingerprints = fingerprints.map{ |f| f[:combinedChecksum] }.uniq
+            expect(unique_fingerprints.length).to eq(1), msg
+          end
         end
       end
     end

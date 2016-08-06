@@ -25,7 +25,8 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
       assignments = grades.map ([z,possible], i) =>
         assignment =
           points_possible: possible,
-          id: @assignment_id + i
+          id: @assignment_id + i,
+          omit_from_final_grade: false
       @submissions ||= []
       submissions = grades.map ([score,z], i) =>
         submission =
@@ -329,3 +330,24 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     grading_scheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['E', 0.50]]
 
     equal(GradeCalculator.letter_grade(grading_scheme, 40), 'E')
+
+  test "omit from final grade assignments", ->
+    @setup_grades @group, [[10, 10], [10, 10]]
+    @group.assignments[0].omit_from_final_grade = true
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 10, 10
+    assertGrade result, 'final', 10, 10
+
+  test "omit from final grade assignments with ungraded assignments", ->
+    @setup_grades @group, [[10, 10], [null, 10]]
+    @group.assignments[0].omit_from_final_grade = true
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 0, 0
+    assertGrade result, 'final', 0, 10
+
+  test "omit from final grade takes precedence over ungraded", ->
+    @setup_grades @group, [[10, 10], [null, 10]]
+    @group.assignments[1].omit_from_final_grade = true
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'current', 10, 10
+    assertGrade result, 'final', 10, 10

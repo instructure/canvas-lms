@@ -18,7 +18,7 @@ module FilesCommon
     ff('.al-trigger-gray')[row_selected].click
     fln("Rename").click
     expect(f(".ef-edit-name-cancel")).to be_displayed
-    file_name_textbox_el = f('.input-block-level')
+    file_name_textbox_el = f('.ef-edit-name-form__input')
     replace_content(file_name_textbox_el, file_name_new)
     file_name_textbox_el.send_keys(:return)
   end
@@ -59,7 +59,7 @@ module FilesCommon
 
   def move_multiple_using_toolbar(files = [])
     files.each do |file_name|
-      file = driver.find_element(xpath: "//span[contains(text(), '#{file_name}') and @class='media-body']")
+      file = driver.find_element(xpath: "//span[contains(text(), '#{file_name}') and @class='ef-name-col__text']")
                    .find_element(xpath: "../..")
       driver.action.key_down(:control).click(file).key_up(:control).perform
     end
@@ -138,7 +138,7 @@ module FilesCommon
 
   def add_folder(name = 'new folder')
     click_new_folder_button
-    new_folder = f("input.input-block-level")
+    new_folder = f("input.ef-edit-name-form__input")
     new_folder.send_keys(name)
     new_folder.send_keys(:return)
     wait_for_ajaximations

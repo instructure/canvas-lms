@@ -24,7 +24,8 @@ define([
       sharedBrandConfigs: React.PropTypes.arrayOf(customTypes.sharedBrandConfig).isRequired,
       activeBrandConfig: customTypes.brandConfig.isRequired,
       accountID: React.PropTypes.string.isRequired,
-      brandableVariableDefaults: customTypes.brandableVariableDefaults
+      brandableVariableDefaults: customTypes.brandableVariableDefaults,
+      baseBrandableVariables: customTypes.variables
     },
 
     getInitialState () {
@@ -43,11 +44,7 @@ define([
       if (_default && _default[0] === '$') {
         return this.brandVariableValue(brandConfig, _default.substring(1))
       }
-      const parent = _.find(this.props.sharedBrandConfigs, sbc => sbc.brand_config.md5 === brandConfig.parent_md5)
-      if (parent) {
-        return this.brandVariableValue(parent.brand_config, variableName)
-      }
-      return _default
+      return this.props.baseBrandableVariables[variableName]
     },
 
     startFromBlankSlate() {
@@ -74,8 +71,11 @@ define([
     },
 
     isActiveBrandConfig (brandConfig) {
-      return this.props.activeBrandConfig &&
-             this.props.activeBrandConfig.md5 === brandConfig.md5
+      if (this.props.activeBrandConfig) {
+        return brandConfig.md5 === this.props.activeBrandConfig.md5
+      } else {
+        return brandConfig === blankConfig.brand_config
+      }
     },
 
     isDeletable (sharedBrandConfig) {
@@ -114,7 +114,10 @@ define([
       }
 
       const isActiveEditableTheme = (sbc) =>
-        !isSystemTheme(sbc) && this.props.activeBrandConfig.md5 === sbc.brand_config.md5
+        !isSystemTheme(sbc) && (
+          this.props.activeBrandConfig &&
+          this.props.activeBrandConfig.md5 === sbc.brand_config.md5
+        )
 
       // even if this theme's md5 is active, don't mark it as active if it is a system theme
       // and there is an account-shared theme that also matches the active md5

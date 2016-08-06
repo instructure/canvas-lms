@@ -110,10 +110,12 @@ class Course < ActiveRecord::Base
 
   has_many :self_enrolled_students, -> { where("self_enrolled") }, through: :student_enrollments, source: :user
   has_many :all_students, :through => :all_student_enrollments, :source => :user
+  has_many :all_accepted_students, :through => :all_accepted_student_enrollments, :source => :user
   has_many :participating_students, -> { where(enrollments: { type: ['StudentEnrollment', 'StudentViewEnrollment'], workflow_state: 'active' }) }, through: :enrollments, source: :user
   has_many :student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :admin_visible_student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :all_student_enrollments, -> { where("enrollments.workflow_state<>'deleted' AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
+  has_many :all_accepted_student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :all_real_users, :through => :all_real_enrollments, :source => :user
   has_many :all_real_enrollments, -> { where("enrollments.workflow_state<>'deleted' AND enrollments.type<>'StudentViewEnrollment'").preload(:user) }, class_name: 'Enrollment'
   has_many :all_real_students, :through => :all_real_student_enrollments, :source => :user
@@ -152,7 +154,7 @@ class Course < ActiveRecord::Base
   has_many :assignments, -> { order('assignments.created_at') }, as: :context, dependent: :destroy
   has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, dependent: :destroy
   has_many :submissions, -> { order('submissions.updated_at DESC') }, through: :assignments, dependent: :destroy
-  has_many :submission_comments, as: :context
+  has_many :submission_comments, -> { published }, as: :context
   has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order('discussion_topics.position DESC, discussion_topics.created_at DESC') }, as: :context, dependent: :destroy
   has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, class_name: 'DiscussionTopic'
   has_many :all_discussion_topics, -> { preload(:user) }, as: :context, class_name: "DiscussionTopic", dependent: :destroy
@@ -218,6 +220,7 @@ class Course < ActiveRecord::Base
   before_save :update_show_total_grade_as_on_weighting_scheme_change
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
+  after_save :update_enrollment_states_if_necessary
   after_save :set_self_enrollment_code
 
   before_save :touch_root_folder_if_necessary
@@ -287,6 +290,24 @@ class Course < ActiveRecord::Base
     if (self.root_account_id_changed? || self.account_id_changed?) && !self.class.skip_updating_account_associations?
       send_now_or_later_if_production(new_record? ? :now : :later, :update_account_associations)
     end
+  end
+
+  def update_enrollment_states_if_necessary
+    if (changes.keys & %w{restrict_enrollments_to_course_dates account_id enrollment_term_id}).any? ||
+        (self.restrict_enrollments_to_course_dates? && (changes.keys & %w{start_at conclude_at}).any?) ||
+        (self.workflow_state_changed? && (completed? || self.workflow_state_was == 'completed'))
+        # a lot of things can change the date logic here :/
+
+      EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self) if self.enrollments.exists?
+      # if the course date settings have been changed, we'll end up reprocessing all the access values anyway, so no need to queue below for other setting changes
+    elsif @changed_settings
+      changed_keys = (@changed_settings & [:restrict_student_future_view, :restrict_student_past_view])
+      if changed_keys.any?
+        EnrollmentState.send_later_if_production(:invalidate_access_for_course, self, changed_keys)
+      end
+    end
+
+    @changed_settings = nil
   end
 
   def module_based?
@@ -2060,19 +2081,24 @@ class Course < ActiveRecord::Base
 
   # returns a scope, not an array of users/enrollments
   def students_visible_to(user, include: nil)
-    scope = case include
-            when :priors
-              self.all_students
-            when :inactive
-              self.admin_visible_students
-            else
-              self.students
-            end
+    include = Array(include)
+
+    if include.include?(:priors)
+      scope = self.all_students
+    elsif include.include?(:inactive) || include.include?(:completed)
+      scope = self.all_accepted_students
+      scope = scope.where("enrollments.workflow_state<>'inactive'") unless include.include?(:inactive)
+      scope = scope.where("enrollments.workflow_state<>'completed'") unless include.include?(:completed)
+    else
+      scope = self.students
+    end
+
     self.apply_enrollment_visibility(scope, user, nil, include: include)
   end
 
   # can apply to user scopes as well if through enrollments (e.g. students, teachers)
-  def apply_enrollment_visibility(scope, user, section_ids=nil, include: nil)
+  def apply_enrollment_visibility(scope, user, section_ids=nil, include: [])
+    include = Array(include)
     if section_ids
       scope = scope.where('enrollments.course_section_id' => section_ids.to_a)
     end
@@ -2081,19 +2107,32 @@ class Course < ActiveRecord::Base
     visibility_level = enrollment_visibility_level_for(user, visibilities)
 
     # teachers, account admins, and student view students can see student view students
-    unless visibility_level == :full || visibilities.any?{|v| v[:admin] || v[:type] == 'StudentViewEnrollment' }
+    unless visibility_level == :full ||
+        visibilities.any?{|v| v[:admin] || v[:type] == 'StudentViewEnrollment' }
       scope = scope.where("enrollments.type<>'StudentViewEnrollment'")
     end
 
-    if include == :inactive && ![:full, :sections].include?(visibility_level)
-      scope = scope.where("enrollments.workflow_state <> 'inactive'") # don't really include inactive unless user is able to view them
+    if include.include?(:inactive) && ![:full, :sections].include?(visibility_level)
+      # don't really include inactive unless user is able to view them
+      scope = scope.where("enrollments.workflow_state <> 'inactive'")
     end
-    # See also MessageableUser::Calculator (same logic used to get users across multiple courses) (should refactor)
+    if include.include?(:completed) && ![:full, :sections].include?(visibility_level)
+      # don't really include concluded unless user is able to view them
+      scope = scope.where("enrollments.workflow_state <> 'completed'")
+    end
+    # See also MessageableUser::Calculator (same logic used to get
+    # users across multiple courses) (should refactor)
     case visibility_level
-      when :full, :limited then scope
-      when :sections then scope.where("enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))", visibilities.map{|s| s[:course_section_id]}, false)
-      when :restricted then scope.where(:enrollments => { :user_id  => visibilities.map{|s| s[:associated_user_id]}.compact + [user] })
-      else scope.none
+    when :full, :limited
+      scope
+    when :sections
+      scope.where("enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))",
+                  visibilities.map{|s| s[:course_section_id]}, false)
+    when :restricted
+      user_ids = visibilities.map { |s| s[:associated_user_id] }.compact
+      scope.where(enrollments: { user_id: user_ids + [user.id] })
+    else
+      scope.none
     end
   end
 
@@ -2505,7 +2544,12 @@ class Course < ActiveRecord::Base
         end
       end
       def #{setting}=(val)
-        settings_frd[#{setting.inspect}] = #{cast_expression}
+        new_val = #{cast_expression}
+        if settings_frd[#{setting.inspect}] != new_val
+          @changed_settings ||= []
+          @changed_settings << #{setting.inspect}
+          settings_frd[#{setting.inspect}] = new_val
+        end
       end
     CODE
     alias_method "#{setting}?", setting if opts[:boolean]
@@ -2610,7 +2654,7 @@ class Course < ActiveRecord::Base
 
   def participating_users(user_ids)
     enrollments = self.enrollments.eager_load(:user).
-      where(:enrollments => {:workflow_state => 'active'}, :users => {:id => user_ids})
+      where(:enrollments => {:workflow_state => 'active'}, :users => {:id => user_ids}).to_a
     Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
     enrollments.select { |e| e.active? }.map(&:user).uniq
   end

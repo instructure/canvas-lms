@@ -5,7 +5,10 @@
       <td class="answer_select" style="width: 30px;">
         <div style="width: 30px;" class="answer_box">
           <% click_to_set_correct = t("Click to set this answer as correct") %>
-          <a href="#" class="select_answer_link no-hover" role="button" title="<%= click_to_set_correct %>"><%= image_tag "blank_answer.png", :class => "answer_image", :alt => click_to_set_correct %></a><br/>
+          <a href="#" class="select_answer_link no-hover" role="button" title="<%= click_to_set_correct %>">
+            <span class="selectAsCorrectAnswerId screenreader-only"></span>
+            <%= image_tag "blank_answer.png", :class => "answer_image", :alt => click_to_set_correct %>
+          </a><br/>
           <span class="answer_weight"><input class="float_value" type="text" style="width: 25px;" aria-label="<%= t("Answer Weight") %>" name="answer_weight"/>%</span>
         </div>
       </td><td>
@@ -65,6 +68,7 @@
           <a href="#" class="comment_focus" title="<%= edit_comment_text %>">
             <span class="ellipsis" aria-hidden="true">...</span>
             <i class="icon-edit standalone-icon"></i>
+            <span class="commentAnswerId screenreader-only"></span>
             <span class="screenreader-only"><%= edit_comment_text %></span>
           </a>
           <span id="comments_header" class="details"><%= before_label(:answer_comments, "Comments, if the student chooses this answer") %></span>
@@ -82,10 +86,12 @@
           <% delete_html_text = t("Delete this Answer") %>
           <a href="#" class="edit_html" title="<%= edit_html_text %>">
             <i class="icon-edit standalone-icon"></i>
+            <span class="editAnswerId screenreader-only"></span>
             <span class="screenreader-only"><%= edit_html_text %></span>
           </a>
           <a href="#" class="delete_answer_link" title="<%= delete_html_text %>">
             <i class="icon-trash standalone-icon"></i>
+            <span class="deleteAnswerId screenreader-only"></span>
             <span class="screenreader-only"><%= delete_html_text %></span>
           </a>
         </div>

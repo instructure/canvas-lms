@@ -1,3 +1,21 @@
+/// Below are the shared styles for our content pieces. Because our layout
+/// changes based on whether our course menu is open or shut
+/// we needed to ensure we share the right styles with these sections, but
+/// still enforce different breakpoints when needed
+
+@mixin shared-main-content {display: flex;}
+@mixin shared-primary {
+  flex: 1;
+  // Fix Firefox and IE Edge issues with contents breaking out of flex container
+  min-width: 1px;
+}
+@mixin shared-secondary {
+  flex: 0 0 $ic-sp*24;
+  padding-left: $ic-sp*2;
+}
+
+
+@if $use_new_styles {
 $ic-left-side-width: $ic-sp*15;
 
 ::-webkit-scrollbar {
@@ -32,22 +50,6 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
   position: relative; // note: this is also set for #right-side-wrapper in _#right-side.scss
   // prevent safari bug where content disappears on scroll
   -webkit-transform: translate3d(0, 0, 0);
-}
-
-/// Below are the shared styles for our content pieces. Because our layout
-/// changes based on whether our course menu is open or shut
-/// we needed to ensure we share the right styles with these sections, but
-/// still enforce different breakpoints when needed
-
-@mixin shared-main-content {display: flex;}
-@mixin shared-primary {
-  flex: 1;
-  // Fix Firefox and IE Edge issues with contents breaking out of flex container
-  min-width: 1px;
-}
-@mixin shared-secondary {
-  flex: 0 0 $ic-sp*24;
-  padding-left: $ic-sp*2;
 }
 
 /// Layout when the course nav IS OPEN
@@ -225,3 +227,4 @@ body:not(.course-menu-expanded) {
   align-items: center;
   box-sizing: border-box;
 }
+}//end @if $use_new_styles

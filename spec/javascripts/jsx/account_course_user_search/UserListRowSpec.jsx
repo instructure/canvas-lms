@@ -67,7 +67,7 @@ define([
       />
     );
 
-    const actions = TestUtils.scryRenderedDOMComponentsWithClass(component.refs.linksContainer, 'user_actions_js_test');
+    const actions = TestUtils.scryRenderedDOMComponentsWithClass(component, 'user_actions_js_test');
     equal(actions.length, 3);
   });
 
@@ -89,7 +89,7 @@ define([
       />
     );
 
-    const actions = TestUtils.scryRenderedDOMComponentsWithClass(component.refs.linksContainer, 'user_actions_js_test');
+    const actions = TestUtils.scryRenderedDOMComponentsWithClass(component, 'user_actions_js_test');
     equal(actions.length, 0);
 
     permissions = originalPermissions;

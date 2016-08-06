@@ -9120,10 +9120,16 @@ function Header(calendar, options) {
 								innerHtml = htmlEscape(overrideText);
 							}
 							else if (themeIcon && options.theme) {
-								innerHtml = "<span class='ui-icon ui-icon-" + themeIcon + "'></span>";
+								innerHtml = "<span aria-hidden='true' class='ui-icon ui-icon-" + themeIcon + "'></span>";
+								if (options.buttonSRText[buttonName]) {
+									innerHtml += "<span class='screenreader-only'>" + htmlEscape(options.buttonSRText[buttonName]) + "</span>";
+								}
 							}
 							else if (normalIcon && !options.theme) {
-								innerHtml = "<span class='fc-icon fc-icon-" + normalIcon + "'></span>";
+								innerHtml = "<span aria-hidden='true' class='fc-icon fc-icon-" + normalIcon + "'></span>";
+								if (options.buttonSRText[buttonName]) {
+									innerHtml += "<span class='screenreader-only'>" + htmlEscape(options.buttonSRText[buttonName]) + "</span>";
+								}
 							}
 							else {
 								innerHtml = htmlEscape(defaultText);

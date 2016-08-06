@@ -7,14 +7,16 @@ Accessible modal dialog component for React.JS
 ```xml
 <Modal
   isOpen={bool}
-  onRequestClose={fn}
+  onAfterOpen={afterOpenFn}
+  onRequestClose={requestOpenFn}
   closeTimeoutMS={n}
-  style={customStyle}>
-
+  style={customStyle}
+>
   <h1>Modal Content</h1>
   <p>Etc.</p>
 </Modal>
 ```
+
 ## Styles
 Styles are passed as an object with 2 keys, 'overlay' and 'content' like so
 ```js
@@ -48,12 +50,24 @@ Styles are passed as an object with 2 keys, 'overlay' and 'content' like so
 Styles passed to the modal are merged in with the above defaults and applied to their respective elements.
 At this time, media queries will need to be handled by the consumer.
 
+### Using CSS Classes
+
+If you prefer not to use inline styles or are unable to do so in your project,
+you can pass `className` and `overlayClassName` props to the Modal.  If you do
+this then none of the default styles will apply and you will have full control
+over styling via CSS.
+
+
+### Overriding styles globally
+The default styles above are available on `Modal.defaultStyles`. Changes to this
+object will apply to all instances of the modal.
 
 ## Examples
 Inside an app:
 
 ```js
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Modal = require('react-modal');
 
 var appElement = document.getElementById('your-app-element');
@@ -91,6 +105,11 @@ var App = React.createClass({
     this.setState({modalIsOpen: true});
   },
 
+  afterOpenModal: function() {
+    // references are now sync'd and can be accessed.
+    this.refs.subtitle.style.color = '#f00';
+  },
+
   closeModal: function() {
     this.setState({modalIsOpen: false});
   },
@@ -101,10 +120,11 @@ var App = React.createClass({
         <button onClick={this.openModal}>Open Modal</button>
         <Modal
           isOpen={this.state.modalIsOpen}
+          onAfterOpen={this.afterOpenModal}
           onRequestClose={this.closeModal}
           style={customStyles} >
 
-          <h2>Hello</h2>
+          <h2 ref="subtitle">Hello</h2>
           <button onClick={this.closeModal}>close</button>
           <div>I am a modal</div>
           <form>
@@ -120,9 +140,31 @@ var App = React.createClass({
   }
 });
 
-React.render(<App/>, appElement);
+ReactDOM.render(<App/>, appElement);
+```
+# Testing
+
+When using React Test Utils with this library, here are some things to keep in mind:
+- You need to set isOpen={true} on the modal component for it to render its children.
+- You need to use the `.portal` property, as in `ReactDOM.findDOMNode(renderedModal.portal)` or `TestUtils.scryRenderedDOMComponentsWithClass(Modal.portal, 'my-modal-class')` to acquire a handle to the inner contents of your modal.
+
+By default the modal is closed when clicking outside of it (the overlay area). If you want to prevent this behavior you can
+pass the 'shouldCloseOnOverlayClick' prop with 'false' value.
+```xml
+<Modal
+  isOpen={bool}
+  onAfterOpen={afterOpenFn}
+  onRequestClose={requestCloseFn}
+  closeTimeoutMS={n}
+  shouldCloseOnOverlayClick={false}
+  style={customStyle}>
+
+  <h1>Force Modal</h1>
+  <p>Modal cannot be closed when clicking the overlay area</p>
+  <button onClick={handleCloseFunc}>Close Modal...</button>
+</Modal>
 ```
 
 # Demos
-* http://rackt.github.io/react-modal/
-* http://rackt.github.io/react-modal/bootstrap
+* http://reactjs.github.io/react-modal/
+* http://reactjs.github.io/react-modal/bootstrap

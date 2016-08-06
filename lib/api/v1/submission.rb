@@ -54,7 +54,8 @@ module Api::V1::Submission
     end
 
     if includes.include?("submission_comments")
-      hash['submission_comments'] = submission_comments_json(submission.comments_for(@current_user), current_user)
+      published_comments = submission.comments_for(@current_user).published
+      hash['submission_comments'] = submission_comments_json(published_comments, current_user)
     end
 
     if includes.include?("rubric_assessment") && submission.rubric_assessment && submission.user_can_read_grade?(current_user)
@@ -180,6 +181,7 @@ module Api::V1::Submission
     hash = submission_attempt_json(attempt.submission, assignment, user, session, context)
     hash.each_key{|k| hash[k] = attempt[k] if attempt[k]}
     hash[:submission_data] = attempt[:submission_data]
+    hash[:submitted_at] = attempt[:finished_at]
     hash[:body] = nil
 
     # since it is graded automatically the graded_at date should be the last time the

@@ -18,7 +18,7 @@ class Assignment
 
       comment_fields = [:comment, :id, :author_name, :created_at, :author_id,
                         :media_comment_type, :media_comment_id,
-                        :cached_attachments, :attachments].freeze
+                        :cached_attachments, :attachments, :draft].freeze
 
       attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
                            :display_name, :filename, :mime_class,
@@ -40,13 +40,13 @@ class Assignment
 
       res[:context][:rep_for_student] = {}
 
-      students = @assignment.representatives(@user) do |rep, others|
-        others.each { |s|
-          res[:context][:rep_for_student][s.id] = rep.id
-        }
+      students = @assignment.representatives(@user, includes: gradebook_includes) do |rep, others|
+        others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
       end
 
-      enrollments = @assignment.context.apply_enrollment_visibility(@assignment.context.admin_visible_student_enrollments, @user, nil, include: :inactive)
+      enrollments =
+        @assignment.context.apply_enrollment_visibility(enrollment_scope(gradebook_includes),
+                                                        @user, nil, include: gradebook_includes)
 
       is_provisional = @grading_role == :provisional_grader || @grading_role == :moderator
       rubric_assmnts = @assignment.visible_rubric_assessments_for(@user, :provisional_grader => is_provisional) || []
@@ -238,6 +238,27 @@ class Assignment
       res
     ensure
       Attachment.skip_thumbnails = nil
+    end
+
+    private
+
+    def gradebook_includes
+      @gradebook_includes ||= begin
+        context_id = @assignment.context.id
+        gb_settings = @user.preferences.fetch(:gradebook_settings, {}).fetch(context_id, {})
+
+        includes = []
+        includes << :inactive if gb_settings.fetch('show_inactive_enrollments', "false") == "true"
+        includes << :completed if gb_settings.fetch('show_concluded_enrollments', "false") == "true"
+        includes
+      end
+    end
+
+    def enrollment_scope(includes)
+      scope = @assignment.context.all_accepted_student_enrollments
+      scope = scope.where("enrollments.workflow_state <> 'inactive'") unless includes.include?(:inactive)
+      scope = scope.where("enrollments.workflow_state <> 'completed'") unless includes.include?(:completed)
+      scope
     end
   end
 end

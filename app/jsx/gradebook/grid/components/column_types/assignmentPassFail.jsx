@@ -53,11 +53,11 @@ define([
     },
 
     render() {
-      var cellContent = !this.props.cellData ||  this.isSubmissionGradedAsNull() ? '-' : ''
+      var cellContent = (!this.props.cellData ||  this.isSubmissionGradedAsNull()) ? '-' : '';
       return (
         <div style={{width: '100%', height: '100%'}} onClick={this.handleClick}>
           <div ref="grade" className={this.getClassName()}>
-            {{cellContent}}
+            {cellContent}
           </div>
         </div>
       );

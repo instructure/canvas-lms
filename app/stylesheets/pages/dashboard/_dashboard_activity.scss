@@ -187,8 +187,8 @@ $ignore-col-width: 50px;
   display: none;
 }
 
-@if $use_new_styles { $dashboardIconSize: 28px; }
-@else { $dashboardIconSize: 32px; }
+$dashboardIconSize: 28px;
+@if not $use_new_styles { $dashboardIconSize: 32px; }
 
 .recent_activity .image-block-image {
   width: $dashboardIconSize;

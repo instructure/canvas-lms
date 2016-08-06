@@ -25,6 +25,7 @@ app/stylesheets/brandable_css_brands
 /config/RAILS4_2
 /config/WEBPACK
 /coverage/
+/coverage-js/
 /db/schema.rb
 /db/*.sqlite*
 /db/*sql

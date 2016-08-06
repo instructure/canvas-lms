@@ -70,7 +70,7 @@ class ExternalToolsController < ApplicationController
   #      }
   #     ]
   def index
-    if authorized_action(@context, @current_user, :update)
+    if authorized_action(@context, @current_user, :read)
       if params[:include_parents]
         @tools = ContextExternalTool.all_tools_for(@context, :user => (params[:include_personal] ? @current_user : nil))
       else

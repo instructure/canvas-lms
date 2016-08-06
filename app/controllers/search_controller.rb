@@ -211,6 +211,7 @@ class SearchController < ApplicationController
     @contentHTML = render_to_string(partial: "all_courses_inner")
 
     if request.xhr?
+      set_no_cache_headers
       return render :text => @contentHTML
     end
   end

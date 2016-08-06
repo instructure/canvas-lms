@@ -232,3 +232,13 @@ define [
     @server.respond()
 
     ok @$testEl.show.called, 'show called'
+
+  test 'resize event gets triggered', ->
+    $(window).resize(() -> ok( true, "resize event triggered" ))
+    @server.respondWith "GET",
+      "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123&frame_external_urls=true",
+      [
+        200, { "Content-Type": "application/json" }, JSON.stringify(itemTooltipData)
+      ]
+    @$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+    @server.respond()

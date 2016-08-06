@@ -22,9 +22,8 @@ describe GradingPeriod do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
 
   let(:account) { Account.create! }
-  let(:enrollment_term) { account.enrollment_terms.create! }
   let(:course) { Course.create! }
-  let(:grading_period_group) { group_helper.create_for_enrollment_term(enrollment_term) }
+  let(:grading_period_group) { group_helper.create_for_account(account) }
   let(:now) { Time.zone.now }
 
   subject(:grading_period) { grading_period_group.grading_periods.build(params) }
@@ -33,7 +32,8 @@ describe GradingPeriod do
     {
       title: 'A Grading Period',
       start_date: now,
-      end_date: 1.day.from_now(now)
+      end_date: 1.day.from_now(now),
+      close_date: 5.days.from_now(now)
     }
   end
 
@@ -57,6 +57,32 @@ describe GradingPeriod do
   it "requires a title" do
     grading_period = GradingPeriod.new(params.except(:title))
     expect(grading_period).to_not be_valid
+  end
+
+  describe "close_date" do
+    it "sets the close_date to the end_date if no close_date is provided" do
+      grading_period = grading_period_group.grading_periods.create!(params.except(:close_date))
+      expect(grading_period.close_date).to eq(grading_period.end_date)
+    end
+
+    it "allows setting a close_date that is different from the end_date" do
+      skip
+      grading_period = grading_period_group.grading_periods.create!(params)
+      expect(grading_period.close_date).not_to eq(grading_period.end_date)
+    end
+
+    it "considers the grading period invalid if the close date is before the end date" do
+      skip
+      period_params = params.merge(close_date: 1.day.ago(params[:end_date]))
+      grading_period = grading_period_group.grading_periods.build(period_params)
+      expect(grading_period).to be_invalid
+    end
+
+    it "considers the grading period valid if the close date is equal to the end date" do
+      period_params = params.merge(close_date: params[:end_date])
+      grading_period = grading_period_group.grading_periods.build(period_params)
+      expect(grading_period).to be_valid
+    end
   end
 
   describe "#destroy" do
@@ -89,8 +115,8 @@ describe GradingPeriod do
       end
 
       it "finds all grading periods on a course" do
-        group_1 = group_helper.create_for_course(@course)
-        group_2 = group_helper.create_for_course(@course)
+        group_1 = group_helper.legacy_create_for_course(@course)
+        group_2 = group_helper.legacy_create_for_course(@course)
         period_1 = period_helper.create_with_weeks_for_group(group_1, 5, 3)
         period_2 = period_helper.create_with_weeks_for_group(group_2, 3, 1)
         expect(GradingPeriod.for(@course)).to match_array([period_1, period_2])
@@ -98,22 +124,24 @@ describe GradingPeriod do
 
       it "ignores grading periods associated with unrelated courses" do
         other_course = Course.create!(account: @sub_account)
-        group_1 = group_helper.create_for_course(@course)
-        group_2 = group_helper.create_for_course(other_course)
+        group_1 = group_helper.legacy_create_for_course(@course)
+        group_2 = group_helper.legacy_create_for_course(other_course)
         period_1 = period_helper.create_with_weeks_for_group(group_1, 5, 3)
         period_helper.create_with_weeks_for_group(group_2, 3, 1)
         expect(GradingPeriod.for(@course)).to match_array([period_1])
       end
 
       it "returns grading periods for the course enrollment term when the course has no grading period groups" do
-        group = group_helper.create_for_enrollment_term(term)
+        group = group_helper.create_for_account(@root_account)
+        term.update_attribute(:grading_period_group_id, group)
         period = period_helper.create_with_weeks_for_group(group, 5, 3)
         expect(GradingPeriod.for(@course)).to match_array([period])
       end
 
       it "returns grading periods for the course enrollment term when the course has no grading periods" do
-        group_helper.create_for_course(@course)
-        group_2 = group_helper.create_for_enrollment_term(term)
+        group_helper.legacy_create_for_course(@course)
+        group_2 = group_helper.create_for_account(@root_account)
+        term.update_attribute(:grading_period_group_id, group_2)
         period = period_helper.create_with_weeks_for_group(group_2, 5, 3)
         expect(GradingPeriod.for(@course)).to match_array([period])
       end
@@ -123,13 +151,13 @@ describe GradingPeriod do
       end
 
       it "returns an empty array when the course has no grading periods" do
-        group_helper.create_for_course(@course)
+        group_helper.legacy_create_for_course(@course)
         expect(GradingPeriod.for(@course)).to match_array([])
       end
 
       it "includes only 'active' grading periods from the course grading period group" do
-        group_1 = group_helper.create_for_course(@course)
-        group_2 = group_helper.create_for_course(@course)
+        group_1 = group_helper.legacy_create_for_course(@course)
+        group_2 = group_helper.legacy_create_for_course(@course)
         period_1 = period_helper.create_with_weeks_for_group(group_1, 5, 3)
         period_2 = period_helper.create_with_weeks_for_group(group_2, 3, 1)
         period_2.workflow_state = :deleted
@@ -138,7 +166,8 @@ describe GradingPeriod do
       end
 
       it "includes only 'active' grading periods from the course enrollment term group" do
-        group = group_helper.create_for_enrollment_term(term)
+        group = group_helper.create_for_account(@root_account)
+        term.update_attribute(:grading_period_group_id, group)
         period_1 = period_helper.create_with_weeks_for_group(group, 5, 3)
         period_2 = period_helper.create_with_weeks_for_group(group, 3, 1)
         period_2.workflow_state = :deleted
@@ -205,7 +234,7 @@ describe GradingPeriod do
         end_date:   4.months.from_now(now)
       )
     end
-    let(:grading_period_group) { group_helper.create_for_course(course) }
+    let(:grading_period_group) { group_helper.legacy_create_for_course(course) }
 
     it "filters the first grading period" do
       assignments = first_grading_period.assignments(course.assignments)
@@ -273,7 +302,7 @@ describe GradingPeriod do
 
   context 'given an existing grading_period' do
     let(:course) { Course.create! }
-    let(:grading_period_group) { group_helper.create_for_course(course) }
+    let(:grading_period_group) { group_helper.legacy_create_for_course(course) }
     let(:existing_grading_period) do
       grading_period_group.grading_periods.create!(
         title: 'a title',
@@ -334,10 +363,10 @@ describe GradingPeriod do
   describe ".json_for" do
     context "when given a course" do
       it "returns a list sorted by date with is_last" do
-        grading_period_group.grading_periods.create! start_date: 1.week.ago, end_date: 2.weeks.from_now, title: 'C'
-        grading_period_group.grading_periods.create! start_date: 4.weeks.ago, end_date: 3.weeks.ago, title: 'A'
-        grading_period_group.grading_periods.create! start_date: 3.weeks.ago, end_date: 2.weeks.ago, title: 'B'
-        course.grading_period_groups << grading_period_group
+        group = group_helper.legacy_create_for_course(course)
+        group.grading_periods.create! start_date: 1.week.ago, end_date: 2.weeks.from_now, title: 'C'
+        group.grading_periods.create! start_date: 4.weeks.ago, end_date: 3.weeks.ago, title: 'A'
+        group.grading_periods.create! start_date: 3.weeks.ago, end_date: 2.weeks.ago, title: 'B'
         json = GradingPeriod.json_for(course, nil)
         expect(json.map { |el| el['title'] }).to eq %w(A B C)
         expect(json.map { |el| el['is_last'] }).to eq [false, false, true]
@@ -352,7 +381,7 @@ describe GradingPeriod do
 
     context "given a course grading period group" do
       subject(:course_period) { grading_period_group.grading_periods.create!(params) }
-      let(:grading_period_group) { group_helper.create_for_course(course) }
+      let(:grading_period_group) { group_helper.legacy_create_for_course(course) }
 
       it { is_expected.not_to be_account_group }
     end
@@ -361,7 +390,7 @@ describe GradingPeriod do
   describe '#course_group?' do
     context "given a course grading period group" do
       subject(:course_period) { grading_period_group.grading_periods.create!(params) }
-      let(:grading_period_group) { group_helper.create_for_course(course) }
+      let(:grading_period_group) { group_helper.legacy_create_for_course(course) }
 
       it { is_expected.to be_course_group }
     end

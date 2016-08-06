@@ -1,7 +1,8 @@
 define [
   'underscore'
   '../modules/UploadQueue'
-], (_, UploadQueue) ->
+  'react-dom'
+], (_, UploadQueue, ReactDOM) ->
 
   ###
   Manages buckets of FileOptions (resolved, nameCollisions, zipOptions)
@@ -54,10 +55,10 @@ define [
       {collisions, resolved, zips}
 
     handleAddFilesClick: ->
-      this.refs.addFileInput.getDOMNode().click()
+      ReactDOM.findDOMNode(this.refs.addFileInput).click()
 
     handleFilesInputChange: (e) ->
-      selectedFiles = @toFilesOptionArray(this.refs.addFileInput.getDOMNode().files)
+      selectedFiles = @toFilesOptionArray(ReactDOM.findDOMNode(this.refs.addFileInput).files)
       {resolved, collisions, zips} = @segregateOptionBuckets(selectedFiles)
       @setState({nameCollisions: collisions, resolvedNames: resolved, zipOptions: zips})
 

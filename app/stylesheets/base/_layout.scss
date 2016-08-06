@@ -1,10 +1,4 @@
 @import "mixins/blue";
-@if $use_new_styles {
-@import "components/ic-typography";
-// Because we're not loading in /scaffold or /type for new ui anymore
-// this needs to be explicitly called out here because common.scss doesn't
-// load everywhere... and we need typography everywhere (^_^)
-}
 
 $body-bg-color:                     $ic-color-light;
 $embedded-bg:                       $ic-color-light;
@@ -157,7 +151,12 @@ body {
 }
 
 .with-left-side {
-  #left-side { display: block; }
+  #left-side {
+    display: block;
+    overflow: visible;
+    /* #main has a z-index: 10 on it. This is needed so that group set names will appear above the main content */
+    z-index: 11;
+  }
   @if $use_new_styles == false {
     min-width: $left_side_width + $min_main_width;
     #footer { margin-left: $left_side_width; }

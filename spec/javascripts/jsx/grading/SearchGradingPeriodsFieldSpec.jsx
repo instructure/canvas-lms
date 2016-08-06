@@ -1,7 +1,8 @@
 define([
   'react',
+  'react-dom',
   'jsx/grading/SearchGradingPeriodsField'
-], (React, SearchGradingPeriodsField) => {
+], (React, ReactDOM, SearchGradingPeriodsField) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
@@ -9,11 +10,11 @@ define([
     renderComponent() {
       const props = { changeSearchText: this.spy() };
       const element = React.createElement(SearchGradingPeriodsField, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 

@@ -49,10 +49,10 @@ module Canvadocs
     # Returns a hash containing the document's id and status
     def upload(obj, extra_params = {})
       params = if obj.is_a?(File)
-        { :file => obj }.merge(extra_params)
+        { file: obj }.merge(extra_params)
         raise Canvadocs::Error, "TODO: support raw files"
       else
-        { :url => obj.to_s }.merge(extra_params)
+        { url: obj.to_s }.merge(extra_params)
       end
 
       raw_body = api_call(:post, "documents", params)

@@ -8,8 +8,8 @@ development:
   # optional. default matches Canvas
   protocol: http
 
-  # optional. default is 'ui/editor'
-  edit_rule_path: "ui/editor"
+  # optional. default is 'ui/edit_rule'
+  edit_rule_path: 'ui/edit_rule'
 
-  # optional. default is 'api/account'
-  create_account_path: 'api/account'
+  # optional. default is 'api/accounts'
+  create_account_path: 'api/accounts'

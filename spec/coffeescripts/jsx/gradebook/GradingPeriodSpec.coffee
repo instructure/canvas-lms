@@ -1,5 +1,6 @@
 define [
   'react'
+  'react-dom'
   'jquery'
   'underscore'
   'jsx/grading/gradingPeriod'
@@ -7,7 +8,7 @@ define [
   'jsx/shared/helpers/dateHelper'
   'jquery.instructure_misc_plugins'
   'compiled/jquery.rails_flash_notifications'
-], (React, $, _, GradingPeriod, fakeENV, DateHelper) ->
+], (React, ReactDOM, $, _, GradingPeriod, fakeENV, DateHelper) ->
 
   TestUtils = React.addons.TestUtils
 
@@ -50,8 +51,8 @@ define [
       GradingPeriodElement = React.createElement(GradingPeriod, @props)
       @gradingPeriod = TestUtils.renderIntoDocument(GradingPeriodElement)
     teardown: ->
-      React.unmountComponentAtNode(@gradingPeriod.getDOMNode().parentNode)
-      fakeENV.teardown()
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@gradingPeriod).parentNode)
+      ENV.GRADING_PERIODS_URL = null
       @server.restore()
 
   test 'sets initial state properly', ->

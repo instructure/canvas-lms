@@ -79,6 +79,10 @@ define([
       $(window).resize(SettingsActions.resize);
     },
 
+    componentDidUpdate() {
+      KeyboardNavigationActions.constructKeyboardNavManager();
+    },
+
     handleKeyDown(event) {
       var reactGradebook = document.getElementById('react-gradebook-canvas');
       var knownCodes = GradebookConstants.RECOGNIZED_KEYBOARD_CODES;
@@ -285,10 +289,7 @@ define([
               height={this.state.settings.height}
               width={this.state.settings.width}
               headerHeight={GradebookConstants.DEFAULT_LAYOUTS.headers.height}>
-
               {this.renderAllColumns()}
-              {KeyboardNavigationActions.constructKeyboardNavManager()}
-
             </Table>
           </div>
         );

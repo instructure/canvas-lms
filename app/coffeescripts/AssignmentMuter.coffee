@@ -25,12 +25,20 @@ define [
     showDialog: =>
       @$dialog = $(mute_dialog_template()).dialog
         buttons: [{
+          text: I18n.t('Cancel')
+          class: 'Button'
+          'data-action': 'cancel'
+          click: =>
+            @$dialog.dialog('close')
+        },{
           text: I18n.t('mute_assignment', 'Mute Assignment')
+          class: 'Button Button--primary'
+          'data-action': 'mute'
           'data-text-while-loading': I18n.t('muting_assignment', 'Muting Assignment...')
           click: =>
             @$dialog.disableWhileLoading $.ajaxJSON(@url, 'put', { status : true }, @afterUpdate)
         }]
-        open: => setTimeout (=> @$dialog.find('#assignment_muter_content').focus()), 100
+        open: => setTimeout (=> @$dialog.parent().find('.ui-dialog-titlebar-close').focus()), 100
         close: => @$dialog.remove()
         resizable: false
         width: 400
@@ -49,11 +57,20 @@ define [
         .text(I18n.t('unmute_dialog', "This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?"))
         .dialog
           buttons: [{
+            text: I18n.t('Cancel')
+            class: 'Button'
+            'data-action': 'cancel'
+            click: =>
+              @$dialog.dialog('close')
+          },{
             text: I18n.t('unmute_button', 'Unmute Assignment')
+            class: 'Button Button--primary'
+            'data-action': 'unmute'
             'data-text-while-loading': I18n.t('unmuting_assignment', 'Unmuting Assignment...')
             click: =>
               @$dialog.disableWhileLoading $.ajaxJSON(@url, 'put', { status : false }, @afterUpdate)
           }]
+          open: => setTimeout (=> @$dialog.parent().find('.ui-dialog-titlebar-close').focus()), 100
           close: => @$dialog.remove()
           resizable: false
           title: I18n.t("unmute_assignment", "Unmute Assignment")

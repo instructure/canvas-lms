@@ -6,11 +6,10 @@
 
 {{#if CONDITIONAL_RELEASE_SERVICE_ENABLED}}
 <div class='edit-assignment-header-cr'>
-
-  <div id="edit-assignment-header-cr-tabs">
+  <div id="edit-assignment-header-cr-tabs" class="ui-tabs-minimal">
     <ul id="edit-assignment-header-cr-tab-nav">
       <li><a href="#edit_assignment_wrapper" id="edit_assignment_link">{{#t}}Details{{/t}}</a></li>
-      <li><a href="#conditional_release_wrapper" id="conditional_release_link">{{#t}}Conditional Content{{/t}}</a></li>
+      <li><a href="#conditional_release_wrapper" id="conditional_release_link">{{#t}}Mastery Paths{{/t}}</a></li>
       {{! this is a weird place for this, but we need to make this line up with the tabs}}
       <span id='edit-assignment-header-cr-spacer'></span>
       {{#if published}}
@@ -42,13 +41,8 @@
 
     </ul>
     <div id="edit-assignment-header-cr-tab-content">
-      <div id="edit_assignment_wrapper">
-        <form id="edit_assignment_form" class="form-horizontal bootstrap-form">
-        </form>
-      </div>
-      <div id="conditional_release_wrapper">
-        <div id="conditional-release-target" />
-      </div>
+      <form id="edit_assignment_form" class="form-horizontal bootstrap-form">
+      </form>
     </div>
   </div>
 
@@ -87,5 +81,8 @@
     </div>
   </div>
 </div>
+
+<form id="edit_assignment_form" class="form-horizontal bootstrap-form">
+</form>
 
 {{/if}}

@@ -1,9 +1,10 @@
 define([
   'react',
+  'react-dom',
   'axios',
   'underscore',
   'jsx/grading/AccountGradingPeriod'
-], (React, axios, _, GradingPeriod) => {
+], (React, ReactDOM, axios, _, GradingPeriod) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
@@ -21,19 +22,19 @@ define([
     onEdit: () => {},
     readOnly: false,
     permissions: allPermissions,
-    deleteGradingPeriodURL: "api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D",
-    onDelete: () => {}
+    deleteGradingPeriodURL: "api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D"
   };
 
   module("AccountGradingPeriod", {
     renderComponent(props = {}) {
       let attrs = _.defaults(props, defaultProps);
+      attrs.onDelete = this.stub();
       const element = React.createElement(GradingPeriod, attrs);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -54,30 +55,30 @@ define([
 
   test("disables the 'edit grading period' button when 'actionsDisabled' is true", function() {
     let period = this.renderComponent({actionsDisabled: true});
-    ok(period.refs.editButton.props.disabled);
+    ok(period.refs.editButton.disabled);
   });
 
   test("disables the 'delete grading period' button when 'actionsDisabled' is true", function() {
     let period = this.renderComponent({actionsDisabled: true});
-    ok(period.refs.deleteButton.props.disabled);
+    ok(period.refs.deleteButton.disabled);
   });
 
   test("displays the start date in a friendly format", function() {
     let period = this.renderComponent();
-    const startDate = React.findDOMNode(period.refs.startDate).textContent;
+    const startDate = ReactDOM.findDOMNode(period.refs.startDate).textContent;
     equal(startDate, "Start Date: Jan 1, 2015 at 8:11pm");
   });
 
   test("displays the end date in a friendly format", function() {
     let period = this.renderComponent();
-    const endDate = React.findDOMNode(period.refs.endDate).textContent;
+    const endDate = ReactDOM.findDOMNode(period.refs.endDate).textContent;
     equal(endDate, "End Date: Mar 1, 2015 at 12am");
   });
 
   test("calls the 'onEdit' callback when the edit button is clicked", function() {
     let spy = sinon.spy();
     let period = this.renderComponent({onEdit: spy});
-    let editButton = React.findDOMNode(period.refs.editButton);
+    let editButton = ReactDOM.findDOMNode(period.refs.editButton);
     Simulate.click(editButton);
     ok(spy.calledOnce);
   });
@@ -100,9 +101,8 @@ define([
   test("does not delete the period if the user cancels the delete confirmation", function() {
     this.stub(window, "confirm", () => false);
     let period = this.renderComponent();
-    let deleteStub = this.stub(period.props, "onDelete");
     Simulate.click(period.refs.deleteButton);
-    ok(deleteStub.notCalled);
+    ok(period.props.onDelete.notCalled);
   });
 
   asyncTest("calls onDelete if the user confirms deletion and the ajax call succeeds", function() {
@@ -110,10 +110,9 @@ define([
     this.stub(axios, "delete").returns(deletePromise);
     this.stub(window, "confirm", () => true);
     let period = this.renderComponent();
-    let deleteStub = this.stub(period.props, "onDelete");
     Simulate.click(period.refs.deleteButton);
     deletePromise.then(function() {
-      ok(deleteStub.calledOnce);
+      ok(period.props.onDelete.calledOnce);
       start();
     });
   });

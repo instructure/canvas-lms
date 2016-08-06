@@ -202,6 +202,15 @@ $announcements_disscussion-summary-color: $ic-color-dark;
   .loader {
     height: 40px;
   }
+
+  .element_toggler {
+    background: none;
+    border: none;
+
+    .icon-mini-arrow-down {
+      vertical-align: initial;
+    }
+  }
 }
 
 .discussion {
@@ -384,4 +393,3 @@ $announcements_disscussion-summary-color: $ic-color-dark;
   @include accessibility-prompt;
   @include fontSize(14px);
 }
-

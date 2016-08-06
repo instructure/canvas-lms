@@ -42,7 +42,7 @@ module CC::Importer::Canvas
       to_export = SCRAPE_ALL_HASH.merge to_export if to_export
       unzip_archive
       set_progress(5)
-      
+
       @manifest = open_file(File.join(@unzipped_file_path, MANIFEST_FILE))
       get_all_resources(@manifest)
 
@@ -52,7 +52,7 @@ module CC::Importer::Canvas
       set_progress(20)
       @course[:assignments] = convert_canvas_assignments
       set_progress(30)
-      @course[:discussion_topics] = convert_topics
+      @course[:discussion_topics], @course[:announcements]  = convert_topics_and_announcements
       set_progress(40)
       lti = CC::Importer::BLTIConverter.new
       res = lti.get_blti_resources(@manifest)
@@ -66,7 +66,9 @@ module CC::Importer::Canvas
       set_progress(71)
       convert_quizzes if Qti.qti_enabled?
       set_progress(80)
-      
+
+      read_external_content
+
       #close up shop
       save_to_file
       set_progress(90)
@@ -74,5 +76,24 @@ module CC::Importer::Canvas
       @course
     end
 
+    def read_external_content
+      folder = File.join(@unzipped_file_path, EXTERNAL_CONTENT_FOLDER)
+      return unless File.directory?(folder)
+
+      external_content = {}
+      Dir["#{folder}/**/**"].each do |path|
+        next if File.directory?(path)
+
+        service_key = File.basename(path, '.json')
+        json = File.read(path)
+        begin
+          data = JSON.parse(json)
+          external_content[service_key] = data
+        rescue JSON::ParserError => e
+          Canvas::Errors.capture_exception(:external_content_migration, e)
+        end
+      end
+      @course[:external_content] = external_content
+    end
   end
 end

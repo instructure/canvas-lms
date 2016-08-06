@@ -53,6 +53,7 @@ describe "conversations new" do
     script = "<IMG SRC=j&#X41vascript:alert('test2')> or <script>alert('xss');</script>"
     compose course: @course, to: [@s[0], @s[1]], subject: script, body: script
     wait_for_ajaximations
+    dismiss_flash_messages
     expect(alert_present?).to be_falsey
     select_view('sent')
     expect(alert_present?).to be_falsey

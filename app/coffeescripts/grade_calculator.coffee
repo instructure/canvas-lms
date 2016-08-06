@@ -41,7 +41,7 @@ define [
                             indexBy('assignment_id').value()
 
       gradeableAssignments = _(group.assignments).reject (a) ->
-        hiddenAssignments[a.id] || _.isEqual(a.submission_types, ['not_graded'])
+        a.omit_from_final_grade || hiddenAssignments[a.id] || _.isEqual(a.submission_types, ['not_graded'])
       assignments = _.indexBy gradeableAssignments, "id"
 
       # filter out submissions from other assignment groups

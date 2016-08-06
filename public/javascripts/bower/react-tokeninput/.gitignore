@@ -2,5 +2,5 @@ TODO
 *.log
 node_modules
 tmp
-
+lib
 example/bundle.js

@@ -12,11 +12,12 @@ define([
     propTypes: {
       name: React.PropTypes.string.isRequired,
       isActiveBrandConfig: React.PropTypes.bool.isRequired,
-      isDeleteable: React.PropTypes.bool.isRequired,
+      isDeletable: React.PropTypes.bool.isRequired,
       isBeingDeleted: React.PropTypes.bool.isRequired,
       startDeleting: React.PropTypes.func.isRequired,
-      cancelDelete: React.PropTypes.func.isRequired,
+      cancelDeleting: React.PropTypes.func.isRequired,
       onDelete: React.PropTypes.func.isRequired,
+      getVariable: React.PropTypes.func.isRequired
     },
 
     render () {
@@ -72,7 +73,6 @@ define([
               style={{ backgroundColor: getVar('ic-brand-global-nav-bgd') }}
             >
               <div className="ic-ThemeCard-thumbnail__icon">
-                {{ /* TODO Chart: is there any way we can load these svg images differently? as-is, it won't be served from CDN or with the optimal caching headers (no fingerprint)*/ }}
                 <SVGWrapper
                   url="/images/svg-icons/svg_icon_courses_new_styles.svg"
                   fillColor={ getVar('ic-brand-global-nav-ic-icon-svg-fill') }
@@ -103,10 +103,7 @@ define([
                 />
               </div>
             </div>
-            { this.props.isBeingDeleted ?
-              null
-              :
-              <div className="ic-ThemeCard-overlay">
+            { !this.props.isBeingDeleted && <div className="ic-ThemeCard-overlay">
                 <div className="ic-ThemeCard-overlay__content">
                   <div className="Button Button--primary">
                     {I18n.t('Open in Theme Editor')}
@@ -130,18 +127,16 @@ define([
               </button>
             </div>
             <div className="ic-ThemeCard-main__actions">
-              { this.props.isDeletable ?
+              { this.props.isDeletable &&
                 <button className="Button Button--icon-action" onClick={this.props.startDeleting}>
                   <span className="screenreader-only">{I18n.t('Delete theme')}</span>
                   <i className="icon-trash" />
                 </button>
-                :
-                null
               }
             </div>
           </div>
           <ReactCSSTransitionGroup transitionName="ic-ThemeCard-overlay-transition">
-          { this.props.isBeingDeleted ?
+          { this.props.isBeingDeleted &&
             <div className="ic-ThemeCard-overlay">
               <div className="ic-ThemeCard-overlay__content">
                 <h4 className="ic-ThemeCard-overlay__heading">
@@ -165,11 +160,9 @@ define([
                 </div>
               </div>
             </div>
-            :
-            null
           }
           </ReactCSSTransitionGroup>
-          { this.props.isActiveBrandConfig ?
+          { this.props.isActiveBrandConfig &&
             <div
               className="ic-ThemeCard-status ic-ThemeCard-status--is-active-theme"
               aria-hidden="true"
@@ -180,11 +173,9 @@ define([
                 {I18n.t('Current theme')}
               </span>
             </div>
-            :
-            null
           }
         </div>
-      );
+      )
     }
   })
 })

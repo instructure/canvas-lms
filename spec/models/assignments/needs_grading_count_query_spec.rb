@@ -129,13 +129,13 @@ module Assignments
           querier = NeedsGradingCountQuery.new(@assignment, @teacher)
           expect(querier.count).to eq 3
 
-          @students[0].submissions.first.find_or_create_provisional_grade!(scorer: @teacher)
+          @students[0].submissions.first.find_or_create_provisional_grade!(@teacher)
           expect(querier.count).to eq 3 # should only update when they add a score
 
-          @students[0].submissions.first.find_or_create_provisional_grade!(scorer: @teacher, score: 3)
+          @students[0].submissions.first.find_or_create_provisional_grade!(@teacher, score: 3)
           expect(querier.count).to eq 2
 
-          @students[1].submissions.first.find_or_create_provisional_grade!(scorer: @ta1)
+          @students[1].submissions.first.find_or_create_provisional_grade!(@ta1)
           expect(querier.count).to eq 1
         end
 
@@ -145,13 +145,13 @@ module Assignments
           querier = NeedsGradingCountQuery.new(@assignment, @teacher)
           expect(querier.count).to eq 3
 
-          @students[0].submissions.first.find_or_create_provisional_grade!(scorer: @teacher, score: 2)
+          @students[0].submissions.first.find_or_create_provisional_grade!(@teacher, score: 2)
           expect(querier.count).to eq 2 # should not show because @teacher graded it
 
-          @students[1].submissions.first.find_or_create_provisional_grade!(scorer: @ta1)
+          @students[1].submissions.first.find_or_create_provisional_grade!(@ta1)
           expect(querier.count).to eq 2 # should still count because it needs another mark
 
-          @students[1].submissions.first.find_or_create_provisional_grade!(scorer: @ta2)
+          @students[1].submissions.first.find_or_create_provisional_grade!(@ta2)
           expect(querier.count).to eq 1 # should not count because it has two marks now
         end
       end

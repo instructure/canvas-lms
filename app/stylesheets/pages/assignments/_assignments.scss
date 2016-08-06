@@ -16,10 +16,6 @@
   }
 }
 
-#edit_assignment_wrapper {
-  padding: 1em;
-}
-
 #point_change_warning {
   margin-top: 15px;
   margin-bottom: 0px;
@@ -152,6 +148,12 @@
       padding-top: 5px;
     }
   }
+}
+
+.omit-from-final-warning {
+  padding: 12px;
+  border-width: 1px;
+  margin: 5px;
 }
 
 #assignment-draft-state {

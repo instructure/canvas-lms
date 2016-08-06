@@ -103,7 +103,7 @@ define([
   module("GradingPeriodSetCollection - API Data Load", {
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     stubTermsSuccess() {
@@ -125,7 +125,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -172,11 +172,11 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -259,11 +259,11 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -496,11 +496,11 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -547,11 +547,11 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -576,11 +576,11 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -644,7 +644,7 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      let component = React.render(element, wrapper);
+      let component = ReactDOM.render(element, wrapper);
       component.onTermsLoaded(exampleTerms);
       component.onSetsLoaded(exampleSets);
       Simulate.click(component.refs["show-grading-period-set-1"].refs.editButton);
@@ -656,7 +656,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 

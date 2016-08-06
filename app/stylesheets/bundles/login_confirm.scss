@@ -2,11 +2,10 @@
 @import "pages/login/registration_dialog.scss";
 @import "pages/login/ic-login-sso.scss";
 
+
+// because these both are entirely wrapped in an @if (not) $use_new_styles {...}
+// only one will be effectively rendered
 // If new UI, then import the new UI login styles/vars
-@if $use_new_styles {
-  @import "pages/login/ic-login.scss";
-}
+@import "pages/login/ic-login.scss";
 // If legacy UI, then load the existing styles for the confirmation/disambiguation box
-@else {
-  @import "pages/login/login_legacy.scss";
-}
+@import "pages/login/login_legacy.scss"; //remove this line once $use_new_styles is turned on everywhere

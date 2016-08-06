@@ -24,17 +24,17 @@ describe "Sessions Timeout" do
     end
   end
 
-  it "when sessions timeout is set to .08 minutes it logs the user out after 5 seconds" do
-    plugin_setting = PluginSetting.new(:name => "sessions", :settings => {"session_timeout" => ".08"})
+  it "logs the user out after the session is expired" do
+    plugin_setting = PluginSetting.new(:name => "sessions", :settings => {"session_timeout" => "1"})
     plugin_setting.save!
     user_with_pseudonym({:active_user => true})
     login_as
     expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_profile_display_name' : '.user_name').text).to eq @user.primary_pseudonym.unique_id
 
-    sleep 5
+    Timecop.travel(Time.now + 1.minute) do
+      get "/courses"
 
-    get "/courses"
-
-    assert_flash_warning_message(/You must be logged in to access this page/)
+      assert_flash_warning_message(/You must be logged in to access this page/)
+    end
   end
 end

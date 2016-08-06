@@ -24,6 +24,7 @@ describe ConferencesController do
     @plugin = PluginSetting.create!(name: 'wimba')
     @plugin.update_attribute(:settings, { :domain => 'wimba.test' })
     course_with_teacher(active_all: true, user: user_with_pseudonym(active_all: true))
+    @inactive_student = course_with_user('StudentEnrollment', course: @course, enrollment_state: 'invited').user
     student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
   end
 
@@ -66,6 +67,13 @@ describe ConferencesController do
       get 'index', :course_id => @course.id
       expect(assigns[:users].include?(@student)).to be_truthy
       expect(assigns[:users].include?(@student_view_student)).to be_falsey
+    end
+
+    it "doesn't include inactive users" do
+      user_session(@teacher)
+      get 'index', :course_id => @course.id
+      expect(assigns[:users].include?(@student)).to be_truthy
+      expect(assigns[:users].include?(@inactive_student)).to be_falsey
     end
 
     it "should not allow the student view student to access collaborations" do

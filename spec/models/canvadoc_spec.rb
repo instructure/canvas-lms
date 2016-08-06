@@ -87,4 +87,42 @@ describe 'Canvadoc' do
       expect(@doc).not_to be_available
     end
   end
+
+  describe '#preferred_plugin' do
+    let(:course) { Course.create! }
+
+    let(:set_preferred_plugin_course_id) do
+      ->(course_id = course.id) do
+        @doc.preferred_plugin_course_id = course_id
+        @doc.save!
+      end
+    end
+
+    let(:feature_name) { 'new_annotations' }
+
+    let(:set_feature_flag) do
+      ->(enabled) do
+        course.account.set_feature_flag!(feature_name, enabled ? 'on' : 'off')
+        course.set_feature_flag!(feature_name, enabled ? 'on' : 'off')
+      end
+    end
+
+    it 'has a preferred plugin of nil when new annotations are disabled' do
+      set_preferred_plugin_course_id.call
+      set_feature_flag.call(false)
+      expect(@doc.send(:preferred_plugin)).to be_nil
+    end
+
+    it 'has a preferred plugin of nil when preferred_plugin_course_id is nil' do
+      set_preferred_plugin_course_id.call(nil)
+      set_feature_flag.call(true)
+      expect(@doc.send(:preferred_plugin)).to be_nil
+    end
+
+    it 'has a preferred plugin of "pdfjs" when new annotations are enabled' do
+      set_preferred_plugin_course_id.call
+      set_feature_flag.call(true)
+      expect(@doc.send(:preferred_plugin)).to eq('pdfjs')
+    end
+  end
 end

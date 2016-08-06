@@ -94,6 +94,7 @@ module CCHelper
   CANVAS_EXPORT_FLAG = 'canvas_export.txt'
   MEDIA_TRACKS = 'media_tracks.xml'
   ASSIGNMENT_XML = 'assignment.xml'
+  EXTERNAL_CONTENT_FOLDER = 'external_content'
 
   def create_key(object, prepend="")
     CCHelper.create_key(object, prepend)

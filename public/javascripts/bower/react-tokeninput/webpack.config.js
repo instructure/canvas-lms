@@ -19,7 +19,7 @@ module.exports = {
   devtool: '#source-map',
   module: {
     loaders: [
-      {test: /\.js$/, loader: 'jsx-loader'}
+      {test: /\.js$/, loader: 'babel'}
     ]
   }
 };

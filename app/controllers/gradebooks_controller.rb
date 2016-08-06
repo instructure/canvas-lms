@@ -133,18 +133,19 @@ class GradebooksController < ApplicationController
 
       visible_assignments.map! do |a|
         {
-          :id => a.id,
-          :submission_types => a.submission_types_array,
-          :points_possible => a.points_possible,
-          :due_at => a.due_at
+          id: a.id,
+          submission_types: a.submission_types_array,
+          points_possible: a.points_possible,
+          due_at: a.due_at,
+          omit_from_final_grade: a.omit_from_final_grade?
         }
       end
 
       {
-        :id           => ag.id,
-        :rules        => ag.rules_hash({stringify_json_ids: true}),
-        :group_weight => ag.group_weight,
-        :assignments  => visible_assignments,
+        id: ag.id,
+        rules: ag.rules_hash({stringify_json_ids: true}),
+        group_weight: ag.group_weight,
+        assignments: visible_assignments,
       }
     end
   end
@@ -195,6 +196,7 @@ class GradebooksController < ApplicationController
       @last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
       set_current_grading_period if multiple_grading_periods?
       set_js_env
+      @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
       gradebook_version = @context.feature_enabled?(:gradebook_performance) ? :react_gradebook : :gradebook2
 
@@ -562,7 +564,8 @@ class GradebooksController < ApplicationController
           :CONTEXT_ACTION_SOURCE => :speed_grader,
           :settings_url => speed_grader_settings_course_gradebook_path,
           :force_anonymous_grading => force_anonymous_grading?(@assignment),
-          :grading_role => grading_role
+          :grading_role => grading_role,
+          :lti_retrieve_url => retrieve_course_external_tools_url(@context.id, assignment_id: @assignment.id, display: 'borderless'),
         }
         if [:moderator, :provisional_grader].include?(grading_role)
           env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)
@@ -570,10 +573,6 @@ class GradebooksController < ApplicationController
         if grading_role == :moderator
           env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
-        end
-
-        if @assignment.external_tool?
-          env[:lti_retrieve_url] = retrieve_course_external_tools_url(@context.id, assignment_id: @assignment.id, display: 'borderless')
         end
 
         if @assignment.quiz

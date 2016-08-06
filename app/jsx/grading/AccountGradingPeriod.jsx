@@ -86,7 +86,6 @@ define([
         <div className="GradingPeriodList__period">
           <div className="GradingPeriodList__period__attributes grid-row">
             <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-4">
-              <span className="screenreader-only">{I18n.t("Grading period title")}</span>
               <span tabIndex="0" ref="title">{this.props.period.title}</span>
             </div>
             <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-4">

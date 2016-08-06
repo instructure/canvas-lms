@@ -423,7 +423,7 @@
   <div id="tab-sections">
     <h2 style="margin-top: 10px;"><%= t('headings.sections', %{Course Sections}) %></h2>
     <ul id="sections">
-      <% @context.course_sections.active.each do |section| %>
+      <% @context.course_sections.active.order(CourseSection.best_unicode_collation_key('name')).each do |section| %>
         <li class="section">
           <% if can_do section, @current_user, :read %>
             <a href="<%= context_url(@context, :context_section_url, section) %>" class="name">

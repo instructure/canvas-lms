@@ -31,13 +31,4 @@ namespace :brand_configs do
     # This'll pick up on all those written brand_configs and compile their css.
     BrandableCSS.compile_all!
   end
-
-  # We need this when webpack is building handlebars files to get the fingerprints
-  # for a given jst template.  this was easier for now than rewriting that extraction
-  # in node.
-  task :fingerprints, [:bundle] do |t, args|
-    bundle = args[:bundle]
-    puts BrandableCSS.all_fingerprints_for(bundle).to_json
-  end
-
 end

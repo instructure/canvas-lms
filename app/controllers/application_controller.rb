@@ -508,8 +508,7 @@ class ApplicationController < ActionController::Base
       format.zip { redirect_to(url_for(path_params)) }
       format.json { render_json_unauthorized }
     end
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+    set_no_cache_headers
   end
 
   # To be used as a before_filter, requires controller or controller actions
@@ -566,7 +565,7 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && @current_user
-          context_enrollments = @context.enrollments.where(user_id: @current_user)
+          context_enrollments = @context.enrollments.where(user_id: @current_user).to_a
           Canvas::Builders::EnrollmentDateBuilder.preload(context_enrollments)
           @context_enrollment = context_enrollments.sort_by{|e| [e.state_with_date_sortable, e.rank_sortable, e.id] }.first
         end
@@ -943,6 +942,10 @@ class ApplicationController < ActionController::Base
     # then the local cache is used when the user clicks the 'back' button.  I don't know how
     # to tell the browser to ALWAYS check back other than to disable caching...
     return true if @cancel_cache_buster || request.xhr? || api_request?
+    set_no_cache_headers
+  end
+
+  def set_no_cache_headers
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
   end
@@ -1325,6 +1328,7 @@ class ApplicationController < ActionController::Base
 
     unless @page
       if params[:titleize].present? && !value_to_boolean(params[:titleize])
+        @page_name = CGI.unescape(@page_name) unless CANVAS_RAILS4_0
         @page = @wiki.build_wiki_page(@current_user, :title => @page_name)
       else
         @page = @wiki.build_wiki_page(@current_user, :url => @page_name)

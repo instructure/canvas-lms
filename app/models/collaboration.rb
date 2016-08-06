@@ -226,15 +226,6 @@ class Collaboration < ActiveRecord::Base
     self.collaborators.pluck(:user_id).join(',')
   end
 
-  # Public: Return the title for this collaboration.
-  #
-  # Returns a title string.
-  def title
-    read_attribute(:title) || self.parse_data["title"]
-  rescue NoMethodError
-    t('#collaboration.default_title', 'Unnamed Collaboration')
-  end
-
   # Internal: Create the collaboration document in the remote service.
   #
   # Returns nothing.
@@ -264,10 +255,11 @@ class Collaboration < ActiveRecord::Base
   # Any current collaborators not passed to this method will be destroyed.
   #
   # users     - An array of users to include as collaborators.
-  # group_ids - An array of group ids to include as collaborators.
+  # groups    - An array of groups or group ids to include as collaborators.
   #
   # Returns nothing.
-  def update_members(users = [], group_ids = [])
+  def update_members(users = [], groups = [])
+    group_ids = groups.map {|g| g.try(:id) || g }
     save! if new_record?
     generate_document
     users << user if user.present? && !users.include?(user)

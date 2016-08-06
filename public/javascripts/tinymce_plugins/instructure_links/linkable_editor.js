@@ -48,12 +48,14 @@ define(["jquery", 'jsx/shared/rce/RceCommandShim'], function($, RceCommandShim){
      *
      * @param {String} text the interior content for the a tag
      * @param {String} classes any css classes to apply to the new link
+     * @param {Object} [dataAttrs] key value pairs for link data attributes
      */
-    this.createLink = function(text, classes){
+    this.createLink = function(text, classes, dataAttrs){
       RceCommandShim.send(this.getEditor(), "create_link",{
         url: text,
         classes: classes,
-        selectedContent: this.selectedContent
+        selectedContent: this.selectedContent,
+        dataAttributes: dataAttrs
       });
     };
   };

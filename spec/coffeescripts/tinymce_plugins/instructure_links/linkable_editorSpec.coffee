@@ -1,7 +1,8 @@
 define [
   'jquery',
-  'tinymce_plugins/instructure_links/linkable_editor'
-], ($, LinkableEditor) ->
+  'tinymce_plugins/instructure_links/linkable_editor',
+  'jsx/shared/rce/RceCommandShim'
+], ($, LinkableEditor, RceCommandShim) ->
 
   rawEditor = null
 
@@ -38,8 +39,15 @@ define [
       selectedContent: "Some Content"
     }
     edMock = @mock(jqueryEditor)
-    edMock.expects("editorBox").withArgs('create_link', expectedOpts)
+    edMock.expects("editorBox").withArgs('create_link', sinon.match(expectedOpts))
     editor.createLink(text, classes)
+
+  test "createLink passes data attributes to create_link command", ->
+    @stub(RceCommandShim, 'send')
+    dataAttrs = {}
+    le = new LinkableEditor({selection: {getContent: () => {}}})
+    le.createLink('text', 'classes', dataAttrs)
+    equal(RceCommandShim.send.firstCall.args[2].dataAttributes, dataAttrs)
 
   # this file wasn't running in jenkins because this file was named _spec.coffee instead of Spec.coffee
   # but these 2 specs were testing something that doesn't exist: LinkableEditor::extractTextContent

@@ -450,7 +450,6 @@ class AssignmentsController < ApplicationController
       append_sis_data(hash)
       js_env(hash)
       conditional_release_js_env(@assignment)
-      @padless = true
       render :edit
     end
   end
