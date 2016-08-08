@@ -244,14 +244,7 @@ $icon-size: 1.4rem;
   }
 }
 
-#enrollment_inactive_notice {
-  width: 100%;
-  border-bottom: 1px solid $ic-border-light;
-  border-radius: 0;
-  text-align: center;
-}
-
-#enrollment_concluded_notice {
+#enrollment_inactive_notice, #enrollment_concluded_notice, #closed_gp_notice {
   width: 100%;
   border-bottom: 1px solid $ic-border-light;
   border-radius: 0;
