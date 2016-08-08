@@ -5,6 +5,7 @@ module Quizzes
     end
 
     def build_outcome_results(questions, alignments)
+      return unless ['complete', 'graded'].include?(@qs.workflow_state)
       create_quiz_outcome_results(questions, alignments)
       questions.each do |question|
         alignments.each do |alignment|
