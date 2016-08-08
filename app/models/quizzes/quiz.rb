@@ -464,7 +464,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def root_entries_max_position
-    question_max = self.active_quiz_questions.where(quiz_group_id: nil).maximum(:position)
+    question_max = self.quiz_questions.active.where(quiz_group_id: nil).maximum(:position)
     group_max = self.quiz_groups.maximum(:position)
     [question_max, group_max, 0].compact.max
   end
