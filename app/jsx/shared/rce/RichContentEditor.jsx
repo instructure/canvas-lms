@@ -12,8 +12,7 @@ define([
 
   function loadServiceRCE(target, tinyMCEInitOptions, callback) {
     serviceRCELoader.loadOnTarget(target, tinyMCEInitOptions, (textarea, remoteEditor) => {
-      // same as freshNode
-      let $textarea = $('#' + textarea.id)
+      let $textarea = freshNode($(textarea))
       $textarea.data('remoteEditor', remoteEditor)
       if (callback) {
         callback()
@@ -47,6 +46,44 @@ define([
 
   function hideResizeHandleForScreenReaders() {
     $('.mce-resizehandle').attr('aria-hidden', true)
+  }
+
+  // Returns a unique id
+  let _editorUid = 0;
+  function nextID(){
+    return "random_editor_id_" + _editorUid++;
+  }
+
+  /**
+   * Make sure each the element has an id. If it
+   * doesn't, give it a random one.
+   * @private
+   */
+  function ensureID($el){
+    const id = $el.attr('id')
+    if(!id || id==''){
+      $el.attr('id', nextID());
+    }
+  }
+
+  /**
+   * we need to make sure we have the latest node in order to capture any
+   * changes, lots of views like to use stale nodes
+   *
+   * @private
+   */
+  function freshNode($target) {
+    // Try to get the id
+    let targetId = $target.attr("id")
+    if(!targetId || targetId==''){
+      return $target
+    }
+    // Try to get the element on the DOM
+    let newTarget = $("#" + targetId)
+    if(newTarget.length<=0){
+      return $target
+    }
+    return newTarget
   }
 
   const RichContentEditor = {
@@ -89,44 +126,47 @@ define([
      *
      * @public
      */
-    loadNewEditor(target, tinyMCEInitOptions={}) {
-      // avoid modifying the original options object provided
-      tinyMCEInitOptions = $.extend({}, tinyMCEInitOptions)
+    loadNewEditor($target, tinyMCEInitOptions={}) {
 
-      if ($(target).length <= 0) {
+      if ($target.length <= 0) {
         // no actual target, just short circuit out
         return
       }
 
+      ensureID($target)
+
+      // avoid modifying the original options object provided
+      tinyMCEInitOptions = $.extend({}, tinyMCEInitOptions)
+
       let callback = undefined
       if (tinyMCEInitOptions.focus) {
         // call activateRCE once loaded
-        callback = this.activateRCE.bind(this, target)
+        callback = this.activateRCE.bind(this, $target)
       }
 
       if (featureFlag()) {
-        target = this.freshNode(target)
+        $target = this.freshNode($target)
 
         if (tinyMCEInitOptions.manageParent) {
           delete tinyMCEInitOptions.manageParent
-          establishParentNode(target)
+          establishParentNode($target)
         }
 
         const originalOnFocus = tinyMCEInitOptions.onFocus
         tinyMCEInitOptions.onFocus = (editor) => {
-          this.activateRCE(target)
+          this.activateRCE($target)
           if (typeof originalOnFocus === 'function') {
             originalOnFocus(editor)
           }
         }
 
-        loadServiceRCE(target, tinyMCEInitOptions, callback)
+        loadServiceRCE($target, tinyMCEInitOptions, callback)
       } else {
-        loadLegacyRCE(target, tinyMCEInitOptions, callback)
+        loadLegacyRCE($target, tinyMCEInitOptions, callback)
 
         // listen for editor_box_focus events on our target, and trigger
         // activateRCE from them
-        target.on('editor_box_focus', () => this.activateRCE(target))
+        $target.on('editor_box_focus', () => this.activateRCE($target))
       }
 
       hideResizeHandleForScreenReaders()
@@ -137,11 +177,11 @@ define([
      *
      * @public
      */
-    callOnRCE(target, methodName, ...args) {
+    callOnRCE($target, methodName, ...args) {
       if (featureFlag()) {
-        target = this.freshNode(target)
+        $target = this.freshNode($target)
       }
-      return RceCommandShim.send(target, methodName, ...args)
+      return RceCommandShim.send($target, methodName, ...args)
     },
 
     /**
@@ -149,11 +189,11 @@ define([
      *
      * @public
      */
-    destroyRCE(target) {
+    destroyRCE($target) {
       if (featureFlag()) {
-        target = this.freshNode(target)
+        $target = this.freshNode($target)
       }
-      RceCommandShim.destroy(target)
+      RceCommandShim.destroy($target)
       Sidebar.hide()
     },
 
@@ -163,24 +203,17 @@ define([
      *
      * @private
      */
-    activateRCE(target) {
+    activateRCE($target) {
       if (featureFlag()) {
-        target = this.freshNode(target)
+        $target = this.freshNode($target)
       }
-      RceCommandShim.focus(target)
+      RceCommandShim.focus($target)
       Sidebar.show()
     },
 
-    /**
-     * we need to make sure we have the latest node in order to capture any
-     * changes, lots of views like to use stale nodes
-     *
-     * @private
-     */
-    freshNode(target) {
-      let targetId = target.attr("id")
-      return $("#" + targetId)
-    }
+    freshNode: freshNode,
+
+    ensureID: ensureID
   }
 
   return RichContentEditor
