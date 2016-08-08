@@ -719,7 +719,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def restrict_future_listing?
-    self.restrict_future_view? && self.course.account.restrict_student_future_listing[:value]
+    self.enrollment_state.pending? && self.enrollment_state.restricted_access? && self.course.account.restrict_student_future_listing[:value]
   end
 
   def active?

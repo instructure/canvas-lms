@@ -403,7 +403,7 @@ class CoursesController < ApplicationController
         @past_enrollments = []
         @current_enrollments = []
         @future_enrollments  = []
-        Canvas::Builders::EnrollmentDateBuilder.preload_state(all_enrollments)
+        Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
         all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
           e = enrollments.sort_by{|e| e.state_with_date_sortable}.first
           if enrollments.count > 1
