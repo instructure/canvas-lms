@@ -663,6 +663,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def enrollment_state
+    raise "cannot call enrollment_state on a new record" if new_record?
     state = self.association(:enrollment_state).target ||=
       self.shard.activate do
         Shackles.activate(:master) do
@@ -748,10 +749,8 @@ class Enrollment < ActiveRecord::Base
   def completed_at
     if date = self.read_attribute(:completed_at)
       date
-    else
-      if completed?
-        self.enrollment_state.state_started_at
-      end
+    elsif !new_record? && completed?
+      self.enrollment_state.state_started_at
     end
   end
 
