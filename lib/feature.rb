@@ -444,6 +444,7 @@ END
       display_name: -> { I18n.t('New Annotations') },
       description: -> { I18n.t('Use the new document annotation tool') },
       applies_to: 'Course',
+      state: 'hidden',
       beta: true,
       root_opt_in: true
     }
