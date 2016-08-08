@@ -13,6 +13,16 @@ Rails.application.config.i18n.backend = I18nema::Backend.new
 Rails.application.config.i18n.enforce_available_locales = true
 Rails.application.config.i18n.fallbacks = true
 
+module DontTrustI18nPluralizations
+  def pluralize(locale, entry, count)
+    super
+  rescue I18n::InvalidPluralizationData => e
+    Rails.logger.error("#{e.message} in locale #{locale.inspect}")
+    ""
+  end
+end
+I18nema::Backend.include(DontTrustI18nPluralizations)
+
 module CalculateDeprecatedFallbacks
   def reload!
     super
