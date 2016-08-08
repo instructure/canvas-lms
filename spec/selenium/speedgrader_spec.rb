@@ -212,9 +212,9 @@ describe 'Speedgrader' do
       end
 
       it 'in submissions page', priority: "1", test_id: 217612 do
-        driver.manage.window.maximize
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}"
         f('a.assess_submission_link').click
+        wait_for_animations
 
         expect(f('#criterion_crit1 input.criterion_points')).to have_value '10'
         expect(f('#criterion_crit2 input.criterion_points')).to have_value '5'
