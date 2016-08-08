@@ -4,15 +4,36 @@ require_relative 'address_book/messageable_user'
 
 # see AddressBook::Base for primary documentation of the interface
 module AddressBook
+  STRATEGIES = {
+    'messageable_user' => { implementation: AddressBook::MessageableUser, label: lambda{ I18n.t('MessageableUser library') } }.freeze,
+    # TODO CNVS-29869
+    #'microservice' => { implementation: AddressBook::Service, label: lambda{ I18n.t('AddressBook microservice') } }.freeze,
+    'empty' => { implementation: AddressBook::Empty, label: lambda{ I18n.t('Empty stub (for testing only)') } }.freeze
+  }.freeze
+  DEFAULT_STRATEGY = 'messageable_user'
 
   def self.registry
     RequestStore.store[:address_books] ||= {}
   end
 
-  # instantiates an address book for the sender. in the near future, will
   # choose the implementation of address book according to the plugin setting
+  def self.strategy
+    strategy = Canvas::Plugin.find('address_book').settings[:strategy]
+    unless STRATEGIES.has_key?(strategy)
+      # plugin setting specifies an invalid strategy. (TODO: logger.warn or
+      # something.) gracefully fall back on default
+      strategy = DEFAULT_STRATEGY
+    end
+    strategy
+  end
+
+  def self.implementation
+    return STRATEGIES[strategy][:implementation]
+  end
+
+  # instantiates an address book for the sender
   def self.for(sender)
-    registry[sender] ||= AddressBook::MessageableUser.new(sender)
+    registry[sender] ||= implementation.new(sender)
   end
 
   # partitions the list of recipients into user ids and context asset strings
