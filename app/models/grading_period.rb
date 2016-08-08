@@ -24,13 +24,12 @@ class GradingPeriod < ActiveRecord::Base
   belongs_to :grading_period_group, inverse_of: :grading_periods
   has_many :grading_period_grades, dependent: :destroy
 
-  validates :title, :start_date, :end_date, :close_date, :grading_period_group_id, presence: true
+  validates :title, :start_date, :end_date, :grading_period_group_id, presence: true
   validate :start_date_is_before_end_date
-  validate :close_date_is_on_or_after_end_date
+  validate :close_date_is_not_before_end_date
   validate :not_overlapping, unless: :skip_not_overlapping_validator?
 
-  before_validation :adjust_close_date_for_course_period
-  before_validation :ensure_close_date
+  before_validation :ensure_close_date, on: :create
 
   scope :current, -> do
     where("start_date <= :now AND end_date >= :now", now: Time.zone.now)
@@ -165,21 +164,18 @@ class GradingPeriod < ActiveRecord::Base
 
   def start_date_is_before_end_date
     if start_date && end_date && end_date < start_date
-      errors.add(:end_date, t('must be after start date'))
+      errors.add(:end_date, t('errors.invalid_grading_period_end_date',
+                              'Grading period end date precedes start date'))
     end
-  end
-
-  def adjust_close_date_for_course_period
-    self.close_date = self.end_date if grading_period_group.present? && course_group?
   end
 
   def ensure_close_date
     self.close_date ||= self.end_date
   end
 
-  def close_date_is_on_or_after_end_date
-    if close_date.present? && end_date.present? && close_date < end_date
-      errors.add(:close_date, t('must be on or after end date'))
+  def close_date_is_not_before_end_date
+    if close_date && end_date && close_date < end_date
+      errors.add(:close_date, t('Grading period close date precedes end date'))
     end
   end
 end
