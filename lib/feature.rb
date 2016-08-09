@@ -436,7 +436,7 @@ END
       description: -> { I18n.t("Use the new Collaborations external tool enabling more options for tools to use to collaborate") },
       applies_to: 'Course',
       state: 'hidden',
-      development: true,
+      development: false,
       root_opt_in: true
     },
     'new_annotations' =>
