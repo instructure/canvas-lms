@@ -103,6 +103,10 @@ class GradingPeriod < ActiveRecord::Base
   end
   alias_method :is_last, :last?
 
+  def closed?
+    Time.zone.now > close_date
+  end
+
   def overlapping?
     overlaps.active.exists?
   end
