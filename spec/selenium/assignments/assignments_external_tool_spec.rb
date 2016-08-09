@@ -49,8 +49,9 @@ describe "external tool assignments" do
     f('.add_item_button.ui-button').click
 
     expect(f('#assignment_external_tool_tag_attributes_url')).to have_attribute('value', @t2.url)
-    f("#edit_assignment_form button[type='submit']").click
-    wait_for_ajaximations
+    disable_implicit_wait do # this action results in an expected 404, so don't wait
+      f("#edit_assignment_form button[type='submit']").click
+    end
 
     a = @course.assignments(true).last
     expect(a).to be_present
