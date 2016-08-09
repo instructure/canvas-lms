@@ -457,8 +457,12 @@ RSpec.configure do |config|
 
   def assert_unauthorized
     # we allow either a raw unauthorized or a redirect to login
-    unless response.status == 401
-       expect(response).to redirect_to(login_url)
+    if response.status.to_i == 401
+      assert_status(401)
+    else
+      # Certain responses require more privileges than the current user has (ie site admin)
+      expect(response).to redirect_to(login_url)
+                      .or redirect_to(root_url)
     end
   end
 
