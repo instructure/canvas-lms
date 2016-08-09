@@ -680,6 +680,7 @@ class Enrollment < ActiveRecord::Base
     if (self.changes.keys & %w{workflow_state start_at end_at}).any?
       @enrollment_dates = nil
       self.enrollment_state.state_is_current = false
+      self.enrollment_state.is_direct_recalculation = true
     end
     self.enrollment_state.ensure_current_state
   end

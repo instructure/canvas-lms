@@ -3,7 +3,7 @@ class EnrollmentState < ActiveRecord::Base
 
   belongs_to :enrollment
 
-  attr_accessor :skip_touch_user, :user_needs_touch
+  attr_accessor :skip_touch_user, :user_needs_touch, :is_direct_recalculation
   validates_presence_of :enrollment_id
 
   self.primary_key = 'enrollment_id'
@@ -85,7 +85,7 @@ class EnrollmentState < ActiveRecord::Base
     end
 
     # TODO: remove when diagnostic columns are removed
-    self.state_recalculated_at = Time.now.utc
+    self.state_recalculated_at = Time.now.utc unless is_direct_recalculation
   end
 
   def calculate_state_based_on_dates
