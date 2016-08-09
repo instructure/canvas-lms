@@ -88,6 +88,22 @@ module SeleniumErrorRecovery
 end
 RSpec::Core::Example.prepend(SeleniumErrorRecovery)
 
+# eventually do this for non-selenium, but right now some things can't
+# make the once-ler round trip
+RSpec::Core::ExampleGroup.singleton_class.prepend(Module.new {
+  # prevent :all hooks from doing db stuff, unless transactional fixtures
+  # are off, in which case we assume you know what you are doing
+  def run_after_context_hooks(*)
+    return super if !use_transactional_fixtures
+    BlankSlateProtection.enable { super }
+  end
+
+  def run_before_context_hooks(*)
+    return super if !use_transactional_fixtures
+    BlankSlateProtection.enable { super }
+  end
+})
+
 shared_context "in-process server selenium tests" do
   include SeleniumDriverSetup
   include OtherHelperMethods
