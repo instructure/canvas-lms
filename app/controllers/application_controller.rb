@@ -110,7 +110,7 @@ class ApplicationController < ActionController::Base
         active_brand_config_json_url: active_brand_config_json_url,
         url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
         current_user_id: @current_user.try(:id),
-        current_user: user_display_json(@current_user, :profile),
+        current_user: Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile) },
         current_user_roles: @current_user.try(:roles, @domain_root_account),
         current_user_disabled_inbox: @current_user.try(:disabled_inbox?),
         files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
@@ -122,7 +122,7 @@ class ApplicationController < ActionController::Base
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
         SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?),
-          eportfolios_enabled: @current_user.try(:eportfolios_enabled?),
+          eportfolios_enabled: (@domain_root_account && @domain_root_account.settings[:enable_eportfolios] != false), # checking all user root accounts is slow
           show_feedback_link: show_feedback_link?
         }
       }
