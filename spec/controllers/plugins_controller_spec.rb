@@ -26,7 +26,7 @@ describe PluginsController do
       expect(PluginSetting.find_by(name: 'error_reporting')).to be_nil
       controller.stubs(:require_setting_site_admin).returns(true)
 
-      put 'update', id: 'error_reporting', all: 1
+      put 'update', id: 'error_reporting', all: 1, plugin_setting: { disabled: false }
       expect(response).to redirect_to(plugin_path('error_reporting', all: 1))
       ps = PluginSetting.find_by!(name: 'error_reporting')
       expect(ps).to be_enabled
