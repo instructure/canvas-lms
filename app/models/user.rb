@@ -2277,15 +2277,13 @@ class User < ActiveRecord::Base
       roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
       roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
       roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
-
-      account_users = root_account.all_account_users_for(self)
-      if account_users.any?
-        roles << 'admin'
-        root_ids = [root_account.id,  Account.site_admin.id]
-        roles << 'root_admin' if account_users.any?{|au| root_ids.include?(au.account_id) }
-      end
+      roles << 'admin' if admin_of_root_account?(root_account)
       roles
     end
+  end
+
+  def admin_of_root_account?(root_account)
+    root_account.all_account_users_for(self).any?
   end
 
   def eportfolios_enabled?

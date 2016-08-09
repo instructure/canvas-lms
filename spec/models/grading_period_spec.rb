@@ -114,6 +114,40 @@ describe GradingPeriod do
     end
   end
 
+  describe "#closed?" do
+    around { |example| Timecop.freeze(now, &example) }
+
+    it "returns true if the current date is past the close date" do
+      period = grading_period_group.grading_periods.build(
+        title: "Closed Period",
+        start_date: 10.days.ago(now),
+        end_date: 5.days.ago(now),
+        close_date: 3.days.ago(now)
+      )
+      expect(period).to be_closed
+    end
+
+    it "returns false if the current date is before the close date" do
+      period = grading_period_group.grading_periods.build(
+        title: "Open Period",
+        start_date: 10.days.ago(now),
+        end_date: 5.days.ago(now),
+        close_date: 2.days.from_now(now)
+      )
+      expect(period).not_to be_closed
+    end
+
+    it "returns false if the current date matches the close date" do
+      period = grading_period_group.grading_periods.build(
+        title: "Open Period",
+        start_date: 10.days.ago(now),
+        end_date: 5.days.ago(now),
+        close_date: now
+      )
+      expect(period).not_to be_closed
+    end
+  end
+
   describe "#destroy" do
     before { subject.destroy }
 
