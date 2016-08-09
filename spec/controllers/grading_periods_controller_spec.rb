@@ -322,6 +322,16 @@ describe GradingPeriodsController do
         let(:period_1) { group.grading_periods.create!(period_1_params) }
         let(:period_2) { group.grading_periods.create!(period_2_params) }
 
+        it "ignores unrelated grading period sets" do
+          unrelated_group = group_helper.create_for_account(root_account)
+          patch :batch_update, {
+            set_id: group.id,
+            grading_periods: [period_1_params]
+          }
+          expect(group.grading_periods.count).to eql(1)
+          expect(unrelated_group.grading_periods).to be_empty
+        end
+
         it "compares the in memory periods' dates for overlapping" do
           patch :batch_update, {
             set_id: group.id,
@@ -608,7 +618,7 @@ describe GradingPeriodsController do
           patch :batch_update, { course_id: course.id, grading_periods: [
             period_1_params.merge(id: period_1.id, title: 'Updated Title')
           ] }
-          expect(response.status).to eql(Rack::Utils.status_code(:unauthorized))
+          expect(response.status).to eql(Rack::Utils.status_code(:not_found))
           json = JSON.parse(response.body)
           expect(json['errors']).to be_present
           expect(json).not_to have_key('grading_periods')
