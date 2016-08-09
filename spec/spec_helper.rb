@@ -421,11 +421,6 @@ RSpec.configure do |config|
     ensure_group_cleanup!(group) if ENV['ENSURE_GROUP_CLEANUP']
   end
 
-  def delete_fixtures!
-    # noop for now, needed for plugin spec tweaks. implementation coming
-    # in g/24755
-  end
-
   # UTC for tests, cuz it's easier :P
   Account.time_zone_attribute_defaults[:default_time_zone] = 'UTC'
 
