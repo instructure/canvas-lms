@@ -196,6 +196,7 @@ describe "speed grader" do
         expect {
           delete_links[0].click
           accept_alert
+          wait_for_ajaximations
         }.to change {
           SubmissionComment.published.count
         }.by(-1)
