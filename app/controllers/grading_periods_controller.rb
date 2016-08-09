@@ -180,7 +180,8 @@ class GradingPeriodsController < ApplicationController
   end
 
   def account_batch_update
-    periods = find_or_build_periods(params[:grading_periods])
+    grading_period_group = GradingPeriodGroup.active.find(params.fetch(:set_id))
+    periods = find_or_build_periods(params[:grading_periods], grading_period_group)
     unless batch_update_rights?(periods)
       return render_unauthorized_action
     end
@@ -205,7 +206,8 @@ class GradingPeriodsController < ApplicationController
   end
 
   def course_batch_update
-    periods = find_or_build_periods(params[:grading_periods])
+    grading_period_group = @context.grading_period_groups.active.first_or_create
+    periods = find_or_build_periods(params[:grading_periods], grading_period_group)
     unless batch_update_rights?(periods)
       return render_unauthorized_action
     end
@@ -259,10 +261,13 @@ class GradingPeriodsController < ApplicationController
     sorted_periods.select { |period| period.errors.present? }.map(&:errors)
   end
 
-  def find_or_build_periods(periods_params)
+  def find_or_build_periods(periods_params, grading_period_group)
     periods_params.map do |period_params|
-      period = GradingPeriod.for(@context, inherit: false).find_by(id: period_params[:id]) if period_params[:id].present?
-      period ||= context_grading_period_group.grading_periods.build
+      if period_params[:id].present?
+        period = grading_period_group.grading_periods.active.find(period_params[:id])
+      else
+        period = grading_period_group.grading_periods.build
+      end
       period.assign_attributes(period_params.except(:id))
       period
     end
@@ -284,10 +289,6 @@ class GradingPeriodsController < ApplicationController
 
   def can_batch_update_in_context?(periods)
     periods.empty? || periods.first.grading_period_group.account_id.blank?
-  end
-
-  def context_grading_period_group
-    @context.grading_period_groups.active.first_or_create
   end
 
   def paginate_for(grading_periods)
@@ -330,9 +331,5 @@ class GradingPeriodsController < ApplicationController
       can_create_grading_periods: can_create_grading_periods,
       can_toggle_grading_periods: can_toggle_grading_periods
     }.as_json
-  end
-
-  def grading_period_group
-    @grading_period_group ||= GradingPeriodGroup.active.find(params[:set_id]) if params[:set_id].present?
   end
 end
