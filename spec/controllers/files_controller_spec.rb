@@ -543,46 +543,60 @@ describe FilesController do
       file_in_a_module
     end
 
-    before(:each) do
-      user_session(@student)
-    end
+    context "as student" do
+      before(:each) do
+        user_session(@student)
+      end
 
-    it "should find files by relative path" do
-      get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path
-      expect(response).to be_redirect
-      get "show_relative", :course_id => @course.id, :file_path => @file.full_path
-      expect(response).to be_redirect
-
-      def test_path(path)
-        file_with_path(path)
+      it "should find files by relative path" do
         get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path
         expect(response).to be_redirect
         get "show_relative", :course_id => @course.id, :file_path => @file.full_path
         expect(response).to be_redirect
+
+        def test_path(path)
+          file_with_path(path)
+          get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path
+          expect(response).to be_redirect
+          get "show_relative", :course_id => @course.id, :file_path => @file.full_path
+          expect(response).to be_redirect
+        end
+
+        test_path("course files/unfiled/test1.txt")
+        test_path("course files/blah")
+        test_path("course files/a/b/c%20dude/d/e/f.gif")
       end
 
-      test_path("course files/unfiled/test1.txt")
-      test_path("course files/blah")
-      test_path("course files/a/b/c%20dude/d/e/f.gif")
+      it "should render unauthorized access page if the file path doesn't match" do
+        get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah"
+        expect(response).to render_template("shared/errors/file_not_found")
+        get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah"
+        expect(response).to render_template("shared/errors/file_not_found")
+      end
+
+      it "should render file_not_found even if the format is non-html" do
+        get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+".css", :format => 'css'
+        expect(response).to render_template("shared/errors/file_not_found")
+      end
+
+      it "should ignore bad file_ids" do
+        get "show_relative", :file_id => @file.id + 1, :course_id => @course.id, :file_path => @file.full_display_path
+        expect(response).to be_redirect
+        get "show_relative", :file_id => "blah", :course_id => @course.id, :file_path => @file.full_display_path
+        expect(response).to be_redirect
+      end
     end
 
-    it "should render unauthorized access page if the file path doesn't match" do
-      get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah"
-      expect(response).to render_template("shared/errors/file_not_found")
-      get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah"
-      expect(response).to render_template("shared/errors/file_not_found")
-    end
+    context "unauthenticated user" do
+      it "renders unauthorized if the file exists" do
+        get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path
+        assert_unauthorized
+      end
 
-    it "should render file_not_found even if the format is non-html" do
-      get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+".css", :format => 'css'
-      expect(response).to render_template("shared/errors/file_not_found")
-    end
-
-    it "should ignore bad file_ids" do
-      get "show_relative", :file_id => @file.id + 1, :course_id => @course.id, :file_path => @file.full_display_path
-      expect(response).to be_redirect
-      get "show_relative", :file_id => "blah", :course_id => @course.id, :file_path => @file.full_display_path
-      expect(response).to be_redirect
+      it "renders unauthorized if the file doesn't exist" do
+        get "show_relative", :course_id => @course.id, :file_path => "course files/nope"
+        assert_unauthorized
+      end
     end
   end
 
