@@ -1753,15 +1753,29 @@ class User < ActiveRecord::Base
     end
   end
 
-  def cached_not_ended_enrollments
-    RequestCache.cache("not_ended_enrollments", self) do
-      self.shard.activate do
-        enrollments = Rails.cache.fetch([self, 'not_ended_enrollments2'].cache_key) do
-          self.not_ended_enrollments.to_a
-        end
-        Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
-        enrollments
-      end
+  def cached_invitations(opts={})
+    enrollments = Rails.cache.fetch([self, 'invited_enrollments', ApplicationController.region ].cache_key) do
+      self.enrollments.shard(in_region_associated_shards).invited_by_date.to_a
+    end
+    if opts[:include_enrollment_uuid] && !enrollments.find { |e| e.uuid == opts[:include_enrollment_uuid] } &&
+      (pending_enrollment = Enrollment.invited_by_date.where(uuid: opts[:include_enrollment_uuid]).first)
+      enrollments << pending_enrollment
+    end
+    enrollments += temporary_invitations
+    ActiveRecord::Associations::Preloader.new.preload(enrollments, :course) if opts[:preload_course]
+    enrollments
+  end
+
+  def has_active_enrollment?
+    # don't need an expires_at here because user will be touched upon enrollment activation
+    Rails.cache.fetch([self, 'has_active_enrollment', ApplicationController.region ].cache_key) do
+      self.enrollments.shard(in_region_associated_shards).current.active_by_date.exists?
+    end
+  end
+
+  def has_future_enrollment?
+    Rails.cache.fetch([self, 'has_future_enrollment', ApplicationController.region ].cache_key, :expires_in => 1.hour) do
+      self.enrollments.shard(in_region_associated_shards).active_or_pending_by_date.exists?
     end
   end
 
@@ -1778,17 +1792,25 @@ class User < ActiveRecord::Base
   end
 
   def participating_student_course_ids
-    participating_enrollments.select(&:student?).map(&:course_id).uniq
+    @participating_student_course_ids ||= self.shard.activate do
+      Rails.cache.fetch([self, 'participating_student_course_ids', ApplicationController.region].cache_key) do
+        self.enrollments.shard(in_region_associated_shards).of_student_type.current.active_by_date.distinct.pluck(:course_id)
+      end
+    end
   end
 
   def participating_instructor_course_ids
-    participating_enrollments.select(&:instructor?).map(&:course_id).uniq
+    @participating_instructor_course_ids ||= self.shard.activate do
+      Rails.cache.fetch([self, 'participating_instructor_course_ids', ApplicationController.region].cache_key) do
+        self.enrollments.shard(in_region_associated_shards).of_instructor_type.current.active_by_date.distinct.pluck(:course_id)
+      end
+    end
   end
 
   def participating_enrollments
     @participating_enrollments ||= self.shard.activate do
-      Rails.cache.fetch([self, 'participating_enrollments'].cache_key, :expires_in => 1.hour) do
-        self.cached_current_enrollments(:preload_dates => true).select(&:participating?)
+      Rails.cache.fetch([self, 'participating_enrollments', ApplicationController.region].cache_key) do
+        self.enrollments.shard(in_region_associated_shards).current.active_by_date.to_a
       end
     end
   end
@@ -1861,8 +1883,7 @@ class User < ActiveRecord::Base
       # still need to optimize the query to use a root_context_code.  that way a
       # users course dashboard even if they have groups does a query with
       # "context_code=..." instead of "context_code IN ..."
-      conditions = setup_context_association_lookups("stream_item_instances.context", opts[:contexts])
-      instances = instances.where(conditions) unless conditions.first.empty?
+      instances = instances.polymorphic_where('stream_item_instances.context' => opts[:contexts])
     elsif opts[:context]
       instances = instances.where(:context_type => opts[:context].class.base_class.name, :context_id => opts[:context])
     end
@@ -1987,12 +2008,10 @@ class User < ActiveRecord::Base
 
   def select_available_assignments(assignments)
     return [] if assignments.empty?
-    enrollments = Shard.partition_by_shard(assignments.map(&:context_id)) do |course_ids|
-      self.enrollments.shard(Shard.current).where(course_id: course_ids).to_a
+    available_course_ids = Shard.partition_by_shard(assignments.map(&:context_id)) do |course_ids|
+      self.enrollments.shard(Shard.current).where(course_id: course_ids).active_by_date.pluck(:course_id)
     end
-    Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
-    enrollments.select! {|e| e.participating? }
-    assignments.select {|a| enrollments.any? {|e| e.course_id == a.context_id} }
+    assignments.select {|a| available_course_ids.include?(a.context_id) }
   end
 
   def select_upcoming_assignments(assignments,opts)
@@ -2019,60 +2038,34 @@ class User < ActiveRecord::Base
     Canvas::ICU.collate_by(undated_events, &:title)
   end
 
-  def setup_context_lookups(contexts=nil)
+  def setup_context_lookups(contexts)
     # TODO: All the event methods use this and it's really slow.
-    Array(contexts || cached_contexts).map(&:asset_string)
+    Array(contexts).map(&:asset_string)
   end
 
-  def setup_context_association_lookups(column, contexts=nil, opts = {})
-    contexts = Array(contexts || cached_contexts)
-    conditions = [[]]
-    backcompat = opts[:backcompat]
-    contexts.map do |context|
-      if backcompat
-        conditions.first << "((#{column}_type=? AND #{column}_id=?) OR (#{column}_code=? AND #{column}_type IS NULL))"
-      else
-        conditions.first << "(#{column}_type=? AND #{column}_id=?)"
-      end
-      conditions.concat [context.class.base_class.name, context.id]
-      conditions << context.asset_string if backcompat
-    end
-    conditions[0] = conditions[0].join(" OR ")
-    conditions
-  end
-
-  # TODO: doesn't actually cache, needs to be optimized
-  def cached_contexts
-    @cached_contexts ||= begin
-      context_groups = []
-      # according to the set_policy block in group.rb, user u can manage group
-      # g if either:
-      # (a) g.context.grants_right?(u, :manage_groups)
-      # (b) g.has_member?(u)
-      # this is a very performance sensitive method, so we're bypassing the
-      # normal policy checking and somewhat duplicating auth logic here. which
-      # is a shame. it'd be really nice to add support to our policy framework
-      # for understanding how to load associations based on policies.
-
-      # :manage_groups is only available for admin enrollments
-      admin_enrolls = self.enrollments.current.of_admin_type
-      group_admin_courses = self.courses_for_enrollments(admin_enrolls).preload(:active_groups).select do |c|
-        c.active_groups.any? && c.grants_right?(self, :manage_groups)
-      end
-      group_admin_courses.each do |c|
-        context_groups += c.active_groups
-      end
-      active_courses = cached_current_enrollments(preload_dates: true, preload_courses: true).
-                       select(&:participating?).
-                       map(&:course).
-                       uniq
-      active_courses + (self.groups.active + context_groups).uniq
-    end
-  end
-
-  # TODO: doesn't actually cache, needs to be optimized
   def cached_context_codes
-    Array(self.cached_contexts).map(&:asset_string)
+    # (hopefully) don't need to include cross-shard because calendar events/assignments/etc are only seached for on current shard anyway
+    @cached_context_codes ||=
+      Rails.cache.fetch([self, 'cached_context_codes', Shard.current].cache_key, :expires_in => 15.minutes) do
+        group_admin_course_ids =
+          Rails.cache.fetch([self, 'group_admin_course_ids', Shard.current].cache_key, :expires_in => 1.hour) do
+            # permissions are cached for an hour anyways
+            admin_enrolls = self.enrollments.shard(Shard.current).of_admin_type.active_by_date
+            Course.where(:id => admin_enrolls.select(:course_id)).to_a.select{|c| c.grants_right?(self, :manage_groups)}.map(&:id)
+          end
+
+        group_ids = group_admin_course_ids.any? ?
+          Group.active.where(:context_type => "Course", :context_id => group_admin_course_ids).pluck(:id) : []
+        group_ids += self.groups.active.pluck(:id)
+        group_ids.uniq!
+
+        cached_current_course_ids = Rails.cache.fetch([self, 'cached_current_course_ids', Shard.current].cache_key) do
+          # don't need an expires at because user will be touched if enrollment state changes from 'active'
+          self.enrollments.shard(Shard.current).active_by_date.distinct.pluck(:course_id)
+        end
+
+        cached_current_course_ids.map{|id| "course_#{id}" } + group_ids.map{|id| "group_#{id}"}
+      end
   end
 
   # context codes of things that might have a schedulable appointment for the
@@ -2094,7 +2087,7 @@ class User < ActiveRecord::Base
   def manageable_appointment_context_codes
     @manageable_appointment_context_codes ||= Rails.cache.fetch([self, 'cached_manageable_appointment_codes', ApplicationController.region ].cache_key, expires_in: 1.day) do
       ret = {:full => [], :limited => [], :secondary => []}
-      cached_current_enrollments(preload_dates: true).each do |e|
+      cached_current_enrollments(preload_courses: true).each do |e|
         next unless e.course.grants_right?(self, :manage_calendar)
         if e.course.visibility_limited_to_course_sections?(self)
           ret[:limited] << "course_#{e.course_id}"

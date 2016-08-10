@@ -498,14 +498,14 @@ class UsersController < ApplicationController
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
-    @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_dates => true).select { |e| e.invited? }
+    @pending_invitations = @current_user.cached_invitations(:include_enrollment_uuid => session[:enrollment_uuid], :preload_course => true)
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
   end
 
   def cached_upcoming_events(user)
     Rails.cache.fetch(['cached_user_upcoming_events', user].cache_key,
       :expires_in => 3.minutes) do
-      user.upcoming_events :contexts => ([user] + user.cached_contexts)
+      user.upcoming_events :context_codes => ([user.asset_string] + user.cached_context_codes)
     end
   end
 

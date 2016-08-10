@@ -74,7 +74,7 @@ class EnrollmentState < ActiveRecord::Base
       self.access_is_current = false
     end
 
-    if self.state_changed? && self.state == "active"
+    if self.state_changed? && (self.state == "active" || self.state_was == "active")
       # we could make this happen on every state change, to expire cached authorization right away but
       # the permissions cache expires within an hour anyway
       # this will at least prevent cached unauthorization
@@ -83,9 +83,6 @@ class EnrollmentState < ActiveRecord::Base
         self.enrollment.user.touch
       end
     end
-
-    # TODO: remove when diagnostic columns are removed
-    self.state_recalculated_at = Time.now.utc unless is_direct_recalculation
   end
 
   def calculate_state_based_on_dates
@@ -143,14 +140,11 @@ class EnrollmentState < ActiveRecord::Base
       self.restricted_access = false
     end
     self.access_is_current = true
-
-    # TODO: remove when diagnostic columns are removed
-    self.access_recalculated_at = Time.now.utc
   end
 
   def self.enrollments_needing_calculation(scope=Enrollment.all)
-    scope.joins("LEFT OUTER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id = enrollments.id").
-      where("enrollment_states IS NULL OR enrollment_states.state_is_current = ? OR enrollment_states.access_is_current = ?", false, false)
+    scope.joins(:enrollment_state).
+      where("enrollment_states.state_is_current = ? OR enrollment_states.access_is_current = ?", false, false)
   end
 
   def self.process_states_in_ranges(start_at, end_at, enrollment_scope=Enrollment.all)
@@ -196,7 +190,7 @@ class EnrollmentState < ActiveRecord::Base
 
   INVALIDATEABLE_STATES = %w{pending_invited pending_active invited active completed inactive}.freeze # don't worry about creation_pending or rejected, etc
   def self.invalidate_states(enrollment_scope)
-    EnrollmentState.where(:enrollment_id => enrollment_scope, :state_is_current => true, :state => INVALIDATEABLE_STATES).update_all(:state_is_current => false, :state_invalidated_at => Time.now.utc)
+    EnrollmentState.where(:enrollment_id => enrollment_scope, :state_is_current => true, :state => INVALIDATEABLE_STATES).update_all(:state_is_current => false)
   end
 
   def self.force_recalculation(enrollment_ids)
@@ -207,7 +201,7 @@ class EnrollmentState < ActiveRecord::Base
   end
 
   def self.invalidate_access(enrollment_scope, states_to_update)
-    EnrollmentState.where(:enrollment_id => enrollment_scope, :access_is_current => true, :state => states_to_update).update_all(:access_is_current => false, :access_invalidated_at => Time.now.utc)
+    EnrollmentState.where(:enrollment_id => enrollment_scope, :access_is_current => true, :state => states_to_update).update_all(:access_is_current => false)
   end
 
   def self.enrollments_for_account_ids(account_ids)
@@ -263,7 +257,6 @@ class EnrollmentState < ActiveRecord::Base
   def self.recalculate_expired_states
     while (enrollments = Enrollment.joins(:enrollment_state).where("enrollment_states.state_valid_until IS NOT NULL AND
            enrollment_states.state_valid_until < ?", Time.now.utc).limit(250).to_a) && enrollments.any?
-      EnrollmentState.where(:enrollment_id => enrollments).update_all("state_invalidated_at = state_valid_until") # temporary, to determine how long it took to update
       process_states_for(enrollments)
     end
   end

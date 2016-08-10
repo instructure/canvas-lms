@@ -755,6 +755,7 @@ describe Enrollment do
           @enrollment.workflow_state = 'active'
           expect(@enrollment.reload.state).to eql(:active)
           expect(@enrollment.state_based_on_date).to eql(:active)
+          expect(Enrollment.where(:id => @enrollment).active_by_date.first).to eq @enrollment
         end
 
         it "should return completed" do
@@ -764,6 +765,7 @@ describe Enrollment do
           @term.save!
           expect(@enrollment.reload.state).to eql(:active)
           expect(@enrollment.state_based_on_date).to eql(:completed)
+          expect(Enrollment.where(:id => @enrollment).active_by_date.first).to be_nil
         end
 
         it "should return accepted for students (inactive for admins) if upcoming and available" do
@@ -784,6 +786,9 @@ describe Enrollment do
           @course.save!
           expect(@enrollment.reload.state).to eql(:active)
           expect(@enrollment.state_based_on_date).to eql(@enrollment.admin? ? :active : :inactive)
+          if @enrollment.student?
+            expect(Enrollment.where(:id => @enrollment).active_by_date.first).to be_nil
+          end
         end
       end
 

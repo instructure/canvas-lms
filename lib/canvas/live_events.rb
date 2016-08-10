@@ -158,12 +158,7 @@ module Canvas::LiveEvents
       state_is_current: enrollment_state.state_is_current,
       state_valid_until: enrollment_state.state_valid_until,
       restricted_access: enrollment_state.restricted_access,
-      access_is_current: enrollment_state.access_is_current,
-      state_invalidated_at: enrollment_state.state_invalidated_at,
-      state_recalculated_at: enrollment_state.state_recalculated_at,
-      access_invalidated_at: enrollment_state.access_invalidated_at,
-      access_recalculated_at: enrollment_state.access_recalculated_at
-
+      access_is_current: enrollment_state.access_is_current
     }
   end
 

@@ -648,18 +648,17 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      enrollment_scope = @context.enrollments.current.shard(@context).preload(:course, :enrollment_state)
+      enrollment_scope = Enrollment.for_user(@context).active_by_date
       group_scope = opts[:include_groups] ? @context.current_groups : nil
 
+      courses = []
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
         # view them.
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
-        if course_ids.empty?
-          enrollment_scope = enrollment_scope.none
-        else
-          enrollment_scope = enrollment_scope.where(:course_id => course_ids)
+        unless course_ids.empty?
+          courses = Course.where(:id => course_ids).where(:id => enrollment_scope.select(:course_id)).to_a
         end
         if group_scope
           group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
@@ -669,8 +668,11 @@ class ApplicationController < ActionController::Base
             group_scope = group_scope.where(:id => group_ids)
           end
         end
+      else
+        courses = Course.shard(@context).where(:id => enrollment_scope.select(:course_id)).to_a
+        enrollment_scope = Enrollment.for_user(@context).active_by_date
       end
-      courses = enrollment_scope.select(&:active?).map(&:course).uniq
+
       groups = group_scope ? group_scope.shard(@context).to_a.reject{|g| g.context_type == "Course" && g.context.concluded?} : []
 
       if opts[:favorites_first]

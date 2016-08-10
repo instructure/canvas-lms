@@ -1691,6 +1691,7 @@ describe User do
         event = @course.calendar_events.create!(title: 'published', start_at: 4.days.from_now)
         expect(@user.upcoming_events).to include(event)
         Timecop.freeze(3.days.from_now) do
+          EnrollmentState.recalculate_expired_states # runs periodically in background
           expect(User.find(@user).upcoming_events).not_to include(event) # re-find user to clear cached_contexts
         end
       end
@@ -1921,6 +1922,7 @@ describe User do
       @quiz.due_at = 3.days.from_now
       @quiz.save!
       Timecop.travel(2.days) do
+        EnrollmentState.recalculate_expired_states # runs periodically in background
         expect(@student.assignments_needing_submitting(:contexts => [@course]).count).to eq 0
       end
     end
@@ -2297,6 +2299,7 @@ describe User do
     it "should not count assignments in soft concluded courses" do
       @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
       Timecop.travel(1.week) do
+        EnrollmentState.recalculate_expired_states # runs periodically in background
         expect(@teacher.reload.assignments_needing_grading.size).to eql(0)
       end
     end
