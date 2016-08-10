@@ -21,6 +21,9 @@ describe 'Canvadoc' do
       f("#plugin_setting_disabled").click
       wait_for_ajaximations
     end
+    if !f(".save_button").enabled?
+      f(".copy_settings_button").click
+    end
   end
 
   context 'as an admin' do

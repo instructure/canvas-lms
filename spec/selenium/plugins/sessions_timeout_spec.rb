@@ -16,6 +16,9 @@ describe "Sessions Timeout" do
           f("#accounts_select option:nth-child(2)").click
           expect(f("#plugin_setting_disabled")).to be_displayed
         end
+        if !f(".save_button").enabled?
+          f(".copy_settings_button").click
+        end
         f("#plugin_setting_disabled").click
         f('#settings_session_timeout').send_keys('19')
         expect_new_page_load{ f('.save_button').click }
