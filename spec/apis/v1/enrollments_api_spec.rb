@@ -980,7 +980,7 @@ describe EnrollmentsApiController, type: :request do
 
       context "filtering by SIS IDs" do
         context "filtering by sis_user_id" do
-          before(:once) do
+          before :once do
             @teacher.pseudonym.update_attribute(:sis_user_id, '1234')
           end
 
@@ -1000,6 +1000,36 @@ describe EnrollmentsApiController, type: :request do
 
           it "returns nothing if there are no matching sis_user_ids" do
             @params[:sis_user_id] = '5678'
+            json = api_call(:get, @path, @params)
+            expect(json).to be_empty
+          end
+        end
+
+        context "filtering by sis_section_id" do
+          before :once do
+            @course.course_sections.first.update_attribute(:sis_source_id, 'SIS123')
+          end
+
+          it "filters by a single sis_section_id" do
+            @params[:sis_section_id] = 'SIS123'
+            json = api_call(:get, @path, @params)
+            json_user_ids = json.map{|user| user["user_id"] }
+            section_user_ids = @course.course_sections.first.enrollments.map{ |e| e.user_id }
+            expect(json.length).to eq (@course.course_sections.first.enrollments.length)
+            expect(json_user_ids).to match_array(section_user_ids)
+          end
+
+          it "filters by a list of sis_section_ids" do
+            @params[:sis_section_id] = ['SIS123', 'SIS456']
+            json = api_call(:get, @path, @params)
+            expect(json.length).to eq (@course.course_sections.first.enrollments.length)
+            json_user_ids = json.map{|user| user["user_id"] }
+            section_user_ids = @course.course_sections.first.enrollments.map{ |e| e.user_id }
+            expect(json_user_ids).to match_array(section_user_ids)
+          end
+
+          it "returns nothing if there are no matching sis_section_ids" do
+            @params[:sis_section_id] = '5678'
             json = api_call(:get, @path, @params)
             expect(json).to be_empty
           end

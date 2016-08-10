@@ -299,6 +299,9 @@ class EnrollmentsApiController < ApplicationController
   # @argument sis_user_id[] [String]
   #   Returns only enrollments for the specified SIS ID(s). May pass in array or string.
   #
+  # @argument sis_section_id[] [String]
+  #   Return only section enrollments matching the specified SIS section ID(s). May pass in array or string.
+  #
   # @returns [Enrollment]
   def index
     endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
@@ -323,6 +326,11 @@ class EnrollmentsApiController < ApplicationController
     if params[:sis_user_id].present?
       pseudonyms = @domain_root_account.pseudonyms.where(sis_user_id: params[:sis_user_id])
       enrollments = enrollments.where(user_id: pseudonyms.pluck(:user_id))
+    end
+
+    if params[:sis_section_id].present?
+      sections = @domain_root_account.course_sections.where(sis_source_id: params[:sis_section_id])
+      enrollments = enrollments.where(course_section_id: sections.pluck(:id))
     end
 
     if params[:grading_period_id].present?
