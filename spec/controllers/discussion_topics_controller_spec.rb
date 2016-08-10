@@ -673,6 +673,33 @@ describe DiscussionTopicsController do
       expect(@student.recent_stream_items.map {|item| item.data}).not_to include topic
     end
 
+    it 'does dispatch new topic notification when not hidden' do
+      notification = Notification.create(name: 'New Discussion Topic', category: 'TestImmediately')
+      @student.communication_channels.create!(path: 'student@example.com') {|cc| cc.workflow_state = 'active'}
+      obj_params = topic_params(@course, published: true)
+      user_session(@teacher)
+      post 'create', { :format => :json }.merge(obj_params)
+      json = JSON.parse response.body
+      topic = DiscussionTopic.find(json['id'])
+      expect(topic).to be_published
+      expect(@student.email_channel.messages.map(&:context)).to include(topic)
+    end
+
+    it 'does dispatch new topic notification when published' do
+      notification = Notification.create(name: 'New Discussion Topic', category: 'TestImmediately')
+      @student.communication_channels.create!(path: 'student@example.com') {|cc| cc.workflow_state = 'active'}
+      obj_params = topic_params(@course, published: false)
+      user_session(@teacher)
+      post 'create', { :format => :json }.merge(obj_params)
+
+      json = JSON.parse response.body
+      topic = DiscussionTopic.find(json['id'])
+      expect(@student.email_channel.messages).to be_empty
+
+      put 'update', course_id: @course.id, topic_id: topic.id, title: 'Updated Topic', format: 'json', published: true
+      expect(@student.email_channel.messages.map(&:context)).to include(topic)
+    end
+
     it 'dispatches an assignment stream item with the correct title' do
       notification = Notification.create(:name => "Assignment Created")
       obj_params = topic_params(@course).
