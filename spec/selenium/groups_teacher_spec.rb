@@ -123,6 +123,8 @@ describe "new groups" do
       # Verifies group leader silhouette and leader's name appear in the group header
       expect(f('.span3.ellipsis.group-leader')).to be_displayed
       expect(f('.span3.ellipsis.group-leader')).to include_text(@students.first.name)
+
+      check_element_has_focus f(".group-user-actions[data-user-id='#{@students.first.id}']")
     end
 
     it "should allow a teacher to set up a group set with member limits", priority: "1", test_id: 94160 do
