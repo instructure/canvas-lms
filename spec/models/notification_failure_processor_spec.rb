@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../messages/messages_helper')
 
 describe NotificationFailureProcessor do
@@ -115,6 +115,31 @@ describe NotificationFailureProcessor do
 
       expect{ Message.find(nonexistent_id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect{ nfp.process }.not_to raise_error
+    end
+
+    context 'shards' do
+      specs_require_sharding
+
+      it 'should find the message on another shard' do
+        message = generate_message(:account_user_notification, :email, @au, user: @user)
+        message.save!
+        failure_queue = mock_queue([
+          {
+            global_id: message.global_id,
+            error_context: nil,
+            error: 'Error from mail system'
+          }
+        ])
+        nfp = NotificationFailureProcessor.new(access_key: 'key', secret_access_key: 'secret')
+        nfp.stubs(:notification_failure_queue).returns(failure_queue)
+        @shard1.activate do
+          nfp.process
+        end
+
+        message.reload
+        expect(message.state).to eq(:transmission_error)
+        expect(message.transmission_errors).not_to be_blank
+      end
     end
   end
 end
