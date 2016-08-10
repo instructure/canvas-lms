@@ -1075,6 +1075,36 @@ describe EnrollmentsApiController, type: :request do
             expect(json).to be_empty
           end
         end
+
+        context "filtering by sis_course_id" do
+          before :once do
+            @course.update_attribute(:sis_source_id, 'SIS123')
+          end
+
+          it "filters by a single sis_course_id" do
+            @params[:sis_course_id] = 'SIS123'
+            json = api_call(:get, @path, @params)
+            expect(json.length).to eq (@course.enrollments.length)
+            json_user_ids = json.map{|user| user["user_id"] }
+            course_user_ids = @course.enrollments.map{ |e| e.user_id }
+            expect(json_user_ids).to match_array(course_user_ids)
+          end
+
+          it "filters by a list of sis_course_ids" do
+            @params[:sis_course_id] = ['SIS123', 'LULZ']
+            json = api_call(:get, @path, @params)
+            expect(json.length).to eq (@course.enrollments.length)
+            json_user_ids = json.map{|user| user["user_id"] }
+            course_user_ids = @course.enrollments.map{ |e| e.user_id }
+            expect(json_user_ids).to match_array(course_user_ids)
+          end
+
+          it "returns nothing if there are no matching sis_course_ids" do
+            @params[:sis_course_id] = 'NONONO'
+            json = api_call(:get, @path, @params)
+            expect(json).to be_empty
+          end
+        end
       end
 
       context 'group_ids' do
