@@ -464,6 +464,11 @@ RSpec.configure do |config|
     # cleaning up after themselves
     truncate_all_tables
 
+    # this would normally get created on demand, but in vanilla canvas the
+    # load_account middleware might try to create it while the thin server
+    # is booting up, which can trip up BlankSlateProtection
+    Account.default
+
     Timecop.safe_mode = true
   end
 

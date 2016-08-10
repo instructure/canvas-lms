@@ -14,7 +14,6 @@ module BlankSlateProtection
       $stderr.puts "\e[33mTIP:\e[0m change this to `:each`, or if you are really concerned"
       $stderr.puts "about performance, use `:once`. `:all` hooks are dangerous because"
       $stderr.puts "they can leave around garbage that affects later specs"
-      pp caller
     else
       $stderr.puts "\e[31mError: Don't create records outside the rspec lifecycle!"
       $stderr.puts "See: " + location + "\e[0m"
