@@ -1506,15 +1506,14 @@ define([
       var $submission_to_view = $("#submission_to_view"),
           submissionToViewVal = $submission_to_view.val(),
           currentSelectedIndex = currentIndex(this, submissionToViewVal),
-          isMostRecent = this.currentStudent &&
-                         this.currentStudent.submission &&
-                         this.currentStudent.submission.submission_history &&
-                         this.currentStudent.submission.submission_history.length - 1 === currentSelectedIndex,
-          submission  = this.currentStudent &&
-                        this.currentStudent.submission &&
-                        this.currentStudent.submission.submission_history &&
-                        this.currentStudent.submission.submission_history[currentSelectedIndex] &&
-                        this.currentStudent.submission.submission_history[currentSelectedIndex].submission
+          submissionHolder = this.currentStudent &&
+                             this.currentStudent.submission,
+          submissionHistory = submissionHolder && submissionHolder.submission_history,
+          isMostRecent = submissionHistory &&
+                         submissionHistory.length - 1 === currentSelectedIndex,
+          submission  = submissionHistory &&
+                        submissionHistory[currentSelectedIndex] &&
+                        submissionHistory[currentSelectedIndex].submission
                         || {},
           inlineableAttachments = [],
           browserableAttachments = [];
@@ -1613,6 +1612,10 @@ define([
       var isConcluded = EG.isStudentConcluded(this.currentStudent.id);
       $enrollment_concluded_notice.showIf(isConcluded);
       SpeedgraderHelpers.setRightBarDisabled(isConcluded);
+      EG.setGradeReadOnly((typeof submissionHolder != "undefined" &&
+                           submissionHolder.submission_type === "online_quiz") ||
+                          isConcluded);
+
       if (isConcluded) {
         $full_width_container.addClass("with_enrollment_notice");
       }
@@ -2204,9 +2207,6 @@ define([
       var grade = EG.getGradeToShow(submission, ENV.grading_role);
 
       $grade.val(grade);
-      EG.setGradeReadOnly((typeof submission != "undefined" &&
-                           submission.submission_type === 'online_quiz') ||
-                          EG.isStudentConcluded(EG.currentStudent.id));
 
       $('#submit_same_score').hide();
       if (typeof submission != "undefined" && submission.score !== null) {
