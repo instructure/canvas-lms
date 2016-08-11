@@ -291,6 +291,8 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
         for assignment_id of @assignments
           student["assignment_#{assignment_id}"] ?=
             @submissionStateMap.getSubmission student.id, assignment_id
+          submissionState = @submissionStateMap.getSubmissionState(student["assignment_#{assignment_id}"])
+          student["assignment_#{assignment_id}"].gradeLocked = submissionState.locked
 
         student.initialized = true
         @calculateStudentGrade(student)
@@ -606,6 +608,8 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
         @updateAssignmentVisibilities(submission) unless submission.assignment_visible
         @updateSubmission(submission)
         @submissionStateMap.setSubmissionCellState(student, @assignments[submission.assignment_id], submission)
+        submissionState = @submissionStateMap.getSubmissionState(submission)
+        student["assignment_#{submission.assignment_id}"].gradeLocked = submissionState.locked
         @calculateStudentGrade(student)
         @grid.updateCell student.row, cell unless thisCellIsActive
         @updateRowTotals student.row

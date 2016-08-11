@@ -194,6 +194,17 @@ define [
     _.each submission, (val, key) =>
       equal selectedSubmission[key], val, "#{key} is the expected value on selectedSubmission"
 
+  test 'selectedSubmission sets gradeLocked', ->
+    selectedSubmission = @srgb.get('selectedSubmission')
+    equal selectedSubmission.gradeLocked, false
+
+  test 'selectedSubmission sets gradeLocked for unassigned students', ->
+    @student = @srgb.get('students')[1]
+    Ember.run =>
+      @srgb.set('selectedStudent', @student)
+      selectedSubmission = @srgb.get('selectedSubmission')
+      equal selectedSubmission.gradeLocked, true
+
   module 'screenreader_gradebook_controller: with selected assignment',
     setup: ->
       setup.call this

@@ -172,11 +172,11 @@ define([
     }
 
     getSubmission(user_id, assignment_id) {
-      return this.submissionMap[user_id][assignment_id];
+      return (this.submissionMap[user_id] || {})[assignment_id];
     }
 
     getSubmissionState({ user_id, assignment_id }) {
-      return this.submissionCellMap[user_id][assignment_id];
+      return (this.submissionCellMap[user_id] || {})[assignment_id];
     }
   };
 
