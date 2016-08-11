@@ -18,6 +18,11 @@ module Gradebook2SRGBCommon
     let(:hide_student_names) { f('#hide_names_checkbox') }
     let(:concluded_enrollments) { f('#concluded_enrollments') }
     let(:show_notes_option) { f('#show_notes') }
+    # content selection buttons
+    let(:previous_student) { f('.student_navigation button.previous_object') }
+    let(:next_student) { f('.student_navigation button.next_object') }
+    let(:previous_assignment) { f('.assignment_navigation button.previous_object') }
+    let(:next_assignment) { f('.assignment_navigation button.next_object') }
   end
 
   def basic_setup(num=1)

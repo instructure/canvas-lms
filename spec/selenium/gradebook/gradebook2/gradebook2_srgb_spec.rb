@@ -11,65 +11,86 @@ describe "Screenreader Gradebook" do
 
   let(:srgb) {"/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"}
 
-  it 'can select a student', priority: "1", test_id: 163994 do
+  def active_element
+    driver.switch_to.active_element
+  end
+
+  def simple_setup
     init_course_with_students 2
     @course.assignment_groups.create! name: 'Group 1'
     @course.assignment_groups.create! name: 'Group 2'
-    a1 = @course.assignments.create!(
-      title: 'Test 1',
-      points_possible: 20,
-      assignment_group: @course.assignment_groups[0]
+    @assign1 = @course.assignments.create!(
+        title: 'Test 1',
+        points_possible: 20,
+        assignment_group: @course.assignment_groups[0]
     )
-    a2 = @course.assignments.create!(
-      title: 'Test 2',
-      points_possible: 20,
-      assignment_group: @course.assignment_groups[1]
+    @assign2 = @course.assignments.create!(
+        title: 'Test 2',
+        points_possible: 20,
+        assignment_group: @course.assignment_groups[1]
     )
 
-    grades = ['15', '12', '11', '3']
+    @grade_array = ['15', '12', '11', '3']
 
-    a1.grade_student @students[0], grade: grades[0]
-    a1.grade_student @students[1], grade: grades[1]
-    a2.grade_student @students[0], grade: grades[2]
-    a2.grade_student @students[1], grade: grades[3]
+    @assign1.grade_student @students[0], grade: @grade_array[0]
+    @assign1.grade_student @students[1], grade: @grade_array[1]
+    @assign2.grade_student @students[0], grade: @grade_array[2]
+    @assign2.grade_student @students[1], grade: @grade_array[3]
+  end
 
+  it 'can select a student', priority: "1", test_id: 163994 do
+    simple_setup
     get srgb
     wait_for_ajaximations
 
     expect(get_options('#student_select').map(&:text)).to eq ['No Student Selected', @students[0].name, @students[1].name]
     click_option '#student_select', @students[0].name
-    expect(ff('#student_information .assignment-group-grade .points').map(&:text)).to eq ["(#{grades[0]} / 20)", "(#{grades[2]} / 20)"]
+    expect(ff('#student_information .assignment-group-grade .points').map(&:text)).to eq ["(#{@grade_array[0]} / 20)", "(#{@grade_array[2]} / 20)"]
     click_option '#student_select', @students[1].name
-    expect(ff('#student_information .assignment-group-grade .points').map(&:text)).to eq ["(#{grades[1]} / 20)", "(#{grades[3]} / 20)"]
+    expect(ff('#student_information .assignment-group-grade .points').map(&:text)).to eq ["(#{@grade_array[1]} / 20)", "(#{@grade_array[3]} / 20)"]
   end
 
   it 'can select a student using buttons', priority: "1", test_id: 163997 do
     init_course_with_students 3
     get srgb
 
-    before = f('.student_navigation button.previous_object')
-    after = f('.student_navigation button.next_object')
-
     # first student
-    expect(before.attribute 'disabled').to be_truthy
-    after.click
+    expect(previous_student.attribute 'disabled').to be_truthy
+    next_student.click
     expect(f('#student_information .student_selection').text).to eq @students[0].name
 
     # second student
-    after.click
+    next_student.click
     expect(f('#student_information .student_selection').text).to eq @students[1].name
 
     # third student
-    after.click
-    expect(after.attribute 'disabled').to be_truthy
+    next_student.click
+    expect(next_student.attribute 'disabled').to be_truthy
     expect(f('#student_information .student_selection').text).to eq @students[2].name
-    expect(before).to eq driver.switch_to.active_element
+    expect(previous_student).to eq driver.switch_to.active_element
 
     # click twice to go back to first student
-    before.click
-    before.click
+    previous_student.click
+    previous_student.click
     expect(f('#student_information .student_selection').text).to eq @students[0].name
-    expect(after).to eq driver.switch_to.active_element
+    expect(next_student).to eq driver.switch_to.active_element
+  end
+
+  it 'can select an assignment using buttons', priority: "2", test_id: 615707 do
+    simple_setup
+    get srgb
+    select_student(@students[0])
+    select_assignment(@assign1)
+
+    expect(previous_assignment.attribute 'disabled').to be_truthy
+    expect(next_assignment.attribute 'disabled').not_to be_truthy
+
+    next_assignment.click
+    expect(previous_assignment.attribute 'disabled').not_to be_truthy
+    expect(next_assignment.attribute 'disabled').to be_truthy
+
+    previous_assignment.click
+    expect(previous_assignment.attribute 'disabled').to be_truthy
   end
 
   it 'can select an assignment', priority: "1", test_id: 163998 do
