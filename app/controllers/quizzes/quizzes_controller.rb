@@ -881,7 +881,7 @@ class Quizzes::QuizzesController < ApplicationController
     submitted_with_submissions = @context.students_visible_to(@current_user, include: :inactive).
         joins(:quiz_submissions).
         where("quiz_submissions.quiz_id=? AND quiz_submissions.workflow_state<>'settings_only'", @quiz)
-    @submitted_student_count = submitted_with_submissions.count(:id, :distinct => true)
+    @submitted_student_count = submitted_with_submissions.distinct.count(:id)
     #add logged out submissions
     @submitted_student_count += @quiz.quiz_submissions.logged_out.not_settings_only.count
     @any_submissions_pending_review = submitted_with_submissions.where("quiz_submissions.workflow_state = 'pending_review'").count > 0

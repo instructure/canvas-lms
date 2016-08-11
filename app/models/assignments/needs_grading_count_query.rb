@@ -44,7 +44,7 @@ module Assignments
             when :full, :limited
               manual_count
             when :sections
-              section_filtered_submissions.count(:id, distinct: true)
+              section_filtered_submissions.distinct.count(:id)
             else
               0
             end
@@ -78,9 +78,9 @@ module Assignments
 
       scope = (level == :sections) ? section_filtered_submissions : all_submissions
       if graded_sub_ids.any?
-        scope.where("submissions.id NOT IN (?)", graded_sub_ids).count(:id, distinct: true)
+        scope.where("submissions.id NOT IN (?)", graded_sub_ids).distinct.count(:id)
       else
-        scope.count(:id, distinct: true)
+        scope.distinct.count(:id)
       end
     end
 
@@ -104,7 +104,7 @@ module Assignments
     def manual_count
       assignment.shard.activate do
         Rails.cache.fetch(['assignment_user_grading_manual_count', assignment, user].cache_key) do
-          all_submissions.count(:id, distinct: true)
+          all_submissions.distinct.count(:id)
         end
       end
     end

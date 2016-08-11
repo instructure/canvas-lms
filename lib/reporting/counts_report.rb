@@ -72,9 +72,9 @@ class CountsReport
               where(pseudonyms: { workflow_state: 'active'}).
               where("course_id IN (?) AND pseudonyms.last_request_at>?", course_ids, timespan.seconds.ago)
 
-            data[:teachers] = enrollment_scope.where(:type => 'TeacherEnrollment').count(:user_id, :distinct => true)
-            data[:students] = enrollment_scope.where(:type => 'StudentEnrollment').count(:user_id, :distinct => true)
-            data[:users] = enrollment_scope.count(:user_id, :distinct => true)
+            data[:teachers] = enrollment_scope.where(:type => 'TeacherEnrollment').distinct.count(:user_id)
+            data[:students] = enrollment_scope.where(:type => 'StudentEnrollment').distinct.count(:user_id)
+            data[:users] = enrollment_scope.distinct.count(:user_id)
 
             # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
             data[:files], data[:files_size] = Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.quoted_table_name} WHERE namespace IN ('account_%s','account_%s') AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.local_id, account.global_id]).first.map(&:to_i)
