@@ -49,7 +49,7 @@ module Api::V1::User
 
       if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
         include_root_account = @domain_root_account.trust_exists?
-        if (sis_pseudonym = SisPseudonym.for(user, @domain_root_account, include_root_account))
+        if sis_pseudonym = sis_pseudonym_for(user)
           # the sis fields on pseudonym are poorly named -- sis_user_id is
           # the id in the SIS import data, where on every other table
           # that's called sis_source_id.
@@ -232,6 +232,7 @@ module Api::V1::User
         json[:course_integration_id] = enrollment.course.integration_id
         json[:sis_section_id] = enrollment.course_section.sis_source_id
         json[:section_integration_id] = enrollment.course_section.integration_id
+        json[:sis_user_id] = sis_pseudonym_for(enrollment.user).try(:sis_user_id)
       end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
       user_includes = includes.include?('avatar_url') ? ['avatar_url'] : []
@@ -313,5 +314,9 @@ module Api::V1::User
 
   def user_can_read_sis_data?(user, context)
     sis_id_context(context).grants_right?(user, :read_sis) || @domain_root_account.grants_right?(user, :manage_sis)
+  end
+
+  def sis_pseudonym_for(user)
+    SisPseudonym.for(user, @domain_root_account, @domain_root_account.trust_exists?)
   end
 end

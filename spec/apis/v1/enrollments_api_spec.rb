@@ -75,6 +75,7 @@ describe EnrollmentsApiController, type: :request do
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
+          'sis_user_id'                        => @unenrolled_user.pseudonym.sis_user_id,
           'section_integration_id'             => @section.integration_id,
           'start_at'                           => nil,
           'end_at'                             => nil
@@ -582,6 +583,7 @@ describe EnrollmentsApiController, type: :request do
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
+          'sis_user_id'                        => @unenrolled_user.pseudonym.sis_user_id,
           'section_integration_id'             => @section.integration_id,
           'start_at'                           => nil,
           'end_at'                             => nil
@@ -732,6 +734,15 @@ describe EnrollmentsApiController, type: :request do
         id_already_found = found_enrollment_ids.include?(id)
         expect(id_already_found).to be_falsey
         found_enrollment_ids << id
+      end
+    end
+
+    context "filtering by SIS IDs" do
+      it "returns an error message with insufficient permissions" do
+        @params[:sis_user_id] = '12345'
+
+        json = api_call(:get, @path, @params, {}, {}, { expected_status: 403 })
+        expect(json['message']).to eq 'Insufficient permissions to filter by SIS fields'
       end
     end
 
@@ -888,6 +899,7 @@ describe EnrollmentsApiController, type: :request do
             'sis_import_id'                      => @enrollment.sis_batch_id,
             'sis_course_id'                      => nil,
             'sis_section_id'                     => nil,
+            'sis_user_id'                        => nil,
             'course_integration_id'              => nil,
             'section_integration_id'             => nil,
             'limit_privileges_to_course_section' => @enrollment.limit_privileges_to_course_section,
@@ -938,6 +950,7 @@ describe EnrollmentsApiController, type: :request do
             'sis_course_id'                      => @course.sis_source_id,
             'course_integration_id'              => @course.integration_id,
             'sis_section_id'                     => @section.sis_source_id,
+            'sis_user_id'                        => @student.pseudonym.sis_user_id,
             'section_integration_id'             => @section.integration_id,
             'user' => {
               'name' => e.user.name,
@@ -963,6 +976,34 @@ describe EnrollmentsApiController, type: :request do
             'total_activity_time' => 0
           }
         }
+      end
+
+      context "filtering by SIS IDs" do
+        context "filtering by sis_user_id" do
+          before(:once) do
+            @teacher.pseudonym.update_attribute(:sis_user_id, '1234')
+          end
+
+          it "filters by a single sis_user_id" do
+            @params[:sis_user_id] = '1234'
+            json = api_call(:get, @path, @params)
+            expect(json.length).to eq(1)
+            expect(json.first['sis_user_id']).to eq(@teacher.pseudonym.sis_user_id)
+          end
+
+          it "filters by a list of sis_user_ids" do
+            @params[:sis_user_id] = ['1234', '5678']
+            json = api_call(:get, @path, @params)
+            expect(json.length).to eq(1)
+            expect(json.first['sis_user_id']).to eq(@teacher.pseudonym.sis_user_id)
+          end
+
+          it "returns nothing if there are no matching sis_user_ids" do
+            @params[:sis_user_id] = '5678'
+            json = api_call(:get, @path, @params)
+            expect(json).to be_empty
+          end
+        end
       end
 
       context 'group_ids' do
@@ -1014,6 +1055,7 @@ describe EnrollmentsApiController, type: :request do
             'sis_course_id'                      => @course.sis_source_id,
             'course_integration_id'              => @course.integration_id,
             'sis_section_id'                     => @section.sis_source_id,
+            'sis_user_id'                        => @student.pseudonym.sis_user_id,
             'section_integration_id'             => @section.integration_id,
             'user' => {
               'name' => e.user.name,
@@ -1421,6 +1463,7 @@ describe EnrollmentsApiController, type: :request do
             'course_integration_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
+            'sis_user_id' => nil,
             'section_integration_id' => nil
           }
           h['grades'] = {
@@ -1677,6 +1720,7 @@ describe EnrollmentsApiController, type: :request do
             'course_integration_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
+            'sis_user_id' => nil,
             'section_integration_id' => nil
           })
         end
@@ -1733,6 +1777,7 @@ describe EnrollmentsApiController, type: :request do
             'course_integration_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
+            'sis_user_id' => nil,
             'section_integration_id' => nil
           })
         end
