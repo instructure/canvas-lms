@@ -315,24 +315,11 @@ class Assignment < ActiveRecord::Base
     true
   end
 
-  def update_student_submissions(old_points_possible = nil)
+  def update_student_submissions
     graded_at = Time.zone.now
     submissions.graded.preload(:user).find_each do |s|
-      if points_possible.to_f > 0 &&
-         old_points_possible.to_f > 0 &&
-         s.score.to_f > 0
-        # Scale existing scores when total possible points changed
-        percentage = points_possible / old_points_possible.to_f
-        s.score = s.score * percentage
-      end
-      if grading_type == 'pass_fail'
-        # If a previously scored assignment just became pass/fail,
-        # update its score to be the max points possible or 0.
-        s.score = if ['complete', 'pass'].include?(s.grade) || score_to_grade(s.score, s.grade) == 'complete'
-            points_possible
-          else
-            0.0
-          end
+      if grading_type == 'pass_fail' && ['complete', 'pass'].include?(s.grade)
+        s.score = points_possible
       end
       s.grade = score_to_grade(s.score, s.grade)
       s.graded_at = graded_at
@@ -347,7 +334,7 @@ class Assignment < ActiveRecord::Base
   # reflect the changes
   def update_submissions_if_details_changed
     if !new_record? && (points_possible_changed? || grading_type_changed? || grading_standard_id_changed?) && !submissions.graded.empty?
-      send_later_if_production(:update_student_submissions, points_possible_was)
+      send_later_if_production(:update_student_submissions)
     end
     true
   end
