@@ -374,12 +374,12 @@ ConditionalRelease) ->
           @$discussionDetailsTab.show()
 
     onChange: ->
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !@assignmentDirty
-        @assignmentDirty = true
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && @assignmentUpToDate
+        @assignmentUpToDate = false
 
     onTabChange: ->
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && @assignmentDirty
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !@assignmentUpToDate
         assignmentData = @getFormData().assignment?.attributes
         @conditionalReleaseEditor.updateAssignment(assignmentData)
-        @assignmentDirty = false
+        @assignmentUpToDate = true
       true

@@ -455,11 +455,11 @@ ConditionalRelease) ->
       errors
 
     onChange: ->
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !@assignmentDirty
-        @assignmentDirty = true
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && @assignmentUpToDate
+        @assignmentUpToDate = false
 
     updateConditionalRelease: ->
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && @assignmentDirty
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !@assignmentUpToDate
         assignmentData = @getFormData()
         @conditionalReleaseEditor.updateAssignment(assignmentData)
-        @assignmentDirty = false
+        @assignmentUpToDate = true

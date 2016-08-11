@@ -170,6 +170,11 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     view.renderGroupCategoryOptions()
     view.loadConditionalRelease()
     stub = @stub(view.conditionalReleaseEditor, 'updateAssignment')
+    view.$discussionEditView.tabs("option", "active", 1)
+    ok stub.calledOnce
+
+    stub.reset()
+    view.$discussionEditView.tabs("option", "active", 0)
     view.onChange()
     view.$discussionEditView.tabs("option", "active", 1)
     ok stub.calledOnce
