@@ -3,6 +3,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :discussion_entry,
           :discussion_topic,
           :enrollment,
+          :enrollment_state,
           :group,
           :group_category,
           :group_membership,
@@ -17,6 +18,10 @@ class LiveEventsObserver < ActiveRecord::Observer
       if obj.syllabus_body_changed?
         Canvas::LiveEvents.course_syllabus_updated(obj, obj.syllabus_body_was)
       end
+    when Enrollment
+      Canvas::LiveEvents.enrollment_updated(obj)
+    when EnrollmentState
+      Canvas::LiveEvents.enrollment_state_updated(obj)
     when WikiPage
       if obj.title_changed? || obj.body_changed?
         Canvas::LiveEvents.wiki_page_updated(obj, obj.title_changed? ? obj.title_was : nil,
@@ -37,6 +42,8 @@ class LiveEventsObserver < ActiveRecord::Observer
       Canvas::LiveEvents.discussion_topic_created(obj)
     when Enrollment
       Canvas::LiveEvents.enrollment_created(obj)
+    when EnrollmentState
+      Canvas::LiveEvents.enrollment_state_created(obj)
     when Group
       Canvas::LiveEvents.group_created(obj)
     when GroupCategory
