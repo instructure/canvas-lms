@@ -11093,9 +11093,7 @@ nb:
           quadrillion: Kvadrillion
           thousand: Tusen
           trillion: Trillioner
-          unit: ""
       format: 
-        delimiter: ""
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -11111,11 +11109,7 @@ nb:
           tb: TB
     percentage: 
       format: 
-        delimiter: ""
         format: "%n%"
-    precision: 
-      format: 
-        delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "tall mellom 1 og 16 inkluderende"
   number_of_allowed_attempts_3d10b740: "Antall tillatte forsøk"
   number_of_respondents_e1e7e8b: "Antall respondenter"
