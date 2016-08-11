@@ -29,6 +29,7 @@ define [
       run =>
         @submission = Ember.Object.create
           grade: 'A'
+          gradeLocked: false
           assignment_id: 1
           user_id: 1
         @assignment = Ember.Object.create
@@ -48,9 +49,7 @@ define [
   test "setting value on init", ->
     component = App.GradingCellComponent.create()
     equal(component.get('value'), '-')
-
     equal(@component.get('value'), 'A')
-
 
   test "saveURL", ->
     equal(@component.get('saveURL'), "/api/v1/assignment/1/1")
@@ -67,36 +66,12 @@ define [
     setType 'letter_grade'
     ok @component.get('isLetterGrade')
 
-  test "isInPastGradingPeriodAndNotAdmin is false when multiple grading periods are not enabled", ->
-    ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled = false
-    equal @component.get('isInPastGradingPeriodAndNotAdmin'), false
-
-  test "isInPastGradingPeriodAndNotAdmin is false when no grading periods are in the past", ->
-    ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past = null
-    equal @component.get('isInPastGradingPeriodAndNotAdmin'), false
-
-  test "isInPastGradingPeriodAndNotAdmin is false when current user roles are undefined", ->
-    ENV.current_user_roles = null
-    equal @component.get('isInPastGradingPeriodAndNotAdmin'), false
-
-  test "isInPastGradingPeriodAndNotAdmin is false when the current user is an admin", ->
-    ENV.current_user_roles = ['admin']
-    equal @component.get('isInPastGradingPeriodAndNotAdmin'), false
-
-  test "isInPastGradingPeriodAndNotAdmin is true for assignments in the previous grading period", ->
-    run => @assignment.set('due_at', tz.parse("2013-10-01T09:59:00Z"))
+  test "isInPastGradingPeriodAndNotAdmin is true when the submission is gradeLocked", ->
+    run => @submission.set('gradeLocked', true)
     equal @component.get('isInPastGradingPeriodAndNotAdmin'), true
 
-  test "isInPastGradingPeriodAndNotAdmin is true for assignments due exactly at the end of the previous grading period", ->
-    run => @assignment.set('due_at', tz.parse("2013-10-01T10:00:00Z"))
-    equal @component.get('isInPastGradingPeriodAndNotAdmin'), true
-
-  test "isInPastGradingPeriodAndNotAdmin is false for assignments after the previous grading period", ->
-    run => @assignment.set('due_at', tz.parse("2013-10-01T10:01:00Z"))
-    equal @component.get('isInPastGradingPeriodAndNotAdmin'), false
-
-  test "isInPastGradingPeriodAndNotAdmin is false for assignments without a due date", ->
-    run => @assignment.set('due_at', null)
+  test "isInPastGradingPeriodAndNotAdmin is false when the submission is not gradeLocked", ->
+    run => @submission.set('gradeLocked', false)
     equal @component.get('isInPastGradingPeriodAndNotAdmin'), false
 
   test "nilPointsPossible", ->

@@ -15,8 +15,9 @@ define [
   '../../shared/components/ic_submission_download_dialog_component'
   'str/htmlEscape'
   'compiled/models/grade_summary/CalculationMethodContent'
+  'jsx/gradebook/SubmissionStateMap'
   'jquery.instructure_date_and_time'
-  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid, ic_submission_download_dialog, htmlEscape, CalculationMethodContent) ->
+  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid, ic_submission_download_dialog, htmlEscape, CalculationMethodContent, SubmissionStateMap) ->
 
   {get, set, setProperties} = Ember
 
@@ -24,6 +25,9 @@ define [
   # http://emberjs.com/api/classes/Ember.Controller.html
   # http://emberjs.com/api/classes/Ember.ArrayController.html
   # http://emberjs.com/api/classes/Ember.ObjectController.html
+
+  gradingPeriodIsClosed = (gradingPeriod) ->
+    new Date(gradingPeriod.close_date) < new Date()
 
   studentsUniqByEnrollments = (args...)->
     hiddenNameCounter = 1
@@ -307,6 +311,17 @@ define [
     studentSelectDefaultLabel: I18n.t "no_student", "No Student Selected"
     assignmentSelectDefaultLabel: I18n.t "no_assignment", "No Assignment Selected"
     outcomeSelectDefaultLabel: I18n.t "no_outcome", "No Outcome Selected"
+
+    submissionStateMap: (
+      periods = _.map get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods'), (gradingPeriod) =>
+        _.extend({}, gradingPeriod, closed: gradingPeriodIsClosed(gradingPeriod))
+      new SubmissionStateMap(
+        gradingPeriodsEnabled: !!get(window, 'ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled')
+        selectedGradingPeriodID: '0'
+        gradingPeriods: periods
+        isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, "admin")
+      )
+    )
 
     assignment_groups: []
 
@@ -607,6 +622,11 @@ define [
           assignmentsProxy.addObject as
     ).observes('assignment_groups', 'assignment_groups.@each')
 
+    populateSubmissionStateMap: (->
+      return unless @get('enrollments.isLoaded') && @get('assignment_groups.isLoaded')
+      @submissionStateMap.setup(@get('students').toArray(), @get('assignments').toArray())
+    ).observes('enrollments.isLoaded', 'assignment_groups.isLoaded')
+
     includeUngradedAssignments: (->
       userSettings.contextGet('include_ungraded_assignments') or false
     ).property().volatile()
@@ -672,18 +692,20 @@ define [
       if arguments.length > 1
         @set 'selectedStudent', @get('students').findBy('id', selectedSubmission.user_id)
         @set 'selectedAssignment', @get('assignments').findBy('id', selectedSubmission.assignment_id)
-        selectedSubmission
       else
         return null unless @get('selectedStudent')? and @get('selectedAssignment')?
         student = @get 'selectedStudent'
         assignment = @get 'selectedAssignment'
         sub = get student, "assignment_#{assignment.id}"
-        sub or {
+        selectedSubmission = sub or {
           user_id: student.id
           assignment_id: assignment.id
           hidden: !@differentiatedAssignmentVisibleToStudent(assignment, student.id)
           grade_matches_current_submission: true
         }
+      submissionState = @submissionStateMap.getSubmissionState(selectedSubmission) || {}
+      selectedSubmission.gradeLocked = submissionState.locked
+      selectedSubmission
     ).property('selectedStudent', 'selectedAssignment')
 
     selectedSubmissionHidden: (->

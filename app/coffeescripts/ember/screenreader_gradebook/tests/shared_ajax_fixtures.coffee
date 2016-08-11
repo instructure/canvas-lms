@@ -247,69 +247,69 @@ define [
   students = [
         {
           user_id: '1'
-          user: { id: '1', name: 'Bob' }
+          user: { id: '1', name: 'Bob', group_ids: [], sections: [] }
           course_section_id: '1'
         }
         {
           user_id: '2'
-          user: { id: '2', name: 'Fred' }
+          user: { id: '2', name: 'Fred', group_ids: [], sections: [] }
           course_section_id: '1'
         }
         {
           user_id: '3'
-          user: { id: '3', name: 'Suzy' }
+          user: { id: '3', name: 'Suzy', group_ids: [], sections: [] }
           course_section_id: '1'
         }
         {
           user_id: '4'
-          user: { id: '4', name: 'Buffy' }
+          user: { id: '4', name: 'Buffy', group_ids: [], sections: [] }
           course_section_id: '2'
         }
         {
           user_id: '5'
-          user: { id: '5', name: 'Willow' }
+          user: { id: '5', name: 'Willow', group_ids: [], sections: [] }
           course_section_id: '2'
         }
         {
           user_id: '5'
-          user: { id: '5', name: 'Willow' }
+          user: { id: '5', name: 'Willow', group_ids: [], sections: [] }
           course_section_id: '1'
         }
         {
           user_id: '6'
-          user: { id: '6', name: 'Giles' }
+          user: { id: '6', name: 'Giles', group_ids: [], sections: [] }
           course_section_id: '2'
         }
         {
           user_id: '7'
-          user: { id: '7', name: 'Xander' }
+          user: { id: '7', name: 'Xander', group_ids: [], sections: [] }
           course_section_id: '2'
         }
         {
           user_id: '8'
-          user: { id: '8', name: 'Cordelia' }
+          user: { id: '8', name: 'Cordelia', group_ids: [], sections: [] }
           course_section_id: '2'
         }
         {
           user_id: '9'
-          user: { id: '9', name: 'Drusilla' }
+          user: { id: '9', name: 'Drusilla', group_ids: [], sections: [] }
           course_section_id: '1'
         }
         {
           user_id: '10'
-          user: { id: '10', name: 'Spike' }
+          user: { id: '10', name: 'Spike', group_ids: [], sections: [] }
           course_section_id: '2'
         }
         {
           user_id: '10'
-          user: { id: '10', name: 'Spike' }
+          user: { id: '10', name: 'Spike', group_ids: [], sections: [] }
           course_section_id: '1'
         }
       ]
 
   concludedStudents = [
         {
-          user: { id: '105', name: 'Lyra' }
+          user: { id: '105', name: 'Lyra', group_ids: [], sections: [] }
           course_section_id: '1'
           user_id: '105'
           workflow_state: 'completed'
