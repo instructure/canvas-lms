@@ -108,7 +108,7 @@
               <ul class="ic-app-header__menu-list">
                 <li class="ic-app-header__menu-list-item">
                  <%= link_to help_link_url,
-                      :id => support_url ? '' : 'global_nav_help_link',
+                      :id => show_feedback_link? ? 'global_nav_help_link' : '',
                       :class => "ic-app-header__menu-list-link",
                       :data => help_link_data do %>
                     <div class="menu-item-icon-container" role="presentation">
