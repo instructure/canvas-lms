@@ -1666,20 +1666,14 @@ class User < ActiveRecord::Base
             end
           end
 
-          courses = scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
+          unless options[:include_completed_courses]
+            scope = scope.joins(:all_enrollments => :enrollment_state).where("enrollment_states.restricted_access = ?", false).
+              where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
+          end
+
+          scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
               order("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}").
               distinct_on(:id).shard(shards).to_a
-
-          unless options[:include_completed_courses]
-            enrollments = Enrollment.where(:id => courses.map { |c| Shard.relative_id_for(c.primary_enrollment_id, c.shard, Shard.current) }).to_a
-            courses_hash = courses.index_by(&:id)
-            # prepopulate the reverse association
-            enrollments.each { |e| e.course = courses_hash[e.course_id] }
-            Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
-            date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
-            courses.reject! { |course| date_restricted_ids.include?(Shard.relative_id_for(course.primary_enrollment_id, course.shard, Shard.current)) }
-          end
-          courses
         end
         result.dup
       end

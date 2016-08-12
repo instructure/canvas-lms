@@ -599,6 +599,22 @@ describe User do
         expect(alice.courses_with_primary_enrollment.size).to eq 0
       end
 
+      it 'filters out completed-by-date enrollments for the correct user' do
+        @shard1.activate do
+          @user = User.create!(:name => 'user')
+          account = Account.create!
+          courseX = account.courses.build
+          courseX.workflow_state = 'available'
+          courseX.start_at = 7.days.ago
+          courseX.conclude_at = 2.days.ago
+          courseX.restrict_enrollments_to_course_dates = true
+          courseX.save!
+          StudentEnrollment.create!(:course => courseX, :user => @user, :workflow_state => 'active')
+        end
+        expect(@user.courses_with_primary_enrollment.count).to eq 0
+        expect(@user.courses_with_primary_enrollment(:current_and_invited_courses, nil, :include_completed_courses => true).count).to eq 1
+      end
+
       it 'works with favorite_courses' do
         @user = User.create!(:name => 'user')
         @shard1.activate do

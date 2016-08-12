@@ -566,9 +566,8 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && @current_user
-          context_enrollments = @context.enrollments.where(user_id: @current_user).to_a
-          Canvas::Builders::EnrollmentDateBuilder.preload_state(context_enrollments)
-          @context_enrollment = context_enrollments.sort_by{|e| [e.state_with_date_sortable, e.rank_sortable, e.id] }.first
+          @context_enrollment = @context.enrollments.where(user_id: @current_user).joins(:enrollment_state).
+            order(Enrollment.state_by_date_rank_sql, Enrollment.type_rank_sql).readonly(false).first
         end
         @context_membership = @context_enrollment
         check_for_readonly_enrollment_state

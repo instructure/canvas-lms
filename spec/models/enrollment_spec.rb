@@ -2083,4 +2083,34 @@ describe Enrollment do
       expect(@user.user_account_associations.where(account: sub_account).exists?).to eq true
     end
   end
+
+  it "should order by state based on date correctly" do
+    u = user(:active_all => true)
+    c1 = course(:active_all => true)
+    c1.start_at = 1.day.from_now
+    c1.conclude_at = 2.days.from_now
+    c1.restrict_enrollments_to_course_dates = true
+    c1.restrict_student_future_view = true
+    c1.save!
+    restricted_enroll = c1.enroll_student(u)
+
+    c2 = course(:active_all => true)
+    c2.start_at = 1.day.from_now
+    c2.conclude_at = 2.days.from_now
+    c2.restrict_enrollments_to_course_dates = true
+    c2.save!
+    future_enroll = c2.enroll_student(u)
+
+    c3 = course(:active_all => true)
+    active_enroll = c3.enroll_student(u)
+
+    [restricted_enroll, future_enroll, active_enroll].each do |e|
+      e.workflow_state = 'active'
+      e.save!
+    end
+
+    enrolls = Enrollment.where(:id => [restricted_enroll, future_enroll, active_enroll]).
+      joins(:enrollment_state).order(Enrollment.state_by_date_rank_sql).to_a
+    expect(enrolls).to eq [active_enroll, future_enroll, restricted_enroll]
+  end
 end

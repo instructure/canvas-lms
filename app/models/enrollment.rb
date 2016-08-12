@@ -613,6 +613,13 @@ class Enrollment < ActiveRecord::Base
     STATE_RANK_HASH[state.to_s]
   end
 
+  STATE_BY_DATE_RANK = ['active', ['invited', 'creation_pending', 'pending_active', 'pending_invited'], 'inactive', 'completed', 'rejected', 'deleted']
+  STATE_BY_DATE_RANK_HASH = rank_hash(STATE_BY_DATE_RANK)
+  def self.state_by_date_rank_sql
+    @state_by_date_rank_sql ||= rank_sql(STATE_BY_DATE_RANK, 'enrollment_states.state').
+      sub(/^CASE/, "CASE WHEN enrollment_states.restricted_access THEN #{STATE_BY_DATE_RANK.index('inactive')}") # pretend restricted access is the same as inactive
+  end
+
   def state_with_date_sortable
     STATE_RANK_HASH[state_based_on_date.to_s]
   end
