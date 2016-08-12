@@ -42,7 +42,7 @@ ENV["RAILS_ENV"] = 'test'
 
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
-  require 'coverage_tool'
+  require_relative 'coverage_tool'
   CoverageTool.start("RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}")
 end
 
