@@ -11097,9 +11097,7 @@ nl:
           quadrillion: Quadriljoen
           thousand: Duizend
           trillion: Triljoen
-          unit: ""
       format: 
-        delimiter: ""
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -11115,11 +11113,7 @@ nl:
           tb: TB
     percentage: 
       format: 
-        delimiter: ""
         format: "%n%"
-    precision: 
-      format: 
-        delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "nummer tussen 1 en 16 inclusief"
   number_of_allowed_attempts_3d10b740: "Aantal toegestane pogingen"
   number_of_respondents_e1e7e8b: "Aantal respondents"

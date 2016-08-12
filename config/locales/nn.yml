@@ -10246,9 +10246,7 @@ nn:
           quadrillion: Kvadrillion
           thousand: Tusen
           trillion: Trillion
-          unit: ""
       format: 
-        delimiter: ""
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -10264,11 +10262,7 @@ nn:
           tb: TB
     percentage: 
       format: 
-        delimiter: ""
         format: "%n%"
-    precision: 
-      format: 
-        delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "tal inkludert 1 til og med 16"
   number_of_allowed_attempts_3d10b740: "Tal på tillatne forsøk"
   number_of_respondents_e1e7e8b: "Tal på respondentar"
@@ -11565,7 +11559,6 @@ nn:
       give_everyone_full_credit: "Gi alle fullt utbytte for dette spørsmålet."
       no_scores_reduced: "Gi poeng for både retta og tidlegare rette svar (*ingen resultat vert reduserte*)"
       regrade_disabled: "Det er ikkje tillate med ny karaktersetjing på dette spørsmålet, fordi eit svar er fjerna eller spørsmålstypen er endra etter at ein student fullførte ei innlevering."
-      regrade_options: ""
       some_scores_reduced: "Gi poeng berre for korrekte svar (*resultata for enkelte studentar kan verte reduserte*)"
       update_question_without_regrading: "Oppdater spørsmålet utan å setje karakterar på nytt"
   quiz_40ee61b1: prøve
