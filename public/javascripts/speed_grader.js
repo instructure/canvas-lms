@@ -773,11 +773,11 @@ define([
       event.stopPropagation();
 
       //Prev()
-      if(event.keyString == "j" || event.keyString == "p") {
+      if(event.keyString == "k" || event.keyString == "p") {
         EG.prev();
       }
       //next()
-      else if(event.keyString == "k" || event.keyString == "n") {
+      else if(event.keyString == "j" || event.keyString == "n") {
         EG.next();
       }
       //comment
