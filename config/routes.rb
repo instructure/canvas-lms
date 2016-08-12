@@ -1853,6 +1853,13 @@ CanvasRails::Application.routes.draw do
     scope(controller: :announcements_api) do
       get 'announcements', action: :index, as: :announcements
     end
+
+    scope(controller: :rubrics_api) do
+      get 'accounts/:account_id/rubrics', action: :index, as: :account_rubrics
+      get 'accounts/:account_id/rubrics/:id', action: :show
+      get 'courses/:course_id/rubrics', action: :index, as: :course_rubrics
+      get 'courses/:course_id/rubrics/:id', action: :show
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
