@@ -23,6 +23,9 @@ module Gradebook2SRGBCommon
     let(:next_student) { f('.student_navigation button.next_object') }
     let(:previous_assignment) { f('.assignment_navigation button.previous_object') }
     let(:next_assignment) { f('.assignment_navigation button.next_object') }
+    # assignment information
+    let(:assignment_link) { f('.assignment_selection a') }
+    let(:speedgrader_link) { f('#assignment-speedgrader-link a') }
   end
 
   def basic_setup(num=1)

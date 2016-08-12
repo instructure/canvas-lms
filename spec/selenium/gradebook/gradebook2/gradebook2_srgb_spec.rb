@@ -93,6 +93,19 @@ describe "Screenreader Gradebook" do
     expect(previous_assignment.attribute 'disabled').to be_truthy
   end
 
+  it 'redirects to an assignment from SpeedGrader', priority: '2', test_id: 615684 do
+    simple_setup
+    @submission = @assign1.submit_homework(@students[0], body: 'student submission')
+    get srgb
+    select_student(@students[0])
+    select_assignment(@assign1)
+    assignment_link.click
+    speedgrader_link.click
+
+    driver.switch_to.window(driver.window_handles.last)
+    expect(driver.title).to eq("#{@assign1.title}, SpeedGrader, Unnamed Course")
+  end
+
   it 'can select an assignment', priority: "1", test_id: 163998 do
     a1 = basic_setup
     a2 = @course.assignments.create!(
