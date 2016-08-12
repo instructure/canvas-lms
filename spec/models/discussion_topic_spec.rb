@@ -822,6 +822,15 @@ describe DiscussionTopic do
       expect(@teacher.stream_item_instances.count).to eq 1
     end
 
+    it "should send stream items to students for graded discussions" do
+      @topic = @course.discussion_topics.build(:title => "topic")
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
+      @assignment.saved_by = :discussion_topic
+      @topic.assignment = @assignment
+      @topic.save
+
+      expect(@student.stream_item_instances.count).to eq 1
+    end
   end
 
   context "posting first to view" do

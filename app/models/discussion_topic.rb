@@ -662,8 +662,6 @@ class DiscussionTopic < ActiveRecord::Base
       false
     elsif self.root_topic_id && self.has_group_category?
       false
-    elsif self.assignment && self.assignment.submission_types == 'discussion_topic' && (!self.assignment.due_at || self.assignment.due_at > 1.week.from_now) # TODO: vdd
-      false
     else
       true
     end
@@ -950,7 +948,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def active_participants_with_visibility
     return active_participants if !self.for_assignment?
-    users_with_visibility = AssignmentStudentVisibility.where(assignment_id: self.assignment_id, course_id: course.id).pluck(:user_id)
+    users_with_visibility = self.assignment.students_with_visibility.pluck(:id)
 
     admin_ids = course.participating_admins.pluck(:id)
     users_with_visibility.concat(admin_ids)
@@ -975,7 +973,7 @@ class DiscussionTopic < ActiveRecord::Base
     subscribed_users = participating_users(sub_ids).to_a
 
     if self.for_assignment?
-      students_with_visibility = AssignmentStudentVisibility.where(course_id: course.id, assignment_id: assignment_id).pluck(:user_id)
+      students_with_visibility = self.assignment.students_with_visibility.pluck(:id)
 
       admin_ids = course.participating_admins.pluck(:id)
       observer_ids = course.participating_observers.pluck(:id)
