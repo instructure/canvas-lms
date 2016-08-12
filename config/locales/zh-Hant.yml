@@ -11083,9 +11083,7 @@ zh-Hant:
           quadrillion: 一百萬的四次方
           thousand: 千
           trillion: 萬億
-          unit: ""
       format: 
-        delimiter: ""
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -11101,11 +11099,7 @@ zh-Hant:
           tb: TB
     percentage: 
       format: 
-        delimiter: ""
         format: "%n%"
-    precision: 
-      format: 
-        delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: 數量在1至16之間
   number_of_allowed_attempts_3d10b740: 允許的嘗試次數
   number_of_respondents_e1e7e8b: 回應個數

@@ -11213,9 +11213,7 @@ pl:
           quadrillion: Kwadrylion
           thousand: Tysiąc
           trillion: Trylion
-          unit: ""
       format: 
-        delimiter: ""
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -11232,11 +11230,7 @@ pl:
           tb: TB
     percentage: 
       format: 
-        delimiter: ""
         format: "%n%"
-    precision: 
-      format: 
-        delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "Liczba od 1 do 16 włącznie"
   number_of_allowed_attempts_3d10b740: "Dozwolona liczba prób"
   number_of_respondents_e1e7e8b: "Ilość respondentów"

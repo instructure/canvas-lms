@@ -11070,9 +11070,7 @@ es:
           quadrillion: "Mil billones"
           thousand: Mil
           trillion: Billón
-          unit: ""
       format: 
-        delimiter: ""
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -11088,11 +11086,7 @@ es:
           tb: TB
     percentage: 
       format: 
-        delimiter: ""
         format: "%n%"
-    precision: 
-      format: 
-        delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "número entre el 1 y 16 incluyendo estos"
   number_of_allowed_attempts_3d10b740: "Cantidad de intentos permitidos"
   number_of_respondents_e1e7e8b: "Número de respondedores"

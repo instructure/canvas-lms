@@ -11211,9 +11211,7 @@ sv:
           quadrillion: Biljard
           thousand: Tusen
           trillion: Biljon
-          unit: ""
       format: 
-        delimiter: ""
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -11229,11 +11227,7 @@ sv:
           tb: TB
     percentage: 
       format: 
-        delimiter: ""
         format: "%n%"
-    precision: 
-      format: 
-        delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "nummer mellan 2 och 16 inkluderat"
   number_of_allowed_attempts_3d10b740: "Tillåtet antal försök"
   number_of_respondents_e1e7e8b: "Antal svarare"
