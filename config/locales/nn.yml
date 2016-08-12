@@ -7428,7 +7428,7 @@ nn:
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "ID er allereie i bruk for denne kontoen og identitetsleverandøren"
   idp_entity_id_25c51837: "ID for IdP-eining"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
-  if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Viss eit attributt er merka som 'provisioning only', så vert det berre nytta når 'Just In Time Provisioning' opprettar ein ny brukar, og det vert ikkje automatisk oppdatert kvar gong brukarar logger inn. "
+  if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Viss eit attributt er merka som 'kun for klargjering', så vert det berre nytta når 'Siste lita-tilføring' opprettar ein ny brukar, og det vert ikkje automatisk oppdatert kvar gong brukarar logger inn. "
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Om aktivert, må innhaldsdesignar informere om opphavsrett og lisens for filene før dei vert publiserte. Gjeld berre dersom Better File Browsing også er aktivert."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Om aktivert, vert spørjingsparametrane ikkje kopiert til POST-tekst under ei LTI-lansering."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Dersom ingen er markerte sender du til alle som tilhøyrer kontoen)"
@@ -11154,7 +11154,7 @@ nn:
           Tilgangstoken gjer at tredjepartsapplikasjonar får tilgang til Canvas
           sine ressursar på dine vegner. Dei vert vanlegvis oppretta automatisk
           etter behov, men om [du utviklar eit nytt eller avgrensa
-          prosjekt](%{documentation_url}), kan du generere token her."
+          prosjekt](%{documentation_url}), kan du generere token her.
       google_drive_description: "Når du har gitt tilgang til Google Drive, kan du levere inn oppgåvene direkte frå Google Drive og opprette og dele dokument med medlemmar i klassene."
       headers: 
         application_abbrev: App
@@ -11371,7 +11371,7 @@ nn:
   provider_icon_5064fa6e: Leverandørikon
   provision_a_catalog_account_8cea67f6: "Klargjer ein Canvas Catalog-konto"
   provisioned_catalog_account_26339afd: "Klargjord Canvas Catalog-konto"
-  provisioning_only_7c0e5911: "Provisioning Only"
+  provisioning_only_7c0e5911: "Kun for klargjering"
   provisioning_title: Klargjering
   pseudonym: 
     errors: 
@@ -15572,7 +15572,7 @@ nn:
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Velkomen til dine kurs. Om du vil tilpasse kurslista, klikkar du på lenka \"Alle kurs\", og markerer kursa med stjerner for vising."
   well_below_mastery_37664bdc: "Godt under meistringsnivå"
   what_are_self_sign_up_groups_af1f002a: "Kva er sjølvregistreringsgrupper?"
-  what_does_provisioning_only_mean_eac9a4a1: "Kva betyr 'Provisioning Only'? "
+  what_does_provisioning_only_mean_eac9a4a1: "Kva betyr 'Kun for klargjering'? "
   what_should_the_csv_file_look_like_985a59ac: "Korleis vil du at CSV-fila skal sjå ut?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Dette er sida folk ser når dei besøker kurset.  Du kan la sida vise aktivitetsstraum, liste over kursmodular, undervisingsplan eller ei tilpassa side du lagar sjølv.  Standard er aktivitetsstraumen i kurset."
   whenever_b943b119: "når som helst"
