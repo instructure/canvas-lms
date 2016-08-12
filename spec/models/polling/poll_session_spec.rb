@@ -90,7 +90,7 @@ describe Polling::PollSession do
 
         expect(Polling::PollSession.available_for(@student1).size).to eq 3
         expect(Polling::PollSession.available_for(@student2).size).to eq 0
-        expect(Polling::PollSession.available_for(@student1)).to eq student1_sessions
+        expect(Polling::PollSession.available_for(@student1)).to match_array student1_sessions
 
         2.times do |n|
           student2_sessions << Polling::PollSession.create(poll: @poll2, course: @course2)
@@ -98,7 +98,7 @@ describe Polling::PollSession do
 
         expect(Polling::PollSession.available_for(@student1).size).to eq 3
         expect(Polling::PollSession.available_for(@student2).size).to eq 2
-        expect(Polling::PollSession.available_for(@student2)).to eq student2_sessions
+        expect(Polling::PollSession.available_for(@student2)).to match_array student2_sessions
     end
   end
 
