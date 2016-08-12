@@ -498,6 +498,7 @@ describe "assignments" do
         expect(f("#assignment-speedgrader-link")).to have_class("hidden")
 
         f("#assignment_publish_button").click
+        wait_for_ajaximations
 
         expect(@assignment.reload).to be_published
         expect(f("#assignment_publish_button")).to include_text("Published")
