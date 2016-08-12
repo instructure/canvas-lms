@@ -462,6 +462,7 @@ class UsersController < ApplicationController
     if request.post?
       if @user == @real_current_user
         session.delete(:become_user_id)
+        session.delete(:enrollment_uuid)
       else
         session[:become_user_id] = params[:user_id]
       end
