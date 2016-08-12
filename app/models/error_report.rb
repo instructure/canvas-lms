@@ -64,10 +64,21 @@ class ErrorReport < ActiveRecord::Base
 
     def log_exception(category, exception, opts)
       category ||= exception.class.name
-      opts[:message] ||= exception.to_s
-      opts[:backtrace] = exception.backtrace.try(:join, "\n")
-      opts[:exception_message] = exception.to_s
+
       @exception = exception
+      message = exception.to_s rescue exception.class.name
+      backtrace = Array(exception.backtrace)
+      while (exception = exception.cause)
+        cause = exception.to_s rescue exception.class.name
+        message += " caused by #{cause}"
+        new_backtrace = Array(exception.backtrace)
+        # remove the common lines of the backtrace, and separate it so you can see
+        # the error handling
+        backtrace = (new_backtrace - backtrace) + ["<Caused>"] + backtrace
+      end
+      opts[:message] ||= message
+      opts[:backtrace] = backtrace.join("\n")
+      opts[:exception_message] = message
       log_error(category, opts)
     end
 
