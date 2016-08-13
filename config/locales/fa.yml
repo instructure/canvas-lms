@@ -221,6 +221,7 @@ fa:
       discovery_url_description: "اگر یک نشانی اینترنتی کشف تنظیم شود، کانواس همه کاربران را در صورت نیاز به اعتبارسنجی به این نشانی اینترنتی هدایت خواهد کرد. بنابراین این صفحه به کاربر کمک خواهد کرد تا بفهمد که برای ورود باید به کجا مراجعه کند. اگر هیچ گونه نشانی اینترنتی کشف پیکربندی نشود، اولین پیکربندی برای اقدام به اعتبارسنجی استفاده خواهد شد."
       login_handle_name_description: "برچسب استفاده شده برای شناسه های یکتای ورود. به‌عنوان مثال: ورود، نام کاربری، شناسه دانشجو و غیره."
       unknown_user_url_description: "نشانی اینترنتی برای هدایت به آن در صورتی که یک کاربر اعتبارسنجی شده در کانواس موجود نباشد."
+  account_course_and_user_search_22bf297a: "جستجوی کاربر و درس حساب"
   account_domain_78f43049: "دامنه حساب"
   account_id_2c3b4f15: "شناسه حساب"
   account_name_13ed649: "%{account_name}"
@@ -409,11 +410,11 @@ fa:
       account_status: "وضعیت حساب"
       add_new_domain: "افزودن دامنه جدید"
       labels: 
-        consortium_autocreate_reverse_trust: ""
-        consortium_autocreate_web_of_trust: ""
-        consortium_can_create_own_accounts: ""
-        consortium_parent_account: ""
-        shard_per_account: ""
+        consortium_autocreate_reverse_trust: "به طور خودکار حساب منشأ به حساب های ریشه جدید اطمینان کند (عکس آن همیشه صادق است)"
+        consortium_autocreate_web_of_trust: "در هنگام ایجاد حساب های جدید یک شبکه اعتماد به طور خودکار ایجاد شود"
+        consortium_can_create_own_accounts: "مدیران کنسرسيوم می توانند حساب های ریشه ایجاد کنند"
+        consortium_parent_account: "حساب منشأ کنسرسیوم"
+        shard_per_account: "ایجاد یک بخش جدید برای هر حساب ریشه جدید"
       license: مجوز
       license_type: "نوع مجوز"
       new_account_domain_title: "دامنه حساب جدید"
@@ -725,7 +726,7 @@ fa:
       account_reports: 
         default: 
           lti_reports: 
-            text: ""
+            text: "این گزارش صدور داده هایی را فراهم می کند که اطلاعات کاربرد LTI (تعامل پذیری ابزار یادگیری) را نشان می دهند."
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -806,18 +807,16 @@ fa:
           section_id: 
             field: "شناسه بخش"
     settings: 
-      about_google_docs: "Google Docs Previews به کاربران امکان می دهد به جای اینکه\n\
-          مجبور باشند اسناد را بارگیری کنند و برنامه مرتبط (مثلاً ورد\n\
-          یا اکسل) را باز نمایند، آنها را در داخل کانواس مشاهده کنند.\n\n\
-          اگر Scribd روی این حساب فعال شده باشد، کانواس سعی\n\
-          می کند برای نشان دادن پیش نمایش از آن استفاده کند.\n\
-          اگر سند در Scribd قابل نمایش نباشد، یا اگر کاربر فلش\n\
-          پلیر نصب نکرده باشد (مثلاً آی پاد/آی فون)،\n\
-          در صورتی که Google Docs Previews فعال شده باشد، کانواس\n\
-          برای استفاده از آن به عقب برمی گردد. با استفاده از این خدمت،\n\
-          تأیید می کنید که [شرایط استفاده از خدمات Google Docs Viewer](%{terms_url})\n\
-          را مطالعه کرده و با آن موافق هستید.\n\
-          \x20"
+      about_google_docs: |-
+          Google Docs Previews به کاربران امکان می دهد به جای اینکه
+          مجبور باشند اسناد را بارگیری کنند و برنامه مرتبط (مثلاً ورد
+          یا اکسل) را باز نمایند، آنها را در داخل کانواس مشاهده کنند.
+          
+          Google Docs Previews همچنین می تواند انواع فایل
+          پشتیبانی نشده توسط پیش نمایشگر سند کانواس را ترجمه کند.
+          
+          با استفاده از این سرویس
+          تأیید می کنید که [Google Docs Viewer Terms of Service](%{terms_url}) را مطالعه کرده اید و با آن موافق هستید.
       about_google_docs_tooltip: "درباره Google Docs Previews"
       account_admins_title: "مدیرهای حساب"
       account_quotas: 
@@ -893,7 +892,7 @@ fa:
         allow_sending_scores_in_emails: "دانشجویان می توانند انتخاب کنند که نمره های خود را در اطلاعیه های پست الکترونیکی دریافت نمایند"
         allow_sis_import: "ورودهای اطلاعات سامانه اطلاعات دانشجو"
         author_email_in_notifications: "نمایش نشانی پست الکترونیکی فرستنده برای اطلاعیه های مربوط به تعامل کاربر"
-        canvadocs_prefer_office_online: ""
+        canvadocs_prefer_office_online: "ترجیح دادن نمایشگر فایل Office 365"
         canvas_authentication: "اعتبارسنجی کانواس"
         default_language: "زبان پیش فرض"
         default_time_zone: "منظقه زمانی پیش فرض"
@@ -907,7 +906,7 @@ fa:
         equella: Equella
         equella_endpoint: "نقطه پایانی Equella"
         equella_teaser: "نظرهای Equella"
-        global_includes: ""
+        global_includes: "سفارشی کردن جایگزین های CSS/جاوااسکریپت"
         global_javascript: "نشانی اینترنتی جاوااسکریپت جهانی"
         global_stylesheet: "نشانی اینترنتی CSS جهانی"
         help_link_available_to: "قابل دسترس برای"
@@ -921,7 +920,7 @@ fa:
         message: پیام
         mfa_settings: "اعتبارسنجی چند عاملی"
         name: "نام حساب"
-        new_sub_account_includes: ""
+        new_sub_account_includes: "اجازه داده شود حساب های فرعی از ویرایشگر زمینه برای سفارشی کردن نام های تجاری خود استفاده کنند"
         no_enrollments_can_create_courses: "کاربرانی که ثبت نام نکرده اند"
         open_registration: "ثبت نام آزاد"
         originality_report_visibility: "دانشجویان می توانند گزارش اصلیت را ببینند"
@@ -1062,7 +1061,7 @@ fa:
       account_reports: 
         sis_export: 
           description: 
-            text: ""
+            text: "گزارش صدور اطلاعات سامانه اطلاعات دانشجو: این گزارش همه فایل های مورد نیاز برای کاربران، حساب ها، نیمسال ها، درس ها، بخش ها، ثبت نام ها، گروه ها، عضویت های گروه، و فهرست بندی های متقابل برای ورود اطلاعات سامانه اطلاعات دانشجو در رده های مرتبط را صادر خواهد کرد. این گزارش فقط موردهای ایجاد شده یا تغییر یافته از طریق سامانه اطلاعات دانشجو را بازمی گرداند."
     sis_export_csv_parameters: 
       account_reports: 
         default: 
@@ -1260,6 +1259,9 @@ fa:
         default: 
           zero_activity: 
             text: "این گزارش، همه دانشجویان ثبت نام شده درهمه درس های موجود در یک نیمسال خاص را نشان می دهد. فایل CSV به دست آمده یک ردیف برای هر ثبت نام کاربر دارد  که از تاریخ مورد نظر از درس بازدید نکرده است."
+  achieve_mastery_count_times_8c9bbcec: 
+    one: "کسب تسلط برای %{count} بار"
+    other: "کسب تسلط برای %{count} بار"
   actions_efcde10d: "اقدام ها"
   actions_for_course_312ff446: "اقدام های مربوط به %{course}"
   actions_taken_6fb20fd0: "اقدامات اتخاذ شده"
@@ -1269,6 +1271,9 @@ fa:
     errors: 
       messages: 
         record_invalid: "تأیید اعتبار انجام نشد: %{errors}"
+        restrict_dependent_destroy: 
+          many: "امکان حذف رکورد به دلیل وجود %{record} وابسته وجود ندارد"
+          one: "امکان حذف رکورد به دلیل وجود %{record} وابسته وجود ندارد"
         taken: "قبلا انتخاب شده است"
   activity_13915493: فعالیت
   activity_by_category_9c2033d1: "فعالیت بر اساس رده"
