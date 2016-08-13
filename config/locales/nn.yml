@@ -5966,12 +5966,12 @@ nn:
             * vise fram skriftlege prøver du er stolt av slik at fleire enn faglærar kan sjå
             * snakke om alle tankane og alt arbeidet du har lagt ned i innleveringane dine
             * lage ei oversikt over den totale utdanningserfaringa
-            * dele arbeidet ditt med venner, moglege arbeidsgjevarar osv."
+            * dele arbeidet ditt med venner, moglege arbeidsgjevarar osv.
             
             e-porteføljen kan vere offentleg og synleg for alle, eller privat slik at berre dei du
-            vil har innsyn. Du kan endre innstillingane når du vil."
+            vil har innsyn. Du kan endre innstillingane når du vil.
             
-            Vil du kome i gang? Klikk på knappen."
+            Vil du kome i gang? Klikk på knappen.
     wizard_box: 
       finish: 
         body: "Vil du kome i gang? Du kan alltid gå tilbake til denne vegvisaren, frå alle sidene, ved å klikke på lenka \"%{help_link_text}\" her."
@@ -7057,7 +7057,7 @@ nn:
       student_groups_tabs_everyone: Alle
       student_groups_tabs_groups: Grupper
     context_manage_groups: 
-      account_group_explanation: "Studentgrupper på kontonivå er bra måte å gruppere studentar på utan å vere tilknytt eit bestemt kurs. Kvar studentgruppe får eigen kalender, diskusjonstavle og samarbeidsverktøy slik at dei kan organisere seg og samarbeide meir effektivt."
+      account_group_explanation: "Studentgrupper på kontonivå er ein bra måte å gruppere studentar på utan å vere tilknytt eit bestemt kurs. Kvar studentgruppe får eigen kalender, diskusjonstavle og samarbeidsverktøy slik at dei kan organisere seg og samarbeide meir effektivt."
       actions: 
         add_students: "Legg studentar til kurset"
       buttons: 
@@ -7158,7 +7158,7 @@ nn:
         saving: "Lagrar ...\""
         where_to_move: "Kvar vil du flytte *%{userName}*?"
       group_categories: 
-        account_group_explanation: "Studentgrupper på kontonivå er bra måte å gruppere studentar på utan å vere tilknytt eit bestemt kurs. Kvar studentgruppe får eigen kalender, diskusjonstavle og samarbeidsverktøy slik at dei kan organisere seg og samarbeide meir effektivt."
+        account_group_explanation: "Studentgrupper på kontonivå er ein bra måte å gruppere studentar på utan å vere tilknytt eit bestemt kurs. Kvar studentgruppe får eigen kalender, diskusjonstavle og samarbeidsverktøy slik at dei kan organisere seg og samarbeide meir effektivt."
         add_group_set: "Legg til gruppesett"
         course_group_explanation: "Studentgrupper er nyttige når ein skal organisere aktivitetar som gruppeprosjekt og eksamensoppgåver. Kvar studentgruppe får eigen kalender, diskusjonstavle og samarbeidsverktøy slik at dei kan organisere seg og samarbeide meir effektivt."
         group_assignment_instructions: "Du kan tilordne studentar tilfeldig til grupper med ein bestemt storleik, eller opprette og organisere gruppene manuelt. Når gruppene er oppretta, kan du oppgi oppgåver til å vere \"gruppeinnleveringar\", som betyr at kvar gruppe har ei innlevering for alle brukarane av gruppa."
@@ -7397,7 +7397,7 @@ nn:
   high_b5cbd048: Høy
   high_contrast_description: |-
       Høgkontrast forsterkar fargekontrasten i brukargrensesnittet (tekst, knappar osv.), og gjer desse elementa
-      tydelegare og enklare å finne. Merk: Varemerking av institusjon vert deaktivert."
+      tydelegare og enklare å finne. Merk: Varemerking av institusjon vert deaktivert.
   high_score_47924c1a: "Høgt: %{score}"
   highest_28ad71e6: Høgast
   highest_score_e080551e: "Høgaste resultat"
@@ -11177,7 +11177,7 @@ nn:
         web_services: Webtenester
         yo_login: Yo-pålogging
       hints: 
-        expires_at: "la stå tom, utan forfall"
+        expires_at: "la stå tomt dersom du ikkje ynskjer utløpsdato"
         language: "Dette vil overstyre alle nettlesarar og kontoinnstillingar."
         name: "Dette namnet vert brukt til karaktersetjing."
         short_name: "Namnet vil vere synleg for alle i diskusjonar, meldingar og kommentarar."
@@ -11313,7 +11313,7 @@ nn:
         cell_number: Mobiltelefonnummer
         country: Land
         email_address: E-postadresse
-        enable_login_for_email: "Eg vil logge på Canvas med e-postadressa"
+        enable_login_for_email: "Eg vil logge på Canvas med denne e-postadressa"
         sms_email: SMS-e-post
       links: 
         add_contact_method: Kontaktmetode
@@ -12764,7 +12764,7 @@ nn:
       app_profiling: Applikasjonsprofil
       become_user: "Verte andre brukarar"
       change_course_state: "Endre kurssituasjon"
-      comment_on_others_submissions: "Sjå alle studentane sin innleveringar og gi kommentarar til dei"
+      comment_on_others_submissions: "Sjå alle studentane sine innleveringar og gi kommentarar til dei"
       create_accounts: "Opprett nye rotkontoar"
       create_collaborations: "Opprett studentsamarbeid"
       create_conferences: "Opprett webkonferansar"
