@@ -1311,15 +1311,16 @@ fa:
   add_grading_period_6f774dc3: "افزودن دوره نمره گذاری"
   add_grading_scheme_81e23c05: "افزودن طرح نمره گذاری"
   add_icon_567dbcaa: "افزودن نماد"
-  add_moderator_review_copy_1st_a484c813: ""
-  add_moderator_review_copy_2nd_e80d458f: ""
-  add_moderator_review_new_3c183cea: ""
+  add_moderator_review_copy_1st_a484c813: "افزودن بازبینی ناظر (نسخه اول)"
+  add_moderator_review_copy_2nd_e80d458f: "افزودن بازبینی ناظر (نسخه دوم)"
+  add_moderator_review_new_3c183cea: "افزودن بازبینی ناظر (جدید)"
   add_module_item: 
     add_assignment_to: "افزودن تکلیف به %{module}"
     add_file_to: "افزودن فایل به %{module}"
     add_page_to: "افزودن صفحه به %{module}"
     add_quiz_to: "افزودن آزمون به %{module}"
     add_topic_to: "افزودن موضوع بحث به %{module}"
+  add_new_announcement_ddacd624: "افزودن اطلاعیه جدید"
   add_new_group_7ac49f31: "افزودن گروه جدید"
   add_new_set_of_due_dates_e8e240f: "افزودن مجموعه جدید تاریخ های مهلت"
   add_people_7ee4b2ec: "افزودن افراد"
@@ -1337,7 +1338,7 @@ fa:
   add_user_e73e8e50: "افزودن کاربر"
   add_users_to_name_b8109bbb: "افزودن کاربران به %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "تکلیف های خود را بیفزایید. می توانید یک فهرست طولانی ایجاد کنید، یا آنها را به گروه هایی تقسیم کنید و حتی برای هر گروه تکلیف، وزن تعیین کنید."
-  add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: ""
+  add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "شناسه قسمت سفارشی نمونه Zendesk خود را برای هر یک از موارد زیر بیفزایید (قسمت هایی که دارای شناسه نباشند، ثبت نخواهد شد):"
   admin_4d3ba42f: مدیر
   after_date_981cd41b: "بعد از %{date} "
   after_last_attempt_c9168da2: "بعد از آخرین تلاش"
@@ -1409,27 +1410,28 @@ fa:
   all_start_dates_must_be_before_the_end_date_d949eca9: "همه تاریخ های شروع باید قبل از تاریخ پایان باشند"
   all_students_have_taken_the_quiz_b558f8b4: "همه دانشجویان آزمون داده اند"
   all_students_have_taken_the_survey_494f9f42: "همه دانشجویان نظرسنجی را انجام داده اند"
+  all_submissions_must_have_a_selected_grade_3a84e5a9: "همه موردهای ارسالی باید یک نمره انتخاب شده داشته باشند."
   all_terms_cd27b0fb: "همه نیمسال‌ها"
-  allow_a_moderator_to_review_multiple_independent_g_752c4b90: ""
-  allow_bulk_grade_export_to_sis_e11a6e66: ""
-  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: ""
-  allow_in_mastery_paths_5332c786: ""
+  allow_a_moderator_to_review_multiple_independent_g_752c4b90: "به یک ناظر اجازه داده شود چند نمره مستقل برای موردهای ارسالی را بازبینی کند"
+  allow_bulk_grade_export_to_sis_e11a6e66: "اجازه دادن به صدور نمره گروهی به سامانه اطلاعات دانشجو"
+  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "امکان تخصیص تصاویر به درس و استفاده از کارت های داشبورد فراهم شود."
+  allow_in_mastery_paths_5332c786: "دادن امکان ورود به مسیرهای تسلط"
   allow_lor_tools: "به کاربران اجازه داده شود ابزارهای بیرونی پیکربندی شده برای LOR را مشاهده و از آنها استفاده نمایند."
   allow_multiple_attempts_e67a0a37: "اجازه دادن به چند تلاش"
   allow_opt_out_of_inbox: "به کاربران اجازه داده شود از صندوق ورودی گفتگو انتخاب کنند. این امر همه اطلاعیه ها و پیام های گفتگو را به عنوان اطلاعیه های فوری به پست الکترونیکی اولیه کاربر ارسال خواهد کرد، نشانه پیام های خوانده نشده صندوق ورودی گفتگو در صندوق ورودی را مخفی خواهد کرد و تنظیمات دلخواه اطلاعیه گفتگو را مخفی خواهد کرد."
-  allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: ""
-  allow_the_ability_to_send_notifications_through_ou_13cc8537: ""
+  allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "به دانشجویان اجازه داده شود ببینند چه کسی برای بازه های زمانی ثبت نام کرده است."
+  allow_the_ability_to_send_notifications_through_ou_13cc8537: "اجازه دادن به ارسال اطلاعیه ها از طریق صف ارسال"
   allowed_attempts_4e229caa: "تلاش های مجاز"
-  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: ""
-  allows_the_scheduling_of_recurring_calendar_events_aac71007: ""
-  allows_users_with_international_phone_numbers_to_r_f90f8522: ""
+  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "به اساتید امکان داده شود داده های نمره را برای صدور به طور گروهی به یکپارچه سازی های سامانه اطلاعات دانشجو علامت گذاری کنند."
+  allows_the_scheduling_of_recurring_calendar_events_aac71007: "امکان زمان بندی رویدادهای تکرار شونده تقویم را فراهم می کند"
+  allows_users_with_international_phone_numbers_to_r_f90f8522: "برای کاربران دارای شماره تلفن بین المللی امکان دریافت پیام های متنی از کانواس را فراهم می کند."
   always_3a59e701: همیشه
-  always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: ""
+  always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "RCE و نوار کناری همیشه از یک سرویس محتوای غنی کانواس بارگذاری شود"
   an_error_occured_please_try_again_e59b65b: "یک خطا رخ داد. لطفا دوباره سعی کنید."
   an_error_occured_while_deleting_the_grading_period_81bb16e5: "در هنگام حذف مجموعه دوره نمره گذاری خطایی رخ داد"
   an_error_occured_while_deleting_the_grading_period_c8343484: "در هنگام حذف دوره نمره گذاری خطایی رخ داد"
-  an_error_occured_while_fetching_enrollment_terms_1b7b4ac: ""
-  an_error_occured_while_fetching_grading_period_set_b4f12aa5: ""
+  an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "در هنگام فراخوانی نیمسال های ثبت نام خطایی رخ داد."
+  an_error_occured_while_fetching_grading_period_set_b4f12aa5: "در هنگام فراخوانی مجموعه های دوره نمره گذاری خطایی رخ داد."
   an_error_occured_while_updating_the_grading_period_9e024cd1: "در هنگام بهنگام سازی مجموعه دوره نمره گذاری خطایی رخ داد"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*یک خطا رخ داد*، لطفا پاسخ خود را بعداً دوباره ارسال نمایید"
   an_error_occurred_publishing_grades_cfdf7631: "در هنگام انتشار نمره ها خطایی رخ داد"
@@ -1521,10 +1523,10 @@ fa:
   announcements_a4b8ed4a: اطلاعیه‌ها
   anonymous_e1b8ad27: ناشناس
   anonymous_grading_ccb5045c: "نمره‌گذاری ناشناس"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: ""
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "نمره گذاری ناشناس نام دانشجویان را ملزم به مخفی کردن در برنامه نمره گذاری سریع™ می کند"
   anonymous_user: "کاربر ناشناس"
   anonymous_user_d984b9ce: "کاربر ناشناس"
-  another_configuration_is_currently_selected_select_95b394e: ""
+  another_configuration_is_currently_selected_select_95b394e: "در حال حاضر، پیکربندی دیگری انتخاب شده است. انتخاب این پیکربندی انتخاب پیکربندی دیگر را لغو می کند."
   answer_answerid_97fc4afc: "پاسخ دادن به %{answerId}"
   answer_correct_answer_c2c4a20c: "%{answer}، (پاسخ درست)"
   answer_description_6b353cfd: "شرح پاسخ"
@@ -1532,16 +1534,16 @@ fa:
   answer_incorrect_answer_80efe585: "%{answer}، (پاسخ نادرست)"
   answer_text_909894d6: "متن پاسخ"
   answer_weight_43420dc5: "وزن پاسخ"
-  answers_which_scored_in_the_bottom_27_74409483: ""
-  answers_which_scored_in_the_middle_46_46466ffd: ""
-  answers_which_scored_in_the_top_27_a605232d: ""
+  answers_which_scored_in_the_bottom_27_74409483: "پاسخ هایی که در 27 درصد پایینی نمره گذاری شده اند"
+  answers_which_scored_in_the_middle_46_46466ffd: "پاسخ هایی که در 46 درصد میانی نمره گذاری شده اند"
+  answers_which_scored_in_the_top_27_a605232d: "پاسخ هایی که در 27 درصد بالایی نمره گذاری شده اند"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "پاسخ ها بعد از آخرین تلاش شما نمایش داده خواهد شد"
   app_b157c2b3: برنامه
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "مرکز برنامه در زبانه \"برنامه ها\" در صفحه تنظیمات یک درس یا حساب ظاهر خواهد شد. نشانی اینترنتی ارائه شده در قسمت زیر باید به یک نقطه نهایی معتبر مرکز برنامه اشاره داشته باشد (برای مثال، %{url} -- حتما اسلش انتهایی را حتما حذف کنید"
   app_placements_6d877225: "جای گذاری برنامه ها"
   app_reregistration_87cc8817: "ثبت نام مجدد برنامه"
-  appends_a_number_to_the_end_of_each_event_title_e__bca98abd: ""
-  appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: ""
+  appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "یک شماره را به انتهای هر عنوان رویداد ضمیمه می کند (برای مثال، رویداد 1، رویداد 2 و غیره)"
+  appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "یک شماره را به انتهای هر عنوان رویداد ضمیمه می کند (برای مثال، رویداد 1، رویداد 2 و غیره)\" for=\"append_iterator"
   application: 
     errors: 
       feed_not_found: "خوراک خبری یافت نشد."
@@ -1571,6 +1573,7 @@ fa:
       first_teacher: "این درس الان تقاضا شده است و شما به عنوان اولین استاد آن ثبت نام شده اید."
       first_teacher_with_email: "این درس الان تقاضا شده است و شما به عنوان اولین استاد آن ثبت نام شده اید. برای تکمیل روند ثبت نام، باید یک نامه الکترونیکی را ظرف مدت کوتاهی دریافت کنید."
       need_to_accept_enrollment: "قبل از اینکه بتوانید به طور کامل در این درس شرکت کنید، باید [دعوت نامه ثبت نام را بپذیرید](%{url})."
+      need_to_accept_future_enrollment: "قبل از اینکه بتوانید به طور کامل در این درس که در %{date} شروع می شود، شرکت کنید، باید [دعوتنامه ثبت نام را بپذیرید](%{url})"
       page_disabled: "این صفحه غیر فعال شده است"
       page_disabled_for_account: "این صفحه برای این حساب غیرفعال شده است"
       page_disabled_for_course: "این صفحه برای این درس غیر فعال شده است"
@@ -1609,7 +1612,7 @@ fa:
   archive_selected_d64506ca: "بایگانی انتخاب شد"
   are_you_sure_26795d3c: "مطمئن هستید؟"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "مطمئنید که می خواهید نمره نهایی کپی شود؟ این نمره جایگزین نمره موجود خواهد شد."
-  are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: ""
+  are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "مطمئنید که می خواهید این کاربر غیر فعال شود؟ او قادر نخواهد بود در هنگام غیر فعال بودن در درس شرکت کند."
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "مطمئنید که می خواهید این %{count} مورد حذف شود؟"
     other: "مطمئنید که می خواهید این %{count} مورد حذف شود؟"
@@ -1618,7 +1621,7 @@ fa:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "مطمئنید که می خواهید این مجموعه دوره نمره گذاری حذف شود؟"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "مطمئنید که می خواهید این دوره نمره گذاری حذف شود؟"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "مطمئنید که می خواهید این طرح نمره گذاری حذف شود؟"
-  are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: ""
+  are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "مطمئنید که می خواهید این کار را انجام دهید؟ این عمل لغو نمی شود و جایگزین نمره های موجود در دفتر نمره خواهد شد."
   are_you_sure_you_want_to_publish_this_comment_26989c2f: ""
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "مطمئنید که می خواهید این ابزار حذف شود؟"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "مطمئنید که می خواهید این کاربر حذف شود؟"
@@ -2255,7 +2258,14 @@ fa:
         date: تاریخ
         details: "اطلاعات بیشتر"
       instructions: 
-        syllabus: ""
+        syllabus: |-
+            صفحه سرفصل، نمای جدولی زمان بندی درس و مبانی نمره گذاری
+            درس را
+            نشان می دهد. می توانید هر گونه نظر، نکته یا ایده ای که درباره ساختار
+            درس، سیاست های
+            درس یا هر چیز دیگر دارید را بیفزایید.
+            
+            برای افزودن چند نظر، روی پیوند «ویرایش» در قسمت بالا کلیک کنید.
       labels: 
         syllabus_body: "شرح سرفصل"
       links: 
@@ -2347,6 +2357,7 @@ fa:
     corrupted: "اطلاعات بیشتر موجود نیست"
     login: ورود
     logout: خروج
+  authentication_with_provider_was_successful_but_no_6a194137: "اعتبارسنجی توسط %{provider} موفقیت آمیز بود، اما هیچ شناسه یکتایی برای ورود به کانواس ارائه نشد."
   authorize_e3f25bb4: "اجازه دادن"
   available_8606e40c: "در دسترس"
   available_after_unlock_at_b5682224: "بعد از %{unlock_at} در دسترس است"
@@ -2354,15 +2365,15 @@ fa:
   available_from_587ce92f: "قابل دسترسی از طریق"
   available_from_date_43b5e11d: "در دسترس از تاریخ"
   available_from_date_afc594fa: "در دسترس از تاریخ:"
-  available_from_date_must_precede_available_until_c9f9e533: ""
+  available_from_date_must_precede_available_until_c9f9e533: "تاریخ «قابل دسترسی از» باید قبل از «قابل دسترسی تا» بیاید"
   available_from_f84e4611: "قابل دسترسی از"
-  available_from_field_for_styleguide_7ced3861: ""
-  available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: ""
+  available_from_field_for_styleguide_7ced3861: "قسمت قابل دسترسی از برای شیوه نامه"
+  available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "قابل دسترسی از - قالب مانند YYYY-MM-DD hh:mm"
   available_until_date_2c0ccec3: "قابل دسترسی تا تاریخ:"
   available_until_date_cd125c62: "قابل دسترسی تا تاریخ"
   available_until_f3b9c4ed: "قابل دسترسی تا"
-  available_until_field_for_styleguide_85d5d65a: ""
-  available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: ""
+  available_until_field_for_styleguide_85d5d65a: "قسمت قابل دسترسی تا برای شیوه نامه"
+  available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "قابل دسترسی تا - قالب مانند YYYY-MM-DD hh:mm"
   available_until_lock_at_ab022445: "تا %{lock_at} قابل دسترسی است"
   availableslots_available_87b8b69d: "%{availableSlots} قابل دسترس"
   average_49c63f9b: میانگین
@@ -2381,11 +2392,14 @@ fa:
   bb_file_description: "فایل .zip صدور 6/7/8/9 Blackboard"
   bb_name: "مبدل Blackboard"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "یک قهرمان باش و از استاد خود درخواست کن که این پیوند را اصلاح کند."
+  before_implementing_custom_css_or_javascript_pleas_128da8cd: "قبل از اجرایی کردن CSS یا جاوااسکریپت سفارشی، لطفا به * اسناد ما* مراجعه کنید."
+  before_implementing_custom_css_or_javascript_pleas_65423572: "قبل از اجرایی کردن CSS یا جاوااسکریپت سفارشی، لطفا به *اسناد ما* مراجعه کنید."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "قبل از انتشار این فایل، باید حقوق استفاده را تعیین کنید."
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "قبل از انتشار، باید حقوق استفاده مربوط به فایل های خود را تعیین کنید."
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "قبل از اینکه بتوانید رخ نمای خود را ویرایش کنید، باید با کلیک کردن روی پیوند موجود در نامه الکترونیکی که  برای شما فرستاده ایم، نشانی پست الکترونیکی خود (%{email}) را تأیید کنید. اگر آن را ندیدید، *برای ارسال دوباره نامه الکترونیکی کلیک کنید* و حتما صندوق هرزنامه خود بازبینی کنید."
   beginning_date_2d2a29ac: "تاریخ شروع"
   belgium_32_e5f5b598: "بلژیک (+32)"
+  below_this_search_field_is_a_list_of_content_type__58aaa03f: "در زیر این قسمت جستجو، فهرستی از %{content_type} آمده است. وقتی تایپ می کنید، این فهرست برای مطابقت با جستجوی شما فهرست خواهد شد. پیام های گفتگو بر اساس هر گزینه ای که انتخاب می کنید فیلتر خواهد شد."
   beta_url_3c7b88ec: "نشانی اینترنتی نسخه آزمایشی:"
   better_file_browsing_description: |-
       یک واسط ساده تر و کاربرپسندتر برای مرور فایل ها. اگر آن را در سطح درس
