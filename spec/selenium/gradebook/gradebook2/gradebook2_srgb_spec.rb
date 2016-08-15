@@ -280,32 +280,6 @@ describe "Screenreader Gradebook" do
     expect(ff('#assignment_information table td').map(&:text)).to eq ['20', '10', '15', '5']
   end
 
-  context 'Group Weights' do
-    before(:each) do
-      enroll_teacher_and_students
-      assignment_1
-      assignment_5
-      user_session(teacher)
-      get "/courses/#{test_course.id}/gradebook/change_gradebook_version?version=srgb"
-    end
-
-    it 'should display the group weighting dialog with group weights disabled', priority: '1', test_id: 163995 do
-      group_weights_button.click
-      expect(f("#assignment_group_weights_dialog table[style='opacity: 0.5;']")).to be_truthy
-    end
-
-    it 'should correctly sync group weight settings between srgb and gb2', priority: '1', test_id: 588913 do
-      turn_on_group_weights
-
-      # go back to gb2 to verify settings stuck
-      get "/courses/#{test_course.id}/gradebook/change_gradebook_version?version=2"
-      gradebook_settings_cog.click
-      group_weights_menu.click
-
-      expect(f("#assignment_group_weights_dialog table[style='opacity: 1;']")).to be_truthy
-    end
-  end
-
   context "as a teacher" do
     before(:each) do
       gradebook_data_setup

@@ -109,9 +109,6 @@
             <%= t('Publish grades to SIS') %>
           </a></li>
           <% end %>
-          <% if @gradebook_is_editable %>
-            <li><a class="dialog_opener" role="button" aria-controls="assignment_group_weights_dialog" href="<%= context_url(@context, :context_assignments_url) %>"><%= t('Set Group Weights') %></a></li>
-          <% end %>
           <li><a class="student_names_toggle" href="#" role="button"><%= t('Hide Student Names') %></a></li>
           <li><a data-arrange-columns-by="due_date" href="#"><label><%= t('Arrange columns by due date') %><input type="radio" name="arrange-columns-by" /></label></a></li>
           <li><a data-arrange-columns-by="assignment_group" href="#"><label><%= t('Arrange columns by assignment group') %><input type="radio" name="arrange-columns-by" /></label></a></li>

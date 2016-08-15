@@ -87,7 +87,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
       @show_attendance = !!UserSettings.contextGet 'show_attendance'
       @include_ungraded_assignments = UserSettings.contextGet 'include_ungraded_assignments'
       @userFilterRemovedRows = []
-      # preferenecs serialization causes these to always come
+      # preferences serialization causes these to always come
       # from the database as strings
       @showConcludedEnrollments = @options.course_is_concluded ||
         @options.settings['show_concluded_enrollments'] == "true"
