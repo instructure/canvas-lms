@@ -2437,6 +2437,7 @@ fa:
   broken_file_link_found_in_your_course_7cc24395: "پیوند خراب فایل در درس شما موجود است"
   browse_your_computer_9a735a4: "رایانه خود را مرور کنید"
   browse_your_computer_for_a_course_image_d7db2376: "رایانه خود را برای یافتن تصویر درس، مرور کنید"
+  bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "نام سطل باید یکی از موارد زیر باشد: %{bucket_names}"
   bulk_course_migration: 
     export_failed: "در هنگام صدور درس با bb_lc٪ {id} از Blackboard خطایی رخ داد"
     export_failed_no_id: "در هنگام وارد کردن درس، خطایی رخ داد"
@@ -2499,7 +2500,7 @@ fa:
     buttons: 
       migrate_courses: "انتقال درس ها"
     confirm: 
-      cancel_migration: ""
+      cancel_migration: "مطمئنید که می خواهید این انتقال لغو شود؟ همه درس های در حال جریان خاتمه خواهند یافت."
       delete_credential: "مطمئنید که می خواهید این اعتبارنامه ها حذف شوند؟"
     errors: 
       upload_failed: "بارگذاری انجام نشد، لطفا دوباره سعی کنید"
@@ -2544,13 +2545,14 @@ fa:
     view_account_roster: "مشاهده فهرست حساب"
     view_course_roster: "مشاهده فهرست درس"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "به طور پیش فرض، همه پیوندها برای یک درس فعال هستند. دانشجویان پیوند بخش هایی که محتوا ندارند را نخواهند دید. برای مثال، اگر هیچ آزمونی ایجاد نکرده اید، آنها پیوند آزمون ها را نخواهند دید. اگر نمی خواهید دانشجویان به قسمت هایی از درس دسترسی داشته باشند، می توانید این پیوندها را مرتب کنید و به طور آشکار غیر فعال سازید."
-  by_lti_2_registration_url_e421e523: ""
+  by_lti_2_registration_url_e421e523: "به وسیله نشانی اینترنتی ثبت نام LTI 2"
   by_url_a163275e: "بر اساس نشانی اینترنتی"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: بستن
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' یک مقدار معتبر برای روش محاسبه است. مقدار باید  بین '%{valid_calculation_ints_min}' و  '%{valid_calculation_ints_max}' باشد"
   calculation_method_fe281f9: "روش محاسبه"
+  calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "روش_محاسبه باید یکی از موارد زیر باشد: %{calc_methods}"
   calculator: 
     buttons: 
       save: "ذخیره سازی"
@@ -2640,6 +2642,7 @@ fa:
     agenda_view: 
       due: مهلت
       loading: "در حال بارگذاری"
+      no_events: "*هیچ رویدادی بعد از این تاریخ موجود نیست.*"
       starts_at: "شروع می شود از"
     appointment_group_deletion_details: "با حذف کردن آن، هر گونه قرار ملاقات که دانشجویان در آن ثبت نام کرده اند، حذف خواهد شد."
     appointment_group_list: 
@@ -2657,7 +2660,7 @@ fa:
       scheduler_explanation_teacher_paragraph_2: "برای مثال، فرض کنید که می خواهید تکلیف مقاله میان ترم را با هر یک از دانشجویان درس خود مرور کنید. ابتدا یک گروه قرار ملاقات جدید ایجاد می کنید، تاریخ ها و زمان هایی که در دسترس هستید را ایجاد می کنید، تعیین می کنید که این زمان به بازه های 15 دقیقه ای تقسیم شود و در هر بازه فقط به یک دانشجو امکان  می دهید."
       scheduler_explanation_teacher_paragraph_3: "سپس دانشجویان مطلع می شوند و می فهمند که باید در یکی از بازه های زمانی تعیین شده ثبت نام کنند. یک تقویم به همراه بازه های زمانی موجود که در بالای هر چیزی در تقویم های دیگر آنها جایگذاری شده است به آنها نشان داده خواهد شد تا آنها بتوانند زمانی که برایشان مناسب است را انتخاب نمایند."
       scheduler_explanation_teacher_paragraph_4: "* اکنون با کلیک کردن روی دکمه «ایجاد یک گروه قرار ملاقات» در سمت راست، شروع به کار کنید. *"
-      signed_up_for: "شما ثبت نام شدید برای"
+      signed_up_for: "*گروه قرار ملاقات %{title}* که ثبت نام کرده اید"
       x_groups_have_signed_up: "%{participant_count} گروه ثبت نام کرده اند"
       x_people_have_signed_up: "%{participant_count} نفر ثبت نام کرده اند"
     buttons: 
@@ -2926,18 +2929,18 @@ fa:
   can_interact_with_users_in_their_section_only_48cb8c43: "فقط می توانید با کاربران در بخش خود تعامل کنید"
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "تا زمانی که یک تکلیف نمره های ممکن نداشته باشد، نمره قابل محاسبه نیست"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "نمی توان تطبیق ها را بر اساس ارتباط های دستورالعمل ارزیابی حذف کرد. برای حذف این ارتباط ها، باید ردیف را از دستورالعمل ارزیابی دارایی حذف کنید"
-  can_t_perform_diffing_against_more_than_one_file_o_44475c0d: ""
+  can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "امکان اجرای diff در برابر بیش از یک فایل از یک نوع وجود ندارد"
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "اگر موردهای ارسالی دانشجو وجود داشته باشد، نمی توان انتشار را لغو کرد"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "اگر موردهای ارسالی دانشجو وجود داشته باشد، نمی توان انتشار %{item_name} را لغو کرد"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "اگر موردهای ارسالی دانشجو وجود داشته باشد، نمی توان انتشار %{name} را لغو کرد"
   canada_1_921df67a: "کانادا (+1)"
   cancel_caeb1e68: لغو
   cannot_be_associated_with_a_different_account_ac863be2: "نمی تواند با یک حساب دیگر در ارتباط باشد"
-  cannot_be_nil_when_account_id_is_nil_be6d1d60: ""
-  cannot_be_nil_when_course_id_is_nil_f539388: ""
-  cannot_be_present_when_account_id_is_present_f7d9b51f: ""
-  cannot_be_present_when_course_id_is_present_785e6a59: ""
-  cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: ""
+  cannot_be_nil_when_account_id_is_nil_be6d1d60: "وقتی شناسه_حساب هیچ باشد، نمی تواند هیچ باشد"
+  cannot_be_nil_when_course_id_is_nil_f539388: "وقتی شناسه_حساب هیچ باشد، نمی تواند هیچ باشد"
+  cannot_be_present_when_account_id_is_present_f7d9b51f: "وقتی شناسه_حساب موجود باشد، نمی تواند موجود باشد"
+  cannot_be_present_when_course_id_is_present_785e6a59: "وقتی شناسه_حساب موجود باشد، نمی تواند موجود باشد"
+  cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "امکان حذف فایلی که به عنوان بخشی از یک تکلیف ارسال شده است، وجود ندارد"
   canvas: 
     migration: 
       errors: 
@@ -2947,14 +2950,14 @@ fa:
     plugins: 
       errors: 
         all_fields_required: "تکمیل همه جاهای خالی لازم است"
-        aws_creds_required: ""
-        endpoint_or_region_required: ""
+        aws_creds_required: "اعتبارنامه های AWS لازم است."
+        endpoint_or_region_required: "منطقه (نقطه نهایی) AWS لازم است."
         fields_required: "پر کردن جای خالی \"%{field}\" لازم است"
-        invalid_live_events_url: ""
+        invalid_live_events_url: "نقطه نهایی معتبر نیست، باید یک نشانی اینترنتی معتبر باشد."
         invalid_url: "نشانی اینترنتی معتبر نیست"
         login_expiration_minimum: "زمان انقضای جلسه باید 20 دقیقه یا بیشتر باشد"
         need_integer: "لطفا یک عدد صحیح را برای حافظه پنهان فهرست پخش وارد کنید"
-        stream_name_required: ""
+        stream_name_required: "نام جریان جنبش یا kinesis stream لازم است."
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "هشدار کانواس - تغییر: %{assignment_name}، %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "هشدار کانواس - دعوت شده: %{course} به عنوان %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "هشدار کانواس - دعوت شده: درس به عنوان %{role_type}"
@@ -2965,17 +2968,17 @@ fa:
   canvas_cartridge_file_description: "بسته صدور درس کانواس"
   canvas_cartridge_name: "وارد کننده کارتریج کانواس"
   canvas_cloud_information_fdd404f2: "اطلاعات ابر کانواس"
-  canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: ""
+  canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "پیوندهای داشبورد کانواس به داشبورد کاتالوگ هدایت خواهند شد"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "کانواس ارائه دهنده هویت شما را به رسمیت نشناخت"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "کانواس برای کاربر %{user} حساب ندارد"
   canvas_error_report_ff678539: "گزارش خطای کانواس"
   canvas_introduction_video_2d81f3ad: "فیلم معرفی کانواس"
-  canvas_parent_description: ""
+  canvas_parent_description: "این تنظیم بازبینی می کند که آیا والدین می توانند با استفاده از برنامه همراه Canvas Parent به دانشجویان دانشگاه شما متصل شوند یا خیر."
   canvas_revision_unknown: ناشناس
-  canvas_ticketing_email_connector_27e253ae: ""
-  canvas_ticketing_web_post_connector_11158897: ""
+  canvas_ticketing_email_connector_27e253ae: "اتصال دهنده پست الکترونیکی صدور بلیت کانواس"
+  canvas_ticketing_web_post_connector_11158897: "اتصال دهنده وب پست صدور بلیت کانواس"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "کانواس همه موردهای ارسالی شما را پس از اینکه آزمون را ذخیره کردید، دوباره نمره گذاری می کند. این کار ممکن است چند دقیقه طول بکشد."
-  careful_changes_to_group_membership_will_apply_to__19a9089c: ""
+  careful_changes_to_group_membership_will_apply_to__19a9089c: "مراقب باشید! تغییر در عضویت گروه درباره گروه هایی اعمال خواهد شد که تکلیف های ارسالی داشته باشند. تکلیف های ارسالی گروهی ممکن است به عنوان نتیجه قرار نگیرند. مایلید یک مجموعه گروه جدید برای تکلیف های آتی ایجاد شود؟"
   cas_url_4ba2843e: "نشانی اینترنتی CAS"
   catalog_already_enabled_56478a3c: "کاتالوگ از قبل فعال شده است"
   catalog_name_46d37909: "نام کاتالوگ"
@@ -3007,8 +3010,8 @@ fa:
       update_assignment_points: "این تکلیف دارای  %{assignmentPoints} امتیاز ممکن است، آیا می خواهید آن را تغییر دهید تا %{rubricPoints} امتیاز ممکن برای مطابقت با این دستورالعمل ارزیابی را داشته باشد؟"
     titles: 
       update_assignment_points: "امتیازهای تکلیف را برای مطابقت با دستورالعمل ارزیابی تغییر می دهید؟"
-  changes_will_still_apply_if_you_leave_this_page_935cedc6: ""
-  chart_of_the_student_s_grades_on_each_assignment_a1fb1908: ""
+  changes_will_still_apply_if_you_leave_this_page_935cedc6: "در صورتی که از این صفحه خارج شوید، تغییرات باز هم اعمال خواهند شد."
+  chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "نمودار نمره های دانشجو برای هر تکلیف"
   chat_2153c6b7: گفتگو
   child_s_username_dde3aa9: "نام کاربری فرزند"
   chile_56_88238b47: "شیلی (+56)"
@@ -3035,13 +3038,13 @@ fa:
   click_to_set_this_answer_as_correct_1326e3fd: "برای تعیین این پاسخ به عنوان پاسخ درست، کلیک کنید"
   click_to_test_dropdown_b950974d: "برای آزمایش منوی بازشونده کلیک کنید"
   click_to_view_event_details_b25dc1f3: "برای مشاهده اطلاعات رویداد کلیک کنید"
-  clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: ""
-  clone_group_set_c2a40e15: ""
+  clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "با کلیک کردن روی عنوان ستون ها، ردیف ها بر اساس آن ستون مرتب خواهند شد."
+  clone_group_set_c2a40e15: "کپی کردن مجموعه گروه"
   close_and_return_to_canvas_80544344: "بستن و بازگشتن به کانواس"
   close_d634289d: بستن
   close_grade_info_58ef5a20: "بستن اطلاعات نمره"
   code_is_case_sensitive_d8175cad: "رمز نسبت به حروف بزرگ و کوچک حساس است."
-  cog_icon_69bdffd5: ""
+  cog_icon_69bdffd5: "نماد چرخ دنده"
   collaboration: 
     default_title: "همکاری ناشناس"
   collaboration_71c024f4: همکاری
@@ -3054,7 +3057,7 @@ fa:
       google: 
         drive: 
           upgrade: 
-            description: ""
+            description: "برای دسترسی به این همکاری، باید به کانواس اجازه دهید به حساب Google Drive شما دسترسی یابد"
     collaboration: 
       delete: "مطمئنید که می خواهید این همکاری حذف شود؟"
       links: 
@@ -3065,6 +3068,8 @@ fa:
           other: "*%{count}* شرکت کننده"
       titles: 
         collaboration: همکاری
+    collaboration_footer: 
+      started_by: "راه اندازی شده توسط *%{user}*، %{at}"
     collaborator_picker: 
       labels: 
         available_groups: "گروه های موجود"
@@ -3127,6 +3132,27 @@ fa:
     google_drive: 
       file_not_found: "فایل همکاری موجود نیست"
     index: 
+      description_rs: |-
+          ابزارهای رایگان آنلاین تحت وب مانند [Google Docs](%{google_url}) محل بسیار خوبی است برای دانشجویانی که روی پروژه ها یا مقاله های گروهی کار می کنند، یادداشت های مشترک برمی دارند و غیره.
+          استاد *یا* دانشجویان می توانند همکاری های گروهی را ایجاد نمایند.
+      description_student: |-
+          **منظور ما از همکاری چیست؟** منظور ما
+          ابزارهای تحت وب برای
+          همکاری روی یک سند مشترک است. می توانید از منابعی نظیر
+          [Google Docs](%{google_url})
+          برای همکاری در انجام اموری نظیر نوشتن مقاله ها یا یادداشت برداری گروهی استفاده کنید. این صفحه
+          یک محل مناسب برای پیگیری این همکاری ها و همچنین ایجاد آنها
+          بدون نیاز به تبادل نامه های الکترونیکی است.
+      description_teacher: |-
+          **منظور ما از همکاری چیست؟** منظور ما
+          ابزارهای تحت وبی هستند که
+          دانشجویان شما به احتمال زیاد با آنها آشنا هستند. دانشجویان می توانند
+          از منابعی نظیر
+          [Google Docs](%{google_url})
+          برای همکاری در انجام اموری نظیر نوشتن مقاله یا یادداشت برداری
+          گروهی استفاده کنند. این صفحه یک محل مناسب برای پیگیری
+          این همکاری ها و همچنین ایجاد آنها بدون نیاز
+          به تبادل نامه های الکترونیکی برای آنها (و شما) فراهم می کند.
       how_to_start_a_new_collaboration: "برای یافتن اطلاعات بیشتر درباره یک نوع خاص از همکاری، روی «شروع یک همکاری جدید» کلیک کنید و سپس نوع مورد نظر را در فهرست بازشونده انتخاب کنید."
       links: 
         delete: "حذف این همکاری"
@@ -3138,19 +3164,20 @@ fa:
         current: "همکاری های فعلی"
     lti_collaborations: "همکاری های LTI"
     show: 
-      error_cause_1: ""
-      error_cause_2: ""
+      error_cause_1: "حساب Google Drive ایجاد کننده با حساب استفاده شده برای ایجاد همکاری متفاوت است."
+      error_cause_2: "ایجاد کننده همکاری دیگر در google doc نویسنده نیست."
       error_cause_3: "google doc دیگر موجود نیست."
-      error_summary: ""
+      error_summary: "ظاهرا این همکاری کار نمی کند. دلایل احتمالی:"
       error_title: "خطای همکاری Google Drive"
       headings: 
         page: "خطای همکاری Google Drive"
       resolution: "با تولید کننده تماس بگیرید و او را در جریان قرار دهید."
     titles: 
       delete: "همکاری حذف شود؟"
-  collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: ""
-  collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: ""
+  collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: "همکاری ها ابزارهای تحت وب برای همکاری در انجام اموری مانند یادداشت برداری یا نگارش مقاله های گروهی هستند. با کلیک کردن روی دکمه «+ همکاری» شروع به کار کنید."
+  collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "همکاری ها ابزارهای تحت وب برای همکاری در انجام اموری مانند یادداشت برداری یا نگارش مقاله های گروهی هستند. با افزودن یک برنامه همکاری شروع به کار کنید."
   collapse_group_c2af7cad: "جمع کردن گروه"
+  collapse_list_of_group_members_for_groupname_d6c66fa0: "جمع کردن اعضای گروه برای %{groupName}"
   collapse_subdiscussion_89af1f5c: "بستن بحث فرعی"
   collapsed_510aa02a: "جمع شده"
   colombia_57_c6c75620: "کلمبیا (+57)"
@@ -3158,6 +3185,7 @@ fa:
   comm_messages: 
     from_beginning: آغاز
     to_now: اکنون
+  comment_by_replying_to_this_message_or_join_the_co_26d42fde: "با پاسخ دادن به این پیام، نظر دهید، یا با استفاده از این پیوند: %{link} به گفتگو بپیوندید."
   comments_e07bcbe3: نظرها
   common_cartridge_description: "امکان تبدیل بسته های متداول کارتریج به قالب واسط  json را برای وارد شدن فراهم می کند"
   common_cartridge_display: "کارتریج رایج"
@@ -3301,7 +3329,7 @@ fa:
   configuration_location_ee0f6592: "محل پیکربندی"
   configuration_type_25a084a4: "نوع پیکربندی"
   configure_ecb97e30: پیکربندی
-  configure_individual_learning_paths_for_students_b_e2fce294: ""
+  configure_individual_learning_paths_for_students_b_e2fce294: "بر اساس نتایج ارزیابی، مسیرهای یادگیری جداگانه ای را برای دانشجویان پیکربندی کنید."
   configure_tool_app_3b1bb50b: "برنامه %{tool} پیکربندی شود؟"
   configure_toolname_app_651371be: "پیکربندی برنامه %{toolName}"
   confirm_contact_method_29d6fe4b: "تأیید روش تماس"
@@ -3625,7 +3653,7 @@ fa:
         user_services: "وب سرویس های ثبت شده"
       help: 
         list_services: "فهرست سرویس های ثبت شده خود را فعال نکرده اید. فعال کردن این فهرست، به اعضای هم گروهی و هم کلاسی شما امکان می دهد که در خارج از کلاس به طور آسان تر با شما در ارتباط باشند."
-        services: ""
+        services: "رخ نمای کاربری خود را به هیچ سرویس بیرونی پیوند نداده اید. می توانید حساب کانواس خود را به سرویس هایی مانند توییتر پیوند دهید. این امر به اعضای هم گروهی و هم کلاسی شما امکان می دهد که در خارج از کلاس به طور آسان تر با شما در ارتباط باشند."
       labels: 
         public_list_services: "به اعضای هم کلاسی/هم گروهی اجازه داده شود که ببینند کدام خدمات را به رخ نمای خود پیوند داده ام"
         user_privileges: مجوزها
@@ -3664,7 +3692,7 @@ fa:
         registered_services: "سرویس های ثبت شده"
         service_types: "نوع سرویس"
       help: 
-        no_services: ""
+        no_services: "رخ نمای کاربری خود را به هیچ سرویس بیرونی پیوند نداده اید. می توانید حساب کانواس خود را به سرویس هایی مانند توییتر پیوند دهید."
         services_private: "فهرست سرویس های ثبت شده خود را فعال نکرده اید. فعال کردن این فهرست به همکلاسی و هم گروهی های شما اجازه می دهد خدماتی که به حساب کانوس خود پیوند داده اید را ببینند."
         user_services: "اگر بقیه اعضا انتخاب کنند، می توانند به شما اجازه دهند ببینید چه سرویس های بیرونی را به حساب کانوس خود پیوند داده اند. این امر می تواند هماهنگی طرح های گروهی و نیز برقراری ارتباط در بیرون از کلاس درس را آسان تر سازد."
       labels: 
@@ -3723,8 +3751,8 @@ fa:
       buttons: 
         add_module: "افزودن ماژول"
       labels: 
-        publish_final_grade: ""
-        require_sequential_progress: ""
+        publish_final_grade: "انتشار نمره نهایی برای دانشجو در هنگامی که این ماژول تکمیل شده است"
+        require_sequential_progress: "دانشجویان باید الزامات را به ترتیب مرور کنند"
       links: 
         add_prerequisite: "افزودن پیش نیاز"
         add_requirement: "افزودن الزام"
@@ -3877,7 +3905,7 @@ fa:
         unfulfilled: "حداقل نمره %{score}"
       modules_item_move_to: "انتقال به..."
       must_contribute: 
-        fulfilled: ""
+        fulfilled: "مشارکت کرد"
         unfulfilled: مشارکت
       must_submit: 
         fulfilled: "ارسال شد"
@@ -3918,8 +3946,8 @@ fa:
   context_nav_link_8d15d95: "پیوند پیمایش زمینه"
   context_nav_link_active_78adb0fa: "پیوند پیمایش زمینه فعال است"
   continue_ac067716: ادامه
-  continue_typing_to_find_additional_sections_or_stu_49786085: ""
-  contributed_to_this_module_item_and_is_complete_2799d5c: ""
+  continue_typing_to_find_additional_sections_or_stu_49786085: "تایپ کردن برای یافتن بخش ها یا دانشجویان دیگر را ادامه دهید."
+  contributed_to_this_module_item_and_is_complete_2799d5c: "در این مورد ماژول مشارکت کرد و تکمیل شده است"
   conversation_dialog: 
     errors: 
       field_is_required: "پر کردن این جای خالی لازم است"
@@ -4038,7 +4066,7 @@ fa:
       reply_all: "پاسخ به همه"
     message_form_dialog: 
       body: "متن اصلی"
-      comboboxInstructions: ""
+      comboboxInstructions: "'گیرنده: (برای انتخاب گیرنده ها، تایپ کردن را شروع کنید. برای پیمایش نتایج، پیکان پایینی را فشار دهید. اگر گزینه قابل قبولی نیافتید، می توانید یک جایگزین وارد نمایید.)"
       headings: 
         new_message: "پیام جدید"
       inbox_actions: 
@@ -4057,7 +4085,7 @@ fa:
       no_course: "درس موجود نیست"
       no_subject: "موضوع موجود نیست"
       search_names_groups_courses: "جستجوی نام ها، گروه ها و درس ها"
-      send_individual_messages: ""
+      send_individual_messages: "ارسال پیام جداگانه برای هر گیرنده"
       titles: 
         media_comment: "نظر رسانه ای ضبط شده"
         record_media_comment: "ضبط یک نظر صوتی یا تصویری"
@@ -4177,7 +4205,7 @@ fa:
       one: "%{count} درس پردازش شد"
       other: "%{count} درس پردازش شد"
     course_format: 
-      blended: ""
+      blended: ترکیبی
       not_set: "تعیین نشده"
       on_campus: "در دانشگاه"
       online: آنلاین
@@ -4467,7 +4495,8 @@ fa:
         conclude_course: "خاتمه دادن به درس"
         delete_course: "حذف درس"
       details: 
-        confirm_conclude: ""
+        conclude_alt_text: "اگر مایلید قابلیت تغییر نمره ها در هنگام محدود کردن دسترسی دانشجو به درس را حفظ کنید، لطفا از تنظیمات تاریخ های درس استفاده کنید. می توانید از طریق راهنماهای ما در *اینجا* با تنظیمات تاریخ درس آشنا شوید."
+        confirm_conclude: "هشدار: خاتمه دادن به درس، کل محتوای درس را بایگانی خواهد کرد و از تغییر دادن نمره ها توسط شما جلوگیری می کند."
         confirm_delete: "مطمئنید که می خواهید این درس حذف شود؟ پس از حذف شدن، دانشجویان و اساتید به آن دسترسی نخواهند داشت. اگر می خواهید آن را از منوی بازشونده درس حذف کنید، باید *در عوض به درس خاتمه دهید*."
         confirm_delete_addendum: "اگر مجوز خاتمه دادن به درس را ندارید، می توانید *تاریخ پایان درس را تغییر دهید*، یا از مدیر خود بخواهید درس را خاتمه دهد."
       headings: 
@@ -4756,14 +4785,14 @@ fa:
         hide_final_grades: "مخفی کردن نمره های کل در خلاصه نمره های دانشجو"
         image: تصویر
         indexed: "شامل سازی این درس در فهرست عمومی درس"
-        is_public_to_auth_users: ""
+        is_public_to_auth_users: "قابل مشاهده ساختن این درس برای کاربران اعتبارسنجی شده"
         language: زبان
         license: مجوز
         open_enrollment: "افزودن پیوند \"پیوستن به این درس\" به صفحه اصلی درس"
         public_syllabus: "عمومی کردن مشاهده سرفصل مربوط به این درس"
         restrict_enrollments_to_course_dates: "کاربران فقط می توانند در این درس بین این تاریخ ها شرکت نمایند"
-        restrict_student_future_view: ""
-        restrict_student_past_view: ""
+        restrict_student_future_view: "محدود کردن دانشجویان برای مشاهده درس قبل از تاریخ شروع"
+        restrict_student_past_view: "محدود کردن دانشجویان برای مشاهده درس بعد از تاریخ پایان"
         root_account: "حساب ریشه"
         root_account_id: "حساب ریشه"
         sis_source_id: "شناسه سامانه اطلاعات دانشجو"
@@ -4978,7 +5007,7 @@ fa:
   created_by_sis_93fbb66b: "ایجاد شده_توسط_سامانه اطلاعات دانشجو"
   created_by_sis_e1449c31: "ایجاد شده توسط سامانه اطلاعات دانشجو"
   created_group_group_name_2097306b: "گروه %{group_name} ایجاد شد"
-  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: ""
+  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "ایجاد صدور مورد ارسالی به شما امکان می دهد فایل فشرده همه تکلیف های ارسالی خود را در همه درس های فعلی و قبلی خود بارگیری کنید. این فایل می تواند یک فایل بزرگ باشد و بنابراین ممکن است مدتی طول بکشد. می تواند از صفحه خارج شوید و بعدا برگردید."
   creative_commons_714a065f: "کریتیو کامنز"
   creative_commons_license_725584ae: "مجوز کریتیو کامنز:"
   criterion_5f0b62f8: معیار
@@ -5069,6 +5098,7 @@ fa:
   current_367624e9: فعلی
   current_courses_d5287d50: "درس های فعلی"
   current_grading_scheme_for_this_assignment_d525463e: "طرح نمره گذاری فعلی برای این درس"
+  current_mastery_score_score_out_of_mastery_points_fedd343f: "نمره تسلط فعلی: %{score} از %{mastery_points}"
   current_provider_6c3f7f96: "ارائه دهنده فعلی"
   current_score_6c81792: "نمره فعلی"
   current_score_74777363: "نمره فعلی"
@@ -5086,11 +5116,11 @@ fa:
       assign_blanks: "تخصیص صفر به دانشجویانی که ارسال نکرده اند"
     out_of_points_possible: "از %{assignment.points_possible}"
     this_is_permanent: "روی منحنی بردن نمره را نمی توان لغو کرد. تاریخچه نمره از پیش روی منحنی برده شده موجود خواهد بود، اما اقدام روی منحنی بردن غیر قابل برگشت است."
-  custom_css_and_javascript_may_cause_accessibility__93d2a823: ""
+  custom_css_and_javascript_may_cause_accessibility__93d2a823: "CSS و جاوااسکریپت سفارشی ممکن است مشکلات دسترس پذیری یا تضاد با بهنگام سازی های آتی کانواس به وجود آورد!"
   custom_fields_fc3e55af: "جاهای خالی سفارشی"
-  custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: ""
+  custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "پیوندهای سفارشی برای درج در منوی فرعی گفتگوی راهنما"
   customize_help_link_62cd05eb: "سفارشی کردن پیوند راهنما"
-  cutoff_score_74254c89: ""
+  cutoff_score_74254c89: "نمره حذف کننده"
   cyan_c1d5f68a: "آبی تیره"
   d2l_display: Desire2Learn
   d2l_file_description: "قالب zip. صدور D2L"
@@ -5265,7 +5295,7 @@ fa:
   day_s_7cc1231f: روز(ها)
   deactivate_this_key_3e79a2b5: "غیر فعالسازی این کلید"
   deactivate_user_86c09036: "غیر فعالسازی کاربر"
-  decaying_average_8bf6a0dd: ""
+  decaying_average_8bf6a0dd: "میانگین جدیدترین نمره ها"
   decrease_indent_d9cf469d: "کاهش تورفتگی"
   deep_orange_4c7eea99: "نارنجی پررنگ"
   deep_purple_bb3e2907: "ارغوانی پر رنگ"
@@ -5275,9 +5305,9 @@ fa:
   default_question_name: پرسش
   default_question_text: "متن پرسش"
   default_template_f2a759ed: "الگوی پیش فرض"
-  default_templates_are_used_as_starting_points_for__f06f9e33: ""
-  define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: ""
-  delay_posting_this_topic_until_aa483eec: ""
+  default_templates_are_used_as_starting_points_for__f06f9e33: "از الگوهای پیش فرض به عنوان نقاط شروع برای زمینه های جدید استفاده می شود و نمی توان آنها را حذف کرد."
+  define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "متن را برای قرار گرفتن در قبل و بعد از منوی بازشونده تعیین کنید و مجموعه ای از پاسخ های ممکن را ایجاد نمایید."
+  delay_posting_this_topic_until_aa483eec: "به تعویق انداختن ارسال این موضوع تا"
   delete_a6efa79d: حذف
   delete_assignment_group_7c3b01c4: "حذف تکلیف گروه"
   delete_assignment_name_deec56e3: "حذف گروه %{name}"
@@ -5455,8 +5485,8 @@ fa:
   discussion_topic_a7bf935: "موضوع بحث"
   discussion_topic_dc85ad4c: "موضوع بحث"
   discussion_topic_menu_3d4684c6: "منوی موضوع بحث"
-  discussion_topic_will_be_available_starting_at_46aa7477: ""
-  discussion_topic_will_be_available_until_f5e3abc8: ""
+  discussion_topic_will_be_available_starting_at_46aa7477: "موضوع بحث قابل دسترسی خواهد بود و شروع می شود در"
+  discussion_topic_will_be_available_until_f5e3abc8: "موضوع بحث قابل دسترسی خواهد بود تا"
   discussion_topics: 
     assignment_details: 
       available_from: "قابل دسترسی از طریق"
@@ -5751,13 +5781,14 @@ fa:
   dismiss_dacdb625: "صرفنظر کردن"
   display_course_catalog: "فهرست قابل جستجوی درس های موجود در این حساب ریشه را در حالی که پرچم «شامل سازی این درس در فهرست عمومی درس» فعال شده است»، نمایش دهید."
   display_name_b80c243e: "نام قابل مشاهده"
-  display_total_grades_when_the_all_grading_periods__1d2b5cf: ""
-  display_totals_for_all_grading_periods_ad1ea050: ""
+  display_total_grades_when_the_all_grading_periods__1d2b5cf: "نمایش مجموع نمره ها در هنگام انتخاب گزینه بازشونده «همه دوره های نمره گذاری» (چند دوره نمره گذاری باید فعال شود)."
+  display_totals_for_all_grading_periods_ad1ea050: "نمایش مجموع ها برای «همه دوره های نمره گذاری»"
   district_id_6f408184: "شناسه منطقه"
-  do_not_count_this_assignment_towards_the_final_gra_4dd92e00: ""
+  divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "تقسیم به بازه های زمانی مساوی %{num_minutes} دقیقه. *حرکت*"
+  do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "این تکلیف متمایل به نمره نهایی محاسبه نشود"
   domain_3b54c511: دامنه
   domain_is_required_1d4c8b25: "دامنه لازم است"
-  don_t_move_lti_query_params_to_post_body_5c80e037: ""
+  don_t_move_lti_query_params_to_post_body_5c80e037: "پارامترهای جستجوی LTI به متن پست حرکت نکنند"
   done_54e3d4b6: "انجام شد"
   done_8af51c9b: "انجام شد"
   done_editing_9f7379d9: "ویرایش انجام شد"
@@ -5772,8 +5803,9 @@ fa:
   download_student_analysis_report_statuslabel_1471c8c2: "بارگیری گزارش تحلیل دانشجو %{statusLabel}"
   download_submissions_7454665f: "بارگیری موردهای ارسالی"
   download_this_file_669f9174: "بارگیری این فایل"
-  downloading_course_content_allows_access_to_conten_164d9336: ""
+  downloading_course_content_allows_access_to_conten_164d9336: "بارگیری محتوای درس امکان دسترسی به محتوا در هنگام آفلاین بودن را می دهد. محتوا می تواند شامل فایل ها، صفحه ها، تکلیف ها، موضوع های بحث یا آزمون ها باشد. برای هر درس روی «ایجاد ePub» کلیک کنید و با استفاده از هر گونه کتابخوان الکترونیکی برای مشاهده، باز کنید."
   draft_comment_b2376ea4: "پیش نویش نظر"
+  drag_and_drop_your_image_here_or_7fba7c14: "تصویر خود را در اینجا بکشید و بیندازید یا"
   drag_to_rearrange_sections_637efee3: "برای بازآرایی بخش ها، بکشید"
   drop_image_62a2a071: "حذف تصویر"
   dropdown_option_1_e6ff2fc: "گزنیه منوی بازشونده 1"
@@ -5796,7 +5828,7 @@ fa:
   due_date_cannot_be_before_section_start_f8950484: "تاریخ مهلت نمی تواند قبل از شروع بخش باشد"
   due_date_cannot_be_before_term_start_ea660b2c: "تاریخ مهلت نمی تواند قبل از شروع نیمسال باشد"
   due_date_cannot_be_before_unlock_date_f263aab0: "تاریخ مهلت نمی تواند قبل از تاریخ قفل گشایی باشد"
-  due_date_field_for_styleguide_a88e02d6: ""
+  due_date_field_for_styleguide_a88e02d6: "قسمت تاریخ مهلت برای شیوه نامه"
   due_date_set_1c6364db: "تاریخ مهلت تعیین شد"
   due_dates: 
     due_at: "مهلت: %{assignment_due_date_time}"
@@ -5805,7 +5837,7 @@ fa:
   due_datetime_f5a81b81: "مهلت: %{dateTime}"
   due_dueat_39d7d6c2: "مهلت %{dueAt}"
   due_dueat_ef67f6f4: "مهلت: %{dueAt}"
-  due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: ""
+  due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "مهلت - قالب مانند YYYY-MM-DD hh:mm"
   due_multiple_dates_cc0ee3f5: "مهلت: چند تاریخ"
   due_multiple_dates_ea8a95e1: "مهلت: چند تاریخ"
   due_multiple_due_dates_d1b141b: "مهلت: چند تاریخ مهلت"
@@ -5813,9 +5845,10 @@ fa:
   due_no_due_date_3c1d1651: "مهلت: بدون تاریخ مهلت"
   due_on_date_5ffb2182: "مهلت در تاریخ"
   due_time_9acd6b69: "مهلت %{time}"
+  duplicate_provider_provider_d9842134: "تکرار کردن ارائه دهنده %{provider}"
   e_c2991d1b: e
-  e_g_doe_jon_fe1d9298: ""
-  e_g_jon_doe_77233e3b: ""
+  e_g_doe_jon_fe1d9298: "برای مثال، Doe، Jon"
+  e_g_jon_doe_77233e3b: "برای مثال، Jon Doe"
   e_mail_only_2cc5e513: "فقط پست الکترونیکی"
   ecollege_file_description: Ecollege
   ecollege_name: "مبدل Ecollege"
@@ -5851,7 +5884,7 @@ fa:
       other: "%{count} امتیاز ممکن"
     errors: 
       load_rubrics_failed: "بارگذاری دستورالعمل های ارزیابی انجام نشد، لطفا دوباره سعی کنید"
-    leave_different: ""
+    leave_different: "متفاوت گذاشتن"
     messages: 
       loading_rubric_groups: "در حال بارگذاری گروه های دستورالعمل ارزیابی..."
       loading_rubrics: "در حال بارگذاری دستورالعمل های ارزیابی..."
@@ -5891,10 +5924,10 @@ fa:
       dialog_title: "میانبرهای صفحه کلید"
       editor_help_link: "باز کردن منوی راهنما"
       keybindings: 
-        close_submenu: ""
-        navigate_toolbar: ""
+        close_submenu: "بستن منو یا گفتگو نیز شما را به قسمت ویرایشگر برمی گرداند"
+        navigate_toolbar: "پیمایش به سمت چپ/راست از طریق منو/نوار ابزار"
         open_dialog: "باز کردن این کادر گفتگوی راهنما"
-        open_menubar: ""
+        open_menubar: "باز کردن نوار ابزار ویرایشگر"
         open_toolbar: "باز کردن نوار ابزار ویرایشگر"
     loading: "درحال بارگذاری..."
     mathjax_text_entry_field_label: "معادله را به صورت LaTeX وارد کنید."
@@ -5928,9 +5961,10 @@ fa:
     titles: 
       font_size: "اندازه قلم، کلید down را برای انتخاب فشار دهید"
       formatting: "در حال قالب بندی، کلید down را برای انتخاب فشار دهید"
-      rte_help: ""
+      rte_help: "قسمت دارای متن غنی. ALT+F8 را برای راهنمایی فشار دهید."
   editor_button_6647db9c: "دکمه ویرایشگر"
   either_the_url_or_domain_should_be_set_c29cf8c1: "نشانی اینترنتی یا دامنه باید تعیین شود."
+  either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "یا اینکه یک کاربر جدید هستید و یا اینکه «شرایط استفاده» از آخرین باری که با آنها موافقت کرده اید، تغییر یافته اند. لطفا قبل از ادامه، با *شرایط استفاده* و **سیاست حریم خصوصی** موافقت کنید."
   email: 
     default_from_name: "نرم افزار کانواس شرکت Instructure"
   email_22a7d52d: "پست الکترونیکی"
@@ -5944,11 +5978,11 @@ fa:
   email_the_user_about_this_account_creation_e63f8759: "ارسال پست الکترونیکی برای آگاهی دادن به کاربر از ایجاد این حساب"
   ember_modules_description: "ماژول هایی که در Ember بازنویسی شده اند. از API کشیدن و رها کردن اصلی برای فراهم کردن امکان کشیدن از محل های بیرونی استفاده می کند."
   enable_6f5d1328: "فعال سازی"
-  enable_dashboard_images_for_courses_5af458b0: ""
+  enable_dashboard_images_for_courses_5af458b0: "فعالسازی تصاویر داشبورد برای درس ها"
   enable_feature_title_987d8e9a: "فعالسازی ویژگی: %{title}"
   enable_gradebook_list_students_by_sortable_name: "دانشجوها را بر اساس نام قابل مرتب سازی آنها در دفتر نمره فهرست بندی کنید. نام فایل مرتب سازی به طور پیش فرض بر اساس «نام خانوادگی، نام» است و می توان آن در قسمت تنظیمات تغییر داد."
-  enable_multiple_grading_periods: ""
-  enable_reregistration_for_lti_2_b2a10444: ""
+  enable_multiple_grading_periods: "چند دوره نمره گذاری به مدیران و اساتید امکان ایجاد دوره های نمره گذاری به همراه تاریخ حذف تعیین شده می دهد. تکلیف ها می توانند از طریق این دوره های نمره گذاری در دفتر نمره فیلتر شوند."
+  enable_reregistration_for_lti_2_b2a10444: "فعالسازی ثبت نام دوباره برای LTI 2"
   enabled_links_be110215: "پیوندهای فعال شده"
   end_date_cannot_be_before_start_date_eb62ed6d: "تاریخ پایان نمی تواند قبل از تاریخ شروع باشد"
   end_date_cdd7a7b6: "تاریخ پایان"
@@ -5999,10 +6033,11 @@ fa:
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: ""
   enter_or_find_an_external_tool_url_6aebbd0d: ""
   enter_your_question_and_multiple_answers_31370054: ""
-  enter_your_question_specifying_where_each_blank_sh_2c6e8035: ""
-  enter_your_question_specifying_where_each_dropdown_b428a9ff: ""
+  enter_your_question_specifying_where_each_blank_sh_2c6e8035: "پرسش خود را وارد کنید، و تعیین کنید که هر جای خالی باید کجا قرار بگیرد. دانشجویان باید پاسخ ها را در کادرهای متنی موجود در هر جای خالی تایپ کنند."
+  enter_your_question_specifying_where_each_dropdown_b428a9ff: "پرسش خود را وارد کنید، و تعیین کنید که هر منوی بازشونده باید کجا قرار بگیرد. سپس پاسخ های احتمالی را برای هر منوی بازشونده تعیین کنید."
   enter_your_question_text_4729b886: "متن پرسش خود را وارد کنید"
-  enter_your_question_text_students_will_see_the_que_f19af9e9: ""
+  enter_your_question_text_students_will_see_the_que_f19af9e9: "متن پرسش خود را وارد کنید. دانشجویان پرسش را به همراه یک کادر متنی کوچک برای تایپ کردن پاسخ خود مشاهده خواهند کرد."
+  entity_entity_id_not_found_in_incommon_metadata_2efb5131: "موجودیت %{entity_id} در InCommon Metadata موجود نیست"
   eportfolio: 
     buttons: 
       done_editing: "ویرایش انجام شد"
@@ -6316,10 +6351,12 @@ fa:
   event_date_f05219e7: "تاریخ رویداد"
   event_end_time_ef830e66: "زمان پایان رویداد"
   event_start_time_441b491f: "زمان شروع رویداد"
+  event_title_course_name_changed_to_37510fbb: "%{event_title}، %{course_name} تغییر یافت به"
   every_665d821e: هر
   everyone_854554dd: همه
   everyone_else_6c6dc7b6: "هر کس دیگر"
-  ex_ba24edf6: ""
+  ex_ba24edf6: مثال
+  exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   example_84698b7d: مثال
   example_final_score_355aff0f: "نمره نهایی نمونه"
   example_final_score_a92b30b9: "نمره نهایی نمونه]]"
@@ -6334,6 +6371,7 @@ fa:
   excused_5877183c: "معاف شد!"
   excused_cf8792eb: "معاف شد"
   exit_d0c7b013: خروج
+  expand_collapse_title_outcome_group_239f0a9d: "باز کردن/جمع کردن گروه نتیجه %{title}"
   expand_group_53765272: "باز کردن گروه"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "باز کردن فهرست اعضای گروه برای %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "باز کردن یا جمع کردن تقویم ها"
@@ -6504,7 +6542,7 @@ fa:
   fall_grading_period_current_score_d48c7f78: "نمره فعلی دوره نمره گذاری پاییز"
   fall_grading_period_final_score_56d96a8f: "نمره فعلی دوره نمره گذاری پاییز"
   fall_grading_period_id_74ef68e: "شناسه دوره نمره گذاری پاییز"
-  favicon_6e658914: ""
+  favicon_6e658914: فاوآیکن
   favorites_c7e0207c: "موارد دلخواه"
   feature_flags: 
     feature_flag: 
@@ -6524,7 +6562,7 @@ fa:
   features: 
     allow_opt_out_of_inbox: "دادن امکان انتخاب از صندوق ورودی به کاربران"
     better_file_browsing: "مرور بهتر فایل"
-    canvas_parent_display_name: ""
+    canvas_parent_display_name: "منشأ کانواس"
     differentiated_assignments: "تکلیف های متمایز"
     differentiated_assignments_account_disable_warning: |-
         غیرفعال کردن این ویژگی روی درس های موجود تأثیر می گذارد. برای راهنمایی برای غیر فعال کردن این ویژگی، لطفا
