@@ -9,29 +9,39 @@ describe "Screenreader Gradebook" do
   include Gradebook2Common
   include Gradebook2SRGBCommon
 
-  let(:srgb) {"/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"}
+  let(:srgb) { "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb" }
+  let(:default_gradebook) { "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2" }
+  let(:set_default_grade) { f('#set_default_grade') }
+  let(:button_type_submit) { f('.button_type_submit') }
+
+  let(:assign1_default_points) {1}
+  let(:assignment_default_points) {20}
+  let(:grading_value) { f('.grading_value') }
+  let(:gradebook_cell_css) { '.gradebook-cell' }
 
   def active_element
     driver.switch_to.active_element
   end
 
-  def simple_setup
-    init_course_with_students 2
+  def simple_setup(student_number = 2)
+    init_course_with_students student_number
     @course.assignment_groups.create! name: 'Group 1'
     @course.assignment_groups.create! name: 'Group 2'
     @assign1 = @course.assignments.create!(
         title: 'Test 1',
-        points_possible: 20,
+        points_possible: assignment_default_points,
         assignment_group: @course.assignment_groups[0]
     )
     @assign2 = @course.assignments.create!(
         title: 'Test 2',
-        points_possible: 20,
+        points_possible: assignment_default_points,
         assignment_group: @course.assignment_groups[1]
     )
 
     @grade_array = ['15', '12', '11', '3']
+  end
 
+  def simple_grade
     @assign1.grade_student @students[0], grade: @grade_array[0]
     @assign1.grade_student @students[1], grade: @grade_array[1]
     @assign2.grade_student @students[0], grade: @grade_array[2]
@@ -40,6 +50,7 @@ describe "Screenreader Gradebook" do
 
   it 'can select a student', priority: "1", test_id: 163994 do
     simple_setup
+    simple_grade
     get srgb
     wait_for_ajaximations
 
@@ -95,6 +106,7 @@ describe "Screenreader Gradebook" do
 
   it 'redirects to an assignment from SpeedGrader', priority: '2', test_id: 615684 do
     simple_setup
+    simple_grade
     @submission = @assign1.submit_homework(@students[0], body: 'student submission')
     get srgb
     select_student(@students[0])
@@ -104,6 +116,22 @@ describe "Screenreader Gradebook" do
 
     driver.switch_to.window(driver.window_handles.last)
     expect(driver.title).to eq("#{@assign1.title}, SpeedGrader, Unnamed Course")
+  end
+
+  it 'sets default grade', priority: '2', test_id: 615689 do
+    num_of_students = 2
+    simple_setup(num_of_students)
+    get srgb
+    select_student(@students[0])
+    select_assignment(@assign1)
+
+    set_default_grade.click
+    replace_content(grading_value, assign1_default_points)
+    button_type_submit.click
+
+    get default_gradebook
+    grade = gradebook_column_array(gradebook_cell_css)
+    expect(grade.count assign1_default_points.to_s).to eq(num_of_students)
   end
 
   it 'can select an assignment', priority: "1", test_id: 163998 do
@@ -170,7 +198,7 @@ describe "Screenreader Gradebook" do
     click_option '#assignment_select', a2.name
     f('#student_and_assignment_grade').clear
     f('#student_and_assignment_grade').send_keys grades[1], :return
-    get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
+    get default_gradebook
     expect(f('.canvas_1 .slick-row .slick-cell:nth-of-type(2)').text).to eq grades[1]
   end
 
@@ -188,7 +216,7 @@ describe "Screenreader Gradebook" do
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
     expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'true')
 
-    get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
+    get default_gradebook
     expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).to have_class 'muted'
   end
 
@@ -207,7 +235,7 @@ describe "Screenreader Gradebook" do
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
     expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'false')
 
-    get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
+    get default_gradebook
     expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).to_not have_class 'muted'
   end
 
@@ -231,7 +259,7 @@ describe "Screenreader Gradebook" do
 
     assignment.grade_student @students[0], grade: 15
     assignment.grade_student @students[1], grade: 5
-    get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
+    get default_gradebook
     f('a.assignment_header_drop').click
     ff('.gradebook-header-menu a').find{|a| a.text == "Assignment Details"}.click
 
@@ -316,14 +344,14 @@ describe "Screenreader Gradebook" do
 
       # When the modal closes
       # by setting a grade the "set default grade" button should have focus
-      f(".button_type_submit").click
+      button_type_submit.click
       accept_alert
-      check_element_has_focus(f "#set_default_grade")
+      check_element_has_focus(set_default_grade)
 
       # by the close button the "set default grade" button should have focus
-      f("#set_default_grade").click
+      set_default_grade.click
       fj('.ui-icon-closethick:visible').click
-      check_element_has_focus(f "#set_default_grade")
+      check_element_has_focus(set_default_grade)
     end
 
     describe "Download Submissions Button" do

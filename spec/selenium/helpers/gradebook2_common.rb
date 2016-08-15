@@ -151,6 +151,15 @@ module Gradebook2Common
     wait_for_ajaximations
   end
 
+  def gradebook_column_array(css_row_class)
+    column = ff(css_row_class)
+    text_values = []
+    column.each do |row|
+      text_values.push(row.text)
+    end
+    text_values
+  end
+
   def conclude_and_unconclude_course
     # conclude course
     @course.complete!
