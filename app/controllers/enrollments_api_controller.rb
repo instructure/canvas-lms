@@ -88,6 +88,11 @@
 #             "example": "SHEL93921",
 #             "type": "string"
 #           },
+#           "sis_account_id": {
+#             "description": "The SIS Account ID in which the enrollment is associated. Only displayed if present. This field is only included if the user has permission to view SIS information.",
+#             "example": "SHEL93921",
+#             "type": "string"
+#           },
 #           "sis_section_id": {
 #             "description": "The SIS Section ID in which the enrollment is associated. Only displayed if present. This field is only included if the user has permission to view SIS information.",
 #             "example": "SHEL93921",
@@ -296,8 +301,13 @@ class EnrollmentsApiController < ApplicationController
   #   Return grades for the given grading_period.  If this parameter is not
   #   specified, the returned grades will be for the whole course.
   #
+  # @argument sis_account_id[] [String]
+  #   Returns only enrollments for the specified SIS account ID(s). Does not
+  #   look into subaccounts. May pass in array or string.
+  #
   # @argument sis_user_id[] [String]
-  #   Returns only enrollments for the specified SIS ID(s). May pass in array or string.
+  #   Returns only enrollments for the specified SIS user ID(s). May pass in
+  #   array or string.
   #
   # @argument sis_section_id[] [String]
   #   Return only section enrollments matching the specified SIS section ID(s). May pass in array or string.
@@ -331,6 +341,12 @@ class EnrollmentsApiController < ApplicationController
     if params[:sis_section_id].present?
       sections = @domain_root_account.course_sections.where(sis_source_id: params[:sis_section_id])
       enrollments = enrollments.where(course_section_id: sections.pluck(:id))
+    end
+
+    if params[:sis_account_id].present?
+      accounts = @domain_root_account.all_accounts.where(sis_source_id: params[:sis_account_id])
+      courses = @domain_root_account.all_courses.where(account_id: accounts.pluck(:id))
+      enrollments = enrollments.where(course_id: courses.pluck(:id))
     end
 
     if params[:grading_period_id].present?

@@ -72,6 +72,7 @@ describe EnrollmentsApiController, type: :request do
           'created_at'                         => new_enrollment.created_at.xmlschema,
           'last_activity_at'                   => nil,
           'total_activity_time'                => 0,
+          'sis_account_id'                     => @course.account.sis_source_id,
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
@@ -580,6 +581,7 @@ describe EnrollmentsApiController, type: :request do
           'created_at'                         => new_enrollment.created_at.xmlschema,
           'last_activity_at'                   => nil,
           'total_activity_time'                => 0,
+          'sis_account_id'                     => @course.account.sis_source_id,
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
@@ -897,6 +899,7 @@ describe EnrollmentsApiController, type: :request do
             'user_id'                            => @student.id,
             'course_section_id'                  => @enrollment.course_section_id,
             'sis_import_id'                      => @enrollment.sis_batch_id,
+            'sis_account_id'                     => nil,
             'sis_course_id'                      => nil,
             'sis_section_id'                     => nil,
             'sis_user_id'                        => nil,
@@ -947,6 +950,7 @@ describe EnrollmentsApiController, type: :request do
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'sis_import_id' => sis_batch.id,
+            'sis_account_id'                     => @course.account.sis_source_id,
             'sis_course_id'                      => @course.sis_source_id,
             'course_integration_id'              => @course.integration_id,
             'sis_section_id'                     => @section.sis_source_id,
@@ -979,6 +983,43 @@ describe EnrollmentsApiController, type: :request do
       end
 
       context "filtering by SIS IDs" do
+        context "filtering by sis_account_id" do
+          before(:once) do
+            root_account_id = @course.account.id
+
+            @subaccount = Account.create!(parent_account_id: root_account_id)
+            @subaccount.root_account_id = root_account_id
+            @subaccount.sis_source_id = '1234'
+            @subaccount.save!
+
+            @course.update_attribute(:account_id, @subaccount.id)
+          end
+
+          it "filters by a single sis_account_id" do
+            @params[:sis_account_id] = '1234'
+            json = api_call(:get, @path, @params)
+            student_ids = json.map { |e| e['user_id'] }
+            expect(json.length).to eq(2)
+            expect(json.first['sis_account_id']).to eq(@subaccount.sis_source_id)
+            expect(student_ids).to match_array([@teacher.id, @student.id])
+          end
+
+          it "filters by a list of sis_account_ids" do
+            @params[:sis_account_id] = ['1234', '5678']
+            json = api_call(:get, @path, @params)
+            student_ids = json.map { |e| e['user_id'] }
+            expect(json.length).to eq(2)
+            expect(json.first['sis_account_id']).to eq(@subaccount.sis_source_id)
+            expect(student_ids).to match_array([@teacher.id, @student.id])
+          end
+
+          it "returns nothing if there are no matching sis_account_ids" do
+            @params[:sis_account_id] = '5678'
+            json = api_call(:get, @path, @params)
+            expect(json).to be_empty
+          end
+        end
+
         context "filtering by sis_user_id" do
           before :once do
             @teacher.pseudonym.update_attribute(:sis_user_id, '1234')
@@ -1082,6 +1123,7 @@ describe EnrollmentsApiController, type: :request do
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
             'sis_import_id' => nil,
+            'sis_account_id'                     => @course.account.sis_source_id,
             'sis_course_id'                      => @course.sis_source_id,
             'course_integration_id'              => @course.integration_id,
             'sis_section_id'                     => @section.sis_source_id,
@@ -1491,6 +1533,7 @@ describe EnrollmentsApiController, type: :request do
             'last_activity_at' => nil,
             'total_activity_time' => 0,
             'course_integration_id' => nil,
+            'sis_account_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
             'sis_user_id' => nil,
@@ -1748,6 +1791,7 @@ describe EnrollmentsApiController, type: :request do
             'last_activity_at'                   => nil,
             'total_activity_time'                => 0,
             'course_integration_id' => nil,
+            'sis_account_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
             'sis_user_id' => nil,
@@ -1805,6 +1849,7 @@ describe EnrollmentsApiController, type: :request do
             'last_activity_at'                   => nil,
             'total_activity_time'                => 0,
             'course_integration_id' => nil,
+            'sis_account_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
             'sis_user_id' => nil,

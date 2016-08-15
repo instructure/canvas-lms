@@ -228,6 +228,7 @@ module Api::V1::User
         json[:grades] = grades_hash(enrollment, user, opts[:grading_period])
       end
       if user_can_read_sis_data?(@current_user, enrollment.course)
+        json[:sis_account_id] = enrollment.course.account.sis_source_id
         json[:sis_course_id] = enrollment.course.sis_source_id
         json[:course_integration_id] = enrollment.course.integration_id
         json[:sis_section_id] = enrollment.course_section.sis_source_id
