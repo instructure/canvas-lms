@@ -64,6 +64,22 @@ module Services
         expect{@message.deliver}.not_to raise_error
       end
 
+      it "expects email sms message type to go through mailer" do
+        @queue.expects(:send_message).once
+        Mailer.expects(:create_message).once
+        @message.path_type = "sms"
+        @message.to = "18015550100@vtext.com"
+        expect{@message.deliver}.not_to raise_error
+      end
+
+      it "expects twilio to not call mailer create_message" do
+        @queue.expects(:send_message).once
+        Mailer.expects(:create_message).never
+        @message.path_type = "sms"
+        @message.to = "+18015550100"
+        expect{@message.deliver}.not_to raise_error
+      end
+
       it "processes push notification message type" do
         @queue.expects(:send_message).once
         sns_client = mock()
