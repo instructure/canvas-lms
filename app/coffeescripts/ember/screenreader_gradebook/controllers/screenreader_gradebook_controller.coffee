@@ -238,22 +238,13 @@ define [
       Ember.$.subscribe 'submissions_updated', _.bind(@updateSubmissionsFromExternal, this)
     ).on('init')
 
-    setupAssignmentGroupsChange: (->
-      Ember.$.subscribe 'assignment_group_weights_changed', _.bind(@checkWeightingScheme, this)
+    setupAssignmentWeightingScheme: (->
       @set 'weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
     ).on('init')
 
     willDestroy: ->
       Ember.$.unsubscribe 'submissions_updated'
-      Ember.$.unsubscribe 'assignment_group_weights_changed'
       @_super()
-
-    checkWeightingScheme: ({assignmentGroups})->
-      ags = @get('assignment_groups')
-      ags.clear()
-      ags.pushObjects assignmentGroups
-
-      @set 'weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
 
     updateSubmissionsFromExternal: (submissions) ->
       subs_proxy = @get('submissions')
