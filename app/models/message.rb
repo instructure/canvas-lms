@@ -629,7 +629,11 @@ class Message < ActiveRecord::Base
       truncated_body = HtmlTextHelper.strip_and_truncate(body, max_length: message_length)
       "#{truncated_body} #{url}"
     else
-      body
+      if to =~ /^\+[0-9]+$/
+        body
+      else
+        Mailer.create_message(self).to_s
+      end
     end
   end
 
