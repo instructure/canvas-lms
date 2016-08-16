@@ -36,7 +36,7 @@
       <% end %>
       <b class="recent_feedback_title"><%= recent_feedback.assignment.title %></b>
       <% if show_context %>
-        <p><%= context.nickname_for(@current_user) %></p>
+        <p><%= context.nickname_for(@current_user, :short_name) %></p>
       <% end %>
       <% if grade %>
         <p><strong><%= grade %></strong></p>

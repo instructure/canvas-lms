@@ -14,7 +14,7 @@ describe "/courses/_recent_feedback" do
 
     render partial: "courses/recent_feedback", object: @submission, locals: {is_hidden: false, show_context: true}
 
-    expect(response.body).to include(@course.name)
+    expect(response.body).to include(@course.short_name)
   end
 
   it "doesn't show the context when not asked to" do
