@@ -13,6 +13,7 @@ describe "Screenreader Gradebook" do
   let(:default_gradebook) { "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2" }
   let(:set_default_grade) { f('#set_default_grade') }
   let(:button_type_submit) { f('.button_type_submit') }
+  let(:arrange_assignments) { f('#arrange_assignments') }
 
   let(:assign1_default_points) {1}
   let(:assignment_default_points) {20}
@@ -48,7 +49,7 @@ describe "Screenreader Gradebook" do
     @assign2.grade_student @students[1], grade: @grade_array[3]
   end
 
-  it 'can select a student', priority: "1", test_id: 163994 do
+  it 'can select a student', priority: '1', test_id: 163994 do
     simple_setup
     simple_grade
     get srgb
@@ -61,7 +62,7 @@ describe "Screenreader Gradebook" do
     expect(ff('#student_information .assignment-group-grade .points').map(&:text)).to eq ["(#{@grade_array[1]} / 20)", "(#{@grade_array[3]} / 20)"]
   end
 
-  it 'can select a student using buttons', priority: "1", test_id: 163997 do
+  it 'can select a student using buttons', priority: '1', test_id: 163997 do
     init_course_with_students 3
     get srgb
 
@@ -87,7 +88,7 @@ describe "Screenreader Gradebook" do
     expect(next_student).to eq driver.switch_to.active_element
   end
 
-  it 'can select an assignment using buttons', priority: "2", test_id: 615707 do
+  it 'can select an assignment using buttons', priority: '2', test_id: 615707 do
     simple_setup
     get srgb
     select_student(@students[0])
@@ -134,7 +135,7 @@ describe "Screenreader Gradebook" do
     expect(grade.count assign1_default_points.to_s).to eq(num_of_students)
   end
 
-  it 'can select an assignment', priority: "1", test_id: 163998 do
+  it 'can select an assignment', priority: '1', test_id: 163998 do
     a1 = basic_setup
     a2 = @course.assignments.create!(
       title: 'Test 2',
@@ -150,7 +151,7 @@ describe "Screenreader Gradebook" do
     expect(f('#assignment_information').text).to include 'Online text entry'
   end
 
-  it 'displays/removes warning message for resubmitted assignments', priority: "1", test_id: 164000 do
+  it 'displays/removes warning message for resubmitted assignments', priority: '1', test_id: 164000 do
     skip "Skipped because this spec fails if not run in foreground\n"\
       "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     assignment = basic_setup
@@ -174,7 +175,7 @@ describe "Screenreader Gradebook" do
     expect(f("#content")).not_to contain_css('p.resubmitted')
   end
 
-  it 'grades match default gradebook grades', priority: "1", test_id: 163994 do
+  it 'grades match default gradebook grades', priority: '1', test_id: 163994 do
     skip "Skipped because this spec fails if not run in foreground\n"\
       "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     a1 = basic_setup
@@ -202,7 +203,7 @@ describe "Screenreader Gradebook" do
     expect(f('.canvas_1 .slick-row .slick-cell:nth-of-type(2)').text).to eq grades[1]
   end
 
-  it 'can mute assignments', priority: "1", test_id: 164001 do
+  it 'can mute assignments', priority: '1', test_id: 164001 do
     assignment = basic_setup
     get srgb
 
@@ -220,7 +221,7 @@ describe "Screenreader Gradebook" do
     expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).to have_class 'muted'
   end
 
-  it 'can unmute assignments', priority: "1", test_id: 288859 do
+  it 'can unmute assignments', priority: '1', test_id: 288859 do
     assignment = basic_setup
     assignment.mute!
 
@@ -239,7 +240,7 @@ describe "Screenreader Gradebook" do
     expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).to_not have_class 'muted'
   end
 
-  it 'can message students who... ', priority: "1", test_id: 164002 do
+  it 'can message students who... ', priority: '1', test_id: 164002 do
     basic_setup
     get srgb
 
@@ -254,7 +255,7 @@ describe "Screenreader Gradebook" do
     expect(f('#message_students_dialog')).to_not be_displayed
   end
 
-  it 'has total graded submission', priority: "1", test_id: 615686 do
+  it 'has total graded submission', priority: '1', test_id: 615686 do
     assignment = basic_setup 2
 
     assignment.grade_student @students[0], grade: 15
@@ -287,12 +288,12 @@ describe "Screenreader Gradebook" do
       get "/courses/#{test_course.id}/gradebook/change_gradebook_version?version=srgb"
     end
 
-    it 'should display the group weighting dialog with group weights disabled', priority: "1", test_id: 163995 do
+    it 'should display the group weighting dialog with group weights disabled', priority: '1', test_id: 163995 do
       group_weights_button.click
       expect(f("#assignment_group_weights_dialog table[style='opacity: 0.5;']")).to be_truthy
     end
 
-    it 'should correctly sync group weight settings between srgb and gb2', priority: "1", test_id: 588913 do
+    it 'should correctly sync group weight settings between srgb and gb2', priority: '1', test_id: 588913 do
       turn_on_group_weights
 
       # go back to gb2 to verify settings stuck
@@ -309,7 +310,7 @@ describe "Screenreader Gradebook" do
       gradebook_data_setup
     end
 
-    it "switches to srgb", priority: "1", test_id: 615682 do
+    it "switches to srgb", priority: '1', test_id: 615682 do
       get "/courses/#{@course.id}/gradebook"
       f("#change_gradebook_version_link_holder").click
       expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
@@ -319,7 +320,7 @@ describe "Screenreader Gradebook" do
       expect(f("#change_gradebook_version_link_holder")).to be_displayed
     end
 
-    it "shows sections in drop-down", priority: "1", test_id: 615680 do
+    it "shows sections in drop-down", priority: '1', test_id: 615680 do
       sections=[]
       2.times do |i|
         sections << @course.course_sections.create!(:name => "other section #{i}")
@@ -333,7 +334,13 @@ describe "Screenreader Gradebook" do
       end
     end
 
-    it "should focus on accessible elements when setting default grades", priority: "1", test_id: 209991 do
+    it 'shows all drop down options', priority: '2', test_id: 615702 do
+      get srgb
+      arrange_assignments.click
+      expect(arrange_assignments.text).to eq("By Assignment Group and Position\nAlphabetically\nBy Due Date")
+    end
+
+    it "should focus on accessible elements when setting default grades", priority: '1', test_id: 209991 do
       get srgb
       select_assignment(@second_assignment)
 
