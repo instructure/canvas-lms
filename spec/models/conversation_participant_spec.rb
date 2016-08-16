@@ -250,8 +250,7 @@ describe ConversationParticipant do
     it "should not include shared contexts by default" do
       users = @convo.reload.participants
       users.each do |user|
-        expect(user.common_groups).to be_empty
-        expect(user.common_courses).to be_empty
+        expect(@me.address_book.cached?(user)).to be_falsey
       end
     end
 
@@ -262,12 +261,16 @@ describe ConversationParticipant do
 
     it "should include shared contexts if requested" do
       users = @convo.reload.participants(:include_participant_contexts => true)
+      address_book = @me.address_book
       users.each do |user|
-        expect(user.common_groups).to eq({})
+        expect(address_book.cached?(user)).to be_truthy
+        common_groups = address_book.common_groups(user)
+        common_courses = address_book.common_courses(user)
+        expect(common_groups).to eq({})
         if [@me.id, @u3.id].include? user.id
-          expect(user.common_courses).to eq({})
+          expect(common_courses).to eq({})
         else
-          expect(user.common_courses).to eq({@course.id => ["StudentEnrollment"]})
+          expect(common_courses).to eq({@course.id => ["StudentEnrollment"]})
         end
       end
     end

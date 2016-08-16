@@ -261,6 +261,11 @@ describe ConversationsController do
         course2.enroll_user(student1, "StudentEnrollment").accept!
         user_session(User.find(student1.id)) # clear process local enrollment cache
 
+        # with the address book, there's another level of caching to bust. in
+        # non-test usage, this cache only lasts for the duration of the
+        # request, so it's not an issue
+        RequestStore.clear!
+
         post 'create', :recipients => [student2.id.to_s], :body => "yo again", :message => "you still suck", :group_conversation => true,
              :course => course2.asset_string, :context_code => course2.asset_string
         expect(response).to be_success

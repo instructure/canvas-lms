@@ -8,6 +8,38 @@ define [
   'helpers/fixtures'
 ], (RichContentEditor, RceCommandShim, RCELoader, Sidebar, fakeENV, editorUtils, fixtures) ->
 
+  module 'RichContentEditor - helper function:'
+
+  test 'ensureID gives the element an id when it is missing', ->
+    $el = $('<div/>')
+    RichContentEditor.ensureID($el)
+    ok $el.attr('id')?
+
+  test 'ensureID gives the element an id when it is blank', ->
+    $el = $('<div id/>')
+    RichContentEditor.ensureID($el)
+    ok $el.attr('id')!=""
+
+  test "ensureID doesn't overwrite an existing id", ->
+    $el = $('<div id="test"/>')
+    RichContentEditor.ensureID($el)
+    ok $el.attr('id')=="test"
+
+  test 'freshNode returns the given element if the id is missing', ->
+    $el = $('<div/>')
+    $fresh = RichContentEditor.freshNode($el)
+    equal $el, $fresh
+
+  test 'freshNode returns the given element if the id is blank', ->
+    $el = $('<div id/>')
+    $fresh = RichContentEditor.freshNode($el)
+    equal $el, $fresh
+
+  test "freshNode returns the given element if it's not on the dom", ->
+    $el = $('<div id="test"/>')
+    $fresh = RichContentEditor.freshNode($el)
+    equal $el, $fresh
+
   module 'RichContentEditor - preloading',
     setup: ->
       fakeENV.setup()
@@ -62,7 +94,7 @@ define [
     ok @$target.editorBox.secondCall.calledWith('set_code', "content")
 
   test 'skips instantiation when called with empty target', ->
-    RichContentEditor.loadNewEditor("#fixtures .invalidTarget", {})
+    RichContentEditor.loadNewEditor($("#fixtures .invalidTarget"), {})
     ok RCELoader.loadOnTarget.notCalled
 
   test 'with focus:true calls focus on RceCommandShim after load', ->

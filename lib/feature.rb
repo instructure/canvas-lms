@@ -241,8 +241,7 @@ END
 Allow users to view and use external tools configured for LOR.
 END
       applies_to: 'User',
-      state: 'hidden',
-      beta: true
+      state: 'hidden'
     },
     'lor_for_account' =>
     {
@@ -251,8 +250,7 @@ END
 Allow users to view and use external tools configured for LOR.
 END
       applies_to: 'RootAccount',
-      state: 'hidden',
-      beta: true
+      state: 'hidden'
     },
     'multiple_grading_periods' =>
     {
@@ -352,8 +350,7 @@ END
       display_name: -> { I18n.t('Enable Dashboard Images for Courses')},
       description: -> {I18n.t('Allow course images to be assigned to a course and used on the dashboard cards.')},
       applies_to: 'Course',
-      state: 'hidden',
-      development: true,
+      state: 'allowed',
       root_opt_in: true,
       beta: true
     },

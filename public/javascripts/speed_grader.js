@@ -17,6 +17,7 @@
  */
 
 define([
+  'jsx/grading/helpers/OutlierScoreHelper',
   'jst/speed_grader/student_viewed_at',
   'jst/speed_grader/submissions_dropdown',
   'jst/speed_grader/speech_recognition',
@@ -52,7 +53,7 @@ define([
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(OutlierScoreHelper, studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // PRIVATE VARIABLES AND FUNCTIONS
   // all of the $ variables here are to speed up access to dom nodes,
@@ -772,11 +773,11 @@ define([
       event.stopPropagation();
 
       //Prev()
-      if(event.keyString == "j" || event.keyString == "p") {
+      if(event.keyString == "k" || event.keyString == "p") {
         EG.prev();
       }
       //next()
-      else if(event.keyString == "k" || event.keyString == "n") {
+      else if(event.keyString == "j" || event.keyString == "n") {
         EG.next();
       }
       //comment
@@ -1982,18 +1983,8 @@ define([
             }
 
             var url = '/submission_comments/' + comment.id;
-            var data = {
-              submission_comment: {
-                draft: 'false'
-              }
-            };
-
-            var ajaxOptions = {
-              url: url,
-              data: data,
-              dataType: 'json',
-              type: 'PATCH'
-            };
+            var data = { submission_comment: { draft: 'false' } };
+            var ajaxOptions = { url: url, data: data, dataType: 'json', type: 'PATCH' };
 
             $.ajax(ajaxOptions).done(commentUpdateSucceeded).fail(commentUpdateFailed);
           }
@@ -2160,13 +2151,16 @@ define([
       var url    = $(".update_submission_grade_url").attr('href'),
           method = $(".update_submission_grade_url").attr('title'),
           formData = {
-            'submission[assignment_id]': jsonData.id,
-            'submission[user_id]':       EG.currentStudent.id,
+            'submission[assignment_id]':      jsonData.id,
+            'submission[user_id]':            EG.currentStudent.id,
             'submission[graded_anonymously]': utils.shouldHideStudentNames()
           };
 
-      var grade = SpeedgraderHelpers.determineGradeToSubmit(use_existing_score,
-                                                            EG.currentStudent, $grade);
+      var grade = SpeedgraderHelpers.determineGradeToSubmit(
+        use_existing_score,
+        EG.currentStudent,
+        $grade
+      );
 
       if (grade.toUpperCase() === "EX") {
         formData["submission[excuse]"] = true;
@@ -2186,6 +2180,16 @@ define([
       }
 
       $.ajaxJSON(url, method, formData, function(submissions) {
+        var pointsPossible = jsonData.points_possible;
+        var score = submissions[0].submission.score;
+
+        if (!submissions[0].submission.excused) {
+          var outlierScoreHelper = new OutlierScoreHelper(score, pointsPossible);
+          if(outlierScoreHelper.hasWarning()) {
+            $.flashWarning(outlierScoreHelper.warningMessage());
+          }
+        }
+
         $.each(submissions, function(){
           EG.setOrUpdateSubmission(this.submission);
         });

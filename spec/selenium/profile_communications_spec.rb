@@ -128,7 +128,7 @@ describe "profile communication settings" do
   end
 
   it "should load an existing frequency setting and save a change" do
-    channel = @user.communication_channels.create(:path => "8011235555@vtext.com", :path_type => "sms")
+    channel = @user.communication_channels.create(:path => "8011235555@vtext.com", :path_type => "email")
     channel.confirm
     # Create a notification policy entry as an existing setting.
     policy = NotificationPolicy.new(:communication_channel_id => channel.id, :notification_id => @sub_comment.id)

@@ -34,6 +34,7 @@
       <input id="web_conference_duration" name="web_conference[duration]" type="text"
              data-restore-value="{{conferenceData.restore_duration}}"
              value="{{conferenceData.duration}}"
+             maxlength="8"
              {{#if settings.disable_duration_changes}}disabled='disabled'{{/if}}> {{#t "duration_in_minutes"}}minutes{{/t}}
     </div>
   </div>

@@ -36,12 +36,19 @@ describe "help dialog" do
       expect(f("body")).not_to contain_css('#help_tray')
       expect(f("#content")).not_to contain_css('.help_dialog_trigger')
 
+      support_url = 'http://example.com/support'
+      Account.default.update_attribute(:settings, {:support_url => support_url})
+
+      # the show_feedback_link setting should override the support_url account setting
       Setting.set('show_feedback_link', 'true')
+
       get "/dashboard"
       expect(ff('#global_nav_help_link').length).to eq(1)
       expect(f("body")).not_to contain_css('#help_tray')
       f('#global_nav_help_link').click
+
       wait_for_ajaximations
+
       expect(f("#help_tray")).to be_displayed
       expect(f("#help_tray a[href='#teacher_feedback']")).to be_displayed
     end
@@ -74,7 +81,7 @@ describe "help dialog" do
       feedback_form.find_element(:css, '[name="body"]').send_keys('test message')
       submit_form(feedback_form)
       wait_for_ajaximations
-      expect(feedback_form).not_to be_displayed
+      expect(f('body')).not_to contain_css("form[action='/api/v1/conversations']")
       cm = ConversationMessage.last
       expect(cm.recipients).to match_array @course.instructors
       expect(cm.recipients.count).to eq 2

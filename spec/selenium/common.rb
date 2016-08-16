@@ -89,18 +89,17 @@ end
 RSpec::Core::Example.prepend(SeleniumErrorRecovery)
 
 # eventually do this for non-selenium, but right now some things can't
-# make the once-ler round trip
-RSpec::Core::ExampleGroup.singleton_class.prepend(Module.new {
-  # prevent :all hooks from doing db stuff, unless transactional fixtures
-  # are off, in which case we assume you know what you are doing
-  def run_after_context_hooks(*)
-    return super if !use_transactional_fixtures
-    BlankSlateProtection.enable { super }
+# make the once-ler round trip, so some specs still have to manage data in
+# before(:all)s
+RSpec.configure do |config|
+  config.before :suite do
+    BlankSlateProtection.enable!
   end
+end
 
-  def run_before_context_hooks(*)
-    return super if !use_transactional_fixtures
-    BlankSlateProtection.enable { super }
+RSpec::Core::ExampleGroup.singleton_class.prepend(Module.new {
+  def run_examples(*)
+    BlankSlateProtection.disable { super }
   end
 })
 

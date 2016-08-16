@@ -644,7 +644,9 @@ class Quizzes::QuizzesController < ApplicationController
 
   def moderate
     if authorized_action(@quiz, @current_user, :grade)
-      @students = @context.students_visible_to(@current_user, include: :inactive).uniq.order_by_sortable_name
+      @students = @context.students_visible_to(@current_user, include: :inactive)
+      @students = @students.name_like(params[:search_term]) if params[:search_term].present?
+      @students = @students.uniq.order_by_sortable_name
       @students = @students.order(:uuid) if @quiz.survey? && @quiz.anonymous_submissions
       last_updated_at = Time.parse(params[:last_updated_at]) rescue nil
       respond_to do |format|
@@ -881,7 +883,7 @@ class Quizzes::QuizzesController < ApplicationController
     submitted_with_submissions = @context.students_visible_to(@current_user, include: :inactive).
         joins(:quiz_submissions).
         where("quiz_submissions.quiz_id=? AND quiz_submissions.workflow_state<>'settings_only'", @quiz)
-    @submitted_student_count = submitted_with_submissions.count(:id, :distinct => true)
+    @submitted_student_count = submitted_with_submissions.distinct.count(:id)
     #add logged out submissions
     @submitted_student_count += @quiz.quiz_submissions.logged_out.not_settings_only.count
     @any_submissions_pending_review = submitted_with_submissions.where("quiz_submissions.workflow_state = 'pending_review'").count > 0

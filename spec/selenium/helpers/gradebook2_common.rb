@@ -151,6 +151,15 @@ module Gradebook2Common
     wait_for_ajaximations
   end
 
+  def gradebook_column_array(css_row_class)
+    column = ff(css_row_class)
+    text_values = []
+    column.each do |row|
+      text_values.push(row.text)
+    end
+    text_values
+  end
+
   def conclude_and_unconclude_course
     # conclude course
     @course.complete!
@@ -248,22 +257,16 @@ module Gradebook2Common
     rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
     @assignment.reload
-    @submission = @assignment.submit_homework(@student_1, :body => 'student 1 submission assignment 1')
+    @assignment.submit_homework(@student_1, :body => 'student 1 submission assignment 1')
     @assignment.grade_student(@student_1, :grade => 10)
-    @submission.score = 10
-    @submission.save!
 
     # second student submission for assignment 1
-    @student_2_submission = @assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 1')
+    student_2_submission = @assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 1')
     @assignment.grade_student(@student_2, :grade => 5)
-    @student_2_submission.score = 5
-    @submission.save!
 
     # third student submission for assignment 1
     @student_3_submission = @assignment.submit_homework(@student_3, :body => 'student 3 submission assignment 1')
     @assignment.grade_student(@student_3, :grade => 5)
-    @student_3_submission.score = 5
-    @submission.save!
 
     # second assignment data
     @second_assignment = assignment_model({
@@ -278,9 +281,8 @@ module Gradebook2Common
 
     # all students get a 5 on assignment 2
     @all_students.each do |s|
-      submission = @second_assignment.submit_homework(s, :body => "#{s.name} submission assignment 2")
+      @second_assignment.submit_homework(s, :body => "#{s.name} submission assignment 2")
       @second_assignment.grade_student(s, :grade => 5)
-      submission.save!
     end
 
     # third assignment data

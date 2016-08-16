@@ -42,7 +42,7 @@ ENV["RAILS_ENV"] = 'test'
 
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
-  require 'coverage_tool'
+  require_relative 'coverage_tool'
   CoverageTool.start("RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}")
 end
 
@@ -462,12 +462,7 @@ RSpec.configure do |config|
 
     # wipe out the test db, in case some non-transactional tests crapped out before
     # cleaning up after themselves
-    truncate_all_tables
-
-    # this would normally get created on demand, but in vanilla canvas the
-    # load_account middleware might try to create it while the thin server
-    # is booting up, which can trip up BlankSlateProtection
-    Account.default
+    truncate_all_tables unless ENV["SHARED_DB"] == "1"
 
     Timecop.safe_mode = true
   end

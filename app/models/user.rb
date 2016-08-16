@@ -2326,6 +2326,10 @@ class User < ActiveRecord::Base
     Conversation.initiate(users, private, options).conversation_participants.where(user_id: self).first
   end
 
+  def address_book
+    @address_book ||= AddressBook.for(self)
+  end
+
   def messageable_user_calculator
     @messageable_user_calculator ||= MessageableUser::Calculator.new(self)
   end
@@ -2829,7 +2833,7 @@ class User < ActiveRecord::Base
       else
         return @submissions_folder if @submissions_folder
         Folder.unique_constraint_retry do
-          self.folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: 'root')
+          @submissions_folder = self.folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: 'root')
             .first_or_create!(name: I18n.t('Submissions', locale: self.locale))
         end
       end

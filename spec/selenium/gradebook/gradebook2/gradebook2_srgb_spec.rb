@@ -9,67 +9,129 @@ describe "Screenreader Gradebook" do
   include Gradebook2Common
   include Gradebook2SRGBCommon
 
-  let(:srgb) {"/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"}
+  let(:srgb) { "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb" }
+  let(:default_gradebook) { "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2" }
+  let(:set_default_grade) { f('#set_default_grade') }
+  let(:button_type_submit) { f('.button_type_submit') }
 
-  it 'can select a student', priority: "1", test_id: 163994 do
-    init_course_with_students 2
+  let(:assign1_default_points) {1}
+  let(:assignment_default_points) {20}
+  let(:grading_value) { f('.grading_value') }
+  let(:gradebook_cell_css) { '.gradebook-cell' }
+
+  def active_element
+    driver.switch_to.active_element
+  end
+
+  def simple_setup(student_number = 2)
+    init_course_with_students student_number
     @course.assignment_groups.create! name: 'Group 1'
     @course.assignment_groups.create! name: 'Group 2'
-    a1 = @course.assignments.create!(
-      title: 'Test 1',
-      points_possible: 20,
-      assignment_group: @course.assignment_groups[0]
+    @assign1 = @course.assignments.create!(
+        title: 'Test 1',
+        points_possible: assignment_default_points,
+        assignment_group: @course.assignment_groups[0]
     )
-    a2 = @course.assignments.create!(
-      title: 'Test 2',
-      points_possible: 20,
-      assignment_group: @course.assignment_groups[1]
+    @assign2 = @course.assignments.create!(
+        title: 'Test 2',
+        points_possible: assignment_default_points,
+        assignment_group: @course.assignment_groups[1]
     )
 
-    grades = ['15', '12', '11', '3']
+    @grade_array = ['15', '12', '11', '3']
+  end
 
-    a1.grade_student @students[0], grade: grades[0]
-    a1.grade_student @students[1], grade: grades[1]
-    a2.grade_student @students[0], grade: grades[2]
-    a2.grade_student @students[1], grade: grades[3]
+  def simple_grade
+    @assign1.grade_student @students[0], grade: @grade_array[0]
+    @assign1.grade_student @students[1], grade: @grade_array[1]
+    @assign2.grade_student @students[0], grade: @grade_array[2]
+    @assign2.grade_student @students[1], grade: @grade_array[3]
+  end
 
+  it 'can select a student', priority: "1", test_id: 163994 do
+    simple_setup
+    simple_grade
     get srgb
     wait_for_ajaximations
 
     expect(get_options('#student_select').map(&:text)).to eq ['No Student Selected', @students[0].name, @students[1].name]
     click_option '#student_select', @students[0].name
-    expect(ff('#student_information .assignment-group-grade .points').map(&:text)).to eq ["(#{grades[0]} / 20)", "(#{grades[2]} / 20)"]
+    expect(ff('#student_information .assignment-group-grade .points').map(&:text)).to eq ["(#{@grade_array[0]} / 20)", "(#{@grade_array[2]} / 20)"]
     click_option '#student_select', @students[1].name
-    expect(ff('#student_information .assignment-group-grade .points').map(&:text)).to eq ["(#{grades[1]} / 20)", "(#{grades[3]} / 20)"]
+    expect(ff('#student_information .assignment-group-grade .points').map(&:text)).to eq ["(#{@grade_array[1]} / 20)", "(#{@grade_array[3]} / 20)"]
   end
 
   it 'can select a student using buttons', priority: "1", test_id: 163997 do
     init_course_with_students 3
     get srgb
 
-    before = f('.student_navigation button.previous_object')
-    after = f('.student_navigation button.next_object')
-
     # first student
-    expect(before.attribute 'disabled').to be_truthy
-    after.click
+    expect(previous_student.attribute 'disabled').to be_truthy
+    next_student.click
     expect(f('#student_information .student_selection').text).to eq @students[0].name
 
     # second student
-    after.click
+    next_student.click
     expect(f('#student_information .student_selection').text).to eq @students[1].name
 
     # third student
-    after.click
-    expect(after.attribute 'disabled').to be_truthy
+    next_student.click
+    expect(next_student.attribute 'disabled').to be_truthy
     expect(f('#student_information .student_selection').text).to eq @students[2].name
-    expect(before).to eq driver.switch_to.active_element
+    expect(previous_student).to eq driver.switch_to.active_element
 
     # click twice to go back to first student
-    before.click
-    before.click
+    previous_student.click
+    previous_student.click
     expect(f('#student_information .student_selection').text).to eq @students[0].name
-    expect(after).to eq driver.switch_to.active_element
+    expect(next_student).to eq driver.switch_to.active_element
+  end
+
+  it 'can select an assignment using buttons', priority: "2", test_id: 615707 do
+    simple_setup
+    get srgb
+    select_student(@students[0])
+    select_assignment(@assign1)
+
+    expect(previous_assignment.attribute 'disabled').to be_truthy
+    expect(next_assignment.attribute 'disabled').not_to be_truthy
+
+    next_assignment.click
+    expect(previous_assignment.attribute 'disabled').not_to be_truthy
+    expect(next_assignment.attribute 'disabled').to be_truthy
+
+    previous_assignment.click
+    expect(previous_assignment.attribute 'disabled').to be_truthy
+  end
+
+  it 'redirects to an assignment from SpeedGrader', priority: '2', test_id: 615684 do
+    simple_setup
+    simple_grade
+    @submission = @assign1.submit_homework(@students[0], body: 'student submission')
+    get srgb
+    select_student(@students[0])
+    select_assignment(@assign1)
+    assignment_link.click
+    speedgrader_link.click
+
+    driver.switch_to.window(driver.window_handles.last)
+    expect(driver.title).to eq("#{@assign1.title}, SpeedGrader, Unnamed Course")
+  end
+
+  it 'sets default grade', priority: '2', test_id: 615689 do
+    num_of_students = 2
+    simple_setup(num_of_students)
+    get srgb
+    select_student(@students[0])
+    select_assignment(@assign1)
+
+    set_default_grade.click
+    replace_content(grading_value, assign1_default_points)
+    button_type_submit.click
+
+    get default_gradebook
+    grade = gradebook_column_array(gradebook_cell_css)
+    expect(grade.count assign1_default_points.to_s).to eq(num_of_students)
   end
 
   it 'can select an assignment', priority: "1", test_id: 163998 do
@@ -136,7 +198,7 @@ describe "Screenreader Gradebook" do
     click_option '#assignment_select', a2.name
     f('#student_and_assignment_grade').clear
     f('#student_and_assignment_grade').send_keys grades[1], :return
-    get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
+    get default_gradebook
     expect(f('.canvas_1 .slick-row .slick-cell:nth-of-type(2)').text).to eq grades[1]
   end
 
@@ -154,7 +216,7 @@ describe "Screenreader Gradebook" do
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
     expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'true')
 
-    get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
+    get default_gradebook
     expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).to have_class 'muted'
   end
 
@@ -173,7 +235,7 @@ describe "Screenreader Gradebook" do
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
     expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'false')
 
-    get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
+    get default_gradebook
     expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).to_not have_class 'muted'
   end
 
@@ -197,7 +259,7 @@ describe "Screenreader Gradebook" do
 
     assignment.grade_student @students[0], grade: 15
     assignment.grade_student @students[1], grade: 5
-    get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
+    get default_gradebook
     f('a.assignment_header_drop').click
     ff('.gradebook-header-menu a').find{|a| a.text == "Assignment Details"}.click
 
@@ -282,14 +344,14 @@ describe "Screenreader Gradebook" do
 
       # When the modal closes
       # by setting a grade the "set default grade" button should have focus
-      f(".button_type_submit").click
+      button_type_submit.click
       accept_alert
-      check_element_has_focus(f "#set_default_grade")
+      check_element_has_focus(set_default_grade)
 
       # by the close button the "set default grade" button should have focus
-      f("#set_default_grade").click
+      set_default_grade.click
       fj('.ui-icon-closethick:visible').click
-      check_element_has_focus(f "#set_default_grade")
+      check_element_has_focus(set_default_grade)
     end
 
     describe "Download Submissions Button" do

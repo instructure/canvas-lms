@@ -26,7 +26,9 @@ describe "assignments" do
       wait_for_ajaximations
 
       expect(fj('.student_reviews:first .peer_reviews').text()).to match /None Assigned/
-      expect(@assignment.submissions.map(&:assessment_requests).flatten.length).to eq 1
+      keep_trying_until do
+        expect(@assignment.submissions.map(&:assessment_requests).flatten.length).to eq 1
+      end
     end
 
     it "allows an account admin who is also a student to submit a peer review", priority: "2", test_id: 216383 do

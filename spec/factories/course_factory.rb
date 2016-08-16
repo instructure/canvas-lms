@@ -167,4 +167,3 @@ def course_with_student_and_submitted_homework
     url: "http://www.google.com"
   })
 end
-

@@ -376,7 +376,18 @@ describe NotificationMessageCreator do
         NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       }.to change(DelayedMessage, :count).by 0
     end
- end
+
+    it "should not use non-email channels for summary messages" do
+      notification_set
+      @notification_policy.frequency = 'daily'
+      @notification_policy.save!
+      @communication_channel.update_attribute(:path_type, 'sms')
+
+      expect {
+        NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
+      }.to change(DelayedMessage, :count).by 0
+    end
+  end
 
   context "localization" do
     before(:each) do
