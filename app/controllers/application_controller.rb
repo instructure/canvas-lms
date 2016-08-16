@@ -677,8 +677,8 @@ class ApplicationController < ActionController::Base
       groups = group_scope ? group_scope.shard(@context).to_a.reject{|g| g.context_type == "Course" && g.context.concluded?} : []
 
       if opts[:favorites_first]
-        hidden_course_ids = @context.hidden_context_ids("Course")
-        courses = courses.sort_by {|c| [hidden_course_ids.include?(c.id) ? 1 : 0, Canvas::ICU.collation_key(c.name)]}
+        favorite_course_ids = @context.favorite_context_ids("Course")
+        courses = courses.sort_by {|c| [favorite_course_ids.include?(c.id) ? 0 : 1, Canvas::ICU.collation_key(c.name)]}
       end
 
       @contexts.concat courses

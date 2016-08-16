@@ -44,6 +44,7 @@
 class FavoritesController < ApplicationController
 
   before_filter :require_user
+  before_filter :check_defaults, :only => [:remove_favorite_course]
   after_filter :touch_user, :only => [:add_favorite_course, :remove_favorite_course, :reset_course_favorites]
 
   include Api::V1::Favorite
@@ -90,7 +91,7 @@ class FavoritesController < ApplicationController
     fave_group_memberships = nil
 
     @current_user.shard.activate do
-      fave_group_memberships = @current_user.groups.active.shard(@current_user).where.not(id: @current_user.hidden_context_ids("Group"))
+      fave_group_memberships = @current_user.groups.active.shard(@current_user).where(id: @current_user.favorite_context_ids("Group"))
     end
     if fave_group_memberships.any?
       render :json => fave_group_memberships.map{ |g| group_json(g, @current_user,session)}
@@ -115,7 +116,17 @@ class FavoritesController < ApplicationController
   #       -H 'Content-Length: 0'
   #
   def add_favorite_course
-    set_favorite(find_course)
+    course = api_find(Course, params[:id])
+    fave = nil
+
+    @current_user.shard.activate do
+      Favorite.unique_constraint_retry do
+        fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course).first
+        fave ||= @current_user.favorites.create!(:context => course)
+      end
+    end
+
+    render :json => favorite_json(fave, @current_user, session)
   end
 
   # @API Add group to favorites
@@ -134,8 +145,18 @@ class FavoritesController < ApplicationController
   #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \
   #       -H 'Content-Length: 0'
   #
-  def add_favorite_group
-    set_favorite(find_group)
+  def add_favorite_groups
+    group = api_find(Group, params[:id])
+    fave = nil
+
+    @current_user.shard.activate do
+      Favorite.unique_constraint_retry do
+        fave = @current_user.favorites.where(:context_type => 'Group', :context_id => group).first
+        fave ||= @current_user.favorites.create!(:context => group)
+      end
+    end
+
+    render :json => favorite_json(fave, @current_user, session)
   end
 
   # @API Remove course from favorites
@@ -152,7 +173,21 @@ class FavoritesController < ApplicationController
   #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
   #
   def remove_favorite_course
-    unset_favorite(find_course)
+    # allow removing a Favorite whose context object no longer exists
+    # but also allow referencing by sis id, if possible
+    courses = api_find_all(Course, [params[:id]])
+    course_id = Shard.relative_id_for(courses.any? ? courses.first.id : params[:id], Shard.current, @current_user.shard)
+    fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course_id).first
+    if fave
+      result = favorite_json(fave, @current_user, session)
+      fave.destroy
+      render :json => result
+    else
+      # can't really return a 404 here without making browsers freak out
+      # in the Courses UI (it's easy for the client's state to get out of
+      # sync with the server's, especially with multiple browsers open)
+      render :json => {}
+    end
   end
 
   # @API Remove group from favorites
@@ -168,8 +203,20 @@ class FavoritesController < ApplicationController
   #       -X DELETE \
   #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
   #
-  def remove_favorite_group
-    unset_favorite(find_group)
+  def remove_favorite_groups
+    group = api_find_all(Group, [params[:id]])
+    group_id= Shard.relative_id_for(group.any? ? group.first.id : params[:id], Shard.current, @current_user.shard)
+    fave = @current_user.favorites.where(:context_type => 'Group', :context_id => group_id).first
+    if fave
+      result = favorite_json(fave, @current_user, session)
+      fave.destroy
+      render :json => result
+    else
+      # can't really return a 404 here without making browsers freak out
+      # in the Group UI (it's easy for the client's state to get out of
+      # sync with the server's, especially with multiple browsers open)
+      render :json => {}
+    end
   end
 
 
@@ -183,8 +230,8 @@ class FavoritesController < ApplicationController
   #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
   #
   def reset_course_favorites
-    Favorite.reset(@current_user, Course)
-    render json: { status: 'ok' }
+    @current_user.favorites.by('Course').destroy_all
+    render :json => { :status => 'ok' }
   end
 
   # @API Reset group favorites
@@ -192,40 +239,29 @@ class FavoritesController < ApplicationController
   # automatically generated list of enrolled group
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/favorites/groups \
+  #     curl https://<canvas>/api/v1/users/self/favorites/group \
   #       -X DELETE \
   #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
   #
-  def reset_group_favorites
-    Favorite.reset(@current_user, Group)
-    render json: { status: 'ok' }
+  def reset_groups_favorites
+    @current_user.favorites.by('Group').destroy_all
+    render :json => { :status => 'ok' }
   end
 
   protected
+
+  # When we have other favorites, this needs to be modified to handle the other
+  # types, rather than just courses.
+  def check_defaults
+    return unless @current_user.favorites.count == 0
+    @current_user.menu_courses.each do |course|
+      @current_user.favorites.create :context => course
+    end
+  end
 
   def touch_user
     # Menu is cached, clear it
     @current_user.touch
   end
 
-  def find_course
-    api_find(Course, params[:id])
-  end
-
-  def find_group
-    api_find(Group, params[:id])
-  end
-
-  def set_favorite(context)
-    fave = Favorite.show_context(@current_user, context)
-    render json: favorite_json(fave, @current_user, session)
-  end
-
-  def unset_favorite(context)
-    if fave = Favorite.hide_context(@current_user, context)
-      render json: favorite_json(fave, @current_user, session)
-    else
-      render :json => {}
-    end
-  end
 end
