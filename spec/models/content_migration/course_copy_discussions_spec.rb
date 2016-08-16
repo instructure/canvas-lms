@@ -175,6 +175,25 @@ describe ContentMigration do
       expect(@copy_to.announcements.where(migration_id: mig_id(ann)).first).to be_nil
     end
 
+    it "should implicitly copy files attached to topics" do
+      att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'),
+        :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      topic = @copy_from.discussion_topics.new(:message => "howdy", :title => "title")
+      topic.attachment = att
+      topic.save!
+
+      @cm.copy_options = {:all_discussion_topics => "1"}
+      @cm.save!
+
+      run_course_copy
+
+      att_copy = @copy_to.attachments.where(migration_id: mig_id(att)).first
+      expect(att_copy).to be_present
+
+      topic_copy = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
+      expect(topic_copy.attachment).to eq att_copy
+    end
+
     it "should not copy deleted assignment attached to topic" do
       graded_discussion_topic
       @assignment.workflow_state = 'deleted'
