@@ -62,10 +62,24 @@ at_exit do
 end
 
 module SeleniumErrorRecovery
+  class RecoverableException < StandardError
+    extend Forwardable
+    def_delegators :@exception, :class, :message, :backtrace
+
+    def initialize(exception)
+      @exception = exception
+    end
+  end
+
   # this gets called wherever an exception happens (example, before/after/around, each/all)
+  #
+  # the example will still fail, but if we recover successfully, subsequent
+  # specs should pass. additionally, the rerun phase will exempt this
+  # failure from the threshold, since it's not a problem with the spec
+  # per se
   def set_exception(exception, *args)
-    maybe_recover_from_exception(exception)
-    super
+    exception = RecoverableException.new(exception) if maybe_recover_from_exception(exception)
+    super exception, *args
   end
 
   def maybe_recover_from_exception(exception)
