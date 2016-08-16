@@ -8,23 +8,52 @@ define([
   'jsx/shared/helpers/dateHelper',
   'jquery.instructure_date_and_time'
 ], function(tz, React, ReactDOM, $, I18n, _, DateHelper) {
-  const types = React.PropTypes;
+  const Types = React.PropTypes;
 
   const postfixId = (text, { props }) => {
     return text + props.id;
   };
 
+  const isEditable = ({ props }) => {
+    return props.permissions.update && !props.readOnly;
+  };
+
+  const tabbableDate = (ref, date) => {
+    let formattedDate = DateHelper.formatDatetimeForDisplay(date);
+    return <span ref={ref} className="GradingPeriod__Action" tabIndex="0">{ formattedDate }</span>;
+  };
+
+  const renderActions = ({ props, onDeleteGradingPeriod }) => {
+    if (props.permissions.delete && !props.readOnly) {
+      let cssClasses = "Button Button--icon-action icon-delete-grading-period";
+      if (props.disabled) cssClasses += " disabled";
+      return (
+        <div className="GradingPeriod__Actions content-box">
+          <button ref="deleteButton"
+                  role="button"
+                  className={cssClasses}
+                  aria-disabled={props.disabled}
+                  onClick={onDeleteGradingPeriod}>
+            <i className="icon-x icon-delete-grading-period"/>
+            <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
+          </button>
+        </div>
+      );
+    }
+  };
+
   let GradingPeriodTemplate = React.createClass({
     propTypes: {
-      title: types.string.isRequired,
-      startDate: types.instanceOf(Date).isRequired,
-      endDate: types.instanceOf(Date).isRequired,
-      id: types.string.isRequired,
-      permissions: types.shape({
-        update: types.bool.isRequired,
-        delete: types.bool.isRequired,
+      title: Types.string.isRequired,
+      startDate: Types.instanceOf(Date).isRequired,
+      endDate: Types.instanceOf(Date).isRequired,
+      closeDate: Types.instanceOf(Date).isRequired,
+      id: Types.string.isRequired,
+      permissions: Types.shape({
+        update: Types.bool.isRequired,
+        delete: Types.bool.isRequired,
       }).isRequired,
-      readOnly: types.bool.isRequired,
+      readOnly: Types.bool.isRequired,
       requiredPropsIfEditable: function(props) {
         if (!props.permissions.update && !props.permissions.delete) return;
 
@@ -68,34 +97,17 @@ define([
     },
 
     onDeleteGradingPeriod: function() {
-      this.props.onDeleteGradingPeriod(this.props.id);
-    },
-
-    renderDeleteButton: function() {
-      if (!this.props.permissions.delete || this.props.readOnly) return null;
-      let cssClasses = "Button Button--icon-action icon-delete-grading-period";
-      if (this.props.disabled) cssClasses += " disabled";
-      return (
-        <div className="col-xs-12 col-sm-6 col-lg-3 manage-buttons-container">
-          <div className="content-box">
-            <div className="buttons-grid-row grid-row">
-              <div className="col-xs">
-                <button ref="deleteButton" role="button" className={cssClasses} onClick={this.onDeleteGradingPeriod}>
-                  <i className="icon-x icon-delete-grading-period"/>
-                  <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
+      if (!this.props.disabled) {
+        this.props.onDeleteGradingPeriod(this.props.id);
+      }
     },
 
     renderTitle: function() {
-      if (this.props.permissions.update && !this.props.readOnly) {
+      if (isEditable(this)) {
         return (
           <input id={postfixId("period_title_", this)}
                  type="text"
+                 className="GradingPeriod__Detail ic-Input"
                  onChange={this.props.onTitleChange}
                  value={this.props.title}
                  disabled={this.props.disabled}
@@ -103,38 +115,40 @@ define([
         );
       } else {
         return (
-          <div id={postfixId("period_title_", this)} ref="title">
-            {this.props.title}
+          <div>
+            <span className="screenreader-only">{I18n.t("Grading Period Name")}</span>
+            <span ref="title" tabIndex="0">{this.props.title}</span>
           </div>
         );
       }
     },
 
     renderStartDate: function() {
-      if (this.props.permissions.update && !this.props.readOnly) {
+      if (isEditable(this)) {
         return (
           <input id={postfixId("period_start_date_", this)}
                  type="text"
                  ref="startDate"
                  name="startDate"
-                 className="input-grading-period-date date_field"
+                 className="GradingPeriod__Detail ic-Input input-grading-period-date date_field"
                  defaultValue={DateHelper.formatDatetimeForDisplay(this.props.startDate)}
                  disabled={this.props.disabled}/>
         );
       } else {
         return (
-          <div id={postfixId("period_start_date_", this)} ref="startDate">
-            {DateHelper.formatDatetimeForDisplay(this.props.startDate)}
+          <div>
+            <span className="screenreader-only">{I18n.t("Start Date")}</span>
+            { tabbableDate("startDate", this.props.startDate) }
           </div>
         );
       }
     },
 
     renderEndDate: function() {
-      if (this.props.permissions.update && !this.props.readOnly) {
+      if (isEditable(this)) {
         return (
           <input id={postfixId("period_end_date_", this)} type="text"
-                 className="input-grading-period-date date_field"
+                 className="GradingPeriod__Detail ic-Input input-grading-period-date date_field"
                  ref="endDate"
                  name="endDate"
                  defaultValue={DateHelper.formatDatetimeForDisplay(this.props.endDate)}
@@ -142,37 +156,57 @@ define([
         );
       } else {
         return (
-          <div id={postfixId("period_end_date_", this)} ref="endDate">
-            {DateHelper.formatDatetimeForDisplay(this.props.endDate)}
+          <div>
+            <span className="screenreader-only">{I18n.t("End Date")}</span>
+            { tabbableDate("endDate", this.props.endDate) }
           </div>
         );
       }
     },
 
+    renderCloseDate: function() {
+      let closeDate = isEditable(this) ? this.props.endDate : this.props.closeDate;
+      return (
+        <div>
+          <span className="screenreader-only">{I18n.t("Close Date")}</span>
+          { tabbableDate("closeDate", closeDate || this.props.endDate) }
+        </div>
+      );
+    },
+
     render: function () {
       return (
         <div id={postfixId("grading-period-", this)} className="grading-period pad-box-mini border border-trbl border-round">
-          <div className="grid-row pad-box-micro">
-            <div className="col-xs-12 col-sm-6 col-lg-3">
-              <label htmlFor={postfixId("period_title_", this)}>
-                {I18n.t("Grading Period Name")}
-              </label>
-              {this.renderTitle()}
+          <div className="GradingPeriod__Details pad-box-micro">
+            <div className="grid-row">
+              <div className="col-xs-12 col-sm-6 col-lg-3">
+                <label className="ic-Label" htmlFor={postfixId("period_title_", this)}>
+                  {I18n.t("Grading Period Name")}
+                </label>
+                {this.renderTitle()}
+              </div>
+              <div className="col-xs-12 col-sm-6 col-lg-3">
+                <label className="ic-Label" htmlFor={postfixId("period_start_date_", this)}>
+                  {I18n.t("Start Date")}
+                </label>
+                {this.renderStartDate()}
+              </div>
+              <div className="col-xs-12 col-sm-6 col-lg-3">
+                <label className="ic-Label" htmlFor={postfixId("period_end_date_", this)}>
+                  {I18n.t("End Date")}
+                </label>
+                {this.renderEndDate()}
+              </div>
+              <div className="col-xs-12 col-sm-6 col-lg-3">
+                <label className="ic-Label" id={postfixId("period_close_date_", this)}>
+                  {I18n.t("Close Date")}
+                </label>
+                {this.renderCloseDate()}
+              </div>
             </div>
-            <div className="col-xs-12 col-sm-6 col-lg-3">
-              <label htmlFor={postfixId("period_start_date_", this)}>
-                {I18n.t("Start Date")}
-              </label>
-              {this.renderStartDate()}
-            </div>
-            <div className="col-xs-12 col-sm-6 col-lg-3">
-              <label htmlFor={postfixId("period_end_date_", this)}>
-               {I18n.t("End Date")}
-              </label>
-              {this.renderEndDate()}
-            </div>
-            {this.renderDeleteButton()}
           </div>
+
+          {renderActions(this)}
         </div>
       );
     }

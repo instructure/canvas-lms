@@ -11,6 +11,7 @@ define [
 ], (React, ReactDOM, $, _, GradingPeriod, fakeENV, DateHelper) ->
 
   TestUtils = React.addons.TestUtils
+  wrapper = document.getElementById('fixtures')
 
   module 'GradingPeriod',
     setup: ->
@@ -20,25 +21,27 @@ define [
       fakeENV.setup()
       ENV.GRADING_PERIODS_URL = "api/v1/courses/1/grading_periods"
 
-      @createdPeriodData = "grading_periods":[
-        {
-          "id":"3", "start_date":"2015-04-20T05:00:00Z", "end_date":"2015-04-21T05:00:00Z",
-          "weight":null, "title":"New Period!", "permissions": { "update":true, "delete":true }
-        }
-      ]
       @updatedPeriodData = "grading_periods":[
         {
-          "id":"1", "startDate":"2015-03-01T06:00:00Z", "endDate":"2015-05-31T05:00:00Z",
-          "weight":null, "title":"Updated Grading Period!", "permissions": { "update":true, "delete":true }
+          "id":"1",
+          "title":"Updated Grading Period!",
+          "startDate":"2015-03-01T06:00:00Z",
+          "endDate":"2015-05-31T05:00:00Z",
+          "closeDate":"2015-06-07T05:00:00Z",
+          "weight":null,
+          "permissions": { "update":true, "delete":true }
         }
       ]
-      @server.respondWith "POST", ENV.GRADING_PERIODS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @createdPeriodData]
       @server.respondWith "PUT", ENV.GRADING_PERIODS_URL + "/1", [200, {"Content-Type":"application/json"}, JSON.stringify @updatedPeriodData]
-      @props =
+      @server.respond()
+
+    renderComponent: (opts = {}) ->
+      exampleProps =
         id: "1"
         title: "Spring"
         startDate: new Date("2015-03-01T00:00:00Z")
         endDate: new Date("2015-05-31T00:00:00Z")
+        closeDate: new Date("2015-06-07T00:00:00Z")
         weight: null
         disabled: false
         readOnly: false
@@ -46,57 +49,64 @@ define [
         onDeleteGradingPeriod: ->
         updateGradingPeriodCollection: sinon.spy()
 
-      @server.respond()
-    renderComponent: ->
-      GradingPeriodElement = React.createElement(GradingPeriod, @props)
-      @gradingPeriod = TestUtils.renderIntoDocument(GradingPeriodElement)
+      props = _.defaults(opts, exampleProps)
+      GradingPeriodElement = React.createElement(GradingPeriod, props)
+      ReactDOM.render(GradingPeriodElement, wrapper)
+
     teardown: ->
-      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@gradingPeriod).parentNode)
+      ReactDOM.unmountComponentAtNode(wrapper)
       ENV.GRADING_PERIODS_URL = null
       @server.restore()
 
   test 'sets initial state properly', ->
-    @renderComponent()
-    equal @gradingPeriod.state.title, @props.title
-    equal @gradingPeriod.state.startDate, @props.startDate
-    equal @gradingPeriod.state.endDate, @props.endDate
-    equal @gradingPeriod.state.weight, @props.weight
+    gradingPeriod = @renderComponent()
+    equal gradingPeriod.state.title, "Spring"
+    deepEqual gradingPeriod.state.startDate, new Date("2015-03-01T00:00:00Z")
+    deepEqual gradingPeriod.state.endDate, new Date("2015-05-31T00:00:00Z")
+    equal gradingPeriod.state.weight, null
 
   test 'onDateChange calls replaceInputWithDate', ->
-    @renderComponent()
-    replaceInputWithDate = @stub(@gradingPeriod, 'replaceInputWithDate')
-    @gradingPeriod.onDateChange("startDate", "period_start_date_1")
+    gradingPeriod = @renderComponent()
+    replaceInputWithDate = @stub(gradingPeriod, 'replaceInputWithDate')
+    gradingPeriod.onDateChange("startDate", "period_start_date_1")
     ok replaceInputWithDate.calledOnce
 
   test 'onDateChange calls updateGradingPeriodCollection', ->
-    @renderComponent()
-    @gradingPeriod.onDateChange("startDate", "period_start_date_1")
-    ok @gradingPeriod.props.updateGradingPeriodCollection.calledOnce
+    gradingPeriod = @renderComponent()
+    gradingPeriod.onDateChange("startDate", "period_start_date_1")
+    ok gradingPeriod.props.updateGradingPeriodCollection.calledOnce
 
   test 'onTitleChange changes the title state', ->
-    @renderComponent()
+    gradingPeriod = @renderComponent()
     fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
-    @gradingPeriod.onTitleChange(fakeEvent)
-    deepEqual @gradingPeriod.state.title, "MXP: Most Xtreme Primate"
+    gradingPeriod.onTitleChange(fakeEvent)
+    equal gradingPeriod.state.title, "MXP: Most Xtreme Primate"
 
   test 'onTitleChange calls updateGradingPeriodCollection', ->
-    @renderComponent()
+    gradingPeriod = @renderComponent()
     fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
-    @gradingPeriod.onTitleChange(fakeEvent)
-    ok @gradingPeriod.props.updateGradingPeriodCollection.calledOnce
+    gradingPeriod.onTitleChange(fakeEvent)
+    ok gradingPeriod.props.updateGradingPeriodCollection.calledOnce
 
   test 'replaceInputWithDate calls formatDatetimeForDisplay', ->
-    @renderComponent()
+    gradingPeriod = @renderComponent()
     formatDatetime = @stub(DateHelper, 'formatDatetimeForDisplay')
     fakeDateElement = { val: -> }
-    @gradingPeriod.replaceInputWithDate("startDate", fakeDateElement)
+    gradingPeriod.replaceInputWithDate("startDate", fakeDateElement)
     ok formatDatetime.calledOnce
 
   test "assigns the 'readOnly' property on the template when false", ->
-    @renderComponent()
-    equal @gradingPeriod.refs.template.props.readOnly, false
+    gradingPeriod = @renderComponent()
+    equal gradingPeriod.refs.template.props.readOnly, false
 
   test "assigns the 'readOnly' property on the template when true", ->
-    @props.readOnly = true
-    @renderComponent()
-    equal @gradingPeriod.refs.template.props.readOnly, true
+    gradingPeriod = @renderComponent(readOnly: true)
+    equal gradingPeriod.refs.template.props.readOnly, true
+
+  test "assigns the 'closeDate' property", ->
+    gradingPeriod = @renderComponent()
+    deepEqual gradingPeriod.refs.template.props.closeDate, new Date("2015-06-07T00:00:00Z")
+
+  test "assigns 'endDate' as 'closeDate' when 'closeDate' is not defined", ->
+    gradingPeriod = @renderComponent(closeDate: null)
+    deepEqual gradingPeriod.refs.template.props.closeDate, new Date("2015-05-31T00:00:00Z")
