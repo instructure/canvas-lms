@@ -286,7 +286,7 @@ define [
         return
 
       if event.midnightFudged
-        event.start = fcUtil.clone(event.originalStart).add(minuteDelta, 'minutes')
+        event.start = fcUtil.addMinuteDelta(event.originalStart, minuteDelta)
 
       # isDueAtMidnight() will read cached midnightFudged property
       if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
@@ -425,7 +425,8 @@ define [
       originalEnd = fcUtil.clone(event.end)
       @copyYMD(event.start, date)
       @copyYMD(event.end, date)
-      @_eventDrop(event, moment.duration(event.start.diff(originalStart)).asMinutes(), false, =>
+      # avoid DST shifts by coercing the minute delta to a whole number of days (it always is for minical drop events)
+      @_eventDrop(event, Math.round(moment.duration(event.start.diff(originalStart)).asDays()) * 60 * 24, false, =>
         event.start = originalStart
         event.end = originalEnd
         @updateEvent(event)
