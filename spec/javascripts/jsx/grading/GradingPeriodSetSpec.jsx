@@ -41,19 +41,20 @@ define([
       id: "1",
       title: "We did it! We did it! We did it! #dora #boots",
       startDate: new Date("2015-01-01T20:11:00+00:00"),
-      endDate: new Date("2015-03-01T00:00:00+00:00")
-    },
-    {
+      endDate: new Date("2015-03-01T00:00:00+00:00"),
+      closeDate: new Date("2015-03-01T00:00:00+00:00")
+    },{
       id: "3",
       title: "Como estas?",
       startDate: new Date("2014-11-01T20:11:00+00:00"),
-      endDate: new Date("2014-11-11T00:00:00+00:00")
-    },
-    {
+      endDate: new Date("2014-11-11T00:00:00+00:00"),
+      closeDate: new Date("2014-11-11T00:00:00+00:00")
+    },{
       id: "2",
       title: "Swiper no swiping!",
       startDate: new Date("2015-04-01T20:11:00+00:00"),
-      endDate: new Date("2015-05-01T00:00:00+00:00")
+      endDate: new Date("2015-05-01T00:00:00+00:00"),
+      closeDate: new Date("2015-05-01T00:00:00+00:00")
     }
   ];
 
@@ -61,7 +62,8 @@ define([
     id: "4",
     title: "Example Period",
     startDate: new Date("2015-03-02T20:11:00+00:00"),
-    endDate: new Date("2015-03-03T00:00:00+00:00")
+    endDate: new Date("2015-03-03T00:00:00+00:00"),
+    closeDate: new Date("2015-03-03T00:00:00+00:00")
   };
 
   const props = {
@@ -383,7 +385,8 @@ define([
       id: "1",
       title: "",
       startDate: new Date("2015-03-02T20:11:00+00:00"),
-      endDate: new Date("2015-03-03T00:00:00+00:00")
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -397,7 +400,8 @@ define([
       id: "1",
       title: "    ",
       startDate: new Date("2015-03-02T20:11:00+00:00"),
-      endDate: new Date("2015-03-03T00:00:00+00:00")
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -410,7 +414,8 @@ define([
     let period = {
       title: "Period without Start Date",
       startDate: undefined,
-      endDate: new Date("2015-03-03T00:00:00+00:00")
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -423,7 +428,22 @@ define([
     let period = {
       title: "Period without End Date",
       startDate: new Date("2015-03-02T20:11:00+00:00"),
-      endDate: null
+      endDate: null,
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
+  test('does not save a grading period without a valid closeDate', function() {
+    let period = {
+      title: "Period without End Date",
+      startDate: new Date("2015-03-02T20:11:00+00:00"),
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: null
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -436,7 +456,8 @@ define([
     let period = {
       title: "Period with Overlapping Start Date",
       startDate: new Date("2015-04-30T20:11:00+00:00"),
-      endDate: new Date("2015-05-30T00:00:00+00:00")
+      endDate: new Date("2015-05-30T00:00:00+00:00"),
+      closeDate: new Date("2015-05-30T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -449,7 +470,8 @@ define([
     let period = {
       title: "Period with Overlapping End Date",
       startDate: new Date("2014-12-30T20:11:00+00:00"),
-      endDate: new Date("2015-01-30T00:00:00+00:00")
+      endDate: new Date("2015-01-30T00:00:00+00:00"),
+      closeDate: new Date("2015-01-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -462,7 +484,22 @@ define([
     let period = {
       title: "Overlapping Period",
       startDate: new Date("2015-03-03T00:00:00+00:00"),
-      endDate: new Date("2015-03-02T20:11:00+00:00")
+      endDate: new Date("2015-03-02T20:11:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
+  test('does not save a grading period with closeDate before endDate', function() {
+    let period = {
+      title: "Overlapping Period",
+      startDate: new Date("2015-03-01T00:00:00+00:00"),
+      endDate: new Date("2015-03-02T20:11:00+00:00"),
+      closeDate: new Date("2015-03-02T20:10:59+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -677,7 +714,8 @@ define([
     let period = {
       title: "",
       startDate: new Date("2015-03-02T20:11:00+00:00"),
-      endDate: new Date("2015-03-03T00:00:00+00:00")
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -690,7 +728,8 @@ define([
     let period = {
       title: "Period without Start Date",
       startDate: undefined,
-      endDate: new Date("2015-03-03T00:00:00+00:00")
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -703,7 +742,8 @@ define([
     let period = {
       title: "Period without End Date",
       startDate: new Date("2015-03-02T20:11:00+00:00"),
-      endDate: null
+      endDate: null,
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -716,7 +756,8 @@ define([
     let period = {
       title: "Period with Overlapping Start Date",
       startDate: new Date("2015-04-30T20:11:00+00:00"),
-      endDate: new Date("2015-05-30T00:00:00+00:00")
+      endDate: new Date("2015-05-30T00:00:00+00:00"),
+      closeDate: new Date("2015-05-30T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -729,7 +770,8 @@ define([
     let period = {
       title: "Period with Overlapping End Date",
       startDate: new Date("2014-12-30T20:11:00+00:00"),
-      endDate: new Date("2015-01-30T00:00:00+00:00")
+      endDate: new Date("2015-01-30T00:00:00+00:00"),
+      closeDate: new Date("2015-01-30T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -742,7 +784,8 @@ define([
     let period = {
       title: "Overlapping Period",
       startDate: new Date("2015-03-03T00:00:00+00:00"),
-      endDate: new Date("2015-03-02T20:11:00+00:00")
+      endDate: new Date("2015-03-02T20:11:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
