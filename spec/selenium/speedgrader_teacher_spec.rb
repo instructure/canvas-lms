@@ -167,7 +167,8 @@ describe "speed grader" do
       wait_for_ajaximations
 
       sections = @course.course_sections
-      expect(ff("#section-menu ul li a")[1]).to have_attribute("text", @course_section.name)
+      section_options_text = f("#section-menu ul")[:textContent] # hidden
+      expect(section_options_text).to include(@course_section.name)
       goto_section(sections[0].id)
       expect(ff("#students_selectmenu option").length).to eq 1
       goto_section(sections[1].id)
