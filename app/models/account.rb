@@ -725,6 +725,33 @@ class Account < ActiveRecord::Base
     chain
   end
 
+  def self.account_chain_ids(starting_account_id)
+    if connection.adapter_name == 'PostgreSQL'
+      Shard.shard_for(starting_account_id).activate do
+        id_chain = []
+        if (starting_account_id.is_a?(Account))
+          id_chain << starting_account_id.id
+          starting_account_id = starting_account_id.parent_account_id
+        end
+
+        if starting_account_id
+          ids = Account.connection.select_values(<<-SQL)
+                WITH RECURSIVE t AS (
+                  SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
+                  UNION
+                  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
+                )
+                SELECT id FROM t
+              SQL
+          id_chain.concat(ids.map(&:to_i))
+        end
+        id_chain
+      end
+    else
+      account_chain(starting_account_id).map(&:id)
+    end
+  end
+
   def self.add_site_admin_to_chain!(chain)
     chain << Account.site_admin unless chain.last.site_admin?
     chain
@@ -735,6 +762,10 @@ class Account < ActiveRecord::Base
     result = @account_chain.dup
     Account.add_site_admin_to_chain!(result) if include_site_admin
     result
+  end
+
+  def account_chain_ids
+    @cached_account_chain_ids ||= Account.account_chain_ids(self)
   end
 
   def account_chain_loop
@@ -832,8 +863,7 @@ class Account < ActiveRecord::Base
   end
 
   def available_custom_roles(include_inactive=false)
-    @role_chain_ids ||= self.account_chain.map(&:id)
-    scope = Role.where(:account_id => @role_chain_ids)
+    scope = Role.where(:account_id => account_chain_ids)
     scope = include_inactive ? scope.not_deleted : scope.active
     scope
   end
@@ -883,7 +913,7 @@ class Account < ActiveRecord::Base
   end
 
   def valid_role?(role)
-    role && (role.built_in? || (self.id == role.account_id) || self.account_chain.map(&:id).include?(role.account_id))
+    role && (role.built_in? || (self.id == role.account_id) || self.account_chain_ids.include?(role.account_id))
   end
 
   def login_handle_name_is_customized?

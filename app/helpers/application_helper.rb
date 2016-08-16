@@ -380,11 +380,11 @@ module ApplicationHelper
         # account_chain_ids is in the order we need to search for tools
         # unfortunately, the db will return an arbitrary one first.
         # so, we pull all the tools (probably will only have one anyway) and look through them here
-        account_chain = @context.account_chain
+        account_chain_ids = @context.account_chain_ids
 
-        tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => account_chain, :tool_id => tool_id).to_a
-        account_chain.each do |account|
-          tool = tools.find {|t| t.context_id == account.id}
+        tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => account_chain_ids, :tool_id => tool_id).to_a
+        account_chain_ids.each do |account_id|
+          tool = tools.find {|t| t.context_id == account_id}
           break if tool
         end
       end

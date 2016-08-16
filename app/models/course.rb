@@ -1339,6 +1339,10 @@ class Course < ActiveRecord::Base
     result
   end
 
+  def account_chain_ids
+    @account_chain_ids ||= Account.account_chain_ids(account_id)
+  end
+
   def institution_name
     return self.root_account.name if self.root_account_id != Account.default.id
     return (self.account || self.root_account).name
@@ -2397,7 +2401,7 @@ class Course < ActiveRecord::Base
 
   def external_tool_tabs(opts)
     tools = self.context_external_tools.active.having_setting('course_navigation')
-    tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain).to_a
+    tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain_ids).to_a
     Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
   end
 
