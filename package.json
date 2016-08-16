@@ -157,6 +157,7 @@
     "webpack-stats": "webpack --profile --json",
     "webpack-production": "NODE_ENV=production gulp rev & node --max_old_space_size=4096 $(yarn bin)/webpack --color --config webpack.production.config.js",
     "jspec": "./spec/jspec.sh",
-    "jspec-watch": "./spec/jspec.sh --watch"
+    "jspec-watch": "./spec/jspec.sh --watch",
+    "a11y-report": "./spec/jspec.sh --a11y"
   }
 }
