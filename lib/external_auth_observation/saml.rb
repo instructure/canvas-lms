@@ -10,10 +10,14 @@ module ExternalAuthObservation
     end
 
     def logout_url
-      saml_request = Onelogin::Saml::LogoutRequest.generate(response.name_qualifier,
-                                                             response.name_id,
-                                                             response.session_index,
-                                                             saml_settings)
+      saml_request = Onelogin::Saml::LogoutRequest.generate(
+        response.name_qualifier,
+        response.sp_name_qualifier,
+        response.name_id,
+        response.name_identifier_format,
+        response.session_index,
+        saml_settings
+      )
       forward_url = saml_request.forward_url
       uri = URI(forward_url)
       uri.to_s

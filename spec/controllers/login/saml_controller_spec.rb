@@ -213,6 +213,39 @@ describe Login::SamlController do
     expect(@user.reload.short_name).to eq 'Cody Cutrer'
   end
 
+  it "handles student logout for parent registration" do
+    unique_id = 'foo@example.com'
+
+    account1 = account_with_saml(
+      parent_registration: true,
+      saml_log_out_url: "http://example.com/logout"
+    )
+    user1 = user_with_pseudonym({:active_all => true, :username => unique_id})
+    @pseudonym.account = account1
+    @pseudonym.save!
+
+    Onelogin::Saml::Response.stubs(:new).returns(
+        stub('response',
+             is_valid?: true,
+             success_status?: true,
+             name_id: unique_id,
+             name_identifier_format: nil,
+             name_qualifier: nil,
+             sp_name_qualifier: nil,
+             session_index: nil,
+             process: nil,
+             issuer: "such a lie",
+             saml_attributes: {}
+        )
+    )
+
+    controller.request.env['canvas.domain_root_account'] = account1
+    session[:parent_registration] = { observee: { unique_id: 'foo@example.com' } }
+    post :create, :SAMLResponse => "foo"
+    expect(response).to be_redirect
+    expect(response.location).to match(/example.com\/logout/)
+  end
+
   context "multiple authorization configs" do
     before :once do
       @account = Account.create!
