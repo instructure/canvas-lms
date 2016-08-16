@@ -144,8 +144,8 @@ class ConversationParticipant < ActiveRecord::Base
         [sanitize_sql(shard_conditions)]
       else
         ConversationParticipant.unscoped do
-          conversation_ids = ConversationParticipant.where(shard_conditions).select(:conversation_id).map do |c|
-            Shard.relative_id_for(c.conversation_id, Shard.current, scope_shard)
+          conversation_ids = ConversationParticipant.where(shard_conditions).pluck(:conversation_id).map do |id|
+            Shard.relative_id_for(id, Shard.current, scope_shard)
           end
           [sanitize_sql(:conversation_id => conversation_ids)]
         end

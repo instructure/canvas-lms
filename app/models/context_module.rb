@@ -259,8 +259,8 @@ class ContextModule < ActiveRecord::Base
   def self.module_names(context)
     Rails.cache.fetch(['module_names', context].cache_key) do
       names = {}
-      context.context_modules.not_deleted.select([:id, :name]).each do |mod|
-        names[mod.id] = mod.name
+      context.context_modules.not_deleted.pluck(:id, :name).each do |id, name|
+        names[id] = name
       end
       names
     end

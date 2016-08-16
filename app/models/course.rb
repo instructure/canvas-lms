@@ -2088,27 +2088,28 @@ class Course < ActiveRecord::Base
   def self.serialization_excludes; [:uuid]; end
 
 
+  ADMIN_TYPES = %w{TeacherEnrollment TaEnrollment DesignerEnrollment}
   def section_visibilities_for(user, opts={})
-    RequestCache.cache('section_visibilities_for', user, self) do
+    RequestCache.cache('section_visibilities_for', user, self, opts) do
       shard.activate do
-        Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
+        Rails.cache.fetch(['section_visibilities_for', user, self, opts].cache_key) do
           workflow_not = opts[:excluded_workflows] || 'deleted'
 
-          enrollments = Enrollment.select([
-            :course_section_id,
-            :limit_privileges_to_course_section,
-            :type,
-            :associated_user_id])
-            .where("user_id=? AND course_id=?", user, self)
-            .where.not(workflow_state: workflow_not)
+          enrollment_rows = Enrollment.where("user_id=? AND course_id=?", user, self).
+            where.not(workflow_state: workflow_not).
+            pluck(
+              :course_section_id,
+              :limit_privileges_to_course_section,
+              :type,
+              :associated_user_id)
 
-          enrollments.map do |e|
+          enrollment_rows.map do |section_id, limit_privileges, type, associated_user_id|
             {
-              :course_section_id => e.course_section_id,
-              :limit_privileges_to_course_section => e.limit_privileges_to_course_section,
-              :type => e.type,
-              :associated_user_id => e.associated_user_id,
-              :admin => e.admin?
+              :course_section_id => section_id,
+              :limit_privileges_to_course_section => limit_privileges,
+              :type => type,
+              :associated_user_id => associated_user_id,
+              :admin => ADMIN_TYPES.include?(type)
             }
           end
         end
