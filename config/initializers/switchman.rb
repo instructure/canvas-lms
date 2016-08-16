@@ -212,4 +212,10 @@ Rails.application.config.after_initialize do
   if !Shard.default.is_a?(Shard) && Switchman.config[:force_sharding] && !ENV['SKIP_FORCE_SHARDING']
     raise 'Sharding is supposed to be set up, but is not! Use SKIP_FORCE_SHARDING=1 to ignore'
   end
+
+  if !CANVAS_RAILS4_0 && Shard.default.is_a?(Shard)
+    # otherwise the serialized settings attribute method won't be properly defined
+    Shard.define_attribute_methods
+    Shard.default.instance_variable_set(:@attributes, Shard.attributes_builder.build_from_database(Shard.default.attributes_before_type_cast))
+  end
 end
