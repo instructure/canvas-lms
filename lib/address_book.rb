@@ -6,8 +6,7 @@ require_relative 'address_book/messageable_user'
 module AddressBook
   STRATEGIES = {
     'messageable_user' => { implementation: AddressBook::MessageableUser, label: lambda{ I18n.t('MessageableUser library') } }.freeze,
-    # TODO CNVS-29869
-    #'microservice' => { implementation: AddressBook::Service, label: lambda{ I18n.t('AddressBook microservice') } }.freeze,
+    'microservice' => { implementation: AddressBook::Service, label: lambda{ I18n.t('AddressBook microservice') } }.freeze,
     'empty' => { implementation: AddressBook::Empty, label: lambda{ I18n.t('Empty stub (for testing only)') } }.freeze
   }.freeze
   DEFAULT_STRATEGY = 'messageable_user'

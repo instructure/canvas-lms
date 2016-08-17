@@ -24,3 +24,5 @@ development:
       encryption-secret: somebigsecret
     rich-content-service:
       app-host: rce.docker
+    address-book:
+      app-host: http://address-book.docker
