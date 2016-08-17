@@ -1012,7 +1012,7 @@ nn:
       account_reports: 
         linn_benton: 
           assignment_group_id: 
-            text: "Tildeling av gruppe-ID:"
+            text: "Oppgåvegruppe-ID:"
           course_id: 
             text: "Kurs-ID:"
     sis_batch_counts: 
@@ -4899,13 +4899,13 @@ nn:
   data_set_identifier_data_set_id_c228b5df: "Datasett-ID: %{data_set_id}"
   date: 
     abbr_day_names: 
-      - su
-      - må
-      - ty
-      - true
-      - to
-      - fr
-      - la
+      - sun
+      - mån
+      - tys
+      - ons
+      - tor
+      - fre
+      - laur
     abbr_month_names: 
       - ~
       - jan."
@@ -4922,13 +4922,13 @@ nn:
       - des."
     datepicker: 
       column_headings: 
-        - su
-        - må
-        - ty
-        - true
-        - to
-        - fr
-        - la
+        - sun
+        - mån
+        - tys
+        - ons
+        - tor
+        - fre
+        - laur
     day_names: 
       - sundag
       - måndag
