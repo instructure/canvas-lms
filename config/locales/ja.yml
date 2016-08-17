@@ -228,6 +228,7 @@ ja:
       discovery_url_description: "検出 URL を設定すると、Canvas は認証の必要なすべてのユーザをその URL に転送します。そのページでは、ログインのためにアクセスする必要のある場所をユーザに指示する必要があります。検出 URL を設定しないと、最初の設定がユーザの認証の試行に使用されます。"
       login_handle_name_description: "一意のログイン ID に使用されるラベル。例:ログイン、ユーザ名、受講生 ID、など。"
       unknown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
+  account_course_and_user_search_22bf297a: アカウントコースとユーザの検索
   account_domain_78f43049: "アカウント ドメイン"
   account_id_2c3b4f15: "アカウント ID"
   account_name_13ed649: "%{account_name}"
@@ -390,9 +391,9 @@ ja:
     add_course_dialog_title: 新しいコースの追加
     add_course_or_user: 
       add_course_button: コースの追加
-      add_course_link: 新しいコースの追加
+      add_course_link: 新しいコース
       add_user_button: ユーザの追加
-      add_user_link: 新しいユーザの追加
+      add_user_link: 新しいユーザ
       display_name_help: ディスカッション、メッセージ、コメントで、他のユーザにはこの名前が表示されます。
       full_name_description: この名前は、講師が採点する際に使用されます。
       labels: 
@@ -837,7 +838,7 @@ ja:
       add_admin_title: アカウント管理者の追加
       add_announcement_button: アナウンスの追加
       add_announcement_link: 新しいアナウンスの追加
-      add_ip_filter_link: さらにフィルタを追加
+      add_ip_filter_link: フィルタ
       alert_icon_calendar_option: カレンダー
       alert_icon_error_option: エラー
       alert_icon_information_option: 情報
@@ -961,7 +962,7 @@ ja:
         turnitin_shared_secret: "Turnitin 共有シークレット"
         users_can_edit_name: ユーザは氏名を編集できます
       links: 
-        add_admins: アカウント管理者の追加
+        add_admins: アカウント管理者
         configure_report: 設定...
         run_report: レポートの実行
       login_handle_name_placeholder: "例: ログイン、ユーザ名、受講生 ID"
@@ -1294,6 +1295,8 @@ ja:
   add_a_new_outcome_group_e3fab2fc: 新しい結果グループを追加する
   add_a_new_user_c440d053: 新しいユーザーの追加
   add_a_reviewer_for_the_selected_students_1c7b5d6f: 選ばれた受講生に、レビューワーを加える
+  add_account_admins_99c03c9e: アカウント管理者の追加
+  add_alert_b2729c99: アラートの追加
   add_an_identity_provider_to_this_account_c2644478: "このアカウントに ID プロバイダーを追加:"
   add_app_baf540f: アプリの追加
   add_assignment_to_name_caf173b0: "課題を %{name} に追加"
@@ -1323,9 +1326,12 @@ ja:
     add_page_to: "ページを %{module} に追加"
     add_quiz_to: "クイズを %{module} に追加"
     add_topic_to: "ディスカッション トピックを %{module} に追加"
+  add_new_announcement_ddacd624: 新しいアナウンスの追加
   add_new_group_7ac49f31: 新規グループの追加
   add_new_set_of_due_dates_e8e240f: 新しい期日を追加
   add_people_7ee4b2ec: メンバーの追加
+  add_quiz_ip_filter_c7b37dc5: "クイズ IP フィルタの追加"
+  add_recipient_ff135ed7: 受信者の追加
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: このポートフォリオにセクションを追加、削除または再配置
   add_review_2fb1590c: 評価を追加
   add_rubric_3636d9a6: 注釈を追加
@@ -1334,6 +1340,7 @@ ja:
   add_students_to_the_course_874be8fb: 受講生をコースに追加
   add_tas_to_the_course_2aac6e02: "TA をコースに追加"
   add_theme_32fa3d50: テーマの追加
+  add_trigger_bc1a0fae: トリガーの追加
   add_user_e73e8e50: ユーザーの追加
   add_users_to_name_b8109bbb: "ユーザーを %{name}に追加"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: 課題を追加してください。長いリストにしても、複数のグループに分割しても構いません。各課題グループに重み付けを指定することもできます。
@@ -1354,8 +1361,8 @@ ja:
   alerts: 
     alert: 
       buttons: 
-        add_criterion: トリガーの追加
-        add_recipient: 受信者の追加
+        add_criterion: トリガー
+        add_recipient: 受信者
         save_alert: アラートの保存
       criteria: 次の場合にアラートを発行
       labels: 
@@ -1373,7 +1380,7 @@ ja:
       alerts_description_account: "すべての条件を満たす受講生 1 人 1 人に対してアラートが生成されます。条件は毎日チェックされ、受講生、講師、アカウント管理者のいずれか、またはすべてに対して、原因となっている問題が解決するまでお知らせが発行されます。"
       alerts_description_course: "すべての条件を満たす受講生 1 人 1 人に対してアラートが生成されます。条件は毎日チェックされ、受講生、または講師、またはその両方に対して、原因となっている問題が解決するまでお知らせが送信されます。"
       buttons: 
-        add_alert: アラートの追加
+        add_alert: アラート
       description: "講師から受講生への交流が %{count} 日間途絶えています"
       option: 講師からの交流がない
       remove: このアイテムを削除
@@ -1410,6 +1417,7 @@ ja:
   all_start_dates_must_be_before_the_end_date_d949eca9: すべての開始日は、終了日の前である必要があります
   all_students_have_taken_the_quiz_b558f8b4: すべての受講生がクイズに回答しました。
   all_students_have_taken_the_survey_494f9f42: すべての受講生がサーベイに回答しました。
+  all_submissions_must_have_a_selected_grade_3a84e5a9: 提出物にはすべて選択した成績が必要です。
   all_terms_cd27b0fb: すべての期間
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: 管理人が、選択された提出物の複数の無所属である採点をレビューすることを許可します
   allow_bulk_grade_export_to_sis_e11a6e66: "SIS へ一括で成績のエクスポートができます"
@@ -1543,6 +1551,7 @@ ja:
   answers_which_scored_in_the_top_27_a605232d: 上位27％において得点した回答
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: 最後の試行の後に解答が表示されます
   api_url_3ee7cb0a: "API URL"
+  app_b157c2b3: アプリ
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "コースまたはアカウントの設定ページの「アプリ」タブにアプリ センターが表示されます。下の URL はアプリ センターのエンドポイントを指している必要があります。 (例: %{url} -- 末尾のスラッシュは省略します"
   app_placements_6d877225: アプリプレースメント
   app_reregistration_87cc8817: アプリ登録
@@ -1633,6 +1642,7 @@ ja:
   are_you_sure_you_want_to_remove_this_tool_7363f90b: このツールを削除してもよろしいですか?
   are_you_sure_you_want_to_remove_this_user_8d1a8295: このユーザを削除してもよろしいですか?
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: このプロファイルの写真をレポートしてもよろしいですか？
+  are_you_sure_you_want_to_submit_this_comment_fbe76ba6: このコメントを提出してもよろしいですか？
   argentina_3257a200: アルゼンチン
   argentina_54_375d6af4: "アルゼンチン (+54)"
   arrange_by_34a545de: 以下によって手配
@@ -2398,6 +2408,7 @@ ja:
   background_image_1a401e1a: 背景の画像
   base_847aca7c: ベース
   base_role_type_a9cc892d: base_role_type
+  base_url_for_mathman_service_bdd4b10b: "MathMan サービスのための基本 url"
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 から .zip ファイルをエクスポート"
   bb_name: "Blackboard コンバータ"
@@ -2449,6 +2460,8 @@ ja:
       permissions: "編集権限: %{name}"
     unpublished_title: 未公開
   broken_file_link_found_in_your_course_7cc24395: "コース内のファイル リンクに問題があります"
+  browse_your_computer_9a735a4: コンピュータ内を検索
+  browse_your_computer_for_a_course_image_d7db2376: コンピュータ内でコース画像を検索
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "バケット名は、以下のうちの一つである必要があります: %{bucket_names}"
   bulk_course_migration: 
     export_failed: "bb_lcid %{id} のコースを Blackboard からエクスポートする際にエラーが発生しました"
@@ -3019,6 +3032,7 @@ ja:
   change_ending_date_to_d2cebd54: 終了日の変更
   change_groups_4e2ab6c3: グループを変更
   change_image_14ad465b: 画像を変更
+  change_image_d56c695f: 画像を変更
   change_name_c8cce76c: 名前の変更
   change_name_to_568374c8: "「%{name}」を次に変更"
   change_points_possible_to_match_rubric_dialog: 
@@ -3039,6 +3053,7 @@ ja:
   choose_an_authentication_service_47dc8875: 認証サービスを選択してください
   choose_assignment_b0132c5e: "-- 課題を選択 --"
   choose_attribute_to_add_866e128d: 追加するには属性を選択
+  choose_image_e5ee5d7a: 画像を選択
   choose_student_1513fcd1: "-- 受講生を選択 --"
   choose_usage_rights_33683854: 使用権を選択...
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' は有効な色ではありません。"
@@ -3054,6 +3069,7 @@ ja:
   click_to_report_profile_picture_370f9625: クリックして、プロファイルの写真をレポートする。
   click_to_set_this_answer_as_correct_1326e3fd: クリックして、この解答を正解として設定
   click_to_test_dropdown_b950974d: クリックして、ドロップダウンをテストする
+  click_to_view_event_details_b25dc1f3: クリックしてイベント詳細を表示
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: コラムのヘッダーをクリックすることで、そのコラム別に列をソートします。
   clone_group_set_c2a40e15: "クローン グループ セット"
   close_and_return_to_canvas_80544344: "閉じて Canvas に戻る"
@@ -4288,6 +4304,7 @@ ja:
       only_teachers: 講師のみ
       teachers_students: 講師と受講生
   course_8a63b4a3: コース
+  course_8dcfb195: コース
   course_and_user_search_ebc1ae41: コースとユーザー検索
   course_announcements_76b07340: コースのアナウンス
   course_assignments_833b8cf1: コースの課題
@@ -4351,6 +4368,8 @@ ja:
   course_home_4c4c0107: "コース ホーム"
   course_home_sub_navigation_b1ee6b03: "コース ホームのサブ ナビゲーション"
   course_id_8bd2a21c: "コース ID"
+  course_id_a7c924d5: "コース ID"
+  course_image_settings_eba3ec55: コースの画像設定
   course_implemented_apps_fa658f5a: コース実行アプリ
   course_list: 
     favorited_tooltip: "クリックしてコース メニューから削除します。"
@@ -4493,6 +4512,7 @@ ja:
       section_enrollments: セクションの登録
   course_settings_sub_navigation_b95deae: "コース設定のサブ ナビゲーション"
   course_setup_wizard_is_showing_a7c087c1: コース設定ウィザードを表示しています。
+  course_sis_7ae8f649: "コース sis"
   course_starts_at_3a01f9da: コースの開始は
   course_statistics: 
     unknown: 不明
@@ -5146,6 +5166,7 @@ ja:
   current_mastery_score_score_out_of_mastery_points_fedd343f: "現在の熟達スコア: %{mastery_points}のうちの%{score} "
   current_provider_6c3f7f96: 現在のプロバイダー
   current_score_6c81792: 現在のスコア
+  current_score_74777363: 現在のスコア
   current_theme_62e5e8cf: 現在のテーマ
   current_total_67bf5f72: "現在の合計:"
   curve_grades_b7a75443: 分布曲線に基づいた評価
@@ -5479,7 +5500,8 @@ ja:
     icon_url: "アイコンの URL:"
     key_name: "鍵名:"
     owner_email: "所有者の電子メール:"
-    redirect_uri: "リダイレクト URI:"
+    redirect_uri: "リダイレクト URI (レガシー):"
+    redirect_uris: "リダイレクト URI:"
     save_key: 鍵の保存
     tool_id: "ツール ID:"
   developer_keys: 
@@ -5862,7 +5884,9 @@ ja:
   download_this_file_669f9174: このファイルをダウンロード
   downloading_course_content_allows_access_to_conten_164d9336: コースのコンテンツをダウンロードすることは、コンテンツがオフラインの間にコンテンツにアクセスすることを可能にします。コンテンツは、ファイル、ページ、課題、議論「のトピック、クイズを含む場合があります。各コースの「ePubを生成」をクリックし、いずれかのeリーダーソフトウェアを開き、閲覧してください。
   draft_comment_b2376ea4: コメントの下書き
+  drag_and_drop_your_image_here_or_7fba7c14: 画像をここにドラッグ＆ドロップするか
   drag_to_rearrange_sections_637efee3: ドラッグしてセクションを並べ替え
+  drop_image_62a2a071: 画像をドロップ
   dropdown_option_1_e6ff2fc: "ドロップダウン オプション1"
   dropdown_option_2_9766a346: "ドロップダウン オプション2"
   due_a73610f6: 期限
@@ -5922,6 +5946,7 @@ ja:
   edit_assignment_group_c04c4af0: 課題グループの編集
   edit_assignment_name_a8f7fae1: "%{name}課題を編集"
   edit_c5fbea07: 編集
+  edit_conference_title_6e234815: "\"%{conference_title}\"を編集"
   edit_course_role_3b992fc2: コースの役割を編集
   edit_current_message_da650d4c: 現在のメッセージの編集
   edit_grading_period_e39af45d: 採点期間を編集する
@@ -6088,6 +6113,7 @@ ja:
     student: 受講生
     teacher: 講師
     teacher_assistant: TA
+  enrollment_state_7a9c55e2: 登録状況
   enrollment_term: 
     errors: 
       delete_default_term: デフォルトの期間は削除できません
@@ -6610,9 +6636,13 @@ ja:
   failed_to_import_media_objects_4c1fcb4f: "メディア オブジェクトのインポートに失敗しました"
   failed_to_log_in_7ceec561: ログインに失敗しました
   failed_to_publish_draft_comment_853761e9: ""
+  failed_to_submit_draft_comment_1de83451: 下書きコメントの提出に失敗しました
   fair_38e62237: 公正
   fair_score_554e2558: 公正なスコア
   fair_use_bee47d77: 公正な使用
+  fall_grading_period_current_score_d48c7f78: "秋期採点期間 現在のスコア"
+  fall_grading_period_final_score_56d96a8f: "秋期採点期間 最終スコア"
+  fall_grading_period_id_74ef68e: "秋期採点期間 id"
   favicon_6e658914: お気に入りアイコン
   favorites_c7e0207c: お気に入り
   feature_flags: 
@@ -6769,6 +6799,7 @@ ja:
   filter_replies_by_unread_caf870ea: 未読の返信のみを表示
   final_grade_info_2aa35d25: 最終成績についての情報
   final_grade_score_fe69a301: "最終的な成績: %{score}"
+  final_score_61e15cf3: 最終的なスコア
   find_8d605019: 検索
   find_an_existing_grading_scheme_d836ea: 既存の採点スキームの検索
   find_an_outcome_919328e6: 結果を検索する
@@ -6941,6 +6972,7 @@ ja:
     student: 受講生
     student_index: "受講生 %{index}"
     student_mute_notification: インストラクタが採点中です
+    submit: 提出
     titles: 
       click_to_record: 音声認識
       hypothetical_score: "これは what-if (仮の事態を想定した) スコアです"
@@ -7394,7 +7426,9 @@ ja:
   grading_period_8b0a4a10: 採点期間
   grading_period_close_date_precedes_end_date_7628a691: 採点期間の締切日が終了日よりも前です
   grading_period_name_31ceb3e3: 採点期間名
+  grading_period_set_f49fe74c: 採点期間のセット
   grading_period_set_for_account_name_b9823b2a: "%{account_name}の採点期間セット"
+  grading_period_set_id_f2377529: 採点期間のセットID
   grading_period_set_title_880a6ec4: 採点期間のセットタイトル
   grading_period_title_23b7f8ac: 採点期間タイトル
   grading_period_title_fa470c50: 採点期間タイトル
@@ -8001,6 +8035,9 @@ ja:
   ignore_until_new_submission_87f32b4: 新しい提出があるまで無視
   ignore_until_new_submission_90ba19b7: 新しい提出があるまで無視
   image_8ad06: 画像
+  image_id_is_not_a_valid_id_7dd6bad6: "image_id は有効な ID ではありません"
+  image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url と image_id の両方はセットできません。"
+  image_url_is_not_a_valid_url_4e31c8b0: "image_url は有効な URL ではありません"
   images: 
     error_checking_color: 画像の色の確認でエラーが発生しました
     invalid_background_color: "背景色は %{color} にする必要があります"
@@ -8054,6 +8091,9 @@ ja:
   include_deleted_objects_3cced3b5: 削除されたオブジェクトを含む;
   include_scores_when_alerting_about_grade_changes_623ec201: 成績変更に関するアラートには、スコアを記載してください。
   include_scores_when_alerting_about_grades_89728ae1: 成績に関する通知をする場合は、スコアを含むようにしてください。
+  include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
+      成績に関するアラートには、スコアを記載してください。
+      使用している電子メールが教育機関の電子メールでない場合は、機密情報を含むコンテンツが教育機関外部に送信されることになります。
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: 学校の受講生情報システムに投稿する際にこの課題の成績を含める
   include_unpublished_assignments_83ebbaec: 未公開の課題を含む
   include_unpublished_courses_7a0e7aab: 未公開のコースを含む
@@ -8250,6 +8290,7 @@ ja:
   join_group_group_name_871a5e3f: "グループ %{group_name} に参加"
   joined_group_group_name_e3802c04: "グループ %{group_name} に参加しました"
   joining_81f8b6c9: 参加しています
+  jpg_png_or_gif_files_14e360d2: "jpg、 png、または gif ファイル"
   jquery: 
     module_sequence_footer: 
       next: 次へ
@@ -8431,6 +8472,7 @@ ja:
   linked_assignment_message: "課題 '%{title}' とリンクされています"
   linked_discussion_topic_message: "ディスカッション トピック '%{title}' とリンクされています"
   linked_quiz_message: "クイズ '%{title}' とリンクされています"
+  linked_with_wiki_page_title_b17c3521: "ウィキページ '%{title}' とリンクされています"
   linkedin_5726caca: LinkedIn
   links: 
     dashboard: "マイ ダッシュボード"
@@ -10422,6 +10464,7 @@ ja:
         tweet: "Canvas アラート - 録音の準備ができました: %{title}, %{name}"
   mexico_52_60d635c7: "メキシコ (+52)"
   mexico_b2d7a271: メキシコ
+  mgp_grade_export_d29b471f: "MGP 成績のエクスポート"
   migration: 
     announcement_type: アナウンス
     assignment_group_type: 課題グループ
@@ -10675,6 +10718,7 @@ ja:
   must_mark_as_done_bf6cc563: 完了にする必要があります
   must_mark_assignment_as_done_e3e4af88: 課題を完了にする必要があります
   must_mark_this_module_item_done_in_order_to_comple_ca3c390f: 完了するには、このモジュールアイテムを終了としてマークする必要があります
+  must_provide_a_valid_url_26fe7e15: "有効な url を提供してください。"
   must_score_at_least_a_score_3b4f813d: "スコアは最低 %{score} でなければならない"
   must_score_at_least_points_points_16a7548e: "スコアは最低 %{points} 点である必要があります"
   must_score_at_least_score_to_complete_this_module__b86b5101: "このモジュールアイテムを完了するには、スコアは最低 %{score} でなければなりません"
@@ -10709,7 +10753,10 @@ ja:
   name_3806192d: "名前:"
   name_app_has_been_deleted_fb2d9426: "%{name} アプリは削除されました"
   name_badfe525: 名前
+  name_current_score_b3198dfa: "%{name} の現在のスコア"
   name_error_fee4236: 名前エラー
+  name_final_score_2dce3ff8: "%{name} の最終スコア"
+  name_grading_period_id_c9c8b6ae: "%{name} の採点期間 id"
   name_has_been_successfully_installed_but_has_not_y_c3148b96: "*名前* は正常にインストールされましたが、まだ有効化されていません。"
   name_is_currently_status_9065c996: "*名前* は現在 **状況** です。"
   name_is_required_ba379522: 名前は必須項目です
@@ -10733,11 +10780,13 @@ ja:
   new_13daf639: 新規
   new_account_role_6e5c4964: 新しいアカウントの役割
   new_annotations_66932016: 新しい注釈
+  new_announcement_23af4598: 新しいアナウンス
   new_announcement_title_course_da7c0ca6: "新しいアナウンス %{title}、%{course}"
   new_appointment_timeslots_are_available_for_signup_a3e3f964: 新しい予約の時間スロットがサインアップ可能になりました
   new_assignment_for_course_name_f71dd337: "%{course_name} への新しい課題"
   new_comment_for_discussion_topic_course_38febf3b: "%{discussion_topic} への新しいコメント、%{course}"
   new_comment_on_announcement_discussion_topic_cours_7905b782: "アナウンスへの新規コメント %{discussion_topic}, %{course}"
+  new_conference_8b483024: 新しい会議
   new_conferences_a020a8a9: 新しい会議
   new_course_role_6a7bb75f: 新しいコースの役割
   new_event_for_course_name_2ba1f734: "%{course_name} の新しいイベント"
@@ -10776,6 +10825,7 @@ ja:
   no_final_grade_selected_3595c9c: 最終の成績が選択されていません
   no_grade_3fa326c: 成績なし
   no_grade_assigned_90e531f5: 採点が割り当てられていません。
+  no_grading_periods_configured_for_this_term_ca22393e: この期間に設定された採点期間はありません
   no_grading_schemes_to_display_8b0e92e7: 表示する採点スキームがありません
   no_icon_1f6ea5f4: アイコンはありません
   no_items_in_module_21f111a2: モジュールにアイテムはありません
@@ -10821,6 +10871,7 @@ ja:
   notes_c42e0fd5: 注意
   notes_for_name_2eefac11: "%{name}へのメモ"
   nothing_to_split_off_of_this_user_28ba9dd5: このユーザーの分割はありません
+  notice_concluded_student_6d416c4: "注意： 完了済みの受講生"
   notice_inactive_student_bcc4248a: "注意: 非アクティブの受講生"
   notification: 
     added_to_conversation_description: 会話に追加されました
@@ -10892,16 +10943,11 @@ ja:
     files_description: コースに新しいファイルが追加されました
     files_display: ファイル
     grading_description: |-
-        次の内容を含みます。
+        以下を含みます：
         
-        * 入力または変更された課題/提出物の成績
-        * ミュート解除された課題の成績
-        * 変更された成績の重み付け
-        
-        
-        
-        お知らせに成績を表示する場合は、[成績変更に関するアラートには、スコアを記載してください] チェックボックスをオンにします。
-        オンにすると、使用している電子メールが教育機関の電子メールでない場合は、機密情報を含むコンテンツが教育機関外部に送信されることになります。
+        * 課題/提出物の成績入力済み/変更済み
+        * 消音解除された課題の成績
+        * 成績の重み付けが変更されました
     grading_display: 採点
     grading_notify_include_grade: 成績変更に関するアラートには、スコアを記載してください。
     grading_policies_description: コースの採点方針の変更
@@ -11748,6 +11794,9 @@ ja:
         download_url: "LockDown ブラウザのダウンロード URL"
         plugin_enabled: 使用可能
         use_lti_tool: "LTI ツールを使用して、LockDown Browser のクイズ設定を管理する (監視に必要)"
+    mathman: 
+      description: "LaTeX 形式をMathML と SVG に変換するシンプルなマイクロサービス"
+      name: MathMan
     med_cornell_export: 
       labels: 
         password: 認証用パスワード
@@ -11910,6 +11959,7 @@ ja:
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "コンマキー、またはシフト + クエスチョンマークを押して、キーボードのショートカットのリストを表示する。　 "
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "コンマキー、またはシフト + ？を押して、キーボードのショートカットのリストを表示する。　"
   press_the_esc_key_to_close_this_modal_14d10601: エスケープキーを押して、このモーダルを閉じてください
+  prev_month_34bd934c: 前月
   preview_53003fd2: プレビュー
   preview_your_changes_373557d8: 変更をプレビュー
   previous_bd2ac015: 前へ
@@ -13821,6 +13871,7 @@ ja:
   remove_f47dc62a: 削除
   remove_filename_87f3781e: "%{filename}を削除"
   remove_icon_a4646413: アイコンを削除
+  remove_image_341340b3: 画像を削除
   remove_recipient_name_a6b83cef: "受信者%{name}を削除する"
   remove_row_c198da5a: 行を削除
   remove_row_f9d59cba: 行を削除
@@ -14239,6 +14290,7 @@ ja:
   search_by_user_dd3ad189: ユーザで検索
   search_courses_591bc900: コースを検索中...
   search_entries_or_author_63fb0a86: エントリまたは作成者を検索
+  search_flickr_6f28b02e: "flickr を検索"
   search_for_files_7541fb28: ファイルの検索
   search_grading_periods_e947a3e9: 採点期間を検索...
   search_groups_or_people_6c15d6ad: グループまたはメンバーを検索
@@ -14272,9 +14324,12 @@ ja:
     status: 
       confirming_course: "%{course_name} を確認しています..."
       removing_crosslisting_of_section: セクションのクロスリスティングを除去しています...
+  section_84b5391: セクション
   section_ends_at_bb9df3c0: セクションの終了日は
   section_filter_cde54d0a: セクションフィルター
+  section_id_6f73f3d5: "セクション id"
   section_name_b6d82574: セクション名
+  section_sis_94511bcd: "セクション sis"
   section_starts_at_65eaed1: セクションの開始日は
   sections: 
     section_created: セクションは正常に作成されました!
@@ -15318,6 +15373,9 @@ ja:
   speedgrader_settings_c9503705: "Speedgrader の設定"
   speedgrader_tm_44688790: SpeedGrader™
   spreadsheet_6d622119: スプレッドシート
+  spring_grading_period_current_score_7083cf0d: 春期採点期間の現在のスコア
+  spring_grading_period_final_score_386d92f7: 春期採点期間の最終スコア
+  spring_grading_period_id_61aec82c: "春期採点期間 id"
   sr_gradebook: 
     all_grading_periods: すべての採点期間
     all_sections: すべてのセクション
@@ -15388,11 +15446,13 @@ ja:
       これにより、アカウントの新しい受講生グループ ページが有効になります。新しいページでは、グループのサインアップをより動的に
       行うことができます。
   student_id: "受講生 ID"
+  student_id_7cc45fb5: "受講生 ID"
   student_interactions_report_7717b685: 受講生の交流レポート
   student_messages_b0a242d: 受講生のメッセージ
   student_must_complete_all_of_these_requirements_656771d6: 学生は、これらすべての必要項目を完了する必要があります。
   student_must_complete_one_of_these_requirements_6046eb3a: 学生は、これらの必要項目のうちの1つを完了する必要があります。
   student_name: 受講生名
+  student_name_b446c661: 受講生名
   student_name_c45b2a7: 受講生名
   student_name_hidden_b894d102: 受講生(名前は非表示)
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: 匿名採点が要求されているので、受講者名は非表示である必要があります。
@@ -15401,6 +15461,7 @@ ja:
       受講生は、受講生の学習達成度の成績表を使用して、コース学習成果の進捗を簡単に表示できます。
       成果は成績表のような形式で表示され、進捗が数字のスコアおよび達成/ほぼ達成/ 補習として
       表示されます。
+  student_sis_d9f0cd39: "受講生 sis"
   student_summary: 
     student_summary_table_ascending: "%{sortText} の昇順で並べ替えられた受講生概要の表"
     student_summary_table_descending: "%{sortText} の降順で並べ替えられた受講生概要の表"
@@ -15683,8 +15744,11 @@ ja:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: Canvasでのイベントを、いつ、どのように通知してほしいかを教えてください。
   templates_4ca13d07: テンプレート
   tenant_d2a41f78: テナント
+  term_41f37cae: 期間
   term_created_27d27c2b: 作成された期間
   term_e1c1d390: 期間
+  term_id_74b933ef: "期間 ID"
+  term_sis_7edb8ab7: "期間 sis"
   term_start_b8c2aad1: 期間の開始日
   term_starting_5bd5e070: 開始になる期間
   terms: 
@@ -15833,9 +15897,11 @@ ja:
   there_was_a_problem_submitting_your_set_27ca2ed0: セットの送信中に問題が発生しました
   there_was_an_error_generating_the_tool_launch_fb3f47ac: ツールの起動を生成中にエラーが発生しました
   there_was_an_error_in_processing_your_request_6513a49a: 要求を処理する際にエラーが発生しました
+  there_was_an_error_retrieving_the_course_image_d7ea094d: コース画像を取得する際にエラーが発生しました
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: コースへの変更を保存中にエラーが発生しました
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: メモを保存中にエラーが発生しました。もう一度やり直してください。
   there_was_an_error_setting_usage_rights_53739e1d: 使用権を設定する際にエラーが発生しました。
+  there_was_an_error_uploading_the_image_932fc4ce: 画像のアップロード中にエラーが発生しました
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "あなたのクエリーにエラーが発生しました; 違う検索でやり直してください"
   there_were_errors_with_the_form_errors_ab5b559a: "フォームにエラーがあります: %{errors}"
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: これらの採点期間は、管理者によってあなたのために作製されました。
@@ -15890,6 +15956,7 @@ ja:
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "このレコーダーは、 Flashを使用します。結果、あなたのローカルマシンにレコーディングを行いやすくなり、メディアアップローダータブを使用して、それをアップロードします。"
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "このレポートは、期間のすべてのコースを表示します。結果として得られるCSVファイルは、各コースにつき一行を使用して、コースID、コースSIS ID、コースの省略名、コース名、アカウントID、アカウント名、MBで使用されたストレージ、そしてMBのすべてのファイルの合計を表示します。使用されるストレージは、コースの割り当てに反するすべてのファイルを反映します。コースのすべてのファイルの合計は、コース割当てへの影響には関係なく、コースにあるすべてのファイルの合計となります。"
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "このレポートでは、指定した期間のすべてのコースが示されます。生成される CSV ファイルは、コースごとに 1 行を使用して、コース ID、コース SIS ID、コースの省略名、コース名、アカウントID、アカウントSIS ID、アカウント名、MBで使用されたストレージが表示されます。"
+  this_report_shows_grading_period_grades_and_overal_a86346a: "このレポートでは、指定した期間に登録したすべての受講生の採点期間の成績(およびコース全体の成績)が示されます。生成される csv ファイルでは、登録ごとに 1 行を使用します。"
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: このサンプルページでは、カスタムブランドの構築をサポートするために、キャンバスで共通のUIエレメントが含まれています。一旦、左のサイドバーで色の値と画像への変更を開始したら、*「あなたの変更を表示」*ボタンが表示されます。それをクリックし、このページをリフレッシュし、どのように変更されたかを見てください。
   this_student_s_responses_are_hidden_because_this_a_252e8335: この課題は匿名なので、この受講生の応答は表示されません。
   this_student_wrote_f1a3f22d: "この受講生の記述:"
@@ -16137,6 +16204,7 @@ ja:
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: 特定のGoogleアプリドメインからのユーザーを背一減するには、ここにドメインを入力してください。
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "Azure Active Directoryのユーザーを制限するには、ここにあなたのテナントを入力してください。"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "課題を表示するには、*アジェンダ* ビューがアクティブであることを確認します。"
+  today_76e10f9c: 本日
   toggle_dashcard_view_or_recent_activity_stream_1de257: トグルダッシュカードビュー、または最近のアクティビティーストリーム
   toggle_editing_answer_text_as_html_9a93fe6: "回答テキストを HTML として編集するかどうか"
   toggle_style_checkbox_1cce5eea: トグルスタイルのチェックボックス
@@ -16190,6 +16258,7 @@ ja:
     originality_report_visible_immediately: ただちに
   twitter_fcef6b54: Twitter
   type_c8106334: タイプ
+  type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}'は有効な画像形式ではありません(jpg、 png、またはgifをお試しください)"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "うわー！フレンドリーなCatalog開発者に連絡してください。 エラーメッセージ: %{message}"
   unable_to_accept_update_fd53a7e2: 更新を受け入れることができません
   unable_to_dismiss_update_df1e32eb: 解散の更新ができません
@@ -16284,6 +16353,8 @@ ja:
   usage_rights_have_been_set_d1b433c7: 使用権が設定されています。
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "次に含まれるすべてのファイルに使用権が設定されます:"
   use_default_890939b7: デフォルトを使用
+  use_mathman_to_convert_latex_to_mathml_680ef7b0: "MathMan を使用して、LaTeX から MathML に変換しますか？"
+  use_mathman_to_convert_latex_to_svg_3f61c9b: "MathMan を使用して、LaTeX から SVG に変換しますか？"
   use_new_folder_tree_in_files_bc0ea09f: ファイル中の新しいフォルダツリーを使う
   use_new_folder_tree_in_files_eb5a451b: ファイル中の新しいフォルダツリーを使う
   use_remote_service_for_notifications_9fe667c6: 通知にリモートサービスを使用する
@@ -16993,7 +17064,9 @@ ja:
   you_are_currently_masquerading_as_user_name_f4a00ade: "現在、%{user_name} としてマスカレードしています"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "%{institution2} からの資格情報を使用して %{institution1} にログインしています"
   you_are_not_enrolled_in_any_courses_a5c63286: どのコースにも登録していません。
+  you_are_not_subscribed_to_this_topic_click_to_subs_38ce1f37: このトピックを購読していません。購読するにはクリックしてください。
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: あなたは登録されているので、新しいコメントの通知を受け取ります。クリックして、登録を抹消
+  you_are_subscribed_to_this_topic_click_to_unsubscr_d6c09364: このトピックを購読しています。購読を中止するにはクリックしてください。
   you_are_the_group_leader_for_this_group_b8629b70: "あなたはこのグループのグループ リーダーです"
   you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: "あなたはセキュリティで保護されたサイト (キャンバス)の中から安全でないコンテンツを起動しようとしています。一部のウェブブラウザでは、このコンテンツをロードができない可能性があります。"
   you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: あなたは登録されていないので、新しいコメントの通知を受け取りません。クリックして登録
