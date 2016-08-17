@@ -2033,7 +2033,7 @@ class CoursesController < ApplicationController
   #   If this option is set to true, the course will be available to students
   #   immediately.
   #
-  # @argument event [String, "claim"|"offer"|"conclude"|"delete"|"undelete"]
+  # @argument course[event] [String, "claim"|"offer"|"conclude"|"delete"|"undelete"]
   #   The action to take on each course.
   #   * 'claim' makes a course no longer visible to students. This action is also called "unpublish" on the web site.
   #     A course cannot be unpublished if students have received graded submissions.
