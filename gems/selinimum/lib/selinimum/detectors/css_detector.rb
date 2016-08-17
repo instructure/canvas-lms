@@ -44,9 +44,9 @@ module Selinimum
 
       def finder
         @finder ||= begin
-          finder = IO.popen("#{File.dirname(__FILE__)}/../../../bin/find_css_bundles", "r+")
+          finder = IO.popen("#{File.dirname(__FILE__)}/../../../bin/find_css_bundles 2>&-", "r+")
           finder.puts DIRECTORY
-          result = finder.readline.strip
+          result = finder.readline.strip rescue nil
           raise "error starting bin/find_css_bundles: #{result}" if result != "Ready"
           finder
         end
