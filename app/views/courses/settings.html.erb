@@ -115,7 +115,7 @@
           <td class="form-label"><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>
           <td>
             <% if can_manage && can_do(@context, @current_user, :manage_sis) %>
-              <%= f.text_field :sis_source_id, :style => "width: 50px;", :title => t('sis_source_id', "SIS ID"), :value => @context.sis_source_id %>
+              <%= f.text_field :sis_source_id, :style => "width: 202px;", :title => t('sis_source_id', "SIS ID"), :value => @context.sis_source_id %>
             <% else %>
               <span id="course_sis_source_id">
                 <%= @context.sis_source_id %>
