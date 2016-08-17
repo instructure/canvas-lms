@@ -89,6 +89,58 @@ class ContextModulesController < ApplicationController
     end
   end
 
+  def choose_mastery_path
+    if authorized_action(@context, @current_user, :participate_as_student)
+      id = params[:id]
+      item = @context.context_module_tags.not_deleted.find(params[:id])
+
+      if item.present? && item.published? && item.context_module.published?
+        rule = ConditionalRelease::Service.rules_for(@context, @current_user, item, session).try(:first)
+
+        # locked assignments always have 0 sets, so this check makes it not return 404 if locked
+        # but instead progress forward and return a warning message if is locked later on
+        if rule.present? && (rule[:locked] || rule[:assignment_sets].length > 1)
+          if !rule[:locked]
+            options = rule[:assignment_sets].map { |set|
+              option = {
+                setId: set[:id]
+              }
+
+              option[:assignments] = set[:assignments].map { |a|
+                assg = a[:model]
+                assg[:assignmentId] = a[:assignment_id]
+                assg
+              }
+
+              option
+            }
+
+            js_env({
+              CHOOSE_MASTERY_PATH_DATA: {
+                options: options,
+                selectedOption: rule[:selected_set_id],
+                courseId: @context.id,
+                moduleId: item.context_module.id,
+                itemId: id
+              }
+            })
+
+            css_bundle :choose_mastery_path
+            js_bundle :choose_mastery_path
+
+            @page_title = join_title(t('Choose Assignment Set'), @context.name)
+
+            return render :text => '', :layout => true
+          else
+            flash[:warning] = t('Module Item is locked.')
+            return redirect_to named_context_url(@context, :context_context_modules_url)
+          end
+        end
+      end
+      return render status: 404, template: 'shared/errors/404_message'
+    end
+  end
+
   def item_redirect
     if authorized_action(@context, @current_user, :read)
       @tag = @context.context_module_tags.not_deleted.find(params[:id])
