@@ -150,5 +150,17 @@ describe LearningOutcomeResult do
       expect(learning_outcome_result.percent).to eq 0.5143
     end
 
+    it "does not fail if parent outcome has integers instead of floats" do
+      learning_outcome_result.learning_outcome.stubs({
+        points_possible: 5, mastery_points: 3
+      })
+      learning_outcome_result.alignment.stubs(mastery_score: 0.7)
+      learning_outcome_result.update_attribute(:score, 6)
+      learning_outcome_result.update_attribute(:possible, 10)
+      learning_outcome_result.calculate_percent!
+
+      expect(learning_outcome_result.percent).to eq 0.5143
+    end
+
   end
 end
