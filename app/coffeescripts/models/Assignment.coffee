@@ -82,6 +82,9 @@ define [
     canFreeze: =>
       @get('frozen_attributes')? && !@frozen()
 
+    canDelete: =>
+      !@hasDueDateInClosedGradingPeriod() && !@frozen()
+
     freezeOnCopy: =>
       @get('freeze_on_copy')
 
@@ -90,6 +93,9 @@ define [
 
     frozenAttributes: =>
       @get('frozen_attributes') || []
+
+    hasDueDateInClosedGradingPeriod: =>
+      @get('has_due_date_in_closed_grading_period')
 
     gradingType: (gradingType) =>
       return @get('grading_type') || 'points' unless gradingType
@@ -314,7 +320,7 @@ define [
         'acceptsOnlineTextEntries', 'acceptsOnlineURL', 'allowedExtensions',
         'restrictFileExtensions', 'isOnlineSubmission', 'isNotGraded',
         'isExternalTool', 'externalToolUrl', 'externalToolNewTab',
-        'turnitinAvailable','turnitinEnabled',
+        'turnitinAvailable','turnitinEnabled', 'hasDueDateInClosedGradingPeriod',
         'gradeGroupStudentsIndividually', 'groupCategoryId', 'frozen',
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
         'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',

@@ -107,7 +107,7 @@ define [
 
     ENV.POST_TO_SIS = options.post_to_sis
 
-    view = new AssignmentListItemView(model: model)
+    view = new AssignmentListItemView(model: model, userIsAdmin: options.userIsAdmin)
     view.$el.appendTo $('#fixtures')
     view.render()
 
@@ -202,6 +202,18 @@ define [
 
     ok window.confirm.called
     ok view.delete.called
+
+  test 'does not attempt to delete an assignment due in a closed grading period', ->
+    @model.set('has_due_date_in_closed_grading_period', true)
+    view = createView(@model)
+
+    @stub(window, "confirm", -> true )
+    @spy view, "delete"
+
+    view.$("#assignment_#{@model.id} .delete_assignment").click()
+
+    ok window.confirm.notCalled
+    ok view.delete.notCalled
 
   test "delete destroys model", ->
     old_asset_string = ENV.context_asset_string
@@ -303,10 +315,31 @@ define [
 
     equal document.activeElement, trigger.get(0)
 
-  test "assignment cannot be deleted if frozen", ->
+  test "disallows deleting frozen assignments", ->
     @model.set('frozen', true)
     view = createView(@model)
-    ok !view.$("#assignment_#{@model.id} a.delete_assignment").length
+    ok view.$("#assignment_#{@model.id} a.delete_assignment.disabled").length
+
+  test "disallows deleting assignments due in closed grading periods", ->
+    @model.set('has_due_date_in_closed_grading_period', true)
+    view = createView(@model)
+    ok view.$("#assignment_#{@model.id} a.delete_assignment.disabled").length
+
+  test "allows deleting non-frozen assignments not due in closed grading periods", ->
+    @model.set('frozen', false)
+    @model.set('has_due_date_in_closed_grading_period', false)
+    view = createView(@model)
+    ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
+
+  test "allows deleting frozen assignments for admins", ->
+    @model.set('frozen', true)
+    view = createView(@model, userIsAdmin: true)
+    ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
+
+  test "allows deleting assignments due in closed grading periods for admins", ->
+    @model.set('has_assignment_due_in_closed_grading_period', true)
+    view = createView(@model, userIsAdmin: true)
+    ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
 
   test "allows publishing", ->
     #setup fake server

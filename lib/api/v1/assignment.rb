@@ -86,6 +86,8 @@ module Api::V1::Assignment
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
+    hash['has_due_date_in_closed_grading_period'] =
+      assignment.due_for_any_student_in_closed_grading_period?
 
     if !opts[:overrides].blank?
       hash['overrides'] = assignment_overrides_json(opts[:overrides], user)

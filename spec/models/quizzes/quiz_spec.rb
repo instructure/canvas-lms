@@ -1719,6 +1719,190 @@ describe Quizzes::Quiz do
     end
   end
 
+  describe "#grants_right?" do
+    before(:once) do
+      quiz_model(course: @course)
+      @admin = account_admin_user()
+      teacher_in_course(:course => @course)
+      @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
+      @grading_period_group.enrollment_terms << @course.enrollment_term
+      @course.enrollment_term.save!
+      @quiz.reload
+
+      @grading_period_group.grading_periods.create!({
+        title: "Closed Grading Period",
+        start_date: 5.weeks.ago,
+        end_date: 3.weeks.ago,
+        close_date: 1.week.ago
+      })
+      @grading_period_group.grading_periods.create!({
+        title: "Open Grading Period",
+        start_date: 3.weeks.ago,
+        end_date: 1.week.ago,
+        close_date: 1.week.from_now
+      })
+    end
+
+    context "to delete" do
+      before(:each) do
+        @course.root_account.enable_feature!(:multiple_grading_periods)
+      end
+
+      context "when multiple grading periods is disabled" do
+        it "is true for admins" do
+          @course.root_account.disable_feature!(:multiple_grading_periods)
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+        end
+
+        it "is false for teachers" do
+          @course.root_account.disable_feature!(:multiple_grading_periods)
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+        end
+      end
+
+      context "when the quiz is due in a closed grading period" do
+        before(:once) do
+          @quiz.update_attributes(due_at: 4.weeks.ago)
+        end
+
+        it "is true for admins" do
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+        end
+
+        it "is false for teachers" do
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(false)
+        end
+      end
+
+      context "when the quiz is due in an open grading period" do
+        before(:once) do
+          @quiz.update_attributes(due_at: 2.weeks.ago)
+        end
+
+        it "is true for admins" do
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+        end
+
+        it "is true for teachers" do
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+        end
+      end
+
+      context "when the quiz is due after all grading periods" do
+        before(:once) do
+          @quiz.update_attributes(due_at: 1.day.from_now)
+        end
+
+        it "is true for admins" do
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+        end
+
+        it "is true for teachers" do
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+        end
+      end
+
+      context "when the quiz is due before all grading periods" do
+        before(:once) do
+          @quiz.update_attributes(due_at: 6.weeks.ago)
+        end
+
+        it "is true for admins" do
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+        end
+
+        it "is true for teachers" do
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+        end
+      end
+
+      context "when the quiz has no due date" do
+        before(:once) do
+          @quiz.update_attributes(due_at: nil)
+        end
+
+        it "is true for admins" do
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+        end
+
+        it "is true for teachers" do
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+        end
+      end
+
+      context "when the quiz is due in a closed grading period for a student" do
+        before(:once) do
+          @quiz.update_attributes(due_at: 2.days.from_now)
+          override = @quiz.assignment_overrides.build
+          override.set = @course.default_section
+          override.override_due_at(4.weeks.ago)
+          override.save!
+        end
+
+        it "is true for admins" do
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+        end
+
+        it "is false for teachers" do
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(false)
+        end
+      end
+
+      context "when the quiz is overridden with no due date for a student" do
+        before(:once) do
+          @quiz.update_attributes(due_at: nil)
+          override = @quiz.assignment_overrides.build
+          override.set = @course.default_section
+          override.save!
+        end
+
+        it "is true for admins" do
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+        end
+
+        it "is true for teachers" do
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+        end
+      end
+
+      context "when the quiz has a deleted override in a closed grading period for a student" do
+        before(:once) do
+          @quiz.update_attributes(due_at: 2.days.from_now)
+          override = @quiz.assignment_overrides.build
+          override.set = @course.default_section
+          override.override_due_at(4.weeks.ago)
+          override.save!
+          override.destroy
+        end
+
+        it "is true for admins" do
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+        end
+
+        it "is true for teachers" do
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+        end
+      end
+
+      context "when the quiz is overridden with no due date and is only visible to overrides" do
+        before(:once) do
+          @quiz.update_attributes(due_at: 4.weeks.ago, only_visible_to_overrides: true)
+          override = @quiz.assignment_overrides.build
+          override.set = @course.default_section
+          override.save!
+        end
+
+        it "is true for admins" do
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+        end
+
+        it "is true for teachers" do
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+        end
+      end
+    end
+  end
+
   describe "#available?" do
     before :once do
       @quiz = @course.quizzes.create!(title: 'Test Quiz')

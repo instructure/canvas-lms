@@ -93,6 +93,12 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       )
     end
 
+    it "includes has_due_date_in_closed_grading_period in returned json" do
+      @course.assignments.create!(title: "Example Assignment")
+      json = api_get_assignments_index_from_course(@course)
+      expect(json.first).to have_key('has_due_date_in_closed_grading_period')
+    end
+
     it "sorts the returned list of assignments" do
       # the API returns the assignments sorted by
       # [assignment_groups.position, assignments.position]
@@ -501,6 +507,12 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         expect(@json.has_key?('published')).to be_truthy
         expect(@json['published']).to be_falsey
       end
+
+      it "includes has_due_date_in_closed_grading_period in returned json" do
+        @course.assignments.create!(title: "Example Assignment")
+        json = api_get_assignment_in_course(@assignment, @course)
+        expect(json).to have_key('has_due_date_in_closed_grading_period')
+      end
     end
 
     describe "differentiated assignments" do
@@ -663,22 +675,17 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
 
     it "returns due dates as they apply to the user" do
-        course_with_student(:active_all => true)
-        @user = @student
-        @student.enrollments.map(&:destroy_permanently!)
-        @assignment = @course.assignments.create!(
-          :title => "Test Assignment",
-          :description => "public stuff"
-        )
-        @section = @course.course_sections.create! :name => "afternoon delight"
-        @course.enroll_user(@student,'StudentEnrollment',
-                            :section => @section,
-                            :enrollment_state => :active)
-        override = create_override_for_assignment
-        json = api_get_assignments_index_from_course(@course).first
-        expect(json['due_at']).to eq override.due_at.iso8601.to_s
-        expect(json['unlock_at']).to eq override.unlock_at.iso8601.to_s
-        expect(json['lock_at']).to eq override.lock_at.iso8601.to_s
+      course_with_student(active_all: true)
+      @user = @student
+      @student.enrollments.map(&:destroy_permanently!)
+      @assignment = @course.assignments.create!(title: "Test Assignment", description: "public stuff")
+      @section = @course.course_sections.create!(name: "afternoon delight")
+      @course.enroll_user(@student, "StudentEnrollment", section: @section, enrollment_state: :active)
+      override = create_override_for_assignment
+      json = api_get_assignments_index_from_course(@course).first
+      expect(json['due_at']).to eq override.due_at.iso8601.to_s
+      expect(json['unlock_at']).to eq override.unlock_at.iso8601.to_s
+      expect(json['lock_at']).to eq override.lock_at.iso8601.to_s
     end
 
     it "returns original assignment due dates" do

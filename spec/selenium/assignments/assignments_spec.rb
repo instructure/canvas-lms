@@ -386,14 +386,15 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments"
         fj("#ag_#{@frozen_assign.assignment_group_id}_manage_link").click
         wait_for_ajaximations
-        expect(f("div#assignment_group_#{@frozen_assign.assignment_group_id}")).not_to contain_css("a.delete_group")
+        element = f("div#assignment_group_#{@frozen_assign.assignment_group_id}")
+        expect(element).to contain_css("a.delete_group.disabled")
       end
 
       it "should not allow deleting a frozen assignment from index page", priority:"2", test_id: 649309 do
         get "/courses/#{@course.id}/assignments"
         fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
         wait_for_ajaximations
-        expect(f("div#assignment_#{@frozen_assign.id}")).not_to contain_jqcss("a.delete_assignment:visible")
+        expect(f("div#assignment_#{@frozen_assign.id}")).to contain_css("a.delete_assignment.disabled")
       end
 
       it "should allow editing the due date even if completely frozen", priority: "2", test_id: 649310 do
