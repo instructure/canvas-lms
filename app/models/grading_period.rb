@@ -94,11 +94,13 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def last?
-    grading_period_group
+    # should never be nil, because self is part of the potential set
+    @last_period ||= grading_period_group
       .grading_periods
       .active
-      .sort_by(&:end_date)
-      .last == self
+      .order(end_date: :desc)
+      .first
+    @last_period == self
   end
   alias_method :is_last, :last?
 
