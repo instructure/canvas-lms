@@ -72,10 +72,12 @@ module ActiveSupport::Callbacks
     #   end
     #
     def suspended_callback?(callback, kind, type=nil)
-      instance_variable_defined?(:@suspended_callbacks) &&
+      val = suspended_callbacks_defined? &&
         suspended_callbacks.include?(callback, kind, type) ||
       suspended_callback_ancestor &&
         suspended_callback_ancestor.suspended_callback?(callback, kind, type)
+
+      val
     end
 
     def suspended_callback_ancestor
@@ -86,11 +88,31 @@ module ActiveSupport::Callbacks
       @suspended_callback_ancestor
     end
 
-    def suspended_callbacks
-      @suspended_callbacks ||= Registry.new
+    module ClassMethods
+      def suspended_callbacks_defined?
+        # If this is a class, we need to save the suspension state in thread
+        # storage to remain thread safe. We could also instead store a Hash on
+        # the class of <Thread, Hash>, but that would grow indefinitely as threads
+        # will grow faster than number of classes.
+        all_classes_state = Thread.current[:suspended_callbacks]
+        all_classes_state && all_classes_state[self]
+      end
+
+      def suspended_callbacks
+        all_classes_state = Thread.current[:suspended_callbacks] ||= {}
+        all_classes_state[self] ||= Registry.new
+      end
     end
 
     module InstanceMethods
+      def suspended_callbacks_defined?
+        instance_variable_defined?(:@suspended_callbacks)
+      end
+
+      def suspended_callbacks
+        @suspended_callbacks ||= Registry.new
+      end
+
       protected
       # as ActiveSupport::Callbacks#run_callbacks, but with the step filtering on
       # suspended_callback? added
@@ -171,6 +193,7 @@ module ActiveSupport::Callbacks
 
     def self.included(base)
       base.extend self
+      base.extend(ClassMethods)
       base.send(:include, InstanceMethods)
     end
   end
