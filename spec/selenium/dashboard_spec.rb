@@ -171,7 +171,7 @@ describe "dashboard" do
                                                  :end_at => Date.today + 1.day)
       a2 = @course.account.announcements.create!(:subject => 'test 2',
                                                  :message => "another annoucement",
-                                                 :start_at => Date.today - 1.day,
+                                                 :start_at => Date.today - 2.days,
                                                  :end_at => Date.today + 1.day)
 
       get "/"
