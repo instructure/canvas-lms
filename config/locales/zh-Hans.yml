@@ -6794,7 +6794,7 @@ zh-Hans:
   filter_replies_by_unread_caf870ea: 按未读过滤回复
   final_grade_info_2aa35d25: 最终成绩信息
   final_grade_score_fe69a301: "最终成绩: %{score}"
-  final_score_61e15cf3: 最后得分
+  final_score_61e15cf3: 最终分数
   find_8d605019: 查找
   find_an_existing_grading_scheme_d836ea: 查找现存的评分方案
   find_an_outcome_919328e6: 寻找一个成果
@@ -10754,7 +10754,7 @@ zh-Hans:
   name_badfe525: 名字、名称
   name_current_score_b3198dfa: "%{name} 目前的得分"
   name_error_fee4236: 名称错误
-  name_final_score_2dce3ff8: "%{name} 最后的得分"
+  name_final_score_2dce3ff8: "%{name} 最终的得分"
   name_grading_period_id_c9c8b6ae: "%{name} 评分周期 id"
   name_has_been_successfully_installed_but_has_not_y_c3148b96: "*名称* 已成功安装，但尚未启用。"
   name_is_currently_status_9065c996: "*名称* 目前的状态为 **状态**。"
@@ -15382,7 +15382,7 @@ zh-Hans:
   speedgrader_tm_44688790: SpeedGrader™
   spreadsheet_6d622119: 电子表格
   spring_grading_period_current_score_7083cf0d: 春季成绩周期的当前得分
-  spring_grading_period_final_score_386d92f7: 春季成绩周期的最后得分
+  spring_grading_period_final_score_386d92f7: 春季成绩周期的最终得分
   spring_grading_period_id_61aec82c: "春季成绩周期 id"
   sr_gradebook: 
     all_grading_periods: 所有评分期限
