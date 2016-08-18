@@ -313,8 +313,11 @@ ko:
         event_source: 원본
         event_type: 유형
         no_item_found: "항목을 찾을 수 없음"
+        select_default: "과목 선택"
+        select_label: "과목 선택"
         time: 시간
         user: 사용자
+      course_search_form: 
         select_default: "과목 선택"
         select_label: "과목 선택"
       course_search_results: 
@@ -2266,7 +2269,6 @@ ko:
   choose_a_csv_file_to_upload_9644480c: "업로드할 CSV 파일 선택:"
   close_d634289d: 닫기
   collaboration: 
-    default_title: "이름 없는 협업"
     collaboration: 
       delete: "이 대화를 삭제하시겠습니까?"
       links: 
@@ -2277,6 +2279,75 @@ ko:
           other: "참여자 *%{count}*명"
       titles: 
         collaboration: 협업
+    collaborator_picker: 
+      labels: 
+        available_groups: "사용 가능한 그룹"
+        available_users: "사용 가능한 사용자"
+        collaborate_with: "협업 상대:"
+        collaboration_members: "협업 멤버"
+        groups: 그룹
+        loading: "로드 중"
+        people: 사용자
+        remove_all: "모두 제거"
+      member_instructions: "협업을 추가하려면 왼쪽 열에 있는 사용자나 그룹을 클릭하거나 두드리십시오."
+    default_title: "이름 없는 협업"
+    edit: 
+      buttons: 
+        cancel: 취소
+        update: "협업 업데이트"
+      labels: 
+        description: "설명:"
+        title: "협업 제목"
+    errors: 
+      cannot_load_collaboration: "협업을 로드할 수 없음"
+      create_failed: "협업 만들기 실패"
+      no_name: "이 문서의 이름 입력"
+      not_enabled: "이 Canvas 사이트는 협업을 사용하지 않음"
+      title_too_long: "이름은 %{maxLength} 글자 이내로 지어주시기 바랍니다. 추가 내용은 설명을 사용하십시오."
+      update_failed: "협업 업데이트 실패"
+    forms: 
+      buttons: 
+        delete_from_canvas: |-
+            Canvas
+            에서만 삭제
+        delete_from_google_docs: |-
+            Google Docs
+            에서도 삭제
+        start_collaborating: "협업 시작"
+        update: "협업 업데이트"
+      collaboration_name: "%{course_or_group_name} 협업"
+      descriptions: 
+        etherpad: |-
+            EtherPad는 신속하게 공유 문서를 설정할 수 있는 오픈 소스 프로젝트입니다. 이는 다른 사람이 입력하는 동안에 무엇을 입력하는 지 볼 수 있을 정도로 충분히 빠릅니다. 반면 "패드"가 암호로 보호되지 않아서 링크를 가진 누구나 편집할 수 있습니다. EtherPad는 익명성을 보장하고 Google 계정이 없어도 참여할 수 있도록 하려면 Google Docs보다 적합합니다.
+            
+            **주의**: 여러분의 작업을 확실하게 보존하려면 [EtherPad 삭제 정책](%{etherpad_deletion_policy_url})을 숙지해야 합니다.
+        google_docs: |-
+            Google Docs는 그룹 프로젝트에서 협업하기에 좋은 곳입니다. Microsoft Word와 같으면서도 이메일을 주고 받지 않고 다른 사람들과 동시에 작업을 할 수 있게 해줍니다.
+            
+            **주의**: Google Docs 협업에 참여하려면 여러분과 협업자 모두 Google 계정이 필요합니다.
+      labels: 
+        collaboration_type: "협업에 사용:"
+        description: "설명:"
+        document_name: "문서 이름"
+      messages: 
+        delete_google_doc_as_well: "이 협업은 Google Doc으로 저장됩니다. Canvas에서만 삭제하시겠습니까, Google Docs에서도 제거하시겠습니까?"
+      titles: 
+        new: "새 협업 시작"
+    index: 
+      how_to_start_a_new_collaboration: "특정 유형의 협업에 대한 자세한 정보를 찾으려면 \"새 협업 시작\"을 클릭하고 드롭다운 리스트에서 유형을 선택합니다."
+      links: 
+        delete: "이 협업 삭제"
+        edit: "이 협업 편집"
+        new: "새 협업 시작"
+      page_title: 협업
+      started_by: "*%{user}*가 %{at}에 시작함"
+      titles: 
+        current: "현재 협업"
+    titles: 
+      delete: "협업을 삭제하시겠습니까?"
+  collaborations: 
+    collaboration: 
+      delete: "이 대화를 삭제하시겠습니까?"
     collaborator_picker: 
       labels: 
         available_groups: "사용 가능한 그룹"
@@ -2333,11 +2404,8 @@ ko:
     index: 
       how_to_start_a_new_collaboration: "특정 유형의 협업에 대한 자세한 정보를 찾으려면 \"새 협업 시작\"을 클릭하고 드롭다운 리스트에서 유형을 선택합니다."
       links: 
-        delete: "이 협업 삭제"
-        edit: "이 협업 편집"
         new: "새 협업 시작"
       page_title: 협업
-      started_by: "*%{user}*가 %{at}에 시작함"
       titles: 
         current: "현재 협업"
     titles: 
@@ -4772,7 +4840,7 @@ ko:
       too_short: "너무 짧음 (최소 %{count} 글자)"
       wrong_length: "길이가 잘못됨 (%{count} 글자여야 함)"
     no_attached_file: "이 과제에 하나 이상의 파일을 첨부해야 함"
-    notices: 
+    notices: ~
     registration_incomplete: "이 페이지를 보기 전에 이메일 주소를 확인해야 함"
     required: "필수 사항"
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
@@ -10499,7 +10567,7 @@ ko:
         current_enrollments: "현재 등록"
         decrosslist_section: "섹션 교차 나열 해제"
   select_content: "내용 선택"
-  select_content_checkbox: 
+  select_content_checkbox: ~
   select_content_dialog: 
     buttons: 
       add_item: "항목 추가"
@@ -10633,7 +10701,7 @@ ko:
       quiz_available_after: "%{start_time} 이후"
       quiz_available_until: "%{end_time}까지"
     canvas-user-nav: 
-      navigation: 
+      navigation: ~
     canvas_footer: 
       ? "User Research"
       : ""
