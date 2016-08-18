@@ -10944,13 +10944,9 @@ zh-Hans:
     grading_description: |-
         包括：
         
-        * 输入/更改的作业/提交项评分
-        * 取消屏蔽的作业评分
-        * 更改的评分加权
-        ​
-        
-        如果您希望在通知中看到评分，请选中“报警评分更改时包括分数”。
-        如果您的电子邮件不是某机构的电子邮件，这意味着敏感内容将发送到机构外部。
+        * 作业/提交评分输入/改变
+        * 取消静音作业评分
+        * 评分加权的改变
     grading_display: 评分
     grading_notify_include_grade: 报警评分更改时包括分数。
     grading_policies_description: 课程评分政策更改
