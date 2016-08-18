@@ -41,9 +41,6 @@ class SplitUsers
      context_id: 'groups.context_id'}.freeze,
     {table: 'page_views',
      scope: -> { where(context_type: 'Course') }}.freeze,
-    {table: 'quizzes/quiz_submissions',
-     scope: -> { joins(:quiz) },
-     context_id: 'quizzes.context_id'}.freeze,
     {table: 'rubric_assessments',
      scope: -> { joins({submission: :assignment}) },
      context_id: 'assignments.context_id'}.freeze,
@@ -172,10 +169,17 @@ class SplitUsers
             update_all((update[:foreign_key] || :user_id) => target_user_id)
         end
         # avoid conflicting submissions for the unique index on user and assignment
-        source_user.submissions.where(assignment_id: Assignment.where(context_id: courses)).
-          where.not(assignment_id: target_user.submissions.select(:assignment_id)).
-          update_all(user_id: target_user_id)
+        handle_submissions(courses, source_user, target_user, target_user_id)
       end
+    end
+
+    def handle_submissions(courses, source_user, target_user, target_user_id)
+      source_user.submissions.where(assignment_id: Assignment.where(context_id: courses)).
+        where.not(assignment_id: target_user.submissions.select(:assignment_id)).
+        update_all(user_id: target_user_id)
+      source_user.quiz_submissions.where(quiz_id: Quizzes::Quiz.where(context_id: courses)).
+        where.not(quiz_id: target_user.quiz_submissions.select(:quiz_id)).
+        update_all(user_id: target_user_id)
     end
 
     def restore_worklow_states_from_records(records)
