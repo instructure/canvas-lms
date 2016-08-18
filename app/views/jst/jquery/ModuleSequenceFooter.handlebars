@@ -9,11 +9,17 @@
     {{/if}}
 
     {{#if next.show}}
-      <a href="{{next.url}}" role="button" class="pull-right bordered" data-tooltip="left" data-html-tooltip-title="{{next.tooltip}}" aria-describedby="msf{{instanceNumber}}-next-desc">
+      <a onclick="return checkInstantSurvey();" href="{{next.url}}" role="button" class="bz-next-button pull-right bordered" data-tooltip="left" data-html-tooltip-title="{{next.tooltip}}" aria-describedby="msf{{instanceNumber}}-next-desc">
         {{#t 'next'}}Next{{/t}}<i class="icon-mini-arrow-right"></i>
         <span id="msf{{instanceNumber}}-next-desc" class="hidden" hidden>{{next.tooltipText}}</span>
       </a>
     {{/if}}
+
+    <div class="pull-right" id="instant-survey-holder">
+      <script>
+      	bzInitializeInstantSurvey();
+      </script>
+    </div>
   </div>
 </div>
 {{#if items_count}}
