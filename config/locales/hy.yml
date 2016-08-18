@@ -12970,6 +12970,7 @@ hy:
       edit_rubric: "Խմբագրել ռուբրիկը"
       page_title: Ռուբրիկներ
       points_possible: 
+        one: "%{count} հնարավոր միավորներ"
         other: "%{count} հնարավոր միավորներ"
       user_rubrics: "Օգտատիրոջ ռուբրիկը"
     loading: "Բեռնում է..."
