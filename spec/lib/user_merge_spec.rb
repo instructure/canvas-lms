@@ -266,12 +266,14 @@ describe UserMerge do
       enrollment1.reload
       expect(enrollment1.user).to eq user1
       expect(enrollment1.workflow_state).to eq 'active'
+      expect(enrollment1.enrollment_state.state).to eq 'active'
       merge_data_record = merge_data.user_merge_data_records.where(context_id: enrollment1).first
       expect(merge_data_record.previous_workflow_state).to eq 'invited'
 
       enrollment2.reload
       expect(enrollment2.user).to eq user2
       expect(enrollment2.workflow_state).to eq 'deleted'
+      expect(enrollment2.enrollment_state.state).to eq 'deleted'
       merge_data_record2 = merge_data.user_merge_data_records.where(context_id: enrollment2).first
       expect(merge_data_record2.previous_workflow_state).to eq 'active'
     end
