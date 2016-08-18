@@ -269,7 +269,7 @@ $button--primary-bgd: $ic-brand-button--primary-bgd;
 // their use in Canvas in order to properly phase them out
 // Nothing changes in the legacy UI.
 
-$lightBackground:               lighten($ic-color-neutral, 8);
+$lightBackground:               $ic-color-medium-light;
 $wellBackground:                $ic-color-light;
 $altBG:                         $ic-bg-light-neutral;
 $borderColor:                   $ic-border-light;
