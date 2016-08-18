@@ -37,6 +37,7 @@ he:
       one: "תלמיד אחד"
       other: "%{count} תלמידים"
     user_count: 
+      one: "%{count} משתמשים"
       other: "%{count} משתמשים"
   GroupUserCollection: 
     flash: 
@@ -8003,7 +8004,7 @@ he:
       feedback: "יש להקליק כאן כדי לומר לנו מה קרה"
     show_me_where: "להראות לי היכן"
   links_14b70841: קישורים
-  load_bank: 
+  load_bank: ~
   load_more_9ca37ccc: "טעינה של עוד..."
   loading_25990131: טוען...
   loading_bde52856: טוען
