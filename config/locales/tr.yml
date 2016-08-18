@@ -8458,6 +8458,7 @@ tr:
             one: "Aşağıdaki koşullar sağlandığı için %{student} için bir uyarı mesajı gönderildi:"
             other: "Aşağıdaki koşullar sağlandığı için %{student} için bir uyarı mesajı gönderildi:"
           body_student: 
+            one: "Aşağıdaki koşullar sağlandığından dolayı sizin için bir uyarı mesajı gönderildi:"
             other: "Aşağıdaki koşullar sağlandığından dolayı sizin için bir uyarı mesajı gönderildi:"
           interaction_description: "%{count} gündür öğrenci/öğretmen etkileşimi yok"
           subject: "Uyarı: %{user_name}"
@@ -8480,6 +8481,7 @@ tr:
           one: "Aşağıdaki koşullar sağlandığı için %{student} için bir uyarı mesajı gönderildi:"
           other: "Aşağıdaki koşullar sağlandığı için %{student} için bir uyarı mesajı gönderildi:"
         body_student: 
+          one: "Aşağıdaki koşullar sağlandığından dolayı sizin için bir uyarı mesajı gönderildi:"
           other: "Aşağıdaki koşullar sağlandığından dolayı sizin için bir uyarı mesajı gönderildi:"
         e67827e04a8a403ca7c0fd5e171d44e0_trinteraction_description: 
           one: "Bir gündür öğrenci/öğretmen etkileşimi yok"
