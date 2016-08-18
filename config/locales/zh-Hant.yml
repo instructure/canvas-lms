@@ -10763,6 +10763,7 @@ zh-Hant:
   no_final_grade_selected_3595c9c: 未選擇最終評分
   no_grade_3fa326c: 無成績
   no_grade_assigned_90e531f5: 未給出評分。
+  no_grading_periods_configured_for_this_term_ca22393e: 沒有為本學期配置評分時段
   no_grading_schemes_to_display_8b0e92e7: 沒有可顯示的評分配置
   no_icon_1f6ea5f4: 無圖標
   no_items_in_module_21f111a2: 模組内無項目
@@ -10808,6 +10809,7 @@ zh-Hant:
   notes_c42e0fd5: 注釋
   notes_for_name_2eefac11: "針對 %{name} 的筆記"
   nothing_to_split_off_of_this_user_28ba9dd5: 這個使用者的內容無法分割
+  notice_concluded_student_6d416c4: 通知：已結業的學生
   notice_inactive_student_bcc4248a: 通知：不活躍的學生
   notification: 
     added_to_conversation_description: 您已被新增至交談
@@ -10879,16 +10881,11 @@ zh-Hant:
     files_description: 新增至您的課程的新檔案
     files_display: 檔案
     grading_description: |-
-        包括：
+        包含:
         
-        * 輸入/更改的任務/提交件成績
-        * 取消靜音的任務成绩
-        * 成績加權更改
-        
-        
-        
-        檢查如果您想看到您的成績通知，「包括當提示關於成績更改時的分數」。
-        如果您的電子郵件是不是一個機構電子郵件，這意味著敏感的內容將被傳送至該機構之外。
+        * 任務/提交件評分的輸入內容/更改內容
+        * 解除靜默的任務評分
+        * 評分權重的更改內容
     grading_display: 評分
     grading_notify_include_grade: 包括當提示關於成績更改時的分數。
     grading_policies_description: 課程評分政策更改
@@ -11731,6 +11728,9 @@ zh-Hant:
         download_url: "鎖定瀏覽器下載 URL"
         plugin_enabled: 已啟用
         use_lti_tool: "使用 LTI 工具來管理鎖定瀏覽器測驗設定(監視器必需的)"
+    mathman: 
+      description: "將 LaTex 公式轉換為 MathML 和 SVG 的一項簡易微服務"
+      name: MathMan
     med_cornell_export: 
       labels: 
         password: 驗證密碼
@@ -11893,6 +11893,7 @@ zh-Hant:
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "按逗號或Shift + 問號，以瀏覽此頁面的鍵盤快速鍵清單"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "按逗號或Shift + ？，以瀏覽鍵盤快速鍵清單。"
   press_the_esc_key_to_close_this_modal_14d10601: 按ESC鍵以關閉此模態
+  prev_month_34bd934c: 上一個月
   preview_53003fd2: 預覽
   preview_your_changes_373557d8: 預覽您的改動
   previous_bd2ac015: 上一個
@@ -13790,6 +13791,7 @@ zh-Hant:
   remove_f47dc62a: 移除
   remove_filename_87f3781e: "移除 %{filename}"
   remove_icon_a4646413: 移除圖標
+  remove_image_341340b3: 移除影像
   remove_recipient_name_a6b83cef: "移除收件人 %{name}"
   remove_row_c198da5a: 移除行
   remove_row_f9d59cba: 移除行
@@ -14208,6 +14210,7 @@ zh-Hant:
   search_by_user_dd3ad189: 按使用者搜尋
   search_courses_591bc900: 搜尋課程...
   search_entries_or_author_63fb0a86: 搜尋輸入項目或作者
+  search_flickr_6f28b02e: "搜尋 flickr 分享"
   search_for_files_7541fb28: 搜尋檔案
   search_grading_periods_e947a3e9: 正在查找評分時段...
   search_groups_or_people_6c15d6ad: 搜尋群組或人員
@@ -14241,9 +14244,12 @@ zh-Hant:
     status: 
       confirming_course: "正在確認 %{course_name}..."
       removing_crosslisting_of_section: 正在取消使章節跨清單…
+  section_84b5391: 章節
   section_ends_at_bb9df3c0: 章節結束日
   section_filter_cde54d0a: 章節過濾器
+  section_id_6f73f3d5: "章節 id"
   section_name_b6d82574: 章節名稱
+  section_sis_94511bcd: "章節 sis"
   section_starts_at_65eaed1: 章節開始日
   sections: 
     section_created: 章節已成功建立！
@@ -15285,6 +15291,9 @@ zh-Hant:
   speedgrader_settings_c9503705: "SpeedGrader 設定"
   speedgrader_tm_44688790: SpeedGrader™
   spreadsheet_6d622119: 試算表
+  spring_grading_period_current_score_7083cf0d: 春季評分時段當前分數
+  spring_grading_period_final_score_386d92f7: 春季評分時段最終分數
+  spring_grading_period_id_61aec82c: "春季評分時段 id"
   sr_gradebook: 
     all_grading_periods: 所有評分時段
     all_sections: 所有章節
@@ -15353,16 +15362,19 @@ zh-Hant:
   student_extensions_d35a907: 學生延期
   student_groups_desc: 這為帳戶啟用新學生群組頁面。新頁面用於提供更動態的群組註冊體驗。
   student_id: "學生 ID"
+  student_id_7cc45fb5: "學生 id"
   student_interactions_report_7717b685: 學生互動報告
   student_messages_b0a242d: 學生郵件
   student_must_complete_all_of_these_requirements_656771d6: 學生必須完成所有下列要求
   student_must_complete_one_of_these_requirements_6046eb3a: 學生必須完成下列要求之一
   student_name: 學生名稱
+  student_name_b446c661: 學生名字
   student_name_c45b2a7: 學生名稱
   student_name_hidden_b894d102: 學生(姓名隱藏)
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: 由於需要匿名評分，學生名稱必須為隱藏
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: 由於本調查為匿名，學生名稱必須隱藏。
   student_outcome_gradebook_description: 學生學習精通成績冊提供了一種方法，學生可以快速檢視課程學習成果的進度。成果以成績冊般的形式呈現，進步以數值評分顯示，以及以精通/接近精通/補修的形式顯示。
+  student_sis_d9f0cd39: "學生 sis"
   student_summary: 
     student_summary_table_ascending: "學生一覽表已按照 %{sortText} 升序排列 "
     student_summary_table_descending: "學生一覽表已按照 %{sortText} 降序排列"
@@ -15645,8 +15657,11 @@ zh-Hant:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: 告訴我們您希望在何時以何方式得到Canvas事件通知。
   templates_4ca13d07: 範本
   tenant_d2a41f78: 租借用戶
+  term_41f37cae: 期限
   term_created_27d27c2b: 學期已創建
   term_e1c1d390: 期限
+  term_id_74b933ef: "期限 id"
+  term_sis_7edb8ab7: "期限 sis"
   term_start_b8c2aad1: 期限開始
   term_starting_5bd5e070: 學期開始
   terms: 
@@ -15795,9 +15810,11 @@ zh-Hant:
   there_was_a_problem_submitting_your_set_27ca2ed0: 提交您的組時遇到問題
   there_was_an_error_generating_the_tool_launch_fb3f47ac: 創建工具啟動時出現錯誤
   there_was_an_error_in_processing_your_request_6513a49a: 處理您的要求時發生錯誤
+  there_was_an_error_retrieving_the_course_image_d7ea094d: 獲取課程影像時出現錯誤
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: 在保存課程變更內容時出現錯誤。
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: 儲存筆記時出現錯誤，請再試一次。
   there_was_an_error_setting_usage_rights_53739e1d: 在設定使用權時發生了一個錯誤
+  there_was_an_error_uploading_the_image_932fc4ce: 上載影像時出現錯誤
   there_was_an_error_with_your_query_please_try_a_di_761dff12: 搜索時出現錯誤，請嘗試不同的搜索項
   there_were_errors_with_the_form_errors_ab5b559a: "該表單含有多個錯誤：%{errors}"
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: 由一位管理員為您創建這些評分時段。
@@ -15852,6 +15869,7 @@ zh-Hant:
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: 本記錄器使用Flash。因此，您或許會發覺更簡易的辦法是使用本地計算機記錄，然後使用媒體上傳功能將其上傳。
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "此報告顯示在特定期限內的所有課程。由此產生的CSV文檔將在每一行顯示一門課程，並顯示課程ID，課程SIS ID，課程短名稱，課程名稱，賬戶ID，賬戶SIS ID，賬戶名稱，已使用的儲存MB數以及所有文檔的總MB數。課程中所有文檔的總數指的是課程所包含的所有文檔，無論這些文檔是否對課程配額產生何種影響。"
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "此報告顯示在特定期限內的所有課程。由此產生的CSV文檔將在每一行顯示一門課程，並顯示課程ID，課程SIS ID，課程短名稱，課程名稱，賬戶ID，賬戶SIS ID，賬戶名稱以及已使用的儲存MB數。"
+  this_report_shows_grading_period_grades_and_overal_a86346a: "此報告顯示了在特定期限內報讀課程的每一名學生在評分期限內的評分 (以及整體的課程評分) 。由此生成的 csv 檔案將每個註冊寫入單獨的一行。"
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: 本樣本頁面包含了Canvas的一般UI元素，方便您設計個性化的品牌。您可以通過左側邊欄調整顔色值和影像内容，並通過*預覽您的改動*按鈕預覽。點擊該按鈕，刷新頁面后即可預覽您的改動。
   this_student_s_responses_are_hidden_because_this_a_252e8335: 這名學生的反應是隱藏的，因為此任務是匿名的。
   this_student_wrote_f1a3f22d: 這位學生寫到：
@@ -16099,6 +16117,7 @@ zh-Hant:
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "要僅限特定Google Apps域的用戶使用，請在此輸入域名稱。"
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "要僅限特定Azure 活躍域的用戶使用，請在此輸入租借用戶名稱。"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要檢視任務，請確保 *議程* 檢視處於活動狀態。"
+  today_76e10f9c: 今天
   toggle_dashcard_view_or_recent_activity_stream_1de257: 切換儀表板視角或近期活動流
   toggle_editing_answer_text_as_html_9a93fe6: "切換編輯答案文字為 HTML"
   toggle_style_checkbox_1cce5eea: 切換風格復選框
@@ -16152,6 +16171,7 @@ zh-Hant:
     originality_report_visible_immediately: 立即
   twitter_fcef6b54: Twitter
   type_c8106334: 類型
+  type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' 不是一個有效的影像檔案格式 (請嘗試 jpg, png, 或 gif)"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "抱歉！請聯係您的Catalog開發人員。錯誤代碼：%{message}"
   unable_to_accept_update_fd53a7e2: 無法接受更新
   unable_to_dismiss_update_df1e32eb: 無法解除更新
@@ -16246,6 +16266,8 @@ zh-Hant:
   usage_rights_have_been_set_d1b433c7: 使用權已設定。
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: 將為如下資料夾所包含的所有檔案設定使用權：
   use_default_890939b7: 使用預設
+  use_mathman_to_convert_latex_to_mathml_680ef7b0: "使用 MathMan 將 LaTeX 轉換成 MathML?"
+  use_mathman_to_convert_latex_to_svg_3f61c9b: "使用 MathMan 將 LaTeX 轉換成 SVG？"
   use_new_folder_tree_in_files_bc0ea09f: 在文檔中應用新的文件夾樹
   use_new_folder_tree_in_files_eb5a451b: 在文檔中應用新的文件夾樹
   use_remote_service_for_notifications_9fe667c6: 採用遙控通知服務
@@ -16954,7 +16976,9 @@ zh-Hant:
   you_are_currently_masquerading_as_user_name_f4a00ade: "您目前正在偽裝成 %{user_name}"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "您使用您來自 %{institution2} 的認證登入了 %{institution1} "
   you_are_not_enrolled_in_any_courses_a5c63286: 您未註冊任何課程
+  you_are_not_subscribed_to_this_topic_click_to_subs_38ce1f37: 您未訂閱這個話題。按一下以訂閱。
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: 您接受訂閱，并將被告知以新的評論。點擊以退訂
+  you_are_subscribed_to_this_topic_click_to_unsubscr_d6c09364: 您訂閱了這個話題。按一下以取消訂閱。
   you_are_the_group_leader_for_this_group_b8629b70: 您是本群組的群組領導者
   you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: "您正在嘗試從一個安全的網站 (Canvas) 發送不安全內容。某些網站的瀏覽器可能會阻止載入此內容。"
   you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: 您取消訂閱，并將不會被告知以新的評論。點擊以訂閱
