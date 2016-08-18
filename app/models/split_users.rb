@@ -105,9 +105,20 @@ class SplitUsers
       move_user_observers(source_user, user, records.where(context_type: 'UserObserver', previous_user_id: user))
       move_attachments(source_user, user, records.where(context_type: 'Attachment'))
       enrollment_ids = records.where(context_type: 'Enrollment', previous_user_id: user).pluck(:context_id)
-      enrollments = Enrollment.where(id: enrollment_ids)
-      enrollments.update_all(user_id: user)
-      transfer_enrollment_data(source_user, user, Course.where(id: enrollments.pluck(:course_id)))
+      enrollments = Enrollment.where(id: enrollment_ids).where.not(user_id: user)
+      courses = []
+      enrollments.each do |e|
+        # skip conflicting enrollments
+        next if Enrollment.where(user_id: user,
+                                 course_section_id: e.course_section_id,
+                                 type: e.type,
+                                 role_id: e.role_id).where.not(id: e).shard(e.shard).exists?
+
+        e.user_id = user
+        e.save_without_callbacks
+        courses << e.course_id
+      end
+      transfer_enrollment_data(source_user, user, Course.where(id: courses))
 
       account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
       AccountUser.where(id: account_users_ids).update_all(user_id: user)
