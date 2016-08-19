@@ -114,6 +114,10 @@ describe "course rubrics" do
 
       links = ffj("#rubric_#{rubric.id}.editing .ratings:first .edit_rating_link")
       expect(links.any?(&:displayed?)).to be_falsey
+
+      # pts should not be editable
+      expect(f('tr.learning_outcome_criterion .points_form .editing').displayed?).to be_falsey
+      expect(f('tr.learning_outcome_criterion .points_form .displaying').displayed?).to be_truthy
     end
 
     it "should not show 'use for grading' as an option" do
