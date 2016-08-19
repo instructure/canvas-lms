@@ -687,7 +687,11 @@ class Enrollment < ActiveRecord::Base
 
   def state_based_on_date
     RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state) do
-      self.enrollment_state.get_effective_state
+      if %w{invited active completed}.include?(self.workflow_state)
+        self.enrollment_state.get_effective_state
+      else
+        self.workflow_state.to_sym
+      end
     end
   end
 
