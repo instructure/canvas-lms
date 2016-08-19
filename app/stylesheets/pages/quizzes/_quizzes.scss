@@ -1648,6 +1648,9 @@ ul#quiz_versions {
     border-bottom: 1px dotted #ccc;
     .title {
       font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .sub_content {
       font-size: 0.8em;
