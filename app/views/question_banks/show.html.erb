@@ -67,7 +67,7 @@
     <span class="current_question_bank_id"><%= @bank.id %></span>
   </div>
 </div>
-<div id="questions" class="<%= 'uneditable' unless can_do(@bank, @current_user, :manage) %> question_editing brief question_bank">
+<div id="questions" class="<%= 'uneditable' unless can_do(@bank, @current_user, :manage) %> question_editing brief question_bank show_correct_answers">
   <% if @questions.total_pages <= 1 %>
     <% @questions.each do |question| %>
       <%= render :partial => "quizzes/quizzes/display_question", :object => question.data, :locals => {:question_bank_id => @bank.id, :editing => true, :asset_string => question.asset_string} %>
