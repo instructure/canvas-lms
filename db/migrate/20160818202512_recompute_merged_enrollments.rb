@@ -9,8 +9,7 @@ class RecomputeMergedEnrollments < ActiveRecord::Migration
 
     if merged_enrollment_ids.any?
       Shard.partition_by_shard(merged_enrollment_ids) do |sliced_ids|
-        EnrollmentState.invalidate_states(Enrollment.where(:id => sliced_ids))
-        EnrollmentState.send_later_if_production(:process_states_for_ids, sliced_ids)
+        EnrollmentState.force_recalculation(sliced_ids)
       end
     end
   end

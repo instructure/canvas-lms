@@ -309,8 +309,7 @@ class UserMerge
 
     enrollment_ids = Enrollment.where(id: scope).where.not(id: keeper).pluck(:id)
     Enrollment.where(:id => enrollment_ids).update_all(workflow_state: keeper.workflow_state)
-    EnrollmentState.invalidate_states(Enrollment.where(:id => enrollment_ids))
-    EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_ids)
+    EnrollmentState.force_recalculation(enrollment_ids)
 
     # mark the would be keeper from the from_user as deleted so it will not be moved later
     keeper.destroy
