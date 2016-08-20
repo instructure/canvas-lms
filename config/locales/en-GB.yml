@@ -16805,7 +16805,7 @@ en-GB:
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Users of screen readers might need to turn off the virtual cursor in order to use these keyboard shortcuts"
   validate: 
     is_required: "This field is required"
-  validate_links_in_content_b1630fba: "Validate Llinks in content"
+  validate_links_in_content_b1630fba: "Validate Links in content"
   vanity_url_76f93382: "Vanity URL"
   video_b9f27375: Video
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Video content is not supported by your device or app."
