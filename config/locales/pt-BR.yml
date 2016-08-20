@@ -1332,7 +1332,7 @@ pt-BR:
   add_new_group_7ac49f31: "Adicionar novo grupo"
   add_new_set_of_due_dates_e8e240f: "Adicionar novo conjunto de prazos para entrega"
   add_people_7ee4b2ec: "Adicionar Pessoas"
-  add_quiz_ip_filter_c7b37dc5: "Adicionar Filtro de IP de Teste"
+  add_quiz_ip_filter_c7b37dc5: "Adicionar Filtro de IP de Questionário"
   add_recipient_ff135ed7: "Adicionar Destinatário"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Adicionar, remover ou reorganizar turmas para este portfólio"
   add_review_2fb1590c: "Adicionar Avaliação"
@@ -1342,7 +1342,7 @@ pt-BR:
   add_students_to_the_course_874be8fb: "Adicionar alunos ao curso"
   add_tas_to_the_course_2aac6e02: "Adicionar assistentes ao curso"
   add_theme_32fa3d50: "Adicionar Tema"
-  add_trigger_bc1a0fae: "Adicionar Disparador"
+  add_trigger_bc1a0fae: "Adicionar Gatilho"
   add_user_e73e8e50: "Adicionar Usuário"
   add_users_to_name_b8109bbb: "Adicionar Usuários a %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Adicione suas tarefas.  Você pode apenas fazer uma longa lista ou dividi-la em grupos - e mesmo especificar pesos para cada grupo de tarefas."
@@ -1363,7 +1363,7 @@ pt-BR:
   alerts: 
     alert: 
       buttons: 
-        add_criterion: Disparador
+        add_criterion: Gatilho
         add_recipient: Destinatário
         save_alert: "Salvar alerta"
       criteria: "Disparar um alerta quando"
@@ -6111,7 +6111,7 @@ pt-BR:
     student: Aluno
     teacher: Professor
     teacher_assistant: Assistente
-  enrollment_state_7a9c55e2: "estado da avaliação"
+  enrollment_state_7a9c55e2: "estado da matrícula"
   enrollment_term: 
     errors: 
       delete_default_term: "Não é possível excluir o termo padrão"
@@ -6638,9 +6638,9 @@ pt-BR:
   fair_38e62237: Justo
   fair_score_554e2558: "Pontuação Justa"
   fair_use_bee47d77: "Uso justo"
-  fall_grading_period_current_score_d48c7f78: "Pontuação atual do período de classificação de Outono"
-  fall_grading_period_final_score_56d96a8f: "Pontuação final do período de classificação de Outono"
-  fall_grading_period_id_74ef68e: "Id do período de classificação de Outono"
+  fall_grading_period_current_score_d48c7f78: "Pontuação atual do período de avaliação de Outono"
+  fall_grading_period_final_score_56d96a8f: "Pontuação final do período de avaliação de Outono"
+  fall_grading_period_id_74ef68e: "Id do período de avaliação de Outono"
   favicon_6e658914: Favicon
   favorites_c7e0207c: Favoritos
   feature_flags: 
@@ -7425,9 +7425,9 @@ pt-BR:
   grading_period_8b0a4a10: "Período de Pontuação"
   grading_period_close_date_precedes_end_date_7628a691: "A data de fechamento do período de pontuação precede a data de encerramento"
   grading_period_name_31ceb3e3: "Nome do período de pontuação"
-  grading_period_set_f49fe74c: "configuração do período de pontuação"
+  grading_period_set_f49fe74c: "configuração do período de avaliação"
   grading_period_set_for_account_name_b9823b2a: "Configuração do Período de Pontuação para %{account_name}"
-  grading_period_set_id_f2377529: "id da configuração do período de pontuação"
+  grading_period_set_id_f2377529: "id da configuração do período de avaliação"
   grading_period_set_title_880a6ec4: "Título da Configuração do Período de Pontuação"
   grading_period_title_23b7f8ac: "Título do Período de Pontuação"
   grading_period_title_fa470c50: "Título do período de pontuação"
@@ -8096,7 +8096,7 @@ pt-BR:
   include_scores_when_alerting_about_grade_changes_623ec201: "Incluir pontuação quando alertando referente a alterações de nota."
   include_scores_when_alerting_about_grades_89728ae1: "Inclua as pontuações ao alertar sobre notas."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
-      Incluir pontuações quando alertar sobre pontuações.
+      Incluir pontuações quando alertar sobre notas.
       Se seu email não é um email institucional, isso significa que conteúdo confidencial será enviado para fora da instituição.
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inclua as notas da tarefa ao postar no Sistema de Informações do Aluno de sua escola"
   include_unpublished_assignments_83ebbaec: "Incluir Tarefas não Publicadas"
@@ -10772,7 +10772,7 @@ pt-BR:
   name_current_score_b3198dfa: "pontuação atual %{name}"
   name_error_fee4236: "Erro de nome"
   name_final_score_2dce3ff8: "pontuação final %{name}"
-  name_grading_period_id_c9c8b6ae: "id do período de classificação %{name} "
+  name_grading_period_id_c9c8b6ae: "id do período de avaliação %{name} "
   name_has_been_successfully_installed_but_has_not_y_c3148b96: "*nome* foi instalado com sucesso, mas ainda não foi ativado."
   name_is_currently_status_9065c996: "*nome* é atualmente **status**."
   name_is_required_ba379522: "Nome é necessário"
@@ -10841,7 +10841,7 @@ pt-BR:
   no_final_grade_selected_3595c9c: "Nenhuma nota final selecionado"
   no_grade_3fa326c: "sem nota"
   no_grade_assigned_90e531f5: "Nenhuma nota atribuido."
-  no_grading_periods_configured_for_this_term_ca22393e: "não há períodos de classificação configurados para este prazo"
+  no_grading_periods_configured_for_this_term_ca22393e: "não há períodos de avaliação configurados para este prazo"
   no_grading_schemes_to_display_8b0e92e7: "Não há esquemas de pontuação a serem exibidos"
   no_icon_1f6ea5f4: "sem ícone"
   no_items_in_module_21f111a2: "Nenhum item no módulo"
@@ -10962,7 +10962,7 @@ pt-BR:
         Incluem:
         
         
-        * Nota de tarefa/envio entrada/alterada
+        * Nota de tarefa/envio inserida/alterada
         * Notas de tarefas não-limitadas
         * Peso da nota mudou
     grading_display: Pontuação
@@ -11808,7 +11808,7 @@ pt-BR:
         plugin_enabled: Ativado
         use_lti_tool: "Utilize a ferramenta LTI para gerenciar as configurações do teste do LockDown Browser (Obrigatório para Monitor)"
     mathman: 
-      description: "Um microservice simples que converte fórmulas de LaTeX para MathML e SVG"
+      description: "Um microserviço simples que converte fórmulas de LaTeX para MathML e SVG"
       name: MathMan
     med_cornell_export: 
       labels: 
@@ -14350,12 +14350,12 @@ pt-BR:
     status: 
       confirming_course: "Confirmando %{course_name}..."
       removing_crosslisting_of_section: "Cancelando a listagem cruzada da seção..."
-  section_84b5391: seção
+  section_84b5391: turma
   section_ends_at_bb9df3c0: "Seção termina às"
   section_filter_cde54d0a: "Filtro de Seção"
-  section_id_6f73f3d5: "id da seção"
+  section_id_6f73f3d5: "id da turma"
   section_name_b6d82574: "Nome da Turma"
-  section_sis_94511bcd: "sis da seção"
+  section_sis_94511bcd: "sis da turma"
   section_starts_at_65eaed1: "Seção começa às"
   sections: 
     section_created: "Seção criada com sucesso!"
@@ -15397,9 +15397,9 @@ pt-BR:
   speedgrader_settings_c9503705: "Configurações do SpeedGrader"
   speedgrader_tm_44688790: SpeedGrader™
   spreadsheet_6d622119: Planilha
-  spring_grading_period_current_score_7083cf0d: "Pontuação atual do período de classificação de Primavera"
-  spring_grading_period_final_score_386d92f7: "Pontuação final do período de classificação de Primavera"
-  spring_grading_period_id_61aec82c: "Id do período de classificação de Primavera"
+  spring_grading_period_current_score_7083cf0d: "Pontuação atual do período de avaliação de Primavera"
+  spring_grading_period_final_score_386d92f7: "Pontuação final do período de avaliação de Primavera"
+  spring_grading_period_id_61aec82c: "Id do período de avaliação de Primavera"
   sr_gradebook: 
     all_grading_periods: "Todos os períodos de classificação"
     all_sections: "Todas as seções"
@@ -15979,7 +15979,7 @@ pt-BR:
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Este gravador utiliza Flash. Como resultado, você pode achar mais facil fazer uma gravação na sua máquina local, e aí utilizar a aba de uploader de mídia para fazer o upload dela."
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "Este relatório mostra todos os cursos para um determinado período. O arquivo csv resultante terá uma linha para cada curso e irá mostrar o id do curso, id SIS do curso, nome curto do curso, nome do curso, id da conta, id SIS da conta, nome da conta, armazenamento usado em MB e a soma de todos os arquivos em MB. O armazenamento usado reflete todos os arquivos que consomem a cota de cursos. A soma de todos os arquivos do curso é a soma de todos os arquivos que estão no curso independentemente do impacto na cota de cursos."
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "Este relatório mostra todos os cursos para um determinado período. O arquivo CSV resultante terá uma linha por curso e mostrará a id do curso, a id sis do curso, nome abreviado do curso, nome do curso, id da conta, id sis da conta, nome da conta, e o armazenamento utilizado em MB."
-  this_report_shows_grading_period_grades_and_overal_a86346a: "Este relatório mostra as notas do período de avaliação (e notas gerais do curso) para cada estudante inscrito em um dado período. O arquivo csv resultante terá uma fileira por inscrição."
+  this_report_shows_grading_period_grades_and_overal_a86346a: "Este relatório mostra as notas do período de avaliação (e notas gerais do curso) para cada estudante inscrito em um dado período. O arquivo csv resultante terá uma linha por inscrição."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Esta página de exemplo inclui elementos comuns de interface do usuário no Canvas para ajudar a construir a sua marca personalizada. Uma vez que você começar a fazer mudanças para os valores de cor e imagens na barra lateral esquerda, você verá um botão de *visualizar as Suas Alterações* de botão. Clique nele para atualizar esta página e ver como as alterações ficaram."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "As respostas deste aluno estão ocultas porque esta tarefa é anônima."
   this_student_wrote_f1a3f22d: "Este aluno escreveu:"
