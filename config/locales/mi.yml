@@ -3920,7 +3920,7 @@ mi:
         remove_item_from_module: "Tangohia tēnei tuemi i te kōwae"
       min_score: 
         fulfilled: "Piro i te iti rawa%{score}"
-        unfulfilled: "Score i te iti rawa %{score}, :score => whakaatu_score"
+        unfulfilled: "Piro i te iti rawa %{score}"
       modules_item_move_to: "Hūnuku ki"
       must_contribute: 
         fulfilled: "whai wāhi"
