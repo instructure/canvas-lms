@@ -303,6 +303,7 @@ module SIS
               @users_to_touch_ids.add(user.id)
               courses_to_recache_due_dates << enrollment.course_id if enrollment.workflow_state_changed?
               enrollment.sis_batch_id = @batch.id if @batch
+              enrollment.skip_touch_user = true
               begin
                 enrollment.save_without_broadcasting!
               rescue ActiveRecord::RecordInvalid
