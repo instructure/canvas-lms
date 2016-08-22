@@ -8,7 +8,7 @@ module ConditionalRelease
       def begin_export(course, opts)
         data = nil
         if opts[:selective]
-          assignment_ids = opts[:exported_assets].map{|asset| (match = asset.match(/assignment_(\d+)/) && match[1])}.compact
+          assignment_ids = opts[:exported_assets].map{|asset| (match = asset.match(/assignment_(\d+)/)) && match[1]}.compact
           return unless assignment_ids.any?
           data = {:export_settings => {:selective => '1', :exported_assignment_ids => assignment_ids}}.to_param
         end
