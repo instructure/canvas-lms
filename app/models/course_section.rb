@@ -246,7 +246,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def deletable?
-    self.enrollments.not_fake.count == 0
+    !self.enrollments.where.not(:workflow_state => 'rejected').not_fake.exists?
   end
 
   def enroll_user(user, type, state='invited')

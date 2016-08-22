@@ -344,6 +344,12 @@ describe CourseSection, "moving to new course" do
       expect(@section.enrollments.map(&:type)).to eql ['StudentViewEnrollment']
       expect(@section).to be_deletable
     end
+
+    it 'should be deletable if it only has rejected enrollments' do
+      student_in_course :section => @section
+      @section.enrollments.first.update_attribute(:workflow_state, "rejected")
+      expect(@section).to be_deletable
+    end
   end
 
   context 'permissions' do
