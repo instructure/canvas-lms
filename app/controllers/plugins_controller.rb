@@ -59,7 +59,7 @@ class PluginsController < ApplicationController
   def find_plugin_setting
     if @plugin = Canvas::Plugin.find(params[:id])
       @plugin_setting = PluginSetting.find_by_name(@plugin.id)
-      @plugin_setting ||= PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_setting) { |ps| ps.disabled = true }
+      @plugin_setting ||= PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings) { |ps| ps.disabled = true }
       true
     else
       false
