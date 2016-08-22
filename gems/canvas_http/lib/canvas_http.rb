@@ -48,7 +48,7 @@ module CanvasHttp
     loop do
       raise(TooManyRedirectsError) if redirect_limit <= 0
 
-      _, uri = CanvasHttp.validate_url(url_str, last_host, last_scheme) # uses the last host and scheme for relative redirects
+      _, uri = CanvasHttp.validate_url(url_str, host: last_host, scheme: last_scheme) # uses the last host and scheme for relative redirects
       http = CanvasHttp.connection_for_uri(uri)
 
       multipart_query = nil
@@ -93,7 +93,7 @@ module CanvasHttp
   end
 
   # returns [normalized_url_string, URI] if valid, raises otherwise
-  def self.validate_url(value, host=nil, scheme=nil)
+  def self.validate_url(value, host: nil, scheme: nil, allowed_schemes: %w{http https})
     value = value.strip
     raise ArgumentError if value.empty?
     uri = URI.parse(value)
@@ -108,7 +108,7 @@ module CanvasHttp
       end
       uri = URI.parse(value) # it's still a URI::Generic
     end
-    raise ArgumentError unless %w(http https).include?(uri.scheme.downcase)
+    raise ArgumentError if !allowed_schemes.nil? && !allowed_schemes.include?(uri.scheme.downcase)
     raise(RelativeUriError) if uri.host.nil? || uri.host.strip.empty?
 
     return value, uri
