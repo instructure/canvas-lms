@@ -365,7 +365,9 @@ RSpec.configure do |config|
     if ENV['COVERAGE'] == "1"
       # do this in a hook so that results aren't clobbered under test-queue
       # (it forks and changes the TEST_ENV_NUMBER)
-      SimpleCov.command_name("rspec:#{Process.pid}:#{ENV['TEST_ENV_NUMBER']}")
+      simple_cov_cmd = "rspec:#{Process.pid}:#{ENV['TEST_ENV_NUMBER']}"
+      puts "Starting SimpleCov command: #{simple_cov_cmd}"
+      SimpleCov.command_name(simple_cov_cmd)
     end
 
     Timecop.safe_mode = true
