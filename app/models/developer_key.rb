@@ -35,7 +35,7 @@ class DeveloperKey < ActiveRecord::Base
   before_save :nullify_empty_icon_url
   after_save :clear_cache
 
-  validates_as_url :redirect_uri
+  validates_as_url :redirect_uri, allowed_schemes: nil
   validate :validate_redirect_uris
 
   scope :nondeleted, -> { where("workflow_state<>'deleted'") }
@@ -57,7 +57,7 @@ class DeveloperKey < ActiveRecord::Base
 
   def validate_redirect_uris
     uris = redirect_uris.map do |value|
-      value, _ = CanvasHttp.validate_url(value)
+      value, _ = CanvasHttp.validate_url(value, allowed_schemes: nil)
       value
     end
 
