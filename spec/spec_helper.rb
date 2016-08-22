@@ -515,8 +515,8 @@ RSpec.configure do |config|
 
   def create_temp_dir!
     dir = Dir.mktmpdir
-    $temp_dirs ||= []
-    $temp_dirs << dir
+    @temp_dirs ||= []
+    @temp_dirs << dir
     dir
   end
 
@@ -766,21 +766,6 @@ RSpec.configure do |config|
     $stdout, $stderr = orig_stdout, orig_stderr
   end
 
-  def verify_post_matches(post_lines, expected_post_lines)
-    # first lines should match
-    expect(post_lines[0]).to eq expected_post_lines[0]
-
-    # now extract the headers
-    post_headers = post_lines[1..post_lines.index("")]
-    expected_post_headers = expected_post_lines[1..expected_post_lines.index("")]
-    expected_post_headers << "User-Agent: Ruby"
-    expect(post_headers.sort).to eq expected_post_headers.sort
-
-    # now check payload
-    expect(post_lines[post_lines.index(""), -1]).to eq
-        expected_post_lines[expected_post_lines.index(""), -1]
-  end
-
   def compare_json(actual, expected)
     if actual.is_a?(Hash)
       actual.each do |k, v|
@@ -821,19 +806,6 @@ RSpec.configure do |config|
 
     def content_type
       self['content-type']
-    end
-  end
-
-  def intify_timestamps(object)
-    case object
-      when Time
-        object.to_i
-      when Hash
-        object.inject({}) { |memo, (k, v)| memo[intify_timestamps(k)] = intify_timestamps(v); memo }
-      when Array
-        object.map { |v| intify_timestamps(v) }
-      else
-        object
     end
   end
 
@@ -916,24 +888,6 @@ class I18nema::Backend
     available_locales_without_stubs | @stubs.keys.map(&:to_sym)
   end
   alias_method :available_locales_without_stubs, :available_locales
-end
-
-class String
-  def red; colorize(self, "\e[1m\e[31m"); end
-
-  def green; colorize(self, "\e[1m\e[32m"); end
-
-  def dark_green; colorize(self, "\e[32m"); end
-
-  def yellow; colorize(self, "\e[1m\e[33m"); end
-
-  def blue; colorize(self, "\e[1m\e[34m"); end
-
-  def dark_blue; colorize(self, "\e[34m"); end
-
-  def pur; colorize(self, "\e[1m\e[35m"); end
-
-  def colorize(text, color_code)  "#{color_code}#{text}\e[0m" end
 end
 
 Dir[Rails.root+'{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
