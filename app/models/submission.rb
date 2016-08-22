@@ -220,15 +220,26 @@ class Submission < ActiveRecord::Base
     given { |user| user && user.id == self.user_id && !self.assignment.muted? }
     can :read_grade
 
-    given {|user, session| !context.feature_enabled?(:multiple_grading_periods) && assignment.published? && context.grants_right?(user, session, :manage_grades) }
+    given do |user, session|
+      !context.feature_enabled?(:multiple_grading_periods) &&
+        assignment.published? &&
+        context.grants_right?(user, session, :manage_grades)
+    end
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
 
-    given {|user, session| context.feature_enabled?(:multiple_grading_periods) && assignment.published? && context.grants_right?(user, session, :manage_grades) }
+    given do |user, session|
+      context.feature_enabled?(:multiple_grading_periods) &&
+        assignment.published? &&
+        context.grants_right?(user, session, :manage_grades)
+    end
     can :read and can :comment and can :make_group_comment and can :read_grade
 
-    given {|user, session| context.feature_enabled?(:multiple_grading_periods) &&
-      assignment.published? && context.grants_right?(user, session, :manage_grades) &&
-      (user.admin_of_root_account?(assignment.root_account) || !in_closed_grading_period?)}
+    given do |user, session|
+      context.feature_enabled?(:multiple_grading_periods) &&
+        assignment.published? &&
+        context.grants_right?(user, session, :manage_grades) &&
+        (user.admin_of_root_account?(assignment.root_account) || !in_closed_grading_period?)
+    end
     can :grade
 
     given {|user, session| self.assignment.user_can_read_grades?(user, session) }
