@@ -467,6 +467,7 @@ class ContentMigration < ActiveRecord::Base
     self.workflow_state = :importing
     self.save
 
+    all_files_path = nil
     begin
       @exported_data_zip = download_exported_data
       @zip_file = Zip::File.open(@exported_data_zip.path)
@@ -500,6 +501,7 @@ class ContentMigration < ActiveRecord::Base
       self.save
       raise e
     ensure
+      File.delete(all_files_path) if all_files_path && File.exists?(all_files_path)
       clear_migration_data
     end
   end
