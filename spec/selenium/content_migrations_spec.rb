@@ -470,6 +470,25 @@ describe "content migrations", :non_parallel do
       expect(@course.announcements.last.locked).to be_truthy
       expect(@course.lock_all_announcements).to be_truthy
     end
+
+    it "should persist topic 'allow liking' settings across course copy", priority: "2", test_id: 1041950 do
+      @copy_from.discussion_topics.create!(
+        title: 'Liking Allowed Here',
+        message: 'Like I said, liking is allowed',
+        allow_rating: true
+      )
+
+      visit_page
+      select_migration_type
+      wait_for_ajaximations
+      click_option('#courseSelect', @copy_from.id.to_s, :value)
+      ff('[name=selective_import]')[0].click
+      submit
+      run_jobs
+      expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
+      @course.reload
+      expect(@course.discussion_topics.last.allow_rating).to be_truthy
+    end
   end
 
   context "importing LTI content" do
