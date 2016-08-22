@@ -51,7 +51,14 @@ errors = []
 linter.ban_new_erb do
   errors << "Your commit includes new ERB files,"\
             " which has been a no-no in Canvas since 2011."\
-            " All new UI should be built in React on top of documented APIs"
+            " All new UI should be built in React on top of documented APIs.\n"\
+            "Maybe try doing something like this in your controller instead:\n\n"\
+            "    @page_title = t('Your Page Title')\n"\
+            "    @body_classes << 'whatever-classes you-want-to-add-to-body'\n"\
+            "    js_bundle :your_js_bundle\n"\
+            "    css_bundle :any_css_bundles_you_want\n"\
+            "    js_env({whatever: 'you need to put in window.ENV'})\n"\
+            "    render :text => "".html_safe, :layout => true"\
 end
 
 linter.ensure_public_js_specs do
