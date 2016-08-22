@@ -184,17 +184,12 @@ define([
           $("#no_changes_detected").show();
         }
 
-        if ( uploadedGradebook.assignments_outside_current_periods.length > 0 ) {
-          var $assignment_list = $("<ul></ul>");
-          var assignments     = uploadedGradebook.assignments_outside_current_periods;
+        if (uploadedGradebook.warning_messages.prevented_new_assignment_creation_in_closed_period) {
+          $("#prevented-new-assignment-in-closed-period").show();
+        }
 
-          _.each(assignments, function(assignment) {
-            var $li = $("<li></li>");
-            $li.text(assignment.title);
-            $assignment_list.append($li);
-          });
-          $("#assignments_outside_current_periods").removeClass("hidden");
-          $("#assignments_outside_current_periods").append($assignment_list);
+        if (uploadedGradebook.warning_messages.prevented_grading_ungradeable_submission) {
+          $("#prevented-grading-ungradeable-submission").show();
         }
     },
 
