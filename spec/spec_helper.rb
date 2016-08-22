@@ -222,85 +222,6 @@ if defined?(Spec::DSL::Main)
   end
 end
 
-def truncate_table(model)
-  case model.connection.adapter_name
-    when "SQLite"
-      model.delete_all
-      begin
-        model.connection.execute("delete from sqlite_sequence where name='#{model.connection.quote_table_name(model.table_name)}';")
-        model.connection.execute("insert into sqlite_sequence (name, seq) values ('#{model.connection.quote_table_name(model.table_name)}', #{rand(100)});")
-      rescue
-      end
-    when "PostgreSQL"
-      begin
-        old_proc = model.connection.raw_connection.set_notice_processor {}
-        model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)} CASCADE")
-      ensure
-        model.connection.raw_connection.set_notice_processor(&old_proc)
-      end
-    else
-      model.connection.execute("SET FOREIGN_KEY_CHECKS=0")
-      model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)}")
-      model.connection.execute("SET FOREIGN_KEY_CHECKS=1")
-  end
-end
-
-def get_table_names(connection)
-  # use custom SQL to exclude tables from extensions
-  schema = connection.shard.name if connection.instance_variable_get(:@config)[:use_qualified_names]
-  table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
-     SELECT relname
-     FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
-     WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
-       AND relkind='r'
-       AND NOT EXISTS (
-         SELECT 1 FROM pg_depend WHERE deptype='e' AND objid=pg_class.oid
-       )
-  SQL
-  table_names.delete('schema_migrations')
-  table_names
-end
-
-def truncate_all_tables
-  raise "don't use truncate_all_tables with transactional fixtures. this kills the postgres" if ActiveRecord::Base.connection.open_transactions > 0
-
-  Shard.with_each_shard do
-    model_connections = ActiveRecord::Base.descendants.map(&:connection).uniq
-    model_connections.each do |connection|
-      table_names = get_table_names(connection)
-      next if table_names.empty?
-      connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
-    end
-
-    Role.ensure_built_in_roles!
-  end
-end
-
-def ensure_group_cleanup!(group)
-  connection = ActiveRecord::Base.connection
-  table_names = get_table_names(connection) - ['roles']
-  table_names.each do |table|
-    next if connection.select_one("SELECT COUNT(*) FROM #{table}")["count"].to_i == 0
-    $stderr.puts
-    $stderr.puts "\e[31mERROR: Garbage data left over in `#{table}` table\e[0m"
-    $stderr.puts "Context: #{group.class.location}"
-    $stderr.puts
-    $stderr.puts "You should clean up any records you create so they don't affect subsequent specs."
-    $stderr.puts "Ideally you should just use \e[33mtransactional fixtures\e[0m, and it will \e[32mJust Work™\e[0m"
-    $stderr.puts
-    exit! 1
-  end
-end
-
-def cleanup_temp_dirs!
-  if $temp_dirs
-    $temp_dirs.each do |dir|
-      FileUtils::rm_rf(dir) if File.exist?(dir)
-    end
-    $temp_dirs = []
-  end
-end
-
 # Be sure to actually test serializing things to non-existent caches,
 # but give Mocks a pass, since they won't exist in dev/prod
 Mocha::Mock.class_eval do
@@ -380,51 +301,7 @@ RSpec.configure do |config|
 
   config.include Onceler::BasicHelpers
 
-  # rspec 2+ only runs global before(:all)'s before the top-level
-  # groups, not before each nested one. so we need to reset some
-  # things to play nicely with its caching
-  Onceler.configure do |c|
-    c.before :record do
-      Account.clear_special_account_cache!(true)
-      AdheresToPolicy::Cache.clear
-      Folder.reset_path_lookups!
-    end
-  end
-
-  Onceler.instance_eval do
-    # since once-ler creates potentially multiple levels of transaction
-    # nesting, we need a way to know the base level so we can compare it
-    # to AR::Conn#open_transactions. that will tell us if something is
-    # "committed" or not (from the perspective of the spec)
-    def base_transactions
-      # if not recording, it's presumed we're in a spec, in which case
-      # transactional fixtures add one more level
-      open_transactions + (recording? ? 0 : 1)
-    end
-  end
-
-  Notification.after_create do
-    Notification.reset_cache!
-    BroadcastPolicy.notification_finder.refresh_cache
-  end
-
-  config.before :all do
-    # so before(:all)'s don't get confused
-    Account.clear_special_account_cache!(true)
-    AdheresToPolicy::Cache.clear
-    # silence migration specs
-    ActiveRecord::Migration.verbose = false
-  end
-
-  config.after :all do |group|
-    cleanup_temp_dirs!
-    ensure_group_cleanup!(group) if ENV['ENSURE_GROUP_CLEANUP']
-  end
-
-  # UTC for tests, cuz it's easier :P
-  Account.time_zone_attribute_defaults[:default_time_zone] = 'UTC'
-
-  config.before :each do
+  def reset_all_the_things!
     I18n.locale = :en
     Time.zone = 'UTC'
     LoadAccount.force_special_account_reload = true
@@ -444,7 +321,38 @@ RSpec.configure do |config|
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.domain_namespace = nil
     Canvas::DynamicSettings.reset_cache!
+    ActiveRecord::Migration.verbose = false
     $spec_api_tokens = {}
+  end
+
+  Onceler.instance_eval do
+    # since once-ler creates potentially multiple levels of transaction
+    # nesting, we need a way to know the base level so we can compare it
+    # to AR::Conn#open_transactions. that will tell us if something is
+    # "committed" or not (from the perspective of the spec)
+    def base_transactions
+      # if not recording, it's presumed we're in a spec, in which case
+      # transactional fixtures add one more level
+      open_transactions + (recording? ? 0 : 1)
+    end
+  end
+
+  Notification.after_create do
+    Notification.reset_cache!
+    BroadcastPolicy.notification_finder.refresh_cache
+  end
+
+  # UTC for tests, cuz it's easier :P
+  Account.time_zone_attribute_defaults[:default_time_zone] = 'UTC'
+
+  Onceler.configure do |c|
+    c.before :record do
+      reset_all_the_things!
+    end
+  end
+
+  config.before :each do
+    reset_all_the_things!
   end
 
   config.before :suite do
@@ -459,10 +367,6 @@ RSpec.configure do |config|
       # (it forks and changes the TEST_ENV_NUMBER)
       SimpleCov.command_name("rspec:#{Process.pid}:#{ENV['TEST_ENV_NUMBER']}")
     end
-
-    # wipe out the test db, in case some non-transactional tests crapped out before
-    # cleaning up after themselves
-    truncate_all_tables unless ENV["SHARED_DB"] == "1"
 
     Timecop.safe_mode = true
   end

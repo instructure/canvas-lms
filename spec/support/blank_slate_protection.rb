@@ -40,10 +40,11 @@ module BlankSlateProtection
     end
 
     def disable
+      enabled = @enabled
       disable!
       yield
     ensure
-      enable!
+      @enabled = enabled
     end
   end
 end
