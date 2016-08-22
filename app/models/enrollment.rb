@@ -74,7 +74,7 @@ class Enrollment < ActiveRecord::Base
   after_save :recalculate_enrollment_state
   after_destroy :update_assignment_overrides_if_needed
 
-  attr_accessor :already_enrolled, :need_touch_user
+  attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -681,6 +681,7 @@ class Enrollment < ActiveRecord::Base
       @enrollment_dates = nil
       self.enrollment_state.state_is_current = false
     end
+    self.enrollment_state.skip_touch_user ||= self.skip_touch_user
     self.enrollment_state.ensure_current_state
   end
 
