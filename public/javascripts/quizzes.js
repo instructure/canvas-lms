@@ -3786,10 +3786,10 @@ define([
         ENV['CONDITIONAL_RELEASE_ENV']);
 
       $('#questions').on("change DOMNodeRemoved DOMNodeInserted", function() {
-        conditionalRelease.assignmentDirty = true;
+        conditionalRelease.assignmentUpToDate = false;
       });
-      $("quiz_tabs").on("tabsbeforeactivate", function(event) {
-        if (conditionalRelease.assignmentDirty) {
+      $("#quiz_tabs").on("tabsbeforeactivate", function(event) {
+        if (!conditionalRelease.assignmentUpToDate) {
           var id = null;
           if (quizModel) {
             id = quizModel.attributes.assignment_id;
@@ -3799,7 +3799,7 @@ define([
             grading_type: "points",
             points_possible: quiz.calculatePointsPossible()
           });
-          conditionalRelease.assignmentDirty = false;
+          conditionalRelease.assignmentUpToDate = true;
         }
       });
 

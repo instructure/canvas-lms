@@ -340,7 +340,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_grades_if_details_changed
-    if points_possible_changed? || muted_changed? || workflow_state_changed? || assignment_group_id_changed?
+    if points_possible_changed? || muted_changed? || workflow_state_changed? ||
+       assignment_group_id_changed? || only_visible_to_overrides_changed?
       Rails.logger.info "GRADES: recalculating because assignment #{global_id} changed. (#{changes.inspect})"
       self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
     end
@@ -1710,7 +1711,7 @@ class Assignment < ActiveRecord::Base
 
   scope :include_submittables, -> { preload(:quiz, :discussion_topic, :wiki_page) }
 
-  scope :no_graded_quizzes_or_topics, -> { where("submission_types NOT IN ('online_quiz', 'discussion_topic')") }
+  scope :no_submittables, -> { where.not(submission_types: %w(online_quiz discussion_topic wiki_page)) }
 
   scope :with_submissions, -> { preload(:submissions) }
 
@@ -2108,6 +2109,11 @@ class Assignment < ActiveRecord::Base
   def run_if_overrides_changed!
     self.relock_modules!
     each_submission_type { |submission| submission.relock_modules! if submission }
+
+    if only_visible_to_overrides?
+      Rails.logger.info "GRADES: recalculating because assignment overrides on #{global_id} changed."
+      context.recompute_student_scores
+    end
   end
 
   def run_if_overrides_changed_later!

@@ -1335,8 +1335,7 @@ describe User do
       course(:active_all => 1)
       @course.enroll_user(@user2)
 
-      expect(@user1.menu_courses).to eq []
-      expect(@user2.menu_courses).to eq [@course]
+      expect(@user1.menu_courses).to eq [@course]
     end
   end
 
@@ -1348,18 +1347,20 @@ describe User do
       (1..3).each do |x|
         course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
         @courses << course
+        @user.favorites.create!(context: course)
       end
 
       @user.save!
     end
 
-    it "should default favorites to enrolled courses" do
+    it "should default favorites to enrolled courses when favorite courses do not exist" do
+      @user.favorites.by("Course").destroy_all
       expect(@user.menu_courses.to_set).to eq @courses.to_set
     end
 
-    it "should only include favorite courses if some have been hidden" do
-      hidden_course = @courses.shift
-      Favorite.hide_context(@user, hidden_course)
+    it "should only include favorite courses when set" do
+      course = @courses.shift
+      @user.favorites.where(context_type: "Course", context_id: course).first.destroy
       expect(@user.menu_courses.to_set).to eq @courses.to_set
     end
 
@@ -1368,24 +1369,16 @@ describe User do
 
       before :each do
         account2 = @shard1.activate { account_model }
-        @cs_courses = []
         (4..6).each do |x|
           course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true, :account => account2).course
-          @cs_courses << course
+          @courses << course
+          @user.favorites.create!(context: course)
         end
       end
 
       it "should include cross shard favorite courses" do
-        hidden_course = @courses.shift
-        Favorite.hide_context(@user, hidden_course)
-
-        hidden_cs_course = @cs_courses.shift
-        Favorite.hide_context(@user, hidden_cs_course)
-
-        menu_courses = @user.menu_courses
-        expect(menu_courses.count).to eq 4
-        expect(menu_courses).to_not include(hidden_course)
-        expect(menu_courses).to_not include(hidden_cs_course)
+        @user.favorites.by("Course").where("id % 2 = 0").destroy_all
+        expect(@user.menu_courses.size).to eql(@courses.length / 2)
       end
     end
   end
@@ -1730,7 +1723,7 @@ describe User do
           # trigger the after db filtering
           Setting.stubs(:get).with('filter_events_by_section_code_threshold', anything).returns(0)
           @course.enroll_student(@student, :section => @sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
-          expect(@student.upcoming_events(:limit => 1)).to eq [@events[1]]
+          expect(@student.upcoming_events(:limit => 2)).to eq [@events[1]]
         end
 
         it "should use the old behavior as a fallback" do
@@ -1738,7 +1731,7 @@ describe User do
           # the optimized call will retrieve the first two events, and then filter them out
           # since it didn't retrieve enough events it will use the old code as a fallback
           @course.enroll_student(@student, :section => @sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
-          expect(@student.upcoming_events(:limit => 1)).to eq [@events[2]]
+          expect(@student.upcoming_events(:limit => 2)).to eq [@events[2]]
         end
       end
     end

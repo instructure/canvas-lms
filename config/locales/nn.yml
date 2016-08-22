@@ -1012,7 +1012,7 @@ nn:
       account_reports: 
         linn_benton: 
           assignment_group_id: 
-            text: "Tildeling av gruppe-ID:"
+            text: "Oppgåvegruppe-ID:"
           course_id: 
             text: "Kurs-ID:"
     sis_batch_counts: 
@@ -4899,13 +4899,13 @@ nn:
   data_set_identifier_data_set_id_c228b5df: "Datasett-ID: %{data_set_id}"
   date: 
     abbr_day_names: 
-      - su
-      - må
-      - ty
-      - true
-      - to
-      - fr
-      - la
+      - sun
+      - mån
+      - tys
+      - ons
+      - tor
+      - fre
+      - laur
     abbr_month_names: 
       - ~
       - jan."
@@ -4922,13 +4922,13 @@ nn:
       - des."
     datepicker: 
       column_headings: 
-        - su
-        - må
-        - ty
-        - true
-        - to
-        - fr
-        - la
+        - sun
+        - mån
+        - tys
+        - ons
+        - tor
+        - fre
+        - laur
     day_names: 
       - sundag
       - måndag
@@ -10246,9 +10246,7 @@ nn:
           quadrillion: Kvadrillion
           thousand: Tusen
           trillion: Trillion
-          unit: ""
       format: 
-        delimiter: ""
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -10264,11 +10262,7 @@ nn:
           tb: TB
     percentage: 
       format: 
-        delimiter: ""
         format: "%n%"
-    precision: 
-      format: 
-        delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "tal inkludert 1 til og med 16"
   number_of_allowed_attempts_3d10b740: "Tal på tillatne forsøk"
   number_of_respondents_e1e7e8b: "Tal på respondentar"
@@ -11565,7 +11559,6 @@ nn:
       give_everyone_full_credit: "Gi alle fullt utbytte for dette spørsmålet."
       no_scores_reduced: "Gi poeng for både retta og tidlegare rette svar (*ingen resultat vert reduserte*)"
       regrade_disabled: "Det er ikkje tillate med ny karaktersetjing på dette spørsmålet, fordi eit svar er fjerna eller spørsmålstypen er endra etter at ein student fullførte ei innlevering."
-      regrade_options: ""
       some_scores_reduced: "Gi poeng berre for korrekte svar (*resultata for enkelte studentar kan verte reduserte*)"
       update_question_without_regrading: "Oppdater spørsmålet utan å setje karakterar på nytt"
   quiz_40ee61b1: prøve
@@ -15569,7 +15562,7 @@ nn:
   webct_name: "Blackboard Vista/CE (WebCT)"
   week_s_cb1492ee: Veke(r)
   welcome_to_the_canvas_theme_editor_73091d1: "Velkomen til temaredigeringsprogram for Canvas"
-  welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Velkomen til dine kurs. Om du vil tilpasse kurslista, klikkar du på lenka \"Alle kurs\", og markerer kursa med stjerner for vising."
+  welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Velkomen til dine kurs. Om du vil tilpasse kurslista, klikkar du på lenka \"Alle kurs\", og stjernemarkerer kursa du vil vise."
   well_below_mastery_37664bdc: "Godt under meistringsnivå"
   what_are_self_sign_up_groups_af1f002a: "Kva er sjølvregistreringsgrupper?"
   what_does_provisioning_only_mean_eac9a4a1: "Kva betyr 'Kun for klargjering'? "

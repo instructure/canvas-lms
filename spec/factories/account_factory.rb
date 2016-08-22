@@ -47,6 +47,7 @@ def account_with_saml(opts={})
   config.auth_type = "saml"
   config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
   config.log_out_url = opts[:saml_log_out_url] if opts[:saml_log_out_url]
+  config.parent_registration = opts[:parent_registration] if opts[:parent_registration]
   @account.authentication_providers << config
   @account.authentication_providers.first.move_to_bottom
   @account

@@ -20,7 +20,7 @@ module CC
 
     def add_assignments
       Assignments::ScopedToUser.new(@course, @user).scope.
-        no_graded_quizzes_or_topics.each do |assignment|
+        no_submittables.each do |assignment|
         next unless export_object?(assignment)
 
         title = assignment.title || I18n.t('course_exports.unknown_titles.assignment', "Unknown assignment")

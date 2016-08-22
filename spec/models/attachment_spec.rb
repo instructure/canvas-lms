@@ -298,17 +298,8 @@ describe Attachment do
     end
 
     context "uploading and db transactions" do
-      self.use_transactional_fixtures = false
-
-      before do
+      before :once do
         attachment_model(:context => Account.default.groups.create!, :filename => 'test.mp4', :content_type => 'video')
-      end
-
-      after do
-        truncate_table(Attachment)
-        truncate_table(Folder)
-        truncate_table(Group)
-        truncate_table(Delayed::Job)
       end
 
       it "should delay upload until the #save transaction is committed" do

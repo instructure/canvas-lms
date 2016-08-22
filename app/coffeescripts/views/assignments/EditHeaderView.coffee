@@ -67,6 +67,7 @@ define [
     onTabChange: ->
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         @editView.updateConditionalRelease()
+      true
 
     onShowErrors: (errors) =>
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED

@@ -473,9 +473,10 @@ class Folder < ActiveRecord::Base
 
   # find all unlocked/visible folders that can be reached by following unlocked/visible folders from the root
   def self.all_visible_folder_ids(context)
-    folder_tree = context.active_folders.not_hidden.not_locked.select([:id, :parent_folder_id]).inject({}) do |folders, item|
-      folders[item.parent_folder_id] ||= []
-      folders[item.parent_folder_id] << item.id
+    folder_tree = context.active_folders.not_hidden.not_locked.pluck(:id, :parent_folder_id).inject({}) do |folders, row|
+      id, parent_folder_id = row
+      folders[parent_folder_id] ||= []
+      folders[parent_folder_id] << id
       folders
     end
     visible_ids = []

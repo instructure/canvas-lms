@@ -9,11 +9,10 @@
     @include fontSize(14px);
   }
   tr.date {
-    // make all dates in the past be 4% darker than normal,
-    // cant use background-color because we want them to still be zebra-striped
+
     &.date_passed {
       > td, > th {
-        background-image: url("/images/4_percent_opacity.png");
+        background-color: $ic-color-medium-light;
       }
     }
     .day_date {
@@ -55,7 +54,7 @@
     }
     &.date_passed {
       td, th {
-        background-color: #f8f8f8;
+        background-color: $ic-color-medium-light;
       }
       &.details {
         color: #444;

@@ -42,9 +42,9 @@ class RollupScore
       return nil if @outcome_results.length < @calculation_int
       n_mastery
     when 'latest'
-      scores.first
+      scores.first.round(PRECISION)
     when 'highest'
-      scores.max
+      scores.max.round(PRECISION)
     end
   end
 
@@ -73,6 +73,5 @@ class RollupScore
     older_avg_weighted = (tmp_scores.sum / tmp_scores.length) * (0.01 * (100 - weight))
     (latest_weighted + older_avg_weighted).round(PRECISION)
   end
-
 
 end

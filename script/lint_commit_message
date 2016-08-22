@@ -5,7 +5,13 @@ require 'json'
 require 'jira_ref_parser'
 require 'yaml'
 
-Dir.chdir(ENV["GERGICH_GIT_PATH"]) if ENV["GERGICH_GIT_PATH"]
+GERGICH_GIT_PATH=ENV.fetch("GERGICH_GIT_PATH", ".")
+
+def git(command)
+  Dir.chdir(GERGICH_GIT_PATH) do
+    `git #{command}`
+  end
+end
 
 def comment(severity, line, message, link_to_guidelines = false)
   $stderr.puts "line #{line}: [#{severity}]: #{message}"
@@ -18,7 +24,7 @@ def comment(severity, line, message, link_to_guidelines = false)
   end
 end
 
-commit_message = ARGV[0] == "--stdin" ? STDIN.read : `git show --pretty=format:%B -s`
+commit_message = ARGV[0] == "--stdin" ? STDIN.read : git("show --pretty=format:%B -s")
 
 exit if commit_message =~ /\A\[?wip($|[\] :-])/i
 lines = commit_message.split(/\n/)
@@ -87,7 +93,7 @@ end
 starts_with_spec = subject =~ /\Aspec: /i
 exit if starts_with_spec # we're trusting you here, don't be evil
 
-commit_files = `git show --pretty=format:"" --name-only`.split("\n")
+commit_files = git("show --pretty=format:"" --name-only").split("\n")
 only_affects_specs = commit_files.all? { |f| f =~ %r{\Aspec/} }
 if only_affects_specs
   comment "warn", 1, "since your commit only affects specs, please prefix your commit message with \"spec: \""

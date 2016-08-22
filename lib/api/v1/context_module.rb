@@ -37,7 +37,15 @@ module Api::V1::ContextModule
     end
     has_update_rights = context_module.grants_right?(current_user, :update)
     hash['published'] = context_module.active? if has_update_rights
-    tags = context_module.content_tags_visible_to(@current_user, assignment_visibilities: opts[:assignment_visibilities], discussion_visibilities: opts[:discussion_visibilities], quiz_visibilities: opts[:quiz_visibilities], observed_student_ids: opts[:observed_student_ids])
+    tags = context_module.content_tags_visible_to(@current_user,
+      opts.slice(
+        :assignment_visibilities,
+        :discussion_visibilities,
+        :page_visibilities,
+        :quiz_visibilities,
+        :observed_student_ids
+      )
+    )
     count = tags.count
     hash['items_count'] = count
     hash['items_url'] = polymorphic_url([:api_v1, context_module.context, context_module, :items])

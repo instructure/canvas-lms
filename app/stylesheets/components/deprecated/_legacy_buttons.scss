@@ -10,12 +10,11 @@
     text-align: left;
     margin: 5px auto;
     display: block;
-    
+
     i[class*=icon-], i[class^=icon-] {
-      &:before { color: #555 }
+      &:before { color: inherit; }
     }
-    @if $use_new_styles { &:first-of-type { margin-top: 0; } }
-    
+
   }
   button.button-sidebar-wide {
     @if $use_new_styles { width: 100%; }

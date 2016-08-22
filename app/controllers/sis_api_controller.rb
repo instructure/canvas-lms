@@ -56,6 +56,7 @@ class SisApiController < ApplicationController
   #       "integration_data": {
   #         "other_data": "values"
   #       },
+  #       "include_in_final_grade": true,
   #       "assignment_group": {
   #         "id": 12,
   #         "name": "Assignments Group",

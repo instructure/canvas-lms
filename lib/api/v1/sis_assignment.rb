@@ -20,7 +20,7 @@ module Api::V1::SisAssignment
   include Api::V1::Json
 
   API_SIS_ASSIGNMENT_JSON_OPTS = {
-    only: %i(id created_at due_at unlock_at lock_at points_possible integration_id integration_data).freeze,
+    only: %i(id created_at due_at unlock_at lock_at points_possible integration_id integration_data include_in_final_grade).freeze,
     methods: %i(name submission_types_array).freeze
   }.freeze
 
@@ -48,6 +48,7 @@ module Api::V1::SisAssignment
     json = api_json(assignment, nil, nil, API_SIS_ASSIGNMENT_JSON_OPTS)
     json[:course_id] = assignment.context_id if assignment.context_type == 'Course'
     json[:submission_types] = json.delete(:submission_types_array)
+    json[:include_in_final_grade] = include_in_final_grade(assignment)
     add_sis_assignment_group_json(assignment, json)
     add_sis_course_sections_json(assignment, json)
     json
@@ -105,6 +106,10 @@ module Api::V1::SisAssignment
     override_json = api_json(override, nil, nil, API_SIS_ASSIGNMENT_OVERRIDES_JSON_OPTS)
     override_json[:override_title] = override_json.delete(:title)
     json[:override] = override_json
+  end
+
+  private def include_in_final_grade(assignment)
+    !(assignment.omit_from_final_grade? || assignment.grading_type == 'not_graded')
   end
 
   private def active_course_sections_for(context)

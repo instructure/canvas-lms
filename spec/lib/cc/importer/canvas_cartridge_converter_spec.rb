@@ -1400,12 +1400,12 @@ XML
 end
 
 describe "cc assignment extensions" do
-  before(:all) do
+  before(:once) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_assignment_extension.zip")
     unzipped_file_path = create_temp_dir!
-    @converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
-    @converter.export
-    @course_data = @converter.course.with_indifferent_access
+    converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+    converter.export
+    @course_data = converter.course.with_indifferent_access
 
     @course = course
     @migration = ContentMigration.create(:context => @course)
@@ -1414,10 +1414,6 @@ describe "cc assignment extensions" do
     enable_cache do
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
-  end
-
-  after(:all) do
-    truncate_all_tables
   end
 
   it "should parse canvas data from cc extension" do
@@ -1448,13 +1444,13 @@ describe "cc assignment extensions" do
 end
 
 describe "matching question reordering" do
-  before(:all) do
+  before(:once) do
     skip unless Qti.qti_enabled?
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_matching_reorder.zip")
     unzipped_file_path = create_temp_dir!
-    @converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
-    @converter.export
-    @course_data = @converter.course.with_indifferent_access
+    converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+    converter.export
+    @course_data = converter.course.with_indifferent_access
 
     @course = course
     @migration = ContentMigration.create(:context => @course)
@@ -1463,10 +1459,6 @@ describe "matching question reordering" do
     enable_cache do
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
-  end
-
-  after(:all) do
-    truncate_all_tables
   end
 
   it "should reorder matching question answers with images if possible (and warn otherwise)" do
@@ -1494,20 +1486,16 @@ describe "matching question reordering" do
   end
 
   describe "announcements vs. discussion topics" do
-    before(:all) do
+    before(:once) do
       archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_announcement.zip")
       unzipped_file_path = create_temp_dir!
-      @converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
-      @converter.export
-      @course_data = @converter.course.with_indifferent_access
+      converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+      converter.export
+      @course_data = converter.course.with_indifferent_access
 
       @course = course
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_type = "canvas_cartridge_importer"
-    end
-
-    after(:all) do
-      truncate_all_tables
     end
 
     it "should separate the announcements into a separate array in the course hash" do

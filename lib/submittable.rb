@@ -17,6 +17,31 @@ module Submittable
       klass.joins(:assignment_student_visibilities)
         .where(assignment_student_visibilities: { user_id: user_ids, course_id: course_ids })
     }
+
+    klass.extend ClassMethods
+  end
+
+  module ClassMethods
+    def visible_ids_by_user(opts)
+      # pluck id, assignment_id, and user_id from items joined with the SQL view
+      plucked_visibilities = pluck_visibilities(opts).group_by{|_, _, user_id| user_id}
+      # items without an assignment are visible to all, so add them into every students hash at the end
+      ids_visible_to_all = self.without_assignment_in_course(opts[:course_id]).pluck(:id)
+      # build map of user_ids to array of item ids {1 => [2,3,4], 2 => [2,4]}
+      opts[:user_id].reduce({}) do |vis_hash, student_id|
+        vis_hash[student_id] = begin
+          ids_from_pluck = (plucked_visibilities[student_id] || []).map{|id, _ ,_| id}
+          ids_from_pluck.concat(ids_visible_to_all)
+        end
+        vis_hash
+      end
+    end
+
+    def pluck_visibilities(opts)
+      name = self.name.underscore.pluralize
+      self.joins_assignment_student_visibilities(opts[:user_id],opts[:course_id]).
+        pluck("#{name}.id", "#{name}.assignment_id", "assignment_student_visibilities.user_id")
+    end
   end
 
   def sync_assignment

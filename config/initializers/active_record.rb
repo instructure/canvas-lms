@@ -680,9 +680,7 @@ ActiveRecord::Relation.class_eval do
   def in_transaction_in_test?
     return false unless Rails.env.test?
     transaction_method = ActiveRecord::ConnectionAdapters::DatabaseStatements.instance_method(:transaction).source_location.first
-    # don't anchor the end of the regex; test_after_commit does an alias_method_chain, thus
-    # changing the name (and source location) of this method
-    transaction_regex = /^#{Regexp.escape(transaction_method)}:\d+:in `transaction/.freeze
+    transaction_regex = /\A#{Regexp.escape(transaction_method)}:\d+:in `transaction'\z/.freeze
     # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
     !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
   end

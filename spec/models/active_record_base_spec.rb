@@ -83,7 +83,7 @@ describe ActiveRecord::Base do
     end
 
     it "should raise an error when not in a transaction" do
-      expect { User.find_in_batches_with_temp_table }.to raise_error
+      expect { User.all.find_in_batches_with_temp_table }.to raise_error /find_in_batches_with_temp_table probably won't work/
     end
 
     it "should find all enrollments from course join in batches" do

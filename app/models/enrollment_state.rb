@@ -169,6 +169,10 @@ class EnrollmentState < ActiveRecord::Base
     process_states_in_ranges(start_at, end_at, enrollments_for_account_ids(account_ids))
   end
 
+  def self.process_states_for_ids(enrollment_ids)
+    process_states_for(Enrollment.where(:id => enrollment_ids).to_a)
+  end
+
   def self.process_states_for(enrollments)
     enrollments = Array(enrollments)
     Canvas::Builders::EnrollmentDateBuilder.preload(enrollments, false)

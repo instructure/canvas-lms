@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
   describe "QTI 1.2 zip" do
-    before(:all) do
+    before(:once) do
       @archive_file_path = File.join(BASE_FIXTURE_DIR, 'qti', 'plain_qti.zip')
       unzipped_file_path = create_temp_dir!
       @dir = create_temp_dir!
@@ -9,9 +9,9 @@ if Qti.migration_executable
       @course = Course.create!(:name => 'tester')
       @migration = ContentMigration.create(:context => @course)
 
-      @converter = Qti::Converter.new(:export_archive_path=>@archive_file_path, :base_download_dir=>unzipped_file_path, :content_migration => @migration)
-      @converter.export
-      @course_data = @converter.course.with_indifferent_access
+      converter = Qti::Converter.new(:export_archive_path=>@archive_file_path, :base_download_dir=>unzipped_file_path, :content_migration => @migration)
+      converter.export
+      @course_data = converter.course.with_indifferent_access
       @course_data['all_files_export'] ||= {}
       @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
@@ -21,12 +21,8 @@ if Qti.migration_executable
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
 
-    after(:all) do
-      truncate_all_tables
-    end
-
     it "should convert the assessments" do
-      expect(@converter.course[:assessments]).to eq QTI_EXPORT_ASSESSMENT
+      expect(@course_data[:assessments]).to eq QTI_EXPORT_ASSESSMENT
       expect(@course.quizzes.count).to eq 1
       quiz = @course.quizzes.first
       expect(quiz.title).to eq 'Quiz'

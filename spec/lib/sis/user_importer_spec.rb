@@ -48,7 +48,7 @@ describe SIS::UserImporter do
 
   context "when the unique_id is invalid the error message reported to the user" do
 
-    before(:all) do
+    before(:once) do
       @user_id = 'sis_id1'
       @login_id = '--*(&*(&%^&*%..-'
       messages = []

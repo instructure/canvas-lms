@@ -306,7 +306,12 @@ class UserMerge
     # record both records state sicne both will change
     user_merge_data.add_more_data(scope)
     # update the record on the target user to the better state of the from users enrollment
-    Enrollment.where(id: scope).where.not(id: keeper).update_all(workflow_state: keeper.workflow_state)
+
+    enrollment_ids = Enrollment.where(id: scope).where.not(id: keeper).pluck(:id)
+    Enrollment.where(:id => enrollment_ids).update_all(workflow_state: keeper.workflow_state)
+    EnrollmentState.invalidate_states(Enrollment.where(:id => enrollment_ids))
+    EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_ids)
+
     # mark the would be keeper from the from_user as deleted so it will not be moved later
     keeper.destroy
   end

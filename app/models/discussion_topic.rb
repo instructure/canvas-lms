@@ -494,30 +494,6 @@ class DiscussionTopic < ActiveRecord::Base
   alias_attribute :unlock_at, :delayed_post_at
   alias_attribute :available_until, :lock_at
 
-  def self.visible_ids_by_user(opts)
-    # pluck id, assignment_id, and user_id from discussions joined with the SQL view
-    plucked_visibilities = pluck_discussion_visibilities(opts).group_by{|r| r["user_id"]}
-    # discussions without an assignment are visible to all, so add them into every students hash at the end
-    ids_of_discussions_visible_to_all = self.without_assignment_in_course(opts[:course_id]).pluck(:id)
-    # format to be hash of user_id's with array of discussion_ids: {1 => [2,3,4], 2 => [2,4]}
-    opts[:user_id].reduce({}) do |vis_hash, student_id|
-      vis_hash[student_id] = begin
-        ids_from_pluck = (plucked_visibilities[student_id.to_s] || []).map{|r| r["id"]}
-        ids_from_pluck.concat(ids_of_discussions_visible_to_all).map(&:to_i)
-      end
-      vis_hash
-    end
-  end
-
-  def self.pluck_discussion_visibilities(opts)
-    # once on Rails 4 change this to a multi-column pluck
-    # and clean up reformatting in visible_ids_by_user
-    connection.select_all(
-      self.joins_assignment_student_visibilities(opts[:user_id],opts[:course_id]).
-        select(["discussion_topics.id", "discussion_topics.assignment_id", "assignment_student_visibilities.user_id"])
-    )
-  end
-
   def should_lock_yet
     # not assignment or vdd aware! only use this to check the topic's own field!
     # you should be checking other lock statuses in addition to this one
@@ -661,8 +637,6 @@ class DiscussionTopic < ActiveRecord::Base
     elsif self.cloned_item_id
       false
     elsif self.root_topic_id && self.has_group_category?
-      false
-    elsif self.assignment && self.assignment.submission_types == 'discussion_topic' && (!self.assignment.due_at || self.assignment.due_at > 1.week.from_now) # TODO: vdd
       false
     else
       true
@@ -950,7 +924,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def active_participants_with_visibility
     return active_participants if !self.for_assignment?
-    users_with_visibility = AssignmentStudentVisibility.where(assignment_id: self.assignment_id, course_id: course.id).pluck(:user_id)
+    users_with_visibility = self.assignment.students_with_visibility.pluck(:id)
 
     admin_ids = course.participating_admins.pluck(:id)
     users_with_visibility.concat(admin_ids)
@@ -975,7 +949,7 @@ class DiscussionTopic < ActiveRecord::Base
     subscribed_users = participating_users(sub_ids).to_a
 
     if self.for_assignment?
-      students_with_visibility = AssignmentStudentVisibility.where(course_id: course.id, assignment_id: assignment_id).pluck(:user_id)
+      students_with_visibility = self.assignment.students_with_visibility.pluck(:id)
 
       admin_ids = course.participating_admins.pluck(:id)
       observer_ids = course.participating_observers.pluck(:id)

@@ -374,6 +374,9 @@ describe "quizzes" do
       f('.upload-label').click
       wait_for_ajaximations
       keep_trying_until { expect(file_upload_submission_data).to eq [""] }
+      # the following attachment will not be backed up w/o this sleep
+      # wait_for_ajaximations doesn't work here
+      sleep 0.5
       upload_attachment_answer
       expect_new_page_load do
         driver.get driver.current_url

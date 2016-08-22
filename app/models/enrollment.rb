@@ -687,7 +687,11 @@ class Enrollment < ActiveRecord::Base
 
   def state_based_on_date
     RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state) do
-      self.enrollment_state.get_effective_state
+      if %w{invited active completed}.include?(self.workflow_state)
+        self.enrollment_state.get_effective_state
+      else
+        self.workflow_state.to_sym
+      end
     end
   end
 
@@ -937,7 +941,7 @@ class Enrollment < ActiveRecord::Base
 
   def self.recompute_final_score_if_stale(course, user=nil)
     Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get('recompute_grades_window', 600).to_i.seconds) do
-      recompute_final_score user ? user.id : course.student_enrollments.except(:preload).select(:user_id).uniq.map(&:user_id), course.id
+      recompute_final_score user ? user.id : course.student_enrollments.except(:preload).distinct.pluck(:user_id), course.id
       yield if block_given?
       true
     end

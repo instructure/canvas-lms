@@ -1,28 +1,6 @@
 /*
 @styleguide Highlights/Alerts
 
-```html
-<p>
-  <div class="alert">
-    <strong>Alert:</strong> Sample .alert style.
-  </div>
-</p>
-<p>
-  <div class="alert alert-error">
-    <strong>Error:</strong> Sample .alert .alert-error style.
-  </div>
-</p>
-<p>
-  <div class="alert alert-success">
-    <strong>Success:</strong> Sample .alert .alert-success style.
-  </div>
-</p>
-<p>
-  <div class="alert alert-info">
-    <strong>Information:</strong> Sample .alert .alert-info style.
-  </div>
-</p>
-```
 
 ```html
 <p>
@@ -86,8 +64,12 @@
 .alert {
   padding: $ic-sp $ic-sp*3 $ic-sp $ic-sp;
   background-color: $ic-bg-light-alert;
-  color: $ic-color-alert;
   border-radius: $ic-border-radius;
+  color: $ic-bg-light-alert-text;
+
+  @if $use_high_contrast {
+    border: 1px solid $ic-bg-light-alert-text;
+  }
 }
 .alert h4 {
   margin: 0;
@@ -106,16 +88,28 @@
 
 .alert-success {
   background-color: $ic-bg-light-success;
-  color: $successText;
+  color: $ic-bg-light-success-text;
+
+  @if $use_high_contrast {
+    border: 1px solid $ic-bg-light-success-text;
+  }
 }
 .alert-danger,
 .alert-error {
   background-color: $ic-bg-light-danger;
-  color: $ic-color-danger;
+  color: $ic-bg-light-danger-text;
+
+  @if $use_high_contrast {
+    border: 1px solid $ic-bg-light-danger-text;
+  }
 }
 .alert-info {
   background-color: $ic-bg-light-primary;
-  color: $ic-brand-primary;
+  color: $ic-bg-light-primary-text;
+
+  @if $use_high_contrast {
+    border: 1px solid $ic-bg-light-primary-text;
+  }
 }
 
 //// end Alerts

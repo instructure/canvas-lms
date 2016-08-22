@@ -1666,7 +1666,7 @@ class User < ActiveRecord::Base
     @courses_with_primary_enrollment ||= {}
     @courses_with_primary_enrollment.fetch(cache_key) do
       res = self.shard.activate do
-        result = Rails.cache.fetch([self, 'courses_with_primary_enrollment3', association, options, ApplicationController.region].cache_key, :expires_in => 15.minutes) do
+        result = Rails.cache.fetch([self, 'courses_with_primary_enrollment2', association, options, ApplicationController.region].cache_key, :expires_in => 15.minutes) do
 
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
@@ -1675,9 +1675,12 @@ class User < ActiveRecord::Base
           shards = in_region_associated_shards
           # Limit favorite courses based on current shard.
           if association == :favorite_courses
-            ids = self.hidden_context_ids("Course")
-            unless ids.empty?
-              scope = scope.where.not(id: ids)
+            ids = self.favorite_context_ids("Course")
+            if ids.empty?
+              scope = scope.none
+            else
+              shards = shards & ids.map { |id| Shard.shard_for(id) }
+              scope = scope.where(id: ids)
             end
           end
 
@@ -2142,15 +2145,12 @@ class User < ActiveRecord::Base
     end
   end
 
-  # don't instantiate a buttload of objects if we can help it
-  def self.pluck_global_id_rows(relation)
-    rows = ActiveRecord::Base.connection.select_all(relation.to_sql)
-    rows.each do |row|
-      row.each do |k, id|
-        row[k] = Shard.relative_id_for(id, Shard.current, Shard.birth)
+  def self.convert_global_id_rows(rows)
+    rows.map do |row|
+      row.map do |id|
+        Shard.relative_id_for(id, Shard.current, Shard.birth)
       end
     end
-    rows
   end
 
   def self.preload_conversation_context_codes(users)
@@ -2166,37 +2166,34 @@ class User < ActiveRecord::Base
     concluded_contexts = {}
 
     Shard.with_each_shard(shards.to_a) do
-      course_rows = pluck_global_id_rows(
+      course_rows = convert_global_id_rows(
           Enrollment.joins(:course).
               where(User.enrollment_conditions(:active)).
               where(user_id: users).
-              select([:user_id, :course_id]).
-              uniq)
-      course_rows.each do |r|
-        active_contexts[r['user_id']] ||= []
-        active_contexts[r['user_id']] << "course_#{r['course_id']}"
+              distinct.pluck(:user_id, :course_id))
+      course_rows.each do |user_id, course_id|
+        active_contexts[user_id] ||= []
+        active_contexts[user_id] << "course_#{course_id}"
       end
 
-      cc_rows = pluck_global_id_rows(
+      cc_rows = convert_global_id_rows(
           Enrollment.joins(:course).
               where(User.enrollment_conditions(:completed)).
               where(user_id: users).
-              select([:user_id, :course_id]).
-              uniq)
-      cc_rows.each do |r|
-        concluded_contexts[r['user_id']] ||= []
-        concluded_contexts[r['user_id']] << "course_#{r['course_id']}"
+              distinct.pluck(:user_id, :course_id))
+      cc_rows.each do |user_id, course_id|
+        concluded_contexts[user_id] ||= []
+        concluded_contexts[user_id] << "course_#{course_id}"
       end
 
-      group_rows = pluck_global_id_rows(
+      group_rows = convert_global_id_rows(
           GroupMembership.joins(:group).
               merge(User.instance_exec(&User.reflections[CANVAS_RAILS4_0 ? :current_group_memberships : 'current_group_memberships'].scope).only(:where)).
               where(user_id: users).
-              select([:user_id, :group_id]).
-              uniq)
-      group_rows.each do |r|
-        active_contexts[r['user_id']] ||= []
-        active_contexts[r['user_id']] << "group_#{r['group_id']}"
+              distinct.pluck(:user_id, :group_id))
+      group_rows.each do |user_id, group_id|
+        active_contexts[user_id] ||= []
+        active_contexts[user_id] << "group_#{group_id}"
       end
     end
     Shard.birth.activate do
@@ -2452,26 +2449,24 @@ class User < ActiveRecord::Base
     }
   end
 
-  # Public: Returns a unique list of the ids of contexts of the specified type
-  # that this user has hidden with Favorite.set_favorite(u, c, false). IDs
-  # will be given relative to the active shard.
+  # Public: Returns a unique list of favorite context type ids relative to the active shard.
   #
   # Examples
   #
-  #   hidden_context_ids("Course")
+  #   favorite_context_ids("Course")
   #   # => [1, 2, 3, 4]
   #
-  # Returns an array of unique relative ids.
-  def hidden_context_ids(context_type)
-    @hidden_context_ids ||= {}
+  # Returns an array of unique global ids.
+  def favorite_context_ids(context_type)
+    @favorite_context_ids ||= {}
 
-    context_ids = @hidden_context_ids[context_type]
+    context_ids = @favorite_context_ids[context_type]
     unless context_ids
       # Only get the users favorites from their shard.
       self.shard.activate do
         # Get favorites and map them to their global ids.
-        context_ids = self.favorites.hidden.where(context_type: context_type).pluck(:context_id).map { |id| Shard.global_id_for(id) }
-        @hidden_context_ids[context_type] = context_ids
+        context_ids = self.favorites.where(context_type: context_type).pluck(:context_id).map { |id| Shard.global_id_for(id) }
+        @favorite_context_ids[context_type] = context_ids
       end
     end
 
@@ -2484,7 +2479,12 @@ class User < ActiveRecord::Base
   def menu_courses(enrollment_uuid = nil)
     return @menu_courses if @menu_courses
 
-    @menu_courses = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid).first(12)
+    favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid)
+    if favorites.length > 0
+      @menu_courses = favorites
+    else
+      @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).first(12)
+    end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses
   end

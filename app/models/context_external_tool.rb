@@ -616,7 +616,7 @@ class ContextExternalTool < ActiveRecord::Base
     context = context.context if context.is_a?(Group)
 
     tool = context.context_external_tools.having_setting(type).where(id: id).first
-    tool ||= ContextExternalTool.having_setting(type).where(context_type: 'Account', context_id: context.account_chain, id: id).first
+    tool ||= ContextExternalTool.having_setting(type).where(context_type: 'Account', context_id: context.account_chain_ids, id: id).first
     raise ActiveRecord::RecordNotFound if !tool && raise_error
 
     tool
@@ -628,7 +628,7 @@ class ContextExternalTool < ActiveRecord::Base
     if !context.is_a?(Account) && context.respond_to?(:context_external_tools)
       tools += context.context_external_tools.having_setting(type.to_s)
     end
-    tools += ContextExternalTool.having_setting(type.to_s).where(context_type: 'Account', context_id: context.account_chain)
+    tools += ContextExternalTool.having_setting(type.to_s).where(context_type: 'Account', context_id: context.account_chain_ids)
   end
 
   def self.serialization_excludes; [:shared_secret,:settings]; end

@@ -20,15 +20,28 @@
 <ul class="message-actions unstyled">
   {{#unless for_submission}}
   <li>
+    <span class="StarButton-LabelContainer" id="star_button_{{id}}" style="display: none;">
+      {{#if starred}}
+        {{#if subject}}
+          {{#t}}Starred "{{subject}}", Click to unstar.{{/t}}
+        {{else}}
+          {{#t}}Starred "(No subject)", Click to unstar.{{/t}}
+        {{/if}}
+      {{else}}
+        {{#if subject}}
+          {{#t}}Not starred "{{subject}}", Click to star.{{/t}}
+        {{else}}
+          {{#t}}'Not starred "(No Subject)", Click to star.{{/t}}
+        {{/if}}
+      {{/if}}
+    </span>
     <a href="#"
        class="star-btn {{#if starred}}active{{/if}}"
        title="{{#if starred}}{{#t "unstar_conversation"}}Unstar conversation{{/t}}{{else}}{{#t "star_conversation"}}Star conversation{{/t}}{{/if}}"
        aria-checked="{{#if starred}}true{{else}}false{{/if}}"
+       aria-labelledby="star_button_{{id}}"
        role="checkbox">
       &#9734;
-      <span class="screenreader-only">
-        {{#t "starred"}}Starred{{/t}}
-      </span>
     </a>
   </li>
   {{/unless}}

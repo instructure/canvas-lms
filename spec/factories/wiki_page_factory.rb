@@ -24,13 +24,13 @@ def wiki_page_model(opts={})
 end
 
 def wiki_page_assignment_model(opts={})
-  page = opts.delete(:wiki_page) || wiki_page_model(opts)
-  assignment_model(
-    course: page.course,
-    wiki_page: page,
+  @page = opts.delete(:wiki_page) || wiki_page_model(opts)
+  assignment_model({
+    course: @page.course,
+    wiki_page: @page,
     submission_types: 'wiki_page',
     title: 'Content Page Assignment'
-  )
+  }.merge(opts))
 end
 
 def valid_wiki_page_attributes

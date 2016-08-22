@@ -1,4 +1,4 @@
-//// 
+////
 // Note: We share this file with other Instructure projects so we can
 // maintain a consistent look feel with our styleguides.
 // If you edit something in there please throw a reference in #ui so we
@@ -6,9 +6,9 @@
 ////
 ////
 ////// Mixins & Silent Classes needed for layout
-// Note that we've pulled in some css flex box layout classes to help alignment. 
+// Note that we've pulled in some css flex box layout classes to help alignment.
 // Since we share this _layout file with other projects that don't have flexbox grid
-// or autoprefixer, we've turned these into silent classes to make sure that we can 
+// or autoprefixer, we've turned these into silent classes to make sure that we can
 // pull in the right prefixes needed for xbrowser support.
 /////
 %sg-flex {
@@ -22,11 +22,11 @@
   display: flex;
 }
 %sg-flex-1 {
-  -webkit-box-flex: 1; 
-  -moz-box-flex: 1; 
-  box-flex: 1; 
-  -ms-flex: 1; 
-  -webkit-flex: 1; 
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  -ms-flex: 1;
+  -webkit-flex: 1;
   flex: 1;
 }
 %sg-flex-align-content-center {
@@ -68,28 +68,28 @@ body.Sg-only {
   z-index: 999;
 }
 .Sg-header__Navigation {
-  @include sg-header-logo; 
+  @include sg-header-logo;
   @extend %sg-flex;
   @extend %sg-flex-1;
   @extend %sg-flex-align-content-center;
-  @extend %sg-flex-justify-content-center;  
+  @extend %sg-flex-justify-content-center;
 }
 .Sg-header__Navigation-item {
   color: $sg-header-navigation-item;
   @include fontSize($ic-font-size--medium);
   padding: 13px 15px;
-  text-transform: capitalize;  
-  text-decoration: none;  
-  @extend %sg-flex-align-self;  
+  text-transform: capitalize;
+  text-decoration: none;
+  @extend %sg-flex-align-self;
   &:hover {
     text-decoration: none;
     color: $sg-header-navigation-item--hover;
     background: $sg-background-sub-nav;
   }
   &:focus {
-    text-decoration: none;  
+    text-decoration: none;
     color: $sg-header-navigation-item;
-  }  
+  }
 }
 .Sg-header__Navigation-item.active {
   background: $sg-background-sub-nav;
@@ -100,7 +100,7 @@ body.Sg-only {
   @extend %sg-flex;
   @extend %sg-flex-1;
   @extend %sg-flex-align-content-center;
-  @extend %sg-flex-justify-content-center;  
+  @extend %sg-flex-justify-content-center;
 }
 .Sg-header__Subnavigation-item {
   &,
@@ -148,7 +148,7 @@ body.Sg-only {
     @include fontSize($ic-font-size--medium);
     text-align: center;
     margin: 0;
-  }  
+  }
   > ul, > dl, > ol {
     margin: 10px 20px;
     li {

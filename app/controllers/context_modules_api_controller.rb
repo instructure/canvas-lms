@@ -380,6 +380,7 @@ class ContextModulesApiController < ApplicationController
 
         opts[:assignment_visibilities] = AssignmentStudentVisibility.visible_assignment_ids_for_user(user_ids, @context.id)
         opts[:discussion_visibilities] = DiscussionTopic.visible_to_students_in_course_with_da(user_ids, @context.id).pluck(:id)
+        opts[:page_visibilities] = WikiPage.visible_to_students_in_course_with_da(user_ids, @context.id).pluck(:id)
         opts[:quiz_visibilities] = Quizzes::Quiz.visible_to_students_in_course_with_da(user_ids,@context.id).pluck(:quiz_id)
       end
 
