@@ -325,18 +325,6 @@ RSpec.configure do |config|
     $spec_api_tokens = {}
   end
 
-  Onceler.instance_eval do
-    # since once-ler creates potentially multiple levels of transaction
-    # nesting, we need a way to know the base level so we can compare it
-    # to AR::Conn#open_transactions. that will tell us if something is
-    # "committed" or not (from the perspective of the spec)
-    def base_transactions
-      # if not recording, it's presumed we're in a spec, in which case
-      # transactional fixtures add one more level
-      open_transactions + (recording? ? 0 : 1)
-    end
-  end
-
   Notification.after_create do
     Notification.reset_cache!
     BroadcastPolicy.notification_finder.refresh_cache
