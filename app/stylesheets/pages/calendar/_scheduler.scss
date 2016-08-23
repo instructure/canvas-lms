@@ -1,9 +1,5 @@
 @import "base/environment";
 
-@if $use_new_styles == false {
-  #wrapper-container { min-width: 1150px; }
-}
-
 .scheduler-content {
   padding: 1em;
   background-color: $bodyBackground;

@@ -35,12 +35,10 @@
       }
 
       td.not_last {
-        @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
-        @else { border-bottom: 1px solid #ddd; }
+        border-bottom: 1px solid $ic-border-light;
       }
       tr.related_event {
-        @if $use_new_styles { background-color: $ic-bg-light-primary; }
-        @else { background-color: #e7f3ff; }
+        background-color: $ic-bg-light-primary;
       }
     }
     &.date_passed {
@@ -55,8 +53,7 @@
     // class to the row that is showing the assignments for that date
     &.related, &.selected {
       td, th {
-        @if $use_new_styles { background-color: $ic-bg-light-primary; }
-        @else { background-color: #def; }
+        background-color: $ic-bg-light-primary;
       }
     }
   }

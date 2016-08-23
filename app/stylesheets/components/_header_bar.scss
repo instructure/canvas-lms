@@ -118,8 +118,7 @@
   border-bottom: 1px solid $ic-border-light;
   background-color: #fff;
   min-height: 33px;
-  @if $use_new_styles { padding-bottom: $ic-sp; }
-  @else { padding: 15px; }
+  padding-bottom: $ic-sp;
 
   &.pinned {
     position: fixed;

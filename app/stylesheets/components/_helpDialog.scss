@@ -15,14 +15,12 @@
         display: block;
         padding: $ic-sp;
         text-decoration: none;
-        @if $use_new_styles { font-weight: 500; }
-        @else { font-weight: bold; }
+        font-weight: 500;
         .subtext {
           display: block;
           @include fontSize(12px);
           color: $ic-font-color--subdued;
-          @if $use_new_styles { font-weight: 300; }
-          @else { font-weight: normal; }
+          font-weight: 300;
         }
         &:focus {
           outline: none;

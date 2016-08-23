@@ -1,27 +1,25 @@
 @import "pages/dashboard/dashboard_activity";
 
-@if $use_new_styles {
-  .ic-Dashboard-content--align-right {
-    align-items: flex-end;
-  }
-  .ic-Dashboard-header {
-    border-bottom: 1px solid $ic-border-light;
-    margin: 0 0 $ic-sp;
-    padding-bottom: $ic-sp;
-    > div {
-      padding-left: 0;
-      padding-right: 0;
-    }
-    .ic-Dashboard-header_title {
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-  }
-
-  // fix awkward spacing when a notification appears above the dashboard
-  .ic-notification {
-    + .ic-Dashboard-header { margin-top: $ic-sp*2; }
-  }
-
-  .ic-Dashboard-Activity { padding: $ic-sp; }
+.ic-Dashboard-content--align-right {
+  align-items: flex-end;
 }
+.ic-Dashboard-header {
+  border-bottom: 1px solid $ic-border-light;
+  margin: 0 0 $ic-sp;
+  padding-bottom: $ic-sp;
+  > div {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .ic-Dashboard-header_title {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+// fix awkward spacing when a notification appears above the dashboard
+.ic-notification {
+  + .ic-Dashboard-header { margin-top: $ic-sp*2; }
+}
+
+.ic-Dashboard-Activity { padding: $ic-sp; }

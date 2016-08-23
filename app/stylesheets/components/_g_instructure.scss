@@ -217,12 +217,9 @@
     margin: 5px 0px;
     width: 100%;
     td, tbody th {
-      @if $use_new_styles { background-color: $lightBackground; }
-      @else { background-color: #e6e7e9; }
+      background-color: $lightBackground;
     }
-    @if $use_new_styles {
-      tbody th { font-weight: 500; }
-    }
+    tbody th { font-weight: 500; }
   }
   table.notifications {
     border-top: 2px solid #999;
@@ -261,8 +258,7 @@
   .events_list, .to-do-list {
     li.event, li.todo {
       i.icon-check {
-        @if $use_new_styles { color: $ic-color-success; }
-        @else { color: #33802a; }
+        color: $ic-color-success;
       }
       .todo-badge {
         @include ic-badge-maker(18px);
@@ -276,8 +272,7 @@
     }
   }
   .events_list {
-    @if $use_new_styles { margin-bottom: $ic-sp*2; }
-    @else { margin-bottom: 20px; }
+    margin-bottom: $ic-sp*2;
     .event-list-view-calendar {
       float: right;
       @include fontSize(12px);
@@ -288,9 +283,7 @@
       }
     }
   }
-  @if $use_new_styles {
-    * + .events_list { margin-top: $ic-sp*2; }
-  }
+  * + .events_list { margin-top: $ic-sp*2; }
   .details {
     margin: 5px;
     padding: 5px 10px;
@@ -319,36 +312,15 @@ table.summary {
     text-align: left;
   }
   th, td, caption {
-    @if $use_new_styles {
-      padding: $ic-sp/2;
-    }
-    @else {
-      padding: 2px 8px;
-      vertical-align: top;
-    }
+    padding: $ic-sp/2;
   }
   thead th, caption {
-    @if $use_new_styles {
-      font-weight: 500;
-      border-bottom: 1px solid $ic-border-dark;
-    }
-    @else {
-      background-color: #4d4d4d;
-      color: #fff;
-      font-weight: normal;
-      border-bottom: 1px solid #4d4d4d;
-    }
+    font-weight: 500;
+    border-bottom: 1px solid $ic-border-dark;
   }
   td, tbody th {
-    @if $use_new_styles {
-      border-bottom: 1px solid $ic-border-light;
-      background-color: $ic-color-light;
-    }
-    @else {
-      border-top: 1px dotted #aaa;
-      background-color: #f2f3f5;
-      color: #595959;
-    }
+    border-bottom: 1px solid $ic-border-light;
+    background-color: $ic-color-light;
   }
   table.subtable {
     th, td {
@@ -494,10 +466,6 @@ body .disabled_link {
   margin: 20px auto;
   &.paper {
     min-width: 400px;
-    @if $use_new_styles == false {
-      padding: 10px 20px;
-      border: 1px solid #aaa;
-    }
   }
   &.plain_text {
     width: 90%;
@@ -1610,8 +1578,7 @@ body.padless-content #content, #content.padless {
 }
 
 #sequence_footer {
-  @if $use_new_styles { padding-top: $ic-sp*2; }
-  @else { padding-top: 15px; }
+  padding-top: $ic-sp*2;
   .next, .prev {
     width: 150px;
     overflow: hidden;
@@ -1727,7 +1694,7 @@ form.user_content_post_form {
 
 .with-fixed-bottom #wrapper-container {
   padding-bottom: 60px;
-  @if $use_new_styles { box-sizing: border-box; }
+  box-sizing: border-box;
 }
 
 #fixed_bottom {

@@ -145,11 +145,6 @@
   margin-left: 9%;
 }
 
-@if $use_new_styles == false {
-  .with-left-side { min-width: 971px; }
-}
-
-
 .accessible-toggler {
   @include ic-focus-base;
   color: #333;

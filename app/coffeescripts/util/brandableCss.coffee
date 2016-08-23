@@ -3,17 +3,12 @@ define ->
 
   brandableCss =
     getCssVariant: ->
-      variant = if window.ENV.use_new_styles
-        'new_styles'
-      else
-        'legacy'
-
       contrast = if window.ENV.use_high_contrast
         '_high_contrast'
       else
         '_normal_contrast'
 
-      variant + contrast
+      'new_styles' + contrast
 
 
     # combinedChecksum should be like '09f833ef7a'

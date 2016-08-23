@@ -47,7 +47,6 @@
   padding-left: 12px;
   margin-right: 2px;
   line-height: 14px; // keeps the overall height an even number
-  @if $use_new_styles { @include fontSize($baseFontSize); }
 }
 
 

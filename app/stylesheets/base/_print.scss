@@ -23,10 +23,8 @@
     border: 0 none !important;
   }
 
-  @if $use_new_styles {
-    #wrapper-container,
-    .ic-app-main-layout-horizontal { margin-left: 0 !important; }
-  }
+  #wrapper-container,
+  .ic-app-main-layout-horizontal { margin-left: 0 !important; }
 
   // this is for firefox, if things dont have overflow:visible then it wont print any more than one page.
   #wrapper-container,
@@ -35,15 +33,13 @@
     overflow: visible !important;
   }
 
-  // for new UI, override flex layout for FF, or else you hit:
+  // Override flex layout for FF, or else you hit:
   // https://bugzilla.mozilla.org/show_bug.cgi?id=258397
-  @if $use_new_styles {
-    .ic-app-main-layout-vertical,
-    .ic-app-main-layout-horizontal,
-    .ic-app-main-and-right-side,
-    .ic-app-main-content {
-      display: block !important;
-    }
+  .ic-app-main-layout-vertical,
+  .ic-app-main-layout-horizontal,
+  .ic-app-main-and-right-side,
+  .ic-app-main-content {
+    display: block !important;
   }
 
   #content {

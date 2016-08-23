@@ -44,8 +44,6 @@ $kyle-menu-bg-color: #e6e7e9;
 $kyle-menu-border-color: #b0afaf;
 $kyle-menu-carat-size: 8px;
 $kyle-menu-border-radius: $baseBorderRadius;
-@if not $use_new_styles { $kyle-menu-border-radius: 4px; }
-
 
 
 // the .ui-menu-carat is the outer border of the carat to make it match the border of the popup
@@ -59,15 +57,13 @@ $kyle-menu-border-radius: $baseBorderRadius;
   border-width: 0px $kyle-menu-carat-size+1px $kyle-menu-carat-size+1px;
   top: -$kyle-menu-carat-size - 1px;
   margin-left: -$kyle-menu-carat-size - 1px;
-  @if $use_new_styles { border-color: darken($ic-border-light, 3%) transparent; }
-  @else { border-color: $kyle-menu-border-color transparent; }
+  border-color: darken($ic-border-light, 3%) transparent;
 }
 .ui-menu-carat span {
   border-width: 0px $kyle-menu-carat-size $kyle-menu-carat-size;
   top: 1px;
   margin-left: -$kyle-menu-carat-size;
-  @if $use_new_styles { border-color: $ic-color-light transparent; }
-  @else { border-color: $kyle-menu-bg-color transparent; }
+  border-color: $ic-color-light transparent;
 }
 .carat-bottom {
   .ui-menu-carat, .ui-menu-carat span {
@@ -85,31 +81,17 @@ $kyle-menu-border-radius: $baseBorderRadius;
   position: absolute; // take it out of the "flow" so that it pops on top and doesnt push things down
   z-index: 9999;
   margin-top: $kyle-menu-carat-size;
-  @if $use_new_styles {
-    text-align: left;
-    border: 1px solid $ic-border-light;
-    box-shadow: 0px 0px 6px rgba(black, 0.1);
-    background-color: $ic-color-light;
-    font-weight: $ic-font-weight;
-  }
-  @else {
-    background-color: $kyle-menu-bg-color;
-    border: 1px solid $kyle-menu-border-color;
-    @include fontSize(12px);
-    color: #525252;
-    border-radius:  $kyle-menu-border-radius + 1;
-    box-shadow: 0px 2px 4px -1px rgba(0,0,0,.4);
-    font-weight: bold;
-  }
+  text-align: left;
+  border: 1px solid $ic-border-light;
+  box-shadow: 0px 0px 6px rgba(black, 0.1);
+  background-color: $ic-color-light;
+  font-weight: $ic-font-weight;
 
   a {
-    @if $use_new_styles {
-      color: #333;
-      padding: $ic-sp/2 $ic-sp;
-      min-width: $ic-sp*12;
-      line-height: 1.1;
-    }
-    @else { color: #525252; }
+    color: #333;
+    padding: $ic-sp/2 $ic-sp;
+    min-width: $ic-sp*12;
+    line-height: 1.1;
   }
   hr {
     margin: 0;
@@ -124,14 +106,7 @@ $kyle-menu-border-radius: $baseBorderRadius;
   li:last-child a { border-bottom-left-radius: $kyle-menu-border-radius; border-bottom-right-radius:$kyle-menu-border-radius; }
   .ui-state-focus {
     font-weight: bold !important;
-    @if $use_new_styles { border: none; }
-    @else {
-      @include vertical-gradient(#0abdff, #008fd6);
-      border-top: 1px solid #d5f1fe;
-      border-bottom: 1px solid #1e7eca;
-      color: white;
-      text-shadow: rgba(0,0,0,0.5) 1px 0 1px;
-    }
+    border: none;
 
     .ui-icon-radio-on {
       background: url(/images/icon-checkmark-rev.svg) 0 50% no-repeat !important;

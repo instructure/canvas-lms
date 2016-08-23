@@ -1,15 +1,13 @@
 @import "base/environment";
 
-@if $use_new_styles {
-  body.ic-full-screen-lti-tool .tool_content_wrapper {
-    // In the new UI, full-width external tools
-    // are 100% height. This stops the body from
-    // throwing vertical scrollbars
-    overflow-y: hidden;
-    // Full-width external tools hide footer, so in new
-    // UI, we know iframe container height can stay 100vh
-    height: 100vh;
-  }
+body.ic-full-screen-lti-tool .tool_content_wrapper {
+  // Full-width external tools
+  // are 100% height. This stops the body from
+  // throwing vertical scrollbars
+  overflow-y: hidden;
+  // Full-width external tools hide footer, so
+  // we know iframe container height can stay 100vh
+  height: 100vh;
 }
 
 #footer {

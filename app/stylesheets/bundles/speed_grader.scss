@@ -24,14 +24,8 @@ $gradebook_header_height: 3.5em;
 }
 
 #gradebook_header {
-  @if $use_new_styles {
-    background-color: $ic-brand-global-nav-bgd;
-    color: $ic-brand-global-nav-menu-item__text-color;
-  }
-  @else {
-    background-color: $ic-color-dark;
-    color: $ic-color-light;
-  }
+  background-color: $ic-brand-global-nav-bgd;
+  color: $ic-brand-global-nav-menu-item__text-color;
 
   padding: 0.375em 0.75em;
   @include fontSize(11px);
@@ -40,12 +34,7 @@ $gradebook_header_height: 3.5em;
     background-image: $iconsActive;
   }
   a {
-    @if $use_new_styles {
-      color: $ic-brand-global-nav-menu-item__text-color;
-    }
-    @else {
-      color: $ic-color-light;
-    }
+    color: $ic-brand-global-nav-menu-item__text-color;
   }
 
   #combo_box_container {
@@ -203,7 +192,7 @@ $icon-size: 1.4rem;
 
 #main {
   position: static;
-  @if $use_new_styles { z-index: 1; }
+  z-index: 1;
 }
 
 #full_width_container {
@@ -688,12 +677,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   }
   .ui-selectmenu-status & {
     margin-top: 1px;
-    @if $use_new_styles {
-      color: $ic-brand-global-nav-menu-item__text-color;
-    }
-    @else {
-      color: $ic-color-light;
-    }
+    color: $ic-brand-global-nav-menu-item__text-color;
   }
 }
 

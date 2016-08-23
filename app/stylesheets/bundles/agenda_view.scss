@@ -1,10 +1,6 @@
 @import "base/environment";
 @import "pages/agenda/agenda_view_minical";
 
-@if $use_new_styles == false {
-  body { background: #E8ECEF; }
-}
-
 /*.ic-app-main-content__secondary {
   @include breakpoint(desktop) {
     flex: 0 0 $ic-sp*24;
@@ -12,35 +8,15 @@
 }*/
 
 #right-side {
-  @if $use_new_styles {
-    padding: $ic-sp;
-    background: $lightBackground;
-    border: 1px solid $ic-border-light;
-  }
-  @else {
-    margin: 0;
-    margin-left: 20px;
-    width: 240px;
-    padding: 13px;
-    background-color: #d3d9df;
-  }
+  padding: $ic-sp;
+  background: $lightBackground;
+  border: 1px solid $ic-border-light;
 
   .element_toggler {
-    @if $use_new_styles {
-      padding: 0;
-      font-weight: 500;
-      @include fontSize(14px);
-      line-height: 1.3;
-    }
-    @else {
-      padding: 5px;
-      @include fontSize(15px);
-      font-weight: bold;
-      &:hover, &:focus {
-        background-color: #DBE0E6;
-        border-radius: 3px;
-      }
-    }
+    padding: 0;
+    font-weight: 500;
+    @include fontSize(14px);
+    line-height: 1.3;
 
     i { vertical-align: middle; }
   }
@@ -157,8 +133,7 @@ span.agendaView--no-assignments {
 
   .navigation_title, .appointment_group_title {
     vertical-align: middle;
-    @if $use_new_styles { padding-left: $ic-sp/4; }
-    @else { padding-left: 12px; }
+    padding-left: $ic-sp/4;
   }
 
   #refresh_calendar_link {
@@ -191,8 +166,7 @@ span.agendaView--no-assignments {
     .fc-widget-header, .fc-axis {
       background: none;
       border-left: none;
-      @if $use_new_styles { color: $ic-font-color--subdued; }
-      @else { color: #627382; }
+      color: $ic-font-color--subdued;
     }
 
     .fc-slats table td {
@@ -261,10 +235,8 @@ span.agendaView--no-assignments {
 
   .fc-event {
     background-color: white;
-    @if $use_new_styles {
-      line-height: 1.3;
-      padding: $ic-sp/4;
-    }
+    line-height: 1.3;
+    padding: $ic-sp/4;
     i {
       margin-right: 2px;
     }
@@ -289,31 +261,19 @@ span.agendaView--no-assignments {
 .rs-section {
   border: none;
   padding: 0;
-  @if $use_new_styles {
-    margin: 0 0 $ic-sp*2;
-    &:last-of-type { margin-bottom: 0; }
-  }
-  @else { margin: 13px 0; }
+  margin: 0 0 $ic-sp*2;
+  &:last-of-type { margin-bottom: 0; }
 }
 
 #context-list-holder, #undated-events {
   background-color: #fff;
   max-height: 300px;
   overflow-y: auto;
-  @if $use_new_styles {
-    border: 1px solid $ic-border-light;
-    padding: $ic-sp/2;
-  }
-  @else {
-    border: 1px solid #C6CDD4;
-    border-radius: 3px;
-    padding: 10px;
-  }
+  border: 1px solid $ic-border-light;
+  padding: $ic-sp/2;
   ul {
     margin-bottom: 10px;
-    @if $use_new_styles {
-      &:last-of-type { margin-bottom: 0; }
-    }
+    &:last-of-type { margin-bottom: 0; }
   }
 }
 
@@ -321,8 +281,7 @@ span.agendaView--no-assignments {
   padding: 0;
   max-height: none;
   .context_list_context {
-    @if $use_new_styles { padding: 1px $ic-sp/2; }
-    @else { padding: 3px; }
+    padding: 1px $ic-sp/2;
   }
   .context-list-toggle-box {
     border-radius: 2px;
@@ -330,14 +289,11 @@ span.agendaView--no-assignments {
   }
   label {
     display: inline;
-    @if $use_new_styles {
-      @include fontSize(13px);
-      font-weight: 500;
-    }
+    @include fontSize(13px);
+    font-weight: 500;
   }
   .checked label {
-    @if $use_new_styles { font-weight: 500; }
-    @else { font-weight: bold; }
+    font-weight: 500;
   }
 }
 
