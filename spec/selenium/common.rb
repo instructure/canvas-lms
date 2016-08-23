@@ -102,21 +102,6 @@ module SeleniumErrorRecovery
 end
 RSpec::Core::Example.prepend(SeleniumErrorRecovery)
 
-# eventually do this for non-selenium, but right now some things can't
-# make the once-ler round trip, so some specs still have to manage data in
-# before(:all)s
-RSpec.configure do |config|
-  config.before :suite do
-    BlankSlateProtection.enable!
-  end
-end
-
-RSpec::Core::ExampleGroup.singleton_class.prepend(Module.new {
-  def run_examples(*)
-    BlankSlateProtection.disable { super }
-  end
-})
-
 shared_context "in-process server selenium tests" do
   include SeleniumDriverSetup
   include OtherHelperMethods

@@ -54,6 +54,12 @@ require 'rspec/rails'
 require_relative 'support/blank_slate_protection'
 BlankSlateProtection.enable!
 
+RSpec::Core::ExampleGroup.singleton_class.prepend(Module.new {
+  def run_examples(*)
+    BlankSlateProtection.disable { super }
+  end
+})
+
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
@@ -333,6 +339,10 @@ RSpec.configure do |config|
   # UTC for tests, cuz it's easier :P
   Account.time_zone_attribute_defaults[:default_time_zone] = 'UTC'
 
+  config.before :all do
+    raise "all specs need to use transactions" unless using_transactions_properly?
+  end
+
   Onceler.configure do |c|
     c.before :record do
       reset_all_the_things!
@@ -340,12 +350,18 @@ RSpec.configure do |config|
   end
 
   config.before :each do
+    raise "all specs need to use transactions" unless using_transactions_properly?
     reset_all_the_things!
   end
 
-  config.before :suite do
-    BlankSlateProtection.disable!
+  # normally all specs should always use transactions; you can override
+  # this in a specific example group if you need to do something fancy/
+  # crazy/slow. but you probably don't. seriously. just use once-ler
+  def using_transactions_properly?
+    use_transactional_fixtures
+  end
 
+  config.before :suite do
     if ENV['TEST_ENV_NUMBER'].present?
       Rails.logger.reopen("log/test#{ENV['TEST_ENV_NUMBER']}.log")
     end
