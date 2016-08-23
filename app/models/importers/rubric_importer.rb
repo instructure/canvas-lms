@@ -42,6 +42,7 @@ module Importers
         item.migration_id = hash[:migration_id]
         item.workflow_state = 'active' if item.deleted?
         item.title = hash[:title]
+        item.populate_rubric_title # just in case
         item.description = hash[:description]
         item.points_possible = hash[:points_possible].to_f
         item.read_only = hash[:read_only] unless hash[:read_only].nil?
