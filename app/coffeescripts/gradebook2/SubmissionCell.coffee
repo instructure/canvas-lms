@@ -123,7 +123,7 @@ define [
 
       tooltipText = $.map(specialClasses, (c)-> GRADEBOOK_TRANSLATIONS["submission_tooltip_#{c}"]).join ', '
 
-      cellCommentHTML = if !opts.student.isConcluded
+      cellCommentHTML = if !opts.student.isConcluded && !opts.isLocked
         """
         <a href="#" data-user-id=#{opts.submission.user_id} data-assignment-id=#{opts.assignment.id} class="gradebook-cell-comment"><span class="gradebook-cell-comment-label">submission comments</span></a>
         """

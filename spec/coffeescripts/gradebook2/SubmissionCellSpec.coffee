@@ -67,6 +67,10 @@ define [
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: true })
     ok submissionCellResponse.indexOf("cannot_edit") > -1
 
+  test "#class.formatter, isLocked: true does not include the cell comment bubble", ->
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: true })
+    equal submissionCellResponse.indexOf("gradebook-cell-comment"), -1
+
   test "#class.formatter, isLocked: false doesn't add grayed-out", ->
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: false })
     equal submissionCellResponse.indexOf("grayed-out"), -1
@@ -74,6 +78,10 @@ define [
   test "#class.formatter, isLocked: false doesn't add cannot_edit", ->
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: false })
     equal submissionCellResponse.indexOf("cannot_edit"), -1
+
+  test "#class.formatter, isLocked: false includes the cell comment bubble", ->
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: false })
+    ok submissionCellResponse.indexOf("gradebook-cell-comment") > -1
 
   test "#class.formatter, tooltip adds your text to the special classes", ->
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { tooltip: "dora_the_explorer" })
