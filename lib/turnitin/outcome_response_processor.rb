@@ -71,10 +71,10 @@ module Turnitin
     private
 
     def stash
-      old_turnit_client = @turnitin_client
-      @turnitin_client = nil
+      old_turnit_client = @_turnitin_client
+      @_turnitin_client = nil
       yield
-      @turnitin_client = old_turnit_client
+      @_turnitin_client = old_turnit_client
     end
 
     def attempt_number
