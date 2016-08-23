@@ -8492,7 +8492,7 @@ bz:
     managed_accounts: Managed Accounts
     my_courses: My Courses
   message:
-    default_subject: Canvas Alert
+    default_subject: Braven Alert
   message_dialog_component:
     ok: Ok
   message_students:
@@ -8564,7 +8564,7 @@ bz:
         subject: "%{user_name} just added you to a conversation in Canvas."
         unknown_user: Unknown User
       twitter:
-        tweet: Canvas Alert - Added to conversation by %{user_name}.
+        tweet: Braven Alert - Added to conversation by %{user_name}.
         unknown_user: Unknown User
     alert:
       email:
@@ -8703,7 +8703,7 @@ bz:
         message: '%{user} canceled his/her reservation for "%{appointment_name}".'
         more_info: More info at %{url}
       twitter:
-        message: Canvas Alert - %{user} canceled his/her reservation for "%{appointment_name}".
+        message: Braven Alert - %{user} canceled his/her reservation for "%{appointment_name}".
     appointment_deleted_for_user:
       email:
         html:
@@ -8746,7 +8746,7 @@ bz:
         message: Your time slot for "%{appointment_name} was canceled".
         more_info: More info at %{url}
       twitter:
-        message: Canvas Alert - Your time slot for "%{appointment_name} was canceled".
+        message: Braven Alert - Your time slot for "%{appointment_name} was canceled".
     appointment_group_deleted:
       email:
         html:
@@ -8778,7 +8778,7 @@ bz:
         message: All appointments for "%{appointment_name} have been canceled".
         more_info: More info at %{url}
       twitter:
-        message: Canvas Alert - All appointments for "%{appointment_name} have been
+        message: Braven Alert - All appointments for "%{appointment_name} have been
           canceled".
     appointment_group_published:
       email:
@@ -8823,7 +8823,7 @@ bz:
           (%{dates}).
         subject: Appointment "%{appointment_name}" is available for signup (%{course})
       twitter:
-        message: Canvas Alert - Signups are open for "%{appointment_name}".
+        message: Braven Alert - Signups are open for "%{appointment_name}".
     appointment_group_updated:
       email:
         group_signup: Group (%{group_category})
@@ -8869,7 +8869,7 @@ bz:
           for signup (%{dates}).
         subject: Appointment "%{appointment_name}" has been updated (%{course})
       twitter:
-        message: Canvas Alert - New time slots are available for "%{appointment_name}".
+        message: Braven Alert - New time slots are available for "%{appointment_name}".
     appointment_reserved_by_user:
       email:
         html:
@@ -8909,7 +8909,7 @@ bz:
         message: '%{user} has signed up for "%{appointment_name}".'
         more_info: More info at %{url}
       twitter:
-        message: Canvas Alert - %{user} has signed up for "%{appointment_name}".
+        message: Braven Alert - %{user} has signed up for "%{appointment_name}".
     appointment_reserved_for_user:
       email:
         html:
@@ -8952,7 +8952,7 @@ bz:
         message: '%{user} has signed you up for "%{appointment_name}" (%{date_and_time}).'
         subject: You have been signed up for "%{appointment_name}" (%{course})
       twitter:
-        message: Canvas Alert - You have been signed up for "%{appointment_name}".
+        message: Braven Alert - You have been signed up for "%{appointment_name}".
     assignment_changed:
       email:
         body: "The assignment \"%{title}\" for %{course} has changed.  \n\nClick here
@@ -8972,7 +8972,7 @@ bz:
       summary:
         subject: 'Artifact Changed: %{title}, %{course}'
       twitter:
-        assignment_change: 'Canvas Alert - Change: %{assignment_name}, %{course_name}'
+        assignment_change: 'Braven Alert - Change: %{assignment_name}, %{course_name}'
     assignment_created:
       email:
         assignment_created: Artifact Created - %{assignment_name}, %{course_name}
@@ -9006,7 +9006,7 @@ bz:
         multiple_due_dates: 'due: Multiple Dates'
         no_due_date: 'due: No Due Date'
       twitter:
-        assignment_change: 'Canvas Alert - Change: %{assignment_name}, %{course_name}'
+        assignment_change: 'Braven Alert - Change: %{assignment_name}, %{course_name}'
         due_at: 'due: %{assignment_due_date_time}'
         multiple_due_dates: 'due: Multiple Dates'
         no_due_date: 'due: No Due Date'
@@ -9040,7 +9040,7 @@ bz:
         due_at: 'due: %{assignment_due_date_time}'
         no_due_date: 'due: No Due Date'
       twitter:
-        assignment_change: 'Canvas Alert - Date Change: %{assignment_name}, %{course_name}'
+        assignment_change: 'Braven Alert - Date Change: %{assignment_name}, %{course_name}'
         due_at: 'due: %{assignment_due_date_time}'
         no_due_date: 'due: No Due Date'
     assignment_due_date_override_changed:
@@ -9075,7 +9075,7 @@ bz:
         due_at: 'due: %{assignment_due_date_time}'
         no_due_date: 'due: No Due Date'
       twitter:
-        assignment_change: 'Canvas Alert - Date Change: %{assignment_name}, %{course_name}
+        assignment_change: 'Braven Alert - Date Change: %{assignment_name}, %{course_name}
           (%{override})'
         due_at: 'due: %{assignment_due_date_time}'
         no_due_date: 'due: No Due Date'
@@ -9098,7 +9098,7 @@ bz:
         assignment_graded: 'Artifact Scored: %{assignment_name}, %{course_name}'
         the_assignment_is_graded: The assignment, %{assignment_name}, has been scored.
       twitter:
-        assignment_graded: 'Canvas Alert - Scored: %{assignment_name}, %{course_name}'
+        assignment_graded: 'Braven Alert - Scored: %{assignment_name}, %{course_name}'
     assignment_locked: This assignment is currently locked.
     assignment_locked_at: This assignment was locked %{at}.
     assignment_locked_module: This assignment is part of the module *%{module}* and
@@ -9127,7 +9127,7 @@ bz:
         turned_in_at: 'turned in: %{submission_date}'
         user_resubmitted: 'Re-Submission: %{user_name}, %{assignment_name}'
       twitter:
-        user_resubmitted: 'Canvas Alert - Resubmission: %{user_name}, %{assignment_name}'
+        user_resubmitted: 'Braven Alert - Resubmission: %{user_name}, %{assignment_name}'
     assignment_submitted:
       email:
         html:
@@ -9151,7 +9151,7 @@ bz:
         turned_in_at: 'turned in: %{submission_date}'
         user_submitted: 'Submission: %{user_name}, %{assignment_name}'
       twitter:
-        user_submitted: 'Canvas Alert - Submission: %{user_name}, %{assignment_name}'
+        user_submitted: 'Braven Alert - Submission: %{user_name}, %{assignment_name}'
     assignment_submitted_late:
       email:
         html:
@@ -9175,7 +9175,7 @@ bz:
         turned_in_at: 'turned in: %{submission_date}'
         user_submitted: 'Late Artifact: %{user_name}, %{assignment_name}'
       twitter:
-        user_submitted: 'Canvas Alert - Late Submission: %{user_name}, %{assignment_name}'
+        user_submitted: 'Braven Alert - Late Submission: %{user_name}, %{assignment_name}'
     assignment_unmuted:
       email:
         body: |-
@@ -9250,7 +9250,7 @@ bz:
           in %{service} and you were invited using your email address, %{email}.
         subject: 'Collaboration Invitation: %{course_or_group}'
       twitter:
-        body: 'Canvas Alert - Collaboration Invite: %{document}, %{course_or_group}'
+        body: 'Braven Alert - Collaboration Invite: %{document}, %{course_or_group}'
     confirm_email_communication_channel:
       email:
         body: The email address, %{email} is being registered at %{website} for the
@@ -9334,7 +9334,7 @@ bz:
         subject: "%{user_name} just sent you a message in Canvas."
         unknown_user: Unknown User
       twitter:
-        tweet: Canvas Alert - Message from %{user_name}.
+        tweet: Braven Alert - Message from %{user_name}.
     course_already_started:
       email:
         body: |-
@@ -9459,7 +9459,7 @@ bz:
           course, %{course}, as a teacher."
         subject: "%{user} accepted the Course Invitation"
       twitter:
-        body: 'Canvas Alert - Accepted: %{user}, %{enrollment_type}, course, %{course}'
+        body: 'Braven Alert - Accepted: %{user}, %{enrollment_type}, course, %{course}'
     enrollment_invitation:
       email:
         body_designer: You've been invited to participate in the course, %{course},
@@ -9536,7 +9536,7 @@ bz:
           as a teacher.
         subject: Course Invitation
       twitter:
-        body: 'Canvas Alert - Invited: course as %{enrollment_type}'
+        body: 'Braven Alert - Invited: course as %{enrollment_type}'
     enrollment_notification:
       email:
         body_designer: You've been enrolled in the course, %{course}, as a designer.
@@ -9595,7 +9595,7 @@ bz:
         body_teacher: You've been enrollment in the course, %{course}, as a teacher.
         subject: Course Enrollment
       twitter:
-        body: 'Canvas Alert - Enrolled: course as %{enrollment_type}'
+        body: 'Braven Alert - Enrolled: course as %{enrollment_type}'
     enrollment_registration:
       email:
         body_designer: You've been invited to participate in a class at %{website}.  The
@@ -9661,7 +9661,7 @@ bz:
           class is called %{course}, and you've been invited to participate as a teacher.
         subject: Course Invitation
       twitter:
-        body: 'Canvas Alert - Invited: course as %{enrollment_type}'
+        body: 'Braven Alert - Invited: course as %{enrollment_type}'
     event_date_changed:
       email:
         email_body: 'The event, %{event_title}, for the course, %{course_name}, has
@@ -9774,7 +9774,7 @@ bz:
             assignment group
           subject: Grade Weight Changed
       twitter:
-        grade_changed: 'Canvas Alert - Grading Policy Changed: %{course_name}'
+        grade_changed: 'Braven Alert - Grading Policy Changed: %{course_name}'
     group_assignment_submitted_late:
       email:
         body: The group %{group_name} has just turned in a late submission for %{assignment_name}
@@ -9798,7 +9798,7 @@ bz:
           in the course %{course_name}.
         subject: 'Late Artifact: %{group_name}, %{assignment_name}'
       twitter:
-        subject: 'Canvas Alert - Late Group Submission: %{group_name}, %{assignment_name}'
+        subject: 'Braven Alert - Late Group Submission: %{group_name}, %{assignment_name}'
     group_membership_accepted:
       email:
         account_group: Your request to join the group %{group_name} for the account
@@ -9836,9 +9836,9 @@ bz:
           %{course_name} has been accepted.
         subject: 'Group Membership Accepted: %{group_name}'
       twitter:
-        account_group: 'Canvas Alert - Group Membership Accepted: %{group_name} for
+        account_group: 'Braven Alert - Group Membership Accepted: %{group_name} for
           the account %{account_name}.'
-        course_group: 'Canvas Alert - Group Membership Accepted: %{group_name} for
+        course_group: 'Braven Alert - Group Membership Accepted: %{group_name} for
           the course %{course_name}.'
     group_membership_rejected:
       email:
@@ -9876,9 +9876,9 @@ bz:
           %{course_name} has been rejected.
         subject: Group Membership Rejected for %{group_name}
       twitter:
-        account_group: 'Canvas Alert - Group Membership Rejected: %{group_name} for
+        account_group: 'Braven Alert - Group Membership Rejected: %{group_name} for
           the account %{account_name}.'
-        course_group: 'Canvas Alert - Group Membership Rejected: %{group_name} for
+        course_group: 'Braven Alert - Group Membership Rejected: %{group_name} for
           the course %{course_name}.'
     html_message:
       html_not_exist: The HTML version of this message was not created nor sent
@@ -9948,7 +9948,7 @@ bz:
         body: A new admin, %{user}, has been added for the account %{account}
         subject: New Account User
       twitter:
-        body: 'Canvas Alert - New Admin: %{user}, %{account}'
+        body: 'Braven Alert - New Admin: %{user}, %{account}'
     new_announcement:
       email:
         html:
@@ -9963,7 +9963,7 @@ bz:
         details: More info at %{url}
         subject: 'New announcement: %{title}, %{course}'
       twitter:
-        body: 'Canvas Alert - Announcement: %{title}, %{course}.'
+        body: 'Braven Alert - Announcement: %{title}, %{course}.'
     new_context_group_membership:
       email:
         body_account: You've been added to a new group for the account %{account}.  The
@@ -10003,8 +10003,8 @@ bz:
           name of the group is %{group_name}.
         subject: New Group Membership for %{course_or_account}
       twitter:
-        body_account: 'Canvas Alert - New Group: %{group} for the account %{account}'
-        body_course: 'Canvas Alert - New Group: %{group} for the course %{course}'
+        body_account: 'Braven Alert - New Group: %{group} for the account %{account}'
+        body_course: 'Braven Alert - New Group: %{group} for the course %{course}'
     new_context_group_membership_invitation:
       email:
         body_account: You've been invited to join the group %{group} for the account
@@ -10040,8 +10040,8 @@ bz:
           %{course}.
         subject: New Group Membership for %{course_or_account}
       twitter:
-        body_account: 'Canvas Alert - Invitation: %{group} for the account %{account}'
-        body_course: 'Canvas Alert - Invitation: %{group} for the course %{course}.'
+        body_account: 'Braven Alert - Invitation: %{group} for the account %{account}'
+        body_course: 'Braven Alert - Invitation: %{group} for the course %{course}.'
     new_course:
       email:
         body: A course, %{course}, has been added for the account %{account}
@@ -10072,7 +10072,7 @@ bz:
           teachers: Teachers
         subject: New Course
       twitter:
-        body: 'Canvas Alert - New Course: %{course}, %{account}'
+        body: 'Braven Alert - New Course: %{course}, %{account}'
     new_discussion_entry:
       email:
         body: "%{user} posted a new comment on the thread %{discussion_topic} for
@@ -10093,7 +10093,7 @@ bz:
       summary:
         subject: 'New Comment for %{discussion_topic}: %{course}'
       twitter:
-        body: 'Canvas Alert - Comment: %{discussion_topic}, %{course}.'
+        body: 'Braven Alert - Comment: %{discussion_topic}, %{course}.'
     new_discussion_topic:
       email:
         body: 'A new discussion has been started that may be interesting to you:'
@@ -10115,7 +10115,7 @@ bz:
       summary:
         subject: 'New Discussion - %{discussion_topic}: %{course}'
       twitter:
-        subject: 'Canvas Alert - Topic: %{discussion_topic}, %{course}'
+        subject: 'Braven Alert - Topic: %{discussion_topic}, %{course}'
     new_event_created:
       email:
         body: 'There''s a new event scheduled for %{course_name} that you should be
@@ -10148,7 +10148,7 @@ bz:
       twitter:
         from_to_time: from %{start_date_time} to %{end_date_time}
         no_time_set: No Time Set
-        subject: 'Canvas Alert - Event: %{event_title}, %{course_name}'
+        subject: 'Braven Alert - Event: %{event_title}, %{course_name}'
     new_file_added:
       email:
         body: 'A new file has been added for the course, %{name}:'
@@ -10166,7 +10166,7 @@ bz:
       summary:
         subject: 'New File Added: %{title}, %{name}'
       twitter:
-        body: 'Canvas Alert - New File: %{title} (%{size}) for %{name}:'
+        body: 'Braven Alert - New File: %{title} (%{size}) for %{name}:'
     new_files_added:
       email:
         body: "%{count} new files have been added for the course, %{name}:"
@@ -10187,7 +10187,7 @@ bz:
         link: You can view them here
         subject: "%{count} new files added for the course, %{name}:"
       twitter:
-        body: Canvas Alert - %{count} new files for %{name}
+        body: Braven Alert - %{count} new files for %{name}
     new_student_organized_group:
       email:
         body_account: A new student organized group named "%{group_name}" was created
@@ -10223,8 +10223,8 @@ bz:
           for the course %{course}. The first member is %{user}.
         subject: New Student Group for %{course_or_account}
       twitter:
-        body_account: 'Canvas Alert - New Group: %{group_name} for the account %{account}'
-        body_course: 'Canvas Alert - New Group: %{group_name} for the course %{course}'
+        body_account: 'Braven Alert - New Group: %{group_name} for the account %{account}'
+        body_course: 'Braven Alert - New Group: %{group_name} for the course %{course}'
     new_teacher_registration:
       email:
         body: "%{user} just registered as a teacher at %{website}."
@@ -10256,7 +10256,7 @@ bz:
           school_position: School Position
         subject: New Teacher Registration
       twitter:
-        body: 'Canvas Alert - New Teacher: %{user}, %{account}'
+        body: 'Braven Alert - New Teacher: %{user}, %{account}'
     new_user:
       email:
         body: A new user, %{user}, has just registered for the account %{account}
@@ -10276,7 +10276,7 @@ bz:
         body: A new user, %{user}, has just registered for the account %{account}
         subject: New User
       twitter:
-        body: 'Canvas Alert - New User: %{user}, %{account}'
+        body: 'Braven Alert - New User: %{user}, %{account}'
     page_locked: This page is currently locked.
     page_locked_at: This page was locked %{at}.
     page_locked_module: This page is part of the module *%{module}* and hasn't been
@@ -10321,7 +10321,7 @@ bz:
         body: A regrade has finished for your practice %{title}.
         subject: 'Practice Rescored: %{quiz}, %{context}'
       twitter:
-        body: 'Canvas Alert - Practice Rescored : %{quiz}'
+        body: 'Braven Alert - Practice Rescored : %{quiz}'
     quiz_unpublished_module: This practice is part of an unpublished module and is
       not available yet.
     report_generated:
@@ -10354,7 +10354,7 @@ bz:
         body: 'You''ve been reminded to assess: %{rubric}, %{context}:'
         subject: 'Reminder to Assess: %{rubric}, %{context}'
       twitter:
-        tweet: 'Canvas Alert - Reminder: assess %{rubric}, %{context}'
+        tweet: 'Braven Alert - Reminder: assess %{rubric}, %{context}'
     rubric_association_created:
       email:
         body: 'A new assessment has been created for %{context}:'
@@ -10373,7 +10373,7 @@ bz:
         body: 'A new assessment has been created for %{context}:'
         subject: 'New Assessment: %{title}, %{context}'
       twitter:
-        tweet: 'Canvas Alert - New Assessment: %{title}, %{context}.'
+        tweet: 'Braven Alert - New Assessment: %{title}, %{context}.'
     self_enrollment_registration:
       email:
         body: |-
@@ -10428,7 +10428,7 @@ bz:
         someone: Someone
         subject: 'Submission Comment: %{user}, %{assignment}, %{context}'
       twitter:
-        tweet: 'Canvas Alert - Comment: %{author} for %{assignment}, %{user}, %{context}.'
+        tweet: 'Braven Alert - Comment: %{author} for %{assignment}, %{user}, %{context}.'
     submission_comment_for_teacher:
       email:
         body: "%{author} just made a new comment on the submission for %{user} for
@@ -10458,7 +10458,7 @@ bz:
         someone: Someone
         subject: 'Submission Comment: %{user}, %{assignment}, %{context}'
       twitter:
-        tweet: 'Canvas Alert - Comment: %{author} for %{assignment}, %{user}, %{context}.'
+        tweet: 'Braven Alert - Comment: %{author} for %{assignment}, %{user}, %{context}.'
     submission_grade_changed:
       email:
         body: The grade on your assignment, %{assignment_title} has been changed.
@@ -10505,7 +10505,7 @@ bz:
         not_applicable: N/A
         score: 'score:  %{score} out of %{total}'
         score_pending: "(pending review)"
-        tweet: 'Canvas Alert - Grade Change: %{date}'
+        tweet: 'Braven Alert - Grade Change: %{date}'
     submission_graded:
       email:
         body: Your assignment, %{assignment}, has been scored.
@@ -10552,7 +10552,7 @@ bz:
         not_applicable: N/A
         score: 'score:  %{score} out of %{total}'
         score_pending_review: "(pending review)"
-        tweet: 'Canvas Alert - Scored: %{assignment}, %{context}'
+        tweet: 'Braven Alert - Scored: %{assignment}, %{context}'
     submission_needs_grading:
       email:
         body: "%{user_name} has completed the practice %{quiz_title}, and it requires
@@ -10584,7 +10584,7 @@ bz:
         subject: 'Practice Submitted: %{quiz}, %{context}'
         submitted_date: 'submitted: %{date}'
       twitter:
-        body: 'Canvas Alert - Practice Submitted: %{quiz}, %{user_name}'
+        body: 'Braven Alert - Practice Submitted: %{quiz}, %{user_name}'
     summaries:
       email:
         daily_body: 'You''re signed up to receive a daily report of some notifications
@@ -10608,7 +10608,7 @@ bz:
       sms:
         notifications_sms: "%{notifications_count} new notifications at %{url}"
       twitter:
-        tweet: Canvas Alert - %{notification_count} new notifications
+        tweet: Braven Alert - %{notification_count} new notifications
     topic_locked: This topic is currently locked.
     topic_locked_at: This topic was locked %{at}.
     topic_locked_module: This topic is part of the module *%{module}* and hasn't been
@@ -10635,7 +10635,7 @@ bz:
       summary:
         subject: 'Updated Wiki Page: %{title}, %{user}'
       twitter:
-        tweet: 'Canvas Alert - Page Updated: %{title}, %{user}.'
+        tweet: 'Braven Alert - Page Updated: %{title}, %{user}.'
     visit_modules_page: "*Visit the course modules page for information on how to
       unlock this content.*"
     web_conference_invitation:
@@ -10660,7 +10660,7 @@ bz:
           %{name}.
         subject: 'Web Conference Invitation: %{name}'
       twitter:
-        tweet: 'Canvas Alert - Invite: attend %{title}, %{name}'
+        tweet: 'Braven Alert - Invite: attend %{title}, %{name}'
   migration:
     announcement_type: Announcement
     assignment_group_type: Artifact Group
