@@ -17,9 +17,9 @@
 #
 
 module Canvas::Plugins::Validators::AccountReportsValidator
-  def self.validate(settings, plugin_setting)
+  def self.validate(settings, _plugin_setting)
     settings.inject({}) do |result, (report_type, enabled)|
-      result[report_type] = true if Canvas::Plugin::value_to_boolean(enabled)
+      result[report_type] = Canvas::Plugin::value_to_boolean(enabled)
       result
     end
   end
