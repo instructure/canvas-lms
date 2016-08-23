@@ -1,3 +1,3 @@
 <% define_content :subject do %>
-<%= 'BZ' %><% # We want to limit it to less than strictly needed because some sms email gateways add extra text so we don't want to cut off the link.
+<%= 'BV' %><% # We want to limit it to less than strictly needed because some sms email gateways add extra text so we don't want to cut off the link.
 %><% end %><% message = html_to_text(asset.message) %><%= CanvasTextHelper.truncate_text(message, :max_length => 110) + ' ' + BitlyHelper.new.bitly_shorten("#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}/courses/#{asset.context.id}/discussion_topics/#{asset.id}") %>
