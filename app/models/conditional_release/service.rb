@@ -30,6 +30,7 @@ module ConditionalRelease
       content_exports_path: 'api/content_exports',
       content_imports_path: 'api/content_imports',
       rules_summary_path: 'api/rules/summary',
+      select_assignment_set_path: 'api/rules/select_assignment_set'
     }.freeze
 
     def self.env_for(context, user = nil, session: nil, assignment: nil, domain: nil, real_user: nil)
@@ -148,6 +149,27 @@ module ConditionalRelease
 
     def self.rules_summary_path
       config[:rules_summary_path]
+    end
+
+    def self.select_assignment_set_url
+      build_url(config[:select_assignment_set_path])
+    end
+
+    # Returns an http response-like hash { code: string, body: string or object }
+    def self.select_mastery_path(context, current_user, student, trigger_assignment_id, assignment_set_id, session)
+      return unless enabled_in_context?(context)
+      if context.blank? || student.blank? || trigger_assignment_id.blank? || assignment_set_id.blank?
+        return { code: '400', body: { message: 'invalid request' } }
+      end
+
+      request_data = {
+        trigger_assignment: trigger_assignment_id,
+        student_id: student.id,
+        assignment_set_id: assignment_set_id
+      }
+      headers = headers_for(context, current_user, domain_for(context), session)
+      request = CanvasHttp.post(select_assignment_set_url, headers, form_data: request_data.to_param)
+      { code: request.code, body: JSON.parse(request.body) }
     end
 
     class << self
