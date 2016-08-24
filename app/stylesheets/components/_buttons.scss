@@ -273,10 +273,18 @@ input[type="button"] {
   cursor: pointer;
   color: $ic-link-color;
 
+  body.Underline-All-Links__enabled & {
+    text-decoration: underline;
+  }
+
   &:hover {
     color: $ic-link-color-hover;
     text-decoration: underline;
     background: transparent;
+
+    body.Underline-All-Links__enabled & {
+      text-decoration: none;
+    }
     &:focus { color: $ic-link-color; }
   }
 

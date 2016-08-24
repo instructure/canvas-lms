@@ -33,16 +33,7 @@
         padding-right: 7px;
         text-align: right;
       }
-      tr.syllabus_assignment {
-        .name a {
-          @if $use_high_contrast {
-            text-decoration: none;
-            &:hover, &:focus {
-              text-decoration: underline;
-            }
-          }
-        }
-      }
+
       td.not_last {
         @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
         @else { border-bottom: 1px solid #ddd; }

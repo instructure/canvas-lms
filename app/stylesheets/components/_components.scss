@@ -63,37 +63,22 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
       & > a {
         display: block;
         text-decoration: none;
-        @if $use_new_styles {
-          color: $ic-color-dark;
-          font-weight: 300;
-          border-radius: $baseBorderRadius;
-          padding: $ic-sp/2 $ic-sp;
-          &:hover, &:focus { background: lighten($ic-color-neutral, 5%); }
-        }
-        // Default UI styles
-        @else {
-          color: ensure-contrast($gray, $lightBackground);
-          padding: 4px 8px;
+        color: $ic-color-dark;
+        font-weight: 300;
+        border-radius: $baseBorderRadius;
+        padding: $ic-sp/2 $ic-sp;
 
-          &:hover, &:focus {
-            @if $use_high_contrast {
-              background: #333;
-              color: #fff;
-              text-decoration: underline;
-            }
-            @else { background: $white; }
-          }
-          &:hover {
-            text-decoration: none;
-            background: $ic-course-sidenav_list-item--bg-color;
-            color: $ic-course-sidenav_list-item--active-font-color;
-          }
+        @if $use_high_contrast {
+          text-decoration: underline;
+        }
+
+        &:hover, &:focus {
+          background: lighten($ic-color-neutral, 5%);
         }
 
         & > span {
           white-space: nowrap;
         }
-
       }
 
       &:last-child > a {

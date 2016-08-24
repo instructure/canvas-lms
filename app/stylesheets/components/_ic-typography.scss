@@ -138,7 +138,7 @@ a {
 /// Underline All Links Feature Flag
 ////////=============
 .Underline-All-Links__enabled {
-  a {
+  a:not(.Button, .btn, .ui-button) {
     text-decoration: underline;
     &:focus, &:hover { text-decoration: none; }
     @include ic-focus-base;
