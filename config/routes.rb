@@ -981,6 +981,19 @@ CanvasRails::Application.routes.draw do
       get 'audit/course/courses/:course_id', action: :for_course, as: 'audit_course_for_course'
     end
 
+    scope(controller: :assignment_overrides) do
+      get 'courses/:course_id/assignments/:assignment_id/overrides', action: :index
+      post 'courses/:course_id/assignments/:assignment_id/overrides', action: :create
+      get 'courses/:course_id/assignments/:assignment_id/overrides/:id', action: :show, as: 'assignment_override'
+      put 'courses/:course_id/assignments/:assignment_id/overrides/:id', action: :update
+      delete 'courses/:course_id/assignments/:assignment_id/overrides/:id', action: :destroy
+      get 'sections/:course_section_id/assignments/:assignment_id/override', action: :section_alias
+      get 'groups/:group_id/assignments/:assignment_id/override', action: :group_alias
+      get 'courses/:course_id/assignments/overrides', action: :batch_retrieve
+      put 'courses/:course_id/assignments/overrides', action: :batch_update
+      post 'courses/:course_id/assignments/overrides', action: :batch_create
+    end
+
     scope(controller: :assignments_api) do
       get 'courses/:course_id/assignments', action: :index, as: 'course_assignments'
       get 'users/:user_id/courses/:course_id/assignments', action: :user_index, as: 'user_course_assignments'
@@ -999,16 +1012,6 @@ CanvasRails::Application.routes.draw do
       post 'sections/:section_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews', action: :create
       delete 'courses/:course_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews', action: :destroy
       delete 'sections/:section_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews', action: :destroy
-    end
-
-    scope(controller: :assignment_overrides) do
-      get 'courses/:course_id/assignments/:assignment_id/overrides', action: :index
-      post 'courses/:course_id/assignments/:assignment_id/overrides', action: :create
-      get 'courses/:course_id/assignments/:assignment_id/overrides/:id', action: :show, as: 'assignment_override'
-      put 'courses/:course_id/assignments/:assignment_id/overrides/:id', action: :update
-      delete 'courses/:course_id/assignments/:assignment_id/overrides/:id', action: :destroy
-      get 'sections/:course_section_id/assignments/:assignment_id/override', action: :section_alias
-      get 'groups/:group_id/assignments/:assignment_id/override', action: :group_alias
     end
 
     scope(controller: :moderation_set) do
