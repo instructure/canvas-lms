@@ -73,7 +73,7 @@ tinymce.create('tinymce.plugins.BZIframes', {
       });
     });
     ed.addButton('bz_iframe', {
-      title: 'Add Framed Page',
+      title: 'Embed Page',
       image: url + '/button.png',
       cmd: 'bzIframe'
     });
