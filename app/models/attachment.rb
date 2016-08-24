@@ -977,6 +977,7 @@ class Attachment < ActiveRecord::Base
       "application/xml" => "code",
       "application/zip" => "zip",
       "audio/mpeg" => "audio",
+      "audio/mp3" => "audio",
       "audio/basic" => "audio",
       "audio/mid" => "audio",
       "audio/3gpp" => "audio",

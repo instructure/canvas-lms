@@ -92,6 +92,14 @@ require 'securerandom'
 #         "thumbnail_url": {
 #           "type": "string"
 #         },
+#         "mime_class": {
+#           "type": "string",
+#           "description": "simplified content-type mapping"
+#         },
+#         "media_entry_id": {
+#           "type": "string",
+#           "description": "identifier for file in third-party transcoding service"
+#         },
 #         "preview_url": {
 #           "type": "string",
 #           "description": "optional: url to the document preview (only included in submission endpoints)"

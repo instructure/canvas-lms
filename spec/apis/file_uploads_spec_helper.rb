@@ -41,7 +41,9 @@ shared_examples_for "file uploads api" do
       'created_at' => attachment.created_at.as_json,
       'updated_at' => attachment.updated_at.as_json,
       'modified_at' => attachment.modified_at.as_json,
-      'thumbnail_url' => attachment.thumbnail_url
+      'thumbnail_url' => attachment.thumbnail_url,
+      'mime_class' => attachment.mime_class,
+      'media_entry_id' => attachment.media_entry_id
     }
 
     if options[:include] && options[:include].include?("enhanced_preview_url") && (attachment.context.is_a?(Course) || attachment.context.is_a?(User))
@@ -96,7 +98,9 @@ shared_examples_for "file uploads api" do
         'created_at' => attachment.created_at.as_json,
         'updated_at' => attachment.updated_at.as_json,
         'thumbnail_url' => attachment.thumbnail_url,
-        'modified_at' => attachment.modified_at.as_json
+        'modified_at' => attachment.modified_at.as_json,
+        'mime_class' => attachment.mime_class,
+        'media_entry_id' => attachment.media_entry_id
     }
 
     if attachment.context.is_a?(User) || attachment.context.is_a?(Course)
