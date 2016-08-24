@@ -109,6 +109,7 @@ class Account < ActiveRecord::Base
 
   before_save :setup_cache_invalidation
   after_save :invalidate_caches_if_changed
+  after_update :clear_special_account_cache_if_special
 
   after_create :default_enrollment_term
   after_create :enable_canvas_authentication
@@ -1161,6 +1162,12 @@ class Account < ActiveRecord::Base
   end
   define_special_account(:default, 'Default Account') # Account.default
   define_special_account(:site_admin) # Account.site_admin
+
+  def clear_special_account_cache_if_special
+    if self.shard == Shard.birth && Account.special_account_ids.values.map(&:to_i).include?(self.id)
+      Account.clear_special_account_cache!(true)
+    end
+  end
 
   # an opportunity for plugins to load some other stuff up before caching the account
   def precache

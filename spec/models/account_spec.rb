@@ -1540,4 +1540,14 @@ describe Account do
       end
     end
   end
+
+  it "should clear special account cache on updates to special accounts" do
+    expect(Account.default.settings[:blah]).to be_nil
+
+    non_cached = Account.find(Account.default.id)
+    non_cached.settings[:blah] = true
+    non_cached.save!
+
+    expect(Account.default.settings[:blah]).to eq true
+  end
 end
