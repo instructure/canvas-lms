@@ -11135,7 +11135,7 @@ es:
         format: "%n%"
   number_between_1_and_16_inclusive_31f5468d: "número entre el 1 y 16 incluyendo estos"
   number_of_allowed_attempts_3d10b740: "Cantidad de intentos permitidos"
-  number_of_respondents_e1e7e8b: "Número de respondedores"
+  number_of_respondents_e1e7e8b: "Número de respuestas"
   o_224cf405: o
   oauth2_provider: 
     auth: 
@@ -11453,7 +11453,7 @@ es:
   people_options_cfb419a6: "Opciones de Personas"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Otros verán este nombre en los foros, mensajes y comentarios."
   percent_complete_3a7edc20: "%{percent} completado"
-  percent_of_respondents_selecting_this_answer_4c2ce4ee: "Porcentaje de respondedores que seleccionaron esta respuesta"
+  percent_of_respondents_selecting_this_answer_4c2ce4ee: "Porcentaje de respuestas que seleccionaron esta respuesta"
   percent_of_students_scored_score_53d2c4d5: "%{percent} de alumnos con una puntuación de %{score}"
   percent_of_students_scoring_1239d948: "Porcentaje de estudiantes que alcanzaron"
   percentage_34ab7c2c: Porcentaje
@@ -16335,7 +16335,7 @@ es:
   user_access_tokens_title: "Identificadores de acceso del usuario"
   user_avatars_e4fc4ed3: "Avatares del usuario"
   user_content_aaf0fb5a: "Contenido del usuario"
-  user_count_respondents_e30a8593: "%{user_count} respondedor"
+  user_count_respondents_e30a8593: "%{user_count} respuestas"
   user_date_range_search: 
     cant_be_blank: "La ID de usuario de Canvas no puede estar vacía"
     cant_come_before_from: "'Hasta la fecha' no puede ser anterior a 'Desde la fecha'"
@@ -16483,7 +16483,7 @@ es:
   user_successfully_inactivated_aee66efd: "Usuario desactivado exitosamente"
   user_successfully_re_activated_b897e35b: "Usuario reactivado exitosamente"
   user_successfully_removed_a366ca5f: "Usuario eliminado correctamente."
-  usercount_respondents_1521244: "%{userCount} respondedores"
+  usercount_respondents_1521244: "%{userCount} respuestas"
   usercount_users_found_8c07f1f2: "%{userCount} usuarios encontrados."
   username_47bb5bbe: "Nombre de usuario"
   username_could_not_be_found_6c3e8383: "El nombre de usuario no pudo ser encontrado"
