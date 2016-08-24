@@ -93,6 +93,23 @@ module Canvas::LiveEvents
     }
   end
 
+  def self.get_attachment_data(attachment)
+    {
+      attachment_id: attachment.global_id,
+      user_id: attachment.global_user_id,
+      display_name: LiveEvents.truncate(attachment.display_name),
+      filename: LiveEvents.truncate(attachment.filename),
+      context_type: attachment.context_type,
+      context_id: attachment.context_id,
+      content_type: attachment.content_type,
+      folder_id: attachment.folder_id,
+      unlock_at: attachment.unlock_at,
+      lock_at: attachment.lock_at,
+      updated_at: attachment.updated_at,
+      hidden: attachment.hidden
+    }
+  end
+
   def self.assignment_created(assignment)
     post_event_stringified('assignment_created', get_assignment_data(assignment))
   end
@@ -158,6 +175,23 @@ module Canvas::LiveEvents
       wiki_page_id: page.global_id,
       title: LiveEvents.truncate(page.title)
     })
+  end
+
+  def self.attachment_created(attachment)
+    post_event_stringified('attachment_created', get_attachment_data(attachment))
+  end
+
+  def self.attachment_updated(attachment, old_display_name)
+    payload = get_attachment_data(attachment)
+    if old_display_name
+      payload[:old_display_name] = LiveEvents.truncate(old_display_name)
+    end
+
+    post_event_stringified('attachment_updated', payload)
+  end
+
+  def self.attachment_deleted(attachment)
+    post_event_stringified('attachment_deleted', get_attachment_data(attachment))
   end
 
   def self.grade_changed(submission, old_submission=nil, old_assignment=submission.assignment)

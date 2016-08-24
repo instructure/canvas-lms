@@ -286,3 +286,54 @@ by `asset_type` and `asset_id`.
 | `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
 | `url` | The URL of the submission (for 'online_url' submissions) |
 | `attempt` | This is the submission attempt number.|
+
+#### `attachment_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of the user associated with the attachment. |
+| `attachment_id` | The Canvas id of the attachment. |
+| `display_name` | The display name of the attachment (possibly truncated). |
+| `filename` | The file name of the attachment (possibly truncated). |
+| `hidden` | Whether the attachment is flagged as hidden |
+| `unlock_at` | The unlock date (attachment is unlocked after this date) |
+| `lock_at` | The lock date (attachment is locked after this date) |
+| `updated_at` | The time at which this attachment was last modified in any way |
+| `context_type` | The type of context the attachment is used in. |
+| `context_id` | The id of the context the attachment is used in. |
+| `content_type` | The content type of the attachment. |
+
+#### `attachment_updated`
+
+`attachment_updated` events are triggered when an attachment's `display_name` is updated.
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of the user associated with the attachment. |
+| `attachment_id` | The Canvas id of the attachment. |
+| `display_name` | The display name of the attachment (possibly truncated). |
+| `old_display_name` | The old display name of the attachment (possibly truncated). |
+| `filename` | The file name of the attachment (possibly truncated). |
+| `hidden` | Whether the attachment is flagged as hidden |
+| `unlock_at` | The unlock date (attachment is unlocked after this date) |
+| `lock_at` | The lock date (attachment is locked after this date) |
+| `updated_at` | The time at which this attachment was last modified in any way |
+| `context_type` | The type of context the attachment is used in. |
+| `context_id` | The id of the context the attachment is used in. |
+| `content_type` | The content type of the attachment. |
+
+#### `attachment_deleted`
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of the user associated with the attachment. |
+| `attachment_id` | The Canvas id of the attachment. |
+| `display_name` | The display name of the attachment (possibly truncated). |
+| `filename` | The file name of the attachment (possibly truncated). |
+| `hidden` | Whether the attachment is flagged as hidden |
+| `unlock_at` | The unlock date |
+| `lock_at` | The lock date |
+| `updated_at` | The time at which this attachment was last modified in any way |
+| `context_type` | The type of context the attachment is used in. |
+| `context_id` | The id of the context the attachment is used in. |
+| `content_type` | The content type of the attachment. |
