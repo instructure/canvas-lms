@@ -131,6 +131,7 @@ class ApplicationController < ActionController::Base
       @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
       @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
       @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
+      @js_env[:TIMEZONE_OFFSET] = Time.zone.now.utc_offset if !@js_env[:TIMEZONE_OFFSET]
       @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
       unless @js_env[:LOCALE]
         @js_env[:LOCALE] = I18n.locale.to_s
