@@ -278,8 +278,11 @@ describe Role do
       @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_students)
 
       roles = Role.role_data(@course, @ta)
-      expect(roles.detect{|r| r[:id] == student_role.id}[:manageable_by_user]).to be_falsey
-      [observer_role, ta_role, teacher_role, designer_role].each do |role|
+
+      [student_role, observer_role].each do |role|
+        expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_falsey
+      end
+      [ta_role, teacher_role, designer_role].each do |role|
         expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
       end
     end

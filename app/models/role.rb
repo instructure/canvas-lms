@@ -273,7 +273,7 @@ class Role < ActiveRecord::Base
       end
     end
     if context.grants_right?(user, :manage_admin_users)
-      manageable += ['ObserverEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
+      manageable += ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
     end
     manageable.uniq.sort
   end
