@@ -336,6 +336,16 @@ END
       development: false,
       root_opt_in: false
     },
+    'better_scheduler' =>
+    {
+      display_name: -> { I18n.t('Use the new scheduler') },
+      description: -> { I18n.t('Uses the new scheduler and its functionality') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      development: true,
+      root_opt_in: false
+    },
     'use_new_tree' =>
     {
       display_name: -> { I18n.t('Use New Folder Tree in Files')},
