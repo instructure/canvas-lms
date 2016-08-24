@@ -380,7 +380,9 @@ class AppointmentGroupsController < ApplicationController
         return redirect_to calendar2_url(:anchor => anchor)
       end
 
-      render :json => appointment_group_json(@group, @current_user, session, :include => ((params[:include] || []) | ['appointments']))
+      render :json => appointment_group_json(@group, @current_user, session,
+                                             :include => ((params[:include] || []) | ['appointments']),
+                                             :include_past_appointments => @group.grants_right?(@current_user, :manage))
     end
   end
 

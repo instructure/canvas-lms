@@ -1433,7 +1433,7 @@ class Account < ActiveRecord::Base
       end
     end
 
-    if feature_enabled?(:use_new_styles) || feature_enabled?(:k12)
+    if settings[:new_custom_help_links] && (feature_enabled?(:use_new_styles) || feature_enabled?(:k12))
       links || Canvas::Help.default_links
     else
       Canvas::Help.default_links + (links || [])

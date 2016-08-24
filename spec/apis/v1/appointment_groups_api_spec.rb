@@ -238,8 +238,8 @@ describe AppointmentGroupsController, type: :request do
     student2 = student_in_course(:course => course2, :active_all => true).user
     ag = AppointmentGroup.create!(:title => 'bleh',
                              :participants_per_appointment => 2,
-                             :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
-                                                   ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]],
+                             :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
+                                                   ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]],
                              :contexts => [course1, course2])
     ag.publish!
     ag.appointments.first.reserve_for(student1, @teacher)
@@ -270,6 +270,28 @@ describe AppointmentGroupsController, type: :request do
     expect(json.keys.sort).to eql((expected_fields + ['appointments']).sort)
     expect(json['id']).to eql ag.id
     expect(json['requiring_action']).to be_falsey
+  end
+
+  describe 'past appointments' do
+    before :once do
+      @ag = AppointmentGroup.create!(:title => "yay",
+                                     :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"],
+                                                           ["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]],
+                                     :contexts => [@course])
+      @ag.publish!
+    end
+
+    it 'returns past appointment slots for teachers' do
+      json = api_call_as_user(@teacher, :get, "/api/v1/appointment_groups/#{@ag.id}",
+              { :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => @ag.to_param})
+      expect(json['appointments'].size).to eq 2
+    end
+
+    it 'does not return past appointment slots for students' do
+      json = api_call_as_user(@student, :get, "/api/v1/appointment_groups/#{@ag.id}",
+              { :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => @ag.to_param})
+      expect(json['appointments'].size).to eq 1
+    end
   end
 
   it 'should enforce create permissions' do

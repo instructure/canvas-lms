@@ -42,6 +42,35 @@ describe Course do
     expect(@course.apply_group_weights?).to eq true
   end
 
+  it "should return course visibility flag" do
+    @course.update_attribute(:is_public, nil)
+    @course.update_attribute(:is_public_to_auth_users, nil)
+
+    expect(@course.course_visibility).to eq('course')
+    @course.update_attribute(:is_public, nil)
+    @course.update_attribute(:is_public_to_auth_users, nil)
+
+    @course.update_attribute(:is_public_to_auth_users, true)
+    expect(@course.course_visibility).to eq('institution')
+
+    @course.update_attribute(:is_public, true)
+    expect(@course.course_visibility).to eq('public')
+  end
+
+  it "should return syllabus visibility flag" do
+    @course.update_attribute(:public_syllabus, nil)
+    @course.update_attribute(:public_syllabus_to_auth, nil)
+    expect(@course.syllabus_visibility_option).to eq('course')
+
+    @course.update_attribute(:public_syllabus, nil)
+    @course.update_attribute(:public_syllabus_to_auth, true)
+    expect(@course.syllabus_visibility_option).to eq('institution')
+
+    @course.update_attribute(:public_syllabus, true)
+    expect(@course.syllabus_visibility_option).to eq('public')
+
+  end
+
   describe "soft-concluded?" do
     before :once do
       @term = Account.default.enrollment_terms.create!

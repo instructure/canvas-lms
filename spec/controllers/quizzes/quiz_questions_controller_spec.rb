@@ -192,5 +192,24 @@ describe Quizzes::QuizQuestionsController do
       }
       expect(response.body).to match /max length is 16384/
     end
+
+    it "should delete non-html comments if needed" do
+      bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+      aq = bank.assessment_questions.create!(:question_data => {
+        :question_type => 'essay_question', :correct_comments => 'stuff', :correct_comments_html => "stuff"})
+
+      # add the first question directly onto the quiz, so it shouldn't get "randomly" selected from the group
+      linked_question = @quiz.quiz_questions.build(:question_data => aq.question_data)
+      linked_question.assessment_question_id = aq.id
+      linked_question.save!
+
+      user_session(@teacher)
+      put 'update', :course_id => @course.id, :quiz_id => @quiz, :id => linked_question.id, :question => {:correct_comments_html => ""}
+      expect(response).to be_success
+
+      linked_question.reload
+      expect(linked_question.question_data['correct_comments_html']).to be_blank
+      expect(linked_question.question_data['correct_comments']).to be_blank
+    end
   end
 end

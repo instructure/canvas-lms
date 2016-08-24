@@ -224,7 +224,7 @@ describe "content migrations", :non_parallel do
       @copy_from.enroll_teacher(@user).accept
     end
 
-    it "should show warning before self-copy" do
+    it "should show warning before self-copy", priority: "1", test_id: 2889675 do
       visit_page
       select_migration_type
       wait_for_ajaximations
@@ -241,7 +241,7 @@ describe "content migrations", :non_parallel do
       expect(f('#courseSelectWarning')).to_not be_displayed
     end
 
-    it "should select by drop-down or by search box" do
+    it "should select by drop-down or by search box", priority: "2", test_id: 2889684 do
       visit_page
       select_migration_type
       wait_for_ajaximations
@@ -273,7 +273,7 @@ describe "content migrations", :non_parallel do
       expect(source_link['href']).to include("/courses/#{@copy_from.id}")
     end
 
-    it "should only show courses the user is authorized to see" do
+    it "should only show courses the user is authorized to see", priority: "1", test_id: 2889686 do
       new_course = Course.create!(:name => "please don't see me")
       visit_page
       select_migration_type
@@ -291,7 +291,7 @@ describe "content migrations", :non_parallel do
       expect(f("option[value=\"#{new_course.id}\"]")).not_to be_nil
     end
 
-    it "should include completed courses when checked" do
+    it "should include completed courses when checked", priority: "1", test_id: 2889687 do
       new_course = Course.create!(:name => "completed course")
       new_course.enroll_teacher(@user).accept
       new_course.complete!
@@ -306,7 +306,7 @@ describe "content migrations", :non_parallel do
       expect(f("option[value=\"#{new_course.id}\"]")).not_to be_nil
     end
 
-    it "should find courses in other accounts" do
+    it "should find courses in other accounts", priority: "1", test_id: 2890402 do
       new_account1 = account_model
       enrolled_course = Course.create!(:name => "faraway course", :account => new_account1)
       enrolled_course.enroll_teacher(@user).accept
@@ -359,7 +359,7 @@ describe "content migrations", :non_parallel do
       test_selective_content(@copy_from)
     end
 
-    it "should set day substitution and date adjustment settings" do
+    it "should set day substitution and date adjustment settings", priority: "1", test_id: 2891737 do
       new_course = Course.create!(:name => "day sub")
       new_course.enroll_teacher(@user).accept
 
@@ -434,7 +434,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "should remove dates" do
+    it "should remove dates", priority: "1", test_id: 2891742 do
       new_course = Course.create!(:name => "date remove", :start_at => 'Jul 1, 2014', :conclude_at => 'Jul 11, 2014')
       new_course.enroll_teacher(@user).accept
 
@@ -469,6 +469,25 @@ describe "content migrations", :non_parallel do
       @course.reload
       expect(@course.announcements.last.locked).to be_truthy
       expect(@course.lock_all_announcements).to be_truthy
+    end
+
+    it "should persist topic 'allow liking' settings across course copy", priority: "2", test_id: 1041950 do
+      @copy_from.discussion_topics.create!(
+        title: 'Liking Allowed Here',
+        message: 'Like I said, liking is allowed',
+        allow_rating: true
+      )
+
+      visit_page
+      select_migration_type
+      wait_for_ajaximations
+      click_option('#courseSelect', @copy_from.id.to_s, :value)
+      ff('[name=selective_import]')[0].click
+      submit
+      run_jobs
+      expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
+      @course.reload
+      expect(@course.discussion_topics.last.allow_rating).to be_truthy
     end
   end
 

@@ -19,6 +19,7 @@ describe "Screenreader Gradebook" do
   let(:assignment_default_points) {20}
   let(:grading_value) { f('.grading_value') }
   let(:gradebook_cell_css) { '.gradebook-cell' }
+  let(:view_grading_history) { f("a[href='/courses/#{@course.id}/gradebook/history']") }
 
   def active_element
     driver.switch_to.active_element
@@ -332,6 +333,14 @@ describe "Screenreader Gradebook" do
       sections.each do |section|
         expect(ui_options.include? section[:name]).to be_truthy
       end
+    end
+
+    it 'shows history', priority: '2', test_id: 615676 do
+      get srgb
+
+      view_grading_history.click
+      expect(driver.page_source).to include('Gradebook History')
+      expect(driver.current_url).to include('gradebook/history')
     end
 
     it 'shows all drop down options', priority: '2', test_id: 615702 do

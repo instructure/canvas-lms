@@ -48,6 +48,13 @@ describe DeveloperKey do
     end
   end
 
+  it "allows non-http redirect URIs" do
+    key = DeveloperKey.new
+    key.redirect_uri = 'tealpass://somewhere.edu/authentication'
+    key.redirect_uris = ['tealpass://somewhere.edu/authentication']
+    expect(key).to be_valid
+  end
+
   describe "#redirect_domain_matches?" do
     it "should match domains exactly, and sub-domains" do
       key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b")

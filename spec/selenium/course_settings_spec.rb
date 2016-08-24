@@ -139,6 +139,15 @@ describe "course settings" do
       expect(@course.time_zone.name).to eq time_zone_value
     end
 
+    it "should only allow less resrictive options in Customize visibility" do
+       get "/courses/#{@course.id}/settings"
+       click_option('#course_course_visibility', 'institution', :value)
+       f('#course_custom_course_visibility').click
+       expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Institution\nPublic"
+       click_option('#course_course_visibility', 'course', :value)
+       expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Course\nInstitution\nPublic"
+    end
+
     it "should disable from Course Navigation tab", priority: "1", test_id: 112172 do
       get "/courses/#{@course.id}/settings#tab-navigation"
       ff(".al-trigger")[0].click

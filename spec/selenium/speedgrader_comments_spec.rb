@@ -145,6 +145,7 @@ describe "speed grader" do
 
       # add teacher comment
       f('#add_a_comment > textarea').send_keys('grader comment')
+      scroll_into_view("#comment_submit_button")
       submit_form('#add_a_comment')
       expect(ff('#comments > .comment')).to have_size(2)
 

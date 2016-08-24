@@ -123,6 +123,10 @@ module CC::Exporter::Epub
       "../templates/#{resource}_template.html.erb"
     end
 
+    def cleanup_files
+      cartridge_converter.delete_unzipped_archive
+    end
+
     private
     def cartridge_converter
       @_cartridge_converter ||= Converters::CartridgeConverter.new({

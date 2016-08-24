@@ -365,6 +365,11 @@ default term for the account will be used</td>
 <td>date</td>
 <td>The course end date. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
 </tr>
+<tr>
+<td>course_format</td>
+<td>enum</td>
+<td>on_campus, online, blended</td>
+</tr>
 </table>
 
 <p>If the start_date is set, it will override the term start date. If the end_date is set, it will

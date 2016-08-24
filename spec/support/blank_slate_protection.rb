@@ -3,8 +3,7 @@ require_relative "./call_stack_utils"
 module BlankSlateProtection
   def create_or_update
     return super unless BlankSlateProtection.enabled?
-    # switchman and once-ler have special snowflake context hooks
-    return super if caller.grep(/specs_require_sharding|r_spec_helper|add_onceler_hooks/).present?
+    return super if caller.grep(BlankSlateProtection.exempt_patterns).present?
 
     location = CallStackUtils.best_line_for(caller).sub(/:in .*/, '')
     if caller.grep(/_context_hooks/).present?
@@ -26,6 +25,10 @@ module BlankSlateProtection
     exit! 1
   end
 
+  # switchman and once-ler have special snowflake context hooks where data
+  # setup is allowed
+  EXEMPT_PATTERNS = %w[specs_require_sharding r_spec_helper add_onceler_hooks]
+
   class << self
     def enabled?
       @enabled
@@ -40,10 +43,15 @@ module BlankSlateProtection
     end
 
     def disable
+      enabled = @enabled
       disable!
       yield
     ensure
-      enable!
+      @enabled = enabled
+    end
+
+    def exempt_patterns
+      Regexp.new(EXEMPT_PATTERNS.map { |pattern| Regexp.escape(pattern) }.join("|"))
     end
   end
 end

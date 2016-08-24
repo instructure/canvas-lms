@@ -199,6 +199,13 @@ class EnrollmentState < ActiveRecord::Base
     EnrollmentState.where(:enrollment_id => enrollment_scope, :state_is_current => true, :state => INVALIDATEABLE_STATES).update_all(:state_is_current => false, :state_invalidated_at => Time.now.utc)
   end
 
+  def self.force_recalculation(enrollment_ids)
+    if enrollment_ids.any?
+      EnrollmentState.where(:enrollment_id => enrollment_ids, :state_is_current => true).update_all(:state_is_current => false)
+      EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_ids)
+    end
+  end
+
   def self.invalidate_access(enrollment_scope, states_to_update)
     EnrollmentState.where(:enrollment_id => enrollment_scope, :access_is_current => true, :state => states_to_update).update_all(:access_is_current => false, :access_invalidated_at => Time.now.utc)
   end

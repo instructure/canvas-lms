@@ -405,6 +405,11 @@ module ApplicationHelper
     link_to(image_tag('help.png', :alt => I18n.t("Help with content licensing")), '#', :class => 'license_help_link no-hover', :title => I18n.t("Help with content licensing"))
   end
 
+  def visibility_help_link
+    js_bundle('visibility_help')
+    link_to(image_tag('help.png', :alt => I18n.t("Help with course visibilities")), '#', :class => 'visibility_help_link no-hover', :title => I18n.t("Help with course visibilities"))
+  end
+
   def equella_enabled?
     @equella_settings ||= @context.equella_settings if @context.respond_to?(:equella_settings)
     @equella_settings ||= @domain_root_account.try(:equella_settings)

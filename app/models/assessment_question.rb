@@ -268,6 +268,16 @@ class AssessmentQuestion < ActiveRecord::Base
       :correct_comments_html, :incorrect_comments_html, :neutral_comments_html
     )
 
+    [
+      [:correct_comments_html, :correct_comments],
+      [:incorrect_comments_html, :incorrect_comments],
+      [:neutral_comments_html, :neutral_comments],
+    ].each do |html_key, non_html_key|
+      if qdata.has_key?(html_key) && qdata[html_key].blank? && qdata[non_html_key].blank?
+        data.delete(non_html_key)
+      end
+    end
+
     question = Quizzes::QuizQuestion::QuestionData.generate(data)
 
     question[:assessment_question_id] = assessment_question.id rescue nil

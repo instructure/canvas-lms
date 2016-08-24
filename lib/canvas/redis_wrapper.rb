@@ -22,7 +22,7 @@ module Canvas
     end
 
     def mget(*keys)
-      options keys.extract_options!
+      options = keys.extract_options!
       super(*keys, options.merge(raw: true))
     end
   end

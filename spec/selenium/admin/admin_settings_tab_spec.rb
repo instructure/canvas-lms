@@ -454,6 +454,31 @@ describe "admin settings tab" do
         {"text"=>"text", "subtext"=>"subtext", "url"=>"http://www.example.com/example", "available_to"=>["user", "student", "teacher"]}
       ]
     end
+
+    it "should preserve the default help links if the account hasn't been configured with the new ui yet" do
+      Account.default.enable_feature!(:use_new_styles)
+      help_link = {:text => "text", :subtext => "subtext", :url => "http://www.example.com/example", :available_to => ["user", "student", "teacher"]}
+      Account.default.settings[:custom_help_links] = [help_link]
+      Account.default.save!
+
+      help_links = Account.default.help_links
+      expect(help_links).to include(help_link.merge(:type => "custom"))
+      expect(help_links & Canvas::Help.default_links).to eq Canvas::Help.default_links
+
+      Setting.set('show_feedback_link', 'true')
+      get "/accounts/#{Account.default.id}/settings"
+
+      top = f('#custom_help_link_settings .ic-Sortable-item')
+      top.find_elements(:css, 'button').last.click
+      wait_for_ajaximations
+
+      click_submit
+
+      new_help_links = Account.default.help_links
+      expect(new_help_links).to_not include(Canvas::Help.default_links.first)
+      expect(new_help_links).to include(Canvas::Help.default_links.last)
+      expect(new_help_links).to include(help_link.merge(:type => "custom"))
+    end
   end
 
   context "external integration keys" do

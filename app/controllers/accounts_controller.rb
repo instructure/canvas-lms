@@ -523,6 +523,7 @@ class AccountsController < ApplicationController
             hash.assert_valid_keys ["text", "subtext", "url", "available_to", "type"]
             hash
           end
+          @account.settings[:new_custom_help_links] = true
         end
 
         params[:account][:turnitin_host] = validated_turnitin_host(params[:account][:turnitin_host])

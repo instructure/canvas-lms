@@ -49,7 +49,7 @@ define([
         links.push(
           <li key="admin" className="ic-NavMenu-list-item ic-NavMenu-list-item--feature-item">
             <a
-              href="/accounts/1/settings"
+              href="/accounts/self/settings"
               className="ic-NavMenu-list-item__link">
               {I18n.t('Customize this menu')}
             </a>

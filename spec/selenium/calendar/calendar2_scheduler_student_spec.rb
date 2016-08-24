@@ -177,7 +177,7 @@ describe "scheduler" do
 
     context "when un-reserving appointments" do
       before do
-        date = Date.today.to_s
+        date = (Date.today + 1.day).to_s
         create_appointment_group(
           max_appointments_per_participant: 1,
           new_appointments: [
