@@ -299,6 +299,9 @@ by `asset_type` and `asset_id`.
 | `unlock_at` | The unlock date (attachment is unlocked after this date) |
 | `lock_at` | The lock date (attachment is locked after this date) |
 | `updated_at` | The time at which this attachment was last modified in any way |
+| `context_type` | The type of context the attachment is used in. |
+| `context_id` | The id of the context the attachment is used in. |
+| `content_type` | The content type of the attachment. |
 
 #### `attachment_updated`
 
@@ -315,6 +318,9 @@ by `asset_type` and `asset_id`.
 | `unlock_at` | The unlock date (attachment is unlocked after this date) |
 | `lock_at` | The lock date (attachment is locked after this date) |
 | `updated_at` | The time at which this attachment was last modified in any way |
+| `context_type` | The type of context the attachment is used in. |
+| `context_id` | The id of the context the attachment is used in. |
+| `content_type` | The content type of the attachment. |
 
 #### `attachment_deleted`
 
@@ -328,3 +334,6 @@ by `asset_type` and `asset_id`.
 | `unlock_at` | The unlock date |
 | `lock_at` | The lock date |
 | `updated_at` | The time at which this attachment was last modified in any way |
+| `context_type` | The type of context the attachment is used in. |
+| `context_id` | The id of the context the attachment is used in. |
+| `content_type` | The content type of the attachment. |
