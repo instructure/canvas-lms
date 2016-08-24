@@ -416,13 +416,24 @@ $icon-size: 1.4rem;
     span.draft-marker {
       color: $red;
       padding-right: 0.5em;
+      flex: none;
+    }
+    div.comment_flex {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 0.5em;
+    }
+    span.comment {
+      flex: auto;
     }
     .comment_citation {
       @include fontSize(12px);
       text-align: right;
     }
     .delete_comment_link, .submit_comment_button {
-      float: right;
+      flex: none;
+      height: 24px;
+      margin-left: 0.5em;
       @if $use_high_contrast {
         color: lighten($ic-color-dark, 12%);
       }
@@ -491,7 +502,7 @@ $icon-size: 1.4rem;
     .avatar {
       height: 24px;
       max-width: 24px;
-      float: left;
+      flex-shrink: 5;
       margin-right: 12px;
     }
   }
