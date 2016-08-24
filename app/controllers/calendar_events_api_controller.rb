@@ -304,10 +304,10 @@ class CalendarEventsApiController < ApplicationController
       end
     end
 
-    scope = @type == :assignment ? assignment_scope : calendar_event_scope
+    scope = @type == :assignment ? assignment_scope(@current_user) : calendar_event_scope(@current_user)
     events = Api.paginate(scope, self, api_v1_calendar_events_url)
     ActiveRecord::Associations::Preloader.new(events, :child_events).run if @type == :event
-    events = apply_assignment_overrides(events) if @type == :assignment
+    events = apply_assignment_overrides(events, @current_user) if @type == :assignment
     mark_submitted_assignments(@current_user, events) if @type == :assignment
 
     events = filter_other_sections_from_events(events)
