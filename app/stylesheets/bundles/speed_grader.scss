@@ -68,8 +68,10 @@ $gradebook_header_height: 3.5em;
   justify-content: flex-start;
   align-items: center;
   flex-wrap: nowrap;
-  flex: 1;
+  flex-shrink: 2;
   min-width: 0;
+  padding-right: $ic-sp;
+  overflow: hidden;
 }
 // little trick to make the icon-font and the icon svg match in size
 $icon-size: 1.4rem;
@@ -79,6 +81,7 @@ $icon-size: 1.4rem;
   align-items: center;
   flex-wrap: nowrap;
   margin-right: $ic-sp;
+  flex-shrink: 0;
 
   // sizes the icon font
   .gradebookActions__Button {
@@ -130,13 +133,15 @@ $icon-size: 1.4rem;
   align-items: center;
   justify-content: flex-end;
   flex-wrap: nowrap;
-  flex: 1;
+  flex-shrink: 0;
   min-width: 0;
+  padding-left: $ic-sp;
 }
 .statsMetric {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
+  align-self: flex-end;
   padding-right: $ic-sp;
   border-right: 1px dotted $ic-brand-global-nav-menu-item__text-color;
 }
