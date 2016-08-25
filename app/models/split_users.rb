@@ -126,8 +126,12 @@ class SplitUsers
     end
 
     def move_user_observers(source_user, user, records)
-      source_user.user_observers.where(id: records.pluck(:context_id)).update_all(user_id: user)
-      source_user.user_observees.where(id: records.pluck(:context_id)).update_all(observer_id: user)
+      # skip when the user observer is between the two users. Just undlete the record
+      not_obs = UserObserver.where(user_id: [source_user, user], observer_id: [source_user, user])
+      obs = UserObserver.where(id: records.pluck(:context_id)).where.not(id: not_obs)
+
+      source_user.user_observers.where(id: obs).update_all(user_id: user)
+      source_user.user_observees.where(id: obs).update_all(observer_id: user)
     end
 
     def move_attachments(source_user, user, records)

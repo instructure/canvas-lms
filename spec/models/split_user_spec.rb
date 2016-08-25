@@ -113,6 +113,17 @@ describe SplitUsers do
         expect(user2.reload.attachments).to eq [attachment2]
       end
 
+      it 'should handle when observing merged user' do
+        user2.observers << user1
+        UserMerge.from(user1).into(user2)
+
+        SplitUsers.split_db_users(user2)
+
+        expect(user1.user_observees).to eq UserObserver.where(user_id: user2, observer_id: user1)
+        expect(user2.user_observers).to eq UserObserver.where(user_id: user2, observer_id: user1)
+      end
+
+
       it 'should handle user_observees' do
         observee1 = user_model
         observee2 = user_model
