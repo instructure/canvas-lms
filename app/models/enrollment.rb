@@ -1079,8 +1079,7 @@ class Enrollment < ActiveRecord::Base
   scope :active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }
   scope :all_active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')") } # includes inactive
 
-  scope :active_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
-    where("enrollment_states.state = 'active'") }
+  scope :active_by_date, -> { joins(:enrollment_state).where("enrollment_states.state = 'active'") }
   scope :invited_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
     where("enrollment_states.state IN ('invited', 'pending_invited')") }
   scope :active_or_pending_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).

@@ -1223,15 +1223,6 @@ class CoursesController < ApplicationController
     end
   end
 
-  def roster
-    if authorized_action(@context, @current_user, :read_roster)
-      log_asset_access([ "roster", @context ], "roster", "other")
-      @students = @context.participating_students.order_by_sortable_name
-      @teachers = @context.instructors.order_by_sortable_name
-      @groups = @context.groups.active
-    end
-  end
-
   def re_send_invitations
     get_context
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users])

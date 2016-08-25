@@ -71,17 +71,35 @@ class CourseSection < ActiveRecord::Base
     User.observing_students_in_course(participating_students.map(&:id), course.id)
   end
 
+  def participating_observers_by_date
+    User.observing_students_in_course(participating_students_by_date.map(&:id), course.id)
+  end
+
   def participating_students
     course.participating_students.where(:enrollments => { :course_section_id => self })
+  end
+
+  def participating_students_by_date
+    course.participating_students_by_date.where(:enrollments => { :course_section_id => self })
   end
 
   def participating_admins
     course.participating_admins.where("enrollments.course_section_id = ? OR NOT COALESCE(enrollments.limit_privileges_to_course_section, ?)", self, false)
   end
 
-  def participants(include_observers=false)
-    ps = participating_students + participating_admins
-    ps += participating_observers if include_observers
+  def participating_admins_by_date
+    course.participating_admins.where("enrollments.course_section_id = ? OR NOT COALESCE(enrollments.limit_privileges_to_course_section, ?)", self, false)
+  end
+
+  def participants(opts={})
+    ps = nil
+    if opts[:by_date]
+      ps = participating_students_by_date + participating_admins_by_date
+      ps += participating_observers_by_date if opts[:include_observers]
+    else
+      ps = participating_students + participating_admins
+      ps += participating_observers if opts[:include_observers]
+    end
     ps
   end
 
