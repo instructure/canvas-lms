@@ -118,10 +118,6 @@ module Canvas::LiveEvents
     }
   end
 
-  def self.assignment_created(assignment)
-    post_event_stringified('assignment_created', get_assignment_data(assignment))
-  end
-
   def self.submission_created(submission)
     post_event_stringified('submission_created', get_submission_data(submission))
   end
@@ -210,6 +206,7 @@ module Canvas::LiveEvents
   end
 
   def self.attachment_updated(attachment, old_display_name)
+    puts attachment.changes
     payload = get_attachment_data(attachment)
     if old_display_name
       payload[:old_display_name] = LiveEvents.truncate(old_display_name)
