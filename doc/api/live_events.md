@@ -323,7 +323,6 @@ by `asset_type` and `asset_id`.
 | `attachment_id` | The Canvas id of the attachment. |
 | `display_name` | The display name of the attachment (possibly truncated). |
 | `filename` | The file name of the attachment (possibly truncated). |
-| `hidden` | Whether the attachment is flagged as hidden |
 | `unlock_at` | The unlock date (attachment is unlocked after this date) |
 | `lock_at` | The lock date (attachment is locked after this date) |
 | `updated_at` | The time at which this attachment was last modified in any way |
@@ -342,7 +341,6 @@ by `asset_type` and `asset_id`.
 | `display_name` | The display name of the attachment (possibly truncated). |
 | `old_display_name` | The old display name of the attachment (possibly truncated). |
 | `filename` | The file name of the attachment (possibly truncated). |
-| `hidden` | Whether the attachment is flagged as hidden |
 | `unlock_at` | The unlock date (attachment is unlocked after this date) |
 | `lock_at` | The lock date (attachment is locked after this date) |
 | `updated_at` | The time at which this attachment was last modified in any way |
@@ -358,7 +356,6 @@ by `asset_type` and `asset_id`.
 | `attachment_id` | The Canvas id of the attachment. |
 | `display_name` | The display name of the attachment (possibly truncated). |
 | `filename` | The file name of the attachment (possibly truncated). |
-| `hidden` | Whether the attachment is flagged as hidden |
 | `unlock_at` | The unlock date |
 | `lock_at` | The lock date |
 | `updated_at` | The time at which this attachment was last modified in any way |

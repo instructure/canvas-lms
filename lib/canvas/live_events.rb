@@ -113,8 +113,7 @@ module Canvas::LiveEvents
       folder_id: attachment.folder_id,
       unlock_at: attachment.unlock_at,
       lock_at: attachment.lock_at,
-      updated_at: attachment.updated_at,
-      hidden: attachment.hidden
+      updated_at: attachment.updated_at
     }
   end
 
