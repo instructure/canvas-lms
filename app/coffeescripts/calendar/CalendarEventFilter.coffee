@@ -2,15 +2,15 @@ define [], () ->
   # We want to filter events received from the datasource. It seems like you should be able
   # to do this at render time as well, and return "false" in eventRender, but on the agenda
   # view that still assumes that the item is taking up space even though it's not displayed.
-  (viewingGroup, events) ->
+  (viewingGroup, events, schedulerState = {}) ->
     # De-dupe, and remove any actual scheduled events (since we don't want to
     # display that among the placeholders.)
     eventIds = {}
     return events unless events.length > 0
     for idx in [events.length - 1..0] # CS doesn't have a way to iterate a list in reverse ?!
       event = events[idx]
-
       keep = true
+      gray = schedulerState.inFindAppointmentMode
       # De-dupe
       if eventIds[event.id]
         keep = false
@@ -27,7 +27,10 @@ define [], () ->
             #  manage it (as a teacher or TA might)
             keep = true
           else
-            keep = false
+            if schedulerState.inFindAppointmentMode && event.isOnCalendar(schedulerState.selectedCourse.asset_string)
+              gray = false
+            else
+              keep = false
         else
           if viewingGroup.id == event.calendarEvent?.appointment_group_id
             # If this is an actual event for an appointment, don't show it
@@ -38,6 +41,11 @@ define [], () ->
 
       # needed for undated assignement edit
       keep = false if !event.start
+
+      if gray
+        event.addClass('grayed')
+      else
+        event.removeClass('grayed')
 
       events.splice(idx, 1) unless keep
       eventIds[event.id] = true

@@ -26,7 +26,7 @@ describe CalendarEventsApiController, type: :request do
 
   context 'events' do
     expected_fields = [
-      'all_day', 'all_day_date', 'child_events', 'child_events_count', 'comments',
+      'all_context_codes', 'all_day', 'all_day_date', 'child_events', 'child_events_count', 'comments',
       'context_code', 'created_at', 'description', 'duplicates', 'end_at', 'hidden', 'html_url',
       'id', 'location_address', 'location_name', 'parent_event_id', 'start_at',
       'title', 'type', 'updated_at', 'url', 'workflow_state'

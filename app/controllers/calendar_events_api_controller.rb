@@ -71,6 +71,11 @@ require 'atom'
 #           "description": "if specified, it indicates which calendar this event should be displayed on. for example, a section-level event would have the course's context code here, while the section's context code would be returned above)",
 #           "type": "string"
 #         },
+#         "all_context_codes": {
+#           "description": "a comma-separated list of all calendar contexts this event is part of",
+#           "example": "course_123,course_456",
+#           "type": "string"
+#         },
 #         "workflow_state": {
 #           "description": "Current state of the event ('active', 'locked' or 'deleted') 'locked' indicates that start_at/end_at cannot be changed (though the event could be deleted). Normally only reservations or time slots with reservations are locked (see the Appointment Groups API)",
 #           "example": "active",

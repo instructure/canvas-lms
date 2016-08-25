@@ -39,3 +39,15 @@ define [
     equal event.end.date(), 26
     equal event.end.hours(), 0
     equal event.end.minutes(), 30
+
+  test 'CommonEvent: isOnCalendar', ->
+    event = commonEventFactory
+      title: 'blah',
+      start_at: '2016-02-25T23:30:00Z',
+      all_context_codes: 'course_1,course_23'
+    ,
+      ['course_1', 'course_23']
+
+    ok event.isOnCalendar('course_1')
+    ok event.isOnCalendar('course_23')
+    notOk event.isOnCalendar('course_2')

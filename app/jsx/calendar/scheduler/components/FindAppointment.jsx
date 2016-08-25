@@ -25,8 +25,8 @@ define([
     }
 
     handleSubmit () {
-      this.props.store.dispatch(Actions.actions.setFindAppointmentMode(!this.props.store.getState().inFindAppointmentMode))
       this.props.store.dispatch(Actions.actions.setCourse(this.state.selectedCourse))
+      this.props.store.dispatch(Actions.actions.setFindAppointmentMode(!this.props.store.getState().inFindAppointmentMode))
       this.setState ({
         isModalOpen: false,
         selectedCourse: {}
@@ -34,12 +34,13 @@ define([
     }
     selectCourse (e) {
       this.setState({
-        selectedCourse: this.props.courses.find((c) => c.id === e.target.value)
+        selectedCourse: this.props.courses.filter((c) => c.id === e.target.value)[0]
       })
     }
     openModal () {
       this.setState({
         isModalOpen: true,
+        selectedCourse: (this.props.courses.length > 0) ? this.props.courses[0] : {}
       })
     }
     endAppointmentMode () {
@@ -87,9 +88,7 @@ define([
               <div className="ic-Form-control">
                 <select onChange={this.selectCourse} value={this.state.selectedCourse.id} className="ic-Input">
                   {this.props.courses.map((c, index) => {
-                    if (c.asset_string.indexOf("user") === -1) {
-                      return(<option key={c.id} value={c.id}>{c.name}</option>)
-                    }
+                    return(<option key={c.id} value={c.id}>{c.name}</option>)
                   })}
                 </select>
               </div>
