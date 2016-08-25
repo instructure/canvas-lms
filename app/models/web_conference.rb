@@ -166,7 +166,7 @@ class WebConference < ActiveRecord::Base
         context.membership_for_user(participant).try(:active?)
       end
     end
-    p.whenever { @new_participants && !@new_participants.empty? }
+    p.whenever { context_is_available? && @new_participants && !@new_participants.empty? }
 
     p.dispatch :web_conference_recording_ready
     p.to { user }
@@ -177,6 +177,17 @@ class WebConference < ActiveRecord::Base
 
   on_create_send_to_streams do
     [self.user_id] + self.web_conference_participants.map(&:user_id)
+  end
+
+  def context_is_available?
+    case context
+    when Course
+      context.available?
+    when Group
+      context.context_available?
+    when Account
+      true
+    end
   end
 
   def add_user(user, type)
