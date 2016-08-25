@@ -135,6 +135,10 @@
   overflow: auto;
 }
 
+#edit_appointment_group_form_holder .scheduler-event-details-footer {
+  display: inline;
+}
+
 .x-close-link {
   padding-right: 5px;
   opacity: 0.5;
@@ -198,6 +202,9 @@
   margin-left: 3px;
 }
 
+.Button.ui-button {
+    font-weight: 300;
+}
 .fc-month-view .fc-widget-content .fc-day-number {
   text-align: left;
 }
