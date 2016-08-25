@@ -206,7 +206,6 @@ module Canvas::LiveEvents
   end
 
   def self.attachment_updated(attachment, old_display_name)
-    puts attachment.changes
     payload = get_attachment_data(attachment)
     if old_display_name
       payload[:old_display_name] = LiveEvents.truncate(old_display_name)
