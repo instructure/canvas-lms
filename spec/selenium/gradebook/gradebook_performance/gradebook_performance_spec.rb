@@ -216,6 +216,7 @@ describe "gradebook performance" do
       group_assignment.submissions.create(:user => @student)
       group_assignment.grade_student @student_1, :grade => 2 # 0 points possible
 
+      make_full_screen
       get "/courses/#{@course.id}/gradebook"
       wait_for_ajaximations
       expect(f('#gradebook_grid .assignment-group-grade')).to include_text('100%') # otherwise 108%

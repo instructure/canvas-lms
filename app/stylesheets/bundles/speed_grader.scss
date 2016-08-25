@@ -7,7 +7,11 @@
   padding: 0;
 }
 
-$gradebook_header_height: 52px;
+// em units are required for the height, positioning and padding
+// on the header bar so it will play nice when a user changes
+// their browser font size to either small or very large
+
+$gradebook_header_height: 3.5em;
 
 #gradebook_header_container {
   height: $gradebook_header_height;
@@ -29,7 +33,7 @@ $gradebook_header_height: 52px;
     color: $ic-color-light;
   }
 
-  padding: $ic-sp/2 $ic-sp;
+  padding: 0.375em 0.75em;
   @include fontSize(11px);
   min-width: 960px;
   .ui-icon {
@@ -199,16 +203,16 @@ $icon-size: 1.4rem;
 
 #full_width_container {
   position: absolute;
-  top: $gradebook_header_height;
+  top: $gradebook_header_height + 0.0625em;
   bottom: 0;
   left: 0;
   right: 0;
   min-width: 960px;
   &.with_moderation_tabs {
-    top: $gradebook_header_height * 2 + 3;
+    top: $gradebook_header_height * 2;
   }
   &.with_enrollment_notice {
-    top: $gradebook_header_height + 46;
+    top: $gradebook_header_height + 3.3625em;
   }
 }
 
@@ -249,12 +253,14 @@ $icon-size: 1.4rem;
 #enrollment_inactive_notice {
   width: 100%;
   border-bottom: 1px solid $ic-border-light;
+  border-radius: 0;
   text-align: center;
 }
 
 #enrollment_concluded_notice {
   width: 100%;
   border-bottom: 1px solid $ic-border-light;
+  border-radius: 0;
   text-align: center;
 }
 
@@ -280,7 +286,7 @@ $icon-size: 1.4rem;
   }
   ul {
     background: $white;
-    height: $gradebook_header_height - 1px;
+    height: $gradebook_header_height - 0.0625em;
     li {
       height: $gradebook_header_height;
       min-width: 275px;
@@ -318,7 +324,7 @@ $icon-size: 1.4rem;
       }
     }
     #new_mark_container {
-      height: $gradebook_header_height - 2px;
+      height: $gradebook_header_height - 0.125em;
       border: none;
     }
     #new_mark_dropdown_link {
@@ -538,7 +544,7 @@ $icon-size: 1.4rem;
 body .ui-selectmenu-dropdown {
   border-radius: 0;
   color: $ic-brand-global-nav-ic-icon-svg-fill !important;
-  height: 21px;
+  height: 1.3125em;
   background-color: transparent;;
   background-image: none;
   border: none;
@@ -551,7 +557,7 @@ body .ui-selectmenu-dropdown {
     padding: 0 20px 0;
     padding: 0 0 0 20px;
     margin: 0 20px 0 0;
-    height: 21px;
+    height: 1.3125em;
     .ui-icon {
       top: 3px !important;
       &:after {
@@ -725,9 +731,9 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   }
   #submission_files_list {
     overflow: hidden;
-    padding: $ic-sp/2 0;
     .submission-file {
       position: relative;
+      padding: $ic-sp/2 0;
       .turnitin_score_container {
         float: left;
         margin-right: $ic-sp;

@@ -87,21 +87,15 @@ module LoginAndSessionMethods
   end
 
   def displayed_username
-    if ENV['CANVAS_FORCE_USE_NEW_STYLES'] || Account.default.feature_enabled?(:use_new_styles)
-      f('[aria-label="Main Navigation"] a[href="/profile"]').click
-      f('#global_nav_profile_display_name').text
-    else
-      f('#identity .user_name').text
-    end
+    f('[aria-label="Main Navigation"] a[href="/profile"]').click
+    f('#global_nav_profile_display_name').text
   end
 
 
   def expect_logout_link_present
-    logout_element = if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+    logout_element = begin
       f('[aria-label="Main Navigation"] a[href="/profile"]').click
       fj('form[action="/logout"] button:contains("Logout")')
-    else
-      f('#identity .logout')
     end
     expect(logout_element).to be_present
     logout_element

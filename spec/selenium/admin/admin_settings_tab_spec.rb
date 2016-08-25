@@ -144,39 +144,6 @@ describe "admin settings tab" do
     end
   end
 
-  context "global includes" do
-    before { skip('global css/js happens in theme editor in newUI') if ENV['CANVAS_FORCE_USE_NEW_STYLES'] }
-
-    it "should not have a global includes section by default" do
-      expect(f("#account_settings")).not_to contain_jqcss('#account_settings_global_includes_settings:visible')
-    end
-
-    it "should have a global includes section if enabled" do
-      Account.default.settings = Account.default.settings.merge({ :global_includes => true })
-      Account.default.save!
-      section = f('#account_settings_global_includes_settings')
-      expect(section.find_element(:id, 'account_settings_sub_account_includes')).not_to be_nil
-    end
-
-    it "a sub-account should not have a global includes section by default" do
-      Account.default.settings = Account.default.settings.merge({ :global_includes => true })
-      Account.default.save!
-      acct = account_model(:root_account => Account.default)
-      get "/accounts/#{acct.id}/settings"
-      expect(f("#account_settings")).not_to contain_jqcss('#account_settings_global_includes_settings:visible')
-    end
-
-    it "a sub-account should have a global includes section if enabled by the parent" do
-      Account.default.settings = Account.default.settings.merge({ :global_includes => true })
-      Account.default.settings = Account.default.settings.merge({ :sub_account_includes => true })
-      Account.default.save!
-      acct = account_model(:root_account => Account.default)
-      get "/accounts/#{acct.id}/settings"
-      section = f('#account_settings_global_includes_settings')
-      expect(section.find_element(:id, 'account_settings_sub_account_includes')).not_to be_nil
-    end
-  end
-
   context "quiz ip address filter" do
 
     def add_quiz_filter name ="www.canvas.instructure.com", value="192.168.217.1/24"
