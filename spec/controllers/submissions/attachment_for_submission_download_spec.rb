@@ -72,6 +72,7 @@ describe Submissions::AttachmentForSubmissionDownload do
             @submission.save
           end
         }.to change(@submission.versions, :count), 'precondition'
+        @submission.reload
         expect(@submission.attachment).to be_nil, 'precondition'
         @options = { download: @attachment.id }
         expect(subject.attachment).to eq @attachment

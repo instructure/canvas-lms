@@ -24,18 +24,20 @@ class Version < ActiveRecord::Base #:nodoc:
   # Return an instance of the versioned ActiveRecord model with the attribute
   # values of this version.
   def model
-    obj = versionable_type.constantize.new
-    YAML::load( self.yaml ).each do |var_name,var_value|
-      # INSTRUCTURE:  added if... so that if a column is removed in a migration after this was versioned it doesen't die with NoMethodError: undefined method `some_column_name=' for ...
-      obj.write_attribute(var_name, var_value) if obj.class.columns_hash[var_name]
+    @model ||= begin
+      obj = versionable_type.constantize.new
+      YAML::load( self.yaml ).each do |var_name,var_value|
+        # INSTRUCTURE:  added if... so that if a column is removed in a migration after this was versioned it doesen't die with NoMethodError: undefined method `some_column_name=' for ...
+        obj.write_attribute(var_name, var_value) if obj.class.columns_hash[var_name]
+      end
+      obj.instance_variable_set(:@new_record, false)
+      obj.simply_versioned_options[:on_load].try(:call, obj, self)
+      # INSTRUCTURE: Added to allow model instances pulled out
+      # of versions to still know their version number
+      obj.simply_versioned_version_model = true
+      obj.send("force_version_number", self.number)
+      obj
     end
-    obj.instance_variable_set(:@new_record, false)
-    obj.simply_versioned_options[:on_load].try(:call, obj, self)
-    # INSTRUCTURE: Added to allow model instances pulled out
-    # of versions to still know their version number
-    obj.simply_versioned_version_model = true
-    obj.send("force_version_number", self.number)
-    obj
   end
 
   # INSTRUCTURE: Added to allow previous version models to be updated
