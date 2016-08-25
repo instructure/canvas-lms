@@ -112,6 +112,7 @@ module Api::V1::Submission
       other_fields -= params[:exclude_response_fields]
     end
 
+    attempt.assignment = assignment
     hash = api_json(attempt, user, session, :only => json_fields, :methods => json_methods)
     if hash['body'].present?
       hash['body'] = api_user_content(hash['body'], context, user)
