@@ -21,19 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe BrandConfigsController do
   before :each do
     @account = Account.default
-    @account.enable_feature!(:use_new_styles)
     @bc = BrandConfig.create(variables: {"ic-brand-primary" => "#321"})
-  end
-
-  describe '#index' do
-    it "should not be allowed without new ui" do
-      @account.disable_feature!(:use_new_styles)
-      admin = account_admin_user(account: @account)
-      user_session(admin)
-      get 'index', account_id: @account.id
-      assert_status(302)
-      expect(flash[:error]).not_to be_blank
-    end
   end
 
   describe '#new' do
@@ -49,15 +37,6 @@ describe BrandConfigsController do
       user_session(user)
       post 'new', {brand_config: @bc, account_id: @account.id}
       assert_status(401)
-    end
-
-    it "should not be allowed without new ui" do
-      @account.disable_feature!(:use_new_styles)
-      admin = account_admin_user(account: @account)
-      user_session(admin)
-      post 'new', {brand_config: @bc, account_id: @account.id}
-      assert_status(302)
-      expect(flash[:error]).not_to be_blank
     end
 
     it "should create variableSchema based on parent configs" do

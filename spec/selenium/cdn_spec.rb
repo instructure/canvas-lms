@@ -53,7 +53,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
   end
 
   def check_css(bundle_name)
-    variant = ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? 'new_styles_normal_contrast' : 'legacy_normal_contrast'
+    variant = 'new_styles_normal_contrast'
     fingerprint = BrandableCSS.cache_for(bundle_name, variant)[:combinedChecksum]
     expect(fingerprint).to match(RE_SHORT_MD5)
     url = "#{EXAMPLE_CDN_HOST}/dist/brandable_css/#{variant}/#{bundle_name}-#{fingerprint}.css"

@@ -82,7 +82,7 @@ describe "dashboard" do
       it 'shows an assignment stream item under Recent Activity in dashboard', priority: "1", test_id: 108723 do
         assignment_model({:submission_types => ['online_text_entry'], :course => @course})
         get "/"
-        f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+        f('#dashboardToggleButton').click
         find('.toggle-details').click
         expect(fj('.fake-link:contains("Unnamed")')).to be_present
       end
@@ -247,15 +247,8 @@ describe "dashboard" do
 
         get "/"
 
-        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-          f('#global_nav_courses_link').click
-          expect(fj('.ic-NavMenu-list-item a:contains("All Courses")')).to be_present
-        else
-          course_menu_item = f("#courses_menu_item")
-          hover(course_menu_item)
-          expect(course_menu_item).to include_text('My Courses')
-          expect(course_menu_item).to include_text('View All or Customize')
-        end
+        f('#global_nav_courses_link').click
+        expect(fj('.ic-NavMenu-list-item a:contains("All Courses")')).to be_present
       end
     end
   end

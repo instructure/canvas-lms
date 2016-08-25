@@ -31,13 +31,11 @@ describe "settings tabs" do
       expect(f("#tab-announcements .announcement-details")).to include_text(displayed_username)
       dismiss_flash_messages
 
-      if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-        # close the "user account" reactTray that opened so we could read the displayed username
-        if tray_close = f('.ic-NavMenu__closeButton')
-         tray_close.click
-        end
-        expect(f('body')).not_to contain_css('.ReactTray__Overlay')
+      # close the "user account" reactTray that opened so we could read the displayed username
+      if tray_close = f('.ic-NavMenu__closeButton')
+       tray_close.click
       end
+      expect(f('body')).not_to contain_css('.ReactTray__Overlay')
 
       expect(f("#tab-announcements .notification_subject").text).to eq subject
       expect(f("#tab-announcements .notification_message").text).to eq "this is a message"

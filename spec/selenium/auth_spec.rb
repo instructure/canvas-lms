@@ -9,7 +9,7 @@ describe "auth" do
       get "/logout"
 
       expect_new_page_load {
-        f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.Button--logout-confirm' : '#modal-box form input[type=submit]').submit()
+        f('.Button--logout-confirm').submit()
       }
       expect(driver.current_url).to match %r{/login}
     end

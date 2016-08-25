@@ -419,4 +419,25 @@ describe "better_file_browsing" do
     end
   end
 
+  context "Directory Header" do
+    it "should sort the files properly", priority: 2, test_id: 1664875 do
+      # this test performs 2 sample sort combinations
+      course_with_teacher_logged_in
+
+      add_file(fixture_file_upload('files/example.pdf', 'application/pdf'), @course, "a_example.pdf")
+      add_file(fixture_file_upload("files/b_file.txt", 'text/plain'), @course, 'b_file.txt')
+
+      get "/courses/#{@course.id}/files"
+
+      # click name once to make it sort descending
+      fj('.ef-plain-link span:contains("Name")').click
+      expect(ff('.ef-name-col__text')[0].text).to eq 'example.pdf'
+      expect(ff('.ef-name-col__text')[1].text).to eq 'b_file.txt'
+
+      # click size twice to make it sort ascending
+      2.times { fj('.ef-plain-link span:contains("Size")').click }
+      expect(ff('.ef-name-col__text')[0].text).to eq 'b_file.txt'
+      expect(ff('.ef-name-col__text')[1].text).to eq 'example.pdf'
+    end
+  end
 end

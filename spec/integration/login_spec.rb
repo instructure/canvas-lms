@@ -267,16 +267,4 @@ describe 'login' do
     post canvas_login_url, pseudonym_session: { unique_id: @pseudonym.unique_id, password: 'qwerty' }
     expect(response).to redirect_to jobs_url
   end
-
-  it "loads custom js 'raw' on mobile login screen", type: :request do
-    js_url = 'https://example.com/path/to/some/file.js'
-    Account.default.settings[:global_includes] = true
-    Account.default.settings[:global_javascript] = js_url
-    Account.default.save!
-
-    get '/login/canvas', {}, { 'HTTP_USER_AGENT' => 'iphone' }
-    # match /optimized/vendor/jquery-1.7.2.js?1440111591 or /optimized/vendor/jquery-1.7.2.js
-    assert_tag(tag: 'script', attributes: { src: /^\/optimized\/vendor\/jquery-1.7.2.js(\?\d+)*$/})
-    assert_tag(tag: 'script', attributes: { src: js_url})
-  end
 end

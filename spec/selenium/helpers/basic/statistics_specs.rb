@@ -38,7 +38,7 @@ shared_examples_for "statistics basic tests" do
       skip('spec is broken on sub account level') if account != Account.default
       get url
       expect_new_page_load { f(list_css[:started]).find_element(:css, '.header').click }
-      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#breadcrumbs .home + li a' : '#section-tabs-header')).to include_text(@course.name)
+      expect(f('#breadcrumbs .home + li a')).to include_text(@course.name)
     end
 
     it "should validate recently ended courses display" do
