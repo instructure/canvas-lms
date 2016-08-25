@@ -3291,6 +3291,11 @@ describe Assignment do
       @assignment.unpublish
     end
 
+    it "updates when omit_from_final_grade changes" do
+      @assignment.context.expects(:recompute_student_scores).once
+      @assignment.update_attribute :omit_from_final_grade, true
+    end
+
     it "should not update grades otherwise" do
       @assignment.context.expects(:recompute_student_scores).never
       @assignment.title = 'hi'

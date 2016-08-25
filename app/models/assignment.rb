@@ -339,9 +339,17 @@ class Assignment < ActiveRecord::Base
     true
   end
 
+  def needs_to_recompute_grade?
+    points_possible_changed? ||
+    muted_changed? ||
+    workflow_state_changed? ||
+    assignment_group_id_changed? ||
+    only_visible_to_overrides_changed? ||
+    omit_from_final_grade_changed?
+  end
+
   def update_grades_if_details_changed
-    if points_possible_changed? || muted_changed? || workflow_state_changed? ||
-       assignment_group_id_changed? || only_visible_to_overrides_changed?
+    if needs_to_recompute_grade?
       Rails.logger.info "GRADES: recalculating because assignment #{global_id} changed. (#{changes.inspect})"
       self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
     end
