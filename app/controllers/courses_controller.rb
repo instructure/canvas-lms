@@ -2529,28 +2529,51 @@ class CoursesController < ApplicationController
       conditions = states.map do |state|
         Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
       end.compact.join(" OR ")
-      enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user).to_a
+      enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user)
+
+      if params[:enrollment_role]
+        enrollments = enrollments.joins(:role).where(roles: { name: params[:enrollment_role] })
+      elsif params[:enrollment_role_id]
+        enrollments = enrollments.where(role_id: params[:enrollment_role_id].to_i)
+      elsif params[:enrollment_type]
+        e_type = "#{params[:enrollment_type].capitalize}Enrollment"
+        enrollments = enrollments.where(type: e_type)
+      end
+
+      if value_to_boolean(params[:current_domain_only])
+        enrollments = enrollments.where(root_account_id: @domain_root_account)
+      elsif params[:root_account_id]
+        root_account = api_find_all(Account, [params[:root_account_id]]).take
+        enrollments = root_account ? enrollments.where(root_account_id: root_account) : Enrollment.none
+      end
+
+      enrollments = enrollments.to_a
     else
       enrollments = user.cached_current_enrollments(preload_courses: true)
     end
 
     enrollments.concat(retrieve_observed_enrollments(user, enrollments)) if include_observed
 
-    # TODO: preload roles after enrollment#role shim is taken out
-    if params[:enrollment_role]
-      enrollments = enrollments.reject { |e| e.role.name != params[:enrollment_role] }
-    elsif params[:enrollment_role_id]
-      enrollments = enrollments.reject { |e| e.role.id.to_s != params[:enrollment_role_id].to_s }
-    elsif params[:enrollment_type]
-      e_type = "#{params[:enrollment_type].capitalize}Enrollment"
-      enrollments = enrollments.reject { |e| e.class.name != e_type }
-    end
+    # these are all duplicated in the params[:state] block above in SQL. but if
+    # used the cached ones, or we added include_observed, we have to re-run them
+    # in pure ruby
+    if include_observed || !params[:state]
+      if params[:enrollment_role]
+        ActiveRecord::Associations::Preloader.new.preload(enrollments, :role)
+        enrollments.reject! { |e| e.role.name != params[:enrollment_role] }
+      elsif params[:enrollment_role_id]
+        enrollments.reject! { |e| e.role_id != params[:enrollment_role_id].to_i }
+      elsif params[:enrollment_type]
+        e_type = "#{params[:enrollment_type].capitalize}Enrollment"
+        enrollments.reject! { |e| e.class.name != e_type }
+      end
 
-    if value_to_boolean(params[:current_domain_only])
-      enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
-    elsif params[:root_account_id]
-      root_account = api_find_all(Account, [params[:root_account_id]]).first
-      enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
+      if value_to_boolean(params[:current_domain_only])
+        enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
+      elsif params[:root_account_id]
+        root_account = api_find_all(Account, [params[:root_account_id]]).take
+        enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
+      end
     end
 
     includes = Set.new(Array(params[:include]))
