@@ -11310,9 +11310,7 @@ ru:
           quadrillion: Квадрильон
           thousand: Тысяча
           trillion: Триллион
-          unit: ""
       format: 
-        delimiter: ""
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -11330,11 +11328,7 @@ ru:
           tb: ТБ
     percentage: 
       format: 
-        delimiter: ""
         format: "%n%"
-    precision: 
-      format: 
-        delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "число от 1 до 16 включительно"
   number_of_allowed_attempts_3d10b740: "Число разрешенных попыток"
   number_of_respondents_e1e7e8b: "Количество респондентов"

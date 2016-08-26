@@ -11054,9 +11054,7 @@ de:
           quadrillion: Billiarde
           thousand: Tausend
           trillion: Billion
-          unit: ""
       format: 
-        delimiter: ""
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -11072,11 +11070,7 @@ de:
           tb: TB
     percentage: 
       format: 
-        delimiter: ""
         format: "%n%"
-    precision: 
-      format: 
-        delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "Zahl zwischen 1 und 16 eingeschlossen"
   number_of_allowed_attempts_3d10b740: "Anzahl der zulässigen Versuche"
   number_of_respondents_e1e7e8b: "Anzahl der Befragten"

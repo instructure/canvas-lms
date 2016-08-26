@@ -4,6 +4,7 @@ class EnrollmentState < ActiveRecord::Base
   belongs_to :enrollment
 
   attr_accessor :skip_touch_user, :user_needs_touch
+  validates_presence_of :enrollment_id
 
   self.primary_key = 'enrollment_id'
 

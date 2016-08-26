@@ -18,3 +18,14 @@ ActiveRecord::LogSubscriber.class_eval do
   end
   alias_method_chain :sql, :tag
 end
+
+if CANVAS_RAILS4_0
+  # CVE-2016-6316
+  ActionView::Helpers::TagHelper.module_eval do
+    def tag_option(key, value, escape)
+      value = value.join(" ") if value.is_a?(Array)
+      value = ERB::Util.h(value) if escape
+      %(#{key}="#{value.gsub(/"/, '&quot;'.freeze)}")
+    end
+  end
+end

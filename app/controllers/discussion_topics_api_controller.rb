@@ -128,7 +128,7 @@ class DiscussionTopicsApiController < ApplicationController
       if include_enrollment_state
         enrollment_context = @context.is_a?(Course) ? @context : @context.context
         all_enrollments = enrollment_context.enrollments.where(:user_id => participants).to_a
-        Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
+        Canvas::Builders::EnrollmentDateBuilder.preload_state(all_enrollments)
         all_enrollments = all_enrollments.group_by(&:user_id)
       end
 

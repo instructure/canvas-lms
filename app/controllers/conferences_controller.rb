@@ -184,7 +184,7 @@ class ConferencesController < ApplicationController
     log_asset_access([ "conferences", @context ], "conferences", "other")
     if @context.is_a? Course
       enrollments = @context.typical_current_enrollments.eager_load(:user).where.not(user_id: @current_user.id).order(User.sortable_name_order_by_clause).to_a
-      Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+      Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
       @users = enrollments.select(&:active?).map(&:user).uniq
     else
       @users = @context.users.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq

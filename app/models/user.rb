@@ -613,7 +613,7 @@ class User < ActiveRecord::Base
   # Returns an array of groups which are currently visible for the user.
   def visible_groups
     @visible_groups ||= begin
-      enrollments = self.cached_current_enrollments(preload_courses: true)
+      enrollments = self.cached_current_enrollments(preload_dates: true, preload_courses: true)
       visible_groups = self.current_groups.select do |group|
         group.context_type != 'Course' || enrollments.any? do |en|
           en.course == group.context && !(en.inactive? || en.completed?) && (en.admin? || en.course.available?)
@@ -1693,7 +1693,7 @@ class User < ActiveRecord::Base
             courses_hash = courses.index_by(&:id)
             # prepopulate the reverse association
             enrollments.each { |e| e.course = courses_hash[e.course_id] }
-            Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+            Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
             date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
             courses.reject! { |course| date_restricted_ids.include?(Shard.relative_id_for(course.primary_enrollment_id, course.shard, Shard.current)) }
           end
@@ -1762,8 +1762,9 @@ class User < ActiveRecord::Base
       end + temporary_invitations
 
       if opts[:preload_dates]
-        Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
-      elsif opts[:preload_courses]
+        Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
+      end
+      if opts[:preload_courses]
         ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
       end
       enrollments
@@ -1773,9 +1774,11 @@ class User < ActiveRecord::Base
   def cached_not_ended_enrollments
     RequestCache.cache("not_ended_enrollments", self) do
       self.shard.activate do
-        Rails.cache.fetch([self, 'not_ended_enrollments2'].cache_key) do
+        enrollments = Rails.cache.fetch([self, 'not_ended_enrollments2'].cache_key) do
           self.not_ended_enrollments.to_a
         end
+        Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
+        enrollments
       end
     end
   end
@@ -2003,7 +2006,7 @@ class User < ActiveRecord::Base
   def select_available_assignments(assignments)
     return [] if assignments.empty?
     enrollments = self.enrollments.where(:course_id => assignments.select{|a| a.context_type == "Course"}.map(&:context_id)).to_a
-    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+    Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments.select!{|e| e.participating?}
     assignments.select{|a| a.context_type != "Course" || enrollments.any?{|e| e.course_id == a.context_id}}
   end

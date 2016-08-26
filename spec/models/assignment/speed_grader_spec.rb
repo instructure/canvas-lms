@@ -278,7 +278,9 @@ describe Assignment::SpeedGrader do
         submission_type: 'online_text_entry',
         body: 'hi'
       })
-      others.each { |u| @assignment.grade_student(u, excuse: true) }
+      others.each { |u|
+        @assignment.grade_student(u, excuse: true)
+      }
       expect(@assignment.representatives(@teacher)).to include g1rep
     end
 

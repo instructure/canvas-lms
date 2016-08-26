@@ -43,8 +43,11 @@ class Cacher < ActiveRecord::Observer
   end
 
   def self.clear_all_site_admin_account_users(current_xlog_location = nil)
-    AccountUser.wait_for_replication(start: current_xlog_location)
-    MultiCache.delete("all_site_admin_account_users3")
+    # send_in_each_region lost the context of which shard was active
+    Account.site_admin.shard.activate do
+      AccountUser.wait_for_replication(start: current_xlog_location)
+      MultiCache.delete("all_site_admin_account_users3")
+    end
   end
 
   def after_destroy(obj)
