@@ -26,6 +26,8 @@ describe RubricAssessment do
     @course.enroll_teacher(@teacher).accept
     @student = user(:active_all => true)
     @course.enroll_student(@student).accept
+    @observer = user(:active_all => true)
+    @course.enroll_user(@observer, 'ObserverEnrollment', {:associated_user_id => @student.id})
     rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
   end
@@ -73,6 +75,43 @@ describe RubricAssessment do
       expect(@assessment.artifact.grader).to eql(@teacher)
       expect(@assessment.artifact.score).to eql(5.0)
       expect(@assessment.data.first[:comments_html]).to be_nil
+    end
+
+    it "should allow observers the ability to view rubric assessments with course association" do
+      submission = @assignment.find_or_create_submission(@student)
+      @assessment = @association.assess(
+          {
+              :user => @student,
+              :assessor => @teacher,
+              :artifact => submission,
+              :assessment => {
+                  :assessment_type => 'grading',
+                  :criterion_crit1 => {
+                      :points => 5
+                  }
+              }
+          })
+      visible_rubric_assessments = submission.visible_rubric_assessments_for(@observer)
+      expect(visible_rubric_assessments.length).to eql(1)
+    end
+
+    it "should allow observers the ability to view rubric assessments with account association" do
+      submission = @assignment.find_or_create_submission(@student)
+      account_association = @rubric.associate_with(@assignment, @account, :purpose => 'grading', :use_for_grading => true)
+      @assessment = account_association.assess(
+          {
+              :user => @student,
+              :assessor => @teacher,
+              :artifact => submission,
+              :assessment => {
+                  :assessment_type => 'grading',
+                  :criterion_crit1 => {
+                      :points => 5
+                  }
+              }
+          })
+      visible_rubric_assessments = submission.visible_rubric_assessments_for(@observer)
+      expect(visible_rubric_assessments.length).to eql(1)
     end
 
     it "should update scores anonymously if graded anonymously" do
