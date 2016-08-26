@@ -748,8 +748,31 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def preload_user_roles!
+    # plz to use before you make a billion calls to user_has_been_X? with different users
+    @user_ids_by_enroll_type ||= begin
+      self.shard.activate do
+        map = {}
+        self.enrollments.active.pluck(:user_id, :type).each do |user_id, type|
+          map[type] ||= []
+          map[type] << user_id
+        end
+        map
+      end
+    end
+  end
+
+  def preloaded_user_has_been?(user, types)
+    self.shard.activate do
+      Array(types).any?{|type| @user_ids_by_enroll_type.has_key?(type) && @user_ids_by_enroll_type[type].include?(user.id)}
+    end
+  end
+
   def user_has_been_instructor?(user)
     return unless user
+    if @user_ids_by_enroll_type
+      return preloaded_user_has_been?(user, %w{TaEnrollment TeacherEnrollment})
+    end
     # enrollments should be on the course's shard
     RequestCache.cache('user_has_been_instructor', self, user) do
       self.shard.activate do
@@ -763,7 +786,15 @@ class Course < ActiveRecord::Base
 
   def user_has_been_admin?(user)
     return unless user
+    if @user_ids_by_enroll_type
+      return preloaded_user_has_been?(user, %w{TaEnrollment TeacherEnrollment DesignerEnrollment})
+    end
+
     RequestCache.cache('user_has_been_admin', self, user) do
+      if @user_ids_by_enroll_type
+        next %w{TaEnrollment TeacherEnrollment DesignerEnrollment}.any?{|type| @user_ids_by_enroll_type[type].include?(user.id)}
+      end
+
       Rails.cache.fetch([self, user, "course_user_has_been_admin"].cache_key) do
         # active here is !deleted; it still includes concluded, etc.
         self.admin_enrollments.active.where(user_id: user).exists?
@@ -773,6 +804,10 @@ class Course < ActiveRecord::Base
 
   def user_has_been_observer?(user)
     return unless user
+    if @user_ids_by_enroll_type
+      return preloaded_user_has_been?(user, "ObserverEnrollment")
+    end
+
     RequestCache.cache('user_has_been_observer', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_been_observer"].cache_key) do
         # active here is !deleted; it still includes concluded, etc.
@@ -783,6 +818,10 @@ class Course < ActiveRecord::Base
 
   def user_has_been_student?(user)
     return unless user
+    if @user_ids_by_enroll_type
+      return preloaded_user_has_been?(user, %w{StudentEnrollment StudentViewEnrollment})
+    end
+
     RequestCache.cache('user_has_been_student', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
         self.all_student_enrollments.where(user_id: user).exists?
@@ -792,6 +831,12 @@ class Course < ActiveRecord::Base
 
   def user_has_no_enrollments?(user)
     return unless user
+    if @user_ids_by_enroll_type
+      self.shard.activate do
+        return !@user_ids_by_enroll_type.values.any?{|arr| arr.include?(user.id)}
+      end
+    end
+
     RequestCache.cache('user_has_no_enrollments', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_no_enrollments"].cache_key) do
         !enrollments.where(user_id: user).exists?
