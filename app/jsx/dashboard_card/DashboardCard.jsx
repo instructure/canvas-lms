@@ -177,6 +177,7 @@ define([
               className="ic-DashboardCard__header_hero"
               style={{backgroundColor: this.props.backgroundColor, opacity: 0.6}}
               onClick={this.headerClick}
+              aria-hidden="true"
             >
             </div>
           </div>
@@ -187,7 +188,8 @@ define([
           <div
             className="ic-DashboardCard__header_hero"
             style={{backgroundColor: this.props.backgroundColor}}
-            onClick={this.headerClick}>
+            onClick={this.headerClick}
+            aria-hidden="true">
           </div>
         );
       }
@@ -202,6 +204,14 @@ define([
           aria-label={this.props.originalName}
         >
           <div className="ic-DashboardCard__header">
+            <span className="screenreader-only">
+              {
+                this.props.imagesEnabled && this.props.image ?
+                  I18n.t("Course image for %{course}", {course: this.state.nicknameInfo.nickname})
+                :
+                  I18n.t("Course card color region for %{course}", {course: this.state.nicknameInfo.nickname}) 
+              }
+            </span>
             {this.renderHeaderHero()}
             <div
               className="ic-DashboardCard__header_content"
