@@ -375,7 +375,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def find_tool(id, selection_type)
-    if selection_type.nil? || ContextExternalTool::EXTENSION_TYPES.include?(selection_type.to_sym)
+    if selection_type.nil? || Lti::ResourcePlacement::PLACEMENTS.include?(selection_type.to_sym)
       @tool = ContextExternalTool.find_for(id, @context, selection_type, false)
     end
 
@@ -833,7 +833,7 @@ class ExternalToolsController < ApplicationController
   private
 
   def set_tool_attributes(tool, params)
-    attrs = ContextExternalTool::EXTENSION_TYPES
+    attrs = Lti::ResourcePlacement::PLACEMENTS
     attrs += [:name, :description, :url, :icon_url, :canvas_icon_class, :domain, :privacy_level, :consumer_key, :shared_secret,
               :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id]
     attrs.each do |prop|
