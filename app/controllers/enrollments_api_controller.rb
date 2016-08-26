@@ -313,7 +313,7 @@ class EnrollmentsApiController < ApplicationController
         end
 
         grading_period = @context.courses.lazy.map do |course|
-          GradingPeriod.context_find(course, params[:grading_period_id])
+          GradingPeriod.for(course).find_by(id: params[:grading_period_id])
         end.detect(&:present?)
       else
         unless multiple_grading_periods?
@@ -321,7 +321,7 @@ class EnrollmentsApiController < ApplicationController
           return false
         end
 
-        grading_period = GradingPeriod.context_find(@context, params[:grading_period_id])
+        grading_period = GradingPeriod.for(@context).find_by(id: params[:grading_period_id])
       end
 
       unless grading_period

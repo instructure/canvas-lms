@@ -8,9 +8,10 @@ define([
   'jsx/navigation_header/trays/GroupsTray',
   'jsx/navigation_header/trays/AccountsTray',
   'jsx/navigation_header/trays/ProfileTray',
+  'jsx/navigation_header/trays/HelpTray',
   'jsx/shared/SVGWrapper',
   'compiled/fn/preventDefault'
-], (_, $, I18n, React, Tray, CoursesTray, GroupsTray, AccountsTray, ProfileTray, SVGWrapper, preventDefault) => {
+], (_, $, I18n, React, Tray, CoursesTray, GroupsTray, AccountsTray, ProfileTray, HelpTray, SVGWrapper, preventDefault) => {
 
   var EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/;
   var ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)/;
@@ -20,8 +21,9 @@ define([
 
   var TYPE_URL_MAP = {
     courses: '/api/v1/users/self/favorites/courses?include=term',
-    groups: '/api/v1/users/self/groups',
-    accounts: '/api/v1/accounts'
+    groups: '/api/v1/users/self/groups?include[]=can_access',
+    accounts: '/api/v1/accounts',
+    help: '/help_links'
   };
 
   var Navigation = React.createClass({
@@ -32,6 +34,7 @@ define([
         groups: [],
         accounts: [],
         courses: [],
+        help: [],
         unread_count: 0,
         unread_count_attempts: 0,
         isTrayOpen: false,
@@ -41,7 +44,9 @@ define([
         accountsLoading: false,
         accountsAreLoaded: false,
         groupsLoading: false,
-        groupsAreLoaded: false
+        groupsAreLoaded: false,
+        helpLoading: false,
+        helpAreLoaded: false
       };
     },
 
@@ -67,14 +72,18 @@ define([
       /// Click Events
       //////////////////////////////////
 
-      ['courses', 'groups', 'accounts', 'profile'].forEach((type) => {
+      ['courses', 'groups', 'accounts', 'profile', 'help'].forEach((type) => {
         $(`#global_nav_${type}_link`).on('click', preventDefault(this.handleMenuClick.bind(this, type)));
       });
     },
 
     componentDidMount () {
       if (this.state.unread_count_attempts == 0) {
-        if (window.ENV.current_user_id && !ENV.current_user_disabled_inbox && this.unreadCountElement().length != 0 && !(window.ENV.current_user && window.ENV.current_user.fake_student)) {
+        if (window.ENV.current_user_id &&
+            !window.ENV.current_user_disabled_inbox &&
+            this.unreadCountElement().length != 0 &&
+            !(window.ENV.current_user &&
+            window.ENV.current_user.fake_student)) {
           this.pollUnreadCount();
         }
       }
@@ -141,6 +150,7 @@ define([
       if (TYPE_URL_MAP[type] && !this.state[`${type}AreLoaded`] && !this.state[`${type}Loading`]) {
         this.getResource(TYPE_URL_MAP[type], type);
       }
+
       if (this.state.isTrayOpen && (this.state.activeItem === type)) {
         this.closeTray();
       } else if (this.state.isTrayOpen && (this.state.activeItem !== type)) {
@@ -202,6 +212,14 @@ define([
             <ProfileTray
               userDisplayName={window.ENV.current_user.display_name}
               userAvatarURL={window.ENV.current_user.avatar_image_url}
+              closeTray={this.closeTray}
+            />
+          );
+        case 'help':
+          return (
+            <HelpTray
+              links={this.state.help}
+              hasLoaded={this.state.helpAreLoaded}
               closeTray={this.closeTray}
             />
           );

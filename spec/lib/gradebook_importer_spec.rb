@@ -121,28 +121,28 @@ describe GradebookImporter do
     it "should Lookup with either Student Name, ID, SIS User ID, or SIS Login ID" do
       course_model
 
-      student_in_course(:name => "Some Name")
+      student_in_course(:name => "Some Name", active_all: true)
       @u1 = @user
 
       user_with_pseudonym(:active_all => true)
       @user.pseudonym.sis_user_id = "SISUSERID"
       @user.pseudonym.save!
-      student_in_course(:user => @user)
+      student_in_course(user: @user, active_all: true)
       @u2 = @user
 
       user_with_pseudonym(:active_all => true, :username => "something_that_has_not_been_taken")
-      student_in_course(:user => @user)
+      student_in_course(user: @user, active_all: true)
       @u3 = @user
 
       user_with_pseudonym(:active_all => true, :username => "inactive_login")
       @user.pseudonym.destroy
-      student_in_course(:user => @user)
+      student_in_course(user: @user, active_all: true)
       @u4 = @user
 
       user_with_pseudonym(:active_all => true, :username => "inactive_login")
       @user.pseudonym.destroy
       @user.pseudonyms.create!(:unique_id => 'active_login', :account => Account.default)
-      student_in_course(:user => @user)
+      student_in_course(user: @user, active_all: true)
       @u5 = @user
 
       uploaded_csv = CSV.generate do |csv|
@@ -183,7 +183,7 @@ describe GradebookImporter do
     it "should Lookup by root account" do
       course_model
 
-      student_in_course(:name => "Some Name")
+      student_in_course(name: "Some Name", active_all: true)
       @u1 = @user
 
       account2 = Account.create!
@@ -212,14 +212,14 @@ describe GradebookImporter do
       user_with_pseudonym(:active_all => true)
       @user.pseudonym.sis_user_id = "0123456"
       @user.pseudonym.save!
-      student_in_course(:user => @user)
+      student_in_course(user: @user, active_all: true)
       @u0 = @user
 
       # user with an sis-id that is a number
       user_with_pseudonym(:active_all => true, :username => "octal_ud")
       @user.pseudonym.destroy
       @user.pseudonyms.create!(:unique_id => '0231163', :account => Account.default)
-      student_in_course(:user => @user)
+      student_in_course(user: @user, active_all: true)
       @u1 = @user
 
       uploaded_csv = CSV.generate do |csv|
@@ -327,7 +327,7 @@ describe GradebookImporter do
   end
 
   it "should parse new and existing users" do
-    course_with_student
+    course_with_student(active_all: true)
     @student1 = @student
     e = student_in_course
     e.update_attribute :workflow_state, 'completed'
@@ -359,7 +359,7 @@ describe GradebookImporter do
   end
 
   it "should include assignments that the grade changed for an existing user" do
-    course_with_student
+    course_with_student(active_all: true)
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     @assignment1.grade_student(@student, :grade => 8)
     importer_with_rows(

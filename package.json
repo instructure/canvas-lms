@@ -10,7 +10,8 @@
 
     "request": "these are to get things to install on node 0.12. remove them when we upgrade node. they are actually not direct-dependencies of our app",
     "request": "2.73.0",
-    "tough-cookie": "2.2.2"
+    "tough-cookie": "2.2.2",
+    "instructure-ui": "0.13.3"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
@@ -21,6 +22,7 @@
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-1": "^6.5.0",
+    "babel-register": "^6.9.0",
     "base64-js": "0.0.8",
     "coffee-loader": "^0.7.2",
     "coffee-script": "1.6.2",

@@ -20,11 +20,12 @@ requirejs.config({
     // CQS dependencies
     'rsvp': '../../../vendor/js/rsvp.min',
     'qtip': '../../../vendor/js/jquery.qtip',
+    'old_version_of_react_used_by_canvas_quizzes_client_apps': '../../../vendor/js/old_version_of_react_used_by_canvas_quizzes_client_apps',
+    'old_version_of_react-router_used_by_canvas_quizzes_client_apps': '../../../vendor/js/old_version_of_react-router_used_by_canvas_quizzes_client_apps',
     // ========================================================================
 
     // ========================================================================
     // Aliases to frequently-used Canvas packages
-    'react': '../../../vendor/packages/react',
     'lodash': '../../../vendor/packages/lodash',
     'd3': '../../../vendor/packages/d3',
     // ========================================================================

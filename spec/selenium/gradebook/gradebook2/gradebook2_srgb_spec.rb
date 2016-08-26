@@ -34,6 +34,7 @@ describe "Screenreader Gradebook" do
     a2.grade_student @students[1], grade: grades[3]
 
     get srgb
+    wait_for_ajaximations
 
     expect(get_options('#student_select').map(&:text)).to eq ['No Student Selected', @students[0].name, @students[1].name]
     click_option '#student_select', @students[0].name

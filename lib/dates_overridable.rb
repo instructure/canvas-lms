@@ -57,7 +57,6 @@ module DatesOverridable
   end
 
   def multiple_due_dates_apply_to?(user)
-    return false if !context.multiple_sections?
     return false if context.user_has_been_student?(user)
 
     if context.user_has_been_observer?(user)

@@ -1942,6 +1942,7 @@ describe Quizzes::Quiz do
         it "should grant submit rights" do
           @course.stubs(:grants_right?).with(@student1, nil, :participate_as_student).returns(true)
           @course.stubs(:grants_right?).with(@student1, nil, :manage_assignments).returns(false)
+          @course.stubs(:grants_right?).with(@student1, nil, :read_as_admin).returns(false)
           @course.stubs(:grants_right?).with(@student1, nil, :manage_grades).returns(false)
           expect(@quiz.grants_right?(@student1, :submit)).to eq true
           @course.unstub(:grants_right?)
@@ -1960,6 +1961,7 @@ describe Quizzes::Quiz do
         it 'should not grant submit rights' do
           @course.stubs(:grants_right?).with(@student2, nil, :participate_as_student).returns(true)
           @course.stubs(:grants_right?).with(@student2, nil, :manage_assignments).returns(false)
+          @course.stubs(:grants_right?).with(@student2, nil, :read_as_admin).returns(false)
           @course.stubs(:grants_right?).with(@student2, nil, :manage_grades).returns(false)
           expect(@quiz.grants_right?(@student2, :submit)).to eq false
         end

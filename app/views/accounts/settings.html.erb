@@ -289,7 +289,10 @@ TEXT
                 <% end %>
               </tbody>
             </table>
-            <a href="#" class="icon-add add_ip_filter_link" style="font-size: 0.9em;"><%= t(:add_ip_filter_link, "Add another filter") %></a>
+            <a href="#" class="icon-add add_ip_filter_link">
+              <span aria-hidden="true"><%= t(:add_ip_filter_link, "Filter") %></span>
+              <span class="screenreader-only"><%= t("Add Quiz IP Filter") %></span>
+            </a>
           </fieldset>
         <% end %>
 
@@ -497,99 +500,14 @@ TEXT
           </fieldset>
         <% end %>
 
-        <% if @account.root_account? && !@account.site_admin? && Setting.get("show_feedback_link", "false") == "true"  %>
+
+        <% if @account.root_account? && !@account.site_admin? && show_feedback_link? %>
+
+          <% if use_new_styles? %>
+            <div id="custom_help_link_settings"></div>
+          <% else %>
           <fieldset>
-            <% if use_new_styles? %>
-              <legend><%= t("Customize Help Link") %></legend>
-              <div class="ic-Form-group ic-Form-group--horizontal">
-                <label class="ic-Form-control">
-                  <span class="ic-Label">
-                    <%= t("Link text") %>
-                  </span>
-                  <input
-                    type="text"
-                    class="ic-Input"
-                    name="account[settings][help_link_name]"
-                    value="<%= @account.settings[:help_link_name] %>"
-                    placeholder="<%= t('Help') %>"
-                  />
-                </label>
-                <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
-                  <legend class="ic-Legend">
-                    <%= t("Navigation icon") %>
-                  </legend>
-                  <div class="ic-Form-control ic-Form-control--radio ic-Form-control--radio-inline">
-                    <label class="ic-Radio ic-Radio--icon-only" data-icon-value="help">
-                      <input name="account[settings][help_link_icon]"
-                        type="radio"
-                        value=""
-                        <%= 'checked' if @account.settings[:help_link_icon].blank? %>
-                      />
-                      <span class="ic-Label">
-                        <span class="screenreader-only">
-                          <%= t("Question mark icon") %>
-                        </span>
-                        <%= svg_icon :help %>
-                      </span>
-                    </label>
-                    <label class="ic-Radio ic-Radio--icon-only" data-icon-value="information">
-                      <input name="account[settings][help_link_icon]"
-                        type="radio"
-                        value="information"
-                        <%= 'checked' if @account.settings[:help_link_icon] == 'information' %>
-                      />
-                      <span class="ic-Label">
-                        <span class="screenreader-only">
-                          <%= t("Information icon") %>
-                        </span>
-                        <%= svg_icon :information %>
-                      </span>
-                    </label>
-                    <label class="ic-Radio ic-Radio--icon-only" data-icon-value="folder">
-                      <input name="account[settings][help_link_icon]"
-                        type="radio"
-                        value="folder"
-                        <%= 'checked' if @account.settings[:help_link_icon] == 'folder' %>
-                      />
-                      <span class="ic-Label">
-                        <span class="screenreader-only">
-                          <%= t("Folder icon") %>
-                        </span>
-                        <%= svg_icon :folder %>
-                      </span>
-                    </label>
-                    <label class="ic-Radio ic-Radio--icon-only" data-icon-value="cog">
-                      <input name="account[settings][help_link_icon]"
-                        type="radio"
-                        value="cog"
-                        <%= 'checked' if @account.settings[:help_link_icon] == 'cog' %>
-                      />
-                      <span class="ic-Label">
-                        <span class="screenreader-only">
-                          <%= t("Cog icon") %>
-                        </span>
-                        <%= svg_icon :cog %>
-                      </span>
-                    </label>
-                    <label class="ic-Radio ic-Radio--icon-only" data-icon-value="lifepreserver">
-                      <input
-                        name="account[settings][help_link_icon]"
-                        type="radio" value="lifepreserver"
-                        <%= 'checked' if @account.settings[:help_link_icon] == 'lifepreserver' %>
-                      />
-                      <span class="ic-Label">
-                        <span class="screenreader-only">
-                          <%= t("Life preserver icon") %>
-                        </span>
-                        <%= svg_icon :lifepreserver %>
-                      </span>
-                    </label>
-                  </div>
-                </fieldset>
-              </div>
-            <% else %>
-              <legend><%= t("Custom Links to include in the help dialog popup") %></legend>
-            <% end %>
+            <legend><%= t("Custom Links to include in the help dialog popup") %></legend>
 
             <p style="font-size: 0.9em;">
               <%= t("If you would like to link to your own campus support website in the help dialog you can do that here.") %>
@@ -648,6 +566,7 @@ TEXT
               <%= t("Add a custom help link") %>
             </button>
           </fieldset>
+          <% end %>
         <% end %>
 
         <% unless @account.site_admin? %>
@@ -688,7 +607,7 @@ TEXT
               <tr>
                 <td>&nbsp;</td>
                 <td>
-                  <a href="<%= account_turnitin_confirmation_path(@account) %>" class="confirm_turnitin_settings_link btn">
+                  <a href="<%= account_turnitin_confirmation_path(@account) %>" class="confirm_turnitin_settings_link Button">
                     <%= t(:confirm_turnitin_settings_link, "confirm Turnitin settings") %>
                   </a>
                 </td>
@@ -774,7 +693,7 @@ acknowledge that you have read and agreed to the
         <%= render partial: 'external_integration_keys', locals: { f: f } %>
 
         <div class="button-container">
-          <button type="submit" class="btn btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
+          <button type="submit" class="Button Button--primary"><%= t(:update_settings_button, "Update Settings") %></button>
         </div>
       <% end %>
     </div>
@@ -889,7 +808,7 @@ acknowledge that you have read and agreed to the
         <% end %>
 
         <div class="button-container">
-          <button type="submit" class="btn btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
+          <button type="submit" class="Button Button--primary"><%= t(:update_settings_button, "Update Settings") %></button>
         </div>
       <% end %>
     </div>
@@ -906,7 +825,7 @@ acknowledge that you have read and agreed to the
     </ul>
     <% unless available_roles.empty? %>
       <% js_bundle :user_lists %>
-      <a href="#" class="add_users_link btn btn-primary"><i class="icon-add"></i> <%= t('links.add_admins', %{Add Account Admins}) %></a>
+      <a href="#" class="add_users_link Button Button--primary" title="<%= t('Add Account Admins') %>" aria-label="<%= t('Add Account Admins') %>"><i class="icon-plus"></i> <%= t('links.add_admins', %{Account Admins}) %></a>
       <%= form_tag account_add_account_user_url(@account), {:id => "enroll_users_form", :style => "display: none;"} do  %>
         <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>
         <div style="margin-top: 5px;">
@@ -921,10 +840,10 @@ acknowledge that you have read and agreed to the
           <%= render :partial => 'shared/user_lists' %>
         </div>
         <div class="form-actions">
-          <button type="button" class="btn go_back_button"><%= t('buttons.modify_users', %{Go back and edit the list of users}) %></button>
-          <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
-          <button type="button" class="btn btn-primary verify_syntax_button"><%= t('buttons.continue', %{Continue...}) %></button>
-          <button type="submit" class="btn btn-primary add_users_button"><%= t('buttons.add_users', %{OK Looks Good, Add These Users}) %></button>
+          <button type="button" class="Button go_back_button"><%= t('buttons.modify_users', %{Go back and edit the list of users}) %></button>
+          <button type="button" class="Button cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+          <button type="button" class="Button Button---primary verify_syntax_button"><%= t('buttons.continue', %{Continue...}) %></button>
+          <button type="submit" class="Button Button--primary add_users_button"><%= t('buttons.add_users', %{OK Looks Good, Add These Users}) %></button>
 
         </div>
       <% end %>
@@ -1029,8 +948,8 @@ acknowledge that you have read and agreed to the
       <% end %>
     </ul>
     <% if can_do(@account, @current_user, :manage_alerts) %>
-      <button id="add_announcement_button" class="btn btn-primary element_toggler add_notification_toggle_focus" aria-controls="add_notification_form">
-        <i class="icon-plus"></i> <%= t("Add a New Announcement") %>
+      <button id="add_announcement_button" class="Button Button--primary element_toggler add_notification_toggle_focus" aria-controls="add_notification_form" title="<%= t('Add New Announcement') %>" aria-label="<%= t('Add New Announcement') %>">
+        <i class="icon-plus"></i> <%= t("New Announcement") %>
       </button>
       <%= form_for :account_notification,
        url: account_account_notifications_url(@account),
@@ -1185,7 +1104,7 @@ acknowledge that you have read and agreed to the
         </div>
 
         <div class="ic-Form-actions">
-          <button type="Button" class="element_toggler btn button-secondary add_notification_cancel_focus" aria-controls="add_notification_form">
+          <button type="Button" class="element_toggler Button Button--secondary add_notification_cancel_focus" aria-controls="add_notification_form">
             <%= t('#buttons.cancel', %{Cancel}) %>
           </button>
           <button type="submit" class="Button Button--primary">
@@ -1253,20 +1172,20 @@ acknowledge that you have read and agreed to the
                         <%= render :partial => parameters_partial if parameters_partial %>
                       </div>
                       <br />
-                      <a href="#" id="run_<%= report %>" class="btn btn-primary btn-small run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
+                      <a href="#" id="run_<%= report %>" class="Button Button--primary Button--small run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
                     </form>
                   </div>
                 </div>
                 <span class="running_report_message" style="<%= hidden unless in_progress %>">
                   <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
                 </span>
-                <a href="#" id="configure_<%= report %>" style="<%= hidden if in_progress %>" class="btn btn-small configure_report_link"><%= t 'links.configure_report', 'Configure...' %></a>
+                <a href="#" id="configure_<%= report %>" style="<%= hidden if in_progress %>" class="Button Button--small configure_report_link"><%= t 'links.configure_report', 'Configure...' %></a>
               <% else %>
                 <form id="<%= report %>_form" class="run_report_form" action="<%= api_v1_account_create_report_path(@account, report) %>">
                   <span class="running_report_message" style="<%= hidden unless in_progress %>">
                     <%= t('report_running', 'The report is running.*You\'ll receive an email when it is done.*', :wrapper => '<div>\1</div>') %>
                   </span>
-                  <a href="#" id="run_<%= report %>" style="<%= hidden if in_progress %>" class="btn btn-small btn-primary run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
+                  <a href="#" id="run_<%= report %>" style="<%= hidden if in_progress %>" class="Button Button--small Button--primary run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
                 </form>
               <% end %>
             </td>

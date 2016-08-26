@@ -185,10 +185,10 @@ module Canvas::Migration::Helpers
           hash[:linked_resource] = {:type => 'quizzes', :migration_id => mig_id}
         elsif mig_id = item['topic_migration_id']
           hash[:linked_resource] = {:type => 'discussion_topics', :migration_id => mig_id}
+        elsif mig_id = item['page_migration_id']
+          hash[:linked_resource] = {:type => 'wiki_pages', :migration_id => mig_id}
         end
-      elsif type == 'discussion_topics' && mig_id = item['assignment_migration_id']
-        hash[:linked_resource] = {:type => 'assignments', :migration_id => mig_id}
-      elsif type == 'quizzes' && mig_id = item['assignment_migration_id']
+      elsif ['discussion_topics', 'quizzes', 'wiki_pages'].include?(type) && mig_id = item['assignment_migration_id']
         hash[:linked_resource] = {:type => 'assignments', :migration_id => mig_id}
       end
       hash
@@ -206,7 +206,7 @@ module Canvas::Migration::Helpers
             when 'attachments'
               course_attachments_data(content_list, source)
             when 'wiki_pages'
-              source.wiki.wiki_pages.not_deleted.select("id, title").each do |item|
+              source.wiki.wiki_pages.not_deleted.select("id, title, assignment_id").each do |item|
                 content_list << course_item_hash(type, item)
               end
             when 'discussion_topics'
@@ -312,8 +312,12 @@ module Canvas::Migration::Helpers
           lr = course_item_hash('discussion_topics', item.discussion_topic, false)
           lr[:message] = I18n.t('linked_discussion_topic_message', "linked with Discussion Topic '%{title}'",
                                 :title => item.discussion_topic.title)
+        elsif item.wiki_page
+          lr = course_item_hash('wiki_pages', item.wiki_page, false)
+          lr[:message] = I18n.t("linked with Wiki Page '%{title}'",
+                                :title => item.wiki_page.title)
         end
-      elsif (item.is_a?(DiscussionTopic) || item.is_a?(Quizzes::Quiz)) && item.assignment
+      elsif [DiscussionTopic, WikiPage, Quizzes::Quiz].any? { |t| item.is_a?(t) } && item.assignment
         lr = course_item_hash('assignments', item.assignment, false)
         lr[:message] = I18n.t('linked_assignment_message', "linked with Assignment '%{title}'",
                               :title => item.assignment.title)

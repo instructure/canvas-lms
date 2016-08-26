@@ -177,7 +177,7 @@ class Quizzes::QuizzesController < ApplicationController
         session.delete(:quiz_id)
       end
       @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
-      @locked = @locked_reason && !@quiz.grants_right?(@current_user, session, :update)
+      @locked = @locked_reason && !can_preview?
 
       @context_module_tag = ContextModuleItem.find_tag_with_preferred([@quiz, @quiz.assignment], params[:module_item_id])
       @sequence_asset = @context_module_tag.try(:content)
@@ -698,6 +698,10 @@ class Quizzes::QuizzesController < ApplicationController
 
   private
 
+  def can_preview?
+    @quiz.grants_right?(@current_user, session, :preview)
+  end
+
   def rich_content_service_config
     rce_js_env(:highrisk)
   end
@@ -713,7 +717,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def get_submission
     submission = @quiz.quiz_submissions.where(user_id: @current_user).order(:created_at).first
-    if !@current_user || (params[:preview] && @quiz.grants_right?(@current_user, session, :update))
+    if !@current_user || (params[:preview] && can_preview?)
       user_code = temporary_user_code
       submission = @quiz.quiz_submissions.where(temporary_user_code: user_code).first
     end
@@ -802,8 +806,8 @@ class Quizzes::QuizzesController < ApplicationController
   helper_method :quiz_redirect_params
 
   def start_quiz!
-    can_retry = @submission && (@quiz.unlimited_attempts? || @submission.attempts_left > 0 || @quiz.grants_right?(@current_user, session, :update))
-    preview = params[:preview] && @quiz.grants_right?(@current_user, session, :update)
+    can_retry = @submission && (@quiz.unlimited_attempts? || @submission.attempts_left > 0 || can_preview?)
+    preview = params[:preview] && can_preview?
     if !@submission || @submission.settings_only? || (@submission.completed? && can_retry && !@just_graded) || preview
       user_code = @current_user
       user_code = nil if preview
@@ -849,7 +853,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def can_take_quiz?
-    return true if  params[:preview] && can_do(@quiz, @current_user, :update)
+    return true if params[:preview] && can_preview?
     return false if params[:take] && !authorized_action(@quiz, @current_user, :submit)
     return false if @submission && @submission.completed? && @submission.attempts_left == 0
     can_take = Quizzes::QuizEligibility.new(course: @context,
@@ -877,7 +881,7 @@ class Quizzes::QuizzesController < ApplicationController
     submitted_with_submissions = @context.students_visible_to(@current_user, include: :inactive).
         joins(:quiz_submissions).
         where("quiz_submissions.quiz_id=? AND quiz_submissions.workflow_state<>'settings_only'", @quiz)
-    @submitted_student_count = submitted_with_submissions.count(:id, :distinct => true)
+    @submitted_student_count = submitted_with_submissions.distinct.count(:id)
     #add logged out submissions
     @submitted_student_count += @quiz.quiz_submissions.logged_out.not_settings_only.count
     @any_submissions_pending_review = submitted_with_submissions.where("quiz_submissions.workflow_state = 'pending_review'").count > 0
@@ -896,7 +900,7 @@ class Quizzes::QuizzesController < ApplicationController
     return unless @quiz.one_time_results?
 
     # ignore teacher views
-    return if @quiz.grants_right?(@current_user, :update)
+    return if can_preview?
 
     submission = @submission || get_submission
 

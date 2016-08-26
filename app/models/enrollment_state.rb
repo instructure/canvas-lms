@@ -3,7 +3,8 @@ class EnrollmentState < ActiveRecord::Base
 
   belongs_to :enrollment
 
-  attr_accessor :skip_touch_user, :user_needs_touch
+  attr_accessor :skip_touch_user, :user_needs_touch, :is_direct_recalculation
+  validates_presence_of :enrollment_id
 
   self.primary_key = 'enrollment_id'
 
@@ -84,7 +85,7 @@ class EnrollmentState < ActiveRecord::Base
     end
 
     # TODO: remove when diagnostic columns are removed
-    self.state_recalculated_at = Time.now.utc
+    self.state_recalculated_at = Time.now.utc unless is_direct_recalculation
   end
 
   def calculate_state_based_on_dates
@@ -168,6 +169,10 @@ class EnrollmentState < ActiveRecord::Base
     process_states_in_ranges(start_at, end_at, enrollments_for_account_ids(account_ids))
   end
 
+  def self.process_states_for_ids(enrollment_ids)
+    process_states_for(Enrollment.where(:id => enrollment_ids).to_a)
+  end
+
   def self.process_states_for(enrollments)
     enrollments = Array(enrollments)
     Canvas::Builders::EnrollmentDateBuilder.preload(enrollments, false)
@@ -192,6 +197,13 @@ class EnrollmentState < ActiveRecord::Base
   INVALIDATEABLE_STATES = %w{pending_invited pending_active invited active completed inactive}.freeze # don't worry about creation_pending or rejected, etc
   def self.invalidate_states(enrollment_scope)
     EnrollmentState.where(:enrollment_id => enrollment_scope, :state_is_current => true, :state => INVALIDATEABLE_STATES).update_all(:state_is_current => false, :state_invalidated_at => Time.now.utc)
+  end
+
+  def self.force_recalculation(enrollment_ids)
+    if enrollment_ids.any?
+      EnrollmentState.where(:enrollment_id => enrollment_ids, :state_is_current => true).update_all(:state_is_current => false)
+      EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_ids)
+    end
   end
 
   def self.invalidate_access(enrollment_scope, states_to_update)

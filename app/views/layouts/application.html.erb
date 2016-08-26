@@ -28,6 +28,7 @@
     @body_classes << 'with-fixed-bottom' if @show_fixed_bottom
     @body_classes << 'pages' if controller.js_env[:WIKI_PAGE].present?
     @body_classes << @active_tab
+    @body_classes << 'Underline-All-Links__enabled' if @current_user && @current_user.feature_enabled?(:underline_all_links)
     @body_classes << 'is-masquerading-or-student-view' if @real_current_user && @real_current_user != @current_user
   end
 

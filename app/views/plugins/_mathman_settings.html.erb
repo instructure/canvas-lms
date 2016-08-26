@@ -1,0 +1,20 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+    <table style="width: 500px;" class="formtable">
+      <tr>
+        <td><%= f.blabel :base_url, t('Base url for MathMan service') %></td>
+        <td><%= f.text_field :base_url %></td>
+      </tr>
+      <tr>
+        <td>
+          <%= f.blabel :use_for_svg, t('Use MathMan to convert LaTeX to SVG?') %>
+        </td>
+        <td><%= f.check_box :use_for_svg %></td>
+      </tr>
+      <tr>
+        <td>
+          <%= f.blabel :use_for_mml, t('Use MathMan to convert LaTeX to MathML?') %>
+        </td>
+        <td><%= f.check_box :use_for_mml %></td>
+      </tr>
+    </table>
+<% end %>

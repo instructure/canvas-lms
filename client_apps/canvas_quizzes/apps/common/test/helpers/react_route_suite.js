@@ -1,11 +1,11 @@
-require([ 'react' ], function(React) {
+require([ 'old_version_of_react_used_by_canvas_quizzes_client_apps' ], function(React) {
   window.React = React;
 
 // Creates a DOM element that ReactSuite tests will use tmount the subject
 // in. Although jasmine_react does that automatically on the start of each
 // ReactSuite, we will prepare it before-hand and expose it to jasmine.fixture
 // if you need to access directly.
-require([ 'jasmine_react', 'canvas_packages/react-router', ], function(ReactSuite, ReactRouter) {
+require([ 'jasmine_react', 'old_version_of_react-router_used_by_canvas_quizzes_client_apps'], function(ReactSuite, ReactRouter) {
   var Route = ReactRouter.Route;
 
   console.log("")

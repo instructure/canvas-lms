@@ -39,6 +39,7 @@ module CC
 
     def add_topic(topic)
       add_exported_asset(topic)
+      add_item_to_export(topic.attachment) if topic.attachment
 
       migration_id = CCHelper.create_key(topic)
 

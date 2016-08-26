@@ -245,7 +245,7 @@ describe GradingPeriodGroup do
         end
 
         it "can read but NOT create, update, not delete root-account " \
-          "grading period groups" do
+          "grading period groups", priority: "1", test_id: 2528644  do
           expect(@root_account_group.
             rights_status(@sub_account_admin, *permissions)).to eq({
             read:   true,
@@ -269,7 +269,7 @@ describe GradingPeriodGroup do
 
       context "teacher" do
         it "can read but NOT create, update, nor delete root-account " \
-          "grading period groups" do
+          "grading period groups", priority: "1", test_id: 2528645 do
           expect(@root_account_group.
             rights_status(@teacher, *permissions)).to eq({
             read:   true,

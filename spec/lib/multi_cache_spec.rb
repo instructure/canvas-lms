@@ -62,4 +62,17 @@ describe MultiCache do
     store = MultiCache.new(ring)
     expect(store.delete('key')).to eq true
   end
+
+  it 'allows writing to all nodes' do
+    ring = [mock, mock]
+    ring[0].expects(:get).once
+    ring[0].expects(:set).once
+    ring[1].expects(:get).once
+    ring[1].expects(:set).once
+
+    store = MultiCache.new(ring)
+    generated = 0
+    store.fetch('key', node: :all) { generated += 1 }
+    expect(generated).to eq 1
+  end
 end

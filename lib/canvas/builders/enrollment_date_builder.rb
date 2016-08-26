@@ -45,8 +45,8 @@ class EnrollmentDateBuilder
     to_preload.each { |e| build(e) }
   end
 
-  # TODO: other places where we use #preload should be replaced with #preload_state after all the states are created
   def self.preload_state(enrollments)
+    raise "call #to_a first before preloading enrollment scope" if enrollments.is_a?(ActiveRecord::Relation)
     return if enrollments.empty?
 
     unless enrollments.first.association(:enrollment_state).loaded?

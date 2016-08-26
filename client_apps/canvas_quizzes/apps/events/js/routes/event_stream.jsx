@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 define(function(require) {
-  var React = require('react');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var EventStream = require('jsx!../views/event_stream');
   var Session = require('jsx!../views/session');
 

@@ -174,6 +174,58 @@ describe GradingPeriod do
         period_2.save
         expect(GradingPeriod.for(@course)).to match_array([period_1])
       end
+
+      it "does not include grading periods from the course enrollment term group if inherit is false" do
+        group = group_helper.create_for_account(@root_account)
+        term.update_attribute(:grading_period_group_id, group)
+        period_1 = period_helper.create_with_weeks_for_group(group, 5, 3)
+        period_2 = period_helper.create_with_weeks_for_group(group, 3, 1)
+        period_2.workflow_state = :deleted
+        period_2.save
+        expect(GradingPeriod.for(@course, inherit: false)).to match_array([])
+      end
+    end
+
+    context "when context is an account" do
+      before(:once) do
+        @root_account = account_model
+        @sub_account = @root_account.sub_accounts.create!
+        @course = Course.create!(account: @sub_account)
+      end
+
+      it "finds all grading periods on an account" do
+        group_1 = group_helper.create_for_account(@root_account)
+        group_2 = group_helper.create_for_account(@root_account)
+        period_1 = period_helper.create_with_weeks_for_group(group_1, 5, 3)
+        period_2 = period_helper.create_with_weeks_for_group(group_2, 3, 1)
+        expect(GradingPeriod.for(@root_account)).to match_array([period_1, period_2])
+      end
+
+      it "returns an empty array when the account has no grading period groups" do
+        expect(GradingPeriod.for(@root_account)).to match_array([])
+      end
+
+      it "returns an empty array when the account has no grading periods" do
+        group_helper.create_for_account(@root_account)
+        expect(GradingPeriod.for(@root_account)).to match_array([])
+      end
+
+      it "does not return grading periods on the course directly" do
+        group = group_helper.legacy_create_for_course(@course)
+        period_1 = period_helper.create_with_weeks_for_group(group, 5, 3)
+        period_2 = period_helper.create_with_weeks_for_group(group, 3, 1)
+        expect(GradingPeriod.for(@root_account)).to match_array([])
+      end
+
+      it "includes only 'active' grading periods from the account grading period group" do
+        group_1 = group_helper.create_for_account(@root_account)
+        group_2 = group_helper.create_for_account(@root_account)
+        period_1 = period_helper.create_with_weeks_for_group(group_1, 5, 3)
+        period_2 = period_helper.create_with_weeks_for_group(group_2, 3, 1)
+        period_2.workflow_state = :deleted
+        period_2.save
+        expect(GradingPeriod.for(@root_account)).to match_array([period_1])
+      end
     end
   end
 
@@ -198,20 +250,6 @@ describe GradingPeriod do
     it "returns nil if no grading periods exist for the given context" do
       GradingPeriod.expects(:for).with(account).returns([])
       expect(GradingPeriod.current_period_for(account)).to be_nil
-    end
-  end
-
-  describe ".context_find" do
-    let(:account) { mock }
-    let(:finder) { mock }
-    let(:grading_period) { mock }
-    let(:id) { 1 }
-
-    it "delegates" do
-      grading_period.expects(:id).returns(1)
-      GradingPeriod.expects(:for).with(account).returns([grading_period])
-
-      expect(GradingPeriod.context_find(account, id)).to eq grading_period
     end
   end
 
@@ -287,7 +325,8 @@ describe GradingPeriod do
       expect(grading_period).to_not be_current
     end
 
-    it "returns true if the current time falls between the start date and end date (inclusive)" do
+    it "returns true if the current time falls between the start date and end date (inclusive)",
+    test_id: 2528634, priority: "2" do
       grading_period.assign_attributes(start_date: 1.month.ago,
                                        end_date:   1.month.from_now)
       expect(grading_period).to be_current
@@ -397,6 +436,13 @@ describe GradingPeriod do
 
     context "given an account grading period group" do
       it { is_expected.not_to be_course_group }
+    end
+  end
+
+  describe '#weight' do
+    it "can persist double precision values" do
+      subject.update!(weight: 1.5)
+      expect(subject.reload.weight).to eql 1.5
     end
   end
 end

@@ -137,12 +137,6 @@ $ic-header-background:          #34444f;
 $ic-header-primary-width:       84px;
 $ic-header-primary-expanded-width: $ic-sp*15;
 
-//============================
-// List Functional Variables
-//============================
-$ic-list-item-background--hover:      #eef7ff;
-$ic-list-item-background--selected:   #d9edf9;
-
 //================================
 // Global light background colors
 //================================
@@ -161,7 +155,7 @@ $ic-bg-light-danger:      lighten($ic-color-danger, 48%);
 //============================
 // List Functional Variables
 //============================
-$ic-list-item-background--hover:      $ic-bg-light-primary;
+$ic-list-item-background--hover:      lighten($ic-bg-light-neutral, 2%);
 $ic-list-item-background--selected:   $ic-bg-light-primary;
 
 //=====================

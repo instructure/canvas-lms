@@ -68,6 +68,15 @@ describe WikiPagesController do
     test_page("/groups/#{@group.id}/#{@group.wiki.path}/hello/revisions")
   end
 
+  it "should work with account group wiki pages" do
+    group = Account.default.groups.create!
+    group.add_user(@user)
+    group_page = group.wiki.wiki_pages.create!(title: "ponies5ever", body: "")
+
+    get "/groups/#{group.id}/pages/#{group_page.url}"
+    expect(response).to be_successful
+  end
+
   context "draft state forwarding" do
     before do
       @wiki_page = create_page :title => "a-page", :body => "body"

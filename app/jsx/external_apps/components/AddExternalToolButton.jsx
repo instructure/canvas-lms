@@ -14,7 +14,7 @@ define([
   const modalOverrides = {
     overlay : {
       backgroundColor: 'rgba(0,0,0,0.5)'
-    },  
+    },
     content : {
       position: 'static',
       top: '0',
@@ -104,7 +104,7 @@ define([
       } else {
         return (
           <ConfigurationForm ref="configurationForm" tool={this.state.tool} configurationType="manual" handleSubmit={this.createTool}>
-            <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
+            <button type="button" className="Button" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
           </ConfigurationForm>
         );
       }
@@ -113,7 +113,7 @@ define([
     render() {
       return (
         <span className="AddExternalToolButton">
-          <a href="#" role="button" aria-label={I18n.t('Add App')} className="btn btn-primary add_tool_link lm" onClick={this.openModal}>{I18n.t('Add App')}</a>
+          <a href="#" role="button" aria-label={I18n.t('Add App')} className="Button Button--primary add_tool_link lm icon-plus" onClick={this.openModal}>{I18n.t('App')}</a>
           <Modal className="ReactModal__Content--canvas"
             overlayClassName="ReactModal__Overlay--canvas"
             style={modalOverrides}

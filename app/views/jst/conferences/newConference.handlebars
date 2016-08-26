@@ -1,34 +1,36 @@
 <div class="ig-row" data-id="{{id}}" id="conf_{{id}}">
   <div class="ig-row__layout">
-    {{#if recording}}
-      <a class="ig-title ellipses element_toggler"
-          href="#"
-          aria-controls="conference-{{id}}"
-          aria-expanded="false"
-          role="button">
-        <i class="icon-mini-arrow-right"></i>
-        {{title}}
-      </a>
-    {{else}}
-      <span class="ig-title ellipses">{{title}}</span>
-    {{/if}}
-    <div class="ig-details">
-      <div class="ellipses">{{description}}</div>
-      {{#if scheduled}}
-        <div class="ellipses">{{datetimeFormatted scheduled_at}}</div>
-      {{/if}}
-      <div class="ellipses {{#if has_actions}}has_actions{{/if}}">
-        {{#if started_at}}
-          <span class="label label-success">{{#t "in_progress"}}In Progress{{/t}}</span>
-        {{/if}}
-      </div>
+    <div class="ig-info">
       {{#if recording}}
-        {{#if multipleRecordings}}
-          <div class="ellipses">{{#t "recordings"}}{{recordingCount}} Recordings{{/t}}</div>
-        {{else}}
-          <div class="ellipses">{{#t "recording"}}1 Recording{{/t}}</div>
-        {{/if}}
+        <a class="ig-title element_toggler"
+            href="#"
+            aria-controls="conference-{{id}}"
+            aria-expanded="false"
+            role="button">
+          <i class="icon-mini-arrow-right"></i>
+          {{title}}
+        </a>
+      {{else}}
+        <span class="ig-title">{{title}}</span>
       {{/if}}
+      <span class="{{#if has_actions}}has_actions{{/if}}">
+        {{#if started_at}}
+          <span class="label label-success ig-row-label">{{#t "in_progress"}}In Progress{{/t}}</span>
+        {{/if}}
+      </span>
+      <div class="ig-details">
+        {{#if scheduled}}
+          <div>{{datetimeFormatted scheduled_at}}</div>
+        {{/if}}
+        {{#if recording}}
+          {{#if multipleRecordings}}
+            <div>{{#t "recordings"}}{{recordingCount}} Recordings{{/t}}</div>
+          {{else}}
+            <div>{{#t "recording"}}1 Recording{{/t}}</div>
+          {{/if}}
+        {{/if}}
+        <div>{{description}}</div>
+      </div>
     </div>
     <div class="ig-admin">
       {{# if show_end}}
@@ -89,11 +91,15 @@
         <li>
           <div class="ig-row">
             <div class="ig-row__layout">
-              <a href="{{playback_url}}" target="_blank" class="ig-title ellipses">{{title}}</a>
-              <div class="ig-details">
-                <div class="ellipses"></div>
-                <div class="ellipses">{{dateString created_at}}</div>
-                <div class="ellipses">{{minutesToHM duration_minutes}}</div>
+              <div class="ig-info">
+                <div class="ig-details">
+                  <a href="{{playback_url}}" target="_blank" class="ig-title">
+                    {{title}}
+                  </a>
+                  {{dateString created_at}}
+                  &nbsp;&#124;&nbsp;
+                  {{minutesToHM duration_minutes}}
+                </div>
               </div>
               <div class="ig-button">
                 <a class="btn btn-small" target="_blank" href="{{playback_url}}">

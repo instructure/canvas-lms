@@ -20,19 +20,19 @@ define([
     renderCurrentGroups() {
       if (!this.props.hasLoaded) {
         return (
-          <li className="ReactTray-list-item ReactTray-list-item--loading-message">
+          <li className="ic-NavMenu-list-item ic-NavMenu-list-item--loading-message">
             {I18n.t('Loading')} &hellip;
           </li>
         );
       }
       var groups =  this.props.groups.map((group) => {
-        if (!group.concluded) {
-          return <li className="ReactTray-list-item" key={group.id}><a href={`/groups/${group.id}`}>{group.name}</a></li>;
+        if (group.can_access && !group.concluded) {
+          return <li className="ic-NavMenu-list-item" key={group.id}><a href={`/groups/${group.id}`}>{group.name}</a></li>;
         };
       });
       groups.push(
-        <li key='allGroupsLink' className='ReactTray-list-item ReactTray-list-item--feature-item'>
-          <a href='/groups' className='ReactTray-list-item__link'>{I18n.t('All Groups')}</a>
+        <li key='allGroupsLink' className='ic-NavMenu-list-item ic-NavMenu-list-item--feature-item'>
+          <a href='/groups' className='ic-NavMenu-list-item__link'>{I18n.t('All Groups')}</a>
         </li>
       );
       return groups;
@@ -41,14 +41,14 @@ define([
     render() {
       return (
         <div>
-          <div className="ReactTray__header">
-            <h1 className="ReactTray__headline">{I18n.t('Groups')}</h1>
-            <button className="Button Button--icon-action ReactTray__closeBtn" type="button" onClick={this.props.closeTray}>
+          <div className="ic-NavMenu__header">
+            <h1 className="ic-NavMenu__headline">{I18n.t('Groups')}</h1>
+            <button className="Button Button--icon-action ic-NavMenu__closeButton" type="button" onClick={this.props.closeTray}>
               <i className="icon-x"></i>
               <span className="screenreader-only">{I18n.t('Close')}</span>
             </button>
           </div>
-          <ul className="ReactTray__link-list">
+          <ul className="ic-NavMenu__link-list">
             {this.renderCurrentGroups()}
           </ul>
         </div>

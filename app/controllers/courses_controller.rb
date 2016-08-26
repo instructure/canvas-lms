@@ -216,6 +216,7 @@ require 'securerandom'
 #           "type": "boolean"
 #         },
 #         "public_description": {
+#           "description": "optional: the public description of the course",
 #           "example": "Come one, come all to InstructureCon 2012!",
 #           "type": "string"
 #         },
@@ -267,6 +268,11 @@ require 'securerandom'
 #           "description": "optional: this will be true if this user is currently prevented from viewing the course because of date restriction settings",
 #           "example": false,
 #           "type": "boolean"
+#         },
+#         "time_zone": {
+#           "description": "The course's IANA time zone name.",
+#           "example": "America/Denver",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -319,7 +325,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -327,6 +333,9 @@ class CoursesController < ApplicationController
   #   - "syllabus_body": Optional information to include with each Course.
   #     When syllabus_body is given the user-generated html for the course
   #     syllabus is returned.
+  #   - "public_description": Optional information to include with each Course.
+  #     When public_description is given the user-generated text for the course
+  #     public description is returned.
   #   - "total_scores": Optional information to include with each Course.
   #     When total_scores is given, any student enrollments will also
   #     include the fields 'computed_current_score', 'computed_final_score',
@@ -342,9 +351,10 @@ class CoursesController < ApplicationController
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
   #     'current_period_computed_final_grade' (see Enrollment documentation for
-  #     more information on these fields). This argument is ignored if the course
-  #     is configured to hide final grades or if the total_scores argument is not
-  #     included.
+  #     more information on these fields). In addition, when this argument is
+  #     passed, the course will have a 'multiple_grading_periods_enabled' attribute
+  #     on it. This argument is ignored if the course is configured to hide final
+  #     grades or if the total_scores argument is not included.
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.
@@ -428,7 +438,7 @@ class CoursesController < ApplicationController
   # @API List courses for a user
   # Returns a list of active courses for this user. To view the course list for a user other than yourself, you must be either an observer of that user or an administrator.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -436,6 +446,9 @@ class CoursesController < ApplicationController
   #   - "syllabus_body": Optional information to include with each Course.
   #     When syllabus_body is given the user-generated html for the course
   #     syllabus is returned.
+  #   - "public_description": Optional information to include with each Course.
+  #     When public_description is given the user-generated text for the course
+  #     public description is returned.
   #   - "total_scores": Optional information to include with each Course.
   #     When total_scores is given, any student enrollments will also
   #     include the fields 'computed_current_score', 'computed_final_score',
@@ -451,9 +464,10 @@ class CoursesController < ApplicationController
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
   #     'current_period_computed_final_grade' (see Enrollment documentation for
-  #     more information on these fields). This argument is ignored if the course
-  #     is configured to hide final grades or if the total_scores argument is not
-  #     included.
+  #     more information on these fields). In addition, when this argument is
+  #     passed, the course will have a 'multiple_grading_periods_enabled' attribute
+  #     on it. This argument is ignored if the course is configured to hide final
+  #     grades or if the total_scores argument is not included.
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.
@@ -575,6 +589,11 @@ class CoursesController < ApplicationController
   #
   # @argument course[apply_assignment_group_weights] [Boolean]
   #   Set to true to weight final grade based on assignment groups percentages.
+  #
+  # @argument course[time_zone] [String]
+  #   The time zone for the course. Allowed time zones are
+  #   {http://www.iana.org/time-zones IANA time zones} or friendlier
+  #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   #
   # @argument offer [Boolean]
   #   If this option is set to true, the course will be available to students
@@ -1484,7 +1503,7 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the list action plus:
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"all_courses"|"permissions"|"observed_users"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"all_courses"|"permissions"|"observed_users"]
   #   - "all_courses": Also search recently deleted courses.
   #   - "permissions": Include permissions the current user has
   #     for the course.
@@ -1988,6 +2007,11 @@ class CoursesController < ApplicationController
   #   If this option is set to true, the totals in student grades summary will
   #   be hidden.
   #
+  # @argument course[time_zone] [String]
+  #   The time zone for the course. Allowed time zones are
+  #   {http://www.iana.org/time-zones IANA time zones} or friendlier
+  #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  #
   # @argument course[apply_assignment_group_weights] [Boolean]
   #   Set to true to weight final grade based on assignment groups percentages.
   #
@@ -2020,6 +2044,21 @@ class CoursesController < ApplicationController
   #
   # @argument course[course_format] [String]
   #   Optional. Specifies the format of the course. (Should be either 'on_campus' or 'online')
+  #
+  # @argument course[image_id] [Integer]
+  #   This is a file ID corresponding to an image file in the course that will
+  #   be used as the course image.
+  #   This will clear the course's image_url setting if set.  If you attempt
+  #   to provide image_url and image_id in a request it will fail.
+  #
+  # @argument course[image_url] [String]
+  #   This is a URL to an image to be used as the course image.
+  #   This will clear the course's image_id setting if set.  If you attempt
+  #   to provide image_url and image_id in a request it will fail.
+  #
+  # @argument course[remove_image] [Boolean]
+  #   If this option is set to true, the course image url and course image
+  #   ID are both set to nil
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
@@ -2137,6 +2176,35 @@ class CoursesController < ApplicationController
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
         return unless process_course_event
+      end
+
+      if params[:course][:image_url] && params[:course][:image_id]
+        respond_to do |format|
+          format.json { render :json => {message: "You cannot provide both an image_url and a image_id."}, :status => :bad_request }
+          return
+        end
+      end
+
+      if params[:course][:image_url]
+        @course.image_url = params[:course][:image_url]
+        @course.image_id = nil
+      end
+
+      if params[:course][:image_id]
+        if @course.attachments.active.where(id: params[:course][:image_id]).exists?
+          @course.image_id = params[:course][:image_id]
+          @course.image_url = nil
+        else
+          respond_to do |format|
+            format.json { render :json => {message: "The image_id is not a valid course file id."}, :status => :bad_request }
+            return
+          end
+        end
+      end
+
+      if params[:course][:remove_image]
+        @course.image_url = nil
+        @course.image_id = nil
       end
 
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
@@ -2477,11 +2545,11 @@ class CoursesController < ApplicationController
 
     hash = []
 
-    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+    Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
-    preloads = [:account]
+    preloads = [:account, :root_account]
     preloads << :teachers if includes.include?('teachers')
     preloads << :grading_standard if includes.include?('total_scores')
     ActiveRecord::Associations::Preloader.new.preload(courses, preloads)

@@ -45,15 +45,8 @@ class UserProfile < ActiveRecord::Base
 
 
       if user && opts[:root_account]
-        opts[:root_account].context_external_tools.active.having_setting('user_navigation').each do |tool|
-          @tabs << {
-            :id => tool.asset_string,
-            :label => tool.label_for(:user_navigation, opts[:language] || I18n.locale),
-            :css_class => tool.asset_string,
-            :href => :user_external_tool_path,
-            :args => [user.id, tool.id]
-          }
-        end
+        tools = opts[:root_account].context_external_tools.active.having_setting('user_navigation')
+        @tabs += Lti::ExternalToolTab.new(user, :user_navigation, tools, opts[:language]).tabs
       end
       if user && user.fake_student?
         @tabs = @tabs.slice(0,2)

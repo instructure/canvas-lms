@@ -118,10 +118,12 @@ class ApplicationController < ActionController::Base
         use_new_styles: use_new_styles?,
         k12: k12?,
         help_link_name: help_link_name,
+        help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
         SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?),
-          eportfolios_enabled: @current_user.try(:eportfolios_enabled?)
+          eportfolios_enabled: @current_user.try(:eportfolios_enabled?),
+          show_feedback_link: show_feedback_link?
         }
       }
       @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
@@ -493,7 +495,9 @@ class ApplicationController < ActionController::Base
         return redirect_to login_url(params.slice(:authentication_provider)) if !@files_domain && !@current_user
 
         if @context.is_a?(Course) && @context_enrollment
-          start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment.state_based_on_date == :inactive
+          if @context_enrollment.inactive?
+            start_date = @context_enrollment.available_at
+          end
           if @context.claimed?
             @unauthorized_message = t('#application.errors.unauthorized.unpublished', "This course has not been published by the instructor yet.")
             @unauthorized_reason = :unpublished
@@ -566,7 +570,7 @@ class ApplicationController < ActionController::Base
         params[:context_type] = "Course"
         if @context && @current_user
           context_enrollments = @context.enrollments.where(user_id: @current_user).to_a
-          Canvas::Builders::EnrollmentDateBuilder.preload(context_enrollments)
+          Canvas::Builders::EnrollmentDateBuilder.preload_state(context_enrollments)
           @context_enrollment = context_enrollments.sort_by{|e| [e.state_with_date_sortable, e.rank_sortable, e.id] }.first
         end
         @context_membership = @context_enrollment
@@ -647,7 +651,7 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      enrollment_scope = @context.enrollments.current.shard(@context).preload(:course)
+      enrollment_scope = @context.enrollments.current.shard(@context).preload(:course, :enrollment_state)
       group_scope = opts[:include_groups] ? @context.current_groups : nil
 
       if only_contexts.present?
@@ -669,7 +673,7 @@ class ApplicationController < ActionController::Base
           end
         end
       end
-      courses = enrollment_scope.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
+      courses = enrollment_scope.select(&:active?).map(&:course).uniq
       groups = group_scope ? group_scope.shard(@context).to_a.reject{|g| g.context_type == "Course" && g.context.concluded?} : []
 
       if opts[:favorites_first]
@@ -797,6 +801,7 @@ class ApplicationController < ActionController::Base
     @upcoming_assignments = sorted.upcoming
     @future_assignments = sorted.future
     @overdue_assignments = sorted.overdue
+    @unsubmitted_assignments = sorted.unsubmitted
 
     condense_assignments if requesting_main_assignments_page?
 
@@ -810,7 +815,8 @@ class ApplicationController < ActionController::Base
       @past_assignments,
       @ungraded_assignments,
       @undated_assignments,
-      @future_assignments
+      @future_assignments,
+      @unsubmitted_assignments
     ]
   end
 
@@ -1683,6 +1689,23 @@ class ApplicationController < ActionController::Base
     UserContent.escape(str, request.host_with_port)
   end
   helper_method :user_content
+
+  def public_user_content(str, context=@context, user=@current_user, is_public=false)
+    return nil unless str
+
+    rewriter = UserContent::HtmlRewriter.new(context, user)
+    rewriter.set_handler('files') do |match|
+      UserContent::FilesHandler.new(
+        match: match,
+        context: context,
+        user: user,
+        preloaded_attachments: {},
+        is_public: is_public
+      ).processed_url
+    end
+    UserContent.escape(rewriter.translate_content(str), request.host_with_port)
+  end
+  helper_method :public_user_content
 
   def find_bank(id, check_context_chain=true)
     bank = @context.assessment_question_banks.active.where(id: id).first || @current_user.assessment_question_banks.active.where(id: id).first

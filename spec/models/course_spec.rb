@@ -1275,7 +1275,16 @@ describe Course, "gradebook_to_csv" do
     e.update_attribute :workflow_state, 'completed'
 
     expect(GradebookExporter.new(@course, @teacher).to_csv).not_to include @student.name
-    expect(GradebookExporter.new(@course, @teacher, include_priors: true).to_csv).to include @student.name
+
+    @teacher.preferences[:gradebook_settings] =
+      { @course.id =>
+        {
+          'show_inactive_enrollments' => 'false',
+          'show_concluded_enrollments' => 'true'
+        }
+      }
+    @teacher.save!
+    expect(GradebookExporter.new(@course, @teacher).to_csv).to include @student.name
   end
 
   context "accumulated points" do
@@ -1573,6 +1582,63 @@ describe Course, "tabs_available" do
 
       expect(tabs).to be_include(t1.asset_string)
       expect(tabs).not_to be_include(t2.asset_string)
+    end
+
+    it 'sets the target value on the tab if the external tool has a windowTarget' do
+      tool = @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tools",
+        :course_navigation => {
+          :text => "blah",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+      tool.settings[:windowTarget] = "_blank"
+      tool.save!
+      tabs = @course.tabs_available
+      tab = tabs.find {|tab| tab[:id] == tool.asset_string}
+      expect(tab[:target]).to eq '_blank'
+    end
+
+    it 'includes in the args "display: borderless" if a target is set' do
+      tool = @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tools",
+        :course_navigation => {
+          :text => "blah",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+      tool.settings[:windowTarget] = "_blank"
+      tool.save!
+      tabs = @course.tabs_available
+      tab = tabs.find {|tab| tab[:id] == tool.asset_string}
+      expect(tab[:args]).to include({display: 'borderless'})
+    end
+
+    it 'does not let value other than "_blank" be set for target' do
+      tool = @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tools",
+        :course_navigation => {
+          :text => "blah",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+      tool.settings[:windowTarget] = "parent"
+      tool.save!
+      tabs = @course.tabs_available
+      tab = tabs.find {|tab| tab[:id] == tool.asset_string}
+      expect(tab.keys).not_to include :target
     end
 
     it "should not include tabs for external tools if opt[:include_external] is false" do
@@ -4478,5 +4544,28 @@ describe Course, "#apply_nickname_for!" do
     @course.apply_nickname_for!(@user)
     @course.apply_nickname_for!(nil)
     expect(@course.name).to eq 'some terrible name'
+  end
+end
+
+describe Course, "#image" do
+  before(:once) do
+    course_with_teacher(active_all: true)
+    attachment_with_context(@course)
+  end
+
+  it "returns the image_url when image_url is set" do
+    @course.image_url = "http://example.com"
+    @course.save!
+    expect(@course.image).to eq "http://example.com"
+  end
+
+  it "returns the download_url for a course file if image_id is set" do
+    @course.image_id = @attachment.id
+    @course.save!
+    expect(@course.image).to eq @attachment.download_url
+  end
+
+  it "returns nil if image_id and image_url are not set" do
+    expect(@course.image).to be_nil
   end
 end

@@ -168,7 +168,7 @@ class BigBlueButtonConference < WebConference
     http_response = nil
     Canvas.timeout_protection("big_blue_button") do
       logger.debug "big blue button api call: #{url_str}"
-      http_response = CanvasHttp.get(url_str, {}, 5)
+      http_response = CanvasHttp.get(url_str, redirect_limit: 5)
     end
 
     case http_response

@@ -82,6 +82,11 @@ $left-offset:  16px;
   position: absolute;
   right: 0;
 }
+// this snippet styles the feature flag description so it allows
+// it to be underlined / highlighted
+.feature-detail-underline {
+  text-decoration: underline;
+}
 
 $switch-background: lighten($ic-color-dark, 15%);
 $switch-background-disabled: lighten($switch-background, 40%);

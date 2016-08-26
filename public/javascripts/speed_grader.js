@@ -1883,7 +1883,11 @@ define([
 
       function renderComment(comment, commentBlank) {
         // Serialization seems to have changed... not sure if it's changed everywhere, though...
-        if(comment.submission_comment) { comment = comment.submission_comment; }
+        if (comment.submission_comment) { comment = comment.submission_comment; }
+
+        // don't render private comments when viewing a group assignment
+        if (!comment.group_comment_id && jsonData.GROUP_GRADING_MODE) return;
+
         comment.posted_at = $.datetimeString(comment.created_at);
 
         var hideStudentName = hideStudentNames && jsonData.studentMap[comment.author_id];
@@ -1990,6 +1994,8 @@ define([
       if (this.currentStudent.submission && this.currentStudent.submission.submission_comments) {
         $.each(this.currentStudent.submission.submission_comments, function(i, comment){
           var $comment = renderComment(comment, $comment_blank);
+
+          if (!$comment) return true; // continue to next comment
 
           $comments.append($comment.show());
           $comments.find(".play_comment_link").mediaCommentThumbnail('normal');

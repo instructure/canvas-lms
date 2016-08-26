@@ -39,33 +39,34 @@
   "requirejs": {
     "bundledDependencies": [
       "rsvp",
-      "qtip"
+      "qtip",
+      "old_version_of_react_used_by_canvas_quizzes_client_apps",
+      "old_version_of_react-router_used_by_canvas_quizzes_client_apps"
     ]
   },
 
   "dependencies": {
-    "fs-extra": "0.12.0",
-    "grunt-connect-proxy": "0.1.11",
+    "fs-extra": "0.30.0",
+    "grunt-connect-proxy": "0.2.0",
     "grunt-connect-rewrite": "0.2.1",
-    "grunt-contrib-connect": "0.8.0",
-    "grunt-contrib-jasmine": "0.8.0",
-    "grunt-contrib-jshint": "0.10.0",
-    "grunt-contrib-watch": "0.6.1",
+    "grunt-contrib-connect": "1.0.2",
+    "grunt-contrib-jasmine": "1.0.3",
+    "grunt-contrib-jshint": "1.0.0",
+    "grunt-contrib-watch": "1.0.0",
     "grunt-jsduck": "1.0.1",
-    "grunt-sass": "0.14.1",
+    "grunt-sass": "1.2.0",
     "grunt-template-jasmine-requirejs": "git://github.com/amireh/grunt-template-jasmine-requirejs.git#0.2.0",
     "jasmine_react": "1.2.4",
     "jasmine_rsvp": "1.0.0",
     "jasmine_xhr": "1.0.2",
     "jquery": "2.1.1",
     "jshint-stylish-ex": "0.2.0",
-    "node-sass": "0.9.3",
     "canvas_react_i18n": "1.1.1",
-    "glob": "4.0.5",
+    "glob": "7.0.5",
     "grunt": "0.4.5",
-    "grunt-cli": "0.1.13",
+    "grunt-cli": "1.2.0",
     "lodash": "2.4.1",
     "react-tools": "0.11.2",
-    "shelljs": "0.1.2"
+    "shelljs": "0.7.0"
   }
 }

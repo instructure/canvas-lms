@@ -179,6 +179,11 @@ describe SearchController do
       expect(assigns[:courses].map(&:id)).to eq [@c1.id]
     end
 
+    it "doesn't explode with non-string searches" do
+      get 'all_courses', search: {'foo' => 'bar'}
+      expect(assigns[:courses].map(&:id)).to eq []
+    end
+
     it "does not cache XHR requests" do
       xhr :get, 'all_courses'
       expect(response.headers["Pragma"]).to eq "no-cache"

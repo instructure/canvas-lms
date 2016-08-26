@@ -18,7 +18,7 @@
 
 class Feature
   ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development,
-    :release_notes_url, :custom_transition_proc, :after_state_change_proc, :autoexpand]
+    :release_notes_url, :custom_transition_proc, :after_state_change_proc, :autoexpand, :touch_context]
   attr_reader *ATTRS
 
   def initialize(opts = {})
@@ -150,6 +150,19 @@ END
       applies_to: 'User',
       state: 'allowed',
       autoexpand: true
+    },
+    'underline_all_links' =>
+    {
+      display_name: -> { I18n.t('Underline Links') },
+      description: -> { I18n.t('Display all text links in Canvas as *underlined text*.',
+        wrapper: {
+          '*' => '<span class="feature-detail-underline">\1</span>'
+        }
+      )
+    },
+      applies_to: 'User',
+      state: 'allowed',
+      beta: true
     },
     'outcome_gradebook' =>
     {
@@ -339,8 +352,7 @@ END
       display_name: -> { I18n.t('Enable Dashboard Images for Courses')},
       description: -> {I18n.t('Allow course images to be assigned to a course and used on the dashboard cards.')},
       applies_to: 'Course',
-      state: 'hidden',
-      development: true,
+      state: 'allowed',
       root_opt_in: true,
       beta: true
     },
@@ -436,7 +448,7 @@ END
       description: -> { I18n.t("Use the new Collaborations external tool enabling more options for tools to use to collaborate") },
       applies_to: 'Course',
       state: 'hidden',
-      development: true,
+      development: false,
       root_opt_in: true
     },
     'new_annotations' =>
@@ -444,6 +456,7 @@ END
       display_name: -> { I18n.t('New Annotations') },
       description: -> { I18n.t('Use the new document annotation tool') },
       applies_to: 'Course',
+      state: 'hidden',
       beta: true,
       root_opt_in: true
     }

@@ -174,6 +174,7 @@ define [
 
     # FullCalendar callbacks
     getEvents: (start, end, timezone, donecb, datacb) =>
+      @gettingEvents = true
       @dataSource.getEvents start, end, @visibleContextList, (events) =>
         if @displayAppointmentEvents
           @dataSource.getEventsForAppointmentGroup @displayAppointmentEvents, (aEvents) =>
@@ -185,8 +186,10 @@ define [
               event.removeClass('current-appointment-group')
             for event in aEvents
               event.addClass('current-appointment-group')
+            @gettingEvents = false
             donecb(calendarEventFilter(@displayAppointmentEvents, events.concat(aEvents)))
         else
+          @gettingEvents = false
           if (datacb?)
             donecb([])
           else
@@ -246,7 +249,7 @@ define [
           .find('.ui-resizable-handle').remove()
       if event.eventType.match(/assignment/) && event.isDueAtMidnight() && view.name == "month"
         element.find('.fc-time').empty()
-      if event.eventType == 'calendar_event' && @options?.activateEvent && event.id == "calendar_event_#{@options?.activateEvent}"
+      if event.eventType == 'calendar_event' && @options?.activateEvent && !@gettingEvents && event.id == "calendar_event_#{@options?.activateEvent}"
         @options.activateEvent = null
         @eventClick event,
           # fake up the jsEvent
@@ -295,15 +298,17 @@ define [
     eventResize: ( event, delta, revertFunc, jsEvent, ui, view ) =>
       event.saveDates(null, revertFunc)
 
+    activeContexts: () ->
+      allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
+      _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
+
     addEventClick: (event, jsEvent, view) =>
       if @displayAppointmentEvents
         # Don't allow new event creation while in scheduler mode
         return
 
       # create a new dummy event
-      allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
-      activeContexts  = _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
-      event = commonEventFactory(null, activeContexts)
+      event = commonEventFactory(null, @activeContexts())
       event.date = @getCurrentDate()
 
       new EditEventDetailsDialog(event).show()
@@ -311,6 +316,7 @@ define [
     eventClick: (event, jsEvent, view) =>
       $event = $(jsEvent.currentTarget)
       if !$event.hasClass('event_pending')
+        event.allPossibleContexts = @activeContexts() if event.can_change_context
         detailsDialog = new ShowEventDetailsDialog(event)
         $event.data('showEventDetailsDialog', detailsDialog)
         detailsDialog.show jsEvent
@@ -321,9 +327,7 @@ define [
         return
 
       # create a new dummy event
-      allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
-      activeContexts  = _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
-      event = commonEventFactory(null, activeContexts)
+      event = commonEventFactory(null, @activeContexts())
       event.date = date
       event.allDay = not date.hasTime()
       (new EditEventDetailsDialog(event)).show()

@@ -1,27 +1,37 @@
 <div class="ig-row" id="conf_{{id}}">
   <div class="ig-row__layout">
-    {{#if recording}}
-      <a class="ig-title ellipses element_toggler"
-          href="#"
-          aria-controls="conference-{{id}}"
-          aria-expanded="false"
-          role="button">
-        <i class="icon-mini-arrow-right"></i>
-        {{title}}
-      </a>
-    {{else}}
-      <span class="ig-title ellipses">{{title}}</span>
-    {{/if}}
-    <div class="ig-details">
-      <div class="ellipses">{{description}}</div>
-      <div class="ellipses">{{dateString ended_at}}</div>
+    <div class="ig-info">
       {{#if recording}}
-        {{#if multipleRecordings}}
-          <div class="ellipses">{{#t "recordings"}}{{recordingCount}} Recordings{{/t}}</div>
-        {{else}}
-          <div class="ellipses">{{#t "recording"}}1 Recording{{/t}}</div>
-        {{/if}}
+        <a class="ig-title element_toggler"
+            href="#"
+            aria-controls="conference-{{id}}"
+            aria-expanded="false"
+            role="button">
+          <i class="icon-mini-arrow-right"></i>
+          {{title}}
+        </a>
+      {{else}}
+        <span class="ig-title">{{title}}</span>
       {{/if}}
+      <div class="ig-details">
+        <div class="ig-details__item">
+          {{dateString ended_at}}
+        </div>
+        {{#if description}}
+          <div class="ig-details__item ig-details__item--wrap-text">
+            {{description}}
+          </div>
+        {{/if}}
+        {{#if recording}}
+          <div class="ig-details__item">
+            {{#if multipleRecordings}}
+              {{#t "recordings"}}{{recordingCount}} Recordings{{/t}}
+            {{else}}
+              {{#t "recording"}}1 Recording{{/t}}
+            {{/if}}
+          </div>
+        {{/if}}
+      </div>
     </div>
     <div class="ig-admin">
       {{#if permissions.delete}}
@@ -52,11 +62,15 @@
         <li>
           <div class="ig-row">
             <div class="ig-row__layout">
-              <a href="{{playback_url}}" target="_blank" class="ig-title ellipses">{{title}}</a>
-              <div class="ig-details">
-                <div class="ellipses"></div>
-                <div class="ellipses">{{dateString created_at}}</div>
-                <div class="ellipses">{{minutesToHM duration_minutes}}</div>
+              <div class="ig-info">
+                <div class="ig-details">
+                  <a href="{{playback_url}}" target="_blank" class="ig-title">
+                    {{title}}
+                  </a>
+                  {{dateString created_at}}
+                  &nbsp;&#124;&nbsp;
+                  {{minutesToHM duration_minutes}}
+                </div>
               </div>
               <div class="ig-button">
                 <a class="btn btn-small" target="_blank" href="{{playback_url}}">

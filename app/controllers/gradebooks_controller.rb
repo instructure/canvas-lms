@@ -127,7 +127,7 @@ class GradebooksController < ApplicationController
                               .reject(&:muted?)
 
       if multiple_grading_periods? && @current_grading_period_id && !view_all_grading_periods?
-        current_period = GradingPeriod.context_find(@context, @current_grading_period_id)
+        current_period = GradingPeriod.for(@context).find_by(id: @current_grading_period_id)
         visible_assignments = current_period.assignments_for_student(visible_assignments, opts[:student])
       end
 

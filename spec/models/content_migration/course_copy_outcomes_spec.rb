@@ -68,6 +68,9 @@ describe ContentMigration do
       old_root = @copy_from.root_outcome_group
 
       lo = create_outcome(@copy_from, old_root)
+      lo.calculation_method = "n_mastery"
+      lo.calculation_int = 2
+      lo.save!
 
       log = @copy_from.learning_outcome_groups.new
       log.context = @copy_from
@@ -108,6 +111,8 @@ describe ContentMigration do
       expect(lo_new.short_description).to eq lo.short_description
       expect(lo_new.description).to eq lo.description
       expect(lo_new.data).to eq lo.data
+      expect(lo_new.calculation_method).to eq lo.calculation_method
+      expect(lo_new.calculation_int).to eq lo.calculation_int
 
       log_new = new_root.child_outcome_groups.first
       expect(log_new.title).to eq log.title

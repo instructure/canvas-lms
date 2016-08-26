@@ -659,5 +659,17 @@ describe "people" do
       open_dropdown_menu("#user_#{student.id}")
       expect_no_dropdown_item('editRoles', "#user_#{student.id}")
     end
+
+    it "should redirect to groups page " do
+      user_session(@teacher)
+
+      get "/courses/#{@course.id}/users"
+
+      group_link = ff('#group_categories_tabs .ui-tabs-nav li').last
+      expect(group_link).to include_text("Groups")
+
+      expect_new_page_load { group_link.click }
+      expect(driver.current_url).to include("/courses/#{@course.id}/groups")
+    end
   end
 end

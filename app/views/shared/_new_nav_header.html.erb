@@ -103,26 +103,27 @@
             <% unless @current_user.nil? %>
               <%= render(:partial => 'external_tools/global_nav_menu_items') %>
             <% end %>
+            <% if show_help_link? %>
+            <div role="region" aria-label="<%= t('Secondary Navigation') %>" class="ic-app-header__secondary-navigation">
+              <ul class="ic-app-header__menu-list">
+                <li class="ic-app-header__menu-list-item">
+                 <%= link_to help_link_url,
+                      :id => show_feedback_link? ? 'global_nav_help_link' : '',
+                      :class => "ic-app-header__menu-list-link",
+                      :data => help_link_data do %>
+                    <div class="menu-item-icon-container" role="presentation">
+                      <%= svg_icon help_link_icon %>
+                    </div>
+                    <div class="menu-item__text">
+                      <%= help_link_name %>
+                    </div>
+                  <% end %>
+                </li>
+              </ul>
+            </div>
+            <% end %>
           </ul>
         </div>
-        <% if show_help_link? %>
-        <div role="region" aria-label="<%= t('Secondary Navigation') %>" class="ic-app-header__secondary-navigation">
-          <ul class="ic-app-header__menu-list">
-            <li class="ic-app-header__menu-list-item">
-              <%= link_to help_link_url,
-                    :class => help_link_classes(["ic-app-header__menu-list-link"]),
-                    :data => help_link_data do %>
-                <div class="menu-item-icon-container" role="presentation">
-                  <%= svg_icon help_link_icon %>
-                </div>
-                <div class="menu-item__text">
-                  <%= help_link_name %>
-                </div>
-              <% end %>
-            </li>
-          </ul>
-        </div>
-        <% end %>
       </div>
     </div>
     <div id="global_nav_tray_container"></div>

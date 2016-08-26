@@ -23,7 +23,7 @@ module DashboardHelper
 
   def show_welcome_message?
     @current_user.present? &&
-      @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_dates => true).select(&:active?).empty?
+      @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_dates => true).all?{|e| !e.active?}
   end
 
   def welcome_message

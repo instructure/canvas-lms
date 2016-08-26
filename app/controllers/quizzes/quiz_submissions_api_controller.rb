@@ -146,14 +146,19 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
 
   before_filter :require_user, :require_context, :require_quiz
   before_filter :require_overridden_quiz, :except => [ :index ]
-  before_filter :require_quiz_submission, :except => [ :index, :create ]
+  before_filter :require_quiz_submission, :except => [ :index, :submission, :create ]
   before_filter :prepare_service, :only => [ :create, :update, :complete ]
   before_filter :validate_ldb_status!, :only => [ :create, :complete ]
 
   # @API Get all quiz submissions.
   # @beta
   #
-  # Get a list of all submissions for this quiz.
+  # Get a list of all submissions for this quiz. Users who can view or manage
+  # grades for a course will have submissions from multiple users returned. A
+  # user who can only submit will have only their own submissions returned. When
+  # a user has an in-progress submission, only that submission is returned. When
+  # there isn't an in-progress quiz_submission, all completed submissions,
+  # including previous attempts, are returned.
   #
   # @argument include[] [String, "submission"|"quiz"|"user"]
   #   Associations to include with the quiz submission.
@@ -193,6 +198,29 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
     else
       render_unauthorized_action
     end
+  end
+
+  # @API Get the quiz submission.
+  # @beta
+  #
+  # Get the submission for this quiz for the current user.
+  #
+  # @argument include[] [String, "submission"|"quiz"|"user"]
+  #   Associations to include with the quiz submission.
+  #
+  # <b>200 OK</b> response code is returned if the request was successful.
+  #
+  # @example_response
+  #  {
+  #    "quiz_submissions": [QuizSubmission]
+  #  }
+  def submission
+    unless @quiz.grants_right?(@current_user, session, :submit)
+      render_unauthorized_action
+    end
+
+    quiz_submission = @quiz.quiz_submissions.where(user_id: @current_user).first(1)
+    serialize_and_render(quiz_submission)
   end
 
   # @API Get a single quiz submission.

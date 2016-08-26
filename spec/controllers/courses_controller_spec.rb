@@ -1435,6 +1435,83 @@ describe CoursesController do
       put 'update', :id => @course.id, :course => { :name => "name change" }
       expect(flash[:error]).to match(/There was an error saving the changes to the course/)
     end
+
+    describe "course images" do
+      before :each do
+        user_session(@teacher)
+      end
+
+      it "should allow valid course file ids" do
+        attachment_with_context(@course)
+        put 'update', :id => @course.id, :course => { :image_id => @attachment.id }
+        @course.reload
+        expect(@course.settings[:image_id]).to eq @attachment.id.to_s
+      end
+
+      it "should allow valid urls" do
+        put 'update', :id => @course.id, :course => { :image_url => 'http://farm3.static.flickr.com/image.jpg' }
+        @course.reload
+        expect(@course.settings[:image_url]).to eq 'http://farm3.static.flickr.com/image.jpg'
+      end
+
+      it "should reject invalid urls" do
+        put 'update', :id => @course.id, :course => { :image_url => 'exam ple.com' }
+        @course.reload
+        expect(@course.settings[:image_url]).to be_nil
+      end
+
+      it "should reject random letters and numbers" do
+        put 'update', :id => @course.id, :course => { :image_id => '123a456b78c' }
+        @course.reload
+        expect(@course.settings[:image_id]).to be_nil
+      end
+
+      it "should reject setting both a url and an id at the same time" do
+        put 'update', :id => @course.id, :course => { :image_id => '123a456b78c', :image_url => 'http://example.com' }
+        @course.reload
+        expect(@course.settings[:image_id]).to be_nil
+        expect(@course.settings[:image_url]).to be_nil
+      end
+
+      it "should reject non-course ids" do
+        put 'update', :id => @course.id, :course => { :image_id => 1234134123 }
+        @course.reload
+        expect(@course.settings[:image_id]).to be_nil
+      end
+
+      it "should clear the image_url when setting an image_id" do
+        attachment_with_context(@course)
+        put 'update', :id => @course.id, :course => { :image_url => 'http://farm3.static.flickr.com/image.jpg' }
+        put 'update', :id => @course.id, :course => { :image_id => @attachment.id }
+        @course.reload
+        expect(@course.settings[:image_id]).to eq @attachment.id.to_s
+        expect(@course.settings[:image_url]).to eq ''
+      end
+
+      it "should clear the image_id when setting an image_url" do
+        put 'update', :id => @course.id, :course => { :image_id => '12345678' }
+        put 'update', :id => @course.id, :course => { :image_url => 'http://farm3.static.flickr.com/image.jpg' }
+        @course.reload
+        expect(@course.settings[:image_id]).to eq ''
+        expect(@course.settings[:image_url]).to eq 'http://farm3.static.flickr.com/image.jpg'
+      end
+
+      it "should clear image id after setting remove_image" do
+        put 'update', :id => @course.id, :course => { :image_id => '12345678' }
+        put 'update', :id => @course.id, :course => { :remove_image => true }
+        @course.reload
+        expect(@course.settings[:image_id]).to eq ''
+        expect(@course.settings[:image_url]).to eq ''
+      end
+
+      it "should clear image url after setting remove_image" do
+        put 'update', :id => @course.id, :course => { :image_url => 'http://farm3.static.flickr.com/image.jpg' }
+        put 'update', :id => @course.id, :course => { :remove_image => true }
+        @course.reload
+        expect(@course.settings[:image_id]).to eq ''
+        expect(@course.settings[:image_url]).to eq ''
+      end
+    end
   end
 
   describe "POST 'unconclude'" do

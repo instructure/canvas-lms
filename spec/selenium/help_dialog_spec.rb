@@ -3,6 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "help dialog" do
   include_context "in-process server selenium tests"
 
+  before do
+    Account.default.enable_feature! :use_new_styles
+  end
+
   context "no user logged in" do
     it "should work with no logged in user" do
       Setting.set('show_feedback_link', 'true')
@@ -29,55 +33,50 @@ describe "help dialog" do
 
     it "should show the Help dialog when help is clicked and feedback is enabled" do
       get "/dashboard"
-      expect(f("body")).not_to contain_css('#help-dialog')
+      expect(f("body")).not_to contain_css('#help_tray')
       expect(f("#content")).not_to contain_css('.help_dialog_trigger')
-
-      Setting.set('show_feedback_link', 'true')
-      get "/dashboard"
-      expect(ff('.help_dialog_trigger').length).to eq(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? 1 : 2)
-      expect(f("body")).not_to contain_css('#help-dialog')
-      f('.help_dialog_trigger').click
-      wait_for_ajaximations
-      expect(f("#help-dialog")).to be_displayed
-      expect(f("#help-dialog a[href='#teacher_feedback']")).to be_displayed
 
       support_url = 'http://example.com/support'
       Account.default.update_attribute(:settings, {:support_url => support_url})
-      get "/dashboard"
-      expect(driver.execute_script("return $('.help_dialog_trigger').attr('href')")).to eq support_url
 
+      # the show_feedback_link setting should override the support_url account setting
+      Setting.set('show_feedback_link', 'true')
+
+      get "/dashboard"
+      expect(ff('#global_nav_help_link').length).to eq(1)
+      expect(f("body")).not_to contain_css('#help_tray')
+      f('#global_nav_help_link').click
+
+      wait_for_ajaximations
+
+      expect(f("#help_tray")).to be_displayed
+      expect(f("#help_tray a[href='#teacher_feedback']")).to be_displayed
     end
 
-    it "should show the help link in footer correctly" do
+    it "should show the support url link in global nav correctly" do
       # if @domain_root_account or Account.default have settings[:support_url] set there should be a link to that site
       support_url = 'http://example.com/support'
       Account.default.update_attribute(:settings, {:support_url => support_url})
       get "/dashboard"
-      link = f('.support_url')
-      expect(link['href']).to eq support_url
-      expect(link).not_to have_class 'help_dialog_trigger'
-
-      # if show_feedback_link is true hijack clicks on the footer help link to show help dialog
-      Setting.set('show_feedback_link', 'true')
-      get "/dashboard"
-      f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.ic-app-header__menu-list-link.support_url' : "#footer-links a[href='#{support_url}']").click
-      expect(f("#help-dialog")).to be_displayed
+      link = f("a[href='#{support_url}']")
+      expect(link['id']).not_to eq 'global_nav_help_link'
     end
 
     it "should allow sending the teacher a message" do
       Setting.set('show_feedback_link', 'true')
       course_with_ta(course: @course)
       get "/courses/#{@course.id}"
-      expect(f("body")).not_to contain_css("#help-dialog")
-      trigger = f('.help_dialog_trigger')
+      expect(f("body")).not_to contain_css("#help_tray")
+      trigger = f('#global_nav_help_link')
       expect(trigger).to be_displayed
       trigger.click
       wait_for_ajaximations
-      expect(f("#help-dialog")).to be_displayed
-      teacher_feedback_link = f("#help-dialog a[href='#teacher_feedback']")
+      expect(f("#help_tray")).to be_displayed
+      teacher_feedback_link = f("#help_tray a[href='#teacher_feedback']")
       expect(teacher_feedback_link).to be_displayed
       teacher_feedback_link.click
-      feedback_form = f("#help-dialog #teacher_feedback")
+      feedback_form = f("form[action='/api/v1/conversations']")
+      wait_for_ajaximations
       expect(feedback_form.find_element(:css, '[name="recipients[]"]')['value']).to eq "course_#{@course.id}_admins"
       feedback_form.find_element(:css, '[name="body"]').send_keys('test message')
       submit_form(feedback_form)
@@ -101,10 +100,10 @@ describe "help dialog" do
     it "should not show the Message teacher button if not a student" do
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
-      f('.help_dialog_trigger').click
+      f('#global_nav_help_link').click
       wait_for_ajaximations
-      expect(f("#help-dialog")).to be_displayed
-      expect(f("#help-dialog")).not_to contain_css("a[href='#teacher_feedback']")
+      expect(f("#help_tray")).to be_displayed
+      expect(f("#help_tray")).not_to contain_css("a[href='#teacher_feedback']")
     end
 
     it "should show the Help dialog on the speedGrader when help is clicked and feedback is enabled" do

@@ -66,7 +66,7 @@ module Api::V1::CalendarEvent
 
     if event.effective_context_code
       if appointment_group && include_child_events
-        common_context_codes = common_ag_context_codes(appointment_group, user, event)
+        common_context_codes = common_ag_context_codes(appointment_group, user, event, options[:for_scheduler])
         effective_context_code = (event.effective_context_code.split(',') & common_context_codes).first
         if effective_context_code
           hash['context_code'] = hash['effective_context_code'] = effective_context_code
@@ -203,7 +203,8 @@ module Api::V1::CalendarEvent
                                                                                  :appointment_group => group,
                                                                                  :appointment_group_id => group.id,
                                                                                  :include => include & ['child_events'],
-                                                                                 :effective_context => @context) }
+                                                                                 :effective_context => @context,
+                                                                                 :for_scheduler => true) }
     end
     hash['appointments_count'] = group.appointments.size
     hash['participant_type'] = group.participant_type
@@ -216,15 +217,17 @@ module Api::V1::CalendarEvent
 
   private
 
-  # find context codes shared by the viewing user and the user signed up,
-  # falling back on the viewing user's contexts if no users are signed up
-  def common_ag_context_codes(appointment_group, user, event)
+  # find context codes shared by the viewing user and the user(s) signed up,
+  # falling back on the viewing user's contexts if no users are signed up.
+  # however, don't limit contexts by existing signups in scheduler view.
+  def common_ag_context_codes(appointment_group, user, event, for_scheduler)
     codes_for_user = appointment_group.context_codes_for_user(user)
-
-    event_user = event.user || infer_user_from_child_events(event.child_events)
-    if event_user
-      codes_for_event_user = appointment_group.context_codes_for_user(event_user)
-      return codes_for_user & codes_for_event_user
+    unless for_scheduler
+      event_user = event.user || infer_user_from_child_events(event.child_events)
+      if event_user
+        codes_for_event_user = appointment_group.context_codes_for_user(event_user)
+        return codes_for_user & codes_for_event_user
+      end
     end
     codes_for_user
   end

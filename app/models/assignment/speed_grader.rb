@@ -2,8 +2,11 @@ require_relative '../assignment'
 
 class Assignment
   class SpeedGrader
+    include GradebookSettingsHelpers
+
     def initialize(assignment, user, avatars: false, grading_role: :grader)
       @assignment = assignment
+      @course = @assignment.context
       @user = user
       @avatars = avatars
       @grading_role = grading_role
@@ -44,9 +47,8 @@ class Assignment
         others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
       end
 
-      enrollments =
-        @assignment.context.apply_enrollment_visibility(enrollment_scope(gradebook_includes),
-                                                        @user, nil, include: gradebook_includes)
+      enrollments = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
+                                                        include: gradebook_includes)
 
       is_provisional = @grading_role == :provisional_grader || @grading_role == :moderator
       rubric_assmnts = @assignment.visible_rubric_assessments_for(@user, :provisional_grader => is_provisional) || []
@@ -240,25 +242,5 @@ class Assignment
       Attachment.skip_thumbnails = nil
     end
 
-    private
-
-    def gradebook_includes
-      @gradebook_includes ||= begin
-        context_id = @assignment.context.id
-        gb_settings = @user.preferences.fetch(:gradebook_settings, {}).fetch(context_id, {})
-
-        includes = []
-        includes << :inactive if gb_settings.fetch('show_inactive_enrollments', "false") == "true"
-        includes << :completed if gb_settings.fetch('show_concluded_enrollments', "false") == "true"
-        includes
-      end
-    end
-
-    def enrollment_scope(includes)
-      scope = @assignment.context.all_accepted_student_enrollments
-      scope = scope.where("enrollments.workflow_state <> 'inactive'") unless includes.include?(:inactive)
-      scope = scope.where("enrollments.workflow_state <> 'completed'") unless includes.include?(:completed)
-      scope
-    end
   end
 end

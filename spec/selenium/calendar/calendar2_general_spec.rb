@@ -140,6 +140,17 @@ describe "calendar2" do
         expect(ag.reload.appointments.first.description).to eq description
         expect(f('.fc-event')).to be
       end
+
+      it "allows moving events between calendars" do
+        event = @user.calendar_events.create! :title => 'blah', :start_at => Date.today
+        get "/calendar2"
+        open_edit_event_dialog
+        f("option[value=course_#{@course.id}]").click
+        submit_form("#edit_calendar_event_form")
+        wait_for_ajaximations
+        expect(event.reload.context).to eq @course
+        expect(f(".fc-event")).to have_class "group_course_#{@course.id}"
+      end
     end
 
     context "time zone" do

@@ -2,14 +2,34 @@
   height: 146px;
   width: 262px;
   box-sizing: border-box;
-  border: 1px solid $ic-border-color;
+  border: 1px solid $ic-border-dark;
   position: relative;
+  background-size: cover;
+  margin-bottom: $ic-sp;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  .Button {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.CourseImageSelector__Overlay {
+  height: 100%;
+  width: 100%;
+  background: rgba($ic-color-light, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.CourseImageSelector__EditDropdown {
+  position: absolute;
+  top: $ic-sp/2;
+  right: $ic-sp/2;
+  padding: $ic-sp/4 0;  
+  border-radius: $ic-border-radius;
+  background-color: rgba(0, 0, 0, 0.3);
+
+  i[class*=icon-], i[class^=icon-] {
+    color: $ic-color-light;
   }
 }
 
@@ -19,5 +39,101 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #fff;
+  background-color: $ic-color-light;
+  max-width: $max_main_width + $right_side_width;
+}
+
+.CourseImagePicker {
+  height: 100%;
+}
+
+.CourseImagePicker__Header {
+  border-bottom: 1px solid $ic-border-color;
+}
+
+.CourseImagePicker__CloseBtn {
+  background-color: $ic-color-dark;
+  color: $ic-color-light;
+  border-radius: 50%;
+  height: $ic-sp*2.5;
+  width: $ic-sp*2.5;
+  box-shadow: none;
+  border: 0;
+  padding-left: $ic-sp/2;
+  @include overwrite-default-icon-size($ic-sp*1.5);
+}
+
+.CourseImagePicker__Content {
+  margin: $ic-sp*2 $ic-sp*8;
+}
+
+.CourseImagePicker__Overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: rgba($ic-color-light, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.DraggingOverlay {
+  top: $ic-sp;
+  left: $ic-sp;
+  right: $ic-sp;
+  bottom: $ic-sp;
+  border: 4px dashed $ic-brand-primary; 
+}
+
+.DraggingOverlay__Content {
+  width: 100%;
+}
+
+.DraggingOverlay__Icon {
+  text-align: center;
+  color: $ic-brand-primary;
+  @include overwrite-default-icon-size($ic-sp*8); 
+}
+
+.DraggingOverlay__Instructions {
+  text-align: center;
+  font-size: $ic-font-size--large;
+}
+
+.UploadArea {
+  border: 2px dotted $ic-border-dark;
+  border-radius: $ic-border-radius;
+  height: 150px;
+  display: flex;
+  align-items: center;
+}
+
+.UploadArea__Content {
+  width: 100%;
+}
+
+.UploadArea__Icon {
+  text-align: center;
+  color: $ic-brand-primary;
+  @include overwrite-default-icon-size($ic-sp*3.5);
+}
+
+.UploadArea__Instructions {
+  margin-top: $ic-sp/2;
+  text-align: center;
+}
+
+.UploadArea__FileTypes {
+  text-align: center;
+  font-style: italic;
+  margin-top: $ic-sp;
+  font-size: $ic-font-size--xsmall;
+}
+
+.FileUpload__Input {
+  display: none;
 }

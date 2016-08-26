@@ -96,6 +96,13 @@ describe "Wiki Pages" do
       switch_editor_views(wiki_page_body)
       expect(f('textarea')).to include_text('test')
     end
+
+    it "blocks linked page from redirecting parent page", priority: "2", test_id: 927147 do
+      @course.wiki.wiki_pages.create!(title: 'Garfield and Odie Food Preparation',
+        body: '<a href="http://example.com/poc/" target="_blank" id="click_here_now">click_here</a>')
+      get "/courses/#{@course.id}/pages/garfield-and-odie-food-preparation"
+      expect(f('#click_here_now').attribute("rel")).to eq "noreferrer"
+    end
   end
 
   context "Index Page as a teacher" do
@@ -379,6 +386,13 @@ describe "Wiki Pages" do
         f('.btn-primary').click
         wait_for_ajaximations
         expect(f('div.user_content.clearfix.enhanced > p').text).to include 'published by teacher'
+      end
+
+      it "keeps focus on clicked revision button" do
+        driver.execute_script("$('button.revision-details')[1].focus();")
+        ff('button.revision-details')[1].click
+        wait_for_ajaximations
+        check_element_has_focus(ff('button.revision-details')[1])
       end
     end
 

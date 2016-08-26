@@ -27,7 +27,7 @@ define [
       "due_at":"2013-08-28T23:59:00-06:00"
       "title":"Winter Session"
 
-    ac = new AssignmentCollection [buildAssignment(
+    buildAssignment
       "id":1
       "name":"History Quiz"
       "description":"test"
@@ -35,60 +35,46 @@ define [
       "points_possible":2
       "position":1
       "all_dates":[date1, date2]
-    )]
-    ac.at(0)
 
   assignment2 = ->
-    ac = new AssignmentCollection [buildAssignment(
+    buildAssignment
       "id":3
       "name":"Math Quiz"
       "due_at":"2013-08-23T23:59:00-06:00"
       "points_possible":10
       "position":2
-    )]
-    ac.at(0)
 
   assignment3 = ->
-    ac = new AssignmentCollection [buildAssignment(
+    buildAssignment
       "id":2
       "name":"Science Quiz"
       "points_possible":5
       "position":3
-    )]
-    ac.at(0)
 
   assignment_grade_percent = ->
-    ac = new AssignmentCollection [buildAssignment(
+    buildAssignment
       "id":2
       "name":"Science Quiz"
       "grading_type": "percent"
-    )]
-    ac.at(0)
 
 
   assignment_grade_pass_fail = ->
-    ac = new AssignmentCollection [buildAssignment(
+    buildAssignment
       "id":2
       "name":"Science Quiz"
       "grading_type": "pass_fail"
-    )]
-    ac.at(0)
 
   assignment_grade_letter_grade = ->
-    ac = new AssignmentCollection [buildAssignment(
+    buildAssignment
       "id":2
       "name":"Science Quiz"
       "grading_type": "letter_grade"
-    )]
-    ac.at(0)
 
   assignment_grade_not_graded = ->
-    ac = new AssignmentCollection [buildAssignment(
+    buildAssignment
       "id":2
       "name":"Science Quiz"
       "grading_type": "not_graded"
-    )]
-    ac.at(0)
 
   buildAssignment = (options) ->
     options ?= {}
@@ -107,6 +93,9 @@ define [
       "all_dates":[]
       "published":true
     $.extend base, options
+
+    ac = new AssignmentCollection [base]
+    ac.at(0)
 
   createView = (model, options) ->
     options = $.extend {canManage: true, canReadGrades: false}, options
@@ -183,7 +172,7 @@ define [
 
   test "does not initialize sis toggle if post to sis disabled but can't manage", ->
     view = createView(@model, canManage: false, post_to_sis: false)
-    ok !view.sisButtonView  
+    ok !view.sisButtonView
 
   test "does not initialize sis toggle if sis enabled but can't manage", ->
     view = createView(@model, canManage: false, post_to_sis: true)
@@ -257,7 +246,6 @@ define [
   test 'do not show score if viewing as non-student', ->
     old_user_roles = ENV.current_user_roles
     ENV.current_user_roles = ["user"]
-
     view = createView(@model, canManage: false)
     str = view.$(".js-score:eq(0) .non-screenreader").html()
     ok str.search("2 pts") != -1
@@ -362,11 +350,12 @@ define [
     I18nStubber.stub 'fr_FR',
       'date.formats.short': '%-d %b'
       'date.abbr_month_names.8': 'août'
-    model = new AssignmentCollection([buildAssignment
+    model = buildAssignment
       id: 1
+      lock_at: "2113-08-28T04:00:00Z"
       all_dates: [
         { lock_at: "2113-08-28T04:00:00Z", title: "Summer Session" }
-        { unlock_at: "2113-08-28T04:00:00Z", title: "Winter Session" }]]).at(0)
+        { unlock_at: "2113-08-28T04:00:00Z", title: "Winter Session" }]
 
     view = createView(model, canManage: true)
     $dds = view.dateAvailableColumnView.$("#vdd_tooltip_#{@model.id}_lock div")
@@ -379,16 +368,62 @@ define [
       'date.formats.short': '%b %-d'
       'date.abbr_month_names.8': 'Aug'
 
-    model = new AssignmentCollection([buildAssignment
+    model = buildAssignment
       id: 1
+      lock_at: "2113-08-28T04:00:00Z"
       all_dates: [
         { lock_at: "2113-08-28T04:00:00Z", title: "Summer Session" }
-        { unlock_at: "2113-08-28T04:00:00Z", title: "Winter Session" }]]).at(0)
+        { unlock_at: "2113-08-28T04:00:00Z", title: "Winter Session" }]
 
     view = createView(model, canManage: true)
     $dds = view.dateAvailableColumnView.$("#vdd_tooltip_#{@model.id}_lock div")
     equal $("span", $dds.first()).last().text().trim(), 'Aug 27'
     equal $("span", $dds.last()).last().text().trim(), 'Aug 27'
+
+  test 'renders lockAt/unlockAt for multiple due dates', ->
+    now = new Date()
+    model = buildAssignment
+      id: 1
+      all_dates: [
+        { due_at: new Date().toISOString() }
+        { due_at: new Date().toISOString() }
+      ]
+    view = createView(model)
+    json = view.toJSON()
+    equal json.showAvailability, true
+
+  test 'renders lockAt/unlockAt when locked', ->
+    future = new Date()
+    future.setDate(future.getDate() + 10)
+    model = buildAssignment
+      id: 1
+      unlock_at: future.toISOString()
+    view = createView(model)
+    json = view.toJSON()
+    equal json.showAvailability, true
+
+  test 'renders lockAt/unlockAt when locking in future', ->
+    past = new Date()
+    past.setDate(past.getDate() - 10)
+    future = new Date()
+    future.setDate(future.getDate() + 10)
+    model = buildAssignment
+      id: 1
+      unlock_at: past,
+      lock_at: future.toISOString()
+    view = createView(model)
+    json = view.toJSON()
+    equal json.showAvailability, true
+
+  test 'does not render lockAt/unlockAt when not locking in future', ->
+    past = new Date()
+    past.setDate(past.getDate() - 10)
+    model = buildAssignment
+      id: 1
+      unlock_at: past.toISOString()
+    view = createView(model)
+    json = view.toJSON()
+    equal json.showAvailability, false
 
   test "renders due date column with locale-appropriate format string", ->
     tz.changeLocale(french, 'fr_FR', 'fr')
@@ -482,5 +517,3 @@ define [
 
     equal screenreaderText(), 'This assignment will not be assigned a grade.', 'sets screenreader text'
     equal nonScreenreaderText(), '', 'sets non-screenreader text'
-
-

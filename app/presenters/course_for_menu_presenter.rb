@@ -27,6 +27,8 @@ class CourseForMenuPresenter
       term: term || nil,
       subtitle: subtitle,
       id: course.id,
+      image: course.feature_enabled?(:course_card_images) ? course.image : nil,
+      imagesEnabled: course.feature_enabled?(:course_card_images),
       links: available_section_tabs.map do |tab|
         presenter = SectionTabPresenter.new(tab, course)
         presenter.to_h

@@ -17,5 +17,7 @@
 #
 
 class ExternalUrl < Tableless
-  column :id, :integer, 0
+  columns do
+    column :id, :integer, 0
+  end
 end

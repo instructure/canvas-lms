@@ -104,3 +104,42 @@ define [
 
     view.$('.ig-details').simulate 'click'
     ok redirected
+
+  test 'renders lockAt/unlockAt for multiple due dates', ->
+    quiz = new Quiz(id: 1, title: 'mdd', all_dates: [
+      { due_at: new Date() },
+      { due_at: new Date() }
+    ])
+    view = createView(quiz)
+    json = view.toJSON()
+    equal json.showAvailability, true
+
+  test 'renders lockAt/unlockAt when locked', ->
+    future = new Date()
+    future.setDate(future.getDate() + 10)
+    quiz = new Quiz(id: 1, title: 'mdd', unlock_at: future.toISOString())
+    view = createView(quiz)
+    json = view.toJSON()
+    equal json.showAvailability, true
+
+  test 'renders lockAt/unlockAt when locking in future', ->
+    past = new Date()
+    past.setDate(past.getDate() - 10)
+    future = new Date()
+    future.setDate(future.getDate() + 10)
+    quiz = new Quiz(
+      id: 1,
+      title: 'unlock later',
+      unlock_at: past.toISOString(),
+      lock_at: future.toISOString())
+    view = createView(quiz)
+    json = view.toJSON()
+    equal json.showAvailability, true
+
+  test 'does not render lockAt/unlockAt when not locking in future', ->
+    past = new Date()
+    past.setDate(past.getDate() - 10)
+    quiz = new Quiz(id: 1, title: 'unlocked for good', unlock_at: past.toISOString())
+    view = createView(quiz)
+    json = view.toJSON()
+    equal json.showAvailability, false

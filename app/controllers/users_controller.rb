@@ -175,7 +175,7 @@ class UsersController < ApplicationController
       add_crumb(@current_user.short_name, crumb_url)
       add_crumb(t('crumbs.grades', 'Grades'), grades_path)
 
-      current_active_enrollments = @user.enrollments.current.preload(:course).shard(@user).to_a
+      current_active_enrollments = @user.enrollments.current.preload(:course, :enrollment_state).shard(@user).to_a
 
       @presenter = GradesPresenter.new(current_active_enrollments)
 
@@ -199,7 +199,7 @@ class UsersController < ApplicationController
 
     course = enrollment.course
     grading_period_id = params[:grading_period_id].to_i
-    grading_period = GradingPeriod.context_find(course, grading_period_id)
+    grading_period = GradingPeriod.for(course).find_by(id: grading_period_id)
     grading_periods = {
       course.id => {
         :periods => [grading_period],
@@ -1009,7 +1009,7 @@ class UsersController < ApplicationController
         shard(@user).
         where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").
         eager_load(:course).
-        preload(:associated_user, :course_section, course: { enrollment_term: :enrollment_dates_overrides }).to_a
+        preload(:associated_user, :course_section, :enrollment_state, course: { enrollment_term: :enrollment_dates_overrides }).to_a
 
       # restrict view for other users
       if @user != @current_user

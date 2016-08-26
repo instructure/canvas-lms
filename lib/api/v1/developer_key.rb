@@ -33,6 +33,7 @@ module Api::V1::DeveloperKey
       if context.grants_right?(user, session, :manage_developer_keys) || user.try(:id) == key.user_id
         hash['api_key'] = key.api_key
         hash['redirect_uri'] = key.redirect_uri
+        hash['redirect_uris'] = key.redirect_uris.join("\n")
       end
       hash['account_name'] = key.account_name
       hash['id'] = key.global_id

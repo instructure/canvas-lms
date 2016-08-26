@@ -230,11 +230,13 @@ describe "gradebook2" do
 
     # show notes column
     gradebook_settings_cog.click
+    wait_for_ajaximations
     show_notes.click
     expect(f("#content")).to contain_jqcss('.custom_column:visible')
 
     # hide notes column
     gradebook_settings_cog.click
+    wait_for_ajaximations
     hide_notes.click
     expect(f("#content")).not_to contain_jqcss('.custom_column:visible')
   end

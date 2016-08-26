@@ -27,8 +27,12 @@
     position: fixed;
     top: 0; left: 0;
     height: 100%;
-    width: $ic-header-primary-width;
+    width: $ic-header-primary-width - 30;
     z-index: 100;
+
+    @include breakpoint(tablet) {
+      width: $ic-header-primary-width;
+    }
   }
 
   .ic-app-header__layout {
@@ -52,15 +56,27 @@
   .ic-app-header__menu-list-item {
     box-sizing: border-box;
     &.ic-app-header__menu-list-item--active {
-      .ic-app-header__menu-list-link { background: $ic-color-light; }
-      .menu-item__text { color: $ic-brand-global-nav-menu-item__text-color--active; }
-      .ic-icon-svg { fill: $ic-brand-global-nav-ic-icon-svg-fill--active; }
+      .ic-app-header__menu-list-link {
+        background: $ic-color-light;
+      }
+      .menu-item__text {
+        color: $ic-brand-global-nav-menu-item__text-color--active;
+      }
+      .ic-icon-svg {
+        fill: $ic-brand-global-nav-ic-icon-svg-fill--active;
+      }
       .ic-avatar {
         border-color: $ic-border-light;
-        &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
+        &.ic-avatar--fake-student {
+          border-color: $ic-masquerade-color;
+        }
       }
-      .menu-item-icon-container .menu-item__badge {
-        @include primary-nav-badge-border($ic-color-light);
+      .menu-item-icon-container {
+        color: $ic-brand-global-nav-ic-icon-svg-fill--active;
+
+        .menu-item__badge {
+          @include primary-nav-badge-border($ic-color-light);
+        }
       }
     }
   }
@@ -142,7 +158,11 @@
     flex-direction: column;
     overflow-y: auto;
     -ms-overflow-style: none; // IE11 and below was throwing on scrollbars no matter if needed or not
-    width: $ic-header-primary-width;
+    width: $ic-header-primary-width - 30;
+
+    @include breakpoint(tablet) {
+      width: $ic-header-primary-width;
+    }
   }
 
   .ic-avatar {
@@ -163,18 +183,40 @@
     z-index: 1;
     width: $ic-sp*4;
     margin: 0 auto;
+    color: $ic-brand-global-nav-ic-icon-svg-fill;
+
     .ic-avatar {
       transform: translate3d(0,0,0);
-      width: $ic-sp*3; height: $ic-sp*3;
+      width: $ic-sp*2.5; height: $ic-sp*2.5;
+
+      @include breakpoint(tablet) {
+        width: $ic-sp*3; height: $ic-sp*3;
+      }
     }
   }
 
   .menu-item__text {
-    margin-top: $ic-sp/2;
-    box-sizing: border-box;
-    color: $ic-brand-global-nav-menu-item__text-color;
-    line-height: 1.1;
-    @include fontSize($ic-font-size--xsmall);
+    position: absolute; // for tablet... completely hide text, but make available to screenreader so it can read it
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    width: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+
+    @include breakpoint(tablet) {
+      position: static;
+      overflow: visible;
+      clip: auto;
+      height: auto;
+      width: auto;
+      margin: $ic-sp/2 auto auto;
+      box-sizing: border-box;
+      color: $ic-brand-global-nav-menu-item__text-color;
+      line-height: 1.1;
+      @include fontSize($ic-font-size--xsmall);
+    }
   }
 
   .menu-item__badge {
@@ -195,11 +237,15 @@
     width: 100%;
     background-color: $ic-brand-global-nav-logo-bgd;
     box-sizing: border-box;
+
     @if $ic-brand-header-image != $ic-logomark-url {
       padding: 0;
     }
     @else {
-      padding: 0 $ic-sp+6;
+      padding: 0 $ic-sp/2;
+      @include breakpoint(tablet) {
+        padding: 0 $ic-sp+6;
+      }
     }
   }
 
@@ -214,11 +260,19 @@
     background-size: contain;
     transition: transform 0.5s;
     @if $ic-brand-header-image != $ic-logomark-url {
-      height: 85px;
+      height: 75px;
     }
     @else {
-      height: 75px;
+      height: 65px;
       transform: scale3d(0.7, 0.7, 0.7); // default canvas logo
+    }
+    @include breakpoint(tablet) {
+      @if $ic-brand-header-image != $ic-logomark-url {
+        height: 85px;
+      }
+      @else {
+        height: 75px;
+      }
     }
   }
   // set to block to avoid any exta inline spacing at bottom
@@ -247,9 +301,12 @@
     overflow-x: hidden;
     width: $ic-sp*28;
     top: 0; bottom: 0;
-    left: $ic-header-primary-width;
+    left: $ic-header-primary-width - 30;
     @if $use_high_contrast == false {
       &:focus { outline: none; }
+    }
+    @include breakpoint(tablet) {
+      left: $ic-header-primary-width;
     }
   }
 
@@ -271,22 +328,29 @@
     flex-direction: column;
   }
 
-  .ReactTray__primary-content {
+
+  // Nav menu styles
+
+  .ic-NavMenu__primary-content {
     flex: 1 0 auto;
   }
 
-  .ReactTray__link-list {
+  .ic-NavMenu__secondary-content {
+    margin-top: $ic-sp;
+  }
+
+  .ic-NavMenu__link-list {
     @include reset-list;
     @include fontSize($ic-font-size--small);
-    .ReactTray-list-item {
+    .ic-NavMenu-list-item {
       line-height: 1.3;
       margin-bottom: $ic-sp;
       &:last-of-type { margin-bottom: 0; }
-      &.ReactTray-list-item--feature-item {
+      &.ic-NavMenu-list-item--feature-item {
         border-top: 1px solid $ic-border-light;
         padding-top: $ic-sp;
       }
-      &.ReactTray-list-item--loading-message {
+      &.ic-NavMenu-list-item--loading-message {
         background: url("/images/panda-cycle-loader.gif") no-repeat left center;
         background-size: 100px;
         text-align: center;
@@ -299,7 +363,7 @@
       }
     }
 
-    .ReactTray-list-item__link {
+    .ic-NavMenu-list-item__link {
       display: inline-block;
       i[class*=icon-],
       i[class^=icon-] { margin-right: $ic-sp/3; }
@@ -307,23 +371,23 @@
 
   }
 
-  .ReactTray__header {
+  .ic-NavMenu__header {
     border-bottom: 1px solid $ic-border-light;
     margin-bottom: $ic-sp;
 
-    &:not(.ReactTray__header--is-profile) {
+    &:not(.ic-NavMenu__header--is-profile) {
       padding-bottom: $ic-sp;
       display: flex;
       align-items: flex-start;
 
-      .ReactTray__headline {
+      .ic-NavMenu__headline {
         flex: 1;
         min-width: 1px;
       }
 
     }
 
-    &.ReactTray__header--is-profile {
+    &.ic-NavMenu__header--is-profile {
       text-align: center;
       padding-bottom: $ic-sp*2;
 
@@ -336,28 +400,56 @@
 
   }
 
-  .ReactTray-profile-header-avatar-image {
+  .ic-NavMenu-profile-header-avatar-image {
     min-width: 72px; min-height: 72px;
   }
 
-  .ReactTray-profile-header-close { text-align: right; }
+  .ic-NavMenu-profile-header-close { text-align: right; }
 
-  .ReactTray-profile-header-logout-form {
+  .ic-NavMenu-profile-header-logout-form {
     margin-top: $ic-sp;
     margin-bottom: 0;
   }
 
-  .ReactTray__headline {
+  .ic-NavMenu__headline {
     @include fontSize(21px);
     box-sizing: border-box;
     margin: 0;
   }
 
-  .ReactTray-list-item__helper-text {
+  .ic-NavMenu-list-item__helper-text {
     color: $ic-hint-text;
     @include fontSize(12px);
     text-transform: uppercase;
     margin-top: $ic-sp/6;
+
+    &.is-help-link {
+      text-transform: none;
+    }
   }
 
+
+  // help dialog/tray styles
+  .ic-HelpDialog__form-legend {
+    display: table;
+    font-size: 1em;
+    line-height: inherit;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .ic-HelpDialog__form-fieldset {
+    border: 0;
+    padding: 0.01em 0 0 0;
+    min-width: 0;
+    margin: 0 0 $spacing-width/2 0;
+  }
+
+  .ic-HelpDialog__form-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
 }

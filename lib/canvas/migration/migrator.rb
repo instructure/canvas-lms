@@ -75,7 +75,7 @@ class Migrator
       FileUtils.copy(@archive_file.path, full_path)
     end
   end
-  
+
   def package_course_files(base_dir=nil)
     base_dir ||= @unzipped_file_path
     zip_file = File.join(@base_export_dir, MigratorHelper::ALL_FILES_ZIP)

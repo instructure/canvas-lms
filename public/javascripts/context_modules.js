@@ -187,8 +187,16 @@ define([
             } else if (info["vdd_tooltip"] != null) {
               info['vdd_tooltip']['link_href'] = $context_module_item.find('a.title').attr('href');
               $context_module_item.find('.due_date_display').html(vddTooltipView(info["vdd_tooltip"]));
+            } else {
+              $context_module_item.find('.due_date_display').remove();
             }
-            $context_module_item.fillTemplateData({data: data, htmlValues: ['points_possible_display']})
+            $context_module_item.fillTemplateData({data: data, htmlValues: ['points_possible_display']});
+
+            // clean up empty elements so they don't show borders in updated item group design
+            if (info["points_possible"] === null) {
+              $context_module_item.find('.points_possible_display').remove();
+            }
+
           });
           vddTooltip();
           if (callback) { callback(); }

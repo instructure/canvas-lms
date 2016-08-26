@@ -19,6 +19,7 @@ describe ContentMigration do
     it "should skip everything if #applies_to_course? returns false" do
       TestExternalContentService.stubs(:applies_to_course?).returns(false)
       TestExternalContentService.expects(:begin_export).never
+      TestExternalContentService.expects(:export_completed?).never
       TestExternalContentService.expects(:retrieve_export).never
       TestExternalContentService.expects(:send_imported_content).never
 
@@ -30,6 +31,7 @@ describe ContentMigration do
 
       test_data = {:sometestdata => "something"}
       TestExternalContentService.expects(:begin_export).with(@copy_from, {}).returns(test_data)
+      TestExternalContentService.expects(:export_completed?).with(test_data).returns(true)
       TestExternalContentService.expects(:retrieve_export).with(test_data).returns(nil)
       TestExternalContentService.expects(:send_imported_content).never
       run_course_copy
@@ -58,6 +60,7 @@ describe ContentMigration do
         '$canvas_page_id' => page.id,
         '$canvas_quiz_id' => quiz.id
       }
+      TestExternalContentService.stubs(:export_completed?).returns(true)
       TestExternalContentService.stubs(:retrieve_export).returns(data)
 
       run_course_copy
@@ -92,6 +95,7 @@ describe ContentMigration do
 
       TestExternalContentService.stubs(:applies_to_course?).returns(true)
       TestExternalContentService.stubs(:begin_export).returns(true)
+      TestExternalContentService.stubs(:export_completed?).returns(true)
       TestExternalContentService.stubs(:retrieve_export).returns(
         {'$canvas_assignment_id' => assmt.id, '$canvas_discussion_topic_id' => topic.id})
 
@@ -115,6 +119,7 @@ describe ContentMigration do
       item = cm.add_item(:id => assmt.id, :type => 'assignment')
 
       TestExternalContentService.stubs(:applies_to_course?).returns(true)
+      TestExternalContentService.stubs(:export_completed?).returns(true)
       TestExternalContentService.stubs(:retrieve_export).returns({})
 
       @cm.copy_options = {:context_modules => {mig_id(cm) => "1"}}
@@ -122,6 +127,18 @@ describe ContentMigration do
 
       TestExternalContentService.expects(:begin_export).with(@copy_from,
         {:selective => true, :exported_assets => ["context_module_#{cm.id}", "assignment_#{assmt.id}"]})
+
+      run_course_copy
+    end
+
+    it "should only check a few times for the export to finish before timing out" do
+      TestExternalContentService.stubs(:applies_to_course?).returns(true)
+      TestExternalContentService.stubs(:begin_export).returns(true)
+      Canvas::Migration::ExternalContent::Migrator.expects(:retry_delay).at_least_once.returns(0) # so we're not actually sleeping for 30s a pop
+      TestExternalContentService.expects(:export_completed?).times(6).returns(false) # retries 5 times
+
+      Canvas::Errors.expects(:capture_exception).with(:external_content_migration,
+        "External content migrations timed out for test_service")
 
       run_course_copy
     end

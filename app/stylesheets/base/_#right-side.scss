@@ -65,11 +65,11 @@
   @if $use_new_styles { margin: 0 0 $ic-sp; }
   @else { margin: 10px 0; }
   li {
-    a {
+    a{
       @include fontSize($ic-font-size--xsmall);
       padding-top: 4px;
       padding-bottom: 4px;
-      display: block;
+      display: flex;
       border-bottom: 1px solid #d6d6d6;
       @if $use_high_contrast {
         text-decoration: none;
@@ -88,6 +88,15 @@
       }
       &:focus {
         text-decoration: underline;
+      }
+      // this is to give todo and event icons some breathing room
+      > i {
+          width: 40px;
+          min-width: 40px;
+          padding-right: $ic-sp;
+          text-align: right;
+          box-sizing: border-box;
+          color: lighten( $grayDark, 15% );
       }
     }
     &:last-child a {
@@ -121,6 +130,7 @@
       }
       @else {
         color: #777;
+        text-decoration: none;
       }
     }
     .more_link {
@@ -164,54 +174,17 @@
       height: 1px;
     }
   }
-  &.events {
-    i {
-      width: 40px;
-      min-width: 40px;
-      padding-right: $ic-sp;
-      text-align: right;
-      box-sizing: border-box;
-    }
-    .event > a {
-      display: flex;
-    }
-  }
+
   &.to-do-list {
     li {
       position: relative;
       a.item {
         display: flex;
       }
-      a.disable_item_link {
-        @if $use_high_contrast {
-          color: #555;
-        }
-        @else {
-          color: #777;
-        }
-        padding: 0;
-        position: absolute;
-        background-image: none;
-        right: 0;
-        top: 4px;
-        z-index: 2;
-        border-bottom: none;
-        box-shadow: none;
-        text-align: right;
-      }
-      &:hover {
-        a.disable_item_link {
-          @if $use_high_contrast {
-            color: #222;
-          }
-          @else {
-            color: #444;
-          }
-        }
-      }
     }
   }
 }
+
 #right-side .todo-list-header {
   margin-top: 21px;
 }
@@ -223,9 +196,12 @@
   padding-right: $ic-sp;
   box-sizing: border-box;
 }
-#right-side .right-side-list .IgnoreButton {
-  width: 25px;
-  min-width: 25px;
+// this is the ignore x-icon on todo list
+#right-side .right-side-list .disable_item_link {
+  position: absolute;
+  right: 0;
+  top: 2px;
+  z-index: 2;
 }
 
 @mixin sidebar-logo {display: block;}

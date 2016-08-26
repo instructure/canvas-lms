@@ -236,9 +236,9 @@ describe "dashboard" do
       it "should display course name in course menu", priority: "1", test_id: 215586 do
         if ENV['CANVAS_FORCE_USE_NEW_STYLES']
           f('#global_nav_courses_link').click
-          expect(fj(".ReactTray__headline:contains('Courses')")).to be_displayed
+          expect(fj(".ic-NavMenu__headline:contains('Courses')")).to be_displayed
           wait_for_ajax_requests
-          expect(fj(".ReactTray-list-item a:contains('#{@course.name}')")).to be_displayed
+          expect(fj(".ic-NavMenu-list-item a:contains('#{@course.name}')")).to be_displayed
         else
           driver.execute_script %{$('#courses_menu_item').addClass('hover');}
           expect(f('#courses_menu_item')).to include_text('My Courses')
@@ -250,13 +250,20 @@ describe "dashboard" do
         group = Group.create!(:name => "group1", :context => @course)
         group.add_user(@user)
 
+        other_unpublished_course = course
+        other_group = Group.create!(:name => "group2", :context => other_unpublished_course)
+        other_group.add_user(@user)
+
         get "/"
 
         if ENV['CANVAS_FORCE_USE_NEW_STYLES']
           f('#global_nav_groups_link').click
-          expect(fj(".ReactTray__headline:contains('Groups')")).to be_displayed
+          expect(fj(".ic-NavMenu__headline:contains('Groups')")).to be_displayed
           wait_for_ajax_requests
-          expect(fj(".ReactTray-list-item a:contains('#{group.name}')")).to be_displayed
+
+          list = fj(".ic-NavMenu-list-item")
+          expect(list).to include_text(group.name)
+          expect(list).to_not include_text(other_group.name)
         else
           driver.execute_script %{$('#courses_menu_item').addClass('hover');}
           expect(f('#courses_menu_item')).to include_text(group.name)
@@ -276,7 +283,7 @@ describe "dashboard" do
       it "should go to a course when clicking a course link from the menu", priority: "1", test_id: 215614 do
         if ENV['CANVAS_FORCE_USE_NEW_STYLES']
           f('#global_nav_courses_link').click
-          fj(".ReactTray-list-item a:contains('#{@course.name}')").click
+          fj(".ic-NavMenu-list-item a:contains('#{@course.name}')").click
         else
           driver.execute_script %{$('#courses_menu_item').addClass('hover');}
           fj("#courses_menu_item a[href='/courses/#{@course.id}']").click
@@ -360,8 +367,8 @@ describe "dashboard" do
 
       if ENV['CANVAS_FORCE_USE_NEW_STYLES']
         f('#global_nav_courses_link').click
-        expect(fj(".ReactTray__headline:contains('Courses')")).to be_displayed
-        expect(f(".ReactTray__link-list")).not_to include_text(c1.name)
+        expect(fj(".ic-NavMenu__headline:contains('Courses')")).to be_displayed
+        expect(f(".ic-NavMenu__link-list")).not_to include_text(c1.name)
       else
         driver.execute_script %{$('#courses_menu_item').addClass('hover');}
         item = fj('#menu_enrollments')
@@ -404,7 +411,7 @@ describe "dashboard" do
         get "/"
         if ENV['CANVAS_FORCE_USE_NEW_STYLES']
           f('#global_nav_courses_link').click
-          expect(fj('.ReactTray-list-item a:contains("All Courses")')).to be_present
+          expect(fj('.ic-NavMenu-list-item a:contains("All Courses")')).to be_present
         else
           course_menu_item = f("#courses_menu_item")
           hover(course_menu_item)

@@ -5,7 +5,7 @@ define([
   '../actions/submissionsActions',
   '../stores/assignmentGroupsStore',
   '../stores/gradingPeriodsStore',
-  'compiled/gradebook2/GRADEBOOK_TRANSLATIONS',
+  'compiled/gradebook2/GradebookTranslations',
   'compiled/jquery.rails_flash_notifications'
 ], function (Reflux, _, $, SubmissionsActions, AssignmentGroupsStore,
              GradingPeriodsStore, GRADEBOOK_TRANSLATIONS) {

@@ -103,7 +103,7 @@ module BroadcastPolicies
     end
 
     def user_active_or_invited?
-      course.student_enrollments.where(user_id: submission.user_id).to_a.any?{|e| e.active? || e.invited?}
+      course.student_enrollments.where(user_id: submission.user_id).preload(:enrollment_state).to_a.any?{|e| e.active? || e.invited?}
     end
   end
 end

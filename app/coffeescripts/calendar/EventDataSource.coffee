@@ -107,6 +107,10 @@ define [
       false
 
     addEventToCache: (event) =>
+      if event.old_context_code
+        delete @cache.contexts[event.old_context_code].events[event.id]
+        delete event.old_context_code
+
       contextCode = event.contextCode()
       contextInfo = @cache.contexts[contextCode]
 

@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 define(function(require) {
-  var React = require('react');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var ScreenReaderContent = require('jsx!./screen_reader_content');
   var SightedUserContent = require('jsx!./sighted_user_content');
   var Icon = React.createClass({

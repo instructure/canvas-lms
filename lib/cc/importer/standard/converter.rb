@@ -91,8 +91,22 @@ module CC::Importer::Standard
     end
 
     def find_file_migration_id(path)
-      @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
+      mig_id = @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
         @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
+
+      unless mig_id
+        full_path = File.expand_path(File.join(@unzipped_file_path, path))
+
+        if full_path.start_with?(File.expand_path(@unzipped_file_path)) && File.exists?(full_path)
+          # try to make it work even if the file wasn't technically included in the manifest :/
+          mig_id = Digest::MD5.hexdigest(path)
+          file = {:path_name => path, :migration_id => mig_id,
+            :file_name => File.basename(path), :type => 'FILE_TYPE'}
+          add_course_file(file)
+        end
+      end
+
+      mig_id
     end
 
     def get_canvas_att_replacement_url(path, resource_dir=nil)
@@ -103,7 +117,7 @@ module CC::Importer::Standard
       end
       path = path[1..-1] if path.start_with?('/')
       mig_id = nil
-      if resource_dir
+      if resource_dir && resource_dir != "."
         mig_id = find_file_migration_id(File.join(resource_dir, path))
       end
       mig_id ||= find_file_migration_id(path)

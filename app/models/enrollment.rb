@@ -74,7 +74,7 @@ class Enrollment < ActiveRecord::Base
   after_save :recalculate_enrollment_state
   after_destroy :update_assignment_overrides_if_needed
 
-  attr_accessor :already_enrolled, :need_touch_user
+  attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -663,6 +663,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def enrollment_state
+    raise "cannot call enrollment_state on a new record" if new_record?
     state = self.association(:enrollment_state).target ||=
       self.shard.activate do
         Shackles.activate(:master) do
@@ -679,13 +680,19 @@ class Enrollment < ActiveRecord::Base
     if (self.changes.keys & %w{workflow_state start_at end_at}).any?
       @enrollment_dates = nil
       self.enrollment_state.state_is_current = false
+      self.enrollment_state.is_direct_recalculation = true
     end
+    self.enrollment_state.skip_touch_user ||= self.skip_touch_user
     self.enrollment_state.ensure_current_state
   end
 
   def state_based_on_date
     RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state) do
-      self.enrollment_state.get_effective_state
+      if %w{invited active completed}.include?(self.workflow_state)
+        self.enrollment_state.get_effective_state
+      else
+        self.workflow_state.to_sym
+      end
     end
   end
 
@@ -718,7 +725,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def restrict_future_listing?
-    self.restrict_future_view? && self.course.account.restrict_student_future_listing[:value]
+    self.enrollment_state.pending? && self.enrollment_state.restricted_access? && self.course.account.restrict_student_future_listing[:value]
   end
 
   def active?
@@ -748,10 +755,8 @@ class Enrollment < ActiveRecord::Base
   def completed_at
     if date = self.read_attribute(:completed_at)
       date
-    else
-      if completed?
-        self.enrollment_state.state_started_at
-      end
+    elsif !new_record? && completed?
+      self.enrollment_state.state_started_at
     end
   end
 

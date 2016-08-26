@@ -3,7 +3,7 @@ define [
   'compiled/util/round'
   'compiled/views/InputFilterView'
   'i18n!gradebook2'
-  'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
+  'compiled/gradebook2/GradebookTranslations'
   'jquery'
   'underscore'
   'compiled/userSettings'

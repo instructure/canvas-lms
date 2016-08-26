@@ -2,12 +2,14 @@ class LiveEventsObserver < ActiveRecord::Observer
   observe :course,
           :discussion_entry,
           :discussion_topic,
+          :enrollment,
           :group,
           :group_category,
           :group_membership,
           :wiki_page,
           :assignment,
-          :submission
+          :submission,
+          :user_account_association
 
   def after_update(obj)
     case obj
@@ -33,6 +35,8 @@ class LiveEventsObserver < ActiveRecord::Observer
       Canvas::LiveEvents.discussion_entry_created(obj)
     when DiscussionTopic
       Canvas::LiveEvents.discussion_topic_created(obj)
+    when Enrollment
+      Canvas::LiveEvents.enrollment_created(obj)
     when Group
       Canvas::LiveEvents.group_created(obj)
     when GroupCategory
@@ -45,6 +49,8 @@ class LiveEventsObserver < ActiveRecord::Observer
       Canvas::LiveEvents.assignment_created(obj)
     when Submission
       Canvas::LiveEvents.submission_created(obj)
+    when UserAccountAssociation
+      Canvas::LiveEvents.user_account_association_created(obj)
     end
   end
 

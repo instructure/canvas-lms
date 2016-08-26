@@ -1,6 +1,6 @@
 @import 'base/environment';
 
-/* 
+/*
 @styleguide Item Groups Condensed
 
 <br/>
@@ -30,13 +30,18 @@
       <li>
         <div class="ig-row">
           <div class="ig-row__layout">
-            <a href="#" class="ig-title ellipses">
-              <i class="icon-assignment"></i> Some Assignment
-            </a>
-            <div class="ig-details">
-              <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
-              <div class="ellipses"><b>Available</b> Nov 1</div>
-              <div class="ellipses">10 pts</div>
+            <div class="ig-type-icon" aria-hidden="true">
+              <i class="icon-assignment"></i>
+            </div>
+            <div class="ig-info">
+              <a href="#" class="ig-title">
+                Some Assignment
+              </a>
+              <div class="ig-details">
+                <div class="ig-details__item"><b>Due</b> Nov 4, 2012</div>
+                <div class="ig-details__item"><b>Available</b> Nov 1</div>
+                <div class="ig-details__item">10 pts</div>
+              </div>
             </div>
             <div class="ig-admin">
               <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
@@ -61,13 +66,18 @@
       <li>
         <div class="ig-row ig-published">
           <div class="ig-row__layout">
-            <a href="#" class="ig-title ellipses">
-              <i class="icon-assignment"></i> Some Assignment
-            </a>
-            <div class="ig-details">
-              <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
-              <div class="ellipses"><b>Available</b> Nov 1</div>
-              <div class="ellipses">10 pts</div>
+            <div class="ig-type-icon" aria-hidden="true">
+              <i class="icon-assignment"></i>
+            </div>
+            <div class="ig-info">
+              <a href="#" class="ig-title">
+                Some Assignment
+              </a>
+              <div class="ig-details">
+                <div class="ig-details__item"><b>Due</b> Nov 4, 2012</div>
+                <div class="ig-details__item"><b>Available</b> Nov 1</div>
+                <div class="ig-details__item">10 pts</div>
+              </div>
             </div>
             <div class="ig-admin">
               <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
@@ -92,13 +102,18 @@
       <li>
         <div class="ig-row">
           <div class="ig-row__layout">
-            <a href="#" class="ig-title ellipses">
-              <i class="icon-assignment"></i> Some Assignment
-            </a>
-            <div class="ig-details">
-              <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
-              <div class="ellipses"><b>Available</b> Nov 1</div>
-              <div class="ellipses">10 pts</div>
+            <div class="ig-type-icon" aria-hidden="true">
+              <i class="icon-assignment"></i>
+            </div>
+            <div class="ig-info">
+              <a href="#" class="ig-title">
+                Some Assignment
+              </a>
+              <div class="ig-details">
+                <div class="ig-details__item"><b>Due</b> Nov 4, 2012</div>
+                <div class="ig-details__item"><b>Available</b> Nov 1</div>
+                <div class="ig-details__item">10 pts</div>
+              </div>
             </div>
             <div class="ig-admin">
               <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
@@ -136,13 +151,18 @@
     <li>
       <div class="ig-row">
         <div class="ig-row__layout">
-          <a href="#" class="ig-title ellipses">
-            <i class="icon-assignment"></i> Some Assignment
-          </a>
-          <div class="ig-details">
-            <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
-            <div class="ellipses"><b>Available</b> Nov 1</div>
-            <div class="ellipses">10 pts</div>
+          <div class="ig-type-icon" aria-hidden="true">
+            <i class="icon-assignment"></i>
+          </div>
+          <div class="ig-info">
+            <a href="#" class="ig-title">
+              Some Assignment
+            </a>
+            <div class="ig-details">
+              <div class="ig-details__item"><b>Due</b> Nov 4, 2012</div>
+              <div class="ig-details__item"><b>Available</b> Nov 1</div>
+              <div class="ig-details__item">10 pts</div>
+            </div>
           </div>
           <div class="ig-admin">
             <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
@@ -190,140 +210,6 @@
       </li>
     </ul>
   </div>
-
-  <div class="item-group-condensed">
-    <div class="ig-header">
-      <h2 class="ig-header-title element_toggler" href="#"
-         aria-controls="cond_group_4"
-         aria-expanded="true">
-        <i class="icon-mini-arrow-down"></i> Item Group Header
-      </h2>
-    </div>
-    <div class='item-group-expandable' id="cond_group_4">
-      <ul class="ig-list">
-        <li>
-          <div class="ig-row">
-            <div class="ig-row__layout">
-              <a class="ig-title ellipses element_toggler" href="#"
-                 aria-controls="cond_sub_group_1"
-                 aria-expanded="true">
-                <i class="icon-mini-arrow-down"></i> Some Conference
-              </a>
-              <div class="ig-details">
-                <div class="ellipses">2 Recordings</div>
-              </div>
-            </div>
-          </div>
-          <div class="ig-sublist" id="cond_sub_group_1">
-            <ul>
-              <li>
-                <div class="ig-row">
-                  <div class="ig-row__layout">
-                    <a href="#" class="ig-title ellipses">Recording 1</a>
-                    <div class="ig-details">
-                      <div class="ellipses">09/09/2013</div>
-                      <div class="ellipses">57:34</div>
-                    </div>
-                    <div class="ig-button">
-                      <a class="btn btn-small" href="#">View</a>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="ig-row">
-                  <div class="ig-row__layout">
-                    <a href="#" class="ig-title ellipses">Recording 2</a>
-                    <div class="ig-details">
-                      <div class="ellipses">09/09/2013</div>
-                      <div class="ellipses">57:34</div>
-                     </div>
-                    <div class="ig-button">
-                      <a class="btn btn-small" href="#">View</a>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-      </ul>
-    </div>
-  </div>
-
-  <div class="item-group-condensed">
-    <div class="ig-header">
-      <h2 class="ig-header-title element_toggler" href="#"
-         aria-controls="cond_group_5"
-         aria-expanded="true">
-        <i class="icon-mini-arrow-down"></i> Item Group Header
-      </h2>
-    </div>
-    <div class='item-group-expandable' id="cond_group_5">
-      <ul class="ig-list">
-        <li>
-          <div class="ig-row">
-            <div class="ig-row__layout">
-              <a class="ig-title ellipses element_toggler" href="#"
-                 aria-controls="cond_sub_group_2"
-                 aria-expanded="true">
-                <i class="icon-mini-arrow-down"></i> Some Conference
-              </a>
-              <div class="ig-details">
-                <div class="ellipses">2 Recordings</div>
-              </div>
-            </div>
-          </div>
-          <div class="ig-sublist" id="cond_sub_group_2">
-            <ul>
-              <li>
-                <div class="ig-row">
-                  <div class="ig-row__layout">
-                    <a href="#" class="ig-title ellipses">Recording 1</a>
-                    <div class="ig-details">
-                      <div class="ellipses">09/09/2013</div>
-                      <div class="ellipses">57:34</div>
-                    </div>
-                    <div class="ig-button">
-                      <a class="btn btn-small" href="#">View</a>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="ig-row">
-                  <div class="ig-row__layout">
-                    <a href="#" class="ig-title ellipses">Recording 2</a>
-                    <div class="ig-details">
-                      <div class="ellipses">09/09/2013</div>
-                      <div class="ellipses">57:34</div>
-                     </div>
-                    <div class="ig-button">
-                     <a class="btn btn-small" href="#">View</a>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </li>
-        <li>
-          <div class="ig-row">
-            <div class="ig-row__layout">
-              <a class="ig-title ellipses" href="#">Some Conference</a>
-              <div class="ig-details">
-                <div class="ellipses">09/09/2013</div>
-                <div class="ellipses">57:34</div>
-              </div>
-              <div class="ig-button">
-                <a class="btn btn-small" href="#">View</a>
-              </div>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-
 </div>
 ```
 
@@ -342,7 +228,7 @@
   }
   @else {
     background-color: $wellBackground;
-    padding-bottom: 70px;  
+    padding-bottom: 70px;
   }
 
   .item-group-condensed {
@@ -408,7 +294,7 @@
     border-bottom-left-radius: $baseBorderRadius;
     border-bottom-right-radius: $baseBorderRadius;
     @if $use_new_styles {
-      &.ig-row-empty { border-bottom: 1px solid $ic-border-light; }  
+      &.ig-row-empty { border-bottom: 1px solid $ic-border-light; }
     }
     @else {
       border-bottom: 1px solid #c1c7cf;
@@ -459,10 +345,10 @@
     }
 
     .ig-sublist {
-      background-color: #f5f7f8;
+      background-color: $ic-bg-light-neutral;
       box-shadow: inset 0 1px 0 #f0f0f0;
-      border-top: 1px solid #e1e3e4;
-      border-bottom: 1px solid #e1e3e4;
+      border-top: 1px solid $ic-border-light;
+      border-bottom: 1px solid $ic-border-light;
 
       ul {
         list-style:none;
@@ -483,11 +369,11 @@
           box-shadow: none;
           margin: 0;
           border-bottom: 1px dotted #e1e2e3;
-          padding-top: $ic-sp/2; padding-bottom: $ic-sp/2;
+          padding-top: $ic-sp/2;
+          padding-bottom: $ic-sp/2;
+          padding-left: $ic-sp*2.5;
           .ig-title {
-            margin-left: 0;
-            color: #434343;
-            padding-left: 22px;
+            color: $ic-font-color-dark;
           }
         }
       }

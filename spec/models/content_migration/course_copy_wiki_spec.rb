@@ -48,6 +48,20 @@ describe ContentMigration do
       expect(@copy_to.wiki.wiki_pages.where(url: "online-unit-pages").first!.body).to eq %{<a href="/courses/#{@copy_to.id}/#{@copy_to.wiki.path}/#{main_page.url}">whoa</a>}
     end
 
+    it "should keep assignment relationship" do
+      vanilla_page_from = @copy_from.wiki.wiki_pages.create!(title: "Everyone Sees This Page")
+      wiki_page_assignment_model(course: @copy_from, title: "conditional page")
+
+      run_course_copy
+
+      page_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(@page)).take!
+      asg_to = @copy_to.assignments.where(migration_id: mig_id(@assignment)).take!
+      expect(asg_to.wiki_page).to eq page_to
+
+      vanilla_page_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(vanilla_page_from)).take!
+      expect(vanilla_page_to.assignment).to be_nil
+    end
+
     context "wiki front page" do
       it "should copy wiki front page setting if there is no front page" do
         fake_front_page = @copy_from.wiki.wiki_pages.create!(:title => "Front Page")

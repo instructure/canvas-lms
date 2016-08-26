@@ -7,7 +7,7 @@ if CANVAS_RAILS4_0
   gem 'tzinfo', '0.3.43'
   gem 'foreigner', '0.9.2'
 else
-  gem 'rails', '4.2.6'
+  gem 'rails', '4.2.7.1'
   gem 'rack', '1.6.4'
   gem 'builder', '3.1.4'
   gem 'protected_attributes', '1.1.3'
@@ -25,7 +25,7 @@ gem 'authlogic', '3.4.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.5.13'
+gem 'switchman', '1.5.18'
 gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
@@ -56,7 +56,7 @@ gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.1.0.beta.3', require: 'ims'
 gem 'json', '1.8.2'
-gem 'oj', '2.14.1'
+gem 'oj', '2.17.1'
 gem 'jwt', '1.2.1', require: false
 gem 'json-jwt', '1.5.1', require: false
 gem 'twilio-ruby', '4.2.1'

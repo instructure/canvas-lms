@@ -50,7 +50,7 @@ define [
       this.el.href = '#' # for keyboard accessibility
       $(this.el).attr("title", I18n.t("editor_help_link", "Open Help Menu"))
 
-      $('<i class="icon-info" />').appendTo(this.el)
+      $('<i class="icon-keyboard-shortcuts" aria-hidden="true" />').appendTo(this.el)
       $('<span class="screenreader-only" />')
         .text(I18n.t('dialog_title', 'Keyboard Shortcuts'))
         .appendTo(this.el)

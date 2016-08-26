@@ -1,7 +1,7 @@
 define(function(require) {
   var Subject = require('jsx!views/questions/answer_table');
   var $ = require('canvas_packages/jquery');
-  var React = require('react');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var d3 = require('d3');
 
   describe('Views.Questions.AnswerTable', function() {

@@ -59,9 +59,31 @@
       &.has_event { background-color: #ccc; }
       &.today { background-color: #F1F1DD; }
     }
-    
+    .event_link_text, .today_text, .previous_month_text, .next_month_text {
+      display: none;
+    }
     &.other_month { color: #888; }
     &:hover, &.related, &.drop_target { background-image: url("/images/4_percent_opacity.png"); }
     &.drop_target { background-color: #aaa; }
+  }
+  .day.today {
+      .today_text {
+          display: block;
+      }
+  }
+  .day.previous_month {
+      .previous_month_text {
+          display: block;
+      }
+  }
+  .day.next_month {
+      .next_month_text {
+          display: block;
+      }
+  }
+  .day.has_event {
+    .event_link_text {
+      display: block;
+    }
   }
 }

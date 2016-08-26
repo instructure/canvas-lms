@@ -9,6 +9,7 @@ RUN  apt-get update -qq \
        libxmlsec1-dev \
        unzip \
        fontforge \
+       python-lxml \
   && npm install -g gulp \
   && rm -rf /var/lib/apt/lists/*
 
@@ -29,3 +30,4 @@ RUN mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 WORKDIR /usr/src/app
 
 ENV RAILS_ENV development
+ENV NGINX_MAX_UPLOAD_SIZE 10g

@@ -1112,6 +1112,29 @@ describe SIS::CSV::UserImporter do
     expect(gm.workflow_state).to eq 'deleted'
   end
 
+  it 'removes account memberships when a user is deleted' do
+    @badmin = user_with_managed_pseudonym(:name => 'bad admin', :account => @account, :sis_user_id => 'badmin')
+    tie_user_to_account(@badmin, :account => @account)
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "badmin,badmin,Bad,Admin,badmin@example.com,deleted"
+    )
+    @badmin.reload
+    expect(@badmin.account_users).to be_empty
+  end
+
+  it 'removes subaccount memberships when a user is deleted' do
+    @subaccount = @account.sub_accounts.create! name: 'subbie'
+    @badmin = user_with_managed_pseudonym(:name => 'bad admin', :account => @subaccount, :sis_user_id => 'badmin')
+    tie_user_to_account(@badmin, :account => @subaccount)
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "badmin,badmin,Bad,Admin,badmin@example.com,deleted"
+    )
+    @badmin.reload
+    expect(@badmin.account_users).to be_empty
+  end
+
   context 'account associations' do
     before(:each) do
       process_csv_data_cleanly(

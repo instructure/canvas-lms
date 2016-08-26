@@ -1969,6 +1969,16 @@ describe User do
         expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
       end
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "includes assignments from other shards" do
+        student = @shard1.activate { user }
+        assignment = create_course_with_assignment_needing_submitting(student: student, override: true)
+        expect(student.assignments_needing_submitting).to eq [assignment]
+      end
+    end
   end
 
   describe "submissions_needing_peer_review" do

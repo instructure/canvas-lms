@@ -222,16 +222,16 @@ module AssignmentOverridesSeleniumHelper
     prepare_vdd_scenario
 
     @teacher1 = user_with_pseudonym(username: 'teacher1@example.com', active_all: 1)
-    @course.enroll_teacher(@teacher1, section: @section_a)
-    @course.enroll_teacher(@teacher1, section: @section_b)
+    @course.enroll_teacher(@teacher1, section: @section_a).accept!
+    @course.enroll_teacher(@teacher1, section: @section_b, allow_multiple_enrollments: true).accept!
   end
 
   def prepare_vdd_scenario_for_ta
     prepare_vdd_scenario
 
     @ta1 = user_with_pseudonym(username: 'ta1@example.com', active_all: 1)
-    @course.enroll_ta(@ta1, section: @section_a)
-    @course.enroll_ta(@ta1, section: @section_b)
+    @course.enroll_ta(@ta1, section: @section_a).accept!
+    @course.enroll_ta(@ta1, section: @section_b, allow_multiple_enrollments: true).accept!
   end
 
   def create_quiz_with_vdd

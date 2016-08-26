@@ -6,13 +6,19 @@
 
 <div class="rs-margin-all">
   <% if show_course %>
-    <a href="#" role="button" class="add_course_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t(:add_course_link, "Add a New Course") %></a>
+    <a href="#" role="button" class="add_course_link Button button-sidebar-wide">
+      <span aria-hidden="true"><i class="icon-plus"></i> <%= t(:add_course_link, "New Course") %></span>
+      <span class="screenreader-only"><%= t('Add a New Course') %></span>
+    </a>
   <% end %>
   <% if show_user %>
-    <a href="#" role="button" class="add_user_link btn button-sidebar-wide"><i class="icon-user-add"></i> <%= t(:add_user_link, "Add a New User") %></a>
+    <a href="#" role="button" class="add_user_link Button button-sidebar-wide" aria-label="<%= t('Add a New User') %>">
+      <span aria-hidden="true"><i class="icon-plus"></i> <%= t(:add_user_link, "New User") %></span>
+      <span class="screenreader-only"><%= t('Add a New User') %></span>
+    </a>
   <% end %>
   <% account_custom_links.each do |link| %>
-    <a href="<%= link[:url] %>" role="button" class="btn button-sidebar-wide"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
+    <a href="<%= link[:url] %>" role="button" class="Button button-sidebar-wide"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
   <% end %>
 </div>
 

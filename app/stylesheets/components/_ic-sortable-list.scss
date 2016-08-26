@@ -1,0 +1,86 @@
+.ic-Sortable-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ic-Sortable-item {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: $ic-sp * 0.75;
+  border: 1px solid $ic-border-light;
+  border-bottom: none;
+  background-color: $ic-color-light;
+
+  &:first-of-type {
+    border-top-left-radius: $borderRadius;
+    border-top-right-radius: $borderRadius;
+  }
+
+  &:last-of-type {
+    border-bottom-left-radius: $borderRadius;
+    border-bottom-right-radius: $borderRadius;
+    border-bottom: 1px solid $ic-border-light;
+  }
+
+  &.ic-Sortable-item--new-item {
+    padding: $ic-sp ($ic-sp*1.5) ($ic-sp*1.5);
+    display: block;
+
+    .ic-Sortable-item__Actions {
+      justify-content: flex-end;
+    }
+  }
+
+  button[aria-disabled] {
+    opacity: 0.5;
+  }
+
+}
+
+.ic-Sortable-list-add-new {
+  margin-top: $ic-sp;
+
+  .ui-menu {
+    min-width: 250px;
+  }
+
+  .ui-menu-item a.disabled {
+    opacity: 0.75;
+  }
+
+  .ui-menu-item a.disabled.ui-state-focus {
+    border-width: 0;
+    font-weight: 500 !important;
+  }
+}
+
+.ic-Sortable-item__Text {
+  flex: 1;
+  padding-right: $ic-sp*2;
+  line-height: $ic-label-line-height;
+  user-select: none;
+}
+
+.ic-Sortable-item__Actions {
+  display: flex;
+  align-items: center;
+}
+
+.ic-Sortable-sort-controls {
+  @include overwrite-default-icon-size(1.25rem);
+  margin-right: $ic-sp;
+}
+
+.ic-Sortable-sort-controls__button {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.ic-Sortable-item__Add-link-fieldset {
+  margin: 0;
+  > *:last-child {
+    margin-bottom: 0;
+  }
+}

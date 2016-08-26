@@ -130,11 +130,16 @@ define([
         if($month.hasClass('mini_month')) {
           $div = $day;
         }
-        $div.removeClass('current_month other_month today');
+        $div.removeClass('current_month other_month next_month previous_month today');
         if(month == firstDayOfMonth.month) {
           $div.addClass('current_month');
         } else {
           $div.addClass('other_month');
+          if(firstDayOfMonth.month == (month + 1) % 12) {
+            $div.addClass('previous_month');
+          } else {
+            $div.addClass('next_month');
+          }
         }
         if(month == today.month && day == today.day && year == today.year) {
           $div.addClass('today');

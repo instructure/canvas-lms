@@ -9,6 +9,7 @@ require [
   'underscore'
   'Backbone'
   'react'
+  'react-dom'
   'jsx/discussion_topics/DiscussionTopicKeyboardShortcutModal'
   'compiled/models/Entry'
   'compiled/models/Topic'
@@ -20,7 +21,7 @@ require [
   'rubricEditBinding'     # sets up event listener for 'rubricEditDataReady'
   'compiled/jquery/sticky'
   'compiled/jquery/ModuleSequenceFooter'
-], (I18n, EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, React, DiscussionTopicKeyboardShortcutModal, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, DiscussionTopicToolbarView, TopicView, EntriesView) ->
+], (I18n, EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, React, ReactDOM, DiscussionTopicKeyboardShortcutModal, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, DiscussionTopicToolbarView, TopicView, EntriesView) ->
 
   descendants = 5
   children    = 10
@@ -40,7 +41,7 @@ require [
 
   discussionTopicToolbarView = new DiscussionTopicToolbarView(el: '#discussion-managebar')
 
-  React.render(
+  ReactDOM.render(
     React.createElement(DiscussionTopicKeyboardShortcutModal),
     document.getElementById('keyboard-shortcut-modal')
   )

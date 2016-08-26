@@ -377,6 +377,8 @@
             <xs:element name="description" type="xs:string" minOccurs="0"/>
             <xs:element name="points_possible" type="xs:float" minOccurs="0"/>
             <xs:element name="mastery_points" type="xs:float" minOccurs="0"/>
+            <xs:element name="calculation_method" type="xs:string" minOccurs="0"/>
+            <xs:element name="calculation_int" type="xs:integer" minOccurs="0"/>
             <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
             <xs:element name="external_identifier" type="xs:string" minOccurs="0"/>
             <xs:element name="is_global_outcome" type="xs:boolean" minOccurs="0"/>

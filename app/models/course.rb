@@ -106,6 +106,7 @@ class Course < ActiveRecord::Base
   has_many :prior_enrollments, -> { preload(:user, :course).where(workflow_state: 'completed') }, class_name: 'Enrollment'
   has_many :prior_users, :through => :prior_enrollments, :source => :user
   has_many :students, :through => :student_enrollments, :source => :user
+  has_many :gradable_students, through: :gradable_student_enrollments, source: :user
   has_many :admin_visible_students, :through => :admin_visible_student_enrollments, :source => :user
 
   has_many :self_enrolled_students, -> { where("self_enrolled") }, through: :student_enrollments, source: :user
@@ -114,6 +115,7 @@ class Course < ActiveRecord::Base
   has_many :participating_students, -> { where(enrollments: { type: ['StudentEnrollment', 'StudentViewEnrollment'], workflow_state: 'active' }) }, through: :enrollments, source: :user
   has_many :student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :admin_visible_student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
+  has_many :gradable_student_enrollments, -> { where(enrollments: { workflow_state: ['active', 'inactive'], type: ['StudentEnrollment', 'StudentViewEnrollment'] }).preload(:user) }, class_name: 'Enrollment'
   has_many :all_student_enrollments, -> { where("enrollments.workflow_state<>'deleted' AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :all_accepted_student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :all_real_users, :through => :all_real_enrollments, :source => :user
@@ -226,6 +228,7 @@ class Course < ActiveRecord::Base
   before_save :touch_root_folder_if_necessary
   before_validation :verify_unique_ids
   validate :validate_course_dates
+  validate :validate_course_image
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
@@ -379,6 +382,40 @@ class Course < ActiveRecord::Base
       false
     else
       true
+    end
+  end
+
+  def validate_course_image
+    if self.image_url.present? && self.image_id.present?
+      self.errors.add(:image, t("image_url and image_id cannot both be set."))
+      false
+    elsif self.image_id.present? && valid_course_image_id?(self.image_id)
+      true
+    elsif self.image_url.present? && valid_course_image_url?(self.image_url)
+      true
+    else
+      if self.image_id.present?
+        self.errors.add(:image_id, t("image_id is not a valid ID"))
+      elsif self.image_url.present?
+        self.errors.add(:image_url, t("image_url is not a valid URL"))
+      end
+      false
+    end
+  end
+
+  def valid_course_image_id?(image_id)
+    image_id.match(Api::ID_REGEX).present?
+  end
+
+  def valid_course_image_url?(image_url)
+    URI.parse(image_url) rescue false
+  end
+
+  def image
+    if self.image_id.present?
+      self.attachments.active.where(id: self.image_id).first.download_url rescue nil
+    elsif self.image_url
+      self.image_url
     end
   end
 
@@ -806,14 +843,25 @@ class Course < ActiveRecord::Base
     self.shard.activate do
       if self.workflow_state_changed?
         if self.completed?
-          Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).update_all(:workflow_state => 'completed', :completed_at => Time.now.utc)
+          enrollment_ids = Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).pluck(:id)
+          if enrollment_ids.any?
+            Enrollment.where(:id => enrollment_ids).update_all(:workflow_state => 'completed', :completed_at => Time.now.utc)
+            EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(:state => 'completed', :state_is_current => true, :access_is_current => false)
+            EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_ids) # recalculate access
+          end
+
           appointment_participants.active.current.update_all(:workflow_state => 'deleted')
           appointment_groups.each(&:clear_cached_available_slots!)
         elsif self.deleted?
           enroll_scope = Enrollment.where("course_id=? AND workflow_state<>'deleted'", self)
+
           user_ids = enroll_scope.group(:user_id).pluck(:user_id).uniq
           if user_ids.any?
-            enroll_scope.update_all(:workflow_state => 'deleted')
+            enrollment_ids = enroll_scope.pluck(:id)
+            if enrollment_ids.any?
+              Enrollment.where(:id => enrollment_ids).update_all(:workflow_state => 'deleted')
+              EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(:state => 'deleted', :state_is_current => true)
+            end
             User.send_later_if_production(:update_account_associations, user_ids)
           end
         end
@@ -824,9 +872,8 @@ class Course < ActiveRecord::Base
         Enrollment.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
       end
 
-      Enrollment.where(:course_id => self).update_all(:updated_at => Time.now.utc)
-      User.where(id: Enrollment.where(course_id: self).select(:user_id)).
-          update_all(updated_at: Time.now.utc)
+      Enrollment.where(:course_id => self).touch_all
+      User.where(id: Enrollment.where(course_id: self).select(:user_id)).touch_all
     end
   end
 
@@ -1159,7 +1206,7 @@ class Course < ActiveRecord::Base
     # Prior users
     given do |user|
       (available? || completed?) && user &&
-        prior_enrollments.for_user(user).any?{|e| !e.inactive?}
+        prior_enrollments.for_user(user).preload(:enrollment_state).any?{|e| !e.inactive?}
     end
     can :read, :read_outcomes
 
@@ -1180,7 +1227,7 @@ class Course < ActiveRecord::Base
 
       given do |user|
         !self.deleted? && user &&
-          (prior_enrollments.for_user(user).any?{|e| !e.inactive? && e.has_permission_to?(permission) && (!applicable_roles || applicable_roles.include?(e.type))} ||
+          (prior_enrollments.for_user(user).preload(:enrollment_state).any?{|e| !e.inactive? && e.has_permission_to?(permission) && (!applicable_roles || applicable_roles.include?(e.type))} ||
             user.cached_not_ended_enrollments.any? do |e|
               e.course_id == self.id && e.completed? && e.has_permission_to?(permission) && (!applicable_roles || applicable_roles.include?(e.type))
             end
@@ -1203,7 +1250,7 @@ class Course < ActiveRecord::Base
     # Student of a concluded course
     given do |user|
       (self.available? || self.completed?) && user &&
-        (prior_enrollments.for_user(user).any?{|e| !e.inactive? && (e.student? || e.assigned_observer?) } ||
+        (prior_enrollments.for_user(user).preload(:enrollment_state).any?{|e| (e.student? || e.assigned_observer?) && !e.inactive?} ||
          user.cached_not_ended_enrollments.any? do |e|
           e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed
          end
@@ -1250,7 +1297,8 @@ class Course < ActiveRecord::Base
     is_unpublished = self.created? || self.claimed?
     @enrollment_lookup ||= {}
     @enrollment_lookup[user.id] ||= shard.activate do
-      self.enrollments.active_or_pending.for_user(user).reject { |e| (is_unpublished && !(e.admin? || e.fake_student?)) || [:inactive, :completed].include?(e.state_based_on_date)}
+      self.enrollments.active_or_pending.for_user(user).preload(:enrollment_state).
+        reject { |e| (is_unpublished && !(e.admin? || e.fake_student?)) || [:inactive, :completed].include?(e.state_based_on_date)}
     end
 
     @enrollment_lookup[user.id].any? {|e| (allow_future || e.state_based_on_date == :active) && e.has_permission_to?(permission) }
@@ -2356,18 +2404,7 @@ class Course < ActiveRecord::Base
   def external_tool_tabs(opts)
     tools = self.context_external_tools.active.having_setting('course_navigation')
     tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain).to_a
-    tools.sort_by(&:id).map do |tool|
-     {
-        :id => tool.asset_string,
-        :label => tool.label_for(:course_navigation, opts[:language] || I18n.locale),
-        :css_class => tool.asset_string,
-        :href => :course_external_tool_path,
-        :visibility => tool.course_navigation(:visibility),
-        :external => true,
-        :hidden => tool.course_navigation(:default) == 'disabled',
-        :args => [self.id, tool.id]
-     }
-    end
+    Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
   end
 
   def tabs_available(user=nil, opts={})
@@ -2521,6 +2558,7 @@ class Course < ActiveRecord::Base
     setting = setting.to_sym
     settings_options[setting] = opts
     cast_expression = "val.to_s"
+    cast_expression = "val" if opts[:arbitrary]
     if opts[:boolean]
       opts[:default] ||= false
       cast_expression = "Canvas::Plugin.value_to_boolean(val)"
@@ -2572,11 +2610,15 @@ class Course < ActiveRecord::Base
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
   add_setting :course_format
+  add_setting :image_id
+  add_setting :image_url
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
 
   add_setting :restrict_student_future_view, :boolean => true, :inherited => true
   add_setting :restrict_student_past_view, :boolean => true, :inherited => true
+
+  add_setting :timetable_data, :arbitrary => true
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
@@ -2655,7 +2697,7 @@ class Course < ActiveRecord::Base
   def participating_users(user_ids)
     enrollments = self.enrollments.eager_load(:user).
       where(:enrollments => {:workflow_state => 'active'}, :users => {:id => user_ids}).to_a
-    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+    Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments.select { |e| e.active? }.map(&:user).uniq
   end
 

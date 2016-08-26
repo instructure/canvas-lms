@@ -19,9 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GradeCalculator do
+  before :once do
+    course_with_student active_all: true
+  end
+
   context "computing grades" do
     it "should compute grades without dying" do
-      course_with_student
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
       @assignment2 = @course.assignments.create!(:title => "Some Assignment2", :points_possible => 10, :assignment_group => @group)
@@ -31,7 +34,6 @@ describe GradeCalculator do
     end
 
     it "should recompute when an assignment's points_possible changes'" do
-      course_with_student
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
       @submission = @assignment.grade_student(@user, :grade => "5")
@@ -41,12 +43,11 @@ describe GradeCalculator do
       @assignment.points_possible = 5
       @assignment.save!
 
-      expect(@user.enrollments.first.computed_current_score).to eql(50.0)
-      expect(@user.enrollments.first.computed_final_score).to eql(50.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(100.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(100.0)
     end
 
     it "should recompute when an assignment group's weight changes'" do
-      course_with_student
       @course.group_weighting_scheme = "percent"
       @course.save
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 50)
@@ -68,7 +69,6 @@ describe GradeCalculator do
     end
 
     it "recomputes when an assignment is flagged as omit from final grade" do
-      course_with_student
       @group = @course.assignment_groups.create!(name: "some group", group_weight: 100)
       assignment = @course.assignments.create!(
         title: "Some Assignment",
@@ -97,8 +97,41 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_final_score).to eql(50.0)
     end
 
+    it "recomputes when an assignment changes assignment groups" do
+      @course.update_attribute :group_weighting_scheme, "percent"
+      ag1 = @course.assignment_groups.create! name: "Group 1", group_weight: 80
+      ag2 = @course.assignment_groups.create! name: "Group 2", group_weight: 20
+      a1 = ag1.assignments.create! points_possible: 10, name: "Assignment 1",
+             context: @course
+      a2 = ag2.assignments.create! points_possible: 10, name: "Assignment 2",
+             context: @course
+
+      a1.grade_student(@student, grade: 0)
+      a2.grade_student(@student, grade: 10)
+
+      enrollment = @student.enrollments.first
+
+      expect(enrollment.computed_final_score).to eq 20
+
+      a2.update_attributes assignment_group: ag1
+      expect(enrollment.reload.computed_final_score).to eq 50
+    end
+
+    it "recomputes during #run_if_overrides_changed!" do
+      a = @course.assignments.create! name: "Foo", points_possible: 10,
+            context: @assignment
+      a.grade_student(@student, grade: 10)
+
+      e = @student.enrollments.first
+      expect(e.computed_final_score).to eq 100
+
+      Submission.update_all(score: 5, grade: 5)
+      a.only_visible_to_overrides = true
+      a.run_if_overrides_changed!
+      expect(e.reload.computed_final_score).to eq 50
+    end
+
     def two_groups_two_assignments(g1_weight, a1_possible, g2_weight, a2_possible)
-      course_with_student
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => g1_weight)
       @assignment = @group.assignments.build(:title => "some assignments", :points_possible => a1_possible)
       @assignment.context = @course
@@ -289,7 +322,6 @@ describe GradeCalculator do
     end
 
     it "should properly calculate the grade when there are 'not graded' assignments with scores" do
-      course_with_student
       @group = @course.assignment_groups.create!(:name => "some group")
       @assignment = @group.assignments.build(:title => "some assignments", :points_possible => 10)
       @assignment.context = @course
@@ -306,7 +338,6 @@ describe GradeCalculator do
     end
 
     def two_graded_assignments
-      course_with_student
       @group = @course.assignment_groups.create!(:name => "some group")
       @assignment = @group.assignments.build(:title => "some assignments", :points_possible => 5)
       @assignment.context = @course
@@ -350,7 +381,6 @@ describe GradeCalculator do
     end
 
     def nil_graded_assignment
-      course_with_student
       @group = @course.assignment_groups.create!(:name => "group2", :group_weight => 50)
       @assignment_1 = @group.assignments.build(:title => "some assignments", :points_possible => 10)
       @assignment_1.context = @course
@@ -403,7 +433,6 @@ describe GradeCalculator do
     end
 
     it "ignores pending_review submissions" do
-      course_with_student(active_all: true)
       a1 = @course.assignments.create! name: "fake quiz", points_possible: 50
       a2 = @course.assignments.create! name: "assignment", points_possible: 50
 
@@ -428,7 +457,6 @@ describe GradeCalculator do
   end
 
   it "should return grades in the order they are requested" do
-    course_with_student
     @student1 = @student
     student_in_course
     @student2 = @student
@@ -447,7 +475,6 @@ describe GradeCalculator do
   end
 
   it "returns point information for unweighted courses" do
-    course_with_student
     a = @course.assignments.create! :points_possible => 50
     a.grade_student @student, :grade => 25
     calc = GradeCalculator.new([@student.id], @course)
@@ -458,7 +485,6 @@ describe GradeCalculator do
   # We should keep this in sync with GradeCalculatorSpec.coffee
   context "GradeCalculatorSpec.coffee examples" do
     before do
-      course_with_student
       @group = @group1 = @course.assignment_groups.create!(:name => 'group 1')
     end
 

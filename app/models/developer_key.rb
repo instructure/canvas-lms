@@ -28,14 +28,15 @@ class DeveloperKey < ActiveRecord::Base
   has_many :page_views
   has_many :access_tokens
 
-  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :email, :event, :auto_expire_tokens
+  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :redirect_uris, :email, :event, :auto_expire_tokens
 
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
   before_save :nullify_empty_icon_url
   after_save :clear_cache
 
-  validates_as_url :redirect_uri
+  validates_as_url :redirect_uri, allowed_schemes: nil
+  validate :validate_redirect_uris
 
   scope :nondeleted, -> { where("workflow_state<>'deleted'") }
 
@@ -47,6 +48,22 @@ class DeveloperKey < ActiveRecord::Base
       event :activate, transitions_to: :active
     end
     state :deleted
+  end
+
+  def redirect_uris=(value)
+    value = value.split if value.is_a?(String)
+    super(value)
+  end
+
+  def validate_redirect_uris
+    uris = redirect_uris.map do |value|
+      value, _ = CanvasHttp.validate_url(value, allowed_schemes: nil)
+      value
+    end
+
+    self.redirect_uris = uris unless uris == redirect_uris
+  rescue URI::Error, ArgumentError
+    errors.add :redirect_uris, 'is not a valid URI'
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -119,9 +136,16 @@ class DeveloperKey < ActiveRecord::Base
   # verify that the given uri has the same domain as this key's
   # redirect_uri domain.
   def redirect_domain_matches?(redirect_uri)
+    return true if redirect_uris.include?(redirect_uri)
+
+    # legacy deprecated
     self_domain = URI.parse(self.redirect_uri).host
     other_domain = URI.parse(redirect_uri).host
-    return self_domain.present? && other_domain.present? && (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
+    result = self_domain.present? && other_domain.present? && (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
+    if result && redirect_uri != self.redirect_uri
+      Rails.logger.info("Allowed lenient OAuth redirect uri #{redirect_uri} on developer key #{global_id}")
+    end
+    result
   rescue URI::Error
     return false
   end

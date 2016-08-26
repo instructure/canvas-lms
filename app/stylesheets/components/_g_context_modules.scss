@@ -55,18 +55,6 @@ $context_module_bg_color: #f2f3f4;
   .ig-row {
     display: flex;
     align-items: center;
-  }
-  .ig-details {
-    .due_date_display {
-      text-align: center;
-      @include breakpoint(desktop) {
-        text-align: right;
-      }
-    }
-
-    .points_possible_display {
-      text-align: center;
-    }
 
     .module-item-status-icon {
       width: 16px;
@@ -75,8 +63,26 @@ $context_module_bg_color: #f2f3f4;
       .icon-mark-as-read {
         opacity: 0.4;
       }
+
+      + .ig-admin {
+        margin-left: $ic-sp;
+      }
+    }
+
+    // if there is going to be nothing in the
+    // .requirement-description.ig-details__item
+    // element, suppress the pipe of the
+    // .ig-details__item before it. (The element
+    // can't be removed bc it might be updated via js.)
+    &:not(.with-completion-requirements) {
+      .ig-details__item:nth-last-child(2) {
+        &:after {
+          display: none;
+        }
+      }
     }
   }
+
   h2 .name {
     display: inline;
     position: absolute;
@@ -299,7 +305,6 @@ $context_module_bg_color: #f2f3f4;
     }
   }
   .type_icon {
-    display: inline-block;
     i {
       color: #777;
       display: none;
@@ -430,8 +435,6 @@ $context_module_bg_color: #f2f3f4;
     }
   }
   .module_item_icons {
-    vertical-align: top;
-    padding-top: 2px;
     text-align: left;
     white-space: nowrap;
     width: 3.2em;
@@ -460,13 +463,6 @@ $context_module_bg_color: #f2f3f4;
 
 .context_module_item {
   .item_name {
-    vertical-align: top;
-    .title {
-      padding-left: 5px;
-      padding-top: 5px;
-      padding-bottom: 5px;
-      font-size: 0.9em;
-    }
     .locked_title {
       display: none;
     }
@@ -490,13 +486,19 @@ $context_module_bg_color: #f2f3f4;
     .type_icon {
       width: 0px;
     }
+    .ig-type-icon {
+      display: none;
+    }
+    .ig-info {
+      margin-left: $ic-sp/4;
+    }
     .criterion img {
       display: none;
     }
     .locked_title {
+      @include fontSize($ic-font-size--medium);
       display: inline;
-      font-weight: bold;
-      color: #888;
+      font-weight: $ic-font-weight;
     }
   }
   .links {

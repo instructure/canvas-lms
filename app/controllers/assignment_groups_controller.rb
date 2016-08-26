@@ -370,7 +370,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def filter_assignments_by_grading_period(assignments, course)
-    grading_period = GradingPeriod.context_find(course, params.fetch(:grading_period_id))
+    grading_period = GradingPeriod.for(course).find_by(id: params.fetch(:grading_period_id))
     return assignments unless grading_period
 
     if params[:scope_assignments_to_student] &&

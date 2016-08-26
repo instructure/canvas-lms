@@ -471,40 +471,14 @@ module Api
 
     rewriter = UserContent::HtmlRewriter.new(context, user)
     rewriter.set_handler('files') do |match|
-      if match.obj_id
-        obj   = preloaded_attachments[match.obj_id]
-        obj ||= if context.is_a?(User) || context.nil?
-                  Attachment.where(id: match.obj_id).first
-                else
-                  context.attachments.find_by_id(match.obj_id)
-                end
-      end
-
-      unless obj && !obj.deleted? && ((is_public && !obj.locked_for?(user)) || user_can_download_attachment?(obj, context, user))
-        if obj && obj.previewable_media? && (uri = URI.parse(match.url) rescue nil)
-          uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
-          next uri.to_s
-        else
-          next
-        end
-      end
-
-      if ["Course", "Group", "Account", "User"].include?(obj.context_type)
-        opts = {:only_path => true}
-        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app? && !is_public
-        if match.rest.start_with?("/preview")
-          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, opts)
-        else
-          opts[:download] = '1'
-          opts[:wrap] = '1' if match.rest.include?('wrap=1')
-          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, opts)
-        end
-      else
-        opts = {:download => '1', :only_path => true}
-        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app? && !is_public
-        url = file_download_url(obj.id, opts)
-      end
-      url
+      UserContent::FilesHandler.new(
+        match: match,
+        context: context,
+        user: user,
+        preloaded_attachments: preloaded_attachments,
+        is_public: is_public,
+        in_app: (respond_to?(:in_app?, true) && in_app?)
+      ).processed_url
     end
     html = rewriter.translate_content(html)
 

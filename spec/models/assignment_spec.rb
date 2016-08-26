@@ -1359,9 +1359,9 @@ describe Assignment do
         @assignment.points_possible = 30
         @assignment.save!
         @sub.reload
-        expect(@sub.score).to eql(22.8)
-        expect(@sub.grade).to eql('C')
-        expect(@enrollment.reload.computed_current_score).to eq 76.0
+        expect(@sub.score).to eql(15.2)
+        expect(@sub.grade).to eql('F')
+        expect(@enrollment.reload.computed_current_score).to eq 50.67
       end
 
       it "should accept lowercase letter grades" do
@@ -1404,9 +1404,9 @@ describe Assignment do
         @assignment.points_possible = 30
         @assignment.save!
         @sub.reload
-        expect(@sub.score).to eql(22.8)
-        expect(@sub.grade).to eql('2.0')
-        expect(@enrollment.reload.computed_current_score).to eq 76.0
+        expect(@sub.score).to eql(15.2)
+        expect(@sub.grade).to eql('0')
+        expect(@enrollment.reload.computed_current_score).to eq 50.67
       end
 
       it "should accept lowercase gpa grades" do
@@ -2932,7 +2932,7 @@ describe Assignment do
       it "preserves pass/fail grade when changing from 0 to positive points possible" do
         @assignment.grade_student(@user, :grade => 'pass')
         @assignment.points_possible = 1.0
-        @assignment.update_student_submissions(@assignment.points_possible_was)
+        @assignment.update_student_submissions
 
         submission.reload
         expect(submission.grade).to eql('complete')
@@ -2941,7 +2941,7 @@ describe Assignment do
       it "changes the score of 'complete' pass/fail submissions to match the assignment's possible points" do
         @assignment.grade_student(@user, :grade => 'pass')
         @assignment.points_possible = 3.0
-        @assignment.update_student_submissions(@assignment.points_possible_was)
+        @assignment.update_student_submissions
 
         submission.reload
         expect(submission.score).to eql(3.0)
@@ -2950,94 +2950,12 @@ describe Assignment do
       it "does not change the score of 'incomplete' pass/fail submissions if assignment points possible has changed" do
         @assignment.grade_student(@user, :grade => 'fail')
         @assignment.points_possible = 2.0
-        @assignment.update_student_submissions(@assignment.points_possible_was)
+        @assignment.update_student_submissions
 
         submission.reload
         expect(submission.score).to eql(0.0)
       end
-    end
 
-    context "percent assignments with initial 100 points possible" do
-      before :once do
-        setup_assignment_without_submission
-        @assignment.grading_type = "percent"
-        @assignment.points_possible = 100.0
-        @assignment.save
-      end
-
-      let(:submission) { @assignment.submissions.first }
-
-      it "preserves percent grade when changing to 10 points possible" do
-        @assignment.grade_student(@user, :grade => '70')
-        @assignment.points_possible = 10.0
-        @assignment.update_student_submissions(@assignment.points_possible_was)
-
-        submission.reload
-        expect(submission.grade).to eql('70%')
-      end
-
-      it "scales score when changing to 10 points possible" do
-        @assignment.grade_student(@user, :grade => '70')
-        @assignment.points_possible = 10.0
-        @assignment.update_student_submissions(@assignment.points_possible_was)
-
-        submission.reload
-        expect(submission.score).to eql(7.0)
-      end
-
-      it "preserves percent grade when changing to 200 points possible" do
-        @assignment.grade_student(@user, :grade => '70')
-        @assignment.points_possible = 200.0
-        @assignment.update_student_submissions(@assignment.points_possible_was)
-
-        submission.reload
-        expect(submission.grade).to eql('70%')
-      end
-
-      it "scales score when changing to 200 points possible" do
-        @assignment.grade_student(@user, :grade => '70')
-        @assignment.points_possible = 200.0
-        @assignment.update_student_submissions(@assignment.points_possible_was)
-
-        submission.reload
-        expect(submission.score).to eql(140.0)
-      end
-
-      it "changes the grade to 'complete' if positive score when changing type to pass/fail" do
-        @assignment.grade_student(@user, :grade => '70')
-        @assignment.grading_type = 'pass_fail'
-        @assignment.update_student_submissions(@assignment.points_possible_was)
-
-        submission.reload
-        expect(submission.grade).to eql('complete')
-      end
-
-      it "sets the max score if positive score when changing type to pass/fail" do
-        @assignment.grade_student(@user, :grade => '70')
-        @assignment.grading_type = 'pass_fail'
-        @assignment.update_student_submissions(@assignment.points_possible_was)
-
-        submission.reload
-        expect(submission.score).to eql(100.0)
-      end
-
-      it "changes the grade to 'fail' if 0 score when changing type to pass/fail" do
-        @assignment.grade_student(@user, :grade => '0')
-        @assignment.grading_type = 'pass_fail'
-        @assignment.update_student_submissions(@assignment.points_possible_was)
-
-        submission.reload
-        expect(submission.grade).to eql('incomplete')
-      end
-
-      it "preserves 0 score when changing type to pass/fail" do
-        @assignment.grade_student(@user, :grade => '0')
-        @assignment.grading_type = 'pass_fail'
-        @assignment.update_student_submissions(@assignment.points_possible_was)
-
-        submission.reload
-        expect(submission.score).to eql(0.0)
-      end
     end
   end
 
@@ -3300,6 +3218,24 @@ describe Assignment do
         g.map { |c| c.submission.user }.sort_by(&:id)
       }).to eq [[s1, s2]]
     end
+
+    it "excludes student names from filenames when anonymous grading is enabled" do
+      @course.enable_feature! :anonymous_grading
+
+      s1 = @students.first
+      sub = submit_homework(s1)
+
+      zip = zip_submissions
+      filename = Zip::File.new(zip.open).entries.map(&:name).first
+      expect(filename).to eq "#{s1.id}_#{sub.id}_homework.pdf"
+
+      comments, ignored = @assignment.generate_comments_from_files(
+        zip.open.path,
+        @teacher)
+
+      expect(comments.map { |g| g.map { |c| c.submission.user } }).to eq [[s1]]
+      expect(ignored).to be_empty
+    end
   end
 
   describe "#restore" do
@@ -3353,6 +3289,11 @@ describe Assignment do
     it "should update grades if workflow_state changes" do
       @assignment.context.expects(:recompute_student_scores).once
       @assignment.unpublish
+    end
+
+    it "updates when omit_from_final_grade changes" do
+      @assignment.context.expects(:recompute_student_scores).once
+      @assignment.update_attribute :omit_from_final_grade, true
     end
 
     it "should not update grades otherwise" do

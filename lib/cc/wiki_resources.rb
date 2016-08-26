@@ -38,6 +38,8 @@ module CC
           meta_fields[:workflow_state] = page.workflow_state
           meta_fields[:front_page] = page.is_front_page?
           meta_fields[:module_locked] = page.locked_by_module_item?(@user, true).present?
+          meta_fields[:assignment_identifier] =
+            page.for_assignment? ? CCHelper.create_key(page.assignment) : nil
 
           File.open(path, 'w') do |file|
             file << @html_exporter.html_page(page.body, page.title, meta_fields)
