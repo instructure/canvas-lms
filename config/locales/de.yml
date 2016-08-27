@@ -5552,7 +5552,7 @@ de:
     assignment_details: 
       available_from: "Verfügbar ab"
       due: Fällig
-      due_date: "fällig am %{date}"
+      due_date: "fällig um %{date}"
       for: Für
       graded_discussion_and_points: 
         one: "Dies ist eine benotete Diskussion: *1 Punkt möglich*"
@@ -5685,7 +5685,7 @@ de:
       first_page: Erste
       last_page: Letzte
     peer_reviews: 
-      due_date: "Fällig am %{date}"
+      due_date: "Fällig um %{date}"
       peer_review_alert: "Ihnen wurde eine Peer-Review für %{person} zugewiesen"
     points_possible_number: "Der Wert für die möglichen Punkte muss eine Zahl sein"
     published_button: 
@@ -5880,13 +5880,13 @@ de:
   dropdown_option_2_9766a346: "Dropdown-Option 2"
   due_a73610f6: Fällig
   due_assignment_due_date_time_5acdf3cf: "Fällig: %{assignment_due_date_time}"
-  due_assignment_due_date_time_607f2e1d: "fällig am: %{assignment_due_date_time}"
-  due_at_5d7d2fa: "Fällig am"
-  due_at_5e18eeac: "Fällig am:"
+  due_assignment_due_date_time_607f2e1d: "fällig um: %{assignment_due_date_time}"
+  due_at_5d7d2fa: "Fällig um"
+  due_at_5e18eeac: "Fällig um:"
   due_at_time_fa41cf6c: "Fällig um: %{time}"
-  due_by_c263dc10: "Fällig am"
+  due_by_c263dc10: "Fällig um"
   due_date_5d0a953c: "Abgabetermin:"
-  due_date_6a281fe3: "Fällig am: %{date}"
+  due_date_6a281fe3: "Fällig um: %{date}"
   due_date_822625d8: Abgabetermin
   due_date_cannot_be_after_course_end_fd128a14: "Der Abgabetermin kann nicht nach dem Kursende liegen"
   due_date_cannot_be_after_lock_date_675b30aa: "Abgabetermin kann nicht nach Sperrdatum liegen"
@@ -5902,16 +5902,16 @@ de:
     due_at: "fällig: %{assignment_due_date_time}"
     multiple_due_dates: "fällig: Mehrere Abgabetermine"
     no_due_date: "fällig: Kein Abgabetermin"
-  due_datetime_f5a81b81: "Fällig am: %{dateTime}"
-  due_dueat_39d7d6c2: "Fällig am %{dueAt}"
-  due_dueat_ef67f6f4: "Fällig am: %{dueAt}"
+  due_datetime_f5a81b81: "Fällig um: %{dateTime}"
+  due_dueat_39d7d6c2: "Fällig um %{dueAt}"
+  due_dueat_ef67f6f4: "Fällig um: %{dueAt}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Fällig - Format TT-MM-JJJJ hh:mm"
-  due_multiple_dates_cc0ee3f5: "Fällig am: Mehrere Daten"
+  due_multiple_dates_cc0ee3f5: "Fällig um: Mehrere Daten"
   due_multiple_dates_ea8a95e1: "fällig: Mehrere Termine"
   due_multiple_due_dates_d1b141b: "Fällig: Mehrere Fälligkeitsdaten"
   due_no_due_date_2b226d2c: "Fällig: Kein Fälligkeitsdatum"
   due_no_due_date_3c1d1651: "Fällig: kein Abgabetermin "
-  due_on_date_5ffb2182: "Fällig am"
+  due_on_date_5ffb2182: "Fällig um"
   due_time_9acd6b69: "Fällig um %{time}"
   duplicate_provider_provider_d9842134: "Provider %{provider} doppeln"
   e_c2991d1b: e
