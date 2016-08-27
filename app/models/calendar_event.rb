@@ -173,6 +173,9 @@ class CalendarEvent < ActiveRecord::Base
   scope :events_without_child_events, -> { where("NOT EXISTS (SELECT 1 FROM #{CalendarEvent.quoted_table_name} children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
   scope :events_with_child_events, -> { where("EXISTS (SELECT 1 FROM #{CalendarEvent.quoted_table_name} children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
 
+  scope :user_created, -> { where(:timetable_code => nil) }
+  scope :for_timetable, -> { where.not(:timetable_code => nil) }
+
   def validate_context!
     @validate_context = true
     context.validation_event_override = self

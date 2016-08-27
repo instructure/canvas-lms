@@ -13,7 +13,8 @@
     <span class="alert-label"><%= before_label :criteria, "Trigger an alert when" %></span>
     <ul class="criteria"></ul>
     <div class="add_criteria_line editing">
-      <select title="<%= t :criteria, "Trigger an alert when" %>"></select> <a href="#" class="add_criterion_link icon-add"><%= t 'buttons.add_criterion', "Add Trigger" %></a>
+      <select title="<%= t :criteria, "Trigger an alert when" %>"></select>
+      <a href="#" class="add_criterion_link icon-add" title="<%= t('Add Trigger') %>" aria-label="<%= t('Add Trigger') %>"><%= t 'buttons.add_criterion', "Trigger" %></a>
     </div>
   </div>
 
@@ -21,7 +22,8 @@
 	  <span class="alert-label"><%= before_label :recipients, "Send a notification to" %></span>
 	  <ul class="recipients"></ul>
 	  <div class="add_recipients_line editing">
-	    <select title="<%= t :recipients, "Send a notification to" %>"></select> <a href="#" class="add_recipient_link icon-add"><%= t 'buttons.add_recipient', "Add Recipient" %></a>
+	    <select title="<%= t :recipients, "Send a notification to" %>"></select>
+      <a href="#" class="add_recipient_link icon-add" title="<%= t('Add Recipient') %>" aria-label="<%= t('Add Recipient') %>"><%= t 'buttons.add_recipient', "Recipient" %></a>
 	  </div>
   </div>
 
@@ -34,7 +36,7 @@
   </div>
 
   <div class="form-actions">
-    <button class="editing btn cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
-    <button type="submit" class="editing btn btn-primary submit_button"><%= t('buttons.save_alert', "Save Alert") %></button>
+    <button class="editing Button cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+    <button type="submit" class="editing Button Button--primary submit_button"><%= t('buttons.save_alert', "Save Alert") %></button>
   </div>
 <% end %>

@@ -99,4 +99,7 @@ define [
         base.selector  = @model.get("id")
         base.link_text = @messages.multipleDates
         base.link_href = @model.get("url")
+
+      base.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
+      base.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
       base

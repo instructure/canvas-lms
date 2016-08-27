@@ -100,7 +100,7 @@ describe "links", priority: "2" do
         expect_new_page_load {
           if ENV['CANVAS_FORCE_USE_NEW_STYLES']
             f('#global_nav_profile_link').click
-            fj('a.ReactTray-list-item__link:contains("Settings")').click
+            fj('a.ic-NavMenu-list-item__link:contains("Settings")').click
           else
             fj('#identity a:contains("Settings")').click
           end

@@ -21,7 +21,7 @@ require [
   options =
     permissions: ENV.PERMISSIONS,
     accountId: ENV.ACCOUNT_ID.toString()
-    roles: ENV.ALL_ROLES
+    roles: ENV.COURSE_ROLES
     addUserUrls: ENV.URLS
     store: store
 

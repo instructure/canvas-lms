@@ -249,10 +249,6 @@ class StreamItem < ActiveRecord::Base
     res = StreamItem.generate_or_update(object)
     prepare_object_for_unread(object)
 
-    # set the hidden flag if an assignment and muted
-    hidden = object.is_a?(Submission) && object.assignment.muted? ? true : false
-
-
     l_context_type = res.context_type
     Shard.partition_by_shard(user_ids) do |user_ids_subset|
       #these need to be determined per shard
@@ -267,11 +263,17 @@ class StreamItem < ActiveRecord::Base
         {
           :stream_item_id => stream_item_id,
           :user_id => user_id,
-          :hidden => hidden,
+          :hidden => false,
           :workflow_state => object_unread_for_user(object, user_id),
           :context_type => l_context_type,
           :context_id => l_context_id,
         }
+      end
+      if object.is_a?(Submission) && object.assignment.muted?
+        # set the hidden flag if an assignment and muted (for the owner of the submission)
+        if owner_insert = inserts.detect{|i| i[:user_id] == object.user_id}
+          owner_insert[:hidden] = true
+        end
       end
 
       StreamItemInstance.unique_constraint_retry do

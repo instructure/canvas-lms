@@ -36,6 +36,7 @@ describe "gradebook2" do
       end
 
       it "maintains focus on export button during past csv export", priority: "2", test_id: 720460 do
+        wait_for_ajaximations
         f('#csv_export_options .ui-menu-item:not(.generate_new_csv)').click
 
         expect(active_element).to have_attribute('id', 'download_csv')

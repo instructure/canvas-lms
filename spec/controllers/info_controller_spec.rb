@@ -55,5 +55,44 @@ describe InfoController do
       get 'help_links'
       expect(I18n.locale.to_s).to eq 'es'
     end
+
+    it "should filter the links based on the current user's role" do
+      account = Account.create!
+      Canvas::Help.stubs(:default_links).returns([
+        {
+          :available_to => ['student'],
+          :text => 'Ask Your Instructor a Question',
+          :subtext => 'Questions are submitted to your instructor',
+          :url => '#teacher_feedback',
+          :is_default => 'true'
+        },
+        {
+          :available_to => ['user', 'student', 'teacher', 'admin'],
+          :text => 'Search the Canvas Guides',
+          :subtext => 'Find answers to common questions',
+          :url => 'http://community.canvaslms.com/community/answers/guides',
+          :is_default => 'true'
+        },
+        {
+          :available_to => ['user', 'student', 'teacher', 'admin'],
+          :text => 'Report a Problem',
+          :subtext => 'If Canvas misbehaves, tell us about it',
+          :url => '#create_ticket',
+          :is_default => 'true'
+        }
+      ])
+      LoadAccount.stubs(:default_domain_root_account).returns(account)
+      admin = account_admin_user active_all: true
+      user_session(admin)
+
+      get 'help_links'
+
+      # because this is a normal application session, the response is prepended
+      # with our anti-csrf measure
+      json = response.body
+      anti_csrf = 'while(1);'
+      links = JSON.parse(json[anti_csrf.length..json.length-1])
+      expect(links.select {|link| link[:text] == 'Ask Your Instructor a Question'}.size).to eq 0
+    end
   end
 end

@@ -44,6 +44,9 @@ module Api::V1
       @hash['workflow_state'] = @course.api_state
       @hash['course_format'] = @course.course_format if @course.course_format.present?
       @hash['restrict_enrollments_to_course_dates'] = !!@course.restrict_enrollments_to_course_dates
+      if @includes.include?(:current_grading_period_scores)
+        @hash['multiple_grading_periods_enabled'] = @course.feature_enabled?(:multiple_grading_periods)
+      end
       clear_unneeded_fields(@hash)
     end
 

@@ -231,7 +231,7 @@ define([
           if (ui.newTab.find('a').hasClass('submit_online_text_entry_option')) {
             $el = $("#submit_online_text_entry_form textarea:first");
             if (!RichContentEditor.callOnRCE($el, 'exists?')) {
-              RichContentEditor.loadNewEditor($el);
+              RichContentEditor.loadNewEditor($el, {manageParent: true});
             }
           }
 
@@ -243,7 +243,7 @@ define([
           if (ui.tab.find('a').hasClass('submit_online_text_entry_option')) {
             $el = $("#submit_online_text_entry_form textarea:first");
             if (!RichContentEditor.callOnRCE($el, 'exists?')) {
-              RichContentEditor.loadNewEditor($el);
+              RichContentEditor.loadNewEditor($el, {manageParent: true});
             }
           }
 

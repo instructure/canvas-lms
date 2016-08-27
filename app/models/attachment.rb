@@ -1280,7 +1280,7 @@ class Attachment < ActiveRecord::Base
       doc = canvadoc || create_canvadoc
       doc.upload({
         annotatable: opts[:wants_annotation],
-        preferred_renders: opts[:preferred_renders]
+        preferred_plugins: opts[:preferred_plugins]
       })
       update_attribute(:workflow_state, 'processing')
     end

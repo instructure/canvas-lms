@@ -13,16 +13,12 @@ clientAppPlugin.prototype.apply = function(compiler){
     nmf.plugin("before-resolve", function(result, callback) {
       let request = result.request;
 
-      // the client apps use an old version of react and used requirejs aliases
-      // to keep it seperate from the react version the rest of canvas uses.
-      //  This should shim that difference into the webpack build.
       if(/client_apps\/canvas_quizzes/.test(result.context)){
-        if(request == "react"){
-          request = "old_unsupported_dont_use_react"
-        }
-
-        if(request == "react-router" || request == "canvas_packages/react-router"){
-          request = "old_unsupported_dont_use_react-router-webpack"
+        // The client apps depend on requiring lodash directly, which was set to
+        // map to lodash.underscore prior to 37914f705ee4055224107f01f0afb772d443f90d
+        // which added up-to-date normal lodash via 'lodash'
+        if (request === "lodash") {
+          request = "underscore";
         }
       }
 

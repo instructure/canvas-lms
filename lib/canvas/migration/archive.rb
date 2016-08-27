@@ -89,6 +89,12 @@ module Canvas::Migration
       return true
     end
 
+    def delete_unzipped_archive
+      if @unzipped_file_path && File.directory?(@unzipped_file_path)
+        FileUtils::rm_rf(@unzipped_file_path)
+      end
+    end
+
     # If the file is a zip file, unzip it, if it's an xml file, copy
     # it into the directory with the given file name
     def prepare_cartridge_file(file_name='imsmanifest.xml')

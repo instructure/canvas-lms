@@ -135,7 +135,7 @@ define([
           var $after = $('<a href="'+ htmlEscape(href) +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(//img.youtube.com/vi/' + htmlEscape(id) + '/2.jpg)" alt="' + htmlEscape($link.data('preview-alt')) + '"/></a>')
             .click(function(event) {
               event.preventDefault();
-              var $video = $("<span class='youtube_holder' style='display: block;'><object width='425' height='344'><param name='wmode' value='opaque'></param><param name='movie' value='//www.youtube.com/v/" + htmlEscape(id) + "&autoplay=1&hl=en_US&fs=1&'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='//www.youtube.com/v/" + htmlEscape(id) + "&autoplay=1&hl=en_US&fs=1&' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='425' height='344' wmode='opaque'></embed></object><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
+              var $video = $("<span class='youtube_holder' style='display: block;'><iframe src='//www.youtube.com/embed/" + htmlEscape(id) + "?autoplay=1&rel=0&hl=en_US&fs=1' frameborder='0' width='425' height='344'></iframe><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
               $video.find(".hide_youtube_embed_link").click(function(event) {
                 event.preventDefault();
                 $video.remove();

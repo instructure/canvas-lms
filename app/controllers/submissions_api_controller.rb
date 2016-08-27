@@ -599,6 +599,10 @@ class SubmissionsApiController < ApplicationController
         submission[:excuse] = params[:submission].delete(:excuse)
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
         submission[:final] = value_to_boolean(params[:submission][:final]) && @context.grants_right?(@current_user, :moderate_grades)
+        if params[:submission][:submission_type] == 'basic_lti_launch' && (!@submission.has_submission? || @submission.submission_type == 'basic_lti_launch')
+          submission[:submission_type] = params[:submission][:submission_type]
+          submission[:url] = params[:submission][:url]
+        end
       end
       if submission[:grade] || submission[:excuse]
         begin

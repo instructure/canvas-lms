@@ -82,6 +82,20 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
     end
 
+    def qs_api_submission(raw = false, data = {})
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submission.json"
+      params = { :controller => 'quizzes/quiz_submissions_api',
+                 :action => 'submission',
+                 :format => 'json',
+                 :course_id => @course.id.to_s,
+                 :quiz_id => @quiz.id.to_s }
+      if raw
+        raw_api_call(:get, url, params, data)
+      else
+        api_call(:get, url, params, data)
+      end
+    end
+
     def qs_api_show(raw = false, data = {})
       url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}.json"
       params = { :controller => 'quizzes/quiz_submissions_api',
@@ -243,6 +257,69 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       student_in_course
       json = qs_api_index(true)
       assert_status(401)
+    end
+  end
+
+  describe 'GET /courses/:course_id/quizzes/:quiz_id/submission' do
+    context 'as a student' do
+      context 'without a submission' do
+        before do
+          enroll_student
+          @user = @student
+        end
+
+        it 'is empty' do
+          json = qs_api_submission
+          expect(json.key?('quiz_submissions')).to be_truthy
+          expect(json['quiz_submissions'].size).to eq 0
+        end
+      end
+
+      context 'with a submission' do
+        before do
+          enroll_student_and_submit
+          @user = @student
+        end
+
+        it 'returns the submission' do
+          json = qs_api_submission
+          expect(json.key?('quiz_submissions')).to be_truthy
+          expect(json['quiz_submissions'].length).to eq 1
+
+          json_quiz_submission = json['quiz_submissions'].first
+          expect(json_quiz_submission['id']).to eq @quiz_submission.id
+        end
+
+        context 'with multiple attempts' do
+          before do
+            make_second_attempt
+          end
+
+          it 'returns the submission' do
+            json = qs_api_submission
+            expect(json.key?('quiz_submissions')).to be_truthy
+            expect(json['quiz_submissions'].length).to eq 1
+
+            json_quiz_submission = json['quiz_submissions'].first
+            expect(json_quiz_submission['id']).to eq @quiz_submission.id
+            expect(json_quiz_submission['attempt']).to eq 2
+          end
+        end
+      end
+    end
+
+    context 'as a teacher' do
+      context 'when a student has a submission' do
+        before do
+          enroll_student_and_submit
+        end
+
+        it 'does not include the student submission' do
+          json = qs_api_submission
+          expect(json.key?('quiz_submissions')).to be_truthy
+          expect(json['quiz_submissions'].size).to eq 0
+        end
+      end
     end
   end
 

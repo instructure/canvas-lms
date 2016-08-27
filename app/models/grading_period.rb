@@ -49,27 +49,17 @@ class GradingPeriod < ActiveRecord::Base
     end
   end
 
-  def self.for(course)
-    periods = active.grading_periods_by(course_id: course.id)
-    if periods.exists?
-      periods
+  def self.for(context, inherit: true)
+    grading_periods = context.grading_periods.active
+    if context.is_a?(Course) && inherit && grading_periods.empty?
+      context.enrollment_term.grading_periods.active
     else
-      grading_period_group_ids = EnrollmentTerm.select(:grading_period_group_id).where(id: course.enrollment_term)
-      active.where(grading_period_group_id: grading_period_group_ids)
+      grading_periods
     end
   end
 
   def self.current_period_for(context)
     self.for(context).find(&:current?)
-  end
-
-  # Takes a context and a grading_period_id and returns a grading period
-  # if it is in the for collection. Uses Enumberable#find to query
-  # collection.
-  def self.context_find(context, grading_period_id)
-    self.for(context).find do |grading_period|
-      grading_period.id == grading_period_id.to_i
-    end
   end
 
   def account_group?

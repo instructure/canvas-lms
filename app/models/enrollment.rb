@@ -680,6 +680,7 @@ class Enrollment < ActiveRecord::Base
     if (self.changes.keys & %w{workflow_state start_at end_at}).any?
       @enrollment_dates = nil
       self.enrollment_state.state_is_current = false
+      self.enrollment_state.is_direct_recalculation = true
     end
     self.enrollment_state.skip_touch_user ||= self.skip_touch_user
     self.enrollment_state.ensure_current_state
@@ -687,7 +688,11 @@ class Enrollment < ActiveRecord::Base
 
   def state_based_on_date
     RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state) do
-      self.enrollment_state.get_effective_state
+      if %w{invited active completed}.include?(self.workflow_state)
+        self.enrollment_state.get_effective_state
+      else
+        self.workflow_state.to_sym
+      end
     end
   end
 
@@ -720,7 +725,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def restrict_future_listing?
-    self.restrict_future_view? && self.course.account.restrict_student_future_listing[:value]
+    self.enrollment_state.pending? && self.enrollment_state.restricted_access? && self.course.account.restrict_student_future_listing[:value]
   end
 
   def active?

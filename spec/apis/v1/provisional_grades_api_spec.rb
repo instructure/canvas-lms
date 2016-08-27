@@ -228,18 +228,73 @@ describe 'Provisional Grades API', type: :request do
         end
       end
 
-      context "with partial provisional grades" do
-        it "publishes the first provisional grade if none have been explicitly selected" do
+      context "with one provisional grade" do
+        it "publishes the only provisional grade if none have been explicitly selected" do
           course_with_user("TaEnrollment", course: @course, active_all: true)
           second_ta = @user
           @submission = @assignment.submit_homework(@student, body: "hello")
           @assignment.moderated_grading_selections.create!(student: @student)
           @assignment.grade_student(@student, grader: @ta, score: 72, provisional: true)
-          @assignment.grade_student(@student, grader: second_ta, score: 88, provisional: true)
 
           api_call_as_user(@teacher, :post, @path, @params)
 
           expect(@submission.reload.score).to eq 72
+        end
+      end
+
+      context "with multiple provisional grades" do
+        before(:once) do
+          course_with_user("TaEnrollment", course: @course, active_all: true)
+          @second_ta = @user
+        end
+
+        it "publishes even when some submissions have no grades" do
+          @submission = @assignment.submit_homework(@student, body: "hello")
+          @assignment.moderated_grading_selections.create!(student: @student)
+
+          @user = @teacher
+          raw_api_call(:post, @path, @params)
+
+          expect(response.response_code).to eq(200)
+          expect(@submission.reload.score).to be_nil
+          expect(@assignment.reload.grades_published_at).not_to be_nil
+        end
+
+        it "does not publish if none have been explicitly selected" do
+          @submission = @assignment.submit_homework(@student, body: "hello")
+          @assignment.moderated_grading_selections.create!(student: @student)
+          @assignment.grade_student(@student, grader: @ta, score: 72, provisional: true)
+          @assignment.grade_student(@student, grader: @second_ta, score: 88, provisional: true)
+
+          @user = @teacher
+          raw_api_call(:post, @path, @params)
+
+          expect(response.response_code).to eq(422)
+          expect(@submission.reload).not_to be_graded
+          expect(@assignment.reload.grades_published_at).to be_nil
+        end
+
+        it "does not publish any if not all have been explicitly selected" do
+          student_1 = @student
+          student_2 = student_in_course(active_all: true, course: @course).user
+          submission_1 = @assignment.submit_homework(student_1, body: "hello")
+          submission_2 = @assignment.submit_homework(student_2, body: "hello")
+          selection_1 = @assignment.moderated_grading_selections.create!(student: student_1)
+          @assignment.moderated_grading_selections.create!(student: student_2)
+          @assignment.grade_student(student_1, grader: @ta, score: 12, provisional: true)
+          @assignment.grade_student(student_1, grader: @second_ta, score: 34, provisional: true)
+          @assignment.grade_student(student_2, grader: @ta, score: 56, provisional: true)
+          @assignment.grade_student(student_2, grader: @second_ta, score: 78, provisional: true)
+
+          selection_1.update_attribute(:selected_provisional_grade_id, submission_1.provisional_grade(@ta))
+
+          @user = @teacher
+          raw_api_call(:post, @path, @params)
+
+          expect(response.response_code).to eq(422)
+          expect(submission_1.reload).not_to be_graded
+          expect(submission_2.reload).not_to be_graded
+          expect(@assignment.reload.grades_published_at).to be_nil
         end
       end
     end

@@ -66,6 +66,10 @@ $ic-DashboardCard-toggle-size: 60px;
   border: 1px solid rgba(black, 0.1);
 }
 
+.ic-DashboardCard__header_image {
+  background-size: cover;
+}
+
 .ic-DashboardCard__header_content {
   box-sizing: border-box;
   padding: $ic-sp*1.5 $ic-sp*1.5 0;

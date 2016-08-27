@@ -66,27 +66,28 @@ describe CanvadocSessionsController do
       get :show, blob: @blob.to_json, hmac: hmac
       assert_status(401)
     end
-    it "should send o365 preferred render" do
+
+    it "should send o365 preferred plugin" do
       Account.default.settings[:canvadocs_prefer_office_online] = true
       Account.default.save!
 
       Attachment.stubs(:find).returns(@attachment1)
       @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
         arg1 == 1 &&
-        arg2[:preferred_renders] == [Canvadocs::RENDER_O365]
+        arg2[:preferred_plugins] == [Canvadocs::RENDER_O365, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
       end
 
       get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
     end
 
-    it "should not send o365 preferred render" do
+    it "should not send o365 preferred plugin" do
       Account.default.settings[:canvadocs_prefer_office_online] = false
       Account.default.save!
 
       Attachment.stubs(:find).returns(@attachment1)
       @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
         arg1 == 1 &&
-        arg2[:preferred_renders] == []
+        arg2[:preferred_plugins] == [Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
       end
 
       get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)

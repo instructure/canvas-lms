@@ -21,6 +21,22 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe Canvas::Migration::Helpers::SelectiveContentFormatter do
   context "overview json data" do
     before do
+      @overview = {
+        'assessments' => [{'title' => 'a1', 'migration_id' => 'a1'}],
+        'modules' => [{'title' => 'a1', 'migration_id' => 'a1'}],
+        'wikis' => [{'title' => 'a1', 'migration_id' => 'a1'}],
+        'external_tools' => [{'title' => 'a1', 'migration_id' => 'a1'}],
+        'outcomes' => [{'title' => 'a1', 'migration_id' => 'a1'}],
+        'file_map' => {'oi' => {'title' => 'a1', 'migration_id' => 'a1'}},
+        'assignments' => [{'title' => 'a1', 'migration_id' => 'a1'},{'title' => 'a2', 'migration_id' => 'a2', 'assignment_group_migration_id' => 'a1'}],
+        'assignment_groups' => [{'title' => 'a1', 'migration_id' => 'a1'}],
+        'calendar_events' => [],
+        "course" => {
+               "migration_id" => "i953adbb6769c915260623f0928fcd527",
+               "title" => "1 graded quiz/discussion",
+               "syllabus_body"=>"oh, hi there."
+        }
+      }
       @migration = mock()
       @migration.stubs(:migration_type).returns('common_cartridge_importer')
       @migration.stubs(:overview_attachment).returns(@migration)
@@ -28,22 +44,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @migration.stubs(:shard).returns('1')
       @migration.stubs(:cache_key).returns('1')
       @migration.stubs(:close)
-      @migration.stubs(:read).returns({
-                                             'assessments' => [{'title' => 'a1', 'migration_id' => 'a1'}],
-                                             'modules' => [{'title' => 'a1', 'migration_id' => 'a1'}],
-                                             'wikis' => [{'title' => 'a1', 'migration_id' => 'a1'}],
-                                             'external_tools' => [{'title' => 'a1', 'migration_id' => 'a1'}],
-                                             'outcomes' => [{'title' => 'a1', 'migration_id' => 'a1'}],
-                                             'file_map' => {'oi' => {'title' => 'a1', 'migration_id' => 'a1'}},
-                                             'assignments' => [{'title' => 'a1', 'migration_id' => 'a1'},{'title' => 'a2', 'migration_id' => 'a2', 'assignment_group_migration_id' => 'a1'}],
-                                             'assignment_groups' => [{'title' => 'a1', 'migration_id' => 'a1'}],
-                                             'calendar_events' => [],
-                                             "course" => {
-                                                     "migration_id" => "i953adbb6769c915260623f0928fcd527",
-                                                     "title" => "1 graded quiz/discussion",
-                                                     "syllabus_body"=>"oh, hi there."
-                                             }
-                                     }.to_json)
+      @migration.stubs(:read).returns(@overview.to_json)
       @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com")
     end
 
@@ -141,9 +142,37 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(@formatter.get_content_list('announcements').first[:title]).to eq 'a2'
     end
 
+    it "should link resources for quizzes and submittables" do
+      @migration.stubs(:read).returns(@overview.merge({
+        'assessments' => [{'title' => 'q1', 'migration_id' => 'q1', 'assignment_migration_id' => 'a5'}],
+        'wikis' => [{'title' => 'w1', 'migration_id' => 'w1', 'assignment_migration_id' => 'a3'}],
+        'discussion_topics' => [{'title' => 'd1', 'migration_id' => 'd1', 'assignment_migration_id' => 'a4'}],
+        'assignments' => [
+          {'title' => 'a1', 'migration_id' => 'a1'},
+          {'title' => 'a2', 'migration_id' => 'a2', 'assignment_group_migration_id' => 'a1'},
+          {'title' => 'w1', 'migration_id' => 'a3', 'page_migration_id' => 'w1', 'assignment_group_migration_id' => 'a2'},
+          {'title' => 'd1', 'migration_id' => 'a4', 'topic_migration_id' => 'd1', 'assignment_group_migration_id' => 'a2'},
+          {'title' => 'q1', 'migration_id' => 'a5', 'quiz_migration_id' => 'q1', 'assignment_group_migration_id' => 'a2'}
+        ],
+        'assignment_groups' => [{'title' => 'a1', 'migration_id' => 'a1'}, {'title' => 'a2', 'migration_id' => 'a2'}]
+      }).to_json)
+
+      asgs = @formatter.get_content_list('assignments').second['sub_items']
+      expect(asgs.map{ |a| a[:linked_resource][:type] }).to eq ['wiki_pages', 'discussion_topics', 'quizzes']
+      asgs.each do |a|
+        asg_mig_id = a[:migration_id]
+        linked_mig_id = a[:linked_resource][:migration_id]
+        linked_type = a[:linked_resource][:type]
+
+        linked_item = @formatter.get_content_list(linked_type).find { |i| i[:migration_id] == linked_mig_id }
+        expect(linked_item[:linked_resource][:migration_id]).to eq asg_mig_id
+      end
+    end
   end
 
   context "course copy" do
+    let(:formatter) { Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration) }
+
     before do
       course_model
       @topic = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
@@ -156,12 +185,11 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @migration = mock()
       @migration.stubs(:migration_type).returns('course_copy_importer')
       @migration.stubs(:source_course).returns(@course)
-      @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration)
     end
 
     it "should list top-level items" do
       #groups should not show up even though there are some
-      expect(@formatter.get_content_list).to eq [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+      expect(formatter.get_content_list).to eq [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
                                              {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"},
                                              {:type=>"context_modules", :property=>"copy[all_context_modules]", :title=>"Modules", :count=>1},
                                              {:type=>"discussion_topics", :property=>"copy[all_discussion_topics]", :title=>"Discussion Topics", :count=>1},
@@ -171,11 +199,28 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     end
 
     it "should list individual types" do
-      expect(@formatter.get_content_list('wiki_pages').length).to eq 1
-      expect(@formatter.get_content_list('context_modules').length).to eq 1
-      expect(@formatter.get_content_list('attachments').length).to eq 1
-      expect(@formatter.get_content_list('discussion_topics').length).to eq 1
-      expect(@formatter.get_content_list('announcements').length).to eq 1
+      expect(formatter.get_content_list('wiki_pages').length).to eq 1
+      expect(formatter.get_content_list('context_modules').length).to eq 1
+      expect(formatter.get_content_list('attachments').length).to eq 1
+      expect(formatter.get_content_list('discussion_topics').length).to eq 1
+      expect(formatter.get_content_list('announcements').length).to eq 1
+    end
+
+    it "should link resources for quizzes and submittables" do
+      wiki_page_assignment_model(course: @course, title: 'sekrit page')
+      assignment_model(course: @course, submission_types: 'discussion_topic', title: 'graded discussion')
+      assignment_quiz([], course: @course, name: "blah").assignment
+
+      asgs = formatter.get_content_list('assignments').first[:sub_items]
+      expect(asgs.map{ |a| a[:linked_resource][:type] }).to eq ['wiki_pages', 'discussion_topics', 'quizzes']
+      asgs.each do |a|
+        asg_mig_id = a[:migration_id]
+        linked_mig_id = a[:linked_resource][:migration_id]
+        linked_type = a[:linked_resource][:type]
+
+        linked_item = formatter.get_content_list(linked_type).find { |i| i[:migration_id] == linked_mig_id }
+        expect(linked_item[:linked_resource][:migration_id]).to eq asg_mig_id
+      end
     end
 
     context "deleted objects" do
@@ -195,23 +240,23 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       end
 
       it "should ignore in top-level list" do
-        expect(@formatter.get_content_list).to eq [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
+        expect(formatter.get_content_list).to eq [{:type=>"course_settings", :property=>"copy[all_course_settings]", :title=>"Course Settings"},
                                              {:type=>"syllabus_body", :property=>"copy[all_syllabus_body]", :title=>"Syllabus Body"}]
       end
 
       it "should ignore in specific item request" do
-        expect(@formatter.get_content_list('wiki_pages').length).to eq 0
-        expect(@formatter.get_content_list('context_modules').length).to eq 0
-        expect(@formatter.get_content_list('attachments').length).to eq 0
-        expect(@formatter.get_content_list('discussion_topics').length).to eq 0
-        expect(@formatter.get_content_list('announcements').length).to eq 0
+        expect(formatter.get_content_list('wiki_pages').length).to eq 0
+        expect(formatter.get_content_list('context_modules').length).to eq 0
+        expect(formatter.get_content_list('attachments').length).to eq 0
+        expect(formatter.get_content_list('discussion_topics').length).to eq 0
+        expect(formatter.get_content_list('announcements').length).to eq 0
 
-        expect(@formatter.get_content_list('assignments').length).to eq 1 # the default assignment group
-        expect(@formatter.get_content_list('assignments').first[:sub_items]).to be_blank
+        expect(formatter.get_content_list('assignments').length).to eq 1 # the default assignment group
+        expect(formatter.get_content_list('assignments').first[:sub_items]).to be_blank
 
-        expect(@formatter.get_content_list('quizzes').length).to eq 0
-        expect(@formatter.get_content_list('calendar_events').length).to eq 0
-        expect(@formatter.get_content_list('rubrics').length).to eq 0
+        expect(formatter.get_content_list('quizzes').length).to eq 0
+        expect(formatter.get_content_list('calendar_events').length).to eq 0
+        expect(formatter.get_content_list('rubrics').length).to eq 0
       end
     end
 
@@ -227,7 +272,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       attachment_model(:context => @course, :filename => 'a4.html', :folder => abc)
       @course.reload
 
-      res = @formatter.get_content_list('attachments')
+      res = formatter.get_content_list('attachments')
       expect(res.length).to eq 4
       expect(res[0][:title]).to eq 'course files'
       expect(res[0][:sub_items][0][:title]).to eq 'a5.html'

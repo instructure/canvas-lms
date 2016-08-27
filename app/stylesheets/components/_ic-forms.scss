@@ -1332,7 +1332,6 @@ select.ic-Input:not(*:root) {
         padding: 0 0 0 $ic-sp;
         background: transparent;
       }
-
       .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio),
       .ic-Checkbox-group {
         flex: 1;
@@ -1413,13 +1412,13 @@ select.ic-Input:not(*:root) {
   _:-ms-input-placeholder, :root  {
     .ic-Form-group.ic-Form-group--horizontal {
 
-      .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio) {
+      > .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio) {
         .ic-Form-help-text {
           padding-left: $ic-horizontal-form-offset + $ic-sp*2;
         }
       }
 
-      .ic-Fieldset--radio-checkbox {
+      > .ic-Fieldset--radio-checkbox {
         padding-left: $ic-horizontal-form-offset + $ic-sp*2;
 
         .ic-Legend {
@@ -1523,9 +1522,11 @@ select.ic-Input:not(*:root) {
 form.ic-Form-group { margin: 0; }
 
 .ic-Form-control {
+  display: block;
   box-sizing: border-box;
   margin-bottom: $ic-sp*1.5;
   position: relative;
+  display: block;
 
   .ic-Form-control--radio {
     margin-bottom: 0;
@@ -1714,6 +1715,7 @@ form.ic-Form-group { margin: 0; }
       background-color: $ic-color-light;
       border: 2px solid transparent;
       border-radius: $borderRadius;
+      color: $ic-font-color-dark;
 
       &:hover {
         border-color: $ic-border-light;
@@ -1727,7 +1729,6 @@ form.ic-Form-group { margin: 0; }
         display: block;
         width: 1.5rem;
         height: 1.5rem;
-        fill: $ic-font-color-dark;
       }
     }
 
@@ -1735,9 +1736,7 @@ form.ic-Form-group { margin: 0; }
       &:checked {
         ~ .ic-Label {
           border-color: $ic-brand-primary;
-          > svg {
-            fill: $ic-brand-primary;
-          }
+          color: $ic-brand-primary;
         }
       }
       &:focus {
@@ -2003,7 +2002,9 @@ form.ic-Form-group { margin: 0; }
 
 .ic-Form-help-text {
   @include fontSize(12px);
+  display: block;
   margin-top: $ic-sp/2;
   color: $ic-font-color--subdued;
   width: 100%;
+  line-height: 1.5;
 }

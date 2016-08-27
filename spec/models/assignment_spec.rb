@@ -3218,6 +3218,24 @@ describe Assignment do
         g.map { |c| c.submission.user }.sort_by(&:id)
       }).to eq [[s1, s2]]
     end
+
+    it "excludes student names from filenames when anonymous grading is enabled" do
+      @course.enable_feature! :anonymous_grading
+
+      s1 = @students.first
+      sub = submit_homework(s1)
+
+      zip = zip_submissions
+      filename = Zip::File.new(zip.open).entries.map(&:name).first
+      expect(filename).to eq "#{s1.id}_#{sub.id}_homework.pdf"
+
+      comments, ignored = @assignment.generate_comments_from_files(
+        zip.open.path,
+        @teacher)
+
+      expect(comments.map { |g| g.map { |c| c.submission.user } }).to eq [[s1]]
+      expect(ignored).to be_empty
+    end
   end
 
   describe "#restore" do
@@ -3271,6 +3289,11 @@ describe Assignment do
     it "should update grades if workflow_state changes" do
       @assignment.context.expects(:recompute_student_scores).once
       @assignment.unpublish
+    end
+
+    it "updates when omit_from_final_grade changes" do
+      @assignment.context.expects(:recompute_student_scores).once
+      @assignment.update_attribute :omit_from_final_grade, true
     end
 
     it "should not update grades otherwise" do

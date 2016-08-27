@@ -304,7 +304,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
         expect(response).not_to be_success
         json = JSON.parse response.body
-        expect(json["errors"]["bucket"].first["message"]).to eq "bucket name must be one of the following: past, overdue, undated, ungraded, upcoming, future"
+        expect(json["errors"]["bucket"].first["message"]).to eq "bucket name must be one of the following: past, overdue, undated, ungraded, unsubmitted, upcoming, future"
       end
 
       def assignment_index_bucketed_api_call(bucket)

@@ -23,11 +23,18 @@ describe "groups" do
   setup_group_page_urls
 
   context "as a student" do
-    before do
-      course_with_student_logged_in(active_all: true)
+    before :once do
+      @student = User.create!(name: "Student 1")
+      @teacher = User.create!(name: "Teacher 1")
+      course_with_student({user: @student, :active_course => true, :active_enrollment => true})
+      @course.enroll_teacher(@teacher).accept!
       group_test_setup(4,1,1)
       # adds all students to the group
-      add_users_to_group(@students + [@user],@testgroup.first)
+      add_users_to_group(@students + [@student],@testgroup.first)
+    end
+
+    before :each do
+      user_session(@student)
     end
 
     #-------------------------------------------------------------------------------------------------------------------
@@ -38,6 +45,16 @@ describe "groups" do
         get url
         expect(f('.recent-activity-header')).to be_displayed
         verify_no_course_user_access(url)
+      end
+
+      it "hides groups for inaccessible courses in groups list", priority: "2", test_id: 927757 do
+        term = EnrollmentTerm.find(@course.enrollment_term_id)
+        term.end_at = Time.zone.now-2.days
+        term.save!
+        @course.restrict_student_past_view = true
+        @course.save
+        get '/groups'
+        expect(f('#content')).not_to contain_css('.previous_groups')
       end
     end
 
@@ -112,6 +129,17 @@ describe "groups" do
         # Checks that all students and teachers created in setup are listed on page
         expect(ff('.student_roster .user_name').size).to eq 5
         expect(ff('.teacher_roster .user_name').size).to eq 1
+      end
+
+      it "shows only active members in groups to students", priority: "2", test_id: 840142 do
+        get people_page
+        student_enrollment = StudentEnrollment.last
+        student = User.find(student_enrollment.user_id)
+        expect(f('.student_roster')).to contain_css("a[href*='#{student.id}']")
+        student_enrollment.workflow_state = "inactive"
+        student_enrollment.save!
+        refresh_page
+        expect(f('.student_roster')).not_to contain_css("a[href*='#{student.id}']")
       end
 
       it "should allow access to people page only within the scope of a group", priority: "1", test_id: 319906 do
@@ -291,7 +319,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "conferences page" do
-      before(:once) do
+      before :once do
         PluginSetting.create!(name: "wimba", settings: {"domain" => "wimba.instructure.com"})
       end
 
@@ -305,7 +333,7 @@ describe "groups" do
     end
     #-------------------------------------------------------------------------------------------------------------------
     describe "collaborations page" do
-      before(:each) do
+      before :each do
         setup_google_drive
         unless PluginSetting.where(name: 'google_drive').exists?
           PluginSetting.create!(name: 'google_drive', settings: {})

@@ -20,21 +20,21 @@ define([
     renderCourses() {
       if (!this.props.hasLoaded) {
         return (
-          <li className="ReactTray-list-item ReactTray-list-item--loading-message">
+          <li className="ic-NavMenu-list-item ic-NavMenu-list-item--loading-message">
             {I18n.t('Loading')} &hellip;
           </li>
         );
       }
       var courses = this.props.courses.map((course) => {
         return (
-          <li key={course.id} className='ReactTray-list-item'>
-            <a href={`/courses/${course.id}`} className='ReactTray-list-item__link'>{course.name}</a>
-            { course.enrollment_term_id > 1 ? ( <div className='ReactTray-list-item__helper-text'>{course.term.name}</div> ) : null }
+          <li key={course.id} className='ic-NavMenu-list-item'>
+            <a href={`/courses/${course.id}`} className='ic-NavMenu-list-item__link'>{course.name}</a>
+            { course.enrollment_term_id > 1 ? ( <div className='ic-NavMenu-list-item__helper-text'>{course.term.name}</div> ) : null }
           </li>
         );
       });
       courses.push(
-        <li key='allCourseLink' className='ReactTray-list-item ReactTray-list-item--feature-item'>
+        <li key='allCourseLink' className='ic-NavMenu-list-item ic-NavMenu-list-item--feature-item'>
           <a href='/courses'>{I18n.t('All Courses')}</a>
         </li>
       );
@@ -43,24 +43,22 @@ define([
 
     render() {
       return (
-        <div className="ReactTray__layout">
-          <div className="ReactTray__primary-content">
-            <div className="ReactTray__header">
-              <h1 className="ReactTray__headline">{I18n.t('Courses')}</h1>
-              <button className="Button Button--icon-action ReactTray__closeBtn" type="button" onClick={this.props.closeTray}>
+        <div className="ic-NavMenu__layout">
+          <div className="ic-NavMenu__primary-content">
+            <div className="ic-NavMenu__header">
+              <h1 className="ic-NavMenu__headline">{I18n.t('Courses')}</h1>
+              <button className="Button Button--icon-action ic-NavMenu__closeButton" type="button" onClick={this.props.closeTray}>
                 <i className="icon-x"></i>
                 <span className="screenreader-only">{I18n.t('Close')}</span>
               </button>
             </div>
-            <ul className="ReactTray__link-list">
+            <ul className="ic-NavMenu__link-list">
               {this.renderCourses()}
             </ul>
           </div>
-          <div className="ReactTray__secondary-content">
-            <div className="ReactTray__info-box">
+          <div className="ic-NavMenu__secondary-content">
               {I18n.t('Welcome to your courses! To customize the list of courses, ' +
                       'click on the "All Courses" link and star the courses to display.')}
-            </div>
           </div>
         </div>
       );

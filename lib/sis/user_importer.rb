@@ -140,8 +140,16 @@ module SIS
             if !status_is_active && !user.new_record?
               # if this user is deleted, we're just going to make sure the user isn't enrolled in anything in this root account and
               # delete the pseudonym.
-              d = @root_account.enrollments.active.where(user_id: user).update_all(workflow_state: 'deleted')
+              enrollment_ids = @root_account.enrollments.active.where(user_id: user).where.not(:workflow_state => 'deleted').pluck(:id)
+              if enrollment_ids.any?
+                Enrollment.where(:id => enrollment_ids).update_all(workflow_state: 'deleted')
+                EnrollmentState.where(:enrollment_id => enrollment_ids).update_all(:state => 'deleted', :state_is_current => true)
+              end
+
+              d = enrollment_ids.count
               d += @root_account.all_group_memberships.active.where(user_id: user).update_all(workflow_state: 'deleted')
+              d += user.account_users.shard(@root_account).where(account_id: @root_account.all_accounts).delete_all
+              d += user.account_users.shard(@root_account).where(account_id: @root_account).delete_all
               if 0 < d
                 should_update_account_associations = true
               end

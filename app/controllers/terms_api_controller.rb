@@ -77,7 +77,7 @@ class TermsApiController < ApplicationController
   # @returns [EnrollmentTerm]
   #
   def index
-    terms = @context.enrollment_terms.order('start_at ASC, end_at ASC, id ASC')
+    terms = @context.enrollment_terms.order('start_at DESC, end_at DESC, id ASC')
 
     state = Array(params[:workflow_state])&['all', 'active', 'deleted']
     state = 'active' if state == []

@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 define(function(require) {
-  var React = require('react');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var WithSidebar = require('jsx!../mixins/with_sidebar');
   var QuestionInspector = require('jsx!../views/question_inspector');
   var QuestionListing = require('jsx!../views/question_listing');

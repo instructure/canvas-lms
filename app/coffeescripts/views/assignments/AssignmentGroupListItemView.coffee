@@ -238,7 +238,6 @@ define [
       @$('.search_show').first().addClass("first_visible")
       @$('.search_show').last().addClass("last_visible")
 
-
     shouldBeExpanded: ->
       @cache.get(@cacheKey())
 

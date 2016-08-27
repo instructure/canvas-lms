@@ -2161,6 +2161,57 @@ describe 'Submissions API', type: :request do
             { expected_status: 400 })
       expect(json["error"]).not_to be_nil
     end
+
+    it "allows a LTI launch URL to be assigned" do
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            posted_grade: 'B',
+            submission_type: 'basic_lti_launch',
+            url: 'http://example.test'
+          },
+        }
+      )
+
+      expect(Submission.count).to eq 1
+      expect(json['submission_type']).to eql 'basic_lti_launch'
+      expect(json['url']).to eql 'http://example.test'
+    end
+
+    it 'does not allow a submission to be overwritten if type is a non-lti type' do
+      submission = @assignment.submit_homework(@student, body: 'what')
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            posted_grade: 'B',
+            submission_type: 'basic_lti_launch',
+            url: 'http://example.test'
+          },
+        }
+      )
+
+      expect(Submission.count).to eq 1
+      expect(json['submission_type']).to eql 'online_text_entry'
+      expect(json['url']).to be_nil
+    end
   end
 
   it "should allow posting grade by sis id" do

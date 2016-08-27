@@ -76,6 +76,11 @@ module Importers
       item.set_as_front_page! if !!hash[:front_page] && context.wiki.has_no_front_page
       migration.add_imported_item(item)
 
+      if hash[:assignment].present?
+        item.assignment = Importers::AssignmentImporter.import_from_migration(
+          hash[:assignment], context, migration)
+      end
+
       item.migration_id = hash[:migration_id]
       (hash[:contents] || []).each do |sub_item|
         next if sub_item[:type] == 'embedded_content'

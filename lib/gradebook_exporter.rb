@@ -18,6 +18,7 @@
 
 class GradebookExporter
   include GradebookTransformer
+  include GradebookSettingsHelpers
 
   def initialize(course, user, options = {})
     @course  = course
@@ -26,9 +27,9 @@ class GradebookExporter
   end
 
   def to_csv
-    collection = @options[:include_priors] ? @course.all_student_enrollments : @course.admin_visible_student_enrollments
-    enrollments_scope = @course.apply_enrollment_visibility(collection, @user)
-    student_enrollments = enrollments_for_csv(enrollments_scope, @options)
+    enrollment_scope = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
+                                                           include: gradebook_includes)
+    student_enrollments = enrollments_for_csv(enrollment_scope, @options)
 
     student_section_names = {}
     student_enrollments.each do |enrollment|
@@ -41,7 +42,7 @@ class GradebookExporter
 
     # grading_period_id == 0 means no grading period selected
     unless @options[:grading_period_id].try(:to_i) == 0
-      grading_period = GradingPeriod.context_find @course, @options[:grading_period_id]
+      grading_period = GradingPeriod.for(@course).find_by(id: @options[:grading_period_id])
     end
 
     calc = GradeCalculator.new(student_enrollments.map(&:user_id), @course,

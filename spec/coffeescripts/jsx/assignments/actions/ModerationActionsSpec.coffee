@@ -156,7 +156,7 @@ define [
       payload:
         students: ['test']
 
-    sinon.stub(@client, 'get').returns(Promise.resolve(fakeResponse))
+    @stub(@client, 'get').returns(Promise.resolve(fakeResponse))
     ModerationActions.apiGetStudents(@client)((action) ->
       deepEqual action, gotStudentsAction
       start()
@@ -174,7 +174,7 @@ define [
     fakeResponse = {data: ['test'], headers: fakeHeaders}
 
     callCount = 0
-    sinon.stub(@client, 'get').returns(Promise.resolve(fakeResponse))
+    @stub(@client, 'get').returns(Promise.resolve(fakeResponse))
     ModerationActions.apiGetStudents(@client)((action) ->
       callCount++
       if callCount >= 2
@@ -206,7 +206,7 @@ define [
       payload:
         message: 'Success! Grades were published to the grade book.'
 
-    sinon.stub(@client, 'post').returns(Promise.resolve(fakeResponse))
+    @stub(@client, 'post').returns(Promise.resolve(fakeResponse))
     ModerationActions.publishGrades(@client)((action) ->
       equal action.type, publishGradesAction.type, 'type matches'
       equal action.payload.message, publishGradesAction.payload.message, 'has proper message'
@@ -225,7 +225,26 @@ define [
       payload:
         message: 'Assignment grades have already been published.'
 
-    sinon.stub(@client, 'post').returns(Promise.reject(fakeResponse))
+    @stub(@client, 'post').returns(Promise.reject(fakeResponse))
+    ModerationActions.publishGrades(@client)((action) ->
+      equal action.type, publishGradesAction.type, 'type matches'
+      equal action.payload.message, publishGradesAction.payload.message, 'has proper message'
+      start()
+    , getState)
+
+  asyncTest "dispatches publishGradesFailed action with selected grades message on 422 failure", ->
+    getState = ->
+      urls:
+        publish_grades_url: 'some_url'
+    fakeResponse =
+      status: 422
+
+    publishGradesAction =
+      type: ModerationActions.PUBLISHED_GRADES_FAILED
+      payload:
+        message: 'All submissions must have a selected grade.'
+
+    @stub(@client, 'post').returns(Promise.reject(fakeResponse))
     ModerationActions.publishGrades(@client)((action) ->
       equal action.type, publishGradesAction.type, 'type matches'
       equal action.payload.message, publishGradesAction.payload.message, 'has proper message'
@@ -244,7 +263,7 @@ define [
       payload:
         message: 'An error occurred publishing grades.'
 
-    sinon.stub(@client, 'post').returns(Promise.reject(fakeResponse))
+    @stub(@client, 'post').returns(Promise.reject(fakeResponse))
     ModerationActions.publishGrades(@client)((action) ->
       equal action.type, publishGradesAction.type, 'type matches'
       equal action.payload.message, publishGradesAction.payload.message, 'has proper message'
@@ -282,7 +301,7 @@ define [
       payload:
         message: 'Reviewers successfully added'
 
-    fakePost = sinon.stub(@client, 'post').returns(Promise.resolve(fakeResponse))
+    fakePost = @stub(@client, 'post').returns(Promise.resolve(fakeResponse))
     ModerationActions.addStudentToModerationSet(@client)((action) ->
       ok fakePost.calledWith(fakeUrl, {student_ids: [1, 2]}), 'called with the correct params'
       equal action.type, moderationSetUpdatedAction.type, 'type matches'
@@ -307,7 +326,7 @@ define [
       payload:
         message: 'A problem occurred adding reviewers.'
 
-    sinon.stub(@client, 'post').returns(Promise.reject(fakeResponse))
+    @stub(@client, 'post').returns(Promise.reject(fakeResponse))
     ModerationActions.addStudentToModerationSet(@client)((action) ->
       equal action.type, moderationSetUpdateFailedAction.type, 'type matches'
       equal action.payload.message, moderationSetUpdateFailedAction.payload.message, 'has proper message'
@@ -341,7 +360,7 @@ define [
         student_id: 1
         selected_provisional_grade_id: 42
 
-    fakePost = sinon.stub(@client, 'put').returns(Promise.resolve(fakeResponse))
+    fakePost = @stub(@client, 'put').returns(Promise.resolve(fakeResponse))
     ModerationActions.selectProvisionalGrade(42, @client)((action) ->
       ok fakePost.calledWith(fakeUrl+"/"+ "42"+"/select"), 'called with the correct params'
       equal action.type, ModerationActions.SELECT_MARK, 'type matches'
@@ -362,7 +381,7 @@ define [
     fakeResponse =
       status: 404
 
-    fakePost = sinon.stub(@client, 'put').returns(Promise.resolve(fakeResponse))
+    fakePost = @stub(@client, 'put').returns(Promise.resolve(fakeResponse))
     ModerationActions.selectProvisionalGrade(42, @client)((action) ->
       ok fakePost.calledWith(fakeUrl+"/"+ "42"+"/select"), 'called with the correct params'
       equal action.type, ModerationActions.SELECTING_PROVISIONAL_GRADES_FAILED, 'type matches'

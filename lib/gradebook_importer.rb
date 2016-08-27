@@ -170,7 +170,7 @@ class GradebookImporter
 
     # remove concluded enrollments
     prior_enrollment_ids = (
-      @all_students.keys - @context.students.pluck(:user_id).map(&:to_i)
+      @all_students.keys - @context.gradable_students.pluck(:user_id).map(&:to_i)
     ).to_set
     @students.delete_if { |s| prior_enrollment_ids.include? s.id }
 

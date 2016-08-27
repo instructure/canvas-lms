@@ -1,9 +1,14 @@
 require 'turnitin_api'
 module Turnitin
+  class SubmissionNotScoredError < StandardError; end
   class OutcomeResponseProcessor
 
-    MAX_ATTEMPTS=11.freeze  # this one goes to 11
-    INTERVAL=5.minutes.freeze
+    MAX_ATTEMPTS=14.freeze  # this one goes to 14 (so that the last attempt is ~24hr after the first)
+
+    def self.max_attempts
+      MAX_ATTEMPTS
+    end
+
     def initialize(tool, assignment, user, outcomes_response_json)
       @tool = tool
       @assignment = assignment
@@ -16,64 +21,65 @@ module Turnitin
       submission = @assignment.submit_homework(@user, attachments:[attachment], submission_type: 'online_upload')
       asset_string = attachment.asset_string
       update_turnitin_data!(submission, asset_string, status: 'pending', outcome_response: @outcomes_response_json)
-      self.send_later(:update_originality_data, submission, asset_string)
+      self.send_later_enqueue_args(:update_originality_data, { max_attempts: self.class.max_attempts }, submission, asset_string)
     end
-    handle_asynchronously :process, max_attempts: 1, run_at: 5.minutes.from_now, priority: Delayed::LOW_PRIORITY
+    handle_asynchronously :process, max_attempts: max_attempts, priority: Delayed::LOW_PRIORITY
 
     def resubmit(submission, asset_string)
-      self.send_later(:update_originality_data, submission, asset_string)
+      self.send_later_enqueue_args(:update_originality_data, { max_attempts: self.class.max_attempts }, submission, asset_string)
     end
 
     def turnitin_client
-      @turnitin_client ||= (
-        lti_params = {
-          'user_id' => Lti::Asset.opaque_identifier_for(@user),
-          'context_id' => Lti::Asset.opaque_identifier_for(@assignment.context),
-          'context_title' => @assignment.context.name,
-          'lis_person_contact_email_primary' => @user.email
-        }
+      @_turnitin_client ||= build_turnitin_client
+    end
 
-        TurnitinApi::OutcomesResponseTransformer.new(
-          @tool.consumer_key,
-          @tool.shared_secret,
-          lti_params,
-          @outcomes_response_json
-        )
+    def build_turnitin_client
+      lti_params = {
+        'user_id' => Lti::Asset.opaque_identifier_for(@user),
+        'context_id' => Lti::Asset.opaque_identifier_for(@assignment.context),
+        'context_title' => @assignment.context.name,
+        'lis_person_contact_email_primary' => @user.email
+      }
+
+      TurnitinApi::OutcomesResponseTransformer.new(
+        @tool.consumer_key,
+        @tool.shared_secret,
+        lti_params,
+        @outcomes_response_json
       )
     end
 
-    def update_originality_data(submission, asset_string, attempt=1)
+    def update_originality_data(submission, asset_string)
       if turnitin_client.scored?
         update_turnitin_data!(submission, asset_string, turnitin_data)
-      elsif attempt <= MAX_ATTEMPTS
-        send_at(INTERVAL.from_now, :update_originality_data,  submission, asset_string, attempt + 1)
+      elsif attempt_number < self.class.max_attempts
+        raise SubmissionNotScoredError
       else
         new_data = {
             status: 'error',
-            public_error_message: I18n.t('turnitin.no_score_after_retries', 'Turnitin has not returned a score after %{max_tries} attempts to retrieve one.', max_tries: MAX_ATTEMPTS)
+            public_error_message: I18n.t('turnitin.no_score_after_retries', 'Turnitin has not returned a score after %{max_tries} attempts to retrieve one.', max_tries: self.class.max_attempts)
         }
         update_turnitin_data!(submission, asset_string, new_data)
       end
     end
 
-
     # dont try and recreate the turnitin client in a delayed job. bad things happen
-    def send_later(*args)
-      stash { super(*args) }
-    end
-
-    # dont try and recreate the turnitin client in a delayed job. bad things happen
-    def send_at(*args)
+    def send_later_enqueue_args(*args)
       stash { super(*args) }
     end
 
     private
 
     def stash
-      old_turnit_client = @turnitin_client
-      @turnitin_client = nil
+      old_turnit_client = @_turnitin_client
+      @_turnitin_client = nil
       yield
-      @turnitin_client = old_turnit_client
+      @_turnitin_client = old_turnit_client
+    end
+
+    def attempt_number
+      current_job = Delayed::Worker.current_job
+      current_job ? current_job.attempts + 1 : 1
     end
 
     def create_attachment
@@ -94,12 +100,14 @@ module Turnitin
             attachment.save!
           end
         rescue StandardError
-          @assignment.attachments.create!(
-            uploaded_data: StringIO.new(I18n.t('An error occurred while attempting to contact Turnitin.')),
-              display_name: 'Failed turnitin submission',
-              filename: 'failed_turnitin.txt',
-              user: @user
-          )
+          if attempt_number == self.class.max_attempts
+            @assignment.attachments.create!(
+              uploaded_data: StringIO.new(I18n.t('An error occurred while attempting to contact Turnitin.')),
+                display_name: 'Failed turnitin submission',
+                filename: 'failed_turnitin.txt',
+                user: @user
+            )
+          end
           raise
         end
       end

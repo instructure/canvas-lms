@@ -187,7 +187,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   end
 
   def is_previewing?
-    @previewing ||= params[:preview] && @quiz.grants_right?(@current_user, session, :update)
+    @previewing ||= params[:preview] && @quiz.grants_right?(@current_user, session, :preview)
   end
 
   def previewing_params

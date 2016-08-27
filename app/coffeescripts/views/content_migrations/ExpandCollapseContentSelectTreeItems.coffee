@@ -6,7 +6,7 @@ define [
 
     # Public Functions
 
-    linkedResourceTypes = ['assignments', 'quizzes', 'discussion_topics']
+    linkedResourceTypes = ['assignments', 'quizzes', 'discussion_topics', 'wiki_pages']
 
     # Take in an tree that should have treeitems and 
     # a .checkbox-caret associated with it

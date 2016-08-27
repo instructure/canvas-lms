@@ -81,7 +81,6 @@ module CC::Exporter::Epub::Converters
 
       save_to_file
       organize_syllabus
-      delete_unzipped_archive
       @course
     end
   end

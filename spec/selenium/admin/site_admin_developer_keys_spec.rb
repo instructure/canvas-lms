@@ -20,7 +20,7 @@ describe "managing developer keys" do
     expect(f("#edit_dialog")).to be_displayed
     f("#key_name").send_keys("Cool Tool")
     f("#email").send_keys("admin@example.com")
-    f("#redirect_uri").send_keys("http://example.com")
+    f("#redirect_uris").send_keys("http://example.com")
     f("#icon_url").send_keys("/images/delete.png")
     submit_dialog("#edit_dialog", '.submit')
     wait_for_ajaximations
@@ -30,7 +30,7 @@ describe "managing developer keys" do
     key = DeveloperKey.last
     expect(key.name).to eq "Cool Tool"
     expect(key.email).to eq "admin@example.com"
-    expect(key.redirect_uri).to eq "http://example.com"
+    expect(key.redirect_uris).to eq ["http://example.com"]
     expect(key.icon_url).to eq "/images/delete.png"
     expect(ff("#keys tbody tr").length).to eq 2
 
@@ -38,7 +38,7 @@ describe "managing developer keys" do
     expect(f("#edit_dialog")).to be_displayed
     replace_content(f("#key_name"),"Cooler Tool")
     replace_content(f("#email"), "admins@example.com")
-    replace_content(f("#redirect_uri"), "https://example.com")
+    replace_content(f("#redirect_uris"), "https://example.com")
     replace_content(f("#icon_url") ,"/images/add.png")
     submit_dialog("#edit_dialog", '.submit')
     wait_for_ajaximations
@@ -48,7 +48,7 @@ describe "managing developer keys" do
     key = DeveloperKey.last
     expect(key.name).to eq "Cooler Tool"
     expect(key.email).to eq "admins@example.com"
-    expect(key.redirect_uri).to eq "https://example.com"
+    expect(key.redirect_uris).to eq ["https://example.com"]
     expect(key.icon_url).to eq "/images/add.png"
     expect(ff("#keys tbody tr").length).to eq 2
 

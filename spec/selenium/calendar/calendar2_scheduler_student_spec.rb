@@ -22,6 +22,10 @@ describe "scheduler" do
     def reserve_appointment_manual(n, comment = nil)
       ffj('.agenda-event .ig-row')[n].click
       if comment
+        # compiled/util/Popover sets focus on the close button twice
+        # within the first 100ms, which can cause it to hijack
+        # keypresses, making a " " close the modal
+        sleep 0.1
         replace_content(f('#appointment-comment'), comment)
       end
       f('.event-details .reserve_event_link').click

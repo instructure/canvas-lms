@@ -24,7 +24,10 @@
 </div>
 
 <div class="button-container" style="margin-top: 20px;">
-  <button class="btn btn-primary add_alert_link"><i class="icon-add"></i> <%= t('buttons.add_alert', 'Add Alert') %></button>
+  <button class="Button Button--primary add_alert_link">
+    <span aria-hidden="true"><i class="icon-plus"></i> <%= t('buttons.add_alert', 'Alert') %></span>
+    <span class="screenreader-only"><%= t('Add Alert') %></span>
+  </button>
 </div>
 
 <%

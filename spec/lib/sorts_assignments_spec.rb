@@ -114,6 +114,7 @@ describe SortsAssignments do
 
   describe "ungraded_for_user_and_session" do
     let(:user) { stub }
+    let(:current_user) { stub }
     let(:session) { stub }
     let(:assignment1) { stub }
     let(:assignment2) { stub }
@@ -135,22 +136,22 @@ describe SortsAssignments do
     end
 
     it "only includes assignments that current user has permission to view" do
-      assignment3.expects(:grants_right?).with(user,session,:grade).
+      assignment3.expects(:grants_right?).with(current_user,session,:grade).
         returns false
-      expect(SortsAssignments.ungraded_for_user_and_session(assignments,user,session)).
+      expect(SortsAssignments.ungraded_for_user_and_session(assignments,user,current_user,session)).
         to match_array [ assignment1, assignment2 ]
     end
 
     it "only includes assignments that are expecting a submission" do
       assignment3.expects(:expects_submission?).returns false
-      expect(SortsAssignments.ungraded_for_user_and_session(assignments,user,session)).
+      expect(SortsAssignments.ungraded_for_user_and_session(assignments,user,current_user,session)).
         to match_array [ assignment1, assignment2 ]
     end
 
     it "only includes assignments that have a grading_count_for_user > 0" do
       Assignments::NeedsGradingCountQuery.stubs(:new).with(assignment2, user).returns(bad_count_query)
       Assignments::NeedsGradingCountQuery.stubs(:new).with(assignment3, user).returns(zero_count_query)
-      expect(SortsAssignments.ungraded_for_user_and_session(assignments,user,session)).
+      expect(SortsAssignments.ungraded_for_user_and_session(assignments,user,current_user,session)).
         to match_array [ assignment1 ]
     end
 
@@ -159,7 +160,7 @@ describe SortsAssignments do
   describe "by_due_date" do
     let(:user) { stub }
     let(:session) { stub }
-    let( :submissions ) { [] }
+    let(:submissions) { [] }
     let(:sorted_assignments) {
       SortsAssignments.by_due_date({
         :assignments => assignments,
@@ -169,6 +170,16 @@ describe SortsAssignments do
         :submissions => []
       })
     }
+
+    before :each do
+      assignments.each { |assignment|
+        assignment.stubs(
+          :grants_right? => true,
+          :expects_submission? => true,
+          :submission_for_student => {id: nil}
+        )
+      }
+    end
 
     it "raises an IndexError if a required field is not passed" do
       expect { SortsAssignments.by_due_date({}) }.
@@ -280,6 +291,44 @@ describe SortsAssignments do
       expect(SortsAssignments.overdue(assignments,user,session,submissions)).to eq [due_yesterday]
     end
 
+  end
+
+  describe "unsubmitted_for_user_and_session" do
+    let(:user) { stub }
+    let(:current_user) { stub }
+    let(:session) { stub }
+    let(:assignment1) { stub }
+    let(:assignment2) { stub }
+    let(:assignment3) { stub }
+    let(:assignments) { [ assignment1, assignment2, assignment3 ] }
+    before :each do
+      assignments.each { |assignment|
+        assignment.stubs(
+          :grants_right? => true,
+          :expects_submission? => true,
+          :submission_for_student => {id: nil}
+        )
+      }
+    end
+
+    it "only includes assignments that current user has permission to view" do
+      assignment1.expects(:grants_right?).with(current_user,session,:grade).
+        returns false
+      expect(SortsAssignments.unsubmitted_for_user_and_session(assignments,user,current_user,session)).
+        to match_array [ assignment2, assignment3 ]
+    end
+
+    it "only includes assignments that are expecting a submission" do
+      assignment2.stubs({:expects_submission? => false})
+      expect(SortsAssignments.unsubmitted_for_user_and_session(assignments,user,current_user,session)).
+        to match_array [ assignment1, assignment3 ]
+    end
+
+    it "only includes assignments that do not have a saved submission for the user" do
+      assignment3.stubs(:submission_for_student => {id: 1})
+      expect(SortsAssignments.unsubmitted_for_user_and_session(assignments,user,current_user,session)).
+        to match_array [ assignment1, assignment2 ]
+    end
   end
 
 end

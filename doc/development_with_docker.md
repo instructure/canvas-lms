@@ -9,14 +9,22 @@ way to get started developing Canvas.
 
 #### OS X
 
-On OS X, make sure you have the following installed:
+On OS X, you can opt for [dinghy](https://github.com/codekitchen/dinghy)
+or [Docker for Mac](https://docs.docker.com/docker-for-mac/).  They each have
+various strengths.  If you don't know which to choose, you should
+probably match your team.  We have engineers using both at Instructure
+so either one is fine.
 
-##### VMWare Fusion
+##### Dinghy
+
+Make sure you have the following installed:
+
+* VMWare Fusion
 
 Preferred over VirtualBox for performance reasons. (although Virtualbox 5 is
 pretty close, about 90% of VMWare fusion in basic testing)
 
-##### Dinghy
+* Dinghy
 
 You'll want to walk through https://github.com/codekitchen/dinghy#install, but
 when you run create, you may want to increase the system resources you give the
@@ -31,6 +39,23 @@ is happy.
 
 Dinghy currently requires OS X Yosemite. Make sure you're using the most recent
 Dinghy release, or else you'll probably have a bad time.
+
+##### Docker for Mac
+
+You can install Docker for Mac to get a very similar experience
+to the native Linux experience, but from your OS X machine.
+
+Download the [stable dmg](https://download.docker.com/mac/stable/Docker.dmg)
+from the [Docker for Mac website](https://docs.docker.com/docker-for-mac/).
+Or the [beta](https://download.docker.com/mac/beta/Docker.dmg) if you want to get cray.
+
+After installing docker for Mac, you will need
+[dory](https://github.com/FreedomBen/dory) for the reverse proxy
+portion that is provided by dinghy.  Install with:
+
+```
+gem install dory
+```
 
 #### Linux
 
@@ -99,6 +124,23 @@ addition to take effect.
 NOTE: Adding non-privileged users to the docker group can be
 a security risk.  Don't add users to this group that shouldn't
 have root privileges.  Dev responsibly my friends.
+
+##### Install dory (optional)
+
+People using dinghy will have a reverse proxy that allows them to access
+canvas at `http://canvas.docker`.  On Linux and Docker for Mac, you will need
+to run your own reverse proxy (or access your containers via IP/port).
+
+Many people at Instructure are using [dory](https://github.com/FreedomBen/dory)
+for this as it uses the same
+proxy under the hood as dinghy which gives you maximum compatibility.
+Detailed instructions are available at the
+[github page](https://github.com/FreedomBen/dory), but you can
+install dory with:
+
+```
+gem install dory
+```
 
 #### Docker-Compose
 
@@ -173,7 +215,11 @@ $ docker-compose up
 ```
 
 If on OS X and using dinghy, you can now open Canvas at http://canvas.docker/.
-If on Linux, canvas is listening and available on localhost port 3000 (http://localhost:3000)
+
+If on Linux or Docker for Mac, canvas is listening and available on
+localhost port 3000 (http://localhost:3000).
+[dory](https://github.com/FreedomBen/dory) can make
+http://canvas.docker/ work for you as well with minimal effort.
 
 ## Normal Usage
 
@@ -318,4 +364,17 @@ starting up, you may try adding `DISABLE_SPRING: 1` to your
 web: &WEB
   environment:
     DISABLE_SPRING: 1
+```
+
+If you are getting DNS resolution errors, and you use Docker for Mac or Linux,
+make sure [dory](https://github.com/FreedomBen/dory) is running:
+
+```
+dory status
+```
+
+If dory is not running, you can start it with:
+
+```
+dory up
 ```

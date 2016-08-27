@@ -542,9 +542,9 @@ class CalendarEventsApiController < ApplicationController
   #
   # Update and return a calendar event
   #
-  # @argument calendar_event[context_code] [Required, String]
-  #   Context code of the course/group/user whose calendar this event should be
-  #   added to.
+  # @argument calendar_event[context_code] [Optional, String]
+  #   Context code of the course/group/user to move this event to.
+  #   Scheduler appointments and events with section-specific times cannot be moved between calendars.
   # @argument calendar_event[title] [String]
   #   Short title for the calendar event.
   # @argument calendar_event[description] [String]
@@ -585,7 +585,21 @@ class CalendarEventsApiController < ApplicationController
         @event.validate_context! if @event.context.is_a?(AppointmentGroup)
         @event.updating_user = @current_user
       end
-      params[:calendar_event].delete(:context_code)
+      context_code = params[:calendar_event].delete(:context_code)
+      if context_code
+        context = Context.find_by_asset_string(context_code)
+        raise ActiveRecord::RecordNotFound, "Invalid context_code" unless context
+        if @event.context != context
+          if @event.context.is_a?(AppointmentGroup)
+            return render :json => { :message => 'Cannot move Scheduler appointments between calendars' }, :status => :bad_request
+          end
+          if @event.parent_calendar_event_id.present? || @event.child_events.any? || @event.effective_context_code.present?
+            return render :json => { :message => 'Cannot move events with section-specific times between calendars' }, :status => :bad_request
+          end
+          @event.context = context
+        end
+        return unless authorized_action(@event, @current_user, :create)
+      end
       if params[:calendar_event][:description].present?
         params[:calendar_event][:description] = process_incoming_html_content(params[:calendar_event][:description])
       end
@@ -736,6 +750,150 @@ class CalendarEventsApiController < ApplicationController
     @current_user.preferences[:selected_calendar_contexts] = params[:selected_contexts]
     @current_user.save!
     render json: {status: 'ok'}
+  end
+
+  # @API Set a course timetable
+  # @beta
+  #
+  # Creates and updates "timetable" events for a course.
+  # Can automaticaly generate a series of calendar events based on simple schedules
+  # (e.g. "Monday and Wednesday at 2:00pm" )
+  #
+  # Existing timetable events for the course and course sections
+  # will be updated if they still are part of the timetable.
+  # Otherwise, they will be deleted.
+  #
+  # @argument timetables[course_section_id][] [Array]
+  #   An array of timetable objects for the course section specified by course_section_id.
+  #   If course_section_id is set to "all", events will be created for the entire course.
+  #
+  # @argument timetables[course_section_id][][weekdays] [String]
+  #   A comma-separated list of abbreviated weekdays
+  #   (Mon-Monday, Tue-Tuesday, Wed-Wednesday, Thu-Thursday, Fri-Friday, Sat-Saturday, Sun-Sunday)
+  #
+  # @argument timetables[course_section_id][][start_time] [String]
+  #   Time to start each event at (e.g. "9:00 am")
+  #
+  # @argument timetables[course_section_id][][end_time] [String]
+  #   Time to end each event at (e.g. "9:00 am")
+  #
+  # @argument timetables[course_section_id][][location_name] [Optional, String]
+  #   A location name to set for each event
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/calendar_events/timetable' \
+  #        -X POST \
+  #        -F 'timetables[all][][weekdays]=Mon,Wed,Fri' \
+  #        -F 'timetables[all][][start_time]=11:00 am' \
+  #        -F 'timetables[all][][end_time]=11:50 am' \
+  #        -F 'timetables[all][][location_name]=Room 237' \
+  #        -H "Authorization: Bearer <token>"
+  def set_course_timetable
+    get_context
+    if authorized_action(@context, @current_user, :manage_calendar)
+      timetable_data = params[:timetables]
+
+      builders = {}
+      updated_section_ids = []
+      timetable_data.each do |section_id, timetables|
+        timetable_data[section_id] = Array(timetables)
+        section = section_id == 'all' ? nil : api_find(@context.active_course_sections, section_id)
+        updated_section_ids << section.id if section
+
+        builder = Courses::TimetableEventBuilder.new(course: @context, course_section: section)
+        builders[section_id] = builder
+
+        builder.process_and_validate_timetables(timetables)
+        if builder.errors.present?
+          return render :json => {:errors => builder.errors}, :status => :bad_request
+        end
+      end
+
+      @context.timetable_data = timetable_data # so we can retrieve it later
+      @context.save!
+
+      timetable_data.each do |section_id, timetables|
+        builder = builders[section_id]
+        event_hashes = builder.generate_event_hashes(timetables)
+        builder.process_and_validate_event_hashes(event_hashes)
+        raise "error creating timetable events #{builder.errors.join(", ")}" if builder.errors.present?
+        builder.send_later(:create_or_update_events, event_hashes) # someday we may want to make this a trackable progress job /shrug
+      end
+
+      # delete timetable events for sections missing here
+      ignored_section_ids = @context.active_course_sections.where.not(:id => updated_section_ids).pluck(:id)
+      if ignored_section_ids.any?
+        CalendarEvent.active.for_timetable.where(:context_type => "CourseSection", :context_id => ignored_section_ids).
+          update_all(:workflow_state => 'deleted', :deleted_at => Time.now.utc)
+      end
+
+      render :json => {:status => 'ok'}
+    end
+  end
+
+  # @API Get course timetable
+  # @beta
+  #
+  # Returns the last timetable set by the
+  # {api:CalendarEventsApiController#set_course_timetable Set a course timetable} endpoint
+  #
+  def get_course_timetable
+    get_context
+    if authorized_action(@context, @current_user, :manage_calendar)
+      timetable_data = @context.timetable_data || {}
+      render :json => timetable_data
+    end
+  end
+
+  # @API Create or update events directly for a course timetable
+  # @beta
+  #
+  # Creates and updates "timetable" events for a course or course section.
+  # Similar to {api:CalendarEventsApiController#set_course_timetable setting a course timetable},
+  # but instead of generating a list of events based on a timetable schedule,
+  # this endpoint expects a complete list of events.
+  #
+  # @argument course_section_id [Optional, String]
+  #   Events will be created for the course section specified by course_section_id.
+  #   If not present, events will be created for the entire course.
+  #
+  # @argument events[] [Array]
+  #   An array of event objects to use.
+  #
+  # @argument events[][start_at] [DateTime]
+  #   Start time for the event
+  #
+  # @argument events[][end_at] [DateTime]
+  #   End time for the event
+  #
+  # @argument events[][location_name] [Optional, String]
+  #   Location name for the event
+  #
+  # @argument events[][code] [Optional, String]
+  #   A unique identifier that can be used to update the event at a later time
+  #   If one is not specified, an identifier will be generated based on the start and end times
+  #
+  def set_course_timetable_events
+    get_context
+    if authorized_action(@context, @current_user, :manage_calendar)
+      section = api_find(@context.active_course_sections, params[:course_section_id]) if params[:course_section_id]
+      builder = Courses::TimetableEventBuilder.new(course: @context, course_section: section)
+
+      event_hashes = params[:events]
+      event_hashes.each do |hash|
+        [:start_at, :end_at].each do |key|
+          hash[key] = CanvasTime.try_parse(hash[key])
+        end
+      end
+      builder.process_and_validate_event_hashes(event_hashes)
+      if builder.errors.present?
+        return render :json => {:errors => builder.errors}, :status => :bad_request
+      end
+
+      builder.send_later(:create_or_update_events, event_hashes)
+      render json: {status: 'ok'}
+    end
   end
 
   protected

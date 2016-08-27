@@ -4,62 +4,70 @@
   data-item-id="{{labelId}}"
 >
   <div class="ig-row__layout">
-    <a href="{{htmlUrl}}" class="ig-title">
-      {{#if canManage}}
-        <span class="draggable-handle">
-          <i class="icon-drag-handle"></i>
-        </span>
-      {{/if}}
-      <i class='icon-{{iconType}}'></i>
-      {{name}}
-    </a>
-    <div class="ig-details">
-      {{#if canManage}}
-        <div class="ellipses modules">
+    {{#if canManage}}
+    <div class="ig-handle">
+      <span class="draggable-handle">
+        <i class="icon-drag-handle"></i>
+      </span>
+    </div>
+    {{/if}}
+    <div class="ig-type-icon">
+      <i aria-hidden="true" class='icon-{{iconType}}'></i>
+    </div>
+    <div class="ig-info">
+      <a href="{{htmlUrl}}" class="ig-title">
+        {{name}}
+      </a>
+      <div class="ig-details">
+        {{#if canManage}}
           {{#if has_modules}}
-            {{#ifEqual module_count 1}}
-              {{module_name}} {{#t}}Module{{/t}}
-            {{else}}
-              <a
-                href='#'
-                title='{{joined_names}}'
-                class="tooltip_link"
-                data-tooltip-selector="#module_tooltip_{{labelId}}"
-              >{{#t}}Multiple Modules{{/t}}</a>
-            {{/ifEqual}}
-            <div id="module_tooltip_{{labelId}}" style="display:none;">
-              {{#each modules}}
-                <span>{{this}}</span><br/>
-              {{/each}}
+            <div class="ig-details__item ig-details__item--wrap-text modules">
+              {{#ifEqual module_count 1}}
+                {{module_name}} {{#t}}Module{{/t}}
+              {{else}}
+                <a
+                  href='#'
+                  title='{{joined_names}}'
+                  class="tooltip_link"
+                  data-tooltip-selector="#module_tooltip_{{labelId}}"
+                >{{#t}}Multiple Modules{{/t}}</a>
+              {{/ifEqual}}
+              <div id="module_tooltip_{{labelId}}" style="display:none;">
+                {{#each modules}}
+                  <span>{{this}}</span>
+                {{/each}}
+              </div>
             </div>
           {{/if}}
+        {{/if}}
+        {{#if showAvailability }}
+        <div class="ig-details__item assignment-date-available" data-view="date-available">
         </div>
-      {{/if}}
-
-      <div class="assignment-date-available ellipses" data-view="date-available"></div>
-      <div class="assignment-date-due ellipses" data-view="date-due"></div>
-
-      <div class="ellipses js-score {{alignTextClass}}">
-        <span class="screenreader-only">
-          {{#if pointsPossible}}
-            {{#t}}{{pointsPossible}} Points Possible{{/t}}
-          {{else}}
+        {{/if}}
+        {{#if showDueDate }}
+          <div class="ig-details__item assignment-date-due" data-view="date-due">
+          </div>
+        {{/if}}
+        {{#if pointsPossible}}
+          <div class="ig-details__item js-score">
+            <span class="screenreader-only">
+              {{#t}}{{pointsPossible}} Points Possible{{/t}}
+            </span>
+            <span class="non-screenreader" aria-hidden="true">
+              {{#t}}{{pointsPossible}} pts{{/t}}
+            </span>
+          </div>
+        {{else}}
+          <span class="js-score screenreader-only">
             {{#t}}No Points Possible{{/t}}
-          {{/if}}
-        </span>
-        <span class="non-screenreader" aria-hidden="true">
-          {{#if pointsPossible}}{{#t}}{{pointsPossible}} pts{{/t}}{{/if}}
-        </span>
+          </span>
+        {{/if}}
       </div>
-
     </div>
-
     {{#if canManage}}
       <div class="ig-admin">
         <span class="sis-button" data-view="sis-button"></span>
-
         <span class="publish-icon" data-view="publish-icon"></span>
-
         <div class="inline-block">
           <a
             class="al-trigger al-trigger-gray"

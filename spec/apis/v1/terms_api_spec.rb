@@ -89,8 +89,8 @@ describe TermsApiController, type: :request do
         @term2.update_attributes(start_at: 2.days.ago, end_at: 6.days.from_now)
 
         json = get_terms
-        expect(json.first['name']).to eq @term2.name
-        expect(json.last['name']).to eq @term1.name
+        expect(json.first['name']).to eq @term1.name
+        expect(json.last['name']).to eq @term2.name
       end
 
       it "should order by end_at second" do
@@ -99,8 +99,8 @@ describe TermsApiController, type: :request do
         @term2.update_attributes(start_at: start_at, end_at: 5.days.from_now)
 
         json = get_terms
-        expect(json.first['name']).to eq @term2.name
-        expect(json.last['name']).to eq @term1.name
+        expect(json.first['name']).to eq @term1.name
+        expect(json.last['name']).to eq @term2.name
       end
 
       it "should order by id last" do

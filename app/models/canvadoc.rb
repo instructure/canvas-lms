@@ -29,7 +29,6 @@ class Canvadoc < ActiveRecord::Base
     url = attachment.authenticated_s3_url(:expires => 1.day)
 
     opts.delete(:annotatable) unless Canvadocs.annotations_supported?
-    opts[:preferred_plugin] = preferred_plugin
 
     response = Canvas.timeout_protection("canvadocs") {
       canvadocs_api.upload(url, opts)
@@ -50,23 +49,12 @@ class Canvadoc < ActiveRecord::Base
   def session_url(opts = {})
     user = opts.delete(:user)
     opts.merge! annotation_opts(user)
-    opts[:preferred_plugin] = preferred_plugin
 
     Canvas.timeout_protection("canvadocs", raise_on_timeout: true) do
       session = canvadocs_api.session(document_id, opts)
       canvadocs_api.view(session["id"])
     end
   end
-
-  def preferred_plugin
-    begin
-      course = Course.find(self.preferred_plugin_course_id)
-      return course.feature_enabled?(:new_annotations) ? 'pdfjs' : nil
-    rescue ActiveRecord::RecordNotFound => e
-    end
-    nil
-  end
-  private :preferred_plugin
 
   def annotation_opts(user)
     return {} if !user || !has_annotations?

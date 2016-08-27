@@ -260,10 +260,6 @@
   }
   .events_list, .to-do-list {
     li.event, li.todo {
-      i[class*=icon-], i[class^=icon-] {
-        color: lighten( $grayDark, 15% );
-        vertical-align: top;
-      }
       i.icon-check {
         @if $use_new_styles { color: $ic-color-success; }
         @else { color: #33802a; }
@@ -276,7 +272,7 @@
     }
     .event-details, .todo-details {
       display: inline-block;
-      padding-right: $ic-sp*2;
+      padding-right: $ic-sp*2+2;
     }
   }
   .events_list {

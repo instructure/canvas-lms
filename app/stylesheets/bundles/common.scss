@@ -3,6 +3,7 @@
 
 // Variables (including Bootstrap and jQuery UI), mixins, and functions
 @import "base/environment";
+@import "../../../node_modules/instructure-ui/dist/instructure-ui";
 
 // Heavily customized vendor styles
 @import "vendor/jqueryui/jquery.ui.all";
@@ -32,6 +33,6 @@
 @import "components/g_mini_calendar";
 @import "components/helpDialog";
 @import "components/ic-expand-link";
+@import "components/flickrSearch";
 @import "vendor/mediaelementplayer";
 @import "base/custom_mediaelementplayer";
-

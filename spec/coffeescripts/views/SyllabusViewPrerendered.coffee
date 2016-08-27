@@ -317,11 +317,26 @@ define [], ->
 
   syllabusContainer: '''<div id="syllabusContainer"/>'''
 
-  miniMonth: '''
+  miniMonthDay: (year, month, day, currentMonth = 1, currentDay = 1) ->
+    month = ("0" + month).slice(-2)
+    day = ("0" + day).slice(-2)
+    """
+            <td id="mini_day_#{year}_#{month}_#{day}" class="mini_calendar_day day #{if month != currentMonth then "other_month " + (if (month + 1) % 12 == currentMonth then "previous_month" else "next_month") else "current_month"} #{if currentDay == day and currentMonth == month then "today" else ""} date_#{month}_#{day}_#{year}">
+              <div class="day_wrapper">
+                <span class="day_number" title="#{month}/#{day}/#{year}">#{day}</span>
+                <span class="screenreader-only previous_month_text">Previous month</span>
+                <span class="screenreader-only next_month_text">Next month</span>
+                <span class="screenreader-only today_text">Today</span>
+                <span class="screenreader-only event_link_text">Click to view event details</span>
+              </div>
+            </td>
+    """
+
+  miniMonth: -> """
     <div class="mini_month" aria-hidden="true">
       <div class="mini-cal-header">
-        <a href="#" class="prev_month_link"><i class="icon-arrow-left standalone-icon"></i></a>
-        <a href="#" class="next_month_link"><i class="icon-arrow-right standalone-icon"></i></a>
+        <button class="prev_month_link Button Button--icon-action"><i class="icon-arrow-open-left"></i><span class="screenreader-only">Prev month</span></button>
+        <button class="next_month_link Button Button--icon-action"><i class="icon-arrow-open-right"></i><span class="screenreader-only">Next month</span></button>
         <span class="mini-cal-month-and-year">
           <span class="month_name">January</span>
           <span class="year_number">2012</span>
@@ -331,144 +346,65 @@ define [], ->
         <span class="month_number">1</span>
       </div>
       <table class="mini_calendar" cellspacing="0">
+        <caption class="screenreader-only">Calendar</caption>
+        <thead>
+          <tr>
+            <th scope="col">
+              <span class="screenreader-only">
+                Sunday
+              </span>
+            </th>
+            <th scope="col">
+              <span class="screenreader-only">
+                Monday
+              </span>
+            </th>
+            <th scope="col">
+              <span class="screenreader-only">
+                Tuesday
+              </span>
+            </th>
+            <th scope="col">
+              <span class="screenreader-only">
+                Wednesday
+              </span>
+            </th>
+            <th scope="col">
+              <span class="screenreader-only">
+                Thursday
+              </span>
+            </th>
+            <th scope="col">
+              <span class="screenreader-only">
+                Friday
+              </span>
+            </th>
+            <th scope="col">
+              <span class="screenreader-only">
+                Saturday
+              </span>
+            </th>
+          </tr>
+        </thead>
         <tbody><tr class="mini_calendar_week">
-            <td id="mini_day_2011_12_25" class="mini_calendar_day day other_month date_12_25_2011">
-              <span class="day_number" title="12/25/2011">25</span>
-            </td>
-            <td id="mini_day_2011_12_26" class="mini_calendar_day day other_month date_12_26_2011">
-              <span class="day_number" title="12/26/2011">26</span>
-            </td>
-            <td id="mini_day_2011_12_27" class="mini_calendar_day day other_month date_12_27_2011">
-              <span class="day_number" title="12/27/2011">27</span>
-            </td>
-            <td id="mini_day_2011_12_28" class="mini_calendar_day day other_month date_12_28_2011">
-              <span class="day_number" title="12/28/2011">28</span>
-            </td>
-            <td id="mini_day_2011_12_29" class="mini_calendar_day day other_month date_12_29_2011">
-              <span class="day_number" title="12/29/2011">29</span>
-            </td>
-            <td id="mini_day_2011_12_30" class="mini_calendar_day day other_month date_12_30_2011">
-              <span class="day_number" title="12/30/2011">30</span>
-            </td>
-            <td id="mini_day_2011_12_31" class="mini_calendar_day day other_month date_12_31_2011">
-              <span class="day_number" title="12/31/2011">31</span>
-            </td>
+          #{(@miniMonthDay(2011, 12, day) for day in [25..31]).join("\n")}
         </tr>
         <tr class="mini_calendar_week">
-            <td id="mini_day_2012_01_01" class="mini_calendar_day day current_month today date_01_01_2012">
-              <span class="day_number" title="01/01/2012">1</span>
-            </td>
-            <td id="mini_day_2012_01_02" class="mini_calendar_day day current_month date_01_02_2012">
-              <span class="day_number" title="01/02/2012">2</span>
-            </td>
-            <td id="mini_day_2012_01_03" class="mini_calendar_day day current_month date_01_02_2012">
-              <span class="day_number" title="01/03/2012">3</span>
-            </td>
-            <td id="mini_day_2012_01_04" class="mini_calendar_day day current_month date_01_04_2012">
-              <span class="day_number" title="01/04/2012">4</span>
-            </td>
-            <td id="mini_day_2012_01_05" class="mini_calendar_day day current_month date_01_05_2012">
-              <span class="day_number" title="01/05/2012">5</span>
-            </td>
-            <td id="mini_day_2012_01_06" class="mini_calendar_day day current_month date_01_06_2012">
-              <span class="day_number" title="01/06/2012">6</span>
-            </td>
-            <td id="mini_day_2012_01_07" class="mini_calendar_day day current_month date_01_07_2012">
-              <span class="day_number" title="01/07/2012">7</span>
-            </td>
+          #{(@miniMonthDay(2012, 1, day) for day in [1..7]).join("\n")}
         </tr>
         <tr class="mini_calendar_week">
-            <td id="mini_day_2012_01_08" class="mini_calendar_day day current_month date_01_08_2012">
-              <span class="day_number" title="01/08/2012">8</span>
-            </td>
-            <td id="mini_day_2012_01_09" class="mini_calendar_day day current_month date_01_09_2012">
-              <span class="day_number" title="01/09/2012">9</span>
-            </td>
-            <td id="mini_day_2012_01_10" class="mini_calendar_day day current_month date_01_10_2012">
-              <span class="day_number" title="01/10/2012">10</span>
-            </td>
-            <td id="mini_day_2012_01_11" class="mini_calendar_day day current_month date_01_11_2012">
-              <span class="day_number" title="01/11/2012">11</span>
-            </td>
-            <td id="mini_day_2012_01_12" class="mini_calendar_day day current_month date_01_12_2012">
-              <span class="day_number" title="01/12/2012">12</span>
-            </td>
-            <td id="mini_day_2012_01_13" class="mini_calendar_day day current_month date_01_13_2012">
-              <span class="day_number" title="01/13/2012">13</span>
-            </td>
-            <td id="mini_day_2012_01_14" class="mini_calendar_day day current_month date_01_14_2012">
-              <span class="day_number" title="01/14/2012">14</span>
-            </td>
+          #{(@miniMonthDay(2012, 1, day) for day in [8..14]).join("\n")}
         </tr>
         <tr class="mini_calendar_week">
-            <td id="mini_day_2012_01_15" class="mini_calendar_day day current_month date_01_15_2012">
-              <span class="day_number" title="01/15/2012">15</span>
-            </td>
-            <td id="mini_day_2012_01_16" class="mini_calendar_day day current_month date_01_16_2012">
-              <span class="day_number" title="01/16/2012">16</span>
-            </td>
-            <td id="mini_day_2012_01_17" class="mini_calendar_day day current_month date_01_17_2012">
-              <span class="day_number" title="01/17/2012">17</span>
-            </td>
-            <td id="mini_day_2012_01_18" class="mini_calendar_day day current_month date_01_18_2012">
-              <span class="day_number" title="01/18/2012">18</span>
-            </td>
-            <td id="mini_day_2012_01_19" class="mini_calendar_day day current_month date_01_19_2012">
-              <span class="day_number" title="01/19/2012">19</span>
-            </td>
-            <td id="mini_day_2012_01_20" class="mini_calendar_day day current_month date_01_20_2012">
-              <span class="day_number" title="01/20/2012">20</span>
-            </td>
-            <td id="mini_day_2012_01_21" class="mini_calendar_day day current_month date_01_21_2012">
-              <span class="day_number" title="01/21/2012">21</span>
-            </td>
+          #{(@miniMonthDay(2012, 1, day) for day in [15..21]).join("\n")}
         </tr>
         <tr class="mini_calendar_week">
-            <td id="mini_day_2012_01_22" class="mini_calendar_day day current_month date_01_22_2012">
-              <span class="day_number" title="01/22/2012">22</span>
-            </td>
-            <td id="mini_day_2012_01_23" class="mini_calendar_day day current_month date_01_23_2012">
-              <span class="day_number" title="01/23/2012">23</span>
-            </td>
-            <td id="mini_day_2012_01_24" class="mini_calendar_day day current_month date_01_24_2012">
-              <span class="day_number" title="01/24/2012">24</span>
-            </td>
-            <td id="mini_day_2012_01_25" class="mini_calendar_day day current_month date_01_25_2012">
-              <span class="day_number" title="01/25/2012">25</span>
-            </td>
-            <td id="mini_day_2012_01_26" class="mini_calendar_day day current_month date_01_26_2012">
-              <span class="day_number" title="01/26/2012">26</span>
-            </td>
-            <td id="mini_day_2012_01_27" class="mini_calendar_day day current_month date_01_27_2012">
-              <span class="day_number" title="01/27/2012">27</span>
-            </td>
-            <td id="mini_day_2012_01_28" class="mini_calendar_day day current_month date_01_28_2012">
-              <span class="day_number" title="01/28/2012">28</span>
-            </td>
+          #{(@miniMonthDay(2012, 1, day) for day in [22..28]).join("\n")}
         </tr>
         <tr class="mini_calendar_week">
-            <td id="mini_day_2012_01_29" class="mini_calendar_day day current_month date_01_29_2012">
-              <span class="day_number" title="01/29/2012">29</span>
-            </td>
-            <td id="mini_day_2012_01_30" class="mini_calendar_day day current_month date_01_30_2012">
-              <span class="day_number" title="01/30/2012">30</span>
-            </td>
-            <td id="mini_day_2012_01_31" class="mini_calendar_day day current_month date_01_31_2012">
-              <span class="day_number" title="01/31/2012">31</span>
-            </td>
-            <td id="mini_day_2012_02_01" class="mini_calendar_day day other_month date_02_01_2012">
-              <span class="day_number" title="02/01/2012">1</span>
-            </td>
-            <td id="mini_day_2012_02_02" class="mini_calendar_day day other_month date_02_02_2012">
-              <span class="day_number" title="02/02/2012">2</span>
-            </td>
-            <td id="mini_day_2012_02_03" class="mini_calendar_day day other_month date_02_03_2012">
-              <span class="day_number" title="02/03/2012">3</span>
-            </td>
-            <td id="mini_day_2012_02_04" class="mini_calendar_day day other_month date_02_04_2012">
-              <span class="day_number" title="02/04/2012">4</span>
-            </td>
+          #{(@miniMonthDay(2012, 1, day) for day in [29..31]).join("\n")}
+          #{(@miniMonthDay(2012, 2, day) for day in [1..4]).join("\n")}
         </tr>
       </tbody></table>
     </div>
-  '''
+  """

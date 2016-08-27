@@ -206,7 +206,12 @@ class ProvisionalGradesController < ApplicationController
       submissions = @assignment.submissions.preload(:all_submission_comments,
                                                     { :provisional_grades => :rubric_assessments })
       selections = @assignment.moderated_grading_selections.index_by(&:student_id)
-      submissions.each do |submission|
+
+      graded_submissions = submissions.select do |submission|
+        submission.provisional_grades.any?
+      end
+
+      grades_to_publish = graded_submissions.map do |submission|
         if (selection = selections[submission.user_id])
           # student in moderation: choose the selected provisional grade
           selected_provisional_grade = submission.provisional_grades
@@ -215,16 +220,21 @@ class ProvisionalGradesController < ApplicationController
 
         # either the student is not in moderation, or not all provisional grades were entered
         # choose the first one with a grade (there should only be one)
-        selected_provisional_grade ||= submission.provisional_grades
-          .select { |pg| pg.graded_at.present? }
-          .sort_by(&:created_at)
-          .first
-
-        if selected_provisional_grade
-          selected_provisional_grade.publish!
+        unless selected_provisional_grade
+          provisional_grades = submission.provisional_grades
+            .select { |pg| pg.graded_at.present? }
+          selected_provisional_grade = provisional_grades.first if provisional_grades.count == 1
         end
+
+        unless selected_provisional_grade
+          return render json: { message: "All submissions must have a selected grade" },
+                        status: :unprocessable_entity
+        end
+
+        selected_provisional_grade
       end
 
+      grades_to_publish.each(&:publish!)
       @context.touch_admins_later # just in case nothing got published
       @assignment.update_attribute(:grades_published_at, Time.now.utc)
       render :json => { :message => "OK" }

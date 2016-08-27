@@ -11,7 +11,7 @@ describe 'developer keys' do
     Account.default.developer_keys.create!(
       name: 'Cool Tool',
       email: 'admin@example.com',
-      redirect_uri: 'http://example.com',
+      redirect_uris: ['http://example.com'],
       icon_url: '/images/delete.png'
     )
   end
@@ -24,7 +24,8 @@ describe 'developer keys' do
     expect(f("#edit_dialog")).to be_displayed
     f("#key_name").send_keys("Cool Tool")
     f("#email").send_keys("admin@example.com")
-    f("#redirect_uri").send_keys("http://example.com")
+    f("#redirect_uris").send_keys("http://example.com")
+    expect(f(".key_form")).not_to contain_css("#redirect_uri")
     f("#icon_url").send_keys("/images/delete.png")
     submit_dialog("#edit_dialog", '.submit')
     wait_for_ajaximations
@@ -34,7 +35,7 @@ describe 'developer keys' do
     key = Account.default.developer_keys.last
     expect(key.name).to eq "Cool Tool"
     expect(key.email).to eq "admin@example.com"
-    expect(key.redirect_uri).to eq "http://example.com"
+    expect(key.redirect_uris).to eq ["http://example.com"]
     expect(key.icon_url).to eq "/images/delete.png"
     expect(ff("#keys tbody tr").length).to eq 1
   end
@@ -46,7 +47,7 @@ describe 'developer keys' do
     expect(f("#edit_dialog")).to be_displayed
     replace_content(f("#key_name"), "Cooler Tool")
     replace_content(f("#email"), "admins@example.com")
-    replace_content(f("#redirect_uri"), "https://example.com")
+    replace_content(f("#redirect_uris"), "http://b/")
     replace_content(f("#icon_url"), "/images/add.png")
     submit_dialog("#edit_dialog", '.submit')
     wait_for_ajaximations
@@ -56,7 +57,31 @@ describe 'developer keys' do
     key = Account.default.developer_keys.last
     expect(key.name).to eq "Cooler Tool"
     expect(key.email).to eq "admins@example.com"
-    expect(key.redirect_uri).to eq "https://example.com"
+    expect(key.redirect_uris).to eq ["http://b/"]
+    expect(key.icon_url).to eq "/images/add.png"
+    expect(ff("#keys tbody tr").length).to eq 1
+  end
+
+  it 'allows editing of legacy redirect URI' do
+    dk = add_developer_key
+    dk.update_attribute(:redirect_uri, "http://a/")
+    get "/accounts/#{Account.default.id}/developer_keys"
+    f("#keys tbody tr.key .edit_link").click
+    expect(f("#edit_dialog")).to be_displayed
+    replace_content(f("#key_name"), "Cooler Tool")
+    replace_content(f("#email"), "admins@example.com")
+    expect(f(".key_form")).to contain_css("#redirect_uri")
+    replace_content(f("#redirect_uri"), "https://b/")
+    replace_content(f("#icon_url"), "/images/add.png")
+    submit_dialog("#edit_dialog", '.submit')
+    wait_for_ajaximations
+
+    expect(f("#edit_dialog")).not_to be_displayed
+    expect(Account.default.developer_keys.count).to eq 1
+    key = Account.default.developer_keys.last
+    expect(key.name).to eq "Cooler Tool"
+    expect(key.email).to eq "admins@example.com"
+    expect(key.redirect_uri).to eq "https://b/"
     expect(key.icon_url).to eq "/images/add.png"
     expect(ff("#keys tbody tr").length).to eq 1
   end

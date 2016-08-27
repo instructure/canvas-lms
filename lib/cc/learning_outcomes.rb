@@ -85,8 +85,11 @@ module CC
 
       migration_id = CCHelper.create_key(item)
       node.learningOutcome(:identifier=>migration_id) do |out_node|
-        out_node.title item.short_description unless item.short_description.blank?
-        out_node.description @html_exporter.html_content(item.description) unless item.description.blank?
+        out_node.title item.short_description if item.short_description.present?
+        out_node.description @html_exporter.html_content(item.description) if item.description.present?
+        out_node.calculation_method item.calculation_method if item.calculation_method.present?
+        out_node.calculation_int item.calculation_int if item.calculation_int.present?
+
         if item.context != @course
           out_node.is_global_outcome !item.context
           out_node.external_identifier item.id
@@ -122,6 +125,5 @@ module CC
         end
       end
     end
-
   end
 end

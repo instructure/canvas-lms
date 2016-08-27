@@ -77,6 +77,14 @@ module Canvas::LiveEvents
     }
   end
 
+  def self.assignment_created(assignment)
+    post_event_stringified('assignment_created', get_assignment_data(assignment))
+  end
+
+  def self.assignment_updated(assignment)
+    post_event_stringified('assignment_updated', get_assignment_data(assignment))
+  end
+
   def self.get_submission_data(submission)
     {
       submission_id: submission.global_id,
@@ -93,20 +101,36 @@ module Canvas::LiveEvents
     }
   end
 
-  def self.assignment_created(assignment)
-    post_event_stringified('assignment_created', get_assignment_data(assignment))
-  end
-
   def self.submission_created(submission)
     post_event_stringified('submission_created', get_submission_data(submission))
   end
 
-  def self.assignment_updated(assignment)
-    post_event_stringified('assignment_updated', get_assignment_data(assignment))
-  end
-
   def self.submission_updated(submission)
     post_event_stringified('submission_updated', get_submission_data(submission))
+  end
+
+  def self.enrollment_created(enrollment)
+    post_event_stringified('enrollment_created', {
+      enrollment_id: enrollment.id,
+      course_id: enrollment.course_id,
+      user_id: enrollment.user_id,
+      user_name: enrollment.user_name,
+      type: enrollment.type,
+      created_at: enrollment.created_at,
+      updated_at: enrollment.updated_at,
+      limit_privileges_to_course_section: enrollment.limit_privileges_to_course_section,
+      course_section_id: enrollment.course_section_id,
+    })
+  end
+
+  def self.user_account_association_created(assoc)
+    post_event_stringified('user_account_association_created', {
+      user_id: assoc.user_id,
+      account_id: assoc.account_id,
+      created_at: assoc.created_at,
+      updated_at: assoc.updated_at,
+      is_admin: !(assoc.account.root_account.all_account_users_for(assoc.user).empty?),
+    })
   end
 
   def self.logged_in(session)

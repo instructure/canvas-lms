@@ -546,7 +546,7 @@ class AssignmentsApiController < ApplicationController
   #   Apply assignment overrides for each assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]
   #   Split up "needs_grading_count" by sections into the "needs_grading_count_by_section" key, defaults to false
-  # @argument bucket [String, "past"|"overdue"|"undated"|"ungraded"|"upcoming"|"future"]
+  # @argument bucket [String, "past"|"overdue"|"undated"|"ungraded"|"unsubmitted"|"upcoming"|"future"]
   #   If included, only return certain assignments depending on due date and submission status.
   # @returns [Assignment]
   def index
@@ -580,11 +580,10 @@ class AssignmentsApiController < ApplicationController
         users = current_user_and_observed(
                     include_observed: include_params.include?("observed_users"))
         submissions_for_user = scope.with_submissions_for_user(users).flat_map(&:submissions)
-        scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @context, submissions_for_user)
+        scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @current_user, @context, submissions_for_user)
       end
 
       assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
-
 
       submissions = submissions_hash(include_params, assignments, submissions_for_user)
 
@@ -1007,6 +1006,6 @@ class AssignmentsApiController < ApplicationController
   def require_user_or_observer
     return render_unauthorized_action unless @current_user.present?
     @user = params[:user_id]=="self" ? @current_user : api_find(User, params[:user_id])
-    authorized_action(@user,@current_user, :read_as_parent)
+    authorized_action(@user,@current_user, [:read_as_parent, :read])
   end
 end

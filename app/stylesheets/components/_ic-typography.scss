@@ -79,8 +79,6 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-h1, h2, h3 { line-height: $ic-line-height * 2; }
-
 h1 { font-size: $ic-font-size * 2.75; } // ~38px
 h2 { font-size: $ic-font-size * 2.25; } // ~32px
 h3 { font-size: $ic-font-size * 1.75; } // ~24px
@@ -135,6 +133,17 @@ a {
     &:focus, &:hover { text-decoration: underline; }
   }
 
+}
+////////=============
+/// Underline All Links Feature Flag
+////////=============
+.Underline-All-Links__enabled {
+  a {
+    text-decoration: underline;
+    &:focus, &:hover { text-decoration: none; }
+    @include ic-focus-base;
+    &:focus { @include ic-focus-variant($color: $ic-link-color, $offset: -1px); }
+  }
 }
 
 // make links in .alert be same color as alert text but bold

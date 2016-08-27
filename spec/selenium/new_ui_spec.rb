@@ -141,7 +141,7 @@ describe 'new ui' do
       expect(global_nav_courses_link).to be_displayed
       global_nav_courses_link.click
       wait_for_ajaximations
-      course_link_list = fj('ul.ReactTray__link-list')
+      course_link_list = fj('ul.ic-NavMenu__link-list')
       course_link_list.find_element(:link_text, 'All Courses').click
 
       # and now actually go to the "/courses" page and make sure it shows up there too as "unpublisned"

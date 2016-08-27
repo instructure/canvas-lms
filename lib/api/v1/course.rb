@@ -37,6 +37,9 @@ module Api::V1::Course
     settings[:lock_all_announcements] = course.lock_all_announcements?
     settings[:restrict_student_past_view] = course.restrict_student_past_view?
     settings[:restrict_student_future_view] = course.restrict_student_future_view?
+    settings[:image_url] = course.image_url
+    settings[:image_id] = course.image_id
+    settings[:image] = course.image
 
     settings
   end
@@ -116,6 +119,7 @@ module Api::V1::Course
     hash['calendar'] = { 'ics' => "#{feeds_calendar_url(course.feed_code)}.ics" }
     hash['syllabus_body'] = api_user_content(course.syllabus_body, course) if builder.include_syllabus
     hash['html_url'] = course_url(course, :host => HostUrl.context_host(course, request.try(:host_with_port))) if builder.include_url
+    hash['time_zone'] = course.time_zone && course.time_zone.tzinfo.name
     hash
   end
 

@@ -44,19 +44,30 @@ header:not(.ic-app-header) {
     }
   }
 
-  i[class*=icon-]:before, i[class^=icon-]:before {
-    font-size: 13px;
-  }
+}
 
+.ig-row-label {
+  margin-right: $ic-sp;
+  @include breakpoint(desktop) {
+    margin-right: $ic-sp*1.5;
+  }
 }
 
 .ig-header-title a {
-  color: #434343;
+  color: $ic-font-color-dark;
 }
 
-.ig-list .ig-row  {
+.ig-list .ig-row {
+  padding-left: $ic-sp;
+  padding-right: $ic-sp;
+}
 
-  .ellipses { color: $ic-font-color--subdued; }
+.ig-info {
+  margin-left: 0;
+}
+
+.ig-title {
+  margin-bottom: 0;
 }
 
 #add_conference_form {
@@ -72,19 +83,10 @@ header:not(.ic-app-header) {
 }
 
 .item-group-expandable .emptyMessage {
-  color: #676b6e;
-  background: #f3f6f7;
+  color: $ic-font-color--subdued;
+  background: $ic-color-light;
   text-align: center;
-  padding: 10px;
+  padding: $ic-sp;
   margin: 0;
   border-radius: 3px;
-}
-
-.ig-title {
-  flex: 0 0 200px;
-  @include breakpoint(desktop) { flex: 0 0 40%; }
-}
-
-.ig-details {
-  flex: 1;
 }

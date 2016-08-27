@@ -71,6 +71,8 @@ module Importers
         item.workflow_state = 'active' if item.deleted?
         item.short_description = hash[:title]
         item.description = hash[:description]
+        item.calculation_method = hash[:calculation_method]
+        item.calculation_int = hash[:calculation_int]
 
         if hash[:ratings]
           item.data = {:rubric_criterion=>{}}

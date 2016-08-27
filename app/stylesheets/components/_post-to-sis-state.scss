@@ -1,9 +1,6 @@
 .post-to-sis-status {
   transition: none;
-  padding-left: 9px;
-  margin-right: 18px;
-  vertical-align: text-top;
-  line-height: 17px;
+  margin-right: $ic-sp;
   cursor: pointer;
 
   input {

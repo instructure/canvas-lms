@@ -213,7 +213,7 @@ class AccountsController < ApplicationController
         timezones: localized_timezones(I18nTimeZone.all)
       },
       BASE_PATH: request.env['PATH_INFO'].sub(/\/search.*/, '') + '/search',
-      ALL_ROLES: Role.account_role_data(@account, @current_user),
+      COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user),
       URLS: {
         USER_LISTS_URL: course_user_lists_url("{{ id }}"),
         ENROLL_USERS_URL: course_enroll_users_url("{{ id }}", :format => :json)
@@ -393,7 +393,7 @@ class AccountsController < ApplicationController
 
     if includes.include?("total_students")
       student_counts = StudentEnrollment.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
-        where(:course_id => @courses).group(:course_id).count(:user_id, :distinct => true)
+        where(:course_id => @courses).group(:course_id).distinct.count(:user_id)
       @courses.each {|c| c.student_count = student_counts[c.id] || 0 }
     end
 
@@ -516,12 +516,14 @@ class AccountsController < ApplicationController
 
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links
-          @account.settings[:custom_help_links] = custom_help_links.select{|k, h| h['state'] != 'deleted'}.sort.map do |index_with_hash|
+          sorted_help_links = custom_help_links.select{|_k, h| h['state'] != 'deleted' && h['state'] != 'new'}.sort
+          @account.settings[:custom_help_links] = sorted_help_links.map do |index_with_hash|
             hash = index_with_hash[1]
             hash.delete('state')
-            hash.assert_valid_keys ["text", "subtext", "url", "available_to"]
+            hash.assert_valid_keys ["text", "subtext", "url", "available_to", "type"]
             hash
           end
+          @account.settings[:new_custom_help_links] = true
         end
 
         params[:account][:turnitin_host] = validated_turnitin_host(params[:account][:turnitin_host])
@@ -647,6 +649,8 @@ class AccountsController < ApplicationController
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
 
       js_env({
+        CUSTOM_HELP_LINKS: @domain_root_account && @domain_root_account.help_links || [],
+        DEFAULT_HELP_LINKS: Canvas::Help.default_links,
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
         CONTEXT_BASE_URL: "/accounts/#{@context.id}",
@@ -877,7 +881,7 @@ class AccountsController < ApplicationController
 
   def build_course_stats
     teachers = TeacherEnrollment.for_courses_with_user_name(@courses).admin.active
-    course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => @courses).group(:course_id).count(:user_id, :distinct => true)
+    course_to_student_counts = StudentEnrollment.student_in_claimed_or_available.where(:course_id => @courses).group(:course_id).distinct.count(:user_id)
     courses_to_teachers = teachers.inject({}) do |result, teacher|
       result[teacher.course_id] ||= []
       result[teacher.course_id] << teacher

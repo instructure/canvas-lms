@@ -353,6 +353,28 @@ describe Submission do
         expect(@user.stream_item_instances.last).to be_hidden
       end
 
+      it "should not create hidden stream_item_instances for instructors when muted, graded, and published" do
+        submission_spec_model
+        @cc = @teacher.communication_channels.create :path => "somewhere"
+        @assignment.mute!
+        expect {
+          @submission.add_comment(:author => @student, :comment => "some comment")
+        }.to change StreamItemInstance, :count
+        expect(@teacher.stream_item_instances.last).to_not be_hidden
+      end
+
+      it "should not hide any existing stream_item_instances for instructors when muted" do
+        submission_spec_model
+        @cc = @teacher.communication_channels.create :path => "somewhere"
+        expect {
+          @submission.add_comment(:author => @student, :comment => "some comment")
+        }.to change StreamItemInstance, :count
+        expect(@teacher.stream_item_instances.last).to_not be_hidden
+        @assignment.mute!
+        @teacher.reload
+        expect(@teacher.stream_item_instances.last).to_not be_hidden
+      end
+
       it "should not create a message for admins and teachers with quiz submissions" do
         course_with_teacher(:active_all => true)
         assignment = @course.assignments.create!(

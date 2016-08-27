@@ -50,16 +50,7 @@ module UserContent
   end
 
   def self.latex_to_mathml(latex)
-    CanvasStatsd::Statsd.time("ritex.parse_attempt") do
-      CanvasStatsd::Statsd.increment("ritex.parse_attempt.count")
-      begin
-        Ritex::Parser.new.parse(latex)
-      rescue Racc::ParseError, Ritex::LexError, Ritex::Error
-        # invalid LaTeX; leave alt alone, skip mathml
-        CanvasStatsd::Statsd.increment("ritex.parse_failure.count")
-        return ""
-      end
-    end
+    Latex.to_math_ml(latex: latex)
   end
 
   class Node < Struct.new(:width, :height, :node_string, :node_hmac)

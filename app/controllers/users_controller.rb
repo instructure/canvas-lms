@@ -199,7 +199,7 @@ class UsersController < ApplicationController
 
     course = enrollment.course
     grading_period_id = params[:grading_period_id].to_i
-    grading_period = GradingPeriod.context_find(course, grading_period_id)
+    grading_period = GradingPeriod.for(course).find_by(id: grading_period_id)
     grading_periods = {
       course.id => {
         :periods => [grading_period],

@@ -80,7 +80,7 @@ require [
 
       if conference.get('permissions').update
         @editConferenceId = conference.get('id')
-        @editView.show(conference)
+        @editView.show(conference, isEditing: true)
       else
         # reached when a user without edit permissions navigates
         # to a specific conference's url directly

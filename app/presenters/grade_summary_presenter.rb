@@ -144,7 +144,7 @@ class GradeSummaryPresenter
   end
 
   def grading_period_assignments(grading_period_id, assignments)
-    grading_period = GradingPeriod.context_find(@context, grading_period_id)
+    grading_period = GradingPeriod.for(@context).find_by(id: grading_period_id)
     if grading_period
       grading_period.assignments_for_student(assignments, student)
     else

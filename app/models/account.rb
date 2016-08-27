@@ -43,6 +43,7 @@ class Account < ActiveRecord::Base
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: 'EnrollmentTerm', foreign_key: 'root_account_id'
   has_many :grading_period_groups, inverse_of: :root_account, dependent: :destroy
+  has_many :grading_periods, through: :grading_period_groups
   has_many :enrollments, -> { where("enrollments.type<>'StudentViewEnrollment'") }, foreign_key: 'root_account_id'
   has_many :all_enrollments, :class_name => 'Enrollment', :foreign_key => 'root_account_id'
   has_many :sub_accounts, -> { where("workflow_state<>'deleted'") }, class_name: 'Account', foreign_key: 'parent_account_id'
@@ -1320,17 +1321,7 @@ class Account < ActiveRecord::Base
 
   def external_tool_tabs(opts)
     tools = ContextExternalTool.active.find_all_for(self, :account_navigation)
-    tools.sort_by(&:id).map do |tool|
-     {
-        :id => tool.asset_string,
-        :label => tool.label_for(:account_navigation, opts[:language] || I18n.locale),
-        :css_class => tool.asset_string,
-        :visibility => tool.account_navigation(:visibility),
-        :href => :account_external_tool_path,
-        :external => true,
-        :args => [self.id, tool.id]
-     }
-    end
+    Lti::ExternalToolTab.new(self, :account_navigation, tools, opts[:language]).tabs
   end
 
   def tabs_available(user=nil, opts={})
@@ -1399,7 +1390,24 @@ class Account < ActiveRecord::Base
   end
 
   def help_links
-    Canvas::Help.default_links + (settings[:custom_help_links] || [])
+    links = settings[:custom_help_links]
+
+    # set the type to custom for any existing custom links that don't have a type set
+    # the new ui will set the type ('custom' or 'default') for any new custom links
+    # since we now allow reordering the links, the default links get stored in the settings as well
+    if !links.blank?
+      links.each do |link|
+        if link[:type].blank?
+          link[:type] = 'custom'
+        end
+      end
+    end
+
+    if settings[:new_custom_help_links] && (feature_enabled?(:use_new_styles) || feature_enabled?(:k12))
+      links || Canvas::Help.default_links
+    else
+      Canvas::Help.default_links + (links || [])
+    end
   end
 
   def set_service_availability(service, enable)

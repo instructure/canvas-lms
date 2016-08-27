@@ -357,14 +357,16 @@ i[class*=icon-], i[class^=icon-] {
   width: 16px; height: 16px; line-height: 16px;
 
   // adjust icon sizes to look good with our large-size button class
-  .btn-large & {
+  .btn-large &,
+  .Button--large & {
     width: 18px; height: 18px; line-height: 18px;
     &:before{ font-size: 18px }
   }
 
   // most icons do not look good this small, so use sparingly.
   // this should only be used for things like: icon-settings and icon-mini-arrow-down
-  .btn-mini & {
+  .btn-mini &,
+  .Button--mini {
     width: 12px; height: 12px; line-height: 12px;
     &:before{ font-size: 12px }
   }
@@ -375,14 +377,6 @@ i[class*=icon-], i[class^=icon-] {
 // things look nicer
 a[class*=icon-], a[class^=icon-] {
   &:before { margin-right: 4px; }
-}
-
-// icons should be a little lighter than the text in a .btn,
-// we're aware and ok that this wont have any effect in ie8
-.btn:not(.btn-primary, .btn-warning, .btn-danger, .btn-success, .btn-info, .btn-inverse) {
-  i[class*=icon-], i[class^=icon-] {
-    color: lighten( $grayDark, 15% );
-  }
 }
 
 .standalone-icon {

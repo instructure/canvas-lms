@@ -464,7 +464,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def root_entries_max_position
-    question_max = self.active_quiz_questions.where(quiz_group_id: nil).maximum(:position)
+    question_max = self.quiz_questions.active.where(quiz_group_id: nil).maximum(:position)
     group_max = self.quiz_groups.maximum(:position)
     [question_max, group_max, 0].compact.max
   end
@@ -1016,7 +1016,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) } #admins.include? user }
-    can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit
+    can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit and can :preview
 
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) } #admins.include? user }
     can :read_statistics and can :read and can :submit and can :grade and can :review_grades
@@ -1025,7 +1025,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     can :submit
 
     given { |user, session| context.grants_right?(user, session, :read_as_admin) }
-    can :read
+    can :read and can :submit and can :preview
 
     given do |user, session|
       published? && context.grants_right?(user, session, :read)

@@ -99,7 +99,11 @@ body {
 
 @if $use_new_styles {
   #wrapper-container {
-    margin-left: $ic-header-primary-width;
+    margin-left: $ic-header-primary-width - 30;
+
+    @include breakpoint(tablet) {
+      margin-left: $ic-header-primary-width;
+    }
     body.primary-nav-expanded & { margin-left: $ic-header-primary-expanded-width; }
     body.no-headers & { margin-left: 0; }
   }

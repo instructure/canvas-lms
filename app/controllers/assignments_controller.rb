@@ -300,12 +300,12 @@ class AssignmentsController < ApplicationController
       @undated_events = @events.select {|e| e.start_at == nil}
       @dates = (@events.select {|e| e.start_at != nil}).map {|e| e.start_at.to_date}.uniq.sort.sort
       if @context.grants_right?(@current_user, session, :read)
-        @syllabus_body = api_user_content(@context.syllabus_body, @context)
+        @syllabus_body = public_user_content(@context.syllabus_body, @context)
       else
         # the requesting user may not have :read if the course syllabus is public, in which
         # case, we pass nil as the user so verifiers are added to links in the syllabus body
         # (ability for the user to read the syllabus was checked above as :read_syllabus)
-        @syllabus_body = api_user_content(@context.syllabus_body, @context, nil, {}, true)
+        @syllabus_body = public_user_content(@context.syllabus_body, @context, nil, true)
       end
 
       hash = { :CONTEXT_ACTION_SOURCE => :syllabus }

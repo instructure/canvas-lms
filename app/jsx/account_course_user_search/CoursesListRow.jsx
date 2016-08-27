@@ -121,7 +121,7 @@ define([
           </div>
           <div className="col-xs-2" role='gridcell'>
             <div className="courses-user-list-actions">
-              <button className="Button Button--icon-action" onClick={this.addUserToCourse} type="button">
+              <button className="Button Button--icon-action addUserButton" onClick={this.addUserToCourse} type="button">
                 <span className="screenreader-only">{I18n.t("Add Users to %{name}", {name: this.props.name})}</span>
                 <i className="icon-plus" aria-hidden="true"></i>
               </button>

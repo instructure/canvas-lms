@@ -167,9 +167,9 @@ define([
 
     submitButton() {
       if (this.state.configurationType === 'lti2') {
-        return <button ref="submitLti2" type="button" className="btn btn-primary" onClick={this.handleSubmit}>{I18n.t('Launch Registration Tool')}</button>
+        return <button ref="submitLti2" type="button" id="submitExternalAppBtn" className="btn btn-primary" onClick={this.handleSubmit}>{I18n.t('Launch Registration Tool')}</button>
       } else {
-        return <button ref="submit" type="button" className="btn btn-primary" onClick={this.handleSubmit}>{I18n.t('Submit')}</button>
+        return <button ref="submit" type="button" id="submitExternalAppBtn" className="btn btn-primary" onClick={this.handleSubmit}>{I18n.t('Submit')}</button>
       }
     },
 

@@ -49,7 +49,7 @@ class CalendarEventsController < ApplicationController
     @event = @context.calendar_events.temp_record
     add_crumb(t('crumbs.new', "New Calendar Event"), named_context_url(@context, :new_context_calendar_event_url))
     @event.assign_attributes(params.slice(:title, :start_at, :end_at, :location_name, :location_address))
-    js_env(:RECURRING_CALENDAR_EVENTS_ENABLED => @context.feature_enabled?(:recurring_calendar_events))
+    js_env(:RECURRING_CALENDAR_EVENTS_ENABLED => feature_context.feature_enabled?(:recurring_calendar_events))
     authorized_action(@event, @current_user, :create)
   end
 
@@ -115,5 +115,15 @@ class CalendarEventsController < ApplicationController
   protected
   def rich_content_service_config
     rce_js_env(:sidebar)
+  end
+
+  def feature_context
+    if @context.is_a?(User)
+      @domain_root_account
+    elsif @context.is_a?(Group)
+      @context.context
+    else
+      @context
+    end
   end
 end

@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 define(function(require) {
-  var React = require('react');
-  var ReactRouter = require('canvas_packages/react-router');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
+  var ReactRouter = require('old_version_of_react-router_used_by_canvas_quizzes_client_apps');
   var I18n = require('i18n!quiz_log_auditing.navigation');
   var Link = ReactRouter.Link;
 

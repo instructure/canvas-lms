@@ -24,23 +24,33 @@ describe GradingPeriodsController, type: :request do
   context "A grading period is associated with a course." do
     before :once do
       course_with_teacher active_all: true
-      grading_periods count: 3, context: @course
+      Account.default.set_feature_flag! :multiple_grading_periods, 'on'
+      grading_period_group =
+        @course.grading_period_groups.create!(title: 'A Group')
+      @grading_period = grading_period_group.grading_periods.create! do |period|
+        period.title = 'A Period'
+        period.start_date = 1.month.from_now(now)
+        period.end_date   = 2.months.from_now(now)
+        period.weight     = 33.33
+      end
     end
 
     context "multiple grading periods feature flag turned on" do
       describe 'GET show' do
-        before :once do
-          @grading_period = @course.grading_periods.active.first
-        end
-
         def get_show(raw = false)
           helper = method(raw ? :raw_api_call : :api_call)
-          helper.call(:get,
-                      "/api/v1/courses/#{@course.id}/grading_periods/#{@grading_period.id}",
-          { controller: 'grading_periods', action: 'show', format: 'json',
-            course_id: @course.id,
-            id: @grading_period.id,
-          }, {})
+          helper.call(
+            :get,
+            "/api/v1/courses/#{@course.id}/grading_periods/#{@grading_period.id}",
+            {
+              controller: 'grading_periods',
+              action: 'show',
+              format: 'json',
+              course_id: @course.id,
+              id: @grading_period.id,
+            },
+            {}
+          )
         end
 
         it "retrieves the grading period specified" do
@@ -65,26 +75,27 @@ describe GradingPeriodsController, type: :request do
       end
 
       describe 'PUT update' do
-        before :once do
-          @grading_period = @course.grading_periods.active.first
-        end
-
         def put_update(params, raw=false)
           helper = method(raw ? :raw_api_call : :api_call)
 
-          helper.call(:put,
-                      "/api/v1/courses/#{@course.id}/grading_periods/#{@grading_period.id}",
-          { controller: 'grading_periods', action: 'update', format: 'json',
-            course_id: @course.id,
-            id: @grading_period.id },
-            { grading_periods: [params] }, {}, {})
-
+          helper.call(
+            :put,
+            "/api/v1/courses/#{@course.id}/grading_periods/#{@grading_period.id}",
+            {
+              controller: 'grading_periods',
+              action: 'update',
+              format: 'json',
+              course_id: @course.id,
+              id: @grading_period.id
+            },
+            { grading_periods: [params] }
+          )
         end
 
         it "updates a grading period successfully" do
-          expect(@grading_period.weight).to_not eq(80)
-          put_update(weight: 80)
-          expect(@grading_period.reload.weight).to eq(80)
+          new_weight = @grading_period.weight + 11.11
+          put_update(weight: new_weight)
+          expect(@grading_period.reload.weight).to eql(new_weight)
         end
 
         it "doesn't update deleted grading periods" do
@@ -95,24 +106,25 @@ describe GradingPeriodsController, type: :request do
       end
 
       describe 'DELETE destroy' do
-        before :once do
-          @grading_period = @course.grading_periods.active.first
-        end
-
         def delete_destroy
-          raw_api_call(:delete,
-                       "/api/v1/courses/#{@course.id}/grading_periods/#{@grading_period.id}",
-          { controller: 'grading_periods', action: 'destroy', format: 'json',
-            course_id: @course.id,
-            id: @grading_period.id.to_s },
-            {}, {}, {})
+          raw_api_call(
+            :delete,
+            "/api/v1/courses/#{@course.id}/grading_periods/#{@grading_period.id}",
+            {
+              controller: 'grading_periods',
+              action: 'destroy',
+              format: 'json',
+              course_id: @course.id,
+              id: @grading_period.id.to_s
+            },
+          )
         end
 
         it "deletes a grading period successfully" do
           delete_destroy
 
           expect(response.code).to eq '204'
-          expect(GradingPeriod.where(id: @grading_period).first).to be_deleted
+          expect(@grading_period.reload).to be_deleted
         end
       end
     end
@@ -123,9 +135,16 @@ describe GradingPeriodsController, type: :request do
       end
 
       it "index should return 404" do
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/grading_periods",
-        { controller: 'grading_periods', action: 'index', format: 'json', course_id: @course.id },
-        {}, {}, expected_status: 404)
+        json = api_call(
+          :get,
+          "/api/v1/courses/#{@course.id}/grading_periods",
+          {
+            controller: 'grading_periods',
+            action: 'index',
+            format: 'json',
+            course_id: @course.id
+          }, {}, {}, expected_status: 404
+        )
         expect(json["message"]).to eq('Page not found')
       end
     end

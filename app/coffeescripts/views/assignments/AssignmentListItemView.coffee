@@ -147,6 +147,8 @@ define [
       # can move items if there's more than one parent
       # collection OR more than one in the model's collection
       data.canMove = @model.collection.view?.parentCollection?.length > 1 or @model.collection.length > 1
+      data.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
+      data.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
 
       if data.canManage
         data.spanWidth      = 'span3'
