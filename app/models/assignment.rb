@@ -2117,8 +2117,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def run_if_overrides_changed!
-    self.relock_modules!
-    each_submission_type { |submission| submission.relock_modules! if submission }
+    relocked_modules = []
+    self.relock_modules!(relocked_modules)
+    each_submission_type { |submission| submission.relock_modules!(relocked_modules) if submission }
 
     if only_visible_to_overrides?
       Rails.logger.info "GRADES: recalculating because assignment overrides on #{global_id} changed."
