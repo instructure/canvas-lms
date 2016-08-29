@@ -324,18 +324,6 @@ describe Account do
   context "settings=" do
     it "should filter disabled settings" do
       a = Account.new
-      a.root_account_id = 1
-      a.settings = {'global_javascript' => 'something'}.with_indifferent_access
-      expect(a.settings[:global_javascript]).to eql(nil)
-
-      a.root_account_id = nil
-      a.settings = {'global_javascript' => 'something'}.with_indifferent_access
-      expect(a.settings[:global_javascript]).to eql(nil)
-
-      a.settings[:global_includes] = true
-      a.settings = {'global_javascript' => 'something'}.with_indifferent_access
-      expect(a.settings[:global_javascript]).to eql('something')
-
       a.settings = {'error_reporting' => 'string'}.with_indifferent_access
       expect(a.settings[:error_reporting]).to eql(nil)
 
@@ -914,20 +902,6 @@ describe Account do
       user
       account.account_users.create!(user: @user)
       expect(account.user_list_search_mode_for(@user)).to eq :preferred
-    end
-  end
-
-  context "settings" do
-    describe ":condition" do
-      it "should not allow setting things where condition is false" do
-        account = Account.default
-        account.stubs(:global_includes?).returns(false)
-        account.settings = { :global_javascript => 'bob' }
-        expect(account.settings[:global_javascript]).to be_nil
-        account.stubs(:global_includes?).returns(true)
-        account.settings = { :global_javascript => 'bob' }
-        expect(account.settings[:global_javascript]).to eq 'bob'
-      end
     end
   end
 

@@ -5,10 +5,6 @@ describe 'new ui' do
   include_context "in-process server selenium tests"
   include FilesCommon
 
-  before(:each) do
-    Account.default.enable_feature!(:use_new_styles)
-  end
-
   context 'as teacher' do
 
     before(:each) do

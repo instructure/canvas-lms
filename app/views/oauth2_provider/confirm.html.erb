@@ -6,17 +6,11 @@
   content_for :page_title, t(:page_title, "App Login")
 %>
 
-<% if use_new_styles? %>
 <div id="modal-box" class="ic-Login-confirmation">
   <header class="ic-Login-confirmation__header">
-    <%= image_tag("login/canvas-logo@2x.png", class:"ic-Login-confirmation__logo", alt:t("Canvas by Instructure")) %>
+    <%= image_tag("login/canvas-logo@2x.png", :class => "ic-Login-confirmation__logo", :alt => t("Canvas by Instructure")) %>
   </header>
   <div class="ic-Login-confirmation__content">
     <%= render("confirm_form") %>
   </div>
 </div>
-<% else %>
-<div id="modal-box">
-  <%= render("confirm_form") %>
-</div>
-<% end %>

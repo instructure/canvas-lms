@@ -15,7 +15,7 @@
     <% @can_manage = can_do(@context, @current_user, :manage) %>
     <% @can_create_announcements = @context.announcements.temp_record.grants_right?(@current_user, session, :create) %>
     <% if can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
-      <div id="course_status" <% unless use_new_styles? %>class="text-center"<% end %>>
+      <div id="course_status">
         <h3>
           <%= t('headers.course_status', %{Course Status}) %>
         </h3>

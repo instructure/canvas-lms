@@ -6,156 +6,156 @@
 
 <div class="conversations">
   <header class="panel">
-    <% if use_new_styles? %><div class="panel__primary"><% end %>
-    <div class="filters">
-      <span aria-hidden="true" class="screenreader-only" id="course-filter-description">
-        <%= t(:filter_messages_by_course, "Filter messages by course") %>
-        &nbsp;
-        <span class="current-selection-label"></span>
-      </span>
-      <select class="course-filter" id="course-filter" aria-haspopup="true" aria-labelledby="course-filter-description"></select>
-      <span aria-hidden="true" class="screenreader-only" id="type-filter-description">
-        <%= t(:filter_messages_by_type, "Filter messages by type") %>
-        &nbsp;
-        <span class="current-selection-label"></span>
-      </span>
-      <select class="type-filter show-tick" id="type-filter" aria-haspopup="true" aria-labelledby="type-filter-description">
-        <option value="inbox"><%= t(:inbox, "Inbox") %></option>
-        <option value="unread"><%= t(:unread, "Unread") %></option>
-        <option value="starred"><%= t(:starred, "Starred") %></option>
-        <option value="sent"><%= t(:sent, "Sent") %></option>
-        <option value="archived"><%= t(:archived, "Archived") %></option>
-        <option value="submission_comments"><%= t(:submission_comments, "Submission Comments") %></option>
-      </select>
-    </div>
-    <% if use_new_styles? %></div><% end %>
-    <% if use_new_styles? %><div class="panel__secondary"><% end %>
-    <div class="actions" id="submission-comment-actions" style="display: none;">
-      <button class="btn"
-              id="submission-reply-btn"
-              title="<%= t(:reply, "Reply") %>"
-              data-tooltip
-              disabled>
-        <span class="screenreader-only"><%= t(:reply, "Reply") %></span>
-        <i class="icon-reply-2"></i>
-      </button>
-    </div>
-
-    <div class="actions" id="conversation-actions">
-      <button class="btn"
-              id="compose-btn"
-              title="<%= t(:compose_new_message, "Compose a new message") %>"
-              data-tooltip>
-        <span class="screenreader-only"><%= t(:compose_new_message, "Compose a new message") %></span>
-        <i class="icon-compose"></i>
-      </button>
-
-      <div class="btn-group">
+    <div class="panel__primary">
+      <div class="filters">
+        <span aria-hidden="true" class="screenreader-only" id="course-filter-description">
+          <%= t(:filter_messages_by_course, "Filter messages by course") %>
+          &nbsp;
+          <span class="current-selection-label"></span>
+        </span>
+        <select class="course-filter" id="course-filter" aria-haspopup="true" aria-labelledby="course-filter-description"></select>
+        <span aria-hidden="true" class="screenreader-only" id="type-filter-description">
+          <%= t(:filter_messages_by_type, "Filter messages by type") %>
+          &nbsp;
+          <span class="current-selection-label"></span>
+        </span>
+        <select class="type-filter show-tick" id="type-filter" aria-haspopup="true" aria-labelledby="type-filter-description">
+          <option value="inbox"><%= t(:inbox, "Inbox") %></option>
+          <option value="unread"><%= t(:unread, "Unread") %></option>
+          <option value="starred"><%= t(:starred, "Starred") %></option>
+          <option value="sent"><%= t(:sent, "Sent") %></option>
+          <option value="archived"><%= t(:archived, "Archived") %></option>
+          <option value="submission_comments"><%= t(:submission_comments, "Submission Comments") %></option>
+        </select>
+      </div>
+      </div>
+      <div class="panel__secondary">
+      <div class="actions" id="submission-comment-actions" style="display: none;">
         <button class="btn"
-                id="reply-btn"
+                id="submission-reply-btn"
                 title="<%= t(:reply, "Reply") %>"
                 data-tooltip
                 disabled>
           <span class="screenreader-only"><%= t(:reply, "Reply") %></span>
           <i class="icon-reply-2"></i>
         </button>
-        <button class="btn"
-                id="reply-all-btn"
-                title="<%= t(:reply_all, "Reply all") %>"
-                data-tooltip
-                disabled>
-          <span class="screenreader-only"><%= t(:reply_all, "Reply all") %></span>
-          <i class="icon-reply-all-2"></i>
-        </button>
-        <button class="btn"
-                id="archive-btn"
-                title="<%= t(:archive, "Archive") %>"
-                data-tooltip
-                disabled>
-          <span class="screenreader-only"><%= t("Archive Selected") %></span>
-          <i class="icon-collection-save"></i>
-        </button>
-        <button class="btn"
-                id="delete-btn"
-                title="<%= t(:delete, "Delete") %>"
-                data-tooltip
-                disabled>
-          <span class="screenreader-only"><%= t("Delete Selected") %></span>
-          <i class="icon-trash"></i>
-        </button>
       </div>
 
-      <div class="inline-block">
-        <button class="al-trigger btn"
-                id="admin-btn"
-                title="<%= t(:more_options, "More options") %>"
-                data-tooltip
-                disabled>
-          <span class="screenreader-only"><%= t(:settings, "Settings") %></span>
-          <i class="icon-settings"></i>
-          <i class="icon-mini-arrow-down"></i>
+      <div class="actions" id="conversation-actions">
+        <button class="btn"
+                id="compose-btn"
+                title="<%= t(:compose_new_message, "Compose a new message") %>"
+                data-tooltip>
+          <span class="screenreader-only"><%= t(:compose_new_message, "Compose a new message") %></span>
+          <i class="icon-compose"></i>
         </button>
-        <ul class="al-options" id="admin-menu">
-          <li><a href="#" id="mark-unread-btn"><%= t(:mark_as_unread, "Mark as unread") %></a></li>
-          <li><a href="#" id="mark-read-btn"><%= t(:mark_as_read, "Mark as read") %></a></li>
-          <li><a href="#" id="forward-btn"><%= t(:forward, "Forward") %></a></li>
-          <li><a href="#" id="star-toggle-btn"><%# text set by view %></a></li>
-        </ul>
-      </div>
-    </div>
 
-    <div id="sending-message" class="badge badge-info" aria-live="polite">
-      <span><%= t(:sending, "sending") %></span>
-      <div id="sending-spinner"></div>
-    </div>
-
-    <div role="search" class="search <% unless use_new_styles? %>pull-right<% end %> form-search">
-      <div class="ac" id="search-autocomplete">
-        <div class="ac-input-box">
-          <ul class="ac-token-list"></ul>
-          <input type="search"
-                 class="ac-input"
-                 id="compose-message-recipients"
-                 aria-expanded="false"
-                 aria-activedescendant=""
-                 aria-owns="ac-result-list-2"
-                 aria-label="<%= t("Search by user") %>"
-                 aria-autocomplete="list" />
-          <span aria-live="polite" class="ac-results-status screenreader-only" id="ac-input-description"></span>
-          <span aria-live="polite" class="ac-selected-name screenreader-only"></span>
-
-          <a href="#"
-             class="ac-clear"
-             title="<%= t(:clear_search, "Clear search results") %>">
-            <i class="icon-x"></i>
-            <span class="screenreader-only">
-              <%= t(:clear_search, "Clear search results") %>
-            </span>
-          </a>
+        <div class="btn-group">
+          <button class="btn"
+                  id="reply-btn"
+                  title="<%= t(:reply, "Reply") %>"
+                  data-tooltip
+                  disabled>
+            <span class="screenreader-only"><%= t(:reply, "Reply") %></span>
+            <i class="icon-reply-2"></i>
+          </button>
+          <button class="btn"
+                  id="reply-all-btn"
+                  title="<%= t(:reply_all, "Reply all") %>"
+                  data-tooltip
+                  disabled>
+            <span class="screenreader-only"><%= t(:reply_all, "Reply all") %></span>
+            <i class="icon-reply-all-2"></i>
+          </button>
+          <button class="btn"
+                  id="archive-btn"
+                  title="<%= t(:archive, "Archive") %>"
+                  data-tooltip
+                  disabled>
+            <span class="screenreader-only"><%= t("Archive Selected") %></span>
+            <i class="icon-collection-save"></i>
+          </button>
+          <button class="btn"
+                  id="delete-btn"
+                  title="<%= t(:delete, "Delete") %>"
+                  data-tooltip
+                  disabled>
+            <span class="screenreader-only"><%= t("Delete Selected") %></span>
+            <i class="icon-trash"></i>
+          </button>
         </div>
 
-        <button class="btn ac-search-btn recipient-finder"
-                id="search-btn"
-                type="button"
-                title="<%= t(:search_for_recipients, "Search for recipients") %>"
-                data-tooltip>
-          <i class="icon-address-book"></i>
-          <span class="screenreader-only">
-            <%= t(:search_names_groups_courses, "Search names, groups, and courses") %>
-          </span>
-        </button>
+        <div class="inline-block">
+          <button class="al-trigger btn"
+                  id="admin-btn"
+                  title="<%= t(:more_options, "More options") %>"
+                  data-tooltip
+                  disabled>
+            <span class="screenreader-only"><%= t(:settings, "Settings") %></span>
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+          </button>
+          <ul class="al-options" id="admin-menu">
+            <li><a href="#" id="mark-unread-btn"><%= t(:mark_as_unread, "Mark as unread") %></a></li>
+            <li><a href="#" id="mark-read-btn"><%= t(:mark_as_read, "Mark as read") %></a></li>
+            <li><a href="#" id="forward-btn"><%= t(:forward, "Forward") %></a></li>
+            <li><a href="#" id="star-toggle-btn"><%# text set by view %></a></li>
+          </ul>
+        </div>
+      </div>
 
-        <div class="ac-result-wrapper" id="ac-result-list-2" aria-hidden="true">
-          <div class="ac-result-container">
-            <div class="ac-result-contents">
-              <ul class="ac-result-list collectionViewItems" role="menu"></ul>
-              <div class="paginatedLoadingIndicator"></div>
+      <div id="sending-message" class="badge badge-info" aria-live="polite">
+        <span><%= t(:sending, "sending") %></span>
+        <div id="sending-spinner"></div>
+      </div>
+
+      <div role="search" class="search form-search">
+        <div class="ac" id="search-autocomplete">
+          <div class="ac-input-box">
+            <ul class="ac-token-list"></ul>
+            <input type="search"
+                   class="ac-input"
+                   id="compose-message-recipients"
+                   aria-expanded="false"
+                   aria-activedescendant=""
+                   aria-owns="ac-result-list-2"
+                   aria-label="<%= t("Search by user") %>"
+                   aria-autocomplete="list" />
+            <span aria-live="polite" class="ac-results-status screenreader-only" id="ac-input-description"></span>
+            <span aria-live="polite" class="ac-selected-name screenreader-only"></span>
+
+            <a href="#"
+               class="ac-clear"
+               title="<%= t(:clear_search, "Clear search results") %>">
+              <i class="icon-x"></i>
+              <span class="screenreader-only">
+                <%= t(:clear_search, "Clear search results") %>
+              </span>
+            </a>
+          </div>
+
+          <button class="btn ac-search-btn recipient-finder"
+                  id="search-btn"
+                  type="button"
+                  title="<%= t(:search_for_recipients, "Search for recipients") %>"
+                  data-tooltip>
+            <i class="icon-address-book"></i>
+            <span class="screenreader-only">
+              <%= t(:search_names_groups_courses, "Search names, groups, and courses") %>
+            </span>
+          </button>
+
+          <div class="ac-result-wrapper" id="ac-result-list-2" aria-hidden="true">
+            <div class="ac-result-container">
+              <div class="ac-result-contents">
+                <ul class="ac-result-list collectionViewItems" role="menu"></ul>
+                <div class="paginatedLoadingIndicator"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <% if use_new_styles? %></div><% end %>
   </header>
 
   <div class="row-fluid messaging-wrapper">

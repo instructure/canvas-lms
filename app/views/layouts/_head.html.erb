@@ -16,10 +16,8 @@
   <%= yield :head %>
   <%= yield :meta_tags %>
   <%= include_custom_meta_tags %>
-  <% if use_new_styles? %>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
-  <% end %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
   <%= include_css_bundles %>
   <%= yield :stylesheets %>
   <%= include_account_css %>

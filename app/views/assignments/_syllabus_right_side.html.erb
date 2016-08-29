@@ -1,5 +1,5 @@
 <% course_home ||= false %>
-<div id="sidebar_content" class="rs-margin-lr <% unless use_new_styles? %><%= 'rs-margin-top' unless course_home %><% end %>">
+<div id="sidebar_content" class="rs-margin-lr">
   <% current = Time.zone.today
     first_day_of_month = Date.new(y=current.year, m=current.month, d=1)
     last_day_of_previous_month = first_day_of_month - 1
@@ -8,10 +8,6 @@
     first_day = last_day_of_previous_month - last_day_of_previous_month.wday
   %>
   <%= render :partial => 'calendars/mini_calendar', :locals => {:current => current, :first_day => first_day, :mini_css => 'static/mini_calendar_sidebar.css' } %>
-  <% unless use_new_styles? %><hr /><% end %>
-  <!--p>
-    <a href="#" class="jump_to_today_link">Jump to Today</a>
-  </p-->
   <%= render :partial => "courses/sidebar_weighting", :object => @groups %>
 </div>
 <%= render :partial => "shared/wiki_sidebar" %>

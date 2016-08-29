@@ -8,39 +8,32 @@
   @headers = false
   @body_classes ||= []
   @body_classes << "modal body--login-confirmation"
-  if use_new_styles?
-    modal_classes = "reaccept_terms ic-Login-confirmation"
-  else
-    modal_classes = "reaccept_terms clearfix"
-  end
 %>
 
-<%= form_tag("/api/v1/users/self", method: "put", class: modal_classes, id: "modal-box") do %>
-  <% if use_new_styles? %>
+<%= form_tag("/api/v1/users/self", method: "put", class: "reaccept_terms ic-Login-confirmation", id: "modal-box") do %>
   <header class="ic-Login-confirmation__header">
     <%= image_tag("login/canvas-logo@2x.png", class:"ic-Login-confirmation__logo", alt:"Canvas by Instructure") %>
   </header>
   <div class="ic-Login-confirmation__content">
-  <% end %>
-  <h2<% if use_new_styles? %> class="ic-Login-confirmation__headline"<% end %>><%= t 'updated_terms_of_use', 'Updated Terms of Use' %></h2>
-  <p>
-    <%= t "Either you're a new user or the *terms of use* have changed since you last agreed to them.  Please agree to the *terms of use* and **privacy policy** before you continue.",
-          wrapper: {
-              '*' => link_to('\1', terms_of_use_url, target: '_blank'),
-              '**' => link_to('\1', privacy_policy_url, target: '_blank')
-          }
-    %>
-  </p>
-  <p>
-    <label class="checkbox">
-      <input type="checkbox" name="user[terms_of_use]" value="1">
-      <%= agree_to_terms %>
-    </label>
-    <input type="hidden" name="redirect_to_previous" value="true" />
-  </p>
-  <div class="button_box<% if use_new_styles? %> ic-Login-confirmation__actions<% end %>">
-    <button type="submit" class="btn btn-primary"><%= t "#buttons.submit", "Submit" %></button>
-    <%= link_to(t("#buttons.cancel", "Cancel"), logout_path, :method => :delete, :class => "btn logout") %>
+    <h2 class="ic-Login-confirmation__headline"><%= t 'updated_terms_of_use', 'Updated Terms of Use' %></h2>
+    <p>
+      <%= t "Either you're a new user or the *terms of use* have changed since you last agreed to them.  Please agree to the *terms of use* and **privacy policy** before you continue.",
+            wrapper: {
+                '*' => link_to('\1', terms_of_use_url, target: '_blank'),
+                '**' => link_to('\1', privacy_policy_url, target: '_blank')
+            }
+      %>
+    </p>
+    <p>
+      <label class="checkbox">
+        <input type="checkbox" name="user[terms_of_use]" value="1">
+        <%= agree_to_terms %>
+      </label>
+      <input type="hidden" name="redirect_to_previous" value="true" />
+    </p>
+    <div class="button_box ic-Login-confirmation__actions">
+      <button type="submit" class="btn btn-primary"><%= t "#buttons.submit", "Submit" %></button>
+      <%= link_to(t("#buttons.cancel", "Cancel"), logout_path, :method => :delete, :class => "btn logout") %>
+    </div>
   </div>
-  <% if use_new_styles? %></div><% end %>
 <% end %>

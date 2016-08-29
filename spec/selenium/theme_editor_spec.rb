@@ -8,7 +8,6 @@ describe 'Theme Editor' do
   include ThemeEditorCommon
 
   before(:each) do
-    Account.default.enable_feature!(:use_new_styles)
     course_with_admin_logged_in
   end
 

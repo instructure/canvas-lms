@@ -289,13 +289,8 @@ module ApplicationHelper
   end
 
   def css_variant
-    if use_new_styles?
-      variant = 'new_styles'
-    else
-      variant = 'legacy'
-    end
     use_high_contrast = @current_user && @current_user.prefers_high_contrast?
-    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast')
+    'new_styles' + (use_high_contrast ? '_high_contrast' : '_normal_contrast')
   end
 
   def css_url_for(bundle_name, plugin=false)
@@ -699,7 +694,7 @@ module ApplicationHelper
   def active_brand_config(opts={})
     return active_brand_config_cache[opts] if active_brand_config_cache.key?(opts)
 
-    ignore_branding = !use_new_styles? || (@current_user.try(:prefers_high_contrast?) && !opts[:ignore_high_contrast_preference])
+    ignore_branding = (@current_user.try(:prefers_high_contrast?) && !opts[:ignore_high_contrast_preference])
     active_brand_config_cache[opts] = if ignore_branding
       nil
     else
@@ -792,17 +787,13 @@ module ApplicationHelper
 
   def include_account_js(options = {})
     return if params[:global_includes] == '0'
-    includes = if use_new_styles?
-      if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
-        abc.css_and_js_overrides[:js_overrides]
-      else
-        Account.site_admin.brand_config.try(:css_and_js_overrides).try(:[], :js_overrides)
-      end
+
+    includes = if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
+      abc.css_and_js_overrides[:js_overrides]
     else
-      get_global_includes.each_with_object([]) do |global_include, memo|
-        memo << global_include[:js] if global_include[:js].present?
-      end
+      Account.site_admin.brand_config.try(:css_and_js_overrides).try(:[], :js_overrides)
     end
+
     if includes.present?
       if options[:raw]
         includes = ["/optimized/vendor/jquery-1.7.2.js"] + includes
@@ -841,16 +832,10 @@ module ApplicationHelper
   def include_account_css
     return if disable_account_css?
 
-    includes = if use_new_styles?
-      if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
-        abc.css_and_js_overrides[:css_overrides]
-      else
-        Account.site_admin.brand_config.try(:css_and_js_overrides).try(:[], :css_overrides)
-      end
+    includes = if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
+      abc.css_and_js_overrides[:css_overrides]
     else
-      get_global_includes.each_with_object([]) do |global_include, css_includes|
-        css_includes << global_include[:css] if global_include[:css].present?
-      end
+      Account.site_admin.brand_config.try(:css_and_js_overrides).try(:[], :css_overrides)
     end
 
     if includes.present?

@@ -24,7 +24,6 @@ describe "brandableCss JS integration specs" do
   end
 
   it "loads css from handlebars with variables correctly" do
-    Account.default.enable_feature!(:use_new_styles)
     course_with_teacher_logged_in
     get '/calendar'
     data = BrandableCSS.cache_for('jst/calendar/calendarApp', 'new_styles_normal_contrast')

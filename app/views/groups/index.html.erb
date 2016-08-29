@@ -10,7 +10,7 @@
   <% if @current_groups.empty? %>
     <%= t(:no_groups, "No Groups") %>
   <% else %>
-    <table id="my_groups_table" <% if use_new_styles? %>class="ic-Table ic-Table--bordered" <% else %>class="table table-bordered current_groups course-list-table"<% end %> >
+    <table id="my_groups_table" class="ic-Table ic-Table--bordered">
       <thead>
         <tr>
           <th scope="col" class="course-list-group-column"><%= t ('Group') %></th>
@@ -42,7 +42,7 @@
   <% if @previous_groups.empty? %>
     <%= t(:no_groups, "No Groups") %>
   <% else %>
-    <table id="my_groups_table" <% if use_new_styles? %>class="ic-Table ic-Table--bordered" <% else %>class="table table-bordered previous_groups course-list-table"<% end %> >
+    <table id="my_groups_table" class="ic-Table ic-Table--bordered">
       <thead>
         <tr>
           <th scope="col" class="course-list-group-column"><%= t ('Group') %></th>

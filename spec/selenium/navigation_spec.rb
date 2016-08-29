@@ -6,7 +6,6 @@ describe 'Global Navigation' do
   context 'As a Teacher' do
     before do
       course_with_teacher_logged_in
-      Account.default.enable_feature! :use_new_styles
     end
 
     describe 'Profile Link' do

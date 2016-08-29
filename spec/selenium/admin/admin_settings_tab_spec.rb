@@ -332,58 +332,7 @@ describe "admin settings tab" do
       checkbox.click if is_checked(selector) != checked
     end
 
-    it 'should add and delete custom help links' do
-      skip('this tests old ui') if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-
-      Account.default.disable_feature! :use_new_styles
-
-      Setting.set('show_feedback_link', 'true')
-      get "/accounts/#{Account.default.id}/settings"
-
-      f('.add_custom_help_link').click
-      f('.add_custom_help_link').click
-      f('.add_custom_help_link').click
-
-      inputs = ff('.custom_help_link:nth-child(1) .formtable input')
-      inputs.find{|e| e['id'].ends_with?('_text')}.send_keys('text')
-      inputs.find{|e| e['id'].ends_with?('_subtext')}.send_keys('subtext')
-      inputs.find{|e| e['id'].ends_with?('_url')}.send_keys('http://www.example.com/example')
-
-      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_user')}, true)
-      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_student')}, true)
-      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_teacher')}, true)
-      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_admin')}, false)
-
-      f('.custom_help_link:nth-child(2) .delete').click
-      expect(f('.custom_help_link:nth-child(2)')).not_to be_displayed
-
-      inputs = ff('.custom_help_link:nth-child(3) .formtable input')
-      inputs.find{|e| e['id'].ends_with?('_text')}.send_keys('text2')
-      inputs.find{|e| e['id'].ends_with?('_subtext')}.send_keys('subtext2')
-      inputs.find{|e| e['id'].ends_with?('_url')}.send_keys('http://www.example.com/example2')
-
-      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_user')}, false)
-      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_student')}, true)
-      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_teacher')}, false)
-      set_checkbox(inputs.find{|e| e['id'].ends_with?('_available_to_admin')}, true)
-
-      click_submit
-      expect(Account.default.settings[:custom_help_links]).to eq [
-        {"text"=>"text", "subtext"=>"subtext", "url"=>"http://www.example.com/example", "available_to"=>["user", "student", "teacher"]},
-        {"text"=>"text2", "subtext"=>"subtext2", "url"=>"http://www.example.com/example2", "available_to"=>["student", "admin"]}
-      ]
-
-      f('.custom_help_link:nth-child(1) .delete').click
-      expect(f('.custom_help_link:nth-child(1)')).not_to be_displayed
-
-      click_submit
-      expect(Account.default.settings[:custom_help_links]).to eq [
-          {"text"=>"text2", "subtext"=>"subtext2", "url"=>"http://www.example.com/example2", "available_to"=>["student", "admin"]}
-      ]
-    end
-
     it "should set custom help link text and icon" do
-      Account.default.enable_feature! :use_new_styles
       Setting.set('show_feedback_link', 'true')
 
       link_name = 'Links'
@@ -423,7 +372,6 @@ describe "admin settings tab" do
     end
 
     it "should preserve the default help links if the account hasn't been configured with the new ui yet" do
-      Account.default.enable_feature!(:use_new_styles)
       help_link = {:text => "text", :subtext => "subtext", :url => "http://www.example.com/example", :available_to => ["user", "student", "teacher"]}
       Account.default.settings[:custom_help_links] = [help_link]
       Account.default.save!

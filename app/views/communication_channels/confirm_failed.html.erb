@@ -1,23 +1,17 @@
 <%
   css_bundle :login_confirm
   @headers = false
-  if use_new_styles?
-    @body_classes << "full-width modal body--login-confirmation"
-  else
-    @body_classes << "modal body--login-confirmation"
-  end
+  @body_classes << "full-width modal body--login-confirmation"
 
   content_for :page_title, t(:page_title, "Registration Confirmation Failed")
 %>
 
-<div id="modal-box"<% if use_new_styles? %> class="ic-Login-confirmation"<% end %>>
-  <% if use_new_styles? %>
+<div id="modal-box" class="ic-Login-confirmation">
   <header class="ic-Login-confirmation__header">
     <%= image_tag("login/canvas-logo@2x.png", class:"ic-Login-confirmation__logo", alt:"Canvas by Instructure") %>
   </header>
   <div class="ic-Login-confirmation__content">
-  <% end %>
-    <h2<% if use_new_styles? %> class="ic-Login-confirmation__headline"<% end %>>
+    <h2 class="ic-Login-confirmation__headline">
       <%= t 'titles.problems_with_registration', "Problem with Registration" %>
     </h2>
     <p><%= t :details, %{It looks like you may have already confirmed your registration.  Try
@@ -32,5 +26,5 @@
       or to let us know what's going on.", :link => help_link_name %>
     <% end %>
     </p>
-  <% if use_new_styles? %></div><% end %>
+  </div>
 </div>

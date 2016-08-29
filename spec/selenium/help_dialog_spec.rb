@@ -3,10 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "help dialog" do
   include_context "in-process server selenium tests"
 
-  before do
-    Account.default.enable_feature! :use_new_styles
-  end
-
   context "no user logged in" do
     it "should work with no logged in user" do
       Setting.set('show_feedback_link', 'true')

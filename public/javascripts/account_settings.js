@@ -150,7 +150,7 @@ define([
       });
     });
 
-    $("#turnitin, #account_settings_global_includes, #enable_equella").change(function() {
+    $("#turnitin, #enable_equella").change(function() {
       var $myFieldset = $('#'+ $(this).attr('id') + '_settings'),
           iAmChecked = $(this).attr('checked');
       $myFieldset.showIf(iAmChecked);

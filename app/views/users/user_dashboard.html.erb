@@ -12,33 +12,22 @@
   <div class="placeholder"></div>
 <% end %>
 
-<% unless use_new_styles? -%>
-  <% content_for :leading_content do %>
-    <h1 class='screenreader-only'> <%= t('user_dashboard', 'User Dashboard') %> </h1>
-  <% end %>
-<% end -%>
-
 <div id="dashboard">
   <%= render :partial => 'shared/dashboard_invitation', :collection => @pending_invitations %>
   <%= render :partial => 'shared/dashboard_messages' %>
 
-  <% if use_new_styles? %>
-    <div class="ic-Dashboard-header">
-      <div class="grid-row bottom-xs">
-      <div class="col-xs-9">
-        <h1 class="ic-Dashboard-header_title"><%= t :dashboard, "Dashboard" %></h1>
-      </div>
-      <div id="RecentActivityToggle_Container"
-        class="col-xs-3 ic-Dashboard-content--align-right">
-      </div>
-      </div>
+  <div class="ic-Dashboard-header">
+    <div class="grid-row bottom-xs">
+    <div class="col-xs-9">
+      <h1 class="ic-Dashboard-header_title"><%= t :dashboard, "Dashboard" %></h1>
     </div>
-    <div id="dashboard-activity" class="ic-Dashboard-Activity" style="display: <%= show_recent_activity? ? 'block' : 'none' %>">
-      <%= render :partial => 'shared/recent_activity' %>
+    <div id="RecentActivityToggle_Container"
+      class="col-xs-3 ic-Dashboard-content--align-right">
     </div>
-    <%= render :partial => 'shared/dashboard_card' %>
-
-  <% else %>
+    </div>
+  </div>
+  <div id="dashboard-activity" class="ic-Dashboard-Activity" style="display: <%= show_recent_activity? ? 'block' : 'none' %>">
     <%= render :partial => 'shared/recent_activity' %>
-  <% end %>
+  </div>
+  <%= render :partial => 'shared/dashboard_card' %>
 </div>

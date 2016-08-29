@@ -115,7 +115,6 @@ class ApplicationController < ActionController::Base
         current_user_disabled_inbox: @current_user.try(:disabled_inbox?),
         files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
-        use_new_styles: use_new_styles?,
         k12: k12?,
         help_link_name: help_link_name,
         help_link_icon: help_link_icon,
@@ -218,11 +217,6 @@ class ApplicationController < ActionController::Base
     @domain_root_account && @domain_root_account.feature_enabled?(:k12)
   end
   helper_method :k12?
-
-  def use_new_styles?
-    @domain_root_account && @domain_root_account.feature_enabled?(:use_new_styles) || k12?
-  end
-  helper_method :use_new_styles?
 
   def multiple_grading_periods?
     account_and_grading_periods_allowed? ||

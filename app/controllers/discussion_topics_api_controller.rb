@@ -103,8 +103,7 @@ class DiscussionTopicsApiController < ApplicationController
   def view
     return unless authorized_action(@topic, @current_user, :read_replies)
 
-    mobile_brand_config = !in_app? && @context.account.root_account.feature_enabled?(:use_new_styles) &&
-      @context.account.effective_brand_config
+    mobile_brand_config = !in_app? && @context.account.effective_brand_config
     opts = {
       :include_new_entries => value_to_boolean(params[:include_new_entries]),
       :include_mobile_overrides => !!mobile_brand_config

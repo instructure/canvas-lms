@@ -9,7 +9,6 @@ describe BrandConfigsApiController do
     end
 
     it "should redirect to the one for @domain_root_account's brand config if set" do
-      Account.default.enable_feature!(:use_new_styles)
       brand_config = Account.default.create_brand_config!(variables: {"ic-brand-primary" => "#321"})
       get :show
       expect(response).to redirect_to("#{Canvas::Cdn.config.host}/#{brand_config.public_json_path}")

@@ -1,8 +1,8 @@
 <%
   content_for :page_title, "Gradebook - #{@context.name}"
   @body_classes << "gradebook2 full-width"
-  @show_left_side = use_new_styles?
-  @collapse_course_menu = true if @show_left_side
+  @show_left_side = true
+  @collapse_course_menu = true
   @show_embedded_chat = false
   css_bundle :slickgrid, :gradebook2
   js_bundle :gradebook2
