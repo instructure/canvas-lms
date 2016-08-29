@@ -695,6 +695,12 @@ describe ContextExternalTool do
       tool.change_domain! new_host
       expect(tool.settings["environments"]).to eq({:launch_url => 'http://www.google.com/'})
     end
+
+    it "should ignore an existing invalid url" do
+      tool.url = "null"
+      tool.change_domain! new_host
+      expect(tool.url).to eq "null"
+    end
   end
 
   describe "standardize_url" do

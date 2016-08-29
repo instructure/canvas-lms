@@ -380,7 +380,7 @@ class ContextExternalTool < ActiveRecord::Base
   def change_domain!(new_domain)
     replace_host = lambda do |url, host|
       uri = Addressable::URI.parse(url)
-      uri.host = host
+      uri.host = host if uri.host
       uri.to_s
     end
 
