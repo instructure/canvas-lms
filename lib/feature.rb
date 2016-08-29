@@ -119,16 +119,6 @@ END
       state: 'hidden',
       root_opt_in: true
     },
-    'use_new_styles' =>
-    {
-      display_name: -> { I18n.t('New UI') },
-      description: -> { I18n.t(<<END) },
-This enables an updated navigation, new dashboard and a simpler, more modern look and feel.
-END
-      applies_to: 'RootAccount',
-      state: 'on',
-      root_opt_in: true
-    },
     'epub_export' =>
     {
       display_name: -> { I18n.t('ePub Exporting') },
