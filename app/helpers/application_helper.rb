@@ -809,13 +809,19 @@ module ApplicationHelper
         javascript_include_tag(*includes)
       else
         str = <<-ENDSCRIPT
-          require(['jquery'], function () {
-            #{includes.to_json}.forEach(function (src) {
-              var s = document.createElement('script');
-              s.src = src;
-              document.body.appendChild(s);
-            });
-          });
+          !function(){
+            function tryToLoadAccountJS () {
+              // wait to make sure jquery is loaded before loading account js
+              if (typeof $ === "undefined") return setTimeout(tryToLoadAccountJS, 20);
+
+              #{includes.to_json}.forEach(function (src) {
+                var s = document.createElement('script');
+                s.src = src;
+                document.body.appendChild(s);
+              });
+            }
+            tryToLoadAccountJS();
+          }();
         ENDSCRIPT
         javascript_tag(str)
       end
