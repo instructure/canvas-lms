@@ -61,8 +61,8 @@ module ConditionalRelease
           context_type: context.class.name,
           context_id: context.id.to_s,
           role: find_role(user, session, context),
-          workflow: 'conditonal-release-api',
-          canvas_token: Canvas::Security::ServicesJwt.for_user(domain, user, real_user: real_user, workflow: 'conditional-release')
+          workflows: ['conditonal-release-api'],
+          canvas_token: Canvas::Security::ServicesJwt.for_user(domain, user, real_user: real_user, workflows: ['conditional-release'])
         })
       )
     end

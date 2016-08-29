@@ -87,7 +87,7 @@ module ConditionalRelease
           account_id: Context.get_account(course).root_account.lti_guid.to_s,
           context_type: 'Course',
           context_id: course.id.to_s,
-          workflow: 'conditonal-release-api'
+          workflows: ['conditonal-release-api']
         })
         {"Authorization" => "Bearer #{token}"}
       end

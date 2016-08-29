@@ -110,6 +110,7 @@ module Canvas::Security
 
       describe "via .for_user" do
         let(:user){ stub(global_id: 42) }
+        let(:ctx){ stub(id: 47) }
         let(:host){ "example.instructure.com" }
         let(:masq_user){ stub(global_id: 24) }
         let(:translate_token) do
@@ -139,16 +140,50 @@ module Canvas::Security
           expect(decrypted_token_body.keys.include?(:masq_sub)).to eq(false)
         end
 
-        it "includes workflow if given" do
-          jwt = ServicesJwt.for_user(host, user, workflow: 'foo')
+        it "includes workflows if given" do
+          workflows = ['foo']
+          jwt = ServicesJwt.for_user(host, user, workflows: workflows)
           decrypted_token_body = translate_token.call(jwt)
-          expect(decrypted_token_body[:workflow]).to eq 'foo'
+          expect(decrypted_token_body[:workflows]).to eq workflows
         end
 
         it "does not include a workflow if not given" do
           jwt = ServicesJwt.for_user(host, user)
           decrypted_token_body = translate_token.call(jwt)
           expect(decrypted_token_body).not_to have_key :workflow
+        end
+
+        it "does not include a workflow if empty array" do
+          workflows = []
+          jwt = ServicesJwt.for_user(host, user, workflows: workflows)
+          decrypted_token_body = translate_token.call(jwt)
+          expect(decrypted_token_body).not_to have_key :workflow
+        end
+
+        it 'includes workflow_state if workflows is given' do
+          workflows = [:foo]
+          state = {'a' => 123}
+          Canvas::JWTWorkflow.expects(:state_for).with(workflows, ctx, user).returns(state)
+          jwt = ServicesJwt.for_user(host, user, workflows: workflows, context: ctx)
+          decrypted_token_body = translate_token.call(jwt)
+          expect(decrypted_token_body[:workflow_state]).to eq(state)
+        end
+
+        it 'does not include workflow_state if empty' do
+          workflows = [:foo]
+          Canvas::JWTWorkflow.expects(:state_for).returns({})
+          jwt = ServicesJwt.for_user(host, user, workflows: workflows, context: ctx)
+          decrypted_token_body = translate_token.call(jwt)
+          expect(decrypted_token_body).not_to have_key :workflow_state
+        end
+
+        it 'includes context type and id if context is given' do
+          ctx = Course.new
+          ctx.id = 47
+          jwt = ServicesJwt.for_user(host, user, context: ctx)
+          decrypted_token_body = translate_token.call(jwt)
+          expect(decrypted_token_body[:context_type]).to eq 'Course'
+          expect(decrypted_token_body[:context_id]).to eq '47'
         end
 
         it "errors without a host" do
