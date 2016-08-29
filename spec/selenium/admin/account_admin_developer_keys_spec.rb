@@ -25,7 +25,6 @@ describe 'developer keys' do
     f("#key_name").send_keys("Cool Tool")
     f("#email").send_keys("admin@example.com")
     f("#redirect_uris").send_keys("http://example.com")
-    expect(f(".key_form")).not_to contain_css("#redirect_uri")
     f("#icon_url").send_keys("/images/delete.png")
     submit_dialog("#edit_dialog", '.submit')
     wait_for_ajaximations
