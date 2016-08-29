@@ -24,7 +24,8 @@ module Autoextend
   end
 
   # Add a hook to automatically extend a class or module with a module,
-  # or call a block when it's defined
+  # or by calling a block, when it is extended (module or class)
+  # or defined (class only).
   #
   #   Autoextend.hook(:User, :MyUserExtension)
   #
@@ -34,12 +35,15 @@ module Autoextend
   #     klass.send(:include, MyUserExtension)
   #   end
   #
-  # If User is already defined, it will immediately prepend
+  # If User is already defined, it will immediately include
   # the MyUserExtension module into it. It then sets up a hook
-  # to automatically prepend User as soon as it _is_ defined.
+  # to automatically include in User if it becomes defined again
+  # (like from ActiveSupport reloading).
+  #
   # Note that this hook happens before any methods have been
   # added to it, so you cannot directly modify anything you
   # expect to exist in the class.
+  #
   # Instead you should either use prepend with super, or
   # set up additional hooks to automatically modify methods
   # as they are added (if you use :include as your method)
@@ -73,6 +77,8 @@ module Autoextend::ClassMethods
   end
 end
 
+# Note: Autoextend can't detect a module being defined,
+# only when it gets included into a class.
 module Autoextend::ModuleMethods
   def prepended(klass)
     Autoextend.const_added(self).each do |extension|
