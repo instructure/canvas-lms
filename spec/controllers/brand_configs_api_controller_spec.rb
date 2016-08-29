@@ -14,5 +14,11 @@ describe BrandConfigsApiController do
       get :show
       expect(response).to redirect_to("#{Canvas::Cdn.config.host}/#{brand_config.public_json_path}")
     end
+
+    it "should set CORS headers" do
+      brand_config = Account.default.create_brand_config!(variables: {"ic-brand-primary" => "#321"})
+      get :show
+      expect(response.header["Access-Control-Allow-Origin"]).to eq "*"
+    end
   end
 end
