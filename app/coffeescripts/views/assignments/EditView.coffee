@@ -260,11 +260,9 @@ ConditionalRelease) ->
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
         conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false
 
-    # separated out so we can easily stub it
-    scrollSidebar: $.scrollSidebar
 
     _attachEditorToDescription: =>
-      RichContentEditor.initSidebar(show: @scrollSidebar)
+      RichContentEditor.initSidebar()
       RichContentEditor.loadNewEditor(@$description, { focus: true, manageParent: true })
 
       $('.rte_switch_views_link').click (e) =>

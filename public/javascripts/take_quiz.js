@@ -33,7 +33,6 @@ define([
   'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
   'jquery.instructure_forms' /* getFormData, errorBox */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'compiled/jquery.rails_flash_notifications',
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
@@ -386,7 +385,6 @@ define([
   });
 
   $(function() {
-    $.scrollSidebar();
     autoBlurActiveInput();
 
     if($("#preview_mode_link").length == 0) {

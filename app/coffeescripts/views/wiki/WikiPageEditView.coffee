@@ -88,15 +88,13 @@ define [
         (ev || window.event).returnValue = warning
         return warning
 
-    # separated out so we can easily stub it
-    scrollSidebar: $.scrollSidebar
 
     # After the page loads, ensure the that wiki sidebar gets initialized
     # correctly.
     # @api custom backbone override
     afterRender: ->
       super
-      RichContentEditor.initSidebar(show: @scrollSidebar)
+      RichContentEditor.initSidebar()
       RichContentEditor.loadNewEditor(@$wikiPageBody, { focus: true, manageParent: true })
 
       @checkUnsavedOnLeave = true

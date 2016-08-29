@@ -36,7 +36,7 @@ define([
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
-  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
+  'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
@@ -493,7 +493,6 @@ define([
         $("#page_select_list").append($page.show());
       });
     }).triggerHandler('change');
-    $.scrollSidebar();
 
     $(".delete_comment_link").click(function(event) {
       event.preventDefault();

@@ -23,7 +23,6 @@ define [
   'compiled/views/editor/KeyboardShortcuts'
   'jquery.instructure_date_and_time' # dateString, datepicker #
   'jquery.instructure_forms' # formSubmit, formErrors #
-  'jquery.instructure_misc_helpers' # scrollSidebar #
   'jquery.instructure_misc_plugins' # ifExists, showIf #
   'jquery.loadingImg' # loadingImage #
   'vendor/jquery.scrollTo' # /\.scrollTo/ #

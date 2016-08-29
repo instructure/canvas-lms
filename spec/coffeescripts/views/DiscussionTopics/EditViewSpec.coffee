@@ -41,7 +41,6 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
           views: {}
 
     (app.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string
-    @stub(app, 'scrollSidebar')
     app.render()
 
   module 'EditView',

@@ -103,46 +103,6 @@ define([
     }
   }
 
-  var scrollSideBarIsBound = false;
-  $.scrollSidebar = function(){
-    if(!scrollSideBarIsBound && !ENV.use_new_styles){
-      var $right_side = $("#right-side"),
-          $main = $('#main'),
-          $not_right_side = $("#not_right_side"),
-          $window = $(window),
-          $rightSideWrapper = $("#right-side-wrapper"),
-          headerHeight = $right_side.offset().top,
-          rightSideMarginBottom = $rightSideWrapper.height() - $right_side.outerHeight(),
-          rightSideMarginTop = $right_side.offset().top - $rightSideWrapper.offset().top;
-
-      function onScroll(){
-        var windowScrollTop = $window.scrollTop(),
-            windowScrollIsBelowHeader = (windowScrollTop > headerHeight - rightSideMarginTop);
-
-        if (windowScrollIsBelowHeader) {
-          var notRightSideHeight = $not_right_side.height(),
-              rightSideHeight = $right_side.height(),
-              notRightSideIsTallerThanRightSide = notRightSideHeight > rightSideHeight,
-              rightSideBottomIsBelowMainBottom = ( headerHeight + $main.height() - windowScrollTop ) <= ( rightSideHeight + rightSideMarginBottom );
-        }
-
-        // windows chrome repaints when you set the class, even if the classes
-        // aren't truly changing, which wreaks havoc on open select elements.
-        // so we only toggle if we really need to
-        if ((windowScrollIsBelowHeader && notRightSideIsTallerThanRightSide && !rightSideBottomIsBelowMainBottom) ^ $rightSideWrapper.hasClass('with-scrolling-right-side')) {
-          $rightSideWrapper.toggleClass('with-scrolling-right-side');
-        }
-        if ((windowScrollIsBelowHeader && notRightSideIsTallerThanRightSide && rightSideBottomIsBelowMainBottom) ^ $rightSideWrapper.hasClass('with-sidebar-pinned-to-bottom')) {
-          $rightSideWrapper.toggleClass('with-sidebar-pinned-to-bottom');
-        }
-      }
-      var throttledOnScroll = _.throttle(onScroll, 50);
-      throttledOnScroll();
-      $window.scroll(throttledOnScroll);
-      scrollSideBarIsBound = true;
-    }
-  };
-
   $.underscore = function(string) {
     return (string || "").replace(/([A-Z])/g, "_$1").replace(/^_/, "").toLowerCase();
   };

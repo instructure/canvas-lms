@@ -29,7 +29,6 @@ define([
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons',
   'compiled/jquery.rails_flash_notifications',
-  'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
   'jquery.disableWhileLoading',
   'message_students' /* messageStudents */
@@ -147,7 +146,6 @@ define([
         dialog.open();
       });
     });
-    $.scrollSidebar();
 
     $("#let_students_take_this_quiz_button").ifExists(function($link){
       var $unlock_for_how_long_dialog = $("#unlock_for_how_long_dialog");
