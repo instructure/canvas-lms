@@ -153,6 +153,22 @@ describe AccountNotification do
         expect(root_account_only.count).to eq 1
       end
     end
+
+    it "scopes sub-accounts to the root account" do
+      sub_announcement = SubAccountNotification.sub_account_notification(subject: 'blah', account: @sub_account)
+      course_with_student(user: @user, account: @sub_account, active_all: true)
+      other_root_account = Account.create!
+      other_announcement = account_notification(account: other_root_account)
+      course_with_student(user: @user, account: other_root_account, active_all: true)
+
+      notes = AccountNotification.for_user_and_account(@user, Account.default)
+      expect(notes).to include sub_announcement
+      expect(notes).not_to include other_announcement
+
+      other_notes = AccountNotification.for_user_and_account(@user, other_root_account)
+      expect(other_notes).not_to include sub_announcement
+      expect(other_notes).to include other_announcement
+    end
   end
 
   describe "survey notifications" do

@@ -26,7 +26,7 @@ class AccountNotification < ActiveRecord::Base
     if account.site_admin?
       current = self.for_account(account)
     else
-      sub_account_ids = UserAccountAssociation.where(user: user).pluck(:account_id)
+      sub_account_ids = UserAccountAssociation.where(user: user).joins(:account).where('COALESCE(accounts.root_account_id,accounts.id)=?', account).pluck(:account_id)
       current = self.for_account(account, sub_account_ids)
     end
 
