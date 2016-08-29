@@ -59,6 +59,22 @@ describe ContentMigration do
       expect(to_outcomes).to eql [mig_id(@outcome)]
     end
 
+    it "should link account rubric outcomes (even if in a group) in selective copy" do
+      @course = @copy_from
+      outcome_group_model(:context => @copy_from)
+      outcome_with_rubric(:outcome_context => @copy_from.account)
+      from_assign = @copy_from.assignments.create! title: 'some assignment'
+      @rubric.associate_with(from_assign, @copy_from, purpose: 'grading')
+
+      @cm.copy_options = {:assignments => {mig_id(from_assign) => true}}
+
+      run_course_copy
+
+      to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
+      to_outcomes = to_assign.rubric.learning_outcome_alignments.map(&:learning_outcome)
+      expect(to_outcomes).to eql [@outcome]
+    end
+
     it "should link assignments to assignment groups when copying all assignments" do
       g = @copy_from.assignment_groups.create!(:name => "group")
       from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
