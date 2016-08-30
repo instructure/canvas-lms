@@ -1093,7 +1093,7 @@ describe CoursesController, type: :request do
         @course.reload
         expect(@course.workflow_state).to eql 'deleted'
         new_course = Course.find(json['id'])
-        expect(new_course.workflow_state).to eql 'created'
+        expect(new_course.workflow_state).to eql 'claimed'
         expect(json['workflow_state']).to eql 'unpublished'
       end
     end
