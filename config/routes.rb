@@ -846,6 +846,7 @@ CanvasRails::Application.routes.draw do
   end
 
   scope '/dashboard' do
+    get 'stream_items' => 'users#dashboard_stream_items', as: :dashboard_stream_items
     put 'view' => 'users#dashboard_view'
     delete 'account_notifications/:id' => 'users#close_notification', as: :dashboard_close_notification
     get 'eportfolios' => 'eportfolios#user_index', as: :dashboard_eportfolios

@@ -52,7 +52,7 @@ describe 'dashcards' do
       f('#DashboardOptionsMenu_Container button').click
       fj('span[role="menuitemradio"]:contains("Recent Activity")').click
       # verify recent activity view
-      expect(f('#dashboard-activity').text).to include('Recent Activity')
+      expect(f('#dashboard-activity')).to include_text('Recent Activity')
     end
 
     it 'should redirect to announcements index', priority: "1", test_id: 222509 do

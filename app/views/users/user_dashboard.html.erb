@@ -43,8 +43,12 @@
   <% if planner_enabled? %>
     <div id="dashboard-planner" class="StudentPlanner__Container" style="display: <%= show_planner? ? 'block' : 'none' %>"></div>
   <% end %>
-  <div id="dashboard-activity" class="ic-Dashboard-Activity" style="display: <%= show_recent_activity? ? 'block' : 'none' %>">
-    <%= render :partial => 'shared/recent_activity' %>
+  <div
+    id="dashboard-activity"
+    class="ic-Dashboard-Activity"
+    style="display: <%= show_recent_activity? ? 'block' : 'none' %>"
+  >
+    <!-- this will be populated via xhr from UsersController::dashboard_stream_items when someone selects the stream-items dashboard option -->
   </div>
 
   <%= render :partial => 'shared/dashboard_card' %>

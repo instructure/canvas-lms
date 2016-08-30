@@ -543,7 +543,15 @@ class UsersController < ApplicationController
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @pending_invitations = @current_user.cached_invitations(:include_enrollment_uuid => session[:enrollment_uuid], :preload_course => true)
+  end
+
+  def dashboard_stream_items
+    cancel_cache_buster
+
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
+    if stale?(etag: @stream_items)
+      render partial: 'shared/recent_activity', layout: false
+    end
   end
 
   def cached_upcoming_events(user)
