@@ -163,6 +163,8 @@ define [
           "filmstrip"
         when "online_quiz"
           "quiz"
+        else
+          "document"
 
   class SubmissionCell.out_of extends SubmissionCell
     init: () ->
