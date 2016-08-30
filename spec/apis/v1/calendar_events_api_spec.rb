@@ -870,6 +870,15 @@ describe CalendarEventsApiController, type: :request do
       expect(cal.events[0].x_alt_desc).to eq nil
     end
 
+    it 'works when event descriptions contain paths to user attachments' do
+      attachment_with_context(@user)
+      @user.calendar_events.create!(description: "/users/#{@user.id}/files/#{@attachment.id}", start_at: Time.now)
+      json = api_call(:get, "/api/v1/calendar_events", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json'
+      })
+      expect(response).to be_success
+    end
+
     context "child_events" do
       let_once :event do
         event = @course.calendar_events.build(:title => 'event', :child_event_data => {"0" => {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string}})
