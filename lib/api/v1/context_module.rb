@@ -190,7 +190,7 @@ module Api::V1::ContextModule
 
   def conditional_release(content_tag, opts = {})
     rules = opts[:conditional_release_rules]
-    assignment_id = content_tag.content.try(:assignment_id) || content_tag.content_id
+    assignment_id = content_tag.assignment.try(:id)
     conditional_release_assignment_set(rules, assignment_id) if rules.present? && assignment_id.present?
   end
 
