@@ -328,6 +328,7 @@ RSpec.configure do |config|
     Attachment.domain_namespace = nil
     Canvas::DynamicSettings.reset_cache!
     ActiveRecord::Migration.verbose = false
+    RequestStore.clear!
     $spec_api_tokens = {}
   end
 
