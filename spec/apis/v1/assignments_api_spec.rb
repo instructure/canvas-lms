@@ -2336,8 +2336,8 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           :title => "Locked Assignment",
           :description => "locked!"
         )
-        @assignment.any_instantiation.expects(:overridden_for).
-          returns @assignment
+        @assignment.any_instantiation.expects(:overridden_for)
+          .returns @assignment
         @assignment.any_instantiation.expects(:locked_for?).returns({
           :asset_string => '',
           :unlock_at => 1.hour.from_now
@@ -2350,6 +2350,28 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         json = api_get_assignment_in_course(@assignment,@course)
         expect(json['description']).to be_nil
         expect(mod.evaluate_for(@user)).to be_unlocked
+      end
+
+      it "still includes a description when a locked assignment is viewable" do
+        @assignment = @course.assignments.create!(
+          :title => "Locked but Viewable Assignment",
+          :description => "locked but viewable!"
+        )
+        @assignment.any_instantiation.expects(:overridden_for)
+          .returns @assignment
+        @assignment.any_instantiation.expects(:locked_for?).returns({
+          :asset_string => '',
+          :unlock_at => 1.hour.ago,
+          :can_view => true
+        }).at_least(1)
+
+        mod = @course.context_modules.create!(:name => "some module")
+        tag = mod.add_item(:id => @assignment.id, :type => 'assignment')
+        mod.completion_requirements = { tag.id => {:type => 'must_view'} }
+        mod.save!
+        json = api_get_assignment_in_course(@assignment,@course)
+        expect(json['description']).not_to be_nil
+        expect(mod.evaluate_for(@user)).to be_completed
       end
 
       it "includes submission info when requested with include flag" do

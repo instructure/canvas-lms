@@ -3,7 +3,7 @@
   tool ||= external_tool
   classes = []
   if tool
-    ContextExternalTool::EXTENSION_TYPES.each do |type|
+    Lti::ResourcePlacement::PLACEMENTS.each do |type|
       classes << "has_#{type}" if tool.try("has_#{type}")
     end
   end

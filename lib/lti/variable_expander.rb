@@ -156,13 +156,13 @@ module Lti
     register_expansion 'Canvas.rootAccount.sisSourceId', [],
                        -> { @root_account.sis_source_id }
 
-    # returns the URL for the external tool that was launched.
+    # returns the API URL for the external tool that was launched.
     # @example
     #   ```
     #   http://example.url/path
     #   ```
     register_expansion 'Canvas.externalTool.url', [],
-                       -> { @controller.named_context_url(@context, :api_v1_context_external_tools_update_url,
+                       -> { @controller.named_context_url(@tool.context, :api_v1_context_external_tools_update_url,
                                                           @tool.id, include_host:true) },
                        LTI1_GUARD
 

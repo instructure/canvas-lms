@@ -306,7 +306,7 @@ class SectionsController < ApplicationController
   def destroy
     if authorized_action(@section, @current_user, :delete)
       respond_to do |format|
-        if @section.enrollments.not_fake.empty?
+        if @section.deletable?
           @section.destroy
           @context.touch
           flash[:notice] = t('section_deleted', "Course section successfully deleted!")

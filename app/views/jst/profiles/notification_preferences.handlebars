@@ -1,3 +1,9 @@
+<div id='notification-legend' aria-hidden='true'>
+  {{#each buttonData}}
+    <span><i class='{{icon}}' /> {{title}}</span>
+  {{/each}}
+</div>
+
 {{#each eventGroups}}
   <table cellspacing="0"
          class="notification-prefs-table table
@@ -47,7 +53,12 @@
             </div>
           </th>
 
-          {{{policyCells}}}
+          {{#each policyCells}}
+            <td class='comm-event-option' data-selection='{{selection}}' data-category='{{category}}' data-channelId='{{channelId}}'>
+              <div class='comm-event-option-contents'>
+              </div>
+            </td>
+          {{/each}}
 
         </tr>
       {{/each}}

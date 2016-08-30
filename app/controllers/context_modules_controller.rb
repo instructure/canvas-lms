@@ -49,7 +49,7 @@ class ContextModulesController < ApplicationController
 
     def load_modules
       @modules = @context.modules_visible_to(@current_user)
-      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
+      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).pluck(:context_module_id, :collapsed).select{|cm_id, collapsed| !!collapsed }.map(&:first)
 
       @can_edit = can_do(@context, @current_user, :manage_content)
 

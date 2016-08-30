@@ -228,13 +228,27 @@ module AccountReports::ReportHelper
     Shackles.activate(:master) { send_report(file) }
   end
 
-  def generate_and_run_report(headers)
-    file = AccountReports.generate_file(@account_report)
+  def generate_and_run_report(headers = nil, extention = 'csv')
+    file = AccountReports.generate_file(@account_report, extention)
     CSV.open(file, "w") do |csv|
-      csv << headers
+      csv << headers unless headers.nil?
       Shackles.activate(:slave) { yield csv }
     end
     file
+  end
+
+  def read_csv_in_chunks(filename, chunk_size = 1000)
+    CSV.open(filename) do |csv|
+      rows = []
+      while (!(row = csv.readline).nil?)
+        rows << row
+        if rows.size == chunk_size
+          yield rows
+          rows = []
+        end
+      end
+      yield rows unless rows.empty?
+    end
   end
 
   def add_extra_text(text)

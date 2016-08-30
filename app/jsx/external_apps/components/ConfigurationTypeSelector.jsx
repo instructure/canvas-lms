@@ -3,8 +3,6 @@ define([
   'react',
   'jsx/external_apps/components/Header',
   'jsx/external_apps/components/ExternalToolsTable',
-  'vendor/bootstrap/bootstrap-dropdown',
-  'vendor/bootstrap-select/bootstrap-select'
 ], function(I18n, React, Header, ExternalToolsTable) {
   return React.createClass({
     displayName: 'ConfigurationTypeSelector',
@@ -18,7 +16,6 @@ define([
       var configSelector = $("#configuration_type_selector");
       if (configSelector && configSelector.length >= 0) {
         configSelector.change(this.props.handleChange);
-        configSelector.selectpicker();
       }
     },
 

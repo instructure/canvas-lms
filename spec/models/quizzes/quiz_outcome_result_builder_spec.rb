@@ -19,18 +19,18 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizOutcomeResultBuilder do
-  def question_data(reset=false)
+  def question_data(reset=false, data={})
     @qdc = (reset || !@qdc) ? 1 : @qdc + 1
     {:name => "question #{@qdc}", :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' =>
       [{'answer_text' => '1', 'answer_weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]
-    }
+    }.merge(data)
   end
 
-  def build_course_quiz_questions_and_a_bank
+  def build_course_quiz_questions_and_a_bank(data={})
     course_with_student(:active_all => true)
     @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
-    @q1 = @quiz.quiz_questions.create!(:question_data => question_data(true))
-    @q2 = @quiz.quiz_questions.create!(:question_data => question_data)
+    @q1 = @quiz.quiz_questions.create!(:question_data => question_data(true, data))
+    @q2 = @quiz.quiz_questions.create!(:question_data => question_data(false, data))
     @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
     @bank = @q1.assessment_question.assessment_question_bank
     @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
@@ -41,6 +41,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
   end
 
   def answer_a_question(question, submission, correct: true)
+    return if question.question_data['answers'] == []
     q_id = question.data[:id]
     answer = if correct
               find_the_answer_from_a_question(question)
@@ -204,5 +205,24 @@ describe Quizzes::QuizOutcomeResultBuilder do
       expect(@results.last.mastery).to eql(true)
       expect(@results.last.original_mastery).to eql(false)
     end
+  end
+
+  describe "quizzes that aren't graded or complete" do
+    before :once do
+      build_course_quiz_questions_and_a_bank({'question_type' => 'essay_question', 'answers' => []})
+      @quiz.generate_quiz_data(:persist => true)
+      @sub = @quiz.generate_submission(@user)
+      @sub.submission_data = {}
+      answer_a_question(@q1, @sub)
+      answer_a_question(@q2, @sub, correct: false)
+      Quizzes::SubmissionGrader.new(@sub).grade_submission
+      @outcome.reload
+      @quiz_results = @outcome.learning_outcome_results.where(user_id: @user).to_a
+    end
+
+    it "does not create an outcome result" do
+      expect(@quiz_results).to be_empty
+    end
+
   end
 end

@@ -22,10 +22,55 @@ describe ContentZipper do
   end
 
   context "submission zips" do
-    it "should schedule a job on the first request, and then respond with progress updates" do
-      course_with_teacher_logged_in(:active_all => true)
+    before(:once) do
+      course_with_teacher(:active_all => true)
       submission_model(:course => @course)
+    end
+
+    before(:each) do
+      user_session(@teacher)
+    end
+
+    it "should schedule a job on the first request, and then respond with progress updates" do
       grab_zip { get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1" }
+    end
+
+    it "should recreate the submission zip if the anonymous grading setting changes" do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
+      att0 = json_parse['attachment']['id']
+
+      @course.enable_feature! :anonymous_grading
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
+      att1 = json_parse['attachment']['id']
+
+      expect(att0).not_to eq(att1)
+    end
+
+    it "should recreate the submission zip if the previous one is too old" do
+      att0 = nil
+      Timecop.travel(1.day.ago) do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
+        att0 = json_parse['attachment']['id']
+      end
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
+      att1 = json_parse['attachment']['id']
+
+      expect(att0).not_to eq(att1)
+    end
+
+    it "should recreate the submission zip if a submission has been made since its creation" do
+      att0 = nil
+      Timecop.travel(1.minute.ago) do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
+        att0 = json_parse['attachment']['id']
+      end
+
+      submission_model(:course => @course)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
+      att1 = json_parse['attachment']['id']
+
+      expect(att0).not_to eq(att1)
     end
   end
 

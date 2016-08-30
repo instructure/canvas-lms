@@ -49,7 +49,7 @@ define([
     $template.find(".provisioning_only_column label").attr('for', checkbox_name);
     $template.find("input[type='checkbox']").attr('name', checkbox_name);
     $template.find("input[type='checkbox']").attr('id', checkbox_name);
-    $template.find('.canvas_attribute').append($selected_canvas_attribute.text());
+    $template.find('.canvas_attribute_name').append($selected_canvas_attribute.text());
     var provider_attribute_name = "authentication_provider[federated_attributes][" + canvas_attribute_html + "][attribute]";
     $template.find('.provider_attribute_column label').attr('for', provider_attribute_name);
     $provider_attribute.attr('name', provider_attribute_name);
@@ -70,7 +70,7 @@ define([
     var $attribute_row = $(this).closest('tr')
     var $federated_attributes = $attribute_row.closest('.federated_attributes')
     var $canvas_attribute_select = $federated_attributes.find('.add_attribute .canvas_attribute');
-    var canvas_attribute_html = $attribute_row.find('.canvas_attribute').text();
+    var canvas_attribute_html = $attribute_row.find('.canvas_attribute_name').text();
     $canvas_attribute_select.append("<option>" + canvas_attribute_html + "</option>");
     var $next = $attribute_row.nextAll(':visible').first().find('input:visible').first();
     $attribute_row.remove();

@@ -13,3 +13,12 @@ development:
 
   # optional. default is 'api/accounts'
   create_account_path: 'api/accounts'
+
+  # optional. default is 'api/content_exports'
+  content_exports_path: 'api/content_exports'
+
+  # optional. default is 'api/content_imports'
+  content_imports_path: 'api/content_imports'
+
+  # optional. default if 'api/rules/summary'
+  rules_summary_path: 'api/rules/summary'

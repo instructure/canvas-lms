@@ -177,6 +177,7 @@ module BasicLTI
         rescue InvalidSourceId => e
           self.code_major = 'failure'
           self.description = e.to_s
+          self.body = "<#{operation_ref_identifier}Response />"
           return true
         end
 
@@ -252,9 +253,9 @@ to because the assignment has no points possible.
             self.code_major = 'failure'
             self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
           end
-
-          self.body = "<replaceResultResponse />"
         end
+
+        self.body = "<replaceResultResponse />"
 
         true
       end

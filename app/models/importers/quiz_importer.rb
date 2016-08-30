@@ -227,9 +227,9 @@ module Importers
 
         unless question_data[:qq_ids][item.migration_id]
           question_data[:qq_ids][item.migration_id] = {}
-          existing_questions = item.quiz_questions.active.where("migration_id IS NOT NULL").select([:id, :migration_id])
-          existing_questions.each do |eq|
-            question_data[:qq_ids][item.migration_id][eq.migration_id] = eq.id
+          existing_questions = item.quiz_questions.active.where("migration_id IS NOT NULL").pluck(:id, :migration_id)
+          existing_questions.each do |id, mig_id|
+            question_data[:qq_ids][item.migration_id][mig_id] = id
           end
         end
 

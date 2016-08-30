@@ -203,7 +203,7 @@ class SearchController < ApplicationController
     end
     pagination_args = {}
     pagination_args[:per_page] = 12 unless request.format == :json
-    ret = Api.paginate(@courses, self, '/search/all_courses/', pagination_args, {enhanced_return: true})
+    ret = Api.paginate(@courses, self, api_v1_search_all_courses_url, pagination_args, {enhanced_return: true})
     @courses = ret[:collection]
 
     if request.format == :json
