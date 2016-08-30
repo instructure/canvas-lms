@@ -35,8 +35,116 @@ define([
   'jquery.templateData' /* fillTemplateData */
 ], function(INST, I18n, $, React, FileSelectBox, _) {
 
-  $(document).ready(function() {
+  var SelectContentDialog = {};
 
+  SelectContentDialog.Events = {
+    init: function() {
+      $("#context_external_tools_select .tools").on('click', '.tool', this.onContextExternalToolSelect);
+    },
+
+    onContextExternalToolSelect : function(e) {
+      e.preventDefault();
+      var $tool = $(this);
+      if($(this).hasClass('selected') && !$(this).hasClass('resource_selection')) {
+        $(this).removeClass('selected');
+        return;
+      }
+      $tool.parents(".tools").find(".tool.selected").removeClass('selected');
+      $tool.addClass('selected');
+      if($tool.hasClass('resource_selection')) {
+        var tool = $tool.data('tool');
+        var frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100);
+        var placement_type = (tool.placements.resource_selection && 'resource_selection') ||
+          (tool.placements.assignment_selection && 'assignment_selection') ||
+          (tool.placements.link_selection && 'link_selection');
+        var placement = tool.placements[placement_type]
+        var width = placement.selection_width;
+        var height = placement.selection_height;
+        var $dialog = $("#resource_selection_dialog");
+        var beforeUnloadHandler = function(e) {
+          return (e.returnValue = I18n.t("Changes you made may not be saved."));
+        };
+        var dialogCancelHandler = function(event, ui) {
+          var r = confirm(I18n.t("Are you sure you want to cancel? Changes you made may not be saved."));
+          if (r == false){
+            event.preventDefault();
+          }
+        };
+        if($dialog.length == 0) {
+          $dialog = $("<div/>", {id: 'resource_selection_dialog', style: 'padding: 0; overflow-y: hidden;'});
+          $dialog.append($("<iframe/>", {id: 'resource_selection_iframe', style: 'width: 800px; height: ' + frameHeight + 'px; border: 0;', src: '/images/ajax-loader-medium-444.gif', borderstyle: '0'}));
+          $("body").append($dialog.hide());
+          $dialog.on("dialogbeforeclose", dialogCancelHandler);
+          $dialog
+            .dialog({
+              autoOpen: false,
+              width: 'auto',
+              resizable: true,
+              close: function() {
+                $(window).off('beforeunload', beforeUnloadHandler);
+                $dialog.find("iframe").attr('src', '/images/ajax-loader-medium-444.gif');
+              },
+              title: I18n.t('link_from_external_tool', "Link Resource from External Tool")
+            })
+            .bind('dialogresize', function() {
+              $(this).find('iframe').add('.fix_for_resizing_over_iframe').height($(this).height()).width($(this).width());
+            })
+            .bind('dialogresizestop', function() {
+              $(".fix_for_resizing_over_iframe").remove();
+            })
+            .bind('dialogresizestart', function() {
+              $(this).find('iframe').each(function(){
+                $('<div class="fix_for_resizing_over_iframe" style="background: #fff;"></div>')
+                  .css({
+                    width: this.offsetWidth+"px", height: this.offsetHeight+"px",
+                    position: "absolute", opacity: "0.001", zIndex: 10000000
+                  })
+                  .css($(this).offset())
+                  .appendTo("body");
+              });
+            })
+            .bind('selection', function(event) {
+              var item = event.contentItems[0];
+              if(item["@type"] === 'LtiLinkItem' && item.url) {
+                $("#external_tool_create_url").val(item.url);
+                $("#external_tool_create_title").val(item.title || tool.name);
+                $("#context_external_tools_select .domain_message").hide();
+              } else {
+                alert(I18n.t('invalid_lti_resource_selection', "There was a problem retrieving a valid link from the external tool"));
+                $("#external_tool_create_url").val('');
+                $("#external_tool_create_title").val('');
+              }
+              $("#resource_selection_dialog iframe").attr('src', 'about:blank');
+              $dialog.off("dialogbeforeclose", dialogCancelHandler);
+              $("#resource_selection_dialog").dialog('close');
+
+              if (item.placementAdvice.presentationDocumentTarget.toLowerCase() === 'window') {
+                document.querySelector('#external_tool_create_new_tab').checked = true
+              }
+            });
+        }
+        $dialog.dialog('close')
+          .dialog('option', 'width', width || 800)
+          .dialog('option', 'height', height || frameHeight || 400)
+          .dialog('open');
+        $dialog.triggerHandler('dialogresize');
+        var url = $.replaceTags($("#select_content_resource_selection_url").attr('href'), 'id', tool.definition_id);
+        url = url + '?placement=' + placement_type;
+        $dialog.find("iframe").attr('src', url);
+        $(window).on('beforeunload', beforeUnloadHandler);
+      } else {
+        var placements = $tool.data('tool').placements
+        var placement = placements.assignment_selection || placements.link_selection
+        $("#external_tool_create_url").val(placement.url || '');
+        $("#context_external_tools_select .domain_message").showIf($tool.data('tool').domain)
+          .find(".domain").text($tool.data('tool').domain);
+        $("#external_tool_create_title").val(placement.title);
+      }
+    }
+
+  }
+
+  $(document).ready(function() {
     var external_services = null;
     var $dialog = $("#select_context_content_dialog");
     INST = INST || {};
@@ -251,93 +359,7 @@ define([
         });
       }
     });
-    $("#context_external_tools_select .tools").delegate('.tool', 'click', function(e) {
-      e.preventDefault();
-
-      var $tool = $(this);
-      if($(this).hasClass('selected') && !$(this).hasClass('resource_selection')) {
-        $(this).removeClass('selected');
-        return;
-      }
-      $tool.parents(".tools").find(".tool.selected").removeClass('selected');
-      $tool.addClass('selected');
-      if($tool.hasClass('resource_selection')) {
-        var tool = $tool.data('tool');
-        var frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100);
-        var placement_type = (tool.placements.resource_selection && 'resource_selection') ||
-          (tool.placements.assignment_selection && 'assignment_selection') ||
-          (tool.placements.link_selection && 'link_selection');
-        var placement = tool.placements[placement_type]
-        var width = placement.selection_width;
-        var height = placement.selection_height;
-        var $dialog = $("#resource_selection_dialog");
-        if($dialog.length == 0) {
-          $dialog = $("<div/>", {id: 'resource_selection_dialog', style: 'padding: 0; overflow-y: hidden;'});
-          $dialog.append($("<iframe/>", {id: 'resource_selection_iframe', style: 'width: 800px; height: ' + frameHeight + 'px; border: 0;', src: '/images/ajax-loader-medium-444.gif', borderstyle: '0'}));
-          $("body").append($dialog.hide());
-          $dialog
-            .dialog({
-              autoOpen: false,
-              width: 'auto',
-              resizable: true,
-              close: function() {
-                $dialog.find("iframe").attr('src', '/images/ajax-loader-medium-444.gif');
-              },
-              title: I18n.t('link_from_external_tool', "Link Resource from External Tool")
-            })
-            .bind('dialogresize', function() {
-              $(this).find('iframe').add('.fix_for_resizing_over_iframe').height($(this).height()).width($(this).width());
-            })
-            .bind('dialogresizestop', function() {
-              $(".fix_for_resizing_over_iframe").remove();
-            })
-            .bind('dialogresizestart', function() {
-              $(this).find('iframe').each(function(){
-                $('<div class="fix_for_resizing_over_iframe" style="background: #fff;"></div>')
-                  .css({
-                    width: this.offsetWidth+"px", height: this.offsetHeight+"px",
-                    position: "absolute", opacity: "0.001", zIndex: 10000000
-                  })
-                  .css($(this).offset())
-                  .appendTo("body");
-              });
-            })
-            .bind('selection', function(event) {
-              var item = event.contentItems[0];
-              if(item["@type"] === 'LtiLinkItem' && item.url) {
-                $("#external_tool_create_url").val(item.url);
-                $("#external_tool_create_title").val(item.title || tool.name);
-                $("#context_external_tools_select .domain_message").hide();
-              } else {
-                alert(I18n.t('invalid_lti_resource_selection', "There was a problem retrieving a valid link from the external tool"));
-                $("#external_tool_create_url").val('');
-                $("#external_tool_create_title").val('');
-              }
-              $("#resource_selection_dialog iframe").attr('src', 'about:blank');
-              $("#resource_selection_dialog").dialog('close');
-
-              if (item.placementAdvice.presentationDocumentTarget.toLowerCase() === 'window') {
-                document.querySelector('#external_tool_create_new_tab').checked = true
-              }
-            });
-        }
-        $dialog.dialog('close')
-          .dialog('option', 'width', width || 800)
-          .dialog('option', 'height', height || frameHeight || 400)
-          .dialog('open');
-        $dialog.triggerHandler('dialogresize');
-        var url = $.replaceTags($("#select_content_resource_selection_url").attr('href'), 'id', tool.definition_id);
-        url = url + '?placement=' + placement_type;
-        $dialog.find("iframe").attr('src', url);
-      } else {
-        var placements = $tool.data('tool').placements
-        var placement = placements.assignment_selection || placements.link_selection
-        $("#external_tool_create_url").val(placement.url || '');
-        $("#context_external_tools_select .domain_message").showIf($tool.data('tool').domain)
-          .find(".domain").text($tool.data('tool').domain);
-        $("#external_tool_create_title").val(placement.title);
-      }
-    });
+    var initEvents = SelectContentDialog.Events.init.bind(SelectContentDialog.Events)();
     var $tool_template = $("#context_external_tools_select .tools .tool:first").detach();
     $("#add_module_item_select").change(function() {
       // Don't disable the form button for these options
@@ -381,7 +403,6 @@ define([
         }
       }
     })
-
     $('#select_context_content_dialog').on('change', '.module_item_select', function () {
       var currentSelectItem = $(this)[0];
       if (currentSelectItem && currentSelectItem.selectedIndex > -1) {
@@ -395,4 +416,6 @@ define([
       }
     });
   });
+
+  return SelectContentDialog;
 });

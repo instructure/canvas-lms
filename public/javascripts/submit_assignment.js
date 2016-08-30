@@ -40,6 +40,46 @@ define([
             HomeworkSubmissionLtiContainer, RCEKeyboardShortcuts,
             RichContentEditor, SubmitAssignmentHelper) {
 
+  var SubmitAssignment = {
+    toolDropDownClickHandler: function(event) {
+      event.preventDefault();
+
+      var tool = $(this).data('tool');
+      var url = "/courses/" + ENV.COURSE_ID + "/external_tools/" + tool.id + "/resource_selection?homework=1&assignment_id=" + ENV.SUBMIT_ASSIGNMENT.ID;
+
+      var width = tool.get('homework_submission').selection_width || tool.get('selection_width');
+      var height = tool.get('homework_submission').selection_height || tool.get('selection_height');
+      var title = tool.get('display_text');
+      var $div = $("<div/>", {id: "homework_selection_dialog", style: "padding: 0; overflow-y: hidden;"}).appendTo($("body"));
+
+      $div.append($("<iframe/>", {frameborder: 0, src: url, id: "homework_selection_iframe"}).css({width: width, height: height}))
+        .bind('selection', function(event, data) {
+          SubmitAssignmentHelper.submitContentItem(event.contentItems[0]);
+          $div.off('dialogbeforeclose', SubmitAssignment.dialogCancelHandler)
+          $div.dialog('close');
+        })
+        .on('dialogbeforeclose', SubmitAssignment.dialogCancelHandler)
+        .dialog({
+          width: 'auto',
+          height: 'auto',
+          title: title,
+          close: function() {
+            $div.remove();
+          }
+        });
+      return $div;
+    },
+    beforeUnloadHandler: function(e) {
+      return (e.returnValue = I18n.t("Changes you made may not be saved."));
+    },
+    dialogCancelHandler: function(event, ui) {
+      var r = confirm(I18n.t("Are you sure you want to cancel? Changes you made may not be saved."));
+      if (r == false){
+        event.preventDefault();
+      }
+    }
+  };
+
   window.submissionAttachmentIndex = -1;
 
   RichContentEditor.preloadRemoteModule();
@@ -444,29 +484,7 @@ define([
     });
     $tools.disableWhileLoading(promise, {buttons: {'.submit': I18n.t('getting_file', 'Retrieving File...')}})
   };
-  $("#submit_from_external_tool_form .tools li").live('click', function(event) {
-    event.preventDefault();
 
-    var tool = $(this).data('tool');
-    var url = "/courses/" + ENV.COURSE_ID + "/external_tools/" + tool.id + "/resource_selection?homework=1&assignment_id=" + ENV.SUBMIT_ASSIGNMENT.ID;
-
-    var width = tool.get('homework_submission').selection_width || tool.get('selection_width');
-    var height = tool.get('homework_submission').selection_height || tool.get('selection_height');
-    var title = tool.get('display_text');
-    var $div = $("<div/>", {id: "homework_selection_dialog", style: "padding: 0; overflow-y: hidden;"}).appendTo($("body"));
-
-    $div.append($("<iframe/>", {frameborder: 0, src: url, id: "homework_selection_iframe"}).css({width: width, height: height}))
-      .bind('selection', function(event, data) {
-        SubmitAssignmentHelper.submitContentItem(event.contentItems[0]);
-        $div.dialog('close');
-      })
-      .dialog({
-        width: 'auto',
-        height: 'auto',
-        title: title,
-        close: function() {
-          $div.remove();
-        }
-      });
-  });
+  $("#submit_from_external_tool_form .tools li").live('click', SubmitAssignment.toolDropDownClickHandler);
+  return SubmitAssignment;
 });

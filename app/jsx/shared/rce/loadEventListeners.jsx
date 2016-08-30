@@ -31,7 +31,7 @@ define([
     });
 
     document.addEventListener('tinyRCE/initExternalTools', function(e) {
-      initializeExternalTools(e.detail.ed, e.detail.url, INST)
+      initializeExternalTools.init(e.detail.ed, e.detail.url, INST)
       callbacks.externalToolCB()
     });
 
