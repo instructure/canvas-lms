@@ -229,19 +229,29 @@ module ConditionalRelease
 
       def rules_data(context, student, content_tags = [], session = {})
         return {rules: []} if context.blank? || student.blank?
-        cached = Rails.cache.fetch(rules_cache_key(context, student))
+        cached = rules_cache(context, student)
         assignments = assignments_for(cached[:rules]) if cached
-        cache_expired = cached &&
-                        (content_tags.detect { |tag| tag.content.updated_at > cached[:updated_at] }.present? ||
-                        (assignments && assignments.detect { |asg| asg.updated_at > cached[:updated_at] }.present?))
+        cache_expired = newer_than_cache?(content_tags.select(&:content), cached) ||
+                        newer_than_cache?(assignments, cached)
 
-        Rails.cache.fetch(rules_cache_key(context, student), force: cache_expired) do
+        rules_cache(context, student, force: cache_expired) do
           data = { submissions: submissions_for(student) }
           headers = headers_for(context, student, domain_for(context), session)
           req = request_rules(headers, data)
           rules = merge_assignment_data!(req, assignments)
-          {rules: rules, updated_at: Time.now}
+          {rules: rules, updated_at: Time.zone.now}
         end
+      end
+
+      def rules_cache(context, student, force: false)
+        Rails.cache.fetch(rules_cache_key(context, student), force: force) do
+          yield if block_given?
+        end
+      end
+
+      def newer_than_cache?(items, cache)
+        cache && cache.key?(:updated_at) && items &&
+        items.detect { |item| item.updated_at > cache[:updated_at] }.present?
       end
 
       def request_rules(headers, data)

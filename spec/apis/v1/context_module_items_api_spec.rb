@@ -1141,12 +1141,15 @@ describe "Module Items API", type: :request do
           mod.add_item(:id => @quiz.id, :type => 'quiz')
           mod.add_item(:id => @topic.id, :type => 'discussion_topic')
           mod.add_item(:id => @wiki_page.id, :type => 'wiki_page')
+          mod.add_item(:type => 'external_url', :url =>
+                       'http://example.com/cyoe', :title => 'cyoe link',
+                       :indent => 1, :updated_at => nil).publish!
+          mod.publish
         end
       end
 
       before :each do
-        Rails.cache.clear
-        resp = [{
+        @resp = [{
                   locked: false,
                   trigger_assignment: @quiz.assignment_id,
                   assignment_sets: [{
@@ -1167,7 +1170,7 @@ describe "Module Items API", type: :request do
                 }]
         ConditionalRelease::Service.stubs(headers_for: {}, submissions_for: [],
           domain_for: "canvas.xyz", "enabled_in_context?" => true,
-          rules_summary_url: "cyoe.abc/rules", request_rules: resp)
+          rules_summary_url: "cyoe.abc/rules", request_rules: @resp)
       end
 
       describe "CYOE interaction" do
@@ -1201,8 +1204,8 @@ describe "Module Items API", type: :request do
 
       describe "caching CYOE data" do
         it "uses the cache when requested again" do
-          ConditionalRelease::Service.expects(:request_rules).once
-
+          ConditionalRelease::Service.expects(:request_rules).never
+          ConditionalRelease::Service.stubs(rules_cache: {rules: @resp, updated_at: 1.day.from_now})
           3.times do
             api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module3.id}/items?include[]=mastery_paths",
               :controller => "context_module_items_api", :action => "index", :format => "json",
