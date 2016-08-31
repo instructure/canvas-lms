@@ -3593,6 +3593,8 @@ nn:
       buttons: 
         add_module: "Legg til modul"
       labels: 
+        before_viewing: Føresetnader
+        module_complete_when: Krav
         publish_final_grade: "Publiser sluttkarakterar for studenten når modulen er fullført"
         require_sequential_progress: "Studentane må gå gjennom vilkåra i kronologisk rekkefølgje"
       links: 
@@ -4012,6 +4014,7 @@ nn:
     batch_update_message: 
       one: "1 kurs er handsama"
       other: "%{count} kurs er handsama"
+    course: Kurs
     course_format: 
       blended: Blanda
       not_set: "Ikkje oppgitt"
@@ -4041,7 +4044,9 @@ nn:
       unpublishable_with_message: "Kan ikkje publiserast: %{message}"
       unpublished: "Ikkje publisert"
       unpublished_with_message: "Ikkje publisert: %{message}"
+    institution: Institusjon
     missing_name: "Kurs utan namn"
+    public: Offentleg
     student_summary: 
       not_sorted: "Studenttabellsamandrag er ikkje sortert"
     student_view_student_name: Teststudent
@@ -6158,6 +6163,7 @@ nn:
       load_success_message: "Du kan navigere bort frå denne sida."
       load_success_title: "Bruk av verktøy er fullført"
   external_url_e9b87215: "Ekstern URL"
+  extreme_critical_emergency_80b3dbda: "EKSTREMT KRITISK NØDSTILFELLE!"
   failed_307449e1: "Mislukkast:"
   failed_to_create_webhook_b766cf5c: "Kan ikkje opprette webkrok."
   failed_to_import_media_objects_4c1fcb4f: "Kan ikkje importere medieobjekt"
