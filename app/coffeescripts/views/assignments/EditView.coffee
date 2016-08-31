@@ -379,6 +379,9 @@ ConditionalRelease) ->
       delete errors.assignmentOverrides
       super(errors)
       @trigger 'show-errors', errors
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+        if errors['conditional_release']
+          @conditionalReleaseEditor.focusOnError()
 
     validateBeforeSave: (data, errors) =>
       errors = @_validateTitle data, errors

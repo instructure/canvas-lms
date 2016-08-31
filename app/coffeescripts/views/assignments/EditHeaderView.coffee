@@ -73,7 +73,6 @@ define [
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         if errors['conditional_release']
           @$headerTabsCr.tabs("option", "active", 1)
-          @editView.$conditionalReleaseTarget.get(0).scrollIntoView()
         else
           @$headerTabsCr.tabs("option", "active", 0)
 

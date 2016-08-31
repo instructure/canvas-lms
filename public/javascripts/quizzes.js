@@ -1779,7 +1779,7 @@ define([
           var crError = conditionalRelease.editor.validateBeforeSave();
           if (crError) {
             $('#quiz_tabs').tabs("option", "active", 2);
-            $('#conditional_release_target').get(0).scrollIntoView();
+            conditionalRelease.editor.focusOnError();
             return false;
           }
         }

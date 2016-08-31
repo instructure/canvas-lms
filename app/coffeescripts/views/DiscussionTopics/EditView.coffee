@@ -347,7 +347,7 @@ ConditionalRelease) ->
         # switch to a tab with errors
         if errors['conditional_release']
           @$discussionEditView.tabs("option", "active", 1)
-          @$conditionalReleaseTarget.get(0).scrollIntoView()
+          @conditionalReleaseEditor.focusOnError()
         else
           @$discussionEditView.tabs("option", "active", 0)
       super(errors)
