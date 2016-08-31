@@ -13,17 +13,28 @@ define([
 
     constructor (props) {
       super(props)
-      this.state = { isModalOpen: false }
+      this.state = {
+        isModalOpen: false,
+        selectedCourse: {}
+      }
       this.openModal = this.openModal.bind(this)
       this.closeModal = this.closeModal.bind(this)
       this.handleSubmit = this.handleSubmit.bind(this)
       this.endAppointmentMode = this.endAppointmentMode.bind(this)
+      this.selectCourse = this.selectCourse.bind(this)
     }
 
     handleSubmit () {
       this.props.store.dispatch(Actions.actions.setFindAppointmentMode(!this.props.store.getState().inFindAppointmentMode))
+      this.props.store.dispatch(Actions.actions.setCourse(this.state.selectedCourse))
       this.setState ({
         isModalOpen: false,
+        selectedCourse: {}
+      })
+    }
+    selectCourse (e) {
+      this.setState({
+        selectedCourse: this.props.courses.find((c) => c.id === e.target.value)
       })
     }
     openModal () {
@@ -33,7 +44,6 @@ define([
     }
     endAppointmentMode () {
       this.props.store.dispatch(Actions.actions.setFindAppointmentMode(false))
-      // Probably should set the state here to close the grey view thing.
       this.setState({
         isModalOpen: false,
       })
@@ -75,7 +85,7 @@ define([
             </div>
             <div className="ReactModal__Body">
               <div className="ic-Form-control">
-                <select className="ic-Input">
+                <select onChange={this.selectCourse} value={this.state.selectedCourse.id} className="ic-Input">
                   {this.props.courses.map((c, index) => {
                     if (c.asset_string.indexOf("user") === -1) {
                       return(<option key={c.id} value={c.id}>{c.name}</option>)
