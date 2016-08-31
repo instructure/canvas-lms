@@ -19,7 +19,7 @@ require [
   @schedulerStore = if ENV.CALENDAR.BETTER_SCHEDULER then configureSchedulerStore() else null
 
   if ENV.CALENDAR.BETTER_SCHEDULER
-    ReactDOM.render(React.createElement(FindAppointment, {courses: @eventDataSource.contexts}), $('#select-course-component')[0])
+    ReactDOM.render(React.createElement(FindAppointment, {courses: @eventDataSource.contexts, store: @schedulerStore}), $('#select-course-component')[0])
 
   @header = new CalendarHeader(
     el: "#calendar_header"

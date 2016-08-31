@@ -2,11 +2,13 @@ define([
   'react',
   'react-modal',
   'i18n!react_scheduler',
-], (React, Modal, I18n) => {
+  'jsx/calendar/scheduler/actions',
+], (React, Modal, I18n, Actions) => {
   class FindAppointment extends React.Component {
 
     static propTypes: {
       courses: React.PropTypes.array.isRequired,
+      store: React.PropTypes.object.isRequired,
     }
 
     constructor (props) {
@@ -14,11 +16,26 @@ define([
       this.state = { isModalOpen: false }
       this.openModal = this.openModal.bind(this)
       this.closeModal = this.closeModal.bind(this)
+      this.handleSubmit = this.handleSubmit.bind(this)
+      this.endAppointmentMode = this.endAppointmentMode.bind(this)
     }
 
+    handleSubmit () {
+      this.props.store.dispatch(Actions.actions.setFindAppointmentMode(!this.props.store.getState().inFindAppointmentMode))
+      this.setState ({
+        isModalOpen: false,
+      })
+    }
     openModal () {
       this.setState({
         isModalOpen: true,
+      })
+    }
+    endAppointmentMode () {
+      this.props.store.dispatch(Actions.actions.setFindAppointmentMode(false))
+      // Probably should set the state here to close the grey view thing.
+      this.setState({
+        isModalOpen: false,
       })
     }
 
@@ -32,7 +49,12 @@ define([
       return (
         <div>
           <h2>{I18n.t('Appointments')}</h2>
-        <button onClick={this.openModal} className="Button">{I18n.t('Find Appointment')}</button>
+          {
+            this.props.store.getState().inFindAppointmentMode ?
+              <button onClick={this.endAppointmentMode} className="Button">{I18n.t('Close')}</button>
+              :
+              <button onClick={this.openModal} className="Button">{I18n.t('Find Appointment')}</button>
+          }
           <Modal
             isOpen={this.state.isModalOpen}
             ref={c => this.modal = c}
@@ -64,7 +86,7 @@ define([
             </div>
             <div className="ReactModal__Footer-Scheduler">
               <div className="ReactModal__Footer-Actions">
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" onClick={this.handleSubmit} className="btn btn-primary">Submit</button>
               </div>
             </div>
           </div>
