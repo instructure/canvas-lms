@@ -169,13 +169,11 @@ module GroupsCommon
 
   def manually_fill_limited_group(member_limit ="2",student_count = 0)
     student_count.times do |n|
-      # Finds all student add buttons and updates the through each iteration
-      studs = ff('.assign-to-group')
-      studs.first.click
-
-      wait_for_ajaximations
+      f('.assign-to-group').click
       f('.set-group').click
       expect(f('.group-summary')).to include_text("#{n+1} / #{member_limit} students")
+      # make sure the popover is gone; it takes 100ms, and its on('close') -> focus can mess up the next click
+      expect(f('body')).not_to contain_css('.set-group')
     end
     expect(f('.show-group-full')).to be_displayed
   end
