@@ -106,10 +106,9 @@ module Api::V1::ContextModule
       # course context
       when *Quizzes::Quiz.class_names
         api_url = api_v1_course_quiz_url(context_module.context, content_tag.content)
-      when 'Assignment', 'WikiPage', 'DiscussionTopic'
-        api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
-      # no context
-      when 'Attachment'
+      when 'DiscussionTopic'
+        api_url = api_v1_course_discussion_topic_url(context_module.context, content_tag.content)
+      when 'Assignment', 'WikiPage', 'Attachment'
         api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
       when 'ContextExternalTool'
         if content_tag.content && content_tag.content.tool_id
