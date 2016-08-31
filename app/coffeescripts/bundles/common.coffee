@@ -70,7 +70,7 @@ require [
   $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
   $('body').on 'click', '#courseMenuToggle', ->
     $('body').toggleClass("course-menu-expanded")
-    
+
     # update course menu and toggle for accessibility
     courseMenuExpanded = $('body').hasClass('course-menu-expanded')
     courseMenuToggleText = if courseMenuExpanded then I18n.t("Hide courses menu") else I18n.t("Show courses menu")
@@ -80,7 +80,6 @@ require [
     $('#left-side').css({display: if courseMenuExpanded then 'block' else 'none'})
 
     resetMenuItemTabIndexes()
-
 
   ##
   # Backbone routes

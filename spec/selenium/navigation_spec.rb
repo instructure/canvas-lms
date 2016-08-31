@@ -63,5 +63,16 @@ describe 'Global Navigation' do
         expect(f('.ic-icon-svg--lti')).to be_displayed
       end
     end
+    describe 'Navigation Expand/Collapse Link' do
+      it 'should collapse and expand the navigation when clicked' do
+        get "/"
+        f('#primaryNavToggle').click
+        wait_for_ajaximations
+        expect(f('body')).not_to have_class("primary-nav-expanded")
+        f('#primaryNavToggle').click
+        wait_for_ajaximations
+        expect(f('body')).to have_class("primary-nav-expanded")
+      end
+    end
   end
 end
