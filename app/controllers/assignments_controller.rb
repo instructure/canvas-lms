@@ -117,12 +117,18 @@ class AssignmentsController < ApplicationController
         @external_tools = []
       end
 
-      js_env({
+      js_data = {
         :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
         :COURSE_ID => @context.id,
         :ASSIGNMENT_ID => @assignment.id,
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
-      })
+      }
+      if params[:module_item_id]
+        js_data[:ModuleSequenceFooter_data] = item_sequence_base(Api.api_type_to_canvas_name('ModuleItem'), params[:module_item_id])
+      end
+
+
+      js_env(js_data)
 
       @can_view_grades = @context.grants_right?(@current_user, session, :view_all_grades)
       @can_grade = @assignment.grants_right?(@current_user, session, :grade)
