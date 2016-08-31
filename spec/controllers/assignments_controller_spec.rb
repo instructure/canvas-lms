@@ -275,12 +275,10 @@ describe AssignmentsController do
     end
 
     it "should assign variables" do
+      @course.update_attribute(:syllabus_body, "<p>Here is your syllabus.</p>")
       user_session(@student)
       get 'syllabus', :course_id => @course.id
-      expect(assigns[:assignment_groups]).not_to be_nil
-      expect(assigns[:events]).not_to be_nil
-      expect(assigns[:undated_events]).not_to be_nil
-      expect(assigns[:dates]).not_to be_nil
+      expect(assigns[:syllabus_body]).not_to be_nil
     end
   end
 
