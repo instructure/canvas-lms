@@ -57,6 +57,7 @@ class UserObserver < ActiveRecord::Base
 
   def create_linked_enrollments
     user.student_enrollments.active_or_pending.order("course_id").each do |enrollment|
+      next unless enrollment.valid?
       enrollment.create_linked_enrollment_for(observer)
     end
   end
