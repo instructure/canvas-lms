@@ -8,6 +8,7 @@ describe "auth" do
       user_logged_in
       get "/logout"
       f('.Button--logout-confirm').click
+      wait_for_ajaximations
 
       keep_trying_until {
         expect(driver.current_url).to match %r{/login/canvas}
