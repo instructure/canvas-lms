@@ -26,10 +26,12 @@ end
 
 def submit
   @course.reload
-  count = @course.content_migrations.count
+  # depending on the type of migration, we need to wait for it to have one of these states
+  scope = { workflow_state: %w[queued exporting exported] }
+  count = @course.content_migrations.where(scope).count
   driver.execute_script("$('#migrationConverterContainer').submit()")
   keep_trying_until do
-    expect(@course.content_migrations.count).to eq count + 1
+    expect(@course.content_migrations.where(scope).count).to eq count + 1
   end
 end
 
