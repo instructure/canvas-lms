@@ -10,7 +10,7 @@ class AddMaterializedDiscussions < ActiveRecord::Migration
       t.text :participants_array, :limit => 10.megabytes
       t.text :entry_ids_array, :limit => 10.megabytes
 
-      t.timestamps
+      t.timestamps null: true
     end
     add_index :discussion_topic_materialized_views, :discussion_topic_id, :unique => true, :name => "index_discussion_topic_materialized_views"
   end

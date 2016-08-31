@@ -8,7 +8,7 @@ class AddIgnores < ActiveRecord::Migration
       t.integer :user_id, :null => false, :limit => 8
       t.string :purpose, :null => false
       t.boolean :permanent, :null => false, :default => false
-      t.timestamps
+      t.timestamps null: true
     end
     add_index :ignores, [:asset_id, :asset_type, :user_id, :purpose], :unique => true, :name => 'index_ignores_on_asset_and_user_id_and_purpose'
     add_foreign_key :ignores, :users

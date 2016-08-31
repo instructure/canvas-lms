@@ -8,7 +8,7 @@ class CreateExternalIntegrationKeys < ActiveRecord::Migration
       t.string :key_value, null: false, length: 255
       t.string :key_type, null: false
 
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :external_integration_keys, [:context_id, :context_type, :key_type], name: 'index_external_integration_keys_unique', unique: true

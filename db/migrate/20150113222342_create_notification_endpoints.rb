@@ -6,7 +6,7 @@ class CreateNotificationEndpoints < ActiveRecord::Migration
       t.integer :access_token_id, limit: 8, null: false
       t.string :token, null: false
       t.string :arn, null: false
-      t.timestamps
+      t.timestamps null: true
     end
     add_index :notification_endpoints, :access_token_id
     add_foreign_key :notification_endpoints, :access_tokens

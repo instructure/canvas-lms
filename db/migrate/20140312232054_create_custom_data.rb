@@ -6,7 +6,7 @@ class CreateCustomData < ActiveRecord::Migration
       t.text :data
       t.string :namespace
       t.references :user, :limit => 8
-      t.timestamps
+      t.timestamps null: true
     end
   end
 

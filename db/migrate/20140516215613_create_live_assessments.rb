@@ -7,7 +7,7 @@ class CreateLiveAssessments < ActiveRecord::Migration
       t.string :title, null: false
       t.integer :context_id, limit: 8, null: false
       t.string :context_type, null: false
-      t.timestamps
+      t.timestamps null: true
     end
     add_index :live_assessments_assessments, [:context_id, :context_type, :key], unique: true, name: 'index_live_assessments'
 
@@ -17,7 +17,7 @@ class CreateLiveAssessments < ActiveRecord::Migration
       t.float :possible
       t.float :score
       t.datetime :assessed_at
-      t.timestamps
+      t.timestamps null: true
     end
     add_index :live_assessments_submissions, [:assessment_id, :user_id], unique: true
 
