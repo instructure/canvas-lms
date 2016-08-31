@@ -455,6 +455,11 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   Only valid if "hide_results" is not set to "always".
   #   Defaults to false.
   #
+  # @argument quiz[only_visible_to_overrides] [Boolean]
+  #   Whether this quiz is only visible to overrides (Only useful if
+  #   'differentiated assignments' account setting is on)
+  #   Defaults to false.
+  #
   # @returns Quiz
   def create
     if authorized_action(@context.quizzes.temp_record, @current_user, :create)
