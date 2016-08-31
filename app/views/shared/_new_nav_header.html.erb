@@ -89,6 +89,21 @@
                 </div>
               </a>
             </li>
+            <% if show_help_link? %>
+            <li class="ic-app-header__menu-list-item">
+             <%= link_to help_link_url,
+                  :id => show_feedback_link? ? 'global_nav_help_link' : '',
+                  :class => "ic-app-header__menu-list-link",
+                  :data => help_link_data do %>
+                <div class="menu-item-icon-container" role="presentation">
+                  <%= svg_icon help_link_icon %>
+                </div>
+                <div class="menu-item__text">
+                  <%= help_link_name %>
+                </div>
+              <% end %>
+            </li>
+            <% end %>
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/conversations') %>">
               <a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">
@@ -103,25 +118,26 @@
             <% unless @current_user.nil? %>
               <%= render(:partial => 'external_tools/global_nav_menu_items') %>
             <% end %>
-            <% if show_help_link? %>
-            <div role="region" aria-label="<%= t('Secondary Navigation') %>" class="ic-app-header__secondary-navigation">
-              <ul class="ic-app-header__menu-list">
-                <li class="ic-app-header__menu-list-item">
-                 <%= link_to help_link_url,
-                      :id => show_feedback_link? ? 'global_nav_help_link' : '',
-                      :class => "ic-app-header__menu-list-link",
-                      :data => help_link_data do %>
-                    <div class="menu-item-icon-container" role="presentation">
-                      <%= svg_icon help_link_icon %>
-                    </div>
-                    <div class="menu-item__text">
-                      <%= help_link_name %>
-                    </div>
-                  <% end %>
-                </li>
-              </ul>
-            </div>
-            <% end %>
+          </ul>
+        </div>
+        <div role="region" aria-label="<%= t('Secondary Navigation') %>" class="ic-app-header__secondary-navigation">
+          <ul class="ic-app-header__menu-list">
+            <li class="menu-item ic-app-header__menu-list-item">
+              <span aria-live="polite">
+                <button
+                  id="primaryNavToggle"
+                  class="ic-app-header__menu-list-link ic-app-header__menu-list-link--nav-toggle"
+                  aria-label="
+                    <% if @current_user.try(:collapse_global_nav?) %><%= t('Expand global navigation') %>
+                    <% else %><%= t('Minimize global navigation') %><% end %>"
+                  title="
+                    <% if @current_user.try(:collapse_global_nav?) %><%= t('Expand global navigation') %>
+                    <% else %><%= t('Minimize global navigation') %><% end %>"
+                >
+                  <%= svg_icon :navtoggle %>
+                </button>
+              </span>
+            </li>
           </ul>
         </div>
       </div>

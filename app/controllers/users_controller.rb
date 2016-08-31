@@ -1289,6 +1289,9 @@ class UsersController < ApplicationController
   #   If true, require user to manually mark discussion posts as read (don't
   #   auto-mark as read).
   #
+  # @argument collapse_global_nav [Boolean]
+  #   If true, the user's page loads with the global navigation collapsed
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/users/<user_id>/settings \
@@ -1301,18 +1304,28 @@ class UsersController < ApplicationController
     case
     when request.get?
       return unless authorized_action(user, @current_user, :read)
-      render(json: { manual_mark_as_read: @current_user.manual_mark_as_read? })
+      render(json: {
+        manual_mark_as_read: @current_user.manual_mark_as_read?,
+        collapse_global_nav: @current_user.collapse_global_nav?
+      })
     when request.put?
       return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
       unless params[:manual_mark_as_read].nil?
         mark_as_read = value_to_boolean(params[:manual_mark_as_read])
         user.preferences[:manual_mark_as_read] = mark_as_read
       end
+      unless params[:collapse_global_nav].nil?
+        collapse_global_nav = value_to_boolean(params[:collapse_global_nav])
+        user.preferences[:collapse_global_nav] = collapse_global_nav
+      end
 
       respond_to do |format|
         format.json {
           if user.save
-            render(json: { manual_mark_as_read: user.manual_mark_as_read? })
+            render(json: {
+              manual_mark_as_read: user.manual_mark_as_read?,
+              collapse_global_nav: user.collapse_global_nav?
+            })
           else
             render(json: user.errors, status: :bad_request)
           end

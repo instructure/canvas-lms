@@ -122,6 +122,7 @@ class ApplicationController < ActionController::Base
         SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?),
           eportfolios_enabled: (@domain_root_account && @domain_root_account.settings[:enable_eportfolios] != false), # checking all user root accounts is slow
+          collapse_global_nav: @current_user.try(:collapse_global_nav?),
           show_feedback_link: show_feedback_link?
         }
       }

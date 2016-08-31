@@ -1400,6 +1400,10 @@ class User < ActiveRecord::Base
     !!preferences[:manual_mark_as_read]
   end
 
+  def collapse_global_nav?
+    !!preferences[:collapse_global_nav]
+  end
+
   def disabled_inbox?
     !!preferences[:disable_inbox]
   end
