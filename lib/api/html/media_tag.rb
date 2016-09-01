@@ -21,7 +21,7 @@ require 'nokogiri'
 module Api
   module Html
     class MediaTag
-   
+
       attr_reader :tag, :doc, :node_builder
 
       def initialize(tag, html, node_builder = Nokogiri::XML::Node)
@@ -47,6 +47,11 @@ module Api
           end
           n['src'] = url_helper.media_redirect_url(media_id, media_type)
           n.inner_html = tag.inner_html
+          if media_object.present?
+            media_object.media_tracks.each do |media_track|
+              n << TrackTag.new(media_track, doc, node_builder).to_node(url_helper)
+            end
+          end
         end
       end
 
@@ -82,13 +87,13 @@ module Api
 
       private
       def media_object
-        @_media_object ||= MediaObject.active.by_media_id(media_id).first
+        @_media_object ||= MediaObject.active.by_media_id(media_id).preload(:media_tracks).first
       end
 
       def tag_is_an_anchor?
         tag.name == 'a'
       end
-      
+
       def already_has_av_comment?
         tag['class'] =~ /\b(audio|video)_comment\b/
       end
