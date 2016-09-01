@@ -502,12 +502,15 @@ define([
     });
 
     $questions
-      .delegate(":checkbox,:radio,label", 'change mouseup', function(event) {
+      .delegate(":checkbox,:radio", 'change', function(event) {
         var $answer = $(this).parents(".answer");
         if (lastAnswerSelected == $answer[0]) {
           $answer.find(":checkbox,:radio").blur();
           quizSubmission.updateSubmission();
         }
+      })
+      .delegate("label.upload-label", 'mouseup', function(event) {
+          quizSubmission.updateSubmission();
       })
       .delegate(":text,textarea,select", 'change', function(event, update) {
         var $this = $(this);
