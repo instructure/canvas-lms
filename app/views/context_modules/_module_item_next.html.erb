@@ -91,6 +91,18 @@
       <div class="grid-row">
         <div class="col-xs col-md">
           <div class="due_date_display"></div>
+          <% if editable %>
+          <div class="bz_section_restrictions">
+            <%
+              if module_item
+              restrictions = ContentTagSectionRestriction.where(:content_tag_id => module_item.id).all
+              if restrictions.any?
+            %> Only for: 
+            <% restrictions.each do |restriction| %>
+              <%= CourseSection.find(restriction.section_id).name %>
+            <% end end end %>
+          </div>
+          <% end %>
         </div>
         <div class="col-xs col-md-3">
           <div class="points_possible_display"></div>
@@ -126,20 +138,6 @@
           <div class='module-item-status-icon'></div> <%# going to set this in JS-land, not here %>
         <% end %>
       </div>
-      <% if editable %>
-      <div class="bz_section_restrictions">
-        <%
-          if module_item
-          restrictions = ContentTagSectionRestriction.where(:content_tag_id => module_item.id).all
-          if restrictions.any?
-        %> Only for: 
-        <% restrictions.each do |restriction| %>
-          <%= CourseSection.find(restriction.section_id).name %>
-        <% end end end %>
-      </div>
-      <% end %>
-      <div class="due_date_display"></div>
-      <div class="points_possible_display"></div>
     </div>
 
     <% if editable || module_item.nil? %>
