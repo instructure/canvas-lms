@@ -1324,7 +1324,7 @@ class User < ActiveRecord::Base
     if fallback and uri = URI.parse(fallback) rescue nil
       uri.scheme ||= request ? request.protocol[0..-4] : HostUrl.protocol # -4 to chop off the ://
       if HostUrl.cdn_host
-        uri.host = HostUrl.cdn_host
+        uri.host = URI.parse(HostUrl.cdn_host).host
       elsif request && !uri.host
         uri.host = request.host
         uri.port = request.port if ![80, 443].include?(request.port)
