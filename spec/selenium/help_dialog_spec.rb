@@ -127,4 +127,30 @@ describe "help dialog" do
       expect(f("#help-dialog a[href='#create_ticket']")).to be_displayed
     end
   end
+
+  context "customization link" do
+    before :each do
+      user_logged_in(:active_all => true)
+      Setting.set('show_feedback_link', 'true')
+    end
+
+    it "should show the link to root account admins" do
+      Account.default.account_users.create!(:user => @user)
+      get "/"
+      wait_for_ajaximations
+      f('#global_nav_help_link').click
+      wait_for_ajaximations
+      expect(ff("#help_tray .ic-NavMenu-list-item__link").last).to include_text("Customize this menu")
+    end
+
+    it "should not show the link to sub account admins" do
+      sub = Account.default.sub_accounts.create!
+      sub.account_users.create!(:user => @user)
+      get "/"
+      wait_for_ajaximations
+      f('#global_nav_help_link').click
+      wait_for_ajaximations
+      expect(ff("#help_tray .ic-NavMenu-list-item__link").last).to_not include_text("Customize this menu")
+    end
+  end
 end
