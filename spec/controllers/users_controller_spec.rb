@@ -893,6 +893,7 @@ describe UsersController do
           start_date: 3.months.ago,
           end_date: 2.months.from_now)
       end
+
       context "as an observer" do
         let(:observer) do
           observer = user_with_pseudonym(active_all: true)
@@ -941,7 +942,7 @@ describe UsersController do
               get 'grades'
 
               selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
-              expect(selected_period_id).to eq grading_period.id
+              expect(selected_period_id).to eq grading_period.global_id
             end
 
             it "returns 0 (signifying 'All Grading Periods') if no current " \
@@ -1013,7 +1014,7 @@ describe UsersController do
               get 'grades'
 
               selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
-              expect(selected_period_id).to eq grading_period.id
+              expect(selected_period_id).to eq grading_period.global_id
             end
 
             it "returns 0 (signifying 'All Grading Periods') if no current " \
@@ -1033,6 +1034,32 @@ describe UsersController do
 
               selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
               expect(selected_period_id).to eq 2939
+            end
+
+            context 'across shards' do
+              specs_require_sharding
+
+              it 'uses global ids for grading periods' do
+                course_with_user('StudentEnrollment', course: test_course, user: student1, active_all: true)
+                @shard1.activate do
+                  account = Account.create!
+                  account.enable_feature!(:multiple_grading_periods)
+                  @course2 = course(active_all: true, account: account)
+                  course_with_user('StudentEnrollment', course: @course2, user: student1, active_all: true)
+                  grading_period_group2 = group_helper.legacy_create_for_course(@course2)
+                  @grading_period2 = grading_period_group2.grading_periods.create!(
+                    title: "Some Semester",
+                    start_date: 3.months.ago,
+                    end_date: 2.months.from_now)
+                end
+
+                user_session(student1)
+
+                get 'grades'
+                expect(response).to be_success
+                selected_period_id = assigns[:grading_periods][@course2.id][:selected_period_id]
+                expect(selected_period_id).to eq @grading_period2.id
+              end
             end
           end
         end
@@ -1105,7 +1132,6 @@ describe UsersController do
         enrollments = assigns[:presenter].teacher_enrollments
         expect(enrollments).to include(@e2)
       end
-
     end
   end
 

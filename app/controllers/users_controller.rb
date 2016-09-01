@@ -202,8 +202,8 @@ class UsersController < ApplicationController
     grading_period = GradingPeriod.for(course).find_by(id: grading_period_id)
     grading_periods = {
       course.id => {
-        :periods => [grading_period],
-        :selected_period_id => grading_period_id
+        periods: [grading_period],
+        selected_period_id: grading_period_id
       }
     }
     calculator = grade_calculator([enrollment.user_id], course, grading_periods)

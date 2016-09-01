@@ -29,10 +29,7 @@ class GradeCalculator
     @course = course.is_a?(Course) ? course : Course.find(course)
     @groups = @course.assignment_groups.active
     @grading_period = opts[:grading_period]
-
-    assignment_scope = @course.assignments.published.gradeable
-    @assignments = assignment_scope.to_a
-
+    @assignments = @course.assignments.published.gradeable.to_a
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = {}
     @final_updates = {}
@@ -192,7 +189,12 @@ class GradeCalculator
 
   def load_assignment_visibilities_for_users(user_ids)
     @assignment_ids_visible_to_user ||= begin
-      AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @course.id, user_id: user_ids)
+      AssignmentStudentVisibility.shard(@course)
+        .visible_assignment_ids_in_course_by_user(
+          course_id: @course.id,
+          user_id: user_ids.map { |u| Shard.global_id_for(u) }, # hack to always find cross-shard enrollments
+          use_global_id: true
+        )
     end
   end
 
@@ -201,7 +203,7 @@ class GradeCalculator
   end
 
   def assignment_ids_visible_to_user(user_id)
-    @assignment_ids_visible_to_user[user_id]
+    @assignment_ids_visible_to_user[Shard.global_id_for(user_id)]
   end
 
   # see comments for dropAssignments in grade_calculator.coffee
