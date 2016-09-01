@@ -336,9 +336,13 @@ describe "speed grader" do
     it 'should display a flash warning banner when viewed in Firefox', priority: "2", test_id: 571755 do
       skip_if_chrome('This test applies to Firefox')
       skip_if_ie('This test applies to Firefox')
+      # sometimes google docs is slow to load, which causes the flash
+      # message to go away before `get` finishes. we're not testing
+      # google docs here anyway, so ¯\_(ツ)_/¯
+      Account.default.disable_service(:google_docs_previews)
+      Account.default.save
       get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
-      expect(fj('#flash_message_holder')).to include_text('Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.')
+      assert_flash_notice_message 'Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.'
     end
   end
 end
-
