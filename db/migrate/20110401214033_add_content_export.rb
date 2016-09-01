@@ -10,7 +10,7 @@ class AddContentExport < ActiveRecord::Migration
       t.text :settings
       t.float :progress
       t.string :workflow_state
-      t.timestamps
+      t.timestamps null: true
     end
     add_index :content_exports, [:course_id]
     add_index :content_exports, [:user_id]

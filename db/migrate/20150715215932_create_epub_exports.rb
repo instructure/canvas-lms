@@ -4,7 +4,7 @@ class CreateEpubExports < ActiveRecord::Migration
     create_table :epub_exports do |t|
       t.integer :content_export_id, :course_id, :user_id, limit: 8
       t.string :workflow_state, default: "created"
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_foreign_key_if_not_exists :epub_exports, :users, delay_validation: true

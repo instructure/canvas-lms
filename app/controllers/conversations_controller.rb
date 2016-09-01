@@ -1016,10 +1016,10 @@ class ConversationsController < ApplicationController
     multiple = conversations.is_a?(Enumerable) || conversations.is_a?(ActiveRecord::Relation)
     conversations = [conversations] unless multiple
     result = Hash.new(false)
-    visible_conversations = @current_user.shard.activate do
-        @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).to_a
-      end
-    visible_conversations.each { |c| result[c.conversation_id] = true }
+    visible_conversation_ids = @current_user.shard.activate do
+      @conversations_scope.where(:conversation_id => conversations.map(&:conversation_id)).pluck(:conversation_id)
+    end
+    visible_conversation_ids.each { |c_id| result[Shard.relative_id_for(c_id, @current_user.shard, Shard.current)] = true }
     if !multiple
       result[conversations.first.conversation_id]
     else

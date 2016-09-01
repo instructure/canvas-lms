@@ -50,6 +50,10 @@ class DeveloperKey < ActiveRecord::Base
     state :deleted
   end
 
+  def redirect_uri=(value)
+    super(value.presence)
+  end
+
   def redirect_uris=(value)
     value = value.split if value.is_a?(String)
     super(value)

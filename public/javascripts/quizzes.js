@@ -2452,7 +2452,6 @@ define([
           $dialog.addClass('loaded');
           for(idx in banks) {
             var bank = banks[idx].assessment_question_bank;
-            bank.title = TextHelper.truncateText(bank.title)
             var $bank = $dialog.find(".bank.blank:first").clone(true).removeClass('blank');
             $bank.fillTemplateData({data: bank, dataValues: ['id', 'context_type', 'context_id']});
             $dialog.find(".bank_list").append($bank);

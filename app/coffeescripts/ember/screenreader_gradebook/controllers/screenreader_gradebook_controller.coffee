@@ -154,7 +154,7 @@ define [
       submissionTypes             = @get('selectedAssignment.submission_types')
       submissionTypesOnWhitelist  = _.intersection(submissionTypes, whitelist)
 
-      hasSubmittedSubmissions and submissionTypesOnWhitelist != []
+      hasSubmittedSubmissions and _.any(submissionTypesOnWhitelist)
     ).property('selectedAssignment')
 
     hideStudentNames: false

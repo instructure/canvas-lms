@@ -213,6 +213,10 @@ module Canvas::Migration::Helpers
               source.discussion_topics.active.only_discussion_topics.select("id, title, user_id, assignment_id").except(:preload).each do |item|
                 content_list << course_item_hash(type, item)
               end
+            when 'learning_outcomes'
+              source.linked_learning_outcomes.active.select('learning_outcomes.id,short_description').each do |item|
+                content_list << course_item_hash(type, item)
+              end
             else
               if source.respond_to?(type)
                 scope = source.send(type).select(:id).except(:preload)
@@ -220,9 +224,7 @@ module Canvas::Migration::Helpers
 
                 scope = scope.select(:assignment_id) if type == 'quizzes'
 
-                if type == 'learning_outcomes'
-                  scope = scope.select(:short_description)
-                elsif type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
+                if type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
                   scope = scope.select(:name)
                 else
                   scope = scope.select(:title)
@@ -251,6 +253,8 @@ module Canvas::Migration::Helpers
               count = source.wiki.wiki_pages.not_deleted.count
             elsif type == 'discussion_topics'
               count = source.discussion_topics.active.only_discussion_topics.count
+            elsif type == 'learning_outcomes'
+              count = source.linked_learning_outcomes.count
             elsif source.respond_to?(type) && source.send(type).respond_to?(:count)
               scope = source.send(type).except(:preload)
               if scope.klass.respond_to?(:not_deleted)

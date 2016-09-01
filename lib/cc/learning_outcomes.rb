@@ -43,7 +43,7 @@ module CC
 
         unless export_object?(LearningOutcome.new, 'learning_outcomes')
           # copy straggler outcomes that should be brought in implicitly
-          @course.learning_outcomes.where.not(:id => @exported_outcome_ids).each do |item|
+          @course.linked_learning_outcomes.where.not(:id => @exported_outcome_ids).each do |item|
             if export_object?(item, 'learning_outcomes')
               process_learning_outcome(outs_node, item)
             end

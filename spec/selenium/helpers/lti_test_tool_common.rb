@@ -20,7 +20,7 @@ module LtiTestToolCommon
     content_item_selection = [
       :assignment_menu, :discussion_menu, :file_menu, :module_menu, :quiz_menu, :wiki_page_menu
     ]
-    ContextExternalTool::EXTENSION_TYPES.each do |extension_type|
+    Lti::ResourcePlacement::PLACEMENTS.each do |extension_type|
       settings_hash = {
         'canvas_icon_class' => 'icon-lti',
         'icon_url' => "http =//lti.docker/selector.png?#{extension_type}",

@@ -8,7 +8,7 @@ class CreateAlerts < ActiveRecord::Migration
       t.text :recipients
       t.integer :repetition
 
-      t.timestamps
+      t.timestamps null: true
     end
 
     create_table :alert_criteria do |t|

@@ -64,20 +64,20 @@ class CalendarsController < ApplicationController
         :appointment_group_url => context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url(:id => '{{ id }}') : '',
         :can_create_calendar_events => context.respond_to?("calendar_events") && CalendarEvent.new.tap{|e| e.context = context}.grants_right?(@current_user, session, :create),
         :can_create_assignments => context.respond_to?("assignments") && Assignment.new.tap{|a| a.context = context}.grants_right?(@current_user, session, :create),
-        :assignment_groups => context.respond_to?("assignments") ? context.assignment_groups.active.select([:id, :name]).map {|g| { :id => g.id, :name => g.name } } : [],
+        :assignment_groups => context.respond_to?("assignments") ? context.assignment_groups.active.pluck(:id, :name).map {|id, name| { :id => id, :name => name } } : [],
         :can_create_appointment_groups => ag_permission
       }
       if context.respond_to?("course_sections")
-        info[:course_sections] = context.course_sections.active.select([:id, :name]).map do |cs|
-          hash = { :id => cs.id, :asset_string => cs.asset_string, :name => cs.name}
+        info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|
+          hash = { :id => id, :asset_string => "course_section_#{id}", :name => name}
           if ag_permission
-            hash[:can_create_ag] = ag_permission[:all_sections] || ag_permission[:section_ids].include?(cs.id)
+            hash[:can_create_ag] = ag_permission[:all_sections] || ag_permission[:section_ids].include?(id)
           end
           hash
         end
       end
       if ag_permission && ag_permission[:all_sections] && context.respond_to?("group_categories")
-        info[:group_categories] = context.group_categories.active.select([:id, :name]).map {|gc| { :id => gc.id, :asset_string => gc.asset_string, :name => gc.name } }
+        info[:group_categories] = context.group_categories.active.pluck(:id, :name).map {|id, name| { :id => id, :asset_string => "group_category_#{id}", :name => name } }
       end
       info
     end

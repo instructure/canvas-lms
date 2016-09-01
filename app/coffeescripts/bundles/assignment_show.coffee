@@ -7,10 +7,10 @@ require [
   'compiled/views/assignments/SpeedgraderLinkView',
   'compiled/util/vddTooltip',
   'compiled/util/markAsDone'
-  'jsx/cyoe_assignment_sidebar/create-conditional-breakdown'
+  'jsx/conditional_release_stats/index'
   'compiled/jquery/ModuleSequenceFooter'
   'jquery.instructure_forms'
-], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView, vddTooltip, MarkAsDone, createConditionalBreakdownApp) ->
+], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView, vddTooltip, MarkAsDone, CyoeStats) ->
 
   $ ->
     $('#content').on('click', '#mark-as-done-checkbox', ->
@@ -74,8 +74,15 @@ require [
         $('.assignment_peer_reviews_link').slideDown()
       else
         $('.assignment_peer_reviews_link').slideUp()
-  $ ->
 
-    if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+  $ ->
+    if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.current_user_roles.indexOf('teacher') != -1
       { assignment, jwt, stats_url } = ENV.CONDITIONAL_RELEASE_ENV
-      createConditionalBreakdownApp('crs-breakdown', assignment, jwt, stats_url)
+      graphsRoot = document.getElementById('crs-graphs')
+      detailsParent = document.getElementById('not_right_side')
+      detailsRoot = document.createElement('div')
+
+      detailsRoot.setAttribute('id', 'crs-details')
+      detailsParent.appendChild(detailsRoot)
+
+      CyoeStats.init(graphsRoot, detailsRoot, assignment, jwt, stats_url)

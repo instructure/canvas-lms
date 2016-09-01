@@ -184,12 +184,24 @@ describe BasicLTI::BasicOutcomes do
 
   end
 
+  describe "#handle_request" do
+    it "sets the response body when an invalid sourcedId is given" do
+      xml.css('sourcedId').remove
+      response = BasicLTI::BasicOutcomes::LtiResponse.new(xml)
+      response.handle_request(tool)
+      expect(response.code_major).to eq('failure')
+      expect(response.description).to eq('Invalid sourcedid')
+      expect(response.body).not_to be_nil
+    end
+  end
+
   describe "#handle_replaceResult" do
     it "accepts a grade" do
       xml.css('resultData').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
       expect(request.code_major).to eq 'success'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
       expect(submission.grade).to eq (assignment.points_possible * 0.92).to_s
@@ -202,6 +214,7 @@ describe BasicLTI::BasicOutcomes do
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
       expect(request.code_major).to eq 'failure'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.description).to eq 'Assignment has no points possible.'
     end
 
@@ -213,6 +226,7 @@ describe BasicLTI::BasicOutcomes do
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
       expect(request.code_major).to eq 'failure'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.description).to eq 'Assignment has no points possible.'
     end
 
@@ -221,6 +235,7 @@ describe BasicLTI::BasicOutcomes do
       assignment.save!
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(request.code_major).to eq 'failure'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.description).to eq 'Assignment is no longer associated with this tool'
     end
 
@@ -228,6 +243,7 @@ describe BasicLTI::BasicOutcomes do
       xml.css('resultScore').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(request.code_major).to eq 'success'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
       expect(submission.body).to eq 'text data for canvas submission'
@@ -240,6 +256,7 @@ describe BasicLTI::BasicOutcomes do
       xml.css('resultScore').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(request.code_major).to eq 'failure'
+      expect(request.body).to eq '<replaceResultResponse />'
     end
 
     it 'accepts LTI launch URLs as a data format with a specific submission type' do
@@ -248,10 +265,10 @@ describe BasicLTI::BasicOutcomes do
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
       expect(request.code_major).to eq 'success'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
       expect(submission.submission_type).to eq 'basic_lti_launch'
     end
-
   end
 end

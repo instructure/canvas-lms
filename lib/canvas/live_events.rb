@@ -109,8 +109,9 @@ module Canvas::LiveEvents
     post_event_stringified('submission_updated', get_submission_data(submission))
   end
 
-  def self.enrollment_created(enrollment)
-    post_event_stringified('enrollment_created', {
+  def self.get_enrollment_data(enrollment)
+    {
+
       enrollment_id: enrollment.id,
       course_id: enrollment.course_id,
       user_id: enrollment.user_id,
@@ -120,7 +121,42 @@ module Canvas::LiveEvents
       updated_at: enrollment.updated_at,
       limit_privileges_to_course_section: enrollment.limit_privileges_to_course_section,
       course_section_id: enrollment.course_section_id,
-    })
+      workflow_state: enrollment.workflow_state
+    }
+  end
+
+  def self.enrollment_created(enrollment)
+    post_event_stringified('enrollment_created', get_enrollment_data(enrollment))
+  end
+
+  def self.enrollment_updated(enrollment)
+    post_event_stringified('enrollment_updated', get_enrollment_data(enrollment))
+  end
+
+  def self.get_enrollment_state_data(enrollment_state)
+    {
+
+      enrollment_id: enrollment_state.enrollment_id,
+      state: enrollment_state.state,
+      state_started_at: enrollment_state.state_started_at,
+      state_is_current: enrollment_state.state_is_current,
+      state_valid_until: enrollment_state.state_valid_until,
+      restricted_access: enrollment_state.restricted_access,
+      access_is_current: enrollment_state.access_is_current,
+      state_invalidated_at: enrollment_state.state_invalidated_at,
+      state_recalculated_at: enrollment_state.state_recalculated_at,
+      access_invalidated_at: enrollment_state.access_invalidated_at,
+      access_recalculated_at: enrollment_state.access_recalculated_at
+
+    }
+  end
+
+  def self.enrollment_state_created(enrollment_state)
+    post_event_stringified('enrollment_state_created', get_enrollment_state_data(enrollment_state))
+  end
+
+  def self.enrollment_state_updated(enrollment_state)
+    post_event_stringified('enrollment_state_updated', get_enrollment_state_data(enrollment_state))
   end
 
   def self.user_account_association_created(assoc)

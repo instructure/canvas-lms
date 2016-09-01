@@ -7,7 +7,7 @@ class CreateGradingPeriodGradesJoinTable < ActiveRecord::Migration
       t.integer :grading_period_id, :limit => 8
       t.float :current_grade
       t.float :final_grade
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_foreign_key :grading_period_grades, :enrollments

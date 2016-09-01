@@ -191,6 +191,18 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
       }
     }
 
+    .ReactModal__Footer-Scheduler {
+      @include ReactModalPadding;
+      border-bottom-left-radius: $baseBorderRadius;
+      border-bottom-right-radius: $baseBorderRadius;
+      background: white;
+      border-top: 1px solid $ic-border-light;
+      @include breakpoint(mini-tablet) {
+        display: flex;
+        align-items: center;
+      }
+    }
+
     .ReactModal__Footer-Actions {
       @include breakpoint(mini-tablet) {
         flex: 1;

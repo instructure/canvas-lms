@@ -2,8 +2,9 @@ define([
   'jquery',
   'react',
   'react-dom',
-  'react-modal'
-], function($, React, ReactDOM, Modal) {
+  'react-modal',
+  'i18n!conditional_release'
+], function($, React, ReactDOM, Modal, I18n) {
 
   const SAVE_TIMEOUT = 15000
 
@@ -178,7 +179,14 @@ define([
       const iframeId = this.popupId();
       return (
         <div className='conditional-release-editor'>
-          <iframe className='conditional-release-editor-frame' ref='iframe' id={iframeId} name={iframeId} />
+          <iframe
+            className='conditional-release-editor-frame'
+            ref='iframe'
+            id={iframeId}
+            name={iframeId}
+            title={I18n.t('Mastery Paths Editor')}
+            aria-label={I18n.t('Mastery Paths Editor')}
+          />
         </div>
       )
     }

@@ -299,6 +299,19 @@ describe 'account authentication' do
 
           expect(ap.reload.federated_attributes).to eq({})
         end
+
+        it "doesn't include screenreader text when removing attributes" do
+          ap.update_attribute(:federated_attributes, { 'locale' => 'provider_locale' })
+          get "/accounts/self/authentication_providers"
+
+          f(".add_federated_attribute_button").click
+          # remove an attribute that was already on the page, and one that was dynamically added
+          2.times do
+            fj(".remove_federated_attribute:visible").click
+          end
+          available = ff("#edit_saml#{ap.id} .federated_attributes_select option")
+          expect(available.any? { |attr| attr.text =~ /attribute/i }).to eq false
+        end
       end
     end
 

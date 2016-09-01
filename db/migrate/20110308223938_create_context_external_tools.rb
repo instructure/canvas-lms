@@ -14,7 +14,7 @@ class CreateContextExternalTools < ActiveRecord::Migration
       t.text :settings
       t.string :workflow_state
       
-      t.timestamps
+      t.timestamps null: true
     end
   end
 

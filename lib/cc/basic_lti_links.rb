@@ -91,7 +91,7 @@ module CC
             ext_node.lticm :property, tool.consumer_key, 'name' => 'consumer_key'
             ext_node.lticm :property, tool.shared_secret, 'name' => 'shared_secret'
           end
-          ContextExternalTool::EXTENSION_TYPES.each do |type|
+          Lti::ResourcePlacement::PLACEMENTS.each do |type|
             if tool.settings[type]
               ext_node.lticm(:options, :name => type.to_s) do |type_node|
 

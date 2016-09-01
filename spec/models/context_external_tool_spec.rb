@@ -59,7 +59,7 @@ describe ContextExternalTool do
     def url_test(nav_url=nil)
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.new(:name => "a", :consumer_key => '12345', :shared_secret => 'secret', :url => "http://www.example.com")
-      ContextExternalTool::EXTENSION_TYPES.each do |type|
+      Lti::ResourcePlacement::PLACEMENTS.each do |type|
         @tool.send "#{type}=", {
                 :url => nav_url,
                 :text => "Example",
@@ -353,7 +353,7 @@ describe ContextExternalTool do
     it "should merge custom fields for extension launches" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.new(:name => "a", :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'a' => "1", 'b' => "2"}, :url =>"http://www.example.com")
-      ContextExternalTool::EXTENSION_TYPES.each do |type|
+      Lti::ResourcePlacement::PLACEMENTS.each do |type|
         @tool.send "#{type}=",  {
           :text =>"Example",
           :url =>"http://www.example.com",
@@ -694,6 +694,12 @@ describe ContextExternalTool do
       tool.settings["environments"] = {:launch_url => 'http://www.google.com/'}
       tool.change_domain! new_host
       expect(tool.settings["environments"]).to eq({:launch_url => 'http://www.google.com/'})
+    end
+
+    it "should ignore an existing invalid url" do
+      tool.url = "null"
+      tool.change_domain! new_host
+      expect(tool.url).to eq "null"
     end
   end
 

@@ -53,6 +53,7 @@ module Api::V1
         ActiveRecord::Associations::Preloader.new.preload(submissions, :assignment) unless opts[:assignment]
         ActiveRecord::Associations::Preloader.new.preload(submissions, :user) unless opts[:student]
         ActiveRecord::Associations::Preloader.new.preload(submissions, :grader)
+        ::Submission.bulk_load_versioned_attachments(versions.map(&:model))
       end
 
       versions.map do |version|

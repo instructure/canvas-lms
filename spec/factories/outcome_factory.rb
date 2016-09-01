@@ -18,8 +18,9 @@
 
 def outcome_model(opts={})
   @context ||= opts.delete(:context) || course_model(:reusable => true)
+  outcome_context = opts.delete(:outcome_context) || @context
   @outcome_group ||= @context.root_outcome_group
-  @outcome = @context.created_learning_outcomes.build(valid_outcome_attributes.merge(opts))
+  @outcome = outcome_context.created_learning_outcomes.build(valid_outcome_attributes.merge(opts))
   @outcome.rubric_criterion = valid_outcome_data
   @outcome.save!
   @outcome_group.add_outcome(@outcome)
@@ -66,7 +67,7 @@ end
 
 def outcome_with_rubric(opts={})
   @outcome_group ||= @course.root_outcome_group
-  @outcome = @course.created_learning_outcomes.create!(
+  @outcome = (opts[:outcome_context] || @course).created_learning_outcomes.create!(
     :description => '<p>This is <b>awesome</b>.</p>',
     :short_description => 'new outcome',
     :calculation_method => 'highest'

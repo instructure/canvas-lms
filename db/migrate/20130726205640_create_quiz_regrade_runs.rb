@@ -5,7 +5,7 @@ class CreateQuizRegradeRuns < ActiveRecord::Migration
       t.integer :quiz_regrade_id, limit: 8, null: false
       t.timestamp :started_at
       t.timestamp :finished_at
-      t.timestamps
+      t.timestamps null: true
     end
   end
 

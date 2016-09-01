@@ -149,19 +149,13 @@ module AccountReports
       headers << I18n.t('final score')
       headers << I18n.t('enrollment state')
 
-      generate_and_run_report headers do |csv|
+      firstpass_file = generate_and_run_report(nil, 'firstpass.csv') do |csv|
         students.find_in_batches do |student_chunk|
           # loading students/courses in chunks to avoid unnecessarily
           # re-loading assignments/etc. in the grade calculator
           students_by_course = student_chunk.group_by { |x| x.course_id }
-          courses_by_id = Course.find(students_by_course.keys).index_by(&:id)
-          students_by_course.each do |course_id, course_students|
-            grading_period_grades = grading_periods.reduce({}) { |h,gp|
-              h[gp] = GradeCalculator.new(course_students.map(&:user_id), courses_by_id[course_id],
-                                          grading_period: gp).compute_scores
-              h
-            }
 
+          students_by_course.each do |course_id, course_students|
             course_students.each do |student|
               arr = []
               arr << student["user_name"]
@@ -178,17 +172,48 @@ module AccountReports
               arr << student["term_sis_id"]
               arr << gp_set.title
               arr << gp_set.id
-              grading_period_grades.each do |gp, grades|
+              grading_periods.each do |gp|
                 arr << gp.id
-                student_grades = grades.shift
-                arr << student_grades[:current][:grade]
-                arr << student_grades[:final][:grade]
+                # Putting placeholders there to be replaced after expensive grade calculation
+                arr << nil
+                arr << nil
               end
               arr << student["computed_current_score"]
               arr << student["computed_final_score"]
               arr << student["enroll_state"]
               csv << arr
             end
+          end
+        end
+      end
+
+      generate_and_run_report headers do |report_csv|
+        read_csv_in_chunks(firstpass_file) do |rows|
+          rows_by_course = rows.group_by { |arr| arr[4].to_i  }
+          courses_by_id = Course.find(rows_by_course.keys).index_by(&:id)
+
+          rows_by_course.each do |course_id, course_rows|
+            grading_period_grades = grading_periods.reduce({}) do |h,gp|
+              h[gp] = GradeCalculator.new(course_rows.map { |arr| arr[1] },
+                                          courses_by_id[course_id],
+                                          grading_period: gp).compute_scores
+              h
+            end
+
+            course_rows.each do |row|
+              column = 13
+              grading_period_grades.each do |gp, grades|
+                row_grades = grades.shift
+                # this accounts for gp.id and moves us to where we want
+                # to drop our grades data.
+                column += 2
+                row[column] = row_grades[:current][:grade]
+                column += 1
+                row[column] = row_grades[:final][:grade]
+              end
+            end
+
+            rows.each { |r| report_csv << r }
           end
         end
       end

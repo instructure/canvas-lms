@@ -566,6 +566,7 @@ class ApplicationController < ActionController::Base
     unless @context
       if params[:course_id]
         @context = api_find(Course.active, params[:course_id])
+        @context.root_account = @domain_root_account if @context.root_account_id == @domain_root_account.id # no sense in refetching it
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && @current_user

@@ -60,7 +60,7 @@ define([], function(){
         "instructure_record": "/javascripts/tinymce_plugins/instructure_record/plugin.js"
       },
       language_load: false,
-      relative_urls: false,
+      convert_urls: false,
       // we add the menubar for a11y purposes but then
       // hide it with js for non screenreader users
       menubar: true,

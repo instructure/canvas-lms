@@ -9,7 +9,7 @@ class CreateSisPostGradesStatuses < ActiveRecord::Migration
       t.string :status, :null => false
       t.string :message, :null => false
       t.datetime :grades_posted_at, :null => false
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :sis_post_grades_statuses, :course_id

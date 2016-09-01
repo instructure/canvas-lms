@@ -772,10 +772,6 @@ describe User do
       set_up_course_with_users
     end
 
-    before(:each) do
-      RequestStore.clear!
-    end
-
     def set_up_course_with_users
       @course = course_model(:name => 'the course')
       @this_section_teacher = @teacher

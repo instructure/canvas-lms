@@ -7,7 +7,7 @@ class CreateAppointmentGroupContexts < ActiveRecord::Migration
       t.string :context_code
       t.integer :context_id, :limit => 8
       t.string :context_type
-      t.timestamps
+      t.timestamps null: true
     end
   end
 

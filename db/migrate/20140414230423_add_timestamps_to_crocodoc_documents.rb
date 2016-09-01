@@ -2,7 +2,7 @@ class AddTimestampsToCrocodocDocuments < ActiveRecord::Migration
   tag :predeploy
 
   def self.up
-    add_timestamps(:crocodoc_documents)
+    add_timestamps(:crocodoc_documents, null: true)
   end
 
   def self.down

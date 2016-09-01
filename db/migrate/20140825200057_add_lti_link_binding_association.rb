@@ -13,7 +13,7 @@ class AddLtiLinkBindingAssociation < ActiveRecord::Migration
       t.string :context_type
       t.text :resource_link_id
       t.text :custom
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :lti_tool_settings, [:resource_link_id, :context_type, :context_id, :tool_proxy_id],name: 'index_lti_tool_settings_on_link_context_and_tool_proxy', unique: true

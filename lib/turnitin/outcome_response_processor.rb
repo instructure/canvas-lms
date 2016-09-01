@@ -79,7 +79,7 @@ module Turnitin
 
     def attempt_number
       current_job = Delayed::Worker.current_job
-      current_job ? current_job + 1 : 1
+      current_job ? current_job.attempts + 1 : 1
     end
 
     def create_attachment
