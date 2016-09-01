@@ -97,20 +97,11 @@ describe "speed grader - discussion submissions" do
         f('#discussion_view_link').click
         wait_for_ajaximations
         authors = ff('h2.discussion-title span')
-        expect(authors[0]).to include_text("This Student")
-        expect(authors[1]).to include_text("Discussion Participant")
-        expect(authors[2]).to include_text(teacher.name)
-      end
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-
-      in_frame 'speedgrader_iframe' do
-        f('.header_title a').click
-        wait_for_ajaximations
-        authors = ff('h2.discussion-title span')
-        expect(authors[0]).to include_text("This Student")
-        expect(authors[1]).to include_text("Discussion Participant")
-        expect(authors[2]).to include_text(teacher.name)
+        expect(authors).to have_size(3)
+        author_text = authors.map(&:text).join("\n")
+        expect(author_text).to include("This Student")
+        expect(author_text).to include("Discussion Participant")
+        expect(author_text).to include(teacher.name)
       end
     end
 
