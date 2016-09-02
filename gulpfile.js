@@ -10,6 +10,8 @@ const STUFF_TO_REV = [
   // We javascript_include_tag('require.js') directly from rails
   'public/javascripts/vendor/require.js',
   'public/optimized/vendor/require.js',
+  'public/javascripts/ie11-polyfill.js',
+  'public/optimized/ie11-polyfill.js',
 
   // But for all other javascript, we only load stuff using js_bundle.
   // Meaning that we only include stuff in the "bundles" dir from rails.
