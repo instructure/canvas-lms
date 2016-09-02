@@ -176,12 +176,14 @@
   </div>
 <% end %>
 
+<% if @messages %>
 <h2><%= t('headings.recent_messages', %{Recent Messages}) %></h2>
 <%= t('no_messages', "No Messages") if @messages.empty? %>
 <% @messages[0,10].each do |message| %>
   <% if message.is_a?(DiscussionEntry) %>
     <%= render :partial => 'discussion_topics/entry', :object => message, :locals => {:out_of_context => true, :show_context => true, :assignment_visible_to_user => message.discussion_topic.visible_for?(@current_user)} %>
   <% end %>
+<% end %>
 <% end %>
 
 <% js_bundle 'legacy/context_roster_user' %>

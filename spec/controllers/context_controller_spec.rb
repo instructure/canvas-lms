@@ -93,7 +93,7 @@ describe ContextController do
     end
 
     it "should assign variables" do
-      user_session(@student)
+      user_session(@teacher)
       @enrollment = @course.enroll_student(user(:active_all => true))
       @enrollment.accept!
       @student = @enrollment.user
@@ -103,7 +103,7 @@ describe ContextController do
       expect(assigns[:user]).not_to be_nil
       expect(assigns[:user]).to eql(@student)
       expect(assigns[:topics]).not_to be_nil
-      expect(assigns[:entries]).not_to be_nil
+      expect(assigns[:messages]).not_to be_nil
     end
 
     describe 'across shards' do
