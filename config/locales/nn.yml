@@ -1897,7 +1897,7 @@ nn:
         points: Poeng
       view_grading_scheme: "Vis karakterskjema"
     group_category_selector: 
-      grade_group_students_individually: "Gi karakterar til kva student individuelt"
+      grade_group_students_individually: "Gi karakterar til kvar student individuelt"
       group_assignment_header: Gruppeoppgåve
       group_category_locked_explanation: "Gruppeinnstillingar kan ikkje endrast, då studentar allereie har levert heimearbeid til denne oppgåva."
       group_category_options: "Ny gruppekategori"
@@ -5520,7 +5520,7 @@ nn:
     unsubscribed: "Stoppa abonnement"
     unsubscribed_hint: "Du abonnerer ikkje på dette emnet. Klikk her for å abonnere."
   dismiss_dacdb625: Forkast
-  display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Vis all lenketekst i Mitt UiB som *understreka tekst*"
+  display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Vis all lenketekst i Canvas som *understreka tekst*"
   display_course_catalog: "Vis ei søkeliste med kurs for denne rotkontoen med \"Inkluder dette kurset i offentleg kursliste\" aktivert."
   display_name_b80c243e: "Namn som skal visast"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Vis alle karakterane når rullegardinmenyen \"Alle karakterperiodane\" er vald (Fleire karakterperiodar må vere aktivert)."
@@ -5591,6 +5591,7 @@ nn:
   duplicate_provider_provider_d9842134: "Dupliser tilbyder %{provider}"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "f.eks. Nordmann, Kari"
+  e_g_http_university_edu_helpdesk_acab04d6: "f.eks., http://university.edu/helpdesk"
   e_g_jon_doe_77233e3b: "f.eks. Nordmann, Ola"
   e_mail_only_2cc5e513: "Kun e-post"
   ecollege_file_description: eCollege
@@ -5638,6 +5639,7 @@ nn:
       criterion_long_description: "Lang skildring av kriterium"
       find_existing_rubric: "Finn gjeldande vurderingskriterium"
   edit_survey_b0d6890d: "Rediger undersøking"
+  edit_text_27d8aa3d: "Rediger %{text}"
   edit_this_announcement_ae6e17b3: "Rediger denne kunngjeringa"
   edit_this_collaboration_393b1a9a: "Rediger samarbeidet"
   edit_this_question_1c82c3cf: "Rediger spørsmålet"
@@ -5719,6 +5721,7 @@ nn:
   email_is_invalid_e0d982eb: "E-postadresse er ugyldig."
   email_is_required_736ac26b: "E-post er obligatorisk"
   email_the_user_about_this_account_creation_e63f8759: "Send e-post til brukaren om kontoopprettinga"
+  empty_stub_for_testing_only_37aad38: "Tom stubb (berre for testing)"
   enable_6f5d1328: Aktiver
   enable_dashboard_images_for_courses_5af458b0: "Slå på dashbordbilder for kurs"
   enable_feature_title_987d8e9a: "Aktiver funksjon: %{title}"
@@ -6337,6 +6340,7 @@ nn:
   for: for
   for_974cbb84: For
   for_all_devices_1f603968: "For alle einingar"
+  for_an_instant_answer_see_if_your_issue_is_address_48280e89: "For å få svar med det same, sjå om du finn spørsmålet ditt i *Canvas Guides*."
   forgot_password_url_3f9c04b: "Gløymt URL-adresse for passord"
   form_background_fb654518: Skjemabakgrunn
   form_border_f61f12dc: "Kantlinje for skjema"
@@ -6391,6 +6395,7 @@ nn:
   goto_next_page_e8e1ae6f: "Gå til neste side"
   goto_page_page_num_bd656bd5: "Gå til side %{page_num}"
   goto_previous_page_85b2fa49: "Gå til forrige side"
+  gpa_scale_6710e2ee: GPA-skala
   gpa_scale_a6d1cdea: GPA-skala
   grade_9c6f076d: Karakter
   grade_assignment_7c1abc11: "Sett karakter på %{assignment}"
@@ -7335,6 +7340,7 @@ nn:
       Det er som eit minikurs der du kan jobbe med færre studentar
       på eit meir fokusert prosjekt."
   groupweight_of_total_9579ae8c: "%{groupWeight}% av totalen"
+  has_turnitin_score_3e1cacf6: "Har Turnitin-resultat"
   help_4c4968b1: Hjelp
   help_dialog: 
     Back: Tilbake
@@ -7366,6 +7372,8 @@ nn:
     submit_this_support_request: "Send feilmelding"
     which_course_is_this_question_about: "Kva kurs gjeld spørsmålet?"
     your_email_address: "E-postadressa di"
+  help_menu_links_51184b65: Hjelpemeny-lenke
+  help_menu_options_7ecf7031: Hjelpemeny-val
   help_with_content_licensing_a146fb0e: "Hjelp med å lisensiere innhald"
   helpers: 
     accessible_date_format: "DD-MM-ÅÅÅÅ tt:mm"
