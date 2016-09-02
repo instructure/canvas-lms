@@ -205,7 +205,7 @@
           <% CommunicationChannel.sms_carriers.each do |(carrier, domain)| %>
             <option value="#@<%= domain %>"><%= carrier %></option>
           <% end %>
-          <option value="other"><%= t('carriers.other', 'Other Carrier') %></option>
+          <option value="other"><%= t('Other Carrier') %></option>
         </select>
       </div>
     </div>
