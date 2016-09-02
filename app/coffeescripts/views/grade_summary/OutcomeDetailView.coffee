@@ -38,13 +38,13 @@ define [
       })
 
       @allAlignments.on 'fetched:last', =>
-        @alignmentsForView.reset(@allAlignments.last(8))
+        @alignmentsForView.reset(@allAlignments.toArray())
 
       @allAlignments.fetch()
 
     show: (model) ->
       @model = model
-      @$el.dialog('option', 'title', @model.group.get('title'))
+      @$el.dialog('option', 'title', @model.group.get('title')).css('maxHeight', 340)
       @progress = new ProgressBarView(model: @model)
       @render()
       super
