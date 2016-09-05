@@ -134,6 +134,7 @@ ar:
     default_login_handle_name: "البريد الإلكتروني"
   account_authorization_config/ldap: 
     test_bind_failed: "فشل الربط مع ظهور الخطأ التالي: %{error}"
+    test_bind_timeout: "المهلة أثناء الربط"
     test_connection_timeout: "المهلة أثناء الاتصال"
     test_host_unknown: "مضيف غير معروف: %{host}"
     test_login_auth_exception: "استثناء عند تسجيل الدخول: %{error}"
@@ -1342,12 +1343,15 @@ ar:
   add_course_assignments_628ed6d0: "إضافة مهام المساق"
   add_course_calendar_events_146154a5: "إضافة أحداث تقويم المساق"
   add_criterion_eb9587ef: "إضافة معيار"
+  add_custom_link_22059c0: "إضافة ارتباط مخصص"
   add_email_address_aef3b61: "إضافة عنوان بريد إلكتروني"
   add_files_to_the_course_da6ffd32: "إضافة ملفات إلى المساق"
   add_folder_ba50d107: "إضافة مجلد"
   add_grading_period_6f774dc3: "إضافة فترة تقييم الدرجات"
   add_grading_scheme_81e23c05: "إضافة نظام تقييم"
+  add_help_menu_links_de9fc34f: "إضافة ارتباطات قائمة التعليمات"
   add_icon_567dbcaa: "إضافة رمز"
+  add_link_fc336ed6: "إضافة ارتباط"
   add_moderator_review_copy_1st_a484c813: "إضافة مراجعة مشرف (نسخ الأول)"
   add_moderator_review_copy_2nd_e80d458f: "إضافة مراجعة مشرف (نسخ الثاني)"
   add_moderator_review_new_3c183cea: "إضافة مراجعة مشرف (جديد)"
@@ -1377,6 +1381,7 @@ ar:
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "أضف مهامك. يمكنك عمل قائمة طويلة أو تقسيمها إلى مجموعات - كما يمكنك تعيين تقديرات لكل مجموعة مهام. "
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "إضافة معرف الحقل المخصص لمثيل Zendesk الخاص بك إلى كل ما يلي (لن يتم تسجيل الحقول التي لا تتضمن معرف):"
   admin_4d3ba42f: المسؤول
+  admins_3e1dce15: المسؤولون
   after_date_981cd41b: "بعد %{date}"
   after_last_attempt_c9168da2: "بعد المحاولة الأخيرة"
   ajax_errors: 
@@ -1691,6 +1696,7 @@ ar:
   arrange_columns_by_due_date_f74f9e2d: "ترتيب الأعمدة حسب موعد الاستحقاق"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "بينما تقوم بالكتابة في هذا الحقل، ستتم تصفية قائمة المجموعات تلقائيًا لتشمل فقط تلك التي تطابق أسماؤها إدخالك."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "سيتم تحديث قائمة النتائج تلقائياً أثناء الكتابة في هذا الحقل."
+  ask_your_instructor_a_question_a61ca5e9: "طرح سؤال على معلمك"
   assessment_by_name_7b879a2c: "تقييم من قبل %{name}"
   assessment_not_yet_completed_e800a0a7: "لم تكتمل المهمة بعد"
   assessment_question: 
@@ -1786,6 +1792,7 @@ ar:
     errors: 
       frozen_assignments_error: "لا يمكنك حذف مجموعة ذات تعيين مقفول."
   assignment_menu_91fe3716: "قائمة المهمة"
+  assignment_muted_4cb590a4: "تم حجب المهمة"
   assignment_muter: 
     mute_assignment: "حجب المهمة"
     muting_assignment: "إخفاء درجة التعيين..."
@@ -3039,6 +3046,7 @@ ar:
   canada_1_921df67a: "كندا (+1)"
   canada_aec587fa: كندا
   cancel_caeb1e68: إلغاء
+  cancel_custom_link_creation_39ec70bd: "إلغاء إنشاء الارتباط المخصص"
   cannot_be_associated_with_a_different_account_ac863be2: "الارتباط بحساب مختلف غير ممكن"
   cannot_be_associated_with_different_accounts_f461814f: "الارتباط بحسابات مختلفة غير ممكن"
   cannot_be_empty_when_course_id_is_nil_and_account__ca96a97e: "لا يمكن أن يكون فارغاً عندما تكون قيمة course_id وقيمة account_id تساويان لا شيء"
@@ -3871,6 +3879,8 @@ ar:
       buttons: 
         add_module: "إضافة وحدة"
       labels: 
+        before_viewing: "المتطلبات الأساسية"
+        module_complete_when: المتطلبات
         publish_final_grade: "نشر الدرجة النهائية للطالب عند اكتمال هذه الوحدة"
         require_sequential_progress: "يجب أن ينتقل الطلاب عبر المتطلبات بترتيب تسلسلي"
       links: 
@@ -4404,6 +4414,7 @@ ar:
       other: "تمت معالجة %{count} مساقات"
       two: "تمت معالجة مساقين"
       zero: "لم تتم معالجة أي مساق"
+    course: المساق
     course_format: 
       blended: ممزوج
       not_set: "غير معيّن"
@@ -4450,6 +4461,7 @@ ar:
     student_summary: 
       not_sorted: "جدول ملخص الطالب"
     student_view_student_name: "اختبار الطالب"
+    syllabus: المناهج
     wiki_permissions: 
       all: "أي شخص"
       only_teachers: "المعلمون فقط"
@@ -5348,6 +5360,7 @@ ar:
   custom_fields_fc3e55af: "حقول مخصصة"
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "تخصيص الارتباطات لتضمينها في نافذة مربع حوار التعليمات"
   customize_help_link_62cd05eb: "تخصيص ارتباط تعليمات"
+  customize_this_menu_efa72a9: "تخصيص هذه القائمة"
   cutoff_score_74254c89: "أدنى درجة للاجتياز"
   cyan_c1d5f68a: سماوي
   d2l_display: Desire2Learn
@@ -5789,6 +5802,7 @@ ar:
     atom_no_author: "بلا مؤلف"
     default_user_name: "اسم المستخدم"
   discussion_group_category_locked: "لا يمكن تعيين فئات المجموعات مباشرةً في مهمة مناقشة ولكن يجب تعيينها في المناقشة بدلاً من ذلك."
+  discussion_submission_781d5d33: "إرسال المناقشة"
   discussion_topic: 
     atom_no_author: "بلا مؤلف"
     default_title: "بلا عنوان"
@@ -6194,6 +6208,7 @@ ar:
   duplicate_provider_provider_d9842134: "تكرار موفر الهوية %{provider}"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "على سبيل المثال، أحمد، كمال"
+  e_g_http_university_edu_helpdesk_acab04d6: "على سبيل المثال، http://university.edu/helpdesk"
   e_g_jon_doe_77233e3b: "على سبيل المثال، كمال أحمد"
   e_mail_only_2cc5e513: "البريد الإلكتروني فقط"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "يمثل كل شريط مهمة واحدة. وتمثل الطبقة الخضراء النسبة المئوية للطلاب الذين سلموا إرسالهم *في الوقت المحدد*. بينما الإرسالات **المتأخرة** تمثّل باللون الأصفر والإرسالات ***المفقودة*** باللون الأحمر."
@@ -6258,6 +6273,7 @@ ar:
       criterion_long_description: "وصف طويل للمعيار"
       find_existing_rubric: "البحث عن عنوان موجود"
   edit_survey_b0d6890d: "تحرير الاستطلاع"
+  edit_text_27d8aa3d: "تحرير %{text}"
   edit_this_announcement_ae6e17b3: "تحرير هذا الإعلان"
   edit_this_collaboration_393b1a9a: "تحرير هذا التعاون"
   edit_this_question_1c82c3cf: "تحرير هذا السؤال"
@@ -7020,6 +7036,7 @@ ar:
     published_status: منشور
     restricted_status: "متوفر من %{from_date} حتى %{until_date}"
     unpublished_status: "غير منشور"
+  file_upload_submission_740711f: "إرسال تحميل ملف"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "تم نشر %{filename} بحق الاستخدام التالي: %{usage_right}"
   filename_progress_percent_uploaded_1f465e66: "%{fileName} - تم تحميل %{progress} بالمئة"
   filename_uploaded_successfully_edd8e825: "تم تحميل %{fileName} بنجاح"
@@ -7191,6 +7208,7 @@ ar:
   goto_next_page_e8e1ae6f: "الانتقال إلى الصفحة التالية"
   goto_page_page_num_bd656bd5: "الانتقال إلى الصفحة %{page_num}"
   goto_previous_page_85b2fa49: "الانتقال إلى الصفحة السابقة"
+  gpa_scale_6710e2ee: "مقياس المعدل التراكمي"
   gpa_scale_a6d1cdea: "مقياس المعدل التراكمي (GPA)"
   grade_9c6f076d: الدرجة
   grade_assignment_7c1abc11: "تقييم %{assignment}"
@@ -8236,6 +8254,7 @@ ar:
     submit_this_support_request: "إرسال البطاقة"
     which_course_is_this_question_about: "أي مساق يدور حوله هذا السؤال؟"
     your_email_address: "بريدك الإلكتروني"
+  help_menu_links_51184b65: "ارتباطات قائمة التعليمات"
   help_with_content_licensing_a146fb0e: "المساعدة بشأن ترخيص المحتوى"
   helpers: 
     accessible_date_format: "DD-MM-YYYY hh:mm"
