@@ -1306,12 +1306,15 @@ da:
   add_course_assignments_628ed6d0: "Opret Kursusopgave"
   add_course_calendar_events_146154a5: "Opret Begivenheder til Kursuskalender"
   add_criterion_eb9587ef: "Tilføj kriterie"
+  add_custom_link_22059c0: "Tilføj brugertilpasset link"
   add_email_address_aef3b61: "Tilføj e-mailadresse"
   add_files_to_the_course_da6ffd32: "Opret Filer til Kurset"
   add_folder_ba50d107: "Opret Mappe"
   add_grading_period_6f774dc3: "Opret Bedømmelsesperiode"
   add_grading_scheme_81e23c05: "Opret Bedømmelsessystem"
+  add_help_menu_links_de9fc34f: "Tilføj hjælp-menulinks"
   add_icon_567dbcaa: "opret ikon"
+  add_link_fc336ed6: "Tilføj link"
   add_moderator_review_copy_1st_a484c813: "Opret moderatorevaluering (kopi 1.)"
   add_moderator_review_copy_2nd_e80d458f: "Opret moderatorevaluering (kopi 2.)"
   add_moderator_review_new_3c183cea: "Opret moderatorevaluering (Ny)"
@@ -1341,6 +1344,7 @@ da:
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Opret dine opgaver. Du kan blot lave en lang liste, eller opdele dem i grupper - og endda specificere vægt for hver opgavegruppe."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Føj dit Zendesk Instance kundefelt-id til hvert af de følgende (felter uden id logges ikke):"
   admin_4d3ba42f: Administrator
+  admins_3e1dce15: Admins
   after_date_981cd41b: "Efter %{date}"
   after_last_attempt_c9168da2: "Efter sidste forsøg"
   ajax_errors: 
@@ -1532,6 +1536,7 @@ da:
   anonymous_user: "Anonym bruger"
   anonymous_user_d984b9ce: "Anonym bruger"
   another_configuration_is_currently_selected_select_95b394e: "Der er valgt en anden konfiguration for øjeblikket. Valg af denne konfiguration vil fravælge den anden."
+  answer_address_book_queries_through_76842372: "Besvar adressebogsforespørgelser gennem"
   answer_answerid_97fc4afc: "Svar %{answerId}"
   answer_correct_answer_c2c4a20c: "%{answer}, (Korrekt svar)"
   answer_description_6b353cfd: Svarbeskrivelse
@@ -1646,6 +1651,7 @@ da:
   arrange_columns_by_due_date_f74f9e2d: "Arranger kolonner efter deadline"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Når du indtaster i dette felt, filtreres listen over grupper automatisk til kun at inkludere dem, hvis navne matcher din indtastning."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Når du indtaster i dette felt, opdateres listen over resultater automatisk."
+  ask_your_instructor_a_question_a61ca5e9: "Stil din underviser et spørgsmål"
   assessment_by_name_7b879a2c: "Bedømmelse af %{name}"
   assessment_not_yet_completed_e800a0a7: "Bedømmelse endnu ikke fuldendt"
   assessment_question: 
@@ -1737,6 +1743,7 @@ da:
     errors: 
       frozen_assignments_error: "Du kan ikke slette en gruppe med en låst opgave."
   assignment_menu_91fe3716: Tildelingsmenu
+  assignment_muted_4cb590a4: "Opgave afbrudt"
   assignment_muter: 
     mute_assignment: "Afbryd opgave"
     muting_assignment: "Afbryder opgave ..."
@@ -2384,6 +2391,7 @@ da:
   available_from_f84e4611: "Tilgængelig fra"
   available_from_field_for_styleguide_7ced3861: "Tilgængeligt Fra-felt til stilmanual"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Tilgængelig fra - Format som ÅÅÅÅ-MM-DD tt:mm"
+  available_to_b7350e02: "Tilgængelig indtil"
   available_until_date_2c0ccec3: "Tilgængelig indtil den:"
   available_until_date_cd125c62: "Tilgængelig indtil dato"
   available_until_f3b9c4ed: "Tilgængelig indtil"
@@ -2953,6 +2961,7 @@ da:
   canada_1_921df67a: "Canada (+1)"
   canada_aec587fa: Canada
   cancel_caeb1e68: Annuller
+  cancel_custom_link_creation_39ec70bd: "Annuller brugertilpasset link oprettelse"
   cannot_be_associated_with_a_different_account_ac863be2: "kan ikke blive associeret med en anden konto"
   cannot_be_associated_with_different_accounts_f461814f: "kan ikke blive associetert med forskellig konti"
   cannot_be_empty_when_course_id_is_nil_and_account__ca96a97e: "kan ikke være tomt, når kurus_id er nul og konto_id er nul"
@@ -3781,6 +3790,8 @@ da:
       buttons: 
         add_module: "Opret Modul"
       labels: 
+        before_viewing: Forudsætninger
+        module_complete_when: Krav
         publish_final_grade: "Offentliggør endelig karakter for den studerende, når dette modul er fuldført"
         require_sequential_progress: "Studerende skal gå igennem kravene i rækkefølge"
       links: 
@@ -4242,6 +4253,7 @@ da:
     batch_update_message: 
       one: "1 kursus behandlet"
       other: "%{count} kurser behandlede"
+    course: Kursus
     course_format: 
       blended: Blandet
       not_set: "Ikke indstillet"
@@ -4284,10 +4296,13 @@ da:
       unpublishable_with_message: "Kan ikke offentliggøres: %{message}"
       unpublished: "Ikke offentliggjort"
       unpublished_with_message: "Ikke offentliggjort: %{message}"
+    institution: Institution
     missing_name: "Kursus uden navn"
+    public: Offentligt
     student_summary: 
       not_sorted: "Oversigtstabel over studerende"
     student_view_student_name: Prøvestuderende
+    syllabus: Pensum
     wiki_permissions: 
       all: alle
       only_teachers: "Kun undervisere"
@@ -4819,6 +4834,7 @@ da:
         course_status_published: "Kurset er offentliggjort"
         course_status_unpublished: "Kursets offentliggørelse er annulleret"
         course_visibility: Synlighed
+        custom_course_visibility: Tilpas
         enrollment_term_id: Semester
         grading_scheme: Bedømmelsessystem
         grading_standard_enabled: "Aktivér kursets bedømmelsessystem"
@@ -5172,8 +5188,10 @@ da:
     this_is_permanent: "Karakterkurven kan ikke fortrydes. Karakteroversigter med kurver er tilgængelige, med kurvehandlingen kan ikke annulleres."
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Tilpasset CSS og Javascript kan eventuelt forårsage tilgængelighedsproblemer med fremtidige Canvas-opdateringer!"
   custom_fields_fc3e55af: "Brugerdefinerede felter"
+  custom_link_details_35fd38fc: "Brugertilpassede link-detaljer"
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Brugertilpassede links for inkludering i hjælp-dialog pop-up vinduet"
   customize_help_link_62cd05eb: "Brugertilpasset hjælp link"
+  customize_this_menu_efa72a9: "Tilpas denne menu"
   cutoff_score_74254c89: skæringsscore
   cyan_c1d5f68a: Cyan
   d2l_display: Desire2Learn
@@ -5539,6 +5557,7 @@ da:
     atom_no_author: "Ingen forfatter"
     default_user_name: Brugernavn
   discussion_group_category_locked: "Gruppekategorier kan ikke indstilles direkte på en diskussionsopgave, men skal indstilles på diskussionen i stedet"
+  discussion_submission_781d5d33: "Indsendelse af diskussion"
   discussion_topic: 
     atom_no_author: "Ingen forfatter"
     default_title: "Ingen overskrift"
@@ -5878,6 +5897,7 @@ da:
   drop_image_62a2a071: "Slip billede"
   dropdown_option_1_e6ff2fc: "Rullemenu indstilling 1"
   dropdown_option_2_9766a346: "Rullemenu indstilling 2"
+  dropped_for_grading_purposes_46256461: "Skal ikke bedømmes"
   due_a73610f6: forfalden
   due_assignment_due_date_time_5acdf3cf: "Forfalden: %{assignment_due_date_time}"
   due_assignment_due_date_time_607f2e1d: "forfalden: %{assignment_due_date_time}"
@@ -5916,6 +5936,7 @@ da:
   duplicate_provider_provider_d9842134: "Duplikeret udbyder %{provider}"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "fx Doe, Jon"
+  e_g_http_university_edu_helpdesk_acab04d6: "f.eks., http://university.edu/helpdesk"
   e_g_jon_doe_77233e3b: "fx Jon Doe"
   e_mail_only_2cc5e513: "Kun e-mail"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Hver bar er en opgave. Grønt lag repræsentere procent af studerende, der har indsendt deres opgave \"til tiden\". Indsendelser der er \"for sent\" er gule og \"manglende\" indsendelser er røde."
@@ -5972,6 +5993,7 @@ da:
       criterion_long_description: "Kriterium lang beskrivelse"
       find_existing_rubric: "Find eksisterende Rubric"
   edit_survey_b0d6890d: "Rediger spørgeundersøgelse"
+  edit_text_27d8aa3d: "Rediger %{text}"
   edit_this_announcement_ae6e17b3: "Rediger denne Meddelelse"
   edit_this_collaboration_393b1a9a: "Rediger dette samarbejde"
   edit_this_question_1c82c3cf: "Rediger dette spørgsmål"
@@ -6616,6 +6638,7 @@ da:
     user_navigation_configured: "Brugernavigation konfigureret"
     wiki_page_menu_configured: "Wikiside menu konfigureret"
   external_url_e9b87215: "Ekstern URL"
+  extreme_critical_emergency_80b3dbda: "EKSTREM KRITISK NØDSTILFÆLDE!"
   failed_307449e1: "Mislykkedes:"
   failed_to_create_webhook_b766cf5c: "Det mislykkedes at oprette webhook."
   failed_to_create_zip_file_1a943d06: "Oprettelse af zip fil mislykkedes"
@@ -6890,6 +6913,7 @@ da:
   goto_next_page_e8e1ae6f: "Gå til næste side"
   goto_page_page_num_bd656bd5: "Gå til side %{page_num}"
   goto_previous_page_85b2fa49: "Gå til forrige side"
+  gpa_scale_6710e2ee: "GPA scale"
   gpa_scale_a6d1cdea: "GPA Scale"
   grade_9c6f076d: Karakter
   grade_assignment_7c1abc11: "Karakter %{assignment}"
