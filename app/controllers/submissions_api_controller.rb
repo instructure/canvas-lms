@@ -752,6 +752,10 @@ class SubmissionsApiController < ApplicationController
   #   See documentation for the posted_grade argument in the
   #   {api:SubmissionsApiController#update Submissions Update} documentation
   #
+  # @argument grade_data[<student_id>][excuse] [Boolean]
+  #   See documentation for the excuse argument in the
+  #   {api:SubmissionsApiController#update Submissions Update} documentation
+  #
   # @argument grade_data[<student_id>][rubric_assessment] [RubricAssessment]
   #   See documentation for the rubric_assessment argument in the
   #   {api:SubmissionsApiController#update Submissions Update} documentation
