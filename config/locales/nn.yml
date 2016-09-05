@@ -7421,6 +7421,7 @@ nn:
   hidden_available_with_a_link_65ef2bda: "Skjult. Tilgjengeleg gjennom lenke"
   hidden_available_with_a_link_click_to_modify_184990e7: "Skjult. Tilgjengeleg gjennom lenke – klikk for å endre"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Filer skjult inni, men er tilgjengelege gjennom lenker."
+  hide_all_artifacts_d654fbd5: "Skjul alle artefaktar"
   hide_correct_answers_at_2421b0aa: "Skjul korrekte svar på"
   hide_correct_answers_at_b1a59408: "Skjul korrekte svar på"
   hide_courses_without_enrollments_6df4dfad: "Skjul kurs utan påmeldingar"
@@ -7442,14 +7443,18 @@ nn:
   host_8be927e0: Vert
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "Kan ikkje nå verten eller peikar ikkje på katalogen"
   hover_over_me_496521b9: "Flytt peikaren over meg"
+  how_is_this_affecting_you_b3b6a639: "Korleis verkar dette på deg?"
   how_many_minutes_ecca5ee7: "Kor mange minutt?"
   html_editor_fb2ab713: HTML-redigeringsprogram
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "Eg godtek *vilkår for bruk* og **retningslinjer for personvern**."
+  i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: "Eg får ikkje gjort noko før eg får svar frå deg"
   i_cb2f5130: i
   i_have_obtained_permission_to_use_this_file_6386f087: "Eg har løyve til å bruke denne fila."
   i_hold_the_copyright_71ee91b1: "Eg er rettshavar"
+  i_need_some_help_but_it_is_not_urgent_d967ea0a: "Eg treng hjelp, men det er ikkje akutt"
   ic_actions: 
     manage: administrer
+  icon_215a1dc6: Ikon
   icons: 
     discussion_submission: "Innsending av diskusjon"
     file_upload_submission: "Innsending av filopplasting"
@@ -7468,6 +7473,7 @@ nn:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Dersom ingen er markerte sender du til alle som tilhøyrer underkontoen)"
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "Om du endrar moglege poeng for ei oppgåve, vert eksisterande karakterar automatisk rekna ut på nytt. "
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Om du endrar moglege poeng for ei oppgåve, må du karaktersetje oppgåva på nytt."
+  if_you_change_an_assignment_s_points_possible_you__dba531cb: "Om du endrar moglege poeng for ei oppgåve, må du karaktersetje alle innleveringar på nytt."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Om du ikkje vel bruksrettar no, vert fila ikkje publisert etter at ho er lasta opp."
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "Om du aktiverer denne funksjonen, må du passe på at Salesforce-kontoen har dei eigendefinerte felta nøyaktig lagt til med namna i venstre kolonne i tabellen"
   if_you_keep_having_problems_click_the_link_link_be_a4d695eb: "Dersom du framleis har problem, kan du klikke på \"%{link}\" lenka nedanfor for å søke i brukardokumentasjonen eller du kan ta kontakt med oss for assistanse."
@@ -7539,6 +7545,7 @@ nn:
   in_progress_9d1ce8b9: "Er i gang"
   inactive_cd40317f: inaktiv
   inbox_bb245a60: Innboks
+  include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inkluderer ei lenke til ein hemmeleg skjermdump ved å bruke noko som liknar på *Jing*."
   include_deleted_enrollments_1c87684a: "Inkluder sletta påmeldingar"
   include_deleted_objects_3cced3b5: "Inkluder sletta objekt;"
   include_scores_when_alerting_about_grades_89728ae1: "Inkluder resultat når du varslar om karakterar."
@@ -7735,6 +7742,7 @@ nn:
     module_sequence_footer: 
       next: Neste
       previous: Førre
+  just_a_casual_question_comment_idea_or_suggestion_1579d069: "Berre eit vanleg spørsmål, ein kommentar, ein idé, eller eit forslag"
   just_in_time_provisioning_382a0354: "Siste lita-tilføring"
   k12_description: |-
       Funksjonar, innstillingar og stilar som gir meining i eit spesifikt K-12-miljø. Så langt handlar det
@@ -7800,6 +7808,7 @@ nn:
   let_students_see_the_correct_answers_dacc2faf: "La  studentane sjå dei korrekte svara"
   let_students_see_their_quiz_responses_fbc07d14: "La studentane sjå prøvesvara sine"
   letter_grade_29ff1938: Bokstavkarakter
+  letter_grade_f00fedc4: bokstavkarakter
   lib: 
     angel: 
       failed_import_link: "Import av lenke mislukkast"
@@ -7887,6 +7896,7 @@ nn:
   limit_search_to_activity_after_c1ac2449: "Avgrens søk til aktivitet etter"
   limit_search_to_activity_before_e05aad05: "Avgrens søk til aktivitet før"
   link_7262adec: Lenke
+  link_description_4355ca82: Lenkeskildring
   link_enrollment: 
     buttons: 
       link: "Lenke til student"
@@ -7901,12 +7911,14 @@ nn:
     titles: 
       link_to_student: "Lenke til student"
   link_has_been_removed_because_content_is_not_prese_fd55f11: "(Lenka er fjerna fordi innhaldet ikkje lenger er tilgjengeleg eller har feil oppløysing.)"
+  link_name_b76fdb38: Lenkenamn
   link_number_1_9f169e48: "Lenke nummer 1"
   link_number_2_61fcff2: "Lenke nummer 2"
   link_number_3_7118ff64: "Lenke nummer 3"
   link_selection_1486c5d0: Lenkeutval
   link_text_d2c702f9: Lenketekst
   link_title_d959a7b3: Lenketittel
+  link_url_a213671c: Lenke-URL
   link_url_cf96376: Lenke-URL
   linked_assignment_message: "kopla til oppgåve '%{title}'"
   linked_discussion_topic_message: "kopla til diskusjonsemne '%{title}'"
@@ -7927,6 +7939,8 @@ nn:
   loaded_more_collaborations_13f1d630: "Lasta fleire samarbeid"
   loading_25990131: "Lastar ...\""
   loading_bde52856: Lastar
+  loading_courses_bd1bffe: "Lastar kurs... "
+  loading_mastery_paths_c558a766: "Lastar meistringsstiar..."
   loading_more_results_def6df65: "Lastar fleire resultat ..."
   locales: 
     nn: "Norwegian (Nynorsk)"
@@ -8044,6 +8058,7 @@ nn:
   low_score_4eeb95b2: "Låg: %{score}"
   lower_bound_to_upper_bound_48d093c2: "%{lower_bound} til %{upper_bound}"
   lower_limit_of_range_6ddd4983: "Nedre grense i området"
+  lowerbound_to_upperbound_352a3c0b: "%{lowerBound}+ til %{upperBound}"
   lti: 
     lti_message: 
       load_tool_new_tab_button: "Last %{tool} i eit nytt vindauge"
@@ -8089,6 +8104,7 @@ nn:
   mark_done_9d81bcd9: Merkt
   marked_done_9fd646f: Merkt
   masquerade_as_name_8bb004c5: "Opptre som %{name}"
+  mastery_paths_breakdown_6e0b5fce: "Nedbryting av meistringsstiar"
   mastery_paths_cc4096c2: Meistringsstiar
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Resultatet reflekterer høgaste resultat i ei karaktersett oppgåve eller prøve."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Resultatet reflekterer den siste karaktersette oppgåva eller prøva."
@@ -8106,6 +8122,7 @@ nn:
   max_users_groups_per_appointment_867c505b: "Talet (maks)på brukarar/grupper per avtale"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Talet (maks) på avtalar ein deltakar kan delta i"
   media_comment_e494a952: Mediekommentar
+  media_comment_submission_14e224dc: "Innsending av mediekommentar"
   media_comments: 
     alerts: 
       kaltura_disabled: "Kaltura er deaktivert for denne Canvas-sida"
@@ -8144,6 +8161,7 @@ nn:
     uploading: "Lastar opp ...\""
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Media står i kø for konvertering, prøv på nytt seinare."
   media_recording_77cddc52: Medieinnspelingar
+  media_recording_submission_b7fd1491: "Innsending av medieopptak"
   media_recordings_749aef6d: Medieinnspelingar
   median_ed291842: Median
   median_score_4657e907: "Median: %{score}"
@@ -8162,6 +8180,7 @@ nn:
   message_896d2ed0: "%{message}"
   message_body_1f782712: Meldingsinnhald
   message_sent_9ff3a79d: "Meldinga er send"
+  message_sent_f4cba0c: "Meldinga er send."
   message_students: 
     message_student: "Send melding til studentar i %{course_name}"
     send_message: "Send melding"
@@ -8169,6 +8188,7 @@ nn:
     recipients: "Mottakarar:"
   message_students_who_369b8488: "Send melding til studentar som ..."
   message_this_student_6d14043d: "Send melding til denne studenten"
+  message_will_be_sent_to_all_the_teachers_and_teach_1b8d17c1: "Sender melding til alle faglærarane og undervisingsassistentane på kurset."
   messages: 
     account_suspended: 
       email: 
@@ -9848,6 +9868,7 @@ nn:
   move_module_item_77754119: "Flytt modul/element"
   move_outcome_ce497e6c: "Flytt resultat"
   move_outcome_group_cfa1a505: "Flytt læringsmålgruppe"
+  move_text_down_7176acd4: "Flytt %{text} ned"
   move_to_9b91c6e0: "Flytt til…"
   move_to_end_fef2fa15: "Flytt til slutten"
   move_to_front_7eae2e90: "FLytt til start"
