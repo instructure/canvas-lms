@@ -428,7 +428,9 @@ class ContextModuleProgression < ActiveRecord::Base
 
     # invalidate all, then re-evaluate each
     Shackles.activate(:master) do
-      progressions.each(&:mark_as_outdated!)
+      ContextModuleProgression.where(:id => progressions, :current => true).update_all(:current => false)
+      User.where(:id => progressions.map(&:user_id)).touch_all
+
       progressions.each do |progression|
         progression.send_later_if_production(:evaluate!, self)
       end
