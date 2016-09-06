@@ -4,7 +4,7 @@ define [
   'compiled/calendar/CalendarEventFilter'
 ], (CommonEvent, commonEventFactory, CalendarEventFilter) ->
 
-  test_events = ->
+  test_events = (can_edit, child_events_count) ->
     [
       commonEventFactory
         id: "1"
@@ -33,7 +33,7 @@ define [
         workflow_state: "active"
         type: "event"
         description: ""
-        child_events_count: 0
+        child_events_count: child_events_count
         effective_context_code: "course_1"
         context_code: "course_1"
         all_context_codes: "course_1,course_2"
@@ -45,7 +45,7 @@ define [
         child_events: []
         url: "http://example.org/api/v1/calendar_events/20"
       ,
-        [{asset_string: 'course_1', id: 1}]
+        [{asset_string: 'course_1', id: 1, can_create_calendar_events: can_edit}]
     ]
 
   module "CalendarEventFilter",
@@ -53,29 +53,41 @@ define [
     teardown: ->
 
   test 'CalendarEventFilter: hides appointment slots and grays nothing when schedulerState is not provided', ->
-    filteredEvents = CalendarEventFilter(null, test_events())
+    filteredEvents = CalendarEventFilter(null, test_events(false, 0))
     equal filteredEvents.length, 1
     equal filteredEvents[0].id, 'calendar_event_1'
     equal filteredEvents[0].className.indexOf('grayed'), -1
 
   test 'CalendarEventFilter: hides appointment slots and grays nothing when not in find-appointment mode', ->
-    filteredEvents = CalendarEventFilter(null, test_events(), {inFindAppointmentMode: false, selectedCourse: null})
+    filteredEvents = CalendarEventFilter(null, test_events(false, 0), {inFindAppointmentMode: false, selectedCourse: null})
     equal filteredEvents.length, 1
     equal filteredEvents[0].id, 'calendar_event_1'
     equal filteredEvents[0].className.indexOf('grayed'), -1
 
   test 'CalendarEventFilter: grays non-appointment events when in find-appointment mode', ->
-    filteredEvents = CalendarEventFilter(null, test_events(), {inFindAppointmentMode: true, selectedCourse: {id: 789, asset_string: 'course_789'}})
+    filteredEvents = CalendarEventFilter(null, test_events(false, 0), {inFindAppointmentMode: true, selectedCourse: {id: 789, asset_string: 'course_789'}})
     equal filteredEvents.length, 1
     equal filteredEvents[0].id, 'calendar_event_1'
     notEqual filteredEvents[0].className.indexOf('grayed'), -1
 
   test 'CalendarEventFilter: unhides appointment slots when in find-appointment mode and the course is selected', ->
-    filteredEvents = CalendarEventFilter(null, test_events(), {inFindAppointmentMode: true, selectedCourse: {id: 1, asset_string: 'course_1'}})
+    filteredEvents = CalendarEventFilter(null, test_events(false, 0), {inFindAppointmentMode: true, selectedCourse: {id: 1, asset_string: 'course_1'}})
     equal filteredEvents.length, 2
     equal filteredEvents[0].id, 'calendar_event_1'
     notEqual filteredEvents[0].className.indexOf('grayed'), -1
     equal filteredEvents[1].id, 'calendar_event_20'
     equal filteredEvents[1].className.indexOf('grayed'), -1
 
+  test 'CalendarEventFilter: grays appointment events for created appointments that are unreserved in appointmentMode', ->
+    filteredEvents = CalendarEventFilter(null, test_events(true, 0), {inFindAppointmentMode: false, selectedCourse: {id: 789, asset_string: 'course_789'}})
+    equal filteredEvents.length, 2
+    equal filteredEvents[0].id, 'calendar_event_1'
+    equal filteredEvents[0].className.indexOf('grayed'), -1
+    notEqual filteredEvents[1].className.indexOf('grayed'), -1
 
+  test 'CalendarEventFilter: does not gray appointment events for created appointments that are reserved without appointmentMode', ->
+    filteredEvents = CalendarEventFilter(null, test_events(true, 2), {selectedCourse: {id: 789, asset_string: 'course_789'}})
+    equal filteredEvents.length, 2
+    equal filteredEvents[0].id, 'calendar_event_1'
+    equal filteredEvents[0].className.indexOf('grayed'), -1
+    equal filteredEvents[1].className.indexOf('grayed'), -1

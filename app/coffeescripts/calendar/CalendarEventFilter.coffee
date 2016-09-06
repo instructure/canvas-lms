@@ -21,11 +21,15 @@ define [], () ->
             # If there is not a reserve_url set, then it is an
             # actual, scheduled event and not just a placeholder.
             keep = true
-          else if event.calendarEvent.child_events_count > 0 && !event.calendarEvent.reserved && event.can_edit
+          else if !event.calendarEvent.reserved && event.can_edit
             # If this *is* a placeholder, and it has child events, and it's not reserved by me,
             # that means people have signed up for it, so we want to display it if I am able to
             #  manage it (as a teacher or TA might)
-            keep = true
+            if schedulerState.hasOwnProperty 'inFindAppointmentMode'
+              keep = true
+              gray = event.calendarEvent.child_events_count == 0 || schedulerState.inFindAppointmentMode
+            else
+              keep = event.calendarEvent.child_events_count > 0
           else
             if schedulerState.inFindAppointmentMode && event.isOnCalendar(schedulerState.selectedCourse.asset_string)
               gray = false
@@ -51,4 +55,3 @@ define [], () ->
       eventIds[event.id] = true
 
     events
-
