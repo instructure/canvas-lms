@@ -117,13 +117,22 @@ module Api::V1::StreamItem
   def api_render_stream(opts)
     items = @current_user.shard.activate do
       scope = @current_user.visible_stream_item_instances(opts).preload(:stream_item)
-      scope = scope.eager_load(:stream_item).where("stream_items.asset_type=?", opts[:asset_type]) if opts.has_key?(:asset_type)
-      if opts.has_key?(:submission_user_id) || opts[:asset_type] == 'Submission'
-        scope = scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
-        # just because there are comments doesn't mean the user can see them.
-        # we still need to filter after the pagination :(
-        scope = scope.where("submissions.submission_comments_count>0")
-        scope = scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
+      if opts.has_key?(:asset_type)
+        is_cross_shard = @current_user.visible_stream_item_instances(opts).
+          where("stream_item_id > ?", Shard::IDS_PER_SHARD).exists?
+        if is_cross_shard
+          # the old join doesn't work for cross-shard stream items, so we basically have to pre-calculate everything
+          scope = scope.where(:stream_item_id => filtered_stream_item_ids(opts))
+        else
+          scope = scope.eager_load(:stream_item).where("stream_items.asset_type=?", opts[:asset_type])
+          if opts[:asset_type] == 'Submission'
+            scope = scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
+            # just because there are comments doesn't mean the user can see them.
+            # we still need to filter after the pagination :(
+            scope = scope.where("submissions.submission_comments_count>0")
+            scope = scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
+          end
+        end
       end
       Api.paginate(scope, self, self.send(opts[:paginate_url], @context), default_per_page: 21).to_a
     end
@@ -132,6 +141,24 @@ module Api::V1::StreamItem
     json = items.map { |i| stream_item_json(i, i.stream_item, @current_user, session) }
     json.select! {|hash| hash['submission_comments'].present?} if opts[:asset_type] == 'Submission'
     render :json => json
+  end
+
+  def filtered_stream_item_ids(opts)
+    all_stream_item_ids = @current_user.visible_stream_item_instances(opts).pluck(:stream_item_id)
+    filtered_ids = []
+
+    Shard.partition_by_shard(all_stream_item_ids) do |sliced_ids|
+      si_scope = StreamItem.where(:id => sliced_ids).where(:asset_type => opts[:asset_type])
+      if opts[:asset_type] == 'Submission'
+        si_scope = si_scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
+        # just because there are comments doesn't mean the user can see them.
+        # we still need to filter after the pagination :(
+        si_scope = si_scope.where("submissions.submission_comments_count>0")
+        si_scope = si_scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
+        filtered_ids += si_scope.pluck(:id).map{|id| Shard.relative_id_for(id, Shard.current, @current_user.shard)}
+      end
+    end
+    filtered_ids
   end
 
   def api_render_stream_summary(contexts = nil)
