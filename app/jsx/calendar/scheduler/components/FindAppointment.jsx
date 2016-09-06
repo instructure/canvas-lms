@@ -25,6 +25,7 @@ define([
     }
 
     handleSubmit () {
+      document.getElementById("FindAppointmentButton").focus()
       this.props.store.dispatch(Actions.actions.setCourse(this.state.selectedCourse))
       this.props.store.dispatch(Actions.actions.setFindAppointmentMode(!this.props.store.getState().inFindAppointmentMode))
       this.setState ({
@@ -51,6 +52,7 @@ define([
     }
 
     closeModal () {
+      document.getElementById("FindAppointmentButton").focus()
       this.setState({
         isModalOpen: false,
       })
@@ -62,9 +64,9 @@ define([
           <h2>{I18n.t('Appointments')}</h2>
           {
             this.props.store.getState().inFindAppointmentMode ?
-              <button onClick={this.endAppointmentMode} className="Button">{I18n.t('Close')}</button>
+              <button onClick={this.endAppointmentMode} id="FindAppointmentButton" className="Button">{I18n.t('Close')}</button>
               :
-              <button onClick={this.openModal} className="Button">{I18n.t('Find Appointment')}</button>
+              <button onClick={this.openModal} id="FindAppointmentButton" className="Button">{I18n.t('Find Appointment')}</button>
           }
           <Modal
             isOpen={this.state.isModalOpen}
