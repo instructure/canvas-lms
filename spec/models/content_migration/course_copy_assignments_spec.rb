@@ -142,13 +142,14 @@ describe ContentMigration do
       @assignment.allowed_extensions = ["doc", "xls"]
       @assignment.position = 2
       @assignment.muted = true
+      @assignment.omit_from_final_grade = true
 
       @assignment.save!
 
       attrs = [:turnitin_enabled, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
           :grade_group_students_individually, :allowed_extensions,
-          :position, :peer_review_count, :muted]
+          :position, :peer_review_count, :muted, :omit_from_final_grade]
 
       run_course_copy
 

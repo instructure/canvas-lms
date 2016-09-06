@@ -170,7 +170,7 @@ module Importers
       [:turnitin_enabled, :peer_reviews,
        :automatic_peer_reviews, :anonymous_peer_reviews,
        :grade_group_students_individually, :allowed_extensions,
-       :position, :peer_review_count, :muted, :moderated_grading
+       :position, :peer_review_count, :muted, :moderated_grading, :omit_from_final_grade
       ].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
