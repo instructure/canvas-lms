@@ -5,7 +5,6 @@ define [
   'compiled/views/DialogBaseView'
   'compiled/views/courses/roster/RosterDialogMixin'
   'jst/courses/roster/LinkToStudentsView'
-  'compiled/jquery.whenAll'
   'jquery.disableWhileLoading'
 ], (I18n, $, _, DialogBaseView, RosterDialogMixin, linkToStudentsViewTemplate) ->
 
