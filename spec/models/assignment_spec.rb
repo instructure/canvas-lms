@@ -1304,6 +1304,45 @@ describe Assignment do
       ids = @late_submissions.map{|s| s.user_id}
     end
 
+    context "intra group peer reviews" do
+      it "should not assign peer reviews to members of the same group when disabled" do
+        @submissions = []
+        gc = @course.group_categories.create! name: "Groupy McGroupface"
+        @a.update_attributes group_category_id: gc.id,
+                             grade_group_students_individually: false
+        users = create_users_in_course(@course, 8.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
+        ["group_1", "group_2"].each do |group_name|
+          group = gc.groups.create! name: group_name, context: @course
+          users.pop(4).each{|user| group.add_user(user)}
+        end
+
+        @a.submit_homework(gc.groups[0].users.first, :submission_type => "online_url", :url => "http://www.google.com")
+        @a.peer_review_count = 3
+
+        res = @a.assign_peer_reviews
+        expect(res.length).to be 0
+      end
+
+      it "should assign peer reviews to members of the same group when enabled" do
+        @submissions = []
+        gc = @course.group_categories.create! name: "Groupy McGroupface"
+        @a.update_attributes group_category_id: gc.id,
+                             grade_group_students_individually: false
+        users = create_users_in_course(@course, 8.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
+        ["group_1", "group_2"].each do |group_name|
+          group = gc.groups.create! name: group_name, context: @course
+          users.pop(4).each{|user| group.add_user(user)}
+        end
+
+        @a.submit_homework(gc.groups[0].users.first, :submission_type => "online_url", :url => "http://www.google.com")
+        @a.peer_review_count = 3
+        @a.intra_group_peer_reviews = true
+        res = @a.assign_peer_reviews
+        expect(res.length).to be 12
+        expect((res.map(&:user_id) - gc.groups[1].users.map(&:id)).length).to be res.length
+      end
+    end
+
     context "differentiated_assignments" do
       before :once do
         setup_differentiated_assignments

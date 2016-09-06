@@ -178,6 +178,9 @@ define [
       return @get('peer_reviews_assign_at') || null unless arguments.length > 0
       @set 'peer_reviews_assign_at', date
 
+    intraGroupPeerReviews: ->
+      @get('intra_group_peer_reviews')
+
     notifyOfUpdate: (notifyOfUpdateBoolean) =>
       return @get 'notify_of_update' unless arguments.length > 0
       @set 'notify_of_update', notifyOfUpdateBoolean

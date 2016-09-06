@@ -330,7 +330,13 @@ describe "assignments" do
           gc = GroupCategory.create(:name => "gc#{i}", :context => @course)
           group = @course.groups.create!(:group_category => gc)
           group.users << student_in_course(:course => @course, :active_all => true).user
-          ag.assignments.create! :context => @course, :name => "assignment#{i}", :group_category => gc, :submission_types => 'online_text_entry'
+          ag.assignments.create!(
+            context: @course,
+            name: "assignment#{i}",
+            group_category: gc,
+            submission_types: 'online_text_entry',
+            peer_reviews: "1",
+            automatic_peer_reviews: true)
         end
         submission = @assignment1.submit_homework(@student)
         submission.submission_type = "online_text_entry"
@@ -372,6 +378,15 @@ describe "assignments" do
         wait_for_ajaximations
 
         expect(f("#assignment_group_category_id option[selected]")).to include_text "New Group Category"
+      end
+
+      it "should show and hide the intra-group peer review toggle depending on group setting" do
+        get "/courses/#{@course.id}/assignments/#{@assignment2.id}/edit"
+        wait_for_ajaximations
+
+        expect(f("#intra_group_peer_reviews")).to be_displayed
+        f("#has_group_category").click
+        expect(f("#intra_group_peer_reviews")).not_to be_displayed
       end
     end
 

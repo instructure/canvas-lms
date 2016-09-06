@@ -31,6 +31,28 @@ describe "assignments" do
       end
     end
 
+    it "displays the intra-group review toggle for group assignments" do
+      course_with_teacher_logged_in
+      student = student_in_course.user
+
+      gc = GroupCategory.create(:name => "Inconceivable", :context => @course)
+      @course.groups.create!(:group_category => gc)
+      @assignment = assignment_model({
+        course: @course,
+        peer_reviews: true,
+        automatic_peer_reviews: true,
+        group_category_id: gc.id
+      })
+
+      submission = @assignment.submit_homework(student)
+      submission.submission_type = "online_text_entry"
+      submission.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+
+      expect(f('#intra_group_peer_reviews')).to be_displayed
+    end
+
     it "allows an account admin who is also a student to submit a peer review", priority: "2", test_id: 216383 do
       course(active_course: true)
       admin_logged_in(account: @course.root_account)

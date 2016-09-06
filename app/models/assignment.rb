@@ -43,7 +43,7 @@ class Assignment < ActiveRecord::Base
     :turnitin_settings, :context, :position, :allowed_extensions,
     :external_tool_tag_attributes, :freeze_on_copy,
     :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading,
-    :omit_from_final_grade
+    :omit_from_final_grade, :intra_group_peer_reviews
 
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
@@ -1623,59 +1623,27 @@ class Assignment < ActiveRecord::Base
   def assign_peer_reviews
     return [] unless self.peer_review_count && self.peer_review_count > 0
 
-    submissions = self.submissions.having_submission.include_assessment_requests
-    student_ids = students_with_visibility(context.students.not_fake_student).pluck(:id)
-
-    submissions = submissions.select{|s| student_ids.include?(s.user_id) }
-    submission_ids = Set.new(submissions) { |s| s.id }
-
     # there could be any conceivable configuration of peer reviews already
     # assigned when this method is called, since teachers can assign individual
     # reviews manually and change peer_review_count at any time. so we can't
     # make many assumptions. that's where most of the complexity here comes
     # from.
-
-    # we track existing assessment requests, and the ones we create here, so
-    # that we don't have to constantly re-query the db.
-    assessor_id_map = {}
-    submissions.each do |s|
-      assessor_id_map[s.id] = s.assessment_requests.map(&:assessor_asset_id)
-    end
+    peer_review_params = current_submissions_and_assessors
     res = []
 
     # for each submission that needs to do more assessments...
     # we sort the submissions randomly so that if there aren't enough
     # submissions still needing reviews, it's random who gets the duplicate
     # reviews.
-    submissions.sort_by { rand }.each do |submission|
+    peer_review_params[:submissions].sort_by { rand }.each do |submission|
       existing = submission.assigned_assessments
       needed = self.peer_review_count - existing.size
       next if needed <= 0
 
       # candidate_set is all submissions for the assignment that this
       # submission isn't already assigned to review.
-      candidate_set = submission_ids - existing.map { |a| a.asset_id }
-      candidate_set.delete(submission.id) # don't assign to ourselves
-
-      candidates = submissions.select { |c|
-        candidate_set.include?(c.id)
-      }.sort_by { |c|
-        [
-          # prefer those who need reviews done
-          assessor_id_map[c.id].count < self.peer_review_count ? CanvasSort::First : CanvasSort::Last,
-          # then prefer those who are not reviewing this submission
-          assessor_id_map[submission.id].include?(c.id) ? CanvasSort::Last : CanvasSort::First,
-          # then prefer those who need the most reviews done (that way we don't run the risk of
-          # getting stuck with a submission needing more reviews than there are available reviewers left)
-          assessor_id_map[c.id].count,
-          # then prefer those who are assigned fewer reviews at this point --
-          # this helps avoid loops where everybody is reviewing those who are
-          # reviewing them, leaving the final assignee out in the cold.
-          c.assigned_assessments.size,
-          # random sort, all else being equal.
-          rand,
-        ]
-      }
+      candidate_set = current_candidate_set(peer_review_params, submission, existing)
+      candidates = sorted_review_candidates(peer_review_params, submission, candidate_set)
 
       # pick the number needed
       assessees = candidates[0, needed]
@@ -1683,11 +1651,10 @@ class Assignment < ActiveRecord::Base
       # if there aren't enough candidates, we'll just not assign as many as
       # peer_review_count would allow. this'll only happen if peer_review_count
       # >= the number of submissions.
-
       assessees.each do |to_assess|
         # make the assignment
         res << to_assess.assign_assessor(submission)
-        assessor_id_map[to_assess.id] << submission.id
+        peer_review_params[:assessor_id_map][to_assess.id] << submission.id
       end
     end
 
@@ -1696,7 +1663,55 @@ class Assignment < ActiveRecord::Base
       self.peer_reviews_assigned = true
     end
     self.save
-    return res
+    res
+  end
+
+  def current_submissions_and_assessors
+    # we track existing assessment requests, and the ones we create here, so
+    # that we don't have to constantly re-query the db.
+    student_ids = students_with_visibility(context.students.not_fake_student).pluck(:id)
+    submissions = self.submissions.having_submission.include_assessment_requests.for_user(student_ids)
+    { student_ids: student_ids,
+      submissions: submissions,
+      submission_ids: Set.new(submissions.pluck(:id)),
+      assessor_id_map: Hash[submissions.map{|s| [s.id, s.assessment_requests.map(&:assessor_asset_id)] }] }
+  end
+
+  def sorted_review_candidates(peer_review_params, current_submission, candidate_set)
+    assessor_id_map = peer_review_params[:assessor_id_map]
+    candidates_for_review = peer_review_params[:submissions].select do |c|
+      candidate_set.include?(c.id)
+    end
+    candidates_for_review.sort_by do |c|
+      [
+        # prefer those who need reviews done
+        assessor_id_map[c.id].count < self.peer_review_count ? CanvasSort::First : CanvasSort::Last,
+        # then prefer those who are not reviewing this submission
+        assessor_id_map[current_submission.id].include?(c.id) ? CanvasSort::Last : CanvasSort::First,
+        # then prefer those who need the most reviews done (that way we don't run the risk of
+        # getting stuck with a submission needing more reviews than there are available reviewers left)
+        assessor_id_map[c.id].count,
+        # then prefer those who are assigned fewer reviews at this point --
+        # this helps avoid loops where everybody is reviewing those who are
+        # reviewing them, leaving the final assignee out in the cold.
+        c.assigned_assessments.size,
+        # random sort, all else being equal.
+        rand,
+      ]
+    end
+  end
+
+  def current_candidate_set(peer_review_params, current_submission, existing)
+    candidate_set = peer_review_params[:submission_ids] - existing.map(&:asset_id)
+    if self.group_category_id && !self.intra_group_peer_reviews
+      # don't assign to our group partners
+      group_ids = peer_review_params[:submissions].select{|s| candidate_set.include?(s.id) && current_submission.group_id == s.group_id}.map(&:id)
+      candidate_set -= group_ids
+    else
+      # don't assign to ourselves
+      candidate_set.delete(current_submission.id) # don't assign to ourselves
+    end
+    candidate_set
   end
 
   # TODO: on a future deploy, rename the column peer_reviews_due_at
