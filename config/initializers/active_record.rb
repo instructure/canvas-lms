@@ -822,7 +822,7 @@ ActiveRecord::Relation.class_eval do
     self.activate do |relation|
       relation.transaction do
         ids_to_touch = relation.not_recently_touched.lock(:no_key_update).order(:id).pluck(:id)
-        unscoped.where(id: ids_to_touch).update_all(updated_at: Time.now.utc)
+        unscoped.where(id: ids_to_touch).update_all(updated_at: Time.now.utc) if ids_to_touch.any?
       end
     end
   end
