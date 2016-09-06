@@ -215,7 +215,6 @@ class ActiveRecord::Base
         shard.activate do
           User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
         end if shard != Shard.current
-        User.invalidate_cache(self.user_id)
       end
     end
     true

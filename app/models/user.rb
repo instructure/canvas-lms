@@ -706,16 +706,6 @@ class User < ActiveRecord::Base
     surname ? "#{surname}, #{given}".strip : given
   end
 
-  def self.user_lookup_cache_key(id)
-    ['_user_lookup2', id].cache_key
-  end
-
-  def self.invalidate_cache(id)
-    Rails.cache.delete(user_lookup_cache_key(id)) if id
-  rescue
-    nil
-  end
-
   def infer_defaults
     self.name = nil if self.name == "User"
     self.name ||= self.email || t('#user.default_user_name', "User")
@@ -732,7 +722,6 @@ class User < ActiveRecord::Base
     self.reminder_time_for_due_dates ||= 48.hours.to_i
     self.reminder_time_for_grading ||= 0
     self.initial_enrollment_type = nil unless ['student', 'teacher', 'ta', 'observer'].include?(initial_enrollment_type)
-    User.invalidate_cache(self.id) if self.id
     true
   end
 
@@ -772,14 +761,6 @@ class User < ActiveRecord::Base
 
   def email_cached?
     Rails.cache.exist?(['user_email', self].cache_key)
-  end
-
-  def self.cached_name(id)
-    key = user_lookup_cache_key(id)
-    user = Rails.cache.fetch(key) do
-      User.where(id: id).first
-    end
-    user && user.name
   end
 
   def gmail_channel
