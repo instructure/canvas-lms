@@ -270,7 +270,7 @@ class Account < ActiveRecord::Base
     if root_account?
       global_includes?
     else
-      root_account.try(:sub_account_includes?)
+      root_account.try(:sub_account_includes?) && root_account.try(:allow_global_includes?)
     end
   end
 

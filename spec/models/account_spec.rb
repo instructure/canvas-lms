@@ -351,6 +351,37 @@ describe Account do
     end
   end
 
+  context "allow_global_includes?" do
+    let(:root){ Account.default }
+    it "false unless they've checked the box to allow it" do
+      expect(root.allow_global_includes?).to be_falsey
+    end
+
+    it "true if they've checked the box to allow it" do
+      root.settings = {'global_includes' => true}
+      expect(root.allow_global_includes?).to be_truthy
+    end
+
+    describe "subaccount" do
+      let(:sub_account){ root.sub_accounts.create! }
+
+      it "false if root account hasn't checked global_includes AND subaccount branding" do
+        expect(sub_account.allow_global_includes?).to be_falsey
+
+        sub_account.root_account.settings = {'global_includes' => true, 'sub_account_includes' => false}
+        expect(sub_account.allow_global_includes?).to be_falsey
+
+        sub_account.root_account.settings = {'global_includes' => false, 'sub_account_includes' => true}
+        expect(sub_account.allow_global_includes?).to be_falsey
+      end
+
+      it "true if root account HAS checked global_includes and turned on subaccount branding" do
+        sub_account.root_account.settings = {'global_includes' => true, 'sub_account_includes' => true}
+        expect(sub_account.allow_global_includes?).to be_truthy
+      end
+    end
+  end
+
   context "turnitin secret" do
     it "should decrypt the turnitin secret to the original value" do
       a = Account.new
