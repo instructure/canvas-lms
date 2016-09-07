@@ -122,12 +122,17 @@ class AssignmentOverride < ActiveRecord::Base
   scope :active, -> { where(:workflow_state => 'active') }
 
   scope :visible_students_only, -> (visible_ids) do
-    select("assignment_overrides.*").
-    joins(:assignment_override_students).
-    where(
+    scope = select("assignment_overrides.*").
+      joins(:assignment_override_students).
+      distinct
+
+    if CANVAS_RAILS4_0 && ActiveRecord::Relation === visible_ids
+      return scope.where("assignment_override_students.user_id IN (#{visible_ids.except(:select).select("users.id").to_sql})")
+    end
+
+    scope.where(
       assignment_override_students: { user_id: visible_ids },
-    ).
-    distinct
+    )
   end
 
   before_validation :default_values
@@ -193,9 +198,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def visible_student_overrides(visible_student_ids)
-    assignment_override_students.any? do |aos|
-      visible_student_ids.include?(aos.user_id)
-    end
+    assignment_override_students.where(user_id: visible_student_ids).exists?
   end
 
   def self.visible_users_for(overrides, user=nil)
