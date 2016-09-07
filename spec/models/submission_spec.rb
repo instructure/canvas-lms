@@ -553,6 +553,19 @@ describe Submission do
           Turnitin::OutcomeResponseProcessor.stubs(:new).returns(outcome_response_processor_mock)
           submission.retrieve_lti_tii_score
         end
+
+        it 'resubmits errored tii attachments even if turnitin_data has non-hash values' do
+          a = @course.assignments.create!(title: "test",
+                                          submission_types: 'external_tool',
+                                          external_tool_tag_attributes: {url: tool.url})
+          submission.assignment = a
+          submission.turnitin_data = lti_tii_data.merge(last_processed_attempt: 1)
+          submission.user = @user
+          outcome_response_processor_mock = mock('outcome_response_processor')
+          outcome_response_processor_mock.expects(:resubmit).with(submission, "attachment_42")
+          Turnitin::OutcomeResponseProcessor.stubs(:new).returns(outcome_response_processor_mock)
+          submission.retrieve_lti_tii_score
+        end
       end
     end
 

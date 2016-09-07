@@ -17,7 +17,7 @@ module SupportHelpers
 
         notify "Success", "#{fixer_name} fixed #{prettify_broken_count} in #{Time.now.to_i - @start_time} seconds!"
       rescue => error
-        notify "Error", "#{fixer_name} failed because #{error.try(:message)}"
+        notify "Error", "#{fixer_name} failed because #{error.try(:message)}<br/><br/>#{error.try(:backtrace).try(:join, "<br/>")}"
         raise error
       end
 

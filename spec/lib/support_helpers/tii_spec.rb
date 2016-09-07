@@ -33,13 +33,7 @@ describe SupportHelpers::Tii do
 
       it 'emails the caller upon error' do
         fixer = SupportHelpers::Tii::Fixer.new('email')
-        Message.expects(:new).with(
-          to: 'email',
-          from: 'tii_script@instructure.com',
-          subject: 'TurnItIn Fixer Error',
-          body: "#{fixer.fixer_name} failed because SupportHelpers::Tii::Fixer must implement #fix",
-          delay_for: 0
-        )
+        Message.expects(:new)
         Mailer.expects(:create_message)
         begin
           fixer.monitor_and_fix
