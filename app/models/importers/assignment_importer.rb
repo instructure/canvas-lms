@@ -177,6 +177,7 @@ module Importers
 
       if item.turnitin_enabled
         settings = JSON.parse(hash[:turnitin_settings]).with_indifferent_access
+        settings[:created] = false if settings[:created]
         item.turnitin_settings = settings
       end
 
