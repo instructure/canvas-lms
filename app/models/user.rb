@@ -1444,7 +1444,8 @@ class User < ActiveRecord::Base
       end
       opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit))
 
-      Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids, opts].cache_key, :expires_in => expires_in) do
+      course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
+      Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids_cache_key, opts].cache_key, :expires_in => expires_in) do
         result = Shackles.activate(:slave) do
           Shard.partition_by_shard(course_ids) do |shard_course_ids|
             scope = Assignment.for_course(shard_course_ids).not_ignored_by(self, purpose)
