@@ -4247,6 +4247,7 @@ nb:
     batch_update_message: 
       one: "1 kurs prosessert"
       other: "%{count} kurs prosessert"
+    course: Kurs
     course_format: 
       blended: Blandet
       not_set: "Ikke satt"
@@ -4289,7 +4290,9 @@ nb:
       unpublishable_with_message: "Kan ikke publiseres: %{message}"
       unpublished: "Ikke publisert"
       unpublished_with_message: "Ikke publisert: %{message}"
+    institution: Institusjon
     missing_name: "Kurs uten navn"
+    public: Offentlig
     student_summary: 
       not_sorted: "Studentenes sammendragstabell"
     student_view_student_name: "Test Student"
