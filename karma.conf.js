@@ -80,6 +80,10 @@ var karmaConfig = {
 
   files: karmaFiles,
 
+  preprocessors: {
+    '**/*.js': ['sourcemap']
+  },
+
   proxies: {
     "/dist/brandable_css/": "/base/public/dist/brandable_css/"
   },
