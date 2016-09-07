@@ -14767,11 +14767,13 @@ nn:
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Spørsmålet viser ei avmerkingsboks ved sidan av kvart svar."
   this_quiz_has_been_excused_d89d2b74: "Prøva er fritatt"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Prøva er ikkje publisert* Prøva er synleg berre for faglærarar før ho er publisert."
+  this_quiz_needs_review_50e014e: "Denne prøva må vurderast"
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Opptakaren bruker Flash. Det kan vere enklare å gjennomføre opptaket på din lokale maskin, og så laste det opp via fana for mediaopplasting. "
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "Rapporten viser alle kursa for eit bestemt semester. Den endelege CSV-fila inneheld ei rad per kurs og viser kurs-ID-en, kurs-SIS-ID-en, kurset sitt kortnamn, kursnamnet, konto-ID, konto-SIS-ID, kontonamn, lagringskapasitet brukt i MB og summen av alle filene i MB. Lagringskapasitet brukt måler total filstorleik mot kurskvoten. Summen av alle filer i kurset tar ikkje omsyn til kurskvoten."
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "Rapporten viser alle kursa for eit bestemt semester. Den endelege CSV-fila inneheld ei rad per kurs og viser kurs-ID-en, kurs-SIS-ID-en, kurset sitt kortnamn, kursnamnet, konto-ID, konto-SIS-ID, kontonamn og lagringskapasitet brukt i MB."
   this_report_shows_grading_period_grades_and_overal_a86346a: "Rapporten viser alle karaktersetjingsperiodane (og alle karakterar) for kvar student som er påmeldt i eit bestemt semester. Den endelege csv-fila inneheld ei rad per brukarpåmelding."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Eksempelsida inneheld vanlege UI-element i Canvas, som kan hjelpe deg med å bygge di eiga merkevare. Når du gjer endringar i fargeverdiar og bilde i venstre sidestolpe, ser du knappen *Førehandsvis endringane*. Klikk på knappen for å oppdatere sida og sjå på endringane."
+  this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "Denne studenten har fått ein uvanleg høg karakter."
   this_student_wrote_f1a3f22d: "Studenten skriv:"
   this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Innleveringa er allereie karaktersett og er klar for moderering."
   this_topic_is_closed_for_comments_3dd10c00: "Dette emnet er stengt for kommentarar."
@@ -15131,6 +15133,7 @@ nn:
   up_c553575d: Opp
   update_4d8ee62: Oppdatering
   update_details_6abfed16: "Oppdater detaljar"
+  update_link_b7cab181: "Oppdater lenke"
   update_tool_7d48ef2a: "Oppdater %{tool}"
   updated_group_group_name_727b1d98: "Oppdatert gruppe %{group_name}"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Oppdatert brukargrensesnitt som søker etter og viser brukarar og kurs i ein konto."
@@ -15191,6 +15194,7 @@ nn:
   user_id_bcace870: Brukar-ID
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "Brukar-ID eller SIS-IS (SIS-ID må ha forstavinga sis_user_id:)"
   user_id_user_id_69a9e865: "Brukar-ID: %{user_id}"
+  user_is_now_group_leader_60ec9b98: "%{user} er no gruppeleiar"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} aksepterte nett no invitasjonen til å ta del i kurset %{course}. Kursrolle: %{role_type}"
   user_just_updated_title_88074ab2: "%{user} nettopp oppdatert %{title}"
   user_lists: 
