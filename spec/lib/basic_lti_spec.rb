@@ -42,6 +42,31 @@ describe BasicLTI do
     expect {lti.convert_blti_xml(xml)}.to raise_error
   end
 
+  it "xml converter should raise an error when given html" do
+    xml = <<-XML
+      <!DOCTYPE html>
+      <html>
+      <head></head>
+      <body><h1>This is html!</h1></body>
+      </html>
+    XML
+    lti = CC::Importer::BLTIConverter.new
+    expect {lti.convert_blti_xml(xml)}.to raise_error
+  end
+
+  it "xml converter should raise an error when given xml not using lti xmlns" do
+    xml = <<-XML
+      <?xml version="1.0" encoding="UTF-8"?>
+          <blti:description>Description</blti:description>
+          <blti:launch_url>http://example.com/other_url?unescapedampersands=1&arebadnews=2</blti:launch_url>
+          <cartridge_bundle identifierref="BLTI001_Bundle"/>
+          <cartridge_icon identifierref="BLTI001_Icon"/>
+      </cartridge_basiclti_link>
+    XML
+    lti = CC::Importer::BLTIConverter.new
+    expect {lti.convert_blti_xml(xml)}.to raise_error
+  end
+
   it "xml converter should use raise an error when unescaped ampersands are used in custom url properties" do
     xml = <<-XML
       <?xml version="1.0" encoding="UTF-8"?>
