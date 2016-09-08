@@ -145,7 +145,7 @@ ul.outcome-level {
     &.selected {
       a {
         background-color: $ic-bg-light-primary;
-        color: $ic-color-dark;
+        color: $ic-font-color-dark;
         position: relative;
         &::before {
           // adds blue border

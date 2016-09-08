@@ -26,7 +26,7 @@
   position: absolute;
   top: $ic-sp/2;
   right: $ic-sp/2;
-  padding: $ic-sp/4 0;  
+  padding: $ic-sp/4 0;
   border-radius: $ic-border-radius;
   background-color: rgba(0, 0, 0, 0.3);
 
@@ -89,7 +89,7 @@
   left: $ic-sp;
   right: $ic-sp;
   bottom: $ic-sp;
-  border: 4px dashed $ic-brand-primary; 
+  border: 4px dashed $ic-brand-primary;
 }
 
 .DraggingOverlay__Content {
@@ -99,7 +99,7 @@
 .DraggingOverlay__Icon {
   text-align: center;
   color: $ic-brand-primary;
-  @include overwrite-default-icon-size($ic-sp*8); 
+  @include overwrite-default-icon-size($ic-sp*8);
 }
 
 .DraggingOverlay__Instructions {

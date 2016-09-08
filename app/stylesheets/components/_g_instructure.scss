@@ -348,10 +348,9 @@ table.formtable td {
     font-weight: bold;
   }
   .unpublished .name a {
-    color: #888;
+    color: $ic-font-color--subdued;
   }
   .details {
-    color: #555;
     font-size: 0.8em;
     margin: 0 0 0 10px;
   }
@@ -362,7 +361,7 @@ table.formtable td {
     .links {
       color: #eee;
       a {
-        color: #767676;
+        color: $ic-font-color--subdued;
       }
     }
   }
@@ -377,9 +376,9 @@ table.formtable td {
   .course, .group, .account {
     .info {
       .links {
-        color: #ccc;
+        color: $ic-hint-text;
         a {
-          color: #444;
+          color: $ic-font-color-dark;
         }
       }
     }
@@ -387,7 +386,7 @@ table.formtable td {
 }
 
 span.hint {
-  color: #444;
+  color: $ic-font-color-dark;
   font-size: 0.8em;
 }
 
@@ -396,11 +395,11 @@ span.hint {
 }
 
 .error_message {
-  color: #ED002F;
+  color: $ic-color-danger;
 }
 
 .formError {
-  color: #ED002F;
+  color: $ic-color-danger;
   font-size: 0.8em;
   padding-left: 15px;
 }
@@ -420,12 +419,11 @@ span.hint {
   }
   .message {
     font-size: 1.5em;
-    color: #000;
   }
 }
 
 .loading_image {
-  background-color: #fff;
+  background-color: $ic-color-light;
 }
 
 // the body part here is to make this selector more specific than the atr-*** ones in g_util_fancy_links.scss so this overrides
@@ -502,7 +500,6 @@ $wizard-highlight-color: $ic-brand-primary;
   }
 }
 
-
 @keyframes icon-slide-up {
   from {
     transform: translate3d(0, 48px, 0);
@@ -511,7 +508,6 @@ $wizard-highlight-color: $ic-brand-primary;
     transform: translate3d(0, 0, 0);
   }
 }
-
 
 #wizard_box {
   border-bottom: 1px solid #aaa;
@@ -589,7 +585,7 @@ $wizard-highlight-color: $ic-brand-primary;
         &.selected {
           @if $use_high_contrast {
             a {
-              color: $ic-color-dark;
+              color: $ic-font-color-dark;
               text-decoration: none;
             }
           }

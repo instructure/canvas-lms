@@ -175,7 +175,7 @@ $dashboardIconSize: 28px;
   line-height: $dashboardIconSize;
   &:before {
     @if $use_high_contrast {
-      color: $ic-color-dark;
+      color: $ic-font-color-dark;
     }
     @else {
       color: darken($ic-color-light, 30%);

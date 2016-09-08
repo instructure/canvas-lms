@@ -16,7 +16,7 @@ body {
   line-height: $ic-line-height;
   @include fontSize($ic-font-size);
   font-family: $ic-font-family;
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
 }
 
 p {

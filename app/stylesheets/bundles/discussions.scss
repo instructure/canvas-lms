@@ -236,7 +236,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-reply-action, .discussion-rate-action {
 
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
   text-decoration: none;
 
   &:hover, &:focus {
@@ -258,7 +258,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-rating {
   @if $use_high_contrast { color: #666; }
-  @else {color: $ic-color-dark;}
+  @else {color: $ic-font-color-dark;}
 }
 
 .entry, .discussion_entry {
@@ -499,10 +499,10 @@ $discussion-dark-text: $ic-color-dark;
   cursor: text;
   border: 1px solid #d4d5d7;
   margin: 15px 0;
-  @if $use_high_contrast { color: $ic-color-dark; }
+
+  @if $use_high_contrast { color: $ic-font-color-dark; }
   transition: border-color 0.2s;
   padding: $ic-sp/2 $ic-sp;
-
   &:hover, &:focus {
     color: #444;
     text-decoration: none;

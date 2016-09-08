@@ -84,7 +84,7 @@ input[type="color"],
   margin-bottom: $baseLineHeight / 2;
   @include fontSize($baseFontSize);
   line-height: $baseLineHeight;
-  color: $gray;
+  color: $ic-font-color-dark;
   @include border-radius($inputBorderRadius);
   vertical-align: middle;
 }

@@ -19,6 +19,7 @@
 <div class="content-box">
   <div class="grid-row">
     <div class="col-xs-7">
+      <p style="margin-top: 0;">Set Canvas' default text color using the <b>Main Text Color</b> field in Theme Editor. Check this text after you change it to see your edits.</p>
       <div class="ic-Form-group">
         <div class="ic-Form-control">
           <label for="theme-preview-input-1" class="ic-Label"><%= t('Text input') %></label>
@@ -111,6 +112,98 @@
     </div>
   </div>
 </div>
+<ul class="ig-list" id="cond_group_1">
+  <li>
+    <div class="ig-row">
+      <div class="ig-row__layout">
+        <div class="ig-type-icon" aria-hidden="true">
+          <i class="icon-assignment"></i>
+        </div>
+        <div class="ig-info">
+          <a href="#" class="ig-title">
+            <%= t('An Assignment Name') %>
+          </a>
+          <div class="ig-details">
+            <div class="ig-details__item"><b>Due</b> Nov 4</div>
+            <div class="ig-details__item"><b>Available</b> Nov 1</div>
+            <div class="ig-details__item">10 pts</div>
+          </div>
+        </div>
+        <div class="ig-admin">
+          <span
+            class="publish-icon publish-icon-publish"
+            data-tooltip=""
+            title="Publish"
+            role="button"
+            tabindex="0">
+            <i class="icon-unpublish"></i>
+            <span class="publish-text" tabindex="-1">
+              &nbsp;<%= t('Publish') %>
+            </span>
+            <span class="screenreader-only accessible_label">
+              <%= t('Unpublished. Click to publish.') %>
+            </span>
+          </span>
+          <div class="inline-block">
+            <a class="al-trigger al-trigger-gray" href="#" role="button">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+              <span class="screenreader-only"><%= t('Manage') %></span>
+            </a>
+            <ul class="al-options">
+              <li><a href="#"><%= t('Edit') %></a></li>
+              <li><a href="#"><%= t('Delete') %></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </li>
+  <li>
+    <div class="ig-row ig-published">
+      <div class="ig-row__layout">
+        <div class="ig-type-icon" aria-hidden="true">
+          <i class="icon-assignment"></i>
+        </div>
+        <div class="ig-info">
+          <a href="#" class="ig-title">
+            <%= t('Another Assignment Name') %>
+          </a>
+          <div class="ig-details">
+            <div class="ig-details__item"><b>Due</b> June 20</div>
+            <div class="ig-details__item"><b>Available</b> May 1</div>
+            <div class="ig-details__item">100 pts</div>
+          </div>
+        </div>
+        <div class="ig-admin">
+          <span
+            class="publish-icon publish-icon-publish"
+            data-tooltip=""
+            title="Publish"
+            role="button"
+            tabindex="0">
+              <i class="icon-unpublish"></i>
+              <span class="publish-text" tabindex="-1">
+                &nbsp;<%= t('Publish') %>
+              </span>
+              <span class="screenreader-only accessible_label">
+                <%= t('Unpublished. Click to publish.') %>
+              </span>
+            </span>
+          <div class="inline-block">
+            <a class="al-trigger al-trigger-gray" href="#" role="button">
+              <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+              <span class="screenreader-only"><%= t('Manage') %></span>
+            </a>
+            <ul class="al-options">
+              <li><a href="#"><%= t('Edit') %></a></li>
+              <li><a href="#"><%= t('Delete') %></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </li>
+</ul>
 <div class="content-box">
   <div class="ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--theme-preview">
     <button type="button" aria-hidden="true" class="Button Button--link Button--small ic-app-course-nav-toggle">

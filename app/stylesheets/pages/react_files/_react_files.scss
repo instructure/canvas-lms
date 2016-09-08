@@ -227,7 +227,7 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
 
 .ef-big-icon {
   width: $ef-thumbnail-size !important;
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
   &:before {
     font-size: $ef-thumbnail-size - 7px !important;
   }

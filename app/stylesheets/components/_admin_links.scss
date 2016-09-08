@@ -120,7 +120,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
   .ui-menu-item {
     a {
       background-color: transparent;
-      color: $ic-color-dark;
+      color: $ic-font-color-dark;
       white-space: nowrap;
       min-width: 180px;
       padding: $ic-sp/2 $ic-sp;
@@ -167,7 +167,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
 
 .al-trigger-gray {
   color: $ic-font-color--subdued;
-  &:hover, &:focus { color: $ic-color-dark; }
+  &:hover, &:focus { color: $ic-font-color-dark; }
 }
 
 .admin-link-hover-area:hover .al-trigger,

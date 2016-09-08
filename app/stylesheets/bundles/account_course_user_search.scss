@@ -20,7 +20,7 @@
 }
 
 [role=columnheader] a{
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
 }
 
 .padding-none {
@@ -55,7 +55,7 @@
       a:visited,
       a:hover {
         text-decoration: none;
-        color: $ic-color-dark;
+        color: $ic-font-color-dark;
       }
     }
   }

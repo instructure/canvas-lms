@@ -430,7 +430,7 @@ $icon-size: 1.4rem;
         color: lighten($ic-color-dark, 25%);
       }
       &:hover, &:focus {
-        color: $ic-color-dark;
+        color: $ic-font-color-dark;
       }
     }
   }
@@ -665,7 +665,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 }
 
 .ui-selectmenu-item-header {
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
 
   .not_submitted & {
     @if $use_high_contrast {
@@ -790,7 +790,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     background: url("/images/arrow_left.png") no-repeat center left;
     overflow: hidden;
     white-space: nowrap;
-    color: $ic-color-dark;
+    color: $ic-font-color-dark;
     font-weight: bold;
     @include fontSize(12px);
   }
@@ -814,7 +814,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
       a {
         line-height: 24px;
-        color: $ic-color-dark;
+        color: $ic-font-color-dark;
         &.selected {
           font-weight: bold;
         }

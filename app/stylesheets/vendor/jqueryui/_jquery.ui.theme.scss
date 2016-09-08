@@ -15,12 +15,10 @@
 ----------------------------------*/
 .ui-widget { @include fontSize($fsDefault); }
 .ui-widget .ui-widget { font-size: 1em; }
-//.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-size: 1em; }
 .ui-widget-content { border: 1px solid $borderColorContent;
-  background: $bgColorContent; //I had this disabled, why?
+  background: $bgColorContent;
   color: $fcContent;
 }
-//.ui-widget-content a { color: $fcContent; }
 .ui-widget-header { @include ui-widget-header-bg-and-text; }
 .ui-widget-header a { color: $fcHeader }
 

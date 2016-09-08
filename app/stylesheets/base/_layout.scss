@@ -3,8 +3,8 @@
 $body-bg-color:                     $ic-color-light;
 $embedded-bg:                       $ic-color-light;
 $layout-modal-bg:                   $ic-color-light;
-$layout-modal-font-color:           $ic-color-dark;
-$footer-links-color:                lighten($ic-color-dark, 16);
+$layout-modal-font-color:           $ic-font-color-dark;
+$footer-links-color:                lighten($ic-font-color-dark, 16);
 $footer-links-border-color:         lighten($ic-color-dark, 16);
 
 body:not(.full-width) .ic-app-container {

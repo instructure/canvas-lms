@@ -39,7 +39,7 @@
     display: none;
 }
 #right-side table.channel_list tr.channel.unconfirmed > td a {
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
   font-style: italic;
 }
 .email_meta {
@@ -61,7 +61,7 @@
 }
 #right-side p.email_channel {
   margin: 0;
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
 }
 .intl_rates_may_apply {
   font-size: 0.8em

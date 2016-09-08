@@ -3,7 +3,6 @@
 
 $border-dark:  #c1c7cf;
 $border-light: #e1e3e4;
-$font-color:   #555;
 $left-offset:  16px;
 
 #tab-features .alert {
@@ -14,7 +13,7 @@ $left-offset:  16px;
 .feature-flags {
   border: 1px solid $border-dark;
   border-radius: 3px;
-  color: $font-color;
+  color: $ic-font-color--subdued;
   list-style: none;
   margin: 0 0 24px 0;
   padding: 0;
@@ -31,7 +30,7 @@ $left-offset:  16px;
 }
 
 .feature-flag .element_toggler, .feature-flag .element_toggler:hover {
-  color: #333;
+  color: $ic-font-color-dark;
   text-decoration: none;
 }
 
@@ -154,7 +153,7 @@ $switch-text: rgba($ic-color-light, 0.6);
       background-color: $switch-background;
       &.ui-state-active {
         background-color: $ic-color-light;
-        color: $ic-color-dark;
+        color: $ic-font-color-dark;
       }
     }
   }
