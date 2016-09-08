@@ -8810,6 +8810,7 @@ pt-BR:
   message_students_who_369b8488: "Enviar mensagem aos alunos que..."
   message_this_student_6d14043d: "Enviar mensagem a este aluno"
   message_will_be_sent_to_all_the_teachers_and_teach_1b8d17c1: "A mensagem será enviada para todos os professores e assistentes de professores no curso."
+  messageableuser_library_767eed20: "biblioteca MessageableUser"
   messages: 
     account_suspended: 
       email: 
@@ -10931,6 +10932,9 @@ pt-BR:
   not_installed_37a21a76: "Não instalado"
   not_now_97efd947: "Agora não"
   not_published_73f7079: "Não publicado"
+  not_starred_no_subject_click_to_star_adfefe93: "'Não avaliado \"(Sem Assunto)\", Clique para avaliar."
+  not_starred_no_subject_click_to_star_dc91380: "Não avaliado \"(Sem Assunto)\", Clique para avaliar."
+  not_starred_subject_click_to_star_4ea6eb64: "Não avaliado \"%{subject}\", Clique para avaliar."
   not_yet_completed_345a0bca: "Ainda não concluido"
   note_for_differentiated_group_topics_some_threads__90adbb21: "Observação: para assuntos diferenciados de grupo, alguns segmentos podem estar sem nenhum aluno atribuido."
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "Aviso: Pode levar até uma semana para o URL Beta para provisionar, dependendo do ciclo de atualização Beta."
@@ -15512,6 +15516,9 @@ pt-BR:
     previous_object: "%{type} anterior"
     student_hidden_name: "Aluno %{position}"
   sso_settings_ebf98263: "Configurações de SSO"
+  starred_no_subject_click_to_unstar_3191d64: "Avaliado \"(Sem Assunto)\", Clique para desavaliar."
+  starred_no_subject_click_to_unstar_bff04bce: "Avaliado \"(Sem assunto)\", Clique para desavaliar."
+  starred_subject_click_to_unstar_6aafcddc: "Avaliado \"%{subject}\", Clique para desavaliar."
   start_date_c41cb23a: "Data de Início:"
   start_date_e937be8a: "Data de início"
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
