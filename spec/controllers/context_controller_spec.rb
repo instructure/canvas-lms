@@ -241,6 +241,18 @@ describe ContextController do
     end
   end
 
+  describe "GET 'undelete_index'" do
+    it 'should work' do
+      user_session(@teacher)
+      assignment_model(course: @course)
+      @assignment.destroy
+
+      get :undelete_index, course_id: @course.id
+      expect(response).to be_success
+      expect(assigns[:deleted_items]).to include(@assignment)
+    end
+  end
+
   describe "POST 'undelete_item'" do
     it 'does not allow dangerous sends' do
       user_session(@teacher)
