@@ -209,7 +209,6 @@ class ActiveRecord::Base
 
   def touch_user
     if self.respond_to?(:user_id) && self.user_id
-      shard = self.user.shard
       User.connection.after_transaction_commit do
         User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
       end
