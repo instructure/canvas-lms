@@ -422,7 +422,7 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "when the object hasn't been overridden" do
       it "raises an exception because it doesn't have any context" do
-        expect { overridden.multiple_due_dates? }.to raise_exception
+        expect { overridable.multiple_due_dates? }.to raise_exception(DatesOverridable::NotOverriddenError)
       end
     end
 
