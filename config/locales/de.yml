@@ -1306,7 +1306,7 @@ de:
   add_course_assignments_628ed6d0: "Kursaufgaben hinzufügen"
   add_course_calendar_events_146154a5: "Kurskalenderevents hinzufügen"
   add_criterion_eb9587ef: "Kriterium hinzufügen"
-  add_custom_link_22059c0: "Benutzerdefinierten Link hinzufügen"
+  add_custom_link_22059c0: "Angepassten Link hinzufügen"
   add_email_address_aef3b61: "E-Mail Adresse hinzufügen"
   add_files_to_the_course_da6ffd32: "Dateien zum Kurs hinzufügen"
   add_folder_ba50d107: "Ordner hinzufügen"
@@ -5189,7 +5189,7 @@ de:
     this_is_permanent: "Anpassung von Noten kann nicht rückgängig gemacht werden. Die Verläufe zuvor angepasster Noten sind verfügbar, der Anpassungsvorgang kann jedoch nicht rückgängig gemacht werden."
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Benutzerdefiniertes CSS und Javascript können zu Problemen beim Zugriff oder Störungen von zukünftigen Canvas-Updates führen!"
   custom_fields_fc3e55af: "Benutzerdefinierte Felder"
-  custom_link_details_35fd38fc: Benutzerdefinierter-Link-Details
+  custom_link_details_35fd38fc: Angepasster-Link-Details
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Im Hilfe-Dialog Popup mit einzuschliessende angepasste Links"
   customize_help_link_62cd05eb: "Hilfe-Link anpassen"
   customize_this_menu_efa72a9: "Dieses Menü personalisieren"
@@ -5862,7 +5862,7 @@ de:
     unsubscribed: Abgemeldet
     unsubscribed_hint: "Sie haben sich nicht für dieses Thema angemeldet. Klicken Sie, um sich anzumelden."
   dismiss_dacdb625: Verwerfen
-  display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Alle Textlinks in Canvas as *unterstrichenen Text* darstellen."
+  display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Alle Textlinks in Canvas als *unterstrichener Text* darstellen."
   display_course_catalog: "Zeigen Sie eine durchsuchbare Liste mit Kursen in diesem Stammkonto mit aktivierter Kennzeichnung \"Diesen Kurs in das öffentliche Kursverzeichnis aufnehmen\" an."
   display_name_b80c243e: "Name anzeigen"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Insgesamte Benotungen anzeigen, wenn die \"Alle Benotungszeiträume\" Dropdown-Option gewählt wird (Mehrere Benotungszeiträume müssen aktiviert sein)."
@@ -6080,7 +6080,7 @@ de:
   email_is_required_736ac26b: "E-Mail obligatorisch"
   email_the_user_about_this_account_creation_e63f8759: "Benachrichtigen Sie den Benutzer per E-mail über die Erstellung dieses Kontos "
   ember_modules_description: "In Ember neu geschriebene Module. Verwenden Sie die native API zum Ziehen und Ablegen, um das Ziehen und Ablegen aus externen Speicherorten zu gestatten."
-  empty_stub_for_testing_only_37aad38: "Leerer Platzhalter (aus Testzwecken)"
+  empty_stub_for_testing_only_37aad38: "Leerer Platzhalter (nur für Testzwecke)"
   enable_6f5d1328: Aktivieren
   enable_dashboard_images_for_courses_5af458b0: "Dashboard-Bilder für Kurse aktivieren"
   enable_feature_title_987d8e9a: "Feature: %{title} aktivieren"
@@ -6746,7 +6746,7 @@ de:
     published_status: Veröffentlicht
     restricted_status: "Verfügbar von %{from_date} bis %{until_date}"
     unpublished_status: "Nicht veröffentlicht"
-  file_upload_submission_740711f: Dateiupload-Einsendung
+  file_upload_submission_740711f: "Einsendung hochgeladener Datei"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} wurde mit den folgenden Nutzungsrechten veröffentlicht %{usage_right}"
   filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} Prozent hochgeladen"
   filename_uploaded_successfully_edd8e825: "%{fileName} erfolgreich hochgeladen!"
@@ -7884,7 +7884,7 @@ de:
       Sie sind wie ein Minikurs, bei dem Sie mit einer geringeren Anzahl von Studenten gezielt an
       einem Projekt arbeiten können.
   groupweight_of_total_9579ae8c: "%{groupWeight}% von Gesamt"
-  has_turnitin_score_3e1cacf6: "Hat einen Turnitin-score"
+  has_turnitin_score_3e1cacf6: "Hat einen Turnitin-Score"
   help_4c4968b1: Hilfe
   help_dialog: 
     Back: Zurück
@@ -8787,7 +8787,7 @@ de:
     recipients: "Empfänger:"
   message_students_who_369b8488: "Studenten benachrichtigen, auf die Folgendes zutrifft:"
   message_this_student_6d14043d: "Eine Nachricht an diesen Studenten senden"
-  message_will_be_sent_to_all_the_teachers_and_teach_1b8d17c1: "Die Nachricht wird an alle Dozenten / Lehrassistenten des Kurses versandt."
+  message_will_be_sent_to_all_the_teachers_and_teach_1b8d17c1: "Die Nachricht wird an alle Dozenten/Lehrassistenten des Kurses versandt."
   messageableuser_library_767eed20: MessageableUser-Bibliothek
   messages: 
     account_suspended: 
@@ -11529,7 +11529,7 @@ de:
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Fügen Sie mindestens eine nicht leere Antwort für jede Variable hinzu."
   please_enter_a_name_for_this_link_318f01a4: "Bitte geben Sie einen Namen für diesen Link ein."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Geben Sie einen Suchbegriff mit drei oder mehr Zeichen ein"
-  please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Bitte geben Sie eine zulässige URL. Dies muss ein Protokoll enthalten (Beispiel: http://, https://, ftp://)."
+  please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Bitte geben Sie eine zulässige URL ein. Diese muss ein Protokoll enthalten (Beispiel: http://, https://, ftp://)."
   please_enter_your_label_name_7745272d: "Bitte geben Sie Ihren %{label_name} ein:"
   please_enter_your_label_name_and_password_5c56be80: "Bitte geben Sie Ihren %{label_name} und Passwort ein:"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Geben Sie an, welche Seite Sie angezeigt und auf welchen Link Sie geklickt haben."
@@ -13903,7 +13903,7 @@ de:
   remove_these_dates_48453a81: "Diese Daten entfernen"
   remove_this_rubric_from_my_list_c7d80704: "Diese Rubric aus meiner Liste entfernen"
   remove_this_section_9a88ca43: "Diesen Abschnitt entfernen"
-  removed_user_as_group_leader_bb69330f: "%{user} wurd als Gruppenleiter entfernt"
+  removed_user_as_group_leader_bb69330f: "%{user} wurde als Gruppenleiter entfernt"
   rename_45608f54: Umbenennen
   rename_c_name_section_e0e92c97: "%{c.name} Abschnitt umbenennen"
   rename_this_section_73065edd: "Diesen Abschnitt umbenennen"
@@ -15934,7 +15934,7 @@ de:
   there_was_a_problem_submitting_your_set_27ca2ed0: "Beim Abschicken Ihres Sets ist ein Problem aufgetreten"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Bei der Erzeugung des Tool-Starts ist ein Fehler aufgetreten"
   there_was_an_error_in_processing_your_request_6513a49a: "Beim Verarbeiten Ihrer Anforderung ist ein Fehler aufgetreten"
-  there_was_an_error_removing_the_image_c83acffe: "Beim Entfernen des Bils ist ein Fehler aufgetreten"
+  there_was_an_error_removing_the_image_c83acffe: "Beim Entfernen des Bilds ist ein Fehler aufgetreten"
   there_was_an_error_retrieving_the_course_image_d7ea094d: "Beim Importieren des Kursbilds ist ein Fehler aufgetreten"
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Beim Speichern der Änderungen am Kurs ist ein Fehler aufgetreten"
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "Beim Speichern der Note ist ein Fehler aufgetreten. Bitte versuchen Sie es später noch einmal."
@@ -17238,7 +17238,7 @@ de:
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Ihr Kommentar wurde automatisch als Entwurf gespeichert."
   your_content_has_been_exported_bbb57764: "Ihr Inhalt wurde exportiert."
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "Ihr Kursthema wurde erfolgreich angewandt."
-  your_email_address_f881e583: "Ihre E-mailadresse"
+  your_email_address_f881e583: "Ihre E-Mail-Adresse"
   your_email_b5364bee: "Ihre E-Mail"
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "Ihre Datei wird ins Notenbuch hochgeladen, und Sie können diese Seite jederzeit verlassen. Wenn Sie eine große .csv-Datei haben, dann dauert es einige Minuten, bis Ihre Änderungen aktualisiert werden. Um zu vermeiden, dass Daten überschrieben werden, bestätigen Sie bitte den erfolgreichen Abschluss Ihres Uploads und dass Ihr Notenbuch korrekt ist, und machen dann erst zusätzliche Veränderungen."
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Ihre Datei wird ins Notenbuch hochgeladen, und Sie können diese Seite jederzeit verlassen. Wenn Sie eine große .csv-Datei haben, dann dauert es einige Minuten, bis Ihre Änderungen aktualisiert werden. Um zu vermeiden, dass Daten überschrieben werden, bestätigen Sie bitte den erfolgreichen Abschluss Ihres Uploads und dass Ihr Notenbuch korrekt ist, und machen dann erst zusätzliche Veränderungen."
