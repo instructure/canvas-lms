@@ -363,7 +363,7 @@ class ContextController < ApplicationController
   ].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = WORKFLOW_TYPES.select { |type| @context.reflections.key?(type) }.
+      @item_types = WORKFLOW_TYPES.select { |type| @context.class.reflections.key?(CANVAS_RAILS4_0 ? type : type.to_s) }.
           map { |type| @context.association(type).reader }
 
       @item_types << @context.wiki.wiki_pages if @context.respond_to? :wiki
