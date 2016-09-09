@@ -16,6 +16,7 @@
           <%= form_tag do |f| %>
             <%= hidden_field_tag 'page_id', p[:page][:id] %>
             <%= hidden_field_tag 'original_html', p[:html] %>
+            <%= hidden_field_tag 'path', p[:path] %>
             <%= text_area_tag 'new_html', p[:html], size: '120x4', style: 'width: 80%;' %>
             <%= submit_tag %>
           <% end %>
@@ -25,6 +26,7 @@
           <%= form_tag do |f| %>
             <%= hidden_field_tag 'page_id', p[:page][:id] %>
             <%= hidden_field_tag 'original_html', p[:html] %>
+            <%= hidden_field_tag 'path', p[:path] %>
             <%= hidden_field_tag 'new_html', p[:fix_html] %>
             <%= submit_tag 'Mark as OK' %>
           <% end %>
