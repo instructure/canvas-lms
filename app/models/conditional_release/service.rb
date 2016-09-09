@@ -243,10 +243,8 @@ module ConditionalRelease
         end
       end
 
-      def rules_cache(context, student, force: false)
-        Rails.cache.fetch(rules_cache_key(context, student), force: force) do
-          yield if block_given?
-        end
+      def rules_cache(context, student, force: false, &block)
+        Rails.cache.fetch(rules_cache_key(context, student), force: force, &block)
       end
 
       def newer_than_cache?(items, cache)
