@@ -9729,18 +9729,18 @@ nn:
     visit_modules_page: "*Gå til sida for kursmodular for meir informasjon om korleis du kan låse opp innhaldet.*"
     web_conference_invitation: 
       email: 
-        body: "Du er invitert til å delta i ei webkonferanse, %{title} for %{name}."
+        body: "Du er invitert til å delta i ein webkonferanse, %{title} for %{name}."
         details_link: "Du kan sjå detaljane her: %{link}"
         html: 
-          body: "Du er invitert til å delta i ei webkonferanse, %{title} for %{name}."
+          body: "Du er invitert til å delta i ein webkonferanse, %{title} for %{name}."
           details_link: "Klikk her for å sjå detaljane"
           subject: "Invitasjon til webkonferanse: %{name}"
         subject: "Invitasjon til webkonferanse: %{name}"
       sms: 
-        body: "Du er invitert til å delta i ei webkonferanse, %{title} for %{name}."
+        body: "Du er invitert til å delta i ein webkonferanse, %{title} for %{name}."
         link_message: "Meir info på %{url}"
       summary: 
-        body: "Du er invitert til å delta i ei webkonferanse, %{title} for %{name}."
+        body: "Du er invitert til å delta i ein webkonferanse, %{title} for %{name}."
         subject: "Invitasjon til webkonferanse: %{name}"
       twitter: 
         tweet: "Canvas-varsel – invitasjon: delta %{title}, %{name}"
@@ -15082,6 +15082,7 @@ nn:
   undated_15c2e5fe: "Utan dato"
   undated_items_toggle_list_visibility_6219e641: "Udaterte element  i liste ein kan vise/skjule"
   undelivered_message_459916a9: "Ikkje levert melding"
+  underline_links_e7cf9b4f: "Understrek lenker"
   undo_a7be8fef: Angre
   unenrolled_users_e7632d24: "Brukarar utan kurspåmeldingar"
   ungraded_answers_31ef2df7: "Svar som ikkje er karaktersette"
@@ -15168,6 +15169,7 @@ nn:
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Bruk det nye eksterne samarbeidsverktyet for å få fleire samarbeidsmoglegheiter"
   use_the_new_document_annotation_tool_2cbc98d0: "Bruk det nye verktyet for dokumentannotering"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Bruk det nye LTI-verktøyet for prøver i staden for vanlege Canvas-prøver"
+  use_the_new_scheduler_1273b832: "Bruk den nye planleggaren"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Bruk denne konfigurasjonen for foreldre-/observatørregistrering"
   used_by_permission_314a78dd: "Med løyve"
   user: 
@@ -15369,7 +15371,7 @@ nn:
       grades: Karakterar
       profile: "%{user}s profil"
     current_conference: 
-      current_conference_text: "Du er invitert til å delta på **[%{conference}](%{link_to_conference})**. Ho starta %{started_at} og har %{participant_count}."
+      current_conference_text: "Du er invitert til å delta på **[%{conference}](%{link_to_conference})**. Den starta %{started_at} og har %{participant_count}."
       participant_count: 
         one: "1 deltakar"
         other: "%{count} deltakarar"
@@ -15525,7 +15527,7 @@ nn:
       sent_email_paragraph: "Vi har sendt ein e-post til %{email_address}. *Klikk på lenka i e-posten for å fullføre registreringa*. Dersom du ikkje har motteke e-posten, kan du **klikke for å sende e-post på nytt**, men du må også sjå etter i Søppelpost."
       while_you_wait: "Medan du ventar ..."
     scheduled_conference: 
-      current_conference_text: "Du er invitert til å delta på %{conference}. Ho startar %{starts_at}."
+      current_conference_text: "Du er invitert til å delta på %{conference}. Den startar %{starts_at}."
     service_not_enabled: "Tenesta er ikkje aktivert"
     show: 
       accounts: Kontoar
@@ -15590,6 +15592,7 @@ nn:
   users_d1b60cb0: Brukarar
   users_matching_search_term_c604db9e: "Brukarar som samsvarar med \"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Brukarar med skjermlesar bør skru av musepeikar for å nytte desse tastatursnarvegane"
+  uses_the_new_scheduler_and_its_functionality_b07e9b14: "Brukar den nye planleggaren og tilhøyrande funksjonalitet"
   validate: 
     is_required: "Dette feltet er obligatorisk"
   validate_links_in_content_b1630fba: "Valider lenker i Innhald"
