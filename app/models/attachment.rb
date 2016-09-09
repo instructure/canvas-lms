@@ -332,6 +332,7 @@ class Attachment < ActiveRecord::Base
     application/msword
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
     application/pdf
+    application/vnd.oasis.opendocument.text
     text/plain
     text/html
     application/rtf
