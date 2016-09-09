@@ -120,11 +120,13 @@ describe LtiApiController, type: :request do
 
     if Canvas.redis_enabled?
       it "should not allow the same nonce to be used more than once" do
-        make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-        assert_status(415)
-        make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-        assert_status(401)
-        check_error_response("Duplicate nonce detected")
+        enable_cache do
+          make_call('nonce' => 'not_so_random', 'content-type' => 'none')
+          assert_status(415)
+          make_call('nonce' => 'not_so_random', 'content-type' => 'none')
+          assert_status(401)
+          check_error_response("Duplicate nonce detected")
+        end
       end
     end
 
