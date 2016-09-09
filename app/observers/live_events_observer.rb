@@ -10,6 +10,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :wiki_page,
           :assignment,
           :submission,
+          :attachment,
           :user_account_association
 
   def after_update(obj)
@@ -26,9 +27,19 @@ class LiveEventsObserver < ActiveRecord::Observer
       if obj.title_changed? || obj.body_changed?
         Canvas::LiveEvents.wiki_page_updated(obj, obj.title_changed? ? obj.title_was : nil,
                                                   obj.body_changed? ? obj.body_was : nil)
+      elsif obj.workflow_state_changed? && obj.workflow_state == 'deleted'
+        # Wiki pages are often soft deleted rather than destroyed
+        Canvas::LiveEvents.wiki_page_deleted(obj)
       end
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)
+    when Attachment
+      if obj.display_name_changed?
+        Canvas::LiveEvents.attachment_updated(obj, obj.display_name_was)
+      elsif obj.file_state_changed? && obj.file_state == 'deleted'
+        # Attachments are often soft deleted rather than destroyed
+        Canvas::LiveEvents.attachment_deleted(obj)
+      end
     when Submission
       Canvas::LiveEvents.submission_updated(obj)
     end
@@ -58,14 +69,15 @@ class LiveEventsObserver < ActiveRecord::Observer
       Canvas::LiveEvents.submission_created(obj)
     when UserAccountAssociation
       Canvas::LiveEvents.user_account_association_created(obj)
+    when Attachment
+      Canvas::LiveEvents.attachment_created(obj)
     end
-  end
-
-  def after_save(obj)
   end
 
   def after_destroy(obj)
     case obj
+    when Attachment
+      Canvas::LiveEvents.attachment_deleted(obj)
     when WikiPage
       Canvas::LiveEvents.wiki_page_deleted(obj)
     end
