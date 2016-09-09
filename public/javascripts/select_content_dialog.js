@@ -136,6 +136,8 @@ define([
 
         if (item_data['item[url]'] === '') {
           $("#content_tag_create_url").errorBox(I18n.t("URL is required"));
+        } else if (item_data['item[title]'] === '') {
+          $("#content_tag_create_title").errorBox(I18n.t("Page Name is required"));
         } else {
           submit(item_data);
         }
@@ -161,6 +163,8 @@ define([
           var $errorBox = $('<div />', { 'class': 'alert alert-error', role: 'alert' }).css({marginTop: 8 });
           $errorBox.text(I18n.t('errors.external_tool_url', "An external tool can't be saved without a URL."));
           $dialog.prepend($errorBox);
+        } else if (item_data['item[title]'] === '') {
+          $("#external_tool_create_title").errorBox(I18n.t("Page Name is required"));
         } else {
           submit(item_data);
         }

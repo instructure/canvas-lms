@@ -1096,6 +1096,10 @@ define([
     });
     $("#edit_item_form").formSubmit({
       beforeSubmit: function(data) {
+        if (data["content_tag[title]"] == '') {
+          $('#content_tag_title').errorBox(I18n.t("Title is required"));
+          return false;
+        }
         $(this).loadingImage();
       },
       success: function(data) {
