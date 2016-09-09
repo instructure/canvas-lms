@@ -31,6 +31,20 @@ describe ContentMigration do
       expect(to_assign.learning_outcome_alignments.map(&:learning_outcome_id)).to eq [lo.id].sort
     end
 
+    it "should not overwrite assignment points possible on import" do
+      @course = @copy_from
+      outcome_with_rubric
+      from_assign = @copy_from.assignments.create! title: 'some assignment'
+      @rubric.associate_with(from_assign, @copy_from, purpose: 'grading', use_for_grading: true)
+      from_assign.update_attribute(:points_possible, 1)
+
+      run_course_copy
+
+      to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
+      expect(to_assign.points_possible).to eq 1
+      expect(to_assign.rubric.rubric_associations.for_grading.first.use_for_grading).to be_truthy
+    end
+
     it "should copy rubric outcomes in selective copy" do
       @course = @copy_from
       outcome_with_rubric
