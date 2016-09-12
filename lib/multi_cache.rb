@@ -41,10 +41,15 @@ class MultiCache < ActiveSupport::Cache::Store
       result = nil
       @ring.each do |node|
         options[:node] = node
-        result = super(key, options) do
-          calculated_value = yield unless did_calculate
-          did_calculate = true
-          calculated_value
+        if block
+          result = super(key, options) do
+            calculated_value = yield unless did_calculate
+            did_calculate = true
+            calculated_value
+          end
+        else
+          result ||= []
+          result << super(key, options)
         end
       end
       result
