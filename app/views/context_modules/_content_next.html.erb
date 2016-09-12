@@ -32,7 +32,7 @@
 </div>
 
 <% if @can_edit %>
-  <div class="hidden-readable screenreader-only" aria-label="keyboard instructions">
+  <div class="hidden-readable screenreader-only" aria-label="<%= t('keyboard instructions') %>">
     <%= t('modules_keyboard_hint_updated',
           'Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu.') %>
   </div>
@@ -75,34 +75,37 @@ TEXT
 <% if @can_edit %>
   <form id="move_context_module_form" style="display:none" class="form-dialog" title="Move Module">
     <div class="form-dialog-content">
-      <h2><%= t('move_module.place', "Place ") %> <span id="move_module_name"> </span></h2>
+      <h4><%= t("Place ") %> <span id="move_module_name"></span></h4>
       <div class="move-module-before-after-container">
-        <input type="radio" name="move_location" value="before" id="move_location_before" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_before"><%= t('move_module.before', "Before") %></label>
+        <input type="radio" name="move_location" value="before" id="move_location_before" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_before"><%= t("Move Module Before") %></label>
           <strong class="move-module-or"><%= t('move_module.or', "OR") %></strong>
-        <input type="radio" name="move_location" value="after" id="move_location_after" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_after"><%= t('move_module.after', "After") %></label>
+        <input type="radio" name="move_location" value="after" id="move_location_after" class="move-module-label-spacer" /><label class="move-module-label-width" for="move_location_after"><%= t("Move Module After") %></label>
       </div>
       <div class="move-module-select-spacer">
+        <label class="screenreader-only" for="move_context_module_select"><%= t('Select module to move before or after') %></label>
         <select name="move_context_module_select" id="move_context_module_select"></select>
       </div>
 
     </div>
     <div class="form-controls">
-      <button type="button" id="move_module_cancel_btn" class="btn">Cancel</button>
+      <button type="button" id="move_module_cancel_btn" class="btn"">Cancel</button>
       <button type="submit" class="btn btn-primary">Move</button>
     </div>
   </form>
 
   <form id="move_module_item_form" style="display:none" class="form-dialog" title="Move Item">
     <div class="form-dialog-content">
-      <h2><%= t('move_module_item.place', "Place ") %><span id="move_module_item_name"> </span></h2>
+      <h4><%= t('move_module_item.place', "Place ") %><span id="move_module_item_name"></span></h4>
       <p><%= t('move_module_item.into', "into") %>
+      <label class="screenreader-only" for="move_module_item_module_select"><%= t('Select module to move item into') %></label>
       <select name="move_module_item_module_select" id="move_module_item_module_select"></select>
       <div class="move-module-before-after-container">
-        <input type="radio" name="item_move_location" value="before" id="item_move_location_before" class="move-module-label-spacer" /><label class="move-module-label-width" for="item_move_location_before"><%= t('move_module.before', "Before") %></label>
+        <input type="radio" name="item_move_location" value="before" id="item_move_location_before" class="move-module-label-spacer" /><label class="move-module-label-width" for="item_move_location_before"><%= t("Move Module Item Before") %></label>
           <strong class="move-module-or"><%= t('move_module_item.or', "OR") %></strong>
-        <input type="radio" name="item_move_location" value="after" id="item_move_location_after" class="move-module-label-spacer" /><label class="move-module-label-width" for="item_move_location_after"><%= t('move_module.after', "After") %></label>
+        <input type="radio" name="item_move_location" value="after" id="item_move_location_after" class="move-module-label-spacer" /><label class="move-module-label-width" for="item_move_location_after"><%= t("Move Module Item After") %></label>
       </div>
       <div class="move-module-select-spacer">
+        <label class="screenreader-only" for="move_module_item_select"><%= t('Select module item to place item before or after') %></label>
         <select name="move_module_item_select" id="move_module_item_select"></select>
       </div>
 
@@ -144,6 +147,7 @@ TEXT
         <tr>
           <td><label for="content_tag_indent_select"><%= before_label('indent', %{Indent}) %></label></td>
           <td>
+            <label class="screenreader-only" for="content_tag_indent_select"><%= t('Select indentation') %></label>
             <select name="content_tag[indent]" id="content_tag_indent_select">
               <% 0.upto(3) do |i| %>
                 <option value="<%= i %>"><%= t('indent.n', { :zero => %{Don't Indent}, :one => %{Indent 1 Level}, :other => %{Indent %{count} Levels} }, :count => i) %></option>
@@ -176,14 +180,16 @@ TEXT
     <h3><%= t 'headings.add_prerequisite', 'Add Prerequisite to %{name}', :name => '<span class="name">&nbsp;</span>'.html_safe %></h3>
     <p style="display: none;"><%= t('select_prerequisite', %{Select the type of prerequisite.  Students cannot see a module until all prerequisites are satisfied.}) %>
       <div>
-        <select class="type" style="display: none;">
+        <label class="screenreader-only" for="prerequisite_type_select"><%= t('Select type of prerequisite') %></label>
+        <select id="prerequisite_type_select" class="type" style="display: none;">
           <option value="module"><%= t('prerequisites.another_module', %{Another Module}) %></option>
         </select>
       </div>
     </p>
     <p class="module_details"><%= t 'module_details', %{Modules are shown in sequential order, so only modules that are above %{name} can be set as prerequisites.}, :name => '<span class="name">&nbsp;</span>'.html_safe %>
       <div>
-        <select class="module_id">
+        <label class="screenreader-only" for="prerequisite_module_select"><%= t('Select prerequite module') %></label>
+        <select id="prerequisite_module_select" class="module_id">
         </select>
       </div>
     </p>
@@ -192,6 +198,7 @@ TEXT
 <div style="display: none;">
   <a href="<%= context_url(@context, :progressions_context_context_modules_url) %>" class="progression_list_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_context_modules_assignment_info_url) %>" class="assignment_info_url">&nbsp;</a>
+  <label class="screenreader-only" for="module_list"><%= t('Select prerequisite module') %></label>
   <select id="module_list">
     <option value="">[ <%= t('select_module.instructions', %{Select Module}) %> ]</option>
     <% @modules.each do |m| %>
@@ -207,12 +214,13 @@ TEXT
   <div id="completion_criterion_option" class="completion_criterion_option">
     <% ot 'criterion_for_assignment', '%{assignment} %{select_criterion}', :assignment => capture { %>
     <span style="padding: 0 4px;">
-      <select class="id assignment_picker" tabindex="0" aria-label="<%= t('Requirement subject') %>">
-      </select>
+      <label class="screenreader-only" for="criterion_assignment_picker"><%= t('Requirement subject') %></label>
+      <select id="criterion_assignment_picker" class="id assignment_picker" tabindex="0"></select>
     </span>
     <% }, :select_criterion => capture { %>
     <span style="padding: 0 4px;">
-      <select class="type assignment_requirement_picker" tabindex="0" aria-label="<%= t('Requirement') %>">
+      <label class="screenreader-only" for="criterion_requirement_picker"><%= t('Requirement') %></label>
+      <select id="criterion_requirement_picker" class="type assignment_requirement_picker" tabindex="0">
         <option class="any" value="must_view"><%= t('requirements.must_view', %{view the item}) %></option>
         <option class="assignment wiki_page" value="must_mark_done"><%= t(%{mark as done}) %></option>
         <option class="wiki_page discussion_topic" value="must_contribute"><%= t('requirements.must_contribute', %{contribute to the page}) %></option>
@@ -222,7 +230,8 @@ TEXT
     </span>
     <% } %>
     <span class="min_score_box" style="display: none;" tabindex="0">
-      <input type="text" class="min_score" style="width: 30px; margin-right: 5px;"/>
+      <label class="screenreader-only" for="criterion_min_score"><%= t('Minimum Score') %></label>
+      <input id="criterion_min_score" type="text" class="min_score" style="width: 30px; margin-right: 5px;"/>
       <span class="points_possible_parent"><%= t 'assignment_points_possible', '/ %{points_possible}', :points_possible => '<span class="points_possible">&nbsp;</span>'.html_safe %></span>
     </pan>
   </div>
