@@ -722,7 +722,7 @@ module ApplicationHelper
   end
 
   def brand_config_for_account(opts={})
-    account = Context.get_account(@context)
+    account = Context.get_account(@context || @course)
 
     # for finding which values to show in the theme editor
     if opts[:ignore_parents]
