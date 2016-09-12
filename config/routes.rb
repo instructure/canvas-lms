@@ -852,8 +852,6 @@ CanvasRails::Application.routes.draw do
     get 'download' => 'files#show', download: '1'
   end
 
-  resources :developer_keys, only: :index # DEPRECATED
-
   resources :rubrics do
     resources :rubric_assessments, path: :assessments
   end
@@ -1403,11 +1401,9 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :developer_keys) do
-      get 'developer_keys', action: :index # DEPRECATED
       get 'developer_keys/:id', action: :show
       delete 'developer_keys/:id', action: :destroy
       put 'developer_keys/:id', action: :update
-      post 'developer_keys', action: :create # DEPRECATED
 
       get 'accounts/:account_id/developer_keys', action: :index, as: 'account_developer_keys'
       post 'accounts/:account_id/developer_keys', action: :create
