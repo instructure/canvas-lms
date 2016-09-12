@@ -18,15 +18,6 @@ require [
 
   @schedulerStore = if ENV.CALENDAR.BETTER_SCHEDULER then configureSchedulerStore() else null
 
-  if ENV.CALENDAR.BETTER_SCHEDULER
-    ReactDOM.render(
-      React.createElement(
-        FindAppointment,
-          courses: @eventDataSource.contexts.filter (context) ->
-            context.asset_string.match /^course_/
-          store: @schedulerStore
-      ), $('#select-course-component')[0])
-
   @header = new CalendarHeader(
     el: "#calendar_header"
     calendar2Only: ENV.CALENDAR.CAL2_ONLY
@@ -40,6 +31,17 @@ require [
     header:        @header
     userId:        ENV.current_user_id
     schedulerStore: @schedulerStore
+    onLoadAppointmentGroups: (ag_map) =>
+      if ENV.CALENDAR.BETTER_SCHEDULER
+        courses = @eventDataSource.contexts.filter (context) ->
+          ag_map.hasOwnProperty(context.asset_string)
+        if courses.length > 0
+          ReactDOM.render(
+            React.createElement(
+              FindAppointment,
+                courses: courses
+                store: @schedulerStore
+            ), $('#select-course-component')[0])
     )
   new MiniCalendar("#minical", @calendar)
   new UndatedEventsList("#undated-events", @eventDataSource, @calendar)

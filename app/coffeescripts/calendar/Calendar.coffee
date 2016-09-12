@@ -96,6 +96,7 @@ define [
               @reservable_appointment_groups[context_code] = [] unless @reservable_appointment_groups[context_code]
               @reservable_appointment_groups[context_code].push "appointment_group_#{group.id}"
           @header.setSchedulerBadgeCount(required)
+          @options.onLoadAppointmentGroups(@reservable_appointment_groups) if @options.onLoadAppointmentGroups
 
       @connectHeaderEvents()
       @connectSchedulerNavigatorEvents()
