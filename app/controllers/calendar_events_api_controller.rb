@@ -446,15 +446,7 @@ class CalendarEventsApiController < ApplicationController
       title = dup_options[:title]
 
       if dup_options[:count] > 0
-        section_events = params[:calendar_event].delete(:child_event_data)
-        # handles multiple section repeast
-        section_events.each do |event|
-          event[:title] = title
-          section_dup_options = get_duplicate_params(event)
-          events += create_event_and_duplicates(section_dup_options)
-        end if section_events.present?
-
-        events += create_event_and_duplicates(dup_options) unless section_events.present?
+        events += create_event_and_duplicates(dup_options)
       else
         events = [@event]
       end
@@ -1168,8 +1160,8 @@ class CalendarEventsApiController < ApplicationController
     end
 
     options[:iterator] ||= 0
-    params = set_duplicate_params(options)
-    event = @context.calendar_events.build(params[:calendar_event])
+    event_attributes = set_duplicate_params(params[:calendar_event], options)
+    event = @context.calendar_events.build(event_attributes)
     event.validate_context! if @context.is_a?(AppointmentGroup)
     event.updating_user = @current_user
     event
@@ -1192,6 +1184,7 @@ class CalendarEventsApiController < ApplicationController
         title:     event_data[:title],
         start_at:  event_data[:start_at],
         end_at:    event_data[:end_at],
+        child_event_data: event_data[:child_event_data],
         count:     duplicate_data.fetch(:count, 0).to_i,
         interval:  duplicate_data.fetch(:interval, 1).to_i,
         add_count: value_to_boolean(duplicate_data[:append_iterator]),
@@ -1199,7 +1192,7 @@ class CalendarEventsApiController < ApplicationController
     }
   end
 
-  def set_duplicate_params(options = {})
+  def set_duplicate_params(event_attributes, options = {})
     options[:iterator] ||= 0
     offset_interval = options[:interval] * options[:iterator]
     offset = if options[:frequency] == "monthly"
@@ -1210,10 +1203,20 @@ class CalendarEventsApiController < ApplicationController
                offset_interval.weeks
              end
 
-    params[:calendar_event][:title] = "#{options[:title]} #{options[:iterator] + 1}" if options[:add_count]
-    params[:calendar_event][:start_at] = Time.zone.parse(options[:start_at]) + offset unless options[:start_at].blank?
-    params[:calendar_event][:end_at] = Time.zone.parse(options[:end_at]) + offset unless options[:end_at].blank?
-    params
+    event_attributes[:title] = "#{options[:title]} #{options[:iterator] + 1}" if options[:add_count]
+    event_attributes[:start_at] = Time.zone.parse(options[:start_at]) + offset unless options[:start_at].blank?
+    event_attributes[:end_at] = Time.zone.parse(options[:end_at]) + offset unless options[:end_at].blank?
+
+    if options[:child_event_data].present?
+      event_attributes[:child_event_data] = options[:child_event_data].map do |child_event|
+        new_child_event = child_event.dup
+        new_child_event[:start_at] = Time.zone.parse(child_event[:start_at]) + offset unless child_event[:start_at].blank?
+        new_child_event[:end_at] = Time.zone.parse(child_event[:end_at]) + offset unless child_event[:end_at].blank?
+        new_child_event
+      end
+    end
+
+    event_attributes
   end
 
   def require_user_or_observer
