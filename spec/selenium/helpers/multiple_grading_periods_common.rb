@@ -135,4 +135,35 @@ module MultipleGradingPeriods
       sleep 1 # InputFilter has a delay
     end
   end
+
+  module StudentPage
+    shared_context "student_page_components" do
+      # Helpers
+      let(:backend_group_helper) { Factories::GradingPeriodGroupHelper.new }
+      let(:backend_period_helper) { Factories::GradingPeriodHelper.new }
+
+      # Period components
+      let(:period_options_css) { '.grading_periods_selector > option' }
+
+      # Assignment components
+      let(:assignment_titles_css) { '.student_assignment > th > a'}
+    end
+
+    def visit_student_grades_page(course, student)
+      get "/courses/#{course.id}/grades/#{student.id}"
+    end
+
+    def select_period_by_name(name)
+      period = ff(period_options_css).find do |option|
+        option.text == name
+      end
+      period.click
+    end
+
+    def assignment_titles
+      ff(assignment_titles_css).map do |option|
+        option.text
+      end
+    end
+  end
 end

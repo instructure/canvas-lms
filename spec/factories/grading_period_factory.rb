@@ -75,11 +75,11 @@ module Factories
       end
     end
 
-    def create_with_weeks_for_group(group, start_weeks_ago, end_weeks_ago)
+    def create_with_weeks_for_group(group, start_weeks_ago, end_weeks_ago, title="Example Grading Period")
       group.grading_periods.create!({
         start_date: start_weeks_ago.weeks.ago,
         end_date: end_weeks_ago.weeks.ago,
-        title: "Example Grading Period"
+        title: title
       })
     end
 
