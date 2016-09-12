@@ -22,18 +22,25 @@ define [], () ->
             # actual, scheduled event and not just a placeholder.
             keep = true
           else if !event.calendarEvent.reserved && event.can_edit
-            # If this *is* a placeholder, and it has child events, and it's not reserved by me,
-            # that means people have signed up for it, so we want to display it if I am able to
-            #  manage it (as a teacher or TA might)
+            # manageable appointment slot not reserved by me
             if schedulerState.hasOwnProperty 'inFindAppointmentMode'
+              # new scheduler is enabled: show unconditionally; gray if no one is signed up
+              # or if we are in find-appointment mode looking to sign up somewhere else
               keep = true
               gray = event.calendarEvent.child_events_count == 0 || schedulerState.inFindAppointmentMode
             else
+              # new scheduler is not enabled: show only if someone is signed up
               keep = event.calendarEvent.child_events_count > 0
           else
+            # reservable appointment slot
             if schedulerState.inFindAppointmentMode && event.isOnCalendar(schedulerState.selectedCourse.asset_string)
-              gray = false
+              # in find-appointment-mode selected course: show if there are available slots; hide otherwise
+              if event.calendarEvent.available_slots == 0
+                keep = false
+              else
+                gray = false
             else
+              # normal calendar mode: hide reservable slots
               keep = false
         else
           if viewingGroup.id == event.calendarEvent?.appointment_group_id
