@@ -4,27 +4,40 @@ describe Quizzes::QuizSubmissionZipper do
 
   let(:attachments) do
     [
-      stub(:id => 1,:display_name => "Foobar.ppt"),
+      stub(:id => 1, :display_name => "Foobar.ppt"),
       stub(:id => 2, :display_name => "Cats.docx"),
-      stub(:id => 3)
+      stub(:id => 3, :display_name => "Pandas.png"),
+      stub(:id => 4)
     ]
   end
   let(:submissions) do
     [
       stub(:user => stub(:id => 1,:last_name_first => "Dale Tom"),
-          :submission_data => [{
-            :attachment_ids => ["1"],
-            :question_id => 1}]),
+           :submission_data => [{
+             :attachment_ids => ["1"],
+             :question_id => 1,
+             :was_preview => false}]),
       stub(:user => stub(:id => 2, :last_name_first => "Florence Ryan"),
            :submission_data =>[{
-              :question_id => 2,
-              :attachment_ids => ["2"]}]),
-      stub(:user => stub,:submission_data => {})
+             :question_id => 2,
+             :attachment_ids => ["2"],
+             :was_preview => false}]),
+      # Teacher upload from Quiz preview:
+      stub(:user => stub(:id => nil, :last_name_first => "Petty Bryan"),
+           :submission_data =>[{
+             :question_id => 3,
+             :attachment_ids => ["3"],
+             :was_preview => true}]),
+      stub(:user => nil, :submission_data => [{}])
     ]
   end
-
   let(:submission_stubs) do
-    submissions.map { |sub| stub(:latest_submitted_attempt => sub) }
+    submissions.map do |sub|
+      stub(
+        :latest_submitted_attempt => sub,
+        :was_preview => sub.submission_data.first[:was_preview]
+      )
+    end
   end
   let(:zip_attachment) { stub(:id => 1, :user => nil) }
 
@@ -43,7 +56,9 @@ describe Quizzes::QuizSubmissionZipper do
   describe "#initialize" do
 
     it "finds the submissions for the given quiz" do
-      expect(@zipper.submissions).to eq submissions
+      filtered_submission = submissions.slice!(2)
+      expect(@zipper.submissions).to include(*submissions)
+      expect(@zipper.submissions).not_to include(filtered_submission)
     end
 
     it "stores the passed zip attachment" do
@@ -96,11 +111,14 @@ describe Quizzes::QuizSubmissionZipper do
       quiz.reload
       attachment = quiz.attachments.build(:filename => 'submissions.zip',
                                   :display_name => 'submissions.zip')
-      attachment.workflow_state = 'to_be_zipped'; attachment.save!
-      teacher = teacher_in_course(:course => @course,:active_all => true)
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.save!
+      teacher_in_course(:course => @course,:active_all => true)
+
       Quizzes::QuizSubmissionZipper.new(
         quiz: quiz,
         zip_attachment: attachment).zip!
+
       attachment.reload
       expect(attachment).to be_zipped
       names = []
