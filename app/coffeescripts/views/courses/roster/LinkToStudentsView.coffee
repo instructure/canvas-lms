@@ -80,7 +80,7 @@ define [
             data =
               enrollment:
                 user_id: @model.get('id')
-                associated_user_id: user.id
+                associated_user_id: id
                 type: enrollment.type
                 limit_privileges_to_course_section: enrollment.limit_priveleges_to_course_section
             if enrollment.role != enrollment.type
