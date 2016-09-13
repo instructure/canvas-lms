@@ -2813,7 +2813,7 @@ nn:
   canada_1_921df67a: "Canada (+1)"
   canada_aec587fa: Canada
   cancel_caeb1e68: Avbryt
-  cancel_custom_link_creation_39ec70bd: "Avbryt arbeidet med tilpassa lenker"
+  cancel_custom_link_creation_39ec70bd: "Avbryt arbeidet med å tilpasse lenker"
   cannot_be_associated_with_a_different_account_ac863be2: "kan ikkje vere tilknytta ein annan konto"
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "kan ikkje vere null når account_id er null"
   cannot_be_nil_when_course_id_is_nil_f539388: "kan ikkje vere null når course_id er null"
@@ -4870,7 +4870,7 @@ nn:
     this_is_permanent: "Kan ikkje angre justering av karakter. Historikk om karakterar før justeringa er tilgjengeleg, men justeringa er endeleg."
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Custom CSS og Javascript kan føre til problem med tilgangar eller skape konflikt ved framtidige   oppdateringar av Canvas! "
   custom_fields_fc3e55af: "Eigendefinerte felt"
-  custom_link_details_35fd38fc: "Tilpassa lenke-detaljar"
+  custom_link_details_35fd38fc: "Tilpassa lenkedetaljar"
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Eigendefinerte koplingar som kan leggast til i hurtigmenyen for dialogboksen"
   customize_help_link_62cd05eb: "Eigendefiner Hjelp-kopling"
   customize_this_menu_efa72a9: "Tilpass denne menyen"
@@ -7354,7 +7354,7 @@ nn:
     how_is_this_affecting_you: "Korleis verkar dette på deg?"
     i_cant_get_things_done_until_i_hear_back_from_you: "Eg får ikkje gjort noko før eg får svar frå deg"
     i_need_some_help_but_its_not_urgent: "Eg treng hjelp, men det er ikkje akutt"
-    include_a_link_to_a_screencast_or_screenshot_using_something_like_jing: "Inkluderer ei lenke til ein hemmeleg skjermdump ved å bruke noko som liknar på *Jing*."
+    include_a_link_to_a_screencast_or_screenshot_using_something_like_jing: "Inkluderer ei lenke til ein skjermdump ved å bruke noko som liknar på *Jing*."
     instructor_question: "Spør faglærar eit spørsmål"
     instructor_question_sub: "Spørsmål er sende til faglæraren din"
     just_a_casual_question_comment_idea_suggestion: "Berre eit vanleg spørsmål, ein kommentar, ein idé, eit forslag"
@@ -7375,7 +7375,7 @@ nn:
   help_menu_links_51184b65: Hjelpemeny-lenke
   help_menu_options_7ecf7031: Hjelpemeny-val
   help_with_content_licensing_a146fb0e: "Hjelp med å lisensiere innhald"
-  help_with_course_visibilities_6b6e22a4: "Hjelp til å velja kor synleg kurset skal vera"
+  help_with_course_visibilities_6b6e22a4: "Hjelp med å velje kurssynlegheit"
   helpers: 
     accessible_date_format: "DD-MM-ÅÅÅÅ tt:mm"
     accessible_date_only_format: DD-MM-ÅÅÅÅ
@@ -7546,7 +7546,7 @@ nn:
   in_progress_9d1ce8b9: "Er i gang"
   inactive_cd40317f: inaktiv
   inbox_bb245a60: Innboks
-  include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inkluderer ei lenke til ein hemmeleg skjermdump ved å bruke noko som liknar på *Jing*."
+  include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inkluder ei lenke til ein skjermdump ved å bruke noko som liknar på *Jing*."
   include_deleted_enrollments_1c87684a: "Inkluder sletta påmeldingar"
   include_deleted_objects_3cced3b5: "Inkluder sletta objekt;"
   include_scores_when_alerting_about_grades_89728ae1: "Inkluder resultat når du varslar om karakterar."
@@ -8106,7 +8106,7 @@ nn:
   mark_done_9d81bcd9: Merkt
   marked_done_9fd646f: Merkt
   masquerade_as_name_8bb004c5: "Opptre som %{name}"
-  mastery_paths_breakdown_6e0b5fce: " Samanbrot av meistringsstiar"
+  mastery_paths_breakdown_6e0b5fce: "Sjå meistringssti-detaljar"
   mastery_paths_cc4096c2: Meistringsstiar
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Resultatet reflekterer høgaste resultat i ei karaktersett oppgåve eller prøve."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Resultatet reflekterer den siste karaktersette oppgåva eller prøva."
@@ -15083,7 +15083,7 @@ nn:
   undated_15c2e5fe: "Utan dato"
   undated_items_toggle_list_visibility_6219e641: "Udaterte element  i liste ein kan vise/skjule"
   undelivered_message_459916a9: "Ikkje levert melding"
-  underline_links_e7cf9b4f: "Understrek lenker"
+  underline_links_e7cf9b4f: "Bruk understreka lenker"
   undo_a7be8fef: Angre
   unenrolled_users_e7632d24: "Brukarar utan kurspåmeldingar"
   ungraded_answers_31ef2df7: "Svar som ikkje er karaktersette"
