@@ -54,6 +54,7 @@ class Enrollment < ActiveRecord::Base
   validate :cant_observe_self, :if => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' }
 
   validate :valid_role?
+  validate :valid_course?
   validate :valid_section?
 
   before_save :assign_uuid
@@ -97,6 +98,12 @@ class Enrollment < ActiveRecord::Base
 
   def cant_observe_self
     self.errors.add(:associated_user_id, "Cannot observe yourself") if self.user_id == self.associated_user_id
+  end
+
+  def valid_course?
+    if self.course.deleted? && !self.deleted?
+      self.errors.add(:course_id, "is not a valid course")
+    end
   end
 
   def valid_section?
