@@ -21,7 +21,7 @@ require [
   @header = new CalendarHeader(
     el: "#calendar_header"
     calendar2Only: ENV.CALENDAR.CAL2_ONLY
-    showScheduler: ENV.CALENDAR.SHOW_SCHEDULER
+    showScheduler: ENV.CALENDAR.SHOW_SCHEDULER and !ENV.CALENDAR.BETTER_SCHEDULER
     )
   @calendar = new Calendar(
     "#calendar-app", ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.MANAGE_CONTEXTS, @eventDataSource,
