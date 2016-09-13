@@ -5,10 +5,8 @@ define([
   './stores/FlickrStore',
   './FlickrImage',
   './SVGWrapper',
-  'instructure-ui'
-], (React, I18n, FlickrActions, FlickrStore, FlickrImage, SVGWrapper, InstUI) => {
-
-  const Spinner = InstUI.Spinner;
+  'instructure-ui/Spinner'
+], (React, I18n, FlickrActions, FlickrStore, FlickrImage, SVGWrapper, { default: Spinner }) => {
 
   class FlickrSearch extends React.Component {
 
@@ -27,7 +25,7 @@ define([
     }
 
     componentWillUnmount() {
-      this.unsubscribe();    
+      this.unsubscribe();
     }
 
     handleChange() {
@@ -45,7 +43,7 @@ define([
         this.searchFlickr(value, 1);
       }
     }
-    
+
     searchFlickr (value, page) {
       FlickrStore.dispatch(FlickrActions.searchFlickr(value, page));
     }
@@ -74,10 +72,10 @@ define([
             <div className="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabIndex="-1">
               <i className="icon-search"></i>
             </div>
-            <input className="ic-Input" 
-                   placeholder={I18n.t('Search flickr')} 
-                   aria-label="Search widgets" 
-                   value={this.state.searchTerm} 
+            <input className="ic-Input"
+                   placeholder={I18n.t('Search flickr')}
+                   aria-label="Search widgets"
+                   value={this.state.searchTerm}
                    type="search"
                    onChange={this.handleInput} />
           </div>
@@ -85,19 +83,19 @@ define([
           {!this.state.searching ?
             <div className="FlickrSearch__images">
               {photos ? photos.photo.map( (photo) => {
-                return <FlickrImage key={photo.id} 
+                return <FlickrImage key={photo.id}
                                     url={photo.url_m}
-                                    searchTerm={this.state.searchTerm} 
+                                    searchTerm={this.state.searchTerm}
                                     selectImage={this.props.selectImage} />
               }) : null }
             </div>
-            : 
+            :
             <div className="FlickrSearch__loading">
               <Spinner title="Loading"/>
             </div>
           }
 
-          {photos ? 
+          {photos ?
             <span className="FlickrSearch__pageNavigation">
               {(this.state.page > 1 && !this.state.searching) ?
                 <a className="FlickrSearch__control" ref="flickrSearchControlPrev" href="#" onClick={this.decrementPageCount}>

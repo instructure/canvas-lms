@@ -5,7 +5,13 @@ define([
 ], (React, ReactDOM, Sidebar) => {
   const TestUtils = React.addons.TestUtils
 
-  module('Sticky Sidebar')
+  const container = document.getElementById('fixtures')
+
+  module('Sticky Sidebar', {
+    teardown () {
+      ReactDOM.unmountComponentAtNode(container)
+    }
+  })
 
   const renderComponent = (props) => {
     return TestUtils.renderIntoDocument(
@@ -16,7 +22,7 @@ define([
   const renderInDOM = (props) => {
     return ReactDOM.render(
       <Sidebar {...props} />
-    , document.getElementById('fixtures'))
+    , container)
   }
 
   const defaultProps = () => {

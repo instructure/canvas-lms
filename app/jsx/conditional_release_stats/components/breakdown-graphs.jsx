@@ -1,10 +1,10 @@
 define([
   'react',
-  'instructure-ui',
+  'instructure-ui/Spinner',
   'i18n!cyoe_assignment_sidebar',
   './breakdown-graph-bar',
   '../helpers/score',
-], (React, { Spinner }, I18n, BarGraph, scoreHelpers) => {
+], (React, { default: Spinner }, I18n, BarGraph, scoreHelpers) => {
   const { object, array, func, number, bool } = React.PropTypes
 
   class BreakdownGraphs extends React.Component {

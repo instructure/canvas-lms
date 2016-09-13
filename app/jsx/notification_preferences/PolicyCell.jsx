@@ -2,14 +2,19 @@ define([
   'jquery',
   'react',
   'react-dom',
-  'instructure-ui',
-], ($, React, ReactDOM, InstUI) => {
+  'instructure-ui/RadioInput',
+  'instructure-ui/RadioInputGroup',
+  'instructure-ui/ScreenReaderContent',
+], (
+  $,
+  React,
+  ReactDOM,
+  { default: RadioInput },
+  { default: RadioInputGroup },
+  { default: ScreenReaderContent }
+) => {
 
 const PropTypes = React.PropTypes
-
-const RadioInputGroup = InstUI.RadioInputGroup
-const RadioInput = InstUI.RadioInput
-const ScreenReaderContent = InstUI.ScreenReaderContent
 
 return class PolicyCell extends React.Component {
   static renderAt (elt, props) {

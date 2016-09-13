@@ -3,13 +3,19 @@ define([
   'react-dom',
   'jsx/conditional_release_stats/components/breakdown-details',
 ], (React, ReactDOM, BreakdownDetails) => {
-  module('Breakdown Details')
+  const container = document.getElementById('fixtures')
+
+  module('Breakdown Details', {
+    teardown() {
+      ReactDOM.unmountComponentAtNode(container);
+    }
+  })
 
   // using ReactDOM instead of TestUtils to render because of InstUI
   const renderComponent = (props) => {
     return ReactDOM.render(
       <BreakdownDetails {...props} />
-    , document.getElementById('fixtures'))
+    , container)
   }
 
   const defaultProps = () => ({

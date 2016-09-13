@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "brandable_css": "0.0.67",
-    "instructure-ui": "0.13.3"
+    "instructure-ui": "0.14.4"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
