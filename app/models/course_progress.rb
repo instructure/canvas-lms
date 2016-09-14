@@ -19,11 +19,13 @@
 class CourseProgress
   include Rails.application.routes.url_helpers
 
-  attr_accessor :course, :user
+  attr_accessor :course, :user, :read_only
 
-  def initialize(course, user)
+  # use read_only to avoid triggering more progression evaluations
+  def initialize(course, user, read_only: false)
     @course = course
     @user = user
+    @read_only = read_only
   end
 
   def modules
@@ -31,7 +33,17 @@ class CourseProgress
   end
 
   def current_module
-    @_current_module ||= modules.detect { |m| m.evaluate_for(user).completed? == false }
+    if read_only
+      @_current_module ||= begin
+        progressions_by_mod_id = module_progressions.index_by(&:context_module_id)
+        modules.detect do |m|
+          prog = progressions_by_mod_id[m.id]
+          prog.nil? || prog.completed? == false
+        end
+      end
+    else
+      @_current_module ||= modules.detect { |m| m.evaluate_for(user).completed? == false }
+    end
   end
 
   def module_progressions
@@ -41,7 +53,14 @@ class CourseProgress
 
   def current_position
     return unless in_progress?
-    @current_position ||= current_module.evaluate_for(user).current_position
+    if read_only
+      @current_positions ||= begin
+        prog = module_progressions.detect{|p| p.context_module_id == current_module.id}
+        prog && prog.current_position
+      end
+    else
+      @current_position ||= current_module.evaluate_for(user).current_position
+    end
   end
 
   def current_content_tag
