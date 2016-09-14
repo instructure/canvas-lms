@@ -392,8 +392,7 @@ class WikiPagesApiController < ApplicationController
   def destroy
     if authorized_action(@page, @current_user, :delete)
       if !@was_front_page
-        @page.workflow_state = 'deleted'
-        @page.save!
+        @page.destroy
         process_front_page
         render :json => wiki_page_json(@page, @current_user, session)
       else
