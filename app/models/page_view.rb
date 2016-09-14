@@ -29,6 +29,8 @@ class PageView < ActiveRecord::Base
   before_save :cap_interaction_seconds
   belongs_to :context, polymorphic: [:course, :account, :group, :user, :user_profile], polymorphic_prefix: true
 
+  CONTEXT_TYPES = %w{Course Account Group User UserProfile}.freeze
+
   attr_accessor :generated_by_hand
   attr_accessor :is_update
 

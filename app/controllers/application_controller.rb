@@ -1097,7 +1097,7 @@ class ApplicationController < ActionController::Base
         @page_view_update = true
       end
       if @page_view && @page_view_update
-        @page_view.context = @context if !@page_view.context_id
+        @page_view.context = @context if !@page_view.context_id && PageView::CONTEXT_TYPES.include?(@context.class.name)
         @page_view.account_id = @domain_root_account.id
         @page_view.developer_key_id = @access_token.try(:developer_key_id)
         @page_view.store
