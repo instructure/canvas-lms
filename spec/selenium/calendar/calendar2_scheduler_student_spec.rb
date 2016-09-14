@@ -54,6 +54,21 @@ describe "scheduler" do
       expect(f('.event-details-content')).to include_text "my comments"
     end
 
+    it "reserves appointment groups via Find Appointment mode" do
+      my_course = @course
+      @course.root_account.enable_feature! :better_scheduler
+      create_appointment_group(:contexts => [my_course])
+      get "/calendar2#view_name=week&view_start=#{(Date.today + 1.day).strftime}"
+      wait_for_ajaximations
+      f('#FindAppointmentButton').click
+      f('.ReactModalPortal button[type="submit"]').click
+      f('.fc-event.scheduler-event').click
+      f('.reserve_event_link').click
+      wait_for_ajaximations
+      f('#FindAppointmentButton').click
+      expect(f('.fc-event.scheduler-event')).to include_text 'new appointment group'
+    end
+
     it "should allow me to replace existing reservation when at limit", priority: "1", test_id: 505291 do
       tomorrow = (Date.today + 1).to_s
       create_appointment_group(:max_appointments_per_participant => 1,

@@ -4,7 +4,7 @@ define [
   'compiled/calendar/CalendarEventFilter'
 ], (CommonEvent, commonEventFactory, CalendarEventFilter) ->
 
-  test_events = (can_edit, child_events_count, available_slots = 1) ->
+  test_events = (can_edit, child_events_count, available_slots = 1, reserved = false) ->
     [
       commonEventFactory
         id: "1"
@@ -45,6 +45,7 @@ define [
         child_events: []
         url: "http://example.org/api/v1/calendar_events/20"
         available_slots: available_slots
+        reserved: reserved
       ,
         [{asset_string: 'course_1', id: 1, can_create_calendar_events: can_edit}]
     ]
@@ -95,6 +96,12 @@ define [
 
   test 'CalendarEventFilter: hides filled slots', ->
     events = test_events(false, 0, 0)
+    filteredEvents = CalendarEventFilter(null, events, {inFindAppointmentMode: true, selectedCourse: {id: 1, asset_string: 'course_1'}})
+    equal filteredEvents.length, 1
+    equal filteredEvents[0].id, 'calendar_event_1'
+
+  test 'CalendarEventFilter: hides already-reserved appointments that still have available slots', ->
+    events = test_events(false, 0, 1, true)
     filteredEvents = CalendarEventFilter(null, events, {inFindAppointmentMode: true, selectedCourse: {id: 1, asset_string: 'course_1'}})
     equal filteredEvents.length, 1
     equal filteredEvents[0].id, 'calendar_event_1'
