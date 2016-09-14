@@ -218,7 +218,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def populate_rubric_title
-    self.title ||= t('context_name_rubric', "%{course_name} Rubric", :course_name => context.name)
+    self.title ||= context && t('context_name_rubric', "%{course_name} Rubric", :course_name => context.name)
   end
 
   CriteriaData = Struct.new(:criteria, :points_possible, :title)
