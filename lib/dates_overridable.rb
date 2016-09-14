@@ -232,7 +232,7 @@ module DatesOverridable
       hash
     end
 
-    if tag_info[:due_date]
+    if user && tag_info[:due_date]
       if tag_info[:due_date] < Time.now
         if self.is_a?(Quizzes::Quiz) || (self.is_a?(Assignment) && expects_submission?)
           has_submission =
