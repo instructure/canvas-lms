@@ -237,7 +237,7 @@ class Assignment
         json
       end
       res[:GROUP_GRADING_MODE] = @assignment.grade_as_group?
-      res
+      StringifyIds.recursively_stringify_ids(res)
     ensure
       Attachment.skip_thumbnails = nil
     end
