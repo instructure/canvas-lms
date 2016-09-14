@@ -71,3 +71,18 @@ define [
       }
     }] } )
     ok ExternalToolsPlugin.dialogCancelHandler.notCalled
+
+  test "it removes the externalContentReady handler on close", ()->
+    externalContentReadySpy = sinon.spy()
+    ExternalToolsPlugin.dialogCancelHandler = ()->
+    $dialog = ExternalToolsPlugin.buttonSelected(@buttonSpy, @fakeEditor)
+    $(window).bind("externalContentReady", externalContentReadySpy)
+    $dialog.dialog('close')
+    $(window).trigger("externalContentReady", { contentItems: [{
+      "@type": 'LtiLinkItem',
+      url: 'http://canvas.instructure.com/test',
+      placementAdvice: {
+        presentationDocumentTarget: ""
+      }
+    }] } )
+    ok externalContentReadySpy.notCalled

@@ -140,6 +140,7 @@ define([
         close: function(){
           $dialog.find("iframe").attr('src', '/images/ajax-loader-medium-444.gif');
           $(window).off('beforeunload', ExternalToolsPlugin.beforeUnloadHandler);
+          $(window).unbind("externalContentReady");
         }
       });
       $(window).on('beforeunload', ExternalToolsPlugin.beforeUnloadHandler);
