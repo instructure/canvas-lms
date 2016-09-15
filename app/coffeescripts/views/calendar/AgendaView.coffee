@@ -76,7 +76,7 @@ define [
 
     appendEvents: (events) =>
       @nextPageDate = events.nextPageDate
-      @collection.push.apply(@collection, calendarEventFilter(@viewingGroup, events))
+      @collection.push.apply(@collection, calendarEventFilter(@viewingGroup, events, @calendar?.schedulerState))
       @collection = _.sortBy(@collection, 'originalStart')
       @render()
 
@@ -201,6 +201,7 @@ define [
       meta:
         hasMore: !!@nextPageDate
         displayAppointmentEvents: @viewingGroup
+        better_scheduler: ENV.CALENDAR.BETTER_SCHEDULER
 
     # Public: Creates the json for the template.
     #

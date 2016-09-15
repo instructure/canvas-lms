@@ -17,14 +17,14 @@
                       <span class="ig-title group_{{contextCode}} {{#if isCompleted}}calendar__event--completed{{/if}}">
                         <span class="screenreader-only">{{readableType}},</span>
                         <i class="icon-{{iconType}}"></i>
-                        {{#if ../../meta.displayAppointmentEvents}}
-                          {{#if isAppointmentGroupEvent}}
+                        {{#if ../../meta.better_scheduler}}
+                          {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}}
+                        {{else}}
+                          {{#ifAll ../../../meta.displayAppointmentEvents isAppointmentGroupEvent}}
                             {{appointmentGroupEventStatus}}
                           {{else}}
                             {{#truncate title 60}}{{/truncate}}
-                          {{/if}}
-                        {{else}}
-                          {{#truncate title 60}}{{/truncate}}
+                          {{/ifAll}}
                         {{/if}}
                         {{#if isCompleted}}<span class="screenreader-only">,(completed),</span>{{/if}}
                       </span>

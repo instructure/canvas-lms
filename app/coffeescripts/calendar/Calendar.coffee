@@ -657,7 +657,7 @@ define [
 
     agendaViewFetch: (start) ->
       @setDateTitle(@formatDate(start, 'date.formats.medium'))
-      @agenda.fetch(@visibleContextList, start)
+      @agenda.fetch(@visibleContextList.concat(@findAppointmentModeGroups()), start)
 
     renderDateRange: (start, end) =>
       @setDateTitle(@formatDate(start, 'date.formats.medium')+' – '+@formatDate(end, 'date.formats.medium'))
@@ -740,10 +740,11 @@ define [
       changed = @schedulerState.inFindAppointmentMode != newState.inFindAppointmentMode
       @schedulerState = newState
       @refetchEvents() if changed
+      if (changed)
+        @loadAgendaView()
 
     findAppointmentModeGroups: () =>
       if @schedulerState.inFindAppointmentMode && @schedulerState.selectedCourse
         @reservable_appointment_groups[@schedulerState.selectedCourse.asset_string] || []
       else
         []
-
