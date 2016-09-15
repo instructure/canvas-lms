@@ -22,6 +22,9 @@ describe Latex::MathMl do
       </math>
     DOC
   end
+  let(:service_url) { 'http://get.mml.com' }
+  let(:request_id)  { '0c0dad8c-7857-4447-ba1f-9f33a2f1debf' }
+  let(:request_id_signature)  { Canvas::Security.sign_hmac_sha512(request_id) }
 
   subject(:math_ml) do
     Latex::MathMl.new(latex: latex)
@@ -36,16 +39,30 @@ describe Latex::MathMl do
     context 'when using mathman' do
       before do
         MathMan.expects(
-          url_for: 'http://get.mml.com',
+          url_for: service_url,
           use_for_mml?: true
+        ).at_least_once
+        RequestContextGenerator.expects(
+          request_id: request_id
+        ).at_least_once
+        Canvas::Security.expects(
+          services_signing_secret: 'wooper'
         ).at_least_once
       end
 
       it 'calls `CanvasHttp.get` with full url' do
-        CanvasHttp.expects(get: OpenStruct.new(
-          status: '200',
-          body: mml_doc
-        ))
+        CanvasHttp.expects(:get).
+          with(service_url, {
+            'X-Request-Context-Id' => Canvas::Security.base64_encode(request_id),
+            'X-Request-Context-Signature' => Canvas::Security.base64_encode(request_id_signature)
+          }).
+          returns(
+            OpenStruct.new(
+              status: '200',
+              body: mml_doc
+            )
+          )
+
         math_ml.parse
       end
 
