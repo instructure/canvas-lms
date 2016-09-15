@@ -69,6 +69,24 @@ module Canvas
           expect(state[:usage_rights_required]).to be true
         end
       end
+
+      describe ':ui' do
+        before(:each) do
+          @u.stubs(:prefers_high_contrast?)
+        end
+
+        it 'sets use_high_contrast to true' do
+          @u.expects(:prefers_high_contrast?).returns(true)
+          state = JWTWorkflow.state_for([:ui], @c, @u)
+          expect(state[:use_high_contrast]).to be true
+        end
+
+        it 'sets use_high_contrast to false' do
+          @u.expects(:prefers_high_contrast?).returns(false)
+          state = JWTWorkflow.state_for([:ui], @c, @u)
+          expect(state[:use_high_contrast]).to be false
+        end
+      end
     end
   end
 end
