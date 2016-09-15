@@ -69,6 +69,12 @@ define [
     view = @editView()
     equal view.$('#assignment_name').val(), 'Test Assignment'
 
+  test 'rejects missing group set for group assignment', ->
+    view = @editView()
+    data = { group_category_id: 'blank' }
+    errors = view.validateBeforeSave(data, [])
+    equal errors['newGroupCategory'][0]['message'], 'Please create a group set'
+
   test 'rejects a letter for points_possible', ->
     view = @editView()
     data = points_possible: 'a'

@@ -282,7 +282,6 @@ describe "assignments" do
       manually_create_assignment
       f('#has_group_category').click
       wait_for_ajaximations
-      click_option('#assignment_group_category_id', 'new', :value)
       fj('.ui-dialog:visible .self_signup_help_link img').click
       wait_for_ajaximations
       expect(f('#self_signup_help_dialog')).to be_displayed
@@ -307,7 +306,7 @@ describe "assignments" do
       end
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
       visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
-      expect(visBoxes.first.text).to eq "Please select a group set for this assignment"
+      expect(visBoxes.first.text).to eq "Please create a group set"
     end
 
     it "shows assignment details, un-editable, for concluded teachers", priority: "2", test_id: 626906 do
@@ -372,12 +371,11 @@ describe "assignments" do
         expect(f("#assignment_group_category_id")).to be_disabled
       end
 
-      it "should revert to [ New Group Category ] if original group is deleted with no submissions", priority: "2", test_id: 627150 do
+      it "should revert to a blank selection if original group is deleted with no submissions", priority: "2", test_id: 627150 do
         @assignment2.group_category.destroy
         get "/courses/#{@course.id}/assignments/#{@assignment2.id}/edit"
         wait_for_ajaximations
-
-        expect(f("#assignment_group_category_id option[selected]")).to include_text "New Group Category"
+        expect(f("#assignment_group_category_id option[selected][value='blank']")).to be_displayed
       end
 
       it "should show and hide the intra-group peer review toggle depending on group setting" do

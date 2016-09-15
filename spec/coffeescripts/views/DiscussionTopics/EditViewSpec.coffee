@@ -81,9 +81,9 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     clock = sinon.useFakeTimers()
     view = @editView()
     clock.tick(1)
-    data = { group_category_id: 'new' }
+    data = { group_category_id: 'blank' }
     errors = view.validateBeforeSave(data, [])
-    ok errors["groupCategorySelector"][0]["message"]
+    ok errors["newGroupCategory"][0]["message"]
     clock.restore()
 
   test 'does not render #podcast_has_student_posts_container for non-course contexts', ->

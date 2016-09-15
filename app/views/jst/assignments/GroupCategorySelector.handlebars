@@ -46,10 +46,11 @@
               {{name}}
             </option>
           {{/each}}
-          <option value="new" {{selectedIf originalGroupRemoved}}>
-            [ {{#t "group_category_options"}}New Group Category{{/t}} ]
-          </option>
+          <option value="blank" {{selectedIf originalGroupRemoved}}></option>
         </select>
+        <div>
+          <button class="Button" type="button" id="create_group_category_id" {{disabledIf groupCategoryIdDisabled}}>{{#t}}New Group Category{{/t}}</button>
+        </div>
       </div>
     </div>
     {{#if groupCategoryLocked}}
