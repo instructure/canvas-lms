@@ -411,6 +411,8 @@ class Enrollment < ActiveRecord::Base
     observers.each do |observer|
       if enrollment = active_linked_enrollment_for(observer)
         enrollment.update_from(self)
+      elsif self.workflow_state_changed? && self.workflow_state_was == 'inactive'
+        create_linked_enrollment_for(observer)
       end
     end
   end
