@@ -11,7 +11,7 @@ group :test do
   gem 'mocha', github: 'maneframe/mocha', ref: 'bb8813fbb4cc589d7c58073d93983722d61b6919', require: false
     gem 'metaclass', '0.0.2', require: false
   gem 'thin', '1.6.3'
-    gem 'eventmachine', '1.0.4', require: false
+    gem 'eventmachine', '1.0.9', require: false
 
   gem 'rspec', '3.4.0'
   gem 'rspec-rails', '3.4.1'
