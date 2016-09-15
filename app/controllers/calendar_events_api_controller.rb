@@ -510,11 +510,12 @@ class CalendarEventsApiController < ApplicationController
     get_event
     if authorized_action(@event, @current_user, :reserve)
       begin
-        if params[:participant_id] && @event.appointment_group.grants_right?(@current_user, session, :manage)
-          participant = @event.appointment_group.possible_participants.detect { |p| p.id == params[:participant_id].to_i }
+        participant_id = Shard.relative_id_for(params[:participant_id], Shard.current, Shard.current) if params[:participant_id]
+        if participant_id && @event.appointment_group.grants_right?(@current_user, session, :manage)
+          participant = @event.appointment_group.possible_participants.detect { |p| p.id == participant_id }
         else
           participant = @event.appointment_group.participant_for(@current_user)
-          participant = nil if participant && params[:participant_id] && params[:participant_id].to_i != participant.id
+          participant = nil if participant && participant_id && participant_id != participant.id
         end
         raise CalendarEvent::ReservationError, "invalid participant" unless participant
         reservation = @event.reserve_for(participant, @current_user,
