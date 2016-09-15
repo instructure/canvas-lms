@@ -70,6 +70,8 @@ define [
       json.canManage =
         if _.any(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], (et) => @model.hasEnrollmentType(et))
           ENV.permissions.manage_admin_users
+        else if @model.hasEnrollmentType('ObserverEnrollment')
+          ENV.permissions.manage_admin_users || ENV.permissions.manage_students
         else
           ENV.permissions.manage_students
       json.customLinks = @model.get('custom_links')
