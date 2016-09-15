@@ -216,8 +216,11 @@
 #           "description": "Permissions the user has for the quiz"
 #         },
 #         "all_dates": {
-#           "$ref": "AssignmentDate",
-#           "description": "list of due dates for the quiz"
+#           "description": "list of due dates for the quiz",
+#           "type": "array",
+#           "items": {
+#             "$ref": "AssignmentDate"
+#           }
 #         },
 #         "version_number": {
 #           "description": "Current version number of the quiz",
@@ -226,7 +229,7 @@
 #         },
 #         "question_types": {
 #           "description": "List of question types in the quiz",
-#           "example": ["mutliple_choice", "essay"],
+#           "example": ["multiple_choice", "essay"],
 #           "type": "array",
 #           "items": {"type": "string"}
 #         }
