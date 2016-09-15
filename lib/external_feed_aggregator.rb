@@ -36,7 +36,7 @@ class ExternalFeedAggregator
 
         feeds.each do |feed|
           Shackles.activate(:master) do
-            if !feed.context || feed.context.root_account.deleted?
+            if !feed.context || feed.context.root_account.deleted? || feed.context.deleted?
               feed.update_attribute(:refresh_at, success_wait_seconds.seconds.from_now)
               next
             end
