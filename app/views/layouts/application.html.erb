@@ -71,7 +71,9 @@
       <% if crumbs.length > 1 %>
         <div class="ic-app-nav-toggle-and-crumbs no-print">
           <% if @show_left_side %>
-            <button type="button" aria-hidden="true" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" title="<%= t('Show and hide courses menu') %>"><i class="icon-hamburger"></i></button>
+            <button type="button" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" aria-live="polite" aria-label="<%= t('Hide courses menu') %>" title="<%= t('Hide courses menu') %>">
+              <i class="icon-hamburger" aria-hidden="true"></i>
+            </button>
             <div class="ic-app-crumbs">
           <% end %>
           <%= render_crumbs %>

@@ -1,6 +1,7 @@
 require [
   'jquery'
   'underscore'
+  'i18n!common'
 
   # true modules that we manage in this file
   'Backbone'
@@ -46,7 +47,7 @@ require [
   'vendor/jquery.pageless'
   'vendor/jquery.scrollTo'
   'compiled/badge_counts'
-], ($, _, Backbone, helpDialog) ->
+], ($, _, I18n, Backbone, helpDialog) ->
   helpDialog.initTriggers()
 
   $('#skip_navigation_link').on 'click', ->
@@ -69,6 +70,15 @@ require [
   $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
   $('body').on 'click', '#courseMenuToggle', ->
     $('body').toggleClass("course-menu-expanded")
+    
+    # update course menu and toggle for accessibility
+    courseMenuExpanded = $('body').hasClass('course-menu-expanded')
+    courseMenuToggleText = if courseMenuExpanded then I18n.t("Hide courses menu") else I18n.t("Show courses menu")
+    courseMenuToggle = $('#courseMenuToggle')
+    courseMenuToggle.attr("aria-label", courseMenuToggleText)
+    courseMenuToggle.attr("title", courseMenuToggleText)
+    $('#left-side').css({display: if courseMenuExpanded then 'block' else 'none'})
+
     resetMenuItemTabIndexes()
 
 
