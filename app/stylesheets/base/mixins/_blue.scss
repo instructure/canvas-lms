@@ -1,16 +1,3 @@
-@mixin bevelText {
-  text-shadow: 0 1px 1px hsla(0, 100%, 100%, 0.75);
-}
-
-@mixin header-text {
-  color: $fcHeader;
-  text-shadow: 0 1px 1px $textShadowHeader;
-}
-@mixin header-bg {
-  @include vertical-gradient($gradientTopHeader, $gradientBottomHeader);
-  box-shadow: inset 0 1px 0 hsla(0, 100%, 100%, 0.75);
-}
-
 @mixin ui-widget-header-bg-and-text {
   border: 1px solid $ic-border-light;
   background: $lightBackground;
@@ -32,10 +19,4 @@
     background-image: url('/images/' + $filename + '@2x.' + $filetype);
     background-size: $bgw $bgh;
   }
-}
-
-// Easier box model
-@mixin border-box {
-  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-  &:before, &:after { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 }
