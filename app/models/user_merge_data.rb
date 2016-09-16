@@ -29,12 +29,13 @@ class UserMergeData < ActiveRecord::Base
     Time.zone.now - Setting.get('user_merge_to_split_time', 90.days.to_i).to_i
   end
 
-  def add_more_data(objects, user=nil)
+  def add_more_data(objects, user: nil, workflow_state: nil)
     objects.each do |o|
       user ||= o.user_id
       r = self.user_merge_data_records.new(context: o, previous_user_id: user)
       r.previous_workflow_state = o.workflow_state if o.class.columns_hash.key?('workflow_state')
       r.previous_workflow_state = o.file_state if o.class == Attachment
+      r.previous_workflow_state = workflow_state if workflow_state
       r.save!
     end
   end
