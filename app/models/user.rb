@@ -1468,9 +1468,9 @@ class User < ActiveRecord::Base
         filter_by_visibilities_in_given_courses(id, courses.map(&:id)).
         published.
         due_between_with_overrides(due_after, due_before).
-        expecting_submission.
         need_submitting_info(id, options[:limit]).
         not_locked
+      assignments = assignments.expecting_submission unless opts[:include_ungraded]
       select_available_assignments(assignments)
     end
   end
