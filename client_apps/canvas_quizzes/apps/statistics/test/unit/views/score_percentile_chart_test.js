@@ -40,6 +40,18 @@ define(function(require) {
       expect(findAll('rect.bar').length).toEqual(101);
     });
 
+    it('should add a description each bar', function() {
+      setProps({
+        scores: {
+          1: 1,]
+          62: 2
+        }
+      });
+
+      var summaryText = find('#summary-statistics').innerText;
+      expect(summaryText).toContain('2 students in percentile 62');
+    });
+
     it('bar height should be based on score frequency', function(done) {
       setProps({
         scores: {
