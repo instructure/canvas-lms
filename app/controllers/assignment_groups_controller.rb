@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -151,14 +151,20 @@ class AssignmentGroupsController < ApplicationController
     if authorized_action(@group, @current_user, :update)
       order = params[:order].split(',').map{|id| id.to_i }
       group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.where(id: order).uniq.except(:order).pluck(:assignment_group_id)))
-      Assignment.where(:id => order, :context_id => @context, :context_type => @context.class.to_s).update_all(:assignment_group_id => @group)
+      assignments = @context.active_assignments.where(id: order).preload(:active_assignment_overrides)
+
+      unless @current_user.admin_of_root_account?(@context.root_account) || can_reorder_assignments?(assignments)
+        return render_unauthorized_action
+      end
+
+      assignments.update_all(assignment_group_id: @group)
       @group.assignments.first.update_order(order) unless @group.assignments.empty?
-      groups = AssignmentGroup.where(:id => group_ids)
+      groups = AssignmentGroup.where(id: group_ids)
       groups.touch_all
       groups.each{|assignment_group| AssignmentGroup.notify_observers(:assignments_changed, assignment_group)}
       ids = @group.active_assignments.map(&:id)
       @context.recompute_student_scores rescue nil
-      render :json => {:reorder => true, :order => ids}, :status => :ok
+      render json: { reorder: true, order: ids}, status: :ok
     end
   end
 
@@ -374,5 +380,11 @@ class AssignmentGroupsController < ApplicationController
     else
       grading_period.assignments(assignments)
     end
+  end
+
+  def can_reorder_assignments?(assignments)
+    return true unless @context.feature_enabled?(:multiple_grading_periods)
+    periods = GradingPeriod.for(@context)
+    assignments.none? { |assignment| assignment.due_for_any_student_in_closed_grading_period?(periods) }
   end
 end

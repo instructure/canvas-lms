@@ -2095,7 +2095,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def due_for_any_student_in_closed_grading_period?(periods = nil)
-    return false unless self.due_date || self.has_overrides?
+    return false unless self.due_date || self.has_active_overrides?
 
     periods ||= GradingPeriod.for(self.course)
     due_in_closed_period = !self.only_visible_to_overrides &&

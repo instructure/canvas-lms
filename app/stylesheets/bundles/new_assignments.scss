@@ -96,6 +96,14 @@
   a {
     color: darken($ic-color-neutral, 40%);
   }
+
+  &.disabled {
+    cursor: not-allowed;
+
+    .icon-drag-handle {
+      color: darken($ic-color-neutral, 10%);
+    }
+  }
 }
 
 .sortable-handle {

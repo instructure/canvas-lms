@@ -216,13 +216,13 @@ shared_examples_for "an object whose dates are overridable" do
     context "has active overrides" do
       before { override }
       it "returns true" do
-        expect(overridable.has_active_overrides?).to eq true
+        expect(overridable.reload.has_active_overrides?).to eq true
       end
     end
     context "when it has deleted overrides" do
       it "returns false" do
         override.destroy
-        expect(overridable.has_active_overrides?).to eq false
+        expect(overridable.reload.has_active_overrides?).to eq false
       end
     end
 

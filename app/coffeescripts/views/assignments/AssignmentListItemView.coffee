@@ -24,7 +24,8 @@ define [
     @optionProperty 'userIsAdmin'
 
     tagName: "li"
-    className: "assignment"
+    className: ->
+      "assignment#{if @canMove() then '' else ' sort-disabled'}"
     template: template
 
     @child 'publishIconView',         '[data-view=publish-icon]'
@@ -42,6 +43,7 @@ define [
       'click .delete_assignment': 'onDelete'
       'click .tooltip_link': preventDefault ->
       'keydown': 'handleKeys'
+      'mousedown': 'stopMoveIfProtected'
 
     messages:
       confirm: I18n.t('Are you sure you want to delete this assignment?')
@@ -121,13 +123,17 @@ define [
 
       if @moveAssignmentView
         @moveAssignmentView.hide()
-        @moveAssignmentView.setTrigger @$moveAssignmentButton
+        if @canMove()
+          @moveAssignmentView.setTrigger @$moveAssignmentButton
 
       @updateScore() if @canReadGrades()
 
     toggleHidden: (model, hidden) =>
       @$el.toggleClass('hidden', hidden)
       @$el.toggleClass('search_show', !hidden)
+
+    stopMoveIfProtected: (e) ->
+      e.stopPropagation() unless @canMove()
 
     createModuleToolTip: =>
       link = @$el.find('.tooltip_link')
@@ -146,9 +152,7 @@ define [
       data.canManage = @canManage()
       data = @_setJSONForGrade(data) unless data.canManage
 
-      # can move items if there's more than one parent
-      # collection OR more than one in the model's collection
-      data.canMove = @model.collection.view?.parentCollection?.length > 1 or @model.collection.length > 1
+      data.canMove = @canMove()
       data.canDelete = @canDelete()
       data.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
       data.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
@@ -206,6 +210,9 @@ define [
 
     canDelete: ->
       @userIsAdmin or @model.canDelete()
+
+    canMove: ->
+      @userIsAdmin or (@canManage() and @model.canDelete())
 
     canManage: ->
       ENV.PERMISSIONS.manage

@@ -149,7 +149,7 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   def points_possible
-    self.assignments.map{|a| a.points_possible || 0}.sum
+    self.assignments.reduce(0) { |sum, assignment| sum + (assignment.points_possible || 0) }
   end
 
   scope :include_active_assignments, -> { preload(:active_assignments) }
@@ -190,21 +190,18 @@ class AssignmentGroup < ActiveRecord::Base
     return false unless PluginSetting.settings_for_plugin(:assignment_freezer)
     return false unless self.active_assignments.length > 0
 
-    self.active_assignments.each do |asmnt|
-      return true if asmnt.frozen_for_user?(user)
+    self.active_assignments.any? do |assignment|
+      assignment.frozen_for_user?(user)
     end
-
-    false
   end
 
   def has_frozen_assignment_group_id_assignment?(user)
     return false unless PluginSetting.settings_for_plugin(:assignment_freezer)
     return false unless self.active_assignments.length > 0
 
-    self.active_assignments.each do |asmnt|
-      return true if asmnt.att_frozen?(:assignment_group_id,user)
+    self.active_assignments.any? do |assignment|
+      assignment.att_frozen?(:assignment_group_id, user)
     end
-    false
   end
 
   def has_assignment_due_in_closed_grading_period?

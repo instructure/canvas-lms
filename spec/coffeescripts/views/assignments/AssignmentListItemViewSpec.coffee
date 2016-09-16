@@ -121,7 +121,6 @@ define [
 
   genSetup = (model=assignment1()) ->
     fakeENV.setup(PERMISSIONS: {manage: false})
-
     @model = model
     @submission = new Submission
     @view = createView(@model, canManage: false)
@@ -134,17 +133,14 @@ define [
     fakeENV.teardown()
     $('#fixtures').empty()
 
-
   module 'AssignmentListItemViewSpec',
     setup: ->
       genSetup.call @
-
       @snapshot = tz.snapshot()
       I18nStubber.pushFrame()
 
     teardown: ->
       genTeardown.call @
-
       tz.restore(@snapshot)
       I18nStubber.popFrame()
 
@@ -188,7 +184,6 @@ define [
 
     ok view.$('.ig-row').hasClass('ig-published')
     @model.set('published', false)
-    #@model.save()
     ok !view.$('.ig-row').hasClass('ig-published')
 
   test 'asks for confirmation before deleting an assignment', ->
@@ -228,7 +223,6 @@ define [
     ENV.context_asset_string = old_asset_string
 
   test "delete calls screenreader message", ->
-
     old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = "course_1"
     server = sinon.fakeServer.create()
@@ -307,7 +301,6 @@ define [
     view = createView(@model, canManage: true)
     trigger = view.$("#assign_#{@model.id}_manage_link")
     ok(trigger.length, 'there is an a node with the correct id')
-    #show menu
     trigger.click()
 
     view.$("#assignment_#{@model.id}_settings_edit_item").click()
@@ -342,7 +335,6 @@ define [
     ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
 
   test "allows publishing", ->
-    #setup fake server
     @server = sinon.fakeServer.create()
     @server.respondWith "PUT", "/api/v1/users/1/assignments/1", [
       200,
@@ -480,6 +472,33 @@ define [
     view = createView(@model, canManage: true)
     equal view.dateDueColumnView.$("#vdd_tooltip_#{@model.id}_due div dd").first().text().trim(), 'Aug 28'
 
+  test 'can move when userIsAdmin is true', ->
+    view = createView(@model, userIsAdmin: true, canManage: false)
+    json = view.toJSON()
+    ok json.canMove
+    notOk view.className().includes('sort-disabled')
+
+  test 'can move when canManage is true and the model can be deleted', ->
+    @stub(@model, 'canDelete').returns(true)
+    view = createView(@model, userIsAdmin: false, canManage: true)
+    json = view.toJSON()
+    ok json.canMove
+    notOk view.className().includes('sort-disabled')
+
+  test 'cannot move when canManage is true but the model cannot be deleted', ->
+    @stub(@model, 'canDelete').returns(false)
+    view = createView(@model, userIsAdmin: false, canManage: true)
+    json = view.toJSON()
+    notOk json.canMove
+    ok view.className().includes('sort-disabled')
+
+  test 'cannot move when canManage is false but the model can be deleted', ->
+    @stub(@model, 'canDelete').returns(true)
+    view = createView(@model, userIsAdmin: false, canManage: false)
+    json = view.toJSON()
+    notOk json.canMove
+    ok view.className().includes('sort-disabled')
+
   module 'AssignmentListItemViewSpec—alternate grading type: percent',
     setup: ->
       genSetup.call @, assignment_grade_percent()
@@ -522,7 +541,6 @@ define [
     ok nonScreenreaderText().match('1.56/5 pts')[0], 'sets non-screenreader score text'
     ok nonScreenreaderText().match('Complete')[0], 'sets non-screenreader grade text'
 
-
   module 'AssignmentListItemViewSpec—alternate grading type: letter_grade',
     setup: ->
       genSetup.call @, assignment_grade_letter_grade()
@@ -539,7 +557,6 @@ define [
     ok screenreaderText().match('Grade: B')[0], 'sets screenreader grade text'
     ok nonScreenreaderText().match('1.56/5 pts')[0], 'sets non-screenreader score text'
     ok nonScreenreaderText().match('B')[0], 'sets non-screenreader grade text'
-
 
   module 'AssignmentListItemViewSpec—alternate grading type: not_graded',
     setup: ->
