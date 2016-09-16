@@ -92,6 +92,7 @@ define([
                   isSelected={_.indexOf(this.props.selectedItems, child) >=0}
                   toggleSelected={this.props.toggleItemSelected.bind(null, child)}
                   userCanManageFilesForContext={this.props.userCanManageFilesForContext}
+                  userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
                   usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
                   externalToolsForContext={this.props.externalToolsForContext}
                   previewItem={this.props.previewItem.bind(null, child)}

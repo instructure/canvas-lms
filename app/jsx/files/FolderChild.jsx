@@ -178,7 +178,7 @@ define([
         { this.renderUsageRightsIndicator() }
 
         <div className= 'ef-links-col' role= 'gridcell'>
-          { this.renderPublishCloud(canManage) }
+          { this.renderPublishCloud(canManage && this.props.userCanRestrictFilesForContext) }
           { this.renderItemCog(canManage) }
         </div>
       </div>
