@@ -890,6 +890,30 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(json['post_to_sis']).to eq false
     end
 
+    it "should not overwrite post_to_sis with default if missing in update params" do
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: true}
+      a.save!
+      json = api_create_assignment_in_course(@course, {'name' => 'some assignment'})
+      @assignment = Assignment.find(json['id'])
+      expect(@assignment.post_to_sis).to eq true
+      a.settings[:sis_default_grade_export] = {locked: false, value: false}
+      a.save!
+      
+      json = api_call(:put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+        {
+          :controller => 'assignments_api',
+          :action => 'update',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :id => @assignment.to_param
+        },
+        {:assignment => {:points_possible => 10}})
+      @assignment.reload
+      expect(@assignment.post_to_sis).to eq true
+    end
+
     it "returns unauthorized for users who do not have permission" do
       student_in_course(:active_all => true)
       @group = @course.assignment_groups.create!({:name => "some group"})
