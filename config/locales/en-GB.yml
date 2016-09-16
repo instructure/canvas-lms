@@ -15967,7 +15967,7 @@ en-GB:
   the_question_text_for_the_question_question_name_w_3a68a2c7: "The question text for the question '%{question_name}' was too long."
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "the roles held by reporting user (student, teacher, administrator, etc.)"
   the_salesforce_account_id_if_it_exists_e7949706: "The Salesforce Account ID (if it exists)"
-  the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "The scheduler tool allows youbto set up time slots for students (or student groups) to sign up. To get started, click the button below."
+  the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "The scheduler tool allows you to set up time slots for students (or student groups) to sign up. To get started, click the button below."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Severity of the issue, as selected by user from a drop-down menu."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "The shortcut icon for iOS/Android devices. 180x180 png"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "The specified user (%{id}) is not a student in this course"
