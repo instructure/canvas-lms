@@ -330,6 +330,10 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
+  # @argument enrollment_state [String, "active"|"invited_or_pending"|"completed"]
+  #   When set, only return courses where the user has an enrollment with the given state.
+  #   This will respect section/course/term date overrides.
+  #
   # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
@@ -512,6 +516,10 @@ class CoursesController < ApplicationController
   #   If set, only return courses that are in the given state(s).
   #   By default, "available" is returned for students and observers, and
   #   anything except "deleted", for all other enrollment types
+  #
+  # @argument enrollment_state [String, "active"|"invited_or_pending"|"completed"]
+  #   When set, only return courses where the user has an enrollment with the given state.
+  #   This will respect section/course/term date overrides.
   #
   # @returns [Course]
   def user_index
@@ -2506,9 +2514,9 @@ class CoursesController < ApplicationController
     # render view
   end
 
-  def retrieve_observed_enrollments(user, enrollments)
-    courses = enrollments.select(&:assigned_observer?).map(&:course).uniq
-    ObserverEnrollment.observed_enrollments_for_courses(courses, user)
+  def retrieve_observed_enrollments(enrollments, active_by_date: false)
+    observer_enrolls = enrollments.select(&:assigned_observer?)
+    ObserverEnrollment.observed_enrollments_for_enrollments(observer_enrolls, active_by_date: active_by_date)
   end
 
   def courses_for_user(user, paginate_url: api_v1_courses_url)
@@ -2520,7 +2528,7 @@ class CoursesController < ApplicationController
       conditions = states.map do |state|
         Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
       end.compact.join(" OR ")
-      enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user)
+      enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user.in_region_associated_shards)
 
       if params[:enrollment_role]
         enrollments = enrollments.joins(:role).where(roles: { name: params[:enrollment_role] })
@@ -2531,6 +2539,15 @@ class CoursesController < ApplicationController
         enrollments = enrollments.where(type: e_type)
       end
 
+      case params[:enrollment_state]
+      when "active"
+        enrollments = enrollments.active_by_date
+      when "invited_or_pending"
+        enrollments = enrollments.invited_or_pending_by_date
+      when "completed"
+        enrollments = enrollments.completed_by_date
+      end
+
       if value_to_boolean(params[:current_domain_only])
         enrollments = enrollments.where(root_account_id: @domain_root_account)
       elsif params[:root_account_id]
@@ -2539,11 +2556,18 @@ class CoursesController < ApplicationController
       end
 
       enrollments = enrollments.to_a
+    elsif params[:enrollment_state] == "active"
+      enrollments = user.participating_enrollments
+      ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
     else
       enrollments = user.cached_current_enrollments(preload_courses: true)
     end
 
-    enrollments.concat(retrieve_observed_enrollments(user, enrollments)) if include_observed
+    if include_observed
+      enrollments.concat(
+        retrieve_observed_enrollments(enrollments, active_by_date: (params[:enrollment_state] == "active"))
+      )
+    end
 
     # these are all duplicated in the params[:state] block above in SQL. but if
     # used the cached ones, or we added include_observed, we have to re-run them
@@ -2557,6 +2581,16 @@ class CoursesController < ApplicationController
       elsif params[:enrollment_type]
         e_type = "#{params[:enrollment_type].capitalize}Enrollment"
         enrollments.reject! { |e| e.class.name != e_type }
+      end
+
+      if params[:enrollment_state] && params[:enrollment_state] != "active"
+        Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
+        case params[:enrollment_state]
+        when "invited_or_pending"
+          enrollments.select!{|e| e.invited? || e.accepted?}
+        when "completed"
+          enrollments.select!(&:completed?)
+        end
       end
 
       if value_to_boolean(params[:current_domain_only])
