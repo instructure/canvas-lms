@@ -231,7 +231,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
     context 'whom has started a quiz' do
       before :once do
-        @quiz.generate_submission(@student)
+        @submission = @quiz.generate_submission(@student)
       end
 
       describe 'GET /courses/:course_id/quizzes/:quiz_id/questions (index)' do
@@ -240,6 +240,15 @@ describe Quizzes::QuizQuestionsController, type: :request do
                               :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
                               :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
           assert_status(401)
+        end
+
+        it 'should be authorized with quiz_submission_id & attempt' do
+          url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions?quiz_submission_id=#{@submission.id}&quiz_submission_attempt=1"
+          raw_api_call(:get, url,
+                              :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
+                              :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s,
+                              :quiz_submission_id => @submission.id, :quiz_submission_attempt => 1)
+          assert_status(200)
         end
       end
 
