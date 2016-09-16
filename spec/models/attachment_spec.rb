@@ -304,7 +304,7 @@ describe Attachment do
 
       it "should delay upload until the #save transaction is committed" do
         @attachment.uploaded_data = default_uploaded_data
-        Attachment.connection.expects(:after_transaction_commit).once
+        Attachment.connection.expects(:after_transaction_commit).twice
         @attachment.expects(:touch_context_if_appropriate).never
         @attachment.expects(:ensure_media_object).never
         @attachment.save
@@ -313,7 +313,7 @@ describe Attachment do
       it "should upload immediately when in a non-joinable transaction" do
         Attachment.connection.transaction(:joinable => false) do
           @attachment.uploaded_data = default_uploaded_data
-          Attachment.connection.expects(:after_transaction_commit).never
+          Attachment.connection.expects(:after_transaction_commit).once
           @attachment.expects(:touch_context_if_appropriate)
           @attachment.expects(:ensure_media_object)
           @attachment.save
