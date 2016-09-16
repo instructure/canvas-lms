@@ -1085,6 +1085,8 @@ class Enrollment < ActiveRecord::Base
     where("enrollment_states.state IN ('invited', 'pending_invited')") }
   scope :active_or_pending_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
     where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')") }
+  scope :invited_or_pending_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
+    where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')") }
   scope :completed_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
     where("enrollment_states.state = ?", "completed") }
   scope :not_inactive_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).

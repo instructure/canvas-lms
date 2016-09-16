@@ -25,16 +25,31 @@ class ObserverEnrollment < Enrollment
     contexts = Array(contexts)
     observed_students = []
     Shard.partition_by_shard(contexts) do |sharded_contexts|
-      observer_enrollments = user.observer_enrollments.where(course_id: sharded_contexts)
-        .where('associated_user_id IS NOT NULL')
+      observer_enrollment_data = user.observer_enrollments.where(course_id: sharded_contexts)
+        .where('associated_user_id IS NOT NULL').pluck(:course_id, :associated_user_id)
 
-      observer_enrollments.group_by(&:course_id).each do |course_id, enrollments|
-        associated_user_ids = enrollments.map(&:associated_user_id)
+      observer_enrollment_data.group_by(&:first).each do |course_id, course_enroll_data|
+        associated_user_ids = course_enroll_data.map(&:last)
         students = StudentEnrollment.active.where(user_id: associated_user_ids, course_id: course_id)
         observed_students.concat(students)
       end
     end
     observed_students
+  end
+
+  def self.observed_enrollments_for_enrollments(observer_enrollments, active_by_date: false)
+    # if we already have the enrollments why go and fetch them again
+    observer_enrollments = Array(observer_enrollments)
+    observed_student_enrollments = []
+    Shard.partition_by_shard(observer_enrollments) do |sharded_observer_enrollments|
+      sharded_observer_enrollments.group_by(&:course_id).each do |course_id, enrollments|
+        associated_user_ids = enrollments.map(&:associated_user_id)
+        student_enrolls = StudentEnrollment.active.where(user_id: associated_user_ids, course_id: course_id)
+        student_enrolls = student_enrolls.active_by_date if active_by_date
+        observed_student_enrollments.concat(student_enrolls.to_a)
+      end
+    end
+    observed_student_enrollments
   end
 
   # returns a hash mapping students to arrays of enrollments
