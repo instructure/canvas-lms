@@ -224,6 +224,18 @@ class ApplicationController < ActionController::Base
   end
   helper_method :multiple_grading_periods?
 
+  def tool_dimensions
+    tool_dimensions = {selection_width: '100%', selection_height: '100%'}
+
+    tool_dimensions.each do |k, v|
+      tool_dimensions[k] = @tool.settings[k] || v
+      tool_dimensions[k] = tool_dimensions[k].to_s << 'px' unless tool_dimensions[k].to_s =~ /%|px/
+    end
+
+    tool_dimensions
+  end
+  private :tool_dimensions
+
   def account_and_grading_periods_allowed?
     @context.is_a?(Account) &&
       @context.feature_allowed?(:multiple_grading_periods)
@@ -1395,7 +1407,8 @@ class ApplicationController < ActionController::Base
         log_asset_access(@tool, "external_tools", "external_tools", overwrite: false)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
-        @lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
+        launch_settings = @tool.settings['post_only'] ? {post_only: true, tool_dimensions: tool_dimensions} : {tool_dimensions: tool_dimensions}
+        @lti_launch = Lti::Launch.new(launch_settings)
 
         success_url = case tag_type
         when :assignments
