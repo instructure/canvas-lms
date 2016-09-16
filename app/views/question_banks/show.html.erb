@@ -19,7 +19,7 @@
   </div>
   <% css_bundle("aligned_outcomes") %>
   <h2 id="aligned_outcomes"><%= t 'headings.aligned_outcomes', "Aligned Outcomes" %></h2>
-  <div class="rs-margin-lr rs-margin-bottom">
+  <div class="rs-margin-bottom">
     <ul class="unstyled_list" id="aligned_outcomes_list">
       <% @alignments.each do |alignment| %>
         <li class="outcome" data-id="<%= alignment.learning_outcome_id %>">

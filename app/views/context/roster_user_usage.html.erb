@@ -4,7 +4,7 @@
   @active_tab="people"
   add_crumb(t('#crumbs.access_report', "Access Report")) %>
 <% content_for :right_side do %>
-  <div class="rs-margin-all rs-margin-lr">
+  <div class="rs-margin-all">
     <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_user_url, @user) %>"><%= image_tag "back.png", :alt => '' %> <%= t('links.back_to_user', %{Back to User Page}) %></a>
   </div>
 <% end %>

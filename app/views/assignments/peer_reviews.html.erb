@@ -1,7 +1,7 @@
 <% content_for :page_title do %><%= join_title @context.name, @assignment.title, t(:page_title, "Peer Reviews") %><% end %>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-lr rs-margin-top">
+  <div class="rs-margin-top">
   <p><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class='back'><%= t 'links.back_to_assignment', "Back to Assignment" %></a></p>
   <p><%= t :details, "To the left you can see the list of students for this assignment, and also
   which student submissions (if any) they have been assigned to review." %></p>

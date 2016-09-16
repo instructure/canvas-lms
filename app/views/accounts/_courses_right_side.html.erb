@@ -2,7 +2,7 @@
   <% term_count =  @root_account.enrollment_terms.active.count %>
   <% if term_count > 1 || @associated_courses_count > 0  %>
     <h2><%= t(:course_filtering, "Course Filtering")%></h2>
-    <div class="rs-margin-lr rs-margin-bottom">
+    <div class="rs-margin-bottom">
       <form method="get">
         <% if term_count > 1 %>
           <label for="enrollment_term"><%= before_label(t(:enrollment_term_label, "Show courses from the term")) %></label><br />
@@ -27,7 +27,7 @@
     <% if @associated_courses_count > 0 %>
       <% js_bundle :account_search %>
       <h2 id="course_name_label"><%= t(:filter_label, "Find a Course") %></h2>
-      <div class="rs-margin-lr rs-margin-bottom">
+      <div class="rs-margin-bottom">
         <%= form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :class => "ic-Form-control account_search_form", :method => :get} do |f| -%>
           <div class="ic-Input-group">
             <input name="focus" type="hidden" value="course_name"/>
