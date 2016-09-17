@@ -39,22 +39,6 @@ describe "outcomes" do
         should_delete_a_learning_outcome
       end
 
-      it "should validate mastery points", priority: "1", test_id: 250537 do
-        should_validate_mastery_points
-      end
-
-      it "should_validate_calculation_method_dropdown", priority: "1", test_id: 162376 do
-        should_validate_calculation_method_dropdown
-      end
-
-      it "should require a title", priority: "2", test_id: 250538 do
-        should_validate_short_description_presence
-      end
-
-      it "should require a title less than 255 chars", priority: "2", test_id: 250539 do
-        should_validate_short_description_length
-      end
-
       context "validate decaying average" do
         before do
           get outcome_url
@@ -70,12 +54,8 @@ describe "outcomes" do
                                                               " will be returned.")
         end
 
-        it "should validate decaying average_above_range", priority: "2", test_id: 261708 do
-          should_validate_decaying_average_above_range
-        end
-
-        it "should validate decaying average_below_range", priority: "2", test_id: 303710 do
-          should_validate_decaying_average_below_range
+        it "should validate decaying average_range", priority: "2", test_id: 261708 do
+          should_validate_decaying_average_range
         end
 
         it "should validate calculation int accepatble values", priority: "1", test_id: 261709 do
@@ -105,12 +85,8 @@ describe "outcomes" do
                                                               " to calculate final score")
         end
 
-        it "should validate n mastery_above_range", priority: "2", test_id: 261712 do
-          should_validate_n_mastery_above_range
-        end
-
-        it "should validate n mastery_below_range", priority: "2", test_id: 303711 do
-          should_validate_n_mastery_below_range
+        it "should validate n mastery_range", priority: "2", test_id: 303711 do
+          should_validate_n_mastery_range
         end
 
         it "should validate calculation int acceptable range values", priority: "1", test_id: 261713 do

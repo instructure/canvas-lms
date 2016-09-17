@@ -124,7 +124,7 @@ require 'atom'
 #           "type": "string"
 #         },
 #         "locale": {
-#           "description": "Optional: This field can be requested with certain API calls, and will return the users locale.",
+#           "description": "Optional: This field can be requested with certain API calls, and will return the users locale in RFC 5646 format.",
 #           "example": "tlh",
 #           "type": "string"
 #         },
@@ -462,6 +462,7 @@ class UsersController < ApplicationController
     if request.post?
       if @user == @real_current_user
         session.delete(:become_user_id)
+        session.delete(:enrollment_uuid)
       else
         session[:become_user_id] = params[:user_id]
       end
@@ -1124,7 +1125,8 @@ class UsersController < ApplicationController
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   #
   # @argument user[locale] [String]
-  #   The user's preferred language as a two-letter ISO 639-1 code.
+  #   The user's preferred language, from the list of languages Canvas supports.
+  #   This is in RFC-5646 format.
   #
   # @argument user[birthdate] [Date]
   #   The user's birth date.
@@ -1240,7 +1242,8 @@ class UsersController < ApplicationController
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   #
   # @argument user[locale] [String]
-  #   The user's preferred language as a two-letter ISO 639-1 code.
+  #   The user's preferred language, from the list of languages Canvas supports.
+  #   This is in RFC-5646 format.
   #
   # @argument user[birthdate] [Date]
   #   The user's birth date.
@@ -1431,7 +1434,8 @@ class UsersController < ApplicationController
   #   The default email address of the user.
   #
   # @argument user[locale] [String]
-  #   The user's preferred language as a two-letter ISO 639-1 code.
+  #   The user's preferred language, from the list of languages Canvas supports.
+  #   This is in RFC-5646 format.
   #
   # @argument user[avatar][token] [String]
   #   A unique representation of the avatar record to assign as the user's

@@ -62,10 +62,24 @@ at_exit do
 end
 
 module SeleniumErrorRecovery
+  class RecoverableException < StandardError
+    extend Forwardable
+    def_delegators :@exception, :class, :message, :backtrace
+
+    def initialize(exception)
+      @exception = exception
+    end
+  end
+
   # this gets called wherever an exception happens (example, before/after/around, each/all)
+  #
+  # the example will still fail, but if we recover successfully, subsequent
+  # specs should pass. additionally, the rerun phase will exempt this
+  # failure from the threshold, since it's not a problem with the spec
+  # per se
   def set_exception(exception, *args)
-    maybe_recover_from_exception(exception)
-    super
+    exception = RecoverableException.new(exception) if maybe_recover_from_exception(exception)
+    super exception, *args
   end
 
   def maybe_recover_from_exception(exception)
@@ -135,6 +149,8 @@ shared_context "in-process server selenium tests" do
   end
 
   before do
+    raise "all specs need to use transactional fixtures" unless self.use_transactional_fixtures
+
     HostUrl.stubs(:default_host).returns($app_host_and_port)
     HostUrl.stubs(:file_host).returns($app_host_and_port)
   end
@@ -143,31 +159,29 @@ shared_context "in-process server selenium tests" do
   # (even if on a different thread - i.e. the server's thread), so that it will be in
   # the same transaction and see the same data
   before do
-    if self.use_transactional_fixtures
-      @db_connection = ActiveRecord::Base.connection
-      @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
+    @db_connection = ActiveRecord::Base.connection
+    @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
 
-      # synchronize db connection methods for a modicum of thread safety
-      methods_to_sync = %w{execute exec_cache exec_no_cache query transaction}
-      [@db_connection, @dj_connection].each do |conn|
-        methods_to_sync.each do |method_name|
-          if conn.respond_to?(method_name, true) && !conn.respond_to?("#{method_name}_with_synchronization", true)
-            arg_list = "*args"
-            arg_list << ", &Proc.new" if method_name == "transaction"
-            conn.class.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              def #{method_name}_with_synchronization(*args)
-                SeleniumDriverSetup.request_mutex.synchronize { #{method_name}_without_synchronization(#{arg_list}) }
-              end
-              alias_method_chain :#{method_name}, :synchronization
-            RUBY
-          end
+    # synchronize db connection methods for a modicum of thread safety
+    methods_to_sync = %w{execute exec_cache exec_no_cache query transaction}
+    [@db_connection, @dj_connection].each do |conn|
+      methods_to_sync.each do |method_name|
+        if conn.respond_to?(method_name, true) && !conn.respond_to?("#{method_name}_with_synchronization", true)
+          arg_list = "*args"
+          arg_list << ", &Proc.new" if method_name == "transaction"
+          conn.class.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            def #{method_name}_with_synchronization(*args)
+              SeleniumDriverSetup.request_mutex.synchronize { #{method_name}_without_synchronization(#{arg_list}) }
+            end
+            alias_method_chain :#{method_name}, :synchronization
+          RUBY
         end
       end
-
-      ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(@db_connection)
-      Delayed::Backend::ActiveRecord::Job.stubs(:connection).returns(@dj_connection)
-      Delayed::Backend::ActiveRecord::Job::Failed.stubs(:connection).returns(@dj_connection)
     end
+
+    ActiveRecord::ConnectionAdapters::ConnectionPool.any_instance.stubs(:connection).returns(@db_connection)
+    Delayed::Backend::ActiveRecord::Job.stubs(:connection).returns(@dj_connection)
+    Delayed::Backend::ActiveRecord::Job::Failed.stubs(:connection).returns(@dj_connection)
   end
 
   around do |example|
@@ -194,7 +208,6 @@ shared_context "in-process server selenium tests" do
       SeleniumDriverSetup.note_recent_spec_run(example, exception)
       record_errors(example, exception, Rails.logger.captured_messages)
       SeleniumDriverSetup.disallow_requests!
-      truncate_all_tables unless self.use_transactional_fixtures
     end
   end
 end

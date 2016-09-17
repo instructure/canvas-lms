@@ -81,7 +81,7 @@ describe "help dialog" do
       feedback_form.find_element(:css, '[name="body"]').send_keys('test message')
       submit_form(feedback_form)
       wait_for_ajaximations
-      expect(feedback_form).not_to be_displayed
+      expect(f('body')).not_to contain_css("form[action='/api/v1/conversations']")
       cm = ConversationMessage.last
       expect(cm.recipients).to match_array @course.instructors
       expect(cm.recipients.count).to eq 2

@@ -16,26 +16,26 @@ $sg-background: #fff !default;
 $sg-codefont: "Monaco", "Courier", monospace !default;
 $sg-font: "Helvetica Neue", "Helvetica", Arial, sans-serif !default;
 
-$sg-background-global-nav: #34444f !default;
-$sg-background-sub-nav: darken($sg-background-global-nav, 10%) !default;
+$sg-background-global-nav: $ic-color-medium-darker !default;
+$sg-background-sub-nav: $ic-color-dark !default;
 $sg-background-links: $sg-background-global-nav !default;
 $sg-background-text: $ic-color-dark !default;
 
 $sg-header-navigation-item: $ic-color-light !default;
 $sg-header-navigation-item--hover: $ic-color-neutral !default;
 $sg-header-navigation-item--active: $ic-color-light !default;
-$sg-title-border: darken($ic-color-neutral, 10) !default;
+$sg-title-border: $ic-color-medium !default;
 
 $sg-header-subnavigation-item: $ic-color-light !default;
 $sg-header-subnavigation-item--hover: $ic-color-neutral !default;
 $sg-header-subnavigation-item--active: $ic-color-light !default;
 
 $sg-content-title-background: $ic-brand-primary !default;
-$sg-content-title-font-color: #fff !default;
+$sg-content-title-font-color: $ic-color-light !default;
 $sg-content-hr-border-color: $sg-background-global-nav !default;
 
 $sg-src-file-path-background: $ic-brand-primary !default;
-$sg-src-file-path-border-color: lighten($ic-brand-primary, 15%) !default;
+$sg-src-file-path-border-color: $ic-color-light !default;
 $sg-src-file-path-font-color: $ic-color-light !default;
 
 //// Stylesheet Examples & Syntax
@@ -43,9 +43,9 @@ $sg-src-file-path-font-color: $ic-color-light !default;
 $sg-example-tag-color: $ic-brand-primary !default;
 $sg-example-string-color: $ic-color-neutral !default;
 $sg-example-border: $ic-color-neutral !default;
-$sg-example-main-color: #1E2631 !default;
-$sg-syntax-main-font-color: $ic-color-neutral !default;
-$sg-example-title-color: darken($ic-color-neutral, 10) !default;
+$sg-example-main-color: $ic-color-dark !default;
+$sg-syntax-main-font-color: $ic-color-light !default;
+$sg-example-title-color: $ic-color-light !default;
 //// Stylesheet Logo
 ////////
 // There is a logo that goes in the top left of the theme. This can

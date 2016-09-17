@@ -18,7 +18,12 @@ describe 'Canvadoc' do
     # whee different UI for plugins
     if element_exists?('#accounts_select')
       f("#accounts_select option:nth-child(2)").click
-      f("#plugin_setting_disabled").click
+      if !f(".save_button").enabled?
+        f(".copy_settings_button").click
+      end
+      if f("#plugin_setting_disabled")[:checked]
+        f("#plugin_setting_disabled").click
+      end
       wait_for_ajaximations
     end
   end

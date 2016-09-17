@@ -91,6 +91,30 @@ describe Api::V1::SisAssignment do
       expect(result[0]["assignment_group"]["group_weight"]).to eq(8.7)
     end
 
+    it "returns false for include_in_final_grade when omit_from_final_grade is true" do
+      assignment_1[:omit_from_final_grade] = true
+      assignment_1[:grading_type] = 'points'
+      assignments = [assignment_1]
+      result = subject.sis_assignments_json(assignments)
+      expect(result[0]['include_in_final_grade']).to eq(false)
+    end
+
+    it "returns false for include_in_final_grade when grading_type is not_graded" do
+      assignment_1[:omit_from_final_grade] = false
+      assignment_1[:grading_type] = 'not_graded'
+      assignments = [assignment_1]
+      result = subject.sis_assignments_json(assignments)
+      expect(result[0]['include_in_final_grade']).to eq(false)
+    end
+
+    it "returns true for include_in_final_grade when appropriate" do
+      assignment_1[:omit_from_final_grade] = false
+      assignment_1[:grading_type] = 'points'
+      assignments = [assignment_1]
+      result = subject.sis_assignments_json(assignments)
+      expect(result[0]['include_in_final_grade']).to eq(true)
+    end
+
     it "returns an empty hash for 0 assignments" do
       assignments = []
       expect(subject.sis_assignments_json(assignments)).to eq([])
@@ -126,4 +150,3 @@ describe Api::V1::SisAssignment do
     end
   end
 end
-

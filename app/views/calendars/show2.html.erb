@@ -8,6 +8,7 @@
     :VIEW_START => @view_start,
     :CAL2_ONLY => true,
     :SHOW_SCHEDULER => @domain_root_account.show_scheduler?,
+    :BETTER_SCHEDULER => @domain_root_account.feature_enabled?(:better_scheduler) && @domain_root_account.show_scheduler?,
     :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size
   }
   js_bundle :calendar2
@@ -64,4 +65,3 @@
 <div id="calendar_header"></div>
 <div id="calendar-app" role="tabpanel" class="<%= 'wrap-calendar-event-titles' if @wrap_titles %>"></div>
 <div id="calendar-drag-and-drop-container"></div>
-

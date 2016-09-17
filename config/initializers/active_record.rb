@@ -209,13 +209,8 @@ class ActiveRecord::Base
 
   def touch_user
     if self.respond_to?(:user_id) && self.user_id
-      shard = self.user.shard
-      User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
       User.connection.after_transaction_commit do
-        shard.activate do
-          User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
-        end if shard != Shard.current
-        User.invalidate_cache(self.user_id)
+        User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
       end
     end
     true
@@ -583,6 +578,12 @@ class ActiveRecord::Base
   def save_without_callbacks
     suspend_callbacks(kind: [:validation, :save, (new_record? ? :create : :update)]) { save }
   end
+
+  def self.touch_all_records
+    self.find_ids_in_ranges do |min_id, max_id|
+      self.where(primary_key => min_id..max_id).touch_all
+    end
+  end
 end
 
 if CANVAS_RAILS4_0
@@ -680,9 +681,7 @@ ActiveRecord::Relation.class_eval do
   def in_transaction_in_test?
     return false unless Rails.env.test?
     transaction_method = ActiveRecord::ConnectionAdapters::DatabaseStatements.instance_method(:transaction).source_location.first
-    # don't anchor the end of the regex; test_after_commit does an alias_method_chain, thus
-    # changing the name (and source location) of this method
-    transaction_regex = /^#{Regexp.escape(transaction_method)}:\d+:in `transaction/.freeze
+    transaction_regex = /\A#{Regexp.escape(transaction_method)}:\d+:in `transaction'\z/.freeze
     # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
     !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
   end

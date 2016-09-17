@@ -16,7 +16,9 @@ module BrandConfigHelpers
   def brand_config_chain(include_self:)
     chain = self.account_chain(include_site_admin: true)
     chain.shift unless include_self
-    chain.select{ |a| a.shard == self.shard }
+    chain.select!{ |a| a.shard == self.shard }
+    ActiveRecord::Associations::Preloader.new.preload(chain, :root_account)
+    chain
   end
   private :brand_config_chain
 

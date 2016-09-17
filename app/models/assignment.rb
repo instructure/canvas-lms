@@ -311,7 +311,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def touch_assignment_group
-    AssignmentGroup.where(:id => self.assignment_group_id).update_all(:updated_at => Time.now.utc) if self.assignment_group_id
+    AssignmentGroup.where(:id => self.assignment_group_id).update_all(:updated_at => Time.zone.now.utc) if self.assignment_group_id
     true
   end
 
@@ -460,7 +460,7 @@ class Assignment < ActiveRecord::Base
 
   def update_submissions_later
     if assignment_group_id_changed? && assignment_group_id_was.present?
-      AssignmentGroup.where(id: assignment_group_id_was).update_all(updated_at: Time.now.utc)
+      AssignmentGroup.where(id: assignment_group_id_was).update_all(updated_at: Time.zone.now.utc)
     end
     self.assignment_group.touch if self.assignment_group
     if points_possible_changed?
@@ -864,8 +864,10 @@ class Assignment < ActiveRecord::Base
                                               include_description:   include_description?(user))
   end
 
-  def include_description?(user)
-    user && !self.locked_for?(user, :check_policies => true)
+  def include_description?(user, lock_info=nil)
+    return unless user
+    lock_info ||= self.locked_for?(user, :check_policies => true)
+    !lock_info || (lock_info[:can_view] && !lock_info[:context_module])
   end
 
   def all_day
@@ -893,12 +895,12 @@ class Assignment < ActiveRecord::Base
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       assignment_for_user = self.overridden_for(user)
-      if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.now)
+      if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.zone.now)
         locked = {:asset_string => assignment_for_user.asset_string, :unlock_at => assignment_for_user.unlock_at}
-      elsif (assignment_for_user.lock_at && assignment_for_user.lock_at < Time.now)
-        locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at, :can_view => true}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
+      elsif (assignment_for_user.lock_at && assignment_for_user.lock_at < Time.zone.now)
+        locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at, :can_view => true}
       else
         each_submission_type do |submission, _, short_type|
           next unless self.send("#{short_type}?")
@@ -1012,7 +1014,7 @@ class Assignment < ActiveRecord::Base
 
   def filter_attributes_for_user(hash, user, session)
     if lock_info = self.locked_for?(user, :check_policies => true)
-      hash.delete('description')
+      hash.delete('description') unless include_description?(user, lock_info)
       hash['lock_info'] = lock_info
     end
   end
@@ -1056,7 +1058,7 @@ class Assignment < ActiveRecord::Base
       :published_score => score,
       :published_grade => grade,
       :workflow_state => 'graded',
-      :graded_at => Time.now.utc
+      :graded_at => Time.zone.now.utc
     }) unless submissions_to_save.empty?
 
     Rails.logger.info "GRADES: recalculating because assignment #{global_id} had default grade set (#{options.inspect})"
@@ -1355,7 +1357,7 @@ class Assignment < ActiveRecord::Base
           :workflow_state => submitted ? "submitted" : "unsubmitted",
           :group => group
         })
-        homework.submitted_at = Time.now
+        homework.submitted_at = Time.zone.now
 
         homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
           if group
@@ -1682,7 +1684,7 @@ class Assignment < ActiveRecord::Base
     end
 
     reviews_due_at = self.peer_reviews_assign_at || self.due_at
-    if reviews_due_at && reviews_due_at < Time.now
+    if reviews_due_at && reviews_due_at < Time.zone.now
       self.peer_reviews_assigned = true
     end
     self.save
@@ -1719,7 +1721,7 @@ class Assignment < ActiveRecord::Base
 
   scope :include_submittables, -> { preload(:quiz, :discussion_topic, :wiki_page) }
 
-  scope :no_graded_quizzes_or_topics, -> { where("submission_types NOT IN ('online_quiz', 'discussion_topic')") }
+  scope :no_submittables, -> { where.not(submission_types: %w(online_quiz discussion_topic wiki_page)) }
 
   scope :with_submissions, -> { preload(:submissions) }
 
@@ -1843,7 +1845,7 @@ class Assignment < ActiveRecord::Base
   scope :published, -> { where(:workflow_state => 'published') }
 
   def overdue?
-    due_at && due_at <= Time.now
+    due_at && due_at <= Time.zone.now
   end
 
   def readable_submission_types
@@ -2115,8 +2117,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def run_if_overrides_changed!
-    self.relock_modules!
-    each_submission_type { |submission| submission.relock_modules! if submission }
+    relocked_modules = []
+    self.relock_modules!(relocked_modules)
+    each_submission_type { |submission| submission.relock_modules!(relocked_modules) if submission }
 
     if only_visible_to_overrides?
       Rails.logger.info "GRADES: recalculating because assignment overrides on #{global_id} changed."

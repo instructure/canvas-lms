@@ -371,19 +371,25 @@ module ApplicationHelper
   end
 
   def active_external_tool_by_id(tool_id)
-    # don't use for groups. they don't have account_chain_ids
-    tool = @context.context_external_tools.active.where(tool_id: tool_id).first
-    return tool if tool
+    @cached_external_tools ||= {}
+    @cached_external_tools[tool_id] ||= Rails.cache.fetch(['active_external_tool_for', @context, tool_id].cache_key, :expires_in => 1.hour) do
+      # don't use for groups. they don't have account_chain_ids
+      tool = @context.context_external_tools.active.where(tool_id: tool_id).first
 
-    # account_chain_ids is in the order we need to search for tools
-    # unfortunately, the db will return an arbitrary one first.
-    # so, we pull all the tools (probably will only have one anyway) and look through them here
-    tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain, :tool_id => tool_id).to_a
-    @context.account_chain.each do |account|
-      tool = tools.find {|t| t.context_id == account.id}
-      return tool if tool
+      unless tool
+        # account_chain_ids is in the order we need to search for tools
+        # unfortunately, the db will return an arbitrary one first.
+        # so, we pull all the tools (probably will only have one anyway) and look through them here
+        account_chain_ids = @context.account_chain_ids
+
+        tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => account_chain_ids, :tool_id => tool_id).to_a
+        account_chain_ids.each do |account_id|
+          tool = tools.find {|t| t.context_id == account_id}
+          break if tool
+        end
+      end
+      tool
     end
-    nil
   end
 
   def external_tool_tab_visible(tool_id)
@@ -397,6 +403,11 @@ module ApplicationHelper
     css_bundle('license_help')
     js_bundle('license_help')
     link_to(image_tag('help.png', :alt => I18n.t("Help with content licensing")), '#', :class => 'license_help_link no-hover', :title => I18n.t("Help with content licensing"))
+  end
+
+  def visibility_help_link
+    js_bundle('visibility_help')
+    link_to(image_tag('help.png', :alt => I18n.t("Help with course visibilities")), '#', :class => 'visibility_help_link no-hover', :title => I18n.t("Help with course visibilities"))
   end
 
   def equella_enabled?

@@ -215,6 +215,10 @@ require 'securerandom'
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "public_syllabus_to_auth": {
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "public_description": {
 #           "description": "optional: the public description of the course",
 #           "example": "Come one, come all to InstructureCon 2012!",
@@ -552,6 +556,9 @@ class CoursesController < ApplicationController
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
   #
+  # @argument course[public_syllabus_to_auth] [Boolean]
+  #   Set to true to make the course syllabus public for authenticated users.
+  #
   # @argument course[public_description] [String]
   #   A publicly visible description of the course.
   #
@@ -686,7 +693,7 @@ class CoursesController < ApplicationController
             @current_user,
             session,
             [:start_at, course_end, :license,
-             :is_public, :is_public_to_auth_users, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
+             :is_public, :is_public_to_auth_users, :public_syllabus, :public_syllabus_to_auth, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
              :restrict_enrollments_to_course_dates, :hide_final_grades], nil)
@@ -1972,6 +1979,9 @@ class CoursesController < ApplicationController
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
   #
+  # @argument course[public_syllabus_to_auth] [Boolean]
+  #   Set to true to make the course syllabus to public for authenticated users.
+  #
   # @argument course[public_description] [String]
   #   A publicly visible description of the course.
   #
@@ -2023,7 +2033,7 @@ class CoursesController < ApplicationController
   #   If this option is set to true, the course will be available to students
   #   immediately.
   #
-  # @argument event [String, "claim"|"offer"|"conclude"|"delete"|"undelete"]
+  # @argument course[event] [String, "claim"|"offer"|"conclude"|"delete"|"undelete"]
   #   The action to take on each course.
   #   * 'claim' makes a course no longer visible to students. This action is also called "unpublish" on the web site.
   #     A course cannot be unpublished if students have received graded submissions.
@@ -2211,6 +2221,11 @@ class CoursesController < ApplicationController
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
 
       @course.attributes = params[:course]
+
+      if params[:course][:course_visibility].present?
+        visibility_configuration(params[:course])
+      end
+
       changes = changed_settings(@course.changes, @course.settings, old_settings)
       @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
         { :priority => Delayed::LOW_PRIORITY }, changes)
@@ -2514,28 +2529,51 @@ class CoursesController < ApplicationController
       conditions = states.map do |state|
         Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
       end.compact.join(" OR ")
-      enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user).to_a
+      enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user)
+
+      if params[:enrollment_role]
+        enrollments = enrollments.joins(:role).where(roles: { name: params[:enrollment_role] })
+      elsif params[:enrollment_role_id]
+        enrollments = enrollments.where(role_id: params[:enrollment_role_id].to_i)
+      elsif params[:enrollment_type]
+        e_type = "#{params[:enrollment_type].capitalize}Enrollment"
+        enrollments = enrollments.where(type: e_type)
+      end
+
+      if value_to_boolean(params[:current_domain_only])
+        enrollments = enrollments.where(root_account_id: @domain_root_account)
+      elsif params[:root_account_id]
+        root_account = api_find_all(Account, [params[:root_account_id]]).take
+        enrollments = root_account ? enrollments.where(root_account_id: root_account) : Enrollment.none
+      end
+
+      enrollments = enrollments.to_a
     else
       enrollments = user.cached_current_enrollments(preload_courses: true)
     end
 
     enrollments.concat(retrieve_observed_enrollments(user, enrollments)) if include_observed
 
-    # TODO: preload roles after enrollment#role shim is taken out
-    if params[:enrollment_role]
-      enrollments = enrollments.reject { |e| e.role.name != params[:enrollment_role] }
-    elsif params[:enrollment_role_id]
-      enrollments = enrollments.reject { |e| e.role.id.to_s != params[:enrollment_role_id].to_s }
-    elsif params[:enrollment_type]
-      e_type = "#{params[:enrollment_type].capitalize}Enrollment"
-      enrollments = enrollments.reject { |e| e.class.name != e_type }
-    end
+    # these are all duplicated in the params[:state] block above in SQL. but if
+    # used the cached ones, or we added include_observed, we have to re-run them
+    # in pure ruby
+    if include_observed || !params[:state]
+      if params[:enrollment_role]
+        ActiveRecord::Associations::Preloader.new.preload(enrollments, :role)
+        enrollments.reject! { |e| e.role.name != params[:enrollment_role] }
+      elsif params[:enrollment_role_id]
+        enrollments.reject! { |e| e.role_id != params[:enrollment_role_id].to_i }
+      elsif params[:enrollment_type]
+        e_type = "#{params[:enrollment_type].capitalize}Enrollment"
+        enrollments.reject! { |e| e.class.name != e_type }
+      end
 
-    if value_to_boolean(params[:current_domain_only])
-      enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
-    elsif params[:root_account_id]
-      root_account = api_find_all(Account, [params[:root_account_id]]).first
-      enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
+      if value_to_boolean(params[:current_domain_only])
+        enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
+      elsif params[:root_account_id]
+        root_account = api_find_all(Account, [params[:root_account_id]]).take
+        enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
+      end
     end
 
     includes = Set.new(Array(params[:include]))
@@ -2565,5 +2603,29 @@ class CoursesController < ApplicationController
     return render_unauthorized_action unless @current_user.present?
     @user = params[:user_id]=="self" ? @current_user : api_find(User,params[:user_id])
     authorized_action(@user,@current_user,:read)
+  end
+
+  def visibility_configuration(params)
+    if params[:course_visibility] == 'institution'
+      @course.is_public_to_auth_users = true
+      @course.is_public = false
+    elsif params[:course_visibility] == 'public'
+      @course.is_public = true
+    else
+      @course.is_public_to_auth_users = false
+      @course.is_public = false
+    end
+    if params[:syllabus_visibility_option].present?
+      customized = params[:syllabus_visibility_option]
+      if @course.is_public || customized == 'public'
+        @course.public_syllabus = true
+      elsif @course.is_public_to_auth_users || customized == 'institution'
+        @course.public_syllabus_to_auth = true
+        @course.public_syllabus = false
+      else
+        @course.public_syllabus = false
+        @course.public_syllabus_to_auth = false
+      end
+    end
   end
 end

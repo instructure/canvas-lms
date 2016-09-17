@@ -131,7 +131,7 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
 
 .btn,       // <-- deprecated- do not use
 .Button {
-  @include canvas-button(darken($ic-color-light, 3%), $textColor);
+  @include canvas-button($ic-color-medium-light, $ic-color-dark);
   border-radius: $baseBorderRadius;
   transition: background-color 0.2s ease-in-out;
   display: inline-block;

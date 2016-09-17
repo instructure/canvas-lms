@@ -17,6 +17,7 @@
  */
 
 define([
+  'jsx/grading/helpers/OutlierScoreHelper',
   'jst/speed_grader/student_viewed_at',
   'jst/speed_grader/submissions_dropdown',
   'jst/speed_grader/speech_recognition',
@@ -52,7 +53,7 @@ define([
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(OutlierScoreHelper, studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // PRIVATE VARIABLES AND FUNCTIONS
   // all of the $ variables here are to speed up access to dom nodes,
@@ -772,11 +773,11 @@ define([
       event.stopPropagation();
 
       //Prev()
-      if(event.keyString == "j" || event.keyString == "p") {
+      if(event.keyString == "k" || event.keyString == "p") {
         EG.prev();
       }
       //next()
-      else if(event.keyString == "k" || event.keyString == "n") {
+      else if(event.keyString == "j" || event.keyString == "n") {
         EG.next();
       }
       //comment
@@ -1757,23 +1758,28 @@ define([
     //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
     renderSubmissionPreview: function() {
       this.emptyIframeHolder()
-      $iframe_holder.html($.raw(
-        '<iframe id="speedgrader_iframe" src="' +
-        htmlEscape('/courses/' + jsonData.context_id  +
+      var src = htmlEscape('/courses/' + jsonData.context_id  +
         '/assignments/' + this.currentStudent.submission.assignment_id +
         '/submissions/' + this.currentStudent.submission.user_id +
         '?preview=true' + (SpeedgraderHelpers.iframePreviewVersion(this.currentStudent.submission)) + (
           utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
-        )) +
-        '" frameborder="0"></iframe>'
-      )).show();
+        ));
+      var iframe = SpeedgraderHelpers.buildIframe(src, {
+        frameborder: 0,
+        allowfullscreen: true
+      });
+      $iframe_holder.html($.raw(iframe)).show();
     },
 
     renderLtiLaunch: function($div, urlBase, externalToolUrl) {
       this.emptyIframeHolder()
       var launchUrl = urlBase + '&url=' + encodeURIComponent(externalToolUrl);
+      var iframe = SpeedgraderHelpers.buildIframe(htmlEscape(launchUrl), {
+        className: 'tool_launch',
+        allowfullscreeen: true
+      });
       $div.html(
-        $.raw('<iframe id="speedgrader_iframe" src="' + htmlEscape(launchUrl) + '" class="tool_launch"></iframe>' )
+        $.raw(iframe)
       ).show();
     },
 
@@ -1835,7 +1841,13 @@ define([
         var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
           .replace("{{submissionId}}", this.currentStudent.submission.user_id)
           .replace("{{attachmentId}}", attachment.id);
-        $iframe_holder.html('<iframe src="'+htmlEscape(src)+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
+        var iframe = SpeedgraderHelpers.buildIframe(htmlEscape(src), {
+          frameborder: 0,
+          allowfullscreen: true
+        });
+        $iframe_holder.html(
+          $.raw(iframe)
+        ).show();
       }
     },
 
@@ -1971,18 +1983,8 @@ define([
             }
 
             var url = '/submission_comments/' + comment.id;
-            var data = {
-              submission_comment: {
-                draft: 'false'
-              }
-            };
-
-            var ajaxOptions = {
-              url: url,
-              data: data,
-              dataType: 'json',
-              type: 'PATCH'
-            };
+            var data = { submission_comment: { draft: 'false' } };
+            var ajaxOptions = { url: url, data: data, dataType: 'json', type: 'PATCH' };
 
             $.ajax(ajaxOptions).done(commentUpdateSucceeded).fail(commentUpdateFailed);
           }
@@ -2149,13 +2151,16 @@ define([
       var url    = $(".update_submission_grade_url").attr('href'),
           method = $(".update_submission_grade_url").attr('title'),
           formData = {
-            'submission[assignment_id]': jsonData.id,
-            'submission[user_id]':       EG.currentStudent.id,
+            'submission[assignment_id]':      jsonData.id,
+            'submission[user_id]':            EG.currentStudent.id,
             'submission[graded_anonymously]': utils.shouldHideStudentNames()
           };
 
-      var grade = SpeedgraderHelpers.determineGradeToSubmit(use_existing_score,
-                                                            EG.currentStudent, $grade);
+      var grade = SpeedgraderHelpers.determineGradeToSubmit(
+        use_existing_score,
+        EG.currentStudent,
+        $grade
+      );
 
       if (grade.toUpperCase() === "EX") {
         formData["submission[excuse]"] = true;
@@ -2175,6 +2180,16 @@ define([
       }
 
       $.ajaxJSON(url, method, formData, function(submissions) {
+        var pointsPossible = jsonData.points_possible;
+        var score = submissions[0].submission.score;
+
+        if (!submissions[0].submission.excused) {
+          var outlierScoreHelper = new OutlierScoreHelper(score, pointsPossible);
+          if(outlierScoreHelper.hasWarning()) {
+            $.flashWarning(outlierScoreHelper.warningMessage());
+          }
+        }
+
         $.each(submissions, function(){
           EG.setOrUpdateSubmission(this.submission);
         });

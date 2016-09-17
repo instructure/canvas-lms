@@ -27,7 +27,6 @@ class PluginsController < ApplicationController
   def show
     if find_plugin_setting
       if @plugin_setting.new_record?
-        @plugin_setting.disabled = true
         clear_encrypted_plugin_settings
       end
       @settings = @plugin.settings
@@ -39,7 +38,7 @@ class PluginsController < ApplicationController
 
   def update
     if find_plugin_setting
-      @plugin_setting.disabled = params[:plugin_setting][:disabled] if params[:plugin_setting] && params[:plugin_setting][:disabled]
+      @plugin_setting.disabled = value_to_boolean(params[:plugin_setting][:disabled]) if params[:plugin_setting] && !params[:plugin_setting][:disabled].nil?
       @plugin_setting.posted_settings = params[:settings] || {} unless @plugin_setting.disabled
       if @plugin_setting.save
         flash[:notice] = t('notices.settings_updated', "Plugin settings successfully updated.")
@@ -60,7 +59,7 @@ class PluginsController < ApplicationController
   def find_plugin_setting
     if @plugin = Canvas::Plugin.find(params[:id])
       @plugin_setting = PluginSetting.find_by_name(@plugin.id)
-      @plugin_setting ||= PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
+      @plugin_setting ||= PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings) { |ps| ps.disabled = true }
       true
     else
       false

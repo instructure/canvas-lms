@@ -137,6 +137,19 @@
 #           "description": "Whether the assignment is excused.  Excused assignments have no impact on a user's grade.",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "workflow_state": {
+#           "description": "The current state of the submission",
+#           "example": "submitted",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "graded",
+#               "submitted",
+#               "unsubmitted",
+#               "pending_review"
+#             ]
+#           }
 #         }
 #       }
 #     }
@@ -171,6 +184,7 @@ class SubmissionsApiController < ApplicationController
   # @response_field url If the submission was made as a URL.
   # @response_field late Whether the submission was made after the applicable due date.
   # @response_field assignment_visible Whether this assignment is visible to the user who submitted the assignment.
+  # @response_field workflow_state The current status of the submission. Possible values: “submitted”, “unsubmitted”, “graded”, “pending_review”
   #
   # @returns [Submission]
   def index

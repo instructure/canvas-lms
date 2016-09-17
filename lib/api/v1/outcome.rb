@@ -59,8 +59,7 @@ module Api::V1::Outcome
           hash['mastery_points'] = criterion[:mastery_points]
           hash['ratings'] = criterion[:ratings]
         end
-
-        if opts[:assessed_outcomes]
+        if opts[:assessed_outcomes] && outcome.context_type != "Account"
           hash['assessed'] = opts[:assessed_outcomes].include?(outcome.id)
         else
           hash['assessed'] = outcome.assessed?

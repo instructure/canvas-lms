@@ -35,7 +35,7 @@ describe "dashboard" do
       expect(items.first.hidden).to eq false
 
       get url
-      f('#dashboardToggleButton').click if url == '/' && ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      f('#dashboardToggleButton').click if url == '/'
       click_recent_activity_header
       item_selector = '#announcement-details tbody tr'
       expect(ff(item_selector).size).to eq 1
@@ -44,7 +44,7 @@ describe "dashboard" do
 
       # should still be gone on reload
       get url
-      f('#dashboardToggleButton').click if url == '/' && ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      f('#dashboardToggleButton').click if url == '/'
       expect(f("#content")).not_to contain_css(item_selector)
 
       expect(@user.recent_stream_items.size).to eq 0
@@ -71,7 +71,7 @@ describe "dashboard" do
           expect(items.first.hidden).to eq false
 
           get "/"
-          f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+          f('#dashboardToggleButton').click
 
           click_recent_activity_header
           expect(ff(item_selector).size).to eq 1
@@ -91,7 +91,7 @@ describe "dashboard" do
       item_selector = '#announcement-details tbody tr'
 
       get "/"
-      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      f('#dashboardToggleButton').click
       expect(f('.no_recent_messages')).to include_text('No Recent Messages')
     end
 
@@ -121,7 +121,7 @@ describe "dashboard" do
     it "should expand/collapse recent activity category", priority: "1", test_id: 215580 do
       create_announcement
       get '/'
-      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      f('#dashboardToggleButton').click
       assert_recent_activity_category_closed
       click_recent_activity_header
       assert_recent_activity_category_is_open
@@ -132,7 +132,7 @@ describe "dashboard" do
     it "should not expand category when a course/group link is clicked", priority: "2", test_id: 215581 do
       create_announcement
       get '/'
-      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      f('#dashboardToggleButton').click
       assert_recent_activity_category_closed
       disable_recent_activity_header_course_link
       click_recent_activity_course_link
@@ -151,7 +151,7 @@ describe "dashboard" do
       expect(items.size).to eq 1
 
       get "/"
-      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      f('#dashboardToggleButton').click
       expect(ff('#conversation-details tbody tr').size).to eq 1
     end
 
@@ -159,7 +159,7 @@ describe "dashboard" do
       NotificationsCommon.setup_notification(@student, name: 'Assignment Created')
       assignment_model({:submission_types => ['online_text_entry'], :course => @course})
       get "/"
-      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      f('#dashboardToggleButton').click
       find('.toggle-details').click
       expect(fj('.fake-link:contains("Unnamed")')).to be_present
     end
@@ -171,11 +171,11 @@ describe "dashboard" do
                                                  :end_at => Date.today + 1.day)
       a2 = @course.account.announcements.create!(:subject => 'test 2',
                                                  :message => "another annoucement",
-                                                 :start_at => Date.today - 1.day,
+                                                 :start_at => Date.today - 2.days,
                                                  :end_at => Date.today + 1.day)
 
       get "/"
-      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      f('#dashboardToggleButton').click
       messages = ffj("#dashboard .account_notification .notification_message")
       expect(messages.size).to eq 2
       expect(messages[0].text).to eq a1.message
@@ -234,16 +234,10 @@ describe "dashboard" do
       end
 
       it "should display course name in course menu", priority: "1", test_id: 215586 do
-        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-          f('#global_nav_courses_link').click
-          expect(fj(".ic-NavMenu__headline:contains('Courses')")).to be_displayed
-          wait_for_ajax_requests
-          expect(fj(".ic-NavMenu-list-item a:contains('#{@course.name}')")).to be_displayed
-        else
-          driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-          expect(f('#courses_menu_item')).to include_text('My Courses')
-          expect(f('#courses_menu_item')).to include_text(@course.name)
-        end
+        f('#global_nav_courses_link').click
+        expect(fj(".ic-NavMenu__headline:contains('Courses')")).to be_displayed
+        wait_for_ajax_requests
+        expect(fj(".ic-NavMenu-list-item a:contains('#{@course.name}')")).to be_displayed
       end
 
       it "should display student groups in header nav", priority: "2", test_id: 215587 do
@@ -256,38 +250,27 @@ describe "dashboard" do
 
         get "/"
 
-        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-          f('#global_nav_groups_link').click
-          expect(fj(".ic-NavMenu__headline:contains('Groups')")).to be_displayed
-          wait_for_ajax_requests
+        f('#global_nav_groups_link').click
+        expect(fj(".ic-NavMenu__headline:contains('Groups')")).to be_displayed
+        wait_for_ajax_requests
 
-          list = fj(".ic-NavMenu-list-item")
-          expect(list).to include_text(group.name)
-          expect(list).to_not include_text(other_group.name)
-        else
-          driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-          expect(f('#courses_menu_item')).to include_text(group.name)
-          expect(f('#courses_menu_item')).to include_text('Current Groups')
-        end
+        list = fj(".ic-NavMenu-list-item")
+        expect(list).to include_text(group.name)
+        expect(list).to_not include_text(other_group.name)
       end
 
       it "should present /courses as the href of the courses nav item", priority: "2", test_id: 215612 do
-        expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_courses_link' : '#courses_menu_item a').attribute('href')).to match(/\/courses$/)
+        expect(f('#global_nav_courses_link').attribute('href')).to match(/\/courses$/)
       end
 
       it "should only open the courses menu when clicking the courses nav item", priority: "1", test_id: 215613 do
-        f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_courses_link' : '#courses_menu_item a').click
+        f('#global_nav_courses_link').click
         expect(driver.current_url).not_to match(/\/courses$/)
       end
 
       it "should go to a course when clicking a course link from the menu", priority: "1", test_id: 215614 do
-        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-          f('#global_nav_courses_link').click
-          fj(".ic-NavMenu-list-item a:contains('#{@course.name}')").click
-        else
-          driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-          fj("#courses_menu_item a[href='/courses/#{@course.id}']").click
-        end
+        f('#global_nav_courses_link').click
+        fj(".ic-NavMenu-list-item a:contains('#{@course.name}')").click
         expect(driver.current_url).to match "/courses/#{@course.id}"
       end
     end
@@ -365,16 +348,9 @@ describe "dashboard" do
       c1.save!
       get "/"
 
-      if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-        f('#global_nav_courses_link').click
-        expect(fj(".ic-NavMenu__headline:contains('Courses')")).to be_displayed
-        expect(f(".ic-NavMenu__link-list")).not_to include_text(c1.name)
-      else
-        driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-        item = fj('#menu_enrollments')
-        expect(item).to be_displayed
-        expect(item).not_to include_text(c1.name)
-      end
+      f('#global_nav_courses_link').click
+      expect(fj(".ic-NavMenu__headline:contains('Courses')")).to be_displayed
+      expect(f(".ic-NavMenu__link-list")).not_to include_text(c1.name)
     end
 
     it "should show recent feedback and it should work", priority: "1", test_id: 216373 do
@@ -409,15 +385,8 @@ describe "dashboard" do
       it "should always have a link to the courses page (with customizations)", priority: "1", test_id: 216378 do
         course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true})
         get "/"
-        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-          f('#global_nav_courses_link').click
-          expect(fj('.ic-NavMenu-list-item a:contains("All Courses")')).to be_present
-        else
-          course_menu_item = f("#courses_menu_item")
-          hover(course_menu_item)
-          expect(course_menu_item).to include_text('My Courses')
-          expect(course_menu_item).to include_text('View All or Customize')
-        end
+        f('#global_nav_courses_link').click
+        expect(fj('.ic-NavMenu-list-item a:contains("All Courses")')).to be_present
       end
     end
   end

@@ -1168,12 +1168,12 @@ describe "context modules" do
       wait_for_ajaximations
       f("#tab-tools-link").click
       f(".add_tool_link.lm").click
-      f(".dropdown-toggle").click
-      fln("By URL").click
-      ff(".input-block-level")[2].send_keys("Khan Academy")
-      ff(".input-block-level")[3].send_keys("key")
-      ff(".input-block-level")[4].send_keys("secret")
-      ff(".input-block-level")[5].send_keys("https://www.eduappcenter.com/configurations/rt6spjamqrgkduhr.xml")
+      f("#configuration_type_selector").click
+      f("option[value='url']").click
+      ff(".formFields input")[0].send_keys("Khan Academy")
+      ff(".formFields input")[1].send_keys("key")
+      ff(".formFields input")[2].send_keys("secret")
+      ff(".formFields input")[3].send_keys("https://www.eduappcenter.com/configurations/rt6spjamqrgkduhr.xml")
       f("#submitExternalAppBtn").click
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External Tool', 'https://www.edu-apps.org/lti_public_resources/launch?driver=khan_academy&remote_id=y2-uaPiyoxc', 'Counting with small numbers')

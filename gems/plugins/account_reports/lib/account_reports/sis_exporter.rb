@@ -406,7 +406,6 @@ module AccountReports
                 cs.sis_source_id AS course_section_sis_id,
                 pseudonyms.sis_user_id AS pseudonym_sis_id,
                 ob.sis_user_id AS ob_sis_id,
-                roles.base_role_type AS role_base_role_type,
                 CASE WHEN enrollments.workflow_state = 'invited' THEN 'invited'
                      WHEN enrollments.workflow_state = 'creation_pending' THEN 'invited'
                      WHEN enrollments.workflow_state = 'active' THEN 'active'
@@ -417,7 +416,6 @@ module AccountReports
         joins("INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = enrollments.course_section_id
                INNER JOIN #{Course.quoted_table_name} ON courses.id = cs.course_id
                INNER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=enrollments.user_id
-               INNER JOIN #{Role.quoted_table_name} ON roles.id = enrollments.role_id
                LEFT OUTER JOIN #{Course.quoted_table_name} nxc ON cs.nonxlist_course_id = nxc.id
                LEFT OUTER JOIN #{Pseudonym.quoted_table_name} AS ob ON ob.user_id = enrollments.associated_user_id
                  AND ob.account_id = enrollments.root_account_id").
@@ -473,7 +471,7 @@ module AccountReports
           row << e.associated_user_id unless @sis_format
           row << e.ob_sis_id
           row << e.sis_batch_id? unless @sis_format
-          row << e.role_base_role_type unless @sis_format
+          row << e.type unless @sis_format
           csv << row
         end
       end

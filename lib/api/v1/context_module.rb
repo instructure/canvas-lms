@@ -20,6 +20,7 @@ module Api::V1::ContextModule
   include Api::V1::User
   include Api::V1::ExternalTools::UrlHelpers
   include Api::V1::Locked
+  include Api::V1::Assignment
 
   MODULE_JSON_ATTRS = %w(id position name unlock_at)
 
@@ -37,7 +38,15 @@ module Api::V1::ContextModule
     end
     has_update_rights = context_module.grants_right?(current_user, :update)
     hash['published'] = context_module.active? if has_update_rights
-    tags = context_module.content_tags_visible_to(@current_user, assignment_visibilities: opts[:assignment_visibilities], discussion_visibilities: opts[:discussion_visibilities], quiz_visibilities: opts[:quiz_visibilities], observed_student_ids: opts[:observed_student_ids])
+    tags = context_module.content_tags_visible_to(@current_user,
+      opts.slice(
+        :assignment_visibilities,
+        :discussion_visibilities,
+        :page_visibilities,
+        :quiz_visibilities,
+        :observed_student_ids
+      )
+    )
     count = tags.count
     hash['items_count'] = count
     hash['items_url'] = polymorphic_url([:api_v1, context_module.context, context_module, :items])
@@ -137,10 +146,12 @@ module Api::V1::ContextModule
 
     hash['content_details'] = content_details(content_tag, current_user) if includes.include?('content_details')
 
+    hash['mastery_paths'] = conditional_release(content_tag, opts) if includes.include?('mastery_paths')
+
     hash
   end
 
-  def content_details(content_tag, current_user, opts={})
+  def content_details(content_tag, current_user, opts = {})
     details = {}
     item = content_tag.content
 
@@ -176,5 +187,17 @@ module Api::V1::ContextModule
     end
 
     details
+  end
+
+  def conditional_release(content_tag, opts = {})
+    rules = opts[:conditional_release_rules]
+    assignment_id = content_tag.content.try(:assignment_id) || content_tag.content_id
+    conditional_release_assignment_set(rules, assignment_id) if rules.present? && assignment_id.present?
+  end
+
+  def conditional_release_assignment_set(rules, id)
+    result = rules.find { |rule| rule[:trigger_assignment].to_s == id.to_s }
+    return unless result.present?
+    result.slice(:locked, :assignment_sets)
   end
 end

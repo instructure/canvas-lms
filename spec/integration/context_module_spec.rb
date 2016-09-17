@@ -275,10 +275,12 @@ describe ContextModule do
     it "should load visibilities for each model" do
       AssignmentStudentVisibility.expects(:visible_assignment_ids_in_course_by_user).returns({}).once
       DiscussionTopic.expects(:visible_ids_by_user).returns({}).once
+      WikiPage.expects(:visible_ids_by_user).returns({}).once
       Quizzes::QuizStudentVisibility.expects(:visible_quiz_ids_in_course_by_user).returns({}).once
       course_module
       @module.assignment_visibilities_for_users([2])
       @module.discussion_visibilities_for_users([2])
+      @module.page_visibilities_for_users([2])
       @module.quiz_visibilities_for_users([2])
     end
   end

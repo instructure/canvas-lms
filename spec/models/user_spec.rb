@@ -772,6 +772,10 @@ describe User do
       set_up_course_with_users
     end
 
+    before(:each) do
+      RequestStore.clear!
+    end
+
     def set_up_course_with_users
       @course = course_model(:name => 'the course')
       @this_section_teacher = @teacher
@@ -800,7 +804,7 @@ describe User do
     # should be putting more than a handful of users into the search results...
     # right?
     def search_messageable_users(viewing_user, *args)
-      viewing_user.search_messageable_users(*args).paginate(:page => 1, :per_page => 20)
+      viewing_user.address_book.search_users(*args).paginate(:page => 1, :per_page => 20)
     end
 
     it "should include yourself even when not enrolled in courses" do
@@ -955,16 +959,17 @@ describe User do
       # other_section_user is a teacher in one course, student in another
       @other_course.enroll_user(@other_section_user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-      messageable_users = search_messageable_users(@admin)
-      this_section_user = messageable_users.detect{|u| u.id == @this_section_user.id}
-      expect(this_section_user.common_courses.keys).to include @first_course.id
-      expect(this_section_user.common_courses[@first_course.id].sort).to eql ['StudentEnrollment', 'TaEnrollment']
+      address_book = @admin.address_book
+      search_messageable_users(@admin)
+      common_courses = address_book.common_courses(@this_section_user)
+      expect(common_courses.keys).to include @first_course.id
+      expect(common_courses[@first_course.id].sort).to eql ['StudentEnrollment', 'TaEnrollment']
 
-      two_context_guy = messageable_users.detect{|u| u.id == @other_section_user.id}
-      expect(two_context_guy.common_courses.keys).to include @first_course.id
-      expect(two_context_guy.common_courses[@first_course.id].sort).to eql ['StudentEnrollment']
-      expect(two_context_guy.common_courses.keys).to include @other_course.id
-      expect(two_context_guy.common_courses[@other_course.id].sort).to eql ['TeacherEnrollment']
+      common_courses = address_book.common_courses(@other_section_user)
+      expect(common_courses.keys).to include @first_course.id
+      expect(common_courses[@first_course.id].sort).to eql ['StudentEnrollment']
+      expect(common_courses.keys).to include @other_course.id
+      expect(common_courses[@other_course.id].sort).to eql ['TeacherEnrollment']
     end
 
     it "should include users with no shared contexts iff admin" do
@@ -1047,38 +1052,38 @@ describe User do
       end
     end
 
-    context "admin_context" do
+    context "is_admin" do
       it "should find users in the course" do
-        expect(search_messageable_users(@admin, :context => @course.asset_string, :admin_context => @course).map(&:id).sort).to eq(
+        expect(search_messageable_users(@admin, context: @course.asset_string, is_admin: true).map(&:id).sort).to eq(
           [@this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
         )
       end
 
       it "should find users in the section" do
-        expect(search_messageable_users(@admin, :context => "section_#{@course.default_section.id}", :admin_context => @course.default_section).map(&:id).sort).to eq(
+        expect(search_messageable_users(@admin, context: "section_#{@course.default_section.id}", is_admin: true).map(&:id).sort).to eq(
           [@this_section_teacher.id, @this_section_user.id]
         )
       end
 
       it "should find users in the group" do
-        expect(search_messageable_users(@admin, :context => @group.asset_string, :admin_context => @group).map(&:id).sort).to eq(
+        expect(search_messageable_users(@admin, context: @group.asset_string, is_admin: true).map(&:id).sort).to eq(
           [@this_section_user.id]
         )
       end
     end
 
-    context "strict_checks" do
+    context "weak_checks" do
       it "should optionally show invited enrollments" do
         course(:active_all => true)
         student_in_course(:user_state => 'creation_pending')
-        expect(search_messageable_users(@teacher, :strict_checks => false).map(&:id)).to include @student.id
+        expect(search_messageable_users(@teacher, weak_checks: true).map(&:id)).to include @student.id
       end
 
       it "should optionally show pending enrollments in unpublished courses" do
         course()
         teacher_in_course(:active_user => true)
         student_in_course()
-        expect(search_messageable_users(@teacher, :strict_checks => false, :context => @course.asset_string, :admin_context => @course).map(&:id)).to include @student.id
+        expect(search_messageable_users(@teacher, weak_checks: true, context: @course.asset_string, is_admin: true).map(&:id)).to include @student.id
       end
     end
   end
@@ -1718,7 +1723,7 @@ describe User do
           # trigger the after db filtering
           Setting.stubs(:get).with('filter_events_by_section_code_threshold', anything).returns(0)
           @course.enroll_student(@student, :section => @sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
-          expect(@student.upcoming_events(:limit => 1)).to eq [@events[1]]
+          expect(@student.upcoming_events(:limit => 2)).to eq [@events[1]]
         end
 
         it "should use the old behavior as a fallback" do
@@ -1726,7 +1731,7 @@ describe User do
           # the optimized call will retrieve the first two events, and then filter them out
           # since it didn't retrieve enough events it will use the old code as a fallback
           @course.enroll_student(@student, :section => @sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
-          expect(@student.upcoming_events(:limit => 1)).to eq [@events[2]]
+          expect(@student.upcoming_events(:limit => 2)).to eq [@events[2]]
         end
       end
     end

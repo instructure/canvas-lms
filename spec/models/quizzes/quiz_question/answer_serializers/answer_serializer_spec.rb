@@ -21,4 +21,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer do
       Quizzes::QuizQuestion::AnswerSerializers.send(:remove_const, :UberHax)
     end
   end
+
+  it 'has Error constant' do
+    expect{Quizzes::QuizQuestion::AnswerSerializers::Error.new('message')}.to_not raise_error
+  end
 end

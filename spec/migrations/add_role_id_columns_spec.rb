@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20140903152155_add_role_id_columns.rb'
 require 'db/migrate/20140905171322_drop_role_name_columns.rb'
 
-describe 'AddRoleIdColumns' do
+describe 'AddRoleIdColumns', shared_db: false do
   describe "up" do
     def create_role(account, name, base)
       role = account.roles.build(:name => name)

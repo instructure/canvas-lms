@@ -529,7 +529,7 @@
 #     }
 class AssignmentsApiController < ApplicationController
   before_filter :require_context
-  before_filter :require_user_or_observer, :only=>[:user_index]
+  before_filter :require_user_visibility, :only=>[:user_index]
   include Api::V1::Assignment
   include Api::V1::Submission
   include Api::V1::AssignmentOverride
@@ -548,6 +548,7 @@ class AssignmentsApiController < ApplicationController
   #   Split up "needs_grading_count" by sections into the "needs_grading_count_by_section" key, defaults to false
   # @argument bucket [String, "past"|"overdue"|"undated"|"ungraded"|"unsubmitted"|"upcoming"|"future"]
   #   If included, only return certain assignments depending on due date and submission status.
+  # @argument assignment_ids[] if set, return only assignments specified
   # @returns [Assignment]
   def index
     error_or_array= get_assignments(@current_user)
@@ -571,7 +572,6 @@ class AssignmentsApiController < ApplicationController
           preload(:rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
       scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
-
       include_params = Array(params[:include])
 
       if params[:bucket]
@@ -583,7 +583,19 @@ class AssignmentsApiController < ApplicationController
         scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @current_user, @context, submissions_for_user)
       end
 
+      if params[:assignment_ids]
+        if params[:assignment_ids].length > Api.max_per_page
+          return render json: { message: "Request contains too many assignment_ids.  Limit #{Api.max_per_page}" }, status: 400
+        end
+        scope = scope.where(id: params[:assignment_ids])
+      end
+
       assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
+
+      if params[:assignment_ids] && assignments.length != params[:assignment_ids].length
+        invalid_ids = params[:assignment_ids] - assignments.map(&:id).map(&:to_s)
+        return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(',')}" }, status: 400
+      end
 
       submissions = submissions_hash(include_params, assignments, submissions_for_user)
 
@@ -1003,9 +1015,14 @@ class AssignmentsApiController < ApplicationController
     return render :json => @context.errors, :status => :bad_request
   end
 
-  def require_user_or_observer
+  def require_user_visibility
     return render_unauthorized_action unless @current_user.present?
     @user = params[:user_id]=="self" ? @current_user : api_find(User, params[:user_id])
-    authorized_action(@user,@current_user, [:read_as_parent, :read])
+    if @context.grants_right?(@current_user, :view_all_grades)
+      # teacher, ta
+      return if @context.students_visible_to(@current_user).include?(@user)
+    end
+    # self, observer
+    authorized_action(@user, @current_user, [:read_as_parent, :read])
   end
 end

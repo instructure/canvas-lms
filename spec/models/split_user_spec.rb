@@ -65,6 +65,20 @@ describe SplitUsers do
         expect(enrollment5.reload.user).to eq user3
       end
 
+      it 'should handle conflicting enrollments' do
+        enrollment1 = course1.enroll_student(user1, enrollment_state: 'active')
+        UserMerge.from(user1).into(user2)
+        enrollment2 = course1.enroll_student(user1, enrollment_state: 'active')
+        SplitUsers.split_db_users(user2)
+
+        user1.reload
+        user2.reload
+        expect(user1).not_to be_deleted
+        expect(user2).not_to be_deleted
+        expect(enrollment1.reload.user).to eq user2
+        expect(enrollment2.reload.user).to eq user1
+      end
+
       it 'should handle user_observers' do
         observer1 = user_model
         observer2 = user_model

@@ -1100,6 +1100,14 @@ describe ContextModule do
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@topic)).to be_truthy
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@topic)).to be_falsey
       end
+      it "should filter differentiated pages" do
+        @page_assignment = wiki_page_assignment_model(course: @course, only_visible_to_overrides: true)
+        create_section_override_for_assignment(@page_assignment, {course_section: @overriden_section})
+        @module.add_item({id: @page.id, type: 'wiki_page'})
+        expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@page)).to be_truthy
+        expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@page)).to be_truthy
+        expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@page)).to be_falsey
+      end
       it "should filter differentiated quizzes" do
         @quiz = Quizzes::Quiz.create!({
           context: @course,

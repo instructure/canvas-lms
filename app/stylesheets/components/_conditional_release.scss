@@ -9,3 +9,78 @@
   flex: 1 1 auto;
   min-height: 100%;
 }
+
+.conditional-release-save-data {
+  padding: 12px 0px;
+}
+
+.crs-breakdown-graph {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.crs-breakdown-title {
+  font-size: 14px;
+  overflow: hidden;
+  color: #555555;
+  font-weight: bold;
+  border-bottom: solid 1px #bbb;
+  margin: 13px 0;
+  padding-bottom: 6px;
+  text-align: left;
+}
+
+.crs-bar__container {
+
+}
+
+.crs-bar__horizontal-outside {
+  position: relative;
+  height: 14px;
+  border-radius: 25px;
+  padding: 5px 0;
+}
+
+.crs-bar__horizontal-inside-fill {
+  position: absolute;
+  height: 50%;
+  border-radius: 20px;
+  background-color: #5B6C79;
+  overflow: hidden;
+}
+
+.crs-bar__horizontal-inside {
+  position: absolute;
+  height: 50%;
+  width: 100%;
+  border-radius: 20px;
+  background-color: #f7f7f7;
+  overflow: hidden;
+}
+
+.crs-bar__bottom {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #555555;
+  margin-left: 4px;
+  margin-bottom: 15px;
+}
+
+.crs-bar__info {
+  height: 50%;
+}
+
+.crs-bar__link {
+  height: 50%;
+  color: #0081bd;
+  text-decoration: none;
+}
+
+.crs-bar__link:focus,  .crs-bar__link:hover{
+  color: #005e8a;
+  text-decoration: underline;
+}

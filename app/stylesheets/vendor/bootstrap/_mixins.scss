@@ -340,7 +340,8 @@
 @mixin canvas-button($button-color, $text-color) {
   background: $button-color;
   color: $text-color;
-  border: 1px solid darken($button-color, 15%);
+  border: 1px solid;
+
   &:focus { color: $text-color; }
   &:hover {
     @if $use_high_contrast {
@@ -367,6 +368,8 @@
   }
 
   @if lightness($button-color) > lightness($text-color) {
+    border-color: $ic-border-color;
+
     &.active, &.Button--active, &:active { box-shadow: none; }
     &.active, &.Button--active {
       background: darken($button-color, 55%);
@@ -382,13 +385,14 @@
   }
 
   @else {
+    border-color: darken($button-color, 15%);
+
     &:focus { @include button-focus-dark; }
     &.active, &.Button--active, &:active {
       background: darken($button-color, 8%);
       box-shadow: none;
     }
   }
-
 }
 
 

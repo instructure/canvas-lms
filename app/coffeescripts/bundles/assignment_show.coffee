@@ -7,9 +7,10 @@ require [
   'compiled/views/assignments/SpeedgraderLinkView',
   'compiled/util/vddTooltip',
   'compiled/util/markAsDone'
+  'jsx/cyoe_assignment_sidebar/create-conditional-breakdown'
   'compiled/jquery/ModuleSequenceFooter'
   'jquery.instructure_forms'
-], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView, vddTooltip, MarkAsDone) ->
+], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView, vddTooltip, MarkAsDone, createConditionalBreakdownApp) ->
 
   $ ->
     $('#content').on('click', '#mark-as-done-checkbox', ->
@@ -48,16 +49,16 @@ require [
 
   # -- This is all for the _grade_assignment sidebar partial
   $ ->
-    $(".upload_submissions_link").click (event) ->
+    $('.upload_submissions_link').click (event) ->
       event.preventDefault()
-      $("#re_upload_submissions_form").slideToggle()
+      $('#re_upload_submissions_form').slideToggle()
 
-    $(".download_submissions_link").click (event) ->
+    $('.download_submissions_link').click (event) ->
       event.preventDefault()
       INST.downloadSubmissions($(this).attr('href'))
-      $(".upload_submissions_link").slideDown()
+      $('.upload_submissions_link').slideDown()
 
-    $("#re_upload_submissions_form").submit (event) ->
+    $('#re_upload_submissions_form').submit (event) ->
       data = $(this).getFormData()
       if !data.submissions_zip
         event.preventDefault()
@@ -66,10 +67,15 @@ require [
         event.preventDefault()
         event.stopPropagation()
         $(this).formErrors
-          submissions_zip: I18n.t('errors.upload_as_zip', "Please upload files as a .zip")
+          submissions_zip: I18n.t('Please upload files as a .zip')
 
-    $("#edit_assignment_form").bind 'assignment_updated', (event, data) ->
+    $('#edit_assignment_form').bind 'assignment_updated', (event, data) ->
       if data.assignment && data.assignment.peer_reviews
-        $(".assignment_peer_reviews_link").slideDown()
+        $('.assignment_peer_reviews_link').slideDown()
       else
-        $(".assignment_peer_reviews_link").slideUp()
+        $('.assignment_peer_reviews_link').slideUp()
+  $ ->
+
+    if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+      { assignment, jwt, stats_url } = ENV.CONDITIONAL_RELEASE_ENV
+      createConditionalBreakdownApp('crs-breakdown', assignment, jwt, stats_url)

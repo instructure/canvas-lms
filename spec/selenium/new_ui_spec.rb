@@ -105,7 +105,7 @@ describe 'new ui' do
       wait_for_ajaximations
       f = FeatureFlag.last
       expect(f.state).to eq 'on'
-      expect(f('.profile_settings.active').css_value('background-color')).to eq('rgba(0, 150, 219, 1)')
+      expect(f('.profile_settings.active').css_value('background-color')).to eq('rgba(0, 142, 226, 1)')
     end
 
     it 'should not break tiny mce css', priority: "2", test_id: 244891 do

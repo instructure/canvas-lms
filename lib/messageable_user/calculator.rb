@@ -286,12 +286,12 @@ class MessageableUser
       # course, and if so with which enrollment type(s)?
       if include_course_id && course = Course.where(id: include_course_id).first
         missing_users = users.reject{ |user| user.global_common_courses.keys.include?(course.global_id) }
-        if missing_user.present?
+        if missing_users.present?
           course.shard.activate do
             reverse_lookup = missing_users.index_by(&:id)
             missing_user_ids = reverse_lookup.keys
             enrollment_scope(scope_options.merge(:course_workflow_state => course.workflow_state)).
-              where(:id => missing_user_ids, :course_id => course.id).
+              where(id: missing_user_ids, enrollments: { course_id: course }).
               each{ |user| reverse_lookup[user.id].include_common_contexts_from(user) }
           end
         end

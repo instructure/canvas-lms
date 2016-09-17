@@ -303,6 +303,54 @@ by `asset_type` and `asset_id`.
 | `updated_at` | The time at which this enrollment was last modified in any way. |
 | `limit_privileges_to_course_section ` | Whether students can only talk to students withing their course section. |
 | `course_section_id ` | The id of the section of the course for the new enrollment. |
+| `workflow_state` | The state of the enrollment. |
+
+#### `enrollment_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `enrollment_id` | The Canvas id of the new enrollment. |
+| `course_id` | The Canvas id of the course for this enrollment. |
+| `user_id` | The Canvas id of the user for this enrollment. |
+| `user_name` | The user's name. |
+| `type` | The type of enrollment; e.g. 'StudentEnrollment', 'TeacherEnrollment', etc. |
+| `created_at` | The time at which this enrollment was created. |
+| `updated_at` | The time at which this enrollment was last modified in any way. |
+| `limit_privileges_to_course_section ` | Whether students can only talk to students withing their course section. |
+| `course_section_id ` | The id of the section of the course for the new enrollment. |
+| `workflow_state` | The state of the enrollment. |
+
+#### `enrollment_state_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `enrollment_id` | The Canvas id of the new enrollment. |
+| `state` | The state of the enrollment. |
+| `state_started_at` | The time when this enrollment state starts. |
+| `state_is_current` | If this enrollment_state is uptodate |
+| `state_valid_until` | The time at which this enrollment is no longer valid. |
+| `restricted_access` | True if this enrollment_state is restricted. |
+| `access_is_current ` | If this enrollment_state access is upto date. |
+| `state_invalidated_at ` | Time enrollment_state was invalidated. |
+| `state_recalculated_at` | Time enrollment_state was created. |
+| `access_invalidated_at` | Time enrollment_state access was invalidated. |
+| `access_recalculated_at` | Time enrollment_state access was created. |
+
+#### `enrollment_state_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `enrollment_id` | The Canvas id of the new enrollment. |
+| `state` | The state of the enrollment. |
+| `state_started_at` | The time when this enrollment state starts. |
+| `state_is_current` | If this enrollment_state is uptodate |
+| `state_valid_until` | The time at which this enrollment is no longer valid. |
+| `restricted_access` | True if this enrollment_state is restricted. |
+| `access_is_current ` | If this enrollment_state access is upto date. |
+| `state_invalidated_at ` | Time enrollment_state was invalidated. |
+| `state_recalculated_at` | Time enrollment_state was created. |
+| `access_invalidated_at` | Time enrollment_state access was invalidated. |
+| `access_recalculated_at` | Time enrollment_state access was created. |
 
 
 #### `user_account_association_created`
@@ -313,4 +361,52 @@ by `asset_type` and `asset_id`.
 | `account_id` | The Canvas id of the account for this association. |
 | `created_at` | The time at which this association was created. |
 | `updated_at` | The time at which this association was last modified. |
-| `roles ` | The roles the user has in the account. |
+| `roles` | The roles the user has in the account. |
+
+#### `attachment_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of the user associated with the attachment. |
+| `attachment_id` | The Canvas id of the attachment. |
+| `display_name` | The display name of the attachment (possibly truncated). |
+| `filename` | The file name of the attachment (possibly truncated). |
+| `unlock_at` | The unlock date (attachment is unlocked after this date) |
+| `lock_at` | The lock date (attachment is locked after this date) |
+| `updated_at` | The time at which this attachment was last modified in any way |
+| `context_type` | The type of context the attachment is used in. |
+| `context_id` | The id of the context the attachment is used in. |
+| `content_type` | The content type of the attachment. |
+
+#### `attachment_updated`
+
+`attachment_updated` events are triggered when an attachment's `display_name` is updated.
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of the user associated with the attachment. |
+| `attachment_id` | The Canvas id of the attachment. |
+| `display_name` | The display name of the attachment (possibly truncated). |
+| `old_display_name` | The old display name of the attachment (possibly truncated). |
+| `filename` | The file name of the attachment (possibly truncated). |
+| `unlock_at` | The unlock date (attachment is unlocked after this date) |
+| `lock_at` | The lock date (attachment is locked after this date) |
+| `updated_at` | The time at which this attachment was last modified in any way |
+| `context_type` | The type of context the attachment is used in. |
+| `context_id` | The id of the context the attachment is used in. |
+| `content_type` | The content type of the attachment. |
+
+#### `attachment_deleted`
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of the user associated with the attachment. |
+| `attachment_id` | The Canvas id of the attachment. |
+| `display_name` | The display name of the attachment (possibly truncated). |
+| `filename` | The file name of the attachment (possibly truncated). |
+| `unlock_at` | The unlock date |
+| `lock_at` | The lock date |
+| `updated_at` | The time at which this attachment was last modified in any way |
+| `context_type` | The type of context the attachment is used in. |
+| `context_id` | The id of the context the attachment is used in. |
+| `content_type` | The content type of the attachment. |

@@ -68,6 +68,7 @@ module Api::V1::Course
   #     "start_at" => nil,
   #     "end_at" => nil,
   #     "public_syllabus" => false,
+  #     "public_syllabus_to_auth" => false,
   #     "storage_quota_mb" => 500,
   #     "hide_final_grades" => false,
   #     "apply_assignment_group_weights" => false,

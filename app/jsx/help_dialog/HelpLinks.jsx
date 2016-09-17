@@ -26,6 +26,8 @@ define([
           <li className="ic-NavMenu-list-item" key={`link${index}`}>
             <a
               href={link.url}
+              target="_blank"
+              rel="noopener"
               onClick={this.handleLinkClick}
               className="ic-NavMenu-list-item__link"
             >

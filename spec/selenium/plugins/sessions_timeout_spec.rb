@@ -3,18 +3,21 @@ require File.expand_path('spec/selenium/common')
 describe "Sessions Timeout" do
   include_context "in-process server selenium tests"
 
-  describe "Validations" do 
-    context "when you are logged in as an admin" do 
+  describe "Validations" do
+    context "when you are logged in as an admin" do
       before do
         user_logged_in
         Account.site_admin.account_users.create!(user: @user)
       end
 
-      it "requires session expiration to be at least 20 minutes" do 
+      it "requires session expiration to be at least 20 minutes" do
         get "/plugins/sessions"
         if !f("#plugin_setting_disabled").displayed?
           f("#accounts_select option:nth-child(2)").click
           expect(f("#plugin_setting_disabled")).to be_displayed
+        end
+        if !f(".save_button").enabled?
+          f(".copy_settings_button").click
         end
         f("#plugin_setting_disabled").click
         f('#settings_session_timeout').send_keys('19')
@@ -29,7 +32,7 @@ describe "Sessions Timeout" do
     plugin_setting.save!
     user_with_pseudonym({:active_user => true})
     login_as
-    expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_profile_display_name' : '.user_name').text).to eq @user.primary_pseudonym.unique_id
+    expect(f('#global_nav_profile_display_name').text).to eq @user.primary_pseudonym.unique_id
 
     Timecop.travel(Time.now + 1.minute) do
       get "/courses"

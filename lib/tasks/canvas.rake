@@ -115,6 +115,7 @@ namespace :canvas do
 
     if ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
       log_time('Making sure node_modules are up to date') {
+        puts "node is: #{`which node`} #{`node -v`}"
         raise 'error running npm install' unless `npm install`
       }
     end
@@ -300,6 +301,8 @@ Switchman::Rake.filter_database_servers do |servers, block|
   block.call(servers)
 end
 
-%w{db:pending_migrations db:skipped_migrations db:migrate:predeploy}.each { |task_name| Switchman::Rake.shardify_task(task_name) }
+%w{db:pending_migrations db:skipped_migrations db:migrate:predeploy}.each do |task_name|
+  Switchman::Rake.shardify_task(task_name, categories: ->{ Shard.categories })
+end
 
 end

@@ -227,6 +227,14 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
+    it "should not allow anonymous users to access a public for authenticated syllabus" do
+      @user = nil
+      public_course_query(:opts => {:expected_status => 401}) do |c|
+        c.public_syllabus = false
+        c.public_syllabus_to_auth = true
+      end
+    end
+
     it 'should return undated events' do
       @course.calendar_events.create(:title => 'undated')
       @course.calendar_events.create(:title => "dated", :start_at => '2012-01-08 12:00:00')
@@ -860,6 +868,15 @@ describe CalendarEventsApiController, type: :request do
       cal = Icalendar.parse(response.body.dup)[0]
       expect(cal.events[0].description).to eq nil
       expect(cal.events[0].x_alt_desc).to eq nil
+    end
+
+    it 'works when event descriptions contain paths to user attachments' do
+      attachment_with_context(@user)
+      @user.calendar_events.create!(description: "/users/#{@user.id}/files/#{@attachment.id}", start_at: Time.now)
+      json = api_call(:get, "/api/v1/calendar_events", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json'
+      })
+      expect(response).to be_success
     end
 
     context "child_events" do

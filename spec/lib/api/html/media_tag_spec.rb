@@ -64,16 +64,23 @@ module Api
         let(:url_helper){ stub({
           media_object_thumbnail_url: "/media/object/thumbnail",
           media_redirect_url: "/media/redirect",
+          proxy: stub(
+            show_media_tracks_url: 'media/track/vtt'
+          )
         }) }
 
         describe 'transforming a video node' do
-          let(:base_tag){ stub(name: 'video', inner_html: "inner_html") }
-
-          let(:html5_node){
-            tag = base_tag
+          let(:media_comment_id) { '42' }
+          let(:base_tag) do
+            tag = stub(name: 'video', inner_html: "inner_html")
             tag.stubs(:[]).with('class').returns('')
-            tag.stubs(:[]).with('data-media_comment_id').returns('42')
-            media_tag = MediaTag.new(tag, doc, StubbedNode)
+            tag.stubs(:[]).with('data-media_comment_id').returns(media_comment_id)
+            tag
+          end
+          let(:media_tag) do
+            MediaTag.new(base_tag, doc, StubbedNode)
+          end
+          let(:html5_node){
             media_tag.as_html5_node(url_helper)
           }
 
@@ -86,6 +93,32 @@ module Api
           specify{ expect(html5_node['src']).to eq(url_helper.media_redirect_url) }
           specify{ expect(html5_node.inner_html).to eq(base_tag.inner_html) }
           specify{ expect(html5_node.tag_name).to eq('video') }
+
+          context 'when media object has subtitle tracks' do
+            let(:media_object) do
+              stub(
+                id: media_comment_id,
+                media_tracks: [
+                  stub(
+                    kind: 'subtitles',
+                    locale: 'en',
+                    id: 1,
+                    media_object_id: media_comment_id
+                  )
+                ]
+              )
+            end
+            let(:media_tag) do
+              MediaTag.new(base_tag, Nokogiri::XML::DocumentFragment.parse('<div></div>'), Nokogiri::XML::Node).tap do |tag|
+                tag.stubs(media_object: media_object)
+              end
+            end
+
+            it 'adds track tag children to html5 node' do
+              node = html5_node.at_css('track')
+              expect(node).not_to be_nil
+            end
+          end
         end
 
         describe 'transforming a audio node' do
@@ -127,6 +160,7 @@ module Api
           before do
             mo = stub(media_type: 'special')
             mo.stubs(:by_media_id).with('911').returns(mo)
+            mo.stubs(:preload).with(:media_tracks).returns(mo)
             mo.stubs(:first).returns(mo)
             MediaObject.stubs(active: mo)
           end

@@ -126,7 +126,7 @@ END
 This enables an updated navigation, new dashboard and a simpler, more modern look and feel.
 END
       applies_to: 'RootAccount',
-      state: ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? 'on' : 'allowed',
+      state: 'on',
       root_opt_in: true
     },
     'epub_export' =>
@@ -241,8 +241,7 @@ END
 Allow users to view and use external tools configured for LOR.
 END
       applies_to: 'User',
-      state: 'hidden',
-      beta: true
+      state: 'hidden'
     },
     'lor_for_account' =>
     {
@@ -251,8 +250,7 @@ END
 Allow users to view and use external tools configured for LOR.
 END
       applies_to: 'RootAccount',
-      state: 'hidden',
-      beta: true
+      state: 'hidden'
     },
     'multiple_grading_periods' =>
     {
@@ -336,6 +334,16 @@ END
       state: 'hidden',
       beta: true,
       development: false,
+      root_opt_in: false
+    },
+    'better_scheduler' =>
+    {
+      display_name: -> { I18n.t('Use the new scheduler') },
+      description: -> { I18n.t('Uses the new scheduler and its functionality') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      development: true,
       root_opt_in: false
     },
     'use_new_tree' =>

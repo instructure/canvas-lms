@@ -231,7 +231,7 @@
           <% end %>
           <% @context.assignment_groups.active.include_active_assignments.each do |group| %>
             <optgroup label="<%= group.name %>">
-            <% group.active_assignments.no_graded_quizzes_or_topics.limit(200).each do |assignment| %>
+            <% group.active_assignments.no_submittables.limit(200).each do |assignment| %>
               <option value="<%= assignment.id %>"><%= assignment.title %></option>
             <% end %>
             </optgroup>

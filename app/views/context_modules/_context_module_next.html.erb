@@ -1,14 +1,13 @@
-
 <%
   context_module_next ||= nil
-  context_module = context_module_next
+  context_module ||= context_module_next
+  module_data = context_module ? process_module_data(context_module) : { published_status: 'unpublished' }
   editable ||= can_do(@context, @current_user, :manage_content)
   workflow_state = context_module && context_module.workflow_state
-  published_status = context_module && context_module.published? ? 'published' : 'unpublished'
   @modules ||= []
 %>
-<% cache_if_module(context_module, editable, @current_user, @context) do %>
 
+<% cache_if_module(context_module, editable, @current_user, @context) do %>
 <div
   class="item-group-condensed context_module
     <%= 'editable_context_module' if editable %>
@@ -112,15 +111,15 @@
           data-module-type="module"
           data-id="<%= context_module && context_module.id %>"
           data-course-id="<%= context_module && context_module.context_id %>"
-          data-published="<%= published_status == 'published' %>"
+          data-published="<%= module_data[:published_status] == 'published' %>"
           data-publishable="<%= true %>"
           data-publish-message="<%= t('Unpublished. Click to publish %{module_name}.', {module_name: context_module ? context_module.name : 'module'}) %>"
           data-unpublish-message="<%= t('Published. Click to unpublish %{module_name}.', {module_name: context_module ? context_module.name : 'module'}) %>"
           title=""
           data-tooltip
-          class="publish-icon module <%= published_status %>"
+          class="publish-icon module <%= module_data[:published_status] %>"
         >
-          <i class="icon-<%= published_status %>" alt="<%= published_status == 'published' ? t('published') : t('unpublished') %>"></i>
+          <i class="icon-<%= module_data[:published_status] %>" alt="<%= module_data[:published_status] == 'published' ? t('published') : t('unpublished') %>"></i>
         </span>
 
         <button
@@ -163,9 +162,9 @@
 
   <div class="content" id="context_module_content_<%= context_module && context_module.id %>">
     <ul class="ig-list items context_module_items <%= 'manageable' if editable %>">
-      <% if context_module %>
-        <% context_module.content_tags_visible_to(@current_user).each do |tag| %>
-          <%= render :partial => 'context_modules/module_item_next', :object => tag, :locals => {:completion_criteria => context_module.completion_requirements, :editable => editable} %>
+      <% if context_module && module_data[:items] %>
+        <% module_data[:items].each do |item| %>
+          <%= render :partial => 'context_modules/module_item_next', :object => item, :as => :module_item, :locals => {:completion_criteria => context_module.completion_requirements, :item_data => module_data[:items_data][item.id], :editable => editable} %>
         <% end %>
       <% end %>
     </ul>

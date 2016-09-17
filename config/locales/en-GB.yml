@@ -105,7 +105,7 @@ en-GB:
     tab_courses: Courses
     tab_developer_keys: "Developer keys"
     tab_faculty_journal: "Faculty journal"
-    tab_grading_standards: Grading
+    tab_grading_standards: Marking
     tab_jobs: Jobs
     tab_outcomes: Outcomes
     tab_permissions: Permissions
@@ -126,6 +126,7 @@ en-GB:
     default_login_handle_name: Email
   account_authorization_config/ldap: 
     test_bind_failed: "Failed to bind with the following error: %{error}"
+    test_bind_timeout: "Timeout when binding"
     test_connection_timeout: "Time out when connecting"
     test_host_unknown: "Unknown host: %{host}"
     test_login_auth_exception: "Exception on login: %{error}"
@@ -397,7 +398,7 @@ en-GB:
       add_user_button: "Add user"
       add_user_link: "New user"
       display_name_help: "People will see this name in discussions, messages and comments."
-      full_name_description: "This name will be used by teachers for grading."
+      full_name_description: "This name will be used by teachers for marking."
       labels: 
         account_id: "Sub account"
         course_code: "Reference code"
@@ -525,7 +526,7 @@ en-GB:
         message_date_to: "To date"
       grade_change_logging_content: 
         find: Find
-        grade_change_activity: "Grade Change Activity"
+        grade_change_activity: "Mark change activity"
         message_assignment_id: "Assignment Id"
         message_course_id: "Course Id"
       grade_change_logging_item: 
@@ -538,7 +539,7 @@ en-GB:
         Anonymous: Anonymous
         Assignment: Assignment
         Course: Course
-        Grader: Grader
+        Grader: Marker
         Student: Student
         To: To
         date: Date
@@ -548,7 +549,7 @@ en-GB:
       logging_content_pane: 
         authentication: "Login / Logout Activity"
         course: "Course Activity"
-        grade_change: "Grade Change Activity"
+        grade_change: "Mark change activity"
         select_default: "Select a Log type"
         select_label: "Select a log type to search."
       page_title: "Admin tools for %{account}"
@@ -614,7 +615,7 @@ en-GB:
           filter_online: 
             check_box: "Online classes only"
     confirm_delete_user: 
-      confirm_delete: "Are you sure you want to delete this user from the account %{account}? This will remove the user's data (including grades) from all courses and groups. This process cannot be undone."
+      confirm_delete: "Are you sure you want to delete this user from the account %{account}? This will remove the user's data (including marks) from all courses and groups. This process cannot be undone."
       delete_button: "Delete %{user}"
       page_title: "Confirm delete"
       title: "Confirm delete %{user} from %{account}"
@@ -699,7 +700,7 @@ en-GB:
       account_reports: 
         default: 
           description: 
-            text: "This report shows the student final grade results for all students in a given term. The resulting csv file will have one row per enrolment, and will show the current and final grade that is displayed in the course gradebook."
+            text: "This report shows the student final mark results for all students in a given term. The resulting csv file will have one row per enrolment, and will show the current and final mark that is displayed in the course gradebook."
     group_type: group
     include_deleted_parameter: 
       account_reports: 
@@ -993,7 +994,7 @@ en-GB:
         external_services_warning: "Notice: Some notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive Canvas course and group information outside of the institutional system."
         external_services_warning_label: "Pop-up message content:"
         from: From
-        sample_subject: "Grade changed: Check in survey, testing course"
+        sample_subject: "Mark changed: Check in survey, testing course"
         subject: Subject
       open_registration_delegated_warning_message: "An external identity provider is enabled, and users created via open registration may not be able to log in unless the external identity provider's login form has a link back to %{url}."
       open_registration_delegated_warning_tooltip: "An external identity provider is enabled"
@@ -1227,7 +1228,7 @@ en-GB:
         default: 
           unpublishd_courses: 
             text: "This report shows all the courses for a given term that are not published. The resulting csv file will have one row per course and will show the course ID, course SIS ID, course short name, course name, course start and end dates."
-    unrecognized_time_zone: "'%{timezone}' is not a recognized time zone"
+    unrecognized_time_zone: "'%{timezone}' is not a recognised time zone"
     unused_courses_csv_description: 
       account_reports: 
         unused_courses: 
@@ -1315,12 +1316,15 @@ en-GB:
   add_course_assignments_628ed6d0: "Add course assignments"
   add_course_calendar_events_146154a5: "Add course calendar events"
   add_criterion_eb9587ef: "Add criterion"
+  add_custom_link_22059c0: "Add custom link"
   add_email_address_aef3b61: "Add email address"
   add_files_to_the_course_da6ffd32: "Add files to the course"
   add_folder_ba50d107: "Add folder"
   add_grading_period_6f774dc3: "Add Marking Period"
-  add_grading_scheme_81e23c05: "Add grading scheme"
+  add_grading_scheme_81e23c05: "Add marking scheme"
+  add_help_menu_links_de9fc34f: "Add help menu links"
   add_icon_567dbcaa: "add icon"
+  add_link_fc336ed6: "Add link"
   add_moderator_review_copy_1st_a484c813: "Add moderator review (Copy 1st)"
   add_moderator_review_copy_2nd_e80d458f: "Add moderator review (Copy 2nd)"
   add_moderator_review_new_3c183cea: "Add moderator review (New)"
@@ -1350,6 +1354,7 @@ en-GB:
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Add your assignments.  You can just make a long list, or break them up into groups - and even specify weights for each assignment group."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Add your Zendesk instance's custom field ID for each of the following (fields that have no ID's will not be logged):"
   admin_4d3ba42f: Admin
+  admins_3e1dce15: Admins
   after_date_981cd41b: "After %{date}"
   after_last_attempt_c9168da2: "After last attempt"
   ajax_errors: 
@@ -1391,12 +1396,12 @@ en-GB:
       the_student: "The student"
       the_teacher: "The teacher"
       title: "Days since a teacher has interacted with the student"
-      ungraded_count_description: "More than %{count} submissions have not been graded"
-      ungraded_count_option: "Ungraded submissions (count)"
-      ungraded_count_title: "Number of submissions that have not been graded"
-      ungraded_timespan_description: "A submission has been left ungraded for %{count} days"
-      ungraded_timespan_option: "Ungraded submissions (Time)"
-      ungraded_timespan_title: "Days that a submission has been left ungraded"
+      ungraded_count_description: "More than %{count} submissions have not been marked"
+      ungraded_count_option: "Unmarked submissions (count)"
+      ungraded_count_title: "Number of submissions that have not been marked"
+      ungraded_timespan_description: "A submission has been left unmarked for %{count} days"
+      ungraded_timespan_option: "Unmarked submissions (Time)"
+      ungraded_timespan_title: "Days that a submission has been left unmarked"
       usernote_description: "No faculty journal entry has been added for %{count} days"
       usernote_option: "No faculty journal entry"
       usernote_title: "Days since a faculty journal has been added"
@@ -1414,7 +1419,7 @@ en-GB:
   all_finished_time_to_publish_your_course_click_the_b6f07217: "All finished?  Time to publish your course!  Click the button below to make it official! Publishing will allow the users to begin participating in the course."
   all_grading_period_sets_must_have_a_title_799538f: "All marking period sets must have a title"
   all_grading_period_sets_must_have_at_least_one_enr_20b84ba1: "All marking period sets must have at least one enrolment term"
-  all_grading_periods_77974940: "All Grading Periods"
+  all_grading_periods_77974940: "All marking periods"
   all_grading_periods_must_have_a_title_a1a38d87: "All marking periods must have a title"
   all_groups_cea25817: "All Groups"
   all_my_files_a0213441: "All My Files"
@@ -1424,7 +1429,7 @@ en-GB:
   all_submissions_must_have_a_selected_grade_3a84e5a9: "All submissions must have a selected mark."
   all_terms_cd27b0fb: "All terms"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Allow a moderator to review multiple independent marks for selected submissions"
-  allow_bulk_grade_export_to_sis_e11a6e66: "Allow bulk grade export to SIS"
+  allow_bulk_grade_export_to_sis_e11a6e66: "Allow bulk mark export to SIS"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Allow course images to be assigned to a course and used on dashboard cards."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Allow course images to be assigned to a course and used on the dashcards."
   allow_in_mastery_paths_5332c786: "Allow in mastery paths"
@@ -1435,7 +1440,7 @@ en-GB:
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Allow ability to send notifications through our dispatch queue"
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: "Allow the ability to send notifications through our dispatch queue"
   allowed_attempts_4e229caa: "Allowed attempts"
-  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Allows teachers to mark grade data to be exported in bulk to SIS integrations."
+  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Allows teachers to record mark data to be exported in bulk to SIS integrations."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Allows the scheduling of recurring calendar events"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Allows users with international phone numbers to receive text messages from Canvas."
   always_3a59e701: Always
@@ -1542,6 +1547,7 @@ en-GB:
   anonymous_user: "Anonymous User"
   anonymous_user_d984b9ce: "Anonymous User"
   another_configuration_is_currently_selected_select_95b394e: "Another configuration is currently selected. Selecting this configuration will deselect the other."
+  answer_address_book_queries_through_76842372: "Answer address book queries through"
   answer_answerid_97fc4afc: "Answer %{answerId}"
   answer_correct_answer_c2c4a20c: "%{answer}, (correct answer)"
   answer_description_6b353cfd: "Answer description"
@@ -1637,8 +1643,8 @@ en-GB:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Are you sure you want to delete this announcement?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Are you sure you want to delete this comment?"
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Are you sure you want to delete this marking period set?"
-  are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Are you sure you want to delete this grading period?"
-  are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Are you sure you want to delete this grading scheme?"
+  are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Are you sure you want to delete this marking period?"
+  are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Are you sure you want to delete this marking scheme?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Are you sure you want to do this? It cannot be undone and will override existing marks in the gradebook."
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Are you sure you want to inactivate this user? User will be unable to participate in the course while inactive."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Are you certain you want to remove this marking period?"
@@ -1655,6 +1661,7 @@ en-GB:
   arrange_columns_by_due_date_f74f9e2d: "Arrange columns by due date"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "As you type in this field, the list of results will be automatically updated."
+  ask_your_instructor_a_question_a61ca5e9: "Ask your instructor a question"
   assessment_by_name_7b879a2c: "Assessment by %{name}"
   assessment_not_yet_completed_e800a0a7: "Assessment not yet completed"
   assessment_question: 
@@ -1681,7 +1688,7 @@ en-GB:
       upload_as_zip: "Please upload files as a zip file"
     feed_entry_title: "Assignment: %{assignment}"
     feed_entry_title_with_course: "Assignment, %{course}: %{assignment}"
-    gpa_scale_explainer: "What is GPA Scale Grading?"
+    gpa_scale_explainer: "What is GPA scale marking?"
     group_assignment_must_have_group_set: "Please select a group set for this assignment"
     labels: 
       due: Due
@@ -1702,26 +1709,26 @@ en-GB:
       external_tool: "an external tool"
       on_paper: "on paper"
     titles: 
-      gpa_scale_explainer: "What is GPA Scale Grading?"
-      grading_scheme_info: "View/edit grading scheme"
+      gpa_scale_explainer: "What is GPA scale marking?"
+      grading_scheme_info: "View/edit marking scheme"
   assignment_976578a8: Assignment
   assignment_comments_e43ed898: "Assignment comments"
   assignment_created_assignment_name_course_name_324a5639: "Assignment created - %{assignment_name}, %{course_name}"
   assignment_d8387b78: assignment
   assignment_details: 
-    no_graded_submissions: "No graded submissions"
+    no_graded_submissions: "No marked submissions"
   assignment_details_bc488179: "Assignment Details"
   assignment_details_dialog: 
     average_score: "Average score:"
     count_of_submissions: "%{cnt} submissions"
-    grading_statistics_for_assignment: "Grade statistics for: %{assignment.name}"
+    grading_statistics_for_assignment: "Mark statistics for: %{assignment.name}"
     high_score: "High score:"
     low_score: "Low score:"
     no_one_scored_higher: "No one scored higher than %{max}"
     no_one_scored_lower: "No one scored lower than %{min}"
     scores_higher_than_the_average: "Scores higher than the average of %{average}"
     scores_lower_than_the_average: "Scores lower than the average of %{average}"
-    total_graded_submissions: "Total graded submissions:"
+    total_graded_submissions: "Total marked submissions:"
   assignment_grades_have_already_been_published_ff2d84c6: "Assignment marks have already been published."
   assignment_group: 
     default_name: Assignments
@@ -1734,7 +1741,7 @@ en-GB:
     titles: 
       assignment_group_weights: "Manage assignment group weighting"
       total: Total
-    weight_final: "Weight final grade based on groups"
+    weight_final: "Weight final mark based on groups"
   assignment_groups: 
     errors: 
       cannot_delete_group: "You cannot delete a group with a locked assignment."
@@ -1746,12 +1753,13 @@ en-GB:
     errors: 
       frozen_assignments_error: "You cannot delete a group with a locked assignment."
   assignment_menu_91fe3716: "Assignment menu"
+  assignment_muted_4cb590a4: "Assignment muted"
   assignment_muter: 
     mute_assignment: "Mute assignment"
     muting_assignment: "Muting assignment..."
     unmute_assignment: "Unmute assignment"
     unmute_button: "Unmute assignment"
-    unmute_dialog: "This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?"
+    unmute_dialog: "This assignment is currently muted. That means students can't see their marks and feedback. Would you like to unmute now?"
     unmuting_assignment: "Unmuting assignment..."
   assignment_name_b2d87383: "Assignment name"
   assignment_name_course_name_is_now_due_55613e9b: "%{assignment_name}, %{course_name}, is now due"
@@ -1814,23 +1822,23 @@ en-GB:
       points_possible_screen_reader: "%{pointsPossible} Points Possible"
       settings: Settings
     assignment_list_item_score: 
-      assignment_grading_type_is_not_graded: "This assignment will not be assigned a grade."
-      assignment_not_yet_graded_screenreader: "Assignment not yet graded. %{pointsPossible} points possible."
+      assignment_grading_type_is_not_graded: "This assignment will not be assigned a mark."
+      assignment_not_yet_graded_screenreader: "Assignment not yet marked. %{pointsPossible} points possible."
       empty_points_possible: "-/%{pointsPossible} pts"
       no_submission: "No submission"
       no_submission_for_assignment_screenreader: "No submission for this assignment. %{pointsPossible} points possible."
-      not_yet_graded: "*Not Yet Graded*"
+      not_yet_graded: "*Not yet marked*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
       score_with_points_possible_screenreader: "Score: %{score} out of %{pointsPossible} points."
     assignment_settings: 
       cancel: Cancel
       save: Save
       validating: Saving...
-      weight_groups: "Weight final grade based on assignment groups"
+      weight_groups: "Weight final mark based on assignment groups"
     assignments_list_right_side: 
       links: 
         manage_assignments: "Manage assignments"
-        see_current_grades: "See my grades so far"
+        see_current_grades: "See my marks to date"
       titles: 
         show_only_assignments_from: "Show only assignments from"
         upcoming_assignments: "Upcoming assignments"
@@ -1865,7 +1873,7 @@ en-GB:
       external_tool_type: "External tool"
       more: "More options"
       multiple_due_dates: "Multiple due dates"
-      not_graded_type: "Not graded"
+      not_graded_type: "Not marked"
       quiz_type: Quiz
       save: Save
       saving: Saving...
@@ -1876,7 +1884,7 @@ en-GB:
       example_group_name: "e.g., Essay group 1"
       group_name: "Group name:"
       never_drop: "Never drop:"
-      percent_of_total: "% of total grade"
+      percent_of_total: "% of total mark"
       save: Save
       saving: Saving...
     create_new_crumb: "Create new"
@@ -1931,7 +1939,7 @@ en-GB:
       freeze_properties: "Lock assignment properties when copied"
       notify_content_change: "Notify users that this content has changed"
       points_possible: Points
-      post_to_sis: "Include this assignment's grades when posting to your school's Student Information System"
+      post_to_sis: "Include this assignment's marks when posting to your school's student information system"
       warnings: 
         assignment_is_frozen: "Some settings have been administratively locked."
     errors: 
@@ -1952,20 +1960,20 @@ en-GB:
       group_assignment_header: Comments...
     external_grader_sidebar: 
       edit_assignment_settings: "Edit assignment settings"
-      speed_grader: "Speed grader"
+      speed_grader: "Speed marker"
     file_retrieval_error: "Retrieving file failed"
     getting_file: "Retrieving file..."
     grade_assignment: 
       buttons: 
         upload_files: "Upload files"
-      graded_count: "%{graded_count} *out of* %{total} submissions graded"
+      graded_count: "%{graded_count} *out of* %{total} submissions marked"
       links: 
         download_submissions: "Download submissions"
         peer_reviews: "Peer reviews"
         reupload_submissions: "Re-upload submissions"
       resubmission_count: 
-        one: "1 ungraded resubmission"
-        other: "%{count} ungraded resubmissions"
+        one: "1 unmarked resubmission"
+        other: "%{count} unmarked resubmissions"
       reupload_instructions: |-
           If you made changes to the student submission files you downloaded
           before, just zip them back up and upload the zip with the form below.
@@ -1975,31 +1983,31 @@ en-GB:
       speed_grader: SpeedGrader™
       titles: 
         related_items: "Related items"
-    grade_gpa_scale_screenreader: "Grade: %{grade}"
-    grade_letter_grade_screenreader: "Grade: %{grade}"
-    grade_pass_fail_screenreader: "Grade: %{grade}"
+    grade_gpa_scale_screenreader: "Mark: %{grade}"
+    grade_letter_grade_screenreader: "Mark: %{grade}"
+    grade_pass_fail_screenreader: "Mark: %{grade}"
     grade_percent: "%{grade}%"
-    grade_percent_screenreader: "Grade: %{grade}%"
+    grade_percent_screenreader: "Mark: %{grade}%"
     grading_type_selector: 
-      display_grade_as: "Display Grade as"
-      gpa_scale_explainer: "GPA Scale Grading is designed for schools that use a 4.0 scale (or 5.0/6.0) for all assignments. This grading scheme is similar to the Letter Grade display but features some important differences:"
+      display_grade_as: "Display mark as"
+      gpa_scale_explainer: "GPA scale marking is designed for schools that use a 4.0 scale (or 5.0/6.0) for all assignments. This marking scheme is similar to the letter mark display but features some important differences:"
       gpa_scale_input_explainer: "Scores are input on the 4.0 scale. For instance, if an assignment is out of 100 points, inputting 4.0 results in 100%, 3.0 results in 87%, etc."
-      gpa_scale_letters_explainer: "Letter grades can be used in addition to number grades."
+      gpa_scale_letters_explainer: "Letter marks can be used in addition to number marks."
       gpa_scale_percentage_explainer: "You cannot input points directly, but can input percentages. For instance, if an assignment is out of 50 points, inputting \"40\" will not work, but \"80%\" will."
-      gpa_scale_recommendation: "Unless your school uses a 4.0 scale (or 5.0/6.0) for grading, Canvas recommends displaying grades as Letter Grade."
-      gpa_scale_scores_explainer: "The only scores allowed are predefined in the grading scheme."
-      gpa_scale_title: "\"What is GPA Scale Grading?\""
+      gpa_scale_recommendation: "Unless your school uses a 4.0 scale (or 5.0/6.0) for marking, Canvas recommends displaying marks as a letter mark."
+      gpa_scale_scores_explainer: "The only scores allowed are predefined in the marking scheme."
+      gpa_scale_title: "What is GPA scale marking?"
       grading_type_options: 
         gpa_scale: "GPA Scale"
-        letter_grade: "Letter grade"
-        not_graded: "Not graded"
+        letter_grade: "Letter mark"
+        not_graded: "Not marked"
         pass_fail: Complete/Incomplete
         percent: Percentage
         points: Points
-      view_grading_scheme: "View Grading Scheme"
+      view_grading_scheme: "View marking scheme"
     group_category_selector: 
       differentiated_groups_warning: "Differentiated group assignments may yield unexpected results."
-      grade_group_students_individually: "Assign grades to each student individually"
+      grade_group_students_individually: "Assign marks to each student individually"
       group_assignment_header: "Group Assignment"
       group_category_locked_explanation: "Students have already submitted homework on this assignment, so group settings cannot be changed."
       group_category_options: "New group category"
@@ -2179,7 +2187,7 @@ en-GB:
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
-        grade: "Grade: %{grade} *(%{points_possible} pts possible)*"
+        grade: "Mark: %{grade} *(%{points_possible} pts possible)*"
         graded_anonymously: "Marked anonymously: %{value}"
         ? "no"
         : "no"
@@ -2326,7 +2334,7 @@ en-GB:
         originality_report_never: Never
         originality_report_visibility: "Students can see the originality report"
         originality_report_visible_after_due_date: "After the due date"
-        originality_report_visible_after_grading: "After the assignment is graded"
+        originality_report_visible_after_grading: "After the assignment is marked"
         originality_report_visible_immediately: Immediately
         settings_exclude_fewer_than_count: "Fewer than %{wordsInput} words"
         settings_exclude_less_than_percent: "Less than %{percentInput} of the document"
@@ -2393,6 +2401,7 @@ en-GB:
   available_from_f84e4611: "Available from"
   available_from_field_for_styleguide_7ced3861: "Available From field for style guide"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Available from - Format Like YYYY-MM-DD hh:mm"
+  available_to_b7350e02: "Available to"
   available_until_date_2c0ccec3: "Available Until Date:"
   available_until_date_cd125c62: "Available Until date"
   available_until_f3b9c4ed: "Available until"
@@ -2963,6 +2972,7 @@ en-GB:
   canada_1_921df67a: "Canada (+1)"
   canada_aec587fa: Canada
   cancel_caeb1e68: Cancel
+  cancel_custom_link_creation_39ec70bd: "Cancel custom link creation"
   cannot_be_associated_with_a_different_account_ac863be2: "cannot be associated with a different account"
   cannot_be_associated_with_different_accounts_f461814f: "cannot be associated with different accounts"
   cannot_be_empty_when_course_id_is_nil_and_account__ca96a97e: "cannot be empty when course_id is nil and account_id is nil"
@@ -3012,7 +3022,7 @@ en-GB:
   careful_changes_to_group_membership_will_apply_to__19a9089c: "Caution! Changes to group membership will apply to groups that already have assignment submissions. Group assignment submissions might not align as a result. Would you like to create a new group set for future assignments?"
   cas_url_4ba2843e: "CAS URL"
   catalog_already_enabled_56478a3c: "Catalogue already enabled"
-  catalog_name_46d37909: "Catalogue Name"
+  catalog_name_46d37909: "Catalogue name"
   catalog_url_a01655dd: "Catalogue URL"
   catalog_users_already_exist_2894b8c4: "Catalogue users already exist"
   category_b9a94408: Category
@@ -3652,9 +3662,9 @@ en-GB:
         student_teacher_activity: "Your interactions report with %{user}"
         teacher_activity: "Student interactions report for %{user}"
         title: 
-          enrollment_sis_defined: "This enrolment was defined by the university, and can't be deleted"
+          enrollment_sis_defined: "This enrolment was defined by the university and cannot be deleted"
         user_account_details: "User account details"
-        user_grades: "Grades for %{user}"
+        user_grades: "Marks for %{user}"
         user_only_view_section: "limit this user to only see fellow section users"
         user_outcomes: "Outcomes for %{user}"
         user_view_all_sections: "let this user see all course users"
@@ -3718,9 +3728,9 @@ en-GB:
         student_teacher_activity: "Interactions with you"
         teacher_activity: "Student interactions report"
         title: 
-          enrollment_sis_defined: "This enrolment was defined by the university, and can't be deleted"
+          enrollment_sis_defined: "This enrolment was defined by the university and cannot be deleted"
         user_account_details: "User account details"
-        user_grades: Grades
+        user_grades: Marks
         user_only_view_section: "limit this user to only see fellow section users"
         user_outcomes: Outcomes
         user_view_all_sections: "let this user see all course users"
@@ -3793,6 +3803,8 @@ en-GB:
       buttons: 
         add_module: "Add module"
       labels: 
+        before_viewing: Prerequisites
+        module_complete_when: Requirements
         publish_final_grade: "When this module has been completed, publish final mark for the student"
         require_sequential_progress: "Students must move through requirements in sequential order"
       links: 
@@ -3855,7 +3867,7 @@ en-GB:
           remove_prerequisite: "Remove this prerequisite"
       module: module
       module_details: "Modules are shown in sequential order, so only modules that are above %{name} can be set as prerequisites."
-      modules_keyboard_hint_updated: "Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu."
+      modules_keyboard_hint_updated: "Warning: For improved accessibility in reordering Modules (or Module items), please use the Move to Dialog option found in the menu."
       move_module: 
         after: After
         before: Before
@@ -3901,7 +3913,7 @@ en-GB:
           student_progress: "See student progress for this module"
       manager_module: "Manage module"
       module_will_unlock_at: "Will unlock *%{unlock_date}*"
-      modules_keyboard_drag_and_drop: "Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu."
+      modules_keyboard_drag_and_drop: "Warning: For improved accessibility in reordering Modules (or Module items), please use the Move to Dialog option found in the menu."
       progression_complete_count: "*%{count}* complete"
       progression_started_count: "*%{count}* in progress"
       reorder_modules: "Drag to reorder modules"
@@ -4254,6 +4266,7 @@ en-GB:
     batch_update_message: 
       one: "1 course processed"
       other: "%{count} courses processed"
+    course: Course
     course_format: 
       blended: Blended
       not_set: "Not set"
@@ -4273,7 +4286,7 @@ en-GB:
       sis_login_id: "SIS Login ID"
       sis_user_id: "SIS User ID"
       student: Student
-    default_grading_scheme_name: "Default grading scheme"
+    default_grading_scheme_name: "Default marking scheme"
     default_name: "My course"
     default_short_name: Course-101
     errors: 
@@ -4296,10 +4309,13 @@ en-GB:
       unpublishable_with_message: "Unpublishable: %{message}"
       unpublished: Unpublished
       unpublished_with_message: "Unpublished: %{message}"
+    institution: Institution
     missing_name: "Unnamed course"
+    public: Public
     student_summary: 
       not_sorted: "Student summary table"
     student_view_student_name: "Test student"
+    syllabus: Syllabus
     wiki_permissions: 
       all: Anyone
       only_teachers: "Only teachers"
@@ -4338,7 +4354,7 @@ en-GB:
       file: "The file \"%{file_name}\" failed to export"
       file_meta: "Failed to export file meta data"
       files: "Failed to export some files"
-      grading_standards: "Failed to export grading standards"
+      grading_standards: "Failed to export marking standards"
       learning_outcomes: "Failed to export learning outcomes"
       lti_links: "Failed to export some web links"
       media_file: "A media file failed to export"
@@ -4412,10 +4428,10 @@ en-GB:
       default_view: "Default View"
       default_wiki_editing_roles: "Default Wiki Editing Roles"
       enrollment_term_id: "Enrolment Term Id"
-      grading_standard_id: "Grading Standard Id"
+      grading_standard_id: "Marking standard Id"
       group_weighting_scheme: "Group Weighting Scheme"
       hide_distribution_graphs: "Hide Distribution Graphs"
-      hide_final_grade: "Hide Final Grade"
+      hide_final_grade: "Hide final mark"
       indexed: Indexed
       integration_id: "Integration Id"
       is_public: "Is Public"
@@ -4431,7 +4447,7 @@ en-GB:
       replacement_course_id: "Replacement Course Id"
       restrict_enrollments_to_course_dates: "Restrict Enrolments To Course Dates"
       root_account_id: "Root Account Id"
-      self_enrollment: Self-Enrolment
+      self_enrollment: Self-enrolment
       self_enrollment_code: "Self-enrolment code"
       self_enrollment_limit: "Self-enrolment limit"
       show_all_discussion_entries: "Show All Discussion Entries"
@@ -4477,14 +4493,14 @@ en-GB:
     cancel: Cancel
     confirm: 
       delete_section: "Are you sure you want to delete this section?"
-      publish_grades: "Are you sure you want to publish these grades to the student information system? You should only do this if all your grades have been finalised."
-      re_publish_grades: "Are you sure you want to republish these grades to the student information system?"
+      publish_grades: "Are you sure you want to publish these marks to the student information system? You should only do this if all your marks have been finalised."
+      re_publish_grades: "Are you sure you want to republish these marks to the student information system?"
     edit_sections_placeholder: "Enter a section name"
     edit_sections_title: "Section name"
     errors: 
       invalid_sis_status: "Invalid SIS publish status"
       invitation: "Invitation failed.  Please try again."
-      publish_grades: "Something went wrong when trying to publish grades to the student information system. Please try again later."
+      publish_grades: "Something went wrong when trying to publish marks to the student information system. Please try again later."
       re_send_all: "Send failed. Please try again"
       section: "Add section failed. Please try again"
     flash: 
@@ -4499,11 +4515,11 @@ en-GB:
     links: 
       fewer_options: "fewer options"
       more_options: "more options"
-      publish: "Publish grades to SIS"
-      publishing: "Publishing grades to SIS..."
+      publish: "Publish marks to SIS"
+      publishing: "Publishing marks to SIS..."
       re_send_all: "Resend all unaccepted invitations"
       re_sending_invitation: "Resending invitation..."
-      republish: "Republish grades to SIS"
+      republish: "Republish marks to SIS"
     re_send_invitation: "Resend invitation"
     remove_user_from_course_section: "Remove user from %{course_section}"
     titles: 
@@ -4547,7 +4563,7 @@ en-GB:
         conclude_course: "Conclude course"
         delete_course: "Delete course"
       details: 
-        conclude_alt_text: "If you would like to retain the ability to change marks while limiting student access to the course, please utilise the course dates settings. Learn about course date settings in our guides *here*."
+        conclude_alt_text: "If you would like to retain the ability to change marks while limiting student access to the course, please use the course dates settings. Learn about course date settings in our guides *here*."
         confirm_conclude: "Warning: Concluding the course will archive all course content and prevent you from modifying marks."
         confirm_delete: "Are you sure you want to delete this course? Once it is deleted, students and teachers will no longer have access to it. If you just want to remove it from the course drop-down menu, you should *conclude the course instead*."
         confirm_delete_addendum: "If you do not have permission to conclude the course, you can *change the course end date*, or ask your administrator to conclude the course."
@@ -4657,7 +4673,7 @@ en-GB:
       buttons: 
         link: "Link to student"
       details: |-
-          When an observer is linked to a student, they have access to that student's grades and course interactions. *Right now this observer is linked to the student, %{student}.*
+          When an observer is linked to a student, they have access to that student's marks and course interactions. *Right now this observer is linked to the student, %{student}.*
           
           To link the course observer %{user} to a student, select the student's name from the list below.
       labels: 
@@ -4682,9 +4698,9 @@ en-GB:
       unconcluded: "Course unconcluded"
       updated: "Course was successfully updated."
     recent_event: 
-      all_graded: "all graded"
+      all_graded: "all marked"
       due: due
-      needs_grading: "needs grading"
+      needs_grading: "needs marking"
       no_new_submissions: "no new submissions"
       no_submissions: "no submissions"
       not_submitted: "not submitted"
@@ -4736,7 +4752,7 @@ en-GB:
         student_invitation_unaccepted_available: "%{name} hasn't yet accepted the invitation to join the course. The invitation was sent: %{time}"
         student_invitation_unaccepted_unavailable: "%{name} was added to the course: %{time}"
       link_to_students_view: 
-        link_student_desc: "When an observer is linked to a student, they have access to that student's grades and course interactions."
+        link_student_desc: "When an observer is linked to a student, s/he has access to that student's marks and course interactions."
       resend_invitations: 
         pending_invitation: "1 invitation has not been accepted."
         pending_invitations: "%{pendingInvitationsCount} invitations haven't been accepted."
@@ -4796,7 +4812,7 @@ en-GB:
         other: "%{count} users"
       headings: 
         details: "Course details"
-        grade_publishing: "Grade publishing"
+        grade_publishing: "Mark publishing"
         move_course: "Move the course to another root account"
         navigation: "Course navigation"
         sections: "Course sections"
@@ -4831,11 +4847,12 @@ en-GB:
         course_status_published: "Course is published"
         course_status_unpublished: "Course is unpublished"
         course_visibility: Visibility
+        custom_course_visibility: Customise
         enrollment_term_id: Term
-        grading_scheme: "Grading scheme"
-        grading_standard_enabled: "Enable course grading scheme"
-        hide_distribution_graphs: "Hide grade distribution graphs from students"
-        hide_final_grades: "Hide totals in student grades summary"
+        grading_scheme: "Marking scheme"
+        grading_standard_enabled: "Enable course marking scheme"
+        hide_distribution_graphs: "Hide mark distribution graphs from students"
+        hide_final_grades: "Hide totals in student marks summary"
         image: Image
         indexed: "Include this course in the public course index"
         is_public_to_auth_users: "Make this course visible to authenticated users"
@@ -4868,14 +4885,14 @@ en-GB:
         after: After
         before: Before
         or: OR
-      nav_items_keyboard_drag_and_drop: "Warning: For improved accessibility in reordering Course Navigation elements, please use the Move To Dialog option found in the menu."
+      nav_items_keyboard_drag_and_drop: "Warning: For improved accessibility in reordering Course Navigation elements, please use the Move to Dialog option found in the menu."
       no_language_preference: "Not set (user-configurable, defaults to %{language})"
       none: None
       page_title: "Course details"
       section_sis_id: "SIS ID: %{section_sis}"
       self_enrollment: "Let students self-enrol by sharing with them a secret URL or code"
       self_enrollment_without_code: "Let students self-enrol by sharing with them a secret URL"
-      set_grading_scheme: "set grading scheme"
+      set_grading_scheme: "set marking scheme"
       sis_source_id: "SIS ID"
       tab_cant_disable: "This page can't be disabled, only hidden"
       tab_disabled: "Page disabled. Will redirect to course home page"
@@ -4884,17 +4901,17 @@ en-GB:
         alerts: Alerts
         details: "Course details"
         feature_options: "Feature Options"
-        grade_publishing: "Grade publishing"
+        grade_publishing: "Mark publishing"
         navigation: Navigation
         sections: Sections
         tools: Apps
       titles: 
         edit_navigation: "Edit course navigation"
       tooltips: 
-        cannot_unpublish_course: "You cannot unpublish this course if there are graded student submissions"
+        cannot_unpublish_course: "You cannot unpublish this course if there are marked student submissions"
       transifex_message: "Join the [Canvas Translation Community](%{transifex_url})"
       turnitin: "these comments will be shown to students when submitting a Turnitin-enabled assignment"
-      view_grading_scheme: "view grading scheme"
+      view_grading_scheme: "view marking scheme"
       wiki_editing_roles: "can create, rename, and edit course wiki pages by default"
       wiki_editing_roles_change_existing: "Change pages currently editable by \"%{current_setting}\" to \"%{new_setting}\"."
     settings_sidebar: 
@@ -5078,8 +5095,8 @@ en-GB:
     eportfolio_welcome: "Welcome to your ePortfolio"
     error_reports: "Error reports"
     files: Files
-    grades: Grades
-    grading_standards: Grading
+    grades: Marks
+    grading_standards: Marking
     groups: Groups
     jobs: Jobs
     media: Media
@@ -5174,18 +5191,20 @@ en-GB:
   curve_grades_dialog: 
     average_score: "Average score"
     buttons: 
-      curve_grades: "Curve grades"
-      curving_grades: "Curving grades..."
-    curve_average: "Enter an average grade for the curve for *%{assignment.name}*. The chart shows a best attempt at curving the grades based on current student scores."
-    curve_grade_for_assignment: "Curve grade for %{assignment.name}"
+      curve_grades: "Curve marks"
+      curving_grades: "Curving marks..."
+    curve_average: "Enter an average mark for the curve for *%{assignment.name}*. The chart shows a best attempt at curving the marks based on current student scores."
+    curve_grade_for_assignment: "Curve mark for %{assignment.name}"
     labels: 
       assign_blanks: "Assign zeroes to unsubmitted students"
     out_of_points_possible: "out of %{assignment.points_possible}"
-    this_is_permanent: "Grade curving cannot be undone. Pre-curved grade histories will be available, but the curving action is irreversible."
+    this_is_permanent: "Mark curving cannot be undone. Pre-curved mark histories will be available, but the curving action is irreversible."
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Custom CSS and Javascript might cause accessibility issues or conflicts with future Canvas updates."
   custom_fields_fc3e55af: "Custom fields"
-  custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Custom links to include in the help dialogue pop-up"
+  custom_link_details_35fd38fc: "Custom link details"
+  custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Custom links to include in the help dialog pop-up"
   customize_help_link_62cd05eb: "Customise help link"
+  customize_this_menu_efa72a9: "Customise this menu"
   cutoff_score_74254c89: "cutoff score"
   cyan_c1d5f68a: Cyan
   d2l_display: Desire2Learn
@@ -5380,9 +5399,9 @@ en-GB:
   delete_current_message_5da0221a: "Delete current message"
   delete_current_module_item_21fefc54: "Delete current module/item"
   delete_custom_help_link_814f0509: "Delete custom help link"
-  delete_grading_period_dba36e59: "Delete grading period"
+  delete_grading_period_dba36e59: "Delete marking period"
   delete_grading_period_set_b35358dd: "Delete marking period set"
-  delete_grading_scheme_6b308832: "Delete grading scheme"
+  delete_grading_scheme_6b308832: "Delete marking scheme"
   delete_group_86c381ec: "Delete group"
   delete_my_account_41060aad: "Delete My Account"
   delete_outcome_cc6546f1: "Delete outcome"
@@ -5551,6 +5570,7 @@ en-GB:
     atom_no_author: "No author"
     default_user_name: "User name"
   discussion_group_category_locked: "Group categories cannot be set directly on a discussion assignment, but should be set on the discussion instead"
+  discussion_submission_781d5d33: "Discussion submission"
   discussion_topic: 
     atom_no_author: "No author"
     default_title: "No title"
@@ -5567,8 +5587,8 @@ en-GB:
       due_date: "due %{date}"
       for: For
       graded_discussion_and_points: 
-        one: "This is a graded discussion: *1 point possible*"
-        other: "This is a graded discussion: *%{count} points possible*"
+        one: "This is a marked discussion: *1 point possible*"
+        other: "This is a marked discussion: *%{count} points possible*"
       show_due_dates: "Show due dates"
       until: Until
     cannot_unpublish_with_replies: "Can't unpublish if there are student replies"
@@ -5585,7 +5605,7 @@ en-GB:
       close_for_comments: "Close for comments"
       delete: Delete
       due: Due
-      graded_discussion: "Graded discussion:"
+      graded_discussion: "Marked discussion:"
       last_post_date: "Last post %{display_last_reply_at}"
       manage: Manage
       move: "Move To…"
@@ -5633,7 +5653,7 @@ en-GB:
       sort_by_likes: "Sort by 'likes'"
       topic_title: "Topic title"
       until: Until
-      use_for_grading: Graded
+      use_for_grading: Marked
       users_must_post_before_seeing_replies: "Users must post before seeing replies"
     entry: 
       authors_name: "Author's name"
@@ -5762,7 +5782,7 @@ en-GB:
       locked: "This topic is closed for comments"
       manage: Manage
       open_to_comments: "Open to comments"
-      this_topic_is_used_for_grading: "This topic is used for grading"
+      this_topic_is_used_for_grading: "This topic is used for marking"
       topic_podcast_feed: "Topic podcast feed"
     this_is_a_group_discussion: "This is a Group Discussion"
     topic_deleted_notice: "%{topic_title} deleted successfully"
@@ -5854,6 +5874,7 @@ en-GB:
     unsubscribed: Unsubscribed
     unsubscribed_hint: "You are not subscribed to this topic. Click to subscribe."
   dismiss_dacdb625: Dismiss
+  display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Display all text links in Canvas as *underlined text*."
   display_course_catalog: "Show a searchable list of courses in this root account with the \"Include this course in the public course index\" flag enabled."
   display_name_b80c243e: "Display name"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Display total marks when the 'All Marking Periods\"' drop-down option is selected (Multiple Marking Periods must be enabled)."
@@ -5890,6 +5911,7 @@ en-GB:
   drop_image_62a2a071: "Drop image"
   dropdown_option_1_e6ff2fc: "Dropdown option 1"
   dropdown_option_2_9766a346: "Dropdown option 2"
+  dropped_for_grading_purposes_46256461: "Dropped for marking purposes"
   due_a73610f6: Due
   due_assignment_due_date_time_5acdf3cf: "Due: %{assignment_due_date_time}"
   due_assignment_due_date_time_607f2e1d: "due: %{assignment_due_date_time}"
@@ -5928,6 +5950,7 @@ en-GB:
   duplicate_provider_provider_d9842134: "Duplicate provider %{provider}"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "e.g. Doe, Jon"
+  e_g_http_university_edu_helpdesk_acab04d6: "e.g. http://university.edu/helpdesk"
   e_g_jon_doe_77233e3b: "e.g. Jon Doe"
   e_mail_only_2cc5e513: "E-Mail only"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Each bar is an assignment. The green layer represents the percentage of students who turned in their submission *on time*. Submissions that are **late** are yellow; ***missing*** submissions are red."
@@ -5952,7 +5975,7 @@ en-GB:
   edit_current_message_da650d4c: "Edit current message"
   edit_grading_period_e39af45d: "Edit marking period"
   edit_grading_period_set_c548f4df: "Edit marking period set"
-  edit_grading_scheme_53091236: "Edit grading scheme"
+  edit_grading_scheme_53091236: "Edit marking scheme"
   edit_group_c8679dba: "Edit group"
   edit_module_item_83258f6d: "Edit module/item"
   edit_name_cbdef0c2: "Edit %{name}"
@@ -5984,6 +6007,7 @@ en-GB:
       criterion_long_description: "Criterion long description"
       find_existing_rubric: "Find existing rubric "
   edit_survey_b0d6890d: "Edit survey"
+  edit_text_27d8aa3d: "Edit %{text}"
   edit_this_announcement_ae6e17b3: "Edit this announcement"
   edit_this_collaboration_393b1a9a: "Edit this collaboration"
   edit_this_question_1c82c3cf: "Edit this question"
@@ -5991,7 +6015,7 @@ en-GB:
   edit_tool_690c199b: "Edit tool"
   edit_toolname_app_23cfbb8: "Edit %{toolName} App"
   edit_user_details_4d7b63ff: "Edit user details"
-  edit_your_catalog_account_cce59310: "Edit your Catalogue Account"
+  edit_your_catalog_account_cce59310: "Edit your catalogue account"
   editing_permissions_for_name_3503e235: "Editing permissions for: %{name}"
   editor: 
     alt_text: "Alternate text:"
@@ -6068,14 +6092,14 @@ en-GB:
   email_is_required_736ac26b: "Email required"
   email_the_user_about_this_account_creation_e63f8759: "Email the user about this account creation"
   ember_modules_description: "Modules rewritten in Ember. Uses the native drag and drop API to allow dragging from external locations."
+  empty_stub_for_testing_only_37aad38: "Empty stub (for testing only)"
   enable_6f5d1328: Enable
   enable_dashboard_images_for_courses_5af458b0: "Enable dashboard images for courses"
   enable_feature_title_987d8e9a: "Enable feature: %{title}"
   enable_gradebook_list_students_by_sortable_name: "List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings."
   enable_multiple_grading_periods: |-
-      Multiple Marking Periods allow teachers and administrators to create marking periods with set
-      
-      cutoff dates. Assignments can be filtered by these marking periods in the results book.
+      Multiple marking periods allow teachers and administrators to create marking periods with set
+      cut-off dates. Assignments can be filtered by these marking periods in the results book.
   enable_or_condition_for_modules_a16f02d8: "Enable \"OR\" Condition for Modules"
   enable_reregistration_for_lti_2_b2a10444: "Enable re-registration for LTI 2"
   enabled_links_be110215: "Enabled Links"
@@ -6386,7 +6410,7 @@ en-GB:
       settings: 
         body: "To change the settings for your ePortfolio, click the \"ePortfolio Settings\" link (%{showme}). You can rename the portfolio and also change whether it is public or private. Private portfolios are only visible to those to whom you grant access."
       submissions: 
-        body1: "You may have noticed at the bottom of this page is a list of recent submissions from your classes (%{showme}). You can quickly add submissions to new pages in your portfolio from this page. Just click the submission you want to add and a simple dialogue will pop up."
+        body1: "You may have noticed at the bottom of this page is a list of recent submissions from your classes (%{showme}). You can quickly add submissions to new pages in your portfolio from this page. Just click the submission you want to add and a simple dialog will pop up."
         body2: "Great! Now to finish adding the submission, you need to choose which section you'd like to add it to and give the page a name. After you click \"Add page\" you'll be taken to the new page so you can edit it in more detail if you like."
   eportfolios_f6dc4579: ePortfolios
   epub_exporting_f5592ff2: "ePub exporting"
@@ -6628,6 +6652,7 @@ en-GB:
     user_navigation_configured: "User navigation configured"
     wiki_page_menu_configured: "Wiki page menu configured"
   external_url_e9b87215: "External URL"
+  extreme_critical_emergency_80b3dbda: "EXTREME CRITICAL EMERGENCY!"
   failed_307449e1: "Failed:"
   failed_to_create_webhook_b766cf5c: "Failed to create webhook."
   failed_to_create_zip_file_1a943d06: "Failed to create zip file"
@@ -6678,9 +6703,9 @@ en-GB:
     k12: "K-12 specific features"
     learning_mastery_gradebook: "Learning Mastery Gradebook"
     lor: "LOR External Tools"
-    multiple_grading_periods: "Multiple grading periods"
+    multiple_grading_periods: "Multiple marking periods"
     new_quiz_statistics: "New Quiz Statistics Page"
-    post_grades: "Post Grades to SIS"
+    post_grades: "Post marks to SIS"
     quiz_log_auditing: "Quiz log auditing"
     student_groups: "New Student Groups Page"
     student_outcome_gradebook: "Student Learning Mastery Gradebook"
@@ -6688,6 +6713,7 @@ en-GB:
   federated_attributes_are_information_sent_from_you_2116fb61: "Federated attributes -- information sent from your authentication provider -- to be used automatically to update corresponding information for users in Canvas each time they log in."
   feed_url_is_required_253fda4e: "Feed URL is required"
   field_name_31fff38e: "Field Name"
+  file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "File a ticket for a personal response from our support team."
   file_attachment_8e7dbfd1: "File attachment"
   file_content_a99b5c6b: "File content"
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "File %{filename} could not be included in the ePub document. Please see separate zip file for access."
@@ -6734,6 +6760,7 @@ en-GB:
     published_status: Published
     restricted_status: "Available from %{from_date} until %{until_date}"
     unpublished_status: Unpublished
+  file_upload_submission_740711f: "File upload submission"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} has been published with the following usage right: %{usage_right}"
   filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} per cent uploaded"
   filename_uploaded_successfully_edd8e825: "%{fileName} uploaded successfully!"
@@ -6795,12 +6822,10 @@ en-GB:
   filter_replies_by_unread_342e8e90: "Filtre replies by unread"
   filter_replies_by_unread_caf870ea: "filter replies by unread"
   final_grade_info_2aa35d25: "Final mark info"
-  final_grade_score_fe69a301: |-
-      Final mark
-      : %{score}
+  final_grade_score_fe69a301: "Final mark: %{score}"
   final_score_61e15cf3: "final score"
   find_8d605019: Find
-  find_an_existing_grading_scheme_d836ea: "Find an Existing Marking Scheme"
+  find_an_existing_grading_scheme_d836ea: "Find an existing marking scheme"
   find_an_outcome_919328e6: "Find an outcome"
   find_flickr_image_view: 
     find_cc_on_flickr: "Find Creative Commons images on Flickr"
@@ -6843,6 +6868,7 @@ en-GB:
   for: for
   for_974cbb84: For
   for_all_devices_1f603968: "For all devices"
+  for_an_instant_answer_see_if_your_issue_is_address_48280e89: "For an instant answer, see if your issue is addressed in the *Canvas Guides*."
   forgot_password_url_3f9c04b: "Forgot Password URL"
   form_background_fb654518: "Form background"
   form_border_f61f12dc: "Form border"
@@ -6903,6 +6929,7 @@ en-GB:
   goto_next_page_e8e1ae6f: "Goto next page"
   goto_page_page_num_bd656bd5: "Goto page %{page_num}"
   goto_previous_page_85b2fa49: "Goto previous page"
+  gpa_scale_6710e2ee: "GPA scale"
   gpa_scale_a6d1cdea: "GPA scale"
   grade_9c6f076d: Mark
   grade_assignment_7c1abc11: "Mark %{assignment}"
@@ -6910,9 +6937,9 @@ en-GB:
     grade_display_warning: 
       checkbox: "Don't show for this course again."
       warning: Warning
-  grade_distribution_e52c9256: "Grade distribution"
-  grade_export_title: "Grade export"
-  grade_info_19fb9875: "Grade info"
+  grade_distribution_e52c9256: "Mark distribution"
+  grade_export_title: "Mark export"
+  grade_info_19fb9875: "Mark info"
   grade_summary: 
     graph_title: "Mean %{mean}, High %{high}, Low %{low}"
     ? "no"
@@ -6924,9 +6951,9 @@ en-GB:
     : "yes"
   gradebook: 
     alerts: 
-      no_active_students: "Sorry, there are either no active students in the course or none are able to be graded by you."
-      no_students_in_groups_back: "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
-      no_students_in_groups_close: "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."
+      no_active_students: "Sorry, there are either no active students in the course or none are able to be marked by you."
+      no_students_in_groups_back: "Sorry, submissions for this assignment cannot be marked in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
+      no_students_in_groups_close: "Sorry, submissions for this assignment cannot be marked in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."
       no_students_in_section: "Could not find any students in that section, falling back to showing all sections."
     allow_message: "Click the \"Allow\" button to begin recording."
     begin_record_prompt: "Click the \"Record\" button to begin."
@@ -6952,9 +6979,9 @@ en-GB:
     edit_view_rubric: "View rubric"
     errors: 
       select_an_option: "Please select an option"
-    graded: graded
+    graded: marked
     graded_by_me: "%{graded_time} by me"
-    graded_then_resubmitted: "graded, then resubmitted (%{when})"
+    graded_then_resubmitted: "marked, then resubmitted (%{when})"
     gradee_index_of_total: "%{gradee} %{x} of %{y}"
     group: Group
     hide_all_details_button: "Hide all details"
@@ -6962,7 +6989,7 @@ en-GB:
     mute_assignment: "Mute assignment"
     no_submission_time: "no submission time"
     nodetect_message: "No speech was detected. You may need to adjust your microphone settings."
-    not_graded: "not graded"
+    not_graded: "not marked"
     not_submitted: "not submitted"
     nth_student: "Student %{n}"
     portion_graded: "%{x}/%{y}"
@@ -6971,7 +6998,7 @@ en-GB:
     show_all_details_button: "Show all details"
     student: Student
     student_index: "Student %{index}"
-    student_mute_notification: "Instructor is working on grades"
+    student_mute_notification: "Instructor is working on marks"
     submit: Submit
     titles: 
       click_to_record: "Speech to Text"
@@ -6996,7 +7023,7 @@ en-GB:
       assignment_options: "Assignment options"
       points_out_of: "Out of %{assignment.points_possible}"
       this_assignment_is_muted: "This assignment is muted"
-      zero_point_assignment: "Assignments in this group have no points possible and cannot be included in grade calculation"
+      zero_point_assignment: "Assignments in this group have no points possible and cannot be included in mark calculation"
     concluded_course_error_message: "This is a concluded course, so only concluded enrolments are available."
     course_average: "Course average"
     course_median: "Course median"
@@ -7011,15 +7038,15 @@ en-GB:
     grade_display_warning: 
       cancel: Cancel
       continue: Continue
-      percent_text: "Students will also see their final grade as a percentage. Are you sure you want to continue?"
-      points_text: "Students will also see their final grade as points. Are you sure you want to continue?"
+      percent_text: "Students will also see their final mark as a percentage. Are you sure you want to continue?"
+      points_text: "Students will also see their final mark as points. Are you sure you want to continue?"
     gradebook_header_menu: 
       assignment_details: "Assignment details"
-      curve_grades: "Curve grades"
+      curve_grades: "Curve marks"
       download_submissions: "Download submissions"
       message_students_who: "Message students who..."
       re_upload_submissions: "Reupload submissions"
-      set_default_grade: "Set default grade"
+      set_default_grade: "Set default mark"
       speedgrader: SpeedGrader
     header_filter: 
       course_average: "Course average"
@@ -7049,7 +7076,7 @@ en-GB:
     outcome_gradebook: 
       export_report: "Export report"
       toggle_sidebar: "Toggle Sidebar"
-    percent_of_grade: "%{percentage} of grade"
+    percent_of_grade: "%{percentage} of mark"
     points_out_of: "out of %{points_possible}"
     resubmitted: "Resubmitted since last graded"
     row_student_name: 
@@ -7063,9 +7090,9 @@ en-GB:
     show_student_names: "Show student names"
     student_name: "Student name"
     students_who: 
-      havent_been_graded: "Haven't been graded"
+      havent_been_graded: "Haven't been marked"
       havent_submitted_yet: "Haven't submitted yet"
-      no_grade_for: "No grade for %{assignment}"
+      no_grade_for: "No mark for %{assignment}"
       no_submission_for: "No submission for %{assignment}"
       not_submitted_yet: "Haven't submitted yet"
       scored_less_than: "Scored less than"
@@ -7089,13 +7116,13 @@ en-GB:
       move_to_end: "Move to end"
       move_to_front: "Move to front"
       options: Options
-      switch_to_percent: "Switch to percent"
+      switch_to_percent: "Switch to per cent"
       switch_to_points: "Switch to points"
     ungraded: "Not factored into grading"
   gradebook_1620a0aa: Gradebook
   gradebook_csvs: 
     grades_filename: Marks
-  gradebook_performance_764d8b3d: "Gradebook Performance"
+  gradebook_performance_764d8b3d: "Gradebook performance"
   gradebook_uploads: 
     new: 
       titles: 
@@ -7123,7 +7150,7 @@ en-GB:
         back: "Go back to Gradebook"
       new_assignment_option: "A new assignment"
       notices: 
-        unchanged: "Note: You uploaded some assignments that had no grade changes detected. They have been hidden."
+        unchanged: "Note: You uploaded some assignments that had no mark changes detected. They have been hidden."
       page_title: Gradebook
       student_answer: "This person is really"
       student_example: "Some guy"
@@ -7171,11 +7198,11 @@ en-GB:
         other: "%{count} comments"
       comment_count_screenreader: "Read comments"
       comments: Comments
-      disabled_for_student_view: "Test Student scores are not included in grade statistics."
+      disabled_for_student_view: "Test Student scores are not included in mark statistics."
       expand: "Expand all learning mastery outcome groups."
       expand_title: Expand
       for_course: "For the course"
-      grading_in_progress: "Instructor is working on grades"
+      grading_in_progress: "Instructor is working on marks"
       headers: 
         anonymous: "Marked anonymously"
         details: Details
@@ -7191,7 +7218,7 @@ en-GB:
         high: High
         low: Low
         mean: Mean
-        only_graded: "Calculate based only on graded assignments"
+        only_graded: "Calculate based only on marked assignments"
         total: Total
         your_score: "Your score"
       learning_outcomes: "Learning Mastery"
@@ -7202,16 +7229,16 @@ en-GB:
         show_details: "Show all details"
       media_comment: "This is a media comment,"
       not_official: "*NOTE*: This is NOT your official score."
-      page_title: "Grades for %{student}"
-      print_grades: "Print grades"
+      page_title: "Marks for %{student}"
+      print_grades: "Print marks"
       score_details: "Score Details"
       see_rubric_results: "See rubric results"
       see_rubric_results_screenreader: "See rubric results"
       see_scoring_details: "See scoring details"
       see_scoring_details_screenreader: "See scoring details"
       see_turnitin_results: "See Turnitin results"
-      student_mute_legend: "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable."
-      student_mute_notification: "Instructor is working on grades"
+      student_mute_legend: "Your instructor is working on marks. While your instructor is working on marks, mark and comment information is unavailable."
+      student_mute_notification: "Instructor is working on marks"
       submission_score: "*%{score}* out of %{possible}"
       titles: 
         enter_score: "Enter a score to test"
@@ -7243,18 +7270,18 @@ en-GB:
       incomplete: Incomplete
     grading_box_extended: 
       labels: 
-        grade: Grade
+        grade: Mark
     history: 
-      graded_on_submission: "Graded on submission"
-      grades_for_date: "Grades for date"
+      graded_on_submission: "Marked on submission"
+      grades_for_date: "Marks for date"
       headers: 
         after: After
         before: Before
         current: Current
         student: Student
       page_title: "Gradebook history"
-      regraded: Regraded
-      revert: "Revert to this grade"
+      regraded: Re-marked
+      revert: "Revert to this mark"
       submission_count: 
         one: "1 change"
         other: "%{count} changes"
@@ -7286,7 +7313,7 @@ en-GB:
       set_group_weights: "Set Group Weights"
       show_concluded_enrollments: "Show Concluded Enrolments"
       show_inactive_enrollments: "Show inactive enrolments"
-      view_grading_history: "View Marking History"
+      view_grading_history: "View marking history"
     screenreader: 
       page_titles: "Gradebook: Individual View"
     speed_grader: 
@@ -7314,7 +7341,7 @@ en-GB:
         media_comment: "Media comment"
         speech_recognition: "Speech recognition"
       keycode_descriptions: 
-        change_grade: "Change grade"
+        change_grade: "Change mark"
         leave_comment: "Leave comment"
         next_student: "Next student"
         previous_student: "Previous student"
@@ -7328,7 +7355,7 @@ en-GB:
       labels: 
         add_comment: "Add a comment"
         average: Avg
-        grade_by_question_beta: "Grade by question (beta)"
+        grade_by_question_beta: "Mark by question (beta)"
         group_comment: "Send comment to the whole group"
         hide_names: "Hide student names in the SpeedGrader"
         show_assessment_by: "Show assessment by"
@@ -7345,14 +7372,14 @@ en-GB:
         remove_attachment: "Remove Attachment"
         settings: Settings
         show_all_sections: "Show all sections"
-        submit_same_score: "Use this same grade for the resubmission"
+        submit_same_score: "Use this same mark for the resubmission"
       loading: loading...
       no_annotation: "Annotations are not available for this document"
       not_newest_notice: "Note: This is not the most recent submission"
       page_header_title: SpeedGrader
       page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
       sort_by: 
-        status: "by submission status (needs grading, not submitted, etc)"
+        status: "by submission status (needs marking, not submitted, etc.)"
         student_name: "by student name (alphabetically)"
         submitted_at: "the date they submitted the assignment"
       submitted_files: "Submitted files: (click to load)"
@@ -7374,7 +7401,7 @@ en-GB:
         no_attendance: Attendance
         student_attendance: "Attendance for %{user}"
       links: 
-        grades: "Grades for %{user}"
+        grades: "Marks for %{user}"
         message_user: "Message %{user}"
       no_attendance_assignments: "No attendance assignments have been created."
       page_title: "Attendance for %{user}"
@@ -7404,9 +7431,9 @@ en-GB:
     titles: 
       total: Total
   graded_25cd3fcd: Marked
-  graded_quiz_7fabdf1f: "Graded quiz"
-  graded_survey_c0f0c395: "Graded survey"
-  grades_a61eba0a: Grades
+  graded_quiz_7fabdf1f: "Marked quiz"
+  graded_survey_c0f0c395: "Marked survey"
+  grades_a61eba0a: Marks
   grades_are_now_reverted_to_original_scores_e6deade1: "Marks are now reverted to original scores"
   grades_are_now_showing_what_if_scores_711a8be2: "Marks are now showing what-if scores"
   grading_aa6de9: Marking
@@ -7415,54 +7442,54 @@ en-GB:
   grading_cell: 
     grade_complete: Complete
     grade_incomplete: Incomplete
-    grade_ungraded: Ungraded
+    grade_ungraded: Unmarked
     out_of: "(out of %{points})"
     out_of_nil: "No points possible"
     out_of_with_score: "(%{score} out of %{points})"
   grading_period: 
     errors: 
-      invalid_grading_period_end_date: "Grading period end date precedes start date"
+      invalid_grading_period_end_date: "Marking period end date precedes start date"
       overlap_message: "Marking period cannot overlap other existing marking periods in group"
   grading_period_8b0a4a10: "Marking period"
   grading_period_close_date_precedes_end_date_7628a691: "Marking period close date precedes end date"
-  grading_period_name_31ceb3e3: "Grading period name"
+  grading_period_name_31ceb3e3: "Marking period name"
   grading_period_set_f49fe74c: "marking period set"
   grading_period_set_for_account_name_b9823b2a: "Marking period set for %{account_name}"
   grading_period_set_id_f2377529: "marking period set ID"
   grading_period_set_title_880a6ec4: "Marking period set title"
   grading_period_title_23b7f8ac: "Marking period title"
   grading_period_title_fa470c50: "Marking period title"
-  grading_periods_81941e66: "Grading periods"
+  grading_periods_81941e66: "Marking periods"
   grading_periods_must_not_overlap_f45336fb: "Marking periods must not overlap"
   grading_scheme_deleted_7ae5a072: "Marking scheme deleted"
   grading_scheme_saved_85535151: "Marking scheme saved"
-  grading_schemes_1c3c3252: "Grading schemes"
+  grading_schemes_1c3c3252: "Marking schemes"
   grading_standard: 
     unknown_grading_details: "Unknown details"
-  grading_standard_title_58f540a3: "Grading standard title"
+  grading_standard_title_58f540a3: "Marking standard title"
   grading_standards: 
     account_index: 
       title: "Marking Standards"
     buttons: 
       save: Save
     confirm: 
-      delete_grading_scheme: "Are you sure you want to delete this grading scheme?"
-      unlink_grading_scheme: "Are you sure you want to unlink this grading scheme?"
+      delete_grading_scheme: "Are you sure you want to delete this marking scheme?"
+      unlink_grading_scheme: "Are you sure you want to unlink this marking scheme?"
     errors: 
-      cannot_delete_grading_scheme: "There was a problem deleting this grading scheme"
-      cannot_load_grading_standards: "Loading grading standards failed.  Please try again"
-      cannot_remove_grading_scheme: "There was a problem removing this grading scheme.  Please reload the page and try again."
+      cannot_delete_grading_scheme: "There was a problem deleting this marking scheme"
+      cannot_load_grading_standards: "Loading marking standards failed. Please try again"
+      cannot_remove_grading_scheme: "There was a problem removing this marking scheme. Please reload the page and try again."
       save_failed: "Save failed"
     grading_scheme_currently_set: "Currently set"
     grading_scheme_not_set: "Not set"
     index: 
-      title: "Grading standards"
+      title: "Marking standards"
     no_grading_standards: "No marking schemes found"
     status: 
-      loading_grading_standards: "Loading grading standards..."
+      loading_grading_standards: "Loading marking standards..."
       saving: Saving...
     titles: 
-      grading_scheme_info: "View/edit grading scheme"
+      grading_scheme_info: "View/edit marking scheme"
   grading_type_type_7d8b42d7: "Marking type: %{type}"
   graph_bar_b5daa23d: "Graph bar"
   graph_of_grades_for_each_assignment_4c44d4d1: "Graph of marks for each assignment"
@@ -7498,7 +7525,7 @@ en-GB:
       communities: Communities
       imported: "Imported groups"
       student_organized: "Student groups"
-      uncategorized: Uncategorized
+      uncategorized: Uncategorised
     invalid_auto_leader: "AutoLeader type needs to be one of the following values: %{values}"
     invalid_self_signup: "Self-signup needs to be one of the following values: %{values}"
     name_required: "Name is required"
@@ -7598,7 +7625,7 @@ en-GB:
         one: "1 student"
         other: "%{count} students"
       warnings: 
-        studend_groups: "These groups are self-organised by students. Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for graded assignments."
+        studend_groups: "These groups are self-organised by students. Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for marked assignments."
     confirm: 
       assign_students: "This will randomly assign all unassigned students as evenly as possible among the existing student groups"
       delete_group: "Are you sure you want to delete this group?"
@@ -7623,7 +7650,7 @@ en-GB:
         invite_only: "Membership by invitation only"
         open_to_course_members: "Course members are free to join"
       page_title: "Course groups"
-      student_group_warning: "If your teacher has talked about putting you into groups as part of an assignment, this is not the way to make that happen. Groups you organise yourself can't be used for grading. You can still form your own groups, but you won't be able to submit an electric copy of any assignments unless your teacher builds the groups for you."
+      student_group_warning: "If your teacher has talked about putting you into groups as part of an assignment, this is not the way to make that happen. Groups you organise yourself can't be used for marking. You can still form your own groups, but you won't be able to submit an electric copy of any assignments unless your teacher builds the groups for you."
       student_groups_tabs_everyone: Everyone
       student_groups_tabs_groups: Groups
     context_manage_groups: 
@@ -7769,7 +7796,7 @@ en-GB:
         message_all_unassigned_option: "Message All Unassigned Students"
         randomly_assign_students_option: "Randomly assign students"
         restricted_self_signup_blurb: "All students in a group are required to be in the same section."
-        self_organized_warning: "These groups are self-organised by students. Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for graded assignments."
+        self_organized_warning: "These groups are self-organised by students. Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for marked assignments."
         self_signup_blurb: "Self sign-up is enabled for these groups."
         settings: Settings
         uncategorized_groups: "These groups are not associated to any particular group set. Because they were imported via SIS, they can only be updated or deleted via SIS."
@@ -7882,6 +7909,7 @@ en-GB:
       It's really like a mini-course where you can work with a smaller number of students on a
       more focussed project.
   groupweight_of_total_9579ae8c: "%{groupWeight}% of Total"
+  has_turnitin_score_3e1cacf6: "Has Turnitin score"
   help_4c4968b1: Help
   help_dialog: 
     Back: Back
@@ -7913,7 +7941,10 @@ en-GB:
     submit_this_support_request: "Submit ticket"
     which_course_is_this_question_about: "Which course is this question about?"
     your_email_address: "Your email address"
+  help_menu_links_51184b65: "Help menu links"
+  help_menu_options_7ecf7031: "Help menu options"
   help_with_content_licensing_a146fb0e: "Help with content licensing"
+  help_with_course_visibilities_6b6e22a4: "Help with course visibilities"
   helpers: 
     accessible_date_format: "YYYY-MM-DD hh:mm"
     accessible_date_only_format: YYYY-MM-DD
@@ -7965,6 +7996,7 @@ en-GB:
   hidden_available_with_a_link_65ef2bda: "Hidden. Available with a link"
   hidden_available_with_a_link_click_to_modify_184990e7: "Hidden. Available with a link. Click to modify"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Hidden files inside will be available with links."
+  hide_all_artifacts_d654fbd5: "Hide all artifacts"
   hide_correct_answers_at_2421b0aa: "Hide correct answers at"
   hide_correct_answers_at_b1a59408: "Hide Correct Answers At"
   hide_courses_without_enrollments_6df4dfad: "Hide courses without enrolments"
@@ -7986,17 +8018,21 @@ en-GB:
   host_8be927e0: Host
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "Host is unreachable or not pointing to Catalogue"
   hover_over_me_496521b9: "Hover over me"
+  how_is_this_affecting_you_b3b6a639: "How is this affecting you?"
   how_many_minutes_ecca5ee7: "How many minutes?"
   html5_first_videos_description: |-
       By default, Canvas will try to use Flash first to play videos. Turn this on to try using HTML5 first,
       then fall back to Flash.
   html_editor_fb2ab713: "HTML Editor"
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "I agree to the *terms of use* and **privacy policy**."
+  i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: "I cannot get things done until I hear back from you"
   i_cb2f5130: i
   i_have_obtained_permission_to_use_this_file_6386f087: "I have obtained permission to use this file."
   i_hold_the_copyright_71ee91b1: "I hold the copyright"
+  i_need_some_help_but_it_is_not_urgent_d967ea0a: "I need some help, but it is not urgent"
   ic_actions: 
     manage: manage
+  icon_215a1dc6: Icon
   icons: 
     discussion_submission: "Discussion submission"
     file_upload_submission: "File upload submission"
@@ -8016,7 +8052,8 @@ en-GB:
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(If none are selected, send to everyone in the entire account)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(If none are selected, send to everyone in the entire sub-account)"
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "If you change an assignment's points possible, existing marks will be automatically scaled."
-  if_you_change_an_assignment_s_points_possible_you__25a0edad: "If you change an assignment's points possible, you must regrade the assignment."
+  if_you_change_an_assignment_s_points_possible_you__25a0edad: "If you change an assignment's points possible, you must mark the assignment again."
+  if_you_change_an_assignment_s_points_possible_you__dba531cb: "If you change an assignment's points possible, you must mark any submissions again."
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "If you configure settings that prevent you from being able to log in, you can directly access regular Canvas login at %{url}"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "If you do not select usage rights now, this file will be unpublished after it's uploaded."
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "If you enable this feature, ensure that your sales-force account has these custom fields added exactly with the names in the left column of the table"
@@ -8030,7 +8067,7 @@ en-GB:
       *Make sure you do not change the names of the submission files, so we can recognise them.*
   if_you_ve_been_using_another_course_management_sys_67edfab1: "If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas. We can walk you through the process of easily migrating your content into Canvas."
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "If you wish to keep your not-yet submitted comments, please save them before navigating away from this page."
-  if_you_would_like_to_link_to_your_own_campus_suppo_85a94934: "If you would like to link to your own campus support website in the help dialogue, you can do that here."
+  if_you_would_like_to_link_to_your_own_campus_suppo_85a94934: "If you would like to link to your own campus support website in the help dialog, you can do that here."
   ignore_91750df8: Ignore
   ignore_assignment_738b3c99: "Ignore assignment"
   ignore_name_55edc6fe: "Ignore %{name}"
@@ -8060,7 +8097,7 @@ en-GB:
     errors: 
       import: 
         external_tool_url: "The url for the external tool assignment \"%{assignment_name}\" wasn't valid."
-        grading_standard_not_found: "The assignment \"%{title}\" referenced a grading scheme that was not found in the target course's account chain."
+        grading_standard_not_found: "The assignment \"%{title}\" referenced a marking scheme that was not found in the target course's account chain."
     imported_assignments_group: "Imported assignments"
   importers/context_external_tool_importer: 
     external_tool_attention_needed: "The security parameters for the external tool \"%{tool_name}\" need to be set in course settings."
@@ -8068,8 +8105,8 @@ en-GB:
     foreign_lti_tool: "The account External Tool for module item \"%{title}\" must be configured before the item can be launched"
     migration_module_item_type: "Module item"
   importers/course_content_importer: 
-    account_grading_standard_warning: "Couldn't find account grading standard for the course."
-    copied_grading_standard_warning: "Couldn't find copied grading standard for the course."
+    account_grading_standard_warning: "Couldn't find account marking standard for the course."
+    copied_grading_standard_warning: "Couldn't find copied marking standard for the course."
     due_dates_warning: "Couldn't adjust the due dates."
     file_import_warning: "File %{file} could not be found"
   importers/learning_outcome_group_importer: 
@@ -8093,6 +8130,7 @@ en-GB:
   inactivate_user_35f6d9d7: "Inactivate user"
   inactive_cd40317f: inactive
   inbox_bb245a60: Inbox
+  include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Include a link to a screencast/screenshot using something like *Jing*."
   include_deleted_enrollments_1c87684a: "Include deleted enrolments"
   include_deleted_objects_3cced3b5: "Include deleted objects;"
   include_scores_when_alerting_about_grade_changes_623ec201: "Include scores when alerting changes in marks."
@@ -8100,7 +8138,7 @@ en-GB:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Include scores when alerting about marks.
       If your email is not an institution email, this means sensitive content will be sent outside of the institution.
-  include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Include this assignment's grades when posting to your school's Student Information System"
+  include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Include this assignment's marks when posting to your school's student information system"
   include_unpublished_assignments_83ebbaec: "Include Unpublished Assignments"
   include_unpublished_courses_7a0e7aab: "Include unpublished courses"
   incorrect_answer_7c17e63b: "Incorrect answer"
@@ -8140,7 +8178,7 @@ en-GB:
     alerts: 
       file_previews_disabled: "File previews have been disabled for this Canvas site"
     browsers: 
-      unrecognized: "Unrecognized browser"
+      unrecognized: "Unrecognised browser"
     buttons: 
       next_module: "Next module"
       previous_module: "Previous module"
@@ -8165,8 +8203,8 @@ en-GB:
       required: "Required field"
       search_failed: "Search failed, please try again."
     links: 
-      minimize_file_preview: "Minimize file preview"
-      minimize_youtube_video: "Minimize video"
+      minimize_file_preview: "Minimise file preview"
+      minimize_youtube_video: "Minimise video"
       view_equella_content_in_new_window: "view the content in a new window"
     loading: Loading...
     no_description: "No description"
@@ -8198,8 +8236,9 @@ en-GB:
   international_sms_9edb9868: "International SMS"
   international_sms_send_from_recipient_s_country_43881ea4: "International SMS – Send from recipient's country"
   international_text_messaging_rates_may_apply_d4b4a97a: "International text messaging rates might apply."
+  invalid_address_book_strategy_904a7ada: "Invalid address book strategy."
   invalid_authenticity_token_b753558c: "Invalid Authenticity Token"
-  invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Invalid csv file, marks could not be updated."
+  invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Invalid csv file; marks could not be updated."
   invalid_points_possible: "The value of possible points for this assignment must be zero or greater."
   invalid_recipient_name_56b22b86: "Invalid recipient name."
   invalid_state_parameter_7a5aa108: "Invalid state parameter"
@@ -8301,6 +8340,7 @@ en-GB:
     module_sequence_footer: 
       next: Next
       previous: Previous
+  just_a_casual_question_comment_idea_or_suggestion_1579d069: "Just a casual question, comment, idea or suggestion"
   just_in_time_provisioning_382a0354: "Just-in-time provisioning"
   k12_description: |-
       Features, settings and styles that make more sense specifically in a K-12 environment. For now, this only
@@ -8313,7 +8353,7 @@ en-GB:
   kind_7f0a88c4: Kind
   labels: 
     lock_module_until: "Lock until"
-  last_enrollment_activity_10fe15ba: "Last Enrolment Activity"
+  last_enrollment_activity_10fe15ba: "Last enrolment activity"
   last_item_79583712: "Last Item:"
   last_login_54565109: "Last login"
   last_modified_by_ca4bb5e1: "Last Modified by"
@@ -8366,6 +8406,7 @@ en-GB:
   let_students_see_the_correct_answers_dacc2faf: "Let students see the correct answers"
   let_students_see_their_quiz_responses_fbc07d14: "Let students see their quiz responses"
   letter_grade_29ff1938: "Letter mark"
+  letter_grade_f00fedc4: "Letter mark"
   lib: 
     angel: 
       failed_import_link: "Failed import link"
@@ -8386,14 +8427,14 @@ en-GB:
       lti: 
         api: 
           not_unauthorized: "unauthorised request"
-          status_unauthorized: unauthorized
-      not_authorized: "user not authorized to perform that action"
+          status_unauthorized: unauthorised
+      not_authorized: "user not authorised to perform that action"
       status_unauthenticated: unauthenticated
-      status_unauthorized: unauthorized
+      status_unauthorized: unauthorised
     basic_lti: 
       bad_score: "Score is not between 0 and 1"
       no_points_comment: |-
-          An external tool attempted to grade this assignment as %{grade}, but was unable
+          An external tool attempted to mark this assignment as %{grade}, but was unable
           to because the assignment has no points possible.
       no_points_possible: "Assignment has no points possible."
       no_score: "No score given"
@@ -8458,6 +8499,7 @@ en-GB:
   limit_search_to_activity_after_c1ac2449: "Limit search to activity after"
   limit_search_to_activity_before_e05aad05: "Limit search to activity before"
   link_7262adec: Link
+  link_description_4355ca82: "Link description"
   link_enrollment: 
     buttons: 
       link: "Link to student"
@@ -8472,12 +8514,14 @@ en-GB:
     titles: 
       link_to_student: "Link to student"
   link_has_been_removed_because_content_is_not_prese_fd55f11: "(Link has been removed either because content is not present or cannot be resolved.)"
+  link_name_b76fdb38: "Link name"
   link_number_1_9f169e48: "Link number 1"
   link_number_2_61fcff2: "Link number 2"
   link_number_3_7118ff64: "Link number 3"
   link_selection_1486c5d0: "Link selection"
   link_text_d2c702f9: "Link text"
   link_title_d959a7b3: "Link title"
+  link_url_a213671c: "Link URL"
   link_url_cf96376: "Link Url"
   linked_assignment_message: "linked with assignment '%{title}'"
   linked_discussion_topic_message: "linked with discussion topic '%{title}'"
@@ -8498,6 +8542,8 @@ en-GB:
   loaded_more_collaborations_13f1d630: "Loaded more collaborations."
   loading_25990131: Loading...
   loading_bde52856: Loading
+  loading_courses_bd1bffe: "Loading courses..."
+  loading_mastery_paths_c558a766: "Loading mastery paths..."
   loading_more_results_def6df65: "Loading more results..."
   locales: 
     en-GB: "English (United Kingdom)"
@@ -8629,6 +8675,7 @@ en-GB:
   low_score_4eeb95b2: "Low: %{score}"
   lower_bound_to_upper_bound_48d093c2: "%{lower_bound} to %{upper_bound}"
   lower_limit_of_range_6ddd4983: "Lower limit of range"
+  lowerbound_to_upperbound_352a3c0b: "%{lowerBound}+ to %{upperBound}"
   lti: 
     lti_message: 
       load_tool_new_tab_button: "Load %{tool} in a new window"
@@ -8676,6 +8723,7 @@ en-GB:
   marked_done_8f61ebb8: "marked done"
   marked_done_9fd646f: "Marked completed"
   masquerade_as_name_8bb004c5: "Masquerade as %{name}"
+  mastery_paths_breakdown_6e0b5fce: "Mastery paths breakdown"
   mastery_paths_cc4096c2: "Mastery paths"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Mastery score reflects highest score of a marked assignment or quiz."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Mastery score reflects the most recent graded assigment or quiz."
@@ -8696,6 +8744,7 @@ en-GB:
   max_users_groups_per_appointment_867c505b: "Maximum users/groups per appointment"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Maximum number of appointments a participant may attend"
   media_comment_e494a952: "Media comment"
+  media_comment_submission_14e224dc: "Media comment submission"
   media_comments: 
     alerts: 
       kaltura_disabled: "Kaltura has been disabled for this Canvas site"
@@ -8734,6 +8783,7 @@ en-GB:
     uploading: Uploading...
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Media has been queued for conversion; Please try again in a little while."
   media_recording_77cddc52: "Media recording"
+  media_recording_submission_b7fd1491: "Media recording submission"
   media_recordings_749aef6d: "Media Recordings"
   median_ed291842: Median
   median_score_4657e907: "Median: %{score}"
@@ -8753,6 +8803,7 @@ en-GB:
   message_body_1f782712: "Message body"
   message_reply_failed_subject_5d27a0c9: "Message reply failed: %{subject}"
   message_sent_9ff3a79d: "Message sent!"
+  message_sent_f4cba0c: "Messages sent"
   message_students: 
     buttons: 
       send_message: "Send message"
@@ -8764,6 +8815,8 @@ en-GB:
     recipients: "Recipients:"
   message_students_who_369b8488: "Message Students who..."
   message_this_student_6d14043d: "Message this student"
+  message_will_be_sent_to_all_the_teachers_and_teach_1b8d17c1: "Message will be sent to all  teachers and teaching assistants in the course."
+  messageableuser_library_767eed20: "MessageableUser library"
   messages: 
     account_suspended: 
       email: 
@@ -8834,14 +8887,14 @@ en-GB:
             other: "An alert has been triggered for you because the following conditions have been met:"
           interaction_description: "No student/teacher interaction for %{count} days"
           subject: "Alert: %{user_name}"
-          ungraded_count_description: "%{count} or more submissions have not been graded"
-          ungraded_timespan_description: "A submission has been left ungraded for %{count} days"
+          ungraded_count_description: "%{count} or more submissions have not been marked"
+          ungraded_timespan_description: "A submission has been left unmarked for %{count} days"
           usernote_description: "No faculty journal entries for %{count} days"
           view_here: "You can view it here"
         interaction_description: "No student/teacher interaction for %{count} days"
         subject: "Alert: %{user_name}"
-        ungraded_count_description: "%{count} or more submissions have not been graded"
-        ungraded_timespan_description: "A submission has been left ungraded for %{count} days"
+        ungraded_count_description: "%{count} or more submissions have not been marked"
+        ungraded_timespan_description: "A submission has been left unmarked for %{count} days"
         usernote_description: "No faculty journal entries for %{count} days"
       sms: 
         body: "An alert has been triggered for %{student}"
@@ -8859,11 +8912,11 @@ en-GB:
           other: "No student/teacher interaction for %{count} or more days"
         subject: "Alert: %{user_name}"
         ungraded_count_description: 
-          one: "One or more assignments have not been graded"
-          other: "%{count} or more assignments have not been graded"
+          one: "One or more assignments have not been marked"
+          other: "%{count} or more assignments have not been marked"
         ungraded_timespan_description: 
-          one: "One or more submissions have been left ungraded for one or more days"
-          other: "One or more submissions have been left ungraded for %{count} or more days"
+          one: "One or more submissions have been left unmarked for one or more days"
+          other: "One or more submissions have been left unmarked for %{count} or more days"
         usernote_description: 
           one: "No faculty journal entries for a day or more"
           other: "No faculty journal entries for %{count} or more days"
@@ -9214,22 +9267,22 @@ en-GB:
         no_due_date: "due: No due date"
     assignment_graded: 
       email: 
-        assignment_graded: "Assignment graded: %{assignment_name}, %{course_name}"
+        assignment_graded: "Assignment marked: %{assignment_name}, %{course_name}"
         html: 
-          assignment_graded: "Assignment graded: %{assignment_name}, %{course_name}"
+          assignment_graded: "Assignment marked: %{assignment_name}, %{course_name}"
           link: "Click here to view the assignment"
-          the_assignment_is_graded: "The assignment, %{assignment_name}, has been graded."
+          the_assignment_is_graded: "The assignment, %{assignment_name}, has been marked."
         labels: 
           view_here: "You can view it here"
-        the_assignment_is_graded: "The assignment, %{assignment_name}, has been graded."
+        the_assignment_is_graded: "The assignment, %{assignment_name}, has been marked."
       sms: 
-        assignment_is_graded: "%{assignment_name}, %{course_name} has been graded."
+        assignment_is_graded: "%{assignment_name}, %{course_name} has been marked."
         more_info_at: "More info at %{web_address}"
       summary: 
-        assignment_graded: "Assignment graded: %{assignment_name}, %{course_name}"
-        the_assignment_is_graded: "The assignment, %{assignment_name}, has been graded."
+        assignment_graded: "Assignment marked: %{assignment_name}, %{course_name}"
+        the_assignment_is_graded: "The assignment, %{assignment_name}, has been marked."
       twitter: 
-        assignment_graded: "Canvas Alert - graded: %{assignment_name}, %{course_name}"
+        assignment_graded: "Canvas Alert - marked: %{assignment_name}, %{course_name}"
     assignment_locked: "This assignment is currently locked."
     assignment_locked_at: "This assignment was locked %{at}."
     assignment_locked_module: "This assignment is part of the module *%{module}* and hasn't been unlocked yet."
@@ -9292,22 +9345,22 @@ en-GB:
     assignment_unmuted: 
       email: 
         body: |-
-            Your instructor has released grade changes and new comments for %{title}. These changes can now be viewed.
+            Your instructor has released mark changes and new comments for %{title}. These changes can now be viewed.
             
             Your can view it here:
             %{url}
         html: 
-          body: "Your instructor has released grade changes and new comments for %{title}. These changes can now be viewed."
+          body: "Your instructor has released mark changes and new comments for %{title}. These changes can now be viewed."
           link: "You can view it here"
           subject: "Assignment unmuted: %{title}, %{course}"
         subject: "Assignment unmuted: %{title}, %{course}"
       sms: 
         body: |-
-            Your instructor has released grades and comments for %{title}, %{course}.
+            Your instructor has released marks and comments for %{title}, %{course}.
             
             More info at %{website}
       summary: 
-        subject: "Grades and comments released for: %{title}, %{course}"
+        subject: "Marks and comments released for: %{title}, %{course}"
     assignment_unpublished_module: "This assignment is part of an unpublished module and is not available yet."
     collaboration_invitation: 
       email: 
@@ -9757,30 +9810,30 @@ en-GB:
         subject: "Forgot password: Canvas"
     grade_weight_changed: 
       email: 
-        grade_changed: "The grading policy for the course, %{course_name} has changed."
-        grading_based_on_points: "Grading is based on total points for all assignments."
+        grade_changed: "The marking policy for the course, %{course_name} has changed."
+        grading_based_on_points: "Marking is based on total points for all assignments."
         html: 
-          grade_changed: "The grading policy for the course, %{course_name}, has changed."
-          grading_based_on_points: "Grading is based on total points for all assignments."
+          grade_changed: "The marking policy for the course, %{course_name} has changed."
+          grading_based_on_points: "Marking is based on total points for all assignments."
           labels: 
-            grades_based_on_percent: "Grading is based on the weighted total for each assignment group"
-            subject: "Grade weight changed"
+            grades_based_on_percent: "Marking is based on the weighted total for each assignment group"
+            subject: "Mark weight changed"
           see_details: "You can see details here"
         labels: 
-          grades_based_on_percent: "Grading is based on the weighted total for each assignment group"
+          grades_based_on_percent: "Marking is based on the weighted total for each assignment group"
           now_see_here: "You can see details here"
-          subject: "Grade weight changed"
+          subject: "Mark weight changed"
       sms: 
-        grade_changed: "The grading policy for the course, %{course_name} has changed."
+        grade_changed: "The marking policy for the course, %{course_name} has changed."
         more_info_at: "More info at %{course_url}"
       summary: 
-        grade_changed: "The grading policy for the course, %{course_name} has changed."
-        grading_based_on_points: "Grading is based on total points for all assignments."
+        grade_changed: "The marking policy for the course, %{course_name} has changed."
+        grading_based_on_points: "Marking is based on total points for all assignments."
         labels: 
-          grades_based_on_percent: "Grading is based on the weighted total for each assignment group"
-          subject: "Grade weight changed"
+          grades_based_on_percent: "Marking is based on the weighted total for each assignment group"
+          subject: "Mark weight changed"
       twitter: 
-        grade_changed: "Canvas Alert - Grading policy changed: %{course_name}"
+        grade_changed: "Canvas Alert - Marking policy changed: %{course_name}"
     group_assignment_submitted_late: 
       email: 
         body: "The group %{group_name} has just submitted late to %{assignment_name} in the course %{course_name}."
@@ -10189,21 +10242,21 @@ en-GB:
     quiz_module_time_locked: "This quiz is part of the module *%{module}*, which is locked until %{time}."
     quiz_regrade_finished: 
       email: 
-        body: "A regrade has finished for the quiz %{quiz}"
+        body: "A re-marking has been finished for the quiz %{quiz}"
         html: 
-          body: "A regrade has finished for the quiz %{quiz}"
+          body: "A re-marking has been finished for the quiz %{quiz}"
           link_message: "You can view the quiz here:"
-          subject: "Quiz regrade finished: %{quiz}, %{context}"
+          subject: "Quiz re-marking finished: %{quiz}, %{context}"
         link_message: "You can view the quiz here:"
-        subject: "Quiz regrade finished: %{quiz}, %{context}"
+        subject: "Quiz re-marking finished: %{quiz}, %{context}"
       sms: 
-        body_sms: "Quiz regrade finished for %{title} in %{context}."
+        body_sms: "Quiz re-marking finished for %{title} in %{context}."
         more_info: "More info at %{url}"
       summary: 
-        body: "A regrade has finished for your quiz %{title}."
-        subject: "Quiz regraded: %{quiz}, %{context}"
+        body: "A re-marking has finished for your quiz %{title}."
+        subject: "Quiz re-marked: %{quiz}, %{context}"
       twitter: 
-        body: "Canvas Alert - Quiz regraded : %{quiz}"
+        body: "Canvas Alert - Quiz re-marked : %{quiz}"
     quiz_unpublished_module: "This quiz is part of an unpublished module and is not available yet."
     report_generated: 
       email: 
@@ -10299,93 +10352,93 @@ en-GB:
         tweet: "Canvas Alert - Comment: %{author} for %{assignment}, %{user}, %{context}."
     submission_grade_changed: 
       email: 
-        body: "The grade on your assignment, %{assignment_title} has been changed."
+        body: "The mark on your assignment, %{assignment_title} has been changed."
         excused: "This assignment has been excused."
         html: 
-          body: "The grade on your assignment, %{assignment_title} has been changed."
+          body: "The mark on your assignment, %{assignment_title} has been changed."
           excused: "This assignment has been excused."
           link_message: "You can review the assignment here"
           no_date_set: "No date set"
           not_applicable: N/A
-          regraded_date: "regraded: %{date}"
+          regraded_date: "re-marked: %{date}"
           score: "score: %{score} out of %{total}"
           score_pending: "score pending review by the teacher"
-          subject: "Grade changed: %{assignment}, %{context}"
+          subject: "Mark changed: %{assignment}, %{context}"
         link_message: "You can review the assignment here:"
         no_date_set: "No date set"
         not_applicable: N/A
-        regraded_date: "regraded: %{date}"
+        regraded_date: "re-marked: %{date}"
         score: "score:  %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
-        subject: "Grade changed: %{assignment}, %{context}"
+        subject: "Mark changed: %{assignment}, %{context}"
       sms: 
-        body_sms: "Your grade for %{title}, %{context} just changed."
+        body_sms: "Your mark for %{title}, %{context} just changed."
         more_info: "More info at %{url}"
         no_date_set: "No date set"
         not_applicable: N/A
-        regraded_date: "re-graded: %{date}"
+        regraded_date: "re-marked: %{date}"
         score: "score:  %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
       summary: 
         no_date_set: "No date set"
         not_applicable: N/A
-        regraded_date: "re-graded: %{date}"
+        regraded_date: "re-marked: %{date}"
         score: "score:  %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
-        subject: "Grade changed: %{title}, %{context}"
+        subject: "Mark changed: %{title}, %{context}"
       twitter: 
         no_date_set: "No date set"
         not_applicable: N/A
         score: "score:  %{score} out of %{total}"
         score_pending: "(pending review)"
-        tweet: "Canvas Alert - Grade change: %{date}"
+        tweet: "Canvas Alert - mark change: %{date}"
     submission_graded: 
       email: 
-        body: "Your assignment, %{assignment}, has been graded."
+        body: "Your assignment, %{assignment}, has been marked."
         excused: "This assignment has been excused."
-        graded_date: "graded: %{date}"
+        graded_date: "marked: %{date}"
         html: 
-          body: "Your assignment, %{assignment}, has been graded."
+          body: "Your assignment, %{assignment}, has been marked."
           excused: "This assignment has been excused."
-          graded_date: "graded: %{date}"
+          graded_date: "marked: %{date}"
           link_message: "You can review the assignment here"
           no_date_set: "No date set"
           not_applicable: N/A
           score: "score: %{score} out of %{total}"
           score_pending_review: "score pending review by the teacher"
-          subject: "Assignment graded: %{assignment}, %{context}"
+          subject: "Assignment marked: %{assignment}, %{context}"
         link_message: "You can review the assignment here:"
         no_date_set: "No date set"
         not_applicable: N/A
         score: "score:  %{score} out of %{total}"
         score_pending_review: "score pending review by the teacher"
-        subject: "Assignment graded: %{assignment}, %{context}"
+        subject: "Assignment marked: %{assignment}, %{context}"
       sms: 
-        graded_date: "graded: %{date}"
+        graded_date: "marked: %{date}"
         more_info: "More info at %{url}"
         no_date_set: "No date set"
         not_applicable: N/A
         score: "score:  %{score} out of %{total}"
         score_pending_review: "score pending review by the teacher"
-        sms_body: "%{assignment}, %{context} has been graded."
+        sms_body: "%{assignment}, %{context} has been marked."
       summary: 
-        graded_date: "graded: %{date}"
+        graded_date: "marked: %{date}"
         no_date_set: "No date set"
         not_applicable: N/A
         score: "score:  %{score} out of %{total}"
         score_pending_review: "score pending review by the teacher"
-        subject: "Assignment graded: %{assignment}, %{context}"
+        subject: "Assignment marked: %{assignment}, %{context}"
       twitter: 
         no_date_set: "No Date Set"
         not_applicable: N/A
         score: "score:  %{score} out of %{total}"
         score_pending_review: "(pending review)"
-        tweet: "Canvas Alert - Graded: %{assignment}, %{context}"
+        tweet: "Canvas Alert - marked: %{assignment}, %{context}"
     submission_needs_grading: 
       email: 
-        body: "%{user_name} has completed the quiz %{quiz_title}, and it requires manual grading."
+        body: "%{user_name} has completed the quiz %{quiz_title}, and it requires manual marking."
         html: 
-          body: "%{user_name} has completed the quiz %{quiz_title}, and it requires manual grading."
+          body: "%{user_name} has completed the quiz %{quiz_title}, and it requires manual marking."
           link_message: "You can review the submission here"
           subject: "Quiz Submitted: %{quiz}, %{context}"
           submitted_date: "submitted: %{date}"
@@ -10393,15 +10446,15 @@ en-GB:
         subject: "Quiz Submitted: %{quiz}, %{context}"
         submitted_date: "submitted: %{date}"
       sms: 
-        body_sms: "Your grade for %{title}, %{context} just changed."
+        body_sms: "Your mark for %{title}, %{context} just changed."
         more_info: "More info at %{url}"
         no_date_set: "No date set"
         not_applicable: N/A
-        regraded_date: "regraded: %{date}"
+        regraded_date: "re-marked: %{date}"
         score: "score:  %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
       summary: 
-        body: "A submission has been turned in for your quiz, *%{title}*, and it requires manual grading."
+        body: "A submission has been turned in for your quiz, *%{title}*, and it requires manual marking."
         subject: "Quiz submitted: %{quiz}, %{context}"
         submitted_date: "submitted: %{date}"
       twitter: 
@@ -10493,7 +10546,7 @@ en-GB:
     external_feed_type: "External feed"
     external_tool_type: "External tool"
     file_type: File
-    grading_standard_type: "Grading standard"
+    grading_standard_type: "Marking standard"
     group_type: Group
     learning_outcome_type: "Learning outcome"
     module_type: Module
@@ -10524,7 +10577,7 @@ en-GB:
   moderate_grades_4f43f85d: "Moderate marks"
   moderated_grading_allows_multiple_graders_to_grade_5c0d53db: "Moderated marking allows multiple markers to mark selected assignments independently; a moderator provides the final mark."
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderated marking cannot be enabled for group assignments"
-  moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderated grading cannot be enabled for peer-reviewed assignments"
+  moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderated marking cannot be enabled for peer-reviewed assignments"
   moderated_grading_e6127f72: "Moderated marking"
   moderated_grading_setting_cannot_be_changed_if_gra_ba939ce2: "Moderated marking setting cannot be changed if marked submissions exist"
   moderated_grading_setting_cannot_be_enabled_for_gr_d81fb43b: "Moderated marking setting cannot be enabled for group assignments"
@@ -10590,8 +10643,8 @@ en-GB:
       cancel: Cancel
       creating: Creating...
     assignments_to_grade: 
-      one: "1 assignment has ungraded submissions"
-      other: "%{count} assignments have ungraded submissions"
+      one: "1 assignment has unmarked submissions"
+      other: "%{count} assignments have unmarked submissions"
     assignments_to_post: 
       one: "You are ready to post 1 assignment."
       other: "You are ready to post %{count} assignments."
@@ -10714,6 +10767,8 @@ en-GB:
   move_module_item_77754119: "Move module/item"
   move_outcome_ce497e6c: "Move outcome"
   move_outcome_group_cfa1a505: "Move outcome group"
+  move_text_down_7176acd4: "Move %{text} down"
+  move_text_up_91fb4241: "Move %{text} up"
   move_to_9b91c6e0: "Move to…"
   move_to_end_fef2fa15: "Move to end"
   move_to_front_7eae2e90: "Move to front"
@@ -10750,11 +10805,11 @@ en-GB:
   mute_assignment_bb505cd8: "Mute Assignment"
   mute_dialog: 
     curving_assignments: "Curving assignments"
-    grade_change_notifications: "Grade change notifications"
+    grade_change_notifications: "Mark change notifications"
     how_to_unmute: "Once you have muted this assignment, you can begin sending notifications again by clicking the \"Unmute assignment\" link."
     mute_assignment: "Mute assignment"
     score_change_notifications: "Score change notifications"
-    see_grade: "Their grade for the assignment"
+    see_grade: "Their mark for the assignment"
     students_will_see: "Students will be able to see that this assignment is muted."
     submission_comments: "Submission comments"
     sure_you_want_to_mute: "Are you sure you want to mute this assignment? While this assignment is muted, students will not receive new notifications about or be able to see:"
@@ -10812,6 +10867,7 @@ en-GB:
   new_group_set_7241a581: "New group set"
   new_module_4e9287e4: "New module"
   new_outcome_7fba8c7d: "New outcome"
+  new_outcome_group_af59f145: "New outcome group"
   new_question_9107c469: "New question"
   new_question_group_d9306280: "New question group"
   new_quiz_statistics_desc: "Enable the new quiz statistics page for a course."
@@ -10843,7 +10899,7 @@ en-GB:
   no_grade_3fa326c: "no mark"
   no_grade_assigned_90e531f5: "No mark assigned."
   no_grading_periods_configured_for_this_term_ca22393e: "no marking periods configured for this term"
-  no_grading_schemes_to_display_8b0e92e7: "No grading schemes to display"
+  no_grading_schemes_to_display_8b0e92e7: "No marking schemes to display"
   no_icon_1f6ea5f4: "no icon"
   no_items_in_module_21f111a2: "No items in module"
   no_ltis_configured_f4b9bc6b: "No LTIs configured"
@@ -10868,18 +10924,22 @@ en-GB:
   not_available_487d3648: "Not available"
   not_available_until_next_submission_2175158: "Not available until next submission"
   not_completed_d70acea3: "Not completed"
+  not_factored_into_grading_455dcf6a: "Not factored into marking"
   not_graded_e027c866: "Not marked"
   not_graded_e78bcd50: "Not marked"
   not_installed_37a21a76: "Not Installed"
   not_now_97efd947: "Not now"
   not_published_73f7079: "Not published"
+  not_starred_no_subject_click_to_star_adfefe93: "'Not starred \"(No Subject)\", Click to star."
+  not_starred_no_subject_click_to_star_dc91380: "Not starred \"(No Subject)\", Click to star."
+  not_starred_subject_click_to_star_4ea6eb64: "Not starred \"%{subject}\", Click to star."
   not_yet_completed_345a0bca: "Not yet completed"
   note_for_differentiated_group_topics_some_threads__90adbb21: "Note: for differentiated group topics, some threads might not have any students assigned."
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "Note: It might take up to a week for the Beta URL to provision, depending on the Beta refresh cycle."
   note_length_cannot_exceed_maxlength_characters_82798b1: "Note: length cannot exceed %{maxLength} characters."
   note_question_details_not_available_when_more_than_93199f6d: "NOTE: Question details not available when more than %{question_count}."
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Note: some items fall outside the start and/or end dates of the course"
-  note_students_have_submitted_work_for_these_assign_7bc34e28: "NOTE: Students have submitted work for these assignments that has not been graded. If you post these grades now, you will need to re-post their scores after grading their latest submissions."
+  note_students_have_submitted_work_for_these_assign_7bc34e28: "NOTE: Students have submitted work for these assignments that has not been marked. If you post these marks now, you will need to re-post their scores after marking their latest submissions."
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "Note: sub-account themes are not active during this preview."
   note_that_email_may_not_always_be_populated_in_the_bb4a1572: "Note that email might not always be populated in the user's profile at Microsoft. OID will not be populated for personal Microsoft accounts."
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Note that some attributes might not be populated for all users at Clever."
@@ -10927,10 +10987,10 @@ en-GB:
       discussion_entry: "Discussion entry"
       due_date: "Due date"
       files: Files
-      grading: Grading
-      grading_policies: "Grading policies"
+      grading: Marking
+      grading_policies: "Marking policies"
       invitiation: Invitation
-      late_grading: "Late grading"
+      late_grading: "Late marking"
       membership_update: "Membership Update"
       migration: Migration
       one: Other
@@ -10965,10 +11025,10 @@ en-GB:
         * Assignment/submission mark entered/changed
         * Un-muted assignment mark
         * Mark weight changed
-    grading_display: Grading
+    grading_display: Marking
     grading_notify_include_grade: "Include scores when alerting about grade changes."
-    grading_policies_description: "Course grading policy change"
-    grading_policies_display: "Grading policies"
+    grading_policies_description: "Course marking policy change"
+    grading_policies_display: "Marking policies"
     invitation_description: |-
         Invitation for:
         
@@ -10982,7 +11042,7 @@ en-GB:
         *Instructor and admin only:*
         
         Late assignment submission
-    late_grading_display: "Late grading"
+    late_grading_display: "Late marking"
     membership_update_description: |-
         *Admin only: pending enrolment activated*
         
@@ -11009,7 +11069,7 @@ en-GB:
       assignment_created: "Assignment created"
       assignment_due_date_changed: "Assignment due date changed"
       assignment_due_date_override_changed: "Assignment due date override changed"
-      assignment_graded: "Assignment Graded"
+      assignment_graded: "Assignment marked"
       assignment_resubmitted: "Assignment resubmitted"
       assignment_submitted: "Assignment submitted"
       assignment_submitted_late: "Assignment submitted late"
@@ -11023,11 +11083,11 @@ en-GB:
       conversation_message: "Conversation message"
       enrollment_accepted: "Enrolment accepted"
       enrollment_invitation: "Enrolment invitation"
-      enrollment_notification: "Enrolment Notification"
+      enrollment_notification: "Enrolment notification"
       enrollment_registration: "Enrolment registration"
       event_date_changed: "Event date changed"
       forgot_password: "Forgot password"
-      grade_weight_changed: "Grade weight changed"
+      grade_weight_changed: "Mark weight changed"
       group_assignment_submitted_late: "Group assignment submitted late"
       group_membership_accepted: "Group membership accepted"
       group_membership_rejected: "Group membership rejected"
@@ -11055,9 +11115,9 @@ en-GB:
       rubric_association_created: "Rubric association created"
       submission_comment: "Submission comment"
       submission_comment_for_teacher: "Submission comment for teacher"
-      submission_grade_changed: "Submission grade changed"
-      submission_graded: "Submission graded"
-      submission_needs_grading: "Submission needs grading"
+      submission_grade_changed: "Submission mark changed"
+      submission_graded: "Submission marked"
+      submission_needs_grading: "Submission needs marking"
       summaries: Summaries
       updated_wiki_page: "Updated wiki page"
       web_conference_invitation: "Web conference invitation"
@@ -11271,6 +11331,7 @@ en-GB:
   orbis_report_header_student_sis_id: "user sis"
   orbis_report_header_submission_score: "submission score"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organise epub by content type (default is by module)."
+  other_ddacb37d: other
   other_timezones_42530564: "Other time zones"
   outcome_groups: 
     invalid_file: "Invalid outcome group file"
@@ -11293,7 +11354,7 @@ en-GB:
         new_group: Group
         new_outcome: Outcome
     common_core: "Common Core Standards"
-    common_core_description: "To the left is the familiar outcomes folder structure for each grouping of the Common Core State Standards. This will allow you to effortlessly include any of the Common Core Standards for grading within your course."
+    common_core_description: "To the left is the familiar outcomes folder structure for each grouping of the Common Core State Standards. This allows you to effortlessly include any of the Common Core Standards for marking within your course."
     confirm: 
       delete: "Are you sure you want to delete?"
       import_group: "Import group \"%{group}\" to group \"%{target}\"?"
@@ -11334,7 +11395,7 @@ en-GB:
       instructions: 
         main: 
           manage: 
-            description: "*Outcomes are created here to track mastery in a course. To get started, check out the menu bar along the top. Click on the New button to create a new outcome, or the New Group button to create a new group to organise your outcomes into. The Find button will allow you to use outcomes that have been created by your state or institution. As you create and use outcomes you will be able to use the panel to the left to navigate through your outcomes. You can drag and drop outcomes between the different levels to create structure.* *More importantly, Canvas allows you to add outcomes to your grading rubrics so that you can evaluate mastery as you grade assignments. Once you've set up outcomes, click Manage Rubrics to start using your outcomes for grading.*"
+            description: "*Outcomes are created here to track mastery in a course. To get started, check out the menu bar along the top. Click on the New button to create a new outcome, or the New Group button to create a new group to organise your outcomes into. The Find button will allow you to use outcomes that have been created by your state or institution. As you create and use outcomes you will be able to use the panel to the left to navigate through your outcomes. You can drag and drop outcomes between the different levels to create structure.* *More importantly, Canvas allows you to add outcomes to your marking rubrics so that you can evaluate mastery as you mark assignments. Once you've set up outcomes, click Manage Rubrics to start using your outcomes for marking.*"
             title: "Setting up outcomes"
     mastery_error: "Must be greater than or equal to 0"
     missing_outcome: "Couldn't find that learning outcome"
@@ -11381,7 +11442,7 @@ en-GB:
       no_aligned_items: "No aligned items"
       no_artifacts: "No artefacts"
     state_standards: "State standards"
-    state_standards_description: "To the left you'll see a folder for each state with their updated state standards. This allows for you to painlessly include state standards for grading within your course."
+    state_standards_description: "To the left you'll see a folder for each state with their updated state standards. This allows for you to painlessly include state standards for marking within your course."
     successful_outcome_creation: "Outcome successfully created!"
     successful_outcome_delete: "Outcome successfully deleted"
     successful_outcome_removal: "Outcome successfully removed"
@@ -11405,7 +11466,7 @@ en-GB:
       score_out_of_possible: "%{score}* out of %{possible}*"
       short_title: 
         attempts: Attempts
-        average_percent: "Avg Percent"
+        average_percent: "Avg per cent"
         latest_score: "Latest Score"
         outcome: Outcome
   overrides: 
@@ -11494,6 +11555,7 @@ en-GB:
   people_b4ebb13c: People
   people_options_cfb419a6: "People options"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "People will see this name in discussions, messages and comments."
+  percent_448ea947: "per cent"
   percent_complete_3a7edc20: "%{percent} complete"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Per cent of respondents selecting this answer"
   percent_of_students_scored_score_53d2c4d5: "%{percent} of students scored %{score}"
@@ -11520,11 +11582,16 @@ en-GB:
   plain_text_e3ab33aa: "Plain text"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Please add at least one non-blank answer."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Please add at least one non-blank answer for each variable."
+  please_enter_a_name_for_this_link_318f01a4: "Please enter a name for this link."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Please enter a search term with three or more characters"
+  please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Please enter a valid URL. Protocol is required (e.g. http://, https://, ftp://)."
   please_enter_your_label_name_7745272d: "Please enter your %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Please enter your %{label_name} and password:"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Please let them know which page you were viewing and link you clicked on."
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Please let them know which page you were viewing and the link you clicked on."
+  please_select_a_user_role_for_this_link_9fb4e655: "Please select a user role for this link."
+  please_select_one_f931e883: "Please select one"
+  please_upload_files_as_a_zip_5a2c799f: "Please upload files as a .zip"
   please_wait_e6355980: "Please wait..."
   plugins: 
     academic_benchmark_importer: 
@@ -11532,6 +11599,9 @@ en-GB:
     account_reports: 
       description: "Select account reports"
       name: "Account reports"
+    address_book: 
+      description: "Configure how to answer address book queries."
+      name: "Address book"
     app_center: 
       description: "App Centre for tracking/installing external tools in Canvas"
       name: "App Centre"
@@ -11689,19 +11759,19 @@ en-GB:
         redirect_uri: "Redirect URI"
         token_uri: "Token URI"
     grade_export: 
-      description: "Grade export for SIS"
-      name: "Grade export"
+      description: "Mark export for SIS"
+      name: "Mark export"
     grade_export_settings: 
       description: |-
-          This plugin allows final grades to be published back to a student information system (SIS).  When enabled, the user will be given an option in the gradebook to publish these grades.  This will occur via a POST request to the specified publish endpoint.  Each type defines its own content format and mime type.  The response from the endpoint does not matter and is currently ignored.
+          This plugin allows final marks to be published back to a student information system (SIS).  When enabled, the user will be given an option in the gradebook to publish these marks. This will occur via a POST request to the specified publish endpoint. Each type defines its own content format and mime type. The response from the endpoint does not matter and is currently ignored.
           
           For example, the Instructure formatted CSV will POST a csv file with mime type 'text/csv' to the specified endpoint, containing the following columns:
           
-          "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score", "grade"
+          "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrolment_id", "enrolment_status", "score", "grade"
           
-          (Note: the "grade" column is only returned if the course specifies a grading standard).
+          (Note: the "mark" column is only returned if the course specifies a marking standard).
           
-          For each student in the course being published, there will be 1 or more rows in the published csv. Specifically, there will be 1 row for each login that the student has in the course's root account.  Most of the time this will result in 1 row per student, but if the student has multiple logins, there will be a row for each of them.
+          For each student in the course being published, there will be 1 or more rows in the published csv. Specifically, there will be 1 row for each login that the student has in the course's root account. Most of the time this will result in 1 row per student, but if the student has multiple logins, there will be a row for each of them.
       labels: 
         format_type: "Output format type"
         publish_endpoint: "Endpoint to publish to"
@@ -11928,10 +11998,11 @@ en-GB:
         user_severity: "User Severity"
         username: Username
   points_bb475533: Points
+  points_bceb5005: points
   points_n_e0b20623: "Points %{n}"
   points_points_b6b422e2: "Points: %{points}"
   points_possible_1c0b3445: "Points possible"
-  points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Points possible must be 0 or more for selected grading type"
+  points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Points possible must be 0 or more for selected marking type"
   pointspossible_points_possible_964c8592: "%{pointsPossible} Points possible"
   pointspossible_pts_624a6733: "%{pointsPossible} pts"
   poland_48_e77cc14d: "Poland (+48)"
@@ -11956,12 +12027,12 @@ en-GB:
   post_1e445890: Post
   post_grade_to_sis_disabled_click_to_toggle_6ee5ff3: "Post mark to SIS disabled. Click to toggle."
   post_grade_to_sis_enabled_click_to_toggle_82da8ce8: "Post mark to SIS enabled. Click to toggle."
-  post_grades_39c52870: "Post grades"
+  post_grades_39c52870: "Post marks"
   post_grades_description: |-
-      Post Grades allows teachers to post grades back to enabled SIS systems: Powerschool,
+      Post marks allows teachers to post marks back to enabled SIS systems: Powerschool,
       Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elements GradingCategory,
       GradingAssignment, GradingAssignmentScore.
-  post_grades_to_sis_97ece878: "Post grades to SIS"
+  post_grades_to_sis_97ece878: "Post marks to SIS"
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "'Post marks to SIS' tick box is enabled by default for assignments, marked discussions and quizzes"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Practice quiz"
@@ -12108,7 +12179,7 @@ en-GB:
       hints: 
         expires_at: "leave blank for no expiration"
         language: "This will override any browser or account settings."
-        name: "This name will be used for grading."
+        name: "This name will be used for marking."
         short_name: "People will see this name in discussions, messages and comments."
         sortable_name: "This name appears in sorted lists."
       labels: 
@@ -12515,10 +12586,10 @@ en-GB:
     regrade: 
       give_everyone_full_credit: "Give everyone full marks for this question"
       no_scores_reduced: "Award points for both corrected and previously correct answers (*no scores will be reduced*)"
-      regrade_disabled: "Regrading is not allowed on this question because either an answer was removed or the question type was changed after a student completed a submission."
+      regrade_disabled: "Re-marking is not allowed on this question because either an answer was removed or the question type was changed after a student completed a submission."
       regrade_options: "Choose a re-mark option for students who have already taken the quiz. Canvas will re-mark all your submissions after you save the quiz (students' scores MIGHT be affected)."
       some_scores_reduced: "Only award points for the correct answer (*some students' scores may be reduced*)"
-      update_question_without_regrading: "Update question without regrading"
+      update_question_without_regrading: "Update question without re-marking"
   quiz_40ee61b1: quiz
   quiz_e0dcce8f: Quiz
   quiz_log_auditing: 
@@ -12702,6 +12773,7 @@ en-GB:
     title: "Quiz statistics"
     unknown_answer: "Something else"
     user_names: "User Names"
+  quiz_submission_dca0c013: "Quiz submission"
   quiz_title_4b50ade9: "Quiz title"
   quiz_type_be1633db: "Quiz type"
   quizzes: 
@@ -12734,7 +12806,7 @@ en-GB:
     cant_unpublish_when_students_submit: "Can't unpublish if there are student submissions"
     choose_option: "[ Choose ]"
     confirms: 
-      delete_answer: "Are you sure? Deleting answers from a question with submissions disables the option to regrade this question."
+      delete_answer: "Are you sure? Deleting answers from a question with submissions disables the option to re-mark this question."
       delete_question: "Are you sure you want to delete this question?"
       delete_quiz: "Are you sure you want to delete this quiz?"
       scrap_and_restart: "Scrap this quiz and start from scratch?"
@@ -12973,13 +13045,13 @@ en-GB:
           delete_question: "Delete this question"
           edit_question: "Edit this question"
           move_copy_question: "move/copy question to another bank"
-        not_yet_graded: "Not yet graded"
+        not_yet_graded: "Not yet marked"
         original_score: "Original score:"
         points_possible: "%{points_possible} pts"
-        regraded_score: "Regraded score:"
+        regraded_score: "Re-marked score:"
         show_ansers_for_variable: "Show answers for %{variable}"
         skip_question_text: "Skip to question text."
-        submission_was_regraded: "This question has been regraded."
+        submission_was_regraded: "This question has been re-marked."
         titles: 
           question_correct_comment: "Students will see this comment if they get the question correct"
           question_incorrect_comment: "Students will see this comment if they get the question wrong"
@@ -13143,7 +13215,7 @@ en-GB:
           other: "%{user} has %{count} attempts left"
         default_quiz_name: "Quiz %{course_name}"
         default_survey_name: "Survey %{course_name}"
-        grade_by_question_warning: "The grade by question feature is affected by questions that are shuffled in a group."
+        grade_by_question_warning: "The mark by question feature is affected by questions that are shuffled in a group."
         headers: 
           quiz_submissions: "Quiz submissions"
           survey_submissions: "Survey submissions"
@@ -13224,7 +13296,7 @@ en-GB:
         minutes: minutes
         minutes_from: "minutes from"
         moderate_page_title: "%{title}: Moderate"
-        outstanding_autosubmission_description: "These quiz submissions are outstanding, likely because a student left the quiz page prior to submission. If you would like to grade them, please press 'Submit' below."
+        outstanding_autosubmission_description: "These quiz submissions are outstanding, likely because a student left the quiz page prior to submission. If you would like to mark them, please press 'Submit' below."
         outstanding_quiz_submissions_found: "There are outstanding quiz submissions."
         page_title: "Moderate quiz"
         reload_student_table: "Reload student table"
@@ -13255,7 +13327,7 @@ en-GB:
       multi_answer: 
         choose_answer: Choose
       muted: 
-        muted_quiz_description: "Your quiz score is unavailable because your instructor has not finished grading it. When your instructor finishes grading this quiz, your score will be available on this page."
+        muted_quiz_description: "Your quiz score is unavailable because your instructor has not finished marking it. When your instructor finishes marking this quiz, your score will be available on this page."
         muted_quiz_header: "Your quiz has been muted"
       new: 
         allowed_attempts: "Number of allowed attempts"
@@ -13335,7 +13407,7 @@ en-GB:
         quizzes_unpublished: 
           one: "1 quiz successfully unpublished!"
           other: "%{count} quizzes successfully unpublished!"
-        submission_doesnt_count: "This quiz will no longer count towards your grade."
+        submission_doesnt_count: "This quiz will no longer count towards your mark."
       question_group: 
         buttons: 
           update: Update
@@ -13412,7 +13484,7 @@ en-GB:
           preview_quiz_again: "Preview the quiz again"
           preview_survey_again: "Preview the survey again"
         no_more_attempts: "No More Attempts available"
-        questions_not_graded: "Some questions not yet graded"
+        questions_not_graded: "Some questions not yet marked"
         score_set_manually: "This score was set by the teacher"
         unlimited_attempts: "Unlimited attempts"
         view_previous_attempts: "View previous attempts"
@@ -13462,11 +13534,11 @@ en-GB:
           survey_score: "Survey Score"
         links: 
           click_to_view_results: "Click here to view the results."
-        questions_not_graded: "Some questions not yet graded"
+        questions_not_graded: "Some questions not yet marked"
         quiz_fudged_negative: "This quiz score has been manually adjusted by %{fudge} points."
         quiz_fudged_positive: "This quiz score has been manually adjusted by +%{fudge} points."
         quiz_not_yet_taken: "The quiz hasn't been taken yet."
-        quiz_submission_needs_review: "The quiz has changed significantly since this submission was made. This submission may need re-grading."
+        quiz_submission_needs_review: "The quiz has changed significantly since this submission was made. This submission may need re-marking."
         requires_lockdown: "Respondus LockDown Browser is required to view your quiz results."
         submitted_at: "Submitted %{when}"
         survey_fudged_negative: "This survey score has been manually adjusted by %{fudge} points."
@@ -13535,11 +13607,11 @@ en-GB:
           show_student_survey_results: "Show student survey results"
           survey_statistics: "Survey statistics"
         manage: Manage
-        only_registered_users: "Only registered, enrolled users can take graded quizzes"
+        only_registered_users: "Only registered, enrolled users can take marked quizzes"
         quiz_regraded_your_score_affected: 
-          one: "This quiz has been regraded; your score was affected."
-          other: "This quiz has been regraded; your new score reflects %{count} questions that were affected."
-        quiz_regraded_your_score_not_affected: "This quiz has been regraded; your score was not affected."
+          one: "This quiz has been re-marked; your score was affected."
+          other: "This quiz has been re-marked; your new score reflects %{count} questions that were affected."
+        quiz_regraded_your_score_not_affected: "This quiz has been re-marked; your score was not affected."
         speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 student submitted so far"
@@ -13588,9 +13660,9 @@ en-GB:
       submission_versions: 
         attempt: Attempt
         attempt_history: "Attempt history"
-        questions_not_graded: "Some questions not yet graded"
+        questions_not_graded: "Some questions not yet marked"
         quiz_attempt_history_description: "A table that shows your quiz attempt history. Each attempt is on the left side. The attempt, time, and score are across the top."
-        regraded: Regraded
+        regraded: Re-marked
         score: Score
         time: Time
       take_quiz: 
@@ -13885,9 +13957,11 @@ en-GB:
   remove_row_c198da5a: "Remove row"
   remove_row_f9d59cba: "Remove row"
   remove_student_from_recipients_4b206e35: "Remove %{student} from recipients"
+  remove_text_8e485c41: "Remove %{text}"
   remove_these_dates_48453a81: "Remove these dates"
   remove_this_rubric_from_my_list_c7d80704: "Remove this rubric from my list"
   remove_this_section_9a88ca43: "Remove this section"
+  removed_user_as_group_leader_bb69330f: "Removed %{user} as group leader"
   rename_45608f54: Rename
   rename_c_name_section_e0e92c97: "Rename %{c.name} section"
   rename_this_section_73065edd: "Rename this section"
@@ -13935,6 +14009,7 @@ en-GB:
     options_2: 
       description: "Schedule student availability"
   restricted_access_d3e99a39: "Restricted Access"
+  resubmitted_since_last_graded_8484d285: "Resubmitted since last marked"
   resume_quiz_afeceb87: "Resume quiz"
   resume_survey_58dce775: "Resume survey"
   retrieve_timeout: "could not retrieve configuration, the server response timed out"
@@ -13974,7 +14049,7 @@ en-GB:
       manage_files: "Manage (add/edit/delete) course files"
       manage_frozen_assignment: "Manage (edit/delete) frozen assignments"
       manage_global_outcomes: "Manage global learning outcomes"
-      manage_grades: "Edit grades"
+      manage_grades: "Edit marks"
       manage_groups: "Manage (create/edit/delete) groups"
       manage_interaction_alerts: "Manage alerts"
       manage_links: "Manage role and trust links"
@@ -14004,11 +14079,11 @@ en-GB:
       send_messages_all: "Send messages to the entire class"
       suspend_accounts: "Suspend accounts"
       undelete_courses: "Undelete courses"
-      view_all_grades: "View all grades"
+      view_all_grades: "View all marks"
       view_analytics: "View analytics pages"
       view_course_changes: "View Course Change Logs"
       view_error_reports: "View error reports"
-      view_grade_changes: "View Grade Change Logs"
+      view_grade_changes: "View mark change logs"
       view_group_pages: "View the group pages of all student groups"
       view_jobs: "View background jobs"
       view_notifications: "View notifications"
@@ -14163,6 +14238,7 @@ en-GB:
   schedule_student_availability_332154a: "Schedule student availability"
   scheduler_shown_df77ca6f: "Scheduler shown"
   school_of_rock_4b7b1fd0: "School of Rock"
+  score_68107950: "%{score}%"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
     one: "Score does not include %{groups} because it has no points possible"
     other: "Score does not include %{groups} because they have no points possible"
@@ -14170,20 +14246,24 @@ en-GB:
     one: "Score does not include %{groups} because it has no points possible"
     other: "Score does not include %{groups} because they have no points possible"
   score_f7ac9e08: Score
+  score_letter_grade_b3bb9e52: "%{score} letter mark"
   score_muted_82eef66: "Score: (muted)"
   score_of_score_view_in_speedgrader_a7c1c954: "Score of %{score}. View in SpeedGrader"
   score_out_of_points_possible_88f370fd: "%{score} out of %{points_possible}"
+  score_percent_11941c81: "%{score} per cent"
+  score_points_3c48e2a8: "%{score} points"
+  score_pts_adcb1af3: "%{score} pts"
   score_score_6f81e8c8: "Score: %{score}"
   screenreader_gradebook: 
     assignment_information: 
       actions: 
         assignment_is_muted: Muted?
-        curve_grades: "Curve grades"
+        curve_grades: Curvemarks
         message_students: "Message students who..."
-        set_default_grade: "Set default grade"
+        set_default_grade: "Set default mark"
       details: 
         avg_score: "Average score"
-        graded_sub_count: "Graded submissions:"
+        graded_sub_count: "Marked submissions"
         high_score: "High score"
         low_score: "Low score"
         no_points: "No points possible"
@@ -14197,7 +14277,7 @@ en-GB:
         warning: Warning
     components: 
       final_grade: 
-        final_grade: "Final grade:"
+        final_grade: "Final mark:"
     content_selection: 
       assignment: 
         select_assignment: "Select an assignment"
@@ -14208,17 +14288,17 @@ en-GB:
       student: 
         select_student: "Select a student"
     grading: 
-      empty_submission_selection: "Select a student and an assignment to view and edit grades."
-      grade_for: "Grade for: %{name}"
-      grading: Grading
-      is_dropped: "This grade is currently dropped for this student."
+      empty_submission_selection: "Select a student and an assignment to view and edit marks."
+      grade_for: "Mark for: %{name}"
+      grading: Marking
+      is_dropped: "This mark is currently dropped for this student."
       is_late: "This submission was late."
       submission_details: "Submission details"
-      submission_hidden: "This assignment is not available to this student and will not be included in their grade."
-      was_resubmitted: "This assignment has been resubmitted since it was graded last."
+      submission_hidden: "This assignment is not available to this student and will not be included in their mark."
+      was_resubmitted: "This assignment has been resubmitted since it was marked last."
     header: 
       gradebook_individual_view: "Gradebook: Individual View"
-      save_instructions: "Note: Grades and notes will be saved automatically after moving out of the field."
+      save_instructions: "Note: Marks and notes will be saved automatically after moving out of the field."
       switch_to_gradebook2: "Switch to Default Gradebook"
     learning_mastery: 
       download_results: "Download results (.csv)"
@@ -14244,14 +14324,14 @@ en-GB:
     settings: 
       assignment_toggles_and_actions: 
         download_current_scores: "Download Current Scores (.csv)"
-        grading_history: "View grading history"
+        grading_history: "View marking history"
         hide_student_names_label: "Hide student names"
-        include_ungraded_assignments: "Treat ungraded as 0"
+        include_ungraded_assignments: "Treat unmarked as 0"
         set_group_weights: "Set group weights"
         show_concluded_enrollments_label: "Show concluded enrolments"
         show_notes: "Show notes in student info"
-        show_total_as_points: "Show totals as points on Student Grade Page"
-        sis_export: "Publish grades to SIS"
+        show_total_as_points: "Show totals as points on Student mark page"
+        sis_export: "Publish marks to SIS"
         upload_scores: "Upload scores (.csv)"
       header: 
         global_settings: "Global settings"
@@ -14264,17 +14344,17 @@ en-GB:
         sort_assignments: "Sort assignments"
     student_information: 
       assignment_groups: 
-        ag_group_grade: Grade
+        ag_group_grade: Mark
         ag_group_name: "Assignment group"
-        ag_group_percent_grade: "% of grade"
-        ag_letter_grade: "Letter grade"
+        ag_group_percent_grade: "% of mark"
+        ag_letter_grade: "Letter mark"
       details: 
         hidden: hidden
         secondary_id: "Secondary ID:"
         sections: "Sections:"
       index: 
         empty_student_selection: "Select a student to view additional information here."
-        grades: Grades
+        grades: Marks
         student_info: "Student information"
         submissions_loading: "Submissions for this student are still loading..."
   search: 
@@ -14303,6 +14383,8 @@ en-GB:
   search_for_files_7541fb28: "Search for files"
   search_grading_periods_e947a3e9: "Search marking periods..."
   search_groups_or_people_6c15d6ad: "Search groups or people"
+  search_people_4782671a: "Search people"
+  search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input."
   search_term_must_be_at_least_num_characters_669098ed: "Search term must be at least %{num} characters"
   search_title_body_or_author_1d26711f: "Search title, body, or author"
   search_users_48b1789e: "Search users..."
@@ -14329,7 +14411,7 @@ en-GB:
     enrolled_as_teacher: "enrolled as a teacher"
     errors: 
       confirmation_failed: "Confirmation failed"
-      course_not_authorized_for_crosslist: "%{course_name} not authorized for cross-listing"
+      course_not_authorized_for_crosslist: "%{course_name} not authorised for cross-listing"
     status: 
       confirming_course: "Confirming %{course_name}..."
       removing_crosslisting_of_section: "De-Cross-Listing Section..."
@@ -14369,7 +14451,7 @@ en-GB:
         other: "%{count} completed enrolments"
       crosslist_description: "Cross-listing allows you to create a section in one account and then move it to a course on a different account. To cross-list this course, you'll need to find the course you want to move it to, either using the search tool or by entering the course's ID."
       decrosslist_description: "This will move the section back to its original course, **%{course_name}**."
-      decrosslist_long_description: "All grades for students in this course will no longer be visible. You can retrieve the grades later by re-cross-listing the course, but in the mean time the grades for these students will come from the original course."
+      decrosslist_long_description: "All marks for students in this course will no longer be visible. You can retrieve the marks later by re-cross-listing the course, but in the mean time, the marks for these students will come from the original course."
       labels: 
         end_at: Ends
         enter_course_id: "Or enter the course's ID"
@@ -14504,13 +14586,13 @@ en-GB:
   set_as_default_email_address_bd3b9b8f: "Set as default email address"
   set_created_createdat_895e2243: "Set created %{createdAt}"
   set_default_email_address_400f70dc: "Set default email address"
-  set_default_grade_a202ebc1: "Set Default Mark"
+  set_default_grade_a202ebc1: "Set default mark"
   set_default_grade_dialog: 
-    default_grades: "Give all students the same grade for *%{assignment.name}* by entering and submitting a grade value below:"
-    dialog_title: "Default grade for %{assignment.name}"
-    overwrite: "Overwrite already-entered grades"
-    set_grades_button: "Set default grade"
-    set_grades_button_loading: "Setting grades..."
+    default_grades: "Give all students the same mark for *%{assignment.name}* by entering and submitting a mark value below:"
+    dialog_title: "Default mark for %{assignment.name}"
+    overwrite: "Overwrite already-entered marks"
+    set_grades_button: "Set default mark"
+    set_grades_button_loading: "Setting marks..."
   set_email_address_as_default_954d284: "Set email address as default"
   set_email_as_default_5b4a28e: "Set email as default"
   set_group_weights_fd41c1f: "Set group weights"
@@ -14565,15 +14647,15 @@ en-GB:
       percent_of_grade: "%{percent} % of grade"
     assignment: 
       due_at: "%{date} at %{time}"
-      graded_count: "%{graded_count} Graded"
+      graded_count: "%{graded_count} marked"
       links: 
         delete_assignment: Delete
         edit_assignment: Edit
         submission_comments: "Submission comments"
         view_rubric_evaluation: "View rubric evaluation"
       points_out_of: "%{points} out of %{possible}"
-      student_mute_notification: "Instructor is working on grades"
-      submitted_and_graded_count: "%{submitted_count} Submitted, %{graded_count} Graded"
+      student_mute_notification: "Instructor is working on marks"
+      submitted_and_graded_count: "%{submitted_count} Submitted, %{graded_count} marked"
       submitted_count: "%{submitted_count} submitted"
       tiles: 
         sort_or_move: "Sort assignments or move to another group"
@@ -14585,7 +14667,7 @@ en-GB:
         move: Move
       defaults: 
         group_name: "Course assignments"
-      group_weight: "*%{percent}% of total grade"
+      group_weight: "*%{percent}% of total mark"
       links: 
         add_an_assignment: "Add an Assignment"
         edit_group_details: "Edit group details"
@@ -14594,7 +14676,7 @@ en-GB:
         reorder_groups: "Reorder groups"
       no_assignments: "No assignments yet"
       titles: 
-        percent_of_final_grade: "Percent of final grade"
+        percent_of_final_grade: "Per cent of final mark"
     assignment_rubric_dialog: 
       links: 
         add_rubric: "Add rubric"
@@ -14749,7 +14831,7 @@ en-GB:
         done: Done
         save: Save
       delete_scheme: "Delete grading scheme"
-      edit_scheme: "Edit grading scheme"
+      edit_scheme: "Edit marking scheme"
       find: Find
       find_existing_scheme: "Find existing grading scheme"
       full_name: "Full name, smaller text"
@@ -14760,16 +14842,16 @@ en-GB:
         name: Name
         range: Range
         scheme_name: "Scheme name"
-      loading_grading_standards: "Loading grading standards..."
-      managing_grading_standards: "manage grading schemes"
+      loading_grading_standards: "Loading marking standards..."
+      managing_grading_standards: "manage marking schemes"
       range_lower: "Lower limit of range"
       range_of_numbers: "%{lower_number} to %{higher_number}"
       range_upper: "Upper limit of range"
       remove_row: "Remove row"
-      remove_scheme: "Remove Grading Scheme"
+      remove_scheme: "Remove marking scheme"
       select_another_scheme: "Select another scheme"
       some_standard: "Some standard"
-      use_this_standard: "Use this grading standard"
+      use_this_standard: "Use this marking standard"
     home_menu: 
       links: 
         courses: Courses
@@ -14810,8 +14892,8 @@ en-GB:
       labels: 
         due: due
       needs_grading_count: 
-        one: "1 needs grading"
-        other: "%{count} need grading"
+        one: "1 needs marking"
+        other: "%{count} need marking"
     menu_enrollment: 
       labels: 
         enrolled_as: "enrolled as"
@@ -14834,7 +14916,7 @@ en-GB:
           is muted, students will not receive new notifications about or be
           able to see:
           
-          *  Grade change notifications
+          *  Mark change notifications
           *  Submission comments
           *  Curving assignments
           *  Score change notifications
@@ -14842,7 +14924,7 @@ en-GB:
           Students will be able to see that this assignment is muted.
           
           Once you have muted this assignment, you can begin sending
-          notifications again by clicking the "Unmute Assignment" link.
+          notifications again by clicking the 'Unmute Assignment' link.
     new_course_form: 
       cancel: Cancel
       course_cose_explanation: "This will be displayed in places with little space"
@@ -14861,7 +14943,7 @@ en-GB:
         dashboard: Dashboard
         skip_to_content: "Skip to content"
     no_recent_activity: 
-      empty_stream_message: "You don't have any messages to show in your stream yet. Once you begin participating in your courses you'll see this stream fill up with messages from discussions, grading updates, private messages between you and other users, etc."
+      empty_stream_message: "You don't have any messages to show in your stream yet. Once you begin participating in your courses, you'll see this stream fill up with messages from discussions, marking updates, private messages between you and other users, etc."
       no_recent_messages: "No recent messages"
     pending_enrollment: 
       designer: "%{course} as a designer."
@@ -14877,7 +14959,7 @@ en-GB:
     primary_header_navigation: 
       menu: 
         calendar: Calendar
-        grades: Grades
+        grades: Marks
       navigation: 
         main: "Main Navigation"
     profile: 
@@ -14933,7 +15015,7 @@ en-GB:
         ratings: Ratings
       labels: 
         custom_rating: "I'll write free-form comments when assessing students"
-        grading_rubric: "Use this rubric for assignment grading"
+        grading_rubric: "Use this rubric for assignment marking"
         total_points: "Total points"
         totallying_rubric: "Hide score total for assessment results"
       links: 
@@ -15083,7 +15165,7 @@ en-GB:
       javascript_required: " To access this site, you must enable JavaScript."
     submission_comment: 
       assignment: Assignment
-      grading_alt: grading
+      grading_alt: marking
       submission_comment: "Submission Comment"
     terms_required: 
       updated_terms_of_use: "Updated Terms of Use"
@@ -15098,7 +15180,7 @@ en-GB:
       public_course: "This page is part of the content for the course, **%{course}**."
       titles: 
         log_in: "Please log in"
-        unauthorized_action: Unauthorized
+        unauthorized_action: Unauthorised
       unauthorized_1: "It appears that you don't have permission to access this page. Please make sure you're authorised to view this content."
       unauthorized_2: "If you think you should be able to view this page, please use the \"Help\" link to notify support of the problem."
       unauthorized_user_is_other: "%{current_user}, you are not authorised to view this page.  The link you followed to get here was for **%{unauthorized_user} (%{unauthorized_user_email})**.  If that's you, you may want to log out and log back in with that email address to gain access to this page."
@@ -15162,7 +15244,7 @@ en-GB:
         discussions: "Click to insert a link to this topic"
         discussions_page: "Click to insert a link to the discussions page"
         files_page: "Click to insert a link to the files page"
-        grades_page: "Click to insert a link to the grades page"
+        grades_page: "Click to insert a link to the marks page"
         modules: "Click to insert a link to this module"
         modules_page: "Click to insert a link to the modules page"
         quizzes: "Click to insert a link to this quiz"
@@ -15182,7 +15264,7 @@ en-GB:
         discussions_page: "Discussions index"
         files_page: "Files index"
         find_on_flickr: "Find images on flickr creative commons"
-        grades_page: Grades
+        grades_page: Marks
         modules: "Modules list"
         modules_page: Modules
         new_page: "Link to a new page"
@@ -15225,6 +15307,7 @@ en-GB:
   shared_secret_892c88f2: "Shared secret"
   short_name_ad9bf84f: "short name"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "should be self-evident, the canvas ID of the reporting user"
+  show_all_artifacts_34b91a83: "Show all artifacts"
   show_all_details_9879980c: "Show all details"
   show_and_hide_courses_menu_9e09d1d0: "Show and hide courses menu"
   show_attendance_columns_4d160e16: "Show attendance columns"
@@ -15234,11 +15317,11 @@ en-GB:
   show_concluded_enrollments_6a05544c: "Show concluded enrolments"
   show_correct_answers_at_30c37e01: "Show correct answers at"
   show_correct_answers_at_a5475aa3: "Show Correct Answers At"
-  show_current_grade_5bf4e0d9: "Show Current Mark"
+  show_current_grade_5bf4e0d9: "Show current mark"
   show_dashboard_card_view_41ebd6c6: "Show dashboard card view"
   show_dashcard_view_76078ecb: "Show dashcard view"
-  show_final_grade_a95e14dc: "Show Final Mark"
-  show_inactive_enrollments_8f4c4824: "Show Inactive Enrolments"
+  show_final_grade_a95e14dc: "Show final mark"
+  show_inactive_enrollments_8f4c4824: "Show inactive enrolments"
   show_links_to_unpublished_content_30c0450d: "Show links to unpublished content"
   show_lti_2_configuration_ui_94ce35a9: "Show LTI 2 Configuration UI"
   show_me_76823679: "Show me"
@@ -15353,6 +15436,7 @@ en-GB:
     android_banner_view_button: VIEW
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Some conferences on this page are hidden because of errors while retrieving their status"
   someone: Someone
+  something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Something is broken, but I can work around it for now"
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Something went wrong inactivating the user. Please try again later."
   something_went_wrong_please_try_again_6d337b6c: "Something went wrong; please try again."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Something went wrong re-activating the user. Please try again later."
@@ -15415,6 +15499,9 @@ en-GB:
     previous_object: "Previous %{type}"
     student_hidden_name: "Student %{position}"
   sso_settings_ebf98263: "SSO settings"
+  starred_no_subject_click_to_unstar_3191d64: "Starred '(No Subject)'. Click to un-star."
+  starred_no_subject_click_to_unstar_bff04bce: "Starred '(No Subject)'. Click to un-star."
+  starred_subject_click_to_unstar_6aafcddc: "Starred '%{subject}'. Click to un-star."
   start_date_c41cb23a: "Start date:"
   start_date_e937be8a: "Start date"
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
@@ -15500,6 +15587,7 @@ en-GB:
     zero: "Student who haven't taken the survey"
   students_will_automatically_receive_full_credit_on_cc61df39: "students will automatically receive full credit once they take the survey"
   students_with_no_submissions_title: "Students with no submissions"
+  studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} out of %{totalStudentsEnrolled} students"
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "You can't delete a sub-account that has courses in it"
@@ -15531,13 +15619,14 @@ en-GB:
       other: "%{count} sub-accounts"
   subaccount_91f4c279: "Sub account"
   subdomain_url_1e43b6f0: "Subdomain URL"
+  subject_114b2e98: Subject
   subject_reply_to: "Re: %{subject}"
   submission: 
     atom_no_author: "No author"
     attached_files_comment: "See attached files."
     media_comment: "This is a media comment."
     state: 
-      graded: graded
+      graded: marked
       submitted: submitted
       unsubmitted: unsubmitted
   submission_comment: 
@@ -15550,7 +15639,7 @@ en-GB:
   submission_details_dialog: 
     add_a_comment: "Add a comment"
     comments: Comments
-    grade_form_label: "Grade:"
+    grade_form_label: "Mark:"
     labels: 
       group_comment: "Send comment to the whole group"
     late: LATE
@@ -15561,7 +15650,7 @@ en-GB:
     post_comment: "Post Comment"
     submitted: "Submitted:"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Submitted multiple times, choose which to view:"
-    update_grade: "Update grade"
+    update_grade: "Update mark"
     view_rubric_assessment_in_the_speedgrader: "View Rubric Assessment in the SpeedGrader"
   submission_in_another_grading_period_e754b329: "Submission in another marking period"
   submissions: 
@@ -15600,7 +15689,7 @@ en-GB:
       hide_rubric_button: "Hide rubric"
       labels: 
         add_a_comment: "Add a comment"
-        grade: Grade
+        grade: Mark
         show_assessment_by: "Show Assessment By"
       late_submission: (late)
       links: 
@@ -15608,7 +15697,7 @@ en-GB:
         submit: "Submit assignment"
       media_comment: "Media comment"
       media_comment_link: "This is a media comment, *click here to view*."
-      only_see_your_own_comments_muted: "You may not see all comments right now because the assignment is currently being graded"
+      only_see_your_own_comments_muted: "You might not see all comments right now because the assignment is currently being marked"
       only_see_your_own_comments_peer: "As a peer reviewing student, you will only see comments written by you."
       options: 
         new_assessment: "[New Assessment]"
@@ -15620,7 +15709,7 @@ en-GB:
       sent_to_whole_group: "Send comment to the whole group"
       show_rubric: "Show Rubric"
       speedgrader: SpeedGrader™
-      student_mute_notification: "Grades are unavailable because the instructor is working on them."
+      student_mute_notification: "Marks are unavailable because the instructor is working on them."
       submission_details: "Submission details"
       submitted_at: "submitted %{submit_date}"
       teachers_notified_of_comments: "Teachers and submitter will be notified of all comments."
@@ -15662,9 +15751,11 @@ en-GB:
   submit_a_feature_idea_2d4baa3d: "Submit a Feature Idea"
   submit_assignment_5799b4e3: "Submit Assignment"
   submit_media_file_f334c1ba: "Submit Media File"
+  submit_ticket_5515ffd: "Submit ticket"
   submitted_at_4d5ea3aa: "Submitted at"
   submitted_datetime_fa2e9287: "Submitted: %{dateTime}"
   submitted_files_82dd3009: "Submitted files"
+  submitted_late_3741af29: "Submitted late"
   submitting_types_7c5a7096: "Submitting: %{types}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Success! All users on this domain will now be able to see this branding"
   success_grades_were_published_to_the_grade_book_da3b4fba: "Success! Marks were published to the grade book."
@@ -15700,7 +15791,7 @@ en-GB:
   switch_to_3f310557: "Switch To"
   switch_to_graph_view_f1153fc1: "Switch to graph view"
   switch_to_group_group_name_786b913b: "Switch to group %{group_name}"
-  switch_to_percentage_295146ac: "Switch to Percentage"
+  switch_to_percentage_295146ac: "Switch to percentage"
   switch_to_points_6a0a1eba: "Switch to Points"
   switch_to_table_view_3aae9919: "Switch to table view"
   switzerland_41_f861e414: "Switzerland (+41)"
@@ -15726,12 +15817,12 @@ en-GB:
     collaborations: Collaborations
     conferences: Conferences
     course_assignments: "Course assignments"
-    course_grades: "Course grades"
+    course_grades: "Course marks"
     course_settings: "Course settings"
     discussions: Discussions
     eportfolios: ePortfolios
     files: Files
-    grades: Grades
+    grades: Marks
     home: Home
     logout: Logout
     modules: Modules
@@ -15821,6 +15912,7 @@ en-GB:
       timespan: "%{start_at} *to* %{end_at}"
   terms_35d91184: "Terms:"
   text_document_eacbcdb7: "Text document"
+  text_entry_submission_7b0ae0c5: "Text entry submission"
   text_entry_submission_cannot_be_empty_3d187cae: "Text entry submission cannot be empty"
   text_input_d3480b8c: "Text input"
   that_user_account_has_been_deleted_please_contact__350e0e0: "That user account has been deleted.  Please contact your system administrator to have your account reactivated."
@@ -15897,21 +15989,23 @@ en-GB:
   there_are_no_configured_ltis_that_interact_with_co_8c780ce6: "There are no configured LTIs that interact with collaborations."
   there_are_no_unsaved_changes_9276e87c: "There are no unsaved changes"
   there_was_a_failure_logging_out_at_your_idp_30070527: "There was a failure logging out at your IdP"
-  there_was_a_problem_deleting_the_grading_period_50ce07c5: "There was a problem deleting the grading period"
-  there_was_a_problem_deleting_the_grading_scheme_2a959c40: "There was a problem deleting the grading scheme"
+  there_was_a_problem_deleting_the_grading_period_50ce07c5: "There was a problem deleting the marking period"
+  there_was_a_problem_deleting_the_grading_scheme_2a959c40: "There was a problem deleting the marking scheme"
   there_was_a_problem_exporting_c33dc250: "There was a problem exporting."
   there_was_a_problem_fetching_periods_bdc09a8f: "There was a problem accessing periods"
   there_was_a_problem_loading_the_gradebook_69b2a17: "There was a problem loading the gradebook."
   there_was_a_problem_logging_in_at_institution_5a298155: "There was a problem logging in at %{institution}"
   there_was_a_problem_saving_the_grading_period_243bed6c: "There was a problem saving the marking period"
-  there_was_a_problem_saving_the_grading_scheme_5e6076e9: "There was a problem saving the grading scheme"
+  there_was_a_problem_saving_the_grading_scheme_5e6076e9: "There was a problem saving the marking scheme"
   there_was_a_problem_submitting_your_set_27ca2ed0: "There was a problem submitting your set"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "There was an error generating the tool launch"
   there_was_an_error_in_processing_your_request_6513a49a: "There was an error in processing your request"
+  there_was_an_error_removing_the_image_c83acffe: "There was an error removing the image"
   there_was_an_error_retrieving_the_course_image_d7ea094d: "There was an error retrieving course image"
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "There was an error saving the changes to the course"
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "There was an error saving the note. Please try again."
   there_was_an_error_setting_usage_rights_53739e1d: "There was an error setting usage rights."
+  there_was_an_error_updating_this_assignment_please_59fc608d: "There was an error updating this assignment. Please refresh the page and try again."
   there_was_an_error_uploading_the_image_932fc4ce: "There was an error uploading image"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "There was an error with your query; please try a different search"
   there_were_errors_with_the_form_errors_ab5b559a: "There were errors with the form: %{errors}"
@@ -15964,21 +16058,25 @@ en-GB:
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "This question will show a checkbox next to each answer."
   this_quiz_has_been_excused_d89d2b74: "This quiz has been excused: the student is no longer required to take this quiz."
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*This quiz is unpublished* Only teachers can see the quiz until it is published."
+  this_quiz_needs_review_50e014e: "This quiz needs to be reviewed"
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "This recorder uses Flash. As a result, you might find it easier to make a recording on your local machine and use the media uploader tab to upload it."
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "This report shows all courses for a given term. The resulting csv file has one row per course and shows the course id, course sis id, course short name, course name, account id, account sis id, account name, storage used in MB, and sum of all files in MB. The storage used reflects all files that go against course quotas. Sum of all files in the course is the sum of all files that are in the course regardless of impact to the course quotas."
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "This report shows all the courses for a given term. The resulting CSV file will have one row per course and will show the course ID, course SIS ID, course short name, course name, account ID, account SIS ID, account name, storage used in MB."
   this_report_shows_grading_period_grades_and_overal_a86346a: "This report shows marking period marks (and overall course marks) for each student enrolled in a given term. The resulting csv file will have one row per enrolment."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "This sample page includes common UI elements in Canvas to help you build your custom branding. Once you start making changes to the colour values and images in the left sidebar, you will see a *Preview Your Changes* button. Click it to refresh this page and see how your changes look."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "The student's responses are hidden because this assignment is anonymous."
+  this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "This student was just awarded an unusually high mark."
+  this_student_was_just_awarded_negative_points_55741a37: "This student was just awarded negative points."
   this_student_wrote_f1a3f22d: "This student wrote:"
   this_submission_has_already_been_graded_and_is_rea_8ec61c52: "This submission has already been marked and is ready for moderation."
   this_topic_is_closed_for_comments_3dd10c00: "This topic is closed for comments."
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "This user has multiple roles in the course. Changing the user's role here will overwrite all her/his current enrolments."
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "This user is currently not able to access the course"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"This user is currently not able to access the course\""
-  this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "This will allow you to authenticate Canvas for posting grades to SIS"
+  this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "This will allow you to authenticate Canvas for posting marks to SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "This will apply these changes to your entire account. Would you like to proceed?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "This will apply this theme to your entire account. Would you like to proceed?"
+  ticket_successfully_submitted_f6254460: "Ticket successfully submitted."
   ticketing_system_52205bff: "Ticketing System"
   ticketing_system_configurations_c4fecd96: "Ticketing system configurations"
   time: 
@@ -16243,7 +16341,7 @@ en-GB:
   tours: 
     quiz_regrade: 
       got_it: "Ok, got it"
-  treat_ungraded_as_0_d38c2b41: "Treat Unmarked as 0"
+  treat_ungraded_as_0_d38c2b41: "Treat unmarked as 0"
   tree_browser: 
     folder_tree_instructions: "Use the up and down arrow keys to navigate through the tree. Press right to expand folders, left to collapse, and enter to choose the selected item."
   turnitin: 
@@ -16284,11 +16382,12 @@ en-GB:
   undated_15c2e5fe: Undated
   undated_items_toggle_list_visibility_6219e641: "Undated items toggle list visibility"
   undelivered_message_459916a9: "Undelivered message"
+  underline_links_e7cf9b4f: "Underline links"
   undo_a7be8fef: Undo
   unenrolled_users_e7632d24: "Unenrolled users"
   ungraded_answers_31ef2df7: "Unmarked answers"
-  ungraded_submissions_44efb0ec: "Ungraded submissions"
-  ungraded_survey_ad7de790: "Ungraded survey"
+  ungraded_submissions_44efb0ec: "Unmarked submissions"
+  ungraded_survey_ad7de790: "Unmarked survey"
   united_arab_emirates_971_649b3750: "United Arab Emirates (+971)"
   united_arab_emirates_a71e57c6: "United Arab Emirates"
   united_kingdom_44_880b06ad: "United Kingdom (+44)"
@@ -16336,6 +16435,7 @@ en-GB:
   up_c553575d: Up
   update_4d8ee62: Update
   update_details_6abfed16: "Update details"
+  update_link_b7cab181: "Update link"
   update_tool_7d48ef2a: "Update %{tool}"
   updated_group_group_name_727b1d98: "Updated group %{group_name}"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Updated UI for searching and displaying users and courses within an account."
@@ -16356,6 +16456,7 @@ en-GB:
   upper_limit_of_range_c454a8f2: "Upper limit of range"
   url_cc9398ca: "URL:"
   url_is_required_4689ed84: "URL required"
+  url_submission_f76327e3: "URL submission"
   url_type_3ece27d2: "URL Type"
   uruguay_1f95051a: Uruguay
   uruguay_598_866a5ef3: "Uruguay (+598)"
@@ -16375,6 +16476,7 @@ en-GB:
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Use the new Collaborations external tool to enable more options for tools to use to collaborate"
   use_the_new_document_annotation_tool_2cbc98d0: "Use the new document annotation tool"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Use the new quiz LTI tool instead of regular canvas quizzes"
+  use_the_new_scheduler_1273b832: "Use the new scheduler"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Use this configuration for parent/observer registration"
   used_by_permission_314a78dd: "Used by permission"
   user: 
@@ -16402,6 +16504,7 @@ en-GB:
   user_id_bcace870: "User ID"
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "User ID or SIS ID (SIS ID should be prepended with sis_user_id:)"
   user_id_user_id_69a9e865: "User ID: %{user_id}"
+  user_is_now_group_leader_60ec9b98: "%{user} is now group leader"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} just accepted invitation to participate in the course, %{course}. Course role: %{role_type}"
   user_just_updated_title_88074ab2: "%{user} just updated %{title}"
   user_lists: 
@@ -16627,10 +16730,10 @@ en-GB:
       linked_student_accounts: "Linked student accounts"
       links: 
         teacher_activity: "Student interactions report"
-      no_grade: "no grade"
-      no_grades: "no grades"
-      page_title: Grades
-      percent: Percent
+      no_grade: "no mark"
+      no_grades: "no marks"
+      page_title: Marks
+      percent: "Per cent"
       send_teacher_message: "Send a message to the teacher"
       show_previous_courses: "Show previous courses"
       titles: 
@@ -16766,7 +16869,7 @@ en-GB:
         last_journal_entry: "Last faculty journal entry"
         student_name: Student
         teacher_activity: "Teacher Activity Report for %{teacher}"
-        ungraded: "Ungraded assignments"
+        ungraded: "Unmarked assignments"
       last_time: 
         one: "1 day ago"
         other: "%{count} days ago"
@@ -16803,6 +16906,7 @@ en-GB:
   users_d1b60cb0: Users
   users_matching_search_term_c604db9e: "Users matching '%{search_term}'"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Users of screen readers might need to turn off the virtual cursor in order to use these keyboard shortcuts"
+  uses_the_new_scheduler_and_its_functionality_b07e9b14: "Uses the new scheduler and its functionality"
   validate: 
     is_required: "This field is required"
   validate_links_in_content_b1630fba: "Validate Links in content"
@@ -16842,9 +16946,9 @@ en-GB:
   warning_6576b5b8: warning
   warning_aacb8c24: Warning
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved."
-  warning_for_improved_accessibility_in_moving_files_71e1028b: "Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu."
+  warning_for_improved_accessibility_in_moving_files_71e1028b: "Warning: For improved accessibility in moving files, please use the Move to Dialog option found in the menu."
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Warning: for improved accessibility of calendar events, please use the agenda view."
-  warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Warning: for improved accessibility of reordering assignments and groups, please use the Move To Dialogue option found in the menu."
+  warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Warning: for improved accessibility of reordering assignments and groups, please use the Move to Dialog option found in the menu."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Warning: For improved accessibility, please click here to use the Individual view Gradebook."
   warning_icon_f64936d7: "warning icon"
   warnings: 
@@ -16891,6 +16995,7 @@ en-GB:
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "When people visit the course, this is the page they'll see.  You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself.  The default is the course activity stream."
   whenever_b943b119: whenever
   where_would_you_like_to_move_title_fabd6e8f: "Where would you like to move %{title}?"
+  which_course_is_this_question_about_f819a158: "Which course is this question about?"
   widget: 
     upload_media_track_form: 
       choose_a_language: "--Choose a Language--"
@@ -17122,7 +17227,7 @@ en-GB:
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "You'll definitely want some of these.  What's the fun of teaching a course if nobody's even listening?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "You will need a refresh token; follow the steps at this link; you might want a technical expert to help"
   you_may_not_see_all_comments_right_now_because_the_96cf2051: "You might not see all comments right now because the assignment is currently being marked."
-  you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "You may want to assign some TAs to help you with the course.  TAs can grade student submissions, help moderate the discussions and even update due dates and assignment details for you."
+  you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "You may want to assign some TAs to help you with the course. TAs can mark student submissions, help moderate the discussions and even update due dates and assignment details for you."
   you_must_agree_to_the_terms_99723f97: "You must agree to the terms."
   you_must_log_in_to_view_replies_9ccd4da0: "You must log in to view replies"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "You must select a course to copy content from"
@@ -17202,6 +17307,7 @@ en-GB:
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Your comment was auto-saved as a draft."
   your_content_has_been_exported_bbb57764: "Your content has been exported."
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "Your custom theme has been successfully applied."
+  your_email_address_f881e583: "Your email address"
   your_email_b5364bee: "Your Email"
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "Your file is being uploaded to Gradebook; you can leave this page at any time. If you have a large CSV file, your changes might take a few minutes to update. To prevent overwriting any data, please confirm the upload has been completed and Gradebook is correct before making additional changes."
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Your file is being uploaded to the Gradebook, and you can leave this page at any time. If you have a large CSV file, your changes might take a few minutes to update. To prevent overwriting any data, please confirm the upload has completed and your Gradebook is correct before making additional changes."

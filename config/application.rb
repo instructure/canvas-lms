@@ -86,7 +86,7 @@ module CanvasRails
     end
 
     # Activate observers that should always be running
-    config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer ]
+    config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer, :conditional_release_observer ]
 
     config.active_record.whitelist_attributes = false
 

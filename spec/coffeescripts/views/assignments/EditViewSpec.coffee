@@ -316,6 +316,12 @@ define [
     view = @editView()
     equal 1, view.$conditionalReleaseTarget.children().size()
 
+  test 'calls update on first switch', ->
+    view = @editView()
+    stub = @stub(view.conditionalReleaseEditor, 'updateAssignment')
+    view.updateConditionalRelease()
+    ok stub.calledOnce
+
   test 'calls update when modified once', ->
     view = @editView()
     stub = @stub(view.conditionalReleaseEditor, 'updateAssignment')
@@ -326,6 +332,8 @@ define [
   test 'does not call update when not modified', ->
     view = @editView()
     stub = @stub(view.conditionalReleaseEditor, 'updateAssignment')
+    view.updateConditionalRelease()
+    stub.reset()
     view.updateConditionalRelease()
     notOk stub.called
 

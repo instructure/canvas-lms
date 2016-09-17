@@ -144,8 +144,8 @@ class ConversationParticipant < ActiveRecord::Base
         [sanitize_sql(shard_conditions)]
       else
         ConversationParticipant.unscoped do
-          conversation_ids = ConversationParticipant.where(shard_conditions).select(:conversation_id).map do |c|
-            Shard.relative_id_for(c.conversation_id, Shard.current, scope_shard)
+          conversation_ids = ConversationParticipant.where(shard_conditions).pluck(:conversation_id).map do |id|
+            Shard.relative_id_for(id, Shard.current, scope_shard)
           end
           [sanitize_sql(:conversation_id => conversation_ids)]
         end
@@ -236,27 +236,24 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def participants(options = {})
-    options = {
-      :include_participant_contexts => false,
-      :include_indirect_participants => false
-    }.merge(options)
-
-    shard.activate do
-      Rails.cache.fetch([conversation, user, 'participants', options].cache_key) do
+    participants = shard.activate do
+      include_indirect_participants = options[:include_indirect_participants] || false
+      Rails.cache.fetch([conversation, user, 'participants', include_indirect_participants].cache_key) do
         participants = conversation.participants
-        if options[:include_indirect_participants]
+        if include_indirect_participants
           user_ids = messages.map(&:all_forwarded_messages).flatten.map(&:author_id)
           user_ids -= participants.map(&:id)
-          participants += Shackles.activate(:slave) { MessageableUser.available.where(:id => user_ids).to_a }
+          participants += AddressBook.available(user_ids)
         end
-        if options[:include_participant_contexts]
-          # we do this to find out the contexts they share with the user
-          user.load_messageable_users(participants, :strict_checks => false)
-        else
-          participants
-        end
+        participants
       end
     end
+
+    if options[:include_participant_contexts]
+      user.address_book.preload_users(participants)
+    end
+
+    participants
   end
 
   def properties(latest = last_message)
@@ -345,13 +342,13 @@ class ConversationParticipant < ActiveRecord::Base
         if operation == :delete
           scope.delete_all
         else
-          scope.update_all(:workflow_state => 'deleted')
+          scope.update_all(:workflow_state => 'deleted', :deleted_at => Time.now)
         end
       else
         if operation == :delete
           scope.where(:conversation_message_id => to_delete).delete_all
         else
-          scope.where(:conversation_message_id => to_delete).update_all(:workflow_state => 'deleted')
+          scope.where(:conversation_message_id => to_delete).update_all(:workflow_state => 'deleted', :deleted_at => Time.now)
         end
         # if the only messages left are generated ones, e.g. "added
         # bob to the conversation", delete those too

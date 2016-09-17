@@ -7,4 +7,7 @@
     <%= render :partial => "submission_sidebar" %>
   <% end %>
 
+  <% if ConditionalRelease::Service.enabled_in_context?(@context) %>
+    <div id="crs-breakdown"></div>
+  <% end %>
 </div>

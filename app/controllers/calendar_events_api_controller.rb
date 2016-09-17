@@ -971,7 +971,8 @@ class CalendarEventsApiController < ApplicationController
       codes.each do |c|
         unless pertinent_context_codes.include?(c)
           context = Context.find_by_asset_string(c)
-          @contexts.push context if context && (context.is_public || context.public_syllabus)
+          @public_to_auth = true if context && user && (context.public_syllabus_to_auth  || context.public_syllabus || context.is_public || context.is_public_to_auth_users)
+          @contexts.push context if context && (context.is_public || context.public_syllabus || @public_to_auth)
         end
       end
 
@@ -1031,7 +1032,7 @@ class CalendarEventsApiController < ApplicationController
     end
 
     scope = Assignment.where([sql.join(' OR ')] + conditions)
-    return scope unless user
+    return scope if @public_to_auth || !user
 
     student_ids = [user.id]
     courses_to_not_filter = []
@@ -1061,7 +1062,7 @@ class CalendarEventsApiController < ApplicationController
 
   def calendar_event_scope(user)
     scope = CalendarEvent.active.order_by_start_at.order(:id)
-    if user
+    if user && !@public_to_auth
       scope = scope.for_user_and_context_codes(user, @context_codes, @section_codes)
     else
       scope = scope.for_context_codes(@context_codes)

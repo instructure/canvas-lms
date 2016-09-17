@@ -170,7 +170,6 @@ class ProfileController < ApplicationController
       ['links', 'user_services']
     )
 
-    known_user = @user_data[:common_contexts].present?
     if @user_data[:known_user] # if you can message them, you can see the profile
       add_crumb(t('crumbs.settings_frd', "%{user}'s Profile", :user => @user.short_name), user_profile_path(@user))
       render

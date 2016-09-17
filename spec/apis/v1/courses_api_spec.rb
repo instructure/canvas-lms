@@ -502,6 +502,7 @@ describe CoursesController, type: :request do
           'account_id' => @account.id,
           'root_account_id' => @account.id,
           'enrollment_term_id' => term.id,
+          'public_syllabus_to_auth' => false,
           'grading_standard_id' => nil,
           'integration_id' => nil,
           'start_at' => '2011-01-01T07:00:00Z',
@@ -565,6 +566,7 @@ describe CoursesController, type: :request do
           'account_id' => @account.id,
           'root_account_id' => @account.id,
           'enrollment_term_id' => term.id,
+          'public_syllabus_to_auth' => false,
           'grading_standard_id' => nil,
           'integration_id' => nil,
           'start_at' => '2011-01-01T07:00:00Z',
@@ -790,6 +792,7 @@ describe CoursesController, type: :request do
         expect(@course.license).to eq 'public_domain'
         expect(@course.is_public).to be_truthy
         expect(@course.public_syllabus).to be_truthy
+        expect(@course.public_syllabus_to_auth).to be_falsey
         expect(@course.public_description).to eq 'new description'
         expect(@course.allow_wiki_comments).to be_truthy
         expect(@course.allow_student_forum_attachments).to be_truthy
@@ -1396,6 +1399,17 @@ describe CoursesController, type: :request do
     json = api_call(:get, "/api/v1/courses.json", { :controller => 'courses', :action => 'index', :format => 'json' })
     json.each { |course| expect(course['public_syllabus']).to be_truthy }
   end
+
+  it "should return public_syllabus_to_auth if requested" do
+    @course1.public_syllabus_to_auth = true
+    @course1.save
+    @course2.public_syllabus_to_auth = true
+    @course2.save
+
+    json = api_call(:get, "/api/v1/courses.json", { :controller => 'courses', :action => 'index', :format => 'json' })
+    json.each { |course| expect(course['public_syllabus_to_auth']).to be_truthy }
+  end
+
 
   describe "scores" do
     before(:once) do
@@ -2558,6 +2572,7 @@ describe CoursesController, type: :request do
         'end_at' => @course1.end_at,
         'default_view' => @course1.default_view,
         'public_syllabus' => @course1.public_syllabus,
+        'public_syllabus_to_auth' => @course1.public_syllabus_to_auth,
         'is_public' => @course1.is_public,
         'is_public_to_auth_users' => @course1.is_public_to_auth_users,
         'workflow_state' => @course1.workflow_state,

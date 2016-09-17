@@ -59,7 +59,7 @@ module CC::Importer::Canvas
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
       end
-      ['is_public', 'public_syllabus', 'indexed', 'allow_student_wiki_edits',
+      ['is_public', 'public_syllabus', 'public_syllabus_to_auth', 'indexed', 'allow_student_wiki_edits',
        'allow_student_assignment_edits', 'show_public_context_messages',
        'allow_student_forum_attachments', 'allow_student_organized_groups', 'lock_all_announcements',
        'open_enrollment', 'allow_wiki_comments',

@@ -79,6 +79,7 @@ define [
       @textAreaContainer.insertBefore @el
       @el.detach()
       if @options.switchViews
+        @switchViews = @createSwitchViews()
         @switchViews.insertBefore @textAreaContainer
       @infoIcon ||= (new KeyboardShortcuts()).render().$el
       @infoIcon.css("float", "right")

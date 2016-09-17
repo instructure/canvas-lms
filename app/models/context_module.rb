@@ -72,8 +72,11 @@ class ContextModule < ActiveRecord::Base
     return if relocked_modules.include?(self)
     self.class.connection.after_transaction_commit do
       relocked_modules << self
-      self.context_module_progressions.update_all("workflow_state = 'locked', lock_version = lock_version + 1")
-      self.invalidate_progressions
+      if self.context_module_progressions.where(:current => true).where.not(:workflow_state => 'locked').
+          update_all(["workflow_state = 'locked', lock_version = lock_version + 1, current = ?", false]) > 0
+
+        send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})
+      end
 
       self.context.context_modules.each do |mod|
         mod.relock_progressions(relocked_modules) if self.is_prerequisite_for?(mod)
@@ -259,8 +262,8 @@ class ContextModule < ActiveRecord::Base
   def self.module_names(context)
     Rails.cache.fetch(['module_names', context].cache_key) do
       names = {}
-      context.context_modules.not_deleted.select([:id, :name]).each do |mod|
-        names[mod.id] = mod.name
+      context.context_modules.not_deleted.pluck(:id, :name).each do |id, name|
+        names[id] = name
       end
       names
     end
@@ -369,11 +372,13 @@ class ContextModule < ActiveRecord::Base
     filter = Proc.new{|tags, user_ids, course_id, opts|
       visible_assignments = opts[:assignment_visibilities] || assignment_visibilities_for_users(user_ids)
       visible_discussions = opts[:discussion_visibilities] || discussion_visibilities_for_users(user_ids)
+      visible_pages = opts[:page_visibilities] || page_visibilities_for_users(user_ids)
       visible_quizzes = opts[:quiz_visibilities] || quiz_visibilities_for_users(user_ids)
       tags.select{|tag|
         case tag.content_type;
         when 'Assignment'; visible_assignments.include?(tag.content_id);
         when 'DiscussionTopic'; visible_discussions.include?(tag.content_id);
+        when 'WikiPage'; visible_pages.include?(tag.content_id);
         when *Quizzes::Quiz.class_names; visible_quizzes.include?(tag.content_id);
         else; true; end
       }
@@ -692,6 +697,11 @@ class ContextModule < ActiveRecord::Base
   def discussion_visibilities_for_users(user_ids)
     discussion_visibilities_by_user = @discussion_visibilities_by_user || DiscussionTopic.visible_ids_by_user(user_id: user_ids, course_id: [context.id])
     user_ids.flat_map{|id| discussion_visibilities_by_user[id]}
+  end
+
+  def page_visibilities_for_users(user_ids)
+    page_visibilities_by_user = @page_visibilities_by_user || WikiPage.visible_ids_by_user(user_id: user_ids, course_id: [context.id])
+    user_ids.flat_map{|id| page_visibilities_by_user[id]}
   end
 
   def quiz_visibilities_for_users(user_ids)

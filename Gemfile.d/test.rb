@@ -21,7 +21,7 @@ group :test do
   gem 'rubocop-rspec', require: false
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
 
-  gem 'once-ler', '0.0.15'
+  gem 'once-ler', '0.0.16'
 
   gem 'sequel', '4.5.0', require: false
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
@@ -29,7 +29,7 @@ group :test do
     gem 'childprocess', '0.5.0', require: false
     gem 'websocket', '1.0.7', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
-  gem 'test_after_commit', '0.4.2'
+  gem 'test_after_commit', '1.1.0'
   gem 'testrailtagging', '~> 0.3.6.9', require: false
 
   gem 'webmock', '1.22.3', require: false

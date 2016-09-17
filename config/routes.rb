@@ -1297,6 +1297,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :conversations) do
       get 'conversations', action: :index, as: 'conversations'
       post 'conversations', action: :create
+      get 'conversations/deleted', action: :deleted_index, as: 'deleted_conversations'
       post 'conversations/mark_all_as_read', action: :mark_all_as_read
       get 'conversations/batches', action: :batches, as: 'conversations_batches'
       get 'conversations/unread_count', action: :unread_count
@@ -1645,6 +1646,15 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/live_assessments/:assessment_id/results", action: :create, as: "course_live_assessment_result_create"
     end
 
+    scope(controller: 'support_helpers/turnitin') do
+      get "support_helpers/turnitin/md5", action: :md5
+      get "support_helpers/turnitin/error2305", action: :error2305
+      get "support_helpers/turnitin/shard", action: :shard
+      get "support_helpers/turnitin/assignment", action: :assignment
+      get "support_helpers/turnitin/pending", action: :pending
+      get "support_helpers/turnitin/expired", action: :expired
+    end
+
     scope(controller: :outcome_groups_api) do
       %w(global account course).each do |context|
         prefix = (context == "global" ? context : "#{context}s/:#{context}_id")
@@ -1851,6 +1861,13 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :announcements_api) do
       get 'announcements', action: :index, as: :announcements
+    end
+
+    scope(controller: :rubrics_api) do
+      get 'accounts/:account_id/rubrics', action: :index, as: :account_rubrics
+      get 'accounts/:account_id/rubrics/:id', action: :show
+      get 'courses/:course_id/rubrics', action: :index, as: :course_rubrics
+      get 'courses/:course_id/rubrics/:id', action: :show
     end
   end
 

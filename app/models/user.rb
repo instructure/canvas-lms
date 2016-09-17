@@ -2145,15 +2145,12 @@ class User < ActiveRecord::Base
     end
   end
 
-  # don't instantiate a buttload of objects if we can help it
-  def self.pluck_global_id_rows(relation)
-    rows = ActiveRecord::Base.connection.select_all(relation.to_sql)
-    rows.each do |row|
-      row.each do |k, id|
-        row[k] = Shard.relative_id_for(id, Shard.current, Shard.birth)
+  def self.convert_global_id_rows(rows)
+    rows.map do |row|
+      row.map do |id|
+        Shard.relative_id_for(id, Shard.current, Shard.birth)
       end
     end
-    rows
   end
 
   def self.preload_conversation_context_codes(users)
@@ -2169,37 +2166,34 @@ class User < ActiveRecord::Base
     concluded_contexts = {}
 
     Shard.with_each_shard(shards.to_a) do
-      course_rows = pluck_global_id_rows(
+      course_rows = convert_global_id_rows(
           Enrollment.joins(:course).
               where(User.enrollment_conditions(:active)).
               where(user_id: users).
-              select([:user_id, :course_id]).
-              uniq)
-      course_rows.each do |r|
-        active_contexts[r['user_id']] ||= []
-        active_contexts[r['user_id']] << "course_#{r['course_id']}"
+              distinct.pluck(:user_id, :course_id))
+      course_rows.each do |user_id, course_id|
+        active_contexts[user_id] ||= []
+        active_contexts[user_id] << "course_#{course_id}"
       end
 
-      cc_rows = pluck_global_id_rows(
+      cc_rows = convert_global_id_rows(
           Enrollment.joins(:course).
               where(User.enrollment_conditions(:completed)).
               where(user_id: users).
-              select([:user_id, :course_id]).
-              uniq)
-      cc_rows.each do |r|
-        concluded_contexts[r['user_id']] ||= []
-        concluded_contexts[r['user_id']] << "course_#{r['course_id']}"
+              distinct.pluck(:user_id, :course_id))
+      cc_rows.each do |user_id, course_id|
+        concluded_contexts[user_id] ||= []
+        concluded_contexts[user_id] << "course_#{course_id}"
       end
 
-      group_rows = pluck_global_id_rows(
+      group_rows = convert_global_id_rows(
           GroupMembership.joins(:group).
               merge(User.instance_exec(&User.reflections[CANVAS_RAILS4_0 ? :current_group_memberships : 'current_group_memberships'].scope).only(:where)).
               where(user_id: users).
-              select([:user_id, :group_id]).
-              uniq)
-      group_rows.each do |r|
-        active_contexts[r['user_id']] ||= []
-        active_contexts[r['user_id']] << "group_#{r['group_id']}"
+              distinct.pluck(:user_id, :group_id))
+      group_rows.each do |user_id, group_id|
+        active_contexts[user_id] ||= []
+        active_contexts[user_id] << "group_#{group_id}"
       end
     end
     Shard.birth.activate do
@@ -2306,16 +2300,16 @@ class User < ActiveRecord::Base
 
   def roles(root_account)
     return @roles if @roles
-    @roles = ['user']
-    valid_types = %w[StudentEnrollment StudentViewEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment ObserverEnrollment]
+    @roles = Rails.cache.fetch(['user_roles_for_root_account', self, root_account].cache_key) do
+      roles = ['user']
 
-    # except where in order to include StudentViewEnrollment's
-    enrollment_types = root_account.all_enrollments.where(type: valid_types, user_id: self, workflow_state: 'active').uniq.pluck(:type)
-    @roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
-    @roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
-    @roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
-    @roles << 'admin' unless root_account.all_account_users_for(self).empty?
-    @roles
+      enrollment_types = root_account.all_enrollments.where(user_id: self, workflow_state: 'active').uniq.pluck(:type)
+      roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
+      roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
+      roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
+      roles << 'admin' unless root_account.all_account_users_for(self).empty?
+      roles
+    end
   end
 
   def eportfolios_enabled?
@@ -2327,6 +2321,10 @@ class User < ActiveRecord::Base
     users = ([self] + users).uniq(&:id)
     private = users.size <= 2 if private.nil?
     Conversation.initiate(users, private, options).conversation_participants.where(user_id: self).first
+  end
+
+  def address_book
+    @address_book ||= AddressBook.for(self)
   end
 
   def messageable_user_calculator
@@ -2835,7 +2833,7 @@ class User < ActiveRecord::Base
       else
         return @submissions_folder if @submissions_folder
         Folder.unique_constraint_retry do
-          self.folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: 'root')
+          @submissions_folder = self.folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: 'root')
             .first_or_create!(name: I18n.t('Submissions', locale: self.locale))
         end
       end

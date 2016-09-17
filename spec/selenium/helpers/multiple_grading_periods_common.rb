@@ -2,13 +2,14 @@ module MultipleGradingPeriods
   module AccountPage
     shared_context "account_page_components" do
       # Helpers
-      let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
-      let(:period_helper) { Factories::GradingPeriodHelper.new }
+      let(:backend_group_helper) { Factories::GradingPeriodGroupHelper.new }
+      let(:backend_period_helper) { Factories::GradingPeriodHelper.new }
 
       # Main page components
       let(:grading_periods_tab) { f("#grading-periods-tab") }
       let(:add_set_of_grading_periods_button) { f('button[aria-label="Add Set of Grading Periods"]') }
       let(:term_dropdown) { f('select[aria-label="Enrollment Term"]')}
+      let(:search_box) { f('.GradingPeriodSearchField input')}
 
       # Set components
       let(:set_name_input) { f('#set-name')}
@@ -21,7 +22,7 @@ module MultipleGradingPeriods
       let(:edit_grading_period_set_button) { f('.edit_grading_period_set_button')}
       let(:edit_set_save_button) { f('button[aria-label="Save Grading Period Set"]') }
       let(:first_collapsed_set) { f('.GradingPeriodSet--collapsed') }
-      let(:all_collapsed_set_titles_css) { '.GradingPeriodSet--collapsed .GradingPeriodSet__title' }
+      let(:all_sets_css) { '.GradingPeriodSet__title'}
 
 
       # Period components
@@ -29,10 +30,11 @@ module MultipleGradingPeriods
       let(:start_date_input) { f('input[data-row-key="start-date"]') }
       let(:end_date_input) { f('input[data-row-key="end-date"]') }
       let(:close_date_input) { f('input[data-row-key="close-date"]') }
-      let(:save_period_button) { f('button[aria-label="Save Grading Period"]')}
-      let(:first_period) { f('.GradingPeriodList__period span') }
-      let(:period_delete_button) { f('.GradingPeriodList .icon-trash')}
-      let(:period_edit_button) { f('.GradingPeriodList .icon-edit')}
+      let(:save_period_button) { f('button[aria-label="Save Grading Period"]') }
+      let(:grading_period_list) { f('.GradingPeriodList') }
+      let(:period_css) { '.GradingPeriodList__period span' }
+      let(:period_delete_button) { f('.GradingPeriodList .icon-trash') }
+      let(:period_edit_button) { f('.GradingPeriodList .icon-edit') }
     end
 
     def visit_account_grading_standards(account_id)
@@ -49,10 +51,6 @@ module MultipleGradingPeriods
     def attach_term_to_set(term)
       term_input.click
       hover_and_click("div:contains(#{term})")
-    end
-
-    def set_present?(title)
-      if set_title.present? then set_title.text == title end
     end
 
     def delete_first_grading_period_set(are_you_sure)
@@ -84,10 +82,6 @@ module MultipleGradingPeriods
       first_collapsed_set.click
     end
 
-    def period_present?(title)
-      first_period.text == title
-    end
-
     def edit_first_grading_period(title)
       expand_first_set
       period_edit_button.click
@@ -96,21 +90,49 @@ module MultipleGradingPeriods
     end
 
     def select_term_filter(term)
-      term_dropdown.click
-      options = ff('select[aria-label="Enrollment Term"] option')
-      options.each do |option|
-        if option.text == term then option.click end
-      end
+      click_option(".EnrollmentTerms__dropdown", term)
     end
 
     def all_collapsed_set_titles
       ff(all_collapsed_set_titles_css)
     end
 
+    def all_sets
+      ff(all_sets_css)
+    end
+
     def find_set(set_name)
-      all_collapsed_set_titles.each do |title|
+      all_sets.each do |title|
         if title.text == set_name then return title end
       end
+      return nil
+    end
+
+    def all_periods
+      ff(period_css)
+    end
+
+    def find_period(period_name)
+      all_periods.each do |period|
+        if period.text == period_name then return period end
+      end
+      return nil
+    end
+
+    def delete_first_grading_period(are_you_sure)
+      expand_first_set
+      period_delete_button.click
+      alert = driver.switch_to.alert
+      if are_you_sure
+        alert.accept
+      else
+        alert.dismiss
+      end
+    end
+
+    def search_grading_periods(search_term)
+      replace_content(search_box, search_term)
+      sleep 1 # InputFilter has a delay
     end
   end
 end

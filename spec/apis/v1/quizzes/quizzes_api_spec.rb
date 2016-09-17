@@ -455,6 +455,17 @@ describe Quizzes::QuizzesApiController, type: :request do
       api_update_quiz({'title' => 'old title'}, {'title' => 'new title'})
       expect(updated_quiz.title).to eq 'new title'
     end
+
+    it "allows quiz attribute \'only_visible_to_overrides\' to be updated to true with PUT request " do
+      api_update_quiz({'only_visible_to_overrides' => 'false'}, {'only_visible_to_overrides' => 'true'})
+      expect(updated_quiz.only_visible_to_overrides).to eq true
+    end
+
+    it "allows quiz attribute \'only_visible_to_overrides\' to be updated to false with PUT request " do
+      api_update_quiz({'only_visible_to_overrides' => 'true'}, {'only_visible_to_overrides' => 'false'})
+      expect(updated_quiz.only_visible_to_overrides).to eq false
+    end
+
     context "jsonapi style request" do
 
       it "renders in a jsonapi style" do

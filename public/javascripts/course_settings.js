@@ -416,6 +416,43 @@ define([
       $("#reset_course_content_dialog").dialog('close');
     });
 
+    $("#course_custom_course_visibility").click(function(event) {
+      $("#customize_course_visibility").toggle(this.checked);
+    });
+
+    $("#course_custom_course_visibility").ready(function(event) {
+      if($("#course_custom_course_visibility")[0].checked) {
+        $("#customize_course_visibility").toggle(true);
+      } else {
+        $("#customize_course_visibility").toggle(false);
+      }
+    });
+
+    $("#course_course_visibility").change(function(event) {
+      var order = $(this).children();
+      var selected = $(this).find(":selected");
+      $.each($('#customize_course_visibility select'), function(i, sel){
+        $(sel).children('option').remove();
+        for(var i=$.inArray(selected[0], order), len=order.length; i < len; i++) {
+          $(order[i]).clone().appendTo($(sel));
+        }
+      });
+      $('#customize_course_visibility select').val($("#course_course_visibility").val())
+    });
+
+    $("#course_custom_course_visibility").ready(function(event) {
+      var order = $("#course_course_visibility").children();
+      var selected = $("#course_course_visibility").find(":selected");
+      var current = $('#customize_course_visibility select').find(":selected");
+      $.each($('#customize_course_visibility select'), function(i, sel){
+        $(sel).children('option').remove();
+        for(var i=$.inArray(selected[0], order), len=order.length; i < len; i++) {
+          $(order[i]).clone().appendTo($(sel));
+        }
+      });
+      $('#customize_course_visibility select').val($(current).val())
+    });
+
     $.scrollSidebar();
   });
 });

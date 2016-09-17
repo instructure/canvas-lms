@@ -27,7 +27,6 @@ class Conversation < ActiveRecord::Base
 
   validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
-  # see also MessageableUser
   def participants(reload = false)
     if !@participants || reload
       Conversation.preload_participants([self])
@@ -305,9 +304,8 @@ class Conversation < ActiveRecord::Base
   end
 
   def preload_users_and_context_codes
-    users = User.select([:id, :updated_at]).where(:id => conversation_participants.map(&:user_id)).map do |u|
-      u = User.send(:instantiate, 'id' => u.id, 'updated_at' => u.updated_at) if u.shard != Shard.current
-      u
+    users = User.where(:id => conversation_participants.map(&:user_id)).pluck(:id, :updated_at).map do |id, updated_at|
+      User.send(:instantiate, 'id' => id, 'updated_at' => updated_at)
     end
     User.preload_conversation_context_codes(users)
     users = users.index_by(&:id)
@@ -327,7 +325,7 @@ class Conversation < ActiveRecord::Base
   # * <tt>:tags</tt> - Array of tags for the message data.
   def add_message_to_participants(message, options = {})
     unless options[:new_message]
-      skip_users = message.conversation_message_participants.active.select(:user_id).to_a
+      skip_user_ids = message.conversation_message_participants.active.pluck(:user_id)
     end
 
     self.conversation_participants.shard(self).activate do |cps|
@@ -336,7 +334,7 @@ class Conversation < ActiveRecord::Base
       cps = cps.visible if options[:only_existing]
 
       unless options[:new_message]
-        cps = cps.where("user_id NOT IN (?)", skip_users.map(&:user_id)) if skip_users.present?
+        cps = cps.where("user_id NOT IN (?)", skip_user_ids) if skip_user_ids.present?
       end
 
       cps = cps.where(:user_id => (options[:only_users]+[message.author]).map(&:id)) if options[:only_users]
@@ -649,10 +647,11 @@ class Conversation < ActiveRecord::Base
     shards = conversations.map(&:associated_shards).flatten.uniq
     Shard.with_each_shard(shards) do
       user_map = Shackles.activate(:slave) do
-        MessageableUser.select("#{MessageableUser.build_select}, last_authored_at, conversation_id").
+        User.select("users.id, users.updated_at, users.short_name, users.name, users.avatar_image_url, users.avatar_image_source, last_authored_at, conversation_id").
           joins(:all_conversations).
           where(:conversation_participants => { :conversation_id => conversations }).
-          order(Conversation.nulls(:last, :last_authored_at, :desc), Conversation.best_unicode_collation_key("COALESCE(short_name, name)")).group_by { |mu| mu.conversation_id.to_i }
+          order(Conversation.nulls(:last, :last_authored_at, :desc), Conversation.best_unicode_collation_key("COALESCE(short_name, name)")).
+          group_by { |u| u.conversation_id.to_i }
       end
       conversations.each do |conversation|
         participants[conversation.global_id].concat(user_map[conversation.id] || [])

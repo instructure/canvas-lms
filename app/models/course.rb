@@ -74,6 +74,7 @@ class Course < ActiveRecord::Base
                   :hide_distribution_graphs,
                   :lock_all_announcements,
                   :public_syllabus,
+                  :public_syllabus_to_auth,
                   :course_format,
                   :time_zone,
                   :organize_epub_by_content_type
@@ -83,7 +84,9 @@ class Course < ActiveRecord::Base
     if read_attribute(:time_zone)
       super
     else
-      root_account.default_time_zone
+      RequestCache.cache("account_time_zone", self.root_account_id) do
+        root_account.default_time_zone
+      end
     end
   end
 
@@ -416,6 +419,60 @@ class Course < ActiveRecord::Base
       self.attachments.active.where(id: self.image_id).first.download_url rescue nil
     elsif self.image_url
       self.image_url
+    end
+  end
+
+  def course_visibility_options
+    ActiveSupport::OrderedHash[
+        'course',
+        {
+            :setting => t('course', 'Course')
+        },
+        'institution',
+        {
+            :setting => t('institution', 'Institution')
+        },
+        'public',
+        {
+            :setting => t('public', 'Public')
+        }
+      ]
+  end
+
+  def custom_course_visibility
+    if public_syllabus == is_public && is_public_to_auth_users == public_syllabus_to_auth
+      return false
+    else
+      return true
+    end
+  end
+
+  def customize_course_visibility_list
+    ActiveSupport::OrderedHash[
+        'syllabus',
+        {
+            :setting => t('syllabus', 'Syllabus')
+        }
+      ]
+  end
+
+  def syllabus_visibility_option
+    if public_syllabus == true
+      'public'
+    elsif public_syllabus_to_auth == true
+      'institution'
+    else
+      'course'
+    end
+  end
+
+  def course_visibility
+    if is_public == true
+      'public'
+    elsif is_public_to_auth_users == true
+      'institution'
+    else
+      'course'
     end
   end
 
@@ -1156,7 +1213,7 @@ class Course < ActiveRecord::Base
     given { |user, session| self.available? && (self.is_public || (self.is_public_to_auth_users && session.present? && session.has_key?(:user_id)))  }
     can :read and can :read_outcomes and can :read_syllabus
 
-    given { |user| self.available? && self.public_syllabus }
+    given { |user, session| self.available? && (self.public_syllabus || (self.public_syllabus_to_auth && session.present? && session.has_key?(:user_id)))}
     can :read_syllabus
 
     RoleOverride.permissions.each do |permission, details|
@@ -1297,7 +1354,7 @@ class Course < ActiveRecord::Base
     is_unpublished = self.created? || self.claimed?
     @enrollment_lookup ||= {}
     @enrollment_lookup[user.id] ||= shard.activate do
-      self.enrollments.active_or_pending.for_user(user).preload(:enrollment_state).
+      self.enrollments.active_or_pending.for_user(user).except(:preload).preload(:enrollment_state).
         reject { |e| (is_unpublished && !(e.admin? || e.fake_student?)) || [:inactive, :completed].include?(e.state_based_on_date)}
     end
 
@@ -1344,6 +1401,10 @@ class Course < ActiveRecord::Base
     result = @account_chain.dup
     Account.add_site_admin_to_chain!(result) if include_site_admin
     result
+  end
+
+  def account_chain_ids
+    @account_chain_ids ||= Account.account_chain_ids(account_id)
   end
 
   def institution_name
@@ -2051,7 +2112,7 @@ class Course < ActiveRecord::Base
 
   def self.clonable_attributes
     [ :group_weighting_scheme, :grading_standard_id, :is_public, :public_syllabus,
-      :allow_student_wiki_edits, :show_public_context_messages,
+      :public_syllabus_to_auth, :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments, :lock_all_announcements,
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_total_grade_as_points,
@@ -2095,27 +2156,28 @@ class Course < ActiveRecord::Base
   def self.serialization_excludes; [:uuid]; end
 
 
+  ADMIN_TYPES = %w{TeacherEnrollment TaEnrollment DesignerEnrollment}
   def section_visibilities_for(user, opts={})
-    RequestCache.cache('section_visibilities_for', user, self) do
+    RequestCache.cache('section_visibilities_for', user, self, opts) do
       shard.activate do
-        Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
+        Rails.cache.fetch(['section_visibilities_for', user, self, opts].cache_key) do
           workflow_not = opts[:excluded_workflows] || 'deleted'
 
-          enrollments = Enrollment.select([
-            :course_section_id,
-            :limit_privileges_to_course_section,
-            :type,
-            :associated_user_id])
-            .where("user_id=? AND course_id=?", user, self)
-            .where.not(workflow_state: workflow_not)
+          enrollment_rows = Enrollment.where("user_id=? AND course_id=?", user, self).
+            where.not(workflow_state: workflow_not).
+            pluck(
+              :course_section_id,
+              :limit_privileges_to_course_section,
+              :type,
+              :associated_user_id)
 
-          enrollments.map do |e|
+          enrollment_rows.map do |section_id, limit_privileges, type, associated_user_id|
             {
-              :course_section_id => e.course_section_id,
-              :limit_privileges_to_course_section => e.limit_privileges_to_course_section,
-              :type => e.type,
-              :associated_user_id => e.associated_user_id,
-              :admin => e.admin?
+              :course_section_id => section_id,
+              :limit_privileges_to_course_section => limit_privileges,
+              :type => type,
+              :associated_user_id => associated_user_id,
+              :admin => ADMIN_TYPES.include?(type)
             }
           end
         end
@@ -2403,7 +2465,7 @@ class Course < ActiveRecord::Base
 
   def external_tool_tabs(opts)
     tools = self.context_external_tools.active.having_setting('course_navigation')
-    tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain).to_a
+    tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain_ids).to_a
     Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
   end
 
@@ -2609,6 +2671,7 @@ class Course < ActiveRecord::Base
   add_setting :lock_all_announcements, :boolean => true, :default => false
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
+  add_setting :public_syllabus_to_auth, :boolean => true, :default => false
   add_setting :course_format
   add_setting :image_id
   add_setting :image_url

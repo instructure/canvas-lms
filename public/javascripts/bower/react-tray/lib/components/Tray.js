@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import TrayPortal from './TrayPortal';
+import { a11yFunction } from '../helpers/customPropTypes';
 const renderSubtreeIntoContainer = ReactDOM.unstable_renderSubtreeIntoContainer;
 
 export default React.createClass({
@@ -9,15 +10,20 @@ export default React.createClass({
   propTypes: {
     isOpen: React.PropTypes.bool,
     onBlur: React.PropTypes.func,
+    onOpen: React.PropTypes.func,
     closeTimeoutMS: React.PropTypes.number,
-    closeOnBlur: React.PropTypes.bool
+    closeOnBlur: React.PropTypes.bool,
+    maintainFocus: React.PropTypes.bool,
+    getElementToFocus: a11yFunction,
+    getAriaHideElement: a11yFunction
   },
 
   getDefaultProps() {
     return {
       isOpen: false,
       closeTimeoutMS: 0,
-      closeOnBlur: true
+      closeOnBlur: true,
+      maintainFocus: true
     };
   },
 

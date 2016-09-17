@@ -3,6 +3,28 @@ define [
   'underscore'
 ], (SpeedgraderHelpers, _)->
 
+  module "SpeedgraderHelpers#buildIframe",
+    setup: ->
+      @buildIframe = SpeedgraderHelpers.buildIframe
+
+  test "sets src to given src", ->
+    expected = '<iframe id="speedgrader_iframe" src="some/url?with=query"></iframe>'
+    equal @buildIframe("some/url?with=query"), expected
+
+  test "applies options as tag attrs", ->
+    expected = '<iframe id="speedgrader_iframe" src="path" frameborder="0"></iframe>'
+    options = {
+      frameborder: 0
+    }
+    equal @buildIframe("path", options), expected
+
+  test "applies className options as class", ->
+    expected = '<iframe id="speedgrader_iframe" src="path" class="test"></iframe>'
+    options = {
+      className: "test"
+    }
+    equal @buildIframe("path", options), expected
+
   module "SpeedgraderHelpers#determineGradeToSubmit",
     setup: ->
       @determineGrade = SpeedgraderHelpers.determineGradeToSubmit

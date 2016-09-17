@@ -230,7 +230,16 @@ class ContextModuleItemsApiController < ApplicationController
       scope = ContentTag.search_by_attribute(scope, :title, params[:search_term])
       items = Api.paginate(scope, self, route)
       prog = @student ? mod.evaluate_for(@student) : nil
-      render :json => items.map { |item| module_item_json(item, @student || @current_user, session, mod, prog, Array(params[:include])) }
+      includes = Array(params[:include])
+      opts = {}
+
+      # Get conditionally released objects if requested
+      # TODO: Document in API when out of beta
+      if includes.include?("mastery_paths")
+        opts[:conditional_release_rules] = ConditionalRelease::Service.rules_for(@context, @student, items, session)
+      end
+
+      render :json => items.map { |item| module_item_json(item, @student || @current_user, session, mod, prog, includes, opts) }
     end
   end
 

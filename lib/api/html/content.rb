@@ -100,6 +100,12 @@ module Api
           @account.effective_brand_config
 
         overrides = @account.effective_brand_config.css_and_js_overrides
+        self.class.add_overrides_to_html(parsed_html, overrides)
+
+        parsed_html
+      end
+
+      def self.add_overrides_to_html(parsed_html, overrides)
         if (mobile_css_overrides = overrides[:mobile_css_overrides])
           mobile_css_overrides.reverse_each do |url|
             tag = parsed_html.document.create_element('link', rel: 'stylesheet', href: url)
@@ -112,7 +118,6 @@ module Api
             parsed_html.add_child(tag)
           end
         end
-        parsed_html
       end
 
       private

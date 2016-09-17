@@ -34,7 +34,7 @@
                 </div>
             <% end %>          </th>
           <td class='account'>
-            <%= link_to(pseudonym ? pseudonym.account.name : nbsp, account_url(pseudonym ? pseudonym.account_id : "{{ account_id }}"), :class => 'account_name') %>
+            <%= link_to(pseudonym ? pseudonym.account.name : nbsp, account_url(pseudonym ? pseudonym.account : "{{ account_id }}"), :class => 'account_name') %>
           </td>
           <td class='details'>
             <table class="ic-Table--condensed">

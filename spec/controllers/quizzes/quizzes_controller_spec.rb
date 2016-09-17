@@ -485,6 +485,29 @@ describe Quizzes::QuizzesController do
       assert_unauthorized
     end
 
+    context 'student_filters' do
+      before do
+        user_session(@teacher)
+        5.times.map do |i|
+          name = "#{(i + 'a'.ord).chr}_student"
+          course_with_student(name: name, course: @course)
+          @student
+        end
+      end
+
+      it "should sort students" do
+        get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
+        expect(assigns[:students] - assigns[:students].sort_by(&:sortable_name)).to eq []
+      end
+
+      it "should filter students" do
+        get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id, :search_term => 'a'
+
+        expect(assigns[:students].count).to eq 1
+        expect(assigns[:students].first.sortable_name).to eq 'a_student'
+      end
+    end
+
     it "should assign variables" do
       user_session(@teacher)
       sub = @quiz.generate_submission(@student)

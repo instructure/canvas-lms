@@ -332,6 +332,7 @@ class Attachment < ActiveRecord::Base
     application/msword
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
     application/pdf
+    application/vnd.oasis.opendocument.text
     text/plain
     text/html
     application/rtf
@@ -460,9 +461,9 @@ class Attachment < ActiveRecord::Base
     write_attribute(:namespace, new_namespace)
 
     self.store.change_namespace(old_full_filename)
-    self.save
-
-    Attachment.where(:root_attachment_id => self).update_all(:namespace => new_namespace)
+    shard.activate do
+      Attachment.where("id=? OR root_attachment_id=?", self, self).update_all(namespace: new_namespace)
+    end
   end
 
   def process_s3_details!(details)

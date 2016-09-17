@@ -37,14 +37,14 @@ describe "/context_modules/index" do
   it "should show content_tags" do
     course
     context_module = @course.context_modules.create!
-    content_tag = context_module.add_item :type => 'context_module_sub_header'
-    content_tag.publish! if content_tag.unpublished?
+    module_item = context_module.add_item :type => 'context_module_sub_header'
+    module_item.publish! if module_item.unpublished?
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
     render 'context_modules/index'
     expect(response).not_to be_nil
     page = Nokogiri('<document>' + response.body + '</document>')
-    expect(page.css("#context_module_item_#{content_tag.id}").length).to eq 1
+    expect(page.css("#context_module_item_#{module_item.id}").length).to eq 1
   end
 
   it "should show unpublished content_tags" do
@@ -54,8 +54,8 @@ describe "/context_modules/index" do
     wiki_page.save!
 
     context_module = @course.context_modules.create!
-    content_tag = context_module.add_item(:type => 'wiki_page', :id => wiki_page.id)
-    expect(content_tag.workflow_state).to eq 'unpublished'
+    module_item = context_module.add_item(:type => 'wiki_page', :id => wiki_page.id)
+    expect(module_item.workflow_state).to eq 'unpublished'
 
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
@@ -63,19 +63,19 @@ describe "/context_modules/index" do
 
     expect(response).not_to be_nil
     page = Nokogiri('<document>' + response.body + '</document>')
-    expect(page.css("#context_module_item_#{content_tag.id}").length).to eq 1
+    expect(page.css("#context_module_item_#{module_item.id}").length).to eq 1
   end
 
   it "should not show deleted content_tags" do
     course
     context_module = @course.context_modules.create!
-    content_tag = context_module.add_item :type => 'context_module_sub_header'
-    content_tag.destroy
+    module_item = context_module.add_item :type => 'context_module_sub_header'
+    module_item.destroy
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
     render 'context_modules/index'
     expect(response).not_to be_nil
     page = Nokogiri('<document>' + response.body + '</document>')
-    expect(page.css("#context_module_item_#{content_tag.id}").length).to eq 0
+    expect(page.css("#context_module_item_#{module_item.id}").length).to eq 0
   end
 end

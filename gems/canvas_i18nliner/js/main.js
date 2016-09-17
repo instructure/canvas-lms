@@ -1,13 +1,11 @@
-var I18nliner = require("i18nliner")["default"];
+var I18nliner = require("i18nliner");
 var Commands = I18nliner.Commands;
 var Check = Commands.Check;
 
-// it auto-registers its processor
-var I18nlinerHbs = require("i18nliner-handlebars");
 
-var JsProcessor = require("i18nliner/dist/lib/processors/js_processor")["default"];
-var HbsProcessor = require("i18nliner-handlebars/dist/lib/hbs_processor")["default"];
-var CallHelpers = require("i18nliner/dist/lib/call_helpers")["default"];
+var JsProcessor = require("i18nliner/dist/lib/processors/js_processor");
+var HbsProcessor = require("i18nliner-handlebars/dist/lib/hbs_processor");
+var CallHelpers = require("i18nliner/dist/lib/call_helpers");
 
 var glob = require("glob");
 

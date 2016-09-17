@@ -44,6 +44,7 @@ describe "conversations index page" do
 
     it "should select all conversations", priority: "1", test_id: 201462 do
       conversations
+      f('#content').click # Ensures focus is in the window and not on the address bar
       driver.action.key_down(modifier)
         .send_keys('a')
         .key_up(modifier)

@@ -1775,6 +1775,46 @@ describe CoursesController do
     end
   end
 
+  context "visibility_configuration" do
+    let(:controller) { CoursesController.new }
+
+    before do
+      controller.instance_variable_set(:@course, Course.new)
+    end
+
+    it "should allow setting course visibility with flag" do
+
+      controller.visibility_configuration({:course_visibility => 'public'})
+      course = controller.instance_variable_get(:@course)
+
+      expect(course.is_public).to eq true
+
+      controller.visibility_configuration({:course_visibility => 'institution'})
+      expect(course.is_public).to eq false
+      expect(course.is_public_to_auth_users).to eq true
+
+      controller.visibility_configuration({:course_visibility => 'course'})
+      expect(course.is_public).to eq false
+      expect(course.is_public).to eq false
+    end
+
+    it "should allow setting syllabus visibility with flag" do
+      controller.visibility_configuration({:course_visibility => 'course', :syllabus_visibility_option => 'public'})
+      course = controller.instance_variable_get(:@course)
+
+      expect(course.public_syllabus).to eq true
+
+      controller.visibility_configuration({:course_visibility => 'course', :syllabus_visibility_option => 'institution'})
+      expect(course.public_syllabus).to eq false
+      expect(course.public_syllabus_to_auth).to eq true
+
+      controller.visibility_configuration({:course_visibility => 'course', :syllabus_visibility_option => 'course'})
+      expect(course.public_syllabus).to eq false
+      expect(course.public_syllabus_to_auth).to eq false
+    end
+
+  end
+
   context "changed_settings" do
     let(:controller) { CoursesController.new }
 
