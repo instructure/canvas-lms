@@ -1,4 +1,5 @@
 group :test do
+  gem 'gergich', '0.1.5', require: false
   gem 'testingbot', require: false
   gem 'simplecov', '0.9.2', require: false
     gem 'docile', '1.1.3', require: false
