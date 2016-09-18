@@ -1,0 +1,5 @@
+require_relative 'dr_diff/command_capture'
+require_relative 'dr_diff/diff_parser'
+require_relative 'dr_diff/git_proxy'
+require_relative 'dr_diff/manager'
+require_relative 'dr_diff/user_config'

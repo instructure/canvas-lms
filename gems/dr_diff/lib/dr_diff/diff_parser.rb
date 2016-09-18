@@ -1,8 +1,5 @@
-require_relative './user_config'
-
-module RuboCop::Canvas
+module DrDiff
   class DiffParser
-
     attr_reader :diff
 
     def initialize(input, raw = true)
@@ -83,7 +80,7 @@ module RuboCop::Canvas
 
     def range_from_file_line(line)
       line_plus_size = line.split(/\s/)[2].split(",")
-      start = line_plus_size[0].gsub("+",'').to_i
+      start = line_plus_size[0].delete("+").to_i
       (start..(start + line_plus_size[1].to_i))
     end
   end
