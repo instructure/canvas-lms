@@ -1964,7 +1964,7 @@ class User < ActiveRecord::Base
     section_codes = self.section_context_codes(context_codes, filter_after_db)
     limit = filter_after_db ? opts[:limit] * 2 : opts[:limit] # pull extra events just in case
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes, section_codes).
-      between(now, opts[:end_at]).limit(limit).to_a.reject(&:hidden?)
+      between(now, opts[:end_at]).limit(limit).order(:start_at).to_a.reject(&:hidden?)
 
     if filter_after_db
       original_count = events.count
