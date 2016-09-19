@@ -1688,7 +1688,7 @@ nn:
     errors: 
       frozen_assignments_error: "Du kan ikkje slette ei gruppe som inneheld ei låst oppgåve."
   assignment_menu_91fe3716: Oppgåvemeny
-  assignment_muted_4cb590a4: "Oppgåve er dempa"
+  assignment_muted_4cb590a4: "Oppgåvene er skjulte"
   assignment_muter: 
     mute_assignment: "Skjul oppgåve"
     muting_assignment: "Skjuler oppgåve ..."
@@ -6484,7 +6484,7 @@ nn:
     column_header: 
       assignment_options: Oppgåvealternativ
       points_out_of: "Av %{assignment.points_possible}"
-      this_assignment_is_muted: "Denne oppgåva er dempa"
+      this_assignment_is_muted: "Denne oppgåva er skjult"
       zero_point_assignment: "Oppgåver i denne gruppa har ikkje moglege poeng og kan ikkje inkluderast i karakterutrekninga"
     concluded_course_error_message: "Dette er eit avslutta kurs og difor er berre avslutta påmeldingar tilgjengelege."
     course_average: Kursgjennomsnitt
@@ -6639,7 +6639,7 @@ nn:
       submission_failed: "Innlevering lukkast ikkje: %{error}"
       submission_failed_default: "Innlevering mislukkast"
     grade: 
-      muted: Dempa
+      muted: Skjult
     grade_summary: 
       assignments: Oppgåver
       change_score_instructions: "Klikk på eit resultat og oppgi ein ny verdi for å sjå korleis endringa verkar inn på totalresultatet."
@@ -8695,8 +8695,8 @@ nn:
         html: 
           body: "Faglæraren din har kunngjort karakterendringar og nye kommentarar for %{title}. Du kan sjå endringane."
           link: "Du ser det her"
-          subject: "Oppgåva er ikkje dempa: %{title}, %{course}"
-        subject: "Oppgåva er ikkje dempa: %{title}, %{course}"
+          subject: "Oppgåva er ikkje skjult: %{title}, %{course}"
+        subject: "Oppgåva er ikkje skjult: %{title}, %{course}"
       sms: 
         body: |-
             Faglæraren din har kunngjort karakterar og kommentarar for %{title}, %{course}."
