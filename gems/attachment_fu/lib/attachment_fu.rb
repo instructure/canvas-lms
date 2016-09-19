@@ -387,11 +387,13 @@ module AttachmentFu # :nodoc:
 
     def find_existing_attachment_for_md5
       self.shard.activate do
-        if self.md5.present? && ns = self.infer_namespace
-          scope = Attachment.where(:md5 => md5, :namespace => ns, :root_attachment_id => nil, :content_type => content_type)
-          scope = scope.where("filename IS NOT NULL")
-          scope = scope.where("id<>?", self) unless new_record?
-          scope.detect { |a| a.store.exists? }
+        Shackles.activate(:slave) do
+          if self.md5.present? && (ns = self.infer_namespace)
+            scope = Attachment.where(md5: md5, namespace: ns, root_attachment_id: nil, content_type: content_type)
+            scope = scope.where("filename IS NOT NULL")
+            scope = scope.where("id<>?", self) unless new_record?
+            scope.detect { |a| a.store.exists? }
+          end
         end
       end
     end
