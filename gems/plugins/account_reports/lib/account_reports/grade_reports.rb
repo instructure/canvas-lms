@@ -212,9 +212,9 @@ module AccountReports
                 row[column] = row_grades[:final][:grade]
               end
             end
-
-            rows.each { |r| report_csv << r }
           end
+
+          rows.each { |r| report_csv << r }
         end
       end
     end
