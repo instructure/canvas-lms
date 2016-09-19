@@ -10,18 +10,17 @@ define [
     window.ENV ||= {}
     window.ENV.active_brand_config = "brand_config_id"
     window.ENV.ASSET_HOST = 'http://cdn.example.com'
-    window.ENV.use_new_styles = true
     window.ENV.use_high_contrast = true
 
   module 'brandableCss.loadStylesheet'
   test 'should load correctly', ->
     brandableCss.loadStylesheet(testBundleId, {combinedChecksum: testFingerprint})
-    expectedHref = "#{window.ENV.ASSET_HOST || ''}/dist/brandable_css/legacy_normal_contrast/#{testBundleId}-#{testFingerprint}.css"
+    expectedHref = "#{window.ENV.ASSET_HOST || ''}/dist/brandable_css/new_styles_normal_contrast/#{testBundleId}-#{testFingerprint}.css"
     equal $('head link[rel="stylesheet"]:last').attr('href'), expectedHref
 
   module 'brandableCss.getCssVariant'
-  test 'should be legacy_normal_contrast by default', ->
-    equal brandableCss.getCssVariant(), 'legacy_normal_contrast'
+  test 'should be new_styles_normal_contrast by default', ->
+    equal brandableCss.getCssVariant(), 'new_styles_normal_contrast'
 
   test 'should pick up ENV settings', ->
     stubENV()
@@ -30,7 +29,7 @@ define [
   module 'brandableCss.urlFor'
   test 'should have right default', ->
     window.ENV = {}
-    expected = "/dist/brandable_css/legacy_normal_contrast/#{testBundleId}-#{testFingerprint}.css"
+    expected = "/dist/brandable_css/new_styles_normal_contrast/#{testBundleId}-#{testFingerprint}.css"
     equal brandableCss.urlFor(testBundleId, {combinedChecksum: testFingerprint}), expected
 
   test 'should handle no_variables correctly', ->

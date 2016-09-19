@@ -3,7 +3,8 @@ define([
   'react',
   'react-dom',
   'react-modal',
-  'i18n!conditional_release'
+  'i18n!conditional_release',
+  'jquery.instructure_forms'
 ], function($, React, ReactDOM, Modal, I18n) {
 
   const SAVE_TIMEOUT = 15000
@@ -40,17 +41,34 @@ define([
     getInitialState() {
       return {
         messagePort: null,
-        validationError: null,
+        validationErrors: null,
         saveInProgress: null
       };
     },
 
-    setValidationError(err) {
-      this.setState({ validationError: err });
+    setValidationErrors(err) {
+      this.setState({ validationErrors: JSON.parse(err) });
     },
 
     validateBeforeSave() {
-      return this.state.validationError;
+      const errors = []
+      if (this.state.validationErrors) {
+
+        this.state.validationErrors.forEach((errorRecord) => {
+          $.screenReaderFlashError(I18n.t('%{error} in mastery paths range %{index}', {
+            error: errorRecord.error,
+            index: errorRecord.index + 1 }))
+          errors.push({ message: errorRecord.error })
+        })
+      }
+      return errors.length == 0 ? null : errors;
+    },
+
+    focusOnError() {
+      if (this.refs.iframe && this.refs.iframe.contentWindow) {
+        this.refs.iframe.contentWindow.focus()
+      }
+      this.postMessage('focusOnError')
     },
 
     updateAssignment(newAttributes = {}) {
@@ -164,8 +182,8 @@ define([
         case 'saveError':
           this.saveError(this.state.saveInProgress, messageEvent.data.messageBody);
           break;
-        case 'validationError':
-          this.setValidationError(messageEvent.data.messageBody);
+        case 'validationErrors':
+          this.setValidationErrors(messageEvent.data.messageBody);
           break;
         }
       }

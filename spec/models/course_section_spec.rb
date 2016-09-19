@@ -385,4 +385,38 @@ describe CourseSection, "moving to new course" do
       end
     end
   end
+
+  context 'enrollment state invalidation' do
+    before :once do
+      course(:active_all => true)
+      @section = @course.course_sections.create!
+      @enrollment = @course.enroll_student(user(:active_all => true), :section => @section)
+    end
+
+    it "should not invalidate unless something date-related changes" do
+      EnrollmentState.expects(:update_enrollment).never
+      @section.name = "durp"
+      @section.save!
+    end
+
+    it "should not invalidate if dates change if it isn't restricted to dates yet" do
+      EnrollmentState.expects(:update_enrollment).never
+      @section.start_at = 1.day.from_now
+      @section.save!
+    end
+
+    it "should invalidate if dates change and section is restricted to dates" do
+      @section.restrict_enrollments_to_section_dates = true
+      @section.save!
+      EnrollmentState.expects(:update_enrollment).with(@enrollment).once
+      @section.start_at = 1.day.from_now
+      @section.save!
+    end
+
+    it "should invalidate if course" do
+      other_course = course(:active_all => true)
+      EnrollmentState.expects(:update_enrollment).with(@enrollment).once
+      @section.crosslist_to_course(other_course)
+    end
+  end
 end

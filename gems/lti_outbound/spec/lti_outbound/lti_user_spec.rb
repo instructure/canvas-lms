@@ -29,9 +29,11 @@ describe LtiOutbound::LTIUser do
   it_behaves_like 'it has a proc attribute setter and getter for', :current_roles
   it_behaves_like 'it has a proc attribute setter and getter for', :concluded_roles
   it_behaves_like 'it has a proc attribute setter and getter for', :currently_active_in_course
+  it_behaves_like 'it has a proc attribute setter and getter for', :current_observee_ids
 
   let(:teacher_role) { LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR }
   let(:learner_role) { LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER }
+  let(:observer_role) { LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER.split(',').last }
 
   describe '#current_role_types' do
     it 'provides a string representation of current roles' do
@@ -79,9 +81,23 @@ describe LtiOutbound::LTIUser do
       expect(LtiOutbound::LTIUser::INACTIVE_STATE).to eq 'inactive'
     end
   end
-  
+
+  describe '#observer?' do
+    it 'returns true when current roles includes observer role' do
+      subject.current_roles = [learner_role, observer_role]
+
+      expect(subject.observer?).to eq true
+    end
+
+    it 'returns false when current roles do not include observer role' do
+      subject.current_roles = [teacher_role]
+
+      expect(subject.observer?).to eq false
+    end
+  end
+
   describe '#learner?' do
-    it 'returns false when current roles includes learner role' do
+    it 'returns true when current roles includes learner role' do
       subject.current_roles = [teacher_role, learner_role]
 
       expect(subject.learner?).to eq true

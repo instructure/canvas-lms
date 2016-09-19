@@ -17,16 +17,16 @@ define [
     key.last_auth = $.datetimeString(key.last_auth_at)
     key.last_access = $.datetimeString(key.last_access_at)
     key.inactive = key.workflow_state == 'inactive'
-    $key = $(developer_key(key));
+    $key = $(developer_key(key))
     $key.data('key', key)
 
   buildForm = (key, $orig) ->
     key = key || {}
 
-    if !key.id && isAccountAdminLevel()
+    if !key.id
       key._formAction = accountEndpoint()
     else
-      key._formAction = siteAdminEndpoint()
+      key._formAction = rawEndpoint()
 
     $form = $(developerKeyFormTemplate(key))
     $form.formSubmit({
@@ -46,32 +46,22 @@ define [
     return $form
 
   sendEvent = (event, $orig) ->
-    $.ajaxJSON(siteAdminEndpoint() + '/' + $orig.data('key').id, 'PUT', { developer_key: { event: event }},
+    $.ajaxJSON(rawEndpoint() + '/' + $orig.data('key').id, 'PUT', { developer_key: { event: event }},
       (data) ->
         $key = buildKey(data)
         $orig.after($key).remove()
     )
 
-  siteAdminEndpoint = ->
+  rawEndpoint = ->
     return '/api/v1/developer_keys'
 
   accountEndpoint = ->
-    return "/api/v1/accounts/self/developer_keys"
-
-  isAccountAdminLevel = ->
-    return window.location.pathname.indexOf('/accounts') == 0
-
-  apiEndpoint = ->
-    if isAccountAdminLevel()
-      return accountEndpoint()
-
-    return siteAdminEndpoint()
-
+    return ENV.accountEndpoint
 
   nextPage = ->
     $("#loading").attr('class', 'loading')
     page++
-    req = $.ajaxJSON(apiEndpoint() + '?page=' + page, 'GET', {}, (data) ->
+    req = $.ajaxJSON(accountEndpoint() + '?page=' + page, 'GET', {}, (data) ->
       for key in data
         $key = buildKey(key)
         $("#keys tbody").append($key)
@@ -112,7 +102,7 @@ define [
   )
   $("#edit_dialog").html(developerKeyFormTemplate({})).dialog({
     autoOpen: false,
-    width: 350
+    width: 400
   }).on('click', '.cancel', () ->
     $("#edit_dialog").dialog('close')
   )

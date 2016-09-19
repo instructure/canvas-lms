@@ -30,8 +30,7 @@ We use jQuery UI button set
   margin-right: 7px;
   .ui-button {
     margin-left: 0;
-    @if $use_new_styles { margin-right: -5px; }
-    @else { margin-right: -4px; }
+    margin-right: -5px;
     border-radius: 0;
     &.ui-corner-right {
       border-top-right-radius: $baseBorderRadius;

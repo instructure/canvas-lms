@@ -35,6 +35,7 @@ module Lti
       user.concluded_roles = -> { concluded_roles() }
       user.login_id = -> { pseudonym ? pseudonym.unique_id : nil }
       user.sis_source_id = -> { pseudonym ? pseudonym.sis_user_id : nil }
+      user.current_observee_ids = -> { current_course_observee_lti_context_ids() }
 
       lti_helper = Lti::SubstitutionsHelper.new(@canvas_context, @canvas_root_account, @canvas_user)
       user.current_roles = lti_helper.current_lis_roles.split(',')
@@ -70,6 +71,16 @@ module Lti
       return [] unless @canvas_context.is_a?(Course)
 
       @current_course_enrollments ||= @canvas_user.enrollments.current.where(course_id: @canvas_context).preload(:enrollment_state).to_a
+    end
+
+    def current_course_observee_lti_context_ids
+      return [] unless @canvas_context.is_a?(Course)
+
+      @current_course_observee_lti_context_ids ||= @canvas_user.observer_enrollments
+                                                               .current
+                                                               .where(course_id: @canvas_context)
+                                                               .preload(:associated_user)
+                                                               .map { |e| e.try(:associated_user).try(:lti_context_id) }.compact
     end
 
     def current_account_enrollments()

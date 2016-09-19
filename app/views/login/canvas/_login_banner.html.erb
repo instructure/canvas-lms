@@ -6,7 +6,7 @@
               :PASSWORD_POLICY => @domain_root_account.password_policy %>
     <%= link_to '#',
           :id => 'coenrollment_link',
-          :class => (use_new_styles? ? "ic-Login__link ic-Login__register-banner" : "register_banner"),
+          :class =>  "ic-Login__link ic-Login__register-banner",
           data: reg_link_data(@domain_root_account.parent_auth_type)  do %>
       <div class="ic-Login__banner-title">
         <%= t('Parent of a Canvas User?') %>
@@ -18,7 +18,7 @@
   <% else %>
     <%= link_to Setting.get("registration_link", "/register_from_website"),
                 :id => 'register_link',
-                :class => (use_new_styles? ? "ic-Login__link ic-Login__register-banner" : "not_external register_banner") do %>
+                :class => "ic-Login__link ic-Login__register-banner" do %>
       <div class="ic-Login__banner-title">
         <%= t('Need a Canvas Account?') %>
       </div>

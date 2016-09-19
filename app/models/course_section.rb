@@ -211,6 +211,7 @@ class CourseSection < ActiveRecord::Base
       self.save!
       self.all_enrollments.update_all :course_id => course
     end
+    EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self)
     User.send_later_if_production(:update_account_associations, user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
       old_course.send_later_if_production(:update_account_associations) unless Course.skip_updating_account_associations?

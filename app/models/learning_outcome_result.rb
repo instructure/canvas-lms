@@ -124,7 +124,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     # but for scaling it's too imprecise and can lead to inaccurate calculations
     parent_outcome = self.learning_outcome
     return unless parent_outcome.try(:mastery_points)
-    parent_outcome.mastery_points / parent_outcome.points_possible
+    parent_outcome.mastery_points.to_f / parent_outcome.points_possible.to_f
   end
 
   def needs_scale?(scale_data)

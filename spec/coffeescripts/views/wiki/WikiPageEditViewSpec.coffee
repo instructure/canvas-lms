@@ -13,11 +13,9 @@ define [
   module 'WikiPageEditView:Init',
     setup: ->
       @initSpy = sinon.spy(RichContentEditor, 'initSidebar')
-      @scrollSidebarStub = sinon.stub(WikiPageEditView.prototype, 'scrollSidebar')
 
     teardown: ->
       RichContentEditor.initSidebar.restore()
-      WikiPageEditView.prototype.scrollSidebar.restore()
       editorUtils.resetRCE()
       $(window).off('beforeunload')
 
@@ -25,11 +23,6 @@ define [
     wikiPageEditView = new WikiPageEditView
     wikiPageEditView.render()
     ok @initSpy.calledOnce, 'Called richContentEditor.initSidebar once'
-
-  test 'scroll sidebar during render', ->
-    wikiPageEditView = new WikiPageEditView
-    wikiPageEditView.render()
-    ok @scrollSidebarStub.calledOnce, 'Called scrollSidebar once'
 
   test 'renders escaped angle brackets properly', ->
     body = "<p>&lt;E&gt;</p>"
@@ -50,11 +43,9 @@ define [
   module 'WikiPageEditView:ConditionalContent',
     setup: ->
       fakeENV.setup(CONDITIONAL_RELEASE_SERVICE_ENABLED: true)
-      sinon.stub(WikiPageEditView.prototype, 'scrollSidebar')
 
     teardown: ->
       fakeENV.teardown()
-      WikiPageEditView.prototype.scrollSidebar.restore()
 
   test 'conditional content option hidden for insufficient rights', ->
     view = new WikiPageEditView
@@ -110,11 +101,9 @@ define [
   module 'WikiPageEditView:UnsavedChanges',
     setup: ->
       fixtures.setup()
-      sinon.stub(WikiPageEditView.prototype, 'scrollSidebar')
 
     teardown: ->
       fixtures.teardown()
-      WikiPageEditView.prototype.scrollSidebar.restore()
       editorUtils.resetRCE()
       $(window).off('beforeunload')
 

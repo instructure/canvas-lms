@@ -19,14 +19,17 @@
 class DeveloperKeysController < ApplicationController
   before_filter :set_key, only: [:update, :destroy ]
   before_filter :require_manage_developer_keys
-  before_filter :set_navigation, :set_keys, :only => [:index]
+  before_filter :set_keys, only: [:index]
 
   include Api::V1::DeveloperKey
 
   def index
     @keys = Api.paginate(@keys, self, developer_keys_url)
     respond_to do |format|
-      format.html
+      format.html do
+        set_navigation
+        js_env(accountEndpoint: api_v1_account_developer_keys_path(@context))
+      end
       format.json { render :json => developer_keys_json(@keys, @current_user, session, account_context) }
     end
   end
@@ -68,10 +71,11 @@ class DeveloperKeysController < ApplicationController
   end
 
   def set_keys
-    if params[:account_id]
+    # this can be simplified once we remove the non-account index route
+    if params[:account_id] && @context != Account.site_admin
       @keys = @context.developer_keys.nondeleted.preload(:account).order("id DESC")
     else
-      set_site_admin_context
+      @context = Account.site_admin
       @keys = DeveloperKey.nondeleted.preload(:account).order("id DESC")
     end
   end

@@ -1,7 +1,8 @@
 define([], () => {
 
   const initialState = {
-    inFindAppointmentMode: false
+    inFindAppointmentMode: false,
+    selectedCourse: {}
   };
 
 

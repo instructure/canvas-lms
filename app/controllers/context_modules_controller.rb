@@ -41,9 +41,10 @@ class ContextModulesController < ApplicationController
     def modules_cache_key
       @modules_cache_key ||= begin
         visible_assignments = @current_user.try(:assignment_and_quiz_visibilities, @context)
-        cache_key_items = [@context.cache_key, @can_edit, 'all_context_modules_draft_8', collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
+        cache_key_items = [@context.cache_key, @can_edit, 'all_context_modules_draft_9', collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
         cache_key = cache_key_items.join('/')
         cache_key = add_menu_tools_to_cache_key(cache_key)
+        cache_key = add_mastery_paths_to_cache_key(cache_key, @context, @modules, @current_user)
       end
     end
 
@@ -54,6 +55,9 @@ class ContextModulesController < ApplicationController
       @can_edit = can_do(@context, @current_user, :manage_content)
 
       modules_cache_key
+
+      @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
+      @is_cyoe_on = ConditionalRelease::Service.enabled_in_context?(@context)
 
       @menu_tools = {}
       placements = [:assignment_menu, :discussion_topic_menu, :file_menu, :module_menu, :quiz_menu, :wiki_page_menu]
@@ -78,11 +82,62 @@ class ContextModulesController < ApplicationController
       log_asset_access([ "modules", @context ], "modules", "other")
       load_modules
 
-      if @context.grants_right?(@current_user, session, :participate_as_student)
-        return unless tab_enabled?(@context.class::TAB_MODULES)
+      if @is_student && tab_enabled?(@context.class::TAB_MODULES)
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end
+    end
+  end
+
+  def choose_mastery_path
+    if authorized_action(@context, @current_user, :participate_as_student)
+      id = params[:id]
+      item = @context.context_module_tags.not_deleted.find(params[:id])
+
+      if item.present? && item.published? && item.context_module.published?
+        rule = ConditionalRelease::Service.rules_for(@context, @current_user, item, session).try(:first)
+
+        # locked assignments always have 0 sets, so this check makes it not return 404 if locked
+        # but instead progress forward and return a warning message if is locked later on
+        if rule.present? && (rule[:locked] || rule[:assignment_sets].length > 1)
+          if !rule[:locked]
+            options = rule[:assignment_sets].map { |set|
+              option = {
+                setId: set[:id]
+              }
+
+              option[:assignments] = set[:assignments].map { |a|
+                assg = a[:model]
+                assg[:assignmentId] = a[:assignment_id]
+                assg
+              }
+
+              option
+            }
+
+            js_env({
+              CHOOSE_MASTERY_PATH_DATA: {
+                options: options,
+                selectedOption: rule[:selected_set_id],
+                courseId: @context.id,
+                moduleId: item.context_module.id,
+                itemId: id
+              }
+            })
+
+            css_bundle :choose_mastery_path
+            js_bundle :choose_mastery_path
+
+            @page_title = join_title(t('Choose Assignment Set'), @context.name)
+
+            return render :text => '', :layout => true
+          else
+            flash[:warning] = t('Module Item is locked.')
+            return redirect_to named_context_url(@context, :context_context_modules_url)
+          end
+        end
+      end
+      return render status: 404, template: 'shared/errors/404_message'
     end
   end
 

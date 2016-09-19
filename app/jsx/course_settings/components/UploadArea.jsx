@@ -50,7 +50,7 @@ define([
               />
             </div>
             <div className="UploadArea__FileTypes">
-              {I18n.t('jpg, png, or gif files')}
+              {I18n.t('For best results crop image to 262px wide by 146px tall. JPG, PNG or GIF file types accepted')}
             </div>
           </div>
         </div>

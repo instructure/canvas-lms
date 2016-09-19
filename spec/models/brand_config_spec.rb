@@ -27,7 +27,6 @@ describe BrandConfig do
 
   def setup_subaccount_with_config
     @parent_account = Account.default
-    @parent_account.enable_feature!(:use_new_styles)
     @parent_config = BrandConfig.create(variables: {"ic-brand-primary" => "#321"})
 
     @subaccount = Account.create!(:parent_account => @parent_account)

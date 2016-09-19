@@ -70,6 +70,24 @@ describe UserObserver do
     expect(enrollments.reload.map(&:workflow_state)).to eql ["active", "active"]
   end
 
+  it "should enroll the observer in courses when the student is inactive" do
+    c1 = course(:active_all => true)
+    enroll = student_in_course(:course => c1, :user => student)
+    enroll.deactivate
+
+    observer = user_with_pseudonym
+    student.observers << observer
+
+    o_enroll = observer.observer_enrollments.first
+    expect(o_enroll).to be_inactive
+
+    o_enroll.destroy_permanently!
+    enroll.reactivate # it should recreate it
+
+    new_o_enroll = observer.observer_enrollments.first
+    expect(new_o_enroll).to be_active
+  end
+
   it "should not enroll the observer in institutions where they lack a login" do
     a1 = account_model
     c1 = course(account: a1, active_all: true)

@@ -83,7 +83,9 @@ define [
       data = @$form.getFormData()
       return unless data['recipients[]'] and data['body']
 
-      data['bulk_message'] = true if data['recipients[]'].length > ENV.CALENDAR.MAX_GROUP_CONVERSATION_SIZE
+      if data['recipients[]'].length > ENV.CALENDAR.MAX_GROUP_CONVERSATION_SIZE
+        data['group_conversation'] = true
+        data['bulk_message'] = true
 
       if @group
         data['tags'] = @group.context_codes

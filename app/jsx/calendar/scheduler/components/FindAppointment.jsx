@@ -13,33 +13,46 @@ define([
 
     constructor (props) {
       super(props)
-      this.state = { isModalOpen: false }
+      this.state = {
+        isModalOpen: false,
+        selectedCourse: {}
+      }
       this.openModal = this.openModal.bind(this)
       this.closeModal = this.closeModal.bind(this)
       this.handleSubmit = this.handleSubmit.bind(this)
       this.endAppointmentMode = this.endAppointmentMode.bind(this)
+      this.selectCourse = this.selectCourse.bind(this)
     }
 
     handleSubmit () {
+      document.getElementById("FindAppointmentButton").focus()
+      this.props.store.dispatch(Actions.actions.setCourse(this.state.selectedCourse))
       this.props.store.dispatch(Actions.actions.setFindAppointmentMode(!this.props.store.getState().inFindAppointmentMode))
       this.setState ({
         isModalOpen: false,
+        selectedCourse: {}
+      })
+    }
+    selectCourse (e) {
+      this.setState({
+        selectedCourse: this.props.courses.filter((c) => c.id === e.target.value)[0]
       })
     }
     openModal () {
       this.setState({
         isModalOpen: true,
+        selectedCourse: (this.props.courses.length > 0) ? this.props.courses[0] : {}
       })
     }
     endAppointmentMode () {
       this.props.store.dispatch(Actions.actions.setFindAppointmentMode(false))
-      // Probably should set the state here to close the grey view thing.
       this.setState({
         isModalOpen: false,
       })
     }
 
     closeModal () {
+      document.getElementById("FindAppointmentButton").focus()
       this.setState({
         isModalOpen: false,
       })
@@ -51,9 +64,9 @@ define([
           <h2>{I18n.t('Appointments')}</h2>
           {
             this.props.store.getState().inFindAppointmentMode ?
-              <button onClick={this.endAppointmentMode} className="Button">{I18n.t('Close')}</button>
+              <button onClick={this.endAppointmentMode} id="FindAppointmentButton" className="Button">{I18n.t('Close')}</button>
               :
-              <button onClick={this.openModal} className="Button">{I18n.t('Find Appointment')}</button>
+              <button onClick={this.openModal} id="FindAppointmentButton" className="Button">{I18n.t('Find Appointment')}</button>
           }
           <Modal
             isOpen={this.state.isModalOpen}
@@ -75,11 +88,9 @@ define([
             </div>
             <div className="ReactModal__Body">
               <div className="ic-Form-control">
-                <select className="ic-Input">
+                <select onChange={this.selectCourse} value={this.state.selectedCourse.id} className="ic-Input">
                   {this.props.courses.map((c, index) => {
-                    if (c.asset_string.indexOf("user") === -1) {
-                      return(<option key={c.id} value={c.id}>{c.name}</option>)
-                    }
+                    return(<option key={c.id} value={c.id}>{c.name}</option>)
                   })}
                 </select>
               </div>

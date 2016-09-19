@@ -175,7 +175,7 @@ class Rubric < ActiveRecord::Base
                                    :context => context,
                                    :use_for_grading => !!opts[:use_for_grading],
                                    :purpose => purpose
-    ra.skip_updating_points_possible = @skip_updating_points_possible
+    ra.skip_updating_points_possible = opts[:skip_updating_points_possible] || @skip_updating_points_possible
     ra.tap &:save
   end
 
@@ -218,7 +218,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def populate_rubric_title
-    self.title ||= t('context_name_rubric', "%{course_name} Rubric", :course_name => context.name)
+    self.title ||= context && t('context_name_rubric', "%{course_name} Rubric", :course_name => context.name)
   end
 
   CriteriaData = Struct.new(:criteria, :points_possible, :title)

@@ -3,50 +3,34 @@
 $body-bg-color:                     $ic-color-light;
 $embedded-bg:                       $ic-color-light;
 $layout-modal-bg:                   $ic-color-light;
-$layout-modal-font-color:           $ic-color-dark;
-$footer-links-color:                lighten($ic-color-dark, 16);
+$layout-modal-font-color:           $ic-font-color-dark;
+$footer-links-color:                lighten($ic-font-color-dark, 16);
 $footer-links-border-color:         lighten($ic-color-dark, 16);
 
-@if $use_new_styles == false {
-  body, html { height: 100%; }
+body:not(.full-width) .ic-app-container {
+  // We want to add a max size to most pages in canvas
+  // unless it's a full-width app
+  max-width: 1366px;
 }
-
-@if $use_new_styles {
-  body:not(.full-width) .ic-app-container {
-    // We want to add a max size to most pages in canvas
-    // unless it's a full-width app
-    max-width: 1366px;
-  }
-}
-
 
 body {
-  @if $use_new_styles {
-    min-height: 100vh;
-    &:not(.is-inside-submission-frame):not(.embedded) {
-      min-width: 768px;
-    }
+  min-height: 100vh;
+  &:not(.is-inside-submission-frame):not(.embedded) {
+    min-width: 768px;
   }
-  @else { min-width: $min_main_width; }
 
   @if $use_high_contrast { background: white; }
   @else {
-    @if $use_new_styles {
-      background: $ic-color-light;
-      font-weight: 300;
-    }
-    @else { background-color: $ic-body-background-color; }
+    background: $ic-color-light;
+    font-weight: 300;
   }
 
   &.no-headers, &.embedded {
     #header, #topbar, #left-side, #breadcrumbs { display: none !important; }
-    @if $use_new_styles {
-      .ic-app-nav-toggle-and-crumbs { display: none; }
-    }
+    .ic-app-nav-toggle-and-crumbs { display: none; }
     #footer { display: none; }
     #wrapper {
       margin: 0;
-      @if $use_new_styles == false { min-width: 400px; }
     }
     #main {
       margin: 0;
@@ -97,62 +81,34 @@ body {
   }
 }
 
-@if $use_new_styles {
-  #wrapper-container {
-    margin-left: $ic-header-primary-width - 30;
+#wrapper-container {
+  margin-left: $ic-header-primary-width - 30;
 
-    @include breakpoint(tablet) {
-      margin-left: $ic-header-primary-width;
-    }
-    body.primary-nav-expanded & { margin-left: $ic-header-primary-expanded-width; }
-    body.no-headers & { margin-left: 0; }
+  @include breakpoint(tablet) {
+    margin-left: $ic-header-primary-width;
   }
-}
-
-@if $use_new_styles == false {
-  #wrapper { @include pie-clearfix; }
+  body.primary-nav-expanded & { margin-left: $ic-header-primary-expanded-width; }
+  body.no-headers & { margin-left: 0; }
 }
 
 #main {
   position: relative;
   z-index: 10;
-
-  @if $use_new_styles == false {
-    background-color: $body-bg-color;
-    border: none;
-    margin-bottom: 40px;
-    @include pie-clearfix;
-    min-height: 450px;
-    max-width: $max_main_width;
-  }
 }
 
 #content {
-  @if $use_new_styles {
-    padding: $ic-sp*2;
-    body.is-inside-submission-frame & {
-      padding-left: $ic-sp;
-      padding-right: $ic-sp;
-    }
-  }
-  @else {
-    padding: 1em;
-    overflow: hidden;
+  padding: $ic-sp*2;
+  body.is-inside-submission-frame & {
+    padding-left: $ic-sp;
+    padding-right: $ic-sp;
   }
 }
 
 // **********************************************************************************
 // all of the following are classes that should be applied to 'body' when appropriate
 
-@if $use_new_styles {
-  body.ic-framed-lti-tool #content { padding: 0 $ic-sp*2; }
-  body.ic-full-screen-lti-tool #content { padding: 0; }
-}
-
-@else {
-  .padless-content #content,
-  #content.padless { padding: 0; }
-}
+body.ic-framed-lti-tool #content { padding: 0 $ic-sp*2; }
+body.ic-full-screen-lti-tool #content { padding: 0; }
 
 .with-left-side {
   #left-side {
@@ -161,27 +117,11 @@ body {
     /* #main has a z-index: 10 on it. This is needed so that group set names will appear above the main content */
     z-index: 11;
   }
-  @if $use_new_styles == false {
-    min-width: $left_side_width + $min_main_width;
-    #footer { margin-left: $left_side_width; }
-    #wrapper { margin-left: 0; }
-    #main { margin-left: $left_side_width; }
-    #header-inner { max-width: $left_side_width + $max_main_width; }
-  }
 }
 
 .with-right-side {
-  @if $use_new_styles == false { min-width: $right_side_width + $min_main_width; }
   #right-side-wrapper {
     display: block;
-    @if $use_new_styles == false {
-      float: right;
-      position: absolute;
-      top: 0;
-    }
-  }
-  @if $use_new_styles == false {
-    #main { margin-right: $right_side_width; }
   }
   #header-inner {
     max-width: $right_side_width + $max_main_width;
@@ -189,7 +129,6 @@ body {
 }
 
 .with-right-side.with-left-side {
-  @if $use_new_styles==false { min-width: $right_side_width + $left_side_width + $min_main_width; }
   #header-inner {
     max-width: $right_side_width + $left_side_width + $max_main_width;
   }
@@ -213,32 +152,12 @@ body {
 // end classes applied to body
 
 #footer {
-  @if $use_new_styles == false {
-    color: #5c5c5c;
-    @include fontSize(11px);
-    margin: 0 15px 34px;
-  }
-
   .footer-logo {
     @include bg-image("footer-logo", "png", no-repeat, left, top, transparent, 140px, 10px);
     display: inline-block;
     height: 10px;
     margin: 0 20px 0 0;
     width: 140px;
-  }
-}
-@if $use_new_styles == false {
-  #footer-links {
-    a {
-      border-left: 1px solid $footer-links-border-color;
-      color: $footer-links-color;
-      padding-right: 2px;
-      padding-left: 5px;
-      &:hover, &:focus {
-        text-decoration: underline;
-      }
-      &:first-child { border-left: none; }
-    }
   }
 }
 

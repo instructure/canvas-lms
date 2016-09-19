@@ -225,7 +225,7 @@
             <div>
               <%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, {:selected => @context.locale}, {:class => 'locale'} %>
               <%= render :partial => 'shared/locale_warning' %>
-              <p> <%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/projects/p/canvas-lms/"
+              <p> <%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/instructure/canvas-crowdsource/"
   Join the [Canvas Translation Community](%{transifex_url})
   TEXT
               %>
@@ -286,7 +286,7 @@
         <td colspan="3" id="course_visibility">
           <% if can_manage %>
             <span>
-              <%= f.select :course_visibility, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], id] } %>
+              <%= f.select :course_visibility, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], id] }, {},  {"aria-label" => t("Course Visibility Options")} %>
               <%= visibility_help_link %>
             </span>
             <div class="panel-border">
@@ -295,7 +295,7 @@
               <% @context.customize_course_visibility_list.map do |setting, options| %>
                 <div id="customize_course_visibility">
                   <%= f.label :syllabus_visibility_option, options[:setting] %>
-                  <%= f.select :syllabus_visibility_option, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], "#{id}"] }, {}, :id => options[:setting] %>
+                  <%= f.select :syllabus_visibility_option, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], "#{id}"] }, {}, {:id => options[:setting], "aria-label" => t("Syllabus Visibility Options")} %>
                 </div>
               <% end %>
             </div>

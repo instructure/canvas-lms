@@ -5,6 +5,8 @@
 # shaped like the example below, one key for the related set of data,
 # and a hash of key/value pairs (no nesting)
 development:
+  address-book:
+    app-host: "http://address-book.docker"
   rich-content-service:
     app-host: "rce.docker"
   canvas:

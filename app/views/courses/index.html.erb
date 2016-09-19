@@ -35,8 +35,7 @@
 <% if @current_enrollments.empty? %>
   <%= t("You are not enrolled in any courses.") %>
 <% else %>
-  <table id="my_courses_table" <% if use_new_styles? %>class="ic-Table ic-Table--bordered course-list-table"
-    <% else %>class="table table-bordered course-list-table"<% end %> >
+  <table id="my_courses_table" class="ic-Table ic-Table--bordered course-list-table">
     <thead>
       <tr>
         <th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th>
@@ -60,8 +59,7 @@
   <div class="content--hasMarginTop">
     <h2><%= t('headings.past_enrollments', %{Past Enrollments}) %></h2>
   </div>
-  <table id="past_enrollments_table" <% if use_new_styles? %>class="ic-Table ic-Table--bordered course-list-table"
-    <% else %>class="table table-bordered course-list-table"<% end %> >
+  <table id="past_enrollments_table" class="ic-Table ic-Table--bordered course-list-table">
     <thead>
       <tr>
         <th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th>
@@ -84,8 +82,7 @@
   <div class="content--hasMarginTop">
     <h2><%= t('headings.future_enrollments', 'Future Enrollments') %></h2>
   </div>
-  <table id="future_enrollments_table" <% if use_new_styles? %>class="ic-Table ic-Table--bordered course-list-table"
-    <% else %>class="table table-bordered course-list-table"<% end %> >
+  <table id="future_enrollments_table" class="ic-Table ic-Table--bordered course-list-table">
     <thead>
       <tr>
         <th scope="col" class="course-list-star-column"><span class="screenreader-only"><%= t ('Favorites') %></span></th>
@@ -109,8 +106,7 @@
   <div class="content--hasMarginTop">
     <h2><%= t('headings.my_groups', %{My Groups}) %></h2>
   </div>
-  <table id="my_groups_table" <% if use_new_styles? %>class="ic-Table ic-Table--bordered course-list-table"
-    <% else %>class="table table-bordered course-list-table"<% end %> >
+  <table id="my_groups_table" class="ic-Table ic-Table--bordered course-list-table">
     <thead>
       <tr>
         <th scope="col" class="course-list-group-column"><%= t ('Group') %></th>

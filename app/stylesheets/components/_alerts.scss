@@ -198,8 +198,7 @@
 
 .ic-flash__headline {
   margin: 0;
-  @if $use_new_styles { font-weight: 500; }
-  @else { font-weight: bold; }
+  font-weight: 500;
 }
 
 .ic-flash__text {
@@ -224,24 +223,17 @@ a.Button--flash {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  @if $use_new_styles {
+  background: $ic-color-action;
+  color: $ic-color-light;
+  // This adds a fixed top border for the fixed bottom alert,
+  // so the top border doesn't disappear on scroll
+  &:after {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 3px;
     background: $ic-color-action;
-    color: $ic-color-light;
-    // This adds a fixed top border for the fixed bottom alert,
-    // so the top border doesn't disappear on scroll
-    &:after {
-      content: "";
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 3px;
-      background: $ic-color-action;
-    }
-  }
-  @else {
-    border-top: 1px solid $ic-border-light;
-    background: $ic-color-light;
-    box-shadow: 0 -1px 2px rgba(black, 0.1);
   }
 
   .avatar {
@@ -252,11 +244,9 @@ a.Button--flash {
 // When the fixed bottom alert is showing, add a
 // left and right border, making Canvas appear as if
 // it is inside a frame.
-@if $use_new_styles {
-  body.is-masquerading-or-student-view {
-    border-right: 3px solid $ic-color-action;
-    .ic-app-header { border-left: 3px solid $ic-color-action; }
-  }
+body.is-masquerading-or-student-view {
+  border-right: 3px solid $ic-color-action;
+  .ic-app-header { border-left: 3px solid $ic-color-action; }
 }
 
 .ic-alert-masquerade-student-view-module {

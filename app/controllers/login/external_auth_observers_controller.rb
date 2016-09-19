@@ -17,10 +17,10 @@ class Login::ExternalAuthObserversController < ApplicationController
 
   private
   def observer_email_taken?
-    @domain_root_account.pseudonyms.by_unique_id(params[:pseudonym][:unique_id]).exists?
+    @domain_root_account.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).exists?
   end
 
   def valid_observee_unique_id?
-    @domain_root_account.pseudonyms.by_unique_id(params[:observee][:unique_id]).exists?
+    @domain_root_account.pseudonyms.active.by_unique_id(params[:observee][:unique_id]).exists?
   end
 end

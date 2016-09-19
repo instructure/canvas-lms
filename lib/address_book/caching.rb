@@ -20,10 +20,12 @@ module AddressBook
         end
       end
 
-      def store(known)
-        known.each do |user|
-          @entries[key(user)] = user
-        end
+      def store(user, common_courses, common_groups)
+        @entries[key(user)] = {
+          instance: user,
+          common_courses: globalize(common_courses),
+          common_groups: globalize(common_groups)
+        }
       end
 
       def cached?(user)
@@ -31,49 +33,34 @@ module AddressBook
       end
 
       def fetch(user)
-        @entries[key(user)]
-      end
-    end
-
-    # implementation should return a paginatable collection. this just proxies
-    # most calls to it. however, after executing the pager, we want to capture
-    # the results in the cache before returning them
-    class Collection
-      def initialize(collection, cache)
-        @collection = collection
-        @cache = cache
+        entry = @entries[key(user)]
+        entry && entry[:instance]
       end
 
-      def paginate(options = {})
-        execute_pager(configure_pager(new_pager, options))
+      def common_courses(user)
+        entry = @entries[key(user)]
+        relativize(entry[:common_courses]) if entry
       end
 
-      def new_pager
-        @collection.new_pager
+      def common_groups(user)
+        entry = @entries[key(user)]
+        relativize(entry[:common_groups]) if entry
       end
 
-      def configure_pager(pager, options)
-        @collection.configure_pager(pager, options)
+      private
+      def globalize(role_hash)
+        Hash[*role_hash.map do |id,roles|
+          id = Shard.global_id_for(id) if id > 0
+          [id, roles]
+        end.flatten(1)]
       end
 
-      def execute_pager(pager)
-        @collection.execute_pager(pager)
-        @cache.store(pager)
-        pager
+      def relativize(role_hash)
+        Hash[*role_hash.map do |id,roles|
+          id = Shard.relative_id_for(id, Shard.current, Shard.current) if id > 0
+          [id, roles]
+        end.flatten(1)]
       end
-
-      def depth
-        @collection.depth
-      end
-    end
-
-    def initialize(sender)
-      super(sender)
-      @cache = Cache.new
-    end
-
-    def cached?(user)
-      @cache.cached?(user)
     end
 
     def known_users(users, options={})
@@ -81,33 +68,9 @@ module AddressBook
       # flag excluded users as "not known" so we don't recheck them
       # individually in the future
       @cache.null(uncached)
-      @cache.store(super(uncached, options))
+      # implementation is responsible for storing known users into cache
+      super(uncached, options)
       users.map{ |user| @cache.fetch(user) }.compact
-    end
-
-    def known_in_context(context, is_admin=false)
-      known = super(context, is_admin)
-      @cache.store(known)
-      known
-    end
-
-    def search_users(options={})
-      collection = super(options)
-      Collection.new(collection, @cache)
-    end
-
-    def preload_users(users)
-      key = users.map{ |user| Shard.global_id_for(user) }.join(',')
-      # still load _all_, not just those missing from in process cache, on
-      # rails cache miss, to be consistent with the cache key (and to let the
-      # cache key stay consistent across calls e.g. from the same conversation)
-      loaded = Rails.cache.fetch([@sender, 'address_book_preload', key].cache_key) do
-        super(users)
-      end
-      # but then prefer in-process cache over rails cache. if they differ, we
-      # can pretty much guarantee the in-process cache is fresher.
-      newly_loaded = loaded.select{ |user| !cached?(user) }
-      @cache.store(newly_loaded)
     end
   end
 end

@@ -3,13 +3,6 @@ body.modal {
     max-width: $modal_box_width - (2 * $modal_box_padding);
     width: auto;
   }
-  
-  @if $use_new_styles == false {
-    #footer {
-      max-width: $modal_box_width + 20px;
-      width: auto;
-    } 
-  }
 
   #login-box .btn {
     float: none;

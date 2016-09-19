@@ -1,8 +1,0 @@
-<li>
-  <a href="<%= url_for(menu_account) %>">
-    <span class="name ellipsis"><%= menu_account.name %></span>
-    <% unless menu_account.root_account? %>
-      <span class="subtitle ellipsis"><%= menu_account.root_account.name %></span>
-    <% end %>
-  </a>  
-</li>

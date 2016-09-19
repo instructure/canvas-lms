@@ -20,26 +20,12 @@
   color: darken($ic-color-neutral, 10);
   display: flex;
   align-items: center;
-  @if $use_new_styles {
-    border-top: 1px solid $ic-border-color;
-  }
-  @else {
-    &:before {   @include shared-sso(left); }
-    &:after  {   @include shared-sso(right);}
-  }
-
+  border-top: 1px solid $ic-border-color;
 }
 .ic-Login__sso-list {
-  @if $use_new_styles {
-    padding: $ic-sp 0 0 0;
-    margin: $ic-sp*2 0 0 0;
-    border-top: 1px solid $ic-color-light;
-  }
-  @else {
-    padding: 0;
-    margin: 0;
-  }
-
+  padding: $ic-sp 0 0 0;
+  margin: $ic-sp*2 0 0 0;
+  border-top: 1px solid $ic-color-light;
 }
 .ic-Login__sso-list__item {
   list-style: none;

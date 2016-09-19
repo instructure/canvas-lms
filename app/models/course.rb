@@ -226,6 +226,7 @@ class Course < ActiveRecord::Base
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_enrollment_states_if_necessary
+  after_save :touch_students_if_necessary
   after_save :set_self_enrollment_code
 
   before_save :touch_root_folder_if_necessary
@@ -726,30 +727,58 @@ class Course < ActiveRecord::Base
     return unless user
     RequestCache.cache('user_is_instructor', self, user) do
       Rails.cache.fetch([self, user, "course_user_is_instructor"].cache_key) do
-        user.cached_current_enrollments(preload_dates: true).any? { |e| e.course_id == self.id && e.participating_instructor? }
+        self.enrollments.for_user(user).active_by_date.of_instructor_type.exists?
       end
     end
   end
 
   def user_is_student?(user, opts = {})
     return unless user
+
     RequestCache.cache('user_is_student', self, user, opts) do
-      Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
-        current_enrollments = user.cached_current_enrollments(
-          preload_dates: true, include_future: opts[:include_future])
-        current_enrollments.any? do |enrollment|
-          enrollment.course_id == self.id &&
-            enrollment.student_with_conditions?(
-              include_future: opts[:include_future],
-              include_fake_student: opts[:include_fake_student]
-            )
+      Rails.cache.fetch([self, user, "course_user_is_student", opts].cache_key) do
+        enroll_types = ["StudentEnrollment"]
+        enroll_types << ["StudentViewEnrollment"] if opts[:include_fake_student]
+
+        enroll_scope = self.enrollments.for_user(user).where(:type => enroll_types)
+        if opts[:include_future]
+          enroll_scope = enroll_scope.active_or_pending_by_date_ignoring_access
+        elsif opts[:include_all]
+          enroll_scope = enroll_scope.not_inactive_by_date_ignoring_access
+        else
+          return false unless self.available?
+          enroll_scope = enroll_scope.active_by_date
         end
+        enroll_scope.exists?
       end
+    end
+  end
+
+  def preload_user_roles!
+    # plz to use before you make a billion calls to user_has_been_X? with different users
+    @user_ids_by_enroll_type ||= begin
+      self.shard.activate do
+        map = {}
+        self.enrollments.active.pluck(:user_id, :type).each do |user_id, type|
+          map[type] ||= []
+          map[type] << user_id
+        end
+        map
+      end
+    end
+  end
+
+  def preloaded_user_has_been?(user, types)
+    self.shard.activate do
+      Array(types).any?{|type| @user_ids_by_enroll_type.has_key?(type) && @user_ids_by_enroll_type[type].include?(user.id)}
     end
   end
 
   def user_has_been_instructor?(user)
     return unless user
+    if @user_ids_by_enroll_type
+      return preloaded_user_has_been?(user, %w{TaEnrollment TeacherEnrollment})
+    end
     # enrollments should be on the course's shard
     RequestCache.cache('user_has_been_instructor', self, user) do
       self.shard.activate do
@@ -763,7 +792,15 @@ class Course < ActiveRecord::Base
 
   def user_has_been_admin?(user)
     return unless user
+    if @user_ids_by_enroll_type
+      return preloaded_user_has_been?(user, %w{TaEnrollment TeacherEnrollment DesignerEnrollment})
+    end
+
     RequestCache.cache('user_has_been_admin', self, user) do
+      if @user_ids_by_enroll_type
+        next %w{TaEnrollment TeacherEnrollment DesignerEnrollment}.any?{|type| @user_ids_by_enroll_type[type].include?(user.id)}
+      end
+
       Rails.cache.fetch([self, user, "course_user_has_been_admin"].cache_key) do
         # active here is !deleted; it still includes concluded, etc.
         self.admin_enrollments.active.where(user_id: user).exists?
@@ -773,6 +810,10 @@ class Course < ActiveRecord::Base
 
   def user_has_been_observer?(user)
     return unless user
+    if @user_ids_by_enroll_type
+      return preloaded_user_has_been?(user, "ObserverEnrollment")
+    end
+
     RequestCache.cache('user_has_been_observer', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_been_observer"].cache_key) do
         # active here is !deleted; it still includes concluded, etc.
@@ -783,6 +824,10 @@ class Course < ActiveRecord::Base
 
   def user_has_been_student?(user)
     return unless user
+    if @user_ids_by_enroll_type
+      return preloaded_user_has_been?(user, %w{StudentEnrollment StudentViewEnrollment})
+    end
+
     RequestCache.cache('user_has_been_student', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
         self.all_student_enrollments.where(user_id: user).exists?
@@ -792,6 +837,12 @@ class Course < ActiveRecord::Base
 
   def user_has_no_enrollments?(user)
     return unless user
+    if @user_ids_by_enroll_type
+      self.shard.activate do
+        return !@user_ids_by_enroll_type.values.any?{|arr| arr.include?(user.id)}
+      end
+    end
+
     RequestCache.cache('user_has_no_enrollments', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_no_enrollments"].cache_key) do
         !enrollments.where(user_id: user).exists?
@@ -1225,56 +1276,51 @@ class Course < ActiveRecord::Base
     given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered") && (self.available? || self.completed? || self.claimed? && hash[:is_admin]) }
     can :read and can :read_outcomes
 
-    given { |user| (self.available? || self.completed?) && user && user.cached_current_enrollments(preload_dates: true).any?{|e| e.course_id == self.id && [:active, :invited, :accepted, :completed].include?(e.state_based_on_date) } }
+    given { |user| (self.available? || self.completed?) && user && enrollments.for_user(user).not_inactive_by_date.exists? }
     can :read and can :read_outcomes
 
     # Active students
     given { |user|
-      available?  && user &&
-        user.cached_current_enrollments(preload_dates: true).any? { |e|
-        e.course_id == id && e.participating_student?
-      }
+      available?  && user && enrollments.for_user(user).active_by_date.of_student_type.exists?
     }
     can :read and can :participate_as_student and can :read_grades and can :read_outcomes
 
-    given { |user| (self.available? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? && e.associated_user_id} }
+    given { |user| (self.available? || self.completed?) && user &&
+      enrollments.for_user(user).active_by_date.where(:type => "ObserverEnrollment").where.not(:associated_user_id => nil).exists? }
     can :read_grades
 
-    given { |user| self.available? && self.teacherless? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
+    given { |user| self.available? && self.teacherless? && user && enrollments.for_user(user).active_by_date.of_student_type.exists? }
     can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p }
 
     # Active admins (Teacher/TA/Designer)
-    given { |user| (self.available? || self.created? || self.claimed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } }
+    given { |user| (self.available? || self.created? || self.claimed?) && user &&
+      enrollments.for_user(user).of_admin_type.active_by_date.exists? }
     can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags
 
     # Teachers and Designers can delete/reset, but not TAs
-    given { |user| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e|
-      e.course_id == self.id && e.participating_content_admin? && e.has_permission_to?(:change_course_state)
-    } }
+    given { |user| !self.deleted? && !self.sis_source_id && user &&
+      enrollments.for_user(user).of_content_admins.active_by_date.to_a.any?{|e| e.has_permission_to?(:change_course_state)}
+    }
     can :delete
 
-    given { |user| !self.deleted? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } }
+    given { |user| !self.deleted? && user && enrollments.for_user(user).of_content_admins.active_by_date.exists? }
     can :reset_content
 
     # Student view student
-    given { |user| user && user.fake_student? && user.cached_not_ended_enrollments.any?{ |e| e.course_id == self.id } }
+    given { |user| user && user.fake_student? && current_enrollments.for_user(user).exists? }
     can :read and can :participate_as_student and can :read_grades and can :read_outcomes
 
     # Prior users
     given do |user|
       (available? || completed?) && user &&
-        prior_enrollments.for_user(user).preload(:enrollment_state).any?{|e| !e.inactive?}
+        enrollments.for_user(user).completed_by_date.exists?
     end
     can :read, :read_outcomes
 
     # Admin (Teacher/TA/Designer) of a concluded course
     given do |user|
       !self.deleted? && user &&
-        (prior_enrollments.for_user(user).any?{|e| e.admin? } ||
-         user.cached_not_ended_enrollments.any? do |e|
-           e.course_id == self.id && e.admin? && e.completed?
-         end
-        )
+        enrollments.for_user(user).of_admin_type.completed_by_date.exists?
     end
     can [:read, :read_as_admin, :use_student_view, :read_outcomes, :view_unpublished_items]
 
@@ -1284,11 +1330,7 @@ class Course < ActiveRecord::Base
 
       given do |user|
         !self.deleted? && user &&
-          (prior_enrollments.for_user(user).preload(:enrollment_state).any?{|e| !e.inactive? && e.has_permission_to?(permission) && (!applicable_roles || applicable_roles.include?(e.type))} ||
-            user.cached_not_ended_enrollments.any? do |e|
-              e.course_id == self.id && e.completed? && e.has_permission_to?(permission) && (!applicable_roles || applicable_roles.include?(e.type))
-            end
-          )
+          enrollments.for_user(user).completed_by_date.to_a.any?{|e| e.has_permission_to?(permission) && (!applicable_roles || applicable_roles.include?(e.type))}
       end
       can permission
     end
@@ -1296,22 +1338,15 @@ class Course < ActiveRecord::Base
     # Teacher or Designer of a concluded course
     given do |user|
       !self.deleted? && !self.sis_source_id && user &&
-        (prior_enrollments.for_user(user).any?{|e| e.content_admin? && e.has_permission_to?(:change_course_state)} ||
-          user.cached_not_ended_enrollments.any? do |e|
-            e.course_id == self.id && e.content_admin? && e.state_based_on_date == :completed && e.has_permission_to?(:change_course_state)
-          end
-        )
+        enrollments.for_user(user).of_content_admins.completed_by_date.to_a.any?{|e| e.has_permission_to?(:change_course_state)}
     end
     can :delete
 
     # Student of a concluded course
     given do |user|
       (self.available? || self.completed?) && user &&
-        (prior_enrollments.for_user(user).preload(:enrollment_state).any?{|e| (e.student? || e.assigned_observer?) && !e.inactive?} ||
-         user.cached_not_ended_enrollments.any? do |e|
-          e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed
-         end
-        )
+        enrollments.for_user(user).completed_by_date.
+        where("enrollments.type = ? OR (enrollments.type = ? AND enrollments.associated_user_id IS NOT NULL)", "StudentEnrollment", "ObserverEnrollment").exists?
     end
     can :read, :read_grades, :read_outcomes
 
@@ -2721,7 +2756,7 @@ class Course < ActiveRecord::Base
       self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration, :lti_context_id, :workflow_state].include?(k.to_sym) }.each do |key, val|
         new_course.write_attribute(key, val)
       end
-      new_course.workflow_state = 'created'
+      new_course.workflow_state = (self.admins.any? ? 'claimed' : 'created')
       # there's a unique constraint on this, so we need to clear it out
       self.self_enrollment_code = nil
       self.self_enrollment = false
@@ -2947,6 +2982,21 @@ class Course < ActiveRecord::Base
 
   def touch_admins
     User.where(id: self.admins).touch_all
+  end
+
+  def touch_students_if_necessary
+    # to update the cached current enrollments
+    if workflow_state_changed? && (workflow_state == 'available' || workflow_state_was == 'available')
+      touch_students_later if self.students.exists?
+    end
+  end
+
+  def touch_students_later
+    send_later_enqueue_args(:touch_students, { :run_at => 15.seconds.from_now, :singleton => "course_touch_students_#{global_id}" })
+  end
+
+  def touch_students
+    User.where(id: self.students).touch_all
   end
 
   def list_students_by_sortable_name?

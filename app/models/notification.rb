@@ -101,11 +101,26 @@ class Notification < ActiveRecord::Base
   #
   def create_message(asset, to_list, options={})
     messages = [] if Rails.env.test?
+
+    preload_asset_roles_if_needed(asset)
+
     to_list.each do |to|
       msgs = NotificationMessageCreator.new(self, asset, options.merge(:to_list => to)).create_message
       messages.concat msgs if Rails.env.test?
     end
     messages
+  end
+
+  TYPES_TO_PRELOAD_CONTEXT_ROLES = ["Assignment Created", "Assignment Due Date Changed"].freeze
+  def preload_asset_roles_if_needed(asset)
+    if TYPES_TO_PRELOAD_CONTEXT_ROLES.include?(self.name)
+      case asset
+      when Assignment
+        asset.context.preload_user_roles!
+      when AssignmentOverride
+        asset.assignment.context.preload_user_roles!
+      end
+    end
   end
 
   def category_spaceless

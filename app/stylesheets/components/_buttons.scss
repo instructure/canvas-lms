@@ -147,12 +147,12 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
   overflow: hidden;
   text-shadow: none;
   user-select: none;
-  @if $use_new_styles and $use_high_contrast == false { font-weight: 300; }
+  @if not $use_high_contrast { font-weight: 300; }
 
   &:focus {
     text-decoration: none;
     outline: none;
-    @if $use_high_contrast == false { outline: none; }
+    @if not $use_high_contrast { outline: none; }
   }
 
   &:hover { text-decoration: none; }
@@ -273,10 +273,18 @@ input[type="button"] {
   cursor: pointer;
   color: $ic-link-color;
 
+  body.Underline-All-Links__enabled & {
+    text-decoration: underline;
+  }
+
   &:hover {
     color: $ic-link-color-hover;
     text-decoration: underline;
     background: transparent;
+
+    body.Underline-All-Links__enabled & {
+      text-decoration: none;
+    }
     &:focus { color: $ic-link-color; }
   }
 

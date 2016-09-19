@@ -170,8 +170,8 @@ define [
     view = createView(@model, canManage: true, post_to_sis: false)
     ok !view.sisButtonView
 
-  test "does not initialize sis toggle if assignment does not expect submissions", ->
-    @model.set('submission_types', ["none"])
+  test "does not initialize sis toggle if assignment is not graded", ->
+    @model.set('submission_types', ["not_graded"])
     view = createView(@model, canManage: true, post_to_sis: true)
     ok !view.sisButtonView
 

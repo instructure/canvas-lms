@@ -5,7 +5,6 @@ describe BrandConfigRegenerator do
   let(:new_brand_config) { BrandConfig.for(variables: {"ic-brand-primary" => "green"}) }
   def setup_account_family_with_configs
     @parent_account = Account.default
-    @parent_account.enable_feature!(:use_new_styles)
     @parent_account.brand_config = @parent_config = BrandConfig.for(variables: {"ic-brand-primary" => "red"})
     @parent_config.save!
     @parent_account.save!
@@ -112,7 +111,6 @@ describe BrandConfigRegenerator do
 
   it "handles site_admin correctly" do
     setup_account_family_with_configs
-    Account.site_admin.enable_feature!(:use_new_styles)
     site_admin_config = BrandConfig.for(variables: {"ic-brand-primary" => "orange"})
     site_admin_config.save!
 

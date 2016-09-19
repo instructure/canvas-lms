@@ -112,12 +112,14 @@ define([
         );
       },
 
-      updateProgressions: function(user_id, callback) {
-        if (!ENV.IS_STUDENT) return;
-        var url = $(".progression_list_url").attr('href');
-        if(user_id) {
-          url = url + "?user_id=" + user_id;
+      updateProgressions: function(callback) {
+        if (!ENV.IS_STUDENT) {
+          if (callback) {
+            callback();
+          }
+          return;
         }
+        var url = $(".progression_list_url").attr('href');
         if($(".context_module_item.progression_requirement:visible").length > 0) {
           $(".loading_module_progressions_link").show().attr('disabled', true);
         }
@@ -1094,6 +1096,10 @@ define([
     });
     $("#edit_item_form").formSubmit({
       beforeSubmit: function(data) {
+        if (data["content_tag[title]"] == '') {
+          $('#content_tag_title').errorBox(I18n.t("Title is required"));
+          return false;
+        }
         $(this).loadingImage();
       },
       success: function(data) {
@@ -1746,7 +1752,11 @@ define([
 
     // need the assignment data to check past due state
     modules.updateAssignmentData(function() {
-      modules.updateProgressions();
+      modules.updateProgressions(function() {
+        if (window.location.hash) {
+          $.scrollTo($(window.location.hash));
+        }
+      });
     });
 
     $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', function(event, goSlow) {
@@ -1849,9 +1859,7 @@ define([
     for(var idx in collapsedModules) {
       $("#context_module_" + collapsedModules[idx]).addClass('collapsed_module');
     }
-    if (window.location.hash) {
-      $.scrollTo($(window.location.hash));
-    }
+
     var foundModules = [];
     var $contextModules = $("#context_modules .context_module");
     if (!$contextModules.length) {

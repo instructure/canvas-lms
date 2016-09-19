@@ -27,21 +27,23 @@ describe DeveloperKeysController do
 
     describe "GET 'index'" do
       it 'should require authorization' do
-        get 'index'
+        get 'index', account_id: Account.site_admin.id
         expect(response).to be_redirect
       end
 
       it 'should return the list of developer keys' do
         user_session(@admin)
-        get 'index'
+        dk = DeveloperKey.create!
+        get 'index', account_id: Account.site_admin.id
         expect(response).to be_success
+        expect(assigns[:keys]).to be_include(dk)
       end
 
       it 'should not include deleted keys' do
         user_session(@admin)
         dk = DeveloperKey.create!
         dk.destroy
-        get 'index'
+        get 'index', account_id: Account.site_admin.id
         expect(response).to be_success
         expect(assigns[:keys]).to_not be_include(dk)
       end
@@ -50,7 +52,7 @@ describe DeveloperKeysController do
         user_session(@admin)
         dk = DeveloperKey.create!
         dk.deactivate!
-        get 'index'
+        get 'index', account_id: Account.site_admin.id
         expect(response).to be_success
         expect(assigns[:keys]).to be_include(dk)
       end
@@ -62,7 +64,7 @@ describe DeveloperKeysController do
 
         post "create", developer_key: {
                        redirect_uri: "http://example.com/sdf"
-                     }
+                     }, account_id: Account.site_admin.id
         expect(response).to be_success
         json_data = JSON.parse(response.body)
 
@@ -75,7 +77,7 @@ describe DeveloperKeysController do
 
         post "create", account_id: Account.site_admin.id, developer_key: {
                        redirect_uri: "http://example.com/sdf"
-                     }
+                     }, account_id: Account.site_admin.id
         expect(response).to be_success
         json_data = JSON.parse(response.body)
 
@@ -83,20 +85,38 @@ describe DeveloperKeysController do
         expect(key.account).to be nil
       end
     end
-  end
 
+    describe "PUT 'update'" do
+      it "should deactivate a key" do
+        user_session(@admin)
 
-  it "An account admin shouldn't be able to access site admin dev keys" do
+        dk = DeveloperKey.create!
+        put 'update', id: dk.id, developer_key: { event: :deactivate }, account_id: Account.site_admin.id
+        expect(response).to be_success
+        expect(dk.reload.state).to eq :inactive
+      end
 
-    @test_domain_root_account = Account.create!
-    @test_domain_root_account_admin= account_admin_user(account: @test_domain_root_account)
-    @sub_account = @test_domain_root_account.sub_accounts.create!
-    LoadAccount.stubs(:default_domain_root_account).returns(@test_domain_root_account)
+      it "should reactivate a key" do
+        user_session(@admin)
 
-    user_session(@test_domain_root_account_admin)
-    get 'index'
-    expect(response).to be_redirect
-    expect(flash[:error]).to eq "You don't have permission to access that page"
+        dk = DeveloperKey.create!
+        dk.deactivate!
+        put 'update', id: dk.id, developer_key: { event: :activate }, account_id: Account.site_admin.id
+        expect(response).to be_success
+        expect(dk.reload.state).to eq :active
+      end
+    end
+
+    describe "DELETE 'destroy'" do
+      it "should soft delete a key" do
+        user_session(@admin)
+
+        dk = DeveloperKey.create!
+        delete 'destroy', id: dk.id, account_id: Account.site_admin.id
+        expect(response).to be_success
+        expect(dk.reload.state).to eq :deleted
+      end
+    end
   end
 
   context "Account admin (not site admin)" do
@@ -116,6 +136,19 @@ describe DeveloperKeysController do
       expect(response).to be_success
     end
 
+    it "An account admin shouldn't be able to access site admin dev keys" do
+      user_session(@test_domain_root_account_admin)
+      get 'index'
+      expect(response).to be_redirect
+      expect(flash[:error]).to eq "You don't have permission to access that page"
+    end
+
+    it "An account admin shouldn't be able to access site admin dev keys explicitly" do
+      user_session(@test_domain_root_account_admin)
+      get 'index', account_id: Account.site_admin.id
+      expect(response).to be_redirect
+      expect(flash[:error]).to eq "You don't have permission to access that page"
+    end
 
     describe "Should be able to create developer key" do
       before :each do
@@ -196,43 +229,6 @@ describe DeveloperKeysController do
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
 
-    end
-  end
-
-  context "workflow" do
-    before :once do
-      account_admin_user(:account => Account.site_admin)
-    end
-    describe "PUT 'update'" do
-      it "should deactivate a key" do
-        user_session(@admin)
-
-        dk = DeveloperKey.create!
-        put 'update', id: dk.id, developer_key: { event: :deactivate }
-        expect(response).to be_success
-        expect(dk.reload.state).to eq :inactive
-      end
-
-      it "should reactivate a key" do
-        user_session(@admin)
-
-        dk = DeveloperKey.create!
-        dk.deactivate!
-        put 'update', id: dk.id, developer_key: { event: :activate }
-        expect(response).to be_success
-        expect(dk.reload.state).to eq :active
-      end
-    end
-
-    describe "DELETE 'destroy'" do
-      it "should soft delete a key" do
-        user_session(@admin)
-
-        dk = DeveloperKey.create!
-        delete 'destroy', id: dk.id
-        expect(response).to be_success
-        expect(dk.reload.state).to eq :deleted
-      end
     end
   end
 end

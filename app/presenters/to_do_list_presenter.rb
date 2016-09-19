@@ -91,6 +91,10 @@ class ToDoListPresenter
       @assignment.context.nickname_for(@user)
     end
 
+    def short_context_name
+      @assignment.context.nickname_for(@user, :short_name)
+    end
+
     def needs_grading_count
       @needs_grading_count ||= Assignments::NeedsGradingCountQuery.new(@assignment, @user).count
     end
@@ -162,6 +166,7 @@ class ToDoListPresenter
 
   class AssessmentRequestPresenter
     delegate :context_name, to: :assignment_presenter
+    delegate :short_context_name, to: :assignment_presenter
     attr_reader :assignment
 
     def initialize(view, assessment_request, user)

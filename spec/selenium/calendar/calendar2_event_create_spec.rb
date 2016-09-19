@@ -111,6 +111,50 @@ describe "calendar2" do
         expect((repeat_event[1].start_at).to_date).to eq((Time.zone.now + 1.week).to_date)
         expect((repeat_event[2].start_at).to_date).to eq((Time.zone.now + 2.weeks).to_date)
       end
+
+      it "should create recurring section-specific events" do
+        Account.default.enable_feature!(:recurring_calendar_events)
+        section1 = @course.course_sections.first
+        section2 = @course.course_sections.create!(:name => "other section")
+
+        day1 = 1.day.from_now.to_date
+        day2 = 2.days.from_now.to_date
+
+        get '/calendar2'
+        fj('.calendar .fc-week .fc-today').click
+        edit_event_dialog = f('#edit_event_tabs')
+        edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
+        title = edit_event_form.find('#calendar_event_title')
+        replace_content(title, "Test Event")
+        click_option(f('.context_id'), @course.name)
+        expect_new_page_load { f('.more_options_link').click }
+
+        f('#use_section_dates').click
+
+        f("#section_#{section1.id}_start_date").send_keys(day1.to_s)
+        f("#section_#{section2.id}_start_date").send_keys(day2.to_s)
+
+        ff(".date_start_end_row input.start_time").select(&:displayed?).each do |input|
+          replace_content(input, "11:30am")
+        end
+        ff(".date_start_end_row input.end_time").select(&:displayed?).each do |input|
+          replace_content(input, "1pm")
+        end
+
+        f('#duplicate_event').click
+        replace_content(f("input[type=number][name='duplicate_count']"), 1)
+
+        expect_new_page_load{f('button[type="submit"]').click}
+
+        expect(CalendarEvent.count).to eq(6) # 2 parent events each with 2 child events
+        s1_events = CalendarEvent.where(:context_code => section1.asset_string).where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
+        expect(s1_events[0].start_at.to_date).to eq day1
+        expect(s1_events[1].start_at.to_date).to eq (day1 + 1.week)
+
+        s2_events = CalendarEvent.where(:context_code => section2.asset_string).where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
+        expect(s2_events[0].start_at.to_date).to eq day2
+        expect(s2_events[1].start_at.to_date).to eq (day2 + 1.week)
+      end
     end
   end
 end

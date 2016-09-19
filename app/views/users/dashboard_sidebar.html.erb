@@ -1,5 +1,5 @@
 <%# Customer-brandable dashboard right-sidebar logo %>
-<% if use_new_styles? && brand_variable("ic-brand-right-sidebar-logo") != "" %>
+<% if brand_variable("ic-brand-right-sidebar-logo") != "" %>
 <div class="ic-sidebar-logo">
   <%= image_tag(brand_variable("ic-brand-right-sidebar-logo"), :class => "ic-sidebar-logo__image", :alt => "Canvas by Instructure") %>
 </div>
@@ -26,9 +26,7 @@
     <%= render :partial => 'shared/new_course_form' %>
   <% end %>
 
-  <% if use_new_styles? %>
-    <a href="<%= grades_path %>" class="Button button-sidebar-wide">
-    <%= t('View Grades') %>
-    </a>
-  <% end %>
+  <a href="<%= grades_path %>" class="Button button-sidebar-wide">
+  <%= t('View Grades') %>
+  </a>
 </div>

@@ -488,7 +488,7 @@ class Submission < ActiveRecord::Base
 
   def retrieve_lti_tii_score
     if (tool = ContextExternalTool.tool_for_assignment(self.assignment))
-      turnitin_data.select {|_,v| v.key?(:outcome_response) }.each do |k, v|
+      turnitin_data.select {|_,v| v.try(:key?, :outcome_response) }.each do |k, v|
         Turnitin::OutcomeResponseProcessor.new(tool, self.assignment, self.user, v[:outcome_response].as_json).resubmit(self, k)
       end
     end

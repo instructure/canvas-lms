@@ -599,6 +599,22 @@ describe User do
         expect(alice.courses_with_primary_enrollment.size).to eq 0
       end
 
+      it 'filters out completed-by-date enrollments for the correct user' do
+        @shard1.activate do
+          @user = User.create!(:name => 'user')
+          account = Account.create!
+          courseX = account.courses.build
+          courseX.workflow_state = 'available'
+          courseX.start_at = 7.days.ago
+          courseX.conclude_at = 2.days.ago
+          courseX.restrict_enrollments_to_course_dates = true
+          courseX.save!
+          StudentEnrollment.create!(:course => courseX, :user => @user, :workflow_state => 'active')
+        end
+        expect(@user.courses_with_primary_enrollment.count).to eq 0
+        expect(@user.courses_with_primary_enrollment(:current_and_invited_courses, nil, :include_completed_courses => true).count).to eq 1
+      end
+
       it 'works with favorite_courses' do
         @user = User.create!(:name => 'user')
         @shard1.activate do
@@ -1691,6 +1707,7 @@ describe User do
         event = @course.calendar_events.create!(title: 'published', start_at: 4.days.from_now)
         expect(@user.upcoming_events).to include(event)
         Timecop.freeze(3.days.from_now) do
+          EnrollmentState.recalculate_expired_states # runs periodically in background
           expect(User.find(@user).upcoming_events).not_to include(event) # re-find user to clear cached_contexts
         end
       end
@@ -1921,6 +1938,7 @@ describe User do
       @quiz.due_at = 3.days.from_now
       @quiz.save!
       Timecop.travel(2.days) do
+        EnrollmentState.recalculate_expired_states # runs periodically in background
         expect(@student.assignments_needing_submitting(:contexts => [@course]).count).to eq 0
       end
     end
@@ -2297,6 +2315,7 @@ describe User do
     it "should not count assignments in soft concluded courses" do
       @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
       Timecop.travel(1.week) do
+        EnrollmentState.recalculate_expired_states # runs periodically in background
         expect(@teacher.reload.assignments_needing_grading.size).to eql(0)
       end
     end
@@ -2972,9 +2991,15 @@ describe User do
       expect(@user.roles(@account)).to eq %w[user observer]
     end
 
-    it "includes 'admin' if the user has an admin user record" do
-      @account.account_users.create!(:user => @user, :role => admin_role)
+    it "includes 'admin' if the user has a sub-account admin user record" do
+      sub_account = @account.sub_accounts.create!
+      sub_account.account_users.create!(:user => @user, :role => admin_role)
       expect(@user.roles(@account)).to eq %w[user admin]
+    end
+
+    it "includes 'root_admin' if the user has a root account admin user record" do
+      @account.account_users.create!(:user => @user, :role => admin_role)
+      expect(@user.roles(@account)).to eq %w[user admin root_admin]
     end
   end
 

@@ -186,24 +186,11 @@
 }
 
 .item-group {
-  @if $use_new_styles {
-    border: 1px solid $ic-border-light;
-    padding: $ic-sp;
-    border-radius: $baseBorderRadius;
-    margin-bottom: $ic-sp*2;
-    background-color: $lightBackground;
-  }
-  @else {
-    border: 1px solid darken($wellBackground, 7%);
-    background-color: $wellBackground;
-    padding: 9px;
-    border-radius: 3px;
-    margin-bottom: 20px;
-  }
-}
-
-@if $use_new_styles == false {
-  .ig-header, .ig-text { padding-left: 30px; }
+  border: 1px solid $ic-border-light;
+  padding: $ic-sp;
+  border-radius: $baseBorderRadius;
+  margin-bottom: $ic-sp*2;
+  background-color: $lightBackground;
 }
 
 .ig-header .name {
@@ -220,14 +207,8 @@
 
 .ig-header {
   min-height: 30px;
-  @if $use_new_styles {
-    padding-top: $ic-sp/2;
-    padding-bottom: $ic-sp/2;
-  }
-  @else {
-    padding-top: 5px;
-    padding-bottom: 5px;
-  }
+  padding-top: $ic-sp/2;
+  padding-bottom: $ic-sp/2;
 
   .ig-header-title {
     text-decoration: none;
@@ -260,8 +241,7 @@
 }
 
 .ig-list li {
-  @if $use_new_styles { margin: $ic-sp/2 0; }
-  @else { margin: 4px 0; }
+  margin: $ic-sp/2 0;
 }
 
 .ig-row__layout {
@@ -288,15 +268,8 @@
   box-sizing: border-box;
   border-radius: $baseBorderRadius;
   color: $ic-font-color--subdued;
-  @if $use_new_styles {
-    border: 1px solid $ic-border-light;
-    background: $ic-color-light;
-  }
-  @else {
-    border: 1px solid #c1c7cf;
-    box-shadow: 0 1px 0 #dde0e4;
-    background: #fff;
-  }
+  border: 1px solid $ic-border-light;
+  background: $ic-color-light;
 
   a.ig-title {
     color: $ic-font-color-dark;
@@ -321,7 +294,7 @@
     background-color: $ic-list-item-background--hover;
   }
 
-  &.ig-published {
+  &.ig-published:not(.student-view) {
 
     &:before {
       content: "";
@@ -346,21 +319,13 @@
     box-sizing: border-box;
     height: $ic-sp*3; line-height: $ic-sp*3;
     padding: 0;
-    @if $use_new_styles {
-      border: 1px solid $ic-border-light;
-      background: $ic-color-light;
-    }
-    @else {
-      background: #f3f6f7;
-      border: 1px solid #dcdee0;
-      box-shadow: none;
-    }
+    border: 1px solid $ic-border-light;
+    background: $ic-color-light;
   }
 
   .ig-empty-msg {
     text-align: center;
-    @if $use_new_styles { color: $ic-font-color--subdued; }
-    @else { color: #676b6e; }
+    color: $ic-font-color--subdued;
   }
 }
 
@@ -374,7 +339,7 @@
   background-color: $ic-font-color--subdued;
   color: $ic-color-light;
 
-  .ig-published & {
+  .ig-published:not(.student-view) & {
     background-color: $ic-color-success;
   }
 }
@@ -392,8 +357,7 @@
   line-height: $ic-label-line-height;
   margin-bottom: $ic-sp/4;
   min-width: 1px; // firefox flex breaks the parent container
-  @if $use_new_styles { font-weight: 500; }
-  @else { font-weight: bold; }
+  font-weight: 500;
 }
 
 .ig-details {

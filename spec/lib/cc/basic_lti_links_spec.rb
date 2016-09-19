@@ -147,6 +147,20 @@ describe CC::BasicLTILinks do
         expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="selection_height"]').text).to eq tool.settings[:selection_height]
       end
 
+      it "adds non placment extensions" do
+        tool.settings[:post_only] = "true"
+        subject.create_blti_link(tool, lti_doc)
+        xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+        expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="post_only"]').text).to eq 'true'
+      end
+
+      it "doesn't add non placement extensions if their value is a collection" do
+        tool.settings[:my_list] = [1,2,3]
+        subject.create_blti_link(tool, lti_doc)
+        xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+        expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="my_list"]')).to be_nil
+      end
+
       context "course_copy" do
         before do
           subject.stubs(:for_course_copy).returns true

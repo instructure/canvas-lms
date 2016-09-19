@@ -76,36 +76,25 @@ define([
             {I18n.t('Files')}
           </h1>
         </header>
-        {ENV.use_new_styles && (
-          <div className='ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files no-print'>
-            <button
-              className='Button Button--link Button--small ic-app-course-nav-toggle'
-              type='button'
-              id='courseMenuToggle'
-              title={I18n.t("Show and hide courses menu")}
-              aria-hidden={true}
-            >
-              <i className='icon-hamburger' />
-            </button>
-            <div className='ic-app-crumbs'>
-              <Breadcrumbs
-                rootTillCurrentFolder={this.state.rootTillCurrentFolder}
-                showingSearchResults={this.state.showingSearchResults}
-                query={this.props.query}
-                contextAssetString={this.props.contextAssetString}
-              />
-            </div>
+        <div className='ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files no-print'>
+          <button
+            className='Button Button--link Button--small ic-app-course-nav-toggle'
+            type='button'
+            id='courseMenuToggle'
+            title={I18n.t("Show and hide courses menu")}
+            aria-hidden={true}
+          >
+            <i className='icon-hamburger' />
+          </button>
+          <div className='ic-app-crumbs'>
+            <Breadcrumbs
+              rootTillCurrentFolder={this.state.rootTillCurrentFolder}
+              showingSearchResults={this.state.showingSearchResults}
+              query={this.props.query}
+              contextAssetString={this.props.contextAssetString}
+            />
           </div>
-        )}
-
-        {(!ENV.use_new_styles) && (
-          <Breadcrumbs
-            rootTillCurrentFolder={this.state.rootTillCurrentFolder}
-            showingSearchResults={this.state.showingSearchResults}
-            query={this.props.query}
-            contextAssetString={this.props.contextAssetString}
-          />
-        )}
+        </div>
         <Toolbar
           currentFolder={this.state.currentFolder}
           query={this.props.query}

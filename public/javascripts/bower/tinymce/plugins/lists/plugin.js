@@ -11,6 +11,7 @@
 /*global tinymce:true */
 /*eslint consistent-this:0 */
 
+define(['bower/tinymce/tinymce'], function(tinymce){
 tinymce.PluginManager.add('lists', function(editor) {
 	var self = this;
 
@@ -810,4 +811,5 @@ tinymce.PluginManager.add('lists', function(editor) {
 			}
 		}
 	});
+});
 });

@@ -209,13 +209,8 @@ class ActiveRecord::Base
 
   def touch_user
     if self.respond_to?(:user_id) && self.user_id
-      shard = self.user.shard
-      User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
       User.connection.after_transaction_commit do
-        shard.activate do
-          User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
-        end if shard != Shard.current
-        User.invalidate_cache(self.user_id)
+        User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
       end
     end
     true
@@ -823,7 +818,7 @@ ActiveRecord::Relation.class_eval do
     self.activate do |relation|
       relation.transaction do
         ids_to_touch = relation.not_recently_touched.lock(:no_key_update).order(:id).pluck(:id)
-        unscoped.where(id: ids_to_touch).update_all(updated_at: Time.now.utc)
+        unscoped.where(id: ids_to_touch).update_all(updated_at: Time.now.utc) if ids_to_touch.any?
       end
     end
   end

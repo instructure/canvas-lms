@@ -14,12 +14,32 @@
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
   <%= yield :auto_discovery %>
   <%= yield :head %>
+  <%=
+    # polyfill browsers that don't have a baseline of features we use like Promise or Object.assign
+    polyfill_url = "#{js_base_url}/ie11-polyfill.js"
+    if request.user_agent.to_s =~ /Trident\/7.0.*rv:11/i
+      # If it looks like IE11, assume they are going to need the polyfill
+      # and serve it to them in the more performant way
+      javascript_include_tag(polyfill_url)
+    else
+      # For other browsers, feature-detect for all the stuff we polyfill and
+      # still provide a fallback if they don't have it.
+      # The crazy string concatenation in the document.write is to trick Chrome
+      # into not preemptively downloading it anyway.
+      javascript_tag(%(
+!function(){
+  var o,s,v;
+  if (!(window.Promise && Object.assign && [].find && [].includes && (o={},s=Symbol(),v={},o[s]=v,o[s]===v) && (function f(){}).bind().name==='bound f')) {
+    document.write('<scr'+'ipt src="#{javascript_path(polyfill_url)}"></sc'+'ript>');
+  }
+}();
+      ))
+    end
+  %>
   <%= yield :meta_tags %>
   <%= include_custom_meta_tags %>
-  <% if use_new_styles? %>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
-  <% end %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
   <%= include_css_bundles %>
   <%= yield :stylesheets %>
   <%= include_account_css %>

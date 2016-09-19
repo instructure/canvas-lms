@@ -5,11 +5,7 @@ $mini-cal-highlight-border: #fa0;
 #minical {
   background-color: #fff;
   text-shadow: none;
-  @if $use_new_styles { border: 1px solid $ic-border-light; }
-  @else {
-    border: 1px solid #ccc;
-    border-radius: 3px;
-  }
+  border: 1px solid $ic-border-light;
   .fc-row .fc-content-skeleton {
     padding-bottom: 0; // takes off padding to ensure borders show around dates
   }
@@ -33,8 +29,7 @@ $mini-cal-highlight-border: #fa0;
       margin: 0;
       padding: 0;
     }
-    @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
-    @else { border-bottom: 1px solid #ccc; }
+    border-bottom: 1px solid $ic-border-light;
     margin-bottom: 0;
   }
 
@@ -51,8 +46,7 @@ $mini-cal-highlight-border: #fa0;
   }
 
   .fc-view-container {
-    @if $use_new_styles { padding: 3px; }
-    @else { padding: 6px; }
+    padding: 3px;
     table {
       border-spacing: 8px 2px;
     }
@@ -80,13 +74,11 @@ $mini-cal-highlight-border: #fa0;
 
   .fc-content-skeleton .fc-state-highlight {
     color: $ic-color-light;
-    @if $use_new_styles { font-weight: 500; }
-    @else { font-weight: bold; }
+    font-weight: 500;
   }
 
   .fc-basic-view td.fc-day-number {
-    @if $use_new_styles { padding: 3px 2px 2px 0; }
-    @else { padding: 4px 1px 4px 0px; }
+    padding: 3px 2px 2px 0;
   }
 
   .event {

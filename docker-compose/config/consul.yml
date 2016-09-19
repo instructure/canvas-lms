@@ -4,10 +4,13 @@ production:
   ssl: true
   acl_token: "xxxxxxxx-yyyy-zzzz-1111-222222222222"
 test:
-  host: some.domain
+  host: consul
   port: 8500
   ssl: false
   init_values:
+    canvas:
+      signing-secret: somebigsecret
+      encryption-secret: somebigsecret
     rich-content-service:
       app-host: rce.docker
       cdn-host: rce.docker
@@ -16,6 +19,9 @@ development:
   port: 8500
   ssl: false
   init_values:
+    canvas:
+      signing-secret: somebigsecret
+      encryption-secret: somebigsecret
     rich-content-service:
       app-host: rce.docker
       cdn-host: rce.docker

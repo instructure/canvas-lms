@@ -1,9 +1,0 @@
-<li class="customListItem" data-id="<%= menu_course[:id] %>">
-  <a href="<%= menu_course[:href] %>">
-    <span class="name ellipsis" title="<%= menu_course[:longName] %>"><%= menu_course[:shortName] %></span>
-    <% if defined? menu_course[:term] %>
-      <span class="subtitle ellipsis enrollment_term menu-item-drop-float-right"><%= menu_course[:term] %></span>
-    <% end %>
-    <span class="subtitle ellipsis"><%= menu_course[:subtitle] %></span>
-  </a>
-</li>

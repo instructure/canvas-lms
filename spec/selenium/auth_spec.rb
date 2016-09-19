@@ -5,10 +5,11 @@ describe "auth" do
 
   describe "logout" do
     it "should present confirmation on GET /logout" do
-      user_logged_in
+      user_with_pseudonym active_user: true
+      login_as
+
       get "/logout"
       f('.Button--logout-confirm').click
-      wait_for_ajaximations
 
       keep_trying_until {
         expect(driver.current_url).to match %r{/login/canvas}

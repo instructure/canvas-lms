@@ -4,6 +4,8 @@ module DatesOverridable
   attr_writer :without_overrides
   include DifferentiableAssignment
 
+  class NotOverriddenError < RuntimeError; end
+
   def self.included(base)
     base.has_many :assignment_overrides, :dependent => :destroy
     base.has_many :active_assignment_overrides, -> { where(workflow_state: 'active') }, class_name: 'AssignmentOverride'
@@ -52,7 +54,7 @@ module DatesOverridable
     if overridden
       !!multiple_due_dates_apply_to?(overridden_for_user)
     else
-      raise "#{self.class.name} has not been overridden"
+      raise NotOverriddenError, "#{self.class.name} has not been overridden"
     end
   end
 
@@ -230,7 +232,7 @@ module DatesOverridable
       hash
     end
 
-    if tag_info[:due_date]
+    if user && tag_info[:due_date]
       if tag_info[:due_date] < Time.now
         if self.is_a?(Quizzes::Quiz) || (self.is_a?(Assignment) && expects_submission?)
           has_submission =

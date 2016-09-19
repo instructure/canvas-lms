@@ -7,27 +7,21 @@
   if !@current_user && !@embedded_view
     css_bundle :login
     @headers = false
-    if use_new_styles?
-      @body_classes << "full-width body--login-confirmation"
-    else
-      @body_classes << "modal"
-    end
+    @body_classes << "full-width body--login-confirmation"
   end
 %>
 
 <div
   id="modal-box"
-  <% if use_new_styles? && !@current_user && !@embedded_view %>class="ic-Login-confirmation"<% end %>
+  <% if !@current_user && !@embedded_view %>class="ic-Login-confirmation"<% end %>
 >
-  <% if use_new_styles? && !@current_user && !@embedded_view %>
+  <% if !@current_user && !@embedded_view %>
     <header class="ic-Login-confirmation__header">
       <%= image_tag("login/canvas-logo@2x.png", class:"ic-Login-confirmation__logo", alt:"Canvas by Instructure") %>
     </header>
     <div class="ic-Login-confirmation__content">
   <% end %>
-    <h2
-      <% if use_new_styles? %> class="ic-Login-confirmation__headline"<% end %>
-    >
+    <h2 class="ic-Login-confirmation__headline">
       <%= t('titles.course_enrollment', 'Enroll in %{course}', :course => @course.name) %>
     </h2>
     <% if !@course.self_enrollment_enabled? %>
@@ -49,6 +43,6 @@
         <%= render :partial => 'authenticate' %>
       <% end %>
     <% end %>
-  <% if use_new_styles? && !@current_user && !@embedded_view %></div><% end %>
+  <% if !@current_user && !@embedded_view %></div><% end %>
   <% if @embedded_view %></div><% end %>
 </div>

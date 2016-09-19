@@ -87,7 +87,7 @@ define [
           closeTarget: @$el.find('a[id*=manage_link]')
           saveURL: -> "#{ENV.URLS.assignment_sort_base_url}/#{@parentListView.value()}/reorder"
 
-        if @expectsSubmission() && @model.postToSISEnabled()
+        if @isGraded() && @model.postToSISEnabled()
           @sisButtonView = new SisButtonView(model: @model)
 
       @dateDueColumnView       = new DateDueColumnView(model: @model)
@@ -203,8 +203,8 @@ define [
     canManage: ->
       ENV.PERMISSIONS.manage
 
-    expectsSubmission: ->
-      !_.contains(@model.get('submission_types'), "none")
+    isGraded: ->
+      !_.contains(@model.get('submission_types'), "not_graded")
 
     gradeStrings: (grade) ->
       pass_fail_map =

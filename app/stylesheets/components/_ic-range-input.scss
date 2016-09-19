@@ -9,7 +9,7 @@
   $range-input-slider-color: $ic-color-neutral;
   $range-input-value-bg-color: $ic-color-dark;
   $range-input-value-text-color: $ic-color-light;
-  $range-input-label-color: $ic-color-dark;
+  $range-input-label-color: $ic-font-color-dark;
 
   @mixin range-input-handle-selector() {
     &::-webkit-slider-thumb {

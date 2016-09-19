@@ -77,12 +77,7 @@
     cursor: pointer;
     line-height: 22px;
     position: relative;
-    @if $use_new_styles {
-      &:hover { background: $lightBackground; }
-    }
-    @else {
-      &:hover { background: #b5b5b5; }
-    }
+    &:hover { background: $lightBackground; }
   }
   .context-list-toggle-box {
     width: 11px;

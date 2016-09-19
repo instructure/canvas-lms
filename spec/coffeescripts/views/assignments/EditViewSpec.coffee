@@ -51,7 +51,6 @@ define [
           model: dueDateList
           views: {}
 
-    @stub(app, 'scrollSidebar')
     app.render()
 
   module 'EditView',
@@ -358,3 +357,9 @@ define [
       mockSuper.verify()
       ok stub.calledOnce
       resolved()
+
+  test 'focuses in conditional release editor if conditional save validation fails', ->
+    view = @editView()
+    focusOnError = @stub(view.conditionalReleaseEditor, 'focusOnError')
+    view.showErrors({ conditional_release: 'foo' })
+    ok focusOnError.called

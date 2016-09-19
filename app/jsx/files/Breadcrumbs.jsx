@@ -9,7 +9,7 @@ define([
 ], function(React, I18n, classnames, Breadcrumbs, filesEnv, BreadcrumbCollapsedContainer, splitAssetString) {
 
   var MAX_CRUMB_WIDTH = 500
-  var MIN_CRUMB_WIDTH = (window.ENV.use_new_styles) ? 80 : 40;
+  var MIN_CRUMB_WIDTH = 80;
 
   Breadcrumbs.renderSingleCrumb = function (folder, isLastCrumb, isRootCrumb) {
     const [contextType, contextId] = splitAssetString(this.props.contextAssetString, false);

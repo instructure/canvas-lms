@@ -84,6 +84,7 @@ describe Login::Oauth2Controller do
       session[:oauth2_nonce] = 'bob'
       aac.any_instantiation.expects(:get_token).returns('token')
       aac.any_instantiation.expects(:unique_id).with('token').returns('user')
+      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
       user_with_pseudonym(username: 'user', active_all: 1)
       @pseudonym.authentication_provider = aac
       @pseudonym.save!
@@ -99,6 +100,7 @@ describe Login::Oauth2Controller do
     it "redirects to login if no user found" do
       aac.any_instantiation.expects(:get_token).returns('token')
       aac.any_instantiation.expects(:unique_id).with('token').returns('user')
+      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
 
       session[:oauth2_nonce] = 'bob'
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
@@ -111,6 +113,7 @@ describe Login::Oauth2Controller do
     it "redirects to login if no user information returned" do
       aac.any_instantiation.expects(:get_token).returns('token')
       aac.any_instantiation.expects(:unique_id).with('token').returns(nil)
+      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
 
       session[:oauth2_nonce] = 'bob'
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
@@ -131,6 +134,7 @@ describe Login::Oauth2Controller do
       aac.update_attribute(:jit_provisioning, true)
       aac.any_instantiation.expects(:get_token).returns('token')
       aac.any_instantiation.expects(:unique_id).with('token').returns('user')
+      aac.any_instantiation.expects(:provider_attributes).with('token').returns({})
 
       session[:oauth2_nonce] = 'bob'
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')

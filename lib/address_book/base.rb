@@ -1,7 +1,12 @@
 module AddressBook
 
   # base interface and partial implementation of AddressBook, including
-  # documentation
+  # documentation.
+  #
+  # also integrates the caching layer, so the implementations don't need to
+  # worry about reading from the cache and skipping over precached recipients.
+  # however, the implementations are responsible for storing results into the
+  # cache.
   class Base
     def self.inherited(derived)
       derived.prepend(AddressBook::Caching)
@@ -11,6 +16,12 @@ module AddressBook
 
     def initialize(sender)
       @sender = sender
+      @cache = AddressBook::Caching::Cache.new
+      @cache.store(sender, {}, {})
+    end
+
+    def cached?(user)
+      @cache.cached?(user)
     end
 
     # filters the list of given users to those actually known.
@@ -38,14 +49,24 @@ module AddressBook
     # sender (key: course id, value: list of roles), assuming the user is
     # known. if not known, returns an empty hash
     def common_courses(user)
-      raise NotImplemented
+      if user == @sender
+        return {}
+      else
+        known = known_user(user)
+        known ? @cache.common_courses(known) : {}
+      end
     end
 
     # returns a hash of the user's roles in their common groups with the
     # sender (key: group id, value: list of roles), assuming the user is
     # known. if not known, returns an empty hash
     def common_groups(user)
-      raise NotImplemented
+      if user == @sender
+        return {}
+      else
+        known = known_user(user)
+        known ? @cache.common_groups(known) : {}
+      end
     end
 
     # returns the known users in the given context (passed as an asset string
@@ -103,19 +124,19 @@ module AddressBook
     # flag the provided users as known, even if they would not otherwise be, to
     # allow `lookup` to return entries for them. used when loading common
     # contexts for participants in existing conversations. future lookups of
-    # users not otherwise known will provide empty sets common contexts
+    # users not otherwise known will provide empty sets common contexts.
     def preload_users(users)
       raise NotImplemented
     end
 
     # returns the course sections known to the sender
     def sections
-      raise NotImplemented
+      @sender.messageable_sections
     end
 
     # returns the groups known to the sender
     def groups
-      raise NotImplemented
+      @sender.messageable_groups
     end
   end
 end

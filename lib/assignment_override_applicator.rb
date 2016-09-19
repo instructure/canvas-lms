@@ -37,7 +37,9 @@ module AssignmentOverrideApplicator
     # students get the last overridden date that applies to them, but teachers
     # should see the assignment's due_date if that is more lenient
     context = result_assignment_or_quiz.context
-    if context && context.grants_right?(user, :manage_assignments) # faster than calling :delete rights on each assignment/quiz
+    if context &&
+      (context.user_has_been_admin?(user) || context.user_has_no_enrollments?(user)) && # don't make a permissions call if we don't need to
+      context.grants_right?(user, :manage_assignments) # faster than calling :delete rights on each assignment/quiz
 
       overridden_section_ids = result_assignment_or_quiz
         .applied_overrides.select { |o| o.set_type == "CourseSection" }
@@ -78,11 +80,12 @@ module AssignmentOverrideApplicator
     Rails.cache.fetch(cache_key) do
       next [] if self.has_invalid_args?(assignment_or_quiz, user)
       context = assignment_or_quiz.context
-      visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).map(&:id)
 
       if context.grants_right?(user, :read_as_admin)
         overrides = assignment_or_quiz.assignment_overrides
         if assignment_or_quiz.current_version?
+          visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).except(:select, :order)
+
           overrides = if overrides.loaded?
                         ovs = overrides.select do |ov|
                           ov.workflow_state == 'active' &&

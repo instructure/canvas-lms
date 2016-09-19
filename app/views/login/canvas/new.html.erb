@@ -1,4 +1,3 @@
-
 <%
   css_bundle :login
   js_bundle :login
@@ -7,13 +6,8 @@
 
 <% extend Api::V1::Account %>
 
-<% if use_new_styles? %>
-  <% @body_classes << "full-width ic-Login-Body" if @body_classes %>
-  <%= render "login/canvas/new_login_content" %>
-<% else %>
-  <% @body_classes << "modal" if @body_classes %>
-  <%= render "login/canvas/legacy_login_content" %>
-<% end %>
+<% @body_classes << "full-width ic-Login-Body" if @body_classes %>
+<%= render "login/canvas/new_login_content" %>
 
 <%= # for plugin use
     render "shared/login_trailer" %>

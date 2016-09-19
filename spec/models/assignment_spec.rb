@@ -2060,6 +2060,12 @@ describe Assignment do
           Notification.create(:name => 'Assignment Created')
         end
 
+        it "preload user roles for much fasterness" do
+          @assignment.context.expects(:preloaded_user_has_been?).at_least_once
+
+          @assignment.do_notifications!
+        end
+
         it "should notify of the correct due date for the recipient, or 'multiple'" do
           @assignment.do_notifications!
 

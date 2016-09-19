@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../../sharding_spec_helper'
 
 describe CalendarEventsApiController, type: :request do
   before :once do
@@ -26,7 +27,7 @@ describe CalendarEventsApiController, type: :request do
 
   context 'events' do
     expected_fields = [
-      'all_day', 'all_day_date', 'child_events', 'child_events_count', 'comments',
+      'all_context_codes', 'all_day', 'all_day_date', 'child_events', 'child_events_count', 'comments',
       'context_code', 'created_at', 'description', 'duplicates', 'end_at', 'hidden', 'html_url',
       'id', 'location_address', 'location_name', 'parent_event_id', 'start_at',
       'title', 'type', 'updated_at', 'url', 'workflow_state'
@@ -615,6 +616,17 @@ describe CalendarEventsApiController, type: :request do
             expect(error['reservations'].size).to eql 0
           end
 
+          context "sharding" do
+            specs_require_sharding
+
+            it "should allow students to specify themselves as the participant" do
+              short_form_id = "#{Shard.current.id}~#{@user.id}"
+              api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations/#{short_form_id}", {
+                :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s, :participant_id => short_form_id})
+              expect(response).to be_success
+            end
+          end
+
           it "should notify the teacher when appointment is canceled" do
             json = api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations", {
               :controller => 'calendar_events_api',
@@ -868,6 +880,15 @@ describe CalendarEventsApiController, type: :request do
       cal = Icalendar.parse(response.body.dup)[0]
       expect(cal.events[0].description).to eq nil
       expect(cal.events[0].x_alt_desc).to eq nil
+    end
+
+    it 'works when event descriptions contain paths to user attachments' do
+      attachment_with_context(@user)
+      @user.calendar_events.create!(description: "/users/#{@user.id}/files/#{@attachment.id}", start_at: Time.now)
+      json = api_call(:get, "/api/v1/calendar_events", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json'
+      })
+      expect(response).to be_success
     end
 
     context "child_events" do

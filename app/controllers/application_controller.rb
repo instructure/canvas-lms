@@ -115,7 +115,6 @@ class ApplicationController < ActionController::Base
         current_user_disabled_inbox: @current_user.try(:disabled_inbox?),
         files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
-        use_new_styles: use_new_styles?,
         k12: k12?,
         help_link_name: help_link_name,
         help_link_icon: help_link_icon,
@@ -218,11 +217,6 @@ class ApplicationController < ActionController::Base
     @domain_root_account && @domain_root_account.feature_enabled?(:k12)
   end
   helper_method :k12?
-
-  def use_new_styles?
-    @domain_root_account && @domain_root_account.feature_enabled?(:use_new_styles) || k12?
-  end
-  helper_method :use_new_styles?
 
   def multiple_grading_periods?
     account_and_grading_periods_allowed? ||
@@ -407,10 +401,12 @@ class ApplicationController < ActionController::Base
 
   def tab_enabled?(id, opts = {})
     return true unless @context && @context.respond_to?(:tabs_available)
-    tabs = @context.tabs_available(@current_user,
-                                   :session => session,
-                                   :include_hidden_unused => true,
-                                   :root_account => @domain_root_account)
+    tabs = Rails.cache.fetch(['tabs_available', @context, @current_user, @domain_root_account,
+      session[:enrollment_uuid]].cache_key, expires_in: 1.hour) do
+
+      @context.tabs_available(@current_user,
+        :session => session, :include_hidden_unused => true, :root_account => @domain_root_account)
+    end
     valid = tabs.any?{|t| t[:id] == id }
     render_tab_disabled unless valid || opts[:no_render]
     return valid
@@ -570,9 +566,8 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && @current_user
-          context_enrollments = @context.enrollments.where(user_id: @current_user).to_a
-          Canvas::Builders::EnrollmentDateBuilder.preload_state(context_enrollments)
-          @context_enrollment = context_enrollments.sort_by{|e| [e.state_with_date_sortable, e.rank_sortable, e.id] }.first
+          @context_enrollment = @context.enrollments.where(user_id: @current_user).joins(:enrollment_state).
+            order(Enrollment.state_by_date_rank_sql, Enrollment.type_rank_sql).readonly(false).first
         end
         @context_membership = @context_enrollment
         check_for_readonly_enrollment_state
@@ -652,18 +647,17 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      enrollment_scope = @context.enrollments.current.shard(@context).preload(:course, :enrollment_state)
+      enrollment_scope = Enrollment.for_user(@context).active_by_date
       group_scope = opts[:include_groups] ? @context.current_groups : nil
 
+      courses = []
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
         # view them.
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
-        if course_ids.empty?
-          enrollment_scope = enrollment_scope.none
-        else
-          enrollment_scope = enrollment_scope.where(:course_id => course_ids)
+        unless course_ids.empty?
+          courses = Course.where(:id => course_ids).where(:id => enrollment_scope.select(:course_id)).to_a
         end
         if group_scope
           group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
@@ -673,8 +667,11 @@ class ApplicationController < ActionController::Base
             group_scope = group_scope.where(:id => group_ids)
           end
         end
+      else
+        courses = Course.shard(@context).where(:id => enrollment_scope.select(:course_id)).to_a
+        enrollment_scope = Enrollment.for_user(@context).active_by_date
       end
-      courses = enrollment_scope.select(&:active?).map(&:course).uniq
+
       groups = group_scope ? group_scope.shard(@context).to_a.reject{|g| g.context_type == "Course" && g.context.concluded?} : []
 
       if opts[:favorites_first]
@@ -1100,7 +1097,7 @@ class ApplicationController < ActionController::Base
         @page_view_update = true
       end
       if @page_view && @page_view_update
-        @page_view.context = @context if !@page_view.context_id
+        @page_view.context = @context if !@page_view.context_id && PageView::CONTEXT_TYPES.include?(@context.class.name)
         @page_view.account_id = @domain_root_account.id
         @page_view.developer_key_id = @access_token.try(:developer_key_id)
         @page_view.store

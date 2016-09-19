@@ -4,26 +4,23 @@
     margin: 0;
     padding: 4px $ic-content-padding;
     list-style: none;
-    @if $use_new_styles { padding: 0; }
-    @else { padding: 4px $ic-content-padding; }
+    padding: 0;
     > li {
       display: inline-block;
       white-space: nowrap;
-      @if $use_new_styles {
-        vertical-align: top;
-        @include fontSize(18px);
-        // temporary solution for new styles before crumbs are re-done:
-        // we do not want to see the home link
-        &:first-of-type { display: none; }
-        &:nth-child(2):before { display: none; }
-      }
+      vertical-align: top;
+      @include fontSize(18px);
+      // temporary solution for new styles before crumbs are re-done:
+      // we do not want to see the home link
+      &:first-of-type { display: none; }
+      &:nth-child(2):before { display: none; }
 
       // We need to give the <span class="ellipsis"> a display other than inline so
       // it can do the ellipsis thing. But if we use block or inline-block we get
       // white space issues, hence the float.
       > a .ellipsis {
         float: right;
-        @if $use_new_styles { line-height: inherit; }
+        line-height: inherit;
         // firefox has a bug so it can't do it like the rest of the browsers:
         // https://bugzilla.mozilla.org/show_bug.cgi?id=488725
         // so we have to do it differently, but doing it this way doesn't work in safari.
@@ -38,26 +35,15 @@
 
       + li {
         &:before {
-          @if $use_new_styles {
-            content: "";
-            width: 5px; height: 9px;
-            display: inline-block;
-            margin: 0 ($ic-sp - 3);
-            background: url("/images/breadcrumb-arrow-light.svg") no-repeat 50% 50%;
-            background-size: 5px 9px;
-          }
-          @else {
-            @extend i[class*=icon-]:before;
-            @extend .icon-arrow-open-right:before;
-            font-size: 10px !important;
-            font-size: 0.65rem !important;
-            color: hsl(0,0,61%);
-            padding: 0 5px;
-          }
+          content: "";
+          width: 5px; height: 9px;
+          display: inline-block;
+          margin: 0 ($ic-sp - 3);
+          background: url("/images/breadcrumb-arrow-light.svg") no-repeat 50% 50%;
+          background-size: 5px 9px;
         }
         &:last-of-type a {
-          @if $use_new_styles { color: $ic-font-color-dark; }
-          @else { color: $ic-font-color--subdued; }
+          color: $ic-font-color-dark;
         }
       }
     }

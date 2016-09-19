@@ -672,6 +672,25 @@ describe CoursesController do
       check_course_show(true)
     end
 
+    context 'when default_view is `syllabus`' do
+      before do
+        course_with_student_logged_in(active_course: 1)
+        @course.default_view = 'syllabus'
+        @course.syllabus_body = '<p>This is your syllabus.</p>'
+        @course.save!
+      end
+
+      it 'assigns syllabus_body' do
+        get :show, id: @course.id
+        expect(assigns[:syllabus_body]).not_to be_nil
+      end
+
+      it 'assigns groups' do
+        get :show, id: @course.id
+        expect(assigns[:groups]).not_to be_nil
+      end
+    end
+
     context "show feedback for the current course only on course front page" do
       before(:once) do
         course_with_student(:active_all => true)
@@ -778,6 +797,7 @@ describe CoursesController do
         get 'show', :id => @course3.id
         expect(assigns(:show_recent_feedback)).to be_falsey
       end
+
     end
 
     context "invitations" do

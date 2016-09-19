@@ -301,6 +301,8 @@ Switchman::Rake.filter_database_servers do |servers, block|
   block.call(servers)
 end
 
-%w{db:pending_migrations db:skipped_migrations db:migrate:predeploy}.each { |task_name| Switchman::Rake.shardify_task(task_name) }
+%w{db:pending_migrations db:skipped_migrations db:migrate:predeploy}.each do |task_name|
+  Switchman::Rake.shardify_task(task_name, categories: ->{ Shard.categories })
+end
 
 end

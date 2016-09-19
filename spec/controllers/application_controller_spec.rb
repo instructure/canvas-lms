@@ -667,12 +667,7 @@ describe ApplicationController do
       user
       controller.instance_variable_set(:@context, @user)
 
-      course_scope = stub('current_enrollments')
-      course_scope.stubs(:current).returns(course_scope)
-      course_scope.stubs(:shard).returns(course_scope)
-      course_scope.stubs(:preload).returns(course_scope)
-      course_scope.expects(:none).returns(Enrollment.none)
-      @user.stubs(:enrollments).returns(course_scope)
+      Course.expects(:where).never
       controller.send(:get_all_pertinent_contexts, only_contexts: 'Group_1')
     end
 

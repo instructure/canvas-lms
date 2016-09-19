@@ -298,6 +298,7 @@ class CoursesController < ApplicationController
   include SearchHelper
   include ContextExternalToolsHelper
   include CustomSidebarLinksHelper
+  include SyllabusHelper
 
   before_filter :require_user, :only => [:index]
   before_filter :require_user_or_observer, :only=>[:user_index]
@@ -1615,12 +1616,11 @@ class CoursesController < ApplicationController
       when 'syllabus'
         rce_js_env(:sidebar)
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
-        @syllabus_body = api_user_content(@context.syllabus_body, @context)
-        @groups = @context.assignment_groups.active.order(:position, AssignmentGroup.best_unicode_collation_key('name')).to_a
-        @events = @context.calendar_events.active.to_a
-        @events.concat @context.assignments.active.to_a
-        @undated_events = @events.select {|e| e.start_at == nil}
-        @dates = (@events.select {|e| e.start_at != nil}).map {|e| e.start_at.to_date}.uniq.sort.sort
+        @groups = @context.assignment_groups.active.order(
+          :position,
+          AssignmentGroup.best_unicode_collation_key('name')
+        ).to_a
+        @syllabus_body = syllabus_user_content
       else
         @active_tab = "home"
         if @context.grants_right?(@current_user, session, :manage_groups)

@@ -84,7 +84,7 @@ input[type="color"],
   margin-bottom: $baseLineHeight / 2;
   @include fontSize($baseFontSize);
   line-height: $baseLineHeight;
-  color: $gray;
+  color: $ic-font-color-dark;
   @include border-radius($inputBorderRadius);
   vertical-align: middle;
 }
@@ -551,7 +551,6 @@ input.search-query {
   padding-left: 14px;
   padding-left: 4px \9; /* IE7-8 doesn't have border-radius, so don't indent the padding */
   margin-bottom: 0; // Remove the default margin on all inputs
-  @if $use_new_styles == false { @include border-radius(15px); }
 }
 
 /* Allow for input prepend/append in search forms */

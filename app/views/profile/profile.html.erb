@@ -46,14 +46,14 @@
 <table class="profile_table">
   <tr>
     <% editable_name = @user.user_can_edit_name? %>
-    <td><%= f.blabel :name, :en => "Full Name" %></td>
+    <th scope="row"><%= f.blabel :name, :en => "Full Name" %></th>
     <td><span <% unless editable_name %>id="name"<% end %>
               class="full_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.name %></span>
       <%= f.text_field :name, :class => "edit_data", :maxlength => 255, :size => 30, "aria-describedby" => "hints_name" if editable_name %>
       <span id="hints_name" class="edit_or_show_data data_description"><br/><%= t('hints.name', "This name will be used for grading.") %></span>
   </tr>
   <tr>
-    <td><%= f.blabel :short_name, :en => "Display Name" %></td>
+    <th scope="row"><%= f.blabel :short_name, :en => "Display Name" %></th>
     <td><span <% unless editable_name %>id="short_name"<% end %>
               class="short_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.short_name %></span>
       <%= f.text_field :short_name, :class => "edit_data", :maxlength => 255, :size => 30, "aria-describedby" => "hints_short_name" if editable_name %>
@@ -61,7 +61,7 @@
     </td>
   </tr>
   <tr>
-    <td><%= f.blabel :sortable_name, :en => "Sortable Name" %></td>
+    <th scope="row"><%= f.blabel :sortable_name, :en => "Sortable Name" %></th>
     <td><span <% unless editable_name %>id="sortable_name"<% end %>
               class="sortable_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.sortable_name %></span>
       <%= f.text_field :sortable_name, :class => "edit_data", :maxlength => 255, :size => 30, "aria-describedby" => "hints_sortable_name" if editable_name %>
@@ -71,7 +71,7 @@
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>
   <% if active_email_channels.length > 1 %>
     <tr>
-      <td><label for="default_email_id"><%= before_label(:default_email, "Default Email") %></label></td>
+      <th scope="row"><label for="default_email_id"><%= before_label(:default_email, "Default Email") %></label></th>
       <td>
         <span class="default_email unique_id display_data"><%=h @default_email_channel.path %></span>
         <select id="default_email_id" name="default_email_id" class="default_email edit_data">
@@ -84,7 +84,7 @@
   <% end %>
   <% if available_locales.size > 1 %>
   <tr>
-    <td><%= f.blabel :locale, :en => "Language" %></td>
+    <th scope="row"><%= f.blabel :locale, :en => "Language" %></th>
     <td>
       <% no_language = t("System Default (%{language})", :language => available_locales[infer_locale(:root_account => @domain_root_account, :accept_language => request.headers['Accept-Language'])]) %>
       <span class="locale display_data"><%= @user.locale ? available_locales[@user.locale] : no_language %></span>
@@ -96,7 +96,7 @@
   </tr>
   <% end %>
   <tr>
-    <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
+    <th scope="row"><%= f.blabel :time_zone, :en => "Time Zone" %></th>
     <td>
       <span class="time_zone display_data">
         <% if name = @user.time_zone.try(:name) %>
@@ -122,12 +122,12 @@
   <% end %>
   <% if !@password_pseudonyms.empty? %>
   <tr class="edit_data_row select_change_password_row" style="display: none;">
-    <td><%= before_label(:password, "Password") %></td>
+    <th scope="row"><%= before_label(:password, "Password") %></th>
     <td><label for="change_password_checkbox" class="checkbox"><input type="checkbox" id="change_password_checkbox" name="pseudonym[change_password]" value="1"/><%= t('labels.change_password', "Change Password") %></label></td>
   </tr>
   <% end %>
   <tr class="change_password_row" style="display: none;">
-    <td class="nobr"><label for="profile_pseudonym_id"><%= before_label(:password_for, "Password For") %></label></td>
+    <th class="nobr" scope="row"><label for="profile_pseudonym_id"><%= before_label(:password_for, "Password For") %></label></th>
     <td>
       <select name="pseudonym[password_id]" id="profile_pseudonym_id">
         <% @password_pseudonyms.each do |p| %>
@@ -137,19 +137,19 @@
     </td>
   </tr>
   <tr class="change_password_row" style="display: none;">
-    <td><label for="old_password"><%= before_label(:old_password, "Old Password") %></label></td>
+    <th scope="row"><label for="old_password"><%= before_label(:old_password, "Old Password") %></label></th>
     <td><input type="password" style="width: 150px;" id="old_password" name="pseudonym[old_password]"/></td>
   </tr>
   <tr class="change_password_row" style="display: none;">
-    <td><%= label :pseudonym, :password, before_label(:new_password, "New Password") %></td>
+    <th scope="row"><%= label :pseudonym, :password, before_label(:new_password, "New Password") %></th>
     <td><%= password_field :pseudonym, :password, :value => "", :style => "width: 150px;" %></td>
   </tr>
   <tr class="change_password_row" style="display: none;">
-    <td><%= label :pseudonym, :password_confirmation, before_label(:confirm_password, "Confirm Password") %></td>
+    <th scope="row"><%= label :pseudonym, :password_confirmation, before_label(:confirm_password, "Confirm Password") %></th>
     <td><%= password_field :pseudonym, :password_confirmation, :value => "", :style => "width: 150px;" %></td>
   </tr>
   <tr class="edit_data_row more_options_link_row" style="display: none;">
-    <td colspan="2"><a href="#" class="more_options_link" style="display: none;"><%= t('links.more_options', "more options") %></a></td>
+    <th scope="row" colspan="2"><a href="#" class="more_options_link" style="display: none;"><%= t('links.more_options', "more options") %></a></th>
   </tr>
 
   <tr class="edit_data_row" style="display: none;">
@@ -171,8 +171,8 @@
 <table class="summary pseudonym_list">
   <thead>
     <tr>
-      <th><%= t('headers.organization', "Organization") %></th>
-      <th><%= t('headers.login', "Login") %></th>
+      <th scope="col"><%= t('headers.organization', "Organization") %></th>
+      <th scope="col"><%= t('headers.login', "Login") %></th>
       <th>&nbsp;</th>
     </tr>
   </thead>
@@ -212,7 +212,7 @@ TEXT
 <p>
 <input type="checkbox" id="show_user_services" <%= 'checked' if @user.show_user_services %>/> <label for="show_user_services"><%= t('labels.show_user_services', "Let fellow course/group members see which services I've linked to my profile") %></label>
 </p>
-<table style="width: 100%;"><tr>
+<table role="presentation" style="width: 100%;"><tr>
   <td style="vertical-align: top; width: 50%; padding-right: 20px;">
     <h3><%= t('headers.registered_services', "Registered Services") %></h3>
     <div style="margin-left: 20px; margin-bottom: 20px;">
@@ -293,7 +293,7 @@ TEXT
           <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
             <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "skype" do |f| %>
             <%= f.hidden_field :service, :value => "skype" %>
-            <table class="formtable">
+            <table class="formtable" role="presentation">
               <tr>
                 <td><%= f.blabel :user_name, :skype_name, :en => "Skype Name" %></td>
                 <td><%= f.text_field :user_name, :style => "width: 150px;" %></td>
@@ -373,7 +373,7 @@ TEXT
           <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
             <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "yo" do |f| %>
             <%= f.hidden_field :service, :value => "yo" %>
-            <table class="formtable">
+            <table class="formtable" role="presentation">
               <tr>
                 <td><%= f.blabel :user_name, :yo_name, :en => "Yo Name" %></td>
                 <td><%= f.text_field :user_name, :style => "width: 150px;" %></td>
@@ -404,7 +404,7 @@ TEXT
           <div style="font-size: 1.0em; margin-top: 10px;">
             <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "delicious" do |f| %>
             <%= f.hidden_field :service, :value => "delicious" %>
-            <table class="formtable">
+            <table role="presentation" class="formtable">
               <tr>
                 <td><%= f.blabel :user_name, :en => "User Name" %></td>
                 <td><%= f.text_field :user_name, :style => "width: 150px;" %></td>
@@ -439,7 +439,7 @@ TEXT
           <div style="font-size: 1.0em; margin-top: 10px;">
             <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "diigo" do |f| %>
             <%= f.hidden_field :service, :value => "diigo" %>
-            <table class="formtable">
+            <table role="presentation" class="formtable">
               <tr>
                 <td><%= f.blabel :user_name, :en => "User Name" %></td>
                 <td><%= f.text_field :user_name, :style => "width: 150px;" %></td>
@@ -480,9 +480,9 @@ TEXT
     <table id="access_tokens" class="summary" style="margin-top: 10px;">
       <thead>
         <tr>
-          <th><%= t('headers.application_abbrev', "App") %></th>
-          <th><%= t('headers.purpose', "Purpose") %></th>
-          <th><%= t('headers.dates', "Dates") %></th>
+          <th scope="col"><%= t('headers.application_abbrev', "App") %></th>
+          <th scope="col"><%= t('headers.purpose', "Purpose") %></th>
+          <th scope="col"><%= t('headers.dates', "Dates") %></th>
           <th>&nbsp;</th>
           <th>&nbsp;</th>
         </tr>
@@ -511,7 +511,7 @@ TEXT
     <div class="results">
       <table>
         <tr>
-          <th><%= before_label(:token, "Token") %></th>
+          <th scope="row"><%= before_label(:token, "Token") %></th>
           <td>
             <div class="visible_token">&nbsp;</div>
             <div class="full_token_warning"><%= mt(:full_token_warning, <<-TEXT)
@@ -522,19 +522,19 @@ TEXT
             %></div>
           </td>
         </tr><tr>
-          <th><%= before_label(:token_application, "App") %></th>
+          <th scope="row"><%= before_label(:token_application, "App") %></th>
           <td class="app_name">&nbsp;</td>
         </tr><tr>
-          <th><%= before_label(:token_purpose, "Purpose") %></th>
+          <th scope="row"><%= before_label(:token_purpose, "Purpose") %></th>
           <td class="purpose">&nbsp;</td>
         </tr><tr>
-          <th><%= before_label(:token_created, "Created") %></th>
+          <th scope="row"><%= before_label(:token_created, "Created") %></th>
           <td class="created">&nbsp;</td>
         </tr><tr>
-          <th><%= before_label(:token_last_used, "Last Used") %></th>
+          <th scope="row"><%= before_label(:token_last_used, "Last Used") %></th>
           <td class="used">&nbsp;</td>
         </tr><tr>
-          <th><%= before_label(:token_expires, "Expires") %></th>
+          <th scope="row"><%= before_label(:token_expires, "Expires") %></th>
           <td class="expires">&nbsp;</td>
         </tr>
         <% unless @real_current_user %>
@@ -559,7 +559,7 @@ project](%{documentation_url}) you can just generate the token from here.
 TEXT
     %>
     <%= form_for :access_token, :url => profile_tokens_url, :html => {:id => "access_token_form", :style => "margin-top: 10px;"} do |f| %>
-      <table class="formtable">
+      <table class="formtable" role="presentation">
         <tr>
           <td><%= f.blabel :purpose, :en => "Purpose" %></td>
           <td><%= f.text_field :purpose %></td>

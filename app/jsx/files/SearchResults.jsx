@@ -11,7 +11,7 @@ define([
   'jsx/files/FilePreview',
   'page',
   'compiled/react_files/modules/FocusStore'
-], function(I18n, _, React, SearchResults, NoResults, ColumnHeaders, Folder, FolderChild, LoadingIndicator, FilePreview, Page, FocusStore) {
+], function(I18n, _, React, SearchResults, NoResults, ColumnHeaders, Folder, FolderChild, LoadingIndicator, FilePreview, page, FocusStore) {
 
   SearchResults.displayErrors =  function (errors) {
     var error_message= null

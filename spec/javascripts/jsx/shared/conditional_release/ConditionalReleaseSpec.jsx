@@ -143,11 +143,24 @@ define([
     test('it can set and retrieve validation errors', () => {
       createComponent();
 
-      sendMessage('validationError', 'foo');
-      ok(component.validateBeforeSave() == 'foo');
+      sendMessage('validationErrors', '[{ "index": 1, "error": "foo" }]');
+      deepEqual(component.validateBeforeSave(), [{ message: 'foo' }]);
 
-      sendMessage('validationError', null);
+      sendMessage('validationErrors', null);
       ok(component.validateBeforeSave() == null);
     });
+  });
+
+  module('focusOnError', () => {
+    test('it dispatches a focusOnError event', (assert) => {
+      createComponent()
+      const resolved = assert.async()
+      const remotePort = connectComponent()
+      remotePort.onmessage = (event) => {
+        ok(event.data.messageType === 'focusOnError')
+        resolved()
+      }
+      component.focusOnError()
+    })
   });
 });

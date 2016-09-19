@@ -1,23 +1,14 @@
-<footer role="contentinfo" id="footer" <% if use_new_styles? %>class="ic-app-footer"<% end %>>
-  <a href="http://www.instructure.com" class="footer-logo <% if use_new_styles? %>ic-app-footer__logo-link<% end %>">
+<footer role="contentinfo" id="footer" class="ic-app-footer">
+  <a href="http://www.instructure.com" class="footer-logo ic-app-footer__logo-link">
     <span class="screenreader-only">
       <%= t(:by_instructure, 'By Instructure') %>
     </span>
   </a>
-  <% if use_new_styles? %><div
-  <% else %><span
-  <% end %>
-    id="footer-links"
-    <% if use_new_styles? %>class="ic-app-footer__links"<% end %>>
+  <div id="footer-links" class="ic-app-footer__links">
     <% if Setting.get("show_opensource_linkback", "false") == "true" %>
       <a href="http://instructure.com"><%= t('open_source_learning_management_system', 'Open Source LMS') %></a>
     <% end %>
     <a target="_blank" href="http://eepurl.com/1LSkT"><%= t('User Research', 'User Research') %></a>
-    <% unless use_new_styles? %>
-      <%= help_link %>
-    <% end %>
     <%= render :partial => 'shared/footer_links' %>
-  <% if use_new_styles? %></div>
-  <% else %></span>
-  <% end %>
+  </div>
 </footer>

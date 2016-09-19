@@ -77,14 +77,12 @@ define([
         if (initialState.locked) {
           initialState.selectedOption = 'unpublished'
         } else {
-          if (initialState.hidden) {
+          if (initialState.lock_at || initialState.unlock_at) {
+            initialState.selectedOption = 'date_range'
+          } else if (initialState.hidden) {
             initialState.selectedOption = 'link_only'
           } else {
-            if (initialState.lock_at || initialState.unlock_at) {
-              initialState.selectedOption = 'date_range'
-            } else {
-              initialState.selectedOption = 'published'
-            }
+            initialState.selectedOption = 'published'
           }
         };
       }

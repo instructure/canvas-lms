@@ -217,12 +217,9 @@
     margin: 5px 0px;
     width: 100%;
     td, tbody th {
-      @if $use_new_styles { background-color: $lightBackground; }
-      @else { background-color: #e6e7e9; }
+      background-color: $lightBackground;
     }
-    @if $use_new_styles {
-      tbody th { font-weight: 500; }
-    }
+    tbody th { font-weight: 500; }
   }
   table.notifications {
     border-top: 2px solid #999;
@@ -261,8 +258,7 @@
   .events_list, .to-do-list {
     li.event, li.todo {
       i.icon-check {
-        @if $use_new_styles { color: $ic-color-success; }
-        @else { color: #33802a; }
+        color: $ic-color-success;
       }
       .todo-badge {
         @include ic-badge-maker(18px);
@@ -276,8 +272,7 @@
     }
   }
   .events_list {
-    @if $use_new_styles { margin-bottom: $ic-sp*2; }
-    @else { margin-bottom: 20px; }
+    margin-bottom: $ic-sp*2;
     .event-list-view-calendar {
       float: right;
       @include fontSize(12px);
@@ -288,9 +283,7 @@
       }
     }
   }
-  @if $use_new_styles {
-    * + .events_list { margin-top: $ic-sp*2; }
-  }
+  * + .events_list { margin-top: $ic-sp*2; }
   .details {
     margin: 5px;
     padding: 5px 10px;
@@ -319,36 +312,15 @@ table.summary {
     text-align: left;
   }
   th, td, caption {
-    @if $use_new_styles {
-      padding: $ic-sp/2;
-    }
-    @else {
-      padding: 2px 8px;
-      vertical-align: top;
-    }
+    padding: $ic-sp/2;
   }
   thead th, caption {
-    @if $use_new_styles {
-      font-weight: 500;
-      border-bottom: 1px solid $ic-border-dark;
-    }
-    @else {
-      background-color: #4d4d4d;
-      color: #fff;
-      font-weight: normal;
-      border-bottom: 1px solid #4d4d4d;
-    }
+    font-weight: 500;
+    border-bottom: 1px solid $ic-border-dark;
   }
   td, tbody th {
-    @if $use_new_styles {
-      border-bottom: 1px solid $ic-border-light;
-      background-color: $ic-color-light;
-    }
-    @else {
-      border-top: 1px dotted #aaa;
-      background-color: #f2f3f5;
-      color: #595959;
-    }
+    border-bottom: 1px solid $ic-border-light;
+    background-color: $ic-color-light;
   }
   table.subtable {
     th, td {
@@ -376,10 +348,9 @@ table.formtable td {
     font-weight: bold;
   }
   .unpublished .name a {
-    color: #888;
+    color: $ic-font-color--subdued;
   }
   .details {
-    color: #555;
     font-size: 0.8em;
     margin: 0 0 0 10px;
   }
@@ -390,7 +361,7 @@ table.formtable td {
     .links {
       color: #eee;
       a {
-        color: #767676;
+        color: $ic-font-color--subdued;
       }
     }
   }
@@ -405,9 +376,9 @@ table.formtable td {
   .course, .group, .account {
     .info {
       .links {
-        color: #ccc;
+        color: $ic-hint-text;
         a {
-          color: #444;
+          color: $ic-font-color-dark;
         }
       }
     }
@@ -415,7 +386,7 @@ table.formtable td {
 }
 
 span.hint {
-  color: #444;
+  color: $ic-font-color-dark;
   font-size: 0.8em;
 }
 
@@ -424,11 +395,11 @@ span.hint {
 }
 
 .error_message {
-  color: #ED002F;
+  color: $ic-color-danger;
 }
 
 .formError {
-  color: #ED002F;
+  color: $ic-color-danger;
   font-size: 0.8em;
   padding-left: 15px;
 }
@@ -448,12 +419,11 @@ span.hint {
   }
   .message {
     font-size: 1.5em;
-    color: #000;
   }
 }
 
 .loading_image {
-  background-color: #fff;
+  background-color: $ic-color-light;
 }
 
 // the body part here is to make this selector more specific than the atr-*** ones in g_util_fancy_links.scss so this overrides
@@ -494,10 +464,6 @@ body .disabled_link {
   margin: 20px auto;
   &.paper {
     min-width: 400px;
-    @if $use_new_styles == false {
-      padding: 10px 20px;
-      border: 1px solid #aaa;
-    }
   }
   &.plain_text {
     width: 90%;
@@ -534,7 +500,6 @@ $wizard-highlight-color: $ic-brand-primary;
   }
 }
 
-
 @keyframes icon-slide-up {
   from {
     transform: translate3d(0, 48px, 0);
@@ -543,7 +508,6 @@ $wizard-highlight-color: $ic-brand-primary;
     transform: translate3d(0, 0, 0);
   }
 }
-
 
 #wizard_box {
   border-bottom: 1px solid #aaa;
@@ -621,7 +585,7 @@ $wizard-highlight-color: $ic-brand-primary;
         &.selected {
           @if $use_high_contrast {
             a {
-              color: $ic-color-dark;
+              color: $ic-font-color-dark;
               text-decoration: none;
             }
           }
@@ -1610,8 +1574,7 @@ body.padless-content #content, #content.padless {
 }
 
 #sequence_footer {
-  @if $use_new_styles { padding-top: $ic-sp*2; }
-  @else { padding-top: 15px; }
+  padding-top: $ic-sp*2;
   .next, .prev {
     width: 150px;
     overflow: hidden;
@@ -1727,7 +1690,7 @@ form.user_content_post_form {
 
 .with-fixed-bottom #wrapper-container {
   padding-bottom: 60px;
-  @if $use_new_styles { box-sizing: border-box; }
+  box-sizing: border-box;
 }
 
 #fixed_bottom {

@@ -50,7 +50,7 @@
     <div class="event-details">
       <b><%= recent_event.title %></b>
       <% if show_context %>
-        <p><%= context.nickname_for(@current_user) %></p>
+        <p><%= context.nickname_for(@current_user, :short_name) %></p>
       <% end %>
       <p>
         <% if is_assignment %>
