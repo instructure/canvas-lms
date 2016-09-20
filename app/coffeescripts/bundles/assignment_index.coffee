@@ -71,10 +71,12 @@ require [
       model: course
       assignmentGroups: assignmentGroups
       weightsView: AssignmentGroupWeightsView
+      userIsAdmin: userIsAdmin
 
     createGroupView = new CreateGroupView
       assignmentGroups: assignmentGroups
       course: course
+      userIsAdmin: userIsAdmin
   else
     showByView = new ToggleShowByView
       course: course

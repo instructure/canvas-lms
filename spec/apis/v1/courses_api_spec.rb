@@ -932,6 +932,64 @@ describe CoursesController, type: :request do
         @course.reload
         expect(@course.grading_standard).to eq @standard
       end
+
+      context "when an assignment is due in a closed grading period" do
+        before(:once) do
+          @course.root_account.enable_feature!(:multiple_grading_periods)
+          @course.update_attributes(group_weighting_scheme: "equal")
+          @grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+          term = @course.enrollment_term
+          term.grading_period_group = @grading_period_group
+          term.save!
+          Factories::GradingPeriodHelper.new.create_for_group(@grading_period_group, {
+            start_date: 2.weeks.ago, end_date: 2.days.ago, close_date: 1.day.ago
+          })
+          @group = @course.assignment_groups.create!(name: 'group')
+          @assignment = @course.assignments.create!({
+            title: 'assignment', assignment_group: @group, due_at: 1.week.ago
+          })
+        end
+
+        it "can change apply_assignment_group_weights with a term change" do
+          @term.grading_period_group = @grading_period_group
+          @term.save!
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '200'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("percent")
+        end
+
+        it "can change apply_assignment_group_weights without a term change" do
+          @new_values["course"].delete("enrollment_term_id")
+          @new_values["course"].delete("term_id")
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '200'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("percent")
+        end
+
+        it "can change group_weighting_scheme with a term change" do
+          @term.grading_period_group = @grading_period_group
+          @term.save!
+          @new_values["course"].delete("apply_assignment_group_weights")
+          @new_values["course"]["group_weighting_scheme"] = "percent"
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '200'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("percent")
+        end
+
+        it "can change group_weighting_scheme without a term change" do
+          @new_values["course"].delete("enrollment_term_id")
+          @new_values["course"].delete("term_id")
+          @new_values["course"].delete("apply_assignment_group_weights")
+          @new_values["course"]["group_weighting_scheme"] = "percent"
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '200'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("percent")
+        end
+      end
     end
 
     context "a designer" do
@@ -1007,14 +1065,108 @@ describe CoursesController, type: :request do
         @course.reload
         expect(@course.sis_source_id).to eql original_sis
       end
+
+      context "when an assignment is due in a closed grading period" do
+        before :once do
+          @course.update_attributes(group_weighting_scheme: "equal")
+          @grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+          term = @course.enrollment_term
+          term.grading_period_group = @grading_period_group
+          term.save!
+          Factories::GradingPeriodHelper.new.create_for_group(@grading_period_group, {
+            start_date: 2.weeks.ago, end_date: 2.days.ago, close_date: 1.day.ago
+          })
+          @group = @course.assignment_groups.create!(name: 'group')
+          @assignment = @course.assignments.create!({
+            title: 'assignment', assignment_group: @group, due_at: 1.week.ago
+          })
+        end
+
+        before :each do
+          @course.root_account.enable_feature!(:multiple_grading_periods)
+        end
+
+        it "cannot change apply_assignment_group_weights with a term change" do
+          @term.grading_period_group = @grading_period_group
+          @term.save!
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '401'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("equal")
+        end
+
+        it "cannot change apply_assignment_group_weights without a term change" do
+          @new_values["course"].delete("enrollment_term_id")
+          @new_values["course"].delete("term_id")
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '401'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("equal")
+        end
+
+        it "cannot change group_weighting_scheme with a term change" do
+          @term.grading_period_group = @grading_period_group
+          @term.save!
+          @new_values["course"].delete("apply_assignment_group_weights")
+          @new_values["course"]["group_weighting_scheme"] = "percent"
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '401'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("equal")
+        end
+
+        it "cannot change group_weighting_scheme without a term change" do
+          @new_values["course"].delete("enrollment_term_id")
+          @new_values["course"].delete("term_id")
+          @new_values["course"].delete("apply_assignment_group_weights")
+          @new_values["course"]["group_weighting_scheme"] = "percent"
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '401'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("equal")
+        end
+
+        it "succeeds when multiple grading periods is disabled" do
+          @course.root_account.disable_feature!(:multiple_grading_periods)
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '200'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("percent")
+        end
+
+        it "succeeds when apply_assignment_group_weights is not changed" do
+          @new_values['course']['apply_assignment_group_weights'] = false
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '200'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("equal")
+        end
+
+        it "succeeds when group_weighting_scheme is not changed" do
+          @new_values["course"].delete("apply_assignment_group_weights")
+          @new_values["course"]["group_weighting_scheme"] = "equal"
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '200'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("equal")
+        end
+
+        it "ignores deleted assignments" do
+          @assignment.destroy
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '200'
+          @course.reload
+          expect(@course.group_weighting_scheme).to eql("percent")
+        end
+      end
     end
 
     context "an unauthorized user" do
       before { user }
 
       it "should return 401 unauthorized" do
-         raw_api_call(:put, @path, @params, @new_values)
-         expect(response.code).to eql '401'
+        raw_api_call(:put, @path, @params, @new_values)
+        expect(response.code).to eql '401'
       end
     end
   end

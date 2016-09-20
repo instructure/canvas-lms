@@ -10,6 +10,8 @@ define [
 
     template: template
 
+    @optionProperty 'canChangeDropRules'
+
     events:
       'click .add_never_drop': 'addNeverDrop'
 
@@ -19,6 +21,11 @@ define [
       # once per batch of changes
       @on 'should-render', _.debounce(@render, 100)
       super
+
+    createItemView: (model) ->
+      options =
+        canChangeDropRules: @canChangeDropRules
+      new @itemView $.extend {}, (@itemViewOptions || {}), {model}, options
 
     attachCollection: (options) ->
       #listen to events on the collection that keeps track of what we can add
@@ -32,6 +39,7 @@ define [
     # use declarative translations in the template
     toJSON: ->
       data =
+        canChangeDropRules: @canChangeDropRules
         hasAssignments: @collection.availableValues.length > 0
         hasNeverDrops: @collection.takenValues.length > 0
 
@@ -42,7 +50,8 @@ define [
     # when we re-render the collection
     addNeverDrop: (e) ->
       e.preventDefault()
-      model =
-        label_id: @collection.ag_id
-        focus: true
-      @collection.add model
+      if @canChangeDropRules
+        model =
+          label_id: @collection.ag_id
+          focus: true
+        @collection.add model

@@ -728,6 +728,100 @@ describe AssignmentGroupsApiController, type: :request do
       @assignment_group.reload
       expect(@assignment_group.rules).to eq rules_in_db
     end
+
+    context "when an assignment is due in a closed grading period" do
+      let(:call_update) do
+        -> (params, expected_status) do
+          api_call(
+            :put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",
+            {
+              controller: 'assignment_groups_api',
+              action: 'update',
+              format: 'json',
+              course_id: @course.id.to_s,
+              assignment_group_id: @assignment_group.id.to_s
+            },
+            params,
+            { 'Accept' => 'application/json+canvas-string-ids' },
+            { expected_status: expected_status }
+          )
+        end
+      end
+
+      before :once do
+        @course.root_account.enable_feature!(:multiple_grading_periods)
+        @grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+        term = @course.enrollment_term
+        term.grading_period_group = @grading_period_group
+        term.save!
+        Factories::GradingPeriodHelper.new.create_for_group(@grading_period_group, {
+          start_date: 2.weeks.ago, end_date: 2.days.ago, close_date: 1.day.ago
+        })
+        @assignment_group.update_attributes(group_weight: 50)
+      end
+
+      context "as a teacher" do
+        before :each do
+          user_session(@teacher)
+          @assignment = @course.assignments.create!({
+            title: 'assignment', assignment_group: @assignment_group, due_at: 1.week.ago
+          })
+        end
+
+        it "cannot change group_weight" do
+          params = { group_weight: 75 }
+          call_update.call(params, 401)
+          expect(@assignment_group.reload.group_weight).to eq(50)
+        end
+
+        it "cannot change rules" do
+          rules_hash = { "never_drop" => ["1", "2"], "drop_lowest" => 1, "drop_highest" => 1 }
+          @assignment_group.rules_hash = rules_hash
+          @assignment_group.save
+          rules_encoded = @assignment_group.rules
+          call_update.call({ rules: { drop_lowest: "1" } }, 401)
+          expect(@assignment_group.reload.rules).to eq(rules_encoded)
+        end
+
+        it "succeeds when group_weight is not changed" do
+          call_update.call({ group_weight: 50 }, 200)
+          expect(@assignment_group.reload.group_weight).to eq(50)
+        end
+
+        it "succeeds when rules have not changed" do
+          rules_hash = { "never_drop" => ["1", "2"], "drop_lowest" => 1, "drop_highest" => 1 }
+          @assignment_group.rules_hash = rules_hash
+          @assignment_group.save
+          rules_encoded = @assignment_group.rules
+          call_update.call({ rules: rules_hash }, 200)
+          expect(@assignment_group.reload.rules).to eq(rules_encoded)
+        end
+
+        it "succeeds when multiple grading periods is disabled" do
+          @course.root_account.disable_feature!(:multiple_grading_periods)
+          call_update.call({ group_weight: 75 }, 200)
+          expect(@assignment_group.reload.group_weight).to eq(75)
+        end
+
+        it "ignores deleted assignments" do
+          @assignment.destroy
+          call_update.call({ group_weight: 75 }, 200)
+          expect(@assignment_group.reload.group_weight).to eq(75)
+        end
+      end
+
+      context "as an admin" do
+        it "can change group_weight" do
+          @course.assignments.create!({
+            title: 'assignment', assignment_group: @assignment_group, due_at: 1.week.ago
+          })
+          admin = account_admin_user(account: @course.root_account)
+          user_session(admin)
+          call_update.call({ group_weight: 75 }, 200)
+          expect(@assignment_group.reload.group_weight).to eq(75)
+        end
+      end
+    end
   end
 
   context '#destroy' do

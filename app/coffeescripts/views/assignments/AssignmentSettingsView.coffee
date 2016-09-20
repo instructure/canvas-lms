@@ -13,16 +13,17 @@ define [
     defaults:
       width: 450
       height: 500
-      collapsedHeight: 175
+      collapsedHeight: 300
 
     events: _.extend({}, @::events,
-      'click .dialog_closer': 'close'
-      'change #apply_assignment_group_weights': 'toggleTableByClick'
+      'click .dialog_closer': 'cancel'
+      'click #apply_assignment_group_weights': 'toggleTableByClick'
       'keyup .group_weight_value': 'updateTotalWeight'
     )
 
     @optionProperty 'assignmentGroups'
     @optionProperty 'weightsView'
+    @optionProperty 'userIsAdmin'
 
     initialize: ->
       super
@@ -33,12 +34,25 @@ define [
       @toggleTableByModel()
       @addAssignmentGroups()
 
+    canChangeWeights: ->
+      @userIsAdmin or !_.any(@assignmentGroups.models, (ag) -> ag.hasAssignmentDueInClosedGradingPeriod())
+
+    submit: (event) ->
+      if @canChangeWeights()
+        super(event)
+      else
+        event?.preventDefault()
+
     saveFormData: (data=null) ->
       for v in @weights
         new_weight = v.findWeight()
         v.model.set('group_weight', new_weight)
         v.model.save()
       super(data)
+
+    cancel: ->
+      if @canChangeWeights()
+        @close()
 
     onSaveSuccess: ->
       super
@@ -49,8 +63,11 @@ define [
       @toggleWeightsTable(checked)
 
     toggleTableByClick: (e) ->
-      checked = $(e.currentTarget).is(':checked')
-      @toggleWeightsTable(checked)
+      if @canChangeWeights()
+        checked = $(e.currentTarget).is(':checked')
+        @toggleWeightsTable(checked)
+      else
+        e.preventDefault()
 
     toggleWeightsTable: (show) ->
       if show
@@ -64,16 +81,17 @@ define [
 
     addAssignmentGroups: ->
       @clearWeights()
+      canChangeWeights = @canChangeWeights()
       total_weight = 0
-      for g in @assignmentGroups.models
+      for model in @assignmentGroups.models
         #create view
-        v = new @weightsView {model: g}
+        v = new @weightsView {model, canChangeWeights: canChangeWeights}
         v.render()
         #add to table
         @$el.find('#assignment_groups_weights tbody').append(v.el)
         @weights.push v
         #sum group weights
-        total_weight += v.findWeight() || 0
+        total_weight += model.get('group_weight') || 0
       total_weight = round(total_weight,2)
 
       @$el.find('#percent_total').text(total_weight + "%")
@@ -92,3 +110,5 @@ define [
     toJSON: ->
       data = super
       data.course
+      data.canChangeWeights = @canChangeWeights()
+      data

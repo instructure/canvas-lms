@@ -2127,6 +2127,18 @@ class CoursesController < ApplicationController
         @course.account = @course.root_account if @course.account.root_account != @course.root_account
       end
 
+      if params[:course].key?(:apply_assignment_group_weights)
+        @course.apply_assignment_group_weights =
+          value_to_boolean params[:course].delete(:apply_assignment_group_weights)
+      end
+      if params[:course].key?(:group_weighting_scheme)
+        @course.group_weighting_scheme = params[:course].delete(:group_weighting_scheme)
+      end
+
+      if @course.group_weighting_scheme_changed? && !can_change_group_weighting_scheme?
+        return render_unauthorized_action
+      end
+
       term_id = params[:course].delete(:term_id)
       enrollment_term_id = params[:course].delete(:enrollment_term_id) || term_id
       if enrollment_term_id && @course.root_account.grants_right?(@current_user, session, :manage_courses)
@@ -2168,9 +2180,6 @@ class CoursesController < ApplicationController
             @course.sis_source_id = sis_id
           end
         end
-      end
-      if params[:course].has_key?(:apply_assignment_group_weights)
-        @course.apply_assignment_group_weights = value_to_boolean params[:course].delete(:apply_assignment_group_weights)
       end
 
       lock_announcements = params[:course].delete(:lock_all_announcements)
@@ -2230,6 +2239,7 @@ class CoursesController < ApplicationController
       end
 
       changes = changed_settings(@course.changes, @course.settings, old_settings)
+
       @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
         { :priority => Delayed::LOW_PRIORITY }, changes)
 
@@ -2655,6 +2665,15 @@ class CoursesController < ApplicationController
         @course.public_syllabus = false
         @course.public_syllabus_to_auth = false
       end
+    end
+  end
+
+  def can_change_group_weighting_scheme?
+    return true unless @course.feature_enabled?(:multiple_grading_periods)
+    return true if @current_user.admin_of_root_account?(@course.root_account)
+    periods = GradingPeriod.for(@course)
+    @course.active_assignments.preload(:active_assignment_overrides).none? do |assignment|
+      assignment.due_for_any_student_in_closed_grading_period?(periods)
     end
   end
 end

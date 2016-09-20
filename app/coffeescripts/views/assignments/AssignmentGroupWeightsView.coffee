@@ -10,6 +10,8 @@ define [
     tagName: 'tr'
     className: 'ag-weights-tr'
 
+    @optionProperty 'canChangeWeights'
+
     events:
       'blur .group_weight_value' : 'roundWeight'
 
@@ -20,3 +22,8 @@ define [
 
     findWeight: ->
       round(parseFloat(@$el.find('.group_weight_value').val()), 2)
+
+    toJSON: ->
+      data = super
+      data.canChangeWeights = @canChangeWeights
+      data

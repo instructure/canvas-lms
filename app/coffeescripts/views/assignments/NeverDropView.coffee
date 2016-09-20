@@ -9,6 +9,8 @@ define [
     className: 'never_drop_rule'
     template: neverDropTemplate
 
+    @optionProperty 'canChangeDropRules'
+
     events:
       'change select': 'setChosen'
       'click .remove_never_drop': 'removeNeverDrop'
@@ -17,14 +19,16 @@ define [
     # and mark it for focusing when we re-render
     # the collection
     setChosen: (e) ->
-      $target = @$(e.currentTarget)
-      @model.set
-        'chosen_id': $target.val()
-        'focus': true
+      if @canChangeDropRules
+        $target = @$(e.currentTarget)
+        @model.set
+          'chosen_id': $target.val()
+          'focus': true
 
     removeNeverDrop: (e) ->
       e.preventDefault()
-      @model.collection.remove @model
+      if @canChangeDropRules
+        @model.collection.remove @model
 
     #after render we want to check and see if we should focus
     #this select
@@ -37,6 +41,7 @@ define [
 
     toJSON: =>
       json = super
+      json.canChangeDropRules = @canChangeDropRules
       json.buttonTitle = I18n.t('remove_unsaved_never_drop_rule', "Remove unsaved never drop rule")
       if @model.has('chosen_id')
         json.assignments = @model.collection.toAssignments(@model.get('chosen_id'))

@@ -4,24 +4,30 @@ define [
   'compiled/collections/AssignmentGroupCollection'
   'compiled/models/AssignmentGroup'
   'compiled/models/Assignment'
+  'compiled/models/Course'
   'compiled/views/assignments/CreateGroupView'
   'jquery'
   'helpers/fakeENV'
   'helpers/jquery.simulate'
-], (_, Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, CreateGroupView, $, fakeENV) ->
+], (_, Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, Course, CreateGroupView, $, fakeENV) ->
 
-  group = ->
-    new AssignmentGroup
+  group = (opts = {}) ->
+    new AssignmentGroup $.extend({
       name: 'something cool'
       assignments: [new Assignment, new Assignment]
+    }, opts)
 
   assignmentGroups = ->
-    @groups = new AssignmentGroupCollection([group(), group()])
+    new AssignmentGroupCollection([group(), group()])
 
-  createView = (hasAssignmentGroup=true)->
+  createView = (opts = {})->
+    groups = opts.assignmentGroups or assignmentGroups()
     args =
-      assignmentGroups: assignmentGroups()
-      assignmentGroup: @groups.first() if hasAssignmentGroup
+      course: opts.course or new Course(apply_assignment_group_weights: true)
+      assignmentGroups: groups
+      assignmentGroup:
+        opts.group or (groups.first() unless opts.newGroup?)
+      userIsAdmin: opts.userIsAdmin
 
     new CreateGroupView(args)
 
@@ -43,7 +49,6 @@ define [
     equal view.$('[name="rules[drop_lowest]"]').length, 0
     equal view.$('[name="rules[drop_highest]"]').length, 0
 
-
   test 'it should not add errors when never_drop rules are added', ->
     view = createView()
     data =
@@ -57,7 +62,7 @@ define [
   test 'it should create a new assignment group', ->
     @stub(CreateGroupView.prototype, 'close', -> )
 
-    view = createView(false)
+    view = createView(newGroup: true)
     view.render()
     view.onSaveSuccess()
     equal view.assignmentGroups.size(), 3
@@ -138,7 +143,7 @@ define [
     ok triggerSpy.calledWith 'render'
 
   test 'it should call render on save success if adding an assignmentGroup', ->
-    view = createView(false)
+    view = createView(newGroup: true)
     @stub(view, 'render')
     view.onSaveSuccess()
     equal view.render.callCount, 1
@@ -148,10 +153,50 @@ define [
     @spy($, 'flashMessage')
     clock = sinon.useFakeTimers()
 
-    view = createView(false)
+    view = createView(newGroup: true)
     view.render()
     view.onSaveSuccess()
     clock.tick(101)
 
     equal $.flashMessage.callCount, 1
     clock.restore()
+
+  test 'does not render group weight input when the course is not using weights', ->
+    groups = new AssignmentGroupCollection([group(), group()])
+    course = new Course(apply_assignment_group_weights: false)
+    view = createView(assignmentGroups: groups, course: course)
+    view.render()
+    notOk view.showWeight()
+    notOk view.$('[name="group_weight"]').length
+
+  test 'disables group weight input when an assignment is due in a closed grading period', ->
+    closed_group = group(has_assignment_due_in_closed_grading_period: true)
+    groups = new AssignmentGroupCollection([group(), closed_group])
+    view = createView(group: closed_group, assignmentGroups: groups)
+    view.render()
+    notOk view.canChangeWeighting()
+    ok view.$('[name="group_weight"]').attr('readonly')
+
+  test 'does not disable group weight input when userIsAdmin is true', ->
+    closed_group = group(has_assignment_due_in_closed_grading_period: true)
+    groups = new AssignmentGroupCollection([group(), closed_group])
+    view = createView(group: closed_group, assignmentGroups: groups, userIsAdmin: true)
+    view.render()
+    ok view.canChangeWeighting()
+    notOk view.$('[name="group_weight"]').attr('readonly')
+
+  test 'disables drop rule inputs when an assignment is due in a closed grading period', ->
+    closed_group = group(has_assignment_due_in_closed_grading_period: true)
+    groups = new AssignmentGroupCollection([group(), closed_group])
+    view = createView(group: closed_group, assignmentGroups: groups)
+    view.render()
+    ok view.$('[name="rules[drop_lowest]"]').attr('readonly')
+    ok view.$('[name="rules[drop_highest]"]').attr('readonly')
+
+  test 'does not disable drop rule inputs when userIsAdmin is true', ->
+    closed_group = group(has_assignment_due_in_closed_grading_period: true)
+    groups = new AssignmentGroupCollection([group(), closed_group])
+    view = createView(group: closed_group, assignmentGroups: groups, userIsAdmin: true)
+    view.render()
+    notOk view.$('[name="rules[drop_lowest]"]').attr('readonly')
+    notOk view.$('[name="rules[drop_highest]"]').attr('readonly')

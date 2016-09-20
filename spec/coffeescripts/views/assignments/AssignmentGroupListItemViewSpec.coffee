@@ -173,6 +173,12 @@ define [
     ok view.createAssignmentView
     ok view.deleteGroupView
 
+  test "initializes editGroupView with userIsAdmin property", ->
+    view = createView(@model, userIsAdmin: true)
+    ok view.editGroupView.userIsAdmin
+    view = createView(@model, userIsAdmin: false)
+    notOk view.editGroupView.userIsAdmin
+
   test "initializes no child views if can't manage", ->
     view = createView(@model, canManage: false)
     ok !view.editGroupView

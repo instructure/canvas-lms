@@ -86,7 +86,5 @@ module Api::V1::AssignmentGroup
     end
 
     assignment_group.attributes = update_params
-
-    assignment_group.save
   end
 end

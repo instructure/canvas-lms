@@ -13,7 +13,10 @@ define [
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
-], (I18n, $, _, Cache, hasLocalStorage, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin) ->
+], (
+  I18n, $, _, Cache, hasLocalStorage, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,
+  CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin
+) ->
 
   class AssignmentGroupListItemView extends DraggableCollectionView
     @mixin AssignmentKeyBindingsMixin
@@ -125,6 +128,7 @@ define [
       if @canManage()
         @editGroupView = new CreateGroupView
           assignmentGroup: @model
+          userIsAdmin: @userIsAdmin
         @createAssignmentView = new CreateAssignmentView
           assignmentGroup: @model
         if @canDelete()
