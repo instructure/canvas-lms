@@ -7,7 +7,7 @@ module Services
       @secret = "opensesame"
       Canvas::DynamicSettings.stubs(:find).
         with("address-book").
-        returns({ "app-host" => @app_host, "secret" => @secret })
+        returns({ "app-host" => @app_host, "secret" => Canvas::Security.base64_encode(@secret) })
       @sender = user_model
       @course = course_model
     end
@@ -29,7 +29,7 @@ module Services
     end
 
     describe "jwt" do
-      it "signs with the secret from the configuration" do
+      it "signs with the base64 decoded secret from the configuration" do
         jwt = Services::AddressBook.jwt
         expect(lambda{ Canvas::Security.decode_jwt(jwt, [@secret]) }).not_to raise_exception
       end

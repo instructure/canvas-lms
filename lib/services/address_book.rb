@@ -80,6 +80,9 @@ module Services
 
     def self.jwt # public only for testing, should not be used directly
       Canvas::Security.create_jwt({ iat: Time.now.to_i }, nil, jwt_secret)
+    rescue StandardError => e
+      Canvas::Errors.capture_exception(:address_book, e)
+      nil
     end
 
     class << self
@@ -99,7 +102,7 @@ module Services
       end
 
       def jwt_secret
-        setting("secret")
+        Canvas::Security.base64_decode(setting("secret"))
       end
 
       # generic retrieve, parse
