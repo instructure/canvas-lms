@@ -35,7 +35,7 @@ define([
       });
       courses.push(
         <li key='allCourseLink' className='ic-NavMenu-list-item ic-NavMenu-list-item--feature-item'>
-          <a href='/courses'>{I18n.t('All Courses')}</a>
+          <a href='/courses' className='ic-NavMenu-list-item__link'>{I18n.t('All Courses')}</a>
         </li>
       );
       return courses;

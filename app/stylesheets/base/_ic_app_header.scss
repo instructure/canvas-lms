@@ -363,6 +363,10 @@ button.ic-app-header__menu-list-link {
 
   .ic-NavMenu-list-item__link {
     display: inline-block;
+    &:focus {
+      @include ic-focus-base; 
+      @include ic-focus-variant($color: $ic-link-color, $offset: 2px); 
+    }
     i[class*=icon-],
     i[class^=icon-] { margin-right: $ic-sp/3; }
   }
