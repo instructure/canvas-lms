@@ -105,7 +105,7 @@ module Api::V1::Conversation
       ActiveRecord::Associations::Preloader.new.preload(users, {:pseudonym => :account}) # for avatar_url
     end
 
-    preload_common_contexts(current_user, users)
+    preload_common_contexts(current_user, users) if options[:include_participant_contexts]
     users.map { |user| conversation_user_json(user, current_user, session, options) }
   end
 
