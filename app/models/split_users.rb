@@ -130,7 +130,7 @@ class SplitUsers
       if source_user.shard != user.shard
         user.shard.activate do
           # remove communication channels that didn't exist prior to the merge
-          CommunicationChannel.where(id: cc_records.where(previous_workflow_state: 'non existent').pluck(:context_id)).delete_all
+          CommunicationChannel.where(id: cc_records.where(previous_workflow_state: 'non_existent').pluck(:context_id)).delete_all
         end
       end
       # move moved communication channels back
