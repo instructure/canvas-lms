@@ -41,7 +41,8 @@ module Canvas
         @paths ||= {
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
-          :instructureui => 'instructure-ui/'
+          :instructureui => 'instructure-ui/',
+          :instructureicons => 'instructure-icons/'
         }.update(cache_busting ? cache_busting_paths : {}).
           update(plugin_paths).
           update(Canvas::RequireJs::PluginExtension.paths).
