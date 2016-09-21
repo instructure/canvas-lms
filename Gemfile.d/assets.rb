@@ -5,5 +5,4 @@ group :assets do
     gem 'pygments.rb', '0.6.3', require: false
       gem 'posix-spawn', '0.3.11', require: false
       gem 'yajl-ruby', '1.2.1', require: false
-  gem 'fontcustom', '~> 1.3.3', require: false
 end
