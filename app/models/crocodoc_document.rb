@@ -23,7 +23,7 @@ class CrocodocDocument < ActiveRecord::Base
 
   belongs_to :attachment
 
-  has_and_belongs_to_many :submissions, -> { readonly(true) }, join_table: :canvadocs_submissions
+  has_many :canvadocs_submissions
 
   MIME_TYPES = %w(
     application/pdf
@@ -97,7 +97,6 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:filter] = user.crocodoc_id!
     end
 
-    submissions = self.submissions.preload(:assignment)
     if submissions.any? { |s| s.grants_right? user, :read_grade }
       opts[:filter] = 'all'
 
@@ -114,6 +113,12 @@ class CrocodocDocument < ActiveRecord::Base
     apply_whitelist(user, opts, whitelist) if whitelist
 
     opts
+  end
+
+  def submissions
+    self.canvadocs_submissions.
+      preload(submission: :assignment).
+      map &:submission
   end
 
   def apply_whitelist(user, opts, whitelist)

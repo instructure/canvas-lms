@@ -1865,9 +1865,9 @@ nn:
         upload_files: "Last opp filer"
       graded_count: "%{graded_count} *out of* %{total} karaktersette innleveringar"
       links: 
-        download_submissions: "Last ned innleveringar"
+        download_submissions: "Last ned innleverte filer"
         peer_reviews: Fagfellevurderingar
-        reupload_submissions: "Last opp innleveringar på nytt"
+        reupload_submissions: "Last tilbake kommenterte filer"
       resubmission_count: 
         one: "1 innlevering send på nytt som ikkje er karaktersett"
         other: "%{count} innleveringar sende på nytt som ikkje er karaktersette"
@@ -3231,7 +3231,7 @@ nn:
       message: 
         export_started: "Eksportprosessen har starta. Det kan ta litt tid for store kurs. *Du kan forlate sida* og du får ein e-post når eksporten er fullført."
       no_submissions: "Du har ingen innleveringar å eksportere akkurat no."
-      user_data_exports: "Last ned innleveringar"
+      user_data_exports: "Last ned innleverte filer"
     labels: 
       new_export: "Ny eksport:"
     links: 
@@ -5543,7 +5543,7 @@ nn:
   download_item_analysis_report_statuslabel_8c9387ec: "Last ned elementanalyserapport %{statusLabel}"
   download_scores_generated_on_date_ff5b9cd2: "Last ned resultat generert den %{date}"
   download_student_analysis_report_statuslabel_1471c8c2: "Last ned studentanalyserapport %{statusLabel}"
-  download_submissions_7454665f: "Last ned innleveringar"
+  download_submissions_7454665f: "Last ned innleverte filer"
   download_this_file_669f9174: "Last ned denne fila"
   downloading_course_content_allows_access_to_conten_164d9336: "Nedlasting av kursinnhald gir tilgang til innhald når du ikkje er på nett. Innhaldet kan omfatte filer, sider, oppgåver, diskusjonsemne og prøver. Klikk på \"Generer EPUB\" for kvart kurs og opne med eReader-programvare for vising."
   draft_comment_b2376ea4: "Kommentar til utkast"
@@ -6507,7 +6507,7 @@ nn:
       curve_grades: "Juster karakterer"
       download_submissions: "Last ned innleveringar"
       message_students_who: "Send melding til studentar som ..."
-      re_upload_submissions: "Last opp innleveringar på nytt"
+      re_upload_submissions: "Last tilbake kommenterte filer"
       set_default_grade: "Bruk standardkarakter"
       speedgrader: SpeedGrader™
     header_filter: 
@@ -12658,11 +12658,11 @@ nn:
   ratio_responded_correctly_6d890107: "%{ratio}% korrekt respons"
   re_activate_user_f7d77c9a: "Aktiver brukar på nytt"
   re_submit_assignment_b3e2bd28: "Lever oppgåve på nytt"
-  re_upload_submissions_125e415d: "Last opp innleveringar på nytt"
+  re_upload_submissions_125e415d: "Last tilbake kommenterte filer"
   re_upload_submissions_form: 
     buttons: 
       upload: "Last opp filer"
-    reupload_submission_files: "Last opp filinnleveringar på nytt"
+    reupload_submission_files: "Last tilbake filinnleveringar"
     upload_info: "Dersom du gjorde endringar i filinnleveringane du lasta ned, kan du pakke dei tilbake i ZIP og laste opp ZIP-fila med skjemaet nedanfor. Studentane ser dei endra filene i kommentarane til innleveringa."
     upload_warning: "Pass på at namna til filinnleveringane er uendra, slik at vi kan kjenne dei att.*"
   react_files: 

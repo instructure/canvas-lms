@@ -58,6 +58,8 @@ define([
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
+
+  var JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .accordion, .tabs';
   function enhanceUserContent() {
     var $content = $("#content");
     $(".user_content:not(.enhanced):visible").addClass('unenhanced');
@@ -68,6 +70,19 @@ define([
         $this.data('unenhanced_content_html', $this.html());
       })
       .find(".enhanceable_content").show()
+        .filter(JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE).ifExists(function($elements){
+          var msg =
+            "Deprecated use of magic jQueryUI widget markup detected:\n\n" +
+            "You're relying on undocumented functionality where Canvas makes " +
+            "jQueryUI widgets out of rich content that has the following class names: " +
+            JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE + ".\n\n" +
+
+            "Canvas is moving away from jQueryUI for our own widgets and this behavior " +
+            "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
+            "you should use your own custom JS file to do any such customizations."
+
+          console.error(msg, $elements);
+        }).end()
         .filter(".dialog").each(function(){
           var $dialog = $(this);
           $dialog.hide();

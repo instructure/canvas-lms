@@ -300,20 +300,10 @@ describe "groups" do
         move_file_to_folder('example.pdf','destination_folder')
       end
 
-      it "should allow group members to publish and unpublish a file", priority: "1", test_id: 273628 do
+      it "should hide the publish cloud" do
         add_test_files
         get files_page
-        set_item_permissions(:unpublish,:toolbar_menu)
-        expect(f('.btn-link.published-status.unpublished')).to be_displayed
-        set_item_permissions(:publish,:toolbar_menu)
-        expect(f('.btn-link.published-status.published')).to be_displayed
-      end
-
-      it "should allow group members to restrict access to a file", priority: "1", test_id: 304672 do
-        add_test_files
-        get files_page
-        set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
-        expect(f('.btn-link.published-status.hiddenState')).to be_displayed
+        expect(f('#content')).to_not contain_css('.btn-link.published-status')
       end
     end
 

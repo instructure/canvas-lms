@@ -973,7 +973,7 @@ describe Attachment do
     end
   end
 
-  context "#change_namespace" do
+  context "#change_namespace and #make_childless" do
     before :once do
       @old_account = account_model
       @new_account = account_model
@@ -1013,6 +1013,17 @@ describe Attachment do
       @root.change_namespace(@new_account.file_namespace)
       expect(@root.namespace).to eq @new_account.file_namespace
       expect(@child.reload.namespace).to eq @root.namespace
+    end
+
+    it 'should allow making a root_attachment childess' do
+      @child.update_attribute(:filename, 'invalid')
+      @root.s3object.stubs(:exists?).returns(true)
+      @child.stubs(:s3object).returns(@old_object)
+      @child.s3object.stubs(:exists?).returns(true)
+      @root.make_childless(@child)
+      expect(@root.reload.children).to eq []
+      expect(@child.reload.root_attachment_id).to eq nil
+      expect(@child.read_attribute(:filename)).to eq @root.filename
     end
   end
 

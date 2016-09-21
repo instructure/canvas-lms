@@ -2,9 +2,10 @@ define [
   'compiled/calendar/CommonEvent'
   'compiled/calendar/commonEventFactory'
   'compiled/calendar/CalendarEventFilter'
-], (CommonEvent, commonEventFactory, CalendarEventFilter) ->
+  'helpers/fakeENV'
+], (CommonEvent, commonEventFactory, CalendarEventFilter, fakeENV) ->
 
-  test_events = (can_edit, child_events_count, available_slots = 1) ->
+  test_events = (can_edit, child_events_count, available_slots = 1, reserved = false) ->
     [
       commonEventFactory
         id: "1"
@@ -45,6 +46,7 @@ define [
         child_events: []
         url: "http://example.org/api/v1/calendar_events/20"
         available_slots: available_slots
+        reserved: reserved
       ,
         [{asset_string: 'course_1', id: 1, can_create_calendar_events: can_edit}]
     ]
@@ -98,3 +100,34 @@ define [
     filteredEvents = CalendarEventFilter(null, events, {inFindAppointmentMode: true, selectedCourse: {id: 1, asset_string: 'course_1'}})
     equal filteredEvents.length, 1
     equal filteredEvents[0].id, 'calendar_event_1'
+
+  test 'CalendarEventFilter: hides already-reserved appointments that still have available slots', ->
+    events = test_events(false, 0, 1, true)
+    filteredEvents = CalendarEventFilter(null, events, {inFindAppointmentMode: true, selectedCourse: {id: 1, asset_string: 'course_1'}})
+    equal filteredEvents.length, 1
+    equal filteredEvents[0].id, 'calendar_event_1'
+
+  test 'CalendarEventFilter: With Viewing Group: do not include events that are actual appointment events', ->
+    fakeENV.setup({CALENDAR: {BETTER_SCHEDULER: false}})
+    events = test_events(true, 0, 1, false)
+    events[1].calendarEvent.reserve_url = null
+    filteredEvents = CalendarEventFilter({id: "2"}, events, {})
+    equal filteredEvents.length, 1
+    equal filteredEvents[0].id, 'calendar_event_1', 'does not include calendar_event_20'
+    fakeENV.teardown()
+
+  test 'CalendarEventFilter: With Viewing Group: include appointment groups for different viewing groups that are filled', ->
+    fakeENV.setup({CALENDAR: {BETTER_SCHEDULER: false}})
+    events = test_events(true, 0, 1, true)
+    events[1].calendarEvent.reserve_url = null
+    filteredEvents = CalendarEventFilter({id: "25"}, events, {})
+    equal filteredEvents.length, 2
+    fakeENV.teardown()
+
+  test 'CalendarEventFilter: With Viewing Group: always follow the normal calendar view flow, if BETTER_SCHEDULER is enabled', ->
+    fakeENV.setup({CALENDAR: {BETTER_SCHEDULER: true}})
+    events = test_events(false, 0, 1, true)
+    filteredEvents = CalendarEventFilter(true, events, {})
+    equal filteredEvents.length, 1
+    equal filteredEvents[0].id, 'calendar_event_1'
+    fakeENV.teardown()

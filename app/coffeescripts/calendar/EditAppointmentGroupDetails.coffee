@@ -110,6 +110,9 @@ define [
       if @apptGroup.workflow_state == 'active'
         @form.find("#appointment-blocks-active-button").attr('disabled', true).prop('checked', true)
 
+      @form.submit @saveClick
+      @form.find('.save_without_publishing_link').click @saveWithoutPublishingClick
+
     creating: ->
       !@editing()
     editing: ->
@@ -227,6 +230,8 @@ define [
 
       deferred = $.ajaxJSON @form.attr('action'), method, params, onSuccess, onError
       @form.disableWhileLoading(deferred)
+
+    activate: () => {}
 
     contextsChanged: (contextCodes, sectionCodes) =>
       # dropdown text

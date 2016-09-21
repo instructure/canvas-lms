@@ -902,7 +902,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def participants(include_observers=false)
     participants = [ self.user ]
-    participants += context.participants(include_observers)
+    participants += context.participants(include_observers: include_observers)
     participants.compact.uniq
   end
 

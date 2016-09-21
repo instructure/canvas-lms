@@ -58,10 +58,7 @@ class Submission < ActiveRecord::Base
 
   has_many :content_participations, :as => :content
 
-  has_and_belongs_to_many :crocodoc_documents,
-    join_table: :canvadocs_submissions
-  has_and_belongs_to_many :canvadocs,
-    join_table: :canvadocs_submissions
+  has_many :canvadocs_submissions
 
   serialize :turnitin_data, Hash
 
@@ -597,14 +594,14 @@ class Submission < ActiveRecord::Base
         if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
           submit_to_canvadocs = true
           a.create_canvadoc!(canvadoc_params) unless a.canvadoc
-          unless canvadocs.exists?(attachment: a)
-            canvadocs << a.canvadoc
+          a.shard.activate do
+            CanvadocsSubmission.find_or_create_by(submission: self, canvadoc: a.canvadoc)
           end
         elsif a.crocodocable?
           submit_to_canvadocs = true
           a.create_crocodoc_document! unless a.crocodoc_document
-          unless crocodoc_documents.exists?(attachment: a)
-            crocodoc_documents << a.crocodoc_document
+          a.shard.activate do
+            CanvadocsSubmission.find_or_create_by(submission: self, crocodoc_document: a.crocodoc_document)
           end
         end
 

@@ -7,11 +7,13 @@ define [
   'vendor/timezone/America/Juneau'
   'vendor/timezone/fr_FR'
   'compiled/views/calendar/AgendaView'
+  'compiled/calendar/Calendar'
   'compiled/calendar/EventDataSource'
   'helpers/ajax_mocks/api/v1/calendarEvents'
   'helpers/ajax_mocks/api/v1/calendarAssignments'
   'helpers/I18nStubber'
-], ($, _, tz, fcUtil, denver, juneau, french, AgendaView, EventDataSource, eventResponse, assignmentResponse, I18nStubber) ->
+  'helpers/fakeENV'
+], ($, _, tz, fcUtil, denver, juneau, french, AgendaView, Calendar, EventDataSource, eventResponse, assignmentResponse, I18nStubber, fakeENV) ->
   loadEventPage = (server, includeNext = false) ->
     sendCustomEvents(server, eventResponse, assignmentResponse, includeNext)
 
@@ -34,18 +36,19 @@ define [
       @snapshot = tz.snapshot()
       tz.changeZone(denver, 'America/Denver')
       I18nStubber.pushFrame()
+      fakeENV.setup({CALENDAR: {}})
 
     teardown: ->
       @container.remove()
       @server.restore()
       tz.restore(@snapshot)
       I18nStubber.popFrame()
+      fakeENV.teardown()
 
   test 'should render results', ->
     view = new AgendaView(el: @container, dataSource: @dataSource)
     view.fetch(@contextCodes, @startDate)
     loadEventPage(@server)
-
     # should render all events
     ok @container.find('.ig-row').length == 18, 'finds 18 ig-rows'
 
@@ -79,6 +82,7 @@ define [
     ok _.isObject(serialized.meta), 'meta is an object'
     ok _.uniq(serialized.days).length == serialized.days.length, 'does not duplicate dates'
     ok serialized.days[0].date == 'Mon, Oct 7', 'finds the correct first day'
+    ok serialized.meta.hasOwnProperty('better_scheduler'), 'contains a property indicating better_scheduler is active or not'
     _.each serialized.days, (d) ->
       ok d.events.length, 'every day has events'
 

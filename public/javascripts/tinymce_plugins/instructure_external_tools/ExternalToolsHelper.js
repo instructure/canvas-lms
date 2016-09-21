@@ -68,13 +68,13 @@ define([
      *   button configs, like the ones passed into "buttonConfig"
      *   above as parameters
      *
-     * @param {function(Hash)} onClickHandler the function that should get
+     * @param {function(Hash), editor} onClickHandler the function that should get
      *   called when this button gets clicked
      *
      * @returns {Hash<string,function(Hash)>} the hash we can use
      *   for generating a dropdown list in jquery
      */
-    clumpedButtonMapping: function(clumpedButtons, onClickHandler){
+    clumpedButtonMapping: function(clumpedButtons, ed, onClickHandler){
       return clumpedButtons.reduce(function(items, button){
         var key;
 
@@ -86,7 +86,7 @@ define([
           key = "<img src='"+ htmlEscape(button.icon_url) +"' data-tool-id='"+ button.id +"'/>";
         }
         key += "&nbsp;" + htmlEscape(button.name);
-        items[key] = function() { onClickHandler(button); };
+        items[key] = function() { onClickHandler(button, ed); };
         return items;
       }, {});
     },

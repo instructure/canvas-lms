@@ -257,7 +257,7 @@ define([
               <i className= 'icon-eye' />
             </a>
 
-            { this.renderRestrictedAccessButtons(canManage) }
+            { this.renderRestrictedAccessButtons(canManage && this.props.userCanRestrictFilesForContext) }
             { this.renderDownloadButton() }
             { this.renderCopyCourseButton(canManage) }
             { this.renderManageUsageRightsButton(canManage) }

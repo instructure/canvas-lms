@@ -93,7 +93,7 @@ define [
         status = I18n.t('%{availableSlots} Available', {availableSlots: @calendarEvent.available_slots})
       if @calendarEvent.available_slots == 0
         status = I18n.t('Filled')
-      if @calendarEvent.reserved == true
+      if @calendarEvent.reserved == true || (@calendarEvent.appointment_group_url && @calendarEvent.parent_event_id)
         status = I18n.t('Reserved')
 
       status

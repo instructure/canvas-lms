@@ -793,7 +793,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
-  #  The assignment is ungraded if this field is omitted.
+  #  The assignment defaults to "points" if this field is omitted.
   #
   # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due.
@@ -934,7 +934,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
-  #  The assignment is ungraded if this field is omitted.
+  #  The assignment defaults to "points" if this field is omitted.
   #
   # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due.

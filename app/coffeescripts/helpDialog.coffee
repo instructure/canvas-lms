@@ -52,6 +52,11 @@ define [
 
         @$dialog.html(helpDialogTemplate locals)
         @initTicketForm()
+
+        # recenter the dialog once all the links have been loaded so it is back in the
+        # middle of the page
+        @$dialog?.dialog('option', 'position', 'center')
+
         $(this).trigger('ready')
       @$dialog.disableWhileLoading @helpLinksDfd
       @dialogInited = true

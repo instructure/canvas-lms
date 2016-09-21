@@ -158,7 +158,7 @@ class AssignmentGroup < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
-    p.to { context.participating_students }
+    p.to { context.participating_students_by_date }
     p.whenever { |record|
       false &&
       record.changed_in_state(:available, :fields => :group_weight)

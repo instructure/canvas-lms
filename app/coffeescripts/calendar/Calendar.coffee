@@ -327,7 +327,7 @@ define [
       $event = $(jsEvent.currentTarget)
       if !$event.hasClass('event_pending')
         event.allPossibleContexts = @activeContexts() if event.can_change_context
-        detailsDialog = new ShowEventDetailsDialog(event)
+        detailsDialog = new ShowEventDetailsDialog(event, @dataSource)
         $event.data('showEventDetailsDialog', detailsDialog)
         detailsDialog.show jsEvent
 
@@ -475,7 +475,16 @@ define [
       @updateEvent(event)
 
     eventDeleted: (event) =>
+      @handleUnreserve(event) if event.isAppointmentGroupEvent() && event.calendarEvent.parent_event_id
       @calendar.fullCalendar('removeEvents', event.id)
+
+    # when an appointment event was deleted, clear the reserved flag and increment the available slot count on the parent
+    handleUnreserve: (event) =>
+      parentEvent = @dataSource.eventWithId("calendar_event_#{event.calendarEvent.parent_event_id}")
+      if parentEvent
+        parentEvent.calendarEvent.reserved = false
+        parentEvent.calendarEvent.available_slots += 1
+        @refetchEvents()
 
     eventSaving: (event) =>
       return unless event.start # undated events can't be rendered
@@ -648,7 +657,7 @@ define [
 
     agendaViewFetch: (start) ->
       @setDateTitle(@formatDate(start, 'date.formats.medium'))
-      @agenda.fetch(@visibleContextList, start)
+      @agenda.fetch(@visibleContextList.concat(@findAppointmentModeGroups()), start)
 
     renderDateRange: (start, end) =>
       @setDateTitle(@formatDate(start, 'date.formats.medium')+' – '+@formatDate(end, 'date.formats.medium'))
@@ -731,10 +740,11 @@ define [
       changed = @schedulerState.inFindAppointmentMode != newState.inFindAppointmentMode
       @schedulerState = newState
       @refetchEvents() if changed
+      if (changed)
+        @loadAgendaView()
 
     findAppointmentModeGroups: () =>
       if @schedulerState.inFindAppointmentMode && @schedulerState.selectedCourse
         @reservable_appointment_groups[@schedulerState.selectedCourse.asset_string] || []
       else
         []
-

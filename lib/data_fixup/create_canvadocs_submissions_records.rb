@@ -22,7 +22,4 @@ module DataFixup::CreateCanvadocsSubmissionsRecords
     end
   end
 
-  class CanvadocsSubmission < ActiveRecord::Base
-    strong_params
-  end
 end

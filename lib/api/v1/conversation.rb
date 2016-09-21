@@ -43,11 +43,6 @@ module Api::V1::Conversation
     audience = conversation.other_participants(explicit_participants)
     result[:messages] = options[:messages].map{ |m| conversation_message_json(m, current_user, session) } if options[:messages]
     result[:submissions] = options[:submissions].map { |s| submission_json(s, s.assignment, current_user, session, nil, ['assignment', 'submission_comments']) } if options[:submissions]
-    unless interleave_submissions
-      result['message_count'] = result[:submissions] ?
-        result['message_count'] - result[:submissions].size :
-        conversation.messages.human.where(:asset_id => nil).count(:all)
-    end
     result[:audience] = audience.map(&:id)
     result[:audience].map!(&:to_s) if stringify_json_ids?
     result[:audience_contexts] = contexts_for(audience, conversation.local_context_tags)
@@ -105,7 +100,7 @@ module Api::V1::Conversation
       ActiveRecord::Associations::Preloader.new.preload(users, {:pseudonym => :account}) # for avatar_url
     end
 
-    preload_common_contexts(current_user, users)
+    preload_common_contexts(current_user, users) if options[:include_participant_contexts]
     users.map { |user| conversation_user_json(user, current_user, session, options) }
   end
 

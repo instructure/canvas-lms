@@ -236,7 +236,7 @@ describe "scheduler" do
       max_appointments_input = f('[name="max_appointments_per_participant"]')
       replace_content(max_appointments_input, '0')
 
-      f('.ui-dialog-buttonset .btn-primary').click
+      f('.ui-dialog-buttonset .Button--primary').click
       assert_error_box('[name="max_appointments_per_participant"]')
     end
 

@@ -1725,6 +1725,23 @@ describe Assignment do
         submittable = @a.send(submission_type)
         expect(submittable).to be_nil
       end
+
+      it "should not delete the assignment when unlinked" do
+        expect(@a.submission_types).to eql(submission_type)
+        submittable = @a.send(submission_type)
+        expect(submittable).not_to be_nil
+        expect(submittable.state).to eql(:active)
+        expect(submittable.assignment_id).to eql(@a.id)
+        @a.submission_types = 'on_paper'
+        @a.save!
+        submittable = submission_class.find(submittable.id)
+        expect(submittable.assignment_id).to eql(nil)
+        expect(submittable.state).to eql(:deleted)
+        @a.reload
+        submittable = @a.send(submission_type)
+        expect(submittable).to be_nil
+        expect(@a.state).to eql(:published)
+      end
     end
 
     context "topics" do
@@ -1767,23 +1784,6 @@ describe Assignment do
         @topic.reload
         expect(@topic.state).to eql(:active)
       end
-
-      it "should not delete the assignment when unlinked from a topic" do
-        expect(@a.submission_types).to eql(submission_type)
-        submittable = @a.send(submission_type)
-        expect(submittable).not_to be_nil
-        expect(submittable.state).to eql(:active)
-        expect(submittable.assignment_id).to eql(@a.id)
-        @a.submission_types = 'on_paper'
-        @a.save!
-        submittable = submission_class.find(submittable.id)
-        expect(submittable.assignment_id).to eql(nil)
-        expect(submittable.state).to eql(:deleted)
-        @a.reload
-        submittable = @a.send(submission_type)
-        expect(submittable).to be_nil
-        expect(@a.state).to eql(:published)
-      end
     end
 
     context "pages" do
@@ -1794,21 +1794,6 @@ describe Assignment do
         before(:once) { @course.enable_feature!(:conditional_release) }
 
         include_examples "submittable"
-
-        it "should not delete the assignment when unlinked from a page" do
-          expect(@a.submission_types).to eql(submission_type)
-          submittable = @a.send(submission_type)
-          expect(submittable).not_to be_nil
-          expect(submittable.state).to eql(:active)
-          expect(submittable.assignment_id).to eql(@a.id)
-          @a.submission_types = 'on_paper'
-          @a.save!
-          expect(submission_class.exists?(submittable.id)).to be_falsey
-          @a.reload
-          submittable = @a.send(submission_type)
-          expect(submittable).to be_nil
-          expect(@a.state).to eql(:published)
-        end
       end
 
       it "should not create a record if feature is disabled" do
@@ -2827,19 +2812,19 @@ describe Assignment do
       group_discussion_assignment
     end
 
-    it "destroys the associated page" do
+    it "destroys the associated page if enabled" do
       course
       @course.enable_feature!(:conditional_release)
       wiki_page_assignment_model course: @course
       @assignment.destroy
-      expect(WikiPage.exists?(@page.id)).to be_falsey
+      expect(@page.reload).to be_deleted
       expect(@assignment.reload).to be_deleted
     end
 
     it "does not destroy the associated page" do
       wiki_page_assignment_model
       @assignment.destroy
-      expect(WikiPage.exists?(@page.id)).to be_truthy
+      expect(@page.reload).not_to be_deleted
       expect(@assignment.reload).to be_deleted
     end
 

@@ -1108,11 +1108,6 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # Obsolete. Forced to false until we go through and clean it up thoroughly
-  def interleave_submissions
-    false
-  end
-
   def include_private_conversation_enrollments
     if params.has_key? :include_private_conversation_enrollments
       value_to_boolean(params[:include_private_conversation_enrollments])

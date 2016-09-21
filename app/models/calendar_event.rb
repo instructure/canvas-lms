@@ -379,7 +379,7 @@ class CalendarEvent < ActiveRecord::Base
     } }
 
     dispatch :appointment_reserved_for_user
-    to { participants - [@updating_user] }
+    to { participants(include_observers: true) - [@updating_user] }
     whenever {
       appointment_group && parent_event &&
       just_created
@@ -387,7 +387,7 @@ class CalendarEvent < ActiveRecord::Base
     data { {:updating_user => @updating_user} }
 
     dispatch :appointment_deleted_for_user
-    to { participants - [@updating_user] }
+    to { participants(include_observers: true) - [@updating_user] }
     whenever {
       appointment_group && parent_event &&
       deleted? &&
@@ -407,8 +407,10 @@ class CalendarEvent < ActiveRecord::Base
       else
         [context]
       end
+    elsif context.respond_to?(:participants)
+      context.participants(include_observers: include_observers, by_date: true)
     else
-      context.participants(include_observers: include_observers)
+      []
     end
   end
 

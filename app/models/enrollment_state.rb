@@ -208,13 +208,13 @@ class EnrollmentState < ActiveRecord::Base
     Enrollment.joins(:course).where(:courses => {:account_id => account_ids}).where(:type => %w{StudentEnrollment ObserverEnrollment})
   end
 
-  ENROLLMENT_BATCH_SIZE = 20_000
+  ENROLLMENT_BATCH_SIZE = 1_000
 
   def self.invalidate_states_for_term(term, enrollment_type=nil)
     # invalidate and re-queue individual jobs for reprocessing because it might be too big to do all at once
     scope = term.enrollments
     scope = scope.where(:type => enrollment_type) if enrollment_type
-    Enrollment.find_ids_in_ranges(:batch_size => ENROLLMENT_BATCH_SIZE) do |min_id, max_id|
+    scope.find_ids_in_ranges(:batch_size => ENROLLMENT_BATCH_SIZE) do |min_id, max_id|
       if invalidate_states(scope.where(:id => min_id..max_id)) > 0
         EnrollmentState.send_later_if_production_enqueue_args(:process_term_states_in_ranges, {:priority => Delayed::LOW_PRIORITY}, min_id, max_id, term, enrollment_type)
       end
@@ -238,7 +238,7 @@ class EnrollmentState < ActiveRecord::Base
 
   def self.invalidate_access_for_accounts(account_ids, changed_keys)
     states_to_update = access_states_to_update(changed_keys)
-    Enrollment.find_ids_in_ranges(:batch_size => ENROLLMENT_BATCH_SIZE) do |min_id, max_id|
+    enrollments_for_account_ids(account_ids).find_ids_in_ranges(:batch_size => ENROLLMENT_BATCH_SIZE) do |min_id, max_id|
       scope = enrollments_for_account_ids(account_ids).where(:id => min_id..max_id)
       if invalidate_access(scope, states_to_update) > 0
         EnrollmentState.send_later_if_production_enqueue_args(:process_account_states_in_ranges, {:priority => Delayed::LOW_PRIORITY}, min_id, max_id, account_ids)

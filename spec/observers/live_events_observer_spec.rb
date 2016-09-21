@@ -60,10 +60,16 @@ describe LiveEventsObserver do
       @page.touch
     end
 
-    it "posts delete events" do
+    it "posts soft delete events" do
       wiki_page_model
       Canvas::LiveEvents.expects(:wiki_page_deleted).once
       @page.destroy
+    end
+
+    it "posts delete events" do
+      wiki_page_model
+      Canvas::LiveEvents.expects(:wiki_page_deleted).once
+      @page.destroy_permanently!
     end
   end
 

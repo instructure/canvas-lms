@@ -16,8 +16,4 @@ module DataFixup::RemoveDuplicateCanvadocsSubmissions
       end
     end
   end
-
-  class CanvadocsSubmission < ActiveRecord::Base
-    strong_params
-  end
 end

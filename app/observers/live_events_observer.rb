@@ -27,9 +27,6 @@ class LiveEventsObserver < ActiveRecord::Observer
       if obj.title_changed? || obj.body_changed?
         Canvas::LiveEvents.wiki_page_updated(obj, obj.title_changed? ? obj.title_was : nil,
                                                   obj.body_changed? ? obj.body_was : nil)
-      elsif obj.workflow_state_changed? && obj.workflow_state == 'deleted'
-        # Wiki pages are often soft deleted rather than destroyed
-        Canvas::LiveEvents.wiki_page_deleted(obj)
       end
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)
