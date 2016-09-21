@@ -303,6 +303,13 @@ describe DueDateCacher do
       end
     end
 
+    context "noop override" do
+      it "should apply to absolutely no one" do
+        assignment_override_model(assignment: assignment_model, set_type: 'Noop', set_id: 1, title: 'Tag 1')
+        expect(@cacher.override_scope(Submission.all, @override)).to be_a ActiveRecord::NullRelation
+      end
+    end
+
     context "multiple overrides" do
       before do
         add_section('second section')

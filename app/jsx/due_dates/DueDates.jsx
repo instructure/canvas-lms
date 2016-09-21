@@ -6,10 +6,11 @@ define([
   'jsx/due_dates/OverrideStudentStore',
   'jsx/due_dates/StudentGroupStore',
   'jsx/due_dates/TokenActions',
+  'compiled/models/AssignmentOverride',
   'i18n!assignments',
   'jquery',
   'compiled/jquery.rails_flash_notifications'
-], (_ ,React, DueDateRow, DueDateAddRowButton, OverrideStudentStore, StudentGroupStore, TokenActions, I18n, $) => {
+], (_ ,React, DueDateRow, DueDateAddRowButton, OverrideStudentStore, StudentGroupStore, TokenActions, Override, I18n, $) => {
 
   var DueDates = React.createClass({
 
@@ -28,6 +29,7 @@ define([
       return {
         students: {},
         sections: {},
+        noops: {[Override.conditionalRelease.noop_id]: Override.conditionalRelease},
         rows: {},
         addedRowCount: 0,
         defaultSectionId: null,
@@ -301,7 +303,8 @@ define([
       var validStudents = this.valuesWithOmission({object: this.state.students, keysToOmit: this.chosenStudentIds()})
       var validGroups = this.valuesWithOmission({object: this.groupsForSelectedSet(), keysToOmit: this.chosenGroupIds()})
       var validSections = this.valuesWithOmission({object: this.state.sections, keysToOmit: this.chosenSectionIds()})
-      return _.union(validStudents, validSections, validGroups)
+      var validNoops = this.valuesWithOmission({object: this.state.noops, keysToOmit: this.chosenNoops()})
+      return _.union(validStudents, validSections, validGroups, validNoops)
     },
 
     chosenIds(idType){
@@ -321,6 +324,10 @@ define([
 
     chosenGroupIds(){
       return this.chosenIds("group_id")
+    },
+
+    chosenNoops(){
+      return this.chosenIds("noop_id")
     },
 
     valuesWithOmission(args){

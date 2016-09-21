@@ -434,6 +434,7 @@ class AssignmentOverridesController < ApplicationController
   def require_course
     @course ||= api_find(Course.active, params[:course_id])
     raise ActiveRecord::RecordNotFound if @course.deleted?
+    @context = @course
     authorized_action(@course, @current_user, :read)
   end
 

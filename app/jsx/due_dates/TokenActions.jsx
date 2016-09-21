@@ -1,7 +1,8 @@
 define([
   'underscore',
-  'compiled/models/AssignmentOverride'
-], (_, AssignmentOverride) => {
+  'compiled/models/AssignmentOverride',
+  'compiled/models/Section'
+], (_, AssignmentOverride, Section) => {
 
   var TokenActions = {
 
@@ -18,7 +19,9 @@ define([
       else if (newToken.group_id) {
         return this.handleGroupTokenAdd(newToken, overridesFromRow)
       }
-      else {
+      else if (newToken.noop_id) {
+        return this.handleNoopTokenAdd(newToken, overridesFromRow)
+      } else {
         return this.handleStudentTokenAdd(newToken, overridesFromRow)
       }
     },
@@ -71,6 +74,21 @@ define([
       return this.addStudentToExistingAdhocOverride(newToken, freshOverride, overridesFromRow)
     },
 
+    // -- Adding Noop --
+
+    handleNoopTokenAdd(token, overridesFromRow){
+      var newOverride = this.newOverrideForRow({
+        noop_id: token.noop_id,
+        title: token.name
+      })
+
+      if(token == AssignmentOverride.conditionalRelease) {
+        overridesFromRow = this.removeDefaultSection(overridesFromRow)
+      }
+
+      return _.union(overridesFromRow, [newOverride])
+    },
+
     // -------------------
     //  Removing Tokens
     // -------------------
@@ -81,6 +99,9 @@ define([
       }
       else if (tokenToRemove.group_id) {
         return this.handleGroupTokenRemove(tokenToRemove, overridesFromRow)
+      }
+      else if (tokenToRemove.noop_id) {
+        return this.handleNoopTokenRemove(tokenToRemove, overridesFromRow)
       }
       else {
         return this.handleStudentTokenRemove(tokenToRemove, overridesFromRow)
@@ -95,12 +116,20 @@ define([
       return this.removeForType("group_id", tokenToRemove, overridesFromRow)
     },
 
+    handleNoopTokenRemove(tokenToRemove, overridesFromRow){
+      return this.removeForType("noop_id", tokenToRemove, overridesFromRow)
+    },
+
     removeForType(selector, tokenToRemove, overridesFromRow){
       var overrideToRemove = _.find(overridesFromRow, function(override){
         return override.get(selector) == tokenToRemove[selector]
       })
 
       return _.difference(overridesFromRow, [overrideToRemove])
+    },
+
+    removeDefaultSection(overridesFromRow){
+      return this.handleTokenRemove({ course_section_id: Section.defaultDueDateSectionID}, overridesFromRow)
     },
 
     handleStudentTokenRemove(tokenToRemove, overridesFromRow){

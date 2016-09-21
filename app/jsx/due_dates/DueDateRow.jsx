@@ -39,12 +39,14 @@ define([
     // 1 group override => 1 token for the group
 
     tokenizedOverrides(){
-      var {sectionOverrides, groupOverrides, adhocOverrides} = _.groupBy(this.props.overrides,
+      var {sectionOverrides, groupOverrides, adhocOverrides, noopOverrides} = _.groupBy(this.props.overrides,
         (ov) => {
           if (ov.get("course_section_id")) {
             return "sectionOverrides"
           } else if (ov.get("group_id")) {
             return "groupOverrides"
+          } else if (ov.get("noop_id")) {
+            return "noopOverrides"
           } else {
             return "adhocOverrides"
           }
@@ -54,7 +56,8 @@ define([
       return _.union(
         this.tokenizedSections(sectionOverrides),
         this.tokenizedGroups(groupOverrides),
-        this.tokenizedAdhoc(adhocOverrides)
+        this.tokenizedAdhoc(adhocOverrides),
+        this.tokenizedNoop(noopOverrides)
       )
     },
 
@@ -86,6 +89,16 @@ define([
         var tokensForStudents = _.map(ov.get("student_ids"), this.tokenFromStudentId, this)
         return overrideTokens.concat(tokensForStudents)
       }, [])
+    },
+
+    tokenizedNoop(noopOverrides){
+      var noopOverrides = noopOverrides || []
+      return _.map(noopOverrides, (override) => {
+        return {
+            noop_id: override.get("noop_id"),
+            name: override.get("title")
+          }
+      })
     },
 
     tokenFromStudentId(studentId){

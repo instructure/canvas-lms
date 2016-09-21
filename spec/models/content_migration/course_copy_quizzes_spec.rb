@@ -411,7 +411,8 @@ describe ContentMigration do
         :require_lockdown_browser_monitor => true,
         :lockdown_browser_monitor_data => 'VGVzdCBEYXRhCg==',
         :one_time_results => true,
-        :show_correct_answers_last_attempt => true
+        :show_correct_answers_last_attempt => true,
+        :only_visible_to_overrides => true,
       }
       q = @copy_from.quizzes.create!(attributes)
 
@@ -997,6 +998,25 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       q2 = @copy_to.assessment_questions.first
       expect(q2.question_data['correct_comments_html']).to eq text
       expect(q2.question_data['answers'].first['comments_html']).to eq text
+    end
+
+    describe "assignment overrides" do
+      before :once do
+        @quiz_plain = @copy_from.quizzes.create!(title: 'my quiz')
+        @quiz_assigned = @copy_from.quizzes.create!(title: 'assignment quiz')
+        @quiz_assigned.did_edit
+        @quiz_assigned.offer!
+      end
+
+      it "should copy only noop overrides" do
+        assignment_override_model(quiz: @quiz_plain, set_type: 'Noop', set_id: 1, title: 'Tag 3')
+        assignment_override_model(quiz: @quiz_assigned, set_type: 'Noop', set_id: 1, title: 'Tag 4')
+        run_course_copy
+        to_quiz_plain = @copy_to.quizzes.where(migration_id: mig_id(@quiz_plain)).first
+        to_quiz_assigned = @copy_to.quizzes.where(migration_id: mig_id(@quiz_assigned)).first
+        expect(to_quiz_plain.assignment_overrides.pluck(:title)).to eq ['Tag 3']
+        expect(to_quiz_assigned.assignment_overrides.pluck(:title)).to eq ['Tag 4']
+      end
     end
   end
 end
