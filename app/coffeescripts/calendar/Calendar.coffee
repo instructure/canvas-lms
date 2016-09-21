@@ -740,7 +740,7 @@ define [
       changed = @schedulerState.inFindAppointmentMode != newState.inFindAppointmentMode
       @schedulerState = newState
       @refetchEvents() if changed
-      if (changed)
+      if (changed && @currentView == 'agenda')
         @loadAgendaView()
 
     findAppointmentModeGroups: () =>
