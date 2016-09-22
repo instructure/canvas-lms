@@ -317,19 +317,16 @@ module CustomSeleniumActions
 
   MODIFIER_KEY = RUBY_PLATFORM =~ /darwin/ ? :command : :control
   def replace_content(el, value, options = {})
-    keys = [MODIFIER_KEY, "a"], :backspace, value
+    keys = [[MODIFIER_KEY, "a"], :backspace, value]
     keys << :tab if options[:tab_out]
-    el.send_keys *keys
-  end
 
-  def clear_content(selector)
-    el = driver.find_element :css, selector
-    driver.action.move_to(el).click.perform
-    driver.action.key_down(:command)
-        .send_keys('a')
-        .key_up(:command)
-        .perform
-    driver.action.send_keys(:backspace).perform
+    # We are treating the chrome browser different because currently Selenium cannot send :command key to the chrome.
+    # This is a known issue and hasn't been solved yet. https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
+    if driver.browser == :chrome
+      driver.execute_script("arguments[0].select()", el)
+      keys.delete_at(0)
+    end
+    el.send_keys(*keys)
   end
 
   # can pass in either an element or a forms css
