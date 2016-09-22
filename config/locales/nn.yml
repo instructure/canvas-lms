@@ -1639,7 +1639,7 @@ nn:
       a_file_upload: "ei filopplasting"
       a_media_recording: "ei mediainnspeling"
       a_quiz: "ei prøve"
-      a_text_entry_box: "ei tekstoppføring"
+      a_text_entry_box: teksteditoren
       a_website_url: "ei URL-adresse til ein nettstad"
       external_tool: "eit eksternt verktøy"
       on_paper: "på papir"
@@ -2091,13 +2091,13 @@ nn:
         external_tool_new_tab: "Last inn verktøyet i ei ny fane"
         turnitin_enabled: "Aktiver Turnitin-innleveringar"
       labels: 
-        allow_file_uploads: Filopplastingar
+        allow_file_uploads: Filopplasting
         allow_media_recordings: Medieinnspelingar
-        allow_text_entry: Tekstoppføring
-        allow_url: Nettstad-URL
+        allow_text_entry: "Tekstinnlegging i editor"
+        allow_url: URL
         allowed_extensions: "Tillatne filtypar"
-        restrict_file_extensions: "Avgrens opplasting av filtypar"
-      online_entry_options: "Alternativ for nettbaserte oppføringar"
+        restrict_file_extensions: "Vel filtypar som kan leverast"
+      online_entry_options: Leveringsmåtar
       submission_type: Innleveringstype
       submission_types: 
         external_tool: "Eksternt verktøy"
@@ -2122,7 +2122,7 @@ nn:
       invalid_google_docs_domain: "Ugyldig domene"
       labels: 
         uploaded_data: Fil
-        url: Nettstad-URL
+        url: URL
       links: 
         add_another_file: "Legg til ei ny fil"
         authorize_google_drive: "Autoriser Google Drive-tilgang"
@@ -2132,8 +2132,8 @@ nn:
           file_upload: Filopplasting
           google_doc: "Google Doc"
           media: Media
-          text_entry: Tekstoppføring
-          website: Nettstad-URL
+          text_entry: "Tekstinnlegging i editor"
+          website: URL
       loading_tools: "Lastar verktøy ..."
       messages: 
         google_drives_auth_required: "Du må gi Canvas tilgang til Google Drive-kontoen din før du kan levere oppgåver direkte frå Google Drive:"
@@ -4726,9 +4726,9 @@ nn:
         files: Fillagring
         students: Studentar
         totals: Totalt
-      text_entry: Tekstoppføring
+      text_entry: "Tekstinnlegging i editor"
       unaccepted_students: "Ikkje godkjende studentar"
-      website_url: Nettstad-URL
+      website_url: URL
     syllabus: 
       headers: 
         date: Dato
@@ -7462,7 +7462,7 @@ nn:
     media_submission: Medieinnlevering
     online_url_submission: "Nettbasert URL-innlevering"
     quiz_submission: Prøveinnlevering
-    text_entry_submission: "Innsending av tekstoppføring"
+    text_entry_submission: "Send inn teksten"
   id_ac7afadf: ID
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "ID er allereie i bruk for denne kontoen og identitetsleverandøren"
   idp_entity_id_25c51837: "ID for IdP-eining"
@@ -10366,12 +10366,12 @@ nn:
   on_time_percent_eebffe38: "På tid: %{percent}"
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Når denne funksjonen er slått på, kan den ikkje slåast av igjen. Ver sikker på at du er klar for å aktivere innleveringsmappa før du går vidare. "
   one_per_line_format_name_value_79647700: "Ein per linje. Format: namn=verdi"
-  online_submission_type_file_uploads_24910d74: "Innlevering på nettet – filopplastingar"
-  online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Innlevering på nettet – filopplastingar – avgrens opplasting av filtypar"
+  online_submission_type_file_uploads_24910d74: "Innlevering på nettet – filopplasting"
+  online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Innlevering på nettet – filopplasting – vel filtypar som kan leverast"
   online_submission_type_media_recordings_9424bf34: "Innlevering på nettet – medieopptak"
-  online_submission_type_text_entry_ac56d100: "Innlevering på nettet – tekstoppføring"
+  online_submission_type_text_entry_ac56d100: "Innlevering på nettet – tekstinnlegging i editor"
   online_submission_type_website_url_2c9df33d: "Innlevering på nettet – nettstad"
-  online_text_entry_1d893ce: "Nettbasert tekstoppføring"
+  online_text_entry_1d893ce: "Nettbasert tekstinnlegging i editor"
   online_upload_59969592: "Nettbasert opplasting"
   online_url_37830a72: "Oppkopla URL"
   only_a_maximum_of_100_events_can_be_created_ad703982: "maksimum 100 hendingar kan opprettast"
@@ -11106,7 +11106,7 @@ nn:
       Aspire (SIS2000), JMC, og andre SIF-aktiverte SIS som godtek SIF-elementa GradingCategory,
       GradingAssignment og GradingAssignmentScore."
   post_grades_to_sis_97ece878: "Post karakterar i SIS"
-  post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "\"Send karakterer til SIS\" er slått på som standard for oppgåver, karaktergivande diskusjoner, og kvissar"
+  post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "\"Send karakterer til SIS\" er slått på som standard for oppgåver, karaktergivande diskusjonar, og prøver"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Øv deg på prøve"
   prerequisites_49659f16: "Føresetnader:"
@@ -14236,7 +14236,7 @@ nn:
     notes: Merknader
     on_paper: "På papir"
     online_quiz: "Nettbasert prøve"
-    online_text_entry: "Nettbasert tekstoppføring"
+    online_text_entry: "Nettbasert tekstinnlegging i editor"
     online_upload: "Nettbasert opplasting"
     online_url: "Oppkopla URL"
     previous_object: "Førre %{type}"
@@ -14632,8 +14632,8 @@ nn:
       timespan: "%{start_at} *til* %{end_at}"
   terms_35d91184: "Semester:"
   text_document_eacbcdb7: Tekstdokument
-  text_entry_submission_7b0ae0c5: "Innsending av tekstoppføring"
-  text_entry_submission_cannot_be_empty_3d187cae: "Innsending av tekstoppføring kan ikkje stå tomt"
+  text_entry_submission_7b0ae0c5: "Send inn teksten"
+  text_entry_submission_cannot_be_empty_3d187cae: "Tekstboksen kan ikkje vere tom"
   text_input_d3480b8c: Tekstoppføring
   that_user_account_has_been_deleted_please_contact__350e0e0: "Brukarkontoen er sletta.  Kontakt systemansvarleg og få kontoen aktivert på nytt."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Konto-ID for kontoen der rapporteringsbrukaren tilhøyrer"
