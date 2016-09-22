@@ -37,6 +37,16 @@ module Api
           expect(Content.new(string).might_need_modification?).to be(true)
         end
 
+        it 'is true for a link to files that include the host' do
+          string = "<body><a href='https://account.instructure.com/files'>link</a></body>"
+          expect(Content.new(string).might_need_modification?).to be(true)
+        end
+
+        it 'is false for a link to files in a context' do
+          string = "<body><a href='/courses/1/files'>link</a></body>"
+          expect(Content.new(string).might_need_modification?).to be(false)
+        end
+
         it 'is false for garden-variety content' do
           string = "<body><a href='http://example.com/123'>link</a></body>"
           expect(Content.new(string).might_need_modification?).to be(false)
