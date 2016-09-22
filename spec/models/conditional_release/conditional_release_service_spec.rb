@@ -116,6 +116,9 @@ describe ConditionalRelease::Service do
   describe 'env_for' do
     before do
       enable_service
+      stub_config({
+        protocol: 'foo', host: 'bar', rules_path: 'rules'
+      })
       course_with_student_logged_in(active_all: true)
     end
 
@@ -165,6 +168,14 @@ describe ConditionalRelease::Service do
       env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment)
       cr_env = env[:CONDITIONAL_RELEASE_ENV]
       expect(cr_env[:assignment][:grading_scheme]).to be_nil
+    end
+
+    it 'includes a relevant rule if include_rule is true' do
+      assignment_model course: @course
+      Service.stubs(:rule_triggered_by).returns(nil)
+      env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment, include_rule: true)
+      cr_env = env[:CONDITIONAL_RELEASE_ENV]
+      expect(cr_env).to have_key :rule
     end
   end
 
@@ -275,6 +286,96 @@ describe ConditionalRelease::Service do
                 .returns(stub(code: '200', body: { key: 'value' }.to_json))
       Service.expects(:clear_rules_cache_for).with(@course, @student)
       Service.select_mastery_path(@course, @student, @student, 100, 200, nil)
+    end
+  end
+
+  describe 'with active_rules' do
+    before(:each) do
+      Service.stubs(:enabled_in_context?).returns(true)
+      Service.stubs(:jwt_for).returns(:jwt)
+    end
+
+    before(:once) do
+      course_with_teacher
+      @a, @b, @c, @d = 4.times.map { assignment_model course: @course }
+    end
+
+    let_once(:default_rules) do
+      [
+        {id: 1, trigger_assignment: @a.id.to_s, scoring_ranges: [{ assignment_sets: [
+          { assignments: [
+            { assignment_id: @b.id.to_s },
+            { assignment_id: @c.id.to_s }]}]}]},
+        {id: 2, trigger_assignment: @b.id.to_s, scoring_ranges: [{ assignment_sets: [
+          { assignments: [
+            { assignment_id: @c.id.to_s }]}]}]},
+        {id: 3, trigger_assignment: @c.id.to_s}
+      ].as_json
+    end
+
+    describe 'rule_triggered_by' do
+      def cache_active_rules(rules = default_rules)
+        Rails.cache.write ['conditional_release', 'active_rules', @course.global_id].cache_key, rules
+      end
+
+      it 'caches the response of any http call' do
+        enable_cache do
+          CanvasHttp.expects(:get).once.returns stub({ body: default_rules.to_json })
+          Service.rule_triggered_by(@a, @teacher, nil)
+        end
+      end
+
+      context 'with cached rules' do
+        it 'returns a matching rule' do
+          enable_cache do
+            cache_active_rules
+            expect(Service.rule_triggered_by(@a, @teacher, nil)['id']).to eq 1
+            expect(Service.rule_triggered_by(@c, @teacher, nil)['id']).to eq 3
+          end
+        end
+
+        it 'returns nil if no rules are matching' do
+          enable_cache do
+            cache_active_rules
+            expect(Service.rule_triggered_by(@d, @teacher, nil)).to be nil
+          end
+        end
+      end
+
+      it 'returns nil without making request if no assignment is provided' do
+        CanvasHttp.stubs(:get).raises 'should not generate request'
+        Service.rule_triggered_by(nil, @teacher, nil)
+      end
+
+      it 'returns nil without making request if service is not enabled' do
+        Service.stubs(:enabled_in_context?).returns(false)
+        CanvasHttp.stubs(:get).raises 'should not generate request'
+        Service.rule_triggered_by(@a, @teacher, nil)
+      end
+    end
+
+    describe 'rules_assigning' do
+      before(:each) do
+        Service.stubs(:active_rules).returns(default_rules)
+      end
+
+      it 'caches the calculation of the reverse index' do
+        enable_cache do
+          Service.rules_assigning(@a, @teacher, nil)
+          Service.stubs(:active_rules).raises 'should not refetch rules'
+          Service.rules_assigning(@b, @teacher, nil)
+        end
+      end
+
+      it 'returns all rules which matched assignments' do
+        expect(Service.rules_assigning(@b, @teacher, nil).map{|r| r['id']}).to eq [1]
+        expect(Service.rules_assigning(@c, @teacher, nil).map{|r| r['id']}).to eq [1, 2]
+      end
+
+      it 'returns nil if no rules matched assignments' do
+        expect(Service.rules_assigning(@a, @teacher, nil)).to eq nil
+        expect(Service.rules_assigning(@d, @teacher, nil)).to eq nil
+      end
     end
   end
 end

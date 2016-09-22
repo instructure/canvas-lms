@@ -7,25 +7,3 @@ development:
 
   # optional. default matches Canvas
   protocol: https
-
-  # optional. default is 'ui/edit_rule'
-  edit_rule_path: 'ui/edit_rule'
-
-  # optional. default is 'api/accounts'
-  create_account_path: 'api/accounts'
-
-  # optional. default is 'api/content_exports'
-  content_exports_path: 'api/content_exports'
-
-  # optional. default is 'api/content_imports'
-  content_imports_path: 'api/content_imports'
-
-  # optional. default if 'api/rules/summary'
-  rules_summary_path: 'api/rules/summary'
-
-  # optional. email-like id for API user pseudonym.
-  # default conditional-release-service@instructure.auth
-  unique_id: conditional-release-service@instructure.auth
-
-  # optional. default is 'api/rules/select_assignment_set'
-  select_assignment_set_path: 'api/rules/select_assignment_set'

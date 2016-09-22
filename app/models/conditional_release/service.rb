@@ -20,26 +20,31 @@ module ConditionalRelease
   class Service
     private_class_method :new
 
-    DEFAULT_CONFIG = {
-      enabled: false, # required
-      host: nil,      # required
-      protocol: nil,  # defaults to Canvas
+    DEFAULT_PATHS = {
       edit_rule_path: "ui/editor",
       stats_path: "stats",
       create_account_path: 'api/accounts',
       content_exports_path: 'api/content_exports',
       content_imports_path: 'api/content_imports',
+      rules_path: 'api/rules?include[]=all&active=true',
       rules_summary_path: 'api/rules/summary',
       select_assignment_set_path: 'api/rules/select_assignment_set'
     }.freeze
 
-    def self.env_for(context, user = nil, session: nil, assignment: nil, domain: nil, real_user: nil)
+    DEFAULT_CONFIG = {
+      enabled: false, # required
+      host: nil,      # required
+      protocol: nil,  # defaults to Canvas
+    }.merge(DEFAULT_PATHS).freeze
+
+    def self.env_for(context, user = nil, session: nil, assignment: nil, domain: nil,
+                    real_user: nil, include_rule: false)
       enabled = self.enabled_in_context?(context)
       env = {
         CONDITIONAL_RELEASE_SERVICE_ENABLED: enabled
       }
       if enabled && user
-        env.merge!({
+        new_env = {
           CONDITIONAL_RELEASE_ENV: {
             jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
             assignment: assignment_attributes(assignment),
@@ -47,7 +52,9 @@ module ConditionalRelease
             stats_url: stats_url,
             locale: I18n.locale.to_s
           }
-        })
+        }
+        new_env[:CONDITIONAL_RELEASE_ENV][:rule] = rule_triggered_by(assignment, user, session) if include_rule
+        env.merge!(new_env)
       end
       env
     end
@@ -71,6 +78,12 @@ module ConditionalRelease
       return unless enabled_in_context?(context)
       data = rules_data(context, student, Array.wrap(content_tags), session)
       data[:rules]
+    end
+
+    def self.clear_active_rules_cache(course)
+      return unless course.present?
+      clear_cache_with_key(active_rules_cache_key(course))
+      clear_cache_with_key(active_rules_reverse_cache_key(course))
     end
 
     def self.clear_submissions_cache_for(user)
@@ -99,22 +112,6 @@ module ConditionalRelease
       !!(configured? && context.feature_enabled?(:conditional_release))
     end
 
-    def self.edit_rule_url
-      build_url edit_rule_path
-    end
-
-    def self.stats_url
-      build_url stats_path
-    end
-
-    def self.create_account_url
-      build_url create_account_path
-    end
-
-    def self.rules_summary_url
-      build_url rules_summary_path
-    end
-
     def self.protocol
       config[:protocol] || HostUrl.protocol
     end
@@ -127,32 +124,11 @@ module ConditionalRelease
       config[:unique_id] || "conditional-release-service@instructure.auth"
     end
 
-    def self.edit_rule_path
-      config[:edit_rule_path]
-    end
-
-    def self.stats_path
-      config[:stats_path]
-    end
-
-    def self.create_account_path
-      config[:create_account_path]
-    end
-
-    def self.content_exports_url
-      build_url(config[:content_exports_path])
-    end
-
-    def self.content_imports_url
-      build_url(config[:content_imports_path])
-    end
-
-    def self.rules_summary_path
-      config[:rules_summary_path]
-    end
-
-    def self.select_assignment_set_url
-      build_url(config[:select_assignment_set_path])
+    DEFAULT_PATHS.each do |path_name, _path|
+      method_name = path_name.to_s.sub(/_path$/, '_url')
+      Service.define_singleton_method method_name do
+        build_url config[path_name]
+      end
     end
 
     # Returns an http response-like hash { code: string, body: string or object }
@@ -174,6 +150,44 @@ module ConditionalRelease
       clear_rules_cache_for(context, student)
 
       { code: request.code, body: JSON.parse(request.body) }
+    end
+
+    def self.triggers_mastery_paths?(assignment, current_user, session = nil)
+      rule_triggered_by(assignment, current_user, session).present?
+    end
+
+    def self.rule_triggered_by(assignment, current_user, session = nil)
+      return unless assignment.present?
+      return unless enabled_in_context?(assignment.context)
+
+      rules = active_rules(assignment.context, current_user, session)
+      return nil unless rules
+
+      rules.find {|r| r['trigger_assignment'] == assignment.id.to_s}
+    end
+
+    def self.rules_assigning(assignment, current_user, session = nil)
+      reverse_lookup = Rails.cache.fetch(active_rules_reverse_cache_key(assignment.context)) do
+        all_rules = active_rules(assignment.context, current_user, session)
+        return nil unless all_rules
+
+        lookup = {}
+        all_rules.each do |rule|
+          (rule['scoring_ranges'] || []).each do |sr|
+            (sr['assignment_sets'] || []).each  do |as|
+              (as['assignments'] || []).each do |a|
+                if a['assignment_id'].present?
+                  lookup[a['assignment_id']] ||= []
+                  lookup[a['assignment_id']] << rule
+                end
+              end
+            end
+          end
+        end
+        lookup.each {|_id, rules| rules.uniq!}
+        lookup
+      end
+      reverse_lookup[assignment.id.to_s]
     end
 
     class << self
@@ -312,12 +326,31 @@ module ConditionalRelease
           context_type updated_at context_code)
       end
 
+      def active_rules(course, current_user, session)
+        return unless enabled_in_context?(course)
+        return unless course.grants_any_right?(current_user, session, :read, :manage_assignments)
+
+        Rails.cache.fetch(active_rules_cache_key(course)) do
+          headers = headers_for(course, current_user, domain_for(course), session)
+          request = CanvasHttp.get(rules_url, headers)
+          JSON.parse(request.body)
+        end
+      end
+
       def rules_cache_key(context, student)
         ['conditional_release_rules', context.global_id, student.global_id].cache_key
       end
 
       def submissions_cache_key(student)
         ['conditional_release_submissions', student.global_id].cache_key
+      end
+
+      def active_rules_cache_key(course)
+        ['conditional_release', 'active_rules', course.global_id].cache_key
+      end
+
+      def active_rules_reverse_cache_key(course)
+        ['conditional_release', 'active_rules_reverse', course.global_id].cache_key
       end
 
       def clear_cache_with_key(key)
