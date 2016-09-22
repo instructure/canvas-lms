@@ -57,7 +57,6 @@ npm-debug.log
 /spec/javascripts/tests.js
 /tmp/
 /vendor/bundle
-docker-compose.override.yml
 
 # generated plugin stuff
 /app/coffeescripts/plugins/
@@ -78,3 +77,6 @@ docker-compose.override.yml
 /gems/*/coverage
 /gems/*/tmp
 /gems/*/node_modules
+
+# user docker compose overrides
+docker-compose.local.*

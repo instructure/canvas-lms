@@ -1,0 +1,15 @@
+# to use this add docker-compose/cassandra.override.yml
+# to your COMPOSE_FILE var in .env
+# Then:
+# - Uncomment configuration in config/cassandra.yml
+# - See config/cassandra.yml.example for further setup instructions
+version: '2'
+services:
+  web:
+    links:
+      - cassandra
+
+  cassandra:
+    image: cassandra:2.2
+    environment:
+      CASSANDRA_START_RPC: 'true'

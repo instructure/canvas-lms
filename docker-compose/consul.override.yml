@@ -1,0 +1,14 @@
+# to use this add docker-compose/consul.override.yml
+# to your COMPOSE_FILE var in .env
+
+version: '2'
+services:
+  web:
+    links:
+      - consul
+
+  consul:
+    image: gliderlabs/consul-server:0.6
+    command: -node canvas-consul -bootstrap
+    environment:
+      GOMAXPROCS: "2"
