@@ -367,7 +367,7 @@ class ContextController < ApplicationController
   ].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = WORKFLOW_TYPES.select { |type| @context.class.reflections.key?(CANVAS_RAILS4_0 ? type : type.to_s) }.
+      @item_types = WORKFLOW_TYPES.select { |type| @context.class.reflections.key?(type.to_s) }.
           map { |type| @context.association(type).reader }
 
       @item_types << @context.wiki.wiki_pages if @context.respond_to? :wiki
@@ -389,7 +389,6 @@ class ContextController < ApplicationController
       scope = @context.wiki if type == 'wiki_page'
       type = 'all_discussion_topic' if type == 'discussion_topic'
       type = type.pluralize
-      type = type.to_sym if CANVAS_RAILS4_0
       raise "invalid type" unless ITEM_TYPES.include?(type.to_sym) && scope.class.reflections.key?(type)
       @item = scope.association(type).reader.find(id)
       @item.restore

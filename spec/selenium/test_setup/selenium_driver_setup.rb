@@ -133,22 +133,12 @@ module SeleniumDriverSetup
   # oj's xss_safe escapes forward slashes, which makes paths invalid
   # in the firefox profile, which makes log_file asplode
   # see https://github.com/SeleniumHQ/selenium/issues/2435#issuecomment-245458210
-  if CANVAS_RAILS4_0
-    def with_vanilla_json
-      orig_options =  MultiJson.dump_options
-      MultiJson.dump_options = {:escape_mode => :json}
-      yield
-    ensure
-      MultiJson.dump_options = orig_options
-    end
-  else
-    def with_vanilla_json
-      orig_options = Oj.default_options
-      Oj.default_options = {:escape_mode => :json}
-      yield
-    ensure
-      Oj.default_options = orig_options
-    end
+  def with_vanilla_json
+    orig_options = Oj.default_options
+    Oj.default_options = {:escape_mode => :json}
+    yield
+  ensure
+    Oj.default_options = orig_options
   end
 
   def chrome_driver

@@ -22,7 +22,7 @@ app/stylesheets/brandable_css_brands
 /config/build.js
 /config/environments/*-local.rb
 /config/locales/generated/
-/config/RAILS4_2
+/config/RAILS5
 /config/WEBPACK
 /coverage/
 /coverage-js/
@@ -31,10 +31,7 @@ app/stylesheets/brandable_css_brands
 /db/*sql
 /exports/
 Gemfile.lock
-Gemfile.lock2
-Gemfile.lock3
-Gemfile.lock4
-Gemfile.lock4_2
+Gemfile.lock5
 /log/
 mkmf.log
 /node_modules

@@ -261,7 +261,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     self.class.where(id: self).
         where("workflow_state NOT IN ('complete', 'pending_review')").
-        update_all(user_id: user_id, submission_data: CANVAS_RAILS4_0 ? new_params.to_yaml : new_params)
+        update_all(user_id: user_id, submission_data: new_params)
 
     record_answer(new_params)
 

@@ -1,21 +1,19 @@
-if CANVAS_RAILS4_0
-  gem 'rails', '4.0.13'
-  gem 'rack', '1.5.4'
-  gem 'builder', '3.1.4'
-  gem 'protected_attributes', '1.0.8'
-  gem 'rails-observers', '0.1.2'
-  gem 'tzinfo', '0.3.43'
-  gem 'foreigner', '0.9.2'
-else
+if CANVAS_RAILS4_2
   gem 'rails', '4.2.7.1'
   gem 'rack', '1.6.4'
-  gem 'builder', '3.2.2'
   gem 'protected_attributes', '1.1.3'
   gem 'rails-observers', '0.1.2'
-  gem 'tzinfo', '1.2.2'
-  gem 'oj_mimic_json', require: false
   gem 'activesupport-json_encoder', '1.1.0'
+  gem 'oauth2', '1.0.0', require: false
+else
+  gem 'rails', '5.0.0.1'
+  gem 'rack', '2.0.1'
+  gem 'oauth2', '1.2.0', require: false
 end
+
+gem 'builder', '3.2.2'
+gem 'tzinfo', '1.2.2'
+gem 'oj_mimic_json', require: false
 
 gem 'encrypted_cookie_store-instructure', '1.1.12', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
@@ -74,7 +72,6 @@ gem 'netaddr', '1.5.0', require: false
 gem 'nokogiri', '1.6.6.2.20150813143452', require: false, github: 'codekitchen/nokogiri', ref: 'd47e53f885'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', require: false
-gem 'oauth2', '1.0.0', require: false
 gem 'parallel', '1.6.2', require: false
   gem 'ruby-progressbar', '1.7.5', require: false #used to show progress of S3Uploader
 gem 'rack-mini-profiler', '0.9.2', require: false

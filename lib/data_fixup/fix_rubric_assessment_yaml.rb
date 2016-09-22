@@ -11,7 +11,7 @@ module DataFixup
             ":comments_html: !str #{$1}"
           end
           if new_yaml != yaml
-            RubricAssessment.where(:id => id).update_all(:data => CANVAS_RAILS4_0 ? new_yaml : YAML.load(new_yaml))
+            RubricAssessment.where(:id => id).update_all(:data => YAML.load(new_yaml))
           end
         end
       end

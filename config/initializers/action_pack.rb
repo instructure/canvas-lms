@@ -36,12 +36,3 @@ ActionController::DataStreaming.class_eval do
   end
   alias_method_chain :send_data, :content_length
 end
-
-# fixed in newer versions of rails
-if CANVAS_RAILS4_0
-  require 'action_dispatch/http/mime_type'
-
-  Mime::LOOKUP.default_proc = proc { |h,k|
-    Mime::Type.new(k) unless k.blank?
-  }
-end

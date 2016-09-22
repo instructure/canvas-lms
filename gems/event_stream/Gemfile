@@ -10,8 +10,8 @@ gem 'paginated_collection', path: '../paginated_collection'
 gem 'simplecov', '0.8.2', :require => false
 gem 'simplecov-rcov', '0.2.3', :require => false
 
-require File.expand_path("../../../config/canvas_rails4_2", __FILE__)
+require File.expand_path("../../../config/canvas_rails5", __FILE__)
 
-if CANVAS_RAILS4_0
-  gem 'rails', '~> 4.0.13'
+if CANVAS_RAILS4_2
+  gem 'rails', '~> 4.2'
 end

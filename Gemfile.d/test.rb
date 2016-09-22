@@ -1,4 +1,10 @@
 group :test do
+  if CANVAS_RAILS4_2
+    gem 'rails-dom-testing', '1.0.7'
+  else
+    gem 'rails-dom-testing', '2.0.1'
+  end
+
   gem 'gergich', '0.1.6', require: false
   gem 'testingbot', require: false
   # simplecov 0.10.0 shows significantly less coverage.
@@ -45,8 +51,4 @@ group :test do
   gem 'jira_ref_parser', '1.0.0'
   gem 'headless', '2.3.1', require: false
   gem 'escape_code', '0.2'
-
-  unless CANVAS_RAILS4_0
-    gem 'rails-dom-testing', '1.0.7'
-  end
 end

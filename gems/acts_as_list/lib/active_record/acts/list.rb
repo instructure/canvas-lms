@@ -64,7 +64,7 @@ module ActiveRecord
             # expand assocations to their foreign keys
             new_scope = {}
             scope.each do |k, v|
-              if reflection = reflections[CANVAS_RAILS4_0 ? k : k.to_s]
+              if reflection = reflections[k.to_s]
                 key = reflection.foreign_key
                 new_scope[key] = v
                 if reflection.options[:polymorphic]

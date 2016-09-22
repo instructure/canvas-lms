@@ -166,7 +166,7 @@ module Importers
       quiz_ids = []
       Quizzes::QuizQuestion.where(:assessment_question_id => aq.id).find_each do |qq|
         if recursively_sub_placeholders!(qq['question_data'], links)
-          Quizzes::QuizQuestion.where(:id => qq.id).update_all(:question_data => CANVAS_RAILS4_0 ? qq['question_data'].to_yaml : qq['question_data'])
+          Quizzes::QuizQuestion.where(:id => qq.id).update_all(:question_data => qq['question_data'])
           quiz_ids << qq.quiz_id
         end
       end
@@ -174,7 +174,7 @@ module Importers
       if quiz_ids.any?
         Quizzes::Quiz.where(:id => quiz_ids.uniq).where("quiz_data IS NOT NULL").find_each do |quiz|
           if recursively_sub_placeholders!(quiz['quiz_data'], links)
-            Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => CANVAS_RAILS4_0 ? quiz['quiz_data'].to_yaml : quiz['quiz_data'])
+            Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'])
           end
         end
       end
@@ -188,19 +188,19 @@ module Importers
       end
 
       if recursively_sub_placeholders!(aq['question_data'], links)
-        AssessmentQuestion.where(:id => aq.id).update_all(:question_data => CANVAS_RAILS4_0 ? aq['question_data'].to_yaml : aq['question_data'])
+        AssessmentQuestion.where(:id => aq.id).update_all(:question_data => aq['question_data'])
       end
     end
 
     def process_quiz_question!(qq, links)
       if recursively_sub_placeholders!(qq['question_data'], links)
-        Quizzes::QuizQuestion.where(:id => qq.id).update_all(:question_data => CANVAS_RAILS4_0 ? qq['question_data'].to_yaml : qq['question_data'])
+        Quizzes::QuizQuestion.where(:id => qq.id).update_all(:question_data => qq['question_data'])
       end
 
       quiz = Quizzes::Quiz.where(:id => qq.quiz_id).where("quiz_data IS NOT NULL").first
       if quiz
         if recursively_sub_placeholders!(quiz['quiz_data'], links)
-          Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => CANVAS_RAILS4_0 ? quiz['quiz_data'].to_yaml : quiz['quiz_data'])
+          Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'])
         end
       end
     end

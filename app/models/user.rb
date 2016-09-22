@@ -2183,7 +2183,7 @@ class User < ActiveRecord::Base
 
       group_rows = convert_global_id_rows(
           GroupMembership.joins(:group).
-              merge(User.instance_exec(&User.reflections[CANVAS_RAILS4_0 ? :current_group_memberships : 'current_group_memberships'].scope).only(:where)).
+              merge(User.instance_exec(&User.reflections['current_group_memberships'].scope).only(:where)).
               where(user_id: users).
               distinct.pluck(:user_id, :group_id))
       group_rows.each do |user_id, group_id|

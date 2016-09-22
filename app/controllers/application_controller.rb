@@ -1290,7 +1290,7 @@ class ApplicationController < ActionController::Base
 
     unless @page
       if params[:titleize].present? && !value_to_boolean(params[:titleize])
-        @page_name = CGI.unescape(@page_name) unless CANVAS_RAILS4_0
+        @page_name = CGI.unescape(@page_name)
         @page = @wiki.build_wiki_page(@current_user, :title => @page_name)
       else
         @page = @wiki.build_wiki_page(@current_user, :url => @page_name)

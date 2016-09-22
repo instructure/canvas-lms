@@ -5,8 +5,7 @@ gemspec
 gem 'paginated_collection', path: '../paginated_collection'
 gem 'json_token', path: '../json_token'
 
-require File.expand_path("../../../config/canvas_rails4_2", __FILE__)
-
-if CANVAS_RAILS4_0
-  gem 'rails', '~> 4.0.13'
+require File.expand_path("../../../config/canvas_rails5", __FILE__)
+if CANVAS_RAILS4_2
+  gem 'rails', '~> 4.2'
 end

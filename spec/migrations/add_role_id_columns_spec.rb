@@ -13,10 +13,6 @@ describe 'AddRoleIdColumns', shared_db: false do
       role
     end
 
-    def returning_id # can remove after rails 4.2
-      CANVAS_RAILS4_0 ? " RETURNING ID" : ""
-    end
-
     before do
       pending("PostgreSQL specific") unless ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
 
@@ -93,25 +89,25 @@ describe 'AddRoleIdColumns', shared_db: false do
       # with a built-in role
       id1 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
-        VALUES(#{@sub_account1.id}, #{user.id}, 'AccountAdmin', '2014-07-07', '2014-07-07')#{returning_id}")
+        VALUES(#{@sub_account1.id}, #{user.id}, 'AccountAdmin', '2014-07-07', '2014-07-07')")
       expect(AccountUser.find(id1).role_id).to eq admin_role.id
 
       # with role 1 for @sub_account1
       id2 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
-        VALUES(#{@sub_account1.id}, #{user.id}, 'accountrole1', '2014-07-07', '2014-07-07')#{returning_id}")
+        VALUES(#{@sub_account1.id}, #{user.id}, 'accountrole1', '2014-07-07', '2014-07-07')")
       expect(AccountUser.find(id2).role_id).to eq @account_role1.id
 
       # with role 2 for @sub_account1
       id3 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
-        VALUES(#{@sub_account1.id}, #{user.id}, 'accountrole2', '2014-07-07', '2014-07-07')#{returning_id}")
+        VALUES(#{@sub_account1.id}, #{user.id}, 'accountrole2', '2014-07-07', '2014-07-07')")
       expect(AccountUser.find(id3).role_id).to eq @account_role2.id
 
       # with the role name meant for the lookalike
       id4 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
-        VALUES(#{@sub_account2.id}, #{user.id}, 'accountrole2', '2014-07-07', '2014-07-07')#{returning_id}")
+        VALUES(#{@sub_account2.id}, #{user.id}, 'accountrole2', '2014-07-07', '2014-07-07')")
       expect(AccountUser.find(id4).role_id).to eq account_role2_lookalike.id
 
       # also make sure the data fixes worked
@@ -149,7 +145,7 @@ describe 'AddRoleIdColumns', shared_db: false do
       null_en_id = Enrollment.connection.insert("INSERT INTO #{Enrollment.quoted_table_name}(
         course_id, course_section_id, root_account_id, user_id, type, workflow_state, created_at, updated_at, role_name)
         VALUES(#{ssa1_course.id}, #{ssa1_course.default_section.id}, #{@root_account.id}, #{@user2.id},
-          'StudentEnrollment', 'active', '2014-07-07', '2014-07-07', 'NonExistentRole')#{returning_id}")
+          'StudentEnrollment', 'active', '2014-07-07', '2014-07-07', 'NonExistentRole')")
 
       @pre_migration.up
       Enrollment.reset_column_information
@@ -165,21 +161,21 @@ describe 'AddRoleIdColumns', shared_db: false do
       id1 = Enrollment.connection.insert("INSERT INTO #{Enrollment.quoted_table_name}(
         course_id, course_section_id, root_account_id, user_id, type, workflow_state, created_at, updated_at)
         VALUES(#{ssa1_course.id}, #{ssa1_course.default_section.id}, #{@root_account.id}, #{@user2.id},
-          'StudentEnrollment', 'active', '2014-07-07', '2014-07-07')#{returning_id}")
+          'StudentEnrollment', 'active', '2014-07-07', '2014-07-07')")
       expect(Enrollment.find(id1).role_id).to eq student_role.id
 
       # with a role name for course_role1
       id2 = Enrollment.connection.insert("INSERT INTO #{Enrollment.quoted_table_name}(
         course_id, course_section_id, root_account_id, user_id, type, role_name, workflow_state, created_at, updated_at)
         VALUES(#{ssa1_course.id}, #{ssa1_course.default_section.id}, #{@root_account.id}, #{@user2.id},
-          'StudentEnrollment', 'courserole1', 'active', '2014-07-07', '2014-07-07')#{returning_id}")
+          'StudentEnrollment', 'courserole1', 'active', '2014-07-07', '2014-07-07')")
       expect(Enrollment.find(id2).role_id).to eq @course_role1.id
 
       # with a role name meant for the lookalike
       id3 = Enrollment.connection.insert("INSERT INTO #{Enrollment.quoted_table_name}(
         course_id, course_section_id, root_account_id, user_id, type, role_name, workflow_state, created_at, updated_at)
         VALUES(#{sa2_course.id}, #{sa2_course.default_section.id}, #{@root_account.id}, #{@user2.id},
-          'StudentEnrollment', 'courserole2', 'active', '2014-07-07', '2014-07-07')#{returning_id}")
+          'StudentEnrollment', 'courserole2', 'active', '2014-07-07', '2014-07-07')")
       expect(Enrollment.find(id3).role_id).to eq course_role2_lookalike.id
 
 
@@ -225,25 +221,25 @@ describe 'AddRoleIdColumns', shared_db: false do
       # with a built-in role
       id1 = RoleOverride.connection.insert("INSERT INTO #{RoleOverride.quoted_table_name}(
         context_id, context_type, enrollment_type, created_at, updated_at)
-        VALUES(#{@sub_account1.id}, 'Account', 'TeacherEnrollment', '2014-07-07', '2014-07-07')#{returning_id}")
+        VALUES(#{@sub_account1.id}, 'Account', 'TeacherEnrollment', '2014-07-07', '2014-07-07')")
       expect(RoleOverride.find(id1).role_id).to eq teacher_role.id
 
       # with role 1 for @sub_account1
       id2 = RoleOverride.connection.insert("INSERT INTO #{RoleOverride.quoted_table_name}(
         context_id, context_type, enrollment_type, created_at, updated_at)
-        VALUES(#{@sub_account1.id}, 'Account', 'accountrole1', '2014-07-07', '2014-07-07')#{returning_id}")
+        VALUES(#{@sub_account1.id}, 'Account', 'accountrole1', '2014-07-07', '2014-07-07')")
       expect(RoleOverride.find(id2).role_id).to eq @account_role1.id
 
       # with role 2 for @sub_account1
       id3 = RoleOverride.connection.insert("INSERT INTO #{RoleOverride.quoted_table_name}(
         context_id, context_type, enrollment_type, created_at, updated_at)
-        VALUES(#{@sub_account1.id}, 'Account', 'accountrole2', '2014-07-07', '2014-07-07')#{returning_id}")
+        VALUES(#{@sub_account1.id}, 'Account', 'accountrole2', '2014-07-07', '2014-07-07')")
       expect(RoleOverride.find(id3).role_id).to eq @account_role2.id
 
       # with the role name meant for the lookalike
       id4 = RoleOverride.connection.insert("INSERT INTO #{RoleOverride.quoted_table_name}(
         context_id, context_type, enrollment_type, created_at, updated_at)
-        VALUES(#{@sub_account2.id}, 'Account', 'accountrole2', '2014-07-07', '2014-07-07')#{returning_id}")
+        VALUES(#{@sub_account2.id}, 'Account', 'accountrole2', '2014-07-07', '2014-07-07')")
       expect(RoleOverride.find(id4).role_id).to eq account_role2_lookalike.id
 
       # also make sure the data fixes worked
@@ -272,7 +268,7 @@ describe 'AddRoleIdColumns', shared_db: false do
 
       null_anr_id = AccountNotificationRole.connection.insert("INSERT INTO #{AccountNotificationRole.quoted_table_name}(
         account_notification_id, role_type)
-        VALUES(#{an1.id}, 'NonExistentRole')#{returning_id}")
+        VALUES(#{an1.id}, 'NonExistentRole')")
 
       @pre_migration.up
       AccountNotificationRole.reset_column_information
@@ -294,19 +290,19 @@ describe 'AddRoleIdColumns', shared_db: false do
       # with a built-in role
       id1 = AccountNotificationRole.connection.insert("INSERT INTO #{AccountNotificationRole.quoted_table_name}(
         account_notification_id, role_type)
-        VALUES(#{an1.id}, 'AccountAdmin')#{returning_id}")
+        VALUES(#{an1.id}, 'AccountAdmin')")
       expect(AccountNotificationRole.find(id1).role_id).to eq admin_role.id
 
       # with role 1 for @sub_account1
       id2 = AccountNotificationRole.connection.insert("INSERT INTO #{AccountNotificationRole.quoted_table_name}(
         account_notification_id, role_type)
-        VALUES(#{an1.id}, 'accountrole1')#{returning_id}")
+        VALUES(#{an1.id}, 'accountrole1')")
       expect(AccountNotificationRole.find(id2).role_id).to eq @account_role1.id
 
       # with the role name meant for the lookalike
       id3 = AccountNotificationRole.connection.insert("INSERT INTO #{AccountNotificationRole.quoted_table_name}(
         account_notification_id, role_type)
-        VALUES(#{an2.id}, 'accountrole2')#{returning_id}")
+        VALUES(#{an2.id}, 'accountrole2')")
       expect(AccountNotificationRole.find(id3).role_id).to eq account_role2_lookalike.id
     end
 
