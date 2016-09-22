@@ -807,6 +807,18 @@ describe Attachment do
       @a.handle_duplicates(:overwrite)
       expect(@a.reload.usage_rights).to eq usage_rights
     end
+
+    it "forces rename semantics in submissions folders" do
+      user_model
+      a1 = attachment_model context: @user, folder: @user.submissions_folder, filename: 'a1.txt'
+      a2 = attachment_model context: @user, folder: @user.submissions_folder, filename: 'a2.txt'
+      a2.display_name = 'a1.txt'
+      deleted = a2.handle_duplicates(:overwrite)
+      expect(deleted).to be_empty
+      a2.reload
+      expect(a2.display_name).not_to eq 'a1.txt'
+      expect(a2.display_name).not_to eq 'a2.txt'
+    end
   end
 
   describe "make_unique_filename" do
