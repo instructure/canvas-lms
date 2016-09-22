@@ -1994,15 +1994,16 @@ class User < ActiveRecord::Base
       end
 
       events += select_available_assignments(
-        select_upcoming_assignments(assignments.map {|a| a.overridden_for(self)}, opts.merge(:time => now)).
-        first(opts[:limit]))
+        select_upcoming_assignments(assignments.map {|a| a.overridden_for(self)}, opts.merge(:time => now))
+      )
+
     end
     events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, Canvas::ICU.collation_key(e.title)] }.uniq.first(opts[:limit])
   end
 
   def select_available_assignments(assignments)
     return [] if assignments.empty?
-    available_course_ids = Shard.partition_by_shard(assignments.map(&:context_id)) do |course_ids|
+    available_course_ids = Shard.partition_by_shard(assignments.map(&:context_id).uniq) do |course_ids|
       self.enrollments.shard(Shard.current).where(course_id: course_ids).active_by_date.pluck(:course_id)
     end
     assignments.select {|a| available_course_ids.include?(a.context_id) }
