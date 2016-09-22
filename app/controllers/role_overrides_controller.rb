@@ -266,7 +266,7 @@ class RoleOverridesController < ApplicationController
   #     manage_students                  -- [ TAD ] Add/remove students for the course
   #     manage_user_notes                -- [ TA  ] Manage faculty journal entries
   #     manage_rubrics                   -- [ TAD ] Edit assessing rubrics
-  #     manage_wiki                      -- [ TADo] Manage wiki (add / edit / delete pages)
+  #     manage_wiki                      -- [ TADo] Manage (add / edit / delete) pages
   #     read_forum                       -- [STADO] View discussions
   #     moderate_forum                   -- [sTADo] Moderate discussions (delete/edit others' posts, lock topics)
   #     post_to_forum                    -- [STADo] Post to discussions

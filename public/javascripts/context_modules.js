@@ -985,7 +985,7 @@ define([
         } else if (data.type == 'discussion_topic') {
           displayType = I18n.t('optgroup.discussion_topics', "Discussions");
         } else if (data.type == 'wiki_page') {
-          displayType = I18n.t('optgroup.wiki_pages', "Wiki Pages");
+          displayType = I18n.t("Pages");
         }
         var $group = $optgroups[displayType]
         if (!$group) {

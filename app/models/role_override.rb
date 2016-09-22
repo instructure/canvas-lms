@@ -68,7 +68,7 @@ class RoleOverride < ActiveRecord::Base
   # RoleOverridesController#add_role
   Permissions.register({
       :manage_wiki => {
-        :label => lambda { t('permissions.manage_wiki', "Manage wiki (add / edit / delete pages)") },
+        :label => lambda { t("Manage (add / edit / delete) pages") },
         :available_to => [
           'TaEnrollment',
           'TeacherEnrollment',
