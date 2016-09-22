@@ -1997,8 +1997,9 @@ class User < ActiveRecord::Base
       end
 
       events += select_available_assignments(
-        select_upcoming_assignments(assignments.map {|a| a.overridden_for(self)}, opts.merge(:time => now)).
-        first(opts[:limit]))
+        select_upcoming_assignments(assignments.map {|a| a.overridden_for(self)}, opts.merge(:time => now))
+      )
+
     end
     events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, Canvas::ICU.collation_key(e.title)] }.uniq.first(opts[:limit])
   end
