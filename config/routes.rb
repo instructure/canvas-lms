@@ -382,6 +382,7 @@ CanvasRails::Application.routes.draw do
     resources :content_exports, only: [:create, :index, :destroy, :show]
     get 'modules/items/assignment_info' => 'context_modules#content_tag_assignment_data', as: :context_modules_assignment_info
     get 'modules/items/:id' => 'context_modules#item_redirect', as: :context_modules_item_redirect
+    get 'modules/items/:id/edit_mastery_paths' => 'context_modules#item_redirect_mastery_paths'
     get 'modules/items/:id/choose' => 'context_modules#choose_mastery_path'
     get 'modules/items/sequence/:id' => 'context_modules#item_details', as: :context_modules_item_details
     delete 'modules/items/:id' => 'context_modules#remove_item', as: :context_modules_remove_item

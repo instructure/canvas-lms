@@ -125,8 +125,10 @@ class Quizzes::QuizzesController < ApplicationController
         question_banks: feature_enabled?(:question_banks),
         post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context)
       },
-      :quiz_menu_tools => external_tools_display_hashes(:quiz_menu)
+      :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
     })
+
+    conditional_release_js_env
 
     if @current_user.present?
       Quizzes::OutstandingQuizSubmissionManager.send_later_if_production(:grade_by_course,

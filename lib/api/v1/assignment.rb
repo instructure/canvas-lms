@@ -113,6 +113,8 @@ module Api::V1::Assignment
       hash['frozen_attributes'] = assignment.frozen_attributes_for_user(user)
     end
 
+    hash['is_quiz_assignment'] = assignment.quiz? && assignment.quiz.assignment?
+
     return hash if assignment.new_record?
 
     # use already generated hash['description'] because it is filtered by

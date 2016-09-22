@@ -190,6 +190,17 @@ module ConditionalRelease
       reverse_lookup[assignment.id.to_s]
     end
 
+    def self.active_rules(course, current_user, session)
+      return unless enabled_in_context?(course)
+      return unless course.grants_any_right?(current_user, session, :read, :manage_assignments)
+
+      Rails.cache.fetch(active_rules_cache_key(course)) do
+        headers = headers_for(course, current_user, domain_for(course), session)
+        request = CanvasHttp.get(rules_url, headers)
+        JSON.parse(request.body)
+      end
+    end
+
     class << self
       private
       def config_file
@@ -326,17 +337,6 @@ module ConditionalRelease
           points_possible min_score max_score grading_type
           submission_types workflow_state context_id
           context_type updated_at context_code)
-      end
-
-      def active_rules(course, current_user, session)
-        return unless enabled_in_context?(course)
-        return unless course.grants_any_right?(current_user, session, :read, :manage_assignments)
-
-        Rails.cache.fetch(active_rules_cache_key(course)) do
-          headers = headers_for(course, current_user, domain_for(course), session)
-          request = CanvasHttp.get(rules_url, headers)
-          JSON.parse(request.body)
-        end
       end
 
       def rules_cache_key(context, student)

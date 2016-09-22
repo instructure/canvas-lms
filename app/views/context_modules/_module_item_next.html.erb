@@ -36,7 +36,7 @@
     <%= module_item.item_class if module_item %>
   "
 >
-  <div class="ig-row <%= 'with-completion-requirements' if criterion %> <%= 'ig-published' if module_item && module_item.published? %>">
+  <div class="ig-row <%= 'with-completion-requirements' if criterion %> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' if @is_student %>">
     <a
       aria-label='<%= module_item && module_item.title %>'
       tabindex="-1"
@@ -206,17 +206,20 @@
           </a>
 
           <ul class="al-options">
-            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('links.outdent_item', %{Decrease indent}) %>"><%= @module_item_image_tags['outdent'] %> <%= t('links.outdent', %{Decrease indent}) %></a></li>
-            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('links.indent_item', %{Increase indent}) %>"><%= @module_item_image_tags['indent'] %> <%= t('links.indent', %{Increase indent}) %></a></li>
-            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('links.edit_item_details', %{Edit item details}) %>"><%= @module_item_image_tags['edit'] %> <%= t('links.edit_item', %{Edit}) %></a></li>
+            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('Decrease indent') %>"><%= @module_item_image_tags['outdent'] %> <%= t('Decrease indent') %></a></li>
+            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('Increase indent') %>"><%= @module_item_image_tags['indent'] %> <%= t('Increase indent') %></a></li>
+            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('Edit item details') %>"><%= @module_item_image_tags['edit'] %> <%= t('Edit') %></a></li>
             <li role="presentation">
               <a href="#<%= module_item ? module_item.id : "{{ id }}" %>"
-                 aria-label="<%= t('links.move_item_label', %{Move this item}) %>"
+                 aria-label="<%= t('Move this item') %>"
                  class="move_module_item_link icon-updown"
-                 title="<%= t('links.move_item', %{Move this item}) %>"
-              ><%= t('modules_item_move_to', "Move to...") %></a>
+                 title="<%= t('Move this item') %>"
+              ><%= t("Move to...") %></a>
             </li>
-            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('links.remove_item_from_module', %{Remove this item from the module}) %>"><%= @module_item_image_tags['delete'] %> <%= t('links.remove_item', %{Remove}) %></a></li>
+            <% if @is_cyoe_on && (module_item && cyoe_able?(module_item)) %>
+            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/edit_mastery_paths" class="mastery_paths_link" title="<%= t('Edit item mastery paths') %>"><i class="icon-mastery-path"></i> <%= t('Mastery Paths') %></a></li>
+            <% end %>
+            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
             <% menu_type_to_class.each do |menu_type, content_class| %>
               <% if !module_item || module_item.content.is_a?(content_class) %>
                 <%

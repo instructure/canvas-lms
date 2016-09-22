@@ -165,7 +165,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :rce_js_env
 
-  def conditional_release_js_env(assignment, include_rule: false)
+  def conditional_release_js_env(assignment = nil, include_rule: false)
     return unless ConditionalRelease::Service.enabled_in_context?(@context)
     cr_env = ConditionalRelease::Service.env_for(
       @context,
@@ -2041,6 +2041,7 @@ class ApplicationController < ActionController::Base
     permissions = @context.rights_status(@current_user, *rights)
     permissions[:manage_course] = permissions[:manage]
     permissions[:manage] = permissions[:manage_assignments]
+
     js_env({
       :URLS => {
         :new_assignment_url => new_polymorphic_url([@context, :assignment]),
@@ -2058,8 +2059,11 @@ class ApplicationController < ActionController::Base
       :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
       :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
       :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
-      :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
+      :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user),
     })
+
+    conditional_release_js_env
+
     if @context.feature_enabled?(:multiple_grading_periods)
       js_env(:active_grading_periods => GradingPeriod.json_for(@context, @current_user))
     end

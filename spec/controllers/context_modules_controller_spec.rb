@@ -64,7 +64,6 @@ describe ContextModulesController do
         expect(assigns[:modules]).to eq [@m2]
       end
     end
-
   end
 
   describe "PUT 'update'" do
@@ -688,7 +687,7 @@ describe ContextModulesController do
     end
   end
 
-  describe "GET 'show'" do
+  describe "GET show" do
     before :once do
       course_with_teacher(active_all: true)
     end
@@ -823,6 +822,46 @@ describe ContextModulesController do
       expect(options.length).to eq 2
       expect(options[0][:setId]).to eq 3
       expect(options[1][:setId]).to eq 4
+    end
+  end
+
+  describe "GET item_redirect_mastery_paths" do
+    before :each do
+      course_with_teacher_logged_in active_all: true
+      @mod = @course.context_modules.create!
+    end
+
+    it "should redirect to assignment edit mastery paths page" do
+      ag = @course.assignment_groups.create!
+      assg = ag.assignments.create! context: @course
+      item = @mod.add_item type: 'assignment', id: assg.id
+
+      get 'item_redirect_mastery_paths', course_id: @course.id, id: item.id
+      assert_redirected_to controller: 'assignments', action: 'edit', id: assg.id, anchor: 'mastery-paths-editor'
+    end
+
+    it "should redirect to quiz edit mastery paths page" do
+      quiz = @course.quizzes.create!
+      item = @mod.add_item type: 'quiz', id: quiz.id
+
+      get 'item_redirect_mastery_paths', course_id: @course.id, id: item.id
+      assert_redirected_to controller: 'quizzes/quizzes', action: 'edit', id: quiz.id, anchor: 'mastery-paths-editor'
+    end
+
+    it "should redirect to discussion edit mastery paths page" do
+      topic = @course.discussion_topics.create!
+      item = @mod.add_item type: 'discussion_topic', id: topic.id
+
+      get 'item_redirect_mastery_paths', course_id: @course.id, id: item.id
+      assert_redirected_to controller: 'discussion_topics', action: 'edit', id: topic.id, anchor: 'mastery-paths-editor'
+    end
+
+    it "should 404 if module item is not a graded type" do
+      page = @course.wiki.wiki_pages.create title: "test"
+      item = @mod.add_item type: 'page', id: page.id
+
+      get 'item_redirect_mastery_paths', :course_id => @course.id, :id => item.id
+      assert_response :missing
     end
   end
 end

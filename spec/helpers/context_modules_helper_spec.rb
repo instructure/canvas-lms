@@ -132,6 +132,7 @@ describe ContextModulesHelper do
     before do
       ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
       ConditionalRelease::Service.stubs(:rules_for).returns([1, 2, 3])
+      ConditionalRelease::Service.stubs(:active_rules).returns([1, 2, 3])
     end
 
     it "does not affect cache keys unless mastery paths enabled" do
@@ -141,13 +142,7 @@ describe ContextModulesHelper do
       expect(cache).to eq 'foo'
     end
 
-    it "does not affect cache keys for teachers" do
-      t = teacher_in_course(course: t_course)
-      cache = add_mastery_paths_to_cache_key('foo', t_course, t_module, @teacher)
-      expect(cache).to eq 'foo'
-    end
-
-    it "creates the same key for the same mastery paths rules" do
+    it "creates the same key for the same mastery paths rules for a student" do
       s1 = student_in_course(course: t_course, active_all: true)
       s2 = student_in_course(course: t_course, active_all: true)
       cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s1.user)
@@ -156,13 +151,83 @@ describe ContextModulesHelper do
       expect(cache1).to eq cache2
     end
 
-    it "creates different keys for different mastery paths rules" do
+    it "creates different keys for different mastery paths rules for a student" do
       s1 = student_in_course(course: t_course, active_all: true)
       s2 = student_in_course(course: t_course, active_all: true)
       cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s1.user)
       ConditionalRelease::Service.stubs(:rules_for).returns([3, 2, 1])
       cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, s2.user)
       expect(cache1).not_to eq cache2
+    end
+
+    it "creates the same key for the same mastery paths rules for a teacher" do
+      t1 = teacher_in_course(course: t_course)
+      t2 = teacher_in_course(course: t_course)
+      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t1.user)
+      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t2.user)
+      expect(cache1).not_to eq 'foo'
+      expect(cache1).to eq cache2
+    end
+
+    it "creates different keys for different mastery paths rules for a teacher" do
+      t1 = teacher_in_course(course: t_course)
+      t2 = teacher_in_course(course: t_course)
+      cache1 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t1.user)
+      ConditionalRelease::Service.stubs(:active_rules).returns([3, 2, 1])
+      cache2 = add_mastery_paths_to_cache_key('foo', t_course, t_module, t2.user)
+      expect(cache1).not_to eq cache2
+    end
+  end
+
+  describe "cyoe_able?" do
+    before do
+      @mod = @course.context_modules.create!
+    end
+
+    it "should return true for a graded assignment module item" do
+      ag = @course.assignment_groups.create!
+      assg = ag.assignments.create! context: @course, submission_types: 'online_text_entry'
+      item = @mod.add_item type: 'assignment', id: assg.id
+
+      expect(cyoe_able?(item)).to eq true
+    end
+
+    it "should return false for a ungraded assignment module item" do
+      ag = @course.assignment_groups.create!
+      assg = ag.assignments.create! context: @course, submission_types: 'not_graded'
+      item = @mod.add_item type: 'assignment', id: assg.id
+
+      expect(cyoe_able?(item)).to eq false
+    end
+
+    it "should return true for a assignment quiz module item" do
+      quiz = @course.quizzes.create! quiz_type: 'assignment'
+      item = @mod.add_item type: 'quiz', id: quiz.id
+
+      expect(cyoe_able?(item)).to eq true
+    end
+
+    it "should return false for a non-assignment quiz module item" do
+      quiz = @course.quizzes.create! quiz_type: 'survey'
+      item = @mod.add_item type: 'quiz', id: quiz.id
+
+      expect(cyoe_able?(item)).to eq false
+    end
+
+    it "should return true for a graded discussion module item" do
+      ag = @course.assignment_groups.create!
+      assg = ag.assignments.create! context: @course, submission_types: 'discussion_topic'
+      topic = @course.discussion_topics.create! assignment: assg
+      item = @mod.add_item type: 'discussion_topic', id: topic.id
+
+      expect(cyoe_able?(item)).to eq true
+    end
+
+    it "should return false for a non-graded discussion module item" do
+      topic = @course.discussion_topics.create!
+      item = @mod.add_item type: 'discussion_topic', id: topic.id
+
+      expect(cyoe_able?(item)).to eq false
     end
   end
 end

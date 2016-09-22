@@ -349,6 +349,7 @@ class DiscussionTopicsController < ApplicationController
                 },
                 :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu)
         }
+        conditional_release_js_env
         append_sis_data(hash)
         js_env(hash)
 

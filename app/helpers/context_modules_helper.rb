@@ -40,11 +40,15 @@ module ContextModulesHelper
   end
 
   def add_mastery_paths_to_cache_key(cache_key, context, module_or_modules, user)
-    if ConditionalRelease::Service.enabled_in_context?(context) && context.user_is_student?(user)
-      items = Rails.cache.fetch("visible_content_tags_for/#{cache_key}") do
-        Array.wrap(module_or_modules).map{ |m| m.content_tags_visible_to(user, :is_teacher => false) }.flatten
+    if ConditionalRelease::Service.enabled_in_context?(context)
+      if context.user_is_student?(user)
+        items = Rails.cache.fetch("visible_content_tags_for/#{cache_key}") do
+          Array.wrap(module_or_modules).map{ |m| m.content_tags_visible_to(user, :is_teacher => false) }.flatten
+        end
+        rules = ConditionalRelease::Service.rules_for(context, user, items, @session)
+      else
+        rules = ConditionalRelease::Service.active_rules(context, user, @session)
       end
-      rules = ConditionalRelease::Service.rules_for(context, user, items, @session)
       cache_key += '/mastery:' + Digest::MD5.hexdigest(rules.to_s)
     end
     cache_key
@@ -90,6 +94,16 @@ module ContextModulesHelper
   def preload_modules_content(modules, can_edit)
     ActiveRecord::Associations::Preloader.new.preload(modules, :content_tags => :content)
     preload_can_unpublish(@context, modules) if can_edit
+  end
+
+  def cyoe_able?(item)
+    if item.content_type == 'Assignment'
+      item.graded? && item.content.graded?
+    elsif item.content_type == 'Quizzes::Quiz'
+      item.graded? && item.content.assignment?
+    else
+      item.graded?
+    end
   end
 
   def process_module_data(mod, is_student = false, is_cyoe_on = false, current_user = nil, session = nil)

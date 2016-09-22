@@ -1,6 +1,5 @@
 # manage groups is for the add_group_category dialog
 require [
-  'underscore'
   'compiled/models/Section'
   'compiled/models/Assignment'
   'compiled/views/assignments/EditHeaderView'
@@ -14,13 +13,14 @@ require [
   'compiled/views/assignments/PeerReviewsSelector'
   'grading_standards'
   'manage_groups'
-], (_, Section, Assignment, EditHeaderView, EditView, SectionCollection,
+], (Section, Assignment, EditHeaderView, EditView, SectionCollection,
+
   DueDateList, OverrideView, AssignmentGroupSelector,
   GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector) ->
 
   ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
 
-  userIsAdmin = _.contains(ENV.current_user_roles, 'admin')
+  userIsAdmin = ENV.current_user_roles.includes('admin')
 
   assignment = new Assignment ENV.ASSIGNMENT
   assignment.urlRoot = ENV.URL_ROOT

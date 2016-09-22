@@ -192,7 +192,6 @@ ConditionalRelease) ->
 
     renderTabs: =>
       @$discussionEditView.tabs()
-      @$discussionDetailsTab.show()
       @toggleConditionalReleaseTab()
 
     loadConditionalRelease: =>

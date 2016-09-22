@@ -57,7 +57,6 @@ define [
       "name":"Science Quiz"
       "grading_type": "percent"
 
-
   assignment_grade_pass_fail = ->
     buildAssignment
       "id":2
@@ -572,3 +571,73 @@ define [
 
     equal screenreaderText(), 'This assignment will not be assigned a grade.', 'sets screenreader text'
     equal nonScreenreaderText(), '', 'sets non-screenreader text'
+
+  module 'AssignListItemViewSpec - mastery paths menu option',
+    setup: ->
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+
+  test 'does not render for assignment if cyoe off', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 0
+
+  test 'renders for assignment if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 1
+
+  test 'does not render for ungraded assignment if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      submission_types: ['not_graded']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 0
+
+  test 'renders for assignment quiz if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      is_quiz_assignment: true
+      submission_types: ['online_quiz']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 1
+
+  test 'does not render for non-assignment quiz if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      is_quiz_assignment: false
+      submission_types: ['online_quiz']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 0
+
+  test 'renders for graded discussion if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      submission_types: ['discussion_topic']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 1
+
+  test 'does not render for graded page if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      submission_types: ['wiki_page']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 0

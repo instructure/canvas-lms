@@ -18,12 +18,12 @@
     <div class="discussion-title">
       <h3 class="inline-block discussion-title-block">
         {{#if assignment}}
-          <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion: {{/t}}</span>
+          <span class="screenreader-only">{{#t}}Graded discussion: {{/t}}</span>
         {{/if}}
         <a href="{{html_url}}" class="title">{{title}}</a>
       </h3>
       {{#if display_last_reply_at}}
-        <small {{ contextSensitiveDatetimeTitle last_reply_at }}>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
+        <small {{ contextSensitiveDatetimeTitle last_reply_at }}>{{#t}}Last post {{display_last_reply_at}}{{/t}}</small>
       {{/if}}
     </div>
 
@@ -39,13 +39,13 @@
       {{#if assignment}}
         {{#if assignment.due_at}}
           <span class="discussion-date-type">
-            {{#t "due"}}Due{{/t}}
+            {{#t}}Due{{/t}}
           </span>
           <span {{ contextSensitiveDatetimeTitle assignment.due_at }}>
             {{datetimeFormatted assignment.due_at}}
           </span>
         {{else}}
-          {{#t "no_due_date"}}No Due Date{{/t}}
+          {{#t}}No Due Date{{/t}}
         {{/if}}
       {{/if}}
     </div>
@@ -86,35 +86,32 @@
       {{#if permissions.delete}}
         <a href="#" class="al-trigger al-trigger-gray" role="button" id="manage_link">
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-          <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
+          <span class="screenreader-only">{{#t}}Manage{{/t}}</span>
         </a>
 
         <ul class="al-options">
           {{#if locked}}
             <li>
               <a href="#" class="icon-lock">
-                {{#t "open_for_comments"}}Open for Comments{{/t}}
+                {{#t}}Open for Comments{{/t}}
               </a>
             </li>
           {{else}}
             {{#if can_lock}}
               <li>
                 <a href="#" class="icon-lock">
-                  {{#t "close_for_comments"}}Close for Comments{{/t}}
+                  {{#t}}Close for Comments{{/t}}
                 </a>
               </li>
             {{/if}}
           {{/if}}
-          <li>
-            <a href="#" class="icon-trash">{{#t "delete"}}Delete{{/t}}</a>
-          </li>
           {{#if pinnable}}
             <li>
               <a href="#" class="icon-pin">
                 {{#if pinned}}
-                  {{#t "unpin"}}Unpin{{/t}}
+                  {{#t}}Unpin{{/t}}
                 {{else}}
-                  {{#t "pin"}}Pin{{/t}}
+                  {{#t}}Pin{{/t}}
                 {{/if}}
               </a>
             </li>
@@ -122,10 +119,18 @@
               <li>
                 <a href="#"
                   class="move_item icon-updown"
-                >{{#t "move"}}Move To&hellip;{{/t}}</a>
+                >{{#t}}Move To&hellip;{{/t}}</a>
               </li>
             {{/if}}
           {{/if}}
+          {{#if showMasteryPaths }}
+          <li>
+            <a href="discussion_topics/{{id}}/edit#mastery-paths-editor" class="icon-mastery-path">{{#t}}Mastery Paths{{/t}}</a>
+          </li>
+          {{/if}}
+          <li>
+            <a href="#" class="icon-trash">{{#t}}Delete{{/t}}</a>
+          </li>
           {{#if ENV.permissions.manage_content}}
             {{>ExternalTools/external_tools_menu discussion_topic_menu_tools}}
           {{/if}}

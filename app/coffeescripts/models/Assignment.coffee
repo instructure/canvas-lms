@@ -318,6 +318,9 @@ define [
       else
         return @dueAt()
 
+    is_quiz_assignment: =>
+      @get('is_quiz_assignment')
+
     toView: =>
       fields = [
         'name', 'dueAt','description','pointsPossible', 'lockAt', 'unlockAt',
@@ -334,7 +337,7 @@ define [
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
         'multipleDueDates', 'nonBaseDates', 'allDates', 'hasDueDate', 'hasPointsPossible'
         'singleSectionDueDate', 'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
-        'omitFromFinalGrade'
+        'omitFromFinalGrade', 'is_quiz_assignment'
       ]
 
       hash = id: @get 'id'

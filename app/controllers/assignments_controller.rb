@@ -360,7 +360,7 @@ class AssignmentsController < ApplicationController
   def new
     @assignment ||= @context.assignments.temp_record
     @assignment.workflow_state = 'unpublished'
-    add_crumb t :create_new_crumb, "Create new"
+    add_crumb t "Create new"
 
     if params[:submission_types] == 'online_quiz'
       redirect_to new_course_quiz_url(@context, index_edit_params)
@@ -436,6 +436,7 @@ class AssignmentsController < ApplicationController
         :VALID_DATE_RANGE => CourseDateRange.new(@context)
       }
 
+      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @assignment.new_record?
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?

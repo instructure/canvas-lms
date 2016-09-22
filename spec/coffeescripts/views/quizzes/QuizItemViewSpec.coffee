@@ -162,3 +162,33 @@ define [
     view = createView(quiz)
     json = view.toJSON()
     equal json.showAvailability, false
+
+  test 'does not render mastery paths menu option for quiz if cyoe off', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'assignment')
+    view = createView(quiz)
+    equal view.$('.icon-mastery-path').length, 0
+
+  test 'renders mastery paths menu option for assignment quiz if cyoe on', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'assignment')
+    view = createView(quiz)
+    equal view.$('.icon-mastery-path').length, 1
+
+  test 'does not render mastery paths menu option for survey quiz if cyoe on', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'survey')
+    view = createView(quiz)
+    equal view.$('.icon-mastery-path').length, 0
+
+  test 'does not render mastery paths menu option for graded survey quiz if cyoe on', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'graded_survey')
+    view = createView(quiz)
+    equal view.$('.icon-mastery-path').length, 0
+
+  test 'does not render mastery paths menu option for practice quiz if cyoe on', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'practice_quiz')
+    view = createView(quiz)
+    equal view.$('.icon-mastery-path').length, 0

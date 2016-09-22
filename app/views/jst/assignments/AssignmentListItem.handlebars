@@ -39,7 +39,7 @@
             </div>
           {{/if}}
         {{/if}}
-        {{#if showAvailability }}
+        {{#if showAvailability}}
         <div class="ig-details__item assignment-date-available" data-view="date-available">
         </div>
         {{/if}}
@@ -89,27 +89,8 @@
                 id="assignment_{{id}}_settings_edit_item"
                 aria-label="{{#t}}Edit Assignment {{name}}{{/t}}"
                 data-focus-returns-to="assign_{{id}}_manage_link"
-              >{{#t "edit"}}Edit{{/t}}</a>
+              >{{#t}}Edit{{/t}}</a>
             </li>
-            {{#if canDelete}}
-            <li>
-              <a
-                class="delete_assignment icon-trash"
-                id="assignment_{{id}}_settings_delete_item"
-                aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
-                data-focus-returns-to="assign_{{id}}_manage_link"
-              >{{#t "delete"}}Delete{{/t}}</a>
-            </li>
-            {{else}}
-            <li>
-              <a
-                class="delete_assignment icon-trash disabled"
-                id="assignment_{{id}}_settings_delete_item"
-                aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
-                aria-disabled=true
-              >{{#t "delete"}}Delete{{/t}}</a>
-            </li>
-            {{/if}}
             {{#if canMove}}
             <li>
               <a
@@ -127,6 +108,36 @@
                 aria-label='{{#t}}Move Assignment {{name}}{{/t}}'
                 aria-disabled=true
               >{{#t}}Move To…{{/t}}</a>
+            </li>
+            {{/if}}
+            {{#if cyoeEnabled}}
+            <li>
+              <a
+                href="assignments/{{id}}/edit/#mastery-paths-editor"
+                class="edit_mastery_paths icon-mastery-path"
+                id="assignment_{{id}}_settings_edit_item_mastery_paths"
+                aria-label="{{#t}}Edit Assignment {{name}} Mastery Paths{{/t}}"
+                data-focus-returns-to="assign_{{id}}_manage_link"
+              >{{#t}}Mastery Paths{{/t}}</a>
+            </li>
+            {{/if}}
+            {{#if canDelete}}
+            <li>
+              <a
+                class="delete_assignment icon-trash"
+                id="assignment_{{id}}_settings_delete_item"
+                aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
+                data-focus-returns-to="assign_{{id}}_manage_link"
+              >{{#t "delete"}}Delete{{/t}}</a>
+            </li>
+            {{else}}
+            <li>
+              <a
+                class="delete_assignment icon-trash disabled"
+                id="assignment_{{id}}_settings_delete_item"
+                aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
+                aria-disabled=true
+              >{{#t "delete"}}Delete{{/t}}</a>
             </li>
             {{/if}}
             {{>ExternalTools/external_tools_menu menu_tools}}

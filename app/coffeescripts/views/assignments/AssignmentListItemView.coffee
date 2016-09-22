@@ -156,6 +156,7 @@ define [
       data.canDelete = @canDelete()
       data.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
       data.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
+      data.cyoeEnabled = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && @isGraded() && (!@model.isQuiz() || data.is_quiz_assignment)
 
       if data.canManage
         data.spanWidth      = 'span3'
@@ -218,7 +219,8 @@ define [
       ENV.PERMISSIONS.manage
 
     isGraded: ->
-      !_.contains(@model.get('submission_types'), "not_graded")
+      submission_types = @model.get('submission_types')
+      submission_types && !submission_types.includes('not_graded') && !submission_types.includes('wiki_page')
 
     gradeStrings: (grade) ->
       pass_fail_map =

@@ -99,6 +99,8 @@ define [
       _.each base.quiz_menu_tools, (tool) =>
         tool.url = tool.base_url + "&quizzes[]=#{@model.get("id")}"
 
+      base.cyoeEnabled = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && base.quiz_type == 'assignment'
+
       if @model.get("multiple_due_dates")
         base.selector  = @model.get("id")
         base.link_text = @messages.multipleDates
