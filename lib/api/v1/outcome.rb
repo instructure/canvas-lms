@@ -113,11 +113,18 @@ module Api::V1::Outcome
     opts[:outcome_style] ||= :abbrev
     opts[:outcome_group_style] ||= :abbrev
     api_json(outcome_link, user, session, :only => %w(context_type context_id)).tap do |hash|
-      hash['url'] = polymorphic_path [:api_v1, outcome_link.context || :global, :outcome_link],
+      link_group = LearningOutcomeGroup.find(outcome_link.associated_asset_id)
+      link_context = link_group.context
+      link_outcome = LearningOutcome.find(outcome_link.content_id)
+      # content_tag outcome links have columns for context_type and id, but OutcomeLink
+      # objects do not, so we need to ensure they get set.
+      hash['context_type'] ||= link_context ? link_context.class.to_s : nil
+      hash['context_id'] ||= link_context ? link_context.id : nil
+      hash['url'] = polymorphic_path [:api_v1, link_context || :global, :outcome_link],
         :id => outcome_link.associated_asset_id,
         :outcome_id => outcome_link.content_id
       hash['outcome_group'] = outcome_group_json(
-        outcome_link.associated_asset,
+        link_group,
         user,
         session,
         opts[:outcome_group_style]
@@ -126,22 +133,26 @@ module Api::V1::Outcome
       # learning_outcome_content has been preloaded (e.g. by
       # ContentTag.order_by_outcome_title)
       hash['outcome'] = outcome_json(
-        outcome_link.learning_outcome_content,
+        link_outcome,
         user,
         session,
         opts.slice(:outcome_style, :assessed_outcomes)
       )
 
       unless outcome_link.deleted?
-        can_manage = outcome_link.context ? outcome_link.context.grants_right?(user, session, :manage_outcomes) :
-          Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+        can_manage = if link_context
+                       link_context.grants_right?(user, session, :manage_outcomes)
+                     else
+                       Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+                     end
         hash['can_unlink'] = can_manage && outcome_link.can_destroy?
+        hash['native'] = link_outcome.context == link_context
       end
 
       if opts[:assessed_outcomes]
-        hash['assessed'] = opts[:assessed_outcomes].include?(outcome_link.learning_outcome_content.id)
+        hash['assessed'] = opts[:assessed_outcomes].include?(link_outcome.id)
       else
-        hash['assessed'] = outcome_link.learning_outcome_content.assessed?(outcome_link[:context_id])
+        hash['assessed'] = link_outcome.assessed?(outcome_link[:context_id])
       end
     end
   end

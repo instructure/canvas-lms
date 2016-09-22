@@ -18,10 +18,11 @@
 
 class LearningOutcomeGroup < ActiveRecord::Base
   include Workflow
+  include OutcomeLinkFinder
+
   attr_accessible :context, :title, :description, :learning_outcome_group, :vendor_guid
   belongs_to :learning_outcome_group
   has_many :child_outcome_groups, :class_name => 'LearningOutcomeGroup', :foreign_key => "learning_outcome_group_id"
-  has_many :child_outcome_links, -> { where(tag_type: 'learning_outcome_association', content_type: 'LearningOutcome') }, class_name: 'ContentTag', as: :associated_asset
   belongs_to :context, polymorphic: [:account, :course]
 
   before_save :infer_defaults
@@ -36,6 +37,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # but when I tried naming the association parent_outcome_group, things
   # didn't quite work.
   alias :parent_outcome_group :learning_outcome_group
+  alias :child_outcome_links :associated_outcome_links
 
   def infer_defaults
     self.context ||= self.parent_outcome_group && self.parent_outcome_group.context
@@ -58,10 +60,9 @@ class LearningOutcomeGroup < ActiveRecord::Base
     # the existing code that requires this shim only occurs when there are
     # either subgroups or outcomes under the group, but not both. and they're
     # from a migration, so the expected order is the migration order.
-    subgroups = self.child_outcome_groups.sort_by{ |group| group.migration_id }
+    subgroups = self.child_outcome_groups.sort_by(&:migration_id)
     return subgroups unless subgroups.empty?
-
-    self.child_outcome_links.map{ |link| link.content }.sort_by{ |outcome| outcome.migration_id }
+    self.child_outcome_links({active_only: false}).map(&:content).sort_by(&:migration_id)
   end
 
   def reorder_content(orders)
@@ -138,13 +139,13 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # groups, but only once per group).
   def add_outcome(outcome)
     # no-op if the outcome is already linked under this group
-    outcome_link = child_outcome_links.active.where(content_id: outcome).first
+    outcome_link = self.child_outcome_links.find{|col| col.content_id == outcome.id.to_i}
     return outcome_link if outcome_link
 
     # create new link and in this group
-    child_outcome_links.create(
-      :content => outcome,
-      :context => self.context || self)
+    outcome_links.create(
+      learning_outcome: outcome
+    )
   end
 
   # copies an existing outcome group, form this context or another, into this
@@ -169,7 +170,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
       copy.add_outcome_group(group, opts)
     end
 
-    original.child_outcome_links.active.each do |link|
+    original.child_outcome_links.each do |link|
       next if opts[:only] && opts[:only][link.asset_string] != "1"
       copy.add_outcome(link.content)
     end
@@ -213,7 +214,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     transaction do
       # delete the children of the group, both links and subgroups, then delete
       # the group itself
-      self.child_outcome_links.active.preload(:content).each do |outcome_link|
+      self.child_outcome_links({preload: true}).each do |outcome_link|
         outcome_link.skip_touch = true if @skip_tag_touch
         outcome_link.destroy
       end
@@ -249,6 +250,13 @@ class LearningOutcomeGroup < ActiveRecord::Base
         group.save!
       end
       group
+    end
+  end
+
+  def self.outcome_links_for_group_set(group_ids, opts={})
+    link_objects = [ContentTag, OutcomeLink]
+    link_objects.flat_map do |object|
+      object.links_for_group(group_ids, {preload_outcomes: opts[:preload]})
     end
   end
 

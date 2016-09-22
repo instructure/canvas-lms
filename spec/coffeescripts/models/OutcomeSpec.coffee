@@ -22,14 +22,6 @@ define [
           "context_type" : "Course"
           "context_id" : 2
 
-  test "native returns true for a course outcome", ->
-    outcome = new Outcome(@accountOutcome, { parse: true })
-    equal outcome.isNative(), false
-
-  test "native returns false for a course outcome imported from the account level", ->
-    outcome = new Outcome(@nativeOutcome, { parse: true })
-    equal outcome.isNative(), true
-
   test "default calculation method settings not set if calculation_method exists", ->
     spy = @spy(Outcome.prototype, 'setDefaultCalcSettings')
     outcome = new Outcome(@accountOutcome, { parse: true })

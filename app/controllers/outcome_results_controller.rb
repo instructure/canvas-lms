@@ -420,7 +420,7 @@ class OutcomeResultsController < ApplicationController
     if params[:outcome_group_id]
       group_id = params[:outcome_group_id].to_i
       reject! "can only include an outcome group id in the outcome context" unless outcome_group_ids.include?(group_id)
-      @outcome_links = ContentTag.learning_outcome_links.active.where(associated_asset_id: group_id).preload(:learning_outcome_content)
+      @outcome_links = LearningOutcomeGroup.outcome_links_for_group_set(group_id, {preload: true})
       @outcomes = @outcome_links.map(&:learning_outcome_content)
     else
       if params[:outcome_ids]
@@ -429,17 +429,13 @@ class OutcomeResultsController < ApplicationController
         # need to instead look at the uniqueness of the associating content tag's
         # context and outcome id in order to ensure we get the correct result
         # from the query without rendering the reject! check moot
-        @outcomes = ContentTag.learning_outcome_links.active.joins(:learning_outcome_content)
-          .where(content_id: outcome_ids, context_type: @context.class_name, context_id: @context.id)
-          .to_a.uniq{|tag| [tag.context, tag.content_id]}.map(&:learning_outcome_content)
+
+        @outcomes = context.linked_learning_outcomes({outcome_ids: outcome_ids})
         reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
       else
         @outcome_links = []
         outcome_group_ids.each_slice(100) do |outcome_group_ids_slice|
-          @outcome_links += ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids_slice)
-        end
-        @outcome_links.each_slice(100) do |outcome_links_slice|
-          ActiveRecord::Associations::Preloader.new.preload(outcome_links_slice, :learning_outcome_content)
+          @outcome_links += LearningOutcomeGroup.outcome_links_for_group_set(outcome_group_ids_slice, {preload: true})
         end
         @outcomes = @outcome_links.map(&:learning_outcome_content)
       end

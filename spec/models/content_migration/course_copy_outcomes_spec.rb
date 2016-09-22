@@ -176,8 +176,8 @@ describe ContentMigration do
 
       to_root = @copy_to.root_outcome_group
       expect(to_root.child_outcome_links.count).to eq 2
-      expect(to_root.child_outcome_links.where(content_id: lo.id).first).not_to be_nil
-      expect(to_root.child_outcome_links.where(content_id: lo2.id).first).not_to be_nil
+      expect(to_root.child_outcome_links.find{|co| co.content_id == lo.id}).not_to be_nil
+      expect(to_root.child_outcome_links.find{|co| co.content_id == lo.id}).not_to be_nil
     end
 
     it "should create outcomes in new course if external context not found" do

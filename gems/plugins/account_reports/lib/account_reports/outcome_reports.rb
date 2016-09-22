@@ -92,17 +92,25 @@ module AccountReports
           INNER JOIN #{ContentTag.quoted_table_name} ct ON (ct.content_id = a.id
                                          AND ct.content_type = 'Assignment')
           INNER JOIN #{LearningOutcome.quoted_table_name} lo ON lo.id = ct.learning_outcome_id
-          INNER JOIN #{ContentTag.quoted_table_name} lol ON lol.content_id = lo.id
+          INNER JOIN #{LearningOutcomeGroup.quoted_table_name} log ON log.context_id = :account_id
+            AND log.context_type = 'Account'
+            AND log.workflow_state != 'deleted'
+          LEFT JOIN #{ContentTag.quoted_table_name} lol ON lol.content_id = lo.id
+            AND lol.associated_asset_id = log.id
             AND lol.context_id = :account_id
             AND lol.context_type = 'Account'
             AND lol.tag_type = 'learning_outcome_association'
             AND lol.workflow_state != 'deleted'
+          LEFT JOIN #{OutcomeLink.quoted_table_name} ol ON ol.learning_outcome_id = lo.id
+            AND ol.learning_outcome_group_id = log.id
+            AND ol.workflow_state != 'deleted'
           LEFT JOIN #{LearningOutcomeResult.quoted_table_name} r ON (r.user_id=pseudonyms.user_id
                                                    AND r.content_tag_id = ct.id)
           LEFT JOIN #{Submission.quoted_table_name} sub ON sub.assignment_id = a.id
             AND sub.user_id = pseudonyms.user_id", parameters])).
         where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
-               AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
+               AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))
+               AND (lol.id IS NOT NULL OR ol.id IS NOT NULL)")
 
       unless @include_deleted
         students = students.where("pseudonyms.workflow_state<>'deleted' AND c.workflow_state='available'")

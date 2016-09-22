@@ -174,7 +174,7 @@ define [
           data['points_possible'] ||= 0
           data['mastery_points'] ||= 0
           can_move = !@readOnly() && ENV.PERMISSIONS?.manage_outcomes
-          can_edit = can_move && @model.isNative() && @model.get('can_edit')
+          can_edit = can_move && @model.outcomeLink.native && @model.get('can_edit')
           can_remove = can_move && @model.outcomeLink.can_unlink
 
           @$el.html outcomeTemplate _.extend data,
@@ -184,7 +184,7 @@ define [
             setQuizMastery: @setQuizMastery,
             useForScoring: @useForScoring,
             isLargeRoster: ENV.IS_LARGE_ROSTER,
-            assessedInContext: @model.outcomeLink.assessed || (@model.isNative() && @model.get('assessed'))
+            assessedInContext: @model.outcomeLink.assessed || (@model.outcomeLink.native && @model.get('assessed'))
 
       @$('input:first').focus()
       @screenreaderTitleFocus()

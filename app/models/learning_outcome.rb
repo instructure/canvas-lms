@@ -18,6 +18,8 @@
 
 class LearningOutcome < ActiveRecord::Base
   include Workflow
+  include OutcomeLinkFinder
+
   attr_accessible :context, :description, :short_description, :title, :display_name
   attr_accessible :rubric_criterion, :vendor_guid, :calculation_method, :calculation_int
 
@@ -260,7 +262,7 @@ class LearningOutcome < ActiveRecord::Base
     # triggered by ContentTag#destroy and the checks have already run, we don't
     # need to do it again. in case of console, we don't care to force the
     # checks. so just an update_all of workflow_state will do.
-    ContentTag.learning_outcome_links.active.where(:content_id => self).update_all(:workflow_state => 'deleted')
+    delete_related_links
 
     # in case this got called in a console, delete the alignments also. the UI
     # won't (shouldn't) allow deleting the outcome if there are still

@@ -186,7 +186,7 @@ class OutcomeGroupsApiController < ApplicationController
 
     url = polymorphic_url [:api_v1, @context, :outcome_group_links]
 
-    links = @context.learning_outcome_links.preload(:learning_outcome_content).order(:id)
+    links = @context.learning_outcome_links.with_outcome.order(:id)
     links = Api.paginate(links, self, url)
 
     outcome_params = params.slice(:outcome_style, :outcome_group_style)
@@ -333,21 +333,22 @@ class OutcomeGroupsApiController < ApplicationController
     @outcome_group = context_outcome_groups.find(params[:id])
 
     # get and paginate links from group
-    link_scope = @outcome_group.child_outcome_links.active.order_by_outcome_title
+    link_scope = @outcome_group.child_outcome_links.sort_by(&:title)
     url = polymorphic_url [:api_v1, @context || :global, :outcome_group_outcomes], :id => @outcome_group.id
     @links = Api.paginate(link_scope, self, url)
 
     # pre-populate the links' groups and contexts to prevent
     # extraneous loads
+
     @links.each do |link|
       link.associated_asset = @outcome_group
-      link.context = @outcome_group.context
+      link.update_context(@outcome_group.context)
     end
 
     outcome_params = params.slice(:outcome_style)
 
     # preload the links' outcomes' contexts.
-    ActiveRecord::Associations::Preloader.new.preload(@links, :learning_outcome_content => :context)
+    ActiveRecord::Associations::Preloader.new.preload(@links, :learning_outcome => :context)
 
     # render to json and serve
     render :json => outcome_links_json(@links, @current_user, session, outcome_params)
@@ -521,12 +522,13 @@ class OutcomeGroupsApiController < ApplicationController
     return unless can_manage_outcomes
 
     @outcome_group = context_outcome_groups.find(params[:id])
-    @outcome_link = @outcome_group.child_outcome_links.active.where(content_id: params[:outcome_id]).first
+    @outcome_link = @outcome_group.find_link_by_outcome_id(params[:outcome_id])
+
     raise ActiveRecord::RecordNotFound unless @outcome_link
     begin
       @outcome_link.destroy
       render :json => outcome_link_json(@outcome_link, @current_user, session)
-    rescue ContentTag::LastLinkToOutcomeNotDestroyed => error
+    rescue @outcome_link.class::LastLinkToOutcomeNotDestroyed => error
       render :json => { 'message' => error.message }, :status => :bad_request
     rescue ActiveRecord::RecordNotSaved
       render :json => 'error'.to_json, :status => :bad_request

@@ -71,7 +71,7 @@ module CC
         next unless export_object?(item, 'learning_outcomes') || export_object?(item, 'learning_outcome_groups')
         process_outcome_group(node, item)
       end
-      group.child_outcome_links.active.each do |item|
+      group.child_outcome_links.each do |item|
         item = item.content
         next unless export_object?(item, 'learning_outcomes')
         process_learning_outcome(node, item)

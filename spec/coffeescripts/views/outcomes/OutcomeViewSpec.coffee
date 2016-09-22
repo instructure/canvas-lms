@@ -191,8 +191,8 @@ define [
   test 'edit and delete buttons are disabled for outcomes that have been assessed', ->
     view = createView
       model: newOutcome(
-        { 'assessed' : true, 'native' : true, 'can_edit' : true, 'can_remove' : true },
-        { 'assessed' : true, 'can_unlink': true }),
+        { 'assessed' : true, 'can_edit' : true, 'can_remove' : true },
+        { 'assessed' : true, 'can_unlink': true, 'native' : true }),
       state: 'show'
     ok view.$('.edit_button').length > 0
     ok view.$('.delete_button').length > 0
@@ -203,8 +203,8 @@ define [
   test 'edit and delete buttons are enabled for outcomes that have not been assessed', ->
     view = createView
       model: newOutcome(
-        { 'assessed' : false, 'native' : true, 'can_edit' : true, 'can_remove' : true  },
-        { 'assessed' : false, 'can_unlink': true}),
+        { 'assessed' : false, 'can_edit' : true, 'can_remove' : true  },
+        { 'assessed' : false, 'can_unlink': true, 'native' : true }),
       state: 'show'
     ok view.$('.edit_button').length > 0
     ok view.$('.delete_button').length > 0
@@ -215,8 +215,8 @@ define [
   test 'edit is disabled when viewing an assessed account outcome in its native context', ->
     view = createView
       model: newOutcome(
-        { 'assessed' : true, 'native' : true, 'can_edit' : true, 'can_remove' : true  },
-        { 'assessed' : false, 'can_unlink': true}),
+        { 'assessed' : true, 'can_edit' : true, 'can_remove' : true  },
+        { 'assessed' : false, 'can_unlink': true, 'native' : true}),
       state: 'show'
     ok view.$('.edit_button').length > 0
     ok view.$('.edit_button').attr('disabled')
@@ -225,8 +225,8 @@ define [
   test 'delete button is not shown for outcomes that cannot be unlinked', ->
     view = createView
       model: newOutcome(
-        { 'assessed' : false, 'native' : true, 'can_edit' : true, 'can_remove' : true  },
-        { 'assessed' : false, 'can_unlink': false}),
+        { 'assessed' : false, 'can_edit' : true, 'can_remove' : true  },
+        { 'assessed' : false, 'can_unlink': false, 'native' : true}),
       state: 'show'
     ok view.$('.edit_button').length > 0
     ok view.$('.delete_button').length == 0
@@ -235,14 +235,14 @@ define [
   test 'an informative banner is displayed when edit/delete buttons are disabled', ->
     view = createView
       model: newOutcome(
-        { 'assessed' : true, 'native' : true },
-        { 'assessed' : true, 'can_unlink': true }),
+        { 'assessed' : true},
+        { 'assessed' : true, 'can_unlink': true, 'native' : true }),
       state: 'show'
     ok view.$('#assessed_info_banner').length > 0
     view.remove()
 
   test 'the banner is not displayed when edit/delete buttons are enabled', ->
-    view = createView(model: newOutcome({'assessed' : false, 'native' : true}, {'can_unlink': true}), state: 'show')
+    view = createView(model: newOutcome({'assessed' : false}, {'can_unlink': true, 'native' : true}), state: 'show')
     ok not view.$('#assessed_info_banner').length > 0
 
   test 'calculation int gets set intelligently when the calc method is changed', ->
@@ -273,12 +273,12 @@ define [
       model: newOutcome(
         {
           'assessed' : true,
-          'native' : false,
           'can_edit' : true,
           'context_type' : 'Account'
         },
         {
           'assessed' : true,
+          'native' : false,
           'can_unlink': true
         }
       ),
@@ -293,12 +293,12 @@ define [
       model: newOutcome(
         {
           'assessed' : true,
-          'native' : false,
           'can_edit' : true,
           'context_type' : 'Account'
         },
         {
           'assessed' : false,
+          'native' : false,
           'can_unlink': true
         }
       ),
