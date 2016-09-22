@@ -19,6 +19,7 @@
 define([
   'jsx/speed_grader/mgp',
   'jsx/grading/helpers/OutlierScoreHelper',
+  'jsx/grading/quizzesNextSpeedGrading',
   'jst/speed_grader/student_viewed_at',
   'jst/speed_grader/submissions_dropdown',
   'jst/speed_grader/speech_recognition',
@@ -56,7 +57,7 @@ define([
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(MGP, OutlierScoreHelper, studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate, vericiteInfoTemplate, vericiteScoreTemplate) {
+], function(MGP, OutlierScoreHelper, quizzesNextSpeedGrading, studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate, vericiteInfoTemplate, vericiteScoreTemplate) {
 
   // PRIVATE VARIABLES AND FUNCTIONS
   // all of the $ variables here are to speed up access to dom nodes,
@@ -153,7 +154,8 @@ define([
       gradeeLabel = studentLabel,
       utils,
       crocodocSessionTimer,
-      isAdmin = _.include(ENV.current_user_roles, "admin");
+      isAdmin = _.include(ENV.current_user_roles, "admin"),
+      showSubmissionOverride;
 
   utils = {
     getParam: function(name){
@@ -772,20 +774,23 @@ define([
     $("#submission_group_comment").prop({checked: true, disabled: true});
   }
 
+  function refreshGrades (cb) {
+    var url = unescape($assignment_submission_url.attr('href')).replace("{{submission_id}}", EG.currentStudent.submission.user_id) + ".json";
+    var currentStudentIDAsOfAjaxCall = EG.currentStudent.id;
+    $.getJSON( url,
+      function(data){
+        if(currentStudentIDAsOfAjaxCall === EG.currentStudent.id) {
+          EG.currentStudent.submission = data.submission;
+          EG.currentStudent.submission_state = SpeedgraderHelpers.submissionState(EG.currentStudent, ENV.grading_role);
+          EG.showGrade();
+          cb && cb(data.submission);
+        }
+      }
+    );
+  }
+
   $.extend(INST, {
-    refreshGrades: function(){
-      var url = unescape($assignment_submission_url.attr('href')).replace("{{submission_id}}", EG.currentStudent.submission.user_id) + ".json";
-      var currentStudentIDAsOfAjaxCall = EG.currentStudent.id;
-      $.getJSON( url,
-        function(data){
-          if(currentStudentIDAsOfAjaxCall === EG.currentStudent.id) {
-            EG.currentStudent.submission = data.submission;
-            EG.currentStudent.submission_state =
-              SpeedgraderHelpers.submissionState(EG.currentStudent, ENV.grading_role);
-            EG.showGrade();
-          }
-      });
-    },
+    refreshGrades: refreshGrades,
     refreshQuizSubmissionSnapshot: function(data) {
       snapshotCache[data.user_id + "_" + data.version_number] = data;
       if(data.last_question_touched) {
@@ -935,6 +940,7 @@ define([
       EG.initComments();
       header.init();
       initKeyCodes();
+
 
       $('.dismiss_alert').click(function(e){
         e.preventDefault();
@@ -1164,7 +1170,12 @@ define([
         this.current_prov_grade_index = null;
         this.handleModerationTabs(0); // sets up tabs and loads first grade
       } else {
-        this.showSubmission();
+        // showSubmissionOverride is optionally set if the user is
+        // using the quizzes.next lti tool. Rather than reload the tool based
+        // on a new URL, it just dispatches a message to tell the tool to
+        // change itself
+        var changeSubmission = showSubmissionOverride || this.showSubmission.bind(this);
+        changeSubmission(this.currentStudent.submission);
       }
     },
 
@@ -2416,6 +2427,11 @@ define([
 
   return {
     setup: function() {
+      function registerQuizzesNext (overriddenShowSubmission) {
+        showSubmissionOverride = overriddenShowSubmission;
+      }
+      quizzesNextSpeedGrading(EG, $iframe_holder, registerQuizzesNext, refreshGrades, window);
+
       // fire off the request to get the jsonData
       window.jsonData = {};
       var speedGraderJsonDfd = $.getJSON(window.location.pathname+ '.json' + window.location.search);
@@ -2429,5 +2445,4 @@ define([
     },
     EG: EG
   };
-
 });
