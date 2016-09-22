@@ -62,6 +62,20 @@ define [
     equal options[1].props.name, 'consumer_key'
     equal options[2].props.name, 'shared_secret'
 
+  test 'configSettings', ->
+    @app['config_options'] = [{"name": "param1","param_type": "text", "default_value": "val1"}]
+
+    data =
+      handleToolInstalled: handleToolInstalled
+      app: @app
+    [ component, addToolButtonNode, modalNode ] = getDOMNodes(data)
+
+    correctSettings =
+      param1: 'val1'
+      name: 'Acclaim'
+
+    deepEqual component.configSettings(), correctSettings
+
   test 'mounting sets fields onto state', ->
     data =
       handleToolInstalled: handleToolInstalled
