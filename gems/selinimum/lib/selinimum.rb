@@ -58,7 +58,6 @@ module Selinimum
   end
 end
 
-require_relative "selinimum/capture"
 require_relative "selinimum/errors"
 require_relative "selinimum/git"
 require_relative "selinimum/minimizer"

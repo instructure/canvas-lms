@@ -239,7 +239,7 @@ describe ConditionalRelease::Service do
       claims = get_claims jwt
       expect(claims[:canvas_token]).not_to be nil
       canvas_claims = get_claims claims[:canvas_token]
-      expect(canvas_claims[:workflow]).to eq 'conditional-release'
+      expect(canvas_claims[:workflows]).to eq ['conditional-release']
       expect(canvas_claims[:sub]).to eq @student.global_id
       expect(canvas_claims[:domain]).to eq 'foo.bar'
     end

@@ -121,7 +121,13 @@ module Lti
       end
 
       it 'rejects a message older than the NONCE_EXPIRATION' do
-        message.oauth_timestamp = (described_class::NONCE_EXPIRATION + 1.minute).ago.to_i
+        enable_cache do
+          validator = nil
+          Timecop.freeze((described_class::NONCE_EXPIRATION + 1.minute).ago) do
+            validator = described_class.new(launch_url, message.signed_post_params(tool.shared_secret))
+          end
+          expect(validator.valid?).to be false
+        end
       end
 
       it "doesn't store the nonce if the signature is invalid" do

@@ -1,20 +1,9 @@
 #!/usr/bin/env ruby
-$:.push File.expand_path("../../gems/rubocop-canvas/lib", __FILE__)
-
-def git_diff(git, sha)
-  unless sha
-    return git.diff if git.dirty?
-    sha = git.head_sha
-  end
-  git.show(sha)
-end
-
-def get_offenses_json(file_sieve, env_sha)
-  ruby_files = file_sieve.files(env_sha)
-  return {} unless ruby_files.size > 0
-  json = `rubocop #{ruby_files.join(' ')} --format json`
-  JSON.parse(json)
-end
+$:.push File.expand_path("../../gems/dr_diff/lib", __FILE__)
+require 'dr_diff'
+require 'json'
+require 'optparse'
+require 'rubocop'
 
 def pretty_comment(comment)
   message = ""
@@ -24,67 +13,66 @@ def pretty_comment(comment)
   puts message
 end
 
-require 'rubocop_canvas'
-require 'optparse'
+def gerrit_patchset?
+  !!ENV['GERRIT_PATCHSET_REVISION']
+end
 
-cli = RuboCop::CLI.new
-if ENV['GERRIT_PATCHSET_REVISION']
-  require 'rubocop_canvas/helpers/comments'
-  require 'shellwords'
-  env_sha = ENV['GERRIT_PATCHSET_REVISION']
-  plugin = ENV['GERRIT_PROJECT']
-  plugin = nil if plugin == 'canvas-lms'
-  git_dir = "gems/plugins/#{plugin}/" if plugin
-  if git_dir && !Dir.exist?(git_dir)
-    puts "No plugin #{plugin} found"
-    exit 0
+def run_heavy_mode(ruby_files)
+  args = ruby_files
+  args_index = ARGV.index('--')
+  if args_index
+    args.concat(ARGV[(args_index + 1)..-1])
   end
+  RuboCop::CLI.new.run(args)
+end
 
-  file_sieve = RuboCop::Canvas::FileSieve.new(git_dir: git_dir)
-  results_json = get_offenses_json(file_sieve, env_sha)
-  unless results_json.empty?
-    diff = git_diff(file_sieve.git, env_sha)
-    comments = RuboCop::Canvas::Comments.build(diff, results_json,
-                                               git_dir: git_dir,
-                                               include_git_dir_in_output: false)
-    `gergich comment #{Shellwords.escape(comments.to_json)}`
-  end
+env_sha = ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION']
+heavy_mode = false
+boyscout_mode = false
+plugin = ENV['GERRIT_PROJECT']
+plugin = nil if plugin == 'canvas-lms'
+
+OptionParser.new do |opts|
+  opts.on("--heavy") { heavy_mode = true }
+  opts.on("--boy-scout") { boyscout_mode = true }
+  opts.on("--plugin PLUGIN") { |v| plugin = v }
+end.parse!
+
+git_dir = "gems/plugins/#{plugin}/" if plugin
+if git_dir && !Dir.exist?(git_dir)
+  puts "No plugin #{plugin} found"
+  exit 0
+end
+
+dr_diff = DrDiff::Manager.new(git_dir: git_dir, sha: env_sha)
+ruby_files = dr_diff.files(/\.rb$/)
+
+if ruby_files.size == 0
+  puts "No ruby file changes found!"
+  exit 0
+end
+
+if heavy_mode
+  run_heavy_mode(ruby_files)
 else
-  heavy_mode = false
-  boyscout_mode = false
-  plugin = nil
-  OptionParser.new do |opts|
-    opts.on("--heavy") { heavy_mode = true }
-    opts.on("--boy-scout") { boyscout_mode = true }
-    opts.on("--plugin PLUGIN") { |v| plugin = v }
-  end.parse!
-  git_dir = "gems/plugins/#{plugin}/" if plugin
+  severe_levels = boyscout_mode ? %w(error warn info) : %w(error warn)
+  comments = dr_diff.comments(format: "rubocop",
+                              command: "bundle exec rubocop #{ruby_files.join(' ')}",
+                              include_git_dir_in_output: !gerrit_patchset?,
+                              severe_levels: severe_levels)
 
-  env_sha = ENV['SHA']
-  file_sieve = RuboCop::Canvas::FileSieve.new(git_dir: git_dir)
-  ruby_files = file_sieve.files(env_sha)
-  if ruby_files.size > 0
-    if heavy_mode
-      args = ruby_files
-      args_index = ARGV.index('--')
-      if args_index
-        args.concat(ARGV[(args_index + 1)..-1])
-      end
-      cli.run(args)
-    else
-      require 'colorize'
-      output_filename = ".rubocop-output.json"
-      cli.run(ruby_files + ["--format", "json", "--out", output_filename])
-      results_json = JSON.parse(File.read(output_filename))
-      diff = git_diff(file_sieve.git, env_sha)
-      comments = RuboCop::Canvas::Comments.build(diff,
-                                                 results_json,
-                                                 git_dir: git_dir,
-                                                 boyscout_mode: boyscout_mode)
-      comments.each{ |comment| pretty_comment(comment) }
-      File.delete(output_filename)
-    end
+  unless comments.size >  0
+    puts "-- -- -- -- -- -- -- -- -- -- --"
+    puts "No relevant rubocop errors found!"
+    puts "-- -- -- -- -- -- -- -- -- -- --"
+    exit(0)
+  end
+
+  if gerrit_patchset?
+    require 'shellwords'
+    `gergich comment #{Shellwords.escape(comments.to_json)}`
   else
-    puts "No ruby file changes found!"
+    require 'colorize'
+    comments.each { |comment| pretty_comment(comment) }
   end
 end

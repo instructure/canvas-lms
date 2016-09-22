@@ -4,12 +4,8 @@ require 'rubocop'
 require 'rubocop_canvas/version'
 
 # helpers
-require 'rubocop_canvas/helpers/comments'
 require 'rubocop_canvas/helpers/consts'
-require 'rubocop_canvas/helpers/diff_parser'
 require 'rubocop_canvas/helpers/file_meta'
-require 'rubocop_canvas/helpers/file_sieve'
-require 'rubocop_canvas/helpers/git_proxy'
 require 'rubocop_canvas/helpers/migration_tags'
 
 # cops

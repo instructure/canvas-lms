@@ -1,12 +1,12 @@
 define([
-  'underscore',
   'redux',
   './app',
   './create-store',
   './actions',
-], (_, { bindActionCreators }, App, createStore, { actions }) => {
+], ({ bindActionCreators }, App, createStore, { actions }) => {
   const CyoeStats = {
     init: (graphsRoot, detailsRoot, assignment, jwt, apiUrl) => {
+      assignment.submission_types = Array.isArray(assignment.submission_types) ? assignment.submission_types : [assignment.submission_types]
       const initState = {
         assignment,
         jwt,
@@ -16,12 +16,12 @@ define([
       const store = createStore(initState)
       const boundActions = bindActionCreators(actions, store.dispatch)
 
-      const app = new App(boundActions)
+      const app = new App(store, boundActions)
 
-      app.renderGraphs(store, graphsRoot)
-      app.renderDetails(store, detailsRoot)
+      app.renderGraphs(graphsRoot)
+      app.renderDetails(detailsRoot)
 
-      boundActions.loadData()
+      boundActions.loadInitialData()
     },
   }
 

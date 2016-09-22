@@ -1,3 +1,4 @@
+gem "aws-sdk", "=1.63.0"
 require "json"
 require "aws-sdk"
 require "fileutils"

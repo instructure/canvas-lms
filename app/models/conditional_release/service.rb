@@ -25,7 +25,7 @@ module ConditionalRelease
       host: nil,      # required
       protocol: nil,  # defaults to Canvas
       edit_rule_path: "ui/editor",
-      stats_path: "stats/students_per_range",
+      stats_path: "stats",
       create_account_path: 'api/account',
       content_exports_path: 'api/content_exports',
       content_imports_path: 'api/content_imports',
@@ -61,8 +61,8 @@ module ConditionalRelease
           context_type: context.class.name,
           context_id: context.id.to_s,
           role: find_role(user, session, context),
-          workflow: 'conditonal-release-api',
-          canvas_token: Canvas::Security::ServicesJwt.for_user(domain, user, real_user: real_user, workflow: 'conditional-release')
+          workflows: ['conditonal-release-api'],
+          canvas_token: Canvas::Security::ServicesJwt.for_user(domain, user, real_user: real_user, workflows: ['conditional-release'])
         })
       )
     end

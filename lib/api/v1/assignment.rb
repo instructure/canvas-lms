@@ -327,7 +327,7 @@ module Api::V1::Assignment
     return false unless valid_assignment_dates?(assignment, assignment_params)
     return false unless valid_submission_types?(assignment, assignment_params)
 
-    assignment = update_from_params(assignment, assignment_params, user, context)
+    assignment = update_from_params(assignment, assignment_params, user, context, new_record: !old_assignment)
 
     if overrides
       assignment.transaction do
@@ -403,7 +403,7 @@ module Api::V1::Assignment
     end
   end
 
-  def update_from_params(assignment, assignment_params, user, context = assignment.context)
+  def update_from_params(assignment, assignment_params, user, context = assignment.context, new_record: false)
     update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_INPUT_FIELDS)
 
     if update_params.has_key?('peer_reviews_assign_at')
@@ -495,10 +495,10 @@ module Api::V1::Assignment
     end
 
     post_to_sis = assignment_params.key?('post_to_sis') ? value_to_boolean(assignment_params['post_to_sis']) : nil
-    if post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(context)
+    if new_record && (post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(context))
       # set the default setting if it is not included.
       assignment.post_to_sis = context.account.sis_default_grade_export[:value]
-    else
+    elsif !post_to_sis.nil?
       assignment.post_to_sis = post_to_sis
     end
 

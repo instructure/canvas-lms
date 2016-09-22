@@ -178,6 +178,19 @@ describe UsersController, type: :request do
     expect(json).to eq []
   end
 
+  it "should include assignments that don't expect an online submission (courses endpoint)" do
+    ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+    json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo", :controller => "courses", :action => "todo_items",
+        :format => "json", :course_id => @student_course.to_param
+    expect(json.map {|e| e['assignment']['id']}).to include ungraded.id
+  end
+
+  it "should include assignments that don't expect an online submission (users endpoint)" do
+    ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+    json = api_call :get, "/api/v1/users/self/todo", :controller => "users", :action => "todo_items", :format => "json"
+    expect(json.map {|e| e['assignment']['id']}).to include ungraded.id
+  end
+
   it "works correctly when turnitin is enabled" do
     @a2.context.any_instantiation.expects(:turnitin_enabled?).returns true
     json = api_call(:get, "/api/v1/users/self/todo",

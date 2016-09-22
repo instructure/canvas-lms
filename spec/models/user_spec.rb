@@ -1998,6 +1998,21 @@ describe User do
         expect(student.assignments_needing_submitting).to eq [assignment]
       end
     end
+
+    context "ungraded assignments" do
+      before :once do
+        course_with_student :active_all => true
+        @assignment = @course.assignments.create! title: 'blah!', due_at: 1.day.from_now, submission_types: 'not_graded'
+      end
+
+      it "excludes ungraded assignments by default" do
+        expect(@student.assignments_needing_submitting).not_to include @assignment
+      end
+
+      it "includes ungraded assignments if requested" do
+        expect(@student.assignments_needing_submitting(include_ungraded: true)).to include @assignment
+      end
+    end
   end
 
   describe "submissions_needing_peer_review" do

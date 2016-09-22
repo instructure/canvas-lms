@@ -16,7 +16,7 @@
   <%= yield :head %>
   <%=
     # polyfill browsers that don't have a baseline of features we use like Promise or Object.assign
-    polyfill_url = "#{js_base_url}/ie11-polyfill.js"
+    polyfill_url = "vendor/ie11-polyfill.js"
     if request.user_agent.to_s =~ /Trident\/7.0.*rv:11/i
       # If it looks like IE11, assume they are going to need the polyfill
       # and serve it to them in the more performant way

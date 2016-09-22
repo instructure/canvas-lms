@@ -104,6 +104,34 @@ describe UsersController, type: :request do
             {"type" => "Message", "count" => 2, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
           ]
     end
+
+    it "should find cross-shard submission comments" do
+      @student = user(:active_all => true)
+      course(:active_all => true)
+      @course.enroll_student(@student).accept!
+      @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
+      @shard1.activate do
+        @teacher = user(:active_all => true)
+      end
+      @course.enroll_teacher(@teacher).accept!
+      @sub = @assignment.grade_student(@student, { :grade => nil }).first
+      @sub.workflow_state = 'submitted'
+      @sub.submission_comments.create!(:comment => 'c1', :author => @teacher, :recipient_id => @student.id)
+      @sub.submission_comments.create!(:comment => 'c2', :author => @student, :recipient_id => @teacher.id)
+      @sub.save!
+
+      json = api_call(:get, "/api/v1/users/self/activity_stream?asset_type=Submission",
+        { :controller => "users", :action => "activity_stream", :format => 'json', :asset_type => "Submission" })
+
+      expect(json.count).to eq 1
+      expect(json.first["submission_comments"].count).to eq 2
+
+      json = api_call(:get, "/api/v1/users/self/activity_stream?asset_type=Submission&submission_user_id=#{@student.id}",
+        { :controller => "users", :action => "activity_stream", :format => 'json', :asset_type => "Submission", :submission_user_id => @student.id.to_s })
+
+      expect(json.count).to eq 1
+      expect(json.first["submission_comments"].count).to eq 2
+    end
   end
 
   it "should still return notification_category in the the activity stream summary if not set (yet)" do

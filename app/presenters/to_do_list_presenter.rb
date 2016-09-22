@@ -12,7 +12,7 @@ class ToDoListPresenter
     if user
       @needs_grading = assignments_needing(:grading)
       @needs_moderation = assignments_needing(:moderation)
-      @needs_submitting = assignments_needing(:submitting)
+      @needs_submitting = assignments_needing(:submitting, include_ungraded: true)
       assessment_requests = user.submissions_needing_peer_review(contexts: contexts, limit: ASSIGNMENT_LIMIT)
       @needs_reviewing = assessment_requests.map do |ar|
         AssessmentRequestPresenter.new(view, ar, user) if ar.asset.assignment.published?
@@ -25,9 +25,9 @@ class ToDoListPresenter
     end
   end
 
-  def assignments_needing(type)
+  def assignments_needing(type, opts = {})
     if @user
-      @user.send("assignments_needing_#{type}", contexts: @contexts, limit: ASSIGNMENT_LIMIT).map do |assignment|
+      @user.send("assignments_needing_#{type}", {contexts: @contexts, limit: ASSIGNMENT_LIMIT}.merge(opts)).map do |assignment|
         AssignmentPresenter.new(@view, assignment, @user, type)
       end
     else
