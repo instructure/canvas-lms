@@ -84,17 +84,20 @@ module AssignmentOverrideApplicator
       if context.grants_right?(user, :read_as_admin)
         overrides = assignment_or_quiz.assignment_overrides
         if assignment_or_quiz.current_version?
-          visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).except(:select, :order)
+          visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).except(:select, :order).pluck(:id)
 
           overrides = if overrides.loaded?
-                        ovs = overrides.select do |ov|
-                          ov.workflow_state == 'active' &&
-                          ov.set_type != 'ADHOC'
-                        end
-                        ovs + overrides.select{ |ov| ov.visible_student_overrides(visible_user_ids) }
+                        ovs, adhoc_ovs = overrides.select{|ov| ov.workflow_state == 'active'}.
+                          partition {|ov| ov.set_type != 'ADHOC' }
+
+                        preload_student_ids_for_adhoc_overrides(adhoc_ovs, visible_user_ids)
+                        ovs + adhoc_ovs.select{|ov| ov.preloaded_student_ids.any?}
                       else
                         ovs = overrides.active.where.not(set_type: 'ADHOC').to_a
-                        ovs + overrides.active.visible_students_only(visible_user_ids).to_a
+                        adhoc_ovs = overrides.active.visible_students_only(visible_user_ids).to_a
+                        preload_student_ids_for_adhoc_overrides(adhoc_ovs, visible_user_ids)
+
+                        ovs + adhoc_ovs
                       end
         else
           overrides = current_override_version(assignment_or_quiz, overrides)
@@ -125,6 +128,21 @@ module AssignmentOverrideApplicator
 
       overrides.compact.select(&:active?)
     end
+  end
+
+  def self.preload_student_ids_for_adhoc_overrides(adhoc_overrides, visible_user_ids)
+    if adhoc_overrides.any?
+      override_ids_to_student_ids = {}
+      AssignmentOverrideStudent.where(:assignment_override_id => adhoc_overrides).
+        where(user_id: visible_user_ids).pluck(:assignment_override_id, :user_id).each do |ov_id, user_id|
+        override_ids_to_student_ids[ov_id] ||= []
+        override_ids_to_student_ids[ov_id] << user_id
+      end
+
+      # we can preload the student ids right now
+      adhoc_overrides.each{ |ov| ov.preloaded_student_ids = override_ids_to_student_ids[ov.id] || [] }
+    end
+    adhoc_overrides
   end
 
   def self.has_invalid_args?(assignment_or_quiz, user)

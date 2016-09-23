@@ -638,7 +638,6 @@ class AssignmentsApiController < ApplicationController
 
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
-        active_overrides = include_override_objects ? assignment.assignment_overrides.active : nil
         needs_grading_course_proxy = @context.grants_right?(user, session, :manage_grades) ?
           Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, user) : nil
 
@@ -650,7 +649,7 @@ class AssignmentsApiController < ApplicationController
                         needs_grading_course_proxy: needs_grading_course_proxy,
                         include_all_dates: include_all_dates,
                         bucket: params[:bucket],
-                        overrides: active_overrides,
+                        include_overrides: include_override_objects,
                         preloaded_user_content_attachments: preloaded_attachments
                         )
       end
@@ -686,7 +685,6 @@ class AssignmentsApiController < ApplicationController
       include_all_dates = value_to_boolean(params[:all_dates] || false)
 
       include_override_objects = included_params.include?('overrides') && @context.grants_any_right?(@current_user, :manage_assignments)
-      active_overrides = include_override_objects ? @assignment.assignment_overrides.active : nil
 
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
@@ -703,7 +701,7 @@ class AssignmentsApiController < ApplicationController
                   include_visibility: include_visibility,
                   needs_grading_count_by_section: needs_grading_count_by_section,
                   include_all_dates: include_all_dates,
-                  overrides: active_overrides)
+                  include_overrides: include_override_objects)
     end
   end
 
