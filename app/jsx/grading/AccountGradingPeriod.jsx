@@ -59,7 +59,9 @@ define([
                   type="button"
                   disabled={this.props.actionsDisabled}
                   onClick={this.onEdit}>
-            <span className="screenreader-only">{I18n.t("Edit grading period")}</span>
+            <span className="screenreader-only">
+              {I18n.t("Edit %{title}", { title: this.props.period.title })}
+            </span>
             <i className="icon-edit" role="presentation"/>
           </button>
         );
@@ -74,7 +76,9 @@ define([
                   className="Button Button--icon-action"
                   disabled={this.props.actionsDisabled}
                   onClick={this.promptDeleteGradingPeriod}>
-            <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
+            <span className="screenreader-only">
+              {I18n.t("Delete %{title}", { title: this.props.period.title })}
+            </span>
             <i className="icon-trash" role="presentation"/>
           </button>
         );

@@ -270,7 +270,9 @@ define([
                   aria-disabled={disabled}
                   type="button"
                   onClick={this.editSet}>
-            <span className="screenreader-only">{I18n.t("Edit Grading Period Set")}</span>
+            <span className="screenreader-only">
+              {I18n.t("Edit %{title}", { title: this.props.set.title })}
+            </span>
             <i className="icon-edit"/>
           </button>
         );
@@ -287,7 +289,9 @@ define([
                   aria-disabled={disabled}
                   type="button"
                   onClick={this.promptDeleteSet}>
-            <span className="screenreader-only">{I18n.t("Delete Grading Period Set")}</span>
+            <span className="screenreader-only">
+              {I18n.t("Delete %{title}", { title: this.props.set.title })}
+            </span>
             <i className="icon-trash"/>
           </button>
         );
