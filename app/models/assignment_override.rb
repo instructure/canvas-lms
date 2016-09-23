@@ -24,7 +24,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   attr_accessible
 
-  attr_accessor :dont_touch_assignment
+  attr_accessor :dont_touch_assignment, :preloaded_student_ids
 
   belongs_to :assignment
   belongs_to :quiz, class_name: 'Quizzes::Quiz'

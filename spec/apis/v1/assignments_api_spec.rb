@@ -2842,6 +2842,47 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
        }]
     end
   end
+
+  context "assignment override preloading" do
+    before :once do
+      course_with_teacher(:active_all => true)
+
+      student_in_course(:course => @course, :active_all => true)
+      @override = assignment_override_model(:course => @course)
+      @override_student = @override.assignment_override_students.build
+      @override_student.user = @student
+      @override_student.save!
+
+      @assignment.only_visible_to_overrides = true
+      @assignment.save!
+    end
+
+    it "should preload student_ids when including adhoc overrides" do
+      @override.any_instantiation.expects(:assignment_override_students).never
+
+      json = api_call_as_user(@teacher, :get,
+        "/api/v1/courses/#{@course.id}/assignments?include[]=overrides",
+        { :controller => 'assignments_api',
+          :action => 'index', :format => 'json',
+          :course_id => @course.id,
+          :include => [ "overrides" ]})
+      expect(json.first["overrides"].first["student_ids"]).to eq [@student.id]
+    end
+
+    it "should preload student_ids when including adhoc overrides on assignment groups api as well" do
+      # yeah i know this is a separate api; sue me
+
+      @override.any_instantiation.expects(:assignment_override_students).never
+
+      json = api_call_as_user(@teacher, :get,
+        "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=overrides",
+        { :controller => 'assignment_groups',
+          :action => 'index', :format => 'json',
+          :course_id => @course.id,
+          :include => [ "assignments", "overrides" ]})
+      expect(json.first["assignments"].first["overrides"].first["student_ids"]).to eq [@student.id]
+    end
+  end
 end
 
 def api_get_assignments_index_from_course(course)

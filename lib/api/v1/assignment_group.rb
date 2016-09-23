@@ -63,6 +63,7 @@ module Api::V1::AssignmentGroup
           assignment_visibilities: opts[:assignment_visibilities].try(:[], a.id),
           exclude_response_fields: opts[:exclude_response_fields],
           overrides: overrides,
+          include_overrides: opts[:include_overrides],
           needs_grading_course_proxy: needs_grading_course_proxy,
           submission: includes.include?('submission') ? opts[:submissions][a.id] : nil
         )
