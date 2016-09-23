@@ -1039,6 +1039,9 @@ class HtmlElement
   def remove_class(c)
     @class_name.sub!(c, '')
   end
+  def has_class(c)
+    @class_name.include?(c + ' ') || @class_name.ends_with?(' ' + c)
+  end
   def text_content=(t)
     @text_content = t
   end
@@ -1091,6 +1094,27 @@ class HtmlElement
       original_children[0].href = link
     end
     @children = [original_children[0]]
+  end
+
+  # Again, not generic, but needs access to the innards. These
+  # class name annotations make ehud's javascript easier to use.
+  def annotate_for_nav
+    @children.each do |child|
+      child.annotate_for_nav
+    end
+
+    if @tag_name == 'ul' && @children.length > 0
+      add_class 'children'
+    end
+
+    if @tag_name == 'li'
+      @children.each do |child|
+        if child.tag_name == 'ul' && child.has_class('children')
+          add_class 'has-children'
+        end
+      end
+    end
+
   end
 
   def find_first_link
