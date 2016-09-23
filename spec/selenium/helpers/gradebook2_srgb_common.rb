@@ -6,7 +6,6 @@ module Gradebook2SRGBCommon
     let(:grade_for_label) { f("label[for='student_and_assignment_grade']") }
     let(:next_assignment_button) { fj("button:contains('Next Assignment')") }
     let(:submission_details_button) { f('#submission_details') }
-    let(:group_weights_button) { f('#ag_weights') }
     let(:notes_field) { f('#student_information textarea') }
     let(:final_grade) { f('#student_information .total-grade') }
     let(:secondary_id_label) { f('#student_information .secondary_id') }
@@ -49,12 +48,6 @@ module Gradebook2SRGBCommon
   # made this method just to improve readability / more descriptive name
   def grade_srgb_assignment(input, grade)
     replace_content(input, grade)
-  end
-
-  def turn_on_group_weights
-    f('#ag_weights').click
-    f('#group_weighting_scheme').click
-    f('button .ui-button-text').click
   end
 
   def tab_out_of_input(input_selector)

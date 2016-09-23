@@ -217,8 +217,27 @@ class Submission < ActiveRecord::Base
     given { |user| user && user.id == self.user_id && !self.assignment.muted? }
     can :read_grade
 
-    given {|user, session| self.assignment.published? && self.assignment.context.grants_right?(user, session, :manage_grades) }
+    given do |user, session|
+      !context.feature_enabled?(:multiple_grading_periods) &&
+        assignment.published? &&
+        context.grants_right?(user, session, :manage_grades)
+    end
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
+
+    given do |user, session|
+      context.feature_enabled?(:multiple_grading_periods) &&
+        assignment.published? &&
+        context.grants_right?(user, session, :manage_grades)
+    end
+    can :read and can :comment and can :make_group_comment and can :read_grade
+
+    given do |user, session|
+      context.feature_enabled?(:multiple_grading_periods) &&
+        assignment.published? &&
+        context.grants_right?(user, session, :manage_grades) &&
+        (user.admin_of_root_account?(assignment.root_account) || !in_closed_grading_period?)
+    end
+    can :grade
 
     given {|user, session| self.assignment.user_can_read_grades?(user, session) }
     can :read and can :read_grade
@@ -247,6 +266,17 @@ class Submission < ActiveRecord::Base
       )
     }
     can :view_turnitin_report
+  end
+
+  def in_closed_grading_period?
+    return false unless self.assignment.context.feature_enabled?(:multiple_grading_periods)
+
+    grading_period = GradingPeriod.
+      for(self.assignment.context).
+      where(":due_at >= start_date AND :due_at <= end_date", due_at: self.cached_due_date).
+      first
+    return false unless grading_period.present?
+    grading_period.closed?
   end
 
   def user_can_read_grade?(user, session=nil)

@@ -7,21 +7,22 @@ define([
   'jsx/grading/gradingPeriodTemplate',
   'jsx/shared/helpers/dateHelper'
 ], function(tz, React, $, I18n, _, GradingPeriodTemplate, DateHelper) {
-  var types = React.PropTypes;
+  var Types = React.PropTypes;
 
   var GradingPeriod = React.createClass({
     propTypes: {
-      title: types.string.isRequired,
-      startDate: types.instanceOf(Date).isRequired,
-      endDate: types.instanceOf(Date).isRequired,
-      id: types.string.isRequired,
-      updateGradingPeriodCollection: types.func.isRequired,
-      onDeleteGradingPeriod: types.func.isRequired,
-      disabled: types.bool.isRequired,
-      readOnly: types.bool.isRequired,
-      permissions: types.shape({
-        update: types.bool.isRequired,
-        delete: types.bool.isRequired,
+      title: Types.string.isRequired,
+      startDate: Types.instanceOf(Date).isRequired,
+      endDate: Types.instanceOf(Date).isRequired,
+      closeDate: Types.instanceOf(Date).isRequired,
+      id: Types.string.isRequired,
+      updateGradingPeriodCollection: Types.func.isRequired,
+      onDeleteGradingPeriod: Types.func.isRequired,
+      disabled: Types.bool.isRequired,
+      readOnly: Types.bool.isRequired,
+      permissions: Types.shape({
+        update: Types.bool.isRequired,
+        delete: Types.bool.isRequired,
       }).isRequired
     },
 
@@ -82,6 +83,7 @@ define([
                                title={this.props.title}
                                startDate={this.props.startDate}
                                endDate={this.props.endDate}
+                               closeDate={this.props.closeDate || this.props.endDate}
                                permissions={this.props.permissions}
                                disabled={this.props.disabled}
                                readOnly={this.props.readOnly}

@@ -48,10 +48,6 @@ describe "group weights" do
   end
 
   it 'should show total column as points' do
-    points_array = ["25"]
-    unweighted_array = ["41.67%"]
-    weighted_array = ["45%"]
-
     @assignment1.grade_student @student, :grade => 20
     @assignment2.grade_student @student, :grade => 5
 
@@ -60,37 +56,19 @@ describe "group weights" do
 
     # Displays total column as points
     get "/courses/#{@course.id}/gradebook2"
-    expect(student_totals).to eq(points_array)
-    wait_for_ajax_requests
-
-    # Display weighted totals
-    toggle_group_weight
-    expect(student_totals).to eq(weighted_array)
-
-    # Display unweighted totals again
-    toggle_group_weight
-    expect(student_totals).to eq(unweighted_array)
+    expect(student_totals).to eq(["25"])
   end
 
-  it "should validate setting group weights", priority: "1", test_id: 164007 do
-    weight_numbers = [26.1, 73.5]
+  it 'should show total column as percent' do
+    @assignment1.grade_student @student, :grade => 20
+    @assignment2.grade_student @student, :grade => 5
 
+    @course.show_total_grade_as_points = false
+    @course.update_attributes(:group_weighting_scheme => 'percent')
+
+    # Displays total column as points
     get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-
-    group_1 = AssignmentGroup.where(name: @group1.name).first
-    group_2 = AssignmentGroup.where(name: @group2.name).first
-
-    #set and check the group weight of the first assignment group
-    set_group_weight(group_1, weight_numbers[0])
-
-    #set and check the group weight of the second assignment group
-    set_group_weight(group_2, weight_numbers[1])
-    validate_group_weight(group_2, weight_numbers[1])
-
-    # check display of group weights in column heading
-    # TODO: make the header cell in the UI update to reflect new value
-    # validate_group_weight_text(AssignmentGroup.all, weight_numbers)
+    expect(student_totals).to eq(["45%"])
   end
 
   context "warning message" do
@@ -124,13 +102,10 @@ describe "group weights" do
       expect(ff('.icon-warning').count).to eq(2)
     end
 
-    it 'should remove triangle warnings if group weights are turned off in gradebook', priority: "1", test_id: 305579 do
+    it 'should not display triangle warnings if group weights are turned off in gradebook', priority: "1", test_id: 305579 do
+      @course.apply_assignment_group_weights = false
+      @course.save!
       get "/courses/#{@course.id}/gradebook"
-      f('#gradebook_settings').click
-      f("[aria-controls='assignment_group_weights_dialog']").click
-      f('#group_weighting_scheme').click
-      submit_dialog('.ui-dialog-buttonset', '.ui-button')
-      refresh_page
       expect(f("body")).not_to contain_css('.icon-warning')
     end
 

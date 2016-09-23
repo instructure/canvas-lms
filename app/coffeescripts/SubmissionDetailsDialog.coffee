@@ -23,12 +23,9 @@ define [
       else
         null
 
-      isInPastGradingPeriodAndNotAdmin = ((assignment) ->
-        GradebookHelpers.gradeIsLocked(assignment, ENV)
-      )(@assignment)
-
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)
-      @submission = $.extend {}, @student["assignment_#{@assignment.id}"],
+      submission = @student["assignment_#{@assignment.id}"]
+      @submission = $.extend {}, submission,
         label: "student_grading_#{@assignment.id}"
         inputName: 'submission[posted_grade]'
         assignment: @assignment
@@ -36,7 +33,7 @@ define [
         loading: true
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
         shouldShowExcusedOption: true
-        isInPastGradingPeriodAndNotAdmin: isInPastGradingPeriodAndNotAdmin
+        isInPastGradingPeriodAndNotAdmin: submission.gradeLocked
       @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
       @submission.grade = "EX" if @submission.excused
       @$el = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
