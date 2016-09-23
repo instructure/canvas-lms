@@ -50,6 +50,16 @@
       {{/if}}
     </div>
 
+    {{#if permissions.update}}
+      {{#if assignment}}
+        {{#if hasCyoeRule}}
+        <div>
+          <a href="discussion_topics/{{id}}/edit#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{title}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+        </div>
+        {{/if}}
+      {{/if}}
+    {{/if}}
+
     <div class="discussion-status">
       <span id="publish-icon" class="publish-icon" data-view="publishIcon"></span>
       <a href="#" data-view="toggleableSubscriptionIcon" class="subscription-toggler" role="button">
@@ -80,7 +90,6 @@
         </div>
       </div>
     </div>
-
 
     <div class="discussion-actions">
       {{#if permissions.delete}}
@@ -123,13 +132,13 @@
               </li>
             {{/if}}
           {{/if}}
-          {{#if showMasteryPaths }}
+          {{#if cyoeEnabled}}
           <li>
-            <a href="discussion_topics/{{id}}/edit#mastery-paths-editor" class="icon-mastery-path">{{#t}}Mastery Paths{{/t}}</a>
+            <a href="discussion_topics/{{id}}/edit#mastery-paths-editor" class="icon-mastery-path" title="{{#t}}Edit Mastery Paths for {{title}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
           </li>
           {{/if}}
           <li>
-            <a href="#" class="icon-trash">{{#t}}Delete{{/t}}</a>
+            <a href="#" class="icon-trash" title="{{#t}}Delete{{/t}}">{{#t}}Delete{{/t}}</a>
           </li>
           {{#if ENV.permissions.manage_content}}
             {{>ExternalTools/external_tools_menu discussion_topic_menu_tools}}

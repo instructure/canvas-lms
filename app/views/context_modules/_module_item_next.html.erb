@@ -179,6 +179,9 @@
     <% end %>
     <% if editable || module_item.nil? %>
       <div class="ig-admin">
+        <% if item_data[:mastery_paths] %>
+        <a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/edit_mastery_paths" title="<%= t('Edit Mastery Paths for %{title}', { title: module_item && module_item.title }) %>"><%= t('Mastery Paths') %></a>
+        <% end %>
         <span
           data-module-item-name="<%= module_item && module_item.title %>"
           data-module-type="<%= module_item && module_item.content_type_class %>"

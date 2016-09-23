@@ -12,6 +12,7 @@ describe "assignment groups" do
     let(:lock_at) { Time.zone.now + 4.days }
 
     before(:each) do
+      ConditionalRelease::Service.stubs(:active_rules).returns([])
       make_full_screen
       course_with_teacher_logged_in
     end

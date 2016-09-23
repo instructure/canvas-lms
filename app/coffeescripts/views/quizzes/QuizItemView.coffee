@@ -100,6 +100,7 @@ define [
         tool.url = tool.base_url + "&quizzes[]=#{@model.get("id")}"
 
       base.cyoeEnabled = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && base.quiz_type == 'assignment'
+      base.hasCyoeRule = base.cyoeEnabled && ENV.CONDITIONAL_RELEASE_ENV.trigger_assignments && ENV.CONDITIONAL_RELEASE_ENV.trigger_assignments.includes(base.assignment_id)
 
       if @model.get("multiple_due_dates")
         base.selector  = @model.get("id")

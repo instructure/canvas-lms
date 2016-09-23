@@ -163,7 +163,8 @@ define [
       base.discussion_topic_menu_tools = ENV.discussion_topic_menu_tools
       _.each base.discussion_topic_menu_tools, (tool) =>
         tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("id")}"
-      base.showMasteryPaths = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && base.assignment_id
+      base.cyoeEnabled = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && base.assignment_id
+      base.hasCyoeRule = base.cyoeEnabled && ENV.CONDITIONAL_RELEASE_ENV.trigger_assignments && ENV.CONDITIONAL_RELEASE_ENV.trigger_assignments.includes(base.assignment_id)
       base
 
     # Internal: Re-render for publish state change preserving focus

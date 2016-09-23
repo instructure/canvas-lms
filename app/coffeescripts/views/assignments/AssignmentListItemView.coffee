@@ -157,6 +157,7 @@ define [
       data.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
       data.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
       data.cyoeEnabled = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && @isGraded() && (!@model.isQuiz() || data.is_quiz_assignment)
+      data.hasCyoeRule = data.cyoeEnabled && ENV.CONDITIONAL_RELEASE_ENV.trigger_assignments && ENV.CONDITIONAL_RELEASE_ENV.trigger_assignments.includes(data.id)
 
       if data.canManage
         data.spanWidth      = 'span3'

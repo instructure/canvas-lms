@@ -48,6 +48,7 @@ module ConditionalRelease
           CONDITIONAL_RELEASE_ENV: {
             jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
             assignment: assignment_attributes(assignment),
+            trigger_assignments: active_rules(context, user, session).try(:map) { |r| r['trigger_assignment'].to_s },
             edit_rule_url: edit_rule_url,
             stats_url: stats_url,
             locale: I18n.locale.to_s

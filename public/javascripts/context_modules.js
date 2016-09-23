@@ -462,13 +462,18 @@ define([
           $item = $('#context_module_item_blank').clone(true).removeAttr('id');
           if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && data.is_cyoe_able) {
             var $admin = $item.find('.ig-admin')
-            var $mpLink = $('<li role="presentation" />').append(
-              $('<a class="mastery_paths_link"><i class="icon-mastery-path" /> </a>')
-                .attr('href', './modules/items/' + data.id + '/edit_mastery_paths')
-                .attr('title', I18n.t('Edit item mastery paths'))
-                .append(htmlEscape(I18n.t('Mastery Paths')))
+            var $mpLink = $('<a class="mastery_paths_link" />')
+              .attr('href', './modules/items/' + data.id + '/edit_mastery_paths')
+              .attr('title', I18n.t('Edit Mastery Paths for %{title}', { title: data.title }))
+              .text(I18n.t('Mastery Paths'))
+
+            if (ENV.CONDITIONAL_RELEASE_ENV.trigger_assignments && ENV.CONDITIONAL_RELEASE_ENV.trigger_assignments.includes(data.assignment_id)) {
+              $admin.prepend($mpLink.clone())
+            }
+
+            $admin.find('.delete_link').parent().before(
+              $('<li role="presentation" />').append($mpLink.prepend('<i class="icon-mastery-path" /> '))
             )
-            $admin.find('.delete_link').parent().before($mpLink)
           }
         }
         $item.addClass(data.type + '_' + data.id);

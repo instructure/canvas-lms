@@ -36,7 +36,9 @@ define [
     view.render()
 
   module 'QuizItemView',
-    setup: -> fakeENV.setup()
+    setup: -> fakeENV.setup({
+      CONDITIONAL_RELEASE_ENV: { trigger_assignments: [] }
+    })
     teardown: -> fakeENV.teardown()
 
   test 'renders admin if can_update', ->
@@ -192,3 +194,23 @@ define [
     quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'practice_quiz')
     view = createView(quiz)
     equal view.$('.icon-mastery-path').length, 0
+
+  test 'does not render mastery paths link for quiz if cyoe off', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    quiz = new Quiz(id: 1, assignment_id: '1', title: 'Foo', can_update: true, quiz_type: 'assignment')
+    view = createView(quiz)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0
+
+  test 'does not render mastery paths link for quiz if quiz does not have a rule', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    ENV.CONDITIONAL_RELEASE_ENV = { trigger_assignments: ['1'] }
+    quiz = new Quiz(id: 1, assignment_id: '2', title: 'Foo', can_update: true, quiz_type: 'assignment')
+    view = createView(quiz)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0
+
+  test 'renders mastery paths link for quiz if quiz has a rule', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    ENV.CONDITIONAL_RELEASE_ENV = { trigger_assignments: ['1'] }
+    quiz = new Quiz(id: 1, assignment_id: '1', title: 'Foo', can_update: true, quiz_type: 'assignment')
+    view = createView(quiz)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 1

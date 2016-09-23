@@ -120,7 +120,7 @@ describe ConditionalRelease::Service do
       stub_config({
         protocol: 'foo', host: 'bar', rules_path: 'rules'
       })
-      Service.stubs(:rules_for).returns([])
+      Service.stubs(:active_rules).returns([])
       course_with_student_logged_in(active_all: true)
     end
 

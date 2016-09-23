@@ -393,6 +393,10 @@
     i[class*=icon-]:before,
     i[class^=icon-]:before { @include fontSize(18px); }
   }
+
+  > a {
+    margin-right: 10px;
+  }
 }
 
 .ig-list .icon-drag-handle {

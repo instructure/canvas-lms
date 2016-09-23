@@ -37,7 +37,9 @@
 
     {{#if can_update}}
     <div class="ig-admin">
-
+      {{#if hasCyoeRule}}
+      <a href="{{edit_url}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+      {{/if}}
       <span class="sis-button" data-view="sis-button"></span>
       <span data-view="publish-icon" class="publish-icon"></span>
 
@@ -54,7 +56,7 @@
           </li>
           {{#if cyoeEnabled}}
           <li role="presentation">
-            <a href="{{edit_url}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz Mastery Paths{{/t}}'>{{#t}}Mastery Paths{{/t}}</a>
+            <a href="{{edit_url}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
           </li>
           {{/if}}
           <li role="presentation">

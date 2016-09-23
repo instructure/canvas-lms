@@ -575,6 +575,7 @@ define [
   module 'AssignListItemViewSpec - mastery paths menu option',
     setup: ->
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+      ENV.CONDITIONAL_RELEASE_ENV = { trigger_assignments: [] }
 
   test 'does not render for assignment if cyoe off', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
@@ -641,3 +642,38 @@ define [
       submission_types: ['wiki_page']
     view = createView(model)
     equal view.$('.icon-mastery-path').length, 0
+
+  module 'AssignListItemViewSpec - mastery paths link',
+    setup: ->
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+      ENV.CONDITIONAL_RELEASE_ENV = {
+        trigger_assignments: ['1']
+      }
+
+  test 'does not render for assignment if cyoe off', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    model = buildAssignment
+      id: '1'
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0
+
+  test 'does not render for assignment if assignment does not have a rule', ->
+    model = buildAssignment
+      id: '2'
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0
+
+  test 'renders for assignment if assignment has a rule', ->
+    model = buildAssignment
+      id: '1'
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 1
