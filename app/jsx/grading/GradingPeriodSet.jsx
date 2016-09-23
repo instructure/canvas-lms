@@ -38,19 +38,29 @@ define([
     }
 
     let validDates = _.all(periods, (period) => {
-      return isValidDate(period.startDate) && isValidDate(period.endDate);
+      return isValidDate(period.startDate) &&
+             isValidDate(period.endDate) &&
+             isValidDate(period.closeDate);
     });
 
     if (!validDates) {
       return [I18n.t('All dates fields must be present and formatted correctly')];
     }
 
-    let orderedDates = _.all(periods, (period) => {
+    let orderedStartAndEndDates = _.all(periods, (period) => {
       return period.startDate < period.endDate;
     });
 
-    if (!orderedDates) {
+    if (!orderedStartAndEndDates) {
       return [I18n.t('All start dates must be before the end date')];
+    }
+
+    let orderedEndAndCloseDates = _.all(periods, (period) => {
+      return period.endDate <= period.closeDate;
+    });
+
+    if (!orderedEndAndCloseDates) {
+      return [I18n.t('All close dates must be on or after the end date')];
     }
 
     if (anyPeriodsOverlap(periods)) {

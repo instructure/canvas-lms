@@ -3018,6 +3018,27 @@ describe User do
     end
   end
 
+  describe "#admin_of_root_account?" do
+    before(:once) do
+      @user = user(active_all: true)
+      @root_account = Account.default
+    end
+
+    it "returns false if the user is not an admin of the root account" do
+      expect(@user).not_to be_admin_of_root_account(@root_account)
+    end
+
+    it "returns true if the user is an admin of the root account" do
+      @root_account.account_users.create!(user: @user)
+      expect(@user).to be_admin_of_root_account(@root_account)
+    end
+
+    it "raises an error if the given account is not a root account" do
+      sub_account = @root_account.sub_accounts.create!
+      expect { @user.admin_of_root_account?(sub_account) }.to raise_error("must be a root account")
+    end
+  end
+
   it "should not grant user_notes rights to restricted users" do
     course_with_ta(:active_all => true)
     student_in_course(:course => @course, :active_all => true)

@@ -4,7 +4,9 @@
     <form class="submission_details_grade_form form-inline">
       <strong><label for="{{label}}">{{#t 'grade_form_label'}}Grade:{{/t}}</label></strong>
       {{> grading_box}}
-      <button style="float: right;" class="btn" type="submit">{{#t "update_grade"}}Update Grade{{/t}}</button>
+      {{#unless isInPastGradingPeriodAndNotAdmin}}
+        <button style="float: right;" class="btn" type="submit">{{#t "update_grade"}}Update Grade{{/t}}</button>
+      {{/unless}}
     </form>
     {{#if speedGraderUrl }}
       <a class="more-details-link" target="_blank" href="{{speedGraderUrl}}">{{#t "more_details_in_the_speedgrader"}}More details in the SpeedGrader{{/t}}</a>

@@ -39,16 +39,22 @@ describe "gradebook2 - total points toggle" do
     submit_dialog(dialog, '.ui-button')
   end
 
-  it "setting group weights should switch to percentage", test_id: 164231, priority: "2" do
+  it "shows points when group weights are not set" do
+    @course.show_total_grade_as_points = true
+    @course.save!
     get "/courses/#{@course.id}/gradebook2"
 
-    toggle_grade_display
     should_show_points
+  end
 
+  it "shows percentages when group weights are set", test_id: 164231, priority: "2" do
+    @course.show_total_grade_as_points = false
+    @course.save!
     group = AssignmentGroup.where(name: @group.name).first
-    set_group_weight(group, 50, enable_scheme: true)
+    group.group_weight = 50
+    group.save!
 
-    disable_group_weight
+    get "/courses/#{@course.id}/gradebook2"
     should_show_percentages
   end
 

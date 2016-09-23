@@ -19,9 +19,9 @@ define [
     isPercent: Ember.computed.equal('assignment.grading_type', 'percent')
     isLetterGrade: Ember.computed.equal('assignment.grading_type', 'letter_grade')
     isPassFail: Ember.computed.equal('assignment.grading_type', 'pass_fail')
-    isInPastGradingPeriodAndNotAdmin: ( ->
-      GradebookHelpers.gradeIsLocked(@assignment, ENV)
-    ).property('assignment')
+    isInPastGradingPeriodAndNotAdmin: (->
+      @submission?.gradeLocked
+    ).property('submission')
     nilPointsPossible: Ember.computed.none('assignment.points_possible')
     isGpaScale: Ember.computed.equal('assignment.grading_type', 'gpa_scale')
 

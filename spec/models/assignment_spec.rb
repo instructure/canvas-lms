@@ -1,4 +1,3 @@
-# coding: utf-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -26,7 +25,8 @@ describe Assignment do
   end
 
   it "should create a new instance given valid attributes" do
-    @course.assignments.create!(assignment_valid_attributes)
+    course = @course.assignments.create!(assignment_valid_attributes)
+    expect(course).to be_valid
   end
 
   it "should have a useful state machine" do
