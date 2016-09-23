@@ -27,12 +27,15 @@ module Api::V1::AssignmentOverride
     api_json(override, @current_user, session, :only => fields).tap do |json|
       case override.set_type
       when 'ADHOC'
-        students = if visible_users.present?
-                     override.assignment_override_students.where(user_id: visible_users)
-                   else
-                     override.assignment_override_students
-                   end
-        json[:student_ids] = students.map(&:user_id)
+        if override.preloaded_student_ids
+          json[:student_ids] = override.preloaded_student_ids
+        else
+          json[:student_ids] = if visible_users.present?
+                       override.assignment_override_students.where(user_id: visible_users).pluck(:user_id)
+                     else
+                       override.assignment_override_students.pluck(:user_id)
+                     end
+        end
       when 'Group'
         json[:group_id] = override.set_id
       when 'CourseSection'
@@ -43,6 +46,10 @@ module Api::V1::AssignmentOverride
 
   def assignment_overrides_json(overrides, user = nil)
     visible_users_ids = ::AssignmentOverride.visible_users_for(overrides, user).map(&:id)
+    # we most likely already have the student_ids preloaded here because of overridden_for, but just in case
+    if overrides.any?{|ov| ov.set_type == 'ADHOC' && !ov.preloaded_student_ids}
+      AssignmentOverrideApplicator.preload_student_ids_for_adhoc_overrides(overrides.select{|ov| ov.set_type == 'ADHOC'}, visible_users_ids)
+    end
     overrides.map{ |override| assignment_override_json(override, visible_users_ids) }
   end
 
