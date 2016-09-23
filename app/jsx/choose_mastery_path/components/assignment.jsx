@@ -15,14 +15,14 @@ define([
     renderTitle () {
       if (this.props.isSelected) {
         return (
-          <a href={`/courses/${this.props.assignment.context_id}/assignments/${this.props.assignment.assignmentId}`} title={this.props.assignment.title} className='item_name cmp-assignment__title-link'>
-            {this.props.assignment.title}
+          <a href={`/courses/${this.props.assignment.context_id}/assignments/${this.props.assignment.assignmentId}`} title={this.props.assignment.name} className='item_name cmp-assignment__title-link'>
+            {this.props.assignment.name}
           </a>
         )
       } else {
         return (
           <span className='item_name'>
-            {this.props.assignment.title}
+            {this.props.assignment.name}
           </span>
         )
       }

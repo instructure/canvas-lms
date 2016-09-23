@@ -9,7 +9,7 @@ define([
   const defaultProps = () => ({
     isSelected: false,
     assignment: {
-      title: 'Ch 2 Quiz',
+      name: 'Ch 2 Quiz',
       type: 'quiz',
       points: 10,
       due_at: new Date(),

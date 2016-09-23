@@ -12,7 +12,7 @@ define([
         setId: 1,
         assignments: [
           {
-            title: 'Ch 2 Quiz',
+            name: 'Ch 2 Quiz',
             type: 'quiz',
             points: 10,
             due_at: new Date(),
@@ -23,7 +23,7 @@ define([
             },
           },
           {
-            title: 'Ch 2 Review',
+            name: 'Ch 2 Review',
             type: 'assignment',
             points: 10,
             due_at: new Date(),
@@ -39,7 +39,7 @@ define([
         setId: 2,
         assignments: [
           {
-            title: 'Ch 2 Quiz',
+            name: 'Ch 2 Quiz',
             type: 'quiz',
             points: 10,
             due_at: new Date(),
@@ -50,7 +50,7 @@ define([
             },
           },
           {
-            title: 'Ch 2 Review',
+            name: 'Ch 2 Review',
             type: 'assignment',
             points: 10,
             due_at: new Date(),

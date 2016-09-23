@@ -252,13 +252,14 @@ module ConditionalRelease
         cache_expired = newer_than_cache?(content_tags.select(&:content), cached) ||
                         newer_than_cache?(assignments, cached)
 
-        rules_cache(context, student, force: cache_expired) do
+        rules_data = rules_cache(context, student, force: cache_expired) do
           data = { submissions: submissions_for(student) }
           headers = headers_for(context, student, domain_for(context), session)
           req = request_rules(headers, data)
-          rules = merge_assignment_data!(req, assignments)
-          {rules: rules, updated_at: Time.zone.now}
+          {rules: req, updated_at: Time.zone.now}
         end
+        rules_data[:rules] = merge_assignment_data(rules_data[:rules], assignments)
+        rules_data
       end
 
       def rules_cache(context, student, force: false, &block)
@@ -273,7 +274,7 @@ module ConditionalRelease
       def request_rules(headers, data)
         req = CanvasHttp.post(rules_summary_url, headers, form_data: data.to_param)
 
-        if req && req.is_a?(Net::HTTPSuccess)
+        if req && req.code == '200'
           JSON.parse(req.body)
         else
           message = "An error occurred when attempting to fetch rules for ConditionalRelease::Service"
@@ -300,7 +301,7 @@ module ConditionalRelease
         Assignment.active.where(id: ids)
       end
 
-      def merge_assignment_data!(response, assignments = nil)
+      def merge_assignment_data(response, assignments = nil)
         return response if response.blank? || (response.is_a?(Hash) && response.key?(:error))
         assignments = assignments_for(response) if assignments.blank?
 
@@ -310,13 +311,14 @@ module ConditionalRelease
           rule[:assignment_sets].map! do |set|
             set[:assignments].map! do |asg|
               assignment = assignments.find { |a| a[:id].to_s == asg[:assignment_id].to_s }
-              asg[:model] = assignment && assignment.slice(*assignment_keys)
+              asg[:model] = assignment
               asg
             end
             set
           end
           rule
         end
+        rules
       end
 
       def assignment_keys

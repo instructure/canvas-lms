@@ -108,7 +108,7 @@ class ContextModulesController < ApplicationController
               }
 
               option[:assignments] = set[:assignments].map { |a|
-                assg = a[:model]
+                assg = assignment_json(a[:model], @current_user, session)
                 assg[:assignmentId] = a[:assignment_id]
                 assg
               }

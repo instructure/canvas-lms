@@ -378,4 +378,74 @@ describe ConditionalRelease::Service do
       end
     end
   end
+
+  describe 'rules_for' do
+    before do
+      enable_service
+    end
+
+    before(:once) do
+      course_with_student_logged_in
+      assignment_model course: @course
+    end
+
+    def expect_cyoe_request(code, assignments = nil)
+      assignments = Array.wrap(assignments)
+      response = stub() do
+        expects(:code).returns(code)
+        unless assignments.nil?
+          assignments_json = assignments.map do |a|
+            { id: a.id, assignment_id: a.id }
+          end
+          expects(:body).returns([
+            { id: 1, trigger_assignment: 2, assignment_sets: [
+              { id: 11, assignments: assignments_json }
+            ]}
+          ].to_json)
+        end
+      end
+      CanvasHttp.expects(:post).once.returns(response)
+    end
+
+    it 'returns a list of rules' do
+      expect_cyoe_request '200', @a
+      rules = Service.rules_for(@course, @student, [], nil)
+      expect(rules.length > 0)
+      assignment = rules[0][:assignment_sets][0][:assignments][0]
+      expect(assignment[:model]).to eq @a
+    end
+
+    it 'uses the cache' do
+      enable_cache do
+        expect_cyoe_request '200', @a
+        Service.rules_for(@course, @student, [], nil)
+        Service.rules_for(@course, @student, [], nil)
+      end
+    end
+
+    it 'does not use the cache if cache cleared manually' do
+      enable_cache do
+        expect_cyoe_request '200', @a
+        Service.rules_for(@course, @student, [], nil)
+
+        Service.clear_rules_cache_for(@course, @student)
+
+        expect_cyoe_request '200', @a
+        Service.rules_for(@course, @student, [], nil)
+      end
+    end
+
+    it 'does not use the cache if assignments updated' do
+      enable_cache do
+        expect_cyoe_request '200', @a
+        Service.rules_for(@course, @student, [], nil)
+
+        @a.title = 'updated'
+        @a.save!
+
+        expect_cyoe_request '200', @a
+        Service.rules_for(@course, @student, [], nil)
+      end
+    end
+  end
 end
