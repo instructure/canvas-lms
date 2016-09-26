@@ -13,6 +13,8 @@ class ToDoListPresenter
       @needs_grading = assignments_needing(:grading)
       @needs_moderation = assignments_needing(:moderation)
       @needs_submitting = assignments_needing(:submitting, include_ungraded: true)
+      @needs_submitting += ungraded_quizzes_needing_submitting
+      @needs_submitting.sort_by! &:due_at
       assessment_requests = user.submissions_needing_peer_review(contexts: contexts, limit: ASSIGNMENT_LIMIT)
       @needs_reviewing = assessment_requests.map do |ar|
         AssessmentRequestPresenter.new(view, ar, user) if ar.asset.assignment.published?
@@ -32,6 +34,12 @@ class ToDoListPresenter
       end
     else
       []
+    end
+  end
+
+  def ungraded_quizzes_needing_submitting
+    @user.ungraded_quizzes_needing_submitting(contexts: @contexts, limit: ASSIGNMENT_LIMIT).map do |quiz|
+      AssignmentPresenter.new(@view, quiz, @user, :submitting)
     end
   end
 
@@ -75,6 +83,7 @@ class ToDoListPresenter
     def initialize(view, assignment, user, type)
       @view = view
       @assignment = assignment
+      @assignment = @assignment.overridden_for(user) if type == :submitting
       @user = user
       @type = type
     end
@@ -124,7 +133,11 @@ class ToDoListPresenter
     end
 
     def assignment_path
-      @view.course_assignment_path(assignment.context_id, assignment.id)
+      if assignment.is_a?(Quizzes::Quiz)
+        @view.course_quiz_path(assignment.context_id, assignment.id)
+      else
+        @view.course_assignment_path(assignment.context_id, assignment.id)
+      end
     end
 
     def ignore_url

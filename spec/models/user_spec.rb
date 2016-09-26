@@ -2015,6 +2015,60 @@ describe User do
     end
   end
 
+  describe "ungraded_quizzes_needing_submitting" do
+    before(:once) do
+      course_with_student :active_all => true
+      @quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.ago)
+      @quiz.publish!
+    end
+
+    it "includes ungraded quizzes" do
+      expect(@student.ungraded_quizzes_needing_submitting).to include @quiz
+    end
+
+    it "excludes graded quizzes" do
+      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "assignment", :due_at => 1.day.ago)
+      other_quiz.publish!
+      expect(@student.ungraded_quizzes_needing_submitting).not_to include other_quiz
+    end
+
+    it "excludes unpublished quizzes" do
+      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.ago)
+      expect(@student.ungraded_quizzes_needing_submitting).not_to include other_quiz
+    end
+
+    it "excludes locked quizzes" do
+      @quiz.unlock_at = 1.day.from_now
+      @quiz.save!
+      expect(@student.ungraded_quizzes_needing_submitting).not_to include @quiz
+    end
+
+    it "filters by due date" do
+      expect(@student.ungraded_quizzes_needing_submitting(:due_after => 1.day.from_now)).not_to include @quiz
+    end
+
+    it "excludes submitted quizzes" do
+      qs = @quiz.quiz_submissions.build :user => @student
+      qs.workflow_state = 'complete'
+      qs.save!
+      expect(@student.ungraded_quizzes_needing_submitting).not_to include @quiz
+    end
+
+    it "filters by enrollment state" do
+      @student.enrollments.where(course: @course).first.complete!
+      expect(@student.ungraded_quizzes_needing_submitting).not_to include @quiz
+    end
+
+    context "sharding" do
+      specs_require_sharding
+      it "includes quizzes from other shards" do
+        other_user = @shard1.activate { user }
+        student_in_course :course => @course, :user => other_user, :active_all => true
+        expect(other_user.ungraded_quizzes_needing_submitting).to include @quiz
+      end
+    end
+  end
+
   describe "submissions_needing_peer_review" do
     before(:each) do
       course_with_student_logged_in(:active_all => true)

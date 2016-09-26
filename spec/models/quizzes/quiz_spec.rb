@@ -2007,4 +2007,54 @@ describe Quizzes::Quiz do
       end
     end
   end
+
+  context "due_between_with_overrides" do
+    before :once do
+      @quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.ago)
+
+      override = @quiz.assignment_overrides.build
+      override.due_at = 1.day.from_now
+      override.due_at_overridden = true
+      override.title = 'override'
+      override.save!
+    end
+
+    it 'should return quizzes due between the given dates' do
+      expect(@course.quizzes.due_between_with_overrides(2.days.ago, Time.now)).to include(@quiz)
+    end
+
+    it 'should return quizzes with overrides between the given dates' do
+      expect(@course.quizzes.due_between_with_overrides(Time.now, 2.days.from_now)).to include(@quiz)
+    end
+
+    it "should exclude quizzes that don't meet either criterion" do
+      expect(@course.quizzes.due_between_with_overrides(1.hour.ago, 1.hour.from_now)).not_to include (@quiz)
+    end
+  end
+
+  context "need_submitting_info" do
+    before(:once) do
+      @quiz1 = @course.quizzes.create!
+      @quiz2 = @course.quizzes.create!
+      @quiz3 = @course.quizzes.create!
+      student_in_course :active_all => true
+      sub2 = @quiz2.quiz_submissions.build(:user => @student)
+      sub2.workflow_state = 'preview'
+      sub2.save!
+      sub3 = @quiz3.quiz_submissions.build(:user => @student)
+      sub3.workflow_state = 'complete'
+      sub3.save!
+    end
+
+    it 'includes quizzes without complete submissions' do
+      quizzes = @course.quizzes.need_submitting_info(@student, 10)
+      expect(quizzes).to include @quiz1
+      expect(quizzes).to include @quiz2
+      expect(quizzes).not_to include @quiz3
+    end
+
+    it 'respects limit' do
+      expect(@course.quizzes.need_submitting_info(@student, 1).length).to eql 1
+    end
+  end
 end

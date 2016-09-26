@@ -1442,14 +1442,20 @@ class User < ActiveRecord::Base
       if opts[:contexts]
         course_ids = Array(opts[:contexts]).map(&:id) & course_ids
       end
-      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit))
+      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes))
 
       course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
       Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids_cache_key, opts].cache_key, :expires_in => expires_in) do
         result = Shackles.activate(:slave) do
           Shard.partition_by_shard(course_ids) do |shard_course_ids|
-            scope = Assignment.for_course(shard_course_ids).not_ignored_by(self, purpose)
-            yield(scope, opts.merge(:shard_course_ids => shard_course_ids))
+            if opts[:ungraded_quizzes]
+              scope = Quizzes::Quiz.where(context_type: 'Course', context_id: shard_course_ids).
+                not_for_assignment.not_ignored_by(self, purpose)
+              yield(scope, opts.merge(:shard_course_ids => shard_course_ids))
+            else
+              scope = Assignment.for_course(shard_course_ids).not_ignored_by(self, purpose)
+              yield(scope, opts.merge(:shard_course_ids => shard_course_ids))
+            end
           end
         end
         result = result[0...opts[:limit]] if opts[:limit]
@@ -1472,6 +1478,21 @@ class User < ActiveRecord::Base
         not_locked
       assignments = assignments.expecting_submission unless opts[:include_ungraded]
       select_available_assignments(assignments)
+    end
+  end
+
+  def ungraded_quizzes_needing_submitting(opts={})
+    assignments_needing('submitting', :student, 15.minutes, opts.merge(:ungraded_quizzes => true)) do |quiz_scope, options|
+      due_after = options[:due_after] || 4.weeks.ago
+      due_before = options[:due_before] || 1.week.from_now
+
+      quizzes = quiz_scope.
+        available.
+        due_between_with_overrides(due_after, due_before).
+        need_submitting_info(id, options[:limit]).
+        not_locked.
+        preload(:context)
+      select_available_assignments(quizzes)
     end
   end
 

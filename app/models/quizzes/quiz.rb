@@ -52,6 +52,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course]
   belongs_to :assignment
   belongs_to :assignment_group
+  has_many :ignores, :as => :asset
 
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
@@ -1065,6 +1066,48 @@ class Quizzes::Quiz < ActiveRecord::Base
     joins(:quiz_student_visibilities).
     where(:quiz_student_visibilities => { :user_id => student_ids, :course_id => course_ids })
   }
+
+  # Return all quizzes and their active overrides where either the
+  # quiz or one of its overrides is due between start and ending.
+  scope :due_between_with_overrides, lambda { |start, ending|
+    joins("LEFT OUTER JOIN #{AssignmentOverride.quoted_table_name} assignment_overrides
+          ON assignment_overrides.quiz_id = quizzes.id").
+    group("quizzes.id").
+    where('quizzes.due_at BETWEEN ? AND ?
+          OR assignment_overrides.due_at_overridden AND
+          assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
+  }
+
+  # Return quizzes (up to limit) that do not have any submissions
+  scope :need_submitting_info, lambda { |user_id, limit|
+    where("(SELECT COUNT(id) FROM #{Quizzes::QuizSubmission.quoted_table_name}
+            WHERE quiz_id = quizzes.id
+            AND workflow_state = 'complete'
+            AND user_id = ?) = 0", user_id).
+      limit(limit).
+      order("quizzes.due_at").
+      preload(:context)
+  }
+
+  scope :not_locked, -> {
+    where("(quizzes.unlock_at IS NULL OR quizzes.unlock_at<:now) AND (quizzes.lock_at IS NULL OR quizzes.lock_at>:now)",
+      :now => Time.zone.now)
+  }
+
+  scope :not_ignored_by, lambda { |user, purpose|
+    where("NOT EXISTS (?)",
+          Ignore.where(asset_type: 'Quizzes::Quiz',
+                       user_id: user,
+                       purpose: purpose).where('asset_id=quizzes.id'))
+  }
+
+  def peer_reviews_due_at
+    nil
+  end
+
+  def submission_action_string
+    t :submission_action_take_quiz, "Take %{title}", :title => title
+  end
 
   def teachers
     context.teacher_enrollments.map(&:user)

@@ -1008,6 +1008,10 @@ class CoursesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       grading = @current_user.assignments_needing_grading(:contexts => [@context]).map { |a| todo_item_json(a, @current_user, session, 'grading') }
       submitting = @current_user.assignments_needing_submitting(:include_ungraded => true, :contexts => [@context]).map { |a| todo_item_json(a, @current_user, session, 'submitting') }
+      if Array(params[:include]).include? 'ungraded_quizzes'
+        submitting += @current_user.ungraded_quizzes_needing_submitting(:contexts => [@context]).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
+        submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] }
+      end
       render :json => (grading + submitting)
     end
   end
