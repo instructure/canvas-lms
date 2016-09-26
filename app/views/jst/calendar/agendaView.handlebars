@@ -18,7 +18,11 @@
                         <span class="screenreader-only">{{readableType}},</span>
                         <i class="icon-{{iconType}}"></i>
                         {{#if ../../meta.better_scheduler}}
-                          {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}}
+                          {{#if can_edit}}
+                            {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}} {{#if reservedUsers }} - {{reservedUsers}} {{/if}}
+                          {{else}}
+                            {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}}
+                          {{/if}}
                         {{else}}
                           {{#ifAll ../../../meta.displayAppointmentEvents isAppointmentGroupEvent}}
                             {{appointmentGroupEventStatus}}
