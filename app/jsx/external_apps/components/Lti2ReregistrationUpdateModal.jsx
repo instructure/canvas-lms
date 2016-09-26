@@ -11,7 +11,8 @@ define([
 
         propTypes: {
             tool: React.PropTypes.object.isRequired,
-            closeHandler: React.PropTypes.func
+            closeHandler: React.PropTypes.func,
+            canAddEdit: React.PropTypes.bool.isRequired
         },
 
         getInitialState() {

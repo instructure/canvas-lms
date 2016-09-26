@@ -779,6 +779,11 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
         :account_allows => lambda {|a| a.mfa_settings != :disabled}
+      },
+      :lti_add_edit => {
+        :label => -> { t('LTI add and edit') },
+        :true_for => %w(TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin),
+        :available_to => %w(TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin)
       }
     })
 

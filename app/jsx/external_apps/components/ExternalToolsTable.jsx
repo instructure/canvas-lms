@@ -10,6 +10,10 @@ define([
   return React.createClass({
     displayName: 'ExternalToolsTable',
 
+    propTypes: {
+      canAddEdit: React.PropTypes.bool.isRequired
+    },
+
     getInitialState() {
       return store.getState();
     },
@@ -42,7 +46,7 @@ define([
         return null;
       }
       return store.getState().externalTools.map(function (tool, idx) {
-        return <ExternalToolsTableRow key={idx} tool={tool} />
+        return <ExternalToolsTableRow key={idx} tool={tool} canAddEdit={this.props.canAddEdit}/>
       }.bind(this));
     },
 

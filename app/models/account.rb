@@ -1004,6 +1004,9 @@ class Account < ActiveRecord::Base
     # any user with an admin enrollment in one of the courses can read
     given { |user| user && self.courses.where(:id => user.enrollments.admin.pluck(:course_id)).exists? }
     can :read
+
+    given { |user| self.grants_right?(user, :lti_add_edit)}
+    can :create_tool_manually
   end
 
   alias_method :destroy_permanently!, :destroy

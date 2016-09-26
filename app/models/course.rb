@@ -1383,6 +1383,9 @@ class Course < ActiveRecord::Base
     # because students can't see prior enrollments)
     given { |user| self.grants_all_rights?(user, :read_roster, :read_as_admin) }
     can :read_prior_roster
+
+    given { |user| self.grants_right?(user, :lti_add_edit)}
+    can :create_tool_manually
   end
 
   def allows_gradebook_uploads?

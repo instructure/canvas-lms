@@ -371,6 +371,18 @@ describe CoursesController do
       student_in_course(active_all: true)
     end
 
+    it "should set tool creation permissions true for roles that are granted rights" do
+      user_session(@teacher)
+      get 'settings', :course_id => @course.id
+      expect(controller.js_env[:PERMISSIONS][:create_tool_manually]).to eq(true)
+    end
+
+    it "should not set tool creation permissions for roles not granted rights" do
+      user_session(@student)
+      get 'settings', :course_id => @course.id
+      expect(controller.js_env[:PERMISSIONS]).to be_nil
+    end
+
     it "should require authorization" do
       get 'settings', :course_id => @course.id
       assert_unauthorized

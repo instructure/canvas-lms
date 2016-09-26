@@ -652,7 +652,10 @@ class AccountsController < ApplicationController
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
         CONTEXT_BASE_URL: "/accounts/#{@context.id}",
-        MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5)
+        MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
+        PERMISSIONS: {
+          :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
+        }
       })
     end
   end

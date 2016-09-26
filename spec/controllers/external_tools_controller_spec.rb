@@ -868,6 +868,28 @@ describe ExternalToolsController do
         'x%3DWith%2520Space%26y%3Dyes&external_tool%5Bdescription%5D=null&external_tool%5Bshared_secret%5D=secret'
       }
 
+      it "should not update tool if user lacks update_manually" do
+        user_session(@student)
+        tool = new_valid_tool(@course)
+        put(
+          "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
+          post_body,
+          { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        )
+        assert_status(401)
+      end
+
+      it "should update tool if user is granted update_manually" do
+        user_session(@teacher)
+        tool = new_valid_tool(@course)
+        put(
+          "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
+          post_body,
+          { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        )
+        assert_status(200)
+      end
+
       it 'accepts form data' do
         user_session(@teacher)
         tool = new_valid_tool(@course)
@@ -1051,6 +1073,18 @@ describe ExternalToolsController do
     it "should require authentication" do
       post 'create', :course_id => @course.id, :format => "json"
       assert_status(401)
+    end
+
+    it "should not create tool if user lacks create_tool_manually" do
+      user_session(@student)
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}, :format => "json"
+      assert_status(401)
+    end
+
+    it "should create tool if user is granted create_tool_manually" do
+      user_session(@teacher)
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}, :format => "json"
+      assert_status(200)
     end
 
     it "should accept basic configurations" do

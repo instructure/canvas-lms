@@ -733,7 +733,7 @@ class ExternalToolsController < ApplicationController
   #        -F 'config_type=by_url' \
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
   def create
-    if authorized_action(@context, @current_user, :update)
+    if authorized_action(@context, @current_user, :create_tool_manually)
       external_tool_params = params[:external_tool] || params
       @tool = @context.context_external_tools.new
       if request.content_type == 'application/x-www-form-urlencoded'
@@ -814,7 +814,7 @@ class ExternalToolsController < ApplicationController
   #        -F 'privacy_level=public'
   def update
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
-    if authorized_action(@tool, @current_user, :update)
+    if authorized_action(@tool, @current_user, :update_manually)
       external_tool_params = params[:external_tool] || params
       if request.content_type == 'application/x-www-form-urlencoded'
         custom_fields = Lti::AppUtil.custom_params(request.raw_post)

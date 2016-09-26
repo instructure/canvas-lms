@@ -279,6 +279,7 @@ class RoleOverridesController < ApplicationController
   #     send_messages_all                -- [sTADo] Send messages to the entire class
   #     view_all_grades                  -- [ TAd ] View all grades
   #     view_group_pages                 -- [sTADo] View the group pages of all student groups
+  #     lti_add_edit                     -- [ TAD ] LTI add and edit
   #
   #   Some of these permissions are applicable only for roles on the site admin
   #   account, on a root account, or for course-level roles with a particular base role type;

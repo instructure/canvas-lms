@@ -48,7 +48,9 @@ define([
   const renderConfigurations = (ctx) => {
     React.render(
       <Root>
-        <Configurations pathname={ctx.pathname} />
+        <Configurations
+          pathname={ctx.pathname}
+          env={window.ENV} />
       </Root>
     , targetNodeToRenderIn);
   }
