@@ -201,6 +201,10 @@ body:not(.course-menu-expanded) {
     opacity: 1;
     transform: translate3d(0,0,0);
   }
+  // account for the course term showing in the left-hand sub-nav
+  #section-tabs-header-subtitle {
+    padding: 0 0 $ic-sp $ic-sp;
+  }
 }
 
 .ic-app-nav-toggle-and-crumbs {

@@ -990,6 +990,11 @@ module ApplicationHelper
     end
   end
 
+  # Determine if url is the current state for the groups sub-nav switcher
+  def group_homepage_pathfinder(group)
+    request.fullpath =~ /groups\/#{group.id}/
+  end
+
   def link_to_parent_signup(auth_type)
     template = auth_type.present? ? "#{auth_type.downcase}Dialog" : "parentDialog"
     path = auth_type.present? ? external_auth_validation_path : users_path
