@@ -7,14 +7,14 @@ module.exports = function(source){
   var newSource = source;
 
   // add a qunit dependency to the dependency list
-  newSource = newSource.replace(/define\(?\s*\[[^\]]/, function(match){
+  newSource = newSource.replace(/(define|require)\(?\s*\[[^\]]/, function(match){
     return match.replace(/\[/, function(innerMatch){
       return innerMatch + "'qunit',";
     });
   });
 
   // don't want the comma if the list is empty
-  newSource = newSource.replace(/define\(?\s*\[\s*\]/, function(match){
+  newSource = newSource.replace(/(define|require)\(?\s*\[\s*\]/, function(match){
     return match.replace(/\[/, function(innerMatch){
       return innerMatch + "'qunit'";
     });

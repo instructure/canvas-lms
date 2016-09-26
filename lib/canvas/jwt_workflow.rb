@@ -42,5 +42,11 @@ module Canvas
         ) || false
       }
     end
+
+    register(:ui) do |_, user|
+      {
+        use_high_contrast: user.try(:prefers_high_contrast?)
+      }
+    end
   end
 end

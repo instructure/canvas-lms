@@ -48,6 +48,13 @@ module Api
           raw_link = "/files/1/download?verifier=123"
           expect(Link.new(raw_link).to_corrected_s).to eq "/courses/1/files/1/download?"
         end
+
+        it 'scopes to the context even if url includes the host' do
+          course_attachment = stub(context_type: "Course", context_id: 1)
+          Attachment.stubs(:where).with(id: "1").returns(stub(first: course_attachment))
+          raw_link = "https://account.instructure.com/files/1/download?verifier=123"
+          expect(Link.new(raw_link).to_corrected_s).to eq "https://account.instructure.com/courses/1/files/1/download?"
+        end
       end
     end
   end

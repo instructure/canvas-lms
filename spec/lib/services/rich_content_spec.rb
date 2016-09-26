@@ -51,7 +51,7 @@ module Services
         ctx = stub("ctx", grants_any_right?: true)
         jwt = stub("jwt")
         Canvas::Security::ServicesJwt.stubs(:for_user).with(domain, user, all_of(
-          has_entry(workflows: [:rich_content]),
+          has_entry(workflows: [:rich_content, :ui]),
           has_entry(context: ctx)
         )).returns(jwt)
         env = described_class.env_for(root_account, user: user, domain: domain, context: ctx)

@@ -42,7 +42,7 @@ module Api
       end
 
       def might_need_modification?
-        !!(html =~ %r{verifier=|['"]/files|instructure_inline_media_comment})
+        !!(html =~ %r{verifier=|\D/files|instructure_inline_media_comment})
       end
 
       # Take incoming html from a user or similar and modify it for safe storage and display

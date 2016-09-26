@@ -11822,7 +11822,7 @@ nn:
       loading_more_questions_failed: "kan ikkje laste fleire spørsmål"
       loading_question_failed: "Kan ikkje laste spørsmål ..."
       loading_questions_failed: "Spørsmåla lastar ikkje, prøv på nytt seinare"
-      missing_access_code: "Du må oppgi ei tilgangskode"
+      missing_access_code: "Du må oppgi ein tilgangskode"
       missing_ip_filter: "Du må oppgi ei gyldig IP-adresse"
       no_answer: "Legg til minst eit svar."
       no_correct_answer: "Vel eit rett svar"
@@ -12001,8 +12001,8 @@ nn:
           submit: Send!
         labels: 
           access_code: Tilgangskode
-        quiz_restricted: "Denne prøva er avgrensa med ei tilgangskode. Du må spørje faglærar eller eksamensvakt om å skrive inn eller oppgi tilgangskoda slik at du kan ta prøva."
-        survey_restricted: "Denne undersøkinga er avgrensa med ei tilgangskode. Du må spørje faglærar eller eksamensvakt om å skrive inn eller oppgi tilgangskoda slik at du kan ta undersøkinga."
+        quiz_restricted: "Denne prøva er avgrensa med ein tilgangskode. Du må spørje faglærar eller eksamensvakt om å skrive inn eller oppgi tilgangskoda slik at du kan ta prøva."
+        survey_restricted: "Denne undersøkinga er avgrensa med ein tilgangskode. Du må spørje faglærar eller eksamensvakt om å skrive inn eller oppgi tilgangskoda slik at du kan ta undersøkinga."
       default_history_crumb: Historikk
       default_title: "Ny prøve"
       display_answer: 
@@ -12794,7 +12794,7 @@ nn:
   reply_to_current_message_55391f5b: "Svar til denne meldinga"
   reply_to_main_discussion_29823888: "Svar til diskusjon"
   reply_to_topic_12412b0f: "Svar til emne"
-  require_an_access_code_600e06e8: "Krev ei tilgangskode"
+  require_an_access_code_600e06e8: "Krev ein tilgangskode"
   require_respondus_lockdown_browser_31425b3a: "Krev Respondus LockDown Browser"
   require_usage_rights_for_uploaded_files_4507865b: "Krev bruksrettar for opplasta filer"
   required_access_code_592902d7: "Obligatorisk tilgangskode"

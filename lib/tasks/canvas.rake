@@ -19,7 +19,7 @@ def check_syntax(files)
   Array(files).each do |js_file|
     js_file.strip!
     # only lint things in public/javascripts that are not in /vendor, /compiled, etc.
-    if js_file.match /public\/javascripts\/(?!vendor|compiled|i18n.js|InstUI.js|translations|old_unsupported_dont_use_react)/
+    if js_file.match /public\/javascripts\/(?!vendor|compiled|instructure\-ui|i18n.js|translations|old_unsupported_dont_use_react)/
       file_path = File.join(Rails.root, js_file)
 
       unless quick

@@ -303,7 +303,7 @@ describe "discussions" do
         edit_name = 'edited discussion name'
         get url
         expect_new_page_load { f(".edit-btn").click }
-        clear_content('input[name=title]')
+        replace_content(f('input[name=title]'), nil)
         edit(edit_name, 'edit message')
       end
 

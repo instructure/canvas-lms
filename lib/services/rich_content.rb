@@ -11,7 +11,7 @@ module Services
             user,
             context: context,
             real_user: real_user,
-            workflows: [:rich_content]
+            workflows: [:rich_content, :ui]
           )
         end
 

@@ -364,7 +364,7 @@ describe "Standard Common Cartridge importing" do
 
       mods = @course.context_modules.to_a
       expect(mods.map(&:position)).to eql [1, 2, 3, 4]
-      expect(mods.map(&:name)).to eql %w(monkeys ponies monsters last)
+      expect(mods.map(&:name)).to eql %w(ponies monsters monkeys last)
     end
 
     it "should fix position conflicts for assignment groups" do

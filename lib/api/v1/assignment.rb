@@ -91,6 +91,8 @@ module Api::V1::Assignment
 
     if !opts[:overrides].blank?
       hash['overrides'] = assignment_overrides_json(opts[:overrides], user)
+    elsif opts[:include_overrides]
+      hash['overrides'] = assignment_overrides_json(assignment.assignment_overrides.select(&:active?), user)
     end
 
     if !assignment.user_submitted.nil?

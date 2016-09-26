@@ -52,6 +52,8 @@ module Importers
 
     def self.process_migration(data, migration)
       modules = data['modules'] ? data['modules'] : []
+      migration.last_module_position = migration.context.context_modules.maximum(:position) if migration.is_a?(ContentMigration)
+
       modules.each do |mod|
         self.process_module(mod, migration)
       end
@@ -102,7 +104,11 @@ module Importers
         item.workflow_state = 'active'
       end
 
-      item.position = hash[:position] || hash[:order]
+      position = hash[:position] || hash[:order]
+      if item.new_record? && migration.try(:last_module_position) # try to import new modules after current ones instead of interweaving positions
+        position = migration.last_module_position + (position || 1)
+      end
+      item.position = position
       item.context = context
       item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
       item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) if hash[:start_at]

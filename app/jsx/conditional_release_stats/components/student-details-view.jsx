@@ -1,11 +1,11 @@
 define([
   'react',
   'classnames',
-  'instructure-ui',
+  'instructure-ui/Spinner',
   'i18n!cyoe_assignment_sidebar',
   './student-assignment-item',
   '../shapes/index',
-], (React, classNames, { Spinner }, I18n, StudentAssignmentItem, { assignmentShape, studentShape }) => {
+], (React, classNames, { default: Spinner }, I18n, StudentAssignmentItem, { assignmentShape, studentShape }) => {
   const { shape, string, number, arrayOf, func, bool } = React.PropTypes
 
   return class StudentDetailsView extends React.Component {
