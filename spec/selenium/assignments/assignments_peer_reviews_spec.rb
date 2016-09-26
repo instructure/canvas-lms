@@ -27,7 +27,7 @@ describe "assignments" do
 
       expect(fj('.student_reviews:first .peer_reviews').text()).to match /None Assigned/
       keep_trying_until do
-        expect(@assignment.submissions.map(&:assessment_requests).flatten.length).to eq 1
+        expect(@assignment.reload.submissions.map(&:assessment_requests).flatten.length).to eq 1
       end
     end
 
