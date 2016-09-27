@@ -169,6 +169,10 @@ module ConditionalRelease
       }
       headers = headers_for(context, current_user, domain_for(context), session)
       request = CanvasHttp.post(select_assignment_set_url, headers, form_data: request_data.to_param)
+
+      # either assignments have changed (req success) or unknown state (req error)
+      clear_rules_cache_for(context, student)
+
       { code: request.code, body: JSON.parse(request.body) }
     end
 
