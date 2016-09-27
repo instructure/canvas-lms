@@ -61,6 +61,12 @@ define [
       else
         $.replaceTags(@contextInfo.calendar_event_url, 'id', @calendarEvent.parent_event_id ? @calendarEvent.id)
 
+    editGroupURL: () ->
+      if @isAppointmentGroupEvent()
+        "/appointment_groups/#{@object.appointment_group_id}/edit"
+      else
+        "#"
+
     displayTimeString: () ->
         if @calendarEvent.all_day
           @formatTime(@startDate(), true)

@@ -173,6 +173,8 @@ define [
       else if @event.object?.available_slots > 0
         params.availableSlotsText = @event.object.available_slots
 
+      params.use_new_scheduler = ENV.CALENDAR.BETTER_SCHEDULER
+      params.is_appointment_group = !!@event.isAppointmentGroupEvent() # this returns the actual url so make it boolean for clarity
       params.reserve_comments = @event.object.reserve_comments ?= @event.object.comments
       params.showEventLink   = params.fullDetailsURL()
       params.showEventLink or= params.isAppointmentGroupEvent()

@@ -816,7 +816,7 @@ CanvasRails::Application.routes.draw do
     end
   end
 
-  resources :appointment_groups, only: [:index, :show]
+  resources :appointment_groups, only: [:index, :show, :edit]
 
   resources :errors, only: [:show, :index, :create], path: :error_reports
 
