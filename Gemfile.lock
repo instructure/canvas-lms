@@ -500,20 +500,20 @@ GEM
       statsd-ruby (= 1.0.0)
     canvas_webex (0.17)
       railties
-    capistrano (3.5.0)
+    capistrano (= 3.5.0)
       airbrussh (>= 1.0.0)
       capistrano-harrow
       i18n
       rake (>= 10.0.0)
       sshkit (>= 1.9.0)
     capistrano-bundler (1.1.4)
-      capistrano (3.5.0)
+      capistrano (= 3.5.0)
       sshkit (~> 1.2)
     capistrano-harrow (0.5.2)
     capistrano-passenger (0.2.0)
-      capistrano (3.5.0)
+      capistrano (= 3.5.0)
     capistrano-rails (1.1.7)
-      capistrano (3.5.0)
+      capistrano (= 3.5.0)
       capistrano-bundler (~> 1.1)
     childprocess (0.5.0)
       ffi (~> 1.0, >= 1.0.11)
@@ -970,7 +970,7 @@ DEPENDENCIES
   canvas_time!
   canvas_unzip!
   canvas_webex (= 0.17)
-  capistrano (3.5.0)
+  capistrano (= 3.5.0)
   capistrano-passenger
   capistrano-rails (~> 1.1)
   cassandra-cql (= 1.2.2)!

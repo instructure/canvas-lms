@@ -183,7 +183,7 @@ namespace :deploy do
             execute(:sudo, 'cp -a', latest_release_path.join('client_apps'), release_path) # some things in public/javascripts are symlinked here
             execute(:sudo, 'cp -a', latest_release_path.join('public/javascripts'), release_path.join('public'))
             execute(:sudo, 'cp -a', latest_release_path.join('public/optimized'), release_path.join('public'))
-            execute(:sudo, 'cp -a', latest_release_path.join('public/stylesheets_compiled'), release_path.join('public'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/dist'), release_path.join('public'))
             execute(:sudo, 'chmod -R g+w', release_path.join('public')) # For some reason, cp -a is not preserving symlinks in public/javascripts/client_apps.  Let the initializer that fixes it create those links.
                                                                         # Also, it db:migrate fails if it has to create new dirs.  E.g. public/plugins
 

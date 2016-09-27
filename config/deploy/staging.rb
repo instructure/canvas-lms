@@ -5,9 +5,9 @@
 # property set.  Don't declare `role :all`, it's a meta role.
 
 # Use private IPs since the server is behind a firewall and public IPs don't work there.
-role :app, %w{deploy@172.31.0.19}
-role :web, %w{deploy@172.31.0.19}
-role :db,  %w{deploy@172.31.0.19}
+role :app, %w{deploy@172.31.3.79}
+role :web, %w{deploy@172.31.3.79}
+role :db,  %w{deploy@172.31.3.79}
 
 set :branch, 'bz-staging'
 
