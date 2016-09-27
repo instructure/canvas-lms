@@ -2308,14 +2308,29 @@ class Course < ActiveRecord::Base
               current_users
             end
 
-    scope =  scope.where(:enrollments => {:workflow_state => opts[:enrollment_state]}) if opts[:enrollment_state]
+    apply_enrollment_visibilities_internal(scope,
+                                           user,
+                                           visibilities,
+                                           visibility,
+                                           enrollment_state: opts[:enrollment_state])
+  end
+
+  def enrollments_visible_to(user)
+    visibilities = section_visibilities_for(user)
+    visibility = enrollment_visibility_level_for(user, visibilities)
+
+    apply_enrollment_visibilities_internal(current_enrollments.except(:preload), user, visibilities, visibility)
+  end
+
+  def apply_enrollment_visibilities_internal(scope, user, visibilities, visibility, enrollment_state: nil)
+    scope = scope.where(enrollments: { workflow_state: enrollment_state }) if enrollment_state
     # See also MessageableUsers (same logic used to get users across multiple courses) (should refactor)
     case visibility
-      when :full then scope
-      when :sections then scope.where(:enrollments => { :course_section_id => visibilities.map {|s| s[:course_section_id] } })
-      when :restricted then scope.where(:enrollments => { :user_id => (visibilities.map { |s| s[:associated_user_id] }.compact + [user]) })
-      when :limited then scope.where("enrollments.type IN ('StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment')")
-      else scope.none
+    when :full then scope
+    when :sections then scope.where(enrollments: { course_section_id: visibilities.map {|s| s[:course_section_id] } })
+    when :restricted then scope.where(enrollments: { user_id: (visibilities.map { |s| s[:associated_user_id] }.compact + [user]) })
+    when :limited then scope.where(enrollments: { type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment'] })
+    else scope.none
     end
   end
 

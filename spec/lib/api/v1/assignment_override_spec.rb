@@ -232,8 +232,8 @@ describe "Api::V1::AssignmentOverride" do
     end
     subject(:assignment_overrides_json) { @subject.assignment_overrides_json([@override], @student) }
 
-    it 'delegates to AssignmentOverride.visible_userse_for' do
-      AssignmentOverride.expects(:visible_users_for).once.returns([@student])
+    it 'delegates to AssignmentOverride.visible_enrollments_for' do
+      AssignmentOverride.expects(:visible_enrollments_for).once.returns(Enrollment.none)
       assignment_overrides_json
     end
   end

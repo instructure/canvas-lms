@@ -45,7 +45,7 @@ module Api::V1::AssignmentOverride
   end
 
   def assignment_overrides_json(overrides, user = nil)
-    visible_users_ids = ::AssignmentOverride.visible_users_for(overrides.compact, user).map(&:id)
+    visible_users_ids = ::AssignmentOverride.visible_enrollments_for(overrides.compact, user).select(:user_id)
     # we most likely already have the student_ids preloaded here because of overridden_for, but just in case
     if overrides.any?{|ov| ov.present? && ov.set_type == 'ADHOC' && !ov.preloaded_student_ids}
       AssignmentOverrideApplicator.preload_student_ids_for_adhoc_overrides(overrides.select{|ov| ov.set_type == 'ADHOC'}, visible_users_ids)
@@ -338,7 +338,7 @@ module Api::V1::AssignmentOverride
 
   def invisible_users_and_overrides_for_user(context, user, existing_overrides)
     # get the student overrides the user can't see and ensure those overrides are included
-    visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).except(:select, :order)
+    visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
     invisible_user_ids = context.users.where.not(id: visible_user_ids).pluck(:id)
     invisible_override_ids = existing_overrides.select{ |ov|
       ov.set_type == 'ADHOC' &&
