@@ -14,9 +14,9 @@ define [
       @clock = sinon.useFakeTimers()
       @props =
         tokens: [
-          {name: "Atilla", student_id: "3", type: "student"},
-          {name: "Huns", course_section_id: "4", type: "section"},
-          {name: "Reading Group 3", group_id: "3", type: "group"}
+          {id: "1", name: "Atilla", student_id: "3", type: "student"},
+          {id: "2", name: "Huns", course_section_id: "4", type: "section"},
+          {id: "3", name: "Reading Group 3", group_id: "3", type: "group"}
         ]
         potentialOptions: [
           {course_section_id: "1", name: "Patricians"},
@@ -40,6 +40,7 @@ define [
         allStudentsFetched: false
         currentlySearching: false
         rowKey: "nullnullnull"
+        disabled: false
 
       @mountPoint = $('<div>').appendTo('body')[0]
       DueDateTokenWrapperElement = React.createElement(DueDateTokenWrapper, @props)
@@ -127,3 +128,28 @@ define [
 
   test 'overrideTokenAriaLabel method', ->
     equal @DueDateTokenWrapper.overrideTokenAriaLabel('group X'), "Currently assigned to group X, click to remove"
+
+  module 'disabled DueDateTokenWrapper',
+    setup: ->
+      fakeENV.setup(context_asset_string = "course_1")
+      props =
+        tokens: [{id: "1", name: "Atilla", student_id: "3", type: "student"}]
+        potentialOptions: [{course_section_id: "1", name: "Patricians"}]
+        handleTokenAdd: ->
+        handleTokenRemove: ->
+        defaultSectionNamer: ->
+        allStudentsFetched: false
+        currentlySearching: false
+        rowKey: "wat"
+        disabled: true
+
+      @mountPoint = $('<div>').appendTo('body')[0]
+      DueDateTokenWrapperElement = React.createElement(DueDateTokenWrapper, props)
+      @DueDateTokenWrapper = ReactDOM.render(DueDateTokenWrapperElement, @mountPoint)
+
+    teardown: ->
+      ReactDOM.unmountComponentAtNode(@mountPoint)
+      fakeENV.teardown()
+
+  test 'renders a readonly token input', ->
+    ok @DueDateTokenWrapper.refs.DisabledTokenInput

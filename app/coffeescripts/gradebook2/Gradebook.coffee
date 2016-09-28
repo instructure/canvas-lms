@@ -37,6 +37,7 @@ define [
   'compiled/views/gradebook/GradingPeriodMenuView'
   'compiled/gradebook2/GradebookKeyboardNav'
   'jsx/gradebook/grid/helpers/columnArranger'
+  'compiled/api/gradingPeriodsApi'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
@@ -59,7 +60,7 @@ Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
 GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
 GradebookHeaderMenu, NumberCompare, htmlEscape, PostGradesStore, PostGradesApp,
 SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate,
-SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
+SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger, GradingPeriodsAPI) ->
 
   class Gradebook
     columnWidths =
@@ -97,8 +98,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
       @totalColumnInFront = UserSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
       @gradingPeriodsEnabled = @options.multiple_grading_periods_enabled
-      @gradingPeriods = _.map @options.active_grading_periods, (gradingPeriod) =>
-        _.extend({}, gradingPeriod, closed: @gradingPeriodIsClosed(gradingPeriod))
+      @gradingPeriods = GradingPeriodsAPI.deserializePeriods(@options.active_grading_periods)
       @gradingPeriodToShow = @getGradingPeriodToShow()
       @submissionStateMap = new SubmissionStateMap
         gradingPeriodsEnabled: @gradingPeriodsEnabled

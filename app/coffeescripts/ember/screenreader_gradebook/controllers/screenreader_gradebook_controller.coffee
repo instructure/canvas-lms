@@ -16,8 +16,13 @@ define [
   'str/htmlEscape'
   'compiled/models/grade_summary/CalculationMethodContent'
   'jsx/gradebook/SubmissionStateMap'
+  'compiled/api/gradingPeriodsApi'
   'jquery.instructure_date_and_time'
-  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid, ic_submission_download_dialog, htmlEscape, CalculationMethodContent, SubmissionStateMap) ->
+], (
+  ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog,
+  AssignmentMuter, GradeCalculator, outcomeGrid, ic_submission_download_dialog, htmlEscape,
+  CalculationMethodContent, SubmissionStateMap, GradingPeriodsAPI
+) ->
 
   {get, set, setProperties} = Ember
 
@@ -93,7 +98,13 @@ define [
     mgpEnabled: get(window, 'ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled')
 
     gradingPeriods:
-      _.compact [{id: '0', title: I18n.t("all_grading_periods", "All Grading Periods")}].concat get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
+      (->
+        periods = get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
+        deserializedPeriods = GradingPeriodsAPI.deserializePeriods(periods)
+        optionForAllPeriods =
+          id: '0', title: I18n.t("all_grading_periods", "All Grading Periods")
+        _.compact([optionForAllPeriods].concat(deserializedPeriods))
+      )()
 
     lastGeneratedCsvLabel:  do () =>
       if get(window, 'ENV.GRADEBOOK_OPTIONS.gradebook_csv_progress')
@@ -304,12 +315,12 @@ define [
     outcomeSelectDefaultLabel: I18n.t "no_outcome", "No Outcome Selected"
 
     submissionStateMap: (
-      periods = _.map get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods'), (gradingPeriod) =>
-        _.extend({}, gradingPeriod, closed: gradingPeriodIsClosed(gradingPeriod))
       new SubmissionStateMap(
         gradingPeriodsEnabled: !!get(window, 'ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled')
         selectedGradingPeriodID: '0'
-        gradingPeriods: periods
+        gradingPeriods: GradingPeriodsAPI.deserializePeriods(
+          get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
+        )
         isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, "admin")
       )
     )

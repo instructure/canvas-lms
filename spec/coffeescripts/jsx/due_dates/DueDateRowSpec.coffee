@@ -16,6 +16,7 @@ define [
         sections: {}
         students: {}
         dates: {}
+        groups: {}
         canDelete: true
         rowKey: "nullnullnull"
         validDropdownOptions: []
@@ -26,13 +27,14 @@ define [
         handleTokenAdd: ->
         handleTokenRemove: ->
         replaceDate: ->
+        inputsDisabled: false
 
       DueDateRowElement = React.createElement(DueDateRow, props)
       @dueDateRow = ReactDOM.render(DueDateRowElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()
-      ReactDOM.unmountComponentAtNode(@dueDateRow.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dueDateRow).parentNode)
 
   test 'renders', ->
     ok @dueDateRow.isMounted()
@@ -65,13 +67,14 @@ define [
         handleTokenAdd: ->
         handleTokenRemove: ->
         replaceDate: ->
+        inputsDisabled: false
 
       DueDateRowElement = React.createElement(DueDateRow, props)
       @dueDateRow = ReactDOM.render(DueDateRowElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()
-      ReactDOM.unmountComponentAtNode(@dueDateRow.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dueDateRow).parentNode)
 
   test 'renders', ->
     ok @dueDateRow.isMounted()
@@ -113,3 +116,35 @@ define [
     tokens = @dueDateRow.tokenizedOverrides()
     token = _.find(tokens, (t) -> t["name"] == "Loading...")
     ok !!token
+
+  module 'DueDateRow with empty props and inputsDisabled true',
+    setup: ->
+      fakeENV.setup()
+      ENV.context_asset_string = "course_1"
+      props =
+        overrides: []
+        sections: {}
+        students: {}
+        dates: {}
+        groups: {}
+        canDelete: true
+        rowKey: "nullnullnull"
+        validDropdownOptions: []
+        currentlySearching: false
+        allStudentsFetched: true
+        handleDelete: ->
+        defaultSectionNamer: ->
+        handleTokenAdd: ->
+        handleTokenRemove: ->
+        replaceDate: ->
+        inputsDisabled: true
+
+      DueDateRowElement = React.createElement(DueDateRow, props)
+      @dueDateRow = ReactDOM.render(DueDateRowElement, $('<div>').appendTo('body')[0])
+
+    teardown: ->
+      fakeENV.teardown()
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dueDateRow).parentNode)
+
+  test 'does not return a remove link', ->
+    notOk @dueDateRow.removeLinkIfNeeded()

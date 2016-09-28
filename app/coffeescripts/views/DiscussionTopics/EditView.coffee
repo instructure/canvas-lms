@@ -359,7 +359,6 @@ ConditionalRelease, deparam) ->
     showErrors: (errors) ->
       # override view handles displaying override errors, remove them
       # before calling super
-      # see getFormValues in DueDateView.coffee
       delete errors.assignmentOverrides
       if @showConditionalRelease()
         # switch to a tab with errors

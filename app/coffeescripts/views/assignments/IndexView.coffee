@@ -9,8 +9,9 @@ define [
   'jst/assignments/NoAssignmentsSearch'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
   'compiled/userSettings'
+  'compiled/api/gradingPeriodsApi'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, KeyboardNavDialog, keyboardNavTemplate, $, _, Backbone, template, NoAssignments, AssignmentKeyBindingsMixin, userSettings) ->
+], (I18n, KeyboardNavDialog, keyboardNavTemplate, $, _, Backbone, template, NoAssignments, AssignmentKeyBindingsMixin, userSettings, GradingPeriodsAPI) ->
 
   class IndexView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
@@ -72,12 +73,14 @@ define [
       @filterResults()
     , 200
 
+    gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)
+
     filterResults: =>
       term = $('#search_term').val()
       gradingPeriod = null
       if ENV.MULTIPLE_GRADING_PERIODS_ENABLED
         gradingPeriodIndex = $("#grading_period_selector").val()
-        gradingPeriod = ENV.active_grading_periods[parseInt(gradingPeriodIndex)] if gradingPeriodIndex != "all"
+        gradingPeriod = @gradingPeriods[parseInt(gradingPeriodIndex)] if gradingPeriodIndex != "all"
         @saveSelectedGradingPeriod(gradingPeriod)
       if term == "" && _.isNull(gradingPeriod)
         #show all
@@ -146,8 +149,8 @@ define [
     selectGradingPeriod: ->
       gradingPeriodId = userSettings.contextGet('assignments_current_grading_period')
       unless _.isNull(gradingPeriodId)
-        for i of ENV.active_grading_periods
-          if ENV.active_grading_periods[i].id == gradingPeriodId
+        for i of @gradingPeriods
+          if @gradingPeriods[i].id == gradingPeriodId
             $("#grading_period_selector").val(i)
             break
 

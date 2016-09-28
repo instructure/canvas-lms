@@ -1,5 +1,6 @@
 define [
   'Backbone'
+  'underscore'
   'compiled/collections/AssignmentGroupCollection'
   'compiled/models/AssignmentGroup'
   'compiled/models/Assignment'
@@ -10,9 +11,10 @@ define [
   'vendor/timezone/America/Juneau'
   'vendor/timezone/fr_FR'
   'helpers/I18nStubber'
+  'helpers/fakeENV'
   'helpers/jquery.simulate'
   'compiled/behaviors/tooltip'
-], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, CreateAssignmentView, DialogFormView, $, tz, juneau, french, I18nStubber) ->
+], (Backbone, _, AssignmentGroupCollection, AssignmentGroup, Assignment, CreateAssignmentView, DialogFormView, $, tz, juneau, french, I18nStubber, fakeENV) ->
 
   fixtures = $('#fixtures')
 
@@ -220,6 +222,37 @@ define [
     json = view.toJSON()
     ok !json.canChooseType
 
+  test "toJSON includes key for disableDueAt", ->
+    view = createView(@assignment1)
+    keys = _.keys(view.toJSON())
+    ok _.contains(keys, "disableDueAt")
+
+  test "toJSON includes key for isInClosedPeriod", ->
+    view = createView(@assignment1)
+    keys = _.keys(view.toJSON())
+    ok _.contains(keys, "isInClosedPeriod")
+
+  test "disableDueAt returns true if due_at is a frozen attribute", ->
+    view = createView(@assignment1)
+    @stub(view.model, 'frozenAttributes', -> ["due_at"])
+    equal view.disableDueAt(), true
+
+  test "disableDueAt returns false if the user is an admin", ->
+    fakeENV.setup()
+    ENV.current_user_roles = ["admin"]
+    view = createView(@assignment1)
+    equal view.disableDueAt(), false
+    fakeENV.teardown()
+
+  test "disableDueAt returns true if the user is not an admin " +
+  "and the assignment has a due date in a closed grading period", ->
+    fakeENV.setup()
+    ENV.current_user_roles = ["teacher"]
+    view = createView(@assignment1)
+    @stub(view.model, 'hasDueDateInClosedGradingPeriod', -> true)
+    equal view.disableDueAt(), true
+    fakeENV.teardown()
+
   test "openAgain doesn't add datetime for multiple dates", ->
     @stub(DialogFormView.prototype, "openAgain", ->)
     @spy $.fn, "datetime_field"
@@ -238,6 +271,17 @@ define [
 
     ok $.fn.datetime_field.called
 
+  test "openAgain doesn't add datetime picker if disableDueAt is true", ->
+    @stub(DialogFormView.prototype, "openAgain", ->)
+    @spy $.fn, "datetime_field"
+
+    view = createView(@assignment2)
+    @stub(view, 'disableDueAt', -> true)
+
+    view.openAgain()
+
+    ok $.fn.datetime_field.notCalled
+
   test "requires name to save assignment", ->
     view = createView(@assignment3)
     data =
@@ -247,6 +291,52 @@ define [
     ok errors["name"]
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is required!"
+
+  test "requires due_at to be in an open grading period if it is being changed and the user is a teacher", ->
+    fakeENV.setup()
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
+    ENV.current_user_roles = ["teacher"]
+    ENV.active_grading_periods = [{
+      id: "1"
+      start_date: "2103-07-01T06:00:00Z"
+      end_date: "2103-08-31T06:00:00Z"
+      title: "Closed Period"
+      close_date: "2103-08-31T06:00:00Z"
+      is_last: false
+      is_closed: true
+    }]
+
+    view = createView(@assignment1)
+    data =
+      name: "Foo"
+      due_at: "2103-08-15T06:00:00Z"
+    errors = view.validateBeforeSave(data, [])
+
+    equal errors["due_at"][0]["message"], "Due date cannot fall in a closed grading period"
+    fakeENV.teardown()
+
+  test "does not require due_at to be in an open grading period if it is being changed and the user is an admin", ->
+    fakeENV.setup()
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
+    ENV.current_user_roles = ["admin"]
+    ENV.active_grading_periods = [{
+      id: "1"
+      start_date: "2103-07-01T06:00:00Z"
+      end_date: "2103-08-31T06:00:00Z"
+      title: "Closed Period"
+      close_date: "2103-08-31T06:00:00Z"
+      is_last: false
+      is_closed: true
+    }]
+
+    view = createView(@assignment1)
+    data =
+      name: "Foo"
+      due_at: "2103-08-15T06:00:00Z"
+    errors = view.validateBeforeSave(data, [])
+
+    notOk errors["due_at"]
+    fakeENV.teardown()
 
   test "requires a name < 255 chars to save assignment", ->
     view = createView(@assignment3)

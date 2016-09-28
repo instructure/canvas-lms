@@ -9,7 +9,10 @@ define [
   'vendor/timezone/fr_FR'
   'helpers/I18nStubber'
   'helpers/fakeENV'
-], (React, ReactDOM, {Simulate, SimulateNative}, _, $, DueDateCalendarPicker, tz, french, I18nStubber, fakeENV) ->
+], (
+  React, ReactDOM, {Simulate, SimulateNative, findRenderedDOMComponentWithTag}, _, $, DueDateCalendarPicker, tz,
+  french, I18nStubber, fakeENV
+) ->
 
   module 'unlock_at DueDateCalendarPicker',
     setup: ->
@@ -22,6 +25,8 @@ define [
         dateType: "unlock_at"
         rowKey: "nullnullnull"
         labelledBy: "foo"
+        inputClasses: "date_field datePickerDateField DueDateInput"
+        disabled: false
 
       @mountPoint = $('<div>').appendTo('body')[0]
       DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, @props)
@@ -52,7 +57,7 @@ define [
     tz.restore(snapshot)
 
   test 'recieved proper class depending on dateType', ->
-    classes = @dueDateCalendarPicker.refs.datePickerWrapper.props.className
+    classes = @dueDateCalendarPicker.refs.datePickerWrapper.className
     equal "DueDateRow__LockUnlockInput", classes
 
   test 'call the update prop when changed', ->
@@ -91,17 +96,19 @@ define [
         dateType: "due_at"
         rowKey: "nullnullnull"
         labelledBy: "foo"
+        inputClasses: "date_field datePickerDateField DueDateInput"
+        disabled: false
 
       DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, props)
       @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()
-      ReactDOM.unmountComponentAtNode(@dueDateCalendarPicker.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dueDateCalendarPicker).parentNode)
       @clock.restore()
 
   test 'recieved proper class depending on dateType', ->
-    classes = @dueDateCalendarPicker.refs.datePickerWrapper.props.className
+    classes = @dueDateCalendarPicker.refs.datePickerWrapper.className
     equal "DueDateInput__Container", classes
 
   test 'converts to fancy midnight (because it is due_at)', ->
@@ -121,3 +128,32 @@ define [
 
     equal date.getMinutes(), 59
     tz.restore(snapshot)
+
+  module 'disabled DueDateCalendarPicker',
+    setup: ->
+      fakeENV.setup()
+      ENV.context_asset_string = "course_1"
+      @props =
+        handleUpdate: ->
+        dateValue: new Date(Date.UTC(2012, 1, 1, 7, 1, 0))
+        dateType: "unlock_at"
+        rowKey: "foobar"
+        labelledBy: "foo"
+        inputClasses: "date_field datePickerDateField DueDateInput"
+        disabled: true
+
+      @mountPoint = document.getElementById("fixtures")
+      DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, @props)
+      @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, @mountPoint)
+
+    teardown: ->
+      fakeENV.teardown()
+      ReactDOM.unmountComponentAtNode(@mountPoint)
+
+  test 'sets the input as readonly', ->
+    input = findRenderedDOMComponentWithTag(@dueDateCalendarPicker, 'input')
+    equal input.readOnly, true
+
+  test 'disables the calendar picker button', ->
+    button = findRenderedDOMComponentWithTag(@dueDateCalendarPicker, 'button')
+    ok button.getAttribute("aria-disabled"), true

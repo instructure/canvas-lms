@@ -451,6 +451,40 @@ define [
     assignment = new Assignment
     deepEqual assignment.allDates(), []
 
+  module "Assignment#inGradingPeriod",
+    setup: ->
+      @gradingPeriod =
+        id: "1"
+        title: "Fall"
+        startDate: new Date("2013-07-01 11:13:00")
+        endDate: new Date("2013-10-01 11:13:00")
+        closeDate: new Date("2013-10-05 11:13:00")
+        isLast: true
+        isClosed: true
+
+      @dateInPeriod = new Date("2013-08-20 11:13:00")
+      @dateOutsidePeriod = new Date("2013-01-20 11:13:00")
+
+  test "returns true if the assignment has a due_at in the given period", ->
+    assignment = new Assignment
+    assignment.set 'due_at', @dateInPeriod
+    equal assignment.inGradingPeriod(@gradingPeriod), true
+
+  test "returns false if the assignment has a due_at outside the given period", ->
+    assignment = new Assignment
+    assignment.set 'due_at', @dateOutsidePeriod
+    equal assignment.inGradingPeriod(@gradingPeriod), false
+
+  test "returns true if the assignment has a date group in the given period", ->
+    dates = [new DateGroup(due_at: @dateInPeriod, title: "Everyone")]
+    assignment = new Assignment all_dates: dates
+    equal assignment.inGradingPeriod(@gradingPeriod), true
+
+  test "returns false if the assignment does not have a date group in the given period", ->
+    dates = [new DateGroup(due_at: @dateOutsidePeriod, title: "Everyone")]
+    assignment = new Assignment all_dates: dates
+    equal assignment.inGradingPeriod(@gradingPeriod), false
+
   module "Assignment#singleSectionDueDate",
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()

@@ -94,12 +94,20 @@ define([
     var path = this.getContextPath() + "/users"
 
     $.getJSON(path,
-      {per_page: STUDENTS_FETCHED_PER_PAGE, page: pageNumber, enrollment_type: "student", include_inactive: false},
+      {per_page: STUDENTS_FETCHED_PER_PAGE, page: pageNumber, enrollment_type: "student", include_inactive: false, include: ["enrollments", "group_ids"]},
       this._fetchStudentsForCourseSuccessHandler.bind(this, {})
     )
   }
 
   OverrideStudentStore._fetchStudentsForCourseSuccessHandler = function(opts, items, status, xhr){
+    _.each(items, function(student) {
+      student.enrollments = _.filter(student.enrollments, function(e) {
+        return e.type === "StudentEnrollment" || e.type === "StudentViewEnrollment"
+      });
+
+      student.sections = _.map(student.enrollments, enrollment => enrollment.course_section_id);
+    });
+
     this.addStudents(items)
 
     var links = parseLinkHeader(xhr)

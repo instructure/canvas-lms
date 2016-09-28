@@ -1,15 +1,13 @@
 define([
   'underscore',
   'react',
-  'jsx/due_dates/DueDateTokenWrapper',
   'jsx/due_dates/DueDateCalendarPicker',
   'jsx/shared/helpers/accessibleDateFormat',
   'timezone',
   'i18n!assignments',
-  'classnames',
   'jquery',
   'jquery.instructure_forms'
-], (_, React, DueDateTokenWrapper, DueDateCalendarPicker, accessibleDateFormat, tz, I18n, cx, $) => {
+], (_, React, DueDateCalendarPicker, accessibleDateFormat, tz, I18n, $) => {
 
   var DueDateCalendarPicker = React.createClass({
 
@@ -17,7 +15,9 @@ define([
       dateType: React.PropTypes.string.isRequired,
       handleUpdate: React.PropTypes.func.isRequired,
       rowKey: React.PropTypes.string.isRequired,
-      labelledBy: React.PropTypes.string.isRequired
+      labelledBy: React.PropTypes.string.isRequired,
+      inputClasses: React.PropTypes.string.isRequired,
+      disabled: React.PropTypes.bool.isRequired
     },
 
     // ---------------
@@ -48,9 +48,9 @@ define([
       if( !(this.props.dateType == "unlock_at") &&
           tz.isMidnight(date) ) {
         return tz.changeToTheSecondBeforeMidnight(date);
-      } else {
-        return date;
       }
+
+      return date;
     },
     // ---------------
     //    Rendering
@@ -66,27 +66,41 @@ define([
         "DueDateRow__LockUnlockInput"
     },
 
-    inputClasses(){
-      return cx({
-        date_field: true,
-        datePickerDateField: true,
-        DueDateInput: this.props.dateType === "due_at",
-        UnlockLockInput: this.props.dateType !== "due_at"
-      })
-    },
-
     render() {
+      if (this.props.disabled) {
+        return (
+          <div className="ic-Form-control">
+            <label className="ic-Label" htmlFor={this.props.dateType}>{this.props.labelText}</label>
+            <div className="ic-Input-group">
+              <input id={this.props.dateType}
+                     readOnly
+                     type="text"
+                     className={`ic-Input ${this.props.inputClasses}`}
+                     defaultValue={this.formattedDate()}/>
+              <div className="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabIndex="-1">
+                <button className="Button Button--icon-action disabled" aria-disabled="true" type="button">
+                  <i className="icon-calendar-month" role="presentation"/>
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       return (
-        <div ref="datePickerWrapper" className={this.wrapperClassName()}>
-          <input type            = "text"
-                 ref             = "dateInput"
-                 title           = {accessibleDateFormat()}
-                 data-tooltip    = ""
-                 className       = {this.inputClasses()}
-                 aria-labelledby = {this.props.labelledBy}
-                 data-row-key    = {this.props.rowKey}
-                 data-date-type  = {this.props.dateType}
-                 defaultValue    = {this.formattedDate()} />
+        <div>
+          <label id={this.props.labelledBy} className="Date__label">{this.props.labelText}</label>
+          <div ref="datePickerWrapper" className={this.wrapperClassName()}>
+            <input type            = "text"
+                   ref             = "dateInput"
+                   title           = {accessibleDateFormat()}
+                   data-tooltip    = ""
+                   className       = {this.props.inputClasses}
+                   aria-labelledby = {this.props.labelledBy}
+                   data-row-key    = {this.props.rowKey}
+                   data-date-type  = {this.props.dateType}
+                   defaultValue    = {this.formattedDate()} />
+          </div>
         </div>
       )
     }

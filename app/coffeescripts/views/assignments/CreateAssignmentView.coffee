@@ -7,8 +7,9 @@ define [
   'jst/EmptyDialogFormWrapper'
   'i18n!assignments'
   'jquery'
+  'compiled/api/gradingPeriodsApi'
   'jquery.instructure_date_and_time'
-], (_, Assignment, DialogFormView, DateValidator, template, wrapper, I18n, $) ->
+], (_, Assignment, DialogFormView, DateValidator, template, wrapper, I18n, $, GradingPeriodsAPI) ->
 
   class CreateAssignmentView extends DialogFormView
     defaults:
@@ -86,12 +87,21 @@ define [
       _.extend json,
         canChooseType: @assignmentGroup?
         uniqLabel: uniqLabel
+        disableDueAt: @disableDueAt()
+        isInClosedPeriod: @model.hasDueDateInClosedGradingPeriod()
+
+    currentUserIsAdmin: ->
+      _.contains(ENV.current_user_roles, "admin")
+
+    disableDueAt: ->
+      _.contains(@model.frozenAttributes(), "due_at") ||
+        (!@currentUserIsAdmin() && @model.hasDueDateInClosedGradingPeriod())
 
     openAgain: ->
       super
 
       timeField = @$el.find(".datetime_field")
-      if @model.multipleDueDates() || @model.isOnlyVisibleToOverrides() || @model.nonBaseDates()
+      if @model.multipleDueDates() || @model.isOnlyVisibleToOverrides() || @model.nonBaseDates() || @disableDueAt()
         timeField.tooltip
           position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
           tooltipClass: 'center bottom vertical',
@@ -130,13 +140,25 @@ define [
         ]
       errors
 
+    _dueAtHasChanged: (dueAt) =>
+      originalDueAt = new Date(@model.dueAt()).getTime()
+      newDueAt = new Date(dueAt).getTime()
+      originalDueAt != newDueAt
+
     _validateDueDate: (data, errors) ->
       return errors unless data.due_at
 
       validRange = ENV.VALID_DATE_RANGE
       data.lock_at = @model.lockAt()
       data.unlock_at = @model.unlockAt()
-      dateValidator = new DateValidator({date_range: _.extend({}, validRange), data: data})
+      data.persisted = !@_dueAtHasChanged(data.due_at)
+      dateValidator = new DateValidator(
+        date_range: _.extend({}, validRange)
+        data: data
+        multipleGradingPeriodsEnabled: !!ENV.MULTIPLE_GRADING_PERIODS_ENABLED
+        gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)
+        userIsAdmin: @currentUserIsAdmin()
+      )
       errs = dateValidator.validateDates()
 
       return errors if _.isEmpty(errs)

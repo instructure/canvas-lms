@@ -150,6 +150,13 @@ describe Quizzes::QuizzesController do
 
   describe "GET 'edit'" do
     before(:once) { course_quiz }
+
+    include_context "multiple grading periods within controller" do
+      let(:course) { @course }
+      let(:teacher) { @teacher }
+      let(:request_params) { [:edit, course_id: course, id: @quiz] }
+    end
+
     it "should require authorization" do
       get 'edit', :course_id => @course.id, :id => @quiz.id
       assert_unauthorized

@@ -417,7 +417,6 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
     showErrors: (errors) ->
       # override view handles displaying override errors, remove them
       # before calling super
-      # see getFormValues in DueDateView.coffee
       delete errors.assignmentOverrides
       super(errors)
       @trigger 'show-errors', errors

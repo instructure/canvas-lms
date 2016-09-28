@@ -21,13 +21,18 @@ define [
   'underscore'
   'timezone'
   'i18n!overrides'
-], ($, _, tz, I18n) ->
+  'jsx/grading/helpers/GradingPeriodsHelper'
+  'jsx/shared/helpers/dateHelper'
+], ($, _, tz, I18n, GradingPeriodsHelper, DateHelper) ->
 
   class DateValidator
 
-    constructor: (dateParams) ->
-      @dateRange = dateParams['date_range']
-      @data = dateParams['data']
+    constructor: (params) ->
+      @dateRange = params['date_range']
+      @data = params['data']
+      @multipleGradingPeriodsEnabled = params.multipleGradingPeriodsEnabled
+      @gradingPeriods = params.gradingPeriods
+      @userIsAdmin = params.userIsAdmin
 
     validateDates: ->
       lockAt = @data.lock_at
@@ -66,6 +71,13 @@ define [
           range: "end_range",
           type: "due"
         }
+
+      if @multipleGradingPeriodsEnabled && !@userIsAdmin && @data.persisted == false
+        datesToValidate.push {
+          date: dueAt,
+          range: "grading_period_range",
+        }
+
       if lockAt
         datesToValidate.push {
           date: lockAt,
@@ -86,9 +98,23 @@ define [
 
       @dateRange
 
+    _validateMultipleGradingPeriodsDate: (date, errs) =>
+      helper = new GradingPeriodsHelper(@gradingPeriods)
+      dueAt = if date == null then null else new Date(@_calendarDate(date))
+      return unless helper.isDateInClosedGradingPeriod(dueAt)
+
+      earliestDate = helper.earliestValidDueDate
+      if earliestDate
+        formatted = DateHelper.formatDateForDisplay(earliestDate)
+        errs["due_at"] = I18n.t("Please enter a due date on or after %{earliestDate}", earliestDate: formatted)
+      else
+        errs["due_at"] = I18n.t("Due date cannot fall in a closed grading period")
+
     _validateDateSequences: (datesToValidate, errs) =>
       for dateSet in datesToValidate
-        if dateSet.date
+        if dateSet.range == "grading_period_range"
+          @_validateMultipleGradingPeriodsDate(dateSet.date, errs)
+        else if dateSet.date
           switch dateSet.range
             when "start_range"
               _.each dateSet.validationDates, (validationDate, dateType) =>

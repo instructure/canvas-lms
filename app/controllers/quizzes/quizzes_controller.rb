@@ -303,8 +303,14 @@ class Quizzes::QuizzesController < ApplicationController
         :REGRADE_OPTIONS => regrade_options,
         :quiz_max_combination_count => QUIZ_MAX_COMBINATION_COUNT,
         :SHOW_QUIZ_ALT_TEXT_WARNING => true,
-        :VALID_DATE_RANGE => CourseDateRange.new(@context)
+        :VALID_DATE_RANGE => CourseDateRange.new(@context),
+        :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods)
       }
+
+      if @context.feature_enabled?(:multiple_grading_periods)
+        hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
+      end
+
       append_sis_data(hash)
       js_env(hash)
 

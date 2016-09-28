@@ -549,11 +549,17 @@ describe DiscussionTopicsController do
       course_topic
     end
 
-    before do
-      user_session(@teacher)
+    include_context "multiple grading periods within controller" do
+      let(:course) { @course }
+      let(:teacher) { @teacher }
+      let(:request_params) { [:edit, course_id: course, id: @topic] }
     end
 
     context 'conditional-release' do
+      before do
+        user_session(@teacher)
+      end
+
       it 'should include environment variables if enabled' do
         ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
         ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'value' })

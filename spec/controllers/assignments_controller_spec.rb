@@ -363,6 +363,12 @@ describe AssignmentsController do
   end
 
   describe "GET 'edit'" do
+    include_context "multiple grading periods within controller" do
+      let(:course) { @course }
+      let(:teacher) { @teacher }
+      let(:request_params) { [:edit, course_id: course, id: @assignment] }
+    end
+
     it "should require authorization" do
       #controller.use_rails_error_handling!
       get 'edit', :course_id => @course.id, :id => @assignment.id
