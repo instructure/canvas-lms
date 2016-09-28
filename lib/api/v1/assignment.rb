@@ -211,7 +211,13 @@ module Api::V1::Assignment
     end
 
     if opts[:include_all_dates] && assignment.assignment_overrides
-      hash['all_dates'] = assignment.dates_hash_visible_to(user)
+      override_count = assignment.assignment_overrides.loaded? ?
+        assignment.assignment_overrides.select(&:active?).count : assignment.assignment_overrides.active.count
+      if override_count < Setting.get('assignment_all_dates_too_many_threshold', '25').to_i
+        hash['all_dates'] = assignment.dates_hash_visible_to(user)
+      else
+        hash['all_dates_count'] = override_count
+      end
     end
 
     if opts[:include_module_ids]

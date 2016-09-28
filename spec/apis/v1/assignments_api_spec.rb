@@ -673,6 +673,35 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(assign['all_dates']).not_to be_nil
     end
 
+    it "doesn't include all_dates if there are too many" do
+      course_with_teacher_logged_in(:active_all => true)
+      s1 = student_in_course(:course => @course, :active_all => true).user
+      s2 = student_in_course(:course => @course, :active_all => true).user
+
+      a = @course.assignments.create!(:title => "all_date_test", :submission_types => "online_url", :only_visible_to_overrides => true)
+      o1 = assignment_override_model(:assignment => a)
+      os1 = o1.assignment_override_students.create!(:user => s1)
+
+      Setting.set('assignment_all_dates_too_many_threshold', '2')
+
+      @user = @teacher
+      json = api_call(:get,
+        "/api/v1/courses/#{@course.id}/assignments.json",
+        { :controller => 'assignments_api', :action => 'index', :format => 'json', :course_id => @course.id.to_s},
+        :include => ['all_dates'])
+      expect(json.first['all_dates'].count).to eq 1
+
+      o2 = assignment_override_model(:assignment => a)
+      os2 = o2.assignment_override_students.create!(:user => s2)
+
+      json = api_call(:get,
+        "/api/v1/courses/#{@course.id}/assignments.json",
+        { :controller => 'assignments_api', :action => 'index', :format => 'json', :course_id => @course.id.to_s},
+        :include => ['all_dates'])
+      expect(json.first['all_dates']).to be_nil
+      expect(json.first['all_dates_count']).to eq 2
+    end
+
 
     it "returns due dates as they apply to the user" do
       course_with_student(active_all: true)

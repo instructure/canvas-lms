@@ -1,6 +1,7 @@
 {{#if multipleDueDates}}
   <strong>{{#t "due"}}Due{{/t}}</strong>
 
+  {{#if allDates}}
   <a title class="vdd_tooltip_link"
      aria-labelledby="vdd_tooltip_{{selector}}"
      data-tooltip-selector="#vdd_tooltip_{{selector}}"
@@ -25,7 +26,9 @@
       {{/each}}
     </dl>
   </div>
-
+  {{else}}
+    {{#t "multiple_dates"}}Multiple Dates{{/t}}
+  {{/if}}
 {{else}}
   {{#if singleSectionDueDate}}
     <strong>{{#t "due_date"}}Due{{/t}}</strong>

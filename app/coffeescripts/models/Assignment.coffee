@@ -280,8 +280,12 @@ define [
         lock_at:   @get("lock_at")
 
     multipleDueDates: =>
-      dateGroups = @get("all_dates")
-      dateGroups && dateGroups.length > 1
+      count = @get("all_dates_count")
+      if count && count > 1
+        true
+      else
+        dateGroups = @get("all_dates")
+        dateGroups && dateGroups.length > 1
 
     hasDueDate: =>
       !@isPage()
