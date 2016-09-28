@@ -155,6 +155,19 @@ describe "calendar2" do
         expect(s2_events[0].start_at.to_date).to eq day2
         expect(s2_events[1].start_at.to_date).to eq (day2 + 1.week)
       end
+
+      it "should query for all the sections in a course when creating an event" do
+        15.times.with_index { |i| add_section("Section #{i}") }
+
+        num_sections = @course.course_sections.count
+
+        get "/courses/#{@course.id}/calendar_events/new"
+        wait_for_ajaximations
+        f('#use_section_dates').click
+
+        num_rows = ff(".show_if_using_sections .row_header").length
+        expect(num_rows).to be_equal(num_sections)
+      end
     end
   end
 end

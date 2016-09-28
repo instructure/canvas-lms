@@ -1,6 +1,6 @@
 define [
   'underscore'
-  'jsx/gradebook2/CheatDepaginator'
+  'jsx/shared/CheatDepaginator'
 ], (_, Depaginate) ->
   listUrl = () =>
     ENV.ENROLLMENT_TERMS_URL

@@ -1,7 +1,7 @@
 define [
-  'jquery'
+  'jquery',
   'helpers/fakeENV',
-  'compiled/api/enrollmentTermsApi'
+  'compiled/api/enrollmentTermsApi',
   'jquery.ajaxJSON'
 ], ($, fakeENV, api) ->
   deserializedTerms = [
@@ -79,10 +79,9 @@ define [
           start()
     @server.respond()
 
-  # TODO fixup CheatDepaginator for failure conditions
-  # asyncTest "SKIPPED: rejects the promise upon errors", ->
-  #    @server.respondWith "GET", /enrollment_terms/, [404, {"Content-Type":"application/json"}, "FAIL"]
-  #    api.list().catch (error) =>
-  #      equal error, "FAIL"
-  #      start()
-  #    @server.respond()
+  asyncTest "rejects the promise upon errors", ->
+     @server.respondWith "GET", /enrollment_terms/, [404, {"Content-Type":"application/json"}, "FAIL"]
+     api.list().catch (error) =>
+       ok "we got here"
+       start()
+     @server.respond()

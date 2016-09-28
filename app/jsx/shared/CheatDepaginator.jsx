@@ -50,6 +50,7 @@ define(["jquery", "underscore", "jquery.ajaxJSON"], ($, _) => {
   const cheaterDepaginate = (url, params, pageCallback) => {
     const gotAllPagesDfd = $.Deferred();
     const data = [];
+    const errHandler = function() {gotAllPagesDfd.reject()};
     pageCallback = consumePagesInOrder(pageCallback, data);
 
     $.ajaxJSON(url, "GET", params, (firstPageResponse, xhr) => {
@@ -78,8 +79,8 @@ define(["jquery", "underscore", "jquery.ajaxJSON"], ($, _) => {
         dfds.push(fetchPage(page));
       }
 
-      $.when(...dfds).then(() => gotAllPagesDfd.resolve(data));
-    });
+      $.when(...dfds).then(() => gotAllPagesDfd.resolve(data), errHandler);
+    }, errHandler);
 
     return gotAllPagesDfd;
   };
