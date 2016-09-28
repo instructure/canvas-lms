@@ -7,6 +7,7 @@ var bundleEntries = require("./bundles");
 var BundleExtensionsPlugin = require("./BundleExtensionsPlugin");
 var WebpackOnBuildPlugin = require('on-build-webpack');
 var path = require('path');
+require('babel-polyfill')
 
 module.exports = {
   devtool: 'eval',

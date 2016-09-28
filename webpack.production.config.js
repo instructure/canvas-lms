@@ -1,4 +1,3 @@
-import 'babel-polyfill'
 var webpack = require("webpack");
 var baseWebpackConfig = require("./frontend_build/baseWebpackConfig");
 var productionWebpackConfig = baseWebpackConfig;

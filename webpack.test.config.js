@@ -1,4 +1,3 @@
-import 'babel-polyfill'
 var webpack = require("webpack");
 var I18nPlugin = require("./frontend_build/i18nPlugin");
 var ClientAppsPlugin = require("./frontend_build/clientAppPlugin");

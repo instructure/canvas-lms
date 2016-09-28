@@ -3,13 +3,13 @@
 // compilation to extract i18nliner scopes, and then we wrap the resulting
 // template in an AMD module, giving it dependencies on handlebars, it's scoped
 // i18n object if it needs one, and any brandableCss variant stuff it needs.
-import Handlebars from 'handlebars'
-import {pick} from 'lodash'
-import {EmberHandlebars} from 'ember-template-compiler'
-import ScopedHbsExtractor from './../gems/canvas_i18nliner/js/scoped_hbs_extractor'
-import {allFingerprintsFor} from 'brandable_css/lib/main'
-import PreProcessor from './../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor'
-import './../gems/canvas_i18nliner/js/scoped_hbs_pre_processor'
+const Handlebars = require('handlebars')
+const {pick} = require('lodash')
+const {EmberHandlebars} = require('ember-template-compiler')
+const ScopedHbsExtractor = require('./../gems/canvas_i18nliner/js/scoped_hbs_extractor')
+const {allFingerprintsFor} = require('brandable_css/lib/main')
+const PreProcessor = require('./../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor')
+require('./../gems/canvas_i18nliner/js/scoped_hbs_pre_processor')
 
 const compileHandlebars = (data) => {
   const path = data.path
@@ -123,14 +123,14 @@ const buildPartialRequirements = (partialPaths) => {
   return requirements
 }
 
-export default function i18nLinerHandlebarsLoader (source) {
+module.exports = function i18nLinerHandlebarsLoader (source) {
   this.cacheable()
   const name = resourceName(this.resourcePath)
   const dependencies = ['handlebars']
 
-  var partialRegistration = emitPartialRegistration(this.resourcePath, name)
+  const partialRegistration = emitPartialRegistration(this.resourcePath, name)
 
-  var cssRegistration = buildCssReference(name)
+  const cssRegistration = buildCssReference(name)
   if (cssRegistration){
     // arguments[1] will be brandableCss
     dependencies.push('compiled/util/brandableCss')
@@ -149,6 +149,6 @@ export default function i18nLinerHandlebarsLoader (source) {
   if (result.translationCount > 0) {
     dependencies.push('i18n!' + result.scope)
   }
-  var compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies, cssRegistration, partialRegistration)
+  const compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies, cssRegistration, partialRegistration)
   return compiledTemplate
 }
