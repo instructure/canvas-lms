@@ -396,7 +396,10 @@ CanvasRails::Application.routes.draw do
     get 'user_notes' => 'user_notes#user_notes'
     get 'details/sis_publish' => 'courses#sis_publish_status', as: :sis_publish_status
     post 'details/sis_publish' => 'courses#publish_to_sis', as: :publish_to_sis
+
     resources :user_lists, only: :create
+    post 'invite_users' => 'users#invite_users', :as => :invite_users
+
     post 'reset' => 'courses#reset_content'
     resources :alerts
     post :student_view
