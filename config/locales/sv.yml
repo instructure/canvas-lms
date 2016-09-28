@@ -16184,7 +16184,7 @@ sv:
       long: "%Y %B %d, %H:%M"
       short: "%d %b %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%k"
+      tiny_on_the_hour: "%-k:%M"
     less_than_a_minute_ago: "mindre än en minut sen"
     pm: pm
     ranges: 
