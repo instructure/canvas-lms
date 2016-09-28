@@ -190,7 +190,7 @@ define([], function(){
   EditorConfig.prototype.toolbar = function(){
     var instructure_buttons = this.buildInstructureButtons();
     var stuff = this.balanceButtons(instructure_buttons);
-    stuff[0] += (",bz_retained_field,bz_retained_field_view,bz_iframe");
+    stuff[0] += (",bz_retained_field,bz_retained_field_view,bz_iframe,bz_tooltip,bz_quickquiz,bz_checklist");
     return stuff;
   };
 
