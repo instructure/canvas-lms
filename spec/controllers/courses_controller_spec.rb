@@ -1225,6 +1225,17 @@ describe CoursesController do
       enrollment = @course.reload.teachers.find { |t| t.name == 'Sam' }.enrollments.first
       expect(enrollment.limit_privileges_to_course_section).to eq true
     end
+
+    it "should also accept a list of user ids (instead of ye old UserList)" do
+      u1 = user
+      u2 = user
+      user_session(@teacher)
+      post 'enroll_users', :course_id => @course.id, :user_ids => [u1.id, u2.id]
+      expect(response).to be_success
+      @course.reload
+      expect(@course.students).to include(u1)
+      expect(@course.students).to include(u2)
+    end
   end
 
   describe "POST create" do
