@@ -12,12 +12,13 @@ define [
       @course_id = @get('course_id')
       @course_id ||= @collection.course_id if @collection
 
-      items = @get('items')
-      @itemCollection = new ModuleItemCollection items,
-        module_id: @get('id')
-        course_id: @course_id
-      if !items
-        @itemCollection.setParam('per_page', 50)
-        @itemCollection.fetch()
+      unless @collection?.skip_items
+        items = @get('items')
+        @itemCollection = new ModuleItemCollection items,
+          module_id: @get('id')
+          course_id: @course_id
+        if !items
+          @itemCollection.setParam('per_page', 50)
+          @itemCollection.fetch()
 
       super
