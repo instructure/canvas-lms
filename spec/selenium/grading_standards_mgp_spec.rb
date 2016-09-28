@@ -59,6 +59,14 @@ describe "multiple grading periods account page" do
       expect(grading_period_list).not_to contain_css(period_css)
     end
 
+    it "defaults close date to end date", test_id: 2887215, priority: "1" do
+      backend_period_helper.create_with_group_for_account(Account.default, title: "New Period")
+      visit_account_grading_standards(Account.default.id)
+      expand_first_set
+      period_edit_button.click
+      expect(close_date_input.attribute("value")).to eq(end_date_input.attribute("value"))
+    end
+
     context "with populated data" do
       group_name_1 = "Group 1"
       group_name_2 = "Group 2"
