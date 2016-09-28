@@ -4962,7 +4962,7 @@ nn:
       tomorrow: "I morgon"
       yesterday: "I går"
     formats: 
-      date_at_time: "%b %-d at %l:%M%P"
+      date_at_time: "%-d. %b %-k:%M"
       default: "%Y-%m-%d"
       full: "%b %-d, %Y %-l:%M%P"
       full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
@@ -14801,7 +14801,7 @@ nn:
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny_on_the_hour: "%-k:%M"
     less_than_a_minute_ago: "mindre enn eit minutt sidan"
     pm: pm
     ranges: 
