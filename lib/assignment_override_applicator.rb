@@ -261,7 +261,7 @@ module AssignmentOverrideApplicator
 
     self.setup_overridden_clone(unoverridden_assignment_or_quiz,
                                 overrides) do |cloned_assignment_or_quiz|
-      if overrides
+      if overrides && overrides.any?
         self.collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field,value|
           # for any times in the value set, bring them back from raw UTC into the
           # current Time.zone before placing them in the assignment
@@ -291,20 +291,22 @@ module AssignmentOverrideApplicator
   def self.collapsed_overrides(assignment_or_quiz, overrides)
     cache_key = [assignment_or_quiz, self.overrides_hash(overrides)].cache_key
     Rails.cache.delete(cache_key) if assignment_or_quiz.reload_overrides_cache?
-    Rails.cache.fetch(cache_key) do
-      overridden_data = {}
-      # clone the assignment_or_quiz, apply overrides, and freeze
-      [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].each do |field|
-        if assignment_or_quiz.respond_to?(field)
-          value = self.send("overridden_#{field}", assignment_or_quiz, overrides)
-          # force times to un-zoned UTC -- this will be a cached value and should
-          # not care about the TZ of the user that cached it. the user's TZ will
-          # be applied before it's returned.
-          value = value.utc if value && value.respond_to?(:utc) && !value.is_a?(Date)
-          overridden_data[field] = value
+    RequestCache.cache('collapsed_overrides', cache_key) do
+      Rails.cache.fetch(cache_key) do
+        overridden_data = {}
+        # clone the assignment_or_quiz, apply overrides, and freeze
+        [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].each do |field|
+          if assignment_or_quiz.respond_to?(field)
+            value = self.send("overridden_#{field}", assignment_or_quiz, overrides)
+            # force times to un-zoned UTC -- this will be a cached value and should
+            # not care about the TZ of the user that cached it. the user's TZ will
+            # be applied before it's returned.
+            value = value.utc if value && value.respond_to?(:utc) && !value.is_a?(Date)
+            overridden_data[field] = value
+          end
         end
+        overridden_data
       end
-      overridden_data
     end
   end
 
