@@ -98,41 +98,31 @@ define([
                 </div>
 
                 <div className="ic-Form-control">
-                  <div className="ic-Label" aria-hidden="true">
+                  <label id="start-date-label" htmlFor="start-date" className="ic-Label">
                     {I18n.t("Start Date")}
-                  </div>
-
-                  <div className="ic-Multi-input">
-                    <div className="ic-Input-group">
-                      <label className="screenreader-only" htmlFor="start-date">
-                        {I18n.t("Start Date")}
-                      </label>
-                      <DueDateCalendarPicker dateValue    = {this.state.period.startDate}
-                                             ref          = "startDate"
-                                             dateType     = "due_at"
-                                             handleUpdate = {changeStartDate.bind(this)}
-                                             rowKey       = "start-date"
-                                             labelledBy   = "start-date" />
-                    </div>
-
-                    <span aria-hidden="true">{I18n.t("Until")}</span>
-
-                    <div className="ic-Input-group">
-                      <label className="screenreader-only" htmlFor="end-date">
-                        {I18n.t("End Date")}
-                      </label>
-                      <DueDateCalendarPicker dateValue    = {this.state.period.endDate}
-                                             ref          = "endDate"
-                                             dateType     = "due_at"
-                                             handleUpdate = {changeEndDate.bind(this)}
-                                             rowKey       = "end-date"
-                                             labelledBy   = "end-date" />
-                    </div>
-                  </div>
+                  </label>
+                  <DueDateCalendarPicker dateValue    = {this.state.period.startDate}
+                                         ref          = "startDate"
+                                         dateType     = "due_at"
+                                         handleUpdate = {changeStartDate.bind(this)}
+                                         rowKey       = "start-date"
+                                         labelledBy   = "start-date-label" />
                 </div>
 
                 <div className="ic-Form-control">
-                  <label className="ic-Label" htmlFor="close-date">
+                  <label id="end-date-label" htmlFor="end-date" className="ic-Label">
+                    {I18n.t("End Date")}
+                  </label>
+                  <DueDateCalendarPicker dateValue    = {this.state.period.endDate}
+                                         ref          = "endDate"
+                                         dateType     = "due_at"
+                                         handleUpdate = {changeEndDate.bind(this)}
+                                         rowKey       = "end-date"
+                                         labelledBy   = "end-date-label" />
+                </div>
+
+                <div className="ic-Form-control">
+                  <label id="close-date-label" htmlFor="close-date" className="ic-Label">
                     {I18n.t("Close Date")}
                   </label>
                   <DueDateCalendarPicker dateValue    = {this.state.period.closeDate}
@@ -140,7 +130,7 @@ define([
                                          dateType     = "due_at"
                                          handleUpdate = {changeCloseDate.bind(this)}
                                          rowKey       = "close-date"
-                                         labelledBy   = "close-date" />
+                                         labelledBy   = "close-date-label" />
                 </div>
               </div>
             </div>
