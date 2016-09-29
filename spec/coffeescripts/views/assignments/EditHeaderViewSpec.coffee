@@ -12,15 +12,16 @@ define [
     name: 'Test Assignment'
     assignment_overrides: []
 
-  editHeaderView = (assignment_opts = {}) ->
-    $.extend(assignment_opts, defaultAssignmentOpts)
-    assignment = new Assignment assignment_opts
+  editHeaderView = (assignmentOptions = {}, viewOptions = {}) ->
+    $.extend(assignmentOptions, defaultAssignmentOpts)
+    assignment = new Assignment assignmentOptions
 
     app = new EditHeaderView
       model: assignment
       views:
         'edit_assignment_form': new Backbone.View
           template: editViewTemplate
+      userIsAdmin: viewOptions.userIsAdmin
 
     app.render()
 
@@ -42,6 +43,37 @@ define [
 
     view.delete()
     equal cb.called, true, 'onDeleteSuccess was called'
+
+  test "disallows deleting frozen assignments", ->
+    view = editHeaderView(frozen: true)
+    ok view.$(".delete_assignment_link.disabled").length
+
+  test "disallows deleting assignments due in closed grading periods", ->
+    view = editHeaderView(has_due_date_in_closed_grading_period: true)
+    ok view.$(".delete_assignment_link.disabled").length
+
+  test "allows deleting non-frozen assignments not due in closed grading periods", ->
+    view = editHeaderView(frozen: false, has_due_date_in_closed_grading_period: false)
+    ok view.$(".delete_assignment_link:not(.disabled)").length
+
+  test "allows deleting frozen assignments for admins", ->
+    view = editHeaderView({ frozen: true }, { userIsAdmin: true })
+    ok view.$(".delete_assignment_link:not(.disabled)").length
+
+  test "allows deleting assignments due in closed grading periods for admins", ->
+    view = editHeaderView({ has_due_date_in_closed_grading_period: true }, { userIsAdmin: true })
+    ok view.$(".delete_assignment_link:not(.disabled)").length
+
+  test 'does not attempt to delete an assignment due in a closed grading period', ->
+    view = editHeaderView(has_due_date_in_closed_grading_period: true)
+
+    @stub(window, "confirm", -> true )
+    @spy view, "delete"
+
+    view.$(".delete_assignment_link").click()
+
+    ok window.confirm.notCalled
+    ok view.delete.notCalled
 
   module 'EditHeaderView - ConditionalRelease',
     setup: ->

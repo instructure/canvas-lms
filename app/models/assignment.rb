@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1002,7 +1002,14 @@ class Assignment < ActiveRecord::Base
     can :grade and can :attach_submission_comment_files
 
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    can :update and can :delete and can :create and can :read and can :attach_submission_comment_files
+    can :update and can :create and can :read and can :attach_submission_comment_files
+
+    given do |user, session|
+      self.context.grants_right?(user, session, :manage_assignments) &&
+        (user.admin_of_root_account?(self.context.root_account) ||
+         !due_for_any_student_in_closed_grading_period?)
+    end
+    can :delete
   end
 
   def user_can_read_grades?(user, session=nil)
@@ -2085,6 +2092,19 @@ class Assignment < ActiveRecord::Base
   def excused_for?(user)
     s = submissions.where(user_id: user.id).first_or_initialize
     s.excused?
+  end
+
+  def due_for_any_student_in_closed_grading_period?(periods = nil)
+    return false unless self.due_date || self.has_overrides?
+
+    periods ||= GradingPeriod.for(self.course)
+    due_in_closed_period = !self.only_visible_to_overrides &&
+      GradingPeriodHelper.date_in_closed_grading_period?(self.due_date, periods)
+    due_in_closed_period ||= self.active_assignment_overrides.any? do |override|
+      GradingPeriodHelper.date_in_closed_grading_period?(override.due_at, periods)
+    end
+
+    due_in_closed_period
   end
 
   # simply versioned models are always marked new_record, but for our purposes

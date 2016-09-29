@@ -58,3 +58,28 @@ def create_adhoc_override_for_assignment(assignment_or_quiz, users, opts={})
   end
   @override
 end
+
+module Factories
+  class AssignmentOverrideHelper
+    def create_adhoc_override(assignment_or_quiz, student, opts = {})
+      override = assignment_override_model(
+        assignment: assignment_or_quiz,
+        due_at: opts.key?(:due_at) ? opts[:due_at] : 7.days.from_now
+      )
+      override_student = override.assignment_override_students.build
+      override_student.user = student
+      override_student.save!
+      override
+    end
+
+    def create_group_override(assignment_or_quiz, group, opts = {})
+      override = assignment_override_model(
+        assignment: assignment_or_quiz,
+        due_at: opts.key?(:due_at) ? opts[:due_at] : 7.days.from_now
+      )
+      override.set = group
+      override.save!
+      override
+    end
+  end
+end

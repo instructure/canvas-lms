@@ -1017,7 +1017,14 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) } #admins.include? user }
-    can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit and can :preview
+    can :read_statistics and can :manage and can :read and can :update and can :create and can :submit and can :preview
+
+    given do |user, session|
+      self.context.grants_right?(user, session, :manage_assignments) &&
+      (user.admin_of_root_account?(self.context.root_account) ||
+       !due_for_any_student_in_closed_grading_period?)
+    end
+    can :delete
 
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) } #admins.include? user }
     can :read_statistics and can :read and can :submit and can :grade and can :review_grades
@@ -1306,6 +1313,20 @@ class Quizzes::Quiz < ActiveRecord::Base
     if assignment
       assignment.submission_for_student(student).excused?
     end
+  end
+
+  def due_for_any_student_in_closed_grading_period?(periods = nil)
+    return false unless self.due_at || self.has_overrides?
+
+    periods ||= GradingPeriod.for(self.course)
+    due_in_closed_period =
+      !self.only_visible_to_overrides &&
+      GradingPeriodHelper.date_in_closed_grading_period?(self.due_at, periods)
+    due_in_closed_period ||= self.active_assignment_overrides.any? do |override|
+      GradingPeriodHelper.date_in_closed_grading_period?(override.due_at, periods)
+    end
+
+    due_in_closed_period
   end
 
   delegate :feature_enabled?, to: :context

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -75,7 +75,14 @@ class AssignmentGroup < ActiveRecord::Base
     can :read
 
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
-    can :read and can :create and can :update and can :delete
+    can :read and can :create and can :update
+
+    given do |user, session|
+      self.context.grants_right?(user, session, :manage_assignments) &&
+        (user.admin_of_root_account?(self.context.root_account) ||
+         !has_assignment_due_in_closed_grading_period?)
+    end
+    can :delete
   end
 
   workflow do
@@ -198,6 +205,15 @@ class AssignmentGroup < ActiveRecord::Base
       return true if asmnt.att_frozen?(:assignment_group_id,user)
     end
     false
+  end
+
+  def has_assignment_due_in_closed_grading_period?
+    published_assignments = context.assignments.published.where(assignment_group_id: self).
+      preload(:active_assignment_overrides, :context)
+    periods = GradingPeriod.for(self.course)
+    published_assignments.any? do |assignment|
+      assignment.due_for_any_student_in_closed_grading_period?(periods)
+    end
   end
 
   def visible_assignments(user, includes=[])

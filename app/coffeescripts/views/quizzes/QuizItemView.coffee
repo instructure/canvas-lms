@@ -64,9 +64,13 @@ define [
     redirectTo: (path) ->
       location.href = path
 
+    canDelete: ->
+      @model.get('permissions').delete
+
     onDelete: (e) =>
       e.preventDefault()
-      @delete() if confirm(@messages.confirm)
+      if @canDelete()
+        @delete() if confirm(@messages.confirm)
 
     # delete quiz item
     delete: ->

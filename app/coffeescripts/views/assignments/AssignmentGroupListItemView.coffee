@@ -18,6 +18,7 @@ define [
   class AssignmentGroupListItemView extends DraggableCollectionView
     @mixin AssignmentKeyBindingsMixin
     @optionProperty 'course'
+    @optionProperty 'userIsAdmin'
 
     tagName: "li"
     className: "item-group-condensed"
@@ -83,6 +84,11 @@ define [
       if @model.hasRules()
         @createRulesToolTip()
 
+    createItemView: (model) ->
+      options =
+        userIsAdmin: @userIsAdmin
+      new @itemView $.extend {}, {model}, options
+
     createRulesToolTip: =>
       link = @$el.find('.tooltip_link')
       link.tooltip
@@ -121,8 +127,9 @@ define [
           assignmentGroup: @model
         @createAssignmentView = new CreateAssignmentView
           assignmentGroup: @model
-        @deleteGroupView = new DeleteGroupView
-          model: @model
+        if @canDelete()
+          @deleteGroupView = new DeleteGroupView
+            model: @model
         @moveGroupView = new MoveDialogView
           model: @model
           closeTarget: @$el.find('a[id*=manage_link]')
@@ -160,6 +167,7 @@ define [
       attributes = _.extend(data, {
         course_home: ENV.COURSE_HOME
         canMove: canMove
+        canDelete: @canDelete()
         showRules: @model.hasRules()
         rulesText: I18n.t('rules_text', "Rule", { count: @model.countRules() })
         displayableRules: @displayableRules()
@@ -297,6 +305,9 @@ define [
       key = @cacheKey()
       expanded = !@cache.get(key)
       @cache.set(key, expanded)
+
+    canDelete: ->
+      @userIsAdmin or @model.canDelete()
 
     canManage: ->
       ENV.PERMISSIONS.manage

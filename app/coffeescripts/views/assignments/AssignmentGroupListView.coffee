@@ -27,6 +27,7 @@ define [
 
   class AssignmentGroupListView extends SortableCollectionView
     @optionProperty 'course'
+    @optionProperty 'userIsAdmin'
 
     template: template
     itemView: AssignmentGroupListItemView
@@ -49,11 +50,11 @@ define [
         groupId: model.id
         reorderURL: @createReorderURL(model.id)
         noItemTemplate: NoAssignmentsListItem
+        userIsAdmin: @userIsAdmin
       new @itemView $.extend {}, (@itemViewOptions || {}), {model}, options
 
     createReorderURL: (id) ->
       @assignment_sort_base_url + "/" + id + "/reorder"
-
 
     # TODO: make menu a child view of listitem so that it can be rendered
     # by itself, and so it can manage all of the dialog stuff,

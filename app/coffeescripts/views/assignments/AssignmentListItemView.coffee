@@ -21,6 +21,8 @@ define [
 
   class AssignmentListItemView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
+    @optionProperty 'userIsAdmin'
+
     tagName: "li"
     className: "assignment"
     template: template
@@ -42,8 +44,8 @@ define [
       'keydown': 'handleKeys'
 
     messages:
-      confirm: I18n.t('confirms.delete_assignment', 'Are you sure you want to delete this assignment?')
-      ag_move_label: I18n.beforeLabel I18n.t('labels.assignment_group_move_label', 'Assignment Group')
+      confirm: I18n.t('Are you sure you want to delete this assignment?')
+      ag_move_label: I18n.beforeLabel I18n.t('Assignment Group')
 
     initialize: ->
       super
@@ -147,6 +149,7 @@ define [
       # can move items if there's more than one parent
       # collection OR more than one in the model's collection
       data.canMove = @model.collection.view?.parentCollection?.length > 1 or @model.collection.length > 1
+      data.canDelete = @canDelete()
       data.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
       data.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
 
@@ -186,6 +189,7 @@ define [
 
     onDelete: (e) =>
       e.preventDefault()
+      return unless @canDelete()
       return @$el.find('a[id*=manage_link]').focus() unless confirm(@messages.confirm)
       if @previousAssignmentInGroup()?
         @focusOnAssignment(@previousAssignmentInGroup())
@@ -199,6 +203,9 @@ define [
       @model.destroy success: =>
         $.screenReaderFlashMessage(I18n.t('Assignment was deleted'))
       @$el.remove()
+
+    canDelete: ->
+      @userIsAdmin or @model.canDelete()
 
     canManage: ->
       ENV.PERMISSIONS.manage
