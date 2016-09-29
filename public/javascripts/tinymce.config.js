@@ -60,14 +60,17 @@ define([], function(){
         "instructure_external_tools": "/javascripts/tinymce_plugins/instructure_external_tools/plugin.js",
         "instructure_record": "/javascripts/tinymce_plugins/instructure_record/plugin.js",
         "bz_retained_fields": "/javascripts/tinymce_plugins/bz_retained_fields/plugin.js",
+	"bz_buttons":         "/javascripts/tinymce_plugins/bz_buttons/plugin.js",
         "bz_iframes":         "/javascripts/tinymce_plugins/bz_iframes/plugin.js"
       },
       language_load: false,
       relative_urls: false,
+      // we add the menubar for a11y purposes but then
+      // hide it with js for non screenreader users
       menubar: true,
       remove_script_host: true,
       resize: true,
-      block_formats: "Paragraph=p;Header 3=h3;Header 4=h4;Header 5=h5;Block Quote=blockquote",
+      block_formats: "Paragraph=p;Header 2=h2;Header 3=h3;Header 4=h4;Header 5=h5;Preformatted=pre;Block Quote=blockquote",
 
       style_formats: [
 	{title: 'Intro', inline: 'span', classes: 'bz-intro'},
@@ -96,7 +99,8 @@ define([], function(){
       extended_valid_elements: "*[*]",
       valid_children: "+body[style|script|svg|textarea|img],+p[textarea|input]",
 
-      content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css," + window.bz_custom_css_url + ",/bz_editor.css",
+      non_empty_elements: "td th iframe video audio object script a i area base basefont br col frame hr img input isindex link meta param embed source wbr track",
+      content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css + "," + window.bz_custom_css_url + ",/bz_editor.css",
       browser_spellcheck: true
     };
   };
@@ -110,12 +114,12 @@ define([], function(){
    * @private
    * @return {String} comma delimited set of external buttons
    */
-  EditorConfig.prototype.external_buttons = function(){
+  EditorConfig.prototype.external_buttons = function() {
     var externals = "";
-    for(var idx in this.extraButtons) {
-      if(this.extraButtons.length <= this.maxButtons || idx < this.maxButtons - 1) {
+    for (var idx = 0; this.extraButtons && (idx < this.extraButtons.length); idx++) {
+      if (this.extraButtons.length <= this.maxButtons || idx < this.maxButtons - 1) {
         externals = externals + ",instructure_external_button_" + this.extraButtons[idx].id;
-      } else if(!externals.match(/instructure_external_button_clump/)) {
+      } else if (!externals.match(/instructure_external_button_clump/)) {
         externals = externals + ",instructure_external_button_clump";
       }
     }

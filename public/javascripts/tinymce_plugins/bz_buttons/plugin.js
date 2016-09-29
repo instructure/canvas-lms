@@ -133,7 +133,7 @@ tinymce.create('tinymce.plugins.BZButtons', {
 	);
     }
 
-    ed.addCommand('bzQuickQuiz', tooltipDialog);
+    ed.addCommand('bzQuickQuiz', quickQuizDialog);
     ed.addButton('bz_quickquiz', {
       title: 'Add Quick Quiz',
       image: url + '/btn-quick-quiz.png',
@@ -177,7 +177,7 @@ tinymce.create('tinymce.plugins.BZButtons', {
 	);
     }
 
-    ed.addCommand('bzChecklist', tooltipDialog);
+    ed.addCommand('bzChecklist', checklistDialog);
     ed.addButton('bz_checklist', {
       title: 'Add Checklist',
       image: url + '/btn-magic-checklist.png',
@@ -196,4 +196,4 @@ tinymce.create('tinymce.plugins.BZButtons', {
   }
 });
 
-tinymce.PluginManager.add('bz_iframes', tinymce.plugins.BZButtons);
+tinymce.PluginManager.add('bz_buttons', tinymce.plugins.BZButtons);
