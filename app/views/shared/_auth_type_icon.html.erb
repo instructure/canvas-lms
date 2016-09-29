@@ -1,8 +1,10 @@
-<%= image_tag("sso_buttons/sso-#{auth_type}.svg", class: "ic-Login_icon-sso ic-Login_icon-sso--icon-only icon-sso-#{auth_type}", role: "presentation", alt: "") %>
+<span class="ic-Login_icon-sso ic-Login_icon-sso--icon-only" role="presentation">
+  <%= svg_icon "#{auth_type}" %>
+</span>
 <% if with_login_text %>
-  <span class="ic-Login_sso-button_title ic-Login_sso-button_title--<%= auth_type %>">
+  <span class="ic-Login__sso-button__title ic-Login__sso-button__title--<%= auth_type %>">
     <%= t do %>
-      Login with <span class="ic-Login_sso-button_title-caps"><%= auth_type %></span>
+      Login with <span class="ic-Login__sso-button__title-caps"><%= auth_type %></span>
     <% end %>
   </span>
 <% end %>

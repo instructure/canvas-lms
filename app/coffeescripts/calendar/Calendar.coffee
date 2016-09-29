@@ -237,7 +237,14 @@ define [
         else
           I18n.t('event_event_title', 'Event Title:')
 
-      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}"))
+      reservedText = ""
+      if event.isAppointmentGroupEvent()
+        if event.reservedUsers == ""
+            reservedText = "\n\n#{I18n.t('Unreserved')}"
+        else
+          reservedText = "\n\n#{I18n.t('Reserved By: ')} #{event.reservedUsers}"
+
+      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-title').text()}\n\n#{I18n.t('Calendar:')} #{htmlEscape(event.contextInfo.name)} #{htmlEscape(reservedText)}"))
       $element.find('.fc-content').prepend($("<span class='screenreader-only'>#{htmlEscape I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}</span>"))
       $element.find('.fc-title').prepend($("<span class='screenreader-only'>#{htmlEscape screenReaderTitleHint} </span>"))
       $element.find('.fc-title').toggleClass('calendar__event--completed', event.isCompleted())

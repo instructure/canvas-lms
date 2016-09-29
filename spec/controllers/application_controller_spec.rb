@@ -471,6 +471,8 @@ describe ApplicationController do
           :url => "http://#{HostUrl.default_host}/selection_test",
           :selection_width => 400,
           :selection_height => 400}
+        tool.settings[:selection_width] = 500
+        tool.settings[:selection_height] = 300
         tool.save!
         tool
       end
@@ -496,6 +498,33 @@ describe ApplicationController do
         expect(assigns[:lti_launch].params["resource_link_id"]).to eq 'e62d81a8a1587cdf9d3bbc3de0ef303d6bc70d78'
       end
 
+      it 'uses selection_width and selection_height if provided' do
+        controller.stubs(:named_context_url).returns(tool.url)
+        controller.stubs(:render)
+        controller.stubs(js_env:[])
+        controller.instance_variable_set(:"@context", course)
+        content_tag.stubs(:id).returns(42)
+        controller.send(:content_tag_redirect, course, content_tag, nil)
+
+        expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq '500px'
+        expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq '300px'
+      end
+
+      it 'appends px to tool dimensions only when needed' do
+        tool.settings = {}
+        tool.save!
+        content_tag = ContentTag.create(content: tool, url: tool.url)
+
+        controller.stubs(:named_context_url).returns(tool.url)
+        controller.stubs(:render)
+        controller.stubs(js_env:[])
+        controller.instance_variable_set(:"@context", course)
+        content_tag.stubs(:id).returns(42)
+        controller.send(:content_tag_redirect, course, content_tag, nil)
+
+        expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq '100%'
+        expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq '100%'
+      end
     end
 
   end

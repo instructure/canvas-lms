@@ -33,6 +33,7 @@ define([
   'compiled/models/Publishable',
   'compiled/views/PublishButtonView',
   'str/htmlEscape',
+  'jsx/modules/utils/setupContentIds',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
@@ -47,7 +48,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'compiled/jquery.rails_flash_notifications'
-], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape) {
+], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -837,6 +838,7 @@ define([
       success: function(data, $module) {
         $module.loadingImage('remove');
         $module.attr('id', 'context_module_' + data.context_module.id);
+        setupContentIds($module, data.context_module.id);
 
         // Set this module up with correct data attributes
         $module.data('moduleId', data.context_module.id);

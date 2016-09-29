@@ -1,9 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" role="presentation" aria-hidden="true" class="ic-icon-svg ic-icon-svg--facebook" width="21" height="21" viewBox="0 0 21 21" version="1.1">
-  <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-    <g transform="translate(-82.000000, -38.000000)">
-      <g transform="translate(82.000000, 38.000000)">
-        <path d="M19.8 21C20.5 21 21 20.5 21 19.8L21 1.2C21 0.5 20.5 0 19.8 0L1.2 0C0.5 0 0 0.5 0 1.2L0 19.8C0 20.5 0.5 21 1.2 21L19.8 21M14.5 21L14.5 12.9 17.2 12.9 17.6 9.7 14.5 9.7 14.5 7.7C14.5 6.8 14.7 6.1 16.1 6.1L17.7 6.1 17.7 3.3C17.4 3.3 16.4 3.2 15.3 3.2 12.9 3.2 11.2 4.7 11.2 7.4L11.2 9.7 8.5 9.7 8.5 12.9 11.2 12.9 11.2 21 14.5 21" fill="#3B5998"/>
-      </g>
-    </g>
-  </g>
+<svg
+  class="ic-icon-svg ic-icon-svg--facebook"
+  version="1.1"
+  viewBox="0 0 32 32"
+  xmlns="http://www.w3.org/2000/svg">
+<path d="M26.7,0H5.3C2.4,0,0,2.4,0,5.3v21.3C0,29.6,2.4,32,5.3,32h21.3c2.9,0,5.3-2.4,5.3-5.3V5.3C32,2.4,29.6,0,26.7,0z M27.2,16
+	H22v14h-6V16h-2.9v-4.6H16v-3c0-4,1.7-6.4,6.5-6.4H28v5h-4.5c-1.3,0-1.5,0.7-1.5,2l0,2.5h6L27.2,16z"/>
 </svg>

@@ -467,8 +467,8 @@ describe "Feature Flags API", type: :request do
     before do
       Feature.stubs(:definitions).returns({
           'custom_feature' => Feature.new(feature: 'custom_feature', applies_to: 'Course', state: 'allowed',
-                after_state_change_proc: ->(context, from_state, to_state) do
-                  t_state_changes << [context.id, from_state, to_state]
+                after_state_change_proc: ->(user, context, from_state, to_state) do
+                  t_state_changes << [user.id, context.id, from_state, to_state]
                 end
           )
       })
@@ -479,7 +479,7 @@ describe "Feature Flags API", type: :request do
         api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature?state=on",
            { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'custom_feature', state: 'on' })
       }.to change(t_state_changes, :size).by(1)
-      expect(t_state_changes.last).to eql [t_course.id, 'allowed', 'on']
+      expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'allowed', 'on']
     end
 
     it "should fire when changing a feature flag's state" do
@@ -488,7 +488,7 @@ describe "Feature Flags API", type: :request do
         api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature?state=on",
            { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'custom_feature', state: 'on' })
       }.to change(t_state_changes, :size).by(1)
-      expect(t_state_changes.last).to eql [t_course.id, 'off', 'on']
+      expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'off', 'on']
     end
   end
 

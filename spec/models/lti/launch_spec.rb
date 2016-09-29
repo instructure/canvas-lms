@@ -16,19 +16,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module ConditionalRelease
-  class ScoreRangeDefaultsController < ApplicationController
-    def index
-      get_context
-      unless ConditionalRelease::Service.enabled_in_context?(@context)
-        return render template: 'shared/errors/404_message', status: :not_found
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
+module Lti
+  describe Launch do
+  let(:launch) {Launch.new}
+
+    describe 'initialize' do
+      it 'correctly sets tool dimension default' do
+        expect(subject.tool_dimensions).to eq({selection_height: '100%', selection_width: '100%'})
       end
 
-      conditional_release_js_env
-
-      render locals: {
-        cr_app_url: ConditionalRelease::Service.edit_rule_url,
-      }
+      it 'uses specified tool dimensions if they are provided' do
+        options = {
+          tool_dimensions: {selection_height: '800', selection_width: '600'}
+        }
+        launch = Launch.new(options)
+        expect(launch.tool_dimensions).to eq options[:tool_dimensions]
+      end
     end
   end
 end

@@ -564,15 +564,27 @@ describe Quizzes::QuizSubmission do
         expect(@quiz_submission.submission.workflow_state).to eql 'pending_review'
       end
 
-      it "should mark a submission as complete once an essay question has been graded" do
+      def grade_question(score)
         @quiz_submission.update_scores({
           'context_id' => @course.id,
           'override_scores' => true,
           'context_type' => 'Course',
           'submission_version_number' => '1',
-          "question_score_#{@questions[0].id}" => '1'
+          "question_score_#{@questions[0].id}" => "#{score}"
         })
+      end
+
+      it "should mark a submission as complete once an essay question has been graded" do
+        grade_question(1)
         expect(@quiz_submission.submission.workflow_state).to eql 'graded'
+      end
+
+      it "recomputes grades when a quiz submission is graded (even if the score doesn't change)" do
+        enrollment = @quiz_submission.user.enrollments.first
+        expect(enrollment.computed_current_score).to eq nil
+        grade_question(0)
+        enrollment.reload
+        expect(enrollment.computed_current_score).to eq 0
       end
 
       it "should increment the assignment needs_grading_count for pending_review state" do

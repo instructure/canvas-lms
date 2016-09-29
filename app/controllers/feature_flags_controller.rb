@@ -259,7 +259,7 @@ class FeatureFlagsController < ApplicationController
       new_flag, saved = create_or_update_feature_flag(new_attrs, current_flag)
       if saved
         if prior_state != new_flag.state && feature_def.after_state_change_proc.is_a?(Proc)
-          feature_def.after_state_change_proc.call(@context, prior_state, new_flag.state)
+          feature_def.after_state_change_proc.call(@current_user, @context, prior_state, new_flag.state)
         end
         render json: feature_flag_json(new_flag, @context, @current_user, session)
       else

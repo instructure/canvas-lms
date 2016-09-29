@@ -2,10 +2,11 @@ module Lti
   class Launch
 
     attr_writer :analytics_id, :analytics_message_type
-    attr_accessor :link_text, :resource_url, :params, :launch_type
+    attr_accessor :link_text, :resource_url, :params, :launch_type, :tool_dimensions
 
     def initialize(options = {})
       @post_only = options[:post_only]
+      @tool_dimensions = options[:tool_dimensions] || {selection_height: '100%', selection_width: '100%'}
     end
 
     def resource_url
