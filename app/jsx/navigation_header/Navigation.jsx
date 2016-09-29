@@ -235,7 +235,7 @@ define([
           onBlur={this.closeTray}
           closeTimeoutMS={400}
           getAriaHideElement={() => $('#application')[0]}
-          getElementToFocus={() => $('.ic-NavMenu__closeButton')[0]}
+          getElementToFocus={() => $('.ReactTray__Content')[0]}
         >
           {this.renderTrayContent()}
         </Tray>

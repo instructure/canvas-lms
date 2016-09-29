@@ -148,7 +148,6 @@ describe Feature do
       expect(fd.default_transitions(t_user, 'off')).to eql({'on'=>{'locked'=>false}})
     end
   end
-
 end
 
 describe "Feature.register" do

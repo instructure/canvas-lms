@@ -298,7 +298,8 @@ class Submission < ActiveRecord::Base
   end
 
   def update_final_score
-    if score_changed? || excused_changed?
+    if score_changed? || excused_changed? ||
+        (workflow_state_was == "pending_review" && workflow_state == "graded")
       if skip_grade_calc
         Rails.logger.info "GRADES: NOT recomputing scores for submission #{global_id} because skip_grade_calc was set"
       else

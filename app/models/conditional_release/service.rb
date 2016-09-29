@@ -26,7 +26,7 @@ module ConditionalRelease
       protocol: nil,  # defaults to Canvas
       edit_rule_path: "ui/editor",
       stats_path: "stats",
-      create_account_path: 'api/account',
+      create_account_path: 'api/accounts',
       content_exports_path: 'api/content_exports',
       content_imports_path: 'api/content_imports',
       rules_summary_path: 'api/rules/summary',

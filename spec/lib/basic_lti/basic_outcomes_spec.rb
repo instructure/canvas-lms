@@ -270,5 +270,91 @@ describe BasicLTI::BasicOutcomes do
       submission = assignment.submissions.where(user_id: @user.id).first
       expect(submission.submission_type).to eq 'basic_lti_launch'
     end
+
+    context "submissions" do
+
+      it "creates a new submissions if there isn't one" do
+        xml.css('resultData').remove
+        expect{BasicLTI::BasicOutcomes.process_request(tool, xml)}.
+          to change{assignment.submissions.where(user_id: @user.id).count}.from(0).to(1)
+      end
+
+      it 'creates a new submission of type "external_tool" when a grade is passed back without a submission' do
+        xml.css('resultData').remove
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(assignment.submissions.where(user_id: @user.id).first.submission_type).to eq 'external_tool'
+      end
+
+      it "doesn't create a new submission if there is only a score sent" do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "text data for canvas submission",
+            grade: "92%"
+          })
+        xml.css('resultData').remove
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.versions.count).to eq 1
+      end
+
+      it "creates a new submission if result_data_text is sent" do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "sample text",
+            grade: "92%"
+          })
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.versions.count).to eq 2
+      end
+
+      it "creates a new submission if result_data_url is sent" do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "sample text",
+            grade: "92%"
+          })
+        xml.css('resultScore').remove
+        xml.at_css('text').replace('<url>http://example.com/launch</url>')
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.versions.count).to eq 2
+      end
+
+      it "creates a new submission if result_data_launch_url is sent" do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "sample text",
+            grade: "92%"
+          })
+        xml.css('resultScore').remove
+        xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.versions.count).to eq 2
+      end
+
+      it "doesn't change the submission type if only the score is sent" do
+        submission_type = 'online_text_entry'
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: submission_type,
+            body: "sample text",
+            grade: "92%"
+          })
+        xml.css('resultData').remove
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.submission_type).to eq submission_type
+      end
+
+    end
+
+
+
   end
 end

@@ -83,7 +83,7 @@ module Selinimum
         # anything loaded *before* cannot (yet) have its dependencies traced
         dependencies["__all_autoloads"] = AutoloadExtensions.loaded_paths
 
-        data = Hash[dependencies.map { |k, v| [k, v.to_a] }].to_json
+        data = Hash[dependencies.map { |k, v| [k, v.to_a] }]
 
         StatStore.save_stats(data, batch_name)
       end

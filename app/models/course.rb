@@ -814,10 +814,6 @@ class Course < ActiveRecord::Base
     end
 
     RequestCache.cache('user_has_been_admin', self, user) do
-      if @user_ids_by_enroll_type
-        next %w{TaEnrollment TeacherEnrollment DesignerEnrollment}.any?{|type| @user_ids_by_enroll_type[type].include?(user.id)}
-      end
-
       Rails.cache.fetch([self, user, "course_user_has_been_admin"].cache_key) do
         # active here is !deleted; it still includes concluded, etc.
         self.admin_enrollments.active.where(user_id: user).exists?
