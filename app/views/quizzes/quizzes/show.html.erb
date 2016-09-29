@@ -70,6 +70,11 @@
           </li>
         <% end %>
       </ul>
+      <% if can_do(@context, @current_user, :view_all_grades) &&
+              @quiz.assignment.present? &&
+              ConditionalRelease::Service.triggers_mastery_paths?(@quiz.assignment, @current_user, session) %>
+        <div id="crs-graphs"></div>
+      <% end %>
     </div>
 
     <% if @submission && params[:preview] %>

@@ -7,7 +7,8 @@
     <%= render :partial => "submission_sidebar" %>
   <% end %>
 
-  <% if ConditionalRelease::Service.enabled_in_context?(@context) %>
+  <% if can_do(@context, @current_user, :view_all_grades) &&
+        ConditionalRelease::Service.triggers_mastery_paths?(@assignment, @current_user, session) %>
     <div id="crs-graphs"></div>
   <% end %>
 </div>

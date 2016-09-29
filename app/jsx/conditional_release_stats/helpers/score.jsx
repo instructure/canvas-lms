@@ -75,13 +75,13 @@ define([
   const percentToLetterGrade = (score, assignment) => {
     if (score === '') { return '' }
     const letterGrade = { letter: null, score: -Infinity }
-    assignment.grading_scheme.forEach((v, k) => {
-      v = parseFloat(v)
+    for (const k in assignment.grading_scheme) {
+      const v = parseFloat(assignment.grading_scheme[k])
       if ((v <= score && v > letterGrade.score) || (v === 0 && v > score)) {
         letterGrade.score = v
         letterGrade.letter = k
       }
-    })
+    }
     return letterGrade.letter ? letterGrade.letter : score
   }
 

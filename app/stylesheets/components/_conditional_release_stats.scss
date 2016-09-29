@@ -1,5 +1,12 @@
-.crs-breakdown-graph {
+#crs-graphs {
   margin-top: 50px;
+
+  &:first-child {
+    margin: 0px;
+  }
+}
+
+.crs-breakdown-graph {
   display: flex;
   flex-direction: column;
 

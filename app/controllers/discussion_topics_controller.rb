@@ -586,7 +586,7 @@ class DiscussionTopicsController < ApplicationController
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
             append_sis_data(js_hash)
             js_env(js_hash)
-
+            conditional_release_js_env(@topic.assignment, include_rule: true)
           end
         end
       end

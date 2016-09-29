@@ -165,7 +165,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :rce_js_env
 
-  def conditional_release_js_env(assignment = nil)
+  def conditional_release_js_env(assignment, include_rule: false)
     return unless ConditionalRelease::Service.enabled_in_context?(@context)
     cr_env = ConditionalRelease::Service.env_for(
       @context,
@@ -173,7 +173,8 @@ class ApplicationController < ActionController::Base
       session: session,
       assignment: assignment,
       domain: request.env['HTTP_HOST'],
-      real_user: @real_current_user
+      real_user: @real_current_user,
+      include_rule: include_rule
     )
     js_env(cr_env)
   end
