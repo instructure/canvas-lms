@@ -14,7 +14,10 @@ tinymce.create('tinymce.plugins.BZButtons', {
       hdr.className = "bz-dialog-header";
       div.appendChild(hdr);
 
-      creationFunction(div);
+      var innerDiv = document.createElement("div");
+      div.appendChild(innerDiv);
+
+      creationFunction(innerDiv);
 
       var i = document.createElement("button");
       i.setAttribute("type", "button");
@@ -91,7 +94,7 @@ tinymce.create('tinymce.plugins.BZButtons', {
     	var titleInput;
 	var statements = [], typeSelects = [];
 	showDialog(
-		"Add Tooltip",
+		"Add Quick Quiz",
 		function(div) {
 		  titleInput = addField(div, "Question:", "input");
 
