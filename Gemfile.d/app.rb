@@ -48,7 +48,6 @@ gem 'hairtrigger', '0.2.15'
   gem 'ruby_parser', '3.7.0', require: false
 gem 'hashery', '1.3.0', require: false
 gem 'highline', '1.6.1', require: false
-gem 'hoe', '3.15.1'
 gem 'httparty', '0.13.7'
 gem 'i18n', '0.7.0'
 gem 'i18nema', '0.0.8'
