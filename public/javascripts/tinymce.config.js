@@ -61,7 +61,8 @@ define([], function(){
         "instructure_record": "/javascripts/tinymce_plugins/instructure_record/plugin.js",
         "bz_retained_fields": "/javascripts/tinymce_plugins/bz_retained_fields/plugin.js",
 	"bz_buttons":         "/javascripts/tinymce_plugins/bz_buttons/plugin.js",
-        "bz_iframes":         "/javascripts/tinymce_plugins/bz_iframes/plugin.js"
+        "bz_iframes":         "/javascripts/tinymce_plugins/bz_iframes/plugin.js",
+        "bz_surveys":         "/javascripts/tinymce_plugins/bz_surveys/plugin.js"
       },
       language_load: false,
       relative_urls: false,
@@ -194,7 +195,7 @@ define([], function(){
   EditorConfig.prototype.toolbar = function(){
     var instructure_buttons = this.buildInstructureButtons();
     var stuff = this.balanceButtons(instructure_buttons);
-    stuff[0] += (",bz_retained_field,bz_retained_field_view,bz_iframe,bz_tooltip,bz_quickquiz,bz_checklist");
+    stuff[0] += (",bz_retained_field,bz_retained_field_view,bz_iframe,bz_survey,bz_tooltip,bz_quickquiz,bz_checklist");
     return stuff;
   };
 
