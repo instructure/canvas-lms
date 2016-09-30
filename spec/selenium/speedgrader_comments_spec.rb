@@ -1,9 +1,11 @@
 require_relative "common"
 require_relative "helpers/speed_grader_common"
+require_relative "helpers/assignments_common"
 
 describe "speed grader" do
   include_context "in-process server selenium tests"
   include SpeedGraderCommon
+  include AssignmentsCommon
 
   before(:each) do
     stub_kaltura
@@ -381,6 +383,49 @@ describe "speed grader" do
         f('#prev-student-button').click
         expect(ffj('#comments .comment .comment_flex > a.delete_comment_link:visible')).to have_size(1)
       end
+    end
+  end
+
+  context 'group assignment comments' do
+    before(:each) do
+      @assignment = create_assignment_for_group('online_url', true)
+      @student1 = @students.first
+      @student2 = @students.second
+      add_user_to_group(@student2,@testgroup[0])
+
+      @group_comment_1 = "group comment from student 1"
+      @assignment.submit_homework(@student1, submission_type: "online_url", url: "http://instructure.com",
+        comment: @group_comment_1, group_comment: true)
+
+      @private_comment_1 = "private comment from student 1"
+      @assignment.submit_homework(@student1, comment: @private_comment_1)
+
+      @group_comment_2 = "group comment from student 2"
+      @assignment.submit_homework(@student2, comment: @group_comment_2, group_comment: true)
+
+      @private_comment_2 = "private comment from student 2"
+      @assignment.submit_homework(@student2, comment: @private_comment_2)
+
+      course_with_teacher_logged_in(course: @course)
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    end
+
+    it 'should not allow non-group comments to be seen by group', priority: "1", test_id: 728596 do
+      goto_student(@student1.name)
+      expect(comment_list).to include(@private_comment_1)
+      expect(comment_list).not_to include(@private_comment_2)
+      goto_student(@student2.name)
+      expect(comment_list).not_to include(@private_comment_1)
+      expect(comment_list).to include(@private_comment_2)
+    end
+
+    it 'should allow group-comments to be seen by whole group', priority: "1", test_id: 728611 do
+      goto_student(@student1.name)
+      expect(comment_list).to include(@group_comment_1)
+      expect(comment_list).to include(@group_comment_2)
+      goto_student(@student2.name)
+      expect(comment_list).to include(@group_comment_1)
+      expect(comment_list).to include(@group_comment_2)
     end
   end
 end
