@@ -133,6 +133,30 @@ describe EnrollmentState do
       expect(enroll_state.state_started_at).to eq ended_at
     end
 
+    it "should invalidate enrollments even if they have null lock versions (i.e. already exist before db migration)" do
+      course(:active_all => true)
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      enroll = student_in_course(:course => @course)
+      enroll_state = enroll.enrollment_state
+      EnrollmentState.where(:enrollment_id => enroll_state).update_all(:lock_version => nil)
+
+      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e.course == @course}
+
+      @course.reload
+      @course.start_at = 4.days.ago
+      ended_at = 3.days.ago
+      @course.conclude_at = ended_at
+      @course.save!
+
+      enroll_state.reload
+      expect(enroll_state.state_is_current?).to be_falsey
+
+      enroll_state.ensure_current_state
+      expect(enroll_state.state).to eq 'completed'
+      expect(enroll_state.state_started_at).to eq ended_at
+    end
+
     it "should invalidate enrollments after changing course setting overriding term dates" do
       course(:active_all => true)
       enroll = student_in_course(:course => @course)
