@@ -22,13 +22,13 @@ module Api
   module Html
     class Link
       attr_reader :link
-      def initialize(link_string)
-        @link = link_string
+      def initialize(link_string, host: nil)
+        @link, @host = link_string, host
       end
 
       def to_corrected_s
         return link if is_not_actually_a_link? || should_skip_correction?
-        strip_verifier_params(scope_link_to_context(link))
+        strip_verifier_params(scope_link_to_context(strip_host(link)))
       end
 
       private
@@ -37,6 +37,17 @@ module Api
       SKIP_CONTEXT_TYPES = ["User"]
       LINK_REGEX = %r{/files/(\d+)/(?:download|preview)}
       VERIFIER_REGEX = %r{(\?)verifier=[^&]*&?|&verifier=[^&]*}
+
+      def strip_host(link)
+        return link if @host.nil?
+        uri = URI.parse(link)
+        if uri.host == @host
+          fragment = "##{uri.fragment}" if uri.fragment
+          "#{uri.request_uri}#{fragment}"
+        else
+          link
+        end
+      end
 
       def strip_verifier_params(local_link)
         if local_link.include?('verifier=')
@@ -47,11 +58,9 @@ module Api
       end
 
       def scope_link_to_context(local_link)
-        uri = URI.parse(local_link)
-        if uri.path.start_with?('/files')
+        if local_link.start_with?('/files')
           if attachment && APPLICABLE_CONTEXT_TYPES.include?(attachment.context_type)
-            uri.path = "/#{attachment.context_type.underscore.pluralize}/#{attachment.context_id}#{uri.path}"
-            return uri.to_s
+            return "/#{attachment.context_type.underscore.pluralize}/#{attachment.context_id}" + local_link
           end
         end
 
