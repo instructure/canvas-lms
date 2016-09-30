@@ -31,6 +31,7 @@ define [
 
   'fullcalendar'
   'fullcalendar/dist/lang-all'
+  'jsx/calendar/patches-to-fullcalendar'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
