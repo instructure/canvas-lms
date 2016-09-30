@@ -131,7 +131,7 @@ class Assignment
       enrollment_types_by_id = enrollments.inject({}){ |h, e| h[e.user_id] ||= e.type; h }
 
       if @assignment.quiz
-        if @assignment.quiz.assignment_overrides.to_a.select(&:active).count == 0
+        if @assignment.quiz.assignment_overrides.to_a.select(&:active?).count == 0
           @assignment.quiz.has_no_overrides = true
         else
           @assignment.quiz.context.preload_user_roles!
