@@ -42,7 +42,7 @@ class EnrollmentDateBuilder
     return if to_preload.empty?
     ActiveRecord::Associations::Preloader.new.preload(to_preload, :course_section)
     ActiveRecord::Associations::Preloader.new.preload(to_preload.map(&:course).uniq, :enrollment_term)
-    to_preload.each { |e| build(e) }
+    to_preload.each { |e| build(e, use_cache) }
   end
 
   def self.preload_state(enrollments)
@@ -65,15 +65,15 @@ class EnrollmentDateBuilder
     enrollment.instance_variable_set(:@enrollment_dates, result)
   end
 
-  def self.build(enrollment)
-    EnrollmentDateBuilder.new(enrollment).build
+  def self.build(enrollment, use_cache=true)
+    EnrollmentDateBuilder.new(enrollment).build(use_cache)
   end
 
   def cache_key
     @cache_key ||= self.class.cache_key(@enrollment)
   end
 
-  def build
+  def build(use_cache=true)
     if enrollment_is_restricted?
       add_enrollment_dates(@enrollment)
     elsif section_is_restricted?
@@ -92,7 +92,7 @@ class EnrollmentDateBuilder
       @enrollment_dates
     end
 
-    Rails.cache.write(cache_key, @enrollment_dates)
+    Rails.cache.write(cache_key, @enrollment_dates) if use_cache
     @enrollment.instance_variable_set(:@enrollment_dates, @enrollment_dates)
   end
 
