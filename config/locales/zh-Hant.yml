@@ -140,7 +140,7 @@ zh-Hant:
   account_authorization_configs: 
     account_required: "必須為 LDAP 驗證"
     index: 
-      delete_auth_confirmation: 是否確定？如果移除，則使用者可能無法登入。
+      delete_auth_confirmation: 是否確定？如果刪除，則使用者可能無法登入。
       delete_auth_link: 清除所有驗證資訊
       ip_address_list_description: "如果您正在使用需要 Canvas 伺服器直接連接您的伺服器的驗證服務，如 LDAP，則需要確保您的伺服器可以接受來自這些 IP 位址的連接："
       no_auth_type_description: 此帳戶目前無法與身份識別提供者整合。
@@ -948,7 +948,7 @@ zh-Hant:
         self_registration_type_observer: 僅觀察者帳戶
         show_scheduler: 啟用排程器
         sis_app_token: "SIS 代理權杖"
-        sis_app_url: "SIS 應用 URL"
+        sis_app_url: "SIS 應用程式 URL"
         sis_default_grade_export: 在作業，有評分的討論和隨堂考部分，“發佈成績到SIS”選項默認為開啟。
         sis_source_id: "SIS ID"
         start_at: 開始
@@ -999,7 +999,7 @@ zh-Hant:
       open_report_description: 公開報告說明
       page_header_title: 帳戶設定
       page_title: 帳戶設定
-      quiz_ip_filters_delete: 移除篩選器
+      quiz_ip_filters_delete: 刪除篩選器
       quiz_ip_filters_help_message: |-
           測驗 IP 篩選器是一種限制存取在一個指定的 IP 範圍內的電腦的測驗。
           
@@ -1336,7 +1336,7 @@ zh-Hant:
   add_people_7ee4b2ec: 新增人員
   add_quiz_ip_filter_c7b37dc5: "新增測驗 IP 篩選器"
   add_recipient_ff135ed7: 新增收件者
-  add_remove_or_rearrange_sections_for_this_portfoli_4628320a: 新增、移除或重新排列此檔案袋的章節
+  add_remove_or_rearrange_sections_for_this_portfoli_4628320a: 新增、刪除或重新排列此檔案袋的章節
   add_review_2fb1590c: 添加檢閲
   add_rubric_3636d9a6: 新增題目
   add_section_8b027a1c: 新增章節
@@ -1388,7 +1388,7 @@ zh-Hant:
         add_alert: 警示
       description: "教師已 %{count} 天沒有與學生互動"
       option: 沒有教師互動
-      remove: 移除此項目
+      remove: 刪除此項目
       the_student: 學生
       the_teacher: 教師
       title: 自從教師與學生互動之日起的天數
@@ -1409,7 +1409,7 @@ zh-Hant:
   all_account_types_e83c1516: 所有的帳戶類型
   all_accounts_3bafc860: 所有
   all_changes_were_saved_f6f3ddcc: 所有改動已保存
-  all_configured_apps_a14eef0a: 所有已配置的應用
+  all_configured_apps_a14eef0a: 所有已配置的應用程式
   all_courses_a7dbb853: 所有課程
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: 所有日期字段必須存在並且格式正確
   all_finished_time_to_publish_your_course_click_the_b6f07217: 全部完成？現在該發佈您的課程了！按一下下方的按鈕正式發佈吧！發佈課程將讓使用者能夠開始參與該課程。
@@ -1560,7 +1560,7 @@ zh-Hant:
   app_b157c2b3: 應用程式
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "應用程式中心將出現在一門課程或一個帳戶設置頁面上的“應用程式”標籤中。下方提供的 URL 應指向一個有效的應用程式中心端點（例如，%{url} ——請確保省略了尾斜杠）"
   app_placements_6d877225: 應用程式配置
-  app_reregistration_87cc8817: "App 程式再註冊"
+  app_reregistration_87cc8817: 應用程式再註冊
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "在每個事件后附加數字 (如：事件1，事件2，等等)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "在每個事件后附加數字 (如：事件1，事件2，等等)\" for=\"追加_叠代器"
   application: 
@@ -1645,8 +1645,8 @@ zh-Hant:
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: 是否確定要阻止該用戶活動？該用戶將無法參加課程。
   are_you_sure_you_want_to_publish_this_comment_26989c2f: 是否確定要公佈此註解？
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: 您確定要刪除此評分時段嗎？
-  are_you_sure_you_want_to_remove_this_tool_7363f90b: 是否確定要移除此工具？
-  are_you_sure_you_want_to_remove_this_user_8d1a8295: 是否確定要移除此使用者？
+  are_you_sure_you_want_to_remove_this_tool_7363f90b: 是否確定要刪除此工具？
+  are_you_sure_you_want_to_remove_this_user_8d1a8295: 是否確定要刪除此使用者？
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: 您確定要報告該個人檔案圖片嗎？
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: 是否確定要提交此評論？
   argentina_3257a200: 阿根廷
@@ -1686,7 +1686,7 @@ zh-Hant:
     feed_entry_title: "任務：%{assignment}"
     feed_entry_title_with_course: "任務，%{course}: %{assignment}"
     gpa_scale_explainer: "GPA 比例分級是什麼？"
-    group_assignment_must_have_group_set: 請為此任務選擇一個群組
+    group_assignment_must_have_group_set: 請為此任務選擇一個群組集合
     labels: 
       due: 截止日期
     name_is_required: 名稱是必需的！
@@ -1898,11 +1898,11 @@ zh-Hant:
       deleting: 正在刪除...
       labels: 
         delete_assignments_in_group: 刪除其任務
-        move_assignments_to: 將其任務移動到
+        move_assignments_to: 將其任務移至
       options: 
         select_group: 選擇群組
       tooltips: 
-        target_group: 選擇群組以將此任務移動到
+        target_group: 選擇群組以將此任務移至
       warnings: 
         delete_assignment_group: "將要刪除 *%{name}*，其中有 **%{assignment_count}** 個任務。"
       would_you_like: 是否想要：
@@ -1916,7 +1916,7 @@ zh-Hant:
     drop_lowest_scores: "降低最低 %{number} 分"
     due_date_view: 
       overrides: 
-        remove_these_dates: 移除這些日期
+        remove_these_dates: 刪除這些日期
     edit: 
       edit_assignment: 編輯任務
     edit_header_view: 
@@ -2141,8 +2141,8 @@ zh-Hant:
       redirect_message: |-
           此提交是一个 URL，現在正在帶您前往 URL 链接。
           [按一下這裡以前往提交頁面](%{url})
-    remove_never_drop_rule: 移除切勿丟棄規則
-    remove_unsaved_never_drop_rule: 移除未儲存的切勿丟棄規則
+    remove_never_drop_rule: 刪除切勿丟棄規則
+    remove_unsaved_never_drop_rule: 刪除未儲存的切勿丟棄規則
     rules_text: 
       one: "%{count} 個規則"
       other: "%{count} 個規則"
@@ -2736,7 +2736,7 @@ zh-Hant:
     edit_appointment_group: 
       affect_reservations: 這將如何影響預約？
       appt_group_options_help1: 一些現有的預約超過您所新增的限制。這些將不會受到影響，這種變化僅阻礙進行新預約。
-      appt_group_options_help2: 但是，可以手動移除任何現有的預約。
+      appt_group_options_help2: 但是，可以手動刪除任何現有的預約。
       calendar: 月曆
       date: 日期
       details: 詳細資料
@@ -3012,7 +3012,7 @@ zh-Hant:
   canvas_ticketing_email_connector_27e253ae: "Canvas 票務電子郵件連接器"
   canvas_ticketing_web_post_connector_11158897: "Canvas 票務網頁后連接器"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas 將在您儲存測驗後重新評分所有提交件，這可能需要幾分鐘的時間。"
-  careful_changes_to_group_membership_will_apply_to__19a9089c: 請注意！對群組成員的改動會應用于已經提交了任務的群組。造成的結果可能是群組任務提交不一致。您確定希望為未來的任務建立一個新群組嗎？
+  careful_changes_to_group_membership_will_apply_to__19a9089c: 請注意！對群組成員的改動會應用于已經提交了任務的群組。造成的結果可能是群組任務提交不一致。您確定希望為未來的任務建立一個新群組集合嗎？
   cas_url_4ba2843e: "CAS URL"
   catalog_already_enabled_56478a3c: Catalog目錄已採用
   catalog_name_46d37909: Catalog目錄名稱
@@ -3116,7 +3116,7 @@ zh-Hant:
         groups: 群組
         loading: 載入
         people: 人員
-        remove_all: 全部移除
+        remove_all: 全部刪除
       member_instructions: 按一下或點一下左側欄中的使用者或群組以新增協作者。
     delete_button: 
       links: 
@@ -3560,17 +3560,17 @@ zh-Hant:
         date_adjustment: 日期調整
         ending_change_to: 更改為
         ending_date: 結束日期
-        remove_dates: 移除日期
+        remove_dates: 刪除日期
         shift_dates: 變換日期
         substitution: 替換
       day_substitution: 
         move_from: 移動自
         move_from_select_label: 從一週的日移動
         move_from_select_title: 從一週的日移動
-        move_to_select_label: 移動至一週的日
-        move_to_select_title: 移動至一週的日
-        remove_day_substitution_link: 移除日替換
-        remove_day_substitution_link_label: 移除日替換
+        move_to_select_label: 移至週的某日
+        move_to_select_title: 移至週的某日
+        remove_day_substitution_link: 刪除日替換
+        remove_day_substitution_link_label: 刪除日替換
         to_happen_on: 至
       external_tool_launch: 
         course: 課程
@@ -3711,7 +3711,7 @@ zh-Hant:
         message_user: 傳送訊息
         more_about_this_user: 關於此使用者的更多資訊
         more_user_details: 更多使用者詳細資料...
-        remove_avatar: 移除頭像圖片
+        remove_avatar: 刪除頭像圖片
         report_avatar: 舉報不適當的圖片
         restore_enrollment: 還原此註冊
         student_teacher_activity: 與您互動
@@ -3810,7 +3810,7 @@ zh-Hant:
       update: 更新模組
     confirm: 
       delete: 是否確定要刪除此模組？
-      delete_item: 是否確定要從模組移除此項目？
+      delete_item: 是否確定要從模組刪除此項目？
     content_next: 
       add_prerequisite: "新增先決條件至 *%{module}*"
       assignment_points_possible: "/ %{points_possible}"
@@ -3853,10 +3853,10 @@ zh-Hant:
       links: 
         student_progress: 檢視進度
         title: 
-          remove_prerequisite: 移除此先決條件
+          remove_prerequisite: 刪除此先決條件
       module: 模組
       module_details: "模組按順序顯示，所以只有那些 %{name} 以上的模組可以被設定為先決條件。"
-      modules_keyboard_hint_updated: 警告：爲了提高重新排列模組（或模組項目）的可存取性，請使用功能表中的『移動到對話方塊』選項。
+      modules_keyboard_hint_updated: "警告：爲了提高重新排列模組 (或模組項目) 的可存取性，請使用功能表中的『移動到對話方塊』選項。"
       move_module: 
         after: 之後
         before: 之前
@@ -3894,7 +3894,7 @@ zh-Hant:
         text: 
           delete_module: 刪除
           edit_module: 編輯
-          move_module: 移動到...
+          move_module: 移至...
         title: 
           delete_module: 刪除此模組
           edit_module: 編輯
@@ -3902,7 +3902,7 @@ zh-Hant:
           student_progress: 查看此模組的學生進度
       manager_module: 管理模組
       module_will_unlock_at: "將解除鎖定 *%{unlock_date}*"
-      modules_keyboard_drag_and_drop: 警告：爲了提高重新排列模組（或模組項目）的可存取性，請使用功能表中的『移動到對話方塊』選項。
+      modules_keyboard_drag_and_drop: "警告：爲了提高重新排列模組 (或模組項目) 的可存取性，請使用功能表中的『移動到對話方塊』選項。"
       progression_complete_count: "*%{count}* 完成"
       progression_started_count: "*%{count}* 進行中"
       reorder_modules: 拖曳以重新排序模組
@@ -3939,15 +3939,15 @@ zh-Hant:
         move_item_label: 移動此項目
         outdent: 減少縮排
         outdent_item: 減少縮排
-        remove_item: 移除
-        remove_item_from_module: 從模組移除此項目
+        remove_item: 刪除
+        remove_item_from_module: 從模組刪除此項目
       max_score: 
         fulfilled: "得分不得超過 %{score}"
         unfulfilled: "得分必須不得超過 %{score}"
       min_score: 
         fulfilled: "得分至少為 %{score}"
         unfulfilled: "得分至少為 %{score}"
-      modules_item_move_to: 移動到...
+      modules_item_move_to: 移至...
       must_contribute: 
         fulfilled: 已貢獻
         unfulfilled: 貢獻
@@ -4013,7 +4013,7 @@ zh-Hant:
     add_attachment: 
       titles: 
         attachment: 要附加的檔案
-        remove_attachment: 移除附件
+        remove_attachment: 刪除附件
     all_courses: 所有課程
     all_in_context: "%{context} 中的所有"
     archive: 封存
@@ -4133,7 +4133,7 @@ zh-Hant:
       titles: 
         media_comment: 已記錄的媒體註解
         record_media_comment: 錄製音訊或視頻註解
-        remove_media_comment: 移除媒體註解
+        remove_media_comment: 刪除媒體註解
     message_item: 
       delete: 刪除
       forward: 轉寄
@@ -4376,9 +4376,9 @@ zh-Hant:
   course_id_8bd2a21c: "課程 ID"
   course_id_a7c924d5: "課程 id"
   course_image_settings_eba3ec55: 課程影像設定
-  course_implemented_apps_fa658f5a: 課程植入的應用
+  course_implemented_apps_fa658f5a: 課程植入的應用程式
   course_list: 
-    favorited_tooltip: 按一下以從課程功能表中移除。
+    favorited_tooltip: 按一下以從課程功能表中刪除。
     nonfavorited_tooltip: 按一下以新增至課程功能表。
     wrapper: 
       close_course_menu_title: 關閉
@@ -4510,7 +4510,7 @@ zh-Hant:
       re_sending_invitation: 正在重新傳送邀請...
       republish: "重新發佈成績至 SIS"
     re_send_invitation: 重新傳送邀請
-    remove_user_from_course_section: "從 %{course_section} 中移除使用者"
+    remove_user_from_course_section: "從 %{course_section} 中刪除使用者"
     titles: 
       link_to_students: 連結至學生
       move_course: 移動課程
@@ -4546,7 +4546,7 @@ zh-Hant:
       biography: 個人簡介
       instructor_name: 名稱
       job_title: 標題
-      remove_instructor: 移除導師
+      remove_instructor: 刪除導師
     confirm_action: 
       buttons: 
         conclude_course: 結束課程
@@ -4708,7 +4708,7 @@ zh-Hant:
         adding_n_users: "已驗證並準備新增 %{users.length} 使用者："
         can_only_grade_students_in_section: 僅可在其章節內為學生評分
         close: 已完成
-        duplicates_removed: 一些重複資料已被移除。
+        duplicates_removed: 一些重複資料已被刪除。
         email: 電子郵件
         email_field_label: 輸入您想新增的使用者的電子郵件地址，並以逗號分隔
         email_field_place_holder: "『範例學生』<student@example.com>，『姓氏，名字』<firstlast@example.com>， justAnEmailAddress@example.com"
@@ -4729,7 +4729,7 @@ zh-Hant:
       index: 
         cannot_add_users: 無法新增新使用者，因為這門課程已結束
         filter_field_description: 搜尋人員。當您在這個欄位中鍵入時，人員清單將會被自動篩選，以便只包括那些與您的輸入相符合的名稱。
-        group_set: 群組設定
+        group_set: 群組集合
         people: 人員
         role_to_search: 限制搜尋至角色
         search_people: 搜尋人員
@@ -4756,7 +4756,7 @@ zh-Hant:
         links: 
           edit_sections: 編輯章節
           link_to_students: 連結至學生
-          remove_from_course: 從課程移除
+          remove_from_course: 從課程刪除
           resend_invitation: 重新傳送邀請
           user_details: 使用者詳細資料
         manage_user: "管理 %{name}"
@@ -4774,11 +4774,11 @@ zh-Hant:
         total_activity: 總活動
         you_can_search_by: 可以按以下方式搜尋：
       section: 
-        remove_user_from_course_section: "從 %{name} 移除使用者"
+        remove_user_from_course_section: "從 %{name} 刪除使用者"
     section: 
       enrollment: 
         links: 
-          unenroll_user: 從課程移除使用者
+          unenroll_user: 從課程刪除使用者
     settings: 
       alerts_title: 警示
       buttons: 
@@ -5597,7 +5597,7 @@ zh-Hant:
       graded_discussion: 已評分的討論：
       last_post_date: "上次發帖 %{display_last_reply_at}"
       manage: 管理
-      move: 移動到...
+      move: 移至...
       no_due_date: 無截止日期
       open_for_comments: 開啟以征求意見
       pin: 釘選
@@ -5837,7 +5837,7 @@ zh-Hant:
       saving_reply: 正在儲存回覆...
     reply_attachment: 
       attachment_label: 附件
-      remove_attachment: 移除
+      remove_attachment: 刪除
     reply_form: 
       attach_file: 附加
       cancel: 取消
@@ -6220,7 +6220,7 @@ zh-Hant:
         add_page: 新增另一個頁面
       titles: 
         delete_page: 刪除此頁面
-        manage_pages: 新增、移除或重新排列此章節的頁面
+        manage_pages: 新增、刪除或重新排列此章節的頁面
         rename_page: 重命名頁面
     page_section: 
       links: 
@@ -6524,7 +6524,7 @@ zh-Hant:
         truncated: 已截斷
       phrase_to_look_for: 要尋找的片語
       posts_added: 新增的帖子
-      remove_feed: "移除 %{display_name}"
+      remove_feed: "刪除 %{display_name}"
   external_integration_keys_8b4f4548: 外部整合金鑰
   external_tool_c5a6410a: 外部工具
   external_tool_url_cannot_be_left_blank_a34b6bb2: "外部工具 URL 無法留空白"
@@ -6931,8 +6931,8 @@ zh-Hant:
   gradebook: 
     alerts: 
       no_active_students: 抱歉，要麼是課程中沒有活動的學生，要麼就是沒有可由您分級的。
-      no_students_in_groups_back: "抱歉，此任務的提交件不能在 Speedgrader 中評分，因為沒有指定的使用者。請指定使用者到該群組，然後再試一次。按一下『確定』以返回。"
-      no_students_in_groups_close: "抱歉，此任務的提交件不能在 Speedgrader 中評分，因為沒有指定的使用者。請指定使用者到該群組，然後再試一次。按一下『確定』以關閉此視窗。"
+      no_students_in_groups_back: "抱歉，此任務的提交件不能在 Speedgrader 中評分，因為沒有指定的使用者。請指定使用者到該群組集合，然後再試一次。按一下『確定』以返回。"
+      no_students_in_groups_close: "抱歉，此任務的提交件不能在 Speedgrader 中評分，因為沒有指定的使用者。請指定使用者到該群組集合，然後再試一次。按一下『確定』以關閉此視窗。"
       no_students_in_section: 找不到該章節的任何學生，切換回去以顯示所有章節。
     allow_message: 按一下「允許」按鈕，開始錄音。
     begin_record_prompt: 按一下「錄音」按鈕開始。
@@ -7346,7 +7346,7 @@ zh-Hant:
         gradebook: 成績冊
         next: 下一個
         previous: 上一個
-        remove_attachment: 移除附件
+        remove_attachment: 刪除附件
         settings: 設定
         show_all_sections: 顯示所有章節
         submit_same_score: 為重新提交使用同樣的成績
@@ -7573,7 +7573,7 @@ zh-Hant:
       buttons: 
         add_group: 新增另一個群組
         collapse_group: 摺疊群組
-        delete_category: 移除此群組集合
+        delete_category: 刪除此群組集合
         delete_group: 刪除群組
         edit_category: 編輯此群組集合
         edit_group: 編輯群組
@@ -7600,7 +7600,7 @@ zh-Hant:
     confirm: 
       assign_students: 這將盡可能平均地在現有學生群組之間隨機指派所有未指派的學生
       delete_group: 是否確定要刪除此群組？
-      remove_category: 是否確定要移除此群組集合？
+      remove_category: 是否確定要刪除此群組集合？
     context_groups: 
       account_groups: 帳戶群組
       actions: 
@@ -7643,7 +7643,7 @@ zh-Hant:
       page_title: 課程群組
       page_title_accounts: 帳戶群組
     create_group_set: 建立群組集合
-    delete_confirm: 是否確定要移除此群組集合？
+    delete_confirm: 是否確定要刪除此群組集合？
     edit: 
       buttons: 
         update: 更新群組
@@ -7672,8 +7672,8 @@ zh-Hant:
     everyone: "每個人 (%{count})"
     feed_title: "%{course_or_account_name}  "
     flash: 
-      removeError: 無法移除該群組集合。請稍後再試一次。
-      removed: 群組集合已成功移除。
+      removeError: 無法刪除該群組集合。請稍後再試一次。
+      removed: 群組集合已成功刪除。
     group: 
       actions: 
         ask_to_join_group: 要求加入此群組
@@ -7730,7 +7730,7 @@ zh-Hant:
         add_group_set: 新增群組集合
         course_group_explanation: 學生群組是為群組專案或檔等組織學生的有效途徑。每一個學生群組都有其自己的月曆、討論板和協作工具，所以他們能夠更有效地組織起來，共同努力。
         group_assignment_instructions: 您可以隨機指派學生到特定規模的群組，或手動建立和組織群組。一旦建立了群組，則可以設置任務為『群組提交件』任務，這意味著每個群組都將有一個針對該群組的所有使用者的提交件。
-        group_set: 群組設定
+        group_set: 群組集合
         headings: 
           account_groups: 帳戶級別的學生群組
           course_groups: 學生群組
@@ -7770,7 +7770,7 @@ zh-Hant:
         self_organized_warning: 這些群組都是學生自己組織的。不像其他類型的群組，學生可以同時屬於一個以上的這些群組，因此這些群組無法用於已評分的任務。
         self_signup_blurb: 已為這些群組啟用了自行註冊。
         settings: 設定
-        uncategorized_groups: "這些群組沒有與任何特定的群組集合關聯。因為它們是透過 SIS 匯入的，只能對其進行更新，或者透過 SIS 將其刪除。"
+        uncategorized_groups: "這些群組沒有與任何特定的群組集合關聯。因為它們是透過 SIS 匯入的，只能對其進行更新，或者透過 SIS 將其刪除。  "
       group_category_edit: 
         allow_self_signup: 允許自行註冊
         cancel: 取消
@@ -7805,12 +7805,12 @@ zh-Hant:
         assign_user_to_group: "指派 %{name} 至群組"
         edit_group_membership: "編輯 %{name} 的成員資格"
         group_leader: 群組領導者
-        move: 移動至...
+        move: 移至...
         move_to_new_group: "移動 %{name} 至新群組"
-        remove: 移除
-        remove_as_leader: 作為領導者移除
-        remove_from_group: "從群組中移除 %{name}"
-        remove_user_as_leader: "作為領導者移除 %{name}"
+        remove: 刪除
+        remove_as_leader: 作為領導者刪除
+        remove_from_group: "從群組中刪除 %{name}"
+        remove_user_as_leader: "作為領導者刪除 %{name}"
         set_as_leader: 設定為領導者
         set_user_as_leader: "設定 %{name} 為領導者"
       group_users: 
@@ -7847,7 +7847,7 @@ zh-Hant:
       already_deleted: 該群組已被刪除
       create_success: 群組已成功建立。
       delete_success: "群組已成功 。"
-      goodbye: "你已從群組 %{group_name} 中移除了自己。"
+      goodbye: "你已從群組 %{group_name} 中刪除了自己。"
       invalid_invitation: ""
       no_students_assigned: 沒有要執行的任何動作。
       students_assigned: 指派給群組的學生。
@@ -8469,7 +8469,7 @@ zh-Hant:
       no_link: "[無連結]"
     titles: 
       link_to_student: 連結至學生
-  link_has_been_removed_because_content_is_not_prese_fd55f11: (鏈接已移除，因為內容無法展示或無法解算。)
+  link_has_been_removed_because_content_is_not_prese_fd55f11: (鏈接已刪除，因為內容無法展示或無法解算。)
   link_name_b76fdb38: 連結名稱
   link_number_1_9f169e48: 連接1
   link_number_2_61fcff2: 連接2
@@ -10489,8 +10489,8 @@ zh-Hant:
   minutes_per_slot_5b7169e5: 每時閒段之分鐘數
   missing_1a256b3b: 遺漏
   missing_percent_94534638: "缺失：%{percent}"
-  mobile_app_css_file_abbf06bd: "移動應用 CSS 文檔"
-  mobile_app_javascript_file_faea55d5: "移動應用 JavaScript 文檔"
+  mobile_app_css_file_abbf06bd: "移動應用程式 CSS 文檔"
+  mobile_app_javascript_file_faea55d5: "移動應用程式 JavaScript 文檔"
   mobile_css_file_b86ded7f: "移動端 CSS檔案"
   mobile_homescreen_icon_f85d6b63: 手機主屏圖標
   mobile_javascript_file_c429158d: "移動端 JavaScript 檔案"
@@ -10685,7 +10685,7 @@ zh-Hant:
     cancel: 取消
     save: 儲存
     saving: 正在儲存...
-    where_to_move: "您想把*%{name}*移動到何處？"
+    where_to_move: "您想把*%{name}*移至何處？"
   move_dialog_select: 
     move_to_end: "-- 在底部 --"
   move_module_item_77754119: 移動模組/項目
@@ -10693,7 +10693,7 @@ zh-Hant:
   move_outcome_group_cfa1a505: 移動成果群組
   move_text_down_7176acd4: "向下移動 %{text} "
   move_text_up_91fb4241: "向上移動 %{text} "
-  move_to_9b91c6e0: 移動到...
+  move_to_9b91c6e0: 移至...
   move_to_end_fef2fa15: 移至結尾
   move_to_front_7eae2e90: 移至前面
   move_to_front_bf6f0194: 移至前面
@@ -10788,7 +10788,7 @@ zh-Hant:
   new_event_for_course_name_2ba1f734: "%{course_name} 的新事件"
   new_file_135ae520: "[新檔案]"
   new_file_added_for_name_a5ec3156: "為 %{name} 新增的新檔案"
-  new_group_set_7241a581: 新群組設定
+  new_group_set_7241a581: 新群組集合
   new_module_4e9287e4: 新模組
   new_outcome_7fba8c7d: 新成果
   new_outcome_group_af59f145: 新成果群組
@@ -11370,7 +11370,7 @@ zh-Hant:
     state_standards_description: 在左邊，您會看到一個針對每個國家的已更新的國家標準的資料夾。這允許您毫不費力地將國家標準納入您的課程評分中。
     successful_outcome_creation: 成果已成功建立！
     successful_outcome_delete: 成果已成功刪除
-    successful_outcome_removal: 成果已成功移除
+    successful_outcome_removal: 成果已成功刪除
     successful_outcome_update: 成果已成功更新！
     titles: 
       find_outcomes: 尋找成果
@@ -11398,7 +11398,7 @@ zh-Hant:
     blank_override: 您必須選中一個學生或分組
     everyone: 每個人
     everyone_else: 其他所有人
-    invalid_group_override: 您無法為任務的群組設置之外的群組指派成員
+    invalid_group_override: 您無法為任務的群組集合之外的群組指派成員
     overrides: 
       everyone: 每個人
   own_copyright_cc59db55: 自有版權
@@ -11816,14 +11816,14 @@ zh-Hant:
           您需要將 %{callback_url} 配置為重定向URL。
           在您保存應用之後，請保存好您的應用ID和密碼，並在此輸入。
       labels: 
-        application_id: 應用程式ID
+        application_id: "應用程式 ID"
         application_secret: 應用程式密碼
     notices: 
       settings_updated: 外掛程式設定已成功更新。
     panda_pub_settings: 
       description: "PandaPub 提供發佈/訂閱服務，安裝后允許 Canvas 的一部份在瀏覽器上接收事件通知，而不是為更改投票表决。"
       labels: 
-        application_id: "應用程序 ID"
+        application_id: "應用程式 ID"
         base_url: "基礎 URL"
         key_id: "密鈅 ID"
         key_secret: 密鈅
@@ -12169,7 +12169,7 @@ zh-Hant:
         diigo_login: "Diigo 登入"
         new_access_token: 新存取權杖
         register_skype: "註冊 Skype"
-        remove_account_from_profile: 從此個人檔案中移除帳戶
+        remove_account_from_profile: 從此個人檔案中刪除帳戶
         unregister_service: 取消註冊服務
       twitter_description: |-
           Twitter 是一項用於發佈和訂閱簡短訊息的服務。
@@ -12433,7 +12433,7 @@ zh-Hant:
     move_questions: 移動問題
     multiple_questions: 多個問題
     question_bank: 題庫
-    remove_outcome_from_bank: 是否確定要從題庫移除此成果？
+    remove_outcome_from_bank: 是否確定要從題庫刪除此成果？
     title: 
       move_copy_questions: 移動/複製問題
     update_outcomes_fail: 更新成果失敗
@@ -12504,7 +12504,7 @@ zh-Hant:
     regrade: 
       give_everyone_full_credit: 就此問題，給所有人滿分
       no_scores_reduced: 為已糾正的和以前的正確答案獎勵積分(*將不會減少分數*)
-      regrade_disabled: 此問題不允許進行重新評分，因為學生完成提交之後，答案已被移除或問題類型已更改。
+      regrade_disabled: 此問題不允許進行重新評分，因為學生完成提交之後，答案已被刪除或問題類型已更改。
       regrade_options: "為已接受測驗的學生選擇重新評分選項。Canvas將在你保存測驗之後，重新對你提交的內容評分 (學生成績有可能受影響)。"
       some_scores_reduced: 僅為正確答案獎勵積分(*部分學生的分數可能會減少*)
       update_question_without_regrading: 更新問題，而不重新評分
@@ -12760,7 +12760,7 @@ zh-Hant:
     file_uploaded_or_removed: 
       quizzes: 
         file_successfully_uploaded: 您的檔案已成功上傳。
-        files_removed: "%{display_name} 已被移除。"
+        files_removed: "%{display_name} 已被刪除。"
     final_answer: 最終答案
     headers: 
       assignment_quizzes: 任務測驗
@@ -13228,7 +13228,7 @@ zh-Hant:
           select_deselect_all: 全選/取消全選
           select_user: "選擇 %{user}"
       move_handle: 
-        move_to: 移動到...
+        move_to: 移至...
         quiz_move_to_accessibility_warning: 除了拖放排序，該元素更容易使用。
       move_question: 
         cancel: 取消
@@ -13237,7 +13237,7 @@ zh-Hant:
         question_group: 至問題群組：
         save: 儲存
         saving: 正在儲存...
-        where_to_move: "您要將 %{quiz_item} 移動到哪裡？"
+        where_to_move: "您要將 %{quiz_item} 移至何處？"
       multi_answer: 
         choose_answer: " "
       muted: 
@@ -13771,7 +13771,7 @@ zh-Hant:
     move: 移動
     move_question: 
       one: "您想要將這 %{count} 個項目移動到何處？"
-      other: "您想要將這 %{count} 個項目移動到何處？"
+      other: "您想要將這 %{count} 個項目移至何處？"
     move_success: 
       one: "%{count} 個項目移動到 %{destinationFolder}"
       other: "%{count} 個項目移動到 %{destinationFolder}"
@@ -13856,26 +13856,26 @@ zh-Hant:
   registration_url_60e0eaaa: "註冊 URL"
   regular_style_checkbox_ee3d71c1: 一般風格復選框
   remind_me_next_time_6402eb7d: 下次提醒我
-  remove_account_from_this_profile_c3095eb2: 從此個人檔案中移除帳戶
-  remove_attachment_ceae0973: 移除附件
-  remove_attribute_59a4aa64: 移除屬性
-  remove_c_name_section_d8eabd3a: "移除%{c.name} 章節"
-  remove_contact_method_ca890ba3: 移除聯絡方式
-  remove_email_address_b1820820: 移除電子郵件地址
-  remove_empty_attachment_b2aea632: 移除空白附件
-  remove_f47dc62a: 移除
-  remove_filename_87f3781e: "移除 %{filename}"
-  remove_icon_a4646413: 移除圖標
-  remove_image_341340b3: 移除影像
-  remove_recipient_name_a6b83cef: "移除收件人 %{name}"
-  remove_row_c198da5a: 移除行
+  remove_account_from_this_profile_c3095eb2: 從此個人檔案中刪除帳戶
+  remove_attachment_ceae0973: 刪除附件
+  remove_attribute_59a4aa64: 刪除屬性
+  remove_c_name_section_d8eabd3a: "刪除%{c.name} 章節"
+  remove_contact_method_ca890ba3: 刪除聯絡方式
+  remove_email_address_b1820820: 刪除電子郵件地址
+  remove_empty_attachment_b2aea632: 刪除空白附件
+  remove_f47dc62a: 刪除
+  remove_filename_87f3781e: "刪除 %{filename}"
+  remove_icon_a4646413: 刪除圖標
+  remove_image_341340b3: 刪除影像
+  remove_recipient_name_a6b83cef: "刪除收件人 %{name}"
+  remove_row_c198da5a: 刪除行
   remove_row_f9d59cba: 移除行
-  remove_student_from_recipients_4b206e35: "從收件人中移除 %{student} "
-  remove_text_8e485c41: "移除 %{text}"
-  remove_these_dates_48453a81: 移除這些日期
-  remove_this_rubric_from_my_list_c7d80704: 從我的清單中移除此評估準則
-  remove_this_section_9a88ca43: 移除此章節
-  removed_user_as_group_leader_bb69330f: "作為群組領導者移除 %{user}"
+  remove_student_from_recipients_4b206e35: "從收件人中刪除 %{student} "
+  remove_text_8e485c41: "刪除 %{text}"
+  remove_these_dates_48453a81: 刪除這些日期
+  remove_this_rubric_from_my_list_c7d80704: 從我的清單中刪除此評估準則
+  remove_this_section_9a88ca43: 刪除此章節
+  removed_user_as_group_leader_bb69330f: "作為群組領導者刪除 %{user}"
   rename_45608f54: 重命名
   rename_c_name_section_e0e92c97: "重命名%{c.name} 章節"
   rename_this_section_73065edd: 重命名此章節
@@ -13949,7 +13949,7 @@ zh-Hant:
       create_conferences: "建立 Web 會議"
       manage_account_memberships: 新增/移除帳戶的其他管理員
       manage_account_settings: 管理帳戶級別的設定
-      manage_admin_users: 新增/移除課程的其他教師、課程設計師或助教
+      manage_admin_users: 新增/刪除課程的其他教師、課程設計師或助教
       manage_announcements: 管理全域宣告
       manage_assignments: 管理(新增/編輯/刪除)任務和測驗
       manage_calendar: 新增、編輯和刪除課程月曆上的事件
@@ -13974,7 +13974,7 @@ zh-Hant:
       manage_sis: "管理 SIS 資料"
       manage_site_settings: 管理網站範圍和外掛程式設定
       manage_storage_quotas: 管理儲存空間配額
-      manage_students: 新增/移除該課程的學生
+      manage_students: 新增/刪除該課程的學生
       manage_user_logins: 修改使用者的登入詳細資料
       manage_user_notes: 管理教職員日誌條目
       manage_user_observers: 管理使用者的觀察者
@@ -14073,7 +14073,7 @@ zh-Hant:
     filter_no_users_found: 沒有找到相符的使用者。
     filter_one_user_found: "找到 1 個使用者。"
     flash: 
-      removeError: 無法移除該使用者。請稍後再試一次。
+      removeError: 無法刪除該使用者。請稍後再試一次。
       removed: 使用者已成功移除。
     greater_than_three: 請輸入有三個或更多字元的搜尋字詞
     invitations_re_sent: 邀請已成功傳送
@@ -14132,7 +14132,7 @@ zh-Hant:
       prompts: 
         are_you_sure_delete: 是否確定要刪除此評估準則？目前，任何與此評估準則相關的課程仍然可以存取它，但新課程無法使用它。
         are_you_sure_remove: 是否確定要從您的清單中移除此評估準則？
-      remove_rubric: 從我的清單中移除此評估準則
+      remove_rubric: 從我的清單中刪除此評估準則
   salesforce_account_id_eb5c78ad: "銷售人員帳戶 ID"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "銷售人員有一個與其產品帳戶不同的登錄主機砂盒的帳戶，因此，如果您使用的是銷售人員砂盒帳戶而您又沒有勾選此複選框，那麼您將無法進行身份驗證 (相反，如果您有一個產品帳戶而且您勾選了不會驗證的複選框，這也同樣起作用)"
   salesforce_ticketing_webtocase_connector_80f75716: "銷售人員票務 WebToCase 連接器"
@@ -14619,7 +14619,7 @@ zh-Hant:
       enrolled_as_student: 學生
       enrolled_as_ta: 助教
       enrolled_as_teacher: 教師
-      favorited_tooltip: 按一下以從課程功能表中移除。
+      favorited_tooltip: 按一下以從課程功能表中刪除。
       nonfavorited_tooltip: 按一下以新增至課程功能表。
       published_course: 是
       published_course_tooltip: 本課程已經公佈。
@@ -14650,8 +14650,8 @@ zh-Hant:
         linked_to: 連結至
       links: 
         link_to_a_student: 連結至學生
-        unenroll_user_course: 從課程移除使用者
-        unenroll_user_section: 從章節中移除使用者
+        unenroll_user_course: 從課程刪除使用者
+        unenroll_user_section: 從章節中刪除使用者
       titles: 
         course_section: 課程章節
     error_form: 
@@ -14759,8 +14759,8 @@ zh-Hant:
       range_lower: 範圍下限
       range_of_numbers: "%{lower_number} 至 %{higher_number}"
       range_upper: 範圍上限
-      remove_row: 移除行
-      remove_scheme: 移除評分配置
+      remove_row: 刪除行
+      remove_scheme: 刪除評分配置
       select_another_scheme: 選擇另一個配置
       some_standard: 一些標準
       use_this_standard: 使用此評分標準
@@ -15665,7 +15665,7 @@ zh-Hant:
   success_all_users_on_this_domain_will_now_see_this_4681b85d: 成功！所有本域名的用戶都會看到這個標誌。
   success_grades_were_published_to_the_grade_book_da3b4fba: 成功！已將評分發佈到成勣冊中。
   successfully_created_a_set_38374719: 已經成功建立一個組
-  successfully_moved_model_to_newgroup_f7b7aa5a: "將 %{model} 成功移動至 %{newGroup}"
+  successfully_moved_model_to_newgroup_f7b7aa5a: "將 %{model} 成功移至 %{newGroup}"
   sum_of_all_files_in_mb_2b705055: 所有文檔的總大小，單位MB
   summary_statistics_f74852a5: 總結統計資料
   support: 
@@ -16277,7 +16277,7 @@ zh-Hant:
   unable_to_accept_update_fd53a7e2: 無法接受更新
   unable_to_dismiss_update_df1e32eb: 無法解除更新
   unable_to_find_clever_district_district_id_61deb1cb: "無法找到 Clever 域 %{district_id}"
-  unable_to_remove_app_4293cb53: 無法移除應用程式
+  unable_to_remove_app_4293cb53: 無法刪除應用程式
   unarchive_selected_e0c4bd3d: 已選取消存檔
   unauthorized: 未授權
   unauthorized_message: JWT簽名無效
@@ -16419,11 +16419,11 @@ zh-Hant:
     adding_users: 正在新增使用者...
     buttons: 
       continue: 繼續…
-    cant_unenroll: 該使用者已透過使用校園註冊系統自動註冊，所以無法手動刪除其。如果您有任何疑問，請連絡系統管理員。
-    delete_confirm: 是否確定要移除此使用者？
+    cant_unenroll: 該使用者已透過使用校園註冊系統自動註冊，所以無法手動刪除。如果您有任何疑問，請連絡系統管理員。
+    delete_confirm: 是否確定要刪除此使用者？
     duplicate_users: 
       one: "找到 %{count} 個重複的使用者，已移除重複者。"
-      other: "找到 %{count} 個重複的使用者，已移除重複者。"
+      other: "找到 %{count} 個重複的使用者，已刪除除重複者。"
     invalid_users_notice: 可能有一些是無效的，您可能需要返回並修復任何錯誤。
     just_now: 此刻
     messages: 
@@ -16464,7 +16464,7 @@ zh-Hant:
     confirms: 
       remove_profile_picture: 是否確定要移除此使用者的個人檔案圖片？
     errors: 
-      failed_to_remove_image: 無法移除影像，請再試一次
+      failed_to_remove_image: 無法刪除影像，請再試一次
       failed_to_report_image: 無法報告影像，請再試一次
       updating_user_details_failed: 更新使用者詳細資料失敗，請再試一次
     messages: 
@@ -16549,7 +16549,7 @@ zh-Hant:
   user_successfully_deactivated_9d92d80d: 使用者已成功停用
   user_successfully_inactivated_aee66efd: 使用者已成功停用。
   user_successfully_re_activated_b897e35b: 使用者已成功重新啟用。
-  user_successfully_removed_a366ca5f: 使用者已成功移除。
+  user_successfully_removed_a366ca5f: 使用者已成功刪除。
   usercount_respondents_1521244: "%{userCount} 個回應"
   usercount_users_found_8c07f1f2: "找到 %{userCount} 個使用者。"
   username_47bb5bbe: 使用者名稱
@@ -16723,7 +16723,7 @@ zh-Hant:
         time_zone: 時區
       merge_with_another_user: 與另一個使用者合併
       none: 無
-      remove_avatar: 移除頭像圖片
+      remove_avatar: 刪除頭像圖片
       report_naughtiness: 舉報不適當的圖片
       titles: 
         edit_user_details: 編輯使用者詳細資料
@@ -16815,7 +16815,7 @@ zh-Hant:
   validate_links_in_content_b1630fba: 驗證內容中的鏈接
   vanity_url_76f93382: 虛假URL
   video_b9f27375: 視頻
-  video_content_is_not_supported_by_your_device_or_a_25214f57: 你的設備或app不支持視頻内容。
+  video_content_is_not_supported_by_your_device_or_a_25214f57: 你的設備或應用程式不支持視頻内容。
   video_player_b371005: 視頻播放器
   view_analytics_91a3b7a: 檢視分析
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: 在表格而非圖示中檢視分析性數據
@@ -16849,9 +16849,9 @@ zh-Hant:
   warning_6576b5b8: 警告
   warning_aacb8c24: 警告
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: 注意：Crocodoc在Firefox瀏覽器使用時受限。評論無法保存。
-  warning_for_improved_accessibility_in_moving_files_71e1028b: 警告：爲了提高移動檔案的可存取性，請使用功能表中的『移動到對話方塊』選項。
+  warning_for_improved_accessibility_in_moving_files_71e1028b: 警告：爲了提高移動檔案的可存取性，請使用功能表中的『移至對話方塊』選項。
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: 警告：為提高月曆事件的可存取性，請使用議程檢視表。
-  warning_for_improved_accessibility_of_reordering_a_5d0206c7: 警告：爲了提高重新排列任務和群組的可存取性，請使用功能表中的『移動到對話方塊』選項。
+  warning_for_improved_accessibility_of_reordering_a_5d0206c7: 警告：爲了提高重新排列任務和群組的可存取性，請使用功能表中的『移至對話方塊』選項。
   warning_for_improved_accessibility_please_click_he_e6472c02: 警告：為改善存取性能，請按一下此處以使用個人成績冊檢視模式。
   warning_icon_f64936d7: 警告圖標
   warnings: 
@@ -17109,8 +17109,8 @@ zh-Hant:
   you_can_update_some_of_this_user_s_information_but_8e99a045: 您可以更新此使用者的一些資訊，但如果他們選擇，他們可以將其改回去。
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "你可以使用單一的16x16, 32x32, 48x48 圖標文檔。"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: 您無法編輯該子賬戶的內容。
-  you_cannot_remove_this_enrollment_c87be1cb: 您無法取消此註冊。
-  you_cannot_remove_your_default_email_address_8ed68e52: 您無法移除您的預設電郵地址
+  you_cannot_remove_this_enrollment_c87be1cb: 您無法刪除此註冊。
+  you_cannot_remove_your_default_email_address_8ed68e52: 您無法刪除您的預設電郵地址
   you_created_an_announcement_in_course_c49e3d70: "您在 %{course} 課程中創建了公告"
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: 您無權訪問請求的討論。
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: 您無權訪問請求的測驗。
@@ -17161,25 +17161,25 @@ zh-Hant:
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "您已經被提醒進行 %{rubric}，%{context} 的評估。"
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: 本頁將跳轉至登陸頁面，您需要使用您孩子的密碼登錄。
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
-      您需要 [在Facebook上創建新應用](%{facebook_url})，然後進入高級設定，允許 Client OAuth登入。
+      您需要 [在Facebook上創建新應用程式](%{facebook_url})，然後進入高級設定，允許 Client OAuth登入。
       您需要將 %{callback_url} 配置為有效的 OAuth 重定向URI。
-      在您保存應用后，保存好您的應用ID和密碼，並在此輸入。
+      在您保存應用程式后，保存好您的應用程式ID和密碼，並在此輸入。
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       你需要在[Google開發者控制臺](%{google_url})上創建一個新的在綫申請。
       您需要將%{callback_url}增添為一個重定向URL.
       完成創建程式后，保存好您的客戶ID和客戶密碼，並在此輸入。
   you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
-      您需要[在微軟上創建新應用t](%{ms_app_url}).
+      您需要[在微軟上創建新應用程式](%{ms_app_url}).
       您需要將 %{callback_url} 配置為重定向URL。
-      在您保存應用之後，請保存好您的應用ID和密碼，並在此輸入。
+      在您保存應用程式之後，請保存好您的應用程式ID和密碼，並在此輸入。
   you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
-      您需要 [在 Clever上新建一個應用](%{clever_url})。
+      您需要 [在 Clever上新建一個應用程式](%{clever_url})。
       您需要將 %{callback_url} 配置為重定向URL。
-      在您創建應用之後，請保存好您的客戶端ID和客戶端密碼，並在此輸入。
+      在您創建應用程式之後，請保存好您的客戶端ID和客戶端密碼，並在此輸入。
   you_will_need_to_register_an_application_on_clever_f412c7b8: |-
-      您需要 [在Clever上註冊一個應用](%{clever_url})。
+      您需要 [在Clever上註冊一個應用程式](%{clever_url})。
       您需要將 %{callback_url} 配置為重定向URL。
-      在創建應用之後，請保存好您的客戶端ID和客戶端密碼，並在此輸入。
+      在創建應用程式之後，請保存好您的客戶端ID和客戶端密碼，並在此輸入。
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
       您需要[在GitHub上註冊一個申請](%{github_url})。
       您需要將%{callback_url}鏈接配置為授權回調URL。
