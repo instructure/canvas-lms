@@ -141,7 +141,7 @@ describe "calendar2" do
 
       # Verify Week and Day labels are correct
       expect(header_text).to include("Jan 8 — 14, 2012")
-      expect(f('.fc-sun')).to include_text('SUN 1/8')
+      expect(f('.fc-sun')).to include_text("8\nSUN")
     end
 
     it "should create event by clicking on week calendar", priority: "1", test_id: 138862 do
