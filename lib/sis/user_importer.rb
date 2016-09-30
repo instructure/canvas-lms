@@ -202,24 +202,24 @@ module SIS
               User.transaction(:requires_new => true) do
                 if user.changed?
                   user_touched = true
-                  raise ImportError, user.errors.first.join(" ") if !user.save && user.errors.size > 0
+                  if !user.save && user.errors.size > 0
+                    add_user_warning(user.errors.first.join(" "), user_id, login_id)
+                    raise ImportError, user.errors.first.join(" ")
+                  end
                 elsif @batch
                   @users_to_set_sis_batch_ids << user.id
                 end
                 pseudo.user_id = user.id
                 if pseudo.changed?
                   pseudo.sis_batch_id = @batch.id if @batch
-                  raise ImportError, pseudo.errors.first.join(" ") if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
+                  if !pseudo.save_without_broadcasting && pseudo.errors.size > 0
+                    add_user_warning(pseudo.errors.first.join(" "), user_id, login_id)
+                    raise ImportError, pseudo.errors.first.join(" ")
+                  end
                 end
               end
             rescue => e
-              user_message = generate_readable_error_message(
-                message: e.message,
-                user_id: user_id,
-                login_id: login_id
-              )
-              developer_message = "Internal error: #{e.inspect}"
-              @messages << "#{user_message} (#{developer_message})"
+              Canvas::Errors.capture_exception(:sis_import, e)
               next
             end
 
@@ -312,6 +312,15 @@ module SIS
       end
 
       private
+
+      def add_user_warning(message, user_id, login_id)
+        user_message = generate_readable_error_message(
+          message: message,
+          user_id: user_id,
+          login_id: login_id
+        )
+        @messages << user_message
+      end
 
       ERRORS_TO_REASONS = {
         'unique_id is invalid' => "Invalid login_id: '%{login_id}'",
