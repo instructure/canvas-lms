@@ -16,30 +16,30 @@ class BzController < ApplicationController
       doc = Nokogiri::HTML(page.body)
       doc.css('img:not(.bz-magic-viewer)').each do |img|
         if img.attributes["alt"].nil?
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Missing alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Missing alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value == ""
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Empty alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Empty alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".png")
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".jpg")
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".svg")
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".gif")
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         end
       end
       doc.css('iframe[src*="vimeo"]:not([data-bz-accessibility-ok])').each do |img|
         orig = img.to_xhtml
         img.set_attribute('data-bz-accessibility-ok', 'yes')
         repl = img.to_xhtml
-        @items << { :page => page, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
+        @items << { :page => page, :path => img.css_path, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
       end
       doc.css('iframe[src*="youtu"]:not([data-bz-accessibility-ok])').each do |img|
         orig = img.to_xhtml
         img.set_attribute('data-bz-accessibility-ok', 'yes')
         repl = img.to_xhtml
-        @items << { :page => page, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
+        @items << { :page => page, :path => img.css_path, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
       end
     end
   end
@@ -51,7 +51,11 @@ class BzController < ApplicationController
     end
 
     page = WikiPage.find(params[:page_id])
-    page.body = page.body.gsub(params[:original_html], params[:new_html])
+    doc = Nokogiri::HTML(page.body)
+    part = doc.css(params[:path])[0]
+    raise "wtf" if params[:original_html] != part.to_xhtml
+    part.replace(params[:new_html])
+    page.body = doc.to_s
     page.save
 
     redirect_to bz_accessibility_mapper_path
