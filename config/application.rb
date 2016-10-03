@@ -161,6 +161,7 @@ module CanvasRails
       tag:yaml.org,2002:timestamp
       tag:yaml.org,2002:map:HashWithIndifferentAccess
       tag:yaml.org,2002:map:ActiveSupport::HashWithIndifferentAccess
+      tag:ruby.yaml.org,2002:hash:ActiveSupport::HashWithIndifferentAccess
       tag:ruby.yaml.org,2002:object:OpenStruct
       tag:ruby.yaml.org,2002:object:Scribd::Document
       tag:ruby.yaml.org,2002:object:Mime::Type
