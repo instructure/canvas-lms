@@ -896,7 +896,7 @@ class Enrollment < ActiveRecord::Base
         t('#enrollment.workflow.deleted', "Deleted")
       when 'invited'
         t('#enrollment.workflow.invited', "Invited")
-      when 'pending'
+      when 'pending', 'creation_pending'
         t('#enrollment.workflow.pending', "Pending")
       when 'rejected'
         t('#enrollment.workflow.rejected', "Rejected")
