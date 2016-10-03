@@ -1,5 +1,5 @@
 group :test do
-  gem 'gergich', '0.1.5', require: false
+  gem 'gergich', '0.1.6', require: false
   gem 'testingbot', require: false
   # simplecov 0.10.0 shows significantly less coverage.
   # ensure the coverage build shows accurate data
