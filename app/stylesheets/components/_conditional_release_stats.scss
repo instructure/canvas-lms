@@ -43,6 +43,7 @@
   border-radius: 20px;
   background-color: $ic-color-medium-darker;
   overflow: hidden;
+  @if $use_high_contrast { border: 1px solid $ic-color-medium-darker; }
 }
 
 .crs-bar__horizontal-inside {
@@ -52,6 +53,7 @@
   border-radius: 20px;
   background-color: $ic-color-medium-light;
   overflow: hidden;
+  @if $use_high_contrast { border: 1px solid $ic-color-medium-darker; }
 }
 
 .crs-bar__bottom {
