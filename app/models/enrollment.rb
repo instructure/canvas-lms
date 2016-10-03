@@ -848,7 +848,7 @@ class Enrollment < ActiveRecord::Base
   def can_be_deleted_by(user, context, session)
     can_remove = [StudentEnrollment, ObserverEnrollment].include?(self.class) &&
       context.grants_right?(user, session, :manage_students)
-    can_remove ||= context.grants_right?(user, session, :manage_admin_users)
+    can_remove ||= context.grants_right?(user, session, :manage_admin_users) unless student?
     can_remove &&= self.user_id != user.id ||
       context.account.grants_right?(user, session, :manage_admin_users)
   end

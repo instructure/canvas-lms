@@ -1884,21 +1884,23 @@ describe Enrollment do
       let(:user) { stub(:id => 42) }
       let(:session) { stub }
 
-      it 'is true for a user who has been granted the right' do
-        context = stub(:grants_right? => true)
+      it 'is true for a user who has been granted :manage_students' do
+        context = Object.new
+        context.stubs(:grants_right?).with(user, session, :manage_students).returns(true)
+        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
       end
 
-      it 'is false for a user without the right' do
+      it 'is false for a user without :manage_students' do
         context = stub(:grants_right? => false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
 
-      it 'is true for a user who can manage_admin_users' do
+      it 'is false for someone with :manage_admin_users but without :manage_students' do
         context = Object.new
         context.stubs(:grants_right?).with(user, session, :manage_students).returns(false)
         context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(true)
-        expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
+        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
 
       it 'is false if a user is trying to remove their own enrollment' do
@@ -1907,6 +1909,33 @@ describe Enrollment do
         context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(false)
         context.stubs(:account => context)
         enrollment.user_id = user.id
+        expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
+      end
+    end
+
+    describe 'on an observer enrollment' do
+      let(:enrollment) { ObserverEnrollment.new }
+      let(:user) { stub(:id => 42) }
+      let(:session) { stub }
+
+      it 'is true with :manage_students' do
+        context = Object.new
+        context.stubs(:grants_right?).with(user, session, :manage_students).returns(true)
+        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(false)
+        expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
+      end
+
+      it 'is true with :manage_admin_users' do
+        context = Object.new
+        context.stubs(:grants_right?).with(user, session, :manage_students).returns(false)
+        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(true)
+        expect(enrollment.can_be_deleted_by(user, context, session)).to be_truthy
+      end
+
+      it 'is false otherwise' do
+        context = Object.new
+        context.stubs(:grants_right?).with(user, session, :manage_students).returns(false)
+        context.stubs(:grants_right?).with(user, session, :manage_admin_users).returns(false)
         expect(enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
     end
