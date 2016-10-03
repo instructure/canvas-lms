@@ -392,9 +392,10 @@ class AppointmentGroupsController < ApplicationController
       if authorized_action(@group, @current_user, :update)
         @page_title = t('Edit %{title}', {title: @group.title})
         js_env({
-          :APPOINTMENT_GROUP => @group
+          :APPOINTMENT_GROUP_ID => @group.id,
         })
         js_bundle :calendar_appointment_group_edit
+        css_bundle :calendar_appointment_group_edit
         render :text => "".html_safe, :layout => true
       end
     end

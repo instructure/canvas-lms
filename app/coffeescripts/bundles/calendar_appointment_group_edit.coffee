@@ -4,6 +4,6 @@ require [
 ], (ReactDOM, EditPage) ->
 
   ReactDOM.render(
-    React.createElement(EditPage, {appointment_group: ENV.APPOINTMENT_GROUP.appointment_group}),
+    React.createElement(EditPage, {appointment_group_id: ENV.APPOINTMENT_GROUP_ID}),
     document.getElementById('content')
   )

@@ -36,8 +36,7 @@ describe "calendar2" do
         wait_for_ajaximations
         expect_new_page_load { f('.group_details').click }
         wait_for_ajaximations
-
-        expect(f('h1')).to include_text "Edit new appointment group"
+        expect(f('#title').attribute('value')).to eql "new appointment group"
       end
 
     end
