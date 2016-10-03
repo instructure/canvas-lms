@@ -128,7 +128,7 @@ namespace :deploy do
   task :clone_data_analytics do
     on roles(:app) do
       within release_path do
-        execute :git, 'clone', 'https://github.com/beyond-z/analytics.git', 'gems/plugins/analytics'
+        execute :git, 'clone', '-b master_upgrade', 'https://github.com/beyond-z/analytics.git', 'gems/plugins/analytics'
       end
     end
   end
