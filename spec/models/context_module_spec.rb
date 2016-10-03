@@ -36,6 +36,18 @@ describe ContextModule do
       @module.save!
       expect(@module.available_for?(nil)).to eql(true)
     end
+
+    it "uses provided progression in opts" do
+      course_with_student(active_all: true)
+      @module = @course.context_modules.create!(name: 'some module')
+      @module.unlock_at = 2.months.from_now
+      @module.save!
+      @progression = @module.find_or_create_progression(@student)
+      @progression.workflow_state = :unlocked # don't save
+      expect(@module.available_for?(@student)).to be_falsey
+      opts = {user_context_module_progressions: {@module.id => @progression}}
+      expect(@module.available_for?(@student, opts)).to be_truthy
+    end
   end
 
   describe "prerequisites=" do

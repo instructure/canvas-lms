@@ -155,6 +155,40 @@ describe DiscussionTopicsController do
       expect(response).to be_success
       expect(assigns["topics"]).to include(@topic)
     end
+
+    it "does not filter module locked discussion by default" do
+      course_topic(user: @teacher)
+      @locked_topic = @topic
+      course_topic(user: @teacher)
+      @module = @course.context_modules.create!(name: 'some module')
+      @module.add_item(type: 'discussion_topic', id: @topic.id)
+      @locked_module = @course.context_modules.create!(name: 'some locked module')
+      @locked_module.add_item(type: 'discussion_topic', id: @locked_topic.id)
+      @locked_module.unlock_at = 2.months.from_now
+      @locked_module.save!
+      user_session(@student)
+      
+      get 'index', course_id: @course.id
+      expect(response).to be_success
+      expect(assigns["topics"]).to include(@locked_topic)
+    end
+
+    it "filters module locked discussions when asked to" do
+      course_topic(user: @teacher)
+      @locked_topic = @topic
+      course_topic(user: @teacher)
+      @module = @course.context_modules.create!(name: 'some module')
+      @module.add_item(type: 'discussion_topic', id: @topic.id)
+      @locked_module = @course.context_modules.create!(name: 'some locked module')
+      @locked_module.add_item(type: 'discussion_topic', id: @locked_topic.id)
+      @locked_module.unlock_at = 2.months.from_now
+      @locked_module.save!
+      user_session(@student)
+
+      get 'index', course_id: @course.id, exclude_context_module_locked_topics: true
+      expect(response).to be_success
+      expect(assigns["topics"]).not_to include(@locked_topic)
+    end
   end
 
   describe "GET 'show'" do

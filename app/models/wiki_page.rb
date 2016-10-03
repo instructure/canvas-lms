@@ -217,7 +217,7 @@ class WikiPage < ActiveRecord::Base
     return false unless self.could_be_locked
     Rails.cache.fetch([locked_cache_key(user), opts[:deep_check_if_needed]].cache_key, :expires_in => 1.minute) do
       locked = false
-      if item = locked_by_module_item?(user, opts[:deep_check_if_needed])
+      if item = locked_by_module_item?(user, opts)
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
         locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"] && locked[:context_module]["unlock_at"] > Time.now.utc
       end

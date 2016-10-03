@@ -264,6 +264,10 @@ class DiscussionTopicsController < ApplicationController
   # @argument search_term [String]
   #   The partial title of the discussion topics to match and return.
   #
+  # @argument exclude_context_module_locked_topics [Boolean]
+  #   For students, exclude topics that are locked by module progression.
+  #   Defaults to false.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
   #          -H 'Authorization: Bearer <token>'
@@ -316,6 +320,10 @@ class DiscussionTopicsController < ApplicationController
     end
 
     @topics = Api.paginate(scope, self, topic_pagination_url)
+
+    if params[:exclude_context_module_locked_topics]
+      @topics = DiscussionTopic.reject_context_module_locked_topics(@topics, @current_user)
+    end
 
     if states.present?
       @topics.reject! { |t| t.locked_for?(@current_user) } if states.include?('unlocked')

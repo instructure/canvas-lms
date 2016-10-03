@@ -163,7 +163,7 @@ module CC
       node.lock_at CCHelper::ims_datetime(assignment.lock_at) if assignment.lock_at
       node.unlock_at CCHelper::ims_datetime(assignment.unlock_at) if assignment.unlock_at
       if manifest && manifest.try(:user).present?
-        node.module_locked assignment.locked_by_module_item?(manifest.user, true).present?
+        node.module_locked assignment.locked_by_module_item?(manifest.user, deep_check_if_needed: true).present?
       end
       node.all_day_date CCHelper::ims_date(assignment.all_day_date) if assignment.all_day_date
       node.peer_reviews_due_at CCHelper::ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at

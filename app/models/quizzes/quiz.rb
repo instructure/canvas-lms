@@ -747,7 +747,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         locked = lock_info.merge({ lock_at: quiz_for_user.lock_at, can_view: true })
       elsif !opts[:skip_assignment] && (assignment_lock = locked_by_assignment?(user, opts))
         locked = assignment_lock
-      elsif (module_lock = locked_by_module_item?(user, opts[:deep_check_if_needed]))
+      elsif (module_lock = locked_by_module_item?(user, opts))
         locked = lock_info.merge({ context_module: module_lock.context_module.attributes })
       elsif !context.try_rescue(:is_public) && !context.grants_right?(user, :participate_as_student) && !opts[:is_observer]
         locked = lock_info.merge({ missing_permission: :participate_as_student.to_s })

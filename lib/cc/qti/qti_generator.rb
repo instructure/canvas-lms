@@ -209,7 +209,7 @@ module CC
           q_node.one_time_results quiz.one_time_results?
           q_node.show_correct_answers_last_attempt quiz.show_correct_answers_last_attempt?
           q_node.only_visible_to_overrides quiz.only_visible_to_overrides?
-          q_node.module_locked quiz.locked_by_module_item?(@user, true).present?
+          q_node.module_locked quiz.locked_by_module_item?(@user, deep_check_if_needed: true).present?
           if quiz.assignment && !quiz.assignment.deleted?
             assignment_migration_id = CCHelper.create_key(quiz.assignment)
             doc.assignment(:identifier=>assignment_migration_id) do |a|
