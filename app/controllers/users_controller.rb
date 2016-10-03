@@ -159,7 +159,7 @@ class UsersController < ApplicationController
   before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_recent_activity_dashboard, :masquerade, :external_tool,
-    :dashboard_sidebar, :settings, :all_menu_courses]
+    :dashboard_sidebar, :settings, :all_menu_courses, :activity_stream, :activity_stream_summary]
   before_filter :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
   before_filter :reject_student_view_student, :only => [:delete_user_service,
