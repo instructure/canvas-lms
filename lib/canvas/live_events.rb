@@ -67,6 +67,9 @@ module Canvas::LiveEvents
   def self.get_assignment_data(assignment)
     {
       assignment_id: assignment.global_id,
+      context_id: assignment.global_context_id,
+      context_type: assignment.context_type,
+      workflow_state: assignment.workflow_state,
       title: LiveEvents.truncate(assignment.title),
       description: LiveEvents.truncate(assignment.description),
       due_at: assignment.due_at,
@@ -91,6 +94,7 @@ module Canvas::LiveEvents
       assignment_id: submission.global_assignment_id,
       user_id: submission.global_user_id,
       submitted_at: submission.submitted_at,
+      graded_at: submission.graded_at,
       updated_at: submission.updated_at,
       score: submission.score,
       grade: submission.grade,
