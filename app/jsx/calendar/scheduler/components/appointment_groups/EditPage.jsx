@@ -7,8 +7,9 @@ define([
   'axios',
   './AppointmentGroupList',
   'compiled/calendar/MessageParticipantsDialog',
-  './ContextSelector'
-], (React, I18n, {default: Button}, {default: Grid, GridCol, GridRow}, {default: ScreenReaderContent}, axios, AppointmentGroupList, MessageParticipantsDialog, ContextSelector) => {
+  './ContextSelector',
+  './TimeBlockSelector'
+], (React, I18n, {default: Button}, {default: Grid, GridCol, GridRow}, {default: ScreenReaderContent}, axios, AppointmentGroupList, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
 
   const parseFormValues = (data) => ({
     description: data.description,
@@ -16,6 +17,19 @@ define([
     title: data.title
   });
 
+  const parseTimeData = (appointmentGroup) => {
+    if (!appointmentGroup.appointments) {
+      return [];
+    }
+    return appointmentGroup.appointments.map((appointment) => ({
+      timeData: {
+        date: appointment.start_at,
+        startTime: appointment.start_at,
+        endTime: appointment.end_at
+      },
+      slotEventId: appointment.id
+    }));
+  }
 
   class EditPage extends React.Component {
 
@@ -29,7 +43,7 @@ define([
       this.state = {
         appointmentGroup: {},
         formValues: {}
-      }
+      };
     }
 
     componentDidMount () {
@@ -110,6 +124,7 @@ define([
             </div>
             <div className="ic-Form-control">
               <label className="ic-Label" htmlFor="timeblocks">{I18n.t('Time Block')}</label>
+              <TimeBlockSelector timeData={parseTimeData(this.state.appointmentGroup)} />
             </div>
             <div className="ic-Form-control">
               <label className="ic-Label" htmlFor="location">{I18n.t('Location')}</label>

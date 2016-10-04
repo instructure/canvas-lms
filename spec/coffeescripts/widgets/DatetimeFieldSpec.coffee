@@ -129,6 +129,10 @@ define [
     field = new DatetimeField(@$field, timeOnly: true)
     equal @$field.next()[0], field.$suggest[0], 'field and suggest are siblings'
 
+  test 'should set the button to disabled when given the option to do so', ->
+    field = new DatetimeField(@$field, disableButton: true)
+    ok @$field.next().attr('disabled')
+
   test 'should not add hidden input by default', ->
     new DatetimeField(@$field, {})
     ok !@$field.data('hiddenInput'), 'no hidden input'
