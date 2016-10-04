@@ -674,7 +674,8 @@ class Assignment < ActiveRecord::Base
     overridden_users
   end
 
-  def students_with_visibility(scope=context.all_students)
+  def students_with_visibility(scope=nil)
+    scope ||= context.all_students.where("enrollments.workflow_state NOT IN ('inactive', 'rejected')")
     return scope unless self.differentiated_assignments_applies?
     scope.able_to_see_assignment_in_course_with_da(self.id, context.id)
   end

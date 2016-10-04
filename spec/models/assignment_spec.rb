@@ -2004,6 +2004,11 @@ describe Assignment do
       expect(@assignment.participants.include?(@student1)).to be_truthy
     end
 
+    it 'excludes students with inactive enrollments' do
+      @student1.student_enrollments.first.deactivate
+      expect(@assignment.participants.include?(@student1)).to be_falsey
+    end
+
     it 'excludes students without visibility' do
       expect(@assignment.participants.include?(@student2)).to be_falsey
     end
