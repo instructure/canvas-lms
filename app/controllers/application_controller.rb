@@ -166,7 +166,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :rce_js_env
 
-  def conditional_release_js_env(assignment = nil, include_rule: false)
+  def conditional_release_js_env(assignment = nil, includes: [])
     return unless ConditionalRelease::Service.enabled_in_context?(@context)
     cr_env = ConditionalRelease::Service.env_for(
       @context,
@@ -175,7 +175,7 @@ class ApplicationController < ActionController::Base
       assignment: assignment,
       domain: request.env['HTTP_HOST'],
       real_user: @real_current_user,
-      include_rule: include_rule
+      includes: includes
     )
     js_env(cr_env)
   end
@@ -2005,7 +2005,7 @@ class ApplicationController < ActionController::Base
       :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user),
     })
 
-    conditional_release_js_env
+    conditional_release_js_env(includes: :active_rules)
 
     if @context.feature_enabled?(:multiple_grading_periods)
       js_env(:active_grading_periods => GradingPeriod.json_for(@context, @current_user))

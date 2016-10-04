@@ -65,8 +65,13 @@
     </div>
     {{#if canManage}}
       <div class="ig-admin">
-        {{#if hasCyoeRule}}
+        {{#if cyoe.isTrigger}}
         <a href="assignments/{{id}}/edit/#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+        {{/if}}
+        {{#if cyoe.isReleased}}
+        <span class="mastery-path-icon" data-tooltip title="{{#t}}Released by Mastery Path{{/t}}">
+          <i class="icon-mastery-path"></i>
+        </span>
         {{/if}}
         <span class="sis-button" data-view="sis-button"></span>
         <span class="publish-icon" data-view="publish-icon"></span>
@@ -113,7 +118,7 @@
               >{{#t}}Move To…{{/t}}</a>
             </li>
             {{/if}}
-            {{#if cyoeEnabled}}
+            {{#if cyoe.isCyoeAble}}
             <li>
               <a
                 href="assignments/{{id}}/edit/#mastery-paths-editor"

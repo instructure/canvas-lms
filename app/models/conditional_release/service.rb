@@ -38,23 +38,29 @@ module ConditionalRelease
     }.merge(DEFAULT_PATHS).freeze
 
     def self.env_for(context, user = nil, session: nil, assignment: nil, domain: nil,
-                    real_user: nil, include_rule: false)
+                  real_user: nil, includes: [])
+      includes = Array.wrap(includes)
       enabled = self.enabled_in_context?(context)
       env = {
         CONDITIONAL_RELEASE_SERVICE_ENABLED: enabled
       }
+
       if enabled && user
-        new_env = {
-          CONDITIONAL_RELEASE_ENV: {
-            jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
-            assignment: assignment_attributes(assignment),
-            trigger_assignments: active_rules(context, user, session).try(:map) { |r| r['trigger_assignment'].to_s },
-            edit_rule_url: edit_rule_url,
-            stats_url: stats_url,
-            locale: I18n.locale.to_s
-          }
+        cyoe_env = {
+          jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
+          assignment: assignment_attributes(assignment),
+          edit_rule_url: edit_rule_url,
+          stats_url: stats_url,
+          locale: I18n.locale.to_s
         }
-        new_env[:CONDITIONAL_RELEASE_ENV][:rule] = rule_triggered_by(assignment, user, session) if include_rule
+
+        cyoe_env[:rule] = rule_triggered_by(assignment, user, session) if includes.include? :rule
+        cyoe_env[:active_rules] = active_rules(context, user, session) if includes.include? :active_rules
+
+        new_env = {
+          CONDITIONAL_RELEASE_ENV: cyoe_env
+        }
+
         env.merge!(new_env)
       end
       env

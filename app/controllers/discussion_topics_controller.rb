@@ -349,7 +349,7 @@ class DiscussionTopicsController < ApplicationController
                 },
                 :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu)
         }
-        conditional_release_js_env
+        conditional_release_js_env(includes: :active_rules)
         append_sis_data(hash)
         js_env(hash)
 
@@ -588,7 +588,7 @@ class DiscussionTopicsController < ApplicationController
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
             append_sis_data(js_hash)
             js_env(js_hash)
-            conditional_release_js_env(@topic.assignment, include_rule: true)
+            conditional_release_js_env(@topic.assignment, includes: [:rule])
           end
         end
       end

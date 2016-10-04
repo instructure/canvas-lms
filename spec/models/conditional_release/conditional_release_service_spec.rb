@@ -172,12 +172,20 @@ describe ConditionalRelease::Service do
       expect(cr_env[:assignment][:grading_scheme]).to be_nil
     end
 
-    it 'includes a relevant rule if include_rule is true' do
+    it 'includes a relevant rule if includes :rule' do
       assignment_model course: @course
       Service.stubs(:rule_triggered_by).returns(nil)
-      env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment, include_rule: true)
+      env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment, includes: [:rule])
       cr_env = env[:CONDITIONAL_RELEASE_ENV]
       expect(cr_env).to have_key :rule
+    end
+
+    it 'includes a active rules if includes :active_rules' do
+      assignment_model course: @course
+      Service.stubs(:rule_triggered_by).returns(nil)
+      env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment, includes: [:active_rules])
+      cr_env = env[:CONDITIONAL_RELEASE_ENV]
+      expect(cr_env).to have_key :active_rules
     end
   end
 

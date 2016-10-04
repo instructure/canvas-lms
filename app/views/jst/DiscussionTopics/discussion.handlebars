@@ -52,10 +52,15 @@
 
     {{#if permissions.update}}
       {{#if assignment}}
-        {{#if hasCyoeRule}}
+        {{#if cyoe.isTrigger}}
         <div>
           <a href="discussion_topics/{{id}}/edit#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{title}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
         </div>
+        {{/if}}
+        {{#if cyoe.isReleased}}
+        <span class="mastery-path-icon" data-tooltip title="{{#t}}Released by Mastery Path{{/t}}">
+          <i class="icon-mastery-path"></i>
+        </span>
         {{/if}}
       {{/if}}
     {{/if}}
@@ -132,7 +137,7 @@
               </li>
             {{/if}}
           {{/if}}
-          {{#if cyoeEnabled}}
+          {{#if cyoe.isCyoeAble}}
           <li>
             <a href="discussion_topics/{{id}}/edit#mastery-paths-editor" class="icon-mastery-path" title="{{#t}}Edit Mastery Paths for {{title}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
           </li>
