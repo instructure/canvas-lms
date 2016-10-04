@@ -472,6 +472,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     unless @topic.grants_right?(@current_user, session, :read)
+      return render_unauthorized_action unless @current_user
       respond_to do |format|
         flash[:error] = t 'You do not have access to the requested discussion.'
         format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
