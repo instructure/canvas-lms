@@ -424,6 +424,7 @@ describe ApplicationHelper do
     it "should override default help link with the configured support url" do
       support_url = 'http://instructure.com'
       Account.default.update_attribute(:settings, { :support_url => support_url })
+      helper.instance_variable_set(:@domain_root_account, Account.default)
       Setting.set('show_feedback_link', 'false')
 
       expect(helper.support_url).to eq support_url
@@ -436,6 +437,7 @@ describe ApplicationHelper do
     it "should return the configured icon" do
       icon = 'inbox'
       Account.default.update_attribute(:settings, { :help_link_icon => icon })
+      helper.instance_variable_set(:@domain_root_account, Account.default)
 
       expect(helper.help_link_icon).to eq icon
     end
@@ -443,6 +445,7 @@ describe ApplicationHelper do
     it "should return the configured help link name" do
       link_name = 'Links'
       Account.default.update_attribute(:settings, { :help_link_name => link_name })
+      helper.instance_variable_set(:@domain_root_account, Account.default)
 
       expect(helper.help_link_name).to eq link_name
     end
