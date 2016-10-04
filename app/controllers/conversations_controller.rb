@@ -1046,7 +1046,7 @@ class ConversationsController < ApplicationController
     users, contexts = AddressBook.partition_recipients(params[:recipients])
     if context
       user_ids = users.map{ |user| Shard.global_id_for(user) }.to_set
-      is_admin = context.grants_right?(@sender, :read_as_admin)
+      is_admin = context.grants_right?(@current_user, :read_as_admin)
       known = @current_user.address_book.
         known_in_context(context.asset_string, is_admin).
         select{ |user| user_ids.include?(user.global_id) }
