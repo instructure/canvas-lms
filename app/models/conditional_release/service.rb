@@ -243,12 +243,13 @@ module ConditionalRelease
         Context.get_account(context).root_account.domain
       end
 
-      def submissions_for(student)
+      def submissions_for(student, context)
         return [] unless student.present?
 
         Rails.cache.fetch(submissions_cache_key(student)) do
           keys = [:id, :assignment_id, :score, :"assignments.points_possible"]
-          student.submissions.eager_load(:assignment).pluck(*keys).map do |values|
+          context.submissions.for_user(student).eager_load(:assignment)
+            .pluck(*keys).map do |values|
             submission = Hash[keys.zip(values)]
             submission[:points_possible] = submission.delete(:"assignments.points_possible")
             submission
@@ -264,7 +265,7 @@ module ConditionalRelease
                         newer_than_cache?(assignments, cached)
 
         rules_data = rules_cache(context, student, force: cache_expired) do
-          data = { submissions: submissions_for(student) }
+          data = { submissions: submissions_for(student, context) }
           headers = headers_for(context, student, domain_for(context), session)
           req = request_rules(headers, data)
           {rules: req, updated_at: Time.zone.now}

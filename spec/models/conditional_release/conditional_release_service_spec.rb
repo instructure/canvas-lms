@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConditionalRelease::Service do
   Service = ConditionalRelease::Service
@@ -416,35 +417,74 @@ describe ConditionalRelease::Service do
       expect(assignment[:model]).to eq @a
     end
 
-    it 'uses the cache' do
-      enable_cache do
-        expect_cyoe_request '200', @a
-        Service.rules_for(@course, @student, [], nil)
-        Service.rules_for(@course, @student, [], nil)
+    context 'caching' do
+      it 'uses the cache' do
+        enable_cache do
+          expect_cyoe_request '200', @a
+          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, [], nil)
+        end
+      end
+
+      it 'does not use the cache if cache cleared manually' do
+        enable_cache do
+          expect_cyoe_request '200', @a
+          Service.rules_for(@course, @student, [], nil)
+
+          Service.clear_rules_cache_for(@course, @student)
+
+          expect_cyoe_request '200', @a
+          Service.rules_for(@course, @student, [], nil)
+        end
+      end
+
+      it 'does not use the cache if assignments updated' do
+        enable_cache do
+          expect_cyoe_request '200', @a
+          Service.rules_for(@course, @student, [], nil)
+
+          @a.title = 'updated'
+          @a.save!
+
+          expect_cyoe_request '200', @a
+          Service.rules_for(@course, @student, [], nil)
+        end
       end
     end
 
-    it 'does not use the cache if cache cleared manually' do
-      enable_cache do
-        expect_cyoe_request '200', @a
-        Service.rules_for(@course, @student, [], nil)
+    context 'submissions' do
+      def submissions_hash_for(submissions)
+        all_the_submissions = Array.wrap(submissions).map do |submission|
+          submission.slice(:id, :assignment_id, :score)
+            .merge(points_possible: submission.assignment.points_possible)
+            .symbolize_keys
+        end
 
-        Service.clear_rules_cache_for(@course, @student)
-
-        expect_cyoe_request '200', @a
-        Service.rules_for(@course, @student, [], nil)
+        { submissions: all_the_submissions }
       end
-    end
 
-    it 'does not use the cache if assignments updated' do
-      enable_cache do
-        expect_cyoe_request '200', @a
-        Service.rules_for(@course, @student, [], nil)
+      context 'for cross-shard users' do
+        specs_require_sharding
 
-        @a.title = 'updated'
-        @a.save!
+        it 'selects submissions' do
+          course_with_student(active_all: true)
+          @shard1.activate do
+            course_with_student(account: Account.create!, user: @student)
+            sub = submission_model(course: @course, user: @student)
+            Service.expects(:request_rules)
+              .with(anything(), submissions_hash_for(sub))
+            Service.rules_for(@course, @student, [], nil)
+          end
+        end
+      end
 
-        expect_cyoe_request '200', @a
+      it 'includes only submissions for the course' do
+        course_with_student(active_all: true)
+        submission_model(course: @course, user: @student)
+        course_with_student(user: @student)
+        sub = submission_model(course: @course, user: @student)
+        Service.expects(:request_rules)
+          .with(anything(), submissions_hash_for(sub))
         Service.rules_for(@course, @student, [], nil)
       end
     end
