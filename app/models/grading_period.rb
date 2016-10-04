@@ -50,6 +50,21 @@ class GradingPeriod < ActiveRecord::Base
     end
   end
 
+  def self.date_in_closed_grading_period?(course:, date:, periods: nil)
+    period = self.for_date_in_course(date: date, course: course, periods: periods)
+    period.present? && period.closed?
+  end
+
+  def self.for_date_in_course(date:, course:, periods: nil)
+    periods ||= self.for(course)
+
+    if date.nil?
+      return periods.sort_by(&:end_date).last
+    else
+      periods.detect { |p| p.in_date_range?(date) }
+    end
+  end
+
   def self.for(context, inherit: true)
     grading_periods = context.grading_periods.active
     if context.is_a?(Course) && inherit && grading_periods.empty?
@@ -162,6 +177,7 @@ class GradingPeriod < ActiveRecord::Base
     grading_periods = self.class.where(
       grading_period_group_id: grading_period_group_id
     )
+
     if new_record?
       grading_periods
     else
@@ -176,11 +192,11 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def adjust_close_date_for_course_period
-    self.close_date = self.end_date if grading_period_group.present? && course_group?
+    self.close_date = end_date if grading_period_group.present? && course_group?
   end
 
   def ensure_close_date
-    self.close_date ||= self.end_date
+    self.close_date ||= end_date
   end
 
   def close_date_is_on_or_after_end_date

@@ -30,7 +30,7 @@ describe GradebookImporter do
   context "construction" do
     let!(:gradebook_course){ course_model }
 
-    it "should require a context, usually a course" do
+    it "requires a context, usually a course" do
       user = user_model
       progress = Progress.create!(tag: "test", context: @user)
       upload = GradebookUpload.new
@@ -41,12 +41,12 @@ describe GradebookImporter do
         not_to raise_error
     end
 
-    it "should store the context and make it available" do
+    it "stores the context and make it available" do
       new_gradebook_importer
       expect(@gi.context).to be_is_a(Course)
     end
 
-    it "should require the contents of an upload" do
+    it "requires the contents of an upload" do
       progress = Progress.create!(tag: "test", context: @user)
       upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress: progress)
       expect{ GradebookImporter.new(upload) }.
@@ -54,7 +54,7 @@ describe GradebookImporter do
     end
 
 
-    it "should handle points possible being sorted in weird places" do
+    it "handles points possible being sorted in weird places" do
       importer_with_rows(
         'Student,ID,Section,Assignment 1,Final Score',
         '"Blend, Bill",6,My Course,-,',
@@ -65,7 +65,7 @@ describe GradebookImporter do
       expect(@gi.students.length).to eq 2
     end
 
-    it "should handle muted line and being sorted in weird places" do
+    it "handles muted line and being sorted in weird places" do
       importer_with_rows(
           'Student,ID,Section,Assignment 1,Final Score',
           '"Blend, Bill",6,My Course,-,',
@@ -122,7 +122,7 @@ describe GradebookImporter do
   end
 
   context "User lookup" do
-    it "should Lookup with either Student Name, ID, SIS User ID, or SIS Login ID" do
+    it "Lookups with either Student Name, ID, SIS User ID, or SIS Login ID" do
       course_model
 
       student_in_course(:name => "Some Name", active_all: true)
@@ -184,7 +184,7 @@ describe GradebookImporter do
       expect(hash[:students][5][:previous_id]).to be_nil
     end
 
-    it "should Lookup by root account" do
+    it "Lookups by root account" do
       course_model
 
       student_in_course(name: "Some Name", active_all: true)
@@ -210,7 +210,7 @@ describe GradebookImporter do
       expect(hash[:students][0][:name]).to eql(@u1.name)
     end
 
-    it "should allow ids that look like numbers" do
+    it "allows ids that look like numbers" do
       course_model
 
       user_with_pseudonym(:active_all => true)
@@ -244,7 +244,7 @@ describe GradebookImporter do
     end
   end
 
-  it "should parse new and existing assignments" do
+  it "parses new and existing assignments" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1')
     @assignment3 = @course.assignments.create!(:name => 'Assignment 3')
@@ -260,7 +260,7 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to eq [@assignment3]
   end
 
-  it "should parse CSVs with the SIS Login ID column" do
+  it "parses CSVs with the SIS Login ID column" do
     course = course_model
     user = user_model
     progress = Progress.create!(tag: "test", context: @user)
@@ -272,7 +272,7 @@ describe GradebookImporter do
     expect{importer.parse!}.not_to raise_error
   end
 
-  it "should not include missing assignments if no new assignments" do
+  it "does not include missing assignments if no new assignments" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1')
     @assignment3 = @course.assignments.create!(:name => 'Assignment 3')
@@ -284,7 +284,7 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to eq []
   end
 
-  it "should not include assignments with no changes" do
+  it "does not include assignments with no changes" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     importer_with_rows(
@@ -307,7 +307,7 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to eq []
   end
 
-  it "should include assignments that changed only in points possible" do
+  it "includes assignments that changed only in points possible" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     importer_with_rows(
@@ -319,7 +319,7 @@ describe GradebookImporter do
     expect(@gi.assignments.first.points_possible).to eq 20
   end
 
-  it "should not try to create assignments for the totals columns" do
+  it "does not try to create assignments for the totals columns" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     importer_with_rows(
@@ -330,7 +330,7 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to be_empty
   end
 
-  it "should parse new and existing users" do
+  it "parses new and existing users" do
     course_with_student(active_all: true)
     @student1 = @student
     e = student_in_course
@@ -351,7 +351,7 @@ describe GradebookImporter do
     expect(@gi.missing_students).to eq [@student2]
   end
 
-  it "should not include assignments that don't have any grade changes" do
+  it "does not include assignments that don't have any grade changes" do
     course_with_student
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     @assignment1.grade_student(@student, :grade => 10)
@@ -362,7 +362,7 @@ describe GradebookImporter do
     expect(@gi.assignments).to eq []
   end
 
-  it "should include assignments that the grade changed for an existing user" do
+  it "includes assignments that the grade changed for an existing user" do
     course_with_student(active_all: true)
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     @assignment1.grade_student(@student, :grade => 8)
@@ -435,7 +435,7 @@ describe GradebookImporter do
       setup_DA
     end
 
-    it "should ignore submissions for students without visibility" do
+    it "ignores submissions for students without visibility" do
       @assignment_one.grade_student(@student_one, :grade => "3")
       @assignment_two.grade_student(@student_two, :grade => "3")
       importer_with_rows(
@@ -450,7 +450,7 @@ describe GradebookImporter do
       expect(json[:students][1][:submissions][1]["grade"]).to eq "9"
     end
 
-    it "should not break the creation of new assignments" do
+    it "does not break the creation of new assignments" do
       importer_with_rows(
           "Student,ID,Section,a1,a2,a3",
           "#{@student_one.name},#{@student_one.id},,1,2,3"
