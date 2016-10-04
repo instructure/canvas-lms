@@ -211,7 +211,7 @@ describe "scheduler" do
       wait_for_ajaximations
       click_appointment_link
       wait_for_ajaximations
-      expect(f('.agenda-event .ig-row')).to be_present
+      expect(f('.agenda-event__item .agenda-event__item-container')).to be_present
     end
 
     it "should validate the appointment group shows on all views after a student signed up", priority: "1", test_id: 1729408 do
@@ -224,7 +224,7 @@ describe "scheduler" do
       f('#week').click
       expect(f('.fc-content .fc-title').text).to include('new appointment group')
       f('#agenda').click
-      expect(f('.agenda-event .ig-title').text).to include('new appointment group')
+      expect(f('.agenda-event__item .agenda-event__item-container').text).to include('new appointment group')
     end
 
     it "should not allow limiting the max appointments per participant to less than 1", priority: "1", test_id: 140194 do
@@ -251,7 +251,7 @@ describe "scheduler" do
       f(".appointment-group-item:nth-child(1) .view_calendar_link").click
       wait_for_ajaximations
 
-      fj('.agenda-event .ig-row').click
+      fj('.agenda-event__item .agenda-event__item-container').click
 
       wait_for_ajaximations
 
@@ -276,7 +276,7 @@ describe "scheduler" do
 
       f(".appointment-group-item:nth-child(1) .view_calendar_link").click
 
-      f('.agenda-event .ig-row').click
+      f('.agenda-event__item .agenda-event__item-container').click
 
       expect(ff('#attendees li')).to have_size(2)
 
@@ -287,7 +287,7 @@ describe "scheduler" do
       wait_for_ajaximations
       expect(ff('#attendees li')).to have_size(1)
 
-      f('.agenda-event .ig-row').click
+      f('.agenda-event__item .agenda-event__item-container').click
 
       expect(ff('#attendees li')).to have_size(1)
       f('.scheduler_done_button').click
@@ -315,7 +315,7 @@ describe "scheduler" do
 
       f(".appointment-group-item:nth-child(1) .view_calendar_link").click
       wait_for_ajaximations
-      fj('.agenda-event .ig-row').click
+      fj('.agenda-event__item .agenda-event__item-container').click
       wait_for_ajaximations
       expect(ffj('#attendees li').size).to eq 2
 
@@ -326,7 +326,7 @@ describe "scheduler" do
       wait_for_ajaximations
       expect(ff('#attendees li').size).to eq 1
 
-      fj('.agenda-event .ig-row').click
+      fj('.agenda-event__item .agenda-event__item-container').click
       expect(ff('#attendees li').size).to eq 1
       f('.scheduler_done_button').click
     end

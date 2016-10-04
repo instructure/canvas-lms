@@ -1,4 +1,4 @@
-<div class="item-group-container">
+<div class="agenda-container">
   {{#if days}}
     {{#each days}}
       <div class="agenda-day{{#if isToday}} agenda-today{{/if}}">
@@ -6,52 +6,47 @@
           <span aria-hidden="true">{{date}}</span>
           <span class="screenreader-only">{{accessibleDate}}</span>
         </h3>
-
-        <div class="agenda-events">
-          <div class="item-group-condensed">
-            <ul class="ig-list">
-              {{#each events}}
-                <li class="agenda-event" data-event-id="{{id}}">
-                  <div class="ig-row" tabindex="0" role="button">
-                    <div class="ig-row__layout">
-                      <span class="ig-title group_{{contextCode}} {{#if isCompleted}}calendar__event--completed{{/if}}">
-                        <span class="screenreader-only">{{readableType}},</span>
-                        <i class="icon-{{iconType}}"></i>
-                        {{#if ../../meta.better_scheduler}}
-                          {{#if can_edit}}
-                            {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}} {{#if reservedUsers }} - {{reservedUsers}} {{/if}}
-                          {{else}}
-                            {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}}
-                          {{/if}}
-                        {{else}}
-                          {{#ifAll ../../../meta.displayAppointmentEvents isAppointmentGroupEvent}}
-                            {{appointmentGroupEventStatus}}
-                          {{else}}
-                            {{#truncate title 60}}{{/truncate}}
-                          {{/ifAll}}
-                        {{/if}}
-                        {{#if isCompleted}}<span class="screenreader-only">,(completed),</span>{{/if}}
-                      </span>
-                      <span class="screenreader-only">,{{contextInfo.name}},</span>
-                      <div class="ig-details">
-                        {{#if assignment}}
-                          <b>{{#t "due"}}Due{{/t}}</b><span class="screenreader-only">,</span>
-                          {{fcMomentToString originalStart "tiny"}}
-                        {{else}}
-                          {{#unless all_day}}
-                            <span class="screenreader-only">{{#t "starts_at"}}Starts at{{/t}},</span>
-                            {{fcMomentToString originalStart "tiny"}}
-                          {{/unless}}
-                        {{/if}}
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              {{/each}}
-            </ul>
-          </div>
-        </div>
       </div>
+
+        <div class="agenda-event__container">
+          <ul class="agenda-event__list">
+            {{#each events}}
+              <li class="agenda-event__item" data-event-id="{{id}}">
+                <div class="agenda-event__item-container" tabindex="0" role="button">
+                  <div class="agenda-event__icon group_{{contextCode}}">
+                    <span class="screenreader-only">{{readableType}},</span>
+                    <i class="icon-{{iconType}}"></i>
+                  </div>
+                  <div class="agenda-event__time">
+                    {{#if assignment}}
+                      {{#t "due"}}Due {{/t}} <span class="screenreader-only">,</span>
+                      {{fcMomentToString originalStart "tiny"}}
+                    {{else}}
+                      {{#unless all_day}}
+                        <span class="screenreader-only">{{#t "starts_at"}}Starts at{{/t}},</span>
+                        {{fcMomentToString originalStart "tiny"}}
+                      {{/unless}}
+                    {{/if}}
+                  </div>
+                  <span class="agenda-event__title group_{{contextCode}} {{#if isCompleted}}calendar__event--completed{{/if}}">
+                    {{#if ../../meta.better_scheduler}}
+                      {{#truncate title 60}}{{/truncate}} - {{appointmentGroupEventStatus}}
+                    {{else}}
+                      {{#ifAll ../../../meta.displayAppointmentEvents isAppointmentGroupEvent}}
+                        {{appointmentGroupEventStatus}}
+                      {{else}}
+                        {{#truncate title 60}}{{/truncate}}
+                      {{/ifAll}}
+                    {{/if}}
+                    {{#if isCompleted}}<span class="screenreader-only">,(completed),</span>{{/if}}
+                  </span>
+                  <span class="screenreader-only">,{{contextInfo.name}},</span>
+                </div>
+              </li>
+            {{/each}}
+          </ul>
+        </div>
+
     {{/each}}
   {{else}}
     {{#t "no_events"}}<span class="agendaView--no-assignments">No events after this date.</span>{{/t}}
