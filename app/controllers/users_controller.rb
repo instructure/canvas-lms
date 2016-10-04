@@ -484,6 +484,10 @@ class UsersController < ApplicationController
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_courses => true).select { |e| e.invited? }
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
+
+    if @current_user.enrollments.active.count == 1
+      redirect_to "/courses/#{@current_user.enrollments.active.first.course.id}"
+    end
   end
 
   def cached_upcoming_events(user)
