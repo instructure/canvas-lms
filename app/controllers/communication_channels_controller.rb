@@ -295,6 +295,7 @@ class CommunicationChannelsController < ApplicationController
       elsif @current_user && @current_user != @user && @enrollment && @user.registered?
 
         if params[:transfer_enrollment].present?
+          @current_user.associate_with_shard(@enrollment.shard)
           @user.transaction do
             @current_user.transaction do
               cc.active? || cc.confirm
