@@ -19,6 +19,8 @@
 # @API External Tools
 # API for accessing and configuring external tools on accounts and courses.
 # "External tools" are IMS LTI links: http://www.imsglobal.org/developers/LTI/index.cfm
+#
+# NOTE: Placements not documented here should be considered beta features and are not officially supported.
 class ExternalToolsController < ApplicationController
   before_filter :require_context
   before_filter :require_access_to_context, except: [:index, :sessionless_launch]
@@ -41,33 +43,58 @@ class ExternalToolsController < ApplicationController
   # @example_response
   #     [
   #      {
-  #        "id":1,
-  #        "name":"BLTI Example",
-  #        "description":"This is for cool things"
-  #        "url":"http://www.example.com/ims/lti",
-  #        "domain":null,
-  #        "privacy_level":anonymous
-  #        "consumer_key":null,
-  #        "created_at":"2037-07-21T13:29:31Z",
-  #        "updated_at":"2037-07-28T19:38:31Z",
-  #        "custom_fields":{"key":"value"},
-  #        "account_navigation":{"url":"...", "text":"..."},
-  #        "user_navigation":{"url":"...", "text":"..."},
-  #        "course_navigation":{"url":"...", "text":"...", "visibility":"members", "default":true},
-  #        "editor_button":{"url":"...", "text":"...", "selection_width":50, "selection_height":50, "icon_url":"..."},
-  #        "resource_selection":{"url":"...", "text":"...", "selection_width":50, "selection_height":50}
+  #        "id": 1,
+  #        "domain": "domain.example.com",
+  #        "url": "http://www.example.com/ims/lti",
+  #        "consumer_key": "key",
+  #        "name": "LTI Tool",
+  #        "description": "This is for cool things",
+  #        "created_at": "2037-07-21T13:29:31Z",
+  #        "updated_at": "2037-07-28T19:38:31Z",
+  #        "privacy_level": "anonymous",
+  #        "custom_fields": {"key": "value"},
+  #        "account_navigation": {
+  #             "canvas_icon_class": "icon-lti",
+  #             "icon_url": "...",
+  #             "text": "...",
+  #             "url": "...",
+  #             "label": "...",
+  #             "selection_width": 50,
+  #             "selection_height":50
+  #        },
+  #        "assignment_selection": null,
+  #        "course_home_sub_navigation": null,
+  #        "course_navigation": {
+  #             "canvas_icon_class": "icon-lti",
+  #             "icon_url": "...",
+  #             "text": "...",
+  #             "url": "...",
+  #             "default": "disabled",
+  #             "enabled": "true",
+  #             "visibility": "public"
+  #        },
+  #        "editor_button": {
+  #             "canvas_icon_class": "icon-lti",
+  #             "icon_url": "...",
+  #             "message_type": "ContentItemSelectionRequest",
+  #             "text": "...",
+  #             "url": "...",
+  #             "label": "...",
+  #             "selection_width": 50,
+  #             "selection_height": 50
+  #        },
+  #        "homework_submission": null,
+  #        "link_selection": null,
+  #        "migration_selection": null,
+  #        "resource_selection": null,
+  #        "tool_configuration": null,
+  #        "user_navigation": null,
+  #        "selection_width": 500,
+  #        "selection_height": 500,
+  #        "icon_url": "...",
+  #        "not_selectable": false
   #      },
-  #      {
-  #        "id":2,
-  #        "name":"Another BLTI Example",
-  #        "description":"This one isn't very cool."
-  #        "url":null,
-  #        "domain":"example.com",
-  #        "privacy_level":anonymous
-  #        "consumer_key":null,
-  #        "created_at":"2037-07-21T13:29:31Z",
-  #        "updated_at":"2037-07-28T19:38:31Z"
-  #      }
+  #      { ...  }
   #     ]
   def index
     if authorized_action(@context, @current_user, :read)
@@ -262,38 +289,83 @@ class ExternalToolsController < ApplicationController
   # Returns the specified external tool.
   #
   # @response_field id The unique identifier for the tool
+  # @response_field domain The domain to match links against
+  # @response_field url The url to match links against
+  # @response_field consumer_key The consumer key used by the tool (The associated shared secret is not returned)
   # @response_field name The name of the tool
   # @response_field description A description of the tool
-  # @response_field url The url to match links against
-  # @response_field domain The domain to match links against
-  # @response_field privacy_level What information to send to the external tool, "anonymous", "name_only", "public"
-  # @response_field consumer_key The consumer key used by the tool (The associated shared secret is not returned)
   # @response_field created_at Timestamp of creation
   # @response_field updated_at Timestamp of last update
+  # @response_field privacy_level What information to send to the external tool, "anonymous", "name_only", "public"
   # @response_field custom_fields Custom fields that will be sent to the tool consumer
   # @response_field account_navigation The configuration for account navigation links (see create API for values)
-  # @response_field user_navigation The configuration for user navigation links (see create API for values)
+  # @response_field assignment_selection The configuration for assignment selection links (see create API for values)
+  # @response_field course_home_sub_navigation The configuration for course home navigation links (see create API for values)
   # @response_field course_navigation The configuration for course navigation links (see create API for values)
   # @response_field editor_button The configuration for a WYSIWYG editor button (see create API for values)
+  # @response_field homework_submission The configuration for homework submission selection (see create API for values)
+  # @response_field link_selection The configuration for link selection (see create API for values)
+  # @response_field migration_selection The configuration for migration selection (see create API for values)
   # @response_field resource_selection The configuration for a resource selector in modules (see create API for values)
+  # @response_field tool_configuration The configuration for a tool configuration link (see create API for values)
+  # @response_field user_navigation The configuration for user navigation links (see create API for values)
+  # @response_field selection_width The pixel width of the iFrame that the tool will be rendered in
+  # @response_field selection_height The pixel height of the iFrame that the tool will be rendered in
+  # @response_field icon_url The url for the tool icon
+  # @response_field not_selectable whether the tool is not selectable from assignment and modules
   #
   # @example_response
   #      {
-  #        "id":1,
-  #        "name":"BLTI Example",
-  #        "description":"This is for cool things"
-  #        "url":"http://www.example.com/ims/lti",
-  #        "domain":null,
-  #        "privacy_level":anonymous
-  #        "consumer_key":null,
-  #        "created_at":"2037-07-21T13:29:31Z",
-  #        "updated_at":"2037-07-28T19:38:31Z",
-  #        "custom_fields":{"key":"value"},
-  #        "account_navigation":{"url":"...", "text":"..."},
-  #        "user_navigation":{"url":"...", "text":"..."},
-  #        "course_navigation":{"url":"...", "text":"...", "visibility":"members", "default":true},
-  #        "editor_button":{"url":"...", "selection_width":50, "selection_height":50, "icon_url":"..."},
-  #        "resource_selection":{"url":"...", "selection_width":50, "selection_height":50}
+  #        "id": 1,
+  #        "domain": "domain.example.com",
+  #        "url": "http://www.example.com/ims/lti",
+  #        "consumer_key": "key",
+  #        "name": "LTI Tool",
+  #        "description": "This is for cool things",
+  #        "created_at": "2037-07-21T13:29:31Z",
+  #        "updated_at": "2037-07-28T19:38:31Z",
+  #        "privacy_level": "anonymous",
+  #        "custom_fields": {"key": "value"},
+  #        "account_navigation": {
+  #             "canvas_icon_class": "icon-lti",
+  #             "icon_url": "...",
+  #             "text": "...",
+  #             "url": "...",
+  #             "label": "...",
+  #             "selection_width": 50,
+  #             "selection_height":50
+  #        },
+  #        "assignment_selection": null,
+  #        "course_home_sub_navigation": null,
+  #        "course_navigation": {
+  #             "canvas_icon_class": "icon-lti",
+  #             "icon_url": "...",
+  #             "text": "...",
+  #             "url": "...",
+  #             "default": "disabled",
+  #             "enabled": "true",
+  #             "visibility": "public"
+  #        },
+  #        "editor_button": {
+  #             "canvas_icon_class": "icon-lti",
+  #             "icon_url": "...",
+  #             "message_type": "ContentItemSelectionRequest",
+  #             "text": "...",
+  #             "url": "...",
+  #             "label": "...",
+  #             "selection_width": 50,
+  #             "selection_height": 50
+  #        },
+  #        "homework_submission": null,
+  #        "link_selection": null,
+  #        "migration_selection": null,
+  #        "resource_selection": null,
+  #        "tool_configuration": null,
+  #        "user_navigation": null,
+  #        "selection_width": 500,
+  #        "selection_height": 500,
+  #        "icon_url": "...",
+  #        "not_selectable": false
   #      }
   def show
     if api_request?
@@ -603,13 +675,9 @@ class ExternalToolsController < ApplicationController
   # @argument text [String]
   #   The default text to show for this tool
   #
-  # @argument not_selectable [Boolean]
-  #   Default: false, if set to true the tool won't show up in the external tool
-  #   selection UI in modules and assignments
-  #
-  # @argument custom_fields [String]
-  #   Custom fields that will be sent to the tool consumer, specified as
-  #   custom_fields[field_name]
+  # @argument custom_fields[field_name] [String]
+  #   Custom fields that will be sent to the tool consumer; can be used
+  #   multiple times
   #
   # @argument account_navigation[url] [String]
   #   The url of the external tool for account navigation
@@ -620,6 +688,12 @@ class ExternalToolsController < ApplicationController
   # @argument account_navigation[text] [String]
   #   The text that will show on the left-tab in the account navigation
   #
+  # @argument account_navigation[selection_width] [String]
+  #   The width of the dialog the tool is launched in
+  #
+  # @argument account_navigation[selection_height] [String]
+  #   The height of the dialog the tool is launched in
+  #
   # @argument user_navigation[url] [String]
   #   The url of the external tool for user navigation
   #
@@ -629,8 +703,17 @@ class ExternalToolsController < ApplicationController
   # @argument user_navigation[text] [String]
   #   The text that will show on the left-tab in the user navigation
   #
-  # @argument course_navigation[url] [String]
-  #   The url of the external tool for course navigation
+  # @argument course_home_sub_navigation[url] [String]
+  #   The url of the external tool for right-side course home navigation menu
+  #
+  # @argument course_home_sub_navigation[enabled] [Boolean]
+  #   Set this to enable this feature
+  #
+  # @argument course_home_sub_navigation[text] [String]
+  #   The text that will show on the right-side course home navigation menu
+  #
+  # @argument course_home_sub_navigation[icon_url] [String]
+  #   The url of the icon to show in the right-side course home navigation menu
   #
   # @argument course_navigation[enabled] [Boolean]
   #   Set this to enable this feature
@@ -660,6 +743,56 @@ class ExternalToolsController < ApplicationController
   #
   # @argument editor_button[selection_height] [String]
   #   The height of the dialog the tool is launched in
+  #
+  # @argument editor_button[message_type] [String]
+  #   Set this to ContentItemSelectionRequest to tell the tool to use
+  #   content-item; otherwise, omit
+  #
+  # @argument homework_submission[url] [String]
+  #   The url of the external tool
+  #
+  # @argument homework_submission[enabled] [Boolean]
+  #   Set this to enable this feature
+  #
+  # @argument homework_submission[text] [String]
+  #   The text that will show on the homework submission tab
+  #
+  # @argument homework_submission[message_type] [String]
+  #   Set this to ContentItemSelectionRequest to tell the tool to use
+  #   content-item; otherwise, omit
+  #
+  # @argument link_selection[url] [String]
+  #   The url of the external tool
+  #
+  # @argument link_selection[enabled] [Boolean]
+  #   Set this to enable this feature
+  #
+  # @argument link_selection[text] [String]
+  #   The text that will show for the link selection text
+  #
+  # @argument link_selection[message_type] [String]
+  #   Set this to ContentItemSelectionRequest to tell the tool to use
+  #   content-item; otherwise, omit
+  #
+  # @argument migration_selection[url] [String]
+  #   The url of the external tool
+  #
+  # @argument migration_selection[enabled] [Boolean]
+  #   Set this to enable this feature
+  #
+  # @argument migration_selection[message_type] [String]
+  #   Set this to ContentItemSelectionRequest to tell the tool to use
+  #   content-item; otherwise, omit
+  #
+  # @argument tool_configuration[url] [String]
+  #   The url of the external tool
+  #
+  # @argument tool_configuration[enabled] [Boolean]
+  #   Set this to enable this feature
+  #
+  # @argument tool_configuration[message_type] [String]
+  #   Set this to ContentItemSelectionRequest to tell the tool to use
+  #   content-item; otherwise, omit
   #
   # @argument resource_selection[url] [String]
   #   The url of the external tool
@@ -691,6 +824,10 @@ class ExternalToolsController < ApplicationController
   #   URL where the server can retrieve an XML tool configuration, as specified
   #   in the CC xml specification. This is required if "config_type" is set to
   #   "by_url"
+  #
+  # @argument not_selectable [Boolean]
+  #   Default: false, if set to true the tool won't show up in the external tool
+  #   selection UI in modules and assignments
   #
   # @example_request
   #
