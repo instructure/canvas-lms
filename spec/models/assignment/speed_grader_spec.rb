@@ -408,6 +408,18 @@ describe Assignment::SpeedGrader do
         expect(json[:submissions].first['submission_history'].first[:submission]['late']).to be_truthy
       end
 
+      it "returns quiz lateness correctly with overrides" do
+        o = @quiz.assignment_overrides.build
+        o.due_at = 1.day.ago
+        o.due_at_overridden = true
+        o.set = @course.default_section
+        o.save!
+
+        @assignment.reload
+        json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+        expect(json[:submissions].first['submission_history'].first[:submission]['late']).to be_truthy
+      end
+
       it "returns quiz history for records before and after namespace change" do
         @quiz.save!
 
