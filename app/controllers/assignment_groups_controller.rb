@@ -153,9 +153,7 @@ class AssignmentGroupsController < ApplicationController
       group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.where(id: order).uniq.except(:order).pluck(:assignment_group_id)))
       assignments = @context.active_assignments.where(id: order).preload(:active_assignment_overrides)
 
-      unless @current_user.admin_of_root_account?(@context.root_account) || can_reorder_assignments?(assignments)
-        return render_unauthorized_action
-      end
+      return render_unauthorized_action unless can_reorder_assignments?(assignments, @group)
 
       assignments.update_all(assignment_group_id: @group)
       @group.assignments.first.update_order(order) unless @group.assignments.empty?
@@ -382,9 +380,13 @@ class AssignmentGroupsController < ApplicationController
     end
   end
 
-  def can_reorder_assignments?(assignments)
+  def can_reorder_assignments?(assignments, group)
+    return true if @current_user.admin_of_root_account?(@context.root_account)
     return true unless @context.feature_enabled?(:multiple_grading_periods)
     periods = GradingPeriod.for(@context)
-    assignments.none? { |assignment| assignment.due_for_any_student_in_closed_grading_period?(periods) }
+    assignments.none? do |assignment|
+      assignment.assignment_group_id != group.id &&
+        assignment.due_for_any_student_in_closed_grading_period?(periods)
+    end
   end
 end
