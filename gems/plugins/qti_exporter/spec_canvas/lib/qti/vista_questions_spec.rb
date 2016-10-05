@@ -356,7 +356,7 @@ module VistaExpected
                        :question_name=>"Calculated Question 2",
                        :question_text=>"What is 10 - [x]?",
                        :incorrect_comments=>"",
-                       :formulas=>[],
+                       :formulas=>[{:formula => "10-[x]"}],
                        :neutral_comments=>"General Feedback.",
                        :question_type=>"calculated_question",
                        :variables=>[{:scale=>0, :min=>-10, :max=>10, :name=>"x"}]}.with_indifferent_access
@@ -457,7 +457,7 @@ module VistaExpected
                         :question_bank_name=>"Export Test",
                         :points_possible=>100,
                         :question_name=>"Calculated Question ",
-                        :formulas=>[],
+                        :formulas=>[{:formula => "(10*[F])**(-1) * (1000*[F]*[r]*[i]**(-1) * (1-(1 ([i]/200))**(-2*([Y]-10)))   1000*[F]*(1 ([i]/200))**(-2*([Y]-10))) * (1 ([i]/100)*([n]/360))"}],
                         :question_text=>
                                 "Based on her excellent performance as a district sales manager, Maria receives a sizable bonus at work. Since her generous salary is more than enough to provide for the needs of her family, she decides to use the bonus to buy a bond as an investment. The par value of the bond that Maria would like to purchase is $[F] thousand. The bond pays [r]% interest, compounded semiannually (with payment on January 1 and July 1) and matures on July 1, 20[Y]. Maria wants a return of [i]%, compounded semiannually. How much would she be willing to pay for the bond if she buys it [n] days after the July 2010 interest anniversary? Give your answer in the format of a quoted bond price, as a percentage of par to three decimal places -- like you would see in the Wall Street Journal. Use the formula discussed in class -- and from the book, NOT the HP 12c bond feature. (Write only the digits, to three decimal palces, e.g. 114.451 and no $, commas, formulas, etc.)",
                         :answer_tolerance=>0.1,
