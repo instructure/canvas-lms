@@ -188,17 +188,15 @@ class Assignment
           end
         elsif @assignment.quiz && sub.quiz_submission
           json['submission_history'] = qs_versions[sub.quiz_submission.id].map do |v|
-            qs = v.model
-            # copy already-loaded associations over to the model so we
-            # don't have to load them again when qs.late? gets called
-            qs.quiz = @assignment.quiz
-            qs.submission = sub
+            # don't use v.model, because these are huge objects, and can be significantly expensive
+            # to instantiate an actual AR object deserializing and reserializing the inner YAML
+            qs = YAML.load(v.yaml)
 
             {submission: {
-                grade: qs.score,
+                grade: qs['score'],
                 show_grade_in_dropdown: true,
-                submitted_at: qs.finished_at,
-                late: qs.late?,
+                submitted_at: qs['finished_at'],
+                late: Quizzes::QuizSubmission.late_from_attributes?(qs, @assignment.quiz, sub),
                 version: v.number,
               }}
           end
