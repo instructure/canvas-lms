@@ -1448,9 +1448,11 @@ class Assignment < ActiveRecord::Base
   # cap the number we will do
   def too_many_qs_versions?(student_submissions)
     qs_threshold = Setting.get("too_many_quiz_submission_versions", "150").to_i
-    qs_threshold <= student_submissions.inject(0) do |sum, s|
-      s.quiz_submission ? sum + s.quiz_submission.versions.size : sum
-    end
+    qs_ids = student_submissions.map(&:quiz_submission_id).compact
+    return false if qs_ids.empty?
+    Version.shard(shard).from(Version.
+        where(versionable_type: 'Quizzes::QuizSubmission', versionable_id: qs_ids).
+        limit(qs_threshold)).count >= qs_threshold
   end
 
   # :including quiz submission versions won't work for records in the

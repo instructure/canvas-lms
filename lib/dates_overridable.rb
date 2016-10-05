@@ -24,8 +24,8 @@ module DatesOverridable
     @without_overrides || self
   end
 
-  def overridden_for(user)
-    AssignmentOverrideApplicator.assignment_overridden_for(self, user)
+  def overridden_for(user, skip_clone: false)
+    AssignmentOverrideApplicator.assignment_overridden_for(self, user, skip_clone: skip_clone)
   end
 
   # All overrides, not just dates
