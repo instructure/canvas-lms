@@ -52,7 +52,12 @@ define([
       var title = tool.get('display_text');
       var $div = $("<div/>", {id: "homework_selection_dialog", style: "padding: 0; overflow-y: hidden;"}).appendTo($("body"));
 
-      $div.append($("<iframe/>", {frameborder: 0, src: url, id: "homework_selection_iframe"}).css({width: width, height: height}))
+      $div.append($("<iframe/>", {
+        frameborder: 0,
+        src: url,
+        id: "homework_selection_iframe",
+        tabindex: '0'
+      }).css({width: width, height: height}))
         .bind('selection', function(event, data) {
           SubmitAssignmentHelper.submitContentItem(event.contentItems[0]);
           $div.off('dialogbeforeclose', SubmitAssignment.dialogCancelHandler)
