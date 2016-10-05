@@ -242,7 +242,9 @@ module AssignmentOverrideApplicator
   # really takes an assignment or quiz but who wants to type out
   # assignment_or_quiz all the time?
   def self.setup_overridden_clone(assignment, overrides = [])
+    assignment.instance_variable_set(:@readonly_clone, true)
     clone = assignment.clone
+    assignment.instance_variable_set(:@readonly_clone, false)
 
     # ActiveRecord::Base#clone wipes out some important crap; put it back
     [:id, :updated_at, :created_at].each { |attr|
