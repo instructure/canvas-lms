@@ -1432,3 +1432,12 @@ end
 ActiveRecord::Relation::Merger.prepend(MultiMergeWithoutConnection) if CANVAS_RAILS4_0
 
 ActiveRecord::Associations::Builder::BelongsTo.singleton_class.prepend(SkipTouchCallbacks::BelongsTo) unless CANVAS_RAILS4_0
+
+unless CANVAS_RAILS4_0
+  module ReadonlyCloning
+    def calculate_changes_from_defaults
+      super unless @readonly_clone # no reason to do this if we're creating a readonly clone - can take a long time with serialized columns
+    end
+  end
+  ActiveRecord::Base.prepend(ReadonlyCloning)
+end
