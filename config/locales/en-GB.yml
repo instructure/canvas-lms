@@ -443,7 +443,7 @@ en-GB:
           restore_course: "Restore courses"
         view_messages: "View notifications"
       admin_tools_cumb: "Admin tools"
-      admin_tools_title: "Admin Tools"
+      admin_tools_title: "Admin tools"
       auth_logging_content_pane: 
         auth_logging: "User Login / Logout Activity"
       auth_logging_search_results: 
@@ -465,7 +465,7 @@ en-GB:
       comm_messages_search_results: 
         no_messages_found: "No messages found"
       course_logging_content: 
-        course_activity: "Course Activity"
+        course_activity: "Course activity"
         find: Find
       course_logging_details: 
         Field: Field
@@ -473,20 +473,20 @@ en-GB:
         To: To
         Value: Value
         blank_placeholder: "-"
-        copied_from_label: "Copied From"
-        copied_to_label: "Copied To"
+        copied_from_label: "Copied from"
+        copied_to_label: "Copied to"
         date: Date
         event_id: "Event Id"
         event_sis_batch: "SIS Batch"
         event_source_label: Source
         event_type_label: Type
-        reset_from_label: "Reset From"
-        reset_to_label: "Reset To"
+        reset_from_label: "Reset from"
+        reset_to_label: "Reset to"
         time: Time
         user: User
       course_logging_item: 
         blank_placeholder: "-"
-        view_event_details: "View Details"
+        view_event_details: "View details"
       course_logging_results: 
         date: Date
         event_details: "Event details"
@@ -513,11 +513,11 @@ en-GB:
           course_code2: "Course code:"
           restore_btn: Restore
         notdeleted_restore: 
-          add_enrollments: "Add Enrolments"
-          header_subtext: "(Not Deleted)"
+          add_enrollments: "Add enrolments"
+          header_subtext: "(Not deleted)"
           view_course: "View course"
         successful_restore: 
-          view_course: "View ourse"
+          view_course: "View course"
         successfull_restore: 
           add_enrollments: "Add enrolments"
           subtext: "What would you like to do next?"
@@ -526,7 +526,7 @@ en-GB:
         message_date_to: "To date"
       grade_change_logging_content: 
         find: Find
-        grade_change_activity: "Grade Change Activity"
+        grade_change_activity: "Grade change activity"
         message_assignment_id: "Assignment Id"
         message_course_id: "Course Id"
       grade_change_logging_item: 
@@ -547,16 +547,16 @@ en-GB:
         no_item_found: "No items found"
         time: Time
       logging_content_pane: 
-        authentication: "Login / Logout Activity"
-        course: "Course Activity"
-        grade_change: "Grade Change Activity"
-        select_default: "Select a Log type"
+        authentication: "Login / Logout activity"
+        course: "Course activity"
+        grade_change: "Grade change activity"
+        select_default: "Select a log type"
         select_label: "Select a log type to search."
       page_title: "Admin tools for %{account}"
       user_date_range_search_form: 
         find: Find
         generate_activity_userid: "User ID: *%{user_id}*"
-        generate_activity_username: "Generate Activity for *%{user}*"
+        generate_activity_username: "Generate activity for *%{user}*"
         message_date_from: "From date"
         message_date_to: "To date"
         search: "Search for people by ID or name"
@@ -621,7 +621,7 @@ en-GB:
       title: "Confirm delete %{user} from %{account}"
     consortium_user_search: 
       find_user_by: "Find a user by login/email"
-      find_user_by_label: Login/email
+      find_user_by_label: Login/Email
     consortium_users: 
       user_search_label: "User search"
     course: 
@@ -855,13 +855,13 @@ en-GB:
       announcement_sent_to_roles: "Send only to the following types of users:"
       announcement_sent_to_subset: "Sent to 1 / %{denominator} users each month"
       buttons: 
-        add_users: "OK, looks good. Add these users"
+        add_users: "OK, looks good. add these users"
         continue: Continue...
         modify_users: "Go back and edit the list of users"
       confirm_global_announcement: "This announcement will be shown to *all* Canvas users. Confirm that you want to create it."
       confirm_turnitin_settings_link: "confirm Turnitin settings"
       course_roles: "Course roles:"
-      create_courses_description: "(Account Administrators can always create courses)"
+      create_courses_description: "(Account administrators can always create courses)"
       create_courses_title: "Who can create new courses"
       custom_links_to_include_in_the_help_dialog_popup: "Custom links to include in the help dialog popup"
       default_language_description: "This will override any browser/OS language settings. Preferred languages can still be set at the course/user level."
@@ -872,7 +872,7 @@ en-GB:
       enabled_web_serices_title: "Enabled web services"
       equall_endpoint_help: "This is the URL to your equella service. It will probably look something like \"%{sample_url}\"."
       equella_settings_title: "Equella settings"
-      feature_options: "Feature Options"
+      feature_options: "Feature options"
       features_title: Features
       global_announcements_description: "Global announcements are a way for you to post sticky messages on the dashboard of all users in your account.  They will appear on each user's dashboard for the given time period or until the user clicks the \"close\"(×) link to ignore the alert. **These announcements should be used sparingly.**"
       global_announcements_title: "Global announcements"
@@ -909,7 +909,7 @@ en-GB:
         default_time_zone: "Default Time Zone"
         domain: "Domain:"
         edit_institution_email: "Users can delete their institution-assigned email address"
-        enable_alerts: Alerts
+        enable_alerts: "Alerts (beta)"
         enable_eportfolios: ePortfolios
         enable_profiles: "Enable profiles"
         enable_user_notes: "Faculty journal"
@@ -928,7 +928,7 @@ en-GB:
         include_students_in_global_survey: "Include students in global surveys"
         locked: "Lock this setting for sub-accounts and courses"
         locked_for_sub_accounts: "Lock this setting for sub-accounts"
-        login_handle_name: "Login Label"
+        login_handle_name: "Login label"
         message: Message
         mfa_settings: "Multi-factor authentication"
         name: "Account name"
@@ -949,7 +949,7 @@ en-GB:
         self_registration_type_all: "All Account Types"
         self_registration_type_observer: "Observer Accounts Only"
         show_scheduler: "Enable scheduler"
-        sis_app_token: "SIS Agent Token"
+        sis_app_token: "SIS agent token"
         sis_app_url: "SIS App URL"
         sis_default_grade_export: "'Post Marks to SIS' checkbox is enabled by default for assignments, marked discussions and quizzes"
         sis_source_id: "SIS ID"
@@ -1198,11 +1198,11 @@ en-GB:
       account_reports: 
         default: 
           enrollment_state: 
-            header: "Enrolment State"
+            header: "Enrolment state"
           include_enrollment_state: 
-            check_box: "Include Enrolment State"
-      active: "Active Enrolments"
-      all: "All Enrolments"
+            check_box: "Include enrolment state"
+      active: "Active enrolments"
+      all: "All enrolments"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1287,8 +1287,8 @@ en-GB:
           one: "Cannot delete record because a dependent %{record} exists"
         taken: "has already been taken"
   activity_13915493: Activity
-  activity_by_category_9c2033d1: "Activity by Category"
-  activity_by_date_878c5b49: "Activity by Date"
+  activity_by_category_9c2033d1: "Activity by category"
+  activity_by_date_878c5b49: "Activity by date"
   add_2nd_review_ea988088: "Add 2nd review"
   add_8523c19b: Add
   add_a_comment_872470ac: "Add a comment"
@@ -1414,15 +1414,15 @@ en-GB:
   all_accounts_3bafc860: "All Accounts"
   all_changes_were_saved_f6f3ddcc: "All changes were saved"
   all_configured_apps_a14eef0a: "All configured apps"
-  all_courses_a7dbb853: "All Courses"
+  all_courses_a7dbb853: "All courses"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "All dates fields must be present and formatted correctly"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "All finished?  Time to publish your course!  Click the button below to make it official! Publishing will allow the users to begin participating in the course."
   all_grading_period_sets_must_have_a_title_799538f: "All grading period sets must have a title"
   all_grading_period_sets_must_have_at_least_one_enr_20b84ba1: "All marking period sets must have at least one enrolment term"
   all_grading_periods_77974940: "All grading periods"
   all_grading_periods_must_have_a_title_a1a38d87: "All grading periods must have a title"
-  all_groups_cea25817: "All Groups"
-  all_my_files_a0213441: "All My Files"
+  all_groups_cea25817: "All groups"
+  all_my_files_a0213441: "All my files"
   all_start_dates_must_be_before_the_end_date_d949eca9: "All start dates must come before end dates"
   all_students_have_taken_the_quiz_b558f8b4: "All students have taken the quiz"
   all_students_have_taken_the_survey_494f9f42: "All students have taken the survey"
