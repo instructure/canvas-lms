@@ -91,7 +91,10 @@ module AppCenter
     end
 
     def get_app_config_url(app_center_id, config_settings)
-      app_details = fetch_app_center_response("/api/v1/lti_apps/#{app_center_id}", 5.minutes, 1, 1)
+      access_token = @app_center.settings['token']
+      endpoint = "/api/v1/lti_apps/#{app_center_id}?access_token=#{access_token}"
+
+      app_details = fetch_app_center_response(endpoint, 5.minutes, 1, 1)
 
       if app_details['config_xml_url']
         user_query_string = ''

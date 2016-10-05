@@ -191,6 +191,15 @@ describe AppCenter::AppApi do
       url = api.get_app_config_url(app_center_id, config_settings)
       expect(url).to be_nil
     end
+
+    it 'sends the app center token' do
+      endpoint = "/api/v1/lti_apps/pr_youtube?access_token=#{api.app_center.settings['token']}"
+      api.stubs(:fetch_app_center_response).with(endpoint, 300, 1, 1).returns(app_center_response)
+      app_center_id = 'pr_youtube'
+      config_settings = {custom_param: 'custom_value'}
+      url = api.get_app_config_url(app_center_id, config_settings)
+      expect(url).to eq "#{app_center_response['config_xml_url']}&custom_param=custom_value"
+    end
   end
 
   describe '#get_apps' do
