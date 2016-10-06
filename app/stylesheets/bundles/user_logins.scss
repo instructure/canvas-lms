@@ -8,7 +8,14 @@
     padding-bottom: 5px;
     border-bottom: 1px solid #eee;
     vertical-align: top;
-    &.sso-icon { vertical-align: middle; }
+    &.sso-icon {
+      padding-top: 6px;
+
+      .ic-icon-svg {
+        width: 26px;
+        height: 26px;
+      }
+    }
   }
   .account_name {
     line-height: 3.0;
