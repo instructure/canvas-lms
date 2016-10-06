@@ -191,7 +191,7 @@ class ChoiceInteraction < AssessmentItemConverter
             migration_id = migration_id.text.strip()
 
             answer = answers_hash[migration_id]
-            answer ||= answers_hash.values.detect{|a| a[:text] == migration_id}
+            answer ||= answers_hash.values.detect{|a| a[:text] && a[:text].downcase == migration_id.downcase}
 
             if answer
               answer[:weight] = get_response_weight(r_if)
