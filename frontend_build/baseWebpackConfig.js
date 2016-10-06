@@ -103,7 +103,8 @@ module.exports = {
           /client_apps\/canvas_quizzes\/apps\//
         ],
         loaders: [
-          'babel?cacheDirectory=tmp'
+          // make sure we don't try to cache JSX assets when building for production
+          'babel' + (process.env.NODE_ENV === 'production' ? '': '?cacheDirectory=tmp')
         ]
       },
       {
