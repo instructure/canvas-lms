@@ -608,8 +608,11 @@ class Attachment < ActiveRecord::Base
 
           attachment_scope = context.attachments.active.where(root_attachment_id: nil)
 
-          if context.is_a?(User)
-            excluded_attachment_ids = context.attachments.joins(:attachment_associations).where("attachment_associations.context_type = ?", "Submission").pluck(:id)
+          if context.is_a?(User) || context.is_a?(Group)
+            excluded_attachment_ids = []
+            if context.is_a?(User)
+              excluded_attachment_ids += context.attachments.joins(:attachment_associations).where("attachment_associations.context_type = ?", "Submission").pluck(:id)
+            end
             excluded_attachment_ids += context.attachments.where(folder_id: context.submissions_folders).pluck(:id)
             attachment_scope = attachment_scope.where("id NOT IN (?)", excluded_attachment_ids) if excluded_attachment_ids.any?
           end
