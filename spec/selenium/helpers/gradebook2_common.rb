@@ -318,9 +318,4 @@ module Gradebook2Common
   def get_group_points
     ff('div.assignment-points-possible')
   end
-
-  def click_it(btn)
-    btn.click
-    wait_for_ajaximations
-  end
 end

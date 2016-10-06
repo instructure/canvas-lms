@@ -159,28 +159,23 @@ module AssignmentsCommon
     )
   end
 
-  def create_assignment_with_group_category_auto_open
-    get "/courses/#{@course.id}/assignments/new"
-
-    f('#assignment_name').send_keys('my title')
-    driver.execute_script 'tinyMCE.activeEditor.setContent("text")'
-
-    f('#assignment_text_entry').click
-    f('#has_group_category').click
+  def create_assignment_with_group_category_preparation
+    create_assignment_preparation
+    select_assignment_group_category(-2)
   end
 
-
-  def create_assignment_with_group_category
+  def create_assignment_preparation
     get "/courses/#{@course.id}/assignments/new"
-
     f('#assignment_name').send_keys('my title')
-    driver.execute_script 'tinyMCE.activeEditor.setContent("text")'
-
+    type_in_tiny('textarea[name=description]', 'text')
     f('#assignment_text_entry').click
+  end
+
+  def select_assignment_group_category(id)
     f('#has_group_category').click
-    move_to_click('#assignment_group_category_id')
-    f('#assignment_group_category_id').send_keys :arrow_up
-    f('#assignment_group_category_id').send_keys :return
+    options = ff('#assignment_group_category_id option')
+    option_element = id.blank? ? options.first : options[id]
+    option_element.click
   end
 
   def create_file_list
