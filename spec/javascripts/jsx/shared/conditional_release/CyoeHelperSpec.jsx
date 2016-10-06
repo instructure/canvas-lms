@@ -7,8 +7,13 @@ define([
     CONDITIONAL_RELEASE_ENV: {
       active_rules: [{
         trigger_assignment: '1',
+        trigger_assignment_model: {
+          grading_type: 'percentage',
+        },
         scoring_ranges: [
           {
+            upper_bound: 1,
+            lower_bound: 0.7,
             assignment_sets: [
               { assignments: [{ assignment_id: '2' }] },
             ],
@@ -84,6 +89,28 @@ define([
       setEnv(cyoeEnv())
       const itemData = CyoeHelper.getItemData('1')
       ok(itemData.isCyoeAble)
+    })
+
+    test('return null for releasedLabel if item is not released by a rule', () => {
+      setEnv(cyoeEnv())
+      const itemData = CyoeHelper.getItemData('1')
+      equal(itemData.releasedLabel, null)
+    })
+
+    test('return correct scoring range for releasedLabel if item is released by a single rule', () => {
+      setEnv(cyoeEnv())
+      const itemData = CyoeHelper.getItemData('2')
+      equal(itemData.releasedLabel, '100% - 70%')
+    })
+
+    test('return correct "Multiple" for releasedLabel if item is released by a multiple rules', () => {
+      const env = cyoeEnv()
+      const newRule = Object.assign({}, env.CONDITIONAL_RELEASE_ENV.active_rules[0])
+      newRule.trigger_assignment = '3'
+      env.CONDITIONAL_RELEASE_ENV.active_rules.push(newRule)
+      setEnv(env)
+      const itemData = CyoeHelper.getItemData('2')
+      equal(itemData.releasedLabel, 'Multiple')
     })
 
     module('reloadEnv', testSetup)

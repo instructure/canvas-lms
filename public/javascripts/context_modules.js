@@ -516,8 +516,9 @@ define([
         var cyoe = CyoeHelper.getItemData(data.assignment_id, data.is_cyoe_able)
 
         if (cyoe.isReleased) {
-          var $pathIcon = $('<span class="mastery-path-icon" data-tooltip><i class="icon-mastery-path" /></span>')
+          var $pathIcon = $('<span class="pill mastery-path-icon" data-tooltip><i class="icon-mastery-path" /></span>')
             .attr('title', I18n.t('Released by Mastery Path'))
+            .append(htmlEscape(cyoe.releasedLabel))
           $admin.prepend($pathIcon)
         }
 

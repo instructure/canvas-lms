@@ -204,7 +204,22 @@ module ConditionalRelease
       Rails.cache.fetch(active_rules_cache_key(course)) do
         headers = headers_for(course, current_user, domain_for(course), session)
         request = CanvasHttp.get(rules_url, headers)
-        JSON.parse(request.body)
+        rules = JSON.parse(request.body)
+
+        trigger_ids = rules.map { |rule| rule['trigger_assignment'] }
+        trigger_assgs = Assignment.preload(:grading_standard).where(id: trigger_ids).each_with_object({}) do |a, assgs|
+          assgs[a.id.to_s] = {
+            points_possible: a.points_possible,
+            grading_type: a.grading_type,
+            grading_scheme: a.uses_grading_standard ? a.grading_scheme : nil,
+          }
+        end
+
+        rules.each do |rule|
+          rule['trigger_assignment_model'] = trigger_assgs[rule['trigger_assignment']]
+        end
+
+        rules
       end
     end
 

@@ -307,20 +307,52 @@ describe ConditionalRelease::Service do
 
     before(:once) do
       course_with_teacher
-      @a, @b, @c, @d = 4.times.map { assignment_model course: @course }
+      @a1 = assignment_model course: @course, grading_type: 'points', points_possible: 20
+      @a2 = assignment_model course: @course, grading_type: 'letter_grade', points_possible: 30
+      @a3 = assignment_model course: @course, grading_type: 'percent', points_possible: 25
+      @a4 = assignment_model course: @course, grading_type: 'points', points_possible: 35
     end
 
     let_once(:default_rules) do
       [
-        {id: 1, trigger_assignment: @a.id.to_s, scoring_ranges: [{ assignment_sets: [
+        {id: 1, trigger_assignment: @a1.id.to_s, scoring_ranges: [{ assignment_sets: [
           { assignments: [
-            { assignment_id: @b.id.to_s },
-            { assignment_id: @c.id.to_s }]}]}]},
-        {id: 2, trigger_assignment: @b.id.to_s, scoring_ranges: [{ assignment_sets: [
+            { assignment_id: @a2.id.to_s },
+            { assignment_id: @a3.id.to_s }]}]}]},
+        {id: 2, trigger_assignment: @a2.id.to_s, scoring_ranges: [{ assignment_sets: [
           { assignments: [
-            { assignment_id: @c.id.to_s }]}]}]},
-        {id: 3, trigger_assignment: @c.id.to_s}
+            { assignment_id: @a3.id.to_s }]}]}]},
+        {id: 3, trigger_assignment: @a3.id.to_s}
       ].as_json
+    end
+
+    context 'assignment data' do
+      before(:each) do
+        Service.stubs(:enabled_in_context?).returns(true)
+        CanvasHttp.expects(:get).once.returns stub({ body: default_rules.to_json })
+      end
+
+      let(:rules) do
+        Service.active_rules(@course, @teacher, @session)
+      end
+
+      it 'includes correct points' do
+        expect(rules[0]['trigger_assignment_model'][:points_possible]).to be 20.0
+        expect(rules[1]['trigger_assignment_model'][:points_possible]).to be 30.0
+      end
+
+      it 'includes correct grading type' do
+        expect(rules[0]['trigger_assignment_model'][:grading_type]).to eq 'points'
+        expect(rules[1]['trigger_assignment_model'][:grading_type]).to eq 'letter_grade'
+      end
+
+      it 'includes grading scheme only for correct grading type' do
+        expect(rules[0]['trigger_assignment_model'][:grading_scheme]).to be nil
+        expect(rules[1]['trigger_assignment_model'][:grading_scheme]).to eq({
+          "A"=>0.94, "A-"=>0.9, "B+"=>0.87, "B"=>0.84, "B-"=>0.8, "C+"=>0.77,
+          "C"=>0.74, "C-"=>0.7, "D+"=>0.67, "D"=>0.64, "D-"=>0.61, "F"=>0.0
+        })
+      end
     end
 
     describe 'rule_triggered_by' do
@@ -331,7 +363,7 @@ describe ConditionalRelease::Service do
       it 'caches the response of any http call' do
         enable_cache do
           CanvasHttp.expects(:get).once.returns stub({ body: default_rules.to_json })
-          Service.rule_triggered_by(@a, @teacher, nil)
+          Service.rule_triggered_by(@a1, @teacher, nil)
         end
       end
 
@@ -339,15 +371,15 @@ describe ConditionalRelease::Service do
         it 'returns a matching rule' do
           enable_cache do
             cache_active_rules
-            expect(Service.rule_triggered_by(@a, @teacher, nil)['id']).to eq 1
-            expect(Service.rule_triggered_by(@c, @teacher, nil)['id']).to eq 3
+            expect(Service.rule_triggered_by(@a1, @teacher, nil)['id']).to eq 1
+            expect(Service.rule_triggered_by(@a3, @teacher, nil)['id']).to eq 3
           end
         end
 
         it 'returns nil if no rules are matching' do
           enable_cache do
             cache_active_rules
-            expect(Service.rule_triggered_by(@d, @teacher, nil)).to be nil
+            expect(Service.rule_triggered_by(@a4, @teacher, nil)).to be nil
           end
         end
       end
@@ -360,7 +392,7 @@ describe ConditionalRelease::Service do
       it 'returns nil without making request if service is not enabled' do
         Service.stubs(:enabled_in_context?).returns(false)
         CanvasHttp.stubs(:get).raises 'should not generate request'
-        Service.rule_triggered_by(@a, @teacher, nil)
+        Service.rule_triggered_by(@a1, @teacher, nil)
       end
     end
 
@@ -371,20 +403,20 @@ describe ConditionalRelease::Service do
 
       it 'caches the calculation of the reverse index' do
         enable_cache do
-          Service.rules_assigning(@a, @teacher, nil)
+          Service.rules_assigning(@a1, @teacher, nil)
           Service.stubs(:active_rules).raises 'should not refetch rules'
-          Service.rules_assigning(@b, @teacher, nil)
+          Service.rules_assigning(@a2, @teacher, nil)
         end
       end
 
       it 'returns all rules which matched assignments' do
-        expect(Service.rules_assigning(@b, @teacher, nil).map{|r| r['id']}).to eq [1]
-        expect(Service.rules_assigning(@c, @teacher, nil).map{|r| r['id']}).to eq [1, 2]
+        expect(Service.rules_assigning(@a2, @teacher, nil).map{|r| r['id']}).to eq [1]
+        expect(Service.rules_assigning(@a3, @teacher, nil).map{|r| r['id']}).to eq [1, 2]
       end
 
       it 'returns nil if no rules matched assignments' do
-        expect(Service.rules_assigning(@a, @teacher, nil)).to eq nil
-        expect(Service.rules_assigning(@d, @teacher, nil)).to eq nil
+        expect(Service.rules_assigning(@a1, @teacher, nil)).to eq nil
+        expect(Service.rules_assigning(@a4, @teacher, nil)).to eq nil
       end
     end
   end

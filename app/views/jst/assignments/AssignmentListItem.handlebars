@@ -69,8 +69,8 @@
         <a href="assignments/{{id}}/edit/?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
         {{/if}}
         {{#if cyoe.isReleased}}
-        <span class="mastery-path-icon" data-tooltip title="{{#t}}Released by Mastery Path{{/t}}">
-          <i class="icon-mastery-path"></i>
+        <span class="pill mastery-path-icon" data-tooltip title="{{#t}}Released by Mastery Path{{/t}}">
+          <i class="icon-mastery-path"></i>{{cyoe.releasedLabel}}
         </span>
         {{/if}}
         <span class="sis-button" data-view="sis-button"></span>
