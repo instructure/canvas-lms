@@ -237,10 +237,7 @@ class AppointmentGroupsController < ApplicationController
   #   "reserved_times":: the event id, start time and end time of reservations
   #                      the current user has made)
   def index
-    unless request.format == :json
-      anchor = calendar_fragment :view_name => :scheduler
-      return redirect_to calendar2_url(:anchor => anchor)
-    end
+    return web_index unless request.format == :json
 
     contexts = params[:context_codes] if params.include?(:context_codes)
 
@@ -374,10 +371,7 @@ class AppointmentGroupsController < ApplicationController
   #   "appointments":: will always be returned
   def show
     if authorized_action(@group, @current_user, :read)
-      unless request.format == :json
-        anchor = calendar_fragment :view_name => :scheduler, :appointment_group_id => @group.id
-        return redirect_to calendar2_url(:anchor => anchor)
-      end
+      return web_show unless request.format == :json
 
       render :json => appointment_group_json(@group, @current_user, session,
                                              :include => ((params[:include] || []) | ['appointments']),
@@ -583,5 +577,37 @@ class AppointmentGroupsController < ApplicationController
     strong_params.require(:appointment_group).permit(:title, :description, :location_name, :location_address, :participants_per_appointment,
       :min_appointments_per_participant, :max_appointments_per_participant, :participant_visibility, :cancel_reason,
       :sub_context_codes => [], :new_appointments => strong_anything)
+  end
+
+  def web_index
+    anchor = if @domain_root_account.feature_enabled?(:better_scheduler)
+      # start with the first reservable appointment group
+      group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
+      calendar_fragment :view_name => :agenda, :view_start => group && group.start_at.strftime('%Y-%m-%d')
+    else
+      calendar_fragment :view_name => :scheduler
+    end
+    return redirect_to calendar2_url(:anchor => anchor)
+  end
+
+  def web_show
+    anchor = if @domain_root_account.feature_enabled?(:better_scheduler)
+      args = {}
+      if params[:find_appointment]
+        # start at the appointment group; enter find-appointment mode for a relevant course
+        args[:view_start] = @group.start_at.strftime('%Y-%m-%d')
+        course_id = @group.appointment_group_contexts.where(context_type: 'Course', context_id: @current_user.student_enrollments.pluck(:course_id)).pluck(:context_id).first
+        args[:find_appointment] = "course_#{course_id}"
+      else
+        # start at the appointment event, or the group start if no event is given
+        event = params[:event_id] && CalendarEvent.find_by_id(params[:event_id])
+        event = nil unless event && event.grants_right?(@current_user, :read)
+        args[:view_start] = (event || @group).start_at.strftime('%Y-%m-%d')
+      end
+      calendar_fragment({ :view_name => :agenda }.merge(args))
+    else
+      calendar_fragment :view_name => :scheduler, :appointment_group_id => @group.id
+    end
+    return redirect_to calendar2_url(:anchor => anchor)
   end
 end

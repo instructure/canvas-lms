@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-  <%= appointment_group_url(asset.appointment_group) %>
+  <%= appointment_group_url(asset.appointment_group, :event_id => asset.to_param) %>
 <% end -%>
 <%= t :message, 'Canvas Alert - %{user} has signed up for "%{appointment_name}".', :user => data.updating_user.name, :appointment_name => asset.title %>

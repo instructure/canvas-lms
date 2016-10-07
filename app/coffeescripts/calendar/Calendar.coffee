@@ -27,13 +27,14 @@ define [
   'compiled/util/deparam'
   'str/htmlEscape'
   'compiled/calendar/CalendarEventFilter'
+  'jsx/calendar/scheduler/actions'
 
   'fullcalendar-with-lang-all'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, tz, moment, fcUtil, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, ContextColorer, deparam, htmlEscape, calendarEventFilter) ->
+], (I18n, $, _, tz, moment, fcUtil, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, ContextColorer, deparam, htmlEscape, calendarEventFilter, schedulerActions) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -108,6 +109,14 @@ define [
 
       if data.view_name == 'scheduler' && data.appointment_group_id
         @scheduler.viewCalendarForGroupId data.appointment_group_id
+
+      # enter find-appointment mode via sign-up-for-things notification URL
+      if data.find_appointment && @schedulerStore
+        course = ENV.CALENDAR.CONTEXTS.filter (context) ->
+          context.asset_string == data.find_appointment
+        if course.length
+          @schedulerStore.dispatch(schedulerActions.actions.setCourse(course[0]))
+          @schedulerStore.dispatch(schedulerActions.actions.setFindAppointmentMode(true))
 
       window.setInterval(@drawNowLine, 1000 * 60)
 
