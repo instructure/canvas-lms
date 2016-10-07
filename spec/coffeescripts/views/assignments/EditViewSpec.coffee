@@ -51,6 +51,7 @@ define [
           model: dueDateList
           views: {}
 
+    app.enableCheckbox = () -> {}
     app.render()
 
   module 'EditView',
@@ -206,6 +207,25 @@ define [
     ok view.$("[type=checkbox][name=moderated_grading]").prop("checked")
     ok view.$("[type=checkbox][name=moderated_grading]").prop("disabled")
     equal view.$('[type=hidden][name=moderated_grading]').attr('value'), '1'
+
+  test 'routes to discussion details normally', ->
+    view = @editView html_url: 'http://foo'
+    equal view.locationAfterSave({}), 'http://foo'
+
+  test 'routes to return_to', ->
+    view = @editView html_url: 'http://foo'
+    equal view.locationAfterSave({ return_to: 'http://bar' }), 'http://bar'
+
+  test 'cancels to env normally', ->
+    ENV.CANCEL_TO = 'http://foo'
+    view = @editView()
+    equal view.locationAfterCancel({}), 'http://foo'
+
+  test 'cancels to return_to', ->
+    ENV.CANCEL_TO = 'http://foo'
+    view = @editView()
+    equal view.locationAfterCancel({ return_to: 'http://bar' }), 'http://bar'
+
 
   module 'EditView: group category locked',
     setup: ->

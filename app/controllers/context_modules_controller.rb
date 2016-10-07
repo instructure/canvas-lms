@@ -174,7 +174,8 @@ class ContextModulesController < ApplicationController
             controller: controller,
             action: 'edit',
             id: @tag.content_id,
-            anchor: 'mastery-paths-editor'
+            anchor: 'mastery-paths-editor',
+            return_to: params[:return_to]
           )
         else
           render status: 404, template: 'shared/errors/404_message'

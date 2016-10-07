@@ -159,6 +159,7 @@ define [
       data.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
 
       data.cyoe = CyoeHelper.getItemData(data.id, @isGraded() && (!@model.isQuiz() || data.is_quiz_assignment))
+      data.return_to = encodeURIComponent window.location.pathname
 
       if data.canManage
         data.spanWidth      = 'span3'

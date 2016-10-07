@@ -17,13 +17,14 @@ define [
   'compiled/jquery/toggleAccessibly'
   'compiled/views/editor/KeyboardShortcuts'
   'jsx/shared/conditional_release/ConditionalRelease'
+  'compiled/util/deparam'
   'jqueryui/dialog'
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
 ], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, template,
 userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
 AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
-ConditionalRelease) ->
+ConditionalRelease, deparam) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -124,14 +125,14 @@ ConditionalRelease) ->
       @assignment = @model
       @setDefaultsIfNew()
       @dueDateOverrideView = options.views['js-assignment-overrides']
-      @on 'success', => window.location = @model.get 'html_url'
+      @on 'success', @redirectAfterSave
       @gradingTypeSelector.on 'change:gradingType', @handleGradingTypeChange
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         @gradingTypeSelector.on 'change:gradingType', @onChange
 
     handleCancel: (ev) =>
       ev.preventDefault()
-      window.location = ENV.CANCEL_TO if ENV.CANCEL_TO?
+      @redirectAfterCancel()
 
     settingsToCache:() =>
       ["assignment_group_id","grading_type","submission_type","submission_types",
@@ -473,6 +474,22 @@ ConditionalRelease) ->
           message: I18n.t 'External Tool URL cannot be left blank'
         ]
       errors
+
+    redirectAfterSave: ->
+      window.location = @locationAfterSave(deparam())
+
+    locationAfterSave: (params) ->
+      return params['return_to'] if params['return_to']?
+      @model.get 'html_url'
+
+    redirectAfterCancel: ->
+      location = @locationAfterCancel(deparam())
+      window.location = location if location
+
+    locationAfterCancel: (params) ->
+      return params['return_to'] if params['return_to']?
+      return ENV.CANCEL_TO if ENV.CANCEL_TO?
+      null
 
     onChange: ->
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && @assignmentUpToDate

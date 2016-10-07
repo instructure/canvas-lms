@@ -523,7 +523,10 @@ define([
 
         if (cyoe.isCyoeAble) {
           var $mpLink = $('<a class="mastery_paths_link" />')
-            .attr('href', './modules/items/' + data.id + '/edit_mastery_paths')
+            .attr('href', './modules/items/' +
+                          data.id +
+                          '/edit_mastery_paths?return_to=' +
+                          encodeURIComponent(window.location.pathname))
             .attr('title', I18n.t('Edit Mastery Paths for %{title}', { title: data.title }))
             .text(I18n.t('Mastery Paths'))
 

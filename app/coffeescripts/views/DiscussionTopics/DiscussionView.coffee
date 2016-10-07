@@ -166,6 +166,7 @@ define [
         tool.url = tool.base_url + "&discussion_topics[]=#{@model.get("id")}"
 
       base.cyoe = CyoeHelper.getItemData(base.assignment_id)
+      base.return_to = encodeURIComponent window.location.pathname
       base
 
     # Internal: Re-render for publish state change preserving focus

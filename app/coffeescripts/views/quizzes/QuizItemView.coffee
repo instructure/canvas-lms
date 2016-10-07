@@ -101,6 +101,7 @@ define [
         tool.url = tool.base_url + "&quizzes[]=#{@model.get("id")}"
 
       base.cyoe = CyoeHelper.getItemData(base.assignment_id, base.quiz_type == 'assignment')
+      base.return_to = encodeURIComponent window.location.pathname
 
       if @model.get("multiple_due_dates")
         base.selector  = @model.get("id")

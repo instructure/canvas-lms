@@ -54,7 +54,7 @@
       {{#if assignment}}
         {{#if cyoe.isTrigger}}
         <div>
-          <a href="discussion_topics/{{id}}/edit#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{title}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+          <a href="discussion_topics/{{id}}/edit?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{title}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
         </div>
         {{/if}}
         {{#if cyoe.isReleased}}
@@ -139,7 +139,7 @@
           {{/if}}
           {{#if cyoe.isCyoeAble}}
           <li>
-            <a href="discussion_topics/{{id}}/edit#mastery-paths-editor" class="icon-mastery-path" title="{{#t}}Edit Mastery Paths for {{title}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+            <a href="discussion_topics/{{id}}/edit?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" title="{{#t}}Edit Mastery Paths for {{title}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
           </li>
           {{/if}}
           <li>

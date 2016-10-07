@@ -444,7 +444,7 @@ class DiscussionTopicsController < ApplicationController
         }
         js_hash['VALID_DATE_RANGE'] = CourseDateRange.new(@context)
       end
-      js_hash[:CANCEL_REDIRECT_URL] = cancel_redirect_url
+      js_hash[:CANCEL_TO] = cancel_redirect_url
       append_sis_data(js_hash)
       js_env(js_hash)
 
