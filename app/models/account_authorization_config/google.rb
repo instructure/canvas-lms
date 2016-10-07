@@ -55,7 +55,7 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
   end
 
   def unique_id(token)
-    id_token = id_token(token)
+    id_token = claims(token)
     if hosted_domain && id_token['hd'] != hosted_domain
       # didn't make a "nice" exception for this, cause it should never happen.
       # either we got MITM'ed (on the server side), or Google's docs lied;
@@ -65,18 +65,10 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
     super
   end
 
-  def provider_attributes(token)
-    result = id_token(token).dup
-    if federated_attributes.any? { |(_k, v)| ['family_name', 'given_name', 'locale', 'name'].include?(v['attribute']) }
-      result.merge!(token.get("https://www.googleapis.com/oauth2/v3/userinfo").parsed)
-    end
-    result
-  end
-
   protected
 
-  def id_token(token)
-    token.options[:id_token] ||= JWT.decode(token.params['id_token'], nil, false).first
+  def userinfo_endpoint
+    "https://www.googleapis.com/oauth2/v3/userinfo".freeze
   end
 
   def authorize_options
