@@ -1,7 +1,0 @@
-<div id="topbar" role="navigation" aria-label="<%= t('navigation.user_menu', 'User Menu') %>">
-  <% if (identity = (yield :identity).presence) %>
-    <%= identity %>
-  <% else %>
-    <%= render(:partial => 'shared/identity') %>
-  <% end %>
-</div>

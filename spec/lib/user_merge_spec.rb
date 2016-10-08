@@ -154,7 +154,7 @@ describe UserMerge do
       user1.communication_channels.create!(:path => 'a@instructure.com')
       user2.communication_channels.create!(:path => 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
       # active => unconfirmed conflict
-      user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
+      cc1 = user1.communication_channels.create!(:path => 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
       user2.communication_channels.create!(:path => 'B@instructure.com')
       # active => active conflict
       user1.communication_channels.create!(:path => 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
@@ -193,6 +193,13 @@ describe UserMerge do
       UserMerge.from(user1).into(user2)
       user1.reload
       user2.reload
+      records = UserMergeData.where(user_id: user2).take.user_merge_data_records
+      expect(records.count).to eq 8
+      record = records.where(context_id: cc1).take
+      expect(record.previous_user_id).to eq user1.id
+      expect(record.previous_workflow_state).to eq 'active'
+      expect(record.context_type).to eq 'CommunicationChannel'
+
       expect(user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq [
           ['A@instructure.com', 'active'],
           ['C@instructure.com', 'active'],
@@ -207,8 +214,7 @@ describe UserMerge do
           ['k@instructure.com', 'active'],
           ['l@instructure.com', 'unconfirmed'],
           ['m@instructure.com', 'unconfirmed'],
-          ['n@instructure.com', 'retired'],
-          ['o@instructure.com', 'retired']
+          ['n@instructure.com', 'retired']
       ]
       expect(user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq [
           ['a@instructure.com', 'retired'],
@@ -217,6 +223,7 @@ describe UserMerge do
           ['e@instructure.com', 'retired'],
           ['g@instructure.com', 'retired'],
           ['i@instructure.com', 'retired'],
+          ['o@instructure.com', 'retired']
       ]
       %w{B@instructure.com F@instructure.com H@instructure.com}.each do |path|
         expect(CommunicationChannel.where(user_id: [user1, user2]).by_path(path).detect { |cc| cc.path == path }).to be_nil

@@ -6,6 +6,14 @@
     "type": "color",
     "default": "#008EE2"
   },{
+    "variable_name": "ic-brand-font-color-dark",
+    "type": "color",
+    "default": "#2D3B45"
+  },{
+    "variable_name": "ic-link-color",
+    "type": "color",
+    "default": "#008EE2"
+  },{
     "variable_name": "ic-brand-button--primary-bgd",
     "type": "color",
     "default": "$ic-brand-primary"
@@ -16,15 +24,11 @@
   },{
     "variable_name": "ic-brand-button--secondary-bgd",
     "type": "color",
-    "default": "#333333"
+    "default": "#2D3B45"
   },{
     "variable_name": "ic-brand-button--secondary-text",
     "type": "color",
     "default": "#ffffff"
-  },{
-    "variable_name": "ic-link-color",
-    "type": "color",
-    "default": "#008EE2"
   }
 ]},
 {

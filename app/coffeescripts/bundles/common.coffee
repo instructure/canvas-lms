@@ -1,6 +1,7 @@
 require [
   'jquery'
   'underscore'
+  'i18n!common'
 
   # true modules that we manage in this file
   'Backbone'
@@ -46,37 +47,39 @@ require [
   'vendor/jquery.pageless'
   'vendor/jquery.scrollTo'
   'compiled/badge_counts'
-], ($, _, Backbone, helpDialog) ->
+], ($, _, I18n, Backbone, helpDialog) ->
   helpDialog.initTriggers()
 
   $('#skip_navigation_link').on 'click', ->
     $($(this).attr('href')).attr('tabindex', -1).focus()
 
-  # TODO: remove this code once people have had time to update their logo-related
-  # custom css. see related code in app/stylesheets/base/_#header.sass.
-  $logo = $('#header-logo')
-  if $logo.length > 0 and $logo.css('background-image').match(/\/canvas\/header_canvas_logo\.png/)
-    $logo.addClass('original')
-
   # show and hide the courses vertical menu when the user clicks the hamburger button
   # This was in the courses bundle, but it sometimes needs to work in places that don't
   # load that bundle.
-  if window.ENV.use_new_styles
-    WIDE_BREAKPOINT = 1200
+  WIDE_BREAKPOINT = 1200
 
-    resetMenuItemTabIndexes = ->
-      # in testing this, it seems that $(document).width() returns 15px less than what it should.
-      tabIndex = if ($('body').hasClass('course-menu-expanded') || $(document).width() >= WIDE_BREAKPOINT - 15)
-        0
-      else
-        -1
-      $('#section-tabs li a').attr('tabIndex', tabIndex)
+  resetMenuItemTabIndexes = ->
+    # in testing this, it seems that $(document).width() returns 15px less than what it should.
+    tabIndex = if ($('body').hasClass('course-menu-expanded') || $(document).width() >= WIDE_BREAKPOINT - 15)
+      0
+    else
+      -1
+    $('#section-tabs li a').attr('tabIndex', tabIndex)
 
-    $(resetMenuItemTabIndexes)
-    $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
-    $('body').on 'click', '#courseMenuToggle', ->
-      $('body').toggleClass("course-menu-expanded")
-      resetMenuItemTabIndexes()
+  $(resetMenuItemTabIndexes)
+  $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
+  $('body').on 'click', '#courseMenuToggle', ->
+    $('body').toggleClass("course-menu-expanded")
+    
+    # update course menu and toggle for accessibility
+    courseMenuExpanded = $('body').hasClass('course-menu-expanded')
+    courseMenuToggleText = if courseMenuExpanded then I18n.t("Hide courses menu") else I18n.t("Show courses menu")
+    courseMenuToggle = $('#courseMenuToggle')
+    courseMenuToggle.attr("aria-label", courseMenuToggleText)
+    courseMenuToggle.attr("title", courseMenuToggleText)
+    $('#left-side').css({display: if courseMenuExpanded then 'block' else 'none'})
+
+    resetMenuItemTabIndexes()
 
 
   ##

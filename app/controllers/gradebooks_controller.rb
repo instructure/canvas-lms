@@ -566,6 +566,8 @@ class GradebooksController < ApplicationController
           :force_anonymous_grading => force_anonymous_grading?(@assignment),
           :grading_role => grading_role,
           :lti_retrieve_url => retrieve_course_external_tools_url(@context.id, assignment_id: @assignment.id, display: 'borderless'),
+          :course_id => @context.id,
+          :assignment_id => @assignment.id,
         }
         if [:moderator, :provisional_grader].include?(grading_role)
           env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)

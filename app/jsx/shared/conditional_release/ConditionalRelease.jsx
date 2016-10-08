@@ -2,8 +2,10 @@ define([
   'jquery',
   'react',
   'react-dom',
-  'react-modal'
-], function($, React, ReactDOM, Modal) {
+  'react-modal',
+  'i18n!conditional_release',
+  'jquery.instructure_forms'
+], function($, React, ReactDOM, Modal, I18n) {
 
   const SAVE_TIMEOUT = 15000
 
@@ -39,17 +41,34 @@ define([
     getInitialState() {
       return {
         messagePort: null,
-        validationError: null,
+        validationErrors: null,
         saveInProgress: null
       };
     },
 
-    setValidationError(err) {
-      this.setState({ validationError: err });
+    setValidationErrors(err) {
+      this.setState({ validationErrors: JSON.parse(err) });
     },
 
     validateBeforeSave() {
-      return this.state.validationError;
+      const errors = []
+      if (this.state.validationErrors) {
+
+        this.state.validationErrors.forEach((errorRecord) => {
+          $.screenReaderFlashError(I18n.t('%{error} in mastery paths range %{index}', {
+            error: errorRecord.error,
+            index: errorRecord.index + 1 }))
+          errors.push({ message: errorRecord.error })
+        })
+      }
+      return errors.length == 0 ? null : errors;
+    },
+
+    focusOnError() {
+      if (this.refs.iframe && this.refs.iframe.contentWindow) {
+        this.refs.iframe.contentWindow.focus()
+      }
+      this.postMessage('focusOnError')
     },
 
     updateAssignment(newAttributes = {}) {
@@ -163,8 +182,8 @@ define([
         case 'saveError':
           this.saveError(this.state.saveInProgress, messageEvent.data.messageBody);
           break;
-        case 'validationError':
-          this.setValidationError(messageEvent.data.messageBody);
+        case 'validationErrors':
+          this.setValidationErrors(messageEvent.data.messageBody);
           break;
         }
       }
@@ -178,7 +197,14 @@ define([
       const iframeId = this.popupId();
       return (
         <div className='conditional-release-editor'>
-          <iframe className='conditional-release-editor-frame' ref='iframe' id={iframeId} name={iframeId} />
+          <iframe
+            className='conditional-release-editor-frame'
+            ref='iframe'
+            id={iframeId}
+            name={iframeId}
+            title={I18n.t('Mastery Paths Editor')}
+            aria-label={I18n.t('Mastery Paths Editor')}
+          />
         </div>
       )
     }

@@ -117,7 +117,7 @@ module Importers
       rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
       rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
       if rubric
-        assoc = rubric.associate_with(item, context, :purpose => 'grading')
+        assoc = rubric.associate_with(item, context, :purpose => 'grading', :skip_updating_points_possible => true)
         assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.has_key?(:rubric_use_for_grading)
         assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.has_key?(:rubric_hide_score_total)
         if hash[:saved_rubric_comments]
@@ -170,7 +170,7 @@ module Importers
       [:turnitin_enabled, :peer_reviews,
        :automatic_peer_reviews, :anonymous_peer_reviews,
        :grade_group_students_individually, :allowed_extensions,
-       :position, :peer_review_count, :muted, :moderated_grading
+       :position, :peer_review_count, :muted, :moderated_grading, :omit_from_final_grade
       ].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end

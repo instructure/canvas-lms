@@ -39,6 +39,10 @@ class AccountAuthorizationConfig::Oauth < AccountAuthorizationConfig::Delegated
     @client ||= OAuth::Consumer.new(consumer_key, consumer_secret, consumer_options)
   end
 
+  def provider_attributes
+    {}
+  end
+
   protected
 
   def token_options

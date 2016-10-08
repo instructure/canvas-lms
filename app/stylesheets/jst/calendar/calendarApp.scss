@@ -34,6 +34,10 @@
   }
 }
 
+.fc-event.grayed {
+  opacity: 0.5;
+}
+
 .fc-event.assignment, .fc-event.assignment_override {
   .fc-event-inner div {
     display: inline;

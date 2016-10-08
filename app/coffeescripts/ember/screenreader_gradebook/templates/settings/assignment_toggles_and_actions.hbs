@@ -74,17 +74,6 @@
   </div>
   <div class="span8">
     <div class="pad-box bottom-only">
-      <button
-        id="ag_weights"
-        class="btn"
-        {{ action 'openDialog' 'ag_weights' target=view }}
-        {{ bind-attr disabled=assignment_groups.isLoading }}
-      >
-        {{#t 'set_group_weights'}}Set Group Weights{{/t}}
-      </button>
-    </div>
-
-    <div class="pad-box bottom-only">
       <button class="btn" {{action "exportGradebookCsv"}} id="gradebook-export">
         <i class="icon-download"></i> {{#t 'download_current_scores'}}Download Current Scores (.csv){{/t}}
       </button>

@@ -1093,7 +1093,7 @@ describe CoursesController, type: :request do
         @course.reload
         expect(@course.workflow_state).to eql 'deleted'
         new_course = Course.find(json['id'])
-        expect(new_course.workflow_state).to eql 'created'
+        expect(new_course.workflow_state).to eql 'claimed'
         expect(json['workflow_state']).to eql 'unpublished'
       end
     end
@@ -1659,6 +1659,71 @@ describe CoursesController, type: :request do
                       { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' })
       expect(json.collect{ |c| c['id'].to_i }).to eq [@course3.id]
       expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'user_id' => @me.id, 'enrollment_state' => 'invited' }]
+    end
+  end
+
+  describe "enrollment_state" do
+    before :once do
+      @course2.start_at = 1.day.from_now
+      @course2.conclude_at = 2.days.from_now
+      @course2.restrict_enrollments_to_course_dates = true
+      @course2.save! # pending_active
+
+      @course3 = course(:active_all => true)
+      @course3.enroll_user(@me, 'StudentEnrollment') #invited
+
+      @course4 = course(:active_all => true)
+      @course4.enroll_user(@me, 'StudentEnrollment')
+      @course4.start_at = 2.days.ago
+      @course4.conclude_at = 1.day.ago
+      @course4.restrict_enrollments_to_course_dates = true
+      @course4.save! # completed
+    end
+
+    it "should return courses with active enrollments" do
+      json = api_call(:get, "/api/v1/courses.json?enrollment_state=active",
+        { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_state => 'active' })
+      expect(json.collect{ |c| c['id'].to_i }).to eq [@course1.id]
+    end
+
+    it "should return courses with invited or pending enrollments" do
+      json = api_call(:get, "/api/v1/courses.json?enrollment_state=invited_or_pending",
+        { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_state => 'invited_or_pending' })
+      expect(json.collect{ |c| c['id'].to_i }.sort).to eq [@course2.id, @course3.id].sort
+    end
+
+    it "should return courses with completed enrollments" do
+      json = api_call(:get, "/api/v1/courses.json?enrollment_state=completed",
+        { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_state => 'completed' })
+      expect(json.collect{ |c| c['id'].to_i }).to eq [@course4.id]
+    end
+
+    it "should return active observed student enrollments if requested" do
+      @student = user(:active_all => true)
+      @student_enroll = @course1.enroll_user(@student, "StudentEnrollment")
+      @student_enroll.accept!
+      @observer = user(:active_all => true)
+      @course1.enroll_user(@observer, "ObserverEnrollment", :associated_user_id => @student.id)
+
+      json = api_call_as_user(@observer, :get,
+        "/api/v1/courses.json?include[]=observed_users&enrollment_state=active",
+        { :controller => 'courses', :action => 'index',
+          :id => @observer_course.to_param, :format => 'json', :include => [ "observed_users" ], :enrollment_state => 'active' })
+
+      expect(json.first['enrollments'].count).to eq 2
+      student_enroll_json = json.first['enrollments'].detect{|e| e["type"] == "student"}
+      expect(student_enroll_json["user_id"]).to eq @student.id
+
+      @student_enroll.start_at = 3.days.ago
+      @student_enroll.end_at = 2.days.ago
+      @student_enroll.save! # soft-conclude
+
+      json = api_call_as_user(@observer, :get,
+        "/api/v1/courses.json?include[]=observed_users&enrollment_state=active",
+        { :controller => 'courses', :action => 'index',
+          :id => @observer_course.to_param, :format => 'json', :include => [ "observed_users" ], :enrollment_state => 'active' })
+
+      expect(json.first['enrollments'].count).to eq 1
     end
   end
 

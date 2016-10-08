@@ -382,6 +382,7 @@ CanvasRails::Application.routes.draw do
     resources :content_exports, only: [:create, :index, :destroy, :show]
     get 'modules/items/assignment_info' => 'context_modules#content_tag_assignment_data', as: :context_modules_assignment_info
     get 'modules/items/:id' => 'context_modules#item_redirect', as: :context_modules_item_redirect
+    get 'modules/items/:id/choose' => 'context_modules#choose_mastery_path'
     get 'modules/items/sequence/:id' => 'context_modules#item_details', as: :context_modules_item_details
     delete 'modules/items/:id' => 'context_modules#remove_item', as: :context_modules_remove_item
     put 'modules/items/:id' => 'context_modules#update_item', as: :context_modules_update_item
@@ -846,7 +847,7 @@ CanvasRails::Application.routes.draw do
     get 'download' => 'files#show', download: '1'
   end
 
-  resources :developer_keys, only: :index
+  resources :developer_keys, only: :index # DEPRECATED
 
   resources :rubrics do
     resources :rubric_assessments, path: :assessments
@@ -1403,13 +1404,13 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :developer_keys) do
-      get 'developer_keys', action: :index
+      get 'developer_keys', action: :index # DEPRECATED
       get 'developer_keys/:id', action: :show
       delete 'developer_keys/:id', action: :destroy
       put 'developer_keys/:id', action: :update
-      post 'developer_keys', action: :create
+      post 'developer_keys', action: :create # DEPRECATED
 
-      get 'accounts/:account_id/developer_keys', action: :index
+      get 'accounts/:account_id/developer_keys', action: :index, as: 'account_developer_keys'
       post 'accounts/:account_id/developer_keys', action: :create
     end
 
@@ -1510,6 +1511,7 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/modules/:module_id/items/:id", action: :update, as: 'course_context_module_item_update'
       delete "courses/:course_id/modules/:module_id/items/:id", action: :destroy
       post "courses/:course_id/modules/:module_id/items/:id/mark_read", action: :mark_item_read
+      post "courses/:course_id/modules/:module_id/items/:id/select_mastery_path", action: :select_mastery_path
     end
 
     scope(controller: 'quizzes/quiz_assignment_overrides') do

@@ -10,6 +10,7 @@ define [
   'bower/tinymce/plugins/textcolor/plugin'
   'bower/tinymce/plugins/link/plugin'
   'bower/tinymce/plugins/directionality/plugin'
+  'bower/tinymce/plugins/lists/plugin'
 ], (markScriptsLoaded, punch) ->
 
   # prevent tiny from loading any CSS assets
@@ -25,6 +26,7 @@ define [
     "plugins/textcolor/plugin"
     "plugins/link/plugin"
     'plugins/directionality/plugin'
+    'plugins/lists/plugin'
   ]
 
   tinymce

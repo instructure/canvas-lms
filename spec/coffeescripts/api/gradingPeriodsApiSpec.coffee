@@ -9,12 +9,14 @@ define [
       id: "1",
       title: "Q1",
       startDate: new Date("2015-09-01T12:00:00Z"),
-      endDate: new Date("2015-10-31T12:00:00Z")
+      endDate: new Date("2015-10-31T12:00:00Z"),
+      closeDate: new Date("2015-11-07T12:00:00Z")
     },{
       id: "2",
       title: "Q2",
       startDate: new Date("2015-11-01T12:00:00Z"),
-      endDate: new Date("2015-12-31T12:00:00Z")
+      endDate: new Date("2015-12-31T12:00:00Z"),
+      closeDate: new Date("2016-01-07T12:00:00Z")
     }
   ]
 
@@ -24,12 +26,14 @@ define [
         id: "1",
         title: "Q1",
         start_date: new Date("2015-09-01T12:00:00Z"),
-        end_date: new Date("2015-10-31T12:00:00Z")
+        end_date: new Date("2015-10-31T12:00:00Z"),
+        close_date: new Date("2015-11-07T12:00:00Z")
       },{
         id: "2",
         title: "Q2",
         start_date: new Date("2015-11-01T12:00:00Z"),
-        end_date: new Date("2015-12-31T12:00:00Z")
+        end_date: new Date("2015-12-31T12:00:00Z"),
+        close_date: new Date("2016-01-07T12:00:00Z")
       }
     ]
   }
@@ -52,6 +56,25 @@ define [
     api.batchUpdate(123, deserializedPeriods)
        .then (periods) =>
           deepEqual periods, deserializedPeriods
+          start()
+
+  asyncTest "uses the endDate as the closeDate when a period has no closeDate", ->
+    periodsWithoutCloseDate = {
+      grading_periods: [
+        {
+          id: "1",
+          title: "Q1",
+          start_date: new Date("2015-09-01T12:00:00Z"),
+          end_date: new Date("2015-10-31T12:00:00Z"),
+          close_date: null
+        }
+      ]
+    }
+    successPromise = new Promise (resolve) => resolve({ data: periodsWithoutCloseDate })
+    @stub(axios, "patch").returns(successPromise)
+    api.batchUpdate(123, deserializedPeriods)
+       .then (periods) =>
+          deepEqual periods[0].closeDate, new Date("2015-10-31T12:00:00Z")
           start()
 
   asyncTest "rejects the promise upon errors", ->

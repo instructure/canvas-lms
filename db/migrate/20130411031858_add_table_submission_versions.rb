@@ -19,7 +19,7 @@ class AddTableSubmissionVersions < ActiveRecord::Migration
 
     add_index :submission_versions, columns,
       :name => 'index_submission_versions',
-      :where => { :context_type => 'Course' },
+      :where => "context_type='Course'",
       :unique => true
   end
 

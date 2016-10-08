@@ -9,7 +9,7 @@ class CreateAccessTokens < ActiveRecord::Migration
       t.datetime :last_used_at
       t.datetime :expires_at
       t.string :purpose
-      t.timestamps
+      t.timestamps null: true
     end
     add_index :access_tokens, [:token], :unique => true
 

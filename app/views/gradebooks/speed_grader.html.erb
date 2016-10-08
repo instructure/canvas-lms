@@ -140,6 +140,9 @@
 <div id="enrollment_concluded_notice" class="alert alert-info" style="display: none;">
   <span><%= t "Notice: Concluded Student" %></span>
 </div>
+<div id="closed_gp_notice" class="alert alert-info" style="display:none">
+  <span><%= t "Notice: The grading period is closed for this student" %></span>
+</div>
 <div id="full_width_container" style="display:none">
   <div id="left_side" class="full_height">
     <div id="left_side_inner">
@@ -230,10 +233,10 @@
           </div>
           <% end %>
 
-          <% if  @assignment.rubric_association || can_do(@context, @current_user, :manage_grades) %>
+          <% if  @assignment.rubric_association || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
           <div id="grading">
             <h2 class="gradebookHeader--rightside"><%= t('headers.assessment', "Assessment") %></h2>
-            <% if can_do(@context, @current_user, :manage_grades) %>
+            <% if can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
               <div id="grade_container">
                 <%= render partial: "grading_box_extended",
                            locals: { assignment: @assignment } %>
@@ -265,15 +268,18 @@
           <div id="discussion">
             <div id="comments">
               <div class="comment" id="comment_blank" style="display: none;">
-                <a href="javascript:void 0;" class="delete_comment_link icon-x">
-                  <span class="screenreader-only"><%= t('icons.delete_comment', 'Delete comment') %></span>
-                </a>
-                <button class="submit_comment_button">
-                  <span><%= t('Submit') %></span>
-                </button>
-                <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="avatar" alt="" style="display: none;"/>
-                <span class="draft-marker" aria-label="<%= t('Draft comment') %>">*</span><span class="comment"></span>
-                <a href="#" class="play_comment_link media-comment" style="display:none;"><%= t('links.click_to_view', "click here to view") %></a>
+                <div class="comment_flex">
+                  <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="avatar" alt="" style="display: none;"/>
+                  <span class="draft-marker" aria-label="<%= t('Draft comment') %>">*</span>
+                  <span class="comment"></span>
+                  <button class="submit_comment_button">
+                    <span><%= t('Submit') %></span>
+                  </button>
+                  <a href="javascript:void 0;" class="delete_comment_link icon-x">
+                    <span class="screenreader-only"><%= t('Delete comment') %></span>
+                  </a>
+                </div>
+                <a href="#" class="play_comment_link media-comment" style="display:none;"><%= t('click here to view') %></a>
                 <div class="media_comment_content" style="display:none"></div>
                 <div class="comment_attachments"></div>
                 <div class="comment_citation">

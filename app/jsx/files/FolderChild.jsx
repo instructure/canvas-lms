@@ -54,7 +54,7 @@ define([
               ref='newName'
               className='ic-Input ef-edit-name-form__input'
               placeholder={I18n.t('name', 'Name')}
-              ariaLabel={I18n.t('folder_name', 'Folder Name')}
+              aria-label={I18n.t('folder_name', 'Folder Name')}
               defaultValue={this.props.model.displayName()}
               maxLength='255'
               onKeyUp={function (event){ if (event.keyCode === 27) {this.cancelEditingName()} }.bind(this)}
@@ -62,10 +62,10 @@ define([
             <button
               type="button"
               className="Button ef-edit-name-form__button ef-edit-name-cancel"
-              ariaLabel={I18n.t('cancel', 'Cancel')}
               onClick={this.cancelEditingName}
             >
-              <i className='icon-x' />
+              <i className='icon-x' aria-hidden />
+              <span className='screenreader-only'>{I18n.t('cancel', 'Cancel')}</span>
             </button>
           </div>
         </form>
@@ -140,7 +140,6 @@ define([
         <label className= {keyboardCheckboxClass} role= 'gridcell'>
           <input
             type= 'checkbox'
-            ariaLabel= {selectCheckboxLabel}
             onFocus= {function(){ this.setState({hideKeyboardCheck: false})}.bind(this)}
             onBlur = {function () {this.setState({hideKeyboardCheck: true})}.bind(this)}
             className = {keyboardCheckboxClass}

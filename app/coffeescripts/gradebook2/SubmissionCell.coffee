@@ -72,7 +72,7 @@ define [
     validate: () ->
       { valid: true, msg: null }
 
-    @formatter: (row, col, submission, assignment, student) ->
+    @formatter: (row, col, submission, assignment, student, opts = {}) ->
       if submission.excused
         grade = "EX"
       else
@@ -85,7 +85,14 @@ define [
         if grade && assignment?.grading_type == "percent"
           grade = grade.toString() + "%"
 
-      this.prototype.cellWrapper(grade, {submission: submission, assignment: assignment, editable: false, student: student})
+      this.prototype.cellWrapper(grade, {
+        submission: submission,
+        assignment: assignment,
+        editable: false,
+        student: student,
+        isLocked: !!opts.isLocked,
+        tooltip: opts.tooltip
+      })
 
     cellWrapper: (innerContents, options = {}) ->
       opts = $.extend({}, {
@@ -94,14 +101,16 @@ define [
         student: {
           isInactive: false,
           isConcluded: false,
-        }
+        },
+        isLocked: false
       }, options)
       opts.submission ||= @opts.item[@opts.column.field]
       opts.assignment ||= @opts.column.object
       submission_type = opts.submission.submission_type if opts.submission?.submission_type || null
       specialClasses = SubmissionCell.classesBasedOnSubmission(opts.submission, opts.assignment)
-      specialClasses.push("grayed-out") if opts.student.isInactive || opts.student.isConcluded
-      specialClasses.push("cannot_edit") if opts.student.isConcluded
+      specialClasses.push("grayed-out") if opts.student.isInactive || opts.student.isConcluded || opts.isLocked
+      specialClasses.push("cannot_edit") if opts.student.isConcluded || opts.isLocked
+      specialClasses.push(opts.tooltip) if opts.tooltip
       opts.editable = false if opts.student.isConcluded
 
       opts.classes += ' no_grade_yet ' unless opts.submission.grade && opts.submission.workflow_state != 'pending_review'
@@ -114,7 +123,7 @@ define [
 
       tooltipText = $.map(specialClasses, (c)-> GRADEBOOK_TRANSLATIONS["submission_tooltip_#{c}"]).join ', '
 
-      cellCommentHTML = if !opts.student.isConcluded
+      cellCommentHTML = if !opts.student.isConcluded && !opts.isLocked
         """
         <a href="#" data-user-id=#{opts.submission.user_id} data-assignment-id=#{opts.assignment.id} class="gradebook-cell-comment"><span class="gradebook-cell-comment-label">submission comments</span></a>
         """
@@ -163,6 +172,8 @@ define [
           "filmstrip"
         when "online_quiz"
           "quiz"
+        else
+          "document"
 
   class SubmissionCell.out_of extends SubmissionCell
     init: () ->
@@ -177,7 +188,7 @@ define [
       @$input = @$wrapper.find('input').focus().select()
 
   class SubmissionCell.letter_grade extends SubmissionCell
-    @formatter: (row, col, submission, assignment, student) ->
+    @formatter: (row, col, submission, assignment, student, opts={}) ->
       innerContents = if submission.excused
         "EX"
       else if submission.score?
@@ -185,16 +196,16 @@ define [
       else
         submission.grade
 
-      SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false, student: student})
+      SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false, student: student, isLocked: !!opts.isLocked, tooltip: opts.tooltip})
 
   class SubmissionCell.gpa_scale extends SubmissionCell
-    @formatter: (row, col, submission, assignment, student) ->
+    @formatter: (row, col, submission, assignment, student, opts={}) ->
       innerContents = if submission.excused
         "EX"
       else
         submission.grade
 
-      SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false, student: student, classes: "gpa_scale_cell"})
+      SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false, student: student, classes: "gpa_scale_cell", isLocked: !!opts.isLocked, tooltip: opts.tooltip})
 
   class SubmissionCell.pass_fail extends SubmissionCell
 
@@ -231,9 +242,9 @@ define [
           aria-label="#{htmlEscape cssClass}"><span class="screenreader-only">#{htmlEscape cssClass}</span>#{checkboxButtonTemplate(iconClass)}</button>
         """, options)
 
-    @formatter: (row, col, submission, assignment, student) ->
+    @formatter: (row, col, submission, assignment, student, opts={}) ->
       return SubmissionCell.formatter.apply(this, arguments) unless submission.grade?
-      pass_fail::htmlFromSubmission({ submission, assignment, editable: false})
+      pass_fail::htmlFromSubmission({ submission, assignment, editable: false, isLocked: opts.isLocked, tooltip: opts.tooltip })
 
     init: () ->
       @$wrapper = $(@cellWrapper())

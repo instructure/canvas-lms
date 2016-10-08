@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../../sharding_spec_helper'
 
 describe CalendarEventsApiController, type: :request do
   before :once do
@@ -26,7 +27,7 @@ describe CalendarEventsApiController, type: :request do
 
   context 'events' do
     expected_fields = [
-      'all_day', 'all_day_date', 'child_events', 'child_events_count', 'comments',
+      'all_context_codes', 'all_day', 'all_day_date', 'child_events', 'child_events_count', 'comments',
       'context_code', 'created_at', 'description', 'duplicates', 'end_at', 'hidden', 'html_url',
       'id', 'location_address', 'location_name', 'parent_event_id', 'start_at',
       'title', 'type', 'updated_at', 'url', 'workflow_state'
@@ -613,6 +614,17 @@ describe CalendarEventsApiController, type: :request do
             error = errors.first
             expect(error.slice("attribute", "type", "message")).to eql({"attribute" => "reservation", "type" => "calendar_event", "message" => "invalid participant"})
             expect(error['reservations'].size).to eql 0
+          end
+
+          context "sharding" do
+            specs_require_sharding
+
+            it "should allow students to specify themselves as the participant" do
+              short_form_id = "#{Shard.current.id}~#{@user.id}"
+              api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations/#{short_form_id}", {
+                :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s, :participant_id => short_form_id})
+              expect(response).to be_success
+            end
           end
 
           it "should notify the teacher when appointment is canceled" do

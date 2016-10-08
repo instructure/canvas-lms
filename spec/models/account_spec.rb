@@ -113,18 +113,12 @@ describe Account do
       process_csv_data_cleanly([
         "course_id,user_id,role,section_id,status,associated_user_id",
         ",U001,student,S001,active,",
-        ",U002,student,S002,active,",
-        ",U003,student,S003,active,",
-        ",U004,student,S004,active,",
         ",U005,student,S005,active,",
         ",U006,student,S006,deleted,",
         ",U007,student,S007,active,",
         ",U008,student,S008,active,",
         ",U009,student,S005,deleted,",
         ",U001,student,S001S,active,",
-        ",U002,student,S002S,active,",
-        ",U003,student,S003S,active,",
-        ",U004,student,S004S,active,",
         ",U005,student,S005S,active,",
         ",U006,student,S006S,deleted,",
         ",U007,student,S007S,active,",
@@ -324,18 +318,6 @@ describe Account do
   context "settings=" do
     it "should filter disabled settings" do
       a = Account.new
-      a.root_account_id = 1
-      a.settings = {'global_javascript' => 'something'}.with_indifferent_access
-      expect(a.settings[:global_javascript]).to eql(nil)
-
-      a.root_account_id = nil
-      a.settings = {'global_javascript' => 'something'}.with_indifferent_access
-      expect(a.settings[:global_javascript]).to eql(nil)
-
-      a.settings[:global_includes] = true
-      a.settings = {'global_javascript' => 'something'}.with_indifferent_access
-      expect(a.settings[:global_javascript]).to eql('something')
-
       a.settings = {'error_reporting' => 'string'}.with_indifferent_access
       expect(a.settings[:error_reporting]).to eql(nil)
 
@@ -348,6 +330,37 @@ describe Account do
       expect(a.settings[:error_reporting][:action]).to eql('email')
       expect(a.settings[:error_reporting][:email]).to eql('bob@yahoo.com')
       expect(a.settings[:error_reporting][:extra]).to eql(nil)
+    end
+  end
+
+  context "allow_global_includes?" do
+    let(:root){ Account.default }
+    it "false unless they've checked the box to allow it" do
+      expect(root.allow_global_includes?).to be_falsey
+    end
+
+    it "true if they've checked the box to allow it" do
+      root.settings = {'global_includes' => true}
+      expect(root.allow_global_includes?).to be_truthy
+    end
+
+    describe "subaccount" do
+      let(:sub_account){ root.sub_accounts.create! }
+
+      it "false if root account hasn't checked global_includes AND subaccount branding" do
+        expect(sub_account.allow_global_includes?).to be_falsey
+
+        sub_account.root_account.settings = {'global_includes' => true, 'sub_account_includes' => false}
+        expect(sub_account.allow_global_includes?).to be_falsey
+
+        sub_account.root_account.settings = {'global_includes' => false, 'sub_account_includes' => true}
+        expect(sub_account.allow_global_includes?).to be_falsey
+      end
+
+      it "true if root account HAS checked global_includes and turned on subaccount branding" do
+        sub_account.root_account.settings = {'global_includes' => true, 'sub_account_includes' => true}
+        expect(sub_account.allow_global_includes?).to be_truthy
+      end
     end
   end
 
@@ -883,20 +896,6 @@ describe Account do
       user
       account.account_users.create!(user: @user)
       expect(account.user_list_search_mode_for(@user)).to eq :preferred
-    end
-  end
-
-  context "settings" do
-    describe ":condition" do
-      it "should not allow setting things where condition is false" do
-        account = Account.default
-        account.stubs(:global_includes?).returns(false)
-        account.settings = { :global_javascript => 'bob' }
-        expect(account.settings[:global_javascript]).to be_nil
-        account.stubs(:global_includes?).returns(true)
-        account.settings = { :global_javascript => 'bob' }
-        expect(account.settings[:global_javascript]).to eq 'bob'
-      end
     end
   end
 

@@ -197,7 +197,8 @@
 #
 class ContextModuleItemsApiController < ApplicationController
   before_filter :require_context
-  before_filter :find_student, :only => [:index, :show]
+  before_filter :require_user, :only => [:select_mastery_path]
+  before_filter :find_student, :only => [:index, :show, :select_mastery_path]
   include Api::V1::ContextModule
 
   # @API List module items
@@ -466,6 +467,50 @@ class ContextModuleItemsApiController < ApplicationController
       else
         render :json => @tag.errors, :status => :bad_request
       end
+    end
+  end
+
+  # @API Select a mastery path
+  #
+  # Select a mastery path when module item includes several possible paths.
+  # Requires Mastery Paths feature to be enabled.  Returns the assignments
+  # which are included in the given path.
+  #
+  # @argument assignment_set_id
+  #   Assignment set chosen, as specified in the mastery_paths portion of the
+  #   context module item response
+  #
+  # @argument student_id
+  #   Which student the selection applies to.  If not specified, current user is
+  #   implied.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/items/<item_id>/select_master_path \
+  #       -X POST \
+  #       -H 'Authorization: Bearer <token>' \
+  #       -d 'assignment_set_id=2992'
+  #
+  # @returns [Assignment]
+  def select_mastery_path
+    return unless authorized_action(@context, @current_user, :read)
+    return unless @student == @current_user || authorized_action(@context, @current_user, :manage_assignments)
+    return render json: { message: 'mastery paths not enabled' }, status: :bad_request unless ConditionalRelease::Service.enabled_in_context?(@context)
+    return render json: { message: 'assignment_set_id required' }, status: :bad_request unless params[:assignment_set_id]
+
+    get_module_item
+    assignment = @item.assignment
+    return render json: { message: 'requested item is not an assignment' }, status: :bad_request unless assignment
+
+    response = ConditionalRelease::Service.select_mastery_path(@context, @current_user, @student, assignment.id, params[:assignment_set_id], session)
+    if response[:code] != '200'
+      render json: response[:body], status: response[:code]
+    else
+      assignment_ids = response[:body]['assignments'].map {|a| a['assignment_id'].try(&:to_i) }
+      assignments = Assignment.where(id: assignment_ids)
+      # match cyoe order
+      assignments = assignments.index_by(&:id).values_at(*assignment_ids)
+      render json: assignments_json(assignments, @current_user, session)
     end
   end
 

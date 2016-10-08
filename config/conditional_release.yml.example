@@ -22,3 +22,6 @@ development:
 
   # optional. default if 'api/rules/summary'
   rules_summary_path: 'api/rules/summary'
+
+  # optional. default is 'api/rules/select_assignment_set'
+  select_assignment_set_path: 'api/rules/select_assignment_set'

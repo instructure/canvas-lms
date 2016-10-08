@@ -4,6 +4,7 @@
   item_data ||= { published_status: 'unpublished' }
   completion_criteria ||= nil
   editable ||= false
+  criterion = completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
 
   @module_item_image_tags ||= {
     'indent' => "<i class='icon-arrow-right'></i>".html_safe,
@@ -19,8 +20,6 @@
     :quiz_menu => Quizzes::Quiz,
     :wiki_page_menu => WikiPage
   }
-
-  criterion = completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
 %>
 
 <li
@@ -28,6 +27,7 @@
   style="<%= hidden unless module_item %>"
   class="
     context_module_item
+    <%= 'student-view' if @is_student %>
     <%= module_item.content_type_class if module_item %>
     <%= 'also_assignment' if module_item && module_item.graded? %>
     indent_<%= module_item.try_rescue(:indent) || '0' %>
@@ -69,13 +69,28 @@
 
     <div class="ig-info">
       <div class="module-item-title">
-        <span class="item_name" aria-hidden="true">
+        <span class="item_name">
           <% if module_item && module_item.content_type == 'ExternalUrl' && module_item.new_tab %>
-            <a aria-label='<%= module_item.title %>' class="title external_url_link" target="_blank" href="<%= module_item.url %>"
-               data-item-href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item.id %>"><%= module_item.title %></a>
+            <a
+              title="<%= module_item && module_item.title %>"
+              class="title external_url_link"
+              target="_blank"
+              href="<%= module_item.url %>"
+              data-item-href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item.id %>"
+            >
+               <%= module_item.title %>
+            </a>
           <% else %>
-            <a title="<%= module_item && module_item.title %>" class="ig-title title"
-               href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>"><%= module_item && module_item.title %></a>
+            <a
+              title="<%= module_item && module_item.title %>"
+              class="ig-title title"
+              href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>"
+              <% if item_data[:mastery_paths] && item_data[:mastery_paths][:locked] %>
+              aria-describedby="module-item-locked-<%= module_item && module_item.id %>"
+              <% end %>
+            >
+              <%= module_item && module_item.title %>
+            </a>
           <% end %>
           <span title="<%= module_item && module_item.title %>" class="title locked_title"><%= module_item && module_item.title %></span>
           <span class="points_possible" style="display: none;"><%= round_if_whole(module_item.try_rescue(:assignment).try_rescue(:points_possible)) || nbsp %></span>

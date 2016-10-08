@@ -53,6 +53,10 @@ class AccountAuthorizationConfig::Oauth2 < AccountAuthorizationConfig::Delegated
     client.auth_code.get_token(code, { redirect_uri: redirect_uri }.merge(token_options))
   end
 
+  def provider_attributes(token)
+    {}
+  end
+
   protected
 
   def client_options

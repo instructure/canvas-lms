@@ -45,4 +45,16 @@ define([
     instructure.enhanceUserContent()
     equal(elem.querySelector('.media_comment_thumbnail').alt, alt)
   }); 
+
+  test("youtube preview ignores missing alt", function () {
+    elem.innerHTML =
+      `<div class="user_content">
+        <a href="#" class="instructure_video_link">
+          Link
+        </a>
+      </div>`
+    this.stub($, 'youTubeID').returns(47)
+    instructure.enhanceUserContent()
+    equal(elem.querySelector('.media_comment_thumbnail').alt, "")
+  }); 
 })

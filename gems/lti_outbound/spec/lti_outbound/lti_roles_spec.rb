@@ -25,9 +25,10 @@ describe LtiOutbound::LTIRoles do
       expect(LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER).to eq 'Learner'
       expect(LtiOutbound::LTIRoles::Institution::ADMIN).to eq 'urn:lti:instrole:ims/lis/Administrator'
       expect(LtiOutbound::LTIRoles::ContextNotNamespaced::CONTENT_DEVELOPER).to eq 'ContentDeveloper'
-      expect(LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER).to eq 'urn:lti:instrole:ims/lis/Observer'
+      expect(LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER).to eq 'urn:lti:instrole:ims/lis/Observer,urn:lti:role:ims/lis/Mentor'
       expect(LtiOutbound::LTIRoles::ContextNotNamespaced::TEACHING_ASSISTANT).to eq 'urn:lti:role:ims/lis/TeachingAssistant'
       expect(LtiOutbound::LTIRoles::System::NONE).to eq 'urn:lti:sysrole:ims/lis/None'
+      expect(LtiOutbound::LTIRoles::Context::OBSERVER).to eq 'urn:lti:role:ims/lis/Learner/NonCreditLearner,urn:lti:role:ims/lis/Mentor'
     end
   end
 end

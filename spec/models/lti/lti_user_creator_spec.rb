@@ -27,6 +27,7 @@ describe Lti::LtiUserCreator do
     end
 
     let(:canvas_user) { user(name: 'Shorty McLongishname') }
+    let(:canvas_user2) { user(name: 'Observer Dude') }
     let(:root_account) { Account.create! }
 
     it 'converts a canvas user to an lti user' do
@@ -58,6 +59,7 @@ describe Lti::LtiUserCreator do
       expect(lti_user.login_id).to eq 'login_id'
       expect(lti_user.id).to eq canvas_user.id
       expect(lti_user.timezone).to eq 'my/zone'
+      expect(lti_user.current_observee_ids).to eq []
     end
 
     context 'the user does not have a pseudonym' do
@@ -80,7 +82,27 @@ describe Lti::LtiUserCreator do
       let(:canvas_course) { course(active_course: true) }
       let(:canvas_account) { root_account }
       let(:course_user_creator) { Lti::LtiUserCreator.new(canvas_user, canvas_account, tool, canvas_course) }
+      let(:course_observer_creator) { Lti::LtiUserCreator.new(canvas_user2, canvas_account, tool, canvas_course) }
       let(:account_user_creator) { Lti::LtiUserCreator.new(canvas_user, canvas_account, tool, canvas_account) }
+
+      def observer_in_course(options = {})
+        associated_user = options.delete(:associated_user)
+        user = options.delete(:user)
+        enrollment = @course.enroll_user(user, 'ObserverEnrollment')
+        enrollment.associated_user = associated_user
+        enrollment.workflow_state = 'active'
+        enrollment.save
+        user
+      end
+
+      it "returns current_observee_ids" do
+        canvas_user.lti_context_id = 'blah'
+        canvas_user.save!
+        observer_in_course(course: canvas_course, user: canvas_user2, associated_user: canvas_user)
+
+        lti_user = course_observer_creator.convert
+        expect(lti_user.current_observee_ids).to match_array ['blah']
+      end
 
       describe "#current_enrollments" do
         it "collects current active student enrollments" do

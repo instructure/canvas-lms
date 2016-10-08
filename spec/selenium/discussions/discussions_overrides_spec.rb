@@ -113,7 +113,7 @@ describe "discussions overrides" do
       it "should list the discussions in main dashboard page", priority: "2", test_id: 632022 do
         course_with_admin_logged_in(course: @course)
         get ""
-        expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\n#{course.name}\nMultiple Due Dates")
+        expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\n#{course.short_name}\nMultiple Due Dates")
       end
     end
   end

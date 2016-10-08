@@ -106,10 +106,9 @@ module Api::V1::ContextModule
       # course context
       when *Quizzes::Quiz.class_names
         api_url = api_v1_course_quiz_url(context_module.context, content_tag.content)
-      when 'Assignment', 'WikiPage', 'DiscussionTopic'
-        api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
-      # no context
-      when 'Attachment'
+      when 'DiscussionTopic'
+        api_url = api_v1_course_discussion_topic_url(context_module.context, content_tag.content)
+      when 'Assignment', 'WikiPage', 'Attachment'
         api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
       when 'ContextExternalTool'
         if content_tag.content && content_tag.content.tool_id
@@ -191,13 +190,13 @@ module Api::V1::ContextModule
 
   def conditional_release(content_tag, opts = {})
     rules = opts[:conditional_release_rules]
-    assignment_id = content_tag.content.try(:assignment_id) || content_tag.content_id
+    assignment_id = content_tag.assignment.try(:id)
     conditional_release_assignment_set(rules, assignment_id) if rules.present? && assignment_id.present?
   end
 
   def conditional_release_assignment_set(rules, id)
     result = rules.find { |rule| rule[:trigger_assignment].to_s == id.to_s }
     return unless result.present?
-    result.slice(:locked, :assignment_sets)
+    result.slice(:locked, :assignment_sets, :selected_set_id)
   end
 end

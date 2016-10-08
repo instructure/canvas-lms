@@ -8,9 +8,11 @@ define([
 
   const { createStore, applyMiddleware } = Redux;
 
+  const logger = ReduxLogger();
+
   const createStoreWithMiddleware = applyMiddleware(
-    ReduxThunk,
-    ReduxLogger
+    logger,
+    ReduxThunk
   )(createStore);
 
   return function configureStore (state = initialState) {

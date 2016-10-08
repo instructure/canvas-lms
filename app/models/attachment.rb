@@ -978,6 +978,7 @@ class Attachment < ActiveRecord::Base
       "application/xml" => "code",
       "application/zip" => "zip",
       "audio/mpeg" => "audio",
+      "audio/mp3" => "audio",
       "audio/basic" => "audio",
       "audio/mid" => "audio",
       "audio/3gpp" => "audio",
@@ -1192,15 +1193,10 @@ class Attachment < ActiveRecord::Base
   end
 
   def make_childless(preferred_child = nil)
-    preferred_child = nil if preferred_child && preferred_child.filename.nil?
-    child = preferred_child || children.where.not(filename: nil).take
-    if !child && children.exists?
-      Attachment.where(root_attachment_id: self).update_all(root_attachment_id: child)
-      return
-    end
+    child = preferred_child || children.take
     raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil
-    child.filename ||= filename if filename
+    child.filename = filename if filename
     if Attachment.s3_storage?
       if filename && s3object.exists? && !child.s3object.exists?
         s3object.copy_to(child.s3object)

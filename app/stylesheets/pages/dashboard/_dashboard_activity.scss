@@ -6,16 +6,10 @@
 
 .recent-activity-header {
   margin: 0;
-  @if $use_new_styles {
-    border-bottom: 1px solid $ic-border-light;
-    line-height: 1.2;
-    padding-bottom: $ic-sp;
-    font-size: 1.5em;
-  }
-  @else {
-    padding: 10px;
-    border-bottom: 1px solid #b3b3b3;
-  }
+  border-bottom: 1px solid $ic-border-light;
+  line-height: 1.2;
+  padding-bottom: $ic-sp;
+  font-size: 1.5em;
 }
 
 .ic-notification + .recent-activity-header { margin-top: $ic-sp*2; }
@@ -25,7 +19,7 @@
   border-bottom: 1px solid #ddd;
   .title {
     font-weight: normal;
-    @if $use_new_styles and $use_high_contrast == false {
+    @if not $use_high_contrast {
       font-weight: 300;
     }
   }
@@ -59,22 +53,15 @@
 .stream_header {
   cursor: pointer;
   user-select: none;
-  @if $use_new_styles {
-    display: flex;
-    padding: $ic-sp;
-    .image-block {
-      flex: 1;
-      align-items: center;
-    }
-  }
-  @else {
-    padding: 10px 0 10px 10px;
-    display: table;
+  display: flex;
+  padding: $ic-sp;
+  .image-block {
+    flex: 1;
+    align-items: center;
   }
   .toggle-details {
     text-transform: uppercase;
-    @if $use_new_styles { @include fontSize(11px); }
-    @else { font-size: 0.75em; }
+    @include fontSize(11px);
   }
   &:hover {
     @if $use_high_contrast == false {
@@ -85,24 +72,14 @@
       text-align: right;
     }
   }
-  @if $use_new_styles == false {
-    .image-block, .header-right-side { display: table-cell; }
-  }
 }
 
 $ignore-col-width: 50px;
 
 .header-right-side {
-  @if $use_new_styles {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-  }
-  @else {
-    width: 100px;
-    padding-right: $ignore-col-width;
-    vertical-align: bottom;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .toggle-details {
@@ -122,8 +99,7 @@ $ignore-col-width: 50px;
 .stream-details {
   width: 100%;
   tr {
-    @if $use_new_styles { border-top: 1px dotted $ic-border-light; }
-    @else { border-top: 1px solid #eee; }
+    border-top: 1px dotted $ic-border-light;
     line-height: 250%;
     // remove hover color on high contrast and use link underlines on hover instead (a11y)
     @if $use_high_contrast == false {
@@ -166,10 +142,8 @@ $ignore-col-width: 50px;
       text-decoration: none;
     }
   }
-  @if $use_new_styles {
-    font-weight: 500;
-    @include fontSize($ic-font-size--xsmall);
-  }
+  font-weight: 500;
+  @include fontSize($ic-font-size--xsmall);
 }
 
 .fake-link {
@@ -188,7 +162,6 @@ $ignore-col-width: 50px;
 }
 
 $dashboardIconSize: 28px;
-@if not $use_new_styles { $dashboardIconSize: 32px; }
 
 .recent_activity .image-block-image {
   width: $dashboardIconSize;
@@ -202,7 +175,7 @@ $dashboardIconSize: 28px;
   line-height: $dashboardIconSize;
   &:before {
     @if $use_high_contrast {
-      color: $ic-color-dark;
+      color: $ic-font-color-dark;
     }
     @else {
       color: darken($ic-color-light, 30%);

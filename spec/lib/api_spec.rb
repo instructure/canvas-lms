@@ -663,7 +663,6 @@ describe Api do
       before(:each) do
         student_in_course
         account = @course.root_account
-        account.enable_feature!(:use_new_styles)
         bc = BrandConfig.create(mobile_css_overrides: 'somewhere.css')
         account.brand_config_md5 = bc.md5
         account.save!

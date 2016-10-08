@@ -5,11 +5,7 @@
       <a 
         href="{{previous.url}}" 
         role="button"
-        {{#if new_styles}}
-          class="Button module-sequence-footer-button--previous"
-        {{else}}
-          class="pull-left"
-        {{/if}}
+        class="Button module-sequence-footer-button--previous"
         data-tooltip="right"
         data-html-tooltip-title="{{previous.tooltip}}"
         aria-describedby="msf{{instanceNumber}}-previous-desc"
@@ -23,11 +19,7 @@
       <a 
         href="{{next.url}}"
         role="button"
-        {{#if new_styles}}
-          class="Button module-sequence-footer-button--next"
-        {{else}}
-          class="pull-right bordered"
-        {{/if}}
+        class="Button module-sequence-footer-button--next"
         data-tooltip="left"
         data-html-tooltip-title="{{next.tooltip}}"
         aria-describedby="msf{{instanceNumber}}-next-desc"

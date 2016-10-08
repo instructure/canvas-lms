@@ -5,13 +5,6 @@ $border: #C1C7CF;
 $borderRadius: 3px;
 $discussion-dark-text: $ic-color-dark;
 
-@if $use_new_styles == false {
-  body.with-right-side.with-left-side {
-    // toolbar needs it to be this wide
-    min-width: 1110px;
-  }
-}
-
 .hidden {
   display: none !important;
 }
@@ -43,21 +36,10 @@ $discussion-dark-text: $ic-color-dark;
   padding: 0;
 
   .entry {
-
-    @if $use_new_styles {
-      background: $ic-color-light;
-      border: 1px solid $ic-border-light;
-      padding: 0;
-      margin: $ic-sp 0 $ic-sp*2 $ic-sp*2;
-    }
-    @else {
-      background: white;
-      border: 1px solid $border;
-      border-radius: $borderRadius;
-      padding: $borderRadius 0 0 0;
-      margin: 16px 0 16px 18px;
-      box-shadow: 0 1px 0 #DDE0E4;
-    }
+    background: $ic-color-light;
+    border: 1px solid $ic-border-light;
+    padding: 0;
+    margin: $ic-sp 0 $ic-sp*2 $ic-sp*2;
 
     &.collapsed, .entry {
       margin: 16px 0 16px 18px;
@@ -116,7 +98,6 @@ $discussion-dark-text: $ic-color-dark;
   margin: 0;
   background: white;
   padding: 6px;
-  @if $use_new_styles == false { border-radius: $borderRadius; }
   .al-trigger {
     margin-left: 10px;
     margin-right: 0px;
@@ -130,9 +111,6 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-section {
   padding: 4px 10px 3px 10px;
-  @if $use_new_styles == false {
-    a { color: $ic-brand-primary; }
-  }
 }
 
 .peer-review-alert {
@@ -235,8 +213,7 @@ $discussion-dark-text: $ic-color-dark;
   height: 10px;
   padding: 12px;
   display: block;
-  @if $use_new_styles { left: -($ic-sp*3); }
-  @else { left: -32px; }
+  left: -($ic-sp*3);
 }
 
 .discussion-read-state {
@@ -259,7 +236,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-reply-action, .discussion-rate-action {
 
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
   text-decoration: none;
 
   &:hover, &:focus {
@@ -281,7 +258,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-rating {
   @if $use_high_contrast { color: #666; }
-  @else {color: $ic-color-dark;}
+  @else {color: $ic-font-color-dark;}
 }
 
 .entry, .discussion_entry {
@@ -301,22 +278,11 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-entry-reply-area {
   padding: 0 0.8em;
-  @if $use_new_styles == false {
-    background: #fff;
-    border-top: 1px solid $border;
-  }
 }
 
 .discussion_entry > .discussion-entry-reply-area {
   padding: 0 0.8em;
-  @if $use_new_styles {
-    border: 1px solid $ic-border-light;
-  }
-  @else {
-    border: 1px solid #d4d5d7;
-    margin: 10px;
-    border-radius: 3px;
-  }
+  border: 1px solid $ic-border-light;
 }
 
 
@@ -349,11 +315,6 @@ $discussion-dark-text: $ic-color-dark;
 .topic {
   padding: 0;
   background: transparent;
-  > .discussion-entry-reply-area {
-    @if $use_new_styles == false {
-      margin: 16px 10px 0 28px;
-    }
-  }
 }
 
 .discussion-reply-form {
@@ -480,15 +441,9 @@ $discussion-dark-text: $ic-color-dark;
   overflow: auto;
 
   .entry-content {
-    @if $use_new_styles {
-      padding: $ic-sp;
-      border-left: 1px solid $ic-border-light;
-      border-right: 1px solid $ic-border-light;
-    }
-    @else {
-      padding: 10px;
-      background: white;
-    }
+    padding: $ic-sp;
+    border-left: 1px solid $ic-border-light;
+    border-right: 1px solid $ic-border-light;
   }
 }
 
@@ -496,14 +451,8 @@ $discussion-dark-text: $ic-color-dark;
   border-bottom: none;
 }
 
-@if $use_new_styles == false {
-  #content { padding: 0; }
-  #main { background: #fff; }
-}
-
 .discussion_subentries {
-  @if $use_new_styles { padding: $ic-sp 0 $ic-sp $ic-sp; }
-  @else { padding: 10px; }
+  padding: $ic-sp 0 $ic-sp $ic-sp;
 }
 
 .discussion-page-nav {
@@ -550,22 +499,14 @@ $discussion-dark-text: $ic-color-dark;
   cursor: text;
   border: 1px solid #d4d5d7;
   margin: 15px 0;
-  @if $use_high_contrast { color: $ic-color-dark; }
-  @else {
-    @if $use_new_styles == false { color: #888; }
-  }
-  @if $use_new_styles {
-    transition: border-color 0.2s;
-    padding: $ic-sp/2 $ic-sp;
-  }
-  @else {
-    padding: 3px 10px;
-    @include fontSize(11px);
-  }
+
+  @if $use_high_contrast { color: $ic-font-color-dark; }
+  transition: border-color 0.2s;
+  padding: $ic-sp/2 $ic-sp;
   &:hover, &:focus {
     color: #444;
     text-decoration: none;
-    @if $use_new_styles { border-color: lighten($ic-link-color, 5%); }
+    border-color: lighten($ic-link-color, 5%);
   }
 }
 
@@ -675,9 +616,7 @@ $discussion-dark-text: $ic-color-dark;
   background: white;
   min-height: 50px;
   &#discussion-toolbar {
-    @if $use_new_styles {
-      + .discussion-entry-reply-area { margin-top: -1px; }
-    }
+    + .discussion-entry-reply-area { margin-top: -1px; }
   }
   .admin-links {
     text-align: left;
@@ -691,16 +630,9 @@ $discussion-dark-text: $ic-color-dark;
     min-height: 53px;
     overflow: visible;
     box-sizing: border-box;
-    @if $use_new_styles {
-      padding: $ic-sp;
-      background: $lightBackground;
-      border: 1px solid $ic-border-light;
-    }
-    @else {
-      background: #fff;
-      border-bottom: 1px solid $ic-color-neutral;
-      padding: 10px 10px 6px 14px;
-    }
+    padding: $ic-sp;
+    background: $lightBackground;
+    border: 1px solid $ic-border-light;
   }
   .headerBar:after {
     clear: both;
@@ -712,21 +644,11 @@ $discussion-dark-text: $ic-color-dark;
     top: 0; left: 0; right: 0;
     z-index: 15; // increase for discussions sticky toolbar
     border-color: $ic-border-light;
-    @if $use_new_styles {
-      background: $lightBackground;
-      min-height: 53px;
-      margin-left: $ic-header-primary-width + ($ic-sp*2);
-      margin-right: $ic-sp*2;
-      box-shadow: 0 2px 3px rgba(black, 0.1);
-    }
-    @else {
-      min-width: 647px;
-      max-width: 1100px;
-      margin-left: $left_side_width + 1;
-      margin-right: $right_side_width + 1;
-      background: white;
-      height: 53px;
-    }
+    background: $lightBackground;
+    min-height: 53px;
+    margin-left: $ic-header-primary-width + ($ic-sp*2);
+    margin-right: $ic-sp*2;
+    box-shadow: 0 2px 3px rgba(black, 0.1);
   }
   [disabled] {
     display: none;

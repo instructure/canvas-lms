@@ -290,11 +290,6 @@ class AssignmentGroupsController < ApplicationController
       group.context = context
       group_assignments = assignments_by_group[group.id] || []
 
-      group_overrides = []
-      if include_overrides
-        group_overrides = group_assignments.map{|assignment| assignment.assignment_overrides.select(&:active?)}.flatten
-      end
-
       options = {
         stringify_json_ids: stringify_json_ids?,
         override_assignment_dates: override_dates?,
@@ -302,7 +297,7 @@ class AssignmentGroupsController < ApplicationController
         assignments: group_assignments,
         assignment_visibilities: assignment_visibilities(context, assignments),
         exclude_response_fields: assignment_excludes,
-        overrides: group_overrides,
+        include_overrides: include_overrides,
         submissions: submissions
       }
 

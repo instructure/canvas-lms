@@ -13,22 +13,11 @@ $page-dark: #ebeff2;
 
 /* bootstrap overrides */
 .nav-pills li a {
-  @if $use_new_styles { color: $ic-color-dark; }
-  @else {
-    color: #585e63;
-    padding-bottom: 5px;
-    padding-top: 6px;
-  }
+  color: $ic-font-color-dark;
 }
 
 .gradebook-navigation-pills {
-  @if $use_new_styles {
-    margin: 0;
-  }
-  @else {
-    @include fontSize($ic-font-size--small);
-    margin: $header-child-margin;
-  }
+  margin: 0;
 }
 
 
@@ -155,39 +144,23 @@ $page-dark: #ebeff2;
 .gradebook-header {
   display: flex;
   align-items: right;
-  @if $use_new_styles {
-    @include clearfix;
-    padding-top: $ic-sp;
-    + .assignment-gradebook-container {
-      #gradebook-toolbar { border-top: 1px solid $ic-border-light; }
-    }
-    .gradebook-navigation { margin-top: 3px; }
+  @include clearfix;
+  padding-top: $ic-sp;
+  + .assignment-gradebook-container {
+    #gradebook-toolbar { border-top: 1px solid $ic-border-light; }
   }
+  .gradebook-navigation { margin-top: 3px; }
 
   .header-buttons {
     flex: 1;
     text-align: right;
     margin-bottom: $ic-sp;
-    @if $use_new_styles == false {
-      margin-right: $ic-sp;
-      top: 1px;
-    }
-    .individual-view-button {
-      @if $use_new_styles == false {
-        padding: $ic-sp/4 $ic-sp;
-      }
-    }
+
     .post-grades-button-placeholder {
       display: inline-block;
-      @if $use_new_styles == false {
-        button#post-grades-button, button#post_grades, button.external-tools-dialog { padding: $ic-sp/4 $ic-sp; }
-      }
     }
     .section-button-placeholder {
       display: inline-block;
-      @if $use_new_styles == false {
-        .section-select-button { padding: $ic-sp/4 $ic-sp; }
-      }
     }
   }
 }

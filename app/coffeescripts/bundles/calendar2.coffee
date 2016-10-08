@@ -3,20 +3,20 @@
 require [
   'jquery',
   'compiled/calendar/Calendar'
+  'react-dom'
+  'react'
   'compiled/calendar/MiniCalendar'
+  'jsx/calendar/scheduler/components/FindAppointment'
   'compiled/views/calendar/CalendarHeader'
   'compiled/calendar/sidebar'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/UndatedEventsList'
   'jsx/calendar/scheduler/store/configureStore'
   'compiled/jquery.kylemenu'
-], ($, Calendar, MiniCalendar, CalendarHeader, drawSidebar, EventDataSource, UndatedEventsList, configureSchedulerStore) ->
+], ($, Calendar, ReactDOM, React, MiniCalendar, FindAppointment, CalendarHeader, drawSidebar, EventDataSource, UndatedEventsList, configureSchedulerStore) ->
   @eventDataSource = new EventDataSource(ENV.CALENDAR.CONTEXTS)
 
   @schedulerStore = if ENV.CALENDAR.BETTER_SCHEDULER then configureSchedulerStore() else null
-
-  console.log(@schedulerStore?.getState())
-
 
   @header = new CalendarHeader(
     el: "#calendar_header"
@@ -30,6 +30,18 @@ require [
     showScheduler: ENV.CALENDAR.SHOW_SCHEDULER
     header:        @header
     userId:        ENV.current_user_id
+    schedulerStore: @schedulerStore
+    onLoadAppointmentGroups: (ag_map) =>
+      if ENV.CALENDAR.BETTER_SCHEDULER
+        courses = @eventDataSource.contexts.filter (context) ->
+          ag_map.hasOwnProperty(context.asset_string)
+        if courses.length > 0
+          ReactDOM.render(
+            React.createElement(
+              FindAppointment,
+                courses: courses
+                store: @schedulerStore
+            ), $('#select-course-component')[0])
     )
   new MiniCalendar("#minical", @calendar)
   new UndatedEventsList("#undated-events", @eventDataSource, @calendar)

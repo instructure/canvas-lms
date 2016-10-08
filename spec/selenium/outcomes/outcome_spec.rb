@@ -17,7 +17,7 @@ describe "outcomes" do
       replace_content(f('input[name=calculation_int]'), value)
       f('.submit_button').click
       wait_for_ajaximations
-      expect(f(' .title').text).to include(title)
+      expect(f('.title').text).to include(title)
       expect((f('#calculation_int').text).to_i).to eq(value)
     end
 
@@ -65,7 +65,7 @@ describe "outcomes" do
         end
 
         it "should retain the settings after saving", priority: "1", test_id: 261710 do
-          save_without_error(rand(99), 'Decaying Average')
+          save_without_error(rand(99) + 1, 'Decaying Average')
           expect(f('#calculation_method').text).to include('Decaying Average')
         end
       end

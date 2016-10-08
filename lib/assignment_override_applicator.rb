@@ -37,7 +37,9 @@ module AssignmentOverrideApplicator
     # students get the last overridden date that applies to them, but teachers
     # should see the assignment's due_date if that is more lenient
     context = result_assignment_or_quiz.context
-    if context && context.grants_right?(user, :manage_assignments) # faster than calling :delete rights on each assignment/quiz
+    if context &&
+      (context.user_has_been_admin?(user) || context.user_has_no_enrollments?(user)) && # don't make a permissions call if we don't need to
+      context.grants_right?(user, :manage_assignments) # faster than calling :delete rights on each assignment/quiz
 
       overridden_section_ids = result_assignment_or_quiz
         .applied_overrides.select { |o| o.set_type == "CourseSection" }
@@ -82,17 +84,20 @@ module AssignmentOverrideApplicator
       if context.grants_right?(user, :read_as_admin)
         overrides = assignment_or_quiz.assignment_overrides
         if assignment_or_quiz.current_version?
-          visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).except(:select, :order)
+          visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).except(:select, :order).pluck(:id)
 
           overrides = if overrides.loaded?
-                        ovs = overrides.select do |ov|
-                          ov.workflow_state == 'active' &&
-                          ov.set_type != 'ADHOC'
-                        end
-                        ovs + overrides.select{ |ov| ov.visible_student_overrides(visible_user_ids) }
+                        ovs, adhoc_ovs = overrides.select{|ov| ov.workflow_state == 'active'}.
+                          partition {|ov| ov.set_type != 'ADHOC' }
+
+                        preload_student_ids_for_adhoc_overrides(adhoc_ovs, visible_user_ids)
+                        ovs + adhoc_ovs.select{|ov| ov.preloaded_student_ids.any?}
                       else
                         ovs = overrides.active.where.not(set_type: 'ADHOC').to_a
-                        ovs + overrides.active.visible_students_only(visible_user_ids).to_a
+                        adhoc_ovs = overrides.active.visible_students_only(visible_user_ids).to_a
+                        preload_student_ids_for_adhoc_overrides(adhoc_ovs, visible_user_ids)
+
+                        ovs + adhoc_ovs
                       end
         else
           overrides = current_override_version(assignment_or_quiz, overrides)
@@ -123,6 +128,21 @@ module AssignmentOverrideApplicator
 
       overrides.compact.select(&:active?)
     end
+  end
+
+  def self.preload_student_ids_for_adhoc_overrides(adhoc_overrides, visible_user_ids)
+    if adhoc_overrides.any?
+      override_ids_to_student_ids = {}
+      AssignmentOverrideStudent.where(:assignment_override_id => adhoc_overrides).
+        where(user_id: visible_user_ids).pluck(:assignment_override_id, :user_id).each do |ov_id, user_id|
+        override_ids_to_student_ids[ov_id] ||= []
+        override_ids_to_student_ids[ov_id] << user_id
+      end
+
+      # we can preload the student ids right now
+      adhoc_overrides.each{ |ov| ov.preloaded_student_ids = override_ids_to_student_ids[ov.id] || [] }
+    end
+    adhoc_overrides
   end
 
   def self.has_invalid_args?(assignment_or_quiz, user)
@@ -213,7 +233,9 @@ module AssignmentOverrideApplicator
   # really takes an assignment or quiz but who wants to type out
   # assignment_or_quiz all the time?
   def self.setup_overridden_clone(assignment, overrides = [])
+    assignment.instance_variable_set(:@readonly_clone, true)
     clone = assignment.clone
+    assignment.instance_variable_set(:@readonly_clone, false)
 
     # ActiveRecord::Base#clone wipes out some important crap; put it back
     [:id, :updated_at, :created_at].each { |attr|

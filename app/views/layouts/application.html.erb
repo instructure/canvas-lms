@@ -56,24 +56,8 @@
 <%# Flash messages must be outside of #application or they won't work in screenreaders with modals open. %>
 <%= render :partial => 'shared/static_notices' %>
 <%= render :partial => 'shared/flash_notices' %>
-<div id="application" <% if use_new_styles? %>class="ic-app"<% end %>>
-
-  <% if use_new_styles? %>
-    <%= render(:partial => 'shared/new_nav_header') unless @headers == false %>
-  <% else %>
-    <%# Begin default Canvas header %>
-    <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
-      <div id="header-inner">
-        <a href="#content" id="skip_navigation_link"><%= t 'Skip To Content' %></a>
-        <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>
-        <b id="header-logo-secondary"></b>
-        <%= render(:partial => "shared/user_header_navigation") %>
-        <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
-        <%= render(:partial => "shared/primary_header_navigation") %>
-      </div>
-    </div>
-    <%# End default Canvas header %>
-  <% end %>
+<div id="application" class="ic-app">
+  <%= render(:partial => 'shared/new_nav_header') unless @headers == false %>
 
   <div id="instructure_ajax_error_box">
     <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link"><%= t('links.close', 'Close') %></a></div>
@@ -82,30 +66,26 @@
 
   <%= yield :leading_content %>
 
-  <div id="wrapper-container" <% if use_new_styles? %>class="ic-app-container"<% end %>>
-    <div id="wrapper" <% if use_new_styles? %>class="ic-app-main-layout-vertical"<% end %>>
-      <% #Start new styles div %>
-      <% if crumbs.length > 1 && use_new_styles? %>
+  <div id="wrapper-container" class="ic-app-container">
+    <div id="wrapper" class="ic-app-main-layout-vertical">
+      <% if crumbs.length > 1 %>
         <div class="ic-app-nav-toggle-and-crumbs no-print">
           <% if @show_left_side %>
-            <button type="button" aria-hidden="true" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" title="<%= t('Show and hide courses menu') %>"><i class="icon-hamburger"></i></button>
+            <button type="button" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" aria-live="polite" aria-label="<%= t('Hide courses menu') %>" title="<%= t('Hide courses menu') %>">
+              <i class="icon-hamburger" aria-hidden="true"></i>
+            </button>
             <div class="ic-app-crumbs">
           <% end %>
           <%= render_crumbs %>
           <% if @show_left_side %></div><% end %>
         </div>
       <% end %>
-    <% if use_new_styles? %><div class="ic-app-main-layout-horizontal"><% end %>
+    <div class="ic-app-main-layout-horizontal">
       <% if @show_left_side %>
-          <div id="left-side" class="<% if !@no_left_side_list_view %>list-view<% end %> <% if use_new_styles? %>ic-app-course-menu<% end %>">
+          <div id="left-side" class="ic-app-course-menu <% if !@no_left_side_list_view %>list-view<% end %>">
           <% if left_side %>
             <%= left_side %>
           <% else %>
-            <% if @context.try(:short_name) && !use_new_styles? %>
-              <h1 id="section-tabs-header">
-                <%= @context.short_name %>
-              </h1>
-            <% end %>
             <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
               <a  class="al-trigger" href="#" style="display:inline-block; float:right" data-popup-within="#wrapper">
                 <i class="icon-mini-arrow-down"></i>
@@ -129,25 +109,23 @@
           <% end %>
         </div>
         <% end %>
-        <div id="main" <% if use_new_styles? %>class="ic-app-main-and-right-side"<% end %>>
-          <div id="not_right_side" <% if use_new_styles? %>class="ic-app-main-content"<% end %>>
-            <div id="content-wrapper" <% if use_new_styles? %>class="ic-app-main-content__primary"<% end %>>
-                <% unless use_new_styles? %><%= render_crumbs %><% end %>
+        <div id="main" class="ic-app-main-and-right-side">
+          <div id="not_right_side" class="ic-app-main-content">
+            <div id="content-wrapper" class="ic-app-main-content__primary">
                 <%= render :partial => 'shared/content_notices' if @show_left_side && @context && @context.respond_to?(:content_notices) %>
-              <div id="content" role="main" <% unless use_new_styles? %>class="container-fluid"<% end %>>
+              <div id="content" role="main">
                 <%= yield %>
               </div>
             </div>
-            <div id="right-side-wrapper" <% if use_new_styles? %>class="ic-app-main-content__secondary"<% end %>>
+            <div id="right-side-wrapper" class="ic-app-main-content__secondary">
               <aside id="right-side" role="complementary">
                 <%= right_side %>
               </aside>
             </div>
           </div>
         </div>
-      <% #End new styles div %>
-      <% if use_new_styles? %></div><% end %>
-      <% if (use_new_styles? && @show_footer) or !use_new_styles? %>
+      </div>
+      <% if @show_footer %>
         <%= render :partial => 'shared/canvas_footer' %>
       <% end %>
     </div>

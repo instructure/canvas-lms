@@ -297,6 +297,14 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['lis_person_contact_email_primary']).to eq 'nobody@example.com'
     end
 
+    it 'includes role_scope_mentor if user is observer and privacy level is public' do
+      tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
+      user.current_roles = [LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER.split(',').last]
+      user.current_observee_ids = ['1', '2', '3']
+      hash = tool_launch.generate
+      expect(hash['role_scope_mentor']).to eq '1,2,3'
+    end
+
     it 'gets the correct width and height based on resource type' do
       tool.settings = {editor_button: {:selection_width => 1000, :selection_height => 300, :icon_url => 'www.example.com/icon', :url => 'www.example.com'}}
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',

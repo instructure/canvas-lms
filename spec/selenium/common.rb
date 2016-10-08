@@ -91,8 +91,23 @@ module SeleniumErrorRecovery
     when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout
       if $selenium_driver && !RSpec.world.wants_to_quit && exception.backtrace.grep(/selenium-webdriver/).present?
         puts "SELENIUM: webdriver is misbehaving.  Will try to re-initialize."
-        # this will cause the selenium driver to get re-initialized if it
-        # crashes for some reason
+
+        if $firefox_log
+          # give firefox a moment to wrap up stuff
+          sleep 2
+
+          if $firefox_process.exited?
+            puts "firefox exited with #{$firefox_process.exit_code}"
+          else
+            puts "firefox is still running, killing it"
+            $firefox_process.stop
+          end
+
+          puts "firefox log:"
+          $firefox_log.rewind
+          puts $firefox_log.read
+        end
+
         $selenium_driver = nil
         return true
       end
@@ -209,5 +224,17 @@ shared_context "in-process server selenium tests" do
       record_errors(example, exception, Rails.logger.captured_messages)
       SeleniumDriverSetup.disallow_requests!
     end
+  end
+end
+
+# get some extra verbose logging from firefox for when things go wrong
+Selenium::WebDriver::Firefox::Binary.class_eval do
+  def execute(*extra_args)
+    args = [self.class.path, '-no-remote'] + extra_args
+    $firefox_process = @process = ChildProcess.build(*args)
+    $firefox_log = @process.io.stdout = @process.io.stderr = Tempfile.new("firefox")
+    $DEBUG = true
+    @process.start
+    $DEBUG = nil
   end
 end

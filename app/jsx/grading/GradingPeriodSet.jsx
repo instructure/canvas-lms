@@ -38,19 +38,29 @@ define([
     }
 
     let validDates = _.all(periods, (period) => {
-      return isValidDate(period.startDate) && isValidDate(period.endDate);
+      return isValidDate(period.startDate) &&
+             isValidDate(period.endDate) &&
+             isValidDate(period.closeDate);
     });
 
     if (!validDates) {
       return [I18n.t('All dates fields must be present and formatted correctly')];
     }
 
-    let orderedDates = _.all(periods, (period) => {
+    let orderedStartAndEndDates = _.all(periods, (period) => {
       return period.startDate < period.endDate;
     });
 
-    if (!orderedDates) {
+    if (!orderedStartAndEndDates) {
       return [I18n.t('All start dates must be before the end date')];
+    }
+
+    let orderedEndAndCloseDates = _.all(periods, (period) => {
+      return period.endDate <= period.closeDate;
+    });
+
+    if (!orderedEndAndCloseDates) {
+      return [I18n.t('All close dates must be on or after the end date')];
     }
 
     if (anyPeriodsOverlap(periods)) {
@@ -260,7 +270,9 @@ define([
                   aria-disabled={disabled}
                   type="button"
                   onClick={this.editSet}>
-            <span className="screenreader-only">{I18n.t("Edit Grading Period Set")}</span>
+            <span className="screenreader-only">
+              {I18n.t("Edit %{title}", { title: this.props.set.title })}
+            </span>
             <i className="icon-edit"/>
           </button>
         );
@@ -277,7 +289,9 @@ define([
                   aria-disabled={disabled}
                   type="button"
                   onClick={this.promptDeleteSet}>
-            <span className="screenreader-only">{I18n.t("Delete Grading Period Set")}</span>
+            <span className="screenreader-only">
+              {I18n.t("Delete %{title}", { title: this.props.set.title })}
+            </span>
             <i className="icon-trash"/>
           </button>
         );

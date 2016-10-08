@@ -1,10 +1,5 @@
 <% if aacs.present? %>
   <div class="ic-Login__sso">
-    <% unless use_new_styles? %>
-      <h4 class="ic-Login__sso-divider" role="presentation">
-        <%= t('OR') %>
-      </h4>
-    <% end %>
     <ul class="ic-Login__sso-list">
       <% aacs.each do |aac| %>
         <% only_one = aacs.size < 2 %>

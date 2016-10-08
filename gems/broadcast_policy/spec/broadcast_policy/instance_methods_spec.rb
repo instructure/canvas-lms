@@ -11,7 +11,7 @@ describe BroadcastPolicy::InstanceMethods do
       @changed_attributes = {}
     end
 
-    def column_for_attribute(_)
+    def has_attribute?(_)
       true
     end
 

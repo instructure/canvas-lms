@@ -15,11 +15,7 @@
 
 <div class="index-content-container">
   <div class="index-content">
-  {{#if ENV.use_new_styles}}
     <table class="ic-Table ic-Table--condensed ic-Table--striped ic-Table--hover-row" role="grid">
-  {{else}}
-    <table class="table" role="grid">
-  {{/if}}
       <thead>
         <tr class="header-row" role="row">
           <th width="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}42%{{else}}46%{{/if}}{{else}}60%{{/if}}" role="columnheader">

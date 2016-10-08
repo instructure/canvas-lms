@@ -17,6 +17,7 @@
  */
 
 define([
+  'jsx/speed_grader/mgp',
   'jsx/grading/helpers/OutlierScoreHelper',
   'jst/speed_grader/student_viewed_at',
   'jst/speed_grader/submissions_dropdown',
@@ -53,7 +54,7 @@ define([
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(OutlierScoreHelper, studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(MGP, OutlierScoreHelper, studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // PRIVATE VARIABLES AND FUNCTIONS
   // all of the $ variables here are to speed up access to dom nodes,
@@ -119,6 +120,7 @@ define([
       $submission_not_newest_notice = $("#submission_not_newest_notice"),
       $enrollment_inactive_notice = $("#enrollment_inactive_notice"),
       $enrollment_concluded_notice = $("#enrollment_concluded_notice"),
+      $closed_gp_notice = $("#closed_gp_notice"),
       $submission_files_container = $("#submission_files_container"),
       $submission_files_list = $("#submission_files_list"),
       $submission_attachment_viewed_at = $("#submission_attachment_viewed_at_container"),
@@ -146,7 +148,8 @@ define([
       groupLabel = I18n.t("group", "Group"),
       gradeeLabel = studentLabel,
       utils,
-      crocodocSessionTimer;
+      crocodocSessionTimer,
+      isAdmin = _.include(ENV.current_user_roles, "admin");
 
   utils = {
     getParam: function(name){
@@ -1149,6 +1152,7 @@ define([
         $full_width_container.removeClass("with_enrollment_notice");
         $enrollment_inactive_notice.hide();
         $enrollment_concluded_notice.hide();
+        $closed_gp_notice.hide();
 
         EG.setGradeReadOnly(true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
         if (ENV.grading_role == 'moderator' && this.currentStudent.submission_state == 'not_graded') {
@@ -1506,15 +1510,14 @@ define([
       var $submission_to_view = $("#submission_to_view"),
           submissionToViewVal = $submission_to_view.val(),
           currentSelectedIndex = currentIndex(this, submissionToViewVal),
-          isMostRecent = this.currentStudent &&
-                         this.currentStudent.submission &&
-                         this.currentStudent.submission.submission_history &&
-                         this.currentStudent.submission.submission_history.length - 1 === currentSelectedIndex,
-          submission  = this.currentStudent &&
-                        this.currentStudent.submission &&
-                        this.currentStudent.submission.submission_history &&
-                        this.currentStudent.submission.submission_history[currentSelectedIndex] &&
-                        this.currentStudent.submission.submission_history[currentSelectedIndex].submission
+          submissionHolder = this.currentStudent &&
+                             this.currentStudent.submission,
+          submissionHistory = submissionHolder && submissionHolder.submission_history,
+          isMostRecent = submissionHistory &&
+                         submissionHistory.length - 1 === currentSelectedIndex,
+          submission  = submissionHistory &&
+                        submissionHistory[currentSelectedIndex] &&
+                        submissionHistory[currentSelectedIndex].submission
                         || {},
           inlineableAttachments = [],
           browserableAttachments = [];
@@ -1611,9 +1614,16 @@ define([
       );
 
       var isConcluded = EG.isStudentConcluded(this.currentStudent.id);
+      var isClosedForStudent = MGP.assignmentClosedForStudent(this.currentStudent, jsonData);
       $enrollment_concluded_notice.showIf(isConcluded);
+      $closed_gp_notice.showIf(isClosedForStudent);
       SpeedgraderHelpers.setRightBarDisabled(isConcluded);
-      if (isConcluded) {
+      EG.setGradeReadOnly((typeof submissionHolder != "undefined" &&
+                           submissionHolder.submission_type === "online_quiz") ||
+                          isConcluded ||
+                          (isClosedForStudent && !isAdmin));
+
+      if (isConcluded || isClosedForStudent) {
         $full_width_container.addClass("with_enrollment_notice");
       }
     },
@@ -2204,9 +2214,6 @@ define([
       var grade = EG.getGradeToShow(submission, ENV.grading_role);
 
       $grade.val(grade);
-      EG.setGradeReadOnly((typeof submission != "undefined" &&
-                           submission.submission_type === 'online_quiz') ||
-                          EG.isStudentConcluded(EG.currentStudent.id));
 
       $('#submit_same_score').hide();
       if (typeof submission != "undefined" && submission.score !== null) {
@@ -2323,14 +2330,43 @@ define([
     }
   };
 
+  function getAssignmentOverrides() {
+    return $.getJSON("/api/v1/courses/" + ENV.course_id +
+                     "/assignments/" + ENV.assignment_id + "/overrides");
+  }
+
+  function getGradingPeriods() {
+    var dfd = $.Deferred();
+    // treating failure as a success here since grading periods 404 when not
+    // enabled
+    $.ajaxJSON("/api/v1/courses/" + ENV.course_id + "/grading_periods",
+      "GET", {},
+      function(response) { dfd.resolve(response.grading_periods); },
+      function() { dfd.resolve([]); },
+      {skipDefaultError: true}
+    );
+
+    return dfd;
+  }
+
+  function gotData(assignmentOverridesResponse, gradingPeriods, speedGraderJsonResponse) {
+    var speedGraderJSON = speedGraderJsonResponse[0];
+    var assignmentOverrides = assignmentOverridesResponse[0];
+
+    speedGraderJSON.gradingPeriods = gradingPeriods;
+    speedGraderJSON.assignmentOverrides = assignmentOverrides;
+
+    window.jsonData = speedGraderJSON;
+    EG.jsonReady();
+  }
+
   return {
     setup: function() {
       // fire off the request to get the jsonData
       window.jsonData = {};
-      $.ajaxJSON(window.location.pathname+ '.json' + window.location.search, 'GET', {}, function(json) {
-        jsonData = json;
-        $(EG.jsonReady);
-      });
+      var speedGraderJsonDfd = $.getJSON(window.location.pathname+ '.json' + window.location.search);
+
+      $.when(getAssignmentOverrides(), getGradingPeriods(), speedGraderJsonDfd).then(gotData);
 
       //run the stuff that just attaches event handlers and dom stuff, but does not need the jsonData
       $(document).ready(function() {

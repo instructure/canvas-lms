@@ -1,4 +1,4 @@
-<div class="rs-margin-lr<% unless use_new_styles? %> rs-margin-top<% end %>">
+<div class="rs-margin-lr">
   <%= external_tools_menu_items(@course_settings_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-settings-sub-navigation-lti", settings_key: :course_settings_sub_navigation}) %>
   <% if can_do(@context, @current_user, :use_student_view) %>
     <%= link_to course_student_view_path(@context), :method => :post, :class => 'btn button-sidebar-wide student_view_button' do %>

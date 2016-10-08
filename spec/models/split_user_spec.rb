@@ -113,6 +113,17 @@ describe SplitUsers do
         expect(user2.reload.attachments).to eq [attachment2]
       end
 
+      it 'should handle when observing merged user' do
+        user2.observers << user1
+        UserMerge.from(user1).into(user2)
+
+        SplitUsers.split_db_users(user2)
+
+        expect(user1.user_observees).to eq UserObserver.where(user_id: user2, observer_id: user1)
+        expect(user2.user_observers).to eq UserObserver.where(user_id: user2, observer_id: user1)
+      end
+
+
       it 'should handle user_observees' do
         observee1 = user_model
         observee2 = user_model
@@ -170,6 +181,65 @@ describe SplitUsers do
         expect(enrollment4.reload.user).to eq user1
         expect(enrollment5.reload.user).to eq user2
       end
+
+      it "should move ccs to the new user (but only if they don't already exist)" do
+        # unconfirmed: active conflict
+        user1.communication_channels.create!(path: 'a@instructure.com')
+        user2.communication_channels.create!(path: 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active: unconfirmed conflict
+        user1.communication_channels.create!(path: 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
+        cc = user2.communication_channels.create!(path: 'B@instructure.com')
+        # active: active conflict
+        user1.communication_channels.create!(path: 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
+        user2.communication_channels.create!(path: 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # unconfirmed: unconfirmed conflict
+        user1.communication_channels.create!(path: 'd@instructure.com')
+        user2.communication_channels.create!(path: 'D@instructure.com')
+        # retired: unconfirmed conflict
+        user1.communication_channels.create!(path: 'e@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        user2.communication_channels.create!(path: 'E@instructure.com')
+        # unconfirmed: retired conflict
+        user1.communication_channels.create!(path: 'f@instructure.com')
+        user2.communication_channels.create!(path: 'F@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired: active conflict
+        user1.communication_channels.create!(path: 'g@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        user2.communication_channels.create!(path: 'G@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active: retired conflict
+        user1.communication_channels.create!(path: 'h@instructure.com') { |cc| cc.workflow_state = 'active' }
+        user2.communication_channels.create!(path: 'H@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired: retired conflict
+        user1.communication_channels.create!(path: 'i@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        user2.communication_channels.create!(path: 'I@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # <nothing>: active
+        user2.communication_channels.create!(path: 'J@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active: <nothing>
+        user1.communication_channels.create!(path: 'k@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # <nothing>: unconfirmed
+        user2.communication_channels.create!(path: 'L@instructure.com')
+        # unconfirmed: <nothing>
+        user1.communication_channels.create!(path: 'm@instructure.com')
+        # <nothing>: retired
+        user2.communication_channels.create!(path: 'N@instructure.com') { |cc| cc.workflow_state = 'retired' }
+        # retired: <nothing>
+        user1.communication_channels.create!(path: 'o@instructure.com') { |cc| cc.workflow_state = 'retired' }
+
+        user1_ccs = user1.communication_channels.where.not(workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort
+        # cc will not be restored because it conflicted on merge and it was unconfirmed and it is frd deleted
+        user2_ccs = user2.communication_channels.where.not(id: cc, workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort
+
+        UserMerge.from(user1).into(user2)
+        SplitUsers.split_db_users(user2)
+        user1.reload
+        user2.reload
+
+        expect(user1.communication_channels.where.not(workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort).to eq user1_ccs
+        expect(user2.communication_channels.where.not(workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort).to eq user2_ccs
+      end
+
     end
 
     it 'should restore submissions' do
@@ -239,6 +309,28 @@ describe SplitUsers do
         expect(p1.reload.user).to eq user1
         expect(@user2.all_pseudonyms).to eq [@p2]
       end
+
+      it "should split a user across shards with ccs" do
+        user1 = user_with_pseudonym(username: 'user1@example.com', active_all: 1)
+        user1_ccs = user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort
+
+        @shard1.activate do
+          account = Account.create!
+          @user2 = user_with_pseudonym(username: 'user2@example.com', active_all: 1, account: account)
+        end
+        user2_ccs = @user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort
+
+        @shard1.activate do
+          UserMerge.from(user1).into(@user2)
+          SplitUsers.split_db_users(@user2)
+        end
+
+        user1.reload
+        @user2.reload
+        expect(user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq user1_ccs
+        expect(@user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq user2_ccs
+      end
+
     end
   end
 end

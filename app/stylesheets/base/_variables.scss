@@ -8,11 +8,7 @@
 //
 //============================================================================================
 
-//======================
-// Canvas Brand Variants
-//======================
-// This imports the variables needed to support new styles {$use_new_styles}
-// accessibility ($use_high_contrast)
+// This imports the variables needed to support accessibility ($use_high_contrast)
 // You can also use the sass function that helps ensure color contrast ratio.
 // Look in /sass-functions/ for more information on how that is used
 @import "variant_variables";
@@ -137,7 +133,6 @@ $contentBoxPadding:         8px;
 // Placeholder for old bootstrap variable; deprecated, but still in use some places
 // Once all of those have been adjusted to use the new variable we can get rid of this
 $ic-line-height: 1.5;
-@if not $use_new_styles { $ic-line-height: 20px; }
 
 $ic-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $ic-font-weight: 500; // instead of "bold"
@@ -186,6 +181,20 @@ $ic-border-light:         $ic-border-color;
 $ic-border-dark:          #A5AFB5;
 @if $use_high_contrast {  $ic-border-dark: #556572; }
 
+//=====================
+// Text-color variables
+//=====================
+$ic-font-color-light:     $ic-color-light;
+$ic-font-color-dark:      $ic-brand-font-color-dark;
+@if $use_high_contrast { $ic-font-color-dark: $ic-color-dark; }
+$ic-font-color--subdued:  lighten($ic-font-color-dark, 15);
+@if $use_high_contrast { $ic-font-color--subdued:  $ic-color-medium-darker; }
+$ic-hint-text:            lighten($ic-font-color-dark, 30);
+@if $use_high_contrast { $ic-hint-text: $ic-color-medium; }
+
+// textColor is a deprecated Bootstrap 2 variable. Please use $ic-font-color-dark!
+$textColor:               $ic-font-color-dark; // deprecated - do not use
+
 //=============================
 // Link-color-related variables
 //=============================
@@ -193,30 +202,19 @@ $ic-border-dark:          #A5AFB5;
 @if $use_high_contrast {    $ic-link-color: #0073A7; }
 $ic-link-color-hover:       darken($ic-link-color, 10%);
 
-$ic-icon-link-color-hover: lighten($ic-color-dark, 15%);
+$ic-icon-link-color-hover: lighten($ic-font-color-dark, 15%);
 @if $use_high_contrast {
-$ic-icon-link-color-hover: $ic-color-dark;
+$ic-icon-link-color-hover: $ic-font-color-dark;
 }
 
-$ic-icon-link-color:       lighten($ic-color-dark, 30%);
+$ic-icon-link-color:       lighten($ic-font-color-dark, 30%);
 @if $use_high_contrast {
-$ic-icon-link-color:       lighten($ic-color-dark, 12%);
+$ic-icon-link-color:       lighten($ic-font-color-dark, 12%);
 }
 
 // linkColor is a deprecated Bootstrap 2 variable. Please use $ic-link-color!
 $linkColor:                 $ic-link-color; // deprecated - do not use
 $linkColorHover:            $ic-link-color-hover; // deprecated - do not use
-
-//=====================
-// Text-color variables
-//=====================
-$ic-font-color-light:     $ic-color-light;
-$ic-font-color-dark:      $ic-color-dark;
-$ic-font-color--subdued:  $ic-color-medium-darker;
-$ic-hint-text:            $ic-color-medium;
-
-// textColor is a deprecated Bootstrap 2 variable. Please use $ic-font-color-dark!
-$textColor:               $ic-font-color-dark; // deprecated - do not use
 
 //=====================
 // Course Nav Variables
@@ -274,13 +272,6 @@ $wellBackground:                $ic-color-light;
 $altBG:                         $ic-bg-light-neutral;
 $borderColor:                   $ic-border-light;
 $activeBG:                      $ic-bg-light-primary;
-@if not $use_new_styles {
-  $lightBackground:               rgb(248, 250, 251);
-  $wellBackground:                #e8ecef;
-  $altBG:                         #dfe9f0;
-  $borderColor:                   #a8adb3;
-  $activeBG:                      #d6ecfc;
-}
 
 //=====================
 // Transition Variables

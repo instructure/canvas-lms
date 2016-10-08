@@ -30,8 +30,7 @@ $kyle-blue: #0081e3;
       box-shadow: none;
       border-bottom: none;
       padding-bottom: 0;
-      @if $use_new_styles { font-weight: 500; }
-      @else { font-weight: bold; }
+      font-weight: 500;
     }
     .fc-button {
       padding: 0px 10px;
@@ -40,13 +39,8 @@ $kyle-blue: #0081e3;
       background: none;
       border: none;
       color: inherit;
-      @if $use_new_styles {
-        box-shadow: none;
-        &:hover { color: $ic-color-dark; }
-      }
-      @else {
-        &:hover { text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.7); }
-      }
+      box-shadow: none;
+      &:hover { color: $ic-font-color-dark; }
     }
   }
   .fc-widget-header {
@@ -97,13 +91,7 @@ $kyle-blue: #0081e3;
   }
   .slot-available {
     background: white;
-    @if $use_new_styles {
-      color: $ic-brand-primary;
-    }
-    @else {
-      color: #0090ff;
-      text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.7);
-    }
+    color: $ic-brand-primary;
   }
   .fc-other-month {
     color: #b4b3b3;

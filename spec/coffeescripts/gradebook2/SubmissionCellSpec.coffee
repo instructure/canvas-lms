@@ -59,19 +59,47 @@ define [
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 'happy'}, { }, student)
     notEqual submissionCellResponse.indexOf("grayed-out"), -1
 
+  test "#class.formatter, isLocked: true adds grayed-out", ->
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: true })
+    ok submissionCellResponse.indexOf("grayed-out") > -1
+
+  test "#class.formatter, isLocked: true adds cannot_edit", ->
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: true })
+    ok submissionCellResponse.indexOf("cannot_edit") > -1
+
+  test "#class.formatter, isLocked: true does not include the cell comment bubble", ->
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: true })
+    equal submissionCellResponse.indexOf("gradebook-cell-comment"), -1
+
+  test "#class.formatter, isLocked: false doesn't add grayed-out", ->
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: false })
+    equal submissionCellResponse.indexOf("grayed-out"), -1
+
+  test "#class.formatter, isLocked: false doesn't add cannot_edit", ->
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: false })
+    equal submissionCellResponse.indexOf("cannot_edit"), -1
+
+  test "#class.formatter, isLocked: false includes the cell comment bubble", ->
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { isLocked: false })
+    ok submissionCellResponse.indexOf("gradebook-cell-comment") > -1
+
+  test "#class.formatter, tooltip adds your text to the special classes", ->
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, {}, {}, { tooltip: "dora_the_explorer" })
+    ok submissionCellResponse.indexOf("dora_the_explorer") > -1
+
   test "#class.formatter, isInactive: false doesn't add grayed-out", ->
     student = { isInactive: false }
-    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10}, { }, student)
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10 }, { }, student)
     equal submissionCellResponse.indexOf("grayed-out"), -1
 
   test "#class.formatter, isConcluded adds grayed-out", ->
     student = { isConcluded: true }
-    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10}, { }, student)
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10 }, { }, student)
     notEqual submissionCellResponse.indexOf("grayed-out"), -1
 
   test "#class.formatter, isConcluded doesn't have grayed-out", ->
     student = { isConcluded: false }
-    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10}, { }, student)
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10 }, { }, student)
     equal submissionCellResponse.indexOf("grayed-out"), -1
 
   test "#letter_grade.formatter, shows EX when submission is excused", ->
@@ -88,3 +116,63 @@ define [
     @stub(SubmissionCell.prototype, 'cellWrapper').withArgs('B').returns('ok')
     formattedResponse = SubmissionCell.letter_grade.formatter(0, 0, {grade: 'B'}, {}, {})
     equal formattedResponse, 'ok'
+
+  test "#letter_grade.formatter, isLocked: true adds grayed-out", ->
+    submissionCellResponse = SubmissionCell.letter_grade.formatter(0, 0, { grade: "A" }, {}, {}, { isLocked: true })
+    ok submissionCellResponse.indexOf("grayed-out") > -1
+
+  test "#letter_grade.formatter, isLocked: true adds cannot_edit", ->
+    submissionCellResponse = SubmissionCell.letter_grade.formatter(0, 0, { grade: "A" }, {}, {}, { isLocked: true })
+    ok submissionCellResponse.indexOf("cannot_edit") > -1
+
+  test "#letter_grade.formatter, isLocked: false doesn't add grayed-out", ->
+    submissionCellResponse = SubmissionCell.letter_grade.formatter(0, 0, { grade: "A" }, {}, {}, { isLocked: false })
+    equal submissionCellResponse.indexOf("grayed-out"), -1
+
+  test "#letter_grade.formatter, isLocked: false doesn't add cannot_edit", ->
+    submissionCellResponse = SubmissionCell.letter_grade.formatter(0, 0, { grade: "A" }, {}, {}, { isLocked: false })
+    equal submissionCellResponse.indexOf("cannot_edit"), -1
+
+  test "#letter_grade.formatter, tooltip adds your text to the special classes", ->
+    submissionCellResponse = SubmissionCell.letter_grade.formatter(0, 0, { grade: "A" }, {}, {}, { tooltip: "dora_the_explorer" })
+    ok submissionCellResponse.indexOf("dora_the_explorer") > -1
+
+  test "#gpa_scale.formatter, isLocked: true adds grayed-out", ->
+    submissionCellResponse = SubmissionCell.gpa_scale.formatter(0, 0, { grade: 3.2 }, {}, {}, { isLocked: true })
+    ok submissionCellResponse.indexOf("grayed-out") > -1
+
+  test "#gpa_scale.formatter, isLocked: true adds cannot_edit", ->
+    submissionCellResponse = SubmissionCell.gpa_scale.formatter(0, 0, { grade: 3.2 }, {}, {}, { isLocked: true })
+    ok submissionCellResponse.indexOf("cannot_edit") > -1
+
+  test "#gpa_scale.formatter, isLocked: false doesn't add grayed-out", ->
+    submissionCellResponse = SubmissionCell.gpa_scale.formatter(0, 0, { grade: 3.2 }, {}, {}, { isLocked: false })
+    equal submissionCellResponse.indexOf("grayed-out"), -1
+
+  test "#gpa_scale.formatter, isLocked: false doesn't add cannot_edit", ->
+    submissionCellResponse = SubmissionCell.gpa_scale.formatter(0, 0, { grade: 3.2 }, {}, {}, { isLocked: false })
+    equal submissionCellResponse.indexOf("cannot_edit"), -1
+
+  test "#gpa_scale.formatter, tooltip adds your text to the special classes", ->
+    submissionCellResponse = SubmissionCell.gpa_scale.formatter(0, 0, { grade: 3.2 }, {}, {}, { tooltip: "dora_the_explorer" })
+    ok submissionCellResponse.indexOf("dora_the_explorer") > -1
+
+  test "#pass_fail.formatter, isLocked: true adds grayed-out", ->
+    submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "complete" }, {}, {}, { isLocked: true })
+    ok submissionCellResponse.indexOf("grayed-out") > -1
+
+  test "#pass_fail.formatter, isLocked: true adds cannot_edit", ->
+    submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "complete" }, {}, {}, { isLocked: true })
+    ok submissionCellResponse.indexOf("cannot_edit") > -1
+
+  test "#pass_fail.formatter, isLocked: false doesn't add grayed-out", ->
+    submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "complete" }, {}, {}, { isLocked: false })
+    equal submissionCellResponse.indexOf("grayed-out"), -1
+
+  test "#pass_fail.formatter, isLocked: false doesn't add cannot_edit", ->
+    submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "complete" }, {}, {}, { isLocked: false })
+    equal submissionCellResponse.indexOf("cannot_edit"), -1
+
+  test "#pass_fail.formatter, tooltip adds your text to the special classes", ->
+    submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "complete" }, {}, {}, { tooltip: "dora_the_explorer" })
+    ok submissionCellResponse.indexOf("dora_the_explorer") > -1

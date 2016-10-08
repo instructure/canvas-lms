@@ -83,6 +83,9 @@ module Api::V1::CalendarEvent
     end
     hash['context_code'] ||= event.context_code
 
+    # a field that always gives all relevant contexts without filtering by signups etc.
+    hash['all_context_codes'] = event.effective_context_code || event.context_code
+
     hash['parent_event_id'] = event.parent_calendar_event_id
     # events are hidden when section-specific events override them
     # but if nobody is logged in, no sections apply, so show the base event

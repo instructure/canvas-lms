@@ -251,7 +251,6 @@ define([
               role= 'button'
               aria-label= {selectedItemIsFolder ? I18n.t('Viewing folders is not available') : I18n.t('View')}
               dataTooltip= ''
-              ariaDisabled= {!this.showingButtons || selectedItemIsFolder}
               disabled= {!this.showingButtons || selectedItemIsFolder}
               tabIndex= {selectedItemIsFolder ? -1 : 0}
             >

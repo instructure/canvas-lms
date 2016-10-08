@@ -21,11 +21,11 @@ describe 'Screenreader Gradebook Student Information' do
 
   before(:each) do
     course_setup
-    login_to_srgb
   end
 
   context 'in Student Information section' do
     it 'allows comments in Notes field', priority: "2", test_id: 615709 do
+      login_to_srgb
       skip_if_chrome('fails in chrome - due to replace content')
       select_student(student)
       show_notes_option.click
@@ -37,7 +37,9 @@ describe 'Screenreader Gradebook Student Information' do
 
     context 'displays no points possible warning' do
       before(:each) do
-        turn_on_group_weights
+        @course.apply_assignment_group_weights = true
+        @course.save!
+        login_to_srgb
       end
 
       it "with only a student selected", priority: "2", test_id: 615711 do

@@ -601,6 +601,13 @@ describe Assignment::SpeedGrader do
       students = json['context']['students'].map { |s| s['id'] }
       expect(students).to include(active_student.id, inactive_student.id, concluded_student.id)
     end
+
+    it "returns concluded students if the course is concluded" do
+      test_course.complete
+      json = Assignment::SpeedGrader.new(assignment, teacher).json
+      students = json['context']['students'].map { |s| s['id'] }
+      expect(students).to include(active_student.id, concluded_student.id)
+    end
   end
 
   def setup_assignment_with_homework

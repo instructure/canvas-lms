@@ -11,20 +11,11 @@
   .outcomes-toolbar {
     margin-top: 0;
     background-image: none;
-    @if $use_new_styles {
-      border: 1px solid $ic-border-light;
-      background-color: darken($lightBackground, 3%);
-      padding: $ic-sp/2;
-      box-sizing: border-box;
-      overflow: auto;
-    }
-    @else {
-      border: none;
-      background-color: #d4dce2;
-      border-radius: 5px 5px 0px 0px;
-      height: 38px;
-      padding: 5px;
-    }
+    border: 1px solid $ic-border-light;
+    background-color: darken($lightBackground, 3%);
+    padding: $ic-sp/2;
+    box-sizing: border-box;
+    overflow: auto;
     .manage_rubrics {
       float: right;
     }
@@ -42,10 +33,8 @@
     padding: 0;
     overflow: hidden;
     background-color: white;
-    @if $use_new_styles {
-      border: 1px solid $ic-border-light;
-      border-top: none;
-    }
+    border: 1px solid $ic-border-light;
+    border-top: none;
     &::after {
       clear: both;
     }
@@ -144,26 +133,19 @@ ul.outcome-level {
       display: block;
       white-space: nowrap;
 
-      @if $use_new_styles {
-        padding: $ic-sp/2 $ic-sp;
-        color: $ic-font-color--subdued;
-        span {
-          vertical-align: middle;
-          &:hover {
-            text-decoration: underline;
-          }
+      padding: $ic-sp/2 $ic-sp;
+      color: $ic-font-color--subdued;
+      span {
+        vertical-align: middle;
+        &:hover {
+          text-decoration: underline;
         }
-      }
-      @else {
-        padding: 4px 12px;
-        color: #555555;
-        i[class*=icon-]:before, i[class^=icon-]:before {vertical-align: baseline;}
       }
     }
     &.selected {
       a {
         background-color: $ic-bg-light-primary;
-        color: $ic-color-dark;
+        color: $ic-font-color-dark;
         position: relative;
         &::before {
           // adds blue border

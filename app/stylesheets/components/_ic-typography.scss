@@ -1,4 +1,3 @@
-@if $use_new_styles {
 /// This is the beginning of fixing typography usage in Canvas. We originally were pulling in a bunch of
 /// bootstrap styles, of which, we'd like to phase out in multiple iterations.
 /// Below is the combination of overwrites and bootstrap styles that were originally in Canvas.
@@ -17,7 +16,7 @@ body {
   line-height: $ic-line-height;
   @include fontSize($ic-font-size);
   font-family: $ic-font-family;
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
 }
 
 p {
@@ -98,10 +97,8 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 h1, h2, .h1, .h2 {
   font-size: 1.8em;
-  @if $use_new_styles {
-    font-weight: 300;
-    line-height: $ic-line-height;
-  }
+  font-weight: 300;
+  line-height: $ic-line-height;
 }
 h3, .h3 {
   font-size: 1.5em;
@@ -138,7 +135,7 @@ a {
 /// Underline All Links Feature Flag
 ////////=============
 .Underline-All-Links__enabled {
-  a {
+  a:not(.Button, .btn, .ui-button) {
     text-decoration: underline;
     &:focus, &:hover { text-decoration: none; }
     @include ic-focus-base;
@@ -599,4 +596,3 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     box-shadow: none;
   }
 }
-}//end @if $use_new_styles

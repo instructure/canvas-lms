@@ -102,6 +102,7 @@ class SplitUsers
     end
 
     def move_records_to_old_user(source_user, user, records)
+      fix_communication_channels(source_user, user, records.where(context_type: 'CommunicationChannel'))
       move_user_observers(source_user, user, records.where(context_type: 'UserObserver', previous_user_id: user))
       move_attachments(source_user, user, records.where(context_type: 'Attachment'))
       enrollment_ids = records.where(context_type: 'Enrollment', previous_user_id: user).pluck(:context_id)
@@ -125,9 +126,30 @@ class SplitUsers
       restore_worklow_states_from_records(records)
     end
 
+    def fix_communication_channels(source_user, user, cc_records)
+      if source_user.shard != user.shard
+        user.shard.activate do
+          # remove communication channels that didn't exist prior to the merge
+          CommunicationChannel.where(id: cc_records.where(previous_workflow_state: 'non_existent').pluck(:context_id)).delete_all
+        end
+      end
+      # move moved communication channels back
+      max_position = user.communication_channels.last.try(:position) || 0
+      scope = source_user.communication_channels.where(id: cc_records.where(previous_user_id: user).pluck(:context_id))
+      scope.update_all(["user_id=?, position=position+?", user, max_position]) unless scope.empty?
+
+      cc_records.where.not(previous_workflow_state: 'non existent').each do |cr|
+        CommunicationChannel.where(id: cr.context_id).update_all(workflow_state: cr.previous_workflow_state)
+      end
+    end
+
     def move_user_observers(source_user, user, records)
-      source_user.user_observers.where(id: records.pluck(:context_id)).update_all(user_id: user)
-      source_user.user_observees.where(id: records.pluck(:context_id)).update_all(observer_id: user)
+      # skip when the user observer is between the two users. Just undlete the record
+      not_obs = UserObserver.where(user_id: [source_user, user], observer_id: [source_user, user])
+      obs = UserObserver.where(id: records.pluck(:context_id)).where.not(id: not_obs)
+
+      source_user.user_observers.where(id: obs).update_all(user_id: user)
+      source_user.user_observees.where(id: obs).update_all(observer_id: user)
     end
 
     def move_attachments(source_user, user, records)
@@ -156,13 +178,6 @@ class SplitUsers
     def move_pseudonyms_to_user(pseudonyms, target_user)
       pseudonyms.each do |pseudonym|
         pseudonym.update_attribute(:user_id, target_user.id)
-        # try to grab the email
-        pseudonym.sis_communication_channel.try(:update_attribute, :user_id, target_user.id)
-        next unless pseudonym.communication_channel_id
-        if pseudonym.communication_channel_id != pseudonym.sis_communication_channel_id
-          cc = CommunicationChannel.where(id: pseudonym.communication_channel_id).first
-          cc.update_attribute(:user_id, target_user.id) if cc
-        end
       end
     end
 

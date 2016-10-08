@@ -250,6 +250,7 @@ describe ConversationParticipant do
     it "should not include shared contexts by default" do
       users = @convo.reload.participants
       users.each do |user|
+        next if user == @me
         expect(@me.address_book.cached?(user)).to be_falsey
       end
     end

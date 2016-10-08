@@ -1,4 +1,3 @@
-# coding: utf-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -26,7 +25,8 @@ describe Assignment do
   end
 
   it "should create a new instance given valid attributes" do
-    @course.assignments.create!(assignment_valid_attributes)
+    course = @course.assignments.create!(assignment_valid_attributes)
+    expect(course).to be_valid
   end
 
   it "should have a useful state machine" do
@@ -2058,6 +2058,12 @@ describe Assignment do
       context "assignment created" do
         before :once do
           Notification.create(:name => 'Assignment Created')
+        end
+
+        it "preload user roles for much fasterness" do
+          @assignment.context.expects(:preloaded_user_has_been?).at_least_once
+
+          @assignment.do_notifications!
         end
 
         it "should notify of the correct due date for the recipient, or 'multiple'" do

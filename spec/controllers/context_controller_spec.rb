@@ -93,7 +93,7 @@ describe ContextController do
     end
 
     it "should assign variables" do
-      user_session(@student)
+      user_session(@teacher)
       @enrollment = @course.enroll_student(user(:active_all => true))
       @enrollment.accept!
       @student = @enrollment.user
@@ -103,7 +103,7 @@ describe ContextController do
       expect(assigns[:user]).not_to be_nil
       expect(assigns[:user]).to eql(@student)
       expect(assigns[:topics]).not_to be_nil
-      expect(assigns[:entries]).not_to be_nil
+      expect(assigns[:messages]).not_to be_nil
     end
 
     describe 'across shards' do
@@ -238,6 +238,18 @@ describe ContextController do
       get :prior_users, :course_id => @course.id
       expect(response).to be_success
       expect(assigns[:prior_users].size).to eql 20
+    end
+  end
+
+  describe "GET 'undelete_index'" do
+    it 'should work' do
+      user_session(@teacher)
+      assignment_model(course: @course)
+      @assignment.destroy
+
+      get :undelete_index, course_id: @course.id
+      expect(response).to be_success
+      expect(assigns[:deleted_items]).to include(@assignment)
     end
   end
 

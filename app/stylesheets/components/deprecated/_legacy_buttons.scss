@@ -17,7 +17,6 @@
 
   }
   button.button-sidebar-wide {
-    @if $use_new_styles { width: 100%; }
-    @else { width: $right_side_width - $right_side_margin - $right_side_margin; }
+    width: 100%;
   }
 }

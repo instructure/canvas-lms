@@ -42,7 +42,6 @@ describe BrandableCSS do
     describe "when called with a brand config" do
       before :once do
         parent_account = Account.default
-        parent_account.enable_feature!(:use_new_styles)
         parent_config = BrandConfig.create(variables: {"ic-brand-primary" => "#321"})
 
         subaccount_bc = BrandConfig.for(

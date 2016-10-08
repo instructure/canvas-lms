@@ -6,27 +6,28 @@ define([
   'jsx/shared/helpers/dateHelper',
   'jquery.instructure_misc_helpers'
 ], function(React, $, axios, I18n, DateHelper) {
-  const types = React.PropTypes;
+  const Types = React.PropTypes;
 
   let AccountGradingPeriod = React.createClass({
     propTypes: {
-      period: types.shape({
-        id:        types.string.isRequired,
-        title:     types.string.isRequired,
-        startDate: types.instanceOf(Date).isRequired,
-        endDate:   types.instanceOf(Date).isRequired
+      period: Types.shape({
+        id:        Types.string.isRequired,
+        title:     Types.string.isRequired,
+        startDate: Types.instanceOf(Date).isRequired,
+        endDate:   Types.instanceOf(Date).isRequired,
+        closeDate: Types.instanceOf(Date).isRequired
       }).isRequired,
-      onEdit: types.func.isRequired,
-      actionsDisabled: types.bool,
-      readOnly: types.bool.isRequired,
-      permissions: types.shape({
-        read:   types.bool.isRequired,
-        create: types.bool.isRequired,
-        update: types.bool.isRequired,
-        delete: types.bool.isRequired
+      onEdit: Types.func.isRequired,
+      actionsDisabled: Types.bool,
+      readOnly: Types.bool.isRequired,
+      permissions: Types.shape({
+        read:   Types.bool.isRequired,
+        create: Types.bool.isRequired,
+        update: Types.bool.isRequired,
+        delete: Types.bool.isRequired
       }).isRequired,
-      onDelete: types.func.isRequired,
-      deleteGradingPeriodURL: types.string.isRequired
+      onDelete: Types.func.isRequired,
+      deleteGradingPeriodURL: Types.string.isRequired
     },
 
     promptDeleteGradingPeriod(event) {
@@ -58,7 +59,9 @@ define([
                   type="button"
                   disabled={this.props.actionsDisabled}
                   onClick={this.onEdit}>
-            <span className="screenreader-only">{I18n.t("Edit grading period")}</span>
+            <span className="screenreader-only">
+              {I18n.t("Edit %{title}", { title: this.props.period.title })}
+            </span>
             <i className="icon-edit" role="presentation"/>
           </button>
         );
@@ -73,7 +76,9 @@ define([
                   className="Button Button--icon-action"
                   disabled={this.props.actionsDisabled}
                   onClick={this.promptDeleteGradingPeriod}>
-            <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
+            <span className="screenreader-only">
+              {I18n.t("Delete %{title}", { title: this.props.period.title })}
+            </span>
             <i className="icon-trash" role="presentation"/>
           </button>
         );
@@ -85,14 +90,17 @@ define([
       return (
         <div className="GradingPeriodList__period">
           <div className="GradingPeriodList__period__attributes grid-row">
-            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-4">
+            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
               <span tabIndex="0" ref="title">{this.props.period.title}</span>
             </div>
-            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-4">
+            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
               <span tabIndex="0" ref="startDate">{I18n.t("Start Date:")} {DateHelper.formatDatetimeForDisplay(this.props.period.startDate)}</span>
             </div>
-            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-4">
+            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
               <span tabIndex="0" ref="endDate">{I18n.t("End Date:")} {DateHelper.formatDatetimeForDisplay(this.props.period.endDate)}</span>
+            </div>
+            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
+              <span tabIndex="0" ref="closeDate">{I18n.t("Close Date:")} {DateHelper.formatDatetimeForDisplay(this.props.period.closeDate)}</span>
             </div>
           </div>
           <div className="GradingPeriodList__period__actions">

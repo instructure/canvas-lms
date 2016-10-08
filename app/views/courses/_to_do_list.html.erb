@@ -32,7 +32,7 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
           <div class="todo-details">
             <b><%= t('Grade %{assignment}', assignment: assignment.title) %></b>
             <% if presenter.show_context? %>
-              <p><%= assignment.context_name %></p>
+              <p><%= assignment.short_context_name %></p>
             <% end %>
             <p>
               <% if assignment.points_possible %>
@@ -59,7 +59,7 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
           <div class="todo-details">
             <b><%= t('Moderate %{assignment}', assignment: assignment.title) %></b>
             <% if presenter.show_context? %>
-              <p><%= assignment.context_name %></p>
+              <p><%= assignment.short_context_name %></p>
             <% end %>
             <p>
               <% if assignment.points_possible %>
@@ -86,7 +86,7 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
           <div class="todo-details">
             <b><%= assignment.submission_action_string %></b>
             <% if presenter.show_context? %>
-              <p><%= assignment.context_name %></p>
+              <p><%= assignment.short_context_name %></p>
             <% end %>
             <p>
               <% if assignment.points_possible %>
@@ -115,7 +115,7 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
           <div class="todo-details">
             <b><%= t('Peer Review for %{assignment}', assignment: assignment.title) %></b>
             <% if presenter.show_context? %>
-              <p><%= assessment_request.context_name %></p>
+              <p><%= assessment_request.short_context_name %></p>
             <% end %>
             <p>
               <% if assignment.try(:points_possible) %>

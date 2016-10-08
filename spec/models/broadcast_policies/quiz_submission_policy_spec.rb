@@ -82,24 +82,29 @@ module BroadcastPolicies
     end
 
     describe '#should_dispatch_submission_needs_grading?' do
-      before { quiz_submission.stubs(:pending_review?).returns false }
+      before { quiz_submission.stubs(:pending_review?).returns true }
       def wont_send_when
         yield
         expect(policy.should_dispatch_submission_needs_grading?).to be_falsey
       end
-      it "is true when quiz is pending review" do
-        quiz_submission.stubs(:pending_review?).returns true
+
+      it "is true when quiz submission is pending review" do
         expect(policy.should_dispatch_submission_needs_grading?).to eq true
       end
+
+      it "is true when quiz is muted" do
+        quiz_submission.stubs(:pending_review?).returns true
+        quiz.stubs(:muted?).returns true
+        expect(policy.should_dispatch_submission_needs_grading?).to eq true
+      end
+
+      specify { wont_send_when { quiz_submission.stubs(:pending_review?).returns false } }
       specify { wont_send_when { quiz.stubs(:assignment).returns nil } }
       specify { wont_send_when { quiz.stubs(:survey?).returns true} }
-      specify { wont_send_when { quiz.stubs(:muted?).returns true } }
       specify { wont_send_when { course.stubs(:available?).returns false} }
       specify { wont_send_when { quiz.stubs(:deleted?).returns true } }
-      specify { wont_send_when { quiz_submission.stubs(:submission).returns nil } }
-      specify { wont_send_when { submission.stubs(:graded_at).returns nil }}
-      specify { wont_send_when { submission.stubs(:pending_review?).returns false }}
-      specify { wont_send_when { QuizSubmissionPolicy.any_instance.stubs(:user_has_visibility?).returns(false) }}
+
+      specify { wont_send_when { policy.stubs(:user_has_visibility?).returns(false) }}
     end
 
 

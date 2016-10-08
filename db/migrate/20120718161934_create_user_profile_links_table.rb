@@ -6,7 +6,7 @@ class CreateUserProfileLinksTable < ActiveRecord::Migration
       t.string :url
       t.string :title
       t.references :user_profile, :limit => 8
-      t.timestamps
+      t.timestamps null: true
     end
   end
 

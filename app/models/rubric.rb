@@ -175,7 +175,7 @@ class Rubric < ActiveRecord::Base
                                    :context => context,
                                    :use_for_grading => !!opts[:use_for_grading],
                                    :purpose => purpose
-    ra.skip_updating_points_possible = @skip_updating_points_possible
+    ra.skip_updating_points_possible = opts[:skip_updating_points_possible] || @skip_updating_points_possible
     ra.tap &:save
   end
 

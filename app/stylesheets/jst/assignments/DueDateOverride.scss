@@ -7,9 +7,6 @@ $assign-border-color: #ccc;
 // Note: a lot of these are overrides due to
 // legacy code.
 #edit_assignment_wrapper .overrides-column-right.overrideFormFlex {
-  @if $use_new_styles == false {
-    width: 500px; // only needed for legacy layout support
-  }
 
   select, .subtitle {
     margin-left: 0;
@@ -40,10 +37,6 @@ $assign-border-color: #ccc;
   font-weight: 500;
 }
 .ContainerDueDate {
-  @if $use_new_styles == false {
-    width: 500px;
-  }
-
   margin: 20px 0; // matches legacy margins
 }
 
@@ -66,7 +59,7 @@ $assign-border-color: #ccc;
   padding: 0;
   > .Button.Button--link {
     padding: 0;
-    color: $ic-color-dark;
+    color: $ic-font-color-dark;
   }
 }
 

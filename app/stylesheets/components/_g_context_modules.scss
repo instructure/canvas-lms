@@ -610,9 +610,3 @@ div.completion_criterion_option {
   border: 0;
   padding: 0;
 }
-
-@media screen and (max-width: 1024px) {
-  @if $use_new_styles == false {
-    .with-left-side.modules { min-width: 700px; }
-  }
-}

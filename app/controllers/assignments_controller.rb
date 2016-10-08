@@ -26,6 +26,7 @@ class AssignmentsController < ApplicationController
   include Api::V1::ExternalTools
 
   include KalturaHelper
+  include SyllabusHelper
   before_filter :require_context
   add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
   before_filter { |c| c.active_tab = "assignments" }
@@ -296,19 +297,11 @@ class AssignmentsController < ApplicationController
     active_tab = "Syllabus"
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
       return unless tab_enabled?(@context.class::TAB_SYLLABUS)
-      @groups = @context.assignment_groups.active.order(:position, AssignmentGroup.best_unicode_collation_key('name')).to_a
-      @assignment_groups = @groups
-      @events = @context.events_for(@current_user)
-      @undated_events = @events.select {|e| e.start_at == nil}
-      @dates = (@events.select {|e| e.start_at != nil}).map {|e| e.start_at.to_date}.uniq.sort.sort
-      if @context.grants_right?(@current_user, session, :read)
-        @syllabus_body = public_user_content(@context.syllabus_body, @context)
-      else
-        # the requesting user may not have :read if the course syllabus is public, in which
-        # case, we pass nil as the user so verifiers are added to links in the syllabus body
-        # (ability for the user to read the syllabus was checked above as :read_syllabus)
-        @syllabus_body = public_user_content(@context.syllabus_body, @context, nil, true)
-      end
+      @groups = @context.assignment_groups.active.order(
+        :position,
+        AssignmentGroup.best_unicode_collation_key('name')
+      ).to_a
+      @syllabus_body = syllabus_user_content
 
       hash = { :CONTEXT_ACTION_SOURCE => :syllabus }
       append_sis_data(hash)

@@ -45,7 +45,9 @@ describe AddressBook::MessageableUser do
       student3 = student_in_course(active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       address_book.known_users([student1, student2])
-      teacher.expects(:load_messageable_users).with([student3], anything).returns([student3])
+      teacher.expects(:load_messageable_users).
+        with([student3], anything).
+        returns(MessageableUser.where(id: student3).to_a)
       known_users = address_book.known_users([student2, student3])
       expect(known_users.map(&:id)).to include(student2.id)
       expect(known_users.map(&:id)).to include(student3.id)
@@ -370,7 +372,7 @@ describe AddressBook::MessageableUser do
       student = student_in_course(active_all: true, name: 'Bob').user
       Rails.cache.expects(:fetch).
         with(regexp_matches(/address_book_preload/)).
-        returns([student])
+        returns(MessageableUser.where(id: student).to_a)
       teacher.expects(:load_messageable_users).never
       AddressBook::MessageableUser.new(teacher).preload_users([student])
     end

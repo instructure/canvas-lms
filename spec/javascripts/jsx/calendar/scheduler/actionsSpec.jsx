@@ -12,6 +12,16 @@ define([
     };
 
     deepEqual(actual, expected);
-  });
+  })
 
-});
+  test('setCourse returns the proper action', () => {
+    const actual = Actions.actions.setCourse({id: 4, name:'blah'});
+    const expected = {
+      type: 'SET_COURSE',
+      payload: {id: 4, name:'blah'}
+    };
+
+    deepEqual(actual, expected)
+  })
+
+})

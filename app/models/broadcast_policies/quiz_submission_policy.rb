@@ -7,14 +7,14 @@ module BroadcastPolicies
     end
 
     def should_dispatch_submission_graded?
-      quiz_is_accepting_messages? &&
+      quiz_is_accepting_messages_for_student? &&
       quiz_submission.user &&
       quiz_submission.user.student_enrollments.map(&:course_id).include?(quiz.context_id) &&
       (quiz_submission.changed_state_to(:complete) || manually_graded)
     end
 
     def should_dispatch_submission_grade_changed?
-      quiz_is_accepting_messages? &&
+      quiz_is_accepting_messages_for_student? &&
       quiz_submission.submission.try(:graded_at) &&
       quiz_submission.changed_in_state(:complete, :fields => [:score]) &&
       user_has_visibility?
@@ -22,7 +22,7 @@ module BroadcastPolicies
 
     def should_dispatch_submission_needs_grading?
       !quiz.survey? &&
-      quiz_is_accepting_messages? &&
+      quiz_is_accepting_messages_for_admin? &&
       quiz_submission.pending_review? &&
       user_has_visibility?
     end
@@ -32,12 +32,19 @@ module BroadcastPolicies
       quiz_submission.quiz
     end
 
-    def quiz_is_accepting_messages?
+    def quiz_is_accepting_messages_for_student?
       quiz_submission &&
       quiz.assignment &&
       !quiz.muted? &&
       quiz.context.available? &&
       !quiz.deleted?
+    end
+
+    def quiz_is_accepting_messages_for_admin?
+      quiz_submission &&
+        quiz.assignment &&
+        quiz.context.available? &&
+        !quiz.deleted?
     end
 
     def manually_graded

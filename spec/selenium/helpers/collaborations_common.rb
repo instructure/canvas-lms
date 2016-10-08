@@ -84,5 +84,8 @@ module CollaborationsCommon
     expect(ff('.members-list li')).to have_size(1)
 
     f('button[type="submit"]').click
+
+    # close the extra window so it doesn't cause focus problems for subsequent specs
+    close_extra_windows
   end
 end

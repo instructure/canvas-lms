@@ -95,9 +95,7 @@ module Api
 
       def add_css_and_js_overrides
         return parsed_html unless @include_mobile
-        return parsed_html unless @account &&
-          @account.root_account.feature_enabled?(:use_new_styles) &&
-          @account.effective_brand_config
+        return parsed_html unless @account && @account.effective_brand_config
 
         overrides = @account.effective_brand_config.css_and_js_overrides
         self.class.add_overrides_to_html(parsed_html, overrides)

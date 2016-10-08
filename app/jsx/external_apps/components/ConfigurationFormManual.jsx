@@ -130,7 +130,7 @@ define([
               <TextInput
                 ref="domain"
                 id="domain"
-                defaultValue={this.props.domain}
+                defaultValue={this.props.domain ? this.props.domain : ''}
                 label={I18n.t('Domain')}
                 errors={this.state.errors} />
             </div>
@@ -157,7 +157,7 @@ define([
           <TextAreaInput
             ref="description"
             id="description"
-            defaultValue={this.props.description}
+            defaultValue={this.props.description ? this.props.description : ''}
             label={I18n.t('Description')}
             rows={6}
             errors={this.state.errors} />

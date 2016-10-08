@@ -21,12 +21,6 @@ $answersSprite: url(/images/answers_sprite.png);
   top: -16px;
 }
 
-@if $use_new_styles == false {
-  #wrapper-container { min-width: 1100px; }
-  .with_item_groups #wrapper-container { min-width: 940px; }
-  .quizzes-speedgrader #wrapper-container { min-width: 1000px; }
-}
-
 // quiz index
 li.quiz {
   cursor: pointer;
@@ -118,28 +112,6 @@ li.quiz {
       }
     }
   }
-  .assignment_dates {
-    @if $use_new_styles == false {
-      border-collapse: collapse;
-      width: 100%;
-      margin-bottom: 1em;
-      thead{
-        background-color: transparent;
-      }
-      tr {
-        th {
-          font-weight: bold;
-          @include fontSize($ic-font-size--small);
-          padding: 0.5em;
-        }
-        td {
-          border-top: 1px solid #BBB;
-          border-bottom: 1px solid #BBB;
-          padding: 0.5em;
-        }
-      }
-    }
-  }
   ul#quiz_student_details {
     list-style: none;
     padding: 0;
@@ -164,16 +136,6 @@ li.quiz {
 
 #wrapper-container {
   overflow: visible;
-}
-
-@if $use_new_styles == false {
-  div#content {
-    overflow: visible;
-    padding: 0;
-  }
-  #right-side-wrapper {
-    position: absolute;
-  }
 }
 
 .quiz-header {
@@ -220,11 +182,6 @@ li.quiz {
 }
 
 #submit_quiz_form {
-  @if not $use_new_styles {
-    .question_holder {
-      overflow: hidden;
-    }
-  }
   .button-container .btn, #submit_quiz_button {
     min-width: 120px;
   }
@@ -532,7 +489,6 @@ li.quiz {
 .question_bank {
   border-bottom: 1px solid #b6babf;
   border-top: 1px solid #fff;
-  overflow: hidden;
   &:first-child {
     border-top: none;
   }
@@ -572,9 +528,6 @@ li.quiz {
   background-color: #fff;
   position: relative;
   min-height: 50px;
-  @if not $use_new_styles {
-    min-width: 515px;
-  }
   margin: 0.7em auto 30px auto;
   _height: 10px;
   &.modified_but_not_saved {
@@ -1648,6 +1601,9 @@ ul#quiz_versions {
     border-bottom: 1px dotted #ccc;
     .title {
       font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .sub_content {
       font-size: 0.8em;
@@ -1958,10 +1914,6 @@ ul#quiz_versions {
       float: right;
     }
   }
-}
-
-@if $use_new_styles == false {
-  #left-side { position: absolute; }
 }
 
 .form-actions {

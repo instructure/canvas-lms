@@ -24,14 +24,8 @@ $gradebook_header_height: 3.5em;
 }
 
 #gradebook_header {
-  @if $use_new_styles {
-    background-color: $ic-brand-global-nav-bgd;
-    color: $ic-brand-global-nav-menu-item__text-color;
-  }
-  @else {
-    background-color: $ic-color-dark;
-    color: $ic-color-light;
-  }
+  background-color: $ic-brand-global-nav-bgd;
+  color: $ic-brand-global-nav-menu-item__text-color;
 
   padding: 0.375em 0.75em;
   @include fontSize(11px);
@@ -40,12 +34,7 @@ $gradebook_header_height: 3.5em;
     background-image: $iconsActive;
   }
   a {
-    @if $use_new_styles {
-      color: $ic-brand-global-nav-menu-item__text-color;
-    }
-    @else {
-      color: $ic-color-light;
-    }
+    color: $ic-brand-global-nav-menu-item__text-color;
   }
 
   #combo_box_container {
@@ -68,8 +57,10 @@ $gradebook_header_height: 3.5em;
   justify-content: flex-start;
   align-items: center;
   flex-wrap: nowrap;
-  flex: 1;
+  flex-shrink: 2;
   min-width: 0;
+  padding-right: $ic-sp;
+  overflow: hidden;
 }
 // little trick to make the icon-font and the icon svg match in size
 $icon-size: 1.4rem;
@@ -79,6 +70,7 @@ $icon-size: 1.4rem;
   align-items: center;
   flex-wrap: nowrap;
   margin-right: $ic-sp;
+  flex-shrink: 0;
 
   // sizes the icon font
   .gradebookActions__Button {
@@ -130,13 +122,15 @@ $icon-size: 1.4rem;
   align-items: center;
   justify-content: flex-end;
   flex-wrap: nowrap;
-  flex: 1;
+  flex-shrink: 0;
   min-width: 0;
+  padding-left: $ic-sp;
 }
 .statsMetric {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
+  align-self: flex-end;
   padding-right: $ic-sp;
   border-right: 1px dotted $ic-brand-global-nav-menu-item__text-color;
 }
@@ -198,7 +192,7 @@ $icon-size: 1.4rem;
 
 #main {
   position: static;
-  @if $use_new_styles { z-index: 1; }
+  z-index: 1;
 }
 
 #full_width_container {
@@ -250,14 +244,7 @@ $icon-size: 1.4rem;
   }
 }
 
-#enrollment_inactive_notice {
-  width: 100%;
-  border-bottom: 1px solid $ic-border-light;
-  border-radius: 0;
-  text-align: center;
-}
-
-#enrollment_concluded_notice {
+#enrollment_inactive_notice, #enrollment_concluded_notice, #closed_gp_notice {
   width: 100%;
   border-bottom: 1px solid $ic-border-light;
   border-radius: 0;
@@ -411,13 +398,24 @@ $icon-size: 1.4rem;
     span.draft-marker {
       color: $red;
       padding-right: 0.5em;
+      flex: none;
+    }
+    div.comment_flex {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 0.5em;
+    }
+    span.comment {
+      flex: auto;
     }
     .comment_citation {
       @include fontSize(12px);
       text-align: right;
     }
     .delete_comment_link, .submit_comment_button {
-      float: right;
+      flex: none;
+      height: 24px;
+      margin-left: 0.5em;
       @if $use_high_contrast {
         color: lighten($ic-color-dark, 12%);
       }
@@ -425,7 +423,7 @@ $icon-size: 1.4rem;
         color: lighten($ic-color-dark, 25%);
       }
       &:hover, &:focus {
-        color: $ic-color-dark;
+        color: $ic-font-color-dark;
       }
     }
   }
@@ -486,7 +484,7 @@ $icon-size: 1.4rem;
     .avatar {
       height: 24px;
       max-width: 24px;
-      float: left;
+      flex-shrink: 5;
       margin-right: 12px;
     }
   }
@@ -660,7 +658,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 }
 
 .ui-selectmenu-item-header {
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
 
   .not_submitted & {
     @if $use_high_contrast {
@@ -672,12 +670,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   }
   .ui-selectmenu-status & {
     margin-top: 1px;
-    @if $use_new_styles {
-      color: $ic-brand-global-nav-menu-item__text-color;
-    }
-    @else {
-      color: $ic-color-light;
-    }
+    color: $ic-brand-global-nav-menu-item__text-color;
   }
 }
 
@@ -790,7 +783,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     background: url("/images/arrow_left.png") no-repeat center left;
     overflow: hidden;
     white-space: nowrap;
-    color: $ic-color-dark;
+    color: $ic-font-color-dark;
     font-weight: bold;
     @include fontSize(12px);
   }
@@ -814,7 +807,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
       a {
         line-height: 24px;
-        color: $ic-color-dark;
+        color: $ic-font-color-dark;
         &.selected {
           font-weight: bold;
         }

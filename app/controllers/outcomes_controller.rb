@@ -64,7 +64,7 @@ class OutcomesController < ApplicationController
       if @context == @outcome.context
         codes = "all"
       else
-        codes = @context.all_courses.select(:id).map(&:asset_string)
+        codes = @context.all_courses.pluck(:id).map{|id| "course_#{id}"}
       end
     end
     @alignments = @outcome.alignments.active.for_context(@context)
@@ -97,7 +97,7 @@ class OutcomesController < ApplicationController
       if @context == @outcome.context
         codes = "all"
       else
-        codes = @context.all_courses.select(:id).map(&:asset_string)
+        codes = @context.all_courses.pluck(:id).map{|id| "course_#{id}"}
       end
     end
     @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort])

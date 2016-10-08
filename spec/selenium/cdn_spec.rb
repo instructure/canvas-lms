@@ -33,7 +33,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
             data
           end
 
-          expect(fingerprints.length).to eq(4), 'We have 4 variants'
+          expect(fingerprints.length).to eq(2), 'We have 2 variants: new_styles_normal_contrast and new_styles_high_contrast'
           msg = 'make sure the conbined results match the result of all_fingerprints_for'
           expect(fingerprints).to eq(BrandableCSS.all_fingerprints_for(bundle_name).values), msg
 

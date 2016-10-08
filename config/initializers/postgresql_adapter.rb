@@ -72,12 +72,6 @@ module PostgreSQLAdapterExtensions
       conditions = options[:where]
       if conditions
         sql_conditions = options[:where]
-        unless sql_conditions.is_a?(String)
-          model_class = table_name.classify.constantize rescue nil
-          model_class ||= ActiveRecord::Base.all_models.detect{|m| m.table_name.to_s == table_name.to_s}
-          model_class ||= ActiveRecord::Base
-          sql_conditions = model_class.send(:sanitize_sql, conditions, table_name.to_s.dup)
-        end
         conditions = " WHERE #{sql_conditions}"
       end
     else
@@ -267,56 +261,47 @@ module PostgreSQLAdapterExtensions
     result = execute(sql, 'SCHEMA')
     leaves, nodes = result.partition { |row| row['typelem'] == '0' }
 
-    if CANVAS_RAILS4_0
-      # populate the leaf nodes
-      leaves.find_all { |row| OID.registered_type? row['typname'] }.each do |row|
-        OID::TYPE_MAP[row['oid'].to_i] = OID::NAMES[row['typname']]
+    # populate the leaf nodes
+    leaves.find_all { |row| OID.registered_type? row['typname'] }.each do |row|
+      OID::TYPE_MAP[row['oid'].to_i] = OID::NAMES[row['typname']]
+    end
+
+    arrays, nodes = nodes.partition { |row| row['typinput'] == 'array_in' }
+
+    # populate composite types
+    nodes.find_all { |row| OID::TYPE_MAP.key? row['typelem'].to_i }.each do |row|
+      if OID.registered_type? row['typname']
+        # this composite type is explicitly registered
+        vector = OID::NAMES[row['typname']]
+      else
+        # use the default for composite types
+        vector = OID::Vector.new row['typdelim'], OID::TYPE_MAP[row['typelem'].to_i]
       end
 
-      arrays, nodes = nodes.partition { |row| row['typinput'] == 'array_in' }
+      OID::TYPE_MAP[row['oid'].to_i] = vector
+    end
 
-      # populate composite types
-      nodes.find_all { |row| OID::TYPE_MAP.key? row['typelem'].to_i }.each do |row|
-        if OID.registered_type? row['typname']
-          # this composite type is explicitly registered
-          vector = OID::NAMES[row['typname']]
-        else
-          # use the default for composite types
-          vector = OID::Vector.new row['typdelim'], OID::TYPE_MAP[row['typelem'].to_i]
-        end
-
-        OID::TYPE_MAP[row['oid'].to_i] = vector
-      end
-
-      # populate array types
-      arrays.find_all { |row| OID::TYPE_MAP.key? row['typelem'].to_i }.each do |row|
-        array = OID::Array.new  OID::TYPE_MAP[row['typelem'].to_i]
-        OID::TYPE_MAP[row['oid'].to_i] = array
-      end
-    else
-      type_map = args.first
-
-      # populate the leaf nodes
-      leaves.find_all { |row| OID.registered_type? row['typname'] }.each do |row|
-        type_map[row['oid'].to_i] = OID::NAMES[row['typname']]
-      end
-
-      records_by_oid = result.group_by { |row| row['oid'] }
-
-      arrays, nodes = nodes.partition { |row| row['typinput'] == 'array_in' }
-
-      # populate composite types
-      nodes.each do |row|
-        add_oid row, records_by_oid, type_map
-      end
-
-      # populate array types
-      arrays.find_all { |row| type_map.key? row['typelem'].to_i }.each do |row|
-        array = OID::Array.new  type_map[row['typelem'].to_i]
-        type_map[row['oid'].to_i] = array
-      end
+    # populate array types
+    arrays.find_all { |row| OID::TYPE_MAP.key? row['typelem'].to_i }.each do |row|
+      array = OID::Array.new  OID::TYPE_MAP[row['typelem'].to_i]
+      OID::TYPE_MAP[row['oid'].to_i] = array
     end
   end
 end
-
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)
+
+unless CANVAS_RAILS4_0
+  module TypeMapInitializerExtensions
+    def query_conditions_for_initial_load(type_map)
+      known_type_names = type_map.keys.map { |n| "'#{n}'" } + type_map.keys.map { |n| "'_#{n}'" }
+      known_type_types = %w('r' 'e' 'd')
+      #debugger
+      <<-SQL % [known_type_names.join(", "), known_type_types.join(", ")]
+      WHERE
+        t.typname IN (%s)
+        OR t.typtype IN (%s)
+      SQL
+    end
+  end
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID::TypeMapInitializer.prepend(TypeMapInitializerExtensions)
+end

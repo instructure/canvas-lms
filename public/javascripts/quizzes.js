@@ -47,7 +47,7 @@ define([
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar, /\$\.underscore/ */,
+  'jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */,
   'jquery.instructure_misc_plugins' /* .dim, confirmDelete, showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
@@ -1511,7 +1511,6 @@ define([
 
     var $quiz_options_form = $("#quiz_options_form");
     var $quiz_edit_wrapper = $("#quiz_edit_wrapper");
-    $.scrollSidebar();
     $(".datetime_field").datetime_field();
     $("#questions").delegate('.group_top,.question,.answer_select,.comment', 'mouseover', function(event) {
       $(this).addClass('hover');
@@ -1780,7 +1779,7 @@ define([
           var crError = conditionalRelease.editor.validateBeforeSave();
           if (crError) {
             $('#quiz_tabs').tabs("option", "active", 2);
-            $('#conditional_release_target').get(0).scrollIntoView();
+            conditionalRelease.editor.focusOnError();
             return false;
           }
         }
@@ -2452,7 +2451,6 @@ define([
           $dialog.addClass('loaded');
           for(idx in banks) {
             var bank = banks[idx].assessment_question_bank;
-            bank.title = TextHelper.truncateText(bank.title)
             var $bank = $dialog.find(".bank.blank:first").clone(true).removeClass('blank');
             $bank.fillTemplateData({data: bank, dataValues: ['id', 'context_type', 'context_id']});
             $dialog.find(".bank_list").append($bank);

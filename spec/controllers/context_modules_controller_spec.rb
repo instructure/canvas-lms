@@ -681,7 +681,7 @@ describe ContextModulesController do
       @tag = @mod.add_item(type: 'quiz', id: @quiz.id)
 
       @quiz.generate_submission(@student).complete!
-      
+
       get 'content_tag_assignment_data', course_id: @course.id, format: 'json' # precache
       json = JSON.parse response.body.gsub("while(1);",'')
       expect(json[@tag.id.to_s]["past_due"]).to be_blank
@@ -708,6 +708,128 @@ describe ContextModulesController do
       user_session(@student)
       get 'show', course_id: @course.id, id: @m1.id
       assert_unauthorized
+    end
+  end
+
+  describe "GET 'choose_mastery_path'" do
+    before :each do
+      ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+    end
+
+    before :once do
+      course_with_student_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      ag = @course.assignment_groups.create!
+      @assg = ag.assignments.create!(:context => @course)
+      @item = @mod.add_item :type => 'assignment', :id => @assg.id
+    end
+
+    it "should return 404 if no rule matches item assignment" do
+      user_session(@student)
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert_response(:missing)
+    end
+
+    it "should return 404 if matching rule is unlocked but has only one assignment set" do
+      user_session(@student)
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: @assg.id,
+          locked: false,
+          assignment_sets: [{}],
+        }
+      ])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert_response(:missing)
+    end
+
+    it "should redirect to context modules page with warning if matching rule is locked" do
+      user_session(@student)
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: @assg.id,
+          locked: true,
+          assignment_sets: [],
+        }
+      ])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert(flash[:warning].present?)
+      assert_redirected_to(controller: 'context_modules', action: 'index')
+    end
+
+    it "should show choose page if matches a rule that is unlocked and has more than two assignment sets" do
+      user_session(@student)
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: @assg.id,
+          locked: false,
+          assignment_sets: [
+            { id: 1, assignments: [{ assignment_id: 1, model: { title: 'Assignment 1' } }] },
+            { id: 2, assignments: [{ assignment_id: 2, model: { title: 'Assignment 2' } }] }
+          ]
+        }
+      ])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert_response(:success)
+      expect(controller.js_env[:CHOOSE_MASTERY_PATH_DATA]).to eq({
+        options: [
+          {
+            setId: 1,
+            assignments: [
+              { assignmentId: 1, title: 'Assignment 1' }
+            ]
+          },
+          {
+            setId: 2,
+            assignments: [
+              { assignmentId: 2, title: 'Assignment 2' }
+            ]
+          }
+        ],
+        selectedOption: nil,
+        courseId: @course.id,
+        moduleId: @mod.id,
+        itemId: @item.id.to_s
+      })
+    end
+
+    it "should show choose page if matches a rule that is unlocked and has more than two assignment sets even if multiple rules are present" do
+      user_session(@student)
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: @assg.id + 1,
+          locked: false,
+          assignment_sets: [
+            { id: 1, assignments: [{ assignment_id: 1, model: { title: 'Assignment 1' } }] },
+            { id: 2, assignments: [{ assignment_id: 2, model: { title: 'Assignment 2' } }] }
+          ]
+        },
+        {
+          trigger_assignment: @assg.id,
+          locked: false,
+          assignment_sets: [
+            { id: 3, assignments: [{ assignment_id: 2, model: { title: 'Assignment 2' } }] },
+            { id: 4, assignments: [{ assignment_id: 1, model: { title: 'Assignment 1' } }] }
+          ]
+        }
+      ])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert_response(:success)
+      expect(controller.js_env[:CHOOSE_MASTERY_PATH_DATA][:options]).to eq([
+        { setId: 3, assignments: [{ assignmentId: 2, title: 'Assignment 2' }] },
+        { setId: 4, assignments: [{ assignmentId: 1, title: 'Assignment 1' }] },
+      ])
     end
   end
 end

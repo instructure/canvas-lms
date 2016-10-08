@@ -33,7 +33,6 @@ define([
   'jquery.instructure_date_and_time' /* friendlyDatetime, friendlyDate */,
   'jquery.instructure_forms' /* getFormData, errorBox */,
   'jqueryui/dialog',
-  'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'compiled/jquery.rails_flash_notifications',
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
@@ -386,7 +385,6 @@ define([
   });
 
   $(function() {
-    $.scrollSidebar();
     autoBlurActiveInput();
 
     if($("#preview_mode_link").length == 0) {
@@ -504,12 +502,15 @@ define([
     });
 
     $questions
-      .delegate(":checkbox,:radio,label", 'change mouseup', function(event) {
+      .delegate(":checkbox,:radio", 'change', function(event) {
         var $answer = $(this).parents(".answer");
         if (lastAnswerSelected == $answer[0]) {
           $answer.find(":checkbox,:radio").blur();
           quizSubmission.updateSubmission();
         }
+      })
+      .delegate("label.upload-label", 'mouseup', function(event) {
+          quizSubmission.updateSubmission();
       })
       .delegate(":text,textarea,select", 'change', function(event, update) {
         var $this = $(this);

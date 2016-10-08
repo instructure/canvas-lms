@@ -11,7 +11,7 @@ define(["jquery", "i18n!gradebook_uploads", "vendor/jquery.spin"],
           dfd.resolve(uploadedGradebook)
         });
       } else if (progress.workflow_state == "failed") {
-        dfd.reject(I18n.t("Invalid csv file, grades could not be updated."));
+        dfd.reject(I18n.t("Invalid CSV file. Grades could not be updated."));
       } else {
         setTimeout(function() {
           $.ajaxJSON(`/api/v1/progress/${progress.id}`, "GET")

@@ -1,30 +1,16 @@
 <h1 class="screenreader-only">{{#t "progression_header"}}Module Progression{{/t}}</h1>
-<div
-  {{#if ENV.use_new_styles}}
-    class="module-progress-view"
-  {{else}}
-    class="row-fluid"
-  {{/if}}
->
+<div class="module-progress-view">
   <div
-    {{#if ENV.use_new_styles}}
-      class="module-progress-view__modules"
-    {{else}}
-      class="span9"
-    {{/if}}
+    class="module-progress-view__modules"
     id="progression_modules"
     aria-busy="true"
     aria-live="polite"
-    aria-relevant="additions" 
+    aria-relevant="additions"
     aria-atomic="false"
   >
   </div>
   <div
-    {{#if ENV.use_new_styles}}
-      class="module-progress-view__students"
-    {{else}}
-      class="span3"
-    {{/if}}
+    class="module-progress-view__students"
     id="progression_students"
     aria-busy="true"
   >

@@ -328,6 +328,7 @@ RSpec.configure do |config|
     Attachment.domain_namespace = nil
     Canvas::DynamicSettings.reset_cache!
     ActiveRecord::Migration.verbose = false
+    RequestStore.clear!
     $spec_api_tokens = {}
   end
 
@@ -864,6 +865,12 @@ RSpec.configure do |config|
     klass.transaction do
       klass.connection.bulk_insert klass.table_name, records
       scope = klass.order("id DESC").limit(records.size)
+      if klass == Enrollment
+        scope.to_a.each do |enrollment|
+          enrollment.create_enrollment_state
+          enrollment.enrollment_state.ensure_current_state
+        end
+      end
       return_type == :record ?
         scope.to_a.reverse :
         scope.pluck(:id).reverse

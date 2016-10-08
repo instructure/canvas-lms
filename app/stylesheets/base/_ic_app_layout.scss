@@ -15,7 +15,6 @@
 }
 
 
-@if $use_new_styles {
 $ic-left-side-width: $ic-sp*15;
 
 ::-webkit-scrollbar {
@@ -227,4 +226,3 @@ body:not(.course-menu-expanded) {
   align-items: center;
   box-sizing: border-box;
 }
-}//end @if $use_new_styles

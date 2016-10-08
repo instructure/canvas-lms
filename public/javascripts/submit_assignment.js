@@ -25,6 +25,7 @@ define([
   'compiled/external_tools/HomeworkSubmissionLtiContainer',
   'compiled/views/editor/KeyboardShortcuts' /* TinyMCE Keyboard Shortcuts for a11y */,
   'jsx/shared/rce/RichContentEditor',
+  'submit_assignment_helper',
   'compiled/jquery.rails_flash_notifications',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
@@ -36,7 +37,8 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/tabs' /* /\.tabs/ */
 ], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool,
-     HomeworkSubmissionLtiContainer, RCEKeyboardShortcuts, RichContentEditor) {
+            HomeworkSubmissionLtiContainer, RCEKeyboardShortcuts,
+            RichContentEditor, SubmitAssignmentHelper) {
 
   window.submissionAttachmentIndex = -1;
 
@@ -452,51 +454,10 @@ define([
     var height = tool.get('homework_submission').selection_height || tool.get('selection_height');
     var title = tool.get('display_text');
     var $div = $("<div/>", {id: "homework_selection_dialog", style: "padding: 0; overflow-y: hidden;"}).appendTo($("body"));
-    function invalidToolReturn(message) {
-      $.flashError(I18n.t("invalid_tool_return", "The launched tool returned an invalid resource for this assignment"));
-      console.log(message);
-      $div.dialog('close');
-    }
+
     $div.append($("<iframe/>", {frameborder: 0, src: url, id: "homework_selection_iframe"}).css({width: width, height: height}))
       .bind('selection', function(event, data) {
-        var valid_submission = true
-        if(data.return_type == 'url') {
-          if($("#submit_online_url_form").length) {
-            $("#external_tool_url").val(data.url);
-            $("#external_tool_submission_type").val('online_url');
-            $("#submit_from_external_tool_form").addClass('has_submission');
-            var $link = $("<a/>", {href: data.url}).text(data.text || data.title);
-            $("#external_tool_submission_details").empty().append($link).attr('class', 'url_submission');
-          } else {
-            invalidToolReturn("this assignment doesn't accept URL submissions");
-            return;
-          }
-        } else if(data.return_type == 'file') {
-          if($("#submit_online_upload_form").length) {
-            var ext = data.text.split(/\./).pop();
-            if(ENV.SUBMIT_ASSIGNMENT && ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS && ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length > 0) {
-              if(!data.text.match(/\./) || $.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0) {
-                valid_submission = false;
-              }
-            }
-            $("#external_tool_url").val(data.url);
-            $("#external_tool_submission_type").val('online_url_to_file');
-            $("#external_tool_filename").val(data.text);
-            $("#external_tool_content_type").val(data.content_type);
-            $("#submit_from_external_tool_form").addClass('has_submission');
-            var $link = $("<a/>", {href: data.url}).text(data.text);
-            $("#external_tool_submission_details").empty().append($link).attr('class', 'file_submission');
-          } else {
-            invalidToolReturn("this assignment doesn't accept file submissions");
-            return;
-          }
-        } else {
-          invalidToolReturn("return_type must be 'link' or 'file'");
-          return;
-        }
-
-        $('#submit_from_external_tool_form .bad_ext_msg').showIf(!valid_submission);
-        $('#submit_from_external_tool_form button[type=submit]').attr('disabled', !valid_submission);
+        SubmitAssignmentHelper.submitContentItem(event.contentItems[0]);
         $div.dialog('close');
       })
       .dialog({

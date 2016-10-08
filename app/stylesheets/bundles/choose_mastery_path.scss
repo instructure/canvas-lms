@@ -1,0 +1,77 @@
+@import "./context_modules2.scss";
+
+.cmp-wrapper {
+  h2 {
+    margin-bottom: 50px;
+  }
+}
+
+.cmp-option {
+  &.item-group-container {
+    padding-bottom: 0;
+    margin-top: 20px;
+  }
+
+  &.cmp-option__disabled {
+    opacity: .5;
+  }
+
+  .context_module {
+    margin-bottom: 0;
+  }
+}
+
+.cmp-assignment,
+.item-group-container .ig-list li.cpm-assignment {
+  margin-bottom: -1px;
+
+  .item_name {
+    color: $ic-font-color-dark;
+    font-weight: bold;
+  }
+
+  .ig-details__item {
+    strong {
+      margin-right: 5px;
+    }
+
+    span:last-child {
+      &:after {
+        content: "\00a0\00a0|\00a0\00a0";
+      }
+    }
+
+    &:last-of-type {
+      span:last-child {
+        &:after {
+          content: '';
+        }
+      }
+    }
+  }
+
+  .type_icon {
+    margin-left: 5px;
+
+    i {
+      color: $ic-color-light;
+    }
+  }
+}
+
+.cmp-button {
+  float: right;
+  margin-top: -10px;
+
+  &.cmp-button__selected,
+  &.cmp-button__disabled {
+    border: none;
+    margin-top: 0;
+    padding: 0 15px;
+    cursor: default;
+  }
+
+  &.cmp-button__disabled {
+    background: $ic-color-medium-darker;
+  }
+}

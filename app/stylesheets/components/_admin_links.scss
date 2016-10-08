@@ -120,7 +120,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
   .ui-menu-item {
     a {
       background-color: transparent;
-      color: $ic-color-dark;
+      color: $ic-font-color-dark;
       white-space: nowrap;
       min-width: 180px;
       padding: $ic-sp/2 $ic-sp;
@@ -155,8 +155,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
   .ui-menu-item a.disabled.ui-state-focus {
     background: none;
     cursor: not-allowed;
-    @if $use_new_styles { color: darken($ic-color-neutral, 20%); }
-    @else { color: darken($ic-color-neutral, 15%); }
+    color: darken($ic-color-neutral, 20%);
   }
   .ui-menu-carat span { border-color: $ic-color-light transparent; }
   .ui-state-focus{
@@ -167,9 +166,8 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
 }
 
 .al-trigger-gray {
-  @if $use_new_styles { color: $ic-font-color--subdued; }
-  @else { color: lighten($ic-color-dark, 20%); }
-  &:hover, &:focus { color: $ic-color-dark; }
+  color: $ic-font-color--subdued;
+  &:hover, &:focus { color: $ic-font-color-dark; }
 }
 
 .admin-link-hover-area:hover .al-trigger,

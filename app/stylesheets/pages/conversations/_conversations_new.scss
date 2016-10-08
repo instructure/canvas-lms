@@ -20,70 +20,56 @@
 
 #content {
   overflow: visible;
-  @if $use_new_styles { padding: 0; }
-  @else {
-    &.container-fluid { padding: 0; }
-  }
+  padding: 0;
 }
 
 .conversations {
   position: relative;
-  @if $use_new_styles == false { min-width: 1160px; }
 }
 
 .conversations .panel {
   box-sizing: border-box;
   height: 58px;
 
-  @if $use_new_styles {
-    background: $lightBackground;
-    border-bottom: 1px solid $ic-border-light;
-    height: 112px;
-    padding: $ic-sp;
+  background: $lightBackground;
+  border-bottom: 1px solid $ic-border-light;
+  height: 112px;
+  padding: $ic-sp;
+  // TODO: revisit when breakpoint fixed
+  // until we have a better breakpoint for desktop
+  // need to put in direct amount for better ux
+  @media only screen and (min-width: 1200px) {
+    height: 62px;
+    display: flex;
+    align-items: center;
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+  .panel__primary {
+    margin-bottom: $ic-sp;
     // TODO: revisit when breakpoint fixed
     // until we have a better breakpoint for desktop
     // need to put in direct amount for better ux
     @media only screen and (min-width: 1200px) {
-      height: 62px;
-      display: flex;
-      align-items: center;
-      padding-bottom: 0;
-      padding-top: 0;
+      margin-bottom: 0;
+      flex: 1;
+      white-space: nowrap;
     }
-    .panel__primary {
-      margin-bottom: $ic-sp;
-      // TODO: revisit when breakpoint fixed
-      // until we have a better breakpoint for desktop
-      // need to put in direct amount for better ux
-      @media only screen and (min-width: 1200px) {
-        margin-bottom: 0;
-        flex: 1;
-        white-space: nowrap;
-      }
-      > * {
-        display: inline-block;
-        white-space: nowrap;
-      }
-    }
-    .panel__secondary {
-      // TODO: revisit when breakpoint fixed
-      // until we have a better breakpoint for desktop
-      // need to put in direct amount for better ux
-      @media only screen and (min-width: 1200px) { white-space: nowrap; }
-      > div {
-        display: inline-block;
-        vertical-align: middle;
-        white-space: nowrap;
-      }
+    > * {
+      display: inline-block;
+      white-space: nowrap;
     }
   }
-  @else {
-    background: #f1f1f1;
-    border-bottom: 1px solid #acacac;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
-    padding: 9px 12px 0 12px;
-    color: #555;
-    > div { display: inline-block; }
+  .panel__secondary {
+    // TODO: revisit when breakpoint fixed
+    // until we have a better breakpoint for desktop
+    // need to put in direct amount for better ux
+    @media only screen and (min-width: 1200px) { white-space: nowrap; }
+    > div {
+      display: inline-block;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
   }
 
   .btn {
@@ -96,8 +82,7 @@
   }
 
   .actions {
-    @if $use_new_styles { margin-right: $ic-sp; }
-    @else { margin-right: 20px; }
+    margin-right: $ic-sp;
   }
 }
 
@@ -109,9 +94,7 @@
 }
 
 .filters {
-  @if $use_new_styles { margin-right: $ic-sp; }
-  @else { margin-right: 50px; }
-
+  margin-right: $ic-sp;
 
   /* TODO: make sure we still need this with the frd filters (may not be selects) */
   select {
@@ -156,24 +139,14 @@
 
 .search .ac {
   display: block;
-  @if $use_new_styles == false {
-    float: left;
-    width: 250px;
-  }
 
   .ac-input-box {
     float: left;
     min-height: 0;
     height: 38px;
     padding: 6px 12px;
-    @if $use_new_styles {
-      box-sizing: border-box;
-      width: 205px;
-    }
-    @else {
-      border-radius: 16px 0 0 16px;
-      width: 203px;
-    }
+    box-sizing: border-box;
+    width: 205px;
 
     .ac-placeholder {
       top: 0;
@@ -195,18 +168,14 @@
 
   .btn {
     float: left;
-    @if $use_new_styles == false { border-radius: 0 16px 16px 0; }
   }
 }
 
 .messaging-wrapper {
   position: absolute;
   bottom: 0;
-  @if $use_new_styles {
-    top: 112px;
-    @media only screen and (min-width: 1200px) { top: 62px; }
-  }
-  @else { top: 58px; }
+  top: 112px;
+  @media only screen and (min-width: 1200px) { top: 62px; }
 }
 
 .message-list-scroller {
@@ -219,14 +188,8 @@
   .list-header {
     color: darken($ic-color-neutral, 50);
     padding: 3px 12px;
-    @if $use_new_styles {
-      background: $lightBackground;
-      border-bottom: 1px solid $ic-border-light;
-    }
-    @else {
-      background: #f3f3f3;
-      border-bottom: 1px solid #bfbfbf;
-    }
+    background: $lightBackground;
+    border-bottom: 1px solid $ic-border-light;
   }
 
   .current-context-code {
@@ -242,12 +205,7 @@
     height: 100px;
     padding: 8px 12px 8px 32px;
     position: relative;
-    @if $use_new_styles {
-      border-bottom: 1px solid $ic-border-light;
-    }
-    @else {
-      border-bottom: 1px solid #bfbfbf;
-    }
+    border-bottom: 1px solid $ic-border-light;
 
     &.active {
       background: $ic-bg-light-primary;
@@ -373,7 +331,7 @@ h2.subject {
   }
 
   .star-btn {
-    color: $ic-color-dark;
+    color: $ic-font-color-dark;
     display: inline-block;
     font-family: 'Hiragino Kaku Gothic Pro', 'Lucida Sans Unicode', 'Arial Unicode MS';
     @include fontSize($ic-font-size--medium);
@@ -464,8 +422,7 @@ h2.subject {
     height: 40px;
     line-height: 40px;
     padding: 0 12px;
-    @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
-    @else { border-bottom: 1px solid #bfbfbf; }
+    border-bottom: 1px solid $ic-border-light;
 
     .label {
       margin-top: 12px;
@@ -482,8 +439,7 @@ h2.subject {
 
     margin: 0 12px;
     padding: 24px 0;
-    @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
-    @else { border-bottom: 1px solid #bfbfbf; }
+    border-bottom: 1px solid $ic-border-light;
 
     p:last-child {
       margin-bottom: 0;
@@ -493,8 +449,7 @@ h2.subject {
       list-style: none;
       margin: 0 1em;
       padding: 0.5em;
-      @if $use_new_styles { border-top: 1px solid $ic-border-light; }
-      @else { border-top: 1px solid #bfbfbf; }
+      border-top: 1px solid $ic-border-light;
     }
 
     .message-attachment-thumbnail {
@@ -550,7 +505,7 @@ h2.subject {
 
   .message-detail-actions li a,
   .actions li a {
-    color: darken($ic-color-neutral, 50);;
+    color: darken($ic-color-neutral, 50);
 
     &:hover, &:focus {
       color: #333;

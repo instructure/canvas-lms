@@ -818,7 +818,7 @@ ActiveRecord::Relation.class_eval do
     self.activate do |relation|
       relation.transaction do
         ids_to_touch = relation.not_recently_touched.lock(:no_key_update).order(:id).pluck(:id)
-        unscoped.where(id: ids_to_touch).update_all(updated_at: Time.now.utc)
+        unscoped.where(id: ids_to_touch).update_all(updated_at: Time.now.utc) if ids_to_touch.any?
       end
     end
   end
@@ -1432,3 +1432,12 @@ end
 ActiveRecord::Relation::Merger.prepend(MultiMergeWithoutConnection) if CANVAS_RAILS4_0
 
 ActiveRecord::Associations::Builder::BelongsTo.singleton_class.prepend(SkipTouchCallbacks::BelongsTo) unless CANVAS_RAILS4_0
+
+unless CANVAS_RAILS4_0
+  module ReadonlyCloning
+    def calculate_changes_from_defaults
+      super unless @readonly_clone # no reason to do this if we're creating a readonly clone - can take a long time with serialized columns
+    end
+  end
+  ActiveRecord::Base.prepend(ReadonlyCloning)
+end

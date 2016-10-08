@@ -28,6 +28,28 @@ module Lti
 
     DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
+    PLACEMENTS = [:account_navigation,
+                  :assignment_menu,
+                  :assignment_selection,
+                  :collaboration,
+                  :course_home_sub_navigation,
+                  :course_navigation,
+                  :course_settings_sub_navigation,
+                  :discussion_topic_menu,
+                  :editor_button,
+                  :file_menu,
+                  :global_navigation,
+                  :homework_submission,
+                  :link_selection,
+                  :migration_selection,
+                  :module_menu,
+                  :post_grades,
+                  :quiz_menu,
+                  :resource_selection,
+                  :tool_configuration,
+                  :user_navigation,
+                  :wiki_page_menu].freeze
+
     PLACEMENT_LOOKUP = {
       'Canvas.placements.accountNavigation' => ACCOUNT_NAVIGATION,
       'Canvas.placements.assignmentSelection' => ASSIGNMENT_SELECTION,

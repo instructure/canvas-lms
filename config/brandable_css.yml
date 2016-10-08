@@ -14,8 +14,6 @@ paths:
 manifest_key_seperator: $$$$$$$$$$$
 
 variants:
-  legacy_normal_contrast: {}
-  legacy_high_contrast: {}
   new_styles_normal_contrast:
     brandable: true
   new_styles_high_contrast: {}

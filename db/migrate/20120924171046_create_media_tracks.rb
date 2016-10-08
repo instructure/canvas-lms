@@ -9,7 +9,7 @@ class CreateMediaTracks < ActiveRecord::Migration
       t.string :locale,           :default => "en"
       t.text :content
 
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :media_tracks, [:media_object_id, :locale], :name => 'media_object_id_locale'

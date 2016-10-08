@@ -5,9 +5,7 @@ body.embedded {
   // New UI adds more layout elements, so needs
   // this for the self-enrollments footer to
   // stick at the bottom of the iframe-modal.
-  @if $use_new_styles {
-    #main { min-height: 100vh !important; }
-  }
+  #main { min-height: 100vh !important; }
 
   // Only give the layout element styles when
   // the body is embedded in an iframe, so the

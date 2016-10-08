@@ -47,6 +47,11 @@ define [
 
       @subscribeToEvents()
       @header = @options.header
+      @schedulerState = {}
+      if @options.schedulerStore
+        @schedulerStore = @options.schedulerStore
+        @schedulerState = @schedulerStore.getState()
+        @schedulerStore.subscribe @onSchedulerStateChange
 
       @el = $(selector).html calendarAppTemplate()
 
@@ -80,13 +85,18 @@ define [
 
       @colorizeContexts()
 
+      @reservable_appointment_groups = {}
       if @options.showScheduler
         # Pre-load the appointment group list, for the badge
         @dataSource.getAppointmentGroups false, (data) =>
           required = 0
           for group in data
             required += 1 if group.requiring_action
+            for context_code in group.context_codes
+              @reservable_appointment_groups[context_code] = [] unless @reservable_appointment_groups[context_code]
+              @reservable_appointment_groups[context_code].push "appointment_group_#{group.id}"
           @header.setSchedulerBadgeCount(required)
+          @options.onLoadAppointmentGroups(@reservable_appointment_groups) if @options.onLoadAppointmentGroups
 
       @connectHeaderEvents()
       @connectSchedulerNavigatorEvents()
@@ -175,7 +185,7 @@ define [
     # FullCalendar callbacks
     getEvents: (start, end, timezone, donecb, datacb) =>
       @gettingEvents = true
-      @dataSource.getEvents start, end, @visibleContextList, (events) =>
+      @dataSource.getEvents start, end, @visibleContextList.concat(@findAppointmentModeGroups()), (events) =>
         if @displayAppointmentEvents
           @dataSource.getEventsForAppointmentGroup @displayAppointmentEvents, (aEvents) =>
             # Make sure any events in the current appointment group get marked -
@@ -187,15 +197,15 @@ define [
             for event in aEvents
               event.addClass('current-appointment-group')
             @gettingEvents = false
-            donecb(calendarEventFilter(@displayAppointmentEvents, events.concat(aEvents)))
+            donecb(calendarEventFilter(@displayAppointmentEvents, events.concat(aEvents), @schedulerState))
         else
           @gettingEvents = false
           if (datacb?)
             donecb([])
           else
-            donecb(calendarEventFilter(@displayAppointmentEvents, events))
+            donecb(calendarEventFilter(@displayAppointmentEvents, events, @schedulerState))
       , datacb && (events) =>
-        datacb(calendarEventFilter(@displayAppointmentEvents, events))
+        datacb(calendarEventFilter(@displayAppointmentEvents, events, @schedulerState))
 
     # Close all event details popup on the page and have them cleaned up.
     closeEventPopups: ->
@@ -715,3 +725,16 @@ define [
       catch e
         data = {}
       data
+
+    onSchedulerStateChange: () =>
+      newState = @schedulerStore.getState()
+      changed = @schedulerState.inFindAppointmentMode != newState.inFindAppointmentMode
+      @schedulerState = newState
+      @refetchEvents() if changed
+
+    findAppointmentModeGroups: () =>
+      if @schedulerState.inFindAppointmentMode && @schedulerState.selectedCourse
+        @reservable_appointment_groups[@schedulerState.selectedCourse.asset_string] || []
+      else
+        []
+

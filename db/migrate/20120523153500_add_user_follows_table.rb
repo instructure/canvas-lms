@@ -7,7 +7,7 @@ class AddUserFollowsTable < ActiveRecord::Migration
       t.string  :followed_item_type
       t.integer :followed_item_id, :limit => 8
 
-      t.timestamps
+      t.timestamps null: true
     end
     # unique index of things a user is following, searchable by thing type
     add_index :user_follows, [:following_user_id, :followed_item_type, :followed_item_id], :unique => true, :name => "index_user_follows_unique"

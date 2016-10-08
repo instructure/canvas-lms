@@ -95,7 +95,7 @@ class AdminsController < ApplicationController
     end
     render :json => admin_json(admin, @current_user, session)
   end
-  
+
   # @API Remove account admin
   #
   # Remove the rights associated with an account admin role from a user.
@@ -129,9 +129,9 @@ class AdminsController < ApplicationController
   # @returns [Admin]
   def index
     if authorized_action(@context, @current_user, :manage_account_memberships)
-      users = api_find_all(User, Array(params[:user_id])) if params[:user_id]
+      user_ids = api_find_all(User, Array(params[:user_id])).pluck(:id) if params[:user_id]
       scope = @context.account_users
-      scope = scope.where(user_id: users) if users
+      scope = scope.where(user_id: user_ids) if user_ids
       route = polymorphic_url([:api_v1, @context, :admins])
       admins = Api.paginate(scope.order(:id), self, route)
       render :json => admins.collect{ |admin| admin_json(admin, @current_user, session) }

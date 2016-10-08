@@ -12,12 +12,14 @@ define [
           id: "1",
           title: "Q1",
           startDate: new Date("2015-09-01T12:00:00Z"),
-          endDate: new Date("2015-10-31T12:00:00Z")
+          endDate: new Date("2015-10-31T12:00:00Z"),
+          closeDate: new Date("2015-11-07T12:00:00Z")
         },{
           id: "2",
           title: "Q2",
           startDate: new Date("2015-11-01T12:00:00Z"),
-          endDate: new Date("2015-12-31T12:00:00Z")
+          endDate: new Date("2015-12-31T12:00:00Z"),
+          closeDate: new Date("2016-01-07T12:00:00Z")
         }
       ],
       permissions: { read: true, create: true, update: true, delete: true },
@@ -41,12 +43,14 @@ define [
             id: "1",
             title: "Q1",
             start_date: new Date("2015-09-01T12:00:00Z"),
-            end_date: new Date("2015-10-31T12:00:00Z")
+            end_date: new Date("2015-10-31T12:00:00Z"),
+            close_date: new Date("2015-11-07T12:00:00Z")
           },{
             id: "2",
             title: "Q2",
             start_date: new Date("2015-11-01T12:00:00Z"),
-            end_date: new Date("2015-12-31T12:00:00Z")
+            end_date: new Date("2015-12-31T12:00:00Z"),
+            close_date: new Date("2016-01-07T12:00:00Z")
           }
         ],
         permissions: { read: true, create: true, update: true, delete: true },
@@ -86,7 +90,7 @@ define [
           start()
     @server.respond()
 
-  asyncTest "uses the creation date as the title if the grading period set does not have a title", ->
+  asyncTest "creates a title from the creation date when the set has no title", ->
     untitledSets =
       grading_period_sets: [
         id: "1"
@@ -95,21 +99,44 @@ define [
         permissions: { read: true, create: true, update: true, delete: true }
         created_at: "2015-11-29T12:00:00Z"
       ]
-
-    @server.respondWith "GET", /grading_period_sets/, [200, { "Content-Type":"application/json", "Link": @fakeHeaders }, JSON.stringify untitledSets]
+    jsonString = JSON.stringify(untitledSets)
+    @server.respondWith(
+      "GET",
+      /grading_period_sets/,
+      [200, { "Content-Type":"application/json", "Link": @fakeHeaders }, jsonString]
+    )
     api.list()
        .then (sets) =>
           equal sets[0].title, "Set created Nov 29, 2015"
           start()
     @server.respond()
 
-  # no fail for CheatDepaginator
-  # asyncTest "SKIPPED: rejects the promise upon errors", ->
-  #   @server.respondWith "GET", /grading_period_sets/, [500, {"Content-Type":"application/json"}, "FAIL"]
-  #   api.list().catch (error) =>
-  #     equal error, "FAIL"
-  #     start()
-  #   @server.respond()
+  asyncTest "uses the endDate as the closeDate when a period has no closeDate", ->
+    setsWithoutPeriodCloseDate =
+      grading_period_sets: [
+        id: "1"
+        title: "Fall 2015"
+        grading_periods: [{
+          id: "1",
+          title: "Q1",
+          start_date: new Date("2015-09-01T12:00:00Z"),
+          end_date: new Date("2015-10-31T12:00:00Z"),
+          close_date: null
+        }]
+        permissions: { read: true, create: true, update: true, delete: true }
+        created_at: "2015-11-29T12:00:00Z"
+      ]
+    jsonString = JSON.stringify(setsWithoutPeriodCloseDate)
+    @server.respondWith(
+      "GET",
+      /grading_period_sets/,
+      [200, { "Content-Type":"application/json", "Link": @fakeHeaders }, jsonString]
+    )
+    api.list()
+       .then (sets) =>
+          deepEqual sets[0].gradingPeriods[0].closeDate, new Date("2015-10-31T12:00:00Z")
+          start()
+    @server.respond()
 
   deserializedSetCreating = {
     title: "Fall 2015",
@@ -190,12 +217,14 @@ define [
           id: "1",
           title: "Q1",
           start_date: new Date("2015-09-01T12:00:00Z"),
-          end_date: new Date("2015-10-31T12:00:00Z")
+          end_date: new Date("2015-10-31T12:00:00Z"),
+          close_date: new Date("2015-11-07T12:00:00Z")
         },{
           id: "2",
           title: "Q2",
           start_date: new Date("2015-11-01T12:00:00Z"),
-          end_date: new Date("2015-12-31T12:00:00Z")
+          end_date: new Date("2015-12-31T12:00:00Z"),
+          close_date: null
         }
       ],
       permissions: { read: true, create: true, update: true, delete: true }

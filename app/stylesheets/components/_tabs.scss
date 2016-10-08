@@ -84,7 +84,7 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         background: $ic-color-light;
         border-color: $ic-border-light;
         a {
-          color: $ic-color-dark;
+          color: $ic-font-color-dark;
           @if $use_high_contrast { text-decoration: none; }
 
           // special handling for Calendar tabs with solid-color header backgrounds
@@ -113,7 +113,7 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
           @if $use_high_contrast { text-decoration: none; }
 
           // special handling for Calendar tabs with solid-color header backgrounds
-          #edit_event & { color: $ic-color-dark; }
+          #edit_event & { color: $ic-font-color-dark; }
         }
       }
     }

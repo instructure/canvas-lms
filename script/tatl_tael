@@ -58,7 +58,7 @@ linter.ban_new_erb do
             "    js_bundle :your_js_bundle\n"\
             "    css_bundle :any_css_bundles_you_want\n"\
             "    js_env({whatever: 'you need to put in window.ENV'})\n"\
-            "    render :text => "".html_safe, :layout => true"\
+            "    render :text => \"\".html_safe, :layout => true"\
 end
 
 linter.ensure_public_js_specs do

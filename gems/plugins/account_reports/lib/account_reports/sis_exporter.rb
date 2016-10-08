@@ -206,7 +206,7 @@ module AccountReports
       end
 
       generate_and_run_report headers do |csv|
-        terms.each do |t|
+        terms.find_each do |t|
           row = []
           row << t.id unless @sis_format
           row << t.sis_source_id
