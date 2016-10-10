@@ -214,6 +214,9 @@ module SeleniumDriverSetup
   alias_method :driver, :selenium_driver
 
   def firefox_profile
+    if $selenium_config[:firefox_path].present?
+      Selenium::WebDriver::Firefox::Binary.path = "#{$selenium_config[:firefox_path]}"
+    end
     profile = Selenium::WebDriver::Firefox::Profile.new
     profile.add_extension Rails.root.join("spec/selenium/test_setup/JSErrorCollector.xpi")
     profile.log_file = "/dev/stdout"
