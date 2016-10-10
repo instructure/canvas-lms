@@ -2,14 +2,14 @@ group :test do
   gem 'gergich', '0.1.5', require: false
   gem 'testingbot', require: false
   gem 'simplecov', '0.9.2', require: false
-    gem 'docile', '1.1.3', require: false
+    gem 'docile', '1.1.5', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
   gem 'bluecloth', '2.2.0' # for generating api docs
     gem 'redcarpet', '3.2.3', require: false
     gem 'github-markdown', '0.6.8', require: false
     gem 'bullet_instructure', '4.14.8', require: 'bullet'
   gem 'mocha', '1.2.0'
-    gem 'metaclass', '0.0.2', require: false
+    gem 'metaclass', '0.0.4', require: false
   gem 'thin', '1.6.3'
     gem 'eventmachine', '1.0.9', require: false
 
@@ -24,11 +24,11 @@ group :test do
 
   gem 'once-ler', '0.0.16'
 
-  gem 'sequel', '4.5.0', require: false
+  gem 'sequel', '4.34.0', require: false
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
   gem 'selenium-webdriver', '2.53.4'
-    gem 'childprocess', '0.5.0', require: false
-    gem 'websocket', '1.0.7', require: false
+    gem 'childprocess', '0.5.9', require: false
+    gem 'websocket', '1.2.3', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test_after_commit', '1.1.0'
   gem 'testrailtagging', '~> 0.3.6.9', require: false
