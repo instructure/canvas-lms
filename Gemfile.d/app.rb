@@ -90,7 +90,7 @@ gem 'ruby-saml-mod', '0.3.1'
 gem 'saml2', '1.0.7', require: false
   gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '57d071040cc4649db9f158e09bbcea028271a4a6'
 gem 'rubycas-client', '2.3.9', require: false
-gem 'rubyzip', '1.1.1', require: 'zip'
+gem 'rubyzip', '1.2.0', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.1.0', require: false
 gem 'shackles', '1.1.0'
