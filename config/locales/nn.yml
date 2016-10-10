@@ -2084,7 +2084,7 @@ nn:
     submission_types_form: 
       advanced_turnitin_settings: "Avanserte Turnitin-innstillingar"
       descriptions: 
-        allowed_extensions: "Oppgi ei liste med aksepterte filtypar, for eksempel: .doc, .xls, .txt"
+        allowed_extensions: "Oppgi ei liste med aksepterte filtypar, for eksempel: doc,xls,txt"
       external_tool_group_warning: "Gruppeoppgåver kan ikkje bruke eksterne verktøy. Markering for gruppeinnstilling vert fjerna når du lagrar"
       external_tool_options: "Alternativ for eksterne verktøy"
       label: 
