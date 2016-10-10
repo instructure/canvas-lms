@@ -7,7 +7,7 @@ define([
       url: React.PropTypes.string.isRequired,
       subtext: React.PropTypes.string,
       available_to: React.PropTypes.array,
-      type: React.PropTypes.oneOf(['default', 'custom', 'plugin']),
+      type: React.PropTypes.oneOf(['default', 'custom']),
       id: React.PropTypes.string,
 
       index: React.PropTypes.number,
