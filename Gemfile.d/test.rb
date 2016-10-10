@@ -13,8 +13,8 @@ group :test do
   gem 'thin', '1.7.0'
     gem 'eventmachine', '1.2.0.1', require: false
 
-  gem 'rspec', '3.5.0'
-  gem 'rspec-rails', '3.5.2'
+  gem 'rspec', '3.4.0'
+  gem 'rspec-rails', '3.4.1'
   gem 'rspec-collection_matchers', '1.1.2'
   gem 'shoulda-matchers', '2.8.0'
 
