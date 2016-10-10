@@ -2155,10 +2155,10 @@ class Assignment < ActiveRecord::Base
       Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
 
-  def run_if_overrides_changed!
+  def run_if_overrides_changed!(student_ids=nil)
     relocked_modules = []
-    self.relock_modules!(relocked_modules)
-    each_submission_type { |submission| submission.relock_modules!(relocked_modules) if submission }
+    self.relock_modules!(relocked_modules, student_ids)
+    each_submission_type { |submission| submission.relock_modules!(relocked_modules, student_ids) if submission }
 
     if only_visible_to_overrides?
       Rails.logger.info "GRADES: recalculating because assignment overrides on #{global_id} changed."
@@ -2166,7 +2166,11 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def run_if_overrides_changed_later!
-    self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, {:singleton => "assignment_overrides_changed_#{self.global_id}"})
+  def run_if_overrides_changed_later!(student_ids=nil)
+    if student_ids
+      self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, {:strand => "assignment_overrides_changed_for_students_#{self.global_id}"}, student_ids)
+    else
+      self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, {:singleton => "assignment_overrides_changed_#{self.global_id}"})
+    end
   end
 end
