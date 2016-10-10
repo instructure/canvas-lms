@@ -56,9 +56,9 @@ module HasContentTags
     Rails.cache.delete locked_cache_key(user)
   end
 
-  def relock_modules!(relocked_modules=[])
+  def relock_modules!(relocked_modules=[], student_ids=nil)
     ContextModule.where(:id => ContentTag.where(:content_id => self, :content_type => self.class.to_s).not_deleted.select(:context_module_id)).each do |mod|
-      mod.relock_progressions(relocked_modules)
+      mod.relock_progressions(relocked_modules, student_ids)
     end
   end
 end

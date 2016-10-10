@@ -197,6 +197,8 @@ module Api::V1::AssignmentOverride
         Set.new :
         override.assignment_override_students.map(&:user_id).to_set
 
+      override.changed_student_ids = Set.new
+
       override_data[:students].each do |student|
         if defunct_student_ids.include?(student.id)
           defunct_student_ids.delete(student.id)
@@ -205,10 +207,12 @@ module Api::V1::AssignmentOverride
           link = override.assignment_override_students.build
           link.assignment_override = override
           link.user = student
+          override.changed_student_ids << student.id
         end
       end
 
       unless defunct_student_ids.empty?
+        override.changed_student_ids.merge(defunct_student_ids)
         override.assignment_override_students.
           where(:user_id => defunct_student_ids.to_a).
           delete_all
@@ -243,7 +247,11 @@ module Api::V1::AssignmentOverride
       update_assignment_override_without_save(override, override_data)
       override.save!
     end
-    override.assignment.run_if_overrides_changed_later!
+    if override.set_type == 'ADHOC' && override.changed_student_ids.present?
+      override.assignment.run_if_overrides_changed_later!(override.changed_student_ids.to_a)
+    else
+      override.assignment.run_if_overrides_changed_later!
+    end
     return true
   rescue ActiveRecord::RecordInvalid
     return false
