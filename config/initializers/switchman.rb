@@ -17,9 +17,9 @@ Rails.application.config.after_initialize do
   module Canvas
     module Shard
       module ClassMethods
-        def current(category=:primary)
+        def current(category=:default)
           if category == :delayed_jobs
-            active_shards[category] || super(:primary).delayed_jobs_shard
+            active_shards[category] || super(:default).delayed_jobs_shard
           else
             super
           end
@@ -27,9 +27,9 @@ Rails.application.config.after_initialize do
 
         def activate!(categories)
           if !@skip_delayed_job_auto_activation && !categories[:delayed_jobs] &&
-              categories[:primary] && categories[:primary] != active_shards[:primary] # only activate if it changed
+              categories[:default] && categories[:default] != active_shards[:default] # only activate if it changed
             skip_delayed_job_auto_activation do
-              categories[:delayed_jobs] = categories[:primary].delayed_jobs_shard
+              categories[:delayed_jobs] = categories[:default].delayed_jobs_shard
             end
           end
           super
