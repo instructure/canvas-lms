@@ -75,7 +75,7 @@ define([
       var result = $this.validateForm(account_validations)
 
       // Work around for Safari to enforce help menu name validation until `required` is supported
-      if (ENV.SETTINGS.show_feedback_link) {
+      if ($('#custom_help_link_settings').length > 0) {
         var help_menu_validations = {
           object_name: 'account[settings]',
           required: ['help_link_name'],
