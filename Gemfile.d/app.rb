@@ -9,7 +9,7 @@ if CANVAS_RAILS4_0
 else
   gem 'rails', '4.2.7.1'
   gem 'rack', '1.6.4'
-  gem 'builder', '3.1.4'
+  gem 'builder', '3.2.2'
   gem 'protected_attributes', '1.1.3'
   gem 'rails-observers', '0.1.2'
   gem 'tzinfo', '1.2.2'
