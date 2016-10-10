@@ -3,7 +3,7 @@ group :assets do
     gem 'colored', '1.2', require: false
     gem 'mustache', '1.0.3', require: false
     gem 'pygments.rb', '0.5.4', require: false
-      gem 'posix-spawn', '0.3.8', require: false
+      gem 'posix-spawn', '0.3.9', require: false
       gem 'yajl-ruby', '1.1.0', require: false
   gem 'fontcustom', '~> 1.3.3', require: false
 end
