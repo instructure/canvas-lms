@@ -648,7 +648,7 @@ class AccountsController < ApplicationController
 
       js_env({
         CUSTOM_HELP_LINKS: @domain_root_account && @domain_root_account.help_links || [],
-        DEFAULT_HELP_LINKS: Canvas::Help.default_links,
+        DEFAULT_HELP_LINKS: Account::HelpLinks.default_links,
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
         CONTEXT_BASE_URL: "/accounts/#{@context.id}",

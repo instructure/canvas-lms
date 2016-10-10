@@ -1424,9 +1424,9 @@ class Account < ActiveRecord::Base
     end
 
     if settings[:new_custom_help_links]
-      links || Canvas::Help.default_links
+      links || Account::HelpLinks.default_links
     else
-      Canvas::Help.default_links + (links || [])
+      Account::HelpLinks.default_links + (links || [])
     end
   end
 

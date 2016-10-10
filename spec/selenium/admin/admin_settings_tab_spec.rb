@@ -378,7 +378,7 @@ describe "admin settings tab" do
 
       help_links = Account.default.help_links
       expect(help_links).to include(help_link.merge(:type => "custom"))
-      expect(help_links & Canvas::Help.default_links).to eq Canvas::Help.default_links
+      expect(help_links & Account::HelpLinks.default_links).to eq Account::HelpLinks.default_links
 
       Setting.set('show_feedback_link', 'true')
       get "/accounts/#{Account.default.id}/settings"
@@ -390,8 +390,8 @@ describe "admin settings tab" do
       click_submit
 
       new_help_links = Account.default.help_links
-      expect(new_help_links).to_not include(Canvas::Help.default_links.first)
-      expect(new_help_links).to include(Canvas::Help.default_links.last)
+      expect(new_help_links).to_not include(Account::HelpLinks.default_links.first)
+      expect(new_help_links).to include(Account::HelpLinks.default_links.last)
       expect(new_help_links).to include(help_link.merge(:type => "custom"))
     end
   end
