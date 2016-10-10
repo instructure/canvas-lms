@@ -68,18 +68,19 @@ class ContextModule < ActiveRecord::Base
     @relock_warning
   end
 
-  def relock_progressions(relocked_modules=[])
+  def relock_progressions(relocked_modules=[], student_ids=nil)
     return if relocked_modules.include?(self)
     self.class.connection.after_transaction_commit do
       relocked_modules << self
-      if self.context_module_progressions.where(:current => true).where.not(:workflow_state => 'locked').
-          update_all(["workflow_state = 'locked', lock_version = lock_version + 1, current = ?", false]) > 0
+      progression_scope = self.context_module_progressions.where(:current => true).where.not(:workflow_state => 'locked')
+      progression_scope = progression_scope.where(:user_id => student_ids) if student_ids
 
+      if progression_scope.update_all(["workflow_state = 'locked', lock_version = lock_version + 1, current = ?", false]) > 0
         send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})
       end
 
       self.context.context_modules.each do |mod|
-        mod.relock_progressions(relocked_modules) if self.is_prerequisite_for?(mod)
+        mod.relock_progressions(relocked_modules, student_ids) if self.is_prerequisite_for?(mod)
       end
     end
   end
