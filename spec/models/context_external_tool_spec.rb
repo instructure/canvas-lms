@@ -728,7 +728,7 @@ describe ContextExternalTool do
     end
 
     it "returns the localized label if a locale is specified" do
-      @tool.settings = {:text => 'tool label', :url => "http://example.com", :text => 'course nav', :labels => {'en-US' => 'english nav'}}
+      @tool.settings = {:url => "http://example.com", :text => 'course nav', :labels => {'en-US' => 'english nav'}}
       @tool.save!
       expect(@tool.default_label('en-US')).to eq 'english nav'
     end
