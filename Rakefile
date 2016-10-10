@@ -5,7 +5,6 @@ require File.expand_path('../config/application', __FILE__)
 
 require 'rake'
 require 'rake/testtask'
-require 'rdoc/task'
 Bundler.require(:i18n_tools)
 
 CanvasRails::Application.load_tasks

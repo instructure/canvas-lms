@@ -79,7 +79,6 @@ gem 'rack-mini-profiler', '0.9.2', require: false
 gem 'flamegraph', '0.1.0', require: false
   gem 'stackprof', '0.2.7', require: false
 gem 'rake', '11.3.0'
-gem 'rdoc', '3.12'
 gem 'ratom-nokogiri', '0.10.4', require: false
 gem 'rdiscount', '1.6.8', require: false
 gem 'ritex', '1.0.1', require: false
