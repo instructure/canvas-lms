@@ -10,8 +10,8 @@ group :test do
     gem 'bullet_instructure', '4.14.8', require: 'bullet'
   gem 'mocha', '1.2.0'
     gem 'metaclass', '0.0.4', require: false
-  gem 'thin', '1.6.3'
-    gem 'eventmachine', '1.0.9', require: false
+  gem 'thin', '1.7.0'
+    gem 'eventmachine', '1.2.0.1', require: false
 
   gem 'rspec', '3.5.0'
   gem 'rspec-rails', '3.5.2'
