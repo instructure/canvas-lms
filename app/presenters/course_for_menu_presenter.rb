@@ -7,9 +7,10 @@ class CourseForMenuPresenter
     Course::TAB_ANNOUNCEMENTS, Course::TAB_FILES
   ].freeze
 
-  def initialize(course, available_section_tabs, user = nil)
+  def initialize(course, available_section_tabs, user = nil, context = nil)
     @course = course
     @user = user
+    @context = context
     @available_section_tabs = (available_section_tabs || []).select do |tab|
       DASHBOARD_CARD_TABS.include?(tab[:id])
     end
@@ -29,10 +30,12 @@ class CourseForMenuPresenter
       id: course.id,
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
       imagesEnabled: course.feature_enabled?(:course_card_images),
+      position: (@context && @context.feature_enabled?(:dashcard_reordering)) ? @user.course_positions[course.asset_string] : nil,
       links: available_section_tabs.map do |tab|
         presenter = SectionTabPresenter.new(tab, course)
         presenter.to_h
       end
+
     }
   end
 

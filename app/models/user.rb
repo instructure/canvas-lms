@@ -1361,6 +1361,10 @@ class User < ActiveRecord::Base
     preferences[:custom_colors] ||= {}
   end
 
+  def course_positions
+    preferences[:course_positions] ||= {}
+  end
+
   def course_nicknames
     preferences[:course_nicknames] ||= {}
   end
