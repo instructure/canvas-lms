@@ -310,6 +310,24 @@ describe SplitUsers do
         expect(@user2.all_pseudonyms).to eq [@p2]
       end
 
+      it 'should split a user across shards' do
+        user1 = user_with_pseudonym(username: 'user1@example.com', active_all: 1)
+        p1 = @pseudonym
+        @shard1.activate do
+          account = Account.create!
+          @user2 = user_with_pseudonym(username: 'user2@example.com', active_all: 1, account: account)
+          @p2 = @pseudonym
+          UserMerge.from(user1).into(@user2)
+        end
+        SplitUsers.split_db_users(@user2)
+        user1.reload
+        @user2.reload
+
+        expect(user1).not_to be_deleted
+        expect(p1.reload.user).to eq user1
+        expect(@user2.all_pseudonyms).to eq [@p2]
+      end
+
       it "should split a user across shards with ccs" do
         user1 = user_with_pseudonym(username: 'user1@example.com', active_all: 1)
         user1_ccs = user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort
