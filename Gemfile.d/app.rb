@@ -31,7 +31,7 @@ gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
 
-gem "after_transaction_commit", '1.0.1'
+gem "after_transaction_commit", '1.1.0'
 gem "aws-sdk", '1.66.0', require: false
   gem 'uuidtools', '2.1.4', require: false
 gem 'barby', '0.5.0', require: false
@@ -41,7 +41,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.4', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.11.4'
+gem 'inst-jobs', '0.11.5'
   gem 'rufus-scheduler', '3.2.2', require: false
 gem 'ffi', '1.9.14', require: false
 gem 'hairtrigger', '0.2.15'
