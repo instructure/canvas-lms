@@ -4493,8 +4493,6 @@ describe Course, 'touch_root_folder_if_necessary' do
       expect { course.broadcast_notifications }.to_not raise_error
     end
   end
-
-  it { is_expected.to have_many(:submission_comments).conditions(-> { published }) }
 end
 
 describe Course, 'invited_count_visible_to' do
