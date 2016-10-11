@@ -245,7 +245,7 @@ describe PageView do
         expect(pv2.store).to be_truthy
         expect(pv3.store).to be_truthy
 
-        expect(Canvas.redis.smembers(bucket).sort).to eq [@user1.global_id.to_s, @user2.global_id.to_s]
+        expect(Canvas.redis.smembers(bucket).sort).to eq [@user1.global_id.to_s, @user2.global_id.to_s].sort
         expect(Canvas.redis.smembers(PageView.user_count_bucket_for_time(store_time_2))).to eq [@user2.global_id.to_s]
       end
     end
