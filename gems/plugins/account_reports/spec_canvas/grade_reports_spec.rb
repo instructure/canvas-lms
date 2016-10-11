@@ -328,7 +328,7 @@ describe "Default Account Reports" do
         reports = read_report("mgp_grade_export_csv",
                               params: {enrollment_term_id: @default_term.id},
                               parse_header: true,
-                              order: ["student name"])
+                              order: ["student name", "course"])
         csv = reports["Default Term.csv"]
         expect(csv.size).to eq 4
         expect(
