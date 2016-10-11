@@ -24,9 +24,7 @@ module Api
       describe '#to_node' do
         let(:url_helper) do
           stub({
-            proxy: stub(
-              show_media_tracks_url: 'media/track/vtt'
-            )
+            show_media_tracks_url: 'media/track/vtt'
           })
         end
 
