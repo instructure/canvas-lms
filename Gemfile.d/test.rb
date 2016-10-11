@@ -8,7 +8,7 @@ group :test do
     gem 'redcarpet', '3.2.3', require: false
     gem 'github-markdown', '0.6.8', require: false
     gem 'bullet_instructure', '4.14.8', require: 'bullet'
-  gem 'mocha', '1.2.0'
+  gem 'mocha', github: 'maneframe/mocha', ref: 'bb8813fbb4cc589d7c58073d93983722d61b6919', require: false
     gem 'metaclass', '0.0.4', require: false
   gem 'thin', '1.7.0'
     gem 'eventmachine', '1.2.0.1', require: false
