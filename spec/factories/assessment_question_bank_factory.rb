@@ -17,26 +17,28 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def assessment_question_bank_model
-  @course ||= course_model(:reusable => true)
-  @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
-end
-
-def assessment_question_bank_with_questions
-  @bank ||= assessment_question_bank_model
-
-  # create a bunch of questions to make it more likely that they'll shuffle randomly
-  # define @q1..@q10
-  (1..10).each do |i|
-    q = @bank.assessment_questions.create!(
-      :question_data => {
-        'name' => "test question #{i}",
-        'points_possible' => 10,
-        'answers' => [{'id' => 1}, {'id' => 2}]
-      }
-    )
-    instance_variable_set("@q#{i}", q)
+module Factories
+  def assessment_question_bank_model
+    @course ||= course_model(:reusable => true)
+    @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
   end
 
-  @bank
+  def assessment_question_bank_with_questions
+    @bank ||= assessment_question_bank_model
+
+    # create a bunch of questions to make it more likely that they'll shuffle randomly
+    # define @q1..@q10
+    (1..10).each do |i|
+      q = @bank.assessment_questions.create!(
+        :question_data => {
+          'name' => "test question #{i}",
+          'points_possible' => 10,
+          'answers' => [{'id' => 1}, {'id' => 2}]
+        }
+      )
+      instance_variable_set("@q#{i}", q)
+    end
+
+    @bank
+  end
 end

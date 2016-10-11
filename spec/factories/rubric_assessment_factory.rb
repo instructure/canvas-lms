@@ -16,12 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def rubric_assessment_model(opts={})
-  rubric_association_model(opts)
-  @rubric_assessment = @rubric_association.rubric_assessments.create!(:user => opts[:user], :assessor => opts[:user], :rubric => @rubric, :artifact => @rubric_association.association_object, :assessment_type => opts[:assessment_type] || 'no_reason')
-end
+module Factories
+  def rubric_assessment_model(opts={})
+    rubric_association_model(opts)
+    @rubric_assessment = @rubric_association.rubric_assessments.create!(:user => opts[:user], :assessor => opts[:user], :rubric => @rubric, :artifact => @rubric_association.association_object, :assessment_type => opts[:assessment_type] || 'no_reason')
+  end
 
-def valid_rubric_assessment_attributes
-  {
-  }
+  def valid_rubric_assessment_attributes
+    {
+    }
+  end
 end

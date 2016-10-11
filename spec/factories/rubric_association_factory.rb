@@ -16,16 +16,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def rubric_association_model(opts={})
-  course_model(:reusable => true) unless @course || opts[:context]
-  @rubric = opts[:rubric] || rubric_model(:context => opts[:context] || @course)
-  @rubric_association_object = opts[:association_object] ||
-    @course.assignments.first ||
-    @course.assignments.create!(assignment_valid_attributes)
-  @rubric_association = @rubric.rubric_associations.create!(valid_rubric_assessment_attributes.merge(:association_object =>  @rubric_association_object, :context => opts[:context] || @course, :purpose => opts[:purpose] || "none"))
-end
+module Factories
+  def rubric_association_model(opts={})
+    course_model(:reusable => true) unless @course || opts[:context]
+    @rubric = opts[:rubric] || rubric_model(:context => opts[:context] || @course)
+    @rubric_association_object = opts[:association_object] ||
+      @course.assignments.first ||
+      @course.assignments.create!(assignment_valid_attributes)
+    @rubric_association = @rubric.rubric_associations.create!(valid_rubric_assessment_attributes.merge(:association_object =>  @rubric_association_object, :context => opts[:context] || @course, :purpose => opts[:purpose] || "none"))
+  end
 
-def valid_rubric_assessment_attributes
-  {
-  }
+  def valid_rubric_assessment_attributes
+    {
+    }
+  end
 end

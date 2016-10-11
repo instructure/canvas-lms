@@ -206,7 +206,16 @@ Mocha::ObjectMethods.instance_methods.each do |m|
 end
 
 factories = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb"
+legit_global_methods = Object.private_methods
 Dir.glob(factories).each { |file| require file }
+crap_factories = (Object.private_methods - legit_global_methods)
+if crap_factories.present?
+  $stderr.puts "\e[31mError: Don't create global factories/helpers"
+  $stderr.puts "Put #{crap_factories.map { |m| "`#{m}`" }.to_sentence} in the `Factories` module"
+  $stderr.puts "(or somewhere else appropriate)\e[0m"
+  $stderr.puts
+  exit! 1
+end
 
 examples = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/shared_examples/*.rb"
 Dir.glob(examples).each { |file| require file }
@@ -304,6 +313,7 @@ RSpec.configure do |config|
   config.order = :random
 
   config.include Helpers
+  config.include Factories
 
   config.include Onceler::BasicHelpers
 

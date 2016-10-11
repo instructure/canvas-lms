@@ -16,21 +16,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def delayed_message_model(opts={})
-  @delayed_message = factory_with_protected_attributes(DelayedMessage, delayed_message_valid_attributes(opts).merge(opts))
-end
+module Factories
+  def delayed_message_model(opts={})
+    @delayed_message = factory_with_protected_attributes(DelayedMessage, delayed_message_valid_attributes(opts).merge(opts))
+  end
 
-def delayed_message_valid_attributes(opts={})
-  opts[:notification] ||= @notification
-  opts[:notification] ||= notification_model
-  user = opts[:user] || @user || User.create!
-  cc = opts.delete(:cc) || user.communication_channels.first || user.communication_channels.create!(:path => "delayed_message@example.com").tap(&:confirm!)
-  np = cc.notification_policies.where(:notification_id => opts[:notification].id, :frequency => Notification::FREQ_IMMEDIATELY).first_or_create!
-  {
-    :notification_id => opts[:notification].id,
-    :notification_policy_id => np.id,
-    :context_id => cc.id,
-    :context_type => "CommunicationChannel",
-    :communication_channel_id => cc.id
-  }
+  def delayed_message_valid_attributes(opts={})
+    opts[:notification] ||= @notification
+    opts[:notification] ||= notification_model
+    user = opts[:user] || @user || User.create!
+    cc = opts.delete(:cc) || user.communication_channels.first || user.communication_channels.create!(:path => "delayed_message@example.com").tap(&:confirm!)
+    np = cc.notification_policies.where(:notification_id => opts[:notification].id, :frequency => Notification::FREQ_IMMEDIATELY).first_or_create!
+    {
+      :notification_id => opts[:notification].id,
+      :notification_policy_id => np.id,
+      :context_id => cc.id,
+      :context_type => "CommunicationChannel",
+      :communication_channel_id => cc.id
+    }
+  end
 end

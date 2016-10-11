@@ -4,14 +4,14 @@ require_relative '../helpers/quizzes_common'
 describe 'when a quiz is published' do
   include_context "in-process server selenium tests"
 
-  let(:quiz_helper) { Class.new { extend QuizzesCommon } }
-
   context 'as a student' do
+    include QuizzesCommon
+
     before(:each) do
       course_with_student_logged_in
-      quiz_helper.create_quiz_with_due_date(
+      create_quiz_with_due_date(
         course: @course,
-        due_at: quiz_helper.default_time_for_due_date(Time.zone.now.advance(days: 2))
+        due_at: default_time_for_due_date(Time.zone.now.advance(days: 2))
       )
     end
 

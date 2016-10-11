@@ -16,13 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def assessment_request_model(opts={})
-  @user = user_model
-  @user2 = user_model
-  @user3 = user_model
-  @submission = submission_model
-  
-  @assessment_request = AssessmentRequest.create!(:user => @user, :assessor_asset => @user2, :assessor => @user3, :asset => @submission)
+module Factories
+  def assessment_request_model(opts={})
+    @user = user_model
+    @user2 = user_model
+    @user3 = user_model
+    @submission = submission_model
 
-  @assessment_request
+    @assessment_request = AssessmentRequest.create!(:user => @user, :assessor_asset => @user2, :assessor => @user3, :asset => @submission)
+
+    @assessment_request
+  end
 end

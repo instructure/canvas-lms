@@ -16,13 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def folder_model(opts={})
-  @folder = factory_with_protected_attributes(Folder, valid_folder_attributes.merge(opts))
-end
+module Factories
+  def folder_model(opts={})
+    @folder = factory_with_protected_attributes(Folder, valid_folder_attributes.merge(opts))
+  end
 
-def valid_folder_attributes
-  {
-    :name => 'vale for name',
-    :context => @course
-  }
+  def valid_folder_attributes
+    {
+      :name => 'vale for name',
+      :context => @course
+    }
+  end
 end

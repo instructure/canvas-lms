@@ -7,7 +7,7 @@ describe "Exportable" do
 
     def attachment
       @_attachment ||= Attachment.create({
-        context: course,
+        context: Course.create,
         filename: 'exortable-test-file',
         uploaded_data: File.open(cartridge_path)
       })
