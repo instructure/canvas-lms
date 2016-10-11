@@ -102,6 +102,10 @@ module Api
         proxy.polymorphic_url([media_context, :media_download], entryId: media_id, media_type: media_type, redirect: '1', host: host, protocol: protocol)
       end
 
+      def show_media_tracks_url(media_object_id, media_id)
+        proxy.show_media_tracks_url(media_object_id, media_id, format: :json, host: host, protocol: protocol)
+      end
+
       # rewrite any html attributes that are urls but just absolute paths, to
       # have the canvas domain prepended to make them a full url
       #

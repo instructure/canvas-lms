@@ -99,4 +99,18 @@ describe DiscussionTopic::MaterializedView do
     },
     ]
   end
+
+  it "should work with media track tags" do
+    obj = @course.media_objects.create! media_id: '0_deadbeef'
+    track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
+
+    bad_entry = @topic.reply_from(:user => @student, :html => %Q{<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>})
+
+    view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
+    view.update_materialized_view_without_send_later
+    structure, participant_ids, entry_ids = @topic.materialized_view
+    entry_json = JSON.parse(structure).last
+    html = Nokogiri::HTML::DocumentFragment.parse(entry_json['message'])
+    expect(html.at_css('video track')['src']).to eq "https://placeholder.invalid/media_objects/#{obj.id}/media_tracks/#{track.id}.json"
+  end
 end
