@@ -46,7 +46,6 @@ if RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
 elsif RUBY_VERSION >= "2.2" && RUBY_VERSION < "2.3"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 elsif RUBY_VERSION >= "2.3.1" && RUBY_VERSION < "2.4"
-  puts "Ruby 2.3 support is untested"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 else
   ruby '2.1.6', :engine => 'ruby', :engine_version => '2.1.6'
