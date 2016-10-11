@@ -34,8 +34,8 @@ module Api
         node_builder.new('track', doc).tap do |n|
           n['kind'] = media_track.kind
           n['srclang'] = media_track.locale
-          n['src'] = url_helper.proxy.show_media_tracks_url(
-            media_track.media_object_id, media_track.id, format: :json
+          n['src'] = url_helper.show_media_tracks_url(
+            media_track.media_object_id, media_track.id
           )
           n['label'] = language_name
         end
