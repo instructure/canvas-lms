@@ -25,18 +25,26 @@ gem 'bundler', bundler_requirements
 # we still manually do this check because older bundler versions don't validate the version requirement
 # of the bundler gem once the bundle has been initially installed
 unless Gem::Requirement.new(*bundler_requirements).satisfied_by?(Gem::Version.new(Bundler::VERSION))
-  if Gem::Version.new(Bundler::VERSION) < Gem::Version.new(req_bundler_version_floor)
-    bundle_command = "gem install bundler -v #{req_bundler_version_ceiling}"
-  else
+  # Always suggest installing the necessary version.
+  install_command = "gem install bundler -v #{req_bundler_version_ceiling}"
+
+  message = "Bundler version #{req_bundler_version_floor} is required; " +
+            "you're currently running #{Bundler::VERSION}.\n\n" +
+            "Install a supported version: `#{install_command}`.\n"
+
+  # If a newer version is in use suggest specifying or removing.
+  if Gem::Version.new(Bundler::VERSION) > Gem::Version.new(req_bundler_version_ceiling)
     require 'shellwords'
-    bundle_command = "bundle _#{req_bundler_version_ceiling}_ " +
-                     "#{ARGV.map { |a| Shellwords.escape(a) }.join(' ')}"
+    version_arg = "_#{req_bundler_version_ceiling}_"
+    versioned_command = "bundle #{version_arg} " +
+                        "#{ARGV.map { |a| Shellwords.escape(a) }.join(' ')}"
+    uninstall_command = "gem uninstall bundler -v #{Bundler::VERSION}"
+
+    message << "\nThen prefix 'bundle' commands with '#{version_arg}' like this: `#{versioned_command}`\n" +
+               "or uninstall this newer version with `#{uninstall_command}`.\n"
   end
 
-  warn "Bundler version #{req_bundler_version_floor} is required; " +
-       "you're currently running #{Bundler::VERSION}. " +
-       "Maybe try `#{bundle_command}`, or " +
-       "`gem uninstall bundler -v #{Bundler::VERSION}`."
+  warn message
   exit 1
 end
 
