@@ -39,7 +39,7 @@ gem 'barby', '0.5.0', require: false
   gem 'chunky_png', '1.3.0', require: false
 gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.10'
-  gem 'adobe_connect', '1.0.3', require: false
+  gem 'adobe_connect', '1.0.4', require: false
 gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.11.4'
   gem 'rufus-scheduler', '3.2.2', require: false
