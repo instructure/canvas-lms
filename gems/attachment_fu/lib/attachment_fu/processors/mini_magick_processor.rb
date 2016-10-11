@@ -3,9 +3,8 @@ require 'mini_magick'
 module AttachmentFu # :nodoc:
   module Processors
     module MiniMagickProcessor
-      def self.included(base)
-        base.send :extend, ClassMethods
-        base.alias_method_chain :process_attachment, :processing
+      def self.prepended(base)
+        base.singleton_class.include(ClassMethods)
       end
 
       module ClassMethods
@@ -25,8 +24,8 @@ module AttachmentFu # :nodoc:
       end
 
     protected
-      def process_attachment_with_processing
-        return unless process_attachment_without_processing
+      def process_attachment
+        return unless super
         if image? && !@resized
           with_image do |img|
             max_image_size = attachment_options[:thumbnail_max_image_size_pixels]

@@ -210,7 +210,7 @@ class Attachment < ActiveRecord::Base
 
     # try an infer encoding if it would be useful to do so
     send_later(:infer_encoding) if self.encoding.nil? && self.content_type =~ /text/ && self.context_type != 'SisBatch'
-    if respond_to?(:process_attachment_with_processing, true) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
+    if respond_to?(:process_attachment, true) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
       self.class.attachment_options[:thumbnails].each do |suffix, size|
         send_later_if_production_enqueue_args(:create_thumbnail_size, {:singleton => "attachment_thumbnail_#{self.global_id}_#{suffix}"}, suffix)
       end
