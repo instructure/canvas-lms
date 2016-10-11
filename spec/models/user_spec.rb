@@ -203,7 +203,10 @@ describe User do
       discussion_topic_model(:context => @course)
 
       @dashboard_key = StreamItemCache.recent_stream_items_key(@teacher)
-      @context_keys = @contexts.map { |context|
+    end
+
+    let(:context_keys) do
+      @contexts.map { |context|
         StreamItemCache.recent_stream_items_key(@teacher, context.class.base_class.name, context.id)
       }
     end
@@ -212,7 +215,7 @@ describe User do
       enable_cache do
         @teacher.cached_recent_stream_items(:contexts => @contexts)
         expect(Rails.cache.read(@dashboard_key)).to be_blank
-        @context_keys.each do |context_key|
+        context_keys.each do |context_key|
           expect(Rails.cache.read(context_key)).not_to be_blank
         end
       end
@@ -222,7 +225,7 @@ describe User do
       enable_cache do
         @teacher.cached_recent_stream_items # cache the dashboard items
         expect(Rails.cache.read(@dashboard_key)).not_to be_blank
-        @context_keys.each do |context_key|
+        context_keys.each do |context_key|
           expect(Rails.cache.read(context_key)).to be_blank
         end
       end
