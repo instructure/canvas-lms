@@ -16,10 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-gem 'bundler', '>= 1.10.3', '<= 1.13.7'
+gem 'bundler', '>= 1.10.3', '<= 1.14.3'
 
 # NOTE: this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
 if RUBY_VERSION >= "2.3.1" && RUBY_VERSION < "2.4"
+  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
+elsif RUBY_VERSION >= "2.4" && RUBY_VERSION < "2.5"
+  puts "Ruby 2.4 support is untested"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 else
   ruby '2.3.1', :engine => 'ruby', :engine_version => '2.3.1'
