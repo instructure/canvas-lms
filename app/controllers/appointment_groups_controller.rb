@@ -523,6 +523,33 @@ class AppointmentGroupsController < ApplicationController
     participants('Group'){ |g| group_json(g, @current_user, session) }
   end
 
+  # @API Get next appointment
+  #
+  # Return the next appointment available to sign up for. The appointment
+  # is returned in a one-element array. If no future appointments are
+  # available, an empty array is returned.
+  #
+  # @argument appointment_group_ids[] [String]
+  #   List of ids of appointment groups to search.
+  #
+  # @returns [CalendarEvent]
+  def next_appointment
+    ag_scope = AppointmentGroup.current.reservable_by(@current_user)
+    ids = Array(params[:appointment_group_ids])
+    ag_scope = ag_scope.where(id: ids) if ids.any?
+    # FIXME this could be a lot faster if we didn't look at eligibility to sign up.
+    # since the UI only cares about the date to jump to, it might not make a difference in many cases
+    events = ag_scope.preload(:appointments => :child_events).to_a.map do |ag|
+      ag.appointments.detect do |appointment|
+        appointment.child_events_for(@current_user).empty? &&
+          (appointment.participants_per_appointment.nil? ||
+           appointment.child_events.count < appointment.participants_per_appointment)
+      end
+    end.compact
+    render :json => events.sort_by(&:start_at)[0..0].map { |event|
+      calendar_event_json(event, @current_user, session)
+    }
+  end
 
   protected
 

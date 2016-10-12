@@ -1373,6 +1373,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :appointment_groups) do
       get 'appointment_groups', action: :index, as: 'appointment_groups'
       post 'appointment_groups', action: :create
+      get 'appointment_groups/next_appointment', action: :next_appointment
       get 'appointment_groups/:id', action: :show, as: 'appointment_group'
       put 'appointment_groups/:id', action: :update
       delete 'appointment_groups/:id', action: :destroy
