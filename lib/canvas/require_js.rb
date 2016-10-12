@@ -79,6 +79,8 @@ module Canvas
           {name: 'qs',                 location: 'symlink_to_node_modules/qs', main: 'dist/qs'},
           {name: 'react',              location: 'symlink_to_node_modules/react', main: 'dist/react-with-addons'},
           {name: 'react-dom',          location: 'symlink_to_node_modules/react-dom', main: 'dist/react-dom'},
+          {name: 'react-dnd',          location: 'symlink_to_node_modules/react-dnd', main: 'dist/ReactDnD.min'},
+          {name: 'react-dnd-html5-backend', location: 'symlink_to_node_modules/react-dnd-html5-backend', main: 'dist/ReactDnDHTML5Backend.min'},
           {name: 'react-redux',        location: 'symlink_to_node_modules/react-redux', main: 'dist/react-redux.min'},
           {name: 'react-select-box',   location: 'symlink_to_node_modules/react-select-box', main: 'dist/react-select-box'},
           {name: 'react-tokeninput',   location: 'symlink_to_node_modules/react-tokeninput', main: 'dist/react-tokeninput'},

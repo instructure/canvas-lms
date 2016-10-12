@@ -88,6 +88,8 @@
     "qs": "https://github.com/hapijs/qs.git#a341cdf2fadba5ede1ce6c95c7051f6f31f37b81",
     "react": "0.14.8",
     "react-dom": "0.14.8",
+    "react-dnd": "2.1.4",
+    "react-dnd-html5-backend": "2.1.2",
     "react-addons-css-transition-group": "0.14.8",
     "react-addons-pure-render-mixin": "0.14.8",
     "react-addons-test-utils": "0.14.8",
