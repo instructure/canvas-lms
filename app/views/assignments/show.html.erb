@@ -102,6 +102,7 @@
       </li>
       <% if @assignment.expects_submission? || @assignment.expects_external_submission? %>
         <% turnitin_text = turnitin_active? ? ' ' + t(:turnitin_enabled_short, '(Turnitin enabled)') : '' %>
+        <% vericite_text = vericite_active? ? ' ' + t(:vericite_enabled_short, '(VeriCite enabled)') : '' %>
         <li>
           <span class='title'><%= t :submitting, 'Submitting' %></span>
           <span class='value'><%= @assignment.readable_submission_types + turnitin_text %></span>
@@ -159,6 +160,14 @@
             <div class="control-label"><%= t :turnitin, 'Turnitin' %></div>
             <div class="controls">
               <span class="value"><%= t :turnitin_enabled, 'Turnitin has been enabled for this assignment.' %></span>
+            </div>
+          </div>
+        <% end %>
+        <% if vericite_active? %>
+          <div class="control-group">
+            <div class="control-label"><%= t :vericite, 'VeriCite' %></div>
+            <div class="controls">
+              <span class="value"><%= t :vericite_enabled, 'VeriCite has been enabled for this assignment.' %></span>
             </div>
           </div>
         <% end %>

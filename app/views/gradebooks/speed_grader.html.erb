@@ -356,6 +356,8 @@
 <a style="display:none;" id="assignment_submission_url" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submission_id}}") %>"></a>
 <a style="display:none;" id="assignment_submission_turnitin_report_url" href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @assignment.id, "{{ user_id }}", "{{ asset_string }}") %>"></a>
 <a style="display:none;" id="assignment_submission_resubmit_to_turnitin_url" href="<%= context_url(@context, :context_assignment_submission_resubmit_to_turnitin_url, @assignment.id, "{{ user_id }}") %>"></a>
+<a style="display:none;" id="assignment_submission_vericite_report_url" href="<%= context_url(@context, :context_assignment_submission_vericite_report_url, @assignment.id, "{{ user_id }}", "{{ asset_string }}") %>"></a>
+<a style="display:none;" id="assignment_submission_resubmit_to_vericite_url" href="<%= context_url(@context, :context_assignment_submission_resubmit_to_vericite_url, @assignment.id, "{{ user_id }}") %>"></a>
 <form id="settings_form" style="display:none; width:400px;" title="<%= t('titles.speedgrader_options', "SpeedGrader Options") %>">
   <p>
     <label for="eg_sort_by"><%= t('labels.sort_by', "Sort student list") %></label>

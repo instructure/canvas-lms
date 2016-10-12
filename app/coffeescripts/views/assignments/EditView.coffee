@@ -8,6 +8,7 @@ define [
   'jst/assignments/EditView'
   'compiled/userSettings'
   'compiled/models/TurnitinSettings'
+  'compiled/models/VeriCiteSettings'
   'compiled/views/assignments/TurnitinSettingsDialog'
   'compiled/fn/preventDefault'
   'compiled/views/calendar/MissingDateDialogView'
@@ -20,7 +21,7 @@ define [
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
 ], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, template,
-userSettings, TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
+userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
 AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
 ConditionalRelease) ->
 
@@ -42,6 +43,7 @@ ConditionalRelease) ->
     RESTRICT_FILE_UPLOADS_OPTIONS = '#restrict_file_extensions_container'
     ALLOWED_EXTENSIONS = '#allowed_extensions_container'
     TURNITIN_ENABLED = '#assignment_turnitin_enabled'
+    VERICITE_ENABLED = '#assignment_vericite_enabled'
     ADVANCED_TURNITIN_SETTINGS = '#advanced_turnitin_settings_link'
     GRADING_TYPE_SELECTOR = '#grading_type_selector'
     GRADED_ASSIGNMENT_FIELDS = '#graded_assignment_fields'
@@ -73,6 +75,7 @@ ConditionalRelease) ->
       els["#{RESTRICT_FILE_UPLOADS_OPTIONS}"] = '$restrictFileUploadsOptions'
       els["#{ALLOWED_EXTENSIONS}"] = '$allowedExtensions'
       els["#{TURNITIN_ENABLED}"] = '$turnitinEnabled'
+      els["#{VERICITE_ENABLED}"] = '$vericiteEnabled'
       els["#{ADVANCED_TURNITIN_SETTINGS}"] = '$advancedTurnitinSettings'
       els["#{GRADING_TYPE_SELECTOR}"] = '$gradingTypeSelector'
       els["#{GRADED_ASSIGNMENT_FIELDS}"] = '$gradedAssignmentFields'
@@ -98,6 +101,7 @@ ConditionalRelease) ->
       events["change #{RESTRICT_FILE_UPLOADS}"] = 'handleRestrictFileUploadsChange'
       events["click #{ADVANCED_TURNITIN_SETTINGS}"] = 'showTurnitinDialog'
       events["change #{TURNITIN_ENABLED}"] = 'toggleAdvancedTurnitinSettings'
+      events["change #{VERICITE_ENABLED}"] = 'toggleAdvancedTurnitinSettings'
       events["change #{ALLOW_FILE_UPLOADS}"] = 'toggleRestrictFileUploads'
       events["click #{EXTERNAL_TOOLS_URL}_find"] = 'showExternalToolsDialog'
       events["change #assignment_points_possible"] = 'handlePointsChange'
@@ -133,7 +137,7 @@ ConditionalRelease) ->
       ["assignment_group_id","grading_type","submission_type","submission_types",
        "points_possible","allowed_extensions","peer_reviews","peer_review_count",
        "automatic_peer_reviews","group_category_id","grade_group_students_individually",
-       "turnitin_enabled"]
+       "turnitin_enabled", "vericite_enabled"]
 
     handlePointsChange:(ev) =>
       ev.preventDefault()
@@ -201,9 +205,17 @@ ConditionalRelease) ->
 
     showTurnitinDialog: (ev) =>
       ev.preventDefault()
-      turnitinDialog = new TurnitinSettingsDialog(model: @assignment.get('turnitin_settings'))
+      type = "turnitin"
+      model = @assignment.get('turnitin_settings')
+      if @$vericiteEnabled.prop('checked')
+        type = "vericite"
+        model = @assignment.get('vericite_settings')
+      turnitinDialog = new TurnitinSettingsDialog(model, type)
       turnitinDialog.render().on 'settings:change', (settings) =>
-        @assignment.set 'turnitin_settings', new TurnitinSettings(settings)
+        if @$vericiteEnabled.prop('checked')
+          @assignment.set 'vericite_settings', new VeriCiteSettings(settings)
+        else
+          @assignment.set 'turnitin_settings', new TurnitinSettings(settings)
         turnitinDialog.off()
         turnitinDialog.remove()
 
@@ -224,7 +236,7 @@ ConditionalRelease) ->
 
     toggleAdvancedTurnitinSettings: (ev) =>
       ev.preventDefault()
-      @$advancedTurnitinSettings.toggleAccessibly @$turnitinEnabled.prop('checked')
+      @$advancedTurnitinSettings.toggleAccessibly (@$turnitinEnabled.prop('checked') || @$vericiteEnabled.prop('checked'))
 
     handleRestrictFileUploadsChange: =>
       @$allowedExtensions.toggleAccessibly @$restrictFileUploads.prop('checked')

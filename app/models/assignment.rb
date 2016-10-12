@@ -21,6 +21,7 @@ require 'set'
 require 'canvas/draft_state_validations'
 require 'bigdecimal'
 require_dependency 'turnitin'
+require_dependency 'vericite'
 
 class Assignment < ActiveRecord::Base
   include Workflow
@@ -39,7 +40,7 @@ class Assignment < ActiveRecord::Base
     :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
     :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
-    :notify_of_update, :time_zone_edited, :turnitin_enabled,
+    :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
     :turnitin_settings, :context, :position, :allowed_extensions,
     :external_tool_tag_attributes, :freeze_on_copy,
     :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading,
@@ -184,6 +185,7 @@ class Assignment < ActiveRecord::Base
     group_category_id
     grade_group_students_individually
     turnitin_enabled
+    vericite_enabled
     turnitin_settings
     allowed_extensions
     muted
@@ -376,19 +378,59 @@ class Assignment < ActiveRecord::Base
     return self.turnitin_settings[:current]
   end
 
-  def turnitin_settings
-    if super.empty?
-      settings = Turnitin::Client.default_assignment_turnitin_settings
-      default_originality = course.turnitin_originality if course
-      settings[:originality_report_visibility] = default_originality if default_originality
+  def turnitin_settings settings=nil
+    if super().empty?
+      # turnitin settings are overloaded for all plagiarism services as requested, so
+      # alternative services can send in their own default settings, otherwise,
+      # default to Turnitin settings
+      if settings.nil?
+        settings = Turnitin::Client.default_assignment_turnitin_settings
+        default_originality = course.turnitin_originality if course
+        settings[:originality_report_visibility] = default_originality if default_originality
+      end
       settings
     else
-      super
+      super()
     end
   end
 
   def turnitin_settings=(settings)
     settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
+    unless settings.blank?
+      [:created, :error].each do |key|
+        settings[key] = self.turnitin_settings[key] if self.turnitin_settings[key]
+      end
+    end
+    write_attribute :turnitin_settings, settings
+  end
+
+  def create_in_vericite
+    return false unless Canvas::Plugin.find(:vericite).try(:enabled?)
+    return true if self.turnitin_settings[:current] && self.turnitin_settings[:vericite]
+    vericite = VeriCite::Client.new()
+    res = vericite.createOrUpdateAssignment(self, self.turnitin_settings)
+
+    # make sure the defaults get serialized
+    self.turnitin_settings = turnitin_settings
+
+    if res[:assignment_id]
+      self.turnitin_settings[:created] = true
+      self.turnitin_settings[:current] = true
+      self.turnitin_settings[:vericite] = true
+      self.turnitin_settings.delete(:error)
+    else
+      self.turnitin_settings[:error] = res
+    end
+    self.save
+    return self.turnitin_settings[:current]
+  end
+
+  def vericite_settings
+    self.turnitin_settings(VeriCite::Client.default_assignment_vericite_settings)
+  end
+
+  def vericite_settings=(settings)
+    settings = VeriCite::Client.normalize_assignment_vericite_settings(settings)
     unless settings.blank?
       [:created, :error].each do |key|
         settings[key] = self.turnitin_settings[key] if self.turnitin_settings[key]
@@ -1491,6 +1533,13 @@ class Assignment < ActiveRecord::Base
                                else
                                  []
                                end
+    users_with_vericite_data = if vericite_enabled?
+                                 submissions
+                                 .reject { |s| s.turnitin_data.blank? }
+                                 .map(&:user)
+                               else
+                                 []
+                               end
     # this only includes users with a submission who are unexcused
     users_who_arent_excused = submissions.reject(&:excused?).map(&:user)
 
@@ -1509,7 +1558,7 @@ class Assignment < ActiveRecord::Base
       candidate_students = visible_group_students if candidate_students.empty?
       candidate_students.sort_by! { |s| enrollment_priority[enrollment_state[s.id]] }
 
-      representative   = (candidate_students & users_with_turnitin_data).first
+      representative   = (candidate_students & (users_with_turnitin_data || users_with_vericite_data)).first
       representative ||= (candidate_students & users_with_submissions).first
       representative ||= candidate_students.first
       others = visible_group_students - [representative]

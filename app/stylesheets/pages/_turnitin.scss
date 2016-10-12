@@ -86,6 +86,11 @@ $turnitin_gray: #808080;
   }
 }
 
+.turnitin_score_container {
+  position: relative;
+  margin-left: 10px;
+}
+
 .turnitin_resubmit_container {
   text-align: right;
 }

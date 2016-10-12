@@ -35,6 +35,8 @@ define([
   'speed_grader_helpers',
   'jst/_turnitinInfo',
   'jst/_turnitinScore',
+  'jst/_vericiteInfo',
+  'jst/_vericiteScore',
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* getJSON, ajaxJSON */,
   'jquery.instructure_forms' /* ajaxJSONFiles */,
@@ -54,7 +56,7 @@ define([
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(MGP, OutlierScoreHelper, studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(MGP, OutlierScoreHelper, studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate, vericiteInfoTemplate, vericiteScoreTemplate) {
 
   // PRIVATE VARIABLES AND FUNCTIONS
   // all of the $ variables here are to speed up access to dom nodes,
@@ -128,6 +130,8 @@ define([
       $assignment_submission_url = $("#assignment_submission_url"),
       $assignment_submission_turnitin_report_url = $("#assignment_submission_turnitin_report_url"),
       $assignment_submission_resubmit_to_turnitin_url = $("#assignment_submission_resubmit_to_turnitin_url"),
+      $assignment_submission_vericite_report_url = $("#assignment_submission_vericite_report_url"),
+      $assignment_submission_resubmit_to_vericite_url = $("#assignment_submission_resubmit_to_vericite_url"),
       $rubric_full = $("#rubric_full"),
       $rubric_full_resizer_handle = $("#rubric_full_resizer_handle"),
       $mute_link = $('#mute_link'),
@@ -1489,7 +1493,58 @@ define([
         }
       }
     },
+    populateVeriCite: function(submission, assetString, vericiteAsset, $vericiteScoreContainer, $vericiteInfoContainer, isMostRecent) {
+      var $vericiteSimilarityScore = null;
 
+      // build up new values based on this asset
+      if (vericiteAsset.status == 'scored' || (vericiteAsset.status == null && vericiteAsset.similarity_score != null)) {
+        $vericiteScoreContainer.html(vericiteScoreTemplate({
+          state: (vericiteAsset.state || 'no') + '_score',
+          reportUrl: $.replaceTags($assignment_submission_vericite_report_url.attr('href'), { user_id: submission.user_id, asset_string: assetString }),
+          tooltip: I18n.t('vericite.tooltip.score', 'VeriCite Similarity Score - See detailed report'),
+          score: vericiteAsset.similarity_score + '%'
+        }));
+      } else if (vericiteAsset.status) {
+        // status == 'error' or status == 'pending'
+        var pendingTooltip = I18n.t('vericite.tooltip.pending', 'VeriCite Similarity Score - Submission pending'),
+            errorTooltip = I18n.t('vericite.tooltip.error', 'VeriCite Similarity Score - See submission error details');
+        $vericiteSimilarityScore = $(vericiteScoreTemplate({
+          state: 'submission_' + vericiteAsset.status,
+          reportUrl: '#',
+          tooltip: (vericiteAsset.status == 'error' ? errorTooltip : pendingTooltip),
+          icon: '/images/turnitin_submission_' + vericiteAsset.status + '.png'
+        }));
+        $vericiteScoreContainer.append($vericiteSimilarityScore);
+        $vericiteSimilarityScore.click(function(event) {
+          event.preventDefault();
+          $vericiteInfoContainer.find('.vericite_'+assetString).slideToggle();
+        });
+
+        var defaultInfoMessage = I18n.t('vericite.info_message',
+                                        'This file is still being processed by VeriCite. Please check back later to see the score'),
+            defaultErrorMessage = I18n.t('vericite.error_message',
+                                         'There was an error submitting to VeriCite. Please try resubmitting the file before contacting support');
+        var $vericiteInfo = $(vericiteInfoTemplate({
+          assetString: assetString,
+          message: (vericiteAsset.status == 'error' ? (vericiteAsset.public_error_message || defaultErrorMessage) : defaultInfoMessage),
+          showResubmit: vericiteAsset.status == 'error' && isMostRecent
+        }));
+        $vericiteInfoContainer.append($vericiteInfo);
+
+        if (vericiteAsset.status == 'error' && isMostRecent) {
+          var resubmitUrl = $.replaceTags($assignment_submission_resubmit_to_vericite_url.attr('href'), { user_id: submission.user_id });
+          $vericiteInfo.find('.vericite_resubmit_button').click(function(event) {
+            event.preventDefault();
+            $(this).attr('disabled', true)
+              .text(I18n.t('vericite.resubmitting', 'Resubmitting...'));
+
+            $.ajaxJSON(resubmitUrl, "POST", {}, function() {
+              window.location.reload();
+            });
+          });
+        }
+      }
+    },
     handleSubmissionSelectionChange: function(){
       clearInterval(crocodocSessionTimer);
 
@@ -1522,20 +1577,37 @@ define([
           inlineableAttachments = [],
           browserableAttachments = [];
 
-      var $turnitinScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
-          $turnitinInfoContainer = $grade_container.find(".turnitin_info_container").empty(),
-          assetString = 'submission_' + submission.id,
-          turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
-      // There might be a previous submission that was text_entry, but the
-      // current submission is an upload. The turnitin asset for the text
-      // entry would still exist
-      if (turnitinAsset && submission.submission_type == 'online_text_entry') {
-        EG.populateTurnitin(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent);
+      var turnitinEnabled = submission.turnitin_data && (typeof submission.turnitin_data.provider === 'undefined');
+      var vericiteEnabled = submission.turnitin_data && submission.turnitin_data.provider === 'vericite';
+      if(vericiteEnabled){
+        var $vericiteScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
+            $vericiteInfoContainer = $grade_container.find(".turnitin_info_container").empty(),
+            assetString = 'submission_' + submission.id,
+            vericiteAsset = vericiteEnabled && submission.turnitin_data && submission.turnitin_data[assetString];
+        // There might be a previous submission that was text_entry, but the
+        // current submission is an upload. The vericite asset for the text
+        // entry would still exist
+        if (vericiteAsset && submission.submission_type == 'online_text_entry') {
+          EG.populateVeriCite(submission, assetString, vericiteAsset, $vericiteScoreContainer, $vericiteInfoContainer, isMostRecent);
+        }
+      }else{
+        //default to TII
+        var $turnitinScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
+            $turnitinInfoContainer = $grade_container.find(".turnitin_info_container").empty(),
+            assetString = 'submission_' + submission.id,
+            turnitinAsset = turnitinEnabled && submission.turnitin_data && submission.turnitin_data[assetString];
+        // There might be a previous submission that was text_entry, but the
+        // current submission is an upload. The turnitin asset for the text
+        // entry would still exist
+        if (turnitinAsset && submission.submission_type == 'online_text_entry') {
+          EG.populateTurnitin(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent);
+        }
       }
 
       //handle the files
       $submission_files_list.empty();
       $turnitinInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
+      $vericiteInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
       $.each(submission.versioned_attachments || [], function(i,a){
         var attachment = a.attachment;
         if (attachment.crocodoc_url && EG.currentStudent.provisional_crocodoc_urls) {
@@ -1583,9 +1655,15 @@ define([
           .show();
         $turnitinScoreContainer = $submission_file.find(".turnitin_score_container");
         assetString = 'attachment_' + attachment.id;
-        turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
+        turnitinAsset = turnitinEnabled && submission.turnitin_data && submission.turnitin_data[assetString];
         if (turnitinAsset) {
           EG.populateTurnitin(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent);
+        }
+        $vericiteScoreContainer = $submission_file.find(".turnitin_score_container");
+        assetString = 'attachment_' + attachment.id;
+        vericiteAsset = vericiteEnabled && submission.turnitin_data && submission.turnitin_data[assetString];
+        if (vericiteAsset) {
+          EG.populateVeriCite(submission, assetString, vericiteAsset, $vericiteScoreContainer, $vericiteInfoContainer, isMostRecent);
         }
       });
 

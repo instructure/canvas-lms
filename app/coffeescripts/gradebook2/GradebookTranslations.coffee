@@ -13,7 +13,7 @@ define ['i18n!gradebook2'], (I18n) ->
     submission_tooltip_media_comment: I18n.t("Media Comment Submission")
     submission_tooltip_media_recording: I18n.t("Media Recording Submission")
     submission_tooltip_online_quiz: I18n.t("Quiz Submission")
-    submission_tooltip_turnitin: I18n.t('Has Turnitin score')
+    submission_tooltip_turnitin: I18n.t('Has similarity score')
     submission_tooltip_not_in_any_grading_period: I18n.t("This submission is not in any grading period"),
     submission_tooltip_in_another_grading_period: I18n.t("This submission is in another grading period"),
     submission_tooltip_in_closed_grading_period: I18n.t("This submission is in a closed grading period"),

@@ -4,13 +4,14 @@ define [
   'Backbone'
   'compiled/backbone-ext/DefaultUrlMixin'
   'compiled/models/TurnitinSettings'
+  'compiled/models/VeriCiteSettings'
   'compiled/models/DateGroup'
   'compiled/collections/AssignmentOverrideCollection'
   'compiled/collections/DateGroupCollection'
   'i18n!assignments'
   'compiled/util/GradingPeriods'
   'timezone'
-], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n, GradingPeriods, tz) ->
+], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n, GradingPeriods, tz) ->
 
   class Assignment extends Model
     @mixin DefaultUrlMixin
@@ -28,6 +29,9 @@ define [
         @set 'assignment_overrides', new AssignmentOverrideCollection(overrides)
       if (turnitin_settings = @get('turnitin_settings'))?
         @set 'turnitin_settings', new TurnitinSettings(turnitin_settings),
+          silent: true
+      if (vericite_settings = @get('vericite_settings'))?
+        @set 'vericite_settings', new VeriCiteSettings(vericite_settings),
           silent: true
       if (all_dates = @get('all_dates'))?
         @set 'all_dates', new DateGroupCollection(all_dates)
@@ -194,6 +198,9 @@ define [
     turnitinAvailable: =>
       typeof @get('turnitin_enabled') != 'undefined'
 
+    vericiteAvailable: =>
+      typeof @get('vericite_enabled') != 'undefined'
+
     gradeGroupStudentsIndividually: (setting) =>
       return @get('grade_group_students_individually') unless arguments.length > 0
       @set 'grade_group_students_individually', setting
@@ -206,6 +213,15 @@ define [
           !!@get( 'turnitin_enabled' )
       else
         @set( 'turnitin_enabled', setting )
+
+    vericiteEnabled: (setting) =>
+      if arguments.length == 0
+        if @get( 'vericite_enabled' ) == undefined
+          false
+        else
+          !!@get( 'vericite_enabled' )
+      else
+        @set( 'vericite_enabled', setting )
 
     groupCategoryId: (id) =>
       return @get( 'group_category_id' ) unless arguments.length > 0
@@ -330,7 +346,7 @@ define [
         'acceptsOnlineTextEntries', 'acceptsOnlineURL', 'allowedExtensions',
         'restrictFileExtensions', 'isOnlineSubmission', 'isNotGraded',
         'isExternalTool', 'externalToolUrl', 'externalToolNewTab',
-        'turnitinAvailable','turnitinEnabled', 'hasDueDateInClosedGradingPeriod',
+        'turnitinAvailable','turnitinEnabled', 'vericiteAvailable','vericiteEnabled', 'hasDueDateInClosedGradingPeriod',
         'gradeGroupStudentsIndividually', 'groupCategoryId', 'frozen',
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
         'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',
@@ -377,6 +393,8 @@ define [
         data.assignment_overrides = new AssignmentOverrideCollection overrides
       if (turnitin_settings = data.turnitin_settings)?
         data.turnitin_settings = new TurnitinSettings turnitin_settings
+      if (vericite_settings = data.vericite_settings)?
+        data.vericite_settings = new VeriCiteSettings vericite_settings
       data
 
     # Update the Assignment model instance to not parse results from the

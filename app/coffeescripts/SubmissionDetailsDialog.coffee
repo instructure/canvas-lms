@@ -14,7 +14,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.scrollTo'
   'vendor/jquery.ba-tinypubsub'
-], ($, submissionDetailsDialog, I18n, GradebookHelpers, {extractDataFor}, OutlierScoreHelper) ->
+], ($, submissionDetailsDialog, I18n, GradebookHelpers, {extractDataForTurnitin}, OutlierScoreHelper) ->
 
   class SubmissionDetailsDialog
     constructor: (@assignment, @student, @options) ->
@@ -89,9 +89,9 @@ define [
           comment.url = "#{@options.context_url}/users/#{comment.author_id}"
           urlPrefix = "#{location.protocol}//#{location.host}"
           comment.image_url = "#{urlPrefix}/images/users/#{comment.author_id}"
-        submission.turnitin = extractDataFor(submission, "submission_#{submission.id}", @options.context_url)
+        submission.turnitin = extractDataForTurnitin(submission, "submission_#{submission.id}", @options.context_url)
         for attachment in submission.attachments || []
-          attachment.turnitin = extractDataFor(submission, "attachment_#{attachment.id}", @options.context_url)
+          attachment.turnitin = extractDataForTurnitin(submission, "attachment_#{attachment.id}", @options.context_url)
       @submission.grade = "EX" if @submission.excused
       @dialog.html(submissionDetailsDialog(@submission))
       @dialog.find('select').trigger('change')
