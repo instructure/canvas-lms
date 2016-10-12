@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk'
+require 'aws-sdk-v1'
 
 class DeveloperKey < ActiveRecord::Base
   include CustomValidations

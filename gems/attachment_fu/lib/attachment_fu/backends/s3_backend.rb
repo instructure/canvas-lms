@@ -124,7 +124,7 @@ module AttachmentFu # :nodoc:
 
       def self.included(base) #:nodoc:
         begin
-          require 'aws-sdk'
+          require 'aws-sdk-v1'
         rescue LoadError
           raise RequiredLibraryNotFoundError.new('AWS SDK could not be loaded')
         end

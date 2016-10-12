@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk'
+require 'aws-sdk-v1'
 require 'json'
 require 'active_support'
 require 'active_support/core_ext/object/blank'
