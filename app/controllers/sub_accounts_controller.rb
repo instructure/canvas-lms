@@ -120,7 +120,8 @@ class SubAccountsController < ApplicationController
     end
     @parent_account = subaccount_or_self(parent_id)
     return unless authorized_action(@parent_account, @current_user, :manage_account_settings)
-    @sub_account = @parent_account.sub_accounts.build(params[:account])
+
+    @sub_account = @parent_account.sub_accounts.build(account_params)
     @sub_account.root_account = @context.root_account
     if params[:account][:sis_account_id]
       can_manage_sis = @account.grants_right?(@current_user, :manage_sis)
@@ -140,7 +141,7 @@ class SubAccountsController < ApplicationController
   def update
     @sub_account = subaccount_or_self(params[:id])
     params[:account].delete(:parent_account_id)
-    if @sub_account.update_attributes(params[:account])
+    if @sub_account.update_attributes(account_params)
       render :json => account_json(@sub_account, @current_user, session, [])
     else
       render :json => @sub_account.errors
@@ -167,5 +168,9 @@ class SubAccountsController < ApplicationController
     else
       @account.find_child(account_id)
     end
+  end
+
+  def account_params
+    strong_params.require(:account).permit(:name, :default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb)
   end
 end

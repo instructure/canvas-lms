@@ -53,7 +53,6 @@ describe AssignmentsHelper do
         submission_types: ["online_url"]
       })
       @context.account.update_attributes!({
-        turnitin_settings: {:originality_report_visibility => 'after_grading'},
         turnitin_account_id: 12345,
         turnitin_shared_secret: "the same combination on my luggage"
       })
@@ -72,7 +71,6 @@ describe AssignmentsHelper do
 
     it "returns false if turnitin is disabled on the account level" do
       @context.account.update_attributes!({
-        turnitin_settings: nil,
         turnitin_account_id: nil,
         turnitin_shared_secret: nil
       })

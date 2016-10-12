@@ -1,8 +1,66 @@
 class WeakParameters < ActiveSupport::HashWithIndifferentAccess
 end
 
+module ArbitraryStrongishParams
+  ANYTHING = Object.new.freeze
+
+  # this is mostly copy-pasted
+  def hash_filter(params, filter)
+    filter = filter.with_indifferent_access
+
+    # Slicing filters out non-declared keys.
+    slice(*filter.keys).each do |key, value|
+      next unless value
+
+      if filter[key] == ActionController::Parameters::EMPTY_ARRAY
+        # Declaration { comment_ids: [] }.
+        array_of_permitted_scalars_filter(params, key)
+      elsif filter[key] == ANYTHING
+        if filtered = recursive_arbitrary_filter(value)
+          params[key] = filtered
+        end
+      else
+        # Declaration { user: :name } or { user: [:name, :age, { address: ... }] }.
+        params[key] = each_element(value) do |element|
+          if element.is_a?(Hash)
+            element = self.class.new(element) unless element.respond_to?(:permit)
+            element.permit(*Array.wrap(filter[key]))
+          end
+        end
+      end
+    end
+  end
+
+  def recursive_arbitrary_filter(value)
+    if value.is_a?(Hash)
+      hash = {}
+      value.each do |k, v|
+        hash[k] = recursive_arbitrary_filter(v) if permitted_scalar?(k)
+      end
+      hash
+    elsif value.is_a?(Array)
+      arr = []
+      value.each do |v|
+        if permitted_scalar?(v)
+          arr << v
+        elsif filtered = recursive_arbitrary_filter(v)
+          arr << filtered
+        end
+      end
+      arr
+    elsif permitted_scalar?(value)
+      value
+    end
+  end
+end
+ActionController::Parameters.prepend(ArbitraryStrongishParams)
+
 # default to *non* strong parameters
 ActionController::Base.class_eval do
+  def strong_anything
+    ArbitraryStrongishParams::ANYTHING
+  end
+
   def params
     @_params ||= WeakParameters.new(request.parameters)
   end

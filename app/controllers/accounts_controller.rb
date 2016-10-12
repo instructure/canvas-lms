@@ -603,7 +603,7 @@ class AccountsController < ApplicationController
         remove_ip_filters = params[:account].delete(:remove_ip_filters)
         params[:account][:ip_filters] = [] if remove_ip_filters
 
-        if @account.update_attributes(params[:account])
+        if @account.update_attributes(strong_account_params)
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account }
         else
@@ -1002,12 +1002,18 @@ class AccountsController < ApplicationController
   end
   private :localized_timezones
 
-  # doesn't do anything yet but we'll be able to extend it if needed for future strong_params permittings
+  private
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret,
       :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,
       :default_time_zone, :parent_account, :default_storage_quota,
-      :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
-      :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5]
+      :default_storage_quota_mb, :storage_quota, :default_locale,
+      :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5,
+      :settings => strong_anything, :ip_filters => strong_anything
+    ]
+  end
+
+  def strong_account_params
+    strong_params.require(:account).permit(*permitted_account_attributes)
   end
 end
