@@ -49,6 +49,17 @@ end
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 require 'rspec/rails'
 
+require 'webmock'
+require 'webmock/rspec/matchers'
+WebMock.allow_net_connect!
+# unlike webmock/rspec, only reset in groups that actually do stubbing
+module WebMock::API
+  include WebMock::Matchers
+  def self.included(other)
+    other.after { WebMock.reset! }
+  end
+end
+
 # ensure people aren't creating records outside the rspec lifecycle, e.g.
 # inside a describe/context block rather than a let/before/example
 require_relative 'support/blank_slate_protection'

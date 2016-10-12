@@ -17,8 +17,6 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require 'webmock'
-WebMock.allow_net_connect!
 
 module Lti
   describe ToolProxyController, :include_lti_spec_helpers, type: :request do
@@ -149,9 +147,6 @@ module Lti
             expect(tp.update_payload).to be nil
             expect(tp.product_version).to eq '10.3'
             assert_requested :put, "http://awesome.dev/face.html"
-
-
-            WebMock.reset!
           end
 
           it 'rolls back if ack response != 200' do
@@ -189,8 +184,6 @@ module Lti
             expect(tp.updated_at).to eq last_updated_at
             expect(tp.product_version).to eq '1.0beta'
             assert_requested :put, "http://awesome.dev/face.html"
-
-            WebMock.reset!
           end
 
           # this should never happen
@@ -225,8 +218,6 @@ module Lti
             expect(tp.updated_at).to eq last_updated_at
             expect(tp.product_version).to eq '1.0beta'
             assert_not_requested :put, "http://awesome.dev/face.html"
-
-            WebMock.reset!
           end
         end
 
@@ -264,9 +255,6 @@ module Lti
             expect(tp.update_payload).to be nil
             expect(tp.product_version).to eq '1.0beta'
             assert_requested :delete, "http://awesome.dev/face.html"
-
-
-            WebMock.reset!
           end
         end
       end

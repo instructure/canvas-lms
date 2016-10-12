@@ -1,8 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 
 require 'nokogiri'
-require 'webmock'
-WebMock.allow_net_connect!
 
 describe "Common Cartridge exporting" do
 

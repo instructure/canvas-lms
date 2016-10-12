@@ -896,6 +896,8 @@ describe ExternalToolsController do
 
   describe "POST 'create_tool_with_verification'" do
     context "form post", type: :request do
+      include WebMock::API
+
       let(:post_body) do
         {
           custom_fields_string: '',
@@ -945,6 +947,10 @@ describe ExternalToolsController do
         AppCenter::AppApi.stubs(:new).returns(app_api)
         app_api.stubs(:fetch_app_center_response).returns(app_center_response)
         app_api.stubs(:get_app_config_url).returns(app_center_response['config_xml_url'])
+
+        configxml = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'config.youtube.xml'))
+        stub_request(:get, app_center_response['config_xml_url']).to_return(body: configxml)
+        stub_request(:get, "https://www.edu-apps.org/tool_i_should_not_have_access_to.xml").to_return(status: 404)
       end
 
       it 'creates tool when provided all required params' do
