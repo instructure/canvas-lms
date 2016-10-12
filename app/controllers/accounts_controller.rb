@@ -1001,4 +1001,13 @@ class AccountsController < ApplicationController
     end
   end
   private :localized_timezones
+
+  # doesn't do anything yet but we'll be able to extend it if needed for future strong_params permittings
+  def permitted_account_attributes
+    [:name, :turnitin_account_id, :turnitin_shared_secret,
+      :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,
+      :default_time_zone, :parent_account, :default_storage_quota,
+      :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
+      :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5]
+  end
 end
