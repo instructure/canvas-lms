@@ -1,9 +1,9 @@
 <div class='module-sequence-padding'></div>
-<div class='module-sequence-footer'>
+<div class='module-sequence-footer' role="navigation" aria-label="{{#t}}Module Navigation{{/t}}">
   <div class="module-sequence-footer-content">
     {{#if previous.show}}
-      <a 
-        href="{{previous.url}}" 
+      <a
+        href="{{previous.url}}"
         role="button"
         class="Button module-sequence-footer-button--previous"
         data-tooltip="right"
@@ -16,7 +16,7 @@
     {{/if}}
 
     {{#if next.show}}
-      <a 
+      <a
         href="{{next.url}}"
         role="button"
         class="Button module-sequence-footer-button--next"
