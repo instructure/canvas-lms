@@ -17,8 +17,8 @@ describe "users" do
       f(".add_pseudonym_link").click
       wait_for_ajaximations
       pseudonym_form.find_element(:css, "#pseudonym_unique_id").send_keys('new_user')
-      pseudonym_form.find_element(:css, "#pseudonym_password").send_keys('qwerty1')
-      pseudonym_form.find_element(:css, "#pseudonym_password_confirmation").send_keys('qwerty1')
+      pseudonym_form.find_element(:css, "#pseudonym_password").send_keys('qwertyuiop')
+      pseudonym_form.find_element(:css, "#pseudonym_password_confirmation").send_keys('qwertyuiop')
       submit_form(pseudonym_form)
       wait_for_ajaximations
 
@@ -26,7 +26,7 @@ describe "users" do
       expect(new_login).not_to be_nil
       expect(new_login.find_element(:css, '.account_name').text()).not_to be_blank
       pseudonym = Pseudonym.by_unique_id('new_user').first
-      expect(pseudonym.valid_password?('qwerty1')).to be_truthy
+      expect(pseudonym.valid_password?('qwertyuiop')).to be_truthy
     end
   end
 
@@ -289,7 +289,7 @@ describe "users" do
     end
 
     it "should register an observer" do
-      user_with_pseudonym(:active_all => true, :password => 'lolwut')
+      user_with_pseudonym(:active_all => true, :password => 'lolwut12')
 
       get '/register'
       f('#signup_parent').click
@@ -298,7 +298,7 @@ describe "users" do
       f('#parent_name').send_keys('parent!')
       f('#parent_email').send_keys('parent@example.com')
       f('#parent_child_username').send_keys(@pseudonym.unique_id)
-      f('#parent_child_password').send_keys('lolwut')
+      f('#parent_child_password').send_keys('lolwut12')
       f('input[name="user[terms_of_use]"]', form).click
 
       expect_new_page_load { form.submit }

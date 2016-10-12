@@ -155,8 +155,8 @@ describe Pseudonym do
 
   it "should change a blank sis_user_id to nil" do
     user
-    pseudonym = Pseudonym.new(:user => @user, :unique_id => 'test@example.com', :password => 'pwd123')
-    pseudonym.password_confirmation = 'pwd123'
+    pseudonym = Pseudonym.new(:user => @user, :unique_id => 'test@example.com', :password => 'passwd123')
+    pseudonym.password_confirmation = 'passwd123'
     pseudonym.sis_user_id = ''
     expect(pseudonym).to be_valid
     expect(pseudonym.sis_user_id).to be_nil
@@ -312,15 +312,15 @@ describe Pseudonym do
 
   describe 'valid_arbitrary_credentials?' do
     it "should ignore password if canvas authentication is disabled" do
-      user_with_pseudonym(:password => 'qwerty')
-      expect(@pseudonym.valid_arbitrary_credentials?('qwerty')).to be_truthy
+      user_with_pseudonym(:password => 'qwertyuiop')
+      expect(@pseudonym.valid_arbitrary_credentials?('qwertyuiop')).to be_truthy
 
       Account.default.authentication_providers.scope.delete_all
       Account.default.authentication_providers.create!(:auth_type => 'ldap')
       @pseudonym.reload
 
       @pseudonym.stubs(:valid_ldap_credentials?).returns(false)
-      expect(@pseudonym.valid_arbitrary_credentials?('qwerty')).to be_falsey
+      expect(@pseudonym.valid_arbitrary_credentials?('qwertyuiop')).to be_falsey
 
       @pseudonym.stubs(:valid_ldap_credentials?).returns(true)
       expect(@pseudonym.valid_arbitrary_credentials?('anything')).to be_truthy

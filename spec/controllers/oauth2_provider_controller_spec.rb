@@ -68,7 +68,7 @@ describe Oauth2ProviderController do
 
     context 'with a user logged in' do
       before :once do
-        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+        user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
       end
 
       before :each do

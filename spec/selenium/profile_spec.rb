@@ -72,11 +72,11 @@ describe "profile" do
     expect(errorboxes.any? { |errorbox| errorbox.text =~ /Can't exceed 255 characters/ }).to be_truthy
   end
 
-  it "rejects passwords shorter than 6 characters", priority: "2", test_id: 1055503 do
+  it "rejects passwords shorter than 8 characters", priority: "2", test_id: 1055503 do
     log_in_to_settings
     change_password('asdfasdf', SecureRandom.hex(2))
     errorboxes = ff('.error_text')
-    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Must be at least 6 characters/ }).to be_truthy
+    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Must be at least 8 characters/ }).to be_truthy
   end
 
   context "non password tests" do

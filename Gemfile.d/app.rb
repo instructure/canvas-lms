@@ -18,8 +18,8 @@ gem 'oj_mimic_json', require: false
 gem 'encrypted_cookie_store-instructure', '1.1.12', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
-gem 'authlogic', '3.4.6'
-  gem 'scrypt', '2.1.1'
+gem 'authlogic', '3.5.0'
+  gem 'scrypt', '3.0.3'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
@@ -36,7 +36,7 @@ gem "aws-sdk-v1", '1.66.0', require: false
 gem 'barby', '0.5.0', require: false
   gem 'rqrcode', '0.4.2', require: false
   gem 'chunky_png', '1.3.0', require: false
-gem 'bcrypt-ruby', '3.0.1'
+gem 'bcrypt-ruby', '3.1.5'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.4', require: false
 gem 'canvas_webex', '0.17'

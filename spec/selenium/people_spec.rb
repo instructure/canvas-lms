@@ -50,7 +50,7 @@ describe "people" do
   def create_user(student_name)
     user = User.create!(:name => student_name)
     user.register!
-    user.pseudonyms.create!(:unique_id => student_name, :password => 'qwerty', :password_confirmation => 'qwerty')
+    user.pseudonyms.create!(:unique_id => student_name, :password => 'qwertyuiop', :password_confirmation => 'qwertyuiop')
     @course.reload
     user
   end

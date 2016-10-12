@@ -181,7 +181,7 @@ describe "quizzes" do
     describe "moderation" do
 
       before do
-        @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+        @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
         @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
         @context = @course
         @quiz = quiz_model

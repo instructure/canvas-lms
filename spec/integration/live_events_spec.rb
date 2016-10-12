@@ -22,8 +22,8 @@ describe LiveEvents do
 
   it 'should trigger a live event on login' do
     Canvas::LiveEvents.expects(:logged_in).once
-    user_with_pseudonym(:username => 'jtfrd@instructure.com', :active_user => true, :password => 'qwerty')
-    post '/login', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwerty'}
+    user_with_pseudonym(:username => 'jtfrd@instructure.com', :active_user => true, :password => 'qwertyuiop')
+    post '/login', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}
     expect(response).to be_redirect
   end
 

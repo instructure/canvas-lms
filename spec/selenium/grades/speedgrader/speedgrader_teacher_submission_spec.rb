@@ -20,7 +20,7 @@ describe "speed grader submissions" do
       #create initial data for second student
       @student_2 = User.create!(:name => 'student 2')
       @student_2.register
-      @student_2.pseudonyms.create!(:unique_id => 'student2@example.com', :password => 'qwerty', :password_confirmation => 'qwerty')
+      @student_2.pseudonyms.create!(:unique_id => 'student2@example.com', :password => 'qwertyuiop', :password_confirmation => 'qwertyuiop')
       @course.enroll_user(@student_2, "StudentEnrollment", :enrollment_state => 'active')
       @submission_2 = @assignment.submit_homework(@student_2, :body => 'second student submission text')
 
@@ -68,7 +68,7 @@ describe "speed grader submissions" do
       # a student without a submission
       @student_2 = User.create!(:name => 'student 2')
       @student_2.register
-      @student_2.pseudonyms.create!(:unique_id => 'student2@example.com', :password => 'qwerty', :password_confirmation => 'qwerty')
+      @student_2.pseudonyms.create!(:unique_id => 'student2@example.com', :password => 'qwertyuiop', :password_confirmation => 'qwertyuiop')
       @course.enroll_user(@student_2, "StudentEnrollment", :enrollment_state => 'active')
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -106,7 +106,7 @@ describe "speed grader submissions" do
 
 
     it "should display no submission message if student does not make a submission", priority: "1", test_id: 283499 do
-      @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+      @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
       @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -256,7 +256,7 @@ describe "speed grader submissions" do
       end
 
       it "should show turnitin score for attached files", priority: "1", test_id: 283507 do
-        @user = user_with_pseudonym({:active_user => true, :username => 'student@example.com', :password => 'qwerty'})
+        @user = user_with_pseudonym({:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop'})
         attachment1 = @user.attachments.new :filename => "homework1.doc"
         attachment1.content_type = "application/msword"
         attachment1.size = 10093

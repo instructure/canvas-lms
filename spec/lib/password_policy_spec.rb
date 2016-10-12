@@ -35,7 +35,7 @@ describe Canvas::PasswordPolicy do
       @pseudonym.password = @pseudonym.password_confirmation = "aaaaa"
       expect(@pseudonym).not_to be_valid
 
-      @pseudonym.password = @pseudonym.password_confirmation = "aaaaaa"
+      @pseudonym.password = @pseudonym.password_confirmation = "aaaaaaaa"
       expect(@pseudonym).to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "football"
@@ -46,11 +46,11 @@ describe Canvas::PasswordPolicy do
     end
 
     it "should enforce minimum length" do
-      pseudonym_with_policy(:min_length => 6)
+      pseudonym_with_policy(:min_length => 10)
       @pseudonym.password = @pseudonym.password_confirmation = "asdfg"
       expect(@pseudonym).not_to be_valid
 
-      @pseudonym.password = @pseudonym.password_confirmation = "asdfgh"
+      @pseudonym.password = @pseudonym.password_confirmation = "asdfghijklm"
       expect(@pseudonym).to be_valid
     end
 

@@ -16,7 +16,7 @@ describe "speed grader - discussion submissions" do
       :name => 'first student',
       :active_user => true,
       :username => 'student@example.com',
-      :password => 'qwerty'
+      :password => 'qwertyuiop'
     )
     @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
     # create and enroll second student
@@ -24,7 +24,7 @@ describe "speed grader - discussion submissions" do
       :name => 'second student',
       :active_user => true,
       :username => 'student2@example.com',
-      :password => 'qwerty'
+      :password => 'qwertyuiop'
     )
     @course.enroll_user(student_2, "StudentEnrollment", :enrollment_state => 'active')
 

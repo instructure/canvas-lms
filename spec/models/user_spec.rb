@@ -1484,22 +1484,22 @@ describe User do
 
     it "should create a copy of an existing pseudonym" do
       # from unrelated account
-      user_with_pseudonym(:active_all => 1, :account => @account2, :username => 'unrelated@example.com', :password => 'abcdef')
+      user_with_pseudonym(:active_all => 1, :account => @account2, :username => 'unrelated@example.com', :password => 'abcdefgh')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1)
       expect(new_pseudonym).not_to be_nil
       expect(new_pseudonym).to be_new_record
       expect(new_pseudonym.unique_id).to eq 'unrelated@example.com'
 
       # from default account
-      @user.pseudonyms.create!(:unique_id => 'default@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
-      @user.pseudonyms.create!(:account => @account3, :unique_id => 'preferred@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
+      @user.pseudonyms.create!(:unique_id => 'default@example.com', :password => 'abcdefgh', :password_confirmation => 'abcdefgh')
+      @user.pseudonyms.create!(:account => @account3, :unique_id => 'preferred@example.com', :password => 'abcdefgh', :password_confirmation => 'abcdefgh')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1)
       expect(new_pseudonym).not_to be_nil
       expect(new_pseudonym).to be_new_record
       expect(new_pseudonym.unique_id).to eq 'default@example.com'
 
       # from site admin account
-      @user.pseudonyms.create!(:account => Account.site_admin, :unique_id => 'siteadmin@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
+      @user.pseudonyms.create!(:account => Account.site_admin, :unique_id => 'siteadmin@example.com', :password => 'abcdefgh', :password_confirmation => 'abcdefgh')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1)
       expect(new_pseudonym).not_to be_nil
       expect(new_pseudonym).to be_new_record
@@ -1513,7 +1513,7 @@ describe User do
 
       # from unrelated account, if other options are not viable
       user2 = User.create!
-      @account1.pseudonyms.create!(:user => user2, :unique_id => 'preferred@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
+      @account1.pseudonyms.create!(:user => user2, :unique_id => 'preferred@example.com', :password => 'abcdefgh', :password_confirmation => 'abcdefgh')
       @user.pseudonyms.detect { |p| p.account == Account.site_admin }.update_attribute(:password_auto_generated, true)
       Account.default.authentication_providers.create!(:auth_type => 'cas')
       Account.default.authentication_providers.first.move_to_bottom
@@ -1522,7 +1522,7 @@ describe User do
       expect(new_pseudonym).to be_new_record
       expect(new_pseudonym.unique_id).to eq 'unrelated@example.com'
       new_pseudonym.save!
-      expect(new_pseudonym.valid_password?('abcdef')).to be_truthy
+      expect(new_pseudonym.valid_password?('abcdefgh')).to be_truthy
     end
 
     it "should not create a new one when there are no viable candidates" do
@@ -1538,13 +1538,13 @@ describe User do
       @account3.authentication_providers.create!(:auth_type => 'cas')
       @account3.authentication_providers.first.move_to_bottom
       expect(@account3).to be_delegated_authentication
-      @user.pseudonyms.create!(:account => @account3, :unique_id => 'jacob@instructure.com', :password => 'abcdef', :password_confirmation => 'abcdef')
+      @user.pseudonyms.create!(:account => @account3, :unique_id => 'jacob@instructure.com', :password => 'abcdefgh', :password_confirmation => 'abcdefgh')
       expect(@user.find_or_initialize_pseudonym_for_account(@account1)).to be_nil
 
       # conflict
       @user2 = User.create! { |u| u.workflow_state = 'registered' }
-      @user2.pseudonyms.create!(:account => @account1, :unique_id => 'jt@instructure.com', :password => 'abcdef', :password_confirmation => 'abcdef')
-      @user.pseudonyms.create!(:unique_id => 'jt@instructure.com', :password => 'ghijkl', :password_confirmation => 'ghijkl')
+      @user2.pseudonyms.create!(:account => @account1, :unique_id => 'jt@instructure.com', :password => 'abcdefgh', :password_confirmation => 'abcdefgh')
+      @user.pseudonyms.create!(:unique_id => 'jt@instructure.com', :password => 'ghijklmn', :password_confirmation => 'ghijklmn')
       expect(@user.find_or_initialize_pseudonym_for_account(@account1)).to be_nil
     end
 
@@ -1554,7 +1554,7 @@ describe User do
       before :once do
         @shard1.activate do
           account = Account.create!
-          user_with_pseudonym(:active_all => 1, :account => account, :password => 'qwerty')
+          user_with_pseudonym(:active_all => 1, :account => account, :password => 'qwertyuiop')
         end
       end
 
@@ -1568,7 +1568,7 @@ describe User do
         p = @user.find_or_initialize_pseudonym_for_account(Account.site_admin)
         expect(p).to be_new_record
         p.save!
-        expect(p.valid_password?('qwerty')).to be_truthy
+        expect(p.valid_password?('qwertyuiop')).to be_truthy
       end
     end
   end
