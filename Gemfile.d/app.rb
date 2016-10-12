@@ -49,7 +49,7 @@ gem 'hairtrigger', '0.2.15'
   gem 'ruby_parser', '3.7.0', require: false
 gem 'hashery', '1.3.0', require: false
 gem 'highline', '1.7.8', require: false
-gem 'httparty', '0.13.7'
+gem 'httparty', '0.14.0'
 gem 'i18n', '0.7.0'
 gem 'i18nema', '0.0.8'
 gem 'i18nliner', '0.0.12'
@@ -102,7 +102,7 @@ gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
 gem 'sentry-raven', '0.15.6', require: false
 gem 'canvas_statsd', '1.0.3'
-gem 'diplomat', '0.15.0', require: false
+gem 'diplomat', '1.0.0', require: false
 gem 'gepub'
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
