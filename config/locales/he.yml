@@ -73,7 +73,7 @@ he:
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "הפורמטים האפשריים: hex, rgb, rgba, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "הפורמטים האפשריים: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "נתקבל: %{user}, בתפקיד %{role_type}, לקורס %{course}"
-  access_token_3be22221: "אסימון כניסה"
+  access_token_3be22221: "אסימון גישה"
   access_token_is_valid_until_d2f048cf: "הרשאת אסימון הגישה בתוקף עד"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "ניתן להשתמש באסימוני גישה כדי לאפשר לאפליקציות אחרות לבצע קריאות API בעבורך. תוכל/י גם לייצר אסימוני גישה ו *להשתמש ב Canvas Open API* כדי לפתח אינטגרציות עצמיות."
   accordion_section_1_7888782d: "איזור נפתח 1"
@@ -94,7 +94,7 @@ he:
     sis_id_in_use: "מזהה SIS \"%{sis_id}\" כבר נמצא בשימוש"
     tab_admin_tools: "כלים ניהוליים"
     tab_authentication: הזדהות
-    tab_brand_configs: נושאים
+    tab_brand_configs: "ערכות נושא"
     tab_courses: קורסים
     tab_developer_keys: "מפתחות פיתוח"
     tab_faculty_journal: "יומן פקולטה"
@@ -883,7 +883,7 @@ he:
         allow_sending_scores_in_emails: "תלמידים יכולים להרשם לקבלת תוצאות בהתראות לדוא\"ל"
         allow_sis_import: "ייבוא SIS"
         author_email_in_notifications: "הצגת כתובת הדוא\"ל של השולח בהודעות תקשורת למשתמשים"
-        canvadocs_prefer_office_online: "העדפת דפדפן אופיס 365"
+        canvadocs_prefer_office_online: "העדפת מציג הקבצים של אופיס 365"
         default_language: "שפת ברירת המחדל"
         default_time_zone: "איזור זמן ברירת המחדל"
         domain: דומיין
@@ -910,7 +910,7 @@ he:
         message: הודעה
         mfa_settings: "אימות זיהוי רב-מרכיבים"
         name: "שם חשבון"
-        new_sub_account_includes: "אפשר/י לחשבונות משנה להשתמש בעורך העיצוב כדי לבצע מיתוג עצמאי "
+        new_sub_account_includes: "אפשר/י לחשבונות משנה להשתמש בעורך ערכות הנושא כדי לבצע מיתוג עצמאי "
         no_enrollments_can_create_courses: "משתמשים ללא רישומים לקורסים"
         open_registration: "הרשמה פתוחה"
         originality_report_visibility: "לתלמידים האפשרות לעיין בדוח המקוריות "
@@ -1046,7 +1046,7 @@ he:
       account_reports: 
         sis_export: 
           description: 
-            text: "דוח יצוא למערכת הבית ספרית: דוח זה ייצא את כל הקבצים הנחוצים עבור משתמשים, חשבונות, תקופות לימוד, קורסים, הקבצות, הרשמות, קבוצות, חברויות בקבוצה, ורשימות צולבות עבור התאמה לקטגוריות המקבילות במערכת הבית ספרית. הדבר יאחזר רק פריטים אשר נוצרו או עודכנו דרך המערכת הבית ספרית."
+            text: "דוח יצוא למערכת הבית ספרית: דוח זה ייצא את כל הקבצים הנחוצים עבור משתמשים, חשבונות, תקופות לימוד, קורסים, הקבצות, הרשמות, קבוצות, חברויות בקבוצה, ורשימות צולבות עבור התאמה לקטגוריות המקבילות במערכת הבית ספרית. התהליך יאחזר רק פריטים אשר נוצרו או עודכנו דרך המערכת הבית ספרית."
     sis_export_csv_parameters: 
       account_reports: 
         default: 
@@ -1289,7 +1289,7 @@ he:
   add_section_8b027a1c: "הוספת הקבצה"
   add_students_to_the_course_874be8fb: "הוספת תלמידים לקורס"
   add_tas_to_the_course_2aac6e02: "הוספת עוזרי הוראה לקורס"
-  add_theme_32fa3d50: "הוספת נושא"
+  add_theme_32fa3d50: "הוספת ערכת נושא"
   add_user_e73e8e50: "הוספת משתמש"
   add_users_to_name_b8109bbb: "הוספת משתמשים ל  %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "הוספת משימותיך. ניתן לערוך רשימה ארוכה או לפרק לקבוצות - ואפילו להגדיר משקלות לכל קבוצת משימות"
@@ -1367,7 +1367,7 @@ he:
   all_terms_cd27b0fb: "כל התקופות/תנאים"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "אפשר/י למפקח לסקור מספר חישובי ציונים עצמאיים עבור הגשות נבחרות"
   allow_bulk_grade_export_to_sis_e11a6e66: "אפשר / י ייצוא  ציונים במכלול למערכת הבית ספרית"
-  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "הרשאת השמה של תמונות הקורס לקורס והשימוש על גבי לוח המחוונים."
+  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "הרשאת השמה של תמונות הקורס לקורס והשימוש בהן על גבי לוח המחוונים."
   allow_lor_tools: "אפשר/י למשתמשים לעיין ולהשתמש בכלי קונפיגורציה חיצוניים עבור LOR."
   allow_multiple_attempts_e67a0a37: "אפשרי נסיונות מרובים"
   allow_opt_out_of_inbox: "אפשר / י למשתמשים לעזוב את תיבת הדוא\"ל הפנימית של השיחות. הדבר יגרום לכל הודעות ותזכורות השיחה להישלח מהר ככל האשפר לדוא\"ל העיקרי של המשתמש, תוך העלמת ההודעות שלא נקראו בתיבה, והעלמת ההעדפות של הודעות השיחה."
@@ -1384,8 +1384,8 @@ he:
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*אירעה שגיאה*, בבקשה לפרסם שוב את תשובתך מאוחר יותר"
   an_error_occurred_publishing_grades_cfdf7631: "אירעה שגיאה בעת פרסום הציונים."
   an_error_occurred_selecting_provisional_grades_9d7bcda: "אירעה שגיאה בעת בחירת הציונים הזמניים"
-  an_error_occurred_trying_to_apply_this_theme_pleas_253d0996: "אירעה שגיאה בעת הנסיון להחיל עיצוב זה. נא לנסות שוב."
-  an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "אירעה שגיאה בנסיון לייצר עיצוב זה. נא לנסות שנית."
+  an_error_occurred_trying_to_apply_this_theme_pleas_253d0996: "אירעה שגיאה בעת הנסיון להחיל ערכת נושא זה. נא לנסות שוב."
+  an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "אירעה שגיאה בנסיון לייצר ערכת נושא זה. נא לנסות שנית."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "אירעה שגיאה בעת הנסיון להכין הורדת קובץ. נא לנסות שנית."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "אירעה שגיאה בעת ההגדרה של זכויות שימוש ל %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "אירעה שגיאה בעת הנסיון להתחבר ל Turnitin."
@@ -1535,7 +1535,7 @@ he:
   application_id_2aa1640f: "מזהה אפליקציה"
   application_secret_e6803c7e: "סיסמה סודית של היישום"
   apply_781a2546: החל
-  apply_theme_7af08387: "החלת נושא"
+  apply_theme_7af08387: "החלת ערכת נושא"
   applying_new_styles_to_subaccounts_e8aeeef2: "החלת סגנונות חדשים לחשבונות המשנה"
   appointment_group: 
     errors: 
@@ -1571,7 +1571,7 @@ he:
   argentina_3257a200: ארגנטינה
   arrange_by_34a545de: "אירגון לפי"
   arrange_columns_by_assignment_group_33acdf03: "ארגן את העמודות לפי קבוצת משימה."
-  arrange_columns_by_assignment_group_59bbddd0: "סידור עמודות לפי קבוצת השמה"
+  arrange_columns_by_assignment_group_59bbddd0: "סידור עמודות לפי קבוצת משימה"
   arrange_columns_by_due_date_888f2551: "ארגן את העמודות לפי תאריך יעד"
   arrange_columns_by_due_date_f74f9e2d: "סידור עמודות לפי תאריך יעד"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "בעת הקלדה בשדה זה, רשימת הקבוצות תסונן אוטומטית לאלו העונים על הקלט שלך."
@@ -1675,7 +1675,7 @@ he:
     unmute_dialog: "משימה זו כרגע אינה פעילה. המשמעות הנה שתלמידים אינם יכולים לעיין בציוניהם ובמשוב. האם להפעילה מחדש?"
     unmuting_assignment: "מחדש משימה שהושתקה..."
   assignment_name_b2d87383: "שם משימה"
-  assignment_name_grade_history_b506426c: "%{assignment_name} הסטורית הציונים של "
+  assignment_name_grade_history_b506426c: "הסטורית הציונים של %{assignment_name}  "
   assignment_options_1e5b7074: "אפשרויות משימה"
   assignment_override: 
     student_count: 
@@ -2179,7 +2179,7 @@ he:
             ניתן להוסיף הערות ומחשבות שלך לגבי מבנה הקורס
             אופן ההתנהלות בו וכל נושא אחר רלוונטי.
             
-            כדי להוסיף הערות, יש להקליק על קישור העריכה למעלה.
+            כדי להוסיף הערות, יש להקליק על קישור העריכה שלמעלה.
       labels: 
         syllabus_body: "תיאור תוכנית הלימוד"
       links: 
@@ -2266,7 +2266,7 @@ he:
     corrupted: "אין פירוט"
     login: התחברות
     logout: התנתקות
-  authentication_with_provider_was_successful_but_no_6a194137: "ההזדהות בעזרת %{provider} הצליחה, אך לא סופק מזהה ייחודי לכניסה לקנבס."
+  authentication_with_provider_was_successful_but_no_6a194137: "ההזדהות עם %{provider} הצליחה, אך לא סופק מזהה ייחודי לכניסה לקנבס."
   authorize_e3f25bb4: הרשאה
   available_8606e40c: זמין
   available_after_unlock_at_b5682224: "זמין אחרי %{unlock_at}"
@@ -3979,7 +3979,7 @@ he:
   correct_answers_are_no_longer_available_c67dfc28: "התשובות הנכונות אינן זמינות יותר"
   correct_answers_will_be_available_from_to_5762e8c6: "התשובות הנכונות תהינה זמינות מ %{from} עד %{to}."
   correct_answers_will_be_available_on_date_48137: "התשובות הנכונות תהינה זמינות בתאריך %{date}."
-  correct_check_icon_617da6c3: "צלמית אישור"
+  correct_check_icon_617da6c3: "צלמית אישור בחירה"
   couldn_t_find_an_authority_to_update_44d9407e: "לא נמצאה הסמכות שתוכל לעדכן"
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "ה headers של ייבוא קבצי CSV של קנבס לא נמצאו"
   couldn_t_generate_diff_message_a0528b20: "פעולת ההשוואה לא הצליחה: %{message}"
@@ -4766,7 +4766,7 @@ he:
   create_account_263ec6: "יצירת חשבון"
   create_assignment_68532ceb: "יצירת משימה"
   create_failed_15d07ad4: "יצירה נכשלה"
-  create_theme_based_on_40651ed3: "יצירת נושא המבוסס על"
+  create_theme_based_on_40651ed3: "יצירת ערכת נושא המבוסס על"
   create_users_view: 
     required: "יש לספק כמה כתובות דוא\"ל"
   created_at_73839757: "נוצר במועד:"
@@ -4867,7 +4867,7 @@ he:
   current_mastery_score_score_out_of_mastery_points_fedd343f: "ציון רמת מומחיות נוכחית: %{score}  מתוך %{mastery_points}"
   current_provider_6c3f7f96: "ספק נוכחי"
   current_score_6c81792: "ציון נוכחי"
-  current_theme_62e5e8cf: "נושא נוכחי"
+  current_theme_62e5e8cf: "ערכת נושא נוכחית"
   current_total_67bf5f72: "סה\"כ נוכחי"
   curve_grades_b7a75443: "עקומת ציונים"
   curve_grades_dialog: 
@@ -5068,7 +5068,7 @@ he:
   default_question_name: שאלה
   default_question_text: "תוכן שאלה"
   default_template_f2a759ed: "תבנית ברירת מחדל"
-  default_templates_are_used_as_starting_points_for__f06f9e33: "תבניות ברירת מחדל משמשות כנקודות מוצא לנושאים חדשים ואין אפשרות לבטלן."
+  default_templates_are_used_as_starting_points_for__f06f9e33: "תבניות ברירת מחדל משמשות כנקודות מוצא לערכות נושא חדשות ואין אפשרות לבטלן."
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "הגדרת מלל הקודמת והעוקבת רשימה נפתחת ובנית אוסף של תשובות אפשריות"
   delay_posting_this_topic_until_aa483eec: "השהית פרסום נושא זה עד"
   delete_a6efa79d: ביטול
@@ -5085,13 +5085,13 @@ he:
   delete_rubric_9b66412d: "ביטול רובריקה"
   delete_selected_a023ccf8: "ביטול פריטים נבחרים"
   delete_survey_56fddbbd: "ביטול סקר"
-  delete_theme_bdb70d25: "ביטול נושא"
+  delete_theme_bdb70d25: "ביטול ערכת נושא"
   delete_this_announcement_fbb4643: "ביטול הכרזה זו"
   delete_this_answer_f1802eaa: "ביטול תשובה זו"
   delete_this_collaboration_4f20b698: "ביטול שיתוף פעולה זה"
   delete_this_feed_67d5d924: "ביטול פיד זה"
   delete_this_question_8f955ceb: "ביטול שאלה זו"
-  delete_this_theme_46d95edc: "לבטל נושא זה?"
+  delete_this_theme_46d95edc: "לבטל ערכת נושא זו?"
   delete_this_token_f5962a4f: "ביטול אסימון זה"
   delete_tool_90ca44da: "ביטול כלי "
   delete_tool_app_9c9f6d35: "האם לבטל את האפליקציה %{tool}  ?"
@@ -5637,7 +5637,7 @@ he:
   edit_this_announcement_ae6e17b3: "עריכת הכרזה זו"
   edit_this_collaboration_393b1a9a: "עריכת שיתוף פעולה זה"
   edit_this_question_1c82c3cf: "עריכת שאלה זו"
-  edit_this_theme_in_theme_editor_f8f07ac9: "עריכת עיצוב בעזרת עורך העיצוב הגמיש"
+  edit_this_theme_in_theme_editor_f8f07ac9: "עריכת ערכת נושא זו בעזרת עורך העיצוב הגמיש"
   edit_tool_690c199b: "עריכת כלי"
   edit_toolname_app_23cfbb8: "עריכת אפליקציה %{toolName} "
   edit_user_details_4d7b63ff: "עריכת פרטי משתמש"
@@ -6108,7 +6108,7 @@ he:
   export_de71cd8e: ייצוא
   exporting_b1eab154: מייצא
   external_apps_f5490181: "אפליקציות חיצוניות"
-  external_collaborations_tool_a4899abb: "כלי שיתופי פעולה חיצוני"
+  external_collaborations_tool_a4899abb: "כלי שיתופי פעולה חיצוניים"
   external_content: 
     cancel: 
       canceling: מבטל...
@@ -6329,7 +6329,7 @@ he:
         no_preview_available: "אין תצוגה מקדימה לקובץ זה"
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "קבץ(ים) יכללו בכל הדפים באפליקצית שולחן העבודה של קנבס"
   file_s_will_be_included_when_user_content_is_displ_4e16dc3c: "קבץ(ים) יכללו כאשר תוכן המשתמש מוצג בתוך אפליקציות iOS או אנדרואיד של קנבס."
-  file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "קבץ(ים) יכללו כאשר תוכן המשתמש מוצג בתוך אפליקציות iOS או אנדרואיד של קנבס, ובאפליקציות צד שלישי שנבנו בעזרת ה API שלנו."
+  file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "הקבץ(ים) יכללו כאשר תוכן המשתמש מוצג בתוך אפליקציות iOS או אנדרואיד של קנבס, ובאפליקציות צד שלישי שנבנו בעזרת ה API שלנו."
   file_size_limit_user_file_quota_applies_19b9b466: "%{file_size_limit} מגבלת מכסת גדל קבצי משתמש מופעלת"
   file_status: 
     hidden_status: "מוסתר. זמין רק עם קישור יעודי."
@@ -6443,7 +6443,7 @@ he:
     one: "נמצא קישור אחד לא תקין"
     other: "נמצאו %{count} קישורים לא תקינים"
   found_count_unresponsive_links_d1791380: 
-    one: "נמצא 1 קישור שאינו מגיב"
+    one: "נמצא קישור אחד שאינו מגיב"
     other: "נמצאו %{count} קישורים שאינם מגיבים"
   from_fdd4956d: מ-
   from_from_to_to_e31f6422: "מ %{from} עד %{to}"
@@ -10003,7 +10003,7 @@ he:
     sure_you_want_to_mute: "בטוח/ה שרוצה להשתיק משימה זו? כאשר היא אינה פעילה, תלמידים לא יקבלו התראות ולא יוכלו לעיין בה"
   muted_283cfa0f: (מושתק/ת)
   my_dashboard_b724020: "לוח המחוונים שלי"
-  my_themes_b72217b8: "הנושאים שלי"
+  my_themes_b72217b8: "ערכות הנושא שלי"
   n_554bc493: "n"
   n_a_d6f6c42f: N/A
   n_number_of_times_c2e78b72: "n פעמים"
@@ -10097,7 +10097,7 @@ he:
   note_question_details_not_available_when_more_than_93199f6d: "שימו לב: פרטי השאלה אינם זמינים כאשר יש יותר מאשר %{question_count} שאלות"
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "הערה: ישנם פריטים אשר תאריכיהם נופלים מחוץ להגדרת תאריך התחילה ו/או הסיום של הקורס"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "הערה: תלמידים הגישו עבודות למשימות אלו שטרם הערכו. אם הציונים יתפרסמו כעת, יהיה צורך לפרסם מחדש את הציונים לאחר סיום כל ההערכות"
-  note_sub_account_themes_are_not_active_during_this_a5dd9da: "הערה: העיצוב של חשבונות משנה אינו פעיל בתצוגה מקדימה זו."
+  note_sub_account_themes_are_not_active_during_this_a5dd9da: "הערה: ערכות הנושא של חשבונות משנה אינו פעיל בתצוגה מקדימה זו."
   note_that_email_may_not_always_be_populated_in_the_bb4a1572: "יש לשים לב שהודעות דוא\"ל לא תמיד מגיעות לפרופיל המשתמש במיקרוסופט. Oid לא יאוכלס עבור חשבונות פרטיים של מיקרוסופט."
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "יש לשים לב שכמה מאפיינים לא יעברו למשתמשי Clever."
   note_this_login_s_account_uses_delegated_authentic_89227914: "יש לשים לב: חשבון הלוג-אין הזה משתמש במנגנון הזדהות מואצל, אך מאפשר החזר סיסמת ההזדהות של קנבס. שדות הסיסמה בטופס זה מעדכנים את סיסמת ההחזר של קנבס, *לא* של ההזדהות שהואצלה."
@@ -10451,7 +10451,7 @@ he:
   only_once_after_each_attempt_cc842738: "רק פעם אחת בתום כל נסיון"
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "רק מורים יכולים לראות קורס זה עד אשר יפורסם."
   open_color_picker_f117df0a: "בחירת צבע חופשית"
-  open_in_theme_editor_156028e2: "פתוח בעורך הנושאים הגמיש"
+  open_in_theme_editor_156028e2: "פתוח בעורך ערכות הנושא הגמיש"
   open_theme_editor_2d924ebe: "עורך עיצוב גמיש"
   open_title_in_a_new_window_b29fed77: "פתיחת %{title} בחלון חדש"
   option_1_dea39f90: "אפשרות 1"
@@ -10706,7 +10706,7 @@ he:
   peru_7dcfdc91: פרו
   philippines_37a6289e: פיליפינים
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "בחירת יעד, לשם נשלח לך שגיאות"
-  pick_a_name_to_save_this_theme_as_9773cb1a: "יש לבחור שם כדי לשמור נושא זה."
+  pick_a_name_to_save_this_theme_as_9773cb1a: "יש לבחור שם כדי לשמור ערכת נושא זה."
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "בחירת נקודת קצה לשם נפרסם את דוחות השגיאות שלך"
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "בחירת תאריך ושעה עבור הגדרות שיחת הועידה הזו:"
   pink_68ad45cb: ורוד
@@ -13208,7 +13208,7 @@ he:
   save_11a80ec3: שמירה
   save_changes_698abe77: "שמירת שינויים"
   save_publish_36440725: "שמירה ופרסום"
-  save_theme_f706116e: "שמירת נושא"
+  save_theme_f706116e: "שמירת ערכת נושא"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "שמירת %{type} שלך כדי להתחיל להגדיר את התוכן המותנה."
   saving_d55dd90e: שומר...
   saving_recording_e111cb05: "שמירת הקלטה..."
@@ -14853,11 +14853,11 @@ he:
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "המזהה הייחודי המשמש לייצג סבב equest/response שלגביו דוח השגיאה הופק."
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "כתובת הדף בו משתמשים מורשים יכולים להשתמש כדי להתחזות למשתמש המדווח באותו הדף עצמו, כדי לנסות ולשחזר את הבעיה."
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "כתובת הדף בו המשתמש היה כאשר דווח על השגיאה"
-  theme_52404e51: נושא
-  theme_editor_b7b00f6b: "עורך העיצוב"
-  theme_editor_changes_have_been_cancelled_2af5cc5f: "שינויי עורך העיצוב בוטלו"
-  theme_name_68f46e09: "שם הנושא"
-  themes_89bfe9c4: נושאים
+  theme_52404e51: "ערכת נושא"
+  theme_editor_b7b00f6b: "עורך ערכות נושא"
+  theme_editor_changes_have_been_cancelled_2af5cc5f: "שינויי עורך ערכות נושא בוטלו"
+  theme_name_68f46e09: "שם ערכת הנושא"
+  themes_89bfe9c4: "ערכות נושא"
   there_are_count_results_in_the_list_e74f6e36: 
     one: "יש תוצאה אחת ברשימה"
     other: "ישנן  %{count} תוצאות ברשימה"
@@ -15168,7 +15168,7 @@ he:
       אם הספק יכול לקנפג קריאה חוזרת תקינה או לנתב URIים, אפשר להשתמש ב  %{callback_url}.
   to_link_the_course_observer_name_to_a_student_star_f993c826: "כדי לקשר את משקיף הקורס *%{name}* לתלמיד, התחל/י להקליד את שם התלמיד מתחת כדי למצאו ואז להקליק עדכון."
   to_minscore_43e5452e: "עד %{minScore}%"
-  to_preview_theme_editor_branding_you_will_need_to__462dda1a: "כדי לעיין בתצוגה מוקדמת של עורך העיצוב, יש צורך ב *הסרת הממשק של קונטרסט רב*"
+  to_preview_theme_editor_branding_you_will_need_to__462dda1a: "כדי לעיין בתצוגה מוקדמת של עורך העיצוב של ערכות הנושא, יש צורך ב *הסרת הממשק של קונטרסט רב*"
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "להגבלת משתמשים מאיזור Clever מסוים, יש לספק את מזהה האיזור כאן. הדבר נחוץ עבור התחברות מיידית של Clever לצורך עבודה בסביבה מרובת פעילים."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "כדי להגביל משתמשים מדומיין ספציפי של גוגל אפפס, יש להקליד את הדומיין כאן."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "להגבלת משמשי  Azure Active Directory שלך, יש להקליד את מזהה החברות שלך כאן."
@@ -15806,7 +15806,7 @@ he:
   webct_file_description: " קורס  +Blackboard Vista/CE, WebCT 6"
   webct_name: "Blackboard Vista/CE (WebCT) "
   week_s_cb1492ee: שבוע(ות)
-  welcome_to_the_canvas_theme_editor_73091d1: "ברוכים הבאים לעורך העיצוב של קנבס"
+  welcome_to_the_canvas_theme_editor_73091d1: "ברוכים הבאים לעורך ערכות הנושא של קנבס"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "ברוכים הבאים לקורסים שלכם! כדי לארגן לכם את רשימת הקורסים לפי נוחיותכם, הקליקו על הקישור \"כל הקורסים\" וסמנו בכוכבית את הקורסים להצגה."
   well_below_mastery_37664bdc: "רחוק מאד מהתמחות"
   what_are_self_sign_up_groups_af1f002a: "מהן קבוצות רישום עצמי?"
@@ -16015,7 +16015,7 @@ he:
   you_can_try_to_log_in_again_2b23ef0f: "ניתן לנסות *להתחבר שוב*"
   you_can_update_some_of_this_user_s_information_but_8e99a045: "ניתן לעדכן חלק מהמידע על המשתמש, אם הם יכולים לשנות זאת חזרה אם ירצו בכך."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "ניתן להשתמש בקובץ יחיד מסוג ICO בגודל  16x16, 32x32, 48x48."
-  you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "אינך יכול/ה לערוך עיצובי דף בחשבון משנה זה."
+  you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "אינך יכול/ה לערוך ערכות נושא בחשבון משנה זה."
   you_cannot_remove_this_enrollment_c87be1cb: "אין אפשרות להסיר הרשמה זו."
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "אינך מורשה להכנס לדיון המבוקש."
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "אינך מורשה לגשת לבוחן המבוקש."
@@ -16038,11 +16038,12 @@ he:
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "יש לבחור קורס כדי להעתיק תוכן ממנו"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "יש להגדיר זאת כמספר הגדול או שווה ל %{min}"
   you_must_specify_a_usage_right_5eb57f87: "חובה להגדיר זכויות שימוש"
+  you_need_to_enable_the_new_ui_feature_before_editi_50cbd68: "יש לשפעל את תכונת ממשק המשתמש החדש כדי לאפשר עריכת ערכות נושא"
   you_need_to_preview_changes_before_saving_85e60232: "עליך \"לעיין בשינויים בתצוגה מקדימה\" לפני ביצוע שמירה."
   you_need_to_preview_your_changes_before_applying_t_468d56e4: "עליך \"לעיין בשינוייך בתצוגה מקדימה\" לפני השמתם לכולם."
   you_need_to_save_before_applying_to_this_account_7436a5ae: "יש לבצע שמירה לפני השמה לחשבון זה"
-  you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: "הנך עורכ/ת את תבנית עיצוב דפי הקנבס שלך! יש ליישם או לבטל את השינויים מתוך *עורך העיצוב*"
-  you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "הנך עורכ/ת את עיצוב תבנית דפי הקנבס שלך! השינויים טרם יושמו."
+  you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: "הנך עורכ/ת את ערכת הנושא של קנבס שלך! יש ליישם או לבטל את השינויים מתוך *עורך ערכות הנושא*"
+  you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "הנך עורכ/ת את ערכת נושא של קנבס שלך! השינויים טרם יושמו."
   you_scored_a_score_a5dd5561: "קיבלת ציון של %{score}."
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "נרשמת לקורס, %{course}. התפקיד בקורס: %{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "קיבלת חשבון בעל תפקיד עבור החשבון  %{account} ב %{website}. סוג התפקיד: %{role_type}."
@@ -16093,7 +16094,7 @@ he:
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "משימותיך תוצגנה כאן, ממוינות לפי תאריך יעד."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "הדפדפן שלך אינו תומך בדרישות המינימום של קנבס. נא לבקר ב *Canvas Community* כדי ללמוד על הרשימה השלמה של דפדפנים נתמכים."
   your_content_has_been_exported_bbb57764: "התוכן שלך יוצא"
-  your_custom_theme_has_been_successfully_applied_eaa0fc82: "העיצוב הידני שלך יושם בהצלחה"
+  your_custom_theme_has_been_successfully_applied_eaa0fc82: "העיצוב הידני של ערכת הנושא שלך יושם בהצלחה"
   your_email_b5364bee: "כתובת הדוא\"ל שלך"
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "הקובץ שלך מועלה כעת לספר הציונים, וניתן לעזוב דף זה בכל עת. אם יש לך קובץ CSV גדול, עדכון השינויים יכול להמשך כמה דקות. כדי למנוע דריסת נתונים כלשהם, בבקשה לוודא שההעלאה הושלמה וספר הציונים שלך נכון, לפני המשך ביצוע שינויים. "
   your_message_has_been_sent_thank_you_e0284316: "הודעתך נשלחה, תודה!"
