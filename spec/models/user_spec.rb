@@ -1195,6 +1195,10 @@ describe User do
       expect(User.avatar_fallback_url('%{fallback}')).to eq(
         '%{fallback}'
       )
+      HostUrl.stubs(:cdn_host).returns('https://mydistribution.cloudfront.net')
+      expect(User.avatar_fallback_url).to eq(
+        "https://mydistribution.cloudfront.net/images/messages/avatar-50.png"
+      )
     end
 
     describe "#clear_avatar_image_url_with_uuid" do
