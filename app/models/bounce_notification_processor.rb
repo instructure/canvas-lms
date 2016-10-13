@@ -16,16 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-v1'
+require 'aws-sdk'
 
 class BounceNotificationProcessor
   attr_reader :config
 
-  POLL_PARAMS = %w{initial_timeout idle_timeout wait_time_seconds visibility_timeout}.map(&:to_sym)
+  POLL_PARAMS = %i{idle_timeout wait_time_seconds visibility_timeout}.freeze
   DEFAULT_CONFIG = {
     bounce_queue_name: 'canvas_notifications_bounces',
     idle_timeout: 10
-  }
+  }.freeze
 
   def self.config
     @@config ||= ConfigFile.load('bounce_notifications').try(:symbolize_keys)
@@ -58,14 +58,13 @@ class BounceNotificationProcessor
 
   def bounce_queue
     return @bounce_queue if defined?(@bounce_queue)
-    sqs = AWS::SQS.new(access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key])
-    @bounce_queue = sqs.queues.named(config[:bounce_queue_name])
+    sqs = Aws::SQS::Client.new(config.slice(:access_key_id, :secret_access_key, :region, :endpoint))
+    @bounce_queue = Aws::SQS::QueuePoller.new(sqs.get_queue_url(queue_name: config[:bounce_queue_name]).queue_url, client: sqs)
   end
 
   def parse_message(message)
-    sqs_body = JSON.parse(message.body)
-    sns_body = JSON.parse(sqs_body['Message'])
-    bounce_notification = sns_body['bounce']
+    sns_body = JSON.parse(message.body)
+    sns_body['bounce']
   end
 
   def process_bounce_notification(bounce_notification)
