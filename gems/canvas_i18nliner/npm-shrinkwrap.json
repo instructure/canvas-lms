@@ -404,9 +404,9 @@
       "resolved": "https://registry.npmjs.org/http-signature/-/http-signature-1.1.1.tgz"
     },
     "i18nliner": {
-      "version": "0.1.5",
-      "from": "i18nliner@0.1.5",
-      "resolved": "https://registry.npmjs.org/i18nliner/-/i18nliner-0.1.5.tgz"
+      "version": "0.1.6",
+      "from": "i18nliner@0.1.6",
+      "resolved": "https://registry.npmjs.org/i18nliner/-/i18nliner-0.1.6.tgz"
     },
     "i18nliner-handlebars": {
       "version": "0.2.0",
