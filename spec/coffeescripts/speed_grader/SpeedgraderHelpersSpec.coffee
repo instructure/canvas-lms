@@ -125,3 +125,99 @@ define [
     @testArea.innerHTML = @startingHTML
     SpeedgraderHelpers.setRightBarDisabled(false)
     equal(@testArea.innerHTML, @startingHTML)
+
+  module "SpeedgraderHelpers#classNameBasedOnStudent",
+    setup: ->
+      @student =
+        submission_state: null,
+        submission: submitted_at: "2016-10-13 12:22:39"
+
+  test "returns graded for graded", ->
+    @student.submission_state = 'graded'
+    state = SpeedgraderHelpers.classNameBasedOnStudent(@student)
+    deepEqual(state, raw: 'graded', formatted: 'graded')
+
+  test "returns 'not graded' for not_graded", ->
+    @student.submission_state = 'not_graded'
+    state = SpeedgraderHelpers.classNameBasedOnStudent(@student)
+    deepEqual(state, raw: 'not_graded', formatted: 'not graded')
+
+  test "returns graded for not_gradeable", ->
+    @student.submission_state = 'not_gradeable'
+    state = SpeedgraderHelpers.classNameBasedOnStudent(@student)
+    deepEqual(state, raw: 'not_gradeable', formatted: 'graded')
+
+  test "returns 'not submitted' for not_submitted", ->
+    @student.submission_state = 'not_submitted'
+    state = SpeedgraderHelpers.classNameBasedOnStudent(@student)
+    deepEqual(state, raw: 'not_submitted', formatted: 'not submitted')
+
+  test "returns resubmitted data for graded_then_resubmitted", ->
+    @student.submission_state = 'resubmitted'
+    state = SpeedgraderHelpers.classNameBasedOnStudent(@student)
+    deepEqual(state, raw: 'resubmitted', formatted: 'graded, then resubmitted (Oct 13 at 12:22pm)')
+
+  module "SpeedgraderHelpers#submissionState",
+    setup: ->
+      @student =
+        submission:
+          grade_matches_current_submission: true
+      @grading_role = 'teacher'
+
+  test "returns graded if grade matches current submission", ->
+    @student.submission.grade_matches_current_submission = true
+    @student.submission.grade = 10
+    result = SpeedgraderHelpers.submissionState(@student, @grading_role)
+    equal(result, 'graded')
+
+  test "returns resubmitted if grade doesn't match current submission", ->
+    @student.submission.grade = 10
+    @student.submission.grade_matches_current_submission = false
+    result = SpeedgraderHelpers.submissionState(@student, @grading_role)
+    equal(result, 'resubmitted')
+
+  test "returns not submitted if submission.workflow_state is unsubmitted", ->
+    @student.submission.workflow_state = 'unsubmitted'
+    result = SpeedgraderHelpers.submissionState(@student, @grading_role)
+    equal(result, 'not_submitted')
+
+  test "returns not_gradeable if provisional_grader and student doesn't need provision grade", ->
+    @student.submission.workflow_state = 'submitted'
+    @student.submission.submitted_at =  "2016-10-13 12:22:39"
+    @student.submission.provisional_grade_id = null
+    @student.needs_provisional_grade = false
+    result = SpeedgraderHelpers.submissionState(@student, 'provisional_grader')
+    equal(result, 'not_gradeable')
+
+  test "returns not_gradeable if moderator and student doesn't need provision grade", ->
+    @student.submission.workflow_state = 'submitted'
+    @student.submission.submitted_at =  "2016-10-13 12:22:39"
+    @student.submission.provisional_grade_id = null
+    @student.needs_provisional_grade = false
+    result = SpeedgraderHelpers.submissionState(@student, 'moderator')
+    equal(result, 'not_gradeable')
+
+  test "returns not_graded if submitted but no grade", ->
+    @student.submission.workflow_state = 'submitted'
+    @student.submission.submitted_at =  "2016-10-13 12:22:39"
+    result = SpeedgraderHelpers.submissionState(@student, @grading_role)
+    equal(result, 'not_graded')
+
+  test "returns not_graded if pending_review", ->
+    @student.submission.workflow_state = 'pending_review'
+    @student.submission.submitted_at =  "2016-10-13 12:22:39"
+    @student.submission.grade = 123
+    result = SpeedgraderHelpers.submissionState(@student, @grading_role)
+    equal(result, 'not_graded')
+
+  test "returns graded if final_provisional_grade.grade exists", ->
+    @student.submission.submitted_at =  "2016-10-13 12:22:39"
+    @student.submission.final_provisional_grade = grade: 123
+    result = SpeedgraderHelpers.submissionState(@student, @grading_role)
+    equal(result, 'graded')
+
+  test "returns graded if submission excused", ->
+    @student.submission.submitted_at =  "2016-10-13 12:22:39"
+    @student.submission.excused = true
+    result = SpeedgraderHelpers.submissionState(@student, @grading_role)
+    equal(result, 'graded')

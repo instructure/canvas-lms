@@ -191,7 +191,7 @@ define([
         return submission.user_id === student.id;
       })[0];
 
-      this.submission_state = submissionState(this);
+      this.submission_state = SpeedgraderHelpers.submissionState(this, ENV.grading_role);
     });
 
     // handle showing students only in a certain section.
@@ -264,50 +264,9 @@ define([
       };
       jsonData.studentsWithSubmissions.sort(compareStudentsBy(function(student){
         return student &&
-          states[submissionState(student)];
+          states[SpeedgraderHelpers.submissionState(student, ENV.grading_role)];
       }));
     }
-  }
-
-  function submissionState(student) {
-    var submission = student.submission;
-    if (submission && submission.workflow_state != 'unsubmitted' && (submission.submitted_at || !(typeof submission.grade == 'undefined'))) {
-      if ((ENV.grading_role == 'provisional_grader' || ENV.grading_role == 'moderator')
-        && !student.needs_provisional_grade && submission.provisional_grade_id === null) {
-        // if we are a provisional grader and it doesn't need a grade (and we haven't given one already) then we shouldn't be able to grade it
-        return "not_gradeable";
-      } else if (!(submission.final_provisional_grade && submission.final_provisional_grade.grade) && !submission.excused &&
-        (typeof submission.grade == 'undefined' || submission.grade === null || submission.workflow_state == 'pending_review')) {
-        return "not_graded";
-      } else if (submission.grade_matches_current_submission) {
-        return "graded";
-      } else {
-        return "resubmitted";
-      }
-    } else {
-      return "not_submitted";
-    }
-  }
-
-  function formattedsubmissionState(raw, submission) {
-    switch(raw) {
-      case "graded":
-        return I18n.t('graded', "graded");
-      case "not_graded":
-        return I18n.t('not_graded', "not graded");
-      case "not_gradeable":
-        return I18n.t('graded', "graded");
-      case "not_submitted":
-        return I18n.t('not_submitted', 'not submitted');
-      case "resubmitted":
-        return I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': $.datetimeString(submission.submitted_at)});
-    }
-  }
-
-  function classNameBasedOnStudent(student){
-    var raw       = student.submission_state;
-    var formatted = formattedsubmissionState(student.submission_state, student.submission);
-    return {raw: raw, formatted: formatted};
   }
 
   // xsslint safeString.identifier MENU_PARTS_DELIMITER
@@ -318,7 +277,7 @@ define([
     $("#hide_student_names").attr('checked', hideStudentNames);
     var optionsHtml = $.map(jsonData.studentsWithSubmissions, function(s, idx){
       var name = s.name.replace(MENU_PARTS_DELIMITER, ""),
-          className = classNameBasedOnStudent(s);
+          className = SpeedgraderHelpers.classNameBasedOnStudent(s);
 
       if(hideStudentNames) {
         name = I18n.t('nth_student', "Student %{n}", {'n': idx + 1});
@@ -821,7 +780,8 @@ define([
         function(data){
           if(currentStudentIDAsOfAjaxCall === EG.currentStudent.id) {
             EG.currentStudent.submission = data.submission;
-            EG.currentStudent.submission_state = submissionState(EG.currentStudent);
+            EG.currentStudent.submission_state =
+              SpeedgraderHelpers.submissionState(EG.currentStudent, ENV.grading_role);
             EG.showGrade();
           }
       });
@@ -1040,7 +1000,7 @@ define([
     getStudentNameAndGrade: function(){
       var hideStudentNames = utils.shouldHideStudentNames();
       var studentName = hideStudentNames ? I18n.t('student_index', "Student %{index}", { index: EG.currentIndex() + 1 }) : EG.currentStudent.name;
-      var submissionStatus = classNameBasedOnStudent(EG.currentStudent);
+      var submissionStatus = SpeedgraderHelpers.classNameBasedOnStudent(EG.currentStudent);
       return studentName + " - " + submissionStatus.formatted;
     },
 
@@ -1181,7 +1141,8 @@ define([
               EG.currentStudent.submission.final_provisional_grade = data.final_provisional_grade;
             }
 
-            EG.currentStudent.submission_state = submissionState(EG.currentStudent);
+            EG.currentStudent.submission_state =
+              SpeedgraderHelpers.submissionState(EG.currentStudent, ENV.grading_role);
             EG.showStudent();
           })
         );
@@ -1388,7 +1349,8 @@ define([
               $.each(EG.currentStudent.submission.provisional_grades, function(i, pg) { pg.selected = false; });
 
               EG.currentStudent.submission.final_provisional_grade = data;
-              EG.currentStudent.submission_state = submissionState(EG.currentStudent);
+              EG.currentStudent.submission_state =
+                SpeedgraderHelpers.submissionState(EG.currentStudent, ENV.grading_role);
               EG.current_prov_grade_index = null;
               EG.handleModerationTabs('final');
               EG.updateModerationTabs();
@@ -2214,7 +2176,7 @@ define([
 
       $.extend(true, student.submission, submission);
 
-      student.submission_state = submissionState(student);
+      student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role);
       if (ENV.grading_role == "moderator") {
         // sync with current provisional grade
         var prov_grade;
@@ -2329,7 +2291,7 @@ define([
       // (ie the current student or all of the students in the group that just got graded)
       $.each(jsonData.studentsWithSubmissions, function(index, val) {
         var $query = $selectmenu.jquerySelectMenu().data('selectmenu').list.find("li:eq("+ index +")"),
-            className = classNameBasedOnStudent(this),
+            className = SpeedgraderHelpers.classNameBasedOnStudent(this),
             submissionStates = 'not_graded not_submitted graded resubmitted';
 
         if (this == EG.currentStudent) {
