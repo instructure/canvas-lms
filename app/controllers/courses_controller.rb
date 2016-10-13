@@ -1372,7 +1372,7 @@ class CoursesController < ApplicationController
       success = false
       if enrollment.invited?
         success = enrollment.accept!
-        flash[:notice] = message || t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
+        flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
       end
 
       if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
