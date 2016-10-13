@@ -120,7 +120,7 @@ describe "eportfolios" do
       wait_for_ajaximations
       expect(f("#delete_eportfolio_form")).to be_displayed
       submit_form("#delete_eportfolio_form")
-      f("#wrapper-container .eportfolios").click
+      f("#wrapper .eportfolios").click
       expect(f("#content")).not_to contain_css("#portfolio_#{@eportfolio.id}")
       expect(f("#whats_an_eportfolio .add_eportfolio_link")).to be_displayed
       expect(Eportfolio.first.workflow_state).to eq 'deleted'
