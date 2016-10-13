@@ -704,7 +704,7 @@ describe SubmissionsController do
 
     it "leaves files in non user/group context alone" do
       assignment_model(context: @course)
-      weird_file = @assignment.attachments.create! name: 'blah', uploaded_data: default_uploaded_data
+      weird_file = @assignment.attachments.create! display_name: 'blah', uploaded_data: default_uploaded_data
       atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [weird_file])
       expect(atts).to eq [weird_file]
     end

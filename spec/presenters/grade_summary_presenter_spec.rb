@@ -234,7 +234,7 @@ describe GradeSummaryPresenter do
     it "returns 'Assignment Group' as an option if there are " \
     "assignments that belong to different assignment groups" do
       @course.assignments.create!(title: "Math Assignment")
-      science_group = @course.assignment_groups.create!(title: "Science Assignments")
+      science_group = @course.assignment_groups.create!(name: "Science Assignments")
       @course.assignments.create!(title: "Science Assignment", assignment_group: science_group)
       expect(presenter.sort_options).to include assignment_group_option
     end

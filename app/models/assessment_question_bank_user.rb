@@ -17,7 +17,7 @@
 #
 
 class AssessmentQuestionBankUser < ActiveRecord::Base
-  attr_accessible :assessment_question_bank, :user
+  strong_params
   belongs_to :assessment_question_bank
   belongs_to :user
 

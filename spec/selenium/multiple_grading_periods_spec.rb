@@ -114,7 +114,7 @@ describe "interaction with multiple grading periods" do
           end_date: 1.day.ago
         )
       end
-      let!(:assignment) { test_course.assignments.create!(title: 'Assignment 1', due_at: 1.day.ago, points: 10) }
+      let!(:assignment) { test_course.assignments.create!(title: 'Assignment 1', due_at: 1.day.ago, points_possible: 10) }
 
       it 'should list an assignment from a previous grading period', priority: "2", test_course: 381145 do
         user_session(teacher)
@@ -153,8 +153,8 @@ describe "interaction with multiple grading periods" do
         end_date: 7.weeks.from_now
       )
     end
-    let!(:assignment1) { test_course.assignments.create!(title: 'Assignment 1', due_at: 3.days.from_now, points: 10) }
-    let!(:assignment2) { test_course.assignments.create!(title: 'Assignment 2', due_at: 6.weeks.from_now, points: 10) }
+    let!(:assignment1) { test_course.assignments.create!(title: 'Assignment 1', due_at: 3.days.from_now, points_possible: 10) }
+    let!(:assignment2) { test_course.assignments.create!(title: 'Assignment 2', due_at: 6.weeks.from_now, points_possible: 10) }
     let!(:grade_assignment1) { assignment1.grade_student(student, { grade: 8 }) }
 
     before(:each) do

@@ -22,7 +22,7 @@ class AlertsController < ApplicationController
   def create
     if authorized_action(@context, @current_user, :manage_interaction_alerts)
       convert_recipients
-      @alert = @context.alerts.build(params[:alert])
+      @alert = @context.alerts.build(alert_params)
       if @alert.save
         headers['Location'] = named_context_url(@context, :context_alert_url, @alert.id)
         render :json => @alert.as_json(:include => :criteria)
@@ -36,7 +36,7 @@ class AlertsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_interaction_alerts)
       convert_recipients
       @alert = @context.alerts.find(params[:id])
-      if @alert.update_attributes(params[:alert])
+      if @alert.update_attributes(alert_params)
         headers['Location'] = named_context_url(@context, :context_alert_url, @alert.id)
         render :json => @alert.as_json(:include => :criteria)
       else
@@ -62,5 +62,10 @@ class AlertsController < ApplicationController
         {:role_id => role.id}
       end
     end.flatten
+  end
+
+  def alert_params
+    strong_params.require(:alert).
+      permit(:context, :repetition, :criteria => [:criterion_type, :threshold], :recipients => strong_anything)
   end
 end

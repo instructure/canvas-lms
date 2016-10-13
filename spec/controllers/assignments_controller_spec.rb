@@ -301,7 +301,7 @@ describe AssignmentsController do
   describe "POST 'create'" do
     it "should require authorization" do
       #controller.use_rails_error_handling!
-      post 'create', :course_id => @course.id
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
       assert_unauthorized
     end
 

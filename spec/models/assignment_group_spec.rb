@@ -140,8 +140,7 @@ describe AssignmentGroup do
         @course.assignments.create!(
           title: "Example Assignment #{n}",
           assignment_group: @assignment_group,
-          points_possible: 10,
-          published: true
+          points_possible: 10
         )
       end
       @assignment = assignments.first

@@ -335,7 +335,7 @@ class AssignmentsController < ApplicationController
     end
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
-    @assignment ||= @context.assignments.build(params[:assignment])
+    @assignment ||= @context.assignments.build(strong_assignment_params)
 
     @assignment.workflow_state ||= "unpublished"
     @assignment.updating_user = @current_user
@@ -476,7 +476,7 @@ class AssignmentsController < ApplicationController
         @assignment.content_being_saved_by(@current_user)
         group = get_assignment_group(params[:assignment])
         @assignment.assignment_group = group if group
-        if @assignment.update_attributes(params[:assignment])
+        if @assignment.update_attributes(strong_assignment_params)
           log_asset_access(@assignment, "assignments", @assignment_group, 'participate')
           @assignment.context_module_action(@current_user, :contributed)
           @assignment.reload
@@ -518,6 +518,22 @@ class AssignmentsController < ApplicationController
   end
 
   protected
+
+  def strong_assignment_params
+    strong_params.require(:assignment).
+      permit(:title, :name, :description, :due_at, :points_possible,
+        :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
+        :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
+        :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
+        :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
+        :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
+        :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
+        :only_visible_to_overrides, :post_to_sis, :integration_id, :moderated_grading,
+        :omit_from_final_grade, :intra_group_peer_reviews,
+        :allowed_extensions => strong_anything,
+        :turnitin_settings => strong_anything,
+        :integration_data => strong_anything)
+  end
 
   def get_assignment_group(assignment_params)
     return unless assignment_params

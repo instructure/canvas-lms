@@ -18,7 +18,7 @@
 
 class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
-  attr_accessible :context, :title, :user, :alignments
+  strong_params
 
   belongs_to :context, polymorphic: [:account, :course]
   has_many :assessment_questions, -> { order('assessment_questions.name, assessment_questions.position, assessment_questions.created_at') }

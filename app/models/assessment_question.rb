@@ -18,7 +18,7 @@
 
 class AssessmentQuestion < ActiveRecord::Base
   include Workflow
-  attr_accessible :name, :question_data, :form_question_data
+  strong_params
 
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion'
   has_many :attachments, :as => :context

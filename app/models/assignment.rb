@@ -35,16 +35,7 @@ class Assignment < ActiveRecord::Base
   include Canvas::DraftStateValidations
   include TurnitinID
 
-  attr_accessible :title, :name, :description, :due_at, :points_possible,
-    :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
-    :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
-    :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
-    :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
-    :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
-    :turnitin_settings, :context, :position, :allowed_extensions,
-    :external_tool_tag_attributes, :freeze_on_copy,
-    :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading,
-    :omit_from_final_grade, :intra_group_peer_reviews
+  strong_params
 
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded

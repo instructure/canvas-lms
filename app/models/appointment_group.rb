@@ -76,7 +76,7 @@ class AppointmentGroup < ActiveRecord::Base
     end
   end
 
-  attr_accessible :title, :description, :location_name, :location_address, :contexts, :sub_context_codes, :participants_per_appointment, :min_appointments_per_participant, :max_appointments_per_participant, :new_appointments, :participant_visibility, :cancel_reason
+  strong_params
 
   # when creating/updating an appointment, you can give it a list of (new)
   # appointment times. these will be added to the existing appointment times

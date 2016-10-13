@@ -350,8 +350,7 @@ class AppointmentGroupsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless contexts.present?
 
     publish = value_to_boolean(params[:appointment_group].delete(:publish))
-    params[:appointment_group][:contexts] = contexts
-    @group = AppointmentGroup.new(params[:appointment_group])
+    @group = AppointmentGroup.new(appointment_group_params.merge(:contexts => contexts))
     @group.update_contexts_and_sub_contexts
     if authorized_action(@group, @current_user, :manage)
       if @group.save
@@ -466,7 +465,7 @@ class AppointmentGroupsController < ApplicationController
     @group.contexts = contexts if contexts
     if authorized_action(@group, @current_user, :update)
       publish = params[:appointment_group].delete(:publish) == "1"
-      if @group.update_attributes(params[:appointment_group])
+      if (publish && params[:appointment_group].blank?) || @group.update_attributes(appointment_group_params)
         @group.publish! if publish
         render :json => appointment_group_json(@group, @current_user, session)
       else
@@ -551,5 +550,11 @@ class AppointmentGroupsController < ApplicationController
   def get_appointment_group
     @group = AppointmentGroup.find(params[:id].to_i)
     @context = @group.contexts_for_user(@current_user).first # FIXME?
+  end
+
+  def appointment_group_params
+    strong_params.require(:appointment_group).permit(:title, :description, :location_name, :location_address, :participants_per_appointment,
+      :min_appointments_per_participant, :max_appointments_per_participant, :participant_visibility, :cancel_reason,
+      :sub_context_codes => [], :new_appointments => strong_anything)
   end
 end

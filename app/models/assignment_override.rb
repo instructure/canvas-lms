@@ -22,7 +22,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   simply_versioned :keep => 10
 
-  attr_accessible
+  strong_params
 
   attr_accessor :dont_touch_assignment, :preloaded_student_ids, :changed_student_ids
 

@@ -19,7 +19,7 @@
 class AssessmentRequest < ActiveRecord::Base
   include Workflow
   include SendToStream
-  attr_accessible :rubric_assessment, :user, :asset, :assessor_asset, :rubric_association, :assessor
+  strong_params
 
   belongs_to :user
   belongs_to :asset, polymorphic: [:submission]

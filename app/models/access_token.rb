@@ -4,7 +4,7 @@ class AccessToken < ActiveRecord::Base
   belongs_to :developer_key
   belongs_to :user
   has_one :account, through: :developer_key
-  attr_accessible :user, :purpose, :expires_at, :developer_key, :regenerate, :scopes, :remember_access
+  strong_params
 
   serialize :scopes, Array
   validate :must_only_include_valid_scopes

@@ -1,7 +1,5 @@
 class AccountNotification < ActiveRecord::Base
-  attr_accessible :subject, :icon, :message,
-    :account, :account_notification_roles, :user, :start_at, :end_at,
-    :required_account_service, :months_in_display_cycle
+  strong_params
 
   validates_presence_of :start_at, :end_at, :subject, :message, :account_id
   validate :validate_dates

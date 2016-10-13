@@ -396,13 +396,13 @@ describe AssignmentGroupsController do
     end
 
     it 'requires authorization' do
-      post 'create', :course_id => @course.id
+      post 'create', :course_id => @course.id, :assignment_group => {:name => 'some test group'}
       assert_unauthorized
     end
 
     it 'does not allow students to create' do
       user_session(@student)
-      post 'create', :course_id => @course.id
+      post 'create', :course_id => @course.id, :assignment_group => {:name => 'some test group'}
       assert_unauthorized
     end
 

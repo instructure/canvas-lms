@@ -82,7 +82,7 @@ class AssignmentGroupsApiController < ApplicationController
   def create
     @assignment_group = @context.assignment_groups.temp_record
     if authorized_action(@assignment_group, @current_user, :create)
-      updated = update_assignment_group(@assignment_group, params)
+      updated = update_assignment_group(@assignment_group, strong_params)
       process_assignment_group(updated)
     end
   end
@@ -95,7 +95,7 @@ class AssignmentGroupsApiController < ApplicationController
   # @returns AssignmentGroup
   def update
     if authorized_action(@assignment_group, @current_user, :update)
-      updated = update_assignment_group(@assignment_group, params)
+      updated = update_assignment_group(@assignment_group, strong_params)
       unless current_user_is_course_admin? || can_update_assignment_group?(@assignment_group)
         return render_unauthorized_action
       end
