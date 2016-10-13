@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-v1'
+require 'aws-sdk'
 require 'json'
 require 'active_support'
 require 'active_support/core_ext/object/blank'
@@ -36,7 +36,7 @@ module LiveEvents
 
     def initialize(config = nil)
       config ||= LiveEvents::Client.config
-      @kinesis = AWS::Kinesis.new(Client.aws_config(config)).client
+      @kinesis = Aws::Kinesis::Client.new(Client.aws_config(config))
       @stream_name = config['kinesis_stream_name']
     end
 
@@ -46,15 +46,10 @@ module LiveEvents
         :secret_access_key => plugin_config['aws_secret_access_key_dec'],
       }
 
-      if !plugin_config['aws_region'].blank?
-        aws[:region] = plugin_config['aws_region']
-      end
+      aws[:region] = plugin_config['aws_region'].presence || 'us-east-1'
 
       if !plugin_config['aws_endpoint'].blank?
-        uri = URI.parse(plugin_config['aws_endpoint'])
-        aws[:kinesis_endpoint] = uri.host
-        aws[:kinesis_port] = uri.port
-        aws[:use_ssl] = (uri.scheme == "https")
+        aws[:endpoint] = plugin_config['aws_endpoint']
       end
 
       aws

@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
 
-  spec.add_dependency "aws-sdk-v1"
+  spec.add_dependency "aws-sdk", "~> 2.6.7"
   spec.add_dependency "canvas_statsd"
   spec.add_dependency "activesupport"
 
