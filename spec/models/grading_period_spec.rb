@@ -423,6 +423,8 @@ describe GradingPeriod do
     end
 
     describe "when due at the same time as the edge of a period" do
+      let(:now) { super().change(usec: 500000) } # middle of the second, so we don't cross the second boundary
+
       let!(:fourth_assignment)  { course.assignments.create!(due_at: third_grading_period.end_date + 0.005.seconds) }
       let!(:fifth_assignment) { course.assignments.create!(due_at: fourth_grading_period.start_date - 0.005.seconds) }
 
