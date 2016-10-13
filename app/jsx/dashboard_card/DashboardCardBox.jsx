@@ -4,7 +4,8 @@ define([
   './DashboardCard',
   './DraggableDashboardCard',
   './DashboardCardBackgroundStore',
-], ($, React, DashboardCard, DraggableDashboardCard, DashboardCardBackgroundStore) => {
+  './MovementUtils'
+], ($, React, DashboardCard, DraggableDashboardCard, DashboardCardBackgroundStore, MovementUtils) => {
   const DashboardCardBox = React.createClass({
 
     displayName: 'DashboardCardBox',
@@ -46,8 +47,9 @@ define([
       newCards.splice(atIndex, 0, newCards.splice(cardIndex, 1)[0]);
       this.setState({
         courseCards: newCards
+      }, () => {
+        MovementUtils.updatePositions(this.state.courseCards, window.ENV.current_user_id);
       });
-
     },
 
     colorsUpdated: function(){

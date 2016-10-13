@@ -1361,8 +1361,12 @@ class User < ActiveRecord::Base
     preferences[:custom_colors] ||= {}
   end
 
-  def course_positions
-    preferences[:course_positions] ||= {}
+  def dashboard_positions
+    preferences[:dashboard_positions] ||= {}
+  end
+
+  def dashboard_positions=(new_positions)
+    preferences[:dashboard_positions] = new_positions
   end
 
   def course_nicknames

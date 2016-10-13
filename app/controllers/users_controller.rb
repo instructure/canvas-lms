@@ -1443,6 +1443,83 @@ class UsersController < ApplicationController
     end
   end
 
+  # @API Get dashboard postions
+  # Returns all dashboard positions that have been saved for a user.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/dashboard_positions/ \
+  #     -X GET \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "dashboard_positions": {
+  #       "course_42": 2,
+  #       "course_88": 1
+  #     }
+  #   }
+  #
+  def get_dashboard_positions
+    user = api_find(User, params[:id])
+    return unless authorized_action(user, @current_user, :read)
+    render(json: {dashboard_positions: user.dashboard_positions})
+  end
+
+  # @API Update dashboard positions
+  # Updates the dashboard positions for a user for a given context.  This allows
+  # positions for the dashboard cards and elsewhere to be customized on a per
+  # user basis.
+  #
+  # The asset string parameter should be in the format 'context_id', for example
+  # 'course_42'
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/dashboard_positions/ \
+  #     -X PUT \
+  #     -F 'dashboard_positions[course_42]=1' \
+  #     -F 'dashboard_positions[course_53]=2' \
+  #     -F 'dashboard_positions[course_10]=3' \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "dashboard_positions": {
+  #       "course_10": 3,
+  #       "course_42": 1,
+  #       "course_53": 2
+  #     }
+  #   }
+  def set_dashboard_positions
+    user = api_find(User, params[:id])
+
+    return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
+    params[:dashboard_positions].each do |key, val|
+      context = Context.find_by_asset_string(key)
+      if context.nil?
+        raise(ActiveRecord::RecordNotFound, "Asset #{key} does not exist")
+      end
+      return unless authorized_action(context, @current_user, :read)
+      position = Integer(val) rescue nil
+      if position.nil?
+        return render(json: { :message => "Invalid position provided" }, status: :bad_request)
+      end
+    end
+
+    user.dashboard_positions = user.dashboard_positions.merge(params[:dashboard_positions])
+
+    respond_to do |format|
+      format.json do
+        if user.save
+          render(json: { dashboard_positions: user.dashboard_positions })
+        else
+          render(json: user.errors, status: :bad_request)
+        end
+      end
+    end
+  end
+
   # @API Edit a user
   # Modify an existing user. To modify a user's login, see the documentation for logins.
   #

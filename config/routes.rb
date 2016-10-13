@@ -1205,6 +1205,9 @@ CanvasRails::Application.routes.draw do
       get 'users/:id/colors/:asset_string', controller: 'users', action: 'get_custom_color'
       put 'users/:id/colors/:asset_string', controller: 'users', action: 'set_custom_color'
 
+      get 'users/:id/dashboard_positions', controller: 'users', action: 'get_dashboard_positions'
+      put 'users/:id/dashboard_positions', controller: 'users', action: 'set_dashboard_positions'
+
       put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
       post 'users/:id/split', controller: 'users', action: 'split'
