@@ -65,6 +65,8 @@ end
 require_relative 'support/blank_slate_protection'
 BlankSlateProtection.enable!
 
+require_relative 'support/discourage_slow_specs'
+
 RSpec::Core::ExampleGroup.singleton_class.prepend(Module.new {
   def run_examples(*)
     BlankSlateProtection.disable { super }
@@ -350,6 +352,7 @@ RSpec.configure do |config|
     Canvas::DynamicSettings.reset_cache!
     ActiveRecord::Migration.verbose = false
     RequestStore.clear!
+    Course.enroll_user_call_count = 0
     $spec_api_tokens = {}
   end
 
