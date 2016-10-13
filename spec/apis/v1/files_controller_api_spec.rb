@@ -624,7 +624,7 @@ describe "Files API", type: :request do
               'created_at' => @att.created_at.as_json,
               'updated_at' => @att.updated_at.as_json,
               'thumbnail_url' => @att.thumbnail_url,
-              'modified_at' => @att.updated_at.as_json,
+              'modified_at' => @att.modified_at.as_json,
               'mime_class' => @att.mime_class,
               'media_entry_id' => @att.media_entry_id
       })
