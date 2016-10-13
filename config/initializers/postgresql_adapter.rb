@@ -295,7 +295,6 @@ unless CANVAS_RAILS4_0
     def query_conditions_for_initial_load(type_map)
       known_type_names = type_map.keys.map { |n| "'#{n}'" } + type_map.keys.map { |n| "'_#{n}'" }
       known_type_types = %w('r' 'e' 'd')
-      #debugger
       <<-SQL % [known_type_names.join(", "), known_type_types.join(", ")]
       WHERE
         t.typname IN (%s)
