@@ -557,5 +557,19 @@ describe AppointmentGroup do
       # expect
       expect(ag.requiring_action?(student)).to be_falsey
     end
+
+    it "deals with custom-sized appointments" do
+      ag = AppointmentGroup.create(:title => "test",
+                                   :contexts => [@course],
+                                   :participants_per_appointment => 1,
+                                   :min_appointments_per_participant => 1,
+                                   :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
+                                                         ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      ag.appointments.first.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
+      ag.appointments.last.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
+      expect(ag).to be_all_appointments_filled
+      ag.appointments.last.update_attribute :participants_per_appointment, 2
+      expect(ag).not_to be_all_appointments_filled
+    end
   end
 end
