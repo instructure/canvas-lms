@@ -123,7 +123,7 @@ describe Quizzes::QuizzesController do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         doc = Nokogiri::HTML(response.body)
-        expect(doc.css("#right-side .rs-margin-top").text).not_to include "Resume Quiz"
+        expect(doc.css("#right-side").text).not_to include "Resume Quiz"
       end
     end
   end

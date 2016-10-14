@@ -1,7 +1,8 @@
 <% if can_do(@context, @current_user, :participate_as_student) %>
-  <div class="rs-margin-top">
-    <a href="<%= context_url(@context, :context_grades_url) %>" class="btn button-sidebar-wide"><%= image_tag "grading_icon.png", :alt => '' %> <%= t 'links.see_current_grades', "See my grades so far" %></a>
-  </div>
+  <a href="<%= context_url(@context, :context_grades_url) %>" class="btn button-sidebar-wide">
+    <i class="icon-check-plus" role="presentation"></i>
+    <%= t 'links.see_current_grades', "See my grades so far" %>
+  </a>
 <% end %>
 <%= render :partial => "shared/event_list", 
            :object  => @upcoming_assignments, 
