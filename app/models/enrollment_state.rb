@@ -20,7 +20,7 @@ class EnrollmentState < ActiveRecord::Base
     Shackles.activate(:master) do
       retry_count = 0
       begin
-        if self.lock_version == 0
+        if self.lock_version == 0 || self.lock_version.nil?
           # needed to prevent stale object errors for pre-existing enrollment state objects (it casts the null value to 0)
           EnrollmentState.where(:enrollment_id => self, :lock_version => nil).update_all(:lock_version => 0)
         end
