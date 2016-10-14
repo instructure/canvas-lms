@@ -764,9 +764,11 @@ describe CoursesController do
       it "should not show unpublished assignments to students" do
         @course1.default_view = "assignments"
         @course1.save!
-        @a1.unpublish
+        @a1a = @course1.assignments.new(:title => "some assignment course 1", due_at: 1.day.from_now)
+        @a1a.save
+        @a1a.unpublish
         get 'show', :id => @course1.id
-        expect(assigns(:assignments).map(&:id).include?(@a1.id)).to be_falsey
+        expect(assigns(:upcoming_assignments).map(&:id).include?(@a1a.id)).to be_falsey
       end
 
       it "should work for wiki view" do

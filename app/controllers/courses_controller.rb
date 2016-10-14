@@ -1614,7 +1614,7 @@ class CoursesController < ApplicationController
         add_crumb(t('#crumbs.assignments', "Assignments"))
         set_js_assignment_data
         js_env(:COURSE_HOME => true)
-        get_sorted_assignments
+        @upcoming_assignments = get_upcoming_assignments(@context)
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
         load_modules

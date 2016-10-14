@@ -756,98 +756,36 @@ class ApplicationController < ActionController::Base
     badge_counts
   end
 
-  # Retrieves all assignments for all contexts held in the @contexts variable.
-  # Also retrieves submissions and sorts the assignments based on
-  # their due dates and submission status for the given user.
-  def get_sorted_assignments
-    @courses = @contexts.select{ |c| c.is_a?(Course) }
-    @just_viewing_one_course = @context.is_a?(Course) && @courses.length == 1
-    @context_codes = @courses.map(&:asset_string)
-    @context = @courses.first
+  def get_upcoming_assignments(course)
+    assignments = AssignmentGroup.visible_assignments(
+      @current_user,
+      course,
+      course.assignment_groups.active
+    ).to_a
 
-    if @just_viewing_one_course
-
-      # fake assignment used for checking if the @current_user can read unpublished assignments
-      fake = @context.assignments.temp_record
-      fake.workflow_state = 'unpublished'
-
-      assignment_scope = :active_assignments
-      if !fake.grants_right?(@current_user, session, :read)
-        # user should not see unpublished assignments
-        assignment_scope = :published_assignments
-      end
-
-      @groups = @context.assignment_groups.active
-      @assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups).to_a
-    else
-      assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
-        [[Assignment.published.for_course(courses).all,
-         AssignmentGroup.active.for_course(courses).order(:position).all]]
-      end
-      @assignments = assignments_and_groups.map(&:first).flatten
-      @groups = assignments_and_groups.map(&:last).flatten
-    end
-    @assignment_groups = @groups
-
-    @courses.each { |course| log_course(course) }
+    log_course(course)
 
     if @current_user
-      @submissions = @current_user.submissions.shard(@current_user).to_a
-      @submissions.each{ |s| s.mute if s.muted_assignment? }
+      submissions = @current_user.submissions.shard(@current_user).to_a
+      submissions.each{ |s| s.mute if s.muted_assignment? }
     else
-      @submissions = []
+      submissions = []
     end
 
-    @assignments.map! {|a| a.overridden_for(@current_user)}
+    assignments.map! {|a| a.overridden_for(@current_user)}
     sorted = SortsAssignments.by_due_date({
-      :assignments => @assignments,
+      :assignments => assignments,
       :user => @current_user,
       :session => session,
       :upcoming_limit => 1.week.from_now,
-      :submissions => @submissions
+      :submissions => submissions
     })
 
-    @past_assignments = sorted.past
-    @undated_assignments = sorted.undated
-    @ungraded_assignments = sorted.ungraded
-    @upcoming_assignments = sorted.upcoming
-    @future_assignments = sorted.future
-    @overdue_assignments = sorted.overdue
-    @unsubmitted_assignments = sorted.unsubmitted
-
-    condense_assignments if requesting_main_assignments_page?
-
-    categorized_assignments.each(&:sort!)
-  end
-
-  def categorized_assignments
-    [
-      @assignments,
-      @upcoming_assignments,
-      @past_assignments,
-      @ungraded_assignments,
-      @undated_assignments,
-      @future_assignments,
-      @unsubmitted_assignments
-    ]
-  end
-
-  def condense_assignments
-    num_weeks = @future_assignments.length > 5 ? 2 : 4
-    @future_assignments = SortsAssignments.up_to(@future_assignments, num_weeks.weeks.from_now)
-    num_weeks = @past_assignments.length < 5 ? 2 : 4
-    @past_assignments = SortsAssignments.down_to(@past_assignments, num_weeks.weeks.ago)
-
-    @overdue_assignments = SortsAssignments.down_to(@overdue_assignments, 4.weeks.ago)
-    @ungraded_assignments = SortsAssignments.down_to(@ungraded_assignments, 4.weeks.ago)
+    sorted.upcoming.sort
   end
 
   def log_course(course)
     log_asset_access([ "assignments", course ], "assignments", "other")
-  end
-
-  def requesting_main_assignments_page?
-    request.path.match(/\A\/assignments/)
   end
 
   # Calculates the file storage quota for @context
