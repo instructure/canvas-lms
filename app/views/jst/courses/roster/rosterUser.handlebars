@@ -5,7 +5,13 @@
   {{#if canViewSisId}}
   <a href="{{html_url}}" class="roster_user_name">{{name}}</a> ({{short_name}})
   {{else}}
-  <a href="{{html_url}}" class="roster_user_name">{{short_name}}</a>
+  <a href="{{html_url}}" class="roster_user_name">
+    {{if Handlebars.Utils.isEmpty(short_name)}}
+      {{name}}
+    {{else}}
+      {{short_name}}
+    {{/if}}
+  </a>
   {{/if}}
   {{#if isPending}}<span class="label label-info" title="{{#t "pending_acceptance_explanation"}}This user has not yet accepted the invitation to the course{{/t}}">{{#t "pending_acceptance_of_invitation"}}pending{{/t}}</span>{{/if}}
   {{#if isInactive}}<span class="label" title="{{#t}}This user is currently not able to access the course{{/t}}">{{#t}}inactive{{/t}}</span>{{/if}}
