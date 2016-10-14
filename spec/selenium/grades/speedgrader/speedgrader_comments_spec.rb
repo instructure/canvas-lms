@@ -1,6 +1,6 @@
-require_relative "common"
-require_relative "helpers/speed_grader_common"
-require_relative "helpers/assignments_common"
+require_relative "../../common"
+require_relative "../../helpers/speed_grader_common"
+require_relative "../../helpers/assignments_common"
 
 describe "speed grader" do
   include_context "in-process server selenium tests"

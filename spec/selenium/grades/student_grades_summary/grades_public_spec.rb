@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + "/common")
-require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
+require_relative "../../common"
+require_relative '../../helpers/public_courses_context'
 
 describe "grades for a public course" do
   include_context "in-process server selenium tests"

@@ -1,5 +1,5 @@
 require_relative '../../helpers/gradebook2_common'
-require_relative '../../helpers/student_grades_page'
+require_relative '../page_objects/student_grades_page'
 
 describe "gradebook2 - logged in as a student" do
   include_context "in-process server selenium tests"

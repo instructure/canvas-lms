@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative './common'
+require_relative '../../common'
 
 describe 'Course Grading Periods' do
   include_examples 'in-process server selenium tests'

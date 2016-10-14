@@ -1,5 +1,3 @@
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-
 module GradingStandards
   class MultipleGradingPeriods
     include SeleniumDriverSetup

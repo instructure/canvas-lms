@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/speed_grader_common')
+require_relative '../../helpers/speed_grader_common'
 
 describe "speed grader submissions" do
   include_context "in-process server selenium tests"

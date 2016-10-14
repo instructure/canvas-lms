@@ -1,4 +1,4 @@
-require_relative "common"
+require_relative "../../common"
 
 describe "speed grader - quiz submissions" do
   include_context "in-process server selenium tests"

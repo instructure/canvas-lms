@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/multiple_grading_periods_common')
+require_relative '../../common'
+require_relative '../page_objects/mgp_page'
 
 describe "multiple grading periods account page" do
   include_context "in-process server selenium tests"
