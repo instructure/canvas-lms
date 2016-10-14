@@ -1,11 +1,20 @@
 require_relative '../../helpers/gradebook2_common'
-require_relative '../../helpers/multiple_grading_periods_common'
+require_relative '../../helpers/student_grades_page'
 
 describe "gradebook2 - logged in as a student" do
   include_context "in-process server selenium tests"
   include Gradebook2Common
-  include MultipleGradingPeriods::StudentPage
-  include_context "student_page_components"
+
+  # Helpers
+  def backend_group_helper
+    Factories::GradingPeriodGroupHelper.new
+  end
+
+  def backend_period_helper
+    Factories::GradingPeriodHelper.new
+  end
+
+  let(:student_grades_page) { StudentGradesPage.new }
 
   it 'should display total grades as points', priority: "2", test_id: 164229 do
     course_with_student_logged_in
@@ -15,8 +24,8 @@ describe "gradebook2 - logged in as a student" do
     @course.show_total_grade_as_points = true
     @course.save!
 
-    get "/courses/#{@course.id}/grades"
-    expect(f('#submission_final-grade .grade')).to include_text("10")
+    student_grades_page.visit_as_student(@course)
+    expect(student_grades_page.final_grade).to include_text("10")
   end
 
   context 'when testing multiple grading periods' do
@@ -49,13 +58,13 @@ describe "gradebook2 - logged in as a student" do
         @course.assignments.create!(due_at: 1.week.from_now, title: current_assignment_name)
 
         # go to student grades page
-        visit_student_grades_page(@course, @student)
+        student_grades_page.visit_as_teacher(@course, @student)
       end
 
       it 'should only show assignments that belong to the selected grading period', priority: "1", test_id: 2528639 do
-        select_period_by_name(past_period_name)
-        expect(assignment_titles).to include(past_assignment_name)
-        expect(assignment_titles).not_to include(current_assignment_name)
+        student_grades_page.select_period_by_name(past_period_name)
+        expect(student_grades_page.assignment_titles).to include(past_assignment_name)
+        expect(student_grades_page.assignment_titles).not_to include(current_assignment_name)
       end
     end
   end

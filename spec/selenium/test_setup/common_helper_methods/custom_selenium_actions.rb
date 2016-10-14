@@ -259,8 +259,9 @@ module CustomSeleniumActions
   end
 
   def hover_and_click(element_jquery_finder)
-    expect(fj(element_jquery_finder.to_s)).to be_present
-    driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
+    if fj(element_jquery_finder).present?
+      driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
+    end
   end
 
   def hover(element)

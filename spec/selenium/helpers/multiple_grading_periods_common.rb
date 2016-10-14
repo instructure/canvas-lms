@@ -1,43 +1,122 @@
-module MultipleGradingPeriods
-  module AccountPage
-    shared_context "account_page_components" do
-      # Helpers
-      let(:backend_group_helper) { Factories::GradingPeriodGroupHelper.new }
-      let(:backend_period_helper) { Factories::GradingPeriodHelper.new }
+require File.expand_path(File.dirname(__FILE__) + '/../common')
 
+module GradingStandards
+  class MultipleGradingPeriods
+    include SeleniumDriverSetup
+    include OtherHelperMethods
+    include CustomSeleniumActions
+    include CustomAlertActions
+    include CustomPageLoaders
+    include CustomScreenActions
+    include CustomValidators
+    include CustomWaitMethods
+    include CustomDateHelpers
+    include LoginAndSessionMethods
+    include SeleniumErrorRecovery
+
+    private
       # Main page components
-      let(:grading_periods_tab) { f("#grading-periods-tab") }
-      let(:add_set_of_grading_periods_button) { f('button[aria-label="Add Set of Grading Periods"]') }
-      let(:term_dropdown) { f('select[aria-label="Enrollment Term"]')}
-      let(:search_box) { f('.GradingPeriodSearchField input')}
+      def grading_periods_tab
+        f("#grading-periods-tab")
+      end
+
+      def add_set_of_grading_periods_button
+        f('button[aria-label="Add Set of Grading Periods"]')
+      end
+
+      def term_dropdown
+        f('select[aria-label="Enrollment Term"]')
+      end
+
+      def search_box
+        f('.GradingPeriodSearchField input')
+      end
 
       # Set components
-      let(:set_name_input) { f('#set-name')}
-      let(:term_input) { f('input[aria-label^="Start typing to search."]') }
-      let(:create_set_button) { fj('button:contains("Create")') }
-      let(:grading_period_set_title_css) { ".GradingPeriodSet__title" }
-      let(:set_title) { f(grading_period_set_title_css) }
-      let(:add_grading_period_link) { f('button[aria-label="Add Grading Period"]') }
-      let(:delete_grading_period_set_button) { f('#grading-period-sets button[title^="Delete "]') }
-      let(:edit_grading_period_set_button) { f('#grading-period-sets button[title^="Edit "]')}
-      let(:edit_set_save_button) { f('button[aria-label="Save Grading Period Set"]') }
-      let(:first_collapsed_set) { f('.GradingPeriodSet--collapsed') }
-      let(:all_sets_css) { '.GradingPeriodSet__title'}
+      def set_name_input
+        f('#set-name')
+      end
 
+      def term_input
+        f('input[aria-label^="Start typing to search."]')
+      end
+
+      def create_set_button
+        fj('button:contains("Create")')
+      end
+
+      def grading_period_set_title_css
+        ".GradingPeriodSet__title"
+      end
+
+      def set_title
+        f(grading_period_set_title_css)
+      end
+
+      def add_grading_period_link
+        f('button[aria-label="Add Grading Period"]')
+      end
+
+      def delete_grading_period_set_button
+        f('#grading-period-sets button[title^="Delete "]')
+      end
+
+      def edit_grading_period_set_button
+        f('#grading-period-sets button[title^="Edit "]')
+      end
+
+      def edit_set_save_button
+        f('button[aria-label="Save Grading Period Set"]')
+      end
+
+      def first_collapsed_set
+        f('.GradingPeriodSet--collapsed')
+      end
+
+      def all_sets_css
+        '.GradingPeriodSet__title'
+      end
 
       # Period components
-      let(:period_title_input) { f('#title') }
-      let(:start_date_input) { f('input[data-row-key="start-date"]') }
-      let(:end_date_input) { f('input[data-row-key="end-date"]') }
-      let(:close_date_input) { f('input[data-row-key="close-date"]') }
-      let(:save_period_button) { f('button[aria-label="Save Grading Period"]') }
-      let(:grading_period_list) { f('.GradingPeriodList') }
-      let(:period_css) { '.GradingPeriodList__period span' }
-      let(:period_delete_button) { f('.GradingPeriodList .icon-trash') }
-      let(:period_edit_button) { f('.GradingPeriodList .icon-edit') }
-    end
+      def period_title_input
+        f('#title')
+      end
 
-    def visit_account_grading_standards(account_id)
+      def start_date_input
+        f('input[data-row-key="start-date"]')
+      end
+
+      def end_date_input
+        f('input[data-row-key="end-date"]')
+      end
+
+      def close_date_input
+        f('input[data-row-key="close-date"]')
+      end
+
+      def save_period_button
+        f('button[aria-label="Save Grading Period"]')
+      end
+
+      def grading_period_list
+        f('.GradingPeriodList')
+      end
+
+      def period_css
+        '.GradingPeriodList__period span'
+      end
+
+      def period_delete_button
+        f('.GradingPeriodList .icon-trash')
+      end
+
+      def period_edit_button
+        f('.GradingPeriodList .icon-edit')
+      end
+
+    public
+
+    def visit(account_id)
       get "/accounts/#{account_id}/grading_standards"
     end
 
@@ -61,6 +140,7 @@ module MultipleGradingPeriods
       else
         alert.dismiss
       end
+      wait_for_ajaximations
     end
 
     def edit_first_grading_period_set(new_name)
@@ -82,9 +162,21 @@ module MultipleGradingPeriods
       first_collapsed_set.click
     end
 
+    def open_grading_period_form
+      period_edit_button.click
+    end
+
+    def close_date_value
+      close_date_input.attribute("value")
+    end
+
+    def end_date_value
+      end_date_input.attribute("value")
+    end
+
     def edit_first_grading_period(title)
       expand_first_set
-      period_edit_button.click
+      open_grading_period_form
       replace_content(period_title_input, title)
       save_period_button.click
     end
@@ -108,6 +200,22 @@ module MultipleGradingPeriods
       return nil
     end
 
+    def grading_period_set_displayed?(set_name)
+      set = find_set(set_name)
+      if set.nil?
+        return false
+      else
+        return set.displayed?
+      end
+    end
+
+    def grading_period_set_deleted?
+      f(grading_period_set_title_css, grading_periods_tab)
+      false
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      true
+    end
+
     def all_periods
       ff(period_css)
     end
@@ -119,8 +227,33 @@ module MultipleGradingPeriods
       return nil
     end
 
+    def add_grading_period_link_displayed?
+      link = add_grading_period_link
+      if link.nil?
+        return false
+      else
+        link.displayed?
+      end
+    end
+
+    def grading_period_displayed?(period_name)
+      period = find_period(period_name)
+      if period.nil?
+        return false
+      else
+        period.displayed?
+      end
+    end
+
+    def grading_period_deleted?
+      create_set_button.displayed?
+      f(period_css, grading_period_list)
+      false
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      true
+    end
+
     def delete_first_grading_period(are_you_sure)
-      expand_first_set
       period_delete_button.click
       alert = driver.switch_to.alert
       if are_you_sure
@@ -133,38 +266,6 @@ module MultipleGradingPeriods
     def search_grading_periods(search_term)
       replace_content(search_box, search_term)
       sleep 1 # InputFilter has a delay
-    end
-  end
-
-  module StudentPage
-    shared_context "student_page_components" do
-      # Helpers
-      let(:backend_group_helper) { Factories::GradingPeriodGroupHelper.new }
-      let(:backend_period_helper) { Factories::GradingPeriodHelper.new }
-
-      # Period components
-      let(:period_options_css) { '.grading_periods_selector > option' }
-
-      # Assignment components
-      let(:assignment_titles_css) { '.student_assignment > th > a'}
-    end
-
-    def visit_student_grades_page(course, student)
-      get "/courses/#{course.id}/grades/#{student.id}"
-    end
-
-    def select_period_by_name(name)
-      period = ff(period_options_css).find do |option|
-        option.text.strip == name if option.text
-      end
-      raise ArgumentError, "No grading period found named #{name}." unless period
-      period.click
-    end
-
-    def assignment_titles
-      ff(assignment_titles_css).map do |option|
-        option.text
-      end
     end
   end
 end
