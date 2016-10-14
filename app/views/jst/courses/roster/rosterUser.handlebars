@@ -3,7 +3,10 @@
 </td>
 <td>
   {{#if canViewSisId}}
-  <a href="{{html_url}}" class="roster_user_name">{{name}}</a> ({{short_name}})
+  <a href="{{html_url}}" class="roster_user_name">{{name}}</a>
+  {{unless Handlebars.Utils.isEmpty(short_name)}}
+    ({{short_name}})
+  {{/if}}
   {{else}}
   <a href="{{html_url}}" class="roster_user_name">
     {{if Handlebars.Utils.isEmpty(short_name)}}
