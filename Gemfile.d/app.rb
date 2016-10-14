@@ -110,7 +110,7 @@ gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbac
 gem 'acts_as_list', path: 'gems/acts_as_list'
 gem 'adheres_to_policy', path: 'gems/adheres_to_policy'
 gem 'attachment_fu', path: 'gems/attachment_fu'
-gem 'autoextend', path: 'gems'
+gem 'autoextend', path: 'gems/autoextend'
 gem 'bookmarked_collection', path: 'gems/bookmarked_collection'
 gem 'broadcast_policy', path: "gems/broadcast_policy"
 gem 'canvas_breach_mitigation', path: 'gems/canvas_breach_mitigation'
