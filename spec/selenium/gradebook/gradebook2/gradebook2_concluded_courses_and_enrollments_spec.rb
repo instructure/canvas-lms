@@ -19,9 +19,9 @@ describe "gradebook2 - concluded courses and enrollments" do
     it "persists settings for displaying inactive enrollments", priority: "2", test_id: 1372593 do
       get course_gradebook2_path(@course)
       wait_for_ajaximations
-      f('#gradebook_settings').click
+      click_it(f('#gradebook_settings'))
 
-      expect { f('label[for="show_inactive_enrollments"]').click }
+      expect { click_it(f('label[for="show_inactive_enrollments"]')) }
         .to change { gradebook_settings_for_course.call(@teacher, @course)}
         .from(nil)
         .to({
@@ -33,9 +33,9 @@ describe "gradebook2 - concluded courses and enrollments" do
     it "persists settings for displaying concluded enrollments", priority: "2", test_id: 1372592 do
       get course_gradebook2_path(@course)
       wait_for_ajaximations
-      f('#gradebook_settings').click
+      click_it(f('#gradebook_settings'))
 
-      expect { f('label[for="show_concluded_enrollments"]').click }
+      expect { click_it(f('label[for="show_concluded_enrollments"]')) }
         .to change { gradebook_settings_for_course.call(@teacher, @course) }
         .from(nil)
         .to({
@@ -62,19 +62,17 @@ describe "gradebook2 - concluded courses and enrollments" do
 
       # show concluded
       expect_new_page_load do
-        f('#gradebook_settings').click
-        f('label[for="show_concluded_enrollments"]').click
+        click_it(f('#gradebook_settings'))
+        click_it(f('label[for="show_concluded_enrollments"]'))
       end
-      wait_for_ajaximations
 
       expect(ff('.student-name').count).to eq @course.all_students.count
 
       # hide concluded
       expect_new_page_load do
-        f('#gradebook_settings').click
-        f('label[for="show_concluded_enrollments"]').click
+        click_it(f('#gradebook_settings'))
+        click_it(f('label[for="show_concluded_enrollments"]'))
       end
-      wait_for_ajaximations
 
       expect(ff('.student-name').count).to eq @course.students.count
     end
@@ -97,19 +95,17 @@ describe "gradebook2 - concluded courses and enrollments" do
 
       # show deactivated
       expect_new_page_load do
-        f('#gradebook_settings').click
-        f('label[for="show_inactive_enrollments"]').click
+        click_it(f('#gradebook_settings'))
+        click_it(f('label[for="show_inactive_enrollments"]'))
       end
-      wait_for_ajaximations
 
       expect(ff('.student-name').count).to eq @course.all_students.count
 
       # hide deactivated
       expect_new_page_load do
-        f('#gradebook_settings').click
-        f('label[for="show_inactive_enrollments"]').click
+        click_it(f('#gradebook_settings'))
+        click_it(f('label[for="show_inactive_enrollments"]'))
       end
-      wait_for_ajaximations
 
       expect(ff('.student-name').count).to eq @course.students.count
     end
@@ -122,7 +118,7 @@ describe "gradebook2 - concluded courses and enrollments" do
 
       cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
       expect(cell.text).to eq '10'
-      cell.click
+      click_it(cell)
       expect(cell).not_to contain_css('.grade') # no input box for entry
     end
   end
