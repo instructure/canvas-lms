@@ -1060,7 +1060,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(response.keys).not_to include 'turnitin_enabled'
       expect(Assignment.last.turnitin_enabled).to be_falsey
     end
-    
+
     it "does not allow modifying vericite_enabled when not enabled on the context" do
       Course.any_instance.expects(:vericite_enabled?).at_least_once.returns false
       response = api_create_assignment_in_course(@course,
@@ -2760,12 +2760,16 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       @assignment = @course.assignments.create!(:title => "some assignment")
     end
 
+    def strong_anything
+      ArbitraryStrongishParams::ANYTHING
+    end
+
     it 'updates the external tool content_id' do
       mh = create_message_handler(create_resource_handler(create_tool_proxy))
       tool_tag = ContentTag.new(url: 'http://www.example.com', new_tab: false, tag_type: 'context_module')
       tool_tag.context = @assignment
       tool_tag.save!
-      params = {
+      params = ActionController::Parameters.new({
         "submission_types" => ["external_tool"],
         "external_tool_tag_attributes" => {
           "url" => "https://testvmserver.test.com/canvas/test/",
@@ -2773,7 +2777,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           "content_id" => mh.id,
           "new_tab" => "0"
         }
-      }
+      })
       assignment = update_from_params(@assignment, params, @user)
       tag = assignment.external_tool_tag
       expect(tag.content_id).to eq mh.id
@@ -2788,7 +2792,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       tool_tag = ContentTag.new(url: 'http://www.example.com', new_tab: false, tag_type: 'context_module')
       tool_tag.context = @assignment
       tool_tag.save!
-      params = {
+      params = ActionController::Parameters.new({
         "submission_types" => ["external_tool"],
         "external_tool_tag_attributes" => {
           "url" => "https://testvmserver.test.com/canvas/test/",
@@ -2796,7 +2800,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           "content_id" => tool.id,
           "new_tab" => "0"
         }
-      }
+      })
       assignment = update_from_params(@assignment, params, @user)
       tag = assignment.external_tool_tag
       expect(tag.content_id).to eq tool.id
@@ -2805,7 +2809,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
     it "does not update integration_data when lacking permission" do
       json = %{{"key": "value"}}
-      params = {"integration_data" => json}
+      params = ActionController::Parameters.new({"integration_data" => json})
 
       update_from_params(@assignment, params, @user)
       expect(@assignment.integration_data).to eq({})
@@ -2813,7 +2817,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
     it "updates integration_data with permission" do
       json = %{{"key": "value"}}
-      params = {"integration_data" => json}
+      params = ActionController::Parameters.new({"integration_data" => json})
       account_admin_user_with_role_changes(
         :role_changes => {:manage_sis => true})
       update_from_params(@assignment, params, @admin)
@@ -2827,7 +2831,8 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       comment = sub.submission_comments.first
       expect(comment.hidden?).to eql true
 
-      update_from_params(@assignment, {"muted" => "false"}, @teacher)
+      params = ActionController::Parameters.new({"muted" => "false"})
+      update_from_params(@assignment, params, @teacher)
       expect(comment.reload.hidden?).to eql false
     end
   end

@@ -403,7 +403,7 @@ class AccountsController < ApplicationController
   # Delegated to by the update action (when the request is an api_request?)
   def update_api
     if authorized_action(@account, @current_user, [:manage_account_settings, :manage_storage_quotas])
-      account_params = params[:account] || {}
+      account_params = params[:account].present? ? strong_account_params : {}
       unauthorized = false
 
       # account settings (:manage_account_settings)
@@ -1017,6 +1017,8 @@ class AccountsController < ApplicationController
   end
 
   def strong_account_params
-    strong_params.require(:account).permit(*permitted_account_attributes)
+    # i'm doing this instead of normal strong_params because we do too much hackery to the weak params, especially in plugins
+    # and it breaks when we enforce inherited weak parameters (because we're not actually editing request.parameters anymore)
+    ActionController::Parameters.new(params).require(:account).permit(*permitted_account_attributes)
   end
 end

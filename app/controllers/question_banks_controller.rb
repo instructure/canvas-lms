@@ -100,7 +100,7 @@ class QuestionBanksController < ApplicationController
 
   def create
     if authorized_action(@context.assessment_question_banks.temp_record, @current_user, :create)
-      @bank = @context.assessment_question_banks.build(params[:assessment_question_bank])
+      @bank = @context.assessment_question_banks.build(bank_params)
       respond_to do |format|
         if @bank.save
           @bank.bookmark_for(@current_user)
@@ -129,7 +129,7 @@ class QuestionBanksController < ApplicationController
   def update
     @bank = @context.assessment_question_banks.find(params[:id])
     if authorized_action(@bank, @current_user, :update)
-      if @bank.update_attributes(params[:assessment_question_bank])
+      if @bank.update_attributes(bank_params)
         @bank.reload
         render :json => @bank.as_json(:include => {:learning_outcome_alignments => {:include => {:learning_outcome => {:include_root => false}}}})
       else
@@ -144,5 +144,11 @@ class QuestionBanksController < ApplicationController
       @bank.destroy
       render :json => @bank
     end
+  end
+
+  private
+
+  def bank_params
+    strong_params.require(:assessment_question_bank).permit(:title, :alignments => strong_anything)
   end
 end

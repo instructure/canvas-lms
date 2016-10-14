@@ -27,6 +27,12 @@ class Attachment < ActiveRecord::Base
   end
   strong_params
 
+  PERMITTED_ATTRIBUTES = [:filename, :display_name, :locked, :position, :lock_at,
+    :unlock_at, :uploaded_data, :hidden, :viewed_at].freeze
+  def self.permitted_attributes
+    PERMITTED_ATTRIBUTES
+  end
+
   EXCLUDED_COPY_ATTRIBUTES = %w{id root_attachment_id uuid folder_id user_id
                                 filename namespace workflow_state}
 

@@ -921,7 +921,7 @@ class DiscussionTopicsController < ApplicationController
         apply_positioning_parameters
         apply_attachment_parameters
         unless @topic.root_topic_id?
-          apply_assignment_parameters(params[:assignment], @topic)
+          apply_assignment_parameters(strong_params[:assignment], @topic)
         end
 
         if publish_later

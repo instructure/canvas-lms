@@ -433,7 +433,8 @@ class GradebooksController < ApplicationController
         submission.delete(:provisional) unless @assignment.moderated_grading?
         if params[:attachments]
           attachments = []
-          params[:attachments].each do |idx, attachment|
+          params[:attachments].keys.each do |idx|
+            attachment = strong_params[:attachments][idx].permit(Attachment.permitted_attributes)
             attachment[:user] = @current_user
             attachments << @assignment.attachments.create(attachment)
           end

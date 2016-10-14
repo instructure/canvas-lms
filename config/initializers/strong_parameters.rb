@@ -1,4 +1,46 @@
 class WeakParameters < ActiveSupport::HashWithIndifferentAccess
+  # stealin some code from strong params to make WeakParameters from the values
+
+  def each(&block)
+    super do |key, value|
+      convert_hashes_to_parameters(key, value)
+    end
+
+    super
+  end
+
+  def [](key)
+    convert_hashes_to_parameters(key, super)
+  end
+
+  def fetch(key, *args)
+    convert_hashes_to_parameters(key, super, false)
+  end
+
+  def delete(key, &block)
+    convert_hashes_to_parameters(key, super, false)
+  end
+
+  def select!(&block)
+    convert_value_to_parameters(super)
+  end
+
+  private
+  def convert_hashes_to_parameters(key, value, assign_if_converted=true)
+    converted = convert_value_to_parameters(value)
+    self[key] = converted if assign_if_converted && !converted.equal?(value)
+    converted
+  end
+
+  def convert_value_to_parameters(value)
+    if value.is_a?(Array)
+      value.map { |_| convert_value_to_parameters(_) }
+    elsif value.is_a?(WeakParameters) || !value.is_a?(Hash)
+      value
+    else
+      self.class.new(value)
+    end
+  end
 end
 
 module ArbitraryStrongishParams

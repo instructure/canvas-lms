@@ -454,9 +454,10 @@ class AssignmentsController < ApplicationController
   def update
     @assignment = @context.assignments.find(params[:id])
     if authorized_action(@assignment, @current_user, :update)
-      params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
-      params[:assignment] ||= {}
-      @assignment.post_to_sis = params[:assignment][:post_to_sis]
+      assignment_params = params[:assignment] ? strong_assignment_params : []
+      assignment_params[:time_zone_edited] = Time.zone.name
+
+      @assignment.post_to_sis = assignment_params[:post_to_sis] if assignment_params.has_key?(:post_to_sis)
       @assignment.updating_user = @current_user
       if params[:assignment][:default_grade]
         params[:assignment][:overwrite_existing_grades] = (params[:assignment][:overwrite_existing_grades] == "1")
@@ -470,13 +471,13 @@ class AssignmentsController < ApplicationController
         @assignment.workflow_state = 'published'
       end
       if Assignment.assignment_type?(params[:assignment_type])
-        params[:assignment][:submission_types] = Assignment.get_submission_type(params[:assignment_type])
+        assignment_params[:submission_types] = Assignment.get_submission_type(params[:assignment_type])
       end
       respond_to do |format|
         @assignment.content_being_saved_by(@current_user)
         group = get_assignment_group(params[:assignment])
         @assignment.assignment_group = group if group
-        if @assignment.update_attributes(strong_assignment_params)
+        if @assignment.update_attributes(assignment_params)
           log_asset_access(@assignment, "assignments", @assignment_group, 'participate')
           @assignment.context_module_action(@current_user, :contributed)
           @assignment.reload

@@ -551,9 +551,11 @@ class SubmissionsController < ApplicationController
     if authorized_action(@submission, @current_user, :comment)
       params[:submission][:commenter] = @current_user
       admin_in_context = !@context_enrollment || @context_enrollment.admin?
+
       if params[:attachments]
         attachments = []
-        params[:attachments].each do |idx, attachment|
+        params[:attachments].keys.each do |idx|
+          attachment = strong_params[:attachments][idx].permit(Attachment.permitted_attributes)
           attachment[:user] = @current_user
           attachments << @assignment.attachments.create(attachment)
         end

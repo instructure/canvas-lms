@@ -307,7 +307,6 @@ module Api::V1::Assignment
     position
     points_possible
     grading_type
-    submission_types
     allowed_extensions
     due_at
     lock_at
@@ -320,17 +319,13 @@ module Api::V1::Assignment
     peer_review_count
     automatic_peer_reviews
     intra_group_peer_reviews
-    external_tool_tag_attributes
     grade_group_students_individually
     turnitin_enabled
-    turnitin_settings
     vericite_enabled
-    vericite_settings
     grading_standard_id
     freeze_on_copy
     notify_of_update
     integration_id
-    integration_data
     omit_from_final_grade
   )
 
@@ -352,9 +347,9 @@ module Api::V1::Assignment
     exclude_self_plag
     store_in_index
   )
-  
+
   def update_api_assignment(assignment, assignment_params, user, context = assignment.context)
-    return nil unless assignment_params.is_a?(Hash)
+    raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
 
     old_assignment = assignment.new_record? ? nil : assignment.clone
     old_assignment.id = assignment.id if old_assignment.present?
@@ -445,7 +440,7 @@ module Api::V1::Assignment
   end
 
   def update_from_params(assignment, assignment_params, user, context = assignment.context, new_record: false)
-    update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_INPUT_FIELDS)
+    update_params = assignment_params.permit(allowed_assignment_input_fields)
 
     if update_params.has_key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
@@ -615,5 +610,16 @@ module Api::V1::Assignment
     else
       course_assignment_submissions_url(context, assignment, zip: 1)
     end
+  end
+
+  def allowed_assignment_input_fields
+    API_ALLOWED_ASSIGNMENT_INPUT_FIELDS + [
+      'turnitin_settings' => strong_anything,
+      'vericite_settings' => strong_anything,
+      'allowed_extensions' => strong_anything,
+      'integration_data' => strong_anything,
+      'external_tool_tag_attributes' => strong_anything,
+      'submission_types' => strong_anything
+    ]
   end
 end
