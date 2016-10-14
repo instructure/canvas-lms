@@ -1,7 +1,10 @@
 @import "vendor/bootstrap/button-groups";
 @import "components/autocomplete";
 
-#not_right_side, #content-wrapper, #content, .conversations {
+#not_right_side,
+.ic-layout-contentWrapper,
+.ic-layout-contentMain,
+.conversations {
   height: 100%;
 }
 
@@ -18,7 +21,7 @@
   display: none;
 }
 
-#content {
+.ic-layout-contentMain {
   overflow: visible;
   padding: 0;
 }

@@ -7,12 +7,6 @@ $layout-modal-font-color:           $ic-font-color-dark;
 $footer-links-color:                lighten($ic-font-color-dark, 16);
 $footer-links-border-color:         lighten($ic-color-dark, 16);
 
-body:not(.full-width) .ic-app-main-layout-vertical {
-  // We want to add a max size to most pages in canvas
-  // unless it's a full-width app
-  max-width: 1366px;
-}
-
 body {
   min-height: 100vh;
   &:not(.is-inside-submission-frame):not(.embedded) {
@@ -38,9 +32,6 @@ body {
       background-color: transparent;
       box-shadow: none;
     }
-    #content {
-      padding-top: 0;
-    }
   }
   &.embedded {
     #application, #wrapper, #main {
@@ -48,9 +39,6 @@ body {
     }
     #main {
       min-height: 0;
-    }
-    #content {
-      padding: 1em;
     }
     h2, .h2 {
       @include ui-widget-header-bg-and-text;
@@ -86,19 +74,8 @@ body {
   z-index: 10;
 }
 
-#content {
-  padding: $ic-sp*2;
-  body.is-inside-submission-frame & {
-    padding-left: $ic-sp;
-    padding-right: $ic-sp;
-  }
-}
-
 // **********************************************************************************
 // all of the following are classes that should be applied to 'body' when appropriate
-
-body.ic-framed-lti-tool #content { padding: 0 $ic-sp*2; }
-body.ic-full-screen-lti-tool #content { padding: 0; }
 
 .with-left-side {
   #left-side {
@@ -127,14 +104,6 @@ body.ic-full-screen-lti-tool #content { padding: 0; }
 .full-width {
   #header-inner, #main {
     max-width: none;
-  }
-}
-
-// This hides stuff till the javascript has done it's stuff
-.hide-content-while-scripts-not-loaded {
-  #content, #right-side-wrapper {
-    transiton: opacity 0.3s;
-    opacity: 1;
   }
 }
 

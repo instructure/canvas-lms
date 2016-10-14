@@ -28,7 +28,7 @@
 
   // this is for firefox, if things dont have overflow:visible then it wont print any more than one page.
   .ic-app-main-layout-vertical,
-  #content,
+  .ic-layout-contentMain,
   #wiki_show_view_main {
     overflow: visible !important;
   }
@@ -42,7 +42,7 @@
     display: block !important;
   }
 
-  #content {
+  .ic-layout-contentMain {
     width: auto;
     // the padding:0 here is to revert the padding added by .with-scrolling-right-side, &.with-sidebar-pinned-to-bottom
     padding: 0 !important;

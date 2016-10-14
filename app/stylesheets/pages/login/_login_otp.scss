@@ -63,8 +63,8 @@ body.modal {
       margin: 0;
     }
   }
-  body.no-headers #content,
-  body.embedded #content {
+  body.no-headers .ic-layout-contentMain,
+  body.embedded .ic-layout-contentMain {
     padding: 10px;
   }
   #login_form {

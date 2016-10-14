@@ -106,9 +106,9 @@
       <% end %>
       <div id="main" class="ic-app-main-and-right-side">
         <div id="not_right_side" class="ic-app-main-content">
-          <div id="content-wrapper" class="ic-app-main-content__primary">
+          <div id="content-wrapper" class="ic-layout-contentWrapper">
               <%= render :partial => 'shared/content_notices' if @show_left_side && @context && @context.respond_to?(:content_notices) %>
-            <div id="content" role="main">
+            <div id="content" class="ic-layout-contentMain" role="main">
               <%= yield %>
             </div>
           </div>

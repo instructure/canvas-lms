@@ -35,7 +35,10 @@ $ic-Login-confirmation-bgd: #34444f;
 ////////////////////////////////////////
 // New Login Styles
 ////////////////////////////////////////
-#content {padding: 0;}
+.ic-layout-contentMain {
+  padding: 0;
+}
+
 body.ic-Login-Body { // apply the background to the body element so that you don't see white bg as you scroll
   background-color: $ic-brand-Login-body-bgd-color;
   background-image:

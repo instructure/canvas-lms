@@ -39,9 +39,35 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
   min-width: 1px;
 }
 
-.ic-app-main-content__primary {
+.ic-layout-contentWrapper {
   box-sizing: border-box;
 }
+
+.ic-layout-contentMain {
+  padding: $ic-sp*2;
+
+  body.is-inside-submission-frame & {
+    padding-left: $ic-sp;
+    padding-right: $ic-sp;
+  }
+
+  body.no-headers & {
+    padding-top: 0;
+  }
+
+  body.embedded & {
+    padding: 0 1em 1em;
+  }
+
+  body.ic-framed-lti-tool & {
+    padding: 0 $ic-sp*2;
+  }
+
+  body.ic-full-screen-lti-tool & {
+    padding: 0;
+  }
+}
+
 .ic-app-main-content__secondary {
   box-sizing: border-box;
   padding: $ic-sp*2;
@@ -55,7 +81,7 @@ body.course-menu-expanded {
   &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
     @include breakpoint(desktop--nav-open) { @include shared-main-content; }
   }
-  &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content__primary {
+  &:not(.ic-no-flex-layout):not(.embedded) .ic-layout-contentWrapper {
     @include breakpoint(desktop--nav-open) {
       @include shared-primary;
     }
@@ -72,7 +98,7 @@ body:not(.course-menu-expanded) {
   &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
     @include breakpoint(desktop) { @include shared-main-content; }
   }
-  &:not(.ic-no-flex-layout):not(.embedded)  .ic-app-main-content__primary {
+  &:not(.ic-no-flex-layout):not(.embedded)  .ic-layout-contentWrapper {
     @include breakpoint(desktop) {
       @include shared-primary;
     }
@@ -121,6 +147,12 @@ body:not(.course-menu-expanded) {
 .ic-app-main-layout-vertical {
   box-sizing: border-box;
   min-height: 100vh;
+
+  body:not(.full-width) & {
+    // We want to add a max size to most pages in canvas
+    // unless it's a full-width app
+    max-width: 1366px;
+  }
 
   body:not(.ic-no-flex-layout):not(.embedded) & {
     display: flex;

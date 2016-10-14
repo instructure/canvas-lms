@@ -1565,7 +1565,8 @@ body > #ui-datepicker-div {
   }
 }
 
-body.padless-content #content, #content.padless {
+body.padless-content .ic-layout-contentMain,
+.ic-layout-contentMain.padless {
   #sequence_footer {
     margin-left: 10px;
     margin-right: 10px;
