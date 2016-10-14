@@ -64,9 +64,7 @@ module Api
         let(:url_helper){ stub({
           media_object_thumbnail_url: "/media/object/thumbnail",
           media_redirect_url: "/media/redirect",
-          proxy: stub(
-            show_media_tracks_url: 'media/track/vtt'
-          )
+          show_media_tracks_url: 'media/track/vtt'
         }) }
 
         describe 'transforming a video node' do

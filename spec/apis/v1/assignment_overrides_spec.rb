@@ -756,6 +756,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "should relock modules when changing overrides" do
+        # but only for the students they affect
         @assignment.only_visible_to_overrides = true
         @assignment.save!
 
@@ -764,15 +765,26 @@ describe AssignmentOverridesController, type: :request do
         mod.completion_requirements = {tag.id => {:type => 'must_submit'}}
         mod.save!
 
+        @old_student = @student
+        @new_student = student_in_course(:course => @course).user
         @other_student = student_in_course(:course => @course).user
 
-        prog = mod.evaluate_for(@other_student)
-        expect(prog).to be_completed # since they can't see the assignment
+        prog = mod.evaluate_for(@old_student)
+        expect(prog).to be_unlocked # since they can see the assignment
 
-        api_update_override(@course, @assignment, @override, :assignment_override => { :student_ids => [@other_student.id] })
+        new_prog = mod.evaluate_for(@new_student)
+        expect(new_prog).to be_completed # since they can't see the assignment yet
+
+        other_prog = mod.evaluate_for(@other_student)
+        other_prog.any_instantiation.expects(:evaluate!).never
+
+        api_update_override(@course, @assignment, @override, :assignment_override => { :student_ids => [@new_student.id] })
 
         prog.reload
-        expect(prog).to be_unlocked # now they can
+        expect(prog).to be_completed # now they can't see it anymore
+
+        new_prog.reload
+        expect(new_prog).to be_unlocked # now they can
       end
 
       it "recomputes grades when changing overrides" do
