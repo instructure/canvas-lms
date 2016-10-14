@@ -2,11 +2,12 @@ define([
   'react',
   'underscore',
   'jquery',
+  'instructure-ui/Button',
   'i18n!grading_periods',
   'compiled/api/gradingPeriodSetsApi',
   'jsx/grading/EnrollmentTermInput',
   'compiled/jquery.rails_flash_notifications'
-], function(React, _, $, I18n, setsApi, EnrollmentTermInput) {
+], function(React, _, $, { default: Button }, I18n, setsApi, EnrollmentTermInput) {
 
   let NewGradingPeriodSetForm = React.createClass({
     propTypes: {
@@ -104,20 +105,18 @@ define([
             <div className="grid-row">
               <div className="col-xs-12 col-lg-12">
                 <div className="ic-Form-actions below-line">
-                  <button aria-disabled={this.state.buttonsDisabled}
-                          className={this.state.buttonsDisabled ? "Button disabled" : "Button"}
-                          type="button"
+                  <Button disabled={this.state.buttonsDisabled}
                           onClick={this.props.closeForm}
                           ref="cancelButton">
                     {I18n.t("Cancel")}
-                  </button>
-                  <button aria-disabled={this.state.buttonsDisabled}
-                          className={this.state.buttonsDisabled ? "Button Button--primary disabled" : "Button Button--primary"}
-                          type="submit"
+                  </Button>
+                  &nbsp;
+                  <Button disabled={this.state.buttonsDisabled}
+                          variant="primary"
                           onClick={this.submit}
                           ref="createButton">
                     {I18n.t("Create")}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

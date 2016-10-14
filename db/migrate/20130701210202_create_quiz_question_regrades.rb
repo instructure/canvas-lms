@@ -6,7 +6,7 @@ class CreateQuizQuestionRegrades < ActiveRecord::Migration
       t.integer :quiz_question_id, limit: 8, null: false
       t.string :regrade_option, null: false
 
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :quiz_question_regrades, [:quiz_regrade_id, :quiz_question_id], unique: true, name: 'index_qqr_on_qr_id_and_qq_id'

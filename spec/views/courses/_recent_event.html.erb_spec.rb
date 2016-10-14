@@ -44,7 +44,7 @@ describe "/courses/_recent_event" do
 
     render partial: "courses/recent_event", object: event, locals: {is_hidden: false, show_context: true}
 
-    expect(response.body).to include(@course.name)
+    expect(response.body).to include(@course.short_name)
   end
 
   it "doesn't show the context when not asked to" do

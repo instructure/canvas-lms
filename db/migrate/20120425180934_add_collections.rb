@@ -11,7 +11,7 @@ class AddCollections < ActiveRecord::Migration
 
       t.string :workflow_state
 
-      t.timestamps
+      t.timestamps null: true
     end
     add_index :collections, [:context_id, :context_type, :workflow_state, :visibility], :name => "index_collections_for_finding"
 
@@ -26,7 +26,7 @@ class AddCollections < ActiveRecord::Migration
       t.integer :image_attachment_id, :limit => 8
       t.text :image_url
 
-      t.timestamps
+      t.timestamps null: true
     end
     add_index :collection_items, [:collection_id, :workflow_state]
     add_index :collection_items, [:collection_item_data_id, :workflow_state], :name => "index_collection_items_on_data_id"
@@ -41,14 +41,14 @@ class AddCollections < ActiveRecord::Migration
       t.integer :post_count, :default => 0
       t.integer :upvote_count, :default => 0
 
-      t.timestamps
+      t.timestamps null: true
     end
 
     create_table :collection_item_upvotes do |t|
       t.integer :collection_item_data_id, :limit => 8
       t.integer :user_id, :limit => 8
 
-      t.timestamps
+      t.timestamps null: true
     end
     add_index :collection_item_upvotes, [:collection_item_data_id, :user_id], :unique => true, :name => "index_collection_item_upvotes_join"
   end

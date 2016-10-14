@@ -64,7 +64,6 @@ describe ContextModulesController do
         expect(assigns[:modules]).to eq [@m2]
       end
     end
-
   end
 
   describe "PUT 'update'" do
@@ -681,14 +680,14 @@ describe ContextModulesController do
       @tag = @mod.add_item(type: 'quiz', id: @quiz.id)
 
       @quiz.generate_submission(@student).complete!
-      
+
       get 'content_tag_assignment_data', course_id: @course.id, format: 'json' # precache
       json = JSON.parse response.body.gsub("while(1);",'')
       expect(json[@tag.id.to_s]["past_due"]).to be_blank
     end
   end
 
-  describe "GET 'show'" do
+  describe "GET show" do
     before :once do
       course_with_teacher(active_all: true)
     end
@@ -708,6 +707,161 @@ describe ContextModulesController do
       user_session(@student)
       get 'show', course_id: @course.id, id: @m1.id
       assert_unauthorized
+    end
+  end
+
+  describe "GET 'choose_mastery_path'" do
+    before :each do
+      ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+    end
+
+    before :once do
+      course_with_student_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      ag = @course.assignment_groups.create!
+      @assg = ag.assignments.create!(:context => @course)
+      @item = @mod.add_item :type => 'assignment', :id => @assg.id
+    end
+
+    it "should return 404 if no rule matches item assignment" do
+      user_session(@student)
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert_response(:missing)
+    end
+
+    it "should return 404 if matching rule is unlocked but has only one assignment set" do
+      user_session(@student)
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: @assg.id,
+          locked: false,
+          assignment_sets: [{}],
+        }
+      ])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert_response(:missing)
+    end
+
+    it "should redirect to context modules page with warning if matching rule is locked" do
+      user_session(@student)
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: @assg.id,
+          locked: true,
+          assignment_sets: [],
+        }
+      ])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert(flash[:warning].present?)
+      assert_redirected_to(controller: 'context_modules', action: 'index')
+    end
+
+    it "should show choose page if matches a rule that is unlocked and has more than two assignment sets" do
+      user_session(@student)
+      assg1, assg2 = create_assignments(@course.id, 2).map {|id| Assignment.find(id)}
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: @assg.id,
+          locked: false,
+          assignment_sets: [
+            { id: 1, assignments: [{ assignment_id: 1, model: assg1 }] },
+            { id: 2, assignments: [{ assignment_id: 2, model: assg2 }] }
+          ]
+        }
+      ])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert_response(:success)
+      mastery_path_data = controller.js_env[:CHOOSE_MASTERY_PATH_DATA]
+      expect(mastery_path_data).to include({
+        selectedOption: nil,
+        courseId: @course.id,
+        moduleId: @mod.id,
+        itemId: @item.id.to_s
+      })
+      options = mastery_path_data[:options]
+      expect(options.length).to eq 2
+      expect(options[0][:setId]).to eq 1
+      expect(options[1][:setId]).to eq 2
+    end
+
+    it "should show choose page if matches a rule that is unlocked and has more than two assignment sets even if multiple rules are present" do
+      user_session(@student)
+      assg1, assg2 = create_assignments(@course.id, 2).map {|id| Assignment.find(id)}
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: @assg.id + 1,
+          locked: false,
+          assignment_sets: [
+            { id: 1, assignments: [{ assignment_id: 1, model: assg1 }] },
+            { id: 2, assignments: [{ assignment_id: 2, model: assg2 }] }
+          ]
+        },
+        {
+          trigger_assignment: @assg.id,
+          locked: false,
+          assignment_sets: [
+            { id: 3, assignments: [{ assignment_id: 2, model: assg2 }] },
+            { id: 4, assignments: [{ assignment_id: 1, model: assg1 }] }
+          ]
+        }
+      ])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert_response(:success)
+      options = controller.js_env[:CHOOSE_MASTERY_PATH_DATA][:options]
+      expect(options.length).to eq 2
+      expect(options[0][:setId]).to eq 3
+      expect(options[1][:setId]).to eq 4
+    end
+  end
+
+  describe "GET item_redirect_mastery_paths" do
+    before :each do
+      course_with_teacher_logged_in active_all: true
+      @mod = @course.context_modules.create!
+    end
+
+    it "should redirect to assignment edit mastery paths page" do
+      ag = @course.assignment_groups.create!
+      assg = ag.assignments.create! context: @course
+      item = @mod.add_item type: 'assignment', id: assg.id
+
+      get 'item_redirect_mastery_paths', course_id: @course.id, id: item.id
+      assert_redirected_to controller: 'assignments', action: 'edit', id: assg.id, anchor: 'mastery-paths-editor'
+    end
+
+    it "should redirect to quiz edit mastery paths page" do
+      quiz = @course.quizzes.create!
+      item = @mod.add_item type: 'quiz', id: quiz.id
+
+      get 'item_redirect_mastery_paths', course_id: @course.id, id: item.id
+      assert_redirected_to controller: 'quizzes/quizzes', action: 'edit', id: quiz.id, anchor: 'mastery-paths-editor'
+    end
+
+    it "should redirect to discussion edit mastery paths page" do
+      topic = @course.discussion_topics.create!
+      item = @mod.add_item type: 'discussion_topic', id: topic.id
+
+      get 'item_redirect_mastery_paths', course_id: @course.id, id: item.id
+      assert_redirected_to controller: 'discussion_topics', action: 'edit', id: topic.id, anchor: 'mastery-paths-editor'
+    end
+
+    it "should 404 if module item is not a graded type" do
+      page = @course.wiki.wiki_pages.create title: "test"
+      item = @mod.add_item type: 'page', id: page.id
+
+      get 'item_redirect_mastery_paths', :course_id => @course.id, :id => item.id
+      assert_response :missing
     end
   end
 end

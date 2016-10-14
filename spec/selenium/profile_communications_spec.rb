@@ -96,9 +96,9 @@ describe "profile communication settings" do
     get "/profile/communication"
     wait_for_ajaximations
     cell = find_frequency_cell("grading", sns_channel.id)
-    buttons = ff('.frequency', cell)
-    expect(buttons[0]).to have_attribute('data-value', 'immediately')
-    expect(buttons[1]).to have_attribute('data-value', 'never')
+    buttons = ff('input', cell)
+    expect(buttons[0]).to have_attribute('value', 'immediately')
+    expect(buttons[1]).to have_attribute('value', 'never')
   end
 
   it "should load the initial state of a user-pref checkbox" do
@@ -128,20 +128,23 @@ describe "profile communication settings" do
   end
 
   it "should load an existing frequency setting and save a change" do
-    channel = @user.communication_channels.create(:path => "8011235555@vtext.com", :path_type => "sms")
+    channel = @user.communication_channels.create(:path => "8011235555@vtext.com", :path_type => "email")
     channel.confirm
     # Create a notification policy entry as an existing setting.
     policy = NotificationPolicy.new(:communication_channel_id => channel.id, :notification_id => @sub_comment.id)
     policy.frequency = Notification::FREQ_DAILY
     policy.save!
     get "/profile/communication"
-    cell = find_frequency_cell(@sub_comment.category.underscore.gsub(/\s/, '_'), channel.id)
+    category_string = @sub_comment.category.underscore.gsub(/\s/, '_')
+    cell = find_frequency_cell(category_string, channel.id)
     # validate existing text is shown correctly (text display and button state)
-    expect(cell.find_element(:css, "input#cat_#{@sub_comment.id}_ch_#{channel.id}_daily")).to be_selected
+    daily_input = cell.find_element(:css, "input#cat_#{category_string}_ch_#{channel.id}_daily")
+    expect(daily_input).to be_selected
 
-    cell.find_element(:css, 'label[data-value="immediately"]').click
     # Change to a different value and verify flash and the save. (click on the radio)
-    expect(cell.find_element(:css, "input#cat_#{@sub_comment.id}_ch_#{channel.id}_immediately")).to be_selected
+    immediate_input = cell.find_element(:css, "input#cat_#{category_string}_ch_#{channel.id}_immediately")
+    immediate_input.send_keys(' ')
+    expect(immediate_input).to be_selected
 
     wait_for_ajaximations
 

@@ -32,7 +32,7 @@ TEXT
             <label class="ic-Label screenreader-only" for="authentication_provider[federated_attributes][<%= canvas_attribute %>][provisioning_only]"><%= t 'Provisioning Only' %></label>
             <input type="checkbox" id="authentication_provider[federated_attributes][<%= canvas_attribute %>][provisioning_only]" name="authentication_provider[federated_attributes][<%= canvas_attribute %>][provisioning_only]" <%= 'checked="checked"'.html_safe if provider_attribute['provisioning_only'] %>/>
           </td>
-          <td class="canvas_attribute"><span class="screenreader-only"><%= t 'Canvas Attribute' %></span><%= canvas_attribute %></td>
+          <td class="canvas_attribute"><span class="screenreader-only"><%= t 'Canvas Attribute' %></span><span class="canvas_attribute_name"><%= canvas_attribute %></span></td>
           <td><label class="ic-Label screenreader-only" for="authentication_provider[federated_attributes][#{canvas_attribute}][attribute]"><%= t 'Provider Attribute' %></label>
             <%= presenter.federated_provider_attribute(aac, canvas_attribute, provider_attribute['attribute']) %></td>
           <td>
@@ -44,7 +44,7 @@ TEXT
         <td class="provisioning_only_column<%= ' federated_attributes_none' unless aac.jit_provisioning? %>">
           <label class="ic-Label screenreader-only"><%= t 'Provisioning Only' %></label>
           <input type="checkbox" /></td>
-        <td class="canvas_attribute"><span class="screenreader-only"><%= t 'Canvas Attribute' %></span></td>
+        <td class="canvas_attribute"><span class="screenreader-only"><%= t 'Canvas Attribute' %></span><span class="canvas_attribute_name"></span></td>
         <td class="provider_attribute_column"><label class="ic-Label screenreader-only"><%= t 'Provider Attribute' %></label><%= presenter.federated_provider_attribute(aac) %></td>
         <td>
           <button type="button" class="Button Button--icon-action remove_federated_attribute"><i class="icon-trash"><span class="screenreader-only"><%= t 'Remove Attribute' %></span></i></button>

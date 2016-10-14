@@ -23,7 +23,6 @@ require 'delayed/testing'
 describe BrandConfigHelpers do
   def setup_account_family_with_configs
     @parent_account = Account.default
-    @parent_account.enable_feature!(:use_new_styles)
     @parent_config = BrandConfig.for(
       variables: {"ic-brand-primary" => "red"},
       js_overrides: nil,
@@ -81,7 +80,6 @@ describe BrandConfigHelpers do
     end
 
     it "should work with site_admin" do
-      Account.site_admin.enable_feature!(:use_new_styles)
       site_admin_config = BrandConfig.for(variables: {"ic-brand-primary" => "orange"})
       site_admin_config.save!
       regenerator = BrandConfigRegenerator.new(Account.site_admin, user, site_admin_config)

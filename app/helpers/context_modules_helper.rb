@@ -17,12 +17,15 @@
 #
 
 module ContextModulesHelper
+  include Api::V1::ContextModule
+
   def cache_if_module(context_module, editable, user, context, &block)
     if context_module
       visible_assignments = user ? user.assignment_and_quiz_visibilities(context) : []
-      cache_key_items = ['context_module_render_17_', context_module.cache_key, editable, true, Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
+      cache_key_items = ['context_module_render_18_', context_module.cache_key, editable, true, Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
       cache_key = cache_key_items.join('/')
       cache_key = add_menu_tools_to_cache_key(cache_key)
+      cache_key = add_mastery_paths_to_cache_key(cache_key, context, context_module, user)
       cache(cache_key, nil, &block)
     else
       yield
@@ -33,6 +36,21 @@ module ContextModulesHelper
     tool_key = @menu_tools && @menu_tools.values.flatten.map(&:cache_key).join("/")
     cache_key += Digest::MD5.hexdigest(tool_key) if tool_key.present?
     # should leave it alone if there are no tools
+    cache_key
+  end
+
+  def add_mastery_paths_to_cache_key(cache_key, context, module_or_modules, user)
+    if ConditionalRelease::Service.enabled_in_context?(context)
+      if context.user_is_student?(user)
+        items = Rails.cache.fetch("visible_content_tags_for/#{cache_key}") do
+          Array.wrap(module_or_modules).map{ |m| m.content_tags_visible_to(user, :is_teacher => false) }.flatten
+        end
+        rules = ConditionalRelease::Service.rules_for(context, user, items, @session)
+      else
+        rules = ConditionalRelease::Service.active_rules(context, user, @session)
+      end
+      cache_key += '/mastery:' + Digest::MD5.hexdigest(rules.to_s)
+    end
     cache_key
   end
 
@@ -71,6 +89,56 @@ module ContextModulesHelper
   def module_item_unpublishable?(item)
     return true if item.nil? || !item.content || !item.content.respond_to?(:can_unpublish?)
     item.content.can_unpublish?
+  end
+
+  def preload_modules_content(modules, can_edit)
+    ActiveRecord::Associations::Preloader.new.preload(modules, :content_tags => :content)
+    preload_can_unpublish(@context, modules) if can_edit
+  end
+
+  def cyoe_able?(item)
+    if item.content_type == 'Assignment'
+      item.graded? && item.content.graded?
+    elsif item.content_type == 'Quizzes::Quiz'
+      item.graded? && item.content.assignment?
+    else
+      item.graded?
+    end
+  end
+
+  def process_module_data(mod, is_student = false, is_cyoe_on = false, current_user = nil, session = nil)
+    # pre-calculated module view data can be added here
+    module_data = {
+      published_status: mod.published? ? 'published' : 'unpublished',
+      items: mod.content_tags_visible_to(@current_user)
+    }
+
+    cyoe_rules = []
+
+    if is_student && is_cyoe_on
+      cyoe_rules = ConditionalRelease::Service.rules_for(@context, current_user, module_data[:items], session)
+    end
+
+    items_data = {}
+    module_data[:items].each do |item|
+      # pre-calculated module item view data can be added here
+      item_data = {
+        published_status: item.published? ? 'published' : 'unpublished',
+      }
+
+      if is_student && is_cyoe_on
+        item_data[:mastery_paths] = conditional_release(item, { conditional_release_rules: cyoe_rules })
+        item_data[:choose_url] = context_url(@context, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
+      end
+
+      item_data[:show_cyoe_placeholder] = is_student && item_data[:mastery_paths] && item_data[:mastery_paths][:selected_set_id] == nil
+
+      items_data[item.id] = item_data
+    end
+
+    module_data[:items_data] = items_data
+
+    return module_data
   end
 
   def module_item_translated_content_type(item)

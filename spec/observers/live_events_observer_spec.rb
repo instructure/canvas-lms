@@ -60,10 +60,16 @@ describe LiveEventsObserver do
       @page.touch
     end
 
-    it "posts delete events" do
+    it "posts soft delete events" do
       wiki_page_model
       Canvas::LiveEvents.expects(:wiki_page_deleted).once
       @page.destroy
+    end
+
+    it "posts delete events" do
+      wiki_page_model
+      Canvas::LiveEvents.expects(:wiki_page_deleted).once
+      @page.destroy_permanently!
     end
   end
 
@@ -134,6 +140,27 @@ describe LiveEventsObserver do
     it "posts create events" do
       Canvas::LiveEvents.expects(:enrollment_created).once
       course_with_student
+    end
+
+    it "posts update events" do
+      Canvas::LiveEvents.expects(:enrollment_updated).once
+      course_with_student
+      @enrollment.workflow_state = 'rejected'
+      @enrollment.save
+    end
+  end
+
+  describe "enrollment_state" do
+    it "posts create events" do
+      Canvas::LiveEvents.expects(:enrollment_state_created).once
+      course_with_student
+    end
+
+    it "posts update events" do
+      Canvas::LiveEvents.expects(:enrollment_state_updated).once
+      course_with_student
+      @enrollment.limit_privileges_to_course_section = true
+      @enrollment.save
     end
   end
 

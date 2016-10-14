@@ -2,12 +2,7 @@
   css_bundle :otp_login
   js_bundle :otp_login
   @headers = false
-  if use_new_styles?
-    @body_classes << "full-width modal body--login-confirmation"
-  else
-    @body_classes << "modal body--login-confirmation"
-  end
-
+  @body_classes << "full-width modal body--login-confirmation"
   content_for :page_title, t(:page_title, "Multi-factor Authentication")
 %>
 
@@ -15,14 +10,12 @@
   <meta name="viewport" id="vp" content="initial-scale=1.0,user-scalable=yes,width=device-width">
 <% end %>
 
-<div id="modal-box"<% if use_new_styles? %> class="ic-Login-confirmation"<% end %>>
-  <% if use_new_styles? %>
+<div id="modal-box" class="ic-Login-confirmation">
   <header class="ic-Login-confirmation__header">
     <%= image_tag("login/canvas-logo@2x.png", class:"ic-Login-confirmation__logo", alt:"Canvas by Instructure") %>
   </header>
   <div class="ic-Login-confirmation__content">
-  <% end %>
-  <h2<% if use_new_styles? %> class="ic-Login-confirmation__headline"<% end %>><%= t 'titles.mfa', "Multi-factor Authentication" %></h2>
+  <h2 class="ic-Login-confirmation__headline"><%= t 'titles.mfa', "Multi-factor Authentication" %></h2>
   <% if configuring? %>
     <div>
       <% if @current_user.mfa_settings(pseudonym_hint: @current_pseudonym) == :required %>
@@ -94,5 +87,5 @@ secret key **%{secret_key}**.
       <%= f.check_box :remember_me %> <%= f.label :remember_me, :en => "Remember this computer" %>
     </div>
   <% end %>
-  <% if use_new_styles? %></div><% end %>
+  </div>
 </div>

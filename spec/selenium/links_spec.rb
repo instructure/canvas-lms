@@ -92,18 +92,14 @@ describe "links", priority: "2" do
     context "right side links" do
 
       it "should navigate user to conversations page after inbox link is clicked" do
-        expect_new_page_load { fj(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_conversations_link' : '#identity a:contains("Inbox")').click}
+        expect_new_page_load { fj('#global_nav_conversations_link').click}
         expect(f("i.icon-email")).to be_displayed
       end
 
       it "should navigate user to user settings page after settings link is clicked" do
         expect_new_page_load {
-          if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-            f('#global_nav_profile_link').click
-            fj('a.ic-NavMenu-list-item__link:contains("Settings")').click
-          else
-            fj('#identity a:contains("Settings")').click
-          end
+          f('#global_nav_profile_link').click
+          fj('a.ic-NavMenu-list-item__link:contains("Settings")').click
         }
         expect(f("a.edit_settings_link")).to be_displayed
       end
@@ -112,13 +108,8 @@ describe "links", priority: "2" do
     context "global nav links" do
 
       it "should navigate user to main page after canvas logo link is clicked" do
-        expect_new_page_load { f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#header .ic-app-header__logomark' : '#header-logo').click }
+        expect_new_page_load { f('#header .ic-app-header__logomark').click }
         expect(driver.current_url).to eq dashboard_url
-      end
-
-      it "should navigate user to gradebook page after grades link is clicked" do
-        skip('there is no global "grades" link in the header in NewUI') if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-        validate_breadcrumb_link(f('#grades_menu_item a'), 'Grades')
       end
 
       it "should navigate user to the calendar page after calender link is clicked" do

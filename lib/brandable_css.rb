@@ -32,12 +32,13 @@ module BrandableCSS
   SASS_STYLE = ENV['SASS_STYLE'] || ((use_compressed ? 'compressed' : 'nested')).freeze
 
   VARIABLE_HUMAN_NAMES = {
-    "ic-brand-primary" => lambda { I18n.t("Primary Color") },
+    "ic-brand-primary" => lambda { I18n.t("Primary Brand Color") },
+    "ic-brand-font-color-dark" => lambda { I18n.t("Main Text Color") },
+    "ic-link-color" => lambda { I18n.t("Link Color") },
     "ic-brand-button--primary-bgd" => lambda { I18n.t("Primary Button") },
     "ic-brand-button--primary-text" => lambda { I18n.t("Primary Button Text") },
     "ic-brand-button--secondary-bgd" => lambda { I18n.t("Secondary Button") },
     "ic-brand-button--secondary-text" => lambda { I18n.t("Secondary Button Text") },
-    "ic-link-color" => lambda { I18n.t("Link") },
     "ic-brand-global-nav-bgd" => lambda { I18n.t("Nav Background") },
     "ic-brand-global-nav-ic-icon-svg-fill" => lambda { I18n.t("Nav Icon") },
     "ic-brand-global-nav-ic-icon-svg-fill--active" => lambda { I18n.t("Nav Icon Active") },
@@ -251,7 +252,7 @@ module BrandableCSS
       percent_complete = 0
       Open3.popen2e(command) do |_stdin, stdout_and_stderr, wait_thr|
         stdout_and_stderr.each do |line|
-          puts line.chomp!
+          Rails.logger.try(:debug, line.chomp!) if defined?(Rails)
 
           # This is a good-enough-for-now approximation to show the progress
           # bar in the UI.  Since we don't know exactly how many files there are,

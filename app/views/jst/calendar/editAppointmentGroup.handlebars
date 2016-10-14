@@ -1,5 +1,5 @@
 <form action='#' id='edit_appointment_form'>
-  <div class="left-column-wrapper">
+  <div class="left-column-wrapper event-details-content">
     <p>
       <label for="edit-appointment-name-{{uniqid}}"><b>{{#t "name"}}Name{{/t}}</b></label><br />
       <input type="text" id="edit-appointment-name-{{uniqid}}" name="title" value="{{appointment_group.title}}"/>
@@ -101,5 +101,9 @@
   <div class="details-wrapper">
     <label for="edit-appointment-details-{{uniqid}}"><b>{{#t "details"}}Details:{{/t}}</b></label><br />
     <textarea id="edit-appointment-details-{{uniqid}}" name="description" class="input-block-level">{{appointment_group.description}}</textarea>
+  </div>
+  <div class="popover-links-holder event-details-footer pull-right scheduler-event-details-footer">
+    <a href="#" class="event_button btn btn-secondary more_options_link save_without_publishing_link">{{#t}}Save{{/t}}</a>
+    <button type="submit" class="event_button btn btn-primary">{{#t}}Save & Publish{{/t}}</button>
   </div>
 </form>

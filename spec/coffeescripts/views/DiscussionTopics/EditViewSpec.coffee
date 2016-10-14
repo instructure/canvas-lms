@@ -41,7 +41,6 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
           views: {}
 
     (app.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string
-    @stub(app, 'scrollSidebar')
     app.render()
 
   module 'EditView',
@@ -82,9 +81,9 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     clock = sinon.useFakeTimers()
     view = @editView()
     clock.tick(1)
-    data = { group_category_id: 'new' }
+    data = { group_category_id: 'blank' }
     errors = view.validateBeforeSave(data, [])
-    ok errors["groupCategorySelector"][0]["message"]
+    ok errors["newGroupCategory"][0]["message"]
     clock.restore()
 
   test 'does not render #podcast_has_student_posts_container for non-course contexts', ->
@@ -97,6 +96,8 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
   module 'EditView - ConditionalRelease',
     setup: ->
       fakeENV.setup()
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+      ENV.CONDITIONAL_RELEASE_ENV = { assignment: { id: 1 }, jwt: 'foo' }
       $(document).on 'submit', -> false
     teardown: ->
       fakeENV.teardown()
@@ -104,36 +105,29 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     editView: ->
       editView.apply(this, arguments)
 
-  conditionalReleaseEnv = { assignment: { id: 1 }, jwt: 'foo' }
   test 'does not show conditional release tab when feature not enabled', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
     view = @editView()
-    equal view.$el.find('#discussion-conditional-release-tab').length, 0
+    equal view.$el.find('#mastery-paths-editor').length, 0
     equal view.$el.find('#discussion-edit-view').hasClass('ui-tabs'), false
 
   test 'shows disabled conditional release tab when feature enabled, but not assignment', ->
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
     view = @editView()
     view.renderTabs()
     view.loadConditionalRelease()
-    equal view.$el.find('#discussion-conditional-release-tab').length, 1
+    equal view.$el.find('#mastery-paths-editor').length, 1
     equal view.$discussionEditView.hasClass('ui-tabs'), true
     equal view.$discussionEditView.tabs("option", "disabled"), true
 
   test 'shows enabled conditional release tab when feature enabled, and assignment', ->
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
     view = @editView({ withAssignment: true })
     view.renderTabs()
     view.loadConditionalRelease()
-    equal view.$el.find('#discussion-conditional-release-tab').length, 1
+    equal view.$el.find('#mastery-paths-editor').length, 1
     equal view.$discussionEditView.hasClass('ui-tabs'), true
     equal view.$discussionEditView.tabs("option", "disabled"), false
 
   test 'enables conditional release tab when changed to assignment', ->
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
     view = @editView()
     view.loadConditionalRelease()
     view.renderTabs()
@@ -144,8 +138,6 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     equal view.$discussionEditView.tabs("option", "disabled"), false
 
   test 'disables conditional release tab when changed from assignment', ->
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
     view = @editView({ withAssignment: true })
     view.loadConditionalRelease()
     view.renderTabs()
@@ -156,29 +148,27 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     equal view.$discussionEditView.tabs("option", "disabled"), true
 
   test 'renders conditional release tab content', ->
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
     view = @editView({ withAssignment: true })
     view.loadConditionalRelease()
     equal 1, view.$conditionalReleaseTarget.children().size()
 
   test 'conditional release editor is updated on tab change', ->
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
     view = @editView({ withAssignment: true })
     view.renderTabs()
     view.renderGroupCategoryOptions()
     view.loadConditionalRelease()
     stub = @stub(view.conditionalReleaseEditor, 'updateAssignment')
+    view.$discussionEditView.tabs("option", "active", 1)
+    ok stub.calledOnce
+
+    stub.reset()
+    view.$discussionEditView.tabs("option", "active", 0)
     view.onChange()
     view.$discussionEditView.tabs("option", "active", 1)
     ok stub.calledOnce
 
   test 'validates conditional release', (assert) ->
     resolved = assert.async()
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
-
     view = @editView({ withAssignment: true })
     _.defer =>
       stub = @stub(view.conditionalReleaseEditor, 'validateBeforeSave').returns 'foo'
@@ -188,9 +178,6 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
 
   test 'calls save in conditional release', (assert) ->
     resolved = assert.async()
-    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
-
     view = @editView({ withAssignment: true })
     _.defer =>
       superPromise = $.Deferred().resolve({}).promise()
@@ -204,3 +191,35 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
         mockSuper.verify()
         ok stub.calledOnce
         resolved()
+
+  test 'does not call conditional release save for an announcement', (assert) ->
+    resolved = assert.async()
+    view = @editView({ isAnnouncement: true })
+    _.defer =>
+      superPromise = $.Deferred().resolve({}).promise()
+      mockSuper = sinon.mock(EditView.__super__)
+      mockSuper.expects('saveFormData').returns superPromise
+
+      savePromise = view.saveFormData()
+      savePromise.then ->
+        mockSuper.verify()
+        notOk view.conditionalReleaseEditor
+        resolved()
+
+  test 'switches to conditional tab if save error contains conditional release error', (assert) ->
+    resolved = assert.async()
+    view = @editView({ withAssignment: true })
+    _.defer =>
+      view.$discussionEditView.tabs('option', 'active', 0)
+      view.showErrors({ foo: 'bar', conditional_release: 'bat' })
+      equal 1, view.$discussionEditView.tabs('option', 'active')
+      resolved()
+
+  test 'switches to details tab if save error does not contain conditional release error', (assert) ->
+    resolved = assert.async()
+    view = @editView({ withAssignment: true })
+    _.defer =>
+      view.$discussionEditView.tabs('option', 'active', 1)
+      view.showErrors({ foo: 'bar', baz: 'bat' })
+      equal 0, view.$discussionEditView.tabs('option', 'active')
+      resolved()

@@ -13,14 +13,12 @@ define([
     let $el = ReactDOM.findDOMNode(component);
     ok($el, "expect element to exist");
     equal($el.getAttribute('aria-disabled'), 'true');
-    ok(_.contains($el.classList, 'disabled'));
   };
 
   const assertEnabled = function(component) {
     let $el = ReactDOM.findDOMNode(component);
     ok($el, "expect element to exist");
-    equal($el.getAttribute('aria-disabled'), 'false');
-    notOk(_.contains($el.classList, 'disabled'));
+    notEqual($el.getAttribute('aria-disabled'), 'true');
   };
 
   const urls = {
@@ -41,19 +39,20 @@ define([
       id: "1",
       title: "We did it! We did it! We did it! #dora #boots",
       startDate: new Date("2015-01-01T20:11:00+00:00"),
-      endDate: new Date("2015-03-01T00:00:00+00:00")
-    },
-    {
+      endDate: new Date("2015-03-01T00:00:00+00:00"),
+      closeDate: new Date("2015-03-01T00:00:00+00:00")
+    },{
       id: "3",
       title: "Como estas?",
       startDate: new Date("2014-11-01T20:11:00+00:00"),
-      endDate: new Date("2014-11-11T00:00:00+00:00")
-    },
-    {
+      endDate: new Date("2014-11-11T00:00:00+00:00"),
+      closeDate: new Date("2014-11-11T00:00:00+00:00")
+    },{
       id: "2",
       title: "Swiper no swiping!",
       startDate: new Date("2015-04-01T20:11:00+00:00"),
-      endDate: new Date("2015-05-01T00:00:00+00:00")
+      endDate: new Date("2015-05-01T00:00:00+00:00"),
+      closeDate: new Date("2015-05-01T00:00:00+00:00")
     }
   ];
 
@@ -61,7 +60,8 @@ define([
     id: "4",
     title: "Example Period",
     startDate: new Date("2015-03-02T20:11:00+00:00"),
-    endDate: new Date("2015-03-03T00:00:00+00:00")
+    endDate: new Date("2015-03-03T00:00:00+00:00"),
+    closeDate: new Date("2015-03-03T00:00:00+00:00")
   };
 
   const props = {
@@ -146,7 +146,7 @@ define([
 
   test("calls the onEdit prop when the 'edit grading period set' button is clicked", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.editButton));
     ok(set.props.onEdit.calledOnce);
     equal(set.props.onEdit.args[0][0], set.props.set);
   });
@@ -155,7 +155,7 @@ define([
     this.stub(axios, "delete");
     this.stub(window, "confirm", () => false);
     let set = this.renderComponent();
-    Simulate.click(set.refs.deleteButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.deleteButton));
     ok(set.props.onDelete.notCalled);
   });
 
@@ -163,7 +163,7 @@ define([
     let deletePromise = this.stubDeleteSuccess();
     this.stub(window, "confirm", () => true);
     let set = this.renderComponent();
-    Simulate.click(set.refs.deleteButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.deleteButton));
     deletePromise.then(function() {
       ok(set.props.onDelete.calledOnce);
       start();
@@ -185,14 +185,14 @@ define([
   test("renders the 'GradingPeriodForm' when 'edit grading period' is clicked", function() {
     let set = this.renderComponent();
     notOk(!!set.refs.editPeriodForm);
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     ok(set.refs.editPeriodForm);
   });
 
   test("disables all grading period actions while open", function() {
     let set = this.renderComponent();
     notOk(!!set.refs.editPeriodForm);
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     assertDisabled(set.refs.addPeriodButton);
     ok(set.refs["show-grading-period-2"].props.actionsDisabled);
     ok(set.refs["show-grading-period-3"].props.actionsDisabled);
@@ -201,29 +201,28 @@ define([
   test("disables set toggling while open", function() {
     let spy = sinon.spy();
     let set = this.renderComponent({ onToggleBody: spy });
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     Simulate.click(set.refs.toggleSetBody);
     notOk(spy.called);
   });
 
   test("'onCancel' removes the 'edit grading period' form", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     set.refs.editPeriodForm.props.onCancel();
     notOk(!!set.refs.editPeriodForm);
   });
 
   test("'onCancel' focuses on the 'edit grading period' button", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     set.refs.editPeriodForm.props.onCancel();
-    let editButton = ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton);
-    equal(document.activeElement, editButton);
+    equal(document.activeElement, ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
   });
 
   test("'onCancel' re-enables all grading period actions", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     set.refs.editPeriodForm.props.onCancel();
     assertEnabled(set.refs.addPeriodButton);
     notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
@@ -234,7 +233,7 @@ define([
   test("'onCancel' re-enables set toggling", function() {
     let spy = sinon.spy();
     let set = this.renderComponent({ onToggleBody: spy });
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     set.refs.editPeriodForm.props.onCancel();
     Simulate.click(set.refs.toggleSetBody);
     ok(spy.calledOnce);
@@ -245,7 +244,7 @@ define([
       let attrs = _.extend({}, props, opts);
       const element = React.createElement(GradingPeriodSet, attrs);
       let component = ReactDOM.render(element, wrapper);
-      Simulate.click(component.refs["show-grading-period-1"].refs.editButton);
+      Simulate.click(ReactDOM.findDOMNode(component.refs["show-grading-period-1"].refs.editButton));
       return component;
     },
 
@@ -365,7 +364,7 @@ define([
     renderComponent() {
       const element = React.createElement(GradingPeriodSet, props);
       let component = ReactDOM.render(element, wrapper);
-      Simulate.click(component.refs["show-grading-period-1"].refs.editButton);
+      Simulate.click(ReactDOM.findDOMNode(component.refs["show-grading-period-1"].refs.editButton));
       return component;
     },
 
@@ -383,7 +382,8 @@ define([
       id: "1",
       title: "",
       startDate: new Date("2015-03-02T20:11:00+00:00"),
-      endDate: new Date("2015-03-03T00:00:00+00:00")
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -397,7 +397,8 @@ define([
       id: "1",
       title: "    ",
       startDate: new Date("2015-03-02T20:11:00+00:00"),
-      endDate: new Date("2015-03-03T00:00:00+00:00")
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -410,7 +411,8 @@ define([
     let period = {
       title: "Period without Start Date",
       startDate: undefined,
-      endDate: new Date("2015-03-03T00:00:00+00:00")
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -423,7 +425,22 @@ define([
     let period = {
       title: "Period without End Date",
       startDate: new Date("2015-03-02T20:11:00+00:00"),
-      endDate: null
+      endDate: null,
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
+  test('does not save a grading period without a valid closeDate', function() {
+    let period = {
+      title: "Period without End Date",
+      startDate: new Date("2015-03-02T20:11:00+00:00"),
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: null
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -436,7 +453,8 @@ define([
     let period = {
       title: "Period with Overlapping Start Date",
       startDate: new Date("2015-04-30T20:11:00+00:00"),
-      endDate: new Date("2015-05-30T00:00:00+00:00")
+      endDate: new Date("2015-05-30T00:00:00+00:00"),
+      closeDate: new Date("2015-05-30T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -449,7 +467,8 @@ define([
     let period = {
       title: "Period with Overlapping End Date",
       startDate: new Date("2014-12-30T20:11:00+00:00"),
-      endDate: new Date("2015-01-30T00:00:00+00:00")
+      endDate: new Date("2015-01-30T00:00:00+00:00"),
+      closeDate: new Date("2015-01-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -462,7 +481,22 @@ define([
     let period = {
       title: "Overlapping Period",
       startDate: new Date("2015-03-03T00:00:00+00:00"),
-      endDate: new Date("2015-03-02T20:11:00+00:00")
+      endDate: new Date("2015-03-02T20:11:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
+  test('does not save a grading period with closeDate before endDate', function() {
+    let period = {
+      title: "Overlapping Period",
+      startDate: new Date("2015-03-01T00:00:00+00:00"),
+      endDate: new Date("2015-03-02T20:11:00+00:00"),
+      closeDate: new Date("2015-03-02T20:10:59+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -504,13 +538,13 @@ define([
   test("renders the 'GradingPeriodForm' when 'add grading period' is clicked", function() {
     let set = this.renderComponent();
     notOk(!!set.refs.newPeriodForm);
-    Simulate.click(set.refs.addPeriodButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.addPeriodButton));
     ok(set.refs.newPeriodForm);
   });
 
   test("disables all grading period actions while open", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs.addPeriodButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.addPeriodButton));
     ok(set.refs["show-grading-period-1"].props.actionsDisabled);
     ok(set.refs["show-grading-period-2"].props.actionsDisabled);
     ok(set.refs["show-grading-period-3"].props.actionsDisabled);
@@ -518,21 +552,21 @@ define([
 
   test("'onCancel' removes the 'new period form'", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs.addPeriodButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.addPeriodButton));
     set.refs.newPeriodForm.props.onCancel();
     notOk(!!set.refs.newPeriodForm);
   });
 
   test("'onCancel' focuses on the 'add grading period' button", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs.addPeriodButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.addPeriodButton));
     set.refs.newPeriodForm.props.onCancel();
     equal(document.activeElement, ReactDOM.findDOMNode(set.refs.addPeriodButton));
   });
 
   test("'onCancel' re-enables all grading period actions", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs.addPeriodButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.addPeriodButton));
     set.refs.newPeriodForm.props.onCancel();
     assertEnabled(set.refs.addPeriodButton);
     notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
@@ -562,7 +596,7 @@ define([
     renderComponent(opts = {}) {
       const element = React.createElement(GradingPeriodSet, _.defaults(opts, props));
       let component = ReactDOM.render(element, wrapper);
-      Simulate.click(component.refs.addPeriodButton);
+      Simulate.click(ReactDOM.findDOMNode(component.refs.addPeriodButton));
       return component;
     },
 
@@ -660,7 +694,7 @@ define([
     renderComponent() {
       const element = React.createElement(GradingPeriodSet, props);
       let component = ReactDOM.render(element, wrapper);
-      Simulate.click(component.refs.addPeriodButton);
+      Simulate.click(ReactDOM.findDOMNode(component.refs.addPeriodButton));
       return component;
     },
 
@@ -677,7 +711,8 @@ define([
     let period = {
       title: "",
       startDate: new Date("2015-03-02T20:11:00+00:00"),
-      endDate: new Date("2015-03-03T00:00:00+00:00")
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -690,7 +725,8 @@ define([
     let period = {
       title: "Period without Start Date",
       startDate: undefined,
-      endDate: new Date("2015-03-03T00:00:00+00:00")
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -703,7 +739,8 @@ define([
     let period = {
       title: "Period without End Date",
       startDate: new Date("2015-03-02T20:11:00+00:00"),
-      endDate: null
+      endDate: null,
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -716,7 +753,8 @@ define([
     let period = {
       title: "Period with Overlapping Start Date",
       startDate: new Date("2015-04-30T20:11:00+00:00"),
-      endDate: new Date("2015-05-30T00:00:00+00:00")
+      endDate: new Date("2015-05-30T00:00:00+00:00"),
+      closeDate: new Date("2015-05-30T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -729,7 +767,8 @@ define([
     let period = {
       title: "Period with Overlapping End Date",
       startDate: new Date("2014-12-30T20:11:00+00:00"),
-      endDate: new Date("2015-01-30T00:00:00+00:00")
+      endDate: new Date("2015-01-30T00:00:00+00:00"),
+      closeDate: new Date("2015-01-30T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();
@@ -742,7 +781,8 @@ define([
     let period = {
       title: "Overlapping Period",
       startDate: new Date("2015-03-03T00:00:00+00:00"),
-      endDate: new Date("2015-03-02T20:11:00+00:00")
+      endDate: new Date("2015-03-02T20:11:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
     };
     let update = this.stubUpdate();
     let set = this.renderComponent();

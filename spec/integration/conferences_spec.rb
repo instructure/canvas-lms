@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe ConferencesController, type: :request do
   before do
@@ -82,5 +82,25 @@ describe ConferencesController, type: :request do
     expect(assigns['users'].member?(@teacher)).to be_falsey
     expect(assigns['users'].member?(@student1)).to be_truthy
     expect(assigns['users'].member?(@student2)).to be_falsey
+  end
+
+  context 'sharding' do
+    specs_require_sharding
+
+    it "should work with cross-shard invitees" do
+      @shard1.activate do
+        @student = user(:active_all => true)
+      end
+      course_with_teacher(:active_all => true)
+      @course.enroll_student(@student).accept!
+
+      course_conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @teacher) { |c| c.start_at = Time.now }
+      course_conference.add_invitee(@student)
+
+      user_session(@student)
+      get "/courses/#{@course.id}/conferences"
+
+      expect(assigns["new_conferences"].map(&:id)).to include(course_conference.id)
+    end
   end
 end

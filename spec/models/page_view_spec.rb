@@ -377,7 +377,7 @@ describe PageView do
         page_views = (0..3).map { |index| page_view_model }
         page_view_ids = page_views.map { |page_view| page_view.request_id }
 
-        expect(PageView.find_all_by_id(page_view_ids)).to eq page_views
+        expect(PageView.find_all_by_id(page_view_ids)).to match_array page_views
       end
 
       it "should return nothing with unknown request id" do
@@ -392,7 +392,7 @@ describe PageView do
         page_views = (0..3).map { |index| page_view_model }
         page_view_ids = page_views.map { |page_view| page_view.request_id }
 
-        expect(PageView.find_all_by_id(page_view_ids)).to eq page_views
+        expect(PageView.find_all_by_id(page_view_ids)).to match_array page_views
       end
 
       it "should return nothing with unknown request id" do

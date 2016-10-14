@@ -51,7 +51,6 @@ define [
           model: dueDateList
           views: {}
 
-    @stub(app, 'scrollSidebar')
     app.render()
 
   module 'EditView',
@@ -69,6 +68,12 @@ define [
   test 'renders', ->
     view = @editView()
     equal view.$('#assignment_name').val(), 'Test Assignment'
+
+  test 'rejects missing group set for group assignment', ->
+    view = @editView()
+    data = { group_category_id: 'blank' }
+    errors = view.validateBeforeSave(data, [])
+    equal errors['newGroupCategory'][0]['message'], 'Please create a group set'
 
   test 'rejects a letter for points_possible', ->
     view = @editView()
@@ -316,6 +321,12 @@ define [
     view = @editView()
     equal 1, view.$conditionalReleaseTarget.children().size()
 
+  test 'calls update on first switch', ->
+    view = @editView()
+    stub = @stub(view.conditionalReleaseEditor, 'updateAssignment')
+    view.updateConditionalRelease()
+    ok stub.calledOnce
+
   test 'calls update when modified once', ->
     view = @editView()
     stub = @stub(view.conditionalReleaseEditor, 'updateAssignment')
@@ -326,6 +337,8 @@ define [
   test 'does not call update when not modified', ->
     view = @editView()
     stub = @stub(view.conditionalReleaseEditor, 'updateAssignment')
+    view.updateConditionalRelease()
+    stub.reset()
     view.updateConditionalRelease()
     notOk stub.called
 
@@ -350,3 +363,39 @@ define [
       mockSuper.verify()
       ok stub.calledOnce
       resolved()
+
+  test 'focuses in conditional release editor if conditional save validation fails', ->
+    view = @editView()
+    focusOnError = @stub(view.conditionalReleaseEditor, 'focusOnError')
+    view.showErrors({ conditional_release: 'foo' })
+    ok focusOnError.called
+
+  module 'Editview: Intra-Group Peer Review toggle',
+    setup: ->
+      fakeENV.setup()
+    teardown: ->
+      fakeENV.teardown()
+    editView: ->
+      editView.apply(this, arguments)
+
+  test 'only appears for group assignments', ->
+    @stub(userSettings, 'contextGet').returns {
+      peer_reviews: "1",
+      group_category_id: 1,
+      automatic_peer_reviews: "1"
+    }
+    view = @editView()
+    view.$el.appendTo $('#fixtures')
+    ok view.$('#intra_group_peer_reviews').is(":visible")
+
+  test 'does not appear when reviews are being assigned manually', ->
+    @stub(userSettings, 'contextGet').returns {peer_reviews: "1", group_category_id: 1}
+    view = @editView()
+    view.$el.appendTo $('#fixtures')
+    ok !view.$('#intra_group_peer_reviews').is(":visible")
+
+  test 'toggle does not appear when there is no group', ->
+    @stub(userSettings, 'contextGet').returns {peer_reviews: "1"}
+    view = @editView()
+    view.$el.appendTo $('#fixtures')
+    ok !view.$('#intra_group_peer_reviews').is(":visible")

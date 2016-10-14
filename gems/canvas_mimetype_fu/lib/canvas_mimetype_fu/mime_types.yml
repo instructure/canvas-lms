@@ -189,6 +189,7 @@ gsf: application/x-font-type1
 gtar: application/x-tar
 gvp: text/x-google-video-pointer
 gz: application/x-gzip
+gzip: application/gzip
 h: text/x-chdr
 h++: text/x-c++hdr
 hbc: application/vnd.hbci

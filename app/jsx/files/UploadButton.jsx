@@ -48,10 +48,9 @@ define([
         <button
           type= 'button'
           className= 'btn btn-primary btn-upload'
-          ariaLabel= {I18n.t('Upload')}
           onClick= {this.handleAddFilesClick}
         >
-          <i className='icon-upload'/>&nbsp;
+          <i className='icon-upload' aria-hidden />&nbsp;
           <span className= {this.hiddenPhoneClassname()} >
             { I18n.t('Upload') }
           </span>

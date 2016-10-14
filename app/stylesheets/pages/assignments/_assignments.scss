@@ -106,28 +106,6 @@
   .form-horizontal.display-only .control-group {
     margin-bottom: 0;
   }
-  .assignment_dates {
-    @if $use_new_styles == false {
-      border-collapse: collapse;
-      width: 100%;
-      margin-bottom: 1em;
-      thead {
-        background-color: transparent;
-      }
-      tr {
-        th {
-          font-weight: bold;
-          @include fontSize($ic-font-size--small);
-          padding: 0.5em;
-        }
-        td {
-          border-top: 1px solid #BBB;
-          border-bottom: 1px solid #BBB;
-          padding: 0.5em;
-        }
-      }
-    }
-  }
   .description.student-version {
     min-height: 260px;
   }

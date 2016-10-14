@@ -29,7 +29,7 @@ define [
         toggler.on('click keyclick', @toggle)
         @div.find('.undated-events-link').hide()
 
-    load: (setFocus = false) =>
+    load: () =>
       return if @hidden
 
       loadingDfd = new $.Deferred()
@@ -75,9 +75,7 @@ define [
             event.end = null
             event.saveDates()
 
-        if setFocus
-          @div.find('.event:first').focus()
-        else if @previouslyFocusedElement
+        if @previouslyFocusedElement
           $(@previouslyFocusedElement).focus()
         else
           @div.siblings('.element_toggler').focus()
@@ -85,13 +83,13 @@ define [
     show: (event) =>
       event.preventDefault()
       @hidden = false
-      @load(setFocus = true)
+      @load()
 
     toggle: (e) =>
       # defer this until after the section toggles
       setTimeout =>
         @hidden = !@div.is(':visible')
-        @load(setFocus = true)
+        @load()
       , 0
 
     clickEvent: (jsEvent) =>

@@ -21,12 +21,16 @@ require_relative '../spec_helper'
 require 'csv'
 
 describe GradebookImporter do
-  let(:gradebook_user){ user_model }
+  let(:gradebook_user) do
+    teacher = User.create!
+    course_with_teacher(user: teacher, course: @course)
+    teacher
+  end
 
   context "construction" do
     let!(:gradebook_course){ course_model }
 
-    it "should require a context, usually a course" do
+    it "requires a context, usually a course" do
       user = user_model
       progress = Progress.create!(tag: "test", context: @user)
       upload = GradebookUpload.new
@@ -37,12 +41,12 @@ describe GradebookImporter do
         not_to raise_error
     end
 
-    it "should store the context and make it available" do
+    it "stores the context and make it available" do
       new_gradebook_importer
       expect(@gi.context).to be_is_a(Course)
     end
 
-    it "should require the contents of an upload" do
+    it "requires the contents of an upload" do
       progress = Progress.create!(tag: "test", context: @user)
       upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress: progress)
       expect{ GradebookImporter.new(upload) }.
@@ -50,7 +54,7 @@ describe GradebookImporter do
     end
 
 
-    it "should handle points possible being sorted in weird places" do
+    it "handles points possible being sorted in weird places" do
       importer_with_rows(
         'Student,ID,Section,Assignment 1,Final Score',
         '"Blend, Bill",6,My Course,-,',
@@ -61,7 +65,7 @@ describe GradebookImporter do
       expect(@gi.students.length).to eq 2
     end
 
-    it "should handle muted line and being sorted in weird places" do
+    it "handles muted line and being sorted in weird places" do
       importer_with_rows(
           'Student,ID,Section,Assignment 1,Final Score',
           '"Blend, Bill",6,My Course,-,',
@@ -118,7 +122,7 @@ describe GradebookImporter do
   end
 
   context "User lookup" do
-    it "should Lookup with either Student Name, ID, SIS User ID, or SIS Login ID" do
+    it "Lookups with either Student Name, ID, SIS User ID, or SIS Login ID" do
       course_model
 
       student_in_course(:name => "Some Name", active_all: true)
@@ -180,7 +184,7 @@ describe GradebookImporter do
       expect(hash[:students][5][:previous_id]).to be_nil
     end
 
-    it "should Lookup by root account" do
+    it "Lookups by root account" do
       course_model
 
       student_in_course(name: "Some Name", active_all: true)
@@ -206,7 +210,7 @@ describe GradebookImporter do
       expect(hash[:students][0][:name]).to eql(@u1.name)
     end
 
-    it "should allow ids that look like numbers" do
+    it "allows ids that look like numbers" do
       course_model
 
       user_with_pseudonym(:active_all => true)
@@ -240,7 +244,7 @@ describe GradebookImporter do
     end
   end
 
-  it "should parse new and existing assignments" do
+  it "parses new and existing assignments" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1')
     @assignment3 = @course.assignments.create!(:name => 'Assignment 3')
@@ -256,7 +260,7 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to eq [@assignment3]
   end
 
-  it "should parse CSVs with the SIS Login ID column" do
+  it "parses CSVs with the SIS Login ID column" do
     course = course_model
     user = user_model
     progress = Progress.create!(tag: "test", context: @user)
@@ -268,7 +272,7 @@ describe GradebookImporter do
     expect{importer.parse!}.not_to raise_error
   end
 
-  it "should not include missing assignments if no new assignments" do
+  it "does not include missing assignments if no new assignments" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1')
     @assignment3 = @course.assignments.create!(:name => 'Assignment 3')
@@ -280,7 +284,7 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to eq []
   end
 
-  it "should not include assignments with no changes" do
+  it "does not include assignments with no changes" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     importer_with_rows(
@@ -303,7 +307,7 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to eq []
   end
 
-  it "should include assignments that changed only in points possible" do
+  it "includes assignments that changed only in points possible" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     importer_with_rows(
@@ -315,7 +319,7 @@ describe GradebookImporter do
     expect(@gi.assignments.first.points_possible).to eq 20
   end
 
-  it "should not try to create assignments for the totals columns" do
+  it "does not try to create assignments for the totals columns" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     importer_with_rows(
@@ -326,7 +330,7 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to be_empty
   end
 
-  it "should parse new and existing users" do
+  it "parses new and existing users" do
     course_with_student(active_all: true)
     @student1 = @student
     e = student_in_course
@@ -347,7 +351,7 @@ describe GradebookImporter do
     expect(@gi.missing_students).to eq [@student2]
   end
 
-  it "should not include assignments that don't have any grade changes" do
+  it "does not include assignments that don't have any grade changes" do
     course_with_student
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     @assignment1.grade_student(@student, :grade => 10)
@@ -358,7 +362,7 @@ describe GradebookImporter do
     expect(@gi.assignments).to eq []
   end
 
-  it "should include assignments that the grade changed for an existing user" do
+  it "includes assignments that the grade changed for an existing user" do
     course_with_student(active_all: true)
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     @assignment1.grade_student(@student, :grade => 8)
@@ -386,9 +390,10 @@ describe GradebookImporter do
 
     describe "simplified json output" do
       it "has only the specified keys" do
-        keys = [:assignments,:assignments_outside_current_periods,
-                :missing_objects, :original_submissions, :students,
-                :unchanged_assignments]
+        keys = [:assignments, :missing_objects,
+                :original_submissions, :students,
+                :unchanged_assignments,
+                :warning_messages]
         expect(hash.keys.sort).to eql(keys)
       end
 
@@ -398,12 +403,12 @@ describe GradebookImporter do
       end
 
       it "a submission only has specified keys" do
-        keys = ["assignment_id", "grade", "original_grade"]
+        keys = ["assignment_id", "grade", "gradeable", "original_grade"]
         expect(submission.keys.sort).to eql(keys)
       end
 
       it "an assignment only has specified keys" do
-        keys = [:due_at, :grading_type, :id, :points_possible, :previous_id,
+        keys = [:grading_type, :id, :points_possible, :previous_id,
                 :title]
         expect(assignment.keys.sort).to eql(keys)
       end
@@ -430,7 +435,7 @@ describe GradebookImporter do
       setup_DA
     end
 
-    it "should ignore submissions for students without visibility" do
+    it "ignores submissions for students without visibility" do
       @assignment_one.grade_student(@student_one, :grade => "3")
       @assignment_two.grade_student(@student_two, :grade => "3")
       importer_with_rows(
@@ -445,7 +450,7 @@ describe GradebookImporter do
       expect(json[:students][1][:submissions][1]["grade"]).to eq "9"
     end
 
-    it "should not break the creation of new assignments" do
+    it "does not break the creation of new assignments" do
       importer_with_rows(
           "Student,ID,Section,a1,a2,a3",
           "#{@student_one.name},#{@student_one.id},,1,2,3"
@@ -453,120 +458,235 @@ describe GradebookImporter do
       expect(@gi.assignments.last.title).to eq 'a3'
       expect(@gi.assignments.last).to be_new_record
       expect(@gi.assignments.last.id).to be < 0
-      json = @gi.as_json
-      expect(json[:students][0][:submissions].first["grade"]).to eq "1"
-      expect(json[:students][0][:submissions].last["grade"]).to eq "3"
+      submissions = @gi.as_json[:students][0][:submissions]
+      expect(submissions.length).to eq(2)
+      expect(submissions.first["grade"]).to eq "1"
+      expect(submissions.last["grade"]).to eq "3"
     end
   end
 
   context "multiple grading periods" do
-    let(:group) { Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course) }
-    let!(:old_period) do
-      old_period_params = { title: "Course Period 2: old period",
-                            start_date: 2.months.ago,
-                            end_date: 1.month.ago }
-      group.grading_periods.create old_period_params
+    before(:once) do
+      account = Account.default
+      @course = account.courses.create!
+      @teacher = User.create!
+      course_with_teacher(course: @course, user: @teacher, active_enrollment: true)
+      account.enable_feature!(:multiple_grading_periods)
+      group = account.grading_period_groups.create!
+      group.enrollment_terms << @course.enrollment_term
+      @now = Time.zone.now
+      group.grading_periods.create!(
+        title: "Closed Period",
+        start_date: 3.months.ago(@now),
+        end_date: 1.month.ago(@now),
+        close_date: 1.month.ago(@now)
+      )
+
+      @active_period = group.grading_periods.create!(
+        title: "Active Period",
+        start_date: 1.month.ago(@now),
+        end_date: 2.months.from_now(@now),
+        close_date: 2.months.from_now(@now)
+      )
+
+      @closed_assignment = @course.assignments.create!(
+        name: "Assignment in closed period",
+        points_possible: 10,
+        due_at: date_in_closed_period
+      )
+
+      @open_assignment = @course.assignments.create!(
+        name: "Assignment in open period",
+        points_possible: 10,
+        due_at: date_in_open_period
+      )
     end
 
-    let!(:current_period) do
-      current_period_params = { title: "Course Period 1: current period",
-                                start_date: 1.month.ago,
-                                end_date: 1.month.from_now }
-      group.grading_periods.create current_period_params
-    end
+    let(:assignments) { @gi.as_json[:assignments] }
+    let(:date_in_open_period) { 1.month.from_now(@now) }
+    let(:date_in_closed_period) { 2.months.ago(@now) }
+    let(:student_submissions) { @gi.as_json[:students][0][:submissions] }
 
-    let(:future_period) do
-      future_period_params = { title: "Course Period 3: future period",
-                                start_date: 1.month.from_now,
-                                end_date: 2.months.from_now }
-      group.grading_periods.create future_period_params
-    end
+    context "uploading submissions for existing assignments" do
+      context "assignments without overrides" do
+        before(:once) do
+          @student = User.create!
+          course_with_student(course: @course, user: @student, active_enrollment: true)
+        end
 
-    let(:account)   { Account.default }
-    let(:course)    { Course.create account: account }
-    let(:student)   { User.create }
-    let(:progress)  { Progress.create tag: "test", context: student }
 
-    let(:importer_json) do
-      lambda do |hashes|
-        hashes.each { |hash| course.assignments.create hash }
+        it "excludes entire assignments if no submissions for the assignment are being uploaded" do
+          importer_with_rows(
+            "Student,ID,Section,Assignment in closed period,Assignment in open period",
+            ",#{@student.id},,5,5",
+          )
+          assignment_ids = assignments.map { |a| a[:id] }
+          expect(assignment_ids).to_not include @closed_assignment.id
+        end
 
-        contents = <<CSV
-Student,ID,Section,#{course.assignments.map(&:name).join(',')}
-,#{student.id},#{',9' * course.assignments.length}
-CSV
-        upload = GradebookUpload.create!(course: course, user: student, progress: progress)
-        attachment = attachment_with_rows(contents)
-        importer = GradebookImporter.new(upload, attachment, student, progress)
-        importer.parse!
-        importer.as_json
+        it "includes assignments if there is at least one submission in the assignment being uploaded" do
+          importer_with_rows(
+            "Student,ID,Section,Assignment in closed period,Assignment in open period",
+            ",#{@student.id},,5,5",
+          )
+          assignment_ids = assignments.map { |a| a[:id] }
+          expect(assignment_ids).to include @open_assignment.id
+        end
+
+        context "submissions already exist" do
+          before(:once) do
+            @closed_assignment.grade_student(@student, grade: 8)
+            @open_assignment.grade_student(@student, grade: 8)
+          end
+
+          it "does not include submissions that fall in closed grading periods" do
+            importer_with_rows(
+              "Student,ID,Section,Assignment in closed period,Assignment in open period",
+              ",#{@student.id},,5,5",
+            )
+            assignment_ids = student_submissions.map { |s| s['assignment_id'] }
+            expect(assignment_ids).to_not include @closed_assignment.id
+          end
+
+          it "includes submissions that do not fall in closed grading periods" do
+            importer_with_rows(
+              "Student,ID,Section,Assignment in closed period,Assignment in open period",
+              ",#{@student.id},,5,5",
+            )
+            assignment_ids = student_submissions.map { |s| s['assignment_id'] }
+            expect(assignment_ids).to include @open_assignment.id
+          end
+        end
+
+
+        context "submissions do not already exist" do
+          it "does not include submissions that will fall in closed grading periods" do
+            importer_with_rows(
+              "Student,ID,Section,Assignment in closed period,Assignment in open period",
+              ",#{@student.id},,5,5",
+            )
+            expect(student_submissions.map {|s| s['assignment_id']}).to_not include @closed_assignment.id
+          end
+
+          it "includes submissions that will not fall in closed grading periods" do
+            importer_with_rows(
+              "Student,ID,Section,Assignment in closed period,Assignment in open period",
+              ",#{@student.id},,5,5",
+            )
+            expect(student_submissions.map {|s| s['assignment_id']}).to include @open_assignment.id
+          end
+        end
+      end
+
+      context "assignments with overrides" do
+        before(:once) do
+          section_one = @course.course_sections.create!(name: 'Section One')
+          @student = student_in_section(section_one)
+
+          # set up overrides such that the student has a due date in an open grading period
+          # for @closed_assignment and a due date in a closed grading period for @open_assignment
+          @override_in_open_grading_period = @closed_assignment.assignment_overrides.create! do |override|
+            override.set = section_one
+            override.due_at_overridden = true
+            override.due_at = date_in_open_period
+          end
+
+          @open_assignment.assignment_overrides.create! do |override|
+            override.set = section_one
+            override.due_at_overridden = true
+            override.due_at = date_in_closed_period
+          end
+        end
+
+        it "excludes entire assignments if there are no submissions in the assignment" \
+        "being uploaded that are gradeable" do
+          @override_in_open_grading_period.update_attribute(:due_at, date_in_closed_period)
+          importer_with_rows(
+            "Student,ID,Section,Assignment in closed period,Assignment in open period",
+            ",#{@student.id},,5,5"
+          )
+          assignment_ids = assignments.map { |a| a[:id] }
+          expect(assignment_ids).not_to include @closed_assignment.id
+        end
+
+        it "includes assignments if there is at least one submission in the assignment" \
+        "being uploaded that is gradeable (it does not fall in a closed grading period)" do
+          importer_with_rows(
+            "Student,ID,Section,Assignment in closed period,Assignment in open period",
+            ",#{@student.id},,5,5"
+          )
+          assignment_ids = assignments.map { |a| a[:id] }
+          expect(assignment_ids).to include @closed_assignment.id
+        end
+
+        context "submissions already exist" do
+          before(:once) do
+            @closed_assignment.grade_student(@student, grade: 8)
+            @open_assignment.grade_student(@student, grade: 8)
+          end
+
+          it "does not include submissions that fall in closed grading periods" do
+            importer_with_rows(
+              "Student,ID,Section,Assignment in closed period,Assignment in open period",
+              ",#{@student.id},,5,5"
+            )
+            assignment_ids = student_submissions.map { |s| s['assignment_id'] }
+            expect(assignment_ids).not_to include @open_assignment.id
+          end
+
+          it "includes submissions that do not fall in closed grading periods" do
+            importer_with_rows(
+              "Student,ID,Section,Assignment in closed period,Assignment in open period",
+              ",#{@student.id},,5,5"
+            )
+            assignment_ids = student_submissions.map { |s| s['assignment_id'] }
+            expect(assignment_ids).to include @closed_assignment.id
+          end
+        end
+
+        context "submissions do not already exist" do
+          it "does not include submissions that will fall in closed grading periods" do
+            importer_with_rows(
+              "Student,ID,Section,Assignment in closed period,Assignment in open period",
+              ",#{@student.id},,5,5"
+            )
+            assignment_ids = student_submissions.map {|s| s['assignment_id']}
+            expect(assignment_ids).to_not include @open_assignment.id
+          end
+
+          it "includes submissions that will not fall in closed grading periods" do
+            importer_with_rows(
+              "Student,ID,Section,Assignment in closed period,Assignment in open period",
+              ",#{@student.id},,5,5"
+            )
+            assignment_ids = student_submissions.map {|s| s['assignment_id']}
+            expect(assignment_ids).to include @closed_assignment.id
+          end
+        end
       end
     end
 
-    describe "assignments_outside_current_periods" do
-      describe "when multiple grading periods is on" do
-        before do
-          course.root_account.enable_feature! :multiple_grading_periods
-        end
-
-        describe "empty assignments_outside_current_periods" do
-          it "when assignments are in a current grading period" do
-            assignment_hashes = [ { name:            'Assignment 1',
-                                    points_possible: 10,
-                                    due_at:          Time.zone.now } ]
-            json = importer_json.call(assignment_hashes)
-            expect(json[:assignments_outside_current_periods]).to be_empty
-          end
-
-          it "when all assignments have no due_ats" do
-            assignment_hashes = [ { points_possible: 10,
-                                    name:            'Assignment 2' } ]
-            json = importer_json.call(assignment_hashes)
-            expect(json[:assignments_outside_current_periods]).to be_empty
-          end
-
-          it "when assignment due_ats are nil and there is a future period" do
-            future_period
-            assignment_hashes = [ { points_possible: 10,
-                                    name:            'Assignment 2.five' } ]
-            json = importer_json.call(assignment_hashes)
-            expect(json[:assignments_outside_current_periods]).to be_empty
-          end
-        end
-
-        describe "when all assignments are in past grading periods" do
-          it "indicates assignments not in a current grading period" do
-            assignment_hashes = [ { points_possible: 10,
-                                    name:            'Assignment 3',
-                                    due_at:          6.weeks.ago } ]
-            json = importer_json.call(assignment_hashes)
-            past_assignment = json[:assignments_outside_current_periods].first
-            expect(past_assignment[:title]).to eq 'Assignment 3'
-          end
-        end
-
-        describe "when some assignments are in past grading periods" do
-          it "indicates assignments not in a current grading period" do
-            assignment_hashes = [ { points_possible: 10,
-                                    name:            'Assignment 4',
-                                    due_at:          6.weeks.ago},
-                                  { points_possible: 10,
-                                    name:            'Assignment 5',
-                                    due_at:          1.day.from_now } ]
-            json = importer_json.call(assignment_hashes)
-            past_assignment = json[:assignments_outside_current_periods].first
-            expect(past_assignment[:title]).to eq 'Assignment 4'
-          end
-        end
+    context "uploading submissions for new assignments" do
+      before(:once) do
+        @student = User.create!
+        course_with_student(course: @course, user: @student, active_enrollment: true)
       end
 
-      it "should be empty when multiple grading periods is off" do
-        assignment_hashes = [ { points_possible: 10,
-                                name:            'Assignment 6',
-                                due_at:          6.weeks.ago } ]
-        json = importer_json.call(assignment_hashes)
-        course.root_account.disable_feature! :multiple_grading_periods
-        expect(json[:assignments_outside_current_periods]).to be_empty
+      it "does not create a new assignment if the last grading period is closed" do
+        @active_period.destroy!
+        importer_with_rows(
+          "Student,ID,Section,Some new assignment",
+          ",#{@student.id},,5",
+        )
+        expect(assignments.count).to eq(0)
+      end
+
+      it "creates a new assignment if the last grading period is not closed" do
+        importer_with_rows(
+          "Student,ID,Section,Some new assignment",
+          ",#{@student.id},,5",
+        )
+        expect(assignments.count).to eq(1)
       end
     end
   end

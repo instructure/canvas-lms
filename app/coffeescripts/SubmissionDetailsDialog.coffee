@@ -1,9 +1,10 @@
 define [
-  'i18n!submission_details_dialog'
   'jquery'
   'jst/SubmissionDetailsDialog'
+  'i18n!submission_details_dialog'
   'compiled/gradebook2/GradebookHelpers'
   'compiled/gradebook2/Turnitin'
+  'jsx/grading/helpers/OutlierScoreHelper'
   'jst/_submission_detail' # a partial needed by the SubmissionDetailsDialog template
   'jst/_turnitinScore' # a partial needed by the submission_detail partial
   'jquery.ajaxJSON'
@@ -13,7 +14,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.scrollTo'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, submissionDetailsDialog, GradebookHelpers, {extractDataFor}) ->
+], ($, submissionDetailsDialog, I18n, GradebookHelpers, {extractDataFor}, OutlierScoreHelper) ->
 
   class SubmissionDetailsDialog
     constructor: (@assignment, @student, @options) ->
@@ -22,12 +23,9 @@ define [
       else
         null
 
-      isInPastGradingPeriodAndNotAdmin = ((assignment) ->
-        GradebookHelpers.gradeIsLocked(assignment, ENV)
-      )(@assignment)
-
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)
-      @submission = $.extend {}, @student["assignment_#{@assignment.id}"],
+      submission = @student["assignment_#{@assignment.id}"]
+      @submission = $.extend {}, submission,
         label: "student_grading_#{@assignment.id}"
         inputName: 'submission[posted_grade]'
         assignment: @assignment
@@ -35,7 +33,7 @@ define [
         loading: true
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
         shouldShowExcusedOption: true
-        isInPastGradingPeriodAndNotAdmin: isInPastGradingPeriodAndNotAdmin
+        isInPastGradingPeriodAndNotAdmin: submission.gradeLocked
       @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
       @submission.grade = "EX" if @submission.excused
       @$el = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
@@ -56,6 +54,9 @@ define [
           formData = {"submission[excuse]": true}
         $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', formData, (data) =>
           @update(data)
+          unless data.excused
+            outlierScoreHelper = new OutlierScoreHelper(@submission.score, @submission.assignment.points_possible)
+            $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
           $.publish 'submissions_updated', [@submission.all_submissions]
           setTimeout =>
             @dialog.dialog('close')

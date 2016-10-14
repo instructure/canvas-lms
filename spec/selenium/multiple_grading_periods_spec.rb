@@ -131,40 +131,6 @@ describe "interaction with multiple grading periods" do
     end
   end
 
-  context 'sub-accounts' do
-    # top-level account & grading periods setup
-    let(:parent_account) { Account.default }
-    let!(:enable_mgp_flag) { parent_account.enable_feature!(:multiple_grading_periods) }
-    # sub-account & grading periods setup
-    let(:sub_account) { Account.create(name: 'Sub Account', parent_account: parent_account) }
-    # sub-account course setup
-    let(:sub_account_course) do
-      sub_account.courses.create(
-        name: 'Sub-Account Course',
-        workflow_state: 'active'
-      )
-    end
-    let(:sub_account_teacher) { user(active_all: true) }
-    let(:enroll_teacher) do
-      sub_account_course.enroll_user(
-        sub_account_teacher,
-        'TeacherEnrollment',
-        enrollment_state: 'active'
-      )
-    end
-    let(:view_sub_course_grading_period) do
-      sub_account_course
-      enroll_teacher
-      user_session(sub_account_teacher)
-      get "/courses/#{sub_account_course.id}/grading_standards"
-    end
-
-    it 'does not allow creation of a GP in sub-account course', priority: "1", test_id: 587759 do
-      view_sub_course_grading_period
-      expect(f('#grading_periods')).not_to contain_css('#add-period-button')
-    end
-  end
-
   context 'student view' do
     let(:account) { Account.default }
     let(:test_course) { account.courses.create!(name: 'New Course') }

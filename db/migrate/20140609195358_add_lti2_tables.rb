@@ -11,7 +11,7 @@ class AddLti2Tables < ActiveRecord::Migration
       t.string :website
       t.string :vendor_email
       t.integer :root_account_id, limit: 8, null: false
-      t.timestamps
+      t.timestamps null: true
     end
 
     create_table :lti_message_handlers do |t|
@@ -20,7 +20,7 @@ class AddLti2Tables < ActiveRecord::Migration
       t.text :capabilities
       t.text :parameters
       t.integer :resource_handler_id, limit: 8, null: false
-      t.timestamps
+      t.timestamps null: true
     end
 
     create_table :lti_resource_handlers do |t|
@@ -30,13 +30,13 @@ class AddLti2Tables < ActiveRecord::Migration
       t.text :description
       t.text :icon_info
       t.integer :tool_proxy_id, limit: 8, null: false
-      t.timestamps
+      t.timestamps null: true
     end
 
     create_table :lti_resource_placements do |t|
       t.integer :resource_handler_id, limit: 8, null: false
       t.string :placement, null: false
-      t.timestamps
+      t.timestamps null: true
     end
 
     create_table :lti_tool_proxies do |t|
@@ -48,14 +48,14 @@ class AddLti2Tables < ActiveRecord::Migration
       t.integer :root_account_id, limit: 8, null: false
       t.string :workflow_state, null: false
       t.text :raw_data, null: false
-      t.timestamps
+      t.timestamps null: true
     end
 
     create_table :lti_tool_proxy_bindings do |t|
       t.integer :context_id, limit: 8, null: false
       t.string :context_type, null: false
       t.integer :tool_proxy_id, limit:8, null: false
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :lti_product_families, [:root_account_id, :vendor_code, :product_code], name: 'index_lti_product_families_on_root_account_vend_code_prod_code', unique: true

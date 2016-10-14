@@ -83,5 +83,3 @@ require [
   $ ->
     SyllabusBehaviors.bindToEditSyllabus()
     SyllabusBehaviors.bindToMiniCalendar()
-
-    $.scrollSidebar()

@@ -216,8 +216,11 @@
 #           "description": "Permissions the user has for the quiz"
 #         },
 #         "all_dates": {
-#           "$ref": "AssignmentDate",
-#           "description": "list of due dates for the quiz"
+#           "description": "list of due dates for the quiz",
+#           "type": "array",
+#           "items": {
+#             "$ref": "AssignmentDate"
+#           }
 #         },
 #         "version_number": {
 #           "description": "Current version number of the quiz",
@@ -226,7 +229,7 @@
 #         },
 #         "question_types": {
 #           "description": "List of question types in the quiz",
-#           "example": ["mutliple_choice", "essay"],
+#           "example": ["multiple_choice", "essay"],
 #           "type": "array",
 #           "items": {"type": "string"}
 #         }
@@ -453,6 +456,11 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   Whether students should be prevented from viewing their quiz results past
   #   the first time (right after they turn the quiz in.)
   #   Only valid if "hide_results" is not set to "always".
+  #   Defaults to false.
+  #
+  # @argument quiz[only_visible_to_overrides] [Boolean]
+  #   Whether this quiz is only visible to overrides (Only useful if
+  #   'differentiated assignments' account setting is on)
   #   Defaults to false.
   #
   # @returns Quiz

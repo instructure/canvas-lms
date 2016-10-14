@@ -177,6 +177,7 @@ module BasicLTI
         rescue InvalidSourceId => e
           self.code_major = 'failure'
           self.description = e.to_s
+          self.body = "<#{operation_ref_identifier}Response />"
           return true
         end
 
@@ -195,9 +196,8 @@ module BasicLTI
         new_score = Float(text_value) rescue false
         raw_score = Float(self.result_total_score) rescue false
         error_message = nil
-        submission_hash = {:submission_type => 'external_tool'}
-
-        if text = result_data_text
+        submission_hash = {}
+        if (text = result_data_text)
           submission_hash[:body] = text
           submission_hash[:submission_type] = 'online_text_entry'
         elsif (url = result_data_url)
@@ -206,9 +206,10 @@ module BasicLTI
         elsif (launch_url = result_data_launch_url)
           submission_hash[:url] = launch_url
           submission_hash[:submission_type] = 'basic_lti_launch'
+        elsif !assignment.submissions.exists?(user_id: user.id)
+          submission_hash[:submission_type] = 'external_tool'
         end
 
-        old_submission = assignment.submissions.where(user_id: user.id).first
 
         if raw_score
           submission_hash[:grade] = raw_score
@@ -237,7 +238,7 @@ to because the assignment has no points possible.
           self.code_major = 'failure'
           self.description = I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.')
         else
-          if submission_hash[:submission_type] != 'external_tool'
+          if submission_hash[:submission_type].present? && submission_hash[:submission_type] != 'external_tool'
             @submission = assignment.submit_homework(user, submission_hash.clone)
           end
 
@@ -252,9 +253,9 @@ to because the assignment has no points possible.
             self.code_major = 'failure'
             self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
           end
-
-          self.body = "<replaceResultResponse />"
         end
+
+        self.body = "<replaceResultResponse />"
 
         true
       end

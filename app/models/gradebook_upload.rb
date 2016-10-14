@@ -27,7 +27,9 @@ class GradebookUpload < ActiveRecord::Base
   serialize :gradebook, JSON
 
   def self.queue_from(course, user, attachment_data)
-    progress = Progress.create!(context: course, tag: "gradebook_upload", user: user)
+    progress = Progress.create!(context: course, tag: "gradebook_upload") do |p|
+      p.user = user
+    end
     gradebook_upload = GradebookUpload.create!(course: course, user: user, progress: progress)
     gradebook_upload_attachment = gradebook_upload.attachments.create!(attachment_data)
     progress.process_job(GradebookImporter, :create_from, {}, gradebook_upload, user, gradebook_upload_attachment)

@@ -233,6 +233,33 @@ define [
     deepEqual assignment.assignmentGroupId(), 12
     deepEqual assignment.get('assignment_group_id'), 12
 
+  module "Assignment#canDelete"
+
+  test "returns false if 'frozen' is true", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'frozen', true
+    deepEqual assignment.canDelete(), false
+
+  test "returns false if 'has_due_date_in_closed_grading_period' is true", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'has_due_date_in_closed_grading_period', true
+    deepEqual assignment.canDelete(), false
+
+  test "returns true if 'frozen' and 'has_due_date_in_closed_grading_period' are false", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'frozen', false
+    assignment.set 'has_due_date_in_closed_grading_period', false
+    deepEqual assignment.canDelete(), true
+
+  module "Assignment#hasDueDateInClosedGradingPeriod"
+
+  test "returns the value of 'has_due_date_in_closed_grading_period'", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'has_due_date_in_closed_grading_period', true
+    deepEqual assignment.hasDueDateInClosedGradingPeriod(), true
+    assignment.set 'has_due_date_in_closed_grading_period', false
+    deepEqual assignment.hasDueDateInClosedGradingPeriod(), false
+
   module "Assignment#gradingType as a setter"
 
   test "sets the record's grading type", ->

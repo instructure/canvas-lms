@@ -349,6 +349,7 @@ class DiscussionTopicsController < ApplicationController
                 },
                 :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu)
         }
+        conditional_release_js_env
         append_sis_data(hash)
         js_env(hash)
 
@@ -472,6 +473,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     unless @topic.grants_right?(@current_user, session, :read)
+      return render_unauthorized_action unless @current_user
       respond_to do |format|
         flash[:error] = t 'You do not have access to the requested discussion.'
         format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
@@ -586,7 +588,7 @@ class DiscussionTopicsController < ApplicationController
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
             append_sis_data(js_hash)
             js_env(js_hash)
-
+            conditional_release_js_env(@topic.assignment, include_rule: true)
           end
         end
       end
@@ -876,6 +878,7 @@ class DiscussionTopicsController < ApplicationController
 
     return unless authorized_action(@topic, @current_user, (is_new ? :create : :update))
 
+    prior_version = @topic.generate_prior_version
     process_podcast_parameters(discussion_topic_hash)
 
     if is_new
@@ -907,6 +910,7 @@ class DiscussionTopicsController < ApplicationController
     if @errors.present?
       render :json => {errors: @errors}, :status => :bad_request
     else
+      @topic.skip_broadcasts = true
       DiscussionTopic.transaction do
         @topic.update_attributes(discussion_topic_hash)
         @topic.root_topic.try(:save)
@@ -919,11 +923,18 @@ class DiscussionTopicsController < ApplicationController
         unless @topic.root_topic_id?
           apply_assignment_parameters(params[:assignment], @topic)
         end
+
         if publish_later
           @topic.publish!
           @topic.root_topic.try(:publish!)
         end
-        render :json => discussion_topic_api_json(@topic.reload, @context, @current_user, session)
+
+        @topic = DiscussionTopic.find(@topic.id)
+        @topic.just_created = is_new
+        @topic.prior_version = prior_version
+        @topic.broadcast_notifications
+
+        render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
       else
         errors = @topic.errors.as_json[:errors]
         errors.merge!(@topic.root_topic.errors.as_json[:errors]) if @topic.root_topic

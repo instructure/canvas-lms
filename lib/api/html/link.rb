@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'uri'
+
 module Api
   module Html
     class Link
@@ -45,9 +47,11 @@ module Api
       end
 
       def scope_link_to_context(local_link)
-        if local_link.start_with?('/files')
+        uri = URI.parse(local_link)
+        if uri.path.start_with?('/files')
           if attachment && APPLICABLE_CONTEXT_TYPES.include?(attachment.context_type)
-            return "/#{attachment.context_type.underscore.pluralize}/#{attachment.context_id}" + local_link
+            uri.path = "/#{attachment.context_type.underscore.pluralize}/#{attachment.context_id}#{uri.path}"
+            return uri.to_s
           end
         end
 

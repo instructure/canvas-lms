@@ -21,7 +21,7 @@ class Canvadoc < ActiveRecord::Base
 
   belongs_to :attachment
 
-  has_and_belongs_to_many :submissions, -> { readonly(true) }, join_table: :canvadocs_submissions
+  has_many :canvadocs_submissions
 
   def upload(opts = {})
     return if document_id.present?
@@ -68,8 +68,6 @@ class Canvadoc < ActiveRecord::Base
       user_filter: user.global_id.to_s,
     }
 
-    submissions = self.submissions.preload(:assignment)
-
     return opts if submissions.empty?
 
     if submissions.any? { |s| s.grants_right? user, :read_grade }
@@ -84,6 +82,12 @@ class Canvadoc < ActiveRecord::Base
     opts
   end
   private :annotation_opts
+
+  def submissions
+    self.canvadocs_submissions.
+      preload(submission: :assignment).
+      map &:submission
+  end
 
   def available?
     !!(document_id && process_state != 'error' && Canvadocs.enabled?)

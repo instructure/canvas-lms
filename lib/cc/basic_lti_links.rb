@@ -91,7 +91,20 @@ module CC
             ext_node.lticm :property, tool.consumer_key, 'name' => 'consumer_key'
             ext_node.lticm :property, tool.shared_secret, 'name' => 'shared_secret'
           end
-          ContextExternalTool::EXTENSION_TYPES.each do |type|
+
+          extension_exclusions = [
+            :custom_fields,
+            :vendor_extensions,
+            :selection_width,
+            :selection_height,
+            :icon_url
+          ] + Lti::ResourcePlacement::PLACEMENTS
+
+          tool.settings.keys.reject{ |i| extension_exclusions.include?(i)}.each do |key|
+            ext_node.lticm(:property, tool.settings[key], 'name' => key.to_s) unless tool.settings[key].respond_to?(:each)
+          end
+
+          Lti::ResourcePlacement::PLACEMENTS.each do |type|
             if tool.settings[type]
               ext_node.lticm(:options, :name => type.to_s) do |type_node|
 

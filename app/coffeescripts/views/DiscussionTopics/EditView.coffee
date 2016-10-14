@@ -18,7 +18,6 @@ define [
   'compiled/views/calendar/MissingDateDialogView'
   'compiled/views/editor/KeyboardShortcuts'
   'jsx/shared/conditional_release/ConditionalRelease'
-  'jquery.instructure_misc_helpers' # $.scrollSidebar
   'compiled/jquery.rails_flash_notifications' #flashMessage
 ], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
 GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, RichContentEditor,
@@ -106,8 +105,6 @@ ConditionalRelease) ->
       if @assignment.hasSubmittedSubmissions()
         @$discussionPointPossibleWarning.toggleAccessibly(@$assignmentPointsPossible.val() != "#{@initialPointsPossible}")
 
-    # separated out so we can easily stub it
-    scrollSidebar: $.scrollSidebar
 
     # also separated for easy stubbing
     loadNewEditor: ($textarea)->
@@ -117,7 +114,7 @@ ConditionalRelease) ->
       super
       $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message'))
 
-      RichContentEditor.initSidebar(show: @scrollSidebar)
+      RichContentEditor.initSidebar()
       _.defer =>
         @loadNewEditor($textarea)
         $('.rte_switch_views_link').click (event) ->
@@ -136,8 +133,8 @@ ConditionalRelease) ->
       _.defer(@renderPostToSisOptions) if ENV.POST_TO_SIS
       _.defer(@watchUnload)
       _.defer(@attachKeyboardShortcuts)
-      _.defer(@renderTabs) if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
-      _.defer(@loadConditionalRelease) if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+      _.defer(@renderTabs) if @showConditionalRelease()
+      _.defer(@loadConditionalRelease) if @showConditionalRelease()
 
       @$(".datetime_field").datetime_field()
 
@@ -195,7 +192,6 @@ ConditionalRelease) ->
 
     renderTabs: =>
       @$discussionEditView.tabs()
-      @$discussionDetailsTab.show()
       @toggleConditionalReleaseTab()
 
     loadConditionalRelease: =>
@@ -261,7 +257,7 @@ ConditionalRelease) ->
       @$('[name="attachment"]').show().focus()
 
     saveFormData: =>
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+      if @showConditionalRelease()
         super.pipe (data, status, xhr) =>
           assignment = data.assignment if data.set_assignment
           @conditionalReleaseEditor.updateAssignment(assignment)
@@ -325,7 +321,7 @@ ConditionalRelease) ->
       if @isAnnouncement()
         unless data.message?.length > 0
           errors['message'] = [{type: 'message_required_error', message: I18n.t("A message is required")}]
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+      if @showConditionalRelease()
         crErrors = @conditionalReleaseEditor.validateBeforeSave()
         errors['conditional_release'] = crErrors if crErrors
 
@@ -346,11 +342,11 @@ ConditionalRelease) ->
       # before calling super
       # see getFormValues in DueDateView.coffee
       delete errors.assignmentOverrides
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+      if @showConditionalRelease()
         # switch to a tab with errors
         if errors['conditional_release']
           @$discussionEditView.tabs("option", "active", 1)
-          @$conditionalReleaseTarget.get(0).scrollIntoView()
+          @conditionalReleaseEditor.focusOnError()
         else
           @$discussionEditView.tabs("option", "active", 0)
       super(errors)
@@ -365,8 +361,11 @@ ConditionalRelease) ->
       else
         @$availabilityOptions.show()
 
+    showConditionalRelease: ->
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !@isAnnouncement()
+
     toggleConditionalReleaseTab: ->
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+      if @showConditionalRelease()
         if @$useForGrading.is(':checked')
           @$discussionEditView.tabs("option", "disabled", false)
         else
@@ -374,12 +373,12 @@ ConditionalRelease) ->
           @$discussionDetailsTab.show()
 
     onChange: ->
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !@assignmentDirty
-        @assignmentDirty = true
+      if @showConditionalRelease() && @assignmentUpToDate
+        @assignmentUpToDate = false
 
     onTabChange: ->
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && @assignmentDirty
+      if @showConditionalRelease() && !@assignmentUpToDate
         assignmentData = @getFormData().assignment?.attributes
         @conditionalReleaseEditor.updateAssignment(assignmentData)
-        @assignmentDirty = false
+        @assignmentUpToDate = true
       true

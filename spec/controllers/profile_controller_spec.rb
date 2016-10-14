@@ -46,6 +46,30 @@ describe ProfileController do
       get 'show', :user_id => @user.id
       expect(response).to redirect_to(login_url)
     end
+
+    describe "other user's profile" do
+      before :each do
+        # to allow viewing other user's profile
+        @controller.stubs(:api_request?).returns(true)
+      end
+
+      it "should include common contexts in @user_data" do
+        user_session(@teacher)
+
+        # teacher and user have a group and course in common
+        group = group()
+        group.add_user(@teacher, 'accepted')
+        group.add_user(@user, 'accepted')
+        student_in_course(user: @user, active_all: true)
+
+        get 'show', user_id: @user.id
+        expect(assigns(:user_data)[:common_contexts].size).to eql(2)
+        expect(assigns(:user_data)[:common_contexts][0]['id']).to eql(@course.id)
+        expect(assigns(:user_data)[:common_contexts][0]['roles']).to eql(['Student'])
+        expect(assigns(:user_data)[:common_contexts][1]['id']).to eql(group.id)
+        expect(assigns(:user_data)[:common_contexts][1]['roles']).to eql(['Member'])
+      end
+    end
   end
 
   describe "update" do

@@ -16,10 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Api::V1::ContextModule
+  include Api
   include Api::V1::Json
   include Api::V1::User
   include Api::V1::ExternalTools::UrlHelpers
   include Api::V1::Locked
+  include Api::V1::Assignment
 
   MODULE_JSON_ATTRS = %w(id position name unlock_at)
 
@@ -37,7 +39,15 @@ module Api::V1::ContextModule
     end
     has_update_rights = context_module.grants_right?(current_user, :update)
     hash['published'] = context_module.active? if has_update_rights
-    tags = context_module.content_tags_visible_to(@current_user, assignment_visibilities: opts[:assignment_visibilities], discussion_visibilities: opts[:discussion_visibilities], quiz_visibilities: opts[:quiz_visibilities], observed_student_ids: opts[:observed_student_ids])
+    tags = context_module.content_tags_visible_to(@current_user,
+      opts.slice(
+        :assignment_visibilities,
+        :discussion_visibilities,
+        :page_visibilities,
+        :quiz_visibilities,
+        :observed_student_ids
+      )
+    )
     count = tags.count
     hash['items_count'] = count
     hash['items_url'] = polymorphic_url([:api_v1, context_module.context, context_module, :items])
@@ -97,10 +107,9 @@ module Api::V1::ContextModule
       # course context
       when *Quizzes::Quiz.class_names
         api_url = api_v1_course_quiz_url(context_module.context, content_tag.content)
-      when 'Assignment', 'WikiPage', 'DiscussionTopic'
-        api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
-      # no context
-      when 'Attachment'
+      when 'DiscussionTopic'
+        api_url = api_v1_course_discussion_topic_url(context_module.context, content_tag.content)
+      when 'Assignment', 'WikiPage', 'Attachment'
         api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
       when 'ContextExternalTool'
         if content_tag.content && content_tag.content.tool_id
@@ -137,10 +146,14 @@ module Api::V1::ContextModule
 
     hash['content_details'] = content_details(content_tag, current_user) if includes.include?('content_details')
 
+    if includes.include?('mastery_paths')
+      hash['mastery_paths'] = conditional_release_json(content_tag, current_user, opts)
+    end
+
     hash
   end
 
-  def content_details(content_tag, current_user, opts={})
+  def content_details(content_tag, current_user, opts = {})
     details = {}
     item = content_tag.content
 
@@ -176,5 +189,29 @@ module Api::V1::ContextModule
     end
 
     details
+  end
+
+  def conditional_release(content_tag, opts = {})
+    rules = opts[:conditional_release_rules]
+    assignment_id = content_tag.assignment.try(:id)
+    conditional_release_assignment_set(rules, assignment_id) if rules.present? && assignment_id.present?
+  end
+
+  def conditional_release_assignment_set(rules, id)
+    result = rules.find { |rule| rule[:trigger_assignment].to_s == id.to_s }
+    return unless result.present?
+    result.slice(:locked, :assignment_sets, :selected_set_id)
+  end
+
+  def conditional_release_json(content_tag, user, opts = {})
+    result = conditional_release(content_tag, opts)
+    return unless result.present?
+    result[:assignment_sets].each do |as|
+      next if as[:assignments].blank?
+      as[:assignments].each do |a|
+        a[:model] = assignment_json(a[:model], user, nil) if a[:model]
+      end
+    end
+    result
   end
 end

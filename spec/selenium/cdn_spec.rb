@@ -33,7 +33,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
             data
           end
 
-          expect(fingerprints.length).to eq(4), 'We have 4 variants'
+          expect(fingerprints.length).to eq(2), 'We have 2 variants: new_styles_normal_contrast and new_styles_high_contrast'
           msg = 'make sure the conbined results match the result of all_fingerprints_for'
           expect(fingerprints).to eq(BrandableCSS.all_fingerprints_for(bundle_name).values), msg
 
@@ -53,7 +53,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
   end
 
   def check_css(bundle_name)
-    variant = ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? 'new_styles_normal_contrast' : 'legacy_normal_contrast'
+    variant = 'new_styles_normal_contrast'
     fingerprint = BrandableCSS.cache_for(bundle_name, variant)[:combinedChecksum]
     expect(fingerprint).to match(RE_SHORT_MD5)
     url = "#{EXAMPLE_CDN_HOST}/dist/brandable_css/#{variant}/#{bundle_name}-#{fingerprint}.css"

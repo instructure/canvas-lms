@@ -11,7 +11,7 @@ define([
   'jsx/files/FilePreview',
   'page',
   'compiled/react_files/modules/FocusStore'
-], function(I18n, _, React, SearchResults, NoResults, ColumnHeaders, Folder, FolderChild, LoadingIndicator, FilePreview, Page, FocusStore) {
+], function(I18n, _, React, SearchResults, NoResults, ColumnHeaders, Folder, FolderChild, LoadingIndicator, FilePreview, page, FocusStore) {
 
   SearchResults.displayErrors =  function (errors) {
     var error_message= null
@@ -92,6 +92,7 @@ define([
                   isSelected={_.indexOf(this.props.selectedItems, child) >=0}
                   toggleSelected={this.props.toggleItemSelected.bind(null, child)}
                   userCanManageFilesForContext={this.props.userCanManageFilesForContext}
+                  userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
                   usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
                   externalToolsForContext={this.props.externalToolsForContext}
                   previewItem={this.props.previewItem.bind(null, child)}

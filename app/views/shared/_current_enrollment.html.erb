@@ -42,7 +42,7 @@
       <td class="course-list-course-title-column
         <%= "course-list-no-left-border" if @show_star_column %>
         <%= "course-list-not-favoritable" unless @show_star_column %>">
-        <% if use_new_styles? && course_color.present? %>
+        <% if course_color.present? %>
           <span aria-hidden="true" class="course-color-block" style="<%= "color: #{course_color};" %>" ></span>
         <% end %>
         <% if show_link %><a href="<%= course_path(current_enrollment.course_id) %>" title="<%= current_enrollment.course.name %>"><% end %>

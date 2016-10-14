@@ -91,7 +91,7 @@ class Feature
   #
   #     # optional hook to be called before after a feature flag change
   #     # queue a delayed_job to perform any nontrivial processing
-  #     after_state_change_proc:  ->(context, old_state, new_state) { ... }
+  #     after_state_change_proc:  ->(user, context, old_state, new_state) { ... }
   #   }
 
   def self.register(feature_hash)
@@ -117,16 +117,6 @@ that they will need to update their Google Docs integration.
 END
       applies_to: 'RootAccount',
       state: 'hidden',
-      root_opt_in: true
-    },
-    'use_new_styles' =>
-    {
-      display_name: -> { I18n.t('New UI') },
-      description: -> { I18n.t(<<END) },
-This enables an updated navigation, new dashboard and a simpler, more modern look and feel.
-END
-      applies_to: 'RootAccount',
-      state: ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? 'on' : 'allowed',
       root_opt_in: true
     },
     'epub_export' =>
@@ -241,8 +231,7 @@ END
 Allow users to view and use external tools configured for LOR.
 END
       applies_to: 'User',
-      state: 'hidden',
-      beta: true
+      state: 'hidden'
     },
     'lor_for_account' =>
     {
@@ -251,8 +240,7 @@ END
 Allow users to view and use external tools configured for LOR.
 END
       applies_to: 'RootAccount',
-      state: 'hidden',
-      beta: true
+      state: 'hidden'
     },
     'multiple_grading_periods' =>
     {
@@ -336,6 +324,16 @@ END
       state: 'hidden',
       beta: true,
       development: false,
+      root_opt_in: false
+    },
+    'better_scheduler' =>
+    {
+      display_name: -> { I18n.t('Use the new scheduler') },
+      description: -> { I18n.t('Uses the new scheduler and its functionality') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      development: true,
       root_opt_in: false
     },
     'use_new_tree' =>
@@ -433,6 +431,12 @@ END
       beta: true,
       development: false,
       root_opt_in: false,
+      after_state_change_proc:  ->(user, context, _old_state, new_state) {
+        if %w(on allowed).include?(new_state) && context.is_a?(Account)
+          @service_account = ConditionalRelease::Setup.new(context.id, user.id)
+          @service_account.activate!
+        end
+      }
     },
     'wrap_calendar_event_titles' =>
     {

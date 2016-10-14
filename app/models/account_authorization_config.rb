@@ -202,7 +202,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def provision_user(unique_id, provider_attributes = {})
     User.transaction(requires_new: true) do
       pseudonym = account.pseudonyms.build
-      pseudonym.user = User.create!(name: unique_id, workflow_state: 'registered')
+      pseudonym.user = User.create!(name: unique_id) { |u| u.workflow_state = 'registered' }
       pseudonym.authentication_provider = self
       pseudonym.unique_id = unique_id
       pseudonym.save!
@@ -242,6 +242,17 @@ class AccountAuthorizationConfig < ActiveRecord::Base
         cc ||= user.communication_channels.email.new(path: value)
         cc.workflow_state = 'active'
         cc.save! if cc.changed?
+      when 'locale'
+        # convert _ to -, be lenient about case, and perform fallbacks
+        value = value.tr('_', '-')
+        lowercase_locales = I18n.available_locales.map(&:to_s).map(&:downcase)
+        while value.include?('-')
+          break if lowercase_locales.include?(value.downcase)
+          value = value.sub(/(?:x-)?-[^-]*$/, '')
+        end
+        if (i = lowercase_locales.index(value.downcase))
+          user.locale = I18n.available_locales[i].to_s
+        end
       else
         user.send("#{attribute}=", value)
       end

@@ -1,13 +1,12 @@
 <% if @domain_root_account.feature_enabled?(:lor_for_account) || (@current_user && @current_user.feature_enabled?(:lor_for_user)) %>
   <% visibility = ContextExternalTool.global_navigation_visibility_for_user(@domain_root_account, @current_user) %>
 
-  <% cache([ContextExternalTool.global_navigation_menu_cache_key(@domain_root_account, visibility), use_new_styles?]) do %>
+  <% cache([ContextExternalTool.global_navigation_menu_cache_key(@domain_root_account, visibility)]) do %>
     <% tools = ContextExternalTool.global_navigation_tools(@domain_root_account, visibility) %>
     <% tools.each do |tool|
         tool_path = account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation')
     %>
-      <li id="<%= tool.asset_string %>_menu_item" class="menu-item <% if use_new_styles? %>ic-app-header__menu-list-item<% end %><% if current_page?(tool_path)%> ic-app-header__menu-list-item--active<% end %>">
-      <% if use_new_styles? %>
+      <li id="<%= tool.asset_string %>_menu_item" class="menu-item ic-app-header__menu-list-item<% if current_page?(tool_path)%> ic-app-header__menu-list-item--active<% end %>">
         <a class='ic-app-header__menu-list-link' href="<%= tool_path %>">
           <% svg_path = tool.extension_setting(:global_navigation, :icon_svg_path_64) %>
           <% if svg_path %>
@@ -21,11 +20,6 @@
             <%= tool.label_for(:global_navigation) %>
           </div>
         </a>
-      <% else %>
-        <a class='menu-item-no-drop' href="<%= tool_path %>">
-          <%= tool.label_for(:global_navigation, I18n.locale) %>
-        </a>
-      <% end %>
       </li>
     <% end %>
   <% end %>

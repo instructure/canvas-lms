@@ -1,7 +1,7 @@
 FROM instructure/ruby-passenger:2.1
 
 USER root
-RUN curl -sL https://deb.nodesource.com/setup_0.12 | bash -
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
 RUN  apt-get update -qq \
   && apt-get install -qqy \
        nodejs \

@@ -35,6 +35,86 @@ describe Submission do
     }
   end
 
+  describe "Multiple Grading Periods" do
+    let(:in_closed_grading_period) { 9.days.ago }
+    let(:in_open_grading_period) { 1.day.from_now }
+    let(:outside_of_any_grading_period) { 10.days.from_now }
+
+    before(:once) do
+      @root_account = @context.root_account
+      @root_account.enable_feature!(:multiple_grading_periods)
+      group = @root_account.grading_period_groups.create!
+      @closed_period = group.grading_periods.create!(
+        title: "Closed!",
+        start_date: 2.weeks.ago,
+        end_date: 1.week.ago,
+        close_date: 3.days.ago
+      )
+      @open_period = group.grading_periods.create!(
+        title: "Open!",
+        start_date: 3.days.ago,
+        end_date: 3.days.from_now,
+        close_date: 5.days.from_now
+      )
+      group.enrollment_terms << @context.enrollment_term
+    end
+
+    describe "permissions" do
+      before(:once) do
+        @admin = user(active_all: true)
+        @root_account.account_users.create!(user: @admin)
+        @teacher = user(active_all: true)
+        @context.enroll_teacher(@teacher)
+      end
+
+      describe "grade" do
+        context "the submission is due in an open grading period" do
+          before(:once) do
+            @assignment.due_at = in_open_grading_period
+            @assignment.save!
+            @submission = Submission.create!(@valid_attributes)
+          end
+
+          it "has grade permissions if the user is a root account admin" do
+            expect(@submission.grants_right?(@admin, :grade)).to eq(true)
+          end
+
+          it "has grade permissions if the user is non-root account admin with manage_grades permissions" do
+            expect(@submission.grants_right?(@teacher, :grade)).to eq(true)
+          end
+
+          it "has not have grade permissions if the user is non-root account admin without manage_grades permissions" do
+            @student = user(active_all: true)
+            @context.enroll_student(@student)
+            expect(@submission.grants_right?(@student, :grade)).to eq(false)
+          end
+        end
+
+        context "the submission is due outside of any grading period" do
+          before(:once) do
+            @assignment.due_at = outside_of_any_grading_period
+            @assignment.save!
+            @submission = Submission.create!(@valid_attributes)
+          end
+
+          it "has grade permissions if the user is a root account admin" do
+            expect(@submission.grants_right?(@admin, :grade)).to eq(true)
+          end
+
+          it "has grade permissions if the user is non-root account admin with manage_grades permissions" do
+            expect(@submission.grants_right?(@teacher, :grade)).to eq(true)
+          end
+
+          it "has not have grade permissions if the user is non-root account admin without manage_grades permissions" do
+            @student = user(active_all: true)
+            @context.enroll_student(@student)
+            expect(@submission.grants_right?(@student, :grade)).to eq(false)
+          end
+        end
+      end
+    end
+  end
+
   it "should create a new instance given valid attributes" do
     Submission.create!(@valid_attributes)
   end
@@ -388,11 +468,11 @@ describe Submission do
         quiz.save!
 
         user       = account_admin_user
-        channel    = user.communication_channels.create!(:path => 'admin@example.com')
+        user.communication_channels.create!(:path => 'admin@example.com')
         submission = quiz.generate_submission(user, false)
         Quizzes::SubmissionGrader.new(submission).grade_submission
 
-        channel2   = @teacher.communication_channels.create!(:path => 'chang@example.com')
+        @teacher.communication_channels.create!(:path => 'chang@example.com')
         submission2 = quiz.generate_submission(@teacher, false)
         Quizzes::SubmissionGrader.new(submission2).grade_submission
 
@@ -547,6 +627,19 @@ describe Submission do
                                           external_tool_tag_attributes: {url: tool.url})
           submission.assignment = a
           submission.turnitin_data = lti_tii_data
+          submission.user = @user
+          outcome_response_processor_mock = mock('outcome_response_processor')
+          outcome_response_processor_mock.expects(:resubmit).with(submission, "attachment_42")
+          Turnitin::OutcomeResponseProcessor.stubs(:new).returns(outcome_response_processor_mock)
+          submission.retrieve_lti_tii_score
+        end
+
+        it 'resubmits errored tii attachments even if turnitin_data has non-hash values' do
+          a = @course.assignments.create!(title: "test",
+                                          submission_types: 'external_tool',
+                                          external_tool_tag_attributes: {url: tool.url})
+          submission.assignment = a
+          submission.turnitin_data = lti_tii_data.merge(last_processed_attempt: 1)
           submission.user = @user
           outcome_response_processor_mock = mock('outcome_response_processor')
           outcome_response_processor_mock.expects(:resubmit).with(submission, "attachment_42")
@@ -871,10 +964,10 @@ describe Submission do
     @assignment.save
 
     @submission = @assignment.submit_homework(@student1, :body => 'some message')
-    sc1 = SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "a")
-    sc2 = SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "b", :hidden => true)
-    sc3 = SubmissionComment.create!(:submission => @submission, :author => @student1, :comment => "c")
-    sc4 = SubmissionComment.create!(:submission => @submission, :author => @student2, :comment => "d")
+    SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "a")
+    SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "b", :hidden => true)
+    SubmissionComment.create!(:submission => @submission, :author => @student1, :comment => "c")
+    SubmissionComment.create!(:submission => @submission, :author => @student2, :comment => "d")
     SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "e", :draft => true)
     @submission.reload
 
@@ -1403,7 +1496,7 @@ describe Submission do
         s = @assignment.submit_homework(@student1,
                                         submission_type: "online_upload",
                                         attachments: [@attachment])
-        expect(s.canvadocs).to eq [@attachment.canvadoc]
+        expect(@attachment.canvadoc.submissions).to eq [s]
       end
 
       it "create records for each group submission" do
@@ -1419,7 +1512,7 @@ describe Submission do
 
         [@student1, @student2].each do |student|
           submission = @assignment.submission_for_student(student)
-          expect(submission.canvadocs).to eq [@attachment.canvadoc]
+          expect(@attachment.canvadoc.submissions).to include submission
         end
       end
 
@@ -1433,8 +1526,8 @@ describe Submission do
         end
 
         it 'sets preferred plugin course id to the course ID' do
-          s = submit_homework.call
-          expect(s.canvadocs.first.preferred_plugin_course_id).to eq(@course.id.to_s)
+          submit_homework.call
+          expect(@attachment.canvadoc.preferred_plugin_course_id).to eq(@course.id.to_s)
         end
       end
     end
@@ -1444,7 +1537,7 @@ describe Submission do
       orig_job_count = job_scope.count
 
       attachment = attachment_model(context: @user)
-      s = @assignment.submit_homework(@user,
+      @assignment.submit_homework(@user,
                                       submission_type: "online_upload",
                                       attachments: [attachment])
       expect(job_scope.count).to eq orig_job_count
@@ -1457,7 +1550,7 @@ describe Submission do
       Canvadocs.stubs(:annotations_supported?).returns true
 
       attachment = crocodocable_attachment_model(context: @user)
-      s = @assignment.submit_homework(@user,
+      @assignment.submit_homework(@user,
                                       submission_type: "online_upload",
                                       attachments: [attachment])
       run_jobs

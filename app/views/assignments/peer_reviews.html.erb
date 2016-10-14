@@ -10,6 +10,12 @@
       <h3 style="margin-bottom: 0;"><%= t 'titles.automatically_assign_reviews', "Automatically Assign Reviews" %></h3>
       <p><%= t 'descriptions.automatically_assign_reviews', "You can assign peer reviews to those users who have submitted but don't already have
       reviews assigned by clicking the button below." %></p>
+      <% if @assignment.group_category %>
+        <div>
+          <%= check_box_tag "intra_group_peer_reviews", "1", @assignment.intra_group_peer_reviews %>
+          <label for="intra_group_peer_reviews"><%= t("Allow intra-group peer reviews") %></label>
+        </div>
+      <% end %>
       <%= t :reviews_per_user, "%{count} reviews per user", :count => %{<input type="text" name="peer_review_count" value="#{@assignment.peer_review_count || 1}" style="width: 25px;"/>}.html_safe %>
       <div class='button-container button-container-right-aligned'>
         <button type="submit" class="btn btn-large"><%= t 'buttons.assign_peer_reviews', "Assign Peer Reviews" %></button>

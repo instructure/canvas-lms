@@ -3,10 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "help dialog" do
   include_context "in-process server selenium tests"
 
-  before do
-    Account.default.enable_feature! :use_new_styles
-  end
-
   context "no user logged in" do
     it "should work with no logged in user" do
       Setting.set('show_feedback_link', 'true')
@@ -81,7 +77,7 @@ describe "help dialog" do
       feedback_form.find_element(:css, '[name="body"]').send_keys('test message')
       submit_form(feedback_form)
       wait_for_ajaximations
-      expect(feedback_form).not_to be_displayed
+      expect(f('body')).not_to contain_css("form[action='/api/v1/conversations']")
       cm = ConversationMessage.last
       expect(cm.recipients).to match_array @course.instructors
       expect(cm.recipients.count).to eq 2
@@ -125,6 +121,32 @@ describe "help dialog" do
       wait_for_ajaximations
       expect(f("#help-dialog")).to be_displayed
       expect(f("#help-dialog a[href='#create_ticket']")).to be_displayed
+    end
+  end
+
+  context "customization link" do
+    before :each do
+      user_logged_in(:active_all => true)
+      Setting.set('show_feedback_link', 'true')
+    end
+
+    it "should show the link to root account admins" do
+      Account.default.account_users.create!(:user => @user)
+      get "/"
+      wait_for_ajaximations
+      f('#global_nav_help_link').click
+      wait_for_ajaximations
+      expect(ff("#help_tray .ic-NavMenu-list-item__link").last).to include_text("Customize this menu")
+    end
+
+    it "should not show the link to sub account admins" do
+      sub = Account.default.sub_accounts.create!
+      sub.account_users.create!(:user => @user)
+      get "/"
+      wait_for_ajaximations
+      f('#global_nav_help_link').click
+      wait_for_ajaximations
+      expect(ff("#help_tray .ic-NavMenu-list-item__link").last).to_not include_text("Customize this menu")
     end
   end
 end

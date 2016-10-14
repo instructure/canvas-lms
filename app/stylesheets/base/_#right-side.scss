@@ -1,10 +1,6 @@
 #right-side-wrapper {
   display: none;
   position: relative;
-  @if $use_new_styles == false {
-    width: 0;
-    right: 0;
-  }
 }
 
 #right-side {
@@ -12,11 +8,6 @@
   // puts it equal with #main, used so datepickers that pop up from #right-side pop up on top
   z-index: 10;
   min-height: 20px;
-  @if $use_new_styles == false {
-    width: $right_side_width - $right_side_margin * 2;
-    color: $ic-color-dark;
-    margin: $right_side_margin $right_side_margin 0;
-  }
   hr {
     border: dotted #aaa;
     border-width: 1px 0 0;
@@ -26,19 +17,10 @@
     @include fontSize($ic-font-size--small);
     overflow: hidden;
     line-height: 1.2em;
-    @if $use_new_styles {
-      border-bottom: 1px solid $ic-border-light;
-      padding-bottom: $ic-sp;
-      margin: 0 0 $ic-sp;
-      font-weight: 500;
-    }
-    @else {
-      color: $gray;
-      font-weight: bold;
-      border-bottom: solid 1px #bbb;
-      margin: $right_side_margin 0;
-      padding-bottom: 6px;
-    }
+    border-bottom: 1px solid $ic-border-light;
+    padding-bottom: $ic-sp;
+    margin: 0 0 $ic-sp;
+    font-weight: 500;
   }
 }
 
@@ -62,8 +44,7 @@
 
 #right-side .right-side-list {
   @include reset-list;
-  @if $use_new_styles { margin: 0 0 $ic-sp; }
-  @else { margin: 10px 0; }
+  margin: 0 0 $ic-sp;
   li {
     a{
       @include fontSize($ic-font-size--xsmall);
@@ -106,15 +87,8 @@
     // this is for things like "nothing for the next week"
     small {
       display: block;
-      @if $use_new_styles {
-        font-style: italic;
-        @include fontSize(13px);
-      }
-      @else {
-        padding: 3px 0 0px 31px;
-        color: #666;
-        font-size: 1em;
-      }
+      font-style: italic;
+      @include fontSize(13px);
     }
     b, em, p {
       font-weight: normal;
@@ -206,47 +180,27 @@
 
 @mixin sidebar-logo {display: block;}
 
-@if $use_new_styles {
+.ic-sidebar-logo {
+  display: none;
+  margin-bottom: $ic-sp*2;
+  text-align: center;
+}
+.ic-sidebar-logo__image {
+  max-width: 180px;
+  max-height: 70px;
+  display: inline-block;
+}
+body:not(.course-menu-expanded) {
   .ic-sidebar-logo {
-    display: none;
-    margin-bottom: $ic-sp*2;
-    text-align: center;
-  }
-  .ic-sidebar-logo__image {
-    max-width: 180px;
-    max-height: 70px;
-    display: inline-block;
-  }
-  body:not(.course-menu-expanded) {
-    .ic-sidebar-logo {
-      @include breakpoint(desktop) {
-        @include sidebar-logo;
-      }
-    }
-  }
-  body.course-menu-expanded {
-    .ic-sidebar-logo {
-      @include breakpoint(desktop--nav-open) {
-        @include sidebar-logo;
-      }
+    @include breakpoint(desktop) {
+      @include sidebar-logo;
     }
   }
 }
-
-// Legacy Styles
-@if not $use_new_styles {
-  // These are the classes that get applied to #right-side-wrapper to handle $.scrollSidebar
-  // NOTE: they used to get applied to body but were moved to #right side to not force a repaint
-  // of the entire page and be less jumpy going in and out display modes.
-  .with-scrolling-right-side {
-    #right-side {
-      position: fixed;
-      top: 0;
-      margin-top: 0;
+body.course-menu-expanded {
+  .ic-sidebar-logo {
+    @include breakpoint(desktop--nav-open) {
+      @include sidebar-logo;
     }
-  }
-  #right-side-wrapper.with-sidebar-pinned-to-bottom {
-    position: absolute;
-    bottom: 0;
   }
 }

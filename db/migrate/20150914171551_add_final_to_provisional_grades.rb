@@ -7,7 +7,7 @@ class AddFinalToProvisionalGrades < ActiveRecord::Migration
     add_index :moderated_grading_provisional_grades,
       [:submission_id],
       :unique => true,
-      :where => ["final = ?", true],
+      :where => "final = TRUE",
       :name => :idx_mg_provisional_grades_unique_submission_when_final
 
     remove_index :moderated_grading_provisional_grades, :name => :idx_mg_provisional_grades_unique_submission_scorer
@@ -15,7 +15,7 @@ class AddFinalToProvisionalGrades < ActiveRecord::Migration
       [:submission_id, :scorer_id],
       :unique => true,
       :name => :idx_mg_provisional_grades_unique_sub_scorer_when_not_final,
-      :where => ["final = ?", false]
+      :where => "final = FALSE"
   end
 
   def down

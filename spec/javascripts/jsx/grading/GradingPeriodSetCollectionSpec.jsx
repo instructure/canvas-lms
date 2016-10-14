@@ -1,24 +1,23 @@
 define([
   'react',
+  'react-dom',
   'underscore',
   'jquery',
   'jsx/grading/GradingPeriodSetCollection',
   'compiled/api/gradingPeriodSetsApi',
   'compiled/api/enrollmentTermsApi'
-], (React, _, $, SetCollection, setsApi, termsApi) => {
+], (React, ReactDOM, _, $, SetCollection, setsApi, termsApi) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
   const assertDisabled = function(component) {
-    let $el = React.findDOMNode(component);
+    let $el = ReactDOM.findDOMNode(component);
     equal($el.getAttribute('aria-disabled'), 'true');
-    ok(_.contains($el.classList, 'disabled'));
   };
 
   const assertEnabled = function(component) {
-    let $el = React.findDOMNode(component);
-    equal($el.getAttribute('aria-disabled'), 'false');
-    notOk(_.contains($el.classList, 'disabled'));
+    let $el = ReactDOM.findDOMNode(component);
+    notEqual($el.getAttribute('aria-disabled'), 'true');
   };
 
   const assertCollapsed = function(component, setId) {
@@ -223,22 +222,19 @@ define([
 
   test("has the add new set button enabled on initial load", function() {
     let collection = this.renderComponent();
-    let addSetFormButton = React.findDOMNode(collection.refs.addSetFormButton);
-    equal(addSetFormButton.getAttribute('aria-disabled'), 'false');
-    notOk(_.contains(addSetFormButton.classList, 'disabled'));
+    assertEnabled(collection.refs.addSetFormButton);
   });
 
   test("disables the add new set button after it is clicked", function() {
     let collection = this.renderComponent();
-    let addSetFormButton = React.findDOMNode(collection.refs.addSetFormButton);
+    let addSetFormButton = ReactDOM.findDOMNode(collection.refs.addSetFormButton);
     Simulate.click(addSetFormButton);
-    equal(addSetFormButton.getAttribute('aria-disabled'), 'true');
-    ok(_.contains(addSetFormButton.classList, 'disabled'));
+    assertDisabled(collection.refs.addSetFormButton);
   });
 
   test("shows the new set form when the add new set button is clicked", function() {
     let collection = this.renderComponent();
-    let addSetFormButton = React.findDOMNode(collection.refs.addSetFormButton);
+    let addSetFormButton = ReactDOM.findDOMNode(collection.refs.addSetFormButton);
     Simulate.click(addSetFormButton);
     ok(collection.refs.newSetForm);
   });
@@ -456,7 +452,7 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
@@ -588,7 +584,7 @@ define([
     let set = this.renderComponent();
     Promise.all([this.sets, this.terms]).then(function() {
       notOk(!!set.refs["edit-grading-period-set-1"], "the edit grading period set form is not visible");
-      Simulate.click(set.refs["show-grading-period-set-1"].refs.editButton);
+      Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-set-1"].refs.editButton));
       ok(set.refs["edit-grading-period-set-1"], "the edit form is visible");
       start();
     });
@@ -597,7 +593,7 @@ define([
   asyncTest("disables other 'grading period set' actions while open", function() {
     let set = this.renderComponent();
     Promise.all([this.sets, this.terms]).then(function() {
-      Simulate.click(set.refs["show-grading-period-set-1"].refs.editButton);
+      Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-set-1"].refs.editButton));
       assertDisabled(set.refs.addSetFormButton);
       ok(set.refs["show-grading-period-set-2"].props.actionsDisabled);
       start();
@@ -607,7 +603,7 @@ define([
   asyncTest("'onCancel' removes the 'edit grading period set' form", function() {
     let set = this.renderComponent();
     Promise.all([this.sets, this.terms]).then(function() {
-      Simulate.click(set.refs["show-grading-period-set-1"].refs.editButton);
+      Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-set-1"].refs.editButton));
       set.refs["edit-grading-period-set-1"].props.onCancel();
       notOk(!!set.refs["edit-grading-period-set-1"]);
       start();
@@ -617,10 +613,9 @@ define([
   asyncTest("'onCancel' focuses on the 'edit grading period set' button", function() {
     let set = this.renderComponent();
     Promise.all([this.sets, this.terms]).then(function() {
-      Simulate.click(set.refs["show-grading-period-set-1"].refs.editButton);
+      Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-set-1"].refs.editButton));
       set.refs["edit-grading-period-set-1"].props.onCancel();
-      let editButton = React.findDOMNode(set.refs["show-grading-period-set-1"].refs.editButton);
-      equal(document.activeElement, editButton);
+      equal(document.activeElement, ReactDOM.findDOMNode(set.refs["show-grading-period-set-1"].refs.editButton));
       start();
     });
   });
@@ -628,7 +623,7 @@ define([
   asyncTest("'onCancel' re-enables all grading period set actions", function() {
     let set = this.renderComponent();
     Promise.all([this.sets, this.terms]).then(function() {
-      Simulate.click(set.refs["show-grading-period-set-1"].refs.editButton);
+      Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-set-1"].refs.editButton));
       set.refs["edit-grading-period-set-1"].props.onCancel();
       assertEnabled(set.refs.addSetFormButton);
       notOk(set.refs["show-grading-period-set-2"].props.actionsDisabled);
@@ -647,12 +642,12 @@ define([
       let component = ReactDOM.render(element, wrapper);
       component.onTermsLoaded(exampleTerms);
       component.onSetsLoaded(exampleSets);
-      Simulate.click(component.refs["show-grading-period-set-1"].refs.editButton);
+      Simulate.click(ReactDOM.findDOMNode(component.refs["show-grading-period-set-1"].refs.editButton));
       return component;
     },
 
     callOnSave(collection) {
-      Simulate.click(collection.refs["edit-grading-period-set-1"].refs.saveButton);
+      Simulate.click(ReactDOM.findDOMNode(collection.refs["edit-grading-period-set-1"].refs.saveButton));
     },
 
     teardown() {

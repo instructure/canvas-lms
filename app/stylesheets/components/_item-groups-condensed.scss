@@ -215,31 +215,15 @@
 
 */
 
-@if $use_new_styles == false {
-  body.with_item_groups #main { background-color: #e8ecef; }
-}
-
 .item-group-container {
-  @if $use_new_styles {
-    background: $lightBackground;
-    padding-bottom: $ic-sp*6;
-    border: 1px solid $ic-border-light;
-    border-top: none;
-  }
-  @else {
-    background-color: $wellBackground;
-    padding-bottom: 70px;
-  }
+  background: $lightBackground;
+  padding-bottom: $ic-sp*6;
+  border: 1px solid $ic-border-light;
+  border-top: none;
 
   .item-group-condensed {
-    @if $use_new_styles {
-      border-bottom: 1px dashed $ic-border-dark;
-      padding: $ic-sp*1.5;
-    }
-    @else {
-      border-bottom: 1px dashed #c2c8d0;
-      padding: 15px;
-    }
+    border-bottom: 1px dashed $ic-border-dark;
+    padding: $ic-sp*1.5;
   }
 
   .item-group-condensed:last-child,
@@ -268,14 +252,12 @@
     border-top-width: 0;
     border-radius: 0;
     background: #fff;
-    @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
-    @else { border-bottom: 1px solid #e1e3e4; }
+    border-bottom: 1px solid $ic-border-light;
   }
 
   .ig-list li:first-child,
   .ig-list li:first-of-type {
-    @if $use_new_styles { margin-top: $ic-sp/2; }
-    @else { margin-top: 5px; }
+    margin-top: $ic-sp/2;
   }
 
   .ig-list li:first-child .ig-row,
@@ -283,8 +265,7 @@
   .first_visible .ig-row {
     border-top-left-radius: $baseBorderRadius;
     border-top-right-radius: $baseBorderRadius;
-    @if $use_new_styles { border-top: 1px solid $ic-border-light; }
-    @else { border-top: 1px solid #c1c7cf; }
+    border-top: 1px solid $ic-border-light;
     &.ig-row-empty { border-top: 1px solid #dcdee0; }
   }
 
@@ -293,26 +274,13 @@
   .last_visible .ig-row {
     border-bottom-left-radius: $baseBorderRadius;
     border-bottom-right-radius: $baseBorderRadius;
-    @if $use_new_styles {
-      &.ig-row-empty { border-bottom: 1px solid $ic-border-light; }
-    }
-    @else {
-      border-bottom: 1px solid #c1c7cf;
-      &.ig-row-empty { border-bottom: 1px solid #dcdee0; }
-    }
+    &.ig-row-empty { border-bottom: 1px solid $ic-border-light; }
   }
 
   .item-group-expandable {
     border-radius: $baseBorderRadius;
-    @if $use_new_styles {
-      background-color: $ic-color-light;
-      border: 1px solid $ic-border-light;
-    }
-    @else {
-      border: 1px solid #c1c7cf;
-      box-shadow: 0 1px 0 #dde0e4;
-      background-color: white;
-    }
+    background-color: $ic-color-light;
+    border: 1px solid $ic-border-light;
 
     .ig-list {
       li { margin: 0; }

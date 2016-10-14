@@ -24,7 +24,7 @@
     "tinymce": "4.1.9",
     "react-tokeninput": "https://github.com/instructure-react/react-tokeninput.git#99a4c49ca695c9df438eff29778ea84072393511",
     "react-select-box": "https://github.com/instructure-react/react-select-box.git#b1ddd39223d48793fbe3dc4e87aca00d57197b5f",
-    "react-tray": "0.3.0",
+    "react-tray": "2.0.1",
     "classnames": "~2.1.2",
     "moment": "~2.10.6",
     "reflux": "~0.2.7",

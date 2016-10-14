@@ -1,7 +1,8 @@
 define([
+  "react",
   "./createStore",
   "underscore"
-], function(createStore, _) {
+], function(React, createStore, _) {
 
   var { string, shape, arrayOf } = React.PropTypes;
 

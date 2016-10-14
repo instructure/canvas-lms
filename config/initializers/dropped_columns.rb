@@ -101,6 +101,7 @@ class ActiveRecord::Base
                         limit_priveleges_to_course_sections
                         role_name
                         sis_source_id).freeze,
+    'enrollment_states' => %w{state_invalidated_at state_recalculated_at access_invalidated_at access_recalculated_at}.freeze,
     'eportfolio_entries' => %w(attachment_id artifact_type url).freeze,
     'eportfolios' => %w{context_id context_type}.freeze,
     'external_feeds' => %w(body_match feed_type feed_purpose).freeze,

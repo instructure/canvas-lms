@@ -450,5 +450,30 @@ describe ContentMigration do
       expect(data).to_not include("LINK.PLACEHOLDER")
       expect(data).to include("courses/#{@copy_to.id}/discussion_topics/#{topic_to.id}")
     end
+
+    it "should work on all_day calendar events" do
+      @old_start = DateTime.parse("01 Jul 2012 06:00:00 UTC +00:00")
+      @new_start = DateTime.parse("05 Aug 2012 06:00:00 UTC +00:00")
+
+      all_day_event = @copy_from.calendar_events.create!(:title => "an event",
+        :start_at => @old_start + 4.days, :all_day => true)
+
+      options = {
+        :everything => true,
+        :shift_dates => true,
+        :old_start_date => 'Jul 1, 2012',
+        :old_end_date => 'Jul 11, 2012',
+        :new_start_date => 'Aug 5, 2012',
+        :new_end_date => 'Aug 15, 2012'
+      }
+      @cm.copy_options = options
+      @cm.save!
+
+      run_course_copy
+
+      new_event = @copy_to.calendar_events.where(:migration_id => mig_id(all_day_event)).first
+      expect(new_event.all_day?).to be_truthy
+      expect(new_event.all_day_date).to eq (@new_start + 4.days).to_date
+    end
   end
 end

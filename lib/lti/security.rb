@@ -84,6 +84,23 @@ module Lti
     end
     private_class_method :generate_params_deprecated
 
+    ##
+    ## Timeline Examples for valid and invalid timestamps
+    ##
+    ## |---exp---timestamp---now---|  VALID
+    ##
+    ## |---timestamp---exp---now---| INVALID
+    ##
+    ## |---exp---now---timestamp---| INVALID
+    ##
+    def self.check_and_store_nonce(cache_key, timestamp, expiration)
+      valid = timestamp.to_i > expiration.ago.to_i
+      valid &&= timestamp.to_i <= Time.now.to_i
+      valid &&= !Rails.cache.exist?(cache_key)
+      Rails.cache.write(cache_key, 'OK', expires_in: expiration) if valid
+      valid
+    end
+
 
   end
 end

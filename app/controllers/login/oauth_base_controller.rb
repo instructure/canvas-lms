@@ -61,7 +61,7 @@ class Login::OauthBaseController < ApplicationController
     false
   end
 
-  def find_pseudonym(unique_ids)
+  def find_pseudonym(unique_ids, provider_attributes = {})
     if unique_ids.nil?
       unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
       logger.warn "Received OAuth2 login with no unique_id"
@@ -76,7 +76,11 @@ class Login::OauthBaseController < ApplicationController
     unique_ids.any? do |unique_id|
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
     end
-    pseudonym ||= @aac.provision_user(unique_ids.first) if !unique_ids.empty? && @aac.jit_provisioning?
+    if pseudonym
+      @aac.apply_federated_attributes(pseudonym, provider_attributes)
+    elsif !unique_ids.empty? && @aac.jit_provisioning?
+      pseudonym = @aac.provision_user(unique_ids.first, provider_attributes)
+    end
 
     if pseudonym
       # Successful login and we have a user

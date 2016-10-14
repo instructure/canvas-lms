@@ -3,7 +3,7 @@ require_relative "../spec_helper"
 describe EnrollmentState do
 
   describe "#enrollments_needing_calculation" do
-    it "should find enrollments that don't have enrollment states (yet) as well" do
+    it "should find enrollments that need calculation" do
       course
       normal_enroll = student_in_course(:course => @course)
 
@@ -12,16 +12,13 @@ describe EnrollmentState do
       invalidated_enroll2 = student_in_course(:course => @course)
       EnrollmentState.where(:enrollment_id => invalidated_enroll2).update_all(:access_is_current => false)
 
-      missing_enroll = student_in_course(:course => @course)
-      EnrollmentState.where(:enrollment_id => missing_enroll).delete_all
-
-      expect(EnrollmentState.enrollments_needing_calculation.to_a).to match_array([invalidated_enroll1, invalidated_enroll2, missing_enroll])
+      expect(EnrollmentState.enrollments_needing_calculation.to_a).to match_array([invalidated_enroll1, invalidated_enroll2])
     end
 
     it "should be able to use a scope" do
       course
       enroll = student_in_course(:course => @course)
-      EnrollmentState.where(:enrollment_id => enroll).delete_all
+      EnrollmentState.where(:enrollment_id => enroll).update_all(:state_is_current => false)
 
       expect(EnrollmentState.enrollments_needing_calculation(Enrollment.where.not(:id => nil)).to_a).to eq [enroll]
       expect(EnrollmentState.enrollments_needing_calculation(Enrollment.where(:id => nil)).to_a).to be_empty
@@ -32,18 +29,6 @@ describe EnrollmentState do
     before :once do
       course(:active_all => true)
       @enrollment = student_in_course(:course => @course)
-    end
-
-    it "should create missing states" do
-      EnrollmentState.where(:enrollment_id => @enrollment).delete_all
-
-      @enrollment.reload
-
-      EnrollmentState.process_states_for(@enrollment)
-
-      @enrollment.reload
-      expect(@enrollment.enrollment_state).to be_present
-      expect(@enrollment.enrollment_state.state).to eq 'invited'
     end
 
     it "should reprocess invalidated states" do
@@ -135,6 +120,30 @@ describe EnrollmentState do
 
       EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e.course == @course}
 
+      @course.start_at = 4.days.ago
+      ended_at = 3.days.ago
+      @course.conclude_at = ended_at
+      @course.save!
+
+      enroll_state.reload
+      expect(enroll_state.state_is_current?).to be_falsey
+
+      enroll_state.ensure_current_state
+      expect(enroll_state.state).to eq 'completed'
+      expect(enroll_state.state_started_at).to eq ended_at
+    end
+
+    it "should invalidate enrollments even if they have null lock versions (i.e. already exist before db migration)" do
+      course(:active_all => true)
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      enroll = student_in_course(:course => @course)
+      enroll_state = enroll.enrollment_state
+      EnrollmentState.where(:enrollment_id => enroll_state).update_all(:lock_version => nil)
+
+      EnrollmentState.expects(:update_enrollment).at_least_once.with {|e| e.course == @course}
+
+      @course.reload
       @course.start_at = 4.days.ago
       ended_at = 3.days.ago
       @course.conclude_at = ended_at
@@ -319,7 +328,6 @@ describe EnrollmentState do
         EnrollmentState.recalculate_expired_states
         enroll_state.reload
         expect(enroll_state.state).to eq 'completed'
-        expect(enroll_state.state_invalidated_at).to eq end_at # for diagnostic purposes
       end
     end
   end

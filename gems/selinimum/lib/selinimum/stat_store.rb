@@ -1,3 +1,4 @@
+gem "aws-sdk", "=1.63.0"
 require "json"
 require "aws-sdk"
 require "fileutils"
@@ -44,8 +45,22 @@ module Selinimum
         recent_shas.detect { |sha| available_shas.include?(sha) }
       end
 
-      # download all the json files stored under canvas-lms/data/<SHA>/
       def download_stats(sha, dest)
+        data = s3.objects[S3_PREFIX + "/builds/" + sha].read
+
+        # legacy, fetch individual json files
+        # TODO: remove me in ~200 commits once the old data falls out
+        if data == "ok"
+          return download_raw_data(sha, dest)
+        end
+
+        File.open("#{dest}/all.json", "wb") do |file|
+          file.write(data)
+        end
+      end
+
+      # download all the json files stored under canvas-lms/data/<SHA>/
+      def download_raw_data(sha, dest)
         prefix = S3_PREFIX + "/data/" + sha + "/"
         objects = s3.objects
           .as_tree(prefix: prefix)
@@ -68,17 +83,25 @@ module Selinimum
         suffix = Time.now.utc.strftime("%Y%m%d%H%M%S")
         suffix += "-#{batch_name}" if batch_name
 
-        save_file("data/#{Git.head}/stats-#{suffix}.json", data)
-
-        # in jenkins land, a given build can have lots of data files (cuz
-        # parallelization). so we track overall build completion/success
-        # separately once everything is done. e.g. if one thread has
-        # failures, the whole dataset is unreliable, so we don't finalize
-        finalize! unless batch_name
+        if batch_name
+          # in jenkins land, a given build can have lots of data files (cuz
+          # parallelization). so we track overall build completion/success
+          # separately once everything is done. e.g. if one thread has
+          # failures, the whole dataset is unreliable, so we don't finalize
+          save_file("data/#{Git.head}/stats-#{suffix}.json", data.to_json)
+        else
+          finalize!(data)
+        end
       end
 
-      def finalize!
-        save_file("builds/#{Git.head}", "ok")
+      def finalize!(data = nil)
+        sha = Git.head
+        data ||= begin
+          dest = Dir.mktmpdir("selinimum")
+          download_raw_data(sha, dest)
+          load_stats(dest)
+        end
+        save_file("builds/#{sha}", data.to_json)
       end
 
       def save_file(filename, data)

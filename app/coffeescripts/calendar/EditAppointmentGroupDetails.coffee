@@ -4,6 +4,7 @@ define [
   'compiled/util/fcUtil'
   'i18n!EditAppointmentGroupDetails'
   'str/htmlEscape'
+  'compiled/calendar/commonEventFactory'
   'compiled/calendar/TimeBlockList'
   'jst/calendar/editAppointmentGroup'
   'jst/calendar/genericSelect'
@@ -13,7 +14,7 @@ define [
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], ($, _, fcUtil, I18n, htmlEscape, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate, sectionCheckboxesTemplate, ContextSelector, preventDefault) ->
+], ($, _, fcUtil, I18n, htmlEscape, commonEventFactory, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate, sectionCheckboxesTemplate, ContextSelector, preventDefault) ->
 
   class EditAppointmentGroupDetails
     constructor: (selector, @apptGroup, @contexts, @closeCB) ->
@@ -109,6 +110,9 @@ define [
 
       if @apptGroup.workflow_state == 'active'
         @form.find("#appointment-blocks-active-button").attr('disabled', true).prop('checked', true)
+
+      @form.submit @saveClick
+      @form.find('.save_without_publishing_link').click @saveWithoutPublishingClick
 
     creating: ->
       !@editing()
@@ -220,13 +224,19 @@ define [
         # TODO: Provide UI for specifying this
         params['appointment_group[min_appointments_per_participant]'] = 1
 
-      onSuccess = => @closeCB(true)
+      onSuccess = (data) =>
+        for eventData in (data.new_appointments || [])
+          event = commonEventFactory(eventData, @contexts)
+          $.publish('CommonEvent/eventSaved', event)
+        @closeCB(true)
       onError = =>
 
       method = if @editing() then 'PUT' else 'POST'
 
       deferred = $.ajaxJSON @form.attr('action'), method, params, onSuccess, onError
       @form.disableWhileLoading(deferred)
+
+    activate: () => {}
 
     contextsChanged: (contextCodes, sectionCodes) =>
       # dropdown text

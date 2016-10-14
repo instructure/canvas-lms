@@ -212,9 +212,9 @@ describe 'Speedgrader' do
       end
 
       it 'in submissions page', priority: "1", test_id: 217612 do
-        driver.manage.window.maximize
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}"
         f('a.assess_submission_link').click
+        wait_for_animations
 
         expect(f('#criterion_crit1 input.criterion_points')).to have_value '10'
         expect(f('#criterion_crit2 input.criterion_points')).to have_value '5'
@@ -506,6 +506,35 @@ describe 'Speedgrader' do
       # Close shortcut modal
       f('.ui-resizable .ui-dialog-titlebar-close').click
       expect(keyboard_modal).not_to be_displayed
+    end
+  end
+
+  context "closed grading periods" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+
+      account = @course.root_account
+      account.enable_feature! :multiple_grading_periods
+
+      gpg = GradingPeriodGroup.new
+      gpg.account_id = account
+      gpg.save!
+      gpg.grading_periods.create! start_date: 3.years.ago,
+        end_date: 1.year.ago,
+        close_date: 1.week.ago,
+        title: "closed grading period"
+      term = @course.enrollment_term
+      term.update_attribute :grading_period_group, gpg
+
+      @assignment = @course.assignments.create! name: "aaa", due_at: 2.years.ago
+      user_session(@teacher)
+    end
+
+    it "disables grading" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      expect(f("#grade_container input")["readonly"]).to eq "true"
+      expect(f("#closed_gp_notice")).to be_displayed
     end
   end
 end

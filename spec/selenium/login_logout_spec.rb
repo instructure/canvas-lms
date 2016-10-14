@@ -20,7 +20,7 @@ describe "login logout test" do
   it "should login successfully with correct username and password", priority: "2" do
     user_with_pseudonym({:active_user => true})
     login_as
-    expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_profile_display_name' : '.user_name').text).to eq @user.primary_pseudonym.unique_id
+    expect(f('#global_nav_profile_display_name').text).to eq @user.primary_pseudonym.unique_id
   end
 
   it "should show error message if wrong credentials are used", priority: "2" do

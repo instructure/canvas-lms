@@ -7,7 +7,7 @@ class CreateAppointmentGroupSubContexts < ActiveRecord::Migration
       t.integer :sub_context_id, :limit => 8
       t.string :sub_context_type
       t.string :sub_context_code
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :appointment_group_sub_contexts, :id

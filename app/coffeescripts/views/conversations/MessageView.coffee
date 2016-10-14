@@ -13,6 +13,7 @@ define [
 
     els:
       '.star-btn': '$starBtn'
+      '.StarButton-LabelContainer': '$starBtnScreenReaderMessage'
       '.read-state': '$readBtn'
 
     events:
@@ -55,11 +56,25 @@ define [
     deselect: (modifier) ->
       @model.set('selected', false) if modifier
 
+    setStarBtnCheckedScreenReaderMessage: ->
+      text = if @model.starred()
+               if @model.get('subject')
+                 I18n.t('Starred "%{subject}", Click to unstar.', subject: @model.get('subject'))
+               else
+                 I18n.t('Starred "(No Subject)", Click to unstar.')
+             else
+               if @model.get('subject')
+                 I18n.t('Not starred "%{subject}", Click to star.', subject: @model.get('subject'))
+               else
+                 I18n.t('Not starred "(No Subject)", Click to star.')
+      @$starBtnScreenReaderMessage.text(text)
+
     setStarBtnChecked: =>
       @$starBtn.attr
         'aria-checked': @model.starred()
         title: if @model.starred() then @messages.unstar else @messages.star
       @$starBtn.toggleClass('active', @model.starred())
+      @setStarBtnCheckedScreenReaderMessage()
 
     toggleStar: (e) ->
       e.preventDefault()

@@ -13,7 +13,7 @@ define([
   const modalOverrides = {
     overlay : {
       backgroundColor: 'rgba(0,0,0,0.5)'
-    },  
+    },
     content : {
       position: 'static',
       top: '0',
@@ -124,22 +124,19 @@ define([
       }
     },
 
-    configUrl() {
-      var url = this.props.app.config_xml_url;
-
+    configSettings() {
       var queryParams = {};
       _.map(this.state.fields, function(v, k) {
         if(v.type == "checkbox") {
           if(!v.value) return;
           queryParams[k] = '1';
         } else
-          queryParams[k] = v.value;
+          queryParams[k] = encodeURIComponent(v.value);
       });
       delete queryParams['consumer_key'];
       delete queryParams['shared_secret'];
 
-      var newUrl = url + (url.indexOf('?') !== -1 ? '&' : '?') + $.param(queryParams);
-      return newUrl;
+      return queryParams;
     },
 
     submit(e) {
@@ -165,10 +162,9 @@ define([
         newTool.set('shared_secret', 'N/A');
       }
 
-      newTool.set('config_url', this.configUrl());
-      newTool.set('config_type', 'by_url');
       newTool.set('name', this.state.fields.name.value);
       newTool.set('app_center_id', this.props.app.short_name);
+      newTool.set('config_settings', this.configSettings())
 
       $(e.target).attr('disabled', 'disabled');
 

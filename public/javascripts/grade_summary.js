@@ -26,7 +26,7 @@ define([
   'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* getFormData */,
-  'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
+  'jquery.instructure_misc_helpers' /* replaceTags */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment, mediaCommentThumbnail */
@@ -352,8 +352,6 @@ define([
     $("#only_consider_graded_assignments").change(function() {
       updateStudentGrades();
     }).triggerHandler('change');
-
-    $.scrollSidebar();
 
     $("#observer_user_url").change(function() {
       if(location.href != $(this).val()) {

@@ -83,7 +83,7 @@ module Lti
       end
 
       it 'converts observers' do
-        expect(subject.enrollments_to_lis_roles([ObserverEnrollment.new]).first).to eq 'urn:lti:instrole:ims/lis/Observer'
+        expect(subject.enrollments_to_lis_roles([ObserverEnrollment.new]).first).to eq 'urn:lti:instrole:ims/lis/Observer,urn:lti:role:ims/lis/Mentor'
       end
 
       it 'converts admins' do

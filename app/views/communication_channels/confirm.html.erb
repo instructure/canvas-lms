@@ -2,25 +2,19 @@
   css_bundle :login_confirm
   js_bundle :registration_confirmation
   @headers = false
-  if use_new_styles?
-    @body_classes << "full-width modal body--login-confirmation"
-  else
-    @body_classes << "modal body--login-confirmation"
-  end
+  @body_classes << "full-width modal body--login-confirmation"
   content_for :page_title, t(:page_title, "Register %{email}", :email => @communication_channel.path)
 %>
 
-<div id="modal-box"<% if use_new_styles? %> class="ic-Login-confirmation"<% end %>>
-  <% if use_new_styles? %>
+<div id="modal-box" class="ic-Login-confirmation">
   <header class="ic-Login-confirmation__header">
     <%= image_tag("login/canvas-logo@2x.png", class:"ic-Login-confirmation__logo", alt:"Canvas by Instructure") %>
   </header>
   <div class="ic-Login-confirmation__content">
-  <% end %>
-  <h2<% if use_new_styles? %> class="ic-Login-confirmation__headline"<% end %>><%= t 'titles.welcome_aboard', "Welcome Aboard!" %></h2>
+  <h2 class="ic-Login-confirmation__headline"><%= t 'titles.welcome_aboard', "Welcome Aboard!" %></h2>
   <% if @current_user && @current_user != @user && @user.registered? && @enrollment %>
     <p><%= mt 'details.wrong_account', "The invitation for %{course} was sent to **%{invited_user}**, but you are currently logged in as **%{current_user}**", :course => @course.name, :invited_user => @user.name, :current_user => @current_user.name %></p>
-    <div class="button_box<% if use_new_styles? %> ic-Login-confirmation__actions<% end %>">
+    <div class="button_box ic-Login-confirmation__actions">
       <a href="<%= registration_confirmation_path(@nonce, :enrollment => @enrollment.uuid, :transfer_enrollment => 1) %>" class="btn" id='transfer'><%=  t 'buttons.transfer_enrollment', "Transfer Enrollment" %></a>
       <a href="<%= login_url(:enrollment => @enrollment.uuid, :pseudonym_session => { :unique_id => @user.pseudonym.try(:unique_id) }, :expected_user_id => @user.id) %>" class="btn" id="login"><%=  t 'buttons.login_as', "Log in as %{invited_user}", :invited_user => @user.name %></a>
     </div>
@@ -36,7 +30,7 @@
   **Are you %{name}?**", :email => @communication_channel.path, :name => friendly_name(@merge_opportunities.first.last.first, @merge_opportunities) %>
           <% end %></p>
         </div>
-        <div class="button_box<% if use_new_styles? %> ic-Login-confirmation__actions<% end %>">
+        <div class="button_box ic-Login-confirmation__actions">
           <% if @pseudonym %><a href="#" class="btn" id="register"><%= t 'buttons.no', 'No' %></a><% end %>
           <a href="<%= merge_or_login_link(@merge_opportunities.first.last.first) %>" class="btn not_external btn-primary" id="merge"><%= @user.registered? ? t('buttons.merge', "Combine") : t('buttons.yes', "Yes") %></a>
         </div>
@@ -54,7 +48,7 @@
                 </li>
               <% end %>
             </ul>
-            <div class="button_box<% if use_new_styles? %> ic-Login-confirmation__actions<% end %>">
+            <div class="button_box ic-Login-confirmation__actions">
               <a href="#" class="btn" id="back"><%= t 'buttons.back', "Back" %></a>
               <a href="#" class="btn btn-primary" id="merge_if_clicked"><%= t 'buttons.continue', 'Continue' %></a>
             </div>
@@ -67,7 +61,7 @@
           <%= mt 'details.logged_in_other_user', "**%{email}** is a new account, but you are currently logged in as **%{user}**.", :email => @communication_channel.path, :user => (@current_pseudonym && @current_pseudonym.user == @current_user ? @current_pseudonym : @current_user.pseudonym).unique_id %>
         <% end %></p>
         <p><strong><%=  t 'details.add_email', "Would you like to add this email address to your current account?" %></strong></p>
-        <div class="button_box<% if use_new_styles? %> ic-Login-confirmation__actions<% end %>">
+        <div class="button_box ic-Login-confirmation__actions">
           <a href="#" class="btn" id="register"><%= t 'buttons.new_account', 'No' %></a>
           <a href="<%= registration_confirmation_path(@nonce, :enrollment => @enrollment.try(:uuid), :confirm => 1) %>" class="btn btn-primary" id='merge'><%=  t 'buttons.add_email_address', "Yes, Add Email Address" %></a>
         </div>
@@ -112,7 +106,7 @@ Which is you?", :count => @merge_opportunities.length %>
             </li>
           <% end %>
         </ul>
-        <div class="button_box<% if use_new_styles? %> ic-Login-confirmation__actions<% end %>">
+        <div class="button_box ic-Login-confirmation__actions">
           <a href="<%= merge_or_login_link(@merge_opportunities.first.last.first) %>" class="btn not_external" id="merge"><%= t 'buttons.continue', "Continue" %></a>
         </div>
       <% end %>
@@ -120,7 +114,7 @@ Which is you?", :count => @merge_opportunities.length %>
   <% elsif @enrollment && @pseudonym %>
     <div class="disambiguation_box"<%= ' style="display: none;"'.html_safe if params[:register] %>>
       <p><%= mt 'details.account_needed', "You've been invited to join **%{course}**. To accept this request you need a Canvas account. Click the link below to create a Canvas account.", :course => @course.name %></p>
-      <div class="button_box<% if use_new_styles? %> ic-Login-confirmation__actions<% end %>">
+      <div class="button_box ic-Login-confirmation__actions">
         <a href="<%= login_url(:host => HostUrl.context_host(@root_account, @request.try(:host_with_port)), :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.uuid) %>" class="btn not_external"><%=  t 'buttons.have_account', "I Have a Canvas Account" %></a>
         <a href="#" class="btn" id="register"><%= t 'buttons.create_account', 'Create My Account' %></a>
       </div>
@@ -185,5 +179,5 @@ Which is you?", :count => @merge_opportunities.length %>
       </div>
     <% end %>
   <% end %>
-  <% if use_new_styles? %></div><% end %>
+  </div>
 </div>

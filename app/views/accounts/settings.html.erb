@@ -91,7 +91,7 @@
                 <% no_language = t(:no_language_preference, "Not set (defaults to %{language})", :language => available_locales[infer_locale(:context => @context.parent_account)]) %>
                 <%= f.select :default_locale, [[no_language, nil]] + available_locales.invert.sort, {:selected => @context.default_locale}, {:class => 'locale'} %>
                 <%= render :partial => 'shared/locale_warning' %>
-                <p class="unbreakable"><%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/projects/p/canvas-lms/"
+                <p class="unbreakable"><%= mt :transifex_message, <<-TEXT, :transifex_url => "https://www.transifex.com/instructure/canvas-crowdsource/"
 Join the [Canvas Translation Community](%{transifex_url})
 TEXT
                 %>
@@ -338,18 +338,16 @@ TEXT
                 <div id="global_includes_warning_message_wrapper">
                   <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
                   <%= settings.label :global_includes, :en => "Custom CSS/JavaScript overrides" %>
-                  <% if use_new_styles? %>
-                    <div id="global_includes_warning_message" class="account_settings__help-text">
-                      <p>
-                        <%= t ("Custom CSS and Javascript may cause accessibility issues or conflicts with future Canvas updates!")%>
-                      </p>
-                      <p>
-                        <%= t do %>
-                        Before implementing custom CSS or Javascript, please refer to <a href="https://community.canvaslms.com/docs/DOC-3010" target="_blank"> our documentation</a>.
-                        <% end %>
-                      </p>
-                    </div>
-                  <% end %><%# end of use_new_styles? %>
+                  <div id="global_includes_warning_message" class="account_settings__help-text">
+                    <p>
+                      <%= t ("Custom CSS and Javascript may cause accessibility issues or conflicts with future Canvas updates!")%>
+                    </p>
+                    <p>
+                      <%= t do %>
+                      Before implementing custom CSS or Javascript, please refer to <a href="https://community.canvaslms.com/docs/DOC-3010" target="_blank"> our documentation</a>.
+                      <% end %>
+                    </p>
+                  </div>
                 </div>
                 <div id="show_scheduler_checkbox">
                   <%= settings.check_box :show_scheduler, :checked => @account.settings[:show_scheduler] %>
@@ -362,7 +360,7 @@ TEXT
               <% end %><%# end of :manage_site_settings %>
               <div>
                 <%= settings.check_box :sub_account_includes, checked: @account.settings[:sub_account_includes] %>
-                <%= settings.label :new_sub_account_includes, :en => "Let sub-accounts use the Theme Editor to customize their own branding" %>
+                <%= settings.label :sub_account_includes, :en => "Let sub-accounts use the Theme Editor to customize their own branding" %>
               </div>
               <% if @account.canvas_authentication? %>
                 <div>
@@ -420,29 +418,6 @@ TEXT
             <% end %>
           <% end %>
         </fieldset>
-
-        <% unless use_new_styles? %>
-          <fieldset id="account_settings_global_includes_settings" style="<%= hidden unless @account.allow_global_includes? %>">
-            <legend><%= t(:global_js_and_css_includes_title, "Global JavaScript and CSS Includes") %></legend>
-            <p style="font-size: 0.9em;"><%= t(:global_js_and_css_includes_description, "These files will be included on all page loads for your account") %></p>
-            <%= f.fields_for :settings do |settings| %>
-              <table class="formtable">
-                <tr>
-                  <td><%= settings.blabel :global_javascript, :en => "Global JavaScript URL" %></td>
-                  <td><%= settings.text_field :global_javascript, :value => @account.settings[:global_javascript] %></td>
-                </tr>
-                <tr>
-                  <td><%= settings.blabel :global_stylesheet, :en => "Global CSS URL" %></td>
-                  <td><%= settings.text_field :global_stylesheet, :value => @account.settings[:global_stylesheet] %></td>
-                </tr>
-              </table>
-              <div>
-                <%= settings.check_box :sub_account_includes, :checked => @account.settings[:sub_account_includes] %>
-                <%= settings.label :sub_account_includes, :en => "Let sub-accounts define additional includes" %>
-              </div>
-            <% end %>
-          </fieldset>
-        <% end %>
 
         <% if !@account.site_admin? &&
                 @account.root_account? &&
@@ -502,71 +477,7 @@ TEXT
 
 
         <% if @account.root_account? && !@account.site_admin? && show_feedback_link? %>
-
-          <% if use_new_styles? %>
-            <div id="custom_help_link_settings"></div>
-          <% else %>
-          <fieldset>
-            <legend><%= t("Custom Links to include in the help dialog popup") %></legend>
-
-            <p style="font-size: 0.9em;">
-              <%= t("If you would like to link to your own campus support website in the help dialog you can do that here.") %>
-            </p>
-
-            <%= f.fields_for :custom_help_links do |custom_help_links, i| %>
-              <div id="custom_help_links">
-                <% ((@account.settings[:custom_help_links] || []) << {}).each_with_index do |help_link, i| %>
-                  <div class="custom_help_link <%= raw ' blank" style="display: none;' if help_link.empty? %>">
-                    <button type="button" class="Button Button--link delete">
-                      <i class="icon-end" aria-hidden="true"></i>
-                      <span class="screenreader-only"><%= t("Delete custom help link") %></span>
-                    </button>
-                    <input type="hidden" name="account[custom_help_links][<%= i %>][state]" value="<%= help_link[:state] || 'active' %>" id="custom_help_links_<%= i %>_state" class="custom_help_link_state"/>
-                    <table class="formtable">
-                      <tr>
-                        <td><label for="custom_help_links_<%= i %>_text"><%= before_label :help_link_text, "Text to display for link" %></label></td>
-                        <td><input type="text" name="account[custom_help_links][<%= i %>][text]" value="<%= help_link[:text] %>" id="custom_help_links_<%= i %>_text"></td>
-                      </tr>
-                      <tr>
-                        <td><label for="custom_help_links_<%= i %>_subtext"><%= before_label :help_link_subtext, "Sub-text" %></label></td>
-                        <td><input type="text" name="account[custom_help_links][<%= i %>][subtext]" value="<%= help_link[:subtext] %>" id="custom_help_links_<%= i %>_subtext"></td>
-                      </tr>
-                      <tr>
-                        <td><label for="custom_help_links_<%= i %>_text"><%= before_label :help_link_url, "URL" %></label></td>
-                        <td><input type="text" name="account[custom_help_links][<%= i %>][url]" value="<%= help_link[:url] %>" id="custom_help_links_<%= i %>_url"></td>
-                      </tr>
-                      <tr>
-                        <td><label><%= before_label :help_link_available_to, "Available to" %></label></td>
-                        <td>
-                          <input type="checkbox" name="account[custom_help_links][<%= i %>][available_to][]" value="user"  <%= 'checked' if help_link.empty? or help_link[:available_to].try :include?, 'user' %> id="custom_help_links_<%= i %>_available_to_user">
-                          <label for="custom_help_links_<%= i %>_available_to_user"><%= t :help_link_available_to_all_users, "Users" %></label>
-
-                          <input type="checkbox" name="account[custom_help_links][<%= i %>][available_to][]" value="student" <%= 'checked' if help_link[:available_to].try :include?, 'student' %> id="custom_help_links_<%= i %>_available_to_student">
-                          <label for="custom_help_links_<%= i %>_available_to_student"><%= t :help_link_available_to_all_students, "Students" %></label>
-
-                          <input type="checkbox" name="account[custom_help_links][<%= i %>][available_to][]" value="teacher" <%= 'checked' if help_link[:available_to].try :include?, 'teacher' %> id="custom_help_links_<%= i %>_available_to_teacher">
-                          <label for="custom_help_links_<%= i %>_available_to_teacher"><%= t :help_link_available_to_all_teachers, "Teachers" %></label>
-
-                          <input type="checkbox" name="account[custom_help_links][<%= i %>][available_to][]" value="admin" <%= 'checked' if help_link[:available_to].try :include?, 'admin' %> id="custom_help_links_<%= i %>_available_to_admin">
-                          <label for="custom_help_links_<%= i %>_available_to_admin"><%= t :help_link_available_to_all_admins, "Admins" %></label>
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
-            <button
-              type="button"
-              class="Button Button--link add_custom_help_link"
-              title="<%= t('Add a custom help link') %>"
-              aria-label="<%= t('Add a custom help link') %>"
-            >
-              <i class="icon-add" aria-hidden="true"></i>
-              <%= t("Add a custom help link") %>
-            </button>
-          </fieldset>
-          <% end %>
+          <div id="custom_help_link_settings"></div>
         <% end %>
 
         <% unless @account.site_admin? %>

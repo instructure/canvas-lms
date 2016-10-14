@@ -108,7 +108,8 @@ entries['instructure-common'] = [
   'LtiThumbnailLauncher',
   'media_comments',
   'page_views',
-  'reminders'
+  'reminders',
+  'jsx/fakeRequireJSFallback'
 ];
 
 entries['vendor'] = [

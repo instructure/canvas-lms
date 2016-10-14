@@ -25,7 +25,7 @@ define([
 
   tinymce.create('tinymce.plugins.InstructureExternalTools', {
     init : function(ed, url){
-      return initializeExternalTools(ed, url, INST)
+      return initializeExternalTools.init(ed, url, INST)
     },
     getInfo : function() {
       return {
@@ -41,6 +41,5 @@ define([
   // Register plugin
   tinymce.PluginManager.add('instructure_external_tools', tinymce.plugins.InstructureExternalTools);
 
-  // Return helpers namespace for unit testing
-  return ExternalToolsHelper;
+  return tinymce;
 });

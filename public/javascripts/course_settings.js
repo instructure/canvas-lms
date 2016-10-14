@@ -19,12 +19,12 @@ define([
   'i18n!course_settings',
   'jquery' /* $ */,
   'underscore',
+  'course_settings_helper' /* tabIdFromElement */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* datetimeString, date_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
-  'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
@@ -36,7 +36,7 @@ define([
   'jqueryui/autocomplete' /* /\.autocomplete/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, _) {
+], function(I18n, $, _, CourseSettingsHelper) {
 
   var GradePublishing = {
     status: null,
@@ -209,27 +209,14 @@ define([
     });
     $("#nav_form").submit(function(){
       tab_id_regex = /(\d+)$/;
-      function tab_id_from_el(el) {
-        var tab_id_str = $(el).attr("id");
-        if (tab_id_str) {
-          var tab_id = tab_id_str.replace(/^nav_edit_tab_id_/, '');
-          if (tab_id.length > 0) {
-            if(!tab_id.match(/context/)) {
-              tab_id = parseInt(tab_id, 10);
-            }
-            return tab_id;
-          }
-        }
-        return null;
-      }
 
       var tabs = [];
       $("#nav_enabled_list li").each(function() {
-        var tab_id = tab_id_from_el(this);
+        var tab_id = CourseSettingsHelper.tabIdFromElement(this);
         if (tab_id !== null) { tabs.push({ id: tab_id }); }
       });
       $("#nav_disabled_list li").each(function() {
-        var tab_id = tab_id_from_el(this);
+        var tab_id = CourseSettingsHelper.tabIdFromElement(this);
         if (tab_id !== null) { tabs.push({ id: tab_id, hidden: true }); }
       });
 
@@ -416,6 +403,41 @@ define([
       $("#reset_course_content_dialog").dialog('close');
     });
 
-    $.scrollSidebar();
+    $("#course_custom_course_visibility").click(function(event) {
+      $("#customize_course_visibility").toggle(this.checked);
+    });
+
+    $("#course_custom_course_visibility").ready(function(event) {
+      if($("#course_custom_course_visibility")[0].checked) {
+        $("#customize_course_visibility").toggle(true);
+      } else {
+        $("#customize_course_visibility").toggle(false);
+      }
+    });
+
+    $("#course_course_visibility").change(function(event) {
+      var order = $(this).children();
+      var selected = $(this).find(":selected");
+      $.each($('#customize_course_visibility select'), function(i, sel){
+        $(sel).children('option').remove();
+        for(var i=$.inArray(selected[0], order), len=order.length; i < len; i++) {
+          $(order[i]).clone().appendTo($(sel));
+        }
+      });
+      $('#customize_course_visibility select').val($("#course_course_visibility").val())
+    });
+
+    $("#course_custom_course_visibility").ready(function(event) {
+      var order = $("#course_course_visibility").children();
+      var selected = $("#course_course_visibility").find(":selected");
+      var current = $('#customize_course_visibility select').find(":selected");
+      $.each($('#customize_course_visibility select'), function(i, sel){
+        $(sel).children('option').remove();
+        for(var i=$.inArray(selected[0], order), len=order.length; i < len; i++) {
+          $(order[i]).clone().appendTo($(sel));
+        }
+      });
+      $('#customize_course_visibility select').val($(current).val())
+    });
   });
 });

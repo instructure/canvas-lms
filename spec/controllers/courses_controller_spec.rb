@@ -672,6 +672,25 @@ describe CoursesController do
       check_course_show(true)
     end
 
+    context 'when default_view is `syllabus`' do
+      before do
+        course_with_student_logged_in(active_course: 1)
+        @course.default_view = 'syllabus'
+        @course.syllabus_body = '<p>This is your syllabus.</p>'
+        @course.save!
+      end
+
+      it 'assigns syllabus_body' do
+        get :show, id: @course.id
+        expect(assigns[:syllabus_body]).not_to be_nil
+      end
+
+      it 'assigns groups' do
+        get :show, id: @course.id
+        expect(assigns[:groups]).not_to be_nil
+      end
+    end
+
     context "show feedback for the current course only on course front page" do
       before(:once) do
         course_with_student(:active_all => true)
@@ -778,6 +797,7 @@ describe CoursesController do
         get 'show', :id => @course3.id
         expect(assigns(:show_recent_feedback)).to be_falsey
       end
+
     end
 
     context "invitations" do
@@ -1773,6 +1793,46 @@ describe CoursesController do
       Auditors::Course.expects(:record_reset).once.with(@course, anything, @user, anything)
       post 'reset_content', :course_id => @course.id
     end
+  end
+
+  context "visibility_configuration" do
+    let(:controller) { CoursesController.new }
+
+    before do
+      controller.instance_variable_set(:@course, Course.new)
+    end
+
+    it "should allow setting course visibility with flag" do
+
+      controller.visibility_configuration({:course_visibility => 'public'})
+      course = controller.instance_variable_get(:@course)
+
+      expect(course.is_public).to eq true
+
+      controller.visibility_configuration({:course_visibility => 'institution'})
+      expect(course.is_public).to eq false
+      expect(course.is_public_to_auth_users).to eq true
+
+      controller.visibility_configuration({:course_visibility => 'course'})
+      expect(course.is_public).to eq false
+      expect(course.is_public).to eq false
+    end
+
+    it "should allow setting syllabus visibility with flag" do
+      controller.visibility_configuration({:course_visibility => 'course', :syllabus_visibility_option => 'public'})
+      course = controller.instance_variable_get(:@course)
+
+      expect(course.public_syllabus).to eq true
+
+      controller.visibility_configuration({:course_visibility => 'course', :syllabus_visibility_option => 'institution'})
+      expect(course.public_syllabus).to eq false
+      expect(course.public_syllabus_to_auth).to eq true
+
+      controller.visibility_configuration({:course_visibility => 'course', :syllabus_visibility_option => 'course'})
+      expect(course.public_syllabus).to eq false
+      expect(course.public_syllabus_to_auth).to eq false
+    end
+
   end
 
   context "changed_settings" do

@@ -167,7 +167,8 @@ describe "speed grader" do
       wait_for_ajaximations
 
       sections = @course.course_sections
-      expect(ff("#section-menu ul li a")[1]).to have_attribute("text", @course_section.name)
+      section_options_text = f("#section-menu ul")[:textContent] # hidden
+      expect(section_options_text).to include(@course_section.name)
       goto_section(sections[0].id)
       expect(ff("#students_selectmenu option").length).to eq 1
       goto_section(sections[1].id)
@@ -335,9 +336,13 @@ describe "speed grader" do
     it 'should display a flash warning banner when viewed in Firefox', priority: "2", test_id: 571755 do
       skip_if_chrome('This test applies to Firefox')
       skip_if_ie('This test applies to Firefox')
+      # sometimes google docs is slow to load, which causes the flash
+      # message to go away before `get` finishes. we're not testing
+      # google docs here anyway, so ¯\_(ツ)_/¯
+      Account.default.disable_service(:google_docs_previews)
+      Account.default.save
       get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
-      expect(fj('#flash_message_holder')).to include_text('Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.')
+      assert_flash_notice_message 'Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.'
     end
   end
 end
-

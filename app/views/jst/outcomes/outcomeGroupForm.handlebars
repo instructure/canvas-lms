@@ -1,6 +1,6 @@
 <form action="{{url}}" class="outcome_group" method="post">
   <label for="outcome_group_title">{{#t "title"}}Name this group{{/t}}:</label>
-  <input id="outcome_group_title" class="outcome_title" name="title" size="50" type="text" value="{{title}}">
+  <input id="outcome_group_title" class="outcome_title" name="title" size="50" type="text" placeholder="{{#t}}New Outcome Group{{/t}}" value="{{title}}">
   <label for="outcome_group_description">{{#t "group_description"}}Describe this group{{/t}}:</label>
   <textarea cols="40" id="outcome_group_description" name="description" rows="20" style="width: 100%; height: 150px;">{{description}}</textarea>
   <div class="button-container pull-right">

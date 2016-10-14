@@ -232,7 +232,7 @@ class ConversationMessage < ActiveRecord::Base
   def format_event_message
     case event_data[:event_type]
     when :users_added
-      user_names = User.where(id: event_data[:user_ids]).order(:id).select([:name, :short_name]).map(&:short_name)
+      user_names = User.where(id: event_data[:user_ids]).order(:id).pluck(:name, :short_name).map{|name, short_name| short_name || name}
       EventFormatter.users_added(author.short_name, user_names)
     end
   end

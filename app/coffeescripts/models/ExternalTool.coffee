@@ -20,7 +20,8 @@ define [
       }
     ]
 
-    urlRoot: -> @_defaultUrl()
+    urlRoot: ->
+      "/api/v1/#{@_contextPath()}/create_tool_with_verification"
 
     custom_fields_string: ->
       ("#{k}=#{v}" for k,v of @get('custom_fields')).join("\n")

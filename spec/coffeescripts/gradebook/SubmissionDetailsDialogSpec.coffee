@@ -112,42 +112,12 @@ define [
     excusedOptionText = $('.grading_value option')[3].text
     deepEqual excusedOptionText, 'Excused'
 
-  test "is enabled when multiple grading periods are not enabled", ->
-    ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled = false
-    new SubmissionDetailsDialog(@assignment, @user, @options).open()
-    equal $('#student_grading_1').prop('disabled'), false
-
-  test "is enabled when no grading periods are in the past", ->
-    ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past = null
-    new SubmissionDetailsDialog(@assignment, @user, @options).open()
-    equal $('#student_grading_1').prop('disabled'), false
-
-  test "is enabled when current user roles are undefined", ->
-    ENV.current_user_roles = null
-    new SubmissionDetailsDialog(@assignment, @user, @options).open()
-    equal $('#student_grading_1').prop('disabled'), false
-
-  test "is enabled when the current user is an admin", ->
-    ENV.current_user_roles = ['admin']
-    new SubmissionDetailsDialog(@assignment, @user, @options).open()
-    equal $('#student_grading_1').prop('disabled'), false
-
-  test "is disabled for assignments in the previous grading period", ->
-    @assignment.due_at = tz.parse("2013-10-01T09:59:00Z")
+  test "is disabled for assignments locked for the given student", ->
+    @user.assignment_1.gradeLocked = true
     new SubmissionDetailsDialog(@assignment, @user, @options).open()
     equal $('#student_grading_1').prop('disabled'), true
 
-  test "is disabled for assignments due exactly at the end of the previous grading period", ->
-    @assignment.due_at = tz.parse("2013-10-01T10:00:00Z")
-    new SubmissionDetailsDialog(@assignment, @user, @options).open()
-    equal $('#student_grading_1').prop('disabled'), true
-
-  test "is enabled for assignments after the previous grading period", ->
-    @assignment.due_at = tz.parse("2013-10-01T10:01:00Z")
-    new SubmissionDetailsDialog(@assignment, @user, @options).open()
-    equal $('#student_grading_1').prop('disabled'), false
-
-  test "is enabled for assignments without a due date", ->
-    @assignment.due_at = null
+  test "is enabled for assignments not locked for the given student", ->
+    @user.assignment_1.gradeLocked = false
     new SubmissionDetailsDialog(@assignment, @user, @options).open()
     equal $('#student_grading_1').prop('disabled'), false

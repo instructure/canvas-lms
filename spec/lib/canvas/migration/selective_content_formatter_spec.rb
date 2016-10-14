@@ -185,6 +185,8 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @migration = mock()
       @migration.stubs(:migration_type).returns('course_copy_importer')
       @migration.stubs(:source_course).returns(@course)
+      @course_outcome = outcome_model
+      @account_outcome = outcome_model(:outcome_context => @course.account)
     end
 
     it "should list top-level items" do
@@ -195,6 +197,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                              {:type=>"discussion_topics", :property=>"copy[all_discussion_topics]", :title=>"Discussion Topics", :count=>1},
                                              {:type=>"wiki_pages", :property=>"copy[all_wiki_pages]", :title=>"Wiki Pages", :count=>1},
                                              {:type=>"announcements", :property=>"copy[all_announcements]", :title=>"Announcements", :count=>1},
+                                             {:type=>"learning_outcomes", :property=>"copy[all_learning_outcomes]", :title=>"Learning Outcomes", :count=>2},
                                              {:type=>"attachments", :property=>"copy[all_attachments]", :title=>"Files", :count=>1}]
     end
 
@@ -204,6 +207,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(formatter.get_content_list('attachments').length).to eq 1
       expect(formatter.get_content_list('discussion_topics').length).to eq 1
       expect(formatter.get_content_list('announcements').length).to eq 1
+      expect(formatter.get_content_list('learning_outcomes').length).to eq 2
     end
 
     it "should link resources for quizzes and submittables" do
@@ -230,6 +234,8 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @wiki.destroy
         @announcement.destroy
         @topic.destroy
+        @course_outcome.destroy
+        @account_outcome.destroy
 
         @course.require_assignment_group
         @course.assignments.create!(:name => "blah").destroy

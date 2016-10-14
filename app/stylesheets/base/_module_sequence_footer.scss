@@ -1,52 +1,12 @@
 $bar-height: 64px;
-$bar-background: null;
-$button-border-line: null;
-$top-bar-border: null;
-$top-bar-shadow: null;
-$text: null;
-$button-hover: null;
-@if not $use_new_styles {
-  $bar-height: 55px;
-  $bar-background: #eff2f5;
-  $button-border-line: #d4d6d9;
-  $top-bar-border: #bdc1c5;
-  $top-bar-shadow: #dcdee0;
-  $text: #3a4651;
-  $button-hover: #dee5ea;
-}
-
-@if $use_new_styles == false {
-  .module-sequence-padding { height: $bar-height + 1; }
-}
 
 .module-sequence-footer {
-  @if $use_new_styles { position: relative }
-  @else { position: absolute; }
+  position: relative;
   left: 0;
   right: 0;
   bottom: 0;
   height: $bar-height+1;
   overflow: hidden;
-
-  @if not $use_new_styles {
-    a {
-      line-height: $bar-height;
-      font-weight: bold;
-      color: $text;
-      border-right: 1px solid $button-border-line;
-      width: 120px;
-      text-align: center;
-
-      &:hover{
-        background-color: $button-hover;
-      }
-
-      &.bordered{
-        border-right: none;
-        border-left: 1px solid $button-border-line;
-      }
-    }
-  }
 
   .hidden-aria-title {
     display: none;
@@ -55,17 +15,10 @@ $button-hover: null;
 
 .module-sequence-footer .module-sequence-footer-content {
   height: $bar-height;
-  @if $use_new_styles {
-    background: $ic-color-light;
-    border-top: 1px solid $ic-border-light;
-    box-sizing: border-box;
-    padding-top: $ic-sp;
-  }
-  @else {
-    background: $bar-background;
-    box-shadow: inset 0px 1px 0px 0px $top-bar-shadow;
-    border-top: 1px solid $top-bar-border;  
-  }
+  background: $ic-color-light;
+  border-top: 1px solid $ic-border-light;
+  box-sizing: border-box;
+  padding-top: $ic-sp;
 }
 
 @keyframes module-sequence-footer-animation {
@@ -77,10 +30,8 @@ $button-hover: null;
   animation: module-sequence-footer-animation 0.5s ease-out;
 }
 
-@if $use_new_styles {
-  .module-sequence-footer-button--next { float: right; }
-  .module-sequence-footer-button--previous { float: left; }
-}
+.module-sequence-footer-button--next { float: right; }
+.module-sequence-footer-button--previous { float: left; }
 
 @media print {
   .module-sequence-padding, .module-sequence-footer {

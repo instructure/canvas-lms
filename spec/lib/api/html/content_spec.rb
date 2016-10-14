@@ -37,6 +37,16 @@ module Api
           expect(Content.new(string).might_need_modification?).to be(true)
         end
 
+        it 'is true for a link to files that include the host' do
+          string = "<body><a href='https://account.instructure.com/files'>link</a></body>"
+          expect(Content.new(string).might_need_modification?).to be(true)
+        end
+
+        it 'is false for a link to files in a context' do
+          string = "<body><a href='/courses/1/files'>link</a></body>"
+          expect(Content.new(string).might_need_modification?).to be(false)
+        end
+
         it 'is false for garden-variety content' do
           string = "<body><a href='http://example.com/123'>link</a></body>"
           expect(Content.new(string).might_need_modification?).to be(false)
@@ -106,7 +116,6 @@ module Api
           })
 
           child_account = Account.default.sub_accounts.create!(name: 'child account')
-          child_account.root_account.enable_feature! :use_new_styles
           child_account.root_account.settings[:sub_account_includes] = true
 
           bc = child_account.build_brand_config({
@@ -135,7 +144,6 @@ module Api
 
           child_account = Account.default.sub_accounts.create!(name: 'child account')
           child_account.save!
-          child_account.root_account.enable_feature! :use_new_styles
 
           html = Content.new(string, child_account, include_mobile: true).add_css_and_js_overrides
           expect(html.to_s).to eq '<link rel="stylesheet" href="https://example.com/site_admin/account.css">' \

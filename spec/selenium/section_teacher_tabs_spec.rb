@@ -13,8 +13,7 @@ describe "section tabs on the left side" do
         element_that_is_not_left_side = f('#content')
         # make sure to mouse off the link so the :hover and :focus styles do not apply
         driver.action.move_to(element_that_is_not_left_side).perform
-        active_tab_highlight_color = ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? 'rgb(0, 150, 219)' : 'rgb(255, 255, 255)'
-        expect(driver.execute_script(js)).to eq(active_tab_highlight_color)
+        expect(driver.execute_script(js)).to eq('rgb(0, 142, 226)')
       end
     end
   end

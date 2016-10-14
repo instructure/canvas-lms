@@ -1,4 +1,5 @@
 define [
+  'i18n!GroupUsersView'
   'jquery'
   'underscore'
   'compiled/collections/GroupCollection'
@@ -9,7 +10,7 @@ define [
   'jst/groups/manage/groupUsers'
   'jqueryui/draggable'
   'jqueryui/droppable'
-], ($, _, GroupCollection, PaginatedCollectionView, GroupUserView, EditGroupAssignmentView, GroupCategoryCloneView, template) ->
+], (I18n, $, _, GroupCollection, PaginatedCollectionView, GroupUserView, EditGroupAssignmentView, GroupCategoryCloneView, template) ->
 
   class GroupUsersView extends PaginatedCollectionView
 
@@ -83,13 +84,21 @@ define [
     removeLeader: (e) ->
       e.preventDefault()
       e.stopPropagation()
-      @model.save(leader: null)
+      $target = $(e.currentTarget)
+      user_id = $target.data('user-id').toString()
+      user_name = @model.get('leader').display_name
+      @model.save {leader: null}, success: =>
+        $.screenReaderFlashMessage(I18n.t('Removed %{user} as group leader', {user: user_name}))
+        $(".group-user-actions[data-user-id='#{user_id}']", @el).focus()
 
     setLeader: (e) ->
       e.preventDefault()
       e.stopPropagation()
       $target = $(e.currentTarget)
-      @model.save(leader: {id: $target.data('user-id').toString()})
+      user_id = $target.data('user-id').toString()
+      @model.save {leader: {id: user_id}}, success: =>
+        $.screenReaderFlashMessage(I18n.t('%{user} is now group leader', {user: @model.get('leader').display_name}))
+        $(".group-user-actions[data-user-id='#{user_id}']", @el).focus()
 
     editGroupAssignment: (e) ->
       e.preventDefault()

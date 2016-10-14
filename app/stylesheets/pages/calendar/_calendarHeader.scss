@@ -6,8 +6,7 @@
     display: table;
     width: 100%;
     height: 40px;
-    @if $use_new_styles { margin-bottom: $ic-sp; }
-    @else { margin-bottom: 5px; }
+    margin-bottom: $ic-sp;
   }
 
   .header-table-row {
@@ -20,8 +19,7 @@
   }
 
   .header-table-left {
-    @if $use_new_styles { width: auto; }
-    @else { width: 42%; }
+    width: auto;
   }
 
   .header-table-middle {
@@ -30,8 +28,7 @@
 
   .header-table-right {
     text-align: right;
-    @if $use_new_styles { width: 60%; }
-    @else { width: 30%; }
+    width: 60%;
   }
 }
 
@@ -49,11 +46,9 @@
   }
 }
 
-@if $use_new_styles {
-  .scheduler_navigator {
-    margin-bottom: $ic-sp;
-    .navigation_buttons { bottom: auto; }
-  }
+.scheduler_navigator {
+  margin-bottom: $ic-sp;
+  .navigation_buttons { bottom: auto; }
 }
 
 .navigation_buttons {
@@ -66,8 +61,7 @@
   line-height: 32px;
   padding-left: 5px;
   white-space: nowrap;
-  @if $use_new_styles { @include fontSize($ic-font-size--medium); }
-  @else { @include fontSize(18px); }
+  @include fontSize($ic-font-size--medium);
 }
 
 #refresh_calendar_link {

@@ -1,6 +1,6 @@
 <ul class='page-action-list'>
   <h2><%= t 'titles.related_items', "Related Items" %></h2>
-  <% if @can_grade && @context.allows_speed_grader? %>
+  <% if (@can_grade  || (@context.concluded? && can_do(@context, @current_user, :read_as_admin))) && @context.allows_speed_grader? %>
     <li id="assignment-speedgrader-link"
       <% if @assignment.unpublished? %>
         class="hidden"

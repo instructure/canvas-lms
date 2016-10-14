@@ -157,7 +157,7 @@ describe "users" do
       wait_for_ajaximations
       expect_new_page_load { f('.button-secondary').click }
       wait_for_ajaximations
-      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_courses_link' : '#courses_menu_item')).to be_displayed
+      expect(f('#global_nav_courses_link')).to be_displayed
       expect(@student_1.workflow_state).to eq 'registered'
       expect(@student_2.workflow_state).to eq 'registered'
     end

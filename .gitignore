@@ -80,3 +80,4 @@ docker-compose.override.yml
 # canvas-gems
 /gems/*/coverage
 /gems/*/tmp
+/gems/*/node_modules

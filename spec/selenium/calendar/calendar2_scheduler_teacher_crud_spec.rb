@@ -39,7 +39,7 @@ describe "scheduler" do
       open_edit_dialog
       edit_form = f('#edit_appointment_form')
       expect(edit_form).to be_displayed
-      f('.ui-dialog-buttonset .btn-primary').click
+      f('.ui-dialog-buttonset .Button--primary').click
       wait_for_ajaximations
       new_appointment_group.reload
       expect(new_appointment_group.workflow_state).to eq 'active'

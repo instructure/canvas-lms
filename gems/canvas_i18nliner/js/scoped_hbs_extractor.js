@@ -1,6 +1,6 @@
-var HbsExtractor = require("i18nliner-handlebars/dist/lib/extractor")["default"];
+var HbsExtractor = require("i18nliner-handlebars/dist/lib/extractor");
 
-var HbsTranslateCall = require("i18nliner-handlebars/dist/lib/t_call")["default"];
+var HbsTranslateCall = require("i18nliner-handlebars/dist/lib/t_call");
 var ScopedHbsTranslateCall = require("./scoped_translate_call")(HbsTranslateCall);
 
 function ScopedHbsExtractor(ast, options) {

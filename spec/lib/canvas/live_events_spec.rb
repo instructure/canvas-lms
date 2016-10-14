@@ -201,4 +201,28 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation')
     end
   end
+
+  describe '.assignment_updated' do
+    it 'triggers a live event with assignment details' do
+      course_with_student_submissions
+      assignment = @course.assignments.first
+
+      LiveEvents.expects(:post_event).with('assignment_updated',
+        has_entries({
+          assignment_id: assignment.global_id.to_s,
+          context_id: @course.global_id.to_s,
+          context_type: 'Course',
+          workflow_state: assignment.workflow_state,
+          title: assignment.title,
+          description: assignment.description,
+          due_at: assignment.due_at,
+          unlock_at: assignment.unlock_at,
+          lock_at: assignment.lock_at,
+          points_possible: assignment.points_possible
+        })
+      ).once
+
+      Canvas::LiveEvents.assignment_updated(assignment)
+    end
+  end
 end

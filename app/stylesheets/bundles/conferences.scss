@@ -14,15 +14,6 @@
 }
 
 /* Page styles */
-@if $use_new_styles == false {
-  body.conferences { min-width: 960px; }
-  #main { background: #e8ecef; }
-  #content {
-    color: #434343;
-    padding: 0;
-  }
-}
-
 header:not(.ic-app-header) {
   background: #fff;
   border-bottom: 1px solid #b6babf;

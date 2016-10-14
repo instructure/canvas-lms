@@ -216,13 +216,13 @@ shared_examples_for "an object whose dates are overridable" do
     context "has active overrides" do
       before { override }
       it "returns true" do
-        expect(overridable.has_active_overrides?).to eq true
+        expect(overridable.reload.has_active_overrides?).to eq true
       end
     end
     context "when it has deleted overrides" do
       it "returns false" do
         override.destroy
-        expect(overridable.has_active_overrides?).to eq false
+        expect(overridable.reload.has_active_overrides?).to eq false
       end
     end
 
@@ -422,7 +422,7 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "when the object hasn't been overridden" do
       it "raises an exception because it doesn't have any context" do
-        expect { overridden.multiple_due_dates? }.to raise_exception
+        expect { overridable.multiple_due_dates? }.to raise_exception(DatesOverridable::NotOverriddenError)
       end
     end
 

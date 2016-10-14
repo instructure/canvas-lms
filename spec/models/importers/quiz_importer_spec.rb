@@ -79,6 +79,7 @@ describe "Importers::QuizImporter" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'text_only_quiz_data'
+    data["quiz_type"] = "practice_quiz"
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
     expect(Quizzes::Quiz.count).to eq 1
@@ -86,12 +87,13 @@ describe "Importers::QuizImporter" do
     expect(quiz.assignment).to be_nil
   end
 
-  it "should not build an assignment, instead set to unpublished" do
+  it "should not build an assignment, instead set to unpublished for canvas imports" do
     context = get_import_context
 
     quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     data = {'assessments' => {'assessments' => [quiz_hash]}}
     migration = context.content_migrations.create!
+    migration.stubs(:canvas_import?).returns(true)
     Importers::CourseContentImporter.import_content(context, data, @migration, migration)
 
     expect(Assignment.count).to eq 0
@@ -100,6 +102,23 @@ describe "Importers::QuizImporter" do
     quiz = Quizzes::Quiz.where(migration_id: quiz_hash[:migration_id]).first
     expect(quiz.unpublished?).to eq true
     expect(quiz.assignment).to be_nil
+  end
+
+  it "should build an assignment for non-canvas imports" do
+    context = get_import_context
+
+    quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
+    data = {'assessments' => {'assessments' => [quiz_hash]}}
+    migration = context.content_migrations.create!
+    migration.stubs(:canvas_import?).returns(false)
+    Importers::CourseContentImporter.import_content(context, data, @migration, migration)
+
+    expect(Assignment.count).to eq 1
+    expect(Quizzes::Quiz.count).to eq 1
+
+    quiz = Quizzes::Quiz.where(migration_id: quiz_hash[:migration_id]).first
+    expect(quiz.unpublished?).to eq true
+    expect(quiz.assignment).to_not be_nil
   end
 
   it "should not create an extra assignment if it already references one (but not set unpublished)" do

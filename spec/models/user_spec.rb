@@ -599,6 +599,22 @@ describe User do
         expect(alice.courses_with_primary_enrollment.size).to eq 0
       end
 
+      it 'filters out completed-by-date enrollments for the correct user' do
+        @shard1.activate do
+          @user = User.create!(:name => 'user')
+          account = Account.create!
+          courseX = account.courses.build
+          courseX.workflow_state = 'available'
+          courseX.start_at = 7.days.ago
+          courseX.conclude_at = 2.days.ago
+          courseX.restrict_enrollments_to_course_dates = true
+          courseX.save!
+          StudentEnrollment.create!(:course => courseX, :user => @user, :workflow_state => 'active')
+        end
+        expect(@user.courses_with_primary_enrollment.count).to eq 0
+        expect(@user.courses_with_primary_enrollment(:current_and_invited_courses, nil, :include_completed_courses => true).count).to eq 1
+      end
+
       it 'works with favorite_courses' do
         @user = User.create!(:name => 'user')
         @shard1.activate do
@@ -800,7 +816,7 @@ describe User do
     # should be putting more than a handful of users into the search results...
     # right?
     def search_messageable_users(viewing_user, *args)
-      viewing_user.search_messageable_users(*args).paginate(:page => 1, :per_page => 20)
+      viewing_user.address_book.search_users(*args).paginate(:page => 1, :per_page => 20)
     end
 
     it "should include yourself even when not enrolled in courses" do
@@ -955,16 +971,17 @@ describe User do
       # other_section_user is a teacher in one course, student in another
       @other_course.enroll_user(@other_section_user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-      messageable_users = search_messageable_users(@admin)
-      this_section_user = messageable_users.detect{|u| u.id == @this_section_user.id}
-      expect(this_section_user.common_courses.keys).to include @first_course.id
-      expect(this_section_user.common_courses[@first_course.id].sort).to eql ['StudentEnrollment', 'TaEnrollment']
+      address_book = @admin.address_book
+      search_messageable_users(@admin)
+      common_courses = address_book.common_courses(@this_section_user)
+      expect(common_courses.keys).to include @first_course.id
+      expect(common_courses[@first_course.id].sort).to eql ['StudentEnrollment', 'TaEnrollment']
 
-      two_context_guy = messageable_users.detect{|u| u.id == @other_section_user.id}
-      expect(two_context_guy.common_courses.keys).to include @first_course.id
-      expect(two_context_guy.common_courses[@first_course.id].sort).to eql ['StudentEnrollment']
-      expect(two_context_guy.common_courses.keys).to include @other_course.id
-      expect(two_context_guy.common_courses[@other_course.id].sort).to eql ['TeacherEnrollment']
+      common_courses = address_book.common_courses(@other_section_user)
+      expect(common_courses.keys).to include @first_course.id
+      expect(common_courses[@first_course.id].sort).to eql ['StudentEnrollment']
+      expect(common_courses.keys).to include @other_course.id
+      expect(common_courses[@other_course.id].sort).to eql ['TeacherEnrollment']
     end
 
     it "should include users with no shared contexts iff admin" do
@@ -1047,38 +1064,38 @@ describe User do
       end
     end
 
-    context "admin_context" do
+    context "is_admin" do
       it "should find users in the course" do
-        expect(search_messageable_users(@admin, :context => @course.asset_string, :admin_context => @course).map(&:id).sort).to eq(
+        expect(search_messageable_users(@admin, context: @course.asset_string, is_admin: true).map(&:id).sort).to eq(
           [@this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
         )
       end
 
       it "should find users in the section" do
-        expect(search_messageable_users(@admin, :context => "section_#{@course.default_section.id}", :admin_context => @course.default_section).map(&:id).sort).to eq(
+        expect(search_messageable_users(@admin, context: "section_#{@course.default_section.id}", is_admin: true).map(&:id).sort).to eq(
           [@this_section_teacher.id, @this_section_user.id]
         )
       end
 
       it "should find users in the group" do
-        expect(search_messageable_users(@admin, :context => @group.asset_string, :admin_context => @group).map(&:id).sort).to eq(
+        expect(search_messageable_users(@admin, context: @group.asset_string, is_admin: true).map(&:id).sort).to eq(
           [@this_section_user.id]
         )
       end
     end
 
-    context "strict_checks" do
+    context "weak_checks" do
       it "should optionally show invited enrollments" do
         course(:active_all => true)
         student_in_course(:user_state => 'creation_pending')
-        expect(search_messageable_users(@teacher, :strict_checks => false).map(&:id)).to include @student.id
+        expect(search_messageable_users(@teacher, weak_checks: true).map(&:id)).to include @student.id
       end
 
       it "should optionally show pending enrollments in unpublished courses" do
         course()
         teacher_in_course(:active_user => true)
         student_in_course()
-        expect(search_messageable_users(@teacher, :strict_checks => false, :context => @course.asset_string, :admin_context => @course).map(&:id)).to include @student.id
+        expect(search_messageable_users(@teacher, weak_checks: true, context: @course.asset_string, is_admin: true).map(&:id)).to include @student.id
       end
     end
   end
@@ -1690,6 +1707,7 @@ describe User do
         event = @course.calendar_events.create!(title: 'published', start_at: 4.days.from_now)
         expect(@user.upcoming_events).to include(event)
         Timecop.freeze(3.days.from_now) do
+          EnrollmentState.recalculate_expired_states # runs periodically in background
           expect(User.find(@user).upcoming_events).not_to include(event) # re-find user to clear cached_contexts
         end
       end
@@ -1718,7 +1736,7 @@ describe User do
           # trigger the after db filtering
           Setting.stubs(:get).with('filter_events_by_section_code_threshold', anything).returns(0)
           @course.enroll_student(@student, :section => @sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
-          expect(@student.upcoming_events(:limit => 1)).to eq [@events[1]]
+          expect(@student.upcoming_events(:limit => 2)).to eq [@events[1]]
         end
 
         it "should use the old behavior as a fallback" do
@@ -1726,7 +1744,7 @@ describe User do
           # the optimized call will retrieve the first two events, and then filter them out
           # since it didn't retrieve enough events it will use the old code as a fallback
           @course.enroll_student(@student, :section => @sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
-          expect(@student.upcoming_events(:limit => 1)).to eq [@events[2]]
+          expect(@student.upcoming_events(:limit => 2)).to eq [@events[2]]
         end
       end
     end
@@ -1920,6 +1938,7 @@ describe User do
       @quiz.due_at = 3.days.from_now
       @quiz.save!
       Timecop.travel(2.days) do
+        EnrollmentState.recalculate_expired_states # runs periodically in background
         expect(@student.assignments_needing_submitting(:contexts => [@course]).count).to eq 0
       end
     end
@@ -1977,6 +1996,75 @@ describe User do
         student = @shard1.activate { user }
         assignment = create_course_with_assignment_needing_submitting(student: student, override: true)
         expect(student.assignments_needing_submitting).to eq [assignment]
+      end
+    end
+
+    context "ungraded assignments" do
+      before :once do
+        course_with_student :active_all => true
+        @assignment = @course.assignments.create! title: 'blah!', due_at: 1.day.from_now, submission_types: 'not_graded'
+      end
+
+      it "excludes ungraded assignments by default" do
+        expect(@student.assignments_needing_submitting).not_to include @assignment
+      end
+
+      it "includes ungraded assignments if requested" do
+        expect(@student.assignments_needing_submitting(include_ungraded: true)).to include @assignment
+      end
+    end
+  end
+
+  describe "ungraded_quizzes_needing_submitting" do
+    before(:once) do
+      course_with_student :active_all => true
+      @quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.ago)
+      @quiz.publish!
+    end
+
+    it "includes ungraded quizzes" do
+      expect(@student.ungraded_quizzes_needing_submitting).to include @quiz
+    end
+
+    it "excludes graded quizzes" do
+      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "assignment", :due_at => 1.day.ago)
+      other_quiz.publish!
+      expect(@student.ungraded_quizzes_needing_submitting).not_to include other_quiz
+    end
+
+    it "excludes unpublished quizzes" do
+      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.ago)
+      expect(@student.ungraded_quizzes_needing_submitting).not_to include other_quiz
+    end
+
+    it "excludes locked quizzes" do
+      @quiz.unlock_at = 1.day.from_now
+      @quiz.save!
+      expect(@student.ungraded_quizzes_needing_submitting).not_to include @quiz
+    end
+
+    it "filters by due date" do
+      expect(@student.ungraded_quizzes_needing_submitting(:due_after => 1.day.from_now)).not_to include @quiz
+    end
+
+    it "excludes submitted quizzes" do
+      qs = @quiz.quiz_submissions.build :user => @student
+      qs.workflow_state = 'complete'
+      qs.save!
+      expect(@student.ungraded_quizzes_needing_submitting).not_to include @quiz
+    end
+
+    it "filters by enrollment state" do
+      @student.enrollments.where(course: @course).first.complete!
+      expect(@student.ungraded_quizzes_needing_submitting).not_to include @quiz
+    end
+
+    context "sharding" do
+      specs_require_sharding
+      it "includes quizzes from other shards" do
+        other_user = @shard1.activate { user }
+        student_in_course :course => @course, :user => other_user, :active_all => true
+        expect(other_user.ungraded_quizzes_needing_submitting).to include @quiz
       end
     end
   end
@@ -2296,6 +2384,7 @@ describe User do
     it "should not count assignments in soft concluded courses" do
       @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
       Timecop.travel(1.week) do
+        EnrollmentState.recalculate_expired_states # runs periodically in background
         expect(@teacher.reload.assignments_needing_grading.size).to eql(0)
       end
     end
@@ -2971,9 +3060,36 @@ describe User do
       expect(@user.roles(@account)).to eq %w[user observer]
     end
 
-    it "includes 'admin' if the user has an admin user record" do
-      @account.account_users.create!(:user => @user, :role => admin_role)
+    it "includes 'admin' if the user has a sub-account admin user record" do
+      sub_account = @account.sub_accounts.create!
+      sub_account.account_users.create!(:user => @user, :role => admin_role)
       expect(@user.roles(@account)).to eq %w[user admin]
+    end
+
+    it "includes 'root_admin' if the user has a root account admin user record" do
+      @account.account_users.create!(:user => @user, :role => admin_role)
+      expect(@user.roles(@account)).to eq %w[user admin root_admin]
+    end
+  end
+
+  describe "#admin_of_root_account?" do
+    before(:once) do
+      @user = user(active_all: true)
+      @root_account = Account.default
+    end
+
+    it "returns false if the user is not an admin of the root account" do
+      expect(@user).not_to be_admin_of_root_account(@root_account)
+    end
+
+    it "returns true if the user is an admin of the root account" do
+      @root_account.account_users.create!(user: @user)
+      expect(@user).to be_admin_of_root_account(@root_account)
+    end
+
+    it "raises an error if the given account is not a root account" do
+      sub_account = @root_account.sub_accounts.create!
+      expect { @user.admin_of_root_account?(sub_account) }.to raise_error("must be a root account")
     end
   end
 

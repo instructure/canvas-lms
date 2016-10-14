@@ -43,7 +43,7 @@ define([
 
     render () {
       var assignments = _.filter(this.props.store.getAssignments(), (a) => {
-        return a.overrides == undefined || (a.overrideForThisSection != undefined) || a.selectedSectionForEveryone != undefined || (a.selectedSectionForEveryone == undefined && a.currentlySelected.type == 'course')
+        return a.overrides == undefined || a.overrides.length == 0 || (a.overrideForThisSection != undefined) || a.selectedSectionForEveryone != undefined || (a.selectedSectionForEveryone == undefined && a.currentlySelected.type == 'course')
       });
       var errorCount = Object.keys(assignmentUtils.withErrors(assignments)).length;
       var store = this.props.store;

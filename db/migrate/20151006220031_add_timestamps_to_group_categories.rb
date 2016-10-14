@@ -3,7 +3,7 @@ class AddTimestampsToGroupCategories < ActiveRecord::Migration
 
   def change
     change_table(:group_categories) do |t|
-      t.timestamps
+      t.timestamps null: true
     end
   end
 end

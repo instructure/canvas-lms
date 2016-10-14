@@ -1,9 +1,12 @@
 require_relative '../spec_helper'
+require_relative '../sharding_spec_helper'
 
 # need tests for:
 # overrides that arent date related
 
 describe "differentiated_assignments" do
+  specs_require_sharding
+
   def course_with_differentiated_assignments_enabled
     @course = Course.create!
     @user = user_model
@@ -126,6 +129,7 @@ describe "differentiated_assignments" do
     visible_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:assignment_id)
     expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
     expect(AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id])[@user.id]).to include(@assignment.id)
+    expect(AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id], use_global_id: true)[Shard.global_id_for(@user.id)]).to include(@assignment.id)
   end
 
   context "table" do

@@ -25,15 +25,15 @@ define([
   'compiled/models/Quiz',
   'compiled/views/PublishButtonView',
   'compiled/quizzes/dump_events',
+  'jsx/conditional_release_stats/index',
   'jquery.instructure_date_and_time' /* dateString, time_field, datetime_field */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons',
   'compiled/jquery.rails_flash_notifications',
-  'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
   'jquery.disableWhileLoading',
   'message_students' /* messageStudents */
-], function(I18n, $, MessageStudentsDialog, QuizArrowApplicator, inputMethods, Quiz, PublishButtonView, QuizLogAuditingEventDumper) {
+], function(I18n, $, MessageStudentsDialog, QuizArrowApplicator, inputMethods, Quiz, PublishButtonView, QuizLogAuditingEventDumper, CyoeStats) {
 
 
   $(document).ready(function () {
@@ -53,7 +53,7 @@ define([
           $("#quiz_details_wrapper").html(html);
           callback();
         });
-      };
+      }
     }
 
     var arrowApplicator = new QuizArrowApplicator();
@@ -147,7 +147,6 @@ define([
         dialog.open();
       });
     });
-    $.scrollSidebar();
 
     $("#let_students_take_this_quiz_button").ifExists(function($link){
       var $unlock_for_how_long_dialog = $("#unlock_for_how_long_dialog");
@@ -209,6 +208,10 @@ define([
     view.on("publish", refresh);
     view.on("unpublish", refresh);
     view.render();
+
+    var graphsRoot = document.getElementById('crs-graphs')
+    var detailsParent = document.getElementById('not_right_side')
+    CyoeStats.init(graphsRoot, detailsParent)
   });
 
 });

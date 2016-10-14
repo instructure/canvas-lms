@@ -49,7 +49,7 @@ define([
 
     validMultipleOverride(a){
       var invalid_overrides = _.filter(a.overrides, (o) => { o == null});
-      if(invalid_overrides.length == 0 && a.due_at == null && a.overrides != undefined && a.overrides.length == a.sectionCount){ return true}
+      if(invalid_overrides.length == 0 && a.due_at == null && a.overrides != undefined && a.overrides.length > 0 && a.overrides.length == a.sectionCount){ return true}
       else{ return false}
     },
 
@@ -73,8 +73,7 @@ define([
                 && (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)){ return }
 
         //for handling the 'Everyone Else' scenario at the course level with sections that have overrides and other sections that are tied under the course "override"
-        else if(a.currentlySelected.id.toString() != store.overrideForEveryone(a)
-                && a.currentlySelected.type == 'course'
+        else if(a.currentlySelected.type == 'course'
                 && a.due_at != null
                 && (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)){ return }
 
@@ -94,7 +93,7 @@ define([
                 && (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)){ return }
 
         //explicitly check for assignment for the entire course and no overrides
-        else if(a.overrides == undefined
+        else if((a.overrides == undefined || a.overrides.length === 0)
                 && (original_error_assignments.length > 0 || original_error_assignments.length == 0)
                 && a.due_at != null && store.validCheck(a)
                 && (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)){ return }

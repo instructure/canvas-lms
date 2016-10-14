@@ -332,6 +332,7 @@ class Attachment < ActiveRecord::Base
     application/msword
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
     application/pdf
+    application/vnd.oasis.opendocument.text
     text/plain
     text/html
     application/rtf
@@ -460,9 +461,9 @@ class Attachment < ActiveRecord::Base
     write_attribute(:namespace, new_namespace)
 
     self.store.change_namespace(old_full_filename)
-    self.save
-
-    Attachment.where(:root_attachment_id => self).update_all(:namespace => new_namespace)
+    shard.activate do
+      Attachment.where("id=? OR root_attachment_id=?", self, self).update_all(namespace: new_namespace)
+    end
   end
 
   def process_s3_details!(details)
@@ -626,7 +627,11 @@ class Attachment < ActiveRecord::Base
 
   def handle_duplicates(method, opts = {})
     return [] unless method.present? && self.folder
-    method = method.to_sym
+    if self.folder.for_submissions?
+      method = :rename
+    else
+      method = method.to_sym
+    end
     deleted_attachments = []
     if method == :rename
       self.save! unless self.id
@@ -977,6 +982,7 @@ class Attachment < ActiveRecord::Base
       "application/xml" => "code",
       "application/zip" => "zip",
       "audio/mpeg" => "audio",
+      "audio/mp3" => "audio",
       "audio/basic" => "audio",
       "audio/mid" => "audio",
       "audio/3gpp" => "audio",
@@ -1191,15 +1197,10 @@ class Attachment < ActiveRecord::Base
   end
 
   def make_childless(preferred_child = nil)
-    preferred_child = nil if preferred_child && preferred_child.filename.nil?
-    child = preferred_child || children.where.not(filename: nil).take
-    if !child && children.exists?
-      Attachment.where(root_attachment_id: self).update_all(root_attachment_id: child)
-      return
-    end
+    child = preferred_child || children.take
     raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil
-    child.filename ||= filename if filename
+    child.filename = filename if filename
     if Attachment.s3_storage?
       if filename && s3object.exists? && !child.s3object.exists?
         s3object.copy_to(child.s3object)

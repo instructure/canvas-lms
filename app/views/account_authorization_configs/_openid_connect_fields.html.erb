@@ -19,11 +19,15 @@ If the provider can configure valid callback or redirect URIs, use %{callback_ur
   <%= f.text_field :end_session_endpoint, class: 'ic-Input' %>
 </div>
 <div class="ic-Form-control">
+  <%= f.label :userinfo_endpoint, 'UserInfo Endpoint', class: 'ic-Label' %>
+  <%= f.text_field :userinfo_endpoint, class: 'ic-Input' %>
+</div>
+<div class="ic-Form-control">
   <%= f.label :scope, 'Scope', class: 'ic-Label' %>
   <%= f.text_field :scope, class: 'ic-Input' %>
 </div>
 <div class="ic-Form-control">
   <%= f.label :login_attribute, 'Login Attribute', class: 'ic-Label' %>
-  <%= f.text_field :login_attribute, placeholder: 'sub', class: 'ic-Input' %>
+  <%= f.text_field :login_attribute, value: aac.raw_login_attribute, placeholder: 'sub', class: 'ic-Input' %>
 </div>
 <%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>

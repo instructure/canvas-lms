@@ -48,7 +48,7 @@ describe SIS::UserImporter do
 
   context "when the unique_id is invalid the error message reported to the user" do
 
-    before(:all) do
+    before(:once) do
       @user_id = 'sis_id1'
       @login_id = '--*(&*(&%^&*%..-'
       messages = []
@@ -68,10 +68,6 @@ describe SIS::UserImporter do
 
     it 'must include the user_id field' do
       expect(@message).to include(@user_id)
-    end
-
-    it 'must include the developer error message' do
-      expect(@message).to include('#<SIS::ImportError: unique_id is invalid>')
     end
 
     it 'must include the text "Invalid login_id"' do

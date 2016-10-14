@@ -1,26 +1,16 @@
 @import "base/environment";
 
 .mini_month {
-  @if $use_new_styles { 
-    padding: $ic-sp 0 0;
-    margin-bottom: $ic-sp*2;
-  }
-  @else { padding: 10px 0 0; }
+  padding: $ic-sp 0 0;
+  margin-bottom: $ic-sp*2;
 }
 
 .mini-cal-header {
   text-align: center;
-  @if $use_new_styles {
-    padding: $ic-sp $ic-sp/2;
-    font-weight: 500;
-    border: 1px solid $ic-border-light;
-    color: $ic-font-color--subdued;
-  }
-  @else {
-    font-family: georgia, serif;
-    @include fontSize($ic-font-size--small);
-    padding: 0 8px;
-  }
+  padding: $ic-sp $ic-sp/2;
+  font-weight: 500;
+  border: 1px solid $ic-border-light;
+  color: $ic-font-color--subdued;
   img {
     vertical-align: middle;
   }
@@ -34,13 +24,8 @@
 
 .mini_calendar {
   width: 100%;
-  @if $use_new_styles {
-    border: 1px solid $ic-border-light;
-    border-top: none;
-  }
-  @else {
-    background-color: #e6e7e8; 
-  }
+  border: 1px solid $ic-border-light;
+  border-top: none;
   .day {
     padding: 0;
     height: 21px;
@@ -48,17 +33,10 @@
     text-align: center;
     cursor: pointer;
     width: 14%;
-    @if $use_new_styles {
-      @include fontSize($ic-font-size--xsmall);
-      border-radius: $baseBorderRadius;
-      &.has_event { background-color: darken($lightBackground, 4%); }
-      &.today { background-color: $ic-bg-light-alert; }
-    }
-    @else {
-      font-size: 0.8em;
-      &.has_event { background-color: #ccc; }
-      &.today { background-color: #F1F1DD; }
-    }
+    @include fontSize($ic-font-size--xsmall);
+    border-radius: $baseBorderRadius;
+    &.has_event { background-color: darken($lightBackground, 4%); }
+    &.today { background-color: $ic-bg-light-alert; }
     .event_link_text, .today_text, .previous_month_text, .next_month_text {
       display: none;
     }

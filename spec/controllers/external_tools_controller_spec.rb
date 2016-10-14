@@ -894,6 +894,114 @@ describe ExternalToolsController do
     end
   end
 
+  describe "POST 'create_tool_with_verification'" do
+    context "form post", type: :request do
+      let(:post_body) do
+        {
+          custom_fields_string: '',
+          consumer_key: 'N/A',
+          shared_secret: 'N/A',
+          config_url: 'https://www.edu-apps.org/lti_public_resources/config.xml?id=youtube&name=YouTube&channel_name=jangbricks',
+          config_type: 'by_url',
+          name:'YouTube',
+          app_center_id: 'pr_youtube',
+          course_navigation: {enabled: true}
+        }
+      end
+
+      let(:app_center_response) do
+        {
+           "id"   =>163,
+           "short_name" => "pr_youtube",
+           "name" => "YouTube",
+           "description" => "\n<p>Search publicly available YouTube videos.</p>\n",
+           "short_description" => "Search publicly available YouTube videos.",
+           "status" => "active",
+           "app_type" => nil,
+           "preview_url" => "https://www.edu-apps.org/lti_public_resources/?tool_id=youtube",
+           "banner_image_url" => "https://edu-app-center.s3.amazonaws.com/uploads/pr_youtube.png",
+           "logo_image_url" => nil,
+           "icon_image_url" => nil,
+           "average_rating" => 4.0,
+           "total_ratings" => 5.0,
+           "is_certified" => false,
+           "config_xml_url" => "https://www.edu-apps.org/lti_public_resources/config.xml?id=youtube",
+           "requires_secret" => false,
+           "config_options" => [
+             {
+                "name" => "channel_name",
+                "param_type" => "text",
+                "default_value" => "",
+                "description" => "Channel Name (Optional)",
+                "is_required" => false
+             }
+           ]
+        }
+      end
+
+      let(:app_api) { mock() }
+
+      before do
+        AppCenter::AppApi.stubs(:new).returns(app_api)
+        app_api.stubs(:fetch_app_center_response).returns(app_center_response)
+        app_api.stubs(:get_app_config_url).returns(app_center_response['config_xml_url'])
+      end
+
+      it 'creates tool when provided all required params' do
+        user_session(@teacher)
+        post(
+          "/api/v1/courses/#{@course.id}/create_tool_with_verification",
+          post_body.to_json,
+          {'CONTENT_TYPE' => 'application/json'}
+        )
+
+        expect(response).to be_success
+        expect(assigns[:tool].name).to eq app_center_response['name']
+      end
+
+      it 'gives error if app_center_id is not provided' do
+        app_api.stubs(:get_app_config_url).returns('')
+        user_session(@teacher)
+
+        post(
+          "/api/v1/courses/#{@course.id}/create_tool_with_verification",
+          post_body.to_json,
+          {'CONTENT_TYPE' => 'application/json'}
+        )
+
+        expect(response).not_to be_success
+        app_api.stubs(:get_app_config_url).returns(app_center_response['config_xml_url'])
+      end
+
+      it 'ignores non-required params' do
+        user_session(@teacher)
+
+        post(
+          "/api/v1/courses/#{@course.id}/create_tool_with_verification",
+          post_body.to_json,
+          {'CONTENT_TYPE' => 'application/json'}
+        )
+
+        expect(response).to be_success
+        expect(assigns[:tool].settings[:course_navigation]).not_to be_truthy
+      end
+
+      it 'uses the config xml provided by the app center' do
+        user_session(@teacher)
+        post_body['config_url'] = 'https://www.edu-apps.org/tool_i_should_not_have_access_to.xml'
+
+        post(
+          "/api/v1/courses/#{@course.id}/create_tool_with_verification",
+          post_body.to_json,
+          {'CONTENT_TYPE' => 'application/json'}
+        )
+
+        expect(response).to be_success
+        expect(assigns[:tool].name).to eq app_center_response['name']
+      end
+    end
+  end
+
   describe "POST 'create'" do
 
     context "form post", type: :request do

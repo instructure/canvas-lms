@@ -159,6 +159,17 @@ module AssignmentsCommon
     )
   end
 
+  def create_assignment_with_group_category_auto_open
+    get "/courses/#{@course.id}/assignments/new"
+
+    f('#assignment_name').send_keys('my title')
+    driver.execute_script 'tinyMCE.activeEditor.setContent("text")'
+
+    f('#assignment_text_entry').click
+    f('#has_group_category').click
+  end
+
+
   def create_assignment_with_group_category
     get "/courses/#{@course.id}/assignments/new"
 

@@ -5,6 +5,8 @@
   border: 1px solid $ic-border-dark;
   position: relative;
   background-size: cover;
+  background-position: center center; 
+  background-repeat: no-repeat;
   margin-bottom: $ic-sp;
   display: flex;
   align-items: center;
@@ -24,7 +26,7 @@
   position: absolute;
   top: $ic-sp/2;
   right: $ic-sp/2;
-  padding: $ic-sp/4 0;  
+  padding: $ic-sp/4 0;
   border-radius: $ic-border-radius;
   background-color: rgba(0, 0, 0, 0.3);
 
@@ -49,6 +51,7 @@
 
 .CourseImagePicker__Header {
   border-bottom: 1px solid $ic-border-color;
+  padding-bottom: $ic-sp;
 }
 
 .CourseImagePicker__CloseBtn {
@@ -86,7 +89,7 @@
   left: $ic-sp;
   right: $ic-sp;
   bottom: $ic-sp;
-  border: 4px dashed $ic-brand-primary; 
+  border: 4px dashed $ic-brand-primary;
 }
 
 .DraggingOverlay__Content {
@@ -96,7 +99,7 @@
 .DraggingOverlay__Icon {
   text-align: center;
   color: $ic-brand-primary;
-  @include overwrite-default-icon-size($ic-sp*8); 
+  @include overwrite-default-icon-size($ic-sp*8);
 }
 
 .DraggingOverlay__Instructions {

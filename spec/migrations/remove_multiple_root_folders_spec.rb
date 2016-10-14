@@ -4,14 +4,6 @@ require 'db/migrate/20130122193536_remove_multiple_root_folders'
 
 describe 'DataFixup::RemoveMultipleRootFolders' do
 
-  unless ActiveRecord::Base.connection.supports_ddl_transactions?
-    self.use_transactional_fixtures = false
-
-    after :all do
-      truncate_all_tables
-    end
-  end
-
   def get_root_folder_name(context)
     if context.is_a? Course
       root_folder_name = Folder::ROOT_FOLDER_NAME

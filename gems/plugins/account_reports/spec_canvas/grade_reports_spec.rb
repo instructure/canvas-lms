@@ -304,14 +304,24 @@ describe "Default Account Reports" do
         past   = gpg.grading_periods.create! title: "Past", start_date: 1.week.ago, end_date: 1.day.ago
         future = gpg.grading_periods.create! title: "Future", start_date: 1.day.from_now, end_date: 1.week.from_now
 
+        @course3 = course(:course_name => 'Fun 404', :account => @account, :active_course => true)
+        @course3.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
+        @course3.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
+
         # set up assignments
         past_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.ago
         future_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.from_now
-
         past_assignment.grade_student(@user2, grade: 25)
         past_assignment.grade_student(@user4, grade: 75)
         future_assignment.grade_student(@user2, grade: 75)
         future_assignment.grade_student(@user4, grade: 25)
+
+        past_assignment = @course3.assignments.create! points_possible: 100, due_at: 3.days.ago
+        future_assignment = @course3.assignments.create! points_possible: 100, due_at: 3.days.from_now
+        past_assignment.grade_student(@user2, grade: 75)
+        past_assignment.grade_student(@user4, grade: 25)
+        future_assignment.grade_student(@user2, grade: 25)
+        future_assignment.grade_student(@user4, grade: 75)
       end
 
       it "reports mgp grades" do
@@ -320,23 +330,35 @@ describe "Default Account Reports" do
                               parse_header: true,
                               order: ["student name"])
         csv = reports["Default Term.csv"]
-        expect(csv.size).to eq 2
+        expect(csv.size).to eq 4
         expect(
           csv.all? { |student|
-            student["course"] == "Math 101"
+            ["Math 101", "Fun 404"].include?(student["course"])
             student["grading period set"] == "Grading Periods"
           }
         ).to eq true
 
-        jason, mike = csv
+        jason1, jason2, mike1, mike2 = csv
 
-        expect(jason["student name"]).to eq "Jason Donovan"
-        expect(jason["Past current score"].to_f).to eq 75
-        expect(jason["Future current score"].to_f).to eq 25
+        expect(jason1["student name"]).to eq "Jason Donovan"
+        expect(jason1["course"]).to eq "Fun 404"
+        expect(jason1["Past current score"].to_f).to eq 25
+        expect(jason1["Future current score"].to_f).to eq 75
 
-        expect(mike["student name"]).to eq "Michael Bolton"
-        expect(mike["Past final score"].to_f).to eq 25
-        expect(mike["Future final score"].to_f).to eq 75
+        expect(jason2["student name"]).to eq "Jason Donovan"
+        expect(jason2["course"]).to eq "Math 101"
+        expect(jason2["Past current score"].to_f).to eq 75
+        expect(jason2["Future current score"].to_f).to eq 25
+
+        expect(mike1["student name"]).to eq "Michael Bolton"
+        expect(mike1["course"]).to eq "Fun 404"
+        expect(mike1["Past final score"].to_f).to eq 75
+        expect(mike1["Future final score"].to_f).to eq 25
+
+        expect(mike2["student name"]).to eq "Michael Bolton"
+        expect(mike2["course"]).to eq "Math 101"
+        expect(mike2["Past final score"].to_f).to eq 25
+        expect(mike2["Future final score"].to_f).to eq 75
       end
 
       it "works with students in multiple sections" do
@@ -351,7 +373,8 @@ describe "Default Account Reports" do
                               order: ["student name", "section id"])
         csv = reports["Default Term.csv"]
 
-        jason, mike1, mike2 = csv
+        # Just look at the course2 enrollments
+        jason, mike1, mike2 = csv[0], csv[2], csv[4]
 
         expect(jason["student name"]).to eq "Jason Donovan"
         expect(mike1["student name"]).to eq "Michael Bolton"

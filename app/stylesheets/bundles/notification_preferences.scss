@@ -78,6 +78,12 @@ thead th {
   }
 }
 
+#notification-legend {
+  display: flex;
+  justify-content: space-around;
+  padding-bottom: 12px;
+}
+
 .notification-prefs-table {
   .ui-button {
     margin-left: 0;
@@ -120,21 +126,16 @@ thead th {
     }
   }
   td.comm-event-option {
-    text-align: left;
+    text-align: center;
     width: 110px;
     min-width: 110px;
     padding: 4px;
     vertical-align: middle;
-    .comm-event-option-contents {
-      position: relative;
-      min-height: 22px;
-      select {
-        opacity: 0;
-        outline: 0;
-        position: absolute;
-        top: 0px;
-        left: 0px;
-      }
+    label {
+      margin: 0;
+    }
+    legend {
+      border: none;
     }
   }
   .user-preference {

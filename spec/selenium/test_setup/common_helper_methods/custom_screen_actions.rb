@@ -45,4 +45,13 @@ module CustomScreenActions
       driver.manage.window.resize_to(1024, h)
     end
   end
+
+  def close_extra_windows
+    while driver.window_handles.size > 1
+      driver.switch_to.window(driver.window_handles.last)
+      driver.close
+    end
+    driver.switch_to.window(driver.window_handles.first)
+    focus_viewport(driver)
+  end
 end

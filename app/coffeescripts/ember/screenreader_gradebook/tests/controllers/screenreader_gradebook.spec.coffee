@@ -11,14 +11,12 @@ define [
 
   App = null
   originalIsDraft = null
-  originalWeightingScheme = null
 
   clone = (obj) ->
     Ember.copy obj, true
 
   setup = (isDraftState=false, sortOrder='assignment_group') ->
     fixtures.create()
-    originalWeightingScheme =  window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
     @contextGetStub = sinon.stub(userSettings, 'contextGet')
     @contextSetStub = sinon.stub(userSettings, 'contextSet')
     @contextGetStub.withArgs('sort_grade_columns_by').returns({sortType: sortOrder})
@@ -36,7 +34,6 @@ define [
       })
 
   teardown = ->
-    window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme = originalWeightingScheme
     @contextGetStub.restore()
     @contextSetStub.restore()
     Ember.run App, 'destroy'
@@ -116,14 +113,6 @@ define [
     equal @srgb.get('assignments.firstObject.name'), 'Z Eats Soup'
     equal @srgb.get('assignments.lastObject.name'), 'Da Fish and Chips!'
 
-  test 'updates assignment groups and weightingScheme when event is triggered', ->
-    window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme = 'whoa'
-    Ember.run =>
-      $.publish('assignment_group_weights_changed', assignmentGroups: Ember.copy(fixtures.assignment_groups, true).slice(0,1))
-
-    equal @srgb.get('weightingScheme'), 'whoa', 'weightingScheme was updated'
-    equal @srgb.get('assignment_groups.length'), 1, 'assignment_groups was updated'
-
   test 'updates assignment_visibility on an assignment', ->
     assignments = @srgb.get('assignments')
     assgn = assignments.objectAt(2)
@@ -193,6 +182,17 @@ define [
     submission = _.find(sub.submissions, (s) => s.assignment_id == @assignment.id)
     _.each submission, (val, key) =>
       equal selectedSubmission[key], val, "#{key} is the expected value on selectedSubmission"
+
+  test 'selectedSubmission sets gradeLocked', ->
+    selectedSubmission = @srgb.get('selectedSubmission')
+    equal selectedSubmission.gradeLocked, false
+
+  test 'selectedSubmission sets gradeLocked for unassigned students', ->
+    @student = @srgb.get('students')[1]
+    Ember.run =>
+      @srgb.set('selectedStudent', @student)
+      selectedSubmission = @srgb.get('selectedSubmission')
+      equal selectedSubmission.gradeLocked, true
 
   module 'screenreader_gradebook_controller: with selected assignment',
     setup: ->

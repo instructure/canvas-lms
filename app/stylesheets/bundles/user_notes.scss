@@ -30,7 +30,7 @@
         padding-left: 0px;
         padding-bottom: 5px;
         @include fontSize(16px);
-        color: $ic-color-dark;
+        color: $ic-font-color-dark;
         font-weight: normal;
       }
       .sub_title {
@@ -44,7 +44,7 @@
     .delete_user_note_link {
       position: relative;
       top: 3px;
-      color: $ic-color-dark;
+      color: $ic-font-color-dark;
     }
 
     .delete_user_note_link:hover {

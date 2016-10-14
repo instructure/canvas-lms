@@ -34,6 +34,7 @@ describe Course do
         'file_path' => File.join(IMPORT_JSON_DIR, 'import_from_migration_small.zip')
       }
       migration = ContentMigration.create!(:context => @course)
+      migration.stubs(:canvas_import?).returns(true)
 
       params = {:copy => {
         :topics => {'1864019689002' => true, '1865116155002' => true},

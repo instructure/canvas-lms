@@ -108,6 +108,7 @@ def ta_in_section(section, opts={})
   ta = opts.fetch(:user) { user }
   enrollment = section.course.enroll_user(ta, 'TaEnrollment', :section => section, :force_update => true)
   ta.save!
+  enrollment.limit_privileges_to_course_section = true unless opts[:full_course_permissions]
   enrollment.workflow_state = 'active'
   enrollment.save!
   ta

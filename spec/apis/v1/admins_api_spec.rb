@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../../sharding_spec_helper'
 
 describe "Admins API", type: :request do
   before :once do
@@ -315,6 +316,20 @@ describe "Admins API", type: :request do
                              "name"=>@another_admin.name,
                              "sortable_name"=>@another_admin.sortable_name,
                              "short_name"=>@another_admin.short_name}}]
+      end
+
+      context 'sharding' do
+        specs_require_sharding
+
+        it "should work with cross-shard users" do
+          @shard1.activate { @other_admin = user }
+          au = Account.default.account_users.create!(:user => @other_admin)
+
+          @user = @admin
+          json = api_call(:get, @path, @path_opts.merge(user_id: [@other_admin.id]))
+
+          expect(json.first["id"]).to eq au.id
+        end
       end
 
       it "should paginate" do

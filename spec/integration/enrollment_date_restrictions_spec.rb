@@ -25,7 +25,7 @@ describe "enrollment_date_restrictions" do
     Account.default.tap{|a| a.settings[:restrict_student_future_view] = {:value => true}}.save!
   end
 
-  it "should not list inactive enrollments in the menu" do
+  it "should not list inactive enrollments in the course list" do
     @student = user_with_pseudonym
     @enrollment1 = course(:course_name => "Course 1", :active_all => 1)
     e1 = student_in_course(:user => @student, :active_all => 1)
@@ -40,13 +40,6 @@ describe "enrollment_date_restrictions" do
     expect(e2.state_based_on_date).to eq :inactive
 
     user_session(@student, @pseudonym)
-
-    get "/"
-    page = Nokogiri::HTML(response.body)
-    list = page.css(".menu-item-drop-column-list li")
-    expect(list.length).to eq 1
-    expect(list[0].text).to match /Course 1/
-    expect(page.css(".menu-item-drop-padded")).to be_empty
 
     get "/courses"
     page = Nokogiri::HTML(response.body)
@@ -73,33 +66,6 @@ describe "enrollment_date_restrictions" do
     get "/courses"
     page = Nokogiri::HTML(response.body)
     expect(page.css(".past_enrollments tr")).to be_empty
-  end
-
-  it "should not list groups from inactive enrollments in the menu" do
-    @student = user_with_pseudonym
-    @course1 = course(:course_name => "Course 1", :active_all => 1)
-    e1 = student_in_course(:user => @student, :active_all => 1)
-    @group1 = @course1.groups.create(:name => "Group 1")
-    @group1.add_user(@student)
-
-    @course2 = course(:course_name => "Course 2", :active_all => 1)
-
-    @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => true)
-    e2 = student_in_course(:user => @student, :active_all => 1)
-    @group2 = @course2.groups.create(:name => "Group 1")
-    @group2.add_user(@student)
-
-    user_session(@student, @pseudonym)
-
-    get "/"
-    page = Nokogiri::HTML(response.body)
-    list = page.css(".menu-item-drop-column-list li").to_a
-    # course lis are still there and view all groups should always show up when
-    # there's at least one 'visible' group
-    expect(list.size).to eq 3
-    expect(list.select{ |li| li.text =~ /Group 1/ }).not_to be_empty
-    expect(list.select{ |li| li.text =~ /View all groups/ }).not_to be_empty
-    expect(list.select{ |li| li.text =~ /Group 2/ }).to be_empty
   end
 
   it "should not show date inactive/completed courses in grades" do

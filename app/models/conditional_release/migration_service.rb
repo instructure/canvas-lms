@@ -8,7 +8,7 @@ module ConditionalRelease
       def begin_export(course, opts)
         data = nil
         if opts[:selective]
-          assignment_ids = opts[:exported_assets].map{|asset| (match = asset.match(/assignment_(\d+)/) && match[1])}.compact
+          assignment_ids = opts[:exported_assets].map{|asset| (match = asset.match(/assignment_(\d+)/)) && match[1]}.compact
           return unless assignment_ids.any?
           data = {:export_settings => {:selective => '1', :exported_assignment_ids => assignment_ids}}.to_param
         end
@@ -87,7 +87,7 @@ module ConditionalRelease
           account_id: Context.get_account(course).root_account.lti_guid.to_s,
           context_type: 'Course',
           context_id: course.id.to_s,
-          workflow: 'conditonal-release-api'
+          workflows: ['conditonal-release-api']
         })
         {"Authorization" => "Bearer #{token}"}
       end

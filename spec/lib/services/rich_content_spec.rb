@@ -44,13 +44,17 @@ module Services
         described_class.env_for(root_account)
       end
 
-      it "includes a JWT for the domain and user's global id" do
+      it "includes a generated JWT for the domain, user, context, and workflwos" do
         root_account = stub("root_account", feature_enabled?: true)
         user = stub("user", global_id: 'global id')
         domain = stub("domain")
+        ctx = stub("ctx", grants_any_right?: true)
         jwt = stub("jwt")
-        Canvas::Security::ServicesJwt.stubs(:generate).with(sub: user.global_id, domain: domain).returns(jwt)
-        env = described_class.env_for(root_account, user: user, domain: domain)
+        Canvas::Security::ServicesJwt.stubs(:for_user).with(domain, user, all_of(
+          has_entry(workflows: [:rich_content, :ui]),
+          has_entry(context: ctx)
+        )).returns(jwt)
+        env = described_class.env_for(root_account, user: user, domain: domain, context: ctx)
         expect(env[:JWT]).to eql(jwt)
       end
 
@@ -60,9 +64,11 @@ module Services
         masq_user = stub("masq_user", global_id: 'other global id')
         domain = stub("domain")
         jwt = stub("jwt")
-        Canvas::Security::ServicesJwt.stubs(:generate).
-          with(sub: user.global_id, domain: domain, masq_sub: masq_user.global_id).
-          returns(jwt)
+        Canvas::Security::ServicesJwt.stubs(:for_user).with(
+          domain,
+          user,
+          has_entry(real_user: masq_user),
+        ).returns(jwt)
         env = described_class.env_for(root_account,
           user: user, domain: domain, real_user: masq_user)
         expect(env[:JWT]).to eql(jwt)

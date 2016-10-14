@@ -18,7 +18,7 @@
 
 class Ignore < ActiveRecord::Base
   belongs_to :user
-  belongs_to :asset, polymorphic: [:assignment, :assessment_request]
+  belongs_to :asset, polymorphic: [:assignment, :assessment_request, :quiz => 'Quizzes::Quiz']
 
   attr_accessible :user, :asset, :purpose, :permanent
   validates_presence_of :user_id, :asset_id, :asset_type, :purpose

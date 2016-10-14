@@ -14635,7 +14635,7 @@ hy:
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%k"
+      tiny_on_the_hour: "%-k:%M"
     less_than_a_minute_ago: "ավելի քիչ, քան մեկ րոպե առաջ"
     pm: pm
     ranges: 

@@ -10,6 +10,21 @@
 
 .context_module_item {
   border: none !important;
+
+  &.context_module_item_conditional_info {
+    .type_icon i {
+      display: inline;
+    }
+
+    .conditional_options_count {
+      background: #1897D8;
+      float: right;
+      padding: 2px 15px;
+      border-radius: 12px;
+      font-size: 11px;
+      color: #fff;
+    }
+  }
 }
 
 .al-options a {

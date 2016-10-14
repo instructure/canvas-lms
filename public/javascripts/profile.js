@@ -83,7 +83,6 @@ define([
         }
       },
       beforeSubmit: function(data) {
-        $update_profile_form.loadingImage();
       },
       success: function(data) {
         var user = data.user;
@@ -98,7 +97,6 @@ define([
           location.reload();
           return;
         }
-        $update_profile_form.loadingImage('remove');
         if ($default_email_id.length > 0) {
           var default_email = $default_email_id.find('option:selected').text();
           $('.default_email.display_data').text(default_email);

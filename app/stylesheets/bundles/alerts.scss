@@ -21,19 +21,19 @@
   }
   .labelled_region{
     margin-bottom: 15px;
-    color: $ic-color-dark;
+    color: $ic-font-color-dark;
   }
   .links {
     float: right;
     opacity: 0.5;
-    color: $ic-color-dark;
+    color: $ic-font-color-dark;
     &:hover {
       opacity: 1.0;
     }
   }
   .repetition_group {
     margin-left: 40px;
-    color: $ic-color-dark;
+    color: $ic-font-color-dark;
     font-weight: normal;
   }
   li {

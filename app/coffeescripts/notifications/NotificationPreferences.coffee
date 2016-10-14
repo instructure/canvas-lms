@@ -6,12 +6,12 @@ define [
   'compiled/userSettings'
   'compiled/notifications/NotificationGroupMappings'
   'jst/profiles/notification_preferences'
-  'jst/profiles/notifications/_policy_cell'
+  'jsx/notification_preferences/PolicyCell'
   'jquery.disableWhileLoading'
   'jquery.ajaxJSON'
   'compiled/jquery.rails_flash_notifications'
   'jqueryui/tooltip'
-], (I18n, $, _, userSettings, NotificationGroupMappings, notificationPreferencesTemplate, policyCellTemplate) ->
+], (I18n, $, _, userSettings, NotificationGroupMappings, notificationPreferencesTemplate, PolicyCell) ->
 
   class NotificationPreferences
 
@@ -59,15 +59,25 @@ define [
       @$notificationSaveStatus = $('#notifications_save_status')
       @initGrid()
 
-    # Build the option cell HTML as an array for all channels and for the given category
-    buildPolicyCellsHtml: (category) =>
-      fragments = for c in @channels
+    buildPolicyCellsProps: (category) =>
+      cellProps = for channel in @channels
         policy = _.find @policies, (p) ->
-          p.communication_channel_id is c.id and p.category is category.category
+          p.communication_channel_id == channel.id and p.category == category.category
         frequency = 'never'
         frequency = policy['frequency'] if policy
-        @policyCellHtml(category, c, frequency)
-      fragments.join ''
+        @policyCellProps(category, channel, frequency)
+
+    policyCellProps: (category, channel, selectedValue = 'never') =>
+      buttonData = @buttonData
+      if channel.type == 'push' || channel.type == 'sms' || channel.type == 'twitter'
+        buttonData = @limitedButtonData
+      {
+        category: category.category
+        channelId: channel.id
+        selection: selectedValue
+        buttonData: buttonData
+        onValueChanged: @saveNewPolicyValue
+      }
 
     communicationEventGroups: =>
       # Want return structure to be like this...
@@ -77,12 +87,12 @@ define [
       #        {
       #          title: 'Due date change'
       #          description: 'When an unfinished course work item has changed when it is due.'
-      #          policyCells: @buildPolicyCellsHtml(1)
+      #          policyCells: @buildPolicyCellsProps(1)
       #        }
       #        {
       #          title: 'Grading policy change'
       #          description: 'Happens when the criteria for a grade is changed.'
-      #          policyCells: @buildPolicyCellsHtml(2)
+      #          policyCells: @buildPolicyCellsProps(2)
       #        }
       #      ]
       #    }
@@ -99,7 +109,7 @@ define [
             item =
               title: category.display_name
               description: category.category_description
-              policyCells: @buildPolicyCellsHtml(category)
+              policyCells: @buildPolicyCellsProps(category)
             if category.option
               item['checkName'] = category.option.name
               item['checkedState'] = category.option.value
@@ -119,9 +129,11 @@ define [
 
     # Build the HTML notifications table.
     buildTable: =>
+      eventGroups = @communicationEventGroups()
       $('#notification-preferences').append(notificationPreferencesTemplate(
         channels: @channels,
-        eventGroups: @communicationEventGroups()
+        eventGroups: eventGroups
+        buttonData: @buttonData
         ))
       # Display Bootstrap-like popover tooltip on category names. Allow entire cell to trigger popup.
       $('#notification-preferences .category-name.show-popover').tooltip(
@@ -132,40 +144,29 @@ define [
           ,
           tooltipClass: 'popover left middle horizontal'
       )
+
+      this.renderAllPolicyCells(eventGroups)
+
       # set min-width on row <th /> cells
       $('tbody th[scope=row]').css('min-width', $('h3.group-name').width())
 
       @setupEventBindings()
       null
 
-    # Generate and return the HTML for an option cell with the with the sepecified value set/reflected.
-    policyCellHtml: (category, channel, selectedValue = 'never') =>
-      # Reset all buttons to not be active by default. Set their ID to be unique to the data combination.
-      _.each(@buttonData, (b) ->
-        b['active'] = false
-        b['coordinate'] = "cat_#{category.id}_ch_#{channel.id}"
-        b['id'] = "#{b['coordinate']}_#{b['code']}"
-      )
-      selected = @findButtonDataForCode(selectedValue)
-      selected['active'] = true
+    renderAllPolicyCells: (eventGroups) =>
+      for group in eventGroups
+        for item in group.items
+          for cell in item.policyCells
+            selector = ".comm-event-option[data-category='#{cell.category}'][data-channelid='#{cell.channelId}']"
+            $elt = $(selector)
+            PolicyCell.renderAt($elt.find('.comm-event-option-contents')[0], cell)
 
-      cellButtonData = if channel.type == 'push' then @limitedButtonData else @buttonData
-
-      policyCellTemplate
-        category:   category.category
-        channelId:  channel.id
-        selected:   selected
-        allButtons: cellButtonData
-
-    # Record and display the value for the cell.
-    saveNewCellValue: ($cell, value) =>
-      # Setup display
-      $cell.attr('data-selection', value)
-      # Get category and channel values
-      category = $cell.attr('data-category')
-      channelId = $cell.attr('data-channelId')
-      # Send value to server
-      data = {category: category, channel_id: channelId, frequency: value}
+    # Record the value for the cell.
+    saveNewPolicyValue: (category, channelId, newValue) =>
+      data =
+        category: category
+        channel_id: channelId
+        frequency: newValue
       @$notificationSaveStatus.disableWhileLoading $.ajaxJSON(@updateUrl, 'PUT', data, null,
         # Error callback
         ((data) =>
@@ -173,42 +174,9 @@ define [
         )
       ), @spinOpts
 
-    setupPreferenceIconsToolTip: (forClass, focusOutClass, at, my) =>
-      $notificationPrefs = $('#notification-preferences')
-
-      $notificationPrefs.find(forClass).tooltip(
-        open: (event, ui) ->
-          _.each($notificationPrefs.find(focusOutClass), (elem) ->
-            $(elem).focusout()
-          )
-        ,
-        position:
-          at: at
-          my: my
-          collision: 'none'
-        ,
-        tooltipClass: 'center bottom vertical'
-      )
-
     # Setup event bindings.
     setupEventBindings: =>
       $notificationPrefs = $('#notification-preferences')
-      $notificationPrefs.find('.event-option-selection').buttonset()
-
-      # a11y requires tooltips shown when using arrows to navigate notification preferences
-      # arrows trigger .ui-botton tooltip while mouse hover triggers .frequency
-      # if focusing with hover and arrow is used, need to focus out of hover and vice versa,
-      # so only one tooltip is shown at a time (as opposed to one for mouse and one for arrows)
-      @setupPreferenceIconsToolTip('.ui-button', '.frequency', 'top-5', 'bottom')
-      @setupPreferenceIconsToolTip('.frequency', '.ui-button', 'top-22', 'center+10')
-
-      $notificationPrefs.find('.frequency').on 'change', (e) =>
-        freq = $(e.currentTarget)
-        cell = freq.closest('td')
-        $(freq).focus()
-        # Record the selected value in data attribute and update image class to reflect new state
-        val = freq.attr('data-value')
-        @saveNewCellValue(cell, val)
 
       # Catch the change for a user preference and record it at the server.
       $notificationPrefs.find('.user-pref-check').on 'change', (e)=>

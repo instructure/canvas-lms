@@ -30,72 +30,7 @@ class UserMerge
       end
     end
 
-    max_position = target_user.communication_channels.last.try(:position) || 0
-    to_retire_ids = []
-    from_user.communication_channels.each do |cc|
-      source_cc = cc
-      # have to find conflicting CCs, and make sure we don't have conflicts
-      target_cc = target_user.communication_channels.detect { |cc| cc.path.downcase == source_cc.path.downcase && cc.path_type == source_cc.path_type }
-
-      if !target_cc && from_user.shard != target_user.shard
-        User.clone_communication_channel(source_cc, target_user, max_position)
-      end
-      next unless target_cc
-
-      # we prefer keeping the "most" active one, preferring the target user if they're equal
-      # the comments inline show all the different cases, with the source cc on the left,
-      # target cc on the right.  The * indicates the CC that will be retired in order
-      # to resolve the conflict
-      if target_cc.active?
-        # retired, active
-        # unconfirmed*, active
-        # active*, active
-        to_retire = source_cc
-      elsif source_cc.active?
-        # active, unconfirmed*
-        # active, retired
-        target_cc.destroy_permanently!
-        if from_user.shard != target_user.shard
-          User.clone_communication_channel(source_cc, target_user, max_position)
-        end
-      elsif target_cc.unconfirmed?
-        # unconfirmed*, unconfirmed
-        # retired, unconfirmed
-        to_retire = source_cc
-      elsif source_cc.unconfirmed?
-        # unconfirmed, retired
-        target_cc.destroy_permanently!
-        if from_user.shard != target_user.shard
-          User.clone_communication_channel(source_cc, target_user, max_position)
-        end
-      elsif
-        # retired, retired
-        to_retire = source_cc
-      end
-
-      if to_retire
-        to_retire_ids << to_retire.id
-      end
-    end
-
-    if from_user.shard != target_user.shard
-      from_user.communication_channels.update_all(:workflow_state => 'retired') unless from_user.communication_channels.empty?
-
-      from_user.user_services.each do |us|
-        new_us = us.clone
-        new_us.shard = target_user.shard
-        new_us.user = target_user
-        new_us.save!
-      end
-      from_user.user_services.delete_all
-    else
-      from_user.shard.activate do
-        CommunicationChannel.where(:id => to_retire_ids).where("workflow_state<>'retired'").update_all(:workflow_state => 'retired') unless to_retire_ids.empty?
-      end
-      scope = from_user.communication_channels
-      scope = scope.where("id NOT IN (?)", to_retire_ids) unless to_retire_ids.empty?
-      scope.update_all(["user_id=?, position=position+?", target_user, max_position]) unless from_user.communication_channels.empty?
-    end
+    handle_communication_channels(target_user, user_merge_data)
 
     destroy_conflicting_module_progressions(@from_user, target_user)
 
@@ -223,15 +158,115 @@ class UserMerge
     from_user.destroy
   end
 
+  def handle_communication_channels(target_user, user_merge_data)
+    max_position = target_user.communication_channels.last.try(:position) || 0
+    to_retire_ids = []
+    known_ccs = target_user.communication_channels.pluck(:id)
+    from_user.communication_channels.each do |cc|
+      # have to find conflicting CCs, and make sure we don't have conflicts
+      target_cc = detect_conflicting_cc(cc, target_user)
+
+      if !target_cc && from_user.shard != target_user.shard
+        User.clone_communication_channel(cc, target_user, max_position)
+        new_cc = target_user.communication_channels.where.not(id: known_ccs).take
+        known_ccs << new_cc.id
+        user_merge_data.add_more_data([new_cc], user: target_user, workflow_state: 'non_existent')
+      end
+
+      next unless target_cc
+      to_retire = handle_conflicting_ccs(cc, target_cc, target_user, max_position)
+
+      to_retire_ids << to_retire.id if to_retire
+    end
+
+    finish_ccs(max_position, target_user, to_retire_ids, user_merge_data)
+  end
+
+  def detect_conflicting_cc(source_cc, target_user)
+    target_user.communication_channels.detect do |c|
+      c.path.downcase == source_cc.path.downcase && c.path_type == source_cc.path_type
+    end
+  end
+
+  def finish_ccs(max_position, target_user, to_retire_ids, user_merge_data)
+    if from_user.shard != target_user.shard
+      handle_cross_shard_cc(target_user, user_merge_data)
+    else
+      from_user.shard.activate do
+        ccs = CommunicationChannel.where(id: to_retire_ids).where.not(workflow_state: 'retired')
+        user_merge_data.add_more_data(ccs) unless to_retire_ids.empty?
+        ccs.update_all(workflow_state: 'retired') unless to_retire_ids.empty?
+      end
+      scope = from_user.communication_channels.where.not(workflow_state: 'retired')
+      scope = scope.where.not(id: to_retire_ids) unless to_retire_ids.empty?
+      unless scope.empty?
+        user_merge_data.add_more_data(scope)
+        scope.update_all(["user_id=?, position=position+?", target_user, max_position])
+      end
+    end
+  end
+
+  def handle_cross_shard_cc(target_user, user_merge_data)
+    ccs = from_user.communication_channels.where.not(workflow_state: 'retired')
+    user_merge_data.add_more_data(ccs) unless ccs.empty?
+    ccs.update_all(workflow_state: 'retired') unless ccs.empty?
+
+    from_user.user_services.each do |us|
+      new_us = us.clone
+      new_us.shard = target_user.shard
+      new_us.user = target_user
+      new_us.save!
+      user_merge_data.add_more_data(new_us, user: target_user, workflow_state: 'non_existent')
+    end
+    user_merge_data.add_more_data(from_user.user_services)
+    from_user.user_services.delete_all
+  end
+
+  def handle_conflicting_ccs(source_cc, target_cc, target_user, max_position)
+    # we prefer keeping the "most" active one, preferring the target user if they're equal
+    # the comments inline show all the different cases, with the source cc on the left,
+    # target cc on the right.  The * indicates the CC that will be retired in order
+    # to resolve the conflict
+    if target_cc.active?
+      # retired, active
+      # unconfirmed*, active
+      # active*, active
+      to_retire = source_cc
+    elsif source_cc.active?
+      # active, unconfirmed*
+      # active, retired
+      # target_cc will not be able to be restored on split, but it is either unconfirmed or retired so nbd
+      target_cc.destroy_permanently!
+      if from_user.shard != target_user.shard
+        User.clone_communication_channel(source_cc, target_user, max_position)
+      end
+    elsif target_cc.unconfirmed?
+      # unconfirmed*, unconfirmed
+      # retired, unconfirmed
+      to_retire = source_cc
+    elsif source_cc.unconfirmed?
+      # unconfirmed, retired
+      # target_cc will not be able to be restored on split, but it is either unconfirmed or retired so nbd
+      target_cc.destroy_permanently!
+      if from_user.shard != target_user.shard
+        User.clone_communication_channel(source_cc, target_user, max_position)
+      end
+    elsif
+      # retired, retired
+    to_retire = source_cc
+    end
+    to_retire
+  end
+
   def move_observees(target_user, user_merge_data)
     # record all the records before destroying them
     # pass the from_user since user_id will be the observer
-    user_merge_data.add_more_data(from_user.user_observees, from_user)
+    user_merge_data.add_more_data(from_user.user_observees, user: from_user)
     user_merge_data.add_more_data(from_user.user_observers)
     # delete duplicate or invalid observers/observees, move the rest
     from_user.user_observees.where(user_id: target_user.user_observees.map(&:user_id)).destroy_all
     from_user.user_observees.where(user_id: target_user).destroy_all
-    user_merge_data.add_more_data(target_user.user_observees.where(user_id: from_user), target_user)
+    user_merge_data.add_more_data(target_user.user_observees.where(user_id: from_user), user: target_user)
     target_user.user_observees.where(user_id: from_user).destroy_all
     from_user.user_observees.active.update_all(observer_id: target_user)
     xor_observer_ids = UserObserver.where(user_id: [from_user, target_user]).uniq.pluck(:observer_id)

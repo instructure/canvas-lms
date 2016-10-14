@@ -251,7 +251,7 @@ class ConversationsController < ApplicationController
       @current_user.reload
 
       hash = {
-        :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
+        :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id.to_s,
         :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
         :CAN_MESSAGE_ACCOUNT_CONTEXT => valid_account_context?(@domain_root_account),
         :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size
@@ -646,6 +646,32 @@ class ConversationsController < ApplicationController
     render :json => {}
   end
 
+  # internal api
+  def deleted_index
+    return render_unauthorized_action unless @current_user.roles(Account.site_admin).include? 'admin'
+
+    query = lambda {
+      participants = ConversationMessageParticipant.query_deleted(params['user_id'], params)
+
+      Api.paginate(
+        participants,
+        self,
+        api_v1_deleted_conversations_url
+      )
+
+      participants.map { |p| deleted_conversation_json(p, @current_user, session) }
+    }
+
+    if (params['conversation_id'])
+      conversation_messages = Conversation.find(params['conversation_id']).shard.activate { query.call }
+    else
+      conversation_messages = query.call
+    end
+
+    render :json => conversation_messages
+  end
+
+
   # @API Add recipients
   # Add recipients to an existing group conversation. Response is similar to
   # the GET/show action, except that only includes the
@@ -990,10 +1016,10 @@ class ConversationsController < ApplicationController
     multiple = conversations.is_a?(Enumerable) || conversations.is_a?(ActiveRecord::Relation)
     conversations = [conversations] unless multiple
     result = Hash.new(false)
-    visible_conversations = @current_user.shard.activate do
-        @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).to_a
-      end
-    visible_conversations.each { |c| result[c.conversation_id] = true }
+    visible_conversation_ids = @current_user.shard.activate do
+      @conversations_scope.where(:conversation_id => conversations.map(&:conversation_id)).pluck(:conversation_id)
+    end
+    visible_conversation_ids.each { |c_id| result[Shard.relative_id_for(c_id, @current_user.shard, Shard.current)] = true }
     if !multiple
       result[conversations.first.conversation_id]
     else
@@ -1003,32 +1029,33 @@ class ConversationsController < ApplicationController
 
   def normalize_recipients
     return unless params[:recipients]
+
     unless params[:recipients].is_a? Array
       params[:recipients] = params[:recipients].split ","
     end
 
-    recipient_ids = MessageableUser.individual_recipients(params[:recipients])
-    contexts      = MessageableUser.context_recipients(params[:recipients])
+    # unrecognized context codes are ignored
+    if AddressBook.valid_context?(params[:context_code])
+      context = Context.find_by_asset_string(params[:context_code])
+      if context.nil?
+        # recognized context code must refer to a valid course or group
+        return render json: { message: 'invalid context_code' }, status: :bad_request
+      end
+    end
 
-    if params[:context_code] =~ MessageableUser::Calculator::CONTEXT_RECIPIENT
-      is_admin = Context.
-        find_by_asset_string(params[:context_code]).
-        grants_right?(@current_user, :read_as_admin)
-      @recipients = @current_user.
-        messageable_user_calculator.
-        messageable_users_in_context(
-          params[:context_code],
-          admin_context: is_admin
-        ).select { |user| recipient_ids.include? user.id }
+    users, contexts = AddressBook.partition_recipients(params[:recipients])
+    if context
+      user_ids = users.map{ |user| Shard.global_id_for(user) }.to_set
+      is_admin = context.grants_right?(@current_user, :read_as_admin)
+      known = @current_user.address_book.
+        known_in_context(context.asset_string, is_admin).
+        select{ |user| user_ids.include?(user.global_id) }
     else
-      @recipients = @current_user.load_messageable_users(recipient_ids, conversation_id: params[:from_conversation_id])
+      known = @current_user.address_book.
+        known_users(users, conversation_id: params[:from_conversation_id])
     end
-
-    contexts.map do |context|
-      @recipients.concat @current_user.messageable_users_in_context(context)
-    end
-
-    @recipients.uniq!(&:id)
+    contexts.each{ |context| known.concat(@current_user.address_book.known_in_context(context)) }
+    @recipients = known.uniq(&:id)
   end
 
   def infer_tags
@@ -1079,11 +1106,6 @@ class ConversationsController < ApplicationController
       media_comment.save
       media_comment
     end
-  end
-
-  # Obsolete. Forced to false until we go through and clean it up thoroughly
-  def interleave_submissions
-    false
   end
 
   def include_private_conversation_enrollments

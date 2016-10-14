@@ -138,7 +138,7 @@
 
 .ui-datepicker td span, .ui-datepicker td a {
   border-radius: $baseBorderRadius;
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
   &.ui-state-default.ui-state-hover {
     @if $use_high_contrast == false {
       border-color: $ic-border-light;

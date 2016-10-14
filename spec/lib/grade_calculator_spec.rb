@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -737,7 +737,7 @@ describe GradeCalculator do
           expect(final_grade_info(@user, @course)[:total]).to eq 40
           expect(final_grade_info(@user, @course)[:possible]).to eq 80
         end
-        it "shouldnt count an invisible assingment with never drop on" do
+        it "should not count an invisible assignment with never drop on" do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           # 5 + 15 + 10 + 20 + 10 - 10 - 10
           expect(final_grade_info(@user, @course)[:total]).to eq 40

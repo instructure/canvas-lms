@@ -15,36 +15,18 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
   & > header,
   // oldskool compat
   #section-tabs-header {
-    @if $use_new_styles {
-      @include fontSize($ic-font-size--small);
-      font-weight: 500;
-      margin: 0 0 $ic-sp/2;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    @else {
-      background-color: transparent;
-      margin-top: 0;
-      padding: 8px 7px;
-      font-weight: bold;
-      color: $gray-dark;
-      // oldskool overrides
-      @include fontSize($ic-font-size--small);
-      margin-bottom: 0;
-      line-height: 19px;
-      height: inherit;
-    }
+    @include fontSize($ic-font-size--small);
+    font-weight: 500;
+    margin: 0 0 $ic-sp/2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   #section-tabs-header-subtitle {
     display: block;
     @include fontSize(11px);
     font-style: italic;
     color: inherit;
-    @if $use_new_styles == false {
-      margin-bottom: $ic-sp/2;
-      padding: 0 $ic-sp*0.75;
-    }
   }
 
   & > *:first-child {
@@ -63,37 +45,22 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
       & > a {
         display: block;
         text-decoration: none;
-        @if $use_new_styles {
-          color: $ic-color-dark;
-          font-weight: 300;
-          border-radius: $baseBorderRadius;
-          padding: $ic-sp/2 $ic-sp;
-          &:hover, &:focus { background: lighten($ic-color-neutral, 5%); }
-        }
-        // Default UI styles
-        @else {
-          color: ensure-contrast($gray, $lightBackground);
-          padding: 4px 8px;
+        color: $ic-font-color-dark;
+        font-weight: 300;
+        border-radius: $baseBorderRadius;
+        padding: $ic-sp/2 $ic-sp;
 
-          &:hover, &:focus {
-            @if $use_high_contrast {
-              background: #333;
-              color: #fff;
-              text-decoration: underline;
-            }
-            @else { background: $white; }
-          }
-          &:hover {
-            text-decoration: none;
-            background: $ic-course-sidenav_list-item--bg-color;
-            color: $ic-course-sidenav_list-item--active-font-color;
-          }
+        @if $use_high_contrast {
+          text-decoration: underline;
+        }
+
+        &:hover, &:focus {
+          background: lighten($ic-color-neutral, 5%);
         }
 
         & > span {
           white-space: nowrap;
         }
-
       }
 
       &:last-child > a {
@@ -108,48 +75,25 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
   }
 
   a.active {
-    @if $use_new_styles {
-      background-color: $ic-brand-course-nav-link--active;
-      font-weight: 500;
-      color: $ic-color-light;
-      &:hover, &:focus { background-color: $ic-brand-primary; }
-      .nav-badge {
-        background: $ic-color-light;
-        color: $ic-brand-primary;
-      }
-    }
-    @else {
-      /// active state colors and backgrounds on left sidenav
-      background: $ic-course-sidenav_list-item--bg-color;
-      color: $ic-course-sidenav_list-item--active-font-color;
-      &:hover {
-        background: $ic-course-sidenav_list-item--bg-color;
-        color: $ic-course-sidenav_list-item--active-font-color;
-      }
+    background-color: $ic-brand-course-nav-link--active;
+    font-weight: 500;
+    color: $ic-color-light;
+    &:hover, &:focus { background-color: $ic-brand-primary; }
+    .nav-badge {
+      background: $ic-color-light;
+      color: $ic-brand-primary;
     }
   }
 }
 .image-block {
-  @if $use_new_styles { display: flex; min-width: 1px;}
-  @else { @include clearfix; }
+  display: flex; min-width: 1px;
 
   .image-block-image {
-    @if $use_new_styles { margin-right: $ic-sp; }
-    @else {
-      float: left;
-      margin-right: $contentBoxPadding;
-    }
+    margin-right: $ic-sp;
   }
   .image-block-content {
-    @if $use_new_styles {
-      flex: 1;
-      min-width: 1px;
-    }
-    @else {
-      display: table-cell;
-      vertical-align: top;
-      width: 10000px;
-    }
+    flex: 1;
+    min-width: 1px;
   }
 }
 
@@ -162,21 +106,12 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
   a {
     display: block;
     padding: 8px 0;
-    @if $use_new_styles {
-      color: $ic-color-dark;
-      font-weight: 500;
-      border-bottom: 1px solid $ic-border-light;
-    }
-    @else {
-      color: $gray;
-      font-weight: bold;
-      border-bottom: solid 1px lighten($grayLight, 10%);
-      box-shadow: 0 1px 0px rgba(255, 255, 255, 0.85);
-    }
+    color: $ic-font-color-dark;
+    font-weight: 500;
+    border-bottom: 1px solid $ic-border-light;
 
     &:hover, &:focus {
-      @if $use_new_styles { color: $ic-link-color; }
-      @else { color: $blue; }
+      color: $ic-link-color;
     }
 
     @if $use_high_contrast { text-decoration: none; }
@@ -187,4 +122,4 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
   }
 }
 
-@if $use_new_styles { * + .page-action-list { margin-top: $ic-sp; } }
+* + .page-action-list { margin-top: $ic-sp; }

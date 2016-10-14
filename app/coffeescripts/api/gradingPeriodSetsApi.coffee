@@ -27,6 +27,9 @@ define [
         title: period.title
         startDate: new Date(period.start_date)
         endDate: new Date(period.end_date)
+        # TODO: After the close_date data fixup has run, this can become:
+        # `closeDate: new Date(period.close_date)`
+        closeDate: new Date(period.close_date || period.end_date)
       }
 
   baseDeserializeSet = (set) ->

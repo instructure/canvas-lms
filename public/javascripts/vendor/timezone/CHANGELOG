@@ -1,3 +1,91 @@
+- Version 1.0.5.
+
+Wed Jun 15 16:30:23 UTC 2016
+
+ * Upgrade IANA TZ Database to `2016e`. #272.
+
+- Version 1.0.4.
+
+Thu Jun  9 02:36:10 UTC 2016
+
+ * Upgrade IANA TZ Database to `2016d`. #266.
+
+- Version 1.0.3.
+
+Thu Jun  9 02:11:50 UTC 2016
+
+ * Upgrade IANA TZ Database to `2016c`. #269.
+
+- Version 1.0.2.
+
+Thu Jun  9 01:26:34 UTC 2016
+
+ * Upgrade IANA TZ Database to `2016b`. #267.
+
+- Version 1.0.1.
+
+Tue Feb 16 16:13:47 UTC 2016
+
+ * Upgrade IANA TZ Database to `2016a`. #264.
+
+- Version 1.0.0.
+
+Mon Feb 15 20:58:45 UTC 2016
+
+ * Decide that the API is finished.
+
+- Version 0.0.48.
+
+Sun Nov 29 20:29:46 UTC 2015
+
+ * Test with Node.js 5.1 on Travis CI. f5d44667b81356e3f8ea43e2cd682add7d8b39b2.
+ * Test with Node.js 4.2 on Travis CI. c56d3e2fc43eb1d2475187de103de7aa4f4042b0.
+ * Use require for resource indexes. #259.
+ * Continued test tidy. #244.
+
+- Version 0.0.47.
+
+Thu Oct  8 00:03:03 UTC 2015
+
+ * Upgrade IANA TZ Database to `2015g`. #257.
+ * More testing tidy.
+
+- Version 0.0.46.
+
+Tue Sep 29 02:29:26 UTC 2015
+
+ * Upgrade TZ Database to `tz2015f`. #255.
+
+- Version 0.0.45.
+
+Sun Sep 27 04:26:41 UTC 2015
+
+ * Upgrade TZ Database to `tz2015e`. #253.
+
+- Version 0.0.44.
+
+Sat Sep 26 04:58:12 UTC 2015
+
+ * Upgrade TZ Database to `tz2015d`. #248.
+
+- Version 0.0.43.
+
+Thu Sep 24 04:40:30 UTC 2015
+
+ * Publish over damaged version 0.0.42 in NPM.
+
+- Version 0.0.42.
+
+Tue Sep 22 06:26:55 UTC 2015
+
+ * Upgrade TZ Database to `tz2015c`. #234.
+
+- Version 0.0.41.
+
+Fri Apr 17 07:45:24 UTC 2015
+
+ * Upgrade TZ Database to `tz2015b`. #232.
+
 - Version 0.0.40.
 
 Fri Feb  6 14:40:10 UTC 2015
@@ -34,32 +122,32 @@ Sun Oct 26 03:17:59 UTC 2014
 
  * Upgrade TZ Database to `tz2014g`. #217.
 
-- Verison 0.0.34.
+- Version 0.0.34.
 
 Thu Aug  7 01:55:45 UTC 2014
 
  * Upgrade TZ Database to `tz2014f`. #215.
 
-- Verison 0.0.33.
+- Version 0.0.33.
 
 Fri Jun 27 16:21:08 UTC 2014
 
  * Upgrade TZ Database to `tz2014e`. #213.
 
-- Verison 0.0.32.
+- Version 0.0.32.
 
 Mon Jun  2 06:34:24 UTC 2014
 
  * Upgrade TZ Database to `tz2014d`. #211.
 
-- Verison 0.0.31.
+- Version 0.0.31.
 
 Sun Jun  1 21:14:47 UTC 2014
 
  * Upgrade TZ database to `2014b`. #209.
  * Upgrade Proof to 0.0.45. #208.
 
-- Verison 0.0.30.
+- Version 0.0.30.
 
 Fri Mar 28 02:32:38 UTC 2014
 
@@ -196,7 +284,7 @@ Wed Jan  2 04:12:59 UTC 2013
  * Delete `fields` variable from `actualize`. #92.
  * Merge `make` function into `convert`. #85.
  * Build on Node.js 0.8, add 0.8 to Travis CI. #90.
- * ixed `sysnopsis.js` assertions. #89.
+ * Fixed `synopsis.js` assertions. #89.
 
 - Version 0.0.14 - Mon Jun 25 21:02:24 UTC 2012
 
@@ -216,7 +304,7 @@ Wed Jan  2 04:12:59 UTC 2013
  * Bump version string returned by Timezone function. #77. #72.
  * Reorganize `actualize` for byte savings. #63.
  * Revert to one based month in date array. #74.
- * Exclude non-JavaScript files, crufy files, from `slurp.js` indices. #71.
+ * Exclude non-JavaScript files, crufty files, from `slurp.js` indices. #71.
  * Remove over-zealous, bloaty argument verification. #70.
 
 - Version 0.0.13 - Mon Jun 25 11:05:06 UTC 2012

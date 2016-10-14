@@ -268,37 +268,105 @@ describe AssignmentGroupsController do
 
   end
 
-  describe "POST 'reorder_assignments'"do
+  describe "POST 'reorder_assignments'" do
     before :once do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
-      @group1 = @course.assignment_groups.create!(:name => 'group 1')
-      @group2 = @course.assignment_groups.create!(:name => 'group 2')
-      @assignment1 = @course.assignments.create!(:title => 'assignment 1', :assignment_group => @group1)
-      @assignment2 = @course.assignments.create!(:title => 'assignment 2', :assignment_group => @group1)
-      @assignment3 = @course.assignments.create!(:title => 'assignment 3', :assignment_group => @group2)
+      @group1 = @course.assignment_groups.create!(name: 'group 1')
+      @group2 = @course.assignment_groups.create!(name: 'group 2')
+      @assignment1 = @course.assignments.create!(title: 'assignment 1', assignment_group: @group1)
+      @assignment2 = @course.assignments.create!(title: 'assignment 2', assignment_group: @group1)
+      @assignment3 = @course.assignments.create!(title: 'assignment 3', assignment_group: @group2)
       @order = "#{@assignment1.id},#{@assignment2.id},#{@assignment3.id}"
     end
 
     it 'requires authorization' do
-      post :reorder_assignments, :course_id => @course.id, :assignment_group_id => @assignment1.assignment_group.id, :order => @order
+      post :reorder_assignments, course_id: @course.id, assignment_group_id: @group1.id, order: @order
       assert_unauthorized
     end
 
     it 'does not allow students to reorder' do
       user_session(@student)
-      post :reorder_assignments, :course_id => @course.id, :assignment_group_id => @assignment1.assignment_group.id, :order => @order
+      post :reorder_assignments, course_id: @course.id, assignment_group_id: @group1.id, order: @order
       assert_unauthorized
     end
 
-    it 'moves the assingment from its current assignment group to another assignment group' do
+    it 'moves the assignment from its current assignment group to another assignment group' do
       user_session(@teacher)
+      post :reorder_assignments, course_id: @course.id, assignment_group_id: @group1.id, order: @order
       expect(response).to be_success
-      post :reorder_assignments, :course_id => @course.id, :assignment_group_id => @assignment1.assignment_group.id, :order => @order
       @assignment3.reload
       expect(@assignment3.assignment_group_id).to eq(@group1.id)
       expect(@group2.assignments.count).to eq(0)
       expect(@group1.assignments.count).to eq(3)
+    end
+
+    context 'with multiple grading periods enabled' do
+      before :once do
+        @course.root_account.enable_feature!(:multiple_grading_periods)
+        group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+        term = @course.enrollment_term
+        term.grading_period_group = group
+        term.save!
+        Factories::GradingPeriodHelper.new.create_for_group(group, {
+          start_date: 2.weeks.ago, end_date: 2.days.ago, close_date: 1.day.ago
+        })
+        @assignment1.update_attributes(due_at: 1.week.ago)
+      end
+
+      it 'does not allow assignments in closed grading periods to be moved into different assignment groups' do
+        user_session(@teacher)
+        post :reorder_assignments, course_id: @course.id, assignment_group_id: @group2.id, order: @order
+        assert_unauthorized
+        expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
+        expect(@assignment2.reload.assignment_group_id).to eq(@group1.id)
+        expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
+      end
+
+      it 'allows assignments not in closed grading periods to be moved into different assignment groups' do
+        user_session(@teacher)
+        order = "#{@assignment3.id},#{@assignment2.id}"
+        post :reorder_assignments, course_id: @course.id, assignment_group_id: @group2.id, order: order
+        expect(response).to be_success
+        expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
+        expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
+        expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
+        expect(@assignment2.position).to eql(2)
+        expect(@assignment3.position).to eql(1)
+      end
+
+      it 'allows assignments in closed grading periods to be reordered within the same assignment group' do
+        user_session(@teacher)
+        order = "#{@assignment3.id},#{@assignment1.id},#{@assignment2.id}"
+        post :reorder_assignments, course_id: @course.id, assignment_group_id: @group1.id, order: order
+        expect(response).to be_success
+        expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
+        expect(@assignment2.reload.assignment_group_id).to eq(@group1.id)
+        expect(@assignment3.reload.assignment_group_id).to eq(@group1.id)
+        expect(@assignment1.position).to eql(2)
+        expect(@assignment2.position).to eql(3)
+        expect(@assignment3.position).to eql(1)
+      end
+
+      it 'allows assignments in closed grading periods when the user is a root admin' do
+        admin = account_admin_user(account: @course.root_account)
+        user_session(admin)
+        post :reorder_assignments, course_id: @course.id, assignment_group_id: @group2.id, order: @order
+        expect(response).to be_success
+        expect(@assignment1.reload.assignment_group_id).to eq(@group2.id)
+        expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
+        expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
+      end
+
+      it 'ignores deleted assignments' do
+        @assignment1.destroy
+        user_session(@teacher)
+        post :reorder_assignments, course_id: @course.id, assignment_group_id: @group2.id, order: @order
+        expect(response).to be_success
+        expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
+        expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
+        expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
+      end
     end
   end
 

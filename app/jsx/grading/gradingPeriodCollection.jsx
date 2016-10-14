@@ -14,10 +14,6 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     return state.periods !== null;
   };
 
-  const canAddPeriods = (state) => {
-    return !state.readOnly && state.canAddNewPeriods;
-  };
-
   let GradingPeriodCollection = React.createClass({
 
     propTypes: {
@@ -30,7 +26,6 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
         readOnly: false,
         disabled: false,
         saveDisabled: true,
-        canAddNewPeriods: false,
         canChangeGradingPeriodsSetting: false
       };
     },
@@ -46,7 +41,6 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
           self.setState({
             periods: self.deserializePeriods(periods),
             readOnly: periods.grading_periods_read_only,
-            canAddNewPeriods: periods.can_create_grading_periods,
             canChangeGradingPeriodsSetting: periods.can_toggle_grading_periods,
             disabled: false,
             saveDisabled: _.isEmpty(periods.grading_periods)
@@ -62,15 +56,9 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
         let newPeriod = ConvertCase.camelize(period);
         newPeriod.startDate = new Date(period.start_date);
         newPeriod.endDate = new Date(period.end_date);
+        newPeriod.closeDate = new Date(period.close_date || period.end_date);
         return newPeriod;
       });
-    },
-
-    componentDidUpdate: function(prevProps, prevState) {
-      if (prevState.periods) {
-        let removedAGradingPeriod = this.state.periods.length < prevState.periods.length;
-        if (removedAGradingPeriod && this.refs.addPeriodButton) this.refs.addPeriodButton.focus();
-      }
     },
 
     deleteGradingPeriod: function(id) {
@@ -103,29 +91,6 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     removeDeletedGradingPeriod: function(id) {
       let newPeriods = _.reject(this.state.periods, period => period.id === id);
       this.setState({periods: newPeriods});
-    },
-
-    getCreateGradingPeriodCSS: function() {
-      let cssClasses = 'center-md new-grading-period pad-box border border-round';
-      if (!this.state.periods || this.state.periods.length === 0) {
-        cssClasses += ' no-active-grading-periods';
-      }
-
-      return cssClasses;
-    },
-
-    createNewGradingPeriod: function() {
-      if (!this.state.readOnly && this.state.canAddNewPeriods) {
-        let newPeriod = {
-          title: '',
-          startDate: new Date(''),
-          endDate: new Date(''),
-          id: _.uniqueId('new'),
-          permissions: { read: true, update: true, delete: true}
-        };
-        let periods = update(this.state.periods, {$push: [newPeriod]});
-        this.setState({periods: periods, saveDisabled: false});
-      }
     },
 
     getPeriodById: function(id) {
@@ -246,7 +211,7 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     },
 
     renderSaveButton: function() {
-      if (periodsAreLoaded(this.state) && !this.state.readOnly && _.all(this.state.periods, period => period.permissions.update || period.permissions.create)) {
+      if (periodsAreLoaded(this.state) && !this.state.readOnly && _.all(this.state.periods, period => period.permissions.update)) {
         let buttonText = this.state.disabled ? I18n.t('Updating') : I18n.t('Save');
         return (
           <div className='form-actions'>
@@ -271,6 +236,7 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
                          title={period.title}
                          startDate={period.startDate}
                          endDate={period.endDate}
+                         closeDate={period.closeDate}
                          permissions={period.permissions}
                          readOnly={this.state.readOnly}
                          disabled={this.state.disabled}
@@ -279,20 +245,6 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
                          onDeleteGradingPeriod={this.deleteGradingPeriod}/>
         );
       });
-    },
-
-    renderAddPeriodButton: function() {
-      if (periodsAreLoaded(this.state) && canAddPeriods(this.state)) {
-        return (
-          <div className={this.getCreateGradingPeriodCSS()}>
-            <button id='add-period-button' className='Button--link' ref='addPeriodButton'
-                    onClick={this.createNewGradingPeriod} disabled={this.state.disabled}>
-              <i className='icon-plus grading-period-add-icon'/>
-              {I18n.t('Add Grading Period')}
-            </button>
-          </div>
-        );
-      }
     },
 
     render: function () {
@@ -304,7 +256,6 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
           <div id='grading_periods' className='content-box'>
             {this.renderGradingPeriods()}
           </div>
-          {this.renderAddPeriodButton()}
           {this.renderSaveButton()}
         </div>
       );

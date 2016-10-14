@@ -73,10 +73,10 @@ class GradebookImporter
     @all_assignments = @context.assignments
       .published
       .gradeable
-      .select([:id, :title, :points_possible, :grading_type, :due_at])
+      .select([:id, :title, :points_possible, :grading_type, :updated_at, :context_id, :context_type, :group_category_id, :created_at, :due_at])
       .index_by(&:id)
     @all_students = @context.all_students
-      .select(['users.id', :name, :sortable_name])
+      .select(['users.id', :name, :sortable_name, 'users.updated_at'])
       .index_by(&:id)
 
     @assignments = nil
@@ -85,6 +85,10 @@ class GradebookImporter
     @pseudonyms_by_login_id = {}
     @students = []
     @pp_row = []
+    @warning_messages = {
+      prevented_new_assignment_creation_in_closed_period: false,
+      prevented_grading_ungradeable_submission: false
+    }
 
     csv_stream do |row|
       already_processed = check_for_non_student_row(row)
@@ -94,47 +98,63 @@ class GradebookImporter
       end
     end
 
-    @assignments_outside_current_periods = []
-    if @context.feature_enabled? :multiple_grading_periods
-      current_period = GradingPeriod.for(@context).current.first
-
-      if current_period.present?
-        with_due_at = @assignments.select(&:due_at)
-        in_current_period = select_in_grading_period(with_due_at, @context, current_period)
-
-        @assignments_outside_current_periods = with_due_at - in_current_period
-        @assignments = @assignments - @assignments_outside_current_periods
-      end
-    end
-
     @missing_assignments = []
     @missing_assignments = @all_assignments.values - @assignments if @missing_assignment
     @missing_students = []
     @missing_students = @all_students.values - @students if @missing_student
 
     # look up existing score for everything that was provided
+    assignment_ids = @missing_assignment ? @all_assignments.values : @assignments
+    user_ids = @missing_student ? @all_students.values : @students
+    # preload periods to avoid N+1s
+    periods = GradingPeriod.for(@context)
+    # preload admin_of_root_account? to avoid N+1
+    is_admin = @user.admin_of_root_account?(@context.root_account)
+
     @original_submissions = @context.submissions
-      .select([:assignment_id, :user_id, :score, :excused])
-      .where(:assignment_id => (@missing_assignment ? @all_assignments.values : @assignments),
-             :user_id => (@missing_student ? @all_students.values : @students))
+      .select(['submissions.id', :assignment_id, :user_id, :score, :excused, :cached_due_date, 'submissions.updated_at'])
+      .where(assignment_id: assignment_ids, user_id: user_ids)
       .map do |submission|
+        is_gradeable = gradeable?(submission: submission, periods: periods, is_admin: is_admin)
+        score = submission.excused? ? "EX" : submission.score.to_s
         {
-          :user_id => submission.user_id,
-          :assignment_id => submission.assignment_id,
-          :score => submission.excused? ? "EX" : submission.score.to_s
+          user_id: submission.user_id,
+          assignment_id: submission.assignment_id,
+          score: score,
+          gradeable: is_gradeable
         }
-    end
+      end
 
     # cache the score on the existing object
     original_submissions_by_student = @original_submissions.inject({}) do |r, s|
       r[s[:user_id]] ||= {}
-      r[s[:user_id]][s[:assignment_id]] = s[:score]
+      r[s[:user_id]][s[:assignment_id]] ||= {}
+      r[s[:user_id]][s[:assignment_id]][:score] = s[:score]
+      r[s[:user_id]][s[:assignment_id]][:gradeable] = s[:gradeable]
       r
     end
+
     @students.each do |student|
       student.gradebook_importer_submissions.each do |submission|
-        submission['original_grade'] = original_submissions_by_student[student.id]
-          .try(:[], submission['assignment_id'].to_i)
+        submission_assignment_id = submission.fetch('assignment_id').to_i
+        assignment = original_submissions_by_student
+          .fetch(student.id, {})
+          .fetch(submission_assignment_id, {})
+        submission['original_grade'] = assignment.fetch(:score, nil)
+        submission['gradeable'] = assignment.fetch(:gradable, nil)
+
+        if submission.fetch('gradeable').nil?
+          assignment = @all_assignments[submission['assignment_id']] || @context.assignments.build
+          new_submission = Submission.new
+          new_submission.user = student
+          new_submission.assignment = assignment
+          new_submission.cache_due_date
+          submission['gradeable'] = gradeable?(
+            submission: new_submission,
+            periods: periods,
+            is_admin: is_admin
+          )
+        end
       end
     end
 
@@ -151,19 +171,29 @@ class GradebookImporter
           # Have potentially mixed case excused in grade match case
           # expectations for the compare so it doesn't look changed
           submission['grade'] = 'EX' if submission['grade'].to_s.upcase == 'EX'
-
-
-          submission['grade'] == submission['original_grade'] ||
+          no_change = submission['grade'] == submission['original_grade'] ||
             (submission['original_grade'].present? && submission['grade'].present? && submission['original_grade'].to_f == submission['grade'].to_f) ||
             (submission['original_grade'].blank? && submission['grade'].blank?)
+
+          if !submission['gradeable'] && !no_change
+            @warning_messages[:prevented_grading_ungradeable_submission] = true
+          end
+
+          no_change || !submission['gradeable']
         end
       end
+
       indexes_to_delete.reverse_each do |idx|
         @assignments.delete_at(idx)
         @students.each do |student|
           student.gradebook_importer_submissions.delete_at(idx)
         end
       end
+
+      @students.each do |student|
+        student.gradebook_importer_submissions.select! { |sub| sub['gradeable'] }
+      end
+
       @unchanged_assignments = !indexes_to_delete.empty?
       @students = [] if @assignments.empty?
     end
@@ -175,8 +205,18 @@ class GradebookImporter
     @students.delete_if { |s| prior_enrollment_ids.include? s.id }
 
     @original_submissions = [] unless @missing_student || @missing_assignment
-    @upload.gradebook = self.as_json
 
+    if prevent_new_assignment_creation?(periods, is_admin)
+      @assignments.delete_if do |assignment|
+        new_assignment = assignment.new_record?
+        if new_assignment
+          @warning_messages[:prevented_new_assignment_creation_in_closed_period] = true
+        end
+        new_assignment
+      end
+    end
+
+    @upload.gradebook = self.as_json
     @upload.save!
   end
 
@@ -243,8 +283,7 @@ class GradebookImporter
 
   def strip_non_assignment_columns(row)
     drop_student_information_columns(row)
-
-    while row.last =~ /Current Score|Current Points|Final Score|Final Points|Final Grade/
+    while row.last =~ /Current Score|Current Points|Current Grade|Final Score|Final Points|Final Grade/
       row.pop
     end
 
@@ -266,9 +305,21 @@ class GradebookImporter
       assignment ||= Assignment.new(:title => title || name_and_id)
       assignment.previous_id = assignment.id
       assignment.id ||= NegativeId.generate
+
       @missing_assignment ||= assignment.new_record?
       assignment
-    end
+    end.compact
+  end
+
+  def prevent_new_assignment_creation?(periods, is_admin)
+    return false unless context.feature_enabled?(:multiple_grading_periods)
+    return false if is_admin
+
+    GradingPeriod.date_in_closed_grading_period?(
+      course: @context,
+      date: nil,
+      periods: periods
+    )
   end
 
   def process_pp(row)
@@ -312,20 +363,20 @@ class GradebookImporter
   end
 
   def process_submissions(row, student)
-    l = []
+    importer_submissions = []
     @assignments.each_with_index do |assignment, idx|
       assignment_id = assignment.new_record? ? assignment.id : assignment.previous_id
       grade = row[idx + @student_columns]
-      unless assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
+      if !assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
         grade = ''
       end
       new_submission = {
         'grade' => grade,
         'assignment_id' => assignment_id
       }
-      l << new_submission
+      importer_submissions << new_submission
     end
-    student.gradebook_importer_submissions = l
+    student.gradebook_importer_submissions = importer_submissions
   end
 
   def assignment_visible_to_student(student, assignment, assignment_id, visible_assignments)
@@ -346,8 +397,7 @@ class GradebookImporter
       },
       :original_submissions => @original_submissions,
       :unchanged_assignments => @unchanged_assignments,
-      :assignments_outside_current_periods =>
-        @assignments_outside_current_periods.map { |a| assignment_to_hash(a) }
+      :warning_messages => @warning_messages
     }
   end
 
@@ -420,8 +470,7 @@ class GradebookImporter
       :previous_id => assignment.previous_id,
       :title => assignment.title,
       :points_possible => assignment.points_possible,
-      :grading_type => assignment.grading_type,
-      :due_at => assignment.due_at
+      :grading_type => assignment.grading_type
     }
   end
 
@@ -439,4 +488,19 @@ class GradebookImporter
   def readonly_assignment?(index)
     @pp_row[index] =~ /read\s+only/
   end
+
+  private
+
+  def gradeable?(submission:, periods:, is_admin:)
+    user_can_grade_submission = submission.grants_right?(@user, :grade)
+    return user_can_grade_submission unless @context.feature_enabled?(:multiple_grading_periods)
+
+    user_can_grade_submission &&
+      (is_admin || !GradingPeriod.date_in_closed_grading_period?(
+        course: submission.context,
+        date: submission.cached_due_date,
+        periods: periods
+      ))
+  end
+
 end

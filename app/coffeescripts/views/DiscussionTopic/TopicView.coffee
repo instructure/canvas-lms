@@ -12,7 +12,6 @@ define [
   'compiled/widget/assignmentRubricDialog'
   'jsx/shared/rce/RceCommandShim'
   'str/htmlEscape'
-  'jquery.instructure_misc_helpers' #scrollSidebar
 ], (I18n, $, Backbone, _, DiscussionTopic, EntriesView, EntryView, PublishButtonView,
     replyTemplate, Reply, assignmentRubricDialog, RceCommandShim, htmlEscape) ->
 
@@ -68,7 +67,6 @@ define [
 
     afterRender: ->
       super
-      $.scrollSidebar() if $(document.body).is('.with-right-side')
       assignmentRubricDialog.initTriggers()
       @$el.toggleClass 'side_comment_discussion', !ENV.DISCUSSION.THREADED
       @subscriptionStatusChanged()

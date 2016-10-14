@@ -26,6 +26,7 @@ class AssignmentsController < ApplicationController
   include Api::V1::ExternalTools
 
   include KalturaHelper
+  include SyllabusHelper
   before_filter :require_context
   add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
   before_filter { |c| c.active_tab = "assignments" }
@@ -124,6 +125,8 @@ class AssignmentsController < ApplicationController
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
       })
 
+      conditional_release_js_env(@assignment, include_rule: true)
+
       @can_view_grades = @context.grants_right?(@current_user, session, :view_all_grades)
       @can_grade = @assignment.grants_right?(@current_user, session, :grade)
       if @can_view_grades || @can_grade
@@ -217,6 +220,7 @@ class AssignmentsController < ApplicationController
     if authorized_action(@assignment, @current_user, :grade)
       cnt = params[:peer_review_count].to_i
       @assignment.peer_review_count = cnt if cnt > 0
+      @assignment.intra_group_peer_reviews = params[:intra_group_peer_reviews].present?
       @assignment.assign_peer_reviews
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url, @assignment.id) }
@@ -294,19 +298,11 @@ class AssignmentsController < ApplicationController
     active_tab = "Syllabus"
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
       return unless tab_enabled?(@context.class::TAB_SYLLABUS)
-      @groups = @context.assignment_groups.active.order(:position, AssignmentGroup.best_unicode_collation_key('name')).to_a
-      @assignment_groups = @groups
-      @events = @context.events_for(@current_user)
-      @undated_events = @events.select {|e| e.start_at == nil}
-      @dates = (@events.select {|e| e.start_at != nil}).map {|e| e.start_at.to_date}.uniq.sort.sort
-      if @context.grants_right?(@current_user, session, :read)
-        @syllabus_body = public_user_content(@context.syllabus_body, @context)
-      else
-        # the requesting user may not have :read if the course syllabus is public, in which
-        # case, we pass nil as the user so verifiers are added to links in the syllabus body
-        # (ability for the user to read the syllabus was checked above as :read_syllabus)
-        @syllabus_body = public_user_content(@context.syllabus_body, @context, nil, true)
-      end
+      @groups = @context.assignment_groups.active.order(
+        :position,
+        AssignmentGroup.best_unicode_collation_key('name')
+      ).to_a
+      @syllabus_body = syllabus_user_content
 
       hash = { :CONTEXT_ACTION_SOURCE => :syllabus }
       append_sis_data(hash)
@@ -364,7 +360,7 @@ class AssignmentsController < ApplicationController
   def new
     @assignment ||= @context.assignments.temp_record
     @assignment.workflow_state = 'unpublished'
-    add_crumb t :create_new_crumb, "Create new"
+    add_crumb t "Create new"
 
     if params[:submission_types] == 'online_quiz'
       redirect_to new_course_quiz_url(@context, index_edit_params)
@@ -440,6 +436,7 @@ class AssignmentsController < ApplicationController
         :VALID_DATE_RANGE => CourseDateRange.new(@context)
       }
 
+      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @assignment.new_record?
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?

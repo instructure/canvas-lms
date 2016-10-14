@@ -465,9 +465,38 @@ describe WikiPage do
     end
   end
 
+  describe "destroy" do
+    before (:once) { course }
+
+    it "should destroy its assignment if enabled" do
+      @course.enable_feature!(:conditional_release)
+      wiki_page_assignment_model course: @course
+      @page.destroy
+      expect(@page.reload).to be_deleted
+      expect(@assignment.reload).to be_deleted
+    end
+
+    it "should not destroy its assignment" do
+      wiki_page_assignment_model course: @course
+      @page.destroy
+      expect(@page.reload).to be_deleted
+      expect(@assignment.reload).not_to be_deleted
+    end
+
+    it "should destroy its content tags" do
+      @page = @course.wiki.wiki_pages.create! title: 'destroy me'
+      @module = @course.context_modules.create!(:name => "module")
+      tag = @module.add_item(type: 'WikiPage', title: 'kill meeee', id: @page.id)
+      @page.destroy
+      expect(@page.reload).to be_deleted
+      expect(tag.reload).to be_deleted
+    end
+  end
+
   describe "restore" do
+    before (:once) { course }
+
     it "should restore to unpublished state" do
-      course
       @page = @course.wiki.wiki_pages.create! title: 'dot dot dot'
       @page.update_attribute(:workflow_state, 'deleted')
       @page.restore
@@ -475,7 +504,6 @@ describe WikiPage do
     end
 
     it "should restore a linked assignment if enabled" do
-      course
       @course.enable_feature!(:conditional_release)
       wiki_page_assignment_model course: @course
       @page.workflow_state = 'deleted'
@@ -487,10 +515,20 @@ describe WikiPage do
     end
 
     it "should not restore a linked assignment" do
-      wiki_page_assignment_model
+      wiki_page_assignment_model course: @course
       @page.workflow_state = 'deleted'
       expect { @page.save! }.not_to change { @assignment.workflow_state }
       expect { @page.restore }.not_to change { @assignment.workflow_state }
+    end
+
+    it "should not restore its content tags" do
+      @page = @course.wiki.wiki_pages.create! title: 'dot dot dot'
+      @module = @course.context_modules.create!(:name => "module")
+      tag = @module.add_item(type: 'WikiPage', title: 'dash dash dash', id: @page.id)
+      @page.update_attribute(:workflow_state, 'deleted')
+      @page.restore
+      expect(@page.reload).to be_unpublished
+      expect(tag.reload).to be_deleted
     end
   end
 

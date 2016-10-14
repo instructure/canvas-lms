@@ -7,7 +7,7 @@ class CustomGradebookColumns < ActiveRecord::Migration
       t.integer :position
       t.string :workflow_state, :default => "active"
       t.integer :course_id, :limit => 8
-      t.timestamps
+      t.timestamps null: true
     end
     add_foreign_key :custom_gradebook_columns, :courses, :dependent => true
 

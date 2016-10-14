@@ -43,7 +43,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   end
 
   validate :user do |record|
-    if record.user && record.context_id && !record.user.student_enrollments.where(:course_id => record.context_id).exists?
+    if record.user && record.context_id && !record.user.student_enrollments.shard(record.shard).where(:course_id => record.context_id).exists?
       record.errors.add :user, "is not in the assignment's course"
     end
   end

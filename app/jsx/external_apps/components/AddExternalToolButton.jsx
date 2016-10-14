@@ -36,7 +36,8 @@ define([
         modalIsOpen: false,
         tool: {},
         isLti2: false,
-        lti2RegistrationUrl: null
+        lti2RegistrationUrl: null,
+        configurationType: '',
       }
     },
 
@@ -66,11 +67,24 @@ define([
       });
     },
 
-    _errorHandler() {
+    _errorHandler(xhr) {
+      const errors = JSON.parse(xhr.responseText).errors;
+      let errorMessage = I18n.t('We were unable to add the app.');
+
+      if (this.state.configurationType !== 'manual') {
+        const errorName = `config_${this.state.configurationType}`;
+        if (errors[errorName]) {
+          errorMessage = errors[errorName][0].message;
+        } else if (errors[Object.keys(errors)[0]][0])  {
+          errorMessage = errors[Object.keys(errors)[0]][0].message;
+        }
+      }
+
       this.throttleCreation = false;
       store.fetch({ force: true });
       this.setState({ tool: {}, isLti2: false, lti2RegistrationUrl: null });
-      $.flashError(I18n.t('We were unable to add the app.'));
+      $.flashError(errorMessage);
+      return errorMessage
     },
 
     handleActivateLti2() {
@@ -91,6 +105,7 @@ define([
           tool: {}
         });
       } else if (!this.throttleCreation) {
+          this.setState({'configurationType': configurationType});
           store.save(configurationType, data, this._successHandler.bind(this), this._errorHandler.bind(this));
           this.throttleCreation = true;
       }

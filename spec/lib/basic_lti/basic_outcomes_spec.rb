@@ -184,12 +184,24 @@ describe BasicLTI::BasicOutcomes do
 
   end
 
+  describe "#handle_request" do
+    it "sets the response body when an invalid sourcedId is given" do
+      xml.css('sourcedId').remove
+      response = BasicLTI::BasicOutcomes::LtiResponse.new(xml)
+      response.handle_request(tool)
+      expect(response.code_major).to eq('failure')
+      expect(response.description).to eq('Invalid sourcedid')
+      expect(response.body).not_to be_nil
+    end
+  end
+
   describe "#handle_replaceResult" do
     it "accepts a grade" do
       xml.css('resultData').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
       expect(request.code_major).to eq 'success'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
       expect(submission.grade).to eq (assignment.points_possible * 0.92).to_s
@@ -202,6 +214,7 @@ describe BasicLTI::BasicOutcomes do
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
       expect(request.code_major).to eq 'failure'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.description).to eq 'Assignment has no points possible.'
     end
 
@@ -213,6 +226,7 @@ describe BasicLTI::BasicOutcomes do
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
       expect(request.code_major).to eq 'failure'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.description).to eq 'Assignment has no points possible.'
     end
 
@@ -221,6 +235,7 @@ describe BasicLTI::BasicOutcomes do
       assignment.save!
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(request.code_major).to eq 'failure'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.description).to eq 'Assignment is no longer associated with this tool'
     end
 
@@ -228,6 +243,7 @@ describe BasicLTI::BasicOutcomes do
       xml.css('resultScore').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(request.code_major).to eq 'success'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
       expect(submission.body).to eq 'text data for canvas submission'
@@ -240,6 +256,7 @@ describe BasicLTI::BasicOutcomes do
       xml.css('resultScore').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(request.code_major).to eq 'failure'
+      expect(request.body).to eq '<replaceResultResponse />'
     end
 
     it 'accepts LTI launch URLs as a data format with a specific submission type' do
@@ -248,10 +265,96 @@ describe BasicLTI::BasicOutcomes do
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
       expect(request.code_major).to eq 'success'
+      expect(request.body).to eq '<replaceResultResponse />'
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
       expect(submission.submission_type).to eq 'basic_lti_launch'
     end
+
+    context "submissions" do
+
+      it "creates a new submissions if there isn't one" do
+        xml.css('resultData').remove
+        expect{BasicLTI::BasicOutcomes.process_request(tool, xml)}.
+          to change{assignment.submissions.where(user_id: @user.id).count}.from(0).to(1)
+      end
+
+      it 'creates a new submission of type "external_tool" when a grade is passed back without a submission' do
+        xml.css('resultData').remove
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(assignment.submissions.where(user_id: @user.id).first.submission_type).to eq 'external_tool'
+      end
+
+      it "doesn't create a new submission if there is only a score sent" do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "text data for canvas submission",
+            grade: "92%"
+          })
+        xml.css('resultData').remove
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.versions.count).to eq 1
+      end
+
+      it "creates a new submission if result_data_text is sent" do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "sample text",
+            grade: "92%"
+          })
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.versions.count).to eq 2
+      end
+
+      it "creates a new submission if result_data_url is sent" do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "sample text",
+            grade: "92%"
+          })
+        xml.css('resultScore').remove
+        xml.at_css('text').replace('<url>http://example.com/launch</url>')
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.versions.count).to eq 2
+      end
+
+      it "creates a new submission if result_data_launch_url is sent" do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "sample text",
+            grade: "92%"
+          })
+        xml.css('resultScore').remove
+        xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.versions.count).to eq 2
+      end
+
+      it "doesn't change the submission type if only the score is sent" do
+        submission_type = 'online_text_entry'
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: submission_type,
+            body: "sample text",
+            grade: "92%"
+          })
+        xml.css('resultData').remove
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.submission_type).to eq submission_type
+      end
+
+    end
+
+
 
   end
 end

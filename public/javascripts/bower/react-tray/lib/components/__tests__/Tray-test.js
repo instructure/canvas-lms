@@ -48,6 +48,12 @@ describe('react-tray', function() {
     }, 0);
   });
 
+  it('should call onOpen when it opens', function() {
+    let calledOpen = false;
+    renderTray({isOpen: true, onOpen: function() { calledOpen = true;}});
+    equal(calledOpen, true);
+  });
+
   it('should close on overlay click', function() {
     renderTray({isOpen: true, onBlur: function() {}, closeTimeoutMS: 0});
     TestUtils.Simulate.click(document.querySelector('.ReactTray__Overlay'));
@@ -78,5 +84,86 @@ describe('react-tray', function() {
     setTimeout(function() {
       equal(document.querySelectorAll('.ReactTray__Content').length, 1);
     }, 0);
+  });
+
+  describe('maintainFocus prop', function() {
+    this.timeout(0);
+    beforeEach(function(done) {
+      const props = {isOpen: true, onBlur: function() {}, closeTimeoutMS: 0, maintainFocus: true};
+      const children = (
+        <div>
+          <a href="#" id="one">One</a>
+          <a href="#" id="two">Two</a>
+          <a href="#" id="three">Three</a>
+        </div>
+      );
+      renderTray(props, children, () => done());
+    });
+
+    it('sends focus to the first item if tabbing away from the last element', function() {
+      const firstItem = document.querySelector('#one');
+      const lastItem = document.querySelector('#three');
+      lastItem.focus();
+      TestUtils.Simulate.keyDown(document.querySelector('.ReactTray__Content'), {keyCode: 9});
+      equal(document.activeElement, firstItem);
+    });
+
+    it('sends focus to the last item if shift + tabbing from the first item', function() {
+      const firstItem = document.querySelector('#one');
+      const lastItem = document.querySelector('#three');
+      firstItem.focus();
+      TestUtils.Simulate.keyDown(document.querySelector('.ReactTray__Content'), {keyCode: 9, shiftKey: true});
+      equal(document.activeElement, lastItem);
+    });
+  });
+
+  describe('getElementToFocus prop', function() {
+    const getElementToFocus = () => {
+      return document.getElementById('two');
+    };
+
+    beforeEach(function(done) {
+      const props = {isOpen: true, onBlur: function() {}, closeTimeoutMS: 0, maintainFocus: true, getElementToFocus: getElementToFocus};
+      const children = (
+        <div>
+          <a href="#" id="one">One</a>
+          <a href="#" id="two">Two</a>
+          <a href="#" id="three">Three</a>
+        </div>
+      );
+      renderTray(props, children, () => done());
+    });
+
+    it('sends focus to the DOM node found via the selector passed in the prop', function() {
+      const secondItem = document.querySelector('#two');
+      equal(document.activeElement, secondItem);
+    });
+  });
+
+  describe('getAriaHideElement prop', function() {
+    const getAriaHideElement = () => {
+      return document.getElementById('main_application_div');
+    };
+
+    beforeEach(function() {
+      const mainDiv = document.createElement('div');
+      mainDiv.id = 'main_application_div';
+      document.body.appendChild(mainDiv);
+    });
+
+    it('adds aria-hidden to the given element when open', function() {
+      renderTray({isOpen: true, getAriaHideElement: getAriaHideElement});
+      const el = document.getElementById('main_application_div');
+      equal(el.getAttribute('aria-hidden'), 'true');
+    });
+
+    it('removes aria-hidden from the given element when closed', function() {
+      renderTray({isOpen: true, onBlur: function() {}, closeTimeoutMS: 0, getAriaHideElement: getAriaHideElement});
+      TestUtils.Simulate.keyDown(document.querySelector('.ReactTray__Content'), {key: 'Esc'});
+      setTimeout(function() {
+        const el = document.getElementById('main_application_div');
+        equal(el.getAttribute('aria-hidden'), null);
+      }, 0);
+    });
   });
 });

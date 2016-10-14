@@ -1,14 +1,24 @@
-<div class="form-dialog-content">
-  <div class="form-horizontal">
-    <label class="checkbox" id="weight-groups" for="apply_assignment_group_weights">
-      {{checkbox "apply_assignment_group_weights"}}
-      {{#t "weight_groups"}}Weight final grade based on assignment groups{{/t}}
-    </label>
+<div class="form-dialog-content ag-weights-content">
+  {{#unless canChangeWeights}}
+  <span class="ag-weights-message alert">{{#t}}Assignment group weights can't be edited because there are
+    assignments in one of the groups whose due dates are closed.{{/t}}</span>
+  {{/unless}}
 
-    <div id="ag_weights_wrapper">
+  <label class="checkbox" id="weight-groups" for="apply_assignment_group_weights">
+    {{#if canChangeWeights}}
+      {{checkbox "apply_assignment_group_weights"}}
+    {{else}}
+      {{checkbox "apply_assignment_group_weights"
+        class="disabled"
+        readonly=true}}
+    {{/if}}
+    {{#t}}Weight final grade based on assignment groups{{/t}}
+  </label>
+
+  <div class="form-horizontal ag-weights-form">
+    <div id="ag_weights_wrapper" class="ag-weights-table">
       <table id="assignment_groups_weights">
         <tbody>
-
         </tbody>
         <tfoot>
           <tr>
@@ -18,19 +28,21 @@
         </tfoot>
       </table>
     </div>
-
   </div>
 </div>
+
 <div class="form-controls">
   <button
     id="cancel-assignment-settings"
-    class="btn dialog_closer"
+    class="btn dialog_closer {{#unless canChangeWeights}}disabled{{/unless}}"
     type="button"
-  >{{#t "cancel"}}Cancel{{/t}}</button>
+    {{#unless canChangeWeights}}aria-disabled=true{{/unless}}
+  >{{#t}}Cancel{{/t}}</button>
   <button
     id="update-assignment-settings"
-    class="btn btn-primary"
-    data-text-while-loading='{{#t "validating"}}Saving...{{/t}}'
+    class="btn btn-primary {{#unless canChangeWeights}}disabled{{/unless}}"
+    data-text-while-loading='{{#t}}Saving...{{/t}}'
     type="submit"
-  >{{#t "save"}}Save{{/t}}</button>
+    {{#unless canChangeWeights}}aria-disabled=true{{/unless}}
+  >{{#t}}Save{{/t}}</button>
 </div>

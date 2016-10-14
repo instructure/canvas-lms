@@ -304,7 +304,7 @@ class Collaboration < ActiveRecord::Base
       users_to_remove = collaborators.where("user_id IS NOT NULL").pluck(:user_id)
       group_ids = collaborators.where("group_id IS NOT NULL").pluck(:group_id)
       if !group_ids.empty?
-        users_to_remove += GroupMembership.where(group_id: group_ids).select(:user_id).uniq.map(&:user_id)
+        users_to_remove += GroupMembership.where(group_id: group_ids).distinct.pluck(:user_id)
         users_to_remove.uniq!
       end
       # make real user objects, instead of just ids, cause that's what this code expects
@@ -354,7 +354,7 @@ class Collaboration < ActiveRecord::Base
   # Returns nothing.
   def add_groups_to_collaborators(group_ids)
     if group_ids.length > 0
-      existing_groups = collaborators.where(:group_id => group_ids).select(:group_id).uniq.map(&:group_id)
+      existing_groups = collaborators.where(:group_id => group_ids).distinct.pluck(:group_id)
       (group_ids - existing_groups).each do |g|
         collaborator = collaborators.build
         collaborator.group_id = g

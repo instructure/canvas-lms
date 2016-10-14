@@ -151,14 +151,13 @@ describe "discussions" do
           expect(get_value("#assignment_group_category_id")).to eq topic.group_category.id.to_s
         end
 
-        it "should revert to [ New Group Category ] if original group is deleted with no submissions", priority: "1", test_id: 270921 do
+        it "should prompt for creating a new group category if original group is deleted with no submissions", priority: "1", test_id: 270921 do
           topic.group_category = @gc
           topic.save!
           @gc.destroy
           get url
           wait_for_ajaximations
-
-          expect(f("#assignment_group_category_id option[selected]")).to include_text "New Group Category"
+          expect(f("#assignment_group_category_id")).not_to be_displayed
         end
 
         context "graded" do

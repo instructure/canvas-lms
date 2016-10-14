@@ -18,7 +18,7 @@ See Forms section.
 @mixin super-toggle-designer (
   $toggle-width: $ic-sp*5,
   $toggle-color-switch: $ic-color-light,
-  $toggle-background-OFF: lighten($ic-color-dark, 15%),
+  $toggle-background-OFF: $ic-color-medium-darker,
   $toggle-background-ON: $ic-color-success,
   $toggle-color-left-unchecked: $ic-color-light,
   $toggle-color-left-checked: $ic-color-light,

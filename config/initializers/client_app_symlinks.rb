@@ -41,7 +41,11 @@ def maintain_client_app_symlinks
     if file.directory?
       file.rmtree unless valid_dirs.include?(file)
     else
-      File.unlink(file) unless valid_files.include?(file)
+      unless valid_files.include?(file)
+        # we might have already removed this file in an rmtree above,
+        # so we need to check if it exists still before trying to unlink it
+        File.unlink(file) if File.exist?(file)
+      end
     end
   end
 

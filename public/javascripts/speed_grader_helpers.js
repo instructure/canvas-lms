@@ -22,6 +22,22 @@ define([
 ], function($, _) {
   var speedgraderHelpers = {
 
+    buildIframe: function(src, options){
+      options = options || {};
+      var parts = ['<iframe'];
+      parts.push(' id="speedgrader_iframe"');
+      parts.push(' src="' + src + '"');
+      Object.keys(options).forEach(function(key){
+        var value = options[key];
+        if (key === 'className') {
+          key = 'class';
+        }
+        parts.push(' ' + key + '="' + value + '"');
+      });
+      parts.push('></iframe>');
+      return parts.join('');
+    },
+
     determineGradeToSubmit: function(use_existing_score, student, grade){
       if (use_existing_score) {
         return student.submission["score"].toString();

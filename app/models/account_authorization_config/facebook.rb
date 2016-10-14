@@ -18,6 +18,7 @@
 
 class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
   include AccountAuthorizationConfig::PluginSettings
+
   self.plugin = :facebook
   plugin_settings :app_id, app_secret: :app_secret_dec
 
@@ -46,18 +47,41 @@ class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
   end
   validates :login_attribute, inclusion: login_attributes
 
+  def self.recognized_federated_attributes
+    [
+      'email'.freeze,
+      'first_name'.freeze,
+      'id'.freeze,
+      'last_name'.freeze,
+      'locale'.freeze,
+      'name'.freeze,
+    ].freeze
+  end
+
   def login_attribute
     super || 'id'.freeze
   end
 
   def unique_id(token)
-    token.get('me'.freeze).parsed[login_attribute]
+    me(token)[login_attribute]
+  end
+
+  def provider_attributes(token)
+    me(token)
   end
 
   protected
 
+  def me(token)
+    # abusing AccessToken#options as a useful place to cache this response
+    token.options[:me] ||= begin
+      attributes = ([login_attribute] + federated_attributes.values.map { |v| v['attribute'] }).uniq
+      token.get("me?fields=#{attributes.join(',')}").parsed
+    end
+  end
+
   def authorize_options
-    if login_attribute == 'email'.freeze
+    if login_attribute == 'email' || federated_attributes.any? { |(_k, v)| v['attribute'] == 'email' }
       { scope: 'email'.freeze }.freeze
     else
       {}.freeze

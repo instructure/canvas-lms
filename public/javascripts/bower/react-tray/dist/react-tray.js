@@ -1,12 +1,12 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("react"), require("ReactDOM"));
+		module.exports = factory(require("react"), require("react-dom"));
 	else if(typeof define === 'function' && define.amd)
-		define(["react", "ReactDOM"], factory);
+		define(["react", "react-dom"], factory);
 	else if(typeof exports === 'object')
-		exports["ReactTray"] = factory(require("react"), require("ReactDOM"));
+		exports["ReactTray"] = factory(require("react"), require("react-dom"));
 	else
-		root["ReactTray"] = factory(root["React"], root["ReactDOM"]);
+		root["ReactTray"] = factory(root["react"], root["react-dom"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -82,6 +82,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _TrayPortal2 = _interopRequireDefault(_TrayPortal);
 
+	var _helpersCustomPropTypes = __webpack_require__(9);
+
 	var renderSubtreeIntoContainer = _reactDom2['default'].unstable_renderSubtreeIntoContainer;
 
 	exports['default'] = _react2['default'].createClass({
@@ -90,15 +92,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  propTypes: {
 	    isOpen: _react2['default'].PropTypes.bool,
 	    onBlur: _react2['default'].PropTypes.func,
+	    onOpen: _react2['default'].PropTypes.func,
 	    closeTimeoutMS: _react2['default'].PropTypes.number,
-	    closeOnBlur: _react2['default'].PropTypes.bool
+	    closeOnBlur: _react2['default'].PropTypes.bool,
+	    maintainFocus: _react2['default'].PropTypes.bool,
+	    getElementToFocus: _helpersCustomPropTypes.a11yFunction,
+	    getAriaHideElement: _helpersCustomPropTypes.a11yFunction
 	  },
 
 	  getDefaultProps: function getDefaultProps() {
 	    return {
 	      isOpen: false,
 	      closeTimeoutMS: 0,
-	      closeOnBlur: true
+	      closeOnBlur: true,
+	      maintainFocus: true
 	    };
 	  },
 
@@ -170,6 +177,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _helpersIsLeavingNode2 = _interopRequireDefault(_helpersIsLeavingNode);
 
+	var _helpersTabbable = __webpack_require__(8);
+
+	var _helpersTabbable2 = _interopRequireDefault(_helpersTabbable);
+
 	var styles = {
 	  overlay: {
 	    position: 'fixed',
@@ -220,9 +231,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    overlayClassName: _react.PropTypes.string,
 	    isOpen: _react.PropTypes.bool,
 	    onBlur: _react.PropTypes.func,
+	    onOpen: _react.PropTypes.func,
 	    closeOnBlur: _react.PropTypes.bool,
 	    closeTimeoutMS: _react.PropTypes.number,
-	    children: _react.PropTypes.any
+	    children: _react.PropTypes.any,
+	    maintainFocus: _react.PropTypes.bool,
+	    getElementToFocus: _react.PropTypes.func,
+	    getAriaHideElement: _react.PropTypes.func
 	  },
 
 	  getInitialState: function getInitialState() {
@@ -250,7 +265,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  componentDidUpdate: function componentDidUpdate() {
 	    if (this.focusAfterRender) {
-	      this.focusContent();
+	      if (this.props.getElementToFocus) {
+	        this.props.getElementToFocus().focus();
+	      } else {
+	        this.focusContent();
+	      }
 	      this.setFocusAfterRender(false);
 	    }
 	  },
@@ -261,6 +280,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  focusContent: function focusContent() {
 	    this.refs.content.focus();
+	  },
+
+	  toggleAriaHidden: function toggleAriaHidden(element) {
+	    if (!element.getAttribute('aria-hidden')) {
+	      element.setAttribute('aria-hidden', true);
+	    } else {
+	      element.removeAttribute('aria-hidden');
+	    }
 	  },
 
 	  handleOverlayClick: function handleOverlayClick(e) {
@@ -275,6 +302,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.props.onBlur();
 	    }
 
+	    // Keep focus inside the tray if maintainFocus is true
+	    if (e.keyCode === 9 && this.props.maintainFocus && (0, _helpersIsLeavingNode2['default'])(this.refs.content, e)) {
+	      e.preventDefault();
+	      var tabbable = (0, _helpersTabbable2['default'])(this.refs.content);
+	      var target = tabbable[e.shiftKey ? tabbable.length - 1 : 0];
+	      target.focus();
+	      return;
+	    }
+
 	    // Treat tabbing away from content as blur/close if closeOnBlur
 	    if (e.keyCode === 9 && this.props.closeOnBlur && (0, _helpersIsLeavingNode2['default'])(this.refs.content, e)) {
 	      e.preventDefault();
@@ -287,6 +323,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    _helpersFocusManager2['default'].markForFocusLater();
 	    this.setState({ isOpen: true }, function () {
+	      if (_this.props.onOpen) {
+	        _this.props.onOpen();
+	      }
+	      if (_this.props.getAriaHideElement) {
+	        _this.toggleAriaHidden(_this.props.getAriaHideElement());
+	      }
 	      _this.setState({ afterOpen: true });
 	    });
 	  },
@@ -296,6 +338,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.closeWithTimeout();
 	    } else {
 	      this.closeWithoutTimeout();
+	    }
+	    if (this.props.getAriaHideElement) {
+	      this.toggleAriaHidden(this.props.getAriaHideElement());
 	    }
 	  },
 
@@ -362,8 +407,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2015 Jed Watson.
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
 	  Licensed under the MIT License (MIT), see
 	  http://jedwatson.github.io/classnames
 	*/
@@ -375,7 +420,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		var hasOwn = {}.hasOwnProperty;
 
 		function classNames () {
-			var classes = '';
+			var classes = [];
 
 			for (var i = 0; i < arguments.length; i++) {
 				var arg = arguments[i];
@@ -384,28 +429,28 @@ return /******/ (function(modules) { // webpackBootstrap
 				var argType = typeof arg;
 
 				if (argType === 'string' || argType === 'number') {
-					classes += ' ' + arg;
+					classes.push(arg);
 				} else if (Array.isArray(arg)) {
-					classes += ' ' + classNames.apply(null, arg);
+					classes.push(classNames.apply(null, arg));
 				} else if (argType === 'object') {
 					for (var key in arg) {
 						if (hasOwn.call(arg, key) && arg[key]) {
-							classes += ' ' + key;
+							classes.push(key);
 						}
 					}
 				}
 			}
 
-			return classes.substr(1);
+			return classes.join(' ');
 		}
 
 		if (typeof module !== 'undefined' && module.exports) {
 			module.exports = classNames;
 		} else if (true) {
 			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
 				return classNames;
-			}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 		} else {
 			window.classNames = classNames;
 		}
@@ -515,6 +560,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports['default'] = findTabbableDescendants;
 	module.exports = exports['default'];
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	// Adapted from https://github.com/react-bootstrap/react-prop-types/blob/master/src/isRequiredForA11y.js
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.a11yFunction = a11yFunction;
+
+	function a11yFunction(props, propName, componentName) {
+	  if (!props[propName] || typeof props[propName] !== 'function') {
+	    return new Error('The prop \'' + propName + '\' is required to make \'' + componentName + '\' fully accessible. ' + 'This will greatly improve the experience for users of assistive technologies. ' + 'You should provide a function that returns a DOM node.');
+	  }
+	}
 
 /***/ }
 /******/ ])

@@ -82,7 +82,8 @@ class AssignmentGroupsApiController < ApplicationController
   def create
     @assignment_group = @context.assignment_groups.temp_record
     if authorized_action(@assignment_group, @current_user, :create)
-      process_assignment_group
+      updated = update_assignment_group(@assignment_group, params)
+      process_assignment_group(updated)
     end
   end
 
@@ -94,7 +95,11 @@ class AssignmentGroupsApiController < ApplicationController
   # @returns AssignmentGroup
   def update
     if authorized_action(@assignment_group, @current_user, :update)
-      process_assignment_group
+      updated = update_assignment_group(@assignment_group, params)
+      unless current_user_is_course_admin? || can_update_assignment_group?(@assignment_group)
+        return render_unauthorized_action
+      end
+      process_assignment_group(updated)
     end
   end
 
@@ -134,12 +139,21 @@ class AssignmentGroupsApiController < ApplicationController
     @assignment_group = @context.assignment_groups.active.find(params[:assignment_group_id])
   end
 
-  def process_assignment_group
-    if update_assignment_group @assignment_group, params
+  def process_assignment_group(updated)
+    if updated && @assignment_group.save
       render :json => assignment_group_json(@assignment_group, @current_user, session, [], { stringify_json_ids: stringify_json_ids? })
     else
       render :json => @assignment_group.errors, :status => :bad_request
     end
   end
 
+  def current_user_is_course_admin?
+    @current_user.admin_of_root_account?(@context.root_account)
+  end
+
+  def can_update_assignment_group?(assignment_group)
+    return true unless assignment_group.group_weight_changed? || assignment_group.rules_changed?
+    return true unless @context.feature_enabled?(:multiple_grading_periods)
+    !assignment_group.has_assignment_due_in_closed_grading_period?
+  end
 end

@@ -86,8 +86,12 @@
   </div>
 <% end -%>
 
-<div id="assignments_outside_current_periods" class="hidden">
-  <h4><%= t('headers.past_grading_periods_prevent_editing', "The following assignments cannot be edited because they are not in a current grading period:") %></h4>
+<div id="prevented-new-assignment-in-closed-period" style="display:none;">
+  <h4><%= t("Some assignments could not be created because they would fall in a closed grading period.") %></h4>
+</div>
+
+<div id="prevented-grading-ungradeable-submission" style="display:none;">
+  <h4><%= t("Some submissions are not gradeable; grade changes for those submissions have been ignored.") %></h4>
 </div>
 
 <style>

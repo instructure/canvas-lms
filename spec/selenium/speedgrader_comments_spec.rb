@@ -145,6 +145,7 @@ describe "speed grader" do
 
       # add teacher comment
       f('#add_a_comment > textarea').send_keys('grader comment')
+      scroll_into_view("#comment_submit_button")
       submit_form('#add_a_comment')
       expect(ff('#comments > .comment')).to have_size(2)
 
@@ -191,11 +192,12 @@ describe "speed grader" do
 
       it 'decreases the number of published comments' do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-        delete_links = ff('#comments .comment > a.delete_comment_link').select(&:displayed?)
+        delete_links = ff('#comments .comment .comment_flex > a.delete_comment_link').select(&:displayed?)
 
         expect {
           delete_links[0].click
           accept_alert
+          wait_for_ajaximations
         }.to change {
           SubmissionComment.published.count
         }.by(-1)
@@ -203,7 +205,7 @@ describe "speed grader" do
 
       it 'removes the deleted comment from the list of comments' do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-        delete_links = ff('#comments .comment > a.delete_comment_link').select(&:displayed?)
+        delete_links = ff('#comments .comment .comment_flex > a.delete_comment_link').select(&:displayed?)
 
         delete_links[0].click
         accept_alert
@@ -211,7 +213,7 @@ describe "speed grader" do
 
         f('#next-student-button').click
         f('#prev-student-button').click
-        expect(ffj('#comments .comment > a.delete_comment_link:visible')).to have_size(1)
+        expect(ffj('#comments .comment .comment_flex > a.delete_comment_link:visible')).to have_size(1)
       end
     end
   end
@@ -292,7 +294,7 @@ describe "speed grader" do
     describe 'draft comment display' do
       it 'has an asterisk prepended to the comment', test_id: 1407011, priority: "1" do
         draft_comment_count = ff('#comments .comment.draft').size
-        draft_comment_marker_count = ff('#comments .comment.draft > .draft-marker').size
+        draft_comment_marker_count = ff('#comments .comment.draft .comment_flex > .draft-marker').size
 
         expect(draft_comment_marker_count).to eq(draft_comment_count)
       end
@@ -317,8 +319,12 @@ describe "speed grader" do
     end
 
     describe 'publishing a draft comment' do
+      before(:each) do
+        @comment_textarea.clear
+      end
+
       it 'should increase the number of published comments', test_id: 1407013, priority: "1" do
-        publish_links = ff('#comments .comment.draft > button.submit_comment_button').select(&:displayed?)
+        publish_links = ff('#comments .comment.draft .comment_flex > button.submit_comment_button').select(&:displayed?)
 
         expect {
           publish_links[0].click
@@ -328,6 +334,23 @@ describe "speed grader" do
           SubmissionComment.published.count
         }.by(1)
       end
+
+      it 'replaces the draft comment in the list of comments with a published comment' do
+        publish_links = ff('#comments .comment.draft .comment_flex > button.submit_comment_button').select(&:displayed?)
+        comment_count = ff('#comments .comment').size
+        draft_comment_count = ff('#comments .comment.draft').size
+
+        publish_links[0].click
+        accept_alert
+        wait_for_ajaximations
+
+        f('#next-student-button').click
+        f('#prev-student-button').click
+
+
+        expect(ff('#comments .comment')).to have_size(comment_count)
+        expect(ff('#comments .comment.draft')).to have_size(draft_comment_count - 1)
+      end
     end
 
     describe 'deleting a draft comment' do
@@ -336,7 +359,7 @@ describe "speed grader" do
       end
 
       it 'decreases the number of draft comments' do
-        delete_links = ff('#comments .comment.draft > a.delete_comment_link').select(&:displayed?)
+        delete_links = ff('#comments .comment.draft .comment_flex > a.delete_comment_link').select(&:displayed?)
 
         expect {
           delete_links[0].click
@@ -348,7 +371,7 @@ describe "speed grader" do
       end
 
       it 'removes the deleted comment from the list of comments' do
-        delete_links = ff('#comments .comment.draft > a.delete_comment_link').select(&:displayed?)
+        delete_links = ff('#comments .comment.draft .comment_flex > a.delete_comment_link').select(&:displayed?)
 
         delete_links[0].click
         accept_alert
@@ -356,7 +379,7 @@ describe "speed grader" do
 
         f('#next-student-button').click
         f('#prev-student-button').click
-        expect(ffj('#comments .comment > a.delete_comment_link:visible')).to have_size(1)
+        expect(ffj('#comments .comment .comment_flex > a.delete_comment_link:visible')).to have_size(1)
       end
     end
   end

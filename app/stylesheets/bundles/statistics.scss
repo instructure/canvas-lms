@@ -1,3 +1,5 @@
+@import 'base/environment';
+
 ul.item_list {
   list-style-type: none;
   padding: 0;
@@ -11,7 +13,7 @@ ul.item_list {
     }
     div.sub_header {
       font-size: 0.8em;
-      color: #888;
+      color: $ic-font-color--subdued;
       margin-top: -5px;
       margin-bottom: 0.5em;
       margin-left: 5px;

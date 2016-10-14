@@ -56,6 +56,7 @@ ConditionalRelease) ->
     ASSIGNMENT_POINTS_CHANGE_WARN = '#point_change_warning'
 
     PEER_REVIEWS_BOX = '#assignment_peer_reviews'
+    INTRA_GROUP_PEER_REVIEWS = '#intra_group_peer_reviews_toggle'
     GROUP_CATEGORY_BOX = '#has_group_category'
     MODERATED_GRADING_BOX = '#assignment_moderated_grading'
     CONDITIONAL_RELEASE_TARGET = '#conditional_release_target'
@@ -103,6 +104,7 @@ ConditionalRelease) ->
       events["change #{PEER_REVIEWS_BOX}"] = 'handleModeratedGradingChange'
       events["change #{GROUP_CATEGORY_BOX}"] = 'handleModeratedGradingChange'
       events["change #{MODERATED_GRADING_BOX}"] = 'handleModeratedGradingChange'
+      events["change #{GROUP_CATEGORY_BOX}"] = 'handleGroupCategoryChange'
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         events["change"] = 'onChange'
       events
@@ -157,6 +159,10 @@ ConditionalRelease) ->
         box.removeProp("disabled").parent().timeoutTooltip().timeoutTooltip('disable').removeAttr('data-tooltip').removeAttr('title')
         @setImplicitCheckboxValue(box, '0')
         @checkboxAccessibleAdvisory(box).text('')
+
+    handleGroupCategoryChange: ->
+      isGrouped = @$groupCategoryBox.prop('checked')
+      @$intraGroupPeerReviews.toggleAccessibly(isGrouped)
 
     handleModeratedGradingChange: =>
       if !ENV?.HAS_GRADED_SUBMISSIONS
@@ -237,6 +243,7 @@ ConditionalRelease) ->
     afterRender: =>
       # have to do these here because they're rendered by other things
       @$peerReviewsBox = $("#{PEER_REVIEWS_BOX}")
+      @$intraGroupPeerReviews = $("#{INTRA_GROUP_PEER_REVIEWS}")
       @$groupCategoryBox = $("#{GROUP_CATEGORY_BOX}")
 
       @_attachEditorToDescription()
@@ -260,11 +267,9 @@ ConditionalRelease) ->
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
         conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false
 
-    # separated out so we can easily stub it
-    scrollSidebar: $.scrollSidebar
 
     _attachEditorToDescription: =>
-      RichContentEditor.initSidebar(show: @scrollSidebar)
+      RichContentEditor.initSidebar()
       RichContentEditor.loadNewEditor(@$description, { focus: true, manageParent: true })
 
       $('.rte_switch_views_link').click (e) =>
@@ -381,6 +386,9 @@ ConditionalRelease) ->
       delete errors.assignmentOverrides
       super(errors)
       @trigger 'show-errors', errors
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+        if errors['conditional_release']
+          @conditionalReleaseEditor.focusOnError()
 
     validateBeforeSave: (data, errors) =>
       errors = @_validateTitle data, errors
@@ -455,11 +463,11 @@ ConditionalRelease) ->
       errors
 
     onChange: ->
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !@assignmentDirty
-        @assignmentDirty = true
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && @assignmentUpToDate
+        @assignmentUpToDate = false
 
     updateConditionalRelease: ->
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && @assignmentDirty
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !@assignmentUpToDate
         assignmentData = @getFormData()
         @conditionalReleaseEditor.updateAssignment(assignmentData)
-        @assignmentDirty = false
+        @assignmentUpToDate = true

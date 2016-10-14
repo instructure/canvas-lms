@@ -77,57 +77,68 @@ $sg-Header-height: 85px;
   padding: 145px 0 0 0;
   flex: 1 170px;
   margin: 5px;
+  border: 1px solid $ic-color-medium-light;
+  border-radius: 3px;
 }
 .Colorguide-var {
   display: block;
   background: $ic-color-light;
+  border-top: 1px solid $ic-color-medium-light;
   padding: 10px;
 }
 
-@mixin colorguide ($bg-color) {
-  background: $bg-color;
-  border: 1px solid darken($bg-color, 10%);
-}
-.Colorguide-color--primary    {@include colorguide($ic-brand-primary);}
-.Colorguide-color--success    {@include colorguide($ic-color-success);}
-.Colorguide-color--neutral    {@include colorguide($ic-color-neutral);}
-.Colorguide-color--action     {@include colorguide($ic-color-action);}
-.Colorguide-color--danger     {@include colorguide($ic-color-danger);}
-.Colorguide-color--alert      {@include colorguide($ic-color-alert);}
-.Colorguide-color--light      {@include colorguide($ic-color-light);}
-.Colorguide-color--dark       {@include colorguide($ic-color-dark);}
+.Colorguide-color--primary        {background: $ic-brand-primary;}
+.Colorguide-color--success        {background: $ic-color-success;}
+.Colorguide-color--action         {background: $ic-color-action;}
+.Colorguide-color--danger         {background: $ic-color-danger;}
+.Colorguide-color--alert          {background: $ic-color-alert;}
+.Colorguide-color--dark           {background: $ic-color-dark;}
+.Colorguide-color--medium-darker  {background: $ic-color-medium-darker;}
+.Colorguide-color--medium         {background: $ic-color-medium;}
+.Colorguide-color--medium-light   {background: $ic-color-medium-light;}
+.Colorguide-color--light          {background: $ic-color-light;}
 
-.Colorguide-container--hc-theme {
-  .Colorguide-color--primary    {@include colorguide(#0073ac);}
-  .Colorguide-color--success    {@include colorguide(#008a14);}
-  .Colorguide-color--neutral    {@include colorguide(hsl(0,0,90%));}
-  .Colorguide-color--action     {@include colorguide(#a23891);}
-  .Colorguide-color--danger     {@include colorguide(#a03536);}
-  .Colorguide-color--alert      {@include colorguide(#9e6b05);}
-  .Colorguide-color--light      {@include colorguide(#ffffff);}
-  .Colorguide-color--dark       {@include colorguide(#333333);}
-}
 
 .sg-bg-color-example {
   background: $ic-bg-light-primary;
   @include fontSize($ic-font-size--small);
-  color: $ic-brand-primary;
   padding: $ic-sp;
+  color: $ic-bg-light-primary-text;
+
+  @if $use_high_contrast {
+    border: 1px solid $ic-bg-light-primary-text;
+  }
+
   &--neutral {
-    color: $ic-color-dark;
     background: $ic-bg-light-neutral;
+    color: $ic-bg-light-neutral-text;
+
+    @if $use_high_contrast {
+      border: 1px solid $ic-bg-light-neutral-text;
+    }
   }
   &--success {
-    color: $ic-color-success;
     background: $ic-bg-light-success;
+    color: $ic-bg-light-success-text;
+
+    @if $use_high_contrast {
+      border: 1px solid $ic-bg-light-success-text;
+    }
   }
   &--alert {
-    color: $ic-color-alert;
     background: $ic-bg-light-alert;
+    color: $ic-bg-light-alert-text;
+    
+    @if $use_high_contrast {
+      border: 1px solid $ic-bg-light-alert-text;
+    }
   }
   &--danger {
-    color: $ic-color-danger;
     background: $ic-bg-light-danger;
+    color: $ic-bg-light-danger-text;
+
+    @if $use_high_contrast {
+      border: 1px solid $ic-bg-light-danger-text;
+    }
   }
 }
-

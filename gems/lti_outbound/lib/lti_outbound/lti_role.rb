@@ -18,7 +18,7 @@ module LtiOutbound
       CONTENT_DEVELOPER = 'urn:lti:role:ims/lis/ContentDeveloper'
       INSTRUCTOR = 'urn:lti:role:ims/lis/Instructor'
       LEARNER = 'urn:lti:role:ims/lis/Learner'
-      OBSERVER = 'urn:lti:role:ims/lis/Learner/NonCreditLearner'
+      OBSERVER = 'urn:lti:role:ims/lis/Learner/NonCreditLearner,urn:lti:role:ims/lis/Mentor'
       TEACHING_ASSISTANT = 'urn:lti:role:ims/lis/TeachingAssistant'
     end
 
@@ -27,7 +27,7 @@ module LtiOutbound
       CONTENT_DEVELOPER = 'ContentDeveloper'
       INSTRUCTOR = 'Instructor'
       LEARNER = 'Learner'
-      OBSERVER = 'urn:lti:instrole:ims/lis/Observer' # actually inst role, but left for backwards compatibility
+      OBSERVER = 'urn:lti:instrole:ims/lis/Observer,urn:lti:role:ims/lis/Mentor' # actually inst role, but left for backwards compatibility
       TEACHING_ASSISTANT = 'urn:lti:role:ims/lis/TeachingAssistant'
     end
   end

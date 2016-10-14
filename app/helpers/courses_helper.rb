@@ -26,6 +26,7 @@ module CoursesHelper
     student_only = opts[:student_only]
     show_assignment_type_icon = opts[:show_assignment_type_icon]
 
+    return [nil, "Quiz", 'icon-quiz'] if recent_event.is_a?(Quizzes::Quiz)
     return [nil, "Event", "icon-calendar-day"] unless recent_event.is_a?(Assignment)
 
     event_type = ['Assignment', 'icon-assignment']

@@ -49,7 +49,7 @@ define([], function(){
       theme: "modern",
       skin: "light",
       skin_url: "/vendor/tinymce_themes/light",
-      plugins: "autolink,media,paste,table,textcolor,link,directionality",
+      plugins: "autolink,media,paste,table,textcolor,link,directionality,lists",
       external_plugins: {
         "instructure_image": "/javascripts/tinymce_plugins/instructure_image/plugin.js",
         "instructure_links": "/javascripts/tinymce_plugins/instructure_links/plugin.js",
@@ -60,7 +60,7 @@ define([], function(){
         "instructure_record": "/javascripts/tinymce_plugins/instructure_record/plugin.js"
       },
       language_load: false,
-      relative_urls: false,
+      convert_urls: false,
       // we add the menubar for a11y purposes but then
       // hide it with js for non screenreader users
       menubar: true,

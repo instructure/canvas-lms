@@ -1,11 +1,13 @@
 define([
   'react',
+  'react-dom',
   'underscore',
   'jquery',
+  'instructure-ui/Button',
   'i18n!grading_periods',
   'jsx/grading/EnrollmentTermInput',
   'compiled/jquery.rails_flash_notifications'
-], function(React, _, $, I18n, EnrollmentTermInput) {
+], function(React, ReactDOM, _, $, { default: Button }, I18n, EnrollmentTermInput) {
   const { array, bool, func, shape, string } = React.PropTypes;
 
   const buildSet = function(attr = {}) {
@@ -47,7 +49,7 @@ define([
     },
 
     componentDidMount() {
-      React.findDOMNode(this.refs.title).focus();
+      ReactDOM.findDOMNode(this.refs.title).focus();
     },
 
     changeTitle(e) {
@@ -84,24 +86,21 @@ define([
     },
 
     renderSaveAndCancelButtons: function() {
-      let disabled = !!this.props.disabled;
       return (
         <div className="ic-Form-actions below-line">
-          <button aria-disabled = {disabled}
-                  className     = {disabled ? "Button disabled" : "Button"}
-                  type          = "button"
+          <Button disabled      = {this.props.disabled}
                   onClick       = {this.triggerCancel}
                   ref           = "cancelButton">
             {I18n.t("Cancel")}
-          </button>
-          <button aria-disabled = {disabled}
+          </Button>
+          &nbsp;
+          <Button variant       = "primary"
+                  disabled      = {this.props.disabled}
                   aria-label    = {I18n.t("Save Grading Period Set")}
-                  className     = {"Button Button--primary" + (disabled ? " disabled" : "")}
-                  type          = "submit"
                   onClick       = {this.triggerSave}
                   ref           = "saveButton">
             {I18n.t("Save")}
-          </button>
+          </Button>
         </div>
       );
     },

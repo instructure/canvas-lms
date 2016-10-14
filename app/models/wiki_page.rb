@@ -27,7 +27,7 @@ class WikiPage < ActiveRecord::Base
   attr_accessor :saved_by
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :wiki_id
-  include Workflow
+  include Canvas::SoftDeletable
   include HasContentTags
   include CopyAuthorizedLinks
   include ContextModuleItem
@@ -172,7 +172,6 @@ class WikiPage < ActiveRecord::Base
     state :post_delayed do
       event :delayed_post, :transitions_to => :active
     end
-    state :deleted
   end
   alias_method :published?, :active?
 
@@ -199,8 +198,6 @@ class WikiPage < ActiveRecord::Base
   def version_history
     self.versions.map(&:model)
   end
-
-  scope :active, -> { where(:workflow_state => 'active') }
 
   scope :deleted_last, -> { order("workflow_state='deleted'") }
 

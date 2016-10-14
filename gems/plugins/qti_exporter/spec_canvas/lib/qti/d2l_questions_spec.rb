@@ -124,6 +124,8 @@ module D2LExpected
                    "<p>Is this <strong>true</strong> or false?</p><img src=\"quizzing/bunny_consumer.png\" alt=\"\">",
            :question_name=>"true false questions",
            :migration_id=>"QUES_968903_1181388",
+            :neutral_comments => "False is not correct",
+            :neutral_comments_html => "False is <strong>not</strong> correct",
            :correct_comments=>""}
 
   ASSESSMENT = {:migration_id=>"res_quiz_90521",
@@ -184,6 +186,7 @@ module D2LExpected
                   :correct_comments=>""}
 
   MULTI_SELECT = {:correct_comments=>"",
+                  :neutral_comments => "a",
                   :question_type=>"multiple_answers_question",
                   :incorrect_comments=>"",
                   :question_bank_id=>"SECT_3981973",
@@ -249,11 +252,13 @@ module D2LExpected
               :question_type=>"Error"}
 
   MATH = {:answers=>[],
+          :answer_tolerance => "2",
+          :formula_decimal_places => 2,
           :question_type=>"calculated_question",
-          :formulas=>[],
+          :formulas=>[{:formula => "2 * x   y - z"}],
           :question_bank_id=>"SECT_3981973",
           :incorrect_comments=>"",
-          :imported_formula=>"2 * {x}   {y} - {z}",
+          :imported_formula=>"2 * x   y - z",
           :points_possible=>3.0,
           :question_bank_name=>"02gilback",
           :question_text=>"<p>Solve the formula:</p>",
@@ -273,7 +278,8 @@ module D2LExpected
          :correct_comments=>"",
          :question_type=>"fill_in_multiple_blanks_question",
          :question_bank_id=>"SECT_3981973",
-         :incorrect_comments=>"",
+          :neutral_comments => "No feedback for you.",
+          :incorrect_comments=>"",
          :points_possible=>1,
          :question_bank_name=>"02gilback",
          :question_text=> "This a weird way to do [QUES_979782_1194494_A4749142] in the blank [QUES_979782_1194494_A4749144] ",

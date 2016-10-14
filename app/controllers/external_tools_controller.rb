@@ -375,7 +375,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def find_tool(id, selection_type)
-    if selection_type.nil? || ContextExternalTool::EXTENSION_TYPES.include?(selection_type.to_sym)
+    if selection_type.nil? || Lti::ResourcePlacement::PLACEMENTS.include?(selection_type.to_sym)
       @tool = ContextExternalTool.find_for(id, @context, selection_type, false)
     end
 
@@ -756,6 +756,52 @@ class ExternalToolsController < ApplicationController
     end
   end
 
+  # Add an external tool and verify the provided
+  # configuration url matches the associated
+  # configuration url listed on the app
+  # center. Besides the argument listed, all arguments
+  # are identical to the "Create an external tool"
+  # endpoint.
+  #
+  # @argument app_center_id [Required, String]
+  #   ID of the external tool in the app center
+  #
+  # @argument config_settings [String]
+  #   Stringified object of key/value pairs to be used
+  #   as query string parameters on the XML configuration
+  #   URL.
+  def create_tool_with_verification
+    if authorized_action(@context, @current_user, :update)
+      app_api = AppCenter::AppApi.new
+
+      required_params = [
+        :consumer_key,
+        :shared_secret,
+        :name,
+        :app_center_id,
+        :context_id,
+        :context_type,
+        :config_settings
+      ]
+
+      external_tool_params = params.select{|k, _| required_params.include?(k.to_sym)}
+
+      external_tool_params[:config_url] = app_api.get_app_config_url(params[:app_center_id], params[:config_settings])
+      external_tool_params[:config_type] = 'by_url'
+
+      @tool = @context.context_external_tools.new
+      set_tool_attributes(@tool, external_tool_params)
+      respond_to do |format|
+        if @tool.save
+          invalidate_nav_tabs_cache(@tool)
+          format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
+        else
+          format.json { render :json => @tool.errors, :status => :bad_request }
+        end
+      end
+    end
+  end
+
   # @API Edit an external tool
   # Update the specified external tool. Uses same parameters as create
   #
@@ -833,7 +879,7 @@ class ExternalToolsController < ApplicationController
   private
 
   def set_tool_attributes(tool, params)
-    attrs = ContextExternalTool::EXTENSION_TYPES
+    attrs = Lti::ResourcePlacement::PLACEMENTS
     attrs += [:name, :description, :url, :icon_url, :canvas_icon_class, :domain, :privacy_level, :consumer_key, :shared_secret,
               :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id]
     attrs.each do |prop|

@@ -99,6 +99,7 @@ module LtiOutbound
           hash['custom_canvas_account_sis_id'] = '$Canvas.account.sisSourceId'
         end
         hash['custom_canvas_api_domain'] = '$Canvas.api.domain'
+        hash['role_scope_mentor'] = user.current_observee_ids.join(',') if user.observer?
       end
 
       # need to set the locale here (instead of waiting for the first call to

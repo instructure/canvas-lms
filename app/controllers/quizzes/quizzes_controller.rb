@@ -125,8 +125,10 @@ class Quizzes::QuizzesController < ApplicationController
         question_banks: feature_enabled?(:question_banks),
         post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context)
       },
-      :quiz_menu_tools => external_tools_display_hashes(:quiz_menu)
+      :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
     })
+
+    conditional_release_js_env
 
     if @current_user.present?
       Quizzes::OutstandingQuizSubmissionManager.send_later_if_production(:grade_by_course,
@@ -176,7 +178,8 @@ class Quizzes::QuizzesController < ApplicationController
       if session[:quiz_id] == @quiz.id && !request.xhr?
         session.delete(:quiz_id)
       end
-      @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
+      is_observer = @context_enrollment && @context_enrollment.observer?
+      @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true, :is_observer => is_observer)
       @locked = @locked_reason && !can_preview?
 
       @context_module_tag = ContextModuleItem.find_tag_with_preferred([@quiz, @quiz.assignment], params[:module_item_id])
@@ -220,6 +223,7 @@ class Quizzes::QuizzesController < ApplicationController
       }
       append_sis_data(hash)
       js_env(hash)
+      conditional_release_js_env(@quiz.assignment, include_rule: true)
 
       @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
       @can_take = can_take_quiz?
@@ -644,7 +648,9 @@ class Quizzes::QuizzesController < ApplicationController
 
   def moderate
     if authorized_action(@quiz, @current_user, :grade)
-      @students = @context.students_visible_to(@current_user, include: :inactive).uniq.order_by_sortable_name
+      @students = @context.students_visible_to(@current_user, include: :inactive)
+      @students = @students.name_like(params[:search_term]) if params[:search_term].present?
+      @students = @students.uniq.order_by_sortable_name
       @students = @students.order(:uuid) if @quiz.survey? && @quiz.anonymous_submissions
       last_updated_at = Time.parse(params[:last_updated_at]) rescue nil
       respond_to do |format|

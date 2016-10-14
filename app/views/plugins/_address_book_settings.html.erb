@@ -1,0 +1,10 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+    <table style="width: 500px;" class="formtable">
+      <tr>
+        <td><%= f.blabel :strategy, t('Answer address book queries through') %></td>
+        <td>
+          <%= f.select :strategy, AddressBook::STRATEGIES.map{ |key,strategy| [strategy[:label].call(), key] }, {}, :class => "select_action" %>
+        </td>
+      </tr>
+    </table>
+<% end %>

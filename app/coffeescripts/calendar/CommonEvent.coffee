@@ -131,3 +131,6 @@ define [
 
     iconType: ->
       if type = @assignmentType() then type else 'calendar-month'
+
+    isOnCalendar: (context_code) ->
+      @calendarEvent.all_context_codes.match(///\b#{context_code}\b///)

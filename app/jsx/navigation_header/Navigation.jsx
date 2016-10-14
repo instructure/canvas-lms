@@ -20,7 +20,7 @@ define([
   var UNREAD_COUNT_POLL_INTERVAL = 60000 // 60 seconds
 
   var TYPE_URL_MAP = {
-    courses: '/api/v1/users/self/favorites/courses?include=term',
+    courses: '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments',
     groups: '/api/v1/users/self/groups?include[]=can_access',
     accounts: '/api/v1/accounts',
     help: '/help_links'
@@ -230,7 +230,13 @@ define([
 
     render () {
       return (
-        <Tray isOpen={this.state.isTrayOpen} onBlur={this.closeTray} closeTimeoutMS={400}>
+        <Tray
+          isOpen={this.state.isTrayOpen}
+          onBlur={this.closeTray}
+          closeTimeoutMS={400}
+          getAriaHideElement={() => $('#application')[0]}
+          getElementToFocus={() => $('.ReactTray__Content')[0]}
+        >
           {this.renderTrayContent()}
         </Tray>
       );

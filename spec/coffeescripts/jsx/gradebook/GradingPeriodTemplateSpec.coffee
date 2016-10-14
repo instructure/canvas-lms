@@ -5,25 +5,35 @@ define [
   'jsx/grading/gradingPeriodTemplate'
 ], (React, ReactDOM, _, GradingPeriod) ->
 
-  TestUtils = React.addons.TestUtils
+  defaultProps =
+    title: "Spring"
+    startDate: new Date("2015-03-01T00:00:00Z")
+    endDate: new Date("2015-05-31T00:00:00Z")
+    closeDate: new Date("2015-06-07T00:00:00Z")
+    id: "1"
+    permissions: {
+      update: true
+      delete: true
+    }
+    disabled: false
+    readOnly: false
+    onDeleteGradingPeriod: ->
+    onDateChange: ->
+    onTitleChange: ->
+
+  Simulate = React.addons.TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   module 'GradingPeriod with read-only permissions',
-    renderComponent: (opts) ->
-      defaultProps =
-        title: "Spring"
-        startDate: new Date("2015-03-01T00:00:00Z")
-        endDate: new Date("2015-05-31T00:00:00Z")
-        id: "1"
-        readOnly: false
+    renderComponent: (opts = {}) ->
+      readOnlyProps =
         permissions: {
           update: false
           delete: false
         }
-        onDeleteGradingPeriod: ->
 
-      @props = _.defaults(opts || {}, defaultProps)
-      GradingPeriodElement = React.createElement(GradingPeriod, @props)
+      props = _.defaults(opts, readOnlyProps, defaultProps)
+      GradingPeriodElement = React.createElement(GradingPeriod, props)
       ReactDOM.render(GradingPeriodElement, wrapper)
 
     teardown: ->
@@ -41,52 +51,33 @@ define [
     gradingPeriod = @renderComponent()
     notOk gradingPeriod.refs.deleteButton
 
-  test 'renderTitle returns a non-input element (since the grading period is readonly)', ->
+  test 'renders attributes as read-only', ->
     gradingPeriod = @renderComponent()
-    notEqual gradingPeriod.renderTitle().type, "input"
+    notEqual gradingPeriod.refs.title.type, "INPUT"
+    notEqual gradingPeriod.refs.startDate.type, "INPUT"
+    notEqual gradingPeriod.refs.endDate.type, "INPUT"
 
-  test 'renderStartDate returns a non-input element (since the grading period is readonly)', ->
+  test 'displays the correct attributes', ->
     gradingPeriod = @renderComponent()
-    notEqual gradingPeriod.renderStartDate().type, "input"
+    equal gradingPeriod.refs.title.textContent, "Spring"
+    equal gradingPeriod.refs.startDate.textContent, "Mar 1, 2015 at 12am"
+    equal gradingPeriod.refs.endDate.textContent, "May 31, 2015 at 12am"
 
-  test 'renderEndDate returns a non-input element (since the grading period is readonly)', ->
+  test 'displays the assigned close date', ->
     gradingPeriod = @renderComponent()
-    notEqual gradingPeriod.renderEndDate().type, "input"
+    equal gradingPeriod.refs.closeDate.textContent, "Jun 7, 2015 at 12am"
 
-  test 'displays the correct title', ->
-    gradingPeriod = @renderComponent()
-    titleNode = gradingPeriod.refs.title
-    equal titleNode.textContent, "Spring"
-
-  test 'displays the correct start date', ->
-    gradingPeriod = @renderComponent()
-    startDateNode = gradingPeriod.refs.startDate
-    equal startDateNode.textContent, "Mar 1, 2015 at 12am"
-
-  test 'displays the correct end date', ->
-    gradingPeriod = @renderComponent()
-    endDateNode = gradingPeriod.refs.endDate
-    equal endDateNode.textContent, "May 31, 2015 at 12am"
+  test 'uses the end date when close date is not defined', ->
+    gradingPeriod = @renderComponent(closeDate: null)
+    equal gradingPeriod.refs.closeDate.textContent, "May 31, 2015 at 12am"
 
   module "GradingPeriod with 'readOnly' set to true",
-    renderComponent: (opts) ->
-      defaultProps =
-        title: "Spring"
-        startDate: new Date("2015-03-01T00:00:00Z")
-        endDate: new Date("2015-05-31T00:00:00Z")
-        id: "1"
+    renderComponent: (opts = {}) ->
+      readOnlyProps =
         readOnly: true
-        permissions: {
-          update: true
-          delete: true
-        }
-        disabled: false
-        onDeleteGradingPeriod: ->
-        onDateChange: ->
-        onTitleChange: ->
 
-      @props = _.defaults(opts || {}, defaultProps)
-      GradingPeriodElement = React.createElement(GradingPeriod, @props)
+      props = _.defaults(opts, readOnlyProps, defaultProps)
+      GradingPeriodElement = React.createElement(GradingPeriod, props)
       ReactDOM.render(GradingPeriodElement, wrapper)
 
     teardown: ->
@@ -104,108 +95,87 @@ define [
     gradingPeriod = @renderComponent()
     notOk gradingPeriod.refs.deleteButton
 
-  test 'renderTitle returns a non-input element (since the grading period is readonly)', ->
+  test 'renders attributes as read-only', ->
     gradingPeriod = @renderComponent()
-    notEqual gradingPeriod.renderTitle().type, "input"
+    notEqual gradingPeriod.refs.title.type, "INPUT"
+    notEqual gradingPeriod.refs.startDate.type, "INPUT"
+    notEqual gradingPeriod.refs.endDate.type, "INPUT"
 
-  test 'renderStartDate returns a non-input element (since the grading period is readonly)', ->
+  test 'displays the correct attributes', ->
     gradingPeriod = @renderComponent()
-    notEqual gradingPeriod.renderStartDate().type, "input"
+    equal gradingPeriod.refs.title.textContent, "Spring"
+    equal gradingPeriod.refs.startDate.textContent, "Mar 1, 2015 at 12am"
+    equal gradingPeriod.refs.endDate.textContent, "May 31, 2015 at 12am"
 
-  test 'renderEndDate returns a non-input element (since the grading period is readonly)', ->
+  test 'displays the assigned close date', ->
     gradingPeriod = @renderComponent()
-    notEqual gradingPeriod.renderEndDate().type, "input"
+    equal gradingPeriod.refs.closeDate.textContent, "Jun 7, 2015 at 12am"
 
-  test 'displays the correct title', ->
-    gradingPeriod = @renderComponent()
-    titleNode = gradingPeriod.refs.title
-    equal titleNode.textContent, "Spring"
-
-  test 'displays the correct start date', ->
-    gradingPeriod = @renderComponent()
-    startDateNode = gradingPeriod.refs.startDate
-    equal startDateNode.textContent, "Mar 1, 2015 at 12am"
-
-  test 'displays the correct end date', ->
-    gradingPeriod = @renderComponent()
-    endDateNode = gradingPeriod.refs.endDate
-    equal endDateNode.textContent, "May 31, 2015 at 12am"
+  test 'uses the end date when close date is not defined', ->
+    gradingPeriod = @renderComponent(closeDate: null)
+    equal gradingPeriod.refs.closeDate.textContent, "May 31, 2015 at 12am"
 
   module 'editable GradingPeriod',
-    setup: ->
-      @props =
-        title: "Spring"
-        startDate: new Date("2015-03-01T00:00:00Z")
-        endDate: new Date("2015-05-31T00:00:00Z")
-        id: "1"
-        permissions: {
-          update: true
-          delete: true
-        }
-        disabled: false
-        readOnly: false
-        onDeleteGradingPeriod: ->
-        onDateChange: ->
-        onTitleChange: ->
-
-      GradingPeriodElement = React.createElement(GradingPeriod, @props)
-      @gradingPeriod = ReactDOM.render(GradingPeriodElement, wrapper)
+    renderComponent: (opts = {}) ->
+      props = _.defaults(opts, defaultProps)
+      GradingPeriodElement = React.createElement(GradingPeriod, props)
+      ReactDOM.render(GradingPeriodElement, wrapper)
 
     teardown: ->
       ReactDOM.unmountComponentAtNode(wrapper)
 
   test 'renders a delete button', ->
-    ok @gradingPeriod.renderDeleteButton()
+    gradingPeriod = @renderComponent()
+    ok gradingPeriod.refs.deleteButton
 
-  test 'renderTitle returns an input element (since the grading period is editable)', ->
-    equal @gradingPeriod.renderTitle().type, "input"
+  test 'renders with input fields', ->
+    gradingPeriod = @renderComponent()
+    equal gradingPeriod.refs.title.tagName, "INPUT"
+    equal gradingPeriod.refs.startDate.tagName, "INPUT"
+    equal gradingPeriod.refs.endDate.tagName, "INPUT"
 
-  test 'renderStartDate returns an input element (since the grading period is editable)', ->
-    equal @gradingPeriod.renderStartDate().type, "input"
+  test 'displays the correct attributes', ->
+    gradingPeriod = @renderComponent()
+    equal gradingPeriod.refs.title.value, "Spring"
+    equal gradingPeriod.refs.startDate.value, "Mar 1, 2015 at 12am"
+    equal gradingPeriod.refs.endDate.value, "May 31, 2015 at 12am"
 
-  test 'renderEndDate returns an input element (since the grading period is editable)', ->
-    equal @gradingPeriod.renderEndDate().type, "input"
+  test 'uses the end date for close date', ->
+    gradingPeriod = @renderComponent()
+    equal gradingPeriod.refs.closeDate.textContent, "May 31, 2015 at 12am"
 
-  test 'displays the correct title', ->
-    titleNode = @gradingPeriod.refs.title
-    equal titleNode.value, "Spring"
+  test "calls onClick handler for clicks on 'delete grading period'", ->
+    deleteSpy = sinon.spy()
+    gradingPeriod = @renderComponent(onDeleteGradingPeriod: deleteSpy)
+    Simulate.click(gradingPeriod.refs.deleteButton)
+    ok deleteSpy.calledOnce
 
-  test 'displays the correct start date', ->
-    startDateNode = @gradingPeriod.refs.startDate
-    equal startDateNode.value, "Mar 1, 2015 at 12am"
-
-  test 'displays the correct end date', ->
-    endDateNode = @gradingPeriod.refs.endDate
-    equal endDateNode.value, "May 31, 2015 at 12am"
+  test "ignores clicks on 'delete grading period' when disabled", ->
+    deleteSpy = sinon.spy()
+    gradingPeriod = @renderComponent(onDeleteGradingPeriod: deleteSpy, disabled: true)
+    Simulate.click(gradingPeriod.refs.deleteButton)
+    notOk deleteSpy.called
 
   module 'custom prop validation for editable periods',
+    renderComponent: (opts = {}) ->
+      props = _.defaults(opts, defaultProps)
+      GradingPeriodElement = React.createElement(GradingPeriod, props)
+      ReactDOM.render(GradingPeriodElement, wrapper)
+
     setup: ->
       @consoleError = @stub(console, 'error')
-      @props =
-        title: "Spring"
-        startDate: new Date("2015-03-01T00:00:00Z")
-        endDate: new Date("2015-05-31T00:00:00Z")
-        id: "1"
-        permissions: {
-          update: true
-          delete: true
-        }
-        disabled: false
-        readOnly: false
-        onDeleteGradingPeriod: ->
-        onDateChange: ->
-        onTitleChange: ->
+
+    teardown: ->
+      ReactDOM.unmountComponentAtNode(wrapper)
 
   test 'does not warn of invalid props if all required props are present and of the correct type', ->
-    React.createElement(GradingPeriod, @props)
+    @renderComponent()
     ok @consoleError.notCalled
 
   test 'warns if required props are missing', ->
-    delete @props.disabled
-    React.createElement(GradingPeriod, @props)
+    @renderComponent(disabled: null)
     ok @consoleError.calledOnce
 
   test 'warns if required props are of the wrong type', ->
-    @props.onDeleteGradingPeriod = "a/s/l?"
-    React.createElement(GradingPeriod, @props)
+    @renderComponent(onDeleteGradingPeriod: "invalid-type")
     ok @consoleError.calledOnce

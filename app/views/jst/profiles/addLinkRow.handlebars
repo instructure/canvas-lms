@@ -1,6 +1,12 @@
 <tr>
-  <td><input aria-label="{{t "Link title" }}" type="text" class="ic-Input" maxlength="255" name="link_titles[]" value="{{title}}"></td>
-  <td>→</td>
+  {{#if title.length}}
+    <th scope="row">
+      <input aria-label="{{title}}" type="text" class="ic-Input" maxlength="255" name="link_titles[]" value="{{title}}">
+    </th>
+  {{else}}
+    <th scope="row"><input aria-label="{{t "Link Title" }}" type="text" class="ic-Input" maxlength="255" name="link_titles[]" value="{{title}}"></th>
+  {{/if}}
+  <td aria-hidden="true">→</td>
   <td><input aria-label="{{t "Link Url" }}" type="text" class="ic-Input" name="link_urls[]" value="{{url}}"></td>
   <td><a href="#" class="remove_link_row" data-event="removeLinkRow"><span class="screenreader-only">{{t "Remove" }}</span><i class="icon-end"></i></a></td>
 </tr>

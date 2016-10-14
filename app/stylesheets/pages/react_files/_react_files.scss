@@ -13,11 +13,9 @@ $ef-thumbnail-size: 36px;
 
 body.files {
   #content { padding-top: 0; }
-  @if $use_new_styles {
-    .ic-app-nav-toggle-and-crumbs {
-      /* display: none; */
-      &.ic-app-nav-toggle-and-crumbs--files { display: flex; }
-    }
+  .ic-app-nav-toggle-and-crumbs {
+    /* display: none; */
+    &.ic-app-nav-toggle-and-crumbs--files { display: flex; }
   }
 }
 
@@ -39,14 +37,8 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
 }
 
 .ef-header {
-  @if $use_new_styles {
-    padding: $ic-sp*2 0 $ic-sp;
-    border-bottom: 1px solid $ic-border-light;
-  }
-  @else {
-    padding: $ic-sp;
-    border-bottom: 1px solid $ic-border-color;
-  }
+  padding: $ic-sp*2 0 $ic-sp;
+  border-bottom: 1px solid $ic-border-light;
   @include breakpoint(desktop) {
     display: flex;
     align-items: center;
@@ -70,8 +62,7 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
     margin-bottom: 0;
     flex: 0 0 $ic-sp*31;
     &.ef-search-form--showing-buttons {
-      @if $use_new_styles { flex: 0 0 $ic-sp*19; }
-      @else { flex: 0 0 $ic-sp*20; }
+      flex: 0 0 $ic-sp*19;
     }
   }
 }
@@ -108,8 +99,7 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
     flex-direction: column;
     flex: 1 1 0%;
     padding: 0px;
-    @if $use_new_styles { border-right: 1px solid $ic-border-light; }
-    @else { border-right: 1px solid $ic-border-color; }
+    border-right: 1px solid $ic-border-light;
     overflow-x: auto;
 
     .tree {
@@ -136,14 +126,8 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
     }
 
     .ef-folder-header{
-      @if $use_new_styles {
-        padding-top: $ic-sp/3;
-        padding-bottom: $ic-sp/3;
-      }
-      @else {
-        padding-top: 5px;
-        padding-bottom: 5px;
-      }
+      padding-top: $ic-sp/3;
+      padding-bottom: $ic-sp/3;
 
       &:hover{
         background-color: #f2f2f2;
@@ -182,14 +166,8 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
 .ef-directory-header{
   display: flex;
   align-items: center;
-  @if $use_new_styles {
-    border-bottom: 1px solid $ic-border-light;
-    padding: $ic-sp/3;
-  }
-  @else {
-    border-bottom: 1px solid $ic-border-color;
-    padding: 5px;
-  }
+  border-bottom: 1px solid $ic-border-light;
+  padding: $ic-sp/3;
 }
 
 .ef-plain-link, .ef-plain-link:hover { color: $ic-font-color-dark; }
@@ -249,7 +227,7 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
 
 .ef-big-icon {
   width: $ef-thumbnail-size !important;
-  color: $ic-color-dark;
+  color: $ic-font-color-dark;
   &:before {
     font-size: $ef-thumbnail-size - 7px !important;
   }
@@ -319,12 +297,7 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
   @include fontSize(13px);
 
   &[role="columnheader"] {
-    @if $use_new_styles {
-      font-weight: $ic-font-weight;
-    }
-    @else {
-      font-weight: bold;
-    }
+    font-weight: $ic-font-weight;
   }
 }
 
@@ -415,12 +388,6 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
   > * {
     position: absolute;
   }
-}
-
-// Hack, Hack, Hack!
-// to make sure that there is space for the ItemCog menu to appear below the bottom thing in the list of files
-@if $use_new_styles == false {
-  #footer { min-height: 80px }
 }
 
 .form-controls {

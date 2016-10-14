@@ -2,8 +2,11 @@ define([
   'jquery',
   'react',
   'react-dom',
-  'react-modal'
-], function($, React, ReactDOM, Modal) {
+  'react-modal',
+  'classnames',
+  'i18n!conditional_release',
+  'jquery.instructure_forms',
+], ($, React, ReactDOM, Modal, classNames, I18n) => {
 
   const SAVE_TIMEOUT = 15000
 
@@ -20,7 +23,6 @@ define([
         <form id='conditional-release-editor-form'
             target={this.props.target}
             method='POST'
-
             action={this.props.env.edit_rule_url}>
           <input type='hidden' name='env' value={JSON.stringify(this.props.env)} />
         </form>
@@ -39,17 +41,34 @@ define([
     getInitialState() {
       return {
         messagePort: null,
-        validationError: null,
+        validationErrors: null,
         saveInProgress: null
       };
     },
 
-    setValidationError(err) {
-      this.setState({ validationError: err });
+    setValidationErrors(err) {
+      this.setState({ validationErrors: JSON.parse(err) });
     },
 
     validateBeforeSave() {
-      return this.state.validationError;
+      const errors = []
+      if (this.state.validationErrors) {
+
+        this.state.validationErrors.forEach((errorRecord) => {
+          $.screenReaderFlashError(I18n.t('%{error} in mastery paths range %{index}', {
+            error: errorRecord.error,
+            index: errorRecord.index + 1 }))
+          errors.push({ message: errorRecord.error })
+        })
+      }
+      return errors.length == 0 ? null : errors;
+    },
+
+    focusOnError() {
+      if (this.refs.iframe && this.refs.iframe.contentWindow) {
+        this.refs.iframe.contentWindow.focus()
+      }
+      this.postMessage('focusOnError')
     },
 
     updateAssignment(newAttributes = {}) {
@@ -95,6 +114,16 @@ define([
         if (this.state.saveInProgress == saveInProgress) {
           this.setState({ saveInProgress: null })
         }
+      }
+    },
+
+    updateModalState(state) {
+      this.setState({ showOverlay: state.isVisible })
+
+      if (state.isVisible) {
+        $('body').addClass('conditional-release-modal-visible')
+      } else {
+        $('body').removeClass('conditional-release-modal-visible')
       }
     },
 
@@ -163,8 +192,11 @@ define([
         case 'saveError':
           this.saveError(this.state.saveInProgress, messageEvent.data.messageBody);
           break;
-        case 'validationError':
-          this.setValidationError(messageEvent.data.messageBody);
+        case 'validationErrors':
+          this.setValidationErrors(messageEvent.data.messageBody);
+          break;
+        case 'modalStateChange':
+          this.updateModalState(messageEvent.data.messageBody)
           break;
         }
       }
@@ -176,9 +208,24 @@ define([
 
     render () {
       const iframeId = this.popupId();
+      const frameClasses = classNames({
+        'conditional-release-editor-frame': true,
+        'conditional-release-editor-frame--modal-visible': this.state.showOverlay,
+      })
+
       return (
         <div className='conditional-release-editor'>
-          <iframe className='conditional-release-editor-frame' ref='iframe' id={iframeId} name={iframeId} />
+          {this.state.showOverlay
+            ? (<div id='conditional-release-modal-overlay' className='ReactModal__Overlay ReactModal__Overlay--after-open'></div>)
+            : null}
+          <iframe
+            className={frameClasses}
+            ref='iframe'
+            id={iframeId}
+            name={iframeId}
+            title={I18n.t('Mastery Paths Editor')}
+            aria-label={I18n.t('Mastery Paths Editor')}
+          />
         </div>
       )
     }

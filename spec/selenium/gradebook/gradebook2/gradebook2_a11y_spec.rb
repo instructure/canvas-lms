@@ -47,13 +47,6 @@ describe "gradebook2" do
   context "return focus to settings menu when it closes" do
     let!(:open_gradebook_settings_menu) { f('#gradebook_settings').click }
 
-    it "after set group weights closes", priority: "2", test_id: 720464 do
-      f("[aria-controls='assignment_group_weights_dialog']").click
-      f('.ui-dialog-titlebar-close').click
-
-      expect(active_element).to have_attribute('id', 'gradebook_settings')
-    end
-
     it "after hide/show student names is clicked", priority: "2", test_id: 720461 do
       f(".student_names_toggle").click
 

@@ -41,8 +41,7 @@ $cell_height: 33px;
 
 .gradebook2 #content {
   position: relative;
-  @if $use_new_styles { padding: 0 $ic-sp*2; }
-  @else { padding: 0; }
+  padding: 0 $ic-sp*2;
 }
 
 #gradebook-grid-wrapper {
@@ -387,19 +386,11 @@ $gradebook_checkbox_width: 16px;
   position: relative;
   background-color: transparent;
   border: transparent;
-  @if $use_new_styles {
-    padding: $ic-sp;
-    border-top: none;
-    @include breakpoint(desktop) {
-      display: flex;
-      align-items: center;
-    }
-  }
-  @else {
-    height: 38px;
-    padding: 6px 10px;
-    border-left: none;
-    border-right: none;
+  padding: $ic-sp;
+  border-top: none;
+  @include breakpoint(desktop) {
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -412,27 +403,18 @@ $gradebook_checkbox_width: 16px;
   input {
     width: 248px;
   }
-  @if $use_new_styles {
-    @include breakpoint(desktop) {
-      margin-left: $ic-sp/3;
-    }
+  @include breakpoint(desktop) {
+    margin-left: $ic-sp/3;
   }
 }
 
 .gradebook_menu {
-  @if $use_new_styles {
-    margin-top: $ic-sp/3;
-    @include breakpoint(desktop) {
-      white-space: nowrap;
-      margin-top: 0;
-      flex: 1;
-      text-align: right;
-    }
-  }
-  @else {
-    position: absolute;
-    right: 10px;
-    top: 6px;
+  margin-top: $ic-sp/3;
+  @include breakpoint(desktop) {
+    white-space: nowrap;
+    margin-top: 0;
+    flex: 1;
+    text-align: right;
   }
 }
 

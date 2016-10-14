@@ -24,6 +24,10 @@ describe 'SetRoleOverrideColumnsNotNull' do
     SetRoleOverrideColumnsNotNull.down
   end
 
+  after do
+    RoleOverride.reset_column_information
+  end
+
   describe "up" do
     it "preserves an RO intended to lock and inherit" do
       role = Role.built_in_account_roles.first

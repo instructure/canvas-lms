@@ -8,7 +8,7 @@ class CreateContentParticipationCounts < ActiveRecord::Migration
       t.integer "context_id", :limit => 8
       t.integer "user_id", :limit => 8
       t.integer "unread_count", :default => 0
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index "content_participation_counts", ["context_id", "context_type", "user_id", "content_type"], :name => "index_content_participation_counts_uniquely", :unique => true

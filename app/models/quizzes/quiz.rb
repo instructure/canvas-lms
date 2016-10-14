@@ -52,6 +52,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course]
   belongs_to :assignment
   belongs_to :assignment_group
+  has_many :ignores, :as => :asset
 
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
@@ -182,8 +183,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
 
-  def build_assignment
-    if !self.assignment_id && self.graded? && ![:assignment, :clone, :migration].include?(@saved_by)
+  def build_assignment(force: false)
+    if !self.assignment_id && self.graded? && (force || ![:assignment, :clone, :migration].include?(@saved_by))
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
@@ -748,7 +749,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         locked = assignment_lock
       elsif (module_lock = locked_by_module_item?(user, opts[:deep_check_if_needed]))
         locked = lock_info.merge({ context_module: module_lock.context_module.attributes })
-      elsif !context.try_rescue(:is_public) && !context.grants_right?(user, :participate_as_student)
+      elsif !context.try_rescue(:is_public) && !context.grants_right?(user, :participate_as_student) && !opts[:is_observer]
         locked = lock_info.merge({ missing_permission: :participate_as_student.to_s })
       end
 
@@ -1016,7 +1017,14 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) } #admins.include? user }
-    can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit and can :preview
+    can :read_statistics and can :manage and can :read and can :update and can :create and can :submit and can :preview
+
+    given do |user, session|
+      self.context.grants_right?(user, session, :manage_assignments) &&
+      (user.admin_of_root_account?(self.context.root_account) ||
+       !due_for_any_student_in_closed_grading_period?)
+    end
+    can :delete
 
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) } #admins.include? user }
     can :read_statistics and can :read and can :submit and can :grade and can :review_grades
@@ -1065,6 +1073,48 @@ class Quizzes::Quiz < ActiveRecord::Base
     joins(:quiz_student_visibilities).
     where(:quiz_student_visibilities => { :user_id => student_ids, :course_id => course_ids })
   }
+
+  # Return all quizzes and their active overrides where either the
+  # quiz or one of its overrides is due between start and ending.
+  scope :due_between_with_overrides, lambda { |start, ending|
+    joins("LEFT OUTER JOIN #{AssignmentOverride.quoted_table_name} assignment_overrides
+          ON assignment_overrides.quiz_id = quizzes.id").
+    group("quizzes.id").
+    where('quizzes.due_at BETWEEN ? AND ?
+          OR assignment_overrides.due_at_overridden AND
+          assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
+  }
+
+  # Return quizzes (up to limit) that do not have any submissions
+  scope :need_submitting_info, lambda { |user_id, limit|
+    where("(SELECT COUNT(id) FROM #{Quizzes::QuizSubmission.quoted_table_name}
+            WHERE quiz_id = quizzes.id
+            AND workflow_state = 'complete'
+            AND user_id = ?) = 0", user_id).
+      limit(limit).
+      order("quizzes.due_at").
+      preload(:context)
+  }
+
+  scope :not_locked, -> {
+    where("(quizzes.unlock_at IS NULL OR quizzes.unlock_at<:now) AND (quizzes.lock_at IS NULL OR quizzes.lock_at>:now)",
+      :now => Time.zone.now)
+  }
+
+  scope :not_ignored_by, lambda { |user, purpose|
+    where("NOT EXISTS (?)",
+          Ignore.where(asset_type: 'Quizzes::Quiz',
+                       user_id: user,
+                       purpose: purpose).where('asset_id=quizzes.id'))
+  }
+
+  def peer_reviews_due_at
+    nil
+  end
+
+  def submission_action_string
+    t :submission_action_take_quiz, "Take %{title}", :title => title
+  end
 
   def teachers
     context.teacher_enrollments.map(&:user)
@@ -1263,6 +1313,20 @@ class Quizzes::Quiz < ActiveRecord::Base
     if assignment
       assignment.submission_for_student(student).excused?
     end
+  end
+
+  def due_for_any_student_in_closed_grading_period?(periods = nil)
+    return false unless self.due_at || self.has_overrides?
+
+    periods ||= GradingPeriod.for(self.course)
+    due_in_closed_period =
+      !self.only_visible_to_overrides &&
+      GradingPeriodHelper.date_in_closed_grading_period?(self.due_at, periods)
+    due_in_closed_period ||= self.active_assignment_overrides.any? do |override|
+      GradingPeriodHelper.date_in_closed_grading_period?(override.due_at, periods)
+    end
+
+    due_in_closed_period
   end
 
   delegate :feature_enabled?, to: :context

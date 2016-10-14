@@ -5,10 +5,6 @@ describe 'new ui' do
   include_context "in-process server selenium tests"
   include FilesCommon
 
-  before(:each) do
-    Account.default.enable_feature!(:use_new_styles)
-  end
-
   context 'as teacher' do
 
     before(:each) do
@@ -105,7 +101,7 @@ describe 'new ui' do
       wait_for_ajaximations
       f = FeatureFlag.last
       expect(f.state).to eq 'on'
-      expect(f('.profile_settings.active').css_value('background-color')).to eq('rgba(0, 150, 219, 1)')
+      expect(f('.profile_settings.active').css_value('background-color')).to eq('rgba(0, 142, 226, 1)')
     end
 
     it 'should not break tiny mce css', priority: "2", test_id: 244891 do

@@ -177,6 +177,15 @@ class RubricAssessment < ActiveRecord::Base
     given {|user| user && self.user_id == user.id }
     can :read
 
+    given { |user|
+      user &&
+      self.user &&
+      self.rubric_association &&
+      self.rubric_association.context.is_a?(Course) &&
+      self.rubric_association.context.observer_enrollments.where(user_id: user, associated_user: self.user, workflow_state: 'active').exists?
+    }
+    can :read
+
     given {|user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :manage) }
     can :create and can :read and can :delete
 

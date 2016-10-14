@@ -106,7 +106,7 @@ describe "discussions" do
           end
           errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
           visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
-          expect(visBoxes.first.text).to eq "Please select a group set for this assignment"
+          expect(visBoxes.first.text).to eq "Please create a group set"
         end
       end
 

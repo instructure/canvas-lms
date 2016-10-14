@@ -1,12 +1,7 @@
 @import "base/environment";
 
 .submission-details-header {
-  @if $use_new_styles {
-    margin-bottom: $ic-sp;
-  }
-  @else {
-    padding: 0px 20px 3px;
-  }
+  margin-bottom: $ic-sp;
 }
 
 .submission-details-header__grade-summary {
@@ -14,54 +9,30 @@
 }
 
 .submission-details-container {
-  @if $use_new_styles {
-    border: 1px solid $ic-border-light;
-    box-sizing: border-box;
-    @include breakpoint(desktop) {
-      display: flex;
-    }
+  border: 1px solid $ic-border-light;
+  box-sizing: border-box;
+  @include breakpoint(desktop) {
+    display: flex;
   }
-  @else {
-    border-top: 2px solid #ccc;
-  }
-
 }
 
 .submission-details-frame {
-  @if $use_new_styles {
-    box-sizing: border-box;
-    @include breakpoint(desktop) { flex: 1; }
-  }
-  @else {
-    float: left;
-    width: 75%;
-  }
+  box-sizing: border-box;
+  @include breakpoint(desktop) { flex: 1; }
 }
 
 .submission-details-comments {
-  @if $use_new_styles {
-    box-sizing: border-box;
-    border-top: 1px solid $ic-border-light;
-    @include breakpoint(desktop) {
-      flex: 0 0 280px;
-      border-top: none;
-    }
-  }
-  @else {
-    float: left;
-    width: 25%;
+  box-sizing: border-box;
+  border-top: 1px solid $ic-border-light;
+  @include breakpoint(desktop) {
+    flex: 0 0 280px;
+    border-top: none;
   }
   .comments {
     height: 300px;
     overflow: auto;
-    @if $use_new_styles {
-      background-color: $ic-bg-light-neutral;
-      @include breakpoint(desktop) { border-left: 1px solid $ic-border-light; }
-    }
-    @else {
-      background-color: #f0f0f0;
-      border-left: 2px solid #ccc;
-    }
+    background-color: $ic-bg-light-neutral;
+    @include breakpoint(desktop) { border-left: 1px solid $ic-border-light; }
   }
 }
 
@@ -69,30 +40,20 @@
   display: flex;
   align-items: center;
   background: $ic-color-light;
-  @if $use_new_styles {
-    padding: $ic-sp $ic-sp/2;
-    border-bottom: 1px solid $ic-border-light;
-    &:last-of-type { border-bottom: none; }
-  }
-  @else {
-    padding: $ic-sp;
-    margin: $ic-sp/2 0;
-    border: 1px solid $ic-border-light;
-    border-radius: $baseBorderRadius;
-    &:first-of-type { margin-top: $ic-sp; }
-  }
+  padding: $ic-sp $ic-sp/2;
+  border-bottom: 1px solid $ic-border-light;
+  &:last-of-type { border-bottom: none; }
 }
 
 .file-upload-submission-info {
-  @if $use_new_styles { @include fontSize(13px); }
+  @include fontSize(13px);
   box-sizing: border-box;
   flex: 0 0 50%;
   padding-right: $ic-sp;
   > a {
     @include fontSize(13px); // need to overwrite default tiny-text style here
     margin-right: $ic-sp/2;
-    @if $use_new_styles { font-weight: 500; }
-    @else { font-weight: bold; }
+    font-weight: 500;
   }
 }
 
@@ -102,7 +63,7 @@
 }
 
 .file-upload-submission-attachment {
-  @if $use_new_styles { @include fontSize(13px); }
+  @include fontSize(13px);
   flex: 0 0 30%;
   text-align: right;
   box-sizing: border-box;
@@ -110,7 +71,7 @@
 }
 
 .file-upload-submission-turnitin {
-  @if $use_new_styles { @include fontSize(13px); }
+  @include fontSize(13px);
   flex: 0 0 20%;
 }
 

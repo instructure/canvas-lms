@@ -5,6 +5,9 @@ module Gradebook2Common
     let(:gradebook_settings_cog) { f('#gradebook_settings') }
     let(:group_weights_menu) { f('[aria-controls="assignment_group_weights_dialog"]') }
     let(:show_notes) { fj('li a:contains("Show Notes Column")') }
+    let(:set_group_weights) { fj('li a:contains("Set Group Weights")') }
+    let(:save_button) { fj('button span:contains("Save")') }
+    let(:group_weighting_scheme) { f('#group_weighting_scheme') }
     let(:hide_notes) { f(".hide") }
   end
   shared_context 'reusable_course' do
@@ -148,6 +151,15 @@ module Gradebook2Common
     wait_for_ajaximations
   end
 
+  def gradebook_column_array(css_row_class)
+    column = ff(css_row_class)
+    text_values = []
+    column.each do |row|
+      text_values.push(row.text)
+    end
+    text_values
+  end
+
   def conclude_and_unconclude_course
     # conclude course
     @course.complete!
@@ -245,22 +257,16 @@ module Gradebook2Common
     rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
     @assignment.reload
-    @submission = @assignment.submit_homework(@student_1, :body => 'student 1 submission assignment 1')
+    @assignment.submit_homework(@student_1, :body => 'student 1 submission assignment 1')
     @assignment.grade_student(@student_1, :grade => 10)
-    @submission.score = 10
-    @submission.save!
 
     # second student submission for assignment 1
-    @student_2_submission = @assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 1')
+    student_2_submission = @assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 1')
     @assignment.grade_student(@student_2, :grade => 5)
-    @student_2_submission.score = 5
-    @submission.save!
 
     # third student submission for assignment 1
     @student_3_submission = @assignment.submit_homework(@student_3, :body => 'student 3 submission assignment 1')
     @assignment.grade_student(@student_3, :grade => 5)
-    @student_3_submission.score = 5
-    @submission.save!
 
     # second assignment data
     @second_assignment = assignment_model({
@@ -275,9 +281,8 @@ module Gradebook2Common
 
     # all students get a 5 on assignment 2
     @all_students.each do |s|
-      submission = @second_assignment.submit_homework(s, :body => "#{s.name} submission assignment 2")
+      @second_assignment.submit_homework(s, :body => "#{s.name} submission assignment 2")
       @second_assignment.grade_student(s, :grade => 5)
-      submission.save!
     end
 
     # third assignment data
@@ -312,56 +317,5 @@ module Gradebook2Common
 
   def get_group_points
     ff('div.assignment-points-possible')
-  end
-
-  def check_group_points(expected_weight_text)
-    2..3.each do |i|
-      expect(get_group_points[i].text).to eq expected_weight_text[i-2] + ' of grade'
-    end
-  end
-
-  def set_group_weight(assignment_group, weight_number, enable_scheme: false)
-    f('#gradebook_settings').click
-    f('[aria-controls="assignment_group_weights_dialog"]').click
-
-    dialog = f('#assignment_group_weights_dialog')
-    expect(dialog).to be_displayed
-
-    if enable_scheme
-      group_check = dialog.find_element(:id, 'group_weighting_scheme')
-      group_check.click
-    end
-    expect(is_checked('#group_weighting_scheme')).to be_truthy
-    group_weight_input = f("#assignment_group_#{assignment_group.id}_weight")
-    set_value(group_weight_input, "")
-    set_value(group_weight_input, weight_number)
-    fj('.ui-button:contains("Save")').click
-    wait_for_ajaximations
-    expect(@course.reload.group_weighting_scheme).to eq 'percent'
-  end
-
-  def disable_group_weight
-    f('#gradebook_settings').click
-    f('[aria-controls="assignment_group_weights_dialog"]').click
-
-    dialog = f('#assignment_group_weights_dialog')
-    expect(dialog).to be_displayed
-
-    group_check = dialog.find_element(:id, 'group_weighting_scheme')
-    group_check.click
-    expect(is_checked('#group_weighting_scheme')).to be_falsey
-    fj('.ui-button:contains("Save")').click
-    refresh_page
-  end
-
-  def validate_group_weight_text(assignment_groups, weight_numbers)
-    assignment_groups.each_with_index do |ag, i|
-      heading = fj(".slick-column-name:contains('#{ag.name}') .assignment-points-possible")
-      expect(heading).to include_text("#{weight_numbers[i]}% of grade")
-    end
-  end
-
-  def validate_group_weight(assignment_group, weight_number)
-    expect(assignment_group.reload.group_weight).to eq weight_number
   end
 end

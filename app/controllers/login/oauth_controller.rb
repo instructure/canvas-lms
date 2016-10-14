@@ -49,14 +49,16 @@ class Login::OauthController < Login::OauthBaseController
     end
 
     unique_id = nil
+    provider_attributes = {}
     return unless timeout_protection do
       token = request_token.get_access_token(opts)
       unique_id = @aac.unique_id(token)
+      provider_attributes = @aac.provider_attributes(token)
     end
 
     reset_session_for_login
 
-    find_pseudonym(unique_id)
+    find_pseudonym(unique_id, provider_attributes)
   end
 
   protected

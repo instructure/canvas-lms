@@ -32,28 +32,12 @@ describe "sub account outcomes" do
           should_delete_a_learning_outcome
         end
 
-        it "should validate mastery points", priority: "2", test_id: 263901 do
-          should_validate_mastery_points
+        it "should validate decaying average_range", priority: "2", test_id: 250518 do
+          should_validate_decaying_average_range
         end
 
-        it "should_validate_calculation_method_dropdown", priority: "2", test_id: 250517 do
-          should_validate_calculation_method_dropdown
-        end
-
-        it "should validate decaying average_above_range", priority: "2", test_id: 250518 do
-          should_validate_decaying_average_above_range
-        end
-
-        it "should validate decaying average_below_range", priority: "2", test_id: 303713 do
-          should_validate_decaying_average_below_range
-        end
-
-        it "should validate n mastery_above_range", priority: "2", test_id: 250519 do
-          should_validate_n_mastery_above_range
-        end
-
-        it "should validate n mastery_below_range", priority: "2", test_id: 303714 do
-          should_validate_n_mastery_below_range
+        it "should validate n mastery_range", priority: "2", test_id: 303714 do
+          should_validate_n_mastery_range
         end
       end
 

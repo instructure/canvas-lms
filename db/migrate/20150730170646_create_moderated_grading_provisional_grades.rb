@@ -10,7 +10,7 @@ class CreateModeratedGradingProvisionalGrades < ActiveRecord::Migration
       t.references :scorer,     null: false, limit: 8
       t.references :submission, null: false, limit: 8
 
-      t.timestamps
+      t.timestamps null: true
     end
 
     add_index :moderated_grading_provisional_grades, :submission_id

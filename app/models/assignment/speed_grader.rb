@@ -21,7 +21,7 @@ class Assignment
 
       comment_fields = [:comment, :id, :author_name, :created_at, :author_id,
                         :media_comment_type, :media_comment_id,
-                        :cached_attachments, :attachments, :draft].freeze
+                        :cached_attachments, :attachments, :draft, :group_comment_id].freeze
 
       attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
                            :display_name, :filename, :mime_class,
@@ -130,6 +130,14 @@ class Assignment
 
       enrollment_types_by_id = enrollments.inject({}){ |h, e| h[e.user_id] ||= e.type; h }
 
+      if @assignment.quiz
+        if @assignment.quiz.assignment_overrides.to_a.select(&:active?).count == 0
+          @assignment.quiz.has_no_overrides = true
+        else
+          @assignment.quiz.context.preload_user_roles!
+        end
+      end
+
       res[:submissions] = submissions.map do |sub|
         json = sub.as_json(:include_root => false,
           :methods => [:submission_history, :late, :external_tool_url],
@@ -188,17 +196,15 @@ class Assignment
           end
         elsif @assignment.quiz && sub.quiz_submission
           json['submission_history'] = qs_versions[sub.quiz_submission.id].map do |v|
-            qs = v.model
-            # copy already-loaded associations over to the model so we
-            # don't have to load them again when qs.late? gets called
-            qs.quiz = @assignment.quiz
-            qs.submission = sub
+            # don't use v.model, because these are huge objects, and can be significantly expensive
+            # to instantiate an actual AR object deserializing and reserializing the inner YAML
+            qs = YAML.load(v.yaml)
 
             {submission: {
-                grade: qs.score,
+                grade: qs['score'],
                 show_grade_in_dropdown: true,
-                submitted_at: qs.finished_at,
-                late: qs.late?,
+                submitted_at: qs['finished_at'],
+                late: Quizzes::QuizSubmission.late_from_attributes?(qs, @assignment.quiz, sub),
                 version: v.number,
               }}
           end
@@ -237,7 +243,7 @@ class Assignment
         json
       end
       res[:GROUP_GRADING_MODE] = @assignment.grade_as_group?
-      res
+      StringifyIds.recursively_stringify_ids(res)
     ensure
       Attachment.skip_thumbnails = nil
     end

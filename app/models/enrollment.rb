@@ -54,6 +54,7 @@ class Enrollment < ActiveRecord::Base
   validate :cant_observe_self, :if => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' }
 
   validate :valid_role?
+  validate :valid_course?
   validate :valid_section?
 
   before_save :assign_uuid
@@ -63,6 +64,7 @@ class Enrollment < ActiveRecord::Base
   before_validation :ensure_role_id
   before_validation :infer_privileges
   after_create :create_linked_enrollments
+  after_create :create_enrollment_state
   after_save :clear_email_caches
   after_save :cancel_future_appointments
   after_save :update_linked_enrollments
@@ -97,6 +99,12 @@ class Enrollment < ActiveRecord::Base
 
   def cant_observe_self
     self.errors.add(:associated_user_id, "Cannot observe yourself") if self.user_id == self.associated_user_id
+  end
+
+  def valid_course?
+    if self.course.deleted? && !self.deleted?
+      self.errors.add(:course_id, "is not a valid course")
+    end
   end
 
   def valid_section?
@@ -231,6 +239,8 @@ class Enrollment < ActiveRecord::Base
     select(:course_id).
         joins(:course).
         where("enrollments.type IN ('TeacherEnrollment','TaEnrollment') AND (courses.workflow_state='claimed' OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))") }
+
+  scope :of_student_type, -> { where(:type => "StudentEnrollment") }
 
   scope :of_admin_type, -> { where(:type => ['TeacherEnrollment','TaEnrollment', 'DesignerEnrollment']) }
 
@@ -401,6 +411,8 @@ class Enrollment < ActiveRecord::Base
     observers.each do |observer|
       if enrollment = active_linked_enrollment_for(observer)
         enrollment.update_from(self)
+      elsif self.workflow_state_changed? && self.workflow_state_was == 'inactive'
+        create_linked_enrollment_for(observer)
       end
     end
   end
@@ -603,6 +615,13 @@ class Enrollment < ActiveRecord::Base
     STATE_RANK_HASH[state.to_s]
   end
 
+  STATE_BY_DATE_RANK = ['active', ['invited', 'creation_pending', 'pending_active', 'pending_invited'], 'inactive', 'completed', 'rejected', 'deleted']
+  STATE_BY_DATE_RANK_HASH = rank_hash(STATE_BY_DATE_RANK)
+  def self.state_by_date_rank_sql
+    @state_by_date_rank_sql ||= rank_sql(STATE_BY_DATE_RANK, 'enrollment_states.state').
+      sub(/^CASE/, "CASE WHEN enrollment_states.restricted_access THEN #{STATE_BY_DATE_RANK.index('inactive')}") # pretend restricted access is the same as inactive
+  end
+
   def state_with_date_sortable
     STATE_RANK_HASH[state_based_on_date.to_s]
   end
@@ -665,6 +684,13 @@ class Enrollment < ActiveRecord::Base
   def enrollment_state
     raise "cannot call enrollment_state on a new record" if new_record?
     state = self.association(:enrollment_state).target ||=
+      self.shard.activate { EnrollmentState.where(:enrollment_id => self).first }
+    state.association(:enrollment).target ||= self # ensure reverse association
+    state
+  end
+
+  def create_enrollment_state
+    self.enrollment_state =
       self.shard.activate do
         Shackles.activate(:master) do
           EnrollmentState.unique_constraint_retry do
@@ -672,8 +698,6 @@ class Enrollment < ActiveRecord::Base
           end
         end
       end
-    state.association(:enrollment).target ||= self # ensure reverse association
-    state
   end
 
   def recalculate_enrollment_state
@@ -824,7 +848,7 @@ class Enrollment < ActiveRecord::Base
   def can_be_deleted_by(user, context, session)
     can_remove = [StudentEnrollment, ObserverEnrollment].include?(self.class) &&
       context.grants_right?(user, session, :manage_students)
-    can_remove ||= context.grants_right?(user, session, :manage_admin_users)
+    can_remove ||= context.grants_right?(user, session, :manage_admin_users) unless student?
     can_remove &&= self.user_id != user.id ||
       context.account.grants_right?(user, session, :manage_admin_users)
   end
@@ -872,7 +896,7 @@ class Enrollment < ActiveRecord::Base
         t('#enrollment.workflow.deleted', "Deleted")
       when 'invited'
         t('#enrollment.workflow.invited', "Invited")
-      when 'pending'
+      when 'pending', 'creation_pending'
         t('#enrollment.workflow.pending', "Pending")
       when 'rejected'
         t('#enrollment.workflow.rejected', "Rejected")
@@ -942,7 +966,7 @@ class Enrollment < ActiveRecord::Base
 
   def self.recompute_final_score_if_stale(course, user=nil)
     Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get('recompute_grades_window', 600).to_i.seconds) do
-      recompute_final_score user ? user.id : course.student_enrollments.except(:preload).select(:user_id).uniq.map(&:user_id), course.id
+      recompute_final_score user ? user.id : course.student_enrollments.except(:preload).distinct.pluck(:user_id), course.id
       yield if block_given?
       true
     end
@@ -1054,6 +1078,23 @@ class Enrollment < ActiveRecord::Base
   scope :accepted, -> { where("enrollments.workflow_state<>'invited'") }
   scope :active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }
   scope :all_active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')") } # includes inactive
+
+  scope :active_by_date, -> { joins(:enrollment_state).where("enrollment_states.state = 'active'") }
+  scope :invited_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
+    where("enrollment_states.state IN ('invited', 'pending_invited')") }
+  scope :active_or_pending_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
+    where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')") }
+  scope :invited_or_pending_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
+    where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')") }
+  scope :completed_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
+    where("enrollment_states.state = ?", "completed") }
+  scope :not_inactive_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
+    where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')") }
+
+  scope :active_or_pending_by_date_ignoring_access, -> { joins(:enrollment_state).
+    where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')") }
+  scope :not_inactive_by_date_ignoring_access, -> { joins(:enrollment_state).
+    where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')") }
 
   scope :currently_online, -> { joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago) }
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope

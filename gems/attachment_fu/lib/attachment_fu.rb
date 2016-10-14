@@ -198,6 +198,19 @@ module AttachmentFu # :nodoc:
         tmp.close
       end
     end
+
+    if Rails.env.test?
+      # thanks to test_after_commit, we can use transactional fixtures,
+      # but we still need reach into connection, since we conditionally
+      # use after_transaction_commit based on transaction nesting
+      def open_transactions
+        connection.instance_variable_get(:@test_open_transactions)
+      end
+    else
+      def open_transactions
+        connection.open_transactions
+      end
+    end
   end
 
   module InstanceMethods
@@ -374,11 +387,13 @@ module AttachmentFu # :nodoc:
 
     def find_existing_attachment_for_md5
       self.shard.activate do
-        if self.md5.present? && ns = self.infer_namespace
-          scope = Attachment.where(:md5 => md5, :namespace => ns, :root_attachment_id => nil, :content_type => content_type)
-          scope = scope.where("filename IS NOT NULL")
-          scope = scope.where("id<>?", self) unless new_record?
-          scope.detect { |a| a.store.exists? }
+        Shackles.activate(:slave) do
+          if self.md5.present? && (ns = self.infer_namespace)
+            scope = Attachment.where(md5: md5, namespace: ns, root_attachment_id: nil, content_type: content_type)
+            scope = scope.where("filename IS NOT NULL")
+            scope = scope.where("id<>?", self) unless new_record?
+            scope.detect { |a| a.store.exists? }
+          end
         end
       end
     end
@@ -529,7 +544,7 @@ module AttachmentFu # :nodoc:
             run_callbacks(:save_and_attachment_processing)
           end
 
-          if self.class.connection.open_transactions == 1
+          if self.class.open_transactions == 1 # yes, == 1, not > 0 ... see comment above
             self.class.connection.after_transaction_commit(&save_and_callbacks)
           else
             save_and_callbacks.call()

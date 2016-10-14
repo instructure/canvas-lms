@@ -64,9 +64,13 @@ define [
     redirectTo: (path) ->
       location.href = path
 
+    canDelete: ->
+      @model.get('permissions').delete
+
     onDelete: (e) =>
       e.preventDefault()
-      @delete() if confirm(@messages.confirm)
+      if @canDelete()
+        @delete() if confirm(@messages.confirm)
 
     # delete quiz item
     delete: ->
@@ -94,6 +98,8 @@ define [
       base.quiz_menu_tools = ENV.quiz_menu_tools
       _.each base.quiz_menu_tools, (tool) =>
         tool.url = tool.base_url + "&quizzes[]=#{@model.get("id")}"
+
+      base.cyoeEnabled = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && base.quiz_type == 'assignment'
 
       if @model.get("multiple_due_dates")
         base.selector  = @model.get("id")

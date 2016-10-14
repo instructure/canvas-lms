@@ -207,7 +207,7 @@ class AppointmentGroupsController < ApplicationController
   include Api::V1::CalendarEvent
 
   before_filter :require_user
-  before_filter :get_appointment_group, :only => [:show, :update, :destroy, :users, :groups]
+  before_filter :get_appointment_group, :only => [:show, :update, :destroy, :users, :groups, :edit]
 
   def calendar_fragment(opts)
     opts.to_json.unpack('H*')
@@ -380,7 +380,24 @@ class AppointmentGroupsController < ApplicationController
         return redirect_to calendar2_url(:anchor => anchor)
       end
 
-      render :json => appointment_group_json(@group, @current_user, session, :include => ((params[:include] || []) | ['appointments']))
+      render :json => appointment_group_json(@group, @current_user, session,
+                                             :include => ((params[:include] || []) | ['appointments']),
+                                             :include_past_appointments => @group.grants_right?(@current_user, :manage))
+    end
+  end
+
+  # Shows the edit page for an assignment group
+  def edit
+    if request.format == :html
+      if authorized_action(@group, @current_user, :update)
+        @page_title = t('Edit %{title}', {title: @group.title})
+        js_env({
+          :APPOINTMENT_GROUP_ID => @group.id,
+        })
+        js_bundle :calendar_appointment_group_edit
+        css_bundle :calendar_appointment_group_edit
+        render :text => "".html_safe, :layout => true
+      end
     end
   end
 

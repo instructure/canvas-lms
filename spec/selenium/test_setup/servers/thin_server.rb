@@ -6,8 +6,10 @@ class SpecFriendlyThinServer
     bind_address = options[:BindAddress] || IPSocket.getaddress(Socket.gethostname)
     port = options[:Port]
     @port_ok = true
-    start_server(app, bind_address, port)
-    wait_for_server(bind_address, port)
+    BlankSlateProtection.disable do
+      start_server(app, bind_address, port)
+      wait_for_server(bind_address, port)
+    end
   end
 
   class NoAcceptorError

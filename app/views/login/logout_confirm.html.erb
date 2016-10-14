@@ -2,50 +2,32 @@
   css_bundle :login
   @headers = false
   content_for :page_title, t(:page_title, "Log Out")
+  @body_classes << "full-width ic-Login-Body" if @body_classes
 %>
-<% if use_new_styles? %>
-  <% @body_classes << "full-width ic-Login-Body" if @body_classes %>
-  <div class="ic-Login">
-    <div class="ic-Login__container">
-      <div class="ic-Login__content">
-        <div class="ic-Login__innerContent">
-          <div class="ic-Login__header">
-            <%= render :partial => 'login/shared/header_logo' %>
-          </div>
-          <div class="ic-Login__body">
-            <h1 class="ic-Login__title">
-              <%= t 'log_out', 'Log Out' %>
-            </h1>
-            <p class="ic-Login__text">
-              <%= t 'details.log_out', 'Are you sure you want to log out of Canvas?' %>
-            </p>
-            <%= form_tag logout_path, method: :delete do %>
-              <div class="ic-Login__actions">
-                <%= link_to(t(:cancel, "Cancel"), '/', :class => (use_new_styles? ? "Button Button--link Button--logout-link" : "btn")) %>
-                <div class="ic-Login__actions--right">
-                  <%= submit_tag(t("Log Out"), :class => "Button Button--primary Button--logout-confirm") %>
-                </div>
+<div class="ic-Login">
+  <div class="ic-Login__container">
+    <div class="ic-Login__content">
+      <div class="ic-Login__innerContent">
+        <div class="ic-Login__header">
+          <%= render :partial => 'login/shared/header_logo' %>
+        </div>
+        <div class="ic-Login__body">
+          <h1 class="ic-Login__title">
+            <%= t 'log_out', 'Log Out' %>
+          </h1>
+          <p class="ic-Login__text">
+            <%= t 'details.log_out', 'Are you sure you want to log out of Canvas?' %>
+          </p>
+          <%= form_tag logout_path, method: :delete do %>
+            <div class="ic-Login__actions">
+              <%= link_to(t(:cancel, "Cancel"), '/', :class => "Button Button--link Button--logout-link") %>
+              <div class="ic-Login__actions--right">
+                <%= submit_tag(t("Log Out"), :class => "Button Button--primary Button--logout-confirm") %>
               </div>
-            <% end %>
-          </div> <!-- end ic-Login__body -->
-        </div> <!-- end ic-Login__innerContent -->
-      </div> <!-- end ic-Login__content -->
+            </div>
+          <% end %>
+        </div> <!-- end ic-Login__body -->
+      </div> <!-- end ic-Login__innerContent -->
     </div> <!-- end ic-Login__content -->
-  </div> <!-- end ic-Login__container -->
-<% else %>
-  <% @body_classes << "modal" if @body_classes %>
-  <!-- Legacy UI for Logout -->
-  <div id="modal-box">
-    <h1><%= t 'log_out', 'Log Out' %></h1>
-    <p>
-      <%= t 'details.log_out', 'Are you sure you want to log out of Canvas?' %>
-    </p>
-    <%= form_tag logout_path, method: :delete do %>
-      <div class="button_box">
-        <%= link_to(t(:cancel, "Cancel"), '/', :class => "btn") %>
-        <%= submit_tag(t("Log Out"), :class => "btn btn-primary") %>
-      </div>
-    <% end %>
-  </div>
-<% end %>
-
+  </div> <!-- end ic-Login__content -->
+</div> <!-- end ic-Login__container -->

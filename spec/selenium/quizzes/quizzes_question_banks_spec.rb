@@ -127,11 +127,12 @@ describe 'quizzes question banks' do
 
     it 'should check permissions when retrieving question banks', priority: "1", test_id: 201933 do
       @course.account = Account.default
-      @course.account.role_overrides.create(
+      @course.account.role_overrides.create!(
         permission: 'read_question_banks',
         role: teacher_role,
         enabled: false
       )
+      Account.default.reload
       @course.save
       quiz = @course.quizzes.create!(title: 'My Quiz')
 
@@ -333,7 +334,8 @@ describe 'quizzes question banks' do
 
       @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
 
-      Account.default.role_overrides.create(:permission => 'read_question_banks', :role => teacher_role, :enabled => false)
+      Account.default.role_overrides.create!(:permission => 'read_question_banks', :role => teacher_role, :enabled => false)
+      Account.default.reload
 
       get "/courses/#{@course.id}/quizzes"
       expect(f("#content")).not_to contain_css('.view_question_banks')

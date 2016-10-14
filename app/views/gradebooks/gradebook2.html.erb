@@ -1,8 +1,8 @@
 <%
   content_for :page_title, "Gradebook - #{@context.name}"
   @body_classes << "gradebook2 full-width"
-  @show_left_side = use_new_styles?
-  @collapse_course_menu = true if @show_left_side
+  @show_left_side = true
+  @collapse_course_menu = true
   @show_embedded_chat = false
   css_bundle :slickgrid, :gradebook2
   js_bundle :gradebook2
@@ -108,9 +108,6 @@
                                                            :anchor => 'tab-grade-publishing') %>">
             <%= t('Publish grades to SIS') %>
           </a></li>
-          <% end %>
-          <% if @gradebook_is_editable %>
-            <li><a class="dialog_opener" role="button" aria-controls="assignment_group_weights_dialog" href="<%= context_url(@context, :context_assignments_url) %>"><%= t('Set Group Weights') %></a></li>
           <% end %>
           <li><a class="student_names_toggle" href="#" role="button"><%= t('Hide Student Names') %></a></li>
           <li><a data-arrange-columns-by="due_date" href="#"><label><%= t('Arrange columns by due date') %><input type="radio" name="arrange-columns-by" /></label></a></li>

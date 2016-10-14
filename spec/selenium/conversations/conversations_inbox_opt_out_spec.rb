@@ -31,14 +31,10 @@ describe "conversations new" do
 
         get '/profile/communication'
         expect(ff('td[data-category="conversation_message"]').count).to eq 1
-        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-          # make sure the link exists in the global nav
-          expect(f('#header')).to contain_css("#global_nav_conversations_link")
-          # make sure the little blue circle indicating how many unread messages you have says 3
-          expect(f('#global_nav_conversations_link .menu-item__badge')).to include_text('3')
-        else
-          expect(ff('.unread-messages-count').count).to eq 1
-        end
+        # make sure the link exists in the global nav
+        expect(f('#header')).to contain_css("#global_nav_conversations_link")
+        # make sure the little blue circle indicating how many unread messages you have says 3
+        expect(f('#global_nav_conversations_link .menu-item__badge')).to include_text('3')
 
         get "/profile/settings"
         f('#disable_inbox').click
@@ -48,11 +44,7 @@ describe "conversations new" do
         get '/profile/communication'
         expect(f("#content")).not_to contain_css('td[data-category="conversation_message"]')
         expect(policy.reload.frequency).to eq "immediately"
-        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-          expect(f("#global_nav_conversations_link .menu-item__badge")).to have_attribute('style', "display: none\;")
-        else
-          expect(f("body")).not_to contain_css('.unread-messages-count')
-        end
+        expect(f("#global_nav_conversations_link .menu-item__badge")).to have_attribute('style', "display: none\;")
       end
     end
   end

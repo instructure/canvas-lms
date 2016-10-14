@@ -1,3 +1,36 @@
+v2.0.1 - Wed, 13 Jul 2016 22:55:21 GMT
+--------------------------------------
+
+- [36e3e55](../../commit/36e3e55) [fixed] Split toggleAriaHidden internal method to two methods
+
+
+v2.0.0 - Wed, 13 Jul 2016 14:42:45 GMT
+--------------------------------------
+
+- [f3b4731](../../commit/f3b4731) [changed] Move elementToFocus prop to getElementToFocus (#9)
+- [7a316ff](../../commit/7a316ff) [added] Prop for adding aria-hidden to application element (#8)
+
+
+v1.1.0 - Mon, 11 Jul 2016 22:24:30 GMT
+--------------------------------------
+
+- [d860b32](../../commit/d860b32) [fixed] Failing test for elementToFocus
+- [3300f2c](../../commit/3300f2c) [added] Add elementToFocus prop (#5)
+- [afe8d85](../../commit/afe8d85) [added] onOpen callback
+
+
+v1.0.1 - Fri, 08 Jul 2016 22:00:48 GMT
+--------------------------------------
+
+- [a374410](../../commit/a374410) [fixed] make default maintainFocus prob actually be true
+
+
+v1.0.0 - Fri, 08 Jul 2016 21:20:29 GMT
+--------------------------------------
+
+- [720c1ce](../../commit/720c1ce) [changed] Maintain focus inside of tray
+
+
 v0.3.0 - Thu, 05 Nov 2015 22:29:26 GMT
 --------------------------------------
 

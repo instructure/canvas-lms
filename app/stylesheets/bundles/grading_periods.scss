@@ -14,9 +14,7 @@
   .grading-period:nth-child(n+2) {
     border-top: none;
   }
-  .input-grading-period-date {
-    width: 160px;
-  }
+
   .icon-delete-grading-period::before {
     padding: 9px 0px;
     cursor: pointer;
@@ -26,34 +24,30 @@
   .icon-delete-grading-period {
     width: 20px;
   }
-  .buttons-grid-row {
-    width: 250px;
-  }
 
   label {
     font-weight: bold;
   }
 }
 
-.new-grading-period {
-  border-right-style: dashed;
-  border-bottom-style: dashed;
-  border-left-style: dashed;
-  border-top-style: none;
-  border-width: 2px;
-  @include fontSize(16px);
+.grading-period {
+  display: flex;
+}
 
-  #add-period-button {
-    @include fontSize(16px);
-    &:hover {
-      text-decoration: none;
-    }
-  }
-  .grading-period-add-icon {
-    margin-right: 4px;
+.GradingPeriod__Details {
+  flex: 1 1;
+}
+
+.GradingPeriod__Detail {
+  width: 100%;
+
+  &.ic-Input.hasDatepicker {
+    display: inline-block;
+    width: calc(100% - 46px);
   }
 }
 
-.no-active-grading-periods {
-  border-top-style: dashed;
+.GradingPeriod__Actions {
+  flex: 0 0;
+  margin-right: 12px;
 }

@@ -1,10 +1,10 @@
-var Errors = require("i18nliner/dist/lib/errors")["default"];
+var Errors = require("i18nliner/dist/lib/errors");
 Errors.register("UnscopedTranslateCall");
 
-var TranslateCall = require("i18nliner/dist/lib/extractors/translate_call")["default"];
+var TranslateCall = require("i18nliner/dist/lib/extractors/translate_call");
 var ScopedTranslateCall = require("./scoped_translate_call")(TranslateCall);
 
-var I18nJsExtractor = require("i18nliner/dist/lib/extractors/i18n_js_extractor")["default"];
+var I18nJsExtractor = require("i18nliner/dist/lib/extractors/i18n_js_extractor");
 
 function ScopedI18nJsExtractor() {
   I18nJsExtractor.apply(this, arguments);

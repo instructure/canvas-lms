@@ -21,10 +21,14 @@ module LockedSerializer
 
   private
   def locked_for_hash
-    @_locked_for_hash ||= (
-      return nil unless scope && object.respond_to?(:locked_for?)
-      context = object.try(:context)
-      object.locked_for?(scope, check_policies: true, context: context)
+    return @_locked_for_hash unless @_locked_for_hash.nil?
+    @_locked_for_hash = (
+      if scope && object.respond_to?(:locked_for?)
+        context = object.try(:context)
+        object.locked_for?(scope, check_policies: true, context: context)
+      else
+        false
+      end
     )
   end
 

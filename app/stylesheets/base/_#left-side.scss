@@ -1,9 +1,5 @@
 #left-side {
   display: none;
-  @if $use_new_styles == false {
-    float: left;
-    width: $left_side_width;
-  }
 }
 
 #section-tabs .section-tab-hidden a {

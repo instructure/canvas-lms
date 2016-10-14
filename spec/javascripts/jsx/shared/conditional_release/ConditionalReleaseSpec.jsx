@@ -120,6 +120,21 @@ define([
     });
   });
 
+  module('updateModalState', () => {
+    test('it adds overlay when modal is visible', (assert) => {
+      createComponent()
+      component.updateModalState({ isVisible: true })
+      ok($('body').hasClass('conditional-release-modal-visible'))
+    });
+
+    test('it removes overlay when modal is no longer visible', (assert) => {
+      createComponent()
+      component.updateModalState({ isVisible: true })
+      component.updateModalState({ isVisible: false })
+      ok(!$('body').hasClass('conditional-release-modal-visible'))
+    });
+  })
+
   module('updateAssignment', () => {
     test('it updates iframe', (assert) => {
       createComponent();
@@ -133,6 +148,7 @@ define([
       component.updateAssignment({ id: 'asdf' });
     });
   })
+
   module('handleMessage', () => {
     const sendMessage = (messageType, messageBody) => {
       component.handleMessage({
@@ -143,11 +159,24 @@ define([
     test('it can set and retrieve validation errors', () => {
       createComponent();
 
-      sendMessage('validationError', 'foo');
-      ok(component.validateBeforeSave() == 'foo');
+      sendMessage('validationErrors', '[{ "index": 1, "error": "foo" }]');
+      deepEqual(component.validateBeforeSave(), [{ message: 'foo' }]);
 
-      sendMessage('validationError', null);
+      sendMessage('validationErrors', null);
       ok(component.validateBeforeSave() == null);
     });
+  });
+
+  module('focusOnError', () => {
+    test('it dispatches a focusOnError event', (assert) => {
+      createComponent()
+      const resolved = assert.async()
+      const remotePort = connectComponent()
+      remotePort.onmessage = (event) => {
+        ok(event.data.messageType === 'focusOnError')
+        resolved()
+      }
+      component.focusOnError()
+    })
   });
 });

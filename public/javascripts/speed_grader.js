@@ -17,6 +17,8 @@
  */
 
 define([
+  'jsx/speed_grader/mgp',
+  'jsx/grading/helpers/OutlierScoreHelper',
   'jst/speed_grader/student_viewed_at',
   'jst/speed_grader/submissions_dropdown',
   'jst/speed_grader/speech_recognition',
@@ -52,7 +54,7 @@ define([
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(MGP, OutlierScoreHelper, studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // PRIVATE VARIABLES AND FUNCTIONS
   // all of the $ variables here are to speed up access to dom nodes,
@@ -118,6 +120,7 @@ define([
       $submission_not_newest_notice = $("#submission_not_newest_notice"),
       $enrollment_inactive_notice = $("#enrollment_inactive_notice"),
       $enrollment_concluded_notice = $("#enrollment_concluded_notice"),
+      $closed_gp_notice = $("#closed_gp_notice"),
       $submission_files_container = $("#submission_files_container"),
       $submission_files_list = $("#submission_files_list"),
       $submission_attachment_viewed_at = $("#submission_attachment_viewed_at_container"),
@@ -145,7 +148,8 @@ define([
       groupLabel = I18n.t("group", "Group"),
       gradeeLabel = studentLabel,
       utils,
-      crocodocSessionTimer;
+      crocodocSessionTimer,
+      isAdmin = _.include(ENV.current_user_roles, "admin");
 
   utils = {
     getParam: function(name){
@@ -772,11 +776,11 @@ define([
       event.stopPropagation();
 
       //Prev()
-      if(event.keyString == "j" || event.keyString == "p") {
+      if(event.keyString == "k" || event.keyString == "p") {
         EG.prev();
       }
       //next()
-      else if(event.keyString == "k" || event.keyString == "n") {
+      else if(event.keyString == "j" || event.keyString == "n") {
         EG.next();
       }
       //comment
@@ -1148,6 +1152,7 @@ define([
         $full_width_container.removeClass("with_enrollment_notice");
         $enrollment_inactive_notice.hide();
         $enrollment_concluded_notice.hide();
+        $closed_gp_notice.hide();
 
         EG.setGradeReadOnly(true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
         if (ENV.grading_role == 'moderator' && this.currentStudent.submission_state == 'not_graded') {
@@ -1505,15 +1510,14 @@ define([
       var $submission_to_view = $("#submission_to_view"),
           submissionToViewVal = $submission_to_view.val(),
           currentSelectedIndex = currentIndex(this, submissionToViewVal),
-          isMostRecent = this.currentStudent &&
-                         this.currentStudent.submission &&
-                         this.currentStudent.submission.submission_history &&
-                         this.currentStudent.submission.submission_history.length - 1 === currentSelectedIndex,
-          submission  = this.currentStudent &&
-                        this.currentStudent.submission &&
-                        this.currentStudent.submission.submission_history &&
-                        this.currentStudent.submission.submission_history[currentSelectedIndex] &&
-                        this.currentStudent.submission.submission_history[currentSelectedIndex].submission
+          submissionHolder = this.currentStudent &&
+                             this.currentStudent.submission,
+          submissionHistory = submissionHolder && submissionHolder.submission_history,
+          isMostRecent = submissionHistory &&
+                         submissionHistory.length - 1 === currentSelectedIndex,
+          submission  = submissionHistory &&
+                        submissionHistory[currentSelectedIndex] &&
+                        submissionHistory[currentSelectedIndex].submission
                         || {},
           inlineableAttachments = [],
           browserableAttachments = [];
@@ -1610,9 +1614,16 @@ define([
       );
 
       var isConcluded = EG.isStudentConcluded(this.currentStudent.id);
+      var isClosedForStudent = MGP.assignmentClosedForStudent(this.currentStudent, jsonData);
       $enrollment_concluded_notice.showIf(isConcluded);
+      $closed_gp_notice.showIf(isClosedForStudent);
       SpeedgraderHelpers.setRightBarDisabled(isConcluded);
-      if (isConcluded) {
+      EG.setGradeReadOnly((typeof submissionHolder != "undefined" &&
+                           submissionHolder.submission_type === "online_quiz") ||
+                          isConcluded ||
+                          (isClosedForStudent && !isAdmin));
+
+      if (isConcluded || isClosedForStudent) {
         $full_width_container.addClass("with_enrollment_notice");
       }
     },
@@ -1757,23 +1768,28 @@ define([
     //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
     renderSubmissionPreview: function() {
       this.emptyIframeHolder()
-      $iframe_holder.html($.raw(
-        '<iframe id="speedgrader_iframe" src="' +
-        htmlEscape('/courses/' + jsonData.context_id  +
+      var src = htmlEscape('/courses/' + jsonData.context_id  +
         '/assignments/' + this.currentStudent.submission.assignment_id +
         '/submissions/' + this.currentStudent.submission.user_id +
         '?preview=true' + (SpeedgraderHelpers.iframePreviewVersion(this.currentStudent.submission)) + (
           utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
-        )) +
-        '" frameborder="0"></iframe>'
-      )).show();
+        ));
+      var iframe = SpeedgraderHelpers.buildIframe(src, {
+        frameborder: 0,
+        allowfullscreen: true
+      });
+      $iframe_holder.html($.raw(iframe)).show();
     },
 
     renderLtiLaunch: function($div, urlBase, externalToolUrl) {
       this.emptyIframeHolder()
       var launchUrl = urlBase + '&url=' + encodeURIComponent(externalToolUrl);
+      var iframe = SpeedgraderHelpers.buildIframe(htmlEscape(launchUrl), {
+        className: 'tool_launch',
+        allowfullscreeen: true
+      });
       $div.html(
-        $.raw('<iframe id="speedgrader_iframe" src="' + htmlEscape(launchUrl) + '" class="tool_launch"></iframe>' )
+        $.raw(iframe)
       ).show();
     },
 
@@ -1835,7 +1851,13 @@ define([
         var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
           .replace("{{submissionId}}", this.currentStudent.submission.user_id)
           .replace("{{attachmentId}}", attachment.id);
-        $iframe_holder.html('<iframe src="'+htmlEscape(src)+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
+        var iframe = SpeedgraderHelpers.buildIframe(htmlEscape(src), {
+          frameborder: 0,
+          allowfullscreen: true
+        });
+        $iframe_holder.html(
+          $.raw(iframe)
+        ).show();
       }
     },
 
@@ -1943,7 +1965,8 @@ define([
                 var updatedComments = _.reject(
                   that.currentStudent.submission.submission_comments,
                   function(item) {
-                    return item.id === comment.id;
+                    var submissionComment = item.submission_comment || item;
+                    return submissionComment.id === comment.id;
                   }
                 );
 
@@ -1964,6 +1987,19 @@ define([
               var $replacementComment = renderComment(data.submission_comment, $comment_blank);
               $replacementComment.show();
               $comment.replaceWith($replacementComment);
+
+              var updatedComments = _.map(that.currentStudent.submission.submission_comments,
+                function(item) {
+                  var submissionComment = item.submission_comment || item;
+                  if (submissionComment.id === comment.id) {
+                    return data.submission_comment;
+                  } else {
+                    return submissionComment;
+                  }
+                }
+              );
+
+              that.currentStudent.submission.submission_comments = updatedComments;
             }
 
             function commentUpdateFailed(jqXHR, textStatus) {
@@ -1971,18 +2007,8 @@ define([
             }
 
             var url = '/submission_comments/' + comment.id;
-            var data = {
-              submission_comment: {
-                draft: 'false'
-              }
-            };
-
-            var ajaxOptions = {
-              url: url,
-              data: data,
-              dataType: 'json',
-              type: 'PATCH'
-            };
+            var data = { submission_comment: { draft: 'false' } };
+            var ajaxOptions = { url: url, data: data, dataType: 'json', type: 'PATCH' };
 
             $.ajax(ajaxOptions).done(commentUpdateSucceeded).fail(commentUpdateFailed);
           }
@@ -2149,13 +2175,16 @@ define([
       var url    = $(".update_submission_grade_url").attr('href'),
           method = $(".update_submission_grade_url").attr('title'),
           formData = {
-            'submission[assignment_id]': jsonData.id,
-            'submission[user_id]':       EG.currentStudent.id,
+            'submission[assignment_id]':      jsonData.id,
+            'submission[user_id]':            EG.currentStudent.id,
             'submission[graded_anonymously]': utils.shouldHideStudentNames()
           };
 
-      var grade = SpeedgraderHelpers.determineGradeToSubmit(use_existing_score,
-                                                            EG.currentStudent, $grade);
+      var grade = SpeedgraderHelpers.determineGradeToSubmit(
+        use_existing_score,
+        EG.currentStudent,
+        $grade
+      );
 
       if (grade.toUpperCase() === "EX") {
         formData["submission[excuse]"] = true;
@@ -2175,6 +2204,16 @@ define([
       }
 
       $.ajaxJSON(url, method, formData, function(submissions) {
+        var pointsPossible = jsonData.points_possible;
+        var score = submissions[0].submission.score;
+
+        if (!submissions[0].submission.excused) {
+          var outlierScoreHelper = new OutlierScoreHelper(score, pointsPossible);
+          if(outlierScoreHelper.hasWarning()) {
+            $.flashWarning(outlierScoreHelper.warningMessage());
+          }
+        }
+
         $.each(submissions, function(){
           EG.setOrUpdateSubmission(this.submission);
         });
@@ -2189,9 +2228,6 @@ define([
       var grade = EG.getGradeToShow(submission, ENV.grading_role);
 
       $grade.val(grade);
-      EG.setGradeReadOnly((typeof submission != "undefined" &&
-                           submission.submission_type === 'online_quiz') ||
-                          EG.isStudentConcluded(EG.currentStudent.id));
 
       $('#submit_same_score').hide();
       if (typeof submission != "undefined" && submission.score !== null) {
@@ -2308,14 +2344,43 @@ define([
     }
   };
 
+  function getAssignmentOverrides() {
+    return $.getJSON("/api/v1/courses/" + ENV.course_id +
+                     "/assignments/" + ENV.assignment_id + "/overrides");
+  }
+
+  function getGradingPeriods() {
+    var dfd = $.Deferred();
+    // treating failure as a success here since grading periods 404 when not
+    // enabled
+    $.ajaxJSON("/api/v1/courses/" + ENV.course_id + "/grading_periods",
+      "GET", {},
+      function(response) { dfd.resolve(response.grading_periods); },
+      function() { dfd.resolve([]); },
+      {skipDefaultError: true}
+    );
+
+    return dfd;
+  }
+
+  function gotData(assignmentOverridesResponse, gradingPeriods, speedGraderJsonResponse) {
+    var speedGraderJSON = speedGraderJsonResponse[0];
+    var assignmentOverrides = assignmentOverridesResponse[0];
+
+    speedGraderJSON.gradingPeriods = gradingPeriods;
+    speedGraderJSON.assignmentOverrides = assignmentOverrides;
+
+    window.jsonData = speedGraderJSON;
+    EG.jsonReady();
+  }
+
   return {
     setup: function() {
       // fire off the request to get the jsonData
       window.jsonData = {};
-      $.ajaxJSON(window.location.pathname+ '.json' + window.location.search, 'GET', {}, function(json) {
-        jsonData = json;
-        $(EG.jsonReady);
-      });
+      var speedGraderJsonDfd = $.getJSON(window.location.pathname+ '.json' + window.location.search);
+
+      $.when(getAssignmentOverrides(), getGradingPeriods(), speedGraderJsonDfd).then(gotData);
 
       //run the stuff that just attaches event handlers and dom stuff, but does not need the jsonData
       $(document).ready(function() {

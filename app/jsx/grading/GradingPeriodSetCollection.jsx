@@ -2,6 +2,7 @@ define([
   'react',
   'underscore',
   'jquery',
+  'instructure-ui/Button',
   'i18n!grading_periods',
   'convert_case',
   'jsx/grading/GradingPeriodSet',
@@ -14,7 +15,7 @@ define([
   'compiled/api/gradingPeriodSetsApi',
   'compiled/api/enrollmentTermsApi',
   'jquery.instructure_misc_plugins'
-], function(React, _, $, I18n, ConvertCase, GradingPeriodSet, SearchGradingPeriodsField, SearchHelpers, DateHelper, EnrollmentTermsDropdown, NewGradingPeriodSetForm, EditGradingPeriodSetForm, SetsApi, TermsApi) {
+], function(React, _, $, { default: Button }, I18n, ConvertCase, GradingPeriodSet, SearchGradingPeriodsField, SearchHelpers, DateHelper, EnrollmentTermsDropdown, NewGradingPeriodSetForm, EditGradingPeriodSetForm, SetsApi, TermsApi) {
 
   const presentEnrollmentTerms = function(enrollmentTerms) {
     return _.map(enrollmentTerms, term => {
@@ -231,7 +232,6 @@ define([
     },
 
     editGradingPeriodSet(set) {
-      let setComponent = this.refs[getShowGradingPeriodSetRef(set)];
       this.setState({ editSet: {id: set.id, saving: false} });
     },
 
@@ -379,17 +379,17 @@ define([
       let disable = this.state.showNewSetForm || !!this.state.editSet.id;
       if (!this.props.readOnly) {
         return (
-          <button
+          <Button
             ref            = 'addSetFormButton'
-            className      = {disable ? 'Button Button--primary disabled' : 'Button Button--primary'}
-            aria-disabled  = {disable}
+            variant        = 'primary'
+            disabled       = {disable}
             onClick        = {this.openNewSetForm}
             aria-label     = {I18n.t("Add Set of Grading Periods")}
           >
             <i className="icon-plus"/>
             &nbsp;
             <span aria-hidden="true">{I18n.t("Set of Grading Periods")}</span>
-          </button>
+          </Button>
         );
       }
     },

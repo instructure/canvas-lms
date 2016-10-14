@@ -38,6 +38,14 @@ define [
         contextInfo = context
         break
 
+    # match one of a multi-context event
+    if contextInfo == null && contextCode && contextCode.indexOf(',') >= 0
+      contextCodes = contextCode.split(',')
+      for context in contexts
+        if contextCodes.indexOf(context.asset_string) >= 0
+          contextInfo = context
+          break
+
     # If we can't find the context, then we're not sure
     # how to handle or display this, so we ditch it.
     if contextInfo == null

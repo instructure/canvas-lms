@@ -5,13 +5,10 @@
 @import "vendor/bootstrap/reset";
 
 // Grid system and page structure
-@import "vendor/bootstrap/scaffolding";//remove this line once $use_new_styles is turned on everywhere
-
 @import "vendor/bootstrap/grid";
 @import "vendor/bootstrap/layouts";
 
 // Base CSS
-@import "vendor/bootstrap/type";//remove this line once $use_new_styles is turned on everywhere
 @import "vendor/bootstrap/code";
 @import "vendor/bootstrap/forms";
 @import "vendor/bootstrap/tables";
@@ -55,5 +52,3 @@
 
 // Tablets to regular desktops
 @import "vendor/bootstrap/responsive-768px-979px";
-
-@import "bootstrap_overrides";//remove this line once $use_new_styles is turned on everywhere}

@@ -345,6 +345,11 @@
 #           "example": "2012-07-01T23:59:00-06:00",
 #           "type": "datetime"
 #         },
+#         "intra_group_peer_reviews": {
+#           "description": "Boolean representing whether or not members from within the same group on a group assignment can be assigned to peer review their own group's work",
+#           "example": "false",
+#           "type": "boolean"
+#         },
 #         "group_category_id": {
 #           "description": "The ID of the assignment’s group set, if this is a group assignment. For group discussions, set group_category_id on the discussion topic, not the linked assignment.",
 #           "example": 1,
@@ -529,7 +534,7 @@
 #     }
 class AssignmentsApiController < ApplicationController
   before_filter :require_context
-  before_filter :require_user_or_observer, :only=>[:user_index]
+  before_filter :require_user_visibility, :only=>[:user_index]
   include Api::V1::Assignment
   include Api::V1::Submission
   include Api::V1::AssignmentOverride
@@ -548,6 +553,7 @@ class AssignmentsApiController < ApplicationController
   #   Split up "needs_grading_count" by sections into the "needs_grading_count_by_section" key, defaults to false
   # @argument bucket [String, "past"|"overdue"|"undated"|"ungraded"|"unsubmitted"|"upcoming"|"future"]
   #   If included, only return certain assignments depending on due date and submission status.
+  # @argument assignment_ids[] if set, return only assignments specified
   # @returns [Assignment]
   def index
     error_or_array= get_assignments(@current_user)
@@ -571,7 +577,6 @@ class AssignmentsApiController < ApplicationController
           preload(:rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
       scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
-
       include_params = Array(params[:include])
 
       if params[:bucket]
@@ -583,7 +588,19 @@ class AssignmentsApiController < ApplicationController
         scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @current_user, @context, submissions_for_user)
       end
 
+      if params[:assignment_ids]
+        if params[:assignment_ids].length > Api.max_per_page
+          return render json: { message: "Request contains too many assignment_ids.  Limit #{Api.max_per_page}" }, status: 400
+        end
+        scope = scope.where(id: params[:assignment_ids])
+      end
+
       assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
+
+      if params[:assignment_ids] && assignments.length != params[:assignment_ids].length
+        invalid_ids = params[:assignment_ids] - assignments.map(&:id).map(&:to_s)
+        return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(',')}" }, status: 400
+      end
 
       submissions = submissions_hash(include_params, assignments, submissions_for_user)
 
@@ -626,7 +643,6 @@ class AssignmentsApiController < ApplicationController
 
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
-        active_overrides = include_override_objects ? assignment.assignment_overrides.active : nil
         needs_grading_course_proxy = @context.grants_right?(user, session, :manage_grades) ?
           Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, user) : nil
 
@@ -638,7 +654,7 @@ class AssignmentsApiController < ApplicationController
                         needs_grading_course_proxy: needs_grading_course_proxy,
                         include_all_dates: include_all_dates,
                         bucket: params[:bucket],
-                        overrides: active_overrides,
+                        include_overrides: include_override_objects,
                         preloaded_user_content_attachments: preloaded_attachments
                         )
       end
@@ -674,7 +690,6 @@ class AssignmentsApiController < ApplicationController
       include_all_dates = value_to_boolean(params[:all_dates] || false)
 
       include_override_objects = included_params.include?('overrides') && @context.grants_any_right?(@current_user, :manage_assignments)
-      active_overrides = include_override_objects ? @assignment.assignment_overrides.active : nil
 
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
@@ -691,7 +706,7 @@ class AssignmentsApiController < ApplicationController
                   include_visibility: include_visibility,
                   needs_grading_count_by_section: needs_grading_count_by_section,
                   include_all_dates: include_all_dates,
-                  overrides: active_overrides)
+                  include_overrides: include_override_objects)
     end
   end
 
@@ -781,7 +796,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
-  #  The assignment is ungraded if this field is omitted.
+  #  The assignment defaults to "points" if this field is omitted.
   #
   # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due.
@@ -922,7 +937,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
-  #  The assignment is ungraded if this field is omitted.
+  #  The assignment defaults to "points" if this field is omitted.
   #
   # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due.
@@ -1003,9 +1018,14 @@ class AssignmentsApiController < ApplicationController
     return render :json => @context.errors, :status => :bad_request
   end
 
-  def require_user_or_observer
+  def require_user_visibility
     return render_unauthorized_action unless @current_user.present?
     @user = params[:user_id]=="self" ? @current_user : api_find(User, params[:user_id])
-    authorized_action(@user,@current_user, [:read_as_parent, :read])
+    if @context.grants_right?(@current_user, :view_all_grades)
+      # teacher, ta
+      return if @context.students_visible_to(@current_user).include?(@user)
+    end
+    # self, observer
+    authorized_action(@user, @current_user, [:read_as_parent, :read])
   end
 end

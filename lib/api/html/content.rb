@@ -42,7 +42,7 @@ module Api
       end
 
       def might_need_modification?
-        !!(html =~ %r{verifier=|['"]/files|instructure_inline_media_comment})
+        !!(html =~ %r{verifier=|\D/files|instructure_inline_media_comment})
       end
 
       # Take incoming html from a user or similar and modify it for safe storage and display
@@ -95,11 +95,15 @@ module Api
 
       def add_css_and_js_overrides
         return parsed_html unless @include_mobile
-        return parsed_html unless @account &&
-          @account.root_account.feature_enabled?(:use_new_styles) &&
-          @account.effective_brand_config
+        return parsed_html unless @account && @account.effective_brand_config
 
         overrides = @account.effective_brand_config.css_and_js_overrides
+        self.class.add_overrides_to_html(parsed_html, overrides)
+
+        parsed_html
+      end
+
+      def self.add_overrides_to_html(parsed_html, overrides)
         if (mobile_css_overrides = overrides[:mobile_css_overrides])
           mobile_css_overrides.reverse_each do |url|
             tag = parsed_html.document.create_element('link', rel: 'stylesheet', href: url)
@@ -112,7 +116,6 @@ module Api
             parsed_html.add_child(tag)
           end
         end
-        parsed_html
       end
 
       private

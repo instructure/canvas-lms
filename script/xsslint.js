@@ -1,6 +1,6 @@
 var XSSLint    = require("xsslint");
 var Linter     = require("xsslint/linter");
-var globby     = require("gglobby").default;
+var globby     = require("gglobby");
 var fs         = require("fs");
 
 XSSLint.configure({

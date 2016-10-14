@@ -26,6 +26,8 @@ define([
           <li className="ic-NavMenu-list-item" key={`link${index}`}>
             <a
               href={link.url}
+              target="_blank"
+              rel="noopener"
               onClick={this.handleLinkClick}
               className="ic-NavMenu-list-item__link"
             >
@@ -45,7 +47,7 @@ define([
 
       // if the current user is an admin, show the settings link to
       // customize this menu
-      if (window.ENV.current_user_roles.indexOf("admin") > -1) {
+      if (window.ENV.current_user_roles.indexOf("root_admin") > -1) {
         links.push(
           <li key="admin" className="ic-NavMenu-list-item ic-NavMenu-list-item--feature-item">
             <a

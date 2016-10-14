@@ -24,7 +24,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   attr_accessible
 
-  attr_accessor :dont_touch_assignment
+  attr_accessor :dont_touch_assignment, :preloaded_student_ids, :changed_student_ids
 
   belongs_to :assignment
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
@@ -122,12 +122,19 @@ class AssignmentOverride < ActiveRecord::Base
   scope :active, -> { where(:workflow_state => 'active') }
 
   scope :visible_students_only, -> (visible_ids) do
-    select("assignment_overrides.*").
-    joins(:assignment_override_students).
-    where(
+    scope = select("assignment_overrides.*").
+      joins(:assignment_override_students).
+      distinct
+
+    if ActiveRecord::Relation === visible_ids
+      column = visible_ids.klass == User ? :id : visible_ids.select_values.first
+      scope = scope.joins("INNER JOIN #{visible_ids.klass.quoted_table_name} ON assignment_override_students.user_id=#{visible_ids.klass.table_name}.#{column}")
+      return scope.merge(visible_ids.except(:select))
+    end
+
+    scope.where(
       assignment_override_students: { user_id: visible_ids },
-    ).
-    distinct
+    )
   end
 
   before_validation :default_values
@@ -193,22 +200,13 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def visible_student_overrides(visible_student_ids)
-    assignment_override_students.any? do |aos|
-      visible_student_ids.include?(aos.user_id)
-    end
+    assignment_override_students.where(user_id: visible_student_ids).exists?
   end
 
-  def self.visible_users_for(overrides, user=nil)
-    return [] if overrides.empty? || user.nil?
+  def self.visible_enrollments_for(overrides, user=nil)
+    return Enrollment.none if overrides.empty? || user.nil?
     override = overrides.first
-    override.visible_users_for(user)
-  end
-
-  def visible_users_for(user)
-    assignment_or_quiz = self.assignment || self.quiz
-    UserSearch.scope_for(assignment_or_quiz.context, user, {
-      force_users_visible_to: true
-    })
+    (override.assignment || override.quiz).context.enrollments_visible_to(user)
   end
 
   override :due_at
