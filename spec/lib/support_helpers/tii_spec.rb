@@ -20,13 +20,14 @@ describe SupportHelpers::Tii do
     describe '#monitor_and_fix' do
       it 'emails the caller upon success' do
         fixer = SupportHelpers::Tii::ShardFixer.new('email')
-        Message.expects(:new).with(
-          to: 'email',
-          from: 'tii_script@instructure.com',
-          subject: 'TurnItIn Fixer Success',
-          body: "#{fixer.fixer_name} fixed 0 assignments in 0 seconds!",
-          delay_for: 0
-        )
+        Message.expects(:new).with do |actual|
+          actual.slice(:to, :from, :subject, :delay_for) == {
+            to: 'email',
+            from: 'tii_script@instructure.com',
+            subject: 'TurnItIn Fixer Success',
+            delay_for: 0
+          } && actual[:body] =~ /fixed 0 assignments in \d+ seconds/
+        end
         Mailer.expects(:create_message)
         fixer.monitor_and_fix
       end
