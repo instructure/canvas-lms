@@ -1415,6 +1415,11 @@ he:
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "תמיד יש לטעון את עורך התוכן העשיר והסרגל הצידי משרות התוכן העשיר של קנבס בכל המקומות"
   an_error_accurred_selecting_provisional_grades_61b36f64: "אירעה שגיאה בבחירת ציונים זמניים"
   an_error_occured_please_try_again_e59b65b: "אירעה שגיאה. נא לנסות שוב."
+  an_error_occured_while_deleting_the_grading_period_81bb16e5: "אירעה שגיאה בעת ביטול אוגדן תקופת ההערכה"
+  an_error_occured_while_deleting_the_grading_period_c8343484: "אירעה שגיאה בעת ביטול תקופת ההערכה"
+  an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "אירעה שגיאה בעת איחזור ההרשמה לתקופות לימוד"
+  an_error_occured_while_fetching_grading_period_set_b4f12aa5: "אירעה שגיאה בעת איחזור אוגדן תקופות הערכה"
+  an_error_occured_while_updating_the_grading_period_9e024cd1: "אירעה שגיאה בעת עדכון אוגדן תקופות הערכה"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*אירעה שגיאה*, בבקשה לפרסם שוב את תשובתך מאוחר יותר"
   an_error_occurred_publishing_grades_cfdf7631: "אירעה שגיאה בעת פרסום הציונים."
   an_error_occurred_selecting_provisional_grades_9d7bcda: "אירעה שגיאה בעת בחירת הציונים הזמניים"
@@ -1509,6 +1514,8 @@ he:
   anonymous_user: "משתמש אנונימי"
   anonymous_user_d984b9ce: "משתמש אנונימי"
   another_configuration_is_currently_selected_select_95b394e: "קונפיגורציה שונה נבחרה כבר. בחירה של קונפיגורציה זו תבטל בחירה קודמת."
+  answer_address_book_queries_through_76842372: "מענה לחיפוש דרך רשימת הכתובות"
+  answer_answerid_97fc4afc: " מענה %{answerId}"
   answer_correct_answer_c2c4a20c: "%{answer}, (תשובה נכונה)"
   answer_description_6b353cfd: "תיאור תשובה"
   answer_distribution_2a956e3f: "התפלגות התשובות"
@@ -1519,6 +1526,7 @@ he:
   answers_which_scored_in_the_middle_46_46466ffd: "תשובות אשר ציונן בקבוצת האמצע של 46%"
   answers_which_scored_in_the_top_27_a605232d: "תשובות אשר ציונן ב 27% העליונים"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "התשובות תוצגנה בתום הנסיון האחרון שלך"
+  app_b157c2b3: אפליקציה
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "מרכז האפליקציות יופיע בלשונית ה\"אפלקציות\" בדף ההגדרות של הקורס או החשבון. הכתובת המסופקת בהמשך צריכה להצביע אל נקודת מרכז אפליקציות תקף. (לדוגמה:   %{url} -- יש וודא שה / שבסוף הכתובת מוסר."
   app_placements_6d877225: "מיקומי אפליקציות"
   app_reregistration_87cc8817: "הרשמה מחודשת של אפליקציה"
@@ -1571,6 +1579,7 @@ he:
   apply_781a2546: החל
   apply_theme_7af08387: "החלת ערכת נושא"
   applying_new_styles_to_subaccounts_e8aeeef2: "החלת סגנונות חדשים לחשבונות המשנה"
+  applying_please_be_patient_f7b5f244: "מיישם, נא להתאזר בסבלנות"
   appointment_group: 
     errors: 
       invalid_end_at: "זמן סיום הפגישה צריך להיות מאוחר יותר מזמן תחילה"
@@ -1596,13 +1605,18 @@ he:
     one: "בטוח/ה שרוצה לבטל את פריטי החשבון %{name}? האלה?"
     other: "בטוח/ה שרוצה לבטל את %{count} פריטי החשבון האלה?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "האם אתם בטוחים כי ברצונכם לבטל הודעה זו?"
+  are_you_sure_you_want_to_delete_this_comment_4ee386d: "האם בטוחים שרוצים לבטל הערה זו"
+  are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "האם בטוחים שרוצים לבטל אוגדן תקופות הערכה זה"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "בטוח/ה שרוצה לבטל את תקופת ההערכה הזו?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "בטוח/ה שרוצה לבטל את סכימת ההערכה הזו?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "בטוח/ה שרוצה לבצע פעולה זו? לא ניתן לשחזר זאת והפעולה תדרוס ציונים קיימים בספר הציונים."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "בטוח/ה שרוצה להסיר את תקופת ההערכה הזו?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "בטוח/ה שרוצה להסיר כלי זה?"
+  are_you_sure_you_want_to_remove_this_user_8d1a8295: "האם בטוחים שרוצים להסיר משתמש זה"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "בטוח/ה שרוצה לדווח על תמונת הפרופיל הזו?"
+  are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "האם בטוחים שרוצים לשגר הודעה זו"
   argentina_3257a200: ארגנטינה
+  argentina_54_375d6af4: "ארגנטינה (+54)"
   arrange_by_34a545de: "אירגון לפי"
   arrange_columns_by_assignment_group_33acdf03: "ארגן את העמודות לפי קבוצת משימה."
   arrange_columns_by_assignment_group_59bbddd0: "סידור עמודות לפי קבוצת משימה"
@@ -1610,6 +1624,7 @@ he:
   arrange_columns_by_due_date_f74f9e2d: "סידור עמודות לפי תאריך יעד"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "בעת הקלדה בשדה זה, רשימת הקבוצות תסונן אוטומטית לאלו העונים על הקלט שלך."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "בעת הקלדה בשדה זה, רשימת התוצאות תסונן באופן אוטומטי."
+  ask_your_instructor_a_question_a61ca5e9: "שאלו את המנחה שלכם שאלה"
   assessment_by_name_7b879a2c: "הערכה ע\"י %{name}"
   assessment_not_yet_completed_e800a0a7: "הערכה טרם הושלמה"
   assessment_question: 
@@ -1701,6 +1716,7 @@ he:
     errors: 
       frozen_assignments_error: "אין אפשרות לבטל קבוצה עם משימה נעולה"
   assignment_menu_91fe3716: "תפריט משימות"
+  assignment_muted_4cb590a4: "המשימה הושהתה"
   assignment_muter: 
     mute_assignment: "השתקת משימה"
     muting_assignment: "משתיק משימה..."
@@ -1709,6 +1725,10 @@ he:
     unmute_dialog: "משימה זו כרגע אינה פעילה. המשמעות הנה שתלמידים אינם יכולים לעיין בציוניהם ובמשוב. האם להפעילה מחדש?"
     unmuting_assignment: "מחדש משימה שהושתקה..."
   assignment_name_b2d87383: "שם משימה"
+  assignment_name_course_name_is_now_due_55613e9b: "%{assignment_name}, %{course_name}, צריכה להיות מוגשת כבר"
+  assignment_name_course_name_no_longer_has_a_due_da_a37b6a7c: "%{assignment_name}, %{course_name}, לא מועד הגשה יותר"
+  assignment_name_course_name_override_is_now_due_ed5ce1e: "%{assignment_name}, %{course_name} (%{override}) צריכה כבר להיות מוגשת"
+  assignment_name_course_name_override_no_longer_has_5a94da2b: "%{assignment_name}, %{course_name} (%{override}) ללא תאריך הגשה יותר"
   assignment_name_grade_history_b506426c: "הסטורית הציונים של %{assignment_name}  "
   assignment_options_1e5b7074: "אפשרויות משימה"
   assignment_override: 
@@ -1717,6 +1737,7 @@ he:
       other: "%{count} תלמידים "
   assignment_selection_6bff05c4: "בחירת משימה"
   assignment_was_deleted_8320d26d: "המשימה בוטלה"
+  assignment_weights_d4bcf9ab: "משקלות המטלה"
   assignments: 
     assignment_count: 
       one: "משימה אחת"
@@ -2264,6 +2285,7 @@ he:
     invalid_date_time: "מועד לא תקין ל%{attribute}"
     invalid_submission_types: "סוגי הגשה לא תקינים"
   assignments_in_this_group_have_no_points_possible__3cd35922: "הגשות בקבוצה זו אינן מאפשרות ניקוד ואינן נכללות בחישוב הציון"
+  assignments_in_this_group_have_no_points_possible__ab0adb72: "מטלות בקבוצה זו הן ללא ניקוד ואינן יכולות להכלל בתחשיב הציון"
   associated_account_course_id_d87a01c5: "מזהה חשבון/קורס נלווה"
   associated_account_name_91854e37: "שם חשבון נלווה"
   associated_course_name_9b5b1945: "שם קורס נלווה"
@@ -2293,9 +2315,12 @@ he:
     titles: 
       attendance_help: "עזרה בנוכחות"
   attention_aaca1f1d: "יש לשים לב!"
+  attribute_d9f3af72: מאפיין
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "סוג השמע אינו נתמך ע\"י המכשיר או האפליקציה שלך."
   audio_dd489fcc: שמע
+  australia_61_eb9bb701: "אוסטרליה (+61)"
   australia_e8d44bf8: אוסטרליה
+  austria_43_7bc58b34: "אוסטריה (+43)"
   auth_logging: 
     corrupted: "אין פירוט"
     login: התחברות
@@ -2312,6 +2337,7 @@ he:
   available_from_f84e4611: "זמין מ"
   available_from_field_for_styleguide_7ced3861: "שדה זמין מתאריך - למדריך למעצב"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "זמין מ- בפורמט כגון YYYY-MM-DD hh:mm"
+  available_to_b7350e02: "זמין ל"
   available_until_date_2c0ccec3: "זמין עד תאריך:"
   available_until_date_cd125c62: "זמין עד תאריך"
   available_until_f3b9c4ed: "זמין עד"
@@ -2329,6 +2355,7 @@ he:
   background_color_b92b52ac: "צבע רקע"
   background_image_1a401e1a: "תמונת רקע"
   base_847aca7c: בסיסי
+  base_role_type_a9cc892d: base_role_type
   bb_display: "Blackboard Learn"
   bb_file_description: "יצוא קובץ Blackboard 6/7/8/9 בפורמט זיפ"
   bb_name: "Blackboard Converter"
