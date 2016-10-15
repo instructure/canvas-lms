@@ -719,9 +719,8 @@ CanvasRails::Application.routes.draw do
   get 'search/bookmarks' => 'users#bookmark_search', as: :bookmark_search
   get 'search/rubrics' => 'search#rubrics'
   get 'search/all_courses' => 'search#all_courses'
-  resources :users do
+  resources :users, except: :destroy do
     match 'masquerade', via: [:get, :post]
-    delete :delete
     concerns :files, :file_images
 
     resources :page_views, only: :index

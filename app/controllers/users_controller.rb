@@ -1688,35 +1688,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def delete
-    @user = User.find(params[:user_id])
-    render_unauthorized_action unless @user.allows_user_to_remove_from_account?(@domain_root_account, @current_user)
-  end
-
-  def destroy
-    @user = api_find(User, params[:id])
-    if @user.allows_user_to_remove_from_account?(@domain_root_account, @current_user)
-      @user.remove_from_root_account(@domain_root_account)
-      if @user == @current_user
-        logout_current_user
-      end
-
-      respond_to do |format|
-        format.html do
-          flash[:notice] = t('user_is_deleted', "%{user_name} has been deleted", :user_name => @user.name)
-          redirect_to(@user == @current_user ? root_url : users_url)
-        end
-
-        format.json do
-          get_context # need the context for user_json
-          render :json => user_json(@user, @current_user, session)
-        end
-      end
-    else
-      render_unauthorized_action
-    end
-  end
-
   def report_avatar_image
     @user = User.find(params[:user_id])
     key = "reported_#{@user.id}"
