@@ -1577,10 +1577,6 @@ class Account < ActiveRecord::Base
   scope :name_like, lambda { |name| where(wildcard('accounts.name', name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
 
-  def canvas_network_enabled?
-    false
-  end
-
   def change_root_account_setting!(setting_name, new_value)
     root_account.settings[setting_name] = new_value
     root_account.save!

@@ -64,7 +64,7 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :groups do
-    resources :groups
+    resources :groups, except: :edit
     resources :group_categories, only: [:create, :update, :destroy]
     get 'group_unassigned_members' => 'groups#unassigned_members'
   end

@@ -683,20 +683,6 @@ class GroupsController < ApplicationController
     render :json => users_json(users, @current_user, session, Array(params[:include]), @context, nil, Array(params[:exclude]))
   end
 
-  def edit
-    account = @context.root_account
-    raise ActiveRecord::RecordNotFound unless account.canvas_network_enabled?
-
-    @group = (@context ? @context.groups : Group).find(params[:id])
-    @context = @group
-
-    folder   = @group.folders.active.first
-    folder ||= @group.folders.active.create! :name => 'Group Pictures'
-    js_env :GROUP_ID => @group.id, :FOLDER_ID => folder.id
-
-    authorized_action(@group, @current_user, :update)
-  end
-
   def public_feed
     return unless get_feed_context(:only => [:group])
     feed = Atom::Feed.new do |f|
