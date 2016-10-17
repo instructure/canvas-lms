@@ -178,10 +178,38 @@ class ExternalToolsController < ApplicationController
 
     tool_id = params[:id]
     launch_url = params[:url]
+    module_item_id = params[:module_item_id]
+    launch_type = params[:launch_type]
+
+    context_module = nil
+    module_item = nil
+    if launch_type == 'module_item'
+      unless module_item_id
+        @context.errors.add(:module_item_id, 'A module item id must be provided for module item LTI launch')
+        render :json => @context.errors, :status => :bad_request
+        return
+      end
+
+      module_item = ContentTag.find(module_item_id)
+      unless module_item
+        @context.errors.add(:module_item_id, 'A module item with the specified id was not found')
+        render :json => @context.errors, :status => :bad_request
+        return
+      end
+
+      context_module = module_item.context_module
+      unless context_module
+        @context.errors.add(:module_item_id, 'The content tag with the specified id is not a content item')
+        render :json => @context.errors, :status => :bad_request
+        return
+      end
+
+      launch_url = module_item.url
+    end
 
     #extra permissions for assignments
     assignment = nil
-    if params[:launch_type] == 'assessment'
+    if launch_type == 'assessment'
       unless params[:assignment_id]
         @context.errors.add(:assignment_id, 'An assignment id must be provided for assessment LTI launch')
         render :json => @context.errors, :status => :bad_request
@@ -206,18 +234,21 @@ class ExternalToolsController < ApplicationController
       launch_url = assignment.external_tool_tag.url
     end
 
-    unless tool_id || launch_url
-      @context.errors.add(:id, 'An id or a url must be provided')
-      @context.errors.add(:url, 'An id or a url must be provided')
+    unless tool_id || launch_url || module_item_id
+      @context.errors.add(:id, 'A tool id, tool url, or module item id must be provided')
+      @context.errors.add(:url, 'A tool id, tool url, or module item id must be provided')
+      @context.errors.add(:module_item_id, 'A tool id, tool url, or module item id must be provided')
       render :json => @context.errors, :status => :bad_request
       return
     end
 
     # locate the tool
-    if launch_url
+    if launch_url && launch_type != 'module_item'
       @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
+    elsif launch_type == 'module_item'
+      @tool = ContextExternalTool.find_external_tool(module_item.url, context_module, module_item.content_id)
     else
-      return unless find_tool(tool_id, params[:launch_type])
+      return unless find_tool(tool_id, launch_type)
     end
     if !@tool
       flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
@@ -228,10 +259,13 @@ class ExternalToolsController < ApplicationController
     # generate the launch
     opts = {
         launch_url: launch_url,
-        resource_type: params[:launch_type]
+        resource_type: launch_type
     }
 
-    if params[:launch_type] == 'assessment'
+    case launch_type
+    when 'module_item'
+      opts[:link_code] = @tool.opaque_identifier_for(module_item)
+    when 'assessment'
       opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag)
     end
 

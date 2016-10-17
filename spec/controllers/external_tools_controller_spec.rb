@@ -1454,6 +1454,53 @@ describe ExternalToolsController do
       expect(tool_settings['custom_canvas_user_id']).to eq @user.id.to_s
       expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
     end
+
+    it "requires context_module_id for module_item launch type" do
+      user_session(@user)
+      @tool = new_valid_tool(@course)
+      @cm = ContextModule.create(context: @course)
+      @tg = ContentTag.create(context: @course,
+        context_module: @cm,
+        content_type: 'ContextExternalTool',
+        content: @tool)
+
+       get :generate_sessionless_launch,
+        course_id: @course.id,
+        launch_type: 'module_item',
+        content_type: 'ContextExternalTool'
+
+      expect(response).not_to be_success
+      expect(response.body).to include 'A module item id must be provided for module item LTI launch'
+    end
+
+    it "Sets the correct resource_link_id for module items when module_item_id is provided" do
+      user_session(@user)
+      @tool = new_valid_tool(@course)
+      @cm = ContextModule.create(context: @course)
+      @tg = ContentTag.create(context: @course,
+        context_module: @cm,
+        content_type: 'ContextExternalTool',
+        content: @tool,
+        url: @tool.url)
+      @cm.content_tags << @tg
+      @cm.save!
+      @course.save!
+
+      get :generate_sessionless_launch,
+        course_id: @course.id,
+        launch_type: 'module_item',
+        module_item_id: @tg.id,
+        content_type: 'ContextExternalTool'
+
+      expect(response).to be_success
+
+      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
+      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
+
+      expect(launch_settings['tool_settings']['resource_link_id']). to eq opaque_id(@tg)
+    end
   end
 
   def opaque_id(asset)
