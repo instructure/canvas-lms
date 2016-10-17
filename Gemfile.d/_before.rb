@@ -16,29 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# # enforce the version of bundler itself, to avoid any surprises
-req_bundler_version_floor, req_bundler_version_ceiling = '1.10.1', '1.13.3'
-bundler_requirements = [">=#{req_bundler_version_floor}",
-                        "<=#{req_bundler_version_ceiling}"]
-gem 'bundler', bundler_requirements
-
-# we still manually do this check because older bundler versions don't validate the version requirement
-# of the bundler gem once the bundle has been initially installed
-unless Gem::Requirement.new(*bundler_requirements).satisfied_by?(Gem::Version.new(Bundler::VERSION))
-  if Gem::Version.new(Bundler::VERSION) < Gem::Version.new(req_bundler_version_floor)
-    bundle_command = "gem install bundler -v #{req_bundler_version_ceiling}"
-  else
-    require 'shellwords'
-    bundle_command = "bundle _#{req_bundler_version_ceiling}_ " +
-                     "#{ARGV.map { |a| Shellwords.escape(a) }.join(' ')}"
-  end
-
-  warn "Bundler version #{req_bundler_version_floor} is required; " +
-       "you're currently running #{Bundler::VERSION}. " +
-       "Maybe try `#{bundle_command}`, or " +
-       "`gem uninstall bundler -v #{Bundler::VERSION}`."
-  exit 1
-end
+gem 'bundler', '>= 1.10.1', '<= 1.13.3'
 
 # NOTE: this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
 if RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
