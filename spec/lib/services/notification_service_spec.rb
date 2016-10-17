@@ -92,24 +92,24 @@ module Services
       end
 
       it "throws error if cannot connect to queue" do
-        @queue.stubs(:send_message).raises(AWS::SQS::Errors::ServiceError)
-        expect{@message.deliver}.to raise_error(AWS::SQS::Errors::ServiceError)
-        expect(@message.transmission_errors).to include("AWS::SQS::Errors::ServiceError")
+        @queue.stubs(:send_message).raises(Aws::SQS::Errors::ServiceError.new('a', 'b'))
+        expect{@message.deliver}.to raise_error(Aws::SQS::Errors::ServiceError)
+        expect(@message.transmission_errors).to include("Aws::SQS::Errors::ServiceError")
         expect(@message.workflow_state).to eql("staged")
       end
 
       it "throws error if queue does not exist" do
-        @queue.stubs(:send_message).raises(AWS::SQS::Errors::NonExistentQueue)
-        expect{@message.deliver}.to raise_error(AWS::SQS::Errors::NonExistentQueue)
-        expect(@message.transmission_errors).to include("AWS::SQS::Errors::NonExistentQueue")
+        @queue.stubs(:send_message).raises(Aws::SQS::Errors::NonExistentQueue.new('a', 'b'))
+        expect{@message.deliver}.to raise_error(Aws::SQS::Errors::NonExistentQueue)
+        expect(@message.transmission_errors).to include("Aws::SQS::Errors::NonExistentQueue")
         expect(@message.workflow_state).to eql("staged")
       end
 
       context 'payload contents' do
         class SendMessageSpy
           attr_accessor :sent_hash
-          def send_message(json)
-            @sent_hash = JSON.parse(json)
+          def send_message(message_body: , queue_url: )
+            @sent_hash = JSON.parse(message_body)
           end
         end
 
