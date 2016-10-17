@@ -39,7 +39,7 @@ if linter.wip?
   exit 0
 end
 
-user_config_file = File.expand_path("../../gems/rubocop-canvas/config/gergich_user_config.yml", __FILE__)
+user_config_file = File.expand_path("../../gems/dr_diff/config/gergich_user_config.yml", __FILE__)
 if File.exists?(user_config_file)
   config = YAML.load_file(user_config_file) || {}
   user_list = config['only_report_errors'] || []
