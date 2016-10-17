@@ -94,6 +94,10 @@ define([
       this.clearUserInput()
     },
 
+    overrideTokenAriaLabel(tokenName) {
+      return I18n.t('Currently assigned to %{tokenName}, click to remove', {tokenName: tokenName});
+    },
+
     handleTokenRemove(token) {
       this.props.handleTokenRemove(token)
     },
@@ -313,11 +317,19 @@ define([
                aria-label = 'Assign to'>
              {I18n.t("Assign to")}
            </div>
+          <div id="ic-tokeninput-description"
+               className = "screenreader-only">
+            { I18n.t('Use this list to remove assigned students. Add new students with combo box after list.') }
+          </div>
           <TokenInput menuContent     = {this.optionsForMenu()}
                       selected        = {this.props.tokens}
                       onInput         = {this.handleInput}
                       onSelect        = {this.handleTokenAdd}
+                      tokenAriaFunc   = {this.overrideTokenAriaLabel}
                       onRemove        = {this.handleTokenRemove}
+                      combobox-aria-label = { I18n.t('Add students by searching by name, course section or group.' +
+                                                     ' After entering text, navigate results by using the down arrow key.' +
+                                                     ' Select a result by using the Enter key.') }
                       value           = {true}
                       showListOnFocus = {true}
                       ref             = "TokenInput" />

@@ -124,3 +124,6 @@ define [
 
     @DueDateTokenWrapper.handleInput("scipio")
     ok !@DueDateTokenWrapper.hidingValidMatches()
+
+  test 'overrideTokenAriaLabel method', ->
+    equal @DueDateTokenWrapper.overrideTokenAriaLabel('group X'), "Currently assigned to group X, click to remove"
