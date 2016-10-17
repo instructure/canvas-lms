@@ -31,7 +31,6 @@ gem 'folio-pagination', '0.0.11', require: 'folio/rails'
 
 gem "after_transaction_commit", '1.1.0'
 gem "aws-sdk", '2.6.7', require: false
-gem "aws-sdk-v1", '1.66.0', require: false
 gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.8', require: false
