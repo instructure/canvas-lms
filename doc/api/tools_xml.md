@@ -428,10 +428,13 @@ External tools can support different LTI environments for different canvas envir
 * __launch_url__: the blti:launch\_url property that should be used for all canvas test environments.
 This property takes precedent over domain changes if both properties are set.
 
-Additionally, the domain and launch\_urls can be set for for each canvas environment
+Additionally, the domain and launch\_urls can be set for each canvas environment
 by specifying the environment as part of the property name (ie, test\_launch\_url,
 beta\_domain, etc).  When used in this manner, specific environment properties take
 precedent over the default values.
+
+NOTE: Test environment settings are established during the refresh process when the environments are
+<a href="https://community.canvaslms.com/docs/DOC-1384">mirrored from production</a>.
 
 ### Test Environment Example
 
