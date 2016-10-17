@@ -681,7 +681,7 @@ class FilesController < ApplicationController
       redirect_to(inline ? attachment.inline_url : attachment.download_url)
     else
       send_file_headers!( :length=> attachment.s3object.content_length, :filename=>attachment.filename, :disposition => 'inline', :type => attachment.content_type_with_encoding)
-      render :status => 200, :text => attachment.s3object.read
+      render :status => 200, :text => attachment.s3object.get.body.read
     end
   end
   protected :send_stored_file
@@ -786,7 +786,7 @@ class FilesController < ApplicationController
       verify_api_id
       @attachment = Attachment.where(id: params[:id], workflow_state: 'unattached', uuid: params[:uuid]).first
     end
-    details = @attachment.s3object.head rescue nil
+    details = @attachment.s3object.data rescue nil
     if @attachment && details
       deleted_attachments = @attachment.handle_duplicates(params[:duplicate_handling])
       @attachment.process_s3_details!(details)
@@ -825,7 +825,7 @@ class FilesController < ApplicationController
     return unless check_quota_after_attachment(request)
     if Attachment.s3_storage?
       return render(:nothing => true, :status => :bad_request) unless @attachment.state == :unattached
-      details = @attachment.s3object.head
+      details = @attachment.s3object.data
       @attachment.process_s3_details!(details)
     else
       @attachment.file_state = 'available'

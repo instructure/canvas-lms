@@ -2,18 +2,16 @@ development:
   bucket_name: development-bucket
   access_key_id: access_key
   secret_access_key: secret_key
+  region: us-east-1
 
 test:
   bucket_name: test-bucket
   access_key_id: access_key
   secret_access_key: secret_key
+  region: us-east-1
   
 production:
   bucket_name: production-bucket
   access_key_id: access_key
   secret_access_key: secret_key
-  # The default endpoint is s3.amazonaws.com, which will technically work
-  # for any region, but will require a bounce through a US region, so will
-  # be slower. It's recommended that you set this for whichever region
-  # your bucket is in.
-  # s3_endpoint: s3-eu-west-1.amazonaws.com
+  region: us-east-1

@@ -849,9 +849,9 @@ describe Attachment do
     it 'should allow custom ttl for download_url' do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
-      attachment.expects(:authenticated_s3_url).with(has_entry(:expires => 86400))
+      attachment.expects(:authenticated_s3_url).with(has_entry(:expires_in => 86400))
       attachment.download_url
-      attachment.expects(:authenticated_s3_url).with(has_entry(:expires => 172800))
+      attachment.expects(:authenticated_s3_url).with(has_entry(:expires_in => 172800))
       attachment.download_url(2.days.to_i)
     end
 
@@ -1015,8 +1015,8 @@ describe Attachment do
       @old_object = mock('old object')
       @new_object = mock('new object')
       new_full_filename = @root.full_filename.sub(@root.namespace, @new_account.file_namespace)
-      @objects = { @root.full_filename => @old_object, new_full_filename => @new_object }
-      @root.bucket.stubs(:objects).returns(@objects)
+      @root.bucket.stubs(:object).with(@root.full_filename).returns(@old_object)
+      @root.bucket.stubs(:object).with(new_full_filename).returns(@new_object)
     end
 
     it "should fail for non-root attachments" do
@@ -1382,19 +1382,19 @@ describe Attachment do
       before do
         s3_storage!
         attachment_model
-        @attachment.s3object.class.any_instance.expects(:read).yields("test")
       end
 
       it "should stream data to the block given" do
         callback = false
+        @attachment.s3object.class.any_instance.expects(:get).yields("test")
         @attachment.open { |data| expect(data).to eq "test"; callback = true }
         expect(callback).to eq true
       end
 
       it "should stream to a tempfile without a block given" do
+        @attachment.s3object.class.any_instance.expects(:get).with(has_key(:response_target))
         file = @attachment.open
         expect(file).to be_a(Tempfile)
-        expect(file.read).to eq "test"
       end
     end
   end

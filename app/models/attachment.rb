@@ -123,7 +123,7 @@ class Attachment < ActiveRecord::Base
   has_attachment(
       :storage => self.store_type.key,
       :path_prefix => file_store_config['path_prefix'],
-      :s3_access => :private,
+      :s3_access => 'private',
       :thumbnails => { :thumb => '128x128' },
       :thumbnail_class => 'Thumbnail'
   )
@@ -900,11 +900,11 @@ class Attachment < ActiveRecord::Base
   end
 
   def download_url(ttl = url_ttl)
-    authenticated_s3_url(expires: ttl, response_content_disposition: "attachment; " + disposition_filename)
+    authenticated_s3_url(expires_in: ttl, response_content_disposition: "attachment; " + disposition_filename)
   end
 
   def inline_url(ttl = url_ttl)
-    authenticated_s3_url(expires: ttl, response_content_disposition: "inline; " + disposition_filename)
+    authenticated_s3_url(expires_in: ttl, response_content_disposition: "inline; " + disposition_filename)
   end
 
   def url_ttl

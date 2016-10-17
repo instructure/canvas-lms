@@ -10,7 +10,7 @@ module DataFixup::EscapeS3Filenames
         Rails.logger.info "copying #{self.id} #{old_filename} to #{new_filename}"
         begin
           # Copy, not rename. For several reasons. We can clean up later.
-          Attachment.bucket.objects[File.join(base_path, old_filename)].copy_to(File.join(base_path, new_filename),
+          Attachment.bucket.object(File.join(base_path, old_filename)).copy_to(File.join(base_path, new_filename),
           :acl => attachment_options[:s3_access])
 
           # We're not going to call filename= here, because it will escape it again. That's right - calling

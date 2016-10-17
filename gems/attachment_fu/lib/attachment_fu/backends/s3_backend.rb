@@ -17,17 +17,17 @@ module AttachmentFu # :nodoc:
     # You can sign up for S3 and get access keys by visiting http://aws.amazon.com/s3.
     #
     # Example configuration (RAILS_ROOT/config/amazon_s3.yml)
-    # 
+    #
     #   development:
     #     bucket_name: appname_development
     #     access_key_id: <your key>
     #     secret_access_key: <your key>
-    #   
+    #
     #   test:
     #     bucket_name: appname_test
     #     access_key_id: <your key>
     #     secret_access_key: <your key>
-    #   
+    #
     #   production:
     #     bucket_name: appname
     #     access_key_id: <your key>
@@ -83,7 +83,7 @@ module AttachmentFu # :nodoc:
     # === Permissions
     #
     # By default, files are stored on S3 with public access permissions. You can customize this using
-    # the <tt>:s3_access</tt> option to <tt>has_attachment</tt>. Available values are 
+    # the <tt>:s3_access</tt> option to <tt>has_attachment</tt>. Available values are
     # <tt>:private</tt>, <tt>:public_read_write</tt>, and <tt>:authenticated_read</tt>.
     #
     # === Other options
@@ -123,28 +123,15 @@ module AttachmentFu # :nodoc:
       mattr_reader :bucket
 
       def self.included(base) #:nodoc:
-        begin
-          require 'aws-sdk-v1'
-        rescue LoadError
-          raise RequiredLibraryNotFoundError.new('AWS SDK could not be loaded')
-        end
+        require 'aws-sdk'
 
-        begin
-          s3_config_path = base.attachment_options[:s3_config_path] || (Rails.root + 'config/amazon_s3.yml')
-          s3_config = YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
-        #rescue
-        #  raise ConfigFileNotFoundError.new('File %s not found' % @@s3_config_path)
-        end
+        s3_config_path = base.attachment_options[:s3_config_path] || (Rails.root + 'config/amazon_s3.yml')
+        s3_config = YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
 
-        # backcompat for AWS::S3 gem options
-        s3_config[:proxy_uri] = s3_config.delete(:proxy) if s3_config.key?(:proxy)
-        s3_config[:s3_endpoint] = s3_config.delete(:server) if s3_config.key?(:server)
+        bucket_name = s3_config.delete(:bucket_name)
 
-        s3 = AWS::S3.new(s3_config)
-
-        @@bucket = s3.buckets[s3_config[:bucket_name]]
-
-        # s3.create_bucket(s3_config[:bucket_name])
+        s3 = Aws::S3::Resource.new(Canvas::AWS.validate_v2_config(s3_config, 'amazon_s3.yml'))
+        @@bucket = s3.bucket(bucket_name)
 
         base.before_update :rename_file
       end
@@ -171,7 +158,7 @@ module AttachmentFu # :nodoc:
       def attachment_path_id
         ((respond_to?(:parent_id) && parent_id) || id).to_s
       end
-      
+
       # INSTRUCTURE: fallback to old path style if there is no cluster attribute
       def namespaced_path
         obj = (respond_to?(:root_attachment) && self.root_attachment) || self
@@ -198,7 +185,7 @@ module AttachmentFu # :nodoc:
       end
 
       def s3object(thumbnail = nil)
-        bucket.objects[full_filename(thumbnail)]
+        bucket.object(full_filename(thumbnail))
       end
 
       # All public objects are accessible via a GET request to the S3 servers. You can generate a
@@ -216,7 +203,7 @@ module AttachmentFu # :nodoc:
       end
       alias :public_filename :s3_url
 
-      # All private objects are accessible via an authenticated GET request to the S3 servers. You can generate an 
+      # All private objects are accessible via an authenticated GET request to the S3 servers. You can generate an
       # authenticated url for an object like this:
       #
       #   @photo.authenticated_s3_url
@@ -224,13 +211,13 @@ module AttachmentFu # :nodoc:
       # By default authenticated urls expire 1 hour after they were generated.
       #
       # Expiration options can be specified either with an absolute time using the <tt>:expires</tt> option,
-      # or with a number of seconds relative to now with the <tt>:expires</tt> option:
+      # or with a number of seconds relative to now with the <tt>:expires_in</tt> option:
       #
       #   # Absolute expiration date (October 13th, 2025)
       #   @photo.authenticated_s3_url(:expires => Time.mktime(2025,10,13).to_i)
-      #   
+      #
       #   # Expiration in five hours from now
-      #   @photo.authenticated_s3_url(:expires => 5.hours)
+      #   @photo.authenticated_s3_url(:expires_in => 5.hours)
       #
       # You can specify whether the url should go over SSL with the <tt>:secure</tt> option.
       # By default, the ssl settings for the current connection will be used:
@@ -243,7 +230,7 @@ module AttachmentFu # :nodoc:
       def authenticated_s3_url(*args)
         thumbnail = args.first.is_a?(String) ? args.first : nil
         options   = args.last.is_a?(Hash)    ? args.last  : {}
-        s3object(thumbnail).url_for(:read, options).to_s
+        s3object(thumbnail).presigned_url(:get, options)
       end
 
       def create_temp_file
@@ -251,7 +238,7 @@ module AttachmentFu # :nodoc:
       end
 
       def current_data
-        s3object.read
+        s3object.get.body.read
       end
 
       protected
@@ -269,12 +256,12 @@ module AttachmentFu # :nodoc:
           # The problem is that we're re-using our s3 storage if you copy
           # a file or if two files have the same md5 and size.  In that case
           # there are multiple attachments pointing to the same place on s3
-          # and we don't want to get rid of the original... 
+          # and we don't want to get rid of the original...
           # TODO: we'll just have to figure out a different way to clean out
           # the cruft that happens because of this
           return
           return unless @old_filename && @old_filename != filename
-          
+
           old_full_filename = File.join(base_path, @old_filename)
 
           # INSTRUCTURE: this dies when the file did not already exist,
@@ -282,7 +269,7 @@ module AttachmentFu # :nodoc:
           # I've added some additional provisions in Attachment.rb, but
           # it looks like they're not always working for some reason
           begin
-            bucket.objects[old_full_filename].rename_to(full_filename, :acl => attachment_options[:s3_access])
+            bucket.object(old_full_filename).move_to(full_filename, :acl => attachment_options[:s3_access])
           rescue => e
             filename = @old_filename
           end
@@ -293,9 +280,13 @@ module AttachmentFu # :nodoc:
 
         def save_to_storage
           if save_attachment?
-            s3object.write((temp_path ? File.open(temp_path, 'rb') : temp_data),
-                           :content_type => content_type,
-                           :acl => attachment_options[:s3_access])
+            options = {
+              body: (temp_path ? File.open(temp_path, 'rb') : temp_data),
+              content_type: content_type,
+              acl: attachment_options[:s3_access]
+            }
+            options.merge!(attachment_options.slice(:cache_control, :expires, :metadata))
+            s3object.put(options)
           end
 
           @old_filename = nil

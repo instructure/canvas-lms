@@ -139,7 +139,7 @@ shared_examples_for "file uploads api" do
     s3_storage!
     # step 1, preflight
     json = preflight({ :name => filename })
-    expect(json['upload_url']).to eq "http://no-bucket.s3.amazonaws.com/"
+    expect(json['upload_url']).to eq "https://no-bucket.s3.amazonaws.com"
     attachment = Attachment.order(:id).last
     redir = json['upload_params']['success_action_redirect']
     exemption_string = has_query_exemption? ? ("quota_exemption=" + attachment.quota_exemption_key + "&") : ""
@@ -148,7 +148,7 @@ shared_examples_for "file uploads api" do
 
     # step 2, upload
     # we skip the actual call and stub this out, since we can't hit s3 during specs
-    AWS::S3::S3Object.any_instance.expects(:head).returns({
+    Aws::S3::Object.any_instance.expects(:data).returns({
       :content_type => 'application/msword',
       :content_length => 1234,
     })
@@ -409,7 +409,7 @@ shared_examples_for "file uploads api with folders" do
 
     redir = json['upload_params']['success_action_redirect']
     attachment = Attachment.order(:id).last
-    AWS::S3::S3Object.any_instance.expects(:head).returns({
+    Aws::S3::Object.any_instance.expects(:data).returns({
                                       :content_type => 'application/msword',
                                       :content_length => 1234,
                                     })

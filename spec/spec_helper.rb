@@ -650,13 +650,13 @@ RSpec.configure do |config|
         # overridden by Attachment anyway; don't re-overwrite it
         next if base.instance_method(method).owner == base
         if method.to_s[-1..-1] == '='
-          base.class_eval <<-CODE
+          base.class_eval <<-CODE, __FILE__, __LINE__ + 1
           def #{method}(arg)
             self.as(self.class.current_backend).#{method} arg
           end
           CODE
         else
-          base.class_eval <<-CODE
+          base.class_eval <<-CODE, __FILE__, __LINE__ + 1
           def #{method}(*args, &block)
             self.as(self.class.current_backend).#{method}(*args, &block)
           end
@@ -674,6 +674,26 @@ RSpec.configure do |config|
     end
   end
 
+  module StubS3
+    def self.stubbed?
+      false
+    end
+
+    def load(file, *args)
+      if StubS3.stubbed? && file == 'amazon_s3'
+        return {
+          access_key_id: 'stub_id',
+          secret_access_key: 'stub_key',
+          region: 'us-east-1',
+          stub_responses: true,
+          bucket_name: 'no-bucket'
+        }
+      end
+
+      super
+    end
+  end
+
   def s3_storage!(opts = {:stubs => true})
     [Attachment, Thumbnail].each do |model|
       model.send(:include, AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
@@ -684,15 +704,8 @@ RSpec.configure do |config|
     end
 
     if opts[:stubs]
-      conn = mock('AWS::S3::Client')
-
-      AWS::S3::S3Object.any_instance.stubs(:read).returns("i am stub data from spec helper. nom nom nom")
-      AWS::S3::S3Object.any_instance.stubs(:write).returns(true)
-      AWS::S3::S3Object.any_instance.stubs(:create_temp_file).returns(true)
-      AWS::S3::S3Object.any_instance.stubs(:client).returns(conn)
-      AWS::Core::Configuration.any_instance.stubs(:access_key_id).returns('stub_id')
-      AWS::Core::Configuration.any_instance.stubs(:secret_access_key).returns('stub_key')
-      AWS::S3::Bucket.any_instance.stubs(:name).returns('no-bucket')
+      ConfigFile.singleton_class.prepend(StubS3)
+      StubS3.stubs(:stubbed?).returns(true)
     else
       if Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
         skip "Please put valid S3 credentials in config/amazon_s3.yml"
