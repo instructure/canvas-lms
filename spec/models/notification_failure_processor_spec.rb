@@ -76,7 +76,7 @@ describe NotificationFailureProcessor do
 
       sns_client = mock()
       NotificationEndpoint.any_instance.expects(:sns_client).at_least_once.returns(sns_client)
-      sns_client.expects(:get_endpoint_attributes).at_least_once.returns(attributes: {'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s})
+      sns_client.expects(:get_endpoint_attributes).at_least_once.returns(stub(attributes: {'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s}))
       sns_client.expects(:create_platform_endpoint).twice.returns({endpoint_arn: bad_arn}, {endpoint_arn: good_arn})
       bad_ne = @at.notification_endpoints.create!(token: 'token1') # order matters
       good_ne = @at.notification_endpoints.create!(token: 'token2')
