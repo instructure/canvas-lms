@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../apis/api_spec_helper')
 
 require 'nokogiri'
 
@@ -91,6 +91,12 @@ describe LtiApiController, type: :request do
     body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
     make_call('body' => body)
     check_failure
+  end
+
+  it "adds xml to an error report if the xml is invalid according to spec" do
+    body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
+    Canvas::Errors.expects(:capture).with { |_, opts| opts[:extra][:xml].present? }.returns({})
+    make_call('body' => body)
   end
 
   it "should require a content-type of application/xml" do
