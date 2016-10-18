@@ -1,5 +1,5 @@
 define([
-  'bower/reflux/dist/reflux',
+  'reflux',
 ], function (Reflux) {
   var TableActions = Reflux.createActions([
     'enterLoadingState'

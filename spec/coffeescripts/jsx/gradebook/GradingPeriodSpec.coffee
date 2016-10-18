@@ -10,7 +10,6 @@ define [
   'compiled/jquery.rails_flash_notifications'
 ], (React, ReactDOM, $, _, GradingPeriod, fakeENV, DateHelper) ->
 
-  TestUtils = React.addons.TestUtils
   wrapper = document.getElementById('fixtures')
 
   module 'GradingPeriod',

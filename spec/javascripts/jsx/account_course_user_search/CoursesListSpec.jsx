@@ -1,9 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/account_course_user_search/CoursesList'
-], (React, CoursesList) => {
-
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, CoursesList) => {
 
   module('Account Course User Search CoursesList View');
 

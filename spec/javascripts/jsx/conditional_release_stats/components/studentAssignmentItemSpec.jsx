@@ -1,8 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/conditional_release_stats/components/student-assignment-item',
-], (React, AssignmentItem) => {
-  const TestUtils = React.addons.TestUtils
+], (React, TestUtils, AssignmentItem) => {
 
   module('Student Assignment Item')
 

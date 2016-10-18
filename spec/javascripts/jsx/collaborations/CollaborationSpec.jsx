@@ -1,10 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'react-dom',
   'jsx/collaborations/Collaboration',
   'timezone'
-], (React, ReactDOM, Collaboration, tz) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, ReactDOM, Collaboration, tz) => {
 
   module('Collaboration');
 

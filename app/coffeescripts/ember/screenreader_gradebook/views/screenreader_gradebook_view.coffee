@@ -1,6 +1,6 @@
 define [
   'ember'
-  'ic-tabs'
+  'ic-tabs/dist/amd/main'
 ], (Ember) ->
 
   ScreenreaderGradebookView = Ember.View.extend

@@ -1,6 +1,6 @@
 define([
   'react',
-  'bower/reflux/dist/reflux',
+  'reflux',
   'jsx/gradebook/grid/stores/customColumnsStore',
   'jsx/gradebook/grid/components/column_types/teacherNote'
 ], function(React, Reflux, CustomColumnsStore, TeacherNote) {

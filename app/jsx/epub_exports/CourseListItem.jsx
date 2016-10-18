@@ -7,7 +7,7 @@ define([
   'jsx/epub_exports/CourseStore',
   'i18n!epub_exports',
   'jsx/shared/FriendlyDatetime',
-  'bower/classnames/index'
+  'classnames'
 ], function(React, _, GenerateLink, DownloadLink, ApiProgressBar, CourseEpubExportStore, I18n, FriendlyDatetime, classnames) {
   var CourseListItem = React.createClass({
     displayName: 'CourseListItem',

@@ -8,7 +8,6 @@ define [
   'jquery'
 ], (React, SubmissionsStore, AssignmentGroupsStore, GradingPeriodsStore,
     GradebookConstants, fakeENV, $) ->
-  TestUtils = React.addons.TestUtils
 
   defaultSubmissions = ->
     [

@@ -1,32 +1,20 @@
 define [
-  'compiled/editor/markScriptsLoaded'
-  'compiled/fn/punch'
-  'bower/tinymce/tinymce'
-  'bower/tinymce/themes/modern/theme'
-  'bower/tinymce/plugins/autolink/plugin'
-  'bower/tinymce/plugins/media/plugin'
-  'bower/tinymce/plugins/paste/plugin'
-  'bower/tinymce/plugins/table/plugin'
-  'bower/tinymce/plugins/textcolor/plugin'
-  'bower/tinymce/plugins/link/plugin'
-  'bower/tinymce/plugins/directionality/plugin'
-  'bower/tinymce/plugins/lists/plugin'
-], (markScriptsLoaded, punch) ->
+  'tinymce/tinymce'
+  'tinymce/themes/modern/theme'
+  'tinymce/plugins/autolink/plugin'
+  'tinymce/plugins/media/plugin'
+  'tinymce/plugins/paste/plugin'
+  'tinymce/plugins/table/plugin'
+  'tinymce/plugins/textcolor/plugin'
+  'tinymce/plugins/link/plugin'
+  'tinymce/plugins/directionality/plugin'
+  'tinymce/plugins/lists/plugin'
+], (tinymce) ->
+
+  # because in the 'optimized' requireJS build, it gets injected as 'undefined'
+  tinymce = tinymce || window.tinymce
 
   # prevent tiny from loading any CSS assets
-  punch tinymce.DOM, 'loadCSS', ->
-
-  # prevents tinyMCE from trying to load these dynamically
-  markScriptsLoaded [
-    'themes/modern/theme',
-    "plugins/autolink/plugin"
-    "plugins/media/plugin"
-    "plugins/paste/plugin"
-    "plugins/table/plugin"
-    "plugins/textcolor/plugin"
-    "plugins/link/plugin"
-    'plugins/directionality/plugin'
-    'plugins/lists/plugin'
-  ]
+  tinymce.DOM.loadCSS = ->
 
   tinymce

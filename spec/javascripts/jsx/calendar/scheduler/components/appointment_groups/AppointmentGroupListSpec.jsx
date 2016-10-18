@@ -1,7 +1,7 @@
 define([
   'react',
   'jsx/calendar/scheduler/components/appointment_groups/AppointmentGroupList',
-], (react, AppointmentGroupList) => {
+], (React, AppointmentGroupList) => {
   const TestUtils = React.addons.TestUtils
 
   module('AppointmentGroupList')

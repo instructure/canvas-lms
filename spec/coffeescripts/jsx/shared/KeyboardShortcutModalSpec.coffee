@@ -3,9 +3,8 @@ define [
   'jsx/shared/KeyboardShortcutModal'
   'react'
   'react-dom'
-], ($, KeyboardShortcutModal, React, ReactDOM) ->
-
-  TestUtils = React.addons.TestUtils
+  'react-addons-test-utils'
+], ($, KeyboardShortcutModal, React, ReactDOM, TestUtils) ->
 
   module 'KeyboardShortcutModal#handleKeydown',
     setup: ->

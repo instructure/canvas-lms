@@ -3,7 +3,6 @@ var webpack = require("webpack");
 var I18nPlugin = require("./frontend_build/i18nPlugin");
 var ClientAppsPlugin = require("./frontend_build/clientAppPlugin");
 var CompiledReferencePlugin = require("./frontend_build/CompiledReferencePlugin");
-var ShimmedAmdPlugin = require("./frontend_build/shimmedAmdPlugin");
 
 var baseWebpackConfig = require("./frontend_build/baseWebpackConfig");
 var testWebpackConfig = baseWebpackConfig;
@@ -26,7 +25,6 @@ testWebpackConfig.output.pathinfo = true;
 testWebpackConfig.output.filename = "[name].bundle.test.js";
 testWebpackConfig.plugins = [
   new I18nPlugin(),
-  new ShimmedAmdPlugin(),
   new ClientAppsPlugin(),
   new CompiledReferencePlugin(),
   new webpack.IgnorePlugin(/\.md$/),

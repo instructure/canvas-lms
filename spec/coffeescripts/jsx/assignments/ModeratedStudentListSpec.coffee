@@ -1,11 +1,12 @@
 define [
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jsx/assignments/ModeratedStudentList'
   'jsx/assignments/constants'
   'underscore'
-], (React, ReactDOM, ModeratedStudentList, Constants, _) ->
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, ModeratedStudentList, Constants, _) ->
+
   fakeStudentList = {students:
     [
       {

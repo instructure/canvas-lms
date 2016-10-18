@@ -4,7 +4,7 @@
 
 define([
   // Get the unpatched Backbone
-  'vendor/backbone',
+  'node_modules-version-of-backbone',
 
   // Apply all of our patches
   'compiled/backbone-ext/Backbone.syncWithMultipart',

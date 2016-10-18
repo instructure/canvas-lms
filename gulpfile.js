@@ -24,8 +24,7 @@ const STUFF_TO_REV = [
 
   // These guys have links in their css to images from their own dir
   'public/javascripts/vendor/slickgrid/**/*',
-  'public/javascripts/bower/jquery.smartbanner/**/*',
-  'public/javascripts/bower/tinymce/skins/lightgray/**/*',
+  'public/javascripts/symlink_to_node_modules/tinymce/skins/lightgray/**/*',
 
   // Include *everything* from plugins & client_apps
   // so we don't have to worry about their internals

@@ -3,7 +3,6 @@ define([
   'react-dom',
   'jsx/gradebook/grid/components/column_types/studentNameColumn'
 ], (React, ReactDOM, StudentNameColumn) => {
-  const TestUtils = React.addons.TestUtils;
   const wrapper = document.getElementById('fixtures');
 
   const buildComponent = (props = {}) => {

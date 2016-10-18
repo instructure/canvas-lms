@@ -12,7 +12,8 @@ requirejs.config({
     '*': {
       'react': '../../../vendor/js/alias_to_old_version_of_react',
       'str': 'canvas/str',
-      'jsx/railsFlashNotificationsHelper': 'canvas/jsx/railsFlashNotificationsHelper'
+      'node_modules-version-of-backbone': 'canvas/symlink_to_node_modules/backbone/backbone',
+      'jsx/railsFlashNotificationsHelper': 'canvas/jsx/railsFlashNotificationsHelper',
     }
   },
 

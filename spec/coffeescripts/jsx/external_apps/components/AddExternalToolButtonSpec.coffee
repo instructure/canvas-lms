@@ -1,11 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'react-modal'
   'jsx/external_apps/components/AddExternalToolButton'
-], (React, ReactDOM, Modal, AddExternalToolButton) ->
+], (React, ReactDOM, TestUtils, Modal, AddExternalToolButton) ->
 
-  TestUtils = React.addons.TestUtils
+  Simulate = TestUtils.Simulate
   wrapper = null
 
   createElement = (data = {}) ->

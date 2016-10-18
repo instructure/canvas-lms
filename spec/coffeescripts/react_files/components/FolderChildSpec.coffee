@@ -7,7 +7,6 @@ define [
   'compiled/models/Folder'
 ], (mockFilesENV, React, ReactDOM, $, FolderChild, Folder) ->
 
-  # Simulate = React.addons.TestUtils.Simulate
 
   # TEST_FOLDERS_COLLECTION_URL = '/courses/<course_id>/folders/<folder_id>/folders'
 
@@ -15,7 +14,7 @@ define [
   #   setup: ->
   #     @div =  $('<div>').appendTo('#fixtures')[0]
 
-  #     # React.addons.TestUtils.renderIntoDocument(routes)
+  #     # TestUtils.renderIntoDocument(routes)
   #     @currentFolder = new Folder()
   #     @currentFolder.folders.url = TEST_FOLDERS_COLLECTION_URL
   #     thisFolder = @currentFolder.folders.add({})

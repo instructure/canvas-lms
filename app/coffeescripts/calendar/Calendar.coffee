@@ -13,7 +13,7 @@ define [
   'compiled/util/fcUtil'
   'compiled/userSettings'
   'compiled/util/hsvToRgb'
-  'bower/color-slicer/dist/color-slicer'
+  'color-slicer'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/commonEventFactory'
@@ -29,7 +29,8 @@ define [
   'compiled/calendar/CalendarEventFilter'
   'jsx/calendar/scheduler/actions'
 
-  'fullcalendar-with-lang-all'
+  'fullcalendar'
+  'fullcalendar/dist/lang-all'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'

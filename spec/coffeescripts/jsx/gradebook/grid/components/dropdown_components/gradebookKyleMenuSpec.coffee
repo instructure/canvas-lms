@@ -1,15 +1,15 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/gradebook/grid/components/dropdown_components/gradebookKyleMenu'
   'jsx/gradebook/grid/components/dropdown_components/totalHeaderDropdownOptions'
   'underscore'
   'jquery'
   'compiled/jquery.kylemenu'
-], (React, ReactDOM, GradebookKyleMenu, DropdownOptions, _, $) ->
+], (React, ReactDOM, {Simulate}, GradebookKyleMenu, DropdownOptions, _, $) ->
 
   wrapper = document.getElementById('fixtures')
-  Simulate = React.addons.TestUtils.Simulate
 
   renderComponent = (data) ->
     componentFactory = React.createFactory(GradebookKyleMenu)

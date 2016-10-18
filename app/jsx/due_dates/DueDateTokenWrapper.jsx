@@ -4,7 +4,7 @@ define([
   'react-modal',
   'jsx/due_dates/OverrideStudentStore',
   'compiled/models/AssignmentOverride',
-  'bower/react-tokeninput/dist/react-tokeninput',
+  'react-tokeninput',
   'i18n!assignments',
   'jquery',
   'jsx/shared/helpers/searchHelpers'

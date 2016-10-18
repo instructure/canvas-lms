@@ -9,8 +9,7 @@ define [
   'jquery'
   'jquery.ajaxJSON'
 ], (React, ReactDOM, AssignmentGroupColumn, GradingPeriodsStore, AssignmentGroupsStore, GradebookConstants, fakeENV, $) ->
-  TestUtils = React.addons.TestUtils
-  Simulate = TestUtils.Simulate
+
   wrapper = document.getElementById('fixtures')
 
   gradingPeriodsData = ->

@@ -1,6 +1,6 @@
 define([
   'react',
-  'bower/reflux/dist/reflux',
+  'reflux',
   '../constants',
   'jquery',
   'underscore',

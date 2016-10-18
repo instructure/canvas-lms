@@ -1,14 +1,14 @@
 define [
-  'react'
-  'react-dom'
+  'react',
+  'react-dom',
+  'react-addons-test-utils',
   'jsx/gradebook/grid/components/dropdown_components/pointsOrPercentageToggle',
   'jsx/gradebook/grid/actions/gradebookToolbarActions',
   'compiled/gradebook2/GradeDisplayWarningDialog',
   'jquery'
-], (React, ReactDOM, PointsOrPercentageToggle, GradebookToolbarActions, GradeDisplayWarningDialog, $) ->
+], (React, ReactDOM, {Simulate}, PointsOrPercentageToggle, GradebookToolbarActions, GradeDisplayWarningDialog, $) ->
 
   wrapper = document.getElementById('fixtures')
-  Simulate = React.addons.TestUtils.Simulate
 
   renderComponent = ->
     componentFactory = React.createFactory(PointsOrPercentageToggle)

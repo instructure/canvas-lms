@@ -1,10 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/external_apps/components/Lti2Edit'
-], (React, ReactDOM, Lti2Edit) ->
+], (React, ReactDOM, TestUtils, Lti2Edit) ->
 
-  TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 

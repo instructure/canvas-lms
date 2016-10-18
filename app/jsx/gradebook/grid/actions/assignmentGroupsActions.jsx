@@ -1,5 +1,5 @@
 define([
-  'bower/reflux/dist/reflux',
+  'reflux',
   'jsx/gradebook/grid/constants',
   'jquery'
 ], function (Reflux, GradebookConstants, $) {

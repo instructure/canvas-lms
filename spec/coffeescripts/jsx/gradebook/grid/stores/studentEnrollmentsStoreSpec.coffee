@@ -3,7 +3,6 @@ define [
   'jsx/gradebook/grid/stores/studentEnrollmentsStore'
   'jsx/gradebook/grid/stores/sectionsStore'
 ], (React, StudentEnrollmentsStore, SectionsStore) ->
-  TestUtils = React.addons.TestUtils
 
   module 'ReactGradebook.studentEnrollmentStore',
     setup: ->

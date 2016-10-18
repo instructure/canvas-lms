@@ -20,7 +20,7 @@ define([
   'i18n!prerequisites_lookup',
   'jquery',
   'str/htmlEscape',
-  'vendor/spin',
+  'spin.js',
   'context_modules',
   'jquery.ajaxJSON',
   'jquery.instructure_misc_helpers'

@@ -1,12 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/gradebook/grid/components/dropdown_components/currentOrFinalGradeToggle',
   'jsx/gradebook/grid/actions/gradebookToolbarActions'
-], (React, ReactDOM, CurrentOrFinalGradeToggle, GradebookToolbarActions) ->
+], (React, ReactDOM, {Simulate}, CurrentOrFinalGradeToggle, GradebookToolbarActions) ->
 
   wrapper = document.getElementById('fixtures')
-  Simulate = React.addons.TestUtils.Simulate
 
   renderComponent = () ->
     element = React.createElement(CurrentOrFinalGradeToggle)

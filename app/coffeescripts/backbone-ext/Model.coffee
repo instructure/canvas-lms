@@ -1,7 +1,7 @@
 define [
   'compiled/util/mixin'
   'underscore'
-  'vendor/backbone'
+  'node_modules-version-of-backbone'
   'compiled/backbone-ext/Model/computedAttributes'
   'compiled/backbone-ext/Model/dateAttributes'
   'compiled/backbone-ext/Model/errors'

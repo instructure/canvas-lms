@@ -6,7 +6,6 @@ define [
 ], (React, ReactDOM, MoveTotalColumnToggle, GradebookToolbarActions) ->
 
   wrapper = document.getElementById('fixtures')
-  Simulate = React.addons.TestUtils.Simulate
 
   renderComponent = () ->
     componentFactory = React.createFactory(MoveTotalColumnToggle)

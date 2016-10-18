@@ -1,5 +1,6 @@
 define([
   'react',
+  'react-addons-update',
   'jsx/grading/gradingPeriod',
   'jquery',
   'i18n!external_tools',
@@ -7,8 +8,7 @@ define([
   'convert_case',
   'jquery.instructure_misc_plugins'
 ],
-function(React, GradingPeriod, $, I18n, _, ConvertCase) {
-  let update = React.addons.update;
+function(React, update, GradingPeriod, $, I18n, _, ConvertCase) {
 
   const periodsAreLoaded = (state) => {
     return state.periods !== null;

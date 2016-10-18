@@ -1,12 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/gradebook/grid/components/assignmentGradeCell'
   'underscore'
   'jsx/gradebook/grid/constants'
-], (React, ReactDOM, AssignmentGradeCell, _, GradebookConstants) ->
+], (React, ReactDOM, {Simulate}, AssignmentGradeCell, _, GradebookConstants) ->
 
-  Simulate = React.addons.TestUtils.Simulate
   wrapper  = document.getElementById('fixtures')
 
   renderComponent = (props) ->

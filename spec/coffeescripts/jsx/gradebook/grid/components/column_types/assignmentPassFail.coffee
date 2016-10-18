@@ -1,12 +1,11 @@
 define [
-  'react'
-  'react-dom'
-  'jquery'
+  'react',
+  'react-dom',
+  'react-addons-test-utils',
+  'jquery',
   'jsx/gradebook/grid/components/column_types/assignmentPassFail'
-], (React, ReactDOM, $, AssignmentPassFail) ->
+], (React, ReactDOM, {Simulate}, $, AssignmentPassFail) ->
 
-  TestUtils = React.addons.TestUtils
-  Simulate  = TestUtils.Simulate
   wrapper   = document.getElementById('fixtures')
 
   renderComponent = (submission) =>

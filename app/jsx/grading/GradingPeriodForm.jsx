@@ -1,13 +1,14 @@
 define([
   'react',
   'react-dom',
+  'react-addons-update',
   'underscore',
   'instructure-ui/Button',
   'i18n!external_tools',
   'jsx/due_dates/DueDateCalendarPicker',
   'jsx/shared/helpers/accessibleDateFormat'
-], function(React, ReactDOM, _, { default: Button }, I18n, DueDateCalendarPicker, accessibleDateFormat) {
-  const update = React.addons.update;
+], function(React, ReactDOM, update, _, { default: Button }, I18n, DueDateCalendarPicker, accessibleDateFormat) {
+
   const Types = React.PropTypes;
 
   const buildPeriod = function(attr) {

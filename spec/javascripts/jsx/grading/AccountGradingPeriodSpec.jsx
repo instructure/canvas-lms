@@ -1,12 +1,12 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'axios',
   'underscore',
   'jsx/grading/AccountGradingPeriod'
-], (React, ReactDOM, axios, _, GradingPeriod) => {
+], (React, ReactDOM, {Simulate}, axios, _, GradingPeriod) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
   const allPermissions = { read: true, create: true, update: true, delete: true };
   const noPermissions = { read: false, create: false, update: false, delete: false };

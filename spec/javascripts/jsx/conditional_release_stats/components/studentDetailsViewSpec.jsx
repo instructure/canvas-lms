@@ -1,8 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/conditional_release_stats/components/student-details-view',
-], (React, StudentDetailsComponent) => {
-  const TestUtils = React.addons.TestUtils
+], (React, TestUtils, StudentDetailsComponent) => {
 
   module('Student Details View Component')
 

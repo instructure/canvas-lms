@@ -18,7 +18,7 @@ define [
   'compiled/gradebook2/GradebookTranslations'
   'compiled/grade_calculator'
   'compiled/userSettings'
-  'vendor/spin'
+  'spin.js'
   'compiled/SubmissionDetailsDialog'
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
   'compiled/gradebook2/GradeDisplayWarningDialog'

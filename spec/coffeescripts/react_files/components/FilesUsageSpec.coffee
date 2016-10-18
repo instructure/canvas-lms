@@ -1,11 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/FilesUsage'
-], (React, ReactDOM, $, FilesUsage) ->
-  TestUtils = React.addons.TestUtils
-  Simulate = TestUtils.Simulate
+], (React, ReactDOM, TestUtils, $, FilesUsage) ->
 
   module 'FilesUsage#update',
     filesUpdateTest: (props, test) ->

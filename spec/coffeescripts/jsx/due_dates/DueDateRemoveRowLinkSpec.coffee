@@ -1,11 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/due_dates/DueDateRemoveRowLink'
-], (React, ReactDOM, _, DueDateRemoveRowLink) ->
-
-  Simulate = React.addons.TestUtils.Simulate
+], (React, ReactDOM, {Simulate}, _, DueDateRemoveRowLink) ->
 
   module 'DueDateRemoveRowLink',
     setup: ->

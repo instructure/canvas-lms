@@ -1,5 +1,5 @@
 define([
-  'bower/reflux/dist/reflux',
+  'reflux',
   'jquery'
 ], function (Reflux, $) {
   var KeyboardNavigationActions = Reflux.createActions([

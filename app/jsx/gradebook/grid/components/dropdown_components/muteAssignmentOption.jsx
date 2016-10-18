@@ -1,7 +1,7 @@
 define([
   'react',
   'jquery',
-  'bower/reflux/dist/reflux',
+  'reflux',
   'underscore',
   'i18n!gradebook',
   'jsx/gradebook/grid/components/dropdown_components/headerDropdownOption',

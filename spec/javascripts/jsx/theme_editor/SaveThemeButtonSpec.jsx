@@ -1,11 +1,12 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jquery',
   'jsx/shared/modal',
   'jsx/theme_editor/SaveThemeButton',
   'jquery.ajaxJSON'
-], (React, ReactDOM, jQuery, Modal, SaveThemeButton) => {
+], (React, ReactDOM, TestUtils, jQuery, Modal, SaveThemeButton) => {
 
   let elem, props
 
@@ -69,7 +70,7 @@ define([
   })
 
   test('modal visibility', function () {
-    let shallowRenderer = React.addons.TestUtils.createRenderer()
+    let shallowRenderer = TestUtils.createRenderer()
     shallowRenderer.render(<SaveThemeButton {...props} />)
     let modal = shallowRenderer.getRenderOutput().props.children.filter(child => {
       return child.type == Modal
@@ -81,28 +82,28 @@ define([
       ...SaveThemeButton.prototype.getInitialState(),
       modalIsOpen: true
     })
-    shallowRenderer = React.addons.TestUtils.createRenderer()
+    shallowRenderer = TestUtils.createRenderer()
     shallowRenderer.render(<SaveThemeButton {...props} />)
     modal = shallowRenderer.getRenderOutput().props.children.find(isType(Modal))
     ok(modal.props.isOpen, 'modal is open')
   })
 
   test('disabling button', () => {
-    const shallowRenderer = React.addons.TestUtils.createRenderer()
+    const shallowRenderer = TestUtils.createRenderer()
     shallowRenderer.render(<SaveThemeButton {...props} />)
     const button = shallowRenderer.getRenderOutput().props.children.find(isType('button'))
     equal(button.props.disabled, false, 'not disabled by default')
   })
 
   test('disabling button: disabled if userNeedsToPreviewFirst', () => {
-    const shallowRenderer = React.addons.TestUtils.createRenderer()
+    const shallowRenderer = TestUtils.createRenderer()
     shallowRenderer.render(<SaveThemeButton {...props} userNeedsToPreviewFirst={true} />)
     const button = shallowRenderer.getRenderOutput().props.children.find(isType('button'))
     ok(button.props.disabled)
   })
 
   test('disabling button: disabled if there are no unsaved changes', () => {
-    const shallowRenderer = React.addons.TestUtils.createRenderer()
+    const shallowRenderer = TestUtils.createRenderer()
     shallowRenderer.render(<SaveThemeButton
       {...props}
       brandConfigMd5={props.sharedBrandConfigBeingEdited.brand_config_md5}
@@ -112,7 +113,7 @@ define([
   })
 
   test('disabling button: disabled if everything is default', () => {
-    const shallowRenderer = React.addons.TestUtils.createRenderer()
+    const shallowRenderer = TestUtils.createRenderer()
     shallowRenderer.render(<SaveThemeButton
       {...props}
       brandConfigMd5={null}

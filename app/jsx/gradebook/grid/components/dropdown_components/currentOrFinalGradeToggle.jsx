@@ -1,6 +1,6 @@
 define([
   'react',
-  'bower/reflux/dist/reflux',
+  'reflux',
   'i18n!gradebook',
   'jsx/gradebook/grid/stores/gradebookToolbarStore',
   'jsx/gradebook/grid/actions/gradebookToolbarActions',

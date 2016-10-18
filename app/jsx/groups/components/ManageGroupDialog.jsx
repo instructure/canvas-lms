@@ -9,7 +9,7 @@ define([
   'jquery.instructure_forms', /* errorBox */
 ], (I18n, _, $, React, BackboneState, PaginatedUserCheckList, InfiniteScroll) => {
   var ManageGroupDialog = React.createClass({
-    mixins: [BackboneState, React.addons.LinkedStateMixin, InfiniteScroll],
+    mixins: [BackboneState, InfiniteScroll],
 
     loadMore() {
       this.props.loadMore();
@@ -65,7 +65,15 @@ define([
                 <tr>
                   <td><label htmlFor="group_name">{I18n.t('Group Name')}</label></td>
                   <td>
-                    <input ref="nameInput" id="group_name" type="text" name="name" maxLength="200" valueLink={this.linkState('name')}/>
+                    <input
+                      ref="nameInput"
+                      id="group_name"
+                      type="text"
+                      name="name"
+                      maxLength="200"
+                      value={this.state.name}
+                      onChange={event => this.setState({name: event.target.value})}
+                    />
                   </td>
                 </tr>
                 <tr>

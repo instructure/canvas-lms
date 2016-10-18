@@ -1,5 +1,5 @@
 define([
-  'bower/reflux/dist/reflux',
+  'reflux',
   'react',
   'compiled/grade_calculator',
   'compiled/gradebook2/gradeFormatter',

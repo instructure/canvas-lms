@@ -3,7 +3,7 @@ define([
   'fixed-data-table',
   'jquery',
   'underscore',
-  'bower/reflux/dist/reflux',
+  'reflux',
   'i18n!gradebook2',
   'jsx/gradebook/grid/wrappers/columnFactory',
   'jsx/gradebook/grid/wrappers/headerWrapper',
@@ -21,7 +21,7 @@ define([
   'jsx/gradebook/grid/stores/tableStore',
   'jsx/gradebook/grid/actions/sectionsActions',
   'jsx/gradebook/grid/helpers/columnArranger',
-  'vendor/spin',
+  'spin.js',
   'jsx/gradebook/grid/helpers/submissionsHelper'
 ], function (
   React,

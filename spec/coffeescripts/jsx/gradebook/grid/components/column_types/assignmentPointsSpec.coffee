@@ -25,7 +25,6 @@ define [
     $.extend(props, additionalProps)
     buildComponent(props)
 
-  TestUtils = React.addons.TestUtils
   wrapper   = document.getElementById('fixtures')
 
   module 'ReactGradebook.assignmentPointsComponent',

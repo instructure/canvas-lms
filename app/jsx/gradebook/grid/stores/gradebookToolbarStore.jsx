@@ -1,6 +1,6 @@
 
 define([
-  'bower/reflux/dist/reflux',
+  'reflux',
   '../actions/gradebookToolbarActions',
   'jquery',
   'underscore',

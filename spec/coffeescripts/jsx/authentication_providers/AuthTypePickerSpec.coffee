@@ -4,7 +4,6 @@ define [
   'jsx/authentication_providers/AuthTypePicker'
 ], (React, ReactDOM, AuthTypePicker) ->
 
-  TestUtils = React.addons.TestUtils
   Picker = null
   fixtureNode = null
   authTypes = [

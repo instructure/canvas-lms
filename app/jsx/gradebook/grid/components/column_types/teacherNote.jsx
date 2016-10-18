@@ -3,7 +3,7 @@ define([
   'underscore',
   'jquery',
   'i18n!gradebook2',
-  'bower/reflux/dist/reflux',
+  'reflux',
   'jsx/gradebook/grid/stores/gradebookToolbarStore',
   'jsx/gradebook/grid/actions/customColumnsActions',
   'react-modal',

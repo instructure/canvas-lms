@@ -5,7 +5,6 @@ define [
   'jquery'
 ], (React, ReactDOM, AssignmentLetterGrade, $) ->
 
-  TestUtils = React.addons.TestUtils
   wrapper   = document.getElementById('fixtures')
 
   renderComponent = (data) ->

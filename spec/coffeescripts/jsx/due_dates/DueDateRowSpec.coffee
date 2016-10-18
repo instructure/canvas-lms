@@ -1,13 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/due_dates/DueDateRow'
   'helpers/fakeENV'
-], (React, ReactDOM, _, DueDateRow, fakeENV) ->
-
-  Simulate = React.addons.TestUtils.Simulate
-  SimulateNative = React.addons.TestUtils.SimulateNative
+], (React, ReactDOM, {Simulate, SimulateNative}, _, DueDateRow, fakeENV) ->
 
   module 'DueDateRow with empty props and canDelete true',
     setup: ->

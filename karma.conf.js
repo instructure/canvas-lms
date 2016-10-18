@@ -80,9 +80,9 @@ var karmaConfig = {
 
   files: karmaFiles,
 
-  preprocessors: {
-    '**/*.js': ['sourcemap']
-  },
+  // preprocessors: {
+  //   '**/*.js': ['sourcemap']
+  // },
 
   proxies: {
     "/dist/brandable_css/": "/base/public/dist/brandable_css/"
@@ -117,7 +117,7 @@ var karmaConfig = {
   // If browser does not capture in given timeout [ms], kill it
   captureTimeout: 60000,
 
-  browserNoActivityTimeout: 20000,
+  browserNoActivityTimeout: 2000000,
 
   // Continuous Integration mode
   // if true, it capture browsers, run tests and exit
@@ -126,6 +126,6 @@ var karmaConfig = {
 
 module.exports = function(config) {
   // config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-  karmaConfig.logLevel = config.LOG_ERROR,
+  karmaConfig.logLevel = config.LOG_INFO,
   config.set(karmaConfig);
 };

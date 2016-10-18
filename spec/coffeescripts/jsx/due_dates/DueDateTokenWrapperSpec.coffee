@@ -1,14 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/due_dates/DueDateTokenWrapper'
   'jsx/due_dates/OverrideStudentStore'
   'helpers/fakeENV'
-], (React, ReactDOM, _, DueDateTokenWrapper, OverrideStudentStore, fakeENV) ->
-
-  Simulate = React.addons.TestUtils.Simulate
-  SimulateNative = React.addons.TestUtils.SimulateNative
+], (React, ReactDOM, {Simulate, SimulateNative}, _, DueDateTokenWrapper, OverrideStudentStore, fakeENV) ->
 
   module 'DueDateTokenWrapper',
     setup: ->

@@ -1,12 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/due_dates/DueDateAddRowButton'
-], (React, ReactDOM, _, DueDateAddRowButton) ->
-
-  Simulate = React.addons.TestUtils.Simulate
-  SimulateNative = React.addons.TestUtils.SimulateNative
+], (React, ReactDOM, {Simulate, SimulateNative}, _, DueDateAddRowButton) ->
 
   module 'DueDateAddRowButton with true display prop',
     setup: ->

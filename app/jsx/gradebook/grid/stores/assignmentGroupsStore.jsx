@@ -1,5 +1,5 @@
 define([
-  'bower/reflux/dist/reflux',
+  'reflux',
   'underscore',
   '../actions/assignmentGroupsActions',
   'jsx/shared/helpers/dateHelper',

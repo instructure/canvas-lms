@@ -1,10 +1,9 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/external_apps/components/AppDetails',
   'jsx/external_apps/lib/AppCenterStore'
-], (React, AppDetails, AppCenterStore) => {
-
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, AppDetails, AppCenterStore) => {
 
   module('External Apps App Details');
 

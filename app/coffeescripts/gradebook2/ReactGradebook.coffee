@@ -8,7 +8,7 @@ define [
   'jquery'
   'underscore'
   'compiled/userSettings'
-  'vendor/spin'
+  'spin.js'
   'str/htmlEscape'
   # 'compiled/gradebook2/PostGradesDialog'
   'jsx/gradebook/SISGradePassback/PostGradesStore'

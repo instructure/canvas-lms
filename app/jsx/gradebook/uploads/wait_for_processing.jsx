@@ -1,4 +1,4 @@
-define(["jquery", "i18n!gradebook_uploads", "vendor/jquery.spin"],
+define(["jquery", "i18n!gradebook_uploads", "spin.js/jquery.spin"],
        ($, I18n) => {
   function waitForProcessing(progress) {
     var dfd = $.Deferred();

@@ -1,11 +1,11 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'underscore',
   'jsx/grading/GradingPeriodForm'
-], (React, ReactDOM, _, GradingPeriodForm) => {
+], (React, ReactDOM, {Simulate}, _, GradingPeriodForm) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
   const examplePeriod = {
     id: '1',

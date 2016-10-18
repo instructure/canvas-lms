@@ -2,10 +2,10 @@ define [
   'jquery'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'compiled/models/File'
   'jsx/files/DragFeedback'
-], ($, React, ReactDOM, File, DragFeedback) ->
-  TestUtils = React.addons.TestUtils
+], ($, React, ReactDOM, TestUtils, File, DragFeedback) ->
 
   module 'DragFeedback'
 

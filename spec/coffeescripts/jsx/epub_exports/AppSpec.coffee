@@ -1,11 +1,11 @@
 define [
-  'underscore'
-  'react'
-  'react-dom'
-  'jsx/epub_exports/App'
+  'underscore',
+  'react',
+  'react-dom',
+  'react-addons-test-utils'
+  'jsx/epub_exports/App',
   'jsx/epub_exports/CourseStore'
-], (_, React, ReactDOM, App, CourseEpubExportStore) ->
-  TestUtils = React.addons.TestUtils
+], (_, React, ReactDOM, TestUtils, App, CourseEpubExportStore) ->
 
   module 'AppSpec',
     setup: ->

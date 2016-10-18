@@ -1,17 +1,15 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/gradebook/grid/components/column_types/teacherNote'
   'react-modal'
   'helpers/fakeENV'
   'jsx/gradebook/grid/constants'
   'compiled/gradebook2/GradebookHelpers'
-], (React, ReactDOM, _, TeacherNote, Modal, fakeENV, GradebookConstants,
-  GradebookHelpers) ->
+], (React, ReactDOM, {Simulate}, _, TeacherNote, Modal, fakeENV, GradebookConstants, GradebookHelpers) ->
 
-  TestUtils = React.addons.TestUtils
-  Simulate = TestUtils.Simulate
   wrapper   = document.getElementById('fixtures')
 
   renderComponent = ->

@@ -1,8 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/choose_mastery_path/components/select-button',
-], (React, SelectButton) => {
-  const TestUtils = React.addons.TestUtils
+], (React, TestUtils, SelectButton) => {
 
   module('Select Button')
 

@@ -1,4 +1,4 @@
-define([], function () {
+define(['react'], function (React) {
   var StandardGradeInputMixin = {
     handleOnChange(event) {
       this.setState({gradeToPost: event.target.value});

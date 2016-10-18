@@ -3,11 +3,10 @@ define [
   'jsx/shared/modal'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/shared/modal-content'
   'jsx/shared/modal-buttons'
-], ($, Modal, React, ReactDOM, ModalContent, ModalButtons) ->
-
-  TestUtils = React.addons.TestUtils
+], ($, Modal, React, ReactDOM, TestUtils, ModalContent, ModalButtons) ->
 
   module 'Modal',
     setup: ->

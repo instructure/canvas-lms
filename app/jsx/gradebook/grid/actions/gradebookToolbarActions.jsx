@@ -1,5 +1,5 @@
 define([
-  'bower/reflux/dist/reflux',
+  'reflux',
   'jquery',
   'underscore',
   'i18n!gradebook2',

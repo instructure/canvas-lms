@@ -1,6 +1,6 @@
 define([
   'react',
-  'bower/reflux/dist/reflux',
+  'reflux',
   'underscore',
   'i18n!gradebook',
   'compiled/gradebook2/SetDefaultGradeDialog',

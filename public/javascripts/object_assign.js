@@ -16,9 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'underscore'
-], function (_) {
+define([], function () {
   //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
   if (!Object.assign) {
     Object.defineProperty(Object, 'assign', {

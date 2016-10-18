@@ -1,12 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/FileRenameForm'
   'compiled/models/Folder'
-], (React, ReactDOM, $, FileRenameForm, Folder) ->
-
-  Simulate = React.addons.TestUtils.Simulate
+], (React, ReactDOM, {Simulate}, $, FileRenameForm, Folder) ->
 
   module 'FileRenameForm',
     setup: ->

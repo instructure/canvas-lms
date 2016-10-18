@@ -1,6 +1,0 @@
-currently just using this for `ic-<foo>` installs, not jquery, or ember, etc,
-but we intend to eventually use bower for all of our third-party javascript.
-
-we also check these deps in so we don't rely on github and others being up to
-run our tests and deploy
-

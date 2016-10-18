@@ -6,7 +6,6 @@ define [
   'jquery.ajaxJSON'
 ], (React, ReactDOM, AssignmentPercentage, $) ->
 
-  TestUtils = React.addons.TestUtils
   wrapper   = document.getElementById('fixtures')
 
   renderComponent = (data) ->

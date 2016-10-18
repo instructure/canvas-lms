@@ -1,6 +1,7 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jquery'
   'jsx/due_dates/DueDateCalendarPicker'
@@ -8,10 +9,7 @@ define [
   'vendor/timezone/fr_FR'
   'helpers/I18nStubber'
   'helpers/fakeENV'
-], (React, ReactDOM, _, $, DueDateCalendarPicker, tz, french, I18nStubber, fakeENV) ->
-
-  Simulate = React.addons.TestUtils.Simulate
-  SimulateNative = React.addons.TestUtils.SimulateNative
+], (React, ReactDOM, {Simulate, SimulateNative}, _, $, DueDateCalendarPicker, tz, french, I18nStubber, fakeENV) ->
 
   module 'unlock_at DueDateCalendarPicker',
     setup: ->

@@ -1,5 +1,5 @@
 define([
-  'bower/reflux/dist/reflux',
+  'reflux',
   'compiled/userSettings',
   'jsx/gradebook/grid/constants',
   'jsx/gradebook/grid/helpers/enrollmentsUrlHelper',

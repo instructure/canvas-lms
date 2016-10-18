@@ -1,9 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/external_apps/components/ConfigurationFormUrl'
-], (React, ReactDOM, ConfigurationFormUrl) ->
+], (React, ReactDOM, TestUtils, ConfigurationFormUrl) ->
 
+  Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   createElement = (data) ->

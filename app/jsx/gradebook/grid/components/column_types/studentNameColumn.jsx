@@ -1,7 +1,7 @@
 define([
   'react',
   'i18n!gradebook2',
-  'bower/reflux/dist/reflux',
+  'reflux',
   '../../stores/gradebookToolbarStore',
   '../../constants'
 ], function(React, I18n, Reflux, GradebookToolbarStore, GradebookConstants) {

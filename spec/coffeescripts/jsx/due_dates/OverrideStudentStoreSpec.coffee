@@ -1,12 +1,10 @@
 define [
   'react'
+  'react-addons-test-utils'
   'underscore'
   'jsx/due_dates/OverrideStudentStore',
   'helpers/fakeENV'
-], (React, _, OverrideStudentStore, fakeENV) ->
-
-  Simulate = React.addons.TestUtils.Simulate
-  SimulateNative = React.addons.TestUtils.SimulateNative
+], (React, {Simulate, SimulateNative}, _, OverrideStudentStore, fakeENV) ->
 
   module 'OverrideStudentStore',
     setup: ->

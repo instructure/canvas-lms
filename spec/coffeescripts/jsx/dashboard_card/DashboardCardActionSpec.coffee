@@ -1,11 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/dashboard_card/DashboardCardAction'
-], (React, ReactDOM, _, DashboardCardAction) ->
-
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, _, DashboardCardAction) ->
 
   module 'DashboardCardAction',
     setup: ->

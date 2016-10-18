@@ -1,9 +1,9 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/shared/DatetimeDisplay',
   'timezone'
-], (React, DatetimeDisplay, tz) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, DatetimeDisplay, tz) => {
 
   module('DatetimeDisplay');
 
