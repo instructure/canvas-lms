@@ -286,10 +286,8 @@ describe "courses" do
     it "should load the users page using ajax" do
       course_with_teacher_logged_in
 
-      # Setup the course with > 50 users (to test scrolling)
-      60.times do |n|
-        @course.enroll_student(user)
-      end
+      # Set up the course with > 50 users (to test scrolling)
+      create_users_in_course @course, 60
 
       @course.enroll_user(user, 'TaEnrollment')
 

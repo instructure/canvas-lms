@@ -36,6 +36,11 @@ module Factories
                                          :allow_multiple_enrollments => true)
   end
 
+  def create_enrollment_states(enrollment_ids, options)
+    enrollment_ids = enrollment_ids.map(&:id) unless enrollment_ids.first.is_a? Fixnum
+    create_records(EnrollmentState, enrollment_ids.map { |id| options.merge({ enrollment_id: id}) }, :nil)
+  end
+
   def create_enrollments(course, users, options = {})
     user_ids = users.first.is_a?(User) ?
       users.map(&:id) :
@@ -47,6 +52,9 @@ module Factories
 
     section_id = options[:section_id] || course.default_section.id
     type = options[:enrollment_type] || "StudentEnrollment"
-    create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active', :role_id => Role.get_built_in_role(type).id}}, options[:return_type])
+    role_id = Role.get_built_in_role(type).id
+    result = create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active', :role_id => role_id}}, options[:return_type])
+    create_enrollment_states(result, {state: "active"})
+    result
   end
 end

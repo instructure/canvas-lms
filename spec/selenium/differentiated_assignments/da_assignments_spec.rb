@@ -161,18 +161,8 @@ describe "interaction with differentiated assignments" do
       create_da_assignment
     end
     it "should hide students from speedgrader if they don't have Differentiated assignment visibility or a graded submission" do
-      # this is all setup
-      @s1, @s2, @s3, @s4, @s5 = ["Not Displayed", "bob", "steve", "mary", "jeanie"].map do |name|
-        course_with_student(:course => @course)
-        @student.name = name
-        @student.tap(&:save)
-      end
-      [@s1, @s2, @s3].each do |student|
-        @course.enroll_user(student, 'StudentEnrollment', :enrollment_state => 'active', :section => @default_section)
-      end
-      [@s4, @s5].each do |student|
-        @course.enroll_user(student, 'StudentEnrollment', :enrollment_state => 'active', :section => @section1)
-      end
+      @s1, @s2, @s3 = create_users_in_course(@course, 3, return_type: :record, section_id: @default_section.id)
+      @s4, @s5 = create_users_in_course(@course, 2, return_type: :record, section_id: @section1.id)
       create_section_override_for_assignment(@da_assignment, course_section: @section1)
       @da_assignment.grade_student(@s3, {:grade => 10})
 

@@ -84,9 +84,7 @@ describe "calendar2" do
         end
 
         it "should constrain context selection to 10" do
-          11.times do |x|
-            course_with_teacher(:course_name => "Course #{x + 1}", :user => @user, :active_all => true).course
-          end
+          create_courses 11, enroll_user: @user
 
           get "/calendar2"
           ff('.context_list_context').each(&:click)

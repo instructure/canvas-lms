@@ -12,13 +12,11 @@ describe "gradebook2" do
   end
 
   def test_n_students(n)
-    n.times { |i| student_in_course(:name => "student #{i+1}") }
+    create_users_in_course @course, n
     get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
     f('.gradebook_filter input').send_keys n
-    sleep 1 # InputFilter has a delay
-    expect(ff('.student-name').size).to eq 1
-    expect(f('.student-name').text).to eq "student #{n}"
+    expect(ff('.student-name')).to have_size 1
+    expect(f('.student-name')).to include_text "user #{n}"
   end
 
   it "should work for 2 pages" do
