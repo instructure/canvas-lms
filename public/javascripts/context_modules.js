@@ -183,13 +183,15 @@ define([
             $context_module_item = $("#context_module_item_" + id);
             var data = {};
             if (info["points_possible"] != null) {
-              data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', { 'points': "" + info["points_possible"]});
+              data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', {'points': "" + info["points_possible"]});
             }
             if (info["due_date"] != null) {
               if (info["past_due"] != null) {
                 $context_module_item.data('past_due', true);
               }
               data["due_date_display"] = $.dateString(info["due_date"])
+            } else if (info['has_many_overrides'] != null) {
+              data["due_date_display"] = I18n.t("Multiple Due Dates");
             } else if (info["vdd_tooltip"] != null) {
               info['vdd_tooltip']['link_href'] = $context_module_item.find('a.title').attr('href');
               $context_module_item.find('.due_date_display').html(vddTooltipView(info["vdd_tooltip"]));
