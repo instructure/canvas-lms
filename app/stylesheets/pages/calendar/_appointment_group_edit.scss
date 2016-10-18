@@ -9,6 +9,22 @@
   }
 }
 
+.AppointmentGroupList__List {
+  width: 100%;
+  margin-top: 10px;
+  margin-left: 30px;
+}
+.AppointmentGroupList__Appointment {
+  margin-top: 5px;
+}
+.AppointmentGroupList__MessageButton{
+  margin-top: 10px;
+  width: 100%;
+  margin-left: 30px;
+}
+.AppointmentGroupList__unreserved{
+  opacity: 0.5;
+}
 
 .ContextSelector__Dropdown {
   position: absolute;

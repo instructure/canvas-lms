@@ -5,8 +5,10 @@ define([
   'instructure-ui/Grid',
   'instructure-ui/ScreenReaderContent',
   'axios',
+  './AppointmentGroupList',
+  'compiled/calendar/MessageParticipantsDialog',
   './ContextSelector'
-], (React, I18n, {default: Button}, {default: Grid, GridCol, GridRow}, {default: ScreenReaderContent}, axios, ContextSelector) => {
+], (React, I18n, {default: Button}, {default: Grid, GridCol, GridRow}, {default: ScreenReaderContent}, axios, AppointmentGroupList, MessageParticipantsDialog, ContextSelector) => {
 
   const parseFormValues = (data) => ({
     description: data.description,
@@ -23,6 +25,7 @@ define([
 
     constructor (props) {
       super(props);
+      this.messageStudents = this.messageStudents.bind(this)
       this.state = {
         appointmentGroup: {},
         formValues: {}
@@ -53,6 +56,17 @@ define([
     setLocationValue = (e) => {
       const newVals = Object.assign(this.state.formValues, {location: e.target.value});
       this.setState({formValues: newVals});
+    }
+
+    messageStudents = (e) => {
+      //TODO: We need to make the MessageParticipantsDialog take in multiple appointments
+      // to be able to get the MessageParticipantsDialog to show all the users
+      // to message, otherwise we need to pass in the calendar datasource, or
+      // rewrite the modal completely
+      ENV.CALENDAR = {}
+      ENV.CALENDAR.MAX_GROUP_CONVERSATION_SIZE = 100
+      const messageStudentsDialog = new MessageParticipantsDialog({timeslot: this.state.appointmentGroup.appointments[0]})
+      messageStudentsDialog.show();
     }
 
     render () {
@@ -124,6 +138,7 @@ define([
             </div>
             <div className="ic-Form-control">
               <label className="ic-Label" htmlFor="appointments">{I18n.t('Appointments')}</label>
+              <AppointmentGroupList appointmentGroup={this.state.appointmentGroup}/>
             </div>
           </form>
         </div>
@@ -132,4 +147,4 @@ define([
   }
 
   return EditPage;
-});
+})
