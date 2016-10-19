@@ -410,3 +410,14 @@ by `asset_type` and `asset_id`.
 | `context_type` | The type of context the attachment is used in. |
 | `context_id` | The id of the context the attachment is used in. |
 | `content_type` | The content type of the attachment. |
+
+#### `account_notification_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `account_notification_id` | The Canvas id of the account notification. |
+| `subject` | The subject of the notification. |
+| `message` | The message to be sent in the notification. |
+| `icon` | The icon to display with the message.  Defaults to warning. |
+| `start_at` | When to send out the notification. |
+| `end_at` | When to expire the notification. |

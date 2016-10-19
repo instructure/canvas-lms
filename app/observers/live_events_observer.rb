@@ -11,7 +11,8 @@ class LiveEventsObserver < ActiveRecord::Observer
           :assignment,
           :submission,
           :attachment,
-          :user_account_association
+          :user_account_association,
+          :account_notification
 
   def after_update(obj)
     changes = obj.changes
@@ -76,6 +77,8 @@ class LiveEventsObserver < ActiveRecord::Observer
       if attachment_eligible?(obj)
         Canvas::LiveEvents.attachment_created(obj)
       end
+    when AccountNotification
+      Canvas::LiveEvents.account_notification_created(obj)
     end
     end
   end

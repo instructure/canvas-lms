@@ -48,6 +48,17 @@ module Canvas::LiveEvents
     })
   end
 
+  def self.account_notification_created(notification)
+    post_event_stringified('account_notification_created', {
+      account_notification_id: notification.id,
+      subject: LiveEvents.truncate(notification.subject),
+      message: LiveEvents.truncate(notification.message),
+      icon: notification.icon,
+      start_at: notification.start_at,
+      end_at: notification.end_at,
+    })
+  end
+
   def self.group_membership_created(membership)
     post_event_stringified('group_membership_created', {
       group_membership_id: membership.global_id,
