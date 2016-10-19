@@ -925,7 +925,13 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def users_with_permissions(users)
-    users.select{|u| self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)}
+    permission = self.is_announcement ? :read_announcements : :read_forum
+    if self.course.is_a?(Course)
+      self.course.filter_users_by_permission(users, permission)
+    else
+      # sucks to be an account-level group
+      users.select{|u| self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)}
+    end
   end
 
   def course

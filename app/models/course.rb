@@ -1768,6 +1768,23 @@ class Course < ActiveRecord::Base
     participants.uniq
   end
 
+  def filter_users_by_permission(users, permission)
+    scope = self.enrollments.where(:user_id => users)
+    details = RoleOverride.permissions[permission]
+    scope = details[:applies_to_concluded] ? scope.not_inactive_by_date : scope.active_or_pending_by_date
+
+    role_user_ids = scope.pluck(:role_id, :user_id)
+    role_ids = role_user_ids.map(&:first).uniq
+
+    roles = Role.where(:id => role_ids).to_a
+    allowed_role_ids = roles.select{|role| RoleOverride.enabled_for?(self, permission, role, self).include?(:self)}.map(&:id)
+    return [] unless allowed_role_ids.any?
+
+    allowed_user_ids = Set.new
+    role_user_ids.each{|role_id, user_id| allowed_user_ids << user_id if allowed_role_ids.include?(role_id)}
+    users.select{|user| allowed_user_ids.include?(user.id)}
+  end
+
   def enroll_user(user, type='StudentEnrollment', opts={})
     enrollment_state = opts[:enrollment_state]
     enrollment_state ||= 'active' if type == 'ObserverEnrollment' && user.registered?
@@ -1994,13 +2011,13 @@ class Course < ActiveRecord::Base
   def vericite_enabled?
     Canvas::Plugin.find(:vericite).try(:enabled?)
   end
-  
+
   def vericite_pledge
     if vericite_enabled?
       Canvas::Plugin.find(:vericite).settings[:pledge]
     end
   end
-  
+
   def vericite_comments
     if vericite_enabled?
       Canvas::Plugin.find(:vericite).settings[:comments]
