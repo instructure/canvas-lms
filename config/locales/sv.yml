@@ -5458,7 +5458,7 @@ sv:
   delete_toolname_app_85f9d4ee: "Radera %{toolName} app"
   deleted_ce03674d: raderad
   deleting_6421031e: raderar
-  delicious_7f9ac66f: Delikat
+  delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demo sidor kräver att Recaptcha-inställningarna konfigureras. Vänligen kontakta din hemside-administratör för göra det här på Canvas."
   demos: 
     _register: 
@@ -11457,7 +11457,7 @@ sv:
       instructions: 
         main: 
           manage: 
-            description: "Här skapas lärandemålen för att följa måluppfyllelsen i kurs/ämne. För att sätta igång kan du ta en titt på menyn högst upp. Klicka på \"Ny\" för att skapa ett nytt lärandemål, eller Ny grupp-knappen för att skapa en ny grupp att organisera målen i. Hitta-knappen låter dig använda lärandemålen som skapats av din organisation. Medans du skapar och använder lärandemålen kan du använda panelen till vänster för att navigera bland dessa. Du kan dra och släppa lärandemål mellan olika nivåer för att skapa en bättre struktur.* *Vad som är ännu viktigare är att Canvas låter dig lägga till lärandemålen i dina matriser så att du kan räkna måluppfyllelse i dina uppgifter. När du är färdig med dina lärandemål trycker du på \"Hantera matriser\" för att börja använda lärandemål när du bedömmer.*"
+            description: "*Här skapas lärandemålen för att följa måluppfyllelsen i kurs/ämne. För att sätta igång kan du ta en titt på menyn högst upp. Klicka på \"Ny\" för att skapa ett nytt lärandemål, eller Ny grupp-knappen för att skapa en ny grupp att organisera målen i. Hitta-knappen låter dig använda lärandemålen som skapats av din organisation. Medans du skapar och använder lärandemålen kan du använda panelen till vänster för att navigera bland dessa. Du kan dra och släppa lärandemål mellan olika nivåer för att skapa en bättre struktur.* *Vad som är ännu viktigare är att Canvas låter dig lägga till lärandemålen i dina matriser så att du kan räkna måluppfyllelse i dina uppgifter. När du är färdig med dina lärandemål trycker du på \"Hantera matriser\" för att börja använda lärandemål när du bedömmer.*"
             title: "Ställer in lärandemål"
     mastery_error: "Måste vara högre eller samma som 0"
     missing_outcome: "Kunde inte hitta lärandemålen"
@@ -11699,10 +11699,10 @@ sv:
     buttons: 
       saving: Sparar...
     canvadocs: 
-      description: "Aktiva Canvasdocs (kompatibel med Box View) som ett alternativ för förhandsvisning av dokument"
-      name: Canvasdocs
+      description: "Aktiva Canvadocs (kompatibel med Box View) som ett alternativ för förhandsvisning av dokument"
+      name: Canvadocs
     canvadocs_settings: 
-      description: "Den här pluginen integrerar med Canvasdoc (eller andra Box View kompatibla med API) för att erbjuda en förhandsvisning av dokument i HTML5."
+      description: "Den här pluginen integrerar med Canvadoc (eller andra Box View kompatibla med API) för att erbjuda en förhandsvisning av dokument i HTML5."
       labels: 
         annotations_supported: "Annontering stödjs"
         api_key: API-nyckel
@@ -11714,7 +11714,7 @@ sv:
       description: "Katalog konto provisioner för Canvas"
       name: "Catalog provisioner"
     clever: 
-      description: "Smart inloggning"
+      description: "Clever inloggning"
     clever_settings: 
       labels: 
         client_id: "Klient ID"
@@ -12286,7 +12286,7 @@ sv:
         add_account: "Lägg till konto"
         configure_mfa: "Ställ in flerstegs-bekräftelse"
         delete_account: "Radera mitt konto"
-        delicious: Delikat
+        delicious: Delicious
         diigo: Diigo
         disable_mfa: "Avaktivera flerstegs-bekräftelse"
         edit_settings: "Redigera inställningar"
