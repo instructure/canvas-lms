@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -282,6 +282,7 @@
 class Quizzes::QuizzesApiController < ApplicationController
   include Api::V1::Quiz
   include ::Filters::Quizzes
+  include SubmittablesGradingPeriodProtection
 
   before_filter :require_context
   before_filter :require_quiz, :only => [:show, :update, :destroy, :reorder, :validate_access_code]
@@ -467,13 +468,14 @@ class Quizzes::QuizzesApiController < ApplicationController
   def create
     if authorized_action(@context.quizzes.temp_record, @current_user, :create)
       @quiz = @context.quizzes.build
+      quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz] || {}
+      return render_create_error(:forbidden) unless grading_periods_allow_submittable_create?(@quiz, quiz_params)
+
       update_api_quiz(@quiz, params)
       unless @quiz.new_record?
         render_json
       else
-        # TODO: we don't really have a strategy in the API yet for returning
-        # errors.
-        render :json => {:errors => @quiz.errors}, :status => 400
+        render_create_error(:bad_request)
       end
     end
   end
@@ -490,6 +492,9 @@ class Quizzes::QuizzesApiController < ApplicationController
   # @returns Quiz
   def update
     if authorized_action(@quiz, @current_user, :update)
+      quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz] || {}
+      return render_update_error(:forbidden) unless grading_periods_allow_submittable_update?(@quiz, quiz_params)
+
       update_api_quiz(@quiz, params)
       if @quiz.valid?
         if accepts_jsonapi?
@@ -498,9 +503,7 @@ class Quizzes::QuizzesApiController < ApplicationController
           render_json
         end
       else
-        errors = @quiz.errors.as_json[:errors]
-        errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)
-        render :json => {:errors => errors}, :status => 400
+        render_update_error(:bad_request)
       end
     end
   end
@@ -563,6 +566,16 @@ class Quizzes::QuizzesApiController < ApplicationController
 
   def render_json
     render json: quiz_json(@quiz, @context, @current_user, session)
+  end
+
+  def render_create_error(status)
+    render json: @quiz.errors, status: status
+  end
+
+  def render_update_error(status)
+    errors = @quiz.errors.as_json[:errors]
+    errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
+    render json: {errors: errors}, status: status
   end
 
   def quiz_params

@@ -308,6 +308,35 @@ module Helpers
     m.save!
     m
   end
+
+  def assert_status(status=500)
+    expect(response.status.to_i).to eq status
+  end
+
+  def assert_unauthorized
+    # we allow either a raw unauthorized or a redirect to login
+    if response.status.to_i == 401
+      assert_status(401)
+    else
+      # Certain responses require more privileges than the current user has (ie site admin)
+      expect(response).to redirect_to(login_url)
+                      .or redirect_to(root_url)
+    end
+  end
+
+  def assert_forbidden
+    assert_status(403)
+  end
+
+  def assert_page_not_found
+    yield
+    assert_status(404)
+  end
+
+  def assert_require_login
+    expect(response).to be_redirect
+    expect(flash[:warning]).to eq "You must be logged in to access this page"
+  end
 end
 
 RSpec.configure do |config|
@@ -470,31 +499,6 @@ RSpec.configure do |config|
                       "pseudonym_session[password]" => password
     assert_response :success
     expect(request.fullpath).to eq "/?login_success=1"
-  end
-
-  def assert_status(status=500)
-    expect(response.status.to_i).to eq status
-  end
-
-  def assert_unauthorized
-    # we allow either a raw unauthorized or a redirect to login
-    if response.status.to_i == 401
-      assert_status(401)
-    else
-      # Certain responses require more privileges than the current user has (ie site admin)
-      expect(response).to redirect_to(login_url)
-                      .or redirect_to(root_url)
-    end
-  end
-
-  def assert_page_not_found
-    yield
-    assert_status(404)
-  end
-
-  def assert_require_login
-    expect(response).to be_redirect
-    expect(flash[:warning]).to eq "You must be logged in to access this page"
   end
 
   # Instead of directly comparing urls

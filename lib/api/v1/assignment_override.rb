@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -336,9 +336,9 @@ module Api::V1::AssignmentOverride
     else
       override.assignment.run_if_overrides_changed_later!
     end
-    return true
+    true
   rescue ActiveRecord::RecordInvalid
-    return false
+    false
   end
 
   # updates only the selected overrides; compare with
@@ -355,7 +355,7 @@ module Api::V1::AssignmentOverride
     end
     overrides.map(&:assignment).uniq.each(&:run_if_overrides_changed_later!)
   rescue ActiveRecord::RecordInvalid
-    return false
+    false
   end
 
   def invisible_users_and_overrides_for_user(context, user, existing_overrides)
@@ -369,13 +369,6 @@ module Api::V1::AssignmentOverride
     return invisible_user_ids, invisible_override_ids
   end
 
-  def overrides_after_defunct_removed(assignment, existing_overrides, overrides_params, invisible_override_ids)
-    override_param_ids = invisible_override_ids + overrides_params.map{ |ov| ov[:id] }
-    remaining_overrides = destroy_defunct_overrides(assignment, override_param_ids, existing_overrides)
-    ActiveRecord::Associations::Preloader.new.preload(remaining_overrides, :assignment_override_students)
-    remaining_overrides
-  end
-
   def update_override_with_invisible_data(override_params, override, invisible_override_ids, invisible_user_ids)
     return override_params = override if invisible_override_ids.include?(override.id)
     # add back in the invisible students for this override if any found
@@ -387,58 +380,78 @@ module Api::V1::AssignmentOverride
     end
   end
 
-  # updates all updates for an assignment; compare with
-  # update_assignment_overrides below, which updates
-  # all overrides for assignment
-  def batch_update_assignment_overrides(assignment, overrides_params, user)
+  def prepare_assignment_overrides_for_batch_update(assignment, overrides_params, user)
     existing_overrides = assignment.assignment_overrides.active
     invisible_user_ids, invisible_override_ids = invisible_users_and_overrides_for_user(
-      assignment.context,
-      user,
-      existing_overrides
+      assignment.context, user, existing_overrides
     )
-    remaining_overrides = overrides_after_defunct_removed(assignment,
-                                                          existing_overrides,
-                                                          overrides_params,
-                                                          invisible_override_ids)
 
-    overrides = overrides_params.map do |override_params|
-      override = get_override_from_params(override_params, assignment, remaining_overrides)
+    override_param_ids = invisible_override_ids + overrides_params.map {|ov| ov[:id].to_i}
+    split_overrides = existing_overrides.group_by do |override|
+      override_param_ids.include?(override.id) ? :keep : :delete
+    end
+
+    overrides_to_keep = split_overrides[:keep] || []
+    overrides_to_delete = split_overrides[:delete] || []
+
+    ActiveRecord::Associations::Preloader.new.preload(overrides_to_keep, :assignment_override_students)
+
+    override_errors = []
+    overrides_to_save = overrides_params.map do |override_params|
+      override = get_override_from_params(override_params, assignment, overrides_to_keep)
       update_override_with_invisible_data(override_params, override, invisible_override_ids, invisible_user_ids)
 
       data, errors = interpret_assignment_override_data(assignment, override_params, override.set_type)
       if errors
-        # add the errors to the assignment so that they are caught on
-        # the Api::V1::Assignment#update_api_assignment
-        # to enact intended behavior
-        assignment.errors.add(:base, errors.join(','))
+        override_errors << errors.join(',')
       else
         update_assignment_override_without_save(override, data)
       end
       override
     end
 
+    overrides_to_create, overrides_to_update = overrides_to_save.partition(&:new_record?)
+
+    {
+      overrides_to_create: overrides_to_create,
+      overrides_to_update: overrides_to_update,
+      overrides_to_delete: overrides_to_delete,
+      override_errors: override_errors
+    }
+  end
+
+  def perform_batch_update_assignment_overrides(assignment, prepared_overrides)
+    prepared_overrides[:override_errors].each do |error|
+      assignment.errors.add(:base, error)
+    end
+
+    if prepared_overrides[:overrides_to_delete].any?
+      assignment.assignment_overrides.where(id: prepared_overrides[:overrides_to_delete]).destroy_all
+    end
+
     raise ActiveRecord::RecordInvalid.new(assignment) unless assignment.valid?
-    overrides.each(&:save!)
+
+    prepared_overrides[:overrides_to_create].each(&:save!)
+    prepared_overrides[:overrides_to_update].each(&:save!)
 
     assignment.run_if_overrides_changed_later!
   end
 
-  def destroy_defunct_overrides(assignment, override_param_ids, existing_overrides)
-    defunct_override_ids =  existing_overrides.map(&:id) - override_param_ids.map(&:to_i)
-    return existing_overrides if defunct_override_ids.empty?
-
-    assignment.assignment_overrides.where(:id => defunct_override_ids).destroy_all
-    existing_overrides.reject{|override| defunct_override_ids.include?(override.id)}
+  def batch_update_assignment_overrides(assignment, overrides_params, user)
+    prepared_overrides = prepare_assignment_overrides_for_batch_update(assignment, overrides_params, user)
+    perform_batch_update_assignment_overrides(assignment, prepared_overrides)
   end
-  private :destroy_defunct_overrides
 
   def get_override_from_params(override_params, assignment, potential_overrides)
-    potential_overrides.detect { |ov|
-      ov.id == override_params[:id].to_i
-    } || assignment.assignment_overrides.build.tap { |ov|
-      ov.dont_touch_assignment = true
-    }
+    override = potential_overrides.detect {|ov| ov.id == override_params[:id].to_i}
+    return override if override
+
+    case assignment
+    when Assignment
+      AssignmentOverride.new(assignment_id: assignment.id, dont_touch_assignment: true)
+    when Quizzes::Quiz
+      AssignmentOverride.new(quiz_id: assignment.id, dont_touch_assignment: true)
+    end
   end
   private :get_override_from_params
 
