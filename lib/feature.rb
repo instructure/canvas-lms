@@ -463,6 +463,16 @@ END
       state: 'hidden',
       beta: true,
       root_opt_in: true
+    },
+    'plagiarism_detection_platform' =>
+    {
+      display_name: -> { I18n.t('Plagiarism Detection Platform') },
+      description: -> { I18n.t('Enable the plagiarism detection platform') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      root_opt_in: true,
+      development: true,
     }
   )
 
