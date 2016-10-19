@@ -261,7 +261,6 @@ describe "scheduler" do
     end
 
     it "should allow removing individual appointment users",:priority  => "1", test_id: 140196 do
-      #set_native_events("false")
       # user appointment group
       create_appointment_group
       ag = AppointmentGroup.first
@@ -294,7 +293,6 @@ describe "scheduler" do
     end
 
     it "should allow removing individual appointment groups" do
-      #set_native_events("false")
       # group appointment group
       gc = @course.group_categories.create!(:name => "Blah Groups")
       title = create_appointment_group :sub_context_codes => [gc.asset_string],

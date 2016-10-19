@@ -48,6 +48,8 @@ module SeleniumDriverSetup
     driver.manage.timeouts.implicit_wait = IMPLICIT_WAIT_TIMEOUT
     driver.manage.timeouts.script_timeout = 60
 
+    puts "Browser: #{browser_name(driver)} - #{browser_version(driver)}"
+
     driver
   end
 
@@ -219,8 +221,17 @@ module SeleniumDriverSetup
     profile
   end
 
-  def set_native_events(setting)
-    driver.instance_variable_get(:@bridge).instance_variable_get(:@capabilities).instance_variable_set(:@native_events, setting)
+  def browser_name(driver)
+    driver_capabilities(driver).browser_name
+  end
+
+  def browser_version(driver)
+    driver_capabilities(driver).version
+  end
+
+  def driver_capabilities(driver)
+    driver.instance_variable_get(:@bridge)
+          .instance_variable_get(:@capabilities)
   end
 
   def app_host
