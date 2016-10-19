@@ -408,7 +408,7 @@ describe AdheresToPolicy::InstanceMethods do
         expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/\>\/permissions_key\/read$/)
 
         session.delete(:permissions_key)
-        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/\>\/read$/)
+        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/\>\/default\/read$/)
 
         expect(actor.call_permission_cache_key_for(nil, nil, :read)).to match(/\>\/read$/)
       end

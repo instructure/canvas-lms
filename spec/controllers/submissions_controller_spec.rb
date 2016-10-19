@@ -162,7 +162,7 @@ describe SubmissionsController do
           )
 
           # cache permission as true (for 5 minutes)
-          expect(@assignment.grants_right?(@student, :submit)).to be_truthy
+          expect(@assignment.grants_right?(@student, {}, :submit)).to be_truthy
         end
 
         # travel past due date (which resets the Assignment#locked_for? cache)

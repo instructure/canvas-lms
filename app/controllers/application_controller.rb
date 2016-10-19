@@ -703,7 +703,7 @@ class ApplicationController < ActionController::Base
         # don't load it again if we've already got it
         next if @contexts.any? { |c| c.asset_string == include_context }
         context = Context.find_by_asset_string(include_context)
-        @contexts << context if context && context.grants_right?(@current_user, :read)
+        @contexts << context if context && context.grants_right?(@current_user, session, :read)
       end
     end
 
@@ -1070,7 +1070,7 @@ class ApplicationController < ActionController::Base
   # analogous to rescue_action_without_handler from ActionPack 2.3
   def rescue_exception(exception)
     raise if Rails.env.development? && !ENV['DISABLE_BETTER_ERRORS']
-    
+
     ActiveSupport::Deprecation.silence do
       message = "\n#{exception.class} (#{exception.message}):\n"
       message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
