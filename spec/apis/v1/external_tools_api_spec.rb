@@ -659,7 +659,8 @@ describe ExternalToolsController, type: :request do
      "link_selection"=>nil,
      "assignment_selection"=>nil,
      "post_grades"=>nil,
-     "collaboration"=>nil
+     "collaboration"=>nil,
+     "assignment_configuration"=>nil
     }
   end
 end
