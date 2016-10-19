@@ -26,6 +26,7 @@ define [
 
     events: do ->
       events = {}
+      events[ "change #{GROUP_CATEGORY_ID}" ] = 'groupCategorySelected'
       events[ "click #{CREATE_GROUP_CATEGORY_ID}" ] = 'showGroupCategoryCreateDialog'
       events[ "change #{HAS_GROUP_CATEGORY}" ] = 'toggleGroupCategoryOptions'
       events
@@ -49,9 +50,11 @@ define [
       super
       @$groupCategoryID.toggleAccessibly !_.isEmpty(@groupCategories)
 
-    showGroupCategoryCreateDialog: =>
+    groupCategorySelected: =>
       newSelectedId = @$groupCategoryID.val()
       StudentGroupStore.setSelectedGroupSet(newSelectedId)
+
+    showGroupCategoryCreateDialog: =>
       # TODO: Yikes, we need to pull the javascript out of manage_groups.js
       # and get rid of this global thing
       window.addGroupCategory (data) =>
