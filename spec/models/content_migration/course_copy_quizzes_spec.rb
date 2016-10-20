@@ -998,5 +998,41 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(q2.question_data['correct_comments_html']).to eq text
       expect(q2.question_data['answers'].first['comments_html']).to eq text
     end
+
+    describe "assignment overrides" do
+      before :once do
+        @quiz_plain = @copy_from.quizzes.create!(title: 'my quiz')
+        @quiz_assigned = @copy_from.quizzes.create!(title: 'assignment quiz')
+        @quiz_assigned.did_edit
+        @quiz_assigned.offer!
+      end
+
+      it "should copy only noop overrides" do
+        assignment_override_model(quiz: @quiz_plain, set_type: 'Noop', set_id: 1, title: 'Tag 3')
+        assignment_override_model(quiz: @quiz_assigned, set_type: 'Noop', set_id: 1, title: 'Tag 4')
+        run_course_copy
+        to_quiz_plain = @copy_to.quizzes.where(migration_id: mig_id(@quiz_plain)).first
+        to_quiz_assigned = @copy_to.quizzes.where(migration_id: mig_id(@quiz_assigned)).first
+        expect(to_quiz_plain.assignment_overrides.pluck(:title)).to eq ['Tag 3']
+        expect(to_quiz_assigned.assignment_overrides.pluck(:title)).to eq ['Tag 4']
+      end
+    end
+
+    it "should not destroy assessment questions when copying twice" do
+      bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      data = {
+        "question_type" => "multiple_choice_question", 'name' => 'test question',
+        'answers' => [{'id' => 1, "text" => "Correct", "weight" => 100},
+          {'id' => 2, "text" => "inorrect", "weight" => 0}],
+      }
+      aq = bank1.assessment_questions.create!(:question_data => data)
+
+      run_course_copy
+
+      run_course_copy # run it twice
+      
+      aq_to = @copy_to.assessment_questions.where(:migration_id => mig_id(aq)).first
+      expect(aq_to.data['question_type']).to eq "multiple_choice_question"
+    end
   end
 end
