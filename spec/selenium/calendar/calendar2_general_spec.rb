@@ -36,7 +36,7 @@ describe "calendar2" do
         wait_for_ajaximations
         expect_new_page_load { f('.group_details').click }
         wait_for_ajaximations
-        expect(f('#title').attribute('value')).to eql "new appointment group"
+        expect(driver.current_url).to include("appointment_groups/#{AppointmentGroup.last.id}/edit")
       end
 
     end

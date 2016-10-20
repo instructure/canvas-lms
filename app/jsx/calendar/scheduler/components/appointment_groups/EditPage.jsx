@@ -16,7 +16,7 @@ define([
     description: data.description,
     location: data.location_name,
     title: data.title
-  });
+  })
 
   const parseTimeData = (appointmentGroup) => {
     if (!appointmentGroup.appointments) {
@@ -36,42 +36,49 @@ define([
 
     static propTypes = {
       appointment_group_id: React.PropTypes.string
-    };
+    }
 
     constructor (props) {
-      super(props);
+      super(props)
       this.messageStudents = this.messageStudents.bind(this)
       this.state = {
         appointmentGroup: {},
         formValues: {},
+        contexts: [],
         isDeleting: false,
-      }
+      };
     }
 
     componentDidMount () {
       axios.get(`/api/v1/appointment_groups/${this.props.appointment_group_id}?include[]=appointments&include[]=child_events`)
-        .then((response) => {
-          const formValues = parseFormValues(response.data);
-          this.setState({
-            formValues,
-            appointmentGroup: response.data
-          });
-        });
+           .then((response) => {
+             const formValues = parseFormValues(response.data)
+             this.setState({
+               formValues,
+               appointmentGroup: response.data,
+             })
+           })
+      axios.get('/api/v1/calendar_events/visible_contexts')
+      .then((response) => {
+       this.setState({
+         contexts: response.data.contexts,
+       })
+      })
     }
 
     setTitleValue = (e) => {
-      const newVals = Object.assign(this.state.formValues, {title: e.target.value});
-      this.setState({formValues: newVals});
+      const newVals = Object.assign(this.state.formValues, {title: e.target.value})
+      this.setState({formValues: newVals})
     }
 
     setDescriptionValue = (e) => {
-      const newVals = Object.assign(this.state.formValues, {description: e.target.value});
-      this.setState({formValues: newVals});
+      const newVals = Object.assign(this.state.formValues, {description: e.target.value})
+      this.setState({formValues: newVals})
     }
 
     setLocationValue = (e) => {
-      const newVals = Object.assign(this.state.formValues, {location: e.target.value});
-      this.setState({formValues: newVals});
+      const newVals = Object.assign(this.state.formValues, {location: e.target.value})
+      this.setState({formValues: newVals})
     }
 
     messageStudents = (e) => {
@@ -82,7 +89,7 @@ define([
       ENV.CALENDAR = {}
       ENV.CALENDAR.MAX_GROUP_CONVERSATION_SIZE = 100
       const messageStudentsDialog = new MessageParticipantsDialog({timeslot: this.state.appointmentGroup.appointments[0]})
-      messageStudentsDialog.show();
+      messageStudentsDialog.show()
     }
 
     deleteGroup = () => {
@@ -126,7 +133,7 @@ define([
           <form className="EditPage__Form ic-Form-group ic-Form-group--horizontal">
             <div className="ic-Form-control">
               <label className="ic-Label"htmlFor="context">{I18n.t('Calendars')}</label>
-              <ContextSelector id="context" className="ic-Input" appointmentGroup={this.state.appointmentGroup} />
+              <ContextSelector id="context" className="ic-Input" contexts={this.state.contexts} appointmentGroup={this.state.appointmentGroup} />
             </div>
             <div className="ic-Form-control">
               <label className="ic-Label" htmlFor="title">{I18n.t('Title')}</label>
@@ -174,9 +181,9 @@ define([
             </div>
           </form>
         </div>
-      );
+      )
     }
   }
 
-  return EditPage;
+  return EditPage
 })

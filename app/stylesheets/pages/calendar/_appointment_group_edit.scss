@@ -8,7 +8,12 @@
     margin-top: 10px;
   }
 }
-
+.hiddenSection {
+  display: none;
+}
+.sectionItem {
+  padding-left: 20px;
+}
 .AppointmentGroupList__List {
   width: 100%;
   margin-top: 10px;
