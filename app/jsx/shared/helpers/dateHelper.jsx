@@ -22,7 +22,7 @@ define([
     },
 
     isMidnight: function(date) {
-      return tz.isMidnight(date, { timezone: ENV.CONTEXT_TIMEZONE });
+      return tz.isMidnight(date);
     }
   };
   return DateHelper;

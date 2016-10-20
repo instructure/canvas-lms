@@ -46,7 +46,7 @@ define([
 
     changeToFancyMidnightIfNeeded(date) {
       if( !(this.props.dateType == "unlock_at") &&
-          tz.isMidnight(date, { timezone: ENV.CONTEXT_TIMEZONE }) ) {
+          tz.isMidnight(date) ) {
         return tz.changeToTheSecondBeforeMidnight(date);
       } else {
         return date;

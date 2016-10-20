@@ -20,6 +20,7 @@ define([
   'jquery' /* $ */,
   'underscore',
   'course_settings_helper' /* tabIdFromElement */,
+  'timezone',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* datetimeString, date_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */,
@@ -36,7 +37,7 @@ define([
   'jqueryui/autocomplete' /* /\.autocomplete/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, _, CourseSettingsHelper) {
+], function(I18n, $, _, CourseSettingsHelper, tz) {
 
   var GradePublishing = {
     status: null,
@@ -276,7 +277,7 @@ define([
       var $warning = $course_form.find("#course_conclude_at_warning");
       var $parent = $(this).parent();
       var date = $(this).data('unfudged-date');
-      var isMidnight = $.midnight(date, {timezone: ENV.CONTEXT_TIMEZONE});
+      var isMidnight = tz.isMidnight(date);
       $warning.detach().appendTo($parent).showIf(isMidnight);
     });
     $course_form.formSubmit({

@@ -112,3 +112,14 @@ define [
     date = @dueDateCalendarPicker.changeToFancyMidnightIfNeeded(date)
 
     equal date.getMinutes(), 59
+
+  test 'converts to fancy midnight in the time zone of the user', ->
+    # This date will be set to midnight in the time zone of the *user*.
+    snapshot = tz.snapshot()
+    tz.changeZone('America/Chicago')
+
+    date = tz.parse('2015-08-31T00:00:00')
+    date = @dueDateCalendarPicker.changeToFancyMidnightIfNeeded(date)
+
+    equal date.getMinutes(), 59
+    tz.restore(snapshot)
