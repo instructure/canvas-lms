@@ -377,9 +377,14 @@ describe AssignmentsController do
 
     it "bootstraps the correct assignment info to js_env" do
       user_session(@teacher)
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      @assignment.tool_settings_tools = [tool]
+
       get 'edit', :course_id => @course.id, :id => @assignment.id
       expect(assigns[:js_env][:ASSIGNMENT]['id']).to eq @assignment.id
       expect(assigns[:js_env][:ASSIGNMENT_OVERRIDES]).to eq []
+      expect(assigns[:js_env][:COURSE_ID]).to eq @course.id
+      expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_ID]).to eq tool.id
     end
 
     context "redirects" do

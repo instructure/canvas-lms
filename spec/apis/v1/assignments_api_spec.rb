@@ -1095,6 +1095,16 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(a.lti_context_id).to eq(lti_assignment_id)
     end
 
+    it "sets the configuration tool if one is provided" do
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      api_create_assignment_in_course(@course, { 'description' => 'description',
+        'assignmentConfigurationTool' => tool.id
+      })
+
+      a = Assignment.last
+      expect(a.tool_settings_tools).to include(tool)
+    end
+
     it "should allow valid submission types as an array" do
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignments",
         { :controller => 'assignments_api',

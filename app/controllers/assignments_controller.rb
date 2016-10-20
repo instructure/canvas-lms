@@ -437,7 +437,9 @@ class AssignmentsController < ApplicationController
             @current_user
             )),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
-        :VALID_DATE_RANGE => CourseDateRange.new(@context)
+        :VALID_DATE_RANGE => CourseDateRange.new(@context),
+        :COURSE_ID => @context.id,
+        :PLAGIARISM_DETECTION_PLATFORM => @context.root_account.feature_enabled?(:plagiarism_detection_platform)
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
@@ -448,6 +450,7 @@ class AssignmentsController < ApplicationController
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
+      hash[:SELECTED_CONFIG_TOOL_ID] = @assignment.tool_settings_tools.first.id unless @assignment.tool_settings_tools.blank?
       append_sis_data(hash)
       js_env(hash)
       conditional_release_js_env(@assignment)
