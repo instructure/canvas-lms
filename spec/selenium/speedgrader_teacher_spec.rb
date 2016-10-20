@@ -177,7 +177,7 @@ describe "speed grader" do
   end
 
   it "shows the first ungraded student with a submission", priority: "1", test_id: 283987 do
-    s1, s2, s3 = n_students_in_course(3)
+    s1, s2, s3 = n_students_in_course(3, course: @course)
     s1.update_attribute :name, "A"
     s2.update_attribute :name, "B"
     s3.update_attribute :name, "C"
@@ -204,7 +204,7 @@ describe "speed grader" do
     f("#settings_link").click
     f('select#eg_sort_by option[value="submitted_at"]').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-    expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text "student@example.com"
+    expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text @student.name
 
     # hide student names
     f("#settings_link").click
@@ -222,7 +222,7 @@ describe "speed grader" do
     f("#settings_link").click
     f('#hide_student_names').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-    expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text "student@example.com"
+    expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text @student.name
   end
 
   context "student dropdown" do

@@ -19,11 +19,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Favorites API", type: :request do
   before :once do
-    @courses = []
-    @courses << course_with_student(:active_all => true, :course_name => "Course 0").course
-    5.times do |x|
-      @courses << course_with_student(:course_name => "Course #{x + 1}", :user => @user, :active_all => true).course
-    end
+    user(active_all: true)
+    @courses = create_courses(6, enroll_user: @user, enrollment_type: "StudentEnrollment", return_type: :record)
   end
 
   context "implicit favorites" do

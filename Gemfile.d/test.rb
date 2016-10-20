@@ -14,6 +14,7 @@ group :test do
     gem 'eventmachine', '1.2.0.1', require: false
 
   gem 'rspec', '3.5.0'
+  gem 'rspec_around_all', '0.2.0'
   gem 'rspec-rails', '3.5.2'
   gem 'rspec-collection_matchers', '1.1.2'
 

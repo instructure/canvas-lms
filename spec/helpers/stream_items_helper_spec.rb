@@ -173,6 +173,7 @@ describe StreamItemsHelper do
     it 'should handle anonymous review for AssessmentRequests' do
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       student = @student
+      create_enrollments(@course, [@other_user])
       assessor_submission = submission_model(assignment: @assignment, user: @other_user)
       assessment_request = AssessmentRequest.create!(assessor: @other_user, asset: @submission,
                                                      user: student, assessor_asset: assessor_submission)

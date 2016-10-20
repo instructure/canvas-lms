@@ -284,7 +284,7 @@ describe "Default Account Reports" do
   end
 
   describe "SIS export and Provisioning reports" do
-    before(:each) do
+    before(:once) do
       Notification.where(name: "Report Generated").first_or_create
       Notification.where(name: "Report Generation Failed").first_or_create
       @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
@@ -293,7 +293,7 @@ describe "Default Account Reports" do
     end
 
     describe "Users" do
-      before(:each) do
+      before(:once) do
         create_some_users_with_pseudonyms()
       end
 
@@ -434,7 +434,7 @@ describe "Default Account Reports" do
     end
 
     describe "Accounts" do
-      before(:each) do
+      before(:once) do
         create_some_accounts()
       end
 
@@ -491,7 +491,7 @@ describe "Default Account Reports" do
     end
 
     describe "Terms" do
-      before(:each) do
+      before(:once) do
         create_some_terms()
       end
 
@@ -540,7 +540,7 @@ describe "Default Account Reports" do
     end
 
     describe "Courses" do
-      before(:each) do
+      before(:once) do
         create_some_courses()
       end
 
@@ -634,7 +634,7 @@ describe "Default Account Reports" do
     end
 
     describe "Sections" do
-      before(:each) do
+      before(:once) do
         create_some_courses_and_sections()
       end
 
@@ -723,7 +723,7 @@ describe "Default Account Reports" do
     end
 
     describe "Enrollments" do
-      before(:each) do
+      before(:once) do
         create_some_enrolled_users()
       end
 
@@ -852,7 +852,7 @@ describe "Default Account Reports" do
     end
 
     describe "Groups" do
-      before(:each) do
+      before(:once) do
         create_some_groups()
       end
 
@@ -903,7 +903,7 @@ describe "Default Account Reports" do
     end
 
     describe "Group Memberships" do
-      before(:each) do
+      before(:once) do
         create_some_group_memberships_n_stuff()
       end
 
@@ -931,14 +931,15 @@ describe "Default Account Reports" do
       it "should run the provisioning report" do
         parameters = {}
         parameters["group_membership"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: [1, 3]})
-        expect(parsed.length).to eq 3
-        expect(parsed[0]).to eq [@group1.id.to_s, @group1.sis_source_id,
-                                 @user1.id.to_s, "user_sis_id_01", "accepted", "true"]
-        expect(parsed[1]).to eq [@group2.id.to_s, @group2.sis_source_id,
-                                 @user2.id.to_s, "user_sis_id_02", "accepted", "true"]
-        expect(parsed[2]).to eq [@group3.id.to_s, nil, @user3.id.to_s,
-                                 "user_sis_id_03", "accepted", "false"]
+        parsed = read_report("provisioning_csv", {params: parameters, order: "skip"})
+        expect(parsed).to match_array([
+          [@group1.id.to_s, @group1.sis_source_id,
+           @user1.id.to_s, "user_sis_id_01", "accepted", "true"],
+          [@group2.id.to_s, @group2.sis_source_id,
+           @user2.id.to_s, "user_sis_id_02", "accepted", "true"],
+          [@group3.id.to_s, nil, @user3.id.to_s,
+           "user_sis_id_03", "accepted", "false"]
+        ])
       end
 
       it "should run the provisioning report" do
@@ -954,7 +955,7 @@ describe "Default Account Reports" do
     end
 
     describe "Cross List" do
-      before(:each) do
+      before(:once) do
         create_some_courses_and_sections()
         @section1.crosslist_to_course(@course2)
         @section3.crosslist_to_course(@course1)

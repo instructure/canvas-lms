@@ -776,7 +776,7 @@ describe Assignment do
 
     context "group assignments" do
       before :once do
-        @student1, @student2 = n_students_in_course(2)
+        @student1, @student2 = n_students_in_course(2, course: @course)
         gc = @course.group_categories.create! name: "asdf"
         group = gc.groups.create! name: "zxcv", context: @course
         [@student1, @student2].each { |u|

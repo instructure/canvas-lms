@@ -42,6 +42,7 @@ module Factories
   end
 
   def create_enrollments(course, users, options = {})
+    enrollment_state = options[:enrollment_state] || "active"
     user_ids = users.first.is_a?(User) ?
       users.map(&:id) :
       users
@@ -50,11 +51,11 @@ module Factories
       create_records(UserAccountAssociation, user_ids.map{ |id| {account_id: course.account_id, user_id: id, depth: 0}})
     end
 
-    section_id = options[:section_id] || course.default_section.id
+    section_id = options[:section_id] || options[:section].try(:id) || course.default_section.id
     type = options[:enrollment_type] || "StudentEnrollment"
     role_id = Role.get_built_in_role(type).id
-    result = create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active', :role_id => role_id}}, options[:return_type])
-    create_enrollment_states(result, {state: "active"})
+    result = create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: enrollment_state, :role_id => role_id}}, options[:return_type])
+    create_enrollment_states(result, {state: enrollment_state})
     result
   end
 end

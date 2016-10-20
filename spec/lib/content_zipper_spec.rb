@@ -25,6 +25,7 @@ describe ContentZipper do
       s1.update_attribute :sortable_name, 'some_999_, _1234_guy'
       s2.update_attribute :sortable_name, 'other 567, guy 8'
       s3.update_attribute :sortable_name, 'trolololo'
+      assignment_model(course: @course)
       [s1, s2, s3].each { |s|
         submission_model user: s, assignment: @assignment, body: "blah"
       }

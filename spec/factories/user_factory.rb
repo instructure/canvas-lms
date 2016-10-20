@@ -130,8 +130,8 @@ module Factories
   end
 
   def n_students_in_course(n, opts={})
-    opts.reverse_merge active_all: true
-    n.times.map { student_in_course(opts); @student }
+    course = opts[:course] || course_model
+    create_users_in_course(course, n, return_type: :record)
   end
 
   def create_users(records, options = {})

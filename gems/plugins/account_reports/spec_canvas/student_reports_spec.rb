@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 describe 'Student reports' do
   include ReportSpecHelper
 
-  before do
+  before :once do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
@@ -62,7 +62,7 @@ describe 'Student reports' do
   end
 
   describe 'students with no submissions report' do
-    before do
+    before :once do
       @type = 'students_with_no_submissions_csv'
       @start_at = 2.months.ago
       @start_at2 = 10.days.ago
@@ -258,7 +258,7 @@ describe 'Student reports' do
   end
 
   describe 'zero activity report' do
-    before(:each) do
+    before(:once) do
       @type = 'zero_activity_csv'
 
       @course1.enroll_user(@user3, 'StudentEnrollment', {:enrollment_state => 'active'})
@@ -381,7 +381,7 @@ describe 'Student reports' do
   end
 
   describe 'last user access report' do
-    before(:each) do
+    before(:once) do
       @type = 'last_user_access_csv'
       @last_login_time = 1.week.ago
       @last_login_time2 = 8.days.ago
@@ -506,7 +506,7 @@ describe 'Student reports' do
   end
 
   describe 'last enrollment activity report' do
-    before(:each) do
+    before(:once) do
       @type = 'last_enrollment_activity_csv'
       @later_activity = 1.week.ago
       @earlier_activity = 8.days.ago
@@ -598,7 +598,7 @@ describe 'Student reports' do
   end
 
   describe 'user access token report' do
-    before(:each) do
+    before(:once) do
       @type = 'user_access_tokens_csv'
       @at1 = AccessToken.create!(
         :user => @user1,

@@ -266,7 +266,8 @@ describe "speed grader submissions" do
         attachment2.size = 10093
         attachment2.save!
 
-        student_submission({:user => @user, :submission_type => :online_upload, :attachments => [attachment1, attachment2]})
+        create_enrollments @course, [@user]
+        student_submission({:user => @user, :submission_type => :online_upload, :attachments => [attachment1, attachment2], :course => @course})
         set_turnitin_asset(attachment1, {:similarity_score => 96, :state => 'failure', :status => 'scored'})
         set_turnitin_asset(attachment2, {:status => 'pending'})
 

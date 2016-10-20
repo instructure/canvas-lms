@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 describe "Course Account Reports" do
   include ReportSpecHelper
 
-  before(:each) do
+  before(:once) do
 
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
@@ -145,7 +145,7 @@ describe "Course Account Reports" do
     end
   end
   describe "Unused Course report" do
-    before(:each) do
+    before(:once) do
       @type = 'unused_courses_csv'
 
       @course6 = Course.create(:name => 'Theology 101', :course_code => 'THE01',
@@ -222,7 +222,7 @@ describe "Course Account Reports" do
   end
 
   describe "course storage report" do
-    before(:each) do
+    before(:once) do
       @report = 'course_storage_csv'
       a = attachment_obj_with_context(@course1)
       a.update_attribute(:size, 1.226.megabyte)
