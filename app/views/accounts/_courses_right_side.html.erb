@@ -6,12 +6,7 @@
       <form method="get">
         <% if term_count > 1 %>
           <label for="enrollment_term"><%= before_label(t(:enrollment_term_label, "Show courses from the term")) %></label><br />
-          <select name="enrollment_term_id">
-            <option value="" <%= 'selected' unless @term %>><%= t(:all_terms, "All Terms") %></option>
-            <% @root_account.enrollment_terms.active.order(EnrollmentTerm.nulls(:first, :start_at)).each do |term| %>
-              <option value="<%= term.id %>" <%= 'selected' if term == @term %>><%= term.name %></option>
-            <% end %>
-          </select>
+          <%= render :partial => 'shared/enrollment_term_select', :locals => { :terms => @root_account.enrollment_terms.active, :selected_id => @term && @term.id } %>
           <br />
         <% end %>
         <% if @query.present? %><input name="course[name]" type="hidden" value="<%= @query %>" /><% end %>
