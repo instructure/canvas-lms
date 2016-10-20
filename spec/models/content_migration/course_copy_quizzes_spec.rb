@@ -1018,5 +1018,22 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         expect(to_quiz_assigned.assignment_overrides.pluck(:title)).to eq ['Tag 4']
       end
     end
+
+    it "should not destroy assessment questions when copying twice" do
+      bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      data = {
+        "question_type" => "multiple_choice_question", 'name' => 'test question',
+        'answers' => [{'id' => 1, "text" => "Correct", "weight" => 100},
+          {'id' => 2, "text" => "inorrect", "weight" => 0}],
+      }
+      aq = bank1.assessment_questions.create!(:question_data => data)
+
+      run_course_copy
+
+      run_course_copy # run it twice
+      
+      aq_to = @copy_to.assessment_questions.where(:migration_id => mig_id(aq)).first
+      expect(aq_to.data['question_type']).to eq "multiple_choice_question"
+    end
   end
 end
