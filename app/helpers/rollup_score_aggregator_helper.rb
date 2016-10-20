@@ -19,16 +19,18 @@ module RollupScoreAggregatorHelper
       result_aggregates = get_aggregates(result)
       alignment_aggregate_score(result_aggregates)
     else
-      result.percent * @outcome.rubric_criterion[:points_possible]
+      result_score(result)
     end
   end
 
-  def scaled_scores
-    @scaled_scores ||= @outcome_results.map {|result| scaled_score_from_result(result)}
+  def retrieve_scores(results)
+    results.map do |result|
+      quiz_score?(result) ? scaled_score_from_result(result) : result_score(result)
+    end
   end
 
-  def raw_scores
-    @raw_scores ||= @outcome_results.map(&:score)
+  def quiz_score?(result)
+    result.respond_to?(:artifact_type) && result.artifact_type == "Quizzes::QuizSubmission"
   end
 
   def sorted_results
@@ -37,7 +39,7 @@ module RollupScoreAggregatorHelper
 
   def get_aggregates(result)
     @outcome_results.reduce({total: 0.0, weighted: 0.0}) do |aggregate, lor|
-      if is_match?(result, lor)
+      if is_match?(result, lor) && lor.possible
         aggregate[:total] += lor.possible
         aggregate[:weighted] += lor.possible * lor.percent
       end
@@ -56,19 +58,20 @@ module RollupScoreAggregatorHelper
     (current_result.association_type == compared_result.association_type)
   end
 
+  def result_score(result)
+    return result.score unless result.try(:percent)
+    result.percent * @points_possible
+  end
+
   def scores
     @scores || begin
-      @quiz_score ||= @outcome_results.first.respond_to?(:artifact_type) ? @outcome_results.first.artifact_type == "Quizzes::QuizSubmission" : false
       case @calculation_method
       when 'decaying_average'
-        @scores = @quiz_score ? sorted_results.map {|r| scaled_score_from_result(r)}.compact : sorted_results.map(&:score)
-      when 'n_mastery'
-        @scores = @quiz_score ? scaled_scores : raw_scores
+        @scores = retrieve_scores(@aggregate ? @outcome_results : sorted_results)
+      when 'n_mastery', 'highest'
+        @scores = retrieve_scores(@outcome_results)
       when 'latest'
-        chosen_result = sorted_results.last
-        @scores = @quiz_score ? [scaled_score_from_result(chosen_result)].compact : [chosen_result.score]
-      when 'highest'
-        @scores = @quiz_score ? scaled_scores : raw_scores
+        @scores = retrieve_scores(@aggregate ? @outcome_results : [sorted_results.last])
       end
     end
   end
