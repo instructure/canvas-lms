@@ -113,6 +113,92 @@ describe "accounts/settings.html.erb" do
     end
   end
 
+  describe "SIS Integration Settings" do
+    before do
+      assigns[:account_users] = []
+      assigns[:associated_courses_count] = 0
+      assigns[:announcements] = AccountNotification.none.paginate
+    end
+
+    def do_render(user)
+      view_context(@account,user)
+      render
+    end
+
+    context "site admin user" do
+      before do
+        @account = Account.site_admin
+        assigns[:account] = @account
+        assigns[:root_account] = @account
+      end
+
+      it "should not show settings to site admin user" do
+        do_render(site_admin_user)
+        expect(response).not_to have_tag("#sis_integration_settings")
+        expect(response).not_to have_tag("input#allow_sis_import")
+      end
+    end
+
+    context "regular admin user" do
+      before do
+        @account = Account.default
+        assigns[:account] = @account
+        assigns[:root_account] = @account
+      end
+
+      it "should show settings to regular admin user" do
+        do_render(account_admin_user)
+        expect(response).to have_tag("#sis_integration_settings")
+        expect(response).to have_tag("input#account_allow_sis_import")
+      end
+
+      context "SIS grade export enabled" do
+        before do
+          Assignment.expects(:sis_grade_export_enabled?).returns(true)
+        end
+
+        it "should include default grade export settings" do
+          do_render(account_admin_user)
+          expect(response).to have_tag("input#account_settings_sis_default_grade_export_value")
+        end
+
+        context "account settings inherited" do
+          before do
+            @account.expects(:sis_default_grade_export).returns({ value: true, locked: true, inherited: true })
+          end
+
+          it "should not include sub-checkbox" do
+            do_render(account_admin_user)
+            expect(response).not_to have_tag("input#account_settings_sis_default_grade_export_locked_for_sub_accounts")
+          end
+        end
+
+        context "account settings not inherited" do
+          before do
+            @account.expects(:sis_default_grade_export).returns({ value: true, locked: true, inherited: false })
+          end
+
+          it "should include sub-checkbox" do
+            do_render(account_admin_user)
+            expect(response).to have_tag("input#account_settings_sis_default_grade_export_locked_for_sub_accounts")
+          end
+        end
+      end
+
+      context "SIS grade export not enabled" do
+        before do
+          Assignment.expects(:sis_grade_export_enabled?).returns(false)
+          do_render(account_admin_user)
+        end
+
+        it "should not include default grade export settings" do
+          expect(response).not_to have_tag("input#account_settings_sis_default_grade_export_value")
+          expect(response).not_to have_tag("input#account_settings_sis_default_grade_export_locked_for_sub_accounts")
+        end
+      end
+    end
+  end
+
   describe "quotas" do
     before do
       @account = Account.default

@@ -323,10 +323,6 @@ TEXT
                     <%= settings.label :enable_eportfolios, :en => "ePortfolios" %>
                   </div>
                   <div>
-                    <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
-                    <%= f.label :allow_sis_import, :en => "SIS imports" %>
-                  </div>
-                  <div>
                     <%= settings.check_box :allow_invitation_previews, :checked => @account.settings[:allow_invitation_previews] %>
                     <%= settings.label :allow_invitation_previews, :en => "Invitation Previews" %>
                   </div>
@@ -441,33 +437,35 @@ TEXT
             </fieldset>
         <% end %>
 
-        <% if !@account.site_admin? && Assignment.sis_grade_export_enabled?(@account) %>
-          <fieldset>
-            <legend><%= t("SIS Grade Export Settings") %></legend>
+        <% unless @account.site_admin? %>
+          <fieldset id="sis_integration_settings">
+            <legend><%= t("SIS Integration Settings") %></legend>
             <table class="formtable">
-              <%= f.fields_for :settings do |settings| %>
-                <%= settings.fields_for :sis_default_grade_export do |r| %>
-                  <% hash = @account.sis_default_grade_export %>
-                  <% disabled = hash[:locked] && hash[:inherited] %>
-                  <tr>
-                    <td colspan="2">
-                      <div class="ic-Checkbox-group">
-                        <div class="ic-Form-control ic-Form-control--checkbox">
-                          <%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                          <label class="ic-Label" for="account_settings_sis_default_grade_export_value" />
-                          <%= t("\"Post Grades to SIS\" checkbox is enabled by default for assignments, graded discussions, and quizzes") %>
-                        </label>
-                      </div>
-                    </div>
-                  </td>
-                  </tr>
-                  <% unless disabled %>
+              <tr>
+                <td colspan="2">
+                  <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
+                  <%= f.label :allow_sis_import, t("SIS imports") %>
+                </td>
+              </tr>
+              <% if Assignment.sis_grade_export_enabled?(@account) %>
+                <%= f.fields_for :settings do |settings| %>
+                  <%= settings.fields_for :sis_default_grade_export do |r| %>
+                    <% hash = @account.sis_default_grade_export %>
+                    <% disabled = hash[:locked] && hash[:inherited] %>
                     <tr>
-                      <td colspan="2" class="sub_checkbox">
-                        <%= r.check_box :locked, :checked => hash[:locked], :id => "account_settings_sis_default_grade_export_locked_for_sub_accounts" %>
-                        <%= r.label :locked_for_sub_accounts, :en => "Lock this setting for sub-accounts" %>
+                      <td colspan="2">
+                        <%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                        <%= r.label :value, t("\"Post Grades to SIS\" checkbox is enabled by default for assignments, graded discussions, and quizzes") %>
                       </td>
                     </tr>
+                    <% unless disabled %>
+                      <tr>
+                        <td colspan="2" class="sub_checkbox">
+                          <%= r.check_box :locked_for_sub_accounts, :checked => hash[:locked] %>
+                          <%= r.label :locked_for_sub_accounts, t("Lock this setting for sub-accounts") %>
+                        </td>
+                      </tr>
+                    <% end %>
                   <% end %>
                 <% end %>
               <% end %>
