@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-gem 'bundler', '>= 1.10.1', '<= 1.13.3'
+gem 'bundler', '>= 1.10.3', '<= 1.13.3'
 
 # NOTE: this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
 if RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
