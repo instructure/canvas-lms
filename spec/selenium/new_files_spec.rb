@@ -419,6 +419,17 @@ describe "better_file_browsing" do
     end
   end
 
+  context "When Require Usage Rights is turned-off" do
+    it "sets files to published by default", priority: "1", test_id: 133136 do
+      course_with_teacher_logged_in
+      Account.default.disable_feature!(:usage_rights_required)
+      add_file(fixture_file_upload("files/b_file.txt", 'text/plain'), @course, 'b_file.txt')
+
+      get "/courses/#{@course.id}/files"
+      expect(f('.btn-link.published-status.published')).to be_displayed
+    end
+  end
+
   context "Directory Header" do
     it "should sort the files properly", priority: 2, test_id: 1664875 do
       # this test performs 2 sample sort combinations
