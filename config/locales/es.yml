@@ -14893,7 +14893,7 @@ es:
         dashboard: "Panel de control"
         skip_to_content: "Saltar al contenido"
     no_recent_activity: 
-      empty_stream_message: " No tiene mensajes que mostrar aún en su stream. Una vez comience a participar en sus cursos verá este stream llenarse de mensajes de las foros, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
+      empty_stream_message: "No tiene mensajes que mostrar aún en su stream. Una vez comience a participar en sus cursos verá este stream llenarse de mensajes de los foros, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
       no_recent_messages: "No hay Mensajes Recientes"
     pending_enrollment: 
       designer: "%{course} como diseñador."
