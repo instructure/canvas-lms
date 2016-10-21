@@ -7,14 +7,14 @@ describe "gradebook2 - total points toggle" do
   let!(:setup) { gradebook_data_setup }
 
   def should_show_percentages
-    wait_for_ajaximations
     ff(".slick-row .slick-cell:nth-child(5)").each { |total| expect(total.text).to match(/%/) }
   end
 
-  def should_show_points
-    expected_points = 15, 10, 10
+  def should_show_points(*expected_points)
     ff(".slick-row .slick-cell:nth-child(5)").each do |total|
-      expect(total.text).to match(/\A#{expected_points.shift}$/)
+      raise Error "Total text is missing." unless total.text
+      total.text.strip!
+      expect(total.text).to match(/\A#{expected_points.shift}$/) unless total.text.length < 1
     end
   end
   
@@ -42,14 +42,16 @@ describe "gradebook2 - total points toggle" do
   it "shows points when group weights are not set" do
     @course.show_total_grade_as_points = true
     @course.save!
+    @course.reload
     get "/courses/#{@course.id}/gradebook2"
 
-    should_show_points
+    should_show_points(15, 10, 10)
   end
 
   it "shows percentages when group weights are set", test_id: 164231, priority: "2" do
     @course.show_total_grade_as_points = false
     @course.save!
+    @course.reload
     group = AssignmentGroup.where(name: @group.name).first
     group.group_weight = 50
     group.save!
@@ -70,9 +72,11 @@ describe "gradebook2 - total points toggle" do
     should_show_percentages
     toggle_grade_display
 
-    should_show_points
+    wait_for_ajaximations
+    should_show_points(15, 10, 10)
 
     toggle_grade_display
+    wait_for_ajaximations
     should_show_percentages
   end
 
