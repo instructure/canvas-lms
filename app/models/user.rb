@@ -2295,7 +2295,7 @@ class User < ActiveRecord::Base
 
   def roles(root_account)
     return @roles if @roles
-    @roles = Rails.cache.fetch(['user_roles_for_root_account2', self, root_account].cache_key) do
+    @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
       roles = ['user']
 
       enrollment_types = root_account.all_enrollments.where(user_id: self, workflow_state: 'active').uniq.pluck(:type)
