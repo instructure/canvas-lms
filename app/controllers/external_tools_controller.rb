@@ -151,7 +151,7 @@ class ExternalToolsController < ApplicationController
   # @API Get a sessionless launch url for an external tool.
   # Returns a sessionless launch url for an external tool.
   #
-  # Either the id or url must be provided.
+  # NOTE: Either the id or url must be provided unless launch_type is assessment or module_item.
   #
   # @argument id [String]
   #   The external id of the tool to launch.
@@ -160,14 +160,58 @@ class ExternalToolsController < ApplicationController
   #   The LTI launch url for the external tool.
   #
   # @argument assignment_id [String]
-  #   The assignment id for an assignment launch.
+  #   The assignment id for an assignment launch. Required if launch_type is set to "assessment".
   #
-  # @argument launch_type [String]
-  #   The type of launch to perform on the external tool.
+  # @argument module_item_id [String]
+  #   The assignment id for a module item launch. Required if launch_type is set to "module_item".
+  #
+  # @argument launch_type [String, "assessment"|"module_item"]
+  #   The type of launch to perform on the external tool. Placement names (eg. "course_navigation")
+  #   can also be specified to use the custom launch url for that placement; if done, the tool id
+  #   must be provided.
   #
   # @response_field id The id for the external tool to be launched.
   # @response_field name The name of the external tool to be launched.
   # @response_field url The url to load to launch the external tool for the user.
+  #
+  # @example_request
+  #
+  #   Finds the tool by id and returns a sessionless launch url
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools/sessionless_launch' \
+  #        -H "Authorization: Bearer <token>" \
+  #        -F 'id=<external_tool_id>'
+  #
+  # @example_request
+  #
+  #   Finds the tool by launch url and returns a sessionless launch url
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools/sessionless_launch' \
+  #        -H "Authorization: Bearer <token>" \
+  #        -F 'url=<lti launch url>'
+  #
+  # @example_request
+  #
+  #   Finds the tool associated with a specific assignment and returns a sessionless launch url
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools/sessionless_launch' \
+  #        -H "Authorization: Bearer <token>" \
+  #        -F 'launch_type=assessment' \
+  #        -F 'assignment_id=<assignment_id>'
+  #
+  # @example_request
+  #
+  #   Finds the tool associated with a specific module item and returns a sessionless launch url
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools/sessionless_launch' \
+  #        -H "Authorization: Bearer <token>" \
+  #        -F 'launch_type=module_item' \
+  #        -F 'module_item_id=<module_item_id>'
+  #
+  # @example_request
+  #
+  #   Finds the tool by id and returns a sessionless launch url for a specific placement
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools/sessionless_launch' \
+  #        -H "Authorization: Bearer <token>" \
+  #        -F 'id=<external_tool_id>' \
+  #        -F 'launch_type=<placement_name>'
+
   def generate_sessionless_launch
     # prerequisite checks
     unless Canvas.redis_enabled?
