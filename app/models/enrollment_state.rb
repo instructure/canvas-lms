@@ -18,9 +18,27 @@ class EnrollmentState < ActiveRecord::Base
 
   def ensure_current_state
     Shackles.activate(:master) do
-      self.recalculate_state if self.state_needs_recalculation?
-      self.recalculate_access if !self.access_is_current?
-      self.save! if self.changed?
+      retry_count = 0
+      begin
+        if self.lock_version == 0 || self.lock_version.nil?
+          # needed to prevent stale object errors for pre-existing enrollment state objects (it casts the null value to 0)
+          EnrollmentState.where(:enrollment_id => self, :lock_version => nil).update_all(:lock_version => 0)
+        end
+
+        self.recalculate_state if self.state_needs_recalculation? || retry_count > 0 # force double-checking on lock conflict
+        self.recalculate_access if !self.access_is_current? || retry_count > 0
+        self.save! if self.changed?
+      rescue ActiveRecord::StaleObjectError
+        # retry up to five times, otherwise return current (stale) data
+
+        self.enrollment.association(:enrollment_state).target = nil # don't cache an old enrollment state, just in case
+        self.reload
+
+        retry_count += 1
+        retry if retry_count < 5
+
+        logger.error { "Failed to evaluate stale enrollment state: #{self.inspect}" }
+      end
     end
   end
 
@@ -190,18 +208,21 @@ class EnrollmentState < ActiveRecord::Base
 
   INVALIDATEABLE_STATES = %w{pending_invited pending_active invited active completed inactive}.freeze # don't worry about creation_pending or rejected, etc
   def self.invalidate_states(enrollment_scope)
-    EnrollmentState.where(:enrollment_id => enrollment_scope, :state_is_current => true, :state => INVALIDATEABLE_STATES).update_all(:state_is_current => false)
+    EnrollmentState.where(:enrollment_id => enrollment_scope, :state => INVALIDATEABLE_STATES).
+      update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
   end
 
   def self.force_recalculation(enrollment_ids)
     if enrollment_ids.any?
-      EnrollmentState.where(:enrollment_id => enrollment_ids, :state_is_current => true).update_all(:state_is_current => false)
+      EnrollmentState.where(:enrollment_id => enrollment_ids).
+        update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
       EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_ids)
     end
   end
 
   def self.invalidate_access(enrollment_scope, states_to_update)
-    EnrollmentState.where(:enrollment_id => enrollment_scope, :access_is_current => true, :state => states_to_update).update_all(:access_is_current => false)
+    EnrollmentState.where(:enrollment_id => enrollment_scope, :state => states_to_update).
+      update_all(["lock_version = COALESCE(lock_version, 0) + 1, access_is_current = ?", false])
   end
 
   def self.enrollments_for_account_ids(account_ids)

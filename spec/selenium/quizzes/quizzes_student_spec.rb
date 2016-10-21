@@ -235,4 +235,21 @@ describe 'quizzes' do
     take_and_answer_quiz
     expect(f("#section-tabs .grades .nav-badge").text).to eq "1"
   end
+
+  it "should show quiz descriptions to observers" do
+    @context = @course
+    quiz = quiz_model
+    description = "some description"
+    quiz.description = description
+    quiz.save!
+
+    @student = @user
+    @observer = user
+    @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+    user_session(@observer)
+
+    open_quiz_show_page
+    
+    expect(f(".description")).to include_text(description)
+  end
 end

@@ -2863,7 +2863,8 @@ describe Assignment do
 
     it 'refreshes the course participation counts' do
       Progress.any_instance.expects(:process_job)
-        .with(@assignment.context, :refresh_content_participation_counts)
+        .with(@assignment.context, :refresh_content_participation_counts,
+              singleton: "refresh_content_participation_counts:#{@assignment.context.global_id}")
       @assignment.destroy
     end
   end
@@ -3263,7 +3264,9 @@ describe Assignment do
       assignment = assignment_model(course: @course)
       assignment.destroy
       Progress.any_instance.expects(:process_job)
-        .with(assignment.context, :refresh_content_participation_counts).once
+        .with(assignment.context, :refresh_content_participation_counts,
+              singleton: "refresh_content_participation_counts:#{assignment.context.global_id}").
+          once
       assignment.restore
     end
   end
