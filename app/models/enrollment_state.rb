@@ -8,6 +8,8 @@ class EnrollmentState < ActiveRecord::Base
 
   self.primary_key = 'enrollment_id'
 
+  self.lock_optimistically = false
+
   def hash
     global_enrollment_id.hash
   end
