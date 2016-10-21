@@ -243,7 +243,6 @@ button.ic-app-header__menu-list-link {
   pointer-events: none;
   box-sizing: border-box;
   background-color: $ic-brand-global-nav-ic-icon-svg-fill--active;
-  color: $ic-font-color-light;
   position: absolute;
   left: 100%;
   top: 50%;
@@ -253,6 +252,14 @@ button.ic-app-header__menu-list-link {
   @include fontSize($ic-font-size--xsmall);
   white-space: nowrap;
   border-radius: $ic-border-radius / 2;
+
+  body:not(.primary-nav-expanded) & {
+    color: $ic-color-light;
+  }
+
+  body.primary-nav-expanded & {
+    color: $ic-brand-global-nav-menu-item__text-color;
+  }
 
   // this class is added after a 1s delay because the
   // transitions look weird when the nav is being closed
@@ -487,8 +494,8 @@ body.primary-nav-expanded {
   .ic-NavMenu-list-item__link {
     display: inline-block;
     &:focus {
-      @include ic-focus-base; 
-      @include ic-focus-variant($color: $ic-link-color, $offset: 2px); 
+      @include ic-focus-base;
+      @include ic-focus-variant($color: $ic-link-color, $offset: 2px);
     }
     i[class*=icon-],
     i[class^=icon-] { margin-right: $ic-sp/3; }
