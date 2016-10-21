@@ -73,7 +73,7 @@ class AssignmentGroup < ActiveRecord::Base
 
     given do |user, session|
       self.context.grants_right?(user, session, :manage_assignments) &&
-        (user.admin_of_root_account?(self.context.root_account) ||
+        (self.context.account_membership_allows(user) ||
          !has_assignment_due_in_closed_grading_period?)
     end
     can :delete

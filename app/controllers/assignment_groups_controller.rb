@@ -386,7 +386,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def can_reorder_assignments?(assignments, group)
-    return true if @current_user.admin_of_root_account?(@context.root_account)
+    return true if @context.account_membership_allows(@current_user)
     return true unless @context.feature_enabled?(:multiple_grading_periods)
     periods = GradingPeriod.for(@context)
     assignments.none? do |assignment|

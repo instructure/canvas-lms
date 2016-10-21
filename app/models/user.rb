@@ -2312,10 +2312,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def admin_of_root_account?(root_account)
-    root_account.all_account_users_for(self).any?
-  end
-
   def eportfolios_enabled?
     accounts = associated_root_accounts.reject(&:site_admin?)
     accounts.size == 0 || accounts.any?{ |a| a.settings[:enable_eportfolios] != false }

@@ -1042,7 +1042,7 @@ class Assignment < ActiveRecord::Base
 
     given do |user, session|
       self.context.grants_right?(user, session, :manage_assignments) &&
-        (user.admin_of_root_account?(self.context.root_account) ||
+        (self.context.account_membership_allows(user) ||
          !due_for_any_student_in_closed_grading_period?)
     end
     can :delete
