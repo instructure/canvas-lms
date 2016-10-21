@@ -155,8 +155,9 @@ module MultipleGradingPeriods
 
     def select_period_by_name(name)
       period = ff(period_options_css).find do |option|
-        option.text == name
+        option.text.strip == name if option.text
       end
+      raise ArgumentError, "No grading period found named #{name}." unless period
       period.click
     end
 
