@@ -6606,6 +6606,7 @@ he:
   for: עבור
   for_974cbb84: עבור
   for_all_devices_1f603968: "לכל המכשירים"
+  for_an_instant_answer_see_if_your_issue_is_address_48280e89: "לתשובה זריזה, כדאי לבדוק אם השאלה נענתה כבר ב*מדריכי קנבס*."
   forgot_password_url_3f9c04b: "כתובת דף שיכחת סיסמה"
   form_background_fb654518: "רקע הטופס"
   form_border_f61f12dc: "גבולות טופס"
@@ -6615,6 +6616,7 @@ he:
   found_count_unresponsive_links_d1791380: 
     one: "נמצא קישור אחד שאינו מגיב"
     other: "נמצאו %{count} קישורים שאינם מגיבים"
+  france_33_90b595d7: צרפת(+33)
   from_fdd4956d: מ-
   from_from_to_to_e31f6422: "מ %{from} עד %{to}"
   full_name_23fdfb6d: "שם מלא"
@@ -6628,6 +6630,7 @@ he:
   generating_5b5e20f8: "מייצר:"
   generating_c2aabc02: "מייצר:"
   generating_preview_45b53be0: "מכין תצוגה מקדימה..."
+  germany_49_fc5b8179: "גרמניה (+49)"
   germany_b02d91c9: גרמניה
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "הבאת אלו מתוך אפליקצית Salesforce המקושרת שלך"
   get_your_users_error_reports_posted_to_salesforce__76f57839: " הבאת דוחות שגויי משתמשיך אשר פורסמו בשרות הענן של Salesforce"
@@ -6661,6 +6664,7 @@ he:
   goto_next_page_e8e1ae6f: "מעבר לדף הבא"
   goto_page_page_num_bd656bd5: " מעבר לדף %{page_num}"
   goto_previous_page_85b2fa49: "מעבר לדף קודם"
+  gpa_scale_6710e2ee: "סולם ההערכה GPA"
   gpa_scale_a6d1cdea: "סולם GPA"
   grade_9c6f076d: ציון
   grade_assignment_7c1abc11: "הערכת %{assignment}"
@@ -6670,6 +6674,7 @@ he:
       warning: אזהרה
   grade_distribution_e52c9256: "התפלגות ציונים"
   grade_export_title: "ייצוא ציונים"
+  grade_info_19fb9875: "מידע ציונים"
   grade_summary: 
     graph_title: "ממוצע %{mean}, גבוה %{high},  נמוך %{low}"
     outcome: 
@@ -6718,13 +6723,14 @@ he:
     not_graded: "ללא ציון"
     not_submitted: "לא הוגש"
     nth_student: "תלמיד Student %{n}"
-    portion_graded: "הוערכו %{x} / %{y} "
+    portion_graded: "%{x}/%{y}"
     recording_expired_message: "מערכת זיהוי דיבור פסקה עקב אי פעילות. יש להקליק על הכפתור \"עצירה\" כדי להשתמש בתוכן הנוכחי להערות או \"ביטול\" כדי להתעלם"
     recording_message: מקליט...
     show_all_details_button: "הצגת כל הפרטים"
     student: תלמיד
     student_index: "תלמיד %{index}"
     student_mute_notification: "המנחה עובד על ההערכות"
+    submit: הגשה
     titles: 
       click_to_record: "המרת דיבור לטקסט"
       hypothetical_score: "זהו ציון לשאלת \"מה יקרה אם...\""
@@ -6799,6 +6805,7 @@ he:
     no_assignments_have_points_warning: "אין אפשרות לחשב ציון עד אשר הוגדר למשימות ניקוד אפשרי."
     notes: הערות
     outcome_gradebook: 
+      export_report: "דוח ייצוא נתונים"
       toggle_sidebar: "מעבר בין מצבי סרגל הצד"
     percent_of_grade: "%{percentage}  מהציון"
     points_out_of: "מ-%{points_possible}"
@@ -7090,6 +7097,7 @@ he:
         previous: הקודם
         remove_attachment: "הסרת קובץ מצורף"
         settings: הגדרות
+        show_all_sections: "הצגת כל ההקבצות"
         submit_same_score: "השתמש/י באותה הערכה לשיגור מחדש"
       loading: טוען...
       no_annotation: "אין דברי הסבר למסמך זה"
@@ -7154,6 +7162,7 @@ he:
   grades_a61eba0a: ציונים
   grades_are_now_reverted_to_original_scores_e6deade1: "הציונים כעת חזרו לניקוד המקורי"
   grades_are_now_showing_what_if_scores_711a8be2: "ההערכות מראות כעת ציוני מה-היה-אילו"
+  grading_aa6de9: הערכה
   grading_box: 
     out_of_points_possible: "מתוך %{assignment.points_possible}"
   grading_cell: 
@@ -7167,7 +7176,14 @@ he:
     errors: 
       invalid_grading_period_end_date: "תאריך סיום תקופת הערכה קודם לתאריך התחלה"
       overlap_message: "תקופת הערכה אינה יכולה לחפוף תקופות הערכה נוכחיות לקבוצה"
+  grading_period_8b0a4a10: "תקופת הערכה"
+  grading_period_close_date_precedes_end_date_7628a691: "תאריך סגירה של תקופת הערכה צריך להקדים לתאריך הסיום של התקופה"
   grading_period_name_31ceb3e3: "שם תקופת הערכה"
+  grading_period_set_f49fe74c: "אוגדן תקופות הערכה"
+  grading_period_set_for_account_name_b9823b2a: "אוגדן תקופות הערכה עבור %{account_name}"
+  grading_period_set_id_f2377529: "מזהה אוגדן תקופות הערכה"
+  grading_period_set_title_880a6ec4: "כותרת אוגדן תקופות הערכה"
+  grading_period_title_23b7f8ac: "כותרת תקופת הערכה"
   grading_periods_81941e66: "תקופות הערכה"
   grading_periods_must_not_overlap_f45336fb: "תקופות הערכה אינן יכולות לחפוף"
   grading_scheme_deleted_7ae5a072: "סכימת הערכה בוטלה"
@@ -7177,6 +7193,8 @@ he:
     unknown_grading_details: "פרטים לא ידועים"
   grading_standard_title_58f540a3: "כותרת תקנית להערכה"
   grading_standards: 
+    account_index: 
+      title: "תקני הערכה"
     buttons: 
       save: שמירה
     confirm: 
@@ -7199,6 +7217,11 @@ he:
       grading_scheme_info: "הצגת/עריכת סכימת הערכה"
   grading_type_type_7d8b42d7: "סוג הערכה: %{type}"
   graph_bar_b5daa23d: "תרשים בר"
+  graph_of_grades_for_each_assignment_4c44d4d1: "תרשים הציונים של כל מטלה"
+  graph_of_student_page_views_and_participation_over_4a1d4803: "תרשים של כמות הצגת הדפים וההשתתפות של תלמיד לאורך זמן"
+  graph_of_student_page_views_by_category_7cb49887: "תרשים של הצגת דפי תלמיד לפי קטגוריה"
+  graph_of_the_distribution_of_grades_in_the_departm_30445777: "תרשים התפלגות הציונים במחלקה"
+  graph_showing_the_fraction_of_on_time_submissions__735e47db: "תרשים שמראה את שיעור ההגשות בזמן לכל מטלה"
   graphs_89fcfeb: גרפים
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "מצויין, כעת יש לך קורס. מה הלאה? ובכן, לפני שמפרסמים אותו לעולם, כדאי לוודא שהבסיס טופל כהלכה. מוצע לעבור על רשימת התיוג שבצד הדף כדי לוודא שהקורס מוכן לשימוש."
   green_15af4778: ירוק
@@ -7609,6 +7632,7 @@ he:
       פרקטית זה כמו מיני-קורס שם אפשר לעבוד במספרי תלמידים קטנים יותר
       על פרויקט מוגדר יותר.
   groupweight_of_total_9579ae8c: "%{groupWeight}% מהסך הכל"
+  has_turnitin_score_3e1cacf6: "קיבלו ציון  Turnitin "
   help_4c4968b1: עזרה
   help_dialog: 
     Back: חזרה
@@ -7640,7 +7664,10 @@ he:
     submit_this_support_request: "דווח תקלה"
     which_course_is_this_question_about: "לאיזה קורס מתחיסת שאלה זו?"
     your_email_address: "כתובת הדוא\"ל שלך"
+  help_menu_links_51184b65: "קישורי פריט עזרה"
+  help_menu_options_7ecf7031: "אפשרויות תפריט עזרה"
   help_with_content_licensing_a146fb0e: "עזרה ברישוי תוכן"
+  help_with_course_visibilities_6b6e22a4: "עזרה בניראות הקורס"
   helpers: 
     accessible_date_format: "YYYY-MM-DD hh:mm"
     accessible_date_only_format: YYYY-MM-DD
@@ -7688,6 +7715,7 @@ he:
   hidden_available_with_a_link_65ef2bda: "מוסתר. זמין רק עם קישור יעודי."
   hidden_available_with_a_link_click_to_modify_184990e7: "מוסתר. זמין רק עם קישור יעודי - הקלקה לעדכון"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "מוסתר. קבצים כלולים יהיו זמינים רק עם קישור יעודי."
+  hide_all_artifacts_d654fbd5: "הסתרת כל הפריטים"
   hide_correct_answers_at_2421b0aa: "הסתרת התשובות הנכונות ב"
   hide_correct_answers_at_b1a59408: "הסתר התשובות הנכונות ב-"
   hide_courses_without_enrollments_6df4dfad: "הסתרת קורסים ללא נרשמים"
@@ -7703,21 +7731,27 @@ he:
   highest_score_e080551e: "הציון הגבוה ביותר"
   homework_submission_172e8354: "הגשת שיעורי בית"
   honduras_44052cf5: הונדורס
+  honduras_504_af7aa636: "הונדורס (+504)"
   hong_kong_37f0321: "הונג קונג"
+  hong_kong_852_98e3b3fe: "הונג קונג (+852)"
   host_8be927e0: Host
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: " ה Host אינו נגיש או שכתובתו אינה בקטלוג"
   hover_over_me_496521b9: "רחף/י מעלי"
+  how_is_this_affecting_you_b3b6a639: "כיצד הדבר משפיע עליך?"
   how_many_minutes_ecca5ee7: "כמה דקות?"
   html5_first_videos_description: |-
       כברירת מחדל, קנבס ינסה להשתמש בפלאש להצגת וידאו. אפשר להפעיל אפשרות זו כדי  להשתמש קודם כל ב HTML5.
       ורק אם הדבר לא מצליח להשתמש בפלאש.
   html_editor_fb2ab713: "עורך HTML"
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "אני מסכים/ה ל*תנאי השימוש* ול**מדיניות הפרטיות**."
+  i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: "אין אפשרות לטפל בענין לפני שנשמע ממך שוב"
   i_cb2f5130: i
   i_have_obtained_permission_to_use_this_file_6386f087: "קיבלתי הרשאות להשתמש בקובץ זה"
   i_hold_the_copyright_71ee91b1: "זכויות היוצרים הן שלי"
+  i_need_some_help_but_it_is_not_urgent_d967ea0a: "נדרשת עזרה, אבל הדבר אינו דחוף"
   ic_actions: 
     manage: ניהול
+  icon_215a1dc6: צלמית
   icons: 
     discussion_submission: "הגשת דיון"
     file_upload_submission: "הגשת העלאת קובץ"
@@ -16151,6 +16185,7 @@ he:
   would_you_like_to_enable_this_app_ccdf735d: "האם ברצונך להפוך אפליקציה זו לפעילה?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "האם ברצונך לאפשר לתלמידים להמשיך בקורס או ברצונך לנעול מחדש מודולים אלו עד אשר הדרישות החדשות ימולאו?"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "עטיפת כותרות אירועים בתצוגת יומן חדשי"
+  x_y_4a86b3ab: "%{x}/%{y}"
   xml_configuration_5ea1b942: "קופיגורצית XML"
   yellow_4cf93785: צהוב
   yes_dde87d5: כן
