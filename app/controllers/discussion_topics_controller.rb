@@ -249,6 +249,10 @@ class DiscussionTopicsController < ApplicationController
   #
   # Returns the paginated list of discussion topics for this course or group.
   #
+  # @argument include[] [String, "all_dates"]
+  #   If "all_dates" is passed, all dates associated with graded discussions'
+  #   assignments will be included.
+  #
   # @argument order_by [String, "position"|"recent_activity"]
   #   Determines the order of the discussion topic list. Defaults to "position".
   #
@@ -274,6 +278,8 @@ class DiscussionTopicsController < ApplicationController
   #
   # @returns [DiscussionTopic]
   def index
+    include_params = Array(params[:include])
+
     if params[:only_announcements]
       return unless authorized_action(@context.announcements.temp_record, @current_user, :read)
     else
@@ -367,9 +373,10 @@ class DiscussionTopicsController < ApplicationController
       end
       format.json do
         render json: discussion_topics_api_json(@topics, @context, @current_user, session,
-          :user_can_moderate => user_can_moderate,
-          :plain_messages => value_to_boolean(params[:plain_messages]),
-          :exclude_assignment_description => value_to_boolean(params[:exclude_assignment_descriptions]))
+          user_can_moderate: user_can_moderate,
+          plain_messages: value_to_boolean(params[:plain_messages]),
+          exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
+          include_all_dates: include_params.include?('all_dates'))
       end
     end
   end

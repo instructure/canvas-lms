@@ -7,8 +7,9 @@ define [
   'jst/DiscussionTopics/discussion'
   'compiled/views/PublishIconView'
   'compiled/views/ToggleableSubscriptionIconView'
+  'compiled/views/assignments/DateDueColumnView'
   'compiled/views/MoveDialogView'
-], (I18n, $, _, {View}, CyoeHelper, template, PublishIconView, ToggleableSubscriptionIconView, MoveDialogView) ->
+], (I18n, $, _, {View}, CyoeHelper, template, PublishIconView, ToggleableSubscriptionIconView, DateDueColumnView, MoveDialogView) ->
 
   class DiscussionView extends View
     # Public: View template (discussion).
@@ -55,10 +56,14 @@ define [
 
     @child 'toggleableSubscriptionIcon', '[data-view=toggleableSubscriptionIcon]'
 
+    @child 'dateDueColumnView', '[data-view=date-due]'
+
     initialize: (options) ->
       @attachModel()
       options.publishIcon = new PublishIconView(model: @model) if ENV.permissions.publish
       options.toggleableSubscriptionIcon = new ToggleableSubscriptionIconView(model: @model)
+      if @model.get('assignment')
+        options.dateDueColumnView = new DateDueColumnView(model: @model.get('assignment'))
       @moveItemView = new MoveDialogView
         model: @model
         nested: true
