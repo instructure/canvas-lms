@@ -16,6 +16,7 @@
 *.eot
 *.sh
 
+/.fontcustom-manifest.json
 /.selinimumignore
 /app/stylesheets/brandable_variables.json
 /app/stylesheets/components/_canvas-icons.scss
