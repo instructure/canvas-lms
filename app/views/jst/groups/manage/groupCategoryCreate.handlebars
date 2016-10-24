@@ -31,8 +31,14 @@
       <label class="radio">
         <input type="radio" id="split_groups" name="split_groups" value="1" style="margin-top:8px">
         {{#t "split_into_groups"}}
-          Split students into {{{num_groups}}} equal groups
+          Split students into {{{num_groups}}} groups
         {{/t}}
+      </label>
+    </div>
+    <div class="controls group-by-section-controls">
+      <label class="checkbox" for="group_by_section">
+        {{checkbox "group_by_section"}}
+        {{#t}}Require group members to be in the same section{{/t}}
       </label>
     </div>
     <div class="controls">
