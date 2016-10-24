@@ -204,7 +204,7 @@ module Selinimum
           classes_to_remove = Set.new(classes_to_remove)
           classes.each do |klass|
             klass.reflections.each do |_, reflection|
-              next unless reflection.instance_variable_defined? :@klass
+              next unless reflection.instance_variable_get(:@klass)
               next unless classes_to_remove.include?(reflection.klass)
               reflection.remove_instance_variable :@klass
             end
