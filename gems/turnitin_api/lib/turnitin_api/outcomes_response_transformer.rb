@@ -31,6 +31,10 @@ module TurnitinApi
       response.body['outcome_originalityreport'].select {|k, _| %w(breakdown numeric).include?(k)}
     end
 
+    def uploaded_at
+      response.body['meta']['date_uploaded']
+    end
+
     def scored?
       originality_data["numeric"]["score"].present?
     end
