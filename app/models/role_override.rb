@@ -952,7 +952,7 @@ class RoleOverride < ActiveRecord::Base
           generated_permission[:enabled] = override.enabled? ? override.applies_to : nil
         end
       end
-      hit_role_context ||= (role_context && override.context_id == role_context.id && override.context_type == 'Account')
+      hit_role_context ||= (role_context.is_a?(Account) && override.has_asset?(role_context))
 
       break if override.locked?
       break if generated_permission[:enabled] && hit_role_context

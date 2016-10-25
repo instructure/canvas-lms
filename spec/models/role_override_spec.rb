@@ -342,22 +342,23 @@ describe RoleOverride do
             @base_role = Role.get_built_in_role(@base_role_name)
             @role_name = 'course role'
             @default_perm = RoleOverride.permissions[@permission][:true_for].include?(@base_role_name)
+            @parent_account = @account
+            @sub = account_model(:parent_account => @account)
+            @account = @parent_account
+            create_role(@base_role_name, @role_name)
           end
 
           it "should use default permissions" do
-            create_role(@base_role_name, @role_name)
             check_permission(@role, @default_perm)
           end
 
           it "should use permission for role" do
-            create_role(@base_role_name, @role_name)
             create_override(@role, !@default_perm)
 
             check_permission(@role, !@default_perm)
           end
 
           it "should not find override for base type of role" do
-            create_role(@base_role_name, @role_name)
             create_override(@role, @default_perm)
             create_override(Role.get_built_in_role(@base_role_name), !@default_perm)
 
@@ -366,19 +367,26 @@ describe RoleOverride do
           end
 
           it "should use permission for role in parent account" do
-            @parent_account = @account
-            @sub = account_model(:parent_account => @account)
             @course = @sub.courses.create!
-            @account = @parent_account
-
-            # create in parent
-            create_role(@base_role_name, @role_name)
 
             #create permission in parent
             create_override(@role, !@default_perm)
 
             # check based on sub account
             hash = RoleOverride.permission_for(@course, @permission, @role)
+            expect((!!hash[:enabled])).to eq !@default_perm
+          end
+
+          it "should use permission for role in parent account if the course is the role_context and has the same id as an account" do
+            @course = @sub.courses.build
+            @course.id = Account.site_admin.id
+            @course.save!
+
+            #create permission in parent
+            create_override(@role, !@default_perm)
+
+            # check based on sub account
+            hash = RoleOverride.permission_for(@course, @permission, @role, @course)
             expect((!!hash[:enabled])).to eq !@default_perm
           end
         end
