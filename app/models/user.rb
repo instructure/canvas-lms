@@ -751,7 +751,7 @@ class User < ActiveRecord::Base
   end
 
   def email
-    # if you change this cache_key, change it in email_cached? as well
+    # if you change this cache_key, change it in email_cached? as well (and email=)
     value = Rails.cache.fetch(['user_email', self].cache_key) do
       email_channel.try(:path) || :none
     end
@@ -801,6 +801,7 @@ class User < ActiveRecord::Base
     cc.move_to_top
     cc.save!
     self.reload
+    Rails.cache.delete(['user_email', self].cache_key)
     cc.path
   end
 
