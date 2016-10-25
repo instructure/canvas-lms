@@ -32,10 +32,6 @@ $ic-tooltip-arrow-size: 0.375rem;
   width: $ic-header-primary-width - 30;
   z-index: 100;
   background-color: $ic-brand-global-nav-bgd;
-
-  body.primary-nav-expanded & {
-    width: $ic-header-primary-width;
-  }
 }
 
 .ic-app-header__main-navigation {
@@ -233,16 +229,9 @@ button.ic-app-header__menu-list-link {
   line-height: 1.8rem;
   margin-top: -0.9rem;
   @include fontSize($ic-font-size--xsmall);
-  white-space: nowrap;
   border-radius: $ic-border-radius / 2;
-
-  body:not(.primary-nav-expanded) & {
-    color: $ic-color-light;
-  }
-
-  body.primary-nav-expanded & {
-    color: $ic-brand-global-nav-menu-item__text-color;
-  }
+  color: $ic-color-light;
+  white-space: nowrap;
 
   // this class is added after a 1s delay because the
   // transitions look weird when the nav is being closed
@@ -331,7 +320,9 @@ button.ic-app-header__menu-list-link {
 
 // stuff that changes when the nav is expanded
 body.primary-nav-expanded {
-  .ic-app-header__primary {
+
+  .ic-app-header {
+    width: $ic-header-primary-width;
     overflow-y: auto;
     -ms-overflow-style: none; // IE11 and below was throwing on scrollbars no matter if needed or not
   }
@@ -382,6 +373,11 @@ body.primary-nav-expanded {
     margin: $ic-sp/4 0 0;
     padding: 0;
     background: transparent;
+    color: $ic-brand-global-nav-menu-item__text-color;
+    white-space: normal;
+    word-break: break-all;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
 
     &::after {
       display: none;
