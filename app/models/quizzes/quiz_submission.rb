@@ -290,9 +290,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
 
     if quiz.cant_go_back?
-      params.reject! { |p, _|
-        p =~ /\Aquestion_(\d)+/ && submission_data[:"_question_#{$1}_read"]
-      }
+      params.reject! do |param, _|
+        question_being_answered = /\Aquestion_(?<question_id>\d+)/.match(param)
+        next unless question_being_answered
+
+        previously_read_marker = :"_question_#{question_being_answered[:question_id]}_read"
+
+        submission_data[previously_read_marker]
+      end
     end
     params
   end
