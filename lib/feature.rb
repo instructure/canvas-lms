@@ -307,14 +307,23 @@ END
         beta: true,
         root_opt_in: true
       },
-    'bulk_sis_grade_export' =>
+    'new_sis_integrations' =>
       {
-          display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
-          description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
+          display_name: -> { I18n.t('Display new SIS integration settings') },
+          description:  -> { I18n.t('Make new settings visible for SIS integrations') },
           applies_to: 'RootAccount',
           state: 'hidden',
           root_opt_in: true,
           beta: true
+      },
+    'bulk_sis_grade_export' =>
+      {
+        display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
+        description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
+        applies_to: 'RootAccount',
+        state: 'hidden',
+        root_opt_in: true,
+        beta: true
       },
     'notification_service' =>
     {
