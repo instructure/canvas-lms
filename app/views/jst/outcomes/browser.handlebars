@@ -23,12 +23,7 @@
       <span class="screenreader-only">{{#t}}Find an Outcome{{/t}}</span>
     </a>
     {{/if}}
-    {{#if canManageRubrics }}
-    <a href="{{contextUrlRoot}}/rubrics" class="manage_rubrics ui-button ui-widget ui-state-default ui-corner-all" role="button">
-      <i class="icon-rubric"></i>
-      <span class="ui-button-text">{{#t "#buttons.manage_rubrics"}}Manage Rubrics{{/t}}</span>
-    </a>
-    {{/if}}
+    <span id="popoverMenu" class="popover-menu"></span>
   </div>
   {{/unless}}
 
