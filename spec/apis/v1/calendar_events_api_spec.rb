@@ -2013,6 +2013,23 @@ describe CalendarEventsApiController, type: :request do
       end
       expect(context['selected']).to be(true)
     end
+
+    it 'includes course sections' do
+      @section = @course.course_sections.try(:first)
+
+      json = api_call(:get, '/api/v1/calendar_events/visible_contexts', {
+        controller: 'calendar_events_api',
+        action: 'visible_contexts',
+        format: 'json'
+      })
+
+      context = json['contexts'].find do |c|
+        c['sections'] && c['sections'].find do |s|
+          s['id'] == @section.id.to_s
+        end
+      end
+      expect(context).not_to be_nil
+    end
   end
 
   describe '#set_course_timetable' do

@@ -733,13 +733,26 @@ class CalendarEventsApiController < ApplicationController
     selected_contexts = @current_user.preferences[:selected_calendar_contexts] || []
 
     contexts = @contexts.map do |context|
-      {
+      context_data = {
         id: context.id,
         name: context.nickname_for(@current_user),
         asset_string: context.asset_string,
         color: @current_user.custom_colors[context.asset_string],
         selected: selected_contexts.include?(context.asset_string)
       }
+
+      if context.is_a?(Course)
+        context_data[:sections] = context.sections_visible_to(@current_user).map do |section|
+          {
+            id: section.id,
+            name: section.name,
+            asset_string: section.asset_string,
+            selected: selected_contexts.include?(section.asset_string),
+          }
+        end
+      end
+
+      context_data
     end
 
     render json: {contexts: StringifyIds.recursively_stringify_ids(contexts)}
