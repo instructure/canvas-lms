@@ -150,6 +150,12 @@ describe Account do
         expect(@account.fast_all_courses({:term => EnrollmentTerm.where(sis_source_id: "T002").first, :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort).to eq []
         expect(@account.fast_all_courses({:term => EnrollmentTerm.where(sis_source_id: "T003").first, :hide_enrollmentless_courses => true}).map(&:sis_source_id).sort).to eq ["C005", "C007", "C005S", "C007S"].sort
       end
+
+      it "should order list by specified parameter" do
+        order = "courses.created_at ASC"
+        @account.expects(:fast_course_base).with(order: order)
+        @account.fast_all_courses(order: order)
+      end
     end
 
     context "name searching" do
