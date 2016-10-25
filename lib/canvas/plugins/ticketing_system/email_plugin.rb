@@ -27,7 +27,7 @@ module Canvas::Plugins::TicketingSystem
         to: conf[:email_address],
         from: error_report.email,
         subject: I18n.t("Canvas Error Report"),
-        body: error_report.to_document,
+        body: JSON.pretty_generate(error_report.to_document, space_before: ''),
         root_account_id: error_report.account_id,
         delay_for: 0,
         context: error_report.raw_report

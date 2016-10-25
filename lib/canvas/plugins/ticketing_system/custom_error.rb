@@ -36,7 +36,7 @@ module Canvas::Plugins::TicketingSystem
           name: self.user_name,
           role: self.user_roles,
           become_user_uri: self.become_user_id_uri,
-          environment: self.pretty_http_env
+          environment: self.http_env
         },
         canvas_details: {
           request_context_id: self.request_context_id,
