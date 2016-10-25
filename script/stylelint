@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 $:.push File.expand_path("../../gems/dr_diff/lib", __FILE__)
 require 'dr_diff'
+require 'json'
 
 def pretty_comment(comment)
   message = ""
@@ -26,7 +27,7 @@ if scss_files.size == 0
 end
 
 comments = dr_diff.comments(format: "stylelint",
-                            command: "stylelint #{scss_files.join(' ')}",
+                            command: "node_modules/.bin/stylelint #{scss_files.join(' ')}",
                             include_git_dir_in_output: !gerrit_patchset?)
 
 unless comments.size >  0
