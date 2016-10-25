@@ -71,7 +71,8 @@ class ExternalToolsController < ApplicationController
   #             "url": "...",
   #             "default": "disabled",
   #             "enabled": "true",
-  #             "visibility": "public"
+  #             "visibility": "public",
+  #             "windowTarget": "_blank"
   #        },
   #        "editor_button": {
   #             "canvas_icon_class": "icon-lti",
@@ -423,7 +424,8 @@ class ExternalToolsController < ApplicationController
   #             "url": "...",
   #             "default": "disabled",
   #             "enabled": "true",
-  #             "visibility": "public"
+  #             "visibility": "public",
+  #             "windowTarget": "_blank"
   #        },
   #        "editor_button": {
   #             "canvas_icon_class": "icon-lti",
@@ -808,6 +810,11 @@ class ExternalToolsController < ApplicationController
   # @argument course_navigation[visibility] [String, "admins"|"members"]
   #   Who will see the navigation tab. "admins" for course admins, "members" for
   #   students, null for everyone
+  #
+  # @argument course_navigation[windowTarget] [String, "_blank"|"_self"]
+  #   Determines how the navigation tab will be opened.
+  #   "_blank"	Launches the external tool in a new window or tab.
+  #   "_self"	(Default) Launches the external tool in an iframe inside of Canvas.
   #
   # @argument course_navigation[default] [Boolean]
   #   Whether the navigation option will show in the course by default or
