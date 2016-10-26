@@ -136,7 +136,7 @@ module VeriCite
               paper_ext = ""
             end
             paper_size = 100 # File.size(
-            responses[a.asset_string] = sendRequest(:submit_paper, { :pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => a.open(), :ptype => '2' }.merge!(opts))
+            responses[a.asset_string] = sendRequest(:submit_paper, { :pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => a.open() }.merge!(opts))
           end
         end
       elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
@@ -147,7 +147,7 @@ module VeriCite
         paper_type = "text/html"
         paper_size = plain_text.bytesize
 
-        responses[submission.asset_string] = sendRequest(:submit_paper, {:pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => plain_text, :ptype => "1" }.merge!(opts))
+        responses[submission.asset_string] = sendRequest(:submit_paper, {:pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => plain_text }.merge!(opts))
       else
         raise "Unsupported submission type for VeriCite integration: #{submission.submission_type}"
       end
