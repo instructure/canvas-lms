@@ -10347,6 +10347,7 @@ he:
   no_final_grade_selected_3595c9c: "לא נבחר ציון סופי"
   no_grade_3fa326c: "אין הערכה"
   no_grade_assigned_90e531f5: "לא נקבע ציון"
+  no_grading_periods_configured_for_this_term_ca22393e: "לתקופה זו לא הוגדרו מועדי הערכה"
   no_grading_schemes_to_display_8b0e92e7: "אין סכימת הערכה להצגה"
   no_items_in_module_21f111a2: "אין פריטים במודול"
   no_ltis_configured_f4b9bc6b: "אף LTI אל קונפג"
@@ -10361,19 +10362,25 @@ he:
   no_students_have_taken_the_quiz_yet_e667644b: "תלמידים טרם בצעו את הבוחן"
   no_students_have_taken_the_survey_yet_d378cd35: "תלמידים טרם השתתפו בסקר"
   no_tls_618add1a: "אין TLS"
+  no_unassigned_terms_deb7b76b: "אין תקופות שלא שויכו"
   no_unresponsive_links_found_8ea497f9: "לא נמצאו קישורים שגויים"
   no_usage_rights_object_supplied_304b8d40: "לא סופק מסמך 'זכויות שימוש'"
   no_users_found_64a043ff: "לא נמצאו משתמשים"
+  norway_47_bc598662: "נורבגיה (+47)"
   norway_c11471b3: נורבגיה
   not_a_number: "הערך חייב להיות מספר חיובי"
   not_available_487d3648: "לא זמין"
   not_available_until_next_submission_2175158: "לא זמין עד ההגשה הבאה"
   not_completed_d70acea3: "טרם הושלם"
+  not_factored_into_grading_455dcf6a: "לא שוקלל בציון"
   not_graded_e027c866: "לא מוערך"
   not_graded_e78bcd50: "לא מוערך/ת"
   not_installed_37a21a76: "לא הותקן"
   not_now_97efd947: "לא כעת"
   not_published_73f7079: "לא פורסם"
+  not_starred_no_subject_click_to_star_adfefe93: "'לא הודגש בכוכבית \"(אין נושא)\", הקלק/י להדגיש."
+  not_starred_no_subject_click_to_star_dc91380: "'לא הודגש בכוכבית \"(אין נושא)\", הקלק/י להדגיש."
+  not_starred_subject_click_to_star_4ea6eb64: "'לא הודגש בכוכבית \"%{subject}\", הקלק/י להדגיש."
   not_yet_completed_345a0bca: "טרם הושלם"
   note_for_differentiated_group_topics_some_threads__90adbb21: "שימו לב: לנושאי קבוצה נבדלים, יתכנו שרשורים ללא שיבוץ תלמידים."
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "הערה: יכול לקחת עד שבוע לכתובת דף ביתא להפוך לזמינה, תלוי במחזור הרענון של דפי ביתא."
@@ -10389,6 +10396,7 @@ he:
   notes_c42e0fd5: הערות
   notes_for_name_2eefac11: "הערות עבור %{name}"
   nothing_to_split_off_of_this_user_28ba9dd5: "אין מה לפצל למשתמש זה"
+  notice_concluded_student_6d416c4: "שימו לב: תלמיד שסוים"
   notice_inactive_student_bcc4248a: "שימו לב: תלמיד לא פעיל"
   notification: 
     added_to_conversation_description: "נתווספת לשיחה"
@@ -10462,13 +10470,9 @@ he:
     grading_description: |-
         כולל:
         
-        * הזנת / שינוי הערכה למשימה/הגשה
-        * הערכת משימה פעילה
-        * שיקלול ההערכה השתנה
-        
-        
-        יש לסמן 'הכללת ציונים כאשר מתריאים לגבי שינויי הערכה' אם ברצונכם לצפות בהערכותיכם במסגרת התראות המערכת.
-        אם כתובת הדוא"ל שלכם אינה של הארגון שלכם משמעו שמידע רגיש ישלח אל מחוץ לארגון.
+        * הערכה למטלה/הגשה בוצעה/שונתה
+        * הערכת מטלה במצב פעיל
+        * שיקלול ציונים השתנה
     grading_display: "חישוב הציון"
     grading_policies_description: "שינוי במדיניות ההערכה לקורס"
     grading_policies_display: "מדיניות הערכה"
@@ -10737,6 +10741,7 @@ he:
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "רק מורים יכולים לראות קורס זה עד אשר יפורסם."
   open_color_picker_f117df0a: "בחירת צבע חופשית"
   open_in_theme_editor_156028e2: "פתוח בעורך ערכות הנושא הגמיש"
+  open_name_color_picker_a2646a33: "פתיחת %{name} לוח הצבעים"
   open_theme_editor_2d924ebe: "עורך עיצוב גמיש"
   open_title_in_a_new_window_b29fed77: "פתיחת %{title} בחלון חדש"
   option_1_dea39f90: "אפשרות 1"
@@ -10764,6 +10769,7 @@ he:
   orbis_report_header_student_sis_id: "מערכת המידע הבית ספרית של המשתמש"
   orbis_report_header_submission_score: "ציון הגשה"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "ארגון ePub לפי סוג תוכן (ברירת המחדל לפי מודול) "
+  other_ddacb37d: אחר
   other_timezones_42530564: "איזורי זמן אחרים"
   outcome_groups: 
     invalid_file: "בקובץ הקבוצתי של תוצאות למידה לא תקין"
@@ -10783,6 +10789,8 @@ he:
       links: 
         back: חזרה
         find: מצא
+        new_group: "קבוצה "
+        new_outcome: תוצאות
     common_core: "תקני בסיס משותפים"
     common_core_description: "בצד הדף ניתן להבחין במבנה המוכר של תיקיות תוצאות לכל אוגדן משותף של תקני בסיס. הדבר יאפשר לך לכלול בקלות כל תקן בסיס מקובל לביצוע ההערכה בקורס שלך"
     confirm: 
@@ -10833,6 +10841,9 @@ he:
     missing_outcome: "הישגי הלמידה האלה לא אותרו"
     new_outcome_group: "קבוצת תוצאות למידה חדשה"
     outcome: 
+      links: 
+        delete_outcome: ביטול
+        edit_outcome: עריכה
       mastery_at_label: "הגדרת מומחיות לכל ציון כזה או גבוה ממנו"
       point_mastery: "מומחיות:  %{mastery_points} נקודות"
       points: 
@@ -10852,6 +10863,10 @@ he:
       points: "%{points_possible} נקודות "
       title: "מתן שם לתוצאת למידה זו"
       total_points: "סך ניקוד "
+    outcome_group: 
+      links: 
+        delete_outcome_group: ביטול
+        edit_outcome_group: עריכה
     outcome_group_form: 
       group_description: "תיאור קבוצה זו"
       title: "מתן שם לקבוצה זו"
@@ -10954,7 +10969,9 @@ he:
     view_more_link: "צפיה בעוד"
   paginated_view: 
     loading_more_results: "טוען תוצאות נוספות"
+  panama_507_831fbc99: "פנמה (+507)"
   panama_fa454c86: פנמה
+  paraguay_595_ca58b83a: "פרגואי (+595)"
   parent_of_a_canvas_user_afba1624: "ההורה של משתמש קנבס?"
   parent_signup_b7c6bf0a: "הזדהות הורה"
   parents_sign_up_here_f0aa8f4f: "הרשמת הורים כאן"
@@ -10962,6 +10979,7 @@ he:
   participations_1823832d: השתתפויות
   pass_fail_3d9461b0: עבר/נכשל
   password_8a271b1c: סיסמה
+  past_14da759a: עבר
   paste_xml_cda3a64e: "הדבקת XML"
   path_4f9abf12: "נתיב כתובת דף"
   paypal: 
@@ -10975,6 +10993,7 @@ he:
   people_b4ebb13c: אנשים
   people_options_cfb419a6: "אפשרויות אנשים"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "אנשים יראו שם זה בדיונים, הודעות והערות"
+  percent_448ea947: אחוז
   percent_complete_3a7edc20: "%{percent} הושלם"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "שעור המגיבים שבחרו תשובה זו"
   percent_of_students_scored_score_53d2c4d5: "%{percent} מהתלמידים קיבלו ציון %{score}"
@@ -10988,8 +11007,10 @@ he:
   permissions: 
     manage_webhooks: "ניהול Webhooks"
     provision_catalog: "הקמת קטלוג"
+  peru_51_d3d38d1f: "פרו (+51)"
   peru_7dcfdc91: פרו
   philippines_37a6289e: פיליפינים
+  philippines_63_a4f62138: "פיליפינים (+63)"
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "בחירת יעד, לשם נשלח לך שגיאות"
   pick_a_name_to_save_this_theme_as_9773cb1a: "יש לבחור שם כדי לשמור ערכת נושא זה."
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "בחירת נקודת קצה לשם נפרסם את דוחות השגיאות שלך"
@@ -10999,6 +11020,8 @@ he:
   plain_text_e3ab33aa: "כיתוב פשוט"
   please_add_at_least_one_non_blank_answer_213c2c8e: "בבקשה להוסיף לפחות תשובה אחת עם תוכן"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "בבקשה להוסיף לפחות תשובה אחת עם תוכן לכל משתנה"
+  please_enter_a_name_for_this_link_318f01a4: "בבקשה להקליד שם לקושור זה"
+  please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "בבקשה להקליד מונח חיפוש עם 3 או יותר תווים"
   please_enter_your_label_name_7745272d: "בבקשה לספק את ה %{label_name}: שלך"
   please_enter_your_label_name_and_password_5c56be80: "בבקשה לספק את ה %{label_name}  והסיסמה שלך"
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "נא לאפשר להם לדעת באיזה דף עיינת והקישור עליו הקלקת. "
