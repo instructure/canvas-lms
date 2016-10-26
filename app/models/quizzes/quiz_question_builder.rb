@@ -69,9 +69,9 @@ class Quizzes::QuizQuestionBuilder
     quiz_data.reduce([]) do |submission_questions, descriptor|
       # pulling from question bank
       questions = if descriptor[:entry_type] == QUIZ_GROUP_ENTRY && descriptor[:assessment_question_bank_id]
-        if bank = ::AssessmentQuestionBank.where(id: descriptor[:assessment_question_bank_id]).first
+        if (bank = ::AssessmentQuestionBank.where(id: descriptor[:assessment_question_bank_id]).first)
           pool = BankPool.new(bank, @picked, &method(:mark_picked))
-          pool.draw(quiz_id, descriptor[:pick_count]).each do |question|
+          pool.draw(quiz_id, descriptor[:id], descriptor[:pick_count]).each do |question|
             question[:points_possible] = descriptor[:question_points]
             question[:published_at] = descriptor[:published_at]
 
@@ -89,7 +89,7 @@ class Quizzes::QuizQuestionBuilder
       # pulling from questions defined directly in a group
       elsif descriptor[:entry_type] == QUIZ_GROUP_ENTRY
         pool = GroupPool.new(descriptor[:questions], @picked, &method(:mark_picked))
-        pool.draw(quiz_id, descriptor[:pick_count]).each do |question|
+        pool.draw(quiz_id, descriptor[:id], descriptor[:pick_count]).each do |question|
           question[:points_possible] = descriptor[:question_points]
         end
 
