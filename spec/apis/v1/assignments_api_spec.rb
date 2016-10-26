@@ -1531,6 +1531,24 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         to eq "Can't unpublish if there are student submissions"
     end
 
+    it "updates using lti_context_id" do
+      @assignment = @course.assignments.create({
+                                                 :name => "some assignment",
+                                                 :points_possible => 15
+                                               })
+      raw_api_call(:put,
+                   "/api/v1/courses/#{@course.id}/assignments/lti_context_id:#{@assignment.lti_context_id}.json",
+                   {:controller => 'assignments_api', :action => 'update',
+                    :format => 'json',
+                    :course_id => @course.id.to_s,
+                    :id => "lti_context_id:#{@assignment.lti_context_id}"},
+                   {
+                     assignment: {:published => false}
+                   })
+      expect(JSON.parse(response.body)['id']).to eq @assignment.id
+    end
+
+
     it "should 400 with invalid date times" do
       the_date = 1.day.ago
       @assignment = @course.assignments.create({
@@ -2210,6 +2228,24 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
               {:expected_status => 200})
         expect(@assignment.reload).to be_deleted
       end
+
+      it "deletes by lti_context_id" do
+        teacher_in_course(:course => @course, :active_all => true)
+        api_call(:delete,
+                 "/api/v1/courses/#{@course.id}/assignments/lti_context_id:#{@assignment.lti_context_id}",
+                 {
+                   :controller => 'assignments',
+                   :action => 'destroy',
+                   :format => 'json',
+                   :course_id => @course.id.to_s,
+                   :id => "lti_context_id:#{@assignment.lti_context_id}"
+                 },
+                 {},
+                 {},
+                 {:expected_status => 200})
+        expect(@assignment.reload).to be_deleted
+      end
+
     end
 
   end
@@ -2235,6 +2271,15 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         @assignment.any_instantiation.stubs(:locked_for?).returns(
           {:asset_string => '', :unlock_at => 1.hour.from_now }
         )
+      end
+
+      it "looks up an assignment by lti_context_id" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/lti_context_id:#{@assignment.lti_context_id}.json",
+                        {:controller => "assignments_api", :action => "show",
+                         :format => "json", :course_id => @course.id.to_s,
+                         :id => "lti_context_id:#{@assignment.lti_context_id}"})
+        expect(json["id"]).to eq @assignment.id
       end
 
       it "does not return the assignment's description if locked for user" do

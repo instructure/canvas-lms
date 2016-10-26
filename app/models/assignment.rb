@@ -70,6 +70,7 @@ class Assignment < ActiveRecord::Base
   validate :discussion_group_ok?
   validate :positive_points_possible?
   validate :moderation_setting_ok?
+  validates :lti_context_id, presence: true, uniqueness: true
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url, content_type, content_id, and new_tab params, the other accessible
@@ -85,6 +86,7 @@ class Assignment < ActiveRecord::Base
     false
   }
   before_validation do |assignment|
+    assignment.lti_context_id ||= SecureRandom.uuid
     if assignment.external_tool? && assignment.external_tool_tag
       assignment.external_tool_tag.context = assignment
       assignment.external_tool_tag.content_type ||= "ContextExternalTool"
@@ -1916,6 +1918,14 @@ class Assignment < ActiveRecord::Base
 
   scope :unpublished, -> { where(:workflow_state => 'unpublished') }
   scope :published, -> { where(:workflow_state => 'published') }
+  scope :api_id, lambda { |api_id|
+    if api_id.start_with?('lti_context_id')
+      lti_context_id = api_id.split(':').last
+      find_by lti_context_id: lti_context_id
+    else
+      find api_id
+    end
+  }
 
   def overdue?
     due_at && due_at <= Time.zone.now

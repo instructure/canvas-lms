@@ -85,7 +85,6 @@ describe DataFixup::FixAuditLogUuidIndexes do
 
   def corrupt_grade_changes
     event_id = CanvasSlug.generate
-    SecureRandom.stubs(:uuid).returns(event_id)
 
     (1..4).each do |i|
       time = Time.zone.now - i.days
@@ -97,16 +96,15 @@ describe DataFixup::FixAuditLogUuidIndexes do
       Timecop.freeze(time) do
         @assignment = course.assignments.create!(:title => 'Assignment', :points_possible => 10)
       end
-
+      SecureRandom.stubs(:uuid).returns(event_id)
       Timecop.freeze(time + 1.hour) do
         @submission = @assignment.grade_student(student, grade: i, grader: teacher).first
       end
+      SecureRandom.unstub(:uuid)
     end
 
     # Lets simulate a deleted submission
     @submission.delete
-
-    SecureRandom.unstub(:uuid)
 
     { event_id: event_id, count: 4 }
   end
