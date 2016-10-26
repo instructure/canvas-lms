@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "course people" do
   include_context "in-process server selenium tests"
 
-  before(:all) do
+  before(:once) do
     # in the people table, the kyle menu can be off the screen
     # and uninteractable if the window is too small
     driver.manage.window.maximize
@@ -22,16 +22,14 @@ describe "course people" do
     add_button.click
     wait_for_ajaximations
 
-    click_option('#role_id', type)
-    click_option('#course_section_id', section_name) if section_name
-    f('#user_list_textarea').send_keys(email)
-    f('#next-step').click
-    wait_for_ajaximations
-    expect(f('#create-users-verified')).to include_text(email)
-    f('#createUsersAddButton').click
-    wait_for_ajax_requests
-    f('.dialog_closer').click
-    wait_for_ajaximations
+    click_option("#peoplesearch_select_role", type)
+    click_option("#peoplesearch_select_section", section_name) if section_name
+    replace_content(f(".addpeople__peoplesearch textarea"), email)
+
+    f("#addpeople_next").click
+    expect(f(".addpeople__peoplereadylist tbody tr")).to include_text(email)
+
+    f("#addpeople_next").click
   end
 
   describe "course users" do
