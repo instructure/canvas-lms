@@ -127,6 +127,11 @@ module Factories
     end
   end
 
+  # quickly create a course, bypassing all that AR crap
+  def create_course(options = {})
+    create_courses(1, options.merge({return_type: :record}))[0]
+  end
+
   # create a bunch of courses at once, optionally enrolling a user in them
   # records can either be the number of records to create, or an array of
   # hashes of attributes you want to insert

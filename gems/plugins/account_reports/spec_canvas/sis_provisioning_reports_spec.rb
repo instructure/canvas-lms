@@ -204,46 +204,23 @@ describe "Default Account Reports" do
     @role.base_role_type = 'DesignerEnrollment'
     @role.save!
 
-    @enrollment1 = @course1.enroll_user(@user1,'ObserverEnrollment',:enrollment_state => :active)
-    @enrollment1.sis_batch_id = @sis.id
-    @enrollment1.save!
-    @enrollment2 = @course3.enroll_user(@user2,'StudentEnrollment',:enrollment_state => :active)
-    @enrollment2.sis_batch_id = @sis.id
-    @enrollment2.save!
-    @enrollment3 = @course1.enroll_user(@user2,'TaEnrollment',:enrollment_state => :active)
-    @enrollment3.sis_batch_id = @sis.id
-    @enrollment3.save!
-    @enrollment4 = @course1.enroll_user(@user3,'StudentEnrollment',:enrollment_state => :active)
-    @enrollment4.sis_batch_id = @sis.id
-    @enrollment4.save!
-    @enrollment5 = @course2.enroll_user(@user3,'StudentEnrollment',:enrollment_state => :active)
-    @enrollment5.sis_batch_id = @sis.id
-    @enrollment5.save!
-    @enrollment6 = @course1.enroll_user(@user4,'TeacherEnrollment',:enrollment_state => :active)
-    @enrollment6.sis_batch_id = @sis.id
-    @enrollment6.save!
-    @enrollment6.destroy
-    @enrollment7 = @course2.enroll_user(@user1,'ObserverEnrollment',:enrollment_state => :active,
-                                        :associated_user_id => @user3.id)
-    @enrollment7.sis_batch_id = @sis.id
-    @enrollment7.save!
-    @enrollment8 = @course4.enroll_user(@user5,'TeacherEnrollment',:enrollment_state => :active)
-    @enrollment9 = @course1.enroll_user(@user4, 'TeacherEnrollment',
-                                        enrollment_state: 'active',
-                                        allow_multiple_enrollments: true,
-                                        section: @section1)
-    @enrollment9.sis_batch_id = @sis.id
-    @enrollment9.save!
-    @enrollment10 = @course1.enroll_user(@user6,'TeacherEnrollment',
-                                         :enrollment_state => :completed)
-    @enrollment11 = @course2.enroll_user(@user4,'DesignerEnrollment',
-                                         :role => @role,
-                                         :enrollment_state => :active)
-    @enrollment11.sis_batch_id = @sis.id
-    @enrollment11.save!
-    @enrollment12 = @course4.enroll_user(@user4,'StudentEnrollment',
-                                         :enrollment_state => :active)
-    Enrollment.where(id: @enrollment12).update_all(workflow_state: 'creation_pending')
+    @enrollment1 = create_enrollment(@course1, @user1, sis_batch_id: @sis.id, enrollment_type: 'ObserverEnrollment')
+    @enrollment2 = create_enrollment(@course3, @user2, sis_batch_id: @sis.id)
+    @enrollment3 = create_enrollment(@course1, @user2, sis_batch_id: @sis.id, enrollment_type: 'TaEnrollment')
+    @enrollment4 = create_enrollment(@course1, @user3, sis_batch_id: @sis.id)
+    @enrollment5 = create_enrollment(@course2, @user3, sis_batch_id: @sis.id)
+    @enrollment6 = create_enrollment(@course1, @user4, sis_batch_id: @sis.id, enrollment_type: 'TeacherEnrollment',
+                                                       enrollment_state: 'deleted')
+    @enrollment7 = create_enrollment(@course2, @user1, sis_batch_id: @sis.id, enrollment_type: 'ObserverEnrollment',
+                                                       associated_user_id: @user3.id)
+    @enrollment8 = create_enrollment(@course4, @user5, enrollment_type: 'TeacherEnrollment')
+    @enrollment9 = create_enrollment(@course1, @user4, sis_batch_id: @sis.id, enrollment_type: 'TeacherEnrollment',
+                                                       section: @section1)
+    @enrollment10 = create_enrollment(@course1, @user6, enrollment_type: 'TeacherEnrollment',
+                                                        enrollment_state: 'completed')
+    @enrollment11 = create_enrollment(@course2, @user4, sis_batch_id: @sis.id, enrollment_type: 'DesignerEnrollment',
+                                                                               role: @role)
+    @enrollment12 = create_enrollment(@course4, @user4, enrollment_state: 'creation_pending')
   end
 
   def create_some_groups()

@@ -41,8 +41,16 @@ module Factories
     create_records(EnrollmentState, enrollment_ids.map { |id| options.merge({ enrollment_id: id}) }, :nil)
   end
 
+  # quickly create an enrollment, bypassing all that AR crap
+  def create_enrollment(course, user, options = {})
+    create_enrollments(course, [user], {return_type: :record}.merge(options))[0]
+  end
+
   def create_enrollments(course, users, options = {})
     enrollment_state = options[:enrollment_state] || "active"
+    sis_batch_id = options[:sis_batch_id]
+    associated_user_id = options[:associated_user_id]
+    limit_privileges_to_course_section = options[:limit_privileges_to_course_section] || false
     user_ids = users.first.is_a?(User) ?
       users.map(&:id) :
       users
@@ -53,8 +61,21 @@ module Factories
 
     section_id = options[:section_id] || options[:section].try(:id) || course.default_section.id
     type = options[:enrollment_type] || "StudentEnrollment"
-    role_id = Role.get_built_in_role(type).id
-    result = create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: enrollment_state, :role_id => role_id}}, options[:return_type])
+    role_id = options[:role].try(:id) || Role.get_built_in_role(type).id
+    result = create_records(Enrollment, user_ids.map { |id|
+      {
+        course_id: course.id,
+        user_id: id,
+        type: type,
+        course_section_id: section_id,
+        root_account_id: course.root_account.id,
+        workflow_state: enrollment_state,
+        role_id: role_id,
+        sis_batch_id: sis_batch_id,
+        associated_user_id: associated_user_id,
+        limit_privileges_to_course_section: limit_privileges_to_course_section
+      }
+    }, options[:return_type])
     create_enrollment_states(result, {state: enrollment_state})
     result
   end
