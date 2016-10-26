@@ -669,6 +669,17 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
     end
 
+    it "adds params from secure_params" do
+      u = user(:active_all => true)
+      account.account_users.create!(user: u)
+      user_session(@user)
+      tool.save!
+      lti_assignment_id = SecureRandom.uuid
+      jwt = Canvas::Security.create_jwt({lti_assignment_id: lti_assignment_id})
+      get :retrieve, {url: tool.url, account_id:account.id, secure_params: jwt}
+      expect(assigns[:lti_launch].params['ext_lti_assignment_id']).to eq lti_assignment_id
+    end
+
     context 'collaborations' do
       let(:collab) do
         collab = ExternalToolCollaboration.create!(
