@@ -1,32 +1,15 @@
 module SupportHelpers
   module Tii
-    class Fixer
-      attr_reader :job_id
+    class TiiFixer < Fixer
 
       def initialize(email, after_time = nil)
-        @email = email
-        @after_time = after_time || 2.months.ago
-        @job_id = Time.now.to_i + Random.rand(1000) # just need something unique
         @buffer_time = Time.now - 1.hour
+        @prefix = "TurnItIn"
+        super(email, after_time)
       end
 
-      def monitor_and_fix
-        @start_time = Time.now.to_i
-
-        fix # actually do it
-
-        notify "Success", "#{fixer_name} fixed #{prettify_broken_count} in #{Time.now.to_i - @start_time} seconds!"
-      rescue => error
-        notify "Error", "#{fixer_name} failed because #{error.try(:message)}<br/><br/>#{error.try(:backtrace).try(:join, "<br/>")}"
-        raise error
-      end
-
-      def fix
-        raise "#{self.class.name} must implement #fix"
-      end
-
-      def fixer_name
-        "TurnItIn #{self.class.name.demodulize} ##{job_id}"
+      def success_message
+        "#{fixer_name} fixed #{prettify_broken_count} in #{elapsed_time} seconds!"
       end
 
       def broken_objects
@@ -58,20 +41,9 @@ module SupportHelpers
       def load_broken_objects
         raise "#{self.class.name} must implement #load_broken_objects"
       end
-
-      def notify(status, message)
-        m = Message.new(
-          to: @email,
-          from: 'tii_script@instructure.com',
-          subject: "TurnItIn Fixer #{status}",
-          body: message,
-          delay_for: 0
-        )
-        Mailer.create_message(m).deliver rescue nil # omg! just ignore delivery failures
-      end
     end
 
-    class Error2305Fixer < Fixer
+    class Error2305Fixer < TiiFixer
       def fix
         broken_objects.each { |a| AssignmentFixer.new(@email, @after_time, a).fix(fix_type_needed) }
       end
@@ -108,7 +80,7 @@ module SupportHelpers
       end
     end
 
-    class ShardFixer < Fixer
+    class ShardFixer < TiiFixer
       def fix
         broken_objects.each { |a| AssignmentFixer.new(@email, @after_time, a).fix }
       end
@@ -135,7 +107,7 @@ module SupportHelpers
       end
     end
 
-    class AssignmentFixer < Fixer
+    class AssignmentFixer < TiiFixer
       def initialize(email, after_time, assignment_id)
         @assignment = Assignment.find(assignment_id)
         super(email, after_time)
@@ -241,21 +213,21 @@ module SupportHelpers
       def resubmit_submissions
         broken_objects.each do |b|
           b.resubmit_to_turnitin
-          sleep 3 # TII's API can't keep up if we don't slow down
+          sleep 3 if Rails.env.production? # TII's API can't keep up if we don't slow down
         end
       end
     end
 
-    class StuckInPendingFixer < Fixer
+    class StuckInPendingFixer < TiiFixer
       def fix
         broken_objects.each do |s|
           Submission.find(s).resubmit_to_turnitin
-          sleep 3 # TII's API can't keep up if we don't slow down
+          sleep 3 if Rails.env.production? # TII's API can't keep up if we don't slow down
         end
 
         stuck_with_object_ids.each do |s|
           Submission.find(s).check_turnitin_status
-          sleep 2 # TII's API can't keep up if we don't slow down
+          sleep 2 if Rails.env.production? # TII's API can't keep up if we don't slow down
         end
       end
 
