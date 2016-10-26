@@ -1,23 +1,27 @@
 <% content_for :page_title do %><%= t(:submissions_upload, "%{assignment} Submissions Upload", :assignment => @assignment.title) %>: <%= t(:comments_made, {:one => "1 Comment Made", :other => "%{count} Comments Made"}, :count => @comments.length) %>, <%= t(:files_ignored, {:one => "1 File Ignored", :other => "%{count} Files Ignored"}, :count => @failures.length) %><% end %>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
-    <p><%= t(:done, <<-TEXT)
-      Done! We took the files you uploaded and attached them with a short comment
-      to each user's submission page for this assignment. The students will get a
-      notification that a new comment was added.
+  <p><%= t(:done, <<-TEXT)
+    Done! We took the files you uploaded and attached them with a short comment
+    to each user's submission page for this assignment. The students will get a
+    notification that a new comment was added.
+    TEXT
+  %></p>
+  <% if !@failures.empty? %>
+    <p><%= t(:failures, <<-TEXT)
+      There were some files we didn't know what to do with. They have not been
+      added to anyone's submission page. You can see the list to the left.
       TEXT
     %></p>
-    <% if !@failures.empty? %>
-      <p><%= t(:failures, <<-TEXT)
-        There were some files we didn't know what to do with. They have not been
-        added to anyone's submission page. You can see the list to the left.
-        TEXT
-      %></p>
-    <% end %>
-    <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class="back"><%= t('links.back_to_assignment', "Back to Assignment Page") %></a><br/>
-    <a href="<%= context_url(@context, :context_gradebook_url) %>" class="back"><%= t('links.back_to_gradebook', "Back to Gradebook") %></a>
-  </div>
+  <% end %>
+  <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class="btn button-sidebar-wide">
+    <i class="icon-arrow-left"></i>
+    <%= t('links.back_to_assignment', "Back to Assignment Page") %>
+  </a>
+  <a href="<%= context_url(@context, :context_gradebook_url) %>" class="btn button-sidebar-wide">
+    <i class="icon-arrow-left"></i>
+    <%= t('links.back_to_gradebook', "Back to Gradebook") %>
+  </a>
 <% end %>
 
 <% content_for :stylesheets do %>

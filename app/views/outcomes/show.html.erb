@@ -4,9 +4,10 @@
   content_for :page_title, @outcome.short_description
 %>
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
-    <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_outcomes_url) %>"><%= image_tag "back.png", :alt => '' %> <%= t "#buttons.back_to_outcomes", "Back to Outcomes" %></a>
-  </div>
+  <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_outcomes_url) %>">
+    <i class="icon-arrow-left"></i>
+    <%= t "#buttons.back_to_outcomes", "Back to Outcomes" %>
+  </a>
 <% end %>
 
 <h2><%= t "#titles.aligned_items", "Aligned Items" %></h2>

@@ -29,7 +29,7 @@
 <% content_for :right_side do %>
   <div id="page_sidebar">
     <% if can_do(@portfolio, @current_user, :manage) && !@owner_view %>
-      <div class="rs-margin-all">
+      <div class="rs-margin-bottom">
         <a href="#" class="wizard_popup_link"><%= help_link_text %></a>
       </div>
     <% end %>

@@ -7,7 +7,7 @@
 <h1 class="screenreader-only"><%= t(:page_title, "Grades for %{student}", :student => @presenter.student_name) %></h1>
 
 <% content_for :right_side do %>
-  <div id="student-grades-right-content" class="rs-margin-all">
+  <div id="student-grades-right-content">
     <% if @exclude_total %>
       <div id="student-grades-final" class="student_assignment final_grade" style="font-size: 1.2em;">
         <%= t('labels.final_grade_hidden', "Calculation of totals has been disabled") %>

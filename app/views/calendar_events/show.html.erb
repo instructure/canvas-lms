@@ -1,7 +1,7 @@
 <% content_for :right_side do %>
   <% return_to_url = return_to_calendar(:context => @context, :event => @event) %>
   <a class="base_calendar_url" href="<%= calendar_url_for() %>" style="display: none;">&nbsp;</a>
-  <div id="sidebar_content" class="rs-margin-all">
+  <div id="sidebar_content">
     <ul class="page-action-list">
       <li><a class="return_url calendar_url" href="<%= return_to_url %>"><i class="icon-arrow-left" aria-hidden='true'></i> <%= t 'links.back_to_calendar', "Back to Calendar" %></a></li>
       <% if can_do(@event, @current_user, :update) %>

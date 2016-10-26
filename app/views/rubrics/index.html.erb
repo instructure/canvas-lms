@@ -1,12 +1,10 @@
 <% content_for :page_title, t(:page_title, "Rubrics") %>
 <% add_crumb t('#crumbs.rubrics', "Rubrics") %>
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
-    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="Button icon-plus add_rubric_link">
-      <span aria-hidden="true"><%= t('buttons.add_rubric', 'Rubric') %></span>
-      <span class="screenreader-only"><%= t('Add Rubric') %></span>
-    </a>
-  </div>
+  <a href="<%= context_url(@context, :context_rubrics_url) %>" class="btn button-sidebar-wide add_rubric_link">
+    <i class="icon-add"></i>
+    <%= t('buttons.add_rubric', 'Add Rubric') %>
+  </a>
 <% end %>
 
 <% js_bundle :edit_rubric %>

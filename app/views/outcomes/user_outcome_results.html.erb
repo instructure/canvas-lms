@@ -3,7 +3,7 @@
 <% content_for :page_title do %><%= t :outcomes_for, "Outcomes for %{user_name}", :user_name => @user.name %><% end %>
   
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
+  <div class="rs-margin-bottom">
     <% chain = (@context.account_chain rescue [@domain_root_account]).select{|a| can_do(a, @current_user, :manage) }; %>
     <% if !chain.empty? %>
       <%= before_label :see_results, "See %{user_name}'s results for", :user_name => @user.short_name %>
@@ -13,9 +13,9 @@
       <% end %>
       </ul>
     <% end %>
-    <div class="show_all_artificts">
-      <a href="#" class="btn" id="show_all_artifacts_link"><%= t "#buttons.show_all_artifacts", "Show All Artifacts" %></a>
-    </div>
+  </div>
+  <div class="show_all_artificts">
+    <a href="#" class="btn button-sidebar-wide" id="show_all_artifacts_link"><%= t "#buttons.show_all_artifacts", "Show All Artifacts" %></a>
   </div>
 <% end %>
 
