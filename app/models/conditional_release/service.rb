@@ -17,6 +17,8 @@
 #
 
 module ConditionalRelease
+  class ServiceError < StandardError; end
+
   class Service
     private_class_method :new
 
@@ -83,8 +85,7 @@ module ConditionalRelease
 
     def self.rules_for(context, student, content_tags, session)
       return unless enabled_in_context?(context)
-      data = rules_data(context, student, Array.wrap(content_tags), session)
-      data[:rules]
+      rules_data(context, student, Array.wrap(content_tags), session)
     end
 
     def self.clear_active_rules_cache(course)
@@ -204,6 +205,9 @@ module ConditionalRelease
       Rails.cache.fetch(active_rules_cache_key(course)) do
         headers = headers_for(course, current_user, domain_for(course), session)
         request = CanvasHttp.get(rules_url, headers)
+        unless request && request.code == '200'
+          raise ServiceError, "error fetching active rules #{request}"
+        end
         rules = JSON.parse(request.body)
 
         trigger_ids = rules.map { |rule| rule['trigger_assignment'] }
@@ -221,6 +225,9 @@ module ConditionalRelease
 
         rules
       end
+    rescue => e
+      Canvas::Errors.capture(e, course_id: course.global_id, user_id: current_user.global_id)
+      []
     end
 
     class << self
@@ -280,7 +287,7 @@ module ConditionalRelease
       end
 
       def rules_data(context, student, content_tags = [], session = {})
-        return {rules: []} if context.blank? || student.blank?
+        return [] if context.blank? || student.blank?
         cached = rules_cache(context, student)
         assignments = assignments_for(cached[:rules]) if cached
         cache_expired = newer_than_cache?(content_tags.select(&:content), cached) ||
@@ -293,7 +300,10 @@ module ConditionalRelease
           {rules: req, updated_at: Time.zone.now}
         end
         rules_data[:rules] = merge_assignment_data(rules_data[:rules], assignments)
-        rules_data
+        rules_data[:rules]
+      rescue ConditionalRelease::ServiceError => e
+        Canvas::Errors.capture(e, course_id: context.global_id, user_id: student.global_id)
+        []
       end
 
       def rules_cache(context, student, force: false, &block)
@@ -311,11 +321,12 @@ module ConditionalRelease
         if req && req.code == '200'
           JSON.parse(req.body)
         else
-          message = "An error occurred when attempting to fetch rules for ConditionalRelease::Service"
-          Rails.logger.warn(message)
-          Rails.logger.warn(req)
-          {error: message}
+          message = "error fetching applied rules #{req}"
+          raise ServiceError, message
         end
+      rescue => e
+        raise if e.is_a? ServiceError
+        raise ServiceError, e.inspect
       end
 
       def assignments_for(response)
@@ -363,7 +374,7 @@ module ConditionalRelease
       end
 
       def rules_cache_key(context, student)
-        ['conditional_release_rules', context.global_id, student.global_id].cache_key
+        ['conditional_release_rules:1', context.global_id, student.global_id].cache_key
       end
 
       def submissions_cache_key(student)

@@ -299,7 +299,34 @@ describe ConditionalRelease::Service do
     end
   end
 
-  describe 'with active_rules' do
+  describe 'active_rules' do
+    before do
+      enable_service
+    end
+
+    it 'caches a successful http response' do
+      enable_cache do
+        course_with_teacher
+        CanvasHttp.expects(:get).once.returns(stub({ code: '200', body: [].to_json }))
+        Canvas::Errors.expects(:capture).never
+        Service.active_rules @course, @user, nil
+        rules = Service.active_rules @course, @user, nil
+        expect(rules).to eq []
+      end
+    end
+
+    it 'does not cache an error http response' do
+      course_with_teacher
+      enable_cache do
+        CanvasHttp.expects(:get).twice.returns(stub({ code: '500' }))
+        Canvas::Errors.expects(:capture).twice.with(instance_of(ConditionalRelease::ServiceError), anything)
+        Service.active_rules @course, @user, nil
+        Service.active_rules @course, @user, nil
+      end
+    end
+  end
+
+  context 'with active_rules' do
     before(:each) do
       Service.stubs(:enabled_in_context?).returns(true)
       Service.stubs(:jwt_for).returns(:jwt)
@@ -329,7 +356,7 @@ describe ConditionalRelease::Service do
     context 'assignment data' do
       before(:each) do
         Service.stubs(:enabled_in_context?).returns(true)
-        CanvasHttp.expects(:get).once.returns stub({ body: default_rules.to_json })
+        CanvasHttp.expects(:get).once.returns stub({ code: '200', body: default_rules.to_json })
       end
 
       let(:rules) do
@@ -360,9 +387,9 @@ describe ConditionalRelease::Service do
         Rails.cache.write ['conditional_release', 'active_rules', @course.global_id].cache_key, rules
       end
 
-      it 'caches the response of any http call' do
+      it 'caches the result of a successful http call' do
         enable_cache do
-          CanvasHttp.expects(:get).once.returns stub({ body: default_rules.to_json })
+          CanvasHttp.expects(:get).once.returns stub({ code: '200', body: default_rules.to_json })
           Service.rule_triggered_by(@a1, @teacher, nil)
         end
       end
@@ -385,13 +412,13 @@ describe ConditionalRelease::Service do
       end
 
       it 'returns nil without making request if no assignment is provided' do
-        CanvasHttp.stubs(:get).raises 'should not generate request'
+        CanvasHttp.expects(:get).never
         Service.rule_triggered_by(nil, @teacher, nil)
       end
 
       it 'returns nil without making request if service is not enabled' do
         Service.stubs(:enabled_in_context?).returns(false)
-        CanvasHttp.stubs(:get).raises 'should not generate request'
+        CanvasHttp.expects(:get).never
         Service.rule_triggered_by(@a1, @teacher, nil)
       end
     end
@@ -432,10 +459,10 @@ describe ConditionalRelease::Service do
     end
 
     def expect_cyoe_request(code, assignments = nil)
-      assignments = Array.wrap(assignments)
       response = stub() do
         expects(:code).returns(code)
         unless assignments.nil?
+          assignments = Array.wrap(assignments)
           assignments_json = assignments.map do |a|
             { id: a.id, assignment_id: a.id }
           end
@@ -455,6 +482,20 @@ describe ConditionalRelease::Service do
       expect(rules.length > 0)
       assignment = rules[0][:assignment_sets][0][:assignments][0]
       expect(assignment[:model]).to eq @a
+    end
+
+    it 'handles an http error with logging and defaults' do
+      expect_cyoe_request '404'
+      Canvas::Errors.expects(:capture).with(instance_of(ConditionalRelease::ServiceError), anything)
+      rules = Service.rules_for(@course, @student, [], nil)
+      expect(rules).to eq []
+    end
+
+    it 'handles a network exception with logging and defaults' do
+      CanvasHttp.expects(:post).throws('something terrible')
+      Canvas::Errors.expects(:capture).with(instance_of(ConditionalRelease::ServiceError), anything)
+      rules = Service.rules_for(@course, @student, [], nil)
+      expect(rules).to eq []
     end
 
     context 'caching' do
@@ -487,6 +528,16 @@ describe ConditionalRelease::Service do
           @a.save!
 
           expect_cyoe_request '200', @a
+          Service.rules_for(@course, @student, [], nil)
+        end
+      end
+
+      it 'does not store an error response in the cache' do
+        enable_cache do
+          expect_cyoe_request '404'
+          Service.rules_for(@course, @student, [], nil)
+
+          expect_cyoe_request '404'
           Service.rules_for(@course, @student, [], nil)
         end
       end
