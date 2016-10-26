@@ -21,6 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Canvas::LiveEvents do
   # The only methods tested in here are ones that have any sort of logic happening.
 
+  def expect_event(event_name, event_body, event_context = nil)
+    LiveEvents.expects(:post_event).with(event_name, event_body, anything, event_context)
+  end
+
   describe ".wiki_page_updated" do
     before(:each) do
       course_with_teacher
@@ -32,7 +36,7 @@ describe Canvas::LiveEvents do
     end
 
     it "should not set old_title or old_body if they don't change" do
-      LiveEvents.expects(:post_event).with('wiki_page_updated', {
+      expect_event('wiki_page_updated', {
         wiki_page_id: @page.global_id.to_s,
         title: "old title",
         body: "old body"
@@ -44,7 +48,7 @@ describe Canvas::LiveEvents do
     it "should set old_title if the title changed" do
       @page.title = "new title"
 
-      LiveEvents.expects(:post_event).with('wiki_page_updated', {
+      expect_event('wiki_page_updated', {
         wiki_page_id: @page.global_id.to_s,
         title: "new title",
         old_title: "old title",
@@ -57,7 +61,7 @@ describe Canvas::LiveEvents do
     it "should set old_body if the body changed" do
       @page.body = "new body"
 
-      LiveEvents.expects(:post_event).with('wiki_page_updated', {
+      expect_event('wiki_page_updated', {
         wiki_page_id: @page.global_id.to_s,
         title: "old title",
         body: "new body",
@@ -69,10 +73,19 @@ describe Canvas::LiveEvents do
   end
 
   describe ".grade_changed" do
+    let(:course_context) do
+      has_entries(
+        root_account_id: @course.root_account.global_id,
+        root_account_lti_guid: @course.root_account.lti_guid,
+        context_id: @course.global_id,
+        context_type: 'Course'
+      )
+    end
+
     it "should set the grader to nil for an autograded quiz" do
       quiz_with_graded_submission([])
 
-      LiveEvents.expects(:post_event).with('grade_change', {
+      expect_event('grade_change', {
         submission_id: @quiz_submission.submission.global_id.to_s,
         assignment_id: @quiz_submission.submission.global_assignment_id.to_s,
         grade: @quiz_submission.submission.grade,
@@ -84,7 +97,7 @@ describe Canvas::LiveEvents do
         grader_id: nil,
         student_id: @quiz_submission.user.global_id.to_s,
         user_id: @quiz_submission.user.global_id.to_s
-      })
+      }, course_context)
 
       Canvas::LiveEvents.grade_changed(@quiz_submission.submission, @quiz_submission.submission.versions.current.model)
     end
@@ -93,7 +106,7 @@ describe Canvas::LiveEvents do
       course_with_student_submissions
       submission = @course.assignments.first.submissions.first
 
-      LiveEvents.expects(:post_event).with('grade_change', {
+      expect_event('grade_change', {
         submission_id: submission.global_id.to_s,
         assignment_id: submission.global_assignment_id.to_s,
         grade: '10',
@@ -105,7 +118,7 @@ describe Canvas::LiveEvents do
         grader_id: @teacher.global_id.to_s,
         student_id: @student.global_id.to_s,
         user_id: @student.global_id.to_s
-      })
+      }, course_context)
 
       submission.grader = @teacher
       submission.grade = '10'
@@ -117,11 +130,11 @@ describe Canvas::LiveEvents do
       course_with_student_submissions
       submission = @course.assignments.first.submissions.first
 
-      LiveEvents.expects(:post_event).with('grade_change',
+      expect_event('grade_change',
         has_entries(
           assignment_id: submission.global_assignment_id.to_s,
           user_id: @student.global_id.to_s
-        ))
+        ), course_context)
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
 
@@ -130,11 +143,11 @@ describe Canvas::LiveEvents do
       submission = @course.assignments.first.submissions.first
 
       submission.score = 9000
-      LiveEvents.expects(:post_event).with('grade_change',
+      expect_event('grade_change',
         has_entries(
           score: 9000,
           old_score: 5
-        ))
+        ), course_context)
       Canvas::LiveEvents.grade_changed(submission, submission.versions.current.model)
     end
 
@@ -147,12 +160,36 @@ describe Canvas::LiveEvents do
 
       submission.assignment.points_possible = 99
 
-      LiveEvents.expects(:post_event).with('grade_change',
+      expect_event('grade_change',
         has_entries(
           points_possible: 99,
           old_points_possible: 5
-        ))
+        ), course_context)
       Canvas::LiveEvents.grade_changed(submission, submission, assignment.versions.current.model)
+    end
+
+    it "includes course context even when global course context unset" do
+      LiveEvents.expects(:get_context).returns({
+        root_account_id: nil,
+        root_account_lti_guid: nil,
+        context_id: nil,
+        context_type: nil,
+        foo: 'bar'
+      })
+      course_with_student_submissions
+      submission = @course.assignments.first.submissions.first
+
+      expect_event('grade_change', anything, course_context)
+      Canvas::LiveEvents.grade_changed(submission)
+    end
+
+    it "includes existing context when global course context overridden" do
+      LiveEvents.expects(:get_context).returns({ foo: 'bar' })
+      course_with_student_submissions
+      submission = @course.assignments.first.submissions.first
+
+      expect_event('grade_change', anything, has_entries({ foo: 'bar' }))
+      Canvas::LiveEvents.grade_changed(submission)
     end
   end
 
@@ -161,7 +198,7 @@ describe Canvas::LiveEvents do
       course_with_student_submissions
       submission = @course.assignments.first.submissions.first
 
-      LiveEvents.expects(:post_event).with('submission_updated',
+      expect_event('submission_updated',
         has_entries(
           user_id: @student.global_id.to_s,
           assignment_id: submission.global_assignment_id.to_s
@@ -174,7 +211,7 @@ describe Canvas::LiveEvents do
     it "should trigger a live event without an asset subtype" do
       course
 
-      LiveEvents.expects(:post_event).with('asset_accessed', {
+      expect_event('asset_accessed', {
         asset_type: 'course',
         asset_id: @course.global_id.to_s,
         asset_subtype: nil,
@@ -189,7 +226,7 @@ describe Canvas::LiveEvents do
     it "should trigger a live event with an asset subtype" do
       course
 
-      LiveEvents.expects(:post_event).with('asset_accessed', {
+      expect_event('asset_accessed', {
         asset_type: 'course',
         asset_id: @course.global_id.to_s,
         asset_subtype: 'assignments',
@@ -207,7 +244,7 @@ describe Canvas::LiveEvents do
       course_with_student_submissions
       assignment = @course.assignments.first
 
-      LiveEvents.expects(:post_event).with('assignment_updated',
+      expect_event('assignment_updated',
         has_entries({
           assignment_id: assignment.global_id.to_s,
           context_id: @course.global_id.to_s,
