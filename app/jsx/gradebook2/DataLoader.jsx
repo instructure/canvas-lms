@@ -1,19 +1,7 @@
 define(['jquery', 'jsx/shared/CheatDepaginator', 'underscore'], ($, cheaterDepaginate, _) => {
   // loaders
   const getAssignmentGroups = (url, params) => {
-    return cheaterDepaginate(url, params).then(function(assignmentGroups) {
-      $.each(assignmentGroups, function(_assignmentGroupIdx, assignmentGroup) {
-        if (assignmentGroup.assignments) {
-          $.each(assignmentGroup.assignments, function(_assignmentIdx, assignment) {
-            const assignmentOverrideUrl = `/api/v1/courses/${assignment.course_id}/assignments/${assignment.id}/overrides`;
-
-            $.ajaxJSON(assignmentOverrideUrl, 'GET', {}, function(overrideData) {
-              assignment.overrides = overrideData;
-            });
-          });
-        }
-      });
-    });
+    return cheaterDepaginate(url, params);
   };
   const getCustomColumns = (url) => {
     return $.ajaxJSON(url, "GET", {});
