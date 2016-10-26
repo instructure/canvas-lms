@@ -5,9 +5,8 @@ define [
   'react'
   'react-dom'
   'jsx/files/BreadcrumbCollapsedContainer'
-  'compiled/react/shared/utils/withReactElement'
   '../modules/customPropTypes'
-], (I18n, $, _, React, ReactDOM, BreadcrumbCollapsedContainerComponent, withReactElement, customPropTypes) ->
+], (I18n, $, _, React, ReactDOM, BreadcrumbCollapsedContainerComponent, customPropTypes) ->
 
   MAX_CRUMB_WIDTH = 500
   MIN_CRUMB_WIDTH = 80
