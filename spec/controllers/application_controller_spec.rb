@@ -704,10 +704,27 @@ describe ApplicationController do
       user
       controller.instance_variable_set(:@context, @user)
 
-      group_scope = stub('current_groups')
-      group_scope.expects(:none).returns(Group.none)
-      @user.stubs(:current_groups).returns(group_scope)
+      @user.expects(:current_groups).never
       controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: 'Course_1')
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should not asplode with cross-shard groups" do
+        user(:active_all => true)
+        controller.instance_variable_set(:@context, @user)
+
+        @shard1.activate do
+          account = Account.create!
+          teacher_in_course(:user => @user, :active_all => true, :account => account)
+          @other_group = group_model(:context => @course)
+          group_model(:context => @course)
+          @group.add_user(@user)
+        end
+        controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: "group_#{@other_group.id},group_#{@group.id}")
+        expect(controller.instance_variable_get(:@contexts).select{|c| c.is_a?(Group)}).to eq [@group]
+      end
     end
   end
 

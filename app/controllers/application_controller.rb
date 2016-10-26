@@ -662,7 +662,8 @@ class ApplicationController < ActionController::Base
       # the grants_right? check to avoid querying for the various memberships
       # again.
       enrollment_scope = Enrollment.for_user(@context).active_by_date
-      group_scope = opts[:include_groups] ? @context.current_groups : nil
+      include_groups = !!opts[:include_groups]
+      group_ids = nil
 
       courses = []
       if only_contexts.present?
@@ -673,20 +674,26 @@ class ApplicationController < ActionController::Base
         unless course_ids.empty?
           courses = Course.where(:id => course_ids).where(:id => enrollment_scope.select(:course_id)).to_a
         end
-        if group_scope
+        if include_groups
           group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-          if group_ids.empty?
-            group_scope = group_scope.none
-          else
-            group_scope = group_scope.where(:id => group_ids)
-          end
+          include_groups = false if group_ids.empty?
         end
       else
-        courses = Course.shard(@context).where(:id => enrollment_scope.select(:course_id)).to_a
-        enrollment_scope = Enrollment.for_user(@context).active_by_date
+        courses = Course.shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).
+          where(:id => enrollment_scope.select(:course_id)).to_a
       end
 
-      groups = group_scope ? group_scope.shard(@context).to_a.reject{|g| g.context_type == "Course" && g.context.concluded?} : []
+      groups = []
+      if include_groups
+        if group_ids
+          Shard.partition_by_shard(group_ids) do |shard_group_ids|
+            groups += @context.current_groups.shard(Shard.current).where(:id => shard_group_ids).to_a
+          end
+        else
+          groups = @context.current_groups.shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).to_a
+        end
+      end
+      groups.reject!{|g| g.context_type == "Course" && g.context.concluded?}
 
       if opts[:favorites_first]
         favorite_course_ids = @context.favorite_context_ids("Course")
