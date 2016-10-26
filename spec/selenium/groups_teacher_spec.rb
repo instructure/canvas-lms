@@ -124,7 +124,7 @@ describe "new groups" do
       expect(f('.span3.ellipsis.group-leader')).to be_displayed
       expect(f('.span3.ellipsis.group-leader')).to include_text(@students.first.name)
 
-      check_element_has_focus f(".group-user-actions[data-user-id='#{@students.first.id}']")
+      check_element_has_focus f(".group-user-actions[data-user-id='user_#{@students.first.id}']")
     end
 
     it "should allow a teacher to set up a group set with member limits", priority: "1", test_id: 94160 do
@@ -182,7 +182,7 @@ describe "new groups" do
       ff(".group-user-actions")[0].click
       fln("Set as Leader").click
       wait_for_ajaximations
-      f(".group-user-actions[data-user-id=\"#{@students[0].id}\"]").click
+      f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
       wait_for_ajaximations
       f(".ui-menu-item .edit-group-assignment").click
       wait_for_ajaximations
@@ -220,7 +220,7 @@ describe "new groups" do
       f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
       wait_for_ajaximations
 
-      f(".group-user-actions[data-user-id=\"#{@students[0].id}\"]").click
+      f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
       wait_for_ajaximations
 
       f('.ui-menu-item .edit-group-assignment').click
@@ -254,7 +254,7 @@ describe "new groups" do
       f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
       wait_for_ajaximations
 
-      f(".group-user-actions[data-user-id=\"#{@students[0].id}\"]").click
+      f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
       wait_for_ajaximations
 
       f('.ui-menu-item .remove-from-group').click
@@ -278,7 +278,7 @@ describe "new groups" do
 
       expect(f(".icon-user.group-leader")).to be_displayed
 
-      f(".group-user-actions[data-user-id=\"#{@students[0].id}\"]").click
+      f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
 
       f(".ui-menu-item .edit-group-assignment").click
 
@@ -308,7 +308,7 @@ describe "new groups" do
 
       expect(f(".icon-user.group-leader")).to be_displayed
 
-      f(".group-user-actions[data-user-id=\"#{@students[1].id}\"]").click
+      f(".group-user-actions[data-user-id=\"user_#{@students[1].id}\"]").click
 
       f(".ui-menu-item .edit-group-assignment").click
       wait_for_ajaximations
@@ -341,7 +341,7 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-user")).to include_text('Test Student 1')
       expect(f('.icon-user.group-leader')).to be_displayed
 
-      f(".group-user-actions[data-user-id=\"#{@students[0].id}\"]").click
+      f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
       f('.ui-menu-item .icon-trash').click
       wait_for_ajaximations
 
