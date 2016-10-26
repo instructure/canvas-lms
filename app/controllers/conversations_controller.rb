@@ -809,8 +809,11 @@ class ConversationsController < ApplicationController
         message_ids = db_ids
 
         # sanity check: can the user see the included messages?
-        unless ConversationMessageParticipant.where(:conversation_message_id => message_ids,
-            :user_id => @current_user.id).count == message_ids.count
+        found_count = 0
+        Shard.partition_by_shard(message_ids) do |shard_message_ids|
+          found_count += ConversationMessageParticipant.where(:conversation_message_id => shard_message_ids, :user_id => @current_user).count
+        end
+        unless found_count == message_ids.count
           return render_error('included_messages', 'not a participant')
         end
       end
