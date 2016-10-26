@@ -1,0 +1,30 @@
+{
+  "name": "Canvas",
+  "short_name": "Canvas",
+  "icons": [
+    {
+      "src": "/web-app-manifest/logo.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/web-app-manifest/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "prefer_related_applications": true,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.instructure.candroid",
+      "id": "com.instructure.candroid"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://itunes.apple.com/app/canvas-by-instructure/id480883488"
+    }
+  ],
+  "start_url": "/",
+  "display": "minimal-ui"
+}

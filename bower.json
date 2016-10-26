@@ -18,7 +18,6 @@
     "ic-modal": "0.1.1",
     "ic-droppable": "~0.1.0",
     "ic-sortable": "0.0.2",
-    "jquery.smartbanner": "https://github.com/jasny/jquery.smartbanner.git#8b3810210256ea2760012e18083c43792c2a4146",
     "react": "0.14.8",
     "react-modal": "1.3.0",
     "tinymce": "4.1.9",

@@ -37,11 +37,6 @@
 
   css_bundle(:instructure_eportfolio) if @eportfolio_view === true
 
-  if request.user_agent.to_s =~ /Android/i
-    js_bundle :smartbanner
-    css_bundle :smartbanner
-  end
-
   content_for :head, include_common_stylesheets
 
 -%>
