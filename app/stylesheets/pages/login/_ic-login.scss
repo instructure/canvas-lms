@@ -113,6 +113,9 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 
 .ic-Login-header__logo {
   flex: 0 0 160px;
+  // Fix Firefox bug where flexed container doesn't
+  // constrain its contents
+  min-width: 1px;
 }
 
 .ic-Login-header__links {
