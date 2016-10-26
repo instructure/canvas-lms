@@ -697,6 +697,9 @@ describe Api do
   context ".process_incoming_html_content" do
     class T
       extend Api
+      def self.request
+        OpenStruct.new({host_with_port: 'some-host'})
+      end
     end
 
     it "should add context to files and remove verifier parameters" do
@@ -724,6 +727,11 @@ describe Api do
         <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;c=2">here</a>
         <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
       </div>}
+    end
+
+    it 'passes host to Content.process_incoming' do
+      Api::Html::Content.expects(:process_incoming).with(anything, host: 'some-host')
+      T.process_incoming_html_content('<div/>')
     end
   end
 

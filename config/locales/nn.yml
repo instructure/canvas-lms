@@ -2148,27 +2148,27 @@ nn:
         media_recordings_disabled: "Medieopptak er ikkje aktivert for dette Canvas-området"
       upload_or_choose_file: "Last opp fila, eller vel ei fil du allereie har lasta opp."
     syllabus: 
-      page_title: "Undervisingsplan for %{course}"
+      page_title: "Kursoversikt for %{course}"
     syllabus_content: 
       buttons: 
-        update_syllabus: "Oppdater undervisingsplan "
+        update_syllabus: "Oppdater kursoversikten "
       headers: 
         date: Dato
         details: Detaljar
       instructions: 
         syllabus: |-
-            Sida for undervisingsplan viser eit tabelloppsett av timeplanen for kurset og grunnlaget for
+            Sida for kursoversikt viser eit tabelloppsett av timeplanen for kurset og grunnlaget for
             karaktersetjing. Du kan legge til kommentarar, merknader eller idear du har om kursstrukturen,
             kursreglane eller andre ting.
             
             Dersom du vil legge til kommentarar, klikkar du på lenka "Rediger" øvst.
       labels: 
-        syllabus_body: "Skildring av undervisingsplan"
+        syllabus_body: "Skildring av kursoversikt"
       links: 
         edit_syllabus_description: Rediger
         jump_to_today: "Hopp til i dag"
       titles: 
-        course_syllabus: "Undervisingsplan for kurs"
+        course_syllabus: Kursoversikt
     titles: 
       add_assignment_group: "Legg til oppgåvegruppe"
       uploading: "Lastar opp innlevering"
@@ -4060,7 +4060,7 @@ nn:
     student_summary: 
       not_sorted: "Studenttabellsamandrag er ikkje sortert"
     student_view_student_name: Teststudent
-    syllabus: Undervisingsplan
+    syllabus: Kursoversikt
     wiki_permissions: 
       all: "Kven som helst"
       only_teachers: "Berre faglærarar"
@@ -4186,7 +4186,7 @@ nn:
       name: Namn
       open_enrollment: "Open påmelding"
       public_description: "Offentleg skildring"
-      public_syllabus: "Offentleg undervisingsplan"
+      public_syllabus: "Offentleg kursoversikt"
       replacement_course_id: "Erstatning av kurs-ID"
       restrict_enrollments_to_course_dates: "Avgrens påmeldingar til kursdatoar"
       root_account_id: Rotkonto-ID
@@ -4276,7 +4276,7 @@ nn:
   course_statistics: 
     unknown: ukjent
   course_storage_391e1bd: "Lagringskapasitet for kurs"
-  course_syllabus_5de1b0af: "Undervisingsplan for kurs"
+  course_syllabus_5de1b0af: Kursoversikt
   course_users: 
     greater_than_three: "Oppgi eit søkeord med tre eller fleire teikn"
     unknown_error: "Noko gjekk gale med søket. Prøv på nytt seinare."
@@ -4653,7 +4653,7 @@ nn:
           course_activity_stream: "Kurset sin aktivitetsstraum"
           custom_page: "Undersider på startsida"
           modules: Kursmodular
-          syllabus: Undervisingsplan
+          syllabus: Kursoversikt
       empty_body: "Utan innhald"
       front_page_not_set: "Startsida må fastsettast først"
       headers: 
@@ -4797,7 +4797,7 @@ nn:
     settings: Innstillingar
     site_admin: Områdeadministrator
     stats: Statistikk
-    syllabus: Undervisingsplan
+    syllabus: Kursoversikt
     users: Brukarar
     wiki_pages: Sider
   css_file_709e6a83: CSS-fil
@@ -7858,7 +7858,7 @@ nn:
         learning_outcomes: Læringsmål
         quizzes: Prøver
         rubrics: Vurderingsskjema
-        syllabus_body: "Innhald i undervisingsplanen"
+        syllabus_body: "Innhald i kursoversikten"
         wikis: Wiki-sider
     cc: 
       standard: 
@@ -14024,7 +14024,7 @@ nn:
         modules: "Klikk for å sette inn ei lenke til denne modulen"
         modules_page: "Klikk for å sette inn ei lenke til modulsida"
         quizzes: "Klikk for å sette inn ei lenke til denne prøva"
-        syllabus_page: "Klikk for å sette inn ei lenke til undervisingsplanen"
+        syllabus_page: "Klikk for å sette inn ei lenke til kursoversikten"
         users_page: "Klikk for å sette inn ei lenke til personsida"
         wiki_pages: "Klikk for å sette inn ei lenke til denne sida"
         wiki_pages_index: "Klikk for å sette inn ei lenke til wikien"
@@ -14045,7 +14045,7 @@ nn:
         modules_page: Modular
         new_page: "Lenke til ei ny side"
         quizzes: Prøveliste
-        syllabus: "Undervisingsplan for kurs"
+        syllabus: Kursoversikt
         upload_file: "Last opp ei ny fil"
         upload_image: "Last opp eit nytt bilde"
         users_page: Personar
@@ -14519,8 +14519,8 @@ nn:
   switch_to_table_view_3aae9919: "Bytt til tabellvising"
   switzerland_41_f861e414: "Sveits (+41)"
   switzerland_f4f7137c: Sveits
-  syllabus: "Undervisingsplan for kurs"
-  syllabus_f191f65b: Undervisingsplan
+  syllabus: Kursoversikt
+  syllabus_f191f65b: Kursoversikt
   system_default_language_28a1052d: "Systemstandard (%{language})"
   tab_1_3d6b3fb: "Fane 1"
   tab_1_content_8944c219: "Fane 1 innhald"
@@ -14556,7 +14556,7 @@ nn:
     profile: Profil
     quizzes: Prøver
     settings: Innstillingar
-    syllabus: Undervisingsplan
+    syllabus: Kursoversikt
     tab_location_error: "Faneplasseringa er ugyldig"
     tab_unmanagable_error: "%{css_class} kan ikkje behandlast"
   take_the_quiz_87214d7e: "Ta prøva"
@@ -15674,7 +15674,7 @@ nn:
   what_are_self_sign_up_groups_af1f002a: "Kva er sjølvregistreringsgrupper?"
   what_does_provisioning_only_mean_eac9a4a1: "Kva betyr 'Kun for klargjering'? "
   what_should_the_csv_file_look_like_985a59ac: "Korleis vil du at CSV-fila skal sjå ut?"
-  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Dette er sida folk ser når dei besøker kurset.  Du kan la sida vise aktivitetsstraum, liste over kursmodular, undervisingsplan eller ei tilpassa side du lagar sjølv.  Standard er aktivitetsstraumen i kurset."
+  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Dette er sida folk ser når dei besøker kurset.  Du kan la sida vise aktivitetsstraum, liste over kursmodular, kursoversikt eller ei tilpassa side du lagar sjølv.  Standard er aktivitetsstraumen i kurset."
   whenever_b943b119: "når som helst"
   where_would_you_like_to_move_title_fabd6e8f: "Kvar vil du flytte %{title}?"
   which_course_is_this_question_about_f819a158: "Kva kurs gjeld spørsmålet?"

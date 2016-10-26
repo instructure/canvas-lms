@@ -16792,7 +16792,7 @@ fa:
         other: "در حال نمایش <b>all&nbsp;%{count}</b> %{model}"
         zero: "%{model} یافت نشد"
     page_gap: "&hellip؛"
-    previous_label: "&#8592؛ قبلی"
+    previous_label: "&#8592 ؛ قبلی"
   wimba_conference: 
     external_urls: 
       archive: بایگانی

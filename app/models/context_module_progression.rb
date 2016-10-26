@@ -432,7 +432,8 @@ class ContextModuleProgression < ActiveRecord::Base
       User.where(:id => progressions.map(&:user_id)).touch_all
 
       progressions.each do |progression|
-        progression.send_later_if_production(:evaluate!, self)
+        progression.send_later_if_production_enqueue_args(:evaluate!,
+          {:n_strand => ["dependent_progression_reevaluation", context_module.global_context_id]}, self)
       end
     end
   end
