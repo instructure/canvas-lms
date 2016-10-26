@@ -77,7 +77,8 @@ define [
         if !@collection.urls or !@collection.urls.next
           @stopPaginationListener() if @collection.length
           return
-        if $(@paginationScrollContainer).is(':visible') and @distanceToBottom() < @distanceTillFetchNextPage
+        shouldFetchNextPage = @distanceToBottom() < @distanceTillFetchNextPage or !@collection.length
+        if $(@paginationScrollContainer).is(':visible') and shouldFetchNextPage
           @collection.fetch _.extend({page: 'next'}, @fetchOptions)
       , 0
 
