@@ -87,8 +87,9 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def validate_calculation_int
-    unless valid_calculation_int?(calculation_int, calculation_method)
-      if valid_calculation_ints.to_a.empty?
+    unless self.class.valid_calculation_int?(calculation_int, calculation_method)
+      valid_ints = self.class.valid_calculation_ints(self.calculation_method)
+      if valid_ints.to_a.empty?
         errors.add(:calculation_int, t(
           "A calculation value is not used with this calculation method"
         ))
@@ -96,22 +97,22 @@ class LearningOutcome < ActiveRecord::Base
         errors.add(:calculation_int, t(
           "'%{calculation_int}' is not a valid value for this calculation method. The value must be between '%{valid_calculation_ints_min}' and '%{valid_calculation_ints_max}'",
           :calculation_int => calculation_int,
-          :valid_calculation_ints_min => valid_calculation_ints.min,
-          :valid_calculation_ints_max => valid_calculation_ints.max
+          :valid_calculation_ints_min => valid_ints.min,
+          :valid_calculation_ints_max => valid_ints.max
         ))
       end
     end
   end
 
-  def valid_calculation_method?(method=self.calculation_method)
+  def self.valid_calculation_method?(method)
     CALCULATION_METHODS.keys.include?(method)
   end
 
-  def valid_calculation_ints(method=self.calculation_method)
+  def self.valid_calculation_ints(method)
     VALID_CALCULATION_INTS[method]
   end
 
-  def valid_calculation_int?(int, method=self.calculation_method)
+  def self.valid_calculation_int?(int, method)
     if valid_calculation_method?(method)
       valid_ints = valid_calculation_ints(method)
       (int.nil? && valid_ints.to_a.empty?) || valid_ints.include?(int)

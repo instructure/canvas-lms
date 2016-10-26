@@ -31,13 +31,15 @@ class OutcomesImportApiController < ApplicationController
 
   def create
     return render json: { error: "must specify a guid to import" } unless params[:guid]
-    return unless valid_guid(params[:guid])
-
     begin
+      err_msg = "Invalid parameters"
+      options = valid_options(params)
+      valid_guid(params[:guid])
+
       err_msg = "Import failed to queue"
 
       # AcademicBenchmark.queue_migration_for_guid can raise Canvas::Migration::Error
-      migration = AcademicBenchmark.import(Array(params[:guid])).first
+      migration = AcademicBenchmark.import(Array(params[:guid]), options).first
 
       if migration
         render json: { migration_id: migration.id, guid: params[:guid] }
@@ -92,10 +94,54 @@ class OutcomesImportApiController < ApplicationController
   ##
   def valid_guid(guid)
     unless guid =~ /[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}/i
-      render json: { error: "GUID is invalid" }
-      return false
+      raise "GUID is invalid: #{guid}"
     end
-    true
+  end
+
+  def parse_int(value)
+    Integer value
+  rescue
+    raise "invalid value, must be integer: #{value}"
+  end
+
+  def valid_options(hash)
+    options = {}
+    if hash.key? :calculation_method
+      options[:calculation_method] = parse_calculation_method hash[:calculation_method]
+      options[:calculation_int] = parse_calculation_int options[:calculation_method], hash[:calculation_int]
+    end
+    options[:mastery_points] = parse_int hash[:mastery_points] if hash.key? :mastery_points
+    options[:points_possible] = parse_int hash[:points_possible] if hash.key? :points_possible
+    unless hash[:ratings].nil?
+      raise "ratings expected to be an array" unless hash[:ratings].is_a?(Array)
+      options[:ratings] = hash[:ratings].map {|r| parse_rating(r)}
+    end
+    options
+  end
+
+  def parse_calculation_method(value)
+    unless LearningOutcome.valid_calculation_method?(value)
+      raise "invalid calculation_method: #{value}"
+    end
+    value
+  end
+
+  def parse_calculation_int(calc_method, value)
+    int = value.nil? ? nil : parse_int(value)
+    unless LearningOutcome.valid_calculation_int?(int, calc_method)
+      raise "invalid calculation_int: #{value}"
+    end
+    int
+  end
+
+  def parse_rating(rating)
+    if rating.nil? || !rating.is_a?(Hash)
+      raise "invalid ratings value: #{rating}"
+    end
+    if rating[:description].nil? || !rating[:description].is_a?(String)
+      raise "invalid description value: #{rating[:description]}"
+    end
+    { :description => rating[:description], :points => parse_int(rating[:points]) }
   end
 
   ##

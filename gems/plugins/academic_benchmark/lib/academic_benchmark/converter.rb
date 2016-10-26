@@ -5,6 +5,7 @@ module AcademicBenchmark
 
     def initialize(settings={})
       super(settings, "academic_benchmark")
+      @ratings_overrides = settings[:migration_options] || {}
 
       ab_settings = AcademicBenchmark.config
 
@@ -126,7 +127,7 @@ module AcademicBenchmark
 
     def process_json_data(data)
       if data = find_by_prop(data, "type", "authority")
-        outcomes = Standard.new(data).build_outcomes
+        outcomes = Standard.new(data).build_outcomes(@ratings_overrides)
         @course[:learning_outcomes] << outcomes
       else
         err_msg = I18n.t("Couldn't find an authority to update")
