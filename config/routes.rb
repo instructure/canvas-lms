@@ -1655,6 +1655,11 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/turnitin/expired", action: :expired
     end
 
+    scope(controller: 'support_helpers/crocodoc') do
+      get "support_helpers/crocodoc/shard", action: :shard
+      get "support_helpers/crocodoc/submission", action: :submission
+    end
+
     scope(controller: :outcome_groups_api) do
       %w(global account course).each do |context|
         prefix = (context == "global" ? context : "#{context}s/:#{context}_id")

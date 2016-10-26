@@ -53,7 +53,8 @@ describe SupportHelpers::TurnitinController do
 
       it "should create a new ShardFixer with after_time" do
         fixer = SupportHelpers::Tii::ShardFixer.new(@user.email, '2016-05-01')
-        SupportHelpers::Tii::ShardFixer.expects(:new).with(@user.email, '2016-05-01').returns(fixer)
+        SupportHelpers::Tii::ShardFixer.expects(:new).
+          with(@user.email, Time.zone.parse('2016-05-01')).returns(fixer)
         fixer.expects(:monitor_and_fix)
         get :shard, after_time: '2016-05-01'
         expect(response.body).to eq("Enqueued TurnItIn ShardFixer ##{fixer.job_id}...")
