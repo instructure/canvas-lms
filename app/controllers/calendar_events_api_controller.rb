@@ -1243,7 +1243,8 @@ class CalendarEventsApiController < ApplicationController
   def require_authorization
     @errors = {}
     user = @observee || @current_user
-    codes = (params[:context_codes] || [user.asset_string])[0, 10]
+    context_limit = @domain_root_account.settings[:calendar_contexts_limit] || 10
+    codes = (params[:context_codes] || [user.asset_string])[0, context_limit]
     get_options(codes, user)
 
     # if specific context codes were requested, ensure the user can access them
