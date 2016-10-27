@@ -92,6 +92,15 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
+  it "should have context_external_tools" do
+    setup_assignment_with_homework
+
+    tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+    @assignment.tool_settings_tools << tool
+    @assignment.save
+    expect(@assignment.tool_settings_tools).to include(tool)
+  end
+
   describe "#has_student_submissions?" do
     before :once do
       setup_assignment_with_students
