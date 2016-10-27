@@ -1,12 +1,13 @@
 define [
   'react'
+  'react-dom'
   'underscore'
   'jsx/gradebook/grid/components/column_types/teacherNote'
   'react-modal'
   'helpers/fakeENV'
   'jsx/gradebook/grid/constants'
   'compiled/gradebook2/GradebookHelpers'
-], (React, _, TeacherNote, Modal, fakeENV, GradebookConstants,
+], (React, ReactDOM, _, TeacherNote, Modal, fakeENV, GradebookConstants,
   GradebookHelpers) ->
 
   TestUtils = React.addons.TestUtils
@@ -21,7 +22,7 @@ define [
       columnId: '1'
 
     componentFactory = React.createFactory(TeacherNote)
-    React.render(componentFactory(props), wrapper)
+    ReactDOM.render(componentFactory(props), wrapper)
 
   module 'ReactGradebook.teacherNoteComponent',
     setup: ->
@@ -32,7 +33,7 @@ define [
       GradebookConstants.refresh()
       Modal.setAppElement(wrapper)
     teardown: ->
-      React.unmountComponentAtNode(wrapper)
+      ReactDOM.unmountComponentAtNode(wrapper)
       fakeENV.teardown()
 
   test 'mounts', ->

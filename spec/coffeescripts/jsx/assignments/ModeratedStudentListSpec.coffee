@@ -60,7 +60,7 @@ define [
     equal moderatedColumns[0].getDOMNode().querySelectorAll('span')[1].textContent, '4', 'displays the grade in the first column'
     equal moderatedColumns[1].getDOMNode().querySelectorAll('span')[1].textContent, 'SpeedGrader™', 'displays speedgrader link in the second'
     equal columns[0].getDOMNode().querySelectorAll('span')[1].textContent, '-', 'third column is a dash'
-    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   test 'show a dash in in the first column when not in the moderation set', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
@@ -75,7 +75,7 @@ define [
     )
     columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
     equal columns[0].getDOMNode().querySelectorAll('span')[1].textContent, '-', 'shows a dash for non moderation set students'
-    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   test 'only shows one column when includeModerationSetHeaders is false', ->
     studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
@@ -91,7 +91,7 @@ define [
     moderatedColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
     equal columns.length, 1, 'only show one column'
     equal moderatedColumns.length, 0, 'no moderated columns shown'
-    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   test 'shows the grade column when there is a selected_provisional_grade_id', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
@@ -108,7 +108,7 @@ define [
 
     gradeColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList_Grade')
     equal gradeColumns[0].props.children[1].props.children, 4
-    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   test 'properly renders final grade if there are no provisional grades', ->
     newFakeStudentList = _.extend({}, fakeUngradedStudentList)
@@ -124,7 +124,7 @@ define [
 
     gradeColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList_Grade')
     equal gradeColumns[0].getDOMNode().querySelectorAll('span')[1].textContent, '-', 'grade column is a dash'
-    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   test 'does not show radio button if there is only one provisional grade', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
@@ -141,7 +141,7 @@ define [
     inputs = TestUtils.scryRenderedDOMComponentsWithTag(studentList, 'input')
     radioInputs = inputs.filter((input) -> input.getDOMNode().type == 'radio')
     equal radioInputs.length, 0, 'does not render any radio buttons'
-    React.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
 
   test 'shows radio button if there is more than 1 provisional grade', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
@@ -168,7 +168,7 @@ define [
     inputs = TestUtils.scryRenderedDOMComponentsWithTag(studentList, 'input')
     radioInputs = inputs.filter((input) -> input.getDOMNode().type == 'radio')
     equal radioInputs.length, 2, 'renders two radio buttons'
-    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   module 'Persist provisional grades'
 
@@ -197,4 +197,4 @@ define [
     radio = TestUtils.scryRenderedDOMComponentsWithTag(studentList, 'input').filter((domComponent) -> domComponent.type == 'radio')
     TestUtils.Simulate.change(radio[0])
     ok callback.called, 'called selectProvisionalGrade'
-    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(studentList.getDOMNode().parentNode)

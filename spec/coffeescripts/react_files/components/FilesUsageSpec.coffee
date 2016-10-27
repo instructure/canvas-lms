@@ -1,8 +1,9 @@
 define [
   'react'
+  'react-dom'
   'jquery'
   'jsx/files/FilesUsage'
-], (React, $, FilesUsage) ->
+], (React, ReactDOM, $, FilesUsage) ->
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
 
@@ -13,7 +14,7 @@ define [
 
       test()
 
-      React.unmountComponentAtNode(@filesUsage.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@filesUsage.getDOMNode().parentNode)
 
       @server.restore()
 

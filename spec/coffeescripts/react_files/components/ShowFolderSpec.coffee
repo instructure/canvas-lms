@@ -2,18 +2,19 @@ define [
   '../mockFilesENV'
   'underscore'
   'react'
+  'react-dom'
   'jsx/files/ShowFolder'
   'compiled/models/Folder'
   'compiled/react_files/components/FolderChild'
-], (mockFilesENV, _, React, ShowFolder, Folder, FolderChild) ->
+], (mockFilesENV, _, React, ReactDOM, ShowFolder, Folder, FolderChild) ->
 
   # module 'ShowFolder',
   #   setup: ->
   #     @$container = $('<div>').appendTo($("#fixtures"))
-  #     @renderedRoutes = React.render(routes, @$container[0])
+  #     @renderedRoutes = ReactDOM.render(routes, @$container[0])
 
   #   teardown: ->
-  #     React.unmountComponentAtNode(@$container[0])
+  #     ReactDOM.unmountComponentAtNode(@$container[0])
   #     $("#fixtures").empty()
 
 

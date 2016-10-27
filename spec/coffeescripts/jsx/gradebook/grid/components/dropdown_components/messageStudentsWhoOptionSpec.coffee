@@ -1,9 +1,11 @@
 define [
+  'react'
+  'react-dom'
   'underscore'
   'jsx/gradebook/grid/components/dropdown_components/messageStudentsWhoOption'
   'jsx/gradebook/grid/helpers/messageStudentsWhoHelper'
   'timezone'
-], (_, MessageStudentsWhoOption, MessageStudentsWhoHelper, tz) ->
+], (React, ReactDOM, _, MessageStudentsWhoOption, MessageStudentsWhoHelper, tz) ->
 
   wrapper = document.getElementById('fixtures')
 
@@ -25,13 +27,13 @@ define [
       submissions: {}
     props = _.defaults(opts, defaultProps)
     componentFactory = React.createFactory(MessageStudentsWhoOption)
-    React.render(componentFactory(props), wrapper)
+    ReactDOM.render(componentFactory(props), wrapper)
 
   module 'MessageStudentsWhoOption',
     setup: ->
       @component = renderComponent()
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'mounts on build', ->
     ok renderComponent().isMounted()
@@ -48,7 +50,7 @@ define [
 
   module 'MessageStudentsWhoOption#combineStudentsWithScores',
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'returns students with their scores for an assignment', ->
     submissions = {

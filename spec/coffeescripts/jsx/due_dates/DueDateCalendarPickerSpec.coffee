@@ -27,7 +27,7 @@ define [
 
       @mountPoint = $('<div>').appendTo('body')[0]
       DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, @props)
-      @dueDateCalendarPicker = React.render(DueDateCalendarPickerElement, @mountPoint)
+      @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, @mountPoint)
 
     teardown: ->
       fakeENV.teardown()
@@ -95,11 +95,11 @@ define [
         labelledBy: "foo"
 
       DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, props)
-      @dueDateCalendarPicker = React.render(DueDateCalendarPickerElement, $('<div>').appendTo('body')[0])
+      @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()
-      React.unmountComponentAtNode(@dueDateCalendarPicker.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@dueDateCalendarPicker.getDOMNode().parentNode)
       @clock.restore()
 
   test 'recieved proper class depending on dateType', ->

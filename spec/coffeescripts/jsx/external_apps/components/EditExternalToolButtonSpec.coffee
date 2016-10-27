@@ -1,7 +1,8 @@
 define [
   'react'
+  'react-dom'
   'jsx/external_apps/components/EditExternalToolButton'
-], (React, EditExternalToolButton) ->
+], (React, ReactDOM, EditExternalToolButton) ->
 
   wrapper = document.getElementById('fixtures')
   prevEnvironment = ENV
@@ -10,14 +11,14 @@ define [
     React.createElement(EditExternalToolButton, data)
 
   renderComponent = (data = {}) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   module 'ExternalApps.EditExternalToolButton',
     setup: ->
       ENV.APP_CENTER = {'enabled': true}
 
     teardown: ->
-      React.unmountComponentAtNode(wrapper)
+      ReactDOM.unmountComponentAtNode(wrapper)
       ENV = prevEnvironment
 
   test 'allows editing of tools', ->

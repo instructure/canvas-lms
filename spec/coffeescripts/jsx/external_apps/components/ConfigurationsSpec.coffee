@@ -1,21 +1,21 @@
 define [
   'react'
+  'react-dom'
   'jsx/external_apps/components/Configurations'
-], (React, Configurations) ->
+], (React, ReactDOM,Configurations) ->
 
   TestUtils = React.addons.TestUtils
   wrapper = document.getElementById('fixtures')
-  prevEnvironment = ENV
 
   createElement = (data = {}) ->
     React.createElement(Configurations, data)
 
   renderComponent = (data = {}) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   module 'ExternalApps.Configurations',
     teardown: ->
-      React.unmountComponentAtNode(wrapper)
+      ReactDOM.unmountComponentAtNode(wrapper)
 
   test 'renders', ->
     component = renderComponent({

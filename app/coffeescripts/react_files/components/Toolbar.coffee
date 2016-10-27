@@ -69,7 +69,7 @@ define [
           $(this).remove()
 
       # This should technically be in JSX land, but ¯\_(ツ)_/¯
-      React.render(React.createElement(RestrictedDialogForm, {
+      ReactDOM.render(React.createElement(RestrictedDialogForm, {
         models: @props.selectedItems
         usageRightsRequiredForContext: @props.usageRightsRequiredForContext
         closeDialog: -> $dialog.dialog('close')

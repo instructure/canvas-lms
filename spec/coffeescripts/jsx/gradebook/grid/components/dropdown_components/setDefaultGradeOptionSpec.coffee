@@ -1,8 +1,9 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/dropdown_components/setDefaultGradeOption',
   'compiled/gradebook2/SetDefaultGradeDialog'
-], (React, SetDefaultGradeOption, SetDefaultGradeDialog) ->
+], (React, ReactDOM, SetDefaultGradeOption, SetDefaultGradeDialog) ->
 
   wrapper = document.getElementById('fixtures')
 
@@ -18,7 +19,7 @@ define [
   renderComponent = ->
     props = defaultProps()
     componentFactory = React.createFactory(SetDefaultGradeOption)
-    React.render(componentFactory(props), wrapper)
+    ReactDOM.render(componentFactory(props), wrapper)
 
   module 'SetDefaultGradeOption',
     setup: ->
@@ -28,7 +29,7 @@ define [
       $("#set_default_grade_form").remove()
       $("noscript:empty").remove()
       $("div:empty:not([id])").remove()
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'mounts on build', ->
     ok renderComponent().isMounted()

@@ -1,9 +1,10 @@
 require [
   'jquery'
   'react'
+  'react-dom'
   'jsx/assignments/ModerationApp'
   'jsx/assignments/store/configureStore'
-], ($, React, ModerationApp, configureStore) ->
+], ($, React, ReactDOM, ModerationApp, configureStore) ->
 
   ModerationAppFactory = React.createFactory ModerationApp
 
@@ -32,4 +33,4 @@ require [
     urls: window.ENV.URLS,
   })
 
-  React.render(ModerationAppFactory(store: store), $('#assignment_moderation')[0])
+  ReactDOM.render(ModerationAppFactory(store: store), $('#assignment_moderation')[0])

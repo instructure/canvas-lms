@@ -1,16 +1,17 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/column_types/assignmentPercentage'
   'jquery'
   'jquery.ajaxJSON'
-], (React, AssignmentPercentage, $) ->
+], (React, ReactDOM, AssignmentPercentage, $) ->
 
   TestUtils = React.addons.TestUtils
   wrapper   = document.getElementById('fixtures')
 
   renderComponent = (data) ->
     element = React.createElement(AssignmentPercentage, data)
-    React.render(element, wrapper)
+    ReactDOM.render(element, wrapper)
 
   buildComponent = (props, additionalProps) ->
     cellData = props || {
@@ -37,7 +38,7 @@ define [
   module 'ReactGradebook.assignmentPercentageComponent',
     setup: ->
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'should mount', ->
     ok(buildComponent().isMounted())

@@ -29,7 +29,7 @@ define([
         />
       );
       this.props.modalOptions.openModal(contents, () => {
-        React.findDOMNode(this).focus();
+        ReactDOM.findDOMNode(this).focus();
       });
     },
 

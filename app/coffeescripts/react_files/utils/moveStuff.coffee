@@ -3,8 +3,9 @@ define [
   'jquery'
   'jsx/files/FileRenameForm'
   'react'
+  'react-dom'
   '../modules/FileOptionsCollection'
-], (I18n, $, FileRenameForm, React, FileOptionsCollection) ->
+], (I18n, $, FileRenameForm, React, ReactDOM, FileOptionsCollection) ->
 
   moveItem = (item, destinationFolder, options = {}) ->
     dfd = $.Deferred()
@@ -15,7 +16,7 @@ define [
       (jqXHR, textStatus, errorThrown) =>
         if jqXHR.status == 409
           # file already exists: prompt and retry
-          React.render(React.createFactory(FileRenameForm)(
+          ReactDOM.render(React.createFactory(FileRenameForm)(
             onClose: ->
             closeWithX: -> dfd.reject()
             closeOnResolve: true

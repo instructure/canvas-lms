@@ -1,9 +1,10 @@
 define([
-  'i18n!modules',
   'react',
+  'react-dom',
+  'i18n!modules',
   'jsx/gradebook/SISGradePassback/PostGradesDialog',
   'classnames'
-], (I18n, React, PostGradesDialog, classnames) => {
+], (React, ReactDOM, I18n, PostGradesDialog, classnames) => {
 
   // The PostGradesApp mounts a single "Post Grades" button, which pops up
   // the PostGradesDialog when clicked.
@@ -50,7 +51,7 @@ define([
         resizable: false,
         buttons: [],
         close(e) {
-          React.unmountComponentAtNode(this);
+          ReactDOM.unmountComponentAtNode(this);
           $(this).remove();
           if(returnFocusTo){
             returnFocusTo.focus();
@@ -64,7 +65,7 @@ define([
       }
 
       this.props.store.reset()
-      React.render(<PostGradesDialog store={this.props.store} closeDialog={closeDialog} />, $dialog[0]);
+      ReactDOM.render(<PostGradesDialog store={this.props.store} closeDialog={closeDialog} />, $dialog[0]);
     },
   });
 

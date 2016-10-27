@@ -2,7 +2,8 @@ define [
   'jquery'
   'jsx/discussion_topics/DiscussionTopicKeyboardShortcutModal'
   'react'
-], ($, DiscussionTopicKeyboardShortcutModal, React) ->
+  'react-dom'
+], ($, DiscussionTopicKeyboardShortcutModal, React, ReactDOM) ->
 
   TestUtils = React.addons.TestUtils
 
@@ -20,7 +21,7 @@ define [
       $('#fixtures').append('<div id="application" />')
 
     teardown: ->
-      React.unmountComponentAtNode(@component.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@component.getDOMNode().parentNode)
       $('#fixtures').empty()
 
   test 'renders shortcuts', ->

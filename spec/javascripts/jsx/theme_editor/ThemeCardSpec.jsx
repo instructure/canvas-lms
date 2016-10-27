@@ -1,7 +1,8 @@
 define([
   'react',
+  'react-dom',
   'jsx/theme_editor/ThemeCard'
-], (React, ThemeCard) => {
+], (React, ReactDOM, ThemeCard) => {
 
   let elem, props
 
@@ -22,7 +23,7 @@ define([
   })
 
   test('Renders the name', () => {
-    const component = React.render(<ThemeCard {...props} />, elem)
+    const component = ReactDOM.render(<ThemeCard {...props} />, elem)
     const node = component.getDOMNode()
     const button = node.querySelector('.ic-ThemeCard-name-button')
     button.removeChild(button.querySelector('.screenreader-only'))
@@ -30,7 +31,7 @@ define([
   })
 
   test('Renders preview of colors', () => {
-    const component = React.render(<ThemeCard {...props} />, elem)
+    const component = ReactDOM.render(<ThemeCard {...props} />, elem)
     const getVar = props.getVariable
     ok(getVar.calledWith('ic-brand-primary'), 'prview ic-brand-primary')
     ok(getVar.calledWith('ic-brand-button--primary-bgd'), 'prview ic-brand-button--primary-bgd')
@@ -41,7 +42,7 @@ define([
   })
 
   test('Incicates if it is the current theme', () => {
-    let component = React.render(<ThemeCard {...props} />, elem)
+    let component = ReactDOM.render(<ThemeCard {...props} />, elem)
     equal(
       component.getDOMNode().querySelector('.ic-ThemeCard-status__text'),
       null,
@@ -49,7 +50,7 @@ define([
     )
 
     props.isActiveBrandConfig = true
-    component = React.render(<ThemeCard {...props} />, elem)
+    component = ReactDOM.render(<ThemeCard {...props} />, elem)
     equal(
       component.getDOMNode().querySelector('.ic-ThemeCard-status__text').textContent,
       'Current theme',
@@ -58,7 +59,7 @@ define([
   })
 
   test('Shows delete overlay if isBeingDeleted is true', () => {
-    let component = React.render(<ThemeCard {...props} />, elem)
+    let component = ReactDOM.render(<ThemeCard {...props} />, elem)
     equal(
       component.getDOMNode().querySelector('.ic-ThemeCard-overlay__heading'),
       null,
@@ -66,7 +67,7 @@ define([
     )
 
     props.isBeingDeleted = true
-    component = React.render(<ThemeCard {...props} />, elem)
+    component = ReactDOM.render(<ThemeCard {...props} />, elem)
     equal(
       component.getDOMNode().querySelector('.ic-ThemeCard-overlay__heading').textContent,
       'Delete this theme?',

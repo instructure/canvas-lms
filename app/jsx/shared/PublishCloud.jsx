@@ -1,10 +1,11 @@
 define([
-  'jquery',
   'react',
+  'react-dom',
+  'jquery',
   'i18n!publish_cloud',
   'compiled/react_files/components/PublishCloud',
   'jsx/files/RestrictedDialogForm'
-], function ($, React, I18n, PublishCloud, RestrictedDialogForm) {
+], function (React, ReactDOM, $, I18n, PublishCloud, RestrictedDialogForm) {
 
   // Function Summary
   // Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
@@ -16,12 +17,12 @@ define([
       width: 800,
       minHeight: 300,
       close: function () {
-        React.unmountComponentAtNode(this);
+        ReactDOM.unmountComponentAtNode(this);
         $(this).remove();
       }
     });
 
-    React.render(
+    ReactDOM.render(
       <RestrictedDialogForm
         usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
         models={[this.props.model]}

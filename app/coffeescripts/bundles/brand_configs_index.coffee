@@ -1,7 +1,8 @@
 require [
   'react'
+  'react-dom'
   'jsx/theme_editor/CollectionView'
-], (React, CollectionView) ->
+], (React, ReactDOM, CollectionView) ->
 
   el = React.createElement(CollectionView, window.ENV.brandConfigStuff)
-  React.render(el, document.getElementById('content'))
+  ReactDOM.render(el, document.getElementById('content'))

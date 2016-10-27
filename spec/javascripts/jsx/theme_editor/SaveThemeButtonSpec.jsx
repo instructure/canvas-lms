@@ -1,10 +1,11 @@
 define([
   'react',
+  'react-dom',
   'jquery',
   'jsx/shared/modal',
   'jsx/theme_editor/SaveThemeButton',
   'jquery.ajaxJSON'
-], (React, jQuery, Modal, SaveThemeButton) => {
+], (React, ReactDOM, jQuery, Modal, SaveThemeButton) => {
 
   let elem, props
 
@@ -32,7 +33,7 @@ define([
   })
 
   asyncTest('save', function () {
-    let component = React.render(<SaveThemeButton {...props} />, elem)
+    let component = ReactDOM.render(<SaveThemeButton {...props} />, elem)
     const updatedBrandConfig = {}
     this.stub(jQuery, 'ajaxJSON').callsArgOnWith(3, component, updatedBrandConfig)
     this.spy(component, 'setState')
@@ -51,12 +52,12 @@ define([
     )
 
     delete props.sharedBrandConfigBeingEdited
-    component = React.render(<SaveThemeButton {...props} />, elem)
+    component = ReactDOM.render(<SaveThemeButton {...props} />, elem)
     jQuery.ajaxJSON.reset()
     component.save()
     ok(component.setState.calledWithMatch({modalIsOpen: true}), 'opens modal')
-    notOk(jQuery.ajaxJSON.called, 'does not make a request') 
-    
+    notOk(jQuery.ajaxJSON.called, 'does not make a request')
+
     component.setState({newThemeName: 'theme name'}, () => {
       component.save()
       ok(

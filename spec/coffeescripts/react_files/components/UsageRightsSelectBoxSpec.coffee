@@ -2,8 +2,9 @@ define [
   'jquery'
   'underscore'
   'react'
+  'react-dom'
   'jsx/files/UsageRightsSelectBox'
-  ], ($, _, React, UsageRightsSelectBox ) ->
+  ], ($, _, React, ReactDOM, UsageRightsSelectBox ) ->
 
     TestUtils = React.addons.TestUtils
 
@@ -19,7 +20,7 @@ define [
 
       uRSB = TestUtils.renderIntoDocument(React.createElement(UsageRightsSelectBox, props))
       ok uRSB.refs.showMessageAlert != undefined, "message is being shown"
-      React.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
 
     test "fetches license options when component mounts", ->
       server = sinon.fakeServer.create()
@@ -36,7 +37,7 @@ define [
       equal uRSB.state.licenseOptions[0].id, "cc_some_option", 'sets data just fine'
 
       server.restore()
-      React.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
 
     test "inserts copyright into textbox when passed in", ->
       copyright = "all dogs go to taco bell"
@@ -46,7 +47,7 @@ define [
 
       uRSB = TestUtils.renderIntoDocument(React.createElement(UsageRightsSelectBox, props))
       equal uRSB.refs.copyright.getDOMNode().value, copyright
-      React.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
 
     test "shows creative commons options when set up", ->
       server = sinon.fakeServer.create()
@@ -65,4 +66,4 @@ define [
       equal uRSB.refs.creativeCommons.getDOMNode().value, "cc_some_option", "shows creative commons option"
 
       server.restore()
-      React.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(uRSB.getDOMNode().parentNode)

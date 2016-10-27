@@ -1,10 +1,11 @@
 define([
   'react',
+  'react-dom',
   'i18n!react_collaborations'
-], (React, i18n) => {
+], (React, ReactDOM, i18n) => {
   class DeleteConfirmation extends React.Component {
     componentDidMount () {
-      React.findDOMNode(this).focus()
+      ReactDOM.findDOMNode(this).focus()
     }
 
     render () {

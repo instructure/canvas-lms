@@ -1,18 +1,18 @@
 define [
   'react'
+  'react-dom'
   'react-modal'
   'jsx/external_apps/components/AddExternalToolButton'
-], (React, Modal, AddExternalToolButton) ->
+], (React, ReactDOM, Modal, AddExternalToolButton) ->
 
   TestUtils = React.addons.TestUtils
-  Simulate = TestUtils.Simulate
   wrapper = null
 
   createElement = (data = {}) ->
     React.createElement(AddExternalToolButton, data)
 
   renderComponent = (data = {}) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   getDOMNodes = ->
     component = renderComponent()
@@ -32,7 +32,7 @@ define [
       Modal.setAppElement(wrapper)
 
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
       wrapper.innerHTML = ''
 
   test 'render', ->

@@ -1,10 +1,11 @@
 define [
   'react'
+  'react-dom'
   'jquery'
   'underscore'
   'jsx/grading/gradingStandardCollection'
   'jsx/grading/gradingStandard'
-], (React, $, _, GradingStandardCollection, GradingStandard) ->
+], (React, ReactDOM, $, _, GradingStandardCollection, GradingStandard) ->
 
   Simulate = React.addons.TestUtils.Simulate
 
@@ -70,7 +71,7 @@ define [
       @server.respond()
 
     teardown: ->
-      React.unmountComponentAtNode(@gradingStandardCollection.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@gradingStandardCollection.getDOMNode().parentNode)
       ENV.current_user_roles = null
       ENV.GRADING_STANDARDS_URL = null
       ENV.DEFAULT_GRADING_STANDARD_DATA = null

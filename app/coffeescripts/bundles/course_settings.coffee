@@ -3,6 +3,7 @@ require [
   'underscore'
   'Backbone'
   'react'
+  'react-dom'
   'compiled/views/course_settings/NavigationView'
   'compiled/collections/UserCollection'
   'compiled/views/feature_flags/FeatureFlagAdminView'
@@ -12,7 +13,7 @@ require [
   'vendor/jquery.cookie'
   'course_settings'
   'grading_standards'
-], ($, _, Backbone, React, NavigationView, UserCollection, FeatureFlagAdminView, CourseImageSelector, configureStore, initialState) ->
+], ($, _, Backbone, React, ReactDOM, NavigationView, UserCollection, FeatureFlagAdminView, CourseImageSelector, configureStore, initialState) ->
   nav_view = new NavigationView
     el: $('#tab-navigation')
 
@@ -27,7 +28,7 @@ require [
   if (window.ENV.COURSE_IMAGES_ENABLED)
     courseImageStore = configureStore(initialState)
 
-    React.render(
+    ReactDOM.render(
       React.createElement(CourseImageSelector, {
         store: courseImageStore,
         name: "course[image]",

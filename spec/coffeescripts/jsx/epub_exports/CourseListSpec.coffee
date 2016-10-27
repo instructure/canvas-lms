@@ -1,8 +1,9 @@
 define [
-  'underscore',
-  'react',
+  'underscore'
+  'react'
+  'react-dom'
   'jsx/epub_exports/CourseList'
-], (_, React, CourseList, I18n) ->
+], (_, React, ReactDOM, CourseList, I18n) ->
   TestUtils = React.addons.TestUtils
 
   module 'CourseListSpec',
@@ -23,7 +24,7 @@ define [
     component = TestUtils.renderIntoDocument(CourseListElement)
     node = component.getDOMNode()
     equal node.querySelectorAll('li').length, 0, 'should not render list items'
-    React.unmountComponentAtNode(node.parentNode)
+    ReactDOM.unmountComponentAtNode(node.parentNode)
 
     CourseListElement = React.createElement(CourseList, courses: @props)
     component = TestUtils.renderIntoDocument(CourseListElement)
@@ -31,4 +32,4 @@ define [
     equal node.querySelectorAll('li').length, Object.keys(@props).length,
       'should have an li element per course in @props'
 
-    React.unmountComponentAtNode(node.parentNode)
+    ReactDOM.unmountComponentAtNode(node.parentNode)

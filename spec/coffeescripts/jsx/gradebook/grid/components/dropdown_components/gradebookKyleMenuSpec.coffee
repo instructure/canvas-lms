@@ -1,11 +1,12 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/dropdown_components/gradebookKyleMenu'
   'jsx/gradebook/grid/components/dropdown_components/totalHeaderDropdownOptions'
   'underscore'
   'jquery'
   'compiled/jquery.kylemenu'
-], (React, GradebookKyleMenu, DropdownOptions, _, $) ->
+], (React, ReactDOM, GradebookKyleMenu, DropdownOptions, _, $) ->
 
   wrapper = document.getElementById('fixtures')
   Simulate = React.addons.TestUtils.Simulate
@@ -15,7 +16,7 @@ define [
     $("<div id='append'></div>").appendTo('#fixtures')
     childFactory = React.createFactory(DropdownOptions)
     child = childFactory({ idAttribute: 'dropdownOptions'})
-    React.render(componentFactory(data, child), wrapper)
+    ReactDOM.render(componentFactory(data, child), wrapper)
 
   module 'GradebookKyleMenu',
     setup: ->
@@ -28,7 +29,7 @@ define [
       @dropdownLink = @dropdown.refs.dropdownLink.getDOMNode()
 
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'dropdown options are not shown until the user clicks on the link', ->
     notOk @dropdown.state.showMenu

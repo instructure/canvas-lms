@@ -1,7 +1,8 @@
 define [
   'react'
+  'react-dom'
   'jsx/external_apps/components/Lti2Permissions'
-], (React, Lti2Permissions) ->
+], (React, ReactDOM, Lti2Permissions) ->
 
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
@@ -15,11 +16,11 @@ define [
     })
 
   renderComponent = (data) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   module 'ExternalApps.Lti2Permissions',
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'renders', ->
     data =

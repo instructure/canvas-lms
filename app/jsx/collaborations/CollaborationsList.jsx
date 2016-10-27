@@ -1,9 +1,10 @@
 define([
   'react',
+  'react-dom',
   './Collaboration',
   '../shared/load-more',
   './store/store'
-], (React, Collaboration, LoadMore, {dispatch}) => {
+], (React, ReactDOM, Collaboration, LoadMore, {dispatch}) => {
   class CollaborationsList extends React.Component {
 
     constructor (props) {
@@ -12,7 +13,7 @@ define([
     }
 
     loadMoreCollaborations () {
-      React.findDOMNode(this.refs[`collaboration-${this.props.collaborationsState.list.length - 1}`]).focus();
+      ReactDOM.findDOMNode(this.refs[`collaboration-${this.props.collaborationsState.list.length - 1}`]).focus();
       dispatch(this.props.getCollaborations(this.props.collaborationsState.nextPage));
     }
 

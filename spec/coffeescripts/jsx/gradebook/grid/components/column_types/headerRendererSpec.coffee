@@ -1,10 +1,11 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/column_types/headerRenderer'
   'jquery'
   'jquery.instructure_date_and_time'
   'translations/_core_en'
-], (React, HeaderRenderer, $) ->
+], (React, ReactDOM, HeaderRenderer, $) ->
 
   wrapper = document.getElementById('fixtures')
 
@@ -21,7 +22,7 @@ define [
 
   renderComponent = (data) ->
     element = React.createElement(HeaderRenderer, data)
-    React.render(element, wrapper)
+    ReactDOM.render(element, wrapper)
 
   buildComponent = (props) ->
     columnData = props
@@ -30,7 +31,7 @@ define [
   module 'HeaderRenderer',
     setup: ->
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'displays nothing if there is no assignment', ->
     props = defaultProps()

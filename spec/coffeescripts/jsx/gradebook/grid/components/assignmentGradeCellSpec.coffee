@@ -1,16 +1,17 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/assignmentGradeCell'
   'underscore'
   'jsx/gradebook/grid/constants'
-], (React, AssignmentGradeCell, _, GradebookConstants) ->
+], (React, ReactDOM, AssignmentGradeCell, _, GradebookConstants) ->
 
   Simulate = React.addons.TestUtils.Simulate
   wrapper  = document.getElementById('fixtures')
 
   renderComponent = (props) ->
     element = React.createElement(AssignmentGradeCell, props)
-    React.render(element, wrapper)
+    ReactDOM.render(element, wrapper)
 
   buildComponent = (props, additionalProps) ->
     cellData = props || {
@@ -49,7 +50,7 @@ define [
 
   module 'ReactGradebook.assignmentGradeCellComponent',
     teardown: ->
-      React.unmountComponentAtNode(wrapper)
+      ReactDOM.unmountComponentAtNode(wrapper)
 
   test 'should mount', ->
     ok(buildComponentWithSubmission().isMounted())
@@ -58,7 +59,7 @@ define [
     setup: ->
       @component = buildComponentWithSubmission()
     teardown: ->
-      React.unmountComponentAtNode(wrapper)
+      ReactDOM.unmountComponentAtNode(wrapper)
 
   test 'should render discussion icon when submission is not graded', ->
     expected = 'icon-discussion'

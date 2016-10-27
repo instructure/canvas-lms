@@ -1,9 +1,10 @@
 define [
-  'underscore',
-  'react',
-  'jsx/epub_exports/App',
+  'underscore'
+  'react'
+  'react-dom'
+  'jsx/epub_exports/App'
   'jsx/epub_exports/CourseStore'
-], (_, React, App, CourseEpubExportStore) ->
+], (_, React, ReactDOM, App, CourseEpubExportStore) ->
   TestUtils = React.addons.TestUtils
 
   module 'AppSpec',
@@ -31,5 +32,5 @@ define [
     CourseEpubExportStore.setState(@props)
     deepEqual component.state, CourseEpubExportStore.getState(),
       'CourseEpubExportStore.setState should trigger component setState'
-    React.unmountComponentAtNode(component.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
 

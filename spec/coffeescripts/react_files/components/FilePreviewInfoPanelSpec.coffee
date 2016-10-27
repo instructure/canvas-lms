@@ -1,10 +1,11 @@
 define [
   'react'
+  'react-dom'
   'jquery'
   'jsx/files/FilePreviewInfoPanel'
   'compiled/models/File'
   'compiled/react_files/utils/getFileStatus'
-], (React, $, FilePreviewInfoPanel, File, getFileStatus) ->
+], (React, ReactDOM, $, FilePreviewInfoPanel, File, getFileStatus) ->
 
   TestUtils = React.addons.TestUtils
 
@@ -23,7 +24,7 @@ define [
       @rendered = TestUtils.renderIntoDocument(@fPIP(displayedItem: @file, usageRightsRequiredForContext: true))
 
     teardown: ->
-      React.unmountComponentAtNode(@rendered.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@rendered.getDOMNode().parentNode)
       @file = null
 
   test 'displays item name', ->

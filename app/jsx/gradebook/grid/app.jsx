@@ -1,8 +1,8 @@
 define([
-  'react',
+  'react-dom',
   './components/gradebook'
-], function (React, Gradebook) {
+], function (ReactDOM, Gradebook) {
   let MOUNT_ELEMENT = document.getElementById('gradebook_grid');
-  React.render(<Gradebook/>, MOUNT_ELEMENT);
+  ReactDOM.render(<Gradebook/>, MOUNT_ELEMENT);
 });
 
