@@ -661,7 +661,7 @@ class ApplicationController < ActionController::Base
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      enrollment_scope = Enrollment.for_user(@context).active_by_date
+      enrollment_scope = Enrollment.for_user(@context).current.active_by_date
       include_groups = !!opts[:include_groups]
       group_ids = nil
 

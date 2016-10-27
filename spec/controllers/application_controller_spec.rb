@@ -692,6 +692,20 @@ describe ApplicationController do
   end
 
   describe "#get_all_pertinent_contexts" do
+    it "doesn't show unpublished courses to students" do
+      student = user(:active_all => true)
+      c1 = course
+      e = c1.enroll_student(student)
+      e.update_attribute(:workflow_state, 'active')
+      c2 = course(:active_all => true)
+      c2.enroll_student(student).accept!
+
+      controller.instance_variable_set(:@context, student)
+      controller.send(:get_all_pertinent_contexts)
+      expect(controller.instance_variable_get(:@contexts).select{|c| c.is_a?(Course)}).to eq [c2]
+    end
+
+
     it "doesn't touch the database if there are no valid courses" do
       user
       controller.instance_variable_set(:@context, @user)
