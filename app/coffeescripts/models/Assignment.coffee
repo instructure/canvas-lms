@@ -79,6 +79,9 @@ define [
       return @get('points_possible') || 0 unless arguments.length > 0
       @set 'points_possible', points
 
+    secureParams: =>
+      @get('secure_params')
+
     assignmentGroupId: (assignment_group_id) =>
       return @get 'assignment_group_id' unless arguments.length > 0
       @set 'assignment_group_id', assignment_group_id
@@ -353,7 +356,7 @@ define [
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
         'multipleDueDates', 'nonBaseDates', 'allDates', 'hasDueDate', 'hasPointsPossible'
         'singleSectionDueDate', 'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
-        'omitFromFinalGrade', 'is_quiz_assignment'
+        'omitFromFinalGrade', 'is_quiz_assignment', 'secureParams'
       ]
 
       hash = id: @get 'id'

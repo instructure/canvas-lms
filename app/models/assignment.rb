@@ -115,6 +115,12 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def secure_params
+    body = {}
+    body[:lti_assignment_id] = SecureRandom.uuid if new_record?
+    Canvas::Security.create_jwt(body)
+  end
+
   def discussion_group_ok?
     return unless new_record? || group_category_id_changed?
     return unless group_category_id && submission_types == 'discussion_topic'

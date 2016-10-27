@@ -18,9 +18,12 @@ define [
   AssignmentGroupSelector, DueDateOverrideView, EditView,
   GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector, fakeENV, userSettings) ->
 
+  s_params = 'asdf32.asdf31.asdf2'
+
   editView = (assignmentOpts = {}) ->
     defaultAssignmentOpts =
       name: 'Test Assignment'
+      secure_params: s_params
       assignment_overrides: []
 
     assignmentOpts = _.extend {}, assignmentOpts, defaultAssignmentOpts
@@ -132,6 +135,13 @@ define [
 
     errors = view.validateBeforeSave({}, [])
     ok !errors["name"]
+
+  test "renders a hidden secure_params field", ->
+    view = @editView()
+    secure_params = view.$('#secure_params')
+
+    equal secure_params.attr('type'), 'hidden'
+    equal secure_params.val(), s_params
 
   test 'does show error message on assignment point change with submissions', ->
     view = @editView has_submitted_submissions: true

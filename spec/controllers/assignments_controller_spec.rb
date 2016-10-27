@@ -299,6 +299,14 @@ describe AssignmentsController do
   end
 
   describe "POST 'create'" do
+    it "sets the lti_context_id if provided" do
+      user_session(@student)
+      lti_context_id = SecureRandom.uuid
+      jwt = Canvas::Security.create_jwt(lti_context_id: lti_context_id)
+      post 'create', course_id: @course.id, assignment: {title: "some assignment",secure_params: jwt}
+      expect(assigns[:assignment].lti_context_id).to eq lti_context_id
+    end
+
     it "should require authorization" do
       #controller.use_rails_error_handling!
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}

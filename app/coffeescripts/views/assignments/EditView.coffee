@@ -57,6 +57,7 @@ ConditionalRelease, deparam) ->
     EXTERNAL_TOOLS_NEW_TAB = '#assignment_external_tool_tag_attributes_new_tab'
     ASSIGNMENT_POINTS_POSSIBLE = '#assignment_points_possible'
     ASSIGNMENT_POINTS_CHANGE_WARN = '#point_change_warning'
+    SECURE_PARAMS = '#secure_params'
 
     PEER_REVIEWS_BOX = '#assignment_peer_reviews'
     INTRA_GROUP_PEER_REVIEWS = '#intra_group_peer_reviews_toggle'
@@ -91,6 +92,7 @@ ConditionalRelease, deparam) ->
       els["#{ASSIGNMENT_POINTS_CHANGE_WARN}"] = '$pointsChangeWarning'
       els["#{MODERATED_GRADING_BOX}"] = '$moderatedGradingBox'
       els["#{CONDITIONAL_RELEASE_TARGET}"] = '$conditionalReleaseTarget'
+      els["#{SECURE_PARAMS}"] = '$secureParams'
       els
     )
 

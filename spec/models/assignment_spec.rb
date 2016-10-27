@@ -104,6 +104,20 @@ describe Assignment do
     end
   end
 
+  describe '#secure_params' do
+    before { setup_assignment_without_submission }
+
+    it 'contains the lti_context_id if the assignment is new' do
+      assignment = Assignment.new
+      lti_assignment_id = Canvas::Security.decode_jwt(assignment.secure_params)[:lti_assignment_id]
+      expect(lti_assignment_id).to be_present
+    end
+
+    it 'returns a jwt' do
+      expect(Canvas::Security.decode_jwt @assignment.secure_params)
+    end
+  end
+
   describe '#grade_to_score' do
     before(:once) { setup_assignment_without_submission }
 

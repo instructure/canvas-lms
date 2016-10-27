@@ -83,6 +83,7 @@ module Api::V1::Assignment
     end
 
     hash = api_json(assignment, user, session, fields)
+    hash['secure_params'] = assignment.secure_params
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
@@ -353,6 +354,11 @@ module Api::V1::Assignment
 
     old_assignment = assignment.new_record? ? nil : assignment.clone
     old_assignment.id = assignment.id if old_assignment.present?
+
+    if assignment_params[:secure_params] && !old_assignment
+      secure_params = Canvas::Security.decode_jwt assignment_params[:secure_params]
+      assignment.lti_context_id = secure_params[:lti_assignment_id]
+    end
 
     overrides = deserialize_overrides(assignment_params[:assignment_overrides])
     overrides = [] if !overrides && assignment_params.has_key?(:assignment_overrides)
