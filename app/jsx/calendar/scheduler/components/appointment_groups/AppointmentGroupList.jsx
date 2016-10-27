@@ -21,7 +21,7 @@ define([
               const sorted = names.sort((a, b) => natcompare.strings(a, b))
               sorted.push(I18n.t('Available'))
               return (
-                <div className='AppointmentGroupList__Appointment'>
+                <div key={c.id} className='AppointmentGroupList__Appointment'>
                   <div className='AppointmentGroupList__unreserved'>
                     <i className="icon-calendar-month"></i>
                     {I18n.t('%{start_time} to %{end_time}', {start_time: $.timeString(c.start_at), end_time: $.timeString(c.end_at)})} - {sorted.join('; ')}
@@ -30,7 +30,7 @@ define([
               )
             } else {
               return (
-                <div className='AppointmentGroupList__Appointment'>
+                <div key={c.id} className='AppointmentGroupList__Appointment'>
                   <div className='AppointmentGroupList__unreserved'>
                     <i className="icon-calendar-month"></i>
                     {I18n.t('%{start_time} to %{end_time}', {start_time: $.timeString(c.start_at), end_time: $.timeString(c.end_at)})} - {I18n.t('Available')}
@@ -40,7 +40,7 @@ define([
             }
           } else {
             return (
-              <div className='AppointmentGroupList__Appointment'>
+              <div key={c.id} className='AppointmentGroupList__Appointment'>
                 <div className='AppointmentGroupList__reserved'>
                   <i className="icon-calendar-month"></i>
                   {I18n.t('%{start_time} to %{end_time}', {start_time: $.timeString(c.start_at), end_time: $.timeString(c.end_at)})}

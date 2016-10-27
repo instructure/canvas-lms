@@ -1,4 +1,5 @@
 define([
+  'jquery',
   'react',
   'i18n!appointment_groups',
   'instructure-ui/Button',
@@ -9,7 +10,7 @@ define([
   'compiled/calendar/MessageParticipantsDialog',
   './ContextSelector',
   './TimeBlockSelector'
-], (React, I18n, {default: Button}, {default: Grid, GridCol, GridRow}, {default: ScreenReaderContent}, axios, AppointmentGroupList, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
+], ($, React, I18n, {default: Button}, {default: Grid, GridCol, GridRow}, {default: ScreenReaderContent}, axios, AppointmentGroupList, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
 
   const parseFormValues = (data) => ({
     description: data.description,
@@ -42,19 +43,20 @@ define([
       this.messageStudents = this.messageStudents.bind(this)
       this.state = {
         appointmentGroup: {},
-        formValues: {}
-      };
+        formValues: {},
+        isDeleting: false,
+      }
     }
 
     componentDidMount () {
       axios.get(`/api/v1/appointment_groups/${this.props.appointment_group_id}?include[]=appointments&include[]=child_events`)
-           .then((response) => {
-             const formValues = parseFormValues(response.data);
-             this.setState({
-               formValues,
-               appointmentGroup: response.data
-             });
-           });
+        .then((response) => {
+          const formValues = parseFormValues(response.data);
+          this.setState({
+            formValues,
+            appointmentGroup: response.data
+          });
+        });
     }
 
     setTitleValue = (e) => {
@@ -83,6 +85,21 @@ define([
       messageStudentsDialog.show();
     }
 
+    deleteGroup = () => {
+      if (!this.state.isDeleting) {
+        this.setState({ isDeleting: true }, () => {
+          axios.delete(`/api/v1/appointment_groups/${this.props.appointment_group_id}`)
+            .then(res => {
+              window.location = '/calendar'
+            })
+            .catch(e => {
+              $.flashError(I18n.t('An error ocurred while deleting the appointment group'))
+              this.setState({ isDeleting: false })
+            })
+        })
+      }
+    }
+
     render () {
       return (
         <div className="EditPage">
@@ -97,7 +114,7 @@ define([
             <Grid startAt="tablet" vAlign="middle">
               <GridRow hAlign="end">
                 <GridCol width="auto">
-                  <Button>{I18n.t('Delete Group')}</Button>
+                  <Button onClick={this.deleteGroup} disabled={this.state.isDeleting}>{I18n.t('Delete Group')}</Button>
                   &nbsp;
                   <Button href="/calendar">{I18n.t('Cancel')}</Button>
                   &nbsp;
