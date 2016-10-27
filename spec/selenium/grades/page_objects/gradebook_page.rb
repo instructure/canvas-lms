@@ -12,7 +12,13 @@ module Gradebook
     include LoginAndSessionMethods
     include SeleniumErrorRecovery
 
+    # Assignment Headings
+    ASSIGNMENT_HEADER_SELECTOR = '.slick-header-column'
+    ASSIGNMENT_HEADER_MENU_SELECTOR = '.gradebook-header-drop'
+    ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR = 'ul.gradebook-header-menu li.ui-menu-item'
+
     private
+
       def gp_dropdown() f(".grading-period-select-button") end
 
       def gp_menu_list() ff("#grading-period-to-show-menu li") end
@@ -25,7 +31,32 @@ module Gradebook
         f(".slick-cell:nth-child(#{x+1})", cell)
       end
 
+      def assignment_header_selector(name)
+        return ASSIGNMENT_HEADER_SELECTOR unless name
+
+        ASSIGNMENT_HEADER_SELECTOR + "[title=\"#{name}\"]"
+      end
+
+      def assignment_header_menu_selector(name)
+        [assignment_header_selector(name), ASSIGNMENT_HEADER_MENU_SELECTOR].join(' ')
+      end
+
     public
+
+      def assignment_header(name)
+        f(assignment_header_selector(name))
+      end
+
+      def assignment_header_menu(name)
+        f(assignment_header_menu_selector(name))
+      end
+
+      def assignment_header_menu_item(name)
+        parent_element = ff(ASSIGNMENT_HEADER_MENU_ITEM_SELECTOR).find { |el| el.text == name }
+
+        f('a', parent_element)
+      end
+
       def visit_gradebook(course)
         get "/courses/#{course.id}/gradebook2"
       end

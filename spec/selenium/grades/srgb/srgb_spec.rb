@@ -328,20 +328,20 @@ describe "Screenreader Gradebook" do
       select_assignment(@second_assignment)
 
       # When the modal opens the close button should have focus
-      default_grade.click
-      focused_classes = driver.execute_script('return document.activeElement.classList')
+      f("#set_default_grade").click
+      focused_classes = active_element[:class].split
       expect(focused_classes).to include("ui-dialog-titlebar-close")
 
       # When the modal closes
       # by setting a grade the "set default grade" button should have focus
       button_type_submit.click
       accept_alert
-      check_element_has_focus(set_default_grade)
+      check_element_has_focus(f("#set_default_grade"))
 
       # by the close button the "set default grade" button should have focus
-      set_default_grade.click
+      f("#set_default_grade").click
       fj('.ui-icon-closethick:visible').click
-      check_element_has_focus(set_default_grade)
+      check_element_has_focus(f("#set_default_grade"))
     end
 
     describe "Download Submissions Button" do

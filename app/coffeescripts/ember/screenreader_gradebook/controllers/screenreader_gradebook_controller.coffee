@@ -19,9 +19,10 @@ define [
   'compiled/api/gradingPeriodsApi'
   'jquery.instructure_date_and_time'
 ], (
-  ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog,
-  AssignmentMuter, GradeCalculator, outcomeGrid, ic_submission_download_dialog, htmlEscape,
-  CalculationMethodContent, SubmissionStateMap, GradingPeriodsAPI
+  ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz,
+  AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid,
+  ic_submission_download_dialog, htmlEscape, CalculationMethodContent, SubmissionStateMap,
+  GradingPeriodsAPI
 ) ->
 
   {get, set, setProperties} = Ember
@@ -189,6 +190,10 @@ define [
     weightingScheme: null
 
     ariaAnnounced: null
+
+    assignmentInClosedGradingPeriod: null
+
+    disableAssignmentGrading: null
 
     actions:
 
@@ -689,6 +694,24 @@ define [
         else ['ag_position', 'position']
       @get('assignments').set('sortProperties', sort_props)
     ).observes('assignmentSort').on('init')
+
+    updateAssignmentStatusInGradingPeriod: (->
+      assignment = @get('selectedAssignment')
+
+      unless assignment
+        @set('assignmentInClosedGradingPeriod', null)
+        @set('disableAssignmentGrading', null)
+        return
+
+      @set('assignmentInClosedGradingPeriod', assignment.has_due_date_in_closed_grading_period)
+
+      # Calculate whether the current user is able to grade assignments given their role and the
+      # result of the calculations above
+      if ENV.current_user_roles? && _.contains(ENV.current_user_roles, 'admin')
+        @set('disableAssignmentGrading', false)
+      else
+        @set('disableAssignmentGrading', assignment.has_due_date_in_closed_grading_period)
+    ).observes('selectedAssignment')
 
     selectedSubmission: ((key, selectedSubmission) ->
       if arguments.length > 1

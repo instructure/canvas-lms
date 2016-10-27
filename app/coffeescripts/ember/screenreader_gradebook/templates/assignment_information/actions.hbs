@@ -18,21 +18,30 @@
     {{#t 'message_students'}}Message students who...{{/t}}
   </button>
 </div>
-<div class="pad-box bottom-only">
+<div class="pad-box no-sides">
   <button
     id="set_default_grade"
-    class="btn"
+    {{ bind-attr class=":btn disableAssignmentGrading:ui-state-disabled" disabled=disableAssignmentGrading }}
     {{ action 'openDialog' 'set_default_grade' target=view }}
   >
     {{#t 'set_default_grade'}}Set default grade{{/t}}
   </button>
+  {{#if disableAssignmentGrading}}
+    {{#t}}Unable to set default grade because this assignment is due in a closed grading period for at least one student{{/t}}
+  {{/if}}
+
+</div>
+<div class="pad-box no-sides">
   {{#if selectedAssignment.points_possible}}
     <button
       id="curve_grades"
-      class="btn"
+      {{ bind-attr class=":btn disableAssignmentGrading:ui-state-disabled" disabled=disableAssignmentGrading }}
       {{ action 'openDialog' 'curve_grades' target=view }}
     >
       {{#t 'curve_grades'}}Curve Grades{{/t}}
     </button>
+    {{#if disableAssignmentGrading}}
+      {{#t}}Unable to curve grades because this assignment is due in a closed grading period for at least one student{{/t}}
+    {{/if}}
   {{/if}}
 </div>

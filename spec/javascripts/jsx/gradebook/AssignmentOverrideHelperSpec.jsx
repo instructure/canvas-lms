@@ -61,10 +61,10 @@ define([
     setup() {
       this.dates = {
         june: new Date("2009-06-03T02:57:42.000Z"),
-        september: new Date("2009-05-03T02:57:42.000Z")
+        may: new Date("2009-05-03T02:57:42.000Z")
       };
 
-      this.assignment = { due_at: this.dates.september, only_visible_to_overrides: false };
+      this.assignment = { due_at: this.dates.may, only_visible_to_overrides: false };
       this.overrides = [
         createOverride({ type: 'student', id: '1', dueAt: this.dates.june })
       ];
@@ -80,6 +80,6 @@ define([
   });
 
   test('returns the assignment due date for students without overrides', function() {
-    equal(this.dueDates[2].getTime(), this.dates.september.getTime())
+    equal(this.dueDates[2].getTime(), this.dates.may.getTime())
   });
 });

@@ -235,6 +235,24 @@ define [
         @srgb.set('selectedAssignment', assignments.objectAt(1))
       equal @srgb.get('assignmentSubmissionTypes'), 'Online URL, Online text entry'
 
+  test 'assignmentInClosedGradingPeriod returns false when the selected assignment does not have
+    a due date in a closed grading period', ->
+    @completeSetup().then =>
+      Ember.run =>
+        assignment = @srgb.get('assignments.lastObject')
+        assignment.has_due_date_in_closed_grading_period = false
+        @srgb.set('selectedAssignment', assignment)
+      equal @srgb.get('assignmentInClosedGradingPeriod'), false
+
+  test 'assignmentInClosedGradingPeriod returns true when the selected assignment has
+    a due date in a closed grading period', ->
+    @completeSetup().then =>
+      Ember.run =>
+        assignment = @srgb.get('assignments.lastObject')
+        assignment.has_due_date_in_closed_grading_period = true
+        @srgb.set('selectedAssignment', assignment)
+      equal @srgb.get('assignmentInClosedGradingPeriod'), true
+
   module 'screenreader_gradebook_controller:draftState',
     setup: ->
       setup.call this, true

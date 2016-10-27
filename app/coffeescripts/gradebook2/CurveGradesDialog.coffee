@@ -12,10 +12,13 @@ define [
 ], (I18n, $, curveGradesDialogTemplate, htmlEscape) ->
 
   class CurveGradesDialog
-    constructor: ({@assignment, @students, context_url}) ->
+    constructor: ({@assignment, @students, @context_url}) ->
+      @initDialog()
+
+    initDialog: =>
       locals =
         assignment: @assignment
-        action: "#{context_url}/gradebook/update_submission"
+        action: "#{@context_url}/gradebook/update_submission"
         middleScore: parseInt((@assignment.points_possible || 0) * 0.6)
         showOutOf: @assignment.points_possible >= 0
       # the dialog will be shared across all instantiation, so make it a prototype property

@@ -11,9 +11,9 @@ define([
     const sections = {};
     const groups = {};
 
-    students.forEach(function(student) {
-      _.each(student.sections, sectionID => sections[sectionID] = addStudentID(student, sections[sectionID]));
-      _.each(student.group_ids, groupID => groups[groupID] = addStudentID(student, groups[groupID]));
+    _.each(students, function(student) {
+      student.sections.forEach(sectionID => sections[sectionID] = addStudentID(student, sections[sectionID]));
+      student.group_ids.forEach(groupID => groups[groupID] = addStudentID(student, groups[groupID]));
     });
 
     return { studentIDsInSections: sections, studentIDsInGroups: groups };

@@ -802,7 +802,7 @@ define [
       else if assignment.points_possible?
         htmlLines.push htmlEscape(I18n.t('points_out_of', "out of %{points_possible}", points_possible: assignment.points_possible))
 
-      $hoveredCell.data('tooltip', $("<span />",
+      $hoveredCell.data 'tooltip', $("<span />",
         class: 'gradebook-tooltip'
         css:
           left: offset.left - 15
@@ -811,7 +811,7 @@ define [
           display: 'block'
         html: $.raw(htmlLines.join('<br />'))
       ).appendTo('body')
-      .css('top', (i, top) -> parseInt(top) - $(this).outerHeight()))
+      .css('top', (i, top) -> parseInt(top) - $(this).outerHeight())
 
     unhoverMinimizedCell: (event) ->
       if $tooltip = $(this).data('tooltip')
