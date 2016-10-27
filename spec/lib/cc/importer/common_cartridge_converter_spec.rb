@@ -620,14 +620,16 @@ describe "other cc files" do
   def import_cc_file(filename)
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/#{filename}")
     unzipped_file_path = create_temp_dir!
-    converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
-    converter.export
-    @course_data = converter.course.with_indifferent_access
 
     @course = course
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_type = "common_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+
+    converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi',
+      :base_download_dir=>unzipped_file_path, :content_migration => @migration)
+    converter.export
+    @course_data = converter.course.with_indifferent_access
     enable_cache do
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
@@ -663,6 +665,17 @@ describe "other cc files" do
       next unless Qti.qti_enabled?
       import_cc_file("cc_pattern_match.zip")
       expect(@migration.migration_issues.first.description).to include("This package includes the question type, Pattern Match")
+    end
+  end
+
+  describe "cc unsupported resource types" do
+    it "should produce warnings" do
+      next unless Qti.qti_enabled?
+      import_cc_file("cc_unsupported_resources.zip")
+      issues = @migration.migration_issues.pluck(:description)
+      expect(issues.any?{|i| i.include?("This package includes APIP file(s)")}).to be_truthy
+      expect(issues.any?{|i| i.include?("This package includes IWB file(s)")}).to be_truthy
+      expect(issues.any?{|i| i.include?("This package includes EPub3 file(s)")}).to be_truthy
     end
   end
 end
