@@ -1496,6 +1496,7 @@ define([
         $('#quiz_tabs').tabs("option", "disabled", false);
       } else {
         $('#quiz_tabs').tabs("option", "disabled", [2]);
+        $('#quiz_tabs').tabs("option", "active", 0)
       }
     }
   }

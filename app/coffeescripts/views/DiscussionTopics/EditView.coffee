@@ -389,14 +389,14 @@ ConditionalRelease, deparam) ->
           @$discussionEditView.tabs("option", "disabled", false)
         else
           @$discussionEditView.tabs("option", "disabled", [1])
-          @$discussionDetailsTab.show()
+          @$discussionEditView.tabs("option", "active", 0)
 
     onChange: ->
       if @showConditionalRelease() && @assignmentUpToDate
         @assignmentUpToDate = false
 
     onTabChange: ->
-      if @showConditionalRelease() && !@assignmentUpToDate
+      if @showConditionalRelease() && !@assignmentUpToDate && @conditionalReleaseEditor
         assignmentData = @getFormData().assignment?.attributes
         @conditionalReleaseEditor.updateAssignment(assignmentData)
         @assignmentUpToDate = true
