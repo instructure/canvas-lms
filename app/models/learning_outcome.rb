@@ -149,18 +149,13 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def align(asset, context, opts={})
-    tag = self.alignments.where(content_id: asset, content_type: asset.class.to_s, tag_type: 'learning_outcome', context_id: context, context_type: context.class.to_s).first
-    tag ||= self.alignments.create(:content => asset, :tag_type => 'learning_outcome', :context => context)
-    mastery_type = opts[:mastery_type]
-    if mastery_type == 'points' || mastery_type == 'points_mastery'
-      mastery_type = 'points_mastery'
-    else
-      mastery_type = 'explicit_mastery'
-    end
-    tag.tag = mastery_type
+    tag = find_or_create_tag(asset, context)
+    tag.tag = determine_tag_type(opts[:mastery_type])
     tag.position = (self.alignments.map(&:position).compact.max || 1) + 1
     tag.mastery_score = opts[:mastery_score] if opts[:mastery_score]
     tag.save
+
+    create_missing_outcome_link(context) if context.is_a? Course
     tag
   end
 
@@ -341,4 +336,34 @@ class LearningOutcome < ActiveRecord::Base
   )
 
   scope :global, -> { where(:context_id => nil) }
+
+  private
+
+  def create_missing_outcome_link(context)
+    context_outcomes = context.learning_outcome_links.where(
+      content_type: "LearningOutcome"
+    ).pluck(:content_id)
+
+    unless context_outcomes.include?(self.id)
+      context.root_outcome_group.add_outcome(self)
+    end
+  end
+
+  def find_or_create_tag(asset, context)
+    self.alignments.find_or_create_by(
+      content: asset,
+      tag_type: 'learning_outcome',
+      context: context
+    )
+  end
+
+  def determine_tag_type(mastery_type)
+    case mastery_type
+    when 'points', 'points_mastery'
+      new_mastery_type = 'points_mastery'
+    else
+      new_mastery_type = 'explicit_mastery'
+    end
+    new_mastery_type
+  end
 end

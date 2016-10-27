@@ -95,9 +95,9 @@ class AssessmentQuestionBank < ActiveRecord::Base
     # add/update current alignments
     unless outcomes.empty?
       alignments.each do |outcome_id, mastery_score|
-        outcome = outcomes.detect{ |outcome| outcome.id == outcome_id.to_i }
-        next unless outcome
-        outcome.align(self, context, :mastery_score => mastery_score)
+        matching_outcome = outcomes.detect{ |outcome| outcome.id == outcome_id.to_i }
+        next unless matching_outcome
+        matching_outcome.align(self, context, :mastery_score => mastery_score)
       end
     end
   end
