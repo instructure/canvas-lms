@@ -414,7 +414,7 @@ class SubmissionsApiController < ApplicationController
       end
     else
       order_by = params[:order] == "graded_at" ? "graded_at" : :id
-      order_direction = params[:order_direction] == "descending" ? "desc" : "asc"
+      order_direction = params[:order_direction] == "descending" ? "desc nulls last" : "asc"
       order = "#{order_by} #{order_direction}"
       submissions = @context.submissions.except(:order).where(:user_id => student_ids).order(order)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?

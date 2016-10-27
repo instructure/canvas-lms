@@ -1336,6 +1336,8 @@ describe 'Submissions API', type: :request do
     it "can return assignments based on graded_at time" do
       @a2.grade_student @student1, grade: 10
       @a1.grade_student @student1, grade: 5
+      @a3 = @course.assignments.create! title: "a3"
+      @a3.submit_homework @student1, body: "hello"
       Submission.where(assignment_id: @a2).update_all(graded_at: 1.hour.from_now)
       json = api_call(:get,
             "/api/v1/courses/#{@course.id}/students/submissions.json",
@@ -1343,7 +1345,7 @@ describe 'Submissions API', type: :request do
               format: 'json', course_id: @course.to_param },
             { student_ids: [@student1.to_param],
               order: "graded_at", order_direction: "descending" })
-      expect(json.map { |a| a["assignment_id"] }).to eq [@a2.id, @a1.id]
+      expect(json.map { |a| a["assignment_id"] }).to eq [@a2.id, @a1.id, @a3.id]
     end
   end
 
