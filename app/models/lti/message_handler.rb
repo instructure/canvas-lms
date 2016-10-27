@@ -62,7 +62,7 @@ module Lti
                            end
       apps.sort_by(&:id).map do |app|
         args = {message_handler_id: app.id, resource_link_fragment: "nav"}
-        args["#{context.class.name.downcase}_id"] = context.id
+        args["#{context.class.name.downcase}_id".to_sym] = context.id
         {
           :id => app.asset_string,
           :label => app.resource_handler.name,
