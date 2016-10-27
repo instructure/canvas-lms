@@ -71,6 +71,13 @@ class ContextExternalTool < ActiveRecord::Base
     self.find_external_tool(launch_url, assignment.context)
   end
 
+  def content_migration_configured?
+    settings.key?('content_migration') &&
+      settings['content_migration'].is_a?(Hash) &&
+      settings['content_migration'].key?('export_start_url') &&
+      settings['content_migration'].key?('import_start_url')
+  end
+
   def extension_setting(type, property = nil)
     return settings[property] unless type
     type = type.to_sym
