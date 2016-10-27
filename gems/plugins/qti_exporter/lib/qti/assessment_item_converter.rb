@@ -163,6 +163,9 @@ class AssessmentItemConverter
       if ref = get_node_att(meta, 'instructureField[name=assessment_question_identifierref]', 'value')
         @question[:assessment_question_migration_id] = ref
       end
+      if get_node_att(meta, 'instructureField[name=cc_profile]', 'value') == 'cc.pattern_match.v0p1'
+        @question[:is_cc_pattern_match] = true
+      end
       if type =  get_node_att(meta, 'instructureField[name=bb_question_type]', 'value')
         @migration_type = type
         case @migration_type

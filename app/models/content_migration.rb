@@ -251,6 +251,13 @@ class ContentMigration < ActiveRecord::Base
     add_issue(user_message, :warning, opts)
   end
 
+  def add_unique_warning(key, warning, opts={})
+    @added_warnings ||= Set.new
+    return if @added_warnings.include?(key) # only add it once
+    @added_warnings << key
+    add_warning(warning, opts)
+  end
+
   def add_import_warning(item_type, item_name, warning)
     item_name = CanvasTextHelper.truncate_text(item_name || "", :max_length => 150)
     add_warning(t('errors.import_error', "Import Error:") + " #{item_type} - \"#{item_name}\"", warning)

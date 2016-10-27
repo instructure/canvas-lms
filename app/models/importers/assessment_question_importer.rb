@@ -119,6 +119,11 @@ module Importers
     def self.prep_for_import(hash, migration, item_type)
       return hash if hash[:prepped_for_import]
 
+      if hash[:is_cc_pattern_match]
+        migration.add_unique_warning(:cc_pattern_match,
+          t("This package includes the question type, Pattern Match, which is not compatible with Canvas. We have converted the question type to Fill in the Blank"))
+      end
+
       if hash[:question_text] && hash[:question_text].length > 16.kilobytes
         hash[:question_text] = t("The imported question text for this question was too long.")
         migration.add_warning(t("The question text for the question \"%{question_name}\" was too long.",

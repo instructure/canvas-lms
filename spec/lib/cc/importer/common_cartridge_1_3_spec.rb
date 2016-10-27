@@ -149,7 +149,8 @@ describe "Standard Common Cartridge importing" do
     end
 
     it "should import assessments from qti inside the manifest" do
-      expect(@migration.migration_issues.count).to eq 0
+      expect(@migration.migration_issues.count).to eq 1
+      expect(@migration.migration_issues.first.description).to include("This package includes the question type, Pattern Match")
 
       expect(@course.quizzes.count).to eq 1
       q = @course.quizzes.first
