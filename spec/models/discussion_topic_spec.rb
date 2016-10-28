@@ -1220,6 +1220,34 @@ describe DiscussionTopic do
       sub = @assignment.submissions.where(:user_id => @student).first
       expect(sub.attachments.to_a).to eq [@attachment]
     end
+
+    it "should associate attachments with graded discussion submissions even with silly deleted topics" do
+      gc1 = group_category(:name => "gc1")
+      group_with_user(group_category: gc1, user: @student, :context => @course)
+      gc2 = group_category(:name => "gc2")
+      group_with_user(group_category: gc2, user: @student, :context => @course)
+      group2 = @group
+
+      @assignment = assignment_model(:course => @course)
+      @topic.assignment = @assignment
+      @topic.group_category = gc1
+      @topic.save!
+      @topic.group_category = gc2 # switching group categories deletes the old child topics
+      @topic.save!
+      @topic.reload
+
+      # can't use child_topic_for to show the exact bug
+      # because that's where the reported bug is
+      sub_topic = @topic.child_topics.where(:context_type => "Group", :context_id => group2).first
+
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "homework.png")
+      entry = sub_topic.reply_from(:user => @student, :text => "entry")
+      entry.attachment = @attachment
+      entry.save!
+
+      sub = @assignment.submissions.where(:user_id => @student).first
+      expect(sub.attachments.to_a).to eq [@attachment]
+    end
   end
 
   describe "#unread_count" do

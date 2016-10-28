@@ -438,7 +438,7 @@ class DiscussionTopic < ActiveRecord::Base
   def child_topic_for(user)
     group_ids = user.group_memberships.active.pluck(:group_id) &
       context.groups.active.pluck(:id)
-    child_topics.where(context_id: group_ids, context_type: 'Group').first
+    child_topics.active.where(context_id: group_ids, context_type: 'Group').first
   end
 
   def change_child_topic_subscribed_state(new_state, current_user)
