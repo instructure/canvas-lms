@@ -213,6 +213,10 @@ module CC::Importer::Standard
           add_warning(message_proc.call)
         end
       end
+
+      if @manifest.at_css('metadata curriculumStandardsMetadata')
+        add_warning(I18n.t("This package includes Curriculum Standards, which are not compatible with Canvas and were not included in the import."))
+      end
     end
   end
 end
