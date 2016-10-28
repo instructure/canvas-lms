@@ -58,7 +58,7 @@ class WikiPage < ActiveRecord::Base
     where(assignment_id: nil).joins(:course).where(courses: {id: course_ids})
   }
 
-  TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
+  TITLE_LENGTH = 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update]
 
   def touch_wiki_context
