@@ -299,7 +299,7 @@ module Importers
         item.migration_id = hash[:migration_id]
         item.new_tab = hash[:new_tab]
         item.position = (context_module.item_migration_position ||= context_module.content_tags.not_deleted.map(&:position).compact.max || 0)
-        if hash[:workflow_state] && !['active', 'published'].include?(item.workflow_state)
+        if hash[:workflow_state] && ContentTag::TABLELESS_CONTENT_TYPES.include?(item.content_type) && !['active', 'published'].include?(item.workflow_state)
           item.workflow_state = hash[:workflow_state]
         end
         context_module.item_migration_position += 1
