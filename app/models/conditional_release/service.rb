@@ -23,14 +23,15 @@ module ConditionalRelease
     private_class_method :new
 
     DEFAULT_PATHS = {
-      edit_rule_path: "ui/editor",
+      base_path: '',
       stats_path: "stats",
       create_account_path: 'api/accounts',
       content_exports_path: 'api/content_exports',
       content_imports_path: 'api/content_imports',
       rules_path: 'api/rules?include[]=all&active=true',
       rules_summary_path: 'api/rules/summary',
-      select_assignment_set_path: 'api/rules/select_assignment_set'
+      select_assignment_set_path: 'api/rules/select_assignment_set',
+      editor_path: 'javascripts/generated/conditional_release_editor.bundle.js'
     }.freeze
 
     DEFAULT_CONFIG = {
@@ -51,9 +52,11 @@ module ConditionalRelease
         cyoe_env = {
           jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
           assignment: assignment_attributes(assignment),
-          edit_rule_url: edit_rule_url,
           stats_url: stats_url,
-          locale: I18n.locale.to_s
+          locale: I18n.locale.to_s,
+          editor_url: editor_url,
+          base_url: base_url,
+          context_id: context.id
         }
 
         cyoe_env[:rule] = rule_triggered_by(assignment, user, session) if includes.include? :rule

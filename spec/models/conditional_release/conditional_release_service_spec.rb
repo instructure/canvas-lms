@@ -80,10 +80,10 @@ describe ConditionalRelease::Service do
       stub_config({
         protocol: 'foo', host: 'bar',
         create_account_path: 'some/path',
-        edit_rule_path: 'some/other/path'
+        editor_path: 'some/other/path'
       })
       expect(Service.create_account_url).to eq 'foo://bar/some/path'
-      expect(Service.edit_rule_url).to eq 'foo://bar/some/other/path'
+      expect(Service.editor_url).to eq 'foo://bar/some/other/path'
     end
 
     it 'requires feature flag to be enabled' do
