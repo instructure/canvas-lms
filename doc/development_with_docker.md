@@ -324,7 +324,8 @@ docker-compose up selenium
 With the container running, you should be able to open a VNC session:
 
 ```sh
-open vnc://secret:secret@selenium.docker/
+open vnc://secret:secret@seleniumff.docker          (firefox)
+open vnc://secret:secret@seleniumch.docker:5901     (chrome)
 ```
 
 Now just run your choice of selenium specs:

@@ -189,7 +189,7 @@ module SeleniumDriverSetup
   end
 
   def selenium_url
-    $selenium_config[:remote_url]
+    (browser == :chrome) ? $selenium_config[:remote_url_chrome] : $selenium_config[:remote_url_firefox]
   end
 
   def ruby_firefox_driver
