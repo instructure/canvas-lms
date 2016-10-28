@@ -2,6 +2,7 @@ define([
   'jquery',
   'react',
   'i18n!appointment_groups',
+  'instructure-ui/Breadcrumb',
   'instructure-ui/Button',
   'instructure-ui/Grid',
   'instructure-ui/ScreenReaderContent',
@@ -12,7 +13,7 @@ define([
   './TimeBlockSelector',
   'compiled/jquery.rails_flash_notifications',
   'jquery.instructure_forms'
-], ($, React, I18n, {default: Button}, {default: Grid, GridCol, GridRow}, {default: ScreenReaderContent}, axios, AppointmentGroupList, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
+], ($, React, I18n, {default: Breadcrumb, BreadcrumbLink}, {default: Button}, {default: Grid, GridCol, GridRow}, {default: ScreenReaderContent}, axios, AppointmentGroupList, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
 
   const parseFormValues = (data) => ({
     description: data.description,
@@ -215,6 +216,14 @@ define([
     render () {
       return (
         <div className="EditPage">
+          <Breadcrumb label={I18n.t('You are here:')}>
+            <BreadcrumbLink href='/calendar'>{I18n.t('Calendar')}</BreadcrumbLink>
+            <BreadcrumbLink>
+              {I18n.t('Edit %{pageTitle}', {
+                pageTitle: this.state.appointmentGroup.title
+              })}
+            </BreadcrumbLink>
+          </Breadcrumb>
           <ScreenReaderContent>
             <h1>
               {I18n.t('Edit %{pageTitle}', {
