@@ -11,7 +11,8 @@ define([
   module('TimeBlockSelector', {
     setup () {
       props = {
-        timeData: []
+        timeData: [],
+        onChange () {}
       };
     },
     teardown () {
@@ -37,4 +38,18 @@ define([
     component.handleSlotDivision();
     equal(component.state.timeBlockRows.length, 6);
   });
+
+  test('calls onChange when there are modifications made', () => {
+    props.onChange = sinon.spy();
+    const component = TestUtils.renderIntoDocument(<TimeBlockSelector {...props} />);
+    const domNode = ReactDOM.findDOMNode(component);
+    $('.TimeBlockSelector__DivideSection-Input', domNode).val(60);
+    const newRow = component.state.timeBlockRows[0];
+    newRow.timeData.startTime = new Date('Oct 26 2016 10:00');
+    newRow.timeData.endTime = new Date('Oct 26 2016 15:00');
+    component.setState({
+      timeBlockRows: [newRow]
+    });
+    ok(props.onChange.called);
+  })
 });

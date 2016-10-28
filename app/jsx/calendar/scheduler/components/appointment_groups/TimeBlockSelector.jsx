@@ -15,7 +15,8 @@ define([
 
     static propTypes = {
       className: React.PropTypes.string,
-      timeData: React.PropTypes.arrayOf(React.PropTypes.object)
+      timeData: React.PropTypes.arrayOf(React.PropTypes.object),
+      onChange: React.PropTypes.func.isRequired
     };
 
     constructor (props) {
@@ -29,6 +30,12 @@ define([
         }]
       };
       this.lastNewId++;
+    }
+
+    componentDidUpdate (prevProps, prevState) {
+      if (prevState !== this.state) {
+        this.props.onChange(this.state.timeBlockRows);
+      }
     }
 
     getNewSlotData () {

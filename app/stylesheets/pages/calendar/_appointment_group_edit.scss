@@ -8,12 +8,25 @@
     margin-top: 10px;
   }
 }
+
+.EditPage__Options-Input {
+  width: 50px;
+}
+
+.EditPage__Options-GroupCheckbox {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
 .hiddenSection {
   display: none;
 }
+
 .sectionItem {
   padding-left: 20px;
 }
+
 .AppointmentGroupList__List {
   width: 100%;
   margin-top: 10px;
