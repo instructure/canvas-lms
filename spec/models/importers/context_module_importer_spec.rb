@@ -42,6 +42,14 @@ describe "Importing modules" do
     end
   end
 
+  it "should import bb8 subitems" do
+    data = get_import_data('bb8', 'sub_items')
+    context = get_import_context('bb8')
+    migration = context.content_migrations.create!
+    Importers::ContextModuleImporter.import_from_migration(data, context, migration)
+    expect(context.context_module_tags.find_by_migration_id('res00796')).not_to be_deleted
+  end
+
   it "should link to url objects" do
     data = get_import_data('vista', 'module')
     context = get_import_context('vista')
