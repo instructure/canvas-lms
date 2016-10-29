@@ -48,6 +48,30 @@ module Api
           raw_link = "/files/1/download?verifier=123"
           expect(Link.new(raw_link).to_corrected_s).to eq "/courses/1/files/1/download?"
         end
+
+        it 'scopes to the context if url includes the host' do
+          course_attachment = stub(context_type: "Course", context_id: 1)
+          Attachment.stubs(:where).with(id: "1").returns(stub(first: course_attachment))
+          host = 'account.instructure.com'
+          raw_link = "https://#{host}/files/1/download?verifier=123"
+          expect(Link.new(raw_link, host: host).to_corrected_s).to eq "/courses/1/files/1/download?"
+        end
+
+        it 'strips the current host from absolute urls' do
+          course_attachment = stub(context_type: "Course", context_id: 1)
+          Attachment.stubs(:where).with(id: "1").returns(stub(first: course_attachment))
+          host = 'account.instructure.com'
+          raw_link = "https://#{host}/courses/1/files/1/download?"
+          expect(Link.new(raw_link, host: host).to_corrected_s).to eq "/courses/1/files/1/download?"
+        end
+
+        it 'does not scope to the context if url includes a differnt host' do
+          course_attachment = stub(context_type: "Course", context_id: 1)
+          Attachment.stubs(:where).with(id: "1").returns(stub(first: course_attachment))
+          host = 'account.instructure.com'
+          raw_link = "https://#{host}/files/1/download"
+          expect(Link.new(raw_link, host: 'other-host').to_corrected_s).to eq raw_link
+        end
       end
     end
   end

@@ -20,6 +20,10 @@
 <% if @headers || !@locked %>
   <% content_for :right_side do %>
     <div id="sidebar_content" class="rs-margin-all">
+      <% if can_do(@context, @current_user, :view_all_grades) &&
+            ConditionalRelease::Service.triggers_mastery_paths?(@topic.assignment, @current_user, session) %>
+        <div id="crs-graphs"></div>
+      <% end %>
     </div>
     <%= render :partial => "shared/wiki_sidebar" %>
   <% end %>

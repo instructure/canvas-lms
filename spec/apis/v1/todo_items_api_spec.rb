@@ -178,6 +178,42 @@ describe UsersController, type: :request do
     expect(json).to eq []
   end
 
+  it "should include assignments that don't expect an online submission (courses endpoint)" do
+    ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+    json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo", :controller => "courses", :action => "todo_items",
+        :format => "json", :course_id => @student_course.to_param
+    expect(json.map {|e| e['assignment']['id']}).to include ungraded.id
+  end
+
+  it "should include assignments that don't expect an online submission (users endpoint)" do
+    ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+    json = api_call :get, "/api/v1/users/self/todo", :controller => "users", :action => "todo_items", :format => "json"
+    expect(json.map {|e| e['assignment']['id']}).to include ungraded.id
+  end
+
+  it "includes ungraded quizzes by request" do
+    survey = @student_course.quizzes.create!(quiz_type: 'survey', due_at: 1.day.from_now)
+    survey.publish!
+
+    # course endpoint
+    json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo", :controller => "courses",
+                    :action => "todo_items", :format => "json", :course_id => @student_course.to_param
+    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
+
+    json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo?include[]=ungraded_quizzes",
+                    :controller => "courses", :action => "todo_items",
+                    :format => "json", :course_id => @student_course.to_param, :include => %w(ungraded_quizzes)
+    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([survey.id])
+
+    # user endpoint
+    json = api_call :get, "/api/v1/users/self/todo", :controller => "users", :action => "todo_items", :format => "json"
+    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
+
+    json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
+                    :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
+    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([survey.id])
+  end
+
   it "works correctly when turnitin is enabled" do
     @a2.context.any_instantiation.expects(:turnitin_enabled?).returns true
     json = api_call(:get, "/api/v1/users/self/todo",

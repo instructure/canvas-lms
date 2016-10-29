@@ -21,9 +21,9 @@ require 'nokogiri'
 module Api
   module Html
     class Content
-      def self.process_incoming(html)
+      def self.process_incoming(html, host: nil)
         return html unless html.present?
-        content = self.new(html)
+        content = self.new(html, host: host)
         # shortcut html documents that definitely don't have anything we're interested in
         return html unless content.might_need_modification?
 
@@ -37,8 +37,8 @@ module Api
 
       attr_reader :html
 
-      def initialize(html_string, account = nil, include_mobile: false)
-        @account, @html, @include_mobile = account, html_string, include_mobile
+      def initialize(html_string, account = nil, include_mobile: false, host: nil)
+        @account, @html, @include_mobile, @host = account, html_string, include_mobile, host
       end
 
       def might_need_modification?
@@ -131,7 +131,7 @@ module Api
       end
 
       def corrected_link(link)
-        Html::Link.new(link).to_corrected_s
+        Html::Link.new(link, host: @host).to_corrected_s
       end
 
       def parsed_html

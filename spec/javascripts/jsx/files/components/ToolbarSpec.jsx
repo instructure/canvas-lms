@@ -67,7 +67,7 @@ define([
   });
 
   test('renders all buttons for users with manage_files permissions', ()  => {
-    const toolbar = TestUtils.renderIntoDocument(toolbarFactory({params: 'foo', query:'', selectedItems: [file], currentFolder: courseFolder, contextId: '1', contextType: 'courses', userCanManageFilesForContext: true}));
+    const toolbar = TestUtils.renderIntoDocument(toolbarFactory({params: 'foo', query:'', selectedItems: [file], currentFolder: courseFolder, contextId: '1', contextType: 'courses', userCanManageFilesForContext: true, userCanRestrictFilesForContext: true}));
     const config = {
       '.btn-view': true,
       '.btn-download': true,
@@ -81,7 +81,7 @@ define([
   });
 
   test('disables preview button on folder', () => {
-    const toolbar = TestUtils.renderIntoDocument(toolbarFactory({params: 'foo', query:'', selectedItems: [userFolder], currentFolder: courseFolder, contextId: '1', contextType: 'courses', userCanManageFilesForContext: true}));
+    const toolbar = TestUtils.renderIntoDocument(toolbarFactory({params: 'foo', query:'', selectedItems: [userFolder], currentFolder: courseFolder, contextId: '1', contextType: 'courses', userCanManageFilesForContext: true, userCanRestrictFilesForContext: true}));
     const config = {
       '.btn-view': false,
       '.btn-download': true,

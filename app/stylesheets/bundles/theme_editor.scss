@@ -51,7 +51,6 @@ $te-footer-height: 72px;
 
 .Theme__container {
   margin: 0; // overwrite default margin on forms
-  opacity: 0.01;
   animation: fadeIn ease-in 1;
   animation-fill-mode:forwards;
   animation-duration: 0.2s;
@@ -257,7 +256,7 @@ $te-footer-height: 72px;
 }
 
 .ThemeEditorFileUpload__fake-input {
-  color: $gray-light;
+  color: $ic-font-color-dark;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -1,0 +1,21 @@
+.EditPage {
+  .EditPage__Header {
+    border-bottom: 1px solid $ic-border-light;
+    padding-bottom: 15px;
+  }
+
+  .EditPage__Form {
+    margin-top: 10px;
+  }
+}
+
+
+.ContextSelector__Dropdown {
+  position: absolute;
+  width: 223px;
+  background: $ic-color-light;
+  border: 1px solid $ic-border-light;
+  margin-top: -3px;
+  padding-bottom: 5px;
+  z-index: 10;
+}

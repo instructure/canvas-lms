@@ -1,10 +1,14 @@
 <div class="never_drop collectionViewItems"> </div>
 {{#if hasAssignments}}
-<button class="btn btn-link add_never_drop" type="button">{{addIcon 'add'}}
-{{#if hasNeverDrops}}
-  {{#t "add_another_assignment"}}Add another assignment{{/t}}
-{{else}}
-  {{#t "add_first_assignment"}}Add an assignment{{/t}}
-{{/if}}
-</button>
+  <button
+    class="btn btn-link add_never_drop{{#unless canChangeDropRules}} disabled{{/unless}}"
+    {{#unless canChangeDropRules}}aria-disabled=true{{/unless}}
+    type="button"
+  >{{addIcon 'add'}}
+    {{#if hasNeverDrops}}
+      {{#t}}Add another assignment{{/t}}
+    {{else}}
+      {{#t}}Add an assignment{{/t}}
+    {{/if}}
+  </button>
 {{/if}}

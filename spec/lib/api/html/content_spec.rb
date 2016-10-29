@@ -37,6 +37,11 @@ module Api
           expect(Content.new(string).might_need_modification?).to be(true)
         end
 
+        it 'is false for a link to files in a context' do
+          string = "<body><a href='/courses/1/files'>link</a></body>"
+          expect(Content.new(string).might_need_modification?).to be(false)
+        end
+
         it 'is false for garden-variety content' do
           string = "<body><a href='http://example.com/123'>link</a></body>"
           expect(Content.new(string).might_need_modification?).to be(false)
@@ -46,10 +51,11 @@ module Api
       describe "#modified_html" do
         it "scrubs links" do
           string = "<body><a href='http://somelink.com'>link</a></body>"
-          Html::Link.expects(:new).with("http://somelink.com").returns(
+          host = 'some-host'
+          Html::Link.expects(:new).with("http://somelink.com", host: host).returns(
             stub(to_corrected_s: "http://otherlink.com")
           )
-          html = Content.new(string).modified_html
+          html = Content.new(string, host: host).modified_html
           expect(html).to match(/otherlink.com/)
         end
 

@@ -15,7 +15,7 @@ class NumericInteraction < AssessmentItemConverter
     get_feedback()
     @question
   end
-  
+
   def get_answer_values
     answer = {:weight=>100,:comments=>"",:id=>unique_local_id,:numerical_answer_type=>"range_answer"}
     if gte = @doc.at_css('responseCondition gte baseValue')
@@ -36,18 +36,42 @@ class NumericInteraction < AssessmentItemConverter
     @doc.css('responseIf, responseElseIf').each do |r_if|
       answer = {:weight=>100, :id=>unique_local_id, :text=>'answer_text'}
       answer[:feedback_id] = get_feedback_id(r_if)
+
       if or_node = r_if.at_css('or')
         # exact answer
         exact_node = or_node.at_css('stringMatch baseValue')
         next unless exact_node
-        answer[:numerical_answer_type] = 'exact_answer'
         exact = exact_node.text rescue "0.0"
-        answer[:exact] = exact.to_f
-        if upper = or_node.at_css('and customOperator[class=varlte] baseValue')
-          # do margin computation with BigDecimal to avoid rounding errors
-          # (this is also used when _scoring_ numeric range questions)
-          margin = BigDecimal.new(upper.text) - BigDecimal.new(exact) rescue "0.0"
-          answer[:margin] = margin.to_f
+
+        is_precision = false
+        if (lower_node = or_node.at_css('and customOperator[class=vargt] baseValue')) &&
+            (upper_node = or_node.at_css('and customOperator[class=varlte] baseValue')) &&
+            lower_node.text.end_with?("5") && upper_node.text.end_with?("5")
+          # tl;dr - super hacky way to try to detect the precision answers
+          upper = upper_node.text.to_d
+          lower = lower_node.text.to_d
+          exact_num = exact.to_d
+
+          if (exact_num - lower) == (upper - exact_num) # same margin on each side
+            _, sig_digits, _b, exp = (upper - lower).split
+            if sig_digits == "1" # i.e. is a power of 10
+              is_precision = true
+              answer[:precision] = exact_num.exponent - exp + 1
+              answer[:approximate] = exact_num.to_f
+              answer[:numerical_answer_type] = 'precision_answer'
+            end
+          end
+        end
+
+        unless is_precision
+          answer[:numerical_answer_type] = 'exact_answer'
+          answer[:exact] = exact.to_f
+          if upper = or_node.at_css('and customOperator[class=varlte] baseValue')
+            # do margin computation with BigDecimal to avoid rounding errors
+            # (this is also used when _scoring_ numeric range questions)
+            margin = BigDecimal.new(upper.text) - BigDecimal.new(exact) rescue "0.0"
+            answer[:margin] = margin.to_f
+          end
         end
         @question[:answers] << answer
       elsif and_node = r_if.at_css('and')

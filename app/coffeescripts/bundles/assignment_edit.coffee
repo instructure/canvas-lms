@@ -13,11 +13,14 @@ require [
   'compiled/views/assignments/PeerReviewsSelector'
   'grading_standards'
   'manage_groups'
-], (Section,Assignment, EditHeaderView, EditView, SectionCollection,
+], (Section, Assignment, EditHeaderView, EditView, SectionCollection,
+
   DueDateList, OverrideView, AssignmentGroupSelector,
   GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector) ->
 
   ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
+
+  userIsAdmin = ENV.current_user_roles.includes('admin')
 
   assignment = new Assignment ENV.ASSIGNMENT
   assignment.urlRoot = ENV.URL_ROOT
@@ -56,6 +59,7 @@ require [
   editHeaderView = new EditHeaderView
     el: headerEl
     model: assignment
+    userIsAdmin: userIsAdmin
     views:
       'edit_assignment_form': editView
 

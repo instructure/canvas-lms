@@ -76,16 +76,16 @@ define [
       return unless datetime?
       datetime = tz.parse(datetime) unless _.isDate datetime
       fudged = $.fudgeDateForProfileTimezone(tz.parse(datetime))
-      timeTitle = ""
+      timeTitleHtml = ""
       if contextSensitive and ENV and ENV.CONTEXT_TIMEZONE
-        timeTitle = Handlebars.helpers.contextSensitiveDatetimeTitle(datetime, hash: {justText: true})
+        timeTitleHtml = Handlebars.helpers.contextSensitiveDatetimeTitle(datetime, hash: {justText: true})
       else
-        timeTitle = htmlEscape $.datetimeString(datetime)
+        timeTitleHtml = $.datetimeString(datetime)
 
       new Handlebars.SafeString """
-        <time data-tooltip data-html-tooltip-title='#{htmlEscape timeTitle}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>
+        <time data-tooltip data-html-tooltip-title='#{htmlEscape timeTitleHtml}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>
           <span aria-hidden='true'>#{$.friendlyDatetime(fudged)}</span>
-          <span class='screenreader-only'>#{htmlEscape timeTitle}</span>
+          <span class='screenreader-only'>#{timeTitleHtml}</span>
         </time>
       """
 

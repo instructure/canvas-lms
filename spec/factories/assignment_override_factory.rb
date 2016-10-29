@@ -44,3 +44,42 @@ def create_section_override_for_assignment(assignment_or_quiz, opts={})
 end
 alias :create_section_override_for_quiz :create_section_override_for_assignment
 
+def create_adhoc_override_for_assignment(assignment_or_quiz, users, opts={})
+  assignment_override_model(opts.merge(assignment: assignment_or_quiz))
+  @override.set = nil
+  @override.set_type = 'ADHOC'
+  @override.save!
+
+  users = Array.wrap(users)
+  users.each do |user|
+    @override_student = @override.assignment_override_students.build
+    @override_student.user = user
+    @override_student.save!
+  end
+  @override
+end
+
+module Factories
+  class AssignmentOverrideHelper
+    def create_adhoc_override(assignment_or_quiz, student, opts = {})
+      override = assignment_override_model(
+        assignment: assignment_or_quiz,
+        due_at: opts.key?(:due_at) ? opts[:due_at] : 7.days.from_now
+      )
+      override_student = override.assignment_override_students.build
+      override_student.user = student
+      override_student.save!
+      override
+    end
+
+    def create_group_override(assignment_or_quiz, group, opts = {})
+      override = assignment_override_model(
+        assignment: assignment_or_quiz,
+        due_at: opts.key?(:due_at) ? opts[:due_at] : 7.days.from_now
+      )
+      override.set = group
+      override.save!
+      override
+    end
+  end
+end

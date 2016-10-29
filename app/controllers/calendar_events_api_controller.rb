@@ -991,8 +991,8 @@ class CalendarEventsApiController < ApplicationController
       if group_codes.present?
         @context_codes += AppointmentGroup.
           reservable_by(user).
-          intersecting(@start_date, @end_date).
           where(id: group_codes).
+          select('appointment_groups.id').
           map(&:asset_string)
       end
       # include manageable appointment group events for the specified contexts

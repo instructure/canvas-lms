@@ -3,7 +3,13 @@ define([
   'react-dom',
   'jsx/conditional_release_stats/components/student-ranges-view',
 ], (React, ReactDOM, RangesView) => {
-  module('Student Ranges View')
+  const container = document.getElementById('fixtures')
+
+  module('Student Ranges View', {
+    teardown() {
+      ReactDOM.unmountComponentAtNode(container)
+    }
+  })
 
   const defaultProps = () => ({
     ranges: [
@@ -60,6 +66,7 @@ define([
       range: 0,
       student: null,
     },
+    loadStudent: () => {},
     selectRange: () => {},
     selectStudent: () => {},
   })
@@ -68,7 +75,7 @@ define([
   const renderComponent = (props) => {
     return ReactDOM.render(
       <RangesView {...props} />
-    , document.getElementById('fixtures'))
+    , container)
   }
 
   test('renders three ranges components correctly', () => {

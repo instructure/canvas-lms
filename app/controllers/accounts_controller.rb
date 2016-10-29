@@ -619,18 +619,16 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :read)
       @available_reports = AccountReport.available_reports if @account.grants_right?(@current_user, @session, :read_reports)
       if @available_reports
-        @last_complete_reports = {}
-        @last_reports = {}
-        if AccountReport.connection.adapter_name == 'PostgreSQL'
-          scope = @account.account_reports.select("DISTINCT ON (report_type) account_reports.*").order(:report_type)
-          @last_complete_reports = scope.last_complete_of_type(@available_reports.keys, nil).preload(:attachment).index_by(&:report_type)
-          @last_reports = scope.last_of_type(@available_reports.keys, nil).index_by(&:report_type)
-        else
-          @available_reports.keys.each do |report|
-            @last_complete_reports[report] = @account.account_reports.last_complete_of_type(report).first
-            @last_reports[report] = @account.account_reports.last_of_type(report).first
-          end
-        end
+        scope = @account.account_reports.where("report_type=name").most_recent
+        @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
+              LATERAL (#{scope.complete.to_sql}) account_reports ").
+            order("report_types.name").
+            preload(:attachment).
+            index_by(&:report_type)
+        @last_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
+              LATERAL (#{scope.to_sql}) account_reports ").
+            order("report_types.name").
+            index_by(&:report_type)
       end
       load_course_right_side
       @account_users = @account.account_users

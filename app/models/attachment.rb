@@ -627,7 +627,11 @@ class Attachment < ActiveRecord::Base
 
   def handle_duplicates(method, opts = {})
     return [] unless method.present? && self.folder
-    method = method.to_sym
+    if self.folder.for_submissions?
+      method = :rename
+    else
+      method = method.to_sym
+    end
     deleted_attachments = []
     if method == :rename
       self.save! unless self.id

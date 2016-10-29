@@ -410,7 +410,7 @@ describe SIS::CSV::UserImporter do
     expect(CommunicationChannel.by_path('user@example.com').first).to be_nil
 
     expect(importer.errors.map(&:last)).to eq []
-    expect(importer.warnings.map(&:last).first).to include('unique_id is invalid')
+    expect(importer.warnings.map(&:last).first).to include('Invalid login_id')
     expect([User.count, Pseudonym.count]).to eq [before_user_count, before_pseudo_count]
   end
 

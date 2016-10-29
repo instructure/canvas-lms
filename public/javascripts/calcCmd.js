@@ -391,6 +391,11 @@ define([
     f('sin', function(x) { return Math.sin(x); }, I18n.t('sin.description', "Returns the sine of the given value"), "sin(radians)");
     f('cos', function(x) { return Math.cos(x); }, I18n.t('cos.description', "Returns the cosine of the given value"), "cos(radians)" );
     f('tan', function(x) { return Math.tan(x); }, I18n.t('tan.description', "Returns the tangent of the given value"), "tan(radians)");
+
+    f('sec', function(x) { return 1 / Math.cos(x); }, I18n.t('sec.description', "Returns the secant of the given value"), "sec(radians)");
+    f('cosec', function(x) { return 1 / Math.sin(x); }, I18n.t('cosec.description', "Returns the cosecant of the given value"), "cosec(radians)" );
+    f('cotan', function(x) { return 1 / Math.tan(x); }, I18n.t('cotan.description', "Returns the cotangent of the given value"), "cotan(radians)");
+
     f('pi', function(x) { return Math.PI; }, I18n.t('pi.description', "Returns the computed value of pi"), "pi()");
     f('if', function(bool, pass, fail) { return bool ? pass : fail; }, I18n.t('if.description', "Evaluates the first argument, returns the second argument if it evaluates to a non-zero value, otherwise returns the third value"), "if(bool,success,fail)");
     var make_list = function(args) {

@@ -33,6 +33,7 @@ define [
     @optionProperty 'assignmentGroups'
     @optionProperty 'assignmentGroup'
     @optionProperty 'course'
+    @optionProperty 'userIsAdmin'
 
     messages:
       non_number: I18n.t('non_number', 'You must use a number')
@@ -100,11 +101,14 @@ define [
       course = @course or @model.collection?.course
       course?.get('apply_assignment_group_weights')
 
+    canChangeWeighting: ->
+      @userIsAdmin or !@model.hasAssignmentDueInClosedGradingPeriod()
+
     checkGroupWeight: ->
-      if @showWeight()
-        @$el.find('.group_weight').removeAttr("disabled")
+      if @showWeight() and @canChangeWeighting()
+        @$el.find('.group_weight').removeAttr("readonly", "aria-disabled")
       else
-        @$el.find('.group_weight').attr("disabled", "disabled")
+        @$el.find('.group_weight').attr("readonly", "readonly").attr("aria-disabled", true)
 
     getNeverDrops: ->
       @$neverDropContainer.empty()
@@ -114,6 +118,7 @@ define [
         ag_id: @model.get('id') or 'new'
 
       @ndCollectionView = new NeverDropCollectionView
+        canChangeDropRules: @canChangeWeighting()
         collection: @never_drops
 
       @$neverDropContainer.append @ndCollectionView.render().el
@@ -129,7 +134,8 @@ define [
     toJSON: ->
       data = @model.toJSON()
       _.extend(data, {
-        disable_weight: !@showWeight()
+        show_weight: @showWeight()
+        can_change_weighting: @canChangeWeighting()
         group_weight: if @showWeight() then data.group_weight else null
         label_id: @model.get('id') or 'new'
         drop_lowest: @model.rules()?.drop_lowest or 0

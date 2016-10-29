@@ -20,13 +20,13 @@ require 'bigdecimal'
 module CC
   module QTI
     module QTIItems
-      
+
       CC_SUPPORTED_TYPES = ['multiple_choice_question',
-                            'multiple_answers_question', 
+                            'multiple_answers_question',
                             'true_false_question',
                             'short_answer_question',
                             'essay_question']
-      
+
       CC_TYPE_PROFILES = {
               'multiple_choice_question' => 'cc.multiple_choice.v0p1',
               'multiple_answers_question' => 'cc.multiple_response.v0p1',
@@ -34,27 +34,27 @@ module CC
               'short_answer_question' => 'cc.fib.v0p1',
               'essay_question' => 'cc.essay.v0p1'
       }
-      
+
       # These types don't stop processing response conditions once the correct
       # answer is found, so they need to show the incorrect response differently
-      MULTI_ANSWER_TYPES = ['matching_question', 
-                           'multiple_dropdowns_question', 
+      MULTI_ANSWER_TYPES = ['matching_question',
+                           'multiple_dropdowns_question',
                            'fill_in_multiple_blanks_question']
-      
+
       def add_ref_or_question(node, question)
         aq = nil
         unless question[:assessment_question_id].blank?
           if aq = AssessmentQuestion.where(id: question[:assessment_question_id]).first
-            if aq.deleted? || 
-                    !aq.assessment_question_bank || 
-                    aq.assessment_question_bank.deleted? || 
+            if aq.deleted? ||
+                    !aq.assessment_question_bank ||
+                    aq.assessment_question_bank.deleted? ||
                     aq.assessment_question_bank.context_id != @course.id ||
                     aq.assessment_question_bank.context_type != @course.class.to_s
               aq = nil
             end
           end
         end
-        
+
         if aq
           ref = CC::CCHelper::create_key(aq)
           node.itemref(:linkrefid => ref)
@@ -71,7 +71,7 @@ module CC
         add_question(node, question, true)
         true
       end
-      
+
       def add_quiz_question(node, question)
         question[:is_quiz_question] = true
         add_question(node, question)
@@ -106,7 +106,7 @@ module CC
               end
             end
           end # meta data
-          
+
           item_node.presentation do |pres_node|
             pres_node.material do |mat_node|
               html_mat_text(mat_node, "<div>#{question['question_text']}</div>", '')
@@ -126,9 +126,9 @@ module CC
               end
               resprocessing(res_node, question)
             end # resprocessing
-            
+
             itemproc_extenstion(node, question)
-            
+
             item_feedback(item_node, 'general_fb', question, 'neutral_comments')
             item_feedback(item_node, 'correct_fb', question, 'correct_comments')
             item_feedback(item_node, 'general_incorrect_fb', question, 'incorrect_comments')
@@ -138,9 +138,9 @@ module CC
           end
         end # item
       end
-      
+
       ## question response_str methods
-      
+
       def presentation_options(node, question)
         if ['multiple_choice_question', 'true_false_question', 'multiple_answers_question'].member? question['question_type']
           multiple_choice_response_str(node, question)
@@ -158,7 +158,7 @@ module CC
           calculated_response_str(node, question)
         end
       end
-      
+
       def multiple_choice_response_str(node, question)
         card = question['question_type'] == 'multiple_answers_question' ? 'Multiple' : 'Single'
         node.response_lid(
@@ -178,14 +178,14 @@ module CC
           end # rc_node
         end
       end
-      
+
       def matching_response_lid(node, question)
         question['answers'].each do |answer|
           node.response_lid(:ident=>"response_#{answer['id']}") do |lid_node|
             lid_node.material do |mat_node|
               html_mat_text(mat_node, answer['html'], answer['text'])
             end
-            
+
             lid_node.render_choice do |rc_node|
               next unless question['matches']
               question['matches'].each do |match|
@@ -199,7 +199,7 @@ module CC
           end #lid_node
         end
       end
-      
+
       def short_answer_response_str(node, question)
         node.response_str(
                 :ident => "response1",
@@ -208,7 +208,7 @@ module CC
           r_node.render_fib {|n| n.response_label(:ident=>'answer1', :rshuffle=>'No')}
         end
       end
-      
+
       def change_missing_word(question)
         # Convert this to a multiple_dropdowns_question then send it on its way
         question['question_text'] = "#{question['question_text'].gsub(%r{^<p>|</p>$}, '')} [drop1] #{question['text_after_answers'].gsub(%r{^<p>|</p>$}, '')}"
@@ -217,10 +217,10 @@ module CC
         end
         question['question_type'] = 'multiple_dropdowns_question'
       end
-      
+
       def multiple_dropdowns_response_lid(node, question)
         groups = question['answers'].group_by{|a|a[:blank_id]}
-        
+
         groups.each_pair do |id, answers|
           node.response_lid(:ident=>"response_#{id}") do |lid_node|
             lid_node.material do |mat_node|
@@ -238,7 +238,7 @@ module CC
           end # lid_node
         end
       end
-      
+
       def calculated_response_str(node, question)
         node.response_str(
                 :ident => "response1",
@@ -249,16 +249,16 @@ module CC
       end
 
       ## question resprocessing methods
-      
+
       def resprocessing(node, question)
         if !question['neutral_comments'].blank? || !question['neutral_comments_html'].blank?
           other_respcondition(node, 'Yes', 'general_fb')
         end
-        
+
         unless ['matching_question', 'numerical_question'].member? question['question_type']
           answer_feedback_respconditions(node, question)
         end
-        
+
         # question type specific resprocessing
         if ['multiple_choice_question', 'true_false_question'].member? question['question_type']
           multiple_choice_resprocessing(node, question)
@@ -279,12 +279,12 @@ module CC
         elsif question['question_type'] == 'numerical_question'
           numerical_resprocessing(node, question)
         end
-        
+
         if (!question['incorrect_comments'].blank? || !question['incorrect_comments_html'].blank?) && !MULTI_ANSWER_TYPES.member?(question['question_type'])
           other_respcondition(node, 'Yes', 'general_incorrect_fb')
         end
       end
-      
+
       def multiple_choice_resprocessing(node, question)
         correct_id = nil
         correct_answer = question['answers'].find{|a|a['weight'].to_i > 0}
@@ -297,7 +297,7 @@ module CC
           correct_feedback_ref(res_node, question)
         end #res_node
       end
-      
+
       def multiple_answers_resprocessing(node, question)
         node.respcondition(:continue=>'No') do |res_node|
           res_node.conditionvar do |c_node|
@@ -318,7 +318,7 @@ module CC
           correct_feedback_ref(res_node, question)
         end #res_node
       end
-      
+
       def short_answer_resprocessing(node, question)
         node.respcondition(:continue=>'No') do |res_node|
           res_node.conditionvar do |c_node|
@@ -330,7 +330,7 @@ module CC
           correct_feedback_ref(res_node, question)
         end #res_node
       end
-      
+
       def numerical_resprocessing(node, question)
         question['answers'].each do |answer|
           node.respcondition(:continue=>'No') do |res_node|
@@ -349,30 +349,51 @@ module CC
                     end
                   end
                 end
+              elsif answer["numerical_answer_type"] == "precision_answer"
+                # this might be one of the worst hacks i've ever done
+                c_node.or do |or_node|
+                  approx = answer['approximate'].to_d
+                  or_node.varequal approx, :respident=>"response1"
+
+                  precision = answer['precision'].to_i
+                  if precision > 0
+                    # there's probably an easier way to do this but i wouldn't know what it is
+                    sci_form = "%.#{precision - 1}E" % approx # e.g. 13.4 -> 1.340E+01 for precision 4
+                    prefix, exp = sci_form.split("E")
+                    range = "5E-#{precision}".to_d # 0.005
+                    floor = "#{prefix.to_d - range}E#{exp}".to_d # 1.3395E+01
+                    ceil = "#{prefix.to_d + range}E#{exp}".to_d # 1.3405E+01
+
+                    or_node.and do |and_node|
+                      and_node.vargt(floor, :respident=>"response1")
+                      and_node.varlte(ceil, :respident=>"response1")
+                    end
+                  end
+                end
               else
                 # answer in range
                 c_node.vargte(answer['start'], :respident=>"response1")
                 c_node.varlte(answer['end'], :respident=>"response1")
               end
             end #c_node
-            
+
             res_node.setvar '100', :action => 'Set', :varname => 'SCORE'
             res_node.displayfeedback(:feedbacktype=>'Response', :linkrefid=>"#{answer['id']}_fb") unless (answer['comments'].blank? && answer['comments_html'].blank?)
             correct_feedback_ref(res_node, question)
           end #res_node
         end
       end
-      
+
       def essay_resprocessing(node, question)
         other_respcondition(node)
       end
-      
+
       def matching_resprocessing(node, question)
         return nil unless question['answers'] && question['answers'].count > 0
-        
+
         correct_points = 100.0 / question['answers'].count
         correct_points = "%.2f" % correct_points
-        
+
         question['answers'].each do |answer|
           node.respcondition do |r_node|
             r_node.conditionvar do |c_node|
@@ -380,7 +401,7 @@ module CC
             end
             r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
           end
-          
+
           unless (answer['comments'].blank? && answer['comments_html'].blank?)
             node.respcondition do |r_node|
               r_node.conditionvar do |c_node|
@@ -393,12 +414,12 @@ module CC
           end
         end
       end
-      
+
       def multiple_dropdowns_resprocessing(node, question)
         groups = question['answers'].group_by{|a|a[:blank_id]}
         correct_points = 100.0 / groups.length
         correct_points = "%.2f" % correct_points
-        
+
         groups.each_pair do |id, answers|
           if answer = answers.find{|a| a['weight'].to_i > 0}
             node.respcondition do |r_node|
@@ -425,9 +446,9 @@ module CC
           r_node.setvar(0, :varname => 'SCORE', :action => 'Set')
         end
       end
-      
+
       # feedback helpers
-      
+
       def answer_feedback_respconditions(node, question)
         question['answers'].each do |answer|
           unless (answer['comments'].blank? && answer['comments_html'].blank?)
@@ -448,7 +469,7 @@ module CC
           end
         end
       end
-      
+
       def other_respcondition(node, continue='No', feedback_ref=nil)
         node.respcondition(:continue=>continue) do |res_node|
           res_node.conditionvar do |c_node|
@@ -457,13 +478,13 @@ module CC
           res_node.displayfeedback(:feedbacktype=>'Response', :linkrefid=>feedback_ref) if feedback_ref
         end #res_node
       end
-      
+
       def correct_feedback_ref(node, question)
         unless question['correct_comments'].blank? && question['correct_comments_html'].blank?
           node.displayfeedback(:feedbacktype=>'Response', :linkrefid=>'correct_fb')
         end
       end
-      
+
       def item_feedback(node, id, question, key)
         return unless question[key].present? || question[key + "_html"].present?
         node.itemfeedback(:ident=>id) do |f_node|
@@ -474,26 +495,26 @@ module CC
           end
         end
       end
-      
+
       # Custom extensions
-      
+
       def itemproc_extenstion(node, question)
         if question['question_type'] == 'calculated_question'
           calculated_extension(node, question)
         end
       end
-      
+
       def calculated_extension(node, question)
         node.itemproc_extension do |ext_node|
           ext_node.calculated do |calc_node|
             calc_node.answer_tolerance question['answer_tolerance']
-            
+
             calc_node.formulas(:decimal_places=>question['formula_decimal_places']) do |forms_node|
               question['formulas'].try(:each) do |f|
                 forms_node.formula f['formula']
               end
             end
-            
+
             calc_node.vars do |vars_node|
               question['variables'].try(:each) do |var|
                 vars_node.var(:name=>var['name'], :scale=>var['scale']) do |var_node|
@@ -502,7 +523,7 @@ module CC
                 end
               end
             end
-            
+
             calc_node.var_sets do |sets_node|
               question['answers'].try(:each) do |answer|
                 sets_node.var_set(:ident=>answer['id']) do |set_node|
@@ -525,7 +546,7 @@ module CC
           mat_node.mattext text_val, :texttype => 'text/plain'
         end
       end
-      
+
     end
   end
 end

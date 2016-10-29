@@ -81,9 +81,9 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     clock = sinon.useFakeTimers()
     view = @editView()
     clock.tick(1)
-    data = { group_category_id: 'new' }
+    data = { group_category_id: 'blank' }
     errors = view.validateBeforeSave(data, [])
-    ok errors["groupCategorySelector"][0]["message"]
+    ok errors["newGroupCategory"][0]["message"]
     clock.restore()
 
   test 'does not render #podcast_has_student_posts_container for non-course contexts', ->
@@ -108,14 +108,14 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
   test 'does not show conditional release tab when feature not enabled', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
     view = @editView()
-    equal view.$el.find('#discussion-conditional-release-tab').length, 0
+    equal view.$el.find('#mastery-paths-editor').length, 0
     equal view.$el.find('#discussion-edit-view').hasClass('ui-tabs'), false
 
   test 'shows disabled conditional release tab when feature enabled, but not assignment', ->
     view = @editView()
     view.renderTabs()
     view.loadConditionalRelease()
-    equal view.$el.find('#discussion-conditional-release-tab').length, 1
+    equal view.$el.find('#mastery-paths-editor').length, 1
     equal view.$discussionEditView.hasClass('ui-tabs'), true
     equal view.$discussionEditView.tabs("option", "disabled"), true
 
@@ -123,7 +123,7 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     view = @editView({ withAssignment: true })
     view.renderTabs()
     view.loadConditionalRelease()
-    equal view.$el.find('#discussion-conditional-release-tab').length, 1
+    equal view.$el.find('#mastery-paths-editor').length, 1
     equal view.$discussionEditView.hasClass('ui-tabs'), true
     equal view.$discussionEditView.tabs("option", "disabled"), false
 

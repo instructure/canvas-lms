@@ -14,30 +14,29 @@ class LiveEventsObserver < ActiveRecord::Observer
           :user_account_association
 
   def after_update(obj)
+    changes = obj.changes
+    obj.class.connection.after_transaction_commit do
     case obj
     when Course
-      if obj.syllabus_body_changed?
-        Canvas::LiveEvents.course_syllabus_updated(obj, obj.syllabus_body_was)
+      if changes["syllabus_body"]
+        Canvas::LiveEvents.course_syllabus_updated(obj, changes["syllabus_body"].first)
       end
     when Enrollment
       Canvas::LiveEvents.enrollment_updated(obj)
     when EnrollmentState
       Canvas::LiveEvents.enrollment_state_updated(obj)
     when WikiPage
-      if obj.title_changed? || obj.body_changed?
-        Canvas::LiveEvents.wiki_page_updated(obj, obj.title_changed? ? obj.title_was : nil,
-                                                  obj.body_changed? ? obj.body_was : nil)
-      elsif obj.workflow_state_changed? && obj.workflow_state == 'deleted'
-        # Wiki pages are often soft deleted rather than destroyed
-        Canvas::LiveEvents.wiki_page_deleted(obj)
+      if changes["title"] || changes["body"]
+        Canvas::LiveEvents.wiki_page_updated(obj, changes["title"] ? changes["title"].first : nil,
+                                                  changes["body"] ? changes["body"].first : nil)
       end
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)
     when Attachment
       if attachment_eligible?(obj)
-        if obj.display_name_changed?
-          Canvas::LiveEvents.attachment_updated(obj, obj.display_name_was)
-        elsif obj.file_state_changed? && obj.file_state == 'deleted'
+        if changes["display_name"]
+          Canvas::LiveEvents.attachment_updated(obj, changes["display_name"].first)
+        elsif changes["file_state"] && obj.file_state == 'deleted'
           # Attachments are often soft deleted rather than destroyed
           Canvas::LiveEvents.attachment_deleted(obj)
         end
@@ -45,9 +44,11 @@ class LiveEventsObserver < ActiveRecord::Observer
     when Submission
       Canvas::LiveEvents.submission_updated(obj)
     end
+    end
   end
 
   def after_create(obj)
+    obj.class.connection.after_transaction_commit do
     case obj
     when DiscussionEntry
       Canvas::LiveEvents.discussion_entry_created(obj)
@@ -76,9 +77,11 @@ class LiveEventsObserver < ActiveRecord::Observer
         Canvas::LiveEvents.attachment_created(obj)
       end
     end
+    end
   end
 
   def after_destroy(obj)
+    obj.class.connection.after_transaction_commit do
     case obj
     when Attachment
       if attachment_eligible?(obj)
@@ -86,6 +89,7 @@ class LiveEventsObserver < ActiveRecord::Observer
       end
     when WikiPage
       Canvas::LiveEvents.wiki_page_deleted(obj)
+    end
     end
   end
 

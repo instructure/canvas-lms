@@ -57,7 +57,6 @@ define [
       "name":"Science Quiz"
       "grading_type": "percent"
 
-
   assignment_grade_pass_fail = ->
     buildAssignment
       "id":2
@@ -107,7 +106,7 @@ define [
 
     ENV.POST_TO_SIS = options.post_to_sis
 
-    view = new AssignmentListItemView(model: model)
+    view = new AssignmentListItemView(model: model, userIsAdmin: options.userIsAdmin)
     view.$el.appendTo $('#fixtures')
     view.render()
 
@@ -121,7 +120,6 @@ define [
 
   genSetup = (model=assignment1()) ->
     fakeENV.setup(PERMISSIONS: {manage: false})
-
     @model = model
     @submission = new Submission
     @view = createView(@model, canManage: false)
@@ -134,17 +132,14 @@ define [
     fakeENV.teardown()
     $('#fixtures').empty()
 
-
   module 'AssignmentListItemViewSpec',
     setup: ->
       genSetup.call @
-
       @snapshot = tz.snapshot()
       I18nStubber.pushFrame()
 
     teardown: ->
       genTeardown.call @
-
       tz.restore(@snapshot)
       I18nStubber.popFrame()
 
@@ -188,7 +183,6 @@ define [
 
     ok view.$('.ig-row').hasClass('ig-published')
     @model.set('published', false)
-    #@model.save()
     ok !view.$('.ig-row').hasClass('ig-published')
 
   test 'asks for confirmation before deleting an assignment', ->
@@ -203,6 +197,18 @@ define [
     ok window.confirm.called
     ok view.delete.called
 
+  test 'does not attempt to delete an assignment due in a closed grading period', ->
+    @model.set('has_due_date_in_closed_grading_period', true)
+    view = createView(@model)
+
+    @stub(window, "confirm", -> true )
+    @spy view, "delete"
+
+    view.$("#assignment_#{@model.id} .delete_assignment").click()
+
+    ok window.confirm.notCalled
+    ok view.delete.notCalled
+
   test "delete destroys model", ->
     old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = "course_1"
@@ -216,7 +222,6 @@ define [
     ENV.context_asset_string = old_asset_string
 
   test "delete calls screenreader message", ->
-
     old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = "course_1"
     server = sinon.fakeServer.create()
@@ -295,7 +300,6 @@ define [
     view = createView(@model, canManage: true)
     trigger = view.$("#assign_#{@model.id}_manage_link")
     ok(trigger.length, 'there is an a node with the correct id')
-    #show menu
     trigger.click()
 
     view.$("#assignment_#{@model.id}_settings_edit_item").click()
@@ -303,13 +307,33 @@ define [
 
     equal document.activeElement, trigger.get(0)
 
-  test "assignment cannot be deleted if frozen", ->
+  test "disallows deleting frozen assignments", ->
     @model.set('frozen', true)
     view = createView(@model)
-    ok !view.$("#assignment_#{@model.id} a.delete_assignment").length
+    ok view.$("#assignment_#{@model.id} a.delete_assignment.disabled").length
+
+  test "disallows deleting assignments due in closed grading periods", ->
+    @model.set('has_due_date_in_closed_grading_period', true)
+    view = createView(@model)
+    ok view.$("#assignment_#{@model.id} a.delete_assignment.disabled").length
+
+  test "allows deleting non-frozen assignments not due in closed grading periods", ->
+    @model.set('frozen', false)
+    @model.set('has_due_date_in_closed_grading_period', false)
+    view = createView(@model)
+    ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
+
+  test "allows deleting frozen assignments for admins", ->
+    @model.set('frozen', true)
+    view = createView(@model, userIsAdmin: true)
+    ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
+
+  test "allows deleting assignments due in closed grading periods for admins", ->
+    @model.set('has_assignment_due_in_closed_grading_period', true)
+    view = createView(@model, userIsAdmin: true)
+    ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
 
   test "allows publishing", ->
-    #setup fake server
     @server = sinon.fakeServer.create()
     @server.respondWith "PUT", "/api/v1/users/1/assignments/1", [
       200,
@@ -447,6 +471,33 @@ define [
     view = createView(@model, canManage: true)
     equal view.dateDueColumnView.$("#vdd_tooltip_#{@model.id}_due div dd").first().text().trim(), 'Aug 28'
 
+  test 'can move when userIsAdmin is true', ->
+    view = createView(@model, userIsAdmin: true, canManage: false)
+    json = view.toJSON()
+    ok json.canMove
+    notOk view.className().includes('sort-disabled')
+
+  test 'can move when canManage is true and the model can be deleted', ->
+    @stub(@model, 'canDelete').returns(true)
+    view = createView(@model, userIsAdmin: false, canManage: true)
+    json = view.toJSON()
+    ok json.canMove
+    notOk view.className().includes('sort-disabled')
+
+  test 'cannot move when canManage is true but the model cannot be deleted', ->
+    @stub(@model, 'canDelete').returns(false)
+    view = createView(@model, userIsAdmin: false, canManage: true)
+    json = view.toJSON()
+    notOk json.canMove
+    ok view.className().includes('sort-disabled')
+
+  test 'cannot move when canManage is false but the model can be deleted', ->
+    @stub(@model, 'canDelete').returns(true)
+    view = createView(@model, userIsAdmin: false, canManage: false)
+    json = view.toJSON()
+    notOk json.canMove
+    ok view.className().includes('sort-disabled')
+
   module 'AssignmentListItemViewSpec—alternate grading type: percent',
     setup: ->
       genSetup.call @, assignment_grade_percent()
@@ -489,7 +540,6 @@ define [
     ok nonScreenreaderText().match('1.56/5 pts')[0], 'sets non-screenreader score text'
     ok nonScreenreaderText().match('Complete')[0], 'sets non-screenreader grade text'
 
-
   module 'AssignmentListItemViewSpec—alternate grading type: letter_grade',
     setup: ->
       genSetup.call @, assignment_grade_letter_grade()
@@ -507,7 +557,6 @@ define [
     ok nonScreenreaderText().match('1.56/5 pts')[0], 'sets non-screenreader score text'
     ok nonScreenreaderText().match('B')[0], 'sets non-screenreader grade text'
 
-
   module 'AssignmentListItemViewSpec—alternate grading type: not_graded',
     setup: ->
       genSetup.call @, assignment_grade_not_graded()
@@ -522,3 +571,73 @@ define [
 
     equal screenreaderText(), 'This assignment will not be assigned a grade.', 'sets screenreader text'
     equal nonScreenreaderText(), '', 'sets non-screenreader text'
+
+  module 'AssignListItemViewSpec - mastery paths menu option',
+    setup: ->
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+
+  test 'does not render for assignment if cyoe off', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 0
+
+  test 'renders for assignment if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 1
+
+  test 'does not render for ungraded assignment if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      submission_types: ['not_graded']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 0
+
+  test 'renders for assignment quiz if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      is_quiz_assignment: true
+      submission_types: ['online_quiz']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 1
+
+  test 'does not render for non-assignment quiz if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      is_quiz_assignment: false
+      submission_types: ['online_quiz']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 0
+
+  test 'renders for graded discussion if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      submission_types: ['discussion_topic']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 1
+
+  test 'does not render for graded page if cyoe on', ->
+    model = buildAssignment
+      id: 1
+      title: 'Foo'
+      can_update: true
+      submission_types: ['wiki_page']
+    view = createView(model)
+    equal view.$('.icon-mastery-path').length, 0

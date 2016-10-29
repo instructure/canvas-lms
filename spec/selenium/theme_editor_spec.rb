@@ -67,6 +67,7 @@ describe 'Theme Editor' do
 
   it 'should accept valid Hex IDs', priority: "1", test_id: 239986 do
     open_theme_editor(Account.default.id)
+    click_global_branding
 
     # verifies theme editor is open
     expect(driver.title).to include 'Theme Editor'
@@ -79,6 +80,7 @@ describe 'Theme Editor' do
 
   it 'should accept valid shortened Hex IDs', priority: "2", test_id: 240455 do
     open_theme_editor(Account.default.id)
+    click_global_branding
 
     # verifies theme editor is open
     expect(driver.title).to include 'Theme Editor'
@@ -90,6 +92,7 @@ describe 'Theme Editor' do
 
   it 'should accept valid color names', priority: "2", test_id: 240233 do
     open_theme_editor(Account.default.id)
+    click_global_branding
 
     # verifies theme editor is open
     expect(driver.title).to include 'Theme Editor'
@@ -101,6 +104,7 @@ describe 'Theme Editor' do
 
   it 'should not accept invalid hex IDs', priority: "1", test_id: 239987 do
     open_theme_editor(Account.default.id)
+    click_global_branding
 
     # verifies theme editor is open
     expect(driver.title).to include 'Theme Editor'

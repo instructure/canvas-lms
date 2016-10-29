@@ -193,6 +193,20 @@ describe WebConference do
       expect(conference.messages_sent['Web Conference Invitation']).not_to be_empty
     end
 
+    it "should not send invitation notifications if course is not published" do
+      @course.workflow_state = 'claimed'
+      @course.save!
+
+      conference = WimbaConference.create!(
+        :title => "my conference",
+        :user => @teacher,
+        :context => @course
+      )
+      conference.add_attendee(@student)
+      conference.save!
+      expect(conference.messages_sent['Web Conference Invitation']).to be_blank
+    end
+
     it "should not send invitation notifications to inactive users" do
       @course.restrict_enrollments_to_course_dates = true
       @course.start_at = 2.days.from_now

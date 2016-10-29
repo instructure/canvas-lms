@@ -96,26 +96,26 @@ describe Assignment::SpeedGrader do
           comment.slice(:author_id, :comment)
         end
         expect(comments).to include({
-          "author_id" => student_A.id,
+          "author_id" => student_A.id.to_s,
           "comment" => homework_params.fetch(:comment)
         },{
-          "author_id" => comment_two_to_group_params.fetch(:user_id),
+          "author_id" => comment_two_to_group_params.fetch(:user_id).to_s,
           "comment" => comment_two_to_group_params.fetch(:comment)
         },{
-          "author_id" => comment_three_to_group_params.fetch(:user_id),
+          "author_id" => comment_three_to_group_params.fetch(:user_id).to_s,
           "comment" => comment_three_to_group_params.fetch(:comment)
         },{
-          "author_id" => comment_six_to_group_params.fetch(:user_id),
+          "author_id" => comment_six_to_group_params.fetch(:user_id).to_s,
           "comment" => comment_six_to_group_params.fetch(:comment)
         })
         expect(comments).not_to include({
-          "author_id" => comment_four_private_params.fetch(:user_id),
+          "author_id" => comment_four_private_params.fetch(:user_id).to_s,
           "comment" => comment_four_private_params.fetch(:comment)
         },{
-          "author_id" => comment_five_private_params.fetch(:user_id),
+          "author_id" => comment_five_private_params.fetch(:user_id).to_s,
           "comment" => comment_five_private_params.fetch(:comment)
         },{
-          "author_id" => comment_seven_private_params.fetch(:user_id),
+          "author_id" => comment_seven_private_params.fetch(:user_id).to_s,
           "comment" => comment_seven_private_params.fetch(:comment)
       })
       end
@@ -154,10 +154,10 @@ describe Assignment::SpeedGrader do
     it "includes only students and sections with overrides for differentiated assignments" do
       json = Assignment::SpeedGrader.new(@assignment, @teacher).json
 
-      expect(json[:context][:students].map{|s| s[:id]}.include?(@student1.id)).to be_truthy
-      expect(json[:context][:students].map{|s| s[:id]}.include?(@student2.id)).to be_falsey
-      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id)).to be_truthy
-      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id)).to be_falsey
+      expect(json[:context][:students].map{|s| s[:id]}.include?(@student1.id.to_s)).to be_truthy
+      expect(json[:context][:students].map{|s| s[:id]}.include?(@student2.id.to_s)).to be_falsey
+      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id.to_s)).to be_truthy
+      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id.to_s)).to be_falsey
     end
 
     it "includes all students when is only_visible_to_overrides false" do
@@ -165,10 +165,10 @@ describe Assignment::SpeedGrader do
       @assignment.save!
       json = Assignment::SpeedGrader.new(@assignment, @teacher).json
 
-      expect(json[:context][:students].map{|s| s[:id]}.include?(@student1.id)).to be_truthy
-      expect(json[:context][:students].map{|s| s[:id]}.include?(@student2.id)).to be_truthy
-      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id)).to be_truthy
-      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id)).to be_truthy
+      expect(json[:context][:students].map{|s| s[:id]}.include?(@student1.id.to_s)).to be_truthy
+      expect(json[:context][:students].map{|s| s[:id]}.include?(@student2.id.to_s)).to be_truthy
+      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id.to_s)).to be_truthy
+      expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id.to_s)).to be_truthy
     end
   end
 
@@ -203,7 +203,7 @@ describe Assignment::SpeedGrader do
     # Test
     json = Assignment::SpeedGrader.new(assignment, @teacher).json
     json[:submissions].each do |submission|
-      user = [student_1, student_2].detect { |s| s.id == submission[:user_id] }
+      user = [student_1, student_2].detect { |s| s.id.to_s == submission[:user_id] }
       expect(submission[:late]).to eq user.submissions.first.late?
     end
   end
@@ -241,7 +241,7 @@ describe Assignment::SpeedGrader do
       json = Assignment::SpeedGrader.new(@assignment, @teacher).json
       @groups.each do |group|
         j = json["context"]["students"].find { |g| g["name"] == group.name }
-        expect(group.users.map(&:id)).to include j["id"]
+        expect(group.users.map { |u| u.id.to_s }).to include j["id"]
       end
       expect(json["GROUP_GRADING_MODE"]).to be_truthy
     end
@@ -259,7 +259,7 @@ describe Assignment::SpeedGrader do
 
       expect(json["submissions"].map { |s|
         s["id"]
-      }.sort).to eq turnitin_submissions.map(&:id).sort
+      }.sort).to eq turnitin_submissions.map { |t| t.id.to_s }.sort
     end
 
     it 'prefers people with submissions' do
@@ -408,6 +408,18 @@ describe Assignment::SpeedGrader do
         expect(json[:submissions].first['submission_history'].first[:submission]['late']).to be_truthy
       end
 
+      it "returns quiz lateness correctly with overrides" do
+        o = @quiz.assignment_overrides.build
+        o.due_at = 1.day.ago
+        o.due_at_overridden = true
+        o.set = @course.default_section
+        o.save!
+
+        @assignment.reload
+        json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+        expect(json[:submissions].first['submission_history'].first[:submission]['late']).to be_truthy
+      end
+
       it "returns quiz history for records before and after namespace change" do
         @quiz.save!
 
@@ -489,7 +501,7 @@ describe Assignment::SpeedGrader do
       it "only includes the grader's provisional rubric assessments" do
         ras = @json['context']['students'][0]['rubric_assessments']
         expect(ras.count).to eq 1
-        expect(ras[0]['assessor_id']).to eq @ta.id
+        expect(ras[0]['assessor_id']).to eq @ta.id.to_s
       end
 
       it "determines whether the student needs a provisional grade" do
@@ -511,7 +523,7 @@ describe Assignment::SpeedGrader do
       it "includes the moderator's provisional rubric assessments" do
         ras = @json['context']['students'][0]['rubric_assessments']
         expect(ras.count).to eq 1
-        expect(ras[0]['assessor_id']).to eq @teacher.id
+        expect(ras[0]['assessor_id']).to eq @teacher.id.to_s
       end
 
       it "lists all provisional grades" do
@@ -519,8 +531,8 @@ describe Assignment::SpeedGrader do
         expect(pgs.size).to eq 2
         expect(pgs.map { |pg| [pg['score'], pg['scorer_id'], pg['submission_comments'].map{|c| c['comment']}.sort] }).to match_array(
           [
-            [2.0, @teacher.id, ["provisional comment", "real comment"]],
-            [3.0, @ta.id, ["other provisional comment", "real comment"]]
+            [2.0, @teacher.id.to_s, ["provisional comment", "real comment"]],
+            [3.0, @ta.id.to_s, ["other provisional comment", "real comment"]]
           ]
         )
       end
@@ -528,7 +540,7 @@ describe Assignment::SpeedGrader do
       it "includes all the other provisional rubric assessments in their respective grades" do
         ta_pras = @json['submissions'][0]['provisional_grades'][1]['rubric_assessments']
         expect(ta_pras.count).to eq 1
-        expect(ta_pras[0]['assessor_id']).to eq @ta.id
+        expect(ta_pras[0]['assessor_id']).to eq @ta.id.to_s
       end
 
       it "includes whether the provisional grade is selected" do
@@ -571,7 +583,7 @@ describe Assignment::SpeedGrader do
       json = Assignment::SpeedGrader.new(assignment, teacher).json
 
       students = json['context']['students'].map { |s| s['id'] }
-      expect(students).to include(active_student.id)
+      expect(students).to include(active_student.id.to_s)
     end
 
     it "returns active and inactive students and enrollments when inactive enromments is true" do
@@ -580,7 +592,7 @@ describe Assignment::SpeedGrader do
       json = Assignment::SpeedGrader.new(assignment, teacher).json
 
       students = json['context']['students'].map { |s| s['id'] }
-      expect(students).to include(active_student.id, inactive_student.id)
+      expect(students).to include(active_student.id.to_s, inactive_student.id.to_s)
     end
 
     it "returns active and concluded students and enrollments when concluded is true" do
@@ -589,7 +601,7 @@ describe Assignment::SpeedGrader do
       json = Assignment::SpeedGrader.new(assignment, teacher).json
 
       students = json['context']['students'].map { |s| s['id'] }
-      expect(students).to include(active_student.id, concluded_student.id)
+      expect(students).to include(active_student.id.to_s, concluded_student.id.to_s)
     end
 
     it "returns active, inactive, and concluded students and enrollments when both settings are true" do
@@ -599,14 +611,15 @@ describe Assignment::SpeedGrader do
       json = Assignment::SpeedGrader.new(assignment, teacher).json
 
       students = json['context']['students'].map { |s| s['id'] }
-      expect(students).to include(active_student.id, inactive_student.id, concluded_student.id)
+      expect(students).to include(active_student.id.to_s, inactive_student.id.to_s,
+                                  concluded_student.id.to_s)
     end
 
     it "returns concluded students if the course is concluded" do
       test_course.complete
       json = Assignment::SpeedGrader.new(assignment, teacher).json
       students = json['context']['students'].map { |s| s['id'] }
-      expect(students).to include(active_student.id, concluded_student.id)
+      expect(students).to include(active_student.id.to_s, concluded_student.id.to_s)
     end
   end
 

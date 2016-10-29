@@ -60,3 +60,5 @@ define [
       nested: @nested
       prefix: 'assignment' if @nested
       hideAnonymousPeerReview: @hideAnonymousPeerReview
+      hasGroupCategory: @parentModel.groupCategoryId()
+      intraGroupPeerReviews: @parentModel.intraGroupPeerReviews()

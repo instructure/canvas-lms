@@ -437,7 +437,7 @@ module BB8Expected
                        :unit_required=>true,
                        :partial_credit_tolerance=>0.1,
                        :incorrect_comments=>"You got it wrong...",
-                       :formulas=>[],
+                       :formulas=>[{:formula => "<math><apply><minus/><cn>10</cn><ci>x</ci></apply></math>"}],
                        :unit_case_sensitive=>false,
                        :points_possible=>10}
 
@@ -463,7 +463,7 @@ module BB8Expected
                         :unit_required=>false,
                         :partial_credit_tolerance=>0,
                         :incorrect_comments=>"Wrong.",
-                        :formulas=>[],
+                        :formulas=>[{:formula => "<math><apply><times/><apply><power/><apply><times/><cn>10</cn><ci>F</ci></apply><apply><minus/><cn>1</cn></apply></apply><apply><plus/><apply><times/><cn>1000</cn><ci>F</ci><ci>r</ci><apply><power/><ci>i</ci><apply><minus/><cn>1</cn></apply></apply><apply><minus/><cn>1</cn><apply><power/><apply><plus/><cn>1</cn><apply><divide/><ci>i</ci><cn>200</cn></apply></apply><apply><minus/><apply><times/><cn>2</cn><apply><minus/><ci>Y</ci><cn>10</cn></apply></apply></apply></apply></apply></apply><apply><times/><cn>1000</cn><ci>F</ci><apply><power/><apply><plus/><cn>1</cn><apply><divide/><ci>i</ci><cn>200</cn></apply></apply><apply><minus/><apply><times/><cn>2</cn><apply><minus/><ci>Y</ci><cn>10</cn></apply></apply></apply></apply></apply></apply><apply><plus/><cn>1</cn><apply><times/><apply><divide/><ci>i</ci><cn>100</cn></apply><apply><divide/><ci>n</ci><cn>360</cn></apply></apply></apply></apply></math>"}],
                         :unit_case_sensitive=>false,
                         :points_possible=>10}
 

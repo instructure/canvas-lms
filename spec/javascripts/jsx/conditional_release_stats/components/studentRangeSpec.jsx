@@ -27,6 +27,7 @@ define([
         },
       ],
     },
+    loadStudent: () => {},
     onStudentSelect: () => {},
   })
 

@@ -10,7 +10,7 @@ define([
     assignment: state.assignment,
     ranges: state.ranges,
     enrolled: state.enrolled,
-    isLoading: state.isLoading,
+    isLoading: state.isInitialDataLoading,
   }))(BreakdownGraphs)
 
   const Sidebar = connect((state) => ({
@@ -18,37 +18,40 @@ define([
   }))(StickySidebar)
 
   const Details = connect((state) => ({
+    isStudentDetailsLoading: state.isStudentDetailsLoading,
     selectedPath: state.selectedPath,
-    ranges: state.ranges,
     assignment: state.assignment,
+    ranges: state.ranges,
+    students: state.studentCache,
   }))(BreakdownDetails)
 
   return class CRSApp {
-    constructor (actions) {
+    constructor (store, actions) {
+      this.store = store
       this.actions = actions
     }
 
-    renderGraphs (store, root) {
+    renderGraphs (root) {
       const actions = {
         selectRange: this.actions.selectRange,
       }
 
       ReactDOM.render(
-        <Provider store={store}>
+        <Provider store={this.store}>
           <Graphs {...actions} />
         </Provider>,
         root
       )
     }
 
-    renderDetails (store, root) {
+    renderDetails (root) {
       const detailActions = {
         selectRange: this.actions.selectRange,
         selectStudent: this.actions.selectStudent,
       }
 
       ReactDOM.render(
-        <Provider store={store}>
+        <Provider store={this.store}>
           <Sidebar
             closeSidebar={this.actions.closeSidebar}
           >

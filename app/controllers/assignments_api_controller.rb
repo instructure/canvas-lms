@@ -345,6 +345,11 @@
 #           "example": "2012-07-01T23:59:00-06:00",
 #           "type": "datetime"
 #         },
+#         "intra_group_peer_reviews": {
+#           "description": "Boolean representing whether or not members from within the same group on a group assignment can be assigned to peer review their own group's work",
+#           "example": "false",
+#           "type": "boolean"
+#         },
 #         "group_category_id": {
 #           "description": "The ID of the assignment’s group set, if this is a group assignment. For group discussions, set group_category_id on the discussion topic, not the linked assignment.",
 #           "example": 1,
@@ -791,7 +796,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
-  #  The assignment is ungraded if this field is omitted.
+  #  The assignment defaults to "points" if this field is omitted.
   #
   # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due.
@@ -932,7 +937,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[grading_type] ["pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
-  #  The assignment is ungraded if this field is omitted.
+  #  The assignment defaults to "points" if this field is omitted.
   #
   # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due.

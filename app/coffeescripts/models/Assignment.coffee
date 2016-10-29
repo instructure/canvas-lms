@@ -82,6 +82,9 @@ define [
     canFreeze: =>
       @get('frozen_attributes')? && !@frozen()
 
+    canDelete: =>
+      !@hasDueDateInClosedGradingPeriod() && !@frozen()
+
     freezeOnCopy: =>
       @get('freeze_on_copy')
 
@@ -90,6 +93,9 @@ define [
 
     frozenAttributes: =>
       @get('frozen_attributes') || []
+
+    hasDueDateInClosedGradingPeriod: =>
+      @get('has_due_date_in_closed_grading_period')
 
     gradingType: (gradingType) =>
       return @get('grading_type') || 'points' unless gradingType
@@ -171,6 +177,9 @@ define [
     peerReviewsAssignAt: (date)  =>
       return @get('peer_reviews_assign_at') || null unless arguments.length > 0
       @set 'peer_reviews_assign_at', date
+
+    intraGroupPeerReviews: ->
+      @get('intra_group_peer_reviews')
 
     notifyOfUpdate: (notifyOfUpdateBoolean) =>
       return @get 'notify_of_update' unless arguments.length > 0
@@ -274,8 +283,12 @@ define [
         lock_at:   @get("lock_at")
 
     multipleDueDates: =>
-      dateGroups = @get("all_dates")
-      dateGroups && dateGroups.length > 1
+      count = @get("all_dates_count")
+      if count && count > 1
+        true
+      else
+        dateGroups = @get("all_dates")
+        dateGroups && dateGroups.length > 1
 
     hasDueDate: =>
       !@isPage()
@@ -305,6 +318,9 @@ define [
       else
         return @dueAt()
 
+    is_quiz_assignment: =>
+      @get('is_quiz_assignment')
+
     toView: =>
       fields = [
         'name', 'dueAt','description','pointsPossible', 'lockAt', 'unlockAt',
@@ -314,14 +330,14 @@ define [
         'acceptsOnlineTextEntries', 'acceptsOnlineURL', 'allowedExtensions',
         'restrictFileExtensions', 'isOnlineSubmission', 'isNotGraded',
         'isExternalTool', 'externalToolUrl', 'externalToolNewTab',
-        'turnitinAvailable','turnitinEnabled',
+        'turnitinAvailable','turnitinEnabled', 'hasDueDateInClosedGradingPeriod',
         'gradeGroupStudentsIndividually', 'groupCategoryId', 'frozen',
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
         'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
         'multipleDueDates', 'nonBaseDates', 'allDates', 'hasDueDate', 'hasPointsPossible'
         'singleSectionDueDate', 'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
-        'omitFromFinalGrade'
+        'omitFromFinalGrade', 'is_quiz_assignment'
       ]
 
       hash = id: @get 'id'

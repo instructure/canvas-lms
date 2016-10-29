@@ -27,7 +27,11 @@ define([
       }
       var groups =  this.props.groups.map((group) => {
         if (group.can_access && !group.concluded) {
-          return <li className="ic-NavMenu-list-item" key={group.id}><a href={`/groups/${group.id}`}>{group.name}</a></li>;
+          return (
+            <li className="ic-NavMenu-list-item" key={group.id}>
+              <a href={`/groups/${group.id}`} className='ic-NavMenu-list-item__link'>{group.name}</a>
+            </li>
+          );
         };
       });
       groups.push(

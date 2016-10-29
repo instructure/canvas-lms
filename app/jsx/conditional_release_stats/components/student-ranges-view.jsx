@@ -1,10 +1,11 @@
 define([
   'react',
-  'instructure-ui',
+  'instructure-ui/TabList',
+  'instructure-ui/ApplyTheme',
   'i18n!cyoe_assignment_sidebar',
   './student-range',
   '../helpers/score',
-], (React, { TabList, TabPanel, Tab, ApplyTheme }, I18n, StudentRange, scoreHelpers) => {
+], (React, { default: TabList, TabPanel, Tab }, { default: ApplyTheme }, I18n, StudentRange, scoreHelpers) => {
   const { array, func, object } = React.PropTypes
 
   const tabsTheme = {
@@ -25,16 +26,14 @@ define([
   }
 
   return class StudentRangesView extends React.Component {
-    static get propTypes () {
-      return {
-        assignment: object.isRequired,
-        ranges: array.isRequired,
-        selectedPath: object.isRequired,
+    static propTypes = {
+      assignment: object.isRequired,
+      ranges: array.isRequired,
+      selectedPath: object.isRequired,
 
-        // actions
-        selectStudent: func.isRequired,
-        selectRange: func.isRequired,
-      }
+      // actions
+      selectStudent: func.isRequired,
+      selectRange: func.isRequired,
     }
 
     renderTabs () {
@@ -60,7 +59,7 @@ define([
             <h4>{I18n.t('Mastery Paths Breakdown')}</h4>
           </header>
           <ApplyTheme theme={tabsTheme}>
-            <TabList style='accordion' selectedIndex={this.props.selectedPath.range} onChange={this.props.selectRange}>
+            <TabList variant='accordion' selectedIndex={this.props.selectedPath.range} onChange={this.props.selectRange}>
               {this.renderTabs()}
             </TabList>
           </ApplyTheme>

@@ -181,9 +181,9 @@ class Group < ActiveRecord::Base
     context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments
   end
 
-  def participants(include_observers=false)
+  def participants(opts={})
     users = participating_users.uniq.all
-    if include_observers && self.context.is_a?(Course)
+    if opts[:include_observers] && self.context.is_a?(Course)
       (users + User.observing_students_in_course(users, self.context)).flatten.uniq
     else
       users

@@ -168,6 +168,22 @@ describe ContentMigration do
       expect(quiz_to.description).to eq body % [@copy_to.id, mod1_to.id]
     end
 
+    it "should not interweave module order" do
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      mod2 = @copy_from.context_modules.create!(:name => "some module 2")
+
+      run_course_copy
+
+      [mod1, mod2].each(&:destroy)
+      mod3 = @copy_from.context_modules.create!(:name => "some module 3")
+      expect(mod3.position).to eq 1
+
+      run_course_copy
+
+      mod3_to = @copy_to.context_modules.where(migration_id: mig_id(mod3)).first
+      expect(mod3_to.position).to eq 3 # put at end
+    end
+
     it "should be able to copy links to files in folders with html entities and unicode in path" do
       root_folder = Folder.root_folders(@copy_from).first
       folder1 = root_folder.sub_folders.create!(:context => @copy_from, :name => "mol&eacute; ? i'm silly")

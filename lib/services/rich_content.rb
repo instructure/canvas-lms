@@ -6,10 +6,16 @@ module Services
       if enabled
         env_hash = env_hash.merge(service_settings)
         if user && domain
-          env_hash[:JWT] = Canvas::Security::ServicesJwt.
-            for_user(domain, user, real_user: real_user)
+          env_hash[:JWT] = Canvas::Security::ServicesJwt.for_user(
+            domain,
+            user,
+            context: context,
+            real_user: real_user,
+            workflows: [:rich_content, :ui]
+          )
         end
 
+        # TODO: Remove once rich content service pull from jwt
         env_hash[:RICH_CONTENT_CAN_UPLOAD_FILES] = (
           user &&
           context &&

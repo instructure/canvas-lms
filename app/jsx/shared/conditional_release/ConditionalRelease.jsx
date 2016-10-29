@@ -3,9 +3,10 @@ define([
   'react',
   'react-dom',
   'react-modal',
+  'classnames',
   'i18n!conditional_release',
-  'jquery.instructure_forms'
-], function($, React, ReactDOM, Modal, I18n) {
+  'jquery.instructure_forms',
+], ($, React, ReactDOM, Modal, classNames, I18n) => {
 
   const SAVE_TIMEOUT = 15000
 
@@ -22,7 +23,6 @@ define([
         <form id='conditional-release-editor-form'
             target={this.props.target}
             method='POST'
-
             action={this.props.env.edit_rule_url}>
           <input type='hidden' name='env' value={JSON.stringify(this.props.env)} />
         </form>
@@ -117,6 +117,16 @@ define([
       }
     },
 
+    updateModalState(state) {
+      this.setState({ showOverlay: state.isVisible })
+
+      if (state.isVisible) {
+        $('body').addClass('conditional-release-modal-visible')
+      } else {
+        $('body').removeClass('conditional-release-modal-visible')
+      }
+    },
+
     popupId() {
       if (this.props.env.assignment) {
         return 'conditional_release_' + this.props.env.assignment.id;
@@ -185,6 +195,9 @@ define([
         case 'validationErrors':
           this.setValidationErrors(messageEvent.data.messageBody);
           break;
+        case 'modalStateChange':
+          this.updateModalState(messageEvent.data.messageBody)
+          break;
         }
       }
     },
@@ -195,10 +208,18 @@ define([
 
     render () {
       const iframeId = this.popupId();
+      const frameClasses = classNames({
+        'conditional-release-editor-frame': true,
+        'conditional-release-editor-frame--modal-visible': this.state.showOverlay,
+      })
+
       return (
         <div className='conditional-release-editor'>
+          {this.state.showOverlay
+            ? (<div id='conditional-release-modal-overlay' className='ReactModal__Overlay ReactModal__Overlay--after-open'></div>)
+            : null}
           <iframe
-            className='conditional-release-editor-frame'
+            className={frameClasses}
             ref='iframe'
             id={iframeId}
             name={iframeId}

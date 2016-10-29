@@ -1,3 +1,13 @@
+body.conditional-release-modal-visible {
+  &.with-left-side #left-side {
+    z-index: 10;
+  }
+
+  .ic-app-header {
+    z-index: 1;
+  }
+}
+
 .conditional-release-editor {
   height: 675px;
   padding-top: 12px;
@@ -8,6 +18,12 @@
   border: none;
   flex: 1 1 auto;
   min-height: 100%;
+  position: relative;
+  overflow-y: hidden;
+
+  &.conditional-release-editor-frame--modal-visible {
+    z-index: 151;
+  }
 }
 
 .conditional-release-save-data {

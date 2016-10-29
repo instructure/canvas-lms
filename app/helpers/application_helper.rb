@@ -662,13 +662,11 @@ module ApplicationHelper
   end
 
   def help_link_icon
-    (@domain_root_account && @domain_root_account.settings[:help_link_icon]) ||
-      (Account.default && Account.default.settings[:help_link_icon]) || 'help'
+    (@domain_root_account && @domain_root_account.settings[:help_link_icon]) || 'help'
   end
 
   def help_link_name
-    (@domain_root_account && @domain_root_account.settings[:help_link_name]) ||
-      (Account.default && Account.default.settings[:help_link_name]) || I18n.t('Help')
+    (@domain_root_account && @domain_root_account.settings[:help_link_name]) || I18n.t('Help')
   end
 
   def help_link_data
@@ -982,6 +980,11 @@ module ApplicationHelper
     else
       request.fullpath.start_with?(to_test)
     end
+  end
+
+  # Determine if url is the current state for the groups sub-nav switcher
+  def group_homepage_pathfinder(group)
+    request.fullpath =~ /groups\/#{group.id}/
   end
 
   def link_to_parent_signup(auth_type)

@@ -1,5 +1,5 @@
 define([
-  'lodash',
+  'underscore',
   'i18n!assignment_categories',
 ], (_, I18n) => {
   const OTHER = {

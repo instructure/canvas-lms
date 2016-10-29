@@ -17,6 +17,30 @@ describe "calendar2" do
       course_with_teacher_logged_in
     end
 
+    context "with Better Scheduler enabled" do
+      before(:each) do
+        account = Account.default
+        account.enable_feature! :better_scheduler
+      end
+
+      it "should let me go to the Edit Appointment group page from the appointment group slot dialog" do
+        date = Date.today.to_s
+        create_appointment_group :new_appointments => [
+                                     ["#{date} 12:00:00", "#{date} 13:00:00"],
+                                     ["#{date} 13:00:00", "#{date} 14:00:00"],
+                                 ]
+
+        get '/calendar2'
+
+        f('.fc-event').click
+        wait_for_ajaximations
+        expect_new_page_load { f('.group_details').click }
+        wait_for_ajaximations
+        expect(f('#title').attribute('value')).to eql "new appointment group"
+      end
+
+    end
+
     it "should let me message students who have signed up for an appointment" do
       date = Date.today.to_s
       create_appointment_group :new_appointments => [

@@ -1,7 +1,7 @@
 {{#if name}}
   <h1 class="screenreader-only">{{name}}</h1>
 {{else}}
-  <h1 class="screenreader-only">{{#t "page_header_title"}}New Assignment{{/t}}</h1>
+  <h1 class="screenreader-only">{{#t}}New Assignment{{/t}}</h1>
 {{/if}}
 
 {{#if CONDITIONAL_RELEASE_SERVICE_ENABLED}}
@@ -9,31 +9,35 @@
   <div id="edit-assignment-header-cr-tabs" class="ui-tabs-minimal">
     <ul id="edit-assignment-header-cr-tab-nav">
       <li><a href="#edit_assignment_wrapper" id="edit_assignment_link">{{#t}}Details{{/t}}</a></li>
-      <li><a href="#conditional_release_wrapper" id="conditional_release_link">{{#t}}Mastery Paths{{/t}}</a></li>
+      <li><a href="#mastery-paths-editor" id="conditional_release_link">{{#t}}Mastery Paths{{/t}}</a></li>
       {{! this is a weird place for this, but we need to make this line up with the tabs}}
       <span id='edit-assignment-header-cr-spacer'></span>
       {{#if published}}
         <span id='assignment-draft-state-cr' class='published-status published'>
           <i class="icon-publish"></i>
-          {{#t "buttons.published"}}Published{{/t}}
+          {{#t}}Published{{/t}}
         </span>
       {{else}}
         <span id='assignment-draft-state-cr' class='published-status unpublished'>
           <i class="icon-unpublished"></i>
-          {{#t "buttons.not_published"}}Not Published{{/t}}
+          {{#t}}Not Published{{/t}}
         </span>
       {{/if}}
 
       <span id='assignment-gear-button-cr'>
         <a role="button" class="al-trigger btn" href="#">
-          <span class="screenreader-only">{{#t "manage_assignment"}}Manage Assignment{{/t}}</span>
+          <span class="screenreader-only">{{#t}}Manage Assignment{{/t}}</span>
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
         </a>
         <ul class="al-options">
           <li>
+          {{#if canDelete}}
             <a href="#" class="delete_assignment_link">
+          {{else}}
+            <a href="#" class="delete_assignment_link disabled" aria-disabled=true>
+          {{/if}}
               <i class="icon-trash"></i>
-              {{#t "titles.delete"}}Delete{{/t}}
+              {{#t}}Delete{{/t}}
             </a>
           </li>
         </ul>
@@ -55,26 +59,30 @@
     {{#if published}}
       <span id='assignment-draft-state' class='published-status published'>
         <i class="icon-publish"></i>
-        {{#t "buttons.published"}}Published{{/t}}
+        {{#t}}Published{{/t}}
       </span>
     {{else}}
       <span id='assignment-draft-state' class='published-status unpublished'>
         <i class="icon-unpublished"></i>
-        {{#t "buttons.not_published"}}Not Published{{/t}}
+        {{#t}}Not Published{{/t}}
       </span>
     {{/if}}
   </div>
   <div class="header-bar-right">
     <div class="admin-links">
       <a role="button" class="al-trigger btn" href="#">
-        <span class="screenreader-only">{{#t "manage_assignment"}}Manage Assignment{{/t}}</span>
+        <span class="screenreader-only">{{#t}}Manage Assignment{{/t}}</span>
         <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
       </a>
       <ul class="al-options">
         <li>
+        {{#if canDelete}}
           <a href="#" class="delete_assignment_link">
+        {{else}}
+          <a href="#" class="delete_assignment_link disabled" aria-disabled=true>
+        {{/if}}
             <i class="icon-trash"></i>
-            {{#t "titles.delete"}}Delete{{/t}}
+            {{#t}}Delete{{/t}}
           </a>
         </li>
       </ul>

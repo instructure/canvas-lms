@@ -126,8 +126,10 @@ class AssignmentOverride < ActiveRecord::Base
       joins(:assignment_override_students).
       distinct
 
-    if CANVAS_RAILS4_0 && ActiveRecord::Relation === visible_ids
-      return scope.where("assignment_override_students.user_id IN (#{visible_ids.except(:select).select("users.id").to_sql})")
+    if ActiveRecord::Relation === visible_ids
+      column = visible_ids.klass == User ? :id : visible_ids.select_values.first
+      scope = scope.joins("INNER JOIN #{visible_ids.klass.quoted_table_name} ON assignment_override_students.user_id=#{visible_ids.klass.table_name}.#{column}")
+      return scope.merge(visible_ids.except(:select))
     end
 
     scope.where(
@@ -201,17 +203,10 @@ class AssignmentOverride < ActiveRecord::Base
     assignment_override_students.where(user_id: visible_student_ids).exists?
   end
 
-  def self.visible_users_for(overrides, user=nil)
-    return [] if overrides.empty? || user.nil?
+  def self.visible_enrollments_for(overrides, user=nil)
+    return Enrollment.none if overrides.empty? || user.nil?
     override = overrides.first
-    override.visible_users_for(user)
-  end
-
-  def visible_users_for(user)
-    assignment_or_quiz = self.assignment || self.quiz
-    UserSearch.scope_for(assignment_or_quiz.context, user, {
-      force_users_visible_to: true
-    })
+    (override.assignment || override.quiz).context.enrollments_visible_to(user)
   end
 
   override :due_at

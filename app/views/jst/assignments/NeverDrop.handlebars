@@ -1,14 +1,19 @@
 <button
-  class="remove_never_drop btn btn-link"
+  class="remove_never_drop btn btn-link{{#unless canChangeDropRules}} disabled{{/unless}}"
   type="button"
   title="{{buttonTitle}}"
   aria-label="{{buttonTitle}}"
+  {{#unless canChangeDropRules}}aria-disabled=true{{/unless}}
 ><i class="icon-end"></i></button>
 
 {{#unless chosen}}
-  <select name="rules[never_drop][]" aria-labelledby="ag_{{label_id}}_never_drop">
+  <select
+    name="rules[never_drop][]"
+    aria-labelledby="ag_{{label_id}}_never_drop"
+    {{#unless canChangeDropRules}}readonly{{/unless}}
+  >
     {{#each assignments}}
-    <option {{selectedIf id ../chosen_id}} value="{{id}}">{{name}}</option>
+      <option {{selectedIf id ../chosen_id}} value="{{id}}">{{name}}</option>
     {{/each}}
   </select>
 {{/unless}}

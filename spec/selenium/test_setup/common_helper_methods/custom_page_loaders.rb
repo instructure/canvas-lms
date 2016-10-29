@@ -2,6 +2,7 @@ module CustomPageLoaders
   # you can pass an array to use the rails polymorphic_path helper, example:
   # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
   def get(link)
+    is_first_request_of_spec = !driver.ready_for_interaction
     driver.ready_for_interaction = true
     link = polymorphic_path(link) if link.is_a? Array
 
@@ -12,6 +13,9 @@ module CustomPageLoaders
 
     if current_uri.path == new_uri.path && (current_uri.query || '') == (new_uri.query || '') && (new_uri.fragment || current_uri.fragment)
       driver.get(app_host + link)
+      # if we're just changing the hash of the url of the previous spec,
+      # force a reload, cuz the `get` above won't
+      driver.navigate.refresh if is_first_request_of_spec
       close_modal_if_present
       wait_for_ajaximations
     else

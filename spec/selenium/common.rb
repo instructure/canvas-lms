@@ -54,13 +54,6 @@ WEBSERVER = (ENV['WEBSERVER'] || 'thin').freeze
 $server_port = nil
 $app_host_and_port = nil
 
-at_exit do
-  begin
-    $selenium_driver.try(:quit)
-  rescue Errno::ECONNREFUSED
-  end
-end
-
 module SeleniumErrorRecovery
   class RecoverableException < StandardError
     extend Forwardable
@@ -223,6 +216,13 @@ shared_context "in-process server selenium tests" do
       SeleniumDriverSetup.note_recent_spec_run(example, exception)
       record_errors(example, exception, Rails.logger.captured_messages)
       SeleniumDriverSetup.disallow_requests!
+    end
+  end
+
+  RSpec.configure do |config|
+    config.after :suite do
+      $selenium_driver.close rescue nil
+      $selenium_driver.quit rescue nil
     end
   end
 end

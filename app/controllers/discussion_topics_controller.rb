@@ -349,6 +349,7 @@ class DiscussionTopicsController < ApplicationController
                 },
                 :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu)
         }
+        conditional_release_js_env
         append_sis_data(hash)
         js_env(hash)
 
@@ -472,6 +473,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     unless @topic.grants_right?(@current_user, session, :read)
+      return render_unauthorized_action unless @current_user
       respond_to do |format|
         flash[:error] = t 'You do not have access to the requested discussion.'
         format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
@@ -586,7 +588,7 @@ class DiscussionTopicsController < ApplicationController
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
             append_sis_data(js_hash)
             js_env(js_hash)
-
+            conditional_release_js_env(@topic.assignment, include_rule: true)
           end
         end
       end

@@ -73,6 +73,7 @@ class ContextModulesController < ApplicationController
            usage_rights_required: @context.feature_enabled?(:usage_rights_required),
            manage_files: @context.grants_right?(@current_user, session, :manage_files)
         }
+      conditional_release_js_env
     end
   end
   include ModuleIndexHelper
@@ -108,7 +109,7 @@ class ContextModulesController < ApplicationController
               }
 
               option[:assignments] = set[:assignments].map { |a|
-                assg = a[:model]
+                assg = assignment_json(a[:model], @current_user, session)
                 assg[:assignmentId] = a[:assignment_id]
                 assg
               }
@@ -152,6 +153,35 @@ class ContextModulesController < ApplicationController
         @progression.uncollapse! if @progression && @progression.collapsed?
         content_tag_redirect(@context, @tag, :context_context_modules_url, :modules)
       end
+    end
+  end
+
+  def item_redirect_mastery_paths
+    @tag = @context.context_module_tags.not_deleted.find(params[:id])
+
+    type_controllers = {
+      assignment: 'assignments',
+      quiz: 'quizzes/quizzes',
+      discussion_topic: 'discussion_topics'
+    }
+
+    if @tag
+      if authorized_action(@tag.content, @current_user, :update)
+        controller = type_controllers[@tag.content_type_class.to_sym]
+
+        if controller.present?
+          redirect_to url_for(
+            controller: controller,
+            action: 'edit',
+            id: @tag.content_id,
+            anchor: 'mastery-paths-editor'
+          )
+        else
+          render status: 404, template: 'shared/errors/404_message'
+        end
+      end
+    else
+      render status: 404, template: 'shared/errors/404_message'
     end
   end
 
@@ -433,13 +463,15 @@ class ContextModulesController < ApplicationController
       end
       json = @tag.as_json
       json['content_tag'].merge!(
-          publishable: module_item_publishable?(@tag),
-          published: @tag.published?,
-          publishable_id: module_item_publishable_id(@tag),
-          unpublishable:  module_item_unpublishable?(@tag),
-          graded: @tag.graded?,
-          content_details: content_details(@tag, @current_user)
-        )
+        publishable: module_item_publishable?(@tag),
+        published: @tag.published?,
+        publishable_id: module_item_publishable_id(@tag),
+        unpublishable:  module_item_unpublishable?(@tag),
+        graded: @tag.graded?,
+        content_details: content_details(@tag, @current_user),
+        assignment_id: @tag.assignment.try(:id),
+        is_cyoe_able: cyoe_able?(@tag)
+      )
       render json: json
     end
   end

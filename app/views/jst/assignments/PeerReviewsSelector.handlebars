@@ -86,6 +86,20 @@
               Must come after due date. If blank, uses due date.
             {{/t}}
           </div>
+          <div id="intra_group_peer_reviews_toggle"
+            aria-enabled="{{hasGroupCategory}}"
+            style="{{hiddenUnless hasGroupCategory}}">
+            <label class="checkbox" for="intra_group_peer_reviews">
+              {{checkbox "intra_group_peer_reviews"
+              id="intra_group_peer_reviews"
+              aria-controls="intra_group_peer_reviews"
+              checked=intraGroupPeerReviews
+              prefix=prefix}}
+              {{#t}}
+                Allow intra-group peer reviews
+              {{/t}}
+            </label>
+          </div>
         </div>
       </div>
 

@@ -3,7 +3,7 @@
     <span class="discussion-drag-handle"
           tabindex="0"
           data-tooltip
-          title="{{#t "drag_up_or_down_to_reorder"}}Drag up or down to reorder{{/t}}"></span>
+          title="{{#t}}Drag up or down to reorder{{/t}}"></span>
   </div>
 {{/if}}
 
@@ -41,25 +41,25 @@
       <div class="discussion-info-icons">
         {{#if locked}}
           <i data-tooltip
-             title="{{#t "locked"}}This topic is closed for comments{{/t}}"
+             title="{{#t}}This topic is closed for comments{{/t}}"
              class="icon-lock"
-             tabindex="0"><span class="screenreader-only">{{#t "locked"}}This topic is closed for comments{{/t}}</span></i>
+             tabindex="0"><span class="screenreader-only">{{#t}}This topic is closed for comments{{/t}}</span></i>
         {{/if}}
 
         {{#if podcast_url}}
           <a href="{{podcast_url}}"
              data-tooltip
-             title="{{#t "topic_podcast_feed"}}Topic Podcast Feed{{/t}}"><i class="icon-rss"></i></a>
+             title="{{#t}}Topic Podcast Feed{{/t}}"><i class="icon-rss"></i></a>
         {{/if}}
 
         {{#each attachments}}
           <a href="{{url}}"
              data-tooltip
-             title="{{#t "attached_file_name"}}Attached: {{display_name}}{{/t}}"><i class="icon-paperclip"></i></a>
+             title="{{#t}}Attached: {{display_name}}{{/t}}"><i class="icon-paperclip"></i></a>
         {{/each}}
         {{#if assignment_id}}
           <i data-tooltip
-             title="{{#t "this_topic_is_used_for_grading"}}This topic is used for grading{{/t}}"
+             title="{{#t}}This topic is used for grading{{/t}}"
              class="icon-assignment"></i>
         {{/if}}
       </div>
@@ -67,27 +67,27 @@
         {{#if permissions.delete}}
           <a href="#" class="al-trigger al-trigger-gray" role="button" id="manage_link" aria-haspopup="true">
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-            <span class="screenreader-only">{{#t "manage"}}Manage{{/t}} announcement with title {{title}}</span>
+            <span class="screenreader-only">{{#t}}Manage{{/t}} announcement with title {{title}}</span>
           </a>
 
           <ul class="al-options">
             {{#if locked}}
               <li>
                 <a href="#" class="icon-lock">
-                  {{#t "open_to_comments"}}Open to Comments{{/t}}
+                  {{#t}}Open to Comments{{/t}}
                 </a>
               </li>
             {{else}}
               {{#if can_lock}}
                 <li>
                   <a href="#" class="icon-lock">
-                    {{#t "close_for_comments"}}Close for Comments{{/t}}
+                    {{#t}}Close for Comments{{/t}}
                   </a>
                 </li>
               {{/if}}
             {{/if}}
             <li>
-              <a href="#" class="icon-trash">{{#t "delete"}}Delete{{/t}}</a>
+              <a href="#" class="icon-trash">{{#t}}Delete{{/t}}</a>
             </li>
           </ul>
         {{/if}}

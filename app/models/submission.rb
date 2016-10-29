@@ -58,10 +58,7 @@ class Submission < ActiveRecord::Base
 
   has_many :content_participations, :as => :content
 
-  has_and_belongs_to_many :crocodoc_documents,
-    join_table: :canvadocs_submissions
-  has_and_belongs_to_many :canvadocs,
-    join_table: :canvadocs_submissions
+  has_many :canvadocs_submissions
 
   serialize :turnitin_data, Hash
 
@@ -213,73 +210,80 @@ class Submission < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user| user && user.id == self.user_id && self.assignment.published?}
+    given do |user|
+      user &&
+        user.id == self.user_id &&
+        self.assignment.published?
+    end
     can :read and can :comment and can :make_group_comment and can :submit
 
     # see user_can_read_grade? before editing :read_grade permissions
-    given { |user| user && user.id == self.user_id && !self.assignment.muted? }
+    given do |user|
+      user &&
+        user.id == self.user_id &&
+        !self.assignment.muted?
+    end
     can :read_grade
 
     given do |user, session|
-      !context.feature_enabled?(:multiple_grading_periods) &&
-        assignment.published? &&
-        context.grants_right?(user, session, :manage_grades)
+      self.assignment.published? &&
+        self.assignment.context.grants_right?(user, session, :manage_grades)
     end
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
 
     given do |user, session|
-      context.feature_enabled?(:multiple_grading_periods) &&
-        assignment.published? &&
-        context.grants_right?(user, session, :manage_grades)
+      self.assignment.user_can_read_grades?(user, session)
     end
-    can :read and can :comment and can :make_group_comment and can :read_grade
-
-    given do |user, session|
-      context.feature_enabled?(:multiple_grading_periods) &&
-        assignment.published? &&
-        context.grants_right?(user, session, :manage_grades) &&
-        (user.admin_of_root_account?(assignment.root_account) || !in_closed_grading_period?)
-    end
-    can :grade
-
-    given {|user, session| self.assignment.user_can_read_grades?(user, session) }
     can :read and can :read_grade
 
-    given {|user| self.assignment && self.assignment.context && user && self.user &&
-      self.assignment.context.observer_enrollments.where(user_id: user, associated_user_id: self.user, workflow_state: 'active').exists? }
+    given do |user|
+      self.assignment &&
+        self.assignment.context &&
+        user &&
+        self.user &&
+        self.assignment.context.observer_enrollments.where(
+          user_id: user,
+          associated_user_id: self.user,
+          workflow_state: 'active'
+        ).exists?
+    end
     can :read and can :read_comments
 
-    given {|user| self.assignment && !self.assignment.muted? && self.assignment.context && user && self.user &&
-      self.assignment.context.observer_enrollments.where(user_id: user, associated_user_id: self.user, workflow_state: 'active').first.try(:grants_right?, user, :read_grades) }
+    given do |user|
+      self.assignment &&
+        !self.assignment.muted? &&
+        self.assignment.context &&
+        user &&
+        self.user &&
+        self.assignment.context.observer_enrollments.where(
+          user_id: user,
+          associated_user_id: self.user,
+          workflow_state: 'active'
+        ).first.try(:grants_right?, user, :read_grades)
+    end
     can :read_grade
 
-    given {|user| self.assignment.published? && user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
+    given do |user|
+      self.assignment.published? &&
+        user &&
+        self.assessment_requests.map(&:assessor_id).include?(user.id)
+    end
     can :read and can :comment
 
-    given { |user, session|
+    given do |user, session|
       turnitin_data &&
-      user_can_read_grade?(user, session) &&
-      (assignment.context.grants_right?(user, session, :manage_grades) ||
-        case assignment.turnitin_settings[:originality_report_visibility]
-          when 'immediate'; true
-          when 'after_grading'; current_submission_graded?
-          when 'after_due_date'; assignment.due_at && assignment.due_at < Time.now.utc
-          when 'never'; false
-        end
-      )
-    }
+        user_can_read_grade?(user, session) &&
+        (assignment.context.grants_right?(user, session, :manage_grades) ||
+          case assignment.turnitin_settings[:originality_report_visibility]
+          when 'immediate' then true
+          when 'after_grading' then current_submission_graded?
+          when 'after_due_date'
+            then assignment.due_at && assignment.due_at < Time.now.utc
+          when 'never' then false
+          end
+        )
+    end
     can :view_turnitin_report
-  end
-
-  def in_closed_grading_period?
-    return false unless self.assignment.context.feature_enabled?(:multiple_grading_periods)
-
-    grading_period = GradingPeriod.
-      for(self.assignment.context).
-      where(":due_at >= start_date AND :due_at <= end_date", due_at: self.cached_due_date).
-      first
-    return false unless grading_period.present?
-    grading_period.closed?
   end
 
   def user_can_read_grade?(user, session=nil)
@@ -301,7 +305,8 @@ class Submission < ActiveRecord::Base
   end
 
   def update_final_score
-    if score_changed? || excused_changed?
+    if score_changed? || excused_changed? ||
+        (workflow_state_was == "pending_review" && workflow_state == "graded")
       if skip_grade_calc
         Rails.logger.info "GRADES: NOT recomputing scores for submission #{global_id} because skip_grade_calc was set"
       else
@@ -597,14 +602,14 @@ class Submission < ActiveRecord::Base
         if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
           submit_to_canvadocs = true
           a.create_canvadoc!(canvadoc_params) unless a.canvadoc
-          unless canvadocs.exists?(attachment: a)
-            canvadocs << a.canvadoc
+          a.shard.activate do
+            CanvadocsSubmission.find_or_create_by(submission: self, canvadoc: a.canvadoc)
           end
         elsif a.crocodocable?
           submit_to_canvadocs = true
           a.create_crocodoc_document! unless a.crocodoc_document
-          unless crocodoc_documents.exists?(attachment: a)
-            crocodoc_documents << a.crocodoc_document
+          a.shard.activate do
+            CanvadocsSubmission.find_or_create_by(submission: self, crocodoc_document: a.crocodoc_document)
           end
         end
 
@@ -1028,7 +1033,7 @@ class Submission < ActiveRecord::Base
     pg = if preloaded_grades
       pgs = preloaded_grades[self.id] || []
       if final
-        pgs.detect{|pg| pg.final}
+        pgs.detect(&:final)
       else
         pgs.detect{|pg| !pg.final && pg.scorer_id == scorer.id}
       end
@@ -1275,7 +1280,7 @@ class Submission < ActiveRecord::Base
     self.graded? && (!self.submitted_at || (self.graded_at && self.graded_at >= self.submitted_at))
   end
 
-  def context(user=nil)
+  def context(_user=nil)
     self.assignment.context if self.assignment
   end
 

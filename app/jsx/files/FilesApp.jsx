@@ -62,6 +62,7 @@ define([
     }
 
     var userCanManageFilesForContext = filesEnv.userHasPermission({contextType: contextType, contextId: contextId}, 'manage_files');
+    var userCanRestrictFilesForContext = userCanManageFilesForContext && contextType != "groups";
     var usageRightsRequiredForContext = (filesEnv.contextsDictionary[`${contextType}_${contextId}`]) ?
                                          filesEnv.contextsDictionary[`${contextType}_${contextId}`].usage_rights_required : false;
     var externalToolsForContext = (filesEnv.contextFor({contextType: contextType, contextId: contextId})) ?
@@ -105,6 +106,7 @@ define([
           contextId={contextId}
           userCanManageFilesForContext={userCanManageFilesForContext}
           usageRightsRequiredForContext={usageRightsRequiredForContext}
+          userCanRestrictFilesForContext={userCanRestrictFilesForContext}
           getPreviewQuery={this.getPreviewQuery}
           getPreviewRoute={this.getPreviewRoute}
           modalOptions={{
@@ -153,6 +155,7 @@ define([
               toggleAllSelected: this.toggleAllSelected,
               areAllItemsSelected: this.areAllItemsSelected,
               userCanManageFilesForContext: userCanManageFilesForContext,
+              userCanRestrictFilesForContext: userCanRestrictFilesForContext,
               usageRightsRequiredForContext: usageRightsRequiredForContext,
               externalToolsForContext: externalToolsForContext,
               previewItem: this.previewItem,

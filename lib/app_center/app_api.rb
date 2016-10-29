@@ -89,5 +89,28 @@ module AppCenter
       end
       json
     end
+
+    def get_app_config_url(app_center_id, config_settings)
+      access_token = @app_center.settings['token']
+      endpoint = "/api/v1/lti_apps/#{app_center_id}?access_token=#{access_token}"
+
+      app_details = fetch_app_center_response(endpoint, 5.minutes, 1, 1)
+
+      if app_details['config_xml_url']
+        user_query_string = ''
+        user_query_string = config_settings.map {|k, v| "#{k}=#{v}"}.join('&') if config_settings
+
+        response_config_url = app_details['config_xml_url']
+
+        uri = URI(response_config_url)
+        response_config_url += (uri.query.present? ? '&' : '?') + user_query_string if user_query_string.present?
+
+        config_url = response_config_url
+      else
+        config_url = nil
+      end
+
+      config_url
+    end
   end
 end

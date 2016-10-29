@@ -282,7 +282,6 @@ describe "assignments" do
       manually_create_assignment
       f('#has_group_category').click
       wait_for_ajaximations
-      click_option('#assignment_group_category_id', 'new', :value)
       fj('.ui-dialog:visible .self_signup_help_link img').click
       wait_for_ajaximations
       expect(f('#self_signup_help_dialog')).to be_displayed
@@ -307,7 +306,7 @@ describe "assignments" do
       end
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
       visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
-      expect(visBoxes.first.text).to eq "Please select a group set for this assignment"
+      expect(visBoxes.first.text).to eq "Please create a group set"
     end
 
     it "shows assignment details, un-editable, for concluded teachers", priority: "2", test_id: 626906 do
@@ -330,7 +329,13 @@ describe "assignments" do
           gc = GroupCategory.create(:name => "gc#{i}", :context => @course)
           group = @course.groups.create!(:group_category => gc)
           group.users << student_in_course(:course => @course, :active_all => true).user
-          ag.assignments.create! :context => @course, :name => "assignment#{i}", :group_category => gc, :submission_types => 'online_text_entry'
+          ag.assignments.create!(
+            context: @course,
+            name: "assignment#{i}",
+            group_category: gc,
+            submission_types: 'online_text_entry',
+            peer_reviews: "1",
+            automatic_peer_reviews: true)
         end
         submission = @assignment1.submit_homework(@student)
         submission.submission_type = "online_text_entry"
@@ -366,12 +371,20 @@ describe "assignments" do
         expect(f("#assignment_group_category_id")).to be_disabled
       end
 
-      it "should revert to [ New Group Category ] if original group is deleted with no submissions", priority: "2", test_id: 627150 do
+      it "should revert to a blank selection if original group is deleted with no submissions", priority: "2", test_id: 627150 do
         @assignment2.group_category.destroy
         get "/courses/#{@course.id}/assignments/#{@assignment2.id}/edit"
         wait_for_ajaximations
+        expect(f("#assignment_group_category_id option[selected][value='blank']")).to be_displayed
+      end
 
-        expect(f("#assignment_group_category_id option[selected]")).to include_text "New Group Category"
+      it "should show and hide the intra-group peer review toggle depending on group setting" do
+        get "/courses/#{@course.id}/assignments/#{@assignment2.id}/edit"
+        wait_for_ajaximations
+
+        expect(f("#intra_group_peer_reviews")).to be_displayed
+        f("#has_group_category").click
+        expect(f("#intra_group_peer_reviews")).not_to be_displayed
       end
     end
 
@@ -386,14 +399,15 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments"
         fj("#ag_#{@frozen_assign.assignment_group_id}_manage_link").click
         wait_for_ajaximations
-        expect(f("div#assignment_group_#{@frozen_assign.assignment_group_id}")).not_to contain_css("a.delete_group")
+        element = f("div#assignment_group_#{@frozen_assign.assignment_group_id}")
+        expect(element).to contain_css("a.delete_group.disabled")
       end
 
       it "should not allow deleting a frozen assignment from index page", priority:"2", test_id: 649309 do
         get "/courses/#{@course.id}/assignments"
         fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
         wait_for_ajaximations
-        expect(f("div#assignment_#{@frozen_assign.id}")).not_to contain_jqcss("a.delete_assignment:visible")
+        expect(f("div#assignment_#{@frozen_assign.id}")).to contain_css("a.delete_assignment.disabled")
       end
 
       it "should allow editing the due date even if completely frozen", priority: "2", test_id: 649310 do

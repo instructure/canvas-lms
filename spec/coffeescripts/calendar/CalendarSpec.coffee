@@ -1,17 +1,88 @@
 define [
   'compiled/calendar/Calendar'
   'compiled/util/fcUtil',
+  'moment'
   'timezone'
   'vendor/timezone/America/Denver'
-], (Calendar, fcUtil, tz, denver) ->
+  'helpers/fixtures'
+  'jquery'
+], (Calendar, fcUtil, moment, tz, denver, fixtures, $) ->
 
   module "Calendar",
     setup: ->
       @snapshot = tz.snapshot()
       tz.changeZone(denver, 'America/Denver')
+      fixtures.setup()
 
     teardown: ->
       tz.restore(@snapshot)
+      fixtures.teardown()
+
+  makeMockDataSource = () ->
+    getAppointmentGroups: sinon.spy()
+    getEvents: sinon.spy()
+    getEventsForAppointmentGroup: sinon.spy()
+    clearCache: sinon.spy()
+    eventWithId: sinon.spy()
+
+  makeMockHeader = () ->
+    setHeaderText: sinon.spy()
+    setSchedulerBadgeCount: sinon.spy()
+    selectView: sinon.spy()
+    on: sinon.spy()
+    animateLoading: sinon.spy()
+    showNavigator: sinon.spy()
+    showPrevNext: sinon.spy()
+    hidePrevNext: sinon.spy()
+    hideAgendaRecommendation: sinon.spy()
+    showAgendaRecommendation: sinon.spy()
+    showSchedulerTitle: sinon.spy()
+    showDoneButton: sinon.spy()
+
+  makeCal = () ->
+    new Calendar('#fixtures', [], null, makeMockDataSource(), header: makeMockHeader())
+
+  test 'creates a fullcalendar instance', ->
+    cal = makeCal()
+    ok $('.fc')[0]
+
+  test 'collaborates with header and data source', ->
+    mockHeader = makeMockHeader()
+    mockDataSource = makeMockDataSource()
+    cal = new Calendar('#fixtures', [], null, mockDataSource, header: mockHeader)
+    ok mockDataSource.getEvents.called
+    ok mockHeader.on.called
+
+  test 'animates loading', ->
+    mockHeader = makeMockHeader()
+    mockDataSource = makeMockDataSource()
+    cal = new Calendar('#fixtures', [], null, mockDataSource, header: mockHeader)
+    cal.ajaxStarted()
+    ok mockHeader.animateLoading.called
+
+  test 'publishes event when date is changed', ->
+    eventSpy = sinon.spy()
+    $.subscribe('Calendar/currentDate', eventSpy)
+    cal = makeCal()
+    cal.navigateDate(Date.now())
+    ok eventSpy.called
+
+  test 'renders events', ->
+    cal = makeCal()
+    $eventDiv = $('<div class="event"><div class="fc-title"></div><div class="fc-content"></div></div>').appendTo('#fixtures')
+    now = moment()
+    event =
+      startDate: () -> now
+      endDate: () -> now
+      isAppointmentGroupEvent: () -> false
+      eventType: 'calendar_event'
+      iconType: () -> 'someicon'
+      contextInfo:
+        name: 'some calendar'
+      isCompleted: () -> false
+
+    cal.eventRender(event, $eventDiv, 'month')
+    ok $('.icon-someicon')[0]
 
   test 'isSameWeek: should check boundaries in profile timezone', ->
     datetime1 = fcUtil.wrap('2015-10-31T23:59:59-06:00')

@@ -12,12 +12,12 @@ describe "/shared/_flash_notices" do
 
   it "puts login text with the button if flagged" do
     render partial: "shared/auth_type_icon", locals: local_options(with_login_text: true)
-    expect(rendered).to match("Login with <span class=\"ic-Login_sso-button_title")
+    expect(rendered).to match("Login with <span class=\"ic-Login__sso-button__title")
   end
 
   it "just uses the icon if flagged to not use login text" do
     render partial: "shared/auth_type_icon", locals: local_options(with_login_text: false)
-    expect(rendered).to_not match("Login with <span class=\"ic-Login_sso-button_title")
+    expect(rendered).to_not match("Login with <span class=\"ic-Login__sso-button__title")
   end
 
   it "renders a screenreader message if provided" do
@@ -32,7 +32,8 @@ describe "/shared/_flash_notices" do
 
   it "uses the button icon based on auth type" do
     render partial: "shared/auth_type_icon", locals: local_options(auth_type: 'twitter')
-    expect(rendered).to match(/sso-twitter(-)?\w*\.svg/)
+    doc = Nokogiri::HTML(response.body)
+    expect(doc.css('svg.ic-icon-svg--twitter')).to be_present
   end
 
 end

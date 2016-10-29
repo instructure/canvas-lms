@@ -69,6 +69,12 @@ define [
     view = @editView()
     equal view.$('#assignment_name').val(), 'Test Assignment'
 
+  test 'rejects missing group set for group assignment', ->
+    view = @editView()
+    data = { group_category_id: 'blank' }
+    errors = view.validateBeforeSave(data, [])
+    equal errors['newGroupCategory'][0]['message'], 'Please create a group set'
+
   test 'rejects a letter for points_possible', ->
     view = @editView()
     data = points_possible: 'a'
@@ -363,3 +369,33 @@ define [
     focusOnError = @stub(view.conditionalReleaseEditor, 'focusOnError')
     view.showErrors({ conditional_release: 'foo' })
     ok focusOnError.called
+
+  module 'Editview: Intra-Group Peer Review toggle',
+    setup: ->
+      fakeENV.setup()
+    teardown: ->
+      fakeENV.teardown()
+    editView: ->
+      editView.apply(this, arguments)
+
+  test 'only appears for group assignments', ->
+    @stub(userSettings, 'contextGet').returns {
+      peer_reviews: "1",
+      group_category_id: 1,
+      automatic_peer_reviews: "1"
+    }
+    view = @editView()
+    view.$el.appendTo $('#fixtures')
+    ok view.$('#intra_group_peer_reviews').is(":visible")
+
+  test 'does not appear when reviews are being assigned manually', ->
+    @stub(userSettings, 'contextGet').returns {peer_reviews: "1", group_category_id: 1}
+    view = @editView()
+    view.$el.appendTo $('#fixtures')
+    ok !view.$('#intra_group_peer_reviews').is(":visible")
+
+  test 'toggle does not appear when there is no group', ->
+    @stub(userSettings, 'contextGet').returns {peer_reviews: "1"}
+    view = @editView()
+    view.$el.appendTo $('#fixtures')
+    ok !view.$('#intra_group_peer_reviews').is(":visible")

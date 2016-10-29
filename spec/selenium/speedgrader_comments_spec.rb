@@ -319,6 +319,10 @@ describe "speed grader" do
     end
 
     describe 'publishing a draft comment' do
+      before(:each) do
+        @comment_textarea.clear
+      end
+
       it 'should increase the number of published comments', test_id: 1407013, priority: "1" do
         publish_links = ff('#comments .comment.draft .comment_flex > button.submit_comment_button').select(&:displayed?)
 
@@ -329,6 +333,23 @@ describe "speed grader" do
         }.to change {
           SubmissionComment.published.count
         }.by(1)
+      end
+
+      it 'replaces the draft comment in the list of comments with a published comment' do
+        publish_links = ff('#comments .comment.draft .comment_flex > button.submit_comment_button').select(&:displayed?)
+        comment_count = ff('#comments .comment').size
+        draft_comment_count = ff('#comments .comment.draft').size
+
+        publish_links[0].click
+        accept_alert
+        wait_for_ajaximations
+
+        f('#next-student-button').click
+        f('#prev-student-button').click
+
+
+        expect(ff('#comments .comment')).to have_size(comment_count)
+        expect(ff('#comments .comment.draft')).to have_size(draft_comment_count - 1)
       end
     end
 

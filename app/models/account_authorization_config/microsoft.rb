@@ -59,6 +59,16 @@ class AccountAuthorizationConfig::Microsoft < AccountAuthorizationConfig::OpenID
   end
   validates :login_attribute, inclusion: login_attributes
 
+  def self.recognized_federated_attributes
+    [
+      'email'.freeze,
+      'name'.freeze,
+      'preferred_username'.freeze,
+      'oid'.freeze,
+      'sub'.freeze,
+    ].freeze
+  end
+
   def login_attribute
     super || 'id'.freeze
   end
@@ -75,8 +85,9 @@ class AccountAuthorizationConfig::Microsoft < AccountAuthorizationConfig::OpenID
 
   def scope
     result = []
-    result << 'profile' if ['oid', 'preferred_username'].include?(login_attribute)
-    result << 'email' if login_attribute == 'email'.freeze
+    requested_attributes = [login_attribute] + federated_attributes.values.map { |v| v['attribute'] }
+    result << 'profile' unless (requested_attributes & ['name', 'oid', 'preferred_username']).empty?
+    result << 'email' if requested_attributes.include?('email')
     result.join(' ')
   end
 

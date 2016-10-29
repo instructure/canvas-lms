@@ -120,6 +120,21 @@ define([
     });
   });
 
+  module('updateModalState', () => {
+    test('it adds overlay when modal is visible', (assert) => {
+      createComponent()
+      component.updateModalState({ isVisible: true })
+      ok($('body').hasClass('conditional-release-modal-visible'))
+    });
+
+    test('it removes overlay when modal is no longer visible', (assert) => {
+      createComponent()
+      component.updateModalState({ isVisible: true })
+      component.updateModalState({ isVisible: false })
+      ok(!$('body').hasClass('conditional-release-modal-visible'))
+    });
+  })
+
   module('updateAssignment', () => {
     test('it updates iframe', (assert) => {
       createComponent();
@@ -133,6 +148,7 @@ define([
       component.updateAssignment({ id: 'asdf' });
     });
   })
+
   module('handleMessage', () => {
     const sendMessage = (messageType, messageBody) => {
       component.handleMessage({

@@ -3,6 +3,7 @@ define [
   'i18n!calendar'
   'compiled/util/Popover'
   'compiled/calendar/CommonEvent'
+  'compiled/calendar/commonEventFactory'
   'compiled/calendar/EditEventDetailsDialog'
   'jst/calendar/eventDetails'
   'jst/calendar/deleteItem'
@@ -14,7 +15,7 @@ define [
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
-], ($, I18n, Popover, CommonEvent, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _, {publish}) ->
+], ($, I18n, Popover, CommonEvent, commonEventFactory, EditEventDetailsDialog, eventDetailsTemplate, deleteItemTemplate, reservationOverLimitDialog, MessageParticipantsDialog, preventDefault, _, {publish}) ->
 
   destroyArguments = (fn) => -> fn.apply(this, [])
 
@@ -76,15 +77,30 @@ define [
         alert "Could not reserve event: #{data}"
         $.publish "CommonEvent/eventSaveFailed", @event
 
-    reserveSuccessCB: (data) =>
+    reserveSuccessCB: (cancel_existing, data) ->
       @popover.hide()
-      # On success, this will return the new event created for the user.
+
+      # remove previous signup(s), if applicable (this has already happened on the backend)
+      if cancel_existing
+        for own k, v of @dataSource.cache.contexts[@event.contextInfo.asset_string].events
+          if v.eventType == 'calendar_event' and
+             v.calendarEvent.parent_event_id and
+             v.calendarEvent.appointment_group_id == @event.calendarEvent.appointment_group_id
+            $.publish "CommonEvent/eventDeleted", v
+
+      # Update the parent event
+      @event.calendarEvent.reserved = true
+      @event.calendarEvent.available_slots -= 1
       $.publish "CommonEvent/eventSaved", @event
+
+      # Add the newly created child event
+      childEvent = commonEventFactory(data, [@event.contextInfo])
+      $.publish "CommonEvent/eventSaved", childEvent
 
     reserveEvent: (params={}) =>
       params['comments'] = $('#appointment-comment').val()
       $.publish "CommonEvent/eventSaving", @event
-      $.ajaxJSON @event.object.reserve_url, 'POST', params, @reserveSuccessCB, @reserveErrorCB
+      $.ajaxJSON @event.object.reserve_url, 'POST', params, @reserveSuccessCB.bind(this, params.cancel_existing), @reserveErrorCB
 
     unreserveEvent: =>
       if @event.object?.parent_event_id && @event.object?.appointment_group_id
@@ -157,6 +173,8 @@ define [
       else if @event.object?.available_slots > 0
         params.availableSlotsText = @event.object.available_slots
 
+      params.use_new_scheduler = ENV.CALENDAR.BETTER_SCHEDULER
+      params.is_appointment_group = !!@event.isAppointmentGroupEvent() # this returns the actual url so make it boolean for clarity
       params.reserve_comments = @event.object.reserve_comments ?= @event.object.comments
       params.showEventLink   = params.fullDetailsURL()
       params.showEventLink or= params.isAppointmentGroupEvent()

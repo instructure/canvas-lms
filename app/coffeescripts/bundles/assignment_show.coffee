@@ -76,13 +76,6 @@ require [
         $('.assignment_peer_reviews_link').slideUp()
 
   $ ->
-    if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.current_user_roles.indexOf('teacher') != -1
-      { assignment, jwt, stats_url } = ENV.CONDITIONAL_RELEASE_ENV
       graphsRoot = document.getElementById('crs-graphs')
       detailsParent = document.getElementById('not_right_side')
-      detailsRoot = document.createElement('div')
-
-      detailsRoot.setAttribute('id', 'crs-details')
-      detailsParent.appendChild(detailsRoot)
-
-      CyoeStats.init(graphsRoot, detailsRoot, assignment, jwt, stats_url)
+      CyoeStats.init(graphsRoot, detailsParent)

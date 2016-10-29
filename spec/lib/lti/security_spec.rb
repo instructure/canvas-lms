@@ -54,6 +54,34 @@ describe Lti::Security do
 
     end
 
+    context '.check_and_store_nonce' do
+      it 'rejects a used nonce' do
+        enable_cache do
+          cache_key = 'abcdefghijklmnopqrstuvwxyz'
+          timestamp = 1.minute.ago
+          expiration = 5.minutes
+          params = [cache_key, timestamp, expiration]
+          expect(Lti::Security.check_and_store_nonce(*params)).to be true
+          expect(Lti::Security.check_and_store_nonce(*params)).to be false
+        end
+      end
+
+      it 'rejects a nonce if the timestamp exceeds the expiration' do
+        cache_key = 'abcdefghijklmnopqrstuvwxyz'
+        expiration = 5.minutes
+        timestamp = (expiration + 1.minute).ago.to_i
+        expect(Lti::Security.check_and_store_nonce(cache_key, timestamp, expiration)).to be false
+      end
+
+      it 'rejects a nonce in the future' do
+        cache_key = 'abcdefghijklmnopqrstuvwxyz'
+        expiration = 5.minutes
+        timestamp = 5.minutes.from_now
+        expect(Lti::Security.check_and_store_nonce(cache_key, timestamp, expiration)).to be false
+      end
+
+    end
+
     it "generates a correct signature" do
       signed_params = Lti::Security.signed_post_params(params, launch_url, consumer_key, consumer_secret)
 

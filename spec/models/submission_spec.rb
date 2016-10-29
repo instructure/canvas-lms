@@ -59,29 +59,6 @@ describe Submission do
       group.enrollment_terms << @context.enrollment_term
     end
 
-    describe "#in_closed_grading_period?" do
-      it "returns true if the submission is due in a closed grading period" do
-        @assignment.due_at = in_closed_grading_period
-        @assignment.save!
-        submission = Submission.create!(@valid_attributes)
-        expect(submission).to be_in_closed_grading_period
-      end
-
-      it "returns false if the submission is due in an open grading period" do
-        @assignment.due_at = in_open_grading_period
-        @assignment.save!
-        submission = Submission.create!(@valid_attributes)
-        expect(submission).not_to be_in_closed_grading_period
-      end
-
-      it "returns false if the submission is due outside of any grading period" do
-        @assignment.due_at = outside_of_any_grading_period
-        @assignment.save!
-        submission = Submission.create!(@valid_attributes)
-        expect(submission).not_to be_in_closed_grading_period
-      end
-    end
-
     describe "permissions" do
       before(:once) do
         @admin = user(active_all: true)
@@ -91,22 +68,6 @@ describe Submission do
       end
 
       describe "grade" do
-        context "the submission is due in a closed grading period" do
-          before(:once) do
-            @assignment.due_at = in_closed_grading_period
-            @assignment.save!
-            @submission = Submission.create!(@valid_attributes)
-          end
-
-          it "has grade permissions if the user is a root account admin" do
-            expect(@submission.grants_right?(@admin, :grade)).to eq(true)
-          end
-
-          it "does not have grade permissions if the user is not a root account admin" do
-            expect(@submission.grants_right?(@teacher, :grade)).to eq(false)
-          end
-        end
-
         context "the submission is due in an open grading period" do
           before(:once) do
             @assignment.due_at = in_open_grading_period
@@ -152,14 +113,6 @@ describe Submission do
         end
       end
     end
-  end
-
-  it "#in_closed_grading_period? returns false if the course does not have Multiple Grading Periods enabled" do
-    @context.root_account.disable_feature!(:multiple_grading_periods)
-    @assignment.due_at = 9.days.ago
-    @assignment.save!
-    submission = Submission.create!(@valid_attributes)
-    expect(submission).not_to be_in_closed_grading_period
   end
 
   it "should create a new instance given valid attributes" do
@@ -515,11 +468,11 @@ describe Submission do
         quiz.save!
 
         user       = account_admin_user
-        channel    = user.communication_channels.create!(:path => 'admin@example.com')
+        user.communication_channels.create!(:path => 'admin@example.com')
         submission = quiz.generate_submission(user, false)
         Quizzes::SubmissionGrader.new(submission).grade_submission
 
-        channel2   = @teacher.communication_channels.create!(:path => 'chang@example.com')
+        @teacher.communication_channels.create!(:path => 'chang@example.com')
         submission2 = quiz.generate_submission(@teacher, false)
         Quizzes::SubmissionGrader.new(submission2).grade_submission
 
@@ -1011,10 +964,10 @@ describe Submission do
     @assignment.save
 
     @submission = @assignment.submit_homework(@student1, :body => 'some message')
-    sc1 = SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "a")
-    sc2 = SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "b", :hidden => true)
-    sc3 = SubmissionComment.create!(:submission => @submission, :author => @student1, :comment => "c")
-    sc4 = SubmissionComment.create!(:submission => @submission, :author => @student2, :comment => "d")
+    SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "a")
+    SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "b", :hidden => true)
+    SubmissionComment.create!(:submission => @submission, :author => @student1, :comment => "c")
+    SubmissionComment.create!(:submission => @submission, :author => @student2, :comment => "d")
     SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "e", :draft => true)
     @submission.reload
 
@@ -1543,7 +1496,7 @@ describe Submission do
         s = @assignment.submit_homework(@student1,
                                         submission_type: "online_upload",
                                         attachments: [@attachment])
-        expect(s.canvadocs).to eq [@attachment.canvadoc]
+        expect(@attachment.canvadoc.submissions).to eq [s]
       end
 
       it "create records for each group submission" do
@@ -1559,7 +1512,7 @@ describe Submission do
 
         [@student1, @student2].each do |student|
           submission = @assignment.submission_for_student(student)
-          expect(submission.canvadocs).to eq [@attachment.canvadoc]
+          expect(@attachment.canvadoc.submissions).to include submission
         end
       end
 
@@ -1573,8 +1526,8 @@ describe Submission do
         end
 
         it 'sets preferred plugin course id to the course ID' do
-          s = submit_homework.call
-          expect(s.canvadocs.first.preferred_plugin_course_id).to eq(@course.id.to_s)
+          submit_homework.call
+          expect(@attachment.canvadoc.preferred_plugin_course_id).to eq(@course.id.to_s)
         end
       end
     end
@@ -1584,7 +1537,7 @@ describe Submission do
       orig_job_count = job_scope.count
 
       attachment = attachment_model(context: @user)
-      s = @assignment.submit_homework(@user,
+      @assignment.submit_homework(@user,
                                       submission_type: "online_upload",
                                       attachments: [attachment])
       expect(job_scope.count).to eq orig_job_count
@@ -1597,7 +1550,7 @@ describe Submission do
       Canvadocs.stubs(:annotations_supported?).returns true
 
       attachment = crocodocable_attachment_model(context: @user)
-      s = @assignment.submit_homework(@user,
+      @assignment.submit_homework(@user,
                                       submission_type: "online_upload",
                                       attachments: [attachment])
       run_jobs

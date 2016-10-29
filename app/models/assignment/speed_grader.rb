@@ -130,6 +130,14 @@ class Assignment
 
       enrollment_types_by_id = enrollments.inject({}){ |h, e| h[e.user_id] ||= e.type; h }
 
+      if @assignment.quiz
+        if @assignment.quiz.assignment_overrides.to_a.select(&:active?).count == 0
+          @assignment.quiz.has_no_overrides = true
+        else
+          @assignment.quiz.context.preload_user_roles!
+        end
+      end
+
       res[:submissions] = submissions.map do |sub|
         json = sub.as_json(:include_root => false,
           :methods => [:submission_history, :late, :external_tool_url],
@@ -235,7 +243,7 @@ class Assignment
         json
       end
       res[:GROUP_GRADING_MODE] = @assignment.grade_as_group?
-      res
+      StringifyIds.recursively_stringify_ids(res)
     ensure
       Attachment.skip_thumbnails = nil
     end

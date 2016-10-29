@@ -50,6 +50,9 @@ module Api::V1::AssignmentGroup
         Assignment.preload_context_module_tags(assignments) # running this again is fine
       end
 
+      hash['has_assignment_due_in_closed_grading_period'] =
+        group.has_assignment_due_in_closed_grading_period?
+
       hash['assignments'] = assignments.map { |a|
         overrides = opts[:overrides].select{|override| override.assignment_id == a.id } unless opts[:overrides].nil?
         a.context = group.context
@@ -83,7 +86,5 @@ module Api::V1::AssignmentGroup
     end
 
     assignment_group.attributes = update_params
-
-    assignment_group.save
   end
 end

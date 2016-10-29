@@ -542,6 +542,15 @@ describe ConversationsController, type: :request do
           assert_status(400)
         end
 
+        it "should allow an admin to send a message in course context" do
+          account_admin_user active_all: true
+          json = api_call(:post, "/api/v1/conversations",
+                  { :controller => 'conversations', :action => 'create', :format => 'json' },
+                  { :recipients => [@bob.id], :body => "test", :context_code => @course.asset_string })
+          conv = Conversation.find(json.first['id'])
+          expect(conv.context).to eq @course
+        end
+
         it "should allow site admin to set any account context" do
           site_admin_user(name: "site admin", active_all: true)
           json = api_call(:post, "/api/v1/conversations",

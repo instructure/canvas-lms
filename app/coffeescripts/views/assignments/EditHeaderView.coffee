@@ -8,6 +8,7 @@ define [
 ], (I18n, Backbone, $, ConditionalRelease, template) ->
 
   class EditHeaderView extends Backbone.View
+    @optionProperty 'userIsAdmin'
 
     template: template
 
@@ -16,9 +17,8 @@ define [
       'change #grading_type_selector': 'onGradingTypeUpdate'
       'tabsbeforeactivate': 'onTabChange'
 
-
     messages:
-      confirm: I18n.t('confirms.delete_assignment', 'Are you sure you want to delete this assignment?')
+      confirm: I18n.t('Are you sure you want to delete this assignment?')
 
     els:
       '#edit-assignment-header-tabs': '$headerTabs'
@@ -36,9 +36,13 @@ define [
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         @toggleConditionalReleaseTab(@model.gradingType())
 
+    canDelete: ->
+      @userIsAdmin or @model.canDelete()
+
     onDelete: (e) =>
       e.preventDefault()
-      @delete() if confirm(@messages.confirm)
+      if @canDelete()
+        @delete() if confirm(@messages.confirm)
 
     delete: ->
       disablingDfd = new $.Deferred()
@@ -78,5 +82,6 @@ define [
 
     toJSON: ->
       json = @model.toView()
+      json.canDelete = @canDelete()
       json['CONDITIONAL_RELEASE_SERVICE_ENABLED'] = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
       json

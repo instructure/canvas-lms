@@ -12,8 +12,8 @@
   </option>
   <% grading_periods.each do |gp| %>
     <option
-      value="<%= gp[:id] %>"
-      <%= "selected=selected" if selected_period_id == gp[:id] %> >
+      value="<%= gp.try(:id) || gp[:id] %>"
+      <%= "selected=selected" if selected_period_id == (gp.try(:id) || gp[:id]) %> >
       <%= gp[:title] %>
     </option>
   <% end %>

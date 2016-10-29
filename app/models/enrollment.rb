@@ -848,7 +848,7 @@ class Enrollment < ActiveRecord::Base
   def can_be_deleted_by(user, context, session)
     can_remove = [StudentEnrollment, ObserverEnrollment].include?(self.class) &&
       context.grants_right?(user, session, :manage_students)
-    can_remove ||= context.grants_right?(user, session, :manage_admin_users)
+    can_remove ||= context.grants_right?(user, session, :manage_admin_users) unless student?
     can_remove &&= self.user_id != user.id ||
       context.account.grants_right?(user, session, :manage_admin_users)
   end
@@ -896,7 +896,7 @@ class Enrollment < ActiveRecord::Base
         t('#enrollment.workflow.deleted', "Deleted")
       when 'invited'
         t('#enrollment.workflow.invited', "Invited")
-      when 'pending'
+      when 'pending', 'creation_pending'
         t('#enrollment.workflow.pending', "Pending")
       when 'rejected'
         t('#enrollment.workflow.rejected', "Rejected")
@@ -1079,8 +1079,7 @@ class Enrollment < ActiveRecord::Base
   scope :active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }
   scope :all_active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')") } # includes inactive
 
-  scope :active_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
-    where("enrollment_states.state = 'active'") }
+  scope :active_by_date, -> { joins(:enrollment_state).where("enrollment_states.state = 'active'") }
   scope :invited_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).
     where("enrollment_states.state IN ('invited', 'pending_invited')") }
   scope :active_or_pending_by_date, -> { joins(:enrollment_state).where("enrollment_states.restricted_access = ?", false).

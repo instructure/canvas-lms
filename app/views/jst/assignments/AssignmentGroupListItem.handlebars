@@ -81,26 +81,31 @@
           <ul class="al-options">
             <li>
               <a
-                href="#"
                 class="edit_group icon-edit"
                 aria-label="{{#t}}Edit Assignment Group{{/t}}"
                 data-focus-returns-to="ag_{{id}}_manage_link"
               >{{#t}}Edit{{/t}}</a>
             </li>
-            {{#unless hasFrozenAssignments}}
-              <li>
-                <a
-                  href="#"
-                  class="delete_group icon-trash"
-                  aria-label='{{#t}}Delete Assignment Group{{/t}}'
-                  data-focus-returns-to="ag_{{id}}_manage_link"
-                >{{#t}}Delete{{/t}}</a>
-              </li>
-            {{/unless}}
+            {{#if canDelete}}
+            <li>
+              <a
+                class="delete_group icon-trash"
+                aria-label='{{#t}}Delete Assignment Group{{/t}}'
+                data-focus-returns-to="ag_{{id}}_manage_link"
+              >{{#t}}Delete{{/t}}</a>
+            </li>
+            {{else}}
+            <li>
+              <a
+                class="delete_group icon-trash disabled"
+                aria-label='{{#t}}Delete Assignment Group{{/t}}'
+                aria-disabled=true
+              >{{#t}}Delete{{/t}}</a>
+            </li>
+            {{/if}}
             {{#if canMove}}
             <li>
               <a
-                href="#"
                 class="move_group icon-updown"
                 aria-label='{{#t}}Move Assignment Group{{/t}}'
                 data-focus-returns-to="ag_{{id}}_manage_link"

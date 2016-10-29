@@ -47,7 +47,7 @@ module DatesOverridable
   end
 
   def has_active_overrides?
-    assignment_overrides.active.exists?
+    active_assignment_overrides.any?
   end
 
   def multiple_due_dates?

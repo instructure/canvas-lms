@@ -127,6 +127,81 @@ describe AppCenter::AppApi do
     end
   end
 
+  describe '#get_app_config_url' do
+    let(:app_center_response) do
+      {
+         "id"   =>163,
+         "short_name" => "pr_youtube",
+         "name" => "YouTube",
+         "description" => "\n<p>Search publicly available YouTube videos.</p>\n",
+         "short_description" => "Search publicly available YouTube videos.",
+         "status" => "active",
+         "app_type" => nil,
+         "preview_url" => "https://www.edu-apps.org/lti_public_resources/?tool_id=youtube",
+         "banner_image_url" => "https://edu-app-center.s3.amazonaws.com/uploads/pr_youtube.png",
+         "logo_image_url" => nil,
+         "icon_image_url" => nil,
+         "average_rating" => 4.0,
+         "total_ratings" => 5.0,
+         "is_certified" => false,
+         "config_xml_url" => "https://www.edu-apps.org/lti_public_resources/config.xml?id=youtube",
+         "requires_secret" => false,
+         "config_options" => [
+           {
+              "name" => "channel_name",
+              "param_type" => "text",
+              "default_value" => "",
+              "description" => "Channel Name (Optional)",
+              "is_required" => false
+           }
+         ]
+      }
+    end
+
+    it 'gets the details of the specified app' do
+      api.stubs(:fetch_app_center_response).returns(app_center_response)
+      app_center_id = 'pr_youtube'
+      config_settings = {}
+      url = api.get_app_config_url(app_center_id, config_settings)
+      expect(url).to eq app_center_response['config_xml_url']
+    end
+
+    it 'appends config settings to an existing query string' do
+      api.stubs(:fetch_app_center_response).returns(app_center_response)
+      app_center_id = 'pr_youtube'
+      config_settings = {custom_param: 'custom_value'}
+      url = api.get_app_config_url(app_center_id, config_settings)
+      expect(url).to eq "#{app_center_response['config_xml_url']}&custom_param=custom_value"
+    end
+
+    it 'creates a query string populated with config settings' do
+      app_center_response['config_xml_url'] = "https://www.edu-apps.org/lti_public_resources/config.xml"
+      api.stubs(:fetch_app_center_response).returns(app_center_response)
+      app_center_id = 'pr_youtube'
+      config_settings = {custom_param: 'custom_value'}
+      url = api.get_app_config_url(app_center_id, config_settings)
+      expect(url).to eq "#{app_center_response['config_xml_url']}?custom_param=custom_value"
+    end
+
+    it 'returns nil if app center id is invalid' do
+      app_center_response = ""
+      api.stubs(:fetch_app_center_response).returns(app_center_response)
+      app_center_id = 'pr_youtube'
+      config_settings = {custom_param: 'custom_value'}
+      url = api.get_app_config_url(app_center_id, config_settings)
+      expect(url).to be_nil
+    end
+
+    it 'sends the app center token' do
+      endpoint = "/api/v1/lti_apps/pr_youtube?access_token=#{api.app_center.settings['token']}"
+      api.stubs(:fetch_app_center_response).with(endpoint, 300, 1, 1).returns(app_center_response)
+      app_center_id = 'pr_youtube'
+      config_settings = {custom_param: 'custom_value'}
+      url = api.get_app_config_url(app_center_id, config_settings)
+      expect(url).to eq "#{app_center_response['config_xml_url']}&custom_param=custom_value"
+    end
+  end
+
   describe '#get_apps' do
     let(:response) do
       response = mock

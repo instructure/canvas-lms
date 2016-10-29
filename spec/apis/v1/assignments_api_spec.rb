@@ -93,6 +93,12 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       )
     end
 
+    it "includes has_due_date_in_closed_grading_period in returned json" do
+      @course.assignments.create!(title: "Example Assignment")
+      json = api_get_assignments_index_from_course(@course)
+      expect(json.first).to have_key('has_due_date_in_closed_grading_period')
+    end
+
     it "sorts the returned list of assignments" do
       # the API returns the assignments sorted by
       # [assignment_groups.position, assignments.position]
@@ -501,6 +507,12 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         expect(@json.has_key?('published')).to be_truthy
         expect(@json['published']).to be_falsey
       end
+
+      it "includes has_due_date_in_closed_grading_period in returned json" do
+        @course.assignments.create!(title: "Example Assignment")
+        json = api_get_assignment_in_course(@assignment, @course)
+        expect(json).to have_key('has_due_date_in_closed_grading_period')
+      end
     end
 
     describe "differentiated assignments" do
@@ -661,24 +673,48 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(assign['all_dates']).not_to be_nil
     end
 
+    it "doesn't include all_dates if there are too many" do
+      course_with_teacher_logged_in(:active_all => true)
+      s1 = student_in_course(:course => @course, :active_all => true).user
+      s2 = student_in_course(:course => @course, :active_all => true).user
+
+      a = @course.assignments.create!(:title => "all_date_test", :submission_types => "online_url", :only_visible_to_overrides => true)
+      o1 = assignment_override_model(:assignment => a)
+      os1 = o1.assignment_override_students.create!(:user => s1)
+
+      Setting.set('assignment_all_dates_too_many_threshold', '2')
+
+      @user = @teacher
+      json = api_call(:get,
+        "/api/v1/courses/#{@course.id}/assignments.json",
+        { :controller => 'assignments_api', :action => 'index', :format => 'json', :course_id => @course.id.to_s},
+        :include => ['all_dates'])
+      expect(json.first['all_dates'].count).to eq 1
+
+      o2 = assignment_override_model(:assignment => a)
+      os2 = o2.assignment_override_students.create!(:user => s2)
+
+      json = api_call(:get,
+        "/api/v1/courses/#{@course.id}/assignments.json",
+        { :controller => 'assignments_api', :action => 'index', :format => 'json', :course_id => @course.id.to_s},
+        :include => ['all_dates'])
+      expect(json.first['all_dates']).to be_nil
+      expect(json.first['all_dates_count']).to eq 2
+    end
+
 
     it "returns due dates as they apply to the user" do
-        course_with_student(:active_all => true)
-        @user = @student
-        @student.enrollments.map(&:destroy_permanently!)
-        @assignment = @course.assignments.create!(
-          :title => "Test Assignment",
-          :description => "public stuff"
-        )
-        @section = @course.course_sections.create! :name => "afternoon delight"
-        @course.enroll_user(@student,'StudentEnrollment',
-                            :section => @section,
-                            :enrollment_state => :active)
-        override = create_override_for_assignment
-        json = api_get_assignments_index_from_course(@course).first
-        expect(json['due_at']).to eq override.due_at.iso8601.to_s
-        expect(json['unlock_at']).to eq override.unlock_at.iso8601.to_s
-        expect(json['lock_at']).to eq override.lock_at.iso8601.to_s
+      course_with_student(active_all: true)
+      @user = @student
+      @student.enrollments.map(&:destroy_permanently!)
+      @assignment = @course.assignments.create!(title: "Test Assignment", description: "public stuff")
+      @section = @course.course_sections.create!(name: "afternoon delight")
+      @course.enroll_user(@student, "StudentEnrollment", section: @section, enrollment_state: :active)
+      override = create_override_for_assignment
+      json = api_get_assignments_index_from_course(@course).first
+      expect(json['due_at']).to eq override.due_at.iso8601.to_s
+      expect(json['unlock_at']).to eq override.unlock_at.iso8601.to_s
+      expect(json['lock_at']).to eq override.lock_at.iso8601.to_s
     end
 
     it "returns original assignment due dates" do
@@ -888,6 +924,30 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       a.save!
       json = api_create_assignment_in_course(@course, create_assignment_json(group, group_category))
       expect(json['post_to_sis']).to eq false
+    end
+
+    it "should not overwrite post_to_sis with default if missing in update params" do
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: true}
+      a.save!
+      json = api_create_assignment_in_course(@course, {'name' => 'some assignment'})
+      @assignment = Assignment.find(json['id'])
+      expect(@assignment.post_to_sis).to eq true
+      a.settings[:sis_default_grade_export] = {locked: false, value: false}
+      a.save!
+
+      json = api_call(:put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+        {
+          :controller => 'assignments_api',
+          :action => 'update',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :id => @assignment.to_param
+        },
+        {:assignment => {:points_possible => 10}})
+      @assignment.reload
+      expect(@assignment.post_to_sis).to eq true
     end
 
     it "returns unauthorized for users who do not have permission" do

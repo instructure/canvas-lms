@@ -42,22 +42,18 @@ define([
 
   test('renders with the save button enabled', function() {
     let form = this.renderComponent();
-    let saveButton = ReactDOM.findDOMNode(form.refs.saveButton);
-    equal(saveButton.disabled, false);
+    equal(form.refs.saveButton.props.disabled, false);
   });
 
   test('renders with the cancel button enabled', function() {
     let form = this.renderComponent();
-    let cancelButton = ReactDOM.findDOMNode(form.refs.saveButton);
-    equal(cancelButton.disabled, false);
+    equal(form.refs.cancelButton.props.disabled, false);
   });
 
   test('optionally renders with the save and cancel buttons disabled', function() {
     let form = this.renderComponent({disabled: true});
-    let saveButton = ReactDOM.findDOMNode(form.refs.saveButton);
-    let cancelButton = ReactDOM.findDOMNode(form.refs.cancelButton);
-    equal(saveButton.disabled, true);
-    equal(cancelButton.disabled, true);
+    equal(form.refs.saveButton.props.disabled, true);
+    equal(form.refs.cancelButton.props.disabled, true);
   });
 
   test("auto-updates 'closeDate' when not already set and 'endDate' changes", function() {

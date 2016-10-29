@@ -237,7 +237,14 @@ define [
         else
           I18n.t('event_event_title', 'Event Title:')
 
-      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}"))
+      reservedText = ""
+      if event.isAppointmentGroupEvent()
+        if event.reservedUsers == ""
+            reservedText = "\n\n#{I18n.t('Unreserved')}"
+        else
+          reservedText = "\n\n#{I18n.t('Reserved By: ')} #{event.reservedUsers}"
+
+      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-title').text()}\n\n#{I18n.t('Calendar:')} #{htmlEscape(event.contextInfo.name)} #{htmlEscape(reservedText)}"))
       $element.find('.fc-content').prepend($("<span class='screenreader-only'>#{htmlEscape I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}</span>"))
       $element.find('.fc-title').prepend($("<span class='screenreader-only'>#{htmlEscape screenReaderTitleHint} </span>"))
       $element.find('.fc-title').toggleClass('calendar__event--completed', event.isCompleted())
@@ -286,7 +293,7 @@ define [
         return
 
       if event.midnightFudged
-        event.start = fcUtil.clone(event.originalStart).add(minuteDelta, 'minutes')
+        event.start = fcUtil.addMinuteDelta(event.originalStart, minuteDelta)
 
       # isDueAtMidnight() will read cached midnightFudged property
       if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
@@ -327,7 +334,7 @@ define [
       $event = $(jsEvent.currentTarget)
       if !$event.hasClass('event_pending')
         event.allPossibleContexts = @activeContexts() if event.can_change_context
-        detailsDialog = new ShowEventDetailsDialog(event)
+        detailsDialog = new ShowEventDetailsDialog(event, @dataSource)
         $event.data('showEventDetailsDialog', detailsDialog)
         detailsDialog.show jsEvent
 
@@ -425,7 +432,8 @@ define [
       originalEnd = fcUtil.clone(event.end)
       @copyYMD(event.start, date)
       @copyYMD(event.end, date)
-      @_eventDrop(event, moment.duration(event.start.diff(originalStart)).asMinutes(), false, =>
+      # avoid DST shifts by coercing the minute delta to a whole number of days (it always is for minical drop events)
+      @_eventDrop(event, Math.round(moment.duration(event.start.diff(originalStart)).asDays()) * 60 * 24, false, =>
         event.start = originalStart
         event.end = originalEnd
         @updateEvent(event)
@@ -475,7 +483,16 @@ define [
       @updateEvent(event)
 
     eventDeleted: (event) =>
+      @handleUnreserve(event) if event.isAppointmentGroupEvent() && event.calendarEvent.parent_event_id
       @calendar.fullCalendar('removeEvents', event.id)
+
+    # when an appointment event was deleted, clear the reserved flag and increment the available slot count on the parent
+    handleUnreserve: (event) =>
+      parentEvent = @dataSource.eventWithId("calendar_event_#{event.calendarEvent.parent_event_id}")
+      if parentEvent
+        parentEvent.calendarEvent.reserved = false
+        parentEvent.calendarEvent.available_slots += 1
+        @refetchEvents()
 
     eventSaving: (event) =>
       return unless event.start # undated events can't be rendered
@@ -648,7 +665,7 @@ define [
 
     agendaViewFetch: (start) ->
       @setDateTitle(@formatDate(start, 'date.formats.medium'))
-      @agenda.fetch(@visibleContextList, start)
+      @agenda.fetch(@visibleContextList.concat(@findAppointmentModeGroups()), start)
 
     renderDateRange: (start, end) =>
       @setDateTitle(@formatDate(start, 'date.formats.medium')+' – '+@formatDate(end, 'date.formats.medium'))
@@ -731,10 +748,11 @@ define [
       changed = @schedulerState.inFindAppointmentMode != newState.inFindAppointmentMode
       @schedulerState = newState
       @refetchEvents() if changed
+      if (changed && @currentView == 'agenda')
+        @loadAgendaView()
 
     findAppointmentModeGroups: () =>
       if @schedulerState.inFindAppointmentMode && @schedulerState.selectedCourse
         @reservable_appointment_groups[@schedulerState.selectedCourse.asset_string] || []
       else
         []
-

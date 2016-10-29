@@ -17,9 +17,9 @@ module MultipleGradingPeriods
       let(:create_set_button) { fj('button:contains("Create")') }
       let(:grading_period_set_title_css) { ".GradingPeriodSet__title" }
       let(:set_title) { f(grading_period_set_title_css) }
-      let(:add_grading_period_link) { f('.GradingPeriodList__new-period__add-button') }
-      let(:delete_grading_period_set_button) { f('.delete_grading_period_set_button') }
-      let(:edit_grading_period_set_button) { f('.edit_grading_period_set_button')}
+      let(:add_grading_period_link) { f('button[aria-label="Add Grading Period"]') }
+      let(:delete_grading_period_set_button) { f('#grading-period-sets button[title^="Delete "]') }
+      let(:edit_grading_period_set_button) { f('#grading-period-sets button[title^="Edit "]')}
       let(:edit_set_save_button) { f('button[aria-label="Save Grading Period Set"]') }
       let(:first_collapsed_set) { f('.GradingPeriodSet--collapsed') }
       let(:all_sets_css) { '.GradingPeriodSet__title'}
@@ -133,6 +133,37 @@ module MultipleGradingPeriods
     def search_grading_periods(search_term)
       replace_content(search_box, search_term)
       sleep 1 # InputFilter has a delay
+    end
+  end
+
+  module StudentPage
+    shared_context "student_page_components" do
+      # Helpers
+      let(:backend_group_helper) { Factories::GradingPeriodGroupHelper.new }
+      let(:backend_period_helper) { Factories::GradingPeriodHelper.new }
+
+      # Period components
+      let(:period_options_css) { '.grading_periods_selector > option' }
+
+      # Assignment components
+      let(:assignment_titles_css) { '.student_assignment > th > a'}
+    end
+
+    def visit_student_grades_page(course, student)
+      get "/courses/#{course.id}/grades/#{student.id}"
+    end
+
+    def select_period_by_name(name)
+      period = ff(period_options_css).find do |option|
+        option.text == name
+      end
+      period.click
+    end
+
+    def assignment_titles
+      ff(assignment_titles_css).map do |option|
+        option.text
+      end
     end
   end
 end

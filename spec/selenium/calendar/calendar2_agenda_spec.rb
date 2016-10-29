@@ -336,4 +336,58 @@ describe "calendar2" do
       expect(f("#content")).not_to contain_css('.event-details .delete_event_link')
     end
   end
+
+  context "agenda view with BETTER_SCHEDULER enabled" do
+    before(:each) do
+      account = Account.default
+      account.settings[:agenda_view] = true
+      account.save!
+      account.enable_feature! :better_scheduler
+    end
+
+    context "as a student" do
+      before(:each) do
+        course_with_student_logged_in
+        create_appointment_group(:contexts => [@course])
+        create_appointment_group(:contexts => [@course])
+      end
+
+      it "shows all options when in find appointment mode" do
+        get "/calendar2#view_name=agenda&view_start=#{(Date.today + 1.day).strftime}"
+        wait_for_ajaximations
+        expect(f('#content')).not_to contain_css('.agenda-event')
+        f('#FindAppointmentButton').click
+        f('.ReactModalPortal button[type="submit"]').click
+        expect(ff('.agenda-event').count).to equal(2)
+      end
+
+      it "shows only the reserved option when not in find appointment mode" do
+        get "/calendar2#view_name=agenda&view_start=#{(Date.today + 1.day).strftime}"
+        wait_for_ajaximations
+        f('#FindAppointmentButton').click
+        f('.ReactModalPortal button[type="submit"]').click
+        f('.agenda-event').click
+        f('.reserve_event_link').click
+        wait_for_ajaximations
+        f('#FindAppointmentButton').click
+        expect(ff('.agenda-event').count).to equal(1)
+        expect(f('.agenda-event')).to include_text 'Reserved'
+      end
+    end
+
+    context "as a teacher" do
+      before(:each) do
+        course_with_teacher_logged_in
+        create_appointment_group(:contexts => [@course])
+        create_appointment_group(:contexts => [@course])
+      end
+
+      it "shows all appointment groups" do
+        get "/calendar2#view_name=agenda&view_start=#{(Date.today + 1.day).strftime}"
+        wait_for_ajaximations
+        expect(ff('.agenda-event').count).to equal(2)
+      end
+    end
+  end
+
 end

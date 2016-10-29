@@ -383,6 +383,7 @@ RSpec.configure do |config|
   # specs on the patchset builds
   if ENV["SELINIMUM_CAPTURE"]
     require "selinimum"
+    require "selinimum/capture"
 
     config.before :suite do
       Selinimum::Capture.install!

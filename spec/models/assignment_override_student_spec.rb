@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative '../sharding_spec_helper'
 
 describe AssignmentOverrideStudent do
   describe "validations" do
@@ -63,6 +64,23 @@ describe AssignmentOverrideStudent do
       @override_student2 = @override.assignment_override_students.build
       @override_student2.user = @student
       expect(@override_student2).not_to be_valid
+    end
+  end
+
+  describe "cross sharded users" do
+    specs_require_sharding
+    it "should work outside of the users native account" do
+      course_with_student(account: @account, active_all: true, user: @student)
+      @shard1.activate do
+        account = Account.create!
+        course = account.courses.create!
+        e2 = course.enroll_student(@student)
+        e2.update_attribute(:workflow_state, 'active')
+        override = assignment_override_model(:course => course)
+        override_student = override.assignment_override_students.build
+        override_student.user = @student
+        expect(override_student).to be_valid
+      end
     end
   end
 

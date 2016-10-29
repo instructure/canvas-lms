@@ -14,7 +14,7 @@ define(function(require) {
       },
 
       render: function() {
-        return React.DOM.svg({ className: "chart" });
+        return React.DOM.div({ref: 'wrapper'}, {}, React.DOM.svg({ className: "chart", ref: 'chart'}));
       },
 
       removeChart: function() {
@@ -29,10 +29,10 @@ define(function(require) {
       return svg.append('title').text(title);
     },
 
-    addDescription: function(svg, description) {
-      return svg.append('text')
-        .attr('fill', 'transparent')
-        .attr('font-size', '0px')
+    addDescription: function(holder, description) {
+      return holder.append('text')
+        .attr('tabindex', '0')
+        .attr('class', 'screenreader-only')
         .text(description);
     },
 

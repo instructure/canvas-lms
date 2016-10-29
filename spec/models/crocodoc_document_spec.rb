@@ -39,11 +39,12 @@ describe 'CrocodocDocument' do
       @other_student = @student
 
       @assignment = @course.assignments.create! name: "a1"
+      attachment = crocodocable_attachment_model(context: @submitter)
       @submission = @assignment.submit_homework @submitter,
         submission_type: "online_upload",
-        attachments: [crocodocable_attachment_model(context: @submitter)]
+        attachments: [attachment]
 
-      @crocodoc = @submission.crocodoc_documents.first
+      @crocodoc = attachment.crocodoc_document
     end
 
     it "should let the teacher view all annotations" do
@@ -116,14 +117,15 @@ describe 'CrocodocDocument' do
     end
 
     it "returns permissions for older submission versions" do
+      attachment = crocodocable_attachment_model(context: @submitter)
       submission2 = @assignment.submit_homework @submitter,
         submission_type: "online_upload",
-        attachments: [crocodocable_attachment_model(context: @submitter)]
+        attachments: [attachment]
 
-      # the submission is now tied to crocodoc documents for all versions
-      expect(submission2.crocodoc_documents.size).to eql 2
+      cd1 = @crocodoc
+      cd2 = attachment.crocodoc_document
 
-      submission2.crocodoc_documents.each { |cd|
+      [cd1, cd2].each { |cd|
         expect(cd.permissions_for_user(@submitter)).to eq({
           filter: 'all',
           admin: false,

@@ -22,17 +22,21 @@ class SisApiController < ApplicationController
   # @API Retrieve assignments enabled for grade export to SIS
   # @beta
   #
-  # Retrieve a list of published assignments flagged as "post_to_sis". Assignment group and section information are
-  # included for convenience.
+  # Retrieve a list of published assignments flagged as "post_to_sis". Assignment group, section, and user override
+  # information are included for convenience.
   #
   # Each section includes course information for the origin course and the cross-listed course, if applicable. The
   # `origin_course` is the course to which the section belongs or the course from which the section was cross-listed.
   # Generally, the `origin_course` should be preferred when performing integration work. The `xlist_course` is provided
   # for consistency and is only present when the section has been cross-listed.
   #
+  # Each user_override includes basic user information, if applicable. The `id` will either be a single users id or an
+  # array of hashes that contain the basic user information for each user associated to the override.
+  #
   # The `override` is only provided if the Differentiated Assignments course feature is turned on and the assignment
   # has an override for that section. When there is an override for the assignment the override object's keys/values can
-  # be merged with the top level assignment object to create a view of the assignment object specific to that section.
+  # be merged with the top level assignment object to create a view of the assignment object specific to that section or
+  # user(s).
   #
   # @argument account_id [Integer] The ID of the account to query.
   # @argument course_id [Integer] The ID of the course to query.
@@ -82,6 +86,32 @@ class SisApiController < ApplicationController
   #           "override": {
   #             "override_title": "Assignment Title",
   #             "due_at": "2015-02-01%17:00:00Z"
+  #           }
+  #         },
+  #       "user_overrides": [
+  #         {
+  #           "id": 163,
+  #           "name": "Test McTest",
+  #           "sis_user_id": "123-456",
+  #           "override": {
+  #             "due_at": "2016-08-29T05:59:59Z"
+  #            }
+  #         },
+  #         {
+  #           "id": [
+  #             {
+  #               "id": 5,
+  #               "name": "Bob",
+  #               "sis_user_id": "84746"
+  #             },
+  #             {
+  #               "id": 7,
+  #               "name": "Joe",
+  #               "sis_user_id": "29361"
+  #             }
+  #           ],
+  #           "override": {
+  #             "due_at": "2016-08-28T05:59:59Z"
   #           }
   #         },
   #

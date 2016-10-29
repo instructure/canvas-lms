@@ -48,7 +48,6 @@ gem 'hairtrigger', '0.2.15'
   gem 'ruby_parser', '3.7.0', require: false
 gem 'hashery', '1.3.0', require: false
 gem 'highline', '1.6.1', require: false
-gem 'hoe', '3.8.1'
 gem 'httparty', '0.13.7'
 gem 'i18n', '0.7.0'
 gem 'i18nema', '0.0.8'
@@ -79,7 +78,7 @@ gem 'parallel', '1.4.1', require: false
 gem 'rack-mini-profiler', '0.9.2', require: false
 gem 'flamegraph', '0.1.0', require: false
   gem 'stackprof', '0.2.7', require: false
-gem 'rake', '10.5.0'
+gem 'rake', '11.3.0'
 gem 'rdoc', '3.12'
 gem 'ratom-nokogiri', '0.10.4', require: false
 gem 'rdiscount', '1.6.8', require: false
@@ -90,7 +89,7 @@ gem 'net-ldap', '0.10.1', require: false
 gem 'ruby-duration', '3.2.0', require: false
 gem 'ruby-saml-mod', '0.3.1'
 gem 'saml2', '1.0.7', require: false
-  gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '3236a249986413c6c399ef3477132a0af0410bb7'
+  gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '57d071040cc4649db9f158e09bbcea028271a4a6'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false

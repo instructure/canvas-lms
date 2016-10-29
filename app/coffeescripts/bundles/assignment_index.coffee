@@ -41,6 +41,8 @@ require [
   else if ENV.current_user_has_been_observer_in_this_course
     includes.push "all_dates"
 
+  userIsAdmin = _.contains(ENV.current_user_roles, 'admin')
+
   assignmentGroups = new AssignmentGroupCollection [],
     course: course
     params:
@@ -54,6 +56,7 @@ require [
     sortURL: ENV.URLS.sort_url
     assignment_sort_base_url: ENV.URLS.assignment_sort_base_url
     course: course
+    userIsAdmin: userIsAdmin
 
   assignmentSettingsView = false
   createGroupView = false
@@ -68,10 +71,12 @@ require [
       model: course
       assignmentGroups: assignmentGroups
       weightsView: AssignmentGroupWeightsView
+      userIsAdmin: userIsAdmin
 
     createGroupView = new CreateGroupView
       assignmentGroups: assignmentGroups
       course: course
+      userIsAdmin: userIsAdmin
   else
     showByView = new ToggleShowByView
       course: course

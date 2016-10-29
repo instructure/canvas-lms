@@ -1,5 +1,12 @@
-.crs-breakdown-graph {
+#crs-graphs {
   margin-top: 50px;
+
+  &:first-child {
+    margin: 0px;
+  }
+}
+
+.crs-breakdown-graph {
   display: flex;
   flex-direction: column;
 
@@ -16,6 +23,20 @@
   }
 }
 
+.crs-breakdown-details__header {
+  margin-top: 10px;
+  font-weight: lighter;
+  border-bottom: 1px solid $ic-border-color;
+  padding: 2px;
+  text-align: center;
+  display: flex;
+}
+
+.crs-breakdown-details__header-text {
+  margin-left: 20px;
+  margin-right: 10px;
+}
+
 .crs-bar__horizontal-outside {
   position: relative;
   height: 14px;
@@ -27,8 +48,9 @@
   position: absolute;
   height: 50%;
   border-radius: 20px;
-  background-color: #5B6C79;
+  background-color: $ic-color-medium-darker;
   overflow: hidden;
+  @if $use_high_contrast { border: 1px solid $ic-color-medium-darker; }
 }
 
 .crs-bar__horizontal-inside {
@@ -36,8 +58,9 @@
   height: 50%;
   width: 100%;
   border-radius: 20px;
-  background-color: #f7f7f7;
+  background-color: $ic-color-medium-light;
   overflow: hidden;
+  @if $use_high_contrast { border: 1px solid $ic-color-medium-darker; }
 }
 
 .crs-bar__bottom {
@@ -46,7 +69,7 @@
   flex-direction: row;
   justify-content: space-between;
   font-size: 14px;
-  color: #555555;
+  color: $ic-color-dark;
   margin-left: 4px;
   margin-bottom: 15px;
 }
@@ -56,15 +79,14 @@
 }
 
 .crs-link-button {
-  height: 50%;
-  color: #0081bd;
   background: transparent;
   border: none;
+  color: $ic-link-color;
 
   &:focus,
   &:hover {
-    color: #005e8a;
     text-decoration: underline;
+    color: $ic-link-color-hover;
   }
 }
 
@@ -75,8 +97,8 @@
   right: 0;
   top: 0;
   transition: all .5s;
-  box-shadow: -2px 0px 15px rgba(0,0,0,.2);
-  background: #fff;
+  box-shadow: -2px 0px 15px $ic-color-medium;
+  background: $ic-color-light;
   z-index: 10;
 
   &.crs-sticky-sidebar__hidden {
@@ -92,16 +114,11 @@
   }
 }
 
-.crs-student-range__item {
-  margin: 15px 15px;
-}
-
 .crs-ranges-view {
-
   .crs-ranges-view__header {
     font-weight: lighter;
     padding: 15px 10px;
-    color: #777;
+    color: $ic-color-medium;
     text-indent: 10px;
   }
 
@@ -111,7 +128,15 @@
     margin: 0 0 1px;
     text-indent: 10px;
     border: none;
-    box-shadow: 0 0 0 1px #d4d4d4 !important;
+    box-shadow: 0 0 0 1px $ic-border-color !important;
+  }
+
+  [class*="-TabPanel__accordion"] {
+    margin-bottom: 1px;
+  }
+
+  [class*="-TabPanel__accordion"][aria-hidden="true"] {
+    margin-bottom: 0;
   }
 
   [class*="-TabPanel__content"] {
@@ -121,6 +146,10 @@
   }
 }
 
+.crs-student-range__item {
+  margin: 15px 15px;
+}
+
 .crs-student__avatar {
   width: 35px;
   height: 35px;
@@ -128,23 +157,23 @@
   margin-right: 10px;
 }
 
-.crs-student__progress-icon {
+.crs-student__trend-icon {
   width: 30px;
   height: 30px;
   font-size: 18px;
   font-weight: bold;
   float: right;
 
-  &.crs-student__progress-icon__positive {
-    color: #00AD18;
+  &.crs-student__trend-icon__positive {
+    color: $ic-color-success;
 
     &:before {
       content: '▲';
     }
   }
 
-  &.crs-student__progress-icon__neutral {
-    color: #9c9c9c;
+  &.crs-student__trend-icon__neutral {
+    color: $ic-color-medium;
     font-family: monospace;
     font-size: 40px;
     line-height: 25px;
@@ -155,8 +184,8 @@
     }
   }
 
-  &.crs-student__progress-icon__negative {
-    color: #C48500;
+  &.crs-student__trend-icon__negative {
+    color: $ic-color-alert;
 
     &:before {
       content: '▼';
@@ -166,4 +195,157 @@
 
 .crs-icon-x {
   margin: auto;
+}
+
+.crs-student-details {
+  width: 365px;
+  height: 100%;
+  position: fixed;
+  right: 0px;
+  top: 0px;
+  transition: all .5s;
+  background: $ic-color-light;
+
+  &.crs-student-details__hidden {
+    right: -365px;
+    opacity: 0;
+  }
+}
+
+.crs-student-details__header {
+  margin-top: 10px;
+  padding: 15px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid $ic-border-color;
+}
+
+.crs-student-details__name {
+  margin: 5px 0px 0px 0px;
+}
+
+.crs-student__range-item {
+  margin: 15px 5px;
+}
+
+.crs-student-details__profile-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  border-bottom: 1px solid $ic-border-color;
+  background-color: $ic-color-medium-light;
+  padding: 17px 10px;
+}
+
+.crs-student-details__profile-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+}
+
+.crs-student-details__profile-inner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: $ic-color-medium-light;
+}
+
+.crs-student-details__score-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid $ic-border-color;
+  padding: 10px;
+}
+
+.crs-student-details__score-date {
+  opacity: .6;
+}
+
+.crs-student-details__score-number {
+  margin: 2px 0px;
+  font-weight: bolder;
+  font-size: 25px;
+}
+
+.crs-student-details__score-title{
+  font-weight: normal;
+}
+
+.crs-breakdown__link {
+  text-decoration: none;
+  font-weight: normal;
+  color: $ic-link-color;
+
+  &:focus,
+  &:hover {
+    color: $ic-link-color-hover;
+    text-decoration: underline;
+  }
+}
+
+.crs-back-button {
+  background: $ic-color-light;
+  border: none;
+}
+
+i.crs-student-details__assignment-icon {
+  background: $ic-color-medium-darker;
+  width: 32px;
+  height: 32px;
+  text-align: center;
+  line-height: 32px;
+  border-radius: 50%;
+  color: $ic-color-light;
+  float: left;
+  margin-left: 5px;
+
+  &:before {
+    font-size: 14px;
+  }
+}
+
+i.crs-icon-assignment {
+  background: $ic-color-action;
+}
+
+i.crs-icon-quiz {
+  background: $ic-color-danger;
+}
+
+i.crs-icon-discussion {
+  background: $ic-color-alert;
+}
+
+.crs-student-details__assignment-name {
+  flex: 0.9;
+}
+
+.crs-student-details__assignment {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 15px 15px;
+  border-bottom: 1px solid $ic-border-color;
+}
+
+.crs-student-details__assignment-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.crs-student-details__loading {
+  display: flex;
+  align-items: center;
+  margin-top: 200px;
+  justify-content:center;
+}
+
+.crs-icon-email {
+  padding-right: 5px;
 }

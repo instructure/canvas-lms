@@ -12,7 +12,6 @@ vendor
 /tinymce/jscripts/tiny_mce/themes
 /tinymce/jscripts/tiny_mce/tiny_mce*.js
 /tinymce/jscripts/tiny_mce/utils
-/InstUI.js
 
 # vendor package in analytics
 /plugins/analytics/react-bootstrap-table.js

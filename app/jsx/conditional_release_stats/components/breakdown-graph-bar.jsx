@@ -5,15 +5,13 @@ define([
   const { string, number, func } = React.PropTypes
 
   class BreakdownGraph extends React.Component {
-    static get propTypes () {
-      return {
-        rangeStudents: number.isRequired,
-        totalStudents: number.isRequired,
-        lowerBound: string.isRequired,
-        upperBound: string.isRequired,
-        rangeIndex: number.isRequired,
-        selectRange: func.isRequired,
-      }
+    static propTypes = {
+      rangeStudents: number.isRequired,
+      totalStudents: number.isRequired,
+      lowerBound: string.isRequired,
+      upperBound: string.isRequired,
+      rangeIndex: number.isRequired,
+      selectRange: func.isRequired,
     }
 
     constructor () {
@@ -25,15 +23,25 @@ define([
       this.props.selectRange(this.props.rangeIndex)
     }
 
-    render () {
+    renderInnerBar() {
       const width = Math.min((this.props.rangeStudents / this.props.totalStudents) * 100, 100)
       const progressBarStyle = { width: width + '%' }
+      if (width > 0) {
+        return (
+          <div style={progressBarStyle} className='crs-bar__horizontal-inside-fill'></div>
+        )
+      } else {
+        return null
+      }
+    }
+
+    render () {
 
       return (
         <div className='crs-bar__container'>
           <div className='crs-bar__horizontal-outside'>
             <div className='crs-bar__horizontal-inside'></div>
-            <div style={progressBarStyle} className='crs-bar__horizontal-inside-fill'></div>
+            { this.renderInnerBar() }
           </div>
           <div className='crs-bar__bottom'>
             <span className='crs-bar__info'>{I18n.t('%{lowerBound}+ to %{upperBound}', {

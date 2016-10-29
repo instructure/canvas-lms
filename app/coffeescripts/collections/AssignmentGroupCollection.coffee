@@ -28,6 +28,7 @@ define [
     loadModuleNames: ->
       modules = new ModuleCollection([], {course_id: @course.id})
       modules.loadAll = true
+      modules.skip_items = true
       modules.fetch()
       modules.on 'fetched:last', =>
         moduleNames = {}

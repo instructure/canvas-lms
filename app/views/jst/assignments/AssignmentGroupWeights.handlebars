@@ -2,7 +2,11 @@
 
 <td class="right-align">
   <div class="input-append">
-    <input type="text" class="span1 group_weight_value" value="{{group_weight}}"/>
+    <input
+      type="text"
+      class="span1 group_weight_value"
+      value="{{group_weight}}"
+      {{#unless canChangeWeights}}readonly{{/unless}} />
     <span class="add-on">%</span>
   </div>
 </td>

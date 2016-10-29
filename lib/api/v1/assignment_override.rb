@@ -45,12 +45,12 @@ module Api::V1::AssignmentOverride
   end
 
   def assignment_overrides_json(overrides, user = nil)
-    visible_users_ids = ::AssignmentOverride.visible_users_for(overrides, user).map(&:id)
+    visible_users_ids = ::AssignmentOverride.visible_enrollments_for(overrides.compact, user).select(:user_id)
     # we most likely already have the student_ids preloaded here because of overridden_for, but just in case
-    if overrides.any?{|ov| ov.set_type == 'ADHOC' && !ov.preloaded_student_ids}
+    if overrides.any?{|ov| ov.present? && ov.set_type == 'ADHOC' && !ov.preloaded_student_ids}
       AssignmentOverrideApplicator.preload_student_ids_for_adhoc_overrides(overrides.select{|ov| ov.set_type == 'ADHOC'}, visible_users_ids)
     end
-    overrides.map{ |override| assignment_override_json(override, visible_users_ids) }
+    overrides.map{ |override| assignment_override_json(override, visible_users_ids) if override }
   end
 
   def assignment_override_collection(assignment, include_students=false)
@@ -62,7 +62,17 @@ module Api::V1::AssignmentOverride
   end
 
   def find_assignment_override(assignment, set_or_id)
+    find_assignment_overrides(assignment, [set_or_id])[0]
+  end
+
+  def find_assignment_overrides(assignment, sets_or_ids)
     overrides = assignment_override_collection(assignment)
+    sets_or_ids.map do |set_or_id|
+      filter_assignment_overrides(overrides, set_or_id)
+    end
+  end
+
+  def filter_assignment_overrides(overrides, set_or_id)
     return nil if overrides.empty? || set_or_id.nil?
     case set_or_id
     when CourseSection, Group
@@ -188,6 +198,66 @@ module Api::V1::AssignmentOverride
     return override_data, errors
   end
 
+  def check_property(object, prop, present, errors, message)
+    object.each_with_index.reject do |element, i|
+      if element[prop].present? != present
+        errors[i] ||= []
+        errors[i] << message
+      end
+    end
+  end
+
+  # receives data of shape [{ id: 2, assignment_id: 1, ...update_params }, ... ]
+  # responds with data of shape [{ assignment: model, override: model, ...update_params }, ...]
+  def interpret_batch_assignment_overrides_data(course, assignment_overrides_data, for_update)
+    return nil, ['no assignment override data present'] unless assignment_overrides_data.present?
+    return nil, ['must specify an array of overrides'] unless assignment_overrides_data.is_a? Array
+
+    all_errors = Array.new(assignment_overrides_data.length)
+
+    check_property(assignment_overrides_data, 'assignment_id', true, all_errors, 'must specify an assignment id')
+    if for_update
+      check_property(assignment_overrides_data, 'id', true, all_errors, 'must specify an override id')
+    else
+      check_property(assignment_overrides_data, 'id', false, all_errors, 'may not specify an override id')
+    end
+    return nil, all_errors unless all_errors.compact.blank?
+
+    grouped = assignment_overrides_data.group_by {|o| o['assignment_id']}
+    assignments = course.active_assignments.where(id: grouped.keys).preload(:assignment_overrides)
+    overrides = grouped.map do |assignment_id, overrides_data|
+      assignment = assignments.find {|a| a.id.to_s == assignment_id.to_s}
+      find_assignment_overrides(assignment, overrides_data.map{|o| o['id']}) if assignment
+    end.flatten.compact if for_update
+
+    interpreted = assignment_overrides_data.each_with_index.map do |override_data, i|
+      assignment = assignments.find {|a| a.id.to_s == override_data['assignment_id'].to_s}
+      unless assignment.present?
+        all_errors[i] = ['assignment not found']
+        next
+      end
+      if for_update
+        override = overrides.find {|o| o.id.to_s == override_data['id'].to_s}
+        unless override.present?
+          all_errors[i] = ['override not found']
+          next
+        end
+        set_type = override.set_type
+      end
+
+      update_data, errors = interpret_assignment_override_data(assignment, override_data, set_type)
+      if errors
+        all_errors[i] = errors
+        next
+      end
+      update_data['assignment'] = assignment
+      update_data['override'] = override if for_update
+      update_data
+    end
+    all_errors = nil if all_errors.compact.blank?
+    [interpreted, all_errors]
+  end
+
   def update_assignment_override_without_save(override, override_data)
     if override_data.has_key?(:students)
       override.set = nil
@@ -257,9 +327,26 @@ module Api::V1::AssignmentOverride
     return false
   end
 
+  # updates only the selected overrides; compare with
+  # batch_update_assignment_overrides below, which updates
+  # all overrides for assignment
+  def update_assignment_overrides(overrides, overrides_data)
+    overrides.zip(overrides_data).each do |override, data|
+      update_assignment_override_without_save(override, data)
+    end
+    return false if overrides.find(&:invalid?).present?
+
+    AssignmentOverride.transaction do
+      overrides.each(&:save!)
+    end
+    overrides.map(&:assignment).uniq.each(&:run_if_overrides_changed_later!)
+  rescue ActiveRecord::RecordInvalid
+    return false
+  end
+
   def invisible_users_and_overrides_for_user(context, user, existing_overrides)
     # get the student overrides the user can't see and ensure those overrides are included
-    visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).except(:select, :order)
+    visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
     invisible_user_ids = context.users.where.not(id: visible_user_ids).pluck(:id)
     invisible_override_ids = existing_overrides.select{ |ov|
       ov.set_type == 'ADHOC' &&
@@ -286,6 +373,9 @@ module Api::V1::AssignmentOverride
     end
   end
 
+  # updates all updates for an assignment; compare with
+  # update_assignment_overrides below, which updates
+  # all overrides for assignment
   def batch_update_assignment_overrides(assignment, overrides_params, user)
     existing_overrides = assignment.assignment_overrides.active
     invisible_user_ids, invisible_override_ids = invisible_users_and_overrides_for_user(

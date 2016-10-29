@@ -37,11 +37,13 @@ define [
         {id: "ID_2", name: "NAME_2", icon_url: "", canvas_icon_class: null},
       ]
       @onClickHander = sinon.spy()
+      @fakeEditor = sinon.spy()
+
 
     teardown: ->
 
   test "returns a hash of markup keys and attaches click handler to value", ->
-    mapping = ExternalToolsHelper.clumpedButtonMapping(@clumpedButtons, @onClickHander)
+    mapping = ExternalToolsHelper.clumpedButtonMapping(@clumpedButtons, @fakeEditor, @onClickHander)
 
     imageKey = _.chain(mapping).keys().select((k) -> k.match(/img/)).value()[0]
     iconKey = _.chain(mapping).keys().select((k) -> !k.match(/img/)).value()[0]

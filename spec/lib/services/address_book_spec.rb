@@ -4,22 +4,54 @@ module Services
   describe AddressBook do
     before do
       @app_host = "address-book"
+      @secret = "opensesame"
       Canvas::DynamicSettings.stubs(:find).
         with("address-book").
-        returns({ "app-host" => @app_host })
+        returns({ "app-host" => @app_host, "secret" => Canvas::Security.base64_encode(@secret) })
       @sender = user_model
       @course = course_model
     end
 
-    def expect_request(url, body={})
-      CanvasHttp.expects(:get).with(url).returns(stub(body: body.to_json, code: 200))
+    def expect_request(url_matcher, options={})
+      body = options[:body] || {}
+      header_matcher = options[:headers] || anything
+      CanvasHttp.expects(:get).
+        with(url_matcher, header_matcher).
+        returns(stub(body: body.to_json, code: 200))
     end
 
-    def stub_response(url, body, code=200)
-      CanvasHttp.stubs(:get).with(url).returns(stub(body: body.to_json, code: code))
+    def stub_response(url_matcher, body, options={})
+      status = options[:status] || 200
+      header_matcher = options[:headers] || anything
+      CanvasHttp.stubs(:get).
+        with(url_matcher, header_matcher).
+        returns(stub(body: body.to_json, code: status))
+    end
+
+    describe "jwt" do
+      it "signs with the base64 decoded secret from the configuration" do
+        jwt = Services::AddressBook.jwt
+        expect(lambda{ Canvas::Security.decode_jwt(jwt, [@secret]) }).not_to raise_exception
+      end
+
+      it "includes current time as ait claim" do
+        Timecop.freeze do
+          jwt = Services::AddressBook.jwt
+          claims = Canvas::Security.decode_jwt(jwt, [@secret])
+          expect(Time.at(claims[:iat])).to be_within(1).of(Time.now)
+        end
+      end
     end
 
     describe "recipients" do
+      it "includes an Authorization header with JWT in request" do
+        Timecop.freeze do
+          jwt = Services::AddressBook.jwt
+          expect_request(anything, headers: has_entry('Authorization' => regexp_matches(%r{Bearer #{jwt}})))
+          Services::AddressBook.recipients(sender: @sender)
+        end
+      end
+
       it "makes request from /recipients in service" do
         expect_request(regexp_matches(%r{^#{@app_host}/recipients\?}))
         Services::AddressBook.recipients(sender: @sender)
@@ -122,7 +154,7 @@ module Services
       end
 
       it "reports errors in service request but then returns sane value" do
-        stub_response(anything, { 'errors' => { 'something' => 'went wrong' } }, 400)
+        stub_response(anything, { 'errors' => { 'something' => 'went wrong' } }, status: 400)
         Canvas::Errors.expects(:capture)
         result = nil
         expect { result = Services::AddressBook.recipients(@sender) }.not_to raise_error
@@ -137,17 +169,17 @@ module Services
       end
 
       it "makes request from /recipients/count in service" do
-        expect_request(regexp_matches(%r{^#{@app_host}/recipients/count\?}), @response)
+        expect_request(regexp_matches(%r{^#{@app_host}/recipients/count\?}), body: @response)
         Services::AddressBook.count_recipients(sender: @sender)
       end
 
       it "normalizes sender same as recipients" do
-        expect_request(regexp_matches(%r{for_sender=#{@sender.global_id}}), @response)
+        expect_request(regexp_matches(%r{for_sender=#{@sender.global_id}}), body: @response)
         Services::AddressBook.count_recipients(sender: @sender)
       end
 
       it "normalizes context same as recipients" do
-        expect_request(regexp_matches(%r{in_context=#{@course.global_asset_string}}), @response)
+        expect_request(regexp_matches(%r{in_context=#{@course.global_asset_string}}), body: @response)
         Services::AddressBook.count_recipients(context: @course)
       end
 
@@ -247,7 +279,7 @@ module Services
       end
 
       it "returns the count from count_recipients call" do
-        expect_request(anything, @response)
+        expect_request(anything, body: @response)
         count = Services::AddressBook.count_in_context(@sender, 'course_1')
         expect(count).to eql(@count)
       end

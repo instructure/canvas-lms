@@ -9,9 +9,9 @@ define([
   const defaultProps = () => ({
     isSelected: false,
     assignment: {
-      title: 'Ch 2 Quiz',
+      name: 'Ch 2 Quiz',
       type: 'quiz',
-      points: 10,
+      points_possible: 10,
       due_at: new Date(),
       itemId: 1,
       category: {
@@ -41,6 +41,23 @@ define([
 
     const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'item_name')
     equal(renderedList[0].textContent, 'Ch 2 Quiz', 'renders title')
+  })
+
+  test('renders points', () => {
+    const pointyProps = defaultProps()
+    const component = renderComponent(pointyProps)
+
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'points_possible_display')
+    equal(renderedList[0].textContent, '10 pts', 'renders points')
+  })
+
+  test('omits points', () => {
+    const pointlessProps = defaultProps()
+    pointlessProps.assignment.points_possible = null
+    const component = renderComponent(pointlessProps)
+
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'points_possible_display')
+    equal(renderedList.length, 0, 'omits points')
   })
 
   test('renders link title when selected', () => {

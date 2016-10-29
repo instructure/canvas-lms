@@ -1,5 +1,10 @@
 <div class="form-dialog-content">
   <div class="form-horizontal">
+    {{#unless can_change_weighting}}
+    <div class="ag-settings-weights-message alert">{{#t}}Assignment group weights and drop rules can't be edited because
+      there are assignments in one of the groups whose due dates are closed.{{/t}}</div>
+    {{/unless}}
+
     <div class="control-group">
       <label class="control-label" for="ag_{{label_id}}_name">
         {{#t "group_name"}}Group Name:{{/t}}
@@ -14,6 +19,8 @@
         />
       </div>
     </div>
+
+    {{#if show_weight}}
     <div class="control-group">
       <div class="controls">
         <input
@@ -22,13 +29,14 @@
           class="span1 group_weight"
           name="group_weight"
           value="{{group_weight}}"
-          {{#if disable_weight}}disabled{{/if}}
+          {{#unless can_change_weighting}}readonly{{/unless}}
         />
         <label style="display:inline-block" for="ag_{{label_id}}_group_weight">
           {{#t "percent_of_total"}}% of total grade{{/t}}
         </label>
       </div>
     </div>
+    {{/if}}
     {{#if editable_drop}}
       <hr/>
       <fieldset>
@@ -45,6 +53,7 @@
               class="span1 field"
               name="rules[drop_lowest]"
               value="{{drop_lowest}}"
+              {{#unless can_change_weighting}}readonly{{/unless}}
             />
           </div>
         </div>
@@ -59,6 +68,7 @@
               class="span1 field"
               name="rules[drop_highest]"
               value="{{drop_highest}}"
+              {{#unless can_change_weighting}}readonly{{/unless}}
             />
           </div>
         </div>

@@ -683,16 +683,15 @@ module QuizzesCommon
     course = opts.fetch(:course, @course)
     @quiz = course.quizzes.create
 
-    answers = [
-      { weight: 100, answer_text: 'A', answer_comments: '', id: 1490 },
-      { weight: 0, answer_text: 'B', answer_comments: '', id: 1020 },
-      { weight: 0, answer_text: 'C', answer_comments: '', id: 7051 }
-    ]
     data = {
       question_name: 'Question 1',
       points_possible: 1,
       question_text: 'This is a multiple choice question',
-      answers: answers,
+      answers: [
+        { weight: 100, answer_text: 'A', answer_comments: '', id: 1490 },
+        { weight: 0, answer_text: 'B', answer_comments: '', id: 1020 },
+        { weight: 0, answer_text: 'C', answer_comments: '', id: 7051 }
+      ],
       question_type: 'multiple_choice_question'
     }
 
@@ -710,7 +709,7 @@ module QuizzesCommon
   end
 
   def seed_quiz_with_submission(num=1, opts={})
-    quiz_data = [
+    quiz_data = opts[:question_data] || [
       {
         question_name: 'Multiple Choice',
         points_possible: 10,
@@ -742,7 +741,6 @@ module QuizzesCommon
     ]
 
     quiz = @course.quizzes.create title: 'Quiz Me!'
-
     num.times do
       quiz_data.each do |question|
         quiz.quiz_questions.create! question_data: question

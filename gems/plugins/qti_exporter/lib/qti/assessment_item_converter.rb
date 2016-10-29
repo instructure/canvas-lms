@@ -224,7 +224,7 @@ class AssessmentItemConverter
         end
       elsif id =~ /solution/i
         @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
-      elsif id =~ /general_|_all/i
+      elsif (@flavor == Qti::Flavors::D2L && f.text.present?) || id =~ /general_|_all/i
         extract_feedback!(@question, :neutral_comments, f)
       elsif id =~ /feedback_(\d*)_fb/i
         if answer = @question[:answers].find{|a|a[:migration_id]== "RESPONSE_#{$1}"}

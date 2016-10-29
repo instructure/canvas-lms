@@ -45,15 +45,24 @@
         <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" href="#">
           <i class="icon-settings"></i>
           <i class="icon-mini-arrow-down"></i>
-          <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
+          <span class="screenreader-only">{{#t}}Settings{{/t}}</span>
         </a>
 
         <ul id="ui-id-{{id}}-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
           <li role="presentation">
-            <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t "title_edit"}}Edit Quiz{{/t}}'>{{#t "links.edit"}}Edit{{/t}}</a>
+            <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz{{/t}}'>{{#t}}Edit{{/t}}</a>
           </li>
+          {{#if cyoeEnabled}}
           <li role="presentation">
-            <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t "title_delete"}}Delete Quiz{{/t}}'>{{#t "links.delete"}}Delete{{/t}}</a>
+            <a href="{{edit_url}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz Mastery Paths{{/t}}'>{{#t}}Mastery Paths{{/t}}</a>
+          </li>
+          {{/if}}
+          <li role="presentation">
+          {{#if permissions.delete}}
+            <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
+          {{else}}
+            <a id="ui-id-{{id}}-3" class="delete-item icon-trash disabled" aria-disabled="true" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
+          {{/if}}
           </li>
           {{>ExternalTools/external_tools_menu quiz_menu_tools}}
         </ul>

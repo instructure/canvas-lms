@@ -300,7 +300,7 @@ class CoursesController < ApplicationController
   include CustomSidebarLinksHelper
   include SyllabusHelper
 
-  before_filter :require_user, :only => [:index]
+  before_filter :require_user, :only => [:index, :activity_stream, :activity_stream_summary]
   before_filter :require_user_or_observer, :only=>[:user_index]
   before_filter :require_context, :only => [:roster, :locks, :create_file, :ping]
   skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
@@ -1007,7 +1007,11 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read)
       grading = @current_user.assignments_needing_grading(:contexts => [@context]).map { |a| todo_item_json(a, @current_user, session, 'grading') }
-      submitting = @current_user.assignments_needing_submitting(:contexts => [@context]).map { |a| todo_item_json(a, @current_user, session, 'submitting') }
+      submitting = @current_user.assignments_needing_submitting(:include_ungraded => true, :contexts => [@context]).map { |a| todo_item_json(a, @current_user, session, 'submitting') }
+      if Array(params[:include]).include? 'ungraded_quizzes'
+        submitting += @current_user.ungraded_quizzes_needing_submitting(:contexts => [@context]).map { |q| todo_item_json(q, @current_user, session, 'submitting') }
+        submitting.sort_by! { |j| (j[:assignment] || j[:quiz])[:due_at] }
+      end
       render :json => (grading + submitting)
     end
   end
@@ -1228,15 +1232,6 @@ class CoursesController < ApplicationController
         format.html { redirect_to named_context_url(@context, :context_details_url) }
         format.json { render :json => {:update_nav => true} }
       end
-    end
-  end
-
-  def roster
-    if authorized_action(@context, @current_user, :read_roster)
-      log_asset_access([ "roster", @context ], "roster", "other")
-      @students = @context.participating_students.order_by_sortable_name
-      @teachers = @context.instructors.order_by_sortable_name
-      @groups = @context.groups.active
     end
   end
 
@@ -2132,6 +2127,18 @@ class CoursesController < ApplicationController
         @course.account = @course.root_account if @course.account.root_account != @course.root_account
       end
 
+      if params[:course].key?(:apply_assignment_group_weights)
+        @course.apply_assignment_group_weights =
+          value_to_boolean params[:course].delete(:apply_assignment_group_weights)
+      end
+      if params[:course].key?(:group_weighting_scheme)
+        @course.group_weighting_scheme = params[:course].delete(:group_weighting_scheme)
+      end
+
+      if @course.group_weighting_scheme_changed? && !can_change_group_weighting_scheme?
+        return render_unauthorized_action
+      end
+
       term_id = params[:course].delete(:term_id)
       enrollment_term_id = params[:course].delete(:enrollment_term_id) || term_id
       if enrollment_term_id && @course.root_account.grants_right?(@current_user, session, :manage_courses)
@@ -2173,9 +2180,6 @@ class CoursesController < ApplicationController
             @course.sis_source_id = sis_id
           end
         end
-      end
-      if params[:course].has_key?(:apply_assignment_group_weights)
-        @course.apply_assignment_group_weights = value_to_boolean params[:course].delete(:apply_assignment_group_weights)
       end
 
       lock_announcements = params[:course].delete(:lock_all_announcements)
@@ -2235,6 +2239,7 @@ class CoursesController < ApplicationController
       end
 
       changes = changed_settings(@course.changes, @course.settings, old_settings)
+
       @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
         { :priority => Delayed::LOW_PRIORITY }, changes)
 
@@ -2660,6 +2665,15 @@ class CoursesController < ApplicationController
         @course.public_syllabus = false
         @course.public_syllabus_to_auth = false
       end
+    end
+  end
+
+  def can_change_group_weighting_scheme?
+    return true unless @course.feature_enabled?(:multiple_grading_periods)
+    return true if @current_user.admin_of_root_account?(@course.root_account)
+    periods = GradingPeriod.for(@course)
+    @course.active_assignments.preload(:active_assignment_overrides).none? do |assignment|
+      assignment.due_for_any_student_in_closed_grading_period?(periods)
     end
   end
 end

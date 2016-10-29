@@ -23,7 +23,11 @@ describe GradingPeriod do
 
   let(:account) { Account.create! }
   let(:course) { Course.create! }
-  let(:grading_period_group) { group_helper.create_for_account(account) }
+  let(:grading_period_group) do
+    group = group_helper.create_for_account(account)
+    group.enrollment_terms << course.enrollment_term
+    group
+  end
   let(:now) { Time.zone.now }
 
   subject(:grading_period) { grading_period_group.grading_periods.build(params) }
@@ -32,7 +36,7 @@ describe GradingPeriod do
     {
       title: 'A Grading Period',
       start_date: now,
-      end_date: 1.day.from_now(now),
+      end_date:   1.day.from_now(now),
       close_date: 5.days.from_now(now)
     }
   end
@@ -50,13 +54,84 @@ describe GradingPeriod do
   end
 
   it "requires start_date to be before end_date" do
-    subject.assign_attributes(start_date: Time.zone.now, end_date: 1.day.ago)
+    subject.assign_attributes(start_date: Time.zone.now, end_date: 1.day.ago(now))
     is_expected.to_not be_valid
   end
 
   it "requires a title" do
     grading_period = GradingPeriod.new(params.except(:title))
     expect(grading_period).to_not be_valid
+  end
+
+  describe ".in_closed_grading_period?" do
+    let(:in_closed_grading_period) { closed_period.start_date + 1.day }
+    let(:in_not_closed_grading_period) { not_closed_period.start_date + 1.day }
+    let(:outside_of_any_grading_period) { not_closed_period.end_date + 1.week }
+    let!(:closed_period) do
+      grading_period_group.grading_periods.create!(
+        title: "closed",
+        start_date: 2.weeks.ago(now),
+        end_date:   1.week.ago(now),
+        close_date: 3.days.ago(now)
+      )
+    end
+    let!(:another_closed_period) do
+      grading_period_group.grading_periods.create!(
+        title: "another closed period",
+        start_date: 4.weeks.ago(now),
+        end_date:   3.weeks.ago(now),
+        close_date: 2.weeks.ago(now)
+      )
+    end
+    let!(:not_closed_period) do
+      grading_period_group.grading_periods.create!(
+        title: "a period",
+        start_date: 3.days.ago(now),
+        end_date:   3.days.from_now(now),
+        close_date: 5.days.from_now(now)
+      )
+    end
+
+    it "returns true if the submission is due in a closed grading period" do
+      result = GradingPeriod.date_in_closed_grading_period?(
+        course: course,
+        date: in_closed_grading_period
+      )
+      expect(result).to be true
+    end
+
+    it "returns false if the submission is due in a not closed grading period" do
+      result = GradingPeriod.date_in_closed_grading_period?(
+        course: course,
+        date: in_not_closed_grading_period
+      )
+      expect(result).to be false
+    end
+
+    it "returns false if the submission is due outside of any grading period" do
+      result = GradingPeriod.date_in_closed_grading_period?(
+        course: course,
+        date: outside_of_any_grading_period
+      )
+      expect(result).to be false
+    end
+
+    it "returns true if the due date is null and the last grading period is closed" do
+      not_closed_period.destroy
+      result = GradingPeriod.date_in_closed_grading_period?(
+        course: course,
+        date: nil
+      )
+      expect(result).to be true
+    end
+
+    it "returns false if the due date is null and the last grading period is not closed" do
+      result = GradingPeriod.date_in_closed_grading_period?(
+        course: course,
+        date: nil
+      )
+      expect(result).to be false
+    end
   end
 
   describe "#as_json_with_user_permissions" do
@@ -129,7 +204,7 @@ describe GradingPeriod do
 
     it "returns false if the current date is before the close date" do
       period = grading_period_group.grading_periods.build(
-        title: "Open Period",
+        title: "A Period",
         start_date: 10.days.ago(now),
         end_date: 5.days.ago(now),
         close_date: 2.days.from_now(now)
@@ -139,7 +214,7 @@ describe GradingPeriod do
 
     it "returns false if the current date matches the close date" do
       period = grading_period_group.grading_periods.build(
-        title: "Open Period",
+        title: "A Period",
         start_date: 10.days.ago(now),
         end_date: 5.days.ago(now),
         close_date: now
@@ -383,21 +458,21 @@ describe GradingPeriod do
     subject(:grading_period) { GradingPeriod.new }
 
     it "returns false for a grading period in the past" do
-      grading_period.assign_attributes(start_date: 2.months.ago,
-                                       end_date:   1.month.ago)
+      grading_period.assign_attributes(start_date: 2.months.ago(now),
+                                       end_date:   1.month.ago(now))
       expect(grading_period).to_not be_current
     end
 
     it "returns true if the current time falls between the start date and end date (inclusive)",
     test_id: 2528634, priority: "2" do
-      grading_period.assign_attributes(start_date: 1.month.ago,
-                                       end_date:   1.month.from_now)
+      grading_period.assign_attributes(start_date: 1.month.ago(now),
+                                       end_date:   1.month.from_now(now))
       expect(grading_period).to be_current
     end
 
     it "returns false for a grading period in the future" do
-      grading_period.assign_attributes(start_date: 1.month.from_now,
-                                       end_date:   2.months.from_now)
+      grading_period.assign_attributes(start_date: 1.month.from_now(now),
+                                       end_date:   2.months.from_now(now))
       expect(grading_period).to_not be_current
     end
   end
@@ -445,20 +520,20 @@ describe GradingPeriod do
 
   describe ".in_date_range?" do
     subject(:period) do
-      grading_period_group.grading_periods.create start_date: 1.week.ago,
-                                                  end_date:   2.weeks.from_now
+      grading_period_group.grading_periods.create start_date: 1.week.ago(now),
+                                                  end_date:   2.weeks.from_now(now)
     end
 
     it "returns true for a date in the period" do
-      expect(period.in_date_range? 1.day.from_now).to be true
+      expect(period.in_date_range? 1.day.from_now(now)).to be true
     end
 
     it "returns false for a date before the period" do
-      expect(period.in_date_range? 8.days.ago).to be false
+      expect(period.in_date_range? 8.days.ago(now)).to be false
     end
 
     it "returns false for a date after the period" do
-      expect(period.in_date_range? 15.days.from_now).to be false
+      expect(period.in_date_range? 15.days.from_now(now)).to be false
     end
   end
 
@@ -466,9 +541,21 @@ describe GradingPeriod do
     context "when given a course" do
       it "returns a list sorted by date with is_last" do
         group = group_helper.legacy_create_for_course(course)
-        group.grading_periods.create! start_date: 1.week.ago, end_date: 2.weeks.from_now, title: 'C'
-        group.grading_periods.create! start_date: 4.weeks.ago, end_date: 3.weeks.ago, title: 'A'
-        group.grading_periods.create! start_date: 3.weeks.ago, end_date: 2.weeks.ago, title: 'B'
+        group.grading_periods.create!(
+          start_date: 1.week.ago(now),
+          end_date: 2.weeks.from_now(now),
+          title: 'C'
+        )
+        group.grading_periods.create!(
+          start_date: 4.weeks.ago(now),
+          end_date: 3.weeks.ago(now),
+          title: 'A'
+        )
+        group.grading_periods.create!(
+          start_date: 3.weeks.ago(now),
+          end_date: 2.weeks.ago(now),
+          title: 'B'
+        )
         json = GradingPeriod.json_for(course, nil)
         expect(json.map { |el| el['title'] }).to eq %w(A B C)
         expect(json.map { |el| el['is_last'] }).to eq [false, false, true]

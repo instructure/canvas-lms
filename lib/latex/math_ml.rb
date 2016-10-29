@@ -22,8 +22,14 @@ module Latex
 
     private
     def mathman_parse
+      url = MathMan.url_for(latex: CGI.escape(latex), target: :mml)
+      request_id = RequestContextGenerator.request_id
+      request_id_signature = Canvas::Security.sign_hmac_sha512(request_id)
       Canvas.timeout_protection("mathman") do
-        response = CanvasHttp.get(MathMan.url_for(latex: CGI.escape(latex), target: :mml))
+        response = CanvasHttp.get(url, {
+          'X-Request-Context-Id' => Canvas::Security.base64_encode(request_id),
+          'X-Request-Context-Signature' => Canvas::Security.base64_encode(request_id_signature)
+        })
         if response.code.to_i == 200
           response.body
         else

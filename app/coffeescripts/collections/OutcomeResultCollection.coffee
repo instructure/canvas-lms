@@ -6,12 +6,14 @@ define [
   'compiled/collections/WrappedCollection'
 ], ($, _, Backbone, Outcome, WrappedCollection) ->
   class OutcomeResultCollection extends WrappedCollection
-    comparator: 'submitted_or_assessed_at'
     key: 'outcome_results'
     model: Outcome
     @optionProperty 'outcome'
-    url: -> "/api/v1/courses/#{@course_id}/outcome_results?user_ids[]=#{@user_id}&outcome_ids[]=#{@outcome.id}&include[]=alignments"
+    url: -> "/api/v1/courses/#{@course_id}/outcome_results?user_ids[]=#{@user_id}&outcome_ids[]=#{@outcome.id}&include[]=alignments&per_page=100"
     loadAll: true
+
+    comparator: (model) ->
+      return -1 * model.get('submitted_or_assessed_at').getTime()
 
     initialize: ->
       super

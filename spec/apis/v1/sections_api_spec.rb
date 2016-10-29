@@ -160,6 +160,15 @@ describe SectionsController, type: :request do
         })
       end
 
+      it "should return the count of active and invited students if 'total_students' flag is given" do
+        @course.offer!
+        user2 = User.create!(:name => 'Bernard')
+        @course.enroll_user(user2, 'StudentEnrollment', :section => @section).accept!
+
+        json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param, :include => ['total_students'] }))
+        expect(json['total_students']).to eq 1
+      end
+
       it "should be accessible from the course context via sis id" do
         @section.update_attribute(:sis_source_id, 'my_section')
         json = api_call(:get, "#{@path_prefix}/sis_section_id:my_section", @path_params.merge({ :id => 'sis_section_id:my_section' }))

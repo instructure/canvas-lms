@@ -2,6 +2,7 @@ define([
   'react',
   'jquery',
   'underscore',
+  'instructure-ui/Button',
   'axios',
   'convert_case',
   'i18n!grading_periods',
@@ -9,7 +10,7 @@ define([
   'jsx/grading/GradingPeriodForm',
   'compiled/api/gradingPeriodsApi',
   'jquery.instructure_misc_helpers'
-], function(React, $, _, axios, ConvertCase, I18n, GradingPeriod, GradingPeriodForm, gradingPeriodsApi) {
+], function(React, $, _, { default: Button }, axios, ConvertCase, I18n, GradingPeriod, GradingPeriodForm, gradingPeriodsApi) {
 
   const sortPeriods = function(periods) {
     return _.sortBy(periods, "startDate");
@@ -70,6 +71,10 @@ define([
 
   const isEditingPeriod = function(state) {
     return !!state.editPeriod.id;
+  };
+
+  const isActionsDisabled = function(state, props) {
+    return !!(props.actionsDisabled || isEditingPeriod(state) || state.newPeriod.period);
   };
 
   const getShowGradingPeriodRef = function(period) {
@@ -262,38 +267,36 @@ define([
 
     renderEditButton() {
       if (!this.props.readOnly && this.props.permissions.update) {
-        let disabled = !!(this.props.actionsDisabled || isEditingPeriod(this.state));
-        let baseClasses = 'Button Button--icon-action edit_grading_period_set_button';
+        let disabled = isActionsDisabled(this.state, this.props);
         return (
-          <button ref="editButton"
-                  className={baseClasses + (disabled ? " disabled" : "")}
-                  aria-disabled={disabled}
-                  type="button"
-                  onClick={this.editSet}>
+          <Button ref="editButton"
+                  variant="icon"
+                  disabled={disabled}
+                  onClick={this.editSet}
+                  title={I18n.t("Edit %{title}", { title: this.props.set.title })}>
             <span className="screenreader-only">
               {I18n.t("Edit %{title}", { title: this.props.set.title })}
             </span>
             <i className="icon-edit"/>
-          </button>
+          </Button>
         );
       }
     },
 
     renderDeleteButton() {
       if (!this.props.readOnly && this.props.permissions.delete) {
-        let disabled = !!(this.props.actionsDisabled || isEditingPeriod(this.state));
-        let baseClasses = 'Button Button--icon-action delete_grading_period_set_button';
+        let disabled = isActionsDisabled(this.state, this.props);
         return (
-          <button ref="deleteButton"
-                  className={baseClasses + (disabled ? " disabled" : "")}
-                  aria-disabled={disabled}
-                  type="button"
-                  onClick={this.promptDeleteSet}>
+          <Button ref="deleteButton"
+                  variant="icon"
+                  disabled={disabled}
+                  onClick={this.promptDeleteSet}
+                  title={I18n.t("Delete %{title}", { title: this.props.set.title })}>
             <span className="screenreader-only">
               {I18n.t("Delete %{title}", { title: this.props.set.title })}
             </span>
             <i className="icon-trash"/>
-          </button>
+          </Button>
         );
       }
     },
@@ -321,7 +324,7 @@ define([
     },
 
     renderGradingPeriods() {
-      let actionsDisabled = !!(this.props.actionsDisabled || isEditingPeriod(this.state) || this.state.newPeriod.period);
+      let actionsDisabled = isActionsDisabled(this.state, this.props);
       return _.map(this.state.gradingPeriods, (period) => {
         if (period.id === this.state.editPeriod.id) {
           return (
@@ -361,18 +364,18 @@ define([
     },
 
     renderNewPeriodButton() {
-      let disabled = !!(this.props.actionsDisabled || isEditingPeriod(this.state));
-      let classList = 'Button Button--link GradingPeriodList__new-period__add-button' + (disabled ? " disabled" : "");
+      let disabled = isActionsDisabled(this.state, this.props);
       return (
         <div className='GradingPeriodList__new-period center-xs border-rbl border-round-b'>
-          <button className={classList}
+          <Button variant="link"
                   ref='addPeriodButton'
-                  aria-disabled={disabled}
+                  disabled={disabled}
                   aria-label={I18n.t('Add Grading Period')}
                   onClick={this.showNewPeriodForm}>
             <i className='icon-plus GradingPeriodList__new-period__add-icon'/>
+            &nbsp;
             {I18n.t('Grading Period')}
-          </button>
+          </Button>
         </div>
       );
     },

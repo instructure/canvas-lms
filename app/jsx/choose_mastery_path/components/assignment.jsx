@@ -15,14 +15,14 @@ define([
     renderTitle () {
       if (this.props.isSelected) {
         return (
-          <a href={`/courses/${this.props.assignment.context_id}/assignments/${this.props.assignment.assignmentId}`} title={this.props.assignment.title} className='item_name cmp-assignment__title-link'>
-            {this.props.assignment.title}
+          <a href={`/courses/${this.props.assignment.context_id}/assignments/${this.props.assignment.assignmentId}`} title={this.props.assignment.name} className='item_name cmp-assignment__title-link'>
+            {this.props.assignment.name}
           </a>
         )
       } else {
         return (
           <span className='item_name'>
-            {this.props.assignment.title}
+            {this.props.assignment.name}
           </span>
         )
       }
@@ -30,6 +30,7 @@ define([
 
     render () {
       const dueAt = this.props.assignment.due_at
+      const points = this.props.assignment.points_possible
       const date = dueAt && I18n.l('date.formats.short', dueAt)
 
       const assgClasses = classNames(
@@ -57,7 +58,9 @@ define([
                     <span>{date}</span>
                   </div>
                 )}
-                <div key='points' className='points_possible_display ig-details__item'>{I18n.t('%{points} pts', { points: this.props.assignment.points_possible })}</div>
+                { points != null && (
+                  <div key='points' className='points_possible_display ig-details__item'>{I18n.t('%{points} pts', { points: points })}</div>
+                )}
               </div>
             </div>
           </div>

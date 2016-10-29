@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Api::V1::ContextModule
+  include Api
   include Api::V1::Json
   include Api::V1::User
   include Api::V1::ExternalTools::UrlHelpers
@@ -145,7 +146,9 @@ module Api::V1::ContextModule
 
     hash['content_details'] = content_details(content_tag, current_user) if includes.include?('content_details')
 
-    hash['mastery_paths'] = conditional_release(content_tag, opts) if includes.include?('mastery_paths')
+    if includes.include?('mastery_paths')
+      hash['mastery_paths'] = conditional_release_json(content_tag, current_user, opts)
+    end
 
     hash
   end
@@ -198,5 +201,17 @@ module Api::V1::ContextModule
     result = rules.find { |rule| rule[:trigger_assignment].to_s == id.to_s }
     return unless result.present?
     result.slice(:locked, :assignment_sets, :selected_set_id)
+  end
+
+  def conditional_release_json(content_tag, user, opts = {})
+    result = conditional_release(content_tag, opts)
+    return unless result.present?
+    result[:assignment_sets].each do |as|
+      next if as[:assignments].blank?
+      as[:assignments].each do |a|
+        a[:model] = assignment_json(a[:model], user, nil) if a[:model]
+      end
+    end
+    result
   end
 end

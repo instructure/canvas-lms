@@ -1633,7 +1633,7 @@ en-GB:
     title: "Edit %{name}"
     update: Update
   archive_3f794d7e: Archive
-  archive_selected_d64506ca: "Archive Selected"
+  archive_selected_d64506ca: "Archive selected"
   are_you_sure_26795d3c: "Are you sure?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Are you sure you want to copy to the final mark? This will overwrite the existing mark."
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "Are you sure you want to deactivate this user? S/he will be unable to participate in the course while inactive."
@@ -1655,9 +1655,9 @@ en-GB:
   argentina_3257a200: Argentina
   argentina_54_375d6af4: "Argentina (+54)"
   arrange_by_34a545de: "Arrange by"
-  arrange_columns_by_assignment_group_33acdf03: "Arrange Columns by Assignment Group"
+  arrange_columns_by_assignment_group_33acdf03: "Arrange columns by assignment group"
   arrange_columns_by_assignment_group_59bbddd0: "Arrange columns by assignment group"
-  arrange_columns_by_due_date_888f2551: "Arrange Columns by Due Date"
+  arrange_columns_by_due_date_888f2551: "Arrange columns by due date"
   arrange_columns_by_due_date_f74f9e2d: "Arrange columns by due date"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "As you type in this field, the list of results will be automatically updated."
@@ -1717,7 +1717,7 @@ en-GB:
   assignment_d8387b78: assignment
   assignment_details: 
     no_graded_submissions: "No graded submissions"
-  assignment_details_bc488179: "Assignment Details"
+  assignment_details_bc488179: "Assignment details"
   assignment_details_dialog: 
     average_score: "Average score:"
     count_of_submissions: "%{cnt} submissions"
@@ -1789,7 +1789,7 @@ en-GB:
       links: 
         add_assignment_group: "Add assignment group\""
     assignment_group_list: 
-      no_assignment_groups: "No Assignment Groups found"
+      no_assignment_groups: "No assignment groups found"
     assignment_group_list_item: 
       add_assignment_to: "Add assignment to %{name}"
       assignment_group_delete: "Delete Assignment Group"
@@ -1926,7 +1926,7 @@ en-GB:
       buttons: 
         not_published: "Not published"
         published: Published
-      manage_assignment: "Manage Assignment"
+      manage_assignment: "Manage assignment"
       page_header_title: "New assignment"
       titles: 
         delete: Delete
@@ -1998,7 +1998,7 @@ en-GB:
       gpa_scale_scores_explainer: "The only scores allowed are predefined in the grading scheme."
       gpa_scale_title: "What is GPA scale grading?"
       grading_type_options: 
-        gpa_scale: "GPA Scale"
+        gpa_scale: "GPA scale"
         letter_grade: "Letter grade"
         not_graded: "Not graded"
         pass_fail: Complete/Incomplete
@@ -2008,7 +2008,7 @@ en-GB:
     group_category_selector: 
       differentiated_groups_warning: "Differentiated group assignments may yield unexpected results."
       grade_group_students_individually: "Assign grades to each student individually"
-      group_assignment_header: "Group Assignment"
+      group_assignment_header: "Group assignment"
       group_category_locked_explanation: "Students have already submitted homework on this assignment, so group settings cannot be changed."
       group_category_options: "New group category"
       group_set: "Group set"
@@ -2129,12 +2129,12 @@ en-GB:
         reminder: "Remind %{assessor} about assessment, last notified %{time}"
     peer_reviews_selector: 
       anonymous_peer_reviews: Anonymity
-      how_to_peer_review: "How to Assign Peer Reviews"
+      how_to_peer_review: "How to assign peer reviews"
       labels: 
-        anonymous_peer_reviews: "Peer Reviews Appear Anonymously"
-        automatically_assign_peer_reviews: "Automatically assign Peer Reviews"
-        manually_assign_peer_reviews: "Manually assign Peer Reviews"
-        require_peer_reviews: "Require Peer Reviews"
+        anonymous_peer_reviews: "Peer reviews appear anonymously"
+        automatically_assign_peer_reviews: "Automatically assign peer reviews"
+        manually_assign_peer_reviews: "Manually assign peer reviews"
+        require_peer_reviews: "Require peer reviews"
       locked_until: "Assign reviews"
       peer_reviews_assign_at_explanation: "Must come after due date. If blank, uses due date."
       peer_reviews_header: "Peer reviews"
@@ -2228,7 +2228,7 @@ en-GB:
         allow_url: "Website URL"
         allowed_extensions: "Allowed file extensions"
         restrict_file_extensions: "Restrict upload file types"
-      online_entry_options: "Online Entry Options"
+      online_entry_options: "Online entry options"
       submission_type: "Submission type"
       submission_types: 
         external_tool: "External tool"
@@ -2395,17 +2395,17 @@ en-GB:
   available_after_unlock_at_b5682224: "Available after %{unlock_at}"
   available_after_unlock_at_until_lock_at_499e8092: "Available after %{unlock_at} until %{lock_at}"
   available_from_587ce92f: "Available from"
-  available_from_date_43b5e11d: "Available From date"
-  available_from_date_afc594fa: "Available From Date:"
+  available_from_date_43b5e11d: "Available from date"
+  available_from_date_afc594fa: "Available from date:"
   available_from_date_must_precede_available_until_c9f9e533: "'Available from' date must precede 'Available until'"
   available_from_f84e4611: "Available from"
-  available_from_field_for_styleguide_7ced3861: "Available From field for style guide"
+  available_from_field_for_styleguide_7ced3861: "Available from field for style guide"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Available from - Format Like YYYY-MM-DD hh:mm"
   available_to_b7350e02: "Available to"
-  available_until_date_2c0ccec3: "Available Until Date:"
-  available_until_date_cd125c62: "Available Until date"
+  available_until_date_2c0ccec3: "Available until date:"
+  available_until_date_cd125c62: "Available until date"
   available_until_f3b9c4ed: "Available until"
-  available_until_field_for_styleguide_85d5d65a: "Available Until field for style guide"
+  available_until_field_for_styleguide_85d5d65a: "Available until field for style guide"
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "Available until - Format Like YYYY-MM-DD hh:mm"
   available_until_lock_at_ab022445: "Available until %{lock_at}"
   availableslots_available_87b8b69d: "%{availableSlots} available"
@@ -2501,7 +2501,7 @@ en-GB:
       waiting_to_export: "Waiting to export from Blackboard"
       waiting_to_import: "Waiting to import into Canvas"
     index: 
-      available_courses: "Available Courses"
+      available_courses: "Available courses"
       bulk_description: "These are the headers expected in the CSV:"
       buttons: 
         add_credentials: "Add credentials"
@@ -2686,7 +2686,7 @@ en-GB:
       edit: Edit
       location: "Location:"
       manage: "Manage %{title} appointment group"
-      message_groups: "Message groups which..."
+      message_groups: "Message groups who..."
       message_students: "Message students who..."
       scheduler_explanation_student_header: "You do not have any appointment groups to sign up for"
       scheduler_explanation_student_paragraph_1: "Teachers can use this scheduler tool to schedule things for their students to sign up for. Things like: \"office hours\", \"group presentation time slots\" or \"lunch with an alumnus\"."

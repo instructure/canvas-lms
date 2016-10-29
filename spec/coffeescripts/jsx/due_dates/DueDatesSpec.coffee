@@ -3,9 +3,10 @@ define [
   'underscore'
   'jsx/due_dates/DueDates'
   'jsx/due_dates/OverrideStudentStore'
+  'jsx/due_dates/StudentGroupStore'
   'compiled/models/AssignmentOverride',
   'helpers/fakeENV'
-], (React, _, DueDates, OverrideStudentStore, AssignmentOverride, fakeENV) ->
+], (React, _, DueDates, OverrideStudentStore, StudentGroupStore, AssignmentOverride, fakeENV) ->
 
   Simulate = React.addons.TestUtils.Simulate
   SimulateNative = React.addons.TestUtils.SimulateNative
@@ -105,6 +106,22 @@ define [
     @spy(@dueDates, 'focusRow')
     @dueDates.addRow()
     equal @dueDates.focusRow.callCount, 1
+
+  test 'filters available groups based on selected group category', ->
+    groups = [
+      {id: "3", group_category_id: "1"},
+      {id: "4", group_category_id: "2"}
+    ]
+    StudentGroupStore.setSelectedGroupSet(null)
+    StudentGroupStore.addGroups(groups)
+    ok !_.contains(@dueDates.validDropdownOptions().map( (opt) -> opt.group_id), "3")
+    ok !_.contains(@dueDates.validDropdownOptions().map( (opt) -> opt.group_id), "4")
+    StudentGroupStore.setSelectedGroupSet("1")
+    ok  _.contains(@dueDates.validDropdownOptions().map( (opt) -> opt.group_id), "3")
+    ok !_.contains(@dueDates.validDropdownOptions().map( (opt) -> opt.group_id), "4")
+    StudentGroupStore.setSelectedGroupSet("2")
+    ok !_.contains(@dueDates.validDropdownOptions().map( (opt) -> opt.group_id), "3")
+    ok  _.contains(@dueDates.validDropdownOptions().map( (opt) -> opt.group_id), "4")
 
   module 'DueDates render callbacks',
     setup: ->

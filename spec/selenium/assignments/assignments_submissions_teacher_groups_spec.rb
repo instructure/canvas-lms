@@ -51,13 +51,13 @@ describe 'submissions' do
     end
 
     it 'Should be able to create a new student group category from the assignment edit page', priority: "1", test_id: 56752 do
-      create_assignment_with_group_category
+      create_assignment_with_group_category_auto_open
 
       f('input[name="category[split_groups]"]').click
       ff('.submit_button').detect(&:displayed?).click
       wait_for_ajaximations
 
-      expect(fj('#assignment_group_category_id:visible')).to include_text("New Group Category")
+      expect(fj('#assignment_group_category_id:visible')).to include_text("Project Groups")
     end
   end
 

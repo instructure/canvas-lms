@@ -62,7 +62,7 @@ define([
         $this.find('.remove_ip_filters').remove(); // just in case it's left over after a failed validation
       }
 
-      var validations = {
+      var account_validations = {
         object_name: 'account',
         required: ['name'],
         property_validations: {
@@ -71,7 +71,23 @@ define([
           }
         }
       };
-      var result = $this.validateForm(validations);
+
+      var result = $this.validateForm(account_validations)
+
+      // Work around for Safari to enforce help menu name validation until `required` is supported
+      if ($('#custom_help_link_settings').length > 0) {
+        var help_menu_validations = {
+          object_name: 'account[settings]',
+          required: ['help_link_name'],
+          property_validations: {
+            'help_link_name': function(value){
+              if (value && value.length > 12) { return I18n.t("help_menu_name_too_long", "Help menu name is too long")}
+            }
+          }
+        }
+        result = (result && $this.validateForm(help_menu_validations));
+      }
+
       if(!result) {
         return false;
       }

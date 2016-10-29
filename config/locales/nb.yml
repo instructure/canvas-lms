@@ -17114,7 +17114,7 @@ nb:
         other: "Viser <b>all&nbsp;%{count}</b> %{model}"
         zero: "Fant ingen %{model}"
     page_gap: "&hellip;"
-    previous_label: "8592; Forrige"
+    previous_label: "&#8592; Forrige"
   will_send_to_everyone_if_no_selections_are_made_b13ecf39: "(vil sende til alle hvis ingen valg er gjort)"
   will_unlock_unlock_date_1024c38d: "Vil låse opp %{unlock_date}"
   wimba_conference: 

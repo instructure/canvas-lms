@@ -473,8 +473,9 @@ class ContextModuleItemsApiController < ApplicationController
   # @API Select a mastery path
   #
   # Select a mastery path when module item includes several possible paths.
-  # Requires Mastery Paths feature to be enabled.  Returns the assignments
-  # which are included in the given path.
+  # Requires Mastery Paths feature to be enabled.  Returns a compound document
+  # with the assignments included in the given path and any module items
+  # related to those assignments
   #
   # @argument assignment_set_id
   #   Assignment set chosen, as specified in the mastery_paths portion of the
@@ -491,7 +492,6 @@ class ContextModuleItemsApiController < ApplicationController
   #       -H 'Authorization: Bearer <token>' \
   #       -d 'assignment_set_id=2992'
   #
-  # @returns [Assignment]
   def select_mastery_path
     return unless authorized_action(@context, @current_user, :read)
     return unless @student == @current_user || authorized_action(@context, @current_user, :manage_assignments)
@@ -503,14 +503,27 @@ class ContextModuleItemsApiController < ApplicationController
     return render json: { message: 'requested item is not an assignment' }, status: :bad_request unless assignment
 
     response = ConditionalRelease::Service.select_mastery_path(@context, @current_user, @student, assignment.id, params[:assignment_set_id], session)
+
     if response[:code] != '200'
       render json: response[:body], status: response[:code]
     else
       assignment_ids = response[:body]['assignments'].map {|a| a['assignment_id'].try(&:to_i) }
-      assignments = Assignment.where(id: assignment_ids)
+      # assignment occurs in delayed job, may not be fully visible to user until job completes
+      assignments = @context.assignments.published.where(id: assignment_ids)
+
+      Assignment.preload_context_module_tags(assignments)
+
       # match cyoe order
       assignments = assignments.index_by(&:id).values_at(*assignment_ids)
-      render json: assignments_json(assignments, @current_user, session)
+
+      # grab locally relevant module items
+      items = assignments.map(&:all_context_module_tags).flatten.select{|a| a.context_module_id == @module.id}
+
+      render json: {
+        meta: { primaryCollection: 'assignments' },
+        items: items.map { |item| module_item_json(item, @student || @current_user, session, @module) },
+        assignments: assignments_json(assignments, @current_user, session)
+      }
     end
   end
 

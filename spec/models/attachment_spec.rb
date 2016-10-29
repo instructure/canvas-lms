@@ -304,7 +304,7 @@ describe Attachment do
 
       it "should delay upload until the #save transaction is committed" do
         @attachment.uploaded_data = default_uploaded_data
-        Attachment.connection.expects(:after_transaction_commit).once
+        Attachment.connection.expects(:after_transaction_commit).twice
         @attachment.expects(:touch_context_if_appropriate).never
         @attachment.expects(:ensure_media_object).never
         @attachment.save
@@ -313,7 +313,7 @@ describe Attachment do
       it "should upload immediately when in a non-joinable transaction" do
         Attachment.connection.transaction(:joinable => false) do
           @attachment.uploaded_data = default_uploaded_data
-          Attachment.connection.expects(:after_transaction_commit).never
+          Attachment.connection.expects(:after_transaction_commit).once
           @attachment.expects(:touch_context_if_appropriate)
           @attachment.expects(:ensure_media_object)
           @attachment.save
@@ -806,6 +806,18 @@ describe Attachment do
       @a.update_attribute(:display_name, 'a1')
       @a.handle_duplicates(:overwrite)
       expect(@a.reload.usage_rights).to eq usage_rights
+    end
+
+    it "forces rename semantics in submissions folders" do
+      user_model
+      a1 = attachment_model context: @user, folder: @user.submissions_folder, filename: 'a1.txt'
+      a2 = attachment_model context: @user, folder: @user.submissions_folder, filename: 'a2.txt'
+      a2.display_name = 'a1.txt'
+      deleted = a2.handle_duplicates(:overwrite)
+      expect(deleted).to be_empty
+      a2.reload
+      expect(a2.display_name).not_to eq 'a1.txt'
+      expect(a2.display_name).not_to eq 'a2.txt'
     end
   end
 

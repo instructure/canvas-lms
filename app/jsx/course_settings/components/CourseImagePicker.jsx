@@ -4,10 +4,8 @@ define([
   'underscore',
   './UploadArea',
   '../../shared/FlickrSearch',
-  'instructure-ui'
-], (React, I18n, _, UploadArea, FlickrSearch, InstUI) => {
-
-  const Spinner = InstUI.Spinner;
+  'instructure-ui/Spinner'
+], (React, I18n, _, UploadArea, FlickrSearch, { default: Spinner }) => {
 
   class CourseImagePicker extends React.Component {
     constructor (props) {
@@ -92,7 +90,7 @@ define([
             </div>
           </div>
           <div className="CourseImagePicker__Content">
-            <UploadArea 
+            <UploadArea
               courseId={this.props.courseId}
               handleFileUpload={this.props.handleFileUpload}/>
             <FlickrSearch selectImage={(flickrUrl) => this.props.handleFlickrUrlUpload(flickrUrl)} />

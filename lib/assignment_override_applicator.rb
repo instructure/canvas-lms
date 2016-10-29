@@ -88,7 +88,7 @@ module AssignmentOverrideApplicator
       if context.grants_right?(user, :read_as_admin)
         overrides = assignment_or_quiz.assignment_overrides
         if assignment_or_quiz.current_version?
-          visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).except(:select, :order).pluck(:id)
+          visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
 
           overrides = if overrides.loaded?
                         ovs, adhoc_ovs = overrides.select{|ov| ov.workflow_state == 'active'}.
@@ -137,8 +137,17 @@ module AssignmentOverrideApplicator
   def self.preload_student_ids_for_adhoc_overrides(adhoc_overrides, visible_user_ids)
     if adhoc_overrides.any?
       override_ids_to_student_ids = {}
-      AssignmentOverrideStudent.where(:assignment_override_id => adhoc_overrides).
-        where(user_id: visible_user_ids).pluck(:assignment_override_id, :user_id).each do |ov_id, user_id|
+      scope = AssignmentOverrideStudent.where(assignment_override_id: adhoc_overrides)
+      scope = if ActiveRecord::Relation === visible_user_ids
+          return adhoc_overrides if visible_user_ids.is_a?(ActiveRecord::NullRelation)
+          scope.
+            joins("INNER JOIN #{Enrollment.quoted_table_name} ON assignment_override_students.user_id=enrollments.user_id").
+            merge(visible_user_ids.except(:select))
+        else
+          scope.where(user_id: visible_user_ids)
+        end
+
+      scope.pluck(:assignment_override_id, :user_id).each do |ov_id, user_id|
         override_ids_to_student_ids[ov_id] ||= []
         override_ids_to_student_ids[ov_id] << user_id
       end
@@ -267,7 +276,7 @@ module AssignmentOverrideApplicator
 
     self.setup_overridden_clone(unoverridden_assignment_or_quiz,
                                 overrides) do |cloned_assignment_or_quiz|
-      if overrides
+      if overrides && overrides.any?
         self.collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field,value|
           # for any times in the value set, bring them back from raw UTC into the
           # current Time.zone before placing them in the assignment
@@ -297,20 +306,22 @@ module AssignmentOverrideApplicator
   def self.collapsed_overrides(assignment_or_quiz, overrides)
     cache_key = [assignment_or_quiz, self.overrides_hash(overrides)].cache_key
     Rails.cache.delete(cache_key) if assignment_or_quiz.reload_overrides_cache?
-    Rails.cache.fetch(cache_key) do
-      overridden_data = {}
-      # clone the assignment_or_quiz, apply overrides, and freeze
-      [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].each do |field|
-        if assignment_or_quiz.respond_to?(field)
-          value = self.send("overridden_#{field}", assignment_or_quiz, overrides)
-          # force times to un-zoned UTC -- this will be a cached value and should
-          # not care about the TZ of the user that cached it. the user's TZ will
-          # be applied before it's returned.
-          value = value.utc if value && value.respond_to?(:utc) && !value.is_a?(Date)
-          overridden_data[field] = value
+    RequestCache.cache('collapsed_overrides', cache_key) do
+      Rails.cache.fetch(cache_key) do
+        overridden_data = {}
+        # clone the assignment_or_quiz, apply overrides, and freeze
+        [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].each do |field|
+          if assignment_or_quiz.respond_to?(field)
+            value = self.send("overridden_#{field}", assignment_or_quiz, overrides)
+            # force times to un-zoned UTC -- this will be a cached value and should
+            # not care about the TZ of the user that cached it. the user's TZ will
+            # be applied before it's returned.
+            value = value.utc if value && value.respond_to?(:utc) && !value.is_a?(Date)
+            overridden_data[field] = value
+          end
         end
+        overridden_data
       end
-      overridden_data
     end
   end
 

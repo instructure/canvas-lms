@@ -122,6 +122,7 @@ class ApplicationController < ActionController::Base
         SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?),
           eportfolios_enabled: (@domain_root_account && @domain_root_account.settings[:enable_eportfolios] != false), # checking all user root accounts is slow
+          collapse_global_nav: @current_user.try(:collapse_global_nav?),
           show_feedback_link: show_feedback_link?
         }
       }
@@ -165,7 +166,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :rce_js_env
 
-  def conditional_release_js_env(assignment = nil)
+  def conditional_release_js_env(assignment = nil, include_rule: false)
     return unless ConditionalRelease::Service.enabled_in_context?(@context)
     cr_env = ConditionalRelease::Service.env_for(
       @context,
@@ -173,7 +174,8 @@ class ApplicationController < ActionController::Base
       session: session,
       assignment: assignment,
       domain: request.env['HTTP_HOST'],
-      real_user: @real_current_user
+      real_user: @real_current_user,
+      include_rule: include_rule
     )
     js_env(cr_env)
   end
@@ -223,6 +225,18 @@ class ApplicationController < ActionController::Base
       context_grading_periods_enabled?
   end
   helper_method :multiple_grading_periods?
+
+  def tool_dimensions
+    tool_dimensions = {selection_width: '100%', selection_height: '100%'}
+
+    tool_dimensions.each do |k, v|
+      tool_dimensions[k] = @tool.settings[k] || v
+      tool_dimensions[k] = tool_dimensions[k].to_s << 'px' unless tool_dimensions[k].to_s =~ /%|px/
+    end
+
+    tool_dimensions
+  end
+  private :tool_dimensions
 
   def account_and_grading_periods_allowed?
     @context.is_a?(Account) &&
@@ -1395,7 +1409,8 @@ class ApplicationController < ActionController::Base
         log_asset_access(@tool, "external_tools", "external_tools", overwrite: false)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
-        @lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
+        launch_settings = @tool.settings['post_only'] ? {post_only: true, tool_dimensions: tool_dimensions} : {tool_dimensions: tool_dimensions}
+        @lti_launch = Lti::Launch.new(launch_settings)
 
         success_url = case tag_type
         when :assignments
@@ -2027,6 +2042,7 @@ class ApplicationController < ActionController::Base
     permissions = @context.rights_status(@current_user, *rights)
     permissions[:manage_course] = permissions[:manage]
     permissions[:manage] = permissions[:manage_assignments]
+
     js_env({
       :URLS => {
         :new_assignment_url => new_polymorphic_url([@context, :assignment]),
@@ -2044,8 +2060,11 @@ class ApplicationController < ActionController::Base
       :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
       :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
       :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
-      :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
+      :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user),
     })
+
+    conditional_release_js_env
+
     if @context.feature_enabled?(:multiple_grading_periods)
       js_env(:active_grading_periods => GradingPeriod.json_for(@context, @current_user))
     end

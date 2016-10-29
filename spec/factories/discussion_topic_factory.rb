@@ -79,4 +79,5 @@ def group_discussion_assignment
   @assignment.saved_by = :discussion_topic
   @topic.assignment = @assignment
   @topic.save!
+  @topic
 end

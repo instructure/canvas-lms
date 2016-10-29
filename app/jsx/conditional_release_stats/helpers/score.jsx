@@ -1,23 +1,32 @@
 define([
   './grading-types',
-  'i18n!cyoe_assignment_sidebar'
-  ], (GradingTypes, I18n)=> {
-
+  'i18n!cyoe_assignment_sidebar',
+], (GradingTypes, I18n) => {
   // stack overflow suggests this implementation
   const isNumeric = (n) => {
     return !isNaN(parseFloat(n)) && isFinite(n)
   }
 
+  const haveGradingScheme = (assignment) => {
+    return assignment ? !!assignment.grading_scheme : false
+  }
+
+  const getGradingType = (assignment) => {
+    let type = assignment ? assignment.grading_type : GradingTypes.percent.key
+    if ((type === GradingTypes.letter_grade.key || type === GradingTypes.gpa_scale.key) && (!haveGradingScheme(assignment))) {
+      return GradingTypes.percent.key
+    }
+    return type
+  }
+
   const percentToScore = (score, assignment) => {
-    const gradingType = assignment ? assignment['grading_type'] : GradingTypes.percent.key
+    const gradingType = getGradingType(assignment)
     if (gradingType === GradingTypes.points.key) {
       return percentToPoints(score, assignment)
     } else if (gradingType === GradingTypes.letter_grade.key || gradingType === GradingTypes.gpa_scale.key) {
       return percentToLetterGrade(score, assignment)
-    } else if (gradingType === GradingTypes.percent.key) {
-      return percentToExternalPercent(score)
     } else {
-      return score
+      return percentToExternalPercent(score)
     }
   }
 
@@ -25,60 +34,54 @@ define([
     // The backend stores nil for the upper and lowerbound scoring types
     if (!score) {
       if (isUpperBound) {
-        score = score || '1.0'
+        score = '1'
       } else {
-        score = score || '0'
+        score = '0'
       }
     }
     return formatScore(percentToScore(score, assignment), assignment)
   }
 
   const formatScore = (score, assignment) => {
-    const gradingType = assignment ? assignment['grading_type'] : GradingTypes.percent.key
+    const gradingType = getGradingType(assignment)
     if (gradingType === GradingTypes.points.key) {
       return I18n.t('%{score} pts', { score })
     } else if (gradingType === GradingTypes.letter_grade.key || gradingType === GradingTypes.gpa_scale.key) {
       return score
-    } else if (gradingType === GradingTypes.percent.key) {
-      return I18n.t('%{score}%', { score })
     } else {
-      return score
+      return I18n.t('%{score}%', { score })
     }
   }
 
   const formatReaderOnlyScore = (score, assignment) => {
-    const gradingType = assignment ? assignment['grading_type'] : GradingTypes.percent.key
+    const gradingType = getGradingType(assignment)
     if (gradingType === GradingTypes.points.key) {
       return I18n.t('%{score} points', { score })
     } else if (gradingType === GradingTypes.letter_grade.key || gradingType === GradingTypes.gpa_scale.key) {
       return I18n.t('%{score} letter grade', { score })
-    } else if (gradingType === GradingTypes.percent.key) {
-      return I18n.t('%{score} percent', { score })
     } else {
-      return score
+      return I18n.t('%{score} percent', { score })
     }
   }
 
   const percentToPoints = (score, assignment) => {
-    if (!assignment['points_possible']) { return '0' }
-    if (score === 0) { return '0' }
     if (!isNumeric(score)) { return score }
+    if (score === 0) { return '0' }
     const percent = parseFloat(score)
-    return Math.ceil(percent * assignment['points_possible']).toString()
+    const pointsPossible = Number(assignment.points_possible) || 100
+    return Math.ceil(percent * pointsPossible).toString()
   }
 
   const percentToLetterGrade = (score, assignment) => {
     if (score === '') { return '' }
     const letterGrade = { letter: null, score: -Infinity }
-    const gradingScheme = assignment['grading_scheme']
-    for(let k in gradingScheme){
-      const v = parseFloat(gradingScheme[k])
+    for (const k in assignment.grading_scheme) {
+      const v = parseFloat(assignment.grading_scheme[k])
       if ((v <= score && v > letterGrade.score) || (v === 0 && v > score)) {
         letterGrade.score = v
         letterGrade.letter = k
       }
     }
-
     return letterGrade.letter ? letterGrade.letter : score
   }
 
@@ -90,8 +93,8 @@ define([
   const scoreHelpers = {
     percentToScore,
     transformScore,
-    formatReaderOnlyScore
+    formatReaderOnlyScore,
   }
-  return scoreHelpers
 
+  return scoreHelpers
 })

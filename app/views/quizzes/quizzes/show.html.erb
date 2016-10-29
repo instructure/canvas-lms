@@ -70,6 +70,11 @@
           </li>
         <% end %>
       </ul>
+      <% if can_do(@context, @current_user, :view_all_grades) &&
+              @quiz.assignment.present? &&
+              ConditionalRelease::Service.triggers_mastery_paths?(@quiz.assignment, @current_user, session) %>
+        <div id="crs-graphs"></div>
+      <% end %>
     </div>
 
     <% if @submission && params[:preview] %>
@@ -213,9 +218,15 @@
             <% end %>
 
             <li role="presentation">
+            <% if @quiz.grants_right?(@current_user, :delete) %>
               <a href="<%= context_url(@context, :context_quiz_url, @quiz) %>" class="delete_quiz_link" tabindex="-1" role="menuitem">
                 <i class="icon-trash"><span class="screenreader-only"><%= admin_delete_title %></span></i> <%= admin_delete_title %>
               </a>
+            <% else %>
+              <a class="disabled" tabindex="-1" role="menuitem" aria-disabled=true>
+                <i class="icon-trash"><span class="screenreader-only"><%= admin_delete_title %></span></i> <%= admin_delete_title %>
+              </a>
+            <% end %>
             </li>
             <%= external_tools_menu_items((@quiz_menu_tools || []), {link_class: "menu_tool_link", settings_key: :quiz_menu, in_list: true, url_params: {:quizzes => [@quiz.id]}}) %>
           </ul>

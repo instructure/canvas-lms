@@ -15,7 +15,7 @@ define [], () ->
       if eventIds[event.id]
         keep = false
       else if event.isAppointmentGroupEvent()
-        if !viewingGroup
+        if !viewingGroup || ENV.CALENDAR.BETTER_SCHEDULER
           # Handle normal calendar view, not scheduler view
           if !event.calendarEvent.reserve_url
             # If there is not a reserve_url set, then it is an
@@ -32,10 +32,10 @@ define [], () ->
               # new scheduler is not enabled: show only if someone is signed up
               keep = event.calendarEvent.child_events_count > 0
           else
-            # reservable appointment slot
+            # appointment slot
             if schedulerState.inFindAppointmentMode && event.isOnCalendar(schedulerState.selectedCourse.asset_string)
-              # in find-appointment-mode selected course: show if there are available slots; hide otherwise
-              if event.calendarEvent.available_slots == 0
+              # show it (non-grayed) if it is reservable; filter it out otherwise
+              if event.calendarEvent.reserved || event.calendarEvent.available_slots == 0
                 keep = false
               else
                 gray = false

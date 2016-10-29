@@ -78,6 +78,13 @@ module Services
       fetch("/recipients/count", query_params(params))['count'] || 0
     end
 
+    def self.jwt # public only for testing, should not be used directly
+      Canvas::Security.create_jwt({ iat: Time.now.to_i }, nil, jwt_secret)
+    rescue StandardError => e
+      Canvas::Errors.capture_exception(:address_book, e)
+      nil
+    end
+
     class << self
       private
       def setting(key)
@@ -94,12 +101,16 @@ module Services
         setting("app-host")
       end
 
+      def jwt_secret
+        Canvas::Security.base64_decode(setting("secret"))
+      end
+
       # generic retrieve, parse
       def fetch(path, params={})
         url = app_host + path
         url += '?' + params.to_query unless params.empty?
         Canvas.timeout_protection("address_book") do
-          response = CanvasHttp.get(url)
+          response = CanvasHttp.get(url, 'Authorization' => "Bearer #{jwt}")
           if response.code.to_i == 200
             return JSON.parse(response.body)
           else

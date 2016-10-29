@@ -176,7 +176,7 @@ define([
           this.setState({assignments: assignments})
         }
 
-        //update normal assingment and the 'Everyone Else' scenario if the course is currentlySelected
+        //update normal assignment and the 'Everyone Else' scenario if the course is currentlySelected
         else {
           this.updateAssignment(assignment_id, {due_at: date, please_ignore: false, hadOriginalErrors: true})
         }

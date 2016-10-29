@@ -83,16 +83,18 @@
     </a></li>
   {{/if}}
   {{#each attachments}}
-    <li><a href="{{url}}">
-      {{#if thumbnail_url}}
-        {{! The thumbnail image is still huge, unfortunately. }}
-        <!--img class="message-attachment-thumbnail" src="{{thumbnail_url}}" /-->
+    <li>
+      {{#if locked_for_user}}
         <i class="icon-paperclip"></i>
+        {{display_name}}
+        <br><em>{{#t}}This attachment has been unpublished by the author.{{/t}}</em>
       {{else}}
-        <i class="icon-paperclip"></i>
+        <a href="{{url}}">
+          <i class="icon-paperclip"></i>
+          {{display_name}}
+        </a>
       {{/if}}
-      {{display_name}}
-    </a></li>
+    </li>
   {{/each}}
 </ul>
 {{/if}}

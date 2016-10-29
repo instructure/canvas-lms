@@ -61,13 +61,30 @@ describe CrocodocSessionsController do
       assert_status(503)
     end
 
-    it "updates attachment.viewed_at if the owner views" do
+    it "updates attachment.viewed_at if the owner (user that is the context of the attachment) views" do
       last_viewed_at = @attachment.viewed_at
 
       get :show, blob: @blob, hmac: @hmac
 
       @attachment.reload
       expect(@attachment.viewed_at).not_to eq(last_viewed_at)
+    end
+
+
+    it "updates attachment.viewed_at if the owner (person in the user attribute of the attachment) views" do
+      assignment = @course.assignments.create!(assignment_valid_attributes)
+      attachment = attachment_model content_type: 'application/pdf', context: assignment, user: @student
+      attachment.submit_to_crocodoc
+      blob = {attachment_id: attachment.global_id,
+             user_id: @student.global_id,
+             type: "crocodoc"}.to_json
+      hmac = Canvas::Security.hmac_sha1(blob)
+      last_viewed_at = attachment.viewed_at
+
+      get :show, blob: blob, hmac: hmac
+
+      attachment.reload
+      expect(attachment.viewed_at).not_to eq(last_viewed_at)
     end
 
     it "doesn't update attachment.viewed_at for non-owner views" do

@@ -30,12 +30,29 @@ class AccountAuthorizationConfig::Twitter < AccountAuthorizationConfig::Oauth
   end
   validates :login_attribute, inclusion: login_attributes
 
+  def self.recognized_federated_attributes
+    [
+      'name'.freeze,
+      'screen_name'.freeze,
+      'time_zone'.freeze,
+      'user_id'.freeze,
+    ].freeze
+  end
+
   def login_attribute
     super || 'user_id'.freeze
   end
 
   def unique_id(token)
     token.params[login_attribute.to_sym]
+  end
+
+  def provider_attributes(token)
+    result = token.params.dup
+    if federated_attributes.any? { |(_k, v)| ['name', 'time_zone'].include?(v['attribute']) }
+      result.merge!(JSON.parse(token.get('/1.1/account/verify_credentials.json?skip_status=true').body))
+    end
+    result
   end
 
   protected

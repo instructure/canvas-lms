@@ -31,9 +31,7 @@ module Lti
     def valid?
       @valid ||= begin
         valid = lti_message_authenticator.valid_signature?
-        valid &&= @params[:oauth_timestamp].to_i > NONCE_EXPIRATION.ago.to_i
-        valid &&= !Rails.cache.exist?(cache_key)
-        Rails.cache.write(cache_key, 'OK', expires_in: NONCE_EXPIRATION) if valid
+        valid &&= Security::check_and_store_nonce(cache_key, @params[:oauth_timestamp], NONCE_EXPIRATION)
         valid
       end
     end

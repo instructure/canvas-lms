@@ -34,7 +34,7 @@ define([
       });
       accounts.push(
         <li key='allAccountLink' className='ic-NavMenu-list-item ic-NavMenu-list-item--feature-item'>
-          <a href='/accounts'>{I18n.t('All Accounts')}</a>
+          <a href='/accounts' className='ic-NavMenu-list-item__link'>{I18n.t('All Accounts')}</a>
         </li>
       );
       return accounts;

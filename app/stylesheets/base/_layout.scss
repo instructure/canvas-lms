@@ -84,10 +84,9 @@ body {
 #wrapper-container {
   margin-left: $ic-header-primary-width - 30;
 
-  @include breakpoint(tablet) {
+  body.primary-nav-expanded & {
     margin-left: $ic-header-primary-width;
   }
-  body.primary-nav-expanded & { margin-left: $ic-header-primary-expanded-width; }
   body.no-headers & { margin-left: 0; }
 }
 
@@ -174,8 +173,6 @@ div.content_notice {
 
 iframe.tool_launch {
   min-height: 500px;
-  width: 100%;
-  height: 100%;
   border: none;
 }
 // implemented to make new profile page use flex for layout //

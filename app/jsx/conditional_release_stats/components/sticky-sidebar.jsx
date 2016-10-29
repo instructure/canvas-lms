@@ -5,12 +5,10 @@ define([
   const { bool, object, func } = React.PropTypes
 
   return class StickySidebar extends React.Component {
-    static get propTypes () {
-      return {
-        children: object,
-        isHidden: bool,
-        closeSidebar: func.isRequired,
-      }
+    static propTypes = {
+      children: object,
+      isHidden: bool,
+      closeSidebar: func.isRequired,
     }
 
     componentDidUpdate (prevProps) {

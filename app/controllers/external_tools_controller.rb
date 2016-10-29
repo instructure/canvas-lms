@@ -756,6 +756,52 @@ class ExternalToolsController < ApplicationController
     end
   end
 
+  # Add an external tool and verify the provided
+  # configuration url matches the associated
+  # configuration url listed on the app
+  # center. Besides the argument listed, all arguments
+  # are identical to the "Create an external tool"
+  # endpoint.
+  #
+  # @argument app_center_id [Required, String]
+  #   ID of the external tool in the app center
+  #
+  # @argument config_settings [String]
+  #   Stringified object of key/value pairs to be used
+  #   as query string parameters on the XML configuration
+  #   URL.
+  def create_tool_with_verification
+    if authorized_action(@context, @current_user, :update)
+      app_api = AppCenter::AppApi.new
+
+      required_params = [
+        :consumer_key,
+        :shared_secret,
+        :name,
+        :app_center_id,
+        :context_id,
+        :context_type,
+        :config_settings
+      ]
+
+      external_tool_params = params.select{|k, _| required_params.include?(k.to_sym)}
+
+      external_tool_params[:config_url] = app_api.get_app_config_url(params[:app_center_id], params[:config_settings])
+      external_tool_params[:config_type] = 'by_url'
+
+      @tool = @context.context_external_tools.new
+      set_tool_attributes(@tool, external_tool_params)
+      respond_to do |format|
+        if @tool.save
+          invalidate_nav_tabs_cache(@tool)
+          format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
+        else
+          format.json { render :json => @tool.errors, :status => :bad_request }
+        end
+      end
+    end
+  end
+
   # @API Edit an external tool
   # Update the specified external tool. Uses same parameters as create
   #

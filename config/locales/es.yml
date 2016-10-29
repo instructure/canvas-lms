@@ -146,7 +146,7 @@ es:
       no_auth_type_description: "Esta cuenta actualmente no se integra con un proveedor de identidad."
       page_title: "Configuraciones de Autentificación"
       profile_page_link_example: "Por ejemplo, aquí está la página de su perfil: [%{friendlyname}](%{url})"
-      settings_description: "Para que un usuario pueda autentificar a través de un proveedor externo de identidad (IdP), el usuario debe tener un identificador de ingreso que está unido a esta cuenta y que concuerda el identificador único provisto por el IdP. Para ver los ingresos actuales del usuario, vea la sección  “Información de Ingreso” en la página del perfil del usuario. (Encontrado haciendo una busqueda del usuario en la lengüeta de “Usuarios”.)"
+      settings_description: "Para que un usuario se pueda autentificar a través de un proveedor externo de identidad (IdP), el usuario debe tener un identificador de ingreso que está unido a esta cuenta y que concuerda el identificador único provisto por el IdP. Para ver los ingresos actuales del usuario, vea la sección  “Información de Ingreso” en la página del perfil del usuario. (Encontrado haciendo una busqueda del usuario en la lengüeta de “Usuarios”.)"
       settings_title: "Configuraciónes de Autentificación"
       test_ldap_link: "Pobrar la autenticación LDAP"
     ldap_fields: 
@@ -970,7 +970,7 @@ es:
         add_admins: "Administradores de cuenta"
         configure_report: Configure...
         run_report: "Ejecutar el Informe"
-      login_handle_name_placeholder: "p. ej: inicio de sesión, nonbre de usuario o ID de alumno"
+      login_handle_name_placeholder: "p. ej: inicio de sesión, nombre de usuario o ID de alumno"
       manual_quotas: 
         find_button: Buscar
         manual_quotas_title: "Cuota configurable de forma manual"
@@ -1338,7 +1338,7 @@ es:
     add_topic_to: "Añadir temas de foro a %{module}"
   add_new_announcement_ddacd624: "Agregar un anuncio nuevo"
   add_new_group_7ac49f31: "Agregar nuevo grupo"
-  add_new_set_of_due_dates_e8e240f: "Agregar nuevo conjunto de fechas límites"
+  add_new_set_of_due_dates_e8e240f: "Agregar nuevo conjunto de horas límite"
   add_people_7ee4b2ec: "Agregar Personas"
   add_quiz_ip_filter_c7b37dc5: "Agregar Filtros IP para las evaluaciones"
   add_recipient_ff135ed7: "Agregar recipiente"
@@ -1432,7 +1432,7 @@ es:
   all_terms_cd27b0fb: "Todos los términos"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Permita que un moderador revise múltiples calificaciones independientes para las presentaciones seleccionadas"
   allow_bulk_grade_export_to_sis_e11a6e66: "Permitir la exportación de calificaciones en cantidades al SIS"
-  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Permitir que las imágenes del curso sean asignadas a un curso y usadas en las tarjetas del tablero de control"
+  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Permite que las imágenes del curso sean asignadas a un curso y usadas en las tarjetas del tablero de control"
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Permitir que las imágenes del curso sean asignadas a un curso y usadas en los dashcards."
   allow_in_mastery_paths_5332c786: "Permitir en los caminos de dominio"
   allow_lor_tools: "Permitir a los usuarios ver y utilizar herramientas externas configuradas para LOR."
@@ -1545,7 +1545,7 @@ es:
   announcements_a4b8ed4a: Anuncios
   anonymous_e1b8ad27: Anónimo
   anonymous_grading_ccb5045c: "Calificación anónima"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "La calificación anónima obliga a que los nombres de los estudiantes sean ocultados en SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "La calificación anónima obliga a que los nombres de los estudiantes se oculten en SpeedGrader™"
   anonymous_user: "Usuario anónimo"
   anonymous_user_d984b9ce: "Usuario anónimo"
   another_configuration_is_currently_selected_select_95b394e: "Otra configuración está seleccionada en este momento. El seleccionar esta configuración anulará la selección de la otra."
@@ -1660,8 +1660,8 @@ es:
   arrange_by_34a545de: "Organizado por"
   arrange_columns_by_assignment_group_33acdf03: "Arreglar columnas por grupo de trabajo"
   arrange_columns_by_assignment_group_59bbddd0: "Arreglar columnas por grupo de tarea"
-  arrange_columns_by_due_date_888f2551: "Arreglar las columnas por fecha límite de entrega"
-  arrange_columns_by_due_date_f74f9e2d: "Arreglar las columnas por fecha límite de entrega"
+  arrange_columns_by_due_date_888f2551: "Arreglar las columnas por hora límite de entrega"
+  arrange_columns_by_due_date_f74f9e2d: "Arreglar las columnas por hora límite de entrega"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Al escribir en este campo, la lista de grupos se filtrará automáticamente para incluir solo aquellos cuyo nombre coincida con su entrada."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Al escribir en este campo, la lista de resultados se actualizará automáticamente."
   ask_your_instructor_a_question_a61ca5e9: "Hágale una pregunta a su instructor"
@@ -1694,7 +1694,7 @@ es:
     gpa_scale_explainer: "¿Qué es la calificación de escala GPA?"
     group_assignment_must_have_group_set: "Seleccione un grupo para esta tarea"
     labels: 
-      due: "Fecha límite"
+      due: "Hora límite"
     name_is_required: "Es obligatorio escribir un nombre"
     name_too_long: "El nombre es demasiado largo"
     points_possible_number: "Puntos posibles debe ser un número"
@@ -1766,9 +1766,9 @@ es:
     unmuting_assignment: "Activando la tarea..."
   assignment_name_b2d87383: "Nombre de tarea"
   assignment_name_course_name_is_now_due_55613e9b: "%{assignment_name}, %{course_name}, se debe entregar ahora"
-  assignment_name_course_name_no_longer_has_a_due_da_a37b6a7c: "%{assignment_name}, %{course_name}, ya no tiene una fecha límite de entrega"
+  assignment_name_course_name_no_longer_has_a_due_da_a37b6a7c: "%{assignment_name}, %{course_name}, ya no tiene una hora límite de entrega"
   assignment_name_course_name_override_is_now_due_ed5ce1e: "%{assignment_name}, %{course_name} (%{override}) se debe entregar ahora"
-  assignment_name_course_name_override_no_longer_has_5a94da2b: "%{assignment_name}, %{course_name} (%{override}) ya no tiene una fecha límite de entrega"
+  assignment_name_course_name_override_no_longer_has_5a94da2b: "%{assignment_name}, %{course_name} (%{override}) ya no tiene una hora límite de entrega"
   assignment_name_grade_history_b506426c: "historial de calificación de %{assignment_name}"
   assignment_options_1e5b7074: "Opciones de la tarea"
   assignment_override: 
@@ -1864,7 +1864,7 @@ es:
       delete_assignment: "¿Está seguro de que desea borrar esta tarea?"
     create_assignment: 
       assignment: Tarea
-      assignment_due_at: "Fecha límite:"
+      assignment_due_at: "Hora límite:"
       assignment_name: "Nombre:"
       assignment_points: "Puntos:"
       assignment_type: "Tipo:"
@@ -1875,7 +1875,7 @@ es:
       discussion_type: Foro
       external_tool_type: "Herramienta externa"
       more: "Más opciones"
-      multiple_due_dates: "Varias fechas límite"
+      multiple_due_dates: "Varias horas límite"
       not_graded_type: "No calificado"
       quiz_type: Evaluación
       save: Guardar
@@ -1895,8 +1895,8 @@ es:
       available: Disponible
       multiple_dates: "Varias fechas"
     date_due_column_view: 
-      due: "Fecha límite"
-      due_date: "Fecha límite"
+      due: "Hora límite"
+      due_date: "Hora límite"
       multiple_dates: "Varias fechas"
     delete_group: 
       cancel: Cancelar
@@ -2676,7 +2676,7 @@ es:
     sample_final_answer: "Este valor es un ejemplo de una respuesta final para este tipo de pregunta"
   calendar: 
     agenda_view: 
-      due: "Fecha límite"
+      due: "Hora límite"
       loading: Cargando
       no_events: "*Sin eventos después de esta fecha*."
       starts_at: "Comienza el:"
@@ -2948,13 +2948,13 @@ es:
         assignment_done: "¡Hecho! ¡La tarea ha sido creada! Puede hacerle clic para ver los detalles, editar y borrar el evento, o arrastre y colóquelo en un día nuevo para cambiar su fecha."
         change_date: "Eso es fácil. Sólo arrastre el evento a una fecha nueva. O puede hacer clic en “Editar” para poder ser más específico."
         create: "Para crear un evento en el calendario, solo haga clic en el día en el calendario en donde quiere el evento."
-        create_assignment: "Al igual que con el evento del calendario, haga clic en la fecha donde quiere agregar la tarea. O puede crear una tarea sin una fecha límite, haciendo clic en la caja de “Eventos sin Fecha” (*¿donde?*)."
+        create_assignment: "Al igual que con el evento del calendario, haga clic en la hora donde quiere agregar la tarea. O puede crear una tarea sin una hora límite, haciendo clic en la caja de “Eventos sin Fecha” (*¿donde?*)."
         delete: "Haga clic en el evento o tarea en el calendario que quiere borrar."
         delete2: "Ahora haga clic en “Borrar” (*¿donde?*) y su evento será borrado."
         delete_done: "Hecho y listo. Esa fue una acción de borrado extreme que hizo."
         done: "¡Listo! ¡El evento se ha creado! Puede hacerle clic para ver los detalles, editarlo y borrarlo, o arrástrelo y póngalo en un día nuevo para cambiar su fecha."
         edit: "¡Excelente! Ahora solo agregue un nombre para el (*¿donde?*). Puede especificar un tiempo de comienzo y finalizado si quiere. O sólo un tiempo de inicio. Haga clic en “Enviar” para terminar."
-        edit_assignment: "Ahora solo ingrese un nombre para la tarea (*¿donde?*) y el grupo de trabajo al que pertenece. Puede especificar una fecha límite si quiere también. Haga clic en “Enviar” para finalizar."
+        edit_assignment: "Ahora solo ingrese un nombre para la tarea (*¿donde?*) y el grupo de trabajo al que pertenece. Puede especificar una hora límite si quiere también. Haga clic en “Enviar” para finalizar."
       labels: 
         i_would_like_to: "Me gustaría"
       links: 
@@ -3558,7 +3558,7 @@ es:
         add_day_sub_title: "Agregar día de sustitución"
         beginning_change_to: "cambiar a"
         beginning_date: "Fecha de inicio"
-        checkbox_label: "Ajustar eventos y fechas límites"
+        checkbox_label: "Ajustar eventos y horas límites"
         date_adjustment: "Ajuste de datos"
         ending_change_to: "cambiar a"
         ending_date: "Fecha de finalización"
@@ -4567,7 +4567,7 @@ es:
     copy: 
       buttons: 
         create_course: "Crear un Curso"
-      conclude_at: "Fecha límite"
+      conclude_at: "Hora límite"
       content_label: Contenido
       course_code: "Código del curso"
       details: "Ingrese los siguientes detalles para comenzar creando una copia de este curso."
@@ -5574,8 +5574,8 @@ es:
   discussion_topics: 
     assignment_details: 
       available_from: "Disponible desde"
-      due: "Fecha límite"
-      due_date: "fecha límite %{date}"
+      due: "Hora límite"
+      due_date: "fora límite %{date}"
       for: Para
       graded_discussion_and_points: 
         one: "Este es un foro con calificación: *vale 1 punto*"
@@ -5595,12 +5595,12 @@ es:
     discussion: 
       close_for_comments: "Cerrar para comentarios"
       delete: Borrar
-      due: "Fecha límite"
+      due: "Hora límite"
       graded_discussion: "Foro con calificación:"
       last_post_date: "Última publicación %{display_last_reply_at}"
       manage: Manejar
       move: "Mover a..."
-      no_due_date: "No hay fecha límite"
+      no_due_date: "No hay hora límite"
       open_for_comments: "Abrir para comentarios"
       pin: Anclar
       unpin: Desanclar
@@ -5708,7 +5708,7 @@ es:
       first_page: Primera
       last_page: Última
     peer_reviews: 
-      due_date: "fecha límite %{date}"
+      due_date: "hora límite %{date}"
       peer_review_alert: "Se le ha asignado una revisión por pares para %{person}"
     points_possible_number: "Puntos posibles debe ser un número"
     published_button: 
@@ -5868,7 +5868,7 @@ es:
   display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Mostrar todos los enlaces de texto en lCanvas *como texto subrayado*."
   display_course_catalog: "Muestra una lista de cursos en la que se puede buscar para esta cuenta principal con el marcador \"Incuya este curso en el índice de cursos públicos\" habilitado."
   display_name_b80c243e: "Mostrar nombre"
-  display_total_grades_when_the_all_grading_periods__1d2b5cf: "Mostrar las calificaciones totales cuando se selecciona la opción desplegable de \"Todos los períodos de calificación\" (debe estar habilitada la opción Múltiples períodos de calificación )."
+  display_total_grades_when_the_all_grading_periods__1d2b5cf: "Muestra las calificaciones totales cuando se selecciona la opción desplegable de \"Todos los períodos de calificación\" (debe estar habilitada la opción Múltiples períodos de calificación)."
   display_totals_for_all_grading_periods_ad1ea050: "Mostrar los totales para \"Todos los períodos de calificación\""
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: "Distribución de las distintas calificaciones de los cursos para todos los alumnos inscritos en los cursos del departamento."
   district_id_6f408184: "ID del distrito"
@@ -5901,13 +5901,13 @@ es:
   dropdown_option_1_e6ff2fc: "Opción de desplegable 1"
   dropdown_option_2_9766a346: "Opción de desplegable 2"
   dropped_for_grading_purposes_46256461: "Eliminado por motivos de calificación"
-  due_a73610f6: "Fecha límite"
-  due_assignment_due_date_time_5acdf3cf: "Fecha límite de entrega: %{assignment_due_date_time}"
-  due_assignment_due_date_time_607f2e1d: "fecha límite: %{assignment_due_date_time}"
+  due_a73610f6: "Hora límite"
+  due_assignment_due_date_time_5acdf3cf: "Hora límite de entrega: %{assignment_due_date_time}"
+  due_assignment_due_date_time_607f2e1d: "hora límite: %{assignment_due_date_time}"
   due_at_5d7d2fa: "Vence el:"
   due_at_5e18eeac: "Vence el:"
   due_at_time_fa41cf6c: "Se vence a las: %{time}"
-  due_by_c263dc10: "Fecha límite:"
+  due_by_c263dc10: "Hora límite:"
   due_date_5d0a953c: "Fecha de entrega:"
   due_date_6a281fe3: "Fecha de vencimiento: %{date}"
   due_date_822625d8: "Fecha de vencimiento"
@@ -5919,8 +5919,8 @@ es:
   due_date_cannot_be_before_section_start_f8950484: "La fecha de vencimiento no puede ser anterior al inicio de la sección"
   due_date_cannot_be_before_term_start_ea660b2c: "La fecha de vencimiento no puede ser anterior al inicio del período"
   due_date_cannot_be_before_unlock_date_f263aab0: "La fecha de entrega no puede ser antes de la fecha de bloqueo"
-  due_date_field_for_styleguide_a88e02d6: "El campo de Fecha límite de entrega para la guía de estilo"
-  due_date_set_1c6364db: "Fecha límite de entrega establecida"
+  due_date_field_for_styleguide_a88e02d6: "El campo de hora límite de entrega para la guía de estilo"
+  due_date_set_1c6364db: "Hora límite de entrega establecida"
   due_dates: 
     due_at: "fecha límite: %{assignment_due_date_time}"
     multiple_due_dates: "vencimiento: muchas fechas de vencimiento"
@@ -5931,10 +5931,10 @@ es:
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Límite - Formato como DD-MM-YYYY hh:mm"
   due_multiple_dates_cc0ee3f5: "Fecha de vencimiento: varias fechas"
   due_multiple_dates_ea8a95e1: "vencimiento: varias fechas"
-  due_multiple_due_dates_d1b141b: "Fecha límite de entrega: múltiples fechas límites de entrega"
-  due_no_due_date_2b226d2c: "Fecha límite de entrega: No hay fecha límite"
-  due_no_due_date_3c1d1651: "fecha límite: No hay fecha límite"
-  due_on_date_5ffb2182: "Fecha límite de entrega el"
+  due_multiple_due_dates_d1b141b: "Hora límite de entrega: múltiples fechas límites de entrega"
+  due_no_due_date_2b226d2c: "Hora límite de entrega: No hay fecha límite"
+  due_no_due_date_3c1d1651: "hora límite: No hay fecha límite"
+  due_on_date_5ffb2182: "Hora límite de entrega el"
   due_time_9acd6b69: "Se vence a las %{time}"
   duplicate_provider_provider_d9842134: "Duplicar el proveedor %{provider}"
   e_c2991d1b: e
@@ -6085,14 +6085,14 @@ es:
   enable_6f5d1328: Habilitar
   enable_dashboard_images_for_courses_5af458b0: "Habilitar Imágenes del tablero de control para Cursos"
   enable_feature_title_987d8e9a: "Habilitar función: %{title}"
-  enable_gradebook_list_students_by_sortable_name: "Haga una lista de los alumnos por orden alfabético en el libro de calificaciones. El orden predeterminado de los nombres es \"Apellido, Nombre\", aunque esta opción puede cambiarse en la configuración."
-  enable_multiple_grading_periods: "Multiples periodos de calificación permiten que los maestros y administradores creen periodos de calificación con fecha límite establecida. Las tareas pueden ser filtradas por estos periodos de calificación en el Libro de calificaciones."
+  enable_gradebook_list_students_by_sortable_name: "Permite hacer una lista de los alumnos por orden alfabético en el libro de calificaciones. El orden predeterminado de los nombres es \"Apellido, Nombre\", aunque esta opción puede cambiarse en la configuración."
+  enable_multiple_grading_periods: "Multiples periodos de calificación permiten que los maestros y administradores creen periodos de calificación con hora límite establecida. Las tareas pueden ser filtradas por estos periodos de calificación en el Libro de calificaciones."
   enable_or_condition_for_modules_a16f02d8: "Habilitar \"O\" Condiciones para Módulos"
   enable_reregistration_for_lti_2_b2a10444: "Habilitar la re-registración para LTI 2"
   enabled_links_be110215: "Enlaces Habilitados"
   end_date_cannot_be_before_start_date_eb62ed6d: "La fecha de término debe ser antes de la fecha de comienzo"
   end_date_cdd7a7b6: "Fecha de finalización"
-  end_date_e0093ed7: "Fecha límite"
+  end_date_e0093ed7: "Hora límite"
   ending_date_e1ea13a4: "Fecha de finalización"
   enrolled_as_272da3b9: "Inscrito como"
   enrollment: 
@@ -7187,7 +7187,7 @@ es:
       headers: 
         anonymous: "Calificado anónimamente"
         details: Información
-        due: "Fecha Límite"
+        due: "Hora límite"
         grades: "Calificaciones para %{student}"
         name: Nombre
         out_of: De
@@ -8366,7 +8366,7 @@ es:
       log_in_to_canvas: "Iniciar sesión en Canvas"
   learn_more_about_collaborations_2978f66d: "Aprenda más sobre colaboraciones"
   learning_mastery_5fc34276: "Dominio de aprendizaje"
-  learning_mastery_gradebook_description: "El libro de calificaciones de dominio del aprendizaje representa el modo en el que los profesores pueden ver de un vistazo el progreso del curso y de los alumnos en los resultados de aprendizaje de los cursos. Los resultados se presentan en un formato similar al de los libros de calificaciones y el progreso del alumno aparece tanto en el formato de puntuación numérica como clasificado como dominado/casi dominio/medidas correctoras."
+  learning_mastery_gradebook_description: "El libro de calificaciones de dominio del aprendizaje representa el modo en el que los profesores pueden ver el progreso del curso y de los alumnos en los resultados de aprendizaje de los cursos. Los resultados se presentan en un formato similar al de los libros de calificaciones y el progreso del alumno aparece tanto en el formato de puntuación numérica como clasificado como dominado/casi dominio/medidas correctoras."
   learning_outcome: 
     no_comment: "Sin Comentario"
     no_description: "Sin Descripción"
@@ -9185,28 +9185,28 @@ es:
         no_due_date: "fecha límite: No hay Fecha Límite"
     assignment_due_date_changed: 
       email: 
-        assignment_due_date_changed: "La fecha límite para la tarea ha cambiado: %{assignment_name}, %{course_name}"
-        assignment_due_date_changed_sentence: "La fecha límite para la tarea, %{assignment_name}, para el curso, %{course_name}, ha cambiado a:"
+        assignment_due_date_changed: "La hora límite para la tarea ha cambiado: %{assignment_name}, %{course_name}"
+        assignment_due_date_changed_sentence: "La hora límite para la tarea, %{assignment_name}, para el curso, %{course_name}, ha cambiado a:"
         html: 
-          assignment_due_date_changed: "La fecha límite de la tarea ha cambiado: %{assignment_name}, %{course_name}"
-          assignment_due_date_changed_sentence: "La fecha límite para la tarea, %{assignment_name}, para el curso, %{course_name}, ha cambiado a:"
+          assignment_due_date_changed: "La hora límite de la tarea ha cambiado: %{assignment_name}, %{course_name}"
+          assignment_due_date_changed_sentence: "La hora límite para la tarea, %{assignment_name}, para el curso, %{course_name}, ha cambiado a:"
           link_text: "Ver la tarea"
-          no_due_date: "No hay fecha límite"
+          no_due_date: "No hay hora límite"
         labels: 
           click_to_see_assignment: "Haga clic aquí para ver la tarea"
-        no_due_date: "No Hay Fecha Límite"
+        no_due_date: "No Hay Hora Límite"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name}, está atrasada:"
         more_info_at_url: "Más información en %{web_address}"
         no_due_date: "No Hay Fecha Límite"
       summary: 
         assignment_due_date_changed: "La fecha límite de la tarea ha cambiado: %{assignment_name}, %{course_name}"
-        due_at: "Fecha Límite: %{assignment_due_date_time}"
-        no_due_date: "Fecha Límite: No hay Fecha Límite"
+        due_at: "Hora Límite: %{assignment_due_date_time}"
+        no_due_date: "Hora Límite: No hay Hora Límite"
       twitter: 
         assignment_change: "Alerta de Canvas - Cambio de Fecha: %{assignment_name}, %{course_name}"
-        due_at: "Fecha Límite: %{assignment_due_date_time}"
-        no_due_date: "Fecha Límite: No Hay Fecha Límite"
+        due_at: "Hora Límite: %{assignment_due_date_time}"
+        no_due_date: "Hora Límite: No Hay Hora Límite"
     assignment_due_date_override_changed: 
       email: 
         assignment_due_date_changed: "Cambio en la fecha de vencimiento de la asignación: %{assignment_name}, %{course_name} (%{override})"
@@ -9215,7 +9215,7 @@ es:
           assignment_due_date_changed: "Fecha de vencimiento de la tarea modificada: %{assignment_name}, %{course_name} (%{override})"
           assignment_due_date_changed_sentence: "Se ha modificado la fecha de vencimiento de la tarea, %{assignment_name}, para el curso, %{course_name} (%{override}), a:"
           link: "Haga clic aquí para ver la tarea"
-          no_due_date: "No hay fecha límite"
+          no_due_date: "No hay hora límite"
         labels: 
           click_to_see_assignment: "Haga clic aquí para ver la tarea"
         no_due_date: "Sin fecha de vencimiento"
@@ -9225,12 +9225,12 @@ es:
         no_due_date: "Sin fecha de vencimiento"
       summary: 
         assignment_due_date_changed: "Cambio en la fecha de vencimiento de la asignación: %{assignment_name}, %{course_name} (%{override})"
-        due_at: "fecha límite: %{assignment_due_date_time}"
-        no_due_date: "fecha límite: No hay fecha límite"
+        due_at: "hora límite: %{assignment_due_date_time}"
+        no_due_date: "hora límite: No hay hora límite"
       twitter: 
         assignment_change: "Alerta de Canvas - Cambio de fecha: %{assignment_name}, %{course_name} (%{override})"
-        due_at: "fecha límite: %{assignment_due_date_time}"
-        no_due_date: "fecha límite: No hay Fecha Límite"
+        due_at: "hora límite: %{assignment_due_date_time}"
+        no_due_date: "hora límite: No hay Hora Límite"
     assignment_graded: 
       email: 
         assignment_graded: "Tarea Calificada: %{assignment_name}, %{course_name}"
@@ -10737,7 +10737,7 @@ es:
   moving_a4d552df: Moviendo...
   multi_factor_authentication_configured_865b1bde: "Autenticación de factores múltiples configurada"
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Múltiples cuentas de Canvas están asociadas con Clever District %{district_id}"
-  multiple_due_dates_6b0d75c6: "Varias fechas límites"
+  multiple_due_dates_6b0d75c6: "Varias horas límites"
   multiple_modules_930713d4: "Varios módulos"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
     one: "Debe alcanzar el dominio al menos una vez. Se promediará las puntuaciones que estén por encima del dominio para calcular la puntuación final."
@@ -10852,9 +10852,9 @@ es:
   no_courses_found_12d68a74: "No se encontraron cursos"
   no_date_bfeb2df7: "Sin fecha"
   no_directory_is_selected_please_select_a_directory_46ded46: "No se ha seleccionado el directorio. Seleccione un directorio antes de hacer clic en \"mover\""
-  no_due_date_1d63d13b: "No hay fecha límite"
-  no_due_date_44271c53: "No hay fecha límite"
-  no_due_date_6e6a23c1: "(no hay fecha límite)"
+  no_due_date_1d63d13b: "No hay hora límite"
+  no_due_date_44271c53: "No hay hora límite"
+  no_due_date_6e6a23c1: "(no hay hora límite)"
   no_e16d9132: "No"
   no_final_grade_selected_3595c9c: "No se ha seleccionado una calificación final"
   no_grade_3fa326c: "sin calificación"
@@ -10946,7 +10946,7 @@ es:
       course_content: "Contenido del Curso"
       discussion: Foro
       discussion_entry: "Ingreso de Foro"
-      due_date: "Fecha Límite"
+      due_date: "Hora Límite"
       files: Archivos
       grading: Calificación
       grading_policies: "Políticas de Calificación"
@@ -11028,12 +11028,12 @@ es:
       appointment_reserved_for_user: "Cita reservada por el usuario"
       assignment_changed: "Tarea Cambió"
       assignment_created: "Tarea Creada"
-      assignment_due_date_changed: "Cambió la Fecha Límite de la Tarea"
+      assignment_due_date_changed: "Cambió la Hora Límite de la Tarea"
       assignment_due_date_override_changed: "Cambio en la omisión de la fecha de vencimiento de la asignación"
       assignment_graded: "Tarea Calificada"
       assignment_resubmitted: "Tarea Reenviada"
       assignment_submitted: "La Tarea fue Enviada"
-      assignment_submitted_late: "Tarea Enviada después de la Fecha Límite"
+      assignment_submitted_late: "Tarea Enviada después de la Hora Límite"
       collaboration_invitation: "Invitación a Colaboración"
       confirm_email_communication_channel: "Confirmar el Canal de Comunicación de Correos Electrónicos"
       confirm_registration: "Confirmar la Inscripción"
@@ -11049,7 +11049,7 @@ es:
       event_date_changed: "Cambio en la Fecha del Evento"
       forgot_password: "Se olvidó la Contraseña"
       grade_weight_changed: "Peso de la Calificación Cambió"
-      group_assignment_submitted_late: "Tarea de Grupo Enviada después de la Fecha Límite"
+      group_assignment_submitted_late: "Tarea de Grupo Enviada después de la Hora Límite"
       group_membership_accepted: "Se Aceptó la Membresía del Grupo"
       group_membership_rejected: "Membresía del Grupo Rechazada"
       merge_email_communication_channel: "Unir el Canal de Comunicación de Correos Electrónicos"
@@ -13355,7 +13355,7 @@ es:
       notices: 
         cant_view_submission_while_muted: "No puede ver el historial de la evaluación mientras esté bloqueada."
         has_submissions_already: "Recuerde, algunos alumnos ya han realizado o han comenzado a realizar esta evaluación"
-        less_than_allotted_time: "Como empezó esta evaluación cerca de la fecha límite, no contará con todo el tiempo para terminarla."
+        less_than_allotted_time: "Como empezó esta evaluación cerca de la hora límite, no contará con todo el tiempo para terminarla."
         no_submission_for_user: "No hay envíos disponibles para ese usuario"
         quiz_updated: "Evaluación actualizada correctamente"
         quizzes_published: 
@@ -13408,7 +13408,7 @@ es:
       quiz_details: 
         allowed_attempts: "Intentos permitidos"
         headers: 
-          due: "Fecha límite"
+          due: "Hora límite"
           points: Puntos
           questions: Preguntas
           time_limit: "Tiempo límite"
@@ -13451,7 +13451,7 @@ es:
         available_from: "Disponible desde"
         cant_go_back: "Bloquear preguntas después de responderlas"
         code: "Código de acceso"
-        due: "Fecha límite"
+        due: "Hora límite"
         filter: "Filtro IP"
         for: Para
         group: "Grupo de trabajo"
@@ -14844,7 +14844,7 @@ es:
       crowdsourced_warning_title: "Idioma traducido mediante \"crowdsourcing\""
     menu_assignment: 
       labels: 
-        due: "fecha límite"
+        due: "hora límite"
       needs_grading_count: 
         one: "1 necesita calificación"
         other: "%{count} necesita calificación"
@@ -14893,7 +14893,7 @@ es:
         dashboard: "Panel de control"
         skip_to_content: "Saltar al contenido"
     no_recent_activity: 
-      empty_stream_message: " No tiene mensajes que mostrar aún en su stream. Una vez comience a participar en sus cursos verá este stream llenarse de mensajes de las foros, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
+      empty_stream_message: "No tiene mensajes que mostrar aún en su stream. Una vez comience a participar en sus cursos verá este stream llenarse de mensajes de los foros, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
       no_recent_messages: "No hay Mensajes Recientes"
     pending_enrollment: 
       designer: "%{course} como diseñador."
@@ -15426,7 +15426,7 @@ es:
     assignment_muted: "Haga clic para reactivar audio"
     assignment_order_alpha: "Por orden alfabético"
     assignment_order_assignment_groups: "Por grupo de trabajo y posición"
-    assignment_order_due_date: "Por fecha límite"
+    assignment_order_due_date: "Por hora límite"
     assignment_unmuted: "Haga clic para desactivar audio"
     discussion_topic: "Tema de Foro"
     external_tool: "Herramienta externa"
@@ -16306,7 +16306,7 @@ es:
       resubmit_to_turnitin: "Voler a enviar a Turnitin"
   turnitin_settings: 
     originality_report_never: Nunca
-    originality_report_visible_after_due_date: "Después de la fecha límite"
+    originality_report_visible_after_due_date: "Después de la hora límite"
     originality_report_visible_after_grading: "Después de que la tarea se califique"
     originality_report_visible_immediately: Inmediatamente
   twitter_fcef6b54: Twitter

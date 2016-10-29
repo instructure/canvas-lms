@@ -13,14 +13,12 @@ define([
     let $el = ReactDOM.findDOMNode(component);
     ok($el, "expect element to exist");
     equal($el.getAttribute('aria-disabled'), 'true');
-    ok(_.contains($el.classList, 'disabled'));
   };
 
   const assertEnabled = function(component) {
     let $el = ReactDOM.findDOMNode(component);
     ok($el, "expect element to exist");
-    equal($el.getAttribute('aria-disabled'), 'false');
-    notOk(_.contains($el.classList, 'disabled'));
+    notEqual($el.getAttribute('aria-disabled'), 'true');
   };
 
   const urls = {
@@ -148,7 +146,7 @@ define([
 
   test("calls the onEdit prop when the 'edit grading period set' button is clicked", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.editButton));
     ok(set.props.onEdit.calledOnce);
     equal(set.props.onEdit.args[0][0], set.props.set);
   });
@@ -157,7 +155,7 @@ define([
     this.stub(axios, "delete");
     this.stub(window, "confirm", () => false);
     let set = this.renderComponent();
-    Simulate.click(set.refs.deleteButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.deleteButton));
     ok(set.props.onDelete.notCalled);
   });
 
@@ -165,7 +163,7 @@ define([
     let deletePromise = this.stubDeleteSuccess();
     this.stub(window, "confirm", () => true);
     let set = this.renderComponent();
-    Simulate.click(set.refs.deleteButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.deleteButton));
     deletePromise.then(function() {
       ok(set.props.onDelete.calledOnce);
       start();
@@ -187,14 +185,14 @@ define([
   test("renders the 'GradingPeriodForm' when 'edit grading period' is clicked", function() {
     let set = this.renderComponent();
     notOk(!!set.refs.editPeriodForm);
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     ok(set.refs.editPeriodForm);
   });
 
   test("disables all grading period actions while open", function() {
     let set = this.renderComponent();
     notOk(!!set.refs.editPeriodForm);
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     assertDisabled(set.refs.addPeriodButton);
     ok(set.refs["show-grading-period-2"].props.actionsDisabled);
     ok(set.refs["show-grading-period-3"].props.actionsDisabled);
@@ -203,29 +201,28 @@ define([
   test("disables set toggling while open", function() {
     let spy = sinon.spy();
     let set = this.renderComponent({ onToggleBody: spy });
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     Simulate.click(set.refs.toggleSetBody);
     notOk(spy.called);
   });
 
   test("'onCancel' removes the 'edit grading period' form", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     set.refs.editPeriodForm.props.onCancel();
     notOk(!!set.refs.editPeriodForm);
   });
 
   test("'onCancel' focuses on the 'edit grading period' button", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     set.refs.editPeriodForm.props.onCancel();
-    let editButton = ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton);
-    equal(document.activeElement, editButton);
+    equal(document.activeElement, ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
   });
 
   test("'onCancel' re-enables all grading period actions", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     set.refs.editPeriodForm.props.onCancel();
     assertEnabled(set.refs.addPeriodButton);
     notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
@@ -236,7 +233,7 @@ define([
   test("'onCancel' re-enables set toggling", function() {
     let spy = sinon.spy();
     let set = this.renderComponent({ onToggleBody: spy });
-    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
     set.refs.editPeriodForm.props.onCancel();
     Simulate.click(set.refs.toggleSetBody);
     ok(spy.calledOnce);
@@ -247,7 +244,7 @@ define([
       let attrs = _.extend({}, props, opts);
       const element = React.createElement(GradingPeriodSet, attrs);
       let component = ReactDOM.render(element, wrapper);
-      Simulate.click(component.refs["show-grading-period-1"].refs.editButton);
+      Simulate.click(ReactDOM.findDOMNode(component.refs["show-grading-period-1"].refs.editButton));
       return component;
     },
 
@@ -367,7 +364,7 @@ define([
     renderComponent() {
       const element = React.createElement(GradingPeriodSet, props);
       let component = ReactDOM.render(element, wrapper);
-      Simulate.click(component.refs["show-grading-period-1"].refs.editButton);
+      Simulate.click(ReactDOM.findDOMNode(component.refs["show-grading-period-1"].refs.editButton));
       return component;
     },
 
@@ -541,13 +538,13 @@ define([
   test("renders the 'GradingPeriodForm' when 'add grading period' is clicked", function() {
     let set = this.renderComponent();
     notOk(!!set.refs.newPeriodForm);
-    Simulate.click(set.refs.addPeriodButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.addPeriodButton));
     ok(set.refs.newPeriodForm);
   });
 
   test("disables all grading period actions while open", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs.addPeriodButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.addPeriodButton));
     ok(set.refs["show-grading-period-1"].props.actionsDisabled);
     ok(set.refs["show-grading-period-2"].props.actionsDisabled);
     ok(set.refs["show-grading-period-3"].props.actionsDisabled);
@@ -555,21 +552,21 @@ define([
 
   test("'onCancel' removes the 'new period form'", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs.addPeriodButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.addPeriodButton));
     set.refs.newPeriodForm.props.onCancel();
     notOk(!!set.refs.newPeriodForm);
   });
 
   test("'onCancel' focuses on the 'add grading period' button", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs.addPeriodButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.addPeriodButton));
     set.refs.newPeriodForm.props.onCancel();
     equal(document.activeElement, ReactDOM.findDOMNode(set.refs.addPeriodButton));
   });
 
   test("'onCancel' re-enables all grading period actions", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs.addPeriodButton);
+    Simulate.click(ReactDOM.findDOMNode(set.refs.addPeriodButton));
     set.refs.newPeriodForm.props.onCancel();
     assertEnabled(set.refs.addPeriodButton);
     notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
@@ -599,7 +596,7 @@ define([
     renderComponent(opts = {}) {
       const element = React.createElement(GradingPeriodSet, _.defaults(opts, props));
       let component = ReactDOM.render(element, wrapper);
-      Simulate.click(component.refs.addPeriodButton);
+      Simulate.click(ReactDOM.findDOMNode(component.refs.addPeriodButton));
       return component;
     },
 
@@ -697,7 +694,7 @@ define([
     renderComponent() {
       const element = React.createElement(GradingPeriodSet, props);
       let component = ReactDOM.render(element, wrapper);
-      Simulate.click(component.refs.addPeriodButton);
+      Simulate.click(ReactDOM.findDOMNode(component.refs.addPeriodButton));
       return component;
     },
 

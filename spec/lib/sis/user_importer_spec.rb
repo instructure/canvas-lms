@@ -70,10 +70,6 @@ describe SIS::UserImporter do
       expect(@message).to include(@user_id)
     end
 
-    it 'must include the developer error message' do
-      expect(@message).to include('#<SIS::ImportError: unique_id is invalid>')
-    end
-
     it 'must include the text "Invalid login_id"' do
       expect(@message).to include('Invalid login_id')
     end

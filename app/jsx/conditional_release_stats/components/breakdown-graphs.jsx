@@ -1,23 +1,21 @@
 define([
   'react',
-  'instructure-ui',
+  'instructure-ui/Spinner',
+  'i18n!cyoe_assignment_sidebar',
   './breakdown-graph-bar',
   '../helpers/score',
-  'i18n!cyoe_assignment_sidebar',
-], (React, { Spinner }, BarGraph, scoreHelpers, I18n) => {
+], (React, { default: Spinner }, I18n, BarGraph, scoreHelpers) => {
   const { object, array, func, number, bool } = React.PropTypes
 
   class BreakdownGraphs extends React.Component {
-    static get propTypes () {
-      return {
-        assignment: object.isRequired,
-        ranges: array.isRequired,
-        enrolled: number.isRequired,
-        isLoading: bool.isRequired,
+    static propTypes = {
+      assignment: object.isRequired,
+      ranges: array.isRequired,
+      enrolled: number.isRequired,
+      isLoading: bool.isRequired,
 
-        // actions
-        selectRange: func.isRequired,
-      }
+      // actions
+      selectRange: func.isRequired,
     }
 
     renderContent () {

@@ -5,26 +5,25 @@ define([
   const { object, func } = React.PropTypes
 
   return class StudentRange extends React.Component {
-    static get propTypes () {
-      return {
-        range: object.isRequired,
-        onStudentSelect: func.isRequired,
-      }
+    static propTypes = {
+      range: object.isRequired,
+      onStudentSelect: func.isRequired,
     }
 
     render () {
       const students = this.props.range.students
-
       return (
         <div className='crs-student-range'>
-          {students.map((student, i) => (
-            <StudentRangeItem
-              key={i}
-              student={student}
-              studentIndex={i}
-              onSelect={this.props.onStudentSelect}
-            />
-          ))}
+          {this.props.range.students.map((student, i) => {
+            return (
+              <StudentRangeItem
+                key={student.user.id}
+                student={student}
+                studentIndex={i}
+                selectStudent={this.props.onStudentSelect}
+              />
+            )}
+          )}
         </div>
       )
     }

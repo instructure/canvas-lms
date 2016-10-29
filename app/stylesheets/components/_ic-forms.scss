@@ -1291,6 +1291,7 @@ select.ic-Input, input[type="file"].ic-Input {
 // special styles for textarea
 textarea.ic-Input {
   height: auto;
+  resize: vertical;
 }
 
 // We removed -webkit-appearance from anything with the

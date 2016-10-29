@@ -284,9 +284,9 @@ class AppointmentGroup < ActiveRecord::Base
   def possible_participants(registration_status: nil, include_observers: false)
     participants = if participant_type == 'User'
                      participant_func = if include_observers
-                                          ->(c) {c.participating_students + c.participating_observers}
+                                          ->(c) {c.participating_students_by_date + c.participating_observers_by_date}
                                         else
-                                          ->(c) {c.participating_students}
+                                          ->(c) {c.participating_students_by_date}
                                         end
                      sub_contexts.empty? ?
                        contexts.map(&participant_func).flatten :

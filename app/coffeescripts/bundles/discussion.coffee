@@ -18,10 +18,11 @@ require [
   'compiled/views/DiscussionTopic/DiscussionTopicToolbarView'
   'compiled/views/DiscussionTopic/TopicView'
   'compiled/views/DiscussionTopic/EntriesView'
+  'jsx/conditional_release_stats/index'
   'rubricEditBinding'     # sets up event listener for 'rubricEditDataReady'
   'compiled/jquery/sticky'
   'compiled/jquery/ModuleSequenceFooter'
-], (I18n, EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, React, ReactDOM, DiscussionTopicKeyboardShortcutModal, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, DiscussionTopicToolbarView, TopicView, EntriesView) ->
+], (I18n, EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, React, ReactDOM, DiscussionTopicKeyboardShortcutModal, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, DiscussionTopicToolbarView, TopicView, EntriesView, CyoeStats) ->
 
   descendants = 5
   children    = 10
@@ -206,3 +207,7 @@ require [
     topicView.on 'addReply', once
   else
     initEntries()
+
+  graphsRoot = document.getElementById('crs-graphs')
+  detailsParent = document.getElementById('not_right_side')
+  CyoeStats.init(graphsRoot, detailsParent)

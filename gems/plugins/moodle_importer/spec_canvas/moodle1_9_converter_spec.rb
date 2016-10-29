@@ -78,7 +78,7 @@ describe Moodle::Converter do
 
   context "assignments" do
     it "should convert assignments" do
-      expect(@course.assignments.count).to eq 6
+      expect(@course.assignments.where.not(:migration_id => nil).count).to eq 6
 
       assignment = @course.assignments.where(title: 'Create a Rails site').first
       expect(assignment).not_to be_nil

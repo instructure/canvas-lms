@@ -6,7 +6,7 @@
   <div class="ig-row__layout">
     {{#if canManage}}
     <div class="ig-handle">
-      <span class="draggable-handle">
+      <span class="draggable-handle{{#unless canMove}} disabled{{/unless}}">
         <i class="icon-drag-handle"></i>
       </span>
     </div>
@@ -26,7 +26,6 @@
                 {{module_name}} {{#t}}Module{{/t}}
               {{else}}
                 <a
-                  href='#'
                   title='{{joined_names}}'
                   class="tooltip_link"
                   data-tooltip-selector="#module_tooltip_{{labelId}}"
@@ -40,7 +39,7 @@
             </div>
           {{/if}}
         {{/if}}
-        {{#if showAvailability }}
+        {{#if showAvailability}}
         <div class="ig-details__item assignment-date-available" data-view="date-available">
         </div>
         {{/if}}
@@ -74,7 +73,6 @@
             id="assign_{{id}}_manage_link"
             role="button"
             tabindex="0"
-            href="#"
           >
             <span class="screenreader-only">{{#t}}Settings for Assignment {{name}}{{/t}}</span>
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
@@ -87,33 +85,59 @@
           >
             <li>
               <a
-                href="#"
                 class="edit_assignment icon-edit"
                 id="assignment_{{id}}_settings_edit_item"
                 aria-label="{{#t}}Edit Assignment {{name}}{{/t}}"
                 data-focus-returns-to="assign_{{id}}_manage_link"
-              >{{#t "edit"}}Edit{{/t}}</a>
+              >{{#t}}Edit{{/t}}</a>
             </li>
-            {{#unless frozen }}
+            {{#if canMove}}
             <li>
               <a
-                href="#"
+                class="move_assignment icon-updown"
+                id="assignment_{{id}}_settings_move_item"
+                aria-label='{{#t}}Move Assignment {{name}}{{/t}}'
+                data-focus-returns-to="assign_{{id}}_manage_link"
+              >{{#t}}Move To…{{/t}}</a>
+            </li>
+            {{else}}
+            <li>
+              <a
+                class="move_assignment icon-updown disabled"
+                id="assignment_{{id}}_settings_move_item"
+                aria-label='{{#t}}Move Assignment {{name}}{{/t}}'
+                aria-disabled=true
+              >{{#t}}Move To…{{/t}}</a>
+            </li>
+            {{/if}}
+            {{#if cyoeEnabled}}
+            <li>
+              <a
+                href="assignments/{{id}}/edit/#mastery-paths-editor"
+                class="edit_mastery_paths icon-mastery-path"
+                id="assignment_{{id}}_settings_edit_item_mastery_paths"
+                aria-label="{{#t}}Edit Assignment {{name}} Mastery Paths{{/t}}"
+                data-focus-returns-to="assign_{{id}}_manage_link"
+              >{{#t}}Mastery Paths{{/t}}</a>
+            </li>
+            {{/if}}
+            {{#if canDelete}}
+            <li>
+              <a
                 class="delete_assignment icon-trash"
                 id="assignment_{{id}}_settings_delete_item"
                 aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
                 data-focus-returns-to="assign_{{id}}_manage_link"
               >{{#t "delete"}}Delete{{/t}}</a>
             </li>
-            {{/unless}}
-            {{#if canMove}}
+            {{else}}
             <li>
               <a
-                href="#"
-                class="move_assignment icon-updown"
-                id="assignment_{{id}}_settings_move_item"
-                aria-label='{{#t}}Move Assignment {{name}}{{/t}}'
-                data-focus-returns-to="assign_{{id}}_manage_link"
-              >{{#t}}Move To…{{/t}}</a>
+                class="delete_assignment icon-trash disabled"
+                id="assignment_{{id}}_settings_delete_item"
+                aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
+                aria-disabled=true
+              >{{#t "delete"}}Delete{{/t}}</a>
             </li>
             {{/if}}
             {{>ExternalTools/external_tools_menu menu_tools}}

@@ -39,6 +39,7 @@ module Api::V1::Assignment
       peer_reviews
       anonymous_peer_reviews
       automatic_peer_reviews
+      intra_group_peer_reviews
       post_to_sis
       grade_group_students_individually
       group_category_id
@@ -86,6 +87,8 @@ module Api::V1::Assignment
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
+    hash['has_due_date_in_closed_grading_period'] =
+      assignment.due_for_any_student_in_closed_grading_period?
 
     if !opts[:overrides].blank?
       hash['overrides'] = assignment_overrides_json(opts[:overrides], user)
@@ -109,6 +112,8 @@ module Api::V1::Assignment
       hash['frozen'] = assignment.frozen_for_user?(user)
       hash['frozen_attributes'] = assignment.frozen_attributes_for_user(user)
     end
+
+    hash['is_quiz_assignment'] = assignment.quiz? && assignment.quiz.assignment?
 
     return hash if assignment.new_record?
 
@@ -141,8 +146,12 @@ module Api::V1::Assignment
     end
 
     if assignment.automatic_peer_reviews? && assignment.peer_reviews?
-      hash['peer_review_count'] = assignment.peer_review_count
-      hash['peer_reviews_assign_at'] = assignment.peer_reviews_assign_at
+      peer_review_params = assignment.slice(
+        :peer_review_count,
+        :peer_reviews_assign_at,
+        :intra_group_peer_reviews
+      )
+      hash.merge!(peer_review_params)
     end
 
     include_needs_grading_count = opts[:exclude_response_fields].exclude?('needs_grading_count')
@@ -209,7 +218,13 @@ module Api::V1::Assignment
     end
 
     if opts[:include_all_dates] && assignment.assignment_overrides
-      hash['all_dates'] = assignment.dates_hash_visible_to(user)
+      override_count = assignment.assignment_overrides.loaded? ?
+        assignment.assignment_overrides.select(&:active?).count : assignment.assignment_overrides.active.count
+      if override_count < Setting.get('assignment_all_dates_too_many_threshold', '25').to_i
+        hash['all_dates'] = assignment.dates_hash_visible_to(user)
+      else
+        hash['all_dates_count'] = override_count
+      end
     end
 
     if opts[:include_module_ids]
@@ -290,6 +305,7 @@ module Api::V1::Assignment
     peer_reviews_assign_at
     peer_review_count
     automatic_peer_reviews
+    intra_group_peer_reviews
     external_tool_tag_attributes
     grade_group_students_individually
     turnitin_enabled
@@ -329,7 +345,7 @@ module Api::V1::Assignment
     return false unless valid_assignment_dates?(assignment, assignment_params)
     return false unless valid_submission_types?(assignment, assignment_params)
 
-    assignment = update_from_params(assignment, assignment_params, user, context)
+    assignment = update_from_params(assignment, assignment_params, user, context, new_record: !old_assignment)
 
     if overrides
       assignment.transaction do
@@ -405,7 +421,7 @@ module Api::V1::Assignment
     end
   end
 
-  def update_from_params(assignment, assignment_params, user, context = assignment.context)
+  def update_from_params(assignment, assignment_params, user, context = assignment.context, new_record: false)
     update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_INPUT_FIELDS)
 
     if update_params.has_key?('peer_reviews_assign_at')
@@ -497,10 +513,10 @@ module Api::V1::Assignment
     end
 
     post_to_sis = assignment_params.key?('post_to_sis') ? value_to_boolean(assignment_params['post_to_sis']) : nil
-    if post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(context)
+    if new_record && (post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(context))
       # set the default setting if it is not included.
       assignment.post_to_sis = context.account.sis_default_grade_export[:value]
-    else
+    elsif !post_to_sis.nil?
       assignment.post_to_sis = post_to_sis
     end
 

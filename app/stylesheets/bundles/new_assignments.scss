@@ -9,10 +9,6 @@
   top: -16px;
 }
 
-#weight-groups {
-  padding-left: 15px;
-}
-
 .ag-header-controls {
   position: absolute;
   top: 0;
@@ -28,24 +24,20 @@
 }
 
 #ag_weights_wrapper {
-  overflow-y: auto;
-  position: absolute;
-  top: 35px;
-  left: 15px;
-  right: 15px;
-  bottom: 15px;
-  #assignment_groups_weights {
-    margin-top: 30px;
-    width: 100%;
-    td {
-      padding: 10px 0px;
-    }
-    td.right-align {
-      text-align: right;
-    }
-    tfoot td {
-      font-weight: bold;
-    }
+  position: relative;
+  padding: 0 20px;
+}
+
+#assignment_groups_weights {
+  width: 100%;
+  td {
+    padding: 10px 0px;
+  }
+  td.right-align {
+    text-align: right;
+  }
+  tfoot td {
+    font-weight: bold;
   }
 }
 
@@ -61,8 +53,38 @@
   }
 }
 
+.form-dialog-content.ag-weights-content {
+  bottom: 59px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+.ag-weights-message {
+  display: block;
+  margin: 20px 20px 0 20px;
+}
+
+.ag-weights-content .checkbox {
+  display: block;
+  margin: 20px;
+}
+
+.ag-weights-form {
+  overflow-y: scroll;
+}
+
+.ag-weights-table {
+  padding-bottom: 10px;
+}
+
 .ag-weights-tr {
   border-bottom: 1px solid #dae1e6;
+}
+
+.ag-settings-weights-message {
+  margin: 0 0 20px 0;
 }
 
 .remove_never_drop {
@@ -95,6 +117,14 @@
   color: darken($ic-color-neutral, 40%);
   a {
     color: darken($ic-color-neutral, 40%);
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+
+    .icon-drag-handle {
+      color: darken($ic-color-neutral, 10%);
+    }
   }
 }
 

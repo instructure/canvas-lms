@@ -153,3 +153,43 @@
     padding-right: 1em;
   }
 }
+// group switcher within left sub-nav
+.al-trigger--within-left-menu {
+  margin: 0 0 $ic-sp $ic-sp/2;
+}
+// set a max-width for this particular use case
+.al-options {
+  .ui-menu-item {
+    a {
+      box-sizing: border-box;
+      max-width: 200px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    &:first-of-type {
+      margin-top: 8px;
+    }
+    &:last-of-type {
+      margin-bottom: 8px;
+    }
+  }
+}
+// style the active group within the switcher
+.active-selection.ui-menu-item .ui-corner-all {
+  color: $ic-font-color--subdued;
+
+  &.ui-state-focus,
+  &:hover,
+  &:focus {
+    background: $ic-color-medium;
+    color: $ic-font-color-light;
+    font-weight: bold;
+  }
+}
+// need to account for setting focus to the first option (if selected)
+.active-selection.ui-menu-item:first-of-type {
+  & .ui-corner-all.ui-state-focus {
+    background: $ic-color-medium;
+  }
+}

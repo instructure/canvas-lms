@@ -2,10 +2,11 @@ define([
   'react',
   'react-dom',
   'underscore',
+  'instructure-ui/Button',
   'i18n!external_tools',
   'jsx/due_dates/DueDateCalendarPicker',
   'jsx/shared/helpers/accessibleDateFormat'
-], function(React, ReactDOM, _, I18n, DueDateCalendarPicker, accessibleDateFormat) {
+], function(React, ReactDOM, _, { default: Button }, I18n, DueDateCalendarPicker, accessibleDateFormat) {
   const update = React.addons.update;
   const Types = React.PropTypes;
 
@@ -144,21 +145,19 @@ define([
     renderSaveAndCancelButtons: function() {
       return (
         <div className="ic-Form-actions below-line">
-          <button className = "Button"
-                  type      = "button"
-                  ref       = "cancelButton"
+          <Button ref       = "cancelButton"
                   disabled  = {this.props.disabled}
                   onClick   = {this.triggerCancel}>
             {I18n.t("Cancel")}
-          </button>
-          <button className  = "Button Button--primary"
-                  type       = "submit"
+          </Button>
+          &nbsp;
+          <Button variant    = "primary"
                   ref        = "saveButton"
                   aria-label = {I18n.t("Save Grading Period")}
                   disabled   = {this.props.disabled}
                   onClick    = {this.triggerSave}>
             {I18n.t("Save")}
-          </button>
+          </Button>
         </div>
       );
     },

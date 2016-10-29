@@ -18,16 +18,6 @@
 
 require 'atom'
 
-# == Schema Information
-#
-# Table name: wikis
-#
-#  id         :integer(4)      not null, primary key
-#  title      :string(255)
-#  created_at :datetime
-#  updated_at :datetime
-#
-
 class Wiki < ActiveRecord::Base
   attr_accessible :title
 

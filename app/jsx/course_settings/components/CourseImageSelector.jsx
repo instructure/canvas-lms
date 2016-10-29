@@ -4,10 +4,8 @@ define([
   'i18n!course_images',
   '../actions',
   './CourseImagePicker',
-  'instructure-ui'
-], (React, Modal, I18n, Actions, CourseImagePicker, InstUI) => {
-
-  const Spinner = InstUI.Spinner;
+  'instructure-ui/Spinner'
+], (React, Modal, I18n, Actions, CourseImagePicker, { default: Spinner }) => {
 
   const modalOverrides = {
     content : {
@@ -70,34 +68,34 @@ define([
               </a>
 
               <ul id="courseImage-editDropdown-1"
-                  ref="editDropdown" 
-                  className="al-options" 
-                  role="menu" 
-                  tabIndex="0" 
-                  aria-hidden="true" 
-                  aria-expanded="false" 
+                  ref="editDropdown"
+                  className="al-options"
+                  role="menu"
+                  tabIndex="0"
+                  aria-hidden="true"
+                  aria-expanded="false"
                   aria-activedescendant="courseImage-editDropdown-2"
               >
                 <li role="presentation">
-                  <a href="#" 
+                  <a href="#"
                      onClick={() => this.changeImage()}
-                     className="icon-compose" 
+                     className="icon-compose"
                      id="courseImage-editDropdown-2"
                      tabIndex="-1"
-                     ref="changeImage"  
-                     role="menuitem" 
+                     ref="changeImage"
+                     role="menuitem"
                   >
                     {I18n.t('Change image')}
                   </a>
                 </li>
                 <li role="presentation">
                   <a href="#"
-                     onClick={() => this.removeImage()} 
-                     className="icon-trash" 
+                     onClick={() => this.removeImage()}
+                     className="icon-trash"
                      id="courseImage-editDropdown-3"
                      tabIndex="-1"
-                     ref="removeImage" 
-                     role="menuitem" 
+                     ref="removeImage"
+                     role="menuitem"
                   >
                      {I18n.t('Remove image')}
                   </a>

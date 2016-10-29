@@ -2,26 +2,8 @@ development:
   # required to enable the feature. default is false.
   enabled: false
 
-  # required. no default.
+  # required. host of the url to the conditional release service. no default.
   host: conditional_release.docker
 
   # optional. default matches Canvas
-  protocol: http
-
-  # optional. default is 'ui/edit_rule'
-  edit_rule_path: 'ui/edit_rule'
-
-  # optional. default is 'api/accounts'
-  create_account_path: 'api/accounts'
-
-  # optional. default is 'api/content_exports'
-  content_exports_path: 'api/content_exports'
-
-  # optional. default is 'api/content_imports'
-  content_imports_path: 'api/content_imports'
-
-  # optional. default if 'api/rules/summary'
-  rules_summary_path: 'api/rules/summary'
-
-  # optional. default is 'api/rules/select_assignment_set'
-  select_assignment_set_path: 'api/rules/select_assignment_set'
+  protocol: https

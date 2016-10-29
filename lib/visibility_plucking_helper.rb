@@ -5,9 +5,11 @@ module VisibilityPluckingHelper
 
   module ClassMethods
     def visible_object_ids_in_course_by_user(column_to_pluck, opts)
+      use_global_id = opts.delete(:use_global_id)
       check_args(opts, :user_id)
       vis_hash = {}
       pluck_own_and_user_ids(column_to_pluck, opts).each do |user_id, column_val|
+        user_id = Shard.global_id_for(user_id) if use_global_id
         vis_hash[user_id] ||= []
         vis_hash[user_id] << column_val
       end

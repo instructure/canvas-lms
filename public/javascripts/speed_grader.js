@@ -1965,7 +1965,8 @@ define([
                 var updatedComments = _.reject(
                   that.currentStudent.submission.submission_comments,
                   function(item) {
-                    return item.id === comment.id;
+                    var submissionComment = item.submission_comment || item;
+                    return submissionComment.id === comment.id;
                   }
                 );
 
@@ -1986,6 +1987,19 @@ define([
               var $replacementComment = renderComment(data.submission_comment, $comment_blank);
               $replacementComment.show();
               $comment.replaceWith($replacementComment);
+
+              var updatedComments = _.map(that.currentStudent.submission.submission_comments,
+                function(item) {
+                  var submissionComment = item.submission_comment || item;
+                  if (submissionComment.id === comment.id) {
+                    return data.submission_comment;
+                  } else {
+                    return submissionComment;
+                  }
+                }
+              );
+
+              that.currentStudent.submission.submission_comments = updatedComments;
             }
 
             function commentUpdateFailed(jqXHR, textStatus) {
