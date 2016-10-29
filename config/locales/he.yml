@@ -4893,7 +4893,7 @@ he:
   created_group_group_name_2097306b: "הקבוצה %{group_name} נוצרה "
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "יצירת ייצוא הגשות תאפשר לך להוריד קובץ זיפ של כל המשימות שהוגשו לכל הקורסים הנוכחיים ואלו שנסתיימו. הקובץ שיווצר יכול להיות גדול מאד, כך שיתכן שהתהליך יתארך. ניתן לעזוב דף זה ולחזור אליו מאוחר יותר."
   creative_commons_714a065f: "Creative Commons"
-  creative_commons_license_725584ae: "רשיון Creative Commons"
+  creative_commons_license_725584ae: "זכויות במסגרת Creative Commons"
   criterion_5f0b62f8: קריוטריון
   crowdsourced: true
   crumbs: 
@@ -5823,7 +5823,7 @@ he:
     save_failed: "השמירה נכשלה, יש לנסות שוב מאוחר יותר."
     saving: שומר...
     screen_reader_tip: "משתמשי תוכנות קריאת מסך: הדרך הנגישה ביותר לשימוש עורך זה הנה לעבור לתצוגה מתקדמת, ואז או לשלב את LaTeX ישירות, או להשתמש בסרגל הכלים כדי לסייע לך לעשות זאת. הקישור למעבר אל התצוגה המתקדמת הנו בסמוך לתחתית דיאולוג זה, מעל לשדה העריכה."
-    search_flickr: "חיפוש זכויות יוצרים של פליקר."
+    search_flickr: "חיפוש על פי זכויות creative commons בפליקר."
     switch_editor_html: "עורך HTML"
     switch_editor_rich_text: "עורך תוכן עשיר"
     switch_editor_visual: "עורך תוכן עשיר"
@@ -14562,7 +14562,7 @@ he:
         discussions: "אינדקס דיון"
         discussions_page: "אינדקס דיונים"
         files_page: "אינדקס קבצים"
-        find_on_flickr: "חיפוש תמונות נחלת הכלל בפליקר"
+        find_on_flickr: "חיפוש תמונות של creative commons בפליקר"
         grades_page: ציונים
         modules: "רשימת מודולים"
         modules_page: מודולים
