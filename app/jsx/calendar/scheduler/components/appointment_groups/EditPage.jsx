@@ -70,8 +70,8 @@ define([
                appointmentGroup: response.data,
              }, () => {
                // Handle setting some pesky values
-               $('.EditPage__Options-LimitUsersPerSlot').val(formValues.limitUsersPerSlot);
-               $('.EditPage__Options-LimitSlotsPerUser').val(formValues.limitSlotsPerUser);
+               $('.EditPage__Options-LimitUsersPerSlot', this.optionFields).val(formValues.limitUsersPerSlot);
+               $('.EditPage__Options-LimitSlotsPerUser', this.optionFields).val(formValues.limitSlotsPerUser);
 
              })
            })
@@ -192,7 +192,7 @@ define([
           location_name: formValues.location,
           participants_per_appointment: formValues.usersPerSlotLimit,
           participant_visibility: (formValues.allowStudentsToView) ? 'protected' : 'private',
-          max_appointments_per_participant: formValues.slotPerUserLimit,
+          max_appointments_per_participant: formValues.slotsPerUserLimit,
           new_appointments: formValues.timeblocks.filter(nullTimeFilter).map(tb => ([
             tb.timeData.startTime,
             tb.timeData.endTime
