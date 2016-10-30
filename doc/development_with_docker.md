@@ -250,6 +250,19 @@ With Better Errors, a REPL is embedded on the page at the point where an
 error was raised. With this approach, you can drop a `raise` or `throw`
 where ever you'd like to invoke better errors REPL.
 
+Better Errors also provides helpful links to open the offending file in your
+editor of choice. In order to help it find your files on your local machine
+(outside the Docker VM), you need to set `BETTER_ERRORS_LOCAL_PATH` in your
+`docker-compose.override.yml` file in your app's root directory to be the
+absolute path to your app, like `'/Users/<username>/Documents/canvas-lms'`
+
+You can also configure which editor is opened. By default, Better Errors will
+try to use TextMate, but you can use any app that supports the `open` url
+scheme (like `txmt://open?url=/Users...`). To do so, set `BETTER_ERRORS_EDITOR`
+in your `docker-compose.override.yml` to your desired editor. Some possible
+options are `emacs`, `mvim`, or `txmt`. If you want to use Sublime, see
+https://github.com/dhoulb/subl
+
 ### Byebug
 
 A byebug server is running in development mode on the web and job containers
