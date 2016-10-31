@@ -36,7 +36,7 @@ define [
   'compiled/views/gradebook/SectionMenuView'
   'compiled/views/gradebook/GradingPeriodMenuView'
   'compiled/gradebook2/GradebookKeyboardNav'
-  'jsx/gradebook/grid/helpers/columnArranger'
+  'jsx/gradebook/shared/helpers/assignmentHelper'
   'compiled/api/gradingPeriodsApi'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
@@ -53,14 +53,14 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor,
-KeyboardNavDialog, KeyboardNavTemplate, Slick, TotalColumnHeaderView, round,
-InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, GradeCalculator, UserSettings,
-Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
-GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
-GradebookHeaderMenu, NumberCompare, htmlEscape, PostGradesStore, PostGradesApp,
-SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate,
-SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger, GradingPeriodsAPI) ->
+], (
+  $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
+  TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, GradeCalculator, UserSettings,
+  Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
+  SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape, PostGradesStore, PostGradesApp,
+  SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView,
+  GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper, GradingPeriodsAPI
+) ->
 
   class Gradebook
     columnWidths =
@@ -440,7 +440,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger, Gr
     compareAssignmentDueDates: (a, b) ->
       firstAssignment = a.object
       secondAssignment = b.object
-      ColumnArranger.compareByDueDate(firstAssignment, secondAssignment)
+      assignmentHelper.compareByDueDate(firstAssignment, secondAssignment)
 
     makeCompareAssignmentCustomOrderFn: (sortOrder) =>
       sortMap = {}

@@ -6,8 +6,7 @@ define [
   'jst/gradebook2/section_to_show_menu'
   'compiled/jquery.kylemenu'
   'vendor/jquery.ba-tinypubsub'
-  'jsx/gradebook/grid/actions/sectionsActions'
-], (I18n, $, _, {View}, template, SectionsActions) ->
+], (I18n, $, _, {View}, template) ->
 
   class SectionMenuView extends View
 

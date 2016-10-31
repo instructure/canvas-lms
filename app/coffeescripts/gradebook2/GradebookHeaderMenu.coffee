@@ -10,7 +10,7 @@ define [
   'jst/re_upload_submissions_form'
   'underscore'
   'compiled/behaviors/authenticity_token'
-  'jsx/gradebook/grid/helpers/messageStudentsWhoHelper'
+  'jsx/gradebook/shared/helpers/messageStudentsWhoHelper'
   'jquery.instructure_forms'
   'jqueryui/dialog'
   'jquery.instructure_misc_helpers'

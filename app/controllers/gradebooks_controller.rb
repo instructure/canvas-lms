@@ -197,11 +197,10 @@ class GradebooksController < ApplicationController
       set_js_env
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
-      gradebook_version = @context.feature_enabled?(:gradebook_performance) ? :react_gradebook : :gradebook2
 
       case @current_user.preferred_gradebook_version
       when "2"
-        render gradebook_version
+        render :gradebook2
         return
       when "srgb"
         render :screenreader
@@ -373,7 +372,6 @@ class GradebooksController < ApplicationController
       :gradebook_column_size_settings_url => change_gradebook_column_size_course_gradebook_url,
       :gradebook_column_order_settings => @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
       :gradebook_column_order_settings_url => save_gradebook_column_order_course_gradebook_url,
-      :gradebook_performance_enabled => @context.feature_enabled?(:gradebook_performance),
       :all_grading_periods_totals => @context.feature_enabled?(:all_grading_periods_totals),
       :sections => sections_json(@context.active_course_sections, @current_user, session),
       :settings_update_url => api_v1_course_gradebook_settings_update_url(@context),

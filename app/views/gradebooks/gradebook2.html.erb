@@ -66,12 +66,12 @@
     <div id="gradebook-toolbar" class="toolbar">
       <div class="gradebook_dropdowns">
         <% if multiple_grading_periods? %>
-          <span id="mgp-dropdown" class="multiple-grading-periods-selector-placeholder"></span>
+          <span class="multiple-grading-periods-selector-placeholder"></span>
         <% end %>
       </div>
       <div class="gradebook_filter" style="display:none">
         <% placeholder = t('Filter by student name or secondary ID') %>
-        <input type="text" class="search-query" id="gradebook-filter-input" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
+        <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
       </div>
       <div class="gradebook_menu">
         <span class="ui-buttonset">

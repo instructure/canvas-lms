@@ -101,7 +101,6 @@
     "redux-actions": "0.11.0",
     "redux-logger": "2.6.1",
     "redux-thunk": "2.1.0",
-    "reflux": "0.2.7",
     "spin.js": "2.3.2"
   },
   "repository": "instructure/canvas-lms",

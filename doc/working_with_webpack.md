@@ -204,8 +204,6 @@ with the docker workflow
 (was a missing bundle, need to start sniffing for which bundles are actually in the
   directory soon)
 
-[X] solve Module build failed: SyntaxError: /app/frontend_build/jsxYankPragma.js!/app/app/jsx/gradebook/grid/stores/tableStore.jsx: Argument name clash in strict mode (13:13)
-
 [X] test in development and
 make sure we have source to
 debug with
