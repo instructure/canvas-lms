@@ -285,7 +285,7 @@ define([
               />
             </div>
             <div className="ic-Form-control">
-              <label className="ic-Label" htmlFor="description">{I18n.t('Description')}</label>
+              <label className="ic-Label" htmlFor="description">{I18n.t('Details')}</label>
               <textarea
                 className="ic-Input"
                 type="text"
