@@ -48,7 +48,7 @@ define [
     focusNameLink: ->
       setTimeout () =>
         ReactDOM.findDOMNode(@refs.nameLink)?.focus()
-      , 0
+      , 100
 
     saveNameEdit: ->
       @setState editing: false, @focusNameLink

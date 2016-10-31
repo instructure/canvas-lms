@@ -61,6 +61,14 @@ define([
             />
             <button
               type="button"
+              className="Button ef-edit-name-form__button ef-edit-name-accept"
+              onClick={this.saveNameEdit}
+            >
+              <i className='icon-check' aria-hidden />
+              <span className='screenreader-only'>{I18n.t('accept', 'Accept')}</span>
+            </button>
+            <button
+              type="button"
               className="Button ef-edit-name-form__button ef-edit-name-cancel"
               onClick={this.cancelEditingName}
             >
