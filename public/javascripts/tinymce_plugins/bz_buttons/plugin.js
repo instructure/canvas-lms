@@ -2,7 +2,7 @@ tinymce.create('tinymce.plugins.BZButtons', {
   init : function(ed, url) {
     /* *********************** */
     /* Generic helper function */
-    function showDialog(headerHtml, creationFunction, callback) {
+    function showDialog(headerHtml, creationFunction, callback, validator) {
       var dialog = document.createElement("div");
       dialog.setAttribute("id", "bz-retained-field-dialog-holder");
       var div = document.createElement("div");
@@ -34,8 +34,10 @@ tinymce.create('tinymce.plugins.BZButtons', {
       i.className = "submit";
       i.innerHTML = "Insert";
       i.onclick = function() {
+      	if(validator == null || validator()) {
             callback();
             dialog.parentNode.removeChild(dialog);
+	}
       };
       div.appendChild(i);
 
@@ -73,11 +75,11 @@ tinymce.create('tinymce.plugins.BZButtons', {
 	showDialog(
 		"Add Tooltip",
 		function(div) {
-		  contentInput = addField(div, "Tooltip Content:", "input");
 		  visibleInput = addField(div, "Visible Content:", "input");
+		  contentInput = addField(div, " Popup Content:", "input");
 		},
 		function() {
-        	  ed.selection.setContent('<span class="bz-has-tooltip" title="'+htmlEncode(contentInput.value)+'">'+htmlEncode(visibleInput.value)+'</span>');
+        	  ed.selection.setContent('<span class="bz-has-tooltip" title="'+htmlEncode(contentInput.value)+'">'+htmlEncode(visibleInput.value)+'</span>&nbsp;');
 		}
 	);
     }
@@ -100,14 +102,13 @@ tinymce.create('tinymce.plugins.BZButtons', {
 
 		  var addButton = document.createElement("button");
 		  addButton.setAttribute("type", "button");
-		  addButton.innerHTML = "Add Item";
+		  addButton.innerHTML = "Add Answer";
 		  addButton.onclick = function() {
 		  	statements.push(addField(div, "Option:", "input"));
 
 			var types = addField(div, "Type:", "select");
 			addOptionToSelect(types, "");
 			addOptionToSelect(types, "wrong");
-			addOptionToSelect(types, "true");
 			addOptionToSelect(types, "correct");
 
 			typeSelects.push(types);
@@ -117,7 +118,6 @@ tinymce.create('tinymce.plugins.BZButtons', {
 		},
 		function() {
 		  var html = '';
-		  html += '<h3>Quick Quiz</h3>';
 		  html += '<div class="bz-quick-quiz">';
 		  html += '<h5>Quick Quiz: '+titleInput.value+'</h5>';
 	          html += '<ul style="list-style: none; margin: 0.25em 0;">';
@@ -129,9 +129,22 @@ tinymce.create('tinymce.plugins.BZButtons', {
 			if(s.length)
 				html += '<li><input name="insta" type="radio" value="'+v+'" />&nbsp;'+htmlEncode(s)+'</li>';
 		  }
-	          html += '</ul></div>';
+	          html += '</ul></div><br />';
 
         	  ed.selection.setContent(html);
+		},
+		function() {
+		  // make sure not all are true and not all are false
+                  var lastWas = null;
+		  for(var a = 0; a < typeSelects.length; a++) {
+		    var v = typeSelects[a].options[typeSelects[a].selectedIndex].value;
+		    if(a && lastWas != v)
+		      return true; // not all the same, pass validation
+		    lastWas = v;
+		  }
+
+		  alert("Please make at least one option true and one option false.");
+		  return false;
 		}
 	);
     }
@@ -173,7 +186,7 @@ tinymce.create('tinymce.plugins.BZButtons', {
 		  	  html += '<li><input name="todo" type="checkbox" />'+htmlEncode(s)+'</li>';
 		  }
 
-		  html += '</ul></form>';
+		  html += '</ul></form><br />';
 
         	  ed.selection.setContent(html);
 		}
