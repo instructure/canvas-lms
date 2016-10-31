@@ -54,7 +54,7 @@ class User < ActiveRecord::Base
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, dependent: :destroy, inverse_of: :user
-  has_many :observers, :through => :user_observers, :class_name => 'User'
+  has_many :observers, -> { where("user_observers.workflow_state <> 'deleted'") }, :through => :user_observers, :class_name => 'User'
   has_many :user_observees,
            class_name: 'UserObserver',
            foreign_key: :observer_id,
