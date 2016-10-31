@@ -751,7 +751,7 @@ define([
         prereqsList += prereqs[i].name + ', ';
       }
       prereqsList = prereqsList.slice(0, -2)
-      var $prerequisitesMessage = $('<div />', {text: 'Prerequisites: ' + htmlEscape(prereqsList),'class': 'prerequisites_message'});
+      var $prerequisitesMessage = $('<div />', {text: 'Prerequisites: ' + prereqsList, 'class': 'prerequisites_message'});
       $prerequisitesDiv.append($prerequisitesMessage);
 
     }
