@@ -12,9 +12,9 @@ define([
     toggleOpen() {
       this.setState({open: !this.state.open}, () => {
         if (this.state.open) {
-          this.refs.memberList.getDOMNode().focus();
+          this.refs.memberList.focus();
         } else {
-          this.refs.groupTitle.getDOMNode().focus();
+          this.refs.groupTitle.focus();
         }
       });
     },

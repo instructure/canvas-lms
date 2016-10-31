@@ -1,9 +1,9 @@
 define([
   'react',
   'react-dom',
-  'underscore',
   'jquery',
   'i18n!student_groups',
+  'compiled/util/natcompare',
   'compiled/models/Group',
   'compiled/collections/UserCollection',
   'compiled/collections/ContextGroupCollection',
@@ -12,192 +12,196 @@ define([
   'jsx/groups/components/Filter',
   'jsx/groups/components/NewGroupDialog',
   'jsx/groups/components/ManageGroupDialog',
-], (React, ReactDOM,  _, $, I18n, Group, UserCollection,
+], (React, ReactDOM, $, I18n, natcompare, Group, UserCollection,
   ContextGroupCollection, BackboneState, PaginatedGroupList, Filter,
   NewGroupDialog, ManageGroupDialog) => {
-  var StudentView = React.createClass({
+  const StudentView = React.createClass({
     mixins: [BackboneState],
 
-    getInitialState() {
-      return ({
+    getInitialState () {
+      return {
         filter: '',
-        userCollection: new UserCollection([], {course_id: ENV.course_id}),
-        groupCollection: new ContextGroupCollection([], {course_id: ENV.course_id})
-      });
+        userCollection: new UserCollection(null, {
+          params: { enrollment_type: 'student' },
+          comparator: natcompare.byGet('sortable_name'),
+        }),
+        groupCollection: new ContextGroupCollection([], { course_id: ENV.course_id })
+      }
     },
 
-    openManageGroupDialog(group) {
-      var $dialog = $('<div>').dialog({
-        id: "manage_group_form",
-        title: "Manage Student Group",
+    openManageGroupDialog (group) {
+      const $dialog = $('<div>').dialog({
+        id: 'manage_group_form',
+        title: 'Manage Student Group',
         height: 500,
         width: 700,
         'fix-dialog-buttons': false,
 
-        close: function(e){
-          ReactDOM.unmountComponentAtNode($dialog[0]);
-          $( this ).remove();
-        }
-      });
+        close: (e) => {
+          ReactDOM.unmountComponentAtNode($dialog[0])
+          $(this).remove()
+        },
+      })
 
-      var closeDialog = function(e){
-        e.preventDefault();
-        $dialog.dialog('close');
-      };
+      const closeDialog = (e) => {
+        e.preventDefault()
+        $dialog.dialog('close')
+      }
 
       ReactDOM.render(<ManageGroupDialog userCollection={this.state.userCollection}
-                                               checked={_.map(group.users, (u) => u.id)}
-                                               groupId={group.id}
-                                               name={group.name}
-                                               maxMembership={group.max_membership}
-                                               updateGroup={this.updateGroup}
-                                               closeDialog={closeDialog}
-                                               loadMore={() => this._loadMore(this.state.userCollection)} />, $dialog[0])
+                                         checked={group.users.map((u) => u.id)}
+                                         groupId={group.id}
+                                         name={group.name}
+                                         maxMembership={group.max_membership}
+                                         updateGroup={this.updateGroup}
+                                         closeDialog={closeDialog}
+                                         loadMore={() => this._loadMore(this.state.userCollection)} />, $dialog[0])
     },
 
-    openNewGroupDialog() {
-      var $dialog = $('<div>').dialog({
-        id: "add_group_form",
-        title: "New Student Group",
+    openNewGroupDialog () {
+      const $dialog = $('<div>').dialog({
+        id: 'add_group_form',
+        title: 'New Student Group',
         height: 500,
         width: 700,
         'fix-dialog-buttons': false,
 
-        close: function(e){
-          ReactDOM.unmountComponentAtNode($dialog[0]);
-          $( this ).remove();
-        }
-      });
+        close: (e) => {
+          ReactDOM.unmountComponentAtNode($dialog[0])
+          $(this).remove()
+        },
+      })
 
-      var closeDialog = function(e){
-        e.preventDefault();
-        $dialog.dialog('close');
-      };
+      const closeDialog = (e) => {
+        e.preventDefault()
+        $dialog.dialog('close')
+      }
 
       ReactDOM.render(<NewGroupDialog userCollection={this.state.userCollection}
-                                            createGroup={this.createGroup}
-                                            closeDialog={closeDialog}
-                                            loadMore={() => this._loadMore(this.state.userCollection)} />, $dialog[0])
+                                      createGroup={this.createGroup}
+                                      closeDialog={closeDialog}
+                                      loadMore={() => this._loadMore(this.state.userCollection)} />, $dialog[0])
     },
 
-    _categoryGroups(group) {
-      return this.state.groupCollection.filter((g) => g.get('group_category_id') === group.get('group_category_id'));
+    _categoryGroups (group) {
+      return this.state.groupCollection.filter((g) => g.get('group_category_id') === group.get('group_category_id'))
     },
 
-    _onCreateGroup(group) {
-      this.state.groupCollection.add(group);
-      $.flashMessage(I18n.t("Created Group %{group_name}", {group_name: group.name}));
+    _onCreateGroup (group) {
+      this.state.groupCollection.add(group)
+      $.flashMessage(I18n.t('Created Group %{group_name}', {group_name: group.name}))
     },
 
-    createGroup(name, joinLevel, invitees) {
+    createGroup (name, joinLevel, invitees) {
       $.ajaxJSON(`/courses/${ENV.course_id}/groups`,
                  'POST',
-                 {group: {name: name, join_level: joinLevel}, invitees: invitees},
-                 (group) => this._onCreateGroup(group));
+                 {group: {name, join_level: joinLevel}, invitees},
+                 (group) => this._onCreateGroup(group))
     },
 
-    _onUpdateGroup(group) {
-      this.state.groupCollection.add(group, {merge: true});
-      $.flashMessage(I18n.t("Updated Group %{group_name}", {group_name: group.name}));
+    _onUpdateGroup (group) {
+      this.state.groupCollection.add(group, {merge: true})
+      $.flashMessage(I18n.t('Updated Group %{group_name}', {group_name: group.name}))
     },
 
-    updateGroup(groupId, name, members) {
+    updateGroup (groupId, name, members) {
       $.ajaxJSON(`/api/v1/groups/${groupId}`,
                  'PUT',
                  {name: name, members: members},
-                 (group) => this._onUpdateGroup(group));
+                 (group) => this._onUpdateGroup(group))
     },
 
-    _loadMore(collection) {
-      if (collection.loadedAll || collection.fetchingNextPage) {
-        return;
+    _loadMore (collection) {
+      if (!collection.loadedAll && !collection.fetchingNextPage) {
+        // if we specify a page before we actually need it, we lose
+        // the params being passed to the api
+        const options = collection.length === 0 ? {} : {page: 'next'}
+        collection.fetch(options)
       }
-      collection.fetch({page: 'next'});
     },
 
-    _extendAttribute(model, attribute, hash) {
-      var copy = _.extend({}, model.get(attribute));
-      model.set(attribute, _.extend(copy, hash));
+    _extendAttribute (model, attribute, hash) {
+      const copy = Object.assign({}, model.get(attribute))
+      model.set(attribute, Object.assign(copy, hash))
     },
 
-    _addUser(groupModel, user) {
-      groupModel.set('users', groupModel.get('users').concat(user));
+    _addUser (groupModel, user) {
+      groupModel.set('users', groupModel.get('users').concat(user))
     },
 
-    _removeUser(groupModel, userId) {
-      groupModel.set('users', _.reject(groupModel.get('users'), (u) => u.id === userId ));
+    _removeUser (groupModel, userId) {
+      groupModel.set('users', groupModel.get('users').filter((u) => u.id !== userId))
       // If user was a leader, unset the leader attribute.
-      var leader = groupModel.get("leader");
-      if (leader && leader.id == userId) {
-        groupModel.set("leader", null);
+      const leader = groupModel.get('leader')
+      if (leader && leader.id === userId) {
+        groupModel.set('leader', null)
       }
     },
 
-    _onLeave(group) {
-      var groupModel = this.state.groupCollection.get(group.id);
-      this._removeUser(groupModel, ENV.current_user_id);
+    _onLeave (group) {
+      const groupModel = this.state.groupCollection.get(group.id)
+      this._removeUser(groupModel, ENV.current_user_id)
       if (!groupModel.get('group_category').allows_multiple_memberships) {
         this._categoryGroups(groupModel).forEach((g) => {
-          this._extendAttribute(g, 'group_category', {is_member: false});
-        });
+          this._extendAttribute(g, 'group_category', {is_member: false})
+        })
       }
 
-      $.flashMessage(I18n.t("Left Group %{group_name}", {group_name: group.name}));
+      $.flashMessage(I18n.t('Left Group %{group_name}', {group_name: group.name}))
     },
 
-    leave(group) {
-      var dfd = $.ajaxJSON(`/api/v1/groups/${group.id}/memberships/self`,
+    leave (group) {
+      const dfd = $.ajaxJSON(`/api/v1/groups/${group.id}/memberships/self`,
                  'DELETE',
                  {},
-                 () => this._onLeave(group));
-      $(ReactDOM.findDOMNode(this.refs.panel)).disableWhileLoading(dfd);
+                 () => this._onLeave(group))
+      $(ReactDOM.findDOMNode(this.refs.panel)).disableWhileLoading(dfd)
     },
 
-
-    _onJoin(group) {
-      var groupModel = this.state.groupCollection.get(group.id);
+    _onJoin (group) {
+      const groupModel = this.state.groupCollection.get(group.id)
       this._categoryGroups(groupModel).forEach((g) => {
-        this._extendAttribute(g, 'group_category', {is_member: true});
+        this._extendAttribute(g, 'group_category', {is_member: true})
         if (!groupModel.get('group_category').allows_multiple_memberships) {
-          this._removeUser(g, ENV.current_user_id);
+          this._removeUser(g, ENV.current_user_id)
         }
-      });
-      this._addUser(groupModel, ENV.current_user);
+      })
 
-      $.flashMessage(I18n.t("Joined Group %{group_name}", {group_name: group.name}));
+      this._addUser(groupModel, ENV.current_user)
+      $.flashMessage(I18n.t('Joined Group %{group_name}', {group_name: group.name}))
     },
 
-    join(group) {
-      var dfd = $.ajaxJSON(`/api/v1/groups/${group.id}/memberships`,
+    join (group) {
+      const dfd = $.ajaxJSON(`/api/v1/groups/${group.id}/memberships`,
                  'POST',
                  {user_id: 'self'},
                  () => this._onJoin(group),
                  // This is making an assumption that when the current user can't join a group it is likely beacuse a student
                  // from another section joined that group after the page loaded for the current user
-                 () => this._extendAttribute(this.state.groupCollection.get(group.id), "permissions", {join: false}));
-      $(ReactDOM.findDOMNode(this.refs.panel)).disableWhileLoading(dfd);
+                 () => this._extendAttribute(this.state.groupCollection.get(group.id), 'permissions', {join: false}))
+      $(ReactDOM.findDOMNode(this.refs.panel)).disableWhileLoading(dfd)
     },
 
-    _filter(group) {
-      var filter = this.state.filter.toLowerCase();
+    _filter (group) {
+      const filter = this.state.filter.toLowerCase()
       return (!filter ||
               group.name.toLowerCase().indexOf(filter) > -1 ||
-              group.users.some(u => u.name.toLowerCase().indexOf(filter) > -1));
+              group.users.some(u => u.name.toLowerCase().indexOf(filter) > -1))
     },
 
-    manage(group) {
-      this.openManageGroupDialog(group);
+    manage (group) {
+      this.openManageGroupDialog(group)
     },
 
-    render() {
-      var filteredGroups = this.state.groupCollection.toJSON().filter(this._filter);
-      var newGroupButton = null
+    render () {
+      const filteredGroups = this.state.groupCollection.toJSON().filter(this._filter)
+      let newGroupButton = null
       if (ENV.STUDENT_CAN_ORGANIZE_GROUPS_FOR_COURSE) {
         newGroupButton = (
           <button aria-label={I18n.t('Add new group')} className="btn btn-primary add_group_link" onClick={this.openNewGroupDialog}>
             <i className="icon-plus" />
             &nbsp;{I18n.t('Group')}
-          </button>);
+          </button>)
       }
 
       return (
@@ -225,8 +229,8 @@ define([
                                   onManage={this.manage}/>
             </div>
           </div>
-        </div>);
-    }
-  });
-  return <StudentView />;
-});
+        </div>)
+    },
+  })
+  return <StudentView />
+})
