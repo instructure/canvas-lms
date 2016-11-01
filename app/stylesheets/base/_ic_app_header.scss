@@ -375,7 +375,7 @@ body.primary-nav-expanded {
     background: transparent;
     color: $ic-brand-global-nav-menu-item__text-color;
     white-space: normal;
-    word-break: break-all;
+    word-wrap: break-word;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
 
