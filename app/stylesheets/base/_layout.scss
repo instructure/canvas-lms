@@ -131,6 +131,10 @@ div.content_notice {
   }
 }
 
+.tool_content_wrapper.custom_height[style] {
+  height: 100% !important;
+}
+
 iframe.tool_launch {
   min-height: 500px;
   width: 100%;
