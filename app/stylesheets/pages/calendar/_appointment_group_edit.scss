@@ -54,6 +54,12 @@
   z-index: 10;
 }
 
+.ContextLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 135px;
+}
+
 
 .TimeBlockSelector__DivideSection-Input {
   width: 40px;
