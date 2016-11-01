@@ -7,7 +7,8 @@ define([
   'i18n!external_tools',
   'jsx/due_dates/DueDateCalendarPicker',
   'jsx/shared/helpers/accessibleDateFormat'
-], function(React, ReactDOM, update, _, { default: Button }, I18n, DueDateCalendarPicker, accessibleDateFormat) {
+], function(React, ReactDOM, update, _, { default: Button }, I18n,
+  DueDateCalendarPicker, accessibleDateFormat) {
 
   const Types = React.PropTypes;
 
@@ -60,7 +61,7 @@ define([
         title:     Types.string.isRequired,
         startDate: Types.instanceOf(Date).isRequired,
         endDate:   Types.instanceOf(Date).isRequired,
-        closeDate: Types.instanceOf(Date).isRequired
+        closeDate: Types.instanceOf(Date)
       }),
       disabled: Types.bool.isRequired,
       onSave:   Types.func.isRequired,
@@ -78,6 +79,72 @@ define([
     componentDidMount: function() {
       this.hackTheDatepickers();
       this.refs.title.focus();
+    },
+
+    triggerSave: function() {
+      if (this.props.onSave) {
+        this.props.onSave(this.state.period);
+      }
+    },
+
+    triggerCancel: function() {
+      if (this.props.onCancel) {
+        this.setState({period: buildPeriod({})}, this.props.onCancel);
+      }
+    },
+
+    hackTheDatepickers: function() {
+      // This can be replaced when we have an extensible datepicker
+      let $form = ReactDOM.findDOMNode(this);
+      let $appends = $form.querySelectorAll('.input-append');
+      $appends.forEach(function($el) {
+        $el.classList.add('ic-Input-group');
+      });
+
+      let $dateFields = $form.querySelectorAll('.date_field');
+      $dateFields.forEach(function($el) {
+        $el.classList.remove('date_field');
+        $el.classList.add('ic-Input');
+      });
+
+      let $suggests = $form.querySelectorAll('.datetime_suggest');
+      $suggests.forEach(function($el) {
+        if(ENV.CONTEXT_TIMEZONE === ENV.TIMEZONE) {
+          $el.remove();
+        } else {
+          $el.innerHTML = $el.innerHTML.replace(/Course/, 'Account');
+        }
+      });
+
+      let $buttons = $form.querySelectorAll('.ui-datepicker-trigger');
+      $buttons.forEach(function($el) {
+        $el.classList.remove('btn');
+        $el.classList.add('Button');
+      });
+    },
+
+    renderSaveAndCancelButtons: function() {
+      return (
+        <div className="ic-Form-actions below-line">
+          <Button
+            ref       = "cancelButton"
+            disabled  = {this.props.disabled}
+            onClick   = {this.triggerCancel}
+          >
+            {I18n.t("Cancel")}
+          </Button>
+          &nbsp;
+          <Button
+            variant    = "primary"
+            ref        = "saveButton"
+            aria-label = {I18n.t("Save Grading Period")}
+            disabled   = {this.props.disabled}
+            onClick    = {this.triggerSave}
+          >
+            {I18n.t("Save")}
+          </Button>
+        </div>
+      );
     },
 
     render: function() {
@@ -106,13 +173,15 @@ define([
                     {I18n.t("Start Date")}
                   </label>
                   <DueDateCalendarPicker
-                    dateValue       = {this.state.period.startDate}
-                    ref             = "startDate"
-                    dateType        = "due_at"
-                    handleUpdate    = {changeStartDate.bind(this)}
-                    rowKey          = "start-date"
-                    labelledBy      = "start-date-label"
-                    isFancyMidnight = {false}
+                    disabled             = {false}
+                    inputClasses         = ''
+                    dateValue            = {this.state.period.startDate}
+                    ref                  = "startDate"
+                    dateType             = "due_at"
+                    handleUpdate         = {changeStartDate.bind(this)}
+                    rowKey               = "start-date"
+                    labelledBy           = "start-date-label"
+                    isFancyMidnight      = {false}
                   />
                 </div>
 
@@ -121,13 +190,15 @@ define([
                     {I18n.t("End Date")}
                   </label>
                   <DueDateCalendarPicker
-                    dateValue       = {this.state.period.endDate}
-                    ref             = "endDate"
-                    dateType        = "due_at"
-                    handleUpdate    = {changeEndDate.bind(this)}
-                    rowKey          = "end-date"
-                    labelledBy      = "end-date-label"
-                    isFancyMidnight = {true}
+                    disabled             = {false}
+                    inputClasses         = ''
+                    dateValue            = {this.state.period.endDate}
+                    ref                  = "endDate"
+                    dateType             = "due_at"
+                    handleUpdate         = {changeEndDate.bind(this)}
+                    rowKey               = "end-date"
+                    labelledBy           = "end-date-label"
+                    isFancyMidnight      = {true}
                   />
                 </div>
 
@@ -136,13 +207,15 @@ define([
                     {I18n.t("Close Date")}
                   </label>
                   <DueDateCalendarPicker
-                    dateValue       = {this.state.period.closeDate}
-                    ref             = "closeDate"
-                    dateType        = "due_at"
-                    handleUpdate    = {changeCloseDate.bind(this)}
-                    rowKey          = "close-date"
-                    labelledBy      = "close-date-label"
-                    isFancyMidnight = {true}
+                    disabled             = {false}
+                    inputClasses         = ''
+                    dateValue            = {this.state.period.closeDate}
+                    ref                  = "closeDate"
+                    dateType             = "due_at"
+                    handleUpdate         = {changeCloseDate.bind(this)}
+                    rowKey               = "close-date"
+                    labelledBy           = "close-date-label"
+                    isFancyMidnight      = {true}
                   />
                 </div>
               </div>
@@ -152,69 +225,6 @@ define([
           {this.renderSaveAndCancelButtons()}
         </div>
       );
-    },
-
-    renderSaveAndCancelButtons: function() {
-      return (
-        <div className="ic-Form-actions below-line">
-          <Button
-            ref       = "cancelButton"
-            disabled  = {this.props.disabled}
-            onClick   = {this.triggerCancel}
-          >
-            {I18n.t("Cancel")}
-          </Button>
-          &nbsp;
-          <Button
-            variant    = "primary"
-            ref        = "saveButton"
-            aria-label = {I18n.t("Save Grading Period")}
-            disabled   = {this.props.disabled}
-            onClick    = {this.triggerSave}
-          >
-            {I18n.t("Save")}
-          </Button>
-        </div>
-      );
-    },
-
-    triggerSave: function() {
-      if (this.props.onSave) {
-        this.props.onSave(this.state.period);
-      }
-    },
-
-    triggerCancel: function() {
-      if (this.props.onCancel) {
-        this.setState({period: buildPeriod({})}, this.props.onCancel);
-      }
-    },
-
-    hackTheDatepickers: function() {
-      // This can be replaced when we have an extensible datepicker
-      let $form = ReactDOM.findDOMNode(this);
-      let $appends = $form.querySelectorAll('.input-append');
-      Array.prototype.forEach.call($appends, function($el) {
-        $el.classList.add('ic-Input-group');
-      });
-      let $dateFields = $form.querySelectorAll('.date_field');
-      Array.prototype.forEach.call($dateFields, function($el) {
-        $el.classList.remove('date_field');
-        $el.classList.add('ic-Input');
-      });
-      let $suggests = $form.querySelectorAll('.datetime_suggest');
-      Array.prototype.forEach.call($suggests, function($el) {
-        $el.remove();
-      });
-      let $buttons = $form.querySelectorAll('.ui-datepicker-trigger');
-      Array.prototype.forEach.call($buttons, function($el) {
-        $el.classList.remove('btn');
-        $el.classList.add('Button');
-      });
-      let $container = $form.querySelectorAll('.DueDateInput__Container');
-      Array.prototype.forEach.call($container, function($el) {
-        $el.classList.add('ic-Input-group');
-      });
     }
   });
 

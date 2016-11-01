@@ -6,19 +6,19 @@ define([
   'jquery.instructure_forms'
 ], ($, React, accessibleDateFormat, tz) => {
 
-  const { PropTypes } = React;
+  const { string, func, bool, instanceOf } = React.PropTypes;
 
   var DueDateCalendarPicker = React.createClass({
 
     propTypes: {
-      dateType:        PropTypes.string.isRequired,
-      handleUpdate:    PropTypes.func.isRequired,
-      rowKey:          PropTypes.string.isRequired,
-      labelledBy:      PropTypes.string.isRequired,
-      inputClasses:    PropTypes.string.isRequired,
-      disabled:        PropTypes.bool.isRequired,
-      isFancyMidnight: PropTypes.bool.isRequired,
-      dateValue:       PropTypes.instanceOf(Date).isRequired
+      dateType: string.isRequired,
+      handleUpdate: func.isRequired,
+      rowKey: string.isRequired,
+      labelledBy: string.isRequired,
+      inputClasses: string.isRequired,
+      disabled: bool.isRequired,
+      isFancyMidnight: bool.isRequired,
+      dateValue: instanceOf(Date).isRequired,
     },
 
     // ---------------
