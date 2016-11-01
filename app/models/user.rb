@@ -30,7 +30,7 @@ class User < ActiveRecord::Base
 
   include Context
 
-  attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
+  attr_accessible :name, :short_name, :roster_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
   attr_accessor :previous_id, :menu_data, :gradebook_importer_submissions, :prior_enrollment
 
   before_save :infer_defaults
@@ -655,6 +655,16 @@ class User < ActiveRecord::Base
 
   def last_name
     User.name_parts(self.sortable_name, likely_already_surname_first: true)[1] || ''
+  end
+
+  def roster_name
+    #send nil if short_name is empty
+    unless self.short_name.empty? || self.short_name.eql?(self.name)
+      name = self.short_name
+    else
+      name = nil
+    end
+    name
   end
 
   # Feel free to add, but the "authoritative" list (http://en.wikipedia.org/wiki/Title_(name)) is quite large

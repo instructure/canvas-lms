@@ -33,6 +33,13 @@ describe "people" do
     expect(f('.collectionViewItems')).to include_text(group_text)
   end
 
+  def enroll_teacher(teacher)
+    e1 = @course.enroll_teacher(teacher)
+    e1.workflow_state = 'active'
+    e1.save!
+    @course.reload
+  end
+
   def enroll_student(student)
     e1 = @course.enroll_student(student)
     e1.workflow_state = 'active'
@@ -97,6 +104,8 @@ describe "people" do
 
       #add first student
       @student_1 = create_user('student@test.com')
+      @student_1.short_name = ('Student 1 Short Name')
+      @student_1.save
 
       enroll_student(@student_1)
 
@@ -114,6 +123,15 @@ describe "people" do
       enroll_ta(@test_ta)
 
       get "/courses/#{@course.id}/users"
+    end
+
+    it "student should have short_name" do
+      enroll_student(@student_1)
+      # need to hit /users page again to show enrollment of 1nd student
+      get "/courses/#{@course.id}/users"
+      wait_for_ajaximations
+      # check student
+      expect(f("span#roster_name_#{@student_1.id}").text).to eq "(#{@student_1.short_name})"
     end
 
     it "should have tabs" do
@@ -320,6 +338,47 @@ describe "people" do
 
       expect(enrollments[0]).to include_text @students[0].name
       expect(enrollments[1]).to include_text @students[1].name
+    end
+  end
+
+  context "people as a student" do
+
+    before (:each) do
+      course_with_student_logged_in
+
+      #add first student
+      @student_1 = create_user('student@test.com')
+      @student_1.short_name = ('Student 1 Short Name')
+      @student_1.save
+      enroll_student(@student_1)
+
+      #adding users for tests to work correctly
+
+      #teacher user
+      @test_teacher = create_user('teacher@test.com')
+      @test_teacher.short_name = ('Teacher Short Name')
+      @test_teacher.save
+
+
+      get "/courses/#{@course.id}/users"
+    end
+
+    it "student should have short_name" do
+      enroll_student(@student_1)
+      # need to hit /users page again to show enrollment of 1nd student
+      get "/courses/#{@course.id}/users"
+      wait_for_ajaximations
+      # check student
+      expect(f("span#roster_name_#{@student_1.id}").text).to eq "#{@student_1.short_name}"
+    end
+
+    it "teacher should have short_name" do
+      enroll_teacher(@test_teacher)
+      # need to hit /users page again to show enrollment of teacher
+      get "/courses/#{@course.id}/users"
+      wait_for_ajaximations
+      # check student
+      expect(f("span#roster_name_#{@test_teacher.id}").text).to eq "#{@test_teacher.short_name}"
     end
   end
 

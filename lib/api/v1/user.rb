@@ -69,6 +69,8 @@ module Api::V1::User
         end
       end
 
+      json[:roster_name] = user.roster_name
+
       if includes.include?('avatar_url') && user.account.service_enabled?(:avatars)
         json[:avatar_url] = avatar_url_for_user(user, blank_fallback)
       end
