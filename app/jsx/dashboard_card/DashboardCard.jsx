@@ -253,7 +253,7 @@ define([
               className="Button Button--icon-action-rev ic-DashboardCard__header-button"
               onClick={this.settingsClick}
               ref="settingsToggle">
-              <i className="icon-compose" aria-hidden="true" />
+              <i className="icon-compose icon-Line" aria-hidden="true" />
                 <span className="screenreader-only">
                   { I18n.t("Choose a color or course nickname for %{course}", { course: this.state.nicknameInfo.nickname}) }
                 </span>
