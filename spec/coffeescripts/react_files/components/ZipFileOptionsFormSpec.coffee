@@ -40,7 +40,6 @@ define [
       props = {
         fileOptions: {file: 'the_file_obj' }
         onZipOptionsResolved: (options)->
-          console.log("Called With ", options)
           zipOptionsResolvedStub(options)
       }
 

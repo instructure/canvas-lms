@@ -142,9 +142,7 @@ define([
           success: () => {
             this.props.afterUpdateColor(color);
           },
-          error: () => {
-            console.log('Error setting color');
-          }
+          error: () => {}
         });
       }
     },

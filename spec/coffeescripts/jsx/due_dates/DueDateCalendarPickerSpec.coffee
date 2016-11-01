@@ -9,10 +9,10 @@ define [
   'vendor/timezone/fr_FR'
   'helpers/I18nStubber'
   'helpers/fakeENV'
-], (
-  React, ReactDOM, {Simulate, SimulateNative, findRenderedDOMComponentWithTag}, _, $, DueDateCalendarPicker, tz,
-  french, I18nStubber, fakeENV
-) ->
+], ( React, ReactDOM, { findRenderedDOMComponentWithTag }, _, $,
+  DueDateCalendarPicker, tz, french, I18nStubber, fakeENV ) ->
+
+  wrapper = document.getElementById('fixtures')
 
   module 'unlock_at DueDateCalendarPicker',
     setup: ->
@@ -20,21 +20,21 @@ define [
       ENV.context_asset_string = "course_1"
       @clock = sinon.useFakeTimers()
       @props =
-        handleUpdate: ->
-        dateValue: new Date(Date.UTC(2012, 1, 1, 7, 1, 0))
-        dateType: "unlock_at"
-        rowKey: "nullnullnull"
-        labelledBy: "foo"
-        inputClasses: "date_field datePickerDateField DueDateInput"
-        disabled: false
+        dateType:        "unlock_at"
+        dateValue:       new Date(Date.UTC(2012, 1, 1, 7, 1, 0))
+        disabled:        false
+        handleUpdate:    ->
+        inputClasses:    "date_field datePickerDateField DueDateInput"
+        isFancyMidnight: false
+        labelledBy:      "foo"
+        rowKey:          "nullnullnull"
 
-      @mountPoint = $('<div>').appendTo('body')[0]
       DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, @props)
-      @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, @mountPoint)
+      @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, wrapper)
 
     teardown: ->
       fakeENV.teardown()
-      ReactDOM.unmountComponentAtNode(@mountPoint)
+      ReactDOM.unmountComponentAtNode(wrapper)
       @clock.restore()
 
   test 'renders', ->
@@ -56,14 +56,10 @@ define [
     I18nStubber.popFrame()
     tz.restore(snapshot)
 
-  test 'recieved proper class depending on dateType', ->
-    classes = @dueDateCalendarPicker.refs.datePickerWrapper.className
-    equal "DueDateRow__LockUnlockInput", classes
-
   test 'call the update prop when changed', ->
     update = @spy(@props, "handleUpdate")
     DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, @props)
-    @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, @mountPoint)
+    @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, wrapper)
     dateInput = $(ReactDOM.findDOMNode(@dueDateCalendarPicker)).find('.date_field').datetime_field()[0]
     $(dateInput).val("tomorrow")
     $(dateInput).trigger("change")
@@ -73,14 +69,14 @@ define [
   test 'deals with empty inputs properly', ->
     update = @spy(@props, "handleUpdate")
     DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, @props)
-    @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, @mountPoint)
+    @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, wrapper)
     dateInput = $(ReactDOM.findDOMNode(@dueDateCalendarPicker)).find('.date_field').datetime_field()[0]
     $(dateInput).val("")
     $(dateInput).trigger("change")
     ok update.calledWith(null)
     update.restore()
 
-  test 'does not convert to fancy midnight (because it is unlock_at)', ->
+  test 'does not convert to fancy midnight when isFancyMidnight is false', ->
     # This date will be set to midnight in the time zone of the app.
     date = tz.parse('2015-08-31T00:00:00')
     equal @dueDateCalendarPicker.changeToFancyMidnightIfNeeded(date), date
@@ -91,27 +87,24 @@ define [
       ENV.context_asset_string = "course_1"
       @clock = sinon.useFakeTimers()
       props =
-        handleUpdate: ->
-        dateValue: new Date(Date.UTC(2012, 1, 1, 7, 0, 0))
-        dateType: "due_at"
-        rowKey: "nullnullnull"
-        labelledBy: "foo"
-        inputClasses: "date_field datePickerDateField DueDateInput"
-        disabled: false
+        dateType:        "due_at"
+        dateValue:       new Date(Date.UTC(2012, 1, 1, 7, 0, 0))
+        disabled:        false
+        handleUpdate:    ->
+        inputClasses:    "date_field datePickerDateField DueDateInput"
+        isFancyMidnight: true
+        labelledBy:      "foo"
+        rowKey:          "nullnullnull"
 
       DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, props)
       @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()
-      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dueDateCalendarPicker).parentNode)
+      ReactDOM.unmountComponentAtNode(wrapper)
       @clock.restore()
 
-  test 'recieved proper class depending on dateType', ->
-    classes = @dueDateCalendarPicker.refs.datePickerWrapper.className
-    equal "DueDateInput__Container", classes
-
-  test 'converts to fancy midnight (because it is due_at)', ->
+  test 'converts to fancy midnight', ->
     # This date will be set to midnight in the time zone of the app.
     date = tz.parse('2015-08-31T00:00:00')
     date = @dueDateCalendarPicker.changeToFancyMidnightIfNeeded(date)
@@ -133,22 +126,22 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
-      @props =
-        handleUpdate: ->
-        dateValue: new Date(Date.UTC(2012, 1, 1, 7, 1, 0))
-        dateType: "unlock_at"
-        rowKey: "foobar"
-        labelledBy: "foo"
-        inputClasses: "date_field datePickerDateField DueDateInput"
-        disabled: true
+      props =
+        dateType:        "unlock_at"
+        dateValue:       new Date(Date.UTC(2012, 1, 1, 7, 1, 0))
+        disabled:        true
+        handleUpdate:    ->
+        inputClasses:    "date_field datePickerDateField DueDateInput"
+        isFancyMidnight: true
+        labelledBy:      "foo"
+        rowKey:          "foobar"
 
-      @mountPoint = document.getElementById("fixtures")
-      DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, @props)
-      @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, @mountPoint)
+      DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, props)
+      @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, wrapper)
 
     teardown: ->
       fakeENV.teardown()
-      ReactDOM.unmountComponentAtNode(@mountPoint)
+      ReactDOM.unmountComponentAtNode(wrapper)
 
   test 'sets the input as readonly', ->
     input = findRenderedDOMComponentWithTag(@dueDateCalendarPicker, 'input')
@@ -157,3 +150,31 @@ define [
   test 'disables the calendar picker button', ->
     button = findRenderedDOMComponentWithTag(@dueDateCalendarPicker, 'button')
     ok button.getAttribute("aria-disabled"), true
+
+  module 'given isFancyMidnight false',
+    setup: ->
+      fakeENV.setup()
+      ENV.context_asset_string = "course_1"
+      @clock = sinon.useFakeTimers()
+      props =
+        dateType:        "due_at"
+        dateValue:       new Date(Date.UTC(2012, 1, 1, 7, 0, 0))
+        disabled:        false
+        handleUpdate:    ->
+        inputClasses:    "date_field datePickerDateField DueDateInput"
+        isFancyMidnight: false
+        labelledBy:      "foo"
+        rowKey:          "nullnullnull"
+
+      DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, props)
+      @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, wrapper)
+
+    teardown: ->
+      fakeENV.teardown()
+      ReactDOM.unmountComponentAtNode(wrapper)
+      @clock.restore()
+
+  test "minutes remain unchanged", ->
+    date = tz.parse('2015-08-31T00:00:00')
+    minutes = @dueDateCalendarPicker.changeToFancyMidnightIfNeeded(date).getMinutes()
+    equal minutes, 0

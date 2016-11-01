@@ -136,7 +136,7 @@ define [
 
   test 'removes aria-hidden from #application when closed', ->
     @component = TestUtils.renderIntoDocument(React.createElement(Modal,
-      onRequestClose: -> console.log('closed'),
+      onRequestClose: ->
       isOpen: true,
       className: 'custom_class_name'
       title: "Hello",
@@ -161,7 +161,7 @@ define [
 
   test "removes aria-hidden from custom setElement property when closed", ->
     @component = TestUtils.renderIntoDocument(React.createElement(Modal,
-      onRequestClose: -> console.log('closed'),
+      onRequestClose: ->
       appElement: $('#fixtures')[0],
       isOpen: true,
       className: 'custom_class_name'

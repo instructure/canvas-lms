@@ -90,49 +90,60 @@ define([
                   <label className="ic-Label" htmlFor="title">
                     {I18n.t("Grading Period Title")}
                   </label>
-                  <input id='title'
-                         ref='title'
-                         className='ic-Input'
-                         title={I18n.t('Grading Period Title')}
-                         defaultValue={this.state.period.title}
-                         onChange={changeTitle.bind(this)}
-                         type='text'/>
+                  <input
+                    id='title'
+                    ref='title'
+                    className='ic-Input'
+                    title={I18n.t('Grading Period Title')}
+                    defaultValue={this.state.period.title}
+                    onChange={changeTitle.bind(this)}
+                    type='text'
+                  />
                 </div>
 
                 <div className="ic-Form-control">
                   <label id="start-date-label" htmlFor="start-date" className="ic-Label">
                     {I18n.t("Start Date")}
                   </label>
-                  <DueDateCalendarPicker dateValue    = {this.state.period.startDate}
-                                         ref          = "startDate"
-                                         dateType     = "due_at"
-                                         handleUpdate = {changeStartDate.bind(this)}
-                                         rowKey       = "start-date"
-                                         labelledBy   = "start-date-label" />
+                  <DueDateCalendarPicker
+                    dateValue       = {this.state.period.startDate}
+                    ref             = "startDate"
+                    dateType        = "due_at"
+                    handleUpdate    = {changeStartDate.bind(this)}
+                    rowKey          = "start-date"
+                    labelledBy      = "start-date-label"
+                    isFancyMidnight = {false}
+                  />
                 </div>
 
                 <div className="ic-Form-control">
                   <label id="end-date-label" htmlFor="end-date" className="ic-Label">
                     {I18n.t("End Date")}
                   </label>
-                  <DueDateCalendarPicker dateValue    = {this.state.period.endDate}
-                                         ref          = "endDate"
-                                         dateType     = "due_at"
-                                         handleUpdate = {changeEndDate.bind(this)}
-                                         rowKey       = "end-date"
-                                         labelledBy   = "end-date-label" />
+                  <DueDateCalendarPicker
+                    dateValue       = {this.state.period.endDate}
+                    ref             = "endDate"
+                    dateType        = "due_at"
+                    handleUpdate    = {changeEndDate.bind(this)}
+                    rowKey          = "end-date"
+                    labelledBy      = "end-date-label"
+                    isFancyMidnight = {true}
+                  />
                 </div>
 
                 <div className="ic-Form-control">
                   <label id="close-date-label" htmlFor="close-date" className="ic-Label">
                     {I18n.t("Close Date")}
                   </label>
-                  <DueDateCalendarPicker dateValue    = {this.state.period.closeDate}
-                                         ref          = "closeDate"
-                                         dateType     = "due_at"
-                                         handleUpdate = {changeCloseDate.bind(this)}
-                                         rowKey       = "close-date"
-                                         labelledBy   = "close-date-label" />
+                  <DueDateCalendarPicker
+                    dateValue       = {this.state.period.closeDate}
+                    ref             = "closeDate"
+                    dateType        = "due_at"
+                    handleUpdate    = {changeCloseDate.bind(this)}
+                    rowKey          = "close-date"
+                    labelledBy      = "close-date-label"
+                    isFancyMidnight = {true}
+                  />
                 </div>
               </div>
             </div>
@@ -146,17 +157,21 @@ define([
     renderSaveAndCancelButtons: function() {
       return (
         <div className="ic-Form-actions below-line">
-          <Button ref       = "cancelButton"
-                  disabled  = {this.props.disabled}
-                  onClick   = {this.triggerCancel}>
+          <Button
+            ref       = "cancelButton"
+            disabled  = {this.props.disabled}
+            onClick   = {this.triggerCancel}
+          >
             {I18n.t("Cancel")}
           </Button>
           &nbsp;
-          <Button variant    = "primary"
-                  ref        = "saveButton"
-                  aria-label = {I18n.t("Save Grading Period")}
-                  disabled   = {this.props.disabled}
-                  onClick    = {this.triggerSave}>
+          <Button
+            variant    = "primary"
+            ref        = "saveButton"
+            aria-label = {I18n.t("Save Grading Period")}
+            disabled   = {this.props.disabled}
+            onClick    = {this.triggerSave}
+          >
             {I18n.t("Save")}
           </Button>
         </div>

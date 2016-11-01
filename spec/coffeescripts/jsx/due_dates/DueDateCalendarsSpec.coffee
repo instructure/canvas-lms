@@ -18,6 +18,7 @@ define [
         dates: {due_at: @someDate}
         overrides: [{get: (->), set:(->)}]
         sections: {}
+        dateValue: @someDate
 
       DueDateCalendarsElement = React.createElement(DueDateCalendars, props)
       @dueDateCalendars = ReactDOM.render(DueDateCalendarsElement, $('<div>').appendTo('body')[0])

@@ -1,11 +1,10 @@
 define([
-  'underscore',
+  'jquery',
   'react',
   'jsx/due_dates/DueDateCalendarPicker',
   'i18n!assignments',
-  'classnames',
-  'jquery'
-], (_ , React, DueDateCalendarPicker, I18n, cx, $) => {
+  'classnames'
+], ($, React, DueDateCalendarPicker, I18n, cx) => {
 
   var DueDateCalendars = React.createClass({
 
@@ -23,19 +22,24 @@ define([
     // -------------------
 
     labelledByForType(dateType){
-      return "label-for-" + dateType + "-" + this.props.rowKey
+      return "label-for-" + dateType + "-" + this.props.rowKey;
     },
 
     datePicker(dateType, labelText){
+      const isNotUnlockAt = dateType !== "unlock_at";
+
       return (
-        <DueDateCalendarPicker dateType     = {dateType}
-                               handleUpdate = {this.props.replaceDate.bind(this, dateType)}
-                               rowKey       = {this.props.rowKey}
-                               labelledBy   = {this.labelledByForType(dateType)}
-                               dateValue    = {this.props.dates[dateType]}
-                               inputClasses = {this.inputClasses(dateType)}
-                               disabled     = {this.props.disabled}
-                               labelText    = {labelText}/>
+        <DueDateCalendarPicker
+          dateType        = {dateType}
+          handleUpdate    = {this.props.replaceDate.bind(this, dateType)}
+          rowKey          = {this.props.rowKey}
+          labelledBy      = {this.labelledByForType(dateType)}
+          dateValue       = {this.props.dates[dateType]}
+          inputClasses    = {this.inputClasses(dateType)}
+          disabled        = {this.props.disabled}
+          labelText       = {labelText}
+          isFancyMidnight = {isNotUnlockAt}
+        />
       );
     },
 
@@ -65,9 +69,9 @@ define([
             </div>
           </div>
         </div>
-      )
+      );
     }
+  });
 
-  })
-  return DueDateCalendars
+  return DueDateCalendars;
 });
