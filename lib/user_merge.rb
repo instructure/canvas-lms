@@ -216,7 +216,7 @@ class UserMerge
       new_us.shard = target_user.shard
       new_us.user = target_user
       new_us.save!
-      user_merge_data.add_more_data(new_us, user: target_user, workflow_state: 'non_existent')
+      user_merge_data.add_more_data([new_us], user: target_user, workflow_state: 'non_existent')
     end
     user_merge_data.add_more_data(from_user.user_services)
     from_user.user_services.delete_all
