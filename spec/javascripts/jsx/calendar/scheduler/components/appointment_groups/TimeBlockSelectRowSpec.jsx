@@ -1,27 +1,39 @@
 define([
   'jquery',
   'react',
+  'react-addons-test-utils',
   'jsx/calendar/scheduler/components/appointment_groups/TimeBlockSelectRow',
-], ($, React, TimeBlockSelectRow) => {
-  const TestUtils = React.addons.TestUtils;
-
+  'vendor/timezone/Europe/London',
+  'timezone',
+  'helpers/fakeENV',
+  'jquery.instructure_date_and_time'
+], ($, React, TestUtils, TimeBlockSelectRow, london, tz, fakeENV) => {
   let props;
+  let tzSnapshot;
 
   module('TimeBlockSelectRow', {
-    setup () {
+    setup() {
+      tzSnapshot = tz.snapshot()
+      // set local timezone to UTC
+      tz.changeZone(london, 'Europe/London')
+      // set user profile timezone to EST (UTC-4)
+      fakeENV.setup({ TIMEZONE: 'America/Detroit' })
+
       props = {
         timeData: {
-          date: new Date(),
-          startTime: new Date(),
-          endTime: new Date()
+          date: new Date('2016-10-28T19:00:00.000Z'),
+          startTime: new Date('2016-10-28T19:00:00.000Z'),
+          endTime: new Date('2016-10-28T19:30:00.000Z')
         },
-        setData () {},
-        handleDelete () {},
-        onBlur () {}
+        setData() {},
+        handleDelete() {},
+        onBlur() {}
       };
     },
-    teardown () {
+    teardown() {
       props = null;
+      tz.restore(tzSnapshot)
+      fakeENV.teardown()
     }
   });
 
@@ -50,6 +62,13 @@ define([
     const disabled = inputs.filter(input => input.hasAttribute('disabled'));
     equal(disabled.length, 3);
   });
+
+  test('render renders out fudged dates for timezones', () => {
+    const component = TestUtils.renderIntoDocument(<TimeBlockSelectRow {...props} />);
+    const inputs = TestUtils.scryRenderedDOMComponentsWithTag(component, 'input');
+    equal(inputs[1].value, ' 8:00pm')
+    equal(inputs[2].value, ' 8:30pm')
+  })
 
   test('handleDelete calls props.handleDelete passing the slotEventId', () => {
     props.handleDelete = sinon.spy();

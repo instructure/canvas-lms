@@ -1,8 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/calendar/scheduler/components/appointment_groups/ContextSelector',
-], (React, ContextSelector) => {
-  const TestUtils = React.addons.TestUtils
+], (React, TestUtils, ContextSelector) => {
 
     let props
 

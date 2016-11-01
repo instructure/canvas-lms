@@ -12,10 +12,10 @@ define([
   './ContextSelector',
   './TimeBlockSelector',
   'compiled/jquery.rails_flash_notifications',
-  'jquery.instructure_forms'
-], ($, React, I18n, {default: Breadcrumb, BreadcrumbLink}, {default: Button}, {default: Grid, GridCol, GridRow}, {default: ScreenReaderContent}, axios, AppointmentGroupList, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
-
-  const parseFormValues = (data) => ({
+  'jquery.instructure_forms',
+  'jquery.instructure_date_and_time'
+], ($, React, I18n, { default: Breadcrumb, BreadcrumbLink }, { default: Button }, { default: Grid, GridCol, GridRow }, { default: ScreenReaderContent }, axios, AppointmentGroupList, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
+  const parseFormValues = data => ({
     description: data.description,
     location: data.location_name,
     title: data.title,
@@ -29,7 +29,7 @@ define([
     if (!appointmentGroup.appointments) {
       return [];
     }
-    return appointmentGroup.appointments.map((appointment) => ({
+    return appointmentGroup.appointments.map(appointment => ({
       timeData: {
         date: appointment.start_at,
         startTime: appointment.start_at,
@@ -39,11 +39,11 @@ define([
     }));
   }
 
-  const nullTimeFilter = (timeBlock) => {
-    return timeBlock.timeData.date != null ||
+  const nullTimeFilter = timeBlock =>
+     timeBlock.timeData.date != null ||
            timeBlock.timeData.startTime != null ||
-           timeBlock.timeData.endTime != null;
-  }
+           timeBlock.timeData.endTime != null
+
 
   class EditPage extends React.Component {
 
@@ -51,7 +51,7 @@ define([
       appointment_group_id: React.PropTypes.string
     }
 
-    constructor (props) {
+    constructor(props) {
       super(props)
       this.messageStudents = this.messageStudents.bind(this)
       this.state = {
@@ -62,7 +62,7 @@ define([
       };
     }
 
-    componentDidMount () {
+    componentDidMount() {
       axios.get(`/api/v1/appointment_groups/${this.props.appointment_group_id}?include[]=appointments&include[]=child_events`)
            .then((response) => {
              const formValues = parseFormValues(response.data)
@@ -73,14 +73,13 @@ define([
                // Handle setting some pesky values
                $('.EditPage__Options-LimitUsersPerSlot', this.optionFields).val(formValues.limitUsersPerSlot);
                $('.EditPage__Options-LimitSlotsPerUser', this.optionFields).val(formValues.limitSlotsPerUser);
-
              })
            })
       axios.get('/api/v1/calendar_events/visible_contexts')
       .then((response) => {
-       this.setState({
-         contexts: response.data.contexts,
-       })
+        this.setState({
+          contexts: response.data.contexts,
+        })
       })
     }
 
@@ -130,57 +129,57 @@ define([
     }
 
 
-    messageStudents = (e) => {
-      //TODO: We need to make the MessageParticipantsDialog take in multiple appointments
+    messageStudents = () => {
+      // TODO: We need to make the MessageParticipantsDialog take in multiple appointments
       // to be able to get the MessageParticipantsDialog to show all the users
       // to message, otherwise we need to pass in the calendar datasource, or
       // rewrite the modal completely
-      ENV.CALENDAR = {}
-      ENV.CALENDAR.MAX_GROUP_CONVERSATION_SIZE = 100
-      const messageStudentsDialog = new MessageParticipantsDialog({timeslot: this.state.appointmentGroup.appointments[0]})
+      window.ENV.CALENDAR = {}
+      window.ENV.CALENDAR.MAX_GROUP_CONVERSATION_SIZE = 100
+      const messageStudentsDialog = new MessageParticipantsDialog({ timeslot: this.state.appointmentGroup.appointments[0] })
       messageStudentsDialog.show()
     }
 
     deleteGroup = () => {
-     if (!this.state.isDeleting) {
-       this.setState({ isDeleting: true }, () => {
-         axios.delete(`/api/v1/appointment_groups/${this.props.appointment_group_id}`)
-           .then(res => {
+      if (!this.state.isDeleting) {
+        this.setState({ isDeleting: true }, () => {
+          axios.delete(`/api/v1/appointment_groups/${this.props.appointment_group_id}`)
+           .then(() => {
              window.location = '/calendar'
            })
-           .catch(e => {
+           .catch(() => {
              $.flashError(I18n.t('An error ocurred while deleting the appointment group'))
              this.setState({ isDeleting: false })
            })
-       })
-     }
-   }
+        })
+      }
+    }
 
     handleSave = () => {
       const formValues = Object.assign({}, this.state.formValues);
       if (formValues.limitUsersPerSlot) {
-        const value = $('.EditPage__Options-LimitUsersPerSlot', this.optionFields).val();
+        const $element = $('.EditPage__Options-LimitUsersPerSlot', this.optionFields);
+        const value = $element.val();
         if (!value) {
-          $('.EditPage__Options-LimitUsersPerSlot', this.optionFields).errorBox(I18n.t('You must provide a value or unselect the option.'));
+          $element.errorBox(I18n.t('You must provide a value or unselect the option.'));
           return;
         } else if (value < 1) {
-          $('.EditPage__Options-LimitUsersPerSlot', this.optionFields).errorBox(I18n.t('You must allow at least one appointment per time slot.'));
+          $element.errorBox(I18n.t('You must allow at least one appointment per time slot.'));
           return;
-        } else {
-          formValues.usersPerSlotLimit = value;
         }
+        formValues.usersPerSlotLimit = value;
       }
       if (formValues.limitSlotsPerUser) {
-        const value = $('.EditPage__Options-LimitSlotsPerUser', this.optionFields).val();
+        const $element = $('.EditPage__Options-LimitSlotsPerUser', this.optionFields);
+        const value = $element.val();
         if (!value) {
-          $('.EditPage__Options-LimitSlotsPerUser', this.optionFields).errorBox(I18n.t('You must provide a value or unselect the option.'));
+          $element.errorBox(I18n.t('You must provide a value or unselect the option.'));
           return;
         } else if (value < 1) {
-          $('.EditPage__Options-LimitSlotsPerUser', this.optionFields).errorBox(I18n.t('You must allow at least one appointment per participant.'));
+          $element.errorBox(I18n.t('You must allow at least one appointment per participant.'));
           return;
-        } else {
-          formValues.slotsPerUserLimit = value;
         }
+        formValues.slotsPerUserLimit = value;
       }
       const url = `/api/v1/appointment_groups/${this.props.appointment_group_id}`;
 
@@ -195,8 +194,8 @@ define([
           participant_visibility: (formValues.allowStudentsToView) ? 'protected' : 'private',
           max_appointments_per_participant: formValues.slotsPerUserLimit,
           new_appointments: formValues.timeblocks.filter(nullTimeFilter).map(tb => ([
-            tb.timeData.startTime,
-            tb.timeData.endTime
+            $.unfudgeDateForProfileTimezone(tb.timeData.startTime),
+            $.unfudgeDateForProfileTimezone(tb.timeData.endTime)
           ])),
           context_codes: [...this.contextSelector.state.selectedContexts],
           sub_context_codes: [...this.contextSelector.state.selectedSubContexts]
@@ -210,10 +209,9 @@ define([
            .catch(() => {
              $.flashError(I18n.t('An error ocurred while saving the appointment group'));
            });
-
     }
 
-    render () {
+    render() {
       return (
         <div className="EditPage">
           <Breadcrumb label={I18n.t('You are here:')}>
@@ -248,7 +246,7 @@ define([
             <div className="ic-Form-control">
               <label className="ic-Label"htmlFor="context">{I18n.t('Calendars')}</label>
               <ContextSelector
-                ref={(c) => {this.contextSelector = c;}}
+                ref={(c) => { this.contextSelector = c; }}
                 id="context"
                 className="ic-Input"
                 appointmentGroup={this.state.appointmentGroup}
