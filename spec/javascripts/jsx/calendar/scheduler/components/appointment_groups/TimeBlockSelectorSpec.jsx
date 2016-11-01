@@ -2,9 +2,9 @@ define([
   'jquery',
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jsx/calendar/scheduler/components/appointment_groups/TimeBlockSelector',
-], ($, React, ReactDOM, TimeBlockSelector) => {
-  const TestUtils = React.addons.TestUtils;
+], ($, React, ReactDOM, TestUtils, TimeBlockSelector) => {
 
   let props;
 

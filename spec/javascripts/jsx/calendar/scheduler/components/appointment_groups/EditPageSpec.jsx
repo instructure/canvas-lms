@@ -1,11 +1,15 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jquery',
   'axios',
+  'moment',
   'jsx/calendar/scheduler/components/appointment_groups/EditPage',
-], (React, $, axios, EditPage) => {
-  const TestUtils = React.addons.TestUtils
-
+  'vendor/timezone/Europe/London',
+  'timezone',
+  'helpers/fakeENV',
+  'jquery.instructure_date_and_time'
+], (React, TestUtils, $, axios, moment, EditPage, london, tz, fakeENV) => {
   const renderComponent = (props = { appointment_group_id: '1' }) => {
     return TestUtils.renderIntoDocument(<EditPage {...props} />)
   }
@@ -143,6 +147,12 @@ define([
    })
 
    test('handleSave prepares the timeblocks appropriately', () => {
+     const snapshot = tz.snapshot()
+     // set local timezone to UTC
+     tz.changeZone(london, 'Europe/London')
+     // set user profile timezone to EST (UTC-4)
+     fakeENV.setup({ TIMEZONE: 'America/Detroit' })
+
      const component = renderComponent()
      sandbox.spy(axios, 'put')
      component.setState({
@@ -150,17 +160,17 @@ define([
          timeblocks: [{
            slotEventId: 'NEW-1',
            timeData: {
-             date: new Date('2016-10-28T19:00:00.000Z'),
-             startTime: new Date('2016-10-28T19:00:00.000Z'),
-             endTime: new Date('2016-10-28T19:30:00.000Z')
+             date: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:00:00.000Z')),
+             startTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:00:00.000Z')),
+             endTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z'))
            }
          },
          {
            slotEventId: 'NEW-2',
            timeData: {
-             date: new Date('2016-10-28T19:30:00.000Z'),
-             startTime: new Date('2016-10-28T19:30:00.000Z'),
-             endTime: new Date('2016-10-28T20:00:00.000Z')
+             date: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z')),
+             startTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z')),
+             endTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T20:00:00.000Z'))
            }
          },
          {
@@ -174,13 +184,18 @@ define([
 
      const requestObj = axios.put.args[0][1]
 
+     // The expected appointments are not fudged
      const expectedAppointments = [
        [new Date('2016-10-28T19:00:00.000Z'), new Date('2016-10-28T19:30:00.000Z')],
        [new Date('2016-10-28T19:30:00.000Z'), new Date('2016-10-28T20:00:00.000Z')]
      ]
 
      deepEqual(requestObj.appointment_group.new_appointments, expectedAppointments)
+
+     tz.restore(snapshot)
+     fakeENV.teardown()
    })
+
 
    test('handleSave sends a request to the proper endpoint', () => {
      const component = renderComponent()

@@ -11,14 +11,14 @@ define([
     if (!dateObj) {
       return '';
     }
-    return I18n.l(`date.formats.${format}`, dateObj);
+    return I18n.l(`date.formats.${format}`, $.fudgeDateForProfileTimezone(dateObj));
   };
 
   const timeToString = (dateObj, format) => {
     if (!dateObj) {
       return '';
     }
-    return I18n.l(`time.formats.${format}`, dateObj);
+    return I18n.l(`time.formats.${format}`, $.fudgeDateForProfileTimezone(dateObj));
   };
 
   class TimeBlockSelectorRow extends React.Component {
