@@ -914,6 +914,16 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def active_participants_include_tas_and_teachers(include_observers=false)
+    participants = active_participants(include_observers)
+    if self.context.is_a?(Group) && !self.context.course.nil?
+      participants += self.context.course.teachers
+      participants += self.context.course.tas
+      participants = participants.compact.uniq
+    end
+    participants
+  end
+
   def users_with_permissions(users)
     users.select{|u| self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)}
   end
