@@ -614,6 +614,15 @@ describe UserMerge do
   context "sharding" do
     specs_require_sharding
 
+    it 'should merge with user_services acorss shards' do
+      user1 = user_model
+      @shard1.activate do
+        @user2 = user_model
+        user_service_model(user: @user2)
+      end
+      UserMerge.from(@user2).into(user1)
+    end
+
     it "should merge a user across shards" do
       user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)
       p1 = @pseudonym
