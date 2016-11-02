@@ -94,10 +94,11 @@ module Lti
     ## |---exp---now---timestamp---| INVALID
     ##
     def self.check_and_store_nonce(cache_key, timestamp, expiration)
+      allowed_future_skew = 1.minute
       valid = timestamp.to_i > expiration.ago.to_i
-      valid &&= timestamp.to_i <= Time.now.to_i
+      valid &&= timestamp.to_i <= (Time.now + allowed_future_skew).to_i
       valid &&= !Rails.cache.exist?(cache_key)
-      Rails.cache.write(cache_key, 'OK', expires_in: expiration) if valid
+      Rails.cache.write(cache_key, 'OK', expires_in: expiration + allowed_future_skew) if valid
       valid
     end
 
