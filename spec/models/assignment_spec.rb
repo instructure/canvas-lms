@@ -2342,6 +2342,8 @@ describe Assignment do
           override = @assignment.assignment_overrides.first
           override.override_due_at(@assignment.due_at)
           override.save!
+          @assignment.reload
+
           @assignment.do_notifications!
 
           # when the override matches the default, show the default and not "Multiple"

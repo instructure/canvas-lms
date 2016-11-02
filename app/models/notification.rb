@@ -116,8 +116,10 @@ class Notification < ActiveRecord::Base
     if TYPES_TO_PRELOAD_CONTEXT_ROLES.include?(self.name)
       case asset
       when Assignment
+        ActiveRecord::Associations::Preloader.new.preload(asset, :assignment_overrides)
         asset.context.preload_user_roles!
       when AssignmentOverride
+        ActiveRecord::Associations::Preloader.new.preload(asset.assignment, :assignment_overrides)
         asset.assignment.context.preload_user_roles!
       end
     end
