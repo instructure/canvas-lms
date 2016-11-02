@@ -50,6 +50,7 @@ define [
       @subscribeToEvents()
       @header = @options.header
       @schedulerState = {}
+      @useBetterScheduler = !!@options.schedulerStore
       if @options.schedulerStore
         @schedulerStore = @options.schedulerStore
         @schedulerState = @schedulerStore.getState()
@@ -339,8 +340,7 @@ define [
       # create a new dummy event
       event = commonEventFactory(null, @activeContexts())
       event.date = @getCurrentDate()
-
-      new EditEventDetailsDialog(event).show()
+      new EditEventDetailsDialog(event, @useBetterScheduler).show()
 
     eventClick: (event, jsEvent, view) =>
       $event = $(jsEvent.currentTarget)
@@ -359,7 +359,7 @@ define [
       event = commonEventFactory(null, @activeContexts())
       event.date = date
       event.allDay = not date.hasTime()
-      (new EditEventDetailsDialog(event)).show()
+      (new EditEventDetailsDialog(event, @useBetterScheduler)).show()
 
     updateFragment: (opts) ->
       replaceState = !!opts.replaceState
