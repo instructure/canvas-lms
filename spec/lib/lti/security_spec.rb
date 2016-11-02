@@ -73,11 +73,18 @@ describe Lti::Security do
         expect(Lti::Security.check_and_store_nonce(cache_key, timestamp, expiration)).to be false
       end
 
-      it 'rejects a nonce in the future' do
+      it 'rejects a nonce more than 1 minute in the future' do
         cache_key = 'abcdefghijklmnopqrstuvwxyz'
         expiration = 5.minutes
-        timestamp = 5.minutes.from_now
+        timestamp = 61.seconds.from_now
         expect(Lti::Security.check_and_store_nonce(cache_key, timestamp, expiration)).to be false
+      end
+
+      it 'accepts a nonce less than 1 minute in the future' do
+        cache_key = 'abcdefghijklmnopqrstuvwxyz'
+        expiration = 5.minutes
+        timestamp = 59.seconds.from_now
+        expect(Lti::Security.check_and_store_nonce(cache_key, timestamp, expiration)).to be true
       end
 
     end
