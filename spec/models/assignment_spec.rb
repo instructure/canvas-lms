@@ -126,10 +126,21 @@ describe Assignment do
   describe '#secure_params' do
     before { setup_assignment_without_submission }
 
-    it 'contains the lti_context_id if the assignment is new' do
+    it 'contains the lti_context_id' do
       assignment = Assignment.new
-      lti_assignment_id = Canvas::Security.decode_jwt(assignment.secure_params)[:lti_assignment_id]
-      expect(lti_assignment_id).to be_present
+
+      new_lti_assignment_id = Canvas::Security.decode_jwt(assignment.secure_params)[:lti_assignment_id]
+      old_lti_assignment_id = Canvas::Security.decode_jwt(@assignment.secure_params)[:lti_assignment_id]
+
+      expect(new_lti_assignment_id).to be_present
+      expect(old_lti_assignment_id).to be_present
+    end
+
+    it 'uses the existing lti_context_id if present' do
+      lti_context_id = SecureRandom.uuid
+      assignment = Assignment.new(lti_context_id: lti_context_id)
+      decoded = Canvas::Security.decode_jwt(assignment.secure_params)
+      expect(decoded[:lti_assignment_id]).to eq(lti_context_id)
     end
 
     it 'returns a jwt' do

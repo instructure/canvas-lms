@@ -122,7 +122,7 @@ class Assignment < ActiveRecord::Base
 
   def secure_params
     body = {}
-    body[:lti_assignment_id] = SecureRandom.uuid if new_record?
+    body[:lti_assignment_id] = self.lti_context_id || SecureRandom.uuid
     Canvas::Security.create_jwt(body)
   end
 

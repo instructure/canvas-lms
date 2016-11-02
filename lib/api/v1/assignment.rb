@@ -83,7 +83,7 @@ module Api::V1::Assignment
     end
 
     hash = api_json(assignment, user, session, fields)
-    hash['secure_params'] = assignment.secure_params
+    hash['secure_params'] = assignment.secure_params if assignment.has_attribute?(:lti_context_id)
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
@@ -270,7 +270,6 @@ module Api::V1::Assignment
     if assignment.context.present?
       hash['submissions_download_url'] = submissions_download_url(assignment.context, assignment)
     end
-
     hash
   end
 
