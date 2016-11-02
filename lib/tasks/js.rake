@@ -25,7 +25,7 @@ namespace :js do
     "**/#{app_name}/**/*.spec.js"
   end
 
-  desc 'generate QUnit runner file @ spec/javascripts/runner.html'
+  desc 'generate requirejs loader file @ spec/javascripts/load_tests.js'
   task :generate_runner do
     build_runner
   end
@@ -33,9 +33,9 @@ namespace :js do
   def build_runner
     require 'canvas/require_js'
     require 'erubis'
-    output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/runner.html.erb")).
+    output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/load_tests.js.erb")).
         result(Canvas::RequireJs.get_binding)
-    File.open("#{Rails.root}/spec/javascripts/runner.html", 'w') { |f| f.write(output) }
+    File.open("#{Rails.root}/spec/javascripts/load_tests.js", 'w') { |f| f.write(output) }
     build_requirejs_config
   end
 
@@ -56,16 +56,6 @@ namespace :js do
     output = Erubis::Eruby.new(File.read("#{Rails.root}/spec/javascripts/requirejs_config.js.erb")).
         result(Canvas::RequireJs.get_binding)
     File.open("#{Rails.root}/spec/javascripts/requirejs_config.js", 'w') { |f| f.write(output) }
-
-    matcher = Canvas::RequireJs.matcher
-    tests = Dir[
-      "public/javascripts/*[!bower]/#{matcher}",
-      "spec/javascripts/compiled/#{matcher}",
-      "spec/plugins/*/javascripts/compiled/#{matcher}"
-    ].map{ |file| file.sub(/\.js$/, '').sub(/public\/javascripts\//, '') }
-    File.open("#{Rails.root}/spec/javascripts/tests.js", 'w') { |f|
-      f.write("window.__TESTS__ = #{JSON.pretty_generate(tests.shuffle(random: generate_prng))}")
-    }
   end
 
   desc 'test javascript specs with Karma'
@@ -100,51 +90,48 @@ namespace :js do
           d.match(/^\./) || ignored_embers.include?(d)
         }.each do |ember_app|
           puts "--> Running tests for '#{ember_app}' ember app"
-          Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
+          ENV["JS_SPEC_MATCHER"] = matcher_for_ember_app ember_app
           test_suite(reporter)
         end
+
+        ENV['JS_SPEC_MATCHER'] = nil
       end
 
-      # run test for non-ember apps
-      Canvas::RequireJs.matcher = nil
       test_suite(reporter)
     end
   end
 
-  def test_suite(reporter=nil)
-    if test_js_with_timeout(300,reporter) != 0 && !ENV['JS_SPEC_MATCHER'] && ENV['retry'] != 'false'
-      puts "--> Karma tests failed." # retrying karma...
-      raise "Karma tests failed on second attempt." if test_js_with_timeout(400,reporter) != 0
-    end
+  def test_suite(reporter = nil)
+    return if test_js_with_timeout(300, reporter)
+
+    do_retry = ENV['retry'] != 'false' && !ENV['JS_SPEC_MATCHER']
+    raise "Karma tests failed" unless do_retry
+
+    puts "--> Karma tests failed." # retrying karma...
+    test_js_with_timeout(400, reporter) or raise "Karma tests failed on second attempt."
   end
 
   def test_js_with_timeout(timeout,reporter)
     require 'canvas/require_js'
-    begin
-      Timeout::timeout(timeout) do
-        quick = ENV["quick"] && ENV["quick"] == "true"
-        unless quick
-          puts "--> do rake js:test quick=true to skip generating compiled coffeescript and handlebars."
-          Rake::Task['js:generate'].invoke
-        end
-        puts "--> executing browser tests with Karma"
-        build_runner
-        reporters = ['progress', 'coverage', reporter].reject(&:blank?).join(',')
-        command = %Q{./node_modules/karma/bin/karma start --browsers Chrome --single-run --reporters #{reporters}}
-        puts "running karma with command: #{command} on node #{`node -v`}"
-        system command
-
-        if $?.exitstatus != 0
-          puts 'some specs failed'
-          result = 1
-        else
-          result = 0
-        end
-        return result
+    Timeout::timeout(timeout) do
+      quick = ENV["quick"] && ENV["quick"] == "true"
+      unless quick
+        puts "--> do rake js:test quick=true to skip generating compiled coffeescript and handlebars."
+        Rake::Task['js:generate'].invoke
       end
-    rescue Timeout::Error
-      puts "Karma tests reached timeout!"
+      puts "--> executing browser tests with Karma"
+      build_runner
+      reporters = ['progress', 'coverage', reporter].reject(&:blank?).join(',')
+      command = %Q{./node_modules/karma/bin/karma start --browsers Chrome --single-run --reporters #{reporters}}
+      puts "running karma with command: #{command} on node #{`node -v`}"
+      result = system(command)
+
+      puts 'some specs failed' unless result
+      result
     end
+  rescue Timeout::Error
+    puts "Karma tests reached timeout!"
+    false
   end
 
   def coffee_destination(dir_or_file)

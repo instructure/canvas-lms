@@ -3,21 +3,12 @@ require 'lib/canvas/require_js/client_app_extension'
 module Canvas
   module RequireJs
     class << self
-      @@matcher = nil
       def get_binding
         binding
       end
 
       PATH_REGEX = %r{.*?/javascripts/(plugins/)?(.*)\.js\z}
       JS_ROOT = "#{Rails.root}/public/javascripts"
-
-      def matcher=(value)
-        @@matcher = value
-      end
-
-      def matcher
-        @@matcher || ENV['JS_SPEC_MATCHER'] || '**/*Spec.js'
-      end
 
       # get all regular canvas (and plugin) bundles
       def app_bundles

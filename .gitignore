@@ -52,8 +52,8 @@ npm-debug.log
 /public/webpack-dist/
 /spec/javascripts/webpack/
 /spec/javascripts/compiled/
+/spec/javascripts/load_tests.js
 /spec/javascripts/requirejs_config.js
-/spec/javascripts/runner.html
 /spec/javascripts/tests.js
 /tmp/
 /vendor/bundle
