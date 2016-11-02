@@ -2207,7 +2207,7 @@ class Course < ActiveRecord::Base
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
       :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
-      :organize_epub_by_content_type ]
+      :organize_epub_by_content_type]
   end
 
   def set_course_dates_if_blank(shift_options)

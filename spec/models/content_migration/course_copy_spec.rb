@@ -417,6 +417,28 @@ describe ContentMigration do
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
     end
 
+    it "should copy dashboard images" do
+      att = attachment_model(:context => @copy_from, :uploaded_data => stub_png_data, :filename => "homework.png")
+      @copy_from.image_id = att.id
+      @copy_from.save!
+
+      run_course_copy
+
+      @copy_to.reload
+      new_att = @copy_to.attachments.where(:migration_id => mig_id(att)).first
+      expect(@copy_to.image_id.to_i).to eq new_att.id
+
+      example_url = "example.com"
+      @copy_from.image_url = example_url
+      @copy_from.image_id = nil
+      @copy_from.save!
+
+      run_course_copy
+
+      @copy_to.reload
+      expect(@copy_to.image_url).to eq example_url
+    end
+
     it "should convert domains in imported urls if specified in account settings" do
       account = @copy_to.root_account
       account.settings[:default_migration_settings] = {:domain_substitution_map => {"http://derp.derp" => "https://derp.derp"}}

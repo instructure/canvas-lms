@@ -292,6 +292,15 @@ module Importers
           end
         end
       end
+      if image_url = settings[:image_url]
+        course.image_url = image_url
+        course.image_id = nil
+      elsif image_ref = settings[:image_identifier_ref]
+        if image_att = course.attachments.where(:migration_id => image_ref).first
+          course.image_id = image_att.id
+          course.image_url = nil
+        end
+      end
       if settings[:lock_all_announcements]
         Announcement.lock_from_course(course)
       end
