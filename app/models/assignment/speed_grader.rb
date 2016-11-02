@@ -177,7 +177,7 @@ class Assignment
         if json['submission_history'] && (@assignment.quiz.nil? || too_many)
           json['submission_history'] = json['submission_history'].map do |version|
             version.as_json(only: submission_fields,
-                            methods: [:versioned_attachments, :late]).tap do |version_json|
+                            methods: [:versioned_attachments, :late, :external_tool_url]).tap do |version_json|
               if version_json['submission'] && version_json['submission']['versioned_attachments']
                 version_json['submission']['versioned_attachments'].map! do |a|
                   if @grading_role == :moderator

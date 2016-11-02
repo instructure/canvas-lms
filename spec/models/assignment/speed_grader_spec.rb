@@ -217,6 +217,14 @@ describe Assignment::SpeedGrader do
     expect(attachment_json['view_inline_ping_url']).to match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
   end
 
+  it "includes lti launch url in submission history" do
+    setup_assignment_without_submission
+    @assignment.submit_homework(@user, :submission_type => 'basic_lti_launch', :url => 'http://www.example.com')
+    json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+    url_json = json['submissions'][0]['submission_history'][0]['submission']['external_tool_url']
+    expect(url_json).to eql('http://www.example.com')
+  end
+
   context "group assignments" do
     before :once do
       course_with_teacher(active_all: true)
