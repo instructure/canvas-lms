@@ -222,7 +222,10 @@ module Importers
       end
       migration.progress=100
       migration.migration_settings ||= {}
-      migration.migration_settings[:imported_assets] = migration.imported_migration_items.map(&:asset_string)
+
+      imported_asset_hash = {}
+      migration.imported_migration_items_hash.each{|k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(',') if assets.present?}
+      migration.migration_settings[:imported_assets] = imported_asset_hash
       migration.workflow_state = :imported
       migration.save
       ActiveRecord::Base.skip_touch_context(false)

@@ -766,8 +766,9 @@ class ContentMigration < ActiveRecord::Base
     @imported_migration_items_hash.values.map(&:values).flatten
   end
 
-  def imported_migration_items_hash(klass)
+  def imported_migration_items_hash(klass=nil)
     @imported_migration_items_hash ||= {}
+    return @imported_migration_items_hash unless klass
     @imported_migration_items_hash[klass.name] ||= {}
   end
 
