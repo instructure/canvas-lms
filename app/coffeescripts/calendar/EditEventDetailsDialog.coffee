@@ -19,7 +19,7 @@ define [
     title: I18n.t('titles.edit_event', "Edit Event")
 
   class
-    constructor: (@event) ->
+    constructor: (@event, @betterScheduler) ->
       @currentContextInfo = null
       dialog.on('dialogclose', @dialogClose)
 
@@ -106,7 +106,8 @@ define [
                                                                          group,
                                                                          _.filter(@event.allPossibleContexts, (c) -> c.can_create_appointment_groups),
                                                                          @closeCB,
-                                                                         @event)
+                                                                         @event,
+                                                                         @betterScheduler)
           dialog.find("#edit_appointment_group_form_holder").data('form-widget', @appointmentGroupDetailsForm)
 
         @setupTabs()
