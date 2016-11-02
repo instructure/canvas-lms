@@ -148,7 +148,6 @@ define([
 
     contextName = (asset_string) => {
       for (let context of this.props.contexts) {
-        if (!context.sections) { continue } // a user context, probably
         if (context.asset_string === asset_string) { return context.name }
         for (let subContext of context.sections) {
           if (subContext.asset_string === asset_string) { return subContext.name }
@@ -209,27 +208,25 @@ define([
       <div>
         {
           this.props.contexts.map(context => {
-            if (context.asset_string.indexOf('user') === -1) {
-              let expanded = this.state.expandedContexts.has(context)
-              let inputId = `${context.asset_string}_checkbox`
-              return (
-                <div className="CourseListItem" key={context.asset_string}>
-                  <i role="button" aria-controls={`${context.asset_string}_sections`} aria-expanded={expanded} onClick={() => this.toggleCourseExpanded(context)} className={`icon-arrow-${expanded ? 'down' : 'right'}`}><span className="screenreader-only">{context.name}</span></i>
-                  <input
-                    ref={(checkbox) => { this.contextCheckboxes[context.asset_string] = checkbox }}
-                    id={inputId}
-                    type="checkbox"
-                    onChange={() => this.toggleCourse(context.asset_string, !this.isContextChecked(context.asset_string))}
-                    value={context.asset_string}
-                    defaultChecked={this.isContextChecked(context.asset_string)}
-                    checked={this.isContextChecked(context.asset_string)}
-                    disabled={this.isContextDisabled(context.asset_string)}
-                  />
-                  <label className="ContextLabel" htmlFor={inputId}>{context.name}</label>
-                  {this.renderSections(context)}
-                </div>
-              )
-            }
+            let expanded = this.state.expandedContexts.has(context)
+            let inputId = `${context.asset_string}_checkbox`
+            return (
+              <div className="CourseListItem" key={context.asset_string}>
+                <i role="button" aria-controls={`${context.asset_string}_sections`} aria-expanded={expanded} onClick={() => this.toggleCourseExpanded(context)} className={`icon-arrow-${expanded ? 'down' : 'right'}`}><span className="screenreader-only">{context.name}</span></i>
+                <input
+                  ref={(checkbox) => { this.contextCheckboxes[context.asset_string] = checkbox }}
+                  id={inputId}
+                  type="checkbox"
+                  onChange={() => this.toggleCourse(context.asset_string, !this.isContextChecked(context.asset_string))}
+                  value={context.asset_string}
+                  defaultChecked={this.isContextChecked(context.asset_string)}
+                  checked={this.isContextChecked(context.asset_string)}
+                  disabled={this.isContextDisabled(context.asset_string)}
+                />
+                <label className="ContextLabel" htmlFor={inputId}>{context.name}</label>
+                {this.renderSections(context)}
+              </div>
+            )
           })
         }
       </div>

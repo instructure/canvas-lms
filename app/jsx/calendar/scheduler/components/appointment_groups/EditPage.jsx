@@ -78,9 +78,9 @@ define([
            })
       axios.get('/api/v1/calendar_events/visible_contexts')
       .then((response) => {
-        this.setState({
-          contexts: response.data.contexts,
-        })
+       this.setState({
+         contexts: response.data.contexts.filter((context) => context.asset_string.match(/^course_/))
+       })
       })
     }
 
