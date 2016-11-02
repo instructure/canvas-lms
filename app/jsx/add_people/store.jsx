@@ -1,7 +1,7 @@
 define([
   'redux',
   'redux-thunk',
-], ({ createStore, applyMiddleware }, ReduxThunk) => {
+], ({ createStore, applyMiddleware }, {default:ReduxThunk}) => {
   // returns createStore(reducer, initialState)
   return applyMiddleware(
     ReduxThunk
