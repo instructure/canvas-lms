@@ -17,7 +17,7 @@ tinymce.create('tinymce.plugins.BZButtons', {
       var innerDiv = document.createElement("div");
       div.appendChild(innerDiv);
 
-      creationFunction(innerDiv);
+      creationFunction(innerDiv, div);
 
       var i = document.createElement("button");
       i.setAttribute("type", "button");
@@ -43,6 +43,10 @@ tinymce.create('tinymce.plugins.BZButtons', {
 
 
       document.body.appendChild(dialog);
+
+      var first = dialog.querySelector("input, textarea");
+      if(first)
+      	first.focus();
     }
 
     // returns the element reference
@@ -97,7 +101,7 @@ tinymce.create('tinymce.plugins.BZButtons', {
 	var statements = [], typeSelects = [];
 	showDialog(
 		"Add Quick Quiz",
-		function(div) {
+		function(div, outerDiv) {
 		  titleInput = addField(div, "Question:", "input");
 
 		  var addButton = document.createElement("button");
@@ -112,8 +116,11 @@ tinymce.create('tinymce.plugins.BZButtons', {
 			addOptionToSelect(types, "correct");
 
 			typeSelects.push(types);
+			statements[statements.length - 1].focus();
 		  };
-		  div.appendChild(addButton);
+		  addButton.onclick();
+		  addButton.onclick();
+		  outerDiv.appendChild(addButton);
 
 		},
 		function() {
@@ -162,17 +169,22 @@ tinymce.create('tinymce.plugins.BZButtons', {
 	var statements = [];
 	showDialog(
 		"Add Checklist",
-		function(div) {
+		function(div, outerDiv) {
 		  headerInput = addField(div, "Header:", "input");
-		  questionInput = addField(div, "Question:", "input");
+		  questionInput = addField(div, "Checklist Prompt:", "input");
 
 		  var addButton = document.createElement("button");
 		  addButton.setAttribute("type", "button");
-		  addButton.innerHTML = "Add Item";
+		  addButton.innerHTML = "Add Statement";
 		  addButton.onclick = function() {
 		  	statements.push(addField(div, "Statement to checkoff:", "input"));
+			statements[statements.length - 1].focus();
 		  };
-		  div.appendChild(addButton);
+		  outerDiv.appendChild(addButton);
+
+		  addButton.onclick();
+		  addButton.onclick();
+
 		},
 		function() {
 		  var html = '<form>';
