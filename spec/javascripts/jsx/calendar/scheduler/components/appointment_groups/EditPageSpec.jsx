@@ -55,6 +55,32 @@ define([
     ok($.flashError.withArgs('An error ocurred while deleting the appointment group'))
   })
 
+  module('Change Handlers')
+
+  test('handleChange updates properties based on the name property', () => {
+    const component = renderComponent()
+    const fakeEvent = {
+      target: {
+        name: 'han',
+        value: 'solo'
+      }
+    }
+    component.handleChange(fakeEvent)
+    equal(component.state.formValues.han, 'solo')
+  })
+
+  test('handleCheckboxChange updates the boolean flag based on the name property', () => {
+    const component = renderComponent()
+    const fakeEvent = {
+      target: {
+        name: 'han',
+        checked: true
+      }
+    }
+    component.handleCheckboxChange(fakeEvent)
+    equal(component.state.formValues.han, true)
+  })
+
   module('Save Group', {
    setup () {
      sandbox = sinon.sandbox.create()

@@ -53,9 +53,10 @@ define([
 
     constructor(props) {
       super(props)
-      this.messageStudents = this.messageStudents.bind(this)
       this.state = {
-        appointmentGroup: {},
+        appointmentGroup: {
+          title: ''
+        },
         formValues: {},
         contexts: [],
         isDeleting: false,
@@ -83,61 +84,25 @@ define([
       })
     }
 
-    setTitleValue = (e) => {
-      const formValues = Object.assign(this.state.formValues, { title: e.target.value });
-      this.setState({ formValues });
-    }
-
-    setDescriptionValue = (e) => {
-      const formValues = Object.assign(this.state.formValues, { description: e.target.value });
-      this.setState({ formValues });
-    }
-
-    setLocationValue = (e) => {
-      const formValues = Object.assign(this.state.formValues, { location: e.target.value });
-      this.setState({ formValues });
-    }
-
-    setContexts = (newContexts) => {
-      const formValues = Object.assign(this.state.formValues, { contexts: newContexts });
-      this.setState({ formValues });
-    }
-
     setTimeBlocks = (newTimeBlocks = []) => {
       const formValues = Object.assign(this.state.formValues, { timeblocks: newTimeBlocks });
       this.setState({ formValues });
     }
 
-    setGroupSignupRequired = (e) => {
-      const formValues = Object.assign(this.state.formValues, { studentGroupSignupRequired: e.target.checked });
+    handleChange = (e) => {
+      const formValues = Object.assign(this.state.formValues, {
+        [e.target.name]: e.target.value
+      });
+
       this.setState({ formValues });
     }
 
-    setLimitUsersPerSlot = (e) => {
-      const formValues = Object.assign(this.state.formValues, { limitUsersPerSlot: e.target.checked });
+    handleCheckboxChange = (e) => {
+      const formValues = Object.assign(this.state.formValues, {
+        [e.target.name]: e.target.checked
+      });
+
       this.setState({ formValues });
-    }
-
-    setAllowStudentsToView = (e) => {
-      const formValues = Object.assign(this.state.formValues, { allowStudentsToView: e.target.checked });
-      this.setState({ formValues });
-    }
-
-    setLimitSlotsPerUser = (e) => {
-      const formValues = Object.assign(this.state.formValues, { limitSlotsPerUser: e.target.checked });
-      this.setState({ formValues });
-    }
-
-
-    messageStudents = () => {
-      // TODO: We need to make the MessageParticipantsDialog take in multiple appointments
-      // to be able to get the MessageParticipantsDialog to show all the users
-      // to message, otherwise we need to pass in the calendar datasource, or
-      // rewrite the modal completely
-      window.ENV.CALENDAR = {}
-      window.ENV.CALENDAR.MAX_GROUP_CONVERSATION_SIZE = 100
-      const messageStudentsDialog = new MessageParticipantsDialog({ timeslot: this.state.appointmentGroup.appointments[0] })
-      messageStudentsDialog.show()
     }
 
     deleteGroup = () => {
@@ -215,7 +180,7 @@ define([
       return (
         <div className="EditPage">
           <Breadcrumb label={I18n.t('You are here:')}>
-            <BreadcrumbLink href='/calendar'>{I18n.t('Calendar')}</BreadcrumbLink>
+            <BreadcrumbLink href="/calendar">{I18n.t('Calendar')}</BreadcrumbLink>
             <BreadcrumbLink>
               {I18n.t('Edit %{pageTitle}', {
                 pageTitle: this.state.appointmentGroup.title
@@ -261,7 +226,7 @@ define([
                 name="title"
                 id="title"
                 value={this.state.formValues.title}
-                onChange={this.setTitleValue}
+                onChange={this.handleChange}
               />
             </div>
             <div className="ic-Form-control">
@@ -279,7 +244,7 @@ define([
                 name="location"
                 id="location"
                 value={this.state.formValues.location}
-                onChange={this.setLocationValue}
+                onChange={this.handleChange}
               />
             </div>
             <div className="ic-Form-control">
@@ -290,7 +255,7 @@ define([
                 name="description"
                 id="description"
                 value={this.state.formValues.description}
-                onChange={this.setDescriptionValue}
+                onChange={this.handleChange}
               />
             </div>
             <div ref={(c) => { this.optionFields = c; }} className="ic-Form-control EditPage__Options">
@@ -315,7 +280,8 @@ define([
                     type="checkbox"
                     checked={this.state.formValues.limitUsersPerSlot}
                     id="limit_users_per_slot"
-                    onChange={this.setLimitUsersPerSlot}
+                    name="limitUsersPerSlot"
+                    onChange={this.handleCheckboxChange}
                   />
                   <label
                     className="ic-Label"
@@ -332,7 +298,8 @@ define([
                     type="checkbox"
                     checked={this.state.formValues.allowStudentsToView}
                     id="allow_students_to_view_signups"
-                    onChange={this.setAllowStudentsToView}
+                    name="allowStudentsToView"
+                    onChange={this.handleCheckboxChange}
                   />
                   <label
                     className="ic-Label"
@@ -346,7 +313,8 @@ define([
                     type="checkbox"
                     checked={this.state.formValues.limitSlotsPerUser}
                     id="limit_slots_per_user"
-                    onChange={this.setLimitSlotsPerUser}
+                    name="limitSlotsPerUser"
+                    onChange={this.handleCheckboxChange}
                   />
                   <label
                     className="ic-Label"

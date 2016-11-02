@@ -157,7 +157,7 @@ define([
     }
 
     contextAndCountText = (contextSet) => {
-      let contextName = this.contextName(contextSet.values().next().value)
+      let contextName = this.contextName(contextSet.values().next().value) || ''
       if (contextSet.size > 1) {
         return I18n.t({one: '%{contextName} and %{count} other',
                        other: '%{contextName} and %{count} others'},
