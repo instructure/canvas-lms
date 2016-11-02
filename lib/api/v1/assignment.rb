@@ -359,9 +359,11 @@ module Api::V1::Assignment
       assignment.lti_context_id = secure_params[:lti_assignment_id]
     end
 
-    tool = ContextExternalTool.find_external_tool_by_id(assignment_params['assignmentConfigurationTool'].to_i,
+    if plagiarism_capable?(assignment_params)
+      tool = ContextExternalTool.find_external_tool_by_id(assignment_params['assignmentConfigurationTool'].to_i,
                                                         context)
-    assignment.tool_settings_tools = [tool] if tool
+      assignment.tool_settings_tools = [tool] if tool
+    end
 
     overrides = deserialize_overrides(assignment_params[:assignment_overrides])
     overrides = [] if !overrides && assignment_params.has_key?(:assignment_overrides)
@@ -612,6 +614,11 @@ module Api::V1::Assignment
   end
 
   private
+
+  def plagiarism_capable?(assignment_params)
+    assignment_params['submission_type'] == 'online' &&
+      assignment_params['submission_types'].include?('online_upload')
+  end
 
   def submissions_download_url(context, assignment)
     if assignment.quiz?
