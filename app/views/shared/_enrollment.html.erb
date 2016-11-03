@@ -19,7 +19,7 @@
         cant_unenroll = ""
         unenroll_image = "delete_circle.png"
       end
-      allowedbypermissions = ([StudentEnrollment, ObserverEnrollment].include?(enrollment.try(:class)) && can_do(@context, @current_user, :manage_students) || can_do(@context, @current_user, :manage_admin_users))
+      allowedbypermissions = enrollment && enrollment.can_be_deleted_by(@current_user, @context, session)
     %>
     <% if show_information_link %>
       <a href="#" class="user_information_link no-hover"><%= image_tag "information.png", :alt => t('Information') %></a>
