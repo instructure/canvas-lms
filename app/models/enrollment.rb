@@ -846,6 +846,8 @@ class Enrollment < ActiveRecord::Base
   #
   # return Boolean
   def can_be_deleted_by(user, context, session)
+    return context.grants_right?(user, session, :use_student_view) if fake_student?
+
     can_remove = [StudentEnrollment, ObserverEnrollment].include?(self.class) &&
       context.grants_right?(user, session, :manage_students)
     can_remove ||= context.grants_right?(user, session, :manage_admin_users) unless student?
