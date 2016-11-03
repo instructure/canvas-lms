@@ -56,9 +56,6 @@ module Guard
           notify_result(changed_files, errors, options)
 
           [changed_files, errors.empty?]
-
-        rescue ExecJS::RuntimeError => e
-          Formatter.error("ExecJS engine error: " + e.message)
         end
 
         private

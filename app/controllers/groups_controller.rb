@@ -274,21 +274,19 @@ class GroupsController < ApplicationController
         @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
         if @context.grants_right?(@current_user, session, :manage_groups)
-          if @domain_root_account.enable_manage_groups2?
-            categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
-            uncategorized = @context.groups.active.uncategorized.to_a
-            if uncategorized.present?
-              json = group_category_json(GroupCategory.uncategorized, @current_user, session)
-              json["groups"] = uncategorized.map{ |group| group_json(group, @current_user, session) }
-              categories_json << json
-            end
-
-            js_env group_categories: categories_json,
-                   group_user_type: @group_user_type,
-                   allow_self_signup: @allow_self_signup
-            # since there are generally lots of users in an account, always do large roster view
-            @js_env[:IS_LARGE_ROSTER] ||= @context.is_a?(Account)
+          categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
+          uncategorized = @context.groups.active.uncategorized.to_a
+          if uncategorized.present?
+            json = group_category_json(GroupCategory.uncategorized, @current_user, session)
+            json["groups"] = uncategorized.map{ |group| group_json(group, @current_user, session) }
+            categories_json << json
           end
+
+          js_env group_categories: categories_json,
+                 group_user_type: @group_user_type,
+                 allow_self_signup: @allow_self_signup
+          # since there are generally lots of users in an account, always do large roster view
+          @js_env[:IS_LARGE_ROSTER] ||= @context.is_a?(Account)
           render :context_manage_groups
         else
           @groups = @user_groups = @groups & (@user_groups || [])
@@ -683,20 +681,6 @@ class GroupsController < ApplicationController
 
     users = Api.paginate(users, self, api_v1_group_users_url)
     render :json => users_json(users, @current_user, session, Array(params[:include]), @context, nil, Array(params[:exclude]))
-  end
-
-  def edit
-    account = @context.root_account
-    raise ActiveRecord::RecordNotFound unless account.canvas_network_enabled?
-
-    @group = (@context ? @context.groups : Group).find(params[:id])
-    @context = @group
-
-    folder   = @group.folders.active.first
-    folder ||= @group.folders.active.create! :name => 'Group Pictures'
-    js_env :GROUP_ID => @group.id, :FOLDER_ID => folder.id
-
-    authorized_action(@group, @current_user, :update)
   end
 
   def public_feed

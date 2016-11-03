@@ -1,7 +1,8 @@
 define [
   'react'
+  'react-dom'
   'jsx/external_apps/components/ConfigurationFormXml'
-], (React, ConfigurationFormXml) ->
+], (React, ReactDOM, ConfigurationFormXml) ->
 
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
@@ -16,11 +17,11 @@ define [
     })
 
   renderComponent = (data) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   module 'ExternalApps.ConfigurationFormXml',
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'isValid when not valid', ->
     data =

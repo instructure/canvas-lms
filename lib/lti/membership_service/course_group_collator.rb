@@ -43,6 +43,7 @@ module Lti
 
       def groups
         @groups ||= @context.groups.active
+                             .order(:id)
                              .offset(@page * @per_page)
                              .limit(@per_page + 1)
       end

@@ -136,6 +136,11 @@ module Api::V1::Submission
       turnitin_hash.delete(:last_processed_attempt)
       hash['turnitin_data'] = turnitin_hash
     end
+    if attempt.vericite_data(false).present? && attempt.can_view_plagiarism_report('vericite', @current_user, session)
+      vericite_hash = attempt.vericite_data(false).dup
+      vericite_hash.delete(:last_processed_attempt)
+      hash['vericite_data'] = vericite_hash
+    end
 
     if other_fields.include?('attachments')
       attachments = attempt.versioned_attachments.dup

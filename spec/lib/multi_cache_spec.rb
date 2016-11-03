@@ -56,8 +56,8 @@ describe MultiCache do
     ring[1].expects(:del).with('key').returns(false)
 
     # TODO remove this when removing the shim from active_support.rb
-    ring[0].expects(:del).with('rails4_2:key').returns(false)
-    ring[1].expects(:del).with('rails4_2:key').returns(false)
+    ring[0].expects(:del).with('rails5:key').returns(false)
+    ring[1].expects(:del).with('rails5:key').returns(false)
 
     store = MultiCache.new(ring)
     expect(store.delete('key')).to eq true

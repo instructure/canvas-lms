@@ -212,6 +212,16 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   .discussion-row {
     display: table-row;
 
+    .mastery-path-icon {
+      margin-right: 10px;
+      padding: 2px 7px;
+      font-size: 0.8em;
+
+      i {
+        margin-right: 5px;
+      }
+    }
+
     > div {
       display: table-cell;
       vertical-align: middle;

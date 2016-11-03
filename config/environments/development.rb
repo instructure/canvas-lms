@@ -21,24 +21,12 @@ environment_configuration(defined?(config) && config) do |config|
   cache_store_rb = File.dirname(__FILE__) + "/cache_store.rb"
   eval(File.new(cache_store_rb).read, nil, cache_store_rb, 1)
 
-  # allow debugging only in development environment by default
-  #
-  # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
-  # The ruby debug gems conflict with the IDE-based debugger gem.
-  # Set this option in your dev environment to disable.
-  unless ENV['DISABLE_RUBY_DEBUGGING']
-    if RUBY_VERSION >= '2.0.0'
-      require 'byebug'
-      if ENV['REMOTE_DEBUGGING_ENABLED']
-        require 'byebug/core'
-        Byebug.start_server('0.0.0.0', 0)
-        puts "Byebug listening on 0.0.0.0:#{Byebug.actual_port}" # rubocop:disable Rails/Output
-        byebug_port_file = File.join(Dir.tmpdir, 'byebug.port')
-        File.write(byebug_port_file, Byebug.actual_port)
-      end
-    else
-      require "debugger"
-    end
+  if ENV['REMOTE_DEBUGGING_ENABLED']
+    require 'byebug/core'
+    Byebug.start_server('0.0.0.0', 0)
+    puts "Byebug listening on 0.0.0.0:#{Byebug.actual_port}" # rubocop:disable Rails/Output
+    byebug_port_file = File.join(Dir.tmpdir, 'byebug.port')
+    File.write(byebug_port_file, Byebug.actual_port)
   end
 
   # Print deprecation notices to the Rails logger

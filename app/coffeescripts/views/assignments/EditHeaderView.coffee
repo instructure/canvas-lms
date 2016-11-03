@@ -65,6 +65,7 @@ define [
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         if gradingType == 'not_graded'
           @$headerTabsCr.tabs("option", "disabled", [1])
+          @$headerTabsCr.tabs("option", "active", 0)
         else
           @$headerTabsCr.tabs("option", "disabled", false)
 

@@ -19,18 +19,17 @@
 require_relative '../spec_helper'
 
 describe GradingPeriod do
-  let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
+  subject(:grading_period) { grading_period_group.grading_periods.build(params) }
 
+  let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:account) { Account.create! }
   let(:course) { Course.create! }
   let(:grading_period_group) do
-    group = group_helper.create_for_account(account)
+    group = account.grading_period_groups.create!(title: "A Group")
     group.enrollment_terms << course.enrollment_term
     group
   end
-  let(:now) { Time.zone.now }
-
-  subject(:grading_period) { grading_period_group.grading_periods.build(params) }
+  let(:now) { Time.zone.now.change(usec: 0) }
 
   let(:params) do
     {
@@ -45,22 +44,22 @@ describe GradingPeriod do
 
   it "requires a start_date" do
     grading_period = GradingPeriod.new(params.except(:start_date))
-    expect(grading_period).to_not be_valid
+    expect(grading_period).not_to be_valid
   end
 
   it "requires an end_date" do
     grading_period = GradingPeriod.new(params.except(:end_date))
-    expect(grading_period).to_not be_valid
+    expect(grading_period).not_to be_valid
   end
 
   it "requires start_date to be before end_date" do
     subject.assign_attributes(start_date: Time.zone.now, end_date: 1.day.ago(now))
-    is_expected.to_not be_valid
+    is_expected.not_to be_valid
   end
 
   it "requires a title" do
     grading_period = GradingPeriod.new(params.except(:title))
-    expect(grading_period).to_not be_valid
+    expect(grading_period).not_to be_valid
   end
 
   describe ".in_closed_grading_period?" do
@@ -133,6 +132,41 @@ describe GradingPeriod do
       expect(result).to be false
     end
   end
+
+  describe ".current" do
+    subject { grading_period_group.grading_periods.current }
+
+    context "no periods" do
+      it "finds no current periods" do
+        is_expected.to be_empty
+      end
+    end
+
+    context "one current period" do
+      let!(:period) do
+        grading_period_group.grading_periods.create!(
+          title:      "a period",
+          start_date: 1.day.ago(now),
+          end_date:   1.day.from_now(now),
+          close_date: 2.days.from_now(now)
+        )
+      end
+
+      it "finds one current period" do
+        is_expected.to eq [period]
+      end
+
+      context "where end_date equals Time.now" do
+        it "does not include period" do
+          Timecop.freeze(Time.zone.now.change(usec: 0)) do
+            period.update(end_date: now)
+            is_expected.to be_empty
+          end
+        end
+      end
+    end
+  end
+
 
   describe "#as_json_with_user_permissions" do
     it "includes the close_date in the returned object" do
@@ -231,7 +265,7 @@ describe GradingPeriod do
     end
 
     it "does not destroy" do
-      expect(subject).to_not be_destroyed
+      expect(subject).not_to be_destroyed
     end
   end
 
@@ -391,6 +425,7 @@ describe GradingPeriod do
     end
   end
 
+  # TODO: move all of this to filter_with_overrides_by_due_at_for_class.rb
   describe "#assignments" do
     let!(:first_assignment)  { course.assignments.create!(due_at: first_grading_period.start_date + 1.second) }
     let!(:second_assignment) { course.assignments.create!(due_at: second_grading_period.start_date + 1.seconds) }
@@ -422,9 +457,18 @@ describe GradingPeriod do
       expect(assignments).to eq [second_assignment, third_assignment]
     end
 
-    describe "when due at the same time as the edge of a period" do
-      let!(:fourth_assignment)  { course.assignments.create!(due_at: third_grading_period.end_date + 0.005.seconds) }
-      let!(:fifth_assignment) { course.assignments.create!(due_at: fourth_grading_period.start_date - 0.005.seconds) }
+    describe "when due at is near the edge of a period" do
+      let!(:fourth_assignment) do
+        course.assignments.create!(
+          due_at: third_grading_period.end_date - 0.995.seconds
+        )
+      end
+
+      let!(:fifth_assignment) do
+        course.assignments.create!(
+          due_at: fourth_grading_period.start_date - 0.005.seconds
+        )
+      end
 
       let(:third_grading_period) do
         grading_period_group.grading_periods.create!(
@@ -442,14 +486,14 @@ describe GradingPeriod do
         )
       end
 
-      it "includes assignments if they are on the end date" do
+      it "includes assignments if they are on the future edge of end date" do
         assignments = third_grading_period.assignments(course.assignments)
         expect(assignments).to include fourth_assignment
       end
 
-      it "does NOT include assignments if they are on the start date" do
+      it "does NOT include assignments if they are on the past edge of start date" do
         assignments = fourth_grading_period.assignments(course.assignments)
-        expect(assignments).to_not include fifth_assignment
+        expect(assignments).not_to include fifth_assignment
       end
     end
   end
@@ -458,21 +502,27 @@ describe GradingPeriod do
     subject(:grading_period) { GradingPeriod.new }
 
     it "returns false for a grading period in the past" do
-      grading_period.assign_attributes(start_date: 2.months.ago(now),
-                                       end_date:   1.month.ago(now))
+      grading_period.assign_attributes(
+        start_date: 2.months.ago(now),
+        end_date:   1.month.ago(now)
+      )
       expect(grading_period).to_not be_current
     end
 
     it "returns true if the current time falls between the start date and end date (inclusive)",
     test_id: 2528634, priority: "2" do
-      grading_period.assign_attributes(start_date: 1.month.ago(now),
-                                       end_date:   1.month.from_now(now))
+      grading_period.assign_attributes(
+        start_date: 1.month.ago(now),
+        end_date:   1.month.from_now(now)
+      )
       expect(grading_period).to be_current
     end
 
     it "returns false for a grading period in the future" do
-      grading_period.assign_attributes(start_date: 1.month.from_now(now),
-                                       end_date:   2.months.from_now(now))
+      grading_period.assign_attributes(
+        start_date: 1.month.from_now(now),
+        end_date:   2.months.from_now(now)
+      )
       expect(grading_period).to_not be_current
     end
   end
@@ -501,12 +551,12 @@ describe GradingPeriod do
         subject { grading_period_group.grading_periods.build(start_date: start_date, end_date: end_date)}
         let(:start_date) { existing_grading_period.end_date }
         let(:end_date)   { existing_grading_period.end_date + 1.month }
-        it { is_expected.to_not be_overlapping }
+        it { is_expected.not_to be_overlapping }
       end
     end
 
     it "after a grading period is persisted it continues to not overlap" do
-      expect(existing_grading_period).to_not be_overlapping
+      expect(existing_grading_period).not_to be_overlapping
     end
   end
 
@@ -520,20 +570,26 @@ describe GradingPeriod do
 
   describe ".in_date_range?" do
     subject(:period) do
-      grading_period_group.grading_periods.create start_date: 1.week.ago(now),
-                                                  end_date:   2.weeks.from_now(now)
+      grading_period_group.grading_periods.create(
+        start_date: 1.week.ago(now),
+        end_date:   2.weeks.from_now(now)
+      )
     end
 
-    it "returns true for a date in the period" do
-      expect(period.in_date_range? 1.day.from_now(now)).to be true
+    it "is in date range for a date in the period" do
+      is_expected.to be_in_date_range(period.end_date - 1.second)
     end
 
-    it "returns false for a date before the period" do
-      expect(period.in_date_range? 8.days.ago(now)).to be false
+    it "is not in date range for a date before the period" do
+      is_expected.not_to be_in_date_range(8.days.ago(now))
     end
 
-    it "returns false for a date after the period" do
-      expect(period.in_date_range? 15.days.from_now(now)).to be false
+    it "is not in date range for or a date after the period" do
+      is_expected.not_to be_in_date_range(15.days.from_now(now))
+    end
+
+    it "is not in date range for a date that equals end_date" do
+      is_expected.not_to be_in_date_range(period.end_date)
     end
   end
 

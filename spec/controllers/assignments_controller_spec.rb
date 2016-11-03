@@ -299,9 +299,17 @@ describe AssignmentsController do
   end
 
   describe "POST 'create'" do
+    it "sets the lti_context_id if provided" do
+      user_session(@student)
+      lti_context_id = SecureRandom.uuid
+      jwt = Canvas::Security.create_jwt(lti_context_id: lti_context_id)
+      post 'create', course_id: @course.id, assignment: {title: "some assignment",secure_params: jwt}
+      expect(assigns[:assignment].lti_context_id).to eq lti_context_id
+    end
+
     it "should require authorization" do
       #controller.use_rails_error_handling!
-      post 'create', :course_id => @course.id
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
       assert_unauthorized
     end
 
@@ -372,6 +380,37 @@ describe AssignmentsController do
       get 'edit', :course_id => @course.id, :id => @assignment.id
       expect(assigns[:js_env][:ASSIGNMENT]['id']).to eq @assignment.id
       expect(assigns[:js_env][:ASSIGNMENT_OVERRIDES]).to eq []
+    end
+
+    context "redirects" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "to quiz" do
+        assignment_quiz [], course: @course
+        get 'edit', :course_id => @course.id, :id => @quiz.assignment.id
+        expect(response).to redirect_to controller.edit_course_quiz_path(@course, @quiz)
+      end
+
+      it "to discussion topic" do
+        group_assignment_discussion course: @course
+        get 'edit', :course_id => @course.id, :id => @root_topic.assignment.id
+        expect(response).to redirect_to controller.edit_course_discussion_topic_path(@course, @root_topic)
+      end
+
+      it "to wiki page" do
+        Course.any_instance.stubs(:feature_enabled?).with(:conditional_release).returns(true)
+        wiki_page_assignment_model course: @course
+        get 'edit', :course_id => @course.id, :id => @page.assignment.id
+        expect(response).to redirect_to controller.edit_course_wiki_page_path(@course, @page)
+      end
+
+      it "includes return_to" do
+        assignment_quiz [], course: @course
+        get 'edit', :course_id => @course.id, :id => @quiz.assignment.id, :return_to => 'flibberty'
+        expect(response.redirect_url).to match(/\?return_to=flibberty/)
+      end
     end
 
     context "conditional release" do

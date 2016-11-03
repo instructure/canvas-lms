@@ -263,6 +263,47 @@ describe "BookmarkedCollection" do
 
       @collection.paginate(:page => page.next_page, :per_page => 2).should == [@deleted_course1, @deleted_course2]
     end
+
+    it "doesn't get confused by subcollections that don't respect per_page" do
+      bookmarker = IDBookmarker
+      created_collection = BookmarkedCollection.build(bookmarker) do |pager|
+        scope = @created_scope
+        scope = bookmarker.restrict_scope(scope, pager)
+        items = scope.limit(2).to_a
+        pager.replace(items[0..0])
+        pager.has_more! if items.length == 2
+        pager
+      end
+
+      @collection = BookmarkedCollection.concat(
+          ['created', created_collection],
+          ['deleted', @deleted_collection]
+      )
+      created_collection.paginate(per_page: 3).should == [@created_course1]
+      @collection.paginate(per_page: 3).should == [@created_course1, @created_course2, @deleted_course1]
+    end
+
+    it "efficiently has a next page that coincides with a partial read" do
+      bookmarker = IDBookmarker
+      created_collection = BookmarkedCollection.build(bookmarker) do |pager|
+        scope = @created_scope
+        scope = bookmarker.restrict_scope(scope, pager)
+        items = scope.limit(2).to_a
+        pager.replace(items[0..0])
+        pager.has_more! if items.length == 2
+        pager
+      end
+
+      @collection = BookmarkedCollection.concat(
+          ['created', created_collection],
+          ['deleted', @deleted_collection]
+      )
+
+      expect(@deleted_collection).to receive(:execute_pager).never
+      @collection.paginate(per_page: 1).next_page.should_not be_nil
+    end
+
+
   end
 
   describe "nested compositions" do

@@ -1,12 +1,13 @@
 define [
   'jquery'
   'react'
+  'react-dom'
   'jsx/files/BreadcrumbCollapsedContainer'
   'compiled/models/Folder'
   'compiled/react_files/modules/filesEnv'
   '../mockFilesENV'
   '../../helpers/stubRouterContext'
-], ($, React, BreadcrumbCollapsedContainer, Folder, filesEnv, mockFilesENV, stubRouterContext) ->
+], ($, React, ReactDOM, BreadcrumbCollapsedContainer, Folder, filesEnv, mockFilesENV, stubRouterContext) ->
   simulate = React.addons.TestUtils.Simulate
   simulateNative = React.addons.TestUtils.SimulateNative
   TestUtils = React.addons.TestUtils
@@ -21,7 +22,7 @@ define [
       @bcc = TestUtils.renderIntoDocument(React.createElement(bcc))
 
     teardown: ->
-      React.unmountComponentAtNode(@bcc.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@bcc.getDOMNode().parentNode)
 
   test 'BCC: opens breadcumbs on mouse enter', ->
     $node = $(@bcc.getDOMNode())

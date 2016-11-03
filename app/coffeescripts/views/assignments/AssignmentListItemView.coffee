@@ -3,6 +3,7 @@ define [
   'Backbone'
   'jquery'
   'underscore'
+  'jsx/shared/conditional_release/CyoeHelper'
   'compiled/views/PublishIconView'
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/assignments/DateAvailableColumnView'
@@ -17,7 +18,7 @@ define [
   'jqueryui/tooltip'
   'compiled/behaviors/tooltip'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, Backbone, $, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
+], (I18n, Backbone, $, _, CyoeHelper, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
 
   class AssignmentListItemView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
@@ -156,7 +157,9 @@ define [
       data.canDelete = @canDelete()
       data.showAvailability = @model.multipleDueDates() or not @model.defaultDates().available()
       data.showDueDate = @model.multipleDueDates() or @model.singleSectionDueDate()
-      data.cyoeEnabled = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && @isGraded() && (!@model.isQuiz() || data.is_quiz_assignment)
+
+      data.cyoe = CyoeHelper.getItemData(data.id, @isGraded() && (!@model.isQuiz() || data.is_quiz_assignment))
+      data.return_to = encodeURIComponent window.location.pathname
 
       if data.canManage
         data.spanWidth      = 'span3'

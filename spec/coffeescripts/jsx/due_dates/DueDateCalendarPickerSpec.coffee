@@ -27,7 +27,7 @@ define [
 
       @mountPoint = $('<div>').appendTo('body')[0]
       DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, @props)
-      @dueDateCalendarPicker = React.render(DueDateCalendarPickerElement, @mountPoint)
+      @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, @mountPoint)
 
     teardown: ->
       fakeENV.teardown()
@@ -95,11 +95,11 @@ define [
         labelledBy: "foo"
 
       DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, props)
-      @dueDateCalendarPicker = React.render(DueDateCalendarPickerElement, $('<div>').appendTo('body')[0])
+      @dueDateCalendarPicker = ReactDOM.render(DueDateCalendarPickerElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()
-      React.unmountComponentAtNode(@dueDateCalendarPicker.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@dueDateCalendarPicker.getDOMNode().parentNode)
       @clock.restore()
 
   test 'recieved proper class depending on dateType', ->
@@ -112,3 +112,14 @@ define [
     date = @dueDateCalendarPicker.changeToFancyMidnightIfNeeded(date)
 
     equal date.getMinutes(), 59
+
+  test 'converts to fancy midnight in the time zone of the user', ->
+    # This date will be set to midnight in the time zone of the *user*.
+    snapshot = tz.snapshot()
+    tz.changeZone('America/Chicago')
+
+    date = tz.parse('2015-08-31T00:00:00')
+    date = @dueDateCalendarPicker.changeToFancyMidnightIfNeeded(date)
+
+    equal date.getMinutes(), 59
+    tz.restore(snapshot)

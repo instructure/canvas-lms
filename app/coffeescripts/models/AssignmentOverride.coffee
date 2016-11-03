@@ -3,7 +3,8 @@ define [
   'underscore'
   'jquery'
   'compiled/models/Section'
-], (Backbone, _, $, Section) ->
+  'i18n!assignments',
+], (Backbone, _, $, Section, I18n) ->
 
   class AssignmentOverride extends Backbone.Model
 
@@ -18,6 +19,10 @@ define [
 
       lock_at_overridden: true
       lock_at: null
+
+    @conditionalRelease:
+      name: I18n.t("Mastery Paths")
+      noop_id: '1'
 
     initialize: ->
       super

@@ -1,4 +1,2 @@
-require_relative "../../config/canvas_rails4_2"
-
 source 'https://rubygems.org'
 gemspec

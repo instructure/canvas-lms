@@ -1,11 +1,12 @@
 require [
   'jquery'
   'react'
+  'react-dom'
   'jsx/shared/FileNotFound'
-], ($, React, preventDefault, FileNotFound) ->
+], ($, React, ReactDOM, preventDefault, FileNotFound) ->
 
   FileNotFoundElement = React.createElement(FileNotFound, {
     contextCode: window.ENV.context_asset_string
-  });
+  })
 
-  React.render(FileNotFoundElement, $('#sendMessageForm')[0])
+  ReactDOM.render(FileNotFoundElement, $('#sendMessageForm')[0])

@@ -3,14 +3,12 @@
 <% js_bundle :collaborations %>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
-    <p><%= mt :description_rs, <<-HEREDOC, :google_url => "http://docs.google.com"
+  <p><%= mt :description_rs, <<-HEREDOC, :google_url => "http://docs.google.com"
 Free online web tools like [Google Docs](%{google_url}) are an excellent place for students to work on group projects or papers, take shared notes, etc.
 Teacher *or* students can set up group collaborations.
 HEREDOC
-       %>
-    </p>
-  </div>
+     %>
+  </p>
 <% end %>
 <a href="#" class="external_link" target="_blank" style="display: none;">&nbsp;</a>
 

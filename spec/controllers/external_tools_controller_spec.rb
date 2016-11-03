@@ -669,6 +669,17 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
     end
 
+    it "adds params from secure_params" do
+      u = user(:active_all => true)
+      account.account_users.create!(user: u)
+      user_session(@user)
+      tool.save!
+      lti_assignment_id = SecureRandom.uuid
+      jwt = Canvas::Security.create_jwt({lti_assignment_id: lti_assignment_id})
+      get :retrieve, {url: tool.url, account_id:account.id, secure_params: jwt}
+      expect(assigns[:lti_launch].params['ext_lti_assignment_id']).to eq lti_assignment_id
+    end
+
     context 'collaborations' do
       let(:collab) do
         collab = ExternalToolCollaboration.create!(
@@ -868,6 +879,28 @@ describe ExternalToolsController do
         'x%3DWith%2520Space%26y%3Dyes&external_tool%5Bdescription%5D=null&external_tool%5Bshared_secret%5D=secret'
       }
 
+      it "should not update tool if user lacks update_manually" do
+        user_session(@student)
+        tool = new_valid_tool(@course)
+        put(
+          "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
+          post_body,
+          { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        )
+        assert_status(401)
+      end
+
+      it "should update tool if user is granted update_manually" do
+        user_session(@teacher)
+        tool = new_valid_tool(@course)
+        put(
+          "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
+          post_body,
+          { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        )
+        assert_status(200)
+      end
+
       it 'accepts form data' do
         user_session(@teacher)
         tool = new_valid_tool(@course)
@@ -896,6 +929,8 @@ describe ExternalToolsController do
 
   describe "POST 'create_tool_with_verification'" do
     context "form post", type: :request do
+      include WebMock::API
+
       let(:post_body) do
         {
           custom_fields_string: '',
@@ -945,6 +980,10 @@ describe ExternalToolsController do
         AppCenter::AppApi.stubs(:new).returns(app_api)
         app_api.stubs(:fetch_app_center_response).returns(app_center_response)
         app_api.stubs(:get_app_config_url).returns(app_center_response['config_xml_url'])
+
+        configxml = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'config.youtube.xml'))
+        stub_request(:get, app_center_response['config_xml_url']).to_return(body: configxml)
+        stub_request(:get, "https://www.edu-apps.org/tool_i_should_not_have_access_to.xml").to_return(status: 404)
       end
 
       it 'creates tool when provided all required params' do
@@ -1045,6 +1084,18 @@ describe ExternalToolsController do
     it "should require authentication" do
       post 'create', :course_id => @course.id, :format => "json"
       assert_status(401)
+    end
+
+    it "should not create tool if user lacks create_tool_manually" do
+      user_session(@student)
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}, :format => "json"
+      assert_status(401)
+    end
+
+    it "should create tool if user is granted create_tool_manually" do
+      user_session(@teacher)
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}, :format => "json"
+      assert_status(200)
     end
 
     it "should accept basic configurations" do
@@ -1413,6 +1464,53 @@ describe ExternalToolsController do
       expect(tool_settings['custom_canvas_course_id']).to eq @course.id.to_s
       expect(tool_settings['custom_canvas_user_id']).to eq @user.id.to_s
       expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
+    end
+
+    it "requires context_module_id for module_item launch type" do
+      user_session(@user)
+      @tool = new_valid_tool(@course)
+      @cm = ContextModule.create(context: @course)
+      @tg = ContentTag.create(context: @course,
+        context_module: @cm,
+        content_type: 'ContextExternalTool',
+        content: @tool)
+
+       get :generate_sessionless_launch,
+        course_id: @course.id,
+        launch_type: 'module_item',
+        content_type: 'ContextExternalTool'
+
+      expect(response).not_to be_success
+      expect(response.body).to include 'A module item id must be provided for module item LTI launch'
+    end
+
+    it "Sets the correct resource_link_id for module items when module_item_id is provided" do
+      user_session(@user)
+      @tool = new_valid_tool(@course)
+      @cm = ContextModule.create(context: @course)
+      @tg = ContentTag.create(context: @course,
+        context_module: @cm,
+        content_type: 'ContextExternalTool',
+        content: @tool,
+        url: @tool.url)
+      @cm.content_tags << @tg
+      @cm.save!
+      @course.save!
+
+      get :generate_sessionless_launch,
+        course_id: @course.id,
+        launch_type: 'module_item',
+        module_item_id: @tg.id,
+        content_type: 'ContextExternalTool'
+
+      expect(response).to be_success
+
+      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
+      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
+
+      expect(launch_settings['tool_settings']['resource_link_id']). to eq opaque_id(@tg)
     end
   end
 

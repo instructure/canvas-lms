@@ -131,10 +131,31 @@ describe Selinimum::Capture::AutoloadExtensions do
       subject.reset_autoloads!
       expect(Object.const_defined?("LeaveBritneyAlone")).to be true
     end
+
+    it "handles uncached reflections" do
+      SomeModel = Class.new(ActiveRecord::Base) do
+        belongs_to :selinimum_bar
+      end
+      subject.reset_autoloads!
+      expect(SomeModel.reflections["selinimum_foo"].instance_variable_get(:@klass)).to be_nil
+    end
+
+    it "resets cached reflections" do
+      AnotherModel = Class.new(ActiveRecord::Base) do
+        belongs_to :selinimum_foo
+      end
+      cache_constants do
+        SelinimumFoo = Class.new(ActiveRecord::Base)
+        expect(AnotherModel.reflections["selinimum_foo"].klass).to eq SelinimumFoo
+      end
+      subject.reset_autoloads!
+      expect(AnotherModel.reflections["selinimum_foo"].instance_variable_get(:@klass)).to be_nil
+    end
   end
 
   after do
     subject.reset_autoloads!
     subject.cached_autoloads.clear
+    subject.remove_instance_variable(:@preloaded_models)
   end
 end

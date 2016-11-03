@@ -43,7 +43,7 @@ module DataFixup
             next
           end
 
-          AssessmentQuestion.where(:id => aq).update_all(:question_data => CANVAS_RAILS4_0 ? hash.to_yaml : hash)
+          AssessmentQuestion.where(:id => aq).update_all(:question_data => hash)
         end
       end
 
@@ -58,7 +58,7 @@ module DataFixup
           end
 
           quiz_ids_to_fix << qq.quiz_id
-          Quizzes::QuizQuestion.where(:id => qq).update_all(:question_data => CANVAS_RAILS4_0 ? hash.to_yaml : hash)
+          Quizzes::QuizQuestion.where(:id => qq).update_all(:question_data => hash)
         end
       end
 
@@ -70,7 +70,7 @@ module DataFixup
             next
           end
 
-          Quizzes::Quiz.where(:id => quiz).update_all(:quiz_data => CANVAS_RAILS4_0 ? hash.to_yaml : hash)
+          Quizzes::Quiz.where(:id => quiz).update_all(:quiz_data => hash)
         end
       end
 

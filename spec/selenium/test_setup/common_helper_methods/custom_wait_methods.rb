@@ -164,6 +164,7 @@ module CustomWaitMethods
   # * doesn't rescue :allthethings: like keep_trying_until
   # * prevents nested waiting, cuz that's terrible
   def wait_for(timeout: SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT, method: nil, ignore: nil)
+    return yield if timeout == 0
     driver.prevent_nested_waiting(method) do
       Selenium::WebDriver::Wait.new(timeout: timeout, ignore: ignore).until do
         yield

@@ -4,8 +4,7 @@ define(['jsx/gradebook2/DataLoader', 'underscore'], (DataLoader, _) => {
     let fakeXhr;
     let XHRS, XHR_HANDLERS, handlerIndex;
 
-    const ASSIGNMENT_GROUPS = [{id: 1, course_id: 1}, {id: 4, course_id: 1, assignments: []}];
-    const ASSIGNMENT_OVERRIDES = [{id: 1}, {id: 2}];
+    const ASSIGNMENT_GROUPS = [{id: 1}, {id: 4}];
     const STUDENTS_PAGE_1 = [{id: 2}, {id: 5}];
     const STUDENTS_PAGE_2 = [{id: 3}, {id: 7}];
     const SUBMISSIONS_CHUNK_1 = [{id: 99}];
@@ -75,8 +74,6 @@ define(['jsx/gradebook2/DataLoader', 'underscore'], (DataLoader, _) => {
         () => {
           respondToXhr("/ags?ag_params=ok",
                        200, {Link: ""}, ASSIGNMENT_GROUPS);
-          respondToXhr("/api/v1/courses/1/assignments/1/overrides", 200, {}, ASSIGNMENT_OVERRIDES);
-          respondToXhr("/api/v1/courses/1/assignments/4/overrides", 200, {}, ASSIGNMENT_OVERRIDES);
         },
       ];
 

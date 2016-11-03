@@ -99,15 +99,7 @@ module Canvas::Security
   def self.verify_hmac_sha512(message, signature, signing_secret=services_signing_secret)
     comparison = sign_hmac_sha512(message, signing_secret)
 
-    if CANVAS_RAILS4_0
-      return false unless signature.bytesize == comparison.bytesize
-      l = signature.unpack "C#{signature.bytesize}"
-      res = 0
-      comparison.each_byte { |byte| res |= byte ^ l.shift }
-      res == 0
-    else
-      ActiveSupport::SecurityUtils.secure_compare(signature, comparison)
-    end
+    ActiveSupport::SecurityUtils.secure_compare(signature, comparison)
   end
 
   # Creates a JWT token string

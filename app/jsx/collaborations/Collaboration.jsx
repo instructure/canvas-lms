@@ -1,11 +1,12 @@
 define([
   'react',
+  'react-dom',
   'jsx/shared/DatetimeDisplay',
   './DeleteConfirmation',
   'i18n!react_collaborations',
   'compiled/str/splitAssetString',
   'jsx/collaborations/store/store'
-], (React, DatetimeDisplay, DeleteConfirmation, i18n, splitAssetString, store) => {
+], (React, ReactDOM, DatetimeDisplay, DeleteConfirmation, i18n, splitAssetString, store) => {
   class Collaboration extends React.Component {
     constructor (props) {
       super(props);
@@ -26,7 +27,7 @@ define([
       this.setState({
         deleteConfirmationOpen: false
       }, () => {
-        React.findDOMNode(this.refs.deleteButton).focus()
+        ReactDOM.findDOMNode(this.refs.deleteButton).focus()
       });
     }
 

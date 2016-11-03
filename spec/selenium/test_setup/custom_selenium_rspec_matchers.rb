@@ -229,3 +229,23 @@ RSpec::Matchers.define :have_size do |size|
     end
   end
 end
+
+# wait for something to become a new value. useful for those times when
+# other implicit waits cannot be used, e.g.
+#
+# # trigger some ajax
+# expect { User.count }.to become(1)
+RSpec::Matchers.define :become do |size|
+  def supports_block_expectations?
+    true
+  end
+
+  match do |actual|
+    raise "The `become` matcher expects a block, e.g. `expect { actual }.to become(value)`, NOT `expect(actual).to become(value)`" unless actual.is_a? Proc
+    disable_implicit_wait do
+      wait_for(method: :become) do
+        actual.call == expected
+      end
+    end
+  end
+end

@@ -33,5 +33,5 @@ Restart Canvas, and events should start flowing to your kinesis stream.
 You can view the stream with the `tail_kinesis` tool:
 
 ```bash
-docker-compose run --rm web script/tail_kinesis kinesis 4567 mystream
+docker-compose run --rm web script/tail_kinesis http://kinesis:4567 mystream
 ```

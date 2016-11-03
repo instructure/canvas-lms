@@ -9,9 +9,17 @@ define([
   return React.createClass({
     displayName: 'Configurations',
 
+    propTypes: {
+        env: React.PropTypes.object.isRequired
+    },
+
+    canAddEdit() {
+      return this.props.env.PERMISSIONS && this.props.env.PERMISSIONS.create_tool_manually
+    },
+
     render() {
       var appCenterLink = function() {
-        if (!ENV.APP_CENTER['enabled']) {
+        if (!this.props.env.APP_CENTER['enabled']) {
           return '';
         }
         const baseUrl = page.base();
@@ -21,10 +29,10 @@ define([
       return (
         <div className="Configurations">
           <Header>
-            <AddExternalToolButton />
+            <AddExternalToolButton canAddEdit={this.canAddEdit()} />
             {appCenterLink()}
           </Header>
-          <ExternalToolsTable />
+          <ExternalToolsTable canAddEdit={this.canAddEdit()}/>
         </div>
       );
     }

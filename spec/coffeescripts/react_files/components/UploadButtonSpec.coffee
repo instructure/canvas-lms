@@ -1,9 +1,10 @@
 define [
   'react'
+  'react-dom'
   'jquery'
   'jsx/files/UploadButton'
   'compiled/react_files/modules/FileOptionsCollection'
-], (React, $, UploadButton, FileOptionsCollection) ->
+], (React, ReactDOM, $, UploadButton, FileOptionsCollection) ->
 
   Simulate = React.addons.TestUtils.Simulate
 
@@ -14,10 +15,10 @@ define [
           files:
             models: []
 
-      @button = React.render(React.createElement(UploadButton, props), $('<div>').appendTo("#fixtures")[0])
+      @button = ReactDOM.render(React.createElement(UploadButton, props), $('<div>').appendTo("#fixtures")[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@button.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@button.getDOMNode().parentNode)
       $("#fixtures").empty()
 
   test 'hides actual file input form', ->

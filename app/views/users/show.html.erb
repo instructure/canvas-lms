@@ -1,14 +1,19 @@
 <% content_for :page_title do %><%= @user.short_name %><% end %>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-lr rs-margin-top">
-    <a href="<%= message_user_path(@user, @context) %>" class="btn button-sidebar-wide"><i class="icon-email"></i> <%= t 'links.message_user', "Message %{user}", :user => context_user_name(@context, @user) %></a>
+  <div>
+    <a href="<%= message_user_path(@user, @context) %>" class="btn button-sidebar-wide">
+      <i class="icon-email"></i>
+      <%= t 'links.message_user', "Message %{user}", :user => context_user_name(@context, @user) %>
+    </a>
     <% if @domain_root_account.try_rescue(:enable_user_notes) and can_do(@user, @current_user, :read_user_notes) %>
-    <a href="<%= user_user_notes_path(@user) %>" class="btn button-sidebar-wide"><%= t('buttons.faculty_journal_for', 'Faculty Journal for %{user}', :user => context_user_name(@context, @user)) %></a>
+      <a href="<%= user_user_notes_path(@user) %>" class="btn button-sidebar-wide">
+        <%= t('buttons.faculty_journal_for', 'Faculty Journal for %{user}', :user => context_user_name(@context, @user)) %>
+      </a>
     <% end %>
   </div>
 <% end %>
-<div style="margin: .3em">
+<div>
   <h1 class="screenreader-only"><%= t(:page_header_title, "User Profile") %></h1>
   <% if @context_account.is_a?(Account) && @context_account.has_outcomes? %>
     <div style="float: right;">

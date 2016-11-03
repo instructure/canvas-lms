@@ -18,11 +18,12 @@ define [
   'compiled/views/calendar/MissingDateDialogView'
   'compiled/views/editor/KeyboardShortcuts'
   'jsx/shared/conditional_release/ConditionalRelease'
+  'compiled/util/deparam'
   'compiled/jquery.rails_flash_notifications' #flashMessage
 ], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
 GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, RichContentEditor,
 htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog, KeyboardShortcuts,
-ConditionalRelease) ->
+ConditionalRelease, deparam) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -68,8 +69,26 @@ ConditionalRelease) ->
       @dueDateOverrideView = options.views['js-assignment-overrides']
       @on 'success', =>
         @unwatchUnload()
-        window.location = @model.get 'html_url'
+        @redirectAfterSave()
       super
+
+    redirectAfterSave: ->
+      window.location = @locationAfterSave(deparam())
+
+    locationAfterSave: (params) =>
+      if params['return_to']
+        params['return_to']
+      else
+        @model.get 'html_url'
+
+    redirectAfterCancel: ->
+      location = @locationAfterCancel(deparam())
+      window.location = location if location
+
+    locationAfterCancel: (params) =>
+      return params['return_to'] if params['return_to']?
+      return ENV.CANCEL_TO if ENV.CANCEL_TO?
+      null
 
     isTopic: => @model.constructor is DiscussionTopic
 
@@ -98,7 +117,7 @@ ConditionalRelease) ->
     handleCancel: (ev) =>
       ev.preventDefault()
       @unwatchUnload()
-      window.location = ENV.CANCEL_REDIRECT_URL if ENV.CANCEL_REDIRECT_URL?
+      @redirectAfterCancel()
 
     handlePointsChange:(ev) =>
       ev.preventDefault()
@@ -370,14 +389,14 @@ ConditionalRelease) ->
           @$discussionEditView.tabs("option", "disabled", false)
         else
           @$discussionEditView.tabs("option", "disabled", [1])
-          @$discussionDetailsTab.show()
+          @$discussionEditView.tabs("option", "active", 0)
 
     onChange: ->
       if @showConditionalRelease() && @assignmentUpToDate
         @assignmentUpToDate = false
 
     onTabChange: ->
-      if @showConditionalRelease() && !@assignmentUpToDate
+      if @showConditionalRelease() && !@assignmentUpToDate && @conditionalReleaseEditor
         assignmentData = @getFormData().assignment?.attributes
         @conditionalReleaseEditor.updateAssignment(assignmentData)
         @assignmentUpToDate = true

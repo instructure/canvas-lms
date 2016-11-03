@@ -550,6 +550,7 @@ Implemented for: Canvas LMS}]
     attachment.save!
 
     migration.attachment = attachment
+    migration.save!
     migration.export_content
 
     session['pending_migration_id'] = migration.id

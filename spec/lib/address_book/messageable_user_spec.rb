@@ -5,7 +5,7 @@ describe AddressBook::MessageableUser do
     it "restricts to provided users" do
       teacher = teacher_in_course(active_all: true).user
       student1 = student_in_course(active_all: true).user
-      student2 = student_in_course(active_all: true)
+      student2 = student_in_course(active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       known_users = address_book.known_users([student1])
       expect(known_users.map(&:id)).to include(student1.id)
@@ -15,7 +15,7 @@ describe AddressBook::MessageableUser do
     it "includes only known users" do
       teacher = teacher_in_course(active_all: true).user
       student1 = student_in_course(active_all: true).user
-      student2 = student_in_course(course: course(), active_all: true)
+      student2 = student_in_course(course: course(), active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       known_users = address_book.known_users([student1, student2])
       expect(known_users.map(&:id)).to include(student1.id)

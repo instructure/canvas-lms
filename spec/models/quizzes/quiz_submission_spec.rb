@@ -288,6 +288,31 @@ describe Quizzes::QuizSubmission do
 
         expect(quiz_submission.events.where(event_type: event_type).count).to eq 1
       end
+
+      context 'with cant_go_back true' do
+        it 'does not allow changing the response for a question that was previously read' do
+          question = @quiz.quiz_questions.create!({ question_data: true_false_question_data })
+          @quiz.one_question_at_a_time = true
+          @quiz.cant_go_back = true
+          @quiz.publish!
+
+          true_answer = question.question_data['answers'].find { |answer| answer['text'] == 'True' }
+          false_answer = question.question_data['answers'].find { |answer| answer['text'] == 'False' }
+          quiz_submission = @quiz.generate_submission(user)
+          quiz_submission.backup_submission_data({
+            "question_#{question.id}" => true_answer['id'],
+            :"_question_#{question.id}_read" => true
+          })
+          quiz_submission.reload
+
+          quiz_submission.backup_submission_data({
+            "question_#{question.id}" => false_answer['id']
+          })
+          quiz_submission.reload
+
+          expect(quiz_submission.submission_data["question_#{question.id}"]).to eq true_answer['id']
+        end
+      end
     end
 
     it "should not allowed grading on an already-graded submission" do

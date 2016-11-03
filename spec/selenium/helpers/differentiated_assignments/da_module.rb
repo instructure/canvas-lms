@@ -17,6 +17,7 @@ module DifferentiatedAssignments
     end
 
     private
+      include Factories
 
       def create_course(opts = {})
         course_name = opts.fetch(:name, 'Selective Release Course')

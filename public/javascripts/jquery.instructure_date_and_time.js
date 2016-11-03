@@ -61,9 +61,6 @@ define([
   $.sameDate = function(d1, d2) {
     return tz.format(d1, '%F') == tz.format(d2, '%F');
   };
-  $.midnight = function(date, options) {
-    return tz.isMidnight(date, options);
-  };
   $.dateString = function(date, options) {
     if (date == null) return "";
     var timezone = options && options.timezone;

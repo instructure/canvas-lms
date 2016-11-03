@@ -2,11 +2,13 @@ define [
   'jquery',
   'jsx/outcomes/OutcomeAlignmentDeleteLink',
   'react'
-], ($, OutcomeAlignmentDeleteLink, React) ->
+  'react-dom'
+], ($, OutcomeAlignmentDeleteLink, React, ReactDOM) ->
+
   module 'OutcomeAlignmentDeleteLink',
     TestUtils = React.addons.TestUtils
     teardown: ->
-      React.unmountComponentAtNode(@component.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@component.getDOMNode().parentNode)
 
   test 'should render span if hasRubricAssociation', ->
     OutcomeAlignmentDeleteLinkElement = React.createElement(OutcomeAlignmentDeleteLink, {

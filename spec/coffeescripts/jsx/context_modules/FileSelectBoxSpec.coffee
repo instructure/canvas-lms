@@ -1,15 +1,16 @@
 define [
   'jquery'
   'react'
+  'react-dom'
   'jsx/context_modules/FileSelectBox'
-], ($, React, FileSelectBox) ->
+], ($, React, ReactDOM, FileSelectBox) ->
 
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   renderComponent = ->
-    React.render(React.createFactory(FileSelectBox)({contextString: 'test_3'}), wrapper)
+    ReactDOM.render(React.createFactory(FileSelectBox)({contextString: 'test_3'}), wrapper)
 
   module 'FileSelectBox',
     setup: ->
@@ -62,7 +63,7 @@ define [
       @component = renderComponent()
 
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'it renders', ->
     ok @component.isMounted()

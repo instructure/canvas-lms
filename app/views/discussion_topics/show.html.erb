@@ -19,7 +19,7 @@
 
 <% if @headers || !@locked %>
   <% content_for :right_side do %>
-    <div id="sidebar_content" class="rs-margin-all">
+    <div id="sidebar_content" class="rs-margin-bottom">
       <% if can_do(@context, @current_user, :view_all_grades) &&
             ConditionalRelease::Service.triggers_mastery_paths?(@topic.assignment, @current_user, session) %>
         <div id="crs-graphs"></div>
@@ -54,6 +54,8 @@
       </div>
     </div>
   </div>
+  <div id="module_sequence_footer"></div>
+  <div id="keyboard-shortcut-modal"></div>
 <% else %>
   <div id="discussion-managebar" class="toolbarView">
     <div class="headerBar">

@@ -400,7 +400,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         Quizzes::Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
         self.assignment = @assignment_to_set if @assignment_to_set && !self.assignment
         a = self.assignment
-        a.quiz.clear_changes_information if a.quiz && !CANVAS_RAILS4_0 # AR#changes persist in after_saves now - needed to prevent an autosave loop
+        a.quiz.clear_changes_information if a.quiz # AR#changes persist in after_saves now - needed to prevent an autosave loop
         a.points_possible = self.points_possible
         a.description = self.description
         a.title = self.title
@@ -747,7 +747,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         locked = lock_info.merge({ lock_at: quiz_for_user.lock_at, can_view: true })
       elsif !opts[:skip_assignment] && (assignment_lock = locked_by_assignment?(user, opts))
         locked = assignment_lock
-      elsif (module_lock = locked_by_module_item?(user, opts[:deep_check_if_needed]))
+      elsif (module_lock = locked_by_module_item?(user, opts))
         locked = lock_info.merge({ context_module: module_lock.context_module.attributes })
       elsif !context.try_rescue(:is_public) && !context.grants_right?(user, :participate_as_student) && !opts[:is_observer]
         locked = lock_info.merge({ missing_permission: :participate_as_student.to_s })
@@ -1021,7 +1021,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     given do |user, session|
       self.context.grants_right?(user, session, :manage_assignments) &&
-      (user.admin_of_root_account?(self.context.root_account) ||
+      (self.context.account_membership_allows(user) ||
        !due_for_any_student_in_closed_grading_period?)
     end
     can :delete

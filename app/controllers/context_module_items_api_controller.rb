@@ -199,6 +199,8 @@ class ContextModuleItemsApiController < ApplicationController
   before_filter :require_context
   before_filter :require_user, :only => [:select_mastery_path]
   before_filter :find_student, :only => [:index, :show, :select_mastery_path]
+  before_filter :disable_escape_html_entities, :only => [:index, :show]
+  after_filter :enable_escape_html_entities, :only => [:index, :show]
   include Api::V1::ContextModule
 
   # @API List module items
@@ -239,7 +241,6 @@ class ContextModuleItemsApiController < ApplicationController
       if includes.include?("mastery_paths")
         opts[:conditional_release_rules] = ConditionalRelease::Service.rules_for(@context, @student, items, session)
       end
-
       render :json => items.map { |item| module_item_json(item, @student || @current_user, session, mod, prog, includes, opts) }
     end
   end
@@ -710,6 +711,16 @@ class ContextModuleItemsApiController < ApplicationController
       render :json => { :message => t('OK') }
     end
   end
+
+  def disable_escape_html_entities
+    ActiveSupport.escape_html_entities_in_json = false
+  end
+  private :disable_escape_html_entities
+
+  def enable_escape_html_entities
+    ActiveSupport.escape_html_entities_in_json = true
+  end
+  private :enable_escape_html_entities
 
   def set_position
     return true unless @tag && params[:module_item][:position]

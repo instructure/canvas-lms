@@ -1,9 +1,10 @@
 define [
   'react'
+  'react-dom'
   'underscore'
   'jsx/due_dates/DueDateRow'
   'helpers/fakeENV'
-], (React, _, DueDateRow, fakeENV) ->
+], (React, ReactDOM, _, DueDateRow, fakeENV) ->
 
   Simulate = React.addons.TestUtils.Simulate
   SimulateNative = React.addons.TestUtils.SimulateNative
@@ -29,11 +30,11 @@ define [
         replaceDate: ->
 
       DueDateRowElement = React.createElement(DueDateRow, props)
-      @dueDateRow = React.render(DueDateRowElement, $('<div>').appendTo('body')[0])
+      @dueDateRow = ReactDOM.render(DueDateRowElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()
-      React.unmountComponentAtNode(@dueDateRow.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@dueDateRow.getDOMNode().parentNode)
 
   test 'renders', ->
     ok @dueDateRow.isMounted()
@@ -68,11 +69,11 @@ define [
         replaceDate: ->
 
       DueDateRowElement = React.createElement(DueDateRow, props)
-      @dueDateRow = React.render(DueDateRowElement, $('<div>').appendTo('body')[0])
+      @dueDateRow = ReactDOM.render(DueDateRowElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()
-      React.unmountComponentAtNode(@dueDateRow.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@dueDateRow.getDOMNode().parentNode)
 
   test 'renders', ->
     ok @dueDateRow.isMounted()

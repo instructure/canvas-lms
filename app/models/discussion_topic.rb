@@ -1036,7 +1036,7 @@ class DiscussionTopic < ActiveRecord::Base
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at, :can_view => true}
       elsif !opts[:skip_assignment] && (self.assignment && l = self.assignment.locked_for?(user, opts))
         locked = l
-      elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
+      elsif self.could_be_locked && item = locked_by_module_item?(user, opts)
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
       elsif self.locked? # nothing more specific, it's just locked
         locked = {:asset_string => self.asset_string, :can_view => true}
@@ -1044,6 +1044,27 @@ class DiscussionTopic < ActiveRecord::Base
         locked = l
       end
       locked
+    end
+  end
+
+  def self.reject_context_module_locked_topics(topics, user)
+    progressions = ContextModuleProgression.
+      joins(context_module: :content_tags).
+      where({
+        user: user,
+        "content_tags.content_type" => "DiscussionTopic",
+        "content_tags.content_id" => topics,
+      }).
+      select("context_module_progressions.*").
+      distinct_on("context_module_progressions.id").
+      preload(:user)
+    progressions = progressions.index_by(&:context_module_id)
+
+    return topics.reject do |topic|
+      topic.locked_by_module_item?(user, {
+        deep_check_if_needed: true,
+        user_context_module_progressions: progressions,
+      })
     end
   end
 

@@ -1,8 +1,9 @@
 require [
   'jquery'
   'react'
+  'react-dom'
   'jsx/external_apps/router'
-], ($, React, router) ->
+], ($, React, ReactDOM, router) ->
   alreadyRendered = false
 
   render_react_apps = (tabId) ->
@@ -11,9 +12,9 @@ require [
       router.start(targetNode)
       alreadyRendered = true
     else if alreadyRendered
-      React.unmountComponentAtNode(targetNode)
+      ReactDOM.unmountComponentAtNode(targetNode)
       alreadyRendered = false
-      router.stop();
+      router.stop()
 
   activeTabId = $('li.ui-state-active > a').prop('id')
   render_react_apps(activeTabId) if activeTabId

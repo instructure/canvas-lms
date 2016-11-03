@@ -32,7 +32,7 @@ module Lti
       launch_url = opts[:launch_url] || default_launch_url(resource_type)
       link_code = opts[:link_code] || default_link_code
       @overrides = opts[:overrides] || {}
-
+      link_params = opts[:link_params] || {}
 
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
       lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context).convert if @user
@@ -51,7 +51,8 @@ module Lti
               user: lti_user,
               tool: lti_tool,
               account: lti_account,
-              variable_expander: variable_expander
+              variable_expander: variable_expander,
+              link_params: link_params
           }
       )
       self

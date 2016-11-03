@@ -4,7 +4,7 @@
   show_user = !hide_add_user && @account.root_account? && can_do(@account, @current_user, :manage_user_logins)
 %>
 
-<div class="rs-margin-all">
+<div class="rs-margin-bottom">
   <% if show_course %>
     <a href="#" role="button" class="add_course_link Button button-sidebar-wide">
       <span aria-hidden="true"><i class="icon-plus"></i> <%= t(:add_course_link, "New Course") %></span>

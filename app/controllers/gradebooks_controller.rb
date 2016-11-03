@@ -301,7 +301,7 @@ class GradebooksController < ApplicationController
     @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(:teacher_notes=> true).first
-    ag_includes = [:assignments, :assignment_visibility]
+    ag_includes = [:assignments, :assignment_visibility, 'overrides']
     chunk_size = if @context.assignments.published.count < Setting.get('gradebook2.assignments_threshold', '20').to_i
       Setting.get('gradebook2.submissions_chunk_size', '35').to_i
     else
@@ -433,7 +433,8 @@ class GradebooksController < ApplicationController
         submission.delete(:provisional) unless @assignment.moderated_grading?
         if params[:attachments]
           attachments = []
-          params[:attachments].each do |idx, attachment|
+          params[:attachments].keys.each do |idx|
+            attachment = strong_params[:attachments][idx].permit(Attachment.permitted_attributes)
             attachment[:user] = @current_user
             attachments << @assignment.attachments.create(attachment)
           end

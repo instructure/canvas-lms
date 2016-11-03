@@ -52,7 +52,12 @@ define([
       var title = tool.get('display_text');
       var $div = $("<div/>", {id: "homework_selection_dialog", style: "padding: 0; overflow-y: hidden;"}).appendTo($("body"));
 
-      $div.append($("<iframe/>", {frameborder: 0, src: url, id: "homework_selection_iframe"}).css({width: width, height: height}))
+      $div.append($("<iframe/>", {
+        frameborder: 0,
+        src: url,
+        id: "homework_selection_iframe",
+        tabindex: '0'
+      }).css({width: width, height: height}))
         .bind('selection', function(event, data) {
           SubmitAssignmentHelper.submitContentItem(event.contentItems[0]);
           $div.off('dialogbeforeclose', SubmitAssignment.dialogCancelHandler)
@@ -107,6 +112,7 @@ define([
     submissionForm.submit(function(event) {
       var self = this;
       var $turnitin = $(this).find(".turnitin_pledge");
+      var $vericite = $(this).find(".vericite_pledge");
       if($("#external_tool_submission_type").val() == "online_url_to_file") {
         event.preventDefault();
         event.stopPropagation();
@@ -114,6 +120,13 @@ define([
         return;
       }
       if($turnitin.length > 0 && !$turnitin.attr('checked')) {
+        alert(I18n.t('messages.agree_to_pledge', "You must agree to the submission pledge before you can submit this assignment."));
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
+      }
+
+      if($vericite.length > 0 && !$vericite.attr('checked')) {
         alert(I18n.t('messages.agree_to_pledge', "You must agree to the submission pledge before you can submit this assignment."));
         event.preventDefault();
         event.stopPropagation();

@@ -4,8 +4,9 @@ define([
   'speed_grader_helpers',
   'helpers/fakeENV',
   'jsx/grading/helpers/OutlierScoreHelper',
+  'compiled/userSettings',
   'jquery.ajaxJSON'
-  ], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper) => {
+  ], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings) => {
 
   module("SpeedGrader", {
     setup() {
@@ -20,6 +21,8 @@ define([
       };
       SpeedGrader.EG.currentStudent = {
         id: 4,
+        name: "Guy B. Studying",
+        submission_state: 'not_graded',
         submission: {
           score: 7,
           grade: 70,
@@ -255,5 +258,19 @@ define([
   test('returns grade of submission if user is provisional grader but score is null', () => {
     let grade = SpeedGrader.EG.getGradeToShow({ grade: 15 }, 'provisional_grader');
     equal(grade, '15');
+  });
+
+  module('speed_grader#getStudentNameAndGrade');
+
+  test('returns name and status', () => {
+    let result = SpeedGrader.EG.getStudentNameAndGrade();
+    equal(result, 'Guy B. Studying - not graded');
+  });
+
+  test('hides name if shouldHideStudentNames is true', function() {
+    this.stub(userSettings, 'get').returns(true);
+    this.stub(SpeedGrader.EG, 'currentIndex').returns(5);
+    let result = SpeedGrader.EG.getStudentNameAndGrade();
+    equal(result, 'Student 6 - not graded');
   });
 });

@@ -146,7 +146,7 @@ zh-Hant:
       no_auth_type_description: 此帳戶目前無法與身份識別提供者整合。
       page_title: 驗證設定
       profile_page_link_example: "例如，這就是您的個人檔案頁：[%{friendlyname}](%{url})"
-      settings_description: "為了讓使用者能夠透過外部身份識別提供者 (IdP) 進行驗證，使用者必須擁有連接至該帳戶並與 IdP 返回的唯一的識別符匹配的登入識別符。要查看使用者的當前登入，請參閱使用者的個人檔案頁面中的『登入資訊』部分。（通過在『使用者』選項卡上搜尋索找到。）"
+      settings_description: "為了讓使用者能夠透過外部身份識別提供者 (IdP) 進行驗證，使用者必須擁有連接至該帳戶並與 IdP 返回的唯一的識別符匹配的登入識別符。要查看使用者的當前登入，請參閱使用者的個人檔案頁面中的『登入資訊』部分。(透過在『使用者』選項卡上搜尋索找到。)"
       settings_title: 驗證設定
       test_ldap_link: 測試LDAP驗證資訊
     ldap_fields: 
@@ -253,7 +253,7 @@ zh-Hant:
       end_text: "結束於：%{end_at}；"
       error_text: "失敗，請將以下錯誤代碼報告至您的系統管理員：ErrorReport:%{error}；"
       extra_text_term: "期限：%{term_name}；"
-      message: "已通過以下設定成功生成 %{type} 報告。帳號：%{account}; %{options}"
+      message: "已透過以下設定成功生成 %{type} 報告。帳號：%{account}; %{options}"
       section_text: "對於章節：%{section}；"
       start_text: "開始於：%{start_at}；"
       term_text: "期限：%{term_name}；"
@@ -823,7 +823,7 @@ zh-Hant:
           Google Docs 預覽也能處理Canvas文檔預覽器
           無法支持的文檔類型。
           
-          通過使用本服務
+          透過使用本服務
           您承認您已閱讀并同意
           [Google Docs 預覽服務條款](%{terms_url})。
       about_google_docs_tooltip: "關於 Google Docs Previews"
@@ -1265,7 +1265,7 @@ zh-Hant:
       account_reports: 
         default: 
           zero_activity: 
-            text: "此報告顯示在特定期限內報讀任何課程的所有學生。由此產生的 csv 檔案將每個使用者註冊（自所述日期起尚未訪問課程）一行。"
+            text: "此報告顯示在特定期限內註冊任何課程的所有學生。由此產生的 csv 檔案將每個使用者註冊（自所述日期起尚未訪問課程）一行。"
   achieve_mastery_count_times_8c9bbcec: 
     one: "達到精通程度 %{count} 次"
     other: "達到精通程度 %{count} 次"
@@ -1433,7 +1433,7 @@ zh-Hant:
   allow_multiple_attempts_e67a0a37: 允許多次嘗試
   allow_opt_out_of_inbox: "允許使用者選擇退出交談的收件匣。這將導致所有交談郵件和通知作為 ASAP 通知傳送到使用者的主要電子郵箱，隱藏收件匣中交談的收件匣中未讀取郵件標記，以及隱藏交談的通知喜好設定。"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: 允許學生瀏覽已完成選擇時閒段的人員名單
-  allow_the_ability_to_send_notifications_through_ou_13cc8537: 允許通過分發隊列的方式發送通知
+  allow_the_ability_to_send_notifications_through_ou_13cc8537: 允許透過分發隊列的方式發送通知
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: 允許通過分發隊列的方式發送通知。
   allowed_attempts_4e229caa: 允許的嘗試
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: 允許教師標記出成績數據，以供批量匯出到SIS。
@@ -1543,7 +1543,7 @@ zh-Hant:
   anonymous_user: 匿名用戶
   anonymous_user_d984b9ce: 匿名用戶
   another_configuration_is_currently_selected_select_95b394e: 當前已使用另一配置方案。選擇此配置方案將取消上一個方案。
-  answer_address_book_queries_through_76842372: 回答通訊錄詢問通過
+  answer_address_book_queries_through_76842372: 回答通訊錄詢問透過
   answer_answerid_97fc4afc: "回答 %{answerId}"
   answer_correct_answer_c2c4a20c: "%{answer}, (正確答案)"
   answer_description_6b353cfd: 答案說明
@@ -2375,7 +2375,7 @@ zh-Hant:
       attendance_help: 考勤說明
   attention_aaca1f1d: 注意！
   attribute_d9f3af72: 屬性
-  audio_content_is_not_supported_by_your_device_or_a_2f5037c6: 你的設備或app不支持音頻内容。
+  audio_content_is_not_supported_by_your_device_or_a_2f5037c6: 你的設備或應用程式不支持音頻内容。
   audio_dd489fcc: 語音
   australia_61_eb9bb701: "澳大利亞  (+61)"
   australia_e8d44bf8: 澳大利亞
@@ -2940,7 +2940,7 @@ zh-Hant:
         assignment_done: 已完成！分任務現在已建立！可以將其按一下以查看詳細資料，編輯和刪除事件，或將其拖放到新的一天來更改其日期。
         change_date: 那個很簡單。只需拖曳事件到一個新的日期，然後鬆開。或者，可以按一下事件，然後按一下『編輯』以獲得更具體一點的資訊。
         create: 要開始建立月曆事件，只需按一下月曆上想要事件發生的日期。
-        create_assignment: 正如處理月曆事件，按一下要新增任務的日期。或者，可以通過按一下方框中（*在何處*？）的『未注日期的事件』以建立一個沒有截止日期的任務。
+        create_assignment: 正如處理月曆事件，按一下要新增任務的日期。或者，可以透過按一下方框中(*在何處？*)的『未注日期的事件』以建立一個沒有截止日期的任務。
         delete: 按一下月曆上要刪除的事件或任務。
         delete2: 現在按一下『刪除』（*在何處*？），事件將被刪除
         delete_done: 已完成。您剛剛接觸的是一些重要的刪除技能。
@@ -3169,11 +3169,11 @@ zh-Hant:
           免費的在綫工具例如[穀歌文檔](%{google_url})能非常好地為學生提供完成群組任務、論文或分享筆記的平臺。
           教師 *或* 學生可以設置群組協作。
       description_student: |-
-          **什麽是協作？**  協作指的是通過在綫合作工具，編輯共享文檔。
+          **什麽是協作？**  協作指的是透過在綫合作工具，編輯共享文檔。
           例如您可以使用
           [穀歌文檔](%{google_url})
           來協作完成群組論文或筆記等項目。本頁可使您
-          輕鬆地瀏覽協作的進程，並且在不用
+          輕鬆地瀏覽協作的進程，並且再不用
           互發電郵，就可以輕鬆設置好協作項目。
       description_teacher: |-
           **什麽是協作？**  協作指的是學生們可能都已經熟悉的在綫協作工具。
@@ -3824,7 +3824,7 @@ zh-Hant:
         create: |-
             課程模組可用於將您的任務、頁面、檔案等整理成更小的部分或單位。模組可以圍繞一個主題為中心，專注於一個特定的主題，或者甚至只是按時間順序進行分組。
             
-            也可以通過為每個模組定義標準和先決條件來排序模組。在學生們解除鎖定其所有先決條件之前，其將無法存取模組。這樣一來就可以防止學生存取某些內容或檔案，直到其（例如）在複習測驗中得分至少 75％。
+            也可以透過為每個模組定義標準和先決條件來排序模組。在學生們解除鎖定其所有先決條件之前，其將無法存取模組。這樣一來就可以防止學生存取某些內容或檔案，直到其（例如）在複習測驗中得分至少 75% o。
             
             要開始將您的課程整理進模組，按一下右側的『%{button}』按鈕。
         no_modules: 尚無為這門課程定義的模組。
@@ -6025,7 +6025,7 @@ zh-Hant:
       editor_help_link: 打開幫助菜單
       keybindings: 
         close_submenu: 關閉菜單或對話之後，您還可以回到編輯區域
-        navigate_toolbar: 通過菜單/工具欄導航左/右
+        navigate_toolbar: 透過菜單/工具欄導航左/右
         open_dialog: 開啟此說明對話方塊
         open_menubar: 打開編輯器的菜單欄
         open_toolbar: 開啟編輯器的工具列
@@ -6736,7 +6736,7 @@ zh-Hant:
     replace: 取代
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: 檔案(s)將包含在Canvas桌面應用中的所有頁面中。
   file_s_will_be_included_when_user_content_is_displ_4e16dc3c: "儅用戶信息在iOS 或 Android應用中展示時，文檔(s)將包括在內。"
-  file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "當通過 Canvas iOS 或 Android 應用，以及基於我方API的第三方應用來展示用戶內容時，文檔將會包含在內(s) 。"
+  file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "當透过 Canvas iOS 或 Android 應用程式，以及基於我方API的第三方應用程式來展示用戶內容時，文檔(s) 將會包含在內。"
   file_size_limit_user_file_quota_applies_19b9b466: "用戶檔案配額為 %{file_size_limit} "
   file_status: 
     hidden_status: 已隱藏。可使用連結
@@ -6794,15 +6794,15 @@ zh-Hant:
   files_uploaded_519844ed: 檔案已上傳
   fill_in_the_blank_read_surrounding_text_1a6c73c7: 填空，閱讀周圍文字
   filled_5d8c39e: 已填充
-  filter_announcements_by_unread_495eeeb3: 通過『未讀取』篩選器對宣告進行篩選
+  filter_announcements_by_unread_495eeeb3: 透過『未讀取』篩選器對宣告進行篩選
   filter_by_ip_address_40965f66: "按 IP 地址篩選"
   filter_by_name_34cbe139: 按名稱篩選
   filter_by_student_name_or_secondary_id_83dc524f: "按學生名稱或助理 ID 篩選"
-  filter_discussions_by_assignments_757924ed: 通過『任務』篩選器對討論進行篩選
-  filter_discussions_by_unread_6c48322: 通過『未讀取』篩選器對討論進行篩選
+  filter_discussions_by_assignments_757924ed: 透過『任務』篩選器對討論進行篩選
+  filter_discussions_by_unread_6c48322: 透過『未讀取』篩選器對討論進行篩選
   filter_e3398407: 篩選器
   filter_ip_addresses_2f296bd2: "篩選 IP 地址"
-  filter_replies_by_unread_342e8e90: 通過『未讀取』篩選器對回復進行篩選
+  filter_replies_by_unread_342e8e90: 透過『未讀取』篩選器對回復進行篩選
   filter_replies_by_unread_caf870ea: 通過『未讀取』篩選器對回復進行篩選
   final_grade_info_2aa35d25: 最終評分資訊
   final_grade_score_fe69a301: "最終成績： %{score}"
@@ -7513,10 +7513,10 @@ zh-Hant:
   group_category_locked: 群組類別不能更改，因為學生已經提交了這項任務
   group_group_name_is_for_a_different_section_4d84d256: "%{group_name} 群組適用於另一個章節"
   group_group_name_is_full_297880d6: "%{group_name} 群組已滿"
-  group_group_name_is_joined_by_invitation_only_4ac2a9e5: "%{group_name} 群組僅通過邀請才能加入"
+  group_group_name_is_joined_by_invitation_only_4ac2a9e5: "%{group_name} 群組僅透過邀請才能加入"
   group_is_for_a_different_section_6a843a4d: 群組適用於另一個章節
   group_is_full_56849d78: 群組已滿
-  group_is_joined_by_invitation_only_d00f5a63: 群組僅通過邀請才能加入
+  group_is_joined_by_invitation_only_d00f5a63: 僅透過邀請才能加入群組
   group_leader_user_name_6f24bebb: "群組領導者 %{user_name}"
   group_members_ae5489ed: 群組成員
   group_membership: 
@@ -7960,8 +7960,8 @@ zh-Hant:
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: 這是一個非常好的機會，讓您能夠了解月曆并將您可能有的任何非任務事件添加到課程之中。請勿擔心，我們將全程幫助您。
   hidden_14a032a7: 已隱藏
   hidden_available_with_a_link_65ef2bda: 已隱藏。可使用連結
-  hidden_available_with_a_link_click_to_modify_184990e7: "已隱藏。通過一個連結可用 — 點擊進行修改"
-  hidden_files_inside_will_be_available_with_links_9bdf702b: 通過連結可獲取裡面隱藏的文件。
+  hidden_available_with_a_link_click_to_modify_184990e7: "已隱藏。透過一個連結可用 — 按一下進行修改"
+  hidden_files_inside_will_be_available_with_links_9bdf702b: 透過連結可獲取裡面隱藏的文件。
   hide_all_artifacts_d654fbd5: 隱藏所有項目
   hide_correct_answers_at_2421b0aa: 隱藏正確答案於
   hide_correct_answers_at_b1a59408: 隱藏正確答案在
@@ -10511,7 +10511,7 @@ zh-Hant:
   module_90d9fd32: 模組
   module_completed_50c50762: 模組已完成
   module_in_progress_fa600662: 模組進行中
-  module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "模組項目已通過獲得至少 %{score} 得分的方式完成"
+  module_item_has_been_completed_by_scoring_at_least_70bcdbcc: "模組項目已透過獲得至少 %{score} 得分的方式完成"
   module_item_has_been_viewed_and_is_complete_6d180117: 模組項目已被檢視並完成
   module_item_marked_as_done_and_is_complete_ad240246: 模組項目已完成並標記為已完成
   module_item_module_item_name_was_successfully_dele_8626d846: "模塊項%{module_item_name}已經成功刪除。"
@@ -11690,7 +11690,7 @@ zh-Hant:
       name: 成績匯出
     grade_export_settings: 
       description: |-
-          此外掛程式允許將最終評分發佈回學生資訊系統 (SIS) 上。啟用後，成績冊將向使用者提供一個選項來發佈這些評分。這將通過一個向指定發佈端點發出的POST要求來實現。每一類型定義其自身的內容格式和MIME類型。來自該端點的回應並不重要而且目前已被忽略。
+          此外掛程式允許將最終評分發佈回學生資訊系統 (SIS) 上。啟用後，成績冊將向使用者提供一個選項來發佈這些評分。這將透過一個向指定發佈端點發出的POST要求來實現。每一類型定義其自身的內容格式和MIME類型。來自該端點的回應並不重要而且目前已被忽略。
           
           例如，Instructure 已格式化的 CSV 將 POST 一個 'text/csv' MIME 類型的 CSV 檔案到指定端點上，其包含以下各欄：
           
@@ -12177,7 +12177,7 @@ zh-Hant:
           然後，如果您允許課程/群組同伴成員查看您註冊的服務，
           他們就可以輕鬆聯繫您的 Twitter 帳戶。
           
-          您還可以通過註冊將通知發送到您的 Twitter 帳戶。
+          您還可以透過註冊將通知發送到您的 Twitter 帳戶。
           這些通知將以直接訊息的方式自己發送給自己，
           而不會顯示在公共流之中。
       unknown_service: 未知
@@ -14440,35 +14440,35 @@ zh-Hant:
         go_to_dashboard: 轉到您的儀表板
     authenticate: 
       buttons: 
-        enroll_in_course: 報讀課程
+        enroll_in_course: 註冊課程
         next: 下一個
-      getting_started: "您正在報讀**%{course}**。"
+      getting_started: "您正在註冊**%{course}**。"
       labels: 
         password: 密碼
     authenticate_or_register: 
       buttons: 
-        enroll_in_course: 報讀課程
+        enroll_in_course: 註冊課程
         next: 下一個
       existing_user: "我已經有一個 %{institution_name} 登入"
-      getting_started: "您正在報讀**%{course}**。"
+      getting_started: "您正在註冊**%{course}**。"
       labels: 
         name: 全名
         password: 密碼
       new_user: 我是一個新使用者
     confirm_enrollments: 
       buttons: 
-        enroll_in_course: 報讀課程
+        enroll_in_course: 註冊課程
         next: 下一個
-      getting_started: "您正在報讀**%{course}**"
+      getting_started: "您正在註冊**%{course}**"
     course_full: 
       class_full: "**%{course}**的註冊已滿。我們對此不便表示抱歉。"
     enrollment_closed: 
       enrollment_is_closed: "**%{course}**的註冊已結束。"
     new: 
       titles: 
-        course_enrollment: "報讀 %{course}"
+        course_enrollment: "註冊%{course}"
     successfully_enrolled: 
-      already_enrolled: "您已成功報讀**%{course}**。"
+      already_enrolled: "您已成功註冊**%{course}**。"
       buttons: 
         go_to_course: 轉到課程
         go_to_dashboard: 轉到您的儀表板
@@ -15856,12 +15856,12 @@ zh-Hant:
       謝謝，
       Canvas技術支持
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
-      標題為"%{subject}"的郵件無法發送，因爲討論主題已被刪除。如果您希望通過Canvas聯絡某人，您可以登入您的賬戶，利用發件箱工具發郵件。
+      標題為"%{subject}"的郵件無法發送，因爲討論主題已被刪除。如果您希望透過Canvas聯絡某人，您可以登入您的賬戶，利用發件箱工具發郵件。
       
       感謝，
       Canvas支援團隊
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
-      您發送的主題為"%{subject}" 的郵件未能投遞。 要通過本郵件向Canvas 回复郵件，您的Canvas檔案中必須有經確認的通訊渠道。請訪問您的檔案，並向下列地址再次發送確認郵件 [See https://community.canvaslms.com/docs/DOC-2281]. 您還可以通過Canvas 收件箱聯繫相關個人 [See https://community.canvaslms.com/docs/DOC-2670].
+      您發送的主題為"%{subject}" 的郵件未能投遞。 要透過本郵件向Canvas 回复郵件，您的Canvas檔案中必須有經確認的通訊渠道。請訪問您的檔案，並向下列地址再次發送確認郵件 [See https://community.canvaslms.com/docs/DOC-2281]。 您還可以透過Canvas 收件箱聯繫相關個人 [See https://community.canvaslms.com/docs/DOC-2670]。
       
       謝謝,
       Canvas 支援團隊
@@ -15967,8 +15967,8 @@ zh-Hant:
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: 本記錄器使用Flash。因此，您或許會發覺更簡易的辦法是使用本地計算機記錄，然後使用媒體上傳功能將其上傳。
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "此報告顯示在特定期限內的所有課程。由此產生的CSV文檔將在每一行顯示一門課程，並顯示課程ID，課程SIS ID，課程短名稱，課程名稱，賬戶ID，賬戶SIS ID，賬戶名稱，已使用的儲存MB數以及所有文檔的總MB數。課程中所有文檔的總數指的是課程所包含的所有文檔，無論這些文檔是否對課程配額產生何種影響。"
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "此報告顯示在特定期限內的所有課程。由此產生的CSV文檔將在每一行顯示一門課程，並顯示課程ID，課程SIS ID，課程短名稱，課程名稱，賬戶ID，賬戶SIS ID，賬戶名稱以及已使用的儲存MB數。"
-  this_report_shows_grading_period_grades_and_overal_a86346a: "此報告顯示了在特定期限內報讀課程的每一名學生在評分期限內的評分 (以及整體的課程評分) 。由此生成的 csv 檔案將每個註冊寫入單獨的一行。"
-  this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: 本樣本頁面包含了Canvas的一般UI元素，方便您設計個性化的品牌。您可以通過左側邊欄調整顔色值和影像内容，並通過*預覽您的改動*按鈕預覽。點擊該按鈕，刷新頁面后即可預覽您的改動。
+  this_report_shows_grading_period_grades_and_overal_a86346a: "此報告顯示了在特定期限內註冊課程的每一名學生在評分期限內的評分 (以及整體的課程評分) 。由此生成的 csv 檔案將每個註冊寫入單獨的一行。"
+  this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: 本樣本頁面包含了Canvas的一般UI元素，方便您設計個性化的品牌。您可以透過左側邊欄調整顔色值和影像内容，並透過*預覽您的改動*按鈕預覽。點擊該按鈕，刷新頁面后即可預覽您的改動。
   this_student_s_responses_are_hidden_because_this_a_252e8335: 這名學生的反應是隱藏的，因為此任務是匿名的。
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: 此學生剛獲得了一個超出平常水平的高分。
   this_student_was_just_awarded_negative_points_55741a37: 此學生剛獲得了一個負分。
@@ -16215,7 +16215,7 @@ zh-Hant:
   to_minscore_43e5452e: "至 %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: 要預覽主題編輯器圖標，您需要*關閉高對比度UI*.
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: 要限制特定Clever域的用戶，請在此輸入那個Clever域的ID。這是在多名租借用戶環境下使用Clever快速登入功能的必須要求。
-  to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "要僅限特定Google Apps域的用戶使用，請在此輸入域名稱。"
+  to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "要僅限特定Google Apps 程式域的用戶使用，請在此輸入域名稱。"
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "要僅限特定Azure 活躍域的用戶使用，請在此輸入租借用戶名稱。"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要檢視任務，請確保 *議程* 檢視處於活動狀態。"
   today_76e10f9c: 今天
@@ -17096,7 +17096,7 @@ zh-Hant:
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "您可以透過按一下以下連結查看群組: %{link}"
   you_can_disable_this_feature_d5e61373: 您可以停用此功能
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: 您可以隱藏或顯示課程的任務，方法是將其切換為打開或關閉。
-  you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "您可以通過 %{url}鏈接，直接通過本接口登入。"
+  you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "您可以透過 %{url}鏈接，直接透過本接口登入。"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: 現在，您可以為已參加測驗的學生設定重新評分選項。
   you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "您可以回復本信息回復評論，或使用鏈接檢視提交的具體內容：%{link}。"
   you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "您可以透過直接回复此電子邮件在 Canvas 中回覆此郵件，或按一下以下鏈接：%{link}。"
@@ -17143,7 +17143,7 @@ zh-Hant:
   you_need_to_preview_your_changes_before_applying_t_468d56e4: 在應用于所有用戶前，您需要"預覽您的改動"。
   you_need_to_preview_your_changes_before_applying_t_cb048bed: 在應用于所有用戶前，您需要"預覽您的改動"
   you_need_to_save_before_applying_to_this_account_7436a5ae: 您需要在套用到該賬戶之前『保存』
-  you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: 您正在編輯您的Canvas主題！請通過*主題編輯器*來應用或取消改變。
+  you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: 您正在編輯您的Canvas主題！請透過*主題編輯器*來應用或取消改變。
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: 您正在編輯您的Canvas主題！所做的改動尚未被應用。
   you_scored_a_score_a5dd5561: "您獲得分數為 %{score}。"
   you_scored_d3e00111: 您已得分

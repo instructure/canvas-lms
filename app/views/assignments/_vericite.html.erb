@@ -1,0 +1,17 @@
+<%- if @context.vericite_comments.present? %>
+  <tr>
+    <td colspan="2" class='vericite-comments'>
+      <%= @context.vericite_comments %>
+    </td>
+  </tr>
+<%- end %>
+<%- if @context.vericite_pledge.present? %>
+  <tr>
+    <td colspan="2">
+      <label class='checkbox'>
+        <input type="checkbox" class='vericite_pledge' name="vericite_pledge" value="1"/>
+        <%= @context.vericite_pledge %>
+      </label>
+    </td>
+  </tr>
+<%- end %>

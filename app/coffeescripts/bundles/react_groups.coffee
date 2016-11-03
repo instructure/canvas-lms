@@ -1,7 +1,6 @@
 require [
-  'react',
-  'jsx/groups/StudentView',
-], (React, StudentView) ->
+  'react-dom'
+  'jsx/groups/StudentView'
+], (ReactDOM, StudentView) ->
 
-  # SView = React.createElement(StudentView);
-  React.render(StudentView, document.getElementById('content'))
+  ReactDOM.render(StudentView, document.getElementById('content'))

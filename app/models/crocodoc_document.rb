@@ -164,7 +164,9 @@ class CrocodocDocument < ActiveRecord::Base
         Shackles.activate(:master) do
           statuses = []
           docs.each_slice(bs) do |sub_docs|
-            statuses.concat CrocodocDocument.crocodoc_api.status(sub_docs.map(&:uuid))
+            Canvas.timeout_protection("crocodoc_status") do
+              statuses.concat CrocodocDocument.crocodoc_api.status(sub_docs.map(&:uuid))
+            end
           end
 
           bulk_updates = {}

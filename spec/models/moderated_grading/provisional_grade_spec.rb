@@ -16,18 +16,6 @@ describe ModeratedGrading::ProvisionalGrade do
 
   it { is_expected.to be_valid }
 
-  it do
-    is_expected.to have_one(:selection).
-      with_foreign_key(:selected_provisional_grade_id).
-      class_name('ModeratedGrading::Selection')
-  end
-  it { is_expected.to belong_to(:submission) }
-  it { is_expected.to belong_to(:scorer).class_name('User') }
-  it { is_expected.to have_many(:rubric_assessments) }
-
-  it { is_expected.to validate_presence_of(:scorer) }
-  it { is_expected.to validate_presence_of(:submission) }
-
   describe 'grade_attributes' do
     it "returns the proper format" do
       json = provisional_grade.grade_attributes

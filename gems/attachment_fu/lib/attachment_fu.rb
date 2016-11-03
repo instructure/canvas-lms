@@ -118,7 +118,7 @@ module AttachmentFu # :nodoc:
           if processors.any?
             attachment_options[:processor] = "#{processors.first}Processor"
             processor_mod = AttachmentFu::Processors.const_get(attachment_options[:processor])
-            include processor_mod unless included_modules.include?(processor_mod)
+            prepend processor_mod unless included_modules.include?(processor_mod)
           end
         rescue Object, Exception
           raise unless load_related_exception?($!)
@@ -518,7 +518,7 @@ module AttachmentFu # :nodoc:
         if @saved_attachment
           # # INSTRUCTURE I (ryan shaw) commented these next lines out so that the thumbnailing does not happen syncronisly as part of the request.
           # # we are going to do the same thing as delayed_jobs
-          # if respond_to?(:process_attachment_with_processing) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
+          # if respond_to?(:process_attachment) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
           #   temp_file = temp_path || create_temp_file
           #   attachment_options[:thumbnails].each { |suffix, size| create_or_update_thumbnail(temp_file, suffix, *size) }
           # end

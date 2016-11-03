@@ -665,9 +665,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.props.onInput(inputValue);
 	  },
 	
-	  handleSelect: function handleSelect(event) {
+	  handleSelect: function handleSelect(event, option) {
 	    var input = this.refs['combo-li'].querySelector('input');
-	    this.props.onSelect(event);
+	    this.props.onSelect(event, option);
 	    this.setState({
 	      selectedToken: null
 	    });

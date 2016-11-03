@@ -25,8 +25,8 @@ define [
 
     events:
       'click .agenda-load-btn': 'loadMore'
-      'click .ig-row': 'manageEvent'
-      'keyclick .ig-row': 'manageEvent'
+      'click .agenda-event__item-container': 'manageEvent'
+      'keyclick .agenda-event__item-container': 'manageEvent'
 
     messages:
       loading_more_items: I18n.t('loading_more_items', "Loading more items.")
@@ -102,7 +102,7 @@ define [
         $("#create_new_event_link").focus()
         currentIndex = -1
       else if(currentIndex >= 0)
-        children = @$('.ig-list').children()
+        children = @$('.agenda-event__list').children()
         elementToFocus = $((children[currentIndex] || children[children.length - 1])).children().first()
         elementToFocus.focus() if elementToFocus
 
@@ -110,7 +110,7 @@ define [
       e.preventDefault()
       e.stopPropagation()
       focusedAlready = true #So we don't focus the add button right when the page loads.
-      eventEl = $(e.target).closest('.agenda-event')
+      eventEl = $(e.target).closest('.agenda-event__item')
       eventId = eventEl.data('event-id')
       currentIndex = -1 #Default currentIndex to be -1 just in case we don't find any event.
       @collection.forEach((val, index, list) => currentIndex = index if val.id == eventId)

@@ -23,11 +23,11 @@
     border: 0 none !important;
   }
 
-  #wrapper-container,
+  .ic-app-main-layout-vertical,
   .ic-app-main-layout-horizontal { margin-left: 0 !important; }
 
   // this is for firefox, if things dont have overflow:visible then it wont print any more than one page.
-  #wrapper-container,
+  .ic-app-main-layout-vertical,
   #content,
   #wiki_show_view_main {
     overflow: visible !important;
@@ -82,7 +82,7 @@
         }
         &:first-of-type {
           padding-left: 0;
-        }  
+        }
         &.home {
           display: none;
         }
@@ -93,5 +93,5 @@
       }
     }
   }
-  
+
 }

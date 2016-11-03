@@ -7,7 +7,7 @@
       </label>
     </div>
     <div class="span6">
-      <%= link_to context_url(@context, :context_quiz_url, @quiz), :role => 'button', :class => 'btn', :id => 'cancel_button' do %>
+      <%= link_to (params[:return_to] || context_url(@context, :context_quiz_url, @quiz)), :role => 'button', :class => 'btn', :id => 'cancel_button' do %>
         <%= t("Cancel") %>
       <% end %>
       <% unless @quiz.published %>

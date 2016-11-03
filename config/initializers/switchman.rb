@@ -17,9 +17,9 @@ Rails.application.config.after_initialize do
   module Canvas
     module Shard
       module ClassMethods
-        def current(category=:default)
+        def current(category=:primary)
           if category == :delayed_jobs
-            active_shards[category] || super(:default).delayed_jobs_shard
+            active_shards[category] || super(:primary).delayed_jobs_shard
           else
             super
           end
@@ -27,9 +27,9 @@ Rails.application.config.after_initialize do
 
         def activate!(categories)
           if !@skip_delayed_job_auto_activation && !categories[:delayed_jobs] &&
-              categories[:default] && categories[:default] != active_shards[:default] # only activate if it changed
+              categories[:primary] && categories[:primary] != active_shards[:primary] # only activate if it changed
             skip_delayed_job_auto_activation do
-              categories[:delayed_jobs] = categories[:default].delayed_jobs_shard
+              categories[:delayed_jobs] = categories[:primary].delayed_jobs_shard
             end
           end
           super
@@ -213,7 +213,7 @@ Rails.application.config.after_initialize do
     raise 'Sharding is supposed to be set up, but is not! Use SKIP_FORCE_SHARDING=1 to ignore'
   end
 
-  if !CANVAS_RAILS4_0 && Shard.default.is_a?(Shard)
+  if Shard.default.is_a?(Shard)
     # otherwise the serialized settings attribute method won't be properly defined
     Shard.define_attribute_methods
     Shard.default.instance_variable_set(:@attributes, Shard.attributes_builder.build_from_database(Shard.default.attributes_before_type_cast))

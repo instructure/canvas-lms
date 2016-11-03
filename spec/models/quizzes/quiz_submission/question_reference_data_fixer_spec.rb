@@ -2,6 +2,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
   before(:once) do
+    # make sure the sequences are nowhere near each other, so as to avoid
+    # flickering failures due to colliding ids
+    User.connection.execute "ALTER SEQUENCE public.assessment_questions_id_seq RESTART WITH 1000"
+    User.connection.execute "ALTER SEQUENCE public.quiz_questions_id_seq RESTART WITH 2000"
+
     @course = course_model
     @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
     @aq = assessment_question_model({

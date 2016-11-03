@@ -23,10 +23,10 @@ class AssessmentQuestionsController < ApplicationController
   before_filter :require_bank
   def create
     if authorized_action(@bank.assessment_questions.new, @current_user, :create)
-      params[:assessment_question] ||= {}
-      params[:assessment_question].delete(:assessment_question_bank_id)
-      params[:assessment_question][:form_question_data] ||= params[:question]
-      @question = @bank.assessment_questions.build(params[:assessment_question])
+      strong_params[:assessment_question] ||= {}
+      strong_params[:assessment_question][:form_question_data] ||= params[:question]
+
+      @question = @bank.assessment_questions.build(assessment_question_params)
       if @question.with_versioning(&:save)
         render json: question_json(@question, @current_user, session, [:assessment_question])
       else
@@ -34,23 +34,21 @@ class AssessmentQuestionsController < ApplicationController
       end
     end
   end
-  
+
   def update
     @question = @bank.assessment_questions.find(params[:id])
     if authorized_action(@question, @current_user, :update)
-      params[:assessment_question] ||= {}
-      # changing the question bank id needs to use the move action, below
-      params[:assessment_question].delete(:assessment_question_bank_id)
-      params[:assessment_question][:form_question_data] ||= params[:question]
+      strong_params[:assessment_question] ||= {}
+      strong_params[:assessment_question][:form_question_data] ||= params[:question]
       @question.edited_independent_of_quiz_question
-      if @question.with_versioning { @question.update_attributes(params[:assessment_question]) }
+      if @question.with_versioning { @question.update_attributes(assessment_question_params) }
         render json: question_json(@question, @current_user, session, [:assessment_question])
       else
         render :json => @question.errors, :status => :bad_request
       end
     end
   end
-  
+
   def destroy
     @question = @bank.assessment_questions.find(params[:id])
     if authorized_action(@question, @current_user, :delete)
@@ -58,9 +56,13 @@ class AssessmentQuestionsController < ApplicationController
       render :json => @question
     end
   end
-  
+
   private
   def require_bank
     @bank = @context.assessment_question_banks.active.find(params[:question_bank_id])
+  end
+
+  def assessment_question_params
+    strong_params.require(:assessment_question).permit(:name, :form_question_data => strong_anything)
   end
 end

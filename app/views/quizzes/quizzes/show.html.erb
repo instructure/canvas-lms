@@ -88,12 +88,9 @@
       </ul>
       <%= render :partial => "quiz_right_side", :locals => {:allow_take => false} %>
     <% else %>
-
-      <div class="rs-margin-top">
-        <% if @submission && @submission.completed? %>
-          <%= render :partial => "quiz_right_side", :locals => {:allow_take => !@locked} %>
-        <% end %>
-      </div>
+      <% if @submission && @submission.completed? %>
+        <%= render :partial => "quiz_right_side", :locals => {:allow_take => !@locked} %>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>

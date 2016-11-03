@@ -7,13 +7,16 @@ class Quizzes::QuizQuestionBuilder
       @mark_picked = mark_picked
     end
 
-    def draw(quiz_id, count)
-      questions = @bank.select_for_submission(quiz_id, count, @picked[:aq])
+    def draw(quiz_id, quiz_group_id, count)
+      questions = @bank.select_for_submission(quiz_id, quiz_group_id, count, @picked[:aq])
       @mark_picked.call(questions)
 
-      if questions.count < count
+      duplicate_index = 1
+      while questions.count < count
         remaining_picks = count - questions.count
-        duplicated = @bank.select_for_submission(quiz_id, remaining_picks, [], @picked[:qq])
+        duplicated = @bank.select_for_submission(quiz_id, quiz_group_id, remaining_picks, [], duplicate_index)
+        break if duplicated.empty?
+        duplicate_index += 1
         @mark_picked.call(duplicated)
         questions.concat(duplicated)
       end

@@ -1,8 +1,9 @@
 define [
   'react'
+  'react-dom'
   'react-modal'
   'jsx/external_apps/components/ManageAppListButton',
-], (React, Modal, ManageAppListButton) ->
+], (React, ReactDOM, Modal, ManageAppListButton) ->
 
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
@@ -18,7 +19,11 @@ define [
     })
 
   renderComponent = ->
-    React.render(createElement(), wrapper)
+    ReactDOM.render(createElement(), wrapper)
+
+  module 'ExternalApps.ManageAppListButton',
+    teardown: ->
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'open and close modal', ->
     component = renderComponent({})

@@ -1,6 +1,7 @@
 <% add_crumb t(:sis_import_crumb, "SIS Import") %>
 <% @active_tab = "sis-import" %>
-<% content_for :page_title do %><%= t(:page_title, "SIS Import") %><% end %>
+<% content_for :page_title do %><%= t(:page_title, "SIS Import") %>
+<% end %>
 
 <div>
   <h1><%= t(:title, "SIS Import") %></h1>
@@ -23,8 +24,8 @@
           <select id="import_type" name="import_type">
             <% SisBatch.valid_import_types.each do |type, data| %>
               <option value="<%= type %>"
-              <% if data[:default] %> selected
-              <% end %>><%= data[:name].respond_to?(:call) ? data[:name].call() : data[:name] %></option>
+                      <% if data[:default] %> selected
+                      <% end %>><%= data[:name].respond_to?(:call) ? data[:name].call : data[:name] %></option>
             <% end %>
           </select>
 
@@ -78,12 +79,12 @@
   <% end %>
 
   <div class="progress_bar_holder" style="<%= hidden unless @current_batch && @current_batch.importing? %> margin-top: 10px;">
-      <div class="copy_progress"></div>
-      <div class="progress_message"><%= t(:import_started_message, "The import process has started! This can take awhile if there is a lot to import. You can leave the page and come back.") %></div>
+    <div class="copy_progress"></div>
+    <div class="progress_message"><%= t(:import_started_message, "The import process has started! This can take awhile if there is a lot to import. You can leave the page and come back.") %></div>
   </div>
 
   <div id="import_log_holder" style="<%= hidden %>">
-    <h2><%= t(:import_log_title, "Import Progress Log") %></h3>
+    <h2><%= t(:import_log_title, "Import Progress Log") %></h2>
     <div id="import_log"></div>
   </div>
 
@@ -91,34 +92,35 @@
   <% pending_batch_count -= 1 if @current_batch && @current_batch.created? %>
   <% if pending_batch_count > 0 %>
     <div class="pending_batches" style="margin-top: 20px">
-      <h2><%= t(:pending_batches_title, "Pending Batches") %></h3>
-      <p><%= t(:pending_batches_count, { :one => "%{count} batch waiting to be processed.", :other => "%{count} batches waiting to be processed." }, :count => pending_batch_count) %></p>
+      <h2><%= t(:pending_batches_title, "Pending Batches") %></h2>
+      <p><%= t(:pending_batches_count, {:one => "%{count} batch waiting to be processed.", :other => "%{count} batches waiting to be processed."}, :count => pending_batch_count) %></p>
     </div>
   <% end %>
 
   <% if show_last_batch %>
     <div class="last_batch" style="margin-top: 20px;">
-      <h2><%= t(:last_batch_title, "Last Batch") %></h3>
-      <p><%= t(:started_at_message, "Started: %{started_at}", :started_at => datetime_string(@last_batch.created_at)) %><br/>
-      <% if @last_batch.diffing_data_set_identifier %>
+      <h2><%= t(:last_batch_title, "Last Batch") %></h2>
+      <p><%= t(:started_at_message, "Started: %{started_at}", :started_at => datetime_string(@last_batch.created_at)) %>
+        <br/>
+        <% if @last_batch.diffing_data_set_identifier %>
         <p><%= t("Data Set Identifier: %{data_set_id}", data_set_id: @last_batch.diffing_data_set_identifier) %></p>
         <% if @last_batch.data[:diffed_against_sis_batch_id] %>
           <p><%= t("Incremental update successfully generated against a previous SIS Import.") %></p>
         <% end %>
       <% end %>
-        <% if @last_batch.workflow_state == 'imported' %>
-          <%= t(:imported_message, "All SIS data was successfully imported.") %>
-          <%= print_counts @last_batch %>
-        <% elsif @last_batch.workflow_state == 'imported_with_messages' %>
-          <%= t(:imported_with_messages_message, "The SIS data was imported but with these messages:") %>
-          <%= print_messages(@last_batch) %>
-          <%= print_counts @last_batch %>
-        <% elsif @last_batch.workflow_state == 'failed' %>
-          <%= t(:import_failed_message, "There was an error importing your SIS data. No records were imported.") %>
-        <% elsif @last_batch.workflow_state == 'failed_with_messages' %>
-          <%= t(:import_failed_with_messages_message, "No SIS records were imported. The import failed with these messages:") %>
-          <%= print_messages(@last_batch) %>
-        <% end %>
+      <% if @last_batch.workflow_state == 'imported' %>
+        <%= t(:imported_message, "All SIS data was successfully imported.") %>
+        <%= print_counts @last_batch %>
+      <% elsif @last_batch.workflow_state == 'imported_with_messages' %>
+        <%= t(:imported_with_messages_message, "The SIS data was imported but with these messages:") %>
+        <%= print_messages(@last_batch) %>
+        <%= print_counts @last_batch %>
+      <% elsif @last_batch.workflow_state == 'failed' %>
+        <%= t(:import_failed_message, "There was an error importing your SIS data. No records were imported.") %>
+      <% elsif @last_batch.workflow_state == 'failed_with_messages' %>
+        <%= t(:import_failed_with_messages_message, "No SIS records were imported. The import failed with these messages:") %>
+        <%= print_messages(@last_batch) %>
+      <% end %>
       </p>
     </div>
   <% end %>

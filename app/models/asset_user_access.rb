@@ -24,7 +24,7 @@ class AssetUserAccess < ActiveRecord::Base
   belongs_to :user
   has_many :page_views
   before_save :infer_defaults
-  attr_accessible :user, :asset_code
+  strong_params
 
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
   scope :for_user, lambda { |user| where(:user_id => user) }

@@ -170,4 +170,11 @@ describe LiveEventsObserver do
       user_with_pseudonym(account: Account.default, username: 'bobbo', active_all: true)
     end
   end
+
+  describe "account_notification" do
+    it "posts create events" do
+      Canvas::LiveEvents.expects(:account_notification_created).once
+      account_notification
+    end
+  end
 end

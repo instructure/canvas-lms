@@ -1,9 +1,10 @@
 define [
   'react'
+  'react-dom'
   'jquery'
   'jsx/files/FileRenameForm'
   'compiled/models/Folder'
-], (React, $, FileRenameForm, Folder) ->
+], (React, ReactDOM, $, FileRenameForm, Folder) ->
 
   Simulate = React.addons.TestUtils.Simulate
 
@@ -15,10 +16,10 @@ define [
             id: 999
             name: 'original_name.txt'
           name: 'options_name.txt'
-      @form = React.render(React.createFactory(FileRenameForm)(props), $('<div>').appendTo('#fixtures')[0])
+      @form = ReactDOM.render(React.createFactory(FileRenameForm)(props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@form.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@form.getDOMNode().parentNode)
       $("#fixtures").empty()
 
   test 'switches to editing file name state with button click', ->

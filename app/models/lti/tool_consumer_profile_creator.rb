@@ -27,6 +27,7 @@ module Lti
           Membership.role
           ToolConsumerProfile.url
           OAuth.splitSecret
+          Context.id
         ).freeze
 
     SERVICES = [

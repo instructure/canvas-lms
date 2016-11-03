@@ -134,6 +134,8 @@ class DueDateCacher
           :workflow_state => 'accepted',
           :group_id => override.set_id
         })
+    when 'Noop'
+      scope.none
     end
   end
 end

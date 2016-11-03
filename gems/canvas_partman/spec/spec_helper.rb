@@ -16,11 +16,7 @@ require 'fixtures/zoo'
 require 'fixtures/animal'
 require 'fixtures/trail'
 
-if RUBY_VERSION =~ /^1.9/
-  require 'debugger'
-elsif RUBY_VERSION =~ /^2/
-  require 'byebug'
-end
+require 'byebug'
 
 RSpec.configure do |config|
   Zoo = CanvasPartmanTest::Zoo

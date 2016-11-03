@@ -1,8 +1,9 @@
 define([
   'i18n!new_nav',
   'react',
-  'jsx/shared/SVGWrapper'
-], (I18n, React, SVGWrapper) => {
+  'jsx/shared/SVGWrapper',
+  'instructure-ui/Spinner'
+], (I18n, React, SVGWrapper, { default: Spinner }) => {
 
   var GroupsTray = React.createClass({
     propTypes: {
@@ -21,7 +22,7 @@ define([
       if (!this.props.hasLoaded) {
         return (
           <li className="ic-NavMenu-list-item ic-NavMenu-list-item--loading-message">
-            {I18n.t('Loading')} &hellip;
+            <Spinner size="small" title={I18n.t('Loading')} />
           </li>
         );
       }

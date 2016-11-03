@@ -2133,10 +2133,8 @@ describe CoursesController, type: :request do
       controller = mock()
       controller.stubs(:params).returns({})
       course_with_teacher(:active_all => true)
-      students = []
       num = Api.per_page_for(controller) + 1 # get the default api per page value
-      num.times { students << student_in_course(:course => @course).user }
-      first_user = @user
+      create_users_in_course(@course, num)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => @course.id.to_s, :format => 'json' })
       expect(json.count).to eq num

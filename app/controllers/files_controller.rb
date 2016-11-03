@@ -920,7 +920,7 @@ class FilesController < ApplicationController
               Attachment.over_quota?(@context, params[:attachment][:uploaded_data].size)
             @attachment.errors.add(:base, t('Upload failed, quota exceeded'))
           else
-            success = @attachment.update_attributes(params[:attachment])
+            success = @attachment.update_attributes(strong_attachment_params)
             @attachment.errors.add(:base, t('errors.server_error', "Upload failed, server error, please try again.")) unless success
           end
         else
@@ -966,19 +966,20 @@ class FilesController < ApplicationController
     @folder ||= Folder.unfiled_folder(@context)
     if authorized_action(@attachment, @current_user, :update)
       respond_to do |format|
+
         just_hide = params[:attachment][:just_hide]
         hidden = params[:attachment][:hidden]
-        params[:attachment].delete_if{|k, v| ![:display_name, :locked, :lock_at, :unlock_at, :uploaded_data, :hidden].include?(k.to_sym) }
         # Need to be careful on this one... we can't let students turn in a
         # file and then edit it after the fact...
-        params[:attachment].delete(:uploaded_data) if @context.is_a?(User)
+        attachment_params = strong_attachment_params
+        attachment_params.delete(:uploaded_data) if @context.is_a?(User)
 
-        if params[:attachment][:uploaded_data].present?
+        if attachment_params[:uploaded_data].present?
           @attachment.user = @current_user
           @attachment.modified_at = Time.now.utc
         end
 
-        @attachment.attributes = params[:attachment]
+        @attachment.attributes = attachment_params
         if just_hide == '1'
           @attachment.locked = false
           @attachment.hidden = true
@@ -1159,5 +1160,9 @@ class FilesController < ApplicationController
     StringifyIds.recursively_stringify_ids(json)
 
     render :json => json, :as_text => true
+  end
+
+  def strong_attachment_params
+    strong_params.require(:attachment).permit(:display_name, :locked, :lock_at, :unlock_at, :uploaded_data, :hidden)
   end
 end

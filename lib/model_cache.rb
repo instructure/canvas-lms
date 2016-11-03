@@ -52,7 +52,7 @@ module ModelCache
       options[:type] ||= :instance
 
       # add the :id lookup for the target class
-      target_klass = reflections[CANVAS_RAILS4_0 ? method.to_sym : method.to_s].klass
+      target_klass = reflections[method.to_s].klass
       unless ModelCache.keys[target_klass.name].include?(options[:key_lookup])
         target_klass.include(ModelCache) unless target_klass.included_modules.include?(ModelCache)
         ModelCache.keys[target_klass.name] << options[:key_lookup]

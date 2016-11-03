@@ -3,7 +3,6 @@
 <% add_crumb @actual_rubric.title %>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
   <% if can_do(@actual_rubric, @current_user, :update) %>
     <a href="#" class="edit_rubric_link btn button-sidebar-wide"><i class="icon-edit"></i> <%= t('titles.edit_rubric', 'Edit Rubric') %></a>
   <% else %>
@@ -12,7 +11,6 @@
   <% if can_do(@actual_rubric, @current_user, :delete) %>
     <a href="#" class="delete_rubric_link btn button-sidebar-wide"><i class="icon-end"></i> <%= t('buttons.delete', 'Delete Rubric') %></a>
   <% end %>
-  </div>
   <a href="<%= context_url(@context, :context_rubrics_url) %>" class="rubrics_url" style="display: none;">&nbsp;</a>
 <% end %>
 

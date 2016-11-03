@@ -20,6 +20,7 @@ define [
       showOn: 'button'
       buttonText: '<i class="icon-calendar-month"></i>'
       buttonImageOnly: false
+      disableButton: false
 
       # localization values understood by $.datepicker
       prevText:           I18n.t('prevText', 'Prev')                        # title text for previous month icon
@@ -93,6 +94,8 @@ define [
       $datepickerButton = @$field.next()
       $datepickerButton.attr('aria-hidden', 'true')
       $datepickerButton.attr('tabindex', '-1')
+      if (options.disableButton)
+        $datepickerButton.attr('disabled', 'true')
 
       return $wrapper
 

@@ -78,9 +78,7 @@ class StreamItem < ActiveRecord::Base
       data['updated_at'] = Time.now.utc
     end
 
-    unless CANVAS_RAILS4_0
-      data = res.class.attributes_builder.build_from_database(data) # @attributes is now an AttributeSet
-    end
+    data = res.class.attributes_builder.build_from_database(data) # @attributes is now an AttributeSet
 
     res.instance_variable_set(:@attributes, data)
     res.instance_variable_set(:@attributes_cache, {})

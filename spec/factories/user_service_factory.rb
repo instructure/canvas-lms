@@ -16,20 +16,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def user_service_model(opts={})
-  @user_service = factory_with_protected_attributes(UserService, valid_user_service_attributes.merge(opts))
-end
+module Factories
+  def user_service_model(opts={})
+    @user_service = factory_with_protected_attributes(UserService, valid_user_service_attributes.merge(opts))
+  end
 
-def valid_user_service_attributes
-  {
-    :user_id => User.create!.id,
-    :token => 'value for token',
-    :secret => 'value for secret', 
-    :protocol => 'value for protocol',
-    :service => 'value for service',
-    :service_user_url => 'value for service_user_url',
-    :service_user_id => 'value for service_user_id',
-    :service_user_name => 'value for service_user_name',
-    :service_domain => 'value for service_domain'
-  }
+  def valid_user_service_attributes
+    {
+      :user_id => User.create!.id,
+      :token => 'value for token',
+      :secret => 'value for secret', 
+      :protocol => 'value for protocol',
+      :service => 'value for service',
+      :service_user_url => 'value for service_user_url',
+      :service_user_id => 'value for service_user_id',
+      :service_user_name => 'value for service_user_name',
+      :service_domain => 'value for service_domain'
+    }
+  end
 end

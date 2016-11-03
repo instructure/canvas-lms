@@ -6,11 +6,9 @@
 %>
 <% @customLinks = account_custom_links; if @customLinks %>
   <% content_for :right_side do %>
-    <div class="rs-margin-all">
-      <% @customLinks.each do |link| %>
-        <a href="<%= link[:url] %>" role="button" class="btn button-sidebar-wide"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
-      <% end %>
-    </div>
+    <% @customLinks.each do |link| %>
+      <a href="<%= link[:url] %>" role="button" class="btn button-sidebar-wide"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
+    <% end %>
   <% end %>
 <% end %>
 <h1 class="screenreader-only"><%= t(:page_header_title, "Account Statistics") %></h1>

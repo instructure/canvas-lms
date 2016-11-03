@@ -14,7 +14,7 @@ class ToDoListPresenter
       @needs_moderation = assignments_needing(:moderation)
       @needs_submitting = assignments_needing(:submitting, include_ungraded: true)
       @needs_submitting += ungraded_quizzes_needing_submitting
-      @needs_submitting.sort_by! &:due_at
+      @needs_submitting.sort_by! { |a| a.due_at || a.updated_at }
       assessment_requests = user.submissions_needing_peer_review(contexts: contexts, limit: ASSIGNMENT_LIMIT)
       @needs_reviewing = assessment_requests.map do |ar|
         AssessmentRequestPresenter.new(view, ar, user) if ar.asset.assignment.published?
@@ -78,7 +78,7 @@ class ToDoListPresenter
   class AssignmentPresenter
     attr_reader :assignment
     protected :assignment
-    delegate :title, :submission_action_string, :points_possible, :due_at, :peer_reviews_due_at, to: :assignment
+    delegate :title, :submission_action_string, :points_possible, :due_at, :updated_at, :peer_reviews_due_at, to: :assignment
 
     def initialize(view, assignment, user, type)
       @view = view

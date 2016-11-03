@@ -7,8 +7,7 @@ define [
   '../modules/customPropTypes'
   '../modules/filesEnv'
   '../utils/omitEmptyValues'
-  'compiled/react/shared/utils/withReactElement'
-  ], ($, _, I18n, React, ReactDOM, customPropTypes, filesEnv, omitEmptyValues, withReactElement) ->
+  ], ($, _, I18n, React, ReactDOM, customPropTypes, filesEnv, omitEmptyValues) ->
 
   contentOptions = [{
       display:  I18n.t("Choose usage rights..."),

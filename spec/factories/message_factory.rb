@@ -16,14 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def message_model(opts={})
-  @message = factory_with_protected_attributes(Message, message_valid_attributes.merge(opts))
-end
+module Factories
+  def message_model(opts={})
+    @message = factory_with_protected_attributes(Message, message_valid_attributes.merge(opts))
+  end
 
-def message_valid_attributes
-  {
-    :subject => "value for subject",
-    :body => "value for body",
-    :sent_at => Time.now
-  }
+  def message_valid_attributes
+    {
+      :subject => "value for subject",
+      :body => "value for body",
+      :sent_at => Time.now
+    }
+  end
 end

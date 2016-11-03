@@ -29,7 +29,11 @@
                 :en => "Content License",
                 :class => "control-label" %>
     <div class="controls">
-      <%= f.select :license, Course.licenses.map { |id, attrs| [attrs[:readable_license], id] } , {}, :class => 'input-xlarge' %>
+      <% cc, non_cc = Course.licenses.map { |id, attrs| [attrs[:readable_license], id]}.partition{|n, id| id.start_with?('cc')} %>
+      <select name="course[license]" id="course_license" class="input-xlarge">
+        <%= options_for_select(non_cc) %>
+        <%= grouped_options_for_select([[t("Creative Commons Licenses"), cc]]) %>
+      </select>
     </div>
   </div>
 

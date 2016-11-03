@@ -104,6 +104,10 @@ module Lti
           expect(subject.create.capability_offered).to include 'OAuth.splitSecret'
         end
 
+        it 'adds the Context.id capability' do
+          expect(subject.create.capability_offered).to include 'Context.id'
+        end
+
         it 'adds the ToolProxyReregistrationRequest capability if the feature flag is on' do
           root_account.stubs(:feature_enabled?).returns(true)
 

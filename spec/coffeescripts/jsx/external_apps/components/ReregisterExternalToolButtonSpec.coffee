@@ -1,9 +1,10 @@
 define [
   'react'
+  'react-dom'
   'react-modal'
   'jsx/external_apps/components/ReregisterExternalToolButton'
   'jsx/external_apps/lib/ExternalAppsStore'
-], (React, Modal, ReregisterExternalToolButton, store) ->
+], (React, ReactDOM, Modal, ReregisterExternalToolButton, store) ->
 
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
@@ -17,7 +18,7 @@ define [
     })
 
   renderComponent = (data) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   getDOMNodes = (data) ->
     component        = renderComponent(data)
@@ -41,7 +42,7 @@ define [
       store.setState({ externalTools: @tools })
     teardown: ->
       store.reset()
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'open and close modal', ->
     data = { tool: @tools[0] }

@@ -1,9 +1,7 @@
 define([
   'react',
-  'jsx/calendar/scheduler/components/FindAppointment',
-  'react-dom',
-  'react-modal'
-], (react, FindAppointmentApp, ReactDom, Modal) => {
+  'jsx/calendar/scheduler/components/FindAppointment'
+], (React, FindAppointmentApp) => {
   const TestUtils = React.addons.TestUtils
 
   module('FindAppointmentApp')

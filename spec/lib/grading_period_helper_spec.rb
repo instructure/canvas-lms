@@ -20,13 +20,13 @@ describe GradingPeriodHelper do
     end
     let(:all_periods) { [period_1, period_2] }
 
-    it "returns true when the date is within a closed grading period (inclusive)" do
+    it "returns true when the date is within a closed grading period (exclusive)" do
       expect(GradingPeriodHelper.date_in_closed_grading_period?(period_1.start_date, all_periods)).to eql(true)
       expect(GradingPeriodHelper.date_in_closed_grading_period?(4.weeks.ago, all_periods)).to eql(true)
-      expect(GradingPeriodHelper.date_in_closed_grading_period?(period_1.end_date, all_periods)).to eql(true)
+      expect(GradingPeriodHelper.date_in_closed_grading_period?(period_1.end_date, all_periods)).to eql(false)
     end
 
-    it "returns false when the date is within an open grading period (inclusive)" do
+    it "returns false when the date is within an open grading period (exclusive)" do
       expect(GradingPeriodHelper.date_in_closed_grading_period?(period_2.start_date, all_periods)).to eql(false)
       expect(GradingPeriodHelper.date_in_closed_grading_period?(10.days.ago, all_periods)).to eql(false)
       expect(GradingPeriodHelper.date_in_closed_grading_period?(period_2.end_date, all_periods)).to eql(false)

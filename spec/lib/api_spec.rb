@@ -698,7 +698,7 @@ describe Api do
     class T
       extend Api
       def self.request
-        OpenStruct.new({host_with_port: 'some-host'})
+        OpenStruct.new({host: 'some-host.com', port: 80})
       end
     end
 
@@ -715,6 +715,7 @@ describe Api do
         <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=lol&amp;a=1">here</a>
         <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;verifier=something&amp;c=2">here</a>
         <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
+        <a href="http://some-host.com/courses/#{@course.id}/assignments">absolute!</a>
       </div>}
       fixed_html = T.process_incoming_html_content(html)
       expect(fixed_html).to eq %{<div>
@@ -726,11 +727,12 @@ describe Api do
         <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?a=1">here</a>
         <a href="/courses/#{@course.id}/files/#{@attachment.id}/download?b=2&amp;c=2">here</a>
         <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
+        <a href="/courses/#{@course.id}/assignments">absolute!</a>
       </div>}
     end
 
-    it 'passes host to Content.process_incoming' do
-      Api::Html::Content.expects(:process_incoming).with(anything, host: 'some-host')
+    it 'passes host and port to Content.process_incoming' do
+      Api::Html::Content.expects(:process_incoming).with(anything, host: 'some-host.com', port: 80)
       T.process_incoming_html_content('<div/>')
     end
   end

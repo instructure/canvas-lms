@@ -37,7 +37,14 @@
 
     {{#if can_update}}
     <div class="ig-admin">
-
+      {{#if cyoe.isTrigger}}
+      <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+      {{/if}}
+      {{#if cyoe.isReleased}}
+      <span class="pill mastery-path-icon" data-tooltip title="{{#t}}Released by Mastery Path{{/t}}">
+        <i class="icon-mastery-path"></i>{{cyoe.releasedLabel}}
+      </span>
+      {{/if}}
       <span class="sis-button" data-view="sis-button"></span>
       <span data-view="publish-icon" class="publish-icon"></span>
 
@@ -52,9 +59,9 @@
           <li role="presentation">
             <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz{{/t}}'>{{#t}}Edit{{/t}}</a>
           </li>
-          {{#if cyoeEnabled}}
+          {{#if cyoe.isCyoeAble}}
           <li role="presentation">
-            <a href="{{edit_url}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz Mastery Paths{{/t}}'>{{#t}}Mastery Paths{{/t}}</a>
+              <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
           </li>
           {{/if}}
           <li role="presentation">

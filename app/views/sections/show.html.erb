@@ -1,20 +1,18 @@
 <% content_for :page_title do %><%= @section.name %><% end %>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
-    <% if can_do(@section, @current_user, :update) %>
-      <a href="#" class="btn button-sidebar-wide edit_section_link"><i class="icon-edit"></i> <%= t('buttons.edit_section', 'Edit Section') %></a>
-      <% if @section.nonxlist_course_id %>
-        <% if can_do(@section.nonxlist_course, @current_user, :manage_sections) %>
-          <a href="#" class="btn button-sidebar-wide uncrosslist_link"><i class="icon-off"></i> <%= t('buttons.uncrosslist_section', 'De-Cross-List this Section') %></a>
-        <% end %>
-        <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.recrosslist_section', 'Re-Cross-List this Section') %></a>
-      <% else %>
-        <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.crosslist_section', 'Cross-List this Section') %></a>
+  <% if can_do(@section, @current_user, :update) %>
+    <a href="#" class="btn button-sidebar-wide edit_section_link"><i class="icon-edit"></i> <%= t('buttons.edit_section', 'Edit Section') %></a>
+    <% if @section.nonxlist_course_id %>
+      <% if can_do(@section.nonxlist_course, @current_user, :manage_sections) %>
+        <a href="#" class="btn button-sidebar-wide uncrosslist_link"><i class="icon-off"></i> <%= t('buttons.uncrosslist_section', 'De-Cross-List this Section') %></a>
       <% end %>
+      <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.recrosslist_section', 'Re-Cross-List this Section') %></a>
+    <% else %>
+      <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.crosslist_section', 'Cross-List this Section') %></a>
     <% end %>
-    <a href="<%= context_url(@context, :context_settings_url) %>" class="btn button-sidebar-wide"><i class="icon-settings"></i> <%= t('buttons.back_to_course', 'Back to Course Settings') %></a>
-  </div>
+  <% end %>
+  <a href="<%= context_url(@context, :context_settings_url) %>" class="btn button-sidebar-wide"><i class="icon-settings"></i> <%= t('buttons.back_to_course', 'Back to Course Settings') %></a>
 <% end %>
 
 <% content_for :stylesheets do %>

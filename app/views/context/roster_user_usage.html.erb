@@ -4,9 +4,10 @@
   @active_tab="people"
   add_crumb(t('#crumbs.access_report', "Access Report")) %>
 <% content_for :right_side do %>
-  <div class="rs-margin-all rs-margin-lr">
-    <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_user_url, @user) %>"><%= image_tag "back.png", :alt => '' %> <%= t('links.back_to_user', %{Back to User Page}) %></a>
-  </div>
+  <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_user_url, @user) %>">
+    <i class="icon-arrow-left"></i>
+    <%= t('links.back_to_user', %{Back to User Page}) %>
+  </a>
 <% end %>
 <h1><%= t 'headings.user_access_report', '%{user} Access Report', :user => @user.name %></h1>
 <% content_for :stylesheets do %>
@@ -17,7 +18,6 @@
 #usage_report th {
   padding: 2px 5px;
   border-bottom: 1px dotted #888;
-
 }
 #usage_report td {
   padding: 8px 5px;

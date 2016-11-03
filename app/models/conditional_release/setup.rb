@@ -52,7 +52,7 @@ module ConditionalRelease
 
         @jwt = ConditionalRelease::Service.jwt_for(@account, @user, @domain)
 
-        self.send_later(:post_to_service)
+        self.send_later_enqueue_args(:post_to_service, max_attempts: 1)
       end
 
     rescue => e

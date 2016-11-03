@@ -85,26 +85,26 @@ describe DataFixup::FixAuditLogUuidIndexes do
 
   def corrupt_grade_changes
     event_id = CanvasSlug.generate
-    SecureRandom.stubs(:uuid).returns(event_id)
 
     (1..4).each do |i|
-      time = Time.now - i.days
+      time = Time.zone.now - i.days
+      course = create_course
+      teacher, student = create_users(2, return_type: :record)
+      create_enrollment course, teacher, enrollment_type: "TeacherEnrollment"
+      create_enrollment course, student
 
       Timecop.freeze(time) do
-        course_with_teacher
-        student_in_course
-        @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
+        @assignment = course.assignments.create!(:title => 'Assignment', :points_possible => 10)
       end
-
+      SecureRandom.stubs(:uuid).returns(event_id)
       Timecop.freeze(time + 1.hour) do
-        @submission = @assignment.grade_student(@student, grade: i, grader: @teacher).first
+        @submission = @assignment.grade_student(student, grade: i, grader: teacher).first
       end
+      SecureRandom.unstub(:uuid)
     end
 
     # Lets simulate a deleted submission
     @submission.delete
-
-    SecureRandom.unstub(:uuid)
 
     { event_id: event_id, count: 4 }
   end
@@ -115,12 +115,14 @@ describe DataFixup::FixAuditLogUuidIndexes do
     SecureRandom.stubs(:uuid).returns(event_id)
 
     (1..3).each do |i|
-      time = Time.now - i.days
+      time = Time.zone.now - i.days
+      course = create_course
+      teacher = create_users(1, return_type: :record)[0]
+      create_enrollment course, teacher, enrollment_type: "TeacherEnrollment"
+      courses << course
 
       Timecop.freeze(time) do
-        course_with_teacher
-        Auditors::Course.record_created(@course, @teacher, { name: @course.name }, source: :manual)
-        courses << @course
+        Auditors::Course.record_created(course, teacher, { name: course.name }, source: :manual)
       end
     end
 

@@ -19,53 +19,53 @@
 # this factory creates an Account with the multiple_grading_periods feature flag enabled.
 # it also creates two grading periods for the account
 # the grading_periods both have a weight of 1
-def grading_periods(options = {})
-  Account.default.set_feature_flag! :multiple_grading_periods, 'on'
-  course = options[:context] || @course || course()
-  count = options[:count] || 2
-
-  grading_period_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)
-  now = Time.zone.now
-  count.times.map do |n|
-    grading_period_group.grading_periods.create!(
-      title:      "Period #{n}",
-      start_date: (n).months.since(now),
-      end_date:   (n+1).months.since(now),
-      weight:     1
-    )
-  end
-end
-
-def create_grading_periods_for(course, opts={})
-  opts = { mgp_flag_enabled: true }.merge(opts)
-  course.root_account = Account.default if !course.root_account
-  course.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
-
-  gp_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)
-  class_name = course.class.name.demodulize
-  timeframes = opts[:grading_periods] || [:current]
-  now = Time.zone.now
-  period_fixtures = {
-    old: {
-      start_date: 5.months.ago(now),
-      end_date:   2.months.ago(now)
-    },
-    current: {
-      start_date: 2.months.ago(now),
-      end_date:   2.months.from_now(now)
-    },
-    future: {
-      start_date: 2.months.from_now(now),
-      end_date:   5.months.from_now(now)
-    }
-  }
-  timeframes.map.with_index(1) do |timeframe, index|
-    period_params = period_fixtures[timeframe].merge(title: "#{class_name} Period #{index}: #{timeframe} period")
-    gp_group.grading_periods.create!(period_params)
-  end
-end
-
 module Factories
+  def grading_periods(options = {})
+    Account.default.set_feature_flag! :multiple_grading_periods, 'on'
+    course = options[:context] || @course || course()
+    count = options[:count] || 2
+
+    grading_period_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)
+    now = Time.zone.now
+    count.times.map do |n|
+      grading_period_group.grading_periods.create!(
+        title:      "Period #{n}",
+        start_date: (n).months.since(now),
+        end_date:   (n+1).months.since(now),
+        weight:     1
+      )
+    end
+  end
+
+  def create_grading_periods_for(course, opts={})
+    opts = { mgp_flag_enabled: true }.merge(opts)
+    course.root_account = Account.default if !course.root_account
+    course.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
+
+    gp_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)
+    class_name = course.class.name.demodulize
+    timeframes = opts[:grading_periods] || [:current]
+    now = Time.zone.now
+    period_fixtures = {
+      old: {
+        start_date: 5.months.ago(now),
+        end_date:   2.months.ago(now)
+      },
+      current: {
+        start_date: 2.months.ago(now),
+        end_date:   2.months.from_now(now)
+      },
+      future: {
+        start_date: 2.months.from_now(now),
+        end_date:   5.months.from_now(now)
+      }
+    }
+    timeframes.map.with_index(1) do |timeframe, index|
+      period_params = period_fixtures[timeframe].merge(title: "#{class_name} Period #{index}: #{timeframe} period")
+      gp_group.grading_periods.create!(period_params)
+    end
+  end
+
   class GradingPeriodHelper
     def create_presets_for_group(group, *preset_names)
       preset_names = [:current] if preset_names.empty?

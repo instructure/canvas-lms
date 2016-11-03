@@ -440,7 +440,7 @@ describe "dashboard" do
 
     it "should display assignment to grade in to do list for a teacher", priority: "1", test_id: 216376 do
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
-      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
       assignment.reload
       assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})

@@ -1,7 +1,18 @@
 module Canvas::LiveEvents
-  def self.post_event_stringified(event_name, payload)
+  def self.post_event_stringified(event_name, payload, context = nil)
     StringifyIds.recursively_stringify_ids(payload)
-    LiveEvents.post_event(event_name, payload)
+    LiveEvents.post_event(event_name, payload, Time.zone.now, context)
+  end
+
+  def self.amended_context(canvas_context)
+    ctx = LiveEvents.get_context || {}
+    return ctx unless canvas_context
+    ctx.merge({
+      context_type: canvas_context.class.to_s,
+      context_id: canvas_context.global_id,
+      root_account_id: canvas_context.root_account.try(:global_id),
+      root_account_lti_guid: canvas_context.root_account.try(:lti_guid),
+    })
   end
 
   def self.course_syllabus_updated(course, old_syllabus_body)
@@ -34,6 +45,17 @@ module Canvas::LiveEvents
       is_announcement: topic.is_announcement,
       title: LiveEvents.truncate(topic.title),
       body: LiveEvents.truncate(topic.message)
+    })
+  end
+
+  def self.account_notification_created(notification)
+    post_event_stringified('account_notification_created', {
+      account_notification_id: notification.id,
+      subject: LiveEvents.truncate(notification.subject),
+      message: LiveEvents.truncate(notification.message),
+      icon: notification.icon,
+      start_at: notification.start_at,
+      end_at: notification.end_at,
     })
   end
 
@@ -270,7 +292,7 @@ module Canvas::LiveEvents
       grader_id: grader_id,
       student_id: submission.global_user_id,
       user_id: submission.global_user_id
-    })
+    }, amended_context(submission.assignment.context))
   end
 
   def self.asset_access(asset, category, role, level)

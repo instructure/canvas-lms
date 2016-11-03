@@ -1,10 +1,11 @@
 require [
   'react'
+  'react-dom'
   'jsx/grading/AccountTabContainer'
-], (React, AccountTabContainer) ->
+], (React, ReactDOM, AccountTabContainer) ->
   TabContainerFactory = React.createFactory AccountTabContainer
 
-  React.render(
+  ReactDOM.render(
     TabContainerFactory(
       multipleGradingPeriodsEnabled: ENV.MULTIPLE_GRADING_PERIODS
       readOnly: ENV.GRADING_PERIODS_READ_ONLY

@@ -16,70 +16,47 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def assignment_override_model(opts={})
-  override_for = opts.delete(:set)
-  assignment = opts.delete(:assignment) || opts.delete(:quiz) || assignment_model(opts)
-  attrs = assignment_override_valid_attributes.merge(opts)
-  attrs[:due_at_overridden] = true if opts[:due_at]
-  attrs[:lock_at_overridden] = true if opts[:lock_at]
-  attrs[:unlock_at_overridden] = true if opts[:unlock_at]
-  attrs[:set] = override_for if override_for
-  @override = factory_with_protected_attributes(assignment.assignment_overrides, attrs)
-end
-
-def assignment_override_valid_attributes
-  { :title => "Some Title" }
-end
-
-def create_section_override_for_assignment(assignment_or_quiz, opts={})
-  ao = assignment_or_quiz.assignment_overrides.build
-  ao.due_at = opts[:due_at] || 2.days.from_now
-  ao.set_type = "CourseSection"
-  #make sure the default due date is overridden with our override due date
-  ao.due_at_overridden = true
-  ao.set = opts[:course_section] || assignment_or_quiz.context.default_section
-  ao.title = "test override"
-  ao.save!
-  ao
-end
-alias :create_section_override_for_quiz :create_section_override_for_assignment
-
-def create_adhoc_override_for_assignment(assignment_or_quiz, users, opts={})
-  assignment_override_model(opts.merge(assignment: assignment_or_quiz))
-  @override.set = nil
-  @override.set_type = 'ADHOC'
-  @override.save!
-
-  users = Array.wrap(users)
-  users.each do |user|
-    @override_student = @override.assignment_override_students.build
-    @override_student.user = user
-    @override_student.save!
-  end
-  @override
-end
-
 module Factories
-  class AssignmentOverrideHelper
-    def create_adhoc_override(assignment_or_quiz, student, opts = {})
-      override = assignment_override_model(
-        assignment: assignment_or_quiz,
-        due_at: opts.key?(:due_at) ? opts[:due_at] : 7.days.from_now
-      )
-      override_student = override.assignment_override_students.build
-      override_student.user = student
-      override_student.save!
-      override
-    end
+  def assignment_override_model(opts={})
+    override_for = opts.delete(:set)
+    assignment = opts.delete(:assignment) || opts.delete(:quiz) || assignment_model(opts)
+    attrs = assignment_override_valid_attributes.merge(opts)
+    attrs[:due_at_overridden] = true if opts[:due_at]
+    attrs[:lock_at_overridden] = true if opts[:lock_at]
+    attrs[:unlock_at_overridden] = true if opts[:unlock_at]
+    attrs[:set] = override_for if override_for
+    @override = factory_with_protected_attributes(assignment.assignment_overrides, attrs)
+  end
 
-    def create_group_override(assignment_or_quiz, group, opts = {})
-      override = assignment_override_model(
-        assignment: assignment_or_quiz,
-        due_at: opts.key?(:due_at) ? opts[:due_at] : 7.days.from_now
-      )
-      override.set = group
-      override.save!
-      override
+  def assignment_override_valid_attributes
+    { :title => "Some Title" }
+  end
+
+  def create_section_override_for_assignment(assignment_or_quiz, opts={})
+    ao = assignment_or_quiz.assignment_overrides.build
+    ao.due_at = opts[:due_at] || 2.days.from_now
+    ao.set_type = "CourseSection"
+    #make sure the default due date is overridden with our override due date
+    ao.due_at_overridden = true
+    ao.set = opts[:course_section] || assignment_or_quiz.context.default_section
+    ao.title = "test override"
+    ao.save!
+    ao
+  end
+  alias :create_section_override_for_quiz :create_section_override_for_assignment
+
+  def create_adhoc_override_for_assignment(assignment_or_quiz, users, opts={})
+    assignment_override_model(opts.merge(assignment: assignment_or_quiz))
+    @override.set = nil
+    @override.set_type = 'ADHOC'
+    @override.save!
+
+    users = Array.wrap(users)
+    users.each do |user|
+      @override_student = @override.assignment_override_students.build
+      @override_student.user = user
+      @override_student.save!
     end
+    @override
   end
 end

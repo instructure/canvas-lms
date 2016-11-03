@@ -1,10 +1,11 @@
 define [
-  'jquery',
-  'jsx/shared/modal',
-  'react',
-  'jsx/shared/modal-content',
+  'jquery'
+  'jsx/shared/modal'
+  'react'
+  'react-dom'
+  'jsx/shared/modal-content'
   'jsx/shared/modal-buttons'
-], ($, Modal, React, ModalContent, ModalButtons) ->
+], ($, Modal, React, ReactDOM, ModalContent, ModalButtons) ->
 
   TestUtils = React.addons.TestUtils
 
@@ -12,7 +13,7 @@ define [
     setup: ->
       $('body').append("<div id=application />")
     teardown: ->
-      React.unmountComponentAtNode(@component.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@component.getDOMNode().parentNode)
       $('#application').remove()
 
   test  'has a default class of, "ReactModal__Content--canvas"', ->

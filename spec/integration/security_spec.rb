@@ -301,7 +301,7 @@ describe "security" do
       token = SessionPersistenceToken.generate(@p)
       creds = token.pseudonym_credentials
       pers1 = @p.persistence_token
-      @p.password = @p.password_confirmation = 'newpass'
+      @p.password = @p.password_confirmation = 'newpass1'
       @p.save!
       pers2 = @p.persistence_token
       expect(pers1).not_to eq pers2

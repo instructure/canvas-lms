@@ -33,22 +33,34 @@ class BookmarkedCollection::ConcatProxy < BookmarkedCollection::CompositeProxy
     index = start_index || 0
     while index < @collections.size
       collection = @collections[index]
-      remaining = pager.per_page - pager.size
+      subpager = nil
 
-      # fetch a page from the current collection
-      subpager = collection.new_pager
-      subpager.per_page = remaining + 1
-      subpager.current_bookmark = subbookmark
-      subpager = collection.execute_pager(subpager)
+      loop do
+        # fetch a page from the current collection
+        remaining = pager.per_page - pager.size
+        subpager = collection.new_pager
+        subpager.per_page = remaining + 1
+        subpager.current_bookmark = subbookmark
+        subpager = collection.execute_pager(subpager)
 
-      # add each item to the pager
-      [remaining, subpager.size].min.times do
-        item, bookmark = subpager.shift_with_bookmark
-        pager.add(item, bookmark, index)
+        # nothing here to copy over
+        break if subpager.empty?
+        subbookmark = subpager.next_bookmark
+
+        # add each item to the pager
+        [remaining, subpager.size].min.times do
+          item, bookmark = subpager.shift_with_bookmark
+          pager.add(item, bookmark, index)
+        end
+
+        # no next page
+        break if subbookmark.nil?
+        # already fulfilled everything we need
+        break if pager.per_page == pager.size
       end
 
       # if there's still more in this collection, we're done
-      if !subpager.empty?
+      if !subpager.empty? || subpager.next_bookmark
         pager.has_more!
         break
       end

@@ -26,7 +26,7 @@ describe "dashboard" do
 
     it "should display assignment to grade in to do list for a teacher", priority: "1", test_id: 216397 do
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
-      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
       assignment.reload
       assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
@@ -41,8 +41,8 @@ describe "dashboard" do
 
     it "should be able to ignore an assignment until the next submission", priority: "1", test_id: 216399 do
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
-      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
-      student2 = user_with_pseudonym(:active_user => true, :username => 'student2@example.com', :password => 'qwerty')
+      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
+      student2 = user_with_pseudonym(:active_user => true, :username => 'student2@example.com', :password => 'qwertyuiop')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
       @course.enroll_user(student2, "StudentEnrollment", :enrollment_state => 'active')
       assignment.reload
@@ -174,7 +174,7 @@ describe "dashboard" do
     describe "Todo Ignore Options Focus Management" do
       before :each do
         assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
-        @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+        @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
         @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
         assignment.submit_homework(@student, {:submission_type => 'online_text_entry', :body => 'ABC'})
       end
@@ -208,7 +208,7 @@ describe "dashboard" do
     it "should not display assignment to grade in to do list for a designer", priority: "1", test_id: 216402 do
       course_with_designer_logged_in(:active_all => true)
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
-      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
       assignment.reload
       assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})

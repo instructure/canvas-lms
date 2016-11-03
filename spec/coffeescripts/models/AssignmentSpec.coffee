@@ -224,6 +224,14 @@ define [
     deepEqual assignment.pointsPossible(), 12
     deepEqual assignment.get('points_possible'), 12
 
+  module "Assignment#secureParams as a getter"
+
+  test "returns secure params if set", ->
+    secure_params = 'eyJ0eXAiOiJKV1QiLCJhb.asdf232.asdf2334'
+    assignment = new Assignment name: 'foo'
+    assignment.set 'secure_params', secure_params
+    deepEqual assignment.secureParams(), secure_params
+
   module "Assignment#assignmentGroupId as a setter"
 
   test "sets the record's assignment group id", ->

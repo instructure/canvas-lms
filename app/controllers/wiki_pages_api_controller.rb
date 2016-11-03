@@ -622,7 +622,7 @@ class WikiPagesApiController < ApplicationController
   end
 
   def assignment_params
-    params[:wiki_page] && params[:wiki_page][:assignment]
+    params[:wiki_page] && strong_params[:wiki_page][:assignment]
   end
 
   def process_front_page

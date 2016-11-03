@@ -35,13 +35,8 @@ class Tableless < ActiveRecord::Base
   end
 
   def self.column(name, sql_type = nil, default = nil, null = true)
-    if CANVAS_RAILS4_0
-      args = [name.to_s, default,
-              sql_type.to_s, null]
-    else
-      args = [name.to_s, default, connection.lookup_cast_type(sql_type.to_s),
-              sql_type.to_s, null]
-    end
+    args = [name.to_s, default, connection.lookup_cast_type(sql_type.to_s),
+            sql_type.to_s, null]
     columns << ActiveRecord::ConnectionAdapters::Column.new(*args)
   end
 

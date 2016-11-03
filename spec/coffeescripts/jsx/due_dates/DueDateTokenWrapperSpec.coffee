@@ -26,13 +26,15 @@ define [
           {id: "2", name: "Agrippa"},
           {id: "3", name: "Publius"},
           {id: "4", name: "Scipio"},
+          {id: "5", name: "Baz"},
           {course_section_id: "2", name: "Plebs | [ $"}, # named strangely to test regex
           {course_section_id: "3", name: "Foo"},
           {course_section_id: "4", name: "Bar"},
           {course_section_id: "5", name: "Baz"},
           {course_section_id: "6", name: "Qux"},
           {group_id: "1", name: "Reading Group One"},
-          {group_id: "2", name: "Reading Group Two"}
+          {group_id: "2", name: "Reading Group Two"},
+          {noop_id: "1", name: "Mastery Paths"}
         ]
         handleTokenAdd: ->
         handleTokenRemove: ->
@@ -69,8 +71,8 @@ define [
     # contend with.
     @DueDateTokenWrapper.removeTimingSafeties()
 
-    # 1 prompt, 3 sections, 4 students, 2 groups, 3 headers = 13
-    equal @DueDateTokenWrapper.optionsForMenu().length, 13
+    # 1 prompt, 3 sections, 4 students, 2 groups, 3 headers, 1 Noop = 14
+    equal @DueDateTokenWrapper.optionsForMenu().length, 14
 
     @DueDateTokenWrapper.handleInput("scipio")
     # 0 sections, 1 student, 1 header = 2
@@ -113,6 +115,11 @@ define [
   test 'findMatchingOption can match characters in the middle of a string', ->
     foundToken = @DueDateTokenWrapper.findMatchingOption("The Elder")
     equal foundToken["name"], "Seneca The Elder"
+
+  test 'findMatchingOption can match tokens by properties', ->
+    fakeOption = { props: { set_props: { name: "Baz", course_section_id: "5"} } }
+    foundToken = @DueDateTokenWrapper.findMatchingOption("Baz", fakeOption)
+    equal foundToken["course_section_id"], "5"
 
   test 'hidingValidMatches updates as matching tag number changes', ->
     ok @DueDateTokenWrapper.hidingValidMatches()

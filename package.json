@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "brandable_css": "0.0.67",
-    "instructure-ui": "0.16.0"
+    "instructure-ui": "0.17.1"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
@@ -52,6 +52,7 @@
     "qunitjs": "^1.14.0",
     "requirejs": "~2.2.0",
     "script-loader": "^0.7.0",
+    "stylelint": "7.3.1",
     "uglify-js": "~2.7.0",
     "vinyl-fs": "0.3.7",
     "webpack": "^1.12.9",

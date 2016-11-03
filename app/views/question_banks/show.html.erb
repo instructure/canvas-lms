@@ -4,7 +4,7 @@
   content_for :page_title, @bank.title
 %>
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
+  <div class="rs-margin-bottom">
     <% if can_do(@bank, @current_user, :manage) %>
       <a href="#" class="btn button-sidebar-wide add_question_link"><i class="icon-add"></i> <%= t 'buttons.add_a_question', "Add a Question" %></a>
       <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide edit_bank_link"><i class="icon-edit"></i> <%= t 'buttons.edit', "Edit Bank Details" %></a>
@@ -19,7 +19,7 @@
   </div>
   <% css_bundle("aligned_outcomes") %>
   <h2 id="aligned_outcomes"><%= t 'headings.aligned_outcomes', "Aligned Outcomes" %></h2>
-  <div class="rs-margin-lr rs-margin-bottom">
+  <div class="rs-margin-bottom">
     <ul class="unstyled_list" id="aligned_outcomes_list">
       <% @alignments.each do |alignment| %>
         <li class="outcome" data-id="<%= alignment.learning_outcome_id %>">

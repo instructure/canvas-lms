@@ -1,10 +1,11 @@
 define [
   'jquery'
   'react'
+  'react-dom'
   'compiled/models/File'
   'jsx/files/DialogPreview'
   'jsx/files/FilesystemObjectThumbnail'
-], ($, React, File, DialogPreview, FilesystemObjectThumbnail) ->
+], ($, React, ReactDOM, File, DialogPreview, FilesystemObjectThumbnail) ->
   TestUtils = React.addons.TestUtils
 
   module 'DialogPreview',
@@ -18,7 +19,7 @@ define [
     dialogPreview = TestUtils.renderIntoDocument(React.createElement(DialogPreview, itemsToShow: [file]))
 
     ok fsObjStub.calledOnce
-    React.unmountComponentAtNode(dialogPreview.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(dialogPreview.getDOMNode().parentNode)
 
   test 'DP: multiple file items rendered in i elements', ->
     url = -> "some_url"
@@ -32,4 +33,4 @@ define [
 
     equal dialogPreview.getDOMNode().getElementsByTagName('i').length, 2, "there are two files rendered"
 
-    React.unmountComponentAtNode(dialogPreview.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(dialogPreview.getDOMNode().parentNode)

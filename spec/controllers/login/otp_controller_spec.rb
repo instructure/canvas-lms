@@ -22,7 +22,7 @@ require 'rotp'
 describe Login::OtpController do
   describe '#new' do
     before :once do
-      user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+      user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
     end
 
     before do
@@ -151,7 +151,7 @@ describe Login::OtpController do
         Account.default.settings[:mfa_settings] = :required
         Account.default.save!
 
-        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+        user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
       end
 
       before do
@@ -222,7 +222,7 @@ describe Login::OtpController do
       Account.default.settings[:mfa_settings] = :optional
       Account.default.save!
 
-      user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+      user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
       @user.otp_secret_key = ROTP::Base32.random_base32
       @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
       @user.save!

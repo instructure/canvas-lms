@@ -16,7 +16,8 @@ define([
     displayName: 'ExternalToolsTableRow',
 
     propTypes: {
-      tool: React.PropTypes.object.isRequired
+      tool: React.PropTypes.object.isRequired,
+      canAddEdit: React.PropTypes.bool.isRequired
     },
 
     renderButtons() {
@@ -46,8 +47,8 @@ define([
               </a>
               <ul className={"al-options"} role="menu" tabIndex="0" aria-hidden="true" aria-expanded="false" >
                 {configureButton}
-                <ManageUpdateExternalToolButton ref="editExternalToolButton" tool={this.props.tool} />
-                <EditExternalToolButton ref="editExternalToolButton" tool={this.props.tool} />
+                <ManageUpdateExternalToolButton tool={this.props.tool} />
+                <EditExternalToolButton ref="editExternalToolButton" tool={this.props.tool} canAddEdit={this.props.canAddEdit}/>
                 <ExternalToolPlacementButton ref="externalToolPlacementButton" tool={this.props.tool} />
                 <ReregisterExternalToolButton ref="reregisterExternalToolButton" tool={this.props.tool}/>
                 <DeleteExternalToolButton ref="deleteExternalToolButton" tool={this.props.tool} />

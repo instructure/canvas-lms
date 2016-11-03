@@ -84,7 +84,7 @@ describe NotificationPolicy do
       set_broadcast_policy do
         dispatch :hello
         to {
-          u = student_in_course.user
+          u = User.create
           u.communication_channels.build(
             :path => 'blarg@example.com',
             :path_type => 'email'

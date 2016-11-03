@@ -1,13 +1,14 @@
 require [
   'react'
+  'react-dom'
   'jsx/theme_editor/ThemeEditor'
-], (React, ThemeEditor) ->
+], (React, ReactDOM, ThemeEditor) ->
 
   # framebust out so we don't ever get theme editor inside theme editor
   if window.top.location isnt self.location
     window.top.location = self.location.href
 
-  React.render(React.createElement(ThemeEditor, {
+  ReactDOM.render(React.createElement(ThemeEditor, {
     brandConfig: window.ENV.brandConfig
     hasUnsavedChanges: window.ENV.hasUnsavedChanges
     variableSchema: window.ENV.variableSchema

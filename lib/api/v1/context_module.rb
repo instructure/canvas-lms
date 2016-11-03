@@ -115,7 +115,15 @@ module Api::V1::ContextModule
         if content_tag.content && content_tag.content.tool_id
           api_url = sessionless_launch_url(context_module.context, :id => content_tag.content.id, :url => (content_tag.url || content_tag.content.url))
         elsif content_tag.content
-          api_url = sessionless_launch_url(context_module.context, :url => (content_tag.url || content_tag.content.url))
+          if content_tag.content_id
+            options = {
+              launch_type: 'module_item',
+              module_item_id: content_tag.id
+            }
+            api_url = sessionless_launch_url(context_module.context, options)
+          else
+            api_url = sessionless_launch_url(context_module.context, :url => (content_tag.url || content_tag.content.url))
+          end
         else
           api_url = sessionless_launch_url(context_module.context, :url => content_tag.url)
         end

@@ -19,6 +19,8 @@ describe ConsulInitializer do
   end
 
   describe ".configure_with" do
+    include WebMock::API
+
     it "passes provided config info to DynamicSettings" do
       config_hash = {hi: "ho", host: "localhost", port: 80}
       ConsulInitializer.configure_with(config_hash.with_indifferent_access)
@@ -36,6 +38,8 @@ describe ConsulInitializer do
           }
         }
       }
+      stub_request(:put, "https://somewhere-without-consul.gov:123456/v1/kv/config/canvas/rich-content-service/app-host").
+        to_return(:status => 500)
       logger = FakeLogger.new
       ConsulInitializer.configure_with(config_hash.with_indifferent_access, logger)
       message = "INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail"

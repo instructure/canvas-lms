@@ -3,11 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 module Gradebook2Common
   shared_context 'gradebook_components' do
     let(:gradebook_settings_cog) { f('#gradebook_settings') }
-    let(:group_weights_menu) { f('[aria-controls="assignment_group_weights_dialog"]') }
     let(:show_notes) { fj('li a:contains("Show Notes Column")') }
-    let(:set_group_weights) { fj('li a:contains("Set Group Weights")') }
     let(:save_button) { fj('button span:contains("Save")') }
-    let(:group_weighting_scheme) { f('#group_weighting_scheme') }
     let(:hide_notes) { f(".hide") }
   end
   shared_context 'reusable_course' do
@@ -203,7 +200,7 @@ module Gradebook2Common
     @student_1_total_treating_ungraded_as_zeros = "18.75%"
     @student_2_total_treating_ungraded_as_zeros = "12.5%"
     @student_3_total_treating_ungraded_as_zeros = "12.5%"
-    @default_password = "qwerty"
+    @default_password = "qwertyuiop"
   end
 
   def assignment_setup(opts={})

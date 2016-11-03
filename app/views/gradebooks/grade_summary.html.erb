@@ -7,7 +7,7 @@
 <h1 class="screenreader-only"><%= t(:page_title, "Grades for %{student}", :student => @presenter.student_name) %></h1>
 
 <% content_for :right_side do %>
-  <div id="student-grades-right-content" class="rs-margin-all">
+  <div id="student-grades-right-content">
     <% if @exclude_total %>
       <div id="student-grades-final" class="student_assignment final_grade" style="font-size: 1.2em;">
         <%= t('labels.final_grade_hidden', "Calculation of totals has been disabled") %>
@@ -330,6 +330,31 @@
               <span class="tooltip_text"><%= t(:see_turnitin_results, "See Turnitin results") %></span>
             </span>
           </a>
+        <% end %>
+        <% if @presenter.vericite_enabled? %>
+          <%
+            vericite = nil
+            url = '#'
+            if submission && submission.can_view_plagiarism_report('vericite', @current_user, session)
+              vericite = assignment_presenter.vericite
+              if assignment_presenter.is_text_entry?
+                url = context_url(@context, :context_assignment_submission_vericite_report_url, assignment.id, @presenter.student_id, submission.asset_string)
+              elsif assignment_presenter.is_online_upload? && assignment_presenter.file
+                asset_string = assignment_presenter.file.asset_string
+                url = context_url(@context, :context_assignment_submission_vericite_report_url, assignment.id, @presenter.student_id, asset_string)
+              end
+            end
+          %>
+
+          <span class="turnitin_score_container" style="<%= 'visibility: hidden;' if !vericite %>">
+            <span class="vericite_score_container_caret <%= vericite && vericite[:state] %>_score"></span>
+            <a title="<%= t('titles.vericite_score', "VeriCite similarity score -- more information") %>" href="<%= url %>" target="_blank" class="tooltip not_external turnitin_similarity_score <%= vericite && vericite[:state] %>_score">
+              <%= vericite && vericite[:similarity_score] %>%
+              <span class="tooltip_wrap right">
+                <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
+              </span>
+            </a>
+          </span>
         <% end %>
       </td>
       <% end %>

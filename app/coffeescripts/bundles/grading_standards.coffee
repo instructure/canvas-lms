@@ -1,10 +1,11 @@
 require [
   'react'
+  'react-dom'
   'jsx/grading/tabContainer'
-], (React, TabContainer) ->
+], (React, ReactDOM, TabContainer) ->
   TabContainerFactory = React.createFactory TabContainer
   mgpEnabled = ENV.MULTIPLE_GRADING_PERIODS
-  React.render(
+  ReactDOM.render(
     TabContainerFactory(multipleGradingPeriodsEnabled: mgpEnabled),
     document.getElementById("react_grading_tabs")
   )

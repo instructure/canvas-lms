@@ -319,6 +319,8 @@ class ContentMigration < ActiveRecord::Base
     return if blocked_by_current_migration?(plugin, retry_count, expires_at)
 
     set_default_settings
+    self.save if self.changed?
+
     plugin ||= Canvas::Plugin.find(migration_type)
     if plugin
       queue_opts = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1,

@@ -577,8 +577,9 @@ class CalendarEventsApiController < ApplicationController
   def update
     get_event(true)
     if authorized_action(@event, @current_user, :update)
+      assignment_params = nil
       if @event.is_a?(Assignment)
-        params[:calendar_event] = {:due_at => params[:calendar_event][:start_at]}
+        assignment_params = {:due_at => params[:calendar_event][:start_at]}
       else
         @event.validate_context! if @event.context.is_a?(AppointmentGroup)
         @event.updating_user = @current_user
@@ -601,7 +602,7 @@ class CalendarEventsApiController < ApplicationController
       if params[:calendar_event][:description].present?
         params[:calendar_event][:description] = process_incoming_html_content(params[:calendar_event][:description])
       end
-      if @event.update_attributes(params[:calendar_event])
+      if @event.update_attributes(assignment_params || params[:calendar_event])
         render :json => event_json(@event, @current_user, session)
       else
         render :json => @event.errors, :status => :bad_request
@@ -732,13 +733,26 @@ class CalendarEventsApiController < ApplicationController
     selected_contexts = @current_user.preferences[:selected_calendar_contexts] || []
 
     contexts = @contexts.map do |context|
-      {
+      context_data = {
         id: context.id,
         name: context.nickname_for(@current_user),
         asset_string: context.asset_string,
         color: @current_user.custom_colors[context.asset_string],
         selected: selected_contexts.include?(context.asset_string)
       }
+
+      if context.is_a?(Course)
+        context_data[:sections] = context.sections_visible_to(@current_user).map do |section|
+          {
+            id: section.id,
+            name: section.name,
+            asset_string: section.asset_string,
+            selected: selected_contexts.include?(section.asset_string),
+          }
+        end
+      end
+
+      context_data
     end
 
     render json: {contexts: StringifyIds.recursively_stringify_ids(contexts)}

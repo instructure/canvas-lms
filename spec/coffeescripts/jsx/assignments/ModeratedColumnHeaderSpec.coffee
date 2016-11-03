@@ -1,8 +1,9 @@
 define [
   'react'
+  'react-dom'
   'jsx/assignments/ModeratedColumnHeader'
   'jsx/assignments/constants'
-], (React, ModeratedColumnHeader, Constants) ->
+], (React, ReactDOM, ModeratedColumnHeader, Constants) ->
   TestUtils = React.addons.TestUtils
 
   module 'ModeratedColumnHeader',
@@ -28,7 +29,7 @@ define [
     link = TestUtils.findRenderedDOMComponentWithTag(columnHeader, 'a')
     TestUtils.Simulate.click(link)
     ok callback.called
-    React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
 
   test 'calls the handleSortMark2 function when mark2 sort is pressed', ->
     callback = sinon.spy()
@@ -40,7 +41,7 @@ define [
     links = TestUtils.scryRenderedDOMComponentsWithTag(columnHeader, 'a')
     TestUtils.Simulate.click(links[1])
     ok callback.called
-    React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
 
   test 'calls the handleSortMark3 function when mark3 sort is pressed', ->
     callback = sinon.spy()
@@ -53,7 +54,7 @@ define [
     links = TestUtils.scryRenderedDOMComponentsWithTag(columnHeader, 'a')
     TestUtils.Simulate.click(links[2])
     ok callback.called
-    React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
 
   test 'calls the handleSelectAll function when the select all checkbox is checked', ->
     callback = sinon.spy()
@@ -64,7 +65,7 @@ define [
     checkbox = TestUtils.findRenderedDOMComponentWithTag(columnHeader, 'input')
     TestUtils.Simulate.change(checkbox.getDOMNode())
     ok callback.called
-    React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
 
 
   test 'displays down arrow when sort direction is DESCENDING', ->
@@ -74,7 +75,7 @@ define [
 
     columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     ok TestUtils. findRenderedDOMComponentWithClass(columnHeader, 'icon-mini-arrow-down'), 'finds the down arrow'
-    React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
 
   test 'displays up arrow when sort direction is ASCENDING', ->
     @props.markColumn = Constants.markColumnNames.MARK_ONE
@@ -83,7 +84,7 @@ define [
 
     columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     ok TestUtils. findRenderedDOMComponentWithClass(columnHeader, 'icon-mini-arrow-up'), 'finds the up arrow'
-    React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
 
   test 'only shows two column when includeModerationSetHeaders is false', ->
     # Tests that name is shown and one grade
@@ -92,11 +93,11 @@ define [
     columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     headers = TestUtils.scryRenderedDOMComponentsWithClass(columnHeader, 'ColumnHeader__Item')
     equal headers.length, 2, 'only shows two header columns'
-    React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
 
   test 'only shows all columns when includeModerationSetHeaders is true', ->
     columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     headers = TestUtils.scryRenderedDOMComponentsWithClass(columnHeader, 'ColumnHeader__Item')
     equal headers.length, 5, 'show all headers when true'
-    React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
 

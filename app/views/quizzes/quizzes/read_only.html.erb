@@ -5,9 +5,10 @@
   content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))
 %>
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
-    <a href="<%= context_url(@context, :context_quiz_url, @quiz.id) %>" class="btn button-sidebar-wide"><%= image_tag "back.png", :alt => '' %> <%= t('links.back_to_quiz_page', "Back to Quiz Page") %></a>
-  </div>
+  <a href="<%= context_url(@context, :context_quiz_url, @quiz.id) %>" class="btn button-sidebar-wide">
+    <i class="icon-arrow-left"></i>
+    <%= t('links.back_to_quiz_page', "Back to Quiz Page") %>
+  </a>
 <% end %>
 
 

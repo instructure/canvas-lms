@@ -13,7 +13,7 @@ define([
   const modalOverrides = {
     overlay : {
       backgroundColor: 'rgba(0,0,0,0.5)'
-    },  
+    },
     content : {
       position: 'static',
       top: '0',
@@ -30,7 +30,8 @@ define([
     displayName: 'EditExternalToolButton',
 
     propTypes: {
-      tool: React.PropTypes.object.isRequired
+      tool: React.PropTypes.object.isRequired,
+      canAddEdit: React.PropTypes.bool.isRequired
     },
 
     getInitialState() {
@@ -116,14 +117,31 @@ define([
     },
 
     form() {
-      if (this.state.tool.app_type === 'ContextExternalTool') {
-        return (
-          <ConfigurationForm ref="configurationForm" tool={this.state.tool} configurationType="manual" handleSubmit={this.saveChanges} showConfigurationSelector={false}>
-            <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
-          </ConfigurationForm>
+      if (this.props.canAddEdit) {
+        if (this.state.tool.app_type === 'ContextExternalTool') {
+          return (
+            <ConfigurationForm ref="configurationForm" tool={this.state.tool} configurationType="manual" handleSubmit={this.saveChanges} showConfigurationSelector={false}>
+              <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
+            </ConfigurationForm>
+          );
+        } else { // Lti::ToolProxy
+          return <Lti2Edit ref="lti2Edit" tool={this.state.tool} handleActivateLti2={this.handleActivateLti2} handleDeactivateLti2={this.handleDeactivateLti2} handleCancel={this.closeModal} />
+        }
+      } else {
+        return(
+          <div ref="configurationForm">
+            <div className="ReactModal__Body">
+              <div className="formFields">
+                <p>{I18n.t('This action has been disabled by your admin.')}</p>
+              </div>
+            </div>
+            <div className="ReactModal__Footer">
+              <div className="ReactModal__Footer-Actions">
+                <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Cancel')}</button>
+              </div>
+            </div>
+          </div>
         );
-      } else { // Lti::ToolProxy
-        return <Lti2Edit ref="lti2Edit" tool={this.state.tool} handleActivateLti2={this.handleActivateLti2} handleDeactivateLti2={this.handleDeactivateLti2} handleCancel={this.closeModal} />
       }
     },
 

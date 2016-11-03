@@ -1,9 +1,10 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/dropdown_components/muteAssignmentOption',
   'compiled/gradebook2/SetDefaultGradeDialog'
   'jquery'
-], (React, SetDefaultGradeOption, SetDefaultGradeDialog, $) ->
+], (React, ReactDOM, SetDefaultGradeOption, SetDefaultGradeDialog, $) ->
 
   wrapper = document.getElementById('fixtures')
 
@@ -13,7 +14,7 @@ define [
   renderComponent = (props) ->
     props = props || defaultProps()
     componentFactory = React.createFactory(SetDefaultGradeOption)
-    React.render(componentFactory(props), wrapper)
+    ReactDOM.render(componentFactory(props), wrapper)
 
   module 'MuteAssignmentOption',
     setup: ->
@@ -22,7 +23,7 @@ define [
     teardown: ->
       $('.ui-dialog').remove()
       $("[id^=ui-id-]").remove()
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'mounts properly', ->
     ok renderComponent().isMounted()

@@ -90,6 +90,9 @@
       <% if @assignment.turnitin_enabled? %>
         <%= render :partial => "turnitin" %>
       <% end %>
+      <% if @assignment.vericite_enabled? %>
+        <%= render :partial => "vericite" %>
+      <% end %>
       <tr>
         <td colspan="2" class='button-container'>
           <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
@@ -130,6 +133,9 @@
       <% if @assignment.turnitin_enabled? %>
         <%= render :partial => "turnitin" %>
       <% end %>
+      <% if @assignment.vericite_enabled? %>
+        <%= render :partial => "vericite" %>
+      <% end %>
       <tr>
         <td class='button-container'>
           <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
@@ -165,6 +171,9 @@
       <%= render :partial => "group_comment" %>
       <% if @assignment.turnitin_enabled? %>
         <%= render :partial => "turnitin" %>
+      <% end %>
+      <% if @assignment.vericite_enabled? %>
+        <%= render :partial => "vericite" %>
       <% end %>
       <tr>
         <td colspan="2" class='button-container'>
@@ -252,6 +261,9 @@
               <%= render :partial => "group_comment" %>
               <% if @assignment.turnitin_enabled? %>
                 <%= render :partial => "turnitin" %>
+              <% end %>
+              <% if @assignment.vericite_enabled? %>
+                <%= render :partial => "vericite" %>
               <% end %>
               <tr>
                 <td colspan="2" class='button-container'>
@@ -383,6 +395,9 @@
           <%= render :partial => "group_comment" %>
           <% if @assignment.turnitin_enabled? %>
             <%= render :partial => "turnitin" %>
+          <% end %>
+          <% if @assignment.vericite_enabled? %>
+            <%= render :partial => "vericite" %>
           <% end %>
           <tr>
             <td colspan="2" class='button-container'>

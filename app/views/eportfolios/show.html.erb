@@ -29,19 +29,19 @@
 <% content_for :right_side do %>
   <div id="page_sidebar">
     <% if can_do(@portfolio, @current_user, :manage) && !@owner_view %>
-      <div class="rs-margin-all">
+      <div class="rs-margin-bottom">
         <a href="#" class="wizard_popup_link"><%= help_link_text %></a>
       </div>
     <% end %>
     <%= render :partial => "eportfolios/page_list" %>
     <% if can_do(@portfolio, @current_user, :manage) && !@owner_view %>
-    <div class="rs-margin-lr edit_content_link_holder">
+    <div class="edit_content_link_holder">
       <a href="#" class="edit_content_link btn button-sidebar-wide"><%= edit_link_text %></a>
       <a href="<%= eportfolio_path(@portfolio.id) %>" class="icon-arrow-left"><%= t('links.back', "Back to Portfolio Dashboard") %></a>
     </div>
     <div id="edit_page_sidebar">
       <h2 class="header"><%= t('headers.add_content', "Add Content") %></h2>
-      <div class="rs-margin-lr">
+      <div>
         <ul>
           <li><a class="add_content_link add_rich_content_link" href="#"><%= t('links.rich_content', "Rich Text Content") %></a></li>
           <li><a class="add_content_link add_html_link" href="#"><%= t('links.html_content', "HTML/Embedded Content") %></a></li>

@@ -1,6 +1,6 @@
 module DatesOverridable
   attr_accessor :applied_overrides, :overridden_for_user, :overridden,
-    :has_no_overrides, :preloaded_override_students
+    :has_no_overrides, :has_too_many_overrides, :preloaded_override_students
   attr_writer :without_overrides
   include DifferentiableAssignment
 
@@ -218,11 +218,14 @@ module DatesOverridable
     without_overrides.due_date_hash.merge(:base => true)
   end
 
-  def context_module_tag_info(user, context)
+  def context_module_tag_info(user, context, user_is_admin: false)
     self.association(:context).target ||= context
     tag_info = Rails.cache.fetch([self, user, "context_module_tag_info"].cache_key) do
       hash = {:points_possible => self.points_possible}
-      if self.multiple_due_dates_apply_to?(user)
+
+      if user_is_admin && self.has_too_many_overrides
+        hash[:has_many_overrides] = true
+      elsif self.multiple_due_dates_apply_to?(user)
         hash[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
       else
         if due_date = self.overridden_for(user).due_at

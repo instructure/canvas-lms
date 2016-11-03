@@ -1,21 +1,22 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/dropdown_components/currentOrFinalGradeToggle',
   'jsx/gradebook/grid/actions/gradebookToolbarActions'
-], (React, CurrentOrFinalGradeToggle, GradebookToolbarActions) ->
+], (React, ReactDOM, CurrentOrFinalGradeToggle, GradebookToolbarActions) ->
 
   wrapper = document.getElementById('fixtures')
   Simulate = React.addons.TestUtils.Simulate
 
   renderComponent = () ->
     element = React.createElement(CurrentOrFinalGradeToggle)
-    React.render(element, wrapper)
+    ReactDOM.render(element, wrapper)
 
   module 'CurrentOrFinalGradeToggle',
     setup: ->
       @component = renderComponent()
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'Displays "Show Current Grade" if treat ungraded as zero is set to true', ->
     @component.setState({ toolbarOptions: { treatUngradedAsZero: true } })

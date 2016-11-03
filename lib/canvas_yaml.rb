@@ -64,6 +64,7 @@ SafeYAML::OPTIONS.merge!(
         !ruby/hash:HashWithIndifferentAccess
         !ruby/hash:ActiveSupport::HashWithIndifferentAccess
         !ruby/hash:WeakParameters
+        !ruby/hash:ActionController::Parameters
         !ruby/object:Class
         !ruby/object:OpenStruct
         !ruby/object:Scribd::Document

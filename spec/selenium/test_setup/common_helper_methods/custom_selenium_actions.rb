@@ -62,7 +62,7 @@ module CustomSeleniumActions
   #   expect(f('#content')).not_to contain_jqcss('.gone:visible')
   def fj(selector, scope = nil)
     stale_element_protection do
-      wait_for(method: :fj) do
+      wait_for(method: :fj, timeout: driver.manage.timeouts.implicit_wait) do
         find_with_jquery selector, scope
       end or raise Selenium::WebDriver::Error::NoSuchElementError
     end
@@ -87,7 +87,7 @@ module CustomSeleniumActions
   def ffj(selector, scope = nil)
     reloadable_collection do
       result = nil
-      wait_for(method: :ffj) do
+      wait_for(method: :ffj, timeout: driver.manage.timeouts.implicit_wait) do
         result = find_all_with_jquery(selector, scope)
         result.present?
       end or raise Selenium::WebDriver::Error::NoSuchElementError
@@ -259,8 +259,9 @@ module CustomSeleniumActions
   end
 
   def hover_and_click(element_jquery_finder)
-    expect(fj(element_jquery_finder.to_s)).to be_present
-    driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
+    if fj(element_jquery_finder).present?
+      driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
+    end
   end
 
   def hover(element)

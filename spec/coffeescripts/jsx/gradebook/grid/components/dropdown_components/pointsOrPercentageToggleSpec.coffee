@@ -1,17 +1,18 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/dropdown_components/pointsOrPercentageToggle',
   'jsx/gradebook/grid/actions/gradebookToolbarActions',
   'compiled/gradebook2/GradeDisplayWarningDialog',
   'jquery'
-], (React, PointsOrPercentageToggle, GradebookToolbarActions, GradeDisplayWarningDialog, $) ->
+], (React, ReactDOM, PointsOrPercentageToggle, GradebookToolbarActions, GradeDisplayWarningDialog, $) ->
 
   wrapper = document.getElementById('fixtures')
   Simulate = React.addons.TestUtils.Simulate
 
   renderComponent = ->
     componentFactory = React.createFactory(PointsOrPercentageToggle)
-    React.render(componentFactory(), wrapper)
+    ReactDOM.render(componentFactory(), wrapper)
 
   removeDialog = ->
     $dialog = $('.ui-dialog')
@@ -28,7 +29,7 @@ define [
           warnedAboutTotalsDisplay: false
       )
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
       removeDialog()
 
   test 'mounts on build', ->

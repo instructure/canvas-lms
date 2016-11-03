@@ -42,7 +42,7 @@
   </div>
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
   <h2><%= t 'headings.user_services', "Registered Web Services" %></h2>
-  <div class="rs-margin-lr">
+  <div>
     <% if can_do(@membership, @current_user, :read_services) && !@membership.user.user_services.empty? %>
       <p>
       <% @membership.user.user_services.each do |service| %>

@@ -2,21 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 
-def enroll_many_students
-  course_with_teacher_logged_in
-
-  500.times do |i|
-    @student= User.create!(:name => "STUDENT_NAME_#{i}")
-    @student.register!
-    @student.pseudonyms.create!(:unique_id => "nobody#{i}@example.com", :password => 'qwerty', :password_confirmation => 'qwerty')
-
-    e = @course.enroll_student(@student)
-    e.workflow_state = 'active'
-    e.save!
-    @course.reload
-  end
-end
-
 describe "large enrollments", priority: "2" do
   include_context "in-process server selenium tests"
   include Gradebook2Common
@@ -24,7 +9,9 @@ describe "large enrollments", priority: "2" do
   context "page links" do
 
     before(:each) do
-      enroll_many_students
+      course_with_teacher_logged_in
+
+      create_users_in_course @course, 500
     end
 
     it "should display course homepage" do

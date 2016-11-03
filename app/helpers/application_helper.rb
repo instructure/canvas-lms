@@ -964,12 +964,17 @@ module ApplicationHelper
   end
 
   def include_custom_meta_tags
+    output = []
     if @meta_tags.present?
-      @meta_tags.
-        map{ |meta_attrs| tag("meta", meta_attrs) }.
-        join("\n").
-        html_safe
+      output = @meta_tags.map{ |meta_attrs| tag("meta", meta_attrs) }
     end
+
+    # set this if you want android users of your site to be prompted to install an android app
+    # you can see an example of the one that instructure uses in public/web-app-manifest/manifest.json
+    manifest_url = Setting.get('web_app_manifest_url', '')
+    output << tag("link", rel: 'manifest', href: manifest_url) if manifest_url.present?
+
+    output.join("\n").html_safe.presence
   end
 
   # Returns true if the current_path starts with the given value

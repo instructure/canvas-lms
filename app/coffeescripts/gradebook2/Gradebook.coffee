@@ -6,6 +6,7 @@ define [
   'timezone'
   'jsx/gradebook2/DataLoader'
   'react'
+  'react-dom'
   'slickgrid.long_text_editor'
   'compiled/views/KeyboardNavDialog'
   'jst/KeyboardNavDialog'
@@ -51,7 +52,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], ($, _, Backbone, tz, DataLoader, React, LongTextEditor,
+], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor,
 KeyboardNavDialog, KeyboardNavTemplate, Slick, TotalColumnHeaderView, round,
 InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, GradeCalculator, UserSettings,
 Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
@@ -967,7 +968,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
           labelText: if $placeholder.hasClass('in-menu') then I18n.t 'PowerSchool' else I18n.t 'Post Grades',
           returnFocusTo: $('#post_grades')
         })
-        React.render(app, $placeholder[0])
+        ReactDOM.render(app, $placeholder[0])
 
     updatePowerschoolPostGradesButton: =>
       showButton = @postGradesStore.hasAssignments() && !!@postGradesStore.getState().selected.sis_id

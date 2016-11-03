@@ -67,7 +67,7 @@ describe "report helper" do
 
   context 'Scopes' do
 
-    before(:each) do
+    before(:once) do
       @enrollment_term = EnrollmentTerm.create(workflow_state: 'active', name: 'Fall term', sis_source_id: 'fall14')
       @enrollment_term.root_account_id = account.id
       @enrollment_term.save!

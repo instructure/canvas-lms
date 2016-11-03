@@ -1,8 +1,9 @@
 define([
-  'i18n!student_groups',
+  'react',
+  'react-dom',
   'underscore',
   'jquery',
-  'react',
+  'i18n!student_groups',
   'compiled/models/Group',
   'compiled/collections/UserCollection',
   'compiled/collections/ContextGroupCollection',
@@ -11,7 +12,9 @@ define([
   'jsx/groups/components/Filter',
   'jsx/groups/components/NewGroupDialog',
   'jsx/groups/components/ManageGroupDialog',
-], (I18n, _, $, React, Group, UserCollection, ContextGroupCollection, BackboneState, PaginatedGroupList, Filter, NewGroupDialog, ManageGroupDialog) => {
+], (React, ReactDOM,  _, $, I18n, Group, UserCollection,
+  ContextGroupCollection, BackboneState, PaginatedGroupList, Filter,
+  NewGroupDialog, ManageGroupDialog) => {
   var StudentView = React.createClass({
     mixins: [BackboneState],
 
@@ -32,7 +35,7 @@ define([
         'fix-dialog-buttons': false,
 
         close: function(e){
-          React.unmountComponentAtNode($dialog[0]);
+          ReactDOM.unmountComponentAtNode($dialog[0]);
           $( this ).remove();
         }
       });
@@ -42,7 +45,7 @@ define([
         $dialog.dialog('close');
       };
 
-      React.render(<ManageGroupDialog userCollection={this.state.userCollection}
+      ReactDOM.render(<ManageGroupDialog userCollection={this.state.userCollection}
                                                checked={_.map(group.users, (u) => u.id)}
                                                groupId={group.id}
                                                name={group.name}
@@ -61,7 +64,7 @@ define([
         'fix-dialog-buttons': false,
 
         close: function(e){
-          React.unmountComponentAtNode($dialog[0]);
+          ReactDOM.unmountComponentAtNode($dialog[0]);
           $( this ).remove();
         }
       });
@@ -71,7 +74,7 @@ define([
         $dialog.dialog('close');
       };
 
-      React.render(<NewGroupDialog userCollection={this.state.userCollection}
+      ReactDOM.render(<NewGroupDialog userCollection={this.state.userCollection}
                                             createGroup={this.createGroup}
                                             closeDialog={closeDialog}
                                             loadMore={() => this._loadMore(this.state.userCollection)} />, $dialog[0])
@@ -147,7 +150,7 @@ define([
                  'DELETE',
                  {},
                  () => this._onLeave(group));
-      $(React.findDOMNode(this.refs.panel)).disableWhileLoading(dfd);
+      $(ReactDOM.findDOMNode(this.refs.panel)).disableWhileLoading(dfd);
     },
 
 
@@ -172,7 +175,7 @@ define([
                  // This is making an assumption that when the current user can't join a group it is likely beacuse a student
                  // from another section joined that group after the page loaded for the current user
                  () => this._extendAttribute(this.state.groupCollection.get(group.id), "permissions", {join: false}));
-      $(React.findDOMNode(this.refs.panel)).disableWhileLoading(dfd);
+      $(ReactDOM.findDOMNode(this.refs.panel)).disableWhileLoading(dfd);
     },
 
     _filter(group) {

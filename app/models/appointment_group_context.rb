@@ -20,7 +20,7 @@ class AppointmentGroupContext < ActiveRecord::Base
   belongs_to :appointment_group
   belongs_to :context, polymorphic: [:course, :course_section]
 
-  attr_accessible :appointment_group, :context
+  strong_params
 
   before_validation :default_values
 

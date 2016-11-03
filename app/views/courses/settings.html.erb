@@ -275,7 +275,11 @@
         <td class="form-label"><%= f.label :license, :en => "License" %></td>
         <td colspan="3">
           <% if can_manage %>
-            <%= f.select :license, Course.licenses.map { |id, attrs| [attrs[:readable_license], id] }%>
+            <% cc, non_cc = Course.licenses.map { |id, attrs| [attrs[:readable_license], id]}.partition{|n, id| id.start_with?('cc')} %>
+            <select name="course[license]" id="course_license">
+              <%= options_for_select(non_cc, @context.license) %>
+              <%= grouped_options_for_select([[t("Creative Commons Licenses"), cc]], @context.license) %>
+            </select>
             <%= license_help_link %>
           <% else %>
             <%= @context.readable_license %>
@@ -397,7 +401,7 @@
               [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
               [t('#course.wiki_permissions.all', "Anyone"), "teachers,students,public"]], {}, :disabled => !can_manage %>
             <label for="course_default_wiki_editing_roles">
-              <%= t('wiki_editing_roles', %{can create, rename, and edit course wiki pages by default}) %>
+              <%= t(%{can create, rename, and edit course pages by default}) %>
             </label><br/>
             <div class="changed_default_wiki_editing_roles" style="display: none; padding-left: 20px; font-size: 0.8em;">
               <input type="checkbox" name="update_default_pages" id="update_default_pages"/>

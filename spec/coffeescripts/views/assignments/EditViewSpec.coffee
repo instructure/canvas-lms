@@ -18,9 +18,12 @@ define [
   AssignmentGroupSelector, DueDateOverrideView, EditView,
   GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector, fakeENV, userSettings) ->
 
+  s_params = 'asdf32.asdf31.asdf2'
+
   editView = (assignmentOpts = {}) ->
     defaultAssignmentOpts =
       name: 'Test Assignment'
+      secure_params: s_params
       assignment_overrides: []
 
     assignmentOpts = _.extend {}, assignmentOpts, defaultAssignmentOpts
@@ -51,6 +54,7 @@ define [
           model: dueDateList
           views: {}
 
+    app.enableCheckbox = () -> {}
     app.render()
 
   module 'EditView',
@@ -132,6 +136,13 @@ define [
     errors = view.validateBeforeSave({}, [])
     ok !errors["name"]
 
+  test "renders a hidden secure_params field", ->
+    view = @editView()
+    secure_params = view.$('#secure_params')
+
+    equal secure_params.attr('type'), 'hidden'
+    equal secure_params.val(), s_params
+
   test 'does show error message on assignment point change with submissions', ->
     view = @editView has_submitted_submissions: true
     view.$el.appendTo $('#fixtures')
@@ -206,6 +217,25 @@ define [
     ok view.$("[type=checkbox][name=moderated_grading]").prop("checked")
     ok view.$("[type=checkbox][name=moderated_grading]").prop("disabled")
     equal view.$('[type=hidden][name=moderated_grading]').attr('value'), '1'
+
+  test 'routes to discussion details normally', ->
+    view = @editView html_url: 'http://foo'
+    equal view.locationAfterSave({}), 'http://foo'
+
+  test 'routes to return_to', ->
+    view = @editView html_url: 'http://foo'
+    equal view.locationAfterSave({ return_to: 'http://bar' }), 'http://bar'
+
+  test 'cancels to env normally', ->
+    ENV.CANCEL_TO = 'http://foo'
+    view = @editView()
+    equal view.locationAfterCancel({}), 'http://foo'
+
+  test 'cancels to return_to', ->
+    ENV.CANCEL_TO = 'http://foo'
+    view = @editView()
+    equal view.locationAfterCancel({ return_to: 'http://bar' }), 'http://bar'
+
 
   module 'EditView: group category locked',
     setup: ->

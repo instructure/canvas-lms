@@ -35,18 +35,38 @@ module CC::Importer::Canvas
       quiz['hide_correct_answers_at'] = get_time_val(doc, 'hide_correct_answers_at')
       quiz['time_limit'] = get_int_val(doc, 'time_limit')
       quiz['allowed_attempts'] = get_int_val(doc, 'allowed_attempts')
-      ['could_be_locked','anonymous_submissions','show_correct_answers',
-       'require_lockdown_browser','require_lockdown_browser_for_results',
-       'shuffle_answers','available', 'cant_go_back', 'one_question_at_a_time',
-       'require_lockdown_browser_monitor',
-       'one_time_results', 'show_correct_answers_last_attempt'
-      ].each do |bool_val|
+      %w(
+        could_be_locked
+        anonymous_submissions
+        show_correct_answers
+        require_lockdown_browser
+        require_lockdown_browser_for_results
+        shuffle_answers
+        available
+        cant_go_back
+        one_question_at_a_time
+        require_lockdown_browser_monitor
+        one_time_results
+        show_correct_answers_last_attempt
+        only_visible_to_overrides
+      ).each do |bool_val|
         val = get_bool_val(doc, bool_val)
         quiz[bool_val] = val unless val.nil?
       end
 
       if asmnt_node = doc.at_css('assignment')
         quiz['assignment'] = parse_canvas_assignment_data(asmnt_node)
+      end
+
+      if doc.at_css("assignment_overrides override")
+        quiz['assignment_overrides'] = []
+        doc.css("assignment_overrides override").each do |override_node|
+          quiz['assignment_overrides'] << {
+            set_type: override_node["set_type"],
+            set_id: override_node["set_id"],
+            title: override_node["title"]
+          }
+        end
       end
 
       quiz

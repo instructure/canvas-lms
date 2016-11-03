@@ -1,1 +1,50 @@
-#  UNABLE TO TEST -- TOUCHES REACT ROUTER
+define [
+  'react'
+  'react-dom'
+  'jsx/external_apps/components/Configurations'
+], (React, ReactDOM,Configurations) ->
+
+  TestUtils = React.addons.TestUtils
+  wrapper = document.getElementById('fixtures')
+
+  createElement = (data = {}) ->
+    React.createElement(Configurations, data)
+
+  renderComponent = (data = {}) ->
+    ReactDOM.render(createElement(data), wrapper)
+
+  module 'ExternalApps.Configurations',
+    teardown: ->
+      ReactDOM.unmountComponentAtNode(wrapper)
+
+  test 'renders', ->
+    component = renderComponent({
+      'env': {
+        'APP_CENTER':{'enabled': true}
+      }
+    })
+    ok component.isMounted()
+    ok TestUtils.isCompositeComponentWithType(component, Configurations)
+
+  test 'canAddEdit', ->
+    component = renderComponent({
+        'env': {
+          'PERMISSIONS': {
+            'create_tool_manually': false
+            },
+          'APP_CENTER':{'enabled': true}
+          }
+      })
+    notOk component.canAddEdit()
+
+    test 'canAddEdit', ->
+      component = renderComponent({
+          'env': {
+            'PERMISSIONS': {
+              'create_tool_manually': true
+              },
+            'APP_CENTER':{'enabled': true}
+            }
+        })
+      ok component.canAddEdit()
+

@@ -425,6 +425,27 @@ describe Course do
       expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
     end
 
+    it "should grant create_tool_manually to the proper individuals" do
+      course_with_teacher(:active_all => true)
+      @teacher = user(:active_all => true)
+      @course.enroll_teacher(@teacher).accept!
+
+      @ta = user(:active_all => true)
+      @course.enroll_ta(@ta).accept!
+
+      @designer = user(:active_all => true)
+      @course.enroll_designer(@designer).accept!
+
+      @student = user(:active_all => true)
+      @course.enroll_student(@student).accept!
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :create_tool_manually)).to be_truthy
+      expect(@course.grants_right?(@ta, :create_tool_manually)).to be_truthy
+      expect(@course.grants_right?(@designer, :create_tool_manually)).to be_truthy
+      expect(@course.grants_right?(@student, :create_tool_manually)).to be_falsey
+    end
+
     def make_date_completed
       @enrollment.reload
       @enrollment.start_at = 4.days.ago
@@ -4493,8 +4514,6 @@ describe Course, 'touch_root_folder_if_necessary' do
       expect { course.broadcast_notifications }.to_not raise_error
     end
   end
-
-  it { is_expected.to have_many(:submission_comments).conditions(-> { published }) }
 end
 
 describe Course, 'invited_count_visible_to' do

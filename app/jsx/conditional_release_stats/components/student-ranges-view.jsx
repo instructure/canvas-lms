@@ -3,9 +3,9 @@ define([
   'instructure-ui/TabList',
   'instructure-ui/ApplyTheme',
   'i18n!cyoe_assignment_sidebar',
+  'jsx/shared/conditional_release/score',
   './student-range',
-  '../helpers/score',
-], (React, { default: TabList, TabPanel, Tab }, { default: ApplyTheme }, I18n, StudentRange, scoreHelpers) => {
+], (React, { default: TabList, TabPanel, Tab }, { default: ApplyTheme }, I18n, scoreHelpers, StudentRange) => {
   const { array, func, object } = React.PropTypes
 
   const tabsTheme = {

@@ -16,14 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def group_membership_model(opts={})
-  do_save = opts.has_key?(:save) ? opts.delete(:save) : true
-  @group_membership = factory_with_protected_attributes(GroupMembership, valid_group_membership_attributes.merge(opts), do_save)
-end
+module Factories
+  def group_membership_model(opts={})
+    do_save = opts.has_key?(:save) ? opts.delete(:save) : true
+    @group_membership = factory_with_protected_attributes(GroupMembership, valid_group_membership_attributes.merge(opts), do_save)
+  end
 
-def valid_group_membership_attributes
-  {
-    :group => @group,
-    :user => @user
-  }
+  def valid_group_membership_attributes
+    {
+      :group => @group,
+      :user => @user
+    }
+  end
 end

@@ -12,6 +12,15 @@ module SpeedGraderCommon
     wait_for_ajaximations
   end
 
+  def goto_student(student_name)
+    f("#combo_box_container .ui-selectmenu-icon").click
+    student_selection = ff(".ui-selectmenu-item-header").find do |option|
+      option.text.strip == student_name if option.text
+    end
+    raise ArgumentError, "There is no student named #{student_name}" unless student_selection
+    student_selection.click
+  end
+
   def set_turnitin_asset(asset, asset_data)
     @submission.turnitin_data ||= {}
     @submission.turnitin_data[asset.asset_string] = asset_data
@@ -93,5 +102,10 @@ module SpeedGraderCommon
     scroll_into_view('#add_a_comment button[type="submit"]')
     f('#add_a_comment button[type="submit"]').click
     wait_for_ajaximations
+  end
+
+  # returns a list of comment strings from right pane
+  def comment_list
+    ff('span.comment').map(&:text)
   end
 end

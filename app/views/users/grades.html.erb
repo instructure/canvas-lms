@@ -4,16 +4,6 @@
   css_bundle :user_grades
 %>
 
-<% if false %>
-<% #TODO: implement previous courses  %>
-<% content_for :right_side do %>
-    <div class="rs-margin-lr rs-margin-top">
-        <a href="#" class="previous_courses_link"><%= image_tag "history.png", :alt => '' %> <%= t('show_previous_courses', 'Show Previous Courses') %></a>
-    </div>
-<% end %>
-<% end %>
-<style>
-</style>
 <h1 class='screenreader-only'><%= t(:page_title, 'Grades') %></h1>
 <% unless @presenter.student_enrollments.empty? %>
 <h2><%= t('titles.current_student_courses', "Courses I'm Taking") %></h2>

@@ -1,5 +1,6 @@
 define([
   'react',
+  'react-dom',
   'page',
   'jsx/external_apps/components/Root',
   'jsx/external_apps/components/AppList',
@@ -7,7 +8,8 @@ define([
   'jsx/external_apps/components/Configurations',
   'jsx/external_apps/lib/AppCenterStore',
   'jsx/external_apps/lib/regularizePathname'
-], function(React, page, Root, AppList, AppDetails, Configurations, AppCenterStore, regularizePathname) {
+], function(React, ReactDOM, page, Root, AppList, AppDetails, Configurations,
+  AppCenterStore, regularizePathname) {
 
   const currentPath = window.location.pathname;
   const re = /(.*\/settings|.*\/details)/;
@@ -24,7 +26,7 @@ define([
     if (!window.ENV.APP_CENTER.enabled) {
       page.redirect('/configurations');
     } else {
-      React.render(
+      ReactDOM.render(
         <Root>
           <AppList pathname={ctx.pathname} />
         </Root>
@@ -33,7 +35,7 @@ define([
   };
 
   const renderAppDetails = (ctx) => {
-    React.render(
+    ReactDOM.render(
       <Root>
         <AppDetails
           shortName={ctx.params.shortName}
@@ -46,9 +48,11 @@ define([
   };
 
   const renderConfigurations = (ctx) => {
-    React.render(
+    ReactDOM.render(
       <Root>
-        <Configurations pathname={ctx.pathname} />
+        <Configurations
+          pathname={ctx.pathname}
+          env={window.ENV} />
       </Root>
     , targetNodeToRenderIn);
   }

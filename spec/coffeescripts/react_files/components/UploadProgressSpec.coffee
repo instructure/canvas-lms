@@ -1,9 +1,10 @@
 define [
   'react'
+  'react-dom'
   'jquery'
   'jsx/files/UploadProgress'
   'compiled/react_files/modules/FileUploader'
-], (React, $, UploadProgress, FileUploader) ->
+], (React, ReactDOM, $, UploadProgress, FileUploader) ->
 
   module 'UploadProgress',
     setup: ->
@@ -16,11 +17,11 @@ define [
 
       @uploader = @mockUploader('filename', 35)
       @node = $('<div>').appendTo('#fixtures')[0]
-      @progressContainer = React.render(React.createFactory(ProgressContainer)(uploader: @uploader), @node)
+      @progressContainer = ReactDOM.render(React.createFactory(ProgressContainer)(uploader: @uploader), @node)
       @prog = @progressContainer.refs.prog
 
     teardown: ->
-      React.unmountComponentAtNode(@progressContainer.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@progressContainer.getDOMNode().parentNode)
       $("#fixtures").empty()
 
     mockUploader: (name, progress) ->

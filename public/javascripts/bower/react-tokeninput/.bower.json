@@ -1,12 +1,12 @@
 {
   "name": "react-tokeninput",
   "homepage": "https://github.com/instructure-react/react-tokeninput",
-  "_release": "99a4c49ca6",
+  "_release": "777816b9f3",
   "_resolution": {
     "type": "commit",
-    "commit": "99a4c49ca695c9df438eff29778ea84072393511"
+    "commit": "777816b9f35e7ec85a814be2fa8402cd41aa07b8"
   },
   "_source": "https://github.com/instructure-react/react-tokeninput.git",
-  "_target": "99a4c49ca695c9df438eff29778ea84072393511",
+  "_target": "777816b9f35e7ec85a814be2fa8402cd41aa07b8",
   "_originalSource": "https://github.com/instructure-react/react-tokeninput.git"
 }

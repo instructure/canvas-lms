@@ -474,7 +474,11 @@ describe Account do
 
     limited_access = [ :read, :manage, :update, :delete, :read_outcomes ]
     conditional_access = RoleOverride.permissions.select { |_, v| v[:account_allows] }.map(&:first)
-    full_access = RoleOverride.permissions.keys + limited_access - conditional_access + [:create_courses]
+    full_access = RoleOverride.permissions.keys +
+                  limited_access - conditional_access +
+                  [:create_courses] +
+                  [:create_tool_manually]
+
     siteadmin_access = [:app_profiling]
     full_root_access = full_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :site_admin }.map(&:first)
     full_sub_access = full_root_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :root }.map(&:first)
@@ -1506,7 +1510,7 @@ describe Account do
         begin
           Account.find_cached(nonsense_id)
         rescue ::Canvas::AccountCacheError => e
-          expect(e.message).to eq(CANVAS_RAILS4_0 ? "Couldn't find Account with id=#{nonsense_id}" : "Couldn't find Account with 'id'=#{nonsense_id}")
+          expect(e.message).to eq("Couldn't find Account with 'id'=#{nonsense_id}")
         end
       end
     end

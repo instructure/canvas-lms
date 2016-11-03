@@ -184,7 +184,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def create
-    @assignment_group = @context.assignment_groups.temp_record(params[:assignment_group])
+    @assignment_group = @context.assignment_groups.temp_record(assignment_group_params)
     if authorized_action(@assignment_group, @current_user, :create)
       respond_to do |format|
         if @assignment_group.save
@@ -203,7 +203,7 @@ class AssignmentGroupsController < ApplicationController
     @assignment_group = @context.assignment_groups.find(params[:id])
     if authorized_action(@assignment_group, @current_user, :update)
       respond_to do |format|
-        if @assignment_group.update_attributes(params[:assignment_group])
+        if @assignment_group.update_attributes(assignment_group_params)
           flash[:notice] = t 'notices.updated', 'Assignment Group was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
           format.json { render :json => @assignment_group.as_json(:permissions => {:user => @current_user, :session => session}), :status => :ok }
@@ -242,6 +242,11 @@ class AssignmentGroupsController < ApplicationController
   end
 
   private
+
+  def assignment_group_params
+    strong_params.require(:assignment_group).
+      permit(:assignment_weighting_scheme, :default_assignment_name, :group_weight, :name, :position, :sis_source_id, :rules)
+  end
 
   def include_params
     params[:include] || []
@@ -381,7 +386,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def can_reorder_assignments?(assignments, group)
-    return true if @current_user.admin_of_root_account?(@context.root_account)
+    return true if @context.account_membership_allows(@current_user)
     return true unless @context.feature_enabled?(:multiple_grading_periods)
     periods = GradingPeriod.for(@context)
     assignments.none? do |assignment|

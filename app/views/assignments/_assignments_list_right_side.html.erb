@@ -1,36 +1,15 @@
-<% course_home ||= false %>
-  <% if @just_viewing_one_course %>
-  <div class="rs-margin-lr rs-margin-top">
-    <% if @courses.length == 1 && can_do(@courses.first, @current_user, :participate_as_student) %>
-      <a href="<%= context_url(@context, :context_grades_url) %>" class="btn button-sidebar-wide"><%= image_tag "grading_icon.png", :alt => '' %> <%= t 'links.see_current_grades', "See my grades so far" %></a>
-    <% end %>
-  </div>
-  <% end %>
-  <%= render :partial => "shared/event_list", 
-             :object  => @upcoming_assignments, 
-             :locals  => {
-               :title         => t('titles.upcoming_assignments', "Upcoming Assignments"),
-               :show_context  => true, 
-               :upcoming      => true,
-               :show_more     => false,
-               :period        => :next_week,
-             } %>
-  
-  <% unless @just_viewing_one_course %>
-    <% if @courses.length == 1 && can_do(@courses.first, @current_user, :manage_assignments) %>
-      <div>
-        <a href="<%= course_assignments_path(@courses.first) %>" class="btn"><i class="icon-edit"></i> <%= t 'links.manage_assignments', "Manage Assignments" %></a>
-      </div>
-    <% elsif @courses.length > 1 %>
-      <h2><%= t 'titles.show_only_assignments_from', "Show Only Assignments from" %></h2>
-      <div class="show-only-from rs-margin-lr">
-        <ul class="unstyled_list">
-        <% @courses.each do |course| %>
-          <li>
-            <%= link_to(course.name, course_assignments_path(course), :class => dom_id(course)) %>
-          </li>
-        <% end %>
-        </ul>
-      </div>
-    <% end %>
-  <% end %>
+<% if can_do(@context, @current_user, :participate_as_student) %>
+  <a href="<%= context_url(@context, :context_grades_url) %>" class="btn button-sidebar-wide">
+    <i class="icon-check-plus" role="presentation"></i>
+    <%= t 'links.see_current_grades', "See my grades so far" %>
+  </a>
+<% end %>
+<%= render :partial => "shared/event_list", 
+           :object  => @upcoming_assignments, 
+           :locals  => {
+             :title         => t('titles.upcoming_assignments', "Upcoming Assignments"),
+             :show_context  => true, 
+             :upcoming      => true,
+             :show_more     => false,
+             :period        => :next_week,
+           } %>

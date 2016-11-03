@@ -20,13 +20,7 @@ class AssignmentGroup < ActiveRecord::Base
 
   include Workflow
 
-  attr_accessible :assignment_weighting_scheme,
-                  :default_assignment_name,
-                  :group_weight,
-                  :name,
-                  :position,
-                  :rules,
-                  :sis_source_id
+  strong_params
 
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: [:course]
@@ -79,7 +73,7 @@ class AssignmentGroup < ActiveRecord::Base
 
     given do |user, session|
       self.context.grants_right?(user, session, :manage_assignments) &&
-        (user.admin_of_root_account?(self.context.root_account) ||
+        (self.context.account_membership_allows(user) ||
          !has_assignment_due_in_closed_grading_period?)
     end
     can :delete

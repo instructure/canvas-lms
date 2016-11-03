@@ -2,9 +2,10 @@ define [
   '../mockFilesENV'
   'jquery'
   'react'
+  'react-dom'
   'compiled/react_files/components/SearchResults'
   'compiled/collections/FilesCollection'
-], (mockFilesENV, $, React, SearchResults, FilesCollection) ->
+], (mockFilesENV, $, React, ReactDOM, SearchResults, FilesCollection) ->
 
   module 'SearchResults#render',
     setup: ->
@@ -15,7 +16,7 @@ define [
   #   expect(1)
 
   #   container = $('<div>').appendTo("#fixtures")[0]
-  #   renderedRoutes = React.renderComponent(routes, container)
+  #   renderedRoutes = ReactDOM.renderComponent(routes, container)
 
   #   @server = sinon.fakeServer.create()
   #   @server.respondWith('GET', new RegExp('/api/v1/courses/999/files?search_term=fake_search_term'), '[]')
@@ -25,6 +26,6 @@ define [
 
 
   #     ok $(container).find(':contains(Your search - "fake_search_term" - did not match any files.)').length, 'displays no matches error'
-  #     React.unmountComponentAtNode(container)
+  #     ReactDOM.unmountComponentAtNode(container)
   #     @server.restore()
   #     start()

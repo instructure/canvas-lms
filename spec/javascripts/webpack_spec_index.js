@@ -12,8 +12,5 @@ function requireAll(requireContext) {
   return requireContext.keys().map(requireContext);
 }
 
-var coffeeTestsContext = require.context(__dirname + "/../coffeescripts", true, /Spec$/);
-var jsxTestsContext = require.context(__dirname + "/jsx", true, /Spec$/);
-
-requireAll(coffeeTestsContext);
-requireAll(jsxTestsContext);
+requireAll(require.context(__dirname + "/../coffeescripts", true, /Spec$/));
+requireAll(require.context(__dirname + "/jsx", true, /Spec$/));

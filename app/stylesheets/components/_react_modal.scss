@@ -7,7 +7,7 @@ React Modal comes with very few default classes to make it as themeable as possi
 <br/>
 
 ```javascript
-React.renderComponent(
+ReactDOM.render(
   ReactModalExample(
     { className: 'ReactModal__Content--canvas'
       overlayClassName: 'ReactModal__Overlay--canvas' }
@@ -34,7 +34,7 @@ The `.ReactModal__Content--mini-modal` class can be appended to the `.ReactModal
 <br/>
 
 ```javascript
-React.renderComponent(
+ReactDOM.render(
   ReactModalExample(
     { label: 'Trigger Confirm Dialog',
       className: 'ReactModal__Content--canvas ReactModal__Content--mini-modal',

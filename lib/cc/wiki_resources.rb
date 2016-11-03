@@ -37,7 +37,7 @@ module CC
           meta_fields[:notify_of_update] = page.notify_of_update
           meta_fields[:workflow_state] = page.workflow_state
           meta_fields[:front_page] = page.is_front_page?
-          meta_fields[:module_locked] = page.locked_by_module_item?(@user, true).present?
+          meta_fields[:module_locked] = page.locked_by_module_item?(@user, deep_check_if_needed: true).present?
           meta_fields[:assignment_identifier] =
             page.for_assignment? ? CCHelper.create_key(page.assignment) : nil
 

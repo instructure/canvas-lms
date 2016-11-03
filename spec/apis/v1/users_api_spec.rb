@@ -1092,6 +1092,22 @@ describe "Users API", type: :request do
         expect(user.time_zone.name).to eql 'Tijuana'
       end
 
+      it "should be able to update email alone" do
+        enable_cache do
+          @student.email
+
+          Timecop.freeze(5.seconds.from_now) do
+            new_email = "bloop@shoop.whoop"
+            json = api_call(:put, @path, @path_options, {
+              :user => {:email => new_email}
+            })
+            expect(json['email']).to eq new_email
+            user = User.find(json['id'])
+            expect(user.email).to eq new_email
+          end
+        end
+      end
+
       it "should catch invalid dates" do
         birthday = Time.now
         json = api_call(:put, @path, @path_options, {

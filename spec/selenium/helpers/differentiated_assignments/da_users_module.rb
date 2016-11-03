@@ -57,6 +57,7 @@ module DifferentiatedAssignments
       end
 
       private
+        include Factories
 
         def create_user(username)
           user_with_pseudonym(username: username, name: username, active_all: true)

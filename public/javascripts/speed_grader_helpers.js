@@ -18,8 +18,10 @@
 
 define([
   'jquery',
-  'underscore'
-], function($, _) {
+  'underscore',
+  'i18n!gradebook',
+  'jquery.instructure_date_and_time'
+], function($, _, I18n) {
   var speedgraderHelpers = {
 
     buildIframe: function(src, options){
@@ -80,7 +82,51 @@ define([
           $(element).removeAttr('readonly');
         }
       });
+    },
+
+
+    classNameBasedOnStudent: function(student){
+      var raw = student.submission_state;
+      var formatted;
+      switch(raw) {
+      case "graded":
+      case "not_gradeable":
+        formatted = I18n.t('graded', "graded");
+        break;
+      case "not_graded":
+        formatted = I18n.t('not_graded', "not graded");
+        break;
+      case "not_submitted":
+        formatted = I18n.t('not_submitted', 'not submitted');
+        break;
+      case "resubmitted":
+        formatted = I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})",
+                           {'when': $.datetimeString(student.submission.submitted_at)});
+        break;
+      }
+      return {raw: raw, formatted: formatted};
+    },
+
+    submissionState: function(student, grading_role){
+      var submission = student.submission;
+      if (submission && submission.workflow_state != 'unsubmitted' && (submission.submitted_at || !(typeof submission.grade == 'undefined'))) {
+        if ((grading_role == 'provisional_grader' || grading_role == 'moderator')
+            && !student.needs_provisional_grade && submission.provisional_grade_id === null) {
+          // if we are a provisional grader and it doesn't need a grade (and we haven't given one already) then we shouldn't be able to grade it
+          return "not_gradeable";
+        } else if (!(submission.final_provisional_grade && submission.final_provisional_grade.grade) && !submission.excused &&
+                   (typeof submission.grade == 'undefined' || submission.grade === null || submission.workflow_state == 'pending_review')) {
+          return "not_graded";
+        } else if (submission.grade_matches_current_submission) {
+          return "graded";
+        } else {
+          return "resubmitted";
+        }
+      } else {
+        return "not_submitted";
+      }
     }
+
   }
 
   return speedgraderHelpers;

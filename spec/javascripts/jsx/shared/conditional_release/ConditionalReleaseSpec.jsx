@@ -7,176 +7,136 @@ define([
 
   const TestUtils = React.addons.TestUtils;
 
-  let component = null;
+  let editor = null
+  window.conditional_release_module = {
+    ConditionalReleaseEditor: (env) => {
+      editor = {
+        attach: sinon.stub(),
+        updateAssignment: sinon.stub(),
+        saveRule: sinon.stub(),
+        getErrors: sinon.stub(),
+        focusOnError: sinon.stub(),
+        env
+      }
+      return editor
+    }
+  }
+
+  let component = null
   const createComponent = (submitCallback) => {
-    // prevent polluting with new tab from form submission
-    $(document).on('submit', '#conditional-release-editor-form', (event) => {
-      $(document).off('submit', '#conditional-release-editor-form');
-      if (submitCallback) { submitCallback() }
-      return false;
-    })
     component = TestUtils.renderIntoDocument(
       <ConditionalRelease.Editor env={assignmentEnv} type='foo' />
-    );
-  };
+    )
+    component.createEditor()
+  }
 
-  const connectComponent = () => {
-    const postMessage = sinon.spy()
-    component.connect({ postMessage: postMessage })
-    // connect call has [port] as third arg:
-    return postMessage.args[0][2][0];
-  };
+  const makePromise = () => {
+    const promise = {}
+    promise.then = sinon.stub().returns(promise)
+    promise.catch = sinon.stub().returns(promise)
+    return promise
+  }
 
-  const createMessage = (messageType, messageBody = null) => {
-    return {
-      context: 'conditional-release',
-      messageType,
-      messageBody
-    }
-  };
-
-  module('Conditional Release component', {
-    teardown: () => {
-      if (component) {
-        component.disconnect();
-        const componentNode = ReactDOM.findDOMNode(component);
-        if (componentNode) {
-          ReactDOM.unmountComponentAtNode(componentNode.parentNode);
-        }
-      }
-      component = null;
-    }
-  });
-
-  const assignmentEnv = { assignment: { id: 1 }, edit_rule_url: 'about:blank', jwt: 'foo' }
+  let ajax = null
+  const assignmentEnv = { assignment: { id: 1 }, editor_url: 'editorurl', jwt: 'foo' }
   const noAssignmentEnv = { edit_rule_url: 'about:blank', jwt: 'foo' }
   const assignmentNoIdEnv = { assignment: { foo: 'bar' }, edit_rule_url: 'about:blank', jwt: 'foo' }
 
-  module('load', () => {
-    test('it submits the hidden form when mounted', (assert) => {
-      const resolved = assert.async();
-      createComponent(() => {
-        expect(0);
-        resolved();
-      })
-    });
-
-    test('it removes the hidden form after submitting', () => {
-      createComponent();
-      notOk(document.contains($('#conditional-release-editor-form').get(0)))
-    });
-  });
-
-  module('connect', () => {
-    test('it connects MessageChannel to target', () => {
-      createComponent();
-      const target = { postMessage: sinon.spy() };
-
-      component.connect(target);
-      ok(target.postMessage.calledOnce);
-      ok(target.postMessage.args[0][0].messageType === 'connect')
-    });
-  });
-
-  module('save', () => {
-    test('it returns success when iframe reports success', (assert) => {
-      createComponent();
-      const remotePort = connectComponent();
-      const resolved = assert.async();
-      remotePort.onmessage = (event) => {
-        ok(event.data.messageType === 'save')
-        remotePort.postMessage(createMessage('saveComplete'))
-      }
-      const promise = component.save();
-      promise.done(() => {
-        resolved();
-      })
-    });
-
-    test('it reports error when iframe reports error', (assert) => {
-      createComponent();
-      const remotePort = connectComponent();
-      const resolved = assert.async();
-      remotePort.onmessage = (event) => {
-        ok(event.data.messageType === 'save')
-        remotePort.postMessage(createMessage('saveError', 'foobarbaz'))
-      }
-      const promise = component.save();
-      promise.fail((reason) => {
-        ok(reason.match(/foobarbaz/));
-        resolved();
-      })
-    });
-
-    test('it times out', (assert) => {
-      createComponent();
-      const remotePort = connectComponent();
-      const resolved = assert.async();
-      const promise = component.save(2);
-      promise.fail((reason) => {
-        ok(reason.match(/timeout/));
-        resolved();
-      })
-    });
-  });
-
-  module('updateModalState', () => {
-    test('it adds overlay when modal is visible', (assert) => {
+  module('Conditional Release component', {
+    setup: () => {
+      ajax = sinon.stub($, 'ajax')
       createComponent()
-      component.updateModalState({ isVisible: true })
-      ok($('body').hasClass('conditional-release-modal-visible'))
-    });
+    },
 
-    test('it removes overlay when modal is no longer visible', (assert) => {
-      createComponent()
-      component.updateModalState({ isVisible: true })
-      component.updateModalState({ isVisible: false })
-      ok(!$('body').hasClass('conditional-release-modal-visible'))
-    });
-  })
-
-  module('updateAssignment', () => {
-    test('it updates iframe', (assert) => {
-      createComponent();
-      const remotePort = connectComponent();
-      const resolved = assert.async();
-      remotePort.onmessage = (event) => {
-        ok(event.data.messageType === 'updateAssignment');
-        ok(event.data.messageBody.id === 'asdf');
-        resolved();
+    teardown: () => {
+      if (component) {
+        const componentNode = ReactDOM.findDOMNode(component)
+        if (componentNode) {
+          ReactDOM.unmountComponentAtNode(componentNode.parentNode)
+        }
       }
-      component.updateAssignment({ id: 'asdf' });
-    });
-  })
-
-  module('handleMessage', () => {
-    const sendMessage = (messageType, messageBody) => {
-      component.handleMessage({
-        data: createMessage(messageType, messageBody)
-      })
+      component = null
+      editor = null
+      ajax.restore()
     }
+  })
 
-    test('it can set and retrieve validation errors', () => {
-      createComponent();
+  test('it loads a cyoe editor on mount', () => {
+    ok(ajax.calledOnce)
+    ok(ajax.calledWithMatch({ url: 'editorurl' }))
+  })
 
-      sendMessage('validationErrors', '[{ "index": 1, "error": "foo" }]');
-      deepEqual(component.validateBeforeSave(), [{ message: 'foo' }]);
+  test('it creates a cyoe editor', () => {
+    ok(editor.attach.calledOnce)
+  })
 
-      sendMessage('validationErrors', null);
-      ok(component.validateBeforeSave() == null);
-    });
-  });
+  test('it forwards focusOnError', () => {
+    component.focusOnError()
+    ok(editor.focusOnError.calledOnce)
+  })
 
-  module('focusOnError', () => {
-    test('it dispatches a focusOnError event', (assert) => {
-      createComponent()
-      const resolved = assert.async()
-      const remotePort = connectComponent()
-      remotePort.onmessage = (event) => {
-        ok(event.data.messageType === 'focusOnError')
-        resolved()
-      }
-      component.focusOnError()
+  test('it transforms validations', () => {
+    editor.getErrors.returns([
+      { index: 0, error: 'foo bar' },
+      { index: 0, error: 'baz bat' },
+      { index: 1, error: 'foo baz' }
+    ])
+    const transformed = component.validateBeforeSave()
+    deepEqual(transformed, [
+      { message: 'foo bar' },
+      { message: 'baz bat' },
+      { message: 'foo baz' }
+    ])
+  })
+
+  test('it returns null if no errors on validation', () => {
+    editor.getErrors.returns([])
+    equal(null, component.validateBeforeSave())
+  })
+
+  test('it saves successfully when editor saves successfully', (assert) => {
+    const resolved = assert.async()
+    const cyoePromise = makePromise()
+
+    editor.saveRule.returns(cyoePromise)
+
+    const promise = component.save()
+    promise.then(() => {
+      ok(true)
+      resolved()
     })
-  });
-});
+    cyoePromise.then.args[0][0]()
+  })
+
+  test('it fails when editor fails', (assert) => {
+    const resolved = assert.async()
+    const cyoePromise = makePromise()
+    editor.saveRule.returns(cyoePromise)
+
+    const promise = component.save()
+    promise.fail((reason) => {
+      equal(reason, 'stuff happened')
+      resolved()
+    })
+    cyoePromise.catch.args[0][0]('stuff happened')
+  })
+
+  test('it times out', (assert) => {
+    const resolved = assert.async()
+    const cyoePromise = makePromise()
+    editor.saveRule.returns(cyoePromise)
+
+    const promise = component.save(2)
+    promise.fail((reason) => {
+      ok(reason.match(/timeout/))
+      resolved()
+    })
+  })
+
+  test('it updates assignments', (assert) => {
+    component.updateAssignment({
+      points_possible: 100
+    })
+    ok(editor.updateAssignment.calledWithMatch({ points_possible: 100 }))
+  })
+})

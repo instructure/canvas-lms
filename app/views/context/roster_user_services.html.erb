@@ -3,11 +3,11 @@
   @active_tab="people"
   add_crumb(t('#crumbs.registered_services', 'Registered Services'), context_url(@context, :context_user_services_url)) %>
 <% content_for :right_side do %>
-  <div class="rs-margin-all rs-margin-lr">
+  <div class="rs-margin-bottom">
     <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_users_url) %>"><i class="icon-arrow-left"></i> <%= t('links.back_to_roster', %{Back to Roster}) %></a>
   </div>
   <h2><%= t('headings.service_types', %{Service Types}) %></h2>
-  <div class="rs-margin-lr">
+  <div>
     <ul class="service_types">
     <% @services_hash.sort_by{|t, s| UserService.sort_position(t) }.each do |service_type, services| %>
       <li>

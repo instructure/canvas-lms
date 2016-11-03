@@ -174,11 +174,16 @@ module CCHelper
         end
       end
       @rewriter.set_handler('files') do |match|
-        # If match.obj_id is nil, it's because we're actually linking to a page
-        # (the /courses/:id/files page) and not to a specific file. In this case,
-        # just pass it straight through.
         if match.obj_id.nil?
-          "#{COURSE_TOKEN}/files"
+          if match_data = match.url.match(%r{/files/folder/(.*)})
+            # this might not be the best idea but let's keep going and see what happens
+            "#{COURSE_TOKEN}/files/folder/#{match_data[1]}"
+          else
+            # If match.obj_id is nil, it's because we're actually linking to a page
+            # (the /courses/:id/files page) and not to a specific file. In this case,
+            # just pass it straight through.
+            "#{COURSE_TOKEN}/files"
+          end
         else
           if @course && match.obj_class == Attachment
             obj = @course.attachments.find_by_id(match.obj_id)

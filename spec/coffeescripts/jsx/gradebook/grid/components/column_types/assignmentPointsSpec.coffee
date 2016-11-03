@@ -1,12 +1,13 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/column_types/assignmentPoints'
   'jquery'
-], (React, AssignmentPoints, $) ->
+], (React, ReactDOM, AssignmentPoints, $) ->
 
   renderComponent = (data) ->
     element = React.createElement(AssignmentPoints, data)
-    React.render(element, wrapper)
+    ReactDOM.render(element, wrapper)
 
   buildComponent = (props, additionalProps) ->
     cellData = props || {
@@ -29,7 +30,7 @@ define [
 
   module 'ReactGradebook.assignmentPointsComponent',
     teardown: ->
-      React.unmountComponentAtNode(wrapper)
+      ReactDOM.unmountComponentAtNode(wrapper)
 
   test 'should mount', ->
     ok(buildComponent().isMounted())

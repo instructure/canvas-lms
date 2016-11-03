@@ -1,11 +1,10 @@
 define([
   'i18n!zip_file_options_form',
   'react',
-  'compiled/react/shared/utils/withReactElement',
   'jsx/shared/modal',
   'jsx/shared/modal-content',
   'jsx/shared/modal-buttons'
-  ], function(I18n, React, withReactElement, Modal, ModalContent, ModalButtons) {
+  ], function(I18n, React, Modal, ModalContent, ModalButtons) {
 
   const modalOverrides = {
     overlay : {

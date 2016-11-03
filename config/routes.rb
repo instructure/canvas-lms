@@ -64,7 +64,7 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :groups do
-    resources :groups
+    resources :groups, except: :edit
     resources :group_categories, only: [:create, :update, :destroy]
     get 'group_unassigned_members' => 'groups#unassigned_members'
   end
@@ -240,6 +240,8 @@ CanvasRails::Application.routes.draw do
       resources :submissions do
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin
         get 'turnitin/:asset_string' => 'submissions#turnitin_report', as: :turnitin_report
+        post 'vericite/resubmit' => 'submissions#resubmit_to_vericite', as: :resubmit_to_vericite
+        get 'vericite/:asset_string' => 'submissions#vericite_report', as: :vericite_report
       end
       get :rubric
       resource :rubric_association, path: :rubric do
@@ -526,6 +528,7 @@ CanvasRails::Application.routes.draw do
     get 'statistics/over_time/:attribute' => 'accounts#statistics_graph', as: :statistics_graph
     get 'statistics/over_time/:attribute.:format' => 'accounts#statistics_graph', as: :formatted_statistics_graph
     get :turnitin_confirmation
+    get :vericite_confirmation
     resources :permissions, controller: :role_overrides, only: [:index, :create] do
       collection do
         post :add_role
@@ -716,9 +719,8 @@ CanvasRails::Application.routes.draw do
   get 'search/bookmarks' => 'users#bookmark_search', as: :bookmark_search
   get 'search/rubrics' => 'search#rubrics'
   get 'search/all_courses' => 'search#all_courses'
-  resources :users do
+  resources :users, except: :destroy do
     match 'masquerade', via: [:get, :post]
-    delete :delete
     concerns :files, :file_images
 
     resources :page_views, only: :index
@@ -1370,6 +1372,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :appointment_groups) do
       get 'appointment_groups', action: :index, as: 'appointment_groups'
       post 'appointment_groups', action: :create
+      get 'appointment_groups/next_appointment', action: :next_appointment
       get 'appointment_groups/:id', action: :show, as: 'appointment_group'
       put 'appointment_groups/:id', action: :update
       delete 'appointment_groups/:id', action: :destroy

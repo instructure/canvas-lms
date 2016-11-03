@@ -99,7 +99,7 @@ module SchedulerCommon
   end
 
   def open_edit_appointment_group_event_dialog
-    f('.agenda-event .ig-row').click
+    f('.agenda-event__item .agenda-event__item-container').click
     expect(f('.edit_event_link')).to be_displayed
     f('.edit_event_link').click
     wait_for_ajaximations

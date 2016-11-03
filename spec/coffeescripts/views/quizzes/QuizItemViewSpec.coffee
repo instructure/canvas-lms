@@ -5,8 +5,9 @@ define [
   'compiled/views/PublishIconView'
   'jquery'
   'helpers/fakeENV'
+  'jsx/shared/conditional_release/CyoeHelper'
   'helpers/jquery.simulate'
-], (Backbone, Quiz, QuizItemView, PublishIconView, $, fakeENV) ->
+], (Backbone, Quiz, QuizItemView, PublishIconView, $, fakeENV, CyoeHelper) ->
 
   fixtures = $('#fixtures')
 
@@ -36,7 +37,22 @@ define [
     view.render()
 
   module 'QuizItemView',
-    setup: -> fakeENV.setup()
+    setup: ->
+      fakeENV.setup({
+        CONDITIONAL_RELEASE_ENV: {
+          active_rules: [{
+            trigger_assignment: '1',
+            scoring_ranges: [
+              {
+                assignment_sets: [
+                  { assignments: [{ assignment_id: '2' }] },
+                ],
+              },
+            ],
+          }],
+        }
+      })
+      CyoeHelper.reloadEnv()
     teardown: -> fakeENV.teardown()
 
   test 'renders admin if can_update', ->
@@ -167,28 +183,64 @@ define [
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
     quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'assignment')
     view = createView(quiz)
-    equal view.$('.icon-mastery-path').length, 0
+    equal view.$('.ig-admin .al-options .icon-mastery-path').length, 0
 
   test 'renders mastery paths menu option for assignment quiz if cyoe on', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-    quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'assignment')
+    quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'assignment', assignment_id: '2')
     view = createView(quiz)
-    equal view.$('.icon-mastery-path').length, 1
+    equal view.$('.ig-admin .al-options .icon-mastery-path').length, 1
 
   test 'does not render mastery paths menu option for survey quiz if cyoe on', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
     quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'survey')
     view = createView(quiz)
-    equal view.$('.icon-mastery-path').length, 0
+    equal view.$('.ig-admin .al-options .icon-mastery-path').length, 0
 
   test 'does not render mastery paths menu option for graded survey quiz if cyoe on', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
     quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'graded_survey')
     view = createView(quiz)
-    equal view.$('.icon-mastery-path').length, 0
+    equal view.$('.ig-admin .al-options .icon-mastery-path').length, 0
 
   test 'does not render mastery paths menu option for practice quiz if cyoe on', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
     quiz = new Quiz(id: 1, title: 'Foo', can_update: true, quiz_type: 'practice_quiz')
     view = createView(quiz)
-    equal view.$('.icon-mastery-path').length, 0
+    equal view.$('.ig-admin .al-options .icon-mastery-path').length, 0
+
+  test 'does not render mastery paths link for quiz if cyoe off', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    quiz = new Quiz(id: 1, assignment_id: '1', title: 'Foo', can_update: true, quiz_type: 'assignment')
+    view = createView(quiz)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0
+
+  test 'does not render mastery paths link for quiz if quiz does not have a rule', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    quiz = new Quiz(id: 1, assignment_id: '2', title: 'Foo', can_update: true, quiz_type: 'assignment')
+    view = createView(quiz)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0
+
+  test 'renders mastery paths link for quiz if quiz has a rule', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    quiz = new Quiz(id: 1, assignment_id: '1', title: 'Foo', can_update: true, quiz_type: 'assignment')
+    view = createView(quiz)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 1
+
+  test 'does not render mastery paths icon for quiz if cyoe off', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    quiz = new Quiz(id: 1, assignment_id: '1', title: 'Foo', can_update: true, quiz_type: 'assignment')
+    view = createView(quiz)
+    equal view.$('.mastery-path-icon').length, 0
+
+  test 'does not render mastery paths icon for quiz if quiz is not released by a rule', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    quiz = new Quiz(id: 1, assignment_id: '1', title: 'Foo', can_update: true, quiz_type: 'assignment')
+    view = createView(quiz)
+    equal view.$('.mastery-path-icon').length, 0
+
+  test 'renders mastery paths link for quiz if quiz has is released by a rule', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    quiz = new Quiz(id: 1, assignment_id: '2', title: 'Foo', can_update: true, quiz_type: 'assignment')
+    view = createView(quiz)
+    equal view.$('.mastery-path-icon').length, 1

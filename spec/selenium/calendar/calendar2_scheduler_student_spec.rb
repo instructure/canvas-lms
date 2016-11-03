@@ -20,7 +20,7 @@ describe "scheduler" do
     end
 
     def reserve_appointment_manual(n, comment = nil)
-      ffj('.agenda-event .ig-row')[n].click
+      ffj('.agenda-event__item .agenda-event__item-container')[n].click
       if comment
         # compiled/util/Popover sets focus on the close button twice
         # within the first 100ms, which can cause it to hijack
@@ -45,8 +45,8 @@ describe "scheduler" do
       click_appointment_link
       wait_for_ajaximations
       reserve_appointment_manual(0, "my comments")
-      expect(f('.agenda-event .ig-row')).to include_text "Reserved"
-      f('.agenda-event .ig-row').click
+      expect(f('.agenda-event__item .agenda-event__item-container')).to include_text "Reserved"
+      f('.agenda-event__item .agenda-event__item-container').click
       expect(f('.event-details-content')).to include_text "my comments"
 
       load_month_view
@@ -81,14 +81,14 @@ describe "scheduler" do
       click_appointment_link
 
       reserve_appointment_manual(0)
-      expect(f('.agenda-event .ig-row')).to include_text "Reserved"
+      expect(f('.agenda-event__item .agenda-event__item-container')).to include_text "Reserved"
 
       # try to reserve the second appointment
       reserve_appointment_manual(1)
       fj('.ui-button:contains(Reschedule)').click
       wait_for_ajax_requests
 
-      event1, event2 = ff('.agenda-event .ig-row')
+      event1, event2 = ff('.agenda-event__item .agenda-event__item-container')
       expect(event1).to include_text "Available"
       expect(event2).to include_text "Reserved"
     end
@@ -107,13 +107,13 @@ describe "scheduler" do
 
       reserve_appointment_manual(0)
       reserve_appointment_manual(1)
-      e1, e2 = ff('.agenda-event .ig-row')
+      e1, e2 = ff('.agenda-event__item .agenda-event__item-container')
       expect(e1).to include_text "Reserved"
       expect(e2).to include_text "Reserved"
 
       reserve_appointment_manual(2)
       fj('.ui-button:contains("OK")').click # "can't reserve" dialog
-      expect(fj('.agenda-event .ig-row:eq(2)')).to include_text "Available"
+      expect(fj('.agenda-event__item .agenda-event__item-container:eq(2)')).to include_text "Available"
     end
 
     it "should allow other users to fill up available timeslots" do
@@ -159,7 +159,7 @@ describe "scheduler" do
 
       # first slot full, but second available
       click_appointment_link
-      e1, e2 = ff('.agenda-event .ig-row')
+      e1, e2 = ff('.agenda-event__item .agenda-event__item-container')
       expect(e1).to include_text "Filled"
       expect(e2).to include_text "Available"
     end
@@ -172,7 +172,7 @@ describe "scheduler" do
       click_scheduler_link
       click_appointment_link
 
-      f('.agenda-event .ig-row').click
+      f('.agenda-event__item .agenda-event__item-container').click
       expect(f("#content")).not_to contain_css('#reservations')
     end
 
@@ -233,22 +233,22 @@ describe "scheduler" do
       it "should let me do so from the agenda view", priority: "1", test_id: 502484 do
         load_agenda_view
 
-        f('.ig-row').click
+        f('.agenda-event__item-container').click
         wait_for_ajaximations
         f('.unreserve_event_link').click
         f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
 
-        expect(f("#content")).not_to contain_css('.ig-row')
+        expect(f("#content")).not_to contain_css('.agenda-event__item-container')
       end
 
       it "should let me do so from the scheduler", priority: "1", test_id: 502485 do
-        f('.agenda-event .ig-row').click
+        f('.agenda-event__item .agenda-event__item-container').click
         f('.unreserve_event_link').click
         f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
 
         wait_for_ajaximations
 
-        expect(f('.agenda-event .ig-row')).to include_text "Available"
+        expect(f('.agenda-event__item .agenda-event__item-container')).to include_text "Available"
       end
     end
   end

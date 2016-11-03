@@ -362,6 +362,26 @@ Canvas::Plugin.register('pandapub', nil, {
   :settings_partial => 'plugins/panda_pub_settings',
   :validator => 'PandaPubValidator'
 })
+Canvas::Plugin.register('vericite', nil, {
+  :name => lambda{ t :name, 'VeriCite' },
+  :description => lambda{ t :description, 'Plagiarism detection service.' },
+  :author => 'VeriCite',
+  :author_website => 'http://www.vericite.com',
+  :version => '1.0.0',
+  :settings => {
+    :account_id => nil,
+    :shared_secret => nil,
+    :host => 'api.vericite.com',
+    :comments => nil,
+    :pledge => nil,
+    :release_to_students => 'immediate',
+    :exclude_quotes => true,
+    :exclude_self_plag => true,
+    :store_in_index => true,
+    :show_preliminary_score => false,
+  },
+  :settings_partial => 'plugins/vericite_settings'
+})
 Canvas::Plugins::TicketingSystem.register!
 Canvas::Plugin.register('live_events', nil, {
   :name => lambda{ t :name, 'Live Events' },

@@ -1,9 +1,11 @@
 define [
+  'react'
+  'react-dom'
   'jquery'
   'underscore'
   'jsx/grading/tabContainer'
   'jqueryui/tabs'
-], ($, _, TabContainer) ->
+], (React, ReactDOM, $, _, TabContainer) ->
 
   TestUtils = React.addons.TestUtils
 
@@ -13,7 +15,7 @@ define [
       TestUtils.renderIntoDocument(element)
 
     unmount: (component) ->
-      React.unmountComponentAtNode(React.findDOMNode(component).parentNode)
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 
   test 'does not render grading periods if Multiple Grading Periods is disabled', ->
     component = @renderComponent(multipleGradingPeriodsEnabled: false)

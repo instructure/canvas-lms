@@ -2,8 +2,9 @@ define [
   'jquery'
   'underscore'
   'react'
+  'react-dom'
   'jsx/files/ZipFileOptionsForm'
-  ], ($, _, React, ZipFileOptionsForm ) ->
+  ], ($, _, React, ReactDOM, ZipFileOptionsForm ) ->
 
     TestUtils = React.addons.TestUtils
 
@@ -17,7 +18,7 @@ define [
 
       zFOF = TestUtils.renderIntoDocument(React.createElement(ZipFileOptionsForm, props))
       equal $(".modalMessage").text(), "Would you like to expand the contents of \"neat_file\" into the current folder, or upload the zip file as is?", "message is displayed"
-      React.unmountComponentAtNode(zFOF.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(zFOF.getDOMNode().parentNode)
 
     test "handleExpandClick expands zip", ->
       zipOptionsResolvedStub = @stub()
@@ -32,7 +33,7 @@ define [
 
       ok zipOptionsResolvedStub.calledWithMatch({file: 'the_file_obj', expandZip: false}), "resolves with correct options"
 
-      React.unmountComponentAtNode(zFOF.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(zFOF.getDOMNode().parentNode)
 
     test "handleUploadClick uploads zip", ->
       zipOptionsResolvedStub = @stub()
@@ -49,4 +50,4 @@ define [
 
       ok zipOptionsResolvedStub.calledWithMatch({file: 'the_file_obj', expandZip: true}), "resolves with correct options"
 
-      React.unmountComponentAtNode(zFOF.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(zFOF.getDOMNode().parentNode)

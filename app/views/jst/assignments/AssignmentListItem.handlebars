@@ -43,7 +43,7 @@
         <div class="ig-details__item assignment-date-available" data-view="date-available">
         </div>
         {{/if}}
-        {{#if showDueDate }}
+        {{#if showDueDate}}
           <div class="ig-details__item assignment-date-due" data-view="date-due">
           </div>
         {{/if}}
@@ -65,6 +65,14 @@
     </div>
     {{#if canManage}}
       <div class="ig-admin">
+        {{#if cyoe.isTrigger}}
+        <a href="assignments/{{id}}/edit/?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+        {{/if}}
+        {{#if cyoe.isReleased}}
+        <span class="pill mastery-path-icon" data-tooltip title="{{#t}}Released by Mastery Path{{/t}}">
+          <i class="icon-mastery-path"></i>{{cyoe.releasedLabel}}
+        </span>
+        {{/if}}
         <span class="sis-button" data-view="sis-button"></span>
         <span class="publish-icon" data-view="publish-icon"></span>
         <div class="inline-block">
@@ -110,14 +118,15 @@
               >{{#t}}Move To…{{/t}}</a>
             </li>
             {{/if}}
-            {{#if cyoeEnabled}}
+            {{#if cyoe.isCyoeAble}}
             <li>
               <a
-                href="assignments/{{id}}/edit/#mastery-paths-editor"
+                href="assignments/{{id}}/edit/?return_to={{return_to}}#mastery-paths-editor"
                 class="edit_mastery_paths icon-mastery-path"
                 id="assignment_{{id}}_settings_edit_item_mastery_paths"
                 aria-label="{{#t}}Edit Assignment {{name}} Mastery Paths{{/t}}"
                 data-focus-returns-to="assign_{{id}}_manage_link"
+                title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}"
               >{{#t}}Mastery Paths{{/t}}</a>
             </li>
             {{/if}}

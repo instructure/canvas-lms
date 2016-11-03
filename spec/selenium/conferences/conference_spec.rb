@@ -5,6 +5,7 @@ require_relative '../helpers/public_courses_context'
 describe 'Web conferences' do
   include_context 'in-process server selenium tests'
   include ConferencesCommon
+  include WebMock::API
 
   before(:once) do
     initialize_wimba_conference_plugin
@@ -18,7 +19,10 @@ describe 'Web conferences' do
   before(:each) do
     user_session(@teacher)
     get conferences_index_page
+    stub_request(:get, /wimba\.instructure\.com/)
   end
+
+  after { close_extra_windows }
 
   context 'when creating a conference' do
     it 'invites a subset of users', priority: "1", test_id: 273639 do

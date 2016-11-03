@@ -174,6 +174,16 @@ describe Lti::LtiOutboundAdapter do
     end
   end
 
+  context "link_params" do
+    let(:link_params) {{ext: {lti_assignment_id: "1234"}}}
+
+    it "passes through the secure_parameters when provided" do
+      LtiOutbound::ToolLaunch.expects(:new).with { |options| options[:link_params] == link_params }
+      adapter.prepare_tool_launch(return_url, variable_expander, {link_params: link_params})
+    end
+
+  end
+
   describe "#launch_url" do
     it "returns the launch url from the prepared tool launch" do
       tool_launch = mock('tool launch', url: '/launch/url')

@@ -78,6 +78,8 @@ describe "quizzes log auditing" do
       end
 
       it 'should show that a session had started and that it is has been read', priority: "2", test_id:605108 do
+        scroll_page_to_bottom # the question viewed event is triggered by page scroll
+        wait_for_ajax_requests
         submit_quiz
 
         sub = @quiz.quiz_submissions.where(:user_id => @student).first

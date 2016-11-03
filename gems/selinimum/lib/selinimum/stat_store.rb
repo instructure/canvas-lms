@@ -1,6 +1,6 @@
-gem "aws-sdk", "=1.63.0"
+gem "aws-sdk-v1", "=1.63.0" unless defined? Bundler
 require "json"
-require "aws-sdk"
+require "aws-sdk-v1"
 require "fileutils"
 require "tmpdir"
 require 'yaml'

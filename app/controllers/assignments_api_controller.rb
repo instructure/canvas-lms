@@ -312,6 +312,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "vericite_enabled": {
+#           "description": "Boolean flag indicating whether or not VeriCite has been enabled for the assignment. NOTE: This flag will not appear unless your account has the VeriCite plugin available",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "turnitin_settings": {
 #           "description": "Settings to pass along to turnitin to control what kinds of matches should be considered. originality_report_visibility can be 'immediate', 'after_grading', 'after_due_date', or 'never' exclude_small_matches_type can be null, 'percent', 'words' exclude_small_matches_value: - if type is null, this will be null also - if type is 'percent', this will be a number between 0 and 100 representing match size to exclude as a percentage of the document size. - if type is 'words', this will be number > 0 representing how many words a match must contain for it to be considered NOTE: This flag will not appear unless your account has the Turnitin plugin available",
 #           "$ref": "TurnitinSettings"
@@ -676,7 +681,8 @@ class AssignmentsApiController < ApplicationController
   #   All dates associated with the assignment, if applicable
   # @returns Assignment
   def show
-    @assignment = @context.active_assignments.preload(:assignment_group, :rubric_association, :rubric).find(params[:id])
+    @assignment = @context.active_assignments.preload(:assignment_group, :rubric_association, :rubric)
+                    .api_id(params[:id])
     if authorized_action(@assignment, @current_user, :read)
       return render_unauthorized_action unless @assignment.visible_to_user?(@current_user)
 
@@ -752,6 +758,12 @@ class AssignmentsApiController < ApplicationController
   #   the submission_types array includes "online_upload".
   #   Toggles Turnitin submissions for the assignment.
   #   Will be ignored if Turnitin is not available for the course.
+  #
+  # @argument assignment[vericite_enabled] [Boolean]
+  #   Only applies when the VeriCite plugin is enabled for a course and
+  #   the submission_types array includes "online_upload".
+  #   Toggles VeriCite submissions for the assignment.
+  #   Will be ignored if VeriCite is not available for the course.
   #
   # @argument assignment[turnitin_settings]
   #   Settings to send along to turnitin. See Assignment object definition for
@@ -894,6 +906,12 @@ class AssignmentsApiController < ApplicationController
   #   Toggles Turnitin submissions for the assignment.
   #   Will be ignored if Turnitin is not available for the course.
   #
+  # @argument assignment[vericite_enabled] [Boolean]
+  #   Only applies when the VeriCite plugin is enabled for a course and
+  #   the submission_types array includes "online_upload".
+  #   Toggles VeriCite submissions for the assignment.
+  #   Will be ignored if VeriCite is not available for the course.
+  #
   # @argument assignment[turnitin_settings]
   #   Settings to send along to turnitin. See Assignment object definition for
   #   format.
@@ -993,7 +1011,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @returns Assignment
   def update
-    @assignment = @context.active_assignments.find(params[:id])
+    @assignment = @context.active_assignments.api_id(params[:id])
     if authorized_action(@assignment, @current_user, :update)
       save_and_render_response
     end
@@ -1003,7 +1021,7 @@ class AssignmentsApiController < ApplicationController
 
   def save_and_render_response
     @assignment.content_being_saved_by(@current_user)
-    if update_api_assignment(@assignment, params[:assignment], @current_user, @context)
+    if update_api_assignment(@assignment, strong_params.require(:assignment), @current_user, @context)
       render :json => assignment_json(@assignment, @current_user, session), :status => 201
     else
       errors = @assignment.errors.as_json[:errors]

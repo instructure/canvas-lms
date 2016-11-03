@@ -83,6 +83,7 @@ module Api::V1::Assignment
     end
 
     hash = api_json(assignment, user, session, fields)
+    hash['secure_params'] = assignment.secure_params
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
@@ -105,6 +106,11 @@ module Api::V1::Assignment
     if assignment.context && assignment.context.turnitin_enabled?
       hash['turnitin_enabled'] = assignment.turnitin_enabled
       hash['turnitin_settings'] = turnitin_settings_json(assignment)
+    end
+
+    if assignment.context && assignment.context.vericite_enabled?
+      hash['vericite_enabled'] = assignment.vericite_enabled
+      hash['vericite_settings'] = vericite_settings_json(assignment)
     end
 
     if PluginSetting.settings_for_plugin(:assignment_freezer)
@@ -287,13 +293,21 @@ module Api::V1::Assignment
     settings.slice(*API_ALLOWED_TURNITIN_SETTINGS)
   end
 
+  def vericite_settings_json(assignment)
+    settings = assignment.vericite_settings.with_indifferent_access
+    [:exclude_quoted, :exclude_self_plag, :store_in_index].each do |key|
+      settings[key] = value_to_boolean(settings[key])
+    end
+
+    settings.slice(*API_ALLOWED_VERICITE_SETTINGS)
+  end
+
   API_ALLOWED_ASSIGNMENT_INPUT_FIELDS = %w(
     name
     description
     position
     points_possible
     grading_type
-    submission_types
     allowed_extensions
     due_at
     lock_at
@@ -306,15 +320,13 @@ module Api::V1::Assignment
     peer_review_count
     automatic_peer_reviews
     intra_group_peer_reviews
-    external_tool_tag_attributes
     grade_group_students_individually
     turnitin_enabled
-    turnitin_settings
+    vericite_enabled
     grading_standard_id
     freeze_on_copy
     notify_of_update
     integration_id
-    integration_data
     omit_from_final_grade
   )
 
@@ -330,11 +342,23 @@ module Api::V1::Assignment
     submit_papers_to
   )
 
+  API_ALLOWED_VERICITE_SETTINGS = %w(
+    originality_report_visibility
+    exclude_quoted
+    exclude_self_plag
+    store_in_index
+  )
+
   def update_api_assignment(assignment, assignment_params, user, context = assignment.context)
-    return nil unless assignment_params.is_a?(Hash)
+    raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
 
     old_assignment = assignment.new_record? ? nil : assignment.clone
     old_assignment.id = assignment.id if old_assignment.present?
+
+    if assignment_params[:secure_params] && !old_assignment
+      secure_params = Canvas::Security.decode_jwt assignment_params[:secure_params]
+      assignment.lti_context_id = secure_params[:lti_assignment_id]
+    end
 
     overrides = deserialize_overrides(assignment_params[:assignment_overrides])
     overrides = [] if !overrides && assignment_params.has_key?(:assignment_overrides)
@@ -422,7 +446,7 @@ module Api::V1::Assignment
   end
 
   def update_from_params(assignment, assignment_params, user, context = assignment.context, new_record: false)
-    update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_INPUT_FIELDS)
+    update_params = assignment_params.permit(allowed_assignment_input_fields)
 
     if update_params.has_key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
@@ -484,6 +508,11 @@ module Api::V1::Assignment
       update_params.delete("turnitin_settings")
     end
 
+    if !assignment.context.try(:vericite_enabled?)
+      update_params.delete("vericite_enabled")
+      update_params.delete("vericite_settings")
+    end
+
     # use Assignment#turnitin_settings= to normalize, but then assign back to
     # hash so that it is written with update_params
     if update_params.has_key?("turnitin_settings")
@@ -495,6 +524,13 @@ module Api::V1::Assignment
       end
       turnitin_settings['exclude_value'] = turnitin_settings['exclude_small_matches_value']
       assignment.turnitin_settings = turnitin_settings
+    end
+
+    # use Assignment#vericite_settings= to normalize, but then assign back to
+    # hash so that it is written with update_params
+    if update_params.has_key?("vericite_settings")
+      vericite_settings = update_params.delete("vericite_settings").slice(*API_ALLOWED_VERICITE_SETTINGS)
+      assignment.vericite_settings = vericite_settings
     end
 
     # TODO: allow rubric creation
@@ -580,5 +616,16 @@ module Api::V1::Assignment
     else
       course_assignment_submissions_url(context, assignment, zip: 1)
     end
+  end
+
+  def allowed_assignment_input_fields
+    API_ALLOWED_ASSIGNMENT_INPUT_FIELDS + [
+      'turnitin_settings' => strong_anything,
+      'vericite_settings' => strong_anything,
+      'allowed_extensions' => strong_anything,
+      'integration_data' => strong_anything,
+      'external_tool_tag_attributes' => strong_anything,
+      'submission_types' => strong_anything
+    ]
   end
 end

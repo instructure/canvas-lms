@@ -1,5 +1,6 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/column_types/assignmentGroupColumn'
   'jsx/gradebook/grid/stores/gradingPeriodsStore'
   'jsx/gradebook/grid/stores/assignmentGroupsStore'
@@ -7,7 +8,7 @@ define [
   'helpers/fakeENV'
   'jquery'
   'jquery.ajaxJSON'
-], (React, AssignmentGroupColumn, GradingPeriodsStore, AssignmentGroupsStore, GradebookConstants, fakeENV, $) ->
+], (React, ReactDOM, AssignmentGroupColumn, GradingPeriodsStore, AssignmentGroupsStore, GradebookConstants, fakeENV, $) ->
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
@@ -36,7 +37,7 @@ define [
 
   renderComponent = (props) ->
     element = React.createElement(AssignmentGroupColumn, props)
-    React.render(element, wrapper)
+    ReactDOM.render(element, wrapper)
 
   innerHTML = (component) ->
     component.refs.cell.getDOMNode().innerHTML
@@ -49,7 +50,7 @@ define [
       AssignmentGroupsStore.getInitialState()
       AssignmentGroupsStore.onLoadCompleted(assignmentGroups())
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
       fakeENV.teardown()
 
   test 'mounts on build', ->

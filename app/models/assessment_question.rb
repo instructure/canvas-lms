@@ -18,7 +18,7 @@
 
 class AssessmentQuestion < ActiveRecord::Base
   include Workflow
-  attr_accessible :name, :question_data, :form_question_data
+  strong_params
 
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion'
   has_many :attachments, :as => :context
@@ -215,23 +215,57 @@ class AssessmentQuestion < ActiveRecord::Base
     end
   end
 
-  def create_quiz_question(quiz_id)
-    quiz_questions.new.tap do |qq|
-      qq.write_attribute(:question_data, question_data)
-      qq.quiz_id = quiz_id
-      qq.workflow_state = 'generated'
-      qq.save_without_callbacks
+  def self.find_or_create_quiz_questions(assessment_questions, quiz_id, quiz_group_id, duplicate_index = 0)
+    return [] if assessment_questions.empty?
+
+    # prepopulate version_number
+    current_versions = Version.shard(Shard.shard_for(quiz_id)).
+        where(versionable_type: 'AssessmentQuestion', versionable_id: assessment_questions).
+        group(:versionable_id).
+        maximum(:number)
+    # cache all the known quiz_questions
+    scope = Quizzes::QuizQuestion.
+        shard(Shard.shard_for(quiz_id)).
+        where(quiz_id: quiz_id, workflow_state: 'generated')
+    # we search for nil quiz_group_id and duplicate_index to find older questions
+    # generated before we added proper race condition checking
+    existing_quiz_questions = scope.
+        where(assessment_question_id: assessment_questions,
+              quiz_group_id: [nil, quiz_group_id],
+              duplicate_index: [nil, duplicate_index]).
+        order("id, quiz_group_id NULLS LAST").
+        group_by(&:assessment_question_id)
+
+    assessment_questions.map do |aq|
+      aq.force_version_number(current_versions[aq.id])
+      qq = existing_quiz_questions[aq.id].try(:first)
+      if !qq
+        begin
+          Quizzes::QuizQuestion.transaction(requires_new: true) do
+            qq = aq.create_quiz_question(quiz_id, quiz_group_id, duplicate_index)
+          end
+        rescue ActiveRecord::RecordNotUnique
+          qq = scope.where(assessment_question_id: aq,
+                           quiz_group_id: quiz_group_id,
+                           duplicate_index: duplicate_index).take!
+          qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
+        end
+      else
+        qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
+      end
+      qq
     end
   end
 
-  def find_or_create_quiz_question(quiz_id, exclude_ids=[])
-    query = quiz_questions.where(quiz_id: quiz_id).order(:id)
-    query = query.where('id NOT IN (?)', exclude_ids) if exclude_ids.present?
-
-    if qq = query.first
-      qq.update_assessment_question! self
-    else
-      create_quiz_question(quiz_id)
+  def create_quiz_question(quiz_id, quiz_group_id = nil, duplicate_index = nil)
+    quiz_questions.new.tap do |qq|
+      qq.write_attribute(:question_data, question_data)
+      qq.quiz_id = quiz_id
+      qq.quiz_group_id = quiz_group_id
+      qq.assessment_question = self
+      qq.workflow_state = 'generated'
+      qq.duplicate_index = duplicate_index
+      qq.save_without_callbacks
     end
   end
 

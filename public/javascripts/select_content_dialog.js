@@ -72,7 +72,13 @@ define([
         };
         if($dialog.length == 0) {
           $dialog = $("<div/>", {id: 'resource_selection_dialog', style: 'padding: 0; overflow-y: hidden;'});
-          $dialog.append($("<iframe/>", {id: 'resource_selection_iframe', style: 'width: 800px; height: ' + frameHeight + 'px; border: 0;', src: '/images/ajax-loader-medium-444.gif', borderstyle: '0'}));
+          $dialog.append($("<iframe/>", {
+            id: 'resource_selection_iframe',
+            style: 'width: 800px; height: ' + frameHeight + 'px; border: 0;',
+            src: '/images/ajax-loader-medium-444.gif',
+            borderstyle: '0',
+            tabindex: '0'
+          }));
           $("body").append($dialog.hide());
           $dialog.on("dialogbeforeclose", dialogCancelHandler);
           $dialog

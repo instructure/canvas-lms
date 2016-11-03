@@ -30,11 +30,7 @@ describe BrandableCSS do
         BrandableCSS.remove_instance_variable(:@variables_map_with_image_urls)
       end
       url = "https://test.host/image.png"
-      if CANVAS_RAILS4_0
-        DummyControllerWithCorrectAssetUrls.helpers.stubs(:image_url).returns(url)
-      else
-        ActionController::Base.helpers.stubs(:image_url).returns(url)
-      end
+      ActionController::Base.helpers.stubs(:image_url).returns(url)
       tile_wide = BrandableCSS.all_brand_variable_values["ic-brand-msapplication-tile-wide"]
       expect(tile_wide).to eq url
     end
