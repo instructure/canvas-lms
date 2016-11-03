@@ -20,10 +20,11 @@ development:
   ssl: false
   init_values:
     canvas:
-      signing-secret: somebigsecret
-      encryption-secret: somebigsecret
+      signing-secret: somebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecret
+      encryption-secret: somebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecret
     rich-content-service:
       app-host: rce.docker
+      cdn-host: null
     address-book:
       app-host: http://address-book.docker
       secret: opensesame

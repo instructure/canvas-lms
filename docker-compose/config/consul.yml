@@ -20,8 +20,8 @@ development:
   ssl: false
   init_values:
     canvas:
-      signing-secret: somebigsecret
-      encryption-secret: somebigsecret
+      signing-secret: somebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecret
+      encryption-secret: somebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecret
     rich-content-service:
       app-host: rce.docker
-      cdn-host: rce.docker
+      cdn-host: null
