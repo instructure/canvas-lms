@@ -996,7 +996,8 @@ class CalendarEventsApiController < ApplicationController
     @context_codes = selected_contexts.map(&:asset_string)
     @section_codes = []
     if user
-      @section_codes = user.section_context_codes(@context_codes)
+      is_admin = user.roles(@domain_root_account).include?('admin') # if we're an admin - don't try to figure out which sections we belong to; just include all of them
+      @section_codes = user.section_context_codes(@context_codes, is_admin)
     end
 
     if @type == :event && @start_date && user
