@@ -237,7 +237,7 @@ class AssessmentQuestion < ActiveRecord::Base
         group_by(&:assessment_question_id)
 
     assessment_questions.map do |aq|
-      aq.force_version_number(current_versions[aq.id])
+      aq.force_version_number(current_versions[aq.id] || 0)
       qq = existing_quiz_questions[aq.id].try(:first)
       if !qq
         begin
