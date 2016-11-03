@@ -285,17 +285,15 @@ describe BasicLTI::BasicOutcomes do
         expect(assignment.submissions.where(user_id: @user.id).first.submission_type).to eq 'external_tool'
       end
 
-      it "doesn't create a new submission if there is only a score sent" do
-        submission = assignment.submit_homework(
+      it "sets the submission type to external tool if the existing submission_type is nil" do
+        submission = assignment.grade_student(
           @user,
           {
-            submission_type: "online_text_entry",
-            body: "text data for canvas submission",
             grade: "92%"
-          })
+          }).first
         xml.css('resultData').remove
         BasicLTI::BasicOutcomes.process_request(tool, xml)
-        expect(submission.reload.versions.count).to eq 1
+        expect(submission.reload.submission_type).to eq 'external_tool'
       end
 
       it "creates a new submission if result_data_text is sent" do
