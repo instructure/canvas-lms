@@ -386,6 +386,9 @@ class AppointmentGroupsController < ApplicationController
         @page_title = t('Edit %{title}', {title: @group.title})
         js_env({
           :APPOINTMENT_GROUP_ID => @group.id,
+          :CALENDAR => {
+            MAX_GROUP_CONVERSATION_SIZE: 100,
+          }
         })
         js_bundle :calendar_appointment_group_edit
         css_bundle :calendar_appointment_group_edit

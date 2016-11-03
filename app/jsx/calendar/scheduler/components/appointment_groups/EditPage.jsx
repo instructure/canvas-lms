@@ -8,13 +8,14 @@ define([
   'instructure-ui/ScreenReaderContent',
   'axios',
   './AppointmentGroupList',
+  'compiled/calendar/EventDataSource',
   'compiled/calendar/MessageParticipantsDialog',
   './ContextSelector',
   './TimeBlockSelector',
   'compiled/jquery.rails_flash_notifications',
   'jquery.instructure_forms',
   'jquery.instructure_date_and_time'
-], ($, React, I18n, { default: Breadcrumb, BreadcrumbLink }, { default: Button }, { default: Grid, GridCol, GridRow }, { default: ScreenReaderContent }, axios, AppointmentGroupList, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
+], ($, React, I18n, { default: Breadcrumb, BreadcrumbLink }, { default: Button }, { default: Grid, GridCol, GridRow }, { default: ScreenReaderContent }, axios, AppointmentGroupList, EventDataSource, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
   const parseFormValues = data => ({
     description: data.description,
     location: data.location_name,
@@ -22,7 +23,6 @@ define([
     limitUsersPerSlot: data.participants_per_appointment,
     limitSlotsPerUser: data.max_appointments_per_participant,
     allowStudentsToView: data.participant_visibility === 'protected'
-
   })
 
   const parseTimeData = (appointmentGroup) => {
@@ -46,7 +46,6 @@ define([
 
 
   class EditPage extends React.Component {
-
     static propTypes = {
       appointment_group_id: React.PropTypes.string
     }
@@ -60,28 +59,32 @@ define([
         formValues: {},
         contexts: [],
         isDeleting: false,
-      };
+        eventDataSource: null,
+      }
     }
 
     componentDidMount() {
       axios.get(`/api/v1/appointment_groups/${this.props.appointment_group_id}?include[]=appointments&include[]=child_events`)
-           .then((response) => {
-             const formValues = parseFormValues(response.data)
-             this.setState({
-               formValues,
-               appointmentGroup: response.data,
-             }, () => {
-               // Handle setting some pesky values
-               $('.EditPage__Options-LimitUsersPerSlot', this.optionFields).val(formValues.limitUsersPerSlot);
-               $('.EditPage__Options-LimitSlotsPerUser', this.optionFields).val(formValues.limitSlotsPerUser);
-             })
-           })
-      axios.get('/api/v1/calendar_events/visible_contexts')
-      .then((response) => {
-       this.setState({
-         contexts: response.data.contexts.filter((context) => context.asset_string.match(/^course_/))
+       .then((response) => {
+         const formValues = parseFormValues(response.data)
+         this.setState({
+           formValues,
+           appointmentGroup: response.data,
+         }, () => {
+           // Handle setting some pesky values
+           $('.EditPage__Options-LimitUsersPerSlot', this.optionFields).val(formValues.limitUsersPerSlot);
+           $('.EditPage__Options-LimitSlotsPerUser', this.optionFields).val(formValues.limitSlotsPerUser);
+         })
        })
-      })
+
+      axios.get('/api/v1/calendar_events/visible_contexts')
+        .then((response) => {
+          const contexts = response.data.contexts.filter(context => context.asset_string.match(/^course_/))
+          this.setState({
+            contexts,
+            eventDataSource: new EventDataSource(contexts),
+          })
+        })
     }
 
     setTimeBlocks = (newTimeBlocks = []) => {
@@ -105,17 +108,25 @@ define([
       this.setState({ formValues });
     }
 
+    messageStudents = () => {
+      const messageStudentsDialog = new MessageParticipantsDialog({
+        group: this.state.appointmentGroup,
+        dataSource: this.state.eventDataSource,
+      })
+      messageStudentsDialog.show()
+    }
+
     deleteGroup = () => {
       if (!this.state.isDeleting) {
         this.setState({ isDeleting: true }, () => {
           axios.delete(`/api/v1/appointment_groups/${this.props.appointment_group_id}`)
-           .then(() => {
-             window.location = '/calendar'
-           })
-           .catch(() => {
-             $.flashError(I18n.t('An error ocurred while deleting the appointment group'))
-             this.setState({ isDeleting: false })
-           })
+            .then(() => {
+              window.location = '/calendar'
+            })
+            .catch(() => {
+              $.flashError(I18n.t('An error ocurred while deleting the appointment group'))
+              this.setState({ isDeleting: false })
+            })
         })
       }
     }
@@ -168,12 +179,12 @@ define([
       };
 
       axios.put(url, requestObj)
-           .then(() => {
-             window.location.href = '/calendar?edit_appointment_group_success=1';
-           })
-           .catch(() => {
-             $.flashError(I18n.t('An error ocurred while saving the appointment group'));
-           });
+        .then(() => {
+          window.location.href = '/calendar?edit_appointment_group_success=1';
+        })
+        .catch(() => {
+          $.flashError(I18n.t('An error ocurred while saving the appointment group'));
+        });
     }
 
     render() {
@@ -330,6 +341,7 @@ define([
             </div>
             <div className="ic-Form-control">
               <span className="ic-Label" htmlFor="appointments">{I18n.t('Appointments')}</span>
+              <Button onClick={this.messageStudents} disabled={this.state.appointmentGroup.appointments_count === 0}>{I18n.t('Message Students')}</Button>
               <AppointmentGroupList appointmentGroup={this.state.appointmentGroup} />
             </div>
           </form>
