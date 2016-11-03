@@ -1,44 +1,25 @@
 @import "mixins/blue";
 
-$body-bg-color:                     $ic-color-light;
-$embedded-bg:                       $ic-color-light;
 $layout-modal-bg:                   $ic-color-light;
 $layout-modal-font-color:           $ic-font-color-dark;
-$footer-links-color:                lighten($ic-font-color-dark, 16);
-$footer-links-border-color:         lighten($ic-color-dark, 16);
 
 body {
   min-height: 100vh;
+  background: $ic-color-light;
+  font-weight: 300;
+
   &:not(.is-inside-submission-frame):not(.embedded) {
     min-width: 768px;
-  }
-
-  @if $use_high_contrast { background: white; }
-  @else {
-    background: $ic-color-light;
-    font-weight: 300;
   }
 
   &.no-headers, &.embedded {
     #header, #topbar, #left-side, #breadcrumbs { display: none !important; }
     .ic-app-nav-toggle-and-crumbs { display: none; }
     #footer { display: none; }
-    #wrapper {
-      margin: 0;
-    }
-    #main {
-      margin: 0;
-      border: 0 none;
-      background-color: transparent;
-      box-shadow: none;
-    }
   }
   &.embedded {
-    #application, #wrapper, #main {
+    #application {
       height: 100%;
-    }
-    #main {
-      min-height: 0;
     }
     h2, .h2 {
       @include ui-widget-header-bg-and-text;
@@ -58,7 +39,6 @@ body {
       color: $layout-modal-font-color !important;
       height: auto !important;
     }
-    background: $embedded-bg;
   }
 }
 
@@ -67,11 +47,6 @@ body {
   a:not([href]), a[href="#"], button:not([type]) {
     visibility: hidden !important;
   }
-}
-
-#main {
-  position: relative;
-  z-index: 10;
 }
 
 // **********************************************************************************
@@ -89,21 +64,6 @@ body {
 .with-right-side {
   #right-side-wrapper {
     display: block;
-  }
-  #header-inner {
-    max-width: $right_side_width + $max_main_width;
-  }
-}
-
-.with-right-side.with-left-side {
-  #header-inner {
-    max-width: $right_side_width + $left_side_width + $max_main_width;
-  }
-}
-
-.full-width {
-  #header-inner, #main {
-    max-width: none;
   }
 }
 
@@ -141,23 +101,7 @@ iframe.tool_launch {
   height: 100%;
   border: none;
 }
-// implemented to make new profile page use flex for layout //
-.ic-Layout {
-  display: flex;
-  padding: $ic-sp;
-  box-sizing: border-box;
-  width: 100%;
-}
-.ic-Layout__Primary {
-  flex: 2;
-    @include breakpoint(desktop) {
-    flex: 3;
-  }
-}
-.ic-Layout__Secondary {
-  flex: 1;
-  text-align: right;
-}
+
 #skip_navigation_link {
   @include accessibility-prompt;
   position: absolute;

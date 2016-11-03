@@ -20,11 +20,12 @@
 
 //// Suppress scroll on the body for Theme Editor
 
-html, body, #main { height: 100%; }
+html, body { height: 100%; }
 
 body { overflow: hidden; }
 
-#main {
+.ic-Layout-columns {
+  height: 100%;
   max-width: 100% !important;
   margin-bottom: 0;
   padding-bottom: 0;

@@ -1565,8 +1565,8 @@ body > #ui-datepicker-div {
   }
 }
 
-body.padless-content .ic-layout-contentMain,
-.ic-layout-contentMain.padless {
+body.padless-content .ic-Layout-contentMain,
+.ic-Layout-contentMain.padless {
   #sequence_footer {
     margin-left: 10px;
     margin-right: 10px;
@@ -1689,7 +1689,7 @@ form.user_content_post_form {
   margin: 4px 0;
 }
 
-.with-fixed-bottom .ic-app-main-layout-vertical {
+.with-fixed-bottom .ic-Layout-wrapper {
   padding-bottom: 60px;
   box-sizing: border-box;
 }
