@@ -1,4 +1,4 @@
-FROM instructure/ruby-passenger:2.1
+FROM instructure/ruby-passenger:2.3
 
 USER root
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -

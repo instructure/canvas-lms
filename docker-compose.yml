@@ -47,7 +47,7 @@ kinesis:
 web: &WEB
   build: ./docker-compose
   volumes:
-    - "canvas-gems:/home/docker/.gem/ruby/2.1.0"
+    - "canvas-gems-23:/home/docker/.gem/ruby/2.3.0"
     - ".:/usr/src/app"
   links:
     - consul
