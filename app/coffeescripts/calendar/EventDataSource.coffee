@@ -112,7 +112,11 @@ define [
         delete event.old_context_code
 
       # Split by comma, for the odd case where #contextCode() returns a comma seprated list
-      contextCode = event.contextCode().split(',')[0]
+      possibleContexts = event.contextCode().split(',')
+      okayContexts = possibleContexts.filter((cCode) =>
+        !!@cache.contexts[cCode]
+      )
+      contextCode = okayContexts[0]
       contextInfo = @cache.contexts[contextCode]
 
       contextInfo.events[event.id] = event
