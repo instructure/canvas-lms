@@ -1996,7 +1996,7 @@ class Assignment < ActiveRecord::Base
   def submission_action_string
     if submission_types == "online_quiz"
       t :submission_action_take_quiz, "Take %{title}", :title => title
-    elsif graded?
+    elsif graded? && expects_submission?
       t :submission_action_turn_in_assignment, "Turn in %{title}", :title => title
     else
       t "Complete %{title}", :title => title
