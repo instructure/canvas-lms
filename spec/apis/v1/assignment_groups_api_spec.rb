@@ -115,21 +115,27 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group2',
         'position' => 7,
         'rules' => {},
-        'group_weight' => 0
+        'group_weight' => 0,
+        'sis_source_id' => nil,
+        'integration_data' => {}
       },
       {
         'id' => group1.id,
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'group_weight' => 0
+        'group_weight' => 0,
+        'sis_source_id' => nil,
+        'integration_data' => {}
       },
       {
         'id' => group3.id,
         'name' => 'group3',
         'position' => 12,
         'rules' => {},
-        'group_weight' => 0
+        'group_weight' => 0,
+        'sis_source_id' => nil,
+        'integration_data' => {}
       }
     ]
   end
@@ -166,7 +172,7 @@ describe AssignmentGroupsController, type: :request do
         'assignments' => [
           controller.assignment_json(@a3,@user,session),
           controller.assignment_json(@a4,@user,session, include_discussion_topic: true)
-        ],
+        ]
       },
       {
         'group_weight' => 40,
@@ -178,7 +184,7 @@ describe AssignmentGroupsController, type: :request do
         'assignments' => [
           controller.assignment_json(@a1,@user,session),
           controller.assignment_json(@a2,@user,session)
-        ],
+        ]
       }
     ]
 
@@ -389,7 +395,7 @@ describe AssignmentGroupsController, type: :request do
         'assignments' => [
           controller.assignment_json(a1, @user,session),
           controller.assignment_json(a2, @user,session)
-        ],
+        ]
       }
     ]
 
@@ -430,7 +436,7 @@ describe AssignmentGroupsController, type: :request do
         'assignments' => [
           controller.assignment_json(a1, @user,session, include_all_dates: true),
           controller.assignment_json(a2, @user,session, include_all_dates: true)
-        ],
+        ]
       }
     ]
 
@@ -692,12 +698,49 @@ describe AssignmentGroupsApiController, type: :request do
           params)
       }.to change(AssignmentGroup, :count).by(1)
     end
+
+    it 'should create an assignment_group with integration_data' do
+      params = {'name' => 'Some group 2', 'position' => 1, 'integration_data'=> {'oh'=> 'hello', 'whats' => 'up'}}
+      response = api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
+        controller: 'assignment_groups_api',
+        action: 'create',
+        format: 'json',
+        course_id: @course.id.to_s},
+                      params)
+      expect(response['integration_data']).to eq({'oh'=> 'hello', 'whats' => 'up'})
+    end
+
+    it 'should not create an assignment_group with invalid integration_data and respond with the correct message' do
+      params = {'name' => 'Some group 2', 'position' => 1, 'integration_data'=> 'boo'}
+      expect do
+        api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
+          controller: 'assignment_groups_api',
+          action: 'create',
+          format: 'json',
+          course_id: @course.id.to_s},
+          params)
+      end.to raise_error("Invalid integration data")
+    end
+
+    it 'should not create an assignment_group with invalid integration_data and respond with the correct status code' do
+      params = {'name' => 'Some group 2', 'position' => 1, 'integration_data'=> 'baz'}
+      response = raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
+        controller: 'assignment_groups_api',
+        action: 'create',
+        format: 'json',
+        course_id: @course.id.to_s},
+        params)
+
+      expect(response).to eq(400)
+    end
   end
 
   context '#update' do
     before :once do
       course_with_teacher(active_all: true)
-      @assignment_group = @course.assignment_groups.create!(name: 'Some group', position: 1)
+      @assignment_group = @course.assignment_groups.create!(name: 'Some group',
+                                                            position: 1,
+                                                            integration_data: {:oh => 'hello'})
     end
 
     it 'should update an assignment group' do
@@ -713,6 +756,61 @@ describe AssignmentGroupsApiController, type: :request do
       expect(json['name']).to eq 'A different name'
       @assignment_group.reload
       expect(@assignment_group.name).to eq 'A different name'
+    end
+
+    it 'should update an assignment groups integration_data with valid data' do
+      params = {'integration_data' => {'too' => 'much tuna'}}
+      api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
+        controller: 'assignment_groups_api',
+        action: 'update',
+        format: 'json',
+        course_id: @course.id.to_s,
+        assignment_group_id: @assignment_group.id.to_s},
+        params)
+
+      @assignment_group.reload
+      expect(@assignment_group.integration_data).to eq({:oh=>'hello', :too=>'much tuna'})
+    end
+
+    it 'should update an assignment group without integration_data' do
+      params = {'name' => 'updating name'}
+      api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
+        controller: 'assignment_groups_api',
+        action: 'update',
+        format: 'json',
+        course_id: @course.id.to_s,
+        assignment_group_id: @assignment_group.id.to_s},
+        params)
+
+      @assignment_group.reload
+      expect(@assignment_group.name).to eq 'updating name'
+      expect(@assignment_group.integration_data).to eq({:oh=>'hello'})
+    end
+
+    it 'should not update an assignment groups integration_data with invalid data and return the correct message' do
+      params = {'name' => 'A different name', 'integration_data' => 'too much tuna'}
+      expect do
+        api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
+          controller: 'assignment_groups_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_group_id: @assignment_group.id.to_s},
+          params)
+      end.to raise_error("Invalid integration data")
+    end
+
+    it 'should not update an assignment groups integration_data with invalid data and return the status code' do
+      params = {'name' => 'A different name', 'integration_data' => 'too much tuna'}
+      response = raw_api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
+        controller: 'assignment_groups_api',
+        action: 'update',
+        format: 'json',
+        course_id: @course.id.to_s,
+        assignment_group_id: @assignment_group.id.to_s},
+        params)
+
+      expect(response).to eq(400)
     end
 
     it 'should update rules properly' do

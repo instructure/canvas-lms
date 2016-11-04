@@ -74,6 +74,12 @@ class AssignmentGroupsApiController < ApplicationController
   # @argument group_weight [Float]
   #   The percent of the total grade that this assignment group represents
   #
+  # @argument sis_source_id [String]
+  #   The sis source id of the Assignment Group
+  #
+  # @argument integration_data [Object]
+  #   The integration data of the Assignment Group
+  #
   # @argument rules
   #   The grading rules that are applied within this assignment group
   #   See the Assignment Group object definition for format
@@ -82,7 +88,10 @@ class AssignmentGroupsApiController < ApplicationController
   def create
     @assignment_group = @context.assignment_groups.temp_record
     if authorized_action(@assignment_group, @current_user, :create)
-      updated = update_assignment_group(@assignment_group, strong_params)
+      unless valid_integration_data?(strong_params)
+        return render :json => 'Invalid integration data', :status => :bad_request
+      end
+      updated = update_assignment_group(@assignment_group, strong_params, :create)
       process_assignment_group(updated)
     end
   end
@@ -95,7 +104,10 @@ class AssignmentGroupsApiController < ApplicationController
   # @returns AssignmentGroup
   def update
     if authorized_action(@assignment_group, @current_user, :update)
-      updated = update_assignment_group(@assignment_group, strong_params)
+      unless valid_integration_data?(strong_params)
+        return render :json => 'Invalid integration data', :status => :bad_request
+      end
+      updated = update_assignment_group(@assignment_group, strong_params, :update)
       unless can_update_assignment_group?(@assignment_group)
         return render_unauthorized_action
       end
@@ -151,5 +163,12 @@ class AssignmentGroupsApiController < ApplicationController
     return true if @context.account_membership_allows(@current_user)
     return true unless assignment_group.group_weight_changed? || assignment_group.rules_changed?
     !assignment_group.any_assignment_in_closed_grading_period?
+  end
+
+  private
+
+  def valid_integration_data?(params)
+    integration_data = params['integration_data']
+    integration_data.is_a?(Hash) || integration_data.nil?
   end
 end

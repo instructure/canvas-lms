@@ -68,6 +68,16 @@
 #           "example": 20,
 #           "type": "integer"
 #         },
+#         "sis_source_id": {
+#           "description": "the sis source id of the Assignment Group",
+#           "example": "1234",
+#           "type": "string"
+#         },
+#         "integration_data": {
+#           "description": "the integration data of the Assignment Group",
+#           "example": {"5678": "0954"},
+#           "type": "object"
+#         },
 #         "assignments": {
 #           "description": "the assignments in this Assignment Group (see the Assignment API for a detailed list of fields)",
 #           "example": [],
@@ -184,6 +194,9 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def create
+    unless valid_integration_data?
+      return render :json => 'Invalid integration data', :status => :bad_request
+    end
     @assignment_group = @context.assignment_groups.temp_record(assignment_group_params)
     if authorized_action(@assignment_group, @current_user, :create)
       respond_to do |format|
@@ -200,6 +213,9 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def update
+    unless valid_integration_data?
+      return render :json => 'Invalid integration data', :status => :bad_request
+    end
     @assignment_group = @context.assignment_groups.find(params[:id])
     if authorized_action(@assignment_group, @current_user, :update)
       respond_to do |format|
@@ -243,9 +259,21 @@ class AssignmentGroupsController < ApplicationController
 
   private
 
+  def valid_integration_data?
+    integration_data = assignment_group_params['integration_data']
+    integration_data.is_a?(Hash) || integration_data.nil?
+  end
+
   def assignment_group_params
     strong_params.require(:assignment_group).
-      permit(:assignment_weighting_scheme, :default_assignment_name, :group_weight, :name, :position, :sis_source_id, :rules)
+      permit(:assignment_weighting_scheme,
+             :default_assignment_name,
+             :group_weight,
+             :name,
+             :position,
+             :rules,
+             :sis_source_id,
+             :integration_data => strong_anything)
   end
 
   def include_params
