@@ -68,6 +68,16 @@ describe AssessmentQuestionBank do
       # it's possible but unlikely that shuffled version is same as original
       expect(is_shuffled1 || is_shuffled2).to be_truthy
     end
+
+    it "should pick randomly quiz group questions in the db" do
+      aq_ids = []
+      20.times do
+        aq_ids << @bank.select_for_submission(@quiz.id, nil, 1).first.assessment_question_id
+      end
+      # shouldn't pick the same one over and over again
+      # yes, technically there's a 0.000000000000000001% chance this will fail spontaneously - sue me
+      expect(aq_ids.uniq.count > 1).to be_truthy
+    end
   end
 
   it "should allow user read access through question bank users" do

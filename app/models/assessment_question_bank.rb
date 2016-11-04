@@ -123,7 +123,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   def select_for_submission(quiz_id, quiz_group_id, count, exclude_ids=[], duplicate_index = 0)
     questions = assessment_questions.active
     questions = questions.where.not(id: exclude_ids) unless exclude_ids.empty?
-    questions = questions.order("RANDOM()").limit(count)
+    questions = questions.reorder("RANDOM()").limit(count)
     aqs = questions.to_a
     quiz_questions = AssessmentQuestion.find_or_create_quiz_questions(aqs, quiz_id, quiz_group_id, duplicate_index)
     # it's important that this shuffle come after the db updates, otherwise
