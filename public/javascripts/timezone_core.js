@@ -244,40 +244,40 @@ define([
     // immediately, or the name of a data file to load and then apply
     // asynchronously.
     applyFeature: function(data, name) {
-      function extendConfig (preloadedData) {
-        tz.extendConfiguration(preloadedData, name);
-        return Promise.resolve();
-      }
+      var promise = $.Deferred();
       if (arguments.length > 1) {
         this.preload(name, data);
-        return extendConfig(data);
+        tz.extendConfiguration(data, name);
+        promise.resolve();
+        return promise;
       }
 
       name = data;
-      var preloadedData = this.preload(name);
-      if(preloadedData instanceof Promise) {
-        return preloadedData.then(extendConfig);
-      } else {
-        return extendConfig(preloadedData);
-      }
+      this.preload(name).then(function(preloadedData){
+        tz.extendConfiguration(preloadedData, name);
+        promise.resolve();
+      });
+
+      return promise;
     },
 
     // preload a specific data file without having to actually
     // change the timezone to do it. Future "applyFeature" calls
     // will apply synchronously if their data is already preloaded.
     preload: function(name, data) {
-      if (arguments.length > 1) {
-        return _preloadedData[name] = data;
-      } else if (_preloadedData[name]){
-        return _preloadedData[name];
+      var promise = $.Deferred();
+      if (arguments.length > 1){
+        _preloadedData[name] = data;
+        promise.resolve(data);
+      } else if(_preloadedData[name]){
+        promise.resolve(_preloadedData[name]);
       } else {
-        return new Promise(function(resolve, reject) {
-          require(["vendor/timezone/" + name], function(data){
-            _preloadedData[name] = data;
-            resolve(data);
-          });
+        require(["vendor/timezone/" + name], function(data){
+          _preloadedData[name] = data;
+          promise.resolve(data);
         });
       }
+      return promise;
     },
 
     changeLocale: function(){
