@@ -1,6 +1,19 @@
 require "fileutils"
 
 module SeleniumDriverSetup
+  # WebDriver uses port 7054 (the "locking port") as a mutex to ensure
+  # that we don't launch two Firefox instances at the same time. Each
+  # new instance you create will wait for the mutex before starting
+  # the browser, then release it as soon as the browser is open.
+  #
+  # The default port mutex wait timeout is 45 seconds.
+  # Bump it to 90 seconds as a stopgap for the recent flood of:
+  # `unable to bind to locking port 7054 within 45 seconds`
+  #
+  # TODO: Investigate why it's taking so long to launch Firefox, or
+  #       what process is hogging port 7054.
+  Selenium::WebDriver::Firefox::Launcher::SOCKET_LOCK_TIMEOUT = 90
+
   # Number of recent specs to show in failure pages
   RECENT_SPEC_RUNS_LIMIT = 500
   # Number of identical failures in a row before we abort this worker
