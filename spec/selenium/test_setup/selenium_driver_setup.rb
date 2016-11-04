@@ -12,6 +12,15 @@ module SeleniumDriverSetup
   #
   # TODO: Investigate why it's taking so long to launch Firefox, or
   #       what process is hogging port 7054.
+  module ::Selenium
+    module WebDriver
+      module Firefox
+        class Launcher
+          remove_const(:SOCKET_LOCK_TIMEOUT)
+        end
+      end
+    end
+  end
   Selenium::WebDriver::Firefox::Launcher::SOCKET_LOCK_TIMEOUT = 90
 
   # Number of recent specs to show in failure pages
