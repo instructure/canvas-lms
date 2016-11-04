@@ -360,13 +360,13 @@ module ConditionalRelease
             set[:assignments].map! do |asg|
               assignment = assignments.find { |a| a[:id].to_s == asg[:assignment_id].to_s }
               asg[:model] = assignment
-              asg
-            end
-            set
-          end
-          rule
-        end
-        rules
+              asg if asg[:model].present?
+            end.compact!
+            set if set[:assignments].present?
+          end.compact!
+          rule if rule[:assignment_sets].present?
+        end.compact!
+        rules.compact
       end
 
       def assignment_keys

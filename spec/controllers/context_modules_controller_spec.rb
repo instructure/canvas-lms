@@ -796,13 +796,14 @@ describe ContextModulesController do
       assert_response(:missing)
     end
 
-    it "should return 404 if matching rule is unlocked but has only one assignment set" do
+    it "should return 404 if matching rule is unlocked but has one selected assignment set" do
       user_session(@student)
 
       ConditionalRelease::Service.stubs(:rules_for).returns([
         {
           trigger_assignment: @assg.id,
           locked: false,
+          selected_set_id: 99,
           assignment_sets: [{}],
         }
       ])
@@ -856,6 +857,27 @@ describe ContextModulesController do
       expect(options[0][:setId]).to eq 1
       expect(options[1][:setId]).to eq 2
     end
+
+    it "should show choose page if matching rule is unlocked and has one unselected assignment set" do
+      user_session(@student)
+
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: @assg.id,
+          locked: false,
+          assignment_sets: [{ id: 1, assignments: []}],
+        }
+      ])
+
+      get 'choose_mastery_path', :course_id => @course.id, :id => @item.id
+      assert_response(:success)
+      mastery_path_data = controller.js_env[:CHOOSE_MASTERY_PATH_DATA]
+      expect(mastery_path_data).to include({
+        selectedOption: nil
+      })
+      expect(mastery_path_data[:options].length).to eq 1
+    end
+
 
     it "should show choose page if matches a rule that is unlocked and has more than two assignment sets even if multiple rules are present" do
       user_session(@student)

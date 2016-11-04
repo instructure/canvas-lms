@@ -455,10 +455,11 @@ describe ConditionalRelease::Service do
 
     before(:once) do
       course_with_student_logged_in
-      assignment_model course: @course
+      @a1, @a2, @a3 = 3.times.map { assignment_model course: @course }
     end
 
     def expect_cyoe_request(code, assignments = nil)
+      a3 = @a3
       response = stub() do
         expects(:code).returns(code)
         unless assignments.nil?
@@ -468,7 +469,8 @@ describe ConditionalRelease::Service do
           end
           expects(:body).returns([
             { id: 1, trigger_assignment: 2, assignment_sets: [
-              { id: 11, assignments: assignments_json }
+              { id: 11, assignments: assignments_json },
+              { id: 12, assignments: [{ id: a3.id, assignment_id: a3.id }]}
             ]}
           ].to_json)
         end
@@ -476,32 +478,54 @@ describe ConditionalRelease::Service do
       CanvasHttp.expects(:post).once.returns(response)
     end
 
+    let(:rules) { Service.rules_for(@course, @student, [], nil) }
+    let(:assignments0) { rules[0][:assignment_sets][0][:assignments] }
+    let(:models0) { assignments0.map{|a| a[:model]} }
+
     it 'returns a list of rules' do
-      expect_cyoe_request '200', @a
-      rules = Service.rules_for(@course, @student, [], nil)
+      expect_cyoe_request '200', @a1
       expect(rules.length > 0)
-      assignment = rules[0][:assignment_sets][0][:assignments][0]
-      expect(assignment[:model]).to eq @a
+      expect(models0).to eq [@a1]
+    end
+
+    it 'filters missing assignments from an assignment set' do
+      expect_cyoe_request '200', [@a1, @a2, @a3]
+      @a1.destroy!
+      expect(models0).to eq [@a2, @a3]
+    end
+
+    it 'filters assignment sets with no assignments' do
+      expect_cyoe_request '200', [@a1, @a2]
+      @a1.destroy!
+      @a2.destroy!
+      expect(rules[0][:assignment_sets].length).to eq 1
+      expect(models0).to eq [@a3]
+    end
+
+    it 'filters rules with no follow on assignments' do
+      expect_cyoe_request '200', [@a1, @a2]
+      @a1.destroy!
+      @a2.destroy!
+      @a3.destroy!
+      expect(rules).to eq []
     end
 
     it 'handles an http error with logging and defaults' do
       expect_cyoe_request '404'
       Canvas::Errors.expects(:capture).with(instance_of(ConditionalRelease::ServiceError), anything)
-      rules = Service.rules_for(@course, @student, [], nil)
       expect(rules).to eq []
     end
 
     it 'handles a network exception with logging and defaults' do
       CanvasHttp.expects(:post).throws('something terrible')
       Canvas::Errors.expects(:capture).with(instance_of(ConditionalRelease::ServiceError), anything)
-      rules = Service.rules_for(@course, @student, [], nil)
       expect(rules).to eq []
     end
 
     context 'caching' do
       it 'uses the cache' do
         enable_cache do
-          expect_cyoe_request '200', @a
+          expect_cyoe_request '200', @a1
           Service.rules_for(@course, @student, [], nil)
           Service.rules_for(@course, @student, [], nil)
         end
@@ -509,25 +533,25 @@ describe ConditionalRelease::Service do
 
       it 'does not use the cache if cache cleared manually' do
         enable_cache do
-          expect_cyoe_request '200', @a
+          expect_cyoe_request '200', @a1
           Service.rules_for(@course, @student, [], nil)
 
           Service.clear_rules_cache_for(@course, @student)
 
-          expect_cyoe_request '200', @a
+          expect_cyoe_request '200', @a1
           Service.rules_for(@course, @student, [], nil)
         end
       end
 
       it 'does not use the cache if assignments updated' do
         enable_cache do
-          expect_cyoe_request '200', @a
+          expect_cyoe_request '200', @a1
           Service.rules_for(@course, @student, [], nil)
 
-          @a.title = 'updated'
-          @a.save!
+          @a1.title = 'updated'
+          @a1.save!
 
-          expect_cyoe_request '200', @a
+          expect_cyoe_request '200', @a1
           Service.rules_for(@course, @student, [], nil)
         end
       end
