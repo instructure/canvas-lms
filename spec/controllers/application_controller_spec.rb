@@ -791,3 +791,30 @@ describe WikiPagesController do
     end
   end
 end
+
+describe CoursesController do
+  describe "set_js_wiki_data" do
+    before :each do
+      course_with_teacher_logged_in :active_all => true
+      @course.default_view = "wiki"
+      @course.show_announcements_on_home_page = true
+      @course.home_page_announcement_limit = 5
+      @course.save!
+      @course.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+    end
+
+    it "should populate js_env with course_home setting" do
+      controller.instance_variable_set(:@context, @course)
+      get 'show', id: @course.id
+      expect(controller.js_env).to include(:COURSE_HOME)
+    end
+
+    it "should populate js_env with setting for show_announcements flag" do
+      controller.instance_variable_set(:@context, @course)
+      get 'show', id: @course.id
+      expect(controller.js_env).to include(:SHOW_ANNOUNCEMENTS, :ANNOUNCEMENT_LIMIT)
+      expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
+      expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(5)
+    end
+  end
+end

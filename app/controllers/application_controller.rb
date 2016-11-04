@@ -1967,6 +1967,11 @@ class ApplicationController < ActionController::Base
       hash[:COURSE_TITLE] = @context.name
     end
 
+    if opts[:show_announcements]
+      hash[:SHOW_ANNOUNCEMENTS] = true
+      hash[:ANNOUNCEMENT_LIMIT] = @context.home_page_announcement_limit
+    end
+
     if @page
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true)
       hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? StringifyIds.stringify_id(current_version.number) : nil

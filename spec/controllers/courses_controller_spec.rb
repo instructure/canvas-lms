@@ -789,6 +789,18 @@ describe CoursesController do
         expect(controller.js_env[:COURSE_TITLE]).to eql @course1.name
       end
 
+      it "should work for wiki view with home page announcements enabled" do
+        @course1.default_view = "wiki"
+        @course1.show_announcements_on_home_page = true
+        @course1.home_page_announcement_limit = 3
+        @course1.save!
+        @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+        get 'show', :id => @course1.id
+        expect(controller.js_env[:COURSE_HOME]).to be_truthy
+        expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
+        expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(3)
+      end
+
       it "should work for syllabus view" do
         @course1.default_view = "syllabus"
         @course1.save

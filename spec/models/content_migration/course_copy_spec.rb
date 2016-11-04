@@ -375,6 +375,8 @@ describe ContentMigration do
       @copy_from.allow_student_forum_attachments = false
       @copy_from.default_wiki_editing_roles = 'teachers'
       @copy_from.allow_student_organized_groups = false
+      @copy_from.show_announcements_on_home_page = false
+      @copy_from.home_page_announcement_limit = nil
       @copy_from.default_view = 'modules'
       @copy_from.open_enrollment = true
       @copy_from.storage_quota = 444

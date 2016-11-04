@@ -77,7 +77,9 @@ class Course < ActiveRecord::Base
                   :public_syllabus_to_auth,
                   :course_format,
                   :time_zone,
-                  :organize_epub_by_content_type
+                  :organize_epub_by_content_type,
+                  :show_announcements_on_home_page,
+                  :home_page_announcement_limit
 
   time_zone_attribute :time_zone
   def time_zone
@@ -2211,7 +2213,8 @@ class Course < ActiveRecord::Base
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
       :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
-      :organize_epub_by_content_type]
+      :organize_epub_by_content_type, :show_announcements_on_home_page,
+      :home_page_announcement_limit ]
   end
 
   def set_course_dates_if_blank(shift_options)

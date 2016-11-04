@@ -1194,6 +1194,12 @@ class CoursesController < ApplicationController
   # @argument restrict_student_future_view [Boolean]
   #   Restrict students from viewing courses before start date
   #
+  # @argument show_announcements_on_home_page [Boolean]
+  #   Show the most recent announcements on the Course home page (if a Wiki, defaults to five announcements, configurable via home_page_announcement_limit)
+  #
+  # @argument home_page_announcement_limit [Integer]
+  #   Limit the number of announcements on the home page if enabled via show_announcements_on_home_page
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
   #     -X PUT \
@@ -1215,7 +1221,9 @@ class CoursesController < ApplicationController
       :hide_distribution_graphs,
       :lock_all_announcements,
       :restrict_student_past_view,
-      :restrict_student_future_view
+      :restrict_student_future_view,
+      :show_announcements_on_home_page,
+      :home_page_announcement_limit
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
     @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
@@ -1612,7 +1620,7 @@ class CoursesController < ApplicationController
         @wiki = @context.wiki
         @page = @wiki.front_page
         set_js_rights [:wiki, :page]
-        set_js_wiki_data :course_home => true
+        set_js_wiki_data :course_home => true, :show_announcements => @context.show_announcements_on_home_page?
         @padless = true
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))

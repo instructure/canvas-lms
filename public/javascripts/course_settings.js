@@ -430,5 +430,9 @@ define([
       });
       $('#customize_course_visibility select').val($(current).val())
     });
+
+    $("#course_show_announcements_on_home_page").change(function(event) {
+      $("#course_home_page_announcement_limit").prop("disabled", !$(this).prop('checked'))
+    });
   });
 });

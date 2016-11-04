@@ -3022,6 +3022,8 @@ describe CoursesController, type: :request do
         'lock_all_announcements' => false,
         'restrict_student_past_view' => false,
         'restrict_student_future_view' => false,
+        'show_announcements_on_home_page' => false,
+        'home_page_announcement_limit' => nil,
         'image_url' => nil,
         'image_id' => nil,
         'image' => nil
@@ -3045,7 +3047,9 @@ describe CoursesController, type: :request do
         :hide_final_grades => true,
         :lock_all_announcements => true,
         :restrict_student_past_view => true,
-        :restrict_student_future_view => true
+        :restrict_student_future_view => true,
+        :show_announcements_on_home_page => false,
+        :home_page_announcement_limit => nil
       })
       expect(json).to eq({
         'allow_student_discussion_topics' => false,
@@ -3059,6 +3063,8 @@ describe CoursesController, type: :request do
         'lock_all_announcements' => true,
         'restrict_student_past_view' => true,
         'restrict_student_future_view' => true,
+        'show_announcements_on_home_page' => false,
+        'home_page_announcement_limit' => nil,
         'image_url' => nil,
         'image_id' => nil,
         'image' => nil
@@ -3071,6 +3077,8 @@ describe CoursesController, type: :request do
       expect(@course.hide_distribution_graphs).to eq true
       expect(@course.hide_final_grades).to eq true
       expect(@course.lock_all_announcements).to eq true
+      expect(@course.show_announcements_on_home_page).to eq false
+      expect(@course.home_page_announcement_limit).to be_falsey
     end
   end
 

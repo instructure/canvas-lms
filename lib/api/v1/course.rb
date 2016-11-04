@@ -37,6 +37,8 @@ module Api::V1::Course
     settings[:lock_all_announcements] = course.lock_all_announcements?
     settings[:restrict_student_past_view] = course.restrict_student_past_view?
     settings[:restrict_student_future_view] = course.restrict_student_future_view?
+    settings[:show_announcements_on_home_page] = course.show_announcements_on_home_page?
+    settings[:home_page_announcement_limit] = course.home_page_announcement_limit
     settings[:image_url] = course.image_url
     settings[:image_id] = course.image_id
     settings[:image] = course.image
