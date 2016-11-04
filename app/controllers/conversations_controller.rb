@@ -427,7 +427,7 @@ class ConversationsController < ApplicationController
   end
 
   # @API Get a single conversation
-  # Returns information for a single conversation. Response includes all
+  # Returns information for a single conversation for the current user. Response includes all
   # fields that are present in the list/index action as well as messages
   # and extended participant information.
   #
