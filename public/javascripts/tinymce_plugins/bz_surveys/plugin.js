@@ -43,6 +43,17 @@ tinymce.create('tinymce.plugins.BZSurveys', {
       label.appendChild(ta);
       div.appendChild(label);
 
+      var i = document.createElement("button");
+      i.setAttribute("type", "button");
+      i.className = "submit";
+      i.innerHTML = "Remove Survey";
+      i.onclick = function() {
+            callback("", []);
+            dialog.parentNode.removeChild(dialog);
+      };
+      div.appendChild(i);
+
+
 
       var i = document.createElement("button");
       i.setAttribute("type", "button");
@@ -74,6 +85,9 @@ tinymce.create('tinymce.plugins.BZSurveys', {
 	if(existing) {
 		ed.dom.remove("instant-survey");
 	}
+
+	if(options.length == 0)
+		return;
 
 	var form = document.createElement("form");
 	form.setAttribute("id", "instant-survey");
