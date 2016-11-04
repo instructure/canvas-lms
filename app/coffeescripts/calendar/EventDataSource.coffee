@@ -111,7 +111,8 @@ define [
         delete @cache.contexts[event.old_context_code].events[event.id]
         delete event.old_context_code
 
-      contextCode = event.contextCode()
+      # Split by comma, for the odd case where #contextCode() returns a comma seprated list
+      contextCode = event.contextCode().split(',')[0]
       contextInfo = @cache.contexts[contextCode]
 
       contextInfo.events[event.id] = event
