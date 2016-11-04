@@ -39,6 +39,7 @@ module Canvas
 
       def paths(cache_busting = false)
         @paths ||= {
+          ember: 'bower/ember/ember',
           :common => 'compiled/bundles/common',
           :jqueryui => 'vendor/jqueryui',
           handlebars: 'symlink_to_node_modules/handlebars/dist/handlebars.runtime',
@@ -119,7 +120,7 @@ module Canvas
       def shims
         <<-JS.gsub(%r{\A +|^ {8}}, '')
           {
-            'bower/ember/ember': {
+            'ember': {
               deps: ['jquery', 'handlebars'],
               exports: 'Ember'
             },

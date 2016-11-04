@@ -24,6 +24,10 @@ testWebpackConfig.output.path = __dirname + '/spec/javascripts/webpack';
 testWebpackConfig.output.pathinfo = true;
 testWebpackConfig.output.filename = "[name].bundle.test.js";
 testWebpackConfig.plugins = [
+
+  // expose a 'qunit' global variable to any file that uses it
+  new webpack.ProvidePlugin({qunit: 'qunitjs'}),
+
   new I18nPlugin(),
   new ClientAppsPlugin(),
   new CompiledReferencePlugin(),
@@ -32,32 +36,31 @@ testWebpackConfig.plugins = [
   new webpack.IgnorePlugin(/package.json/)
 ];
 
-testWebpackConfig.resolve.alias.qunit = "qunitjs/qunit/qunit.js";
+testWebpackConfig.resolve.alias.qunit = 'qunitjs';
 testWebpackConfig.resolve.root.push(__dirname + '/spec/coffeescripts');
 testWebpackConfig.resolve.root.push(__dirname + '/spec/javascripts/support');
 
-testWebpackConfig.module.loaders.push({
-  test: /\/spec\/coffeescripts\//,
-  loaders: ["qunitDependencyLoader"]
-});
-
 // Some plugins use a special spec_canvas path for their specs
-testWebpackConfig.module.loaders.push({
-  test: /\/spec_canvas\/coffeescripts\//,
+testWebpackConfig.module.loaders.unshift({
+  test: [
+    /\/spec\/coffeescripts\//,
+    /\/spec_canvas\/coffeescripts\//,
+    /\/spec\/javascripts\/jsx\//,
+    /\/ember\/.*\/tests\//
+  ],
+
+  // Our spec files expect qunit's global `test`, `module`, `asyncTest` and `start` variables.
+  // These imports loaders make it so they are avalable as local variables
+  // inside of a closure, without truly making them globals.
+  // We should get rid of this and just change our actual source to s/test/qunit.test/ and s/module/qunit.module/
   loaders: [
-    'qunitDependencyLoader'
+    'imports?test=>qunit.test',
+    'imports?asyncTest=>qunit.asyncTest',
+    'imports?start=>qunit.start',
+    "qunitDependencyLoader"
   ]
 });
 
-testWebpackConfig.module.loaders.push({
-  test: /\/spec\/javascripts\/jsx\//,
-  loaders: ["qunitJsxDependencyLoader"]
-});
-
-testWebpackConfig.module.loaders.push({
-  test: /\/ember\/.*\/tests\//,
-  loaders: ["qunitDependencyLoader"]
-});
 
 testWebpackConfig.module.postLoaders = [{
   test: /(jsx.*(\.js$|\.jsx$)|\.coffee$|public\/javascripts\/.*\.js$)/,

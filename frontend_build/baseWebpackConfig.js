@@ -22,6 +22,7 @@ module.exports = {
   },
   resolve: {
     alias: {
+      'old_version_of_react_used_by_canvas_quizzes_client_apps': __dirname + '/../client_apps/canvas_quizzes/vendor/js/old_version_of_react_used_by_canvas_quizzes_client_apps',
       handlebars: __dirname + '/../node_modules/handlebars/dist/handlebars.runtime',
       'node_modules-version-of-backbone': __dirname + '/../node_modules/backbone',
       'node_modules-version-of-moment': __dirname + '/../node_modules/moment',
@@ -141,7 +142,6 @@ module.exports = {
       {
         test: /\.hbs$/,
         include: [
-          path.resolve(__dirname, "../app/coffeescript/ember"),
           /app\/coffeescripts\/ember\/screenreader_gradebook\/templates\//,
           /app\/coffeescripts\/ember\/shared\/templates\//
         ],
