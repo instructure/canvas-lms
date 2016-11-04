@@ -105,7 +105,8 @@ define [
           @appointmentGroupDetailsForm = new EditAppointmentGroupDetails($('#edit_appointment_group_form_holder'),
                                                                          group,
                                                                          _.filter(@event.allPossibleContexts, (c) -> c.can_create_appointment_groups),
-                                                                         @closeCB)
+                                                                         @closeCB,
+                                                                         @event)
           dialog.find("#edit_appointment_group_form_holder").data('form-widget', @appointmentGroupDetailsForm)
 
         @setupTabs()
