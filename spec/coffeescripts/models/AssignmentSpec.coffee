@@ -241,7 +241,9 @@ define [
     deepEqual assignment.assignmentGroupId(), 12
     deepEqual assignment.get('assignment_group_id'), 12
 
-  module "Assignment#canDelete"
+  module "Assignment#canDelete",
+    setup: -> fakeENV.setup()
+    teardown: -> fakeENV.teardown()
 
   test "returns false if 'frozen' is true", ->
     assignment = new Assignment name: 'foo'
@@ -249,11 +251,13 @@ define [
     deepEqual assignment.canDelete(), false
 
   test "returns false if 'has_due_date_in_closed_grading_period' is true", ->
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
     assignment = new Assignment name: 'foo'
     assignment.set 'has_due_date_in_closed_grading_period', true
     deepEqual assignment.canDelete(), false
 
   test "returns true if 'frozen' and 'has_due_date_in_closed_grading_period' are false", ->
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
     assignment = new Assignment name: 'foo'
     assignment.set 'frozen', false
     assignment.set 'has_due_date_in_closed_grading_period', false
@@ -262,11 +266,13 @@ define [
   module "Assignment#hasDueDateInClosedGradingPeriod"
 
   test "returns the value of 'has_due_date_in_closed_grading_period'", ->
+    fakeENV.setup(MULTIPLE_GRADING_PERIODS_ENABLED: true)
     assignment = new Assignment name: 'foo'
     assignment.set 'has_due_date_in_closed_grading_period', true
     deepEqual assignment.hasDueDateInClosedGradingPeriod(), true
     assignment.set 'has_due_date_in_closed_grading_period', false
     deepEqual assignment.hasDueDateInClosedGradingPeriod(), false
+    fakeENV.teardown()
 
   module "Assignment#gradingType as a setter"
 

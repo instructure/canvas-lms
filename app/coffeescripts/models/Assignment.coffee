@@ -102,7 +102,7 @@ define [
       @get('frozen_attributes') || []
 
     hasDueDateInClosedGradingPeriod: =>
-      @get('has_due_date_in_closed_grading_period')
+      !!ENV.MULTIPLE_GRADING_PERIODS_ENABLED && @get('has_due_date_in_closed_grading_period')
 
     gradingType: (gradingType) =>
       return @get('grading_type') || 'points' unless gradingType

@@ -120,13 +120,10 @@ define [
 
       @snapshot = tz.snapshot()
       I18nStubber.pushFrame()
+      fakeENV.setup()
 
     teardown: ->
-      ENV.VALID_DATE_RANGE = {
-        start_at: {date: null, date_context: null}
-        end_at: {date: null, date_context: null}
-      }
-
+      fakeENV.teardown()
       tz.restore(@snapshot)
       I18nStubber.popFrame()
 
@@ -238,20 +235,17 @@ define [
     equal view.disableDueAt(), true
 
   test "disableDueAt returns false if the user is an admin", ->
-    fakeENV.setup()
-    ENV.current_user_roles = ["admin"]
     view = createView(@assignment1)
+    @stub(view, 'currentUserIsAdmin', -> true)
     equal view.disableDueAt(), false
-    fakeENV.teardown()
 
-  test "disableDueAt returns true if the user is not an admin " +
-  "and the assignment has a due date in a closed grading period", ->
-    fakeENV.setup()
-    ENV.current_user_roles = ["teacher"]
+  test "disableDueAt returns true if the user is not an admin and the assignment has " +
+  "a due date in a closed grading period", ->
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
     view = createView(@assignment1)
+    @stub(view, 'currentUserIsAdmin', -> false)
     @stub(view.model, 'hasDueDateInClosedGradingPeriod', -> true)
     equal view.disableDueAt(), true
-    fakeENV.teardown()
 
   test "openAgain doesn't add datetime for multiple dates", ->
     @stub(DialogFormView.prototype, "openAgain", ->)
@@ -293,9 +287,7 @@ define [
     equal errors["name"][0]["message"], "Name is required!"
 
   test "requires due_at to be in an open grading period if it is being changed and the user is a teacher", ->
-    fakeENV.setup()
     ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
-    ENV.current_user_roles = ["teacher"]
     ENV.active_grading_periods = [{
       id: "1"
       start_date: "2103-07-01T06:00:00Z"
@@ -307,18 +299,16 @@ define [
     }]
 
     view = createView(@assignment1)
+    @stub(view, 'currentUserIsAdmin', -> false)
     data =
       name: "Foo"
       due_at: "2103-08-15T06:00:00Z"
     errors = view.validateBeforeSave(data, [])
 
     equal errors["due_at"][0]["message"], "Due date cannot fall in a closed grading period"
-    fakeENV.teardown()
 
   test "does not require due_at to be in an open grading period if it is being changed and the user is an admin", ->
-    fakeENV.setup()
     ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
-    ENV.current_user_roles = ["admin"]
     ENV.active_grading_periods = [{
       id: "1"
       start_date: "2103-07-01T06:00:00Z"
@@ -330,13 +320,13 @@ define [
     }]
 
     view = createView(@assignment1)
+    @stub(view, 'currentUserIsAdmin', -> true)
     data =
       name: "Foo"
       due_at: "2103-08-15T06:00:00Z"
     errors = view.validateBeforeSave(data, [])
 
     notOk errors["due_at"]
-    fakeENV.teardown()
 
   test "requires a name < 255 chars to save assignment", ->
     view = createView(@assignment3)
