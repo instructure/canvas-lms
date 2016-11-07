@@ -3,7 +3,8 @@ define [
   'jsx/gradebook2/DataLoader'
   'underscore'
   'timezone'
-], (Gradebook, DataLoader, _, tz) ->
+  'compiled/SubmissionDetailsDialog'
+], (Gradebook, DataLoader, _, tz, SubmissionDetailsDialog) ->
 
   module "Gradebook2#gradeSort"
 
@@ -187,3 +188,69 @@ define [
     @setupShowNotesColumn(teacherNotesNotYetLoaded: false)
     @showNotesColumn()
     ok @loadNotes.notCalled
+
+  module 'Gradebook#cellCommentClickHandler',
+    setup: ->
+      @cellCommentClickHandler = Gradebook.prototype.cellCommentClickHandler
+      @assignments = {
+        '61890000000013319': { name: 'Assignment #1' }
+      }
+      @student = @stub().returns({})
+      @options = {}
+
+      @fixture = document.createElement('div')
+      @fixture.className = 'editable'
+      @fixture.setAttribute('data-assignment-id', '61890000000013319')
+      @fixture.setAttribute('data-user-id', '61890000000013319')
+
+      @fixtureParent = document.getElementById('fixtures')
+      @fixtureParent.appendChild(@fixture)
+
+      @submissionDialogArgs = undefined
+
+      @fakeSubmissionDetailsDialog = @stub SubmissionDetailsDialog, 'open', =>
+        @submissionDialogArgs = arguments
+
+      @event = {
+        preventDefault: @stub(),
+        currentTarget: @fixture
+      }
+      @grid = {
+        getActiveCellNode: @stub().returns(@fixture)
+      }
+
+    teardown: ->
+      @fixtureParent.innerHTML = ""
+      @fixture = undefined
+      @fakeSubmissionDetailsDialog.restore()
+
+  test 'when not editable, returns false if the active cell node has the "cannot_edit" class', ->
+    @fixture.className = 'cannot_edit'
+
+    result = @cellCommentClickHandler(@event)
+
+    equal result, false
+    ok @event.preventDefault.called
+
+  test 'when editable, removes the "editable" class from the active cell', ->
+    @cellCommentClickHandler(@event)
+
+    equal '', @fixture.className
+    ok @event.preventDefault.called
+
+  test 'when editable, calls @student with the user id as a string', ->
+    @cellCommentClickHandler(@event)
+
+    ok @student.calledWith('61890000000013319')
+
+  test 'when editable, calls SubmissionDetailsDialog', ->
+    @cellCommentClickHandler(@event)
+
+    expectedArguments = {
+      0: { name: 'Assignment #1' },
+      1: {},
+      2: {}
+    }
+
+    ok @fakeSubmissionDetailsDialog.called
+    deepEqual expectedArguments, @submissionDialogArgs

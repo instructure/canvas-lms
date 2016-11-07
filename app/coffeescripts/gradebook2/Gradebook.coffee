@@ -845,6 +845,23 @@ define [
 
       @grid.getEditorLock().commitCurrentEdit()
 
+    cellCommentClickHandler: (event) ->
+      event.preventDefault()
+      return false if $(@grid.getActiveCellNode()).hasClass("cannot_edit")
+      currentTargetElement = $(event.currentTarget)
+      # Access these data attributes individually instead of using currentTargetElement.data()
+      # so they stay strings.  Strange things have happened here with long numbers:
+      # parseInt("61890000000013319") = 61890000000013320
+      data =
+        assignmentId: currentTargetElement.attr('data-assignment-id'),
+        userId: currentTargetElement.attr('data-user-id')
+      $(@grid.getActiveCellNode()).removeClass('editable')
+      assignment = @assignments[data.assignmentId]
+      student = @student(data.userId)
+      opts = @options
+
+      SubmissionDetailsDialog.open assignment, student, opts
+
     onGridInit: () ->
       tooltipTexts = {}
       # TODO: this "if @spinner" crap is necessary because the outcome
@@ -875,11 +892,7 @@ define [
             $(this).removeClass('hover focus')
             $(this).find('div.gradebook-tooltip').removeClass('first-row')
         .delegate '.gradebook-cell-comment', 'click.gradebook', (event) =>
-          event.preventDefault()
-          return false if $(@grid.getActiveCellNode()).hasClass("cannot_edit")
-          data = $(event.currentTarget).data()
-          $(@grid.getActiveCellNode()).removeClass('editable')
-          SubmissionDetailsDialog.open @assignments[data.assignmentId], @student(data.userId.toString()), @options
+          @cellCommentClickHandler(event)
         .delegate '.minimized',
           'mouseenter' : @hoverMinimizedCell,
           'mouseleave' : @unhoverMinimizedCell
