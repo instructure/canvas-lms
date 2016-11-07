@@ -120,6 +120,8 @@
     "webpack-test": "NODE_ENV=test webpack --progress --color --config webpack.test.config.js",
     "webpack-test-ember": "NODE_ENV=test WEBPACK_TEST_BUNDLE=ember webpack --progress --color --config webpack.test.config.js",
     "webpack-test-watch": "NODE_ENV=test webpack --progress --color --watch --config webpack.test.config.js",
-    "webpack-production": "NODE_ENV=production webpack --progress --color --config webpack.production.config.js"
+    "webpack-production": "NODE_ENV=production webpack --progress --color --config webpack.production.config.js",
+    "jspec": "./spec/jspec.sh",
+    "jspec-watch": "./spec/jspec.sh --watch"
   }
 }
