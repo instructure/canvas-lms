@@ -51,7 +51,12 @@ class CrocodocSessionsController < ApplicationController
 
   rescue HmacHelper::Error
     render :text => 'unauthorized', :status => :unauthorized
+  rescue Canvas::TimeoutCutoff
+    Rails.logger.error("redirect user to error page due to timeout protection")
+    render :text => "Service is currently unavailable. Try again later.",
+           :status => :service_unavailable
   rescue Timeout::Error
+    Rails.logger.error("redirect user to error page due to timeout")
     render :text => "Service is currently unavailable. Try again later.",
            :status => :service_unavailable
   end
