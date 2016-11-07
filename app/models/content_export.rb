@@ -26,9 +26,11 @@ class ContentExport < ActiveRecord::Base
   has_one :epub_export
   has_a_broadcast_policy
   serialize :settings
-  attr_accessible :context, :export_type, :user, :selected_content, :progress
+
+  strong_params
 
   attr_writer :master_migration
+
   validates_presence_of :context_id, :workflow_state
 
   has_one :job_progress, :class_name => 'Progress', :as => :context

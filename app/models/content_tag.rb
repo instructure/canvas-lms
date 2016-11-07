@@ -54,7 +54,7 @@ class ContentTag < ActiveRecord::Base
 
   acts_as_list :scope => :context_module
 
-  attr_accessible :learning_outcome, :context, :tag_type, :mastery_score, :content_asset_string, :content, :title, :indent, :position, :url, :new_tab, :content_type
+  strong_params
 
   set_policy do
     given {|user, session| self.context && self.context.grants_right?(user, session, :manage_content)}

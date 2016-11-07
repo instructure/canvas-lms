@@ -17,7 +17,7 @@
 #
 
 class Canvadoc < ActiveRecord::Base
-  attr_accessible :document_id, :process_state, :preferred_plugin_course_id
+  strong_params
 
   belongs_to :attachment
 

@@ -19,7 +19,7 @@
 require 'crocodoc'
 
 class CrocodocDocument < ActiveRecord::Base
-  attr_accessible :uuid, :process_state, :attachment_id
+  strong_params
 
   belongs_to :attachment
 

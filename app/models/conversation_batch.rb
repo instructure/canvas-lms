@@ -13,7 +13,7 @@ class ConversationBatch < ActiveRecord::Base
 
   scope :in_progress, -> { where(:workflow_state => ['created', 'sending']) }
 
-  attr_accessible
+  strong_params
   attr_accessor :mode
 
   attr_reader :conversations

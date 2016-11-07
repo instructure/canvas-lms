@@ -35,7 +35,7 @@ class ConversationMessage < ActiveRecord::Base
   belongs_to :asset, polymorphic: [:submission]
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
-  attr_accessible
+  strong_params
 
   after_create :generate_user_note!
   after_save :update_attachment_associations

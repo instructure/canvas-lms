@@ -231,7 +231,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context.context_modules.temp_record, @current_user, :create)
       @module = @context.context_modules.build
       @module.workflow_state = 'unpublished'
-      @module.attributes = params[:context_module]
+      @module.attributes = context_module_params
       respond_to do |format|
         if @module.save
           format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
@@ -560,7 +560,7 @@ class ContextModulesController < ApplicationController
       elsif params[:unpublish]
         @module.unpublish
       end
-      if @module.update_attributes(params[:context_module])
+      if @module.update_attributes(context_module_params)
         json = @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session})
         json['context_module']['relock_warning'] = true if @module.relock_warning?
         render :json => json
@@ -628,5 +628,10 @@ class ContextModulesController < ApplicationController
         assignments_or_quizzes.each{|o| o.has_too_many_overrides = true if ids.include?(o.id) }
       end
     end
+  end
+
+  def context_module_params
+    strong_params.require(:context_module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade, :requirement_count,
+      :completion_requirements => strong_anything, :prerequisites => strong_anything)
   end
 end

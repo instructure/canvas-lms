@@ -24,5 +24,6 @@ class ClonedItem < ActiveRecord::Base
   has_many :attachments, -> { order(:id) }
   has_many :discussion_topics, -> { order(:id) }
   has_many :wiki_pages, -> { order(:id) }
-  attr_accessible :original_item
+
+  strong_params
 end

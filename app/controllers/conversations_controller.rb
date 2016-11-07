@@ -136,7 +136,7 @@ class ConversationsController < ApplicationController
   # batch up all delayed jobs to make this more responsive to the user
   batch_jobs_in_actions :only => :create
 
-  API_ALLOWED_FIELDS = %w{workflow_state subscribed starred scope filter}.freeze
+  API_ALLOWED_FIELDS = %w{workflow_state subscribed starred}.freeze
 
   # @API List conversations
   # Returns the list of conversations for the current user, most recent ones first.
@@ -594,7 +594,7 @@ class ConversationsController < ApplicationController
   #     "participants": [{"id": 1, "name": "Joe TA"}]
   #   }
   def update
-    if @conversation.update_attributes(params[:conversation].slice(*API_ALLOWED_FIELDS))
+    if @conversation.update_attributes(strong_params.require(:conversation).permit(*API_ALLOWED_FIELDS))
       render :json => conversation_json(@conversation, @current_user, session)
     else
       render :json => @conversation.errors, :status => :bad_request
