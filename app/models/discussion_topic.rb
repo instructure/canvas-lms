@@ -38,12 +38,7 @@ class DiscussionTopic < ActiveRecord::Base
   restrict_columns :settings, [:delayed_post_at, :require_initial_post, :discussion_type,
                                :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating]
 
-  attr_accessible(
-    :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
-    :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
-    :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
-    :group_category, :allow_rating, :only_graders_can_rate, :sort_by_rating
-  )
+  strong_params
   attr_accessor :user_has_posted, :saved_by
 
   module DiscussionTypes
