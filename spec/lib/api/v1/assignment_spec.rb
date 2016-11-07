@@ -74,7 +74,6 @@ describe "Api::V1::Assignment" do
       end
     end
 
-
     it "includes all assignment overrides fields when an assignment_override exists" do
       assignment.assignment_overrides.create(:workflow_state => 'active')
       overrides = assignment.assignment_overrides
@@ -109,6 +108,26 @@ describe "Api::V1::Assignment" do
       params = { override_dates: false, exclude_response_fields: ['needs_grading_count'] }
       json = api.assignment_json(assignment, user, session, params)
       expect(json).not_to have_key "needs_grading_count"
+    end
+  end
+
+  describe "*_settings_hash methods" do
+    let(:assignment) { AssignmentApiHarness.new }
+    let(:test_params) do
+      ActionController::Parameters.new({
+        "turnitin_settings" => {},
+        "vericite_settings" => {}
+      })
+    end
+
+    it "#turnitin_settings_hash returns a Hash with indifferent access" do
+      turnitin_hash = assignment.turnitin_settings_hash(test_params)
+      expect(turnitin_hash).to be_instance_of(HashWithIndifferentAccess)
+    end
+
+    it "#vericite_settings_hash returns a Hash with indifferent access" do
+      vericite_hash = assignment.vericite_settings_hash(test_params)
+      expect(vericite_hash).to be_instance_of(HashWithIndifferentAccess)
     end
   end
 end
