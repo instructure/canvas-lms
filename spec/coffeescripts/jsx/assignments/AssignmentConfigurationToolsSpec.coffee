@@ -63,8 +63,8 @@ define [
             'url': 'http://localhost:3000/messages/blti'
             'title': 'Lti2Example'
         }
-
       ]
+      @stub($, 'ajax', -> {status: 200, data: toolDefinitions})
 
     teardown: ->
       wrapper.innerHTML = ''

@@ -58,7 +58,6 @@ define([
         }, self),
         error: function(xhr) {
           $.flashError(I18n.t('Error retrieving assignment configuration tools'));
-          console.log(xhr)
         }
       });
     },
