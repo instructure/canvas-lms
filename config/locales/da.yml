@@ -12316,7 +12316,7 @@ da:
         enable_login_for_email: "Jeg vil logge på Canvas ved brug af denne e-mailadresse"
         sms_email: "SMS e-mail"
       links: 
-        add_contact_method: Kontakmetode
+        add_contact_method: Kontaktmetode
         add_email_address: E-mailadresse
         email: E-mail
         resend_confirmation: "Send bekræftelse igen"
