@@ -341,6 +341,8 @@ class ProfileController < ApplicationController
           @email_channel.move_to_top if @email_channel
         end
         if params[:pseudonym]
+          pseudonym_params = strong_params[:pseudonym].permit(:password, :password_confirmation, :unique_id)
+
           change_password = params[:pseudonym].delete :change_password
           old_password = params[:pseudonym].delete :old_password
           if params[:pseudonym][:password_id] && change_password
@@ -355,11 +357,11 @@ class ProfileController < ApplicationController
             format.json { render :json => {:errors => {:old_password => error_msg}}, :status => :bad_request }
           end
           if change_password != '1' || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
-            params[:pseudonym].delete :password
-            params[:pseudonym].delete :password_confirmation
+            pseudonym_params.delete :password
+            pseudonym_params.delete :password_confirmation
           end
           params[:pseudonym].delete :password_id
-          if !params[:pseudonym].empty? && pseudonym_to_update && !pseudonym_to_update.update_attributes(params[:pseudonym])
+          if !pseudonym_params.empty? && pseudonym_to_update && !pseudonym_to_update.update_attributes(pseudonym_params)
             pseudonymed = true
             flash[:error] = t('errors.profile_update_failed', "Login failed to update")
             format.html { redirect_to user_profile_url(@current_user) }

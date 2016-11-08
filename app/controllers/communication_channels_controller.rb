@@ -341,10 +341,11 @@ class CommunicationChannelsController < ApplicationController
           @user.attributes = params[:user] if params[:user]
 
           if params[:pseudonym]
+            pseudonym_params = strong_params[:pseudonym].permit(:password, :password_confirmation, :unique_id)
             if @pseudonym.unique_id.present?
-              params[:pseudonym].delete(:unique_id)
+              pseudonym_params.delete(:unique_id)
             end
-            @pseudonym.attributes = params[:pseudonym]
+            @pseudonym.attributes = pseudonym_params
           end
 
           @pseudonym.communication_channel = cc

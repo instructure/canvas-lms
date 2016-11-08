@@ -2306,20 +2306,23 @@ class UsersController < ApplicationController
     @pseudonym.require_password = require_password
     # pre-populate the reverse association
     @pseudonym.user = @user
+
+    pseudonym_params = strong_params[:pseudonym] ?
+      strong_params[:pseudonym].permit(:password, :password_confirmation, :unique_id) : {}
     # don't require password_confirmation on api calls
-    params[:pseudonym][:password_confirmation] = params[:pseudonym][:password] if api_request?
+    pseudonym_params[:password_confirmation] = pseudonym_params[:password] if api_request?
     # don't allow password setting for new users that are not self-enrolling
     # in a course (they need to go the email route)
     unless allow_password
-      params[:pseudonym].delete(:password)
-      params[:pseudonym].delete(:password_confirmation)
+      pseudonym_params.delete(:password)
+      pseudonym_params.delete(:password_confirmation)
     end
     if params[:pseudonym][:authentication_provider_id]
       @pseudonym.authentication_provider = @context.
           authentication_providers.active.
           find(params[:pseudonym][:authentication_provider_id])
     end
-    @pseudonym.attributes = params[:pseudonym]
+    @pseudonym.attributes = pseudonym_params
     @pseudonym.sis_user_id = sis_user_id
     @pseudonym.integration_id = integration_id
 

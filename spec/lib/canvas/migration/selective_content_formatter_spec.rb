@@ -242,7 +242,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @course.assignment_groups.create!(:name => "blah").destroy
         @course.quizzes.create!.destroy
         @course.calendar_events.create!(:name => "blah").destroy
-        @course.rubrics.create!(:name => "blah").destroy
+        @course.rubrics.create!.destroy
       end
 
       it "should ignore in top-level list" do

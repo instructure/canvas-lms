@@ -34,7 +34,7 @@ class PageView < ActiveRecord::Base
   attr_accessor :generated_by_hand
   attr_accessor :is_update
 
-  attr_accessible :url, :user, :controller, :action, :session_id, :developer_key, :user_agent, :real_user, :context
+  strong_params
 
   # note that currently we never query page views from the perspective of the course;
   # we simply don't record them for non-logged-in users in a public course
