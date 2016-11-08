@@ -183,9 +183,10 @@ describe "accounts/settings.html.erb" do
           end
 
           it { expect(response).to     have_tag("#sis_grade_export_settings") }
-          it { expect(response).to     have_tag("input#account_allow_sis_import") }
+          it { expect(response).to     have_tag("#account_allow_sis_import") }
           it { expect(response).to     have_tag("#old_sis_integrations") }
           it { expect(response).not_to have_tag("#sis_integration_settings") }
+          it { expect(response).not_to have_tag("#account_settings_sis_syncing_value") }
         end
       end
 
@@ -200,7 +201,8 @@ describe "accounts/settings.html.erb" do
           end
 
           it { expect(response).to     have_tag("#sis_integration_settings") }
-          it { expect(response).to     have_tag("input#account_allow_sis_import") }
+          it { expect(response).to     have_tag("#account_allow_sis_import") }
+          it { expect(response).to     have_tag("#account_settings_sis_syncing_value") }
           it { expect(response).not_to have_tag("#sis_grade_export_settings") }
           it { expect(response).not_to have_tag("#old_sis_integrations") }
         end

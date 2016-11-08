@@ -151,6 +151,7 @@ class Account < ActiveRecord::Base
   # the account settings page
   add_setting :sis_app_token, :root_only => true
   add_setting :sis_app_url, :root_only => true
+  add_setting :sis_syncing, :boolean => true, :default => false, :inheritable => true
   add_setting :sis_default_grade_export, :boolean => true, :default => false, :inheritable => true
 
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false

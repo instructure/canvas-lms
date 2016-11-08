@@ -10,10 +10,24 @@ describe "admin settings tab" do
 
   def get_settings_page(account)
     get "/accounts/#{account.id}/settings"
+    wait_for_ajaximations
   end
 
-  def set_checkbox(checkbox,checked)
+  def set_checkbox(id,checked)
+    checkbox = f(id)
     checkbox.click if is_checked(checkbox) != checked
+  end
+
+  def set_checkbox_via_label(id,checked)
+    # Use this method for checkboxes that are hidden by their label (ic-Checkbox)
+    checkbox = f(id)
+    label = f("label[for=\"#{id[1..-1]}\"]")
+    label.click if is_checked(checkbox) != checked
+  end
+
+  def get_checkbox(id)
+    checkbox = f(id)
+    is_checked(checkbox)
   end
 
   def click_submit
@@ -56,44 +70,71 @@ describe "admin settings tab" do
 
   context "SIS Integration Settings" do
     let(:allow_sis_import) { "#account_allow_sis_import" }
+    let(:sis_syncing) { "#account_settings_sis_syncing_value" }
     let(:default_grade_export) { "#account_settings_sis_default_grade_export_value" }
 
-    shared_examples "SIS settings behavior" do
+    def test_checkbox_on_off(id)
+      set_checkbox_via_label(id,true)
+      click_submit
+      expect(get_checkbox(id)).to be_truthy
+
+      set_checkbox_via_label(id,false)
+      click_submit
+      expect(get_checkbox(id)).to be_falsey
+    end
+
+    context ":new_sis_integrations => false" do
+      before do
+        account.set_feature_flag! :new_sis_integrations, 'off'
+        get_settings_page(account)
+      end
+
       it "persists SIS import settings on refresh" do
-        set_checkbox(f(allow_sis_import),false)
-        click_submit
-        expect(is_checked(f(allow_sis_import))).to be_falsey
+        test_checkbox_on_off(allow_sis_import)
+      end
 
-        set_checkbox(f(allow_sis_import),true)
-        click_submit
-        expect(is_checked(f(allow_sis_import))).to be_truthy
+      it "does not display SIS syncing setting" do
+        expect(f("body")).not_to contain_css(sis_syncing)
+      end
 
-        set_checkbox(f(allow_sis_import),false)
-        click_submit
-        expect(is_checked(f(allow_sis_import))).to be_falsey
+      context "SIS grade export disabled" do
+        before do
+          account.set_feature_flag! :bulk_sis_grade_export, 'off'
+          account.set_feature_flag! 'post_grades', 'off'
+          get_settings_page(account)
+        end
+
+        it "does not display 'Post Grades to SIS'" do
+          expect(f("body")).not_to contain_css(default_grade_export)
+        end
       end
 
       context "SIS grade export enabled" do
-
         before do
           account.set_feature_flag! :bulk_sis_grade_export, 'on'
           account.set_feature_flag! 'post_grades', 'on'
           get_settings_page(account)
         end
 
-        it "persists 'Post Grades to SIS' settings on refresh" do
-          set_checkbox(f(default_grade_export),false)
-          click_submit
-          expect(is_checked(f(default_grade_export))).to be_falsey
-
-          set_checkbox(f(default_grade_export),true)
-          click_submit
-          expect(is_checked(f(default_grade_export))).to be_truthy
-
-          set_checkbox(f(default_grade_export),false)
-          click_submit
-          expect(is_checked(f(default_grade_export))).to be_falsey
+        it "persists 'Post Grades to SIS' on refresh" do
+          test_checkbox_on_off(default_grade_export)
         end
+      end
+    end
+
+    context ":new_sis_integrations => true" do
+      before do
+        account.set_feature_flag! :new_sis_integrations, 'on'
+        get_settings_page(account)
+      end
+
+
+      it "persists SIS import settings on refresh" do
+        test_checkbox_on_off(allow_sis_import)
+      end
+
+      it "persists SIS syncing settings on refresh" do
+        test_checkbox_on_off(sis_syncing)
       end
 
       context "SIS grade export disabled" do
@@ -107,27 +148,37 @@ describe "admin settings tab" do
           expect(f("body")).not_to contain_css(default_grade_export)
         end
       end
-    end
 
-    context ":new_sis_integrations feature flag does not change behavior" do
-      context ":new_sis_integrations => false" do
+      context "SIS grade export enabled" do
         before do
-          account.set_feature_flag! :new_sis_integrations, 'off'
-          get_settings_page(account)
+          account.set_feature_flag! :bulk_sis_grade_export, 'on'
+          account.set_feature_flag! 'post_grades', 'on'
         end
 
-        include_examples "SIS settings behavior"
-      end
+        context "SIS syncing => false" do
+          before do
+            account.settings = { sis_syncing: { value: false } }
+           account.save
+            get_settings_page(account)
+          end
 
-      context ":new_sis_integrations => true" do
-        before do
-          account.set_feature_flag! :new_sis_integrations, 'on'
-          get_settings_page(account)
+          it "does not display the 'Post Grades to SIS' option" do
+            expect(f(default_grade_export)).not_to be_displayed
+          end
         end
 
-        include_examples "SIS settings behavior"
+        context "SIS syncing => true" do
+          before do
+            account.settings = { sis_syncing: { value: true } }
+            account.save
+            get_settings_page(account)
+          end
+
+          it "persists 'Post Grades to SIS' settings on refresh" do
+            test_checkbox_on_off(default_grade_export)
+          end
+        end
       end
     end
-
   end
 end

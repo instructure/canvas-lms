@@ -309,8 +309,8 @@ END
       },
     'new_sis_integrations' =>
       {
-          display_name: -> { I18n.t('Display new SIS integration settings') },
-          description:  -> { I18n.t('Make new settings visible for SIS integrations') },
+          display_name: -> { I18n.t('Enable new SIS integration settings') },
+          description:  -> { I18n.t('Make new settings for SIS integrations visible and active') },
           applies_to: 'RootAccount',
           state: 'hidden',
           root_opt_in: true,
