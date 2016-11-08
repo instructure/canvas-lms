@@ -24,7 +24,8 @@ class Folder < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
   include Workflow
-  attr_accessible :name, :full_name, :parent_folder, :workflow_state, :lock_at, :unlock_at, :locked, :hidden, :context, :position
+
+  strong_params
 
   ROOT_FOLDER_NAME = "course files"
   PROFILE_PICS_FOLDER_NAME = "profile pictures"

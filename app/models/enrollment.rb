@@ -78,7 +78,7 @@ class Enrollment < ActiveRecord::Base
   after_destroy :update_assignment_overrides_if_needed
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
+  strong_params
 
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
   scope :current_and_invited, -> { joins(:course).where(QueryBuilder.new(:current_and_invited).conditions).readonly(false) }

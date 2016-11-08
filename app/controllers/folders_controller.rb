@@ -364,7 +364,7 @@ class FoldersController < ApplicationController
   #
   # @returns Folder
   def update
-    folder_params = process_folder_params(params, api_request?)
+    folder_params = process_folder_params(strong_params, api_request?)
     if api_request?
       @folder = Folder.find(params[:id])
       @context = @folder.context
@@ -449,7 +449,7 @@ class FoldersController < ApplicationController
   #
   # @returns Folder
   def create
-    folder_params = process_folder_params(params, api_request?)
+    folder_params = process_folder_params(strong_params, api_request?)
     source_folder_id = folder_params.delete(:source_folder_id)
     if folder_params[:folder_id]
       parent_folder = Folder.find(folder_params[:folder_id])
@@ -504,7 +504,7 @@ class FoldersController < ApplicationController
 
   def process_folder_params(parameters, api_request)
     folder_params = (api_request ? parameters : parameters[:folder]) || {}
-    folder_params.slice(:name, :parent_folder_id, :parent_folder_path, :folder_id,
+    folder_params.permit(:name, :parent_folder_id, :parent_folder_path, :folder_id,
                         :source_folder_id, :lock_at, :unlock_at, :locked,
                         :hidden, :context, :position, :just_hide)
   end

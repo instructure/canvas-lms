@@ -17,7 +17,7 @@
 #
 
 class EportfolioCategory < ActiveRecord::Base
-  attr_accessible :name
+  strong_params
   attr_readonly :eportfolio_id
 
   has_many :eportfolio_entries, -> { order(:position) }, dependent: :destroy

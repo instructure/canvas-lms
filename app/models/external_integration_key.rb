@@ -17,7 +17,7 @@
 #
 
 class ExternalIntegrationKey < ActiveRecord::Base
-  attr_accessible
+  strong_params
 
   belongs_to :context, polymorphic: [:account]
 

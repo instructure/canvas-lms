@@ -39,7 +39,7 @@ module Api::V1::ExternalFeeds
   end
 
   def create_api_external_feed(context, feed_params, user)
-    feed = context.external_feeds.build(feed_params.slice(*API_ALLOWED_EXTERNAL_FEED_PARAMS))
+    feed = context.external_feeds.build(feed_params.permit(*API_ALLOWED_EXTERNAL_FEED_PARAMS))
     feed.user = user
     feed
   end
