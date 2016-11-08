@@ -19,7 +19,7 @@
 require 'aws-sdk'
 
 class NotificationEndpoint < ActiveRecord::Base
-  attr_accessible :token, :arn
+  strong_params
 
   belongs_to :access_token
 
