@@ -19,7 +19,7 @@
 require 'atom'
 
 class Wiki < ActiveRecord::Base
-  attr_accessible :title
+  strong_params
 
   has_many :wiki_pages, :dependent => :destroy
 

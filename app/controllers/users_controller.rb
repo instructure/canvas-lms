@@ -1569,7 +1569,8 @@ class UsersController < ApplicationController
   #
   # @returns User
   def update
-    params[:user] ||= {}
+    strong_params[:user] ||= {}
+    user_params = strong_params[:user]
     @user = api_request? ?
       api_find(User, params[:id]) :
       params[:id] ? api_find(User, params[:id]) : @current_user
@@ -1579,7 +1580,7 @@ class UsersController < ApplicationController
       @default_pseudonym.move_to_top
     end
 
-    update_email = @user.grants_right?(@current_user, :manage_user_details) && params[:user][:email]
+    update_email = @user.grants_right?(@current_user, :manage_user_details) && user_params[:email]
     managed_attributes = []
     managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
@@ -1590,26 +1591,27 @@ class UsersController < ApplicationController
     end
 
     if @user.grants_right?(@current_user, :update_avatar)
-      avatar = params[:user].delete(:avatar)
+      avatar = user_params.delete(:avatar)
 
       # delete any avatar_image passed, because we only allow updating avatars
       # based on [:avatar][:token].
-      params[:user].delete(:avatar_image)
+      user_params.delete(:avatar_image)
 
       managed_attributes << :avatar_image
       if token = avatar.try(:[], :token)
         if av_json = avatar_for_token(@user, token)
-          params[:user][:avatar_image] = { :type => av_json['type'],
+          user_params[:avatar_image] = { :type => av_json['type'],
             :url => av_json['url'] }
         end
       elsif url = avatar.try(:[], :url)
-        params[:user][:avatar_image] = { :type => 'external', :url => url }
+        user_params[:avatar_image] = { :type => 'external', :url => url }
       end
     end
 
-    user_params = params[:user].slice(*managed_attributes)
+    if managed_attributes.any? && user_params.except(*managed_attributes).empty?
+      managed_attributes << {:avatar_image => strong_anything} if managed_attributes.delete(:avatar_image)
+      user_params = user_params.permit(*managed_attributes)
 
-    if managed_attributes.any? && user_params == params[:user]
       # admins can update avatar images even if they are locked
       admin_avatar_update = user_params[:avatar_image] &&
         @user.grants_right?(@current_user, :update_avatar) &&
@@ -2255,18 +2257,22 @@ class UsersController < ApplicationController
     end
 
     if params[:user]
-      if self_enrollment && params[:user][:self_enrollment_code]
-        params[:user][:self_enrollment_code].strip!
+      user_params = strong_params[:user].
+        permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
+          :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use,
+          :self_enrollment_code, :initial_enrollment_type)
+      if self_enrollment && user_params[:self_enrollment_code]
+        user_params[:self_enrollment_code].strip!
       else
-        params[:user].delete(:self_enrollment_code)
+        user_params.delete(:self_enrollment_code)
       end
-      if params[:user][:birthdate].present? && params[:user][:birthdate] !~ Api::ISO8601_REGEX &&
-          params[:user][:birthdate] !~ Api::DATE_REGEX
+      if user_params[:birthdate].present? && user_params[:birthdate] !~ Api::ISO8601_REGEX &&
+          user_params[:birthdate] !~ Api::DATE_REGEX
         return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
                                                             'Invalid date or invalid datetime for birthdate')}}, :status => 400)
       end
 
-      @user.attributes = params[:user]
+      @user.attributes = user_params
       accepted_terms = params[:user].delete(:terms_of_use)
       @user.accept_terms if value_to_boolean(accepted_terms)
       includes << "terms_of_use" unless accepted_terms.nil?

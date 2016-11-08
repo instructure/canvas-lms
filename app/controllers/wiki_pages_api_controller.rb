@@ -293,8 +293,8 @@ class WikiPagesApiController < ApplicationController
   #
   # @returns Page
   def create
-    initial_params = params.slice(:url)
-    initial_params.merge! (params[:wiki_page] || {}).slice(:url, :title)
+    initial_params = strong_params.permit(:url)
+    initial_params.merge!(params[:wiki_page] ? strong_params[:wiki_page].permit(:url, :title) : {})
 
     @wiki = @context.wiki
     @page = @wiki.build_wiki_page(@current_user, initial_params)
@@ -536,7 +536,7 @@ class WikiPagesApiController < ApplicationController
 
   def get_update_params(allowed_fields=Set[])
     # normalize parameters
-    page_params = (params[:wiki_page] || {}).slice(*%w(title body notify_of_update published front_page editing_roles))
+    page_params = params[:wiki_page] ? strong_params[:wiki_page].permit(*%w(title body notify_of_update published front_page editing_roles)) : {}
 
     if page_params.has_key?(:published)
       published_value = page_params.delete(:published)

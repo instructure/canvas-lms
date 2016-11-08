@@ -329,12 +329,16 @@ class ProfileController < ApplicationController
     end
 
     respond_to do |format|
-      if !@user.user_can_edit_name? && params[:user]
-        params[:user].delete(:name)
-        params[:user].delete(:short_name)
-        params[:user].delete(:sortable_name)
+      user_params = params[:user] ? strong_params[:user].
+        permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
+          :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate)
+        : {}
+      if !@user.user_can_edit_name?
+        user_params.delete(:name)
+        user_params.delete(:short_name)
+        user_params.delete(:sortable_name)
       end
-      if @user.update_attributes(params[:user])
+      if @user.update_attributes(user_params)
         pseudonymed = false
         if params[:default_email_id].present?
           @email_channel = @user.communication_channels.email.where(id: params[:default_email_id]).first
@@ -392,8 +396,9 @@ class ProfileController < ApplicationController
     short_name = params[:user] && params[:user][:short_name]
     @user.short_name = short_name if short_name && @user.user_can_edit_name?
     if params[:user_profile]
-      params[:user_profile].delete(:title) unless @user.user_can_edit_name?
-      @profile.attributes = params[:user_profile]
+      user_profile_params = strong_params[:user_profile].permit(:title, :bio)
+      user_profile_params.delete(:title) unless @user.user_can_edit_name?
+      @profile.attributes = user_profile_params
     end
 
     if params[:link_urls] && params[:link_titles]

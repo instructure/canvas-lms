@@ -21,7 +21,7 @@ class UserProfile < ActiveRecord::Base
 
   delegate :short_name, :name, :asset_string, :opaque_identifier, :to => :user
 
-  attr_accessible :title, :bio
+  strong_params
 
   has_many :links, :class_name => 'UserProfileLink', :dependent => :destroy
 

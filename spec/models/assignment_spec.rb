@@ -2709,7 +2709,7 @@ describe Assignment do
     end
 
     it "should not be locked by wiki page when feature is disabled" do
-      a1 = wiki_page_assignment_model(:course => @course, :submission_types => "wiki_page")
+      a1 = wiki_page_assignment_model(:course => @course)
       a1.reload
       expect(a1.locked_for?(@user)).to be_falsey
 
