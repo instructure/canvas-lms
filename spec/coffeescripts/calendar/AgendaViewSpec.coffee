@@ -17,7 +17,8 @@ define [
   loadEventPage = (server, includeNext = false) ->
     sendCustomEvents(server, eventResponse, assignmentResponse, includeNext)
 
-  sendCustomEvents = (server, events, assignments, includeNext = false, requestIndex = 0) ->
+  sendCustomEvents = (server, events, assignments, includeNext = false) ->
+    requestIndex = server.requests.length - 2
     server.requests[requestIndex].respond 200,
       { 'Content-Type': 'application/json', 'Link': '</api/magic>; rel="'+(if includeNext then 'next' else 'current')+'"' }, events
     server.requests[requestIndex+1].respond 200,
@@ -114,7 +115,7 @@ define [
     for i in [1..2]
       addEvents(events, date)
       date.setFullYear(date.getFullYear()+1)
-    sendCustomEvents(@server, JSON.stringify(events), JSON.stringify([]), false, 2)
+    sendCustomEvents(@server, JSON.stringify(events), JSON.stringify([]), false)
 
     equal @container.find('.agenda-event__item-container').length, 70, 'finds 70 agenda-event__item-containers'
 
