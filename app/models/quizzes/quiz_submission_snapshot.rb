@@ -19,6 +19,6 @@
 class Quizzes::QuizSubmissionSnapshot < ActiveRecord::Base
   belongs_to :quiz_submission, class_name: 'Quizzes::QuizSubmission'
   serialize :data
-
-  attr_accessible :quiz_submission, :attempt, :data
+  
+  strong_params
 end

@@ -240,7 +240,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @course.require_assignment_group
         @course.assignments.create!(:name => "blah").destroy
         @course.assignment_groups.create!(:name => "blah").destroy
-        @course.quizzes.create!(:name => "blah").destroy
+        @course.quizzes.create!.destroy
         @course.calendar_events.create!(:name => "blah").destroy
         @course.rubrics.create!(:name => "blah").destroy
       end

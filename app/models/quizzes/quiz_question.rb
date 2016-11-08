@@ -32,7 +32,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   include Workflow
 
-  attr_accessible :quiz, :quiz_group, :assessment_question, :question_data, :assessment_question_version
+  strong_params
   attr_readonly :quiz_id
   belongs_to :quiz, class_name: 'Quizzes::Quiz', inverse_of: :quiz_questions
   belongs_to :assessment_question

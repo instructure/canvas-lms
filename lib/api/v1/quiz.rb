@@ -110,11 +110,11 @@ module Api::V1::Quiz
   end
 
   def filter_params(quiz_params)
-    quiz_params.slice(*API_ALLOWED_QUIZ_INPUT_FIELDS[:only])
+    quiz_params.permit(*API_ALLOWED_QUIZ_INPUT_FIELDS[:only])
   end
 
   def update_api_quiz(quiz, params, save = true)
-    quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz]
+    quiz_params = accepts_jsonapi? ? Array(strong_params[:quizzes]).first : strong_params[:quiz]
     return nil unless quiz.is_a?(Quizzes::Quiz) && quiz_params.is_a?(Hash)
     update_params = filter_params(quiz_params)
 

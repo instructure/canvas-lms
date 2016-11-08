@@ -23,7 +23,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   include Workflow
 
-  attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade, :has_seen_results
+  strong_params
   attr_readonly :quiz_id, :user_id
   attr_accessor :grader_id
 

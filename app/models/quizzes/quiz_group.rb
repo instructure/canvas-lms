@@ -19,7 +19,7 @@
 class Quizzes::QuizGroup < ActiveRecord::Base
   self.table_name = 'quiz_groups'
 
-  attr_accessible :name, :pick_count, :question_points, :assessment_question_bank_id
+  strong_params
   attr_readonly :quiz_id
 
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
