@@ -1041,6 +1041,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :originality_reports_api) do
       post "assignments/:assignment_id/submissions/:submission_id/originality_report", action: :create
       put "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :update
+      get "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :show
     end
 
     scope(controller: :provisional_grades) do

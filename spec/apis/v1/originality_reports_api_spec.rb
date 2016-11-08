@@ -48,7 +48,96 @@ describe 'Originality Reports API', type: :request do
     Account.any_instance.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
   end
 
-  describe "PUT assignments/:assignment_id/files/:file_id/originality_report (#update)" do
+  describe "GET assignments/:assignment_id/originality_report/submissions/:submission_id/:id (#show)" do
+    before :each do
+      report_initial_values = {
+        attachment: @attachment,
+        originality_score: 0.5,
+        submission: @submission
+      }
+      @report = OriginalityReport.create!(report_initial_values)
+      @endpoints[:show] = "/api/v1/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id}"
+    end
+
+    it "requires manage_grades permissions" do
+      get @endpoints[:show]
+      expect(response.status).to eq 401
+    end
+
+    it "returns an originality report in the response" do
+      user_session(@teacher)
+      expected_keys = [
+        'id',
+        'file_id',
+        'originality_score',
+        'originality_report_file_id',
+        'originality_report_url',
+        'originality_report_lti_url',
+        'created_at',
+        'updated_at',
+        'submission_id'
+      ].freeze
+
+      get @endpoints[:show]
+
+      expect(response).to be_success
+      expect(JSON.parse(response.body[9..-1]).keys).to match_array(expected_keys)
+    end
+
+    it "returns the specified originality report in the response" do
+      user_session(@teacher)
+      get @endpoints[:show]
+
+      expect(response).to be_success
+      expect(JSON.parse(response.body[9..-1])['id']).to eq @report.id
+    end
+
+    it "checks that the specified originality report exists" do
+      user_session(@teacher)
+      invalid_report_url = "/api/v1/assignments/#{@assignment.id}/submissions/#{@submission.id}originality_report/#{@report.id + 1}"
+      get invalid_report_url
+
+      expect(response.status).to eq 404
+    end
+
+    it "checks that the specified submission exists" do
+      user_session(@teacher)
+      invalid_report_url = "/api/v1/assignments/#{@assignment.id}/submissions/#{@submission.id + 1}originality_report/#{@report.id}"
+      get invalid_report_url
+
+      expect(response.status).to eq 404
+    end
+
+    it "requires the plagiarism feature flag" do
+      Account.any_instance.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(false)
+      user_session(@teacher)
+      post @endpoints[:show]
+      expect(response).not_to be_success
+    end
+
+    it "verifies the specified attachment is in the course" do
+      user_session(@teacher)
+      attachment = @attachment.dup
+      attachment.context = @course
+      attachment.save!
+
+      post @endpoints[:show], originality_report: {file_id: attachment.id, originality_score: 0.4}
+      expect(response.status).to eq 404
+    end
+
+    it "verifies that the specified submission includes the attachment" do
+      user_session(@teacher)
+      sub = @submission.dup
+      sub.attachments
+      sub.user = @teacher
+      sub.save!
+      endpoint = "/api/v1/assignments/#{@assignment.id}/submissions/#{sub.id}/originality_report/#{@report.id}"
+      get endpoint, originality_report: {originality_report_lti_url: "http://www.lti-test.com"}
+      expect(response.status).to eq 401
+    end
+  end
+
+  describe "PUT assignments/:assignment_id/originality_report (#update)" do
     before :each do
       report_initial_values = {
         attachment: @attachment,

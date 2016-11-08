@@ -67,7 +67,7 @@
 class OriginalityReportsApiController < ApplicationController
   before_action :require_user
   before_action :attachment_in_context, only: [:create]
-  before_action :report_in_context, only: [:update]
+  before_action :report_in_context, only: [:update, :show]
 
   # @API Create an Originality Report
   # Create a new OriginalityReport for the specified file
@@ -144,6 +144,18 @@ class OriginalityReportsApiController < ApplicationController
       else
         render json: @report.errors, status: :bad_request
       end
+    end
+  end
+
+  # @API Show an Originality Report
+  # Get a single originality report
+  #
+  # @returns OriginalityReport
+  def show
+    if authorized_action(@assignment.context, @current_user, :manage_grades) &&
+      @assignment.context.root_account.feature_enabled?(:plagiarism_detection_platform)
+
+      render json: api_json(@report, @current_user, session)
     end
   end
 
