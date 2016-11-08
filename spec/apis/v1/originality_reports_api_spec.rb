@@ -48,6 +48,101 @@ describe 'Originality Reports API', type: :request do
     Account.any_instance.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(true)
   end
 
+  describe "PUT assignments/:assignment_id/files/:file_id/originality_report (#update)" do
+    before :each do
+      report_initial_values = {
+        attachment: @attachment,
+        originality_score: 0.5,
+        submission: @submission
+      }
+      @report = OriginalityReport.create!(report_initial_values)
+      @endpoints[:update] = "/api/v1/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id}"
+    end
+
+    it "checks that the OriginalityReport exists" do
+      user_session(@teacher)
+      invalid_report_url = "/api/v1/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id + 1}"
+      put invalid_report_url, originality_report: {originality_score: 0.3}
+      expect(response.status).to eq 404
+    end
+
+    it "checks that the Submission exists" do
+      user_session(@teacher)
+      invalid_report_url = "/api/v1/assignments/#{@assignment.id}/submissions/#{@submission.id + 1}/originality_report/#{@report.id}"
+      put invalid_report_url, originality_report: {originality_score: 0.3}
+      expect(response.status).to eq 404
+    end
+
+    it "updates originality score" do
+      user_session(@teacher)
+      put @endpoints[:update], originality_report: {originality_score: 0.3}
+
+      expect(response).to be_success
+      expect(OriginalityReport.find(@report.id).originality_score).to eq 0.3
+    end
+
+    it "does not update originality score if out of range" do
+      user_session(@teacher)
+      put @endpoints[:update], originality_report: {originality_score: 1.5}
+
+      expect(response.status).to eq 400
+      expect(JSON.parse(response.body)['errors'].key? 'originality_score').to be_truthy
+    end
+
+    it "updates originality report attachment id" do
+      report_file = @attachment.dup
+      report_file.save!
+      user_session(@teacher)
+      put @endpoints[:update], originality_report: {originality_report_file_id: report_file.id}
+
+      expect(response).to be_success
+      expect(OriginalityReport.find(@report.id).originality_report_file_id).to eq report_file.id
+    end
+
+    it "updates originality report url" do
+      user_session(@teacher)
+      put @endpoints[:update], originality_report: {originality_report_url: "http://www.test.com"}
+
+      expect(response).to be_success
+      expect(OriginalityReport.find(@report.id).originality_report_url).to eq "http://www.test.com"
+    end
+
+    it "updates originality report LTI url" do
+      user_session(@teacher)
+      put @endpoints[:update], originality_report: {originality_report_lti_url: "http://www.lti-test.com"}
+
+      expect(response).to be_success
+      expect(OriginalityReport.find(@report.id).originality_report_lti_url).to eq "http://www.lti-test.com"
+    end
+
+    it "requires the plagiarism feature flag" do
+      Account.any_instance.stubs(:feature_enabled?).with(:plagiarism_detection_platform).returns(false)
+      user_session(@teacher)
+      put @endpoints[:udpate], originality_report: {originality_report_lti_url: "http://www.lti-test.com"}
+      expect(response).not_to be_success
+    end
+
+    it "verifies the report is in the same context as the assignment" do
+      user_session(@teacher)
+      @submission.attachments = []
+      @submission.save!
+      put @endpoints[:update], originality_report: {originality_report_lti_url: "http://www.lti-test.com"}
+
+      expect(response.status).to eq 401
+    end
+
+    it "verifies that the specified submission includes the attachment" do
+      user_session(@teacher)
+      sub = @submission.dup
+      sub.attachments
+      sub.user = @teacher
+      sub.save!
+      endpoint = "/api/v1/assignments/#{@assignment.id}/submissions/#{sub.id}/originality_report/#{@report.id}"
+      put endpoint, originality_report: {originality_report_lti_url: "http://www.lti-test.com"}
+      expect(response.status).to eq 401
+    end
+  end
+
   describe "POST assignments/:assignment_id/submissions/:submission_id/originality_report (#create)" do
     it "creates an originality report when provided required params" do
       user_session(@teacher)

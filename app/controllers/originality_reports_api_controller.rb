@@ -66,7 +66,8 @@
 #     }
 class OriginalityReportsApiController < ApplicationController
   before_action :require_user
-  before_action :attachment_in_context
+  before_action :attachment_in_context, only: [:create]
+  before_action :report_in_context, only: [:update]
 
   # @API Create an Originality Report
   # Create a new OriginalityReport for the specified file
@@ -95,7 +96,7 @@ class OriginalityReportsApiController < ApplicationController
   def create
     if authorized_action(@assignment.context, @current_user, :manage_grades) &&
       @assignment.context.root_account.feature_enabled?(:plagiarism_detection_platform)
-      report_attributes = strong_params.require(:originality_report).permit(permitted_attributes).to_hash.merge(
+      report_attributes = strong_params.require(:originality_report).permit(create_attributes).to_hash.merge(
         {submission_id: strong_params.require(:submission_id)})
 
       @report = OriginalityReport.new(report_attributes)
@@ -113,9 +114,42 @@ class OriginalityReportsApiController < ApplicationController
     end
   end
 
+  # @API Edit an Originality Report
+  # Modify an existing originality report
+  #
+  # @argument originality_report[originality_score] [Float]
+  #   A number between 0 and 1 representing the measure of the
+  #   specified file's originality.
+  #
+  # @argument originality_report[originality_report_url] [String]
+  #   The URL where the originality report for the specified
+  #   file may be found.
+  #
+  # @argument originality_report[originality_report_lti_url] [String]
+  #   The URL of an LTI tool launch where the originality report of
+  #   the specified file may be found. Takes precedent over
+  #   originality_report_url in the Canvas UI.
+  #
+  # @argument originality_report[originality_report_file_id] [Integer]
+  #    The ID of the file within Canvas that contains the originality
+  #    report for the submitted file provided in the request URL.
+  #
+  # @returns OriginalityReport
+  def update
+    if authorized_action(@assignment.context, @current_user, :manage_grades)&&
+      @assignment.context.root_account.feature_enabled?(:plagiarism_detection_platform)
+
+      if @report.update_attributes(strong_params.require(:originality_report).permit(update_attributes))
+        render json: api_json(@report, @current_user, session)
+      else
+        render json: @report.errors, status: :bad_request
+      end
+    end
+  end
+
   private
 
-  def permitted_attributes
+  def create_attributes
     [:originality_score,
      :file_id,
      :originality_report_file_id,
@@ -123,11 +157,28 @@ class OriginalityReportsApiController < ApplicationController
      :originality_report_lti_url].freeze
   end
 
+  def update_attributes
+    [:originality_report_file_id,
+     :originality_report_url,
+     :originality_report_lti_url,
+     :originality_score].freeze
+  end
+
   def attachment_in_context
     @assignment = Assignment.find(params[:assignment_id])
     attachment = Attachment.find(strong_params.require(:originality_report)[:file_id])
     submission = Submission.find(params[:submission_id])
+    verify_submission_attachment(attachment, submission)
+  end
 
+  def report_in_context
+    @assignment = Assignment.find(params[:assignment_id])
+    @report = OriginalityReport.find(params[:id])
+    submission = Submission.find(params[:submission_id])
+    verify_submission_attachment(@report.attachment, submission)
+  end
+
+  def verify_submission_attachment(attachment, submission)
     unless submission.assignment == @assignment && submission.attachments.include?(attachment)
       head :unauthorized
     end
