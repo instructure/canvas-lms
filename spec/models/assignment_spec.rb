@@ -115,7 +115,6 @@ describe Assignment do
       guid: SecureRandom.uuid,
       shared_secret: 'abc',
       product_family: product_family,
-      root_account: account,
       product_version: '1',
       workflow_state: 'disabled',
       raw_data: {'proxy' => 'value'},

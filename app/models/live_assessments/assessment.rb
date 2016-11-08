@@ -18,7 +18,7 @@
 
 module LiveAssessments
   class Assessment < ActiveRecord::Base
-    attr_accessible :context, :key, :title
+    strong_params
 
     belongs_to :context, polymorphic: [:course]
     has_many :submissions, class_name: 'LiveAssessments::Submission'
