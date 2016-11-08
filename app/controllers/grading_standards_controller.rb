@@ -59,7 +59,7 @@ class GradingStandardsController < ApplicationController
 
   def create
     if authorized_action(@context, @current_user, :manage_grades)
-      @standard = @context.grading_standards.build(params[:grading_standard])
+      @standard = @context.grading_standards.build(grading_standard_params)
       if @standard.read_attribute(:data).blank?
         @standard.data = GradingStandard.default_grading_standard
       end
@@ -79,7 +79,7 @@ class GradingStandardsController < ApplicationController
     if authorized_action(@standard, @current_user, :manage)
       @standard.user = @current_user
       respond_to do |format|
-        if @standard.update_attributes(params[:grading_standard])
+        if @standard.update_attributes(grading_standard_params)
           format.json { render json: standard_as_json(@standard) }
         else
           format.json { render json: @standard.errors, status: :bad_request }
@@ -109,5 +109,10 @@ class GradingStandardsController < ApplicationController
 
   def standard_as_json(standard)
     standard.as_json(methods: JSON_METHODS, permissions: { user: @current_user })
+  end
+
+  def grading_standard_params
+    return {} unless strong_params[:grading_standard]
+    strong_params[:grading_standard].permit(:title, :standard_data => strong_anything, :data => strong_anything)
   end
 end

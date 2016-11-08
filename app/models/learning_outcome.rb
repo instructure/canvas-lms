@@ -19,8 +19,7 @@
 class LearningOutcome < ActiveRecord::Base
   include Workflow
   include OutcomeAttributes
-  attr_accessible :context, :description, :short_description, :title, :display_name
-  attr_accessible :rubric_criterion, :vendor_guid, :calculation_method, :calculation_int
+  strong_params
 
   belongs_to :context, polymorphic: [:account, :course]
   has_many :learning_outcome_results

@@ -19,7 +19,7 @@
 class GradingPeriod < ActiveRecord::Base
   include Canvas::SoftDeletable
 
-  attr_accessible :weight, :start_date, :end_date, :close_date, :title
+  strong_params
 
   belongs_to :grading_period_group, inverse_of: :grading_periods
   has_many :scores, -> { active }, dependent: :destroy
