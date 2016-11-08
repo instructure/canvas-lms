@@ -19,7 +19,7 @@
 class ScribdMimeType < ActiveRecord::Base
   has_many :attachments
 
-  attr_accessible :extension, :name
+  strong_params
 
   self.shard_category = :unsharded
 end

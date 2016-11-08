@@ -30,7 +30,7 @@ class StreamItem < ActiveRecord::Base
       :discussion_topic, :message, :submission, :web_conference, :assessment_request]
   validates_presence_of :asset_type, :data
 
-  attr_accessible :context, :asset
+  strong_params
   after_destroy :destroy_stream_item_instances
   attr_accessor :unread, :participant, :invalidate_immediately
 

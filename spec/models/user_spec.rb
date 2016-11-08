@@ -504,7 +504,7 @@ describe User do
     teacher = teacher_in_course(:active_all => true).user
     student = student_in_course(:active_all => true).user
     sub = @assignment.grade_student(student, grade: 9, grader: @teacher).first
-    sub.submission_comments.create!(:comment => 'c1', :author => other_teacher, :recipient_id => student.id)
+    sub.submission_comments.create!(:comment => 'c1', :author => other_teacher)
     sub.save!
     expect(teacher.recent_feedback(:contexts => [@course])).to be_empty
   end
