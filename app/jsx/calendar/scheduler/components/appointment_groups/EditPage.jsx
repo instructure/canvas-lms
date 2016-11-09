@@ -343,7 +343,7 @@ define([
             </div>
             <div className="ic-Form-control">
               <span className="ic-Label" htmlFor="appointments">{I18n.t('Appointments')}</span>
-              <Button onClick={this.messageStudents} disabled={this.state.appointmentGroup.appointments_count === 0}>{I18n.t('Message Students')}</Button>
+              <Button ref={(c) => { this.messageStudentsButton = c }} onClick={this.messageStudents} disabled={this.state.appointmentGroup.appointments_count === 0}>{I18n.t('Message Students')}</Button>
               <AppointmentGroupList appointmentGroup={this.state.appointmentGroup} />
             </div>
           </form>

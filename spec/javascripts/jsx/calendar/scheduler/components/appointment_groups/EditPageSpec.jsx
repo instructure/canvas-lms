@@ -1,5 +1,6 @@
 define([
   'react',
+  'react-dom',
   'react-addons-test-utils',
   'jquery',
   'axios',
@@ -8,10 +9,18 @@ define([
   'vendor/timezone/Europe/London',
   'timezone',
   'helpers/fakeENV',
+  'instructure-ui/Button',
   'jquery.instructure_date_and_time'
-], (React, TestUtils, $, axios, moment, EditPage, london, tz, fakeENV) => {
+], (React, ReactDOM, TestUtils, $, axios, moment, EditPage, london, tz, fakeENV, { default: Button }) => {
+  const container = document.getElementById('fixtures')
+
   const renderComponent = (props = { appointment_group_id: '1' }) => {
     return TestUtils.renderIntoDocument(<EditPage {...props} />)
+  }
+
+  // use ReactDOM instead of TestUtils to test integration with non-react things that need real DOM
+  const renderComponentInDOM = (props = { appointment_group_id: '1' }) => {
+    return ReactDOM.render(<EditPage {...props} />, container)
   }
 
   let sandbox = null
@@ -22,6 +31,31 @@ define([
     const component = renderComponent()
     const editPage = TestUtils.findRenderedDOMComponentWithClass(component, 'EditPage')
     ok(editPage)
+  })
+
+
+  module('Message Users')
+
+  test('renders message users button', () => {
+    const component = renderComponent()
+    ok(component.messageStudentsButton)
+  })
+
+  test('clicking message users button opens message students modal', () => {
+    const component = renderComponentInDOM()
+    const button = ReactDOM.findDOMNode(component.messageStudentsButton)
+
+    // needed by message modal
+    component.setState({
+      eventDataSource: {
+        getParticipants: (group, status, cb) => cb([])
+      },
+    })
+
+    button.click()
+    const messageModal = document.querySelector('#message_participants_form')
+
+    ok(messageModal)
   })
 
 
