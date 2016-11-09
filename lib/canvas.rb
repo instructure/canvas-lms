@@ -208,6 +208,7 @@ module Canvas
     raise if options[:raise_on_timeout]
     return nil
   rescue Timeout::Error => e
+    Rails.logger.error("Timeout during service call: #{service_name}")
     Canvas::Errors.capture_exception(:service_timeout, e)
     raise if options[:raise_on_timeout]
     return nil
