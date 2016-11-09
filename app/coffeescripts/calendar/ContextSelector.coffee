@@ -1,10 +1,11 @@
 define [
   'jquery'
   'underscore'
+  'i18n!context_sector'
   'jst/calendar/contextSelector'
   'jst/calendar/contextSelectorItem'
   'compiled/fn/preventDefault'
-], ($, _, contextSelectorTemplate, contextSelectorItemTemplate, preventDefault) ->
+], ($, _, I18n, contextSelectorTemplate, contextSelectorItemTemplate, preventDefault) ->
 
   class ContextSelectorItem
     constructor: (@context) ->
@@ -23,8 +24,14 @@ define [
       @$sectionCheckboxes.change @sectionChange
 
     toggleSections: (e) =>
-      @$listItem.find('.ag_sections_toggle').toggleClass('ag-sections-expanded')
       @$sectionsList.toggleClass('hidden')
+      $toggle = @$listItem.find('.ag_sections_toggle')
+      $toggle.toggleClass('ag-sections-expanded')
+
+      if $toggle.hasClass('ag-sections-expanded')
+        $toggle.find('.screenreader-only').text(I18n.t('Hide course sections for course %{name}', { name: @context.name }))
+      else
+        $toggle.find('.screenreader-only').text(I18n.t('Show course sections for course %{name}', { name: @context.name }))
 
     change: =>
       newState =  switch @state
