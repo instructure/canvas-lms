@@ -35,7 +35,7 @@ module Lti
       exports = {}
 
       configured_tools.each do |tool|
-        migrator = Lti::ContentMigrationService::Migrator.new(course, tool)
+        migrator = Lti::ContentMigrationService::Exporter.new(course, tool)
         migrator.start!
         exports["lti_#{tool.id}"] = migrator if migrator.successfully_started?
       end

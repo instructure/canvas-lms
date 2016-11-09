@@ -16,7 +16,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Lti::ContentMigrationService::Migrator do
+RSpec.describe Lti::ContentMigrationService::Exporter do
   include WebMock::API
   include LtiSpecHelper
 
@@ -28,7 +28,7 @@ RSpec.describe Lti::ContentMigrationService::Migrator do
       consumer_key:  '12345',
       shared_secret: 'sekret',
     }) }
-    let(:migrator) { Lti::ContentMigrationService::Migrator.new(course, tool) }
+    let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool) }
     let(:status_url) { 'https://lti.example.com/export/42/status' }
 
     before do
@@ -63,7 +63,7 @@ RSpec.describe Lti::ContentMigrationService::Migrator do
       consumer_key:  '12345',
       shared_secret: 'sekret',
     }) }
-    let(:migrator) { Lti::ContentMigrationService::Migrator.new(course, tool) }
+    let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool) }
     let(:fetch_url) { 'https://lti.example.com/export/42' }
 
     before do
@@ -124,7 +124,7 @@ RSpec.describe Lti::ContentMigrationService::Migrator do
       }.to_json
       stub_request(:post, 'https://lti.example.com/begin_export').
         to_return(:status => 200, :body => response_body, :headers => {})
-      @migrator = Lti::ContentMigrationService::Migrator.new(@course, @tool)
+      @migrator = Lti::ContentMigrationService::Exporter.new(@course, @tool)
       @migrator.start!
     end
 
@@ -158,7 +158,7 @@ RSpec.describe Lti::ContentMigrationService::Migrator do
   end
 
   describe '#successfully_started?' do
-    let(:migrator) { Lti::ContentMigrationService::Migrator.new('', '') }
+    let(:migrator) { Lti::ContentMigrationService::Exporter.new('', '') }
     it 'must return true when status and fetch urls are both present' do
       migrator.instance_variable_set(:@status_url, 'junk')
       migrator.instance_variable_set(:@fetch_url, 'junk')

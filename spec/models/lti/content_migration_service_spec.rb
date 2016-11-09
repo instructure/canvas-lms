@@ -56,7 +56,7 @@ RSpec.describe Lti::ContentMigrationService do
     end
 
     it 'must return a hash with the data returned by the tool for the next steps in the process' do
-      expect(@return_value).to include "lti_#{@tool.id}" => an_instance_of(Lti::ContentMigrationService::Migrator)
+      expect(@return_value).to include "lti_#{@tool.id}" => an_instance_of(Lti::ContentMigrationService::Exporter)
     end
   end
 end

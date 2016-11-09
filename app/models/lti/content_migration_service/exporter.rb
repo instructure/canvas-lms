@@ -16,7 +16,7 @@
 
 module Lti
   module ContentMigrationService
-    class Migrator
+    class Exporter
       FAILED_STATUS = 'failed'.freeze
       SUCCESSFUL_STATUS = 'completed'.freeze
       JWT_LIFETIME = 30.seconds
