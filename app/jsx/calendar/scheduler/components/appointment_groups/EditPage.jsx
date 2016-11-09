@@ -35,7 +35,7 @@ define([
         startTime: appointment.start_at,
         endTime: appointment.end_at
       },
-      slotEventId: appointment.id
+      slotEventId: appointment.id.toString(),
     }));
   }
 
@@ -54,7 +54,9 @@ define([
       super(props)
       this.state = {
         appointmentGroup: {
-          title: ''
+          title: '',
+          context_codes: [],
+          sub_context_codes: [],
         },
         formValues: {},
         contexts: [],
