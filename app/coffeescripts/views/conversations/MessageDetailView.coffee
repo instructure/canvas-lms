@@ -37,6 +37,7 @@ define [
         $template = $(template(context))
         @model.messageCollection.each (message) =>
           message.set('conversation_id', context.id) unless message.get('conversation_id')
+          message.set('cannot_reply', context.cannot_reply) if context.cannot_reply
           childView = new MessageItemView(model: message).render()
           $template.find('.message-content').append(childView.$el)
           @listenTo(childView, 'reply',     => @trigger('reply', message))

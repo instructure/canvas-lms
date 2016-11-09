@@ -26,6 +26,7 @@ describe ConversationsController do
     users = create_users_in_course(course, user_data, account_associations: true, return_type: :record)
     @conversation = @user.initiate_conversation(users)
     @conversation.add_message(opts[:message] || 'test')
+    @conversation.conversation.update_attribute(:context, course)
     @conversation
   end
 
@@ -359,6 +360,7 @@ describe ConversationsController do
       @course2 = course(:active_all => true)
       @course2.enroll_teacher(@user).accept
       @course3 = course(:active_all => true)
+      @course3.enroll_student(@user)
       @group1 = @course1.groups.create!
       @group2 = @course1.groups.create!
       @group3 = @course3.groups.create!
@@ -468,6 +470,15 @@ describe ConversationsController do
       expect(response).to be_success
       expect(@conversation.messages.size).to eq 2
       expect(@conversation.reload.last_message_at).to eql expected_lma
+    end
+
+    it "should require permissions" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+
+      post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"
+      assert_unauthorized
     end
 
     it "should queue a job if needed" do

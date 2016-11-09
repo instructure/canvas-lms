@@ -481,9 +481,11 @@ class Group < ActiveRecord::Base
       can :read_forum and
       can :read_announcements and
       can :read_roster and
-      can :send_messages and
-      can :send_messages_all and
       can :view_unpublished_items
+
+      given { |user, session| user && self.has_member?(user) &&
+        (!self.context || self.context.is_a?(Account) || self.context.grants_any_right?(user, session, :send_messages, :send_messages_all)) }
+      can :send_messages and can :send_messages_all
 
       # if I am a member of this group and I can moderate_forum in the group's context
       # (makes it so group members cant edit each other's discussion entries)

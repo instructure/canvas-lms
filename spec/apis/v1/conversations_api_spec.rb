@@ -947,7 +947,8 @@ describe ConversationsController, type: :request do
 
   context "conversation" do
     it "should return the conversation" do
-      conversation = conversation(@bob)
+      conversation = conversation(@bob, :context_type => "Course", :context_id => @course.id)
+
       attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
       media_object = MediaObject.new
       media_object.media_id = '0_12345678'
@@ -1037,6 +1038,18 @@ describe ConversationsController, type: :request do
         "context_name" => conversation.context_name,
         "context_code" => conversation.conversation.context_code,
       })
+    end
+
+    it "should indicate if conversation permissions for the context are missing" do
+      @user = @billy
+      conversation = conversation(@bob, :sender => @billy, :context_type => "Course", :context_id => @course.id)
+
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+
+      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
+        { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :format => 'json' })
+
+      expect(json["cannot_reply"]).to eq true
     end
 
     it "should still include attachment verifiers when using session auth" do

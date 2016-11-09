@@ -711,6 +711,18 @@ class Conversation < ActiveRecord::Base
     conversation_participants.shard(self).delete_all
   end
 
+  def replies_locked_for?(user)
+    return false unless %w{Course Group}.include?(self.context_type)
+    course = self.context.is_a?(Course) ? self.context : self.context.context
+
+    # can still reply if a teacher is involved
+    if self.conversation_participants.where(:user_id => course.admin_enrollments.active.select(:user_id)).exists?
+      false
+    else
+      !self.context.grants_any_right?(user, :send_messages, :send_messages_all)
+    end
+  end
+
   protected
 
   def maybe_update_timestamp(col, val, additional_conditions=[])

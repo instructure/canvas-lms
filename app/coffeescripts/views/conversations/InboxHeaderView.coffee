@@ -110,7 +110,7 @@ define [
       @updateUi(newModel)
 
     updateUi: (newModel) ->
-      @toggleMessageBtns(!newModel || !newModel.get('selected'))
+      @toggleMessageBtns(newModel)
       @onReadStateChange(newModel)
       @onStarStateChange(newModel)
       @onArchivedStateChange(newModel)
@@ -176,13 +176,16 @@ define [
       @courseView.setValue(state.course)
       @trigger('course', @courseView.getCurrentContext())
 
-    toggleMessageBtns: (value) ->
-      @toggleReplyBtn(value)
-      @toggleReplyAllBtn(value)
-      @toggleArchiveBtn(value)
-      @toggleDeleteBtn(value)
-      @toggleAdminBtn(value)
-      @hideForwardBtn(value)
+    toggleMessageBtns: (newModel) ->
+      no_model = !newModel || !newModel.get('selected')
+      cannot_reply = no_model || newModel.get('cannot_reply')
+
+      @toggleReplyBtn(cannot_reply)
+      @toggleReplyAllBtn(cannot_reply)
+      @toggleArchiveBtn(no_model)
+      @toggleDeleteBtn(no_model)
+      @toggleAdminBtn(no_model)
+      @hideForwardBtn(no_model)
 
     toggleReplyBtn:    (value) ->
       @_toggleBtn(@$replyBtn, value)

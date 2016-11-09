@@ -13,6 +13,7 @@
     </h2>
 
     <ul class="message-detail-actions pull-right unstyled">
+      {{#unless cannot_reply}}
       <li>
         <a href="#"
            class="icon-reply-2 reply-btn Button Button--icon-action"
@@ -21,6 +22,7 @@
           <span class="screenreader-only">{{#t "reply"}}Reply{{/t}}</span>
         </a>
       </li>
+      {{/unless}}
       {{#unless for_submission}}
       <li>
         <div class="inline-block" role="application">
@@ -35,9 +37,11 @@
             <span class="screenreader-only">{{#t "message_actions"}}Message actions{{/t}}</span>
           </a>
           <ul class="al-options message-header-menu">
-            <li>
-              <a href="#" class="reply-all-btn">{{#t "reply_all"}}Reply all{{/t}}</a>
-            </li>
+            {{#unless cannot_reply}}
+              <li>
+                <a href="#" class="reply-all-btn">{{#t "reply_all"}}Reply all{{/t}}</a>
+              </li>
+            {{/unless}}
             <li>
               <a href="#" class="forward-btn">{{#t "forward"}}Forward{{/t}}</a>
             </li>

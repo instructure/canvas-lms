@@ -53,7 +53,7 @@ define [
     # Internal: Construct the search URL for the given term.
     url: (term) ->
       baseURL = '/api/v1/search/recipients?'
-      params = { search: term, per_page: 20, 'permissions[]': 'send_messages_all', synthetic_contexts: true }
+      params = { search: term, per_page: 20, 'permissions[]': 'send_messages_all', messageable_only: true, synthetic_contexts: true }
       params.context = @currentContext.id if @currentContext
 
       baseURL + _.reduce(params, (queryString, v, k) ->

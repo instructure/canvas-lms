@@ -228,10 +228,12 @@ require [
         remoteLaunch: true
 
     _initCollections: () ->
+      gc = new GroupCollection()
+      gc.setParam('include[]', 'can_message')
       @courses =
         favorites: new FavoriteCourseCollection()
         all: new CourseCollection()
-        groups: new GroupCollection()
+        groups: gc
       @courses.favorites.fetch()
 
     _initViews: ->
