@@ -99,6 +99,7 @@ class BzController < ApplicationController
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
+      data.path = request.referrer
       data.name = params[:name]
     else
       data = result.first
