@@ -134,7 +134,7 @@ define([
         $dialog.dialog('close')
       });
       $dialog.dialog({
-        title: I18n.t("Embed content from %{name}", {name: button.name}),
+        title: button.name,
         width: (button.width || 800),
         height: (button.height || frameHeight || 400),
         close: function(){
