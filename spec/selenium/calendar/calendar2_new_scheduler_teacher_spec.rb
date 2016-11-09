@@ -57,7 +57,7 @@ describe "scheduler" do
         datepicker_current
         set_value(fj('.time_field.start_time:visible'), start_time_text)
         set_value(fj('.time_field.end_time:visible'),end_time_text)
-        find('.save_without_publishing_link').click
+        find('.scheduler-event-details-footer .btn-primary').click
       end
 
       # make sure that the DB record for the Appointment Group is correct
