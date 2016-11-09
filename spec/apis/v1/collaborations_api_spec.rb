@@ -106,7 +106,18 @@ describe CollaborationsController, type: :request do
       expect(json.count).to eq 1
     end
 
-    it 'returns collaborations for which a user has access to through their group membership' do
+    it 'returns course collaborations for which a user has access to through their group membership' do
+      user = user_with_pseudonym(:active_all => true)
+      @course.enroll_student(user).accept!
+      gc = group_category
+      group = gc.groups.create!(:context => @course)
+      group.add_user(@user, 'accepted')
+      @course_collaboration.update_members([], [group.id])
+      json = api_call(:get, url, url_options)
+      expect(json.count).to eq 1
+    end
+
+    it 'returns group collaborations for which a user has access to through their group membership' do
       @group.add_user(@user)
       json = api_call(:get, group_url, group_url_options)
       expect(json.count).to eq 1
