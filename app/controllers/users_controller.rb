@@ -488,13 +488,19 @@ class UsersController < ApplicationController
       return redirect_to(dashboard_url, :status => :moved_permanently)
     end
     disable_page_views if @current_pseudonym && @current_pseudonym.unique_id == "pingdom@instructure.com"
+    # This is temporary to facilitate testing the StudentContextTray before it's live
+    tray_params = {
+      tray_course_id: params[:tray_course_id],
+      tray_user_id: params[:tray_user_id],
+      STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+    }
 
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
         :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard],
         :custom_colors => @current_user.custom_colors
-      }
+      }.merge(tray_params)
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)

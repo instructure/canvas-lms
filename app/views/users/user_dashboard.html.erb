@@ -12,6 +12,8 @@
   <div class="placeholder"></div>
 <% end %>
 
+<div id="StudentContextTray__Container" style="z-index: 100;"></div>
+
 <div id="dashboard">
   <%= render :partial => 'shared/dashboard_invitation', :collection => @pending_invitations %>
   <%= render :partial => 'shared/dashboard_messages' %>

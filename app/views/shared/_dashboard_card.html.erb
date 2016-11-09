@@ -1,5 +1,5 @@
 <% js_bundle :dashboard_card %>
-<% css_bundle :dashboard_card %>
+<% css_bundle :dashboard_card, :context_cards %>
 
 <%
 dashboard_courses = map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true)
