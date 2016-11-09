@@ -13,12 +13,12 @@ module AccountsAuthConfigsCommon
   def add_sso_config
     get "/accounts/#{Account.default.id}/authentication_providers"
     sso_url = 'http://test.example.com'
-    sso_form = f("#edit_sso_settings")
     set_value(f("#sso_settings_login_handle_name"), 'login')
     set_value(f("#sso_settings_change_password_url"), sso_url)
     set_value(f("#sso_settings_auth_discovery_url"), sso_url)
     f("button[type='submit']").click
     wait_for_ajaximations
+    Account.default.reload
   end
 
   def add_ldap_config(*)
