@@ -46,6 +46,15 @@ end
 module ArbitraryStrongishParams
   ANYTHING = Object.new.freeze
 
+  def initialize(attributes = nil)
+    @anythings = {}.with_indifferent_access
+    super
+  end
+
+  def encode_with(_coder)
+    raise "Strong parameters should not be dumped to YAML"
+  end
+
   # this is mostly copy-pasted
   def hash_filter(params, filter)
     filter = filter.with_indifferent_access
@@ -60,6 +69,7 @@ module ArbitraryStrongishParams
       elsif filter[key] == ANYTHING
         if filtered = recursive_arbitrary_filter(value)
           params[key] = filtered
+          params.instance_variable_get(:@anythings)[key] = true
         end
       else
         # Declaration { user: :name } or { user: [:name, :age, { address: ... }] }.
@@ -92,6 +102,17 @@ module ArbitraryStrongishParams
       arr
     elsif permitted_scalar?(value)
       value
+    end
+  end
+
+  def convert_hashes_to_parameters(key, value, assign_if_converted=true)
+    return value if @anythings.key?(key)
+    super
+  end
+
+  def dup
+    super.tap do |duplicate|
+      duplicate.instance_variable_set(:@anythings, @anythings.dup)
     end
   end
 end
