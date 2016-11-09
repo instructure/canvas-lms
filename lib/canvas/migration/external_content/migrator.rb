@@ -101,7 +101,7 @@ module Canvas::Migration::ExternalContent
 
         pending_imports = {}
         imported_content.each do |key, content|
-          service = self.registered_services[key]
+          service = import_service_for(key)
           if service
             begin
               if import = service.send_imported_content(migration.context, content)
@@ -115,10 +115,23 @@ module Canvas::Migration::ExternalContent
         ensure_imports_completed(pending_imports)
       end
 
+      private def import_service_for(key)
+        if Lti::ContentMigrationService::KEY_REGEX  =~ key
+          Lti::ContentMigrationService.importer_for(key)
+        else
+          self.registered_services[key]
+        end
+      end
+
       def ensure_imports_completed(pending_imports)
         # keep pinging until they're all finished
         retry_block_for_each(pending_imports.keys) do |key|
-          self.registered_services[key].import_completed?(pending_imports[key])
+          import_data = pending_imports[key]
+          if import_data.respond_to?(:import_completed?)
+            import_data.import_completed?
+          else
+            self.registered_services[key].import_completed?(import_data)
+          end
         end
       end
     end

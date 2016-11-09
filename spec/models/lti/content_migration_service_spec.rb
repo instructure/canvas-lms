@@ -59,4 +59,22 @@ RSpec.describe Lti::ContentMigrationService do
       expect(@return_value).to include "lti_#{@tool.id}" => an_instance_of(Lti::ContentMigrationService::Exporter)
     end
   end
+
+  describe '.importer_for(key)' do
+    it 'must return an Importer with the original_tool_id set when the key is valid' do
+      importer = Lti::ContentMigrationService.importer_for('lti_42')
+      expect(importer).to be_an(Lti::ContentMigrationService::Importer)
+      expect(importer.original_tool_id).to eq 42
+    end
+
+    it "must return nil when the key doesn't include an id" do
+      importer = Lti::ContentMigrationService.importer_for('lti_')
+      expect(importer).to be_nil
+    end
+
+    it 'must return nil when the key has extra stuff at the end' do
+      importer = Lti::ContentMigrationService.importer_for('lti_23_foobar')
+      expect(importer).to be_nil
+    end
+  end
 end

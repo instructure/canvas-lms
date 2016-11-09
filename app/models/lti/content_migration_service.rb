@@ -16,6 +16,8 @@
 
 module Lti
   module ContentMigrationService
+    KEY_REGEX = /\Alti_(?<id>\d+)\z/
+
     def self.enabled?
       Setting.get('enable_lti_content_migration', 'false') == 'true'
     end
@@ -41,6 +43,12 @@ module Lti
       end
 
       exports
+    end
+
+    def self.importer_for(key)
+      match = KEY_REGEX.match(key)
+      return unless match
+      Lti::ContentMigrationService::Importer.new(match[:id].to_i)
     end
   end
 end
