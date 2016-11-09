@@ -33,6 +33,12 @@ module Utils
         expect(string).to eq("Oct 1")
       end
 
+      it 'can use the full format' do
+        date = Date.parse("2010-10-1")
+        string = DatePresenter.new(date).as_string(:full)
+        expect(string).to eq("Oct 1, 2010 12:00")
+      end
+
       describe 'on relative dates' do
         let(:today) { Date.parse("2014-10-1") }
         around do |example|
