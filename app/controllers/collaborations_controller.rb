@@ -99,10 +99,16 @@ class CollaborationsController < ApplicationController
                              where(type: 'ExternalToolCollaboration')
 
     unless @context.grants_right?(@current_user, session, :manage_content)
+      where_collaborators = Collaboration.arel_table[:user_id].eq(@current_user.id).
+                            or(Collaborator.arel_table[:user_id].eq(@current_user.id))
+      if @context.instance_of?(Course)
+        users_course_groups = @context.groups.joins(:users).where(User.arel_table[:id].eq(@current_user.id)).pluck(:id)
+        where_collaborators = where_collaborators.or(Collaborator.arel_table[:group_id].in(users_course_groups))
+      end
+
       collaborations_query = collaborations_query.
                                 eager_load(:collaborators).
-                                where(Collaboration.arel_table[:user_id].eq(@current_user.id).
-                                or(Collaborator.arel_table[:user_id].eq(@current_user.id)))
+                                where(where_collaborators)
     end
 
     collaborations = Api.paginate(
