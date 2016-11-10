@@ -26,6 +26,7 @@
     "no-continue": ["off"],
     "no-plusplus": ["off"],
     "semi": ["off"],
+    "space-before-function-paren": ["error", "always"],
     "import/no-amd": ["off"]
   }
 }
