@@ -53,6 +53,10 @@ describe FilesController do
     @file = factory_with_protected_attributes(@user.attachments, :uploaded_data => io)
   end
 
+  def account_js_file
+    @file = factory_with_protected_attributes(@account.attachments, :uploaded_data => fixture_file_upload('test.js', 'text/javascript', false))
+  end
+
   def folder_file
     @file = @folder.active_file_attachments.build(:uploaded_data => io)
     @file.context = @course
@@ -651,6 +655,35 @@ describe FilesController do
         get "show_relative", params: {:course_id => @course.id, :file_path => "course files/nope"}
         assert_unauthorized
       end
+    end
+  
+    context "account-context files" do
+      before :once do
+        @account = account_model
+      end
+
+      before :each do
+        allow(HostUrl).to receive(:file_host).and_return('files.test')
+        request.host = 'files.test'
+        user_session(@teacher)
+      end
+
+      it "should skip verification for an account-context file" do
+        account_js_file
+        verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
+        ts, sf_verifier = @teacher.access_verifier
+        get 'show_relative', params: { :download => 1, :inline => 1, :sf_verifier => sf_verifier, :ts => ts, :user_id => @teacher.id, :verifier => verifier, :account_id => @account.id, :file_id => @file.id, :file_path => @file.full_path }
+        expect(response).to be_success
+      end
+      
+      it "should enforce verification for contexts other than account" do
+        course_file
+        verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
+        ts, sf_verifier = @teacher.access_verifier
+        get 'show_relative', params: { :download => 1, :inline => 1, :sf_verifier => sf_verifier, :ts => ts, :user_id => @teacher.id, :verifier => verifier, :account_id => @account.id, :file_id => @file.id, :file_path => @file.full_path }
+        assert_unauthorized
+      end
+
     end
   end
 
