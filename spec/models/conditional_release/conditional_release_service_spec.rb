@@ -502,12 +502,13 @@ describe ConditionalRelease::Service do
       expect(models0).to eq [@a3]
     end
 
-    it 'filters rules with no follow on assignments' do
+    it 'does not filter rules with no follow on assignments' do
       expect_cyoe_request '200', [@a1, @a2]
       @a1.destroy!
       @a2.destroy!
       @a3.destroy!
-      expect(rules).to eq []
+      expect(rules.length).to eq 1
+      expect(rules[0][:assignment_sets].length).to eq 0
     end
 
     it 'handles an http error with logging and defaults' do

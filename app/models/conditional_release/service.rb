@@ -364,7 +364,7 @@ module ConditionalRelease
             end.compact!
             set if set[:assignments].present?
           end.compact!
-          rule if rule[:assignment_sets].present?
+          rule
         end.compact!
         rules.compact
       end
