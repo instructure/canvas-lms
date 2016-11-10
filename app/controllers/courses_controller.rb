@@ -2686,9 +2686,6 @@ class CoursesController < ApplicationController
   def can_change_group_weighting_scheme?
     return true unless @course.feature_enabled?(:multiple_grading_periods)
     return true if @course.account_membership_allows(@current_user)
-    periods = GradingPeriod.for(@course)
-    @course.active_assignments.preload(:active_assignment_overrides).none? do |assignment|
-      assignment.due_for_any_student_in_closed_grading_period?(periods)
-    end
+    !@course.any_assignment_in_closed_grading_period?
   end
 end

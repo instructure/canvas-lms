@@ -4461,7 +4461,7 @@ describe Course, 'touch_root_folder_if_necessary' do
         @course.tab_configuration = [{"id" => Course::TAB_FILES, "hidden" => true}]
         @course.save!
         AdheresToPolicy::Cache.clear # this happens between requests; we're testing the Rails cache
-        expect(@root_folder.reload.grants_right?(@student, :read_contents)).to be_falsy
+        expect(@root_folder.reload.grants_right?(@student, :read_contents)).to be_falsey
       end
 
       @course.tab_configuration = [{"id" => Course::TAB_FILES}]
@@ -4666,5 +4666,25 @@ describe Course, "#filter_users_by_permission" do
 
     expect(@course.filter_users_by_permission(users, :read_forum)).to eq users # should still work since it is a retroactive permission
     expect(@course.filter_users_by_permission(users, :moderate_forum)).to be_empty # unlike this one
+  end
+end
+
+describe Course, '#assignment_in_closed_grading_period?' do
+  it 'delegates to EffectiveDueDates#in_closed_grading_period?' do
+    test_course = Course.create!
+    edd = EffectiveDueDates.for_course(test_course)
+    EffectiveDueDates.expects(:for_course).with(test_course).returns(edd)
+    edd.expects(:in_closed_grading_period?).with(7).returns(true)
+    expect(test_course.assignment_in_closed_grading_period?(7)).to eq(true)
+  end
+end
+
+describe Course, '#any_assignment_in_closed_grading_period?' do
+  it 'delegates to EffectiveDueDates#any_in_closed_grading_period?' do
+    test_course = Course.create!
+    edd = EffectiveDueDates.for_course(test_course)
+    EffectiveDueDates.expects(:for_course).with(test_course).returns(edd)
+    edd.expects(:any_in_closed_grading_period?).returns(true)
+    expect(test_course.any_assignment_in_closed_grading_period?).to eq(true)
   end
 end

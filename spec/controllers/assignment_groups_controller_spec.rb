@@ -326,6 +326,24 @@ describe AssignmentGroupsController do
         expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
       end
 
+      it 'allows assignments with no effective due date in a closed grading period to be moved into different groups' do
+        user_session(@teacher)
+        student = @course.students.first
+
+        override = @assignment2.assignment_overrides.create!(due_at: 1.month.from_now, due_at_overridden: true)
+        override.assignment_override_students.create!(user: student)
+
+        @order = "#{@assignment3.id},#{@assignment2.id}"
+
+        post :reorder_assignments, course_id: @course.id, assignment_group_id: @group2.id, order: @order
+        expect(response).to be_success
+        expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
+        expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
+        expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
+        expect(@assignment2.position).to eql(2)
+        expect(@assignment3.position).to eql(1)
+      end
+
       it 'allows assignments not in closed grading periods to be moved into different assignment groups' do
         user_session(@teacher)
         order = "#{@assignment3.id},#{@assignment2.id}"

@@ -752,9 +752,7 @@ describe AssignmentGroupsApiController, type: :request do
       before :once do
         @course.root_account.enable_feature!(:multiple_grading_periods)
         @grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
-        term = @course.enrollment_term
-        term.grading_period_group = @grading_period_group
-        term.save!
+        @grading_period_group.enrollment_terms << @course.enrollment_term
         Factories::GradingPeriodHelper.new.create_for_group(@grading_period_group, {
           start_date: 2.weeks.ago, end_date: 2.days.ago, close_date: 1.day.ago
         })
@@ -764,8 +762,12 @@ describe AssignmentGroupsApiController, type: :request do
       context "as a teacher" do
         before :each do
           @current_user = @teacher
+          student_in_course(course: @course, active_all: true)
           @assignment = @course.assignments.create!({
-            title: 'assignment', assignment_group: @assignment_group, due_at: 1.week.ago
+            title: 'assignment',
+            assignment_group: @assignment_group,
+            due_at: 1.week.ago,
+            workflow_state: 'published'
           })
         end
 

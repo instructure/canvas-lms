@@ -199,13 +199,13 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   def has_assignment_due_in_closed_grading_period?
-    published_assignments = context.assignments.published.where(assignment_group_id: self).
-      preload(:active_assignment_overrides, :context)
-    periods = GradingPeriod.for(self.course)
-    published_assignments.any? do |assignment|
-      assignment.due_for_any_student_in_closed_grading_period?(periods)
-    end
+    effective_due_dates.any_in_closed_grading_period?
   end
+
+  def effective_due_dates
+    @effective_due_dates ||= EffectiveDueDates.for_course(context, published_assignments)
+  end
+  private :effective_due_dates
 
   def visible_assignments(user, includes=[])
     self.class.visible_assignments(user, self.context, [self], includes)

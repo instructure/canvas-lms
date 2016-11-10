@@ -989,6 +989,16 @@ describe CoursesController, type: :request do
           @course.reload
           expect(@course.group_weighting_scheme).to eql("percent")
         end
+
+        it 'cannot change group_weighting_scheme if any effective due dates in the whole course are in a closed grading period' do
+          Course.any_instance.expects(:any_assignment_in_closed_grading_period?).returns(true)
+          @new_values["course"]["group_weighting_scheme"] = "percent"
+          teacher_in_course(course: @course, active_all: true)
+          raw_api_call(:put, @path, @params, @new_values)
+          expect(response.code).to eql '401'
+          @course.reload
+          expect(@course.group_weighting_scheme).not_to eql("percent")
+        end
       end
     end
 

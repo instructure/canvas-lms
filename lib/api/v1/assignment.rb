@@ -60,7 +60,21 @@ module Api::V1::Assignment
   }.freeze
 
   def assignments_json(assignments, user, session, opts = {})
-    assignments.map{ |assignment| assignment_json(assignment, user, session, opts) }
+    # check if all assignments being serialized belong to the same course
+    contexts = assignments.map {|a| [a.context_id, a.context_type] }.uniq
+    if contexts.length == 1
+      # if so, calculate their effective due dates in one go, rather than individually
+      opts.merge!({exclude_has_due_date_in_closed_grading_period: true})
+      due_dates = EffectiveDueDates.for_course(assignments.first.context, assignments)
+    end
+
+    assignments.map do |assignment|
+      json = assignment_json(assignment, user, session, opts)
+      unless json.key? 'has_due_date_in_closed_grading_period'
+        json['has_due_date_in_closed_grading_period'] = due_dates.in_closed_grading_period?(assignment)
+      end
+      json
+    end
   end
 
   def assignment_json(assignment, user, session, opts = {})
@@ -89,8 +103,9 @@ module Api::V1::Assignment
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
-    hash['has_due_date_in_closed_grading_period'] =
-      assignment.due_for_any_student_in_closed_grading_period?
+    unless opts[:exclude_has_due_date_in_closed_grading_period]
+      hash['has_due_date_in_closed_grading_period'] = assignment.in_closed_grading_period?
+    end
 
     if !opts[:overrides].blank?
       hash['overrides'] = assignment_overrides_json(opts[:overrides], user)

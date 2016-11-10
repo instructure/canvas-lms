@@ -3656,107 +3656,13 @@ describe Assignment do
     end
   end
 
-  describe "due_for_any_student_in_closed_grading_period?" do
-    before(:once) do
-      @course.root_account.enable_feature!(:multiple_grading_periods)
-      grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
-      grading_period_group.enrollment_terms << @course.enrollment_term
-      @course.enrollment_term.save!
-
-      grading_period_group.grading_periods.create!({
-        title: "Closed Grading Period",
-        start_date: 5.weeks.ago,
-        end_date: 3.weeks.ago,
-        close_date: 1.week.ago
-      })
-      @last_period = grading_period_group.grading_periods.create!({
-        title: "Open Grading Period",
-        start_date: 3.weeks.ago,
-        end_date: 1.week.ago,
-        close_date: 1.week.from_now
-      })
-
-      @assignment = @course.assignments.create!(title: "Example Assignment", only_visible_to_overrides: false)
-    end
-
-    it "is true when the assignment is due in a closed grading period" do
-      @assignment.update_attributes(due_at: 4.weeks.ago)
-      expect(@assignment.due_for_any_student_in_closed_grading_period?).to eql true
-    end
-
-    it "is false when the assignment is due in an open grading period" do
-      @assignment.update_attributes(due_at: 2.weeks.ago)
-      expect(@assignment.due_for_any_student_in_closed_grading_period?).to eql false
-    end
-
-    it "is false when the assignment is due after all grading periods" do
-      @assignment.update_attributes(due_at: 1.day.from_now)
-      expect(@assignment.due_for_any_student_in_closed_grading_period?).to eql false
-    end
-
-    it "is false when the assignment is due before all grading periods" do
-      @assignment.update_attributes(due_at: 6.weeks.ago)
-      expect(@assignment.due_for_any_student_in_closed_grading_period?).to eql false
-    end
-
-    context "when the assignment has no due date" do
-      it "is true when the last grading period is closed" do
-        @assignment.update_attributes(due_at: nil)
-        @last_period.update_attributes(close_date: 1.week.ago)
-        expect(@assignment.due_for_any_student_in_closed_grading_period?).to eql true
-      end
-
-      it "is false when the last grading period is open" do
-        @assignment.update_attributes(due_at: nil)
-        expect(@assignment.due_for_any_student_in_closed_grading_period?).to eql false
-      end
-    end
-
-    it "is true when the assignment has an override with a due date in a closed grading period" do
-      @assignment.update_attributes(due_at: 2.days.from_now)
-      override = @assignment.assignment_overrides.build
-      override.set = @course.default_section
-      override.override_due_at(4.weeks.ago)
-      override.save!
-      expect(@assignment.reload.due_for_any_student_in_closed_grading_period?).to eql true
-    end
-
-    context "when the assignment has an override with no due date" do
-      it "is true when the last grading period is closed" do
-        @last_period.update_attributes(close_date: 1.week.ago)
-        @assignment.update_attributes(due_at: nil)
-        override = @assignment.assignment_overrides.build
-        override.set = @course.default_section
-        override.save!
-        expect(@assignment.reload.due_for_any_student_in_closed_grading_period?).to eql true
-      end
-
-      it "is false when the last grading period is open" do
-        @assignment.update_attributes(due_at: nil)
-        override = @assignment.assignment_overrides.build
-        override.set = @course.default_section
-        override.save!
-        expect(@assignment.reload.due_for_any_student_in_closed_grading_period?).to eql false
-      end
-    end
-
-    it "is false when the assignment has a deleted override with a due date in a closed grading period" do
-      @assignment.update_attributes(due_at: 2.days.from_now)
-      override = @assignment.assignment_overrides.build
-      override.set = @course.default_section
-      override.override_due_at(4.weeks.ago)
-      override.save!
-      override.destroy
-      expect(@assignment.reload.due_for_any_student_in_closed_grading_period?).to eql false
-    end
-
-    it "is false when the assignment is due in a closed grading period and only visible to overrides" do
-      @assignment.update_attributes(due_at: 4.weeks.ago, only_visible_to_overrides: true)
-      override = @assignment.assignment_overrides.build
-      override.set = @course.default_section
-      override.override_due_at(2.days.from_now)
-      override.save!
-      expect(@assignment.reload.due_for_any_student_in_closed_grading_period?).to eql false
+  describe '#in_closed_grading_period?' do
+    it 'calls EffectiveDueDates#in_closed_grading_period?' do
+      assignment_model(course: @course)
+      edd = EffectiveDueDates.for_course(@course, @assignment)
+      EffectiveDueDates.expects(:for_course).with(@course, @assignment.id).returns(edd)
+      edd.expects(:in_closed_grading_period?).with(@assignment.id).returns(true)
+      expect(@assignment.in_closed_grading_period?).to eq(true)
     end
   end
 

@@ -1055,7 +1055,7 @@ class Assignment < ActiveRecord::Base
     given do |user, session|
       self.context.grants_right?(user, session, :manage_assignments) &&
         (self.context.account_membership_allows(user) ||
-         !due_for_any_student_in_closed_grading_period?)
+         !in_closed_grading_period?)
     end
     can :delete
   end
@@ -2173,15 +2173,9 @@ class Assignment < ActiveRecord::Base
     s.excused?
   end
 
-  def due_for_any_student_in_closed_grading_period?(periods = nil)
-    periods ||= GradingPeriod.for(self.course)
-    due_in_closed_period = !self.only_visible_to_overrides &&
-      GradingPeriodHelper.date_in_closed_grading_period?(self.due_date, periods)
-    due_in_closed_period ||= self.active_assignment_overrides.any? do |override|
-      GradingPeriodHelper.date_in_closed_grading_period?(override.due_at, periods)
-    end
-
-    due_in_closed_period
+  def in_closed_grading_period?
+    @effective_due_dates ||= EffectiveDueDates.for_course(context, id)
+    @effective_due_dates.in_closed_grading_period?(id)
   end
 
   # simply versioned models are always marked new_record, but for our purposes

@@ -151,7 +151,7 @@ class AssignmentGroupsController < ApplicationController
     if authorized_action(@group, @current_user, :update)
       order = params[:order].split(',').map{|id| id.to_i }
       group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.where(id: order).uniq.except(:order).pluck(:assignment_group_id)))
-      assignments = @context.active_assignments.where(id: order).preload(:active_assignment_overrides)
+      assignments = @context.active_assignments.where(id: order)
 
       return render_unauthorized_action unless can_reorder_assignments?(assignments, @group)
 
@@ -386,12 +386,15 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def can_reorder_assignments?(assignments, group)
-    return true if @context.account_membership_allows(@current_user)
     return true unless @context.feature_enabled?(:multiple_grading_periods)
-    periods = GradingPeriod.for(@context)
+    return true if @context.account_membership_allows(@current_user)
+
+    effective_due_dates = EffectiveDueDates.for_course(@context, assignments)
     assignments.none? do |assignment|
+      # if the assignment is being moved into a different group and it's in
+      # a closed period, do not allow it to be moved.
       assignment.assignment_group_id != group.id &&
-        assignment.due_for_any_student_in_closed_grading_period?(periods)
+        effective_due_dates.in_closed_grading_period?(assignment.id)
     end
   end
 end
