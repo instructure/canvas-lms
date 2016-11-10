@@ -1880,7 +1880,7 @@ class Course < ActiveRecord::Base
 
   def resubmission_for(asset)
     asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
-    instructors.order(:id).each(&:touch)
+    instructors.touch_all
   end
 
   def grading_standard_enabled
