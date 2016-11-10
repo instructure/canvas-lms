@@ -110,6 +110,24 @@ class BzController < ApplicationController
     render :nothing => true
   end
 
+  def retained_data_stats
+    @result = ActiveRecord::Base.connection.execute("
+      SELECT
+        count(*) AS cnt,
+        value
+      FROM
+        retained_data
+      WHERE
+        name = #{ActiveRecord::Base.connection.quote(params[:name])}
+      GROUP BY
+        value
+      ORDER BY
+        cnt DESC
+    ")
+
+    @name = params[:name]
+  end
+
   def last_user_url
     @current_user.last_url = params[:last_url]
     @current_user.last_url_title = params[:last_url_title]
