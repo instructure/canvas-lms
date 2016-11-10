@@ -108,7 +108,11 @@ require 'securerandom'
 #     }
 #
 class FilesController < ApplicationController
-  protect_from_forgery :except => [:api_capture], with: :exception
+  # show_relative is exempted from protect_from_forgery in order to allow 
+  # brand-config-uploaded JS to work
+  # verify_authenticity_token is manually-invoked where @context is not
+  # an Account in show_relative
+  protect_from_forgery :except => [:api_capture, :show_relative], with: :exception
 
   before_action :require_user, only: :create_pending
   before_action :require_context, except: [
@@ -568,6 +572,10 @@ class FilesController < ApplicationController
     path = params[:file_path]
     file_id = params[:file_id]
     file_id = nil unless file_id.to_s =~ Api::ID_REGEX
+
+    # Manually-invoke verify_authenticity_token for non-Account contexts
+    # This is to allow Account-level file downloads to skip request forgery protection
+    verify_authenticity_token unless @context.is_a?(Account)
 
     #if the relative path matches the given file id use that file
     if file_id && @attachment = @context.attachments.where(id: file_id).first
