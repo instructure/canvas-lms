@@ -292,6 +292,12 @@ module SeleniumDriverSetup
   def record_errors(example, exception, log_messages)
     js_errors = driver.execute_script("return window.JSErrorCollector_errors && window.JSErrorCollector_errors.pump()") || []
 
+    # ignore "mutating the [[Prototype]] of an object" js errors
+    mutating_prototype_error = "mutating the [[Prototype]] of an object"
+    js_errors.reject! do |error|
+      error["errorMessage"].start_with? mutating_prototype_error
+    end
+
     # always send js errors to stdout, even if the spec passed. we have to
     # empty the JSErrorCollector anyway, so we might as well show it.
     meta = example.metadata
