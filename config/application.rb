@@ -230,12 +230,7 @@ module CanvasRails
       end
     end
 
-    if Rails.env.development? && !ENV['DISABLED_BETTER_ERRORS']
-      require 'better_errors'
-      require 'binding_of_caller'
-    else
-      config.exceptions_app = ExceptionsApp.new
-    end
+    config.exceptions_app = ExceptionsApp.new
 
     config.before_initialize do
       config.action_controller.asset_host = Canvas::Cdn.method(:asset_host_for)

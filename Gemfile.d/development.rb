@@ -12,12 +12,11 @@ group :development do
   gem 'spring', '>= 1.3.2'
   gem 'spring-commands-rspec', '1.0.2'
 
-  gem 'better_errors', '~> 2.1.1', require: false
-  gem 'binding_of_caller', require: false
-
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
+
+
   unless ENV['DISABLE_RUBY_DEBUGGING']
     gem 'byebug', '~> 9.0', platform: :mri
   end
