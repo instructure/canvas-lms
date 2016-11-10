@@ -106,10 +106,38 @@ describe ContextModulesHelper do
       expect(item_data[:choose_url]).to eq context_url(t_course, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
     end
 
-    it "should set show_cyoe_placeholder to true if no set has been selected for a cyoe trigger assignment module item" do
+    it "should set show_cyoe_placeholder to true if no set has been selected and the rule is locked" do
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: assg.id,
+          locked: true,
+          assignment_sets: [],
+        }
+      ])
       module_data = process_module_data(t_module, true, true, @student, @session)
       item_data = module_data[:items_data][item.id]
       expect(item_data[:show_cyoe_placeholder]).to eq true
+    end
+
+    it "should set show_cyoe_placeholder to true if no set has been selected and sets are available" do
+      module_data = process_module_data(t_module, true, true, @student, @session)
+      item_data = module_data[:items_data][item.id]
+      expect(item_data[:show_cyoe_placeholder]).to eq true
+
+    end
+
+    it "should set show_cyoe_placeholder to false if no set has been selected and no sets are available" do
+      ConditionalRelease::Service.stubs(:rules_for).returns([
+        {
+          trigger_assignment: assg.id,
+          locked: false,
+          assignment_sets: [],
+        }
+      ])
+      module_data = process_module_data(t_module, true, true, @student, @session)
+      item_data = module_data[:items_data][item.id]
+      expect(item_data[:show_cyoe_placeholder]).to eq false
+
     end
 
     it "should set show_cyoe_placeholder to false if set has been selected for a cyoe trigger assignment module item" do
