@@ -99,6 +99,7 @@ class BzController < ApplicationController
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
+      data.path = request.referrer
       data.name = params[:name]
     else
       data = result.first
@@ -107,6 +108,24 @@ class BzController < ApplicationController
     data.value = params[:value]
     data.save
     render :nothing => true
+  end
+
+  def retained_data_stats
+    @result = ActiveRecord::Base.connection.execute("
+      SELECT
+        count(*) AS cnt,
+        value
+      FROM
+        retained_data
+      WHERE
+        name = #{ActiveRecord::Base.connection.quote(params[:name])}
+      GROUP BY
+        value
+      ORDER BY
+        cnt DESC
+    ")
+
+    @name = params[:name]
   end
 
   def last_user_url
