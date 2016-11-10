@@ -199,6 +199,14 @@ define([
     ok(srcUrl.indexOf(encodeURIComponent(url)) > -1)
   });
 
+  test('can be fullscreened', () => {
+    let retrieveUrl = 'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22';
+    let url = 'www.example.com/lti/launch/user/4';
+    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, url);
+    let fullscreenAttr = $div.find('iframe').attr('allowfullscreen');
+    equal(fullscreenAttr, "true");
+  })
+
   module('speed_grader#getGradeToShow');
 
   test('returns an empty string if submission is null', () => {

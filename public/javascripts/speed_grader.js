@@ -1837,7 +1837,7 @@ define([
       var launchUrl = urlBase + '&url=' + encodeURIComponent(externalToolUrl);
       var iframe = SpeedgraderHelpers.buildIframe(htmlEscape(launchUrl), {
         className: 'tool_launch',
-        allowfullscreeen: true
+        allowfullscreen: true
       });
       $div.html(
         $.raw(iframe)
