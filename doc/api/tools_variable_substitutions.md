@@ -206,6 +206,13 @@ returns the current course id. Only available when launched in a course.
 1234
 ```
 
+## Canvas.course.workflowState
+returns the current course workflow state. Workflow states of "claimed" or "created" indicate an unpublished course.
+
+```
+available
+```
+
 ## Canvas.course.sisSourceId
 returns the current course sis source id. Only available when launched in a course.
 
