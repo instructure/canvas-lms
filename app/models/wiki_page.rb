@@ -419,8 +419,7 @@ class WikiPage < ActiveRecord::Base
     if revised_at_changed?
       CanvasPandaPub.post_update(
         "/private/wiki_page/#{self.global_id}/update", {
-          revised_at: self.revised_at,
-          revision: self.versions.current.number
+          revised_at: self.revised_at
         })
     end
   end
