@@ -5,6 +5,8 @@ require 'google/api_client'
 require 'google/api_client/auth/storage'
 require 'google/api_client/auth/storages/file_store'
 
+require 'csv'
+
 class BzController < ApplicationController
 
   before_filter :require_user
@@ -111,7 +113,7 @@ class BzController < ApplicationController
   end
 
   def retained_data_stats
-    @result = ActiveRecord::Base.connection.execute("
+    @aggregate_result = ActiveRecord::Base.connection.execute("
       SELECT
         count(*) AS cnt,
         value
@@ -125,7 +127,79 @@ class BzController < ApplicationController
         cnt DESC
     ")
 
+    individual_responses = ActiveRecord::Base.connection.execute("
+      SELECT
+        user_id,
+        value,
+        path
+      FROM
+        retained_data
+      WHERE
+        name = #{ActiveRecord::Base.connection.quote(params[:name])}
+      ORDER BY
+        value
+    ")
+
+    @individual_responses = []
+
+    individual_responses.each do |response|
+      # this is WAY less efficient than doing a join but
+      # idk how the model pulls this so i'm just letting
+      # ruby do it.
+      u = User.find(response["user_id"])
+      r = {}
+      r["value"] = response["value"]
+      r["path"] = response["path"]
+      r["name"] = u.name
+      r["email"] = u.email
+      @individual_responses.push(r)
+    end
+
     @name = params[:name]
+  end
+
+  def retained_data_export
+    course = Course.find(params[:course])
+    all_fields = {}
+    items = []
+    course.enrollments.each do |enrollment|
+      u = User.find(enrollment.user_id)
+      item = {}
+      item["Name"] = u.name
+      item["Email"] = u.email
+
+      RetainedData.where(:user_id => u.id).each do |rd|
+        item[rd.name] = rd.value
+        all_fields[rd.name] = rd.name
+      end
+
+      items.push(item)
+    end
+
+    csv_result = CSV.generate do |csv|
+      header = []
+      header << "Name"
+      header << "Email"
+      all_fields.each do |k, v|
+        header << v
+      end
+      csv << header
+
+      items.each do |item|
+        row = []
+        row << item["Name"]
+        row << item["Email"]
+        all_fields.each do |k, v|
+          row << item[v]
+        end
+
+        csv << row
+      end
+    end
+
+    respond_to do |format|
+      format.csv { render text: csv_result }
+    end
   end
 
   def last_user_url
