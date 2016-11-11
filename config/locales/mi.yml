@@ -275,15 +275,15 @@ mi:
     report_header_associated_user_id: tauututanga_apataki_here
     report_header_attempt: whakamātautanga
     report_header_canvas_account_id: canvas_account_id
-    report_header_canvas_associated_user_id: tauututanga_apataki_here_canvas
-    report_header_canvas_course_id: tauututanga_kaupapa_canvas
-    report_header_canvas_group_id: tauututanga_rōpū_canvas
-    report_header_canvas_nonxlist_course_id: tauututanga_kaupapa_rārangikore_canvas
-    report_header_canvas_parent_id: tauututanga_mātua_canvas
-    report_header_canvas_section_id: tauututanga_wāhanga_canvas
-    report_header_canvas_term_id: tauututanga_wāhanga_canvas
-    report_header_canvas_user_id: tauututanga_apataki_canvas
-    report_header_canvas_xlist_course_id: canvas_xlist_tauututanga_kaupapa
+    report_header_canvas_associated_user_id: canvas_associated_user_id
+    report_header_canvas_course_id: canvas_course_id
+    report_header_canvas_group_id: canvas_group_id
+    report_header_canvas_nonxlist_course_id: canvas_nonxlist_course_id
+    report_header_canvas_parent_id: canvas_parent_id
+    report_header_canvas_section_id: canvas_section_id
+    report_header_canvas_term_id: canvas_term_id
+    report_header_canvas_user_id: canvas_user_id
+    report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: kaupapa
     report_header_course__id: tauututanga_kaupapa
     report_header_course_id: "tauututanga kaupapa"
