@@ -139,7 +139,7 @@ namespace :js do
         sub(%r{/javascripts/compiled/plugins/([^/]+)(/|$)}, '/plugins/\\1/javascripts/compiled\\2')
   end
 
-  desc "build webpack js"
+  desc "Build webpack js"
   task :webpack do
     if CANVAS_WEBPACK
       if ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
@@ -153,8 +153,35 @@ namespace :js do
     end
   end
 
-  desc "optimize and build js for production"
+  desc "Optimize and build js for production"
   task :build do
+    Rake::Task['js:rjs_config'].invoke
+
+    puts "--> Concatenating JavaScript bundles with r.js"
+    time = Benchmark.realtime { Rake::Task['js:rjs_concat'].invoke }
+    puts "--> Concatenated JavaScript bundles in #{time}"
+
+    unless ENV["JS_BUILD_NO_UGLIFY"]
+      puts "--> Compressing JavaScript with UglifyJS"
+      time = Benchmark.realtime { Rake::Task['js:compress'].invoke }
+      puts "--> Compressed JavaScript in #{time}"
+    end
+  end
+
+  desc "Concatenate js bundles with r.js"
+  task :rjs_concat do
+    output = `node #{Rails.root}/node_modules/requirejs/bin/r.js -o #{Rails.root}/config/build.js 2>&1`
+    raise "Error running js:rjs_concat: \n#{output}\nABORTING" if $?.exitstatus != 0
+  end
+
+  desc "Compress js with uglify"
+  task :compress do
+    output = `npm run compress 2>&1`
+    raise "Error running js:compress: \n#{output}\nABORTING" if $?.exitstatus != 0
+  end
+
+  desc "Write config/build.js for r.js"
+  task :rjs_config do
     require 'config/initializers/plugin_symlinks'
     require 'canvas/require_js'
     require 'erubis'
@@ -162,22 +189,6 @@ namespace :js do
     output = Erubis::Eruby.new(File.read("#{Rails.root}/config/build.js.erb")).
         result(Canvas::RequireJs.get_binding)
     File.open("#{Rails.root}/config/build.js", 'w') { |f| f.write(output) }
-
-    puts "--> Concatenating JavaScript bundles with r.js"
-    optimize_time = Benchmark.realtime do
-      output = `node #{Rails.root}/node_modules/requirejs/bin/r.js -o #{Rails.root}/config/build.js 2>&1`
-      raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
-    end
-    puts "--> Concatenated JavaScript bundles in #{optimize_time}"
-
-    unless ENV["JS_BUILD_NO_UGLIFY"]
-      puts "--> Compressing JavaScript with UglifyJS"
-      optimize_time = Benchmark.realtime do
-        output = `npm run compress 2>&1`
-        raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
-      end
-      puts "--> Compressed JavaScript in #{optimize_time}"
-    end
   end
 
   desc "Compile React JSX to JS"
