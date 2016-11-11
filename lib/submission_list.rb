@@ -294,7 +294,9 @@ class SubmissionList
 
     # A list of all versions in YAML format
     def yaml_list
-      @yaml_list ||= self.course.submissions.map {|s| s.versions.map { |v| v.yaml } }.flatten
+      @yaml_list ||= self.course.submissions.preload(:versions).map do |s|
+        s.versions.map { |v| v.yaml }
+      end.flatten
     end
 
     # A list of hashes.  All the versions of all the submissions for a
