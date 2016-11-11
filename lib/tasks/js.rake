@@ -134,7 +134,7 @@ namespace :js do
     false
   end
 
-  desc "generates plugin extension modules"
+  desc "Generates plugin extension modules"
   task :generate_extensions do
     require 'canvas/require_js/plugin_extension'
     Canvas::RequireJs::PluginExtension.generate_all
@@ -322,20 +322,14 @@ namespace :js do
       dirs << [directory, destination]
     end
 
-    dirs.each { |source,dest|
-      if Rails.env == 'development'
-        msg = `node_modules/.bin/babel #{source} --out-dir #{dest} --source-maps inline 2>&1 >/dev/null`
-      else
-        msg = `node_modules/.bin/babel #{source} --out-dir #{dest} 2>&1 >/dev/null`
-      end
-
-      unless $?.success?
-        raise msg
-      end
-    }
+    dirs.each do |source,dest|
+      opts = Rails.env.development? ? "--source-maps inline" : ""
+      msg = `node_modules/.bin/babel #{source} --out-dir #{dest} #{opts} 2>&1 >/dev/null`
+      raise msg unless $?.success?
+    end
   end
 
-  desc "creates ember app bundles"
+  desc "Creates ember app bundles"
   task :bundle_ember_apps do
     require 'lib/ember_bundle'
     Dir.entries('app/coffeescripts/ember').reject { |d| d.match(/^\./) || d == 'shared' }.each do |app|
