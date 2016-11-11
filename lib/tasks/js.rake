@@ -172,14 +172,11 @@ namespace :js do
     maintain_client_app_symlinks
   end
 
-  desc "generates compiled coffeescript, handlebars templates and plugin extensions"
-  task :generate do
-    require 'config/initializers/plugin_symlinks'
+  desc "Cleans build javascript files"
+  task :clean do
     require 'config/initializers/client_app_symlinks'
-    require 'fileutils'
+    require 'config/initializers/plugin_symlinks'
 
-    # clear out all the files in case there are any old compiled versions of
-    # files that don't map to any source file anymore
     paths_to_remove = [
       Dir.glob('public/javascripts/{compiled,jst,jsx}'),
       Dir.glob('public/plugins/*/javascripts/{compiled,jst,jsx}'),
@@ -187,7 +184,14 @@ namespace :js do
       Dir.glob('spec/plugins/*/javascripts/compiled')
     ]
     FileUtils.rm_rf(paths_to_remove)
+  end
 
+  desc "Generates compiled coffeescript, handlebars templates and plugin extensions"
+  task :generate do
+    require 'config/initializers/client_app_symlinks'
+    require 'config/initializers/plugin_symlinks'
+
+    Rake::Task['js:clean'].invoke
     Rake::Task['js:build_client_apps'].invoke
 
     threads = []
