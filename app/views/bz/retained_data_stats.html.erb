@@ -11,12 +11,13 @@
 
 <table id="instant-survey-report-details">
 	<caption>Individual Responses</caption>
-	<tr><th>Name</th><th>Email</th><th>Response</th></tr>
+	<tr><th>Name</th><th>Email</th><th>Response</th><th>Set On</th></tr>
 	<% @individual_responses.each do |row| %>
 	<tr>
 	  <td><%= row["name"] %></td>
 	  <td><%= row["email"] %></td>
 	  <td><%= row["value"] %></td>
+	  <td><a href="<%= row["path"] %>">Link</a></td>
 	</tr>
 	<% end %>
 </table>
