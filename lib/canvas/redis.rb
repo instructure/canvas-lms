@@ -64,7 +64,7 @@ module Canvas::Redis
 
     if self.ignore_redis_failures?
       Canvas::Errors.capture(e, type: :redis)
-      last_redis_failure[redis_name] = Time.zone.now
+      last_redis_failure[redis_name] = Time.now
       failure_retval
     else
       raise
@@ -78,7 +78,7 @@ module Canvas::Redis
     def process(commands, *a, &b)
       # These instance vars are used by the added #log_request_response method.
       @processing_requests = commands.map(&:dup)
-      @process_start = Time.zone.now
+      @process_start = Time.now
 
       # try to return the type of value the command would expect, for some
       # specific commands that we know can cause problems if we just return
@@ -111,7 +111,7 @@ module Canvas::Redis
       # client works this way because #process may be called with many commands
       # at once, if using #pipeline.
       @processing_requests ||= []
-      @process_start ||= Time.zone.now
+      @process_start ||= Time.now
       log_request_response(@processing_requests.shift, response, @process_start)
       response
     end
@@ -125,7 +125,7 @@ module Canvas::Redis
         command: command,
         # request_size is the sum of all the string parameters send with the command.
         request_size: request.sum { |c| c.to_s.size },
-        request_time_ms: (Time.zone.now - start_time) * 1000,
+        request_time_ms: (Time.now - start_time) * 1000,
         host: location,
       }
       unless NON_KEY_COMMANDS.include?(command)
@@ -155,7 +155,7 @@ module Canvas::Redis
       end
 
       logline = JSON.generate(message.compact)
-      Rails.logger.debug(logline)
+      Rails.logger.debug(logline) if Rails.logger
     end
 
     def write(command)
