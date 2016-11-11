@@ -36,7 +36,7 @@
           <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
         {{/if}}
         {{#if CAN.UPDATE_CONTENT}}
-          <a href="/bz/retained_data_stats?name=instant-survey-{{page_id}}" class="btn">See Survey Results</a>
+          <a href="/bz/retained_data_stats?name=instant-survey-{{page_id}}" style="display: none;" id="see-survey-results-button" class="btn">See Survey Results</a>
         {{/if}}
         {{#if CAN.ACCESS_GEAR_MENU}}
           <div class="inline-block">
