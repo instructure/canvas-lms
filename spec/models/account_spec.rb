@@ -485,14 +485,13 @@ describe Account do
                   [:create_courses] +
                   [:create_tool_manually]
 
-    siteadmin_access = [:app_profiling]
     full_root_access = full_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :site_admin }.map(&:first)
     full_sub_access = full_root_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :root }.map(&:first)
     # site admin has access to everything everywhere
     hash.each do |k, v|
       account = v[:account]
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
-      expect(account.check_policy(hash[:site_admin][:user]) - conditional_access).to match_array siteadmin_access + limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      expect(account.check_policy(hash[:site_admin][:user]) - conditional_access).to match_array limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
     end
 
     # root admin has access to everything except site admin
@@ -534,7 +533,7 @@ describe Account do
     hash.each do |k, v|
       account = v[:account]
       admin_array = full_access + (k == :site_admin ? [:read_global_outcomes] : [])
-      user_array = siteadmin_access + some_access + [:reset_any_mfa] +
+      user_array = some_access + [:reset_any_mfa] +
         (k == :site_admin ? [:read_global_outcomes] : [])
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_array
       expect(account.check_policy(hash[:site_admin][:user])).to match_array user_array

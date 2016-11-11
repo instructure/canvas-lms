@@ -45,7 +45,6 @@ class ApplicationController < ActionController::Base
   skip_before_filter :activate_authlogic
   prepend_before_filter :activate_authlogic
 
-  before_filter ::Filters::AllowAppProfiling
   before_filter :check_pending_otp
   before_filter :set_user_id_header
   before_filter :set_time_zone
