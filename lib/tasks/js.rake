@@ -224,4 +224,10 @@ namespace :js do
       EmberBundle.new(app).build
     end
   end
+
+  desc "Ensure up-to-date node environment"
+  task :npm_install do
+    puts "node is: #{`node -v`.strip} (#{`which node`.strip})"
+    raise 'error running npm install' unless `npm install`
+  end
 end
