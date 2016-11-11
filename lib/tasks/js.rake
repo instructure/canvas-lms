@@ -2,6 +2,74 @@ require 'json'
 require_relative "../../config/initializers/webpack"
 
 namespace :js do
+  # ---------------- META TASKS ----------------
+  # (add functionality as a separate task below)
+
+  desc "Generates compiled coffeescript, handlebars templates and plugin extensions"
+  task :generate do
+    require 'config/initializers/client_app_symlinks'
+    require 'config/initializers/plugin_symlinks'
+
+    Rake::Task['js:clean'].invoke
+    Rake::Task['js:build_client_apps'].invoke
+
+    threads = []
+    threads << Thread.new do
+      puts "--> Generating plugin extensions"
+      extensions_time = Benchmark.realtime { Rake::Task['js:generate_extensions'].invoke }
+      puts "--> Generating plugin extensions finished in #{extensions_time}"
+    end
+
+    threads << Thread.new do
+      puts "--> Compiling React JSX"
+      jsx_time = Benchmark.realtime { Rake::Task['js:jsx'].invoke }
+      puts "--> Compiling React JSX finished in #{jsx_time}"
+    end
+
+    threads << Thread.new do
+      puts "--> Pre-compiling handlebars templates"
+      handlebars_time = Benchmark.realtime { Rake::Task['jst:compile'].invoke }
+      puts "--> Pre-compiling handlebars templates finished in #{handlebars_time}"
+    end
+
+    threads << Thread.new do
+      puts "--> Pre-compiling ember handlebars templates"
+      ember_handlebars_time = Benchmark.realtime { Rake::Task['jst:ember'].invoke }
+      puts "--> Pre-compiling ember handlebars templates finished in #{ember_handlebars_time}"
+    end
+
+    # can't be in own thread, needs to happen before coffeescript
+    puts "--> Creating ember app bundles"
+    bundle_time = Benchmark.realtime { Rake::Task['js:bundle_ember_apps'].invoke }
+    puts "--> Creating ember app bundles finished in #{bundle_time}"
+
+    threads << Thread.new do
+      coffee_time = Benchmark.realtime do
+        Rake::Task['js:coffee'].invoke
+      end
+      puts "--> Compiling CoffeeScript finished in #{coffee_time}"
+    end
+
+    threads.each(&:join)
+  end
+
+  desc "Optimize and build js for production"
+  task :build do
+    Rake::Task['js:rjs_config'].invoke
+
+    puts "--> Concatenating JavaScript bundles with r.js"
+    time = Benchmark.realtime { Rake::Task['js:rjs_concat'].invoke }
+    puts "--> Concatenated JavaScript bundles in #{time}"
+
+    unless ENV["JS_BUILD_NO_UGLIFY"]
+      puts "--> Compressing JavaScript with UglifyJS"
+      time = Benchmark.realtime { Rake::Task['js:compress'].invoke }
+      puts "--> Compressed JavaScript in #{time}"
+    end
+  end
+
+  # --- TASKS ---
+
   desc "Generates plugin extension modules"
   task :generate_extensions do
     require 'canvas/require_js/plugin_extension'
@@ -54,54 +122,6 @@ namespace :js do
     FileUtils.rm_rf(paths_to_remove)
   end
 
-  desc "Generates compiled coffeescript, handlebars templates and plugin extensions"
-  task :generate do
-    require 'config/initializers/client_app_symlinks'
-    require 'config/initializers/plugin_symlinks'
-
-    Rake::Task['js:clean'].invoke
-    Rake::Task['js:build_client_apps'].invoke
-
-    threads = []
-    threads << Thread.new do
-      puts "--> Generating plugin extensions"
-      extensions_time = Benchmark.realtime { Rake::Task['js:generate_extensions'].invoke }
-      puts "--> Generating plugin extensions finished in #{extensions_time}"
-    end
-
-    threads << Thread.new do
-      puts "--> Compiling React JSX"
-      jsx_time = Benchmark.realtime { Rake::Task['js:jsx'].invoke }
-      puts "--> Compiling React JSX finished in #{jsx_time}"
-    end
-
-    threads << Thread.new do
-      puts "--> Pre-compiling handlebars templates"
-      handlebars_time = Benchmark.realtime { Rake::Task['jst:compile'].invoke }
-      puts "--> Pre-compiling handlebars templates finished in #{handlebars_time}"
-    end
-
-    threads << Thread.new do
-      puts "--> Pre-compiling ember handlebars templates"
-      ember_handlebars_time = Benchmark.realtime { Rake::Task['jst:ember'].invoke }
-      puts "--> Pre-compiling ember handlebars templates finished in #{ember_handlebars_time}"
-    end
-
-    # can't be in own thread, needs to happen before coffeescript
-    puts "--> Creating ember app bundles"
-    bundle_time = Benchmark.realtime { Rake::Task['js:bundle_ember_apps'].invoke }
-    puts "--> Creating ember app bundles finished in #{bundle_time}"
-
-    threads << Thread.new do
-      coffee_time = Benchmark.realtime do
-        Rake::Task['js:coffee'].invoke
-      end
-      puts "--> Compiling CoffeeScript finished in #{coffee_time}"
-    end
-
-    threads.each(&:join)
-  end
-
   desc "Compile Coffeescript to JS"
   task :coffee do
     require 'coffee-script'
@@ -150,21 +170,6 @@ namespace :js do
         `npm run webpack-development`
       end
       raise "Error running js:webpack: \nABORTING" if $?.exitstatus != 0
-    end
-  end
-
-  desc "Optimize and build js for production"
-  task :build do
-    Rake::Task['js:rjs_config'].invoke
-
-    puts "--> Concatenating JavaScript bundles with r.js"
-    time = Benchmark.realtime { Rake::Task['js:rjs_concat'].invoke }
-    puts "--> Concatenated JavaScript bundles in #{time}"
-
-    unless ENV["JS_BUILD_NO_UGLIFY"]
-      puts "--> Compressing JavaScript with UglifyJS"
-      time = Benchmark.realtime { Rake::Task['js:compress'].invoke }
-      puts "--> Compressed JavaScript in #{time}"
     end
   end
 
