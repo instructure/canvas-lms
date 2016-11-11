@@ -140,6 +140,7 @@ namespace :js do
     Canvas::RequireJs::PluginExtension.generate_all
   end
 
+  desc "Build client_apps"
   task :build_client_apps do
     require 'config/initializers/client_app_symlinks'
 
@@ -150,33 +151,18 @@ namespace :js do
         puts "Building client app '#{app_name}'"
 
         if File.exists?('./package.json')
-          puts "\tRunning 'npm install'..."
           output = `npm install` rescue `npm cache clean && npm install`
           unless $?.exitstatus == 0
-            puts <<-MESSAGE
-            -------------------------------------------------------------------
-            INSTALL FAILURE:
-            #{output}
-            -------------------------------------------------------------------
-            MESSAGE
-
+            puts "INSTALL FAILURE:\n#{output}"
             raise "Package installation failure for client app #{app_name}"
           end
         end
 
-        begin
-          puts "\tRunning 'npm run build'..."
-          output = `./script/build`
-          unless $?.exitstatus == 0
-            puts <<-MESSAGE
-            -------------------------------------------------------------------
-            BUILD FAILURE:
-            #{output}
-            -------------------------------------------------------------------
-            MESSAGE
-
-            raise "Build script failed for client app #{app_name}"
-          end
+        puts "\tRunning 'npm run build'..."
+        output = `./script/build`
+        unless $?.exitstatus == 0
+          puts "BUILD FAILURE:\n#{output}"
+          raise "Build script failed for client app #{app_name}"
         end
 
         puts "Client app '#{app_name}' was built successfully."
