@@ -134,22 +134,6 @@ namespace :js do
     false
   end
 
-  def coffee_destination(dir_or_file)
-    dir_or_file.sub('app/coffeescripts', 'public/javascripts/compiled').
-        sub('spec/coffeescripts', 'spec/javascripts/compiled').
-        sub(%r{/javascripts/compiled/plugins/([^/]+)(/|$)}, '/plugins/\\1/javascripts/compiled\\2')
-  end
-
-  def compile_coffeescript(coffee_file)
-    destination = coffee_destination(coffee_file).sub(%r{\.coffee$}, '.js')
-    FileUtils.mkdir_p(File.dirname(destination))
-    File.open(destination, 'wb') do |out|
-      File.open(coffee_file) do |cfile|
-        out.write CoffeeScript.compile(cfile)
-      end
-    end
-  end
-
   desc "generates plugin extension modules"
   task :generate_extensions do
     require 'canvas/require_js/plugin_extension'
@@ -207,8 +191,6 @@ namespace :js do
     require 'config/initializers/plugin_symlinks'
     require 'config/initializers/client_app_symlinks'
     require 'fileutils'
-    require 'canvas'
-    require 'canvas/coffee_script'
 
     # clear out all the files in case there are any old compiled versions of
     # files that don't map to any source file anymore
@@ -254,31 +236,49 @@ namespace :js do
 
     threads << Thread.new do
       coffee_time = Benchmark.realtime do
-        require 'coffee-script'
-        require 'parallel'
-
-        if Canvas::CoffeeScript.coffee_script_binary_is_available?
-          puts "--> Compiling CoffeeScript with 'coffee' binary"
-          dirs = Dir[Rails.root+'{app,spec}/coffeescripts/{,plugins/*/}**/*.coffee'].
-              map { |f| File.dirname(f) }.uniq
-          Parallel.each(dirs, :in_threads => Parallel.processor_count) do |dir|
-            destination = coffee_destination(dir)
-            FileUtils.mkdir_p(destination)
-            system("coffee -c -o #{destination} #{dir}/*.coffee")
-            raise "Unable to compile coffeescripts in #{dir}" if $?.exitstatus != 0
-          end
-        else
-          puts "--> Compiling CoffeeScript with coffee-script gem"
-          files = Dir[Rails.root+'{app,spec}/coffeescripts/{,plugins/*/}**/*.coffee']
-          Parallel.each(files, :in_threads => Parallel.processor_count) do |file|
-            compile_coffeescript file
-          end
-        end
+        Rake::Task['js:coffee'].invoke
       end
       puts "--> Compiling CoffeeScript finished in #{coffee_time}"
     end
 
     threads.each(&:join)
+  end
+
+  desc "Compile Coffeescript to JS"
+  task :coffee do
+    require 'coffee-script'
+    require 'parallel'
+    require 'canvas/coffee_script'
+
+    if Canvas::CoffeeScript.coffee_script_binary_is_available?
+      puts "--> Compiling CoffeeScript with 'coffee' binary"
+      dirs = Dir[Rails.root+'{app,spec}/coffeescripts/{,plugins/*/}**/*.coffee'].
+          map { |f| File.dirname(f) }.uniq
+      Parallel.each(dirs, :in_threads => Parallel.processor_count) do |dir|
+        destination = coffee_destination(dir)
+        FileUtils.mkdir_p(destination)
+        system("coffee -c -o #{destination} #{dir}/*.coffee")
+        raise "Unable to compile coffeescripts in #{dir}" if $?.exitstatus != 0
+      end
+    else
+      puts "--> Compiling CoffeeScript with coffee-script gem"
+      files = Dir[Rails.root+'{app,spec}/coffeescripts/{,plugins/*/}**/*.coffee']
+      Parallel.each(files, :in_threads => Parallel.processor_count) do |file|
+        destination = coffee_destination(file).sub(%r{\.coffee$}, '.js')
+        FileUtils.mkdir_p(File.dirname(destination))
+        File.open(destination, 'wb') do |out|
+          File.open(file) do |cfile|
+            out.write CoffeeScript.compile(cfile)
+          end
+        end
+      end
+    end
+  end
+
+  def coffee_destination(dir_or_file)
+    dir_or_file.sub('app/coffeescripts', 'public/javascripts/compiled').
+        sub('spec/coffeescripts', 'spec/javascripts/compiled').
+        sub(%r{/javascripts/compiled/plugins/([^/]+)(/|$)}, '/plugins/\\1/javascripts/compiled\\2')
   end
 
   desc "build webpack js"
