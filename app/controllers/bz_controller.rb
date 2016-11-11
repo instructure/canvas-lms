@@ -111,7 +111,7 @@ class BzController < ApplicationController
   end
 
   def retained_data_stats
-    @result = ActiveRecord::Base.connection.execute("
+    @aggregate_result = ActiveRecord::Base.connection.execute("
       SELECT
         count(*) AS cnt,
         value
@@ -124,6 +124,32 @@ class BzController < ApplicationController
       ORDER BY
         cnt DESC
     ")
+
+    individual_responses = ActiveRecord::Base.connection.execute("
+      SELECT
+        user_id,
+        value
+      FROM
+        retained_data
+      WHERE
+        name = #{ActiveRecord::Base.connection.quote(params[:name])}
+      ORDER BY
+        value
+    ")
+
+    @individual_responses = []
+
+    individual_responses.each do |response|
+      # this is WAY less efficient than doing a join but
+      # idk how the model pulls this so i'm just letting
+      # ruby do it.
+      u = User.find(response["user_id"])
+      r = {}
+      r["value"] = response["value"]
+      r["name"] = u.name
+      r["email"] = u.email
+      @individual_responses.push(r)
+    end
 
     @name = params[:name]
   end
