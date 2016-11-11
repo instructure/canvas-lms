@@ -905,7 +905,7 @@ RSpec.configure do |config|
   end
 end
 
-class I18nema::Backend
+class I18n::Backend::Simple
   def stub(translations)
     @stubs = translations.with_indifferent_access
     singleton_class.instance_eval do
@@ -923,8 +923,8 @@ class I18nema::Backend
 
   def lookup_with_stubs(locale, key, scope = [], options = {})
     init_translations unless initialized?
-    keys = normalize_keys(locale, key, scope, options[:separator])
-    keys.inject(@stubs){ |h,k| h[k] if h.respond_to?(:key) } || direct_lookup(*keys)
+    keys = I18n.normalize_keys(locale, key, scope, options[:separator])
+    keys.inject(@stubs){ |h,k| h[k] if h.respond_to?(:key) } || lookup_without_stubs(locale, key, scope, options)
   end
   alias_method :lookup_without_stubs, :lookup
 

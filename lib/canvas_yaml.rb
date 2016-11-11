@@ -23,15 +23,6 @@
 # is switched to Psych. Otherwise we
 # won't have access to (safe|unsafe)_load.
 require 'yaml'
-
-require 'syck' # so we can undo all the things before something else requires it
-if defined?(YAML::ENGINE)
-  YAML::ENGINE.yamler = 'psych'
-else
-  Object.send(:remove_const, :YAML)
-  YAML = Psych # :/
-end
-
 require 'safe_yaml'
 
 module FixSafeYAMLNullMerge

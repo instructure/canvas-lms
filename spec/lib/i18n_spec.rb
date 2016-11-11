@@ -22,7 +22,7 @@ describe I18n do
   context "_core_en.js" do
     it "should be up-to-date" do
       skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
-      translations = {'en' => I18n.backend.direct_lookup('en').slice(*I18nTasks::Utils::CORE_KEYS)}
+      translations = {'en' => I18n.backend.send(:translations)[:en].slice(*I18nTasks::Utils::CORE_KEYS)}
 
       # HINT: if this spec fails, run `rake i18n:generate_js`...
       # it probably means you added a format or a new language
