@@ -158,7 +158,7 @@ define([
 
       if (this.props.type === "button") {
         return(
-          <a href="#" tabIndex="-1" ref="placementButton" role="menuitem" aria-label={editAriaLabel} className="btn long" onClick={this.openModal} >
+          <a href="#" ref="placementButton" role="menuitem" aria-label={editAriaLabel} className="btn long" onClick={this.openModal} >
             <i className="icon-info" data-tooltip="left" title={I18n.t('Tool Placements')}></i>
             { this.getModal() }
           </a>
