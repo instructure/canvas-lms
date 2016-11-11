@@ -169,6 +169,9 @@ class BzController < ApplicationController
       item["Email"] = u.email
 
       RetainedData.where(:user_id => u.id).each do |rd|
+        next if params[:type] == 'magic' && rd.name.starts_with?('instant-survey-')
+        next if params[:type] == 'survey' && !rd.name.starts_with?('instant-survey-')
+
         item[rd.name] = rd.value
         all_fields[rd.name] = rd.name
       end
@@ -181,7 +184,14 @@ class BzController < ApplicationController
       header << "Name"
       header << "Email"
       all_fields.each do |k, v|
-        header << v
+        if v.starts_with?("instant-survey-")
+          page = WikiPage.find(v["instant-survey-".length ... v.length].to_i)
+          # I can't believe that url isn't just a public method but nope
+          # gotta construct myself
+          header << "http://#{HostUrl.context_host(context)}/#{page.context.class.to_s.downcase.pluralize}/#{page.context.id}/pages/#{page.url}"
+        else
+          header << v
+        end
       end
       csv << header
 
