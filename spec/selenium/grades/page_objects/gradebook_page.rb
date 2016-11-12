@@ -58,7 +58,7 @@ module Gradebook
       end
 
       def visit_gradebook(course)
-        get "/courses/#{course.id}/gradebook2"
+        get "/courses/#{course.id}/gradebook/change_gradebook_version?version=2"
       end
 
       def select_grading_period(grading_period_id)
@@ -78,7 +78,7 @@ module Gradebook
 
       def cell_graded?(grade, x_coordinate, y_coordinate)
         cell = grading_cell(x_coordinate, y_coordinate)
-        if (cell.text == grade)
+        if cell.text == grade
           return true
         else
           return false
