@@ -15,6 +15,9 @@ CanvasRails::Application.routes.draw do
   get 'bz/user_retained_data' => 'bz#user_retained_data'
   post 'bz/user_retained_data' => 'bz#set_user_retained_data'
 
+  get 'bz/retained_data_stats' => 'bz#retained_data_stats'
+  get 'bz/retained_data_export' => 'bz#retained_data_export'
+
   get 'bz/accessibility_mapper' => 'bz#accessibility_mapper'
   post 'bz/accessibility_mapper' => 'bz#save_html_changes'
   get 'bz/full_module_view' => 'bz#full_module_view'

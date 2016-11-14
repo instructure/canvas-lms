@@ -5,6 +5,8 @@ require 'google/api_client'
 require 'google/api_client/auth/storage'
 require 'google/api_client/auth/storages/file_store'
 
+require 'csv'
+
 class BzController < ApplicationController
 
   before_filter :require_user
@@ -16,30 +18,30 @@ class BzController < ApplicationController
       doc = Nokogiri::HTML(page.body)
       doc.css('img:not(.bz-magic-viewer)').each do |img|
         if img.attributes["alt"].nil?
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Missing alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Missing alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value == ""
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Empty alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Empty alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".png")
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".jpg")
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".svg")
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".gif")
-          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+          @items << { :page => page, :path => img.css_path, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         end
       end
       doc.css('iframe[src*="vimeo"]:not([data-bz-accessibility-ok])').each do |img|
         orig = img.to_xhtml
         img.set_attribute('data-bz-accessibility-ok', 'yes')
         repl = img.to_xhtml
-        @items << { :page => page, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
+        @items << { :page => page, :path => img.css_path, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
       end
       doc.css('iframe[src*="youtu"]:not([data-bz-accessibility-ok])').each do |img|
         orig = img.to_xhtml
         img.set_attribute('data-bz-accessibility-ok', 'yes')
         repl = img.to_xhtml
-        @items << { :page => page, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
+        @items << { :page => page, :path => img.css_path, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
       end
     end
   end
@@ -51,7 +53,11 @@ class BzController < ApplicationController
     end
 
     page = WikiPage.find(params[:page_id])
-    page.body = page.body.gsub(params[:original_html], params[:new_html])
+    doc = Nokogiri::HTML(page.body)
+    part = doc.css(params[:path])[0]
+    raise "wtf" if params[:original_html] != part.to_xhtml
+    part.replace(params[:new_html])
+    page.body = doc.to_s
     page.save
 
     redirect_to bz_accessibility_mapper_path
@@ -95,6 +101,7 @@ class BzController < ApplicationController
     if result.empty?
       data = RetainedData.new()
       data.user_id = @current_user.id
+      data.path = request.referrer
       data.name = params[:name]
     else
       data = result.first
@@ -103,6 +110,106 @@ class BzController < ApplicationController
     data.value = params[:value]
     data.save
     render :nothing => true
+  end
+
+  def retained_data_stats
+    @aggregate_result = ActiveRecord::Base.connection.execute("
+      SELECT
+        count(*) AS cnt,
+        value
+      FROM
+        retained_data
+      WHERE
+        name = #{ActiveRecord::Base.connection.quote(params[:name])}
+      GROUP BY
+        value
+      ORDER BY
+        cnt DESC
+    ")
+
+    individual_responses = ActiveRecord::Base.connection.execute("
+      SELECT
+        user_id,
+        value,
+        path
+      FROM
+        retained_data
+      WHERE
+        name = #{ActiveRecord::Base.connection.quote(params[:name])}
+      ORDER BY
+        value
+    ")
+
+    @individual_responses = []
+
+    individual_responses.each do |response|
+      # this is WAY less efficient than doing a join but
+      # idk how the model pulls this so i'm just letting
+      # ruby do it.
+      u = User.find(response["user_id"])
+      r = {}
+      r["value"] = response["value"]
+      r["path"] = response["path"]
+      r["name"] = u.name
+      r["email"] = u.email
+      @individual_responses.push(r)
+    end
+
+    @name = params[:name]
+  end
+
+  def retained_data_export
+    course = Course.find(params[:course])
+    all_fields = {}
+    items = []
+    course.enrollments.each do |enrollment|
+      u = User.find(enrollment.user_id)
+      item = {}
+      item["Name"] = u.name
+      item["Email"] = u.email
+
+      RetainedData.where(:user_id => u.id).each do |rd|
+        next if params[:type] == 'magic' && rd.name.starts_with?('instant-survey-')
+        next if params[:type] == 'survey' && !rd.name.starts_with?('instant-survey-')
+
+        item[rd.name] = rd.value
+        all_fields[rd.name] = rd.name
+      end
+
+      items.push(item)
+    end
+
+    csv_result = CSV.generate do |csv|
+      header = []
+      header << "Name"
+      header << "Email"
+      all_fields.each do |k, v|
+        if v.starts_with?("instant-survey-")
+          page = WikiPage.find(v["instant-survey-".length ... v.length].to_i)
+          # I can't believe that url isn't just a public method but nope
+          # gotta construct myself
+          header << "http://#{HostUrl.context_host(context)}/#{page.context.class.to_s.downcase.pluralize}/#{page.context.id}/pages/#{page.url}"
+        else
+          header << v
+        end
+      end
+      csv << header
+
+      items.each do |item|
+        row = []
+        row << item["Name"]
+        row << item["Email"]
+        all_fields.each do |k, v|
+          row << item[v]
+        end
+
+        csv << row
+      end
+    end
+
+    respond_to do |format|
+      format.csv { render text: csv_result }
+    end
   end
 
   def last_user_url

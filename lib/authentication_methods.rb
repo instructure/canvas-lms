@@ -256,7 +256,16 @@ module AuthenticationMethods
   protected :store_location
 
   def redirect_back_or_default(default)
-    redirect_to(session[:return_to] || default)
+    ret = default
+    if session[:return_to]
+      ret = session[:return_to]
+      if ret.include? '?'
+        ret += '&login_success=1'
+      else
+        ret += '?login_success=1'
+      end
+    end
+    redirect_to(ret)
     session.delete(:return_to)
   end
   protected :redirect_back_or_default

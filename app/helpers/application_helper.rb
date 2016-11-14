@@ -372,14 +372,27 @@ module ApplicationHelper
 
                   item_element = HtmlElement.new('li', module_list_item)
                   last_item_element = item_element
-                  item_element.add_class(item.content_type)
+
+                  # Targeting that in css is a bit of a pain due to the colons
+                  # so i am just renaming it for convenience there
+                  if item.content_type == 'Quizzes::Quiz'
+                    item_element.add_class('Quiz')
+                  else
+                    item_element.add_class(item.content_type)
+                  end
 
                   liclass = ''
                   if item.id.to_i == module_item_id.to_i
                     item_element.add_class('active')
                     parent = item_element.parent
-                    while(parent)
+                    if parent
                       parent.add_class('active-parent')
+                      parent = parent.parent
+                    end
+                    while(parent)
+                      unless parent.has_class('bz-nav-module-name')
+                        parent.add_class('active-ancestor')
+                      end
                       parent = parent.parent
                     end
                     has_active = true
@@ -388,6 +401,7 @@ module ApplicationHelper
                   if item.content_type == 'ContextModuleSubHeader'
                     a = HtmlElement.new('span', item_element)
                     a.text_content = item.title
+                    a.add_class('subheader-title');
                     last_header_item = a
                   else
                     a = HtmlElement.new('a', item_element)
@@ -398,6 +412,7 @@ module ApplicationHelper
                       last_header_item = nil
                     end
                     a.add_class(liclass)
+                    a.add_class('item-title')
                     a.text_content = item.title
                   end
                 end
@@ -424,6 +439,7 @@ module ApplicationHelper
 
                 previous_list = main_module_list_item
               end
+              outer_list.annotate_for_nav
               link << outer_list.to_html
             end
           end
@@ -1023,6 +1039,9 @@ class HtmlElement
   def remove_class(c)
     @class_name.sub!(c, '')
   end
+  def has_class(c)
+    @class_name.include?(c + ' ') || @class_name.ends_with?(' ' + c)
+  end
   def text_content=(t)
     @text_content = t
   end
@@ -1075,6 +1094,27 @@ class HtmlElement
       original_children[0].href = link
     end
     @children = [original_children[0]]
+  end
+
+  # Again, not generic, but needs access to the innards. These
+  # class name annotations make ehud's javascript easier to use.
+  def annotate_for_nav
+    @children.each do |child|
+      child.annotate_for_nav
+    end
+
+    if @tag_name == 'ul' && @children.length > 0
+      add_class 'children'
+    end
+
+    if @tag_name == 'li'
+      @children.each do |child|
+        if child.tag_name == 'ul' && child.has_class('children')
+          add_class 'has-children'
+        end
+      end
+    end
+
   end
 
   def find_first_link
