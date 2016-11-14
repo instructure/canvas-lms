@@ -304,7 +304,7 @@ class CalendarEventsApiController < ApplicationController
       end
     end
 
-    scope = @type == :assignment ? assignment_scope(@current_user) : calendar_event_scope(@current_user)
+    scope = @type == :assignment ? assignment_scope : calendar_event_scope() # @current_user arg on both scopes when update btw
     events = Api.paginate(scope, self, api_v1_calendar_events_url)
     ActiveRecord::Associations::Preloader.new(events, :child_events).run if @type == :event
     events = apply_assignment_overrides(events, @current_user) if @type == :assignment
