@@ -17,9 +17,13 @@ module Gradebook
 
       def gp_menu_list() ff("#grading-period-to-show-menu li") end
 
-      def grading_cell(x=0, y=0) f(".container_1 .slick-row:nth-child(#{y+1}) .slick-cell:nth-child(#{x+1})") end
-
       def grade_input(cell) f(".grade", cell) end
+
+      def grading_cell(x=0, y=0)
+        cell = f(".container_1")
+        cell = f(".slick-row:nth-child(#{y+1})", cell)
+        f(".slick-cell:nth-child(#{x+1})", cell)
+      end
 
     public
       def visit_gradebook(course)
@@ -48,8 +52,6 @@ module Gradebook
         else
           return false
         end
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        false
       end
   end
 end
