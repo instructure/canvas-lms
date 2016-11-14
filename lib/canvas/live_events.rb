@@ -151,6 +151,25 @@ module Canvas::LiveEvents
     post_event_stringified('submission_updated', get_submission_data(submission))
   end
 
+  def self.get_user_data(user)
+    {
+      user_id: user.id,
+      name: user.name,
+      short_name: user.short_name,
+      workflow_state: user.workflow_state,
+      created_at: user.created_at,
+      updated_at: user.updated_at
+    }
+  end
+
+  def self.user_created(user)
+    post_event_stringified('user_created', get_user_data(user))
+  end
+
+  def self.user_updated(user)
+    post_event_stringified('user_updated', get_user_data(user))
+  end
+
   def self.get_enrollment_data(enrollment)
     {
 

@@ -290,6 +290,30 @@ by `asset_type` and `asset_id`.
 | `attempt` | This is the submission attempt number. |
 
 
+#### `user_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of user. |
+| `name` | Name of user. |
+| `short_name` | Short name of user. |
+| `workflow_state` | State of the user. |
+| `created_at` | The time at which this user was created. |
+| `updated_at` | The time at which this user was last modified in any way. |
+
+
+#### `user_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of user. |
+| `name` | Name of user. |
+| `short_name` | Short name of user. |
+| `workflow_state` | State of the user. |
+| `created_at` | The time at which this user was created. |
+| `updated_at` | The time at which this user was last modified in any way. |
+
+
 #### `enrollment_created`
 
 | Field | Description |

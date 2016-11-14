@@ -11,6 +11,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :assignment,
           :submission,
           :attachment,
+          :user,
           :user_account_association,
           :account_notification
 
@@ -44,6 +45,8 @@ class LiveEventsObserver < ActiveRecord::Observer
       end
     when Submission
       Canvas::LiveEvents.submission_updated(obj)
+    when User
+      Canvas::LiveEvents.user_updated(obj)
     end
     end
   end
@@ -79,6 +82,8 @@ class LiveEventsObserver < ActiveRecord::Observer
       end
     when AccountNotification
       Canvas::LiveEvents.account_notification_created(obj)
+    when User
+      Canvas::LiveEvents.user_created(obj)
     end
     end
   end

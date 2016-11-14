@@ -136,6 +136,20 @@ describe LiveEventsObserver do
     end
   end
 
+  describe "user" do
+    it "posts create events" do
+      Canvas::LiveEvents.expects(:user_created).once
+      user_model
+    end
+
+    it "posts update events" do
+      Canvas::LiveEvents.expects(:user_updated).once
+      user_model
+      @user.name = "Name Changed"
+      @user.save
+    end
+  end
+
   describe "enrollment" do
     it "posts create events" do
       Canvas::LiveEvents.expects(:enrollment_created).once
