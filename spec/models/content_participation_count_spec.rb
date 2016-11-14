@@ -30,7 +30,7 @@ describe ContentParticipationCount do
 
   describe "create_or_update" do
     before :once do
-      @submission = @assignment.grade_student(@student, { :grade => 3 }).first
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
     end
 
     it "should count current unread objects correctly" do
@@ -64,7 +64,7 @@ describe ContentParticipationCount do
 
   describe "unread_count_for" do
     before :once do
-      @submission = @assignment.grade_student(@student, { :grade => 3 }).first
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
     end
 
     it "should find the unread count for different types" do
@@ -121,25 +121,25 @@ describe ContentParticipationCount do
     end
 
     it "should be unread after assignment is graded" do
-      @submission = @assignment.grade_student(@student, { :grade => 3 }).first
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 1
     end
 
     it "should not be unread if the assignment is unpublished after the submission is graded" do
-      @submission = @assignment.grade_student(@student, { :grade => 3 }).first
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
       @assignment.update_attribute(:workflow_state, 'unpublished')
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
     end
 
     it "should be read after viewing the graded assignment" do
-      @submission = @assignment.grade_student(@student, { :grade => 3 }).first
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
       @submission.change_read_state("read", @student)
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
     end
 
     it "should be unread after submission is graded" do
       @assignment.submit_homework(@student)
-      @submission = @assignment.grade_student(@student, { :grade => 3 }).first
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 1
     end
 

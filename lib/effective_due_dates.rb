@@ -58,7 +58,7 @@ class EffectiveDueDates
 
   # This iterates through a single assignment's EffectiveDueDate hash to see
   # if any students in them are in a closed grading period.
-  def in_closed_grading_period?(assignment_id)
+  def in_closed_grading_period?(assignment_id, student_or_student_id = nil)
     assignment_id = assignment_id.id if assignment_id.is_a?(Assignment)
     return false if assignment_id.nil?
 
@@ -69,10 +69,23 @@ class EffectiveDueDates
     return false if @any_in_closed_grading_period == false
 
     assignment_due_dates = to_hash[assignment_id]
-    any_student_in_closed_grading_period?(assignment_due_dates)
+    student_id = student_or_student_id.try(:id) || student_or_student_id
+
+    if usable_student_id?(student_id)
+      assignment_due_dates[student_id][:in_closed_grading_period]
+    else
+      any_student_in_closed_grading_period?(assignment_due_dates)
+    end
   end
 
   private
+
+  def usable_student_id?(student_id)
+    return false unless student_id.present?
+    return false unless student_id.to_i.present?
+
+    true
+  end
 
   def grading_periods_enabled?
     return @grading_periods_enabled unless @grading_periods_enabled.nil?
@@ -312,11 +325,11 @@ class EffectiveDueDates
         overrides.override_id,
         CASE
           -- check whether or not this due date falls in a closed grading period
-          WHEN overrides.due_at IS NOT NULL AND CURRENT_TIMESTAMP >= periods.close_date THEN TRUE
+          WHEN overrides.due_at IS NOT NULL AND '#{Time.zone.now.iso8601}'::timestamptz >= periods.close_date THEN TRUE
           -- when no explicit due date is provided, we treat it as if it's in the latest grading period
           WHEN overrides.due_at IS NULL AND
               overrides.override_type <> 'Submission' AND
-              CURRENT_TIMESTAMP >= (SELECT close_date FROM last_period) THEN TRUE
+              '#{Time.zone.now.iso8601}'::timestamptz >= (SELECT close_date FROM last_period) THEN TRUE
           ELSE FALSE
         END AS closed,
         CASE

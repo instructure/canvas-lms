@@ -499,7 +499,7 @@ describe "assignments" do
         @assignment.update_attributes(points_possible: 15)
         @assignment.publish
         course_with_student_logged_in(active_all: true, course: @course)
-        @assignment.grade_student(@student, grade: 14)
+        @assignment.grade_student(@student, grade: 14, grader: @teacher)
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
         expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").

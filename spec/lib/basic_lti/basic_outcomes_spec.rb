@@ -289,7 +289,8 @@ describe BasicLTI::BasicOutcomes do
         submission = assignment.grade_student(
           @user,
           {
-            grade: "92%"
+            grade: "92%",
+            grader_id: -1
           }).first
         xml.css('resultData').remove
         BasicLTI::BasicOutcomes.process_request(tool, xml)

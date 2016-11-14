@@ -247,7 +247,13 @@ describe SplitUsers do
       assignment = course1.assignments.new(title: "some assignment")
       assignment.workflow_state = "published"
       assignment.save
-      valid_attributes = {assignment_id: assignment.id, user_id: user1.id, grade: "1.5", url: "www.instructure.com"}
+      valid_attributes = {
+        assignment_id: assignment.id,
+        user_id: user1.id,
+        grade: "1.5",
+        grader: @teacher,
+        url: "www.instructure.com"
+      }
       submission = Submission.create!(valid_attributes)
 
       UserMerge.from(user1).into(user2)
@@ -262,7 +268,13 @@ describe SplitUsers do
       assignment = course1.assignments.new(title: "some assignment")
       assignment.workflow_state = "published"
       assignment.save
-      valid_attributes = {assignment_id: assignment.id, user_id: user1.id, grade: "1.5", url: "www.instructure.com"}
+      valid_attributes = {
+        assignment_id: assignment.id,
+        user_id: user1.id,
+        grade: "1.5",
+        grader: @teacher,
+        url: "www.instructure.com"
+      }
       submission1 = Submission.create!(valid_attributes)
       valid_attributes[:user_id] = user2.id
       submission2 = Submission.create!(valid_attributes)

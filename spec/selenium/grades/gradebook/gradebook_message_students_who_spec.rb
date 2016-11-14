@@ -30,7 +30,7 @@ describe "gradebook2 - message students who" do
     @third_submission.save!
 
     # student 2 graded without submission (turned in paper by hand)
-    @third_assignment.grade_student(@student_2, :grade => 42)
+    @third_assignment.grade_student(@student_2, grade: 42, grader: @teacher)
 
     # student 3 has neither submitted nor been graded
 

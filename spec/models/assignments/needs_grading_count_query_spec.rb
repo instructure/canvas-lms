@@ -53,7 +53,7 @@ module Assignments
         expect(NeedsGradingCountQuery.new(@assignment, @ta).count).to eql(1)
 
         # grade an assignment
-        @assignment.grade_student(@user1, :grade => "1")
+        @assignment.grade_student(@user1, grade: "1", grader: @teacher)
         @assignment.reload
 
         # check that the numbers changed

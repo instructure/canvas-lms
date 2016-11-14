@@ -83,7 +83,7 @@ describe "Outcome Groups API", type: :request do
     context.enroll_student(user) unless context.student_enrollments.exists?(user_id: user.id)
     a = rubric.associate_with(assignment, context, :purpose => 'grading')
     assignment.reload
-    submission = assignment.grade_student(user, :grade => "10").first
+    submission = assignment.grade_student(user, grade: "10", grader: @teacher).first
     a.assess({
       :user => user,
       :assessor => user,

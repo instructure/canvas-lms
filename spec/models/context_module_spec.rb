@@ -945,7 +945,7 @@ describe ContextModule do
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user).accept!
 
-      @quiz.assignment.grade_student(@user, :grade => 100)
+      @quiz.assignment.grade_student(@user, grade: 100, grader: @teacher)
 
       @progression = @module.evaluate_for(@user)
       expect(@progression).to be_completed
@@ -1056,7 +1056,7 @@ describe ContextModule do
     end
 
     it 'should not prevent a student from completing a module' do
-      @other_assignment.grade_student(@student, :grade => '95')
+      @other_assignment.grade_student(@student, grade: '95', grader: @teacher)
       expect(@module.evaluate_for(@student)).to be_completed
     end
   end

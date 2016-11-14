@@ -301,8 +301,8 @@ describe UserMerge do
       context_module2.save
 
       #have a conflicting module_progrssion
-      assignment2.grade_student(user1, :grade => "10")
-      assignment2.grade_student(user2, :grade => "4")
+      assignment2.grade_student(user1, :grade => "10", grader: @teacher)
+      assignment2.grade_student(user2, :grade => "4", grader: @teacher)
 
       #have a duplicate module_progression
       context_module.update_for(user1, :read, tag)

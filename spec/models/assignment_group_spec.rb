@@ -45,7 +45,7 @@ describe AssignmentGroup do
                                   :points_possible => 10,
                                   :only_visible_to_overrides => true})}
       assignments.first.destroy
-      assignments.second.grade_student(@student, {grade: 10})
+      assignments.second.grade_student(@student, grade: 10, grader: @teacher)
       assignment_to_override = assignments.last
       create_section_override_for_assignment(assignment_to_override, course_section: @s)
       @course.reload

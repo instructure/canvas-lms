@@ -169,27 +169,31 @@ describe "differentiated_assignments" do
       end
 
       context "user in section with override who then changes sections" do
-        before{enroller_user_in_section(@section_foo)}
+        before do
+          enroller_user_in_section(@section_foo)
+          @student = @user
+          teacher_in_course(course: @course)
+        end
         it "should keep the quiz visible if there is a grade" do
-          @quiz.assignment.grade_student(@user, {grade: 10})
-          @user.enrollments.each(&:destroy_permanently!)
-          enroller_user_in_section(@section_bar, {user: @user})
+          @quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
+          @student.enrollments.each(&:destroy_permanently!)
+          enroller_user_in_section(@section_bar, {user: @student})
           ensure_user_sees_quiz
         end
 
         it "should not keep the quiz visible if there is no score, even if it has a grade" do
-          @quiz.assignment.grade_student(@user, {grade: 10})
+          @quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
           @quiz.assignment.submissions.last.update_attribute("score", nil)
           @quiz.assignment.submissions.last.update_attribute("grade", 10)
-          @user.enrollments.each(&:destroy_permanently!)
-          enroller_user_in_section(@section_bar, {user: @user})
+          @student.enrollments.each(&:destroy_permanently!)
+          enroller_user_in_section(@section_bar, {user: @student})
           ensure_user_does_not_see_quiz
         end
 
         it "should keep the quiz visible if the grade is zero" do
-          @quiz.assignment.grade_student(@user, {grade: 0})
-          @user.enrollments.each(&:destroy_permanently!)
-          enroller_user_in_section(@section_bar, {user: @user})
+          @quiz.assignment.grade_student(@student, grade: 0, grader: @teacher)
+          @student.enrollments.each(&:destroy_permanently!)
+          enroller_user_in_section(@section_bar, {user: @student})
           ensure_user_sees_quiz
         end
       end

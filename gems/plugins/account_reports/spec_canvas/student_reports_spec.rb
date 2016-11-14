@@ -36,6 +36,12 @@ describe 'Student reports' do
     @course3 = Course.create(:name => 'Science 101', :course_code => 'SCI101',
                              :account => @account)
     @course3.offer
+
+    @teacher = User.create!
+    @course1.enroll_teacher(@teacher)
+    @course2.enroll_teacher(@teacher)
+    @course3.enroll_teacher(@teacher)
+
     @assignment1 = @course1.assignments.create!(:title => 'My Assignment')
     @assignment2 = @course2.assignments.create!(:title => 'My Assignment')
     @assignment3 = @course3.assignments.create!(:title => 'My Assignment')
@@ -69,18 +75,18 @@ describe 'Student reports' do
       @end_at = 1.day.ago
 
       @submission_time = 1.month.ago
-      @assignment1.grade_student(@user1, {:grade => '4'})
+      @assignment1.grade_student(@user1, grade: '4', grader: @teacher)
       s = Submission.where(assignment_id: @assignment1, user_id: @user1).first
       s.submitted_at = @submission_time
       s.save!
 
       @submission_time2 = 40.days.ago
-      @assignment1.grade_student(@user2, {:grade => '5'})
+      @assignment1.grade_student(@user2, grade: '5', grader: @teacher)
       s = Submission.where(assignment_id: @assignment1, user_id: @user2).first
       s.submitted_at = @submission_time2
       s.save!
 
-      @assignment2.grade_student(@user1, {:grade => '9'})
+      @assignment2.grade_student(@user1, grade: '9', grader: @teacher)
       s = Submission.where(assignment_id: @assignment2, user_id: @user1).first
       s.submitted_at = @submission_time2
       s.save!

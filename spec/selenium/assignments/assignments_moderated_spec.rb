@@ -12,6 +12,7 @@ describe "moderated grading assignments" do
     @student = User.create!
     @course.enroll_student(@student)
     @user = User.create!
+    @course.enroll_ta(@user)
   end
 
   it "publishes grades from the moderate screen" do

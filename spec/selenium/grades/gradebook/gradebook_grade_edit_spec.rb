@@ -217,7 +217,7 @@ describe "editing grades" do
   it "should not factor non graded assignments into group total", priority: "1", test_id: 220323 do
     expected_totals = [@student_1_total_ignoring_ungraded, @student_2_total_ignoring_ungraded]
     ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')
-    @ungraded_assignment.grade_student(@student_1, :grade => 20)
+    @ungraded_assignment.grade_student(@student_1, grade: 20, grader: @teacher)
     ungraded_submission.save!
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations

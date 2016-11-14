@@ -148,6 +148,7 @@ describe Api::V1::GradebookHistory do
       @course.enroll_student(student1)
       @grader1 = User.create!(:name => 'grader 1')
       @grader2 = User.create!(:name => 'grader 2')
+      @course.enroll_teacher(@grader2)
       @assignment = @course.assignments.create!(:title => "some assignment")
       @submission = @assignment.submit_homework(student1)
       @submission.update_attributes(graded_at: now, grader_id: @grader1.id)

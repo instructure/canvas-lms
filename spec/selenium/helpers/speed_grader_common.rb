@@ -63,8 +63,8 @@ module SpeedGraderCommon
   end
 
   def clear_grade_and_validate
-    @assignment.grade_student @students[0], {grade: ''}
-    @assignment.grade_student @students[1], {grade: ''}
+    @assignment.grade_student @students[0], grade: '', grader: @teacher
+    @assignment.grade_student @students[1], grade: '', grader: @teacher
 
     refresh_page
     expect(f('#grading-box-extended')).to have_value ''

@@ -70,7 +70,7 @@ describe "/courses/_recent_event" do
     end
 
     it 'shows the grade for a graded assignment' do
-      @assignment.grade_student(@user, grade: 7)
+      @assignment.grade_student(@user, grade: 7, grader: @teacher)
 
       render partial: "courses/recent_event", object: @assignment, locals: {is_hidden: false}
 

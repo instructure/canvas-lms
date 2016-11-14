@@ -237,9 +237,11 @@ describe AssignmentGroupsController, type: :request do
       @user.enrollments.each(&:destroy_permanently!)
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @user)
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
       # make a1 and a3 visible
       create_section_override_for_assignment(@a1, course_section: @section)
-      @a3.grade_student(@user, {grade: 10})
+      @a3.grade_student(@user, grade: 10, grader: @teacher)
 
       [@a1, @a2, @a3, @a4].each(&:reload)
 
@@ -325,8 +327,8 @@ describe AssignmentGroupsController, type: :request do
           course_id: @course.id, grading_period_id: @gp_future.id,
           assignment_group_id: @group1.id, include: ['assignments', 'submission']
         }
-        @group1_assignment_future.grade_student(student, grade: 10)
-        @group1_assignment_today.grade_student(student, grade: 8)
+        @group1_assignment_future.grade_student(student, grade: 10, grader: @teacher)
+        @group1_assignment_today.grade_student(student, grade: 8, grader: @teacher)
         json = api_call_as_user(student, :get, api_path, api_settings)
         expect(json["assignments"].length).to eq(1)
         expect(json["assignments"].first["submission"]).to be_present
@@ -560,9 +562,11 @@ describe AssignmentGroupsApiController, type: :request do
 
       it 'should include submission when flag is present' do
         student_in_course(active_all: true)
+        teacher_in_course(active_all: true, course: @course)
         @submission = bare_submission_model(@assignment, @student, {
           score: '25',
           grade: '25',
+          grader: @teacher,
           submitted_at: Time.zone.now
         })
 

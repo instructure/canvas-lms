@@ -35,7 +35,7 @@ describe "/quizzes/quizzes/show" do
     quiz.save!
     quiz.reload
     quiz.assignment.mute!
-    quiz.assignment.grade_student(@student, :grade => 5)
+    quiz.assignment.grade_student(@student, grade: 5, grader: @teacher)
     submission = quiz.quiz_submissions.create
     submission.score = 5
     submission.user = @student
@@ -131,7 +131,7 @@ describe "/quizzes/quizzes/show" do
     quiz.save!
     quiz.reload
     quiz.assignment.mute!
-    quiz.assignment.grade_student(@student, grade: 5)
+    quiz.assignment.grade_student(@student, grade: 5, grader: @teacher)
     submission = quiz.quiz_submissions.create
     submission.score = 5
     submission.user = @student

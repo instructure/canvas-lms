@@ -214,7 +214,8 @@ describe Enrollment do
 
   context "drop scores" do
     before(:once) do
-      course_with_student
+      course_with_teacher
+      course_with_student(course: @course)
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 50, :rules => "drop_lowest:1")
       @assignment = @group.assignments.build(:title => "some assignments", :points_possible => 10)
       @assignment.context = @course
@@ -228,10 +229,10 @@ describe Enrollment do
       @enrollment = @user.enrollments.first
       @group.update_attribute(:rules, "drop_highest:1")
       expect(@enrollment.reload.computed_current_score).to eql(nil)
-      @submission = @assignment.grade_student(@user, :grade => "9")
+      @submission = @assignment.grade_student(@user, grade: "9", grader: @teacher)
       expect(@submission[0].score).to eql(9.0)
       expect(@enrollment.reload.computed_current_score).to eql(90.0)
-      @submission2 = @assignment2.grade_student(@user, :grade => "20")
+      @submission2 = @assignment2.grade_student(@user, grade: "20", grader: @teacher)
       expect(@submission2[0].score).to eql(20.0)
       expect(@enrollment.reload.computed_current_score).to eql(50.0)
       @group.update_attribute(:rules, nil)
@@ -241,8 +242,8 @@ describe Enrollment do
     it "should drop low scores for groups when specified" do
       @enrollment = @user.enrollments.first
       expect(@enrollment.reload.computed_current_score).to eql(nil)
-      @submission = @assignment.grade_student(@user, :grade => "9")
-      @submission2 = @assignment2.grade_student(@user, :grade => "20")
+      @submission = @assignment.grade_student(@user, grade: "9", grader: @teacher)
+      @submission2 = @assignment2.grade_student(@user, grade: "20", grader: @teacher)
       expect(@submission2[0].score).to eql(20.0)
       expect(@enrollment.reload.computed_current_score).to eql(90.0)
       @group.update_attribute(:rules, "")
@@ -253,10 +254,10 @@ describe Enrollment do
       @enrollment = @user.enrollments.first
       @group.update_attribute(:rules, "drop_lowest:2")
       expect(@enrollment.reload.computed_current_score).to eql(nil)
-      @submission = @assignment.grade_student(@user, :grade => "9")
+      @submission = @assignment.grade_student(@user, grade: "9", grader: @teacher)
       expect(@submission[0].score).to eql(9.0)
       expect(@enrollment.reload.computed_current_score).to eql(90.0)
-      @submission2 = @assignment2.grade_student(@user, :grade => "20")
+      @submission2 = @assignment2.grade_student(@user, grade: "20", grader: @teacher)
       expect(@submission2[0].score).to eql(20.0)
       expect(@enrollment.reload.computed_current_score).to eql(90.0)
     end

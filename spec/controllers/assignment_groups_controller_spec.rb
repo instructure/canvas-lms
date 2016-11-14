@@ -219,6 +219,7 @@ describe AssignmentGroupsController do
         @submission = bare_submission_model(@assignment, @student, {
           score: '25',
           grade: '25',
+          grader: @teacher,
           submitted_at: Time.zone.now
         })
       end

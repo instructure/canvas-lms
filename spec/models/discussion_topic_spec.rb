@@ -1103,7 +1103,7 @@ describe DiscussionTopic do
       submissions = Submission.where(user_id: @student, assignment_id: assignment).to_a
       expect(submissions.count).to eq 1
       student_submission = submissions.first
-      assignment.grade_student(@student, {:grade => 9})
+      assignment.grade_student(@student, grade: 9, grader: @teacher)
       student_submission.reload
       expect(student_submission.workflow_state).to eq 'graded'
 
@@ -1238,7 +1238,7 @@ describe DiscussionTopic do
       @topic.reply_from(:user => @student, :text => "entry")
       @student.reload
 
-      @assignment.grade_student(@student, :grade => 1)
+      @assignment.grade_student(@student, grade: 1, grader: @teacher)
       @submission = Submission.where(:user_id => @student, :assignment_id => @assignment).first
       expect(@submission.workflow_state).to eq 'graded'
 

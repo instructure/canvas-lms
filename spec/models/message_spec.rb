@@ -398,10 +398,11 @@ describe Message do
       assignment.workflow_state = "published"
       assignment.save
       valid_attributes = {
-        :assignment_id => assignment.id,
-        :user_id => user1.id,
-        :grade => "1.5",
-        :url => "www.instructure.com"
+        assignment_id: assignment.id,
+        user_id: user1.id,
+        grade: "1.5",
+        grader: @teacher,
+        url: "www.instructure.com"
       }
       Submission.create!(valid_attributes)
     end

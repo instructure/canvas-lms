@@ -48,6 +48,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
                                        user,
                                        score: '99',
                                        grade: '99',
+                                       grader: @teacher,
                                        submitted_at: now,
                                        grade_matches_current_submission: true
     return assignment,submission
@@ -3509,7 +3510,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
          "grade" => "99",
          "grade_matches_current_submission" => true,
          "graded_at" => nil,
-         "grader_id" => nil,
+         "grader_id" => @teacher.id,
          "id" => @submission.id,
          "score" => 99,
          "submission_type" => nil,
@@ -3539,7 +3540,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
          "grade" => "99",
          "grade_matches_current_submission" => true,
          "graded_at" => nil,
-         "grader_id" => nil,
+         "grader_id" => @teacher.id,
          "id" => @submission.id,
          "score" => 99,
          "submission_type" => nil,

@@ -135,6 +135,8 @@ describe "interaction with multiple grading periods" do
     let(:account) { Account.default }
     let(:test_course) { account.courses.create!(name: 'New Course') }
     let(:student) { user(active_all: true) }
+    let(:teacher) { user(active_all: true) }
+    let!(:enroll_teacher) { test_course.enroll_teacher(teacher) }
     let!(:enroll_student) { test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active') }
     let!(:enable_mgp_flag) { account.enable_feature!(:multiple_grading_periods) }
     let!(:enable_course_mgp_flag) { test_course.enable_feature!(:multiple_grading_periods) }
@@ -155,7 +157,7 @@ describe "interaction with multiple grading periods" do
     end
     let!(:assignment1) { test_course.assignments.create!(title: 'Assignment 1', due_at: 3.days.from_now, points_possible: 10) }
     let!(:assignment2) { test_course.assignments.create!(title: 'Assignment 2', due_at: 6.weeks.from_now, points_possible: 10) }
-    let!(:grade_assignment1) { assignment1.grade_student(student, { grade: 8 }) }
+    let!(:grade_assignment1) { assignment1.grade_student(student, grade: 8, grader: teacher) }
 
     before(:each) do
       test_course.offer!

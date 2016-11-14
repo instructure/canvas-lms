@@ -168,8 +168,10 @@ describe "submissions" do
 
     it "should show as not turned in when submission was auto created in speedgrader", priority: "1", test_id: 237025 do
       # given
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
       @assignment.update_attributes(:submission_types => "online_text_entry")
-      @assignment.grade_student(@student, :grade => "0")
+      @assignment.grade_student(@student, grade: "0", grader: @teacher)
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
@@ -179,8 +181,10 @@ describe "submissions" do
 
     it "should not show as turned in or not turned in when assignment doesn't expect a submission", priority: "1", test_id: 237025 do
       # given
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
       @assignment.update_attributes(:submission_types => "on_paper")
-      @assignment.grade_student(@student, :grade => "0")
+      @assignment.grade_student(@student, grade: "0", grader: @teacher)
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
@@ -190,13 +194,17 @@ describe "submissions" do
     end
 
     it "should show not graded anonymously" do
-      @assignment.grade_student(@student, :grade => "0", graded_anonymously: false)
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+      @assignment.grade_student(@student, grade: "0", grader: @teacher, graded_anonymously: false)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(f('#sidebar_content .details')).to include_text "Graded Anonymously: no"
     end
 
     it "should show graded anonymously" do
-      @assignment.grade_student(@student, :grade => "0", graded_anonymously: true)
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+      @assignment.grade_student(@student, grade: "0", grader: @teacher, graded_anonymously: true)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(f('#sidebar_content .details')).to include_text "Graded Anonymously: yes"
     end
@@ -419,10 +427,10 @@ describe "submissions" do
         assignments << @course.assignments.create!(title: "Assignment #{type}", submission_types: type, points_possible: 20)
       end
 
-      assignments[1].grade_student @students[0], {grade: 10}
+      assignments[1].grade_student @students[0], grade: 10, grader: @teacher
 
       assignments.each do |assignment|
-        assignment.grade_student @students[0], {excuse: true}
+        assignment.grade_student @students[0], excuse: true, grader: @teacher
       end
 
       return assignments
@@ -451,7 +459,7 @@ describe "submissions" do
         submission_types: 'online_text_entry'
       )
 
-      @assignment.grade_student @student, {excuse: 1}
+      @assignment.grade_student @student, excuse: 1, grader: @teacher
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(f("#content")).not_to contain_css('a.submit_assignment_link')
       expect(f('#assignment_show .assignment-title').text).to eq 'assignment 1'

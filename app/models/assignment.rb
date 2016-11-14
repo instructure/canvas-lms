@@ -1164,7 +1164,14 @@ class Assignment < ActiveRecord::Base
     self.submissions.where(user_id: user.id).first_or_initialize
   end
 
-  class GradeError < StandardError; end
+  class GradeError < StandardError
+    attr_accessor :status_code
+
+    def initialize(message = nil, status_code = nil)
+      super(message)
+      self.status_code = status_code
+    end
+  end
 
   def compute_grade_and_score(grade, score)
     if grade
@@ -1232,6 +1239,11 @@ class Assignment < ActiveRecord::Base
   protected :tool_settings_tools
 
   def save_grade_to_submission(submission, original_student, group, opts)
+    unless submission.grader_can_grade?
+      error_details = submission.grading_error_message
+      raise GradeError.new("Cannot grade this submission at this time: #{error_details}", :forbidden)
+    end
+
     submission.skip_grade_calc = opts[:skip_grade_calc]
 
     previously_graded = submission.grade.present? || submission.excused?
@@ -1246,6 +1258,7 @@ class Assignment < ActiveRecord::Base
 
     unless opts[:provisional]
       submission.grader = grader
+      submission.grader_id = opts[:grader_id] if opts.key?(:grader_id)
       submission.grade = grade
       submission.score = score
       submission.graded_anonymously = opts[:graded_anonymously] if opts.key?(:graded_anonymously)
@@ -2201,9 +2214,16 @@ class Assignment < ActiveRecord::Base
     s.excused?
   end
 
-  def in_closed_grading_period?
+  def effective_due_dates
     @effective_due_dates ||= EffectiveDueDates.for_course(context, id)
-    @effective_due_dates.in_closed_grading_period?(id)
+  end
+
+  def in_closed_grading_period?
+    effective_due_dates.in_closed_grading_period?(id)
+  end
+
+  def in_closed_grading_period_for_student?(student)
+    effective_due_dates.in_closed_grading_period?(id, student)
   end
 
   # simply versioned models are always marked new_record, but for our purposes

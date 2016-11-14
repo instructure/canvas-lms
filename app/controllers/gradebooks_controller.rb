@@ -422,6 +422,7 @@ class GradebooksController < ApplicationController
         s[:assignment_id]
       }).index_by(&:id)
 
+      request_error_status = nil
       @submissions = []
       submissions.compact.each do |submission|
         @assignment = assignments[submission[:assignment_id].to_i]
@@ -470,6 +471,7 @@ class GradebooksController < ApplicationController
           end
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
+          request_error_status = e.status_code
           @error_message = e.to_s
         end
       end
@@ -489,9 +491,11 @@ class GradebooksController < ApplicationController
           }
         else
           flash[:error] = t('errors.submission_failed', "Submission was unsuccessful: %{error}", :error => @error_message || t('errors.submission_failed_default', 'Submission Failed'))
+          request_error_status ||= :bad_request
+
           format.html { render :show, course_id: @assignment.context.id }
-          format.json { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
-          format.text { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
+          format.json { render json: { errors: { base: @error_message } }, status: request_error_status }
+          format.text { render json: { errors: { base: @error_message } }, status: request_error_status }
         end
       end
     end

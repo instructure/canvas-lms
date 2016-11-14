@@ -66,12 +66,12 @@ describe GradeSummaryPresenter do
     it 'works' do
       s1, s2, s3, s4 = n_students_in_course(4)
       a = @course.assignments.create! points_possible: 10
-      a.grade_student s1, grade:  0
-      a.grade_student s2, grade:  5
-      a.grade_student s3, grade: 10
+      a.grade_student s1, grade:  0, grader: @teacher
+      a.grade_student s2, grade:  5, grader: @teacher
+      a.grade_student s3, grade: 10, grader: @teacher
 
       # this student should be ignored
-      a.grade_student s4, grade: 99
+      a.grade_student s4, grade: 99, grader: @teacher
       s4.enrollments.each &:destroy
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
@@ -89,11 +89,11 @@ describe GradeSummaryPresenter do
       fake_student.preferences[:fake_student] = true
 
       a = @course.assignments.create! points_possible: 10
-      a.grade_student s1, grade:  0
-      a.grade_student s2, grade:  5
-      a.grade_student s3, grade: 10
-      a.grade_student removed_student, grade: 20
-      a.grade_student fake_student, grade: 100
+      a.grade_student s1, grade:  0, grader: @teacher
+      a.grade_student s2, grade:  5, grader: @teacher
+      a.grade_student s3, grade: 10, grader: @teacher
+      a.grade_student removed_student, grade: 20, grader: @teacher
+      a.grade_student fake_student, grade: 100, grader: @teacher
 
       removed_student.enrollments.each do |enrollment|
         enrollment.workflow_state = 'inactive'
@@ -111,10 +111,10 @@ describe GradeSummaryPresenter do
     it 'doesnt factor nil grades into the average or min' do
       s1, s2, s3, s4 = n_students_in_course(4)
       a = @course.assignments.create! points_possible: 10
-      a.grade_student s1, grade:  2
-      a.grade_student s2, grade:  6
-      a.grade_student s3, grade: 10
-      a.grade_student s4, grade: nil
+      a.grade_student s1, grade:  2, grader: @teacher
+      a.grade_student s2, grade:  6, grader: @teacher
+      a.grade_student s3, grade: 10, grader: @teacher
+      a.grade_student s4, grade: nil, grader: @teacher
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
@@ -136,11 +136,11 @@ describe GradeSummaryPresenter do
       fake_student.preferences[:fake_student] = true
 
       a = @course.assignments.create! points_possible: 10
-      a.grade_student s1, grade:  0
-      a.grade_student s2, grade:  5
-      a.grade_student s3, grade: 10
-      a.grade_student removed_student, grade: 20
-      a.grade_student fake_student, grade: 100
+      a.grade_student s1, grade:  0, grader: @teacher
+      a.grade_student s2, grade:  5, grader: @teacher
+      a.grade_student s3, grade: 10, grader: @teacher
+      a.grade_student removed_student, grade: 20, grader: @teacher
+      a.grade_student fake_student, grade: 100, grader: @teacher
 
       removed_student.enrollments.each do |enrollment|
         enrollment.workflow_state = 'inactive'
@@ -162,8 +162,8 @@ describe GradeSummaryPresenter do
       a1, a2 = 2.times.map {
         @course.assignments.create! points_possible: 10
       }
-      a1.grade_student @student, grade: 10
-      a2.grade_student @student, grade: 10
+      a1.grade_student @student, grade: 10, grader: @teacher
+      a2.grade_student @student, grade: 10, grader: @teacher
 
       a2.destroy
 
@@ -173,7 +173,7 @@ describe GradeSummaryPresenter do
 
     it "doesn't error on submissions for assignments not in the pre-loaded assignment list" do
       assign = @course.assignments.create! points_possible: 10
-      assign.grade_student @student, grade: 10
+      assign.grade_student @student, grade: 10, grader: @teacher
       assign.update_attribute(:submission_types, "not_graded")
 
       p = GradeSummaryPresenter.new(@course, @teacher, @student.id)

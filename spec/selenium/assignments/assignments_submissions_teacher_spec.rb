@@ -35,7 +35,7 @@ describe "submissions" do
       student_in_course
       assignment = create_assignment
       assignment.submissions.create(:user => @student)
-      assignment.grade_student @student, :grade => 2
+      assignment.grade_student @student, grade: 2, grader: @teacher
       get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
       expect(f('.grading_value')[:value]).to eq '2'
     end

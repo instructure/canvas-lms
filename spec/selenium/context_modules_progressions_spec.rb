@@ -210,7 +210,7 @@ describe "context modules" do
       tag = @module1.add_item({id: @assignment_1.id, type: 'assignment'})
       add_requirement({tag.id => {type:'min_score', min_score: 10}})
       @assignment_1.submit_homework(@student, body: "done!")
-      @assignment_1.grade_student(@student, grade: 15)
+      @assignment_1.grade_student(@student, grade: 15, grader: @teacher)
       validate_access_to_module
     end
 

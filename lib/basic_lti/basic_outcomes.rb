@@ -214,9 +214,11 @@ module BasicLTI
 
         if raw_score
           submission_hash[:grade] = raw_score
+          submission_hash[:grader_id] = -_tool.id
         elsif new_score
           if (0.0 .. 1.0).include?(new_score)
             submission_hash[:grade] = "#{round_if_whole(new_score * 100)}%"
+            submission_hash[:grader_id] = -_tool.id
           else
             error_message = I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1")
           end
@@ -245,6 +247,7 @@ to because the assignment has no points possible.
 
           if new_score || raw_score
             submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
+            submission_hash[:grader_id] = -_tool.id
             @submission = assignment.grade_student(user, submission_hash).first
           end
 
@@ -261,8 +264,8 @@ to because the assignment has no points possible.
         true
       end
 
-      def handle_deleteResult(tool, course, assignment, user)
-        assignment.grade_student(user, :grade => nil)
+      def handle_deleteResult(tool, _course, assignment, user)
+        assignment.grade_student(user, :grade => nil, grader_id: -tool.id)
         self.body = "<deleteResultResponse />"
         true
       end

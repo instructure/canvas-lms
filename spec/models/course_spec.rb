@@ -1087,7 +1087,7 @@ describe Course, "gradebook_to_csv" do
   it "should generate gradebook csv" do
     @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
     @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-    @assignment.grade_student(@student, :grade => "10")
+    @assignment.grade_student(@student, grade: "10", grader: @teacher)
     @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
     @course.recompute_student_scores
     @student.reload
@@ -1129,8 +1129,8 @@ describe Course, "gradebook_to_csv" do
     @student.reload
     @course.reload
 
-    g1a1.grade_student(@student, grade: 10)
-    g2a1.grade_student(@student, grade: 5)
+    g1a1.grade_student(@student, grade: 10, grader: @teacher)
+    g2a1.grade_student(@student, grade: 5, grader: @teacher)
 
     csv = GradebookExporter.new(@course, @teacher).to_csv
     expect(csv).not_to be_nil
@@ -1253,9 +1253,9 @@ describe Course, "gradebook_to_csv" do
     @course.save!
     @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
     @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-    @assignment.grade_student(@student, :grade => "10")
+    @assignment.grade_student(@student, grade: "10", grader: @teacher)
     @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
-    @assignment2.grade_student(@student, :grade => "8")
+    @assignment2.grade_student(@student, grade: "8", grader: @teacher)
     @course.recompute_student_scores
     @student.reload
     @course.reload
@@ -1290,9 +1290,9 @@ describe Course, "gradebook_to_csv" do
     @user1.pseudonym.save!
     @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
     @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-    @assignment.grade_student(@user1, :grade => "10")
-    @assignment.grade_student(@user2, :grade => "9")
-    @assignment.grade_student(@user3, :grade => "9")
+    @assignment.grade_student(@user1, grade: "10", grader: @teacher)
+    @assignment.grade_student(@user2, grade: "9", grader: @teacher)
+    @assignment.grade_student(@user3, grade: "9", grader: @teacher)
     @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
     @course.recompute_student_scores
     @course.reload
@@ -1386,7 +1386,7 @@ describe Course, "gradebook_to_csv" do
   context "accumulated points" do
     before :once do
       a = @course.assignments.create! :title => "Blah", :points_possible => 10
-      a.grade_student @student, :grade => 8
+      a.grade_student @student, grade: 8, grader: @teacher
     end
 
     it "includes points for unweighted courses" do
@@ -1444,9 +1444,9 @@ describe Course, "gradebook_to_csv" do
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
       @assignment.muted = true
       @assignment.save!
-      @assignment.grade_student(@user1, :grade => "10")
-      @assignment.grade_student(@user2, :grade => "9")
-      @assignment.grade_student(@user3, :grade => "9")
+      @assignment.grade_student(@user1, grade: "10", grader: @teacher)
+      @assignment.grade_student(@user2, grade: "9", grader: @teacher)
+      @assignment.grade_student(@user3, grade: "9", grader: @teacher)
       @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
       @course.recompute_student_scores
       @course.reload
@@ -1500,7 +1500,7 @@ describe Course, "gradebook_to_csv" do
       points_possible: 10,
       title: "blah"
     a.publish
-    a.grade_student(@student, grade: "C")
+    a.grade_student(@student, grade: "C", grader: @teacher)
     rows = CSV.parse(GradebookExporter.new(@course, @teacher).to_csv)
     expect(rows[2][4]).to eql "C"
   end
@@ -1525,8 +1525,8 @@ describe Course, "gradebook_to_csv" do
     before :once do
       course_with_teacher(:active_all => true)
       setup_DA
-      @assignment.grade_student(@student1, :grade => "3")
-      @assignment2.grade_student(@student2, :grade => "3")
+      @assignment.grade_student(@student1, grade: "3", grader: @teacher)
+      @assignment2.grade_student(@student2, grade: "3", grader: @teacher)
     end
 
     it "should insert N/A for non-visible assignments" do
