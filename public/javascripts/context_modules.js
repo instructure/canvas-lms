@@ -528,7 +528,8 @@ define([
 
         if (cyoe.isCyoeAble) {
           var $mpLink = $('<a class="mastery_paths_link" />')
-            .attr('href', './modules/items/' +
+            .attr('href', ENV.CONTEXT_URL_ROOT +
+                          '/modules/items/' +
                           data.id +
                           '/edit_mastery_paths?return_to=' +
                           encodeURIComponent(window.location.pathname))

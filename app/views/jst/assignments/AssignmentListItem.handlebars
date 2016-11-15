@@ -66,7 +66,7 @@
     {{#if canManage}}
       <div class="ig-admin">
         {{#if cyoe.isTrigger}}
-        <a href="assignments/{{id}}/edit/?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+        <a href="{{htmlEditUrl}}?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
         {{/if}}
         {{#if cyoe.isReleased}}
         <span class="pill mastery-path-icon" data-tooltip title="{{#t}}Released by Mastery Path{{/t}}">
@@ -121,7 +121,7 @@
             {{#if cyoe.isCyoeAble}}
             <li>
               <a
-                href="assignments/{{id}}/edit/?return_to={{return_to}}#mastery-paths-editor"
+                href="{{htmlEditUrl}}?return_to={{return_to}}#mastery-paths-editor"
                 class="edit_mastery_paths icon-mastery-path"
                 id="assignment_{{id}}_settings_edit_item_mastery_paths"
                 aria-label="{{#t}}Edit Assignment {{name}} Mastery Paths{{/t}}"
