@@ -143,6 +143,18 @@ tinymce.create('tinymce.plugins.BZButtons', {
 		function() {
 		  // make sure not all are true and not all are false
                   var lastWas = null;
+		  var correctCount = 0;
+		  for(var a = 0; a < typeSelects.length; a++) {
+		    var v = typeSelects[a].options[typeSelects[a].selectedIndex].value;
+		    if(v == 'correct')
+		    	correctCount++;
+		  }
+
+                  if(correctCount != 1) {
+		    alert("Please make the quick quiz have only one right answer.");
+		    return false;
+		  }
+
 		  for(var a = 0; a < typeSelects.length; a++) {
 		    var v = typeSelects[a].options[typeSelects[a].selectedIndex].value;
 		    if(a && lastWas != v)
@@ -201,7 +213,21 @@ tinymce.create('tinymce.plugins.BZButtons', {
 		  html += '</ul></form><br />';
 
         	  ed.selection.setContent(html);
+		},
+		function() {
+		  var count = 0;
+		  for(var a = 0; a < statements.length; a++) {
+		  	var s = statements[a].value;
+			if(s.length)
+			  count++;
 		}
+
+		if(count < 2) {
+			alert("Please make at least two items in the checklist.");
+			return false;
+		}
+
+		return true;
 	);
     }
 
