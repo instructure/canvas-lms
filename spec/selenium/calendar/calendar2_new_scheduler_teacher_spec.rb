@@ -30,7 +30,6 @@ describe "scheduler" do
     end
 
     it 'creates an Appointment Group with the feature flag ON', priority: "1", test_id: 2981262 do
-      skip('spec is broken. Bug ticket created: CNVS-33323')
       Account.default.enable_feature!(:better_scheduler)
 
       title = 'my appt'
@@ -53,11 +52,13 @@ describe "scheduler" do
 
       # select a proper appointment group time
       t = Time.zone.local(2016, 11, 7, 1, 0, 0)
+      date = Time.zone.today.advance(years: 1).to_s
       Timecop.freeze(t) do
         fj('.ui-datepicker-trigger:visible').click
         datepicker_current
         set_value(fj('.time_field.start_time:visible'), start_time_text)
         set_value(fj('.time_field.end_time:visible'),end_time_text)
+        set_value(fj('.date_field:visible'), date)
         find('.scheduler-event-details-footer .btn-primary').click
       end
 
