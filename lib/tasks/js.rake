@@ -230,4 +230,9 @@ namespace :js do
     puts "node is: #{`node -v`.strip} (#{`which node`.strip})"
     raise 'error running npm install' unless `npm install`
   end
+
+  desc "Run Gulp Rev, for fingerprinting assets"
+  task :gulp_rev do
+    raise "Error reving files" unless system('node_modules/.bin/gulp rev')
+  end
 end

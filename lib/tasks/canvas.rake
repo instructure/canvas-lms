@@ -95,7 +95,8 @@ namespace :canvas do
     end
     combined_time = times.reduce(:+)
     puts "Finished compiling assets in #{real_time}. parallelism saved #{combined_time - real_time} (#{real_time.to_f / combined_time.to_f * 100.0}%)"
-    raise "Error reving files" unless system('node_modules/.bin/gulp rev')
+
+    log_time("gulp rev") { Rake::Task['js:gulp_rev'].invoke }
   end
 end
 
