@@ -43,7 +43,7 @@ class OutcomeGroupsController < ApplicationController
         data[:outcomes].each do |outcome_hash|
           params = {}
           outcome_hash = outcome_hash.with_indifferent_access
-          outcome = group.learning_outcomes.create(params)
+          group.learning_outcomes.create(params)
         end
         render :json => group.as_json(:include => :learning_outcomes),
                :as_text => true
@@ -78,14 +78,6 @@ class OutcomeGroupsController < ApplicationController
       @outcome_group.destroy
       @context.touch
       render :json => @outcome_group
-    end
-  end
-
-  def reorder
-    if authorized_action(@context, @current_user, :manage_outcomes)
-      @outcome_group = @context.learning_outcome_groups.active.find(params[:outcome_group_id])
-      @asset_strings = @outcome_group.reorder_content(params[:ordering])
-      render :json => @asset_strings
     end
   end
 end
