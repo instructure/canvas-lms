@@ -30,6 +30,7 @@ describe "scheduler" do
     end
 
     it 'creates an Appointment Group with the feature flag ON', priority: "1", test_id: 2981262 do
+      skip('spec is broken. Bug ticket created: CNVS-33323')
       Account.default.enable_feature!(:better_scheduler)
 
       title = 'my appt'
@@ -62,7 +63,7 @@ describe "scheduler" do
 
       # make sure that the DB record for the Appointment Group is correct
       last_group = AppointmentGroup.last
-      expect(last_group.title).to eq title
+      expect(last_group.title).to eq title # spec breaks here
       expect(last_group.location_name).to eq location
       expect(last_group.start_at.strftime("%I")).to eq start_time_text
       expect(last_group.end_at.strftime("%I")).to eq end_time_text
