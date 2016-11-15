@@ -21,6 +21,7 @@ define([
   'compiled/models/ModuleFile',
   'jsx/shared/PublishCloud',
   'react',
+  'react-dom',
   'compiled/models/PublishableModuleItem',
   'compiled/views/PublishIconView',
   'INST' /* INST */,
@@ -50,7 +51,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'compiled/jquery.rails_flash_notifications'
-], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, Helper, CyoeHelper, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
+], function(_, ModuleFile, PublishCloud, React, ReactDOM, PublishableModuleItem, PublishIconView, INST, I18n, $, Helper, CyoeHelper, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -1497,7 +1498,7 @@ define([
         }
 
         var Cloud = React.createElement(PublishCloud, props);
-        React.render(Cloud, $el[0]);
+        ReactDOM.render(Cloud, $el[0]);
         return {model: file} // Pretending this is a backbone view
       }
 
@@ -1560,6 +1561,10 @@ define([
       var publish = model.publish, unpublish = model.unpublish;
       model.publish = function() {
         return publish.apply(model, arguments).done(function(data) {
+          if (data.publish_warning) {
+            $.flashWarning(I18n.t('Some module items could not be published'))
+          }
+
           relock_modules_dialog.renderIfNeeded(data);
           model
             .fetch({data: {include: 'items'}})

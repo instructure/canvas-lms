@@ -24,6 +24,38 @@ describe ContextModule do
     @module = @course.context_modules.create!(:name => "some module")
   end
 
+  describe "publish_items!" do
+    context "with file usage rights required" do
+      before :each do
+        course_module
+        @course.enable_feature! :usage_rights_required
+        @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data, :locked => true)
+        @tag = @module.add_item(:id => @file.id, :type => "attachment")
+      end
+
+      it "should not publish Attachment module items if usage rights are missing" do
+        @file.usage_rights = nil
+        @module.publish_items!
+        expect(@tag.published?).to eql(false)
+        expect(@file.published?).to eql(false)
+      end
+
+      it "should publish Attachment module items if usage rights are present" do
+        @file.usage_rights = @course.usage_rights.create(:use_justification => 'own_copyright')
+        @file.save!
+
+        # ensure models are in sync around publish_items!
+        @module.reload
+        @module.publish_items!
+        @file.reload
+        @tag.reload
+
+        expect(@tag.published?).to eql(true)
+        expect(@file.published?).to eql(true)
+      end
+    end
+  end
+
   describe "available_for?" do
     it "should return true by default" do
       course_module
