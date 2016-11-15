@@ -331,6 +331,7 @@ describe ContentTag do
   end
 
   it "should not attempt to update asset name attribute if it's over the db limit" do
+    skip "CNVS-33340 - only passes if your db was created prior to rails 4.2"
     course
     @page = @course.wiki.wiki_pages.create!(:title => "some page")
     @module = @course.context_modules.create!(:name => "module")
@@ -343,6 +344,7 @@ describe ContentTag do
   end
 
   it "should properly trim asset name for assignments" do
+    skip "CNVS-33340 - only passes if your db was created prior to rails 4.2"
     course
     @assign = @course.assignments.create!(:title => "some assignment")
     @module = @course.context_modules.create!(:name => "module")
