@@ -557,6 +557,18 @@ describe ConditionalRelease::Service do
         end
       end
 
+      it 'does not use the cache if assignments are saved' do
+        enable_cache do
+          expect_cyoe_request '200', @a1
+          Service.rules_for(@course, @student, [], nil)
+
+          @a1.save!
+
+          expect_cyoe_request '200', @a1
+          Service.rules_for(@course, @student, [], nil)
+        end
+      end
+
       it 'does not store an error response in the cache' do
         enable_cache do
           expect_cyoe_request '404'

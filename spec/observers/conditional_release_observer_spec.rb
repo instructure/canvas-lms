@@ -54,17 +54,20 @@ describe ConditionalReleaseObserver do
   describe "assignment" do
     it "clears cache on create" do
       ConditionalRelease::Service.expects(:clear_active_rules_cache).at_least(1)
+      ConditionalRelease::Service.expects(:clear_applied_rules_cache).at_least(1)
       assignment_model
     end
 
     it "clears cache on update" do
       ConditionalRelease::Service.expects(:clear_active_rules_cache).at_least(1)
+      ConditionalRelease::Service.expects(:clear_applied_rules_cache).at_least(1)
       @assignment.name = "different name"
       @assignment.save!
     end
 
     it "clears cache on delete" do
       ConditionalRelease::Service.expects(:clear_active_rules_cache).at_least(1)
+      ConditionalRelease::Service.expects(:clear_applied_rules_cache).at_least(1)
       @assignment.destroy
     end
   end
