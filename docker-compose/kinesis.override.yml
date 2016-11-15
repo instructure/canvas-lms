@@ -10,5 +10,5 @@ services:
   kinesis:
     image: instructure/kinesalite
     environment:
-      VIRTUAL_HOST: kinesis.*
+      VIRTUAL_HOST: kinesis.docker
       VIRTUAL_PORT: 4567

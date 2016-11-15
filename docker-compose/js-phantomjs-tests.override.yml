@@ -9,4 +9,4 @@ services:
      - ".:/app"
    environment:
      NODE_ENV: CI
-     VIRTUAL_HOST: phantom.*
+     VIRTUAL_HOST: phantom.docker
