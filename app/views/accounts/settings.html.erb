@@ -608,7 +608,7 @@ acknowledge that you have read and agreed to the
               </tr>
               <tr>
                 <td><%= t 'notifications.email_date', 'Date' %></td>
-                <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
+                <td><%= datetime_string(Time.zone.now) %></td>
               </tr>
               <tr>
                 <td><%= t 'notifications.email_to', 'To' %></td>
@@ -648,7 +648,7 @@ acknowledge that you have read and agreed to the
               </tr>
               <tr>
                 <td><%= t 'notifications.email_date', 'Date' %></td>
-                <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
+                <td><%= datetime_string(Time.zone.now) %></td>
               </tr>
               <tr>
                 <td><%= t 'notifications.email_to', 'To' %></td>
