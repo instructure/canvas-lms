@@ -98,12 +98,14 @@ module SeleniumDriverSetup
     test_number = ENV["TEST_ENV_NUMBER"]
     # it'll be '', '2', '3', '4'...
     test_number = test_number.blank? ? 1 : test_number.to_i
-    # start at 61 to avoid conflicts with other test runner Xvfb stuff
+    # start at 21 to avoid conflicts with other test runner Xvfb stuff
 
-    display = 60 + test_number
+    display = 20 + test_number
     @headless = Headless.new(
       display: display,
       dimensions: "1920x1080x24",
+      reuse: false,
+      destroy_at_exit: true,
       video: {
         provider: :ffmpeg,
         # yay interframe compression
