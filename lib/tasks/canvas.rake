@@ -29,21 +29,20 @@ namespace :canvas do
   end
 
   desc "Compile javascript and css assets."
-  task :compile_assets, :generate_documentation, :check_syntax, :compile_styleguide, :build_js do |t, args|
-    # :check_syntax is currently a dummy argument that isn't used.
-    args.with_defaults(:generate_documentation => true, :check_syntax => false, :compile_styleguide => true, :build_js => true)
-    truthy_values = [true, 'true', '1']
-    generate_documentation = truthy_values.include?(args[:generate_documentation])
-    compile_styleguide = truthy_values.include?(args[:compile_styleguide])
-    build_js = truthy_values.include?(args[:build_js])
+  task :compile_assets do |t, args|
+    npm_install = ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
+    compile_css = ENV["COMPILE_ASSETS_CSS"] != "0"
+    build_styleguide = ENV["COMPILE_ASSETS_STYLEGUIDE"] != "0"
+    build_js = ENV["COMPILE_ASSETS_BUILD_JS"] != "0"
+    build_api_docs = ENV["COMPILE_ASSETS_API_DOCS"] != "0"
 
-    if ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
+    if npm_install
       log_time('Making sure node_modules are up to date') {
         Rake::Task['js:npm_install'].invoke
       }
     end
 
-    if ENV["COMPILE_ASSETS_CSS"] != "0"
+    if compile_css
       # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
       # to exist before we run handlebars stuff, so we have to do this first
       Rake::Task['css:compile'].invoke
@@ -55,7 +54,7 @@ namespace :canvas do
 
     tasks = Hash.new
 
-    if compile_styleguide
+    if build_styleguide
       tasks["css:styleguide"] = -> {
         Rake::Task['css:styleguide'].invoke
       }
@@ -81,7 +80,7 @@ namespace :canvas do
       }
     end
 
-    if generate_documentation
+    if build_api_docs
       tasks["Generate documentation [yardoc]"] = -> {
         Rake::Task['doc:api'].invoke
       }
