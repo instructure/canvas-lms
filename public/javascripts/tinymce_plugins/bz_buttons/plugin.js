@@ -220,14 +220,15 @@ tinymce.create('tinymce.plugins.BZButtons', {
 		  	var s = statements[a].value;
 			if(s.length)
 			  count++;
-		}
+		  }
 
-		if(count < 2) {
+		  if(count < 2) {
 			alert("Please make at least two items in the checklist.");
 			return false;
-		}
+		  }
 
-		return true;
+		  return true;
+		}
 	);
     }
 
