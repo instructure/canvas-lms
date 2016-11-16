@@ -16,7 +16,7 @@ gem 'builder', '3.2.2'
 gem 'tzinfo', '1.2.2'
 gem 'oj_mimic_json', require: false
 
-gem 'encrypted_cookie_store-instructure', '1.1.12', require: 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.2.2', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.5.0'
