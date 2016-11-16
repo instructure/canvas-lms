@@ -234,6 +234,8 @@ class Course < ActiveRecord::Base
   has_many :progresses, as: :context
   has_many :gradebook_csvs, inverse_of: :course
 
+  has_many :master_course_templates, :class_name => "MasterCourses::MasterTemplate"
+
   prepend Profile::Association
 
   before_save :assign_uuid
