@@ -70,9 +70,7 @@ gem 'jwt', '1.2.1', require: false
 gem 'json-jwt', '1.6.5', require: false
 gem 'twilio-ruby', '4.2.1'
 
-gem 'mail', '2.5.4', require: false
-  gem 'treetop', '1.4.15', require: false
-    gem 'polyglot', '0.3.5', require: false
+gem 'mail', '2.6.4', require: false
 gem 'marginalia', '1.4.0', require: false
 gem 'mime-types', '1.25.1', require: 'mime/types'
 gem 'mini_magick', '4.2.7'

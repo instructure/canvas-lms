@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activesupport", ">= 3.2", "< 5.1"
 
-  spec.add_dependency "mail", "2.5.4"
+  spec.add_dependency "mail", "2.6.4"
   spec.add_dependency "html_text_helper"
   spec.add_dependency "utf8_cleaner"
   spec.add_dependency "canvas_statsd"
