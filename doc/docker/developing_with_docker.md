@@ -17,7 +17,7 @@ By default `docker-compose` will look at 2 files
 - docker-compose.override.yml
 If you need more than what the default override provides you should use a `.env` file to set your `COMPOSE_FILE` environment variable.
 
-Create a `docker-compose.<username>.override.yml` and append it the `COMPOSE_FILE` environment variable.
+Create a `docker-compose.local.<username>.yml` and append it the `COMPOSE_FILE` environment variable.
 Then add only the extras you need to that file.
 
 ```bash
@@ -80,7 +80,7 @@ execution. To use it, you will need to enable `REMOTE_DEBUGGING_ENABLED` in your
 this file, you will need to create it and add the following:
 
 ```
-version: 2
+version: '2'
 services:
   web:
     environment:
