@@ -639,7 +639,7 @@ module Api::V1::Assignment
       assignment.lti_context_id = secure_params[:lti_assignment_id]
     end
 
-    apply_external_tool_settings(assignment, assignment_params, context)
+    apply_external_tool_settings(assignment, assignment_params)
 
     overrides = pull_overrides_from_params(assignment_params)
 
@@ -702,12 +702,24 @@ module Api::V1::Assignment
       valid_submission_types?(assignment, assignment_params)
   end
 
-  def apply_external_tool_settings(assignment, assignment_params, context)
+  def apply_external_tool_settings(assignment, assignment_params)
     if plagiarism_capable?(assignment_params)
-      tool_id = assignment_params['assignmentConfigurationTool'].to_i
-      tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
-      assignment.tool_settings_tools = [tool] if tool
+      tool = assignment_configuration_tool(assignment_params)
+      assignment.tool_settings_tool = tool
     end
+  end
+
+  def assignment_configuration_tool(assignment_params)
+    tool_id = assignment_params['assignmentConfigurationTool'].to_i
+    tool = nil
+    if assignment_params['configuration_tool_type'] == 'ContextExternalTool'
+      tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
+    elsif assignment_params['configuration_tool_type'] == 'Lti::MessageHandler'
+      mh = Lti::MessageHandler.find(tool_id)
+      mh_context = mh.resource_handler.tool_proxy.context
+      tool = mh if mh_context == @context || mh_context == @context.account || mh_context == @context.root_account
+    end
+    tool
   end
 
   def plagiarism_capable?(assignment_params)
