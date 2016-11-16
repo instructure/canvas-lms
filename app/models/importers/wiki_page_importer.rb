@@ -71,8 +71,10 @@ module Importers
         else
           item.workflow_state = 'unpublished' if item.new_record? || item.deleted?
         end
+      else
+        item.workflow_state = 'unpublished' if item.deleted?
       end
-
+      
       item.set_as_front_page! if !!hash[:front_page] && context.wiki.has_no_front_page
       migration.add_imported_item(item)
 

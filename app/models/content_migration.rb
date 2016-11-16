@@ -450,6 +450,13 @@ class ContentMigration < ActiveRecord::Base
     false
   end
 
+  def original_id_for(mig_id)
+    return nil unless mig_id.is_a?(String)
+    prefix = "#{migration_settings[:id_prepender]}_"
+    return nil unless mig_id.start_with? prefix
+    mig_id[prefix.length..-1]
+  end
+
   def import_object?(asset_type, mig_id)
     return false unless mig_id
     return true if import_everything?
@@ -458,6 +465,9 @@ class ContentMigration < ActiveRecord::Base
 
     return false unless to_import(asset_type).present?
 
+    if (orig_id = original_id_for(mig_id))
+      return true if is_set?(to_import(asset_type)[orig_id])
+    end
     is_set?(to_import(asset_type)[mig_id])
   end
 

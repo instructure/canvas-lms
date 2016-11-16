@@ -348,6 +348,40 @@ describe ContentMigration do
       new_quiz.quiz_questions.first.question_data[:question_text])
   end
 
+  it "selectively imports quizzes when id_prepender is in use" do
+    skip unless Qti.qti_enabled?
+
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @teacher)
+    cm.migration_type = 'qti_converter'
+    cm.migration_settings['import_immediately'] = true
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
+    attachment = Attachment.new
+    attachment.context = cm
+    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment.filename = 'file.zip'
+    attachment.save!
+
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    expect(@course.quizzes.count).to eq 1
+    teh_quiz = @course.quizzes.first
+    teh_quiz.destroy!
+
+    cm.migration_settings['id_prepender'] = 'blah!'
+    cm.migration_settings['migration_ids_to_import'] = {'copy' => {'quizzes' => {teh_quiz.migration_id => '1'}}}
+    cm.save!
+    cm.queue_migration
+    run_jobs
+    expect(@course.quizzes.active.find_by_migration_id("blah!_#{teh_quiz.migration_id}")).not_to be_nil
+  end
+
   it "should identify and import compressed tarball archives" do
     skip unless Qti.qti_enabled?
 
