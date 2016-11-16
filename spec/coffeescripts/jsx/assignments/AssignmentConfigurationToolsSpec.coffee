@@ -63,6 +63,17 @@ define [
             'url': 'http://localhost:3000/messages/blti'
             'title': 'Lti2Example'
         }
+        {
+          'definition_type': 'ContextExternalTool'
+          'definition_id': 5
+          'name': 'Redirect Tool'
+          'description': 'Add links to external web resources that show up as navigation items in course, user or account navigation. Whatever URL you specify is loaded within the content pane when users click the link.'
+          'domain': null
+          'placements': 'assignment_configuration':
+            'message_type': 'basic-lti-launch-request'
+            'url': 'https://www.edu-apps.org/redirect'
+            'title': 'Redirect Tool'
+        }
       ]
       @stub($, 'ajax', -> {status: 200, data: toolDefinitions})
 
@@ -85,6 +96,12 @@ define [
     option = wrapper.querySelector('option')
     equal option.getAttribute('data-launch'), 'none'
 
+  test 'it renders empty string for tool type when no tool is selected', ->
+    component = renderComponenet({'courseId': 1, 'secureParams': secureParams})
+    component.setState({tools: toolDefinitions})
+    tool_type = wrapper.querySelector('#configuration-tool-type')
+    equal tool_type.value, ''
+
   test 'it renders each tool', ->
     component = renderComponenet({'courseId': 1, 'secureParams': secureParams})
     component.setState({tools: toolDefinitions})
@@ -106,4 +123,32 @@ define [
     computedUrl = component.getLaunch(tool)
     equal computedUrl, correctUrl
 
+  test 'it renders the proper tool type for LTI 1.x tools', ->
+    component = renderComponenet({'courseId': 1, 'secureParams': secureParams})
+    component.setState({tools: toolDefinitions})
+    tool_select = wrapper.querySelector('#assignment_configuration_tool')
+    tool_type = wrapper.querySelector('#configuration-tool-type')
+    tool_select.options[1].selected = 'selected'
+    component.setToolLaunchUrl()
+    equal tool_type.value, 'ContextExternalTool'
 
+  test 'it renders the proper tool type for LTI 2 tools', ->
+    component = renderComponenet({'courseId': 1, 'secureParams': secureParams})
+    component.setState({tools: toolDefinitions})
+    tool_select = wrapper.querySelector('#assignment_configuration_tool')
+    tool_type = wrapper.querySelector('#configuration-tool-type')
+    tool_select.options[4].selected = 'selected'
+    component.setToolLaunchUrl()
+    equal tool_type.value, 'Lti::MessageHandler'
+
+  test 'it renders proper tool when duplicate IDs but unique tool types are present', ->
+    component = renderComponenet({
+      'courseId': 1,
+      'secureParams': secureParams,
+      'selectedTool': 5,
+      'selectedToolType': 'ContextExternalTool'
+    })
+    component.setState({tools: toolDefinitions})
+    select_box = wrapper.querySelector('#assignment_configuration_tool')
+    selected = select_box.options[select_box.selectedIndex]
+    equal selected.getAttribute('data-type'), 'ContextExternalTool'

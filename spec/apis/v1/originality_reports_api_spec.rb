@@ -35,7 +35,7 @@ describe 'Originality Reports API', type: :request do
     @assignment = @course.assignments.create!(title: "some assignment",
                                               assignment_group: @group,
                                               points_possible: 12,
-                                              tool_settings_tools:[@tool])
+                                              tool_settings_tool: @tool)
     @attachment.context = @student
     @attachment.save!
 

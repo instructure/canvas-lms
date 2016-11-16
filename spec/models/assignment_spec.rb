@@ -92,13 +92,49 @@ describe Assignment do
     expect(@assignment.errors[:grading_type]).not_to be_nil
   end
 
-  it "should have context_external_tools" do
+  it "should allow ContextExternalTools through polymorphic association" do
     setup_assignment_with_homework
 
     tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
-    @assignment.tool_settings_tools << tool
+    @assignment.tool_settings_tool = tool
     @assignment.save
-    expect(@assignment.tool_settings_tools).to include(tool)
+    expect(@assignment.tool_settings_tool).to eq(tool)
+  end
+
+  it "should have Lti::MessageHandler through polymorphic association" do
+    setup_assignment_with_homework
+    account = @assignment.context.account
+    product_family = Lti::ProductFamily.create(
+      vendor_code: '123',
+      product_code: 'abc',
+      vendor_name: 'acme',
+      root_account: account
+    )
+    tool_proxy = Lti::ToolProxy.create!(
+      context: account,
+      guid: SecureRandom.uuid,
+      shared_secret: 'abc',
+      product_family: product_family,
+      root_account: account,
+      product_version: '1',
+      workflow_state: 'disabled',
+      raw_data: {'proxy' => 'value'},
+      lti_version: '1'
+    )
+    resource_handler = Lti::ResourceHandler.create(
+      resource_type_code: 'code',
+      name: 'resource name',
+      tool_proxy: tool_proxy
+    )
+    message_handler = Lti::MessageHandler.create(
+      message_type: 'message_type',
+      launch_path: 'https://samplelaunch/blti',
+      resource_handler: resource_handler
+    )
+
+    @assignment.tool_settings_tool = message_handler
+    @assignment.save
+    expect(@assignment.tool_settings_tool).to eq(message_handler)
   end
 
   describe "#has_student_submissions?" do

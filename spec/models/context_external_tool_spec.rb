@@ -352,18 +352,6 @@ describe ContextExternalTool do
     end
   end
 
-  describe "assignments" do
-    it "should have assignments" do
-      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
-      a = @course.assignments.create!(title: "test",
-                                        submission_types: 'external_tool',
-                                        external_tool_tag_attributes: {url: tool.url})
-      tool.tool_settings_assignments << a
-      tool.save
-      expect(tool.tool_settings_assignments).to include(a)
-    end
-  end
-
   describe "#extension_setting" do
 
     it "returns the top level extension setting if no placement is given" do

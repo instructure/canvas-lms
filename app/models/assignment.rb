@@ -64,8 +64,9 @@ class Assignment < ActiveRecord::Base
   belongs_to :grading_standard
   belongs_to :group_category
 
-  has_many :context_external_tool_assignment_lookups, dependent: :delete_all
-  has_many :tool_settings_tools, through: :context_external_tool_assignment_lookups, source: :context_external_tool
+  has_many :assignment_configuration_tool_lookups, dependent: :delete_all
+  has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'ContextExternalTool'
+  has_many :tool_settings_tool_proxies, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'Lti::MessageHandler'
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
@@ -1202,6 +1203,33 @@ class Assignment < ActiveRecord::Base
 
     submissions.compact
   end
+
+  def tool_settings_tool
+    self.tool_settings_tools.first
+  end
+
+  def tool_settings_tool=(tool)
+    self.tool_settings_tools = [tool]
+  end
+
+  def tool_settings_tools=(tools)
+    tool_settings_context_external_tools.clear
+    tool_settings_tool_proxies.clear
+    tools.each do |t|
+      if t.instance_of? ContextExternalTool
+        tool_settings_context_external_tools << t
+      elsif t.instance_of? Lti::MessageHandler
+        tool_settings_tool_proxies << t
+      end
+    end
+    tools
+  end
+  protected :tool_settings_tools=
+
+  def tool_settings_tools
+    tool_settings_context_external_tools + tool_settings_tool_proxies
+  end
+  protected :tool_settings_tools
 
   def save_grade_to_submission(submission, original_student, group, opts)
     submission.skip_grade_calc = opts[:skip_grade_calc]
