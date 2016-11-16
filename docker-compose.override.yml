@@ -1,7 +1,7 @@
 # See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
 version: '2'
 services:
-  web: &WEB
+  jobs: &BASE
     build:
       context: .
     volumes:
@@ -16,17 +16,20 @@ services:
       - quizzes_node_modules:/usr/src/app/client_apps/canvas_quizzes/node_modules
       - selinimum_node_modules:/usr/src/app/gems/selinimum/node_modules
       - tmp:/usr/src/app/tmp
-    environment:
+    environment: &BASE-ENV
       RAILS_ENV: development
-      VIRTUAL_HOST: .canvas.docker
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
 
   guard:
-    <<: *WEB
+    <<: *BASE
     command: bundle exec guard -i
 
-  jobs:
-    <<: *WEB
+  web:
+    <<: *BASE
+    environment:
+      <<: *BASE-ENV
+      VIRTUAL_HOST: .canvas.docker
+
 
   postgres:
     volumes:
