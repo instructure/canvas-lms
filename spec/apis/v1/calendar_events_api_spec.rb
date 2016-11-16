@@ -175,6 +175,20 @@ describe CalendarEventsApiController, type: :request do
       expect(json.size).to eql 14 # first context has no events
     end
 
+    it 'does not count appointment groups against the context limit' do
+      Account.default.settings[:calendar_contexts_limit] = 1
+      Account.default.save!
+      group1 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
+      group1.publish!
+      contexts = [@course, group1].map(&:asset_string)
+      student_in_course :active_all => true
+      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-02&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+        :context_codes => contexts, :start_date => '2012-01-01', :end_date => '2012-01-02', :per_page => '25'})
+      slot = json.detect { |thing| thing['appointment_group_id'] == group1.id }
+      expect(slot).not_to be_nil
+    end
+
     it 'should fail with unauthorized if provided a context the user cannot access' do
       contexts = [@course.asset_string]
 
