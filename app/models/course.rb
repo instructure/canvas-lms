@@ -79,7 +79,8 @@ class Course < ActiveRecord::Base
                   :time_zone,
                   :organize_epub_by_content_type,
                   :show_announcements_on_home_page,
-                  :home_page_announcement_limit
+                  :home_page_announcement_limit,
+                  :enable_offline_web_export
 
   time_zone_attribute :time_zone
   def time_zone
@@ -2214,7 +2215,7 @@ class Course < ActiveRecord::Base
       :hide_final_grade, :hide_distribution_graphs,
       :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
       :organize_epub_by_content_type, :show_announcements_on_home_page,
-      :home_page_announcement_limit ]
+      :home_page_announcement_limit, :enable_offline_web_export ]
   end
 
   def set_course_dates_if_blank(shift_options)
@@ -2784,6 +2785,7 @@ class Course < ActiveRecord::Base
   add_setting :image_id
   add_setting :image_url
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
+  add_setting :enable_offline_web_export, :boolean => true, :default => true
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
 
   add_setting :restrict_student_future_view, :boolean => true, :inherited => true

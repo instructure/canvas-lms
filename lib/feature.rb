@@ -500,7 +500,7 @@ END
       description: -> { I18n.t(<<END) },
       This enables a course setting to allow students to export the course as an offline web zip folder
 END
-      applies_to: 'Account',
+      applies_to: 'Course',
       state: 'hidden',
       beta: true,
       development: true
