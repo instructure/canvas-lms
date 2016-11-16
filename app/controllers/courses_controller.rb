@@ -877,7 +877,11 @@ class CoursesController < ApplicationController
 
       users = Api.paginate(users, self, api_v1_course_users_url)
       includes = Array(params[:include])
-      user_json_preloads(users, includes.include?('email'))
+      user_json_preloads(
+        users,
+        includes.include?('email'),
+        group_memberships: includes.include?('group_ids')
+      )
       unless includes.include?('test_student') || Array(params[:enrollment_type]).include?("student_view")
         users.reject! do |u|
           u.preferences[:fake_student]
