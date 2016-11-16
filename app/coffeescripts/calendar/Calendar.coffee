@@ -253,7 +253,9 @@ define [
 
       reservedText = ""
       if event.isAppointmentGroupEvent()
-        if event.reservedUsers == ""
+        if event.appointmentGroupEventStatus == "Reserved"
+          reservedText = "\n\n#{I18n.t('Reserved By You')}"
+        else if event.reservedUsers == ""
             reservedText = "\n\n#{I18n.t('Unreserved')}"
         else
           reservedText = "\n\n#{I18n.t('Reserved By: ')} #{event.reservedUsers}"
