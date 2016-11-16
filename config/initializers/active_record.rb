@@ -780,7 +780,7 @@ ActiveRecord::Relation.class_eval do
     raise ArgumentError unless args.length == 1
 
     column = args.first.first
-    values = args.first.last
+    values = Array(args.first.last)
     original_length = values.length
     values = values.compact
 
