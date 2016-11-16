@@ -203,6 +203,15 @@ module Importers
             event.save
           end
 
+          migration.imported_migration_items_by_class(AssignmentOverride).each do |event|
+            AssignmentOverride.overridden_dates.each do |field|
+              date = event.send(field)
+              next unless date
+              event.send("#{field}=", shift_date(date, shift_options))
+            end
+            event.save_without_broadcasting
+          end
+
           migration.imported_migration_items_by_class(ContextModule).each do |event|
             event.unlock_at = shift_date(event.unlock_at, shift_options)
             event.save

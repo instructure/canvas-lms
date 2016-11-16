@@ -143,6 +143,12 @@
                 <xs:attribute name="set_type" type="xs:string" use="required"/>
                 <xs:attribute name="set_id" type="xs:string" use="required"/>
                 <xs:attribute name="title" type="xs:string" use="required"/>
+                <xs:attribute name="due_at" type="xs:dateTime"/>
+                <xs:attribute name="unlock_at" type="xs:dateTime"/>
+                <xs:attribute name="lock_at" type="xs:dateTime"/>
+                <xs:attribute name="due_at_overridden" type="xs:boolean"/>
+                <xs:attribute name="unlock_at_overridden" type="xs:boolean"/>
+                <xs:attribute name="lock_at_overridden" type="xs:boolean"/>
               </xs:complexType>
             </xs:element>
           </xs:sequence>
@@ -569,6 +575,12 @@
                   <xs:attribute name="set_type" type="xs:string" use="required"/>
                   <xs:attribute name="set_id" type="xs:string" use="required"/>
                   <xs:attribute name="title" type="xs:string" use="required"/>
+                  <xs:attribute name="due_at" type="xs:dateTime"/>
+                  <xs:attribute name="unlock_at" type="xs:dateTime"/>
+                  <xs:attribute name="lock_at" type="xs:dateTime"/>
+                  <xs:attribute name="due_at_overridden" type="xs:boolean"/>
+                  <xs:attribute name="unlock_at_overridden" type="xs:boolean"/>
+                  <xs:attribute name="lock_at_overridden" type="xs:boolean"/>
                 </xs:complexType>
               </xs:element>
             </xs:sequence>

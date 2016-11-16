@@ -197,7 +197,12 @@ module CC
       node.assignment_overrides do |ao_node|
         # Quizzes export their own overrides
         assignment.assignment_overrides.active.where(set_type: 'Noop', quiz_id: nil).each do |o|
-          ao_node.override(o.slice(:set_type, :set_id, :title))
+          override_attrs = o.slice(:set_type, :set_id, :title)
+          AssignmentOverride.overridden_dates.each do |field|
+            next unless o.send("#{field}_overridden")
+            override_attrs[field] = o[field]
+          end
+          ao_node.override(override_attrs)
         end
       end
       node.quiz_identifierref CCHelper.create_key(assignment.quiz) if assignment.quiz

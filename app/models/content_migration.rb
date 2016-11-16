@@ -809,8 +809,8 @@ class ContentMigration < ActiveRecord::Base
     imported_migration_items_hash(klass)[migration_id]
   end
 
-  def add_imported_item(item)
-    imported_migration_items_hash(item.class)[item.migration_id] = item
+  def add_imported_item(item, key: item.migration_id)
+    imported_migration_items_hash(item.class)[key] = item
   end
 
   def add_attachment_path(path, migration_id)

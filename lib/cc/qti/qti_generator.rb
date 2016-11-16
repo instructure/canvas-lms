@@ -222,7 +222,12 @@ module CC
           end
           q_node.assignment_overrides do |ao_node|
             quiz.assignment_overrides.active.where(set_type: 'Noop').each do |o|
-              ao_node.override(o.slice(:set_type, :set_id, :title))
+              override_attrs = o.slice(:set_type, :set_id, :title)
+              AssignmentOverride.overridden_dates.each do |field|
+                next unless o.send("#{field}_overridden")
+                override_attrs[field] = o[field]
+              end
+              ao_node.override(override_attrs)
             end
           end
         end
