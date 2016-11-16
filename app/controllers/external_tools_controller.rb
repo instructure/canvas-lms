@@ -559,10 +559,10 @@ class ExternalToolsController < ApplicationController
       else
         basic_lti_launch_request(tool, selection_type, opts)
     end
-  rescue Lti::UnauthorizedError
+  rescue Lti::Errors::UnauthorizedError
     render_unauthorized_action
     nil
-  rescue Lti::UnsupportedExportTypeError, Lti::InvalidMediaTypeError
+  rescue Lti::Errors::UnsupportedExportTypeError, Lti::Errors::InvalidMediaTypeError
     respond_to do |format|
       err = t('There was an error generating the tool launch')
       format.html do
