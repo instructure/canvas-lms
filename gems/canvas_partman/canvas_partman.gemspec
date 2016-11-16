@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.license       = 'AGPL'
 
-  spec.add_dependency 'activerecord', '>= 3.2', '< 4.3'
+  spec.add_dependency 'activerecord', '>= 3.2', '< 5.1'
   spec.add_dependency 'pg', '~> 0.17'
 
   spec.add_development_dependency 'bundler', '~> 1.5'

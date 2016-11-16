@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "tzinfo"
 
-  spec.add_dependency "activesupport", ">= 3.2", "< 4.3"
+  spec.add_dependency "activesupport", ">= 3.2", "< 5.1"
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
