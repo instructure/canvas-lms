@@ -484,7 +484,16 @@ END
       beta: true,
       root_opt_in: true,
       development: true,
-    }
+    },
+    'master_courses' =>
+    {
+      display_name: -> { I18n.t('Master Courses') },
+      description: -> { I18n.t('Enable the creation of Master Courses') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      development: true,
+    },
   )
 
   def self.definitions
