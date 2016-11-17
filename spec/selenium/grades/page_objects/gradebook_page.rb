@@ -66,7 +66,7 @@ module Gradebook
         period = gp_menu_list.find do |item|
           f('label', item).attribute("for") == "period_option_#{grading_period_id}"
         end
-        period.click
+        expect_new_page_load { period.click }
       end
 
       def enter_grade(grade, x_coordinate, y_coordinate)
