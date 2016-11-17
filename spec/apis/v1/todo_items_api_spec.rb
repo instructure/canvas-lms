@@ -178,22 +178,28 @@ describe UsersController, type: :request do
     expect(json).to eq []
   end
 
-  it "should include assignments that don't expect an online submission (courses endpoint)" do
-    ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+  it "should include future assignments that don't expect an online submission (courses endpoint)" do
+    past_ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+    ungraded = @student_course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo", :controller => "courses", :action => "todo_items",
         :format => "json", :course_id => @student_course.to_param
     expect(json.map {|e| e['assignment']['id']}).to include ungraded.id
+    expect(json.map {|e| e['assignment']['id']}).not_to include past_ungraded.id
   end
 
-  it "should include assignments that don't expect an online submission (users endpoint)" do
-    ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+  it "should include future assignments that don't expect an online submission (users endpoint)" do
+    past_ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+    ungraded = @student_course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
     json = api_call :get, "/api/v1/users/self/todo", :controller => "users", :action => "todo_items", :format => "json"
     expect(json.map {|e| e['assignment']['id']}).to include ungraded.id
+    expect(json.map {|e| e['assignment']['id']}).not_to include past_ungraded.id
   end
 
   it "includes ungraded quizzes by request" do
     survey = @student_course.quizzes.create!(quiz_type: 'survey', due_at: 1.day.from_now)
     survey.publish!
+    past_survey = @student_course.quizzes.create!(quiz_type: 'survey', due_at: 1.day.ago)
+    past_survey.publish!
 
     # course endpoint
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo", :controller => "courses",

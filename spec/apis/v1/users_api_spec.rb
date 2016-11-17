@@ -1837,7 +1837,7 @@ describe "Users API", type: :request do
     end
 
     it "should not return assignments that don't expect a submission" do
-      ungraded = @course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
+      ungraded = @course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
       json = api_call(:get, @path, @params)
       expect(json.map { |a| a['id'] }).not_to include ungraded.id
     end

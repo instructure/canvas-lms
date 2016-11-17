@@ -2032,14 +2032,17 @@ describe User do
       before :once do
         course_with_student :active_all => true
         @assignment = @course.assignments.create! title: 'blah!', due_at: 1.day.from_now, submission_types: 'not_graded'
+        @past_assignment = @course.assignments.create! title: 'blah!', due_at: 1.day.ago, submission_types: 'not_graded'
       end
 
       it "excludes ungraded assignments by default" do
         expect(@student.assignments_needing_submitting).not_to include @assignment
+        expect(@student.assignments_needing_submitting).not_to include @past_assignment
       end
 
-      it "includes ungraded assignments if requested" do
+      it "includes future ungraded assignments if requested" do
         expect(@student.assignments_needing_submitting(include_ungraded: true)).to include @assignment
+        expect(@student.assignments_needing_submitting(include_ungraded: true)).not_to include @past_assignment
       end
     end
   end
@@ -2047,7 +2050,7 @@ describe User do
   describe "ungraded_quizzes_needing_submitting" do
     before(:once) do
       course_with_student :active_all => true
-      @quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.ago)
+      @quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.from_now)
       @quiz.publish!
     end
 
@@ -2056,13 +2059,13 @@ describe User do
     end
 
     it "excludes graded quizzes" do
-      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "assignment", :due_at => 1.day.ago)
+      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "assignment", :due_at => 1.day.from_now)
       other_quiz.publish!
       expect(@student.ungraded_quizzes_needing_submitting).not_to include other_quiz
     end
 
     it "excludes unpublished quizzes" do
-      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.ago)
+      other_quiz = @course.quizzes.create!(:title => "some quiz", :quiz_type => "survey", :due_at => 1.day.from_now)
       expect(@student.ungraded_quizzes_needing_submitting).not_to include other_quiz
     end
 
@@ -2073,7 +2076,7 @@ describe User do
     end
 
     it "filters by due date" do
-      expect(@student.ungraded_quizzes_needing_submitting(:due_after => 1.day.from_now)).not_to include @quiz
+      expect(@student.ungraded_quizzes_needing_submitting(:due_after => 2.days.from_now)).not_to include @quiz
     end
 
     it "excludes submitted quizzes" do
