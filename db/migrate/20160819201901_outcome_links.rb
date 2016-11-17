@@ -1,4 +1,4 @@
-class OutcomeLinks < ActiveRecord::Migration
+class OutcomeLinks < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class AddTypeToEpubExports < ActiveRecord::Migration
+class AddTypeToEpubExports < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

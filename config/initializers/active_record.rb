@@ -1090,6 +1090,16 @@ class ActiveRecord::Migration
   # at least one of these tags is required
   DEPLOY_TAGS = [:predeploy, :postdeploy]
 
+  if CANVAS_RAILS4_2
+    class V4_2 < self
+      class << self
+        def method_missing(name, *args, &block) # :nodoc:
+          (delegate || superclass.delegate || superclass.superclass.delegate).send(name, *args, &block)
+        end
+      end
+    end
+  end
+
   class << self
     def tag(*tags)
       raise "invalid tags #{tags.inspect}" unless tags - VALID_TAGS == []
@@ -1111,7 +1121,17 @@ class ActiveRecord::Migration
     if CANVAS_RAILS4_2
       def [](version)
         raise ArgumentError unless version == 4.2
-        self
+        V4_2
+      end
+
+      def inherited(klass)
+        super
+        return if klass.name == 'V4_2' || klass.superclass != ActiveRecord::Migration
+        raise \
+            "Directly inheriting from ActiveRecord::Migration is deprecated. " \
+            "Please specify the Rails release the migration was written for:\n" \
+            "\n" \
+            "  class #{klass.name} < ActiveRecord::Migration[4.2]"
       end
     end
   end
