@@ -14730,7 +14730,8 @@ ja:
   select_student_name_caaff244: "受講生の選択%{name}"
   select_students_for_review_6e004a12: レビューのために受講生を選択
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "関連付けるファイルを選択するか、または [新しいファイル] を選択してファイルを追加します。"
-  select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "関連付けるページを選択するか、[新しいページ]を選択して新しいページを追加します。."
+  select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "関連付けるページを選択するか、[新しいページ]を選択して新しいページを追加します。"
+  select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "この*モジュール*に関連付けるページを選択するか、[新しいページ]を選択して新しいページを追加します。"
   select_type_of_prerequisite_8d6fa902: 前提条件のタイプを選択する
   select_video_file_35b61d4e: ビデオファイルを選択
   selected_274ce24f: 選択されました
