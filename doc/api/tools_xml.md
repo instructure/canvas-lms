@@ -682,7 +682,16 @@ display to the user.
 {"status":"completed"}
 ```
 
-#### Exports Including Canvas Record IDs.
+#### Exporting a Subset of Course Content
+If the user has chosen to migrate a subset of the source course's content an
+this will be indicated to the tool by inclusion of an additional field in the
+post body called `custom_exported_assets`. This will be an array of asset
+identifiers in the form of `<asset type key>_<asset_id>` (e.g. `assignment_42`)
+these use the same mappings as exported identifiers below. In the event that a
+tool provider has no content to export for a subset export either return an
+empty JSON object in the response or a status code outside the 200 range.
+
+#### Exported Data Including Canvas Record IDs.
 If in the process of importing your tool needs to receive record identifers for
 newly created items in Canavs the source IDs may be included in the export data
 with keys matching the pattern `/^\$canvas_(\w+)_id$/`. Example export data

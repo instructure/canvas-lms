@@ -28,7 +28,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
       consumer_key:  '12345',
       shared_secret: 'sekret',
     }) }
-    let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool) }
+    let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool, {}) }
     let(:status_url) { 'https://lti.example.com/export/42/status' }
 
     before do
@@ -63,7 +63,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
       consumer_key:  '12345',
       shared_secret: 'sekret',
     }) }
-    let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool) }
+    let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool, {}) }
     let(:fetch_url) { 'https://lti.example.com/export/42' }
 
     before do
@@ -124,41 +124,66 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
       }.to_json
       stub_request(:post, 'https://lti.example.com/begin_export').
         to_return(:status => 200, :body => response_body, :headers => {})
-      @migrator = Lti::ContentMigrationService::Exporter.new(@course, @tool)
-      @migrator.start!
+      @options = {}
+      @migrator = Lti::ContentMigrationService::Exporter.new(@course, @tool, @options)
     end
 
-    it 'must post the context_id to the configured tools' do
-      assert_requested(:post, 'https://lti.example.com/begin_export', {
-        body: hash_including(context_id: Lti::Asset.opaque_identifier_for(@course))
-      })
+    context 'for a full export' do
+      before do
+        @migrator.start!
+      end
+      it 'must post the context_id to the configured tools' do
+        assert_requested(:post, 'https://lti.example.com/begin_export', {
+          body: hash_including(context_id: Lti::Asset.opaque_identifier_for(@course))
+        })
+      end
+
+      it 'must post the tool_consumer_instance_guid to the configured tools' do
+        assert_requested(:post, 'https://lti.example.com/begin_export', {
+          body: hash_including(tool_consumer_instance_guid: @root_account.lti_guid)
+        })
+      end
+
+      it 'must include a JWT as the Authorization header for each request' do
+        assert_requested(:post, 'https://lti.example.com/begin_export', {
+          headers: {'Authorization' => /^Bearer [a-zA-Z0-9\-_]{36,}\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]{43}$/}
+        })
+      end
+
+      it 'must include any variable expansions requested by the tool' do
+        assert_requested(:post, 'https://lti.example.com/begin_export', {
+          body: hash_including('custom_course_id' => @course.id.to_s)
+        })
+      end
+
+      it 'must not include the exported assets key' do
+        assert_not_requested(:post, 'https://lti.example.com/begin_export', {
+          body: hash_including('custom_exported_assets' => anything)
+        })
+      end
+
+      it 'must mark the migration as successfully started' do
+        expect(@migrator).to be_successfully_started
+      end
     end
 
-    it 'must post the tool_consumer_instance_guid to the configured tools' do
-      assert_requested(:post, 'https://lti.example.com/begin_export', {
-        body: hash_including(tool_consumer_instance_guid: @root_account.lti_guid)
-      })
-    end
+    context 'for a partial export' do
+      before do
+        @options[:selective] = true
+        @exports = @options[:exported_assets] = ['assignment_42', 'learning_outcome_84', 'announcement_21']
+        @migrator.start!
+      end
 
-    it 'must include a JWT as the Authorization header for each request' do
-      assert_requested(:post, 'https://lti.example.com/begin_export', {
-        headers: {'Authorization' => /^Bearer [a-zA-Z0-9\-_]{36,}\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]{43}$/}
-      })
-    end
-
-    it 'must include any variable expansions requested by the tool' do
-      assert_requested(:post, 'https://lti.example.com/begin_export', {
-        body: hash_including('custom_course_id' => @course.id.to_s)
-      })
-    end
-
-    it 'must mark the migration as successfully started' do
-      expect(@migrator).to be_successfully_started
+      it 'must include the exported assets in the request to the tool' do
+        assert_requested(:post, 'https://lti.example.com/begin_export', {
+          body: hash_including('custom_exported_assets' => @exports)
+        })
+      end
     end
   end
 
   describe '#successfully_started?' do
-    let(:migrator) { Lti::ContentMigrationService::Exporter.new('', '') }
+    let(:migrator) { Lti::ContentMigrationService::Exporter.new('', '', {}) }
     it 'must return true when status and fetch urls are both present' do
       migrator.instance_variable_set(:@status_url, 'junk')
       migrator.instance_variable_set(:@fetch_url, 'junk')

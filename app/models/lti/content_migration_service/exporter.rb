@@ -17,9 +17,10 @@
 module Lti
   module ContentMigrationService
     class Exporter < Lti::ContentMigrationService::Migrator
-      def initialize(course, tool)
+      def initialize(course, tool, options)
         @course = course
         @tool = tool
+        @options = options
       end
 
       def export_completed?
@@ -80,15 +81,26 @@ module Lti
 
       private
 
+      def base_post_body
+        {
+          context_id: Lti::Asset.opaque_identifier_for(@course),
+          tool_consumer_instance_guid: root_account.lti_guid,
+        }
+      end
+
       def export_start_url
         @tool.settings['content_migration']['export_start_url']
       end
 
       def start_export_post_body
-        {
-          context_id: Lti::Asset.opaque_identifier_for(@course),
-          tool_consumer_instance_guid: root_account.lti_guid,
-        }.merge(expanded_variables)
+        body_hash = base_post_body.
+          merge(expanded_variables).
+          merge(selected_assets)
+        Rack::Utils.build_nested_query(body_hash)
+      end
+
+      def selected_assets
+        (@options[:selective] ? {custom_exported_assets: @options[:exported_assets]} : Hash.new)
       end
     end
   end
