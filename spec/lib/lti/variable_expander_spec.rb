@@ -614,6 +614,13 @@ module Lti
           expect(exp_hash[:test]).to eq 456
         end
 
+        it 'has substitution for $Canvas.user.isRootAccountAdmin' do
+          user.stubs(:roles).returns(["root_admin"])
+          exp_hash = {test: '$Canvas.user.isRootAccountAdmin'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq true
+        end
+
         it 'has substitution for $Canvas.xuser.allRoles' do
           Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
           substitution_helper.stubs(:all_roles).returns('Admin,User')

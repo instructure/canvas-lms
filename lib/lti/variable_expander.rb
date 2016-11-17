@@ -360,6 +360,10 @@ module Lti
                        -> { @current_user.global_id},
                        USER_GUARD
 
+   register_expansion 'Canvas.user.isRootAccountAdmin', [],
+                      -> { @current_user.roles(@root_account).include? 'root_admin' },
+                      USER_GUARD
+
     # Substitutions for the primary pseudonym for the user for the account
     # This should hold all the SIS information for the user
     # This may not be the pseudonym the user is actually gingged in with
