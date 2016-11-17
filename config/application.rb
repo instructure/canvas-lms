@@ -81,7 +81,7 @@ module CanvasRails
     # Activate observers that should always be running
     config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer, :conditional_release_observer ]
 
-    config.active_record.whitelist_attributes = false
+    config.active_record.whitelist_attributes = false if CANVAS_RAILS4_2
 
     config.active_record.raise_in_transactional_callbacks = true # may as well opt into the new behavior
 
