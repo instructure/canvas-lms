@@ -27,6 +27,31 @@ describe MasterCourses::MasterTemplate do
     end
   end
 
+  describe "is_master_course?" do
+    def check
+      MasterCourses::MasterTemplate.is_master_course?(@course)
+    end
+
+    it "should cache the result" do
+      enable_cache do
+        expect(check).to be_falsey
+        @course.expects(:master_course_templates).never
+        expect(check).to be_falsey
+        expect(MasterCourses::MasterTemplate.is_master_course?(@course.id)).to be_falsey # should work with ids too
+      end
+    end
+
+    it "should invalidate the cache when set as master course" do
+      enable_cache do
+        expect(check).to be_falsey
+        template = MasterCourses::MasterTemplate.set_as_master_course(@course) # invalidate on create
+        expect(check).to be_truthy
+        template.destroy! # and on workflow_state change
+        expect(check).to be_falsey
+      end
+    end
+  end
+
   describe "content_tag_for" do
     before :once do
       @template = MasterCourses::MasterTemplate.set_as_master_course(@course)

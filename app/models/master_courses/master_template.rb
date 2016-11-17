@@ -15,6 +15,25 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   scope :for_full_course, -> { where(:full_course => true) }
 
+  after_save :invalidate_course_cache
+
+  def invalidate_course_cache
+    if self.workflow_state_changed?
+      Rails.cache.delete(self.class.course_cache_key(self.course))
+    end
+  end
+
+  def self.course_cache_key(course_id)
+    ["has_master_courses_templates", Shard.global_id_for(course_id)].cache_key
+  end
+
+  def self.is_master_course?(course_id)
+    Rails.cache.fetch(course_cache_key(course_id)) do
+      course_id = course_id.id if course_id.is_a?(Course)
+      self.where(:course_id => course_id).active.exists?
+    end
+  end
+
   def self.set_as_master_course(course)
     self.unique_constraint_retry do
       course.master_course_templates.active.for_full_course.first_or_create
