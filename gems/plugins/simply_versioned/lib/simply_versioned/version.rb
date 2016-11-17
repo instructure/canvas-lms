@@ -19,8 +19,6 @@ class Version < ActiveRecord::Base #:nodoc:
 
   before_create :initialize_number
 
-  attr_accessible :yaml, :versionable
-
   # Return an instance of the versioned ActiveRecord model with the attribute
   # values of this version.
   def model
