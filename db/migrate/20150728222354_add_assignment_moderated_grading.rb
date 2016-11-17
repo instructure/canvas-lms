@@ -1,4 +1,4 @@
-class AddAssignmentModeratedGrading < ActiveRecord::Migration
+class AddAssignmentModeratedGrading < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

@@ -1,4 +1,4 @@
-class DropFailedJobsOriginalId < ActiveRecord::Migration
+class DropFailedJobsOriginalId < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.connection

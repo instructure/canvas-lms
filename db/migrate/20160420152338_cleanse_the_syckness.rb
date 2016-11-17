@@ -1,4 +1,4 @@
-class CleanseTheSyckness < ActiveRecord::Migration
+class CleanseTheSyckness < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

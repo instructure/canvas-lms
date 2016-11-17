@@ -1,4 +1,4 @@
-class ModeratedGradingForeignKeyIndexes < ActiveRecord::Migration
+class ModeratedGradingForeignKeyIndexes < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

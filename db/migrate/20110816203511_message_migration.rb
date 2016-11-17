@@ -1,4 +1,4 @@
-class MessageMigration < ActiveRecord::Migration
+class MessageMigration < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

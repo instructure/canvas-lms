@@ -1,4 +1,4 @@
-class CreateContextExternalToolPlacements < ActiveRecord::Migration
+class CreateContextExternalToolPlacements < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   EXTENSION_TYPES = [:account_navigation, :course_home_sub_navigation, :course_navigation,

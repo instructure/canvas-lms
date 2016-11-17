@@ -1,4 +1,4 @@
-class DropAccountIdFromCourseSections < ActiveRecord::Migration
+class DropAccountIdFromCourseSections < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

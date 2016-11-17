@@ -1094,6 +1094,13 @@ class ActiveRecord::Migration
     def has_postgres_proc?(procname)
       connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'").to_i != 0
     end
+
+    if CANVAS_RAILS4_2
+      def [](version)
+        raise ArgumentError unless version == 4.2
+        self
+      end
+    end
   end
 
   def connection

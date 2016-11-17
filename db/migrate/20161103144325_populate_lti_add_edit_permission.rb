@@ -1,4 +1,4 @@
-class PopulateLtiAddEditPermission < ActiveRecord::Migration
+class PopulateLtiAddEditPermission < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def change

@@ -1,4 +1,4 @@
-class CreateContextExternalToolAssignmentLookups < ActiveRecord::Migration
+class CreateContextExternalToolAssignmentLookups < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

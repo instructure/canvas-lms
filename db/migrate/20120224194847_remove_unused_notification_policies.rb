@@ -1,4 +1,4 @@
-class RemoveUnusedNotificationPolicies < ActiveRecord::Migration
+class RemoveUnusedNotificationPolicies < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class AddDataExport < ActiveRecord::Migration
+class AddDataExport < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

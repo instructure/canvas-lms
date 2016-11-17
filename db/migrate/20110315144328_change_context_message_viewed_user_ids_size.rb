@@ -1,4 +1,4 @@
-class ChangeContextMessageViewedUserIdsSize < ActiveRecord::Migration
+class ChangeContextMessageViewedUserIdsSize < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

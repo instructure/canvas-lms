@@ -1,4 +1,4 @@
-class ChangeGroupWorkflowStates < ActiveRecord::Migration
+class ChangeGroupWorkflowStates < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

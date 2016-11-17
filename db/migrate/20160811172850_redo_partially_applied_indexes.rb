@@ -1,4 +1,4 @@
-class RedoPartiallyAppliedIndexes < ActiveRecord::Migration
+class RedoPartiallyAppliedIndexes < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

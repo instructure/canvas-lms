@@ -1,4 +1,4 @@
-class AddVericiteEnabledToAssignments < ActiveRecord::Migration
+class AddVericiteEnabledToAssignments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

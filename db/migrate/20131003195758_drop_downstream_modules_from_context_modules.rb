@@ -1,4 +1,4 @@
-class DropDownstreamModulesFromContextModules < ActiveRecord::Migration
+class DropDownstreamModulesFromContextModules < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

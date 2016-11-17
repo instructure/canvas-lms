@@ -1,4 +1,4 @@
-class BeginPsychMigration < ActiveRecord::Migration
+class BeginPsychMigration < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def runnable?

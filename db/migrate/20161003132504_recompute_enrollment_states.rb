@@ -1,4 +1,4 @@
-class RecomputeEnrollmentStates < ActiveRecord::Migration
+class RecomputeEnrollmentStates < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

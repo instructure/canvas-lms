@@ -1,4 +1,4 @@
-class AddSettingsToCourses < ActiveRecord::Migration
+class AddSettingsToCourses < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class RemoveIrrelevantSubmissionMessages < ActiveRecord::Migration
+class RemoveIrrelevantSubmissionMessages < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   disable_ddl_transaction!
@@ -14,7 +14,7 @@ class RemoveIrrelevantSubmissionMessages < ActiveRecord::Migration
         FROM #{ConversationMessage.quoted_table_name} cm,
           #{ConversationParticipant.quoted_table_name} cp,
           #{SubmissionComment.quoted_table_name} sc
-        WHERE 
+        WHERE
           cm.asset_id = sc.submission_id
           AND cp.conversation_id = cm.conversation_id
           AND sc.author_id = cp.user_id

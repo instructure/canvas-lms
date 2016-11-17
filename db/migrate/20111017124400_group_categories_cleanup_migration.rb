@@ -2,7 +2,7 @@
 # broken and did not update assignments correctly. the current version is
 # fixed, but if you ran the broken one, this will clean it up. if you ran the
 # fixed one, this migration is a no-op.
-class GroupCategoriesCleanupMigration < ActiveRecord::Migration
+class GroupCategoriesCleanupMigration < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.uncached_group_category_id_for(context, name)

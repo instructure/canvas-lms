@@ -1,4 +1,4 @@
-class FixImportedQuestionMediaComments < ActiveRecord::Migration
+class FixImportedQuestionMediaComments < ActiveRecord::Migration[4.2]
   tag :postdeploy
   def up
     DataFixup::FixImportedQuestionMediaComments.send_later_if_production_enqueue_args(:run,

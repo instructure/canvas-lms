@@ -1,4 +1,4 @@
-class AddCassandraEventSourceToCoursesAuditor < ActiveRecord::Migration
+class AddCassandraEventSourceToCoursesAuditor < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   include Canvas::Cassandra::Migration

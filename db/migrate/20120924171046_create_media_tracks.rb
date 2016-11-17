@@ -1,4 +1,4 @@
-class CreateMediaTracks < ActiveRecord::Migration
+class CreateMediaTracks < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

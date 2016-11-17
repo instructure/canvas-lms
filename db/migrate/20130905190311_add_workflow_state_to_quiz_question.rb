@@ -1,4 +1,4 @@
-class AddWorkflowStateToQuizQuestion < ActiveRecord::Migration
+class AddWorkflowStateToQuizQuestion < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

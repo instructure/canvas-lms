@@ -1,4 +1,4 @@
-class DropNameDetailsFromUsers < ActiveRecord::Migration
+class DropNameDetailsFromUsers < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class RemoveCanvinterestTables < ActiveRecord::Migration
+class RemoveCanvinterestTables < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

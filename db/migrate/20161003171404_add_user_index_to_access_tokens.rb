@@ -1,4 +1,4 @@
-class AddUserIndexToAccessTokens < ActiveRecord::Migration
+class AddUserIndexToAccessTokens < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

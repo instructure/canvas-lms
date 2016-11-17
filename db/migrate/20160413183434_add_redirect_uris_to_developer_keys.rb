@@ -1,4 +1,4 @@
-class AddRedirectUrisToDeveloperKeys < ActiveRecord::Migration
+class AddRedirectUrisToDeveloperKeys < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

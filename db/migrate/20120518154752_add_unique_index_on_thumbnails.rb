@@ -1,4 +1,4 @@
-class AddUniqueIndexOnThumbnails < ActiveRecord::Migration
+class AddUniqueIndexOnThumbnails < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

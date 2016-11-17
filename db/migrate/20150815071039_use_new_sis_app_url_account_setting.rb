@@ -1,4 +1,4 @@
-class UseNewSisAppUrlAccountSetting < ActiveRecord::Migration
+class UseNewSisAppUrlAccountSetting < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction! unless Rails.env.production?
 

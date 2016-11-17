@@ -1,4 +1,4 @@
-class PopulateImportSisPermission < ActiveRecord::Migration
+class PopulateImportSisPermission < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

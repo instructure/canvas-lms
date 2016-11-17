@@ -1,4 +1,4 @@
-class RemoveDeletedFromAssignmentStudentVisibilityView < ActiveRecord::Migration
+class RemoveDeletedFromAssignmentStudentVisibilityView < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

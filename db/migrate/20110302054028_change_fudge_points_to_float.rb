@@ -1,4 +1,4 @@
-class ChangeFudgePointsToFloat < ActiveRecord::Migration
+class ChangeFudgePointsToFloat < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

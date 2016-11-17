@@ -1,4 +1,4 @@
-class MigrateAppointmentGroupContexts < ActiveRecord::Migration
+class MigrateAppointmentGroupContexts < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

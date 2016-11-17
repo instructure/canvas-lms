@@ -1,4 +1,4 @@
-class AddManageRubricsPermission < ActiveRecord::Migration
+class AddManageRubricsPermission < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

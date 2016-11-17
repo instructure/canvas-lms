@@ -1,4 +1,4 @@
-class EncryptGoogleDriveSettings < ActiveRecord::Migration
+class EncryptGoogleDriveSettings < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

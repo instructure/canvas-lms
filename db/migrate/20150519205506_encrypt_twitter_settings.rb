@@ -1,4 +1,4 @@
-class EncryptTwitterSettings < ActiveRecord::Migration
+class EncryptTwitterSettings < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

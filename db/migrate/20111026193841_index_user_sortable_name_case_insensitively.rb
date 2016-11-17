@@ -1,4 +1,4 @@
-class IndexUserSortableNameCaseInsensitively < ActiveRecord::Migration
+class IndexUserSortableNameCaseInsensitively < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

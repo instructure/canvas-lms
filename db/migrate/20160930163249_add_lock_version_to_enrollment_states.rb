@@ -1,4 +1,4 @@
-class AddLockVersionToEnrollmentStates < ActiveRecord::Migration
+class AddLockVersionToEnrollmentStates < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

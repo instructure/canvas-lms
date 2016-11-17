@@ -1,4 +1,4 @@
-class FixDeletedEnrollmentStates < ActiveRecord::Migration
+class FixDeletedEnrollmentStates < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

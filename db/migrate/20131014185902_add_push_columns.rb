@@ -1,4 +1,4 @@
-class AddPushColumns < ActiveRecord::Migration
+class AddPushColumns < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

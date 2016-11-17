@@ -1,4 +1,4 @@
-class CreateCustomData < ActiveRecord::Migration
+class CreateCustomData < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

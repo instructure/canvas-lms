@@ -1,4 +1,4 @@
-class RenameBrowserLocales < ActiveRecord::Migration
+class RenameBrowserLocales < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

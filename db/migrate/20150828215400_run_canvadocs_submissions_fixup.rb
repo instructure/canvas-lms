@@ -1,4 +1,4 @@
-class RunCanvadocsSubmissionsFixup < ActiveRecord::Migration
+class RunCanvadocsSubmissionsFixup < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def change

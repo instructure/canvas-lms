@@ -1,4 +1,4 @@
-class AddSettingsToAuthenticationProviders < ActiveRecord::Migration
+class AddSettingsToAuthenticationProviders < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

@@ -1,4 +1,4 @@
-class UpdateCollectionItemImageColumns < ActiveRecord::Migration
+class UpdateCollectionItemImageColumns < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   # rubocop:disable Migration/RemoveColumn

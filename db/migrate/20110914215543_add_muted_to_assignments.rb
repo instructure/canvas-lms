@@ -1,4 +1,4 @@
-class AddMutedToAssignments < ActiveRecord::Migration
+class AddMutedToAssignments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

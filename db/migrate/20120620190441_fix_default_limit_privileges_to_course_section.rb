@@ -1,4 +1,4 @@
-class FixDefaultLimitPrivilegesToCourseSection < ActiveRecord::Migration
+class FixDefaultLimitPrivilegesToCourseSection < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

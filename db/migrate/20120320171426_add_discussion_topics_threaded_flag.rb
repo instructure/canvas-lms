@@ -1,4 +1,4 @@
-class AddDiscussionTopicsThreadedFlag < ActiveRecord::Migration
+class AddDiscussionTopicsThreadedFlag < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

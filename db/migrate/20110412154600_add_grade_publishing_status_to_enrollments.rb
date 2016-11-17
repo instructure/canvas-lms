@@ -1,4 +1,4 @@
-class AddGradePublishingStatusToEnrollments < ActiveRecord::Migration
+class AddGradePublishingStatusToEnrollments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

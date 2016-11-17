@@ -1,4 +1,4 @@
-class AddParentMd5ToBrandConfigs < ActiveRecord::Migration
+class AddParentMd5ToBrandConfigs < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

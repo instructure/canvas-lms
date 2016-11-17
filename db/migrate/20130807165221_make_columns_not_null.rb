@@ -1,4 +1,4 @@
-class MakeColumnsNotNull < ActiveRecord::Migration
+class MakeColumnsNotNull < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   tag :postdeploy
 

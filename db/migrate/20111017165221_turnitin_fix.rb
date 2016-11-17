@@ -1,4 +1,4 @@
-class TurnitinFix < ActiveRecord::Migration
+class TurnitinFix < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

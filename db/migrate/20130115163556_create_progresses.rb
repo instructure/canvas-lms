@@ -1,4 +1,4 @@
-class CreateProgresses < ActiveRecord::Migration
+class CreateProgresses < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

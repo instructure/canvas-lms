@@ -1,4 +1,4 @@
-class AddAssignmentPostColumns < ActiveRecord::Migration
+class AddAssignmentPostColumns < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up
@@ -13,7 +13,7 @@ class AddAssignmentPostColumns < ActiveRecord::Migration
     if index_exists?(:assignments, :integration_id)
       remove_index :assignments, :integration_id
     end
-    
+
     remove_column :assignments, :post_to_sis
     remove_column :assignments, :integration_id
   end

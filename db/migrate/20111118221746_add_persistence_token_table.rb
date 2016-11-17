@@ -1,4 +1,4 @@
-class AddPersistenceTokenTable < ActiveRecord::Migration
+class AddPersistenceTokenTable < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

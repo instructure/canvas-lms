@@ -1,4 +1,4 @@
-class FixAuditLogUuidIndexes < ActiveRecord::Migration
+class FixAuditLogUuidIndexes < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   include Canvas::Cassandra::Migration

@@ -1,4 +1,4 @@
-class ConvertHighContrastSettingToFeatureFlag < ActiveRecord::Migration
+class ConvertHighContrastSettingToFeatureFlag < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

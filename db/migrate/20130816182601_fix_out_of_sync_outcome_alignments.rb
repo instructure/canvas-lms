@@ -1,4 +1,4 @@
-class FixOutOfSyncOutcomeAlignments < ActiveRecord::Migration
+class FixOutOfSyncOutcomeAlignments < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

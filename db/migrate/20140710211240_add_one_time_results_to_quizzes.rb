@@ -1,4 +1,4 @@
-class AddOneTimeResultsToQuizzes < ActiveRecord::Migration
+class AddOneTimeResultsToQuizzes < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

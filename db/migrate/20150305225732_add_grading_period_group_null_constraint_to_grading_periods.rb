@@ -1,4 +1,4 @@
-class AddGradingPeriodGroupNullConstraintToGradingPeriods < ActiveRecord::Migration
+class AddGradingPeriodGroupNullConstraintToGradingPeriods < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

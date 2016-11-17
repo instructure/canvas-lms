@@ -1,4 +1,4 @@
-class AddAvatarImageToGroups < ActiveRecord::Migration
+class AddAvatarImageToGroups < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

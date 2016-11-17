@@ -1,4 +1,4 @@
-class AddGradedAnonymouslyToProvisionalGrade < ActiveRecord::Migration
+class AddGradedAnonymouslyToProvisionalGrade < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

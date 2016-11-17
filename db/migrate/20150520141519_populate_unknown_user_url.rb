@@ -1,4 +1,4 @@
-class PopulateUnknownUserUrl < ActiveRecord::Migration
+class PopulateUnknownUserUrl < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

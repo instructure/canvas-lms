@@ -1,4 +1,4 @@
-class SubmissionCommentsInConversations < ActiveRecord::Migration
+class SubmissionCommentsInConversations < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class AddLti2Tables < ActiveRecord::Migration
+class AddLti2Tables < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

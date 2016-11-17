@@ -1,4 +1,4 @@
-class AddTitleToGradingPeriodGroups < ActiveRecord::Migration
+class AddTitleToGradingPeriodGroups < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

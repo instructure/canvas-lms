@@ -1,4 +1,4 @@
-class AddLastInlineViewToAttachments < ActiveRecord::Migration
+class AddLastInlineViewToAttachments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

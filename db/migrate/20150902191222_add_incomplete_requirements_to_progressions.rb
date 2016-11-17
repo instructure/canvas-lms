@@ -1,4 +1,4 @@
-class AddIncompleteRequirementsToProgressions < ActiveRecord::Migration
+class AddIncompleteRequirementsToProgressions < ActiveRecord::Migration[4.2]
   tag :predeploy
   def up
     add_column :context_module_progressions, :incomplete_requirements, :text

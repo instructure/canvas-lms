@@ -1,4 +1,4 @@
-class AddSchemaMigrationsPrimaryKey < ActiveRecord::Migration
+class AddSchemaMigrationsPrimaryKey < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

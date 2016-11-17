@@ -1,4 +1,4 @@
-class ConvertStorageQuotasToBytes < ActiveRecord::Migration
+class ConvertStorageQuotasToBytes < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   FIELDS_TO_FIX = [
@@ -8,7 +8,7 @@ class ConvertStorageQuotasToBytes < ActiveRecord::Migration
     [ Course, :storage_quota ],
     [ Group, :storage_quota ],
   ]
-  
+
   def self.up
     FIELDS_TO_FIX.each do |klass, field|
       change_column klass.table_name.to_s, field, :integer, :limit => 8

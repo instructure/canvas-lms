@@ -1,4 +1,4 @@
-class AddProvisionalGradeIdToSubmissionComments < ActiveRecord::Migration
+class AddProvisionalGradeIdToSubmissionComments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

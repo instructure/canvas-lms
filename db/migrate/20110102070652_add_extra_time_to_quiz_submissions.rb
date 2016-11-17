@@ -1,4 +1,4 @@
-class AddExtraTimeToQuizSubmissions < ActiveRecord::Migration
+class AddExtraTimeToQuizSubmissions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

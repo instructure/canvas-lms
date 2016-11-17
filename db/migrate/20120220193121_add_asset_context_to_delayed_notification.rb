@@ -1,4 +1,4 @@
-class AddAssetContextToDelayedNotification < ActiveRecord::Migration
+class AddAssetContextToDelayedNotification < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

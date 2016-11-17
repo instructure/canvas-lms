@@ -1,4 +1,4 @@
-class CreateEnrollmentStates < ActiveRecord::Migration
+class CreateEnrollmentStates < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

@@ -1,4 +1,4 @@
-class AddContextToToolProxy < ActiveRecord::Migration
+class AddContextToToolProxy < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

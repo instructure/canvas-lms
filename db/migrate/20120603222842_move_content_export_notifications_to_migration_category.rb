@@ -1,4 +1,4 @@
-class MoveContentExportNotificationsToMigrationCategory < ActiveRecord::Migration
+class MoveContentExportNotificationsToMigrationCategory < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

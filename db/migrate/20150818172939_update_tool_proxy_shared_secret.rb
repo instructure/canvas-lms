@@ -1,4 +1,4 @@
-class UpdateToolProxySharedSecret < ActiveRecord::Migration
+class UpdateToolProxySharedSecret < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

@@ -1,4 +1,4 @@
-class AddUserToSisBatches < ActiveRecord::Migration
+class AddUserToSisBatches < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

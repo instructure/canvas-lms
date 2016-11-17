@@ -1,4 +1,4 @@
-class CreateVersionPartitions < ActiveRecord::Migration
+class CreateVersionPartitions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

@@ -1,4 +1,4 @@
-class AddSourceToJobs < ActiveRecord::Migration
+class AddSourceToJobs < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.connection

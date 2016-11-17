@@ -1,4 +1,4 @@
-class NewInboxMediaComments < ActiveRecord::Migration
+class NewInboxMediaComments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

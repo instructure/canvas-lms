@@ -1,4 +1,4 @@
-class CreateBookmarks < ActiveRecord::Migration
+class CreateBookmarks < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

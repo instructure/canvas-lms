@@ -1,4 +1,4 @@
-class AddCourseSettingsSubNavigationForExternalTools < ActiveRecord::Migration
+class AddCourseSettingsSubNavigationForExternalTools < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

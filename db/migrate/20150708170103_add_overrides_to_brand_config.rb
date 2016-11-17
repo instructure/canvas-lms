@@ -1,4 +1,4 @@
-class AddOverridesToBrandConfig < ActiveRecord::Migration
+class AddOverridesToBrandConfig < ActiveRecord::Migration[4.2]
   tag :predeploy
   def change
     add_column :brand_configs, :js_overrides, :text

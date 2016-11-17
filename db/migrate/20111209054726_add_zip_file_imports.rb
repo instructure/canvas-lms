@@ -1,4 +1,4 @@
-class AddZipFileImports < ActiveRecord::Migration
+class AddZipFileImports < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

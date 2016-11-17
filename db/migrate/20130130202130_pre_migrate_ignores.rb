@@ -1,4 +1,4 @@
-class PreMigrateIgnores < ActiveRecord::Migration
+class PreMigrateIgnores < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

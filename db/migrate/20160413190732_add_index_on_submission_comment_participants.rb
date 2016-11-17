@@ -1,4 +1,4 @@
-class AddIndexOnSubmissionCommentParticipants < ActiveRecord::Migration
+class AddIndexOnSubmissionCommentParticipants < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 
