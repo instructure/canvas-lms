@@ -1,8 +1,8 @@
 group :test do
   if CANVAS_RAILS4_2
-    gem 'rails-dom-testing', '1.0.7'
+    gem 'rails-dom-testing', '1.0.8'
   else
-    gem 'rails-dom-testing', '2.0.1'
+    gem 'rails-dom-testing', '2.0.2'
   end
 
   gem 'gergich', '0.1.11', require: false
