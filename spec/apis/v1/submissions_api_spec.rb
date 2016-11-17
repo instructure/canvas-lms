@@ -1270,7 +1270,7 @@ describe 'Submissions API', type: :request do
       submit_homework(@a1, @student2)
     end
 
-    it "returns all submissions for a student" do
+    it "returns all submissions for a student", priority: "1", test_id: 2989898 do
       json = api_call(:get,
             "/api/v1/courses/#{@course.id}/students/submissions.json",
             { :controller => 'submissions_api', :action => 'for_students',
