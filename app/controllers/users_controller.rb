@@ -2250,6 +2250,10 @@ class UsersController < ApplicationController
       cc_type = cc_params[:type] || CommunicationChannel::TYPE_EMAIL
       cc_addr = cc_params[:address] || params[:pseudonym][:unique_id]
 
+      if cc_type == CommunicationChannel::TYPE_EMAIL
+        cc_addr = nil unless EmailAddressValidator.valid?(cc_addr)
+      end
+
       can_manage_students = [Account.site_admin, @context].any? do |role|
         role.grants_right?(@current_user, :manage_students)
       end
@@ -2262,7 +2266,7 @@ class UsersController < ApplicationController
         includes << 'confirmation_url' if value_to_boolean(cc_params[:confirmation_url])
       end
 
-    else
+    elsif EmailAddressValidator.valid?(params[:pseudonym][:unique_id])
       cc_type = CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
     end

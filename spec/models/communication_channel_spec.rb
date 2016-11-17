@@ -135,6 +135,12 @@ describe CommunicationChannel do
     expect(@cc.path_type).to eql('email')
   end
 
+  it 'should sort of validate emails' do
+    user = User.create!
+    invalid_stuff = {username: "invalid", user: user, pseudonym_id: "1" }
+    expect{communication_channel(user, invalid_stuff)}.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
   it "should act as list" do
     expect(CommunicationChannel).to be_respond_to(:acts_as_list)
   end
