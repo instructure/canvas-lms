@@ -23,7 +23,9 @@ module Lti
       end
 
       def export_completed?
-        response = CanvasHttp.get(@status_url, base_request_headers)
+        response = Canvas.retriable(on: Timeout::Error) do
+          CanvasHttp.get(@status_url, base_request_headers)
+        end
         if response.code.to_i == 200
           parsed_response = JSON.parse(response.body)
           @export_status = parsed_response['status']
@@ -36,32 +38,39 @@ module Lti
             false
           end
         end
+      rescue Timeout::Error
+        false
       end
 
       def retrieve_export
         return nil if @export_status == FAILED_STATUS
-        response = CanvasHttp.get(@fetch_url, base_request_headers)
+        response = Canvas.retriable(on: Timeout::Error) do
+          CanvasHttp.get(@fetch_url, base_request_headers)
+        end
         if response.code.to_i == 200
           JSON.parse(response.body)
         else
           raise "Unable to fetch export data from #{@status_url}: #{response.code} #{response.message}. (#{response.body})"
         end
+      rescue Timeout::Error
+        raise "Fetching data from #{@tool.name} timed out."
       end
 
       def start!
         return if defined? @status_url
 
-        CanvasHttp.post(export_start_url, base_request_headers, form_data: start_export_post_body) do |response|
-          case response.code.to_i
-          when (200..201)
-            parsed_response = JSON.parse(response.body)
-            unless parsed_response.empty?
-              @status_url = parsed_response['status_url']
-              @fetch_url = parsed_response['fetch_url']
-            end
+        response = Canvas.retriable(on: Timeout::Error) do
+          CanvasHttp.post(export_start_url, base_request_headers, form_data: start_export_post_body)
+        end
+        case response.code.to_i
+        when (200..201)
+          parsed_response = JSON.parse(response.body)
+          unless parsed_response.empty?
+            @status_url = parsed_response['status_url']
+            @fetch_url = parsed_response['fetch_url']
           end
         end
-      rescue JSON::JSONError
+      rescue JSON::JSONError, Timeout::Error
         # We're ok with this, we'll just assume it failed.
       end
 

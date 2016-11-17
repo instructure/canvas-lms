@@ -28,22 +28,27 @@ module Lti
         @root_account = course.root_account
         load_tool!
         post_body = start_import_post_body(content)
-        CanvasHttp.post(import_start_url, base_request_headers, form_data: post_body) do |response|
-          case response.code.to_i
-          when (200..201)
-            parsed_response = JSON.parse(response.body)
-            unless parsed_response.empty?
-              @status_url = parsed_response['status_url']
-            end
-          else
-            raise "Unable to start import for external tool #{@tool.name} (#{response.code})"
+        response = Canvas.retriable(on: Timeout::Error) do
+          CanvasHttp.post(import_start_url, base_request_headers, form_data: post_body)
+        end
+        case response.code.to_i
+        when (200..201)
+          parsed_response = JSON.parse(response.body)
+          unless parsed_response.empty?
+            @status_url = parsed_response['status_url']
           end
+        else
+          raise "Unable to start import for external tool #{@tool.name} (#{response.code})"
         end
         self
+      rescue Timeout::Error
+        raise "Unable to start import for external tool #{@tool.name}, request timed out."
       end
 
       def import_completed?
-        response = CanvasHttp.get(@status_url, base_request_headers)
+        response = Canvas.retriable(on: Timeout::Error) do
+          CanvasHttp.get(@status_url, base_request_headers)
+        end
         if response.code.to_i == 200
           parsed_response = JSON.parse(response.body)
           @export_status = parsed_response['status']
@@ -56,6 +61,8 @@ module Lti
             false
           end
         end
+      rescue Timeout::Error
+        false
       end
 
       private
