@@ -399,7 +399,7 @@ define([
     });
 
     $("#course_custom_course_visibility").ready(function(event) {
-      if($("#course_custom_course_visibility")[0].checked) {
+      if($("#course_custom_course_visibility").prop('checked')) {
         $("#customize_course_visibility").toggle(true);
       } else {
         $("#customize_course_visibility").toggle(false);
