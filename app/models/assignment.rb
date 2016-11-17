@@ -183,6 +183,7 @@ class Assignment < ActiveRecord::Base
     automatic_peer_reviews
     peer_reviews_due_at
     peer_review_count
+    intra_group_peer_reviews
     submission_types
     group_category_id
     grade_group_students_individually
