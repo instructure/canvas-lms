@@ -97,6 +97,7 @@ ActionView::Helpers::FormHelper.module_eval do
     text, options = _label_symbol_translation(method, text, options)
     label_without_symbol_translation(object_name, method, text, options)
   end
+  # when removing this, be sure to remove it from i18nliner_extensions.rb
   alias_method_chain :label, :symbol_translation
 end
 
