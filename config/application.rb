@@ -136,7 +136,9 @@ module CanvasRails
 
             raise "Canvas requires PostgreSQL 9.3 or newer" unless postgresql_version >= 90300
 
-            ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID::Money.precision = (postgresql_version >= 80300) ? 19 : 10
+            if CANVAS_RAILS4_2
+              ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID::Money.precision = (postgresql_version >= 80300) ? 19 : 10
+            end
 
             configure_connection
 
