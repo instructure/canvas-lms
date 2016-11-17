@@ -28,7 +28,7 @@ gem 'switchman', '1.8.0'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
-  gem 'will_paginate', '3.0.7', require: false
+  gem 'will_paginate', '3.1.5', require: false
 
 gem "after_transaction_commit", '1.1.0'
 gem "aws-sdk", '2.6.7', require: false
