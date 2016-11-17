@@ -64,4 +64,31 @@ describe MasterCourses::MasterTemplate do
       expect(page_tag.reload.content).to eq @page
     end
   end
+
+  describe "child subscriptions" do
+    it "should be able to add other courses as 'child' courses" do
+      template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      new_course = course
+      sub = template.add_child_course!(new_course)
+      expect(sub.child_course).to eq new_course
+      expect(sub.master_template).to eq template
+      expect(sub).to be_active
+      expect(sub.use_selective_copy).to be_falsey # should default to false - we'll set it to true later after the first import
+
+      expect(template.child_subscriptions.active.count).to eq 1
+      sub.destroy!
+
+      # can re-add
+      new_sub = template.add_child_course!(new_course)
+      expect(new_sub).to_not eq sub
+      expect(template.child_subscriptions.active.count).to eq 1
+    end
+
+    it "should require child courses to belong to the same root account" do
+      template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      new_root_account = Account.create!
+      new_course = course(:account => new_root_account)
+      expect { template.add_child_course!(new_course) }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
 end

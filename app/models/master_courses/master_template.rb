@@ -4,6 +4,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   belongs_to :course
   has_many :master_content_tags, :class_name => "MasterCourses::MasterContentTag", :inverse_of => :master_template
+  has_many :child_subscriptions, :class_name => "MasterCourses::ChildSubscription", :inverse_of => :master_template
 
   strong_params
 
@@ -45,6 +46,14 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       tag ||= self.master_content_tags.create!(:content => content)
       tag
     end
+  end
 
+  def add_child_course!(child_course)
+    MasterCourses::ChildSubscription.unique_constraint_retry do |retry_count|
+      child_sub = nil
+      child_sub = self.child_subscriptions.active.where(:child_course_id => child_course).first if retry_count > 0
+      child_sub ||= self.child_subscriptions.create!(:child_course => child_course)
+      child_sub
+    end
   end
 end
