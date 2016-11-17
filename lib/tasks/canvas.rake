@@ -30,11 +30,17 @@ namespace :canvas do
 
   desc "Compile javascript and css assets."
   task :compile_assets do |t, args|
+    require_relative "../../config/initializers/webpack"
+
+    # opt out
     npm_install = ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
     compile_css = ENV["COMPILE_ASSETS_CSS"] != "0"
     build_styleguide = ENV["COMPILE_ASSETS_STYLEGUIDE"] != "0"
     build_js = ENV["COMPILE_ASSETS_BUILD_JS"] != "0"
     build_api_docs = ENV["COMPILE_ASSETS_API_DOCS"] != "0"
+
+    # opt in
+    webpack_and_rjs = ENV["COMPILE_ASSETS_WEBPACK_RJS_FALLBACK"] == "1"
 
     if npm_install
       log_time('Making sure node_modules are up to date') {
@@ -61,21 +67,25 @@ namespace :canvas do
     end
 
     # TODO: Once webpack is the only way, remove js:build
-    if build_js
-      tasks["compile coffee, js 18n, run r.js optimizer, and webpack"] = -> {
-        prereqs = ['js:generate', 'i18n:generate_js']
-        prereqs.each do |name|
-          log_time(name) { Rake::Task[name].invoke }
-        end
+    if CANVAS_WEBPACK
+      msg = webpack_and_rjs ? ", r.js optimizer" : ""
+      tasks["compile coffee/jsx, js 18n, run webpack#{msg}"] = -> {
+        log_time('js:generate') { Rake::Task['js:generate'].invoke }
+        log_time('i18n:generate_js') { Rake::Task['i18n:generate_js'].invoke }
+        ptasks = ['js:webpack']
+        ptasks << 'js:build' if webpack_and_rjs
         # webpack and js:build can run concurrently
-        Parallel.each(['js:build', 'js:webpack'], :in_threads => processes.to_i) do |name|
+        Parallel.each(ptasks, in_threads: processes.to_i) do |name|
           log_time(name) { Rake::Task[name].invoke }
         end
       }
     else
-      tasks["compile coffee"] = -> {
-        ['js:generate'].each do |name|
-          log_time(name) { Rake::Task[name].invoke }
+      msg = build_js ? ", js i18n, r.js optimizer" : ""
+      tasks["compile coffee/jsx#{msg}"] = -> {
+        log_time('js:generate') { Rake::Task['js:generate'].invoke }
+        if build_js
+          log_time('i18n:generate_js') { Rake::Task['i18n:generate_js'].invoke }
+          log_time('js:build') { Rake::Task['js:build'].invoke }
         end
       }
     end
