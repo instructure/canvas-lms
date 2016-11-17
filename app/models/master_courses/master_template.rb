@@ -5,6 +5,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   belongs_to :course
   has_many :master_content_tags, :class_name => "MasterCourses::MasterContentTag", :inverse_of => :master_template
   has_many :child_subscriptions, :class_name => "MasterCourses::ChildSubscription", :inverse_of => :master_template
+  has_many :master_migrations, :class_name => "MasterCourses::MasterMigration", :inverse_of => :master_template
 
   strong_params
 

@@ -91,4 +91,12 @@ describe MasterCourses::MasterTemplate do
       expect { template.add_child_course!(new_course) }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
+
+  describe "master_migrations" do
+    it "should be able to create a migration" do
+      template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      mig = template.master_migrations.create!
+      expect(mig.master_template).to eq template
+    end
+  end
 end
