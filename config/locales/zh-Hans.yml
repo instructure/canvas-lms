@@ -1156,7 +1156,7 @@ zh-Hans:
       loading_text: 正在加载...
       media_data: 
         one: "*%{count} 个文件*的 %{file_size} "
-        other: "*%{count} 个文件*的 %{file_size} "
+        other: "*%{count} 个文件的* %{file_size} "
       media_file_storage_header: 媒体文件存储
       none_message: 无项目可显示
       over_time_link: 超时
@@ -1170,7 +1170,7 @@ zh-Hans:
       title_data_point_over_time: "%{data_point} 超时"
       uploaded_data: 
         one: "*%{count} 个文件*的 %{file_size} "
-        other: "*%{count} 个文件*的 %{file_size} "
+        other: "*%{count} 个文件的* %{file_size} "
       uploaded_file_storage_header: 已上传的文件存储
     student_assessment_scores_csv_parameters: 
       account_reports: 
@@ -1965,7 +1965,7 @@ zh-Hans:
     grade_assignment: 
       buttons: 
         upload_files: 上传文件
-      graded_count: "%{graded_count}*（共* %{total}）个作业已计分"
+      graded_count: "%{graded_count} *共* %{total} 个作业已计分"
       links: 
         download_submissions: 下载作业
         peer_reviews: 同侪审阅
@@ -7566,7 +7566,7 @@ zh-Hans:
         create_category: 创建类别
       default_name_for_groups: 项目组
       group_limit_blank: (留为空白以便没有限制)
-      group_structure_group_limit: "*小组仅限 *%{group_limit} 个成员"
+      group_structure_group_limit: "*小组仅限* %{group_limit} 个成员"
       group_structure_self_signup: "*立即创建* %{number_of_groups} *个小组*"
       group_structure_standard: "*将学生分为* %{number_of_groups} *个相等的学习小组*"
       labels: 
@@ -7676,7 +7676,7 @@ zh-Hans:
     edit_group_category: 
       allow_self_signup: 允许自行注册
       group_limit_blank: (留为空白以便没有限制)
-      group_structure_group_limit: "*小组仅限 *%{group_limit} 个成员"
+      group_structure_group_limit: "*小组仅限* %{group_limit} 个成员"
       restricted_self_signup: 要求小组成员在相同的班级中
       self_signup_help_tooltip: 什么是自行注册小组?
     edit_group_set: 编辑小组集
