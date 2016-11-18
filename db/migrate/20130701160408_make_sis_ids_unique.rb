@@ -9,9 +9,7 @@ class MakeSisIdsUnique < ActiveRecord::Migration[4.2]
     add_index :course_sections, [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true, algorithm: :concurrently
     add_index :enrollment_terms, [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true, algorithm: :concurrently
     add_index :enrollment_terms, :root_account_id, algorithm: :concurrently
-    if connection.adapter_name == 'PostgreSQL'
-      remove_index :pseudonyms, :unique_id
-    end
+    remove_index :pseudonyms, name: 'index_pseudonyms_on_unique_id'
     add_index :pseudonyms, [:sis_user_id, :account_id], where: "sis_user_id IS NOT NULL", unique: true, algorithm: :concurrently
     add_index :pseudonyms, :account_id, algorithm: :concurrently
     add_index :groups, [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true, algorithm: :concurrently
@@ -40,9 +38,7 @@ class MakeSisIdsUnique < ActiveRecord::Migration[4.2]
     remove_index :course_sections, [:sis_source_id, :root_account_id]
     remove_index :enrollment_terms, [:sis_source_id, :root_account_id]
     remove_index :enrollment_terms, :root_account_id
-    if connection.adapter_name == 'PostgreSQL'
-      remove_index :pseudonyms, [:unique_id, :account_id]
-    end
+    remove_index :pseudonyms, [:unique_id, :account_id]
     remove_index :pseudonyms, [:sis_user_id, :account_id]
     remove_index :pseudonyms, :account_id
     remove_index :groups, [:sis_source_id, :root_account_id]
