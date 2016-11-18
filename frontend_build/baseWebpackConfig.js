@@ -7,6 +7,7 @@ var bundleEntries = require("./bundles");
 var BundleExtensionsPlugin = require("./BundleExtensionsPlugin");
 var WebpackOnBuildPlugin = require('on-build-webpack');
 var path = require('path');
+var WebpackHooks = require('./webpackHooks')
 require('babel-polyfill')
 
 module.exports = {
@@ -196,6 +197,7 @@ module.exports = {
         child_process.spawn("gulp", ["rev"]);
       }
     }),
+    new WebpackHooks(),
     new webpack.PrefetchPlugin("./app/coffeescripts/calendar/ContextSelector.coffee"),
     new webpack.PrefetchPlugin("./app/coffeescripts/calendar/TimeBlockRow.coffee"),
     new webpack.PrefetchPlugin("./app/coffeescripts/react_files/components/FolderTree.coffee"),
