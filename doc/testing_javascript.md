@@ -11,10 +11,9 @@ be following this path when doing front-end development on Canvas.  If you need 
 getting started with that please see [development_with_docker.md](https://github.com/instructure/canvas-lms/blob/master/doc/development_with_docker.md)
 and [working_with_webpack.md](https://github.com/instructure/canvas-lms/blob/master/doc/working_with_webpack.md).
 
-Before we can get started in earnest, we need to make a few changes to a couple of files.
-Inside `docker-compose.yml` you should see an entry for `phantomjs-tests`.  You should
-uncomment it so we can use it. It is the container we will use because of its awesome
-flexibility even if we aren't planning to run tests using PhantomJS.
+Before we can get started in earnest, we need to make a few changes to a couple
+of files. Inside your `.env` file, add the phantomjs-tests override in your
+`COMPOSE_FILE` definition: `docker-compose/js-phantomjs-tests.override.yml`
 
 The next file to be aware of is `webpack_spec_index.js`.  This file is how the test bundle
 gets created.  We can modify it to limit what tests get run.  For instance, if you don't
