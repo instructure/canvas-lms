@@ -111,6 +111,26 @@ define [
     imageUpdateAvatar: ->
       $.when(@getImage(), @preflightRequest()).then(@onPreflight)
 
+    handleErrorUpdating: (response) ->
+      if (response)
+        # try to get an error message out of JSON string
+        errors = try
+          JSON.parse(response).errors
+        catch error
+          undefined
+
+        if errors
+          errorReducer = (errorString, currentError) ->
+            errorString += currentError.message
+
+          message = if errors.base
+            errors.base.reduce(errorReducer, '')
+          else
+            I18n.t('Your profile photo could not be uploaded. You may have exceeded your upload limit.')
+
+          $.flashError(message)
+          @enableSelectButton()
+
     preflightRequest: ->
       $.post('/files/pending', {
         name: 'profile.jpg'
@@ -123,24 +143,12 @@ define [
       })
 
     onPreflight: (image, response) =>
-      # try to get an error message out of JSON string
-      errors = try
-        JSON.parse(response[0]).errors
-      catch error
-        undefined
+      @handleErrorUpdating(response[0].responseText)
+      @image = image
+      preflightResponse = response[0]
+      @postAvatar(preflightResponse).then(_.partial(@onPostAvatar, preflightResponse))
 
-      if errors
-        message = if errors.base
-          errors.base
-        else
-          I18n.t('Your profile photo could not be uploaded. You may have exceeded your upload limit.')
 
-        $.flashError(message)
-        @enableSelectButton()
-      else
-        @image = image
-        preflightResponse = response[0]
-        @postAvatar(preflightResponse).then(_.partial(@onPostAvatar, preflightResponse))
 
     postAvatar: (preflightResponse) =>
       image = @image
@@ -160,6 +168,7 @@ define [
         dataType: dataType
         processData: false
         type: 'POST'
+        error: (xhr) => @handleErrorUpdating(xhr.responseText)
       })
 
     onPostAvatar: (preflightResponse, postAvatarResponse) =>
