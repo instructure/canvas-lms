@@ -55,6 +55,26 @@ describe 'Theme Editor' do
     expect(f('#left-side #section-tabs .brand_configs').text).to eq 'Themes'
   end
 
+  it 'should close after preview (no changes saved)', priority: "1", test_id: 239984 do
+    open_theme_editor(Account.default.id)
+
+    # verifies theme editor is open
+    expect(driver.title).to include 'Theme Editor'
+    f('.Theme__editor-color-block_input-text').send_keys('#dc6969')
+    preview_your_changes
+    run_jobs
+    expect(fj('.ReactModalPortal h3:contains("Generating preview")')).to be_displayed
+    exit_btn = fj('.Theme__header button:contains("Exit")')
+
+    keep_trying_until do
+      exit_btn.click
+      driver.switch_to.alert.accept
+      assert_flash_notice_message(/Theme editor changes have been cancelled/)
+      expect(driver.current_url).to end_with("/accounts/#{Account.default.id}/brand_configs")
+      expect(f('#left-side #section-tabs .brand_configs').text).to eq 'Themes'
+    end
+  end
+
   it 'should display the preview button when valid change is made', priority: "1", test_id: 239984 do
     open_theme_editor(Account.default.id)
 
