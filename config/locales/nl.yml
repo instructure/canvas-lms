@@ -1394,7 +1394,7 @@ nl:
       ungraded_count_description: "Meer dan %{count} inzendingen zijn niet beoordeeld"
       ungraded_count_option: "Niet-beoordeelde inzendingen (aantal)"
       ungraded_count_title: "Aantal inzendingen dat niet is beoordeeld"
-      ungraded_timespan_description: "Een inzending is na %{count}dagen nog steeds niet beoordeeld"
+      ungraded_timespan_description: "Een inzending is na %{count} dagen nog steeds niet beoordeeld"
       ungraded_timespan_option: "Niet-beoordeelde inzendingen (tijd)"
       ungraded_timespan_title: "Aantal dagen waarna een inzending nog niet is beoordeeld"
       usernote_description: "Er is al %{count} dagen geen faculteitsnieuws toegevoegd"
@@ -7768,7 +7768,7 @@ nl:
       group_category_create: 
         allow_self_signup: "Zelfinschrijving toestaan"
         cancel: Annuleren
-        create_groups: "%{num_groups} groepen nu aanmaken"
+        create_groups: "Nu %{num_groups} groepen maken"
         create_groups_manually: "Ik zal de groepen handmatig maken"
         group_set_name: "Groepsreeks naam"
         group_structure: Groepsstructuur
@@ -7815,7 +7815,7 @@ nl:
       group_edit: 
         cancel: Annuleren
         group_join_level: "Bezig met deelnemen"
-        group_max_membership: "Groepen tot  leden beperken"
+        group_max_membership: "Groepen tot leden beperken"
         group_max_membership_help: "(Leeg laten om max groepsreeks te kunnen gebruiken)"
         group_max_membership_members: leden
         group_name: Groepsnaam
@@ -10509,7 +10509,7 @@ nl:
         subject: "Bijgewerkte wikipagina: %{title}, %{user}"
       twitter: 
         tweet: "Canvas waarschuwing - Pagina bijgewerkt: %{title}, %{user}."
-    visit_modules_page: "*De pagina met cursusmodules bezoeken als je wilt weten hoe je deze inhoud moet/kunt ontgrendelen.*"
+    visit_modules_page: "*Naar de modulepagina van de cursus gaan voor meer informatie over het ontgrendelen van deze inhoud.*"
     web_conference_invitation: 
       email: 
         body: "Je bent uitgenodigd om deel te nemen aan een webvergadering, %{title} voor %{name}."
@@ -15120,7 +15120,7 @@ nl:
         full_comments: "Klikken om volledige opmerkingen te zien"
         linked_to_learning_outcome: "Dit criterium is aan een leerresultaat gekoppeld"
     select_content_dialog: 
-      add_to_module: "Aan *module* toevoegen %{item}"
+      add_to_module: "%{item} aan *module* toevoegen"
       assignment_item: Opdracht
       assignment_item_select_label: "De opdracht selecteren die je wilt koppelen, of een opdracht toevoegen door \"Nieuwe opdracht\" te selecteren."
       assignment_notice: "De opdracht selecteren die je aan deze *module* wilt koppelen of een opdracht toevoegen door \"Nieuwe opdracht\" te selecteren."
@@ -15182,7 +15182,7 @@ nl:
         needs_cookies: "Cookies vereist"
         needs_login: Aanmelden
         unauthorized_action: Niet-gemachtigd
-        unpublished: "Nog niet beschikbaar"
+        unpublished: "Nog niet beoordeeld"
       needs_cookies: "Cookies zijn niet ingeschakeld in jouw browser. Pas dit in jouw beveiligingsvoorkeuren aan voordat je verder gaat."
       needs_login: "Toegang tot deze pagina is beperkt tot geautoriseerde gebruikers. Je bent momenteel niet gemachtigd om deze pagina weer te geven."
       public_course: "Deze pagina is onderdeel van de inhoud van de cursus **%{course}**."
