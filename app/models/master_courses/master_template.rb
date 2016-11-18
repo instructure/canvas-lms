@@ -7,6 +7,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   has_many :child_subscriptions, :class_name => "MasterCourses::ChildSubscription", :inverse_of => :master_template
   has_many :master_migrations, :class_name => "MasterCourses::MasterMigration", :inverse_of => :master_template
 
+  belongs_to :active_migration, :class_name => "MasterCourses::MasterMigration"
+
   strong_params
 
   include Canvas::SoftDeletable
@@ -56,5 +58,9 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       child_sub ||= self.child_subscriptions.create!(:child_course => child_course)
       child_sub
     end
+  end
+
+  def active_migration_running?
+    self.active_migration && self.active_migration.still_running?
   end
 end

@@ -41,6 +41,12 @@ module CC
       @for_course_copy = opts[:for_course_copy]
       @qti_only_export = @content_export && @content_export.qti_export?
       @manifest_opts = opts.slice(:version)
+
+      if @content_export && @content_export.for_master_migration?
+        @master_migration = opts[:master_migration]
+        @master_migration_type = opts[:master_migration_type]
+        raise "master_migration required" unless @master_migration
+      end
     end
 
     def self.export(content_export, opts={})
@@ -76,14 +82,26 @@ module CC
           write_external_content(external_content)
         end
 
-        copy_all_to_zip
-        @zip_file.close
+        @export_dirs = [@export_dir]
+        if @master_migration
+          # for efficiency to the max, short-circuit the usual course copy process (i.e. zip up, save, and then unzip again)
+          # and instead go straight to the intermediate json
+          converter = CC::Importer::Canvas::Converter.new(:unzipped_file_path => @export_dir)
+          @export_dirs << converter.base_export_dir # make sure we clean this up too afterwards
+          converter.export
+          @export_path = converter.course["full_export_file_path"] # this is the course_export.json
+          @export_type = 'application/json'
+        else
+          copy_all_to_zip
+          @zip_file.close
+          @export_path = @zip_path
+        end
 
-        if @content_export && File.exist?(@zip_path)
+        if @content_export && File.exist?(@export_path)
           att = Attachment.new
           att.context = @content_export
           att.user = @content_export.user
-          att.uploaded_data = Rack::Test::UploadedFile.new(@zip_path, Attachment.mimetype(@zip_path))
+          att.uploaded_data = Rack::Test::UploadedFile.new(@export_path, @export_type || Attachment.mimetype(@export_path))
           if att.save
             @content_export.attachment = att
             @content_export.save
@@ -95,8 +113,10 @@ module CC
         return false
       ensure
         @zip_file.close if @zip_file
-        if !@migration_config[:keep_after_complete] && File.directory?(@export_dir)
-          FileUtils::rm_rf(@export_dir)
+        if !@migration_config[:keep_after_complete]
+          @export_dirs.each do |export_dir|
+            FileUtils::rm_rf(export_dir) if File.directory?(export_dir)
+          end
         end
       end
       true

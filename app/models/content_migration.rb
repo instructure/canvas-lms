@@ -320,13 +320,12 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def queue_migration(plugin=nil, retry_count: 0, expires_at: nil)
-    reset_job_progress
+    reset_job_progress unless plugin && plugin.settings[:skip_initial_progress]
 
     expires_at ||= Setting.get('content_migration_job_expiration_hours', '48').to_i.hours.from_now
     return if blocked_by_current_migration?(plugin, retry_count, expires_at)
 
     set_default_settings
-    self.save if self.changed?
 
     plugin ||= Canvas::Plugin.find(migration_type)
     if plugin
@@ -338,7 +337,7 @@ class ContentMigration < ActiveRecord::Base
         queue_opts[:n_strand] = self.n_strand
       end
 
-      if self.workflow_state == 'exported' && !plugin.settings[:skip_conversion_step]
+      if plugin.settings[:import_immediately] || (self.workflow_state == 'exported' && !plugin.settings[:skip_conversion_step])
         # it's ready to be imported
         self.workflow_state = :importing
         self.save
@@ -348,9 +347,8 @@ class ContentMigration < ActiveRecord::Base
         begin
           worker_class = Canvas::Migration::Worker.const_get(plugin.settings['worker'])
           self.workflow_state = :exporting
-          job = Delayed::Job.enqueue(worker_class.new(self.id), queue_opts)
           self.save
-          job
+          Delayed::Job.enqueue(worker_class.new(self.id), queue_opts)
         rescue NameError
           self.workflow_state = 'failed'
           message = "The migration plugin #{migration_type} doesn't have a worker."
@@ -488,22 +486,31 @@ class ContentMigration < ActiveRecord::Base
 
     all_files_path = nil
     begin
-      @exported_data_zip = download_exported_data
-      @zip_file = Zip::File.open(@exported_data_zip.path)
-      @exported_data_zip.close
-      data = JSON.parse(@zip_file.read('course_export.json'), :max_nesting => 50)
-      data = prepare_data(data)
+      data = nil
+      if self.for_master_course_import?
+        # copy the attachments
+        source_export = ContentExport.find(self.migration_settings[:master_course_export_id])
+        self.context.copy_attachments_from_course(source_export.context, :content_export => source_export, :content_migration => self)
 
-      if @zip_file.find_entry('all_files.zip')
-        # the file importer needs an actual file to process
-        all_files_path = create_all_files_path(@exported_data_zip.path)
-        @zip_file.extract('all_files.zip', all_files_path)
-        data['all_files_export']['file_path'] = all_files_path
+        data = JSON.parse(self.exported_attachment.open, :max_nesting => 50)
+        data = prepare_data(data)
       else
-        data['all_files_export']['file_path'] = nil
-      end
+        @exported_data_zip = download_exported_data
+        @zip_file = Zip::File.open(@exported_data_zip.path)
+        @exported_data_zip.close
+        data = JSON.parse(@zip_file.read('course_export.json'), :max_nesting => 50)
+        data = prepare_data(data)
 
-      @zip_file.close
+        if @zip_file.find_entry('all_files.zip')
+          # the file importer needs an actual file to process
+          all_files_path = create_all_files_path(@exported_data_zip.path)
+          @zip_file.extract('all_files.zip', all_files_path)
+          data['all_files_export']['file_path'] = all_files_path
+        else
+          data['all_files_export']['file_path'] = nil
+        end
+        @zip_file.close
+      end
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
 
@@ -512,12 +519,15 @@ class ContentMigration < ActiveRecord::Base
       if !self.import_immediately?
         update_import_progress(100)
       end
+
+      self.update_master_migration('completed') if self.for_master_course_import?
     rescue => e
       self.workflow_state = :failed
       er_id = Canvas::Errors.capture_exception(:content_migration, e)[:error_report]
       migration_settings[:last_error] = "ErrorReport:#{er_id}"
       logger.error e
       self.save
+      self.update_master_migration('failed') if self.for_master_course_import?
       raise e
     ensure
       File.delete(all_files_path) if all_files_path && File.exists?(all_files_path)
@@ -525,6 +535,11 @@ class ContentMigration < ActiveRecord::Base
     end
   end
   alias_method :import_content_without_send_later, :import_content
+
+  def update_master_migration(state)
+    master_migration = MasterCourses::MasterMigration.find(self.migration_settings[:master_migration_id])
+    master_migration.update_import_state!(self, state)
+  end
 
   def prepare_data(data)
     data = data.with_indifferent_access if data.is_a? Hash
@@ -544,6 +559,10 @@ class ContentMigration < ActiveRecord::Base
 
   def for_course_copy?
     self.migration_type && self.migration_type == 'course_copy_importer'
+  end
+
+  def for_master_course_import?
+    self.migration_type == 'master_course_import'
   end
 
   def check_cross_institution

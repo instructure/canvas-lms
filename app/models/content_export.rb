@@ -34,6 +34,7 @@ class ContentExport < ActiveRecord::Base
   #export types
   COMMON_CARTRIDGE = 'common_cartridge'
   COURSE_COPY = 'course_copy'
+  MASTER_COURSE_COPY = 'master_course_copy'
   QTI = 'qti'
   USER_DATA = 'user_data'
   ZIP = 'zip'
@@ -188,7 +189,11 @@ class ContentExport < ActiveRecord::Base
   end
 
   def for_course_copy?
-    self.export_type == COURSE_COPY
+    self.export_type == COURSE_COPY || self.export_type == MASTER_COURSE_COPY
+  end
+
+  def for_master_migration?
+    self.export_type == MASTER_COURSE_COPY
   end
 
   def common_cartridge?
@@ -337,7 +342,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
-  scope :not_for_copy, -> { where("content_exports.export_type<>?", COURSE_COPY) }
+  scope :not_for_copy, -> { where("content_exports.export_type NOT IN (?)", [COURSE_COPY, MASTER_COURSE_COPY]) }
   scope :common_cartridge, -> { where(export_type: COMMON_CARTRIDGE) }
   scope :qti, -> { where(export_type: QTI) }
   scope :course_copy, -> { where(export_type: COURSE_COPY) }
