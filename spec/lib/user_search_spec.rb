@@ -187,6 +187,11 @@ describe UserSearch do
             cc.retire!
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end
+
+          it 'matches unconfirmed channels' do
+            cc2 = user.communication_channels.create!(path: 'unconfirmed@example.com')
+            expect(UserSearch.for_user_in_context("unconfirmed", course, user)).to eq [user]
+          end
         end
 
         describe 'searching by a DB ID' do
