@@ -12,7 +12,6 @@ const STUFF_TO_REV = [
   'public/optimized/vendor/require.js',
   'public/javascripts/vendor/ie11-polyfill.js',
   'public/javascripts/vendor/lato-fontfaceobserver.js',
-  'public/optimized/vendor/lato-fontfaceobserver.js',
 
   // But for all other javascript, we only load stuff using js_bundle.
   // Meaning that we only include stuff in the "bundles" dir from rails.
