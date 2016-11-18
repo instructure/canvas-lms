@@ -71,6 +71,29 @@ Note that the actual bodies of events may include more fields than
 what's described in this document. Those fields are subject to change.
 
 
+#### `course_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `course_id` | The Canvas id of the created course. |
+| `account_id` | The Account id of the created course. |
+| `name` | The name the created course. |
+| `created_at` | The time at which this course was created. |
+| `updated_at` | The time at which this course was last modified in any way. |
+| `workflow_state` | The state of the course. |
+
+#### `course_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `course_id` | The Canvas id of the updated course. |
+| `account_id` | The Account id of the created course. |
+| `name` | The name the updated course. |
+| `created_at` | The time at which this course was created. |
+| `updated_at` | The time at which this course was last modified in any way. |
+| `workflow_state` | The state of the course. |
+
+
 #### `syllabus_updated`
 
 | Field | Description |

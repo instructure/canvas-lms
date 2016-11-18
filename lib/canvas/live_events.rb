@@ -15,6 +15,25 @@ module Canvas::LiveEvents
     })
   end
 
+  def self.get_course_data(course)
+    {
+      course_id: course.id,
+      account_id: course.account_id,
+      name: course.name,
+      created_at: course.created_at,
+      updated_at: course.updated_at,
+      workflow_state: course.workflow_state
+    }
+  end
+
+  def self.course_created(course)
+    post_event_stringified('course_created', get_course_data(course))
+  end
+
+  def self.course_updated(course)
+    post_event_stringified('course_updated', get_course_data(course))
+  end
+
   def self.course_syllabus_updated(course, old_syllabus_body)
     post_event_stringified('syllabus_updated', {
       course_id: course.global_id,

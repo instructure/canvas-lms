@@ -23,6 +23,7 @@ class LiveEventsObserver < ActiveRecord::Observer
       if changes["syllabus_body"]
         Canvas::LiveEvents.course_syllabus_updated(obj, changes["syllabus_body"].first)
       end
+      Canvas::LiveEvents.course_updated(obj)
     when Enrollment
       Canvas::LiveEvents.enrollment_updated(obj)
     when EnrollmentState
@@ -54,6 +55,8 @@ class LiveEventsObserver < ActiveRecord::Observer
   def after_create(obj)
     obj.class.connection.after_transaction_commit do
     case obj
+    when Course
+      Canvas::LiveEvents.course_created(obj)
     when DiscussionEntry
       Canvas::LiveEvents.discussion_entry_created(obj)
     when DiscussionTopic

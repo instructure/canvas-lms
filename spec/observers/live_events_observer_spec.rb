@@ -73,6 +73,20 @@ describe LiveEventsObserver do
     end
   end
 
+  describe "course" do
+    it "posts create events" do
+      Canvas::LiveEvents.expects(:course_created).once
+      course_model
+    end
+
+    it "posts update events" do
+      Canvas::LiveEvents.expects(:course_updated).twice
+      course_model # creation fires updated as well
+      @course.name = "Name Changed"
+      @course.save
+    end
+  end
+
   describe "discussion topic" do
     it "posts create events" do
       course_model
