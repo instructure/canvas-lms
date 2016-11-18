@@ -3156,7 +3156,7 @@ nb:
         etherpad: |-
             EtherPad er et prosjekt med åpen kildekode som raskt lar deg sette opp delte dokumenter. Det er så raskt at du kan se hva andre skriver mens de skriver det. "Pad"er er imidlertid ikke passordbeskyttet, så alle med lenka til dem kan redigere dem. EtherPad er bedre egnet enn Google Docs om du ønsker å tillate anonymitet og/eller la personer som ikke har Google-kontoer delta.
             
-            **Advarsel:** Sjekk [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) for å sikre at arbeidet ditt ikke blir slettet.
+            **Advarsel**: Sjekk [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) for å sikre at arbeidet ditt ikke blir slettet.
         google_docs: |-
             Google Docs er en godt egnet ressurs for å samarbeide på et gruppeprosjekt. Det er som Microsoft Word, men lar deg arbeide sammen med andre på den samme filen samtidig uten
             å måtte sende den rundt med epost.
