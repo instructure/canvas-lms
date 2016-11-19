@@ -205,7 +205,10 @@ describe "scheduler" do
     end
 
     it "should validate the appointment group shows up on the calendar", priority: "1", test_id: 140193 do
-      create_appointment_group
+      date = Time.zone.today.to_s
+      create_appointment_group(:new_appointments => [
+        [date + ' 12:00:00', date + ' 13:00:00'],
+      ])
       get "/calendar2"
       click_scheduler_link
       wait_for_ajaximations
@@ -215,7 +218,10 @@ describe "scheduler" do
     end
 
     it "should validate the appointment group shows on all views after a student signed up", priority: "1", test_id: 1729408 do
-      create_appointment_group
+      date = Time.zone.today.to_s
+      create_appointment_group(:new_appointments => [
+        [date + ' 12:00:00', date + ' 13:00:00'],
+      ])
       ag = AppointmentGroup.first
       student_in_course(course: @course, active_all: true)
       ag.appointments.first.reserve_for(@user, @user, comments: 'this is important')
