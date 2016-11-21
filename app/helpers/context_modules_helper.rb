@@ -129,7 +129,8 @@ module ContextModulesHelper
       if is_cyoe_on
         item_data[:mastery_paths] = conditional_release(item, { conditional_release_rules: cyoe_rules })
         if is_student && item_data[:mastery_paths].present?
-          item_data[:show_cyoe_placeholder] = item_data[:mastery_paths][:selected_set_id].nil?
+          item_data[:show_cyoe_placeholder] = item_data[:mastery_paths][:selected_set_id].nil? &&
+                  (item_data[:mastery_paths][:locked] || item_data[:mastery_paths][:assignment_sets].present?)
           item_data[:choose_url] = context_url(@context, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
         end
       end

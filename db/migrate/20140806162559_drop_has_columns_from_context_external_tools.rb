@@ -1,4 +1,4 @@
-class DropHasColumnsFromContextExternalTools < ActiveRecord::Migration
+class DropHasColumnsFromContextExternalTools < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   EXTENSION_TYPES = [:account_navigation, :course_home_sub_navigation, :course_navigation,

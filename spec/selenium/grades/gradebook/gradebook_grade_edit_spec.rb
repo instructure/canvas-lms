@@ -1,4 +1,5 @@
 require_relative '../../helpers/gradebook2_common'
+require_relative '../page_objects/gradebook_page'
 
 describe "editing grades" do
   include_context "in-process server selenium tests"
@@ -242,5 +243,72 @@ describe "editing grades" do
     wait_for_ajaximations
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
     expect_flash_message :error, /refresh/
+  end
+
+  context 'with multiple grading periods enabled' do
+    before(:each) do
+      root_account = @course.root_account = Account.default
+      root_account.enable_feature!(:multiple_grading_periods)
+
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(root_account)
+      group.enrollment_terms << @course.enrollment_term
+      group.save!
+
+      period_helper = Factories::GradingPeriodHelper.new
+      @first_period = period_helper.create_presets_for_group(group, :past).first
+      @first_period.save!
+      @second_period = period_helper.create_presets_for_group(group, :current).first
+      @second_period.save!
+
+      @first_assignment.due_at = @first_period.close_date - 1.day
+      @first_assignment.save!
+      @first_assignment.reload
+
+      @second_assignment.due_at = @second_period.close_date - 1.day
+      @second_assignment.save!
+      @second_assignment.reload
+
+      @page = Gradebook::MultipleGradingPeriods.new
+    end
+
+    context 'for assignments with at least one due date in a closed grading period' do
+      before(:each) do
+        get "/courses/#{@course.id}/gradebook?grading_period_id=0"
+
+        @page.assignment_header_menu(@first_assignment.name).click
+      end
+
+      describe 'the Curve Grades menu item' do
+        before(:each) do
+          @curve_grades_menu_item = @page.assignment_header_menu_item('Curve Grades')
+        end
+
+        it 'is disabled' do
+          expect(@curve_grades_menu_item[:class]).to include('ui-state-disabled')
+        end
+
+        it 'gives an error when clicked' do
+          @curve_grades_menu_item.click
+
+          expect_flash_message :error, /Unable to curve grades/
+        end
+      end
+
+      describe 'the Set Default Grade menu item' do
+        before(:each) do
+          @set_default_grade_menu_item = @page.assignment_header_menu_item('Set Default Grade')
+        end
+
+        it 'is disabled' do
+          expect(@set_default_grade_menu_item[:class]).to include('ui-state-disabled')
+        end
+
+        it 'gives an error when clicked' do
+          @set_default_grade_menu_item.click
+
+          expect_flash_message :error, /Unable to set default grade/
+        end
+      end
+    end
   end
 end

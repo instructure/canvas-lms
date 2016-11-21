@@ -2,11 +2,11 @@ define [
   'jquery'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'compiled/models/File'
   'jsx/files/DialogPreview'
   'jsx/files/FilesystemObjectThumbnail'
-], ($, React, ReactDOM, File, DialogPreview, FilesystemObjectThumbnail) ->
-  TestUtils = React.addons.TestUtils
+], ($, React, ReactDOM, TestUtils, File, DialogPreview, FilesystemObjectThumbnail) ->
 
   module 'DialogPreview',
     setup: ->

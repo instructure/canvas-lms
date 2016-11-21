@@ -54,7 +54,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
     @include fontSize(14px);
     line-height: 1;
     display: block;
-    font-weight: 500;
+    font-weight: bold;
   }
   .discussion-column {
     &.image-block {
@@ -152,7 +152,6 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
     color: #686868;
     @include fontSize(11px);
     font-style: italic;
-    font-weight: 300;
   }
 
   .collectionViewItems {
@@ -310,8 +309,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   .title {
     display: block;
     @include fontSize(14px);
-    @if $use_high_contrast { font-weight: bold; }
-    @else { font-weight: 500; }
+    font-weight: bold;
     &:focus {
       outline: 0;
       text-decoration: underline;

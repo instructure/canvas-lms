@@ -2,12 +2,11 @@ define [
   '../mockFilesENV'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/shared/PublishCloud'
   'compiled/models/FilesystemObject'
-], (mockFilesEnv, React, ReactDOM, $, PublishCloud, FilesystemObject) ->
-
-  Simulate = React.addons.TestUtils.Simulate
+], (mockFilesEnv, React, ReactDOM, {Simulate}, $, PublishCloud, FilesystemObject) ->
 
   # Integration Tests
   module 'PublishCloud',

@@ -1,0 +1,36 @@
+// Get a list of all the test files to include
+<%
+  matcher = ENV['JS_SPEC_MATCHER'] || 'spec/**/*Spec.js' # default to all regular canvas specs
+  files = Dir["spec/{javascripts,plugins/*/javascripts}/**/*{.spec,Spec}.js"] + # regular canvas (+ plugin) specs
+          Dir["public/javascripts/compiled/ember/**/*.spec.js"]                 # ember specs
+  files &= Dir[matcher]
+  files.sort!
+  files.each do |file|
+    file.sub!(/\A(spec|public\/javascripts)\//, {"spec/" => "../../spec/", "public/javascripts/" => ""})
+    file.sub!(/\.js\z/, '')
+  end
+%>
+var thingsToLoadWithRequireJS = <%= files.inspect %>
+
+// include the english translations by default, same as would happen in
+// production via common.js. this saves the test writer from having to stub
+// translations anytime they need to use code that uses a no-default
+// translation call (e.g. I18n.t('#date.formats.medium')) with the default
+// locale
+thingsToLoadWithRequireJS.push('translations/_core_en')
+
+window.addEventListener("DOMContentLoaded", function() {
+  if (!document.getElementById('fixtures')) {
+    var fixturesDiv = document.createElement('div')
+    fixturesDiv.id = 'fixtures'
+    document.body.appendChild(fixturesDiv)
+  }
+}, false)
+
+if(!window.ENV) window.ENV = {}
+
+requirejs.config({
+  baseUrl: '/base/public/javascripts',
+  deps: thingsToLoadWithRequireJS, // dynamically load all test files
+  callback: window.__karma__.start
+});

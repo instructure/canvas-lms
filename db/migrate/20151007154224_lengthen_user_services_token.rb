@@ -1,4 +1,4 @@
-class LengthenUserServicesToken < ActiveRecord::Migration
+class LengthenUserServicesToken < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

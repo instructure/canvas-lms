@@ -1,4 +1,4 @@
-class CreateDiscussionEntryParticipants < ActiveRecord::Migration
+class CreateDiscussionEntryParticipants < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

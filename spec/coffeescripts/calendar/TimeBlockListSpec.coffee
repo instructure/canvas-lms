@@ -3,7 +3,8 @@ define [
   'jquery'
   'compiled/calendar/TimeBlockList'
   'moment'
-], ($, TimeBlockList, moment) ->
+  'compiled/util/fcUtil'
+], ($, TimeBlockList, moment, fcUtil) ->
 
   module "TimeBlockList",
     setup: ->
@@ -20,7 +21,8 @@ define [
         [wrappedDate("2/3/#{nextYear} 11:15"), wrappedDate("2/3/#{nextYear} 15:01"), true]
         [wrappedDate("2/3/#{nextYear} 16:00"), wrappedDate("2/3/#{nextYear} 19:00")]
       ]
-      @me = new TimeBlockList(@$holder, @$splitter, @blocks)
+      @blankRow = { date: fcUtil.wrap(new Date(2017, 2, 3)) }
+      @me = new TimeBlockList(@$holder, @$splitter, @blocks, @blankRow)
 
     teardown: ->
       @$holder.detach()
@@ -34,6 +36,8 @@ define [
   test "should not include locked or blank rows in .blocks()", ->
     deepEqual @me.blocks(), [@blocks[0], @blocks[2]]
 
+  test "should not render custom date in blank row if more than one time block already", ->
+    equal(@me.rows[3].$date.val(), '')
 
   test "should handle intialization of locked / unlocked rows", ->
     ok !@me.rows[0].locked, 'first row should not be locked'
@@ -86,3 +90,23 @@ define [
 
     equal @me.rows.length, 12
     equal @me.blocks().length, 10
+
+  module "TimeBlockList with no time blocks",
+    setup: ->
+      wrappedDate = (str) ->
+        moment( new Date(str))
+
+      @$holder = $('<table>').appendTo("#fixtures")
+      @$splitter = $('<a>').appendTo("#fixtures")
+      @blocks = []
+      @blankRow = { date: fcUtil.wrap(new Date(2050, 2, 3)) }
+      @me = new TimeBlockList(@$holder, @$splitter, @blocks, @blankRow)
+
+    teardown: ->
+      @$holder.detach()
+      @$splitter.detach()
+      $("#fixtures").empty()
+      $(".ui-tooltip").remove()
+
+  test "should render custom date in blank row if provided", ->
+    equal(@me.rows[0].$date.val(), 'Thu Mar 3, 2050')

@@ -1,4 +1,4 @@
-class RemoveUnusedExternalFeedColumns < ActiveRecord::Migration
+class RemoveUnusedExternalFeedColumns < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

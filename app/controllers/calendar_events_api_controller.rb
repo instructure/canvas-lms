@@ -996,7 +996,8 @@ class CalendarEventsApiController < ApplicationController
     @context_codes = selected_contexts.map(&:asset_string)
     @section_codes = []
     if user
-      @section_codes = user.section_context_codes(@context_codes)
+      is_admin = user.roles(@domain_root_account).include?('admin') # if we're an admin - don't try to figure out which sections we belong to; just include all of them
+      @section_codes = user.section_context_codes(@context_codes, is_admin)
     end
 
     if @type == :event && @start_date && user
@@ -1243,7 +1244,10 @@ class CalendarEventsApiController < ApplicationController
   def require_authorization
     @errors = {}
     user = @observee || @current_user
-    codes = (params[:context_codes] || [user.asset_string])[0, 10]
+    # appointment groups show up here in find-appointment mode; give them a free ride
+    ag_count = (params[:context_codes] || []).count { |code| code =~ /\Aappointment_group_/ }
+    context_limit = @domain_root_account.settings[:calendar_contexts_limit] || 10
+    codes = (params[:context_codes] || [user.asset_string])[0, context_limit + ag_count]
     get_options(codes, user)
 
     # if specific context codes were requested, ensure the user can access them

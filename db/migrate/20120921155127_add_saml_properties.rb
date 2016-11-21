@@ -1,4 +1,4 @@
-class AddSamlProperties < ActiveRecord::Migration
+class AddSamlProperties < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

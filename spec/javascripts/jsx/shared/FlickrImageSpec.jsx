@@ -1,9 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/shared/FlickrImage'
-], (React, FlickrImage) => {
-
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, FlickrImage) => {
 
   module('FlickrImage View');
 

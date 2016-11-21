@@ -15,7 +15,8 @@ requirejs.config({
       'vendor': 'canvas/vendor',
       'timezone': 'canvas/timezone',
       'jquery.instructure_date_and_time': 'canvas/jquery.instructure_date_and_time',
-      'i18nObj': 'i18n'
+      'i18nObj': 'i18n',
+      'moment': 'canvas/symlink_to_node_modules/moment/moment'
     },
 
     'canvas/jquery.instructure_date_and_time': {

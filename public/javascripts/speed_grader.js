@@ -1614,7 +1614,7 @@ define([
             .data('attachment', attachment)
             .click(function(event){
               event.preventDefault();
-              EG.loadSubmissionPreview($(this).data('attachment'));
+              EG.loadSubmissionPreview($(this).data('attachment'), null);
             })
           .end()
           .find('a.submission-file-download')
@@ -1648,7 +1648,7 @@ define([
       }
 
       // load up a preview of one of the attachments if we can.
-      this.loadSubmissionPreview(preview_attachment);
+      this.loadSubmissionPreview(preview_attachment, submission);
 
       // if there is any submissions after this one, show a notice that they are not looking at the newest
       $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
@@ -1794,7 +1794,7 @@ define([
       };
     },
 
-    loadSubmissionPreview: function(attachment) {
+    loadSubmissionPreview: function(attachment, submission) {
       clearInterval(crocodocSessionTimer);
       $submissions_container.children().hide();
       $(".speedgrader_alert").hide();
@@ -1804,10 +1804,10 @@ define([
           $this_student_has_a_submission.show();
       } else if (attachment) {
         this.renderAttachment(attachment);
-      } else if (this.currentStudent.submission.external_tool_url) {
-        this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, this.currentStudent.submission.external_tool_url)
+      } else if (submission && submission.submission_type === 'basic_lti_launch') {
+        this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission.external_tool_url);
       } else {
-        this.renderSubmissionPreview()
+        this.renderSubmissionPreview();
       }
     },
 
@@ -1837,7 +1837,7 @@ define([
       var launchUrl = urlBase + '&url=' + encodeURIComponent(externalToolUrl);
       var iframe = SpeedgraderHelpers.buildIframe(htmlEscape(launchUrl), {
         className: 'tool_launch',
-        allowfullscreeen: true
+        allowfullscreen: true
       });
       $div.html(
         $.raw(iframe)

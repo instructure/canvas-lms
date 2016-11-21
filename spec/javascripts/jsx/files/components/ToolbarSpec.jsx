@@ -1,10 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jquery',
   'jsx/files/Toolbar'
-], (React, $, Toolbar) => {
+], (React, TestUtils, $, Toolbar) => {
 
-  const { TestUtils } = React.addons;
   const Folder = require('compiled/models/Folder');
   const File = require('compiled/models/File');
 

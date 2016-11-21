@@ -4,7 +4,7 @@ define([
   'axios',
   'convert_case',
   'i18n!grading_periods',
-  'bower/react-tokeninput/dist/react-tokeninput',
+  'react-tokeninput',
 ], function(React, _, axios, ConvertCase, I18n, TokenInput) {
   let ComboboxOption = TokenInput.Option;
   TokenInput = TokenInput.default;

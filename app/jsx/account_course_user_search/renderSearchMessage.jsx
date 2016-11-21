@@ -1,6 +1,7 @@
 define([
+  'react', //for React.createElement outputted by jsx
   "i18n!account_course_user_search",
-], function(I18n) {
+], function(React, I18n) {
 
   return function(collection, loadMore, noneFoundMessage) {
     if (!collection || collection.loading) {

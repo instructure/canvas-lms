@@ -1,4 +1,4 @@
-class FixRubricAssessmentYaml < ActiveRecord::Migration
+class FixRubricAssessmentYaml < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

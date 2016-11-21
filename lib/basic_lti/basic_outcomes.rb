@@ -197,6 +197,7 @@ module BasicLTI
         raw_score = Float(self.result_total_score) rescue false
         error_message = nil
         submission_hash = {}
+        existing_submission = assignment.submissions.where(user_id: user.id).first
         if (text = result_data_text)
           submission_hash[:body] = text
           submission_hash[:submission_type] = 'online_text_entry'
@@ -206,7 +207,7 @@ module BasicLTI
         elsif (launch_url = result_data_launch_url)
           submission_hash[:url] = launch_url
           submission_hash[:submission_type] = 'basic_lti_launch'
-        elsif !assignment.submissions.exists?(user_id: user.id)
+        elsif !existing_submission || existing_submission.submission_type.blank?
           submission_hash[:submission_type] = 'external_tool'
         end
 

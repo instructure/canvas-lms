@@ -1,4 +1,4 @@
-class DeleteEmptyConversations < ActiveRecord::Migration
+class DeleteEmptyConversations < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

@@ -1,11 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/external_apps/lib/AppCenterStore'
   'jsx/external_apps/components/AppFilters'
-], (React, ReactDOM, store, AppFilters) ->
+], (React, ReactDOM, TestUtils, store, AppFilters) ->
 
-  TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 

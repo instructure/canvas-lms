@@ -1,4 +1,4 @@
-class AddQuizRegradeForeignKeys < ActiveRecord::Migration
+class AddQuizRegradeForeignKeys < ActiveRecord::Migration[4.2]
   tag :predeploy
   def self.up
     add_foreign_key_if_not_exists :quiz_regrades, :users

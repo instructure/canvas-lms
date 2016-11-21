@@ -1,4 +1,4 @@
-class ChangeExternalFeedEntryTitleToText < ActiveRecord::Migration
+class ChangeExternalFeedEntryTitleToText < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

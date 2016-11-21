@@ -1,4 +1,4 @@
-class AddOutcomeStandardsColumns < ActiveRecord::Migration
+class AddOutcomeStandardsColumns < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class DropCachedS3Url < ActiveRecord::Migration
+class DropCachedS3Url < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

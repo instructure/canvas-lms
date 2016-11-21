@@ -1,4 +1,4 @@
-class AddDeletedAtToConversationMessageParticipants < ActiveRecord::Migration
+class AddDeletedAtToConversationMessageParticipants < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

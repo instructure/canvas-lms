@@ -1,4 +1,4 @@
-class AddPseudonymToStudentViewStudents < ActiveRecord::Migration
+class AddPseudonymToStudentViewStudents < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

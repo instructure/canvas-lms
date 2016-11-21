@@ -1,4 +1,4 @@
-class DropMovedInAccountStructure < ActiveRecord::Migration
+class DropMovedInAccountStructure < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

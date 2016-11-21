@@ -3,6 +3,7 @@ jst
 vendor
 
 /bower
+/symlink_to_node_modules
 /jsx/.module-cache
 /jsx/sample.js
 /mediaelement

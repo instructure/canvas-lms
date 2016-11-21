@@ -82,6 +82,15 @@ describe "/courses/_recent_event" do
 
       expect(response.body).to include(view.datetime_string(@assignment.due_at))
     end
+
+    it 'shows overridden due date' do
+      different_due_at = 2.days.from_now
+      create_adhoc_override_for_assignment(@assignment, @user, due_at: different_due_at)
+
+      render partial: "courses/recent_event", object: @assignment, locals: {is_hidden: false}
+
+      expect(response.body).to include(view.datetime_string(different_due_at))
+    end
   end
 
   context "assignment muting" do

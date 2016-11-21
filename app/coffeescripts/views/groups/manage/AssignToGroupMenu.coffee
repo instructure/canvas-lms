@@ -45,7 +45,7 @@ define [
             else if @cloneCategoryView.changeGroups
               @moveUser(newGroupId)
             else
-              $("[data-user-id='#{userId}']").focus()
+              $("[data-user-id='user_#{userId}']").focus()
               @hide()
       else
         @moveUser(newGroupId)

@@ -187,6 +187,7 @@ define [
         el: @$messageCourse,
         courses: @options.courses,
         defaultOption: I18n.t('select_course', 'Select course')
+        messageableOnly: true
       )
       if @model
         if @model.get('context_code')

@@ -322,10 +322,14 @@ TEXT
                     <%= settings.check_box :enable_eportfolios, :checked => @account.settings[:enable_eportfolios] != false %>
                     <%= settings.label :enable_eportfolios, :en => "ePortfolios" %>
                   </div>
-                  <div>
-                    <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
-                    <%= f.label :allow_sis_import, :en => "SIS imports" %>
-                  </div>
+
+                  <% if !@account.feature_enabled?(:new_sis_integrations) %>
+                    <div id="old_sis_integrations">
+                      <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
+                      <%= f.label :allow_sis_import, t("SIS imports") %>
+                    </div>
+                  <% end %>
+
                   <div>
                     <%= settings.check_box :allow_invitation_previews, :checked => @account.settings[:allow_invitation_previews] %>
                     <%= settings.label :allow_invitation_previews, :en => "Invitation Previews" %>
@@ -334,7 +338,10 @@ TEXT
                     <%= settings.check_box :enable_alerts, :checked => @account.settings[:enable_alerts] %>
                     <%= settings.label :enable_alerts, :en => "Alerts (beta)" %>
                   </div>
-                <% end %><%# end of site_admin? %>
+                <% end %>
+                <%# end of site_admin? %>
+
+
                 <div id="global_includes_warning_message_wrapper">
                   <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
                   <%= settings.label :global_includes, :en => "Custom CSS/JavaScript overrides" %>
@@ -357,7 +364,10 @@ TEXT
                   <%= settings.check_box :enable_profiles, :checked => @account.settings[:enable_profiles] %>
                   <%= settings.label :enable_profiles, :en => "Enable Profiles" %>
                 </div>
-              <% end %><%# end of :manage_site_settings %>
+              <% end %>
+              <%# end of :manage_site_settings %>
+
+
               <div>
                 <%= settings.check_box :sub_account_includes, checked: @account.settings[:sub_account_includes] %>
                 <%= settings.label :sub_account_includes, :en => "Let sub-accounts use the Theme Editor to customize their own branding" %>
@@ -419,62 +429,13 @@ TEXT
           <% end %>
         </fieldset>
 
-        <% if !@account.site_admin? &&
-                @account.root_account? &&
-                @account.feature_allowed?(:post_grades) &&
-                @account.grants_right?(@current_user, :manage_site_settings) %>
-            <fieldset id="add_sis_app_token">
-              <legend><%= t("SIS Agent Token Authentication") %></legend>
-              <p style="font-size: 0.9em;"><%= t("This will allow you to authenticate Canvas for posting grades to SIS") %></p>
-              <%= f.fields_for :settings do |settings| %>
-                  <table class="formtable">
-                    <tr>
-                      <td><%= settings.blabel :sis_app_token, :en => "SIS Agent Token" %></td>
-                      <td><%= settings.text_field :sis_app_token, :value => @account.settings[:sis_app_token] %></td>
-                    </tr>
-                    <tr>
-                      <td><%= settings.blabel :sis_app_url, :en => "SIS App URL" %></td>
-                      <td><%= settings.text_field :sis_app_url, :value => @account.settings[:sis_app_url] %></td>
-                    </tr>
-                  </table>
-              <% end %>
-            </fieldset>
+        <% unless @account.site_admin? %>
+            <% if @account.feature_enabled?(:new_sis_integrations) %>
+                <%= render partial: 'sis_integration_settings', locals: { f: f } %>
+            <% else %>
+                <%= render partial: 'sis_integration_settings_old', locals: { f: f } %>
+            <% end %>
         <% end %>
-
-        <% if !@account.site_admin? && Assignment.sis_grade_export_enabled?(@account) %>
-          <fieldset>
-            <legend><%= t("SIS Grade Export Settings") %></legend>
-            <table class="formtable">
-              <%= f.fields_for :settings do |settings| %>
-                <%= settings.fields_for :sis_default_grade_export do |r| %>
-                  <% hash = @account.sis_default_grade_export %>
-                  <% disabled = hash[:locked] && hash[:inherited] %>
-                  <tr>
-                    <td colspan="2">
-                      <div class="ic-Checkbox-group">
-                        <div class="ic-Form-control ic-Form-control--checkbox">
-                          <%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                          <label class="ic-Label" for="account_settings_sis_default_grade_export_value" />
-                          <%= t("\"Post Grades to SIS\" checkbox is enabled by default for assignments, graded discussions, and quizzes") %>
-                        </label>
-                      </div>
-                    </div>
-                  </td>
-                  </tr>
-                  <% unless disabled %>
-                    <tr>
-                      <td colspan="2" class="sub_checkbox">
-                        <%= r.check_box :locked, :checked => hash[:locked], :id => "account_settings_sis_default_grade_export_locked_for_sub_accounts" %>
-                        <%= r.label :locked_for_sub_accounts, :en => "Lock this setting for sub-accounts" %>
-                      </td>
-                    </tr>
-                  <% end %>
-                <% end %>
-              <% end %>
-            </table>
-          </fieldset>
-        <% end %>
-
 
         <% if @account.root_account? && !@account.site_admin? && show_feedback_link? %>
           <div id="custom_help_link_settings"></div>

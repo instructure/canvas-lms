@@ -2,12 +2,11 @@ define([
   'jquery',
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jsx/files/Breadcrumbs',
   'compiled/models/Folder',
   'helpers/fakeENV'
-], ($, React, ReactDOM, Breadcrumbs, Folder, fakeENV) => {
-
-  const TestUtils = React.addons.TestUtils
+], ($, React, ReactDOM, TestUtils, Breadcrumbs, Folder, fakeENV) => {
 
   module('Files Breadcrumbs Component', {
     setup () {

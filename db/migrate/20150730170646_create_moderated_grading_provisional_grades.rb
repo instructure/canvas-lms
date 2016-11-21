@@ -1,4 +1,4 @@
-class CreateModeratedGradingProvisionalGrades < ActiveRecord::Migration
+class CreateModeratedGradingProvisionalGrades < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

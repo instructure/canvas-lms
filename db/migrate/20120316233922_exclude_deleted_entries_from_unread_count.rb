@@ -1,4 +1,4 @@
-class ExcludeDeletedEntriesFromUnreadCount < ActiveRecord::Migration
+class ExcludeDeletedEntriesFromUnreadCount < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

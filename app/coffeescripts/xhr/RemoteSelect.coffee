@@ -28,7 +28,7 @@ define [
   'jquery'
   'underscore'
   'compiled/class/cache'
-  'vendor/spin'
+  'spin.js'
   'jst/util/select/optgroups'
   'jst/util/select/options'
 ], ($, _, cache, Spinner, optGroupTpl, optsTpl) ->

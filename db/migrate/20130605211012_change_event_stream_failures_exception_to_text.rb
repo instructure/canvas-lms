@@ -1,4 +1,4 @@
-class ChangeEventStreamFailuresExceptionToText < ActiveRecord::Migration
+class ChangeEventStreamFailuresExceptionToText < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class ClearRailsCache < ActiveRecord::Migration
+class ClearRailsCache < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   # note that if you have any environments that are "split" somehow -

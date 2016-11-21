@@ -7,7 +7,7 @@
   title="{{#t 'group_leader'}}Group Leader{{/t}}"></i>{{/if}}
 {{#if canAssignToGroup}}
   <a href="#"
-     data-user-id="{{id}}"
+     data-user-id="user_{{id}}"
      class="assign-to-group"
      aria-haspopup="true"
      aria-label="{{#t "assign_user_to_group"}}Assign {{name}} to a group{{/t}}">
@@ -17,8 +17,8 @@
 {{#if canEditGroupAssignment}}
   <div>
     <a href="#"
-       id='group-{{groupId}}-user-{{id}}-actions'
-       data-user-id="{{id}}"
+       id='group-{{groupId}}-user-user_{{id}}-actions'
+       data-user-id="user_{{id}}"
        class="al-trigger group-user-actions"
        data-kyle-menu-options='{"appendMenuTo": "body"}'
        role="button">
@@ -30,7 +30,7 @@
     <ul class="al-options">
         <li>
           <a href="#"
-             data-user-id="{{id}}"
+             data-user-id="user_{{id}}"
              aria-label="{{#t "remove_from_group"}}Remove {{name}} from group{{/t}}"
              class="icon-trash remove-from-group">
               {{#t "remove"}}Remove{{/t}}
@@ -39,7 +39,7 @@
       {{#if isLeader}}
     <li>
         <a href="#"
-           data-user-id="{{id}}"
+           data-user-id="user_{{id}}"
            aria-label="{{#t "remove_user_as_leader"}}Remove {{name}} as leader{{/t}}"
            class="icon-user remove-as-leader">
             {{#t "remove_as_leader"}}Remove as Leader{{/t}}
@@ -48,7 +48,7 @@
       {{else}}
       <li>
         <a href="#"
-           data-user-id="{{id}}"
+           data-user-id="user_{{id}}"
            aria-label="{{#t "set_user_as_leader"}}Set {{name}} as leader{{/t}}"
            class="icon-user set-as-leader">
             {{#t "set_as_leader"}}Set as Leader{{/t}}
@@ -57,8 +57,8 @@
       {{/if}}
       <li>
         <a href="#"
-           data-focus-returns-to='group-{{groupId}}-user-{{id}}-actions'
-           data-user-id="{{id}}"
+           data-focus-returns-to='group-{{groupId}}-user-user_{{id}}-actions'
+           data-user-id="user_{{id}}"
            aria-label="{{#t "move_to_new_group"}}Move {{name}} to a new group{{/t}}"
            class="icon-updown edit-group-assignment">
             {{#t "move"}}Move To...{{/t}}

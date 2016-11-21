@@ -1,4 +1,4 @@
-class AddRecordingReadyToWebConference < ActiveRecord::Migration
+class AddRecordingReadyToWebConference < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

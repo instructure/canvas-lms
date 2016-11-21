@@ -1,4 +1,4 @@
-class AddRestrictionOptionsToCoursesAndSections < ActiveRecord::Migration
+class AddRestrictionOptionsToCoursesAndSections < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -135,11 +135,13 @@ define [
 
   module 'AssignmentListItemViewSpec',
     setup: ->
+      fakeENV.setup()
       genSetup.call @
       @snapshot = tz.snapshot()
       I18nStubber.pushFrame()
 
     teardown: ->
+      fakeENV.teardown()
       genTeardown.call @
       tz.restore(@snapshot)
       I18nStubber.popFrame()
@@ -199,6 +201,7 @@ define [
     ok view.delete.called
 
   test 'does not attempt to delete an assignment due in a closed grading period', ->
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
     @model.set('has_due_date_in_closed_grading_period', true)
     view = createView(@model)
 
@@ -314,11 +317,13 @@ define [
     ok view.$("#assignment_#{@model.id} a.delete_assignment.disabled").length
 
   test "disallows deleting assignments due in closed grading periods", ->
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
     @model.set('has_due_date_in_closed_grading_period', true)
     view = createView(@model)
     ok view.$("#assignment_#{@model.id} a.delete_assignment.disabled").length
 
   test "allows deleting non-frozen assignments not due in closed grading periods", ->
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
     @model.set('frozen', false)
     @model.set('has_due_date_in_closed_grading_period', false)
     view = createView(@model)
@@ -330,6 +335,7 @@ define [
     ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
 
   test "allows deleting assignments due in closed grading periods for admins", ->
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
     @model.set('has_assignment_due_in_closed_grading_period', true)
     view = createView(@model, userIsAdmin: true)
     ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length

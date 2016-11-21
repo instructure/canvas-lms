@@ -1,6 +1,6 @@
 define [
   'compiled/gradebook2/GradebookHelpers'
-  'jsx/gradebook/grid/constants'
+  'jsx/gradebook/shared/constants'
 ], (GradebookHelpers, GradebookConstants) ->
   module "GradebookHelpers#noErrorsOnPage",
     setup: ->

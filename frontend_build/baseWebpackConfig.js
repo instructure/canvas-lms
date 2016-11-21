@@ -4,10 +4,10 @@ var I18nPlugin = require("./i18nPlugin");
 var ClientAppsPlugin = require("./clientAppPlugin");
 var CompiledReferencePlugin = require("./CompiledReferencePlugin");
 var bundleEntries = require("./bundles");
-var ShimmedAmdPlugin = require("./shimmedAmdPlugin");
 var BundleExtensionsPlugin = require("./BundleExtensionsPlugin");
 var WebpackOnBuildPlugin = require('on-build-webpack');
 var path = require('path');
+require('babel-polyfill')
 
 module.exports = {
   devtool: 'eval',
@@ -23,13 +23,21 @@ module.exports = {
   },
   resolve: {
     alias: {
+      'old_version_of_react_used_by_canvas_quizzes_client_apps': __dirname + '/../client_apps/canvas_quizzes/vendor/js/old_version_of_react_used_by_canvas_quizzes_client_apps',
+      handlebars: __dirname + '/../node_modules/handlebars/dist/handlebars.runtime',
+      'node_modules-version-of-backbone': __dirname + '/../node_modules/backbone',
+      'node_modules-version-of-moment': __dirname + '/../node_modules/moment',
+      'node_modules-version-of-react-modal': __dirname + '/../node_modules/react-modal',
+
+      // once we are all-webpack we should remove this line and just change all the 'require's
+      // to instructure-ui compnentns to have the right path
+      'instructure-ui': __dirname + '/../node_modules/instructure-ui/lib/components',
+
+      // see comment at the top of this file for how we should do this better
+      moment: 'custom_moment_locales/mi_nz',
+
       qtip: "jquery.qtip",
       'backbone': 'Backbone',
-      'React': 'react',
-      realTinymce: "bower/tinymce/tinymce",
-      'ic-ajax': "bower/ic-ajax/dist/amd/main",
-      'ic-tabs': "bower/ic-tabs/dist/amd/main",
-      'bower/axios/dist/axios': 'bower/axios/dist/axios.amd',
       'timezone': 'timezone_webpack_shim'
     },
     root: [
@@ -57,6 +65,23 @@ module.exports = {
     preLoaders: [],
     noParse: [],
     loaders: [
+
+      // to get tinymce to work. see: https://github.com/tinymce/tinymce/issues/2836
+      {
+        test: require.resolve('tinymce/tinymce'),
+        loaders: [
+          'imports?this=>window',
+          'exports?window.tinymce'
+        ]
+      },
+      {
+        test: /tinymce\/(themes|plugins)\//,
+        loaders: [
+          'imports?this=>window'
+        ]
+      },
+
+
       {
         test: /\.js$/,
         include: path.resolve(__dirname, "../public/javascripts"),
@@ -80,8 +105,8 @@ module.exports = {
           /client_apps\/canvas_quizzes\/apps\//
         ],
         loaders: [
-          'babel?cacheDirectory=tmp',
-          'jsxYankPragma'
+          // make sure we don't try to cache JSX assets when building for production
+          'babel' + (process.env.NODE_ENV === 'production' ? '': '?cacheDirectory=tmp')
         ]
       },
       {
@@ -118,7 +143,6 @@ module.exports = {
       {
         test: /\.hbs$/,
         include: [
-          path.resolve(__dirname, "../app/coffeescript/ember"),
           /app\/coffeescripts\/ember\/screenreader_gradebook\/templates\//,
           /app\/coffeescripts\/ember\/shared\/templates\//
         ],
@@ -139,7 +163,7 @@ module.exports = {
         loader: "exports-loader?window.jQuery"
       },
       {
-        test: /bower\/handlebars\/handlebars\.runtime/,
+        test: /node_modules\/handlebars\/dist\/handlebars\.runtime/,
         loader: "exports-loader?Handlebars"
       },
       {
@@ -153,7 +177,6 @@ module.exports = {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
     }),
     new I18nPlugin(),
-    new ShimmedAmdPlugin(),
     new ClientAppsPlugin(),
     new CompiledReferencePlugin(),
     new BundleExtensionsPlugin(),
@@ -206,10 +229,6 @@ module.exports = {
     new webpack.PrefetchPlugin("./app/jsx/files/ShowFolder.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/files/UploadButton.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/files/utils/openMoveDialog.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/gradebook/grid/components/column_types/headerRenderer.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/gradebook/grid/components/dropdown_components/assignmentHeaderDropdownOptions.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/gradebook/grid/components/gradebook.jsx"),
-    new webpack.PrefetchPlugin("./app/jsx/gradebook/grid/wrappers/columnFactory.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/gradebook/SISGradePassback/PostGradesApp.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/gradebook/SISGradePassback/PostGradesDialogCorrectionsPage.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/grading/gradingPeriodCollection.jsx"),
@@ -231,8 +250,5 @@ module.exports = {
     new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/statistics/js/views/app.jsx"),
     new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/statistics/js/views/questions/multiple_choice.jsx"),
     new webpack.PrefetchPlugin("./client_apps/canvas_quizzes/apps/statistics/js/views/summary/report.jsx"),
-    new webpack.PrefetchPlugin("./public/javascripts/axios.js"),
-    new webpack.PrefetchPlugin("./public/javascripts/bower/k5uploader/lib/ui_config_from_node.js"),
-    new webpack.PrefetchPlugin("./public/javascripts/bower/reflux/dist/reflux.min.js")
   ]
 };

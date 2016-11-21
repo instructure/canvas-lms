@@ -1,0 +1,11 @@
+# to use this add docker-compose/js-tests.override.yml
+# to your COMPOSE_FILE var in .env
+
+version: '2'
+services:
+  js-tests:
+   build: ./docker-compose/karma
+   volumes:
+     - ".:/app"
+   environment:
+     NODE_ENV: CI

@@ -3,7 +3,7 @@ define [
   '../start_app'
   '../shared_ajax_fixtures'
   'compiled/gradebook2/GradebookHelpers'
-  'jsx/gradebook/grid/constants'
+  'jsx/gradebook/shared/constants'
 ], (Ember, startApp, fixtures, GradebookHelpers, GradebookConstants) ->
 
   {run} = Ember

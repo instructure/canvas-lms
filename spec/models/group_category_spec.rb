@@ -468,6 +468,101 @@ describe GroupCategory do
       expect(new_group.wiki_id).to be_nil
     end
   end
+
+  describe "randomly assigning by section" do
+    context "group size distribution" do
+      def test_group_distribution(section_counts, group_count)
+        calc = GroupCategory::GroupBySectionCalculator.new(nil)
+        mock_users_by_section = {}
+        section_counts.each_with_index do |u_count, idx|
+          mock_users_by_section[idx] = stub(:count => u_count)
+        end
+        calc.users_by_section_id = mock_users_by_section
+        calc.user_count = section_counts.sum
+        calc.groups = stub(:count => group_count)
+        dist = calc.determine_group_distribution
+        dist.sort_by{|k, v| k}.map(&:last)
+      end
+
+      it "should handle small sections" do
+        # it would normally try to go for 5 students per group since 20 / 4
+        # but since we have small sections we'll have to increase the group sizes for the big section
+        expect(test_group_distribution([2, 3, 15], 4)).to eq [[2], [3], [8, 7]]
+      end
+
+      it "should try to smartishly distribute users" do
+        # can't keep things perfectly evenly distributed, but we can try our best
+        expect(test_group_distribution([2, 3, 14, 11], 10)).to eq [[2], [3], [4, 4, 3, 3], [3, 3, 3, 2]]
+      end
+
+      it "should not split up groups twice in a row" do
+        # my original implementation would have made split the last section up into 5 groups
+        # because it still had the largest remainder after splitting once
+        expect(test_group_distribution([5, 5, 9, 11], 10)).to eq [[3, 2], [5], [3, 3, 3], [3, 3, 3, 2]]
+      end
+    end
+
+    before :once do
+      @category = @course.group_categories.create!(:name => "category")
+    end
+
+    it "should require as many groups as sections" do
+      section2 = @course.course_sections.create!
+      student_in_course(:course => @course)
+      student_in_course(:course => @course, :section => section2)
+      @category.groups.create!(:name => "group", :context => @course)
+
+      expect(@category.distribute_members_among_groups_by_section).to be_falsey
+      expect(@category.errors.full_messages.first).to include("Must have at least as many groups as sections")
+    end
+
+    it "should require empty groups" do
+      student_in_course(:course => @course)
+      group = @category.groups.create!(:name => "group", :context => @course)
+      group.add_user(@student)
+
+      expect(@category.distribute_members_among_groups_by_section).to be_falsey
+      expect(@category.errors.full_messages.first).to include("Groups must be empty")
+    end
+
+    it "should complain if groups have size restrictions" do
+      group = @category.groups.create!(:name => "group", :context => @course)
+      group.max_membership = 2
+      group.save!
+
+      expect(@category.distribute_members_among_groups_by_section).to be_falsey
+      expect(@category.errors.full_messages.first).to include("Groups cannot have size restrictions")
+    end
+
+    it "should be able to randomly distribute members into groups" do
+      section1 = @course.default_section
+      section2 = @course.course_sections.create!
+      section3 = @course.course_sections.create!
+
+      users_to_section = {}
+      create_users_in_course(@course, 2, return_type: :record, section_id: section1.id).each do |user|
+        users_to_section[user] = section1
+      end
+      create_users_in_course(@course, 4, return_type: :record, section_id: section2.id).each do |user|
+        users_to_section[user] = section2
+      end
+      create_users_in_course(@course, 6, return_type: :record, section_id: section3.id).each do |user|
+        users_to_section[user] = section3
+      end
+
+      groups = []
+      6.times { |i| groups << @category.groups.create(:name => "Group #{i}", :context => @course) }
+
+      expect(@category.distribute_members_among_groups_by_section).to be_truthy
+      groups.each do |group|
+        group.reload
+        expect(group.users.count).to eq 2
+        u1, u2 = group.users.to_a
+        expect(users_to_section[u1]).to eq users_to_section[u2] # should be in same section
+      end
+      expect(groups.map(&:users).flatten).to match_array users_to_section.keys # should have distributed everybody
+    end
+  end
 end
 
 def assert_random_group_assignment(category, course, initial_spread, result_spread, opts={})

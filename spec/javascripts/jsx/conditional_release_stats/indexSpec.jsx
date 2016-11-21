@@ -1,11 +1,11 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'helpers/fakeENV',
   'jsx/conditional_release_stats/index',
   'jsx/conditional_release_stats/components/breakdown-graphs'
-], (React, ReactDOM, fakeENV, CyoeStats, BreakdownGraphs) => {
-  const TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, fakeENV, CyoeStats, BreakdownGraphs) => {
 
   const defaultEnv = () => ({
     ranges: [

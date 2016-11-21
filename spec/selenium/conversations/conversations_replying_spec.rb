@@ -99,6 +99,26 @@ describe "conversations new" do
         assert_number_of_recipients(2)
       end
     end
+
+    it "should not let a student reply to a student conversation if they lose messaging permissions" do
+      @convo.conversation_participants.where(:user_id => @teacher).delete_all
+      @convo.update_attribute(:context, @course)
+      user_session(@s1)
+      go_to_inbox_and_select_message
+      expect(f('#reply-btn')).to_not be_disabled
+
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+      go_to_inbox_and_select_message
+      expect(f('#reply-btn')).to be_disabled
+    end
+
+    it "should let a student reply to a conversation including a teacher even if they lose messaging permissions" do
+      @convo.update_attribute(:context, @course)
+      user_session(@s1)
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+      go_to_inbox_and_select_message
+      expect(f('#reply-btn')).to_not be_disabled
+    end
   end
 end
 

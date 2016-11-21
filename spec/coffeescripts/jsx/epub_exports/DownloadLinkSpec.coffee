@@ -1,11 +1,11 @@
 define [
-  'underscore'
-  'react'
-  'react-dom'
-  'jsx/epub_exports/DownloadLink'
+  'underscore',
+  'react',
+  'react-dom',
+  'react-addons-test-utils',
+  'jsx/epub_exports/DownloadLink',
   'i18n!epub_exports',
-], (_, React, ReactDOM, DownloadLink, I18n) ->
-  TestUtils = React.addons.TestUtils
+], (_, React, ReactDOM, TestUtils, DownloadLink, I18n) ->
 
   module 'DownloadLink',
     setup: ->

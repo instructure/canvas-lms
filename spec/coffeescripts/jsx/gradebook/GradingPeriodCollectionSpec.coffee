@@ -1,15 +1,14 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'underscore'
   'jsx/grading/gradingPeriodCollection'
   'helpers/fakeENV'
   'jquery.instructure_misc_plugins'
   'compiled/jquery.rails_flash_notifications'
-], (React, ReactDOM, $, _, GradingPeriodCollection, fakeENV) ->
-
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, $, _, GradingPeriodCollection, fakeENV) ->
 
   module 'GradingPeriodCollection',
     setup: ->

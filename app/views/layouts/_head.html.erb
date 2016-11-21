@@ -30,11 +30,16 @@
 !function(){
   var o,s,v;
   if (!(window.Promise && Object.assign && [].find && [].includes && (o={},s=Symbol(),v={},o[s]=v,o[s]===v) && (function f(){}).bind().name==='bound f')) {
-    document.write('<scr'+'ipt src="#{javascript_path(polyfill_url)}"></sc'+'ript>');
+    s = 's', document.write('<'+s+'cr'+'ipt src="#{javascript_path(polyfill_url)}"></'+s+'c'+'ript>');
   }
 }();
       ))
     end
+  %>
+  <%=
+    # Load the fontface observer for lato async and as fast as possible so it doesn't flicker with fallback font.
+    # That's why we don't load it in a 'require' at the bottom of the page
+    javascript_include_tag("#{js_base_url}/vendor/lato-fontfaceobserver.js", async: true)
   %>
   <%= yield :meta_tags %>
   <%= include_custom_meta_tags %>

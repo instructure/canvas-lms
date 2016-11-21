@@ -1,4 +1,4 @@
-class AddTurnitinOriginalityToAccounts < ActiveRecord::Migration
+class AddTurnitinOriginalityToAccounts < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

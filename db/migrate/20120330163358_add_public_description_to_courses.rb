@@ -1,4 +1,4 @@
-class AddPublicDescriptionToCourses < ActiveRecord::Migration
+class AddPublicDescriptionToCourses < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

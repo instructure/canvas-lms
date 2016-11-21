@@ -1,4 +1,4 @@
-class AssociateGradedDiscussionAttachments < ActiveRecord::Migration
+class AssociateGradedDiscussionAttachments < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

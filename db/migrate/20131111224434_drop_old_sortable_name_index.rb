@@ -1,4 +1,4 @@
-class DropOldSortableNameIndex < ActiveRecord::Migration
+class DropOldSortableNameIndex < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   disable_ddl_transaction!

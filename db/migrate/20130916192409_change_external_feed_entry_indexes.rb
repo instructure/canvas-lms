@@ -1,4 +1,4 @@
-class ChangeExternalFeedEntryIndexes < ActiveRecord::Migration
+class ChangeExternalFeedEntryIndexes < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

@@ -202,7 +202,7 @@ module GroupsCommon
   end
 
   def select_randomly_assign_students_option
-    f('.icon-settings').click
+    f('.group-category-summary .icon-settings').click
     wait_for_ajaximations
     f('.randomly-assign-members').click
     wait_for_ajaximations

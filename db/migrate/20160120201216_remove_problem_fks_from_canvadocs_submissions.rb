@@ -1,4 +1,4 @@
-class RemoveProblemFksFromCanvadocsSubmissions < ActiveRecord::Migration
+class RemoveProblemFksFromCanvadocsSubmissions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

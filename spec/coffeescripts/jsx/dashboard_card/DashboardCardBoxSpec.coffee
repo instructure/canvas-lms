@@ -1,12 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/dashboard_card/DashboardCardBox'
   'jsx/dashboard_card/CourseActivitySummaryStore'
-], (React, ReactDOM, _, DashboardCardBox, CourseActivitySummaryStore) ->
-
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, _, DashboardCardBox, CourseActivitySummaryStore) ->
 
   module 'DashboardCardBox',
     setup: ->

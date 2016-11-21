@@ -1,12 +1,15 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'axios',
   'underscore',
-  'jsx/grading/AccountGradingPeriod'
-], (React, ReactDOM, axios, _, GradingPeriod) => {
+  'jsx/grading/AccountGradingPeriod',
+  'helpers/fakeENV',
+  'timezone',
+  'vendor/timezone/America/Chicago'
+], (React, ReactDOM, { Simulate }, axios, _, GradingPeriod, fakeENV, tz, chicago) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
   const allPermissions = { read: true, create: true, update: true, delete: true };
   const noPermissions = { read: false, create: false, update: false, delete: false };
@@ -80,6 +83,15 @@ define([
     let period = this.renderComponent();
     const closeDate = ReactDOM.findDOMNode(period.refs.closeDate).textContent;
     equal(closeDate, "Close Date: Mar 8, 2015 at 12am");
+  });
+
+  test("when the local timezone diffes from the server timezone dates include the timezone", function() {
+    tz.preload('America/Chicago', chicago);
+    fakeENV.setup({TIMEZONE: 'America/Denver', CONTEXT_TIMEZONE: 'America/Chicago'});
+    let period = this.renderComponent();
+    const closeDate = period.refs.closeDate.textContent;
+    equal(closeDate, "Close Date: Mar 7, 2015 at 6pm UTC");
+    fakeENV.teardown();
   });
 
   test("calls the 'onEdit' callback when the edit button is clicked", function() {

@@ -1,0 +1,12 @@
+# to use this add docker-compose/phantomjs-tests.override.yml
+# to your COMPOSE_FILE var in .env
+
+version: '2'
+services:
+  phantomjs-tests:
+   build: ./docker-compose/phantomjs-karma
+   volumes:
+     - ".:/app"
+   environment:
+     NODE_ENV: CI
+     VIRTUAL_HOST: phantom.docker

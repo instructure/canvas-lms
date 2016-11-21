@@ -228,6 +228,34 @@ describe DiscussionTopic do
       expect(@topic.visible_for?(admin)).to be_truthy
     end
 
+    context "participants with teachers and tas" do
+      before(:once) do
+        group_course = course(:active_course => true)
+        @group_student, @group_ta, @group_teacher = create_users(3, return_type: :record)
+        @not_group_student, @group_designer = create_users(2, return_type: :record)
+        group_course.enroll_teacher(@group_teacher).accept!
+        group_course.enroll_ta(@group_ta).accept!
+        group_course.enroll_designer(@group_designer).accept!
+        group_category = group_course.group_categories.create(:name => "new cat")
+        group = group_course.groups.create(:name => "group", :group_category => group_category)
+        group.add_user(@group_student)
+        @announcement = group.announcements.build(:title => "group topic", :message => "group message")
+        @announcement.save!
+      end
+
+      it "should be visible to instructors and tas" do
+        [@group_student, @group_ta, @group_teacher].each do |user|
+          expect(@announcement.active_participants_include_tas_and_teachers.include?(user)).to be_truthy
+        end
+      end
+
+      it "should not include people out of the group or non-instructors" do
+        [@not_group_student, @group_designer].each do |user|
+          expect(@announcement.active_participants_include_tas_and_teachers.include?(user)).to be_falsey
+        end
+      end
+    end
+
     context "differentiated assignements" do
       before do
         @course = course(:active_course => true)
@@ -1217,6 +1245,34 @@ describe DiscussionTopic do
       entry.save!
 
       @topic.ensure_submission(@student)
+      sub = @assignment.submissions.where(:user_id => @student).first
+      expect(sub.attachments.to_a).to eq [@attachment]
+    end
+
+    it "should associate attachments with graded discussion submissions even with silly deleted topics" do
+      gc1 = group_category(:name => "gc1")
+      group_with_user(group_category: gc1, user: @student, :context => @course)
+      gc2 = group_category(:name => "gc2")
+      group_with_user(group_category: gc2, user: @student, :context => @course)
+      group2 = @group
+
+      @assignment = assignment_model(:course => @course)
+      @topic.assignment = @assignment
+      @topic.group_category = gc1
+      @topic.save!
+      @topic.group_category = gc2 # switching group categories deletes the old child topics
+      @topic.save!
+      @topic.reload
+
+      # can't use child_topic_for to show the exact bug
+      # because that's where the reported bug is
+      sub_topic = @topic.child_topics.where(:context_type => "Group", :context_id => group2).first
+
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "homework.png")
+      entry = sub_topic.reply_from(:user => @student, :text => "entry")
+      entry.attachment = @attachment
+      entry.save!
+
       sub = @assignment.submissions.where(:user_id => @student).first
       expect(sub.attachments.to_a).to eq [@attachment]
     end

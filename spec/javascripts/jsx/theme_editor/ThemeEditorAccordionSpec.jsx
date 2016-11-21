@@ -1,12 +1,13 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jquery',
   'jsx/theme_editor/ThemeEditorAccordion',
   'jsx/theme_editor/RangeInput',
   'jsx/theme_editor/ThemeEditorColorRow',
   'jsx/theme_editor/ThemeEditorImageRow',
-], (React, ReactDOM, jQuery, ThemeEditorAccordion, RangeInput, ColorRow, ImageRow) => {
+], (React, ReactDOM, TestUtils, jQuery, ThemeEditorAccordion, RangeInput, ColorRow, ImageRow) => {
 
   let elem, props
 
@@ -222,7 +223,7 @@ define([
         accept: 'image/*'
       }]
     }]
-    const shallowRenderer = React.addons.TestUtils.createRenderer()
+    const shallowRenderer = TestUtils.createRenderer()
     shallowRenderer.render(<ThemeEditorAccordion {...props} />)
     const vdom = shallowRenderer.getRenderOutput()
     const rows = vdom.props.children[0][1].props.children

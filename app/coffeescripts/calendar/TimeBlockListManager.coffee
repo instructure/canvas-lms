@@ -1,4 +1,4 @@
-define ['jquery', 'moment', 'compiled/util/fcUtil', 'bower/fullcalendar/dist/fullcalendar'], ($, moment, fcUtil) ->
+define ['jquery', 'moment', 'compiled/util/fcUtil'], ($, moment, fcUtil) ->
 
   class TimeBlockListManager
     # takes an optional array of Date pairs

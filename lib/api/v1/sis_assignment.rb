@@ -44,22 +44,13 @@ module Api::V1::SisAssignment
     assignments.map { |a| sis_assignment_json(a) }
   end
 
-  private
-
   def sis_assignment_json(assignment)
     json = api_json(assignment, nil, nil, API_SIS_ASSIGNMENT_JSON_OPTS)
     json[:course_id] = assignment.context_id if assignment.context_type == 'Course'
     json[:submission_types] = json.delete(:submission_types_array)
     json[:include_in_final_grade] = include_in_final_grade(assignment)
-    user_overrides = active_user_level_assignment_overrides_for(assignment)
     add_sis_assignment_group_json(assignment, json)
     add_sis_course_sections_json(assignment, json)
-
-    if !user_overrides.nil? && user_overrides.count > 0
-      builder = UserOverridesBuilder.new(assignment, json)
-      builder.update_json
-    end
-
     json
   end
 
@@ -117,12 +108,11 @@ module Api::V1::SisAssignment
     json[:override] = override_json
   end
 
-  def include_in_final_grade(assignment)
+  private def include_in_final_grade(assignment)
     !(assignment.omit_from_final_grade? || assignment.grading_type == 'not_graded')
   end
 
-
-  def active_course_sections_for(context)
+  private def active_course_sections_for(context)
     if context.respond_to?(:active_course_sections) && context.association(:active_course_sections).loaded?
       context.active_course_sections
     elsif context.respond_to?(:course_sections) && context.association(:course_sections).loaded?
@@ -130,17 +120,11 @@ module Api::V1::SisAssignment
     end
   end
 
-  def active_assignment_overrides_for(assignment)
+  private def active_assignment_overrides_for(assignment)
     if assignment.association(:active_assignment_overrides).loaded?
       assignment.active_assignment_overrides
     elsif assignment.association(:assignment_overrides).loaded?
       assignment.assignment_overrides.select(&:active?)
-    end
-  end
-
-  def active_user_level_assignment_overrides_for(assignment)
-    if assignment.assignment_override_students
-      assignment.assignment_override_students
     end
   end
 end

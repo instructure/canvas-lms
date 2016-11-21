@@ -1,4 +1,4 @@
-class AddParametersToCourseImports < ActiveRecord::Migration
+class AddParametersToCourseImports < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -36,7 +36,10 @@ define([
               </span>
             </button>
           </div>
-          <HelpDialog links={this.props.links} onFormSubmit={this.props.closeTray} />
+          <HelpDialog 
+            links={this.props.links}
+            hasLoaded={this.props.hasLoaded}  
+            onFormSubmit={this.props.closeTray} />
         </div>
       );
     }

@@ -482,6 +482,15 @@ describe User do
     expect(@user.recent_feedback(:contexts => [@course])).not_to be_empty
   end
 
+  it "should include recent feedback for student view users" do
+    @course = course_model
+    @course.offer!
+    @assignment = @course.assignments.create :title => "Test Assignment", :points_possible => 10
+    test_student = @course.student_view_student
+    @assignment.grade_student test_student, :grade => 9
+    expect(test_student.recent_feedback).not_to be_empty
+  end
+
   it "should not include recent feedback for unpublished assignments" do
     create_course_with_student_and_assignment
     @assignment.grade_student @user, :grade => 9

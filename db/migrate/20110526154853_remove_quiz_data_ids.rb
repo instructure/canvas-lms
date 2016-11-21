@@ -1,5 +1,5 @@
 # some cloned quiz questions mistakenly have the old question id saved to the data hash, causing issues when trying to edit.
-class RemoveQuizDataIds < ActiveRecord::Migration
+class RemoveQuizDataIds < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   class QuizQuestionDataMigrationARShim < ActiveRecord::Base

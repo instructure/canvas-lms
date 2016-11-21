@@ -1,4 +1,4 @@
-class RemoveNotNullOnVariables < ActiveRecord::Migration
+class RemoveNotNullOnVariables < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

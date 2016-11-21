@@ -1,4 +1,4 @@
-class AddAdhocOverridesToVisibilityView < ActiveRecord::Migration
+class AddAdhocOverridesToVisibilityView < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

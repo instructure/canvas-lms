@@ -417,6 +417,28 @@ describe ContentMigration do
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
     end
 
+    it "should copy dashboard images" do
+      att = attachment_model(:context => @copy_from, :uploaded_data => stub_png_data, :filename => "homework.png")
+      @copy_from.image_id = att.id
+      @copy_from.save!
+
+      run_course_copy
+
+      @copy_to.reload
+      new_att = @copy_to.attachments.where(:migration_id => mig_id(att)).first
+      expect(@copy_to.image_id.to_i).to eq new_att.id
+
+      example_url = "example.com"
+      @copy_from.image_url = example_url
+      @copy_from.image_id = nil
+      @copy_from.save!
+
+      run_course_copy
+
+      @copy_to.reload
+      expect(@copy_to.image_url).to eq example_url
+    end
+
     it "should convert domains in imported urls if specified in account settings" do
       account = @copy_to.root_account
       account.settings[:default_migration_settings] = {:domain_substitution_map => {"http://derp.derp" => "https://derp.derp"}}
@@ -590,6 +612,47 @@ describe ContentMigration do
 
       new_topic = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
       expect(new_topic.message).to match(Regexp.new("/courses/#{@copy_to.id}/files/folder/#{folder.name}"))
+    end
+
+    it "should not desync imported module item published status with existing content" do
+      asmnt = @copy_from.assignments.create!(:title => "some assignment")
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+
+      run_course_copy
+
+      new_asmnt = @copy_to.assignments.where(:migration_id => mig_id(asmnt)).first
+      new_asmnt.unpublish!
+
+      new_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+      new_page.unpublish!
+
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      tag = mod1.add_item({:id => asmnt.id, :type => 'assignment', :indent => 1})
+      tag2 = mod1.add_item({:id => page.id, :type => 'wiki_page', :indent => 1})
+
+      @cm.copy_options = {:all_context_modules => "1"}
+      @cm.save!
+      run_course_copy
+
+      new_tag = @copy_to.context_module_tags.where(:migration_id => mig_id(tag)).first
+      expect(new_tag).to be_unpublished
+
+      new_tag2 = @copy_to.context_module_tags.where(:migration_id => mig_id(tag2)).first
+      expect(new_tag2).to be_unpublished
+    end
+
+    it "should copy over published tableless module items" do
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag1 = mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
+      tag1.publish!
+      tag2 = mod.add_item({ :title => 'Example 2', :type => 'external_url', :url => 'http://derp.derp/something2' })
+
+      run_course_copy
+
+      new_tag1 = @copy_to.context_module_tags.where(:migration_id => mig_id(tag1)).first
+      new_tag2 = @copy_to.context_module_tags.where(:migration_id => mig_id(tag2)).first
+      expect(new_tag1).to be_published
+      expect(new_tag2).to be_unpublished
     end
   end
 end

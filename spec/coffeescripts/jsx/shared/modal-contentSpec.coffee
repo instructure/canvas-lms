@@ -2,10 +2,9 @@ define [
   'jquery'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/shared/modal-content'
-], ($, React, ReactDOM, ModalContent) ->
-
-  TestUtils = React.addons.TestUtils
+], ($, React, ReactDOM, TestUtils, ModalContent) ->
 
   module 'ModalContent'
 

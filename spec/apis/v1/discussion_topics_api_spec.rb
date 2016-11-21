@@ -73,18 +73,32 @@ describe Api::V1::DiscussionTopics do
     expect(data[:permissions][:attach]).to eq true
   end
 
-  it "should recognize include_assignment flag" do
-    #set @domain_root_account
-    @test_api.instance_variable_set(:@domain_root_account, Account.default)
-
+  it "should include assignment" do
     data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
     expect(data[:assignment]).to be_nil
+  end
 
-    @topic.assignment = assignment_model(:course => @course)
-    @topic.save!
+  context "with assignment" do
+    before :once do
+      @test_api.instance_variable_set(:@domain_root_account, Account.default)
 
-    data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil, include_assignment: true)
-    expect(data[:assignment]).not_to be_nil
+      @topic.assignment = assignment_model(:course => @course)
+      @topic.save!
+    end
+
+    it "should include assignment" do
+      data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
+      expect(data[:assignment]).not_to be_nil
+    end
+
+    it "should include all_dates" do
+      data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
+      expect(data[:assignment][:all_dates]).to be_nil
+
+      data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil,
+        include_all_dates: true)
+      expect(data[:assignment][:all_dates]).not_to be_nil
+    end
   end
 end
 

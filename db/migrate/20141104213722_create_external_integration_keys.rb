@@ -1,4 +1,4 @@
-class CreateExternalIntegrationKeys < ActiveRecord::Migration
+class CreateExternalIntegrationKeys < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

@@ -1,10 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/external_apps/components/Configurations'
-], (React, ReactDOM,Configurations) ->
+], (React, ReactDOM, TestUtils, Configurations) ->
 
-  TestUtils = React.addons.TestUtils
   wrapper = document.getElementById('fixtures')
 
   createElement = (data = {}) ->

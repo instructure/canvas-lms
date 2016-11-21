@@ -17,32 +17,31 @@
     display: none !important;
   }
 
-  #main,
-  #wrapper {
+  .ic-Layout-columns,
+  .ic-Layout-wrapper {
     margin: 0 !important;
     border: 0 none !important;
   }
 
-  .ic-app-main-layout-vertical,
-  .ic-app-main-layout-horizontal { margin-left: 0 !important; }
+  .ic-Layout-wrapper,
+  .ic-Layout-columns { margin-left: 0 !important; }
 
   // this is for firefox, if things dont have overflow:visible then it wont print any more than one page.
-  .ic-app-main-layout-vertical,
-  #content,
+  .ic-Layout-wrapper,
+  .ic-Layout-contentMain,
   #wiki_show_view_main {
     overflow: visible !important;
   }
 
   // Override flex layout for FF, or else you hit:
   // https://bugzilla.mozilla.org/show_bug.cgi?id=258397
-  .ic-app-main-layout-vertical,
-  .ic-app-main-layout-horizontal,
-  .ic-app-main-and-right-side,
+  .ic-Layout-wrapper,
+  .ic-Layout-columns,
   .ic-app-main-content {
     display: block !important;
   }
 
-  #content {
+  .ic-Layout-contentMain {
     width: auto;
     // the padding:0 here is to revert the padding added by .with-scrolling-right-side, &.with-sidebar-pinned-to-bottom
     padding: 0 !important;

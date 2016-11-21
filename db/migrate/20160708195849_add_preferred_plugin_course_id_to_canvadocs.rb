@@ -1,4 +1,4 @@
-class AddPreferredPluginCourseIdToCanvadocs < ActiveRecord::Migration
+class AddPreferredPluginCourseIdToCanvadocs < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

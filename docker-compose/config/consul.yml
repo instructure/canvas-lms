@@ -1,27 +1,27 @@
-production:
-  host: 10.11.12.13
-  port: 8500
-  ssl: true
-  acl_token: "xxxxxxxx-yyyy-zzzz-1111-222222222222"
-test:
-  host: consul
-  port: 8500
-  ssl: false
-  init_values:
-    canvas:
-      signing-secret: somebigsecret
-      encryption-secret: somebigsecret
-    rich-content-service:
-      app-host: rce.docker
-      cdn-host: rce.docker
-development:
-  host: consul
-  port: 8500
-  ssl: false
-  init_values:
-    canvas:
-      signing-secret: somebigsecret
-      encryption-secret: somebigsecret
-    rich-content-service:
-      app-host: rce.docker
-      cdn-host: rce.docker
+# production:
+#   host: 10.11.12.13
+#   port: 8500
+#   ssl: true
+#   acl_token: "xxxxxxxx-yyyy-zzzz-1111-222222222222"
+# test:
+#   host: consul
+#   port: 8500
+#   ssl: false
+#   init_values:
+#     canvas:
+#       signing-secret: somebigsecret
+#       encryption-secret: somebigsecret
+#     rich-content-service:
+#       app-host: rce.docker
+#       cdn-host: rce.docker
+# development:
+#   host: consul
+#   port: 8500
+#   ssl: false
+#   init_values:
+#     canvas:
+#       signing-secret: somebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecret
+#       encryption-secret: somebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecretsomebigsecret
+#     rich-content-service:
+#       app-host: rce.docker
+#       cdn-host: null

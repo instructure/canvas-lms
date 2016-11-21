@@ -1,9 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/files/ColumnHeaders'
-], (React, ColumnHeaders) => {
-
-  const { TestUtils } = React.addons;
+], (React, TestUtils, ColumnHeaders) => {
 
   module('ColumnHeaders');
 

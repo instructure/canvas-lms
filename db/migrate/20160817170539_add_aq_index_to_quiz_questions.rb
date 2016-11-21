@@ -1,4 +1,4 @@
-class AddAqIndexToQuizQuestions < ActiveRecord::Migration
+class AddAqIndexToQuizQuestions < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   tag :postdeploy
 

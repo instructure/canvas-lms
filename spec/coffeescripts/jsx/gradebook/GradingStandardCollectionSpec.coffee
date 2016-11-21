@@ -1,13 +1,14 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'underscore'
   'jsx/grading/gradingStandardCollection'
   'jsx/grading/gradingStandard'
-], (React, ReactDOM, $, _, GradingStandardCollection, GradingStandard) ->
+], (React, ReactDOM, TestUtils, $, _, GradingStandardCollection, GradingStandard) ->
 
-  Simulate = React.addons.TestUtils.Simulate
+  Simulate = TestUtils.Simulate
 
   module 'GradingStandardCollection',
     setup: ->
@@ -67,7 +68,7 @@ define [
       @server.respondWith "POST", ENV.GRADING_STANDARDS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @createdStandard]
       @server.respondWith "PUT", ENV.GRADING_STANDARDS_URL + "/1", [200, {"Content-Type":"application/json"}, JSON.stringify @updatedStandard]
       GradingStandardCollectionElement = React.createElement(GradingStandardCollection)
-      @gradingStandardCollection = React.addons.TestUtils.renderIntoDocument(GradingStandardCollectionElement)
+      @gradingStandardCollection = TestUtils.renderIntoDocument(GradingStandardCollectionElement)
       @server.respond()
 
     teardown: ->

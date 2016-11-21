@@ -1,9 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/grading/gradingPeriodTemplate'
-], (React, ReactDOM, _, GradingPeriod) ->
+], (React, ReactDOM, {Simulate}, _, GradingPeriod) ->
 
   defaultProps =
     title: "Spring"
@@ -21,7 +22,6 @@ define [
     onDateChange: ->
     onTitleChange: ->
 
-  Simulate = React.addons.TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   module 'GradingPeriod with read-only permissions',

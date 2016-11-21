@@ -1,13 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'react-modal'
   'jsx/external_apps/components/ReregisterExternalToolButton'
   'jsx/external_apps/lib/ExternalAppsStore'
-], (React, ReactDOM, Modal, ReregisterExternalToolButton, store) ->
+], (React, ReactDOM, {Simulate}, Modal, ReregisterExternalToolButton, store) ->
 
-  TestUtils = React.addons.TestUtils
-  Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   Modal.setAppElement(wrapper)

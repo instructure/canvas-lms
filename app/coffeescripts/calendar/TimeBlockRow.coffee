@@ -10,6 +10,7 @@ define [
     constructor: (@TimeBlockList, data={}) ->
       @locked = data.locked
       timeoutId = null
+      data.date = data.date || data.start
       @$row = $(timeBlockRowTemplate(data)).bind
         focusin: =>
           clearTimeout timeoutId

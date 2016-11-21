@@ -1,10 +1,13 @@
-<div class="group-description" role='button' tabindex='0' aria-controls="group_detail-{{id}}" aria-expanded='false'>
-  <div class="outcome-icon" aria-label="{{#t}}expand/collapse {{title}} Outcome Group{{/t}}">
+<div id="group_header-{{id}}" class="group-description" role='button' tabindex='0' aria-controls="group_detail-{{id}}" aria-expanded='false'>
+  <label class="screenreader-only" for="group_header-{{id}}">
+    {{#t}}Expand/collapse {{title}} Outcome Group, student meets mastery of {{mastery_count}} of {{count}} outcomes{{/t}}
+  </label>
+  <div class="outcome-icon">
     <i class="icon-mini-arrow-down collapsed-arrow"></i>
     <i class="icon-mini-arrow-up expanded-arrow"></i>
   </div>
-  <h3 class="group-title"><span role='button' tabindex='0'>{{title}}</span></h3>
-  <div class="group-status">
+  <h3 class="group-title" aria-hidden="true">{{title}}</h3>
+  <div class="group-status" aria-hidden="true">
     <ul class="pill">
       <li
       {{#if mastery_count}}

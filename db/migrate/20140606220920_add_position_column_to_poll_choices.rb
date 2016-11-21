@@ -1,4 +1,4 @@
-class AddPositionColumnToPollChoices < ActiveRecord::Migration
+class AddPositionColumnToPollChoices < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

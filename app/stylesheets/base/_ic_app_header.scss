@@ -239,7 +239,7 @@ button.ic-app-header__menu-list-link {
     transition:
       transform 0.3s cubic-bezier(0.175, 0.885, 0.320, 1.275),
       opacity 0.3s;
-    transition-delay: 1s;
+    transition-delay: 0.3s;
   }
 
   &::after {
@@ -375,7 +375,7 @@ body.primary-nav-expanded {
     background: transparent;
     color: $ic-brand-global-nav-menu-item__text-color;
     white-space: normal;
-    word-break: break-all;
+    word-wrap: break-word;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
 

@@ -1,4 +1,4 @@
-class AddAggregateCountsToCollections < ActiveRecord::Migration
+class AddAggregateCountsToCollections < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

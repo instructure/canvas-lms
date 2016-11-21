@@ -75,7 +75,8 @@ define [
     view.remove()
 
   module 'AssignmentSettingsView with an assignment in a closed grading period',
-    setup: -> fakeENV.setup()
+    setup: ->
+      fakeENV.setup(MULTIPLE_GRADING_PERIODS_ENABLED: true)
     teardown: -> fakeENV.teardown()
 
   test 'disables the checkbox', ->

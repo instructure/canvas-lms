@@ -285,6 +285,10 @@ class GroupsController < ApplicationController
           js_env group_categories: categories_json,
                  group_user_type: @group_user_type,
                  allow_self_signup: @allow_self_signup
+          if @context.is_a?(Course)
+            # get number of sections with students in them so we can enforce a min group size for random assignment on sections
+            js_env(:student_section_count => @context.enrollments.active_or_pending.where(:type => "StudentEnrollment").distinct.count(:course_section_id))
+          end
           # since there are generally lots of users in an account, always do large roster view
           @js_env[:IS_LARGE_ROSTER] ||= @context.is_a?(Account)
           render :context_manage_groups
@@ -344,8 +348,8 @@ class GroupsController < ApplicationController
           redirect_to named_context_url(@group.context, :context_url)
           return
         end
-        @current_conferences = @group.web_conferences.select{|c| c.active? && c.users.include?(@current_user) } rescue []
-        @scheduled_conferences = @context.web_conferences.select{|c| c.scheduled? && c.users.include?(@current_user)} rescue []
+        @current_conferences = @group.web_conferences.active.select{|c| c.active? && c.users.include?(@current_user) } rescue []
+        @scheduled_conferences = @context.web_conferences.active.select{|c| c.scheduled? && c.users.include?(@current_user)} rescue []
         @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @context }) || []
         if params[:join] && @group.grants_right?(@current_user, :join)
           if @group.full?

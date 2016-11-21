@@ -1,4 +1,4 @@
-class AddDeveloperKeyRedirectUri < ActiveRecord::Migration
+class AddDeveloperKeyRedirectUri < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

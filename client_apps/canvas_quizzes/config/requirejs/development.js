@@ -27,7 +27,7 @@ requirejs.config({
     // ========================================================================
     // Aliases to frequently-used Canvas packages
     'lodash': '../../../vendor/packages/lodash',
-    'd3': '../../../vendor/packages/d3',
+    'd3': '../../../vendor/canvas_public/javascripts/symlink_to_node_modules/d3/d3',
     // ========================================================================
 
     // ========================================================================

@@ -1,4 +1,4 @@
-class AddTimeZoneToCourses < ActiveRecord::Migration
+class AddTimeZoneToCourses < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

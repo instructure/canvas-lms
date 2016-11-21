@@ -62,6 +62,24 @@ describe ContentMigration do
       expect(vanilla_page_to.assignment).to be_nil
     end
 
+    it "re-imports updated/deleted page" do
+      page = @copy_from.wiki.wiki_pages.create!(:title => "blah", :body => "<p>orig</p>")
+
+      run_course_copy
+
+      page_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
+      page_to.destroy
+
+      page.body = '<p>updated</p>'
+      page.save!
+
+      run_course_copy
+
+      page_to.reload
+      expect(page_to.workflow_state).to eq 'active'
+      expect(page_to.body).to eq page.body
+    end
+
     context "wiki front page" do
       it "should copy wiki front page setting if there is no front page" do
         fake_front_page = @copy_from.wiki.wiki_pages.create!(:title => "Front Page")

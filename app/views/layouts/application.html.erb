@@ -64,7 +64,7 @@
 
   <%= yield :leading_content %>
 
-  <div id="wrapper" class="ic-app-main-layout-vertical">
+  <div id="wrapper" class="ic-Layout-wrapper">
     <% if crumbs.length > 1 %>
       <div class="ic-app-nav-toggle-and-crumbs no-print">
         <% if @show_left_side %>
@@ -77,46 +77,44 @@
         <% if @show_left_side %></div><% end %>
       </div>
     <% end %>
-    <div class="ic-app-main-layout-horizontal">
-    <% if @show_left_side %>
-      <div id="left-side" class="ic-app-course-menu <% if !@no_left_side_list_view %>list-view<% end %>">
-        <% if left_side %>
-          <%= left_side %>
-        <% else %>
-          <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
-            <a  class="al-trigger al-trigger--within-left-menu" href="#" data-popup-within="#wrapper">
-              <%= t("Switch Group")%>
-              <i class="icon-mini-arrow-down"></i>
-            </a>
-            <ul class="al-options">
-              <% @context.group_category.groups.active.by_name.each do |group| %>
-                <li class="<%= 'active-selection' if group_homepage_pathfinder(group) %>"><%= link_to group.short_name, group_path(group) %></li>
-              <% end %>
-            </ul>
+    <div id="main" class="ic-Layout-columns">
+      <% if @show_left_side %>
+        <div id="left-side" class="ic-app-course-menu <% if !@no_left_side_list_view %>list-view<% end %>">
+          <% if left_side %>
+            <%= left_side %>
+          <% else %>
+            <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
+              <a  class="al-trigger al-trigger--within-left-menu" href="#" data-popup-within="#wrapper">
+                <%= t("Switch Group")%>
+                <i class="icon-mini-arrow-down"></i>
+              </a>
+              <ul class="al-options">
+                <% @context.group_category.groups.active.by_name.each do |group| %>
+                  <li class="<%= 'active-selection' if group_homepage_pathfinder(group) %>"><%= link_to group.short_name, group_path(group) %></li>
+                <% end %>
+              </ul>
+            <% end %>
+            <% if @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
+              <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
+            <% end %>
+            <%= section_tabs %>
           <% end %>
-          <% if @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
-            <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
+          <% if left_side_custom %>
+            <%= left_side_custom %>
           <% end %>
-          <%= section_tabs %>
-        <% end %>
-        <% if left_side_custom %>
-          <%= left_side_custom %>
-        <% end %>
-      </div>
+        </div>
       <% end %>
-      <div id="main" class="ic-app-main-and-right-side">
-        <div id="not_right_side" class="ic-app-main-content">
-          <div id="content-wrapper" class="ic-app-main-content__primary">
-              <%= render :partial => 'shared/content_notices' if @show_left_side && @context && @context.respond_to?(:content_notices) %>
-            <div id="content" role="main">
-              <%= yield %>
-            </div>
+      <div id="not_right_side" class="ic-app-main-content">
+        <div id="content-wrapper" class="ic-Layout-contentWrapper">
+            <%= render :partial => 'shared/content_notices' if @show_left_side && @context && @context.respond_to?(:content_notices) %>
+          <div id="content" class="ic-Layout-contentMain" role="main">
+            <%= yield %>
           </div>
-          <div id="right-side-wrapper" class="ic-app-main-content__secondary">
-            <aside id="right-side" role="complementary">
-              <%= right_side %>
-            </aside>
-          </div>
+        </div>
+        <div id="right-side-wrapper" class="ic-app-main-content__secondary">
+          <aside id="right-side" role="complementary">
+            <%= right_side %>
+          </aside>
         </div>
       </div>
     </div>

@@ -1,8 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/choose_mastery_path/components/path-option',
-], (React, PathOption) => {
-  const TestUtils = React.addons.TestUtils
+], (React, TestUtils, PathOption) => {
 
   module('Path Option')
 

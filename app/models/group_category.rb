@@ -19,7 +19,7 @@
 class GroupCategory < ActiveRecord::Base
   attr_accessible :name, :role, :context
   attr_reader :create_group_count
-  attr_accessor :assign_unassigned_members
+  attr_accessor :assign_unassigned_members, :group_by_section
 
   belongs_to :context, polymorphic: [:course, :account]
   has_many :groups, :dependent => :destroy
@@ -215,6 +215,7 @@ class GroupCategory < ActiveRecord::Base
     end
     members = members.to_a
     groups = groups.to_a
+
     ##
     # new memberships to be returned
     new_memberships = []
@@ -368,6 +369,27 @@ class GroupCategory < ActiveRecord::Base
     new_memberships
   end
 
+  def distribute_members_among_groups_by_section
+    # trying to make this work for new group sets is hard enough - i'm not even going to bother with ones with existing stuff
+    if GroupMembership.active.where(:group_id => groups.active).exists?
+      self.errors.add(:group_by_section, t("Groups must be empty to assign by section")); return
+    end
+    if groups.active.where.not(:max_membership => nil).exists?
+      self.errors.add(:group_by_section, t("Groups cannot have size restrictions to assign by section")); return
+    end
+
+    group_count = groups.active.count
+    section_count = self.context.enrollments.active_or_pending.where(:type => "StudentEnrollment").distinct.count(:course_section_id)
+    return unless group_count > 0 && section_count > 0
+
+    if group_count < section_count
+      self.errors.add(:create_group_count, t("Must have at least as many groups as sections to assign by section")); return
+    end
+
+    GroupBySectionCalculator.new(self).distribute_members
+    true
+  end
+
   def create_group_count=(num)
     @create_group_count = num && num > 0 ?
       [num, Setting.get('max_groups_in_new_category', '200').to_i].min :
@@ -376,7 +398,10 @@ class GroupCategory < ActiveRecord::Base
 
   def auto_create_groups
     create_groups(@create_group_count) if @create_group_count
-    assign_unassigned_members if @assign_unassigned_members && @create_group_count
+    if @assign_unassigned_members && @create_group_count
+      by_section = @group_by_section && self.context.is_a?(Course)
+      assign_unassigned_members(by_section)
+    end
     @create_group_count = @assign_unassigned_members = nil
   end
 
@@ -393,15 +418,27 @@ class GroupCategory < ActiveRecord::Base
     context.users_not_in_groups(allows_multiple_memberships? ? [] : groups.active)
   end
 
-  def assign_unassigned_members
+  def assign_unassigned_members(by_section=false)
     Delayed::Batch.serial_batch do
-      distribute_members_among_groups(unassigned_users, groups.active)
+      if by_section
+        distribute_members_among_groups_by_section
+        if current_progress
+          if self.errors.any?
+            current_progress.message = self.errors.full_messages
+            current_progress.fail
+          else
+            complete_progress
+          end
+        end
+      else
+        distribute_members_among_groups(unassigned_users, groups.active)
+      end
     end
   end
 
-  def assign_unassigned_members_in_background
+  def assign_unassigned_members_in_background(by_section=false)
     start_progress
-    send_later_enqueue_args :assign_unassigned_members, :priority => Delayed::LOW_PRIORITY
+    send_later_enqueue_args(:assign_unassigned_members, {:priority => Delayed::LOW_PRIORITY}, by_section)
   end
 
   def clone_groups_and_memberships(new_group_category)
@@ -455,6 +492,100 @@ class GroupCategory < ActiveRecord::Base
   def update_groups_max_membership
     if group_limit_changed?
       groups.update_all(:max_membership => group_limit)
+    end
+  end
+
+  class GroupBySectionCalculator
+    # this got too big and I didn't feel like stuffing it into a giant method anymore
+    def initialize(category)
+      @category = category
+    end
+
+    attr_accessor :users_by_section_id, :user_count, :groups
+
+    def distribute_members
+      @groups = @category.groups.active.to_a
+
+      get_users_by_section_id
+      determine_group_distribution
+      assign_students_to_groups
+    end
+
+    def get_users_by_section_id
+      # fetch and group users by section_id
+      id_pairs = User.joins(:not_ended_enrollments).where(enrollments: {course_id: @category.context, type: 'StudentEnrollment'}).
+        pluck("users.id, enrollments.course_section_id").uniq(&:first) # not even going to try to deal with multi-section students
+
+      @users_by_section_id = {}
+      all_users = User.where(:id => id_pairs.map(&:first)).index_by(&:id)
+      @user_count = all_users.count
+      id_pairs.each do |user_id, section_id|
+        @users_by_section_id[section_id] ||= []
+        @users_by_section_id[section_id] << all_users[user_id]
+      end
+    end
+
+    def determine_group_distribution
+      # try to figure out how to best split up the groups
+      goal_group_size = @user_count / @groups.count # try to get groups with at least this size
+
+      num_groups_assigned = 0
+      user_counts = {}
+      group_counts = {}
+
+      @users_by_section_id.each do |section_id, sect_users|
+        # first pass - give each section a base-level number of groups
+        user_count = sect_users.count
+        user_counts[section_id] = user_count
+
+        group_count = [user_count / goal_group_size, 1].max # at least one group
+        num_groups_assigned += group_count
+        group_counts[section_id] = group_count
+      end
+
+      extra_groups = {}
+      while num_groups_assigned != @groups.count # keep going until we get the levels just right
+        if num_groups_assigned > @groups.count
+          # we over-assigned because of sections with too few people (only one group) - so we'll have to steal one from a big section
+          # preferably one that can take the hit the best - i.e. has the most groups currently and then fewest extra users
+          big_section_id = group_counts.select{|k, count| count > 1}.sort_by{|k, count| [count, -1 * user_counts[k]]}.last.first
+          group_counts[big_section_id] -= 1
+          num_groups_assigned -= 1
+        else
+          # more likely will we have some extra groups now because of remainder students from our first pass
+          # so at least one section will have to have some smaller groups now
+          # best thing to do now is to find the group with the most remaining
+          leftover_sec_id = group_counts.sort_by{|k, count| [-1 * (extra_groups[k] || 0), user_counts[k] % count]}.last.first
+          group_counts[leftover_sec_id] += 1
+          extra_groups[leftover_sec_id] ||= 0
+          extra_groups[leftover_sec_id] += 1
+          num_groups_assigned += 1
+        end
+      end
+
+      @group_distributions = {}
+      group_counts.each do |section_id, num_groups|
+        # turn them into an array of group sizes, e.g. 7 users into 3 groups becomes [3, 2, 2]
+        dist = [user_counts[section_id] / num_groups] * num_groups # base
+        (user_counts[section_id] % num_groups).times do |idx| # distribute remainder around
+          dist[idx % num_groups] += 1
+        end
+        @group_distributions[section_id] = dist
+      end
+      if @group_distributions.values.map(&:count).sum != @groups.count || @group_distributions.any?{|k, v| v.sum != user_counts[k]}
+        raise "user/group count mismatch" # we should make sure this works before going any further
+      end
+      @group_distributions
+    end
+
+    def assign_students_to_groups
+      @group_distributions.each do |section_id, group_sizes|
+        @users_by_section_id[section_id].shuffle!
+        group_sizes.each do |group_size|
+          group = @groups.pop
+          group.bulk_add_users_to_group(@users_by_section_id[section_id].pop(group_size))
+        end
+      end
     end
   end
 end

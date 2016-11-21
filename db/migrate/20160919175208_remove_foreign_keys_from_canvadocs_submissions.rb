@@ -1,4 +1,4 @@
-class RemoveForeignKeysFromCanvadocsSubmissions < ActiveRecord::Migration
+class RemoveForeignKeysFromCanvadocsSubmissions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

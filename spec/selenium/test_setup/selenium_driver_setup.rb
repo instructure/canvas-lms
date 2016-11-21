@@ -1,6 +1,28 @@
 require "fileutils"
 
 module SeleniumDriverSetup
+  # WebDriver uses port 7054 (the "locking port") as a mutex to ensure
+  # that we don't launch two Firefox instances at the same time. Each
+  # new instance you create will wait for the mutex before starting
+  # the browser, then release it as soon as the browser is open.
+  #
+  # The default port mutex wait timeout is 45 seconds.
+  # Bump it to 90 seconds as a stopgap for the recent flood of:
+  # `unable to bind to locking port 7054 within 45 seconds`
+  #
+  # TODO: Investigate why it's taking so long to launch Firefox, or
+  #       what process is hogging port 7054.
+  module ::Selenium
+    module WebDriver
+      module Firefox
+        class Launcher
+          remove_const(:SOCKET_LOCK_TIMEOUT)
+        end
+      end
+    end
+  end
+  Selenium::WebDriver::Firefox::Launcher::SOCKET_LOCK_TIMEOUT = 90
+
   # Number of recent specs to show in failure pages
   RECENT_SPEC_RUNS_LIMIT = 500
   # Number of identical failures in a row before we abort this worker
@@ -82,6 +104,8 @@ module SeleniumDriverSetup
     @headless = Headless.new(
       display: display,
       dimensions: "1920x1080x24",
+      reuse: false,
+      destroy_at_exit: true,
       video: {
         provider: :ffmpeg,
         # yay interframe compression
@@ -189,7 +213,7 @@ module SeleniumDriverSetup
   end
 
   def selenium_url
-    $selenium_config[:remote_url]
+    (browser == :chrome) ? $selenium_config[:remote_url_chrome] : $selenium_config[:remote_url_firefox]
   end
 
   def ruby_firefox_driver
@@ -269,6 +293,12 @@ module SeleniumDriverSetup
 
   def record_errors(example, exception, log_messages)
     js_errors = driver.execute_script("return window.JSErrorCollector_errors && window.JSErrorCollector_errors.pump()") || []
+
+    # ignore "mutating the [[Prototype]] of an object" js errors
+    mutating_prototype_error = "mutating the [[Prototype]] of an object"
+    js_errors.reject! do |error|
+      error["errorMessage"].start_with? mutating_prototype_error
+    end
 
     # always send js errors to stdout, even if the spec passed. we have to
     # empty the JSErrorCollector anyway, so we might as well show it.

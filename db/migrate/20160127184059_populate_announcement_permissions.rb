@@ -1,4 +1,4 @@
-class PopulateAnnouncementPermissions < ActiveRecord::Migration
+class PopulateAnnouncementPermissions < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

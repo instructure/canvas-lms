@@ -1,12 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/shared/FriendlyDatetime'
   'i18nObj'
   'helpers/I18nStubber'
-], (React, ReactDOM, FriendlyDatetime, I18n, I18nStubber) ->
-
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, FriendlyDatetime, I18n, I18nStubber) ->
 
   module 'FriendlyDatetime',
     setup: ->

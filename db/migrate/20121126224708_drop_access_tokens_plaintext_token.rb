@@ -1,4 +1,4 @@
-class DropAccessTokensPlaintextToken < ActiveRecord::Migration
+class DropAccessTokensPlaintextToken < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

@@ -19,17 +19,26 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe DeveloperKeysController, type: :request do
+  let(:sa_id) { Account.site_admin.id }
+
   describe "GET 'index'" do
     it 'should require authorization' do
-      unauthorized_api_call(:get, "/api/v1/developer_keys.json",
-                      {:controller => 'developer_keys', :action => 'index',
-                       :format => 'json'})
+      unauthorized_api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+        controller: 'developer_keys',
+        action: 'index',
+        format: 'json',
+        account_id: sa_id.to_s
+      })
     end
 
     it 'should have the default developer key' do
       admin_session
-      json = api_call(:get, "/api/v1/developer_keys.json",
-                      {:controller => 'developer_keys', :action => 'index', :format => 'json'})
+      json = api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+        controller: 'developer_keys',
+        action: 'index',
+        format: 'json',
+        account_id: sa_id.to_s
+      })
 
       confirm_valid_key_in_json(json, DeveloperKey.default)
     end
@@ -37,8 +46,12 @@ describe DeveloperKeysController, type: :request do
     it 'should return the list of developer keys' do
       admin_session
       key = DeveloperKey.create!
-      json = api_call(:get, "/api/v1/developer_keys.json",
-                      {:controller => 'developer_keys', :action => 'index', :format => 'json'})
+      json = api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+        controller: 'developer_keys',
+        action: 'index',
+        format: 'json',
+        account_id: sa_id.to_s
+      })
 
       confirm_valid_key_in_json(json, key)
     end
@@ -46,9 +59,12 @@ describe DeveloperKeysController, type: :request do
 
   describe "POST 'create'" do
     it 'should require authorization' do
-      unauthorized_api_call(:post, "/api/v1/developer_keys.json",
-                      {:controller => 'developer_keys', :action => 'create',
-                       :format => 'json'}, {:developer_key => {}})
+      unauthorized_api_call(:post, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+        controller: 'developer_keys',
+        action: 'create',
+        format: 'json',
+        account_id: sa_id.to_s
+      }, {developer_key: {}})
     end
 
     it 'should create a new developer key' do
@@ -59,9 +75,12 @@ describe DeveloperKeysController, type: :request do
   describe "PUT 'update'" do
     it 'should require authorization' do
       key = DeveloperKey.create!
-      unauthorized_api_call(:put, "/api/v1/developer_keys/#{key.id}.json",
-                      {:controller => 'developer_keys', :action => 'update', :id => key.id.to_s,
-                       :format => 'json'}, {:developer_key => {}})
+      unauthorized_api_call(:put, "/api/v1/developer_keys/#{key.id}.json", {
+        controller: 'developer_keys',
+        action: 'update',
+        id: key.id.to_s,
+        format: 'json'
+      }, {developer_key: {}})
     end
 
 
@@ -73,9 +92,12 @@ describe DeveloperKeysController, type: :request do
   describe "DELETE 'destroy'" do
     it 'should require authorization' do
       key = DeveloperKey.create!
-      unauthorized_api_call(:delete, "/api/v1/developer_keys/#{key.id}.json",
-                      {:controller => 'developer_keys', :action => 'destroy', :id => key.id.to_s,
-                       :format => 'json'})
+      unauthorized_api_call(:delete, "/api/v1/developer_keys/#{key.id}.json", {
+        controller: 'developer_keys',
+        action: 'destroy',
+        id: key.id.to_s,
+        format: 'json'
+      })
     end
 
     it 'should delete an existing developer key' do
@@ -85,17 +107,20 @@ describe DeveloperKeysController, type: :request do
 
 
   def admin_session
-    account_admin_user(:account => Account.site_admin)
+    account_admin_user(account: Account.site_admin)
   end
 
   def create_call
     admin_session
-    post_hash = {:developer_key => {'name' => 'cool tool', :icon_url => ''}}
+    post_hash = { developer_key: { name: 'cool tool', icon_url: '' } }
     # make sure this key is created
     DeveloperKey.default
-    json = api_call(:post, "/api/v1/developer_keys.json",
-                    {:controller => 'developer_keys', :action => 'create', :format => 'json',
-                     }, post_hash)
+    json = api_call(:post, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+      controller: 'developer_keys',
+      action: 'create',
+      format: 'json',
+      account_id: sa_id.to_s
+    }, post_hash)
 
     expect(DeveloperKey.count).to eq 2
     confirm_valid_key_in_json([json], DeveloperKey.last)
@@ -104,10 +129,13 @@ describe DeveloperKeysController, type: :request do
   def update_call
     admin_session
     key = DeveloperKey.create!
-    post_hash = {:developer_key => {'name' => 'cool tool'}}
-    json = api_call(:put, "/api/v1/developer_keys/#{key.id}.json",
-                    {:controller => 'developer_keys', :action => 'update', :format => 'json',
-                     :id => key.id.to_s}, post_hash)
+    post_hash = { developer_key: { name: 'cool tool' } }
+    json = api_call(:put, "/api/v1/developer_keys/#{key.id}.json", {
+      controller: 'developer_keys',
+      action: 'update',
+      format: 'json',
+      id: key.id.to_s
+    }, post_hash)
 
     key.reload
     confirm_valid_key_in_json([json], key)
@@ -116,9 +144,12 @@ describe DeveloperKeysController, type: :request do
   def destroy_call
     admin_session
     key = DeveloperKey.create!()
-    api_call(:delete, "/api/v1/developer_keys/#{key.id}.json",
-                    {:controller => 'developer_keys', :action => 'destroy', :format => 'json',
-                     :id => key.id.to_s})
+    api_call(:delete, "/api/v1/developer_keys/#{key.id}.json", {
+      controller: 'developer_keys',
+      action: 'destroy',
+      format: 'json',
+      id: key.id.to_s
+    })
 
     expect(DeveloperKey.where(id: key).first).to be_deleted
   end

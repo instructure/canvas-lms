@@ -198,7 +198,7 @@
 
 .ic-flash__headline {
   margin: 0;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .ic-flash__text {
@@ -260,7 +260,7 @@ body.is-masquerading-or-student-view {
     }
   }
   &.ic-alert-masquerade-student-view-module--header {
-    font-weight: 500;
+    font-weight: bold;
   }
   &.ic-alert-masquerade-student-view-module--description {
     font-style: italic;
@@ -330,7 +330,7 @@ $ic-notification-border-thickness: 2px;
   margin-right: $ic-sp/3;
   @include fontSize($ic-font-size--small);
   display: inline;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .ic-notification__content {
@@ -362,7 +362,6 @@ $ic-notification-border-thickness: 2px;
 
 .notification_account_content_text {
   font-size: 0.8em;
-  font-weight: 300;
   padding-left: 12px;
   line-height: 22px;
 }

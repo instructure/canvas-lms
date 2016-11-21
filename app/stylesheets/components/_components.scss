@@ -16,7 +16,7 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
   // oldskool compat
   #section-tabs-header {
     @include fontSize($ic-font-size--small);
-    font-weight: 500;
+    font-weight: bold;
     margin: 0 0 $ic-sp/2;
     white-space: nowrap;
     overflow: hidden;
@@ -46,7 +46,6 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
         display: block;
         text-decoration: none;
         color: $ic-font-color-dark;
-        font-weight: 300;
         border-radius: $baseBorderRadius;
         padding: $ic-sp/2 $ic-sp;
 
@@ -76,7 +75,7 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
 
   a.active {
     background-color: $ic-brand-course-nav-link--active;
-    font-weight: 500;
+    font-weight: bold;
     color: $ic-color-light;
     &:hover, &:focus { background-color: $ic-brand-primary; }
     .nav-badge {
@@ -107,7 +106,7 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
     display: block;
     padding: 8px 0;
     color: $ic-font-color-dark;
-    font-weight: 500;
+    font-weight: bold;
     border-bottom: 1px solid $ic-border-light;
 
     &:hover, &:focus {

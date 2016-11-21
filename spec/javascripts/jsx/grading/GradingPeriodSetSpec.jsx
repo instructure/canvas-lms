@@ -1,13 +1,13 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'underscore',
   'axios',
   'jsx/grading/GradingPeriodSet',
   'compiled/api/gradingPeriodsApi'
-], (React, ReactDOM, _, axios, GradingPeriodSet, gradingPeriodsApi) => {
+], (React, ReactDOM, {Simulate}, _, axios, GradingPeriodSet, gradingPeriodsApi) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
   const assertDisabled = function(component) {
     let $el = ReactDOM.findDOMNode(component);

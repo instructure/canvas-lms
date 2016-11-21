@@ -877,7 +877,11 @@ class CoursesController < ApplicationController
 
       users = Api.paginate(users, self, api_v1_course_users_url)
       includes = Array(params[:include])
-      user_json_preloads(users, includes.include?('email'))
+      user_json_preloads(
+        users,
+        includes.include?('email'),
+        group_memberships: includes.include?('group_ids')
+      )
       unless includes.include?('test_student') || Array(params[:enrollment_type]).include?("student_view")
         users.reject! do |u|
           u.preferences[:fake_student]
@@ -1633,8 +1637,9 @@ class CoursesController < ApplicationController
         else
           @contexts += @user_groups if @user_groups
         end
-        @current_conferences = @context.web_conferences.select{|c| c.active?(false, false) && c.users.include?(@current_user) }
-        @scheduled_conferences = @context.web_conferences.select{|c| c.scheduled? && c.users.include?(@current_user)}
+        web_conferences = @context.web_conferences.active.to_a
+        @current_conferences = web_conferences.select{|c| c.active?(false, false) && c.users.include?(@current_user) }
+        @scheduled_conferences = web_conferences.select{|c| c.scheduled? && c.users.include?(@current_user)}
         @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @contexts }) || []
       end
 
@@ -1797,11 +1802,17 @@ class CoursesController < ApplicationController
       limit_privileges = value_to_boolean(enrollment_options[:limit_privileges_to_course_section])
       enrollment_options[:limit_privileges_to_course_section] = limit_privileges
       enrollment_options[:role] = custom_role if custom_role
-      list = UserList.new(params[:user_list],
+
+      list =
+        if params[:user_ids]
+          Array(params[:user_ids])
+        else
+          UserList.new(params[:user_list],
                           root_account: @context.root_account,
                           search_method: @context.user_list_search_mode_for(@current_user),
                           initial_type: params[:enrollment_type],
                           current_user: @current_user)
+        end
       if !@context.concluded? && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
         ActiveRecord::Associations::Preloader.new.preload(@enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
         json = @enrollments.map { |e|
@@ -2121,12 +2132,6 @@ class CoursesController < ApplicationController
         if account && account != @course.account && account.grants_right?(@current_user, session, :manage_courses)
           @course.account = account
         end
-      end
-
-      root_account_id = params[:course].delete :root_account_id
-      if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
-        @course.root_account = Account.root_accounts.find(root_account_id)
-        @course.account = @course.root_account if @course.account.root_account != @course.root_account
       end
 
       if params[:course].key?(:apply_assignment_group_weights)

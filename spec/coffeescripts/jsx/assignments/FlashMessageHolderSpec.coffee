@@ -5,7 +5,6 @@ define [
   'jsx/assignments/store/configureStore'
 ], (React, ReactDOM, FlashMessageHolder, configureStore) ->
 
-  TestUtils = React.addons.TestUtils
 
   module 'FlashMessageHolder',
     setup: ->

@@ -67,6 +67,7 @@ class Pseudonym < ActiveRecord::Base
         if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
     }
     config.crypto_provider = Authlogic::CryptoProviders::Sha512
+    config.validates_length_of_password_field_options = { minimum: 6, if: :require_password? }
   end
 
   attr_writer :require_password

@@ -1,8 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/collaborations/CollaborationsApp'
-], (react, CollaborationsApp) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, CollaborationsApp) => {
 
   module('CollaborationsApp');
 

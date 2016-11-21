@@ -1,12 +1,9 @@
 define [
-  'react'
+  'react-addons-test-utils'
   'underscore'
   'jsx/dashboard_card/DashboardCardBackgroundStore'
   'helpers/fakeENV'
-], (React, _, DashboardCardBackgroundStore, fakeENV) ->
-
-  Simulate = React.addons.TestUtils.Simulate
-  SimulateNative = React.addons.TestUtils.SimulateNative
+], ({Simulate, SimulateNative}, _, DashboardCardBackgroundStore, fakeENV) ->
 
   TEST_COLORS = {
     '#008400',

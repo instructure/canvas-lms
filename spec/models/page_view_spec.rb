@@ -199,8 +199,7 @@ describe PageView do
   it "should not store if the page view has no user" do
     Setting.set('enable_page_views', 'db')
     @page_view.user = nil
-    expect(@page_view.store).to be_falsey
-    expect(PageView.count).to eq 0
+    expect(@page_view).not_to be_valid
   end
 
   if Canvas.redis_enabled?

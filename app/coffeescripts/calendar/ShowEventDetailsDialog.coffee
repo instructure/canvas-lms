@@ -173,11 +173,23 @@ define [
       else if @event.object?.available_slots > 0
         params.availableSlotsText = @event.object.available_slots
 
+      if @event.calendarEvent
+        contextCodes = @event.calendarEvent.all_context_codes.split(',')
+        params.isGreaterThanOne = contextCodes.length > 1
+        params.contextsCount = contextCodes.length - 1
+        params.contextsName = @dataSource.contexts.map((context) =>
+          if contextCodes.includes(context.asset_string)
+            return context.name
+          else
+            ""
+        ).filter((context) => context.length > 0)
+
       params.use_new_scheduler = ENV.CALENDAR.BETTER_SCHEDULER
       params.is_appointment_group = !!@event.isAppointmentGroupEvent() # this returns the actual url so make it boolean for clarity
       params.reserve_comments = @event.object.reserve_comments ?= @event.object.comments
       params.showEventLink   = params.fullDetailsURL()
       params.showEventLink or= params.isAppointmentGroupEvent()
+
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))
       @popover.el.data('showEventDetailsDialog', @)
 

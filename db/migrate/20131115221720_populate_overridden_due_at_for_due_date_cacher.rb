@@ -1,4 +1,4 @@
-class PopulateOverriddenDueAtForDueDateCacher < ActiveRecord::Migration
+class PopulateOverriddenDueAtForDueDateCacher < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

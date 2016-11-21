@@ -53,7 +53,7 @@
   > a {
     @include fontSize(13px); // need to overwrite default tiny-text style here
     margin-right: $ic-sp/2;
-    font-weight: 500;
+    font-weight: bold;
   }
 }
 

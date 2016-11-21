@@ -1,14 +1,14 @@
 define([
   'react',
   'react-dom',
+  'react-addons-update',
   'jsx/grading/dataRow',
   'jquery',
   'i18n!external_tools',
   'underscore',
   'compiled/str/splitAssetString'
 ],
-function(React, ReactDOM, DataRow, $, I18n, _, splitAssetString) {
-  var update = React.addons.update;
+function(React, ReactDOM , update, DataRow, $, I18n, _, splitAssetString) {
   var GradingStandard = React.createClass({
 
     getInitialState: function() {

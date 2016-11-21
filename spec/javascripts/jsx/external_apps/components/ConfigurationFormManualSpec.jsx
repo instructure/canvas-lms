@@ -1,9 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/external_apps/components/ConfigurationFormManual'
-], (React, ConfigurationFormManual) => {
-
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, ConfigurationFormManual) => {
 
   module('External Apps Manual Configuration Form');
 

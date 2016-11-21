@@ -1,9 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/shared/FlickrSearch'
-], (React, FlickrSearch) => {
-
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, FlickrSearch) => {
 
   module('FlickrSearch View');
 

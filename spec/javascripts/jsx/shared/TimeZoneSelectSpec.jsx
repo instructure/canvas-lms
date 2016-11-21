@@ -1,9 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/shared/TimeZoneSelect'
-], (React, TimeZoneSelect) => {
-
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, TimeZoneSelect) => {
 
   module('TimeZoneSelect Component');
 

@@ -1,4 +1,4 @@
-class AddEnrollmentLastActivityAt < ActiveRecord::Migration
+class AddEnrollmentLastActivityAt < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

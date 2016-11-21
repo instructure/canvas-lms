@@ -1,4 +1,4 @@
-class DropUnencryptedGoogleDriveSettings < ActiveRecord::Migration
+class DropUnencryptedGoogleDriveSettings < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

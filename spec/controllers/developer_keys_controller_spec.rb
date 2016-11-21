@@ -138,7 +138,7 @@ describe DeveloperKeysController do
 
     it "An account admin shouldn't be able to access site admin dev keys" do
       user_session(@test_domain_root_account_admin)
-      get 'index'
+      get 'index', account_id: Account.site_admin.id
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end

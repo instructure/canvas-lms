@@ -1,0 +1,23 @@
+<% selected_id ||= nil %>
+<% exclude_all_option ||= false %>
+<% name ||= 'enrollment_term_id' %>
+<% id ||= 'enrollment_term_id' %>
+<select id="<%= id %>" name="<%= name %>">
+  <% unless exclude_all_option %>
+    <option value="" <%= 'selected' unless selected_id %>><%= t("All Terms") %></option>
+  <% end %>
+  <% if terms.not_ended.any? %>
+    <optgroup label="<%= t("Active Terms") %>">
+      <% terms.not_ended.by_name.each do |term| %>
+        <option value="<%= term.id %>" <%= 'selected' if term.id == selected_id %>><%= term.name %></option>
+      <% end %>
+    </optgroup>
+  <% end %>
+  <% if terms.ended.any? %>
+    <optgroup label="<%= t("Past Terms") %>">
+      <% terms.ended.by_name.each do |term| %>
+        <option value="<%= term.id %>" <%= 'selected' if term.id == selected_id %>><%= term.name %></option>
+      <% end %>
+    </optgroup>
+  <% end %>
+</select>

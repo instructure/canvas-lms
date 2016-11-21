@@ -8,6 +8,7 @@ describe 'Theme Editor' do
   include ThemeEditorCommon
 
   before(:each) do
+    make_full_screen
     course_with_admin_logged_in
   end
 
@@ -49,9 +50,29 @@ describe 'Theme Editor' do
     fj('.Theme__header button:contains("Exit")').click
     driver.switch_to.alert.accept
     # validations
-    assert_flash_notice_message /Theme editor changes have been cancelled/
+    assert_flash_notice_message(/Theme editor changes have been cancelled/)
     expect(driver.current_url).to end_with("/accounts/#{Account.default.id}/brand_configs")
     expect(f('#left-side #section-tabs .brand_configs').text).to eq 'Themes'
+  end
+
+  it 'should close after preview (no changes saved)', priority: "1", test_id: 239984 do
+    open_theme_editor(Account.default.id)
+
+    # verifies theme editor is open
+    expect(driver.title).to include 'Theme Editor'
+    f('.Theme__editor-color-block_input-text').send_keys('#dc6969')
+    preview_your_changes
+    run_jobs
+    expect(fj('.ReactModalPortal h3:contains("Generating preview")')).to be_displayed
+    exit_btn = fj('.Theme__header button:contains("Exit")')
+
+    keep_trying_until do
+      exit_btn.click
+      driver.switch_to.alert.accept
+      assert_flash_notice_message(/Theme editor changes have been cancelled/)
+      expect(driver.current_url).to end_with("/accounts/#{Account.default.id}/brand_configs")
+      expect(f('#left-side #section-tabs .brand_configs').text).to eq 'Themes'
+    end
   end
 
   it 'should display the preview button when valid change is made', priority: "1", test_id: 239984 do
@@ -140,19 +161,5 @@ describe 'Theme Editor' do
 
     # expect all 15 text fields to have working validation
     expect(all_warning_messages.length).to eq 15
-  end
-
-  it 'should have color squares that match the hex value', priority: "2", test_id: 241993 do
-    open_theme_editor(Account.default.id)
-    create_theme
-
-    click_global_branding
-    verify_colors_for_arrays(all_global_branding, all_global_branding('color_box'))
-
-    click_global_navigation
-    verify_colors_for_arrays(all_global_navigation, all_global_navigation('color_box'))
-
-    click_watermarks_and_other_images
-    verify_colors_for_arrays(all_watermarks, all_watermarks('color_box'))
   end
 end

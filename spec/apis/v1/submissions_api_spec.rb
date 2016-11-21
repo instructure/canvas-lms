@@ -1251,83 +1251,102 @@ describe 'Submissions API', type: :request do
 
   end
 
-  it "returns all submissions for a student" do
-    student1 = user(:active_all => true)
-    student2 = user_with_pseudonym(:active_all => true)
-    student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
+  describe "#for_students" do
+    before(:once) do
+      @student1 = user(:active_all => true)
+      @student2 = user_with_pseudonym(:active_all => true)
+      @student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
 
-    course_with_teacher(:active_all => true)
+      course_with_teacher(:active_all => true)
 
-    @course.enroll_student(student1).accept!
-    @course.enroll_student(student2).accept!
+      @course.enroll_student(@student1).accept!
+      @course.enroll_student(@student2).accept!
 
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
-    a2 = @course.assignments.create!(:title => 'assignment2', :grading_type => 'letter_grade', :points_possible => 25)
+      @a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+      @a2 = @course.assignments.create!(:title => 'assignment2', :grading_type => 'letter_grade', :points_possible => 25)
 
-    submit_homework(a1, student1)
-    submit_homework(a2, student1)
-    submit_homework(a1, student2)
+      submit_homework(@a1, @student1)
+      submit_homework(@a2, @student1)
+      submit_homework(@a1, @student2)
+    end
 
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/students/submissions.json",
-          { :controller => 'submissions_api', :action => 'for_students',
-            :format => 'json', :course_id => @course.to_param },
-          { :student_ids => [student1.to_param] })
+    it "returns all submissions for a student", priority: "1", test_id: 2989898 do
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :course_id => @course.to_param },
+            { :student_ids => [@student1.to_param] })
 
-    expect(json.size).to eq 2
-    json.each { |submission| expect(submission['user_id']).to eq student1.id }
+      expect(json.size).to eq 2
+      json.each { |submission| expect(submission['user_id']).to eq @student1.id }
 
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/students/submissions.json",
-          { :controller => 'submissions_api', :action => 'for_students',
-            :format => 'json', :course_id => @course.to_param },
-          { :student_ids => [student1.to_param, student2.to_param] })
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :course_id => @course.to_param },
+            { :student_ids => [@student1.to_param, @student2.to_param] })
 
-    expect(json.size).to eq 3
+      expect(json.size).to eq 3
 
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/students/submissions.json",
-          { :controller => 'submissions_api', :action => 'for_students',
-            :format => 'json', :course_id => @course.to_param },
-          { :student_ids => [student1.to_param, student2.to_param],
-            :assignment_ids => [a1.to_param] })
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :course_id => @course.to_param },
+            { :student_ids => [@student1.to_param, @student2.to_param],
+              :assignment_ids => [@a1.to_param] })
 
-    expect(json.size).to eq 2
-    expect(json.all? { |submission| expect(submission['assignment_id']).to eq a1.id }).to be_truthy
+      expect(json.size).to eq 2
+      expect(json.all? { |submission| expect(submission['assignment_id']).to eq @a1.id }).to be_truthy
 
-    # by sis user id!
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/students/submissions.json",
-          { :controller => 'submissions_api', :action => 'for_students',
-            :format => 'json', :course_id => @course.to_param },
-          { :student_ids => [student1.to_param, 'sis_user_id:my-student-id'],
-            :assignment_ids => [a1.to_param] })
+      # by sis user id!
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :course_id => @course.to_param },
+            { :student_ids => [@student1.to_param, 'sis_user_id:my-student-id'],
+              :assignment_ids => [@a1.to_param] })
 
-    expect(json.size).to eq 2
-    expect(json.all? { |submission| expect(submission['assignment_id']).to eq a1.id }).to be_truthy
+      expect(json.size).to eq 2
+      expect(json.all? { |submission| expect(submission['assignment_id']).to eq @a1.id }).to be_truthy
 
-    # by sis login id!
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/students/submissions.json",
-          { :controller => 'submissions_api', :action => 'for_students',
-            :format => 'json', :course_id => @course.to_param },
-          { :student_ids => [student1.to_param, "sis_login_id:#{student2.pseudonym.unique_id}"],
-            :assignment_ids => [a1.to_param] })
+      # by sis login id!
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :course_id => @course.to_param },
+            { :student_ids => [@student1.to_param, "sis_login_id:#{@student2.pseudonym.unique_id}"],
+              :assignment_ids => [@a1.to_param] })
 
-    expect(json.size).to eq 2
-    expect(json.all? { |submission| expect(submission['assignment_id']).to eq a1.id }).to be_truthy
+      expect(json.size).to eq 2
+      expect(json.all? { |submission| expect(submission['assignment_id']).to eq @a1.id }).to be_truthy
 
-    # concluded enrollments!
-    student2.enrollments.first.conclude
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/students/submissions.json",
-          { :controller => 'submissions_api', :action => 'for_students',
-            :format => 'json', :course_id => @course.to_param },
-          { :student_ids => [student1.to_param, "sis_login_id:#{student2.pseudonym.unique_id}"],
-            :assignment_ids => [a1.to_param] })
+      # concluded enrollments!
+      @student2.enrollments.first.conclude
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { :controller => 'submissions_api', :action => 'for_students',
+              :format => 'json', :course_id => @course.to_param },
+            { :student_ids => [@student1.to_param, "sis_login_id:#{@student2.pseudonym.unique_id}"],
+              :assignment_ids => [@a1.to_param] })
 
-    expect(json.size).to eq 2
-    expect(json.all? { |submission| expect(submission['assignment_id']).to eq a1.id }).to be_truthy
+      expect(json.size).to eq 2
+      expect(json.all? { |submission| expect(submission['assignment_id']).to eq @a1.id }).to be_truthy
+    end
+
+    it "can return assignments based on graded_at time", priority: "1", test_id: 2989899 do
+      @a2.grade_student @student1, grade: 10
+      @a1.grade_student @student1, grade: 5
+      @a3 = @course.assignments.create! title: "a3"
+      @a3.submit_homework @student1, body: "hello"
+      Submission.where(assignment_id: @a2).update_all(graded_at: 1.hour.from_now)
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students',
+              format: 'json', course_id: @course.to_param },
+            { student_ids: [@student1.to_param],
+              order: "graded_at", order_direction: "descending" })
+      expect(json.map { |a| a["assignment_id"] }).to eq [@a2.id, @a1.id, @a3.id]
+    end
   end
 
   context "moderated assignments" do

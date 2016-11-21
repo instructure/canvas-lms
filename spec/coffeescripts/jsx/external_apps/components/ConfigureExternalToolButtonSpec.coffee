@@ -1,11 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'react-modal'
   'jsx/external_apps/components/ConfigureExternalToolButton'
-], (React, ReactDOM, Modal, ConfigureExternalToolButton) ->
+], (React, ReactDOM, TestUtils, Modal, ConfigureExternalToolButton) ->
 
-  TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 

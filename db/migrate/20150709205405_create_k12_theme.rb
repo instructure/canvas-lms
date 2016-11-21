@@ -1,4 +1,4 @@
-class CreateK12Theme < ActiveRecord::Migration
+class CreateK12Theme < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   NAME = "K12 Theme"

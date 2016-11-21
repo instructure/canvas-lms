@@ -7,6 +7,7 @@ if CANVAS_RAILS4_2
   gem 'oauth2', '1.0.0', require: false
 else
   gem 'rails', '5.0.0.1'
+  gem 'rails-observers', github: 'rails/rails-observers', ref: '3fe157d6cbb5b5e767ded248009fc59443d63fa1'
   gem 'rack', '2.0.1'
   gem 'oauth2', '1.2.0', require: false
 end
@@ -23,11 +24,11 @@ gem 'authlogic', '3.5.0'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.7.2'
+gem 'switchman', '1.8.0'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
-  gem 'will_paginate', '3.0.7', require: false
+  gem 'will_paginate', '3.1.5', require: false
 
 gem "after_transaction_commit", '1.1.0'
 gem "aws-sdk", '2.6.7', require: false
@@ -36,7 +37,7 @@ gem "aws-sdk-v1", '1.66.0', require: false
 gem 'barby', '0.5.0', require: false
   gem 'rqrcode', '0.4.2', require: false
   gem 'chunky_png', '1.3.0', require: false
-gem 'bcrypt-ruby', '3.1.5'
+gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.4', require: false
 gem 'canvas_webex', '0.17'
@@ -57,13 +58,13 @@ gem 'ims-lti', '2.1.0.beta.3', require: 'ims'
 gem 'json', '1.8.3'
 gem 'oj', '2.17.1'
 gem 'jwt', '1.2.1', require: false
-gem 'json-jwt', '1.5.1', require: false
+gem 'json-jwt', '1.6.5', require: false
 gem 'twilio-ruby', '4.2.1'
 
 gem 'mail', '2.5.4', require: false
   gem 'treetop', '1.4.15', require: false
     gem 'polyglot', '0.3.5', require: false
-gem 'marginalia', '1.3.0', require: false
+gem 'marginalia', '1.4.0', require: false
 gem 'mime-types', '1.25.1', require: 'mime/types'
 gem 'mini_magick', '4.2.7'
   gem 'subexec', '0.0.4', require: false
@@ -74,7 +75,6 @@ gem 'nokogiri', '1.6.6.2.20150813143452', require: false, github: 'codekitchen/n
 gem 'oauth-instructure', '0.4.10', require: false
 gem 'parallel', '1.6.2', require: false
   gem 'ruby-progressbar', '1.7.5', require: false #used to show progress of S3Uploader
-gem 'rack-mini-profiler', '0.9.2', require: false
 gem 'flamegraph', '0.1.0', require: false
   gem 'stackprof', '0.2.9', require: false
 gem 'rake', '11.3.0'
@@ -99,7 +99,8 @@ gem 'useragent', '0.16.7', require: false
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
 gem 'sentry-raven', '0.15.6', require: false
-gem 'canvas_statsd', '1.0.3'
+gem 'canvas_statsd', '1.0.7'
+  gem 'aroi', '0.0.4', require: false
 gem 'diplomat', '1.0.0', require: false
 gem 'gepub'
 

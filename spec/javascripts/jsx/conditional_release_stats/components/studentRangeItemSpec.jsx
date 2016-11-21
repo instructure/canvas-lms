@@ -1,8 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/conditional_release_stats/components/student-range-item',
-], (React, StudentRangeItem) => {
-  const TestUtils = React.addons.TestUtils
+], (React, TestUtils, StudentRangeItem) => {
 
   module('Student Range Item')
 

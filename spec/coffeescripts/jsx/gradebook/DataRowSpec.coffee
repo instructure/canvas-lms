@@ -1,12 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/grading/dataRow'
-], (React, ReactDOM, $, DataRow) ->
-
-  Simulate = React.addons.TestUtils.Simulate
-  SimulateNative = React.addons.TestUtils.SimulateNative
+], (React, ReactDOM, {Simulate, SimulateNative}, $, DataRow) ->
 
   module 'DataRow not being edited, without a sibling',
     setup: ->

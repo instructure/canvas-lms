@@ -222,7 +222,10 @@ module Importers
       end
       migration.progress=100
       migration.migration_settings ||= {}
-      migration.migration_settings[:imported_assets] = migration.imported_migration_items.map(&:asset_string)
+
+      imported_asset_hash = {}
+      migration.imported_migration_items_hash.each{|k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(',') if assets.present?}
+      migration.migration_settings[:imported_assets] = imported_asset_hash
       migration.workflow_state = :imported
       migration.save
       ActiveRecord::Base.skip_touch_context(false)
@@ -287,6 +290,15 @@ module Importers
           else
             migration.add_warning(t(:account_grading_standard_warning,"Couldn't find account grading standard for the course." ))
           end
+        end
+      end
+      if image_url = settings[:image_url]
+        course.image_url = image_url
+        course.image_id = nil
+      elsif image_ref = settings[:image_identifier_ref]
+        if image_att = course.attachments.where(:migration_id => image_ref).first
+          course.image_id = image_att.id
+          course.image_url = nil
         end
       end
       if settings[:lock_all_announcements]

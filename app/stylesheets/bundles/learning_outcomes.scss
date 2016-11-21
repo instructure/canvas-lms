@@ -1,10 +1,6 @@
 @import "base/environment";
 @import "pages/rubrics";
 
-#main {
-  max-width: none;
-}
-
 .outcomes-browser {
   min-width: 840px;
   margin-top: 0px;
@@ -17,6 +13,9 @@
     box-sizing: border-box;
     overflow: auto;
     .manage_rubrics {
+      float: right;
+    }
+    .popover-menu {
       float: right;
     }
     .search {

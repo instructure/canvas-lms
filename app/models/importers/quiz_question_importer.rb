@@ -29,8 +29,10 @@ module Importers
           INSERT INTO #{Quizzes::QuizQuestion.quoted_table_name} (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)
           VALUES (?,?,?,?,?,?,?,?)
         SQL
-        qq_ids[mig_id] = self.item_class.connection.insert(query, "#{self.item_class.name} Create",
-          self.item_class.primary_key, nil, self.item_class.sequence_name)
+        Shackles.activate(:master) do
+          qq_ids[mig_id] = self.item_class.connection.insert(query, "#{self.item_class.name} Create",
+            self.item_class.primary_key, nil, self.item_class.sequence_name)
+        end
       end
       hash
     end

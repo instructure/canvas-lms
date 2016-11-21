@@ -1,4 +1,4 @@
-class CreateDelayedJobsTestStory < ActiveRecord::Migration
+class CreateDelayedJobsTestStory < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

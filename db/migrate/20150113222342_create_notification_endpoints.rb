@@ -1,4 +1,4 @@
-class CreateNotificationEndpoints < ActiveRecord::Migration
+class CreateNotificationEndpoints < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

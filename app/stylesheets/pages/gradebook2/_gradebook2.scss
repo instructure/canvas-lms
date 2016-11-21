@@ -9,10 +9,6 @@ a#accessibility_warning {
   display: none;
 }
 
-#main {
-  margin-bottom: 0;
-}
-
 $cell_height: 33px;
 
 // ******* overrides of the default slick.grid.css styles ********
@@ -42,7 +38,7 @@ $cell_height: 33px;
 
 // ******* END overrides of the default slick.grid.css styles ********
 
-.gradebook2 #content {
+.gradebook2 .ic-Layout-contentMain {
   position: relative;
   padding: 0 $ic-sp*2;
 }

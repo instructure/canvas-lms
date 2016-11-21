@@ -16984,6 +16984,7 @@ pt:
   webct_file_description: "Disciplina Blackboard Vista/CE, WebCT 6+"
   webct_name: "Blackboard Vista/CE (WebCT)"
   week_s_cb1492ee: Semana(s)
+  weight_final_grade_based_on_assignment_groups_3124161: "Ponderar nota final com base nos grupos de tarefa"
   welcome_to_the_canvas_theme_editor_73091d1: "Bem-vindo ao Editor de Tema Canvas"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Bem vindo às suas disciplinas! Para personalizar esta lista de disciplinas, clique na ligação \"Todas as Disciplinas\" e escolha as disciplinas para apresentar."
   well_below_mastery_37664bdc: "Muito abaixo de Domínio"

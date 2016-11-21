@@ -1,4 +1,4 @@
-class FixDuplicateCommunicationChannels < ActiveRecord::Migration
+class FixDuplicateCommunicationChannels < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

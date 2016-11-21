@@ -31,7 +31,7 @@ define [
       @contexts or= availableContexts
 
       @contexts = _.intersection(@contexts, availableContexts)
-      @contexts = @contexts.slice(0, 10)
+      @contexts = @contexts.slice(0, ENV.CALENDAR.VISIBLE_CONTEXTS_LIMIT)
 
       @notify()
 
@@ -56,7 +56,7 @@ define [
         @contexts.splice index, 1
       else
         @contexts.push context
-        @contexts.shift() if @contexts.length > 10
+        @contexts.shift() if @contexts.length > ENV.CALENDAR.VISIBLE_CONTEXTS_LIMIT
       @notifyOnChange()
 
     notifyOnChange: =>

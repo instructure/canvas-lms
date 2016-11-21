@@ -1,4 +1,4 @@
-class CreateAlerts < ActiveRecord::Migration
+class CreateAlerts < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

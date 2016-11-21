@@ -1,4 +1,4 @@
-class AddNotInFinalGradeToAssignments < ActiveRecord::Migration
+class AddNotInFinalGradeToAssignments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

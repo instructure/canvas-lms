@@ -1,4 +1,4 @@
-class FixNameOfSisBatchesPendingIndex < ActiveRecord::Migration
+class FixNameOfSisBatchesPendingIndex < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

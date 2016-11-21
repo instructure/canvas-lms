@@ -2,12 +2,11 @@ define [
   '../mockFilesENV'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/RestrictedDialogForm'
   'compiled/models/Folder'
-], (mockFilesENV, React, ReactDOM, $, RestrictedDialogForm, Folder) ->
-
-  Simulate = React.addons.TestUtils.Simulate
+], (mockFilesENV, React, ReactDOM, {Simulate}, $, RestrictedDialogForm, Folder) ->
 
   module 'RestrictedDialogForm Multiple Selected Items',
     setup: ->

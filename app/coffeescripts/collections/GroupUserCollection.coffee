@@ -35,6 +35,9 @@ define [
     membershipsLocked: ->
       false
 
+    getUser: (asset_string) ->
+      @get(asset_string.replace("user_", ""))
+
     addUser: (user) ->
       if @membershipsLocked()
         @get(user)?.moved()

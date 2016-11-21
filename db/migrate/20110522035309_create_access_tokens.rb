@@ -1,4 +1,4 @@
-class CreateAccessTokens < ActiveRecord::Migration
+class CreateAccessTokens < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up
@@ -26,7 +26,7 @@ class CreateAccessTokens < ActiveRecord::Migration
     end
     remove_column :developer_keys, :user_id
     rename_column :developer_keys, :user_id_int, :user_id
-    
+
     add_column :developer_keys, :name, :string
   end
 

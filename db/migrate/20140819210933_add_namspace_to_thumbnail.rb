@@ -1,4 +1,4 @@
-class AddNamspaceToThumbnail < ActiveRecord::Migration
+class AddNamspaceToThumbnail < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

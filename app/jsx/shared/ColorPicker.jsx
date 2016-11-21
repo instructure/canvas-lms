@@ -8,8 +8,6 @@ define([
   'compiled/jquery.rails_flash_notifications'
 ], function($, React, ReactModal, I18n, CourseNicknameEdit, classnames) {
 
-  const ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
-
   var PREDEFINED_COLORS = [
     {hexcode: '#EF4437', name: I18n.t('Red')},
     {hexcode: '#E71F63', name: I18n.t('Pink')},
@@ -144,9 +142,7 @@ define([
           success: () => {
             this.props.afterUpdateColor(color);
           },
-          error: () => {
-            console.log('Error setting color');
-          }
+          error: () => {}
         });
       }
     },

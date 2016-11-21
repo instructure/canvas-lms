@@ -1,5 +1,5 @@
 # This migration comes from switchman (originally 20130328224244)
-class CreateDefaultShard < ActiveRecord::Migration
+class CreateDefaultShard < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

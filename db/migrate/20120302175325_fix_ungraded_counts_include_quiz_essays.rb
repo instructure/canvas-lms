@@ -1,4 +1,4 @@
-class FixUngradedCountsIncludeQuizEssays < ActiveRecord::Migration
+class FixUngradedCountsIncludeQuizEssays < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

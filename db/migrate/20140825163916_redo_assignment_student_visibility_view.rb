@@ -1,4 +1,4 @@
-class RedoAssignmentStudentVisibilityView < ActiveRecord::Migration
+class RedoAssignmentStudentVisibilityView < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

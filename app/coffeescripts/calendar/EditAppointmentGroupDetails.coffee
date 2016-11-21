@@ -17,7 +17,7 @@ define [
 ], ($, _, fcUtil, I18n, htmlEscape, commonEventFactory, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate, sectionCheckboxesTemplate, ContextSelector, preventDefault) ->
 
   class EditAppointmentGroupDetails
-    constructor: (selector, @apptGroup, @contexts, @closeCB) ->
+    constructor: (selector, @apptGroup, @contexts, @closeCB, @event, @useBetterScheduler) ->
       @currentContextInfo = null
       @appointment_group = _.extend(
         {use_group_signup: @apptGroup.participant_type is 'Group'}
@@ -25,6 +25,7 @@ define [
       )
 
       $(selector).html editAppointmentGroupTemplate({
+        better_scheduler: @useBetterScheduler
         title: @apptGroup.title
         contexts: @contexts
         appointment_group: @appointment_group,
@@ -70,7 +71,7 @@ define [
 
       # make sure this is the spot
       timeBlocks = ([fcUtil.wrap(appt.start_at), fcUtil.wrap(appt.end_at), true] for appt in @apptGroup.appointments || [] )
-      @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body"), @form.find(".splitter"), timeBlocks)
+      @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body"), @form.find(".splitter"), timeBlocks, { date: @event && @event.date })
 
       @form.find('[name="slot_duration"]').change (e) =>
         if @form.find('[name="autosplit_option"]').is(":checked")
@@ -112,7 +113,11 @@ define [
         @form.find("#appointment-blocks-active-button").attr('disabled', true).prop('checked', true)
 
       @form.submit @saveClick
-      @form.find('.save_without_publishing_link').click @saveWithoutPublishingClick
+      if @useBetterScheduler
+        @form.find('.cancel_btn').click @cancel
+      else
+        @form.find('.save_without_publishing_link').click @saveWithoutPublishingClick
+
 
     creating: ->
       !@editing()
@@ -156,6 +161,10 @@ define [
     saveWithoutPublishingClick: (jsEvent) =>
       jsEvent.preventDefault()
       @save(false)
+
+    cancel: (e) =>
+      e.preventDefault()
+      @closeCB(false)
 
     saveClick: (jsEvent) =>
       jsEvent.preventDefault()

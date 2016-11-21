@@ -1,4 +1,4 @@
-class EnsureSubmissionsForDiscussions < ActiveRecord::Migration
+class EnsureSubmissionsForDiscussions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

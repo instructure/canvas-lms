@@ -4,9 +4,10 @@ define([
   'instructure-ui/Button',
   'axios',
   'i18n!grading_periods',
+  'timezone',
   'jsx/shared/helpers/dateHelper',
   'jquery.instructure_misc_helpers'
-], function(React, $, { default: Button }, axios, I18n, DateHelper) {
+], function(React, $, { default: Button }, axios, I18n, tz, DateHelper) {
   const Types = React.PropTypes;
 
   let AccountGradingPeriod = React.createClass({
@@ -55,11 +56,13 @@ define([
     renderEditButton() {
       if (this.props.permissions.update && !this.props.readOnly) {
         return (
-          <Button ref="editButton"
-                  variant="icon"
-                  disabled={this.props.actionsDisabled}
-                  onClick={this.onEdit}
-                  title={I18n.t("Edit %{title}", { title: this.props.period.title })}>
+          <Button
+            ref="editButton"
+            variant="icon"
+            disabled={this.props.actionsDisabled}
+            onClick={this.onEdit}
+            title={I18n.t("Edit %{title}", { title: this.props.period.title })}
+          >
             <span className="screenreader-only">
               {I18n.t("Edit %{title}", { title: this.props.period.title })}
             </span>
@@ -72,11 +75,13 @@ define([
     renderDeleteButton() {
       if (this.props.permissions.delete && !this.props.readOnly) {
         return (
-          <Button ref="deleteButton"
-                  variant="icon"
-                  disabled={this.props.actionsDisabled}
-                  onClick={this.promptDeleteGradingPeriod}
-                  title={I18n.t("Delete %{title}", { title: this.props.period.title })}>
+          <Button
+            ref="deleteButton"
+            variant="icon"
+            disabled={this.props.actionsDisabled}
+            onClick={this.promptDeleteGradingPeriod}
+            title={I18n.t("Delete %{title}", { title: this.props.period.title })}
+          >
             <span className="screenreader-only">
               {I18n.t("Delete %{title}", { title: this.props.period.title })}
             </span>
@@ -84,7 +89,16 @@ define([
           </Button>
         );
       }
+    },
 
+    dateWithTimezone(date) {
+      const displayDatetime = DateHelper.formatDatetimeForDisplay(date);
+
+      if(ENV.CONTEXT_TIMEZONE === ENV.TIMEZONE) {
+        return displayDatetime;
+      } else {
+        return `${displayDatetime} ${tz.format(date, '%Z')}`;
+      }
     },
 
     render() {
@@ -95,13 +109,13 @@ define([
               <span tabIndex="0" ref="title">{this.props.period.title}</span>
             </div>
             <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
-              <span tabIndex="0" ref="startDate">{I18n.t("Start Date:")} {DateHelper.formatDatetimeForDisplay(this.props.period.startDate)}</span>
+              <span tabIndex="0" ref="startDate">{I18n.t("Start Date:")} {this.dateWithTimezone(this.props.period.startDate)}</span>
             </div>
             <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
-              <span tabIndex="0" ref="endDate">{I18n.t("End Date:")} {DateHelper.formatDatetimeForDisplay(this.props.period.endDate)}</span>
+              <span tabIndex="0" ref="endDate">{I18n.t("End Date:")} {this.dateWithTimezone(this.props.period.endDate)}</span>
             </div>
             <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
-              <span tabIndex="0" ref="closeDate">{I18n.t("Close Date:")} {DateHelper.formatDatetimeForDisplay(this.props.period.closeDate)}</span>
+              <span tabIndex="0" ref="closeDate">{I18n.t("Close Date:")} {this.dateWithTimezone(this.props.period.closeDate)}</span>
             </div>
           </div>
           <div className="GradingPeriodList__period__actions">
@@ -111,7 +125,6 @@ define([
         </div>
       );
     },
-
   });
 
   return AccountGradingPeriod;

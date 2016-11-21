@@ -9,9 +9,9 @@ define [
   'compiled/collections/AssignmentOverrideCollection'
   'compiled/collections/DateGroupCollection'
   'i18n!assignments'
-  'compiled/util/GradingPeriods'
+  'jsx/grading/helpers/GradingPeriodsHelper'
   'timezone'
-], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n, GradingPeriods, tz) ->
+], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, VeriCiteSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n, GradingPeriodsHelper, tz) ->
 
   class Assignment extends Model
     @mixin DefaultUrlMixin
@@ -102,7 +102,7 @@ define [
       @get('frozen_attributes') || []
 
     hasDueDateInClosedGradingPeriod: =>
-      @get('has_due_date_in_closed_grading_period')
+      !!ENV.MULTIPLE_GRADING_PERIODS_ENABLED && @get('has_due_date_in_closed_grading_period')
 
     gradingType: (gradingType) =>
       return @get('grading_type') || 'points' unless gradingType
@@ -371,11 +371,12 @@ define [
 
     inGradingPeriod: (gradingPeriod) ->
       dateGroups = @get("all_dates")
+      gradingPeriodsHelper = new GradingPeriodsHelper(gradingPeriod)
       if dateGroups
         _.any dateGroups.models, (dateGroup) =>
-          GradingPeriods.dateIsInGradingPeriod(dateGroup.dueAt(), gradingPeriod)
+          gradingPeriodsHelper.isDateInGradingPeriod(dateGroup.dueAt(), gradingPeriod.id)
       else
-        GradingPeriods.dateIsInGradingPeriod(tz.parse(@dueAt()), gradingPeriod)
+        gradingPeriodsHelper.isDateInGradingPeriod(tz.parse(@dueAt()), gradingPeriod.id)
 
     search: (regex, gradingPeriod) ->
       match = regex == "" || @get('name').match(regex)

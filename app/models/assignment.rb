@@ -64,6 +64,9 @@ class Assignment < ActiveRecord::Base
   belongs_to :grading_standard
   belongs_to :group_category
 
+  has_many :context_external_tool_assignment_lookups, dependent: :delete_all
+  has_many :tool_settings_tools, through: :context_external_tool_assignment_lookups, source: :context_external_tool
+
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
@@ -73,7 +76,7 @@ class Assignment < ActiveRecord::Base
   validates :lti_context_id, presence: true, uniqueness: true
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
-    # only accept the url, content_type, content_id, and new_tab params, the other accessible
+    # only accept the url, content_tyupe, content_id, and new_tab params, the other accessible
     # params don't apply to an content tag being used as an external_tool_tag
     content = case attrs['content_type']
               when 'Lti::MessageHandler', 'lti/message_handler'
@@ -119,7 +122,7 @@ class Assignment < ActiveRecord::Base
 
   def secure_params
     body = {}
-    body[:lti_assignment_id] = SecureRandom.uuid if new_record?
+    body[:lti_assignment_id] = self.lti_context_id || SecureRandom.uuid
     Canvas::Security.create_jwt(body)
   end
 
@@ -1078,12 +1081,9 @@ class Assignment < ActiveRecord::Base
   def participants_with_visibility(opts={})
     users = context.participating_admins
 
-    applicable_students = if opts[:excluded_user_ids]
-                            students_with_visibility.reject{|s| opts[:excluded_user_ids].include?(s.id)}
-                          else
-                            students_with_visibility
-                          end
-
+    student_scope = students_with_visibility(context.participating_students_by_date)
+    student_scope = student_scope.where.not(:id => opts[:excluded_user_ids]) if opts[:excluded_user_ids]
+    applicable_students = student_scope.to_a
     users += applicable_students
 
     if opts[:include_observers]
@@ -1996,7 +1996,7 @@ class Assignment < ActiveRecord::Base
   def submission_action_string
     if submission_types == "online_quiz"
       t :submission_action_take_quiz, "Take %{title}", :title => title
-    elsif graded?
+    elsif graded? && expects_submission?
       t :submission_action_turn_in_assignment, "Turn in %{title}", :title => title
     else
       t "Complete %{title}", :title => title
@@ -2173,8 +2173,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def due_for_any_student_in_closed_grading_period?(periods = nil)
-    return false unless self.due_date || self.has_active_overrides?
-
     periods ||= GradingPeriod.for(self.course)
     due_in_closed_period = !self.only_visible_to_overrides &&
       GradingPeriodHelper.date_in_closed_grading_period?(self.due_date, periods)

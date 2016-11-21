@@ -1,4 +1,4 @@
-class AddUserNoteToConversationBatch < ActiveRecord::Migration
+class AddUserNoteToConversationBatch < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

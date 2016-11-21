@@ -1,4 +1,4 @@
-class AddSourceCourseToContentMigration < ActiveRecord::Migration
+class AddSourceCourseToContentMigration < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

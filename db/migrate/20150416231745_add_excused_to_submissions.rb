@@ -1,4 +1,4 @@
-class AddExcusedToSubmissions < ActiveRecord::Migration
+class AddExcusedToSubmissions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

@@ -1,4 +1,4 @@
-class AddSomeIndices < ActiveRecord::Migration
+class AddSomeIndices < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

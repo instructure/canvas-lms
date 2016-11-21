@@ -447,9 +447,11 @@ class GroupCategoriesController < ApplicationController
     return render(:json => {}, :status => :bad_request) if @group_category.student_organized?
     return render(:json => {}, :status => :bad_request) if @context.is_a?(Course) && @group_category.restricted_self_signup?
 
+    by_section = value_to_boolean(params[:group_by_section])
+
     if value_to_boolean(params[:sync])
       # do the distribution and note the changes
-      memberships = @group_category.assign_unassigned_members
+      memberships = @group_category.assign_unassigned_members(by_section)
 
       # render the changes
       json = memberships.group_by{ |m| m.group_id }.map do |group_id, new_members|
@@ -457,7 +459,7 @@ class GroupCategoriesController < ApplicationController
       end
       render :json => json
     else
-      @group_category.assign_unassigned_members_in_background
+      @group_category.assign_unassigned_members_in_background(by_section)
       render :json => progress_json(@group_category.current_progress, @current_user, session)
     end
   end

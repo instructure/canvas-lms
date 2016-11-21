@@ -1,0 +1,13 @@
+{
+    "env": {
+        "qunit": true
+    },
+    "globals": {
+        "module": true,
+        "test": true,
+        "equal": true,
+        "ok": true,
+        "sinon": true,
+        "deepEqual": true
+    }
+}

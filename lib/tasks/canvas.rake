@@ -39,8 +39,7 @@ namespace :canvas do
 
     if ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
       log_time('Making sure node_modules are up to date') {
-        puts "node is: #{`which node`} #{`node -v`}"
-        raise 'error running npm install' unless `npm install`
+        Rake::Task['js:npm_install'].invoke
       }
     end
 
@@ -96,28 +95,9 @@ namespace :canvas do
     end
     combined_time = times.reduce(:+)
     puts "Finished compiling assets in #{real_time}. parallelism saved #{combined_time - real_time} (#{real_time.to_f / combined_time.to_f * 100.0}%)"
-    raise "Error reving files" unless system('node_modules/.bin/gulp rev')
+
+    log_time("gulp rev") { Rake::Task['js:gulp_rev'].invoke }
   end
-
-  desc "Check static assets and generate api documentation."
-     task :check_static_assets do
-       threads = []
-       threads << Thread.new do
-         puts "--> JS tests"
-         Rake::Task['js:test'].invoke
-       end
-
-       threads << Thread.new do
-         puts "--> i18n check"
-         Rake::Task['i18n:check'].invoke
-       end
-
-       threads << Thread.new do
-         puts "--> Generating API documentation"
-         Rake::Task['doc:api'].invoke
-       end
-     threads.each(&:join)
-   end
 end
 
 namespace :lint do

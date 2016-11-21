@@ -1,13 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/UsageRightsIndicator'
   'compiled/models/Folder'
   'compiled/models/File'
-], (React, ReactDOM, $, UsageRightsIndicator, Folder, File) ->
-
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, $, UsageRightsIndicator, Folder, File) ->
 
   module 'UsageRightsIndicator'
 

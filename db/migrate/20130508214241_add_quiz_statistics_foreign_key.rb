@@ -1,4 +1,4 @@
-class AddQuizStatisticsForeignKey < ActiveRecord::Migration
+class AddQuizStatisticsForeignKey < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

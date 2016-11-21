@@ -1,4 +1,4 @@
-class PopulateSubmissionCommentDraftField < ActiveRecord::Migration
+class PopulateSubmissionCommentDraftField < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

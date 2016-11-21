@@ -39,11 +39,11 @@ define([
   function createGradingPeriod(opts={}) {
     const defaults = {
       id: '1',
-      is_last: false,
-      closed: false
+      isLast: false,
+      isClosed: false
     };
 
-    return Object.assign(defaults, opts);
+    return Object.assign(defaults, opts, { startDate: new Date(opts.startDate), endDate: new Date(opts.endDate), closeDate: new Date(opts.closeDate) });
   }
 
   function createOverride({ type, id, dueAt }={}) {
@@ -123,9 +123,9 @@ define([
 
   module('SubmissionStateMap with MGP enabled and all grading periods selected', {
     setup() {
-      const closedPeriod = createGradingPeriod({ id: '1', start_date: '2015-07-01', end_date: '2015-07-31', close_date: '2015-08-02', closed: true });
-      const openPeriod = createGradingPeriod({ id: '2', start_date: '2015-08-01', end_date: '2015-08-31', close_date: '2015-09-02' });
-      const lastPeriod = createGradingPeriod({ id: '3', start_date: '2015-09-01', end_date: '2015-09-30', close_date: '2015-10-02', is_last: true });
+      const closedPeriod = createGradingPeriod({ id: '1', startDate: '2015-07-01', endDate: '2015-07-31', closeDate: '2015-08-02', isClosed: true });
+      const openPeriod = createGradingPeriod({ id: '2', startDate: '2015-08-01', endDate: '2015-08-31', closeDate: '2015-09-02' });
+      const lastPeriod = createGradingPeriod({ id: '3', startDate: '2015-09-01', endDate: '2015-09-30', closeDate: '2015-10-02', isLast: true });
       this.DATE_BEFORE_FIRST_PERIOD = '2015-06-15';
       this.DATE_IN_CLOSED_PERIOD = '2015-07-15';
       this.DATE_IN_OPEN_PERIOD = '2015-08-15';
@@ -256,9 +256,9 @@ define([
 
   module('SubmissionStateMap with MGP enabled and a non-closed grading period selected that is not the last grading period', {
     setup() {
-      const closedPeriod = createGradingPeriod({ id: '1', start_date: '2015-07-01', end_date: '2015-07-31', close_date: '2015-08-02', closed: true });
-      const openPeriod = createGradingPeriod({ id: '2', start_date: '2015-08-01', end_date: '2015-08-31', close_date: '2015-09-02' });
-      const lastPeriod = createGradingPeriod({ id: '3', start_date: '2015-09-01', end_date: '2015-09-30', close_date: '2015-10-02', is_last: true });
+      const closedPeriod = createGradingPeriod({ id: '1', startDate: '2015-07-01', endDate: '2015-07-31', closeDate: '2015-08-02', isClosed: true });
+      const openPeriod = createGradingPeriod({ id: '2', startDate: '2015-08-01', endDate: '2015-08-31', closeDate: '2015-09-02' });
+      const lastPeriod = createGradingPeriod({ id: '3', startDate: '2015-09-01', endDate: '2015-09-30', closeDate: '2015-10-02', isLast: true });
       this.DATE_BEFORE_FIRST_PERIOD = '2015-06-15';
       this.DATE_IN_CLOSED_PERIOD = '2015-07-15';
       this.DATE_IN_SELECTED_PERIOD = '2015-08-15';
@@ -361,10 +361,10 @@ define([
 
   module('SubmissionStateMap with MGP enabled and a closed grading period selected that is not the last grading period', {
     setup() {
-      const firstClosedPeriod = createGradingPeriod({ id: '1', start_date: '2015-06-01', end_date: '2015-06-30', close_date: '2015-07-02', closed: true });
-      const secondClosedPeriod = createGradingPeriod({ id: '2', start_date: '2015-07-01', end_date: '2015-07-31', close_date: '2015-08-02', closed: true });
-      const openPeriod = createGradingPeriod({ id: '3', start_date: '2015-08-01', end_date: '2015-08-31', close_date: '2015-09-02'});
-      const lastPeriod = createGradingPeriod({ id: '4', start_date: '2015-09-01', end_date: '2015-09-30', close_date: '2015-10-02', is_last: true });
+      const firstClosedPeriod = createGradingPeriod({ id: '1', startDate: '2015-06-01', endDate: '2015-06-30', closeDate: '2015-07-02', isClosed: true });
+      const secondClosedPeriod = createGradingPeriod({ id: '2', startDate: '2015-07-01', endDate: '2015-07-31', closeDate: '2015-08-02', isClosed: true });
+      const openPeriod = createGradingPeriod({ id: '3', startDate: '2015-08-01', endDate: '2015-08-31', closeDate: '2015-09-02'});
+      const lastPeriod = createGradingPeriod({ id: '4', startDate: '2015-09-01', endDate: '2015-09-30', closeDate: '2015-10-02', isLast: true });
       this.DATE_BEFORE_FIRST_PERIOD = '2015-05-15';
       this.DATE_IN_SELECTED_PERIOD = '2015-07-15';
       this.DATE_IN_OPEN_PERIOD = '2015-08-15';
@@ -467,9 +467,9 @@ define([
 
   module('SubmissionStateMap with MGP enabled and the last grading period selected which is not closed', {
     setup() {
-      const closedPeriod = createGradingPeriod({ id: '1', start_date: '2015-07-01', end_date: '2015-07-31', close_date: '2015-08-02', closed: true });
-      const openPeriod = createGradingPeriod({ id: '2', start_date: '2015-08-01', end_date: '2015-08-31', close_date: '2015-09-02' });
-      const lastPeriod = createGradingPeriod({ id: '3', start_date: '2015-09-01', end_date: '2015-09-30', close_date: '2015-10-02', is_last: true });
+      const closedPeriod = createGradingPeriod({ id: '1', startDate: '2015-07-01', endDate: '2015-07-31', closeDate: '2015-08-02', isClosed: true });
+      const openPeriod = createGradingPeriod({ id: '2', startDate: '2015-08-01', endDate: '2015-08-31', closeDate: '2015-09-02' });
+      const lastPeriod = createGradingPeriod({ id: '3', startDate: '2015-09-01', endDate: '2015-09-30', closeDate: '2015-10-02', isLast: true });
       this.DATE_BEFORE_FIRST_PERIOD = '2015-06-15';
       this.DATE_IN_CLOSED_PERIOD = '2015-07-15';
       this.DATE_IN_OPEN_PERIOD = '2015-08-15';
@@ -573,9 +573,9 @@ define([
 
   module('SubmissionStateMap with MGP enabled and the last grading period selected which is closed', {
     setup() {
-      const closedPeriod = createGradingPeriod({ id: '1', start_date: '2015-07-01', end_date: '2015-07-31', close_date: '2015-08-02', closed: true });
-      const openPeriod = createGradingPeriod({ id: '2', start_date: '2015-08-01', end_date: '2015-08-31', close_date: '2015-12-25' });
-      const lastPeriodAndClosed = createGradingPeriod({ id: '3', start_date: '2015-09-01', end_date: '2015-09-30', close_date: '2015-10-02', is_last: true, closed: true });
+      const closedPeriod = createGradingPeriod({ id: '1', startDate: '2015-07-01', endDate: '2015-07-31', closeDate: '2015-08-02', isClosed: true });
+      const openPeriod = createGradingPeriod({ id: '2', startDate: '2015-08-01', endDate: '2015-08-31', closeDate: '2015-12-25' });
+      const lastPeriodAndClosed = createGradingPeriod({ id: '3', startDate: '2015-09-01', endDate: '2015-09-30', closeDate: '2015-10-02', isLast: true, isClosed: true });
       this.DATE_BEFORE_FIRST_PERIOD = '2015-06-15';
       this.DATE_IN_CLOSED_PERIOD = '2015-07-15';
       this.DATE_IN_OPEN_PERIOD = '2015-08-15';

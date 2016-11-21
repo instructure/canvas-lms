@@ -1,13 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'compiled/models/File'
   'compiled/models/Folder'
   'compiled/models/FilesystemObject'
   'jsx/files/FilesystemObjectThumbnail'
-], (React, ReactDOM, File, Folder, FilesystemObject, FilesystemObjectThumbnail) ->
-
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, File, Folder, FilesystemObject, FilesystemObjectThumbnail) ->
 
   module 'Filesystem Object Thumbnail: file',
     setup: ->

@@ -1,4 +1,4 @@
-class AddCollectionItemHtmlPreview < ActiveRecord::Migration
+class AddCollectionItemHtmlPreview < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

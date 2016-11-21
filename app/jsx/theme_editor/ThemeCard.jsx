@@ -1,10 +1,9 @@
 define([
   'i18n!theme_editor',
   'react',
-  'jsx/shared/SVGWrapper'
-], (I18n, React, SVGWrapper) => {
-
-  const ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
+  'jsx/shared/SVGWrapper',
+  'react-addons-css-transition-group',
+], (I18n, React, SVGWrapper, ReactCSSTransitionGroup) => {
 
   return React.createClass({
     displayName: 'ThemeCard',

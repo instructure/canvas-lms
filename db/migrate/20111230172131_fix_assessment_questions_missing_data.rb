@@ -1,4 +1,4 @@
-class FixAssessmentQuestionsMissingData < ActiveRecord::Migration
+class FixAssessmentQuestionsMissingData < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

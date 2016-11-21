@@ -1,4 +1,4 @@
-class AddFrontPageAttributesToWikis < ActiveRecord::Migration
+class AddFrontPageAttributesToWikis < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

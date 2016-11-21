@@ -1,4 +1,4 @@
-class LengthenSubmissionAttachmentIds < ActiveRecord::Migration
+class LengthenSubmissionAttachmentIds < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

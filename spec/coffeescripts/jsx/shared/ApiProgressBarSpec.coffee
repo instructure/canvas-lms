@@ -1,11 +1,11 @@
 define [
-  'underscore'
-  'react'
-  'react-dom'
+  'underscore',
+  'react',
+  'react-dom',
+  'react-addons-test-utils',
   'jsx/shared/ApiProgressBar'
   'jsx/shared/stores/ProgressStore'
-], (_, React, ReactDOM, ApiProgressBar, ProgressStore) ->
-  TestUtils = React.addons.TestUtils
+], (_, React, ReactDOM, TestUtils, ApiProgressBar, ProgressStore) ->
 
   module 'ApiProgressBarSpec',
     setup: ->

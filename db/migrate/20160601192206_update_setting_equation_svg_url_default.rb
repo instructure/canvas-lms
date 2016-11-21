@@ -1,4 +1,4 @@
-class UpdateSettingEquationSvgUrlDefault < ActiveRecord::Migration
+class UpdateSettingEquationSvgUrlDefault < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

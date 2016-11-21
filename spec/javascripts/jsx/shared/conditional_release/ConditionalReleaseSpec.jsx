@@ -1,11 +1,10 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jquery',
   'jsx/shared/conditional_release/ConditionalRelease'
-], (React, ReactDOM, $, ConditionalRelease) => {
-
-  const TestUtils = React.addons.TestUtils;
+], (React, ReactDOM, TestUtils, $, ConditionalRelease) => {
 
   let editor = null
   window.conditional_release_module = {

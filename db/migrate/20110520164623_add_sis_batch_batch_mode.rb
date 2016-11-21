@@ -1,4 +1,4 @@
-class AddSisBatchBatchMode < ActiveRecord::Migration
+class AddSisBatchBatchMode < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

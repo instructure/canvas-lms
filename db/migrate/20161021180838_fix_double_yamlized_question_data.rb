@@ -1,4 +1,4 @@
-class FixDoubleYamlizedQuestionData < ActiveRecord::Migration
+class FixDoubleYamlizedQuestionData < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

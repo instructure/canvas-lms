@@ -1,11 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'react-modal'
   'jsx/external_apps/components/AddApp'
-], (React, ReactDOM, Modal, AddApp) ->
+], (React, ReactDOM, TestUtils, Modal, AddApp) ->
 
-  TestUtils = React.addons.TestUtils
+  Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   Modal.setAppElement(wrapper)

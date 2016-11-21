@@ -1,4 +1,4 @@
-class CreateFeatureFlags < ActiveRecord::Migration
+class CreateFeatureFlags < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

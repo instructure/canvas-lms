@@ -1,4 +1,4 @@
-class RemoveForeignKeyConstraintFromGradebookCsvs < ActiveRecord::Migration
+class RemoveForeignKeyConstraintFromGradebookCsvs < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

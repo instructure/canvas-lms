@@ -1,10 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/due_dates/DueDateCalendars'
   'helpers/fakeENV'
-], (React, ReactDOM, _, DueDateCalendars, fakeENV) ->
+], (React, ReactDOM, {Simulate, SimulateNative}, _, DueDateCalendars, fakeENV) ->
 
   module 'DueDateCalendars',
     setup: ->
@@ -17,6 +18,7 @@ define [
         dates: {due_at: @someDate}
         overrides: [{get: (->), set:(->)}]
         sections: {}
+        dateValue: @someDate
 
       DueDateCalendarsElement = React.createElement(DueDateCalendars, props)
       @dueDateCalendars = ReactDOM.render(DueDateCalendarsElement, $('<div>').appendTo('body')[0])

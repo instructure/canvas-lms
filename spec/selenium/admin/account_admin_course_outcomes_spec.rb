@@ -19,7 +19,10 @@ describe "account admin outcomes" do
 
     it "should be able to manage course rubrics" do
       get "/courses/#{@course.id}/outcomes"
-      expect_new_page_load { f('.manage_rubrics').click }
+      expect_new_page_load do
+        f('#popoverMenu button').click
+        f('[data-reactid*="manage-rubrics"]').click
+      end
 
       expect(f('.add_rubric_link')).to be_displayed
     end

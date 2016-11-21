@@ -101,9 +101,11 @@ module Importers
           INSERT INTO #{AssessmentQuestion.quoted_table_name} (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)
           VALUES (?,?,'active',?,?,?,?)
         SQL
-        id = AssessmentQuestion.connection.insert(query, "#{name} Create",
-          AssessmentQuestion.primary_key, nil, AssessmentQuestion.sequence_name)
-        hash['assessment_question_id'] = id
+        Shackles.activate(:master) do
+          id = AssessmentQuestion.connection.insert(query, "#{name} Create",
+            AssessmentQuestion.primary_key, nil, AssessmentQuestion.sequence_name)
+          hash['assessment_question_id'] = id
+        end
       end
 
       if import_warnings
@@ -118,6 +120,11 @@ module Importers
 
     def self.prep_for_import(hash, migration, item_type)
       return hash if hash[:prepped_for_import]
+
+      if hash[:is_cc_pattern_match]
+        migration.add_unique_warning(:cc_pattern_match,
+          t("This package includes the question type, Pattern Match, which is not compatible with Canvas. We have converted the question type to Fill in the Blank"))
+      end
 
       if hash[:question_text] && hash[:question_text].length > 16.kilobytes
         hash[:question_text] = t("The imported question text for this question was too long.")

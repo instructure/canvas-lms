@@ -1,4 +1,4 @@
-class PopulateVisibleLastAuthoredAt < ActiveRecord::Migration
+class PopulateVisibleLastAuthoredAt < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

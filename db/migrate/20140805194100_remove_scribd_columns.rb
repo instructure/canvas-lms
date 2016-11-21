@@ -1,4 +1,4 @@
-class RemoveScribdColumns < ActiveRecord::Migration
+class RemoveScribdColumns < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

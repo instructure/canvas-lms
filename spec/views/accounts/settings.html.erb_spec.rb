@@ -113,6 +113,150 @@ describe "accounts/settings.html.erb" do
     end
   end
 
+  describe "SIS Integration Settings" do
+    before do
+      assigns[:account_users] = []
+      assigns[:associated_courses_count] = 0
+      assigns[:announcements] = AccountNotification.none.paginate
+    end
+
+    def do_render(user)
+      view_context(@account,user)
+      render
+    end
+
+    context "site admin user" do
+      before do
+        @account = Account.site_admin
+        assigns[:account] = @account
+        assigns[:root_account] = @account
+      end
+
+      context "should not show settings to site admin user" do
+        context "new_sis_integrations => true" do
+          before do
+            @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(true)
+          end
+
+          it { expect(response).not_to have_tag("#sis_integration_settings") }
+          it { expect(response).not_to have_tag("#sis_grade_export_settings") }
+          it { expect(response).not_to have_tag("#old_sis_integrations") }
+          it { expect(response).not_to have_tag("input#allow_sis_import") }
+        end
+      end
+
+      context "new_sis_integrations => false" do
+        before do
+          @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(false)
+        end
+
+        it { expect(response).not_to have_tag("#sis_integration_settings") }
+        it { expect(response).not_to have_tag("#sis_grade_export_settings") }
+        it { expect(response).not_to have_tag("#old_sis_integrations") }
+        it { expect(response).not_to have_tag("input#allow_sis_import") }
+      end
+    end
+
+    context "regular admin user" do
+      let(:current_user) { account_admin_user }
+      before do
+        @account = Account.default
+
+        assigns[:account] = @account
+        assigns[:root_account] = @account
+        assigns[:current_user] = current_user
+
+        @account.stubs(:feature_enabled?).with(:post_grades).returns(true)
+        @account.stubs(:feature_enabled?).with(:google_docs_domain_restriction).returns(true)
+      end
+
+      context "new_sis_integrations => false" do
+        before do
+          @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(false)
+          @account.stubs(:grants_right?).with(current_user, :manage_account_memberships).returns(true)
+        end
+
+        context "show old version of settings to regular admin user" do
+          before do
+            @account.stubs(:grants_right?).with(current_user, :manage_site_settings).returns(true)
+            do_render(current_user)
+          end
+
+          it { expect(response).to     have_tag("#sis_grade_export_settings") }
+          it { expect(response).to     have_tag("#account_allow_sis_import") }
+          it { expect(response).to     have_tag("#old_sis_integrations") }
+          it { expect(response).not_to have_tag("#sis_integration_settings") }
+          it { expect(response).not_to have_tag("#account_settings_sis_syncing_value") }
+        end
+      end
+
+      context "new_sis_integrations => true" do
+        before do
+          @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(true)
+        end
+
+        context "should show settings to regular admin user" do
+          before do
+            do_render(account_admin_user)
+          end
+
+          it { expect(response).to     have_tag("#sis_integration_settings") }
+          it { expect(response).to     have_tag("#account_allow_sis_import") }
+          it { expect(response).to     have_tag("#account_settings_sis_syncing_value") }
+          it { expect(response).not_to have_tag("#sis_grade_export_settings") }
+          it { expect(response).not_to have_tag("#old_sis_integrations") }
+        end
+
+        context "SIS grade export enabled" do
+          before do
+            Assignment.expects(:sis_grade_export_enabled?).returns(true)
+          end
+
+          it "should include default grade export settings" do
+            do_render(account_admin_user)
+            expect(response).to have_tag("input#account_settings_sis_default_grade_export_value")
+          end
+
+          context "account settings inherited" do
+            before do
+              @account.expects(:sis_default_grade_export).returns({ value: true, locked: true, inherited: true })
+            end
+
+            it "should not include sub-checkbox" do
+              do_render(account_admin_user)
+              expect(response).not_to have_tag(
+                "input#account_settings_sis_default_grade_export_locked_for_sub_accounts"
+              )
+            end
+          end
+
+          context "account settings not inherited" do
+            before do
+              @account.expects(:sis_default_grade_export).returns({ value: true, locked: true, inherited: false })
+            end
+
+            it "should include sub-checkbox" do
+              do_render(account_admin_user)
+              expect(response).to have_tag("input#account_settings_sis_default_grade_export_locked_for_sub_accounts")
+            end
+          end
+        end
+
+        context "SIS grade export not enabled" do
+          before do
+            Assignment.expects(:sis_grade_export_enabled?).returns(false)
+            do_render(account_admin_user)
+          end
+
+          it "should not include default grade export settings" do
+            expect(response).not_to have_tag("input#account_settings_sis_default_grade_export_value")
+            expect(response).not_to have_tag("input#account_settings_sis_default_grade_export_locked_for_sub_accounts")
+          end
+        end
+      end
+    end
+  end
+
   describe "quotas" do
     before do
       @account = Account.default

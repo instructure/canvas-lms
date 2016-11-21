@@ -108,7 +108,6 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   border-left: 4px solid transparent;
   background: url("/images/wizard-todo-unchecked.svg") no-repeat $ic-sp 50%;
   background-size: 18px 18px;
-  font-weight: 300;
 
   @if $use_high_contrast {
     color: $ic-color-light;
@@ -163,7 +162,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @include fontSize(36px);
   text-align: center;
   color: $ic-color-light;
-  font-weight: 700;
+  font-weight: bold;
   margin: 0;
   @include breakpoint(mini-tablet) {
     @include fontSize(48px);
@@ -284,7 +283,6 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 }
 
 .ic-wizard-box__message-text {
-  font-weight: 300;
   margin-bottom: 0;
 
   @include breakpoint(desktop) {
@@ -296,4 +294,3 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 // Styles for specific React Components
 @import "pages/course_wizard/CourseWizard";
-

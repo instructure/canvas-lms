@@ -1,47 +1,17 @@
-// today, our spec files use qunit without requiring it.  That sort of sucks
-// for webpack.  This adds a requirement for qunit to each spec file that's digested,
-// and adds "qunit." to module and test calls.  Can be cleaned up later, but helps
-// us get off the ground running tests in webpack from day one.
+// Our spec files use qunit's global variables. in webpack.test.config.js, we set
+// up some 'imports' loaders for 'test', 'asyncTest', and 'start' so they are available 
+// globally but we can't do the same for 'module' because if you define a global 
+// variable 'module' that screws everything up. so this just replaces 
+// "module(..." calls with "qunit.module"
+// We should get rid of all these loaders and just change our actual source 
+// to s/test/qunit.test/ and s/module/qunit.module/
 
-module.exports = function(source){
-  var newSource = source;
+const lineThatStartsWithTheWordModule = /^\s+(return )?module\(/gm
 
-  // add a qunit dependency to the dependency list
-  newSource = newSource.replace(/(define|require)\(?\s*\[[^\]]/, function(match){
-    return match.replace(/\[/, function(innerMatch){
-      return innerMatch + "'qunit',";
-    });
-  });
-
-  // don't want the comma if the list is empty
-  newSource = newSource.replace(/(define|require)\(?\s*\[\s*\]/, function(match){
-    return match.replace(/\[/, function(innerMatch){
-      return innerMatch + "'qunit'";
-    });
-  });
-
-  // add a qunit reference in the AMD callback to capture the qunit dependency
-  newSource = newSource.replace(/\],\s*\(.+(\n.+)*\)\s*->/, function(match){
-    return match.replace(/\],\s*\(/, function(innerMatch){
-      return innerMatch + "qunit,";
-    });
-  });
-
-  // don't want the comma if the list is empty
-  newSource = newSource.replace(/\],\s*\(\s*\)\s*->/, function(match){
-    return match.replace(/\],\s*\(/, function(innerMatch){
-      return innerMatch + "qunit";
-    });
-  });
-
-  // replace module and test calls with "qunit.module" and "qunit.test"
-  newSource = newSource.replace(/^\s+module\s/gm, function(match){
-    return match.replace("module", "qunit.module");
-  });
-
-  newSource = newSource.replace(/^\s+test\s/gm, function(match){
-    return match.replace("test", "qunit.test");
-  });
-
-  return newSource;
-};
+module.exports = function(source) {
+  this.cacheable()
+  // replace "module(..." calls with "qunit.module"
+  return source.replace(lineThatStartsWithTheWordModule, match => 
+    match.replace('module', 'qunit.module')
+  )
+}

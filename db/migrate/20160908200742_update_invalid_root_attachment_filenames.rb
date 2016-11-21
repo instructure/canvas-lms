@@ -1,4 +1,4 @@
-class UpdateInvalidRootAttachmentFilenames < ActiveRecord::Migration
+class UpdateInvalidRootAttachmentFilenames < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

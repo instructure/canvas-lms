@@ -71,14 +71,19 @@ module Importers
         item.workflow_state = 'active' if item.deleted?
         item.short_description = hash[:title]
         item.description = hash[:description]
-        item.calculation_method ||= hash[:calculation_method]
-        item.calculation_int ||= hash[:calculation_int]
+        assessed = item.assessed?
+        unless assessed
+          item.calculation_method = hash[:calculation_method] || item.calculation_method
+          item.calculation_int = hash[:calculation_int] || item.calculation_int
+        end
 
         if hash[:ratings]
           item.data = {:rubric_criterion=>{}}
-          item.data[:rubric_criterion][:ratings] = hash[:ratings] ? hash[:ratings].map(&:symbolize_keys) : []
-          item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
-          item.data[:rubric_criterion][:points_possible] = hash[:points_possible]
+          unless assessed
+            item.data[:rubric_criterion][:ratings] = hash[:ratings] ? hash[:ratings].map(&:symbolize_keys) : []
+            item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
+            item.data[:rubric_criterion][:points_possible] = hash[:points_possible]
+          end
           item.data[:rubric_criterion][:description] = item.short_description || item.description
         end
 

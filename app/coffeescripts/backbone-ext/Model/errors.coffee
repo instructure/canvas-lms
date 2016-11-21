@@ -1,4 +1,4 @@
-define ['underscore', 'vendor/backbone'], (_, Backbone) ->
+define ['underscore', 'node_modules-version-of-backbone'], (_, Backbone) ->
 
   _.extend Backbone.Model.prototype,
 

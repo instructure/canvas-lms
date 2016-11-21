@@ -110,13 +110,13 @@ If the `launch_presentation_return_url`</code> were
     <td>this is used as the 'href' attribute of the inserted link</td>
     <td>(required)</td>
   </tr><tr>
+    <td>text=&lt;text&gt;</td>
+    <td>this is the suggested text for the inserted link. Highlighted content will be overwritten by this value.</td>
+    <td>(required)</td>
+  </tr><tr>
     <td>title=&lt;text&gt;</td>
     <td>this is used as the 'title' attribute of the inserted link</td>
     <td>(optional)</td>
-  </tr><tr>
-    <td>text=&lt;text&gt;</td>
-    <td>this is the suggested text for the inserted link. If the user has already selected some content before opening this dialog, the link will wrap that content and this value will be ignored</td>
-    <td>(optional, defaults to 'link')</td>
   </tr><tr>
     <td>target=&lt;text&gt;</td>
     <td>this is used as the 'target' attribute of the inserted link</td>
@@ -128,9 +128,8 @@ If the `launch_presentation_return_url`</code> were
 If the `launch_presentation_return_url` were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
-- http://www.example.com/done?return_type=url&url=https%3A%2F%2Fothersite.com%2Flink
-- http://www.example.com/done?return_type=url&url=https%3A%2F%2Fothersite.com%2Flink&text=other+site+link
-- http://www.example.com/done?return_type=url&url=https%3A%2F%2Fothersite.com%2Flink&title=link&target=_blank
+- http://www.example.com/done?return_type=url&url=https%3A%2F%2Fothersite.com%2Flink&text=Link+Text
+- http://www.example.com/done?return_type=url&url=https%3A%2F%2Fothersite.com%2Flink&title=link&target=_blank&text=Link+Text
 
 ### to embed an external tool link:
 <table class="tool">
@@ -148,8 +147,8 @@ If the `launch_presentation_return_url` were
     <td>(optional)</td>
   </tr><tr>
     <td>text=&lt;text&gt;</td>
-    <td>this is the suggested text for the inserted link. If the user has already selected some content before opening this dialog, the link will wrap that content and this value will be ignored.</td>
-    <td>(optional, defaults to 'link')</td>
+    <td>this is the suggested text for the inserted link. Highlighted content will be overwritten by this value.</td>
+    <td>(required)</td>
   </tr>
 </table>
 
@@ -157,9 +156,8 @@ If the `launch_presentation_return_url` were
 If the `launch_presentation_return_url` were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
-- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link
-- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&text=other+site+link
-- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&title=link
+- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&text=Link+Text
+- http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link&title=link_title&text=Link+Text
 
 Remember that these links would only work if the current tool or some other tool was set to
 match on either the exact URL returned or the domain (in this case othersite.com)
@@ -190,7 +188,7 @@ If the `launch_presentation_return_url` were
 - http://www.example.com/done?return_type=oembed&endpoint=http%3A%2F%2Fwww.flickr.com%2Fservices%2Foembed%2F&url=http%3A%2F%2Fwww.flickr.com%2Fphotos%2Fbees%2F2341623661%2F
 
 ## Settings
-All of these settings are contained under "editor_button" in the tool configuration
+All of these settings are configurable for the "editor_button" placement in the tool configuration
 
 -   url: &lt;url&gt; (optional)
 

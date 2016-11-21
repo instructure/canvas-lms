@@ -1,10 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/external_apps/components/Lti2Iframe'
-], (React, ReactDOM, Lti2Iframe) ->
+], (React, ReactDOM, TestUtils, Lti2Iframe) ->
 
-  TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 

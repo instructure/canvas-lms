@@ -64,7 +64,7 @@ module Canvas::Redis
 
     if self.ignore_redis_failures?
       Canvas::Errors.capture(e, type: :redis)
-      last_redis_failure[redis_name] = Time.zone.now
+      last_redis_failure[redis_name] = Time.now
       failure_retval
     else
       raise
@@ -76,6 +76,10 @@ module Canvas::Redis
 
   module Client
     def process(commands, *a, &b)
+      # These instance vars are used by the added #log_request_response method.
+      @processing_requests = commands.map(&:dup)
+      @process_start = Time.now
+
       # try to return the type of value the command would expect, for some
       # specific commands that we know can cause problems if we just return
       # nil
@@ -96,6 +100,62 @@ module Canvas::Redis
       Canvas::Redis.handle_redis_failure(failure_val, self.location) do
         super
       end
+    end
+
+    NON_KEY_COMMANDS = %i[eval evalsha].freeze
+
+    def read
+      response = super
+      # Each #read grabs the response to one command send to #process, so we
+      # pop off the next queued request and send that to the logger. The redis
+      # client works this way because #process may be called with many commands
+      # at once, if using #pipeline.
+      @processing_requests ||= []
+      @process_start ||= Time.now
+      log_request_response(@processing_requests.shift, response, @process_start)
+      response
+    end
+
+    def log_request_response(request, response, start_time)
+      return if request.nil? # redis client does internal keepalives and connection commands
+
+      command = request.shift
+      message = {
+        message: "redis_request".freeze,
+        command: command,
+        # request_size is the sum of all the string parameters send with the command.
+        request_size: request.sum { |c| c.to_s.size },
+        request_time_ms: (Time.now - start_time) * 1000,
+        host: location,
+      }
+      unless NON_KEY_COMMANDS.include?(command)
+        message[:key] = request.first
+      end
+      if defined?(Marginalia)
+        message[:controller] = Marginalia::Comment.controller
+        message[:action] = Marginalia::Comment.action
+        message[:job_tag] = Marginalia::Comment.job_tag
+      end
+      if command == :set && Thread.current[:last_cache_generate]
+        # :last_cache_generate comes from the instrumentation added in
+        # config/initializeers/cache_store_instrumentation.rb
+        # This is necessary because the Rails caching layer doesn't pass this
+        # information down to the Redis client -- we could try to infer it by
+        # looking for reads followed by writes to the same key, but this would be
+        # error prone, especially since further cache reads can happen inside the
+        # generation block.
+        message[:generate_time_ms] = Thread.current[:last_cache_generate] * 1000
+        Thread.current[:last_cache_generate] = nil
+      end
+      if response.is_a?(Exception)
+        message[:error] = response.to_s
+        message[:response_size] = 0
+      else
+        message[:response_size] = response.try(:size) || 0
+      end
+
+      logline = JSON.generate(message.compact)
+      Rails.logger.debug(logline) if Rails.logger
     end
 
     def write(command)

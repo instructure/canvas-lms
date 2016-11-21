@@ -97,8 +97,8 @@ module Outcomes
     #
     # Returns an Array of RollupScore objects
     def rollup_user_results(user_results)
-      filtered_results = user_results.select{|r| r.score != nil}
-      outcome_scores = filtered_results.chunk(&:learning_outcome_id).map do |_, outcome_results|
+      filtered_results = user_results.select{|r| !r.score.nil?}
+      filtered_results.group_by(&:learning_outcome_id).map do |_, outcome_results|
         RollupScore.new(outcome_results)
       end
     end

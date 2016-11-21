@@ -227,7 +227,7 @@ $page-dark: #ebeff2;
 
     .slick-column-name {
       color: $header-font-color;
-      font-weight: 500;
+      font-weight: bold;
     }
 
     &.ui-state-default {
@@ -260,7 +260,7 @@ $page-dark: #ebeff2;
       background: transparent;
       border: none;
       @include fontSize(15px);
-      font-weight: 500;
+      font-weight: bold;
       line-height: 39px;
       min-height: 40px;
     }
@@ -321,7 +321,7 @@ $page-dark: #ebeff2;
 }
 
 .outcome-score {
-  font-weight: 700;
+  font-weight: bold;
 }
 
 .outcome-result {

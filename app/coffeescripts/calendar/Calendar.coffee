@@ -13,7 +13,7 @@ define [
   'compiled/util/fcUtil'
   'compiled/userSettings'
   'compiled/util/hsvToRgb'
-  'bower/color-slicer/dist/color-slicer'
+  'color-slicer'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/commonEventFactory'
@@ -29,7 +29,9 @@ define [
   'compiled/calendar/CalendarEventFilter'
   'jsx/calendar/scheduler/actions'
 
-  'fullcalendar-with-lang-all'
+  'fullcalendar'
+  'fullcalendar/dist/lang-all'
+  'jsx/calendar/patches-to-fullcalendar'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
@@ -49,6 +51,7 @@ define [
       @subscribeToEvents()
       @header = @options.header
       @schedulerState = {}
+      @useBetterScheduler = !!@options.schedulerStore
       if @options.schedulerStore
         @schedulerStore = @options.schedulerStore
         @schedulerState = @schedulerStore.getState()
@@ -250,7 +253,9 @@ define [
 
       reservedText = ""
       if event.isAppointmentGroupEvent()
-        if event.reservedUsers == ""
+        if event.appointmentGroupEventStatus == "Reserved"
+          reservedText = "\n\n#{I18n.t('Reserved By You')}"
+        else if event.reservedUsers == ""
             reservedText = "\n\n#{I18n.t('Unreserved')}"
         else
           reservedText = "\n\n#{I18n.t('Reserved By: ')} #{event.reservedUsers}"
@@ -338,8 +343,7 @@ define [
       # create a new dummy event
       event = commonEventFactory(null, @activeContexts())
       event.date = @getCurrentDate()
-
-      new EditEventDetailsDialog(event).show()
+      new EditEventDetailsDialog(event, @useBetterScheduler).show()
 
     eventClick: (event, jsEvent, view) =>
       $event = $(jsEvent.currentTarget)
@@ -358,7 +362,7 @@ define [
       event = commonEventFactory(null, @activeContexts())
       event.date = date
       event.allDay = not date.hasTime()
-      (new EditEventDetailsDialog(event)).show()
+      (new EditEventDetailsDialog(event, @useBetterScheduler)).show()
 
     updateFragment: (opts) ->
       replaceState = !!opts.replaceState

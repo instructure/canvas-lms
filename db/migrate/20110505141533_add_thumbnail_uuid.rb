@@ -1,4 +1,4 @@
-class AddThumbnailUuid < ActiveRecord::Migration
+class AddThumbnailUuid < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   class Thumbnail < ActiveRecord::Base

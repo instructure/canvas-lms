@@ -22,9 +22,9 @@ class EnrollmentsFromUserList
       EnrollmentsFromUserList.new(course, opts).process(list)
     end
   end
-  
+
   attr_reader :students, :course
-  
+
   def initialize(course, opts={})
     @course = course
     @enrollment_type = opts[:enrollment_type] || 'StudentEnrollment'
@@ -34,14 +34,21 @@ class EnrollmentsFromUserList
     @limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     @enrolled_users = {}
   end
-  
+
   def process(list)
-    raise ArgumentError, "Must provide a UserList" unless list.is_a?(UserList)
+    raise ArgumentError, "Must provide a UserList or Array (of user ids)" unless list.is_a?(UserList) || list.is_a?(Array)
     @enrollments = []
     @user_ids_to_touch = []
 
-    list.addresses.slice!(0,@limit) if @limit
-    list.users.each_slice(Setting.get('enrollments_from_user_list_batch_size', 50).to_i) do |users|
+    users =
+      if list.is_a?(UserList)
+        list.addresses.slice!(0,@limit) if @limit
+        list.users
+      else
+        # list of user ids
+        User.where(:id => list).to_a
+      end
+    users.each_slice(Setting.get('enrollments_from_user_list_batch_size', 50).to_i) do |users|
       @course.transaction do
         Enrollment.suspend_callbacks(:update_cached_due_dates) do
           users.each { |user| enroll_user(user) }
@@ -59,9 +66,9 @@ class EnrollmentsFromUserList
 
     @enrollments
   end
-  
+
   protected
-  
+
   def enroll_user(user)
     return unless user
     return if @enrolled_users.has_key?(user.id)

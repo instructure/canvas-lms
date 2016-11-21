@@ -54,7 +54,7 @@ class User < ActiveRecord::Base
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, dependent: :destroy, inverse_of: :user
-  has_many :observers, :through => :user_observers, :class_name => 'User'
+  has_many :observers, -> { where("user_observers.workflow_state <> 'deleted'") }, :through => :user_observers, :class_name => 'User'
   has_many :user_observees,
            class_name: 'UserObserver',
            foreign_key: :observer_id,
@@ -63,7 +63,7 @@ class User < ActiveRecord::Base
   has_many :observed_users, :through => :user_observees, :source => :user
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :group_memberships, -> { preload(:group) }, dependent: :destroy
-  has_many :groups, :through => :group_memberships
+  has_many :groups, -> { where("group_memberships.workflow_state<>'deleted'") }, :through => :group_memberships
   has_many :polls, class_name: 'Polling::Poll'
 
   has_many :current_group_memberships, -> { eager_load(:group).where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state<>'deleted'") }, class_name: 'GroupMembership'
@@ -1361,6 +1361,10 @@ class User < ActiveRecord::Base
     preferences[:custom_colors] ||= {}
   end
 
+  def course_positions
+    preferences[:course_positions] ||= {}
+  end
+
   def course_nicknames
     preferences[:course_nicknames] ||= {}
   end
@@ -1814,7 +1818,8 @@ class User < ActiveRecord::Base
   def participating_student_course_ids
     @participating_student_course_ids ||= self.shard.activate do
       Rails.cache.fetch([self, 'participating_student_course_ids', ApplicationController.region].cache_key) do
-        self.enrollments.shard(in_region_associated_shards).of_student_type.current.active_by_date.distinct.pluck(:course_id)
+        self.enrollments.shard(in_region_associated_shards).where(:type => %w{StudentEnrollment StudentViewEnrollment}).
+          current.active_by_date.distinct.pluck(:course_id)
       end
     end
   end

@@ -1,8 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/choose_mastery_path/components/assignment',
-], (React, Assignment) => {
-  const TestUtils = React.addons.TestUtils
+], (React, TestUtils, Assignment) => {
 
   module('Assignment')
 

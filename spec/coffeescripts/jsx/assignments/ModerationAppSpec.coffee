@@ -1,12 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/assignments/ModerationApp'
   'jsx/assignments/actions/ModerationActions'
-], (React, ReactDOM, ModerationApp, Actions) ->
-
-  TestUtils = React.addons.TestUtils
-
+], (React, ReactDOM, TestUtils, ModerationApp, Actions) ->
 
   module 'ModerationApp',
     setup: ->

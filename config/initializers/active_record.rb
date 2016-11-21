@@ -780,7 +780,7 @@ ActiveRecord::Relation.class_eval do
     raise ArgumentError unless args.length == 1
 
     column = args.first.first
-    values = args.first.last
+    values = Array(args.first.last)
     original_length = values.length
     values = values.compact
 
@@ -1093,6 +1093,13 @@ class ActiveRecord::Migration
 
     def has_postgres_proc?(procname)
       connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'").to_i != 0
+    end
+
+    if CANVAS_RAILS4_2
+      def [](version)
+        raise ArgumentError unless version == 4.2
+        self
+      end
     end
   end
 

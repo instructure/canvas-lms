@@ -1,4 +1,4 @@
-class AddStreamItemInstanceHidden < ActiveRecord::Migration
+class AddStreamItemInstanceHidden < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

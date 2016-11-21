@@ -10,7 +10,10 @@
 .account > .header {
   padding: $ic-sp/3 $ic-sp;
   box-sizing: border-box;
-  .name { font-weight: 500; }
+
+  .name {
+    font-weight: bold;
+  }
 }
 
 .account.editing_account > .header .edit_account {

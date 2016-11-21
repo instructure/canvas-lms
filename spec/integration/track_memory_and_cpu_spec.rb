@@ -20,6 +20,7 @@ describe "memory and cpu tracking", type: :request do
     CanvasStatsd::Statsd.expects(:timing).with('request.users.user_dashboard.sql.read', kind_of(Numeric))
     CanvasStatsd::Statsd.expects(:timing).with('request.users.user_dashboard.sql.write', kind_of(Numeric))
     CanvasStatsd::Statsd.expects(:timing).with('request.users.user_dashboard.sql.cache', kind_of(Numeric))
+    CanvasStatsd::Statsd.expects(:timing).with('request.users.user_dashboard.cache.read', kind_of(Numeric))
     get "/"
   end
 end

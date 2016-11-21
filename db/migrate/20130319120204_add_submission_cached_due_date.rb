@@ -1,4 +1,4 @@
-class AddSubmissionCachedDueDate < ActiveRecord::Migration
+class AddSubmissionCachedDueDate < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

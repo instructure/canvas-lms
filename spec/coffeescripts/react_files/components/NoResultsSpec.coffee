@@ -1,10 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/NoResults'
-], (React, ReactDOM, $, NoResults) ->
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, $, NoResults) ->
 
   module "NoResults"
 
