@@ -41,7 +41,7 @@ define [
       $("<div />").confirmDelete
         url: url
         message: $ deleteItemTemplate(message: opts.message || event.deleteConfirmation, hide_reason: event.object.workflow_state isnt 'locked')
-        dialog: {title: opts.dialogTitle || I18n.t('confirm_deletion', "Confirm Deletion")}
+        dialog: {title: opts.dialogTitle || I18n.t("Confirm Deletion")}
         prepareData: ($dialog) => {cancel_reason: $dialog.find('#cancel_reason').val() }
         confirmed: () =>
           @popover.hide()
@@ -58,10 +58,10 @@ define [
           width: 450
           buttons: if error.reschedulable
                      [
-                       text: I18n.t 'do_nothing', 'Do Nothing'
+                       text: I18n.t 'Do Nothing'
                        click: -> $dialog.dialog('close')
                      ,
-                       text: I18n.t 'reschedule', 'Reschedule'
+                       text: I18n.t 'Reschedule'
                        'class': 'btn-primary'
                        click: =>
                          $dialog.disableWhileLoading @reserveEvent({cancel_existing:true}).always ->
@@ -69,7 +69,7 @@ define [
                      ]
                    else
                      [
-                       text: I18n.t 'ok', 'OK'
+                       text: I18n.t 'OK'
                        click: -> $dialog.dialog('close')
                      ]
 
@@ -78,8 +78,6 @@ define [
         $.publish "CommonEvent/eventSaveFailed", @event
 
     reserveSuccessCB: (cancel_existing, data) ->
-      @popover.hide()
-
       # remove previous signup(s), if applicable (this has already happened on the backend)
       if cancel_existing
         for own k, v of @dataSource.cache.contexts[@event.contextInfo.asset_string].events
@@ -99,6 +97,7 @@ define [
 
     reserveEvent: (params={}) =>
       params['comments'] = $('#appointment-comment').val()
+      @popover.hide()
       $.publish "CommonEvent/eventSaving", @event
       $.ajaxJSON @event.object.reserve_url, 'POST', params, @reserveSuccessCB.bind(this, params.cancel_existing), @reserveErrorCB
 
@@ -110,7 +109,7 @@ define [
           e.object?.own_reservation
 
       for e in events
-        @deleteEvent(e, dialogTitle: I18n.t('confirm_unreserve', "Confirm Reservation Removal"), message: I18n.t('prompts.unreserve_event', "Are you sure you want to delete your reservation to this event?"))
+        @deleteEvent(e, dialogTitle: I18n.t("Confirm Reservation Removal"), message: I18n.t("Are you sure you want to delete your reservation to this event?"))
         return
 
     cancelAppointment: ($appt) =>
@@ -119,12 +118,11 @@ define [
       $("<div/>").confirmDelete
         url: url
         message: $ deleteItemTemplate(message: I18n.t(
-          'cancel_appointment'
           'Are you sure you want to cancel your appointment with %{name}?'
           name: event.user?.short_name or event.group.name)
         )
         dialog:
-          title: I18n.t('confirm_removal', "Confirm Removal")
+          title: I18n.t("Confirm Removal")
           width: '400px'
           resizable: false
         prepareData: ($dialog) => {cancel_reason: $dialog.find('#cancel_reason').val() }
