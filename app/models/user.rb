@@ -1705,7 +1705,7 @@ class User < ActiveRecord::Base
               where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
           end
 
-          scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
+          scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state, enrollments.created_at AS primary_enrollment_date").
               order("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}").
               distinct_on(:id).shard(shards).to_a
         end
@@ -1714,7 +1714,7 @@ class User < ActiveRecord::Base
 
       if association == :current_and_invited_courses
         if enrollment_uuid && pending_course = Course.
-          select("courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state").
+          select("courses.*, enrollments.type AS primary_enrollment, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state, enrollments.created_at AS primary_enrollment_date").
           joins(:enrollments).
           where(:enrollments => { :uuid => enrollment_uuid, :workflow_state => 'invited' }).first
           res << pending_course
@@ -1729,6 +1729,7 @@ class User < ActiveRecord::Base
             c.primary_enrollment_role_id = e.role_id
             c.primary_enrollment_rank = e.rank_sortable
             c.primary_enrollment_state = e.workflow_state
+            c.primary_enrollment_date = e.created_at
             c.invitation = e.uuid
             c
           end)
@@ -2489,7 +2490,10 @@ class User < ActiveRecord::Base
     if favorites.length > 0
       @menu_courses = favorites
     else
-      @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).first(12)
+      # this terribleness is so we try to make sure that the newest courses show up in the menu
+      @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).
+        sort_by{ |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }.first(12).
+        sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
     end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses
