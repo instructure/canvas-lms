@@ -1051,9 +1051,16 @@ class AccountsController < ApplicationController
 
   def sort_order
     load_course_right_side unless @courses_sort_orders.present?
-    order = @courses_sort_orders.find do |ord|
-      ord[:key] == params[:courses_sort_order]
+
+    if !params[:courses_sort_order].nil?
+      @current_user.preferences[:course_sort] = params[:courses_sort_order]
+      @current_user.save!
     end
+
+    order = @courses_sort_orders.find do |ord|
+      ord[:key] == @current_user.preferences[:course_sort]
+    end
+
 
     order && "#{order[:col]} #{order[:direction]}"
   end
