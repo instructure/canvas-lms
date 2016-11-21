@@ -210,6 +210,7 @@ describe "calendar2" do
     end
 
     it "should extend event time by dragging", priority: "1", test_id: 138864 do
+      skip('spec is fragile needs fixing ticket is CNVS-33485')
       # Create event on current day at 9:00 AM in current time zone
       midnight = Time.zone.now.beginning_of_day
       event1 = make_event(start: midnight + 9.hours, end_at: midnight + 10.hours)
