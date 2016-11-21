@@ -1,30 +1,28 @@
-var glob = require("glob");
+const glob = require('glob')
 
-var entries = {};
+const entries = {}
 
-var bundlesPattern = __dirname + "/../app/coffeescripts/bundles/**/*.coffee";
-var pluginBundlesPattern = __dirname + "/../gems/plugins/*/app/coffeescripts/bundles/*.coffee";
-var bundleNameRegexp = /\/coffeescripts\/bundles\/(.*).coffee/;
-var fileNameRegexp = /\/([^/]+)\.coffee/;
-var pluginNameRegexp = /plugins\/([^/]+)\/app/;
+const bundlesPattern = __dirname + '/../app/coffeescripts/bundles/**/*.coffee'
+const pluginBundlesPattern = __dirname + '/../gems/plugins/*/app/coffeescripts/bundles/*.coffee'
+const bundleNameRegexp = /\/coffeescripts\/bundles\/(.*).coffee/
+const fileNameRegexp = /\/([^/]+)\.coffee/
+const pluginNameRegexp = /plugins\/([^/]+)\/app/
 
-var appBundles = glob.sync(bundlesPattern, []);
-var pluginBundles = glob.sync(pluginBundlesPattern, []);
+const appBundles = glob.sync(bundlesPattern, [])
+const pluginBundles = glob.sync(pluginBundlesPattern, [])
 
 // these are bundles that are dependencies, and therefore should not be compiled
 //  as entry points (webpack won't allow that).
 // TODO: Ultimately we should move them to other directories.
 var nonEntryPoints = ['common', 'modules/account_quota_settings', 'modules/content_migration_setup'];
 
-appBundles.forEach(function(entryFilepath){
-  var entryBundlePath = entryFilepath.replace(/^.*app\/coffeescripts\/bundles/, "./app/coffeescripts/bundles")
-  var entryName = bundleNameRegexp.exec(entryBundlePath)[1];
-  if(nonEntryPoints.indexOf(entryName) < 0){
-    entries[entryName] = entryBundlePath;
+appBundles.forEach(entryFilepath => {
+  const entryBundlePath = entryFilepath.replace(/^.*app\/coffeescripts\/bundles/, './app/coffeescripts/bundles')
+  const entryName = bundleNameRegexp.exec(entryBundlePath)[1]
+  if (!nonEntryPoints.includes(entryName)) {
+    entries[entryName] = entryBundlePath
   }
-});
-
-
+})
 
 // TODO: Include this from source rather than after the ember app compilation step.
 //      This whole "compiled" folder should eventually go away
