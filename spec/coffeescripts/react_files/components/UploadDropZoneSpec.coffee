@@ -1,7 +1,8 @@
 define [
   'react'
+  'react-dom'
   'jsx/files/UploadDropZone'
-], (React, UploadDropZone) ->
+], (React, ReactDOM, UploadDropZone) ->
 
   Simulate = React.addons.TestUtils.Simulate
   UploadDropZone = React.createFactory(UploadDropZone)
@@ -10,10 +11,10 @@ define [
 
   module 'UploadDropZone',
     setup: ->
-      @uploadZone = React.render(UploadDropZone({}), node)
+      @uploadZone = ReactDOM.render(UploadDropZone({}), node)
 
     teardown: ->
-      React.unmountComponentAtNode(node)
+      ReactDOM.unmountComponentAtNode(node)
 
   test 'displays nothing by default', ->
     displayText = @uploadZone.getDOMNode().innerHTML.trim()

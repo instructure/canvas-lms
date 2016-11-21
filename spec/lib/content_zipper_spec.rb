@@ -24,7 +24,8 @@ describe ContentZipper do
       s1, s2, s3 = n_students_in_course(3)
       s1.update_attribute :sortable_name, 'some_999_, _1234_guy'
       s2.update_attribute :sortable_name, 'other 567, guy 8'
-      s3.update_attribute :sortable_name, '45'
+      s3.update_attribute :sortable_name, 'trolololo'
+      assignment_model(course: @course)
       [s1, s2, s3].each { |s|
         submission_model user: s, assignment: @assignment, body: "blah"
       }
@@ -37,7 +38,7 @@ describe ContentZipper do
       expected_file_patterns = [
         /other567guy8/,
         /some9991234guy/,
-        /45/,
+        /trolololo/,
       ]
 
       filename = attachment.reload.full_filename

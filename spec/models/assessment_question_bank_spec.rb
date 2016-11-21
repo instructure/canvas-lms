@@ -39,15 +39,15 @@ describe AssessmentQuestionBank do
     end
 
     it "should return the desired count of questions" do
-      expect(@bank.select_for_submission(@quiz.id, 0).length).to eq 0
-      expect(@bank.select_for_submission(@quiz.id, 2).length).to eq 2
-      expect(@bank.select_for_submission(@quiz.id, 4).length).to eq 4
-      expect(@bank.select_for_submission(@quiz.id, 11).length).to eq 10
+      expect(@bank.select_for_submission(@quiz.id, nil, 0).length).to eq 0
+      expect(@bank.select_for_submission(@quiz.id, nil, 2).length).to eq 2
+      expect(@bank.select_for_submission(@quiz.id, nil, 4).length).to eq 4
+      expect(@bank.select_for_submission(@quiz.id, nil, 11).length).to eq 10
     end
 
     it "should exclude specified questions" do
-      original = [@q1.id, @q2.id, @q3.id, @q4.id, @q5.id, @q6.id, @q7.id, @q8.id, @q9.id, @q10.id]
-      selected_ids = @bank.select_for_submission(@quiz.id, 10, [@q1.id, @q10.id]).map(&:assessment_question_id)
+      [@q1.id, @q2.id, @q3.id, @q4.id, @q5.id, @q6.id, @q7.id, @q8.id, @q9.id, @q10.id]
+      selected_ids = @bank.select_for_submission(@quiz.id, nil, 10, [@q1.id, @q10.id]).map(&:assessment_question_id)
 
       expect(selected_ids.include?(@q1.id)).to be_falsey
       expect(selected_ids.include?(@q10.id)).to be_falsey
@@ -58,8 +58,8 @@ describe AssessmentQuestionBank do
     it "should return the questions in a random order" do
       original = [@q1.id, @q2.id, @q3.id, @q4.id, @q5.id, @q6.id, @q7.id, @q8.id, @q9.id, @q10.id]
 
-      selected1 = @bank.select_for_submission(@quiz.id, 10).map(&:id)
-      selected2 = @bank.select_for_submission(@quiz.id, 10).map(&:id)
+      selected1 = @bank.select_for_submission(@quiz.id, nil, 10).map(&:id)
+      selected2 = @bank.select_for_submission(@quiz.id, nil, 10).map(&:id)
 
       # make sure at least one is shuffled
       is_shuffled1 = (original != selected1)
@@ -69,26 +69,14 @@ describe AssessmentQuestionBank do
       expect(is_shuffled1 || is_shuffled2).to be_truthy
     end
 
-    it "shuffles _after_ iteration has happened" do
-      class FakeAq
-        @times_called = 0
-        class << self
-          attr_accessor :times_called
-        end
-
-        attr_reader :caller_number
-        def find_or_create_quiz_question(_quiz_id, _exclude_qq_ids)
-          @caller_number = FakeAq.times_called
-          FakeAq.times_called += 1
-          self
-        end
+    it "should pick randomly quiz group questions in the db" do
+      aq_ids = []
+      20.times do
+        aq_ids << @bank.select_for_submission(@quiz.id, nil, 1).first.assessment_question_id
       end
-      aqs = [FakeAq.new, FakeAq.new, FakeAq.new]
-      ordered_aqs = stub(order: aqs, pluck: [1,2,3], shuffle: aqs.shuffle)
-      AssessmentQuestion.stubs(:where).returns(ordered_aqs)
-      @bank.select_for_submission(@quiz.id, 3)
-      expect(aqs[0].caller_number < aqs[1].caller_number).to be_truthy
-      expect(aqs[1].caller_number < aqs[2].caller_number).to be_truthy
+      # shouldn't pick the same one over and over again
+      # yes, technically there's a 0.000000000000000001% chance this will fail spontaneously - sue me
+      expect(aq_ids.uniq.count > 1).to be_truthy
     end
   end
 

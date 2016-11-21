@@ -46,15 +46,13 @@
 <% unless params[:headless] %>
   <% content_for :right_side do %>
     <% if @current_version && can_do(@quiz, @current_user, :grade) %>
-      <div class="rs-margin-lr rs-margin-top">
-        <p>
-          <% if @quiz.survey? %>
-            <%= t(:latest_survey_results, "Here's the latest survey results for %{user}. You can modify the points for any question and add more comments, then click \"Update Scores\" at the bottom of the page.", :user => user_name) %>
-          <% else %>
-            <%= t(:latest_quiz_results, "Here's the latest quiz results for %{user}. You can modify the points for any question and add more comments, then click \"Update Scores\" at the bottom of the page.", :user => user_name) %>
-          <% end %>
-        </p>
-      </div>
+      <p>
+        <% if @quiz.survey? %>
+          <%= t(:latest_survey_results, "Here's the latest survey results for %{user}. You can modify the points for any question and add more comments, then click \"Update Scores\" at the bottom of the page.", :user => user_name) %>
+        <% else %>
+          <%= t(:latest_quiz_results, "Here's the latest quiz results for %{user}. You can modify the points for any question and add more comments, then click \"Update Scores\" at the bottom of the page.", :user => user_name) %>
+        <% end %>
+      </p>
     <% end %>
     <% unless params[:headless] %>
         <h2>
@@ -64,7 +62,7 @@
             <%= t('headers.quiz_submissions', "Quiz Submissions") %>
           <% end %>
         </h2>
-      <div class="rs-margin-lr">
+      <div>
         <ul id="quiz_versions" style="max-height: 250px; overflow: auto;">
         <% @version_instances.each do |version_instance| %>
           <li class="quiz_version <%= "selected" if version_instance.version_number == @submission.version_number %>">

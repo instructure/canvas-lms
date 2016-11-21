@@ -41,14 +41,20 @@ class CrocodocDocument < ActiveRecord::Base
 
     url = attachment.authenticated_s3_url(:expires => 1.day)
 
-    response = Canvas.timeout_protection("crocodoc") {
-      crocodoc_api.upload(url)
-    }
+    begin
+      response = Canvas.timeout_protection("crocodoc_upload", raise_on_timeout: true) do
+        crocodoc_api.upload(url)
+      end
+    rescue Canvas::TimeoutCutoff
+      raise Canvas::Crocodoc::CutoffError, "not uploading due to timeout protection"
+    rescue Timeout::Error
+      raise Canvas::Crocodoc::TimeoutError, "not uploading due to timeout error"
+    end
 
     if response && response['uuid']
       update_attributes :uuid => response['uuid'], :process_state => 'QUEUED'
     elsif response.nil?
-      raise "no response received (request timed out?)"
+      raise "no response received"
     else
       raise response.inspect
     end
@@ -76,7 +82,7 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:editable] = false
     end
 
-    Canvas.timeout_protection("crocodoc", raise_on_timeout: true) do
+    Canvas.timeout_protection("crocodoc_session", raise_on_timeout: true) do
       response = crocodoc_api.session(uuid, opts)
       session = response['session']
       crocodoc_api.view(session)
@@ -164,7 +170,9 @@ class CrocodocDocument < ActiveRecord::Base
         Shackles.activate(:master) do
           statuses = []
           docs.each_slice(bs) do |sub_docs|
-            statuses.concat CrocodocDocument.crocodoc_api.status(sub_docs.map(&:uuid))
+            Canvas.timeout_protection("crocodoc_status") do
+              statuses.concat CrocodocDocument.crocodoc_api.status(sub_docs.map(&:uuid))
+            end
           end
 
           bulk_updates = {}

@@ -3,12 +3,11 @@ define [
   'i18n!react_files'
   'react',
   'compiled/collections/FilesCollection'
-  'compiled/react/shared/utils/withReactElement'
   '../modules/customPropTypes'
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'
   '../utils/locationOrigin'
-], (_, I18n, React, FilesCollection, withReactElement, customPropTypes, updateAPIQuerySortParams, getAllPages) ->
+], (_, I18n, React, FilesCollection, customPropTypes, updateAPIQuerySortParams, getAllPages) ->
 
   SearchResults =
     displayName: 'SearchResults'

@@ -21,20 +21,20 @@ set up at the account level.
 
 Canvas currently supports the following types of tool extensions:
 
-- <a href="assignment_tools.html">External tool assignments, with grades passed back from the tool to Canvas</a>
+[External tool assignments, with grades passed back from the tool to Canvas](assignment_tools.html):
 
   This type of integration is part of the
-  <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html">LTI 1.1 specification</a>,
+  [LTI 1.1 specification](http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html),
   and is important in that it allows external services to take care of things
   that can be graded automatically, or outside the LMS scope.
 
-  Example use cases might include:
+   Example use cases might include:
 
   - Administering a timed, auto-graded coding project
   - Evaluating a student's ability to correctly draw notes at different musical intervals
   - Giving students credit for participating in an interactive lesson on the Civil War
 
-- <a href="navigation_tools.html#course_navigation">Adding a link/tab to the course navigation</a>
+[Adding a link/tab to the course navigation](navigation_tools.html#course_navigation):
 
   Example use cases might include:
 
@@ -43,7 +43,7 @@ Canvas currently supports the following types of tool extensions:
   - Connecting to study room scheduling tool
   - Linking to campus communication hub
 
-- <a href="navigation_tools.html#account_navigation">Adding a link/tab to the account navigation</a>
+[Adding a link/tab to the account navigation](navigation_tools.html#account_navigation):
 
   Example use cases might include:
 
@@ -51,28 +51,41 @@ Canvas currently supports the following types of tool extensions:
   - Building helper libraries for campus-specific customizations
   - Leveraging single sign-on for access to other systems, like SIS
 
-- <a href="navigation_tools.html#user_navigation">Adding a link/tab to the user profile navigation</a>
+[Adding a link/tab to the user profile navigation](navigation_tools.html#user_navigation):
 
   Example use cases might include:
 
   - Leveraging single sign-on to student portal from within Canvas
   - Linking to an external user profile
 
-- <a href="editor_button_tools.html">Adding a button to insert custom content using the rich content editor</a>
+[Selecting content to add to a variety of locations](content_item.html):
 
   Example use cases might include:
 
-  - Embedding resources from campus video repository
-  - Inserting custom-designed chemistry diagrams into quiz question text
-  - Building integrations with new or subject-area-specialized web authoring services
+  - adding a button to embed content to the Rich Content Editor:
 
-- <a href="link_selection_tools.html">Selecting a link for modules or an external tool assignment</a>
+   * Embedding resources from campus video/image repository
+   * Inserting custom-designed chemistry diagrams into quiz question text
+   * Building integrations with new or subject-area-specialized web authoring services
 
-  Example use cases might include:
+  - selecting links for modules or external tools
 
-  - Building and then linking to a remixed version of an online Physics textbook
-  - Selecting from a list of pre-built, interactive quizzes on blood vessels
-  - Choosing a chapter from an e-textbook to add to the "Null Hypothesis" module
+   * Building and then linking to a remixed version of an online Physics textbook
+   * Selecting from a list of pre-built, interactive quizzes on blood vessels
+   * Choosing a specific chapter from an e-textbook to add to a module
+
+  - creating custom assignments for Canvas
+
+   * Creating a Canvas assignment that launches the student to a custom assessment
+  that can be automatically graded by the tool and synced with the Canvas Gradebook
+   * Launching the student to an assessment with interactive videos. Once complete,
+  the tool returns an LTI launch url that allows the teacher to see the submission
+  without leaving Canvas.
+
+  - allowing a student to submit attachments to assignments
+
+   * A student launches a custom video recording tool and submits the recording to Canvas
+   * A student chooses an item from a portfolio tool and submits the item to Canvas
 
 
 

@@ -411,7 +411,8 @@ describe ContentMigration do
         :require_lockdown_browser_monitor => true,
         :lockdown_browser_monitor_data => 'VGVzdCBEYXRhCg==',
         :one_time_results => true,
-        :show_correct_answers_last_attempt => true
+        :show_correct_answers_last_attempt => true,
+        :only_visible_to_overrides => true,
       }
       q = @copy_from.quizzes.create!(attributes)
 

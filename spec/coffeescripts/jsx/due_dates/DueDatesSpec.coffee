@@ -1,15 +1,13 @@
 define [
   'react'
+  'react-dom'
   'underscore'
   'jsx/due_dates/DueDates'
   'jsx/due_dates/OverrideStudentStore'
   'jsx/due_dates/StudentGroupStore'
   'compiled/models/AssignmentOverride',
   'helpers/fakeENV'
-], (React, _, DueDates, OverrideStudentStore, StudentGroupStore, AssignmentOverride, fakeENV) ->
-
-  Simulate = React.addons.TestUtils.Simulate
-  SimulateNative = React.addons.TestUtils.SimulateNative
+], (React, ReactDOM, _, DueDates, OverrideStudentStore, StudentGroupStore, AssignmentOverride, fakeENV) ->
 
   module 'DueDates',
     setup: ->
@@ -32,10 +30,10 @@ define [
 
       @syncWithBackboneStub = @stub(props, 'syncWithBackbone')
       DueDatesElement = React.createElement(DueDates, props)
-      @dueDates = React.render(DueDatesElement, $('<div>').appendTo('body')[0])
+      @dueDates = ReactDOM.render(DueDatesElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@dueDates.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@dueDates.getDOMNode().parentNode)
       fakeENV.teardown()
 
   test 'renders', ->
@@ -156,9 +154,9 @@ define [
     )
 
     # render with the props (which should provide info for fetchStudentsByID call)
-    @dueDates = React.render(DueDatesElement, $('<div>').appendTo('body')[0])
+    @dueDates = ReactDOM.render(DueDatesElement, $('<div>').appendTo('body')[0])
 
     ok !fetchAdhocStudentsStub.calledWith(["18", "22"])
     ok fetchAdhocStudentsStub.calledWith(["1","3"])
 
-    React.unmountComponentAtNode(@dueDates.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(@dueDates.getDOMNode().parentNode)

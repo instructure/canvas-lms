@@ -166,7 +166,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :rce_js_env
 
-  def conditional_release_js_env(assignment = nil, include_rule: false)
+  def conditional_release_js_env(assignment = nil, includes: [])
     return unless ConditionalRelease::Service.enabled_in_context?(@context)
     cr_env = ConditionalRelease::Service.env_for(
       @context,
@@ -175,7 +175,7 @@ class ApplicationController < ActionController::Base
       assignment: assignment,
       domain: request.env['HTTP_HOST'],
       real_user: @real_current_user,
-      include_rule: include_rule
+      includes: includes
     )
     js_env(cr_env)
   end
@@ -703,7 +703,7 @@ class ApplicationController < ActionController::Base
         # don't load it again if we've already got it
         next if @contexts.any? { |c| c.asset_string == include_context }
         context = Context.find_by_asset_string(include_context)
-        @contexts << context if context && context.grants_right?(@current_user, :read)
+        @contexts << context if context && context.grants_right?(@current_user, session, :read)
       end
     end
 
@@ -756,98 +756,36 @@ class ApplicationController < ActionController::Base
     badge_counts
   end
 
-  # Retrieves all assignments for all contexts held in the @contexts variable.
-  # Also retrieves submissions and sorts the assignments based on
-  # their due dates and submission status for the given user.
-  def get_sorted_assignments
-    @courses = @contexts.select{ |c| c.is_a?(Course) }
-    @just_viewing_one_course = @context.is_a?(Course) && @courses.length == 1
-    @context_codes = @courses.map(&:asset_string)
-    @context = @courses.first
+  def get_upcoming_assignments(course)
+    assignments = AssignmentGroup.visible_assignments(
+      @current_user,
+      course,
+      course.assignment_groups.active
+    ).to_a
 
-    if @just_viewing_one_course
-
-      # fake assignment used for checking if the @current_user can read unpublished assignments
-      fake = @context.assignments.temp_record
-      fake.workflow_state = 'unpublished'
-
-      assignment_scope = :active_assignments
-      if !fake.grants_right?(@current_user, session, :read)
-        # user should not see unpublished assignments
-        assignment_scope = :published_assignments
-      end
-
-      @groups = @context.assignment_groups.active
-      @assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups).to_a
-    else
-      assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
-        [[Assignment.published.for_course(courses).all,
-         AssignmentGroup.active.for_course(courses).order(:position).all]]
-      end
-      @assignments = assignments_and_groups.map(&:first).flatten
-      @groups = assignments_and_groups.map(&:last).flatten
-    end
-    @assignment_groups = @groups
-
-    @courses.each { |course| log_course(course) }
+    log_course(course)
 
     if @current_user
-      @submissions = @current_user.submissions.shard(@current_user).to_a
-      @submissions.each{ |s| s.mute if s.muted_assignment? }
+      submissions = @current_user.submissions.shard(@current_user).to_a
+      submissions.each{ |s| s.mute if s.muted_assignment? }
     else
-      @submissions = []
+      submissions = []
     end
 
-    @assignments.map! {|a| a.overridden_for(@current_user)}
+    assignments.map! {|a| a.overridden_for(@current_user)}
     sorted = SortsAssignments.by_due_date({
-      :assignments => @assignments,
+      :assignments => assignments,
       :user => @current_user,
       :session => session,
       :upcoming_limit => 1.week.from_now,
-      :submissions => @submissions
+      :submissions => submissions
     })
 
-    @past_assignments = sorted.past
-    @undated_assignments = sorted.undated
-    @ungraded_assignments = sorted.ungraded
-    @upcoming_assignments = sorted.upcoming
-    @future_assignments = sorted.future
-    @overdue_assignments = sorted.overdue
-    @unsubmitted_assignments = sorted.unsubmitted
-
-    condense_assignments if requesting_main_assignments_page?
-
-    categorized_assignments.each(&:sort!)
-  end
-
-  def categorized_assignments
-    [
-      @assignments,
-      @upcoming_assignments,
-      @past_assignments,
-      @ungraded_assignments,
-      @undated_assignments,
-      @future_assignments,
-      @unsubmitted_assignments
-    ]
-  end
-
-  def condense_assignments
-    num_weeks = @future_assignments.length > 5 ? 2 : 4
-    @future_assignments = SortsAssignments.up_to(@future_assignments, num_weeks.weeks.from_now)
-    num_weeks = @past_assignments.length < 5 ? 2 : 4
-    @past_assignments = SortsAssignments.down_to(@past_assignments, num_weeks.weeks.ago)
-
-    @overdue_assignments = SortsAssignments.down_to(@overdue_assignments, 4.weeks.ago)
-    @ungraded_assignments = SortsAssignments.down_to(@ungraded_assignments, 4.weeks.ago)
+    sorted.upcoming.sort
   end
 
   def log_course(course)
     log_asset_access([ "assignments", course ], "assignments", "other")
-  end
-
-  def requesting_main_assignments_page?
-    request.path.match(/\A\/assignments/)
   end
 
   # Calculates the file storage quota for @context
@@ -985,7 +923,7 @@ class ApplicationController < ActionController::Base
   end
 
   def require_reacceptance_of_terms
-    if session[:require_terms] && !api_request? && request.get?
+    if session[:require_terms] && request.get? && !api_request? && !verified_file_request?
       render "shared/terms_required", status: :unauthorized
       false
     end
@@ -1131,6 +1069,8 @@ class ApplicationController < ActionController::Base
 
   # analogous to rescue_action_without_handler from ActionPack 2.3
   def rescue_exception(exception)
+    raise if Rails.env.development? && !ENV['DISABLE_BETTER_ERRORS']
+
     ActiveSupport::Deprecation.silence do
       message = "\n#{exception.class} (#{exception.message}):\n"
       message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
@@ -1326,6 +1266,10 @@ class ApplicationController < ActionController::Base
     @api_request ||= !!request.path.match(API_REQUEST_REGEX)
   end
 
+  def verified_file_request?
+    params[:controller] == 'files' && params[:action] == 'show' && params[:verifier].present?
+  end
+
   def session_loaded?
     session.send(:loaded?) rescue false
   end
@@ -1346,7 +1290,7 @@ class ApplicationController < ActionController::Base
 
     unless @page
       if params[:titleize].present? && !value_to_boolean(params[:titleize])
-        @page_name = CGI.unescape(@page_name) unless CANVAS_RAILS4_0
+        @page_name = CGI.unescape(@page_name)
         @page = @wiki.build_wiki_page(@current_user, :title => @page_name)
       else
         @page = @wiki.build_wiki_page(@current_user, :url => @page_name)
@@ -1594,6 +1538,8 @@ class ApplicationController < ActionController::Base
         !!WebConference.config
       elsif feature == :crocodoc
         !!Canvas::Crocodoc.config
+      elsif feature == :vericite
+        Canvas::Plugin.find(:vericite).try(:enabled?)
       elsif feature == :lockdown_browser
         Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
       else
@@ -2063,7 +2009,7 @@ class ApplicationController < ActionController::Base
       :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user),
     })
 
-    conditional_release_js_env
+    conditional_release_js_env(includes: :active_rules)
 
     if @context.feature_enabled?(:multiple_grading_periods)
       js_env(:active_grading_periods => GradingPeriod.json_for(@context, @current_user))

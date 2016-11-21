@@ -162,7 +162,7 @@ describe SubmissionsController do
           )
 
           # cache permission as true (for 5 minutes)
-          expect(@assignment.grants_right?(@student, :submit)).to be_truthy
+          expect(@assignment.grants_right?(@student, {}, :submit)).to be_truthy
         end
 
         # travel past due date (which resets the Assignment#locked_for? cache)
@@ -552,47 +552,6 @@ describe SubmissionsController do
     end
   end
 
-  describe 'GET /submissions/:id param routing', type: :request do
-    before do
-      course_with_student_and_submitted_homework
-      @context = @course
-    end
-
-    describe "preview query param", type: :request do
-      it 'renders with submissions/previews#show if params is present and format is html' do
-        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1"
-        expect(request.params[:controller]).to eq 'submissions/previews'
-        expect(request.params[:action]).to eq 'show'
-      end
-
-      it 'renders with submissions#show if params is present and format is json' do
-        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1", format: :json
-        expect(request.params[:controller]).to eq 'submissions'
-        expect(request.params[:action]).to eq 'show'
-      end
-
-      it 'renders with action #show if params is not present' do
-        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
-        expect(request.params[:controller]).to eq 'submissions'
-        expect(request.params[:action]).to eq 'show'
-      end
-    end
-
-    describe "download query param", type: :request do
-      it 'renders with action #download if params is present' do
-        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?download=12345"
-        expect(request.params[:controller]).to eq 'submissions/downloads'
-        expect(request.params[:action]).to eq 'show'
-      end
-
-      it 'renders with action #show if params is not present' do
-        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
-        expect(request.params[:controller]).to eq 'submissions'
-        expect(request.params[:action]).to eq 'show'
-      end
-    end
-  end
-
   describe "GET show" do
     before do
       course_with_student_and_submitted_homework
@@ -704,7 +663,7 @@ describe SubmissionsController do
 
     it "leaves files in non user/group context alone" do
       assignment_model(context: @course)
-      weird_file = @assignment.attachments.create! name: 'blah', uploaded_data: default_uploaded_data
+      weird_file = @assignment.attachments.create! display_name: 'blah', uploaded_data: default_uploaded_data
       atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [weird_file])
       expect(atts).to eq [weird_file]
     end

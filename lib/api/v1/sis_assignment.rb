@@ -40,29 +40,17 @@ module Api::V1::SisAssignment
     only: %i(title due_at unlock_at lock_at).freeze
   }.freeze
 
-  API_SIS_ASSIGNMENT_USER_LEVEL_JSON_OPTS = {
-      only: %i(id name sis_user_id).freeze
-  }.freeze
-
-  API_SIS_ASSIGNMENT_USER_LEVEL_OVERRIDES_JSON_OPTS = {
-      only: %i(assignment_override_id due_at).freeze
-  }.freeze
-
   def sis_assignments_json(assignments)
     assignments.map { |a| sis_assignment_json(a) }
   end
-
-  private
 
   def sis_assignment_json(assignment)
     json = api_json(assignment, nil, nil, API_SIS_ASSIGNMENT_JSON_OPTS)
     json[:course_id] = assignment.context_id if assignment.context_type == 'Course'
     json[:submission_types] = json.delete(:submission_types_array)
     json[:include_in_final_grade] = include_in_final_grade(assignment)
-    user_overrides = active_user_level_assignment_overrides_for(assignment)
     add_sis_assignment_group_json(assignment, json)
     add_sis_course_sections_json(assignment, json)
-    add_sis_user_overrides_json(assignment, json) if !user_overrides.nil? && user_overrides.count > 0
     json
   end
 
@@ -82,83 +70,6 @@ module Api::V1::SisAssignment
     json.merge!(sections: sis_assignment_course_sections_json(course_sections, assignment))
   end
 
-  def add_sis_user_overrides_json(assignment, json)
-    users = active_user_level_assignment_overrides_for(assignment)
-    return if users.nil?
-    json.merge!(user_overrides: sis_assignment_users_json(users, assignment))
-  end
-
-  # Deals with a case where the same assignment override
-  # is assigned to more than one student.
-  def extract_multiple_user_overrides(user_overrides, assignment)
-    override_info = []
-    matching_pairs = []
-
-    user_overrides.each { |user| override_info.push(extract_user_override_info(user)) }
-    info_copy = override_info
-    override_info.each do |override|
-      info_copy.each do |copy|
-        if override[:id] != copy[:id] && override[:override_id] == copy[:override_id]
-          matching_pairs.push([override[:id], copy[:id]].sort())
-        end
-      end
-    end
-
-    pairs = get_unique_pairs(matching_pairs)
-    return user_overrides if pairs.nil?
-    get_associated_user_info(user_overrides, pairs, assignment)
-  end
-
-  def get_unique_pairs(matching_pairs)
-    found_pairs = []
-
-    pairs = matching_pairs.map do |numbers|
-      pair = numbers.uniq - found_pairs
-      found_pairs += pair
-      pair
-    end
-
-    pairs.reject!(&:empty?)
-  end
-
-  def get_associated_user_info(users, unique_pairs, assignment)
-    overrides = active_assignment_overrides_for(assignment)
-    associated_users = []
-    valid_user_overrides = users.to_a
-    unique_pairs.each do |pair|
-      if pair.class == Array
-        temp = []
-        temp_due_at = nil
-        pair.each do |id|
-          user = users.find(id)
-          temp_due_at = overrides.find(user.assignment_override_id).due_at
-          temp.push({'id' => user.user_id,
-                     'name' => user.user.name,
-                     'sis_user_id' => user.user.pseudonym.sis_user_id}) if user && id == user.id
-          valid_user_overrides.delete_if { |u| u.id == id }
-        end
-        temp.push({'due_at' => temp_due_at})
-        associated_users.push(temp)
-      else
-        user = users.find(pair)
-        associated_users.push({'id' => user.user_id,
-                               'name' => user.user.name,
-                               'sis_user_id' => user.user.pseudonym.sis_user_id})  if user && pair == user.id
-        valid_user_overrides.delete_if { |u| u.id == pair }
-      end
-    end
-    associated_users.concat valid_user_overrides
-  end
-
-  def extract_user_override_info(user)
-    {id: user.id, user_id: user.user_id, override_id: user.assignment_override_id}
-  end
-
-  def sis_assignment_users_json(users, assignment)
-    users = extract_multiple_user_overrides(users, assignment)
-    users.map { |s| sis_assignment_user_json(s, assignment) }
-  end
-
   def sis_assignment_course_sections_json(course_sections, assignment)
     if assignment.only_visible_to_overrides
       section_ids = active_assignment_overrides_for(assignment).map { |o| o.set_id if o.set_type == 'CourseSection' }
@@ -167,21 +78,6 @@ module Api::V1::SisAssignment
     end
 
     course_sections.map { |s| sis_assignment_course_section_json(s, assignment) }
-  end
-
-  def sis_assignment_user_json(user, assignment)
-    if user.class == Array
-      json = {}
-      *json[:id], json[:override] = user
-    else
-      # This merge! is required so we can obtain the name from the user object
-      # and the rest of the attributes from the pseudonym object
-      sis_assignment_user_level_json = api_json(user.user, nil, nil, API_SIS_ASSIGNMENT_USER_LEVEL_JSON_OPTS)
-      sis_assignment_pseudonym_level_json = api_json(user.user.pseudonym, nil, nil, API_SIS_ASSIGNMENT_USER_LEVEL_JSON_OPTS)
-      json = sis_assignment_user_level_json.merge!(sis_assignment_pseudonym_level_json)
-      add_sis_assignment_user_level_override_json(json, assignment, user)
-    end
-    json
   end
 
   def sis_assignment_course_section_json(course_section, assignment)
@@ -212,26 +108,11 @@ module Api::V1::SisAssignment
     json[:override] = override_json
   end
 
-  def include_in_final_grade(assignment)
+  private def include_in_final_grade(assignment)
     !(assignment.omit_from_final_grade? || assignment.grading_type == 'not_graded')
   end
 
-  def add_sis_assignment_user_level_override_json(json, assignment, user)
-    assignment_overrides = active_assignment_overrides_for(assignment)
-    return unless assignment_overrides
-
-    override = assignment_overrides.detect do |assignment_override|
-      assignment_override.set_type == 'ADHOC' &&
-      assignment_override.assignment_id == user.assignment_id &&
-      assignment_override.id == user.assignment_override_id
-    end
-    return if override.nil?
-
-    override_json = api_json(override, nil, nil, API_SIS_ASSIGNMENT_USER_LEVEL_OVERRIDES_JSON_OPTS)
-    json[:override] = override_json
-  end
-
-  def active_course_sections_for(context)
+  private def active_course_sections_for(context)
     if context.respond_to?(:active_course_sections) && context.association(:active_course_sections).loaded?
       context.active_course_sections
     elsif context.respond_to?(:course_sections) && context.association(:course_sections).loaded?
@@ -239,17 +120,11 @@ module Api::V1::SisAssignment
     end
   end
 
-  def active_assignment_overrides_for(assignment)
+  private def active_assignment_overrides_for(assignment)
     if assignment.association(:active_assignment_overrides).loaded?
       assignment.active_assignment_overrides
     elsif assignment.association(:assignment_overrides).loaded?
       assignment.assignment_overrides.select(&:active?)
-    end
-  end
-
-  def active_user_level_assignment_overrides_for(assignment)
-    if assignment.assignment_override_students
-      assignment.assignment_override_students
     end
   end
 end

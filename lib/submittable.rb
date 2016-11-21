@@ -98,7 +98,7 @@ module Submittable
           submission_types: 'wiki_page'
         ).update_all(workflow_state: 'deleted', updated_at: Time.now.utc)
       elsif self.assignment && @saved_by != :assignment
-        self.clear_changes_information unless CANVAS_RAILS4_0 # needed to prevent an infinite loop in rails 4.2
+        self.clear_changes_information # needed to prevent an infinite loop in rails 4.2
         self.sync_assignment
         self.assignment.save
       end

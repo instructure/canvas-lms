@@ -170,25 +170,31 @@ describe AppointmentGroup do
 
   context "permissions" do
     before :once do
-      course_with_teacher(:active_all => true)
-      @teacher = @user
-      section1 = @course.default_section
+      @course, @course2, @course3, other_course = create_courses(4, return_type: :record)
+
+      @teacher, @teacher2, @teacher3, @ta, @student, @student_in_section2, @student_in_section3,
+        @student_in_course2_section2, @student_in_course3_section2 = create_users(9, return_type: :record)
+
       section2 = @course.course_sections.create!
       section3 = @course.course_sections.create!
-      other_course = Course.create!
+      c2s2 = @course2.course_sections.create!
+      c3s2 = @course3.course_sections.create!
+
       gc = group_category
       @user_group = @course.groups.create!(:group_category => gc)
+      @user_group.users << @student
 
-      student_in_course(:course => @course, :active_all => true)
-      @student = @user
-      @user_group.users << @user
-
-      @student_in_section2 = student_in_section(section2, :course => @course)
-      @student_in_section3 = student_in_section(section3, :course => @course)
-
-      user(:active_all => true)
-      @course.enroll_user(@user, 'TaEnrollment', :section => section2, :limit_privileges_to_course_section => true).accept!
-      @ta = @user
+      create_enrollment @course, @teacher, enrollment_type: "TeacherEnrollment"
+      create_enrollment @course, @student
+      create_enrollment @course, @student_in_section2, section: section2
+      create_enrollment @course, @student_in_section3, section: section3
+      create_enrollment @course, @ta, enrollment_type: "TaEnrollment", section: section2,
+                                      limit_privileges_to_course_section: true
+      create_enrollment @course2, @teacher2, enrollment_type: "TeacherEnrollment"
+      create_enrollment @course3, @teacher2, enrollment_type: "TeacherEnrollment"
+      create_enrollment @course3, @teacher3, enrollment_type: "TeacherEnrollment"
+      create_enrollment @course2, @student_in_course2_section2, section: c2s2
+      create_enrollment @course3, @student_in_course3_section2, section: c3s2
 
       @g1 = AppointmentGroup.create(:title => "test", :contexts => [@course])
       @g1.publish!
@@ -207,19 +213,8 @@ describe AppointmentGroup do
       @g7.publish!
 
       # multiple contexts
-      course_bak, teacher_bak = @course, @teacher
-      course_with_teacher(:active_all => true)
-      @course2, @teacher2 = @course, @teacher
-      course_with_teacher(:user => @teacher2, :active_all => true)
-      teacher_in_course(:course => @course)
-      @course3, @teacher3, @course, @teacher = @course, @teacher, course_bak, teacher_bak
       @g8 = AppointmentGroup.create(:title => "test", :contexts => [@course2, @course3])
       @g8.publish!
-
-      c2s2 = @course2.course_sections.create!
-      c3s2 = @course3.course_sections.create!
-      @student_in_course2_section2 = student_in_section(c2s2, :course => @course2)
-      @student_in_course3_section2 = student_in_section(c3s2, :course => @course3)
 
       # multiple contexts and sub contexts
       @g9 = AppointmentGroup.create! :title => "multiple everything",
@@ -556,6 +551,20 @@ describe AppointmentGroup do
       res = ag.appointments.first.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
       # expect
       expect(ag.requiring_action?(student)).to be_falsey
+    end
+
+    it "deals with custom-sized appointments" do
+      ag = AppointmentGroup.create(:title => "test",
+                                   :contexts => [@course],
+                                   :participants_per_appointment => 1,
+                                   :min_appointments_per_participant => 1,
+                                   :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
+                                                         ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      ag.appointments.first.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
+      ag.appointments.last.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
+      expect(ag).to be_all_appointments_filled
+      ag.appointments.last.update_attribute :participants_per_appointment, 2
+      expect(ag).not_to be_all_appointments_filled
     end
   end
 end

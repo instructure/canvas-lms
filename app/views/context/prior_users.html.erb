@@ -6,9 +6,10 @@
 <% content_for :page_title, t('titles.prior_users', "Prior Users") %>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-lr rs-margin-top">
-    <a href="<%= context_url(@context, :context_users_url) %>" class="btn button-sidebar-wide"><i class="icon-arrow-left"></i> <%= t('links.back_to_people', %{Back to People}) %></a>
-  </div>
+  <a href="<%= context_url(@context, :context_users_url) %>" class="btn button-sidebar-wide">
+    <i class="icon-arrow-left"></i>
+    <%= t('links.back_to_people', %{Back to People}) %>
+  </a>
 <% end %>
 
 <% css_bundle :prior_users %>

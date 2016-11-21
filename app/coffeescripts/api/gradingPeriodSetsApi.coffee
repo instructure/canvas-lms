@@ -4,7 +4,7 @@ define [
   'i18n!grading_periods'
   'jsx/shared/helpers/dateHelper'
   'axios'
-  'jsx/gradebook2/CheatDepaginator'
+  'jsx/shared/CheatDepaginator'
   'jquery.instructure_misc_helpers'
 ], ($, _, I18n, DateHelper, axios, Depaginate) ->
   listUrl = () =>

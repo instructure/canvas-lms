@@ -274,7 +274,7 @@ module AdheresToPolicy
       # If you're going to add something to the user session that
       # affects permissions, you'd durn well better a :permissions_key
       # on the session as well
-      permissions_key = session && session[:permissions_key]
+      permissions_key = session ? (session[:permissions_key] || 'default') : nil # no session != no permissions_key
       ['permissions', self, user, permissions_key, right].compact.
         map{ |element| ActiveSupport::Cache.expand_cache_key(element) }.
         to_param

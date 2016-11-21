@@ -81,7 +81,7 @@ describe ConditionalRelease::Setup do
     it "should not run if the Conditional Release service isn't configured" do
       Service.stubs(:configured?).returns(false)
       @setup.expects(:create_token!).never
-      @setup.expects(:send_later).never
+      @setup.expects(:send_later_enqueue_args).never
       @setup.activate!
     end
 
@@ -89,7 +89,7 @@ describe ConditionalRelease::Setup do
       user = setup_cr_user(@root_account)
       setup_cr_token_for_user(user)
       init = ConditionalRelease::Setup.new(@account.id, @user.id)
-      init.expects(:send_later).never
+      init.expects(:send_later_enqueue_args).never
       init.activate!
     end
 
@@ -104,7 +104,7 @@ describe ConditionalRelease::Setup do
     end
 
     it "should enqueue a job to POST the account data to the Conditional Release service" do
-      @setup.expects(:send_later).once
+      @setup.expects(:send_later_enqueue_args).once
       @setup.activate!
     end
 
@@ -119,7 +119,9 @@ describe ConditionalRelease::Setup do
 
       details = get_api_user_details(t_new_account)
 
-      Delayed::Job.find_by_tag("ConditionalRelease::Setup#post_to_service").invoke_job
+      job = Delayed::Job.find_by_tag("ConditionalRelease::Setup#post_to_service")
+      expect(job.max_attempts).to eq 1
+      job.invoke_job
 
       expect(details[:token].count).to eq 1
       expect(details[:user].is_a?(User)).to be_truthy

@@ -26,7 +26,7 @@ describe 'Moderated Grades API', type: :request do
     sec2 = @course.course_sections.create!(:name => "section 2")
     @assignment = @course.assignments.create! name: "asdf"
     @assignment.update_attribute :moderated_grading, true
-    @student1, @student2, @student3 = n_students_in_course(3)
+    @student1, @student2, @student3 = n_students_in_course(3, course: @course)
     @course.enroll_student(@student1, :section => sec1, :allow_multiple_enrollments => true)
     @course.enroll_student(@student2, :section => sec1, :allow_multiple_enrollments => true)
     @course.enroll_student(@student3, :section => sec1, :allow_multiple_enrollments => true)

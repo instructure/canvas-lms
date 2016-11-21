@@ -275,6 +275,14 @@ describe FilesController do
         expect(json_parse['attachment']).to_not be_nil
         expect(json_parse['attachment']['md5']).to be_nil
       end
+
+      it "should not redirect to terms-acceptance page" do
+        user_session(@teacher)
+        session[:require_terms] = true
+        verifier = Attachments::Verification.new(@file).verifier_for_user(@teacher)
+        get 'show', :course_id => @course.id, :id => @file.id, :verifier => verifier, :format => 'json'
+        expect(response).to be_success
+      end
     end
 
     it "should assign variables" do

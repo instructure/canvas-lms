@@ -17,7 +17,7 @@
 #
 
 require 'spec_helper'
-require 'aws-sdk-v1'
+require 'aws-sdk'
 
 describe LiveEvents::Client do
   def stub_config(opts = {})
@@ -35,9 +35,7 @@ describe LiveEvents::Client do
     LiveEvents.max_queue_size = -> { 100 }
 
     @kclient = mock()
-    kinesis = mock()
-    kinesis.stubs(:client).returns(@kclient)
-    AWS::Kinesis.stubs(:new).returns(kinesis)
+    Aws::Kinesis::Client.stubs(:new).returns(@kclient)
 
     @client = LiveEvents::Client.new
   end
@@ -55,9 +53,7 @@ describe LiveEvents::Client do
         "aws_endpoint" => "http://example.com:6543/"
       })
 
-      res[:kinesis_endpoint].should eq("example.com")
-      res[:kinesis_port].should eq(6543)
-      res[:use_ssl].should eq(false)
+      res[:endpoint].should eq("http://example.com:6543/")
     end
   end
 

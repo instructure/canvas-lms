@@ -82,7 +82,7 @@ class AssignmentGroupsApiController < ApplicationController
   def create
     @assignment_group = @context.assignment_groups.temp_record
     if authorized_action(@assignment_group, @current_user, :create)
-      updated = update_assignment_group(@assignment_group, params)
+      updated = update_assignment_group(@assignment_group, strong_params)
       process_assignment_group(updated)
     end
   end
@@ -95,8 +95,8 @@ class AssignmentGroupsApiController < ApplicationController
   # @returns AssignmentGroup
   def update
     if authorized_action(@assignment_group, @current_user, :update)
-      updated = update_assignment_group(@assignment_group, params)
-      unless current_user_is_course_admin? || can_update_assignment_group?(@assignment_group)
+      updated = update_assignment_group(@assignment_group, strong_params)
+      unless can_update_assignment_group?(@assignment_group)
         return render_unauthorized_action
       end
       process_assignment_group(updated)
@@ -147,11 +147,8 @@ class AssignmentGroupsApiController < ApplicationController
     end
   end
 
-  def current_user_is_course_admin?
-    @current_user.admin_of_root_account?(@context.root_account)
-  end
-
   def can_update_assignment_group?(assignment_group)
+    return true if @context.account_membership_allows(@current_user)
     return true unless assignment_group.group_weight_changed? || assignment_group.rules_changed?
     return true unless @context.feature_enabled?(:multiple_grading_periods)
     !assignment_group.has_assignment_due_in_closed_grading_period?

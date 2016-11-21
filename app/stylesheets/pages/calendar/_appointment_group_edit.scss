@@ -9,6 +9,43 @@
   }
 }
 
+.EditPage__Options-Input {
+  width: 50px;
+}
+
+.EditPage__Options-GroupCheckbox {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.hiddenSection {
+  display: none;
+}
+
+.sectionItem {
+  padding-left: 20px;
+}
+
+.AppointmentGroupList__List {
+  width: 100%;
+  margin-top: 10px;
+  margin-left: 30px;
+}
+
+.AppointmentGroupList__Appointment {
+  margin-top: 5px;
+}
+
+.AppointmentGroupList__MessageButton {
+  margin-top: 10px;
+  width: 100%;
+  margin-left: 30px;
+}
+
+.AppointmentGroupList__unreserved {
+  opacity: 0.5;
+}
 
 .ContextSelector__Dropdown {
   position: absolute;
@@ -18,4 +55,33 @@
   margin-top: -3px;
   padding-bottom: 5px;
   z-index: 10;
+}
+
+.TimeBlockSelectorRow .col-xs {
+  flex-basis: auto;
+}
+
+.TimeBlockSelector__DivideSection-Input {
+  width: 40px;
+}
+
+.TimeBlockSelectorRow__Date,
+.TimeBlockSelectorRow__StartTime,
+.TimeBlockSelectorRow__EndTime {
+  width: 130px;
+}
+
+#message_participants_form .participant_list {
+  margin: 10px 0 20px;
+
+  .student-recipient {
+    list-style-type: none;
+    box-shadow: 0 0 1px $ic-color-dark;
+    background: $ic-color-medium-light;
+    padding: 2px 10px;
+    margin-right: 5px;
+    border-radius: 12px;
+    display: inline-block;
+    font-size: 0.9em;
+  }
 }

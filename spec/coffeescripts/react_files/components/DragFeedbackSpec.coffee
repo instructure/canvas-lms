@@ -1,9 +1,10 @@
 define [
   'jquery'
   'react'
+  'react-dom'
   'compiled/models/File'
   'jsx/files/DragFeedback'
-], ($, React, File, DragFeedback) ->
+], ($, React, ReactDOM, File, DragFeedback) ->
   TestUtils = React.addons.TestUtils
 
   module 'DragFeedback'
@@ -17,4 +18,4 @@ define [
     dragFeedback = TestUtils.renderIntoDocument(React.createElement(DragFeedback, pageX: 1, pageY: 1, itemsToDrag: [file, file2]))
 
     equal dragFeedback.getDOMNode().getElementsByClassName('badge')[0].innerHTML, "2", "has two items"
-    React.unmountComponentAtNode(dragFeedback.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(dragFeedback.getDOMNode().parentNode)

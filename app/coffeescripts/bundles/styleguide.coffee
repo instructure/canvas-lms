@@ -2,6 +2,7 @@ require [
   'jquery'
   'underscore'
   'react'
+  'react-dom'
   'compiled/fn/preventDefault'
   'compiled/views/PublishButtonView'
   'compiled/views/PublishIconView'
@@ -12,7 +13,7 @@ require [
   'jqueryui/button'
   'jqueryui/tooltip'
   'jquery.instructure_date_and_time'
-], ($, _, React, preventDefault, PublishButtonView, PublishIconView, ReactModalExample, Backbone) ->
+], ($, _, React, ReactDOM, preventDefault, PublishButtonView, PublishIconView, ReactModalExample, Backbone) ->
 
   do ->
     dialog = $('#dialog-buttons-dialog').dialog({
@@ -23,7 +24,7 @@ require [
 
 
     # React Modal
-    React.render(
+    ReactDOM.render(
       React.createElement(
         ReactModalExample, {
           className: 'ReactModal__Content--canvas',
@@ -31,9 +32,9 @@ require [
         }
       )
     , document.getElementById('react-modal-example')
-    );
+    )
 
-    React.render(
+    ReactDOM.render(
       React.createElement(
         ReactModalExample, {
           label: 'Trigger Confirm Dialog',
@@ -166,4 +167,4 @@ require [
     $(".Sg-header__Navigation a").removeClass('active')
     $(this).addClass('active')
 
-  $('.Sg-header__Navigation a').on('click', selectCategory);
+  $('.Sg-header__Navigation a').on('click', selectCategory)

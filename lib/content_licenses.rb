@@ -28,41 +28,41 @@ module ContentLicenses
               :readable_license => t('#cc.private', 'Private (Copyrighted)'),
               :license_url => "http://en.wikipedia.org/wiki/Copyright"
           },
+          'public_domain',
+          {
+            :readable_license => t('#cc.public_domain', 'Public Domain'),
+            :license_url => "http://en.wikipedia.org/wiki/Public_domain"
+          },
+          'cc_by',
+          {
+            :readable_license => t('#cc.by', 'CC Attribution'),
+            :license_url => "http://creativecommons.org/licenses/by/4.0"
+          },
+          'cc_by_sa',
+          {
+            :readable_license => t('#cc.by_sa', 'CC Attribution Share Alike'),
+            :license_url => "http://creativecommons.org/licenses/by-sa/4.0"
+          },
+          'cc_by_nc',
+          {
+            :readable_license => t('#cc.by_nc', 'CC Attribution Non-Commercial'),
+            :license_url => "http://creativecommons.org/licenses/by-nc/4.0"
+          },
+          'cc_by_nc_sa',
+          {
+            :readable_license => t('#cc.by_nc_sa', 'CC Attribution Non-Commercial Share Alike'),
+            :license_url => "http://creativecommons.org/licenses/by-nc-sa/4.0"
+          },
+          'cc_by_nd',
+          {
+            :readable_license => t('#cc.by_nd', 'CC Attribution No Derivatives'),
+            :license_url => "http://creativecommons.org/licenses/by-nd/4.0"
+          },
           'cc_by_nc_nd',
           {
               :readable_license => t('#cc.by_nc_nd', 'CC Attribution Non-Commercial No Derivatives'),
               :license_url => "http://creativecommons.org/licenses/by-nc-nd/4.0/"
-          },
-          'cc_by_nc_sa',
-          {
-              :readable_license => t('#cc.by_nc_sa', 'CC Attribution Non-Commercial Share Alike'),
-              :license_url => "http://creativecommons.org/licenses/by-nc-sa/4.0"
-          },
-          'cc_by_nc',
-          {
-              :readable_license => t('#cc.by_nc', 'CC Attribution Non-Commercial'),
-              :license_url => "http://creativecommons.org/licenses/by-nc/4.0"
-          },
-          'cc_by_nd',
-          {
-              :readable_license => t('#cc.by_nd', 'CC Attribution No Derivatives'),
-              :license_url => "http://creativecommons.org/licenses/by-nd/4.0"
-          },
-          'cc_by_sa',
-          {
-              :readable_license => t('#cc.by_sa', 'CC Attribution Share Alike'),
-              :license_url => "http://creativecommons.org/licenses/by-sa/4.0"
-          },
-          'cc_by',
-          {
-              :readable_license => t('#cc.by', 'CC Attribution'),
-              :license_url => "http://creativecommons.org/licenses/by/4.0"
-          },
-          'public_domain',
-          {
-              :readable_license => t('#cc.public_domain', 'Public Domain'),
-              :license_url => "http://en.wikipedia.org/wiki/Public_domain"
-          },
+          }
       ]
     end
 

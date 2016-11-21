@@ -8,7 +8,7 @@ define [
   'compiled/util/round'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers' # raw
-], ($, _, GRADEBOOK_TRANSLATIONS, OutlierScoreHelper, htmlEscape, {extractData}, round) ->
+], ($, _, GRADEBOOK_TRANSLATIONS, OutlierScoreHelper, htmlEscape, {extractDataTurnitin}, round) ->
 
   class SubmissionCell
 
@@ -117,7 +117,7 @@ define [
       innerContents = null if opts.submission.workflow_state == 'pending_review' && !isNaN(innerContents)
       innerContents ?= if submission_type then SubmissionCell.submissionIcon(submission_type) else '-'
 
-      if turnitin = extractData(opts.submission)
+      if turnitin = extractDataTurnitin(opts.submission)
         specialClasses.push('turnitin')
         innerContents += "<span class='gradebook-cell-turnitin #{htmlEscape turnitin.state}-score' />"
 

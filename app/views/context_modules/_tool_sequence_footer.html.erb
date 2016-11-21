@@ -1,9 +1,15 @@
 <% js_bundle 'module_sequence_footer' %>
 <% if @tag.context.is_a?(Assignment) && (can_do(@tag.context, @current_user, :grade) || can_do(@tag.context.context, @current_user, :manage_assignments)) %>
   <% content_for :right_side do %>
-    <div class="rs-margin-all">
-      <%= render :partial => 'assignments/external_grader_sidebar', :locals => { :assignment => @tag.context } %>
-    </div>
+    <% assignment = @tag.context %>
+    <a href="<%= context_url(assignment.context, :edit_context_assignment_url, assignment.id, :return_to => request.url) %>" class="btn button-sidebar-wide">
+      <i class="icon-edit"></i>
+      <%= t :edit_assignment_settings, "Edit Assignment Settings" %>
+    </a>
+    <a target="_blank" id="speedgrader_button" class="btn button-sidebar-wide" href="<%= context_url(assignment.context, :speed_grader_context_gradebook_url, :assignment_id => assignment.id) %>">
+      <i class="icon-speed-grader"></i>
+      <%= t :speed_grader, "Speed Grader™" %>
+    </a>
   <% end %>
 <% end %>
 <% if @module_tag %>

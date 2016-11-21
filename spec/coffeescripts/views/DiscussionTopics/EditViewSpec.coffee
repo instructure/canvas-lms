@@ -18,10 +18,9 @@ define [
 Announcement, DueDateOverrideView, EditView, AssignmentGroupCollection,
 GroupCategorySelector, fakeENV, RichContentEditor) ->
 
-  editView = (opts = {}) ->
+  editView = (opts = {}, discussOpts = {}) ->
     modelClass = if opts.isAnnouncement then Announcement else DiscussionTopic
 
-    discussOpts = {}
     if opts.withAssignment
       assignmentOpts = _.extend {}, opts.assignmentOpts,
         name: 'Test Assignment'
@@ -92,6 +91,24 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     view = @editView({ withAssignment: true, permissions: { CAN_MODERATE: true } })
     equal view.$el.find('#podcast_enabled').length, 1
     equal view.$el.find('#podcast_has_student_posts_container').length, 0
+
+  test 'routes to discussion details normally', ->
+    view = @editView({}, { html_url: 'http://foo' })
+    equal view.locationAfterSave({}), 'http://foo'
+
+  test 'routes to return_to', ->
+    view = @editView({}, { html_url: 'http://foo' })
+    equal view.locationAfterSave({ return_to: 'http://bar' }), 'http://bar'
+
+  test 'cancels to env normally', ->
+    ENV.CANCEL_TO = 'http://foo'
+    view = @editView()
+    equal view.locationAfterCancel({}), 'http://foo'
+
+  test 'cancels to return_to', ->
+    ENV.CANCEL_TO = 'http://foo'
+    view = @editView()
+    equal view.locationAfterCancel({ return_to: 'http://bar' }), 'http://bar'
 
   module 'EditView - ConditionalRelease',
     setup: ->

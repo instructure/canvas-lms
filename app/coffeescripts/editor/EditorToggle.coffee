@@ -6,10 +6,11 @@ define [
   'compiled/fn/preventDefault'
   'compiled/views/editor/KeyboardShortcuts'
   'react'
+  'react-dom'
   'jsx/editor/SwitchEditorControl'
   'jsx/shared/rce/RichContentEditor'
 ], (_, I18n, $, Backbone, preventDefault, KeyboardShortcuts,
-    React, SwitchEditorControl, RichContentEditor) ->
+    React, ReactDOM, SwitchEditorControl, RichContentEditor) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -161,7 +162,7 @@ define [
     createSwitchViews: ->
       component = React.createElement(SwitchEditorControl, { textarea: @textArea })
       $container = $("<div class='switch-views'></div>")
-      React.render(component, $container[0])
+      ReactDOM.render(component, $container[0])
       return $container
 
 

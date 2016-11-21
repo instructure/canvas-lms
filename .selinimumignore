@@ -16,8 +16,12 @@
 *.eot
 *.sh
 
+*.rubocop.yml
+
+/.dockerignore
 /.fontcustom-manifest.json
 /.selinimumignore
+/.stylelintrc
 /app/stylesheets/brandable_variables.json
 /app/stylesheets/components/_canvas-icons.scss
 /bin
@@ -25,7 +29,9 @@
 !/config/environments/test.rb
 /doc
 /docker-compose*
+/Gemfile.d/development.rb
 /gems/*/spec
+/gems/dr_diff
 /gems/rubocop-canvas
 /gems/selinimum
 /gems/tatl_tael
@@ -33,8 +39,10 @@
 /Guardfile
 /lib/data_fixup
 /public/fonts
+/public/javascripts/.xssignore
 /public/javascripts/translations/_core_en.js
 /script
+/webpack.production.config.babel.js
 
 # ignore all specs and spec-related things, except selenium specs and things
 # that can affect them

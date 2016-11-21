@@ -210,7 +210,9 @@ class DiscussionEntriesController < ApplicationController
   def save_attachment
     return unless can_attach?
 
-    @attachment = @context.attachments.create(params[:attachment])
+    attachment_params = strong_params.require(:attachment).
+      permit(Attachment.permitted_attributes)
+    @attachment = @context.attachments.create(attachment_params)
     @entry.attachment = @attachment
     @entry.save
   end

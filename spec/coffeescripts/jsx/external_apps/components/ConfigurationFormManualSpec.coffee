@@ -1,10 +1,9 @@
 define [
   'react'
+  'react-dom'
   'jsx/external_apps/components/ConfigurationFormManual'
-], (React, ConfigurationFormManual) ->
+], (React, ReactDOM, ConfigurationFormManual) ->
 
-  TestUtils = React.addons.TestUtils
-  Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   createElement = (data) ->
@@ -20,11 +19,11 @@ define [
     })
 
   renderComponent = (data) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   module 'ExternalApps.ConfigurationFormManual',
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'customFieldsToMultiLine', ->
     data =

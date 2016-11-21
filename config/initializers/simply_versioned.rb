@@ -1,5 +1,5 @@
 Rails.configuration.to_prepare do
-  reflection = Version.reflections[CANVAS_RAILS4_0 ? :versionable : 'versionable']
+  reflection = Version.reflections['versionable']
   reflection.options[:exhaustive] = false
   reflection.options[:polymorphic] = [
     :assessment_question,

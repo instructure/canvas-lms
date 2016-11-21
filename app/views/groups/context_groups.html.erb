@@ -6,18 +6,6 @@
   <% js_bundle :react_groups %>
 <% else %>
 
-<% content_for :right_side do %>
-  <div class="rs-margin-lr rs-margin-top">
-    <% if @context.respond_to?(:allow_student_organized_groups) && @context.allow_student_organized_groups %>
-      <% if can_do(@context.groups.temp_record, @current_user, :create) %>
-        <a href="#" class="btn button-sidebar-wide add_group_link icon-add"><%= t 'actions.add', 'Start a New Group' %></a>
-      <% end %>
-    <% else %>
-      <%= t :groups_disabled, 'Student-organized groups have been disabled for this course, so you\'ll have to be content with the groups the teacher makes for you.' %>
-    <% end %>
-  </div>
-<% end %>
-
 <% js_bundle :groups %>
 <div id="group_categories_tabs" class="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all">
   <ul class='collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all'>

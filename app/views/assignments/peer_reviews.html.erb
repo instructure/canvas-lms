@@ -1,8 +1,10 @@
 <% content_for :page_title do %><%= join_title @context.name, @assignment.title, t(:page_title, "Peer Reviews") %><% end %>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-lr rs-margin-top">
-  <p><a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class='back'><%= t 'links.back_to_assignment', "Back to Assignment" %></a></p>
+  <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class='btn button-sidebar-wide'>
+    <i class="icon-arrow-left"></i>
+    <%= t 'links.back_to_assignment', "Back to Assignment" %>
+  </a>
   <p><%= t :details, "To the left you can see the list of students for this assignment, and also
   which student submissions (if any) they have been assigned to review." %></p>
   <% unless @submissions.empty? %>
@@ -22,7 +24,6 @@
       </div>
     <% end %>
   <% end %>
-  </div>
 <% end %>
 <% js_bundle 'legacy/assignments_peer_reviews' %>
 <% content_for :stylesheets do %>
@@ -51,7 +52,7 @@
 }
 </style>
 <% end %>
-<h2><%= t :title, "%{assignment} Peer Reviews", :assignment => @assignment.title %></h2>
+<h1><%= t :title, "%{assignment} Peer Reviews", :assignment => @assignment.title %></h1>
   <% if @assignment.rubric_association %>
     <%= t :overview_with_rubric, "Student peer reviews will be considered complete when students have commented
       at least once on the page and filled out the rubric form for the assignment." %>

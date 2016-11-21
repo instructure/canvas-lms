@@ -1,10 +1,11 @@
 define([
   '../../../compiled/react_files/mockFilesENV',
   'react',
+  'react-dom',
   'jquery',
   'jsx/files/ItemCog',
   'compiled/models/Folder'
-], (mockFilesENV, React, $, ItemCog, Folder) => {
+], (mockFilesENV, React, ReactDOM, $, ItemCog, Folder) => {
   const { TestUtils } = React.addons;
   const { Simulate } = TestUtils;
 
@@ -60,10 +61,10 @@ define([
 
   module('ItemCog', {
     setup () {
-      itemCog = React.render(<ItemCog {...sampleProps(true)} />, $('<div>').appendTo('#fixtures')[0]);
+      itemCog = ReactDOM.render(<ItemCog {...sampleProps(true)} />, $('<div>').appendTo('#fixtures')[0]);
     },
     teardown () {
-      React.unmountComponentAtNode(React.findDOMNode(itemCog).parentNode);
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(itemCog).parentNode);
       $('#fixtures').empty();
     }
   });
@@ -72,7 +73,7 @@ define([
   test('deletes model when delete link is pressed', () => {
     const ajaxSpy = sinon.spy($, 'ajax');
     sinon.stub(window, 'confirm').returns(true);
-    Simulate.click(React.findDOMNode(itemCog.refs.deleteLink));
+    Simulate.click(ReactDOM.findDOMNode(itemCog.refs.deleteLink));
     ok(window.confirm.calledOnce, 'confirms before deleting');
     ok(ajaxSpy.calledWithMatch({url: '/api/v1/folders/999', type: 'DELETE', data: {force: 'true'}}), 'sends DELETE to right url');
     $.ajax.restore();
@@ -80,7 +81,7 @@ define([
   });
 
   test('only shows download button for limited users', () => {
-    const readOnlyItemCog = React.render(<ItemCog {...sampleProps(false)} />, $('<div>').appendTo('#fixtures')[0]);
+    const readOnlyItemCog = ReactDOM.render(<ItemCog {...sampleProps(false)} />, $('<div>').appendTo('#fixtures')[0]);
     ok(buttonsEnabled(readOnlyItemCog, readOnlyConfig), 'only download button is shown');
   });
 
@@ -89,8 +90,8 @@ define([
   });
 
   test('downloading a file returns focus back to the item cog', () => {
-    Simulate.click(React.findDOMNode(itemCog.refs.download));
-    equal(document.activeElement, $(React.findDOMNode(itemCog)).find('.al-trigger')[0], 'the cog has focus');
+    Simulate.click(ReactDOM.findDOMNode(itemCog.refs.download));
+    equal(document.activeElement, $(ReactDOM.findDOMNode(itemCog)).find('.al-trigger')[0], 'the cog has focus');
   });
 
   test('deleting a file returns focus to the previous item cog when there are more items', () => {
@@ -107,10 +108,10 @@ define([
         );
       }
     });
-    const itemCogs = React.render(<ContainerApp />, $('#fixtures')[0]);
+    const itemCogs = ReactDOM.render(<ContainerApp />, $('#fixtures')[0]);
     const renderedCogs = TestUtils.scryRenderedComponentsWithType(itemCogs, ItemCog)
-    Simulate.click(React.findDOMNode(renderedCogs[1].refs.deleteLink));
-    equal(document.activeElement, $(React.findDOMNode(renderedCogs[0])).find('.al-trigger')[0], 'the cog has focus');
+    Simulate.click(ReactDOM.findDOMNode(renderedCogs[1].refs.deleteLink));
+    equal(document.activeElement, $(ReactDOM.findDOMNode(renderedCogs[0])).find('.al-trigger')[0], 'the cog has focus');
     window.confirm.restore();
   });
 
@@ -131,9 +132,9 @@ define([
         );
       }
     });
-    const container = React.render(<ContainerApp />, $('#fixtures')[0]);
+    const container = ReactDOM.render(<ContainerApp />, $('#fixtures')[0]);
     const renderedCog = TestUtils.findRenderedComponentWithType(container, ItemCog);
-    Simulate.click(React.findDOMNode(renderedCog.refs.deleteLink));
+    Simulate.click(ReactDOM.findDOMNode(renderedCog.refs.deleteLink));
     equal(document.activeElement, $('.someFakeLink')[0], 'the name column has focus');
     window.confirm.restore();
   });

@@ -18,13 +18,6 @@ require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
 
-if CANVAS_RAILS4_0
-  ActiveRecord::Base.class_eval do
-    mattr_accessor :dump_schema_after_migration, instance_writer: false
-    self.dump_schema_after_migration = true
-  end
-end
-
 module CanvasRails
   class Application < Rails::Application
     config.autoload_paths += [config.root.join('lib').to_s]
@@ -90,9 +83,8 @@ module CanvasRails
 
     config.active_record.whitelist_attributes = false
 
-    unless CANVAS_RAILS4_0
-      config.active_record.raise_in_transactional_callbacks = true # may as well opt into the new behavior
-    end
+    config.active_record.raise_in_transactional_callbacks = true # may as well opt into the new behavior
+
     config.active_support.encode_big_decimal_as_string = false
 
     config.autoload_paths += %W(#{Rails.root}/app/middleware
@@ -144,17 +136,13 @@ module CanvasRails
 
             raise "Canvas requires PostgreSQL 9.3 or newer" unless postgresql_version >= 90300
 
-            if CANVAS_RAILS4_0
-              ActiveRecord::ConnectionAdapters::PostgreSQLColumn.money_precision = (postgresql_version >= 80300) ? 19 : 10
-            else
-              ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID::Money.precision = (postgresql_version >= 80300) ? 19 : 10
-            end
+            ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID::Money.precision = (postgresql_version >= 80300) ? 19 : 10
 
             configure_connection
 
             break
           rescue ::PG::Error => error
-            if !CANVAS_RAILS4_0 && error.message.include?("does not exist")
+            if error.message.include?("does not exist")
               raise ActiveRecord::NoDatabaseError.new(error.message, error)
             elsif index == hosts.length - 1
               raise
@@ -242,7 +230,12 @@ module CanvasRails
       end
     end
 
-    config.exceptions_app = ExceptionsApp.new
+    if Rails.env.development? && !ENV['DISABLED_BETTER_ERRORS']
+      require 'better_errors'
+      require 'binding_of_caller'
+    else
+      config.exceptions_app = ExceptionsApp.new
+    end
 
     config.before_initialize do
       config.action_controller.asset_host = Canvas::Cdn.method(:asset_host_for)

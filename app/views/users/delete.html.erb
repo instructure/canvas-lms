@@ -1,9 +1,0 @@
-<% content_for :page_title do %><%= t('titles.confirm_delete', 'Confirm Delete User') %><% end %>
-
-<div style="width: 500px; margin-left: auto; margin-right: auto; margin-top: 10px;">
-  <h2><%= t('titles.really_delete_user', 'Really delete %{user_name}', :user_name => @user.name) %></h2>
-  <%= t('are_you_sure', 'Are you sure you want to delete this user account?') %>
-  <%= form_for @user, :html => {:method => 'delete', :style => "margin-top: 20px;"} do %>
-    <button type="submit" class="btn btn-large"><%= image_tag "delete.png", :alt => '' %><%= t('buttons.delete_user', 'Delete %{user_name}', :user_name => @user.name) %></button>
-  <% end %>
-</div>

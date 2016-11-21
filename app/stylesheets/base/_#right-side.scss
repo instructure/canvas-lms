@@ -24,20 +24,6 @@
   }
 }
 
-.rs-match-list-indent {
-  padding-left: 31px;
-}
-
-// .rs-margin-lr was removed because it is not needed since #right-side has it's own margin
-.rs-margin-top {
-  margin-top: $right_side_margin;
-}
-
-.rs-margin-all {
-  margin-top: $right_side_margin;
-  margin-bottom: $right_side_margin;
-}
-
 .rs-margin-bottom {
   margin-bottom: $right_side_margin;
 }

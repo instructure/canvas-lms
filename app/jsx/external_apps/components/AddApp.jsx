@@ -31,7 +31,8 @@ define([
 
     propTypes: {
       handleToolInstalled: React.PropTypes.func.isRequired,
-      app: React.PropTypes.object.isRequired
+      app: React.PropTypes.object.isRequired,
+      canAddEdit: React.PropTypes.bool.isRequired
     },
 
     getInitialState() {

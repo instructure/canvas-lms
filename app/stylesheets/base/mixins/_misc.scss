@@ -13,16 +13,6 @@
   background-image: linear-gradient(to bottom, $topColor, $bottomColor);
 }
 
-@mixin accessible_text_replacement {
-  display: inline-block;
-  text-indent: -999px;
-  overflow: hidden;
-  background-repeat: no-repeat;
-}
-
-@mixin unselectable { user-select: none; }
-
-
 // Firefox has a bug with white-space that breaks our ellipses CSS. This mixin
 // replaces the ellipses with a gradient fade-out. The mixin should be applied to
 // the parent of the ellipses or ellipsis class. There is an optional parameter

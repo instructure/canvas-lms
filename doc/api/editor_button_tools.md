@@ -1,6 +1,13 @@
 Rich Content Editor Button Tools
 =================================
 
+<a name="top"></a>
+<div class="warning-message">The methods outlined here use resource selection, which is deprecated.
+<p></p>
+See the <a href="content_item.html">Content Item</a> documentation to design a tool that
+can add content to the RCE in a way that conforms with the most up to date
+<a href="http://www.imsglobal.org/lti/">IMS LTI standard</a>. </div>
+
 An extension to standard LTI, external tools can be 
 configured to appear as buttons in the rich content 
 editor. When a tool is configured, users will see it appear in the rich 

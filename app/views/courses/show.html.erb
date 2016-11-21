@@ -85,13 +85,15 @@
     <% end %>
 
     <% if @context.available? && @context.self_enrollment_enabled? && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) %>
-      <div class="rs-margin-lr rs-margin-top">
-        <a href="<%= enroll_url(@context.self_enrollment_code) %>" title="<%= t('links.join_course', %{Join this Course}) %>" class="btn button-sidebar-wide self_enrollment_link" data-open-as-dialog><i class="icon-user-add"></i>  <%= t('links.join_course', %{Join this Course}) %></a>
-      </div>
+      <a href="<%= enroll_url(@context.self_enrollment_code) %>" class="btn button-sidebar-wide self_enrollment_link" data-open-as-dialog>
+        <i class="icon-user-add"></i>
+        <%= t('links.join_course', %{Join this Course}) %>
+      </a>
     <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? %>
-      <div class="rs-margin-lr rs-margin-top">
-        <a href="#" class="btn button-sidebar-wide self_unenrollment_link"><i class="icon-end"></i> <%= t('links.drop_course', %{Drop this Course}) %></a>
-      </div>
+      <a href="#" class="btn button-sidebar-wide self_unenrollment_link">
+        <i class="icon-end"></i>
+        <%= t('links.drop_course', %{Drop this Course}) %>
+      </a>
       <div id="self_unenrollment_dialog" style="display: none;">
         <h2><i class="icon-warning"></i> <%= t('headings.confirm_unenroll', %{Confirm Unenrollment}) %></h2>
         <%= t('details.confirm_unenroll', %{Are you sure you want to unenroll in this course?  You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.}) %>

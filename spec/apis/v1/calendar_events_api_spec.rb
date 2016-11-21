@@ -151,7 +151,7 @@ describe CalendarEventsApiController, type: :request do
       expect(json.size).to eql 1
     end
 
-    it 'should return events from up to 10 contexts' do
+    it 'should return events from up to 10 contexts by default' do
       contexts = [@course.asset_string]
       course_ids = create_courses(15, enroll_user: @me)
       create_records(CalendarEvent, course_ids.map{ |id| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}", start_at: '2012-01-08 12:00:00', workflow_state: 'active'}})
@@ -160,6 +160,33 @@ describe CalendarEventsApiController, type: :request do
         :controller => 'calendar_events_api', :action => 'index', :format => 'json',
         :context_codes => contexts, :start_date => '2012-01-08', :end_date => '2012-01-07', :per_page => '25'})
       expect(json.size).to eql 9 # first context has no events
+    end
+
+    it 'should return events from contexts up to the account limit setting' do
+      contexts = [@course.asset_string]
+      Account.default.settings[:calendar_contexts_limit] = 15
+      Account.default.save!
+      course_ids = create_courses(20, enroll_user: @me)
+      create_records(CalendarEvent, course_ids.map{ |id| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}", start_at: '2012-01-08 12:00:00', workflow_state: 'active'}})
+      contexts.concat course_ids.map{ |id| "course_#{id}" }
+      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+        :context_codes => contexts, :start_date => '2012-01-08', :end_date => '2012-01-07', :per_page => '25'})
+      expect(json.size).to eql 14 # first context has no events
+    end
+
+    it 'does not count appointment groups against the context limit' do
+      Account.default.settings[:calendar_contexts_limit] = 1
+      Account.default.save!
+      group1 = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
+      group1.publish!
+      contexts = [@course, group1].map(&:asset_string)
+      student_in_course :active_all => true
+      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-02&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+        :context_codes => contexts, :start_date => '2012-01-01', :end_date => '2012-01-02', :per_page => '25'})
+      slot = json.detect { |thing| thing['appointment_group_id'] == group1.id }
+      expect(slot).not_to be_nil
     end
 
     it 'should fail with unauthorized if provided a context the user cannot access' do
@@ -2012,6 +2039,23 @@ describe CalendarEventsApiController, type: :request do
         c['asset_string'] == @course.asset_string
       end
       expect(context['selected']).to be(true)
+    end
+
+    it 'includes course sections' do
+      @section = @course.course_sections.try(:first)
+
+      json = api_call(:get, '/api/v1/calendar_events/visible_contexts', {
+        controller: 'calendar_events_api',
+        action: 'visible_contexts',
+        format: 'json'
+      })
+
+      context = json['contexts'].find do |c|
+        c['sections'] && c['sections'].find do |s|
+          s['id'] == @section.id.to_s
+        end
+      end
+      expect(context).not_to be_nil
     end
   end
 

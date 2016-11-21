@@ -829,9 +829,9 @@ class CoursesController < ApplicationController
   #   - "custom_links": Optionally include plugin-supplied custom links for each student,
   #   such as analytics information
   # @argument user_id [String]
-  #   If included, the user will be queried and if the user is part of the
-  #   users set, the page parameter will be modified so that the page
-  #   containing user_id will be returned.
+  #   If this parameter is given and it corresponds to a user in the course,
+  #   the +page+ parameter will be ignored and the page containing the specified user
+  #   will be returned instead.
   #
   # @argument user_ids[] [Integer]
   #   If included, the course users set will only include users with IDs
@@ -1129,6 +1129,7 @@ class CoursesController < ApplicationController
 
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
+
       js_env({
         COURSE_ID: @context.id,
         USERS_URL: "/api/v1/courses/#{@context.id}/users",
@@ -1141,6 +1142,7 @@ class CoursesController < ApplicationController
           :manage_students => @context.grants_right?(@current_user, session, :manage_students),
           :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
           :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
+          :create_tool_manually => @context.grants_right?(@current_user, session, :create_tool_manually),
         },
         APP_CENTER: {
           enabled: Canvas::Plugin.find(:app_center).enabled?
@@ -1372,7 +1374,7 @@ class CoursesController < ApplicationController
       success = false
       if enrollment.invited?
         success = enrollment.accept!
-        flash[:notice] = message || t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
+        flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
       end
 
       if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
@@ -1612,7 +1614,7 @@ class CoursesController < ApplicationController
         add_crumb(t('#crumbs.assignments', "Assignments"))
         set_js_assignment_data
         js_env(:COURSE_HOME => true)
-        get_sorted_assignments
+        @upcoming_assignments = get_upcoming_assignments(@context)
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
         load_modules
@@ -2670,7 +2672,7 @@ class CoursesController < ApplicationController
 
   def can_change_group_weighting_scheme?
     return true unless @course.feature_enabled?(:multiple_grading_periods)
-    return true if @current_user.admin_of_root_account?(@course.root_account)
+    return true if @course.account_membership_allows(@current_user)
     periods = GradingPeriod.for(@course)
     @course.active_assignments.preload(:active_assignment_overrides).none? do |assignment|
       assignment.due_for_any_student_in_closed_grading_period?(periods)

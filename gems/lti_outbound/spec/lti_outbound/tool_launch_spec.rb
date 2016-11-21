@@ -261,6 +261,45 @@ describe LtiOutbound::ToolLaunch do
       expect(hash).to_not have_key 'john'
     end
 
+    context "link_params" do
+      let(:link_params) do
+        {
+          custom: {
+            'custom_param' => 123
+          },
+          ext:{
+            'ext_param' => 123,
+          }
+        }
+      end
+
+      let(:tool_launch) do
+        LtiOutbound::ToolLaunch.new(
+          url: 'http://www.yahoo.com',
+          tool: tool,
+          user: user,
+          account: account,
+          context: course,
+          link_code: '123456',
+          return_url: 'http://www.google.com',
+          outgoing_email_address: 'outgoing_email_address',
+          variable_expander: variable_expander,
+          link_params: link_params
+        )
+      end
+
+      it 'includes custom fields from link_params' do
+        hash = tool_launch.generate
+        expect(hash).to include({'custom_param' => 123})
+      end
+
+      it 'includes ext fields from link_params' do
+        hash = tool_launch.generate
+        expect(hash).to include({'ext_param' => 123})
+      end
+
+    end
+
     it 'does not include name and email if anonymous' do
       tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
       hash = tool_launch.generate

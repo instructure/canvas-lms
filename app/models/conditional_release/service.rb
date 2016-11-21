@@ -17,18 +17,21 @@
 #
 
 module ConditionalRelease
+  class ServiceError < StandardError; end
+
   class Service
     private_class_method :new
 
     DEFAULT_PATHS = {
-      edit_rule_path: "ui/editor",
+      base_path: '',
       stats_path: "stats",
       create_account_path: 'api/accounts',
       content_exports_path: 'api/content_exports',
       content_imports_path: 'api/content_imports',
       rules_path: 'api/rules?include[]=all&active=true',
       rules_summary_path: 'api/rules/summary',
-      select_assignment_set_path: 'api/rules/select_assignment_set'
+      select_assignment_set_path: 'api/rules/select_assignment_set',
+      editor_path: 'javascripts/generated/conditional_release_editor.bundle.js'
     }.freeze
 
     DEFAULT_CONFIG = {
@@ -38,22 +41,31 @@ module ConditionalRelease
     }.merge(DEFAULT_PATHS).freeze
 
     def self.env_for(context, user = nil, session: nil, assignment: nil, domain: nil,
-                    real_user: nil, include_rule: false)
+                  real_user: nil, includes: [])
+      includes = Array.wrap(includes)
       enabled = self.enabled_in_context?(context)
       env = {
         CONDITIONAL_RELEASE_SERVICE_ENABLED: enabled
       }
+
       if enabled && user
-        new_env = {
-          CONDITIONAL_RELEASE_ENV: {
-            jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
-            assignment: assignment_attributes(assignment),
-            edit_rule_url: edit_rule_url,
-            stats_url: stats_url,
-            locale: I18n.locale.to_s
-          }
+        cyoe_env = {
+          jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
+          assignment: assignment_attributes(assignment),
+          stats_url: stats_url,
+          locale: I18n.locale.to_s,
+          editor_url: editor_url,
+          base_url: base_url,
+          context_id: context.id
         }
-        new_env[:CONDITIONAL_RELEASE_ENV][:rule] = rule_triggered_by(assignment, user, session) if include_rule
+
+        cyoe_env[:rule] = rule_triggered_by(assignment, user, session) if includes.include? :rule
+        cyoe_env[:active_rules] = active_rules(context, user, session) if includes.include? :active_rules
+
+        new_env = {
+          CONDITIONAL_RELEASE_ENV: cyoe_env
+        }
+
         env.merge!(new_env)
       end
       env
@@ -76,8 +88,7 @@ module ConditionalRelease
 
     def self.rules_for(context, student, content_tags, session)
       return unless enabled_in_context?(context)
-      data = rules_data(context, student, Array.wrap(content_tags), session)
-      data[:rules]
+      rules_data(context, student, Array.wrap(content_tags), session)
     end
 
     def self.clear_active_rules_cache(course)
@@ -197,8 +208,29 @@ module ConditionalRelease
       Rails.cache.fetch(active_rules_cache_key(course)) do
         headers = headers_for(course, current_user, domain_for(course), session)
         request = CanvasHttp.get(rules_url, headers)
-        JSON.parse(request.body)
+        unless request && request.code == '200'
+          raise ServiceError, "error fetching active rules #{request}"
+        end
+        rules = JSON.parse(request.body)
+
+        trigger_ids = rules.map { |rule| rule['trigger_assignment'] }
+        trigger_assgs = Assignment.preload(:grading_standard).where(id: trigger_ids).each_with_object({}) do |a, assgs|
+          assgs[a.id.to_s] = {
+            points_possible: a.points_possible,
+            grading_type: a.grading_type,
+            grading_scheme: a.uses_grading_standard ? a.grading_scheme : nil,
+          }
+        end
+
+        rules.each do |rule|
+          rule['trigger_assignment_model'] = trigger_assgs[rule['trigger_assignment']]
+        end
+
+        rules
       end
+    rescue => e
+      Canvas::Errors.capture(e, course_id: course.global_id, user_id: current_user.global_id)
+      []
     end
 
     class << self
@@ -243,12 +275,13 @@ module ConditionalRelease
         Context.get_account(context).root_account.domain
       end
 
-      def submissions_for(student)
+      def submissions_for(student, context)
         return [] unless student.present?
 
         Rails.cache.fetch(submissions_cache_key(student)) do
           keys = [:id, :assignment_id, :score, :"assignments.points_possible"]
-          student.submissions.eager_load(:assignment).pluck(*keys).map do |values|
+          context.submissions.for_user(student).eager_load(:assignment)
+            .pluck(*keys).map do |values|
             submission = Hash[keys.zip(values)]
             submission[:points_possible] = submission.delete(:"assignments.points_possible")
             submission
@@ -257,20 +290,23 @@ module ConditionalRelease
       end
 
       def rules_data(context, student, content_tags = [], session = {})
-        return {rules: []} if context.blank? || student.blank?
+        return [] if context.blank? || student.blank?
         cached = rules_cache(context, student)
         assignments = assignments_for(cached[:rules]) if cached
         cache_expired = newer_than_cache?(content_tags.select(&:content), cached) ||
                         newer_than_cache?(assignments, cached)
 
         rules_data = rules_cache(context, student, force: cache_expired) do
-          data = { submissions: submissions_for(student) }
+          data = { submissions: submissions_for(student, context) }
           headers = headers_for(context, student, domain_for(context), session)
           req = request_rules(headers, data)
           {rules: req, updated_at: Time.zone.now}
         end
         rules_data[:rules] = merge_assignment_data(rules_data[:rules], assignments)
-        rules_data
+        rules_data[:rules]
+      rescue ConditionalRelease::ServiceError => e
+        Canvas::Errors.capture(e, course_id: context.global_id, user_id: student.global_id)
+        []
       end
 
       def rules_cache(context, student, force: false, &block)
@@ -288,11 +324,12 @@ module ConditionalRelease
         if req && req.code == '200'
           JSON.parse(req.body)
         else
-          message = "An error occurred when attempting to fetch rules for ConditionalRelease::Service"
-          Rails.logger.warn(message)
-          Rails.logger.warn(req)
-          {error: message}
+          message = "error fetching applied rules #{req}"
+          raise ServiceError, message
         end
+      rescue => e
+        raise if e.is_a? ServiceError
+        raise ServiceError, e.inspect
       end
 
       def assignments_for(response)
@@ -323,13 +360,13 @@ module ConditionalRelease
             set[:assignments].map! do |asg|
               assignment = assignments.find { |a| a[:id].to_s == asg[:assignment_id].to_s }
               asg[:model] = assignment
-              asg
-            end
-            set
-          end
+              asg if asg[:model].present?
+            end.compact!
+            set if set[:assignments].present?
+          end.compact!
           rule
-        end
-        rules
+        end.compact!
+        rules.compact
       end
 
       def assignment_keys
@@ -340,7 +377,7 @@ module ConditionalRelease
       end
 
       def rules_cache_key(context, student)
-        ['conditional_release_rules', context.global_id, student.global_id].cache_key
+        ['conditional_release_rules:1', context.global_id, student.global_id].cache_key
       end
 
       def submissions_cache_key(student)

@@ -1,9 +1,10 @@
 require [
   'jquery'
   'react'
+  'react-dom'
   'jsx/epub_exports/App'
-], ($, React, EpubExportsApp) ->
+], ($, React, ReactDOM, EpubExportsApp) ->
   $('.course-epub-exports-app').each( (_i, element) ->
     component = React.createElement(EpubExportsApp)
-    React.render(component, element)
+    ReactDOM.render(component, element)
   )

@@ -137,6 +137,25 @@
             </a>
           </div>
         </div>
+        {{!-- VeriCite (online assignments only) --}}
+        <div style="{{hiddenUnless vericiteAvailable}}">
+          <label for="assignment_vericite_enabled" class="checkbox">
+            {{checkbox "vericiteEnabled"
+              id="assignment_vericite_enabled"
+              name="vericite_enabled"
+              aria-controls="advanced_turnitin_settings_link"
+              disabled=submissionTypesFrozen}}
+            {{#t "label.vericite_enabled"}}Enable VeriCite Submissions{{/t}}
+          </label>
+          <div class="nested">
+            <a href="#"
+              id="advanced_turnitin_settings_link"
+              aria-expanded="{{vericiteEnabled}}"
+              style="{{hiddenUnless vericiteEnabled}}">
+              {{#t "advanced_vericite_settings"}}Advanced VeriCite Settings{{/t}}
+            </a>
+          </div>
+        </div>
       </div>
 
       {{!-- External tool submissions --}}

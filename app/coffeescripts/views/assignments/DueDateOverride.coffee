@@ -2,12 +2,13 @@ define [
   'Backbone'
   'underscore'
   'react'
+  'react-dom'
   'jst/assignments/DueDateOverride'
   'compiled/util/DateValidator'
   'i18n!overrides'
   'jsx/due_dates/DueDates'
   'jsx/due_dates/StudentGroupStore'
-], (Backbone, _, React, template, DateValidator, I18n, DueDates, StudentGroupStore) ->
+], (Backbone, _, React, ReactDOM, template, DateValidator, I18n, DueDates, StudentGroupStore) ->
 
   class DueDateOverrideView extends Backbone.View
 
@@ -29,7 +30,7 @@ define [
         selectedGroupSetId: @model.assignment.get("group_category_id")
       })
 
-      React.render(DueDatesElement, div)
+      ReactDOM.render(DueDatesElement, div)
 
     validateBeforeSave: (data, errors) =>
       return errors unless data

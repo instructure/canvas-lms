@@ -135,6 +135,7 @@ module Api::V1::QuizQuestion
       true_false_question
       multiple_answers_question
       matching_question
+      multiple_dropdowns_question
     )
 
     unless allow_answer_whitelist.include?(question_data[:question_type])
@@ -142,9 +143,10 @@ module Api::V1::QuizQuestion
     end
 
     # need the answer text for multiple choice - only info necessary though
+    # multiple_dropdown needs blank_id
     if question_data[:answers]
       question_data[:answers].each do |record|
-        record.keep_if {|k, v| %w(id text html).include?(k.to_s) }
+        record.keep_if {|k, _| %w(id text html blank_id).include?(k.to_s) }
       end
     end
 

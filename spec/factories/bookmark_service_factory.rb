@@ -16,20 +16,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def bookmark_service_model(opts={})
-  @bookmark_service = factory_with_protected_attributes(BookmarkService, valid_bookmark_service_attributes.merge(opts))
-end
+module Factories
+  def bookmark_service_model(opts={})
+    @bookmark_service = factory_with_protected_attributes(BookmarkService, valid_bookmark_service_attributes.merge(opts))
+  end
 
-def valid_bookmark_service_attributes
-  {
-    :user_id => User.create!.id,
-    :token => 'value for token',
-    :secret => 'value for secret', 
-    :protocol => 'value for protocol',
-    :service => 'diigo',
-    :service_user_url => 'value for service_user_url',
-    :service_user_id => 'value for service_user_id',
-    :service_user_name => 'value for service_user_name',
-    :service_domain => 'value for service_domain'
-  }
+  def valid_bookmark_service_attributes
+    {
+      :user_id => User.create!.id,
+      :token => 'value for token',
+      :secret => 'value for secret', 
+      :protocol => 'value for protocol',
+      :service => 'diigo',
+      :service_user_url => 'value for service_user_url',
+      :service_user_id => 'value for service_user_id',
+      :service_user_name => 'value for service_user_name',
+      :service_domain => 'value for service_domain'
+    }
+  end
 end

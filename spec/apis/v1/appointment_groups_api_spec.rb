@@ -484,4 +484,34 @@ describe AppointmentGroupsController, type: :request do
       end
     end
   end
+
+  describe "next_appointment" do
+    before :once do
+      @ag1 = AppointmentGroup.create!(:title => "past", :contexts => [@course2], :new_appointments =>
+                                       [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
+      @ag1.publish!
+      @ag2 = AppointmentGroup.create!(:title => "future1", :contexts => [@course2],
+                                      :participants_per_appointment => 1, :max_appointments_per_participant => 1,
+                                      :new_appointments =>
+                                       [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
+                                        ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      @ag2.publish!
+      @ag2.appointments.first.reserve_for(@student1, @me)
+      @path = "/api/v1/appointment_groups/next_appointment?appointment_group_ids[]=#{@ag1.to_param}&appointment_group_ids[]=#{@ag2.to_param}"
+      @params = { :controller => 'appointment_groups', :action => 'next_appointment', :format => 'json',
+                  :appointment_group_ids => [@ag1.to_param, @ag2.to_param] }
+    end
+
+    it 'returns the first available appointment in the future' do
+      json = api_call_as_user(@student2, :get, @path, @params)
+      expect(json.length).to eq 1
+      expect(json[0]['id']).to eq @ag2.appointments.last.id
+    end
+
+    it 'returns an empty array if no future appointments are available' do
+      @ag2.appointments.last.reserve_for(@student2, @me)
+      json = api_call_as_user(@student2, :get, @path, @params)
+      expect(json.length).to eq 0
+    end
+  end
 end

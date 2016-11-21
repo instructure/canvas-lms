@@ -1,3 +1,5 @@
+require 'yaml'
+
 module DrDiff
   class UserConfig
     USER_CONFIG_FILE = File.expand_path("../../../config/gergich_user_config.yml", __FILE__)

@@ -27,13 +27,15 @@ define [
   'compiled/util/deparam'
   'str/htmlEscape'
   'compiled/calendar/CalendarEventFilter'
+  'jsx/calendar/scheduler/actions'
 
   'fullcalendar-with-lang-all'
+  'jsx/calendar/patches-to-fullcalendar'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, tz, moment, fcUtil, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, ContextColorer, deparam, htmlEscape, calendarEventFilter) ->
+], (I18n, $, _, tz, moment, fcUtil, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, ContextColorer, deparam, htmlEscape, calendarEventFilter, schedulerActions) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -48,6 +50,7 @@ define [
       @subscribeToEvents()
       @header = @options.header
       @schedulerState = {}
+      @useBetterScheduler = !!@options.schedulerStore
       if @options.schedulerStore
         @schedulerStore = @options.schedulerStore
         @schedulerState = @schedulerStore.getState()
@@ -101,11 +104,21 @@ define [
       @connectHeaderEvents()
       @connectSchedulerNavigatorEvents()
       @connectAgendaEvents()
+      $('#flash_message_holder').on 'click', '.gotoDate_link', (event) =>
+        @gotoDate fcUtil.wrap($(event.target).data('date'))
 
       @header.selectView(@getCurrentView())
 
       if data.view_name == 'scheduler' && data.appointment_group_id
         @scheduler.viewCalendarForGroupId data.appointment_group_id
+
+      # enter find-appointment mode via sign-up-for-things notification URL
+      if data.find_appointment && @schedulerStore
+        course = ENV.CALENDAR.CONTEXTS.filter (context) ->
+          context.asset_string == data.find_appointment
+        if course.length
+          @schedulerStore.dispatch(schedulerActions.actions.setCourse(course[0]))
+          @schedulerStore.dispatch(schedulerActions.actions.setFindAppointmentMode(true))
 
       window.setInterval(@drawNowLine, 1000 * 60)
 
@@ -327,8 +340,7 @@ define [
       # create a new dummy event
       event = commonEventFactory(null, @activeContexts())
       event.date = @getCurrentDate()
-
-      new EditEventDetailsDialog(event).show()
+      new EditEventDetailsDialog(event, @useBetterScheduler).show()
 
     eventClick: (event, jsEvent, view) =>
       $event = $(jsEvent.currentTarget)
@@ -347,7 +359,7 @@ define [
       event = commonEventFactory(null, @activeContexts())
       event.date = date
       event.allDay = not date.hasTime()
-      (new EditEventDetailsDialog(event)).show()
+      (new EditEventDetailsDialog(event, @useBetterScheduler)).show()
 
     updateFragment: (opts) ->
       replaceState = !!opts.replaceState
@@ -668,6 +680,8 @@ define [
       @agenda.fetch(@visibleContextList.concat(@findAppointmentModeGroups()), start)
 
     renderDateRange: (start, end) =>
+      @agendaStart = fcUtil.unwrap(start)
+      @agendaEnd = fcUtil.unwrap(end)
       @setDateTitle(@formatDate(start, 'date.formats.medium')+' – '+@formatDate(end, 'date.formats.medium'))
       # for "load more" with voiceover, we want the alert to happen later so
       # the focus change doesn't interrupt it.
@@ -747,12 +761,51 @@ define [
       newState = @schedulerStore.getState()
       changed = @schedulerState.inFindAppointmentMode != newState.inFindAppointmentMode
       @schedulerState = newState
-      @refetchEvents() if changed
-      if (changed && @currentView == 'agenda')
-        @loadAgendaView()
+      if changed
+        @refetchEvents()
+        @findNextAppointment() if @schedulerState.inFindAppointmentMode
+        @loadAgendaView() if (@currentView == 'agenda')
 
     findAppointmentModeGroups: () =>
       if @schedulerState.inFindAppointmentMode && @schedulerState.selectedCourse
         @reservable_appointment_groups[@schedulerState.selectedCourse.asset_string] || []
       else
         []
+
+    visibleDateRange: () =>
+      range = {}
+      if @currentView == 'agenda'
+        range.start = @agendaStart
+        range.end = @agendaEnd
+      else
+        view = @calendar.fullCalendar('getView')
+        range.start = fcUtil.unwrap(view.intervalStart)
+        range.end = fcUtil.unwrap(view.intervalEnd)
+      range
+
+    findNextAppointment: () =>
+      # determine whether any reservable appointment slots are visible
+      range = @visibleDateRange()
+      # FIXME attempted optimization, except these events aren't in the cache yet;
+      # if we want to do this, it needs to happen after @refetchEvents completes (asynchronously)
+      # which may actually make the UI less responsive
+      #courseEvents = @dataSource.getEventsFromCacheForContext range.start, range.end, @schedulerState.selectedCourse.asset_string
+      #return if _.any courseEvents, (event) ->
+      #    event.isAppointmentGroupEvent() && event.calendarEvent.reserve_url &&
+      #    !event.calendarEvent.reserved && event.calendarEvent.available_slots > 0
+
+      # find the next reservable appointment and report its date
+      group_ids = _.map @findAppointmentModeGroups(), (asset_string) ->
+        _.last asset_string.split('_')
+      return unless group_ids.length > 0
+      $.getJSON '/api/v1/appointment_groups/next_appointment?' + $.param({appointment_group_ids: group_ids}), (data) ->
+        if data.length > 0
+          nextDate = Date.parse(data[0].start_at)
+          if nextDate < range.start || nextDate >= range.end
+            # fixme link
+            $.flashMessage I18n.t('The next available appointment in this course is on *%{date}*',
+              wrappers: ["<a href='#' class='gotoDate_link' data-date='#{nextDate.toISOString()}'>$1</a>"],
+              date: tz.format(nextDate, 'date.formats.long'))
+            , 30000
+        else
+          $.flashWarning I18n.t('There are no available signups for this course.')

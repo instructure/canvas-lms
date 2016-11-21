@@ -393,6 +393,20 @@
     i[class*=icon-]:before,
     i[class^=icon-]:before { @include fontSize(18px); }
   }
+
+  > a {
+    margin-right: 10px;
+  }
+
+  .mastery-path-icon {
+    margin-right: 10px;
+    padding: 2px 7px;
+    font-size: 0.8em;
+
+    i {
+      margin-right: 5px;
+    }
+  }
 }
 
 .ig-list .icon-drag-handle {

@@ -122,10 +122,10 @@
       <div id="wiki_pages_select" class="module_item_option">
         <div style="font-size: 0.8em;">
           <i class="icon-document"></i>
-          <%= t :wiki_page_notice, 'Select the wiki page you want to associate with this *module*, or add a new page by selecting "New Page".', :wrapper => '<span class="holder_type">\1</span>' %>
+          <%= t 'Select the page you want to associate with this *module*, or add a new page by selecting "New Page".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
-        <select class="module_item_select" aria-label="<%= t 'wiki_page_select_label', 'Select the wiki page you want to associate, or add a new page by selecting "New Page".' %>" multiple>
+        <select class="module_item_select" aria-label="<%= t 'Select the page you want to associate, or add a new page by selecting "New Page".' %>" multiple>
           <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
           <option value="new"><%= t :new_page_option, "[ New Page ]" %></option>
           <% cache([@context.wiki, 'non_deleted_wiki_pages']) do  %>

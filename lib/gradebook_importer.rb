@@ -108,8 +108,8 @@ class GradebookImporter
     user_ids = @missing_student ? @all_students.values : @students
     # preload periods to avoid N+1s
     periods = GradingPeriod.for(@context)
-    # preload admin_of_root_account? to avoid N+1
-    is_admin = @user.admin_of_root_account?(@context.root_account)
+    # preload is_admin to avoid N+1
+    is_admin = @context.account_membership_allows(@user)
 
     @original_submissions = @context.submissions
       .select(['submissions.id', :assignment_id, :user_id, :score, :excused, :cached_due_date, 'submissions.updated_at'])

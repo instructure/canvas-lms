@@ -1383,6 +1383,9 @@ class Course < ActiveRecord::Base
     # because students can't see prior enrollments)
     given { |user| self.grants_all_rights?(user, :read_roster, :read_as_admin) }
     can :read_prior_roster
+
+    given { |user| self.grants_right?(user, :lti_add_edit)}
+    can :create_tool_manually
   end
 
   def allows_gradebook_uploads?
@@ -1986,6 +1989,22 @@ class Course < ActiveRecord::Base
 
   def turnitin_enabled?
     !!self.turnitin_settings
+  end
+
+  def vericite_enabled?
+    Canvas::Plugin.find(:vericite).try(:enabled?)
+  end
+  
+  def vericite_pledge
+    if vericite_enabled?
+      Canvas::Plugin.find(:vericite).settings[:pledge]
+    end
+  end
+  
+  def vericite_comments
+    if vericite_enabled?
+      Canvas::Plugin.find(:vericite).settings[:comments]
+    end
   end
 
   def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)

@@ -1,8 +1,9 @@
 define [
   'jquery'
   'react'
+  'react-dom'
   'jsx/navigation_header/Navigation'
-], ($, React, Navigation) ->
+], ($, React, ReactDOM, Navigation) ->
 
   wrapper = document.getElementById('fixtures')
   $(wrapper).append('<div id="holder">')
@@ -10,7 +11,7 @@ define [
 
   renderComponent = ->
     Nav = React.createElement(Navigation)
-    React.render(Nav, componentHolder)
+    ReactDOM.render(Nav, componentHolder)
 
   module 'GlobalNavigation',
     setup: ->
@@ -28,7 +29,7 @@ define [
 
     teardown: ->
       @server.restore()
-      React.unmountComponentAtNode componentHolder
+      ReactDOM.unmountComponentAtNode componentHolder
       $('#holder').remove()
       @$inbox_data.remove()
 
@@ -48,4 +49,4 @@ define [
     @server.respond()
     $badge = $('#global_nav_conversations_link').find('.menu-item__badge')
     notOk $badge.is(':visible')
-    
+

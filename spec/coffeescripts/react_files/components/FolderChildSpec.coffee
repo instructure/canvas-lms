@@ -1,10 +1,11 @@
 define [
   '../mockFilesENV'
   'react'
+  'react-dom'
   'jquery'
   'compiled/react_files/components/FolderChild'
   'compiled/models/Folder'
-], (mockFilesENV, React, $, FolderChild, Folder) ->
+], (mockFilesENV, React, ReactDOM, $, FolderChild, Folder) ->
 
   # Simulate = React.addons.TestUtils.Simulate
 
@@ -33,10 +34,10 @@ define [
   #         onItemDragLeaveOrEnd: ->
   #         onItemDrop: ->
 
-  #     @component = React.render(FolderChild(@sampleProps(true)), @div)
+  #     @component = ReactDOM.render(FolderChild(@sampleProps(true)), @div)
 
   #   teardown: ->
-  #     React.unmountComponentAtNode(@component.getDOMNode().parentNode)
+  #     ReactDOM.unmountComponentAtNode(@component.getDOMNode().parentNode)
 
 
   # test 'allows creating a new folder', ->

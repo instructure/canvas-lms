@@ -25,7 +25,13 @@ class Attachment < ActiveRecord::Base
     col = table ? "#{table}.display_name" : 'display_name'
     best_unicode_collation_key(col)
   end
-  attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden, :viewed_at
+  strong_params
+
+  PERMITTED_ATTRIBUTES = [:filename, :display_name, :locked, :position, :lock_at,
+    :unlock_at, :uploaded_data, :hidden, :viewed_at].freeze
+  def self.permitted_attributes
+    PERMITTED_ATTRIBUTES
+  end
 
   EXCLUDED_COPY_ATTRIBUTES = %w{id root_attachment_id uuid folder_id user_id
                                 filename namespace workflow_state}
@@ -210,8 +216,10 @@ class Attachment < ActiveRecord::Base
 
     # try an infer encoding if it would be useful to do so
     send_later(:infer_encoding) if self.encoding.nil? && self.content_type =~ /text/ && self.context_type != 'SisBatch'
-    if respond_to?(:process_attachment_with_processing, true) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
-      self.class.attachment_options[:thumbnails].each { |suffix, size| send_later_if_production(:create_thumbnail_size, suffix) }
+    if respond_to?(:process_attachment, true) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
+      self.class.attachment_options[:thumbnails].each do |suffix, size|
+        send_later_if_production_enqueue_args(:create_thumbnail_size, {:singleton => "attachment_thumbnail_#{self.global_id}_#{suffix}"}, suffix)
+      end
     end
   end
 
@@ -344,6 +352,11 @@ class Attachment < ActiveRecord::Base
 
   def turnitinable?
     TURNITINABLE_MIME_TYPES.include?(content_type)
+  end
+
+  def vericiteable?
+    # accept any file format
+    true
   end
 
   def flag_as_recently_created
@@ -601,8 +614,11 @@ class Attachment < ActiveRecord::Base
 
           attachment_scope = context.attachments.active.where(root_attachment_id: nil)
 
-          if context.is_a?(User)
-            excluded_attachment_ids = context.attachments.joins(:attachment_associations).where("attachment_associations.context_type = ?", "Submission").pluck(:id)
+          if context.is_a?(User) || context.is_a?(Group)
+            excluded_attachment_ids = []
+            if context.is_a?(User)
+              excluded_attachment_ids += context.attachments.joins(:attachment_associations).where("attachment_associations.context_type = ?", "Submission").pluck(:id)
+            end
             excluded_attachment_ids += context.attachments.where(folder_id: context.submissions_folders).pluck(:id)
             attachment_scope = attachment_scope.where("id NOT IN (?)", excluded_attachment_ids) if excluded_attachment_ids.any?
           end
@@ -1083,7 +1099,7 @@ class Attachment < ActiveRecord::Base
         locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
       elsif (self.lock_at && Time.now > self.lock_at)
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
-      elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
+      elsif self.could_be_locked && item = locked_by_module_item?(user, opts)
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
         locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"] && locked[:context_module]["unlock_at"] > Time.now.utc
       end

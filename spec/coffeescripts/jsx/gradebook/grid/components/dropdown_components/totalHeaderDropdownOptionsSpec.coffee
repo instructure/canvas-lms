@@ -1,21 +1,22 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/dropdown_components/totalHeaderDropdownOptions'
   'helpers/fakeENV'
   'jsx/gradebook/grid/constants'
-], (React, DropdownOptions, fakeENV, GradebookConstants) ->
+], (React, ReactDOM, DropdownOptions, fakeENV, GradebookConstants) ->
 
   wrapper = document.getElementById('fixtures')
 
   renderComponent = (data) ->
     componentFactory = React.createFactory(DropdownOptions)
-    React.render(componentFactory(data), wrapper)
+    ReactDOM.render(componentFactory(data), wrapper)
 
   module 'TotalHeaderDropdownOptions',
     setup: ->
       @component = renderComponent({ idAttribute: 'dropdownOptions'})
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'includes options for Switch to Points and Move to Front', ->
     ok @component.refs.switchToPoints
@@ -30,7 +31,7 @@ define [
       GradebookConstants.refresh()
       @component = renderComponent({ idAttribute: 'dropdownOptions'})
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
       fakeENV.teardown()
 
   test 'does not includes an option for Switch to Points', ->

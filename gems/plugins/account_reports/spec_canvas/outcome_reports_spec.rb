@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 describe "Outcome Reports" do
   include ReportSpecHelper
 
-  before(:each) do
+  before(:once) do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')

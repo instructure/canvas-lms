@@ -1,10 +1,10 @@
 define [
   'react'
+  'react-dom'
   'jsx/external_apps/components/ConfigurationFormLti2'
-], (React, ConfigurationFormLti2) ->
+], (React, ReactDOM, ConfigurationFormLti2) ->
 
   TestUtils = React.addons.TestUtils
-  Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   createElement = (data) ->
@@ -13,11 +13,11 @@ define [
     })
 
   renderComponent = (data) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   module 'ExternalApps.ConfigurationFormLti2',
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'renders', ->
     component = renderComponent({ registrationUrl: '' })

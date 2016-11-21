@@ -19,7 +19,7 @@ define [
     fudged = $.fudgeDateForProfileTimezone(@original)
     equal fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(@original, '%F %T')
 
-  test 'should parse dates before the year 1000', -> 
+  test 'should parse dates before the year 1000', ->
     # using specific string (and specific timezone to guarantee it) since tz.format has a bug pre-1000
     tz.changeZone(detroit, 'America Detroit')
     oldDate = new Date(Date.UTC(900, 1, 1, 0, 0, 0))
@@ -123,35 +123,6 @@ define [
     date3 = new Date(+date1 - 1000) # Jan 2, 1970 at 00:00:01am EST
     ok $.sameDate(date1, date2)
     ok !$.sameDate(date1, date3)
-
-  module 'midnight',
-    setup: -> @snapshot = tz.snapshot()
-    teardown: -> tz.restore(@snapshot)
-
-  test 'should return true iff the time is midnight', ->
-    date1 = new Date(0)
-    date2 = new Date(60000)
-    ok $.midnight(date1)
-    ok !$.midnight(date2)
-
-  test 'should check time relative to profile timezone', ->
-    tz.changeZone(detroit, 'America/Detroit')
-    date1 = new Date(0) # 12am UTC = 7pm EST
-    date2 = new Date(5 * 3600000) # 5am UTC = 00:00am EST
-    date3 = new Date(+date2 + 60000) # 00:01am EST
-    ok !$.midnight(date1)
-    ok $.midnight(date2)
-    ok !$.midnight(date3)
-
-  test 'should check time relative to specific timezone if provided', ->
-    tz.changeZone(detroit, 'America/Detroit')
-    tz.preload('America/Juneau', juneau)
-    date1 = new Date(0) # 12am UTC = 16:00 AKST (in 1970)
-    date2 = new Date(8 * 3600000) # 8am UTC = 00:00 AKST
-    date3 = new Date(+date2 + 60000) # 00:01 AKST
-    ok !$.midnight(date1, timezone: 'America/Juneau')
-    ok $.midnight(date2, timezone: 'America/Juneau')
-    ok !$.midnight(date3, timezone: 'America/Juneau')
 
   module 'dateString',
     setup: ->

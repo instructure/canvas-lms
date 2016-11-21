@@ -37,12 +37,17 @@ module Canvas
   end
 
   def self.reconnect_redis
-    @redis = nil
     if Rails.cache && Rails.cache.respond_to?(:reconnect)
       Canvas::Redis.handle_redis_failure(nil, "none") do
         Rails.cache.reconnect
       end
     end
+
+    return unless @redis
+    # We're sharing redis connections between Canvas.redis and Rails.cache,
+    # so don't call reconnect on the cache too.
+    return if Rails.cache.respond_to?(:data) && @redis.__getobj__ == Rails.cache.data
+    @redis = nil
   end
 
   def self.cache_stores

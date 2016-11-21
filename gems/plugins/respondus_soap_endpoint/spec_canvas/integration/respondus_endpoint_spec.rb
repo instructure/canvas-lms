@@ -154,7 +154,7 @@ Implemented for: Canvas LMS}
     user1 = @user
     user2 = user_with_pseudonym :active_user => true,
       :username => "nobody2@example.com",
-      :password => "test123"
+      :password => "test1234"
     user2.save!
 
     status, details, context = soap_request('ValidateAuth',
@@ -168,12 +168,12 @@ Implemented for: Canvas LMS}
                                  ['Institution', ''])
     expect(status).to eq "Success"
     status, details, context2 = soap_request('ValidateAuth',
-                                 'nobody2@example.com', 'test123',
+                                 'nobody2@example.com', 'test1234',
                                  '',
                                  ['Institution', ''])
     expect(status).to eq "Success"
     status, details, context2 = soap_request('ValidateAuth',
-                                 'nobody2@example.com', 'test123',
+                                 'nobody2@example.com', 'test1234',
                                  context,
                                  ['Institution', ''])
     expect(status).to eq "Invalid context"

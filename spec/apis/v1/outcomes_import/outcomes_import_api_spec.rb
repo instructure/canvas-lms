@@ -113,7 +113,7 @@ describe "Outcomes Import API", type: :request do
     shared_examples "academic benchmark config" do
       describe "api_key" do
         let(:request) do
-          ->(type:, guid: guid, expected_status: 200) do
+          ->(type:, guid: nil, expected_status: 200) do
             case type
             when "available" then return available_json(expected_status: expected_status)
             when "create" then return create_json(guid: guid, expected_status: expected_status)

@@ -96,7 +96,7 @@ describe AccountNotification do
         account: @sub_account,
         role_ids: [Role.get_built_in_role("StudentEnrollment").id]
       }
-      sub_account_announcement = SubAccountNotification.sub_account_notification(params)
+      sub_account_announcement = sub_account_notification(params)
       unenrolled = @user
       course_with_student(account: @sub_account, active_all: true)
       students_notifications = AccountNotification.for_user_and_account(@student, Account.default)
@@ -112,7 +112,7 @@ describe AccountNotification do
         account: @sub_account,
         role_ids: [Role.get_built_in_role("AccountAdmin").id]
       }
-      sub_account_announcement = SubAccountNotification.sub_account_notification(params)
+      sub_account_announcement = sub_account_notification(params)
       non_admin_user = @user
       account_admin_user(account: @sub_account)
       admin_notifications = AccountNotification.for_user_and_account(@admin, Account.default)
@@ -127,7 +127,7 @@ describe AccountNotification do
         subject: 'sub account notification',
         account: @sub_account,
       }
-      sub_account_announcement = SubAccountNotification.sub_account_notification(params)
+      sub_account_announcement = sub_account_notification(params)
       unenrolled_user = @user
       account_admin_user(account: @sub_account)
       course_with_student(account: @sub_account, active_all: true)
@@ -144,7 +144,7 @@ describe AccountNotification do
         subject: 'sub account notification',
         account: @sub_account,
       }
-      SubAccountNotification.sub_account_notification(params)
+      sub_account_notification(params)
       enable_cache do
         root_and_sub_account = AccountNotification.for_account(Account.default, [@sub_account.id])
         expect(root_and_sub_account.count).to eq 2
@@ -155,7 +155,7 @@ describe AccountNotification do
     end
 
     it "scopes sub-accounts to the root account" do
-      sub_announcement = SubAccountNotification.sub_account_notification(subject: 'blah', account: @sub_account)
+      sub_announcement = sub_account_notification(subject: 'blah', account: @sub_account)
       course_with_student(user: @user, account: @sub_account, active_all: true)
       other_root_account = Account.create!
       other_announcement = account_notification(account: other_root_account)

@@ -14,7 +14,6 @@
   padding-left: $ic-sp*2;
 }
 
-
 $ic-left-side-width: $ic-sp*15;
 
 ::-webkit-scrollbar {
@@ -85,8 +84,6 @@ body:not(.course-menu-expanded) {
   }
 }
 
-
-
 .ic-app-footer {
   box-sizing: border-box;
   padding: $ic-sp 0;
@@ -121,11 +118,6 @@ body:not(.course-menu-expanded) {
   min-height: 100vh;
 }
 
-.ic-app-container {
-  box-sizing: border-box;
-  min-height: 100vh;
-}
-
 .ic-app-main-layout-vertical {
   box-sizing: border-box;
   min-height: 100vh;
@@ -133,6 +125,14 @@ body:not(.course-menu-expanded) {
   body:not(.ic-no-flex-layout):not(.embedded) & {
     display: flex;
     flex-direction: column;
+  }
+
+  body:not(.no-headers) & {
+    margin-left: $ic-header-primary-width - 30;
+  }
+
+  body:not(.no-headers).primary-nav-expanded & {
+    margin-left: $ic-header-primary-width;
   }
 }
 

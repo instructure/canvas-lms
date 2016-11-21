@@ -12,11 +12,7 @@ module GroupsCommon
   end
 
   def seed_students(count, base_name = 'Test Student')
-    @students = []
-    count.times do |n|
-      @students << User.create!(:name => "#{base_name} #{n+1}")
-      @course.enroll_student(@students.last).accept!
-    end
+    @students = create_users_in_course(@course, count, return_type: :record, name_prefix: base_name)
   end
 
   # Creates group sets equal to groupset_count and groups within each group set equal to groups_per_set

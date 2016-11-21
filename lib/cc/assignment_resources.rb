@@ -163,7 +163,7 @@ module CC
       node.lock_at CCHelper::ims_datetime(assignment.lock_at) if assignment.lock_at
       node.unlock_at CCHelper::ims_datetime(assignment.unlock_at) if assignment.unlock_at
       if manifest && manifest.try(:user).present?
-        node.module_locked assignment.locked_by_module_item?(manifest.user, true).present?
+        node.module_locked assignment.locked_by_module_item?(manifest.user, deep_check_if_needed: true).present?
       end
       node.all_day_date CCHelper::ims_date(assignment.all_day_date) if assignment.all_day_date
       node.peer_reviews_due_at CCHelper::ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
@@ -194,15 +194,21 @@ module CC
           end
         end
       end
+      node.assignment_overrides do |ao_node|
+        # Quizzes export their own overrides
+        assignment.assignment_overrides.active.where(set_type: 'Noop', quiz_id: nil).each do |o|
+          ao_node.override(o.slice(:set_type, :set_id, :title))
+        end
+      end
       node.quiz_identifierref CCHelper.create_key(assignment.quiz) if assignment.quiz
       node.allowed_extensions assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?
       node.has_group_category assignment.has_group_category?
       node.group_category assignment.group_category.try :name if assignment.group_category
       atts = [:points_possible, :grading_type,
-              :all_day, :submission_types, :position, :turnitin_enabled, :peer_review_count,
+              :all_day, :submission_types, :position, :turnitin_enabled, :vericite_enabled, :peer_review_count,
               :peer_reviews, :automatic_peer_reviews, :moderated_grading,
               :anonymous_peer_reviews, :grade_group_students_individually, :freeze_on_copy, :muted,
-              :omit_from_final_grade, :intra_group_peer_reviews]
+              :omit_from_final_grade, :intra_group_peer_reviews, :only_visible_to_overrides]
       atts.each do |att|
         node.tag!(att, assignment.send(att)) if assignment.send(att) == false || !assignment.send(att).blank?
       end

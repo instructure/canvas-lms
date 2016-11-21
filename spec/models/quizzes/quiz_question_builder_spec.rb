@@ -67,6 +67,29 @@ describe Quizzes::QuizQuestionBuilder do
           to eq(questions.map { |q| q[:id] }.sort)
       end
 
+      it 'should duplicate questions to fill the group' do
+        aq = assessment_question_model(bank: @bank, name: 'Group Question 1')
+
+        @group = @quiz.quiz_groups.create!({
+                                               name: "question group a",
+                                               pick_count: 5,
+                                               question_points: 5.0,
+                                               assessment_question_bank_id: @bank.id
+                                           })
+
+        # it should pick 2 questions from that bank
+        expect(questions.count).to eq(5)
+
+        # verify the correct questions were pulled:
+        expect(questions.map { |q| q[:assessment_question_id] }).to eq [aq.id] * 5
+
+        # it generates quiz questions for every AQ it pulls out of the bank:
+        expect(@quiz.quiz_questions.count).to eq(5)
+        expect(@quiz.quiz_questions.generated.count).to eq(5)
+        expect(@quiz.quiz_questions.pluck(:id).sort).
+            to eq(questions.map { |q| q[:id] }.sort)
+      end
+
       it "should duplicate questions from a bank" do
         assessment_question_model(bank: @bank)
 

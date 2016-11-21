@@ -1,21 +1,22 @@
 define [
   'react'
+  'react-dom'
   'jsx/gradebook/grid/components/dropdown_components/moveTotalColumnToggle',
   'jsx/gradebook/grid/actions/gradebookToolbarActions'
-], (React, MoveTotalColumnToggle, GradebookToolbarActions) ->
+], (React, ReactDOM, MoveTotalColumnToggle, GradebookToolbarActions) ->
 
   wrapper = document.getElementById('fixtures')
   Simulate = React.addons.TestUtils.Simulate
 
   renderComponent = () ->
     componentFactory = React.createFactory(MoveTotalColumnToggle)
-    React.render(componentFactory(), wrapper)
+    ReactDOM.render(componentFactory(), wrapper)
 
   module 'MoveTotalColumnToggle',
     setup: ->
       @component = renderComponent()
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'mounts correctly', ->
     ok @component.isMounted()

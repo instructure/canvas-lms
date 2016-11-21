@@ -1,4 +1,4 @@
-define(['jquery', 'jsx/gradebook2/CheatDepaginator', 'underscore'], ($, cheaterDepaginate, _) => {
+define(['jquery', 'jsx/shared/CheatDepaginator', 'underscore'], ($, cheaterDepaginate, _) => {
   // loaders
   const getAssignmentGroups = (url, params) => {
     return cheaterDepaginate(url, params);

@@ -252,7 +252,7 @@ module Calendar2Common
 
   def assert_title(title,agenda_view)
     if agenda_view
-      expect(f('.ig-title')).to include_text(title)
+      expect(f('.agenda-event__title')).to include_text(title)
     else
       expect(f('.fc-title')).to include_text(title)
     end

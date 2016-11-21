@@ -9,8 +9,9 @@ define [
   'vendor/timezone/fr_FR'
   'helpers/I18nStubber'
   'helpers/fakeENV'
+  'jsx/shared/conditional_release/CyoeHelper'
   'helpers/jquery.simulate'
-], (Backbone, Assignment, Submission, AssignmentListItemView, $, tz, juneau, french, I18nStubber, fakeENV) ->
+], (Backbone, Assignment, Submission, AssignmentListItemView, $, tz, juneau, french, I18nStubber, fakeENV, CyoeHelper) ->
   screenreaderText = null
   nonScreenreaderText = null
 
@@ -584,7 +585,7 @@ define [
       can_update: true
       submission_types: ['online_text_entry']
     view = createView(model)
-    equal view.$('.icon-mastery-path').length, 0
+    equal view.$('.ig-admin .al-options .icon-mastery-path').length, 0
 
   test 'renders for assignment if cyoe on', ->
     model = buildAssignment
@@ -593,7 +594,7 @@ define [
       can_update: true
       submission_types: ['online_text_entry']
     view = createView(model)
-    equal view.$('.icon-mastery-path').length, 1
+    equal view.$('.ig-admin .al-options .icon-mastery-path').length, 1
 
   test 'does not render for ungraded assignment if cyoe on', ->
     model = buildAssignment
@@ -602,7 +603,7 @@ define [
       can_update: true
       submission_types: ['not_graded']
     view = createView(model)
-    equal view.$('.icon-mastery-path').length, 0
+    equal view.$('.ig-admin .al-options .icon-mastery-path').length, 0
 
   test 'renders for assignment quiz if cyoe on', ->
     model = buildAssignment
@@ -612,7 +613,7 @@ define [
       is_quiz_assignment: true
       submission_types: ['online_quiz']
     view = createView(model)
-    equal view.$('.icon-mastery-path').length, 1
+    equal view.$('.ig-admin .al-options .icon-mastery-path').length, 1
 
   test 'does not render for non-assignment quiz if cyoe on', ->
     model = buildAssignment
@@ -631,7 +632,7 @@ define [
       can_update: true
       submission_types: ['discussion_topic']
     view = createView(model)
-    equal view.$('.icon-mastery-path').length, 1
+    equal view.$('.ig-admin .al-options .icon-mastery-path').length, 1
 
   test 'does not render for graded page if cyoe on', ->
     model = buildAssignment
@@ -640,4 +641,94 @@ define [
       can_update: true
       submission_types: ['wiki_page']
     view = createView(model)
-    equal view.$('.icon-mastery-path').length, 0
+    equal view.$('.ig-admin .al-options .icon-mastery-path').length, 0
+
+  module 'AssignListItemViewSpec - mastery paths link',
+    setup: ->
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+      ENV.CONDITIONAL_RELEASE_ENV = {
+        active_rules: [{
+          trigger_assignment: '1',
+          scoring_ranges: [
+            {
+              assignment_sets: [
+                { assignments: [{ assignment_id: '2' }] },
+              ],
+            },
+          ],
+        }],
+      }
+      CyoeHelper.reloadEnv()
+
+  test 'does not render for assignment if cyoe off', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    model = buildAssignment
+      id: '1'
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0
+
+  test 'does not render for assignment if assignment does not have a rule', ->
+    model = buildAssignment
+      id: '2'
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0
+
+  test 'renders for assignment if assignment has a rule', ->
+    model = buildAssignment
+      id: '1'
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 1
+
+  module 'AssignListItemViewSpec - mastery paths icon',
+    setup: ->
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+      ENV.CONDITIONAL_RELEASE_ENV = {
+        active_rules: [{
+          trigger_assignment: '1',
+          scoring_ranges: [
+            {
+              assignment_sets: [
+                { assignments: [{ assignment_id: '2' }] },
+              ],
+            },
+          ],
+        }],
+      }
+      CyoeHelper.reloadEnv()
+
+  test 'does not render for assignment if cyoe off', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
+    model = buildAssignment
+      id: '2'
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.mastery-path-icon').length, 0
+
+  test 'does not render for assignment if assignment is not released by a rule', ->
+    model = buildAssignment
+      id: '1'
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.mastery-path-icon').length, 0
+
+  test 'renders for assignment if assignment is released by a rule', ->
+    model = buildAssignment
+      id: '2'
+      title: 'Foo'
+      can_update: true
+      submission_types: ['online_text_entry']
+    view = createView(model)
+    equal view.$('.mastery-path-icon').length, 1

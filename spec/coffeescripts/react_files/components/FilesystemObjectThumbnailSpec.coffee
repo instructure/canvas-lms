@@ -1,10 +1,11 @@
 define [
   'react'
+  'react-dom'
   'compiled/models/File'
   'compiled/models/Folder'
   'compiled/models/FilesystemObject'
   'jsx/files/FilesystemObjectThumbnail'
-], (React, File, Folder, FilesystemObject, FilesystemObjectThumbnail) ->
+], (React, ReactDOM, File, Folder, FilesystemObject, FilesystemObjectThumbnail) ->
 
   TestUtils = React.addons.TestUtils
 
@@ -20,7 +21,7 @@ define [
 
     teardown: ->
       @clock.restore()
-      React.unmountComponentAtNode(@thumbnail.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@thumbnail.getDOMNode().parentNode)
 
   test "displays the thumbnail image", ->
     equal $(@thumbnail.getDOMNode()).attr("style"), "background-image:url('sweet_thumbnail_url');", "set background image to correct url"
@@ -40,7 +41,7 @@ define [
 
     teardown: ->
       @clock.restore()
-      React.unmountComponentAtNode(@thumbnail.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@thumbnail.getDOMNode().parentNode)
 
   test "adds mimeClass-Folder if it's a folder", ->
     ok $(@thumbnail.getDOMNode()).hasClass("mimeClass-folder"), "adds mimeClass for folder"
@@ -63,7 +64,7 @@ define [
     ok $(thumbnail.getDOMNode()).hasClass("customClassname"), "finds the custom className"
 
     clock.restore()
-    React.unmountComponentAtNode(thumbnail.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(thumbnail.getDOMNode().parentNode)
 
   module 'Filesystem Object Thumbnail: checkForThumbnail',
     setup: ->
@@ -87,7 +88,7 @@ define [
     teardown: ->
       @server.restore()
       @clock.restore()
-      React.unmountComponentAtNode(@thumbnail.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@thumbnail.getDOMNode().parentNode)
 
   test "fetches thumbnail_url and puts it into state", ->
     @clock.tick(1000)

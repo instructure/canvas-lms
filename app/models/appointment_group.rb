@@ -76,7 +76,7 @@ class AppointmentGroup < ActiveRecord::Base
     end
   end
 
-  attr_accessible :title, :description, :location_name, :location_address, :contexts, :sub_context_codes, :participants_per_appointment, :min_appointments_per_participant, :max_appointments_per_participant, :new_appointments, :participant_visibility, :cancel_reason
+  strong_params
 
   # when creating/updating an appointment, you can give it a list of (new)
   # appointment times. these will be added to the existing appointment times
@@ -338,10 +338,14 @@ class AppointmentGroup < ActiveRecord::Base
     participant = participant_for(user_or_participant) if participant_type == 'Group' && participant.is_a?(User)
     return false unless eligible_participant?(participant)
     return false unless min_appointments_per_participant
-    return false if participants_per_appointment \
-                  && appointments \
-                  && appointments_participants.count >= (participants_per_appointment * appointments.length)
+    return false if all_appointments_filled?
     return reservations_for(participant).size < min_appointments_per_participant
+  end
+
+  def all_appointments_filled?
+    return false unless participants_per_appointment
+    appointments_participants.count >= appointments.sum(
+      sanitize_sql(['COALESCE(participants_per_appointment, ?)', self.participants_per_appointment]))
   end
 
   def participant_for(user)

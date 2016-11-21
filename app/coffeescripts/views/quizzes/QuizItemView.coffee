@@ -3,12 +3,13 @@ define [
   'jquery'
   'underscore'
   'Backbone'
+  'jsx/shared/conditional_release/CyoeHelper'
   'compiled/views/PublishIconView'
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/assignments/DateAvailableColumnView'
   'compiled/views/SisButtonView'
   'jst/quizzes/QuizItemView'
-], (I18n, $, _, Backbone, PublishIconView, DateDueColumnView, DateAvailableColumnView, SisButtonView, template) ->
+], (I18n, $, _, Backbone, CyoeHelper, PublishIconView, DateDueColumnView, DateAvailableColumnView, SisButtonView, template) ->
 
   class ItemView extends Backbone.View
 
@@ -99,7 +100,8 @@ define [
       _.each base.quiz_menu_tools, (tool) =>
         tool.url = tool.base_url + "&quizzes[]=#{@model.get("id")}"
 
-      base.cyoeEnabled = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && base.quiz_type == 'assignment'
+      base.cyoe = CyoeHelper.getItemData(base.assignment_id, base.quiz_type == 'assignment')
+      base.return_to = encodeURIComponent window.location.pathname
 
       if @model.get("multiple_due_dates")
         base.selector  = @model.get("id")

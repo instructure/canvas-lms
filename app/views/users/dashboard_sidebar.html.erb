@@ -17,7 +17,7 @@
 <% if @show_recent_feedback %>
 <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('recent_feedback', "Recent Feedback"), :period => :two_weeks, :show_context => true, :is_recent_feedback => true} %>
 <% end %>
-<div class="rs-margin-lr">
+<div>
   <% if show_user_create_course_button(@current_user) %>
     <button type="button"
             id="start_new_course"

@@ -1349,6 +1349,13 @@ describe Attachment do
       expect(quota[:quota_used]).to eq 0
     end
 
+    it "should not count attachments in group submissions folders toward the quota" do
+      group_model
+      attachment_model(:context => @group, :uploaded_data => stub_png_data, :filename => 'whatever.png', :folder => @group.submissions_folder)
+      @attachment.update_attribute(:size, 1.megabyte)
+      quota = Attachment.get_quota(@group)
+      expect(quota[:quota_used]).to eq 0
+    end
   end
 
   context "#open" do

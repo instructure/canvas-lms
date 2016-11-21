@@ -15,7 +15,7 @@ describe "people" do
   end
 
   def open_student_group_dialog
-    f('.add_category_link').click
+    f('#add-group-set').click
     dialog = fj('.ui-dialog:visible')
     expect(dialog).to be_displayed
     dialog
@@ -27,11 +27,10 @@ describe "people" do
       fln('View User Groups').click
     end
     open_student_group_dialog
-    inputs = ffj('input:visible')
-    replace_content(inputs[0], group_text)
-    submit_dialog_form('#add_category_form')
+    replace_content(f('#new_category_name'), group_text)
+    submit_form('.group-category-create')
     wait_for_ajaximations
-    expect(f('#category_list')).to include_text(group_text)
+    expect(f('.collectionViewItems')).to include_text(group_text)
   end
 
   def enroll_student(student)
@@ -51,7 +50,7 @@ describe "people" do
   def create_user(student_name)
     user = User.create!(:name => student_name)
     user.register!
-    user.pseudonyms.create!(:unique_id => student_name, :password => 'qwerty', :password_confirmation => 'qwerty')
+    user.pseudonyms.create!(:unique_id => student_name, :password => 'qwertyuiop', :password_confirmation => 'qwertyuiop')
     @course.reload
     user
   end
@@ -98,8 +97,6 @@ describe "people" do
 
       #add first student
       @student_1 = create_user('student@test.com')
-      Account.default.settings[:enable_manage_groups2] = false
-      Account.default.save!
 
       enroll_student(@student_1)
 
@@ -217,22 +214,13 @@ describe "people" do
       create_student_group
     end
 
-    it "should test self sign up help functionality" do
-      f("#people-options .Button").click
-      expect_new_page_load { fln('View User Groups').click }
-      open_student_group_dialog
-      fj('.self_signup_help_link:visible').click
-      help_dialog = f('#self_signup_help_dialog')
-      expect(help_dialog).to be_displayed
-    end
-
     it "should test self sign up functionality" do
       f("#people-options .Button").click
       expect_new_page_load { fln('View User Groups').click }
       dialog = open_student_group_dialog
-      dialog.find_element(:css, '#category_enable_self_signup').click
-      expect(dialog.find_element(:css, '#category_split_group_count')).not_to be_displayed
-      expect(dialog.find_element(:css, '#category_create_group_count')).to be_displayed
+      dialog.find_element(:css, '#enable_self_signup').click
+      expect(dialog.find_element(:css, '#split_groups')).not_to be_displayed
+      expect(dialog).to include_text("groups now")
     end
 
     it "should test self sign up / group structure functionality" do
@@ -242,12 +230,13 @@ describe "people" do
         fln('View User Groups').click
       end
       dialog = open_student_group_dialog
-      dialog.find_element(:css, '#category_enable_self_signup').click
-      dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
-      submit_dialog_form('#add_category_form')
+      replace_content(f('#new_category_name'), 'new group')
+      dialog.find_element(:css, '#enable_self_signup').click
+      fj('input[name="create_group_count"]:visible').send_keys(group_count)
+      submit_form('.group-category-create')
       wait_for_ajaximations
       expect(@course.groups.count).to eq 4
-      expect(f('.group_count')).to include_text("#{group_count} Groups")
+      expect(f('.groups-with-count')).to include_text("Groups (#{group_count})")
     end
 
     it "should test group structure functionality" do
@@ -259,29 +248,34 @@ describe "people" do
         fln('View User Groups').click
       end
       dialog = open_student_group_dialog
-      dialog.find_element(:css, '#category_split_groups').click
-      replace_content(f('#category_split_group_count'), group_count)
+      replace_content(f('#new_category_name'), 'new group')
+      dialog.find_element(:css, '#split_groups').click
+      fj('input[name="create_group_count"]:visible').send_keys(group_count)
       expect(@course.groups.count).to eq 0
-      submit_dialog_form('#add_category_form')
+      submit_form('.group-category-create')
+      wait_for_ajaximations
+      run_jobs
       wait_for_ajaximations
       expect(@course.groups.count).to eq group_count.to_i
-      expect(ffj('.left_side .group_name:visible').count).to eq group_count.to_i
+      expect(f('.groups-with-count')).to include_text("Groups (#{group_count})")
     end
 
     it "should edit a student group" do
       new_group_name = "new group edit name"
       create_student_group
-      f('.edit_category_link').click
-      edit_form = f('#edit_category_form')
-      edit_form.find_element(:css, 'input#category_name').send_keys(new_group_name)
+      fj('.group-category-actions:visible a:visible').click
+      f('.edit-category').click
+      edit_form = f('.group-category-edit')
+      edit_form.find_element(:css, 'input[name="name"]').send_keys(new_group_name)
       submit_form(edit_form)
       wait_for_ajaximations
-      expect(fj(".category_name").text).to eq new_group_name
+      expect(f(".collectionViewItems")).to include_text(new_group_name)
     end
 
     it "should delete a student group" do
       create_student_group
-      f('.delete_category_link').click
+      fj('.group-category-actions:visible a:visible').click
+      f('.delete-category').click
       keep_trying_until do
         expect(driver.switch_to.alert).not_to be_nil
         driver.switch_to.alert.accept
@@ -289,36 +283,7 @@ describe "people" do
       end
       wait_for_ajaximations
       refresh_page
-      expect(f('#no_groups_message')).to be_displayed
-    end
-
-    it "should randomly assign students" do
-      expected_student_count = "0 students"
-
-      enroll_more_students
-
-      group_count = 4
-      expect_new_page_load do
-        f("#people-options .Button").click
-        fln('View User Groups').click
-      end
-      open_student_group_dialog
-      submit_dialog_form('#add_category_form')
-      wait_for_ajaximations
-      group_count.times do
-        f('.add_group_link').click
-        f('.button-container > .btn-small').click
-        wait_for_ajaximations
-      end
-      f('.assign_students_link').click
-      keep_trying_until do
-        expect(driver.switch_to.alert).not_to be_nil
-        driver.switch_to.alert.accept
-        true
-      end
-      wait_for_ajax_requests
-      assert_flash_notice_message /Students assigned to groups/
-      expect(f('.right_side .user_count').text).to eq expected_student_count
+      expect(f('.empty-groupset-instructions')).to be_displayed
     end
 
     it "should test prior enrollment functionality" do

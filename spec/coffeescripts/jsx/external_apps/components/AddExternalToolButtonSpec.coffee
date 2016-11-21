@@ -1,18 +1,18 @@
 define [
   'react'
+  'react-dom'
   'react-modal'
   'jsx/external_apps/components/AddExternalToolButton'
-], (React, Modal, AddExternalToolButton) ->
+], (React, ReactDOM, Modal, AddExternalToolButton) ->
 
   TestUtils = React.addons.TestUtils
-  Simulate = TestUtils.Simulate
   wrapper = null
 
-  createElement = ->
-    React.createElement(AddExternalToolButton)
+  createElement = (data = {}) ->
+    React.createElement(AddExternalToolButton, data)
 
-  renderComponent = ->
-    React.render(createElement(), wrapper)
+  renderComponent = (data = {}) ->
+    ReactDOM.render(createElement(data), wrapper)
 
   getDOMNodes = ->
     component = renderComponent()
@@ -32,7 +32,7 @@ define [
       Modal.setAppElement(wrapper)
 
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
       wrapper.innerHTML = ''
 
   test 'render', ->
@@ -126,3 +126,16 @@ define [
           "error_report_id":8
         })
         equal addToolButton._errorHandler(xhr), 'We were unable to add the app.'
+
+      test 'gives access error message when permission not granted', ->
+        component = renderComponent({'canAddEdit': false})
+        accessDeniedMessage = 'This action has been disabled by your admin.'
+        form = JSON.stringify(component.renderForm())
+        ok form.indexOf(accessDeniedMessage) >= 0
+
+      test 'gives no access error message when permission is granted', ->
+        component = renderComponent({'canAddEdit': true})
+        accessDeniedMessage = 'This action has been disabled by your admin.'
+        form = JSON.stringify(component.renderForm())
+        notOk form.indexOf(accessDeniedMessage) >= 0
+

@@ -1,9 +1,10 @@
 define([
   'jquery',
   'react',
+  'react-dom',
   'i18n!file_not_found',
   'compiled/fn/preventDefault'
-], function ($, React, I18n, preventDefault) {
+], function ($, React, ReactDOM, I18n, preventDefault) {
 
   const LABEL_TEXT = I18n.t('Please let them know which page you were viewing and the link you clicked on.');
 
@@ -21,12 +22,12 @@ define([
         recipients: this.props.contextCode + '_teachers',
         body: `${I18n.t('This most likely happened because you imported course content without its associated files.')}
 
-        ${I18n.t('This student wrote:')} ${React.findDOMNode(this.refs.message).value}`,
+        ${I18n.t('This student wrote:')} ${ReactDOM.findDOMNode(this.refs.message).value}`,
         context_code: this.props.contextCode
       };
 
       const dfd = $.post('/api/v1/conversations', conversationData);
-      $(React.findDOMNode(this.refs.form)).disableWhileLoading(dfd);
+      $(ReactDOM.findDOMNode(this.refs.form)).disableWhileLoading(dfd);
 
       dfd.done(() => this.setState({status: 'sent'}));
     }

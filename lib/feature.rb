@@ -427,10 +427,10 @@ END
       display_name: -> { I18n.t('Mastery Paths') },
       description: -> { I18n.t('Configure individual learning paths for students based on assessment results.') },
       applies_to: 'Course',
-      state: 'hidden',
+      state: 'allowed',
       beta: true,
       development: false,
-      root_opt_in: false,
+      root_opt_in: true,
       after_state_change_proc:  ->(user, context, _old_state, new_state) {
         if %w(on allowed).include?(new_state) && context.is_a?(Account)
           @service_account = ConditionalRelease::Setup.new(context.id, user.id)
@@ -463,6 +463,16 @@ END
       state: 'hidden',
       beta: true,
       root_opt_in: true
+    },
+    'plagiarism_detection_platform' =>
+    {
+      display_name: -> { I18n.t('Plagiarism Detection Platform') },
+      description: -> { I18n.t('Enable the plagiarism detection platform') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      root_opt_in: true,
+      development: true,
     }
   )
 

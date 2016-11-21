@@ -1,8 +1,129 @@
 class WeakParameters < ActiveSupport::HashWithIndifferentAccess
+  # stealin some code from strong params to make WeakParameters from the values
+
+  def each(&block)
+    super do |key, value|
+      convert_hashes_to_parameters(key, value)
+    end
+
+    super
+  end
+
+  def [](key)
+    convert_hashes_to_parameters(key, super)
+  end
+
+  def fetch(key, *args)
+    convert_hashes_to_parameters(key, super, false)
+  end
+
+  def delete(key, &block)
+    convert_hashes_to_parameters(key, super, false)
+  end
+
+  def select!(&block)
+    convert_value_to_parameters(super)
+  end
+
+  private
+  def convert_hashes_to_parameters(key, value, assign_if_converted=true)
+    converted = convert_value_to_parameters(value)
+    self[key] = converted if assign_if_converted && !converted.equal?(value)
+    converted
+  end
+
+  def convert_value_to_parameters(value)
+    if value.is_a?(Array)
+      value.map { |_| convert_value_to_parameters(_) }
+    elsif value.is_a?(WeakParameters) || !value.is_a?(Hash)
+      value
+    else
+      self.class.new(value)
+    end
+  end
 end
+
+module ArbitraryStrongishParams
+  ANYTHING = Object.new.freeze
+
+  def initialize(attributes = nil)
+    @anythings = {}.with_indifferent_access
+    super
+  end
+
+  def encode_with(_coder)
+    raise "Strong parameters should not be dumped to YAML"
+  end
+
+  # this is mostly copy-pasted
+  def hash_filter(params, filter)
+    filter = filter.with_indifferent_access
+
+    # Slicing filters out non-declared keys.
+    slice(*filter.keys).each do |key, value|
+      next unless value
+
+      if filter[key] == ActionController::Parameters::EMPTY_ARRAY
+        # Declaration { comment_ids: [] }.
+        array_of_permitted_scalars_filter(params, key)
+      elsif filter[key] == ANYTHING
+        if filtered = recursive_arbitrary_filter(value)
+          params[key] = filtered
+          params.instance_variable_get(:@anythings)[key] = true
+        end
+      else
+        # Declaration { user: :name } or { user: [:name, :age, { address: ... }] }.
+        params[key] = each_element(value) do |element|
+          if element.is_a?(Hash)
+            element = self.class.new(element) unless element.respond_to?(:permit)
+            element.permit(*Array.wrap(filter[key]))
+          end
+        end
+      end
+    end
+  end
+
+  def recursive_arbitrary_filter(value)
+    if value.is_a?(Hash)
+      hash = {}
+      value.each do |k, v|
+        hash[k] = recursive_arbitrary_filter(v) if permitted_scalar?(k)
+      end
+      hash
+    elsif value.is_a?(Array)
+      arr = []
+      value.each do |v|
+        if permitted_scalar?(v)
+          arr << v
+        elsif filtered = recursive_arbitrary_filter(v)
+          arr << filtered
+        end
+      end
+      arr
+    elsif permitted_scalar?(value)
+      value
+    end
+  end
+
+  def convert_hashes_to_parameters(key, value, assign_if_converted=true)
+    return value if @anythings.key?(key)
+    super
+  end
+
+  def dup
+    super.tap do |duplicate|
+      duplicate.instance_variable_set(:@anythings, @anythings.dup)
+    end
+  end
+end
+ActionController::Parameters.prepend(ArbitraryStrongishParams)
 
 # default to *non* strong parameters
 ActionController::Base.class_eval do
+  def strong_anything
+    ArbitraryStrongishParams::ANYTHING
+  end
+
   def params
     @_params ||= WeakParameters.new(request.parameters)
   end

@@ -55,6 +55,30 @@ define [
     teardown: ->
       tz.restore(@snapshot)
 
+  test 'addEventToCache handles cases where the contextCode returns a list', ->
+    fakeEvent = {
+      contextCode: -> "course_1,course_2",
+      id: 42
+    }
+    @source.addEventToCache(fakeEvent)
+    ok(this.source.cache.contexts.course_1.events[42])
+
+  test 'addEventToCache handles the case where contextCode contains context not in the cache', ->
+    fakeEvent = {
+      contextCode: -> "course_3,course_2",
+      id: 42
+    }
+    @source.addEventToCache(fakeEvent)
+    ok(this.source.cache.contexts.course_2.events[42])
+
+  test 'addEventToCache handles cases where the contextCode is a single item', ->
+    fakeEvent = {
+      contextCode: -> "course_1",
+      id: 42
+    }
+    @source.addEventToCache(fakeEvent)
+    ok(this.source.cache.contexts.course_1.events[42])
+
   test 'overlapping ranges: overlap at start shifts start to end of overlap', ->
     @source.getEvents(@date1, @date2, @contexts, ->)
     @source.getEvents(@date1, @date4, @contexts, ->)

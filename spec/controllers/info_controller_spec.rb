@@ -58,7 +58,7 @@ describe InfoController do
 
     it "should filter the links based on the current user's role" do
       account = Account.create!
-      Canvas::Help.stubs(:default_links).returns([
+      Account::HelpLinks.stubs(:default_links).returns([
         {
           :available_to => ['student'],
           :text => 'Ask Your Instructor a Question',

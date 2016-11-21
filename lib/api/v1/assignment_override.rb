@@ -40,6 +40,8 @@ module Api::V1::AssignmentOverride
         json[:group_id] = override.set_id
       when 'CourseSection'
         json[:course_section_id] = override.set_id
+      when 'Noop'
+        json[:noop_id] = override.set_id
       end
     end
   end
@@ -145,7 +147,7 @@ module Api::V1::AssignmentOverride
       override_data[:students] = students
     end
 
-    if !set_type && data.has_key?(:group_id)
+    if !set_type && data.key?(:group_id)
       group_category_id = assignment.group_category_id || assignment.discussion_topic.try(:group_category_id)
       if !group_category_id
         # don't recognize group_id for non-group assignments
@@ -162,7 +164,7 @@ module Api::V1::AssignmentOverride
       end
     end
 
-    if !set_type && data.has_key?(:course_section_id)
+    if !set_type && data.key?(:course_section_id)
       set_type = 'CourseSection'
 
       # look up the section
@@ -174,23 +176,28 @@ module Api::V1::AssignmentOverride
       override_data[:section] = section
     end
 
+    if !set_type && data.key?(:noop_id)
+      set_type = 'Noop'
+      override_data[:noop_id] = data[:noop_id]
+    end
+
     errors << "one of student_ids, group_id, or course_section_id is required" if !set_type && errors.empty?
 
-    if set_type == 'ADHOC' && data.has_key?(:title)
+    if %w(ADHOC Noop).include?(set_type) && data.key?(:title)
       override_data[:title] = data[:title]
     end
 
     # collect override values
     [:due_at, :unlock_at, :lock_at].each do |field|
-      if data.has_key?(field)
-        if data[field].blank?
-          # override value of nil/'' is meaningful
-          override_data[field] = nil
-        elsif value = Time.zone.parse(data[field].to_s)
-          override_data[field] = value
-        else
-          errors << "invalid #{field} #{data[field].inspect}"
-        end
+      next unless data.key?(field)
+
+      if data[field].blank?
+        # override value of nil/'' is meaningful
+        override_data[field] = nil
+      elsif value = Time.zone.parse(data[field].to_s)
+        override_data[field] = value
+      else
+        errors << "invalid #{field} #{data[field].inspect}"
       end
     end
 
@@ -259,7 +266,14 @@ module Api::V1::AssignmentOverride
   end
 
   def update_assignment_override_without_save(override, override_data)
-    if override_data.has_key?(:students)
+    if override_data.key?(:noop_id)
+      override.set = nil
+      override.set_type = 'Noop'
+      override.set_id = override_data[:noop_id]
+      override.title = override_data[:title]
+    end
+
+    if override_data.key?(:students)
       override.set = nil
       override.set_type = 'ADHOC'
 
@@ -289,11 +303,11 @@ module Api::V1::AssignmentOverride
       end
     end
 
-    if override_data.has_key?(:group)
+    if override_data.key?(:group)
       override.set = override_data[:group]
     end
 
-    if override_data.has_key?(:section)
+    if override_data.key?(:section)
       override.set = override_data[:section]
     end
 
@@ -304,7 +318,7 @@ module Api::V1::AssignmentOverride
     end
 
     [:due_at, :unlock_at, :lock_at].each do |field|
-      if override_data.has_key?(field)
+      if override_data.key?(field)
         override.send("override_#{field}", override_data[field])
       else
         override.send("clear_#{field}_override")

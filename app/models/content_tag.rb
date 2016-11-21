@@ -155,6 +155,7 @@ class ContentTag < ActiveRecord::Base
 
   def graded?
     return true if self.content_type == 'Assignment'
+    return false if self.content_type == 'WikiPage'
     return false unless self.can_have_assignment?
 
     return content && !content.assignment_id.nil?
@@ -183,7 +184,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def can_have_assignment?
-    ['Assignment', 'DiscussionTopic', 'Quizzes::Quiz'].include?(self.content_type)
+    ['Assignment', 'DiscussionTopic', 'Quizzes::Quiz', 'WikiPage'].include?(self.content_type)
   end
 
   def assignment

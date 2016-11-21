@@ -33,7 +33,10 @@ class GradingPeriod < ActiveRecord::Base
   before_validation :ensure_close_date
 
   scope :current, -> do
-    where("start_date <= :now AND end_date >= :now", now: Time.zone.now)
+    period_table = GradingPeriod.arel_table
+    now = Time.zone.now
+    where(period_table[:start_date].lteq(now)).
+      where(period_table[:end_date].gt(now))
   end
 
   scope :grading_periods_by, ->(context_with_ids) do
@@ -106,7 +109,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def in_date_range?(date)
-    start_date <= date && end_date >= date
+    start_date <= date && date < end_date
   end
 
   def last?

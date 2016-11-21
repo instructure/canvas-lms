@@ -751,7 +751,7 @@ class User < ActiveRecord::Base
   end
 
   def email
-    # if you change this cache_key, change it in email_cached? as well
+    # if you change this cache_key, change it in email_cached? as well (and email=)
     value = Rails.cache.fetch(['user_email', self].cache_key) do
       email_channel.try(:path) || :none
     end
@@ -801,6 +801,7 @@ class User < ActiveRecord::Base
     cc.move_to_top
     cc.save!
     self.reload
+    Rails.cache.delete(['user_email', self].cache_key)
     cc.path
   end
 
@@ -2183,7 +2184,7 @@ class User < ActiveRecord::Base
 
       group_rows = convert_global_id_rows(
           GroupMembership.joins(:group).
-              merge(User.instance_exec(&User.reflections[CANVAS_RAILS4_0 ? :current_group_memberships : 'current_group_memberships'].scope).only(:where)).
+              merge(User.instance_exec(&User.reflections['current_group_memberships'].scope).only(:where)).
               where(user_id: users).
               distinct.pluck(:user_id, :group_id))
       group_rows.each do |user_id, group_id|
@@ -2295,7 +2296,7 @@ class User < ActiveRecord::Base
 
   def roles(root_account)
     return @roles if @roles
-    @roles = Rails.cache.fetch(['user_roles_for_root_account2', self, root_account].cache_key) do
+    @roles = Rails.cache.fetch(['user_roles_for_root_account3', self, root_account].cache_key) do
       roles = ['user']
 
       enrollment_types = root_account.all_enrollments.where(user_id: self, workflow_state: 'active').uniq.pluck(:type)
@@ -2310,10 +2311,6 @@ class User < ActiveRecord::Base
       end
       roles
     end
-  end
-
-  def admin_of_root_account?(root_account)
-    root_account.all_account_users_for(self).any?
   end
 
   def eportfolios_enabled?

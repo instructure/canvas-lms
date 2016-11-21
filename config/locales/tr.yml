@@ -50,6 +50,7 @@ tr:
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Canvas yönetim panelinin sağdaki kenar çubuğunda görünen tam ölçülü logo. İdeal boyutlar 360 x 140 pikseldir. Kabul edilen dosya formatları: svg, png, jepg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Raporlayan kullanıcı için ilgi çekici ortam bilgisi barındırmada kullanışlı bir anahtar/değer yığını "
   a_message_is_required_129e1814: "Bir mesaj gerekli"
+  a_name_for_this_set_is_required_222bad23: "Bu set için bir isim gereklidir"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Dersiniz %{course_name} için yeni bir ödev oluşturuldu"
   a_problem_occurred_adding_reviewers_57b083d9: "Gözlemci ekleme esnasında hata oluştu."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Notlandırma şemaları, şemayı düzenleme ya da silme ikonlarının adlarını içeren tablo"
@@ -226,6 +227,7 @@ tr:
       discovery_url_description: "Bir Keşif URL'si ayarlanırsa kimlilk doğrulama gerektiğinde Canvas bütün kullanıcıları bu URL'ye yönlendirecektir. Bu sayfada, kullanıcıların oturum açması için nereye gitmeleri gerektiği net bir şekilde belirtilmelidir. Keşif URL'si yapılandırılmazsa kullanıcı doğrulama girişimi için ilk yapılandırma kullanılacaktır."
       login_handle_name_description: "Özel oturum açma tanımlamaları için kullanılan etiket. Örneğin: Oturum Açma, Kullanıcı Adı, Öğrenci ID, vs."
       unknown_user_url_description: "Kimliği doğrulanmış bir kullanıcı Canvas'ta bulunamadığında yönlendirilecek URL."
+  account_course_and_user_search_22bf297a: "Hesap içinde Ders ve Kullanıcı Arama"
   account_domain_78f43049: "Hesap Alan Adı"
   account_id_2c3b4f15: "hesap id"
   account_name_13ed649: "%{account_name}"
@@ -388,9 +390,9 @@ tr:
     add_course_dialog_title: "Yeni Ders Ekle"
     add_course_or_user: 
       add_course_button: "Ders Ekle"
-      add_course_link: "Yeni Ders Ekle"
+      add_course_link: "Yeni Ders"
       add_user_button: "Kullanıcı Ekle"
-      add_user_link: "Yeni Kullanıcı Ekle"
+      add_user_link: "Yeni Kullanıcı"
       display_name_help: "İnsanlar bu ismi tartışmalar, mesajlar ve yorumlarda görecek."
       full_name_description: "Bu isim puanlandırmada öğretmenler tarafından kullanılacaktır."
       labels: 
@@ -683,6 +685,11 @@ tr:
             header: "Şu zaman başlat:"
     default_account_quotas_not_updated: "Varsayılan hesap kotaları güncellenmedi"
     default_account_quotas_updated: "Varsayılan hesap kotaları güncellendi"
+    engagement_report_csv_parameters: 
+      account_reports: 
+        bryan_engagement: 
+          enrollment_term_ids: 
+            field: "Kayıt Dönem Idleri"
     find_not_authorized: "Bu %{type}'e erişime yetkiniz yok"
     find_not_found: "Bu ID ile bir %{type} bulunamadı"
     grade_export_csv_description: 
@@ -832,7 +839,7 @@ tr:
       add_admin_title: "Yönetici Hesabı Ekle"
       add_announcement_button: "Duyuru Ekle"
       add_announcement_link: "Yeni Duyuru Ekle"
-      add_ip_filter_link: "Başka filtre ekle"
+      add_ip_filter_link: Filtre
       alert_icon_calendar_option: takvim
       alert_icon_error_option: hata
       alert_icon_information_option: bilgi
@@ -892,6 +899,7 @@ tr:
         allow_sending_scores_in_emails: "Öğrenciler puanlarını eposta bildirimi olarak alabilirler"
         allow_sis_import: "ÖBS İçe Aktarımları"
         author_email_in_notifications: "Kullanıcı etkileşim Bildirimleri için gönderenin eposta adresini göster"
+        canvadocs_prefer_office_online: "Office 365 dosya izleyicisini tercih et"
         canvas_authentication: "Canvas Kimlik Doğrulaması"
         default_language: "Varsayılan Dil"
         default_time_zone: "Varsayılan Zaman Dilimi"

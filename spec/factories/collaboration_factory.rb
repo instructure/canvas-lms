@@ -16,22 +16,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def collaboration_model(opts={})
-  @collaboration = factory_with_protected_attributes(Collaboration, valid_collaboration_attributes.merge(opts))
-end
+module Factories
+  def collaboration_model(opts={})
+    @collaboration = factory_with_protected_attributes(Collaboration, valid_collaboration_attributes.merge(opts))
+  end
 
-def google_docs_collaboration_model(opts={})
-  @collaboration = factory_with_protected_attributes(GoogleDocsCollaboration, valid_collaboration_attributes.merge(opts))
-end
+  def google_docs_collaboration_model(opts={})
+    @collaboration = factory_with_protected_attributes(GoogleDocsCollaboration, valid_collaboration_attributes.merge(opts))
+  end
 
-def valid_collaboration_attributes
-  {
-    :collaboration_type => "value for collaboration_type",
-    :document_id => "document:dc3pjs4r_3hhc6fvcc",
-    :user_id => User.create!.id,
-    :context => @course || course_model,
-    :url => "value for url",
-    :title => "My Collaboration",
-    :data => File.read('gems/google_drive/spec/fixtures/google_drive/file_data.json')
-  }
+  def valid_collaboration_attributes
+    {
+      :collaboration_type => "value for collaboration_type",
+      :document_id => "document:dc3pjs4r_3hhc6fvcc",
+      :user_id => User.create!.id,
+      :context => @course || course_model,
+      :url => "value for url",
+      :title => "My Collaboration",
+      :data => File.read('gems/google_drive/spec/fixtures/google_drive/file_data.json')
+    }
+  end
 end

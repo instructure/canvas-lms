@@ -1,8 +1,9 @@
 define [
   'react'
+  'react-dom'
   'react-modal'
   'jsx/external_apps/components/ConfigureExternalToolButton'
-], (React, Modal, ConfigureExternalToolButton) ->
+], (React, ReactDOM, Modal, ConfigureExternalToolButton) ->
 
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
@@ -16,7 +17,7 @@ define [
     })
 
   renderComponent = (data) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   getDOMNodes = (data) ->
     component        = renderComponent(data)
@@ -46,7 +47,7 @@ define [
         },
       ]
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'open and close modal', ->
     tool = {

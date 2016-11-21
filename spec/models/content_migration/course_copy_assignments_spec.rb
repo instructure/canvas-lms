@@ -149,6 +149,7 @@ describe ContentMigration do
     it "should copy assignment attributes" do
       assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
       @assignment.turnitin_enabled = true
+      @assignment.vericite_enabled = true
       @assignment.peer_reviews = true
       @assignment.peer_review_count = 2
       @assignment.automatic_peer_reviews = true
@@ -157,13 +158,15 @@ describe ContentMigration do
       @assignment.position = 2
       @assignment.muted = true
       @assignment.omit_from_final_grade = true
+      @assignment.only_visible_to_overrides = true
 
       @assignment.save!
 
-      attrs = [:turnitin_enabled, :peer_reviews,
+      attrs = [:turnitin_enabled, :vericite_enabled, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
           :grade_group_students_individually, :allowed_extensions,
-          :position, :peer_review_count, :muted, :omit_from_final_grade]
+          :position, :peer_review_count, :muted, :omit_from_final_grade,
+          :only_visible_to_overrides]
 
       run_course_copy
 
@@ -511,6 +514,23 @@ describe ContentMigration do
         expect(@copy_to.assignments.count).to eql 1
         expect(@copy_to.assignments.first.grading_standard).to be_nil
         expect(unrelated_grading_standard.reload.title).not_to eql gs.title
+      end
+    end
+
+    describe "assignment overrides" do
+      before :once do
+        @assignment = @copy_from.assignments.create!(title: 'ovrdn')
+      end
+
+      it "should copy only noop overrides" do
+        assignment_override_model(assignment: @assignment, set_type: 'ADHOC')
+        assignment_override_model(assignment: @assignment, set_type: 'Noop', set_id: 1, title: 'Tag 1')
+        assignment_override_model(assignment: @assignment, set_type: 'Noop', set_id: nil, title: 'Tag 2')
+        run_course_copy
+        to_assignment = @copy_to.assignments.first
+        expect(to_assignment.assignment_overrides.length).to eq 2
+        expect(to_assignment.assignment_overrides.detect{ |o| o.set_id == 1 }.title).to eq 'Tag 1'
+        expect(to_assignment.assignment_overrides.detect{ |o| o.set_id == nil }.title).to eq 'Tag 2'
       end
     end
   end

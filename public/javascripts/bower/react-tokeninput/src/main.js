@@ -34,9 +34,9 @@ module.exports = React.createClass({
     this.props.onInput(inputValue);
   },
 
-  handleSelect: function(event) {
+  handleSelect: function(event, option) {
     var input = this.refs['combo-li'].querySelector('input');
-    this.props.onSelect(event)
+    this.props.onSelect(event, option)
     this.setState({
       selectedToken: null
     })

@@ -21,7 +21,7 @@ require_relative 'report_spec_helper'
 describe 'lti report' do
   include ReportSpecHelper
 
-  before(:each) do
+  before(:once) do
     @type = 'lti_report_csv'
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @sub_account = Account.create(parent_account: @account, name: 'Sub Account')

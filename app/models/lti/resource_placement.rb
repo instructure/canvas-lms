@@ -25,10 +25,12 @@ module Lti
     LINK_SELECTION = 'link_selection'
     POST_GRADES = 'post_grades'
     RESOURCE_SELECTION = 'resource_selection'
+    ASSIGNMENT_CONFIGURATION = 'assignment_configuration'
 
     DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
     PLACEMENTS = [:account_navigation,
+                  :assignment_configuration,
                   :assignment_menu,
                   :assignment_selection,
                   :collaboration,
@@ -56,6 +58,7 @@ module Lti
       'Canvas.placements.courseNavigation' => COURSE_NAVIGATION,
       'Canvas.placements.linkSelection' => LINK_SELECTION,
       'Canvas.placements.postGrades' => POST_GRADES,
+      'Canvas.placements.assignmentConfiguration' => ASSIGNMENT_CONFIGURATION,
     }.freeze
 
     attr_accessible :placement, :message_handler, :resource_handler

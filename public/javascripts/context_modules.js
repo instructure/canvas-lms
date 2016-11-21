@@ -26,6 +26,7 @@ define([
   'INST' /* INST */,
   'i18n!context_modules',
   'jquery' /* $ */,
+  'jsx/shared/conditional_release/CyoeHelper',
   'compiled/views/context_modules/context_modules' /* handles the publish/unpublish state */,
   'compiled/views/modules/RelockModulesDialog',
   'compiled/util/vddTooltip',
@@ -48,7 +49,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'compiled/jquery.rails_flash_notifications'
-], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
+], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, CyoeHelper, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -182,13 +183,15 @@ define([
             $context_module_item = $("#context_module_item_" + id);
             var data = {};
             if (info["points_possible"] != null) {
-              data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', { 'points': "" + info["points_possible"]});
+              data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', {'points': "" + info["points_possible"]});
             }
             if (info["due_date"] != null) {
               if (info["past_due"] != null) {
                 $context_module_item.data('past_due', true);
               }
               data["due_date_display"] = $.dateString(info["due_date"])
+            } else if (info['has_many_overrides'] != null) {
+              data["due_date_display"] = I18n.t("Multiple Due Dates");
             } else if (info["vdd_tooltip"] != null) {
               info['vdd_tooltip']['link_href'] = $context_module_item.find('a.title').attr('href');
               $context_module_item.find('.due_date_display').html(vddTooltipView(info["vdd_tooltip"]));
@@ -460,16 +463,7 @@ define([
           }
         } else {
           $item = $('#context_module_item_blank').clone(true).removeAttr('id');
-          if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && data.is_cyoe_able) {
-            var $admin = $item.find('.ig-admin')
-            var $mpLink = $('<li role="presentation" />').append(
-              $('<a class="mastery_paths_link"><i class="icon-mastery-path" /> </a>')
-                .attr('href', './modules/items/' + data.id + '/edit_mastery_paths')
-                .attr('title', I18n.t('Edit item mastery paths'))
-                .append(htmlEscape(I18n.t('Mastery Paths')))
-            )
-            $admin.find('.delete_link').parent().before($mpLink)
-          }
+          modules.evaluateItemCyoe($item, data)
         }
         $item.addClass(data.type + '_' + data.id);
         $item.addClass(data.type);
@@ -506,6 +500,47 @@ define([
           }
         }
         return $item;
+      },
+
+      evaluateItemCyoe: function($item, data) {
+        if (!CyoeHelper.isEnabled()) return;
+        $item = $($item)
+        var $itemData = $item.find('.publish-icon')
+        var $admin = $item.find('.ig-admin')
+
+        data = data || {
+          id: $itemData.attr('data-module-item-id'),
+          title: $itemData.attr('data-module-item-name'),
+          assignment_id: $itemData.attr('data-assignment-id'),
+          is_cyoe_able: $itemData.attr('data-is-cyoeable') === 'true'
+        }
+
+        var cyoe = CyoeHelper.getItemData(data.assignment_id, data.is_cyoe_able)
+
+        if (cyoe.isReleased) {
+          var $pathIcon = $('<span class="pill mastery-path-icon" data-tooltip><i class="icon-mastery-path" /></span>')
+            .attr('title', I18n.t('Released by Mastery Path'))
+            .append(htmlEscape(cyoe.releasedLabel))
+          $admin.prepend($pathIcon)
+        }
+
+        if (cyoe.isCyoeAble) {
+          var $mpLink = $('<a class="mastery_paths_link" />')
+            .attr('href', './modules/items/' +
+                          data.id +
+                          '/edit_mastery_paths?return_to=' +
+                          encodeURIComponent(window.location.pathname))
+            .attr('title', I18n.t('Edit Mastery Paths for %{title}', { title: data.title }))
+            .text(I18n.t('Mastery Paths'))
+
+          if (cyoe.isTrigger) {
+            $admin.prepend($mpLink.clone())
+          }
+
+          $admin.find('.delete_link').parent().before(
+            $('<li role="presentation" />').append($mpLink.prepend('<i class="icon-mastery-path" /> '))
+          )
+        }
       },
 
       getNextPosition: function($module) {
@@ -950,7 +985,7 @@ define([
         } else if (data.type == 'discussion_topic') {
           displayType = I18n.t('optgroup.discussion_topics', "Discussions");
         } else if (data.type == 'wiki_page') {
-          displayType = I18n.t('optgroup.wiki_pages', "Wiki Pages");
+          displayType = I18n.t("Pages");
         }
         var $group = $optgroups[displayType]
         if (!$group) {
@@ -1634,6 +1669,10 @@ define([
     $(".context_module_item").live('mouseover focus', function() {
       $(".context_module_item_hover").removeClass('context_module_item_hover');
       $(this).addClass('context_module_item_hover');
+    })
+
+    $('.context_module_item').each(function (i, $item) {
+      modules.evaluateItemCyoe($item)
     });
 
     var $currentElem = null;

@@ -1,10 +1,11 @@
 define [
   '../mockFilesENV'
   'react'
+  'react-dom'
   'jquery'
   'jsx/shared/PublishCloud'
   'compiled/models/FilesystemObject'
-], (mockFilesEnv, React, $, PublishCloud, FilesystemObject) ->
+], (mockFilesEnv, React, ReactDOM, $, PublishCloud, FilesystemObject) ->
 
   Simulate = React.addons.TestUtils.Simulate
 
@@ -17,10 +18,10 @@ define [
         model: @model
         userCanManageFilesForContext: true
 
-      @publishCloud = React.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
+      @publishCloud = ReactDOM.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
 
   test "model change event updates components state", ->
     equal @publishCloud.state.published, false, "published starts off as false"
@@ -28,10 +29,10 @@ define [
     equal @publishCloud.state.published, true, "changing models locked changes it to true"
 
   test "clicking a published cloud opens restricted dialog", ->
-    @stub(React, 'render')
+    @stub(ReactDOM, 'render')
     Simulate.click(@publishCloud.refs.publishCloud.getDOMNode())
 
-    ok React.render.calledOnce, 'renders a component inside the dialog'
+    ok ReactDOM.render.calledOnce, 'renders a component inside the dialog'
 
   module 'PublishCloud Student View',
     setup: ->
@@ -41,10 +42,10 @@ define [
         model: @model
         userCanManageFilesForContext: false
 
-      @publishCloud = React.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
+      @publishCloud = ReactDOM.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
 
   test 'should display a non clickable restricted dates icon', ->
     equal @publishCloud.refs.publishCloud.props.onClick, undefined, 'does not have a click event'
@@ -58,10 +59,10 @@ define [
         model: new FilesystemObject(hidden: false, id: 42)
         userCanManageFilesForContext: true
 
-      @publishCloud = React.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
+      @publishCloud = ReactDOM.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
 
   test "when published is true, toggles it to false", ->
     @publishCloud.setState published: true
@@ -88,28 +89,28 @@ define [
       model: model
       userCanManageFilesForContext: true
 
-    @publishCloud = React.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
+    @publishCloud = ReactDOM.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
     equal @publishCloud.state.published, !model.get('locked'), "not locked is published"
     equal @publishCloud.state.restricted, false, "restricted should be false"
     equal @publishCloud.state.hidden, false, "hidden should be false"
-    React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
 
   test "restricted is true when lock_at/unlock_at is set", ->
     model = new FilesystemObject(hidden: false, lock_at: '123', unlock_at: '123', id: 42)
     props = model: model
 
-    @publishCloud = React.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
+    @publishCloud = ReactDOM.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
 
     equal @publishCloud.state.restricted, true, "restricted is true when lock_at/ulock_at is set"
-    React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
 
   module 'PublishCloud#extractStateFromModel'
 
   test "returns object that can be used to set state", ->
     model = new FilesystemObject(locked: true, hidden: true, lock_at: '123', unlock_at: '123', id: 42)
     props = model: model
-    @publishCloud = React.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
+    @publishCloud = ReactDOM.render(React.createElement(PublishCloud, props), $('#fixtures')[0])
 
     newModel = new FilesystemObject(locked: false, hidden: true, lock_at: null, unlock_at: null)
     deepEqual @publishCloud.extractStateFromModel(newModel), {hidden: true, published: true, restricted: false}, "returns object to set state with"
-    React.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(@publishCloud.getDOMNode().parentNode)

@@ -1,7 +1,8 @@
 define [
   'react'
+  'react-dom'
   'jsx/external_apps/components/TextAreaInput'
-], (React, TextAreaInput) ->
+], (React, ReactDOM, TextAreaInput) ->
 
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
@@ -19,7 +20,7 @@ define [
     })
 
   renderComponent = (data) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   getDOMNodes = (data) ->
     component = renderComponent(data)
@@ -29,7 +30,7 @@ define [
 
   module 'ExternalApps.TextAreaInput',
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'renders', ->
     data =

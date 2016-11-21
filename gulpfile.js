@@ -39,7 +39,7 @@ const STUFF_TO_REV = [
 ]
 
 
-gulp.task('rev', () => {
+gulp.task('rev', function(){
   var stuffToRev = STUFF_TO_REV;
   if(process.env.SKIP_JS_REV){
     // just get fonts and images
@@ -55,7 +55,7 @@ gulp.task('rev', () => {
   .pipe(gulp.dest(DIST))
 })
 
-gulp.task('watch', () => {
+gulp.task('watch', function(){
   gulp.watch(STUFF_TO_REV, ['rev'])
 })
 

@@ -1,10 +1,9 @@
 define [
   'react'
+  'react-dom'
   'jsx/external_apps/components/ConfigurationFormUrl'
-], (React, ConfigurationFormUrl) ->
+], (React, ReactDOM, ConfigurationFormUrl) ->
 
-  TestUtils = React.addons.TestUtils
-  Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   createElement = (data) ->
@@ -16,11 +15,11 @@ define [
     })
 
   renderComponent = (data) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   module 'ExternalApps.ConfigurationFormUrl',
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'isValid when not valid', ->
     data =

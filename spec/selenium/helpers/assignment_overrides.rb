@@ -79,19 +79,27 @@ module AssignmentOverridesSeleniumHelper
     wait_for_ajaximations
   end
 
-  def select_last_override_section(section_name)
+  def select_last_override_section(override_name)
     driver.switch_to.default_content
-    fj('.ic-tokeninput-input:last').send_keys(section_name)
+    fj('.ic-tokeninput-input:last').send_keys(override_name)
     wait_for_ajaximations
     fj(".ic-tokeninput-option:visible:last").click
     wait_for_ajaximations
   end
 
-  def select_first_override_section(section_name)
+  def select_first_override_section(override_name)
     driver.switch_to.default_content
-    fj('.ic-tokeninput-input:first').send_keys(section_name)
+    fj('.ic-tokeninput-input:first').send_keys(override_name)
     wait_for_ajaximations
     fj(".ic-tokeninput-option:visible:first").click
+    wait_for_ajaximations
+  end
+
+  def select_first_override_header(override_name)
+    driver.switch_to.default_content
+    fj('.ic-tokeninput-input:first').send_keys(override_name)
+    wait_for_ajaximations
+    fj(".ic-tokeninput-list [role='option']:visible:first").click
     wait_for_ajaximations
   end
 

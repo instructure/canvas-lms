@@ -7,7 +7,7 @@ $layout-modal-font-color:           $ic-font-color-dark;
 $footer-links-color:                lighten($ic-font-color-dark, 16);
 $footer-links-border-color:         lighten($ic-color-dark, 16);
 
-body:not(.full-width) .ic-app-container {
+body:not(.full-width) .ic-app-main-layout-vertical {
   // We want to add a max size to most pages in canvas
   // unless it's a full-width app
   max-width: 1366px;
@@ -43,7 +43,7 @@ body {
     }
   }
   &.embedded {
-    #application, #wrapper-container, #wrapper, #main {
+    #application, #wrapper, #main {
       height: 100%;
     }
     #main {
@@ -79,15 +79,6 @@ body {
   a:not([href]), a[href="#"], button:not([type]) {
     visibility: hidden !important;
   }
-}
-
-#wrapper-container {
-  margin-left: $ic-header-primary-width - 30;
-
-  body.primary-nav-expanded & {
-    margin-left: $ic-header-primary-width;
-  }
-  body.no-headers & { margin-left: 0; }
 }
 
 #main {
@@ -173,6 +164,8 @@ div.content_notice {
 
 iframe.tool_launch {
   min-height: 500px;
+  width: 100%;
+  height: 100%;
   border: none;
 }
 // implemented to make new profile page use flex for layout //

@@ -88,5 +88,9 @@ describe TurnitinApi::OutcomesResponseTransformer do
       expect(subject.originality_data['numeric']['max']).to eq 100
       expect(subject.originality_data['numeric']['score']).to eq 100
     end
+
+    it 'returns uploaded_at' do
+      expect(subject.uploaded_at).to eq '2015-10-24T19:48:40Z'
+    end
   end
 end

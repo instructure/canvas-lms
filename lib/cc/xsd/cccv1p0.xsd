@@ -104,6 +104,7 @@
       <xs:element name="position" type="xs:integer" minOccurs="0"/>
       <xs:element name="turnitin_enabled" type="xs:boolean" minOccurs="0"/>
       <xs:element name="turnitin_settings" type="xs:string" minOccurs="0"/>
+      <xs:element name="vericite_enabled" type="xs:boolean" minOccurs="0"/>
       <xs:element name="peer_review_count" type="xs:integer" minOccurs="0"/>
       <xs:element name="peer_reviews_assigned" type="xs:boolean" minOccurs="0"/>
       <xs:element name="peer_reviews" type="xs:boolean" minOccurs="0"/>
@@ -120,12 +121,26 @@
       <xs:element name="freeze_on_copy" type="xs:boolean" minOccurs="0"/>
       <xs:element name="muted" type="xs:boolean" minOccurs="0"/>
       <xs:element name="omit_from_final_grade" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="only_visible_to_overrides" type="xs:boolean" minOccurs="0"/>
       <xs:element name="saved_rubric_comments" minOccurs="0">
         <xs:complexType>
           <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:element name="comment" type="xs:string">
               <xs:complexType>
                 <xs:attribute name="criterion_id" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="assignment_overrides" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="override" type="xs:string">
+              <xs:complexType>
+                <xs:attribute name="set_type" type="xs:string" use="required"/>
+                <xs:attribute name="set_id" type="xs:string" use="required"/>
+                <xs:attribute name="title" type="xs:string" use="required"/>
               </xs:complexType>
             </xs:element>
           </xs:sequence>
@@ -521,6 +536,7 @@
         <xs:element name="cant_go_back" type="xs:boolean" minOccurs="0"/>
         <xs:element name="one_time_results" type="xs:boolean" minOccurs="0"/>
         <xs:element name="show_correct_answers_last_attempt" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="only_visible_to_overrides" type="xs:boolean" minOccurs="0"/>
         <xs:element name="assignment_group_identifierref" type="xs:string" minOccurs="0"/>
 
         <xs:element name="quiz_type" minOccurs="0" default="practice_quiz">
@@ -541,6 +557,20 @@
               <xs:enumeration value="keep_highest"/>
             </xs:restriction>
           </xs:simpleType>
+        </xs:element>
+
+        <xs:element name="assignment_overrides" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="override" type="xs:string">
+                <xs:complexType>
+                  <xs:attribute name="set_type" type="xs:string" use="required"/>
+                  <xs:attribute name="set_id" type="xs:string" use="required"/>
+                  <xs:attribute name="title" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
         </xs:element>
 
       </xs:all>

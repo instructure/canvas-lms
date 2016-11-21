@@ -3,6 +3,7 @@ require_relative 'spec_components_assignable_module'
 module SpecComponents
   class Assignment
     include Assignable
+    include Factories
 
     def initialize(opts)
       course = opts[:course]

@@ -1,12 +1,13 @@
 define([
   'react',
+  'react-dom',
   'jsx/grading/gradingStandardCollection',
   'jsx/grading/gradingPeriodCollection',
   'jquery',
   'i18n!external_tools',
   'jquery.instructure_misc_plugins'
 ],
-function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n) {
+function(React, ReactDOM, GradingStandardCollection, GradingPeriodCollection, $, I18n) {
 
   var TabContainer = React.createClass({
 
@@ -15,7 +16,7 @@ function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n) {
     },
 
     componentDidMount: function() {
-      $(React.findDOMNode(this)).children(".ui-tabs-minimal").tabs();
+      $(ReactDOM.findDOMNode(this)).children(".ui-tabs-minimal").tabs();
     },
 
     render: function () {

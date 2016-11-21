@@ -12,12 +12,8 @@ module ActiveRecord
           end
 
           def column(type)
-            if CANVAS_RAILS4_0
-              PostgreSQLColumn.new(nil, 1, 1, type)
-            else
-              sql_type = @conn.type_to_sql(type)
-              PostgreSQLColumn.new(nil, 1, @conn.lookup_cast_type(sql_type), sql_type)
-            end
+            sql_type = @conn.type_to_sql(type)
+            PostgreSQLColumn.new(nil, 1, @conn.lookup_cast_type(sql_type), sql_type)
           end
 
           describe "Infinity and NaN" do
@@ -36,7 +32,7 @@ module ActiveRecord
             it 'properly quotes Infinity in a datetime column' do
               infinity = 1.0/0
               c = column('datetime')
-              assert_equal (CANVAS_RAILS4_0 ? "'infinity'" : "'Infinity'"), @conn.quote(infinity, c)
+              assert_equal ("'Infinity'"), @conn.quote(infinity, c)
             end
           end
 

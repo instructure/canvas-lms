@@ -20,6 +20,12 @@
               <br><span class="event-details-actual-context">{{actualContextInfo.name}}</span>
             {{/if}}
           </td>
+          {{#if isGreaterThanOne}}
+            <td title="{{list contextsName}}">
+              {{#t}} + {{contextsCount}} more{{/t}}
+              <span class="screenreader-only">{{list contextsName}}</span>
+            </td>
+          {{/if}}
         </tr>
       {{/if}}
       {{#if location_name}}

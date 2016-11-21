@@ -109,7 +109,7 @@ class SectionsController < ApplicationController
 
       includes = Array(params[:include])
 
-      sections = Api.paginate(@context.active_course_sections, self, api_v1_course_sections_url)
+      sections = Api.paginate(@context.active_course_sections.order(CourseSection.best_unicode_collation_key('name')), self, api_v1_course_sections_url)
 
       render :json => sections_json(sections, @current_user, session, includes)
     end

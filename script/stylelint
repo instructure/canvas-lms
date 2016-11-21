@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+$:.push File.expand_path("../../gems/dr_diff/lib", __FILE__)
+require 'dr_diff'
+require 'json'
+
+def pretty_comment(comment)
+  message = ""
+  message += "[#{comment[:severity]}]".colorize(:yellow)
+  message += " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
+  message += " => #{comment[:message].colorize(:green)}"
+  puts message
+end
+
+def gerrit_patchset?
+  !!ENV['GERRIT_PATCHSET_REVISION']
+end
+
+env_sha = ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION']
+
+dr_diff = DrDiff::Manager.new(sha: env_sha)
+STYLELINT_FILE_REGEX = /\.s?css$/
+scss_files = dr_diff.files(STYLELINT_FILE_REGEX)
+
+if scss_files.size == 0
+  puts "No scss or css file changes found!"
+  exit 0
+end
+
+comments = dr_diff.comments(format: "stylelint",
+                            command: "node_modules/.bin/stylelint #{scss_files.join(' ')}",
+                            include_git_dir_in_output: !gerrit_patchset?)
+
+unless comments.size >  0
+  puts "-- -- -- -- -- -- -- -- -- -- --"
+  puts "No relevant scss or css errors found!"
+  puts "-- -- -- -- -- -- -- -- -- -- --"
+  exit(0)
+end
+
+if gerrit_patchset?
+  require 'shellwords'
+  `gergich comment #{Shellwords.escape(comments.to_json)}`
+else
+  require 'colorize'
+  comments.each { |comment| pretty_comment(comment) }
+end
+
+exit(1)

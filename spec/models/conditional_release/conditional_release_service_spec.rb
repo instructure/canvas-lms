@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConditionalRelease::Service do
   Service = ConditionalRelease::Service
@@ -79,10 +80,10 @@ describe ConditionalRelease::Service do
       stub_config({
         protocol: 'foo', host: 'bar',
         create_account_path: 'some/path',
-        edit_rule_path: 'some/other/path'
+        editor_path: 'some/other/path'
       })
       expect(Service.create_account_url).to eq 'foo://bar/some/path'
-      expect(Service.edit_rule_url).to eq 'foo://bar/some/other/path'
+      expect(Service.editor_url).to eq 'foo://bar/some/other/path'
     end
 
     it 'requires feature flag to be enabled' do
@@ -119,7 +120,7 @@ describe ConditionalRelease::Service do
       stub_config({
         protocol: 'foo', host: 'bar', rules_path: 'rules'
       })
-      Service.stubs(:rules_for).returns([])
+      Service.stubs(:active_rules).returns([])
       course_with_student_logged_in(active_all: true)
     end
 
@@ -171,12 +172,20 @@ describe ConditionalRelease::Service do
       expect(cr_env[:assignment][:grading_scheme]).to be_nil
     end
 
-    it 'includes a relevant rule if include_rule is true' do
+    it 'includes a relevant rule if includes :rule' do
       assignment_model course: @course
       Service.stubs(:rule_triggered_by).returns(nil)
-      env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment, include_rule: true)
+      env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment, includes: [:rule])
       cr_env = env[:CONDITIONAL_RELEASE_ENV]
       expect(cr_env).to have_key :rule
+    end
+
+    it 'includes a active rules if includes :active_rules' do
+      assignment_model course: @course
+      Service.stubs(:rule_triggered_by).returns(nil)
+      env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment, includes: [:active_rules])
+      cr_env = env[:CONDITIONAL_RELEASE_ENV]
+      expect(cr_env).to have_key :active_rules
     end
   end
 
@@ -290,7 +299,34 @@ describe ConditionalRelease::Service do
     end
   end
 
-  describe 'with active_rules' do
+  describe 'active_rules' do
+    before do
+      enable_service
+    end
+
+    it 'caches a successful http response' do
+      enable_cache do
+        course_with_teacher
+        CanvasHttp.expects(:get).once.returns(stub({ code: '200', body: [].to_json }))
+        Canvas::Errors.expects(:capture).never
+        Service.active_rules @course, @user, nil
+        rules = Service.active_rules @course, @user, nil
+        expect(rules).to eq []
+      end
+    end
+
+    it 'does not cache an error http response' do
+      course_with_teacher
+      enable_cache do
+        CanvasHttp.expects(:get).twice.returns(stub({ code: '500' }))
+        Canvas::Errors.expects(:capture).twice.with(instance_of(ConditionalRelease::ServiceError), anything)
+        Service.active_rules @course, @user, nil
+        Service.active_rules @course, @user, nil
+      end
+    end
+  end
+
+  context 'with active_rules' do
     before(:each) do
       Service.stubs(:enabled_in_context?).returns(true)
       Service.stubs(:jwt_for).returns(:jwt)
@@ -298,20 +334,52 @@ describe ConditionalRelease::Service do
 
     before(:once) do
       course_with_teacher
-      @a, @b, @c, @d = 4.times.map { assignment_model course: @course }
+      @a1 = assignment_model course: @course, grading_type: 'points', points_possible: 20
+      @a2 = assignment_model course: @course, grading_type: 'letter_grade', points_possible: 30
+      @a3 = assignment_model course: @course, grading_type: 'percent', points_possible: 25
+      @a4 = assignment_model course: @course, grading_type: 'points', points_possible: 35
     end
 
     let_once(:default_rules) do
       [
-        {id: 1, trigger_assignment: @a.id.to_s, scoring_ranges: [{ assignment_sets: [
+        {id: 1, trigger_assignment: @a1.id.to_s, scoring_ranges: [{ assignment_sets: [
           { assignments: [
-            { assignment_id: @b.id.to_s },
-            { assignment_id: @c.id.to_s }]}]}]},
-        {id: 2, trigger_assignment: @b.id.to_s, scoring_ranges: [{ assignment_sets: [
+            { assignment_id: @a2.id.to_s },
+            { assignment_id: @a3.id.to_s }]}]}]},
+        {id: 2, trigger_assignment: @a2.id.to_s, scoring_ranges: [{ assignment_sets: [
           { assignments: [
-            { assignment_id: @c.id.to_s }]}]}]},
-        {id: 3, trigger_assignment: @c.id.to_s}
+            { assignment_id: @a3.id.to_s }]}]}]},
+        {id: 3, trigger_assignment: @a3.id.to_s}
       ].as_json
+    end
+
+    context 'assignment data' do
+      before(:each) do
+        Service.stubs(:enabled_in_context?).returns(true)
+        CanvasHttp.expects(:get).once.returns stub({ code: '200', body: default_rules.to_json })
+      end
+
+      let(:rules) do
+        Service.active_rules(@course, @teacher, @session)
+      end
+
+      it 'includes correct points' do
+        expect(rules[0]['trigger_assignment_model'][:points_possible]).to be 20.0
+        expect(rules[1]['trigger_assignment_model'][:points_possible]).to be 30.0
+      end
+
+      it 'includes correct grading type' do
+        expect(rules[0]['trigger_assignment_model'][:grading_type]).to eq 'points'
+        expect(rules[1]['trigger_assignment_model'][:grading_type]).to eq 'letter_grade'
+      end
+
+      it 'includes grading scheme only for correct grading type' do
+        expect(rules[0]['trigger_assignment_model'][:grading_scheme]).to be nil
+        expect(rules[1]['trigger_assignment_model'][:grading_scheme]).to eq({
+          "A"=>0.94, "A-"=>0.9, "B+"=>0.87, "B"=>0.84, "B-"=>0.8, "C+"=>0.77,
+          "C"=>0.74, "C-"=>0.7, "D+"=>0.67, "D"=>0.64, "D-"=>0.61, "F"=>0.0
+        })
+      end
     end
 
     describe 'rule_triggered_by' do
@@ -319,10 +387,10 @@ describe ConditionalRelease::Service do
         Rails.cache.write ['conditional_release', 'active_rules', @course.global_id].cache_key, rules
       end
 
-      it 'caches the response of any http call' do
+      it 'caches the result of a successful http call' do
         enable_cache do
-          CanvasHttp.expects(:get).once.returns stub({ body: default_rules.to_json })
-          Service.rule_triggered_by(@a, @teacher, nil)
+          CanvasHttp.expects(:get).once.returns stub({ code: '200', body: default_rules.to_json })
+          Service.rule_triggered_by(@a1, @teacher, nil)
         end
       end
 
@@ -330,28 +398,28 @@ describe ConditionalRelease::Service do
         it 'returns a matching rule' do
           enable_cache do
             cache_active_rules
-            expect(Service.rule_triggered_by(@a, @teacher, nil)['id']).to eq 1
-            expect(Service.rule_triggered_by(@c, @teacher, nil)['id']).to eq 3
+            expect(Service.rule_triggered_by(@a1, @teacher, nil)['id']).to eq 1
+            expect(Service.rule_triggered_by(@a3, @teacher, nil)['id']).to eq 3
           end
         end
 
         it 'returns nil if no rules are matching' do
           enable_cache do
             cache_active_rules
-            expect(Service.rule_triggered_by(@d, @teacher, nil)).to be nil
+            expect(Service.rule_triggered_by(@a4, @teacher, nil)).to be nil
           end
         end
       end
 
       it 'returns nil without making request if no assignment is provided' do
-        CanvasHttp.stubs(:get).raises 'should not generate request'
+        CanvasHttp.expects(:get).never
         Service.rule_triggered_by(nil, @teacher, nil)
       end
 
       it 'returns nil without making request if service is not enabled' do
         Service.stubs(:enabled_in_context?).returns(false)
-        CanvasHttp.stubs(:get).raises 'should not generate request'
-        Service.rule_triggered_by(@a, @teacher, nil)
+        CanvasHttp.expects(:get).never
+        Service.rule_triggered_by(@a1, @teacher, nil)
       end
     end
 
@@ -362,20 +430,20 @@ describe ConditionalRelease::Service do
 
       it 'caches the calculation of the reverse index' do
         enable_cache do
-          Service.rules_assigning(@a, @teacher, nil)
+          Service.rules_assigning(@a1, @teacher, nil)
           Service.stubs(:active_rules).raises 'should not refetch rules'
-          Service.rules_assigning(@b, @teacher, nil)
+          Service.rules_assigning(@a2, @teacher, nil)
         end
       end
 
       it 'returns all rules which matched assignments' do
-        expect(Service.rules_assigning(@b, @teacher, nil).map{|r| r['id']}).to eq [1]
-        expect(Service.rules_assigning(@c, @teacher, nil).map{|r| r['id']}).to eq [1, 2]
+        expect(Service.rules_assigning(@a2, @teacher, nil).map{|r| r['id']}).to eq [1]
+        expect(Service.rules_assigning(@a3, @teacher, nil).map{|r| r['id']}).to eq [1, 2]
       end
 
       it 'returns nil if no rules matched assignments' do
-        expect(Service.rules_assigning(@a, @teacher, nil)).to eq nil
-        expect(Service.rules_assigning(@d, @teacher, nil)).to eq nil
+        expect(Service.rules_assigning(@a1, @teacher, nil)).to eq nil
+        expect(Service.rules_assigning(@a4, @teacher, nil)).to eq nil
       end
     end
   end
@@ -387,20 +455,22 @@ describe ConditionalRelease::Service do
 
     before(:once) do
       course_with_student_logged_in
-      assignment_model course: @course
+      @a1, @a2, @a3 = 3.times.map { assignment_model course: @course }
     end
 
     def expect_cyoe_request(code, assignments = nil)
-      assignments = Array.wrap(assignments)
+      a3 = @a3
       response = stub() do
         expects(:code).returns(code)
         unless assignments.nil?
+          assignments = Array.wrap(assignments)
           assignments_json = assignments.map do |a|
             { id: a.id, assignment_id: a.id }
           end
           expects(:body).returns([
             { id: 1, trigger_assignment: 2, assignment_sets: [
-              { id: 11, assignments: assignments_json }
+              { id: 11, assignments: assignments_json },
+              { id: 12, assignments: [{ id: a3.id, assignment_id: a3.id }]}
             ]}
           ].to_json)
         end
@@ -408,43 +478,129 @@ describe ConditionalRelease::Service do
       CanvasHttp.expects(:post).once.returns(response)
     end
 
+    let(:rules) { Service.rules_for(@course, @student, [], nil) }
+    let(:assignments0) { rules[0][:assignment_sets][0][:assignments] }
+    let(:models0) { assignments0.map{|a| a[:model]} }
+
     it 'returns a list of rules' do
-      expect_cyoe_request '200', @a
-      rules = Service.rules_for(@course, @student, [], nil)
+      expect_cyoe_request '200', @a1
       expect(rules.length > 0)
-      assignment = rules[0][:assignment_sets][0][:assignments][0]
-      expect(assignment[:model]).to eq @a
+      expect(models0).to eq [@a1]
     end
 
-    it 'uses the cache' do
-      enable_cache do
-        expect_cyoe_request '200', @a
-        Service.rules_for(@course, @student, [], nil)
-        Service.rules_for(@course, @student, [], nil)
+    it 'filters missing assignments from an assignment set' do
+      expect_cyoe_request '200', [@a1, @a2, @a3]
+      @a1.destroy!
+      expect(models0).to eq [@a2, @a3]
+    end
+
+    it 'filters assignment sets with no assignments' do
+      expect_cyoe_request '200', [@a1, @a2]
+      @a1.destroy!
+      @a2.destroy!
+      expect(rules[0][:assignment_sets].length).to eq 1
+      expect(models0).to eq [@a3]
+    end
+
+    it 'does not filter rules with no follow on assignments' do
+      expect_cyoe_request '200', [@a1, @a2]
+      @a1.destroy!
+      @a2.destroy!
+      @a3.destroy!
+      expect(rules.length).to eq 1
+      expect(rules[0][:assignment_sets].length).to eq 0
+    end
+
+    it 'handles an http error with logging and defaults' do
+      expect_cyoe_request '404'
+      Canvas::Errors.expects(:capture).with(instance_of(ConditionalRelease::ServiceError), anything)
+      expect(rules).to eq []
+    end
+
+    it 'handles a network exception with logging and defaults' do
+      CanvasHttp.expects(:post).throws('something terrible')
+      Canvas::Errors.expects(:capture).with(instance_of(ConditionalRelease::ServiceError), anything)
+      expect(rules).to eq []
+    end
+
+    context 'caching' do
+      it 'uses the cache' do
+        enable_cache do
+          expect_cyoe_request '200', @a1
+          Service.rules_for(@course, @student, [], nil)
+          Service.rules_for(@course, @student, [], nil)
+        end
+      end
+
+      it 'does not use the cache if cache cleared manually' do
+        enable_cache do
+          expect_cyoe_request '200', @a1
+          Service.rules_for(@course, @student, [], nil)
+
+          Service.clear_rules_cache_for(@course, @student)
+
+          expect_cyoe_request '200', @a1
+          Service.rules_for(@course, @student, [], nil)
+        end
+      end
+
+      it 'does not use the cache if assignments updated' do
+        enable_cache do
+          expect_cyoe_request '200', @a1
+          Service.rules_for(@course, @student, [], nil)
+
+          @a1.title = 'updated'
+          @a1.save!
+
+          expect_cyoe_request '200', @a1
+          Service.rules_for(@course, @student, [], nil)
+        end
+      end
+
+      it 'does not store an error response in the cache' do
+        enable_cache do
+          expect_cyoe_request '404'
+          Service.rules_for(@course, @student, [], nil)
+
+          expect_cyoe_request '404'
+          Service.rules_for(@course, @student, [], nil)
+        end
       end
     end
 
-    it 'does not use the cache if cache cleared manually' do
-      enable_cache do
-        expect_cyoe_request '200', @a
-        Service.rules_for(@course, @student, [], nil)
+    context 'submissions' do
+      def submissions_hash_for(submissions)
+        all_the_submissions = Array.wrap(submissions).map do |submission|
+          submission.slice(:id, :assignment_id, :score)
+            .merge(points_possible: submission.assignment.points_possible)
+            .symbolize_keys
+        end
 
-        Service.clear_rules_cache_for(@course, @student)
-
-        expect_cyoe_request '200', @a
-        Service.rules_for(@course, @student, [], nil)
+        { submissions: all_the_submissions }
       end
-    end
 
-    it 'does not use the cache if assignments updated' do
-      enable_cache do
-        expect_cyoe_request '200', @a
-        Service.rules_for(@course, @student, [], nil)
+      context 'for cross-shard users' do
+        specs_require_sharding
 
-        @a.title = 'updated'
-        @a.save!
+        it 'selects submissions' do
+          course_with_student(active_all: true)
+          @shard1.activate do
+            course_with_student(account: Account.create!, user: @student)
+            sub = submission_model(course: @course, user: @student)
+            Service.expects(:request_rules)
+              .with(anything(), submissions_hash_for(sub))
+            Service.rules_for(@course, @student, [], nil)
+          end
+        end
+      end
 
-        expect_cyoe_request '200', @a
+      it 'includes only submissions for the course' do
+        course_with_student(active_all: true)
+        submission_model(course: @course, user: @student)
+        course_with_student(user: @student)
+        sub = submission_model(course: @course, user: @student)
+        Service.expects(:request_rules)
+          .with(anything(), submissions_hash_for(sub))
         Service.rules_for(@course, @student, [], nil)
       end
     end

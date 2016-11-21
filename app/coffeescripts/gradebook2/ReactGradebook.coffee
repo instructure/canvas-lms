@@ -1,5 +1,6 @@
 define [
   'react'
+  'react-dom'
   'compiled/util/round'
   'compiled/views/InputFilterView'
   'i18n!gradebook2'
@@ -39,7 +40,7 @@ define [
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
   'vendor/jquery.ba-tinypubsub'
-], (React, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _,
+], (React, ReactDOM, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _,
   userSettings, Spinner, htmlEscape, PostGradesStore, PostGradesApp,
   columnHeaderTemplate, SectionMenuView, GradingPeriodMenuView,
   GradebookConstants, GradebookToolbarActions, StudentEnrollmentsActions,
@@ -97,7 +98,7 @@ define [
       app = React.createElement(PostGradesApp, store: @postGradesStore)
       $placeholder = $('.post-grades-placeholder')
       if ($placeholder.length > 0)
-        React.render(app, $placeholder[0])
+        ReactDOM.render(app, $placeholder[0])
 
     initSettingsDropdown: () ->
       preferences = @getInitialToolbarPreferences()

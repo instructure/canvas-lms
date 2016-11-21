@@ -266,7 +266,7 @@ class RoleOverridesController < ApplicationController
   #     manage_students                  -- [ TAD ] Add/remove students for the course
   #     manage_user_notes                -- [ TA  ] Manage faculty journal entries
   #     manage_rubrics                   -- [ TAD ] Edit assessing rubrics
-  #     manage_wiki                      -- [ TADo] Manage wiki (add / edit / delete pages)
+  #     manage_wiki                      -- [ TADo] Manage (add / edit / delete) pages
   #     read_forum                       -- [STADO] View discussions
   #     moderate_forum                   -- [sTADo] Moderate discussions (delete/edit others' posts, lock topics)
   #     post_to_forum                    -- [STADo] Post to discussions
@@ -279,6 +279,7 @@ class RoleOverridesController < ApplicationController
   #     send_messages_all                -- [sTADo] Send messages to the entire class
   #     view_all_grades                  -- [ TAd ] View all grades
   #     view_group_pages                 -- [sTADo] View the group pages of all student groups
+  #     lti_add_edit                     -- [ TAD ] LTI add and edit
   #
   #   Some of these permissions are applicable only for roles on the site admin
   #   account, on a root account, or for course-level roles with a particular base role type;

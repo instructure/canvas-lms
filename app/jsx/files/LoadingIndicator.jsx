@@ -1,7 +1,7 @@
 define([
   'i18n!react_files',
   'react'
-], function (I18n, React, withReactElement) {
+], function (I18n, React) {
 
   var LoadingIndicator = React.createClass({
     displayName: 'LoadingIndicator',

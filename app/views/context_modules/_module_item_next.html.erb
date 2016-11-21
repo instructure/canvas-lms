@@ -187,6 +187,8 @@
           data-course-id="<%= module_item && module_item.context_id %>"
           data-module-id="<%= module_item && module_item.context_module_id %>"
           data-module-item-id="<%= module_item && module_item.id %>"
+          data-assignment-id="<%= module_item && module_item.assignment.try(:id) %>"
+          data-is-cyoeable="<%= module_item && cyoe_able?(module_item) %>"
           data-published="<%= module_item && item_data[:published_status] == 'published' %>"
           data-publishable="<%= module_item_publishable?(module_item) %>"
           data-unpublishable="<%= module_item_unpublishable?(module_item) %>"
@@ -216,9 +218,6 @@
                  title="<%= t('Move this item') %>"
               ><%= t("Move to...") %></a>
             </li>
-            <% if @is_cyoe_on && (module_item && cyoe_able?(module_item)) %>
-            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/edit_mastery_paths" class="mastery_paths_link" title="<%= t('Edit item mastery paths') %>"><i class="icon-mastery-path"></i> <%= t('Mastery Paths') %></a></li>
-            <% end %>
             <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
             <% menu_type_to_class.each do |menu_type, content_class| %>
               <% if !module_item || module_item.content.is_a?(content_class) %>

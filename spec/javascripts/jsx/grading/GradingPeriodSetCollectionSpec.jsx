@@ -456,7 +456,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 

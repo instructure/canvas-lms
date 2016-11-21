@@ -1,8 +1,9 @@
 define [
   'react'
+  'react-dom'
   'jsx/assignments/FlashMessageHolder'
   'jsx/assignments/store/configureStore'
-], (React, FlashMessageHolder, configureStore) ->
+], (React, ReactDOM, FlashMessageHolder, configureStore) ->
 
   TestUtils = React.addons.TestUtils
 
@@ -15,11 +16,11 @@ define [
         onError: ->
         onSuccess: ->
 
-      @flashMessageHolder = React.render(React.createElement(FlashMessageHolder, @props), document.getElementById('fixtures'))
+      @flashMessageHolder = ReactDOM.render(React.createElement(FlashMessageHolder, @props), document.getElementById('fixtures'))
 
     teardown: ->
       @props = null
-      React.unmountComponentAtNode(document.getElementById('fixtures'))
+      ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 
 
   test 'renders nothing', ->
@@ -31,7 +32,7 @@ define [
     @props.message = 'error'
     @props.time = 125
     @props.onError = -> called = true
-    React.render(React.createElement(FlashMessageHolder, @props), document.getElementById('fixtures'))
+    ReactDOM.render(React.createElement(FlashMessageHolder, @props), document.getElementById('fixtures'))
 
     ok called, 'called error'
 
@@ -42,7 +43,7 @@ define [
     @props.message = 'success'
     @props.time = 125
     @props.onSuccess = -> called = true
-    React.render(React.createElement(FlashMessageHolder, @props), document.getElementById('fixtures'))
+    ReactDOM.render(React.createElement(FlashMessageHolder, @props), document.getElementById('fixtures'))
 
     ok called, 'called success'
 
@@ -54,7 +55,7 @@ define [
     @props.time = 1
     @props.onSuccess = -> called = true
     @props.onError = -> errCalled = true
-    React.render(React.createElement(FlashMessageHolder, @props), document.getElementById('fixtures'))
+    ReactDOM.render(React.createElement(FlashMessageHolder, @props), document.getElementById('fixtures'))
 
 
 

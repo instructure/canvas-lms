@@ -2,6 +2,7 @@ define [
   'jquery'
   'underscore'
   'react'
+  'react-dom'
   'react-modal'
   'jsx/shared/ColorPicker'
   'compiled/userSettings'
@@ -14,7 +15,7 @@ define [
   'compiled/jquery.kylemenu'
   'jquery.instructure_misc_helpers'
   'vendor/jquery.ba-tinypubsub'
-], ($, _, React, ReactModal, ColorPickerComponent, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource, forceScreenreaderToReparse) ->
+], ($, _, React, ReactDOM, ReactModal, ColorPickerComponent, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource, forceScreenreaderToReparse) ->
   ColorPicker = React.createFactory(ColorPickerComponent)
 
   class VisibleContextManager
@@ -30,7 +31,7 @@ define [
       @contexts or= availableContexts
 
       @contexts = _.intersection(@contexts, availableContexts)
-      @contexts = @contexts.slice(0, 10)
+      @contexts = @contexts.slice(0, ENV.CALENDAR.VISIBLE_CONTEXTS_LIMIT)
 
       @notify()
 
@@ -55,7 +56,7 @@ define [
         @contexts.splice index, 1
       else
         @contexts.push context
-        @contexts.shift() if @contexts.length > 10
+        @contexts.shift() if @contexts.length > ENV.CALENDAR.VISIBLE_CONTEXTS_LIMIT
       @notifyOnChange()
 
     notifyOnChange: =>
@@ -117,9 +118,9 @@ define [
       assetString = $(this).closest('li').data('context')
 
       # ensures previously picked color clears
-      React.unmountComponentAtNode($('#color_picker_holder')[0]);
+      ReactDOM.unmountComponentAtNode($('#color_picker_holder')[0])
 
-      React.render(ColorPicker({
+      ReactDOM.render(ColorPicker({
         isOpen: true
         positions: positions
         assetString: assetString,
@@ -127,11 +128,11 @@ define [
           forceScreenreaderToReparse($('#application')[0])
         afterUpdateColor: (color) =>
           color = '#' + color
-          $existingStyles = $('#calendar_color_style_overrides');
+          $existingStyles = $('#calendar_color_style_overrides')
           $newStyles = $('<style>')
           $newStyles.text ".group_#{assetString},.group_#{assetString}:hover,.group_#{assetString}:focus{color: #{color}; border-color: #{color}; background-color: #{color};}"
           $existingStyles.append($newStyles)
-      }), $('#color_picker_holder')[0]);
+      }), $('#color_picker_holder')[0])
 
     $skipLink.on 'click', (e) ->
       e.preventDefault()

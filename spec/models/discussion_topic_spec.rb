@@ -1658,6 +1658,37 @@ describe DiscussionTopic do
     end
   end
 
+  describe "locked by context module" do
+    before(:once) do
+      discussion_topic_model(context: @course)
+      @module = @course.context_modules.create!(name: 'some module')
+      @module.add_item(type: 'discussion_topic', id: @topic.id)
+      @module.unlock_at = 2.months.from_now
+      @module.save!
+      @topic.reload
+    end
+
+    it "stays visible_for? student even when locked by module" do
+      expect(@topic.visible_for?(@student)).to be_truthy
+    end
+
+    it "is locked_for? students when locked by module" do
+      expect(@topic.locked_for?(@student, deep_check_if_needed: true)).to be_truthy
+    end
+
+    describe "reject_context_module_locked_topics" do
+      it "filters module locked topics for students" do
+        topics = DiscussionTopic.reject_context_module_locked_topics([@topic], @student)
+        expect(topics).to be_empty
+      end
+
+      it "does not filter module locked topics for teachers" do
+        topics = DiscussionTopic.reject_context_module_locked_topics([@topic], @teacher)
+        expect(topics).not_to be_empty
+      end
+    end
+  end
+
   describe 'entries_for_feed' do
     before(:once) do
       @topic = @course.discussion_topics.create!(user: @teacher, message: 'topic')

@@ -41,6 +41,10 @@ module LiveEvents
     require 'live_events/client'
     require 'live_events/async_worker'
 
+    def get_context
+      Thread.current[:live_events_ctx].try(:clone)
+    end
+
     # Set (on the current thread) the context to be used for future calls to post_event.
     def set_context(ctx)
       Thread.current[:live_events_ctx] = ctx

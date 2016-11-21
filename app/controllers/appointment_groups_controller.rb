@@ -237,10 +237,7 @@ class AppointmentGroupsController < ApplicationController
   #   "reserved_times":: the event id, start time and end time of reservations
   #                      the current user has made)
   def index
-    unless request.format == :json
-      anchor = calendar_fragment :view_name => :scheduler
-      return redirect_to calendar2_url(:anchor => anchor)
-    end
+    return web_index unless request.format == :json
 
     contexts = params[:context_codes] if params.include?(:context_codes)
 
@@ -350,8 +347,7 @@ class AppointmentGroupsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless contexts.present?
 
     publish = value_to_boolean(params[:appointment_group].delete(:publish))
-    params[:appointment_group][:contexts] = contexts
-    @group = AppointmentGroup.new(params[:appointment_group])
+    @group = AppointmentGroup.new(appointment_group_params.merge(:contexts => contexts))
     @group.update_contexts_and_sub_contexts
     if authorized_action(@group, @current_user, :manage)
       if @group.save
@@ -375,10 +371,7 @@ class AppointmentGroupsController < ApplicationController
   #   "appointments":: will always be returned
   def show
     if authorized_action(@group, @current_user, :read)
-      unless request.format == :json
-        anchor = calendar_fragment :view_name => :scheduler, :appointment_group_id => @group.id
-        return redirect_to calendar2_url(:anchor => anchor)
-      end
+      return web_show unless request.format == :json
 
       render :json => appointment_group_json(@group, @current_user, session,
                                              :include => ((params[:include] || []) | ['appointments']),
@@ -393,6 +386,9 @@ class AppointmentGroupsController < ApplicationController
         @page_title = t('Edit %{title}', {title: @group.title})
         js_env({
           :APPOINTMENT_GROUP_ID => @group.id,
+          :CALENDAR => {
+            MAX_GROUP_CONVERSATION_SIZE: 100,
+          }
         })
         js_bundle :calendar_appointment_group_edit
         css_bundle :calendar_appointment_group_edit
@@ -466,7 +462,7 @@ class AppointmentGroupsController < ApplicationController
     @group.contexts = contexts if contexts
     if authorized_action(@group, @current_user, :update)
       publish = params[:appointment_group].delete(:publish) == "1"
-      if @group.update_attributes(params[:appointment_group])
+      if (publish && params[:appointment_group].blank?) || @group.update_attributes(appointment_group_params)
         @group.publish! if publish
         render :json => appointment_group_json(@group, @current_user, session)
       else
@@ -524,6 +520,33 @@ class AppointmentGroupsController < ApplicationController
     participants('Group'){ |g| group_json(g, @current_user, session) }
   end
 
+  # @API Get next appointment
+  #
+  # Return the next appointment available to sign up for. The appointment
+  # is returned in a one-element array. If no future appointments are
+  # available, an empty array is returned.
+  #
+  # @argument appointment_group_ids[] [String]
+  #   List of ids of appointment groups to search.
+  #
+  # @returns [CalendarEvent]
+  def next_appointment
+    ag_scope = AppointmentGroup.current.reservable_by(@current_user)
+    ids = Array(params[:appointment_group_ids])
+    ag_scope = ag_scope.where(id: ids) if ids.any?
+    # FIXME this could be a lot faster if we didn't look at eligibility to sign up.
+    # since the UI only cares about the date to jump to, it might not make a difference in many cases
+    events = ag_scope.preload(:appointments => :child_events).to_a.map do |ag|
+      ag.appointments.detect do |appointment|
+        appointment.child_events_for(@current_user).empty? &&
+          (appointment.participants_per_appointment.nil? ||
+           appointment.child_events.count < appointment.participants_per_appointment)
+      end
+    end.compact
+    render :json => events.sort_by(&:start_at)[0..0].map { |event|
+      calendar_event_json(event, @current_user, session)
+    }
+  end
 
   protected
 
@@ -551,5 +574,43 @@ class AppointmentGroupsController < ApplicationController
   def get_appointment_group
     @group = AppointmentGroup.find(params[:id].to_i)
     @context = @group.contexts_for_user(@current_user).first # FIXME?
+  end
+
+  def appointment_group_params
+    strong_params.require(:appointment_group).permit(:title, :description, :location_name, :location_address, :participants_per_appointment,
+      :min_appointments_per_participant, :max_appointments_per_participant, :participant_visibility, :cancel_reason,
+      :sub_context_codes => [], :new_appointments => strong_anything)
+  end
+
+  def web_index
+    anchor = if @domain_root_account.feature_enabled?(:better_scheduler)
+      # start with the first reservable appointment group
+      group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
+      calendar_fragment :view_name => :agenda, :view_start => group && group.start_at.strftime('%Y-%m-%d')
+    else
+      calendar_fragment :view_name => :scheduler
+    end
+    return redirect_to calendar2_url(:anchor => anchor)
+  end
+
+  def web_show
+    anchor = if @domain_root_account.feature_enabled?(:better_scheduler)
+      args = {}
+      if params[:find_appointment]
+        # start at the appointment group; enter find-appointment mode for a relevant course
+        args[:view_start] = @group.start_at.strftime('%Y-%m-%d')
+        course_id = @group.appointment_group_contexts.where(context_type: 'Course', context_id: @current_user.student_enrollments.pluck(:course_id)).pluck(:context_id).first
+        args[:find_appointment] = "course_#{course_id}"
+      else
+        # start at the appointment event, or the group start if no event is given
+        event = params[:event_id] && CalendarEvent.find_by_id(params[:event_id])
+        event = nil unless event && event.grants_right?(@current_user, :read)
+        args[:view_start] = (event || @group).start_at.strftime('%Y-%m-%d')
+      end
+      calendar_fragment({ :view_name => :agenda }.merge(args))
+    else
+      calendar_fragment :view_name => :scheduler, :appointment_group_id => @group.id
+    end
+    return redirect_to calendar2_url(:anchor => anchor)
   end
 end

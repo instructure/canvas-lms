@@ -99,6 +99,10 @@ describe LocaleSelection do
       @course.save
     end
 
+    after do
+      I18n.config.clear_available_locales_set
+    end
+
     it "should use the default locale if there is no other context" do
       expect(ls.infer_locale).to eql('en')
       expect(ls.infer_locale(:root_account => @root_account)).to eql('en')

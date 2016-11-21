@@ -19,6 +19,7 @@ module Turnitin
     def process
       attachment = create_attachment
       submission = @assignment.submit_homework(@user, attachments:[attachment], submission_type: 'online_upload')
+      submission.submitted_at = turnitin_client.uploaded_at if turnitin_client.uploaded_at
       asset_string = attachment.asset_string
       update_turnitin_data!(submission, asset_string, status: 'pending', outcome_response: @outcomes_response_json)
       self.send_later_enqueue_args(:update_originality_data, { max_attempts: self.class.max_attempts }, submission, asset_string)

@@ -73,7 +73,7 @@ class ContextModulesController < ApplicationController
            usage_rights_required: @context.feature_enabled?(:usage_rights_required),
            manage_files: @context.grants_right?(@current_user, session, :manage_files)
         }
-      conditional_release_js_env
+      conditional_release_js_env(includes: :active_rules)
     end
   end
   include ModuleIndexHelper
@@ -101,7 +101,7 @@ class ContextModulesController < ApplicationController
 
         # locked assignments always have 0 sets, so this check makes it not return 404 if locked
         # but instead progress forward and return a warning message if is locked later on
-        if rule.present? && (rule[:locked] || rule[:assignment_sets].length > 1)
+        if rule.present? && (rule[:locked] || !rule[:selected_set_id] || rule[:assignment_sets].length > 1)
           if !rule[:locked]
             options = rule[:assignment_sets].map { |set|
               option = {
@@ -174,7 +174,8 @@ class ContextModulesController < ApplicationController
             controller: controller,
             action: 'edit',
             id: @tag.content_id,
-            anchor: 'mastery-paths-editor'
+            anchor: 'mastery-paths-editor',
+            return_to: params[:return_to]
           )
         else
           render status: 404, template: 'shared/errors/404_message'
@@ -263,11 +264,17 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       info = {}
       now = Time.now.utc.iso8601
-      @context.module_items_visible_to(@current_user).each do |tag|
+
+      all_tags = @context.module_items_visible_to(@current_user)
+      user_is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
+
+      preload_assignments_and_quizzes(all_tags, user_is_admin)
+
+      all_tags.each do |tag|
         info[tag.id] = if tag.can_have_assignment? && tag.assignment
-          tag.assignment.context_module_tag_info(@current_user, @context)
+          tag.assignment.context_module_tag_info(@current_user, @context, user_is_admin: user_is_admin)
         elsif tag.content_type_quiz?
-          tag.content.context_module_tag_info(@current_user, @context)
+          tag.content.context_module_tag_info(@current_user, @context, user_is_admin: user_is_admin)
         else
           {:points_possible => nil, :due_date => nil}
         end
@@ -565,6 +572,55 @@ class ContextModulesController < ApplicationController
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
         format.json { render :json => @module.as_json(:methods => :workflow_state) }
+      end
+    end
+  end
+
+  private
+  def preload_assignments_and_quizzes(tags, user_is_admin)
+    assignment_tags = tags.select{|ct| ct.can_have_assignment?}
+    return unless assignment_tags.any?
+    ActiveRecord::Associations::Preloader.new.preload(assignment_tags, :content)
+
+    content_with_assignments = assignment_tags.
+      select{|ct| ct.content_type != "Assignment" && ct.content.assignment_id}.map(&:content)
+    ActiveRecord::Associations::Preloader.new.preload(content_with_assignments, :assignment) if content_with_assignments.any?
+
+    if user_is_admin && should_preload_override_data?
+      assignments = assignment_tags.map(&:assignment).compact
+      plain_quizzes = assignment_tags.select{|ct| ct.content.is_a?(Quizzes::Quiz) && !ct.content.assignment}.map(&:content)
+
+      preload_has_too_many_overrides(assignments, :assignment_id)
+      preload_has_too_many_overrides(plain_quizzes, :quiz_id)
+      overrideables = (assignments + plain_quizzes).select{|o| !o.has_too_many_overrides}
+
+      if overrideables.any?
+        ActiveRecord::Associations::Preloader.new.preload(overrideables, :assignment_overrides)
+        overrideables.each { |o| o.has_no_overrides = true if o.assignment_overrides.size == 0 }
+      end
+    end
+  end
+
+  def should_preload_override_data?
+    key = ['preloaded_module_override_data', @context.global_asset_string, @current_user].cache_key
+    # if the user has been touched we should preload all of the overrides because it's almost certain we'll need them all
+    if Rails.cache.read(key)
+      false
+    else
+      Rails.cache.write(key, true)
+      true
+    end
+  end
+
+  def preload_has_too_many_overrides(assignments_or_quizzes, override_column)
+    # find the assignments/quizzes with too many active overrides and mark them as such
+    if assignments_or_quizzes.any?
+      ids = AssignmentOverride.active.where(override_column => assignments_or_quizzes).
+        group(override_column).having("COUNT(*) > ?", Setting.get('assignment_all_dates_too_many_threshold', '25').to_i).
+        active.pluck(override_column)
+
+      if ids.any?
+        assignments_or_quizzes.each{|o| o.has_too_many_overrides = true if ids.include?(o.id) }
       end
     end
   end

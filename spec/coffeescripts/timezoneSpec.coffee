@@ -290,14 +290,6 @@ define [
     tz.changeZone(detroit, 'America/Detroit')
     ok !tz.isMidnight(epoch)
 
-  test "isMidnight() is true when date is midnight adjusted for zone.", ->
-    tz.changeZone(detroit, 'America/Detroit')
-    date = tz.parse('2012-09-02 00:00:00')
-    ok tz.isMidnight(date, { timezone: 'America/Detroit' })
-
-  test "isMidnight() is false when date is not midnight adjusted for zone.", ->
-    ok !tz.isMidnight(epoch, { timezone: 'America/Detroit' })
-
   test "changeToTheSecondBeforeMidnight() returns null when no argument given.", ->
     equal tz.changeToTheSecondBeforeMidnight(), null
 

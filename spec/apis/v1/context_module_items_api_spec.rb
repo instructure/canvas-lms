@@ -172,7 +172,8 @@ describe "Module Items API", type: :request do
         expect(item).to include('url')
         uri = URI(item['url'])
         expect(uri.path).to eq "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
-        expect(uri.query).to include('url=')
+        expect(uri.query).to include("module_item_id=#{@module1.content_tags.last.id}")
+        expect(uri.query).to include('launch_type=module_item')
       end
     end
 

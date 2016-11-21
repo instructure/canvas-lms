@@ -24,14 +24,6 @@ describe GradingPeriodGroup do
 
   let(:account) { Account.default }
 
-  # after dev lands in master, re add this title validation
-  # it { is_expected.to validate_presence_of(:title) }
-  it { is_expected.to belong_to(:course) }
-  it { is_expected.to have_many(:enrollment_terms).inverse_of(:grading_period_group) }
-  it { is_expected.to have_many(:grading_periods).dependent(:destroy) }
-
-  it { is_expected.to allow_mass_assignment_of(:title) }
-
   describe ".for" do
     context "when given a root account" do
       it "fetches sets on a root account" do

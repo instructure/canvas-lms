@@ -213,6 +213,7 @@ module Importers
         lockdown_browser_monitor_data
         one_time_results
         show_correct_answers_last_attempt
+        only_visible_to_overrides
       ].each do |attr|
         attr = attr.to_sym
         item.send("#{attr}=", hash[attr]) if hash.key?(attr)
@@ -267,6 +268,16 @@ module Importers
       elsif !item.assignment && grading = hash[:grading]
         item.quiz_type = 'assignment'
         hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
+      end
+
+      if hash[:assignment_overrides]
+        hash[:assignment_overrides].each do |o|
+          override = item.assignment_overrides.build
+          override.set_type = o[:set_type]
+          override.title = o[:title]
+          override.set_id = o[:set_id]
+          override.save!
+        end
       end
 
       if item.graded? && !item.assignment

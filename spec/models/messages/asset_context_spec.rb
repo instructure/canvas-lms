@@ -7,8 +7,8 @@ module Messages
     let(:user){ stub("User", short_name: "User Name") }
     let(:asset){ stub("Asset", user: user, author: author) }
 
-    def asset_for(notification_name, asset = asset)
-      AssetContext.new(asset, notification_name)
+    def asset_for(notification_name, a = asset)
+      AssetContext.new(a, notification_name)
     end
 
     describe '#reply_to_name' do

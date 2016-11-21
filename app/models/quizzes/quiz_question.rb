@@ -156,12 +156,14 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     return true
   end
 
-  def update_assessment_question! aq
+  def update_assessment_question!(aq, quiz_group_id, duplicate_index)
     if assessment_question_version.blank? || assessment_question_version < aq.version_number
       self.assessment_question = aq
       self.write_attribute(:question_data, aq.question_data)
-      save!
     end
+    self.quiz_group_id = quiz_group_id
+    self.duplicate_index = duplicate_index
+    save! if changed?
 
     return self
   end

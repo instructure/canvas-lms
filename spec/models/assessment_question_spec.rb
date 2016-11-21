@@ -197,34 +197,34 @@ describe AssessmentQuestion do
     expect(data.object_id).to eq question.question_data.object_id
   end
 
-  describe '#find_or_create_quiz_question' do
+  describe '.find_or_create_quiz_questions' do
     let(:assessment_question){assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))}
     let(:quiz){quiz_model}
 
     it 'should create a quiz_question when one does not exist' do
       expect do
-        assessment_question.find_or_create_quiz_question(quiz.id)
-      end.to change{AssessmentQuestion.count}.by(1)
+        AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil)
+      end.to change{Quizzes::QuizQuestion.count}.by(1)
     end
 
     it 'should find an existing quiz_question' do
-      qq = assessment_question.find_or_create_quiz_question(quiz.id)
+      qq = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
 
       expect do
-        qq2 = assessment_question.find_or_create_quiz_question(quiz.id)
+        qq2 = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
         expect(qq2.id).to eql(qq.id)
       end.to_not change{AssessmentQuestion.count}
     end
 
     it 'should find and update an out of date quiz_question' do
-      qq = assessment_question.find_or_create_quiz_question(quiz.id)
+      qq = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
 
       assessment_question.name = 'changed'
       assessment_question.with_versioning(&:save!)
 
       expect(qq.assessment_question_version).to_not eql(assessment_question.version_number)
 
-      qq2 = assessment_question.find_or_create_quiz_question(quiz.id)
+      qq2 = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
       expect(qq.assessment_question_version).to_not eql(qq2.assessment_question_version)
       expect(qq2.assessment_question_version).to eql(assessment_question.version_number)
     end
@@ -234,7 +234,8 @@ describe AssessmentQuestion do
       questions = []
       3.times { questions << assessment_question.create_quiz_question(quiz.id) }
       smallest_id_question = questions.sort_by(&:id).first
-      expect(assessment_question.find_or_create_quiz_question(quiz.id).id).to eq(smallest_id_question.id)
+      qq = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
+      expect(qq.id).to eq(smallest_id_question.id)
     end
   end
 end

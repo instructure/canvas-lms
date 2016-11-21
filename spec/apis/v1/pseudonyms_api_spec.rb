@@ -129,7 +129,7 @@ describe PseudonymsController, type: :request do
         json = api_call(:post, @path, @path_options, {
           :user => { :id => @student.id },
           :login => {
-            :password    => 'abc123',
+            :password    => 'abcd1234',
             :sis_user_id => '12345',
             :unique_id   => 'test@example.com'
           }
@@ -152,7 +152,7 @@ describe PseudonymsController, type: :request do
         raw_api_call(:post, @path, @path_options, {
           :user  => { :id => @student.id },
           :login => {
-            :password => 'abc123',
+            :password => 'abcd1234',
             :sis_user_id => '12345',
             :unique_id => 'duplicate@example.com'
           }
@@ -165,7 +165,7 @@ describe PseudonymsController, type: :request do
         raw_api_call(:post, @path, @path_options, {
           :user  => { :id => @student.id },
           :login => {
-            :password => 'abc123',
+            :password => 'abcd1234',
             :sis_user_id => '12345',
             :unique_id => 'duplicate@example.com'
           }
@@ -183,7 +183,7 @@ describe PseudonymsController, type: :request do
         raw_api_call(:post, @path, @path_options, {
           user: { id: @student.id },
           login: {
-            password: 'abc123',
+            password: 'abcd1234',
             unique_id: 'student@example.com',
             authentication_provider_id: 'cas'
           }
@@ -198,7 +198,7 @@ describe PseudonymsController, type: :request do
         raw_api_call(:post, @path, @path_options, {
           :user => { :id => @admin.id },
           :login => {
-            :password => 'abc123',
+            :password => 'abcd1234',
             :sis_user_id => '12345',
             :unique_id => 'test@example.com'
           }

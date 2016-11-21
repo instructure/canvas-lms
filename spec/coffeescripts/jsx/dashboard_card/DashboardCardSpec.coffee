@@ -1,10 +1,11 @@
 define [
   'react'
+  'react-dom'
   'underscore'
   'jsx/dashboard_card/DashboardCard'
   'jsx/dashboard_card/CourseActivitySummaryStore',
   'helpers/assertions'
-], (React, _, DashboardCard, CourseActivitySummaryStore, assertions) ->
+], (React, ReactDOM, _, DashboardCard, CourseActivitySummaryStore, assertions) ->
 
   TestUtils = React.addons.TestUtils
 
@@ -32,7 +33,7 @@ define [
 
     teardown: ->
       localStorage.clear()
-      React.unmountComponentAtNode(@component.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@component.getDOMNode().parentNode)
       @wrapper.remove() if @wrapper
 
   test 'render', ->
@@ -57,9 +58,9 @@ define [
 
     @wrapper = $('<div>').appendTo('body')[0]
 
-    @component = React.render(DashCard, @wrapper)
+    @component = ReactDOM.render(DashCard, @wrapper)
 
-    $html = $(React.findDOMNode(@component))
+    $html = $(ReactDOM.findDOMNode(@component))
 
     done = assert.async()
     assertions.isAccessible $html, done

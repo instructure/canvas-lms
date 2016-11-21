@@ -37,14 +37,12 @@
 <% end %>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
-    <% if !@context.is_a?(User) && @context.grants_right?(@current_user, session, :manage_assignments) %>
-      <a href="#" class="add_bank_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t 'add_bank', 'Add Question Bank' %></a>
-    <% end %>
-    <% if @current_user && @context != @current_user %>
-      <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="btn button-sidebar-wide see_bookmarked_banks"><%= image_tag("bookmark.png", alt: "") %> <%= t 'see_bookmarked_banks', 'See My Bookmarked Banks' %></a>
-    <% end %>
-  </div>
+  <% if !@context.is_a?(User) && @context.grants_right?(@current_user, session, :manage_assignments) %>
+    <a href="#" class="add_bank_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t 'add_bank', 'Add Question Bank' %></a>
+  <% end %>
+  <% if @current_user && @context != @current_user %>
+    <a href="<%= context_url(@current_user, :context_question_banks_url) %>" class="btn button-sidebar-wide see_bookmarked_banks"><%= image_tag("bookmark.png", alt: "") %> <%= t 'see_bookmarked_banks', 'See My Bookmarked Banks' %></a>
+  <% end %>
 <% end %>
 
 <div class="quiz-header">

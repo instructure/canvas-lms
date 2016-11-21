@@ -142,6 +142,7 @@ class Submission < ActiveRecord::Base
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
   before_save :prep_for_submitting_to_turnitin
+  before_save :prep_for_submitting_to_vericite
   before_save :check_url_changed
   before_save :check_reset_graded_anonymously
   before_create :cache_due_date
@@ -153,6 +154,7 @@ class Submission < ActiveRecord::Base
   after_save :queue_websnap
   after_save :update_final_score
   after_save :submit_to_turnitin_later
+  after_save :submit_to_vericite_later
   after_save :update_admins_if_just_submitted
   after_save :check_for_media_object
   after_save :update_quiz_submission
@@ -199,7 +201,7 @@ class Submission < ActiveRecord::Base
   after_save :grade_change_audit
 
   def new_version_needed?
-    turnitin_data_changed? || (changes.keys - [
+    turnitin_data_changed? || vericite_data_changed? || (changes.keys - [
       "updated_at",
       "processed",
       "process_attempts",
@@ -270,20 +272,39 @@ class Submission < ActiveRecord::Base
     end
     can :read and can :comment
 
-    given do |user, session|
-      turnitin_data &&
-        user_can_read_grade?(user, session) &&
-        (assignment.context.grants_right?(user, session, :manage_grades) ||
-          case assignment.turnitin_settings[:originality_report_visibility]
-          when 'immediate' then true
-          when 'after_grading' then current_submission_graded?
-          when 'after_due_date'
-            then assignment.due_at && assignment.due_at < Time.now.utc
-          when 'never' then false
-          end
-        )
-    end
+    given { |user, session|
+      can_view_plagiarism_report('turnitin', user, session)
+    }
+
     can :view_turnitin_report
+
+    given { |user, session|
+      can_view_plagiarism_report('vericite', user, session)
+    }
+    can :view_vericite_report
+  end
+
+  def can_view_plagiarism_report(type, user, session)
+    if(type == "vericite")
+      plagData = self.vericite_data_hash
+      @submit_to_vericite = false
+      settings = assignment.vericite_settings
+    else
+      plagData = self.turnitin_data
+      @submit_to_turnitin = false
+      settings = assignment.turnitin_settings
+    end
+    return plagData &&
+    user_can_read_grade?(user, session) &&
+    (assignment.context.grants_right?(user, session, :manage_grades) ||
+      case settings[:originality_report_visibility]
+       when 'immediate' then true
+       when 'after_grading' then current_submission_graded?
+       when 'after_due_date'
+         then assignment.due_at && assignment.due_at < Time.now.utc
+       when 'never' then false
+      end
+    )
   end
 
   def user_can_read_grade?(user, session=nil)
@@ -396,23 +417,13 @@ class Submission < ActiveRecord::Base
   end
 
   def prep_for_submitting_to_turnitin
-    last_attempt = self.turnitin_data && self.turnitin_data[:last_processed_attempt]
-    @submit_to_turnitin = false
-    if self.turnitinable? && (!last_attempt || last_attempt < self.attempt) && (@group_broadcast_submission || !self.group)
-      if self.turnitin_data[:last_processed_attempt] != self.attempt
-        self.turnitin_data[:last_processed_attempt] = self.attempt
-      end
-      @submit_to_turnitin = true
-    end
+    prep_for_submitting_to_plagiarism('turnitin')
   end
 
   TURNITIN_JOB_OPTS = { :n_strand => 'turnitin', :priority => Delayed::LOW_PRIORITY, :max_attempts => 2 }
 
   def submit_to_turnitin_later
-    if self.turnitinable? && @submit_to_turnitin
-      delay = Setting.get('turnitin_submission_delay_seconds', 60.to_s).to_i
-      send_later_enqueue_args(:submit_to_turnitin, { :run_at => delay.seconds.from_now }.merge(TURNITIN_JOB_OPTS))
-    end
+    submit_to_plagiarism_later('turnitin')
   end
 
   TURNITIN_RETRY = 5
@@ -518,6 +529,328 @@ class Submission < ActiveRecord::Base
   def turnitinable_by_lti?
     turnitin_data.select{|_, v| v.is_a?(Hash) && v.key?(:outcome_response)}.any?
   end
+
+  # VeriCite
+
+  # this function will check if the score needs to be updated and update/save the new score if so,
+  # otherwise, it just returns the vericite_data_hash
+  def vericite_data(lookup_data = false)
+    self.vericite_data_hash ||= {}
+    # check to see if the score is stale, if so, fetch it again
+    update_scores = false
+    # since there could be multiple versions, let's not waste calls for old versions and use the old score
+    if Canvas::Plugin.find(:vericite).try(:enabled?) && !self.readonly? && lookup_data && self.versions.current && self.versions.current.number == self.version_number
+      self.vericite_data_hash.keys.each do |asset_string|
+        data = self.vericite_data_hash[asset_string]
+        next unless data && data.is_a?(Hash) && data[:object_id]
+        update_scores = update_scores || vericite_recheck_score(data)
+      end
+      # we have found at least one score that is stale, call VeriCite and save the results
+      if update_scores
+        check_vericite_status
+      end
+    end
+    if !self.vericite_data_hash.empty?
+      # only set vericite provider flag if the hash isn't empty
+      self.vericite_data_hash[:provider] = :vericite
+    end
+    self.vericite_data_hash
+  end
+
+  def vericite_data_hash
+    # use the same backend structure to store "content review" data
+    self.turnitin_data
+  end
+
+  # this function looks at a vericite data object and determines whether the score needs to be rechecked (i.e. cache for 20 mins)
+  def vericite_recheck_score(data)
+    update_scores = false
+    # only recheck scores if an old score exists
+    if !data[:similarity_score_time].blank?
+      now = Time.now.to_i
+      score_age = Time.now.to_i - data[:similarity_score_time]
+      score_cache_time = 1200 # by default cache scores for 20 mins
+      # change the cache based on how long it has been since the paper was submitted
+      # if !data[:submit_time].blank? && (now - data[:submit_time]) > 86400
+      # # it has been more than 24 hours since this was submitted, increase cache time
+      #   score_cache_time = 86400
+      # end
+      # only cache the score for 20 minutes or 24 hours based on when the paper was submitted
+      if(score_age > score_cache_time)
+        #check if we just recently requested this score
+        last_checked = 1000 # default to a high number so that if it is not set, it won't effect the outcome
+        if !data[:similarity_score_check_time].blank?
+          last_checked = now - data[:similarity_score_check_time]
+        end
+        # only update if we didn't just ask VeriCite for the scores 20 seconds again (this is in the case of an error, we don't want to keep asking immediately)
+        if last_checked > 20
+          update_scores = true
+        end
+      end
+    end
+    update_scores
+  end
+
+   VERICITE_STATUS_RETRY = 16 #this caps the retries off at 36 hours (checking once every 4 hours)
+
+  def check_vericite_status(attempt=1)
+    self.vericite_data_hash ||= {}
+    vericite = nil
+    needs_retry = false
+    # check all assets in the vericite_data (self.vericite_assets is only the
+    # current assets) so that we get the status for assets of previous versions
+    # of the submission as well
+
+    # flag to make sure that all scores are just updates and not new
+    recheck_score_all = true
+    self.vericite_data_hash.keys.each do |asset_string|
+      data = self.vericite_data_hash[asset_string]
+      next unless data && data.is_a?(Hash) && data[:object_id]
+      # check to see if the score is stale, if so, delete it and fetch again
+      recheck_score = vericite_recheck_score(data)
+      # keep track whether all scores are updates or if any are new
+      recheck_score_all = recheck_score_all && recheck_score
+      # look up scores if:
+      if recheck_score || data[:similarity_score].blank?
+        if attempt < VERICITE_STATUS_RETRY
+          # keep track of when we asked for this score, so if it fails, we don't keep trying immediately again (i.e. wain 20 sec before trying again)
+          data[:similarity_score_check_time] = Time.now.to_i
+          vericite ||= VeriCite::Client.new()
+          res = vericite.generateReport(self, asset_string)
+          if res[:similarity_score]
+            # keep track of when we updated the score so that we can ask VC again once it is stale (i.e. cache for 20 mins)
+            data[:similarity_score_time] = Time.now.to_i
+            data[:similarity_score] = res[:similarity_score].to_i
+            data[:state] = VeriCite.state_from_similarity_score data[:similarity_score]
+            data[:status] = 'scored'
+            # since we have a score, we know this report shouldn't have any errors, clear them out
+            data = clear_vericite_errors(data)
+          else
+            needs_retry ||= true
+          end
+        elsif !recheck_score # if we already have a score, continue to use it and do not set an error
+          data[:status] = 'error'
+          data[:public_error_message] = I18n.t('vericite.no_score_after_retries', 'VeriCite has not returned a score after %{max_tries} attempts to retrieve one.', max_tries: VERICITE_RETRY)
+        end
+      else
+        data[:status] = 'scored'
+      end
+      self.vericite_data_hash[asset_string] = data
+    end
+
+    if !self.vericite_data_hash.empty?
+      # only set vericite provider flag if the hash isn't empty
+      self.vericite_data_hash[:provider] = :vericite
+    end
+    retry_mins = 2 ** attempt
+    if retry_mins > 240
+      #cap the retry max wait to 4 hours
+      retry_mins = 240;
+    end
+    send_at(retry_mins.minutes.from_now, :check_vericite_status, attempt + 1) if needs_retry
+    self.vericite_data_changed!
+    # if all we did was recheck scores, do not version this save (i.e. increase the attempt number)
+    if recheck_score_all
+      self.with_versioning( false ) do |t|
+        t.save!
+      end
+    else
+      self.save
+    end
+  end
+
+  def vericite_report_url(asset_string, user, session)
+    if self.vericite_data_hash && self.vericite_data_hash[asset_string] && self.vericite_data_hash[asset_string][:similarity_score]
+      vericite = VeriCite::Client.new()
+      if self.grants_right?(user, :grade)
+        vericite.submissionReportUrl(self, user, asset_string)
+      elsif can_view_plagiarism_report('vericite', user, session)
+        vericite.submissionStudentReportUrl(self, user, asset_string)
+      end
+    else
+      nil
+    end
+  end
+
+  def prep_for_submitting_to_vericite
+    prep_for_submitting_to_plagiarism('vericite')
+  end
+
+  VERICITE_JOB_OPTS = { :n_strand => 'vericite', :priority => Delayed::LOW_PRIORITY, :max_attempts => 2 }
+
+  def submit_to_vericite_later
+    submit_to_plagiarism_later('vericite')
+  end
+
+  VERICITE_RETRY = 5
+  def submit_to_vericite(attempt=0)
+    return unless vericiteable? && Canvas::Plugin.find(:vericite).try(:enabled?)
+    vericite = VeriCite::Client.new()
+    reset_vericite_assets
+
+    # Make sure the assignment exists and user is enrolled
+    assignment_created = self.assignment.create_in_vericite
+    #vericite_enrollment = vericite.enrollStudent(self.context, self.user)
+    if assignment_created
+      delete_vericite_errors
+    else
+      assignment_error = assignment.vericite_settings[:error]
+      self.vericite_data_hash[:assignment_error] = assignment_error if assignment_error.present?
+      #self.vericite_data_hash[:student_error] = vericite_enrollment.error_hash if vericite_enrollment.error?
+      self.vericite_data_changed!
+      if !self.vericite_data_hash.empty?
+        # only set vericite provider flag if the hash isn't empty
+        self.vericite_data_hash[:provider] = :vericite
+      end
+      self.save
+    end
+    # even if the assignment didn't save, VeriCite will still allow this file to be submitted
+    # Submit the file(s)
+    submission_response = vericite.submitPaper(self)
+    # VeriCite will not resubmit a file if it already has a similarity_score (i.e. success)
+    update = false
+    submission_response.each do |res_asset_string, response|
+      update = true
+      self.vericite_data_hash[res_asset_string].merge!(response)
+      # keep track of when we first submitted
+      self.vericite_data_hash[res_asset_string][:submit_time] = Time.now.to_i if self.vericite_data_hash[res_asset_string][:submit_time].blank?
+      self.vericite_data_changed!
+      if !response[:object_id] && !(attempt < VERICITE_RETRY)
+        self.vericite_data_hash[res_asset_string][:status] = 'error'
+      elsif response[:object_id]
+        # success, make sure any error messages are cleared
+        self.vericite_data_hash[res_asset_string] = clear_vericite_errors(self.vericite_data_hash[res_asset_string])
+      end
+    end
+    # only save if there were newly submitted attachments
+    if update
+      send_later_enqueue_args(:check_vericite_status, { :run_at => 5.minutes.from_now }.merge(VERICITE_JOB_OPTS))
+      if !self.vericite_data_hash.empty?
+        # only set vericite provider flag if the hash isn't empty
+        self.vericite_data_hash[:provider] = :vericite
+      end
+      self.save
+
+      # Schedule retry if there were failures
+      submit_status = submission_response.present? && submission_response.values.all?{ |v| v[:object_id] }
+      unless submit_status
+        send_later_enqueue_args(:submit_to_vericite, { :run_at => 5.minutes.from_now }.merge(VERICITE_JOB_OPTS), attempt + 1) if attempt < VERICITE_RETRY
+        return false
+      end
+    end
+
+    true
+  end
+
+  def vericite_assets
+    if self.submission_type == 'online_upload'
+      self.attachments.select{ |a| a.vericiteable? }
+    elsif self.submission_type == 'online_text_entry'
+      [self]
+    else
+      []
+    end
+  end
+
+  def delete_vericite_errors
+    self.vericite_data_hash.delete(:status)
+    self.vericite_data_hash.delete(:assignment_error)
+    self.vericite_data_hash.delete(:student_error)
+  end
+  private :delete_vericite_errors
+
+  def reset_vericite_assets
+    self.vericite_data_hash ||= {}
+    delete_vericite_errors
+    vericite_assets.each do |a|
+      asset_data = self.vericite_data_hash[a.asset_string] || {}
+      asset_data[:status] = 'pending'
+      asset_data = clear_vericite_errors(asset_data)
+      self.vericite_data_hash[a.asset_string] = asset_data
+      self.vericite_data_changed!
+    end
+  end
+
+  def clear_vericite_errors(asset_data)
+    [:error_code, :error_message, :public_error_message].each do |key|
+      asset_data.delete(key)
+    end
+    asset_data
+  end
+
+
+  def resubmit_to_vericite
+    reset_vericite_assets
+    if !self.vericite_data_hash.empty?
+      # only set vericite provider flag if the hash isn't empty
+      self.vericite_data_hash[:provider] = :vericite
+    end
+    self.save
+
+    @submit_to_vericite = true
+    submit_to_vericite_later
+  end
+
+  def vericiteable?
+    %w(online_upload online_text_entry).include?(submission_type) &&
+      assignment.vericite_enabled?
+  end
+
+  def vericite_data_changed!
+    @vericite_data_changed = true
+  end
+
+  def vericite_data_changed?
+    @vericite_data_changed
+  end
+
+  # End VeriCite
+
+  # Plagiarism functions:
+
+  def prep_for_submitting_to_plagiarism(type)
+    if(type == "vericite")
+      plagData = self.vericite_data_hash
+      @submit_to_vericite = false
+      canSubmit = self.vericiteable?
+    else
+      plagData = self.turnitin_data
+      @submit_to_turnitin = false
+      canSubmit = self.turnitinable?
+    end
+    last_attempt = plagData && plagData[:last_processed_attempt]
+    if canSubmit && (!last_attempt || last_attempt < self.attempt) && (@group_broadcast_submission || !self.group)
+      if plagData[:last_processed_attempt] != self.attempt
+        plagData[:last_processed_attempt] = self.attempt
+      end
+      if(type == "vericite")
+        @submit_to_vericite = true
+      else
+        @submit_to_turnitin = true
+      end
+    end
+  end
+
+  def submit_to_plagiarism_later(type)
+    if(type == "vericite")
+      submitPlag = @submit_to_vericite
+      canSubmit = self.vericiteable?
+      delayName = 'vericite_submission_delay_seconds'
+      delayFunction = :submit_to_vericite
+      delayOpts = VERICITE_JOB_OPTS
+    else
+      submitPlag = @submit_to_turnitin
+      canSubmit = self.turnitinable?
+      delayName = 'turnitin_submission_delay_seconds'
+      delayFunction = :submit_to_turnitin
+      delayOpts = TURNITIN_JOB_OPTS
+    end
+    if canSubmit && submitPlag
+      delay = Setting.get(delayName, 60.to_s).to_i
+      send_later_enqueue_args(delayFunction, { :run_at => delay.seconds.from_now }.merge(delayOpts))
+    end
+  end
+  # End Plagiarism functions
 
   def external_tool_url
     URI.encode(url) if self.submission_type == 'basic_lti_launch'
@@ -700,6 +1033,10 @@ class Submission < ActiveRecord::Base
       last_submitted_at = nil
       self.versions.sort_by(&:created_at).reverse_each do |version|
         model = version.model
+        # since vericite_data is a function, make sure you are cloning the most recent vericite_data_hash
+        if self.vericiteable?
+          model.turnitin_data = self.vericite_data(true)
+        end
         if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
           res << model
           last_submitted_at = model.submitted_at

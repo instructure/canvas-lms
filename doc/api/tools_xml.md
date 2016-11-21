@@ -230,6 +230,31 @@ found below.
 </cartridge_basiclti_link>
 ```
 
+### Launch in new tab
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+    xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+    xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+    xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+    http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+    http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+    http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+    <blti:launch_url>https://example.com/attendance</blti:launch_url>
+    <blti:title>Attendance</blti:title>
+    <blti:description>Provides an interactive seating chart and attendance tool</blti:description>
+    <blti:extensions platform="canvas.instructure.com">
+      <lticm:property name="privacy_level">public</lticm:property>
+      <lticm:options name="course_navigation">
+        <lticm:property name="enabled">true</lticm:property>
+        <lticm:property name="windowTarget">_blank</lticm:property>
+      </lticm:options>
+    </blti:extensions>
+</cartridge_basiclti_link>
+```
+
 ## Account Navigation External Tool Examples
 
 ### Minimal configuration
@@ -428,10 +453,13 @@ External tools can support different LTI environments for different canvas envir
 * __launch_url__: the blti:launch\_url property that should be used for all canvas test environments.
 This property takes precedent over domain changes if both properties are set.
 
-Additionally, the domain and launch\_urls can be set for for each canvas environment
+Additionally, the domain and launch\_urls can be set for each canvas environment
 by specifying the environment as part of the property name (ie, test\_launch\_url,
 beta\_domain, etc).  When used in this manner, specific environment properties take
 precedent over the default values.
+
+NOTE: Test environment settings are established during the refresh process when the environments are
+<a href="https://community.canvaslms.com/docs/DOC-1384">mirrored from production</a>.
 
 ### Test Environment Example
 

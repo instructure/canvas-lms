@@ -73,6 +73,7 @@ module Api::V1::ExternalTools
       query_params[:url] = opts[:url] if opts.include?(:url)
       query_params[:launch_type] = opts[:launch_type] if opts.include?(:launch_type)
       query_params[:assignment_id] = opts[:assignment_id] if opts.include?(:assignment_id)
+      query_params[:module_item_id] = opts[:module_item_id] if opts.include?(:module_item_id)
       uri.query = query_params.to_query
 
       uri.to_s

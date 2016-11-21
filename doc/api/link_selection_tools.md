@@ -1,6 +1,13 @@
 External Tool Link Selector
 ============================
 
+<a name="top"></a>
+<div class="warning-message">The methods outlined here use resource selection, which is deprecated.
+<p></p>
+See the <a href="content_item.html">Content Item</a> documentation to design a tool that
+can add content to the RCE in a way that conforms with the most up to date
+<a href="http://www.imsglobal.org/lti/">IMS LTI standard</a>. </div>
+
 An extension to standard LTI, external tools can be configured 
 to allow selecting custom links to be 
 added to modules or used for external tool assignments. When a tool is 

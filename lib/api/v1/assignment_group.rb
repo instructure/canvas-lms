@@ -77,11 +77,11 @@ module Api::V1::AssignmentGroup
   end
 
   def update_assignment_group(assignment_group, params)
-    return nil unless params.is_a?(Hash)
+    return nil unless params.is_a?(ActionController::Parameters)
 
-    update_params = params.slice(*API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS)
+    update_params = params.permit(*API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS)
 
-    if rules = update_params.delete('rules')
+    if rules = params.delete('rules')
       assignment_group.rules_hash = rules
     end
 

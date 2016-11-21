@@ -338,7 +338,7 @@ define([
   $.fn.fillWindowWithMe = function(options){
     var opts               = $.extend({minHeight: 400}, options),
         $this              = $(this),
-        $wrapper_container = $('#wrapper-container'),
+        $wrapper           = $('#wrapper'),
         $main              = $('#main'),
         $not_right_side    = $('#not_right_side'),
         $window            = $(window),
@@ -347,7 +347,7 @@ define([
     function fillWindowWithThisElement(){
       $toResize.height(0);
       var spaceLeftForThis = $window.height()
-                             - ($wrapper_container.offset().top + $wrapper_container.outerHeight())
+                             - ($wrapper.offset().top + $wrapper.outerHeight())
                              + ($main.height() - $not_right_side.height()),
           newHeight = Math.max(400, spaceLeftForThis);
 
@@ -422,4 +422,3 @@ define([
 
   return $;
 });
-

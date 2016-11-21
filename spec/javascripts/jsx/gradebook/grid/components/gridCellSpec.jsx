@@ -1,8 +1,9 @@
 define([
   'react',
+  'react-dom',
   'jsx/gradebook/grid/components/gridCell',
   'jsx/gradebook/grid/components/column_types/assignmentPoints'
-], (React, GridCell, AssignmentPointsColumn) => {
+], (React, ReactDOM, GridCell, AssignmentPointsColumn) => {
   const wrapper = document.getElementById('fixtures');
 
   const buildComponent = (props = {}) => {
@@ -21,7 +22,7 @@ define([
     const deep = true;
     $.extend(deep, props, defaultProps);
     const componentFactory = React.createFactory(GridCell);
-    return React.render(componentFactory(props), wrapper);
+    return ReactDOM.render(componentFactory(props), wrapper);
   };
 
   test('mounts', () => {

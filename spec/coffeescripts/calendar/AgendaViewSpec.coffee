@@ -50,7 +50,7 @@ define [
     view.fetch(@contextCodes, @startDate)
     loadEventPage(@server)
     # should render all events
-    ok @container.find('.ig-row').length == 18, 'finds 18 ig-rows'
+    ok @container.find('.agenda-event__item-container').length == 18, 'finds 18 agenda-event__item-containers'
 
     # should bin results by day
     ok @container.find('.agenda-date').length == view.toJSON().days.length
@@ -106,7 +106,7 @@ define [
       addEvents(events, date)
     sendCustomEvents(@server, JSON.stringify(events), JSON.stringify([]), true)
 
-    ok @container.find('.ig-row').length, 40, 'finds 40 ig-rows'
+    ok @container.find('.agenda-event__item-container').length, 40, 'finds 40 agenda-event__item-containers'
     ok @container.find('.agenda-load-btn').length
     view.loadMore({preventDefault: $.noop})
 
@@ -116,7 +116,7 @@ define [
       date.setFullYear(date.getFullYear()+1)
     sendCustomEvents(@server, JSON.stringify(events), JSON.stringify([]), false, 2)
 
-    equal @container.find('.ig-row').length, 70, 'finds 70 ig-rows'
+    equal @container.find('.agenda-event__item-container').length, 70, 'finds 70 agenda-event__item-containers'
 
   test 'renders non-assignment events with locale-appropriate format string', ->
     tz.changeLocale(french, 'fr_FR', 'fr')
@@ -128,7 +128,7 @@ define [
     loadEventPage(@server)
 
     # this event has a start_at of 2013-10-08T20:30:00Z, or 1pm MDT
-    ok @container.find('.ig-details').slice(2, 3).text().match(/13:00/), 'formats according to locale'
+    ok @container.find('.agenda-event__time').slice(2, 3).text().match(/13:00/), 'formats according to locale'
 
   test 'renders assignment events with locale-appropriate format string', ->
     tz.changeLocale(french, 'fr_FR', 'fr')
@@ -140,7 +140,7 @@ define [
     loadEventPage(@server)
 
     # this event has a start_at of 2013-10-13T05:59:59Z, or 11:59pm MDT
-    ok @container.find('.ig-details').slice(12, 13).text().match(/23:59/), 'formats according to locale'
+    ok @container.find('.agenda-event__time').slice(12, 13).text().match(/23:59/), 'formats according to locale'
 
   test 'renders non-assignment events in appropriate timezone', ->
     tz.changeZone(juneau, 'America/Juneau')
@@ -153,7 +153,7 @@ define [
     loadEventPage(@server)
 
     # this event has a start_at of 2013-10-08T20:30:00Z, or 11:00am AKDT
-    ok @container.find('.ig-details').slice(2, 3).text().match(/11:00am/), 'formats in correct timezone'
+    ok @container.find('.agenda-event__time').slice(2, 3).text().match(/11:00am/), 'formats in correct timezone'
 
   test 'renders assignment events in appropriate timezone', ->
     tz.changeZone(juneau, 'America/Juneau')
@@ -166,4 +166,4 @@ define [
     loadEventPage(@server)
 
     # this event has a start_at of 2013-10-13T05:59:59Z, or 9:59pm AKDT
-    ok @container.find('.ig-details').slice(12, 13).text().match(/9:59pm/), 'formats in correct timezone'
+    ok @container.find('.agenda-event__time').slice(12, 13).text().match(/9:59pm/), 'formats in correct timezone'

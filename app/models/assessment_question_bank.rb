@@ -18,7 +18,7 @@
 
 class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
-  attr_accessible :context, :title, :user, :alignments
+  strong_params
 
   belongs_to :context, polymorphic: [:account, :course]
   has_many :assessment_questions, -> { order('assessment_questions.name, assessment_questions.position, assessment_questions.created_at') }
@@ -120,13 +120,12 @@ class AssessmentQuestionBank < ActiveRecord::Base
     user && self.assessment_question_bank_users.where(user_id: user).exists?
   end
 
-  def select_for_submission(quiz_id, count, exclude_ids=[], exclude_qq_ids=[])
-    ids = self.assessment_questions.active.pluck(:id)
-    ids = (ids - exclude_ids).shuffle[0...count]
-    questions = ids.empty? ? [] : AssessmentQuestion.where(id: ids).order(:id)
-    quiz_questions = questions.map do |aq|
-      aq.find_or_create_quiz_question(quiz_id, exclude_qq_ids)
-    end
+  def select_for_submission(quiz_id, quiz_group_id, count, exclude_ids=[], duplicate_index = 0)
+    questions = assessment_questions.active
+    questions = questions.where.not(id: exclude_ids) unless exclude_ids.empty?
+    questions = questions.reorder("RANDOM()").limit(count)
+    aqs = questions.to_a
+    quiz_questions = AssessmentQuestion.find_or_create_quiz_questions(aqs, quiz_id, quiz_group_id, duplicate_index)
     # it's important that this shuffle come after the db updates, otherwise
     # this can cause deadlocks when run in a transaction
     quiz_questions.shuffle

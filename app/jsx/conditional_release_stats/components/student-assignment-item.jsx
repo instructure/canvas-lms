@@ -2,7 +2,7 @@ define([
   'react',
   'classnames',
   'jsx/shared/helpers/assignment-categories',
-  '../helpers/score',
+  'jsx/shared/conditional_release/score',
   '../shapes/assignment',
 ], (React, classNames, categoryHelper, scoreHelpers, assignmentShape) => {
   const { object, number } = React.PropTypes

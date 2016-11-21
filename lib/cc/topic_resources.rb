@@ -123,7 +123,7 @@ module CC
       doc.has_group_category topic.has_group_category?
       doc.group_category topic.group_category.name if topic.group_category
       doc.workflow_state topic.workflow_state
-      doc.module_locked topic.locked_by_module_item?(@user, true).present?
+      doc.module_locked topic.locked_by_module_item?(@user, deep_check_if_needed: true).present?
       doc.allow_rating topic.allow_rating
       doc.only_graders_can_rate topic.only_graders_can_rate
       doc.sort_by_rating topic.sort_by_rating

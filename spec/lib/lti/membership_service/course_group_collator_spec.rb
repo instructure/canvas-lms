@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 module Lti::MembershipService
   describe CourseGroupCollator do
     context 'course with lots of groups' do
-      before(:each) do
+      before(:once) do
         course_with_teacher
         @group_category = @course.group_categories.create!(name: 'Membership')
 
@@ -76,7 +76,7 @@ module Lti::MembershipService
 
           expect(membership.status).to eq(IMS::LIS::Statuses::SimpleNames::Active)
           expect(membership.role).to match_array([IMS::LIS::ContextType::URNs::Group])
-          expect(membership.member.name).to eq("Group 100")
+          expect(membership.member.name).to eq("Group 0")
         end
       end
 

@@ -1,8 +1,9 @@
 define [
-  'react',
-  'jquery',
+  'react'
+  'react-dom'
+  'jquery'
   'jsx/gradebook/grid/components/column_types/assignmentPassFail'
-], (React, $, AssignmentPassFail) ->
+], (React, ReactDOM, $, AssignmentPassFail) ->
 
   TestUtils = React.addons.TestUtils
   Simulate  = TestUtils.Simulate
@@ -16,7 +17,7 @@ define [
       rowData: {enrollment: {}}
       isActiveCell: true
     element = React.createElement(AssignmentPassFail, data)
-    React.render(element, wrapper)
+    ReactDOM.render(element, wrapper)
 
   createSubmission = (score) =>
     id: 2
@@ -32,7 +33,7 @@ define [
 
   module 'ReactGradebook.assignmentPassFail',
     teardown: ->
-      React.unmountComponentAtNode(wrapper)
+      ReactDOM.unmountComponentAtNode(wrapper)
 
   test 'should mount', =>
     ok(renderComponent().isMounted())

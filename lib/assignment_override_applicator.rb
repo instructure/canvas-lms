@@ -107,6 +107,10 @@ module AssignmentOverrideApplicator
           overrides = current_override_version(assignment_or_quiz, overrides)
         end
 
+        unless ConditionalRelease::Service.enabled_in_context?(assignment_or_quiz.context)
+          overrides = overrides.select { |override| override.try(:set_type) != 'Noop' }
+        end
+
         return overrides
       end
 

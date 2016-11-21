@@ -288,7 +288,7 @@ class CommunicationChannel < ActiveRecord::Base
   }
 
   def self.by_path_condition(path)
-    Arel::Nodes::NamedFunction.new('lower', [CANVAS_RAILS4_0 ? path : Arel::Nodes.build_quoted(path)])
+    Arel::Nodes::NamedFunction.new('lower', [Arel::Nodes.build_quoted(path)])
   end
 
   scope :by_path, ->(path) { where(by_path_condition(arel_table[:path]).eq(by_path_condition(path))) }

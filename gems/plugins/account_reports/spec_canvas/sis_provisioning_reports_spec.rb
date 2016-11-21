@@ -204,46 +204,23 @@ describe "Default Account Reports" do
     @role.base_role_type = 'DesignerEnrollment'
     @role.save!
 
-    @enrollment1 = @course1.enroll_user(@user1,'ObserverEnrollment',:enrollment_state => :active)
-    @enrollment1.sis_batch_id = @sis.id
-    @enrollment1.save!
-    @enrollment2 = @course3.enroll_user(@user2,'StudentEnrollment',:enrollment_state => :active)
-    @enrollment2.sis_batch_id = @sis.id
-    @enrollment2.save!
-    @enrollment3 = @course1.enroll_user(@user2,'TaEnrollment',:enrollment_state => :active)
-    @enrollment3.sis_batch_id = @sis.id
-    @enrollment3.save!
-    @enrollment4 = @course1.enroll_user(@user3,'StudentEnrollment',:enrollment_state => :active)
-    @enrollment4.sis_batch_id = @sis.id
-    @enrollment4.save!
-    @enrollment5 = @course2.enroll_user(@user3,'StudentEnrollment',:enrollment_state => :active)
-    @enrollment5.sis_batch_id = @sis.id
-    @enrollment5.save!
-    @enrollment6 = @course1.enroll_user(@user4,'TeacherEnrollment',:enrollment_state => :active)
-    @enrollment6.sis_batch_id = @sis.id
-    @enrollment6.save!
-    @enrollment6.destroy
-    @enrollment7 = @course2.enroll_user(@user1,'ObserverEnrollment',:enrollment_state => :active,
-                                        :associated_user_id => @user3.id)
-    @enrollment7.sis_batch_id = @sis.id
-    @enrollment7.save!
-    @enrollment8 = @course4.enroll_user(@user5,'TeacherEnrollment',:enrollment_state => :active)
-    @enrollment9 = @course1.enroll_user(@user4, 'TeacherEnrollment',
-                                        enrollment_state: 'active',
-                                        allow_multiple_enrollments: true,
-                                        section: @section1)
-    @enrollment9.sis_batch_id = @sis.id
-    @enrollment9.save!
-    @enrollment10 = @course1.enroll_user(@user6,'TeacherEnrollment',
-                                         :enrollment_state => :completed)
-    @enrollment11 = @course2.enroll_user(@user4,'DesignerEnrollment',
-                                         :role => @role,
-                                         :enrollment_state => :active)
-    @enrollment11.sis_batch_id = @sis.id
-    @enrollment11.save!
-    @enrollment12 = @course4.enroll_user(@user4,'StudentEnrollment',
-                                         :enrollment_state => :active)
-    Enrollment.where(id: @enrollment12).update_all(workflow_state: 'creation_pending')
+    @enrollment1 = create_enrollment(@course1, @user1, sis_batch_id: @sis.id, enrollment_type: 'ObserverEnrollment')
+    @enrollment2 = create_enrollment(@course3, @user2, sis_batch_id: @sis.id)
+    @enrollment3 = create_enrollment(@course1, @user2, sis_batch_id: @sis.id, enrollment_type: 'TaEnrollment')
+    @enrollment4 = create_enrollment(@course1, @user3, sis_batch_id: @sis.id)
+    @enrollment5 = create_enrollment(@course2, @user3, sis_batch_id: @sis.id)
+    @enrollment6 = create_enrollment(@course1, @user4, sis_batch_id: @sis.id, enrollment_type: 'TeacherEnrollment',
+                                                       enrollment_state: 'deleted')
+    @enrollment7 = create_enrollment(@course2, @user1, sis_batch_id: @sis.id, enrollment_type: 'ObserverEnrollment',
+                                                       associated_user_id: @user3.id)
+    @enrollment8 = create_enrollment(@course4, @user5, enrollment_type: 'TeacherEnrollment')
+    @enrollment9 = create_enrollment(@course1, @user4, sis_batch_id: @sis.id, enrollment_type: 'TeacherEnrollment',
+                                                       section: @section1)
+    @enrollment10 = create_enrollment(@course1, @user6, enrollment_type: 'TeacherEnrollment',
+                                                        enrollment_state: 'completed')
+    @enrollment11 = create_enrollment(@course2, @user4, sis_batch_id: @sis.id, enrollment_type: 'DesignerEnrollment',
+                                                                               role: @role)
+    @enrollment12 = create_enrollment(@course4, @user4, enrollment_state: 'creation_pending')
   end
 
   def create_some_groups()
@@ -284,7 +261,7 @@ describe "Default Account Reports" do
   end
 
   describe "SIS export and Provisioning reports" do
-    before(:each) do
+    before(:once) do
       Notification.where(name: "Report Generated").first_or_create
       Notification.where(name: "Report Generation Failed").first_or_create
       @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
@@ -293,7 +270,7 @@ describe "Default Account Reports" do
     end
 
     describe "Users" do
-      before(:each) do
+      before(:once) do
         create_some_users_with_pseudonyms()
       end
 
@@ -434,7 +411,7 @@ describe "Default Account Reports" do
     end
 
     describe "Accounts" do
-      before(:each) do
+      before(:once) do
         create_some_accounts()
       end
 
@@ -491,7 +468,7 @@ describe "Default Account Reports" do
     end
 
     describe "Terms" do
-      before(:each) do
+      before(:once) do
         create_some_terms()
       end
 
@@ -540,7 +517,7 @@ describe "Default Account Reports" do
     end
 
     describe "Courses" do
-      before(:each) do
+      before(:once) do
         create_some_courses()
       end
 
@@ -634,7 +611,7 @@ describe "Default Account Reports" do
     end
 
     describe "Sections" do
-      before(:each) do
+      before(:once) do
         create_some_courses_and_sections()
       end
 
@@ -723,7 +700,7 @@ describe "Default Account Reports" do
     end
 
     describe "Enrollments" do
-      before(:each) do
+      before(:once) do
         create_some_enrolled_users()
       end
 
@@ -766,57 +743,56 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollments"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: [3, 1, 8]})
-
-        expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", @user6.id.to_s, nil,
+        parsed = read_report("provisioning_csv", {params: parameters, order: "skip"})
+        expect(parsed).to match_array [
+                                [@course1.id.to_s, "SIS_COURSE_ID_1", @user6.id.to_s, nil,
                                  "teacher", teacher_role.id.to_s, @enrollment10.course_section_id.to_s,
-                                 nil, "concluded", nil, nil, "false", 'TeacherEnrollment']
-        expect(parsed[1]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", @user1.id.to_s, "user_sis_id_01",
+                                 nil, "concluded", nil, nil, "false", 'TeacherEnrollment'],
+                                [@course1.id.to_s, "SIS_COURSE_ID_1", @user1.id.to_s, "user_sis_id_01",
                                  "observer", observer_role.id.to_s,
                                  @enrollment1.course_section_id.to_s, nil, "active", nil, nil, "true",
-                                 'ObserverEnrollment']
-        expect(parsed[2]).to eq [@course2.id.to_s, "SIS_COURSE_ID_2", @user1.id.to_s, "user_sis_id_01",
+                                 'ObserverEnrollment'],
+                                [@course2.id.to_s, "SIS_COURSE_ID_2", @user1.id.to_s, "user_sis_id_01",
                                  "observer", observer_role.id.to_s,
                                  @enrollment7.course_section_id.to_s, nil, "active",
-                                 @user3.id.to_s, "user_sis_id_03", "true", 'ObserverEnrollment']
-        expect(parsed[3]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", @user2.id.to_s, "user_sis_id_02",
+                                 @user3.id.to_s, "user_sis_id_03", "true", 'ObserverEnrollment'],
+                                [@course1.id.to_s, "SIS_COURSE_ID_1", @user2.id.to_s, "user_sis_id_02",
                                  "ta", ta_role.id.to_s,
                                  @enrollment3.course_section_id.to_s, nil, "active", nil, nil, "true",
-                                 'TaEnrollment']
-        expect(parsed[4]).to eq [@course3.id.to_s, "SIS_COURSE_ID_3", @user2.id.to_s, "user_sis_id_02",
+                                 'TaEnrollment'],
+                                [@course3.id.to_s, "SIS_COURSE_ID_3", @user2.id.to_s, "user_sis_id_02",
                                  "student", student_role.id.to_s,
                                  @enrollment2.course_section_id.to_s, nil, "active", nil, nil, "true",
-                                 'StudentEnrollment']
-        expect(parsed[5]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", @user3.id.to_s, "user_sis_id_03",
+                                 'StudentEnrollment'],
+                                [@course1.id.to_s, "SIS_COURSE_ID_1", @user3.id.to_s, "user_sis_id_03",
                                  "student", student_role.id.to_s,
                                  @enrollment4.course_section_id.to_s, nil, "active", nil, nil, "true",
-                                 'StudentEnrollment']
-        expect(parsed[6]).to eq [@course2.id.to_s, "SIS_COURSE_ID_2", @user3.id.to_s, "user_sis_id_03",
+                                 'StudentEnrollment'],
+                                [@course2.id.to_s, "SIS_COURSE_ID_2", @user3.id.to_s, "user_sis_id_03",
                                  "student", student_role.id.to_s,
                                  @enrollment5.course_section_id.to_s, nil, "active", nil, nil, "true",
-                                 'StudentEnrollment']
-        expect(parsed[7]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", @user4.id.to_s, "user_sis_id_04",
+                                 'StudentEnrollment'],
+                                [@course1.id.to_s, "SIS_COURSE_ID_1", @user4.id.to_s, "user_sis_id_04",
                                  "teacher", teacher_role.id.to_s, @enrollment9.course_section_id.to_s,
                                  "english_section_1", "active", nil, nil, "true",
-                                 'TeacherEnrollment']
-        expect(parsed[8]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", @user4.id.to_s, "user_sis_id_04",
+                                 'TeacherEnrollment'],
+                                [@course1.id.to_s, "SIS_COURSE_ID_1", @user4.id.to_s, "user_sis_id_04",
                                  "teacher", teacher_role.id.to_s,
                                  @enrollment6.course_section_id.to_s, nil, "deleted", nil, nil, "true",
-                                 'TeacherEnrollment']
-        expect(parsed[9]).to eq [@course2.id.to_s, "SIS_COURSE_ID_2", @user4.id.to_s, "user_sis_id_04",
+                                 'TeacherEnrollment'],
+                                [@course2.id.to_s, "SIS_COURSE_ID_2", @user4.id.to_s, "user_sis_id_04",
                                  "Pixel Engineer", @role.id.to_s, @enrollment11.course_section_id.to_s,
-                                 nil, "active", nil, nil, "true", 'DesignerEnrollment']
-        expect(parsed[10]).to eq [@course4.id.to_s, nil, @user4.id.to_s,
-                                  "user_sis_id_04", "student",
-                                  student_role.id.to_s,
-                                  @enrollment12.course_section_id.to_s, nil,
-                                  "invited", nil, nil, "false", 'StudentEnrollment']
-        expect(parsed[11]).to eq [@course4.id.to_s, nil, @user5.id.to_s,
-                                  "user_sis_id_05", "teacher", teacher_role.id.to_s,
-                                  @enrollment8.course_section_id.to_s, nil, "active", nil, nil, "false",
-                                  'TeacherEnrollment']
-        expect(parsed.length).to eq 12
-
+                                 nil, "active", nil, nil, "true", 'DesignerEnrollment'],
+                                [@course4.id.to_s, nil, @user4.id.to_s,
+                                 "user_sis_id_04", "student",
+                                 student_role.id.to_s,
+                                 @enrollment12.course_section_id.to_s, nil,
+                                 "invited", nil, nil, "false", 'StudentEnrollment'],
+                                [@course4.id.to_s, nil, @user5.id.to_s,
+                                 "user_sis_id_05", "teacher", teacher_role.id.to_s,
+                                 @enrollment8.course_section_id.to_s, nil, "active", nil, nil, "false",
+                                 'TeacherEnrollment']
+        ]
       end
 
       it "should run the provisioning report on a term and sub account with deleted enrollments" do
@@ -853,7 +829,7 @@ describe "Default Account Reports" do
     end
 
     describe "Groups" do
-      before(:each) do
+      before(:once) do
         create_some_groups()
       end
 
@@ -904,7 +880,7 @@ describe "Default Account Reports" do
     end
 
     describe "Group Memberships" do
-      before(:each) do
+      before(:once) do
         create_some_group_memberships_n_stuff()
       end
 
@@ -932,14 +908,15 @@ describe "Default Account Reports" do
       it "should run the provisioning report" do
         parameters = {}
         parameters["group_membership"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: [1, 3]})
-        expect(parsed.length).to eq 3
-        expect(parsed[0]).to eq [@group1.id.to_s, @group1.sis_source_id,
-                                 @user1.id.to_s, "user_sis_id_01", "accepted", "true"]
-        expect(parsed[1]).to eq [@group2.id.to_s, @group2.sis_source_id,
-                                 @user2.id.to_s, "user_sis_id_02", "accepted", "true"]
-        expect(parsed[2]).to eq [@group3.id.to_s, nil, @user3.id.to_s,
-                                 "user_sis_id_03", "accepted", "false"]
+        parsed = read_report("provisioning_csv", {params: parameters, order: "skip"})
+        expect(parsed).to match_array([
+          [@group1.id.to_s, @group1.sis_source_id,
+           @user1.id.to_s, "user_sis_id_01", "accepted", "true"],
+          [@group2.id.to_s, @group2.sis_source_id,
+           @user2.id.to_s, "user_sis_id_02", "accepted", "true"],
+          [@group3.id.to_s, nil, @user3.id.to_s,
+           "user_sis_id_03", "accepted", "false"]
+        ])
       end
 
       it "should run the provisioning report" do
@@ -947,15 +924,15 @@ describe "Default Account Reports" do
         parameters["group_membership"] = true
         parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: [1, 3]})
         expect(parsed.length).to eq 2
-        expect(parsed[0]).to eq [@group2.id.to_s, @group2.sis_source_id,
-                                 @user2.id.to_s, "user_sis_id_02", "accepted", "true"]
-        expect(parsed[1]).to eq [@group3.id.to_s, nil, @user3.id.to_s,
+        expect(parsed[0]).to eq [@group3.id.to_s, nil, @user3.id.to_s,
                                  "user_sis_id_03", "accepted", "false"]
+        expect(parsed[1]).to eq [@group2.id.to_s, @group2.sis_source_id,
+                                 @user2.id.to_s, "user_sis_id_02", "accepted", "true"]
       end
     end
 
     describe "Cross List" do
-      before(:each) do
+      before(:once) do
         create_some_courses_and_sections()
         @section1.crosslist_to_course(@course2)
         @section3.crosslist_to_course(@course1)

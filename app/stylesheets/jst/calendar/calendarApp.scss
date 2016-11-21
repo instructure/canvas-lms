@@ -1,10 +1,5 @@
 @import "base/environment";
 
-#main {
-  background-color: transparent;
-  border: none;
-}
-
 #calendar-app {
   position: relative;
 }
@@ -25,15 +20,10 @@
   }
   .fc-head thead .fc-widget-header {
     color: $ic-font-color--subdued;
-    font-weight: bold;
     padding: 10px 0;
     text-transform: uppercase;
   }
-  .fc-widget-header, .fc-widget-content {
-    border-color: #dadada;
-  }
 }
-
 .fc-event.grayed {
   opacity: 0.5;
 }
@@ -68,7 +58,6 @@
     @include reset-list;
   }
   th {
-    font-weight: bold;
     padding-bottom: 3px;
     padding-right: 8px;
   }
@@ -214,4 +203,38 @@
 .calendar__event--completed {
   text-decoration: line-through;
   opacity: 0.7;
+}
+
+//////////////////////////////////////
+/////// NEW CALENDAR LOOK / OVERRIDES
+/////////////////////////////////////
+
+//lose the horizontal border for weekly view
+.fc-time-grid .fc-slats td {
+  border-top: 0;
+}
+.fc-agendaWeek-view .fc-event {
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left-width: 3px;
+}
+.fc-day-header__week-number {
+  @include fontSize(36px);
+  font-weight: 200;
+}
+.fc-day-header__week-day {
+  @include fontSize(16px);
+  font-weight: 500;
+}
+
+// to change the size/color of the event time only within the event container
+.fc-agendaWeek-view .fc-event-container a[class*="group_"] .fc-content .fc-time {
+  color: $ic-font-color-dark;
+}
+// override the default fullcalendar.css to accommodate wider left border on events
+.fc-ltr .fc-time-grid .fc-event-container {
+  margin-left: 1px;
 }

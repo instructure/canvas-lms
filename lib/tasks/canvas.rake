@@ -9,64 +9,6 @@ def log_time(name, &block)
   time
 end
 
-def check_syntax(files)
-  quick = ENV["quick"] && ENV["quick"] == "true"
-  puts "--> Checking Syntax...."
-  show_stoppers = []
-  raise "jsl needs to be in your $PATH, download from: javascriptlint.com" if `which jsl`.empty?
-  puts "--> Found jsl..."
-
-  Array(files).each do |js_file|
-    js_file.strip!
-    # only lint things in public/javascripts that are not in /vendor, /compiled, etc.
-    if js_file.match /public\/javascripts\/(?!vendor|compiled|instructure\-ui|i18n.js|translations|old_unsupported_dont_use_react)/
-      file_path = File.join(Rails.root, js_file)
-
-      unless quick
-        # to use this, you need to have jshint installed from npm
-        # (which means you need to have node.js installed)
-        # on osx you can do:
-        # brew install node
-        # npm install jshint
-        unless `which jshint`.empty?
-          puts " --> Checking #{js_file} using JSHint:"
-          js_hint_errors = `jshint #{file_path} --config "#{File.join(Rails.root, '.jshintrc')}"`
-          puts js_hint_errors
-        end
-
-        # Checks for coding style problems using google's js style guide.
-        # Only works if you have gjslint installed.
-        # Download from http://code.google.com/closure/utilities/
-        unless `which gjslint`.empty?
-          puts " --> Checking #{js_file} using gjslint.py:"
-          gjslint_errors = `gjslint --nojsdoc --strict #{js_file}`
-          puts gjslint_errors = gjslint_errors.split("\n").reject{ |l| l.match("Line too long") }.join("\n")
-        end
-      end
-
-      jsl_output = `jsl -process "#{file_path}" -nologo -conf "#{File.join(Rails.root, 'config', 'jslint.conf')}"`
-      exit_status = $?.exitstatus
-      if exit_status != 0
-        puts " --> Error checking #{js_file} using jsl:"
-        if jsl_output.match("warning: trailing comma is not legal in ECMA-262 object initializers") || jsl_output.match("extra comma is not recommended in array initializers")
-          exit_status = 2
-          jsl_output << "fatal trailing comma found. Stupid IE!"
-        end
-        if exit_status >= 2
-          show_stoppers << jsl_output
-        end
-        puts jsl_output
-      end
-    end
-  end
-  if show_stoppers.empty?
-    puts " --> No JavaScript errors found using jsl"
-  else
-    raise "FATAL JavaScript errors found using jsl"
-  end
-end
-
-
 namespace :canvas do
   desc "Compresses static assets"
   task :compress_assets do
@@ -86,30 +28,12 @@ namespace :canvas do
     puts "Compressed #{processed} assets, #{before_bytes} -> #{after_bytes} bytes (#{"%.0f" % ((before_bytes.to_f - after_bytes.to_f) / before_bytes * 100)}% reduction)"
   end
 
-  task :check_syntax  => "canvas:check_syntax:all"
-  namespace :check_syntax do
-    desc "Checks all js files that are staged for commiting to git for syntax errors. Make your .git/hooks/pre-commit look like: rake canvas:check_syntax:changed quick=true to not allow committing js with syntax errors"
-    task :changed do
-      files = `git diff-index --name-only --cached HEAD -- | grep '\.js$'`
-      check_syntax(files)
-    end
-
-    desc "Checks all js files for sytax errors."
-    task :all do
-      #bundles = YAML.load(ERB.new(File.read('config/assets.yml')).result)['javascripts']
-      files = (Dir.glob('./public/javascripts/*.js')).
-        reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18n.js|translations\/)/ }
-
-      check_syntax(files)
-    end
-  end
-
   desc "Compile javascript and css assets."
   task :compile_assets, :generate_documentation, :check_syntax, :compile_styleguide, :build_js do |t, args|
+    # :check_syntax is currently a dummy argument that isn't used.
     args.with_defaults(:generate_documentation => true, :check_syntax => false, :compile_styleguide => true, :build_js => true)
     truthy_values = [true, 'true', '1']
     generate_documentation = truthy_values.include?(args[:generate_documentation])
-    check_syntax = truthy_values.include?(args[:check_syntax])
     compile_styleguide = truthy_values.include?(args[:compile_styleguide])
     build_js = truthy_values.include?(args[:build_js])
 
@@ -158,12 +82,6 @@ namespace :canvas do
       }
     end
 
-    if check_syntax
-      tasks["check JavaScript syntax"] = -> {
-        Rake::Task['canvas:check_syntax'].invoke
-      }
-    end
-
     if generate_documentation
       tasks["Generate documentation [yardoc]"] = -> {
         Rake::Task['doc:api'].invoke
@@ -195,11 +113,6 @@ namespace :canvas do
        end
 
        threads << Thread.new do
-         puts "--> Check syntax"
-         Rake::Task['canvas:check_syntax'].invoke
-       end
-
-       threads << Thread.new do
          puts "--> Generating API documentation"
          Rake::Task['doc:api'].invoke
        end
@@ -217,20 +130,6 @@ namespace :lint do
       raise "lint:render_json test failed"
     else
       puts "lint:render_json test succeeded"
-    end
-  end
-end
-
-if CANVAS_RAILS4_0
-  old_task = Rake::Task['db:_dump']
-  old_actions = old_task.actions.dup
-  old_task.actions.clear
-
-  old_task.enhance do
-    if ActiveRecord::Base.dump_schema_after_migration == false
-      # do nothing
-    else
-      old_actions.each(&:call)
     end
   end
 end

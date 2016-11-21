@@ -1,8 +1,9 @@
 define [
   'react'
+  'react-dom'
   'jquery'
   'jsx/shared/ProgressBar'
-], (React, $, ProgressBar) ->
+], (React, ReactDOM, $, ProgressBar) ->
 
   module 'ProgressBar',
     setup: ->
@@ -10,16 +11,16 @@ define [
       $("#fixtures").empty()
 
   test 'sets width on progress bar', ->
-    prog = React.render(React.createElement(ProgressBar, {progress: 35}), $('<div>').appendTo('#fixtures')[0])
+    prog = ReactDOM.render(React.createElement(ProgressBar, {progress: 35}), $('<div>').appendTo('#fixtures')[0])
     equal prog.refs.bar.getDOMNode().style.width, '35%'
-    React.unmountComponentAtNode(prog.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(prog.getDOMNode().parentNode)
 
   test 'shows indeterminate loader when progress is 100 but not yet complete', ->
-    prog = React.render(React.createElement(ProgressBar, {progress: 100}), $('<div>').appendTo('#fixtures')[0])
+    prog = ReactDOM.render(React.createElement(ProgressBar, {progress: 100}), $('<div>').appendTo('#fixtures')[0])
     ok prog.refs.container.getDOMNode().className.match(/almost-done/)
-    React.unmountComponentAtNode(prog.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(prog.getDOMNode().parentNode)
 
   test 'style width value never reaches over 100%', ->
-    prog = React.render(React.createElement(ProgressBar, {progress: 200}), $('<div>').appendTo('#fixtures')[0])
+    prog = ReactDOM.render(React.createElement(ProgressBar, {progress: 200}), $('<div>').appendTo('#fixtures')[0])
     equal prog.refs.bar.getDOMNode().style.width, '100%'
-    React.unmountComponentAtNode(prog.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(prog.getDOMNode().parentNode)

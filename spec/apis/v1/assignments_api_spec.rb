@@ -532,13 +532,15 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       before :once do
-        course_with_teacher_logged_in(:active_all => true)
-        @assignment = @course.assignments.create :name => 'differentiated assignment'
+        course_with_teacher_logged_in(active_all: true)
+        @assignment = @course.assignments.create(name: 'differentiated assignment')
         section = @course.course_sections.create!(name: "second test section")
         create_section_override_for_assignment(@assignment, {course_section: section})
+        assignment_override_model(assignment: @assignment, set_type: 'Noop', title: 'Just a Tag')
       end
 
       it "should include overrides if overrides flag is included in the params" do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
         assignments_json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments",
           {
             controller: 'assignments_api',
@@ -546,9 +548,10 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
             format: 'json',
             course_id: @course.id.to_s,
           },
-            :include => ['overrides']
+            include: ['overrides']
           )
         expect(assignments_json[0].keys).to include("overrides")
+        expect(assignments_json[0]["overrides"].length).to eq 2
       end
 
       it "should include the only_visible_to_overrides flag if differentiated assignments is on" do
@@ -903,6 +906,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         'peer_review_count' => 2,
         'group_category_id' => group_category.id,
         'turnitin_enabled' => true,
+        'vericite_enabled' => true,
         'grading_type' => 'points',
         'muted' => 'true'
       }
@@ -978,6 +982,8 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       @group_category = @course.group_categories.create!(name: "foo")
       @course.any_instantiation.expects(:turnitin_enabled?).
         at_least_once.returns true
+      @course.any_instantiation.expects(:vericite_enabled?).
+        at_least_once.returns true
       @json = api_create_assignment_in_course(@course,
         create_assignment_json(@group, @group_category)
        )
@@ -1001,6 +1007,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(@json['position']).to eq 1
       expect(@json['group_category_id']).to eq @group_category.id
       expect(@json['turnitin_enabled']).to eq true
+      expect(@json['vericite_enabled']).to eq true
       expect(@json['turnitin_settings']).to eq({
         'originality_report_visibility' => 'immediate',
         's_paper_check' => true,
@@ -1054,6 +1061,18 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(Assignment.last.turnitin_enabled).to be_falsey
     end
 
+    it "does not allow modifying vericite_enabled when not enabled on the context" do
+      Course.any_instance.expects(:vericite_enabled?).at_least_once.returns false
+      response = api_create_assignment_in_course(@course,
+            { 'name' => 'some assignment',
+              'vericite_enabled' => false
+            }
+       )
+
+      expect(response.keys).not_to include 'vericite_enabled'
+      expect(Assignment.last.vericite_enabled).to be_falsey
+    end
+
     it "should process html content in description on create" do
       should_process_incoming_user_content(@course) do |content|
         api_create_assignment_in_course(@course, { 'description' => content })
@@ -1062,6 +1081,18 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         a.reload
         a.description
       end
+    end
+
+    it "sets the lti_context_id if provided" do
+      lti_assignment_id = SecureRandom.uuid
+      jwt = Canvas::Security.create_jwt(lti_assignment_id: lti_assignment_id)
+
+      api_create_assignment_in_course(@course, { 'description' => 'description',
+        'secure_params' => jwt
+      })
+
+      a = Assignment.last
+      expect(a.lti_context_id).to eq(lti_assignment_id)
     end
 
     it "should allow valid submission types as an array" do
@@ -1122,11 +1153,16 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           'assignment_overrides' => {
             '0' => {
               'student_ids' => [@student.id],
-              'due_at' => @adhoc_due_at.iso8601 },
+              'due_at' => @adhoc_due_at.iso8601
+            },
             '1' => {
                 'course_section_id' => @course.default_section.id,
                 'due_at' => @section_due_at.iso8601
-              }
+            },
+            '2' => {
+                'title' => 'Helpful Tag',
+                'noop_id' => 999
+            }
           }
         }
       }
@@ -1146,7 +1182,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       )
 
       @assignment = Assignment.find @json['id']
-      expect(@assignment.assignment_overrides.count).to eq 2
+      expect(@assignment.assignment_overrides.count).to eq 3
 
       @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
       expect(@adhoc_override).not_to be_nil
@@ -1160,6 +1196,14 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(@section_override.set).to eq @course.default_section
       expect(@section_override.due_at_overridden).to be_truthy
       expect(@section_override.due_at.to_i).to eq @section_due_at.to_i
+
+      @noop_override = @assignment.assignment_overrides.where(set_type: 'Noop').first
+      expect(@noop_override).not_to be_nil
+      expect(@noop_override.set).to be_nil
+      expect(@noop_override.set_type).to eq 'Noop'
+      expect(@noop_override.set_id).to eq 999
+      expect(@noop_override.title).to eq 'Helpful Tag'
+      expect(@noop_override.due_at_overridden).to be_falsey
     end
 
     it 'accepts configuration argument to split needs grading by section' do
@@ -1202,48 +1246,6 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         }, {needs_grading_count_by_section: 'true'})
       expect(show_json.keys).to include("needs_grading_count_by_section")
     end
-
-    it "allows creating an assignment with overrides via the API" do
-     student_in_course(:course => @course, :active_enrollment => true)
-
-     adhoc_due_at = 5.days.from_now
-     section_due_at = 7.days.from_now
-
-     @user = @teacher
-     @json = api_call(:post, "/api/v1/courses/#{@course.id}/assignments.json",
-       { :controller => 'assignments_api',
-         :action => 'create',
-         :format => 'json',
-         :course_id => @course.id.to_s },
-         { :assignment => {
-           'name' => 'some assignment',
-           'assignment_overrides' => {
-             '0' => {
-               'student_ids' => [@student.id],
-               'title' => 'adhoc override',
-               'due_at' => adhoc_due_at.iso8601 },
-               '1' => {
-                 'course_section_id' => @course.default_section.id,
-                 'due_at' => section_due_at.iso8601
-               }
-             }
-           }
-           })
-     @assignment = Assignment.find @json['id']
-     expect(@assignment.assignment_overrides.count).to eq 2
-
-     @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
-     expect(@adhoc_override).not_to be_nil
-     expect(@adhoc_override.set).to eq [@student]
-     expect(@adhoc_override.due_at_overridden).to be_truthy
-     expect(@adhoc_override.due_at.to_i).to eq adhoc_due_at.to_i
-
-     @section_override = @assignment.assignment_overrides.where(set_type: 'CourseSection').first
-     expect(@section_override).not_to be_nil
-     expect(@section_override.set).to eq @course.default_section
-     expect(@section_override.due_at_overridden).to be_truthy
-     expect(@section_override.due_at.to_i).to eq section_due_at.to_i
-   end
 
     context "adhoc overrides" do
       def adhoc_override_api_call(rest_method, endpoint, action, opts={})
@@ -1529,6 +1531,24 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         to eq "Can't unpublish if there are student submissions"
     end
 
+    it "updates using lti_context_id" do
+      @assignment = @course.assignments.create({
+                                                 :name => "some assignment",
+                                                 :points_possible => 15
+                                               })
+      raw_api_call(:put,
+                   "/api/v1/courses/#{@course.id}/assignments/lti_context_id:#{@assignment.lti_context_id}.json",
+                   {:controller => 'assignments_api', :action => 'update',
+                    :format => 'json',
+                    :course_id => @course.id.to_s,
+                    :id => "lti_context_id:#{@assignment.lti_context_id}"},
+                   {
+                     assignment: {:published => false}
+                   })
+      expect(JSON.parse(response.body)['id']).to eq @assignment.id
+    end
+
+
     it "should 400 with invalid date times" do
       the_date = 1.day.ago
       @assignment = @course.assignments.create({
@@ -1785,6 +1805,10 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
               '1' => {
                 'course_section_id' => @course.default_section.id,
                 'due_at' => @section_due_at.iso8601
+              },
+              '2' => {
+                'title' => 'Helpful Tag',
+                'noop_id' => 999
               }
             }
           })
@@ -1792,7 +1816,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "updates any ADHOC overrides" do
-          expect(@assignment.assignment_overrides.count).to eq 2
+          expect(@assignment.assignment_overrides.count).to eq 3
           @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
           expect(@adhoc_override).not_to be_nil
           expect(@adhoc_override.set).to eq [@student]
@@ -1806,6 +1830,16 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           expect(@section_override.set).to eq @course.default_section
           expect(@section_override.due_at_overridden).to be_truthy
           expect(@section_override.due_at.to_i).to eq @section_due_at.to_i
+        end
+
+        it "updates any Noop overrides" do
+          @noop_override = @assignment.assignment_overrides.where(set_type: 'Noop').first
+          expect(@noop_override).not_to be_nil
+          expect(@noop_override.set).to be_nil
+          expect(@noop_override.set_type).to eq 'Noop'
+          expect(@noop_override.set_id).to eq 999
+          expect(@noop_override.title).to eq 'Helpful Tag'
+          expect(@noop_override.due_at_overridden).to be_falsey
         end
       end
 
@@ -2194,6 +2228,24 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
               {:expected_status => 200})
         expect(@assignment.reload).to be_deleted
       end
+
+      it "deletes by lti_context_id" do
+        teacher_in_course(:course => @course, :active_all => true)
+        api_call(:delete,
+                 "/api/v1/courses/#{@course.id}/assignments/lti_context_id:#{@assignment.lti_context_id}",
+                 {
+                   :controller => 'assignments',
+                   :action => 'destroy',
+                   :format => 'json',
+                   :course_id => @course.id.to_s,
+                   :id => "lti_context_id:#{@assignment.lti_context_id}"
+                 },
+                 {},
+                 {},
+                 {:expected_status => 200})
+        expect(@assignment.reload).to be_deleted
+      end
+
     end
 
   end
@@ -2219,6 +2271,15 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         @assignment.any_instantiation.stubs(:locked_for?).returns(
           {:asset_string => '', :unlock_at => 1.hour.from_now }
         )
+      end
+
+      it "looks up an assignment by lti_context_id" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/lti_context_id:#{@assignment.lti_context_id}.json",
+                        {:controller => "assignments_api", :action => "show",
+                         :format => "json", :course_id => @course.id.to_s,
+                         :id => "lti_context_id:#{@assignment.lti_context_id}"})
+        expect(json["id"]).to eq @assignment.id
       end
 
       it "does not return the assignment's description if locked for user" do
@@ -2641,6 +2702,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         student_in_section(section2, user: @student3)
         create_section_override_for_assignment(@assignment1, {course_section: section1})
         create_section_override_for_assignment(@assignment2, {course_section: section2})
+        assignment_override_model(assignment: @assignment1, set_type: 'Noop', title: 'Just a Tag')
       end
 
       def visibility_api_request(assignment)
@@ -2656,6 +2718,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       it "should include overrides if overrides flag is included in the params" do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
         assignments_json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}.json",
           {
             controller: 'assignments_api',
@@ -2667,6 +2730,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           :include => ['overrides']
         )
         expect(assignments_json.keys).to include("overrides")
+        expect(assignments_json["overrides"].length).to eq 2
       end
 
 
@@ -2753,12 +2817,16 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       @assignment = @course.assignments.create!(:title => "some assignment")
     end
 
+    def strong_anything
+      ArbitraryStrongishParams::ANYTHING
+    end
+
     it 'updates the external tool content_id' do
       mh = create_message_handler(create_resource_handler(create_tool_proxy))
       tool_tag = ContentTag.new(url: 'http://www.example.com', new_tab: false, tag_type: 'context_module')
       tool_tag.context = @assignment
       tool_tag.save!
-      params = {
+      params = ActionController::Parameters.new({
         "submission_types" => ["external_tool"],
         "external_tool_tag_attributes" => {
           "url" => "https://testvmserver.test.com/canvas/test/",
@@ -2766,7 +2834,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           "content_id" => mh.id,
           "new_tab" => "0"
         }
-      }
+      })
       assignment = update_from_params(@assignment, params, @user)
       tag = assignment.external_tool_tag
       expect(tag.content_id).to eq mh.id
@@ -2781,7 +2849,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       tool_tag = ContentTag.new(url: 'http://www.example.com', new_tab: false, tag_type: 'context_module')
       tool_tag.context = @assignment
       tool_tag.save!
-      params = {
+      params = ActionController::Parameters.new({
         "submission_types" => ["external_tool"],
         "external_tool_tag_attributes" => {
           "url" => "https://testvmserver.test.com/canvas/test/",
@@ -2789,7 +2857,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           "content_id" => tool.id,
           "new_tab" => "0"
         }
-      }
+      })
       assignment = update_from_params(@assignment, params, @user)
       tag = assignment.external_tool_tag
       expect(tag.content_id).to eq tool.id
@@ -2798,7 +2866,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
     it "does not update integration_data when lacking permission" do
       json = %{{"key": "value"}}
-      params = {"integration_data" => json}
+      params = ActionController::Parameters.new({"integration_data" => json})
 
       update_from_params(@assignment, params, @user)
       expect(@assignment.integration_data).to eq({})
@@ -2806,7 +2874,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
     it "updates integration_data with permission" do
       json = %{{"key": "value"}}
-      params = {"integration_data" => json}
+      params = ActionController::Parameters.new({"integration_data" => json})
       account_admin_user_with_role_changes(
         :role_changes => {:manage_sis => true})
       update_from_params(@assignment, params, @admin)
@@ -2820,7 +2888,8 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       comment = sub.submission_comments.first
       expect(comment.hidden?).to eql true
 
-      update_from_params(@assignment, {"muted" => "false"}, @teacher)
+      params = ActionController::Parameters.new({"muted" => "false"})
+      update_from_params(@assignment, params, @teacher)
       expect(comment.reload.hidden?).to eql false
     end
   end

@@ -59,6 +59,13 @@ describe AssignmentOverride do
     expect(@override.set).to eq [@student]
   end
 
+  it "should allow reading set_id when set_type is noop" do
+    @override = AssignmentOverride.new
+    @override.set_type = 'Noop'
+    expect(@override.set_id).to be_nil
+    expect(@override.set).to eq nil
+  end
+
   it "should remove adhoc associations when an adhoc override is deleted" do
     @override = assignment_override_model(:course => @course)
     @override_student = @override.assignment_override_students.build
@@ -183,6 +190,13 @@ describe AssignmentOverride do
       expect(@override).to be_valid
     end
 
+    it "should accept noop with arbitrary set_id" do
+      @override.set_type = 'Noop'
+      @override.set_id = 9000
+      expect(@override).to be_valid
+      expect(@override.set_id).to eq 9000
+    end
+
     it "should reject an empty set_id with a non-adhoc set_type" do
       @override.set = nil
       @override.set_type = 'CourseSection'
@@ -296,6 +310,13 @@ describe AssignmentOverride do
       @override.title = 'Other Value'
       @override.valid? # trigger bookkeeping
       expect(@override.title).to eq 'Other Value'
+    end
+
+    it "should not be changed for noop" do
+      @override.set_type = 'Noop'
+      @override.title = 'Literally Anything'
+      @override.valid? # trigger bookkeeping
+      expect(@override.title).to eq 'Literally Anything'
     end
 
     it "should set ADHOC's title to reflect students (with few)" do
@@ -718,6 +739,13 @@ describe AssignmentOverride do
   describe "applies_to_students" do
     before do
       student_in_course
+    end
+
+    it "returns empty set for noop" do
+      @override = assignment_override_model(:course => @course)
+      @override.set_type = 'Noop'
+
+      expect(@override.applies_to_students).to eq []
     end
 
     it "returns the right students for ADHOC" do

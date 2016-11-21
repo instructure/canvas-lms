@@ -115,7 +115,7 @@ module ContextModulesHelper
 
     cyoe_rules = []
 
-    if is_student && is_cyoe_on
+    if is_cyoe_on
       cyoe_rules = ConditionalRelease::Service.rules_for(@context, current_user, module_data[:items], session)
     end
 
@@ -126,18 +126,19 @@ module ContextModulesHelper
         published_status: item.published? ? 'published' : 'unpublished',
       }
 
-      if is_student && is_cyoe_on
+      if is_cyoe_on
         item_data[:mastery_paths] = conditional_release(item, { conditional_release_rules: cyoe_rules })
-        item_data[:choose_url] = context_url(@context, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
+        if is_student && item_data[:mastery_paths].present?
+          item_data[:show_cyoe_placeholder] = item_data[:mastery_paths][:selected_set_id].nil? &&
+                  (item_data[:mastery_paths][:locked] || item_data[:mastery_paths][:assignment_sets].present?)
+          item_data[:choose_url] = context_url(@context, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
+        end
       end
-
-      item_data[:show_cyoe_placeholder] = is_student && item_data[:mastery_paths] && item_data[:mastery_paths][:selected_set_id] == nil
 
       items_data[item.id] = item_data
     end
 
     module_data[:items_data] = items_data
-
     return module_data
   end
 

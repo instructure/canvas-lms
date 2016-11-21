@@ -43,6 +43,7 @@ define([
   'quiz_labels',
   'jsx/shared/rce/RichContentEditor',
   'jsx/shared/conditional_release/ConditionalRelease',
+  'compiled/util/deparam',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -63,7 +64,7 @@ define([
             DueDateList, QuizRegradeView, SectionList,
             MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
             RCEKeyboardShortcuts, INST, QuizFormulaSolution, addAriaDescription,
-            RichContentEditor, ConditionalRelease){
+            RichContentEditor, ConditionalRelease, deparam){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
@@ -1495,6 +1496,7 @@ define([
         $('#quiz_tabs').tabs("option", "disabled", false);
       } else {
         $('#quiz_tabs').tabs("option", "disabled", [2]);
+        $('#quiz_tabs').tabs("option", "active", 0)
       }
     }
   }
@@ -1839,7 +1841,11 @@ define([
           }
           $(".show_rubric_link").showIf(data.quiz.assignment);
           $("#quiz_assignment_id").val(data.quiz.quiz_type || "practice_quiz").change();
-          location.href = $(this).attr('action');
+          if (deparam()['return_to']) {
+            location.href = deparam()['return_to']
+          } else {
+            location.href = $(this).attr('action');
+          }
           quiz.updateDisplayComments();
         }
 

@@ -370,6 +370,7 @@ class SearchController < ApplicationController
     enrollment_counts = {:all => users.size}
     users.each do |user|
       common_courses = @current_user.address_book.common_courses(user)
+      next unless common_courses.key?(course[:id])
       roles = common_courses[course[:id]].uniq
       roles.each do |role|
         enrollment_counts[role] ||= 0

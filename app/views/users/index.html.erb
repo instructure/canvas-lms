@@ -9,7 +9,7 @@
 <% end %>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-lr rs-margin-top" style="padding-bottom: 20px;">
+  <div class="rs-margin-bottom">
     <a href="<%= context_url(@context, :context_groups_url) %>" class="btn button-sidebar-wide user_groups"><i class="icon-group"></i> <%= t('buttons.user_groups', 'View User Groups') %></a>
     <% if service_enabled?(:avatars) %>
       <a href="<%= context_url(@context, :context_avatars_url) %>" class="btn button-sidebar-wide manage_profile_pictures"><i class="icon-student-view"></i> <%= t('buttons.manage_profile_pictures', 'Manage Profile Pictures') %></a>
@@ -18,7 +18,7 @@
 
   <% if @enrollment_terms.size > 1 %>
     <h2><%= t('titles.choose_term', 'Choose Term') %></h2>
-    <div class="rs-margin-lr rs-margin-bottom">
+    <div class="rs-margin-bottom">
       <label for="enrollment_term"><%= before_label('show_users_for_term', 'Show users with enrollments in the term') %></label><br />
       <%= form_tag(account_users_path, :method => :get) do %>
         <input name="focus" type="hidden" value="enrollment_term_id"/>

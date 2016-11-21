@@ -208,7 +208,8 @@ module CC
           q_node.available quiz.available?
           q_node.one_time_results quiz.one_time_results?
           q_node.show_correct_answers_last_attempt quiz.show_correct_answers_last_attempt?
-          q_node.module_locked quiz.locked_by_module_item?(@user, true).present?
+          q_node.only_visible_to_overrides quiz.only_visible_to_overrides?
+          q_node.module_locked quiz.locked_by_module_item?(@user, deep_check_if_needed: true).present?
           if quiz.assignment && !quiz.assignment.deleted?
             assignment_migration_id = CCHelper.create_key(quiz.assignment)
             doc.assignment(:identifier=>assignment_migration_id) do |a|
@@ -218,6 +219,11 @@ module CC
           if quiz.assignment_group_id
             ag = @course.assignment_groups.find(quiz.assignment_group_id)
             q_node.assignment_group_identifierref create_key(ag)
+          end
+          q_node.assignment_overrides do |ao_node|
+            quiz.assignment_overrides.active.where(set_type: 'Noop').each do |o|
+              ao_node.override(o.slice(:set_type, :set_id, :title))
+            end
           end
         end
       end

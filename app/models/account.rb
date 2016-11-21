@@ -20,11 +20,7 @@ require 'atom'
 
 class Account < ActiveRecord::Base
   include Context
-  attr_accessible :name, :turnitin_account_id, :turnitin_shared_secret,
-    :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,
-    :default_time_zone, :parent_account, :settings, :default_storage_quota,
-    :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
-    :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5
+  strong_params
 
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
 
@@ -192,7 +188,6 @@ class Account < ActiveRecord::Base
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
-  add_setting :enable_manage_groups2, :boolean => true, :root_only => true, :default => true
   add_setting :mfa_settings, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
@@ -1008,6 +1003,9 @@ class Account < ActiveRecord::Base
     # any user with an admin enrollment in one of the courses can read
     given { |user| user && self.courses.where(:id => user.enrollments.admin.pluck(:course_id)).exists? }
     can :read
+
+    given { |user| self.grants_right?(user, :lti_add_edit)}
+    can :create_tool_manually
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -1426,9 +1424,9 @@ class Account < ActiveRecord::Base
     end
 
     if settings[:new_custom_help_links]
-      links || Canvas::Help.default_links
+      links || Account::HelpLinks.default_links
     else
-      Canvas::Help.default_links + (links || [])
+      Account::HelpLinks.default_links + (links || [])
     end
   end
 
@@ -1578,10 +1576,6 @@ class Account < ActiveRecord::Base
   scope :processing_sis_batch, -> { where("accounts.current_sis_batch_id IS NOT NULL").order(:updated_at) }
   scope :name_like, lambda { |name| where(wildcard('accounts.name', name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
-
-  def canvas_network_enabled?
-    false
-  end
 
   def change_root_account_setting!(setting_name, new_value)
     root_account.settings[setting_name] = new_value

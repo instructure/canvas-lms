@@ -1,11 +1,11 @@
 define [
   'react'
+  'react-dom'
   'react-modal'
   'jsx/external_apps/components/AddApp'
-], (React, Modal, AddApp) ->
+], (React, ReactDOM, Modal, AddApp) ->
 
   TestUtils = React.addons.TestUtils
-  Simulate = TestUtils.Simulate
   wrapper = document.getElementById('fixtures')
 
   Modal.setAppElement(wrapper)
@@ -20,7 +20,7 @@ define [
     })
 
   renderComponent = (data) ->
-    React.render(createElement(data), wrapper)
+    ReactDOM.render(createElement(data), wrapper)
 
   getDOMNodes = (data) ->
     component = renderComponent(data)
@@ -42,7 +42,7 @@ define [
         "status": "active"
       }
     teardown: ->
-      React.unmountComponentAtNode wrapper
+      ReactDOM.unmountComponentAtNode wrapper
 
   test 'renders', ->
     data =

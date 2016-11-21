@@ -371,6 +371,18 @@ describe CoursesController do
       student_in_course(active_all: true)
     end
 
+    it "should set tool creation permissions true for roles that are granted rights" do
+      user_session(@teacher)
+      get 'settings', :course_id => @course.id
+      expect(controller.js_env[:PERMISSIONS][:create_tool_manually]).to eq(true)
+    end
+
+    it "should not set tool creation permissions for roles not granted rights" do
+      user_session(@student)
+      get 'settings', :course_id => @course.id
+      expect(controller.js_env[:PERMISSIONS]).to be_nil
+    end
+
     it "should require authorization" do
       get 'settings', :course_id => @course.id
       assert_unauthorized
@@ -752,9 +764,11 @@ describe CoursesController do
       it "should not show unpublished assignments to students" do
         @course1.default_view = "assignments"
         @course1.save!
-        @a1.unpublish
+        @a1a = @course1.assignments.new(:title => "some assignment course 1", due_at: 1.day.from_now)
+        @a1a.save
+        @a1a.unpublish
         get 'show', :id => @course1.id
-        expect(assigns(:assignments).map(&:id).include?(@a1.id)).to be_falsey
+        expect(assigns(:upcoming_assignments).map(&:id).include?(@a1a.id)).to be_falsey
       end
 
       it "should work for wiki view" do

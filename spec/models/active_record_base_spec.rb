@@ -315,7 +315,7 @@ describe ActiveRecord::Base do
         User.connection.unstub(:select)
 
         User.create!
-        User.connection.expects(:select).once.returns(CANVAS_RAILS4_0 ? [] : ActiveRecord::Result.new([], []))
+        User.connection.expects(:select).once.returns(ActiveRecord::Result.new([], []))
         User.first
       end
     end
@@ -331,7 +331,7 @@ describe ActiveRecord::Base do
         u2 = User.new
         u2.id = u.id
         expect{ u2.save! }.to raise_error(ActiveRecord::RecordNotUnique)
-        User.connection.expects(:select).once.returns(CANVAS_RAILS4_0 ? [] : ActiveRecord::Result.new([], []))
+        User.connection.expects(:select).once.returns(ActiveRecord::Result.new([], []))
         User.first
       end
     end
@@ -689,19 +689,19 @@ describe ActiveRecord::Base do
     end
 
     it "prefixes specific associations" do
-      expect(AssessmentRequest.reflections.keys).to be_include(CANVAS_RAILS4_0 ? :assessor_asset_user : 'assessor_asset_user')
+      expect(AssessmentRequest.reflections.keys).to be_include('assessor_asset_user')
     end
 
     it "prefixes specific associations with an explicit name" do
-      expect(LearningOutcomeResult.reflections.keys).to be_include(CANVAS_RAILS4_0 ? :association_assignment : 'association_assignment')
+      expect(LearningOutcomeResult.reflections.keys).to be_include('association_assignment')
     end
 
     it "passes the correct foreign key down to specific associations" do
-      expect(LearningOutcomeResult.reflections[CANVAS_RAILS4_0 ? :association_assignment : 'association_assignment'].foreign_key).to eq :association_id
+      expect(LearningOutcomeResult.reflections['association_assignment'].foreign_key).to eq :association_id
     end
 
     it "handles class resolution that doesn't match the association name" do
-      expect(Attachment.reflections[CANVAS_RAILS4_0 ? :quiz : 'quiz'].klass).to eq Quizzes::Quiz
+      expect(Attachment.reflections['quiz'].klass).to eq Quizzes::Quiz
     end
 
     it "doesn't validate the type field for non-exhaustive associations" do

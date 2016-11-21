@@ -26,8 +26,7 @@ module Assignments
     end
     let_once(:published) do
       @course.assignments.create({
-        title: 'published assignment',
-        state: 'published'
+        title: 'published assignment'
       })
     end
     let_once(:unpublished) do

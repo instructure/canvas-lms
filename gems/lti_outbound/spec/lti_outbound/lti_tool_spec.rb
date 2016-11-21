@@ -115,6 +115,24 @@ describe LtiOutbound::LTITool do
     end
   end
 
+  describe '#format_lti_params' do
+    it 'ignores the key if the prefix matches' do
+      lti_params = {'custom_my_param' => 123}
+      expect(subject.format_lti_params('custom', lti_params)).to eq lti_params
+    end
+
+    it 'replaces whitespace with "_"' do
+      lti_params = {'custom_my param' => 123}
+      expect(subject.format_lti_params('custom', lti_params).keys).to eq ['custom_my_param']
+    end
+
+    it 'adds the prefix if not present' do
+      lti_params = {'my_param' => 123}
+      expect(subject.format_lti_params('custom', lti_params)).to eq({'custom_my_param' => 123})
+    end
+
+  end
+
   describe '#selection_width' do
     it 'returns selection width from settings for a resource type' do
       subject.settings = {editor_button: {:selection_width => 100}}

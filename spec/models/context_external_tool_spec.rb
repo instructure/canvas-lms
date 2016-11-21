@@ -728,7 +728,7 @@ describe ContextExternalTool do
     end
 
     it "returns the localized label if a locale is specified" do
-      @tool.settings = {:text => 'tool label', :url => "http://example.com", :text => 'course nav', :labels => {'en-US' => 'english nav'}}
+      @tool.settings = {:url => "http://example.com", :text => 'course nav', :labels => {'en-US' => 'english nav'}}
       @tool.save!
       expect(@tool.default_label('en-US')).to eq 'english nav'
     end
@@ -1070,6 +1070,38 @@ describe ContextExternalTool do
 
     end
 
+    describe 'set_policy' do
+      let(:tool) do
+        @course.context_external_tools.create(
+          name: "a",
+          consumer_key: '12345',
+          shared_secret: 'secret',
+          url: 'http://example.com/launch'
+        )
+      end
 
+      it 'should grant update_manually to the proper individuals' do
+        @admin = account_admin_user()
+
+        course_with_teacher(:active_all => true, :account => Account.default)
+        @teacher = user(:active_all => true)
+        @course.enroll_teacher(@teacher).accept!
+
+        @designer = user(:active_all => true)
+        @course.enroll_designer(@designer).accept!
+
+        @ta = user(:active_all => true)
+        @course.enroll_ta(@ta).accept!
+
+        @student = user(:active_all => true)
+        @course.enroll_student(@student).accept!
+
+        expect(tool.grants_right?(@admin, :update_manually)).to be_truthy
+        expect(tool.grants_right?(@teacher, :update_manually)).to be_truthy
+        expect(tool.grants_right?(@designer, :update_manually)).to be_truthy
+        expect(tool.grants_right?(@ta, :update_manually)).to be_truthy
+        expect(tool.grants_right?(@student, :update_manually)).to be_falsey
+      end
+    end
   end
 end

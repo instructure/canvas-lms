@@ -820,7 +820,7 @@ describe ConversationsController, type: :request do
                     'hidden_for_user' => false,
                     'created_at' => attachment.created_at.as_json,
                     'updated_at' => attachment.updated_at.as_json,
-                    'modified_at' => attachment.updated_at.as_json,
+                    'modified_at' => attachment.modified_at.as_json,
                     'thumbnail_url' => attachment.thumbnail_url,
                     'mime_class' => attachment.mime_class,
                     'media_entry_id' => attachment.media_entry_id }], "participating_user_ids" => [@me.id, @bob.id].sort
@@ -831,6 +831,25 @@ describe ConversationsController, type: :request do
           }
         ]
         expect(json).to eq expected
+      end
+
+      context "cross-shard message forwarding" do
+        specs_require_sharding
+
+        it "should not asplode" do
+          @shard1.activate do
+            course_with_teacher(:active_course => true, :active_enrollment => true, :user => @me)
+            @bob = student_in_course(:course => @course, :name => "bob")
+
+            @message = conversation(@me, :sender => @bob).messages.first
+          end
+
+          json = api_call(:post, "/api/v1/conversations/#{@conversation.conversation_id}/add_message",
+            { :controller => 'conversations', :action => 'add_message', :id => @conversation.conversation_id.to_s, :format => 'json' },
+            { :body => "wut wut", :included_messages => [@message.id]})
+
+          expect(json['last_message']).to eq "wut wut"
+        end
       end
 
       it "should set subject" do
@@ -1005,7 +1024,7 @@ describe ConversationsController, type: :request do
                 'created_at' => attachment.created_at.as_json,
                 'updated_at' => attachment.updated_at.as_json,
                 'thumbnail_url' => attachment.thumbnail_url,
-                'modified_at' => attachment.updated_at.as_json,
+                'modified_at' => attachment.modified_at.as_json,
                 'mime_class' => attachment.mime_class,
                 'media_entry_id' => attachment.media_entry_id
               }

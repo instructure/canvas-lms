@@ -239,6 +239,19 @@ Ctrl-C your `docker-compose up` window and restart.
 
 ## Debugging
 
+### Better Errors
+
+>[Better Errors](https://github.com/charliesome/better_errors) replaces the standard Rails error page
+>with a much better and more useful error page.
+
+A major downside of using byebug in docker is the need to establish a
+remote byebug session as this will slow down the booting ruby process.
+With Better Errors, a REPL is embedded on the page at the point where an
+error was raised. With this approach, you can drop a `raise` or `throw`
+where ever you'd like to invoke better errors REPL.
+
+### Byebug
+
 A byebug server is running in development mode on the web and job containers
 to allow you to remotely control any sessions where `byebug` has yielded
 execution. To use it, you will need to enable `REMOTE_DEBUGGING_ENABLED` in your

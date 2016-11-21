@@ -1,14 +1,15 @@
 require [
   'underscore'
-  'Backbone',
-  'jquery',
-  'react',
+  'Backbone'
+  'jquery'
+  'react'
+  'react-dom'
   'i18n!dashboard'
   'compiled/util/newCourseForm'
   'jst/dashboard/show_more_link'
   'jsx/dashboard_card/RecentActivityToggle'
   'jquery.disableWhileLoading'
-], (_, {View}, $, React, I18n, newCourseForm, showMoreTemplate, RecentActivityToggle) ->
+], (_, {View}, $, React, ReactDOM, I18n, newCourseForm, showMoreTemplate, RecentActivityToggle) ->
 
   if ENV.DASHBOARD_SIDEBAR_URL
     rightSide = $('#right-side')
@@ -24,7 +25,7 @@ require [
     toggleElement = React.createElement(RecentActivityToggle, {
       recent_activity_dashboard: ENV.PREFERENCES.recent_activity_dashboard
     })
-    React.render(toggleElement, recentActivityToggleContainer)
+    ReactDOM.render(toggleElement, recentActivityToggleContainer)
 
   class DashboardView extends View
 

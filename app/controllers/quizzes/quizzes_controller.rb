@@ -128,7 +128,7 @@ class Quizzes::QuizzesController < ApplicationController
       :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
     })
 
-    conditional_release_js_env
+    conditional_release_js_env(includes: :active_rules)
 
     if @current_user.present?
       Quizzes::OutstandingQuizSubmissionManager.send_later_if_production(:grade_by_course,
@@ -223,7 +223,7 @@ class Quizzes::QuizzesController < ApplicationController
       }
       append_sis_data(hash)
       js_env(hash)
-      conditional_release_js_env(@quiz.assignment, include_rule: true)
+      conditional_release_js_env(@quiz.assignment, includes: [:rule])
 
       @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
       @can_take = can_take_quiz?

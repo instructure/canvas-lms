@@ -242,7 +242,10 @@ class ContextModule < ActiveRecord::Base
       return true
     end
 
-    progression = self.find_or_create_progression(user)
+    progression = if opts[:user_context_module_progressions]
+      opts[:user_context_module_progressions][self.id]
+    end
+    progression ||= self.find_or_create_progression(user)
     # if the progression is locked, then position in the progression doesn't
     # matter. we're not available.
 
@@ -252,7 +255,7 @@ class ContextModule < ActiveRecord::Base
       res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
     end
     if !res && opts[:deep_check_if_needed]
-      progression = self.evaluate_for(user)
+      progression = self.evaluate_for(progression)
       if tag && tag.context_module_id == self.id && self.require_sequential_progress
         res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
       end

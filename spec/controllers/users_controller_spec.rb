@@ -239,164 +239,6 @@ describe UsersController do
     expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
   end
 
-  describe "GET 'delete'" do
-    it "should fail when the user doesn't exist" do
-      account_admin_user
-      user_session(@admin)
-      assert_page_not_found do
-        get 'delete', :user_id => (User.all.map(&:id).max + 1)
-      end
-    end
-
-    it "should fail when the current user doesn't have user manage permissions" do
-      course_with_teacher_logged_in
-      student_in_course :course => @course
-      get 'delete', :user_id => @student.id
-      assert_status(401)
-    end
-
-    it "should succeed when the current user has the :manage permission and is not deleting any system-generated pseudonyms" do
-      account_admin_user_with_role_changes(role_changes: {manage_sis: false})
-      user_session(@user)
-      course_with_student
-      get 'delete', :user_id => @student.id
-      expect(response).to be_success
-    end
-
-    it "should fail when the current user won't be able to delete managed pseudonyms" do
-      account_admin_user_with_role_changes(role_changes: {manage_sis: false})
-      user_session(@admin)
-      course_with_student
-      managed_pseudonym @student, account: @course.account
-      get 'delete', :user_id => @student.id
-      assert_unauthorized
-    end
-
-    it "should not fail when the only managed pseudonyms are in another account" do
-      account_admin_user_with_role_changes(role_changes: {manage_sis: false})
-      user_session(@user)
-      course_with_student
-      pseudonym @student, account: @course.account
-      managed_pseudonym @student, account: account_model
-      get 'delete', :user_id => @student.id
-      expect(response).to be_success
-    end
-
-    it "should succeed when the current user has enough permissions to delete any system-generated pseudonyms" do
-      account_admin_user
-      user_session(@admin)
-      course_with_student
-      managed_pseudonym @student, account: @course.account
-      get 'delete', :user_id => @student.id
-      expect(flash[:error]).to be_nil
-      expect(response).to be_success
-    end
-  end
-
-  describe "POST 'destroy'" do
-    it "should fail when the user doesn't exist" do
-      account_admin_user
-      user_session(@admin)
-      PseudonymSession.find(1).stubs(:destroy).returns(nil)
-      assert_page_not_found do
-        post 'destroy', :id => (User.all.map(&:id).max + 1)
-      end
-    end
-
-    it "should fail when the current user doesn't have user manage permissions" do
-      course_with_teacher_logged_in
-      student_in_course :course => @course
-      PseudonymSession.find(1).stubs(:destroy).returns(nil)
-      post 'destroy', :id => @student.id
-      assert_status(401)
-      expect(@student.associated_accounts.map(&:id)).to include(@course.account_id)
-    end
-
-    it "should succeed when the current user has the :manage permission and is not deleting any system-generated pseudonyms" do
-      account_admin_user_with_role_changes(role_changes: {manage_sis: false})
-      user_session(@admin)
-      course_with_student
-      PseudonymSession.find(1).stubs(:destroy).returns(nil)
-      post 'destroy', :id => @student.id
-      expect(response).to redirect_to(users_url)
-      expect(@student.associated_accounts.map(&:id)).to_not include(@course.account_id)
-    end
-
-    it "should fail when the current user won't be able to delete managed pseudonyms" do
-      account_admin_user_with_role_changes(role_changes: {manage_sis: false})
-      user_session(@admin)
-      course_with_student
-      managed_pseudonym @student, account: @course.account
-      PseudonymSession.find(1).stubs(:destroy).returns(nil)
-      post 'destroy', :id => @student.id
-      assert_unauthorized
-      expect(@student.associated_accounts.map(&:id)).to include(@course.account_id)
-    end
-
-    it "should fail when the user has a SIS ID and uses canvas authentication" do
-      user_with_pseudonym
-      course_with_student_logged_in user: @user
-      @student.pseudonym.update_attribute :sis_user_id, 'kzarn'
-      post 'destroy', id: @student.id
-      assert_status(401)
-      expect(@student.associated_accounts.map(&:id)).to include(@course.account_id)
-    end
-
-    it "should succeed when the current user has enough permissions to delete any system-generated pseudonyms" do
-      account_admin_user
-      user_session(@admin)
-      course_with_student
-      managed_pseudonym @student, account: @course.account
-      PseudonymSession.find(1).stubs(:destroy).returns(nil)
-      post 'destroy', :id => @student.id
-      expect(response).to redirect_to(users_url)
-      expect(@student.associated_accounts.map(&:id)).to_not include(@course.account_id)
-    end
-
-    it "should succeed when the system-generated pseudonyms are on another account" do
-      account_admin_user_with_role_changes(role_changes: {managed_sis: false})
-      user_session(@admin)
-      course_with_student
-      managed_pseudonym @student, account: account_model
-      PseudonymSession.find(1).stubs(:destroy).returns(nil)
-      post 'destroy', :id => @student.id
-      expect(response).to redirect_to(users_url)
-      expect(@student.associated_accounts.map(&:id)).to_not include(@course.account_id)
-    end
-
-    it "should clear the session and log the user out when the current user deletes himself, with managed pseudonyms and :manage_login permissions" do
-      account_admin_user
-      user_session(@admin)
-      managed_pseudonym @admin
-      PseudonymSession.find(1).expects(:destroy).returns(nil)
-      post 'destroy', :id => @admin.id
-      expect(response).to redirect_to(root_url)
-      expect(@admin.associated_accounts.map(&:id)).to_not include(Account.default.id)
-    end
-
-    it "should clear the session and log the user out when the current user deletes himself, without managed pseudonyms and :manage_login permissions" do
-      account_admin_user(user: @user)
-      pseudonym(@admin, account: Account.default)
-      user_session(@admin, @pseudonym)
-      PseudonymSession.find(1).expects(:destroy).returns(nil)
-      post 'destroy', :id => @admin.id
-      expect(response).to redirect_to(root_url)
-      expect(@admin.associated_accounts(true).map(&:id)).to_not include(Account.default.id)
-    end
-
-    it "should not remove the user from their other root accounts, if any" do
-      other_account = account_model
-      account_admin_user
-      user_session(@admin)
-      course_with_student account: Account.default
-      course_with_student account: other_account, user: @student
-      post 'destroy', :id => @student.id
-      expect(response).to redirect_to(users_url)
-      expect(@student.associated_accounts.map(&:id)).to_not include(Account.default.id)
-      expect(@student.associated_accounts.map(&:id)).to include(other_account.id)
-    end
-  end
-
   describe "POST 'create'" do
     it "should not allow creating when self_registration is disabled and you're not an admin'" do
       post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
@@ -422,15 +264,15 @@ describe UsersController do
           course(:active_all => true)
           @course.update_attribute(:self_enrollment, true)
 
-          post 'create', :pseudonym => { :unique_id => 'jane@example.com', :password => 'lolwut', :password_confirmation => 'lolwut' }, :user => { :name => 'Jane Student', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1', :format => 'json'
+          post 'create', :pseudonym => { :unique_id => 'jane@example.com', :password => 'lolwut12', :password_confirmation => 'lolwut12' }, :user => { :name => 'Jane Student', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1', :format => 'json'
           assert_status(403)
         end
 
         it "should allow observers to self register" do
-          user_with_pseudonym(:active_all => true, :password => 'lolwut')
+          user_with_pseudonym(:active_all => true, :password => 'lolwut12')
           course_with_student(:user => @user, :active_all => true)
 
-          post 'create', :pseudonym => { :unique_id => 'jane@example.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut' }, :user => { :name => 'Jane Observer', :terms_of_use => '1', :initial_enrollment_type => 'observer' }, :format => 'json'
+          post 'create', :pseudonym => { :unique_id => 'jane@example.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut12' }, :user => { :name => 'Jane Observer', :terms_of_use => '1', :initial_enrollment_type => 'observer' }, :format => 'json'
           expect(response).to be_success
           new_pseudo = Pseudonym.where(unique_id: 'jane@example.com').first
           new_user = new_pseudo.user
@@ -625,7 +467,7 @@ describe UsersController do
       end
 
       it "should validate the observee's credentials" do
-        user_with_pseudonym(:active_all => true, :password => 'lolwut')
+        user_with_pseudonym(:active_all => true, :password => 'lolwut12')
 
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'not it' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'observer' }
         assert_status(400)
@@ -634,9 +476,9 @@ describe UsersController do
       end
 
       it "should link the user to the observee" do
-        user_with_pseudonym(:active_all => true, :password => 'lolwut')
+        user_with_pseudonym(:active_all => true, :password => 'lolwut12')
 
-        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'observer' }
+        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :observee => { :unique_id => @pseudonym.unique_id, :password => 'lolwut12' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'observer' }
         expect(response).to be_success
         u = User.where(name: 'Jacob Fugal').first
         expect(u).to be_pre_registered

@@ -1,9 +1,10 @@
 require [
   'jquery'
   'react'
+  'react-dom'
   'compiled/userSettings'
   'jsx/course_wizard/CourseWizard'
-], ($, React, userSettings, CourseWizard) ->
+], ($, React, ReactDOM, userSettings, CourseWizard) ->
 
   ###
   # This essentially handles binding the button events and calling out to the
@@ -18,7 +19,7 @@ require [
   courseWizardFactory = React.createFactory(CourseWizard)
 
   $(".wizard_popup_link").click((event) ->
-      React.render(courseWizardFactory({
+      ReactDOM.render(courseWizardFactory({
         overlayClassName:'CourseWizard__modalOverlay',
         showWizard: true
       }), $wizard_box[0])

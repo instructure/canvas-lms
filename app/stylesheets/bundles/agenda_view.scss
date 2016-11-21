@@ -8,9 +8,6 @@
 }*/
 
 #right-side {
-  padding: $ic-sp;
-  background: $lightBackground;
-  border: 1px solid $ic-border-light;
 
   .element_toggler {
     padding: 0;
@@ -24,88 +21,87 @@
 
 .agenda-wrapper {
   background-color: #fff;
-  border: 1px solid #C6CDD4;
-  border-radius: 3px;
-
   display: none;
   &.active {
     display: block;
   }
 
-  .item-group-container {
+  .agenda-container {
     background: none;
+    border: none;
     padding: 0;
   }
 }
 
 .agenda-day {
-  border-bottom: 1px dashed #D9DBDC;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-
-  .item-group-condensed {
-    padding: 0;
-    border: none;
-  }
+  display: block;
+  border-bottom: 1px solid $ic-border-light;
+  margin-top: $ic-sp*2;
+  padding: $ic-sp/2;
 
   &.agenda-today {
-    background-color: #FEF6E8;
+    background: $ic-color-medium-light;
   }
-  &:last-child {
-    border-bottom: none;
+
+  .agenda-date {
+    @include fontSize(14px);
+    margin: 0;
+    padding-left: $ic-sp - 2;
   }
 }
-
-.agenda-date {
-  @include fontSize(12px);
-  font-weight: bold;
-  line-height: 1.5;
+.agenda-event__list {
   margin: 0;
-  flex: 0 0 90px;
-  @include breakpoint(desktop) { flex: 0 0 125px; }
+  padding: 0;
+}
+.agenda-event__item {
+  list-style: none;
+}
+.agenda-event__item-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: $ic-sp;
+
+  &:hover, &:focus {
+    box-shadow: inset 3px 0 0 $ic-brand-primary;
+  }
 }
 
-.agenda-events { flex: 1; }
+.agenda-event__item-container .agenda-event__icon {
+  background: none;
+  flex: 0 0 2rem;
+  padding-left: $ic-sp/4;
+
+  &:hover, &:focus {
+    background: none;
+  }
+}
+.agenda-event__time {
+  flex: 0 0 7.875rem;
+  font-weight: 300;
+}
+
+.agenda-event__item-container .agenda-event__title {
+  background: none;
+  font-weight: 500;
+  flex: 1;
+
+  &:hover, &:focus {
+    background: none;
+  }
+}
+
+.agenda-event__action {
+  display: flex;
+  justify-content: flex-end;
+  flex: 0 0 6.25rem;
+}
 
 span.agendaView--no-assignments {
   display: block;
-  padding: 10px;
-  @include fontSize(13px);
-}
-#calendar-app .agenda-event {
-  margin: 0;
-  outline: none;
-
-  .ig-row {
-    border: none;
-    box-shadow: none;
-    background: none;
-    border-radius: 3px;
-    cursor: pointer;
-    padding: $ic-sp/2;
-
-    &:hover, &:focus {
-      background-color: #F2F4F6;
-    }
-  }
-  @include breakpoint(desktop) {
-    .ig-details {
-      justify-content: flex-start;
-      > * {
-        flex: 0 1 auto;
-        padding: 0;
-        margin-right: $ic-sp/3;
-      }
-    }
-  }
-  .ig-title {
-    background: none;
-    font-weight: normal;
-    // override standard width for .ig-title or it looks too scrunched up
-    @include breakpoint(desktop) { flex: 1.34; }
-  }
-
+  margin-top: $ic-sp*2;
+  font-weight: normal;
+  @include fontSize(14px);
 }
 
 .agenda-actions {
@@ -163,7 +159,12 @@ span.agendaView--no-assignments {
       background-color: white;
     }
 
+    .fc-divider {
+      padding-bottom: 0;
+    }
+
     .fc-widget-header, .fc-axis {
+      box-sizing: border-box;
       background: none;
       border-left: none;
       color: $ic-font-color--subdued;
@@ -174,7 +175,7 @@ span.agendaView--no-assignments {
     }
 
     .fc-axis span {
-      border-color: #DADADA;
+      border-color: $ic-border-light;
       padding: 3px 6px;
     }
 
@@ -187,6 +188,7 @@ span.agendaView--no-assignments {
     }
 
     .fc-widget-header {
+      border-top: none;
       border-right: none;
       text-transform: uppercase;
 
@@ -194,13 +196,23 @@ span.agendaView--no-assignments {
         border-bottom: none;
       }
     }
-
-    .fc-widget-content.fc-state-highlight {
-      background-color: $ic-bg-light-alert;
+    .fc-day-grid .fc-today {
+      background-color: transparent;
+      box-shadow: .5px -6px 0px 0px $ic-brand-primary;
+      border: 3px solid $ic-border-light;
+    }
+    // this is to hide the border-right that is being added inline within the all-day row
+    .fc-day-grid .fc-row {
+      border-right-color: $ic-color-light;
+    }
+    .fc-time-grid  .fc-today {
+      background-color: transparent;
+      border: 3px solid $ic-border-light;
     }
 
     .fc-event {
       white-space: nowrap;
+      background-color: $ic-color-light;
     }
 
     .calendar-nowline {
@@ -222,19 +234,18 @@ span.agendaView--no-assignments {
     .fc-body {
       background-color: white;
     }
+
+    .fc-today {
+      background: $ic-color-medium-light;
+    }
   }
 
   .fc-other-month {
     background: none;
   }
 
-  .fc-state-highlight {
-    background-color: #fef6e8;
-    box-shadow: none;
-  }
-
   .fc-event {
-    background-color: white;
+    background-color: $ic-color-light;
     line-height: 1.3;
     padding: $ic-sp/4;
     i {
@@ -269,8 +280,7 @@ span.agendaView--no-assignments {
   background-color: #fff;
   max-height: 300px;
   overflow-y: auto;
-  border: 1px solid $ic-border-light;
-  padding: $ic-sp/2;
+
   ul {
     margin-bottom: 10px;
     &:last-of-type { margin-bottom: 0; }
@@ -297,29 +307,21 @@ span.agendaView--no-assignments {
   }
 }
 
+#calendar-toggle-button,
+#undated-events-button {
+  text-transform: uppercase;
+}
+
 #undated-events {
   display: none;
   .event {
-    background-color: #fff;
-    line-height: 24px;
+    background-color: $ic-color-light;
+    line-height: $ic-line-height;
+    padding: 0;
+    border: none;
     .undated_event_title {
       color: inherit;
+      @include fontSize(13px);
     }
   }
 }
-
-/*.ig-row {
-  cursor: pointer;
-  border-bottom: none;
-  border-top: none;
-  .icon-settings {
-    color: #bbb;
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    &:hover {
-      color: #444;
-    }
-  }
-}
-*/

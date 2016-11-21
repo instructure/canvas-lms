@@ -22,7 +22,7 @@ class Alert < ActiveRecord::Base
 
   serialize :recipients
 
-  attr_accessible :context, :repetition, :criteria, :recipients
+  strong_params
 
   validates_presence_of :context_id
   validates_presence_of :context_type

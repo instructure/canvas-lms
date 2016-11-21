@@ -31,6 +31,9 @@ define [
             click: @save
           }
         ]
+      @dialog.submit (event) =>
+        event.preventDefault()
+        @save()
 
     show: -> @dialog.dialog('open')
 

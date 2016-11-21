@@ -14,9 +14,12 @@ ScopedI18nJsExtractor.prototype = Object.create(I18nJsExtractor.prototype);
 ScopedI18nJsExtractor.prototype.constructor = ScopedI18nJsExtractor;
 
 
-ScopedI18nJsExtractor.prototype.processCall = function(node) {
+ScopedI18nJsExtractor.prototype.processCall = function(node, traverse) {
   this.inferI18nScope(node);
-  I18nJsExtractor.prototype.processCall.call(this, node);
+  I18nJsExtractor.prototype.processCall.call(this, node, traverse);
+  if (this.i18nScope && this.i18nScope.node === node) {
+    this.popI18nScope();
+  }
 };
 
 ScopedI18nJsExtractor.prototype.inferI18nScope = function(node) {
@@ -45,12 +48,6 @@ ScopedI18nJsExtractor.prototype.inferI18nScope = function(node) {
     if (scope && (scope = scope[1])) {
       this.pushI18nScope({name: scope, node: node});
     }
-  }
-};
-
-ScopedI18nJsExtractor.prototype.leave = function(node) {
-  if (this.i18nScope && this.i18nScope.node === node) {
-    this.popI18nScope();
   }
 };
 

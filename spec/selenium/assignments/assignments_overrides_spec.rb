@@ -12,6 +12,7 @@ describe "assignment groups" do
     let(:lock_at) { Time.zone.now + 4.days }
 
     before(:each) do
+      ConditionalRelease::Service.stubs(:active_rules).returns([])
       make_full_screen
       course_with_teacher_logged_in
     end
@@ -63,6 +64,9 @@ describe "assignment groups" do
     end
 
     it "should allow setting overrides", priority: "1", test_id: 216349 do
+      ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+      ConditionalRelease::Service.stubs(:jwt_for).returns(:jwt)
+
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(:name => "other section")
       default_section_due = Time.zone.now + 1.days
@@ -73,6 +77,7 @@ describe "assignment groups" do
 
       wait_for_ajaximations
       select_first_override_section(default_section.name)
+      select_first_override_header("Mastery Paths")
 
       first_due_at_element.clear
       first_due_at_element.
@@ -87,10 +92,12 @@ describe "assignment groups" do
 
       update_assignment!
       overrides = assign.reload.assignment_overrides
-      expect(overrides.count).to eq 2
+      expect(overrides.count).to eq 3
       default_override = overrides.detect{ |o| o.set_id == default_section.id }
       expect(default_override.due_at.to_date).
         to eq default_section_due.to_date
+      noop_override = overrides.detect{ |o| o.set_type == "Noop" }
+      expect(noop_override.title).to eq "Mastery Paths"
       other_override = overrides.detect{ |o| o.set_id == other_section.id }
       expect(other_override.due_at.to_date).
         to eq other_section_due.to_date
