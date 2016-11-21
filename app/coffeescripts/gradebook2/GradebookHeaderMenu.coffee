@@ -85,7 +85,7 @@ define [
       }
 
     disableUnavailableMenuActions: (menu) ->
-      return false unless menu? && @assignment?.has_due_date_in_closed_grading_period
+      return false unless menu? && @assignment?.inClosedGradingPeriod
 
       actionsToDisable = ['curveGrades', 'setDefaultGrade']
 
@@ -128,7 +128,7 @@ define [
       selected_section: @gradebook.sectionToShow
       isAdmin: @isCurrentUserAdmin()
     }) =>
-      if !opts.isAdmin && opts.assignment.has_due_date_in_closed_grading_period
+      if !opts.isAdmin && opts.assignment.inClosedGradingPeriod
         $.flashError(
           I18n.t(
             "Unable to set default grade because this assignment is due in " +
@@ -144,7 +144,7 @@ define [
       context_url:@gradebook.options.context_url
       isAdmin: @isCurrentUserAdmin()
     }) =>
-      if !opts.isAdmin && opts.assignment.has_due_date_in_closed_grading_period
+      if !opts.isAdmin && opts.assignment.inClosedGradingPeriod
         $.flashError(
           I18n.t(
             "Unable to curve grades because this assignment is due in " +

@@ -324,11 +324,10 @@ define [
     assignment_groups: []
 
     fetchAssignmentGroups: (->
-      params = {}
+      params = { exclude_response_fields: ['has_due_date_in_closed_grading_period'] }
       gpId = @get('selectedGradingPeriod.id')
       if @get('mgpEnabled') && gpId != '0'
-        params =
-          grading_period_id: gpId
+        params.grading_period_id = gpId
       @set('assignment_groups', [])
       @set('assignmentsFromGroups', [])
       Ember.run.once =>
@@ -546,11 +545,19 @@ define [
       }
     )
 
-    processAssignment: (as, assignmentGroups) ->
+    processAssignment: (as, assignmentGroups, effectiveDueDates) ->
       assignmentGroup = assignmentGroups.findBy('id', as.assignment_group_id)
       set as, 'sortable_name', as.name.toLowerCase()
       set as, 'ag_position', assignmentGroup.position
       set as, 'noPointsPossibleWarning', assignmentGroup.invalid
+
+      if effectiveDueDates?
+        dueDates = effectiveDueDates.get(as.id) || {}
+        set as, 'effectiveDueDates', dueDates
+        set as, 'inClosedGradingPeriod', _.any(dueDates, (date) => date.in_closed_grading_period)
+      else
+        set as, 'effectiveDueDates', {}
+        set as, 'inClosedGradingPeriod', false
 
       if as.due_at
         due_at = tz.parse(as.due_at)
@@ -608,8 +615,9 @@ define [
       assignmentGroups = @get('assignment_groups')
       assignments = _.flatten(assignmentGroups.mapBy 'assignments')
       assignmentList = []
+      effectiveDueDates = @get('effectiveDueDates') if @get('effectiveDueDates.isLoaded')
       assignments.forEach (as) =>
-        @processAssignment(as, assignmentGroups)
+        @processAssignment(as, assignmentGroups, effectiveDueDates)
         shouldRemoveAssignment = (as.published is false) or
           as.submission_types.contains 'not_graded' or
           as.submission_types.contains 'attendance' and !@get('showAttendance')
@@ -618,7 +626,7 @@ define [
         else
           assignmentList.push(as)
       @set('assignmentsFromGroups', assignmentList)
-    ).observes('assignment_groups.isLoaded', 'assignment_groups.isLoading')
+    ).observes('assignment_groups.isLoaded', 'assignment_groups.isLoading', 'effectiveDueDates.isLoaded')
 
     populateAssignments: (->
       assignmentsFromGroups = @get('assignmentsFromGroups')
@@ -630,10 +638,11 @@ define [
         Ember.SortableMixin, { content: [] }
       )
 
+      effectiveDueDatesLoaded = @get('effectiveDueDates.isLoaded')
       if selectedStudent?
         assignmentsFromGroups.forEach (assignment) =>
           submissionCriteria = { assignment_id: assignment.id, user_id: selectedStudent.id }
-          unless submissionStateMap?.getSubmissionState(submissionCriteria)?.hideGrade
+          unless effectiveDueDatesLoaded && submissionStateMap?.getSubmissionState(submissionCriteria)?.hideGrade
             proxy.addObject(assignment)
       else
         proxy.addObjects(assignmentsFromGroups)
@@ -646,9 +655,6 @@ define [
       map = new SubmissionStateMap(
         gradingPeriodsEnabled: !!@mgpEnabled
         selectedGradingPeriodID: @get('selectedGradingPeriod.id') || '0'
-        gradingPeriods: GradingPeriodsAPI.deserializePeriods(
-          get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
-        )
         isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, "admin")
       )
       map.setup(@get('students').toArray(), @get('assignmentsFromGroups').toArray())
@@ -724,14 +730,14 @@ define [
         @set('disableAssignmentGrading', null)
         return
 
-      @set('assignmentInClosedGradingPeriod', assignment.has_due_date_in_closed_grading_period)
+      @set('assignmentInClosedGradingPeriod', assignment.inClosedGradingPeriod)
 
       # Calculate whether the current user is able to grade assignments given their role and the
       # result of the calculations above
       if ENV.current_user_roles? && _.contains(ENV.current_user_roles, 'admin')
         @set('disableAssignmentGrading', false)
       else
-        @set('disableAssignmentGrading', assignment.has_due_date_in_closed_grading_period)
+        @set('disableAssignmentGrading', assignment.inClosedGradingPeriod)
     ).observes('selectedAssignment')
 
     selectedSubmission: ((key, selectedSubmission) ->

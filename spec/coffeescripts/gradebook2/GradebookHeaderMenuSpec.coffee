@@ -219,25 +219,25 @@ define [
     equal @disabledMenuItems(@menu).length, 0
 
   test 'disables 0 menu items when given a menu and @assignment which does not have
-    has_due_date_in_closed_grading_period set', ->
+    inClosedGradingPeriod set', ->
     @assignment = {}
 
     equal @disableUnavailableMenuActions(@menu), false
     equal @disabledMenuItems(@menu).length, 0
 
   test 'disables 0 menu items when given a menu and @assignment which has
-    has_due_date_in_closed_grading_period set', ->
+    inClosedGradingPeriod set', ->
     @assignment = {
-      has_due_date_in_closed_grading_period: false
+      inClosedGradingPeriod: false
     }
 
     equal @disableUnavailableMenuActions(@menu), false
     equal @disabledMenuItems(@menu).length, 0
 
   test 'disables the curveGrades and setDefaultGrade menu items when given a menu and @assignment
-    which _does_ have has_due_date_in_closed_grading_period set', ->
+    which _does_ have inClosedGradingPeriod set', ->
     @assignment = {
-      has_due_date_in_closed_grading_period: true
+      inClosedGradingPeriod: true
     }
 
     equal @disableUnavailableMenuActions(@menu), true
@@ -257,7 +257,7 @@ define [
       @options = {
         isAdmin: true
         assignment: {
-          has_due_date_in_closed_grading_period: false
+          inClosedGradingPeriod: false
         }
       }
       @spy($, 'flashError')
@@ -274,7 +274,7 @@ define [
 
   test 'calls the SetDefaultGradeDialog when isAdmin is true and assignment does have a due date in
     a closed grading period', ->
-    @options.assignment.has_due_date_in_closed_grading_period = true
+    @options.assignment.inClosedGradingPeriod = true
     @setDefaultGrade(@options)
 
     ok @dialogStub.called
@@ -289,7 +289,7 @@ define [
   test 'calls the flashError when isAdmin is false and assignment does have a due date in
     a closed grading period', ->
     @options.isAdmin = false
-    @options.assignment.has_due_date_in_closed_grading_period = true
+    @options.assignment.inClosedGradingPeriod = true
     @setDefaultGrade(@options)
 
     notOk @dialogStub.called
@@ -303,7 +303,7 @@ define [
       @options = {
         isAdmin: true
         assignment: {
-          has_due_date_in_closed_grading_period: false
+          inClosedGradingPeriod: false
         }
       }
       @spy($, 'flashError')
@@ -320,7 +320,7 @@ define [
 
   test 'calls the CurveGradesDialog when isAdmin is true and assignment does have a due date in
     a closed grading period', ->
-    @options.assignment.has_due_date_in_closed_grading_period = true
+    @options.assignment.inClosedGradingPeriod = true
     @curveGrades(@options)
 
     ok @dialogStub.called
@@ -335,7 +335,7 @@ define [
   test 'calls the flashError when isAdmin is false and assignment does have a due date in
     a closed grading period', ->
     @options.isAdmin = false
-    @options.assignment.has_due_date_in_closed_grading_period = true
+    @options.assignment.inClosedGradingPeriod = true
     @curveGrades(@options)
 
     notOk @dialogStub.called

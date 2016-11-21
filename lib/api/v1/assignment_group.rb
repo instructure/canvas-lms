@@ -69,8 +69,10 @@ module Api::V1::AssignmentGroup
         )
       }
 
-      hash['has_assignment_due_in_closed_grading_period'] =
-        hash["assignments"].any?{ |assn| assn["has_due_date_in_closed_grading_period"] }
+      unless opts[:exclude_response_fields].include?('has_due_date_in_closed_grading_period')
+        hash['has_assignment_due_in_closed_grading_period'] =
+          hash["assignments"].any?{ |assn| assn["has_due_date_in_closed_grading_period"] }
+      end
     end
 
     hash

@@ -103,7 +103,6 @@ define [
       @submissionStateMap = new SubmissionStateMap
         gradingPeriodsEnabled: @gradingPeriodsEnabled
         selectedGradingPeriodID: @gradingPeriodToShow
-        gradingPeriods: @gradingPeriods
         isAdmin: _.contains(ENV.current_user_roles, "admin")
       @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
       @gradebookColumnOrderSettings = @options.gradebook_column_order_settings
@@ -147,16 +146,22 @@ define [
         submissionsChunkSize: @options.chunk_size
         customColumnDataURL: @options.custom_column_data_url
         customColumnDataPageCb: @gotCustomColumnDataChunk
+        effectiveDueDatesURL: @options.effective_due_dates_url
       )
 
-      dataLoader.gotAssignmentGroups.then @gotAllAssignmentGroups
+      gotGroupsAndDueDates = Promise.all([
+        dataLoader.gotAssignmentGroups,
+        dataLoader.gotEffectiveDueDates
+      ]).then(@gotAllAssignmentGroupsAndEffectiveDueDates)
+
       dataLoader.gotCustomColumns.then @gotCustomColumns
       dataLoader.gotStudents.then @gotAllStudents
 
-      $.when(dataLoader.gotCustomColumns,
-             dataLoader.gotAssignmentGroups).then(@doSlickgridStuff)
+      Promise.all([
+        dataLoader.gotCustomColumns,
+        gotGroupsAndDueDates
+      ]).then(@doSlickgridStuff)
 
-      @assignmentGroupsLoaded = dataLoader.gotAssignmentGroups
       @studentsLoaded = dataLoader.gotStudents
       @allSubmissionsLoaded = dataLoader.gotSubmissions
 
@@ -239,10 +244,13 @@ define [
       @initHeader()
       @gridReady.resolve()
 
+    gotAllAssignmentGroupsAndEffectiveDueDates: ([assignmentGroups, effectiveDueDates]) =>
+      @effectiveDueDates = effectiveDueDates
+      @gotAllAssignmentGroups(assignmentGroups)
+
     gotAllAssignmentGroups: (assignmentGroups) =>
       @assignmentGroups = {}
       @assignments      = {}
-
       # purposely passing the @options and assignmentGroups by reference so it can update
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
       new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
@@ -252,6 +260,8 @@ define [
         for assignment in group.assignments
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
+          assignment.effectiveDueDates = @effectiveDueDates[assignment.id] || {}
+          assignment.inClosedGradingPeriod = _.any(assignment.effectiveDueDates, (date) => date.in_closed_grading_period)
           @assignments[assignment.id] = assignment
       @postGradesStore.setGradeBookAssignments @assignments
 
@@ -1618,7 +1628,7 @@ define [
       selectedPeriodId = @getGradingPeriodToShow()
       @isAllGradingPeriods(selectedPeriodId)
 
-    fieldsToExcludeFromAssignments: ['description', 'needs_grading_count']
+    fieldsToExcludeFromAssignments: ['description', 'needs_grading_count', 'has_due_date_in_closed_grading_period']
 
     studentsUrl: ->
       switch

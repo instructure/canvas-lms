@@ -28,6 +28,8 @@ define [
     App = startApp()
     Ember.run =>
       @srgb = SRGBController.create()
+      effectiveDueDates = Ember.ObjectProxy.create(content: clone fixtures.effectiveDueDates)
+      Ember.setProperties effectiveDueDates, { isLoaded: true }
       @srgb.set('model', {
         enrollments: Ember.ArrayProxy.create(content: clone fixtures.students)
         assignment_groups: Ember.ArrayProxy.create(content: [])
@@ -35,6 +37,7 @@ define [
         sections: Ember.ArrayProxy.create(content: clone fixtures.sections)
         outcomes: Ember.ArrayProxy.create(content: clone fixtures.outcomes)
         outcome_rollups: Ember.ArrayProxy.create(content: clone fixtures.outcome_rollups)
+        effectiveDueDates: effectiveDueDates
       })
 
   teardown = ->
@@ -251,7 +254,7 @@ define [
     @completeSetup().then =>
       Ember.run =>
         assignment = @srgb.get('assignments.lastObject')
-        assignment.has_due_date_in_closed_grading_period = false
+        assignment.inClosedGradingPeriod = false
         @srgb.set('selectedAssignment', assignment)
       equal @srgb.get('assignmentInClosedGradingPeriod'), false
 
@@ -260,7 +263,7 @@ define [
     @completeSetup().then =>
       Ember.run =>
         assignment = @srgb.get('assignments.lastObject')
-        assignment.has_due_date_in_closed_grading_period = true
+        assignment.inClosedGradingPeriod = true
         @srgb.set('selectedAssignment', assignment)
       equal @srgb.get('assignmentInClosedGradingPeriod'), true
 

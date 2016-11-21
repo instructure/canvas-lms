@@ -336,10 +336,6 @@ define [
               published: true
               muted: false
               only_visible_to_overrides: true
-              overrides: [{
-                due_at: "2013-09-15T10:00:00Z"
-                student_ids: ["1"]
-              }]
               assignment_visibility: ["1"]
             }
             {
@@ -354,10 +350,6 @@ define [
               published: true
               muted: true
               only_visible_to_overrides: true
-              overrides: [{
-                due_at: "2013-09-15T10:00:00Z"
-                student_ids: ["2"]
-              }]
               assignment_visibility: ["2"]
             }
             {
@@ -562,6 +554,23 @@ define [
     { outcome_id: '2', user_id: '2', score: 3 }
   ]
 
+  effectiveDueDates =
+    1:
+      1:
+        due_at: '2013-09-15T10:00:00Z'
+        grading_period_id: '2'
+        in_closed_grading_period: true
+    2:
+      2:
+        due_at: '2013-09-15T10:00:00Z'
+        grading_period_id: '2'
+        in_closed_grading_period: true
+    3:
+      1:
+        due_at: '2013-12-01T10:00:00Z'
+        grading_period_id: '3'
+        in_closed_grading_period: false
+
   custom_columns: customColumns
   set_default_grade_response: default_grade_response
   students: students
@@ -571,6 +580,7 @@ define [
   sections: sections
   outcomes: outcomes
   outcome_rollups: outcomeRollups
+  effectiveDueDates: effectiveDueDates
   create: (overrides) ->
 
     window.ENV =
@@ -578,6 +588,7 @@ define [
         current_user_id: 1
         context_asset_string: 'course_1'
         GRADEBOOK_OPTIONS: {
+          effective_due_dates_url: '/api/v1/courses/1/effective_due_dates'
           enrollments_url: '/api/v1/enrollments'
           enrollments_with_concluded_url: '/api/v1/concluded_enrollments'
           assignment_groups_url: '/api/v1/assignment_groups'
@@ -621,6 +632,11 @@ define [
           ]
         }
       }
+
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.effective_due_dates_url,
+      response: clone effectiveDueDates
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: 'success'
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.enrollments_url,
       response: clone students

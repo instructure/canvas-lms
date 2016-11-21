@@ -2881,7 +2881,11 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course1.id}.json?include[]=tabs",
         { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json', :include => ['tabs'] })
       expect(json).to have_key 'tabs'
-      expect(json['tabs'].map{ |tab| tab['id']} ).to eq(["home", "announcements", "assignments", "discussions", "grades", "people", "pages", "files", "syllabus", "outcomes", "quizzes", "modules", "settings"])
+      expected_tabs = [
+        "home", "announcements", "assignments", "discussions", "grades", "people",
+        "pages", "files", "syllabus", "outcomes", "quizzes", "modules", "settings"
+      ]
+      expect(json['tabs'].map{ |tab| tab['id'] }).to match_array(expected_tabs)
     end
 
     context "when scoped to account" do
@@ -3384,5 +3388,89 @@ describe ContentImportsController, type: :request do
                     { :controller => 'courses', :action => 'link_validation', :format => 'json', :course_id => @course.id.to_param })
     expect(json['state']).to eq('completed')
     expect(json['issues']).to eq(['mock_issue'])
+  end
+end
+
+describe CoursesController, type: :request do
+  before(:once) do
+    @now = Time.zone.now
+    @test_course = Course.create!
+    @teacher = course_with_teacher(course: @test_course, active_all: true).user
+    @test_student = student_in_course(course: @test_course, active_all: true).user
+    @assignment1 = @test_course.assignments.create!(due_at: 5.days.ago(@now))
+    @assignment2 = @test_course.assignments.create!(due_at: 10.days.from_now(@now))
+    @effective_due_dates_path = "/api/v1/courses/#{@test_course.id}/effective_due_dates"
+    @options = { controller: "courses", action: "effective_due_dates", format: "json", course_id: @test_course.id }
+    # api_call sets up session based on @user; i'd rather set it here explicitly than make our
+    # course_with_teacher and student_in_course calls order-dependent
+    @user = @teacher
+  end
+
+  describe "#effective_due_dates" do
+    context "permissions" do
+      it "allows teachers to access the information" do
+        api_call(:get, @effective_due_dates_path, @options, {}, {}, expected_status: 200)
+      end
+
+      it "does not allow teachers to from other courses to access the information" do
+        new_course = Course.create!
+        @user = course_with_teacher(course: new_course, active_all: true).user
+        api_call(:get, @effective_due_dates_path, @options, {}, {}, expected_status: 401)
+      end
+
+      it "allows TAs to access the information" do
+        @user = ta_in_course(course: @test_course, active_all: true).user
+        api_call(:get, @effective_due_dates_path, @options, {}, {}, expected_status: 200)
+      end
+
+      it "allows admins to access the information" do
+        @user = @test_course.root_account.users.create!
+        api_call(:get, @effective_due_dates_path, @options, {}, {}, expected_status: 200)
+      end
+
+      it "does not allow students to access the information" do
+        @user = @test_student
+        api_call(:get, @effective_due_dates_path, @options, {}, {}, expected_status: 401)
+      end
+    end
+
+    it "returns a key for each assignment in the course" do
+      json = api_call(:get, @effective_due_dates_path, @options)
+      expect(json.keys).to contain_exactly(@assignment1.id.to_s, @assignment2.id.to_s)
+    end
+
+    it "returns a subset of assignments if specific assignment ids are requested" do
+      json = api_call(:get, @effective_due_dates_path, @options.merge(assignment_ids: [@assignment2.id]))
+      expect(json.keys).to contain_exactly(@assignment2.id.to_s)
+    end
+
+    it "returns all assignments if the assignment_ids param is not an array" do
+      json = api_call(:get, @effective_due_dates_path, @options.merge(assignment_ids: @assignment2.id))
+      expect(json.keys).to contain_exactly(@assignment1.id.to_s, @assignment2.id.to_s)
+    end
+
+    it "each assignment only contains keys for students that are assigned to it" do
+      @new_student = student_in_course(course: @test_course, active_all: true).user
+      override = @assignment1.assignment_overrides.create!(
+        due_at: 10.days.from_now(@now),
+        due_at_overridden: true
+      )
+      override.assignment_override_students.create!(user: @new_student)
+      @assignment1.due_at = nil
+      @assignment1.only_visible_to_overrides = true
+      @assignment1.save!
+      @user = @teacher
+
+      json = api_call(:get, @effective_due_dates_path, @options)
+      student_ids = json[@assignment1.id.to_s].keys
+      expect(student_ids).to contain_exactly(@new_student.id.to_s)
+    end
+
+    it "returns the effective due at along with grading period information" do
+      json = api_call(:get, @effective_due_dates_path, @options)
+      due_date_info = json[@assignment1.id.to_s][@student.id.to_s]
+      expected_attributes = ["due_at", "grading_period_id", "in_closed_grading_period"]
+      expect(due_date_info.keys).to match_array(expected_attributes)
+    end
   end
 end

@@ -135,6 +135,13 @@ describe Course do
       2.times { edd.to_hash }
     end
 
+    it 'can be passed a list of keys to only return those attributes' do
+      due_dates = EffectiveDueDates.for_course(@test_course)
+      due_dates_hash = due_dates.to_hash([:due_at, :override_source])
+      attributes_returned = due_dates_hash[@assignment1.id][@student1.id].keys
+      expect(attributes_returned).to contain_exactly(:due_at, :override_source)
+    end
+
     describe 'initializes with' do
       it 'no arguments and defaults to all active course assignments' do
         edd = EffectiveDueDates.for_course(@test_course)

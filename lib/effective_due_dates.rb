@@ -17,6 +17,77 @@ class EffectiveDueDates
   # like Canvas code than EffectiveDueDates.new(...)
   singleton_class.send :alias_method, :for_course, :new
 
+  def to_hash(included = [])
+    return @hash if @hash && included.empty?
+
+    hash = query.each_with_object({}) do |row, hsh|
+      assignment_id = row.delete("assignment_id").to_i
+      student_id = row.delete("student_id").to_i
+      hsh[assignment_id] ||= {}
+      attributes = {}
+      if include?(included, :due_at)
+        attributes[:due_at] = row["due_at"] && Time.zone.parse(row["due_at"])
+      end
+      if include?(included, :grading_period_id)
+        attributes[:grading_period_id] = row["grading_period_id"] && row["grading_period_id"].to_i
+      end
+      if include?(included, :in_closed_grading_period)
+        attributes[:in_closed_grading_period] = row["closed"] == "t"
+      end
+      if include?(included, :override_id)
+        attributes[:override_id] = row["override_id"] && row["override_id"].to_i
+      end
+      attributes[:override_source] = row["override_type"] if include?(included, :override_source)
+      hsh[assignment_id][student_id] = attributes
+    end
+
+    @hash = hash if included.empty?
+    hash
+  end
+
+  # This iterates through a course's EffectiveDueDate hash with multiple
+  # assignments to see if any of them are in a closed grading period.
+  def any_in_closed_grading_period?
+    return @any_in_closed_grading_period unless @any_in_closed_grading_period.nil?
+
+    @any_in_closed_grading_period = grading_periods_enabled? &&
+        to_hash.any? do |_, assignment_due_dates|
+          any_student_in_closed_grading_period?(assignment_due_dates)
+        end
+  end
+
+  # This iterates through a single assignment's EffectiveDueDate hash to see
+  # if any students in them are in a closed grading period.
+  def in_closed_grading_period?(assignment_id)
+    assignment_id = assignment_id.id if assignment_id.is_a?(Assignment)
+    return false if assignment_id.nil?
+
+    # false if MGP isn't even enabled
+    return false unless grading_periods_enabled?
+    # if we've already checked all assignments and it was false,
+    # no need to check this one specifically
+    return false if @any_in_closed_grading_period == false
+
+    assignment_due_dates = to_hash[assignment_id]
+    any_student_in_closed_grading_period?(assignment_due_dates)
+  end
+
+  private
+
+  def grading_periods_enabled?
+    return @grading_periods_enabled unless @grading_periods_enabled.nil?
+    @grading_periods_enabled = @context.feature_enabled?(:multiple_grading_periods)
+  end
+
+  def any_student_in_closed_grading_period?(assignment_due_dates)
+    return false unless assignment_due_dates
+    assignment_due_dates.any? { |_, student| student[:in_closed_grading_period] }
+  end
+
+  def include?(included, attribute)
+    included.empty? || included.include?(attribute)
+  end
+
   # This beauty of a method brings together assignment overrides,
   # due dates, multiple grading periods, course/group enrollments,
   # etc to calculate each student's effective due date and whether
@@ -32,8 +103,8 @@ class EffectiveDueDates
   #     }, ...
   #   }, ...
   # }
-  def to_hash
-    return @hash unless @hash.nil?
+  def query
+    return @query unless @query.nil?
 
     # default to all active assignments on this course if nothing is passed
     assignment_collection = @assignments.empty? ? [@context.active_assignments] : @assignments
@@ -52,7 +123,7 @@ class EffectiveDueDates
       assignment_collection = assignment_collection.join(',')
     end
 
-    @hash = ActiveRecord::Base.connection.select_all("
+    @query = ActiveRecord::Base.connection.select_all("
       -- fetch the assignment itself
       WITH models AS (
         SELECT *
@@ -259,56 +330,6 @@ class EffectiveDueDates
       -- match the effective due date with its grading period
       LEFT OUTER JOIN applied_grading_periods periods ON
           overrides.due_at >= periods.start_date AND overrides.due_at < periods.end_date
-    ").each_with_object({}) do |row, hsh|
-      assignment_id = row.delete("assignment_id").to_i
-      student_id = row.delete("student_id").to_i
-      hsh[assignment_id] ||= {}
-      hsh[assignment_id][student_id] = {
-        due_at: row["due_at"] && Time.zone.parse(row["due_at"]),
-        grading_period_id: row["grading_period_id"] && row["grading_period_id"].to_i,
-        in_closed_grading_period: row["closed"] == "t",
-        override_id: row["override_id"] && row["override_id"].to_i,
-        override_source: row["override_type"]
-      }
-    end
-  end
-
-  # This iterates through a course's EffectiveDueDate hash with multiple
-  # assignments to see if any of them are in a closed grading period.
-  def any_in_closed_grading_period?
-    return @any_in_closed_grading_period unless @any_in_closed_grading_period.nil?
-
-    @any_in_closed_grading_period = mgp_enabled? &&
-        to_hash.any? do |_, assignment_due_dates|
-          any_student_in_closed_grading_period?(assignment_due_dates)
-        end
-  end
-
-  # This iterates through a single assignment's EffectiveDueDate hash to see
-  # if any students in them are in a closed grading period.
-  def in_closed_grading_period?(assignment_id)
-    assignment_id = assignment_id.id if assignment_id.is_a?(Assignment)
-    return false if assignment_id.nil?
-
-    # obviously false if MGP isn't even enabled
-    return false unless mgp_enabled?
-    # if we've already checked all assignments and it was false,
-    # no need to check this one specifically
-    return false if @any_in_closed_grading_period == false
-
-    assignment_due_dates = to_hash[assignment_id]
-    any_student_in_closed_grading_period?(assignment_due_dates)
-  end
-
-  private
-
-  def mgp_enabled?
-    return @mgp_enabled unless @mgp_enabled.nil?
-    @mgp_enabled = @context.feature_enabled?(:multiple_grading_periods)
-  end
-
-  def any_student_in_closed_grading_period?(assignment_due_dates)
-    return false unless assignment_due_dates
-    assignment_due_dates.any? { |_, student| student[:in_closed_grading_period] }
+    ")
   end
 end

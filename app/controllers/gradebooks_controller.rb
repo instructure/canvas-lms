@@ -299,7 +299,7 @@ class GradebooksController < ApplicationController
     @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(:teacher_notes=> true).first
-    ag_includes = [:assignments, :assignment_visibility, 'overrides']
+    ag_includes = [:assignments, :assignment_visibility]
     chunk_size = if @context.assignments.published.count < Setting.get('gradebook2.assignments_threshold', '20').to_i
       Setting.get('gradebook2.submissions_chunk_size', '35').to_i
     else
@@ -315,6 +315,7 @@ class GradebooksController < ApplicationController
       ),
       :sections_url => api_v1_course_sections_url(@context),
       :course_url => api_v1_course_url(@context),
+      :effective_due_dates_url => api_v1_course_effective_due_dates_url(@context),
       :enrollments_url => custom_course_enrollments_api_url(per_page: per_page),
       :enrollments_with_concluded_url =>
         custom_course_enrollments_api_url(include_concluded: true, per_page: per_page),

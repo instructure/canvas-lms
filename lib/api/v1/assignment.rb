@@ -64,7 +64,8 @@ module Api::V1::Assignment
     contexts = assignments.map {|a| [a.context_id, a.context_type] }.uniq
     if contexts.length == 1
       # if so, calculate their effective due dates in one go, rather than individually
-      opts.merge!({exclude_has_due_date_in_closed_grading_period: true})
+      opts[:exclude_response_fields] ||= []
+      opts[:exclude_response_fields] << 'has_due_date_in_closed_grading_period'
       due_dates = EffectiveDueDates.for_course(assignments.first.context, assignments)
     end
 
@@ -103,7 +104,8 @@ module Api::V1::Assignment
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
-    unless opts[:exclude_has_due_date_in_closed_grading_period]
+
+    unless opts[:exclude_response_fields].include?('has_due_date_in_closed_grading_period')
       hash['has_due_date_in_closed_grading_period'] = assignment.in_closed_grading_period?
     end
 
