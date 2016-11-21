@@ -888,12 +888,12 @@ class Attachment < ActiveRecord::Base
     h.number_to_human_size(self.size) rescue "size unknown"
   end
 
-  def download_url
-    authenticated_s3_url(:expires => url_ttl, :response_content_disposition => "attachment; " + disposition_filename)
+  def download_url(ttl = url_ttl)
+    authenticated_s3_url(expires: ttl, response_content_disposition: "attachment; " + disposition_filename)
   end
 
-  def inline_url
-    authenticated_s3_url(:expires => url_ttl, :response_content_disposition => "inline; " + disposition_filename)
+  def inline_url(ttl = url_ttl)
+    authenticated_s3_url(expires: ttl, response_content_disposition: "inline; " + disposition_filename)
   end
 
   def url_ttl
