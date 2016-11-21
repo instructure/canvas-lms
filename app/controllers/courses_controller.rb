@@ -2734,6 +2734,8 @@ class CoursesController < ApplicationController
 
   def offline_web_exports
     return render status: 404, template: 'shared/errors/404_message' unless @context.allow_web_export_download?
+    mvmp = MustViewModuleProgressor.new(@current_user, @context)
+    mvmp.make_progress
     @page_title = t('Course Content Downloads')
     render :text => 'Downloads'.html_safe, :layout => true
   end
