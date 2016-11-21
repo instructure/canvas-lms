@@ -336,6 +336,10 @@ define [
               published: true
               muted: false
               only_visible_to_overrides: true
+              overrides: [{
+                due_at: "2013-09-15T10:00:00Z"
+                student_ids: ["1"]
+              }]
               assignment_visibility: ["1"]
             }
             {
@@ -350,6 +354,10 @@ define [
               published: true
               muted: true
               only_visible_to_overrides: true
+              overrides: [{
+                due_at: "2013-09-15T10:00:00Z"
+                student_ids: ["2"]
+              }]
               assignment_visibility: ["2"]
             }
             {
@@ -585,6 +593,32 @@ define [
           outcome_gradebook_enabled: true
           outcome_links_url: 'api/v1/courses/1/outcome_group_links'
           outcome_rollups_url: 'api/v1/courses/1/outcome_rollups'
+          active_grading_periods: [
+            {
+              id: '1'
+              title: 'Fall Period 1'
+              start_date: '2013-08-01T00:00:00Z'
+              end_date: '2013-09-01T00:00:00Z'
+              close_date: '2013-09-08T00:00:00Z'
+              is_closed: true
+            }
+            {
+              id: '2'
+              title: 'Fall Period 2'
+              start_date: '2013-09-01T00:00:00Z'
+              end_date: '2013-11-01T00:00:00Z'
+              close_date: '2013-11-08T00:00:00Z'
+              is_closed: true
+            }
+            {
+              id: '3'
+              title: 'Fall Period 3'
+              start_date: '2013-11-01T00:00:00Z'
+              end_date: '2014-01-01T00:00:00Z'
+              close_date: '2014-01-08T00:00:00Z'
+              is_closed: false
+            }
+          ]
         }
       }
 

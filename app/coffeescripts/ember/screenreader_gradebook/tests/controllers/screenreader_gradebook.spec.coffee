@@ -154,14 +154,25 @@ define [
   module 'screenreader_gradebook_controller: with selected student',
     setup: ->
       setup.call this
-      Ember.run =>
-        student = @srgb.get('students.firstObject')
-        @srgb.set('selectedStudent', student)
+      @completeSetup = =>
+        workAroundRaceCondition().then =>
+          Ember.run =>
+            @srgb.set('selectedGradingPeriod', { id: '3' })
+            @srgb.set('assignment_groups', Ember.ArrayProxy.create(content: clone fixtures.assignment_groups))
+            @srgb.set('assignment_groups.isLoaded', true)
+            student = @srgb.get('students.firstObject')
+            @srgb.set('selectedStudent', student)
     teardown: ->
       teardown.call this
 
   test 'selectedSubmission should be null when just selectedStudent is set', ->
-    strictEqual @srgb.get('selectedSubmission'), null
+    @completeSetup().then =>
+      strictEqual @srgb.get('selectedSubmission'), null
+
+  test 'assignments excludes any due for the selected student in a different grading period', ->
+    @srgb.mgpEnabled = true
+    @completeSetup().then =>
+      deepEqual(@srgb.get('assignments').mapBy('id'), ['3'])
 
   module 'screenreader_gradebook_controller: with selected student, assignment, and outcome',
     setup: ->
