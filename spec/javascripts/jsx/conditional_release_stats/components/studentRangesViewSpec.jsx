@@ -78,17 +78,22 @@ define([
     , container)
   }
 
-  test('renders three ranges components correctly', () => {
-    const component = renderComponent(defaultProps())
+  // skip if webpack: CNVS-33473
+  if (window.hasOwnProperty("define")) {
+    test('renders three ranges components correctly', () => {
+      const component = renderComponent(defaultProps())
 
-    const tabs = document.querySelectorAll('[role="tab"]')
-    equal(tabs.length, 3, 'renders full component')
+      const tabs = document.querySelectorAll('[role="tab"]')
+      equal(tabs.length, 3, 'renders full component')
 
-    const tabPanels = document.querySelectorAll('[role="tabpanel"]');
-    equal(tabPanels.length, 3, 'renders full component')
+      const tabPanels = document.querySelectorAll('[role="tabpanel"]');
+      equal(tabPanels.length, 3, 'renders full component')
 
-    // Accordion only renders the currently open tab, so we only check for the first tab's content
-    ok(document.querySelector('[role="tabpanel"] .crs-student-range'))
+      // Accordion only renders the currently open tab, so we only check for the first tab's content
+      ok(document.querySelector('[role="tabpanel"] .crs-student-range'))
 
-  })
+    })
+  } else {
+    QUnit.skip('renders three ranges components correctly')
+  }
 })
