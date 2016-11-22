@@ -75,8 +75,6 @@ gem 'nokogiri', '1.6.6.2.20150813143452', require: false, github: 'codekitchen/n
 gem 'oauth-instructure', '0.4.10', require: false
 gem 'parallel', '1.6.2', require: false
   gem 'ruby-progressbar', '1.7.5', require: false #used to show progress of S3Uploader
-gem 'flamegraph', '0.1.0', require: false
-  gem 'stackprof', '0.2.9', require: false
 gem 'rake', '11.3.0'
 gem 'ratom-nokogiri', '0.10.4', require: false
 gem 'rdiscount', '1.6.8', require: false
