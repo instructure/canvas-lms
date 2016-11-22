@@ -706,7 +706,7 @@ define([
         placeholder: 'context_module_placeholder',
         forcePlaceholderSize: true,
         axis: 'y',
-        containment: "#context_modules"
+        containment: '#content'
       }
     };
   })();
