@@ -23,7 +23,7 @@
   <% js_env :canManageCourse => can_do(@context, @current_user, :manage) %>
 <% else %>
   <div class="roster-container">
-    <div class="roster student_roster">
+    <div class="roster roster-column student_roster">
       <h2><%= @primary_users.keys.first %></h2>
       <ul class="user-list">
       <% @primary_users[@primary_users.keys.first].each do |student| %>
@@ -46,7 +46,7 @@
       </ul>
     </div>
     <% unless !@secondary_users || @secondary_users.empty? %>
-    <div class="roster teacher_roster">
+    <div class="roster roster-column teacher_roster">
       <h2><%= @secondary_users.keys.first %></h2>
       <ul class="user-list">
       <% @secondary_users[@secondary_users.keys.first].each do |teacher| %>
