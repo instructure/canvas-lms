@@ -412,7 +412,7 @@ class AccountsController < ApplicationController
       unless account_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_account_settings)
           if account_settings[:settings]
-            account_settings[:settings].slice!(:restrict_student_past_view, :restrict_student_future_view, :restrict_student_future_listing)
+            account_settings[:settings].slice!(:restrict_student_past_view, :restrict_student_future_view, :restrict_student_future_listing, :lock_all_announcements)
           end
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
           @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
@@ -492,6 +492,12 @@ class AccountsController < ApplicationController
   #   Restrict students from viewing courses before start date
   #
   # @argument account[settings][restrict_student_future_view][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
+  # @argument account[settings][lock_all_announcements][value] [Boolean]
+  #   Disable comments on announcements
+  #
+  # @argument account[settings][lock_all_announcements][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
   #
   # @argument account[settings][restrict_student_future_listing][value] [Boolean]

@@ -398,7 +398,7 @@
             <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
             <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>
             <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
-            <%= f.check_box :lock_all_announcements, :disabled => !can_manage %>
+            <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
             <%= label_tag :course_lock_all_announcements, :en => 'Disable comments on announcements' %><br />
             <%= f.select :default_wiki_editing_roles, [
               [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],

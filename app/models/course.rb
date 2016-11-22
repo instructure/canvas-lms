@@ -2776,7 +2776,7 @@ class Course < ActiveRecord::Base
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
   add_setting :show_total_grade_as_points, :boolean => true, :default => false
-  add_setting :lock_all_announcements, :boolean => true, :default => false
+  add_setting :lock_all_announcements, :boolean => true, :default => false, :inherited => true
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
   add_setting :public_syllabus_to_auth, :boolean => true, :default => false

@@ -76,9 +76,9 @@ class DiscussionTopicPresenter
   #
   # Returns a boolean.
   def comments_disabled?
-    !!((topic.is_a?(Announcement) &&
+    !!(topic.is_a?(Announcement) &&
       topic.context.is_a?(Course) &&
-      topic.context.settings[:lock_all_announcements]))
+      topic.context.settings[:lock_all_announcements])
   end
 
   # Public: Determine if the discussion's context has a large roster flag set.
