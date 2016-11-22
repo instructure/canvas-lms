@@ -320,6 +320,19 @@ describe DiscussionTopic do
           expect(@topic.active_participants_with_visibility.include?(@student2)).to be_falsey
         end
 
+        it "should not grant reply permissions to group if course is concluded" do
+          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          group_category = @course.group_categories.create(:name => "new cat")
+          @group = @course.groups.create(:name => "group", :group_category => group_category)
+          @group.add_user(@student1)
+          @course.complete!
+          @topic = @group.discussion_topics.create(:title => "group topic")
+          @topic.save!
+
+          expect(@topic.context).to eq(@group)
+          expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies].sort
+        end
+
         it "should work for subtopics for graded assignments" do
           group_discussion_assignment
           ct = @topic.child_topics.first
