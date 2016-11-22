@@ -12,6 +12,7 @@ require [
   'translations/_core_en'
   'jquery.ajaxJSON'
   'jquery.google-analytics'
+  'vendor/swfobject/swfobject'
   'reminders'
   'jquery.instructure_forms'
   'instructure'
