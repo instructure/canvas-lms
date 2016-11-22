@@ -2027,7 +2027,7 @@ define([
   LatexCmds.rfloor = bind(VanillaSymbol, '\\rfloor ', '&#8971;');
   LatexCmds.lceil = bind(VanillaSymbol, '\\lceil ', '&#8968;');
   LatexCmds.rceil = bind(VanillaSymbol, '\\rceil ', '&#8969;');
-  LatexCmds.slash = bind(VanillaSymbol, '\\slash ', '&#47;');
+  LatexCmds.slash = bind(VanillaSymbol, '/');
   LatexCmds.lbrace = bind(VanillaSymbol, '\\lbrace ', '&#123;');
   LatexCmds.rbrace = bind(VanillaSymbol, '\\rbrace ', '&#125;');
 
