@@ -84,6 +84,7 @@ define [
         reply_count_tooltip: @replyTooltip()
         assignment: json.assignment?.toJSON()
         defaultDates: @defaultDates().toJSON()
+        isRootTopic: @isRootTopic()
       delete json.assignment.rubric if json.assignment
       json
 
@@ -182,6 +183,9 @@ define [
       if !document.activeElement? || document.activeElement.nodeName == "BODY"
         $toFocus = $('.ig-header-title', $toFocus) if $toFocus.hasClass('discussion-list')
         $toFocus.focus()
+
+    isRootTopic: () ->
+      !@get('root_topic_id') && @get('group_category_id')
 
     groupCategoryId: (id) =>
       return @get( 'group_category_id' ) unless arguments.length > 0

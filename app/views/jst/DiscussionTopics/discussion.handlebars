@@ -65,6 +65,7 @@
     </div>
 
     <div class="discussion-unread-status">
+      {{#unless isRootTopic}}
       <div class="new-and-total-badge pull-right">
         <span class="new-items"
               title="{{unread_count_tooltip}}"
@@ -86,6 +87,7 @@
           {{reply_count_tooltip}}
         </div>
       </div>
+      {{/unless}}
     </div>
 
     <div class="discussion-actions">
