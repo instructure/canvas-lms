@@ -83,7 +83,7 @@ describe MasterCourses::MasterMigration do
       new_course = course
       new_sub = @template.add_child_course!(new_course)
 
-      @migration.expects(:export_to_child_courses).with(:full, [new_sub])
+      @migration.expects(:export_to_child_courses).with(:full, [new_sub], true)
       @migration.perform_exports
     end
 
@@ -92,7 +92,7 @@ describe MasterCourses::MasterMigration do
       sel_sub = @template.add_child_course!(old_course)
       sel_sub.update_attribute(:use_selective_copy, true)
 
-      @migration.expects(:export_to_child_courses).with(:selective, [sel_sub])
+      @migration.expects(:export_to_child_courses).with(:selective, [sel_sub], true)
       @migration.perform_exports
     end
 
@@ -121,21 +121,32 @@ describe MasterCourses::MasterMigration do
     def run_master_migration
       @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
       run_jobs
+      @migration.reload
     end
 
     it "should create an export once and import in each child course" do
       @copy_to1 = course
-      @subscription = @template.add_child_course!(@copy_to1)
+      @sub1 = @template.add_child_course!(@copy_to1)
       @copy_to2 = course
-      @subscription = @template.add_child_course!(@copy_to2)
+      @sub2 = @template.add_child_course!(@copy_to2)
 
       assmt = @copy_from.assignments.create!(:name => "some assignment")
       att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
 
       run_master_migration
 
-      @migration.reload
       expect(@migration).to be_completed
+
+      assmt_tag = @template.content_tag_for(assmt)
+      att_tag = @template.content_tag_for(att)
+      [assmt_tag, att_tag].each do |tag|
+        expect(tag.current_migration_id).to eq @migration.id # should keep track of the latest successful export
+      end
+
+      [@sub1, @sub2].each do |sub|
+        sub.reload
+        expect(sub.use_selective_copy?).to be_truthy # should have been marked as up-to-date now
+      end
 
       [@copy_to1, @copy_to2].each do |copy_to|
         assmt_to = copy_to.assignments.where(:migration_id => mig_id(assmt)).first
@@ -145,6 +156,59 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "should copy selectively" # TODO
+    it "should copy selectively on second time" do
+      @copy_to = course
+      @sub = @template.add_child_course!(@copy_to)
+
+      topic = @copy_from.discussion_topics.create!(:title => "some title")
+
+      run_master_migration
+      expect(@migration.export_results.keys).to eq [:full]
+
+      topic_to = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
+      expect(topic_to).to be_present
+      cm1 = ContentMigration.find(@migration.import_results.keys.first)
+      expect(cm1.migration_settings[:imported_assets]["DiscussionTopic"]).to eq topic_to.id.to_s
+
+      page = @copy_from.wiki.wiki_pages.create!(:title => "another title")
+
+      run_master_migration
+      expect(@migration.export_results.keys).to eq [:selective]
+
+      page_to = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+      expect(page_to).to be_present
+
+      cm2 = ContentMigration.find(@migration.import_results.keys.first)
+      expect(cm2.migration_settings[:imported_assets]["DiscussionTopic"]).to be_blank # should have excluded it from the selective export
+      expect(cm2.migration_settings[:imported_assets]["WikiPage"]).to eq page_to.id.to_s
+    end
+
+    it "should create two exports (one selective and one full) if needed" do
+      @copy_to1 = course
+      @template.add_child_course!(@copy_to1)
+
+      topic = @copy_from.discussion_topics.create!(:title => "some title")
+
+      run_master_migration
+      expect(@migration.export_results.keys).to eq [:full]
+      topic_to1 = @copy_to1.discussion_topics.where(:migration_id => mig_id(topic)).first
+      expect(topic_to1).to be_present
+      new_title = "new title"
+      topic_to1.update_attribute(:title, new_title)
+
+      page = @copy_from.wiki.wiki_pages.create!(:title => "another title")
+
+      @copy_to2 = course
+      @template.add_child_course!(@copy_to2) # new child course - needs full update
+
+      run_master_migration
+      expect(@migration.export_results.keys).to match_array([:selective, :full]) # should create both
+
+      expect(@copy_to1.wiki.wiki_pages.where(:migration_id => mig_id(page)).first).to be_present # should bring the wiki page in the selective
+      expect(topic_to1.reload.title).to eq new_title # should not have have overwritten the new change in the child course
+
+      expect(@copy_to2.discussion_topics.where(:migration_id => mig_id(topic)).first).to be_present # should bring both in the full
+      expect(@copy_to2.wiki.wiki_pages.where(:migration_id => mig_id(page)).first).to be_present
+    end
   end
 end

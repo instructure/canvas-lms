@@ -83,11 +83,13 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     # 1) determine whether to make a full export, a selective export, or both
     up_to_date_subs, new_subs = subs.partition(&:use_selective_copy?)
 
-    # do a selective export first
+    # do a selective export first (if necessary)
     # if any changes are made between the selective export and the full export, then we'll carry those in the next selective export
     # and the ones that got the full export will get the changes twice
-    export_to_child_courses(:selective, up_to_date_subs) if up_to_date_subs.any?
-    export_to_child_courses(:full, new_subs) if new_subs.any?
+    # the primary export is the one we'll use to mark the content tags as exported (i.e. the first one)
+    self.master_template.load_tags!
+    export_to_child_courses(:selective, up_to_date_subs, true) if up_to_date_subs.any?
+    export_to_child_courses(:full, new_subs, !up_to_date_subs.any?) if new_subs.any?
 
     self.workflow_state = 'imports_queued'
     self.imports_queued_at = Time.now
@@ -97,12 +99,9 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     raise e
   end
 
-  def export_to_child_courses(type, subscriptions)
-    self.export_results[type] = {}
-    self.export_results[type][:subscriptions] = subscriptions.map(&:id)
+  def export_to_child_courses(type, subscriptions, export_is_primary)
+    export = self.create_export(type, export_is_primary)
 
-    export = self.create_export(type)
-    export_results[type][:content_export_id] = export.id
     if export.exported_for_course_copy?
       self.queue_imports(type, export, subscriptions)
     else
@@ -110,7 +109,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     end
   end
 
-  def create_export(type)
+  def create_export(type, is_primary)
     # ideally we'll make this do more than just the usual CC::Exporter but we'll also do some stuff
     # in CC::Importer::Canvas to turn it into the big ol' "course_export.json" and we'll save that alone
     # and return it
@@ -119,8 +118,28 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     ce.export_type = ContentExport::MASTER_COURSE_COPY
     ce.user = self.user
     ce.save!
-    ce.export_course(:master_migration => self, :master_migration_type => type)
+    ce.export_course(:master_migration => self, :master_migration_type => type, :is_primary_export => is_primary)
     ce
+  end
+
+  def export_object?(obj)
+    successful_ids = self.master_template.successful_migration_ids
+    return true unless successful_ids.any?
+
+    if tag = self.master_template.content_tag_for(obj)
+      # export unless current_migration_id points to a completed migration
+      !(tag.current_migration_id && successful_ids.include?(tag.current_migration_id))
+    else
+      true
+    end
+  end
+
+  def mark_exported_object_as_current!(obj)
+    if tag = self.master_template.content_tag_for(obj)
+      tag.lock!
+      tag.current_migration_id = self.id
+      tag.save!
+    end
   end
 
   class MigrationPluginStub # so we can (ab)use queue_migration
@@ -130,7 +149,11 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def queue_imports(type, export, subscriptions)
-    self.lock!
+    self.lock! # make sure that we don't have race conditions with imports sending back results
+    self.export_results[type] = {:subscriptions => subscriptions.map(&:id), :content_export_id => export.id}
+
+    imports_expire_at = self.created_at + hours_until_expire.hours # tighten the limit until the import jobs expire
+
     subscriptions.each do |sub|
       cm = sub.child_course.content_migrations.build
       cm.migration_type = "master_course_import"
@@ -142,9 +165,9 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cm.exported_attachment = export.attachment
       cm.save!
 
-      cm.queue_migration(MigrationPluginStub)
+      cm.queue_migration(MigrationPluginStub, expires_at: imports_expire_at)
 
-      self.import_results[cm.id] = {:subscription_id => sub.id, :state => 'queued'}
+      self.import_results[cm.id] = {:import_type => type, :subscription_id => sub.id, :state => 'queued'}
     end
     self.save!
     # this job is finished now but we won't mark ourselves as "completed" until all the import migrations are finished
@@ -152,7 +175,13 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def update_import_state!(import_migration, state)
     self.lock!
-    self.import_results[import_migration.id][:state] = state
+    res = self.import_results[import_migration.id]
+    res[:state] = state
+    if state == 'completed' && res[:import_type] == :full
+      if sub = self.master_template.child_subscriptions.active.where(:id => res[:subscription_id], :use_selective_copy => false).first
+        sub.update_attribute(:use_selective_copy, true) # mark subscription as up-to-date
+      end
+    end
     if self.import_results.values.all?{|r| r[:state] != 'queued'}
       # all imports are done
       if self.import_results.values.all?{|r| r[:state] == 'completed'}

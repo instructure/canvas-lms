@@ -35,8 +35,15 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def content_tag_for(content)
+    return unless MasterCourses::ALLOWED_CONTENT_TYPES.include?(content.class.base_class.name)
     if @content_tag_index
-      (@content_tag_index[content.class.base_class.name] || {})[content.id] || create_content_tag_for!(content)
+      tag = (@content_tag_index[content.class.base_class.name] || {})[content.id]
+      unless tag
+        tag = create_content_tag_for!(content)
+        @content_tag_index[content.class.base_class.name] ||= {}
+        @content_tag_index[content.class.base_class.name][content.id] = tag
+      end
+      tag
     else
       self.master_content_tags.polymorphic_where(:content => content).first || create_content_tag_for!(content)
     end
@@ -62,5 +69,9 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def active_migration_running?
     self.active_migration && self.active_migration.still_running?
+  end
+
+  def successful_migration_ids
+    @successful_mig_ids ||= self.master_migrations.where(:workflow_state => "completed").pluck(:id)
   end
 end
