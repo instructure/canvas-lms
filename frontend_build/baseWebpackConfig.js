@@ -22,6 +22,7 @@ const timezoneAndLocaleBundles = timezones.concat(momentLocales).reduce((memo, f
 
 // Put any custom moment locales here:
 timezoneAndLocaleBundles['moment/locale/mi-nz'] = 'custom_moment_locales/mi_nz.js'
+timezoneAndLocaleBundles['moment/locale/ht-ht'] = 'custom_moment_locales/ht_ht.js'
 
 module.exports = {
   // In prod build, don't attempt to continue if there are any errors.
