@@ -171,6 +171,14 @@ class EnrollmentState < ActiveRecord::Base
     end
   end
 
+  def self.build_states_in_ranges
+    Enrollment.find_ids_in_ranges(:batch_size => 250) do |min_id, max_id|
+      enrollments = Enrollment.joins("LEFT OUTER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id = enrollments.id").
+        where("enrollment_states IS NULL").where(:id => min_id..max_id).to_a
+      enrollments.each(&:create_enrollment_state)
+    end
+  end
+
   def self.process_term_states_in_ranges(start_at, end_at, term, enrollment_type=nil)
     scope = term.enrollments
     scope = scope.where(:type => enrollment_type) if enrollment_type
