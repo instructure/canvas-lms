@@ -772,18 +772,21 @@ describe UserMerge do
 
     it "should move user attachments and handle duplicates" do
       course
-      root_attachment = Attachment.create(:context => @course, :filename => "unique_name1.txt",
+      # FileSystemBackend is not namespace-aware, so the same id+name in
+      # different shards (e.g. root_attachment and its copy) can cause
+      # :boom: ... set high ids for things that get copied, so their
+      # copies' ids don't collide
+      root_attachment = Attachment.create(:id => 1_000_000, :context => @course, :filename => "unique_name1.txt",
                                           :uploaded_data => StringIO.new("root_attachment_data"))
-
       user1 = User.create!
       # should not copy because it's identical to @user2_attachment1
       user1_attachment1 = Attachment.create!(:user => user1, :context => user1, :filename => "shared_name1.txt",
                                              :uploaded_data => StringIO.new("shared_data"))
       # copy should have root_attachment directed to @user2_attachment2, and be renamed
-      user1_attachment2 = Attachment.create!(:user => user1, :context => user1, :filename => "shared_name2.txt",
+      user1_attachment2 = Attachment.create!(:id => 1_000_001, :user => user1, :context => user1, :filename => "shared_name2.txt",
                                              :uploaded_data => StringIO.new("shared_data2"))
       # should copy as a root_attachment (even though it isn't one currently)
-      user1_attachment3 = Attachment.create!(:user => user1, :context => user1, :filename => "unique_name2.txt",
+      user1_attachment3 = Attachment.create!(:id => 1_000_002, :user => user1, :context => user1, :filename => "unique_name2.txt",
                                              :uploaded_data => StringIO.new("root_attachment_data"))
       user1_attachment3.content_type = "text/plain"
       user1_attachment3.save!
