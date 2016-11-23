@@ -14,8 +14,20 @@ class Speedgrader
       f("#average_score")
     end
 
+    def grade_input
+      f('#grading-box-extended')
+    end
+
     def visit(course, assignment)
       get "/courses/#{course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
+    end
+
+    def enter_grade(grade)
+      grade_input.send_keys(grade, :tab)
+    end
+
+    def current_grade
+      grade_input['value']
     end
   end
 end
