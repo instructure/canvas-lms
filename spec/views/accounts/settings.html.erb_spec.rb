@@ -197,6 +197,7 @@ describe "accounts/settings.html.erb" do
         let(:sis_syncing) { "input#account_settings_sis_syncing_value" }
         let(:sis_syncing_locked) { "input#account_settings_sis_syncing_locked" }
         let(:default_grade_export) { "#account_settings_sis_default_grade_export_value" }
+        let(:require_assignment_due_date) { "#account_settings_sis_require_assignment_due_date_value" }
 
         before do
           @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(true)
@@ -211,6 +212,7 @@ describe "accounts/settings.html.erb" do
           it { expect(response).to     have_tag(allow_sis_import) }
           it { expect(response).to     have_tag(sis_syncing) }
           it { expect(response).to     have_tag(sis_syncing_locked) }
+          it { expect(response).to     have_tag(require_assignment_due_date) }
           it { expect(response).not_to have_tag("#sis_grade_export_settings") }
           it { expect(response).not_to have_tag("#old_sis_integrations") }
         end
@@ -230,6 +232,7 @@ describe "accounts/settings.html.erb" do
               expect(response).not_to have_tag("#{sis_syncing}[disabled]")
               expect(response).not_to have_tag("#{sis_syncing_locked}[disabled]")
               expect(response).not_to have_tag("#{default_grade_export}[disabled]")
+              expect(response).not_to have_tag("#{require_assignment_due_date}[disabled]")
             end
           end
 
@@ -244,6 +247,7 @@ describe "accounts/settings.html.erb" do
                 expect(response).to have_tag("#{sis_syncing}[disabled]")
                 expect(response).to have_tag("#{sis_syncing_locked}[disabled]")
                 expect(response).to have_tag("#{default_grade_export}[disabled]")
+                expect(response).to have_tag("#{require_assignment_due_date}[disabled]")
               end
             end
 
@@ -257,6 +261,7 @@ describe "accounts/settings.html.erb" do
                 expect(response).not_to have_tag("#{sis_syncing}[disabled]")
                 expect(response).not_to have_tag("#{sis_syncing_locked}[disabled]")
                 expect(response).not_to have_tag("#{default_grade_export}[disabled]")
+                expect(response).not_to have_tag("#{require_assignment_due_date}[disabled]")
               end
             end
           end

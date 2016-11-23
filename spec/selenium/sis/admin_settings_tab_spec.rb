@@ -74,6 +74,7 @@ describe "admin settings tab" do
     let(:sis_syncing) { "#account_settings_sis_syncing_value" }
     let(:sis_syncing_locked) { "#account_settings_sis_syncing_locked" }
     let(:default_grade_export) { "#account_settings_sis_default_grade_export_value" }
+    let(:require_assignment_due_date) { "#account_settings_sis_require_assignment_due_date_value" }
 
     def test_checkbox_on_off(id)
       set_checkbox_via_label(id,true)
@@ -139,12 +140,17 @@ describe "admin settings tab" do
 
         context "SIS syncing => true" do
           before do
+            account.set_feature_flag! :bulk_sis_grade_export, 'on'
+            account.set_feature_flag! 'post_grades', 'on'
             account.settings = { sis_syncing: { value: true } }
             account.save
             get_settings_page(account)
           end
 
           it { test_checkbox_on_off(sis_syncing_locked) }
+          it { set_checkbox_via_label(default_grade_export,true)
+               click_submit
+               test_checkbox_on_off(require_assignment_due_date) }
         end
       end
 
@@ -207,6 +213,7 @@ describe "admin settings tab" do
             get_settings_page(sub_account)
             expect(f(sis_syncing)).not_to be_disabled
             expect(f(sis_syncing_locked)).not_to be_disabled
+            expect(f(require_assignment_due_date)).not_to be_disabled
             expect(f(default_grade_export)).not_to be_disabled
           end
         end
@@ -221,6 +228,7 @@ describe "admin settings tab" do
             get_settings_page(sub_account)
             expect(f(sis_syncing)).to be_disabled
             expect(f(sis_syncing_locked)).to be_disabled
+            expect(f(require_assignment_due_date)).to be_disabled
             expect(f(default_grade_export)).to be_disabled
           end
         end
