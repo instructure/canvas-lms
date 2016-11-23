@@ -47,7 +47,7 @@ define [
         new Progress(url: progressObject.progress_url).poll().progress(onProgress)
       .pipe (progressObject) ->
         contentExportId = progressObject.context_id
-        $.get("#{url}/#{contentExportId}")
+        $.getJSON("#{url}/#{contentExportId}")
       .pipe (response) ->
         $(window).off('beforeunload', promptBeforeLeaving)
         if response.workflow_state is 'exported'

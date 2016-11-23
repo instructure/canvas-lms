@@ -110,7 +110,7 @@ define [
       folderPath = urlHelper.decodeSpecialChars(folderPath)
 
       url = "/api/v1/#{contextType}/#{contextId}/folders/by_path#{folderPath}"
-      $.get(url).pipe (folders) ->
+      $.getJSON(url).pipe (folders) ->
         folders.map (folderAttrs) ->
           new Folder(folderAttrs, {parse: true})
 
