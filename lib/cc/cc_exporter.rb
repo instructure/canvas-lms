@@ -85,7 +85,6 @@ module CC
 
         @export_dirs = [@export_dir]
         if @master_migration
-          mark_attachments_as_current!
           # for efficiency to the max, short-circuit the usual course copy process (i.e. zip up, save, and then unzip again)
           # and instead go straight to the intermediate json
           converter = CC::Importer::Canvas::Converter.new(:unzipped_file_path => @export_dir)
@@ -161,19 +160,7 @@ module CC
     end
 
     def add_exported_asset(obj)
-      if @master_migration && @is_primary_export
-        @master_migration.mark_exported_object_as_current!(obj)
-      end
       @content_export && @content_export.add_exported_asset(obj)
-    end
-
-    def mark_attachments_as_current!
-      # because they aren't actually exported
-      @course.attachments.not_deleted.each do |att|
-        if @master_migration_type == :full || @master_migration.export_object?(att)
-          @master_migration.mark_exported_object_as_current!(att)
-        end
-      end
     end
 
     def export_symbol?(obj)

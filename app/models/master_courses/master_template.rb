@@ -90,7 +90,10 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     self.active_migration && self.active_migration.still_running?
   end
 
-  def successful_migration_ids
-    @successful_mig_ids ||= self.master_migrations.where(:workflow_state => "completed").pluck(:id)
+  def last_export_at
+    unless defined?(@last_export_at)
+      @last_export_at = self.master_migrations.where(:workflow_state => "completed").order("id DESC").limit(1).pluck(:exports_started_at).first
+    end
+    @last_export_at
   end
 end

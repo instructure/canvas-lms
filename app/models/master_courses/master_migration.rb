@@ -123,23 +123,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def export_object?(obj)
-    successful_ids = self.master_template.successful_migration_ids
-    return true unless successful_ids.any?
-
-    if tag = self.master_template.content_tag_for(obj)
-      # export unless current_migration_id points to a completed migration
-      !(tag.current_migration_id && successful_ids.include?(tag.current_migration_id))
-    else
-      true
-    end
-  end
-
-  def mark_exported_object_as_current!(obj)
-    if tag = self.master_template.content_tag_for(obj)
-      tag.lock!
-      tag.current_migration_id = self.id
-      tag.save!
-    end
+    last_export_at = self.master_template.last_export_at
+    last_export_at.nil? || obj.updated_at >= last_export_at
   end
 
   class MigrationPluginStub # so we can (ab)use queue_migration

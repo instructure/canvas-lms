@@ -137,12 +137,6 @@ describe MasterCourses::MasterMigration do
 
       expect(@migration).to be_completed
 
-      assmt_tag = @template.content_tag_for(assmt)
-      att_tag = @template.content_tag_for(att)
-      [assmt_tag, att_tag].each do |tag|
-        expect(tag.current_migration_id).to eq @migration.id # should keep track of the latest successful export
-      end
-
       [@sub1, @sub2].each do |sub|
         sub.reload
         expect(sub.use_selective_copy?).to be_truthy # should have been marked as up-to-date now
@@ -161,6 +155,7 @@ describe MasterCourses::MasterMigration do
       @sub = @template.add_child_course!(@copy_to)
 
       topic = @copy_from.discussion_topics.create!(:title => "some title")
+      DiscussionTopic.where(:id => topic).update_all(:updated_at => 5.seconds.ago) # just in case, to fool the selective export
 
       run_master_migration
       expect(@migration.export_results.keys).to eq [:full]
