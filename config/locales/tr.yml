@@ -930,6 +930,7 @@ tr:
         new_sub_account_includes: "Alt hesaplar kendi markaları için Tema Düzenleyiciyi kullanabilsin"
         no_enrollments_can_create_courses: "Hiçbir kayıtlı olmayan kullanıcılar"
         open_registration: "Açık Kayıt"
+        originality_report_visibility: "Öğrenciler orijinallik raporunu görebilir"
         outgoing_email_default_name_option_custom: "Varsayılan \"Kimden\" İsmi"
         outgoing_email_default_name_option_default: "Varsayılan Canvas Ayarları"
         prevent_course_renaming_by_teachers: "Öğretmenlerin derslerin isimlerini değiştirmelerine izin verme"
@@ -960,7 +961,7 @@ tr:
         turnitin_shared_secret: "Turnitin Gizli Anahtarı"
         users_can_edit_name: "Kullanıcılar kendi isimlerini düzenleyebilirler"
       links: 
-        add_admins: "Yönetici Hesabı Ekle"
+        add_admins: "Hesap Yöneticileri"
         configure_report: Yapılandır...
         run_report: "Raporu Çalıştır"
       login_handle_name_placeholder: "örn: Kullanıcı adı veya Öğrenci ID"
@@ -1263,8 +1264,10 @@ tr:
     one: "1 deya defa yeterlilik sağlayın"
     other: "%{count} defa yeterlilik sağlayın"
   actions_efcde10d: Eylemler
+  actions_for_course_312ff446: "%{course} için Eylemler"
   actions_taken_6fb20fd0: "Gerçekleştirilen Eylemler"
   activate_this_key_6cd98f4b: "Bu anahtarı etkinleştir"
+  active_d7e32718: Etkin
   activerecord: 
     errors: 
       messages: 
@@ -1278,19 +1281,33 @@ tr:
   activity_by_date_878c5b49: "Güne göre Etkinlik"
   add_2nd_review_ea988088: "2. Gözden Geçiren Ekle"
   add_8523c19b: Ekle
+  add_a_comment_872470ac: "Yorum Ekle"
   add_a_course_b72b18d7: "Ders Ekle"
+  add_a_custom_help_link_4328252f: "Özel yardım linki ekle"
   add_a_new_announcement_878b717f: "Yeni Duyuru Ekle"
   add_a_new_course_4a041207: "Yeni Ders Ekle"
+  add_a_new_outcome_cbdbe96c: "Yeni Öğrenme Çıktısı Ekle"
+  add_a_new_outcome_group_e3fab2fc: "Yeni Öğrenme Çıktısı Grubu Ekle"
   add_a_new_user_c440d053: "Yeni Kullanıcı Ekle"
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Seçilen öğrenciler için gözlemci ekle"
+  add_account_admins_99c03c9e: "Hesap Yöneticileri Ekle"
+  add_alert_b2729c99: "Uyarı Ekle"
   add_an_identity_provider_to_this_account_c2644478: "Bu hesap için bir kimlik sağlayıcı ekleyin:"
   add_app_baf540f: "Uygulama Ekle"
+  add_assignment_to_name_caf173b0: "%{name}'a Ödev Ekle"
   add_attachment_93868828: "Dosya Ekle"
+  add_attribute_6d6d4a65: "Özellik Ekle"
+  add_bank: 
+    default_name: "İsim Yok"
   add_collaboration_da9665ac: "İşbirliği Ekle"
+  add_contact_method_d2dfea03: "İletişim Yöntemi Ekle"
   add_content_to_module_name_589a8d54: "%{module_name} Modülüne İçerik Ekle"
   add_course_406cb773: "Ders Ekle"
   add_course_assignments_628ed6d0: "Ödev Ekle"
   add_course_calendar_events_146154a5: "Ders Takvim Olay Ekle"
+  add_criterion_eb9587ef: "Kriter Ekle"
+  add_custom_link_22059c0: "Özel Link Ekle"
+  add_email_address_aef3b61: "Eposta Adresi Ekle"
   add_files_to_the_course_da6ffd32: "Derse Dosya Ekle"
   add_folder_ba50d107: "Klasör Ekle"
   add_grading_period_6f774dc3: "Notlandırma Peryodu Ekleyin"
@@ -1305,20 +1322,25 @@ tr:
     add_page_to: "%{module} modülüne sayfa ekle"
     add_quiz_to: "%{module} modülüne kısa sınav ekle"
     add_topic_to: "%{module} modülüne tartışma başlığı ekle"
+  add_new_announcement_ddacd624: "Yeni Duyuru Ekle"
   add_new_group_7ac49f31: "Yeni grup ekle"
   add_new_set_of_due_dates_e8e240f: "Son tarih dizesi ekleyin"
   add_people_7ee4b2ec: "Katılımcı Ekle"
+  add_recipient_ff135ed7: "Alıcı Ekle"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Bu portfolyoya bölüm ekleyin, silin veya yeniden ayarlayın"
   add_review_2fb1590c: "Değerlendirme Ekle"
+  add_rubric_3636d9a6: "Değerlendirme Listesi Ekle"
   add_section_8b027a1c: "Bölüm Ekle"
   add_students_to_the_course_874be8fb: "Derse Öğrenci Ekle"
   add_tas_to_the_course_2aac6e02: "Derse Öğretim Elemanı Yardımcıları Ekle"
   add_theme_32fa3d50: "Tema Ekle"
+  add_trigger_bc1a0fae: "Tetikleyici Ekle"
   add_user_e73e8e50: "Kullanıcı Ekle"
   add_users_to_name_b8109bbb: "%{name}'a Kullanıcıları Ekle"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Ödevlerinizi ekleyin. Yalnızca uzun bir liste yapabilir ya da bunları gruplara ayırabilirsiniz- ve hatta her ödev grubu için ağırlıkları belirleyebilirsiniz."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Aşağıdakilerin her biri için Zendesk yapılandırılmanızın isteğe bağlı alan ID'sini ekleyin (ID'si olamayan alanların logları tutulmayacak):"
   admin_4d3ba42f: Yönetici
+  admins_3e1dce15: Yöneticiler
   after_date_981cd41b: "%{date}'dan sonra"
   after_last_attempt_c9168da2: "Son Teşebbüsten Sonra"
   ajax_errors: 
@@ -1334,8 +1356,8 @@ tr:
   alerts: 
     alert: 
       buttons: 
-        add_criterion: "Tetikleyici Ekle"
-        add_recipient: "Alıcı Ekle"
+        add_criterion: Tetikleyici
+        add_recipient: Alıcı
         save_alert: "Uyarıyı Kaydet"
       criteria: "Şu olduğunda uyarıyı başlat"
       labels: 
@@ -1353,7 +1375,7 @@ tr:
       alerts_description_account: "Kriterlerin tümünü karşılayan her bir öğrenci için bir uyarı oluşturulur.  Uyarılar her gün kontrol edilir ve sorun sebebi çözülene kadar öğrenci, öğretmen ve/veya hesap yöneticisine bildirimler gönderilir."
       alerts_description_course: "Kriterlerin tümünü karşılayan her bir öğrenci için bir uyarı oluşturulur.  Uyarılar her gün kontrol edilip neden olan sorun çözülene kadar öğrenci, öğretmen ve/veya hesap yöneticisine bildirimler gönderilecek."
       buttons: 
-        add_alert: "Uyarı Ekle"
+        add_alert: Uyarı
       description: "Öğretmen %{count} gündür öğrenci ile etkileşim kurmadı."
       option: "Öğretmen Etkileşimi Yok"
       remove: "Bu öğeyi kaldır"
@@ -1381,6 +1403,7 @@ tr:
   all_courses_a7dbb853: "Tüm Dersler"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Tüm tarih alanları olmalı ve doğru biçimlendirilmeli"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Her şey tamam mı? Dersinizi yayınlama zamanı! Yayınlamak için aşağıdaki butona tıklayın! Dersi yayınladığınızda kullanıcılar derse katılmaya başlayacaklar."
+  all_grading_period_sets_must_have_a_title_799538f: "Tüm notlandırma peryodlarının başlığı olmalı"
   all_grading_periods_77974940: "Tüm Notlandırma Periyotları"
   all_grading_periods_must_have_a_title_a1a38d87: "Tüm notlandırma peryodlarının bir başlığı olmalı"
   all_groups_cea25817: "Tüm Gruplar"
@@ -1510,6 +1533,7 @@ tr:
   answers_which_scored_in_the_top_27_a605232d: "En süt %27'de notlandırılmış cevaplar"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Son teşebbüsünüzden sonra cevaplar gösterilecektir"
   api_url_3ee7cb0a: "API URL"
+  app_b157c2b3: Uygulama
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "Bir dersin veya Hesabın ayarlar sayfasındaki \"Uygulamalar\" sekmesinde Uygulama Merkezi görülecektir. Aşağıdaki URL geçerli bir Uygulama Merkezine yönlenmelidir (örneğin %{url} -- sondaki kesme işaretini yazmayın"
   app_placements_6d877225: "Uygulama Yerleştirmeleri"
   app_reregistration_87cc8817: "Uygulama Yeniden Kayıt"
@@ -1587,11 +1611,13 @@ tr:
     one: "%{name} öğesini silmek istediğinizden emin misiniz?"
     other: "%{count} öğeyi silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Bu duyuru silmek istediğinizden emin misiniz?"
+  are_you_sure_you_want_to_delete_this_comment_4ee386d: "Bu yorumu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Bu notlandırma peryodunu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Bu notlandırma şemasını silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Bunu yapmak istediğinize emin misiniz? Bu işlem geri alınamaz ve not defterinde var olan notların üzerine yazılır."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Bu notlandırma peryodunu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Bu aracı kaldırmak istediğinize emin misiniz?"
+  are_you_sure_you_want_to_remove_this_user_8d1a8295: "Bu kullanıcıyı silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Bu profil resmini rapor etmek istediğnize emin misiniz?"
   arrange_by_34a545de: "Göre düzenle"
   arrange_columns_by_assignment_group_33acdf03: "Sütunları Ödev Grubuna göre düzenle"
@@ -1690,6 +1716,7 @@ tr:
     errors: 
       frozen_assignments_error: "Kilitli ödevleri olan grubu silemezsiniz."
   assignment_menu_91fe3716: "Ödev Menüsü"
+  assignment_muted_4cb590a4: "Ödev bekletiliyor"
   assignment_muter: 
     mute_assignment: "Ödevi Beklet"
     muting_assignment: "Ödev beklemeye alınıyor..."
@@ -1698,6 +1725,8 @@ tr:
     unmute_dialog: "Bu ödev şu anda bekletiliyor. Öğrenciler notlarını ve geribildirimleri göremezler. Şimdi açmak ister misiniz?"
     unmuting_assignment: "Ödev beklemeden çıkarılıyor..."
   assignment_name_b2d87383: "Ödev Adı"
+  assignment_name_course_name_is_now_due_55613e9b: "%{assignment_name}, %{course_name}, bitiş tarihi artık"
+  assignment_name_course_name_override_is_now_due_ed5ce1e: "%{course_name} (%{override}), %{assignment_name} bitişi"
   assignment_name_grade_history_b506426c: "%{assignment_name} not geçmişi"
   assignment_options_1e5b7074: "Ödev Seçenekleri"
   assignment_override: 
@@ -2093,6 +2122,7 @@ tr:
       due_at: Bitiş
       for: "Kim için"
       links: 
+        add_rubric: "Değerlendirme Listesi"
         assign_rubric: "Değerlendirme Listesi Ata"
         edit: Düzenle
       manage: Yönet
@@ -2222,6 +2252,7 @@ tr:
       labels: 
         syllabus_body: "Ders Programı Açıklaması"
       links: 
+        edit_syllabus_description: Düzenle
         jump_to_today: "Bugüne Git"
       titles: 
         course_syllabus: "Ders Programı"
@@ -2268,6 +2299,7 @@ tr:
     invalid_date_time: "%{attribute} için geçersiz tarih"
     invalid_submission_types: "Geçersiz gönderim türü"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Bu gruptaki ödevlerin olası puanları yok ve not hesaplamasına dahil edilemezler"
+  assignments_in_this_group_have_no_points_possible__ab0adb72: "Bu gruptaki ödevlerin olası puanları yoktur ve not hesaplamasına dahil edilemezler."
   associated_account_course_id_d87a01c5: "İlişkilendirilmiş Hesap/Ders ID"
   associated_account_name_91854e37: "İlişkilendirilmiş Hesap Adı"
   associated_course_name_9b5b1945: "İlişkilendirilmiş Ders Adı"
@@ -2298,8 +2330,11 @@ tr:
     titles: 
       attendance_help: "Katılım Yardımı"
   attention_aaca1f1d: Uyarı!
+  attribute_d9f3af72: Özellik
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Cihazınız ya da uygulamanız tarafından sesli içerik destekenmiyor."
   audio_dd489fcc: Ses
+  australia_61_eb9bb701: "Avusturalya (+61)"
+  austria_43_7bc58b34: "Avusturya (+43)"
   auth_logging: 
     corrupted: "Ayrıntılar Bulunamadı"
     login: "OTURUM AÇ"
@@ -2315,6 +2350,7 @@ tr:
   available_from_f84e4611: "Tarihinden itibaren kullanılabilir"
   available_from_field_for_styleguide_7ced3861: "Stil kılavuzu için Şu Tarihten İtibaren Etkin alanı"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Şu Tarihten itibaren Etkin - YYYY-MM-DD hh:mm Gibi Format"
+  available_to_b7350e02: "Şunlar kullanabilir"
   available_until_date_2c0ccec3: "Son Geçerlilik Tarihi:"
   available_until_date_cd125c62: "Son Geçerlilik Tarihi"
   available_until_f3b9c4ed: "Şu tarihe kadar geçerli"
@@ -2332,6 +2368,7 @@ tr:
   background_color_b92b52ac: "Arkaplan Rengi"
   background_image_1a401e1a: "Arkaplan Resimi"
   base_847aca7c: Temel
+  base_role_type_a9cc892d: base_role_type
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 .zip dışarı aktarma dosyası"
   bb_name: "Blackboard Dönüştürücü"
@@ -2342,6 +2379,7 @@ tr:
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Yayınlamadan önce dosyalarınızdaki kullanım haklarını ayarlamalısınız."
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Profilinizi düzenlemeden önce, e-posta adresinize (%{email}) yollamış olduğumuz bağlantıdan doğrulamanız gerekmektedir. Eğer e-postaya ulaşamadıysanız, gereksiz klasörünü kontrol edin veya *tekrardan e-posta gönderimi sağlamak için tıklayın* "
   beginning_date_2d2a29ac: "Başlama tarihi"
+  belgium_32_e5f5b598: "Belçika (+32)"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Bu arama alanının altında %{content_type} listesi vardır. Siz yazarken liste sorgu eşleşmesine göre filtrelenecektir.  Karşılıklı yapılan mesajlaşmalar belirlediğiniz seçeneğe göre filtrelenir."
   beta_url_3c7b88ec: "Beta URL:"
   better_file_browsing_description: |-
@@ -2359,11 +2397,13 @@ tr:
   blocked_by_running_migration_d8a57cb7: "Çalışan taşıma işlemi tarafından engellendi"
   blue_daf8fea9: Mavi
   body_shadow_d36e8c2e: "Gövde Gölgesi"
+  bolivia_591_9b8a7a5c: "Bolivya (+591)"
   bookmark_service: 
     default_title: "Başlık Yok"
   bookmark_this_question_bank_dc414a82: "Bu Soru Bankasını Sık Kullanılanlara Ekle"
   bounce_count_reset_c4c2218f: "Sıçrama sayısını sıfırlama!"
   bounce_reason_689ed4c6: "Sıçrama nedeni"
+  brazil_55_34103ffa: "Brezilya (+55)"
   breadcrumb_1_cb3c504: "Breadcrumb 1"
   breadcrumb_2_95ba94be: "Breadcrumb 2"
   broccoli_cloud: 
@@ -10877,6 +10917,8 @@ tr:
     missing_outcome: "Bu öğrenme çıktısı bulunamadı"
     new_outcome_group: "Yeni Öğrenme Çıktısı Grubu"
     outcome: 
+      links: 
+        edit_outcome: Düzenle
       mastery_at_label: "Şu düzeyde ya da üstünde bir yeterlilik puanı belirle:"
       point_mastery: "Yeterlik: %{mastery_points} Puan"
       points: 
@@ -10896,6 +10938,9 @@ tr:
       points: "%{points_possible} Puan"
       title: "Bu öğrenme çıktısına isim verin"
       total_points: "Toplam Puan"
+    outcome_group: 
+      links: 
+        edit_outcome_group: Düzenle
     outcome_group_form: 
       group_description: "Bu grup ile ilgili açıklama"
       title: "Bu gruba isim verin"
@@ -13467,6 +13512,8 @@ tr:
     index: 
       account_rubrics: "Hesap Değerlendirme Listeleri"
       are_you_sure_prompt: "Bu değerlendirme listesine silmek istediğinize emin misiniz? Bu değerlendirme listesiyle ilişkili herhangi bir dersten bu listeye erişilebilir fakat hiç bir yeni ders bu listeyi kullanamaz."
+      buttons: 
+        add_rubric: "Değerlendirme Listesi"
       course_rubrics: "Ders Değerlendirme Listeleri"
       delete_rubric: "Değerlendirme Listesini Sil"
       edit_rubric: "Değerlendirme Listesini Düzenle"
