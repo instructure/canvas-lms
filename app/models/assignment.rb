@@ -210,7 +210,6 @@ class Assignment < ActiveRecord::Base
     turnitin_settings
     allowed_extensions
     muted
-    needs_grading_count
     could_be_locked
     freeze_on_copy
     copied
@@ -1956,8 +1955,10 @@ class Assignment < ActiveRecord::Base
   # This should only be used in the course drop down to show assignments not yet graded.
   scope :need_grading_info, lambda {
     chain = api_needed_fields.
-        where("assignments.needs_grading_count>0").
-        order("assignments.due_at")
+      where("EXISTS (?)",
+        Submission.where("assignment_id=assignments.id").
+          where(Submission.needs_grading_conditions)).
+      order("assignments.due_at")
 
     chain.preload(:context)
   }
@@ -2203,6 +2204,10 @@ class Assignment < ActiveRecord::Base
       .group("assignments.id")
       .select("assignments.*, count(s.assignment_id) AS student_submission_count")
     end
+  end
+
+  def needs_grading_count
+    Assignments::NeedsGradingCountQuery.new(self).manual_count
   end
 
   def can_unpublish?

@@ -27,10 +27,10 @@ module Assignments
 
     delegate :course, :section_visibilities, :visibility_level, :visible_section_ids, :to => :course_proxy
 
-    def initialize(_assignment, _user, _course_proxy=nil)
-      @assignment = _assignment
-      @user = _user
-      @course_proxy = _course_proxy || CourseProxy.new(@assignment.context, @user)
+    def initialize(assignment, user=nil, course_proxy=nil)
+      @assignment = assignment
+      @user = user
+      @course_proxy = course_proxy || CourseProxy.new(@assignment.context, @user)
     end
 
     def count

@@ -105,9 +105,23 @@ module Assignments
         querier = NeedsGradingCountQuery.new(@assignment, @teacher)
 
         expect(querier.count).to eql(1)
-        expect(querier.manual_count).to eql(1)
         querier.count_by_section.each do |count|
           expect(count[:needs_grading_count]).to eql(1)
+        end
+      end
+
+      it "should cache" do
+        @assignment = @course.assignments.create(
+          title: "some assignment",
+          submission_types: ['online_text_entry']
+        )
+        querier = NeedsGradingCountQuery.new(@assignment, @teacher)
+        @assignment.expects(:moderated_grading?).twice
+        enable_cache do
+          querier.count
+          querier.count
+          @assignment.update_attribute(:updated_at, Time.now.utc + 1.minute)
+          querier.count
         end
       end
 
@@ -154,6 +168,119 @@ module Assignments
 
           @students[1].submissions.first.find_or_create_provisional_grade!(@ta2)
           expect(querier.count).to eq 1 # should not count because it has two marks now
+        end
+      end
+    end
+
+    describe "#manual_count" do
+      before :once do
+        @assignment = @course.assignments.create(title: "some assignment", submission_types: ['online_text_entry'])
+        @section2 = @course.course_sections.create!(name: 'section 2')
+      end
+
+      it "should count submissions in all section(s)" do
+        @user1 = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
+        @user2 = user_with_pseudonym(active_all: true, name: 'Student2', username: 'student2@instructure.com')
+        @section2.enroll_user(@user2, 'StudentEnrollment', 'active')
+        @course.enroll_student(@user1).update_attribute(:workflow_state, 'active')
+
+        # make a submission in each section
+        @assignment.submit_homework @user1, submission_type: "online_text_entry", body: "o hai"
+        @assignment.submit_homework @user2, submission_type: "online_text_entry", body: "haldo"
+        @assignment.reload
+
+        expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(2)
+
+        # grade an assignment
+        @assignment.grade_student(@user1, grade: "1", grader: @teacher)
+        @assignment.reload
+
+        # check that the numbers changed
+        expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
+      end
+
+      it "should not count submissions multiple times" do
+        @user = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
+        @section1 = @course.course_sections.create!(name: 'section 1')
+        @section1.enroll_user(@user, 'StudentEnrollment', 'active')
+        @section2.enroll_user(@user, 'StudentEnrollment', 'active')
+
+        @assignment.submit_homework @user, submission_type: "online_text_entry", body: "o hai"
+        @assignment.reload
+
+        expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
+      end
+
+      context "with submission" do
+        before :once do
+          @assignment.submit_homework(@user, submission_type: 'online_text_entry', body: 'blah')
+        end
+
+        it "should count ungraded submissions" do
+          expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
+          @assignment.grade_student(@user, grade: "0", grader: @teacher)
+          @assignment.reload
+          expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
+        end
+
+        it "should not count non-student submissions" do
+          assignment_model(course: @course)
+          s = @assignment.find_or_create_submission(@teacher)
+          s.submission_type = 'online_quiz'
+          s.workflow_state = 'submitted'
+          s.save!
+          expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
+          s.workflow_state = 'graded'
+          s.save!
+          @assignment.reload
+          expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
+        end
+
+        it "should count only enrolled student submissions" do
+          expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
+          @course.enrollments.where(user_id: @user.id).first.destroy
+          @assignment.reload
+          expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
+          e = @course.enroll_student(@user)
+          e.invite
+          e.accept
+          @assignment.reload
+          expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
+
+          # multiple enrollments should not cause double-counting (either by creating as or updating into "active")
+          section2 = @course.course_sections.create!(name: 's2')
+          e2 = @course.enroll_student(@user,
+                                      enrollment_state: 'invited',
+                                      section: section2,
+                                      allow_multiple_enrollments: true)
+          e2.accept
+          section3 = @course.course_sections.create!(name: 's2')
+          e3 = @course.enroll_student(@user,
+                                      enrollment_state: 'active',
+                                      section: section3,
+                                      allow_multiple_enrollments: true)
+          expect(@user.enrollments.where(workflow_state: 'active').count).to be(3)
+          @assignment.reload
+          expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
+
+          # and as long as one enrollment is still active, the count should not change
+          e2.destroy
+          e3.complete
+          @assignment.reload
+          expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
+
+          # ok, now gone for good
+          e.destroy
+          @assignment.reload
+          expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
+          expect(@user.enrollments.where(workflow_state: 'active').count).to be(0)
+
+          # enroll the user as a teacher, it should have no effect
+          e4 = @course.enroll_teacher(@user)
+          e4.accept
+          @assignment.reload
+          expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
+          expect(@user.enrollments.where(workflow_state: 'active').count).to be(1)
         end
       end
     end
