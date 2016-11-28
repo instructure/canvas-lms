@@ -23,21 +23,21 @@ Migration/ModelBehavior:
   Include:
     - "**/db/migrate/*.rb"
     - "lib/data_fixup/*.rb"
-  Whitelist: [
-    Canvas
-    DataFixup
-    Switchman
-    Shard
-    Account.default
-    Account.site_admin
-    *.quoted_table_name
-    *.connection
-    *.transaction
-    *.find_ids_in_batches
-    *.find_ids_in_ranges
-    *.update_all
-    *.delete_all
-  ]
+  Whitelist:
+    - Canvas
+    - DataFixup
+    - Switchman
+    - Shard
+    - Account.default
+    - Account.site_admin
+    - "*.quoted_table_name"
+    - "*.connection"
+    - "*.transaction"
+    - "*.find_ids_in_batches"
+    - "*.find_ids_in_ranges"
+    - "*.update_all"
+    - "*.delete_all"
+    - "ActiveRecord::Migration"
 
 Migration/PrimaryKey:
   <<: *Migration
