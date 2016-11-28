@@ -217,6 +217,7 @@ module.exports = {
     new webpack.PrefetchPlugin("./app/jsx/dashboard_card/DashboardCard.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/due_dates/DueDates.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/due_dates/DueDateCalendarPicker.jsx"),
+    new webpack.PrefetchPlugin("./app/jsx/eportfolios/MoveToDialog.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/epub_exports/CourseListItem.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/external_apps/components/AppDetails.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/external_apps/components/AppList.jsx"),
