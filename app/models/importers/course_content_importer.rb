@@ -282,6 +282,16 @@ module Importers
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
       course.settings_will_change! unless atts.empty?
+
+      # superhax to force new wiki front page if home view changed
+      if settings['default_view'] && settings['default_view'] != course.default_view && data[:wikis]
+        if page_hash = data[:wikis].detect{|h| h[:front_page]}
+          if page = migration.find_imported_migration_item(WikiPage, page_hash[:migration_id])
+            page.set_as_front_page!
+          end
+        end
+      end
+
       settings.slice(*atts.map(&:to_s)).each do |key, val|
         course.send("#{key}=", val)
       end

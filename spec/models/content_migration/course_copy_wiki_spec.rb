@@ -113,6 +113,24 @@ describe ContentMigration do
         expect(@copy_to.wiki.front_page).to eq copy_to_front_page
       end
 
+      it "should overwrite current front page if default_view setting is also changed to wiki" do
+        copy_from_front_page = @copy_from.wiki.wiki_pages.create!(:title => "stuff and stuff")
+        @copy_from.wiki.set_front_page_url!(copy_from_front_page.url)
+
+        copy_to_front_page = @copy_to.wiki.wiki_pages.create!(:title => "stuff and stuff and even more stuf")
+        @copy_to.wiki.set_front_page_url!(copy_to_front_page.url)
+
+        @copy_from.update_attribute(:default_view, 'wiki')
+        @copy_to.update_attribute(:default_view, 'feed')
+
+        run_course_copy
+
+        @copy_to.reload
+        expect(@copy_to.default_view).to eq 'wiki'
+        new_front_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(copy_from_front_page)).first
+        expect(@copy_to.wiki.front_page).to eq new_front_page
+      end
+
       it "should remain with no front page if other front page is not selected for copy" do
         front_page = @copy_from.wiki.wiki_pages.create!(:title => "stuff and stuff")
         @copy_from.wiki.set_front_page_url!(front_page.url)
