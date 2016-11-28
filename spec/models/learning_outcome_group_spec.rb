@@ -93,7 +93,7 @@ describe LearningOutcomeGroup do
     it 'validates length of description' do
       expect{ @course.learning_outcome_groups.create!(title: 'foobar', description: long_text) }.to raise_error(
         ActiveRecord::RecordInvalid,
-        "Validation failed: Description is too long (maximum is 65535 characters)"
+        "Validation failed: Description is too long (maximum is 65,535 characters)"
       )
     end
   end

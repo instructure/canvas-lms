@@ -20,6 +20,14 @@ module DontTrustI18nPluralizations
     Rails.logger.error("#{e.message} in locale #{locale.inspect}")
     ""
   end
+
+  # make sure count special values get formatted
+  def interpolate(locale, string, values = {})
+    if values[:count] && values[:count].is_a?(Numeric)
+      values[:count] = ActiveSupport::NumberHelper.number_to_delimited(values[:count])
+    end
+    super
+  end
 end
 I18nema::Backend.include(DontTrustI18nPluralizations)
 
@@ -77,6 +85,10 @@ module I18nUtilities
     text = before_label(text) if options.delete(:before)
     return text, options
   end
+
+  def n(*args)
+    I18n.n(*args)
+  end
 end
 
 ActionView::Base.send(:include, I18nUtilities)
@@ -120,6 +132,32 @@ ActionView::Helpers::FormBuilder.class_eval do
     label(method, text, options)
   end
 end
+
+module NumberLocalizer
+  # precision (default nil): if nil, use the precision of the passed in number.
+  #   if you want to cap precision, and have less precise numbers not have trailing zeros, you should be
+  #   rounding the number before passing to this helper, and not passing precision
+  # percentage (default false): format as a percentage
+  def n(number, precision: nil, percentage: false)
+    if percentage
+      # no precision? default to the number's precision, not to some arbitrary precision
+      if precision.nil?
+        precision = 9
+        strip_insignificant_zeros = true
+      end
+      return ActiveSupport::NumberHelper.number_to_percentage(number,
+                                                              precision: precision,
+                                                              strip_insignificant_zeros: strip_insignificant_zeros)
+    end
+
+    if precision.nil?
+      return ActiveSupport::NumberHelper.number_to_delimited(number)
+    end
+
+    ActiveSupport::NumberHelper.number_to_rounded(number, precision: precision)
+  end
+end
+I18n.singleton_class.include(NumberLocalizer)
 
 I18n.send(:extend, Module.new {
   attr_accessor :localizer

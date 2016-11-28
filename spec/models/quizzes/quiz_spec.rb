@@ -1120,7 +1120,7 @@ describe Quizzes::Quiz do
       it "should not allow quiz points higher than allowable by postgres" do
         q = Quizzes::Quiz.new(:points_possible => 2000000001)
         expect(q.valid?).to eq false
-        expect(Array(q.errors[:points_possible])).to eq ["must be less than or equal to 2000000000"]
+        expect(Array(q.errors[:points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end
     end
 

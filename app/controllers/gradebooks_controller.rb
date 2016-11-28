@@ -647,11 +647,7 @@ class GradebooksController < ApplicationController
     groups ||= @context.assignment_groups.active
 
     percentage = lambda do |weight|
-      # find the smallest precision necessary to capture up to two digits of
-      # significant decimals, but to avoid unnecessary zeros on the end. (so we
-      # can have 100%, but still have 33.33%, for example)
-      precision = sprintf('%.2f', weight % 1).sub(/^(?:0|1)\.(\d?[1-9])?0*$/, '\1').length
-      number_to_percentage(weight, :precision => precision)
+      I18n.n(weight, percentage: true)
     end
 
     points_possible =

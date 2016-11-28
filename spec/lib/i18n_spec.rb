@@ -51,5 +51,14 @@ describe I18n do
         I18n.t(:__interpolation_test, "Hello %{world}", {foo: "bar"})
       }.to raise_error(I18n::MissingInterpolationArgument)
     end
+
+    it "should format count numbers" do
+      I18n.backend.stub(en: { __interpolation_test: { one: "One thing", other: "%{count} things" }}) do
+        expect(I18n.t(:__interpolation_test,
+                      one: "One thing",
+                      other: "%{count} things",
+                      count: 1001)).to eq "1,001 things"
+      end
+    end
   end
 end
