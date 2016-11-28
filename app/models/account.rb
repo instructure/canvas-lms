@@ -214,6 +214,7 @@ class Account < ActiveRecord::Base
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
   add_setting :app_center_access_token
+  add_setting :enable_offline_web_export, boolean: true, root_only: true, default: false
 
   add_setting :strict_sis_check, :boolean => true, :root_only => true, :default => false
   add_setting :lock_all_announcements, default: false, boolean: true, inheritable: true

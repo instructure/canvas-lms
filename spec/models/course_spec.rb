@@ -33,7 +33,7 @@ describe Course do
     @course.enrollment_term = Account.default.default_enrollment_term
   end
 
-  it "should propery determine if group weights are active" do
+  it "should properly determine if group weights are active" do
     @course.update_attribute(:group_weighting_scheme, nil)
     expect(@course.apply_group_weights?).to eq false
     @course.update_attribute(:group_weighting_scheme, 'equal')
@@ -69,6 +69,16 @@ describe Course do
     @course.update_attribute(:public_syllabus, true)
     expect(@course.syllabus_visibility_option).to eq('public')
 
+  end
+
+  it 'should return offline web export flag' do
+    expect(@course.enable_offline_web_export?).to eq false
+    account = Account.default
+    account.settings[:enable_offline_web_export] = true
+    account.save
+    expect(@course.enable_offline_web_export?).to eq true
+    @course.update_attribute(:enable_offline_web_export, false)
+    expect(@course.enable_offline_web_export?).to eq false
   end
 
   describe "soft-concluded?" do
@@ -170,6 +180,16 @@ describe Course do
       @root_account = Account.default
       @root_account.default_time_zone = 'America/Chicago'
       expect(@course.time_zone).to eq ActiveSupport::TimeZone['Central Time (US & Canada)']
+    end
+  end
+
+  describe "#allow_web_export_download?" do
+    it "should return setting" do
+      expect(course.allow_web_export_download?).to eq false
+      account = Account.default
+      account.settings[:enable_offline_web_export] = true
+      account.save
+      expect(@course.allow_web_export_download?).to eq true
     end
   end
 
@@ -4362,7 +4382,7 @@ describe Course do
     end
   end
 
-  it "creates a scope the returns deleted courses" do
+  it "creates a scope that returns deleted courses" do
     @course1 = Course.create!
     @course1.workflow_state = 'deleted'
     @course1.save!

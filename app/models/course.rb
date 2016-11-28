@@ -1501,6 +1501,10 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def allow_web_export_download?
+    root_account.enable_offline_web_export? && self.enable_offline_web_export?
+  end
+
   def grade_publishing_status_translation(status, message)
     status = "unpublished" if status.blank?
     case status
@@ -2785,7 +2789,7 @@ class Course < ActiveRecord::Base
   add_setting :image_id
   add_setting :image_url
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
-  add_setting :enable_offline_web_export, :boolean => true, :default => true
+  add_setting :enable_offline_web_export, :boolean => true, :default => lambda { |c| c.root_account.enable_offline_web_export? }
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
 
   add_setting :restrict_student_future_view, :boolean => true, :inherited => true

@@ -494,17 +494,6 @@ END
       beta: true,
       development: true,
     },
-    'offline_web_export' =>
-    {
-      display_name: -> { I18n.t('Offline Web Export') },
-      description: -> { I18n.t(<<END) },
-      This enables a course setting to allow students to export the course as an offline web zip folder
-END
-      applies_to: 'Course',
-      state: 'hidden',
-      beta: true,
-      development: true
-    },
      'student_context_cards' =>
     {
       display_name: -> { I18n.t('Student Context Card') },

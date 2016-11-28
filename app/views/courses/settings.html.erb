@@ -332,7 +332,8 @@
             <%= (format_options.detect{|text, key| key == @context.course_format} || format_options.first).first %>
           <% end %>
         </td>
-      </tr><tr>
+      </tr>
+      <tr>
         <td class="form-label"><label for="course_epub_export"><%= before_label('course_epub_export', %{Epub Export}) %></label></td>
         <td colspan="3" id="epub_export">
           <div>
@@ -341,7 +342,7 @@
           </div>
         </td>
       </tr>
-      <% if @context.feature_enabled?(:offline_web_export) %>
+      <% if @context.root_account.enable_offline_web_export? %>
         <tr>
           <td class="form-label"><label for="course_offline_export"><%= before_label('course_offline_export', %{Offline Course}) %></label></td>
           <td colspan="3" id="offline_web_export">
