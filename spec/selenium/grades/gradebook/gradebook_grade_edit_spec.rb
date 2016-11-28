@@ -1,5 +1,6 @@
 require_relative '../../helpers/gradebook2_common'
 require_relative '../page_objects/gradebook_page'
+require_relative '../page_objects/grading_curve_page'
 
 describe "editing grades" do
   include_context "in-process server selenium tests"
@@ -190,9 +191,9 @@ describe "editing grades" do
 
     open_assignment_options(0)
     f('[data-action="curveGrades"]').click
-    curve_form = f('#curve_grade_dialog')
-    set_value(curve_form.find_element(:css, '#middle_score'), curved_grade_text)
-    fj('.ui-dialog-buttonset .ui-button:contains("Curve Grades")').click
+    curve_form = GradingCurvePage.new
+    curve_form.edit_grade_curve(curved_grade_text)
+    curve_form.curve_grade_submit
     accept_alert
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text).to eq curved_grade_text
   end
