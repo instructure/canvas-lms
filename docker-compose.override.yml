@@ -6,6 +6,8 @@ services:
       context: .
     volumes:
       - .:/usr/src/app
+      - api_docs:/usr/src/app/public/doc/api
+      - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
       - bundler:/home/docker/.bundler/
       - canvas-docker-gems:/home/docker/.gem/
       - generated_1:/usr/src/app/public/javascripts/client_apps
@@ -16,6 +18,7 @@ services:
       - quizzes_node_modules:/usr/src/app/client_apps/canvas_quizzes/node_modules
       - selinimum_node_modules:/usr/src/app/gems/selinimum/node_modules
       - tmp:/usr/src/app/tmp
+      - yardoc:/usr/src/app/.yardoc
     environment: &BASE-ENV
       RAILS_ENV: development
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
@@ -36,6 +39,8 @@ services:
       - pg_data:/var/lib/postgresql/data
 
 volumes:
+  api_docs: {}
+  brandable_css_brands: {}
   bundler: {}
   canvas-docker-gems: {}
   generated_1: {}
@@ -47,3 +52,4 @@ volumes:
   quizzes_node_modules: {}
   selinimum_node_modules: {}
   tmp: {}
+  yardoc: {}
