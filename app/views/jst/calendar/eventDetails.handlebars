@@ -129,10 +129,12 @@
       {{#if can_unreserve }}
         <button class="unreserve_event_link Button Button--small Button--link">{{#t "links.unreserve"}}Un-reserve{{/t}}</button>
       {{/if}}
-      {{#if reservations }}
-        <button class="message_students Button Button--small Button--link">
-          {{#t "message_students"}}Message students{{/t}}
-        </button>
+      {{#if can_edit}}
+        {{#if reservations }}
+          <button class="message_students Button Button--small Button--link">
+            {{#t "message_students"}}Message students{{/t}}
+          </button>
+        {{/if}}
       {{/if}}
     </div>
   </div>
