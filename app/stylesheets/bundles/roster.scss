@@ -1,6 +1,12 @@
 @import "base/environment";
 @import "components/context_search";
 
+// to reduce the avatar from displaying so large in the roster table
+.rosterUser .avatar {
+  width: $ic-sp*2;
+  height: $ic-sp*2;
+}
+
 .roster-container {
   display: flex;
 }
