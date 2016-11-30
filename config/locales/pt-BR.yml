@@ -3140,7 +3140,7 @@ pt-BR:
   close_and_return_to_canvas_80544344: "Fechar e retornar ao Canvas"
   close_d634289d: Fechar
   close_date_9b52fb9b: "Data de fechamento:"
-  close_date_a2f617b3: "Fechar Data"
+  close_date_a2f617b3: "Data de fechamento"
   close_for_comments_37783f56: "Fechar para Comentários"
   close_grade_info_58ef5a20: "Fechar informação de nota"
   close_picker_256aca8a: "Fechar Selecionador"
@@ -3881,19 +3881,19 @@ pt-BR:
       delete: "Tem certeza que deseja excluir este módulo?"
       delete_item: "Tem certeza que deseja remover este item do módulo?"
     content_next: 
-      add_prerequisite: "Adicionar prerrequisito para *%{module}*"
+      add_prerequisite: "Adicionar pré-requisito para *%{module}*"
       assignment_points_possible: "/ %{points_possible}"
       buttons: 
-        add_prerequisite: "Adicionar prerrequisito"
+        add_prerequisite: "Adicionar pré-requisito"
       criterion_for_assignment: "%{assignment} %{select_criterion}"
       headings: 
-        add_prerequisite: "Adicionar prerrequisito para %{name}"
+        add_prerequisite: "Adicionar pré-requisito para %{name}"
         course_modules: "Módulos do curso"
       help: 
         create: |-
             Os módulos do curso permitem organizar suas tarefas, páginas, arquivos, etc., em seções menores ou unidades. Os módulos podem girar em torno de um tema, focar um tópico específico ou mesmo serem agrupados cronologicamente.
             
-            Também é possível sequenciar os módulos definindo critérios e prerrequisitos pra cada um deles. Os alunos não poderão acessar os módulos até eles desbloquearem todos seus prerrequisitos. Desta forma, é possível evitar que os alunos acessem certos conteúdos ou arquivos até eles terem, digamos, obtido ao menos 75% em um teste de revisão.
+            Também é possível sequenciar os módulos definindo critérios e pré-requisitos pra cada um deles. Os alunos não poderão acessar os módulos até eles desbloquearem todos seus pré-requisitos. Desta forma, é possível evitar que os alunos acessem certos conteúdos ou arquivos até eles terem, digamos, obtido ao menos 75% em um teste de revisão.
             
             Para começar a organizar seu curso em módulos, clique no botão "%{button}", à direita.
         no_modules: "Nenhum módulo foi definido para este curso."
@@ -3922,9 +3922,9 @@ pt-BR:
       links: 
         student_progress: "Exibir progresso"
         title: 
-          remove_prerequisite: "Remover este prerrequisito"
+          remove_prerequisite: "Remover este pré-requisito"
       module: módulo
-      module_details: "Os módulos são exibidos em ordem sequencial; assim, somente os módulos acima de %{name} podem ser definidos como prerrequisitos."
+      module_details: "Os módulos são exibidos em ordem sequencial; assim, somente os módulos acima de %{name} podem ser definidos como pré-requisitos."
       modules_keyboard_hint_updated: "Aviso: para melhorar a acessibilidade ao reclassificar os Módulos (ou itens de Módulo), use a opção de diálogo Mover para localizada no menu."
       move_module: 
         after: Depois
@@ -3945,7 +3945,7 @@ pt-BR:
       select_module: 
         instructions: "Selecionar o módulo"
         name: "%{module}"
-      select_prerequisite: "Selecione o tipo de prerrequisito Os alunos não podem ver um módulo satisfazer todos os prerrequisitos."
+      select_prerequisite: "Selecione o tipo de pré-requisito. Os alunos não podem ver um módulo satisfazer todos os pré-requisitos."
     context_module: 
       unpublish: "Retirar da publicação"
     context_module_next: 
@@ -4049,7 +4049,7 @@ pt-BR:
     titles: 
       add: "Adicionar módulo"
       add_item: "Adicionar item a %{module}"
-      add_prerequisite: "Adicionar prerrequisito a %{module}"
+      add_prerequisite: "Adicionar pré-requisito a %{module}"
       edit: "Editar configurações do módulo"
       edit_item: "Editar detalhes do item"
     tool_sequence_footer: 
@@ -6795,7 +6795,7 @@ pt-BR:
   features: 
     allow_opt_out_of_inbox: "Permitir que os usuários optem por sair da caixa de entrada"
     better_file_browsing: "Melhor navegação de arquivo"
-    canvas_parent_display_name: "Canvas Pais"
+    canvas_parent_display_name: "Canvas Parent"
     differentiated_assignments: "Tarefas diferenciadas"
     differentiated_assignments_account_disable_warning: |-
         O desligamento deste recurso impactará os cursos existentes. Para assistência a desativar este recurso, entre em contato com
@@ -8725,7 +8725,7 @@ pt-BR:
         buttons: 
           request_password: "Solicitar senha"
         dont_know_password: "Esqueceu a Senha?"
-        log_in: "Fazer Login"
+        log_in: Entrar
         login_handle: "Insira seu %{login_handle_name} e enviaremos um link para alterar sua senha."
         password: Senha
         sending: Enviando...
@@ -8753,7 +8753,7 @@ pt-BR:
         labels: 
           password: Senha
           remember_me: "Continuar Conectado"
-        log_in: "Log In"
+        log_in: Entrar
         login_handle: "Insira seu %{login_handle_name} e enviaremos um link para alterar sua senha."
         open_source_learning_management_system: "LMS de Código Aberto"
     logout_confirm: 
@@ -12250,12 +12250,12 @@ pt-BR:
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "A caixa de seleção de \"Postar Notas para o SIS\" é ativado automaticamente para tarefas, discussões avaliadas, e quizzes"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Praticar teste"
-  prerequisites_49659f16: "Prerrequisitos:"
+  prerequisites_49659f16: "Pré-requisitos:"
   prerequisites_lookup: 
     headers: 
-      completion_prerequisites: "Prerrequisitos de conclusão"
+      completion_prerequisites: "Pré-requisitos de conclusão"
     labels: 
-      requirements_must_be_completed: "Os seguintes prerrequisitos devem ser concluídos antes desta página ser destravada"
+      requirements_must_be_completed: "Os seguintes pré-requisitos devem ser concluídos antes desta página ser destravada"
   presentation_2d9387ca: Apresentação
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Pressione a tecla de vírgula ou shift + ponto de interrogação para ver uma lista de atalhos de teclado"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Pressione a tecla de vírgula ou shift + ? para ver uma lista de atalhos de teclado"
@@ -13102,7 +13102,7 @@ pt-BR:
       possible_answer: "Possível resposta"
     ldb_login_popup: 
       email: Email
-      log_in: "Log In"
+      log_in: Entrar
       logged_out_of_canvas: "*Você se desconectou do Canvas.* Conecte-se para continuar."
       password: Senha
       titles: 
@@ -16853,7 +16853,7 @@ pt-BR:
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} acabou de adicioná-lo a uma conversa no Canvas. Para exibir a conversa, clique neste link: %{link}."
   user_name_just_sent_you_a_message_in_canvas_9e911af7: "%{user_name} acabou de enviá-lo uma mensagem no Canvas"
   user_name_successfully_added_79af8365: "%{user_name} adicionado com sucesso!"
-  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, você precisará fazer *log in* antes de poder ver essa página."
+  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, você precisará fazer *login* antes de poder ver essa página."
   user_navigation_a097be0f: "Navegação de Usuário"
   user_not_authorized_to_manage_sis_data_account_sis_47bd4eec: "usuário não autorizado para gerenciar dados SIS - account[sis_account_id]"
   user_notes: 
