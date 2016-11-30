@@ -110,7 +110,7 @@ module SeleniumErrorRecovery
 end
 RSpec::Core::Example.prepend(SeleniumErrorRecovery)
 
-shared_context "in-process server selenium tests" do
+module SeleniumDependencies
   include SeleniumDriverSetup
   include OtherHelperMethods
   include CustomSeleniumActions
@@ -122,6 +122,10 @@ shared_context "in-process server selenium tests" do
   include CustomDateHelpers
   include LoginAndSessionMethods
   include SeleniumErrorRecovery
+end
+
+shared_context "in-process server selenium tests" do
+  include SeleniumDependencies
 
   # set up so you can use rails urls helpers in your selenium tests
   include Rails.application.routes.url_helpers
