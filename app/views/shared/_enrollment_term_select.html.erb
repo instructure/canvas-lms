@@ -6,9 +6,16 @@
   <% unless exclude_all_option %>
     <option value="" <%= 'selected' unless selected_id %>><%= t("All Terms") %></option>
   <% end %>
-  <% if terms.not_ended.any? %>
+  <% if terms.started.not_ended.any? %>
     <optgroup label="<%= t("Active Terms") %>">
-      <% terms.not_ended.by_name.each do |term| %>
+      <% terms.started.not_ended.by_name.each do |term| %>
+        <option value="<%= term.id %>" <%= 'selected' if term.id == selected_id %>><%= term.name %></option>
+      <% end %>
+    </optgroup>
+  <% end %>
+  <% if terms.not_started.any? %>
+    <optgroup label="<%= t("Future Terms") %>">
+      <% terms.not_started.by_name.each do |term| %>
         <option value="<%= term.id %>" <%= 'selected' if term.id == selected_id %>><%= term.name %></option>
       <% end %>
     </optgroup>
