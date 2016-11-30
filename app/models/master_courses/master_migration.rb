@@ -21,16 +21,17 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   # create a new migration and queue it up (if we can)
   def self.start_new_migration!(master_template, user=nil)
-    master_template.lock!
-    if master_template.active_migration_running?
-      master_template.save! # clear the lock
-      raise "cannot start new migration while another one is running"
-    else
-      new_migration = master_template.master_migrations.create!(:user => user)
-      master_template.active_migration = new_migration
-      master_template.save!
-      new_migration.queue_export_job
-      new_migration
+    master_template.class.transaction do
+      master_template.lock!
+      if master_template.active_migration_running?
+        raise "cannot start new migration while another one is running"
+      else
+        new_migration = master_template.master_migrations.create!(:user => user)
+        master_template.active_migration = new_migration
+        master_template.save!
+        new_migration.queue_export_job
+        new_migration
+      end
     end
   end
 
@@ -87,7 +88,6 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     # if any changes are made between the selective export and the full export, then we'll carry those in the next selective export
     # and the ones that got the full export will get the changes twice
     # the primary export is the one we'll use to mark the content tags as exported (i.e. the first one)
-    self.master_template.load_tags!
     export_to_child_courses(:selective, up_to_date_subs, true) if up_to_date_subs.any?
     export_to_child_courses(:full, new_subs, !up_to_date_subs.any?) if new_subs.any?
 
@@ -134,11 +134,11 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   end
 
   def queue_imports(type, export, subscriptions)
-    self.lock! # make sure that we don't have race conditions with imports sending back results
     self.export_results[type] = {:subscriptions => subscriptions.map(&:id), :content_export_id => export.id}
 
     imports_expire_at = self.created_at + hours_until_expire.hours # tighten the limit until the import jobs expire
 
+    cms = []
     subscriptions.each do |sub|
       cm = sub.child_course.content_migrations.build
       cm.migration_type = "master_course_import"
@@ -150,31 +150,36 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cm.exported_attachment = export.attachment
       cm.save!
 
-      cm.queue_migration(MigrationPluginStub, expires_at: imports_expire_at)
-
       self.import_results[cm.id] = {:import_type => type, :subscription_id => sub.id, :state => 'queued'}
+      cms << cm
     end
     self.save!
+
+    # just queue them all at once afterwards so we don't have to queue them in a transaction
+    cms.each { |cm| cm.queue_migration(MigrationPluginStub, expires_at: imports_expire_at) }
     # this job is finished now but we won't mark ourselves as "completed" until all the import migrations are finished
   end
 
   def update_import_state!(import_migration, state)
-    self.lock!
-    res = self.import_results[import_migration.id]
-    res[:state] = state
-    if state == 'completed' && res[:import_type] == :full
-      if sub = self.master_template.child_subscriptions.active.where(:id => res[:subscription_id], :use_selective_copy => false).first
-        sub.update_attribute(:use_selective_copy, true) # mark subscription as up-to-date
+    self.class.transaction do # turns out locking does nothing outside a transaction - oopsimanoob
+      self.lock!
+      res = self.import_results[import_migration.id]
+      res[:state] = state
+      if state == 'completed' && res[:import_type] == :full
+        if sub = self.master_template.child_subscriptions.active.where(:id => res[:subscription_id], :use_selective_copy => false).first
+          sub.update_attribute(:use_selective_copy, true) # mark subscription as up-to-date
+        end
       end
-    end
-    if self.import_results.values.all?{|r| r[:state] != 'queued'}
-      # all imports are done
-      if self.import_results.values.all?{|r| r[:state] == 'completed'}
-        self.workflow_state = 'completed'
-      else
-        self.workflow_state = 'imports_failed'
+      if self.import_results.values.all?{|r| r[:state] != 'queued'}
+        # all imports are done
+        if self.import_results.values.all?{|r| r[:state] == 'completed'}
+          self.workflow_state = 'completed'
+        else
+          self.workflow_state = 'imports_failed'
+        end
       end
+      self.save!
     end
-    self.save!
   end
 end
+
