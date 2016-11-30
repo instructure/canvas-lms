@@ -210,7 +210,6 @@ describe "calendar2" do
     end
 
     it "should extend event time by dragging", priority: "1", test_id: 138864 do
-      skip('spec is fragile needs fixing ticket is CNVS-33485')
       # Create event on current day at 9:00 AM in current time zone
       midnight = Time.zone.now.beginning_of_day
       event1 = make_event(start: midnight + 9.hours, end_at: midnight + 10.hours)
@@ -222,10 +221,17 @@ describe "calendar2" do
       # Drag and drop event resizer from first event onto assignment icon
       load_week_view
       expect(ff('.fc-view-container .icon-calendar-month')).to have_size(1)
-      drag_and_drop_element(f('.fc-end-resizer'), f('.icon-assignment'))
 
-      # Verify Event now ends at assignment start time + 30 minutes
-      expect(event1.reload.end_at).to eql(midnight + 12.hours + 30.minutes)
+      # Calendar currently has post loading javascript that places the calendar event
+      # In the correct place, however we don't have a wait_ajax_animation that waits
+      # Long enough for this spec to pass given that we drag too soon causing it to fail
+      disable_implicit_wait do
+        keep_trying_until(10) do
+          # Verify Event now ends at assignment start time + 30 minutes
+          drag_and_drop_element(f('.fc-end-resizer'), f('.icon-assignment'))
+          expect(event1.reload.end_at).to eql(midnight + 12.hours + 30.minutes)
+        end
+      end
     end
 
     it "should make event all-day by dragging", priority: "1", test_id: 138866 do
