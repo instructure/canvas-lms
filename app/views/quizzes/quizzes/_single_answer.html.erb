@@ -32,7 +32,7 @@
   <% if !editable%>
     <% attachment = @attachments[user_answer[:attachment_ids].try(:first).to_i] %>
       <% if attachment %>
-        <a class="icon-download" href="<%=attachment.authenticated_s3_url %>">
+        <a class="icon-download" href="<%= file_download_url(attachment) %>">
           <%= attachment.display_name %>
         </a>
       <% end %>
