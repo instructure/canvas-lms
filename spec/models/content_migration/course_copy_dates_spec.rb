@@ -475,5 +475,25 @@ describe ContentMigration do
       expect(new_event.all_day?).to be_truthy
       expect(new_event.all_day_date).to eq (@new_start + 4.days).to_date
     end
+
+    it "should remove dates for all-day events" do
+      @old_start = DateTime.parse("01 Jul 2012 06:00:00 UTC +00:00")
+
+      all_day_event = @copy_from.calendar_events.create!(:title => "an event",
+        :start_at => @old_start + 4.days, :all_day => true)
+
+      options = {
+        :everything => true,
+        :remove_dates => true
+      }
+      @cm.copy_options = options
+      @cm.save!
+
+      run_course_copy
+
+      new_event = @copy_to.calendar_events.where(:migration_id => mig_id(all_day_event)).first
+      expect(new_event.all_day?).to be_truthy
+      expect(new_event.all_day_date).to be_nil
+    end
   end
 end

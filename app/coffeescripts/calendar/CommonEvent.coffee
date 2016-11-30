@@ -103,6 +103,7 @@ define [
       @preventWrappingAcrossDates()
 
     formatTime: (datetime, allDay=false) ->
+      return null unless datetime
       datetime = fcUtil.unwrap(datetime)
       if allDay
         formattedHtml = $.dateString(datetime)
