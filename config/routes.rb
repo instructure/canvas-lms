@@ -382,6 +382,7 @@ CanvasRails::Application.routes.draw do
     end
 
     resources :content_exports, only: [:create, :index, :destroy, :show]
+    get 'offline_web_exports' => 'courses#offline_web_exports'
     get 'modules/items/assignment_info' => 'context_modules#content_tag_assignment_data', as: :context_modules_assignment_info
     get 'modules/items/:id' => 'context_modules#item_redirect', as: :context_modules_item_redirect
     get 'modules/items/:id/edit_mastery_paths' => 'context_modules#item_redirect_mastery_paths'
