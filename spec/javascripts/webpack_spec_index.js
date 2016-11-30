@@ -1,5 +1,3 @@
-const path = require('path')
-
 require('./support/sinon/sinon-1.17.2');
 require('./support/sinon/sinon-qunit-amd-1.0.0');
 
@@ -19,6 +17,6 @@ if (__SPEC_FILE) {
 } else if (__SPEC_DIR) {
   requireAll(require.context(__SPEC_DIR, true, /Spec$/))
 } else {
-  requireAll(require.context(path.join(__dirname, '../coffeescripts'), true, /Spec$/))
-  requireAll(require.context(path.join(__dirname, 'jsx'), true, /Spec$/))
+  requireAll(require.context(__dirname + '/../coffeescripts', true, /Spec$/))
+  requireAll(require.context(__dirname + '/jsx', true, /Spec$/))
 }

@@ -26,13 +26,13 @@ testWebpackConfig.output.filename = "[name].bundle.test.js";
 testWebpackConfig.plugins = [
   // expose a 'qunit' global variable to any file that uses it
   new webpack.ProvidePlugin({qunit: 'qunitjs'}),
-  new webpack.DefinePlugin(jspecEnv),
   new I18nPlugin(),
   new ClientAppsPlugin(),
   new CompiledReferencePlugin(),
   new webpack.IgnorePlugin(/\.md$/),
   new webpack.IgnorePlugin(/(CHANGELOG|LICENSE|README)$/),
-  new webpack.IgnorePlugin(/package.json/)
+  new webpack.IgnorePlugin(/package.json/),
+  new webpack.DefinePlugin(jspecEnv),
 ];
 
 testWebpackConfig.resolve.alias.qunit = 'qunitjs';
