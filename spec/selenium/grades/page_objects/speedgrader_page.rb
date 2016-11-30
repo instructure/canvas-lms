@@ -1,16 +1,6 @@
 class Speedgrader
   class << self
-    include SeleniumDriverSetup
-    include OtherHelperMethods
-    include CustomSeleniumActions
-    include CustomAlertActions
-    include CustomPageLoaders
-    include CustomScreenActions
-    include CustomValidators
-    include CustomWaitMethods
-    include CustomDateHelpers
-    include LoginAndSessionMethods
-    include SeleniumErrorRecovery
+    include SeleniumDependencies
 
     def grade_value
       f('#grade_container input[type=text]').attribute('value')

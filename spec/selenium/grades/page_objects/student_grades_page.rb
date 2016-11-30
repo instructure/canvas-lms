@@ -1,15 +1,5 @@
 class StudentGradesPage
-  include SeleniumDriverSetup
-  include OtherHelperMethods
-  include CustomSeleniumActions
-  include CustomAlertActions
-  include CustomPageLoaders
-  include CustomScreenActions
-  include CustomValidators
-  include CustomWaitMethods
-  include CustomDateHelpers
-  include LoginAndSessionMethods
-  include SeleniumErrorRecovery
+  include SeleniumDependencies
 
   # Period components
   def period_options_css
