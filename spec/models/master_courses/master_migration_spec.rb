@@ -156,14 +156,19 @@ describe MasterCourses::MasterMigration do
 
       topic = @copy_from.discussion_topics.create!(:title => "some title")
       DiscussionTopic.where(:id => topic).update_all(:updated_at => 5.seconds.ago) # just in case, to fool the selective export
+      att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      Attachment.where(:id => att).update_all(:updated_at => 5.seconds.ago) # ditto
 
       run_master_migration
       expect(@migration.export_results.keys).to eq [:full]
 
       topic_to = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
       expect(topic_to).to be_present
+      att_to = @copy_to.attachments.where(:migration_id => mig_id(att)).first
+      expect(att_to).to be_present
       cm1 = ContentMigration.find(@migration.import_results.keys.first)
       expect(cm1.migration_settings[:imported_assets]["DiscussionTopic"]).to eq topic_to.id.to_s
+      expect(cm1.migration_settings[:imported_assets]["Attachment"]).to eq att_to.id.to_s
 
       page = @copy_from.wiki.wiki_pages.create!(:title => "another title")
 
@@ -175,6 +180,7 @@ describe MasterCourses::MasterMigration do
 
       cm2 = ContentMigration.find(@migration.import_results.keys.first)
       expect(cm2.migration_settings[:imported_assets]["DiscussionTopic"]).to be_blank # should have excluded it from the selective export
+      expect(cm2.migration_settings[:imported_assets]["Attachment"]).to be_blank
       expect(cm2.migration_settings[:imported_assets]["WikiPage"]).to eq page_to.id.to_s
     end
 

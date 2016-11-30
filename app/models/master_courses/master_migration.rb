@@ -116,13 +116,17 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     ce = ContentExport.new
     ce.context = self.master_template.course
     ce.export_type = ContentExport::MASTER_COURSE_COPY
+    ce.settings[:master_migration_type] = type
+    ce.settings[:master_migration_id] = self.id # so we can find on the import side when we copy attachments
     ce.user = self.user
     ce.save!
-    ce.export_course(:master_migration => self, :master_migration_type => type, :is_primary_export => is_primary)
+    ce.master_migration = self # don't need to reload
+    ce.export_course
     ce
   end
 
   def export_object?(obj)
+    return false unless obj
     last_export_at = self.master_template.last_export_at
     last_export_at.nil? || obj.updated_at >= last_export_at
   end

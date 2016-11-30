@@ -27,6 +27,8 @@ class ContentExport < ActiveRecord::Base
   has_a_broadcast_policy
   serialize :settings
   attr_accessible :context, :export_type, :user, :selected_content, :progress
+
+  attr_writer :master_migration
   validates_presence_of :context_id, :workflow_state
 
   has_one :job_progress, :class_name => 'Progress', :as => :context
@@ -196,6 +198,10 @@ class ContentExport < ActiveRecord::Base
     self.export_type == MASTER_COURSE_COPY
   end
 
+  def master_migration
+    @master_migration ||= MasterCourses::MasterMigration.find(settings[:master_migration_id])
+  end
+
   def common_cartridge?
     self.export_type == COMMON_CARTRIDGE
   end
@@ -239,6 +245,9 @@ class ContentExport < ActiveRecord::Base
   #   Returns: bool
   def export_object?(obj, asset_type=nil)
     return false unless obj
+    if for_master_migration?
+      return settings[:master_migration_type] == :selective ? master_migration.export_object?(obj) : true
+    end
     return true unless selective_export?
 
     # because Announcement.table_name == 'discussion_topics'

@@ -42,12 +42,7 @@ module CC
       @qti_only_export = @content_export && @content_export.qti_export?
       @manifest_opts = opts.slice(:version)
 
-      if @content_export && @content_export.for_master_migration?
-        @master_migration = opts[:master_migration]
-        @master_migration_type = opts[:master_migration_type]
-        @is_primary_export = opts[:is_primary_export]
-        raise "master_migration required" unless @master_migration
-      end
+      @for_master_migration = true if @content_export && @content_export.for_master_migration?
     end
 
     def self.export(content_export, opts={})
@@ -84,7 +79,7 @@ module CC
         end
 
         @export_dirs = [@export_dir]
-        if @master_migration
+        if @for_master_migration
           # for efficiency to the max, short-circuit the usual course copy process (i.e. zip up, save, and then unzip again)
           # and instead go straight to the intermediate json
           converter = CC::Importer::Canvas::Converter.new(:unzipped_file_path => @export_dir)
@@ -152,11 +147,7 @@ module CC
     end
 
     def export_object?(obj, asset_type=nil)
-      if @master_migration
-        @master_migration_type == :selective ? @master_migration.export_object?(obj) : true
-      else
-        @content_export ? @content_export.export_object?(obj, asset_type) : true
-      end
+      @content_export ? @content_export.export_object?(obj, asset_type) : true
     end
 
     def add_exported_asset(obj)
