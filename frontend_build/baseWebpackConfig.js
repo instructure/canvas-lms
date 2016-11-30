@@ -28,6 +28,7 @@ module.exports = {
       'node_modules-version-of-backbone': __dirname + '/../node_modules/backbone',
       'node_modules-version-of-moment': __dirname + '/../node_modules/moment',
       'node_modules-version-of-react-modal': __dirname + '/../node_modules/react-modal',
+      lodash: __dirname + '/../node_modules/lodash',
 
       // once we are all-webpack we should remove this line and just change all the 'require's
       // to instructure-ui compnentns to have the right path
