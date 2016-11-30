@@ -12560,7 +12560,7 @@ fr-CA:
       labels: 
         email: Courriel
         name: Nom
-    welcome_to_canvas: "Bienvenue dans Canvas!"
+    welcome_to_canvas: "Bienvenue à Canvas!"
   registration_url_60e0eaaa: "URL d’inscription"
   regular_style_checkbox_ee3d71c1: "Case à cocher de style standard"
   released_by_mastery_path_b87fcdf5: "Rendu disponible par le Chemin de Réussite"
@@ -15289,7 +15289,7 @@ fr-CA:
           qu’ils seront disponibles, vous verrez des informations à leur sujet ici
           et dans la barre de navigation en haut. Entre-temps, vous pouvez vous inscrire
           à d’autres cours ou définir votre profil.
-      welcome_to_happiness: "Bienvenue dans Canvas!"
+      welcome_to_happiness: "Bienvenue à Canvas!"
   users_d1b60cb0: Utilisateurs
   users_matching_search_term_c604db9e: "Les utilisateurs correspondant à « %{search_term} »"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Les utilisateurs de lecteurs d'écran devront peut-être désactiver le curseur virtuel afin de pouvoir utiliser ces raccourcis clavier"
