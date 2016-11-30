@@ -6,7 +6,7 @@ describe OriginalityReport do
   let(:course) { course_model }
   let(:submission) { submission_model }
 
-  subject {OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)}
+  subject {OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission, workflow_state: 'pending')}
 
   it 'can have attachments associated with it' do
     expect(subject.attachment).to eq attachment
@@ -22,6 +22,28 @@ describe OriginalityReport do
     subject.attachment = nil
     subject.valid?
     expect(subject.errors[:attachment]).to eq ["can't be blank"]
+  end
+
+  it 'requies a valid workflow_state' do
+    subject.workflow_state = 'invalid_state'
+    subject.valid?
+    expect(subject.errors).to include :workflow_state
+  end
+
+  it 'allows the "pending" workflow state' do
+    expect(subject.workflow_state).to eq 'pending'
+  end
+
+  it 'allows the "scored" workflow state' do
+    subject.workflow_state = 'scored'
+    subject.save!
+    expect(subject.workflow_state).to eq 'scored'
+  end
+
+  it 'allows the "error" workflow state' do
+    subject.workflow_state = 'error'
+    subject.save!
+    expect(subject.workflow_state).to eq 'error'
   end
 
   it 'can have a submission' do

@@ -75,7 +75,8 @@ describe 'Originality Reports API', type: :request do
         'originality_report_lti_url',
         'created_at',
         'updated_at',
-        'submission_id'
+        'submission_id',
+        'workflow_state'
       ].freeze
 
       get @endpoints[:show]
@@ -253,7 +254,8 @@ describe 'Originality Reports API', type: :request do
         'originality_report_lti_url',
         'created_at',
         'updated_at',
-        'submission_id'
+        'submission_id',
+        'workflow_state'
       ].freeze
 
       post @endpoints[:create], originality_report: {file_id: @attachment.id, originality_score: 0.4}
