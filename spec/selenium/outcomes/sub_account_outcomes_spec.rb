@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/../../common')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/outcome_common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/outcome_common')
 
 describe "sub account outcomes" do
   include_context "in-process server selenium tests"
