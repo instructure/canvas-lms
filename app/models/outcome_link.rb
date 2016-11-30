@@ -26,7 +26,18 @@ class OutcomeLink < ActiveRecord::Base
   belongs_to :learning_outcome_group
   belongs_to :learning_outcome
 
-  delegate :context, :context_id, :context_type, to: :learning_outcome_group
+  def context
+    learning_outcome_group.context || learning_outcome_group
+  end
+
+  def context_id
+    learning_outcome_group.context_id || learning_outcome_group.id
+  end
+
+  def context_type
+    learning_outcome_group.context_type || LearningOutcomeGroup.to_s
+  end
+
   delegate :title, to: :learning_outcome
 
   # aliases for compatibility with legacy content_tag
@@ -40,6 +51,8 @@ class OutcomeLink < ActiveRecord::Base
 
   scope :active, -> { where(:workflow_state => 'active') }
   scope :outcome_links_for_context, lambda { |context|
+    context.instance_of?(LearningOutcomeGroup) ?
+    where(learning_outcome_group: context) :
     eager_load(:learning_outcome_group).where(learning_outcome_groups: {
       context_id: context.id,
       context_type: context.class.to_s
