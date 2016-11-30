@@ -1,10 +1,4 @@
 module OtherHelperMethods
-
-  #this is needed for using the before_label function in I18nUtilities
-  def t(*a, &b)
-    I18n.t(*a, &b)
-  end
-
   # usage
   # require_exec 'compiled/util/foo', 'bar', <<-CS
   #   foo('something')
@@ -119,11 +113,6 @@ module OtherHelperMethods
     @file.close
     fullpath = @file.path
     filename = File.basename(@file.path)
-    if $selenium_config[:host_and_port]
-      driver.file_detector = proc do |args|
-        args.first if File.exist?(args.first.to_s)
-      end
-    end
     [filename, fullpath, data, @file]
   end
 

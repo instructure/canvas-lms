@@ -12,7 +12,7 @@ module CustomPageLoaders
     new_uri = URI.parse(link)
 
     if current_uri.path == new_uri.path && (current_uri.query || '') == (new_uri.query || '') && (new_uri.fragment || current_uri.fragment)
-      driver.get(app_host + link)
+      driver.get(app_url + link)
       # if we're just changing the hash of the url of the previous spec,
       # force a reload, cuz the `get` above won't
       driver.navigate.refresh if is_first_request_of_spec
@@ -20,7 +20,7 @@ module CustomPageLoaders
       wait_for_ajaximations
     else
       expect_new_page_load(true) do
-        driver.get(app_host + link)
+        driver.get(app_url + link)
       end
     end
   end

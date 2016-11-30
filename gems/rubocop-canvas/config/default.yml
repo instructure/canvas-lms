@@ -12,6 +12,8 @@ Lint/NoFileUtilsRmRf:
 
 Lint/NoSleep:
   Enabled: true
+  Exclude:
+    - "**/spec/selenium/test_setup/**/*.rb"
 
 Migration/ConcurrentIndex: &Migration
   Enabled: true
@@ -65,6 +67,8 @@ Specs/NoBeforeOnceStubs:
 
 Specs/NoExecuteScript:
   <<: *Specs
+  Exclude:
+    - "**/spec/selenium/test_setup/**/*.rb"
 
 Specs/PreferFOverFj:
   <<: *Specs

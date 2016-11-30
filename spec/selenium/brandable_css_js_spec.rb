@@ -19,7 +19,7 @@ describe "brandableCss JS integration specs" do
     data = BrandableCSS.all_fingerprints_for(css_bundle).values.first
     expect(data[:includesNoVariables]).to be_truthy
     expect(data[:combinedChecksum]).to match(/\A[a-f0-9]{10}\z/), '10 chars of an MD5'
-    url = "#{Canvas::Cdn.config.host || app_host}/dist/brandable_css/no_variables/#{css_bundle}-#{data[:combinedChecksum]}.css"
+    url = "#{app_url}/dist/brandable_css/no_variables/#{css_bundle}-#{data[:combinedChecksum]}.css"
     expect(fj("head link[rel='stylesheet'][data-loaded-by-brandableCss][href*='#{css_bundle}']")['href']).to eq(url)
   end
 
@@ -29,7 +29,7 @@ describe "brandableCss JS integration specs" do
     data = BrandableCSS.cache_for('jst/calendar/calendarApp', 'new_styles_normal_contrast')
     expect(data[:includesNoVariables]).to be_falsy
     expect(data[:combinedChecksum]).to match(/\A[a-f0-9]{10}\z/), '10 chars of an MD5'
-    url = "#{Canvas::Cdn.config.host || app_host}/dist/brandable_css/new_styles_normal_contrast/jst/calendar/calendarApp-#{data[:combinedChecksum]}.css"
-    expect(fj("head link[rel='stylesheet'][data-loaded-by-brandableCss][href*='calendarApp']")['href']).to eq(url)
+    url = "#{app_url}/dist/brandable_css/new_styles_normal_contrast/jst/calendar/calendarApp-#{data[:combinedChecksum]}.css"
+    expect(f("head link[rel='stylesheet'][data-loaded-by-brandableCss][href*='calendarApp']")['href']).to eq(url)
   end
 end
