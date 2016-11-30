@@ -8719,7 +8719,7 @@ pt:
         buttons: 
           request_password: "Solicitar senha"
         dont_know_password: "Esqueceu a senha?"
-        log_in: "Iniciar sessão"
+        log_in: Registar
         login_handle: "Introduza o seu %{login_handle_name} e enviar-lhe-emos uma ligação para alterar a sua palavra-passe."
         password: Palavra-passe
         sending: "A enviar..."
@@ -8747,7 +8747,7 @@ pt:
         labels: 
           password: "Senha "
           remember_me: "Permanecer ligado "
-        log_in: "Log In "
+        log_in: Registar
         login_handle: "Introduza o seu %{login_handle_name} e enviar-lhe-emos uma ligação para alterar a sua palavra-passe."
         open_source_learning_management_system: "LMS Open Source "
     logout_confirm: 
