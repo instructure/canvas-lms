@@ -68,6 +68,15 @@ describe Api::V1::User do
       )
     end
 
+    it 'only loads pseudonyms for the user once, even if there are multiple enrollments' do
+      sis_stub = SisPseudonym.for(@student, @course, true)
+      SisPseudonym.expects(:for).once.returns(sis_stub)
+      ta_enrollment = ta_in_course(user: @student, course: @course)
+      teacher_enrollment = teacher_in_course(user: @student, course: @course)
+      @test_api.current_user = @admin
+      @test_api.user_json(@student, @admin, {}, [], @course, [ta_enrollment, teacher_enrollment])
+    end
+
     it 'should support optionally including group_ids' do
       @group = @course.groups.create!(:name => "My Group")
       @group.add_user(@student, 'accepted', true)
