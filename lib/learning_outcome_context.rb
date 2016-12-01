@@ -18,11 +18,11 @@ module LearningOutcomeContext
     def linked_learning_outcomes(opts={})
       ids_in_context = self.learning_outcome_links.pluck(:content_id)
       outcome_ids = opts[:outcome_ids] ? ids_in_context & opts[:outcome_ids] : ids_in_context
-      LearningOutcome.where(id: outcome_ids).active
+      LearningOutcome.active.where(id: outcome_ids)
     end
 
     def learning_outcome_links
-      ContentTag.from("(#{content_tag_query.to_sql} UNION #{outcome_link_query.to_sql}) AS content_tags").active
+      ContentTag.active.from("(#{content_tag_query.to_sql} UNION #{outcome_link_query.to_sql}) AS content_tags")
     end
 
     # return the outcome but only if it's available in either the context or one
