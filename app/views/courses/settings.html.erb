@@ -333,15 +333,17 @@
           <% end %>
         </td>
       </tr>
-      <tr>
-        <td class="form-label"><label for="course_epub_export"><%= before_label('course_epub_export', %{Epub Export}) %></label></td>
-        <td colspan="3" id="epub_export">
-          <div>
-            <%= f.check_box :organize_epub_by_content_type, :disabled => !can_manage %>
-            <%= f.label :organize_epub_by_content_type, t("Organize epub by content type (default is by module).") %>
-          </div>
-        </td>
-      </tr>
+      <% if @context.feature_enabled?(:epub_export) && !@context.root_account.enable_offline_web_export? %>
+        <tr>
+          <td class="form-label"><label for="course_epub_export"><%= before_label('course_epub_export', %{Epub Export}) %></label></td>
+          <td colspan="3" id="epub_export">
+            <div>
+              <%= f.check_box :organize_epub_by_content_type, :disabled => !can_manage %>
+              <%= f.label :organize_epub_by_content_type, t("Organize epub by content type (default is by module).") %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
       <% if @context.root_account.enable_offline_web_export? %>
         <tr>
           <td class="form-label"><label for="course_offline_export"><%= before_label('course_offline_export', %{Offline Course}) %></label></td>
