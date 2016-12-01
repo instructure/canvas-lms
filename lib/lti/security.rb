@@ -47,6 +47,7 @@ module Lti
     # params once no matter how many times it appears. For query params since we copy them to the body, it should
     # appear a minimum of twice in the base string.
     def self.generate_params_deprecated(params, url, key, secret)
+      url.strip!
       uri = URI.parse(url)
 
       if uri.port == uri.default_port

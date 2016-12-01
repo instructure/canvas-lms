@@ -107,6 +107,25 @@ describe Lti::Security do
       expect(header.valid?(signature: signed_params['oauth_signature'])).to eq true
     end
 
+    it "handles whitespace in URLs" do
+      url_with_whitespace = "http://www.test.com "
+      signed_params = Lti::Security.signed_post_params(params, url_with_whitespace, consumer_key, consumer_secret)
+
+      nonce = signed_params['oauth_nonce']
+      timestamp = signed_params['oauth_timestamp']
+
+      header = SimpleOAuth::Header.new(
+        :post,
+        url_with_whitespace,
+        params,
+        consumer_key: consumer_key,
+        consumer_secret: consumer_secret,
+        nonce: nonce,
+        timestamp: timestamp
+      )
+      expect(header.valid?(signature: signed_params['oauth_signature'])).to eq true
+    end
+
     it "generates the signature for urls with query params in an incorrect way that we are aware of and saddened by" do
       # in this set of conditions the old code moves the query params to the body, uses the url minus the query params
       # for the base string, and then launches to the full url..... :-(
