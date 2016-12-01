@@ -43,7 +43,7 @@ class Assignment < ActiveRecord::Base
     :turnitin_settings, :context, :position, :allowed_extensions,
     :external_tool_tag_attributes, :freeze_on_copy,
     :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading,
-    :omit_from_final_grade, :intra_group_peer_reviews
+    :omit_from_final_grade, :intra_group_peer_reviews, :hide_submissions_from_students
 
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
@@ -1365,6 +1365,7 @@ class Assignment < ActiveRecord::Base
           :processed => false,
           :process_attempts => 0,
           :workflow_state => submitted ? "submitted" : "unsubmitted",
+          :hidden_from_students => self.hide_submissions_from_students,
           :group => group
         })
         homework.submitted_at = Time.zone.now

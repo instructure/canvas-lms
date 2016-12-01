@@ -46,6 +46,7 @@ module Api::V1::Assignment
       grading_standard_id
       moderated_grading
       omit_from_final_grade
+      hide_submissions_from_students
     )
   }.freeze
 
@@ -316,6 +317,7 @@ module Api::V1::Assignment
     integration_id
     integration_data
     omit_from_final_grade
+    hide_submissions_from_students
   )
 
   API_ALLOWED_TURNITIN_SETTINGS = %w(
