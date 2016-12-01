@@ -292,6 +292,7 @@ module SeleniumDriverSetup
   end
 
   def record_errors(example, exception, log_messages)
+    close_modal_if_present
     js_errors = driver.execute_script("return window.JSErrorCollector_errors && window.JSErrorCollector_errors.pump()") || []
 
     # ignore "mutating the [[Prototype]] of an object" js errors
