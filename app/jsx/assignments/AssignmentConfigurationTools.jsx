@@ -12,8 +12,7 @@ define([
     propTypes: {
       courseId: React.PropTypes.number.isRequired,
       secureParams: React.PropTypes.string.isRequired,
-      selectedTool: React.PropTypes.number,
-      selectedToolType: React.PropTypes.string
+      selectedTool: React.PropTypes.number
     },
 
     componentWillMount() {
@@ -27,7 +26,6 @@ define([
     getInitialState() {
       return {
         toolLaunchUrl: 'none',
-        toolType: '',
         tools: []
       };
     },
@@ -45,11 +43,9 @@ define([
         data: data,
         success: $.proxy(function(data) {
           let prevToolLaunch = undefined;
-          let prevToolType = undefined;
-          if (this.props.selectedTool && this.props.selectedToolType) {
+          if (this.props.selectedTool) {
             for (var i = 0; i < data.length; i++) {
-              if (data[i].definition_id == this.props.selectedTool &&
-                  data[i].definition_type === this.props.selectedToolType) {
+              if (data[i].definition_id == this.props.selectedTool) {
                 prevToolLaunch = this.getLaunch(data[i]);
                 break;
               }
@@ -57,7 +53,6 @@ define([
           }
           this.setState({
             tools: data,
-            toolType: this.props.selectedToolType,
             toolLaunchUrl: prevToolLaunch || 'none'
           });
         }, self),
@@ -90,11 +85,8 @@ define([
     setToolLaunchUrl() {
       const selector = this.refs.assignmentConfigurationTool;
       const selectedOption = selector.options[selector.selectedIndex];
-      const selectedType = selectedOption.getAttribute('data-type');
-
       this.setState({
-        toolLaunchUrl: selectedOption.getAttribute('data-launch'),
-        toolType: selectedType
+        toolLaunchUrl: selectedOption.getAttribute('data-launch')
       });
     },
 
@@ -111,7 +103,6 @@ define([
                 <option
                   value={tool.definition_id}
                   data-launch={this.getLaunch(tool)}
-                  data-type={tool.definition_type}
                   selected={tool.definition_id == this.props.selectedTool}
                   >
                   {tool.name}
@@ -120,12 +111,6 @@ define([
             })
           }
         </select>
-      );
-    },
-
-    renderToolType() {
-      return(
-        <input type="hidden" id ="configuration-tool-type" name="configuration_tool_type" value={this.state.toolType} />
       );
     },
 
@@ -149,7 +134,6 @@ define([
           <div className="form-column-right">
             <div className="border border-trbl border-round">
               {this.renderOptions()}
-              {this.renderToolType()}
               {this.renderConfigTool()}
             </div>
           </div>
@@ -158,13 +142,9 @@ define([
     }
   });
 
-  const attach = function(element, courseId, secureParams, selectedTool, selectedToolType) {
+  const attach = function(element, courseId, secureParams, selectedTool) {
     const configTools = (
-      <AssignmentConfigurationTools
-        courseId ={courseId}
-        secureParams={secureParams}
-        selectedTool={selectedTool}
-        selectedToolType={selectedToolType}/>
+      <AssignmentConfigurationTools courseId ={courseId} secureParams={secureParams} selectedTool={selectedTool}/>
     );
     return ReactDOM.render(configTools, element);
   };

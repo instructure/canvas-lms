@@ -450,10 +450,7 @@ class AssignmentsController < ApplicationController
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
-
-      selected_tool = @assignment.tool_settings_tool
-      hash[:SELECTED_CONFIG_TOOL_ID] = selected_tool ? selected_tool.id : nil
-      hash[:SELECTED_CONFIG_TOOL_TYPE] = selected_tool ? selected_tool.class.to_s : nil
+      hash[:SELECTED_CONFIG_TOOL_ID] = @assignment.tool_settings_tools.first.id unless @assignment.tool_settings_tools.blank?
 
       if @context.feature_enabled?(:multiple_grading_periods)
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)

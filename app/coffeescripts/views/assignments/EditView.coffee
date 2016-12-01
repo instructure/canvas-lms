@@ -276,8 +276,7 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
             @$assignmentConfigurationTools.get(0),
             parseInt(ENV.COURSE_ID),
             @$secureParams.val(),
-            parseInt(ENV.SELECTED_CONFIG_TOOL_ID),
-            ENV.SELECTED_CONFIG_TOOL_TYPE)
+            parseInt(ENV.SELECTED_CONFIG_TOOL_ID))
 
       @_attachEditorToDescription()
       @addTinyMCEKeyboardShortcuts()

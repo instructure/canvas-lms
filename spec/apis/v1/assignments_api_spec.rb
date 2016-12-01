@@ -1095,121 +1095,27 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(a.lti_context_id).to eq(lti_assignment_id)
     end
 
-    it "sets the configuration LTI 1 tool if one is provided" do
+    it "sets the configuration tool if one is provided" do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       api_create_assignment_in_course(@course, {
         'description' => 'description',
         'assignmentConfigurationTool' => tool.id,
-        'configuration_tool_type' => 'ContextExternalTool',
         'submission_type' => 'online',
         'submission_types' => ['online_upload']
       })
 
       a = Assignment.last
-      expect(a.tool_settings_tool).to eq(tool)
-    end
-
-    it "sets the configuration an LTI 2 tool in account context" do
-      account = @course.account
-      product_family = Lti::ProductFamily.create(
-        vendor_code: '123',
-        product_code: 'abc',
-        vendor_name: 'acme',
-        root_account: account
-      )
-
-      tool_proxy = Lti:: ToolProxy.create(
-        shared_secret: 'shared_secret',
-        guid: 'guid',
-        product_version: '1.0beta',
-        lti_version: 'LTI-2p0',
-        product_family: product_family,
-        context: account,
-        workflow_state: 'active',
-        raw_data: 'some raw data'
-      )
-
-      resource_handler = Lti::ResourceHandler.create(
-        resource_type_code: 'code',
-        name: 'resource name',
-        tool_proxy: tool_proxy
-      )
-
-      message_handler = Lti::MessageHandler.create(
-        message_type: 'message_type',
-        launch_path: 'https://samplelaunch/blti',
-        resource_handler: resource_handler
-      )
-
-      Lti::ToolProxyBinding.create(context: account, tool_proxy: tool_proxy)
-
-      api_create_assignment_in_course(@course, {
-        'description' => 'description',
-        'assignmentConfigurationTool' => message_handler.id,
-        'configuration_tool_type' => 'Lti::MessageHandler',
-        'submission_type' => 'online',
-        'submission_types' => ['online_upload']
-      })
-
-      a = Assignment.last
-      expect(a.tool_settings_tool).to eq(message_handler)
-    end
-
-    it "sets the configuration an LTI 2 tool in course context" do
-      account = @course.account
-      product_family = Lti::ProductFamily.create(
-        vendor_code: '123',
-        product_code: 'abc',
-        vendor_name: 'acme',
-        root_account: account
-      )
-
-      tool_proxy = Lti:: ToolProxy.create(
-        shared_secret: 'shared_secret',
-        guid: 'guid',
-        product_version: '1.0beta',
-        lti_version: 'LTI-2p0',
-        product_family: product_family,
-        context: @course,
-        workflow_state: 'active',
-        raw_data: 'some raw data'
-      )
-
-      resource_handler = Lti::ResourceHandler.create(
-        resource_type_code: 'code',
-        name: 'resource name',
-        tool_proxy: tool_proxy
-      )
-
-      message_handler = Lti::MessageHandler.create(
-        message_type: 'message_type',
-        launch_path: 'https://samplelaunch/blti',
-        resource_handler: resource_handler
-      )
-
-      Lti::ToolProxyBinding.create(context: @course, tool_proxy: tool_proxy)
-
-      api_create_assignment_in_course(@course, {
-        'description' => 'description',
-        'assignmentConfigurationTool' => message_handler.id,
-        'configuration_tool_type' => 'Lti::MessageHandler',
-        'submission_type' => 'online',
-        'submission_types' => ['online_upload']
-      })
-
-      a = Assignment.last
-      expect(a.tool_settings_tool).to eq(message_handler)
+      expect(a.tool_settings_tools).to include(tool)
     end
 
     it "does not set the configuration tool if the submission type is not online with uploads" do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       api_create_assignment_in_course(@course, {'description' => 'description',
-        'assignmentConfigurationTool' => tool.id,
-        'configuration_tool_type' => 'ContextExternalTool'
+        'assignmentConfigurationTool' => tool.id
       })
 
       a = Assignment.last
-      expect(a.tool_settings_tool).not_to eq(tool)
+      expect(a.tool_settings_tools).not_to include(tool)
     end
 
     it "should allow valid submission types as an array" do
