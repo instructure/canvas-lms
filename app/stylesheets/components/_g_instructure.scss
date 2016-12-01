@@ -117,7 +117,7 @@
   @-moz-document url-prefix() {
     overflow-x: hidden;
   }
-  a {
+  a:not(.btn, .Button) {
     text-decoration: underline;
   }
 
