@@ -3107,13 +3107,42 @@ describe 'Submissions API', type: :request do
                       attachments: [crocodocable_attachment_model(context: @student)])
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a.id}/submissions?include[]=submission_history",
-                    {course_id: @course.id.to_s, assignment_id: a.id.to_s,
-                     action: 'index', controller: 'submissions_api', format: 'json',
-                     include: %w[submission_history]})
+                    { course_id: @course.id.to_s, assignment_id: a.id.to_s,
+                      action: 'index', controller: 'submissions_api', format: 'json',
+                      include: %w[submission_history] })
 
     expect(json[0]["submission_history"][0]["attachments"][0]["preview_url"]).to match(
       /canvadoc_session/
     )
+  end
+
+  it "includes crocodoc whitelist ids in the preview url for attachments" do
+    Canvas::Crocodoc.stubs(:config).returns({a: 1})
+
+    course_with_teacher_logged_in active_all: true
+    student_in_course active_all: true
+    @user = @teacher
+    assignment = @course.assignments.create!(moderated_grading: true)
+    submission = assignment.submit_homework(@student, submission_type: 'online_upload',
+      attachments: [crocodocable_attachment_model(context: @student)])
+    provisional_grade = submission.find_or_create_provisional_grade!(@teacher, score: 1)
+    assignment.moderated_grading_selections.create! do |s|
+      s.student = @student
+      s.provisional_grade = provisional_grade
+    end
+    assignment.update(grades_published_at: 1.hour.ago)
+    submission.reload
+    submission.attachments.first.create_crocodoc_document(uuid: '1234',
+                                                          process_state: 'PROCESSED')
+
+    url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions?include[]=submission_history"
+    json = api_call(:get, url, { course_id: @course.id.to_s, assignment_id: assignment.id.to_s,
+                      action: 'index', controller: 'submissions_api', format: 'json',
+                      include: %w[submission_history] })
+
+    result_url = json.first.fetch("submission_history").first.fetch("attachments").first.
+      fetch("preview_url")
+    expect(result_url).to match(/crocodoc_ids%22:\[1,2\]/)
   end
 
 
