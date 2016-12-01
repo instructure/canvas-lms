@@ -56,7 +56,7 @@ module CC
         end
 
         if aq
-          ref = CC::CCHelper::create_key(aq)
+          ref = create_key(aq)
           node.itemref(:linkrefid => ref)
         else
           add_question(node, question)

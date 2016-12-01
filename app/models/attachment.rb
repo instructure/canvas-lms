@@ -271,7 +271,7 @@ class Attachment < ActiveRecord::Base
       dup.root_attachment_id = self.root_attachment_id || self.id
     end
     dup.context = context
-    dup.migration_id = CC::CCHelper.create_key(self)
+    dup.migration_id = options[:migration_id] || CC::CCHelper.create_key(self)
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end

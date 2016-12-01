@@ -74,7 +74,7 @@ module CC
             @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course,
               :selective => true, :exported_assets => @content_export.exported_assets.to_a)
           end
-          external_content = Canvas::Migration::ExternalContent::Migrator.retrieve_exported_content(@pending_exports)
+          external_content = Canvas::Migration::ExternalContent::Migrator.retrieve_exported_content(@content_export, @pending_exports)
           write_external_content(external_content)
         end
 
@@ -144,6 +144,10 @@ module CC
 
     def export_id
       @content_export ? @content_export.id : nil
+    end
+
+    def create_key(*args)
+      @content_export ? @content_export.create_key(*args) : CCHelper.create_key(*args)
     end
 
     def export_object?(obj, asset_type=nil)

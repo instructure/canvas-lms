@@ -28,7 +28,7 @@ module CC
         begin
           add_exported_asset(page)
 
-          migration_id = CCHelper.create_key(page)
+          migration_id = create_key(page)
           file_name = "#{page.url}.html"
           relative_path = File.join(CCHelper::WIKI_FOLDER, file_name)
           path = File.join(wiki_folder, file_name)
@@ -39,7 +39,7 @@ module CC
           meta_fields[:front_page] = page.is_front_page?
           meta_fields[:module_locked] = page.locked_by_module_item?(@user, deep_check_if_needed: true).present?
           meta_fields[:assignment_identifier] =
-            page.for_assignment? ? CCHelper.create_key(page.assignment) : nil
+            page.for_assignment? ? create_key(page.assignment) : nil
 
           File.open(path, 'w') do |file|
             file << @html_exporter.html_page(page.body, page.title, meta_fields)

@@ -115,7 +115,7 @@ describe MasterCourses::MasterMigration do
     end
 
     def mig_id(obj)
-      CC::CCHelper.create_key(obj)
+      @template.migration_id_for(obj)
     end
 
     def run_master_migration
@@ -210,6 +210,75 @@ describe MasterCourses::MasterMigration do
 
       expect(@copy_to2.discussion_topics.where(:migration_id => mig_id(topic)).first).to be_present # should bring both in the full
       expect(@copy_to2.wiki.wiki_pages.where(:migration_id => mig_id(page)).first).to be_present
+    end
+
+    context "master courses + external migrations" do
+      class TestExternalContentService
+        cattr_reader :course, :imported_content
+        def self.send_imported_content(course, imported_content)
+          @@course = course
+          @@imported_content = imported_content
+        end
+      end
+
+      before :each do
+        Canvas::Migration::ExternalContent::Migrator.stubs(:registered_services).returns({'test_service' => TestExternalContentService})
+      end
+
+      it "should work" do
+        @copy_to = course
+        @template.add_child_course!(@copy_to)
+
+        assmt = @copy_from.assignments.create!
+        topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
+        ann = @copy_from.announcements.create!(:message => "goodbye")
+        cm = @copy_from.context_modules.create!(:name => "some module")
+        item = cm.add_item(:id => assmt.id, :type => 'assignment')
+        att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+        page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+        quiz = @copy_from.quizzes.create!
+
+        TestExternalContentService.stubs(:applies_to_course?).returns(true)
+        TestExternalContentService.stubs(:begin_export).returns(true)
+
+        data = {
+          '$canvas_assignment_id' => assmt.id,
+          '$canvas_discussion_topic_id' => topic.id,
+          '$canvas_announcement_id' => ann.id,
+          '$canvas_context_module_id' => cm.id,
+          '$canvas_context_module_item_id' => item.id,
+          '$canvas_file_id' => att.id, # $canvas_attachment_id works too
+          '$canvas_page_id' => page.id,
+          '$canvas_quiz_id' => quiz.id
+        }
+        TestExternalContentService.stubs(:export_completed?).returns(true)
+        TestExternalContentService.stubs(:retrieve_export).returns(data)
+
+        run_master_migration
+
+        copied_assmt = @copy_to.assignments.where(:migration_id => mig_id(assmt)).first
+        copied_topic = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
+        copied_ann = @copy_to.announcements.where(:migration_id => mig_id(ann)).first
+        copied_cm = @copy_to.context_modules.where(:migration_id => mig_id(cm)).first
+        copied_item = @copy_to.context_module_tags.where(:migration_id => mig_id(item)).first
+        copied_att = @copy_to.attachments.where(:migration_id => mig_id(att)).first
+        copied_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+        copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+
+        expect(TestExternalContentService.course).to eq @copy_to
+
+        expected_data = {
+          '$canvas_assignment_id' => copied_assmt.id,
+          '$canvas_discussion_topic_id' => copied_topic.id,
+          '$canvas_announcement_id' => copied_ann.id,
+          '$canvas_context_module_id' => copied_cm.id,
+          '$canvas_context_module_item_id' => copied_item.id,
+          '$canvas_file_id' => copied_att.id, # $canvas_attachment_id works too
+          '$canvas_page_id' => copied_page.id,
+          '$canvas_quiz_id' => copied_quiz.id
+        }
+        expect(TestExternalContentService.imported_content).to eq expected_data
+      end
     end
   end
 end

@@ -60,7 +60,7 @@ module Canvas::Migration::ExternalContent
       end
 
       # retrieves data from each service to be saved as JSON in the exported package
-      def retrieve_exported_content(pending_exports)
+      def retrieve_exported_content(content_export, pending_exports)
         exported_content = {}
 
         retry_block_for_each(pending_exports.keys) do |key|
@@ -68,7 +68,7 @@ module Canvas::Migration::ExternalContent
 
           if export_completed?(pending_export, key)
             service_data = retrieve_export_data(pending_export, key)
-            exported_content[key] = Canvas::Migration::ExternalContent::Translator.new.translate_data(service_data, :export) if service_data
+            exported_content[key] = Canvas::Migration::ExternalContent::Translator.new(content_export: content_export).translate_data(service_data, :export) if service_data
             true
           end
         end
@@ -97,7 +97,7 @@ module Canvas::Migration::ExternalContent
 
       # sends back the imported content to the external services
       def send_imported_content(migration, imported_content)
-        imported_content = Canvas::Migration::ExternalContent::Translator.new(migration).translate_data(imported_content, :import)
+        imported_content = Canvas::Migration::ExternalContent::Translator.new(content_migration: migration).translate_data(imported_content, :import)
 
         pending_imports = {}
         imported_content.each do |key, content|

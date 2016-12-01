@@ -238,6 +238,14 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
+  def create_key(obj, prepend="")
+    if for_master_migration?
+      master_migration.master_template.migration_id_for(obj, prepend) # because i'm too scared to use normal migration ids
+    else
+      CC::CCHelper.create_key(obj, prepend)
+    end
+  end
+
   # Method Summary
   #   Takes in an ActiveRecord object. Determines if the item being
   #   checked should be exported or not.
@@ -245,10 +253,9 @@ class ContentExport < ActiveRecord::Base
   #   Returns: bool
   def export_object?(obj, asset_type=nil)
     return false unless obj
-    if for_master_migration?
-      return settings[:master_migration_type] == :selective ? master_migration.export_object?(obj) : true
-    end
     return true unless selective_export?
+
+    return master_migration.export_object?(obj) if for_master_migration?
 
     # because Announcement.table_name == 'discussion_topics'
     if obj.is_a?(Announcement)
@@ -278,7 +285,7 @@ class ContentExport < ActiveRecord::Base
 
   def add_item_to_export(obj, type=nil)
     return unless obj && (type || obj.class.respond_to?(:table_name))
-    return unless selective_export?
+    return unless selective_export? && !for_master_migration?
 
     asset_type = type || obj.class.table_name
     selected_content[asset_type] ||= {}
@@ -287,7 +294,11 @@ class ContentExport < ActiveRecord::Base
 
   def selective_export?
     if @selective_export.nil?
-      @selective_export = !(selected_content.empty? || is_set?(selected_content[:everything]))
+      if for_master_migration?
+        @selective_export = (settings[:master_migration_type] == :selective)
+      else
+        @selective_export = !(selected_content.empty? || is_set?(selected_content[:everything]))
+      end
     end
     @selective_export
   end

@@ -20,7 +20,7 @@ module CC
     class QTIGenerator
       include CC::CCHelper
       include QTIItems
-      delegate :add_error, :export_object?, :add_exported_asset, :to => :@manifest
+      delegate :add_error, :export_object?, :add_exported_asset, :create_key, :to => :@manifest
 
       def initialize(manifest, resources_node, html_exporter)
         @manifest = manifest
@@ -211,7 +211,7 @@ module CC
           q_node.only_visible_to_overrides quiz.only_visible_to_overrides?
           q_node.module_locked quiz.locked_by_module_item?(@user, deep_check_if_needed: true).present?
           if quiz.assignment && !quiz.assignment.deleted?
-            assignment_migration_id = CCHelper.create_key(quiz.assignment)
+            assignment_migration_id = create_key(quiz.assignment)
             doc.assignment(:identifier=>assignment_migration_id) do |a|
               AssignmentResources.create_canvas_assignment(a, quiz.assignment, @manifest)
             end

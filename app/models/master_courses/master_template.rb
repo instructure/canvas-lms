@@ -77,6 +77,11 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     end
   end
 
+  def migration_id_for(obj, prepend="")
+    key = obj.is_a?(ActiveRecord::Base) ? obj.global_asset_string : obj.to_s
+    "mc_#{self.shard.id}_#{self.id}_#{Digest::MD5.hexdigest(prepend + key)}"
+  end
+
   def add_child_course!(child_course)
     MasterCourses::ChildSubscription.unique_constraint_retry do |retry_count|
       child_sub = nil

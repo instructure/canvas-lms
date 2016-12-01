@@ -2153,7 +2153,8 @@ class Course < ActiveRecord::Base
 
         if !ce || ce.export_object?(file)
           begin
-            new_file = file.clone_for(self, nil, :overwrite => true)
+            migration_id = ce && ce.create_key(file)
+            new_file = file.clone_for(self, nil, :overwrite => true, :migration_id => migration_id)
             cm.add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ''), new_file.migration_id)
             new_folder_id = merge_mapped_id(file.folder)
 
