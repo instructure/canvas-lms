@@ -2492,7 +2492,8 @@ class User < ActiveRecord::Base
     else
       # this terribleness is so we try to make sure that the newest courses show up in the menu
       @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).
-        sort_by{ |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }.first(12).
+        sort_by{ |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }.
+        first(Setting.get('menu_course_limit', '20').to_i).
         sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
     end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
