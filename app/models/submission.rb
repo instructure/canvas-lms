@@ -536,6 +536,17 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  # Preload OriginalityReport before using this method
+  def originality_report_url(asset_string, user)
+    url = nil
+    if self.grants_right?(user, :view_turnitin_report)
+      attachment = self.attachments.find_by_asset_string(asset_string)
+      report = self.originality_reports.find_by(attachment: attachment)
+      url = report.originality_report_url if report
+    end
+    url
+  end
+
   def delete_turnitin_errors
     self.turnitin_data.delete(:status)
     self.turnitin_data.delete(:assignment_error)

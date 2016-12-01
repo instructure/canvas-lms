@@ -856,6 +856,46 @@ describe Submission do
 
     end
 
+    describe '#originality_report_url' do
+      let_once(:test_course) do
+        test_course = course_model
+        test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
+        test_course.enroll_student(test_student, enrollment_state: 'active')
+        test_course
+      end
+
+      let_once(:test_teacher) { User.create }
+      let_once(:test_student) { User.create }
+      let_once(:assignment) { Assignment.create!(title: 'test assignment', context: test_course) }
+      let_once(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
+      let_once(:submission) { assignment.submit_homework(test_student, attachments: [attachment]) }
+      let_once(:report_url) { 'http://www.test-score.com' }
+      let!(:originality_report) {
+        OriginalityReport.create!(attachment: attachment,
+                                  submission: submission,
+                                  originality_score: 0.5,
+                                  originality_report_url: report_url)
+      }
+
+      it 'returns nil if no originality report exists for the submission' do
+        originality_report.destroy
+        expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to be_nil
+      end
+
+      it 'returns nil if no report url is present in the report' do
+        originality_report.update_attribute(:originality_report_url, nil)
+        expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to be_nil
+      end
+
+      it 'returns the originality_report_url if present' do
+        expect(submission.originality_report_url(attachment.asset_string, test_teacher)).to eq(report_url)
+      end
+
+      it 'requires the :grade permission' do
+        unauthorized_user = User.new
+        expect(submission.originality_report_url(attachment.asset_string, unauthorized_user)).to be_nil
+      end
+    end
   end
 
   context "turnitin" do
