@@ -74,10 +74,14 @@ define [
         @$('#ag_weights_wrapper').show()
         @$('#apply_assignment_group_weights').prop('checked', true)
         @setDimensions(null, @defaults.height)
+        if @$trigger && @$trigger.find
+          @$trigger.find('i').removeClass('icon-blank').addClass('icon-check')
       else
         @$('#ag_weights_wrapper').hide()
         @$('#apply_assignment_group_weights').prop('checked', false)
         @setDimensions(null, @defaults.collapsedHeight)
+        if @$trigger && @$trigger.find
+          @$trigger.find('i').removeClass('icon-check').addClass('icon-blank')
 
     addAssignmentGroups: ->
       @clearWeights()

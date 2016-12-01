@@ -25,6 +25,8 @@ define [
       assignmentGroups: opts.assignmentGroups or assignmentGroups()
       weightsView: AssignmentGroupWeightsView
       userIsAdmin: opts.userIsAdmin
+    if opts.trigger
+      view.setTrigger(opts.trigger)
     view.open()
     view
 
@@ -63,6 +65,23 @@ define [
     attributes = view.getFormData()
     equal(attributes.apply_assignment_group_weights, "0")
     view.remove()
+
+  test 'changes the checkbox icon on the menu item when apply_assignment_group_weights flag changes', ->
+    $('body').append('<a id="assignmentSettingsCog"><i class="icon-check"></i></a> ')
+    $trigger = $('#assignmentSettingsCog')
+    view = createView(trigger: $trigger[0])
+
+    view.$('#apply_assignment_group_weights').click()
+    iconClass = view.$trigger.find('i').attr('class')
+
+    view.$('#apply_assignment_group_weights').click()
+    notEqual iconClass, view.$trigger.find('i').attr('class')
+
+    view.$('#apply_assignment_group_weights').click()
+    equal iconClass, view.$trigger.find('i').attr('class')
+
+    view.remove()
+    $trigger.remove()
 
   test 'saves group weights', ->
     view = createView(weighted: true)

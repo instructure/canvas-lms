@@ -46,6 +46,8 @@ class AssignmentsController < ApplicationController
       @context.require_assignment_group
       set_js_assignment_data # in application_controller.rb, because the assignments page can be shared with the course home
 
+      js_env(WEIGHT_FINAL_GRADES: @context.apply_group_weights?)
+
       respond_to do |format|
         format.html do
           @padless = true

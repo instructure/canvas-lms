@@ -317,6 +317,7 @@ describe "assignment groups" do
     expect(f("#assignment_group_#{ag1.id} .ag-header-controls")).to include_text('50% of Total')
     expect(f("#assignment_group_#{ag2.id} .ag-header-controls")).to include_text('40% of Total')
 
+    f("#course_assignment_settings_link").click
     f("#assignmentSettingsCog").click
     wait_for_ajaximations
     # assignment settings Total should == 90%

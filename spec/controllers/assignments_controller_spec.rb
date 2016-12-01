@@ -54,6 +54,13 @@ describe AssignmentsController do
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
+    it "should set WEIGHT_FINAL_GRADES in js_env" do
+      user_session @teacher
+      get 'index', course_id: @course.id
+
+      expect(assigns[:js_env][:WEIGHT_FINAL_GRADES]).to eq(@course.apply_group_weights?)
+    end
+
     context "draft state" do
       it "should create a default group if none exist" do
         user_session(@student)
