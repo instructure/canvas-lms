@@ -3,8 +3,7 @@ define([
   'i18n!appointment_groups',
   'instructure-ui/Button',
   'instructure-ui/Grid',
-], (React, I18n, {default: Button}, {default: Grid, GridCol, GridRow}) => {
-
+], (React, I18n, { default: Button }, { default: Grid, GridCol, GridRow }) => {
   class ContextSelector extends React.Component {
     static propTypes = {
       appointmentGroup: React.PropTypes.object,
@@ -15,6 +14,7 @@ define([
     constructor () {
       super()
       this.contextCheckboxes = {}
+      this.sectionsCheckboxes = {}
       this.state = {
         showDropdown: false,
         selectedContexts: new Set(),
@@ -23,7 +23,11 @@ define([
       }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentDidMount () {
+      this.setIndeterminates()
+    }
+
+    componentWillReceiveProps (nextProps) {
       this.setState({
         selectedContexts: new Set(nextProps.appointmentGroup.context_codes),
         selectedSubContexts: new Set(nextProps.appointmentGroup.sub_context_codes),
@@ -31,21 +35,18 @@ define([
       })
     }
 
-    setIndeterminates() {
-      for (let context in this.contextCheckboxes) {
+    componentDidUpdate (previousProps) {
+      this.setIndeterminates()
+    }
+
+    setIndeterminates () {
+      for (const context in this.contextCheckboxes) {
         if (this.contextCheckboxes[context]) {
           this.contextCheckboxes[context].indeterminate = this.isContextIndeterminate(context)
         }
       }
     }
 
-    componentDidMount() {
-      this.setIndeterminates()
-    }
-
-    componentDidUpdate(previousProps) {
-      this.setIndeterminates()
-    }
 
     handleContextSelectorButtonClick = (e) => {
       e.preventDefault()
@@ -67,7 +68,7 @@ define([
     }
 
     isSubContextDisabled = (context, subContext) => {
-      return this.isContextDisabled(context) || !!this.props.appointmentGroup.sub_context_codes.find(scc=>scc === subContext)
+      return this.isContextDisabled(context) || !!this.props.appointmentGroup.sub_context_codes.find(scc => scc === subContext)
     }
 
     isContextChecked = (context) => {
@@ -76,16 +77,16 @@ define([
 
     isContextIndeterminate = (context) => {
       if (!this.state.selectedContexts.has(context)) { return false }
-      let subContexts = this.subContextsForContext(context)
+      const subContexts = this.subContextsForContext(context)
       return subContexts.some(subContext => this.state.selectedSubContexts.has(subContext))
     }
 
     isContextDisabled = (context) => {
-      return !!this.props.appointmentGroup.context_codes.find(c=> c === context)
+      return !!this.props.appointmentGroup.context_codes.find(c => c === context)
     }
 
     subContextsForContext = (context) => {
-      return this.props.contexts.find(c=>c.asset_string === context).sections.map(s=>s.asset_string)
+      return this.props.contexts.find(c => c.asset_string === context).sections.map(s => s.asset_string)
     }
 
     toggleCourse = (course, select) => {
@@ -94,7 +95,7 @@ define([
       const subContexts = new Set(this.state.selectedSubContexts)
       const subContextsToRemove = this.subContextsForContext(course)
       if (select) { contexts.add(course) } else { contexts.delete(course) }
-      for (let subContext of subContextsToRemove) { subContexts.delete(subContext) }
+      for (const subContext of subContextsToRemove) { subContexts.delete(subContext) }
       this.setState({
         selectedContexts: contexts,
         selectedSubContexts: subContexts
@@ -109,7 +110,7 @@ define([
       const subContexts = new Set(this.state.selectedSubContexts)
       const siblingSubContexts = new Set(this.subContextsForContext(context))
       let checkedSubContexts = new Set()
-      for (let subContext of subContexts) {
+      for (const subContext of subContexts) {
         if (siblingSubContexts.has(subContext)) {
           checkedSubContexts.add(subContext)
         }
@@ -123,12 +124,12 @@ define([
       if (select) { checkedSubContexts.add(section) } else { checkedSubContexts.delete(section) }
 
       // start with no sub contexts selected and then add the ones that are checked
-      for (let subContext of siblingSubContexts) { subContexts.delete(subContext) }
+      for (const subContext of siblingSubContexts) { subContexts.delete(subContext) }
       if ([...siblingSubContexts].every(ssc => checkedSubContexts.has(ssc))) {
         // if they're all checked, we don't actually store them as selected
         contexts.add(context)
       } else if (checkedSubContexts.size > 0) {
-        for (let subContext of checkedSubContexts) { subContexts.add(subContext) }
+        for (const subContext of checkedSubContexts) { subContexts.add(subContext) }
         contexts.add(context)
       } else {
         // no sub contexts were checked
@@ -141,30 +142,29 @@ define([
     }
 
     toggleCourseExpanded = (course) => {
-      let contexts = new Set(this.state.expandedContexts)
+      const contexts = new Set(this.state.expandedContexts)
       if (contexts.has(course)) { contexts.delete(course) } else { contexts.add(course) }
-      this.setState({expandedContexts: contexts})
+      this.setState({ expandedContexts: contexts })
     }
 
-    contextName = (asset_string) => {
-      for (let context of this.props.contexts) {
-        if (context.asset_string === asset_string) { return context.name }
-        for (let subContext of context.sections) {
-          if (subContext.asset_string === asset_string) { return subContext.name }
+    contextName = (assetString) => {
+      for (const context of this.props.contexts) {
+        if (context.asset_string === assetString) { return context.name }
+        for (const subContext of context.sections) {
+          if (subContext.asset_string === assetString) { return subContext.name }
         }
       }
     }
 
     contextAndCountText = (contextSet) => {
-      let contextName = this.contextName(contextSet.values().next().value) || ''
+      const contextName = this.contextName(contextSet.values().next().value) || ''
       if (contextSet.size > 1) {
-        return I18n.t({one: '%{contextName} and %{count} other',
-                       other: '%{contextName} and %{count} others'},
-                      {contextName: contextName,
-                      count: contextSet.size - 1})
-      } else {
-        return contextName
+        return I18n.t({ one: '%{contextName} and %{count} other',
+          other: '%{contextName} and %{count} others' },
+          { contextName,
+            count: contextSet.size - 1 })
       }
+      return contextName
     }
 
     buttonText = () => {
@@ -182,21 +182,22 @@ define([
         <div id={`${context.asset_string}_sections`} className={this.state.expandedContexts.has(context) ? '' : 'hiddenSection'}>
           {
             context.sections.map(section => {
-                return (
-                  <div className="sectionItem" key={section.asset_string}>
-                    <input
-                      id={`${section.asset_string}_checkbox`}
-                      key={`${section.asset_string}_checkbox`}
-                      type="checkbox"
-                      onChange={() => this.toggleSection(context.asset_string, section.asset_string, !this.isSubContextChecked(context.asset_string, section.asset_string))}
-                      value={section.asset_string}
-                      defaultChecked={this.isSubContextChecked(context.asset_string, section.asset_string)}
-                      checked={this.isSubContextChecked(context.asset_string, section.asset_string)}
-                      disabled={this.isSubContextDisabled(context.asset_string, section.asset_string)}
-                    />
-                    <label className="ContextLabel" htmlFor={`${section.asset_string}_checkbox`}>{section.name}</label>
-                  </div>
-                )
+              return (
+                <div className="sectionItem" key={section.asset_string}>
+                  <input
+                    id={`${section.asset_string}_checkbox`}
+                    key={`${section.asset_string}_checkbox`}
+                    type="checkbox"
+                    onChange={() => this.toggleSection(context.asset_string, section.asset_string, !this.isSubContextChecked(context.asset_string, section.asset_string))}
+                    ref={(checkbox) => { this.sectionsCheckboxes[section.asset_string] = checkbox }}
+                    value={section.asset_string}
+                    defaultChecked={this.isSubContextChecked(context.asset_string, section.asset_string)}
+                    checked={this.isSubContextChecked(context.asset_string, section.asset_string)}
+                    disabled={this.isSubContextDisabled(context.asset_string, section.asset_string)}
+                  />
+                  <label className="ContextLabel" htmlFor={`${section.asset_string}_checkbox`}>{section.name}</label>
+                </div>
+              )
             })
           }
         </div>
@@ -205,31 +206,39 @@ define([
 
     renderListItems () {
       return (
-      <div>
-        {
-          this.props.contexts.map(context => {
-            let expanded = this.state.expandedContexts.has(context)
-            let inputId = `${context.asset_string}_checkbox`
-            return (
-              <div className="CourseListItem" key={context.asset_string}>
-                <i role="button" aria-controls={`${context.asset_string}_sections`} aria-expanded={expanded} onClick={() => this.toggleCourseExpanded(context)} className={`icon-arrow-${expanded ? 'down' : 'right'}`}><span className="screenreader-only">{context.name}</span></i>
-                <input
-                  ref={(checkbox) => { this.contextCheckboxes[context.asset_string] = checkbox }}
-                  id={inputId}
-                  type="checkbox"
-                  onChange={() => this.toggleCourse(context.asset_string, !this.isContextChecked(context.asset_string))}
-                  value={context.asset_string}
-                  defaultChecked={this.isContextChecked(context.asset_string)}
-                  checked={this.isContextChecked(context.asset_string)}
-                  disabled={this.isContextDisabled(context.asset_string)}
-                />
-                <label className="ContextLabel" htmlFor={inputId}>{context.name}</label>
-                {this.renderSections(context)}
-              </div>
-            )
-          })
-        }
-      </div>
+        <div>
+          {
+            this.props.contexts.map(context => {
+              const expanded = this.state.expandedContexts.has(context)
+              const inputId = `${context.asset_string}_checkbox`
+              return (
+                <div className="CourseListItem" key={context.asset_string}>
+                  <i
+                    role="button"
+                    aria-controls={`${context.asset_string}_sections`}
+                    aria-expanded={expanded}
+                    onClick={() => this.toggleCourseExpanded(context)}
+                    className={`icon-arrow-${expanded ? 'down' : 'right'}`}
+                  >
+                    <span className="screenreader-only">{context.name}</span>
+                  </i>
+                  <input
+                    ref={(checkbox) => { this.contextCheckboxes[context.asset_string] = checkbox }}
+                    id={inputId}
+                    type="checkbox"
+                    onChange={() => this.toggleCourse(context.asset_string, !this.isContextChecked(context.asset_string))}
+                    value={context.asset_string}
+                    defaultChecked={this.isContextChecked(context.asset_string)}
+                    checked={this.isContextChecked(context.asset_string)}
+                    disabled={this.isContextDisabled(context.asset_string)}
+                  />
+                  <label className="ContextLabel" htmlFor={inputId}>{context.name}</label>
+                  {this.renderSections(context)}
+                </div>
+              )
+            })
+          }
+        </div>
       )
     }
 
@@ -240,7 +249,7 @@ define([
       return (
         <div className={classes} {...this.props}>
           <Button
-            ref={(c) => {this.dropdownButton = c }}
+            ref={(c) => { this.dropdownButton = c }}
             aria-expanded={this.state.showDropdown}
             aria-controls="context-selector-dropdown"
             onClick={this.handleContextSelectorButtonClick}

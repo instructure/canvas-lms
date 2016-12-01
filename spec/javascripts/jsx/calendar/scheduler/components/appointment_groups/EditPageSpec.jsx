@@ -46,6 +46,47 @@ define([
     }
   })
 
+  test('mocks editPage axios to appointmentGroups', (assert) => {
+    const done = assert.async()
+    moxios.stubRequest(/appointment_groups/, {
+      status: 200,
+      response: { limitUsersPerSlot: 4, limitSlotsPerUser: 6 }
+    })
+    const component = renderComponent();
+    moxios.wait(() => {
+      ok(component.state.appointmentGroup.limitUsersPerSlot === 4)
+      done()
+    })
+  })
+
+  test('mocks editPage axios to calendarEvents', (assert) => {
+    const done = assert.async()
+    moxios.stubRequest(/calendar_events/, {
+      status: 200,
+      response: { contexts: [{ asset_string: 'course_1' }, { asset_string: 'course_2' }] }
+    })
+    const component = renderComponent();
+    moxios.wait(() => {
+      ok(component.state.contexts[0].asset_string === 'course_1')
+      done()
+    })
+  })
+
+
+  test('set time blocks correctly', (assert) => {
+    const done = assert.async()
+    moxios.stubRequest(/appointment_groups/, {
+      status: 200,
+      response: { limitUsersPerSlot: 4, limitSlotsPerUser: 6 }
+    })
+    const component = renderComponent();
+    moxios.wait(() => {
+      component.setTimeBlocks(4)
+      ok(component.state.formValues.timeblocks === 4)
+      done()
+    })
+  })
+
   test('renders message users button', () => {
     const component = renderComponent()
     ok(component.messageStudentsButton)
