@@ -165,6 +165,12 @@ CanvasRails::Application.routes.draw do
   # and the application_helper method :context_url to make retrieving
   # these contexts, and also generating context-specific urls, easier.
   resources :courses do
+    get 'dynamic_syllabus' => 'bz#dynamic_syllabus'
+    get 'dynamic_syllabus/edit' => 'bz#dynamic_syllabus_edit'
+    post 'dynamic_syllabus/edit' => 'bz#save_dynamic_syllabus_edit'
+    get 'dynamic_syllabus/modules_edit' => 'bz#dynamic_syllabus_modules_edit'
+    post 'dynamic_syllabus/modules_edit' => 'bz#save_dynamic_syllabus_modules_edit'
+
     # DEPRECATED
     get 'self_enrollment/:self_enrollment' => 'courses#self_enrollment', as: :self_enrollment
     post 'self_unenrollment/:self_unenrollment' => 'courses#self_unenrollment', as: :self_unenrollment

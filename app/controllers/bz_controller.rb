@@ -293,4 +293,67 @@ class BzController < ApplicationController
     render :nothing => true
   end
 
+
+  def dynamic_syllabus
+    @course = Course.find(params[:course_id])
+
+    @progressions = @current_user.context_module_progressions
+
+    #@course.context_modules.active.each do |mod|
+      #mod.part_id = 2
+      #mod.save
+    #end
+  end
+
+  def dynamic_syllabus_edit
+    @course = Course.find(params[:course_id])
+    raise "Unauthorized" if !authorized_action(@course, @current_user, :update)
+  end
+
+  def save_dynamic_syllabus_edit
+    @course = Course.find(params[:course_id])
+    raise "Unauthorized" if !authorized_action(@course, @current_user, :update)
+
+    @course.intro_title = params[:course_intro_title]
+    @course.intro_text = params[:course_intro_text]
+    @course.save
+
+    params[:part_id].each_with_index do |part_id, idx|
+      part = part_id == '' ? CoursePart.new : CoursePart.find(part_id.to_i)
+
+      part.title = params[:part_title][idx]
+      next if part.title == ''
+      part.intro = params[:part_intro][idx]
+      part.task_box_title = params[:task_box_title][idx]
+      part.task_box_intro = params[:task_box_intro][idx]
+      part.course_id = @course.id
+      part.position = idx
+
+      part.save
+    end
+
+    redirect_to "/courses/#{@course.id}/dynamic_syllabus"
+  end
+
+  def dynamic_syllabus_modules_edit
+    @course = Course.find(params[:course_id])
+    raise "Unauthorized" if !authorized_action(@course, @current_user, :update)
+
+    @course_parts = CoursePart.where(:course_id => @course.id)
+  end
+
+  def save_dynamic_syllabus_modules_edit
+    @course = Course.find(params[:course_id])
+    raise "Unauthorized" if !authorized_action(@course, @current_user, :update)
+
+    params[:module_id].each_with_index do |module_id, idx|
+      mod = ContextModule.find(module_id)
+      mod.intro_text = params[:intro_text][idx]
+      mod.image_url = params[:image_url][idx]
+      mod.part_id = (params[:part_id][idx] == '') ? nil : params[:part_id][idx]
+      mod.save
+    end
+
+    redirect_to "/courses/#{@course.id}/dynamic_syllabus"
+  end
 end

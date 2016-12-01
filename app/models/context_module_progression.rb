@@ -285,6 +285,26 @@ class ContextModuleProgression < ActiveRecord::Base
   end
   private :evaluate_current_position
 
+  def current_position_tag_without_progress
+    completion_requirements = context_module.completion_requirements || []
+    requirements_met = self.requirements_met || []
+
+    current_position = nil
+
+    # for an observer/student combo user we don't want to filter based on the
+    # normal observer logic, instead return vis for student enrollment only
+    context_module.content_tags_visible_to(self.user, is_teacher: false, ignore_observer_logic: true).each do |tag|
+      current_position = tag
+      all_met = completion_requirements.select{|r| r[:id] == tag.id }.all? do |req|
+        requirements_met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type] }
+      end
+      break unless all_met
+    end
+
+    current_position
+  end
+
+
   # attempts to calculate and save the progression state
   # will not raise a StaleObjectError if there is a conflict
   # may reload the object and may return stale data (if there is a conflict)
