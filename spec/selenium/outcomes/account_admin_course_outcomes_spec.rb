@@ -64,12 +64,36 @@ describe "account admin outcomes" do
         should_create_an_outcome_group_nested
       end
 
-      it "should edit an outcome group", priority: "2", test_id: 114335  do
+      it "should edit an outcome group", priority: "2", test_id: 114335 do
         should_edit_an_outcome_group
       end
 
       it "should delete an outcome group", priority: "2", test_id: 250238 do
         should_delete_an_outcome_group
+      end
+    end
+
+    context "outcome groups" do
+      let(:ten) { 10 }
+
+      before(:each) do
+        setup_fake_state_data(ten)
+        open_outcomes_find
+        click_on_state_standards
+      end
+
+      it "should expand/collapse outcome groups", priority: "2", test_id: 114338 do
+        import_state_standart_into_account
+
+        back_button = f(".go_back")
+        expand_child_folders(ten, back_button)
+
+        # collapse back to the root folder by repeatedly clicking on |Back| (upper left)
+        ten.downto(1) do |i|
+          outcome_group = ffj(".outcome-level:visible .outcome-group .ellipsis")[i - 1]
+          expect(outcome_group.text).to eq "Level #{i}"
+          back_button.click
+        end
       end
     end
 
@@ -86,6 +110,49 @@ describe "account admin outcomes" do
           g.click
           expect(f('.ui-dialog-buttonpane .btn-primary')).not_to be_displayed
         end
+      end
+    end
+
+    private
+
+    def setup_fake_state_data(counter)
+      root_group = LearningOutcomeGroup.global_root_outcome_group
+      1.upto(counter) do |og|
+        root_group = root_group.child_outcome_groups.create!(:title => "Level #{og}")
+      end
+      Setting.set(AcademicBenchmark.common_core_setting_key, root_group.id.to_s)
+    end
+
+    def open_outcomes_find
+      get outcome_url
+      wait_for_ajaximations
+      f('.find_outcome').click
+      wait_for_ajaximations
+    end
+
+    def click_on_state_standards
+      top_level_groups = ff(".outcome-level .outcome-group")
+      expect(top_level_groups.count).to eq 3
+      top_level_groups[1].click
+      wait_for_ajaximations
+    end
+
+    def import_state_standart_into_account
+      ffj(".outcome-level:last .outcome-group .ellipsis").first.click
+      f(".btn-primary").click
+      expect(driver.switch_to.alert).not_to be nil
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+    end
+
+    def expand_child_folders(counter, back_button)
+      back_button.click
+      expect(back_button).not_to be_displayed
+      counter.times do
+        outcome_group = ffj(".outcome-level:visible:last .outcome-group .ellipsis")[0]
+        outcome_group.click
+        wait_for_animations
+        expect(back_button).to be_displayed
       end
     end
   end
