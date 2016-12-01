@@ -1431,7 +1431,7 @@ da:
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillad bulkeksport af karakterer til SIS"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillad kursusbilleder at blive tildelt til et kursus og benyttet på oversigten."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Gør det muligt at føje kursusbilleder til et kursus, og til brug på dashcards."
-  allow_in_mastery_paths_5332c786: "Tillad i beherskelsesstier"
+  allow_in_mastery_paths_5332c786: "Tillad i læringsstier"
   allow_intra_group_peer_reviews_53f1e455: "Tillad interne peer-review"
   allow_lor_tools: "Giv brugerne mulighed for at se og bruge eksterne værktøjer, der er konfigureret til LOR."
   allow_multiple_attempts_e67a0a37: "Tillad flere forsøg"
@@ -8868,7 +8868,7 @@ da:
   marked_done_9fd646f: "Markeret som færdig"
   masquerade_as_name_8bb004c5: "Forklæd som %{name}"
   mastery_paths_breakdown_6e0b5fce: "Nedbrydning af beherskelses-stier"
-  mastery_paths_cc4096c2: Beherskelsesstier
+  mastery_paths_cc4096c2: Læringsstier
   mastery_paths_editor_930655bb: "Mål-sti redigeringsprogram"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Score for beherskelse afspejler den højeste score for en bedømt opgave eller quiz."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Beherskelsescore reflektere den mest nylige bedømte opgave eller quiz."
@@ -13623,7 +13623,7 @@ da:
           link_to_a_question_bank: "Link til spørgsmålsbank"
         show_questions_and_points: "Vælg *%{num_questions}* spørgsmål, #%{num_points}# pts til dette spørgsmål"
         titles: 
-          add_question_to_group: "Føj spørgsmålsgruppe"
+          add_question_to_group: "Føj til spørgsmålsgruppe"
           collapse_group: "Skjul gruppe"
           delete_group: "Slet gruppe"
           edit_group_details: "Rediger gruppedetaljer"
