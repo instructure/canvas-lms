@@ -4,9 +4,11 @@ define([
   'i18n!appointment_groups',
   'jsx/shared/FriendlyDatetime',
   'compiled/util/natcompare',
+  'instructure-icons/react/Line/IconCalendarAddLine',
+  'instructure-icons/react/Line/IconCalendarReservedLine',
   'jquery',
   'jquery.instructure_date_and_time'
-], (React, classnames, I18n, FriendlyDatetime, natcompare, $) => {
+], (React, classnames, I18n, FriendlyDatetime, natcompare, { default: IconCalendarAddLine }, { default: IconCalendarReservedLine }, $) => {
   const renderAppointment = (appointment, participantList = '') => {
     const timeLabel = I18n.t('%{start_time} to %{end_time}', {
       start_time: $.timeString(appointment.start_at),
@@ -25,6 +27,12 @@ define([
       AppointmentGroupList__Appointment: true,
       'AppointmentGroupList__Appointment--reserved': isReserved,
       'AppointmentGroupList__Appointment--unreserved': !isReserved
+    });
+
+    const iconClasses = classnames({
+      AppointmentGroupList__Icon: true,
+      'AppointmentGroupList__Icon--reserved': isReserved,
+      'AppointmentGroupList__Icon--unreserved': !isReserved
     })
 
     const statusText = (isReserved) ?
@@ -34,7 +42,11 @@ define([
     return (
       <div key={appointment.id} className={rowClasses}>
         <div>
-          <i className="icon-calendar-month" />
+          <span className={iconClasses}>
+            {
+              (isReserved) ? <IconCalendarReservedLine /> : <IconCalendarAddLine />
+            }
+          </span>
           <span className="pad-box-micro AppointmentGroupList__Appointment-timeLabel">{timeLabel}</span>
           <span className={badgeClasses}>{statusText}</span>
           <span className="pad-box-micro AppointmentGroupList__Appointment-label">{participantList}</span>

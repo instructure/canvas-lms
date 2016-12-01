@@ -131,7 +131,17 @@ define [
       return 'assignment'
 
     iconType: ->
-      if type = @assignmentType() then type else 'calendar-month'
+      if type = @assignmentType()
+        type
+      else if ENV.CALENDAR.BETTER_SCHEDULER
+        if @isAppointmentGroupEvent() && @isAppointmentGroupFilledEvent()
+          'calendar-reserved'
+        else if @isAppointmentGroupEvent()
+          'calendar-add'
+        else
+          'calendar-month'
+      else
+        'calendar-month'
 
     isOnCalendar: (context_code) ->
       @calendarEvent.all_context_codes.match(///\b#{context_code}\b///)
