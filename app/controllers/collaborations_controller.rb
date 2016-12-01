@@ -19,6 +19,78 @@
 # @API Collaborations
 # API for accessing course and group collaboration information.
 #
+# @model Collaboration
+#     {
+#       "id": "Collaboration",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The unique identifier for the collaboration",
+#           "example": 43,
+#           "type": "integer"
+#         },
+#         "collaboration_type": {
+#           "description": "A name for the type of collaboration",
+#           "example": "Microsoft Office",
+#           "type": "string"
+#         },
+#         "document_id": {
+#           "description": "The collaboration document identifier for the collaboration provider",
+#           "example": "oinwoenfe8w8ef_onweufe89fef",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "description": "The canvas id of the user who created the collaboration",
+#           "example": 92,
+#           "type": "integer"
+#         },
+#         "context_id": {
+#           "description": "The canvas id of the course or group to which the collaboration belongs",
+#           "example": 77,
+#           "type": "integer"
+#         },
+#         "context_type": {
+#           "description": "The canvas type of the course or group to which the collaboration belongs",
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "The LTI launch url to view collaboration.",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "The timestamp when the collaboration was created",
+#           "example": "2012-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "The timestamp when the collaboration was last modified",
+#           "example": "2012-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "description": {
+#           "type": "string"
+#         },
+#         "title": {
+#           "type": "string"
+#         },
+#         "type": {
+#           "description": "Another representation of the collaboration type",
+#           "example": "ExternalToolCollaboration",
+#           "type": "string"
+#         },
+#         "update_url": {
+#           "description": "The LTI launch url to edit the collaboration",
+#           "type": "string"
+#         },
+#         "user_name": {
+#           "description": "The name of the user who owns the collaboration",
+#           "example": "John Danger",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
 # @model Collaborator
 #     {
 #       "id": "Collaborator",
@@ -83,7 +155,8 @@ class CollaborationsController < ApplicationController
 
   # @API List collaborations
   # List collaborations the current user has access to in the context of the course
-  # provided in the url
+  # provided in the url. NOTE: this only returns ExternalToolCollaboration type
+  # collaborations.
   #
   #   curl https://<canvas>/api/v1/courses/1/collaborations/
   #
