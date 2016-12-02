@@ -74,6 +74,7 @@ class Submission < ActiveRecord::Base
   has_many :rubric_assessments, :as => :artifact
   has_many :attachment_associations, :as => :context
   has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
+  has_many :originality_reports
   has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
@@ -509,6 +510,20 @@ class Submission < ActiveRecord::Base
     end
 
     true
+  end
+
+  # This method pulls data from the OriginalityReport table
+  # Preload OriginalityReport before using this method in a collection of submissions
+  def originality_data
+    data = self.originality_reports.each_with_object({}) do |originality_report, hash|
+      hash[Attachment.asset_string(originality_report.attachment_id)] = {
+        similarity_score: originality_report.originality_score.round(2),
+        state: originality_report.state,
+        report_url: originality_report.originality_report_url,
+        status: originality_report.workflow_state
+      }
+    end
+    turnitin_data.merge(data)
   end
 
   def turnitin_assets

@@ -15,7 +15,7 @@ describe OriginalityReport do
   it 'requires an originality score' do
     subject.originality_score = nil
     subject.valid?
-    expect(subject.errors[:originality_score]).to eq ["can't be blank", "score must be between 0 and 1"]
+    expect(subject.errors[:originality_score]).to eq ["can't be blank", "score must be between 0 and 100"]
   end
 
   it 'requires an attachment' do
@@ -58,4 +58,9 @@ describe OriginalityReport do
     subject.save!
     expect(subject.originality_report_attachment).to eq originality_attachemnt
   end
+
+  it 'returns the state of the originality report' do
+    expect(subject.state).to eq 'acceptable'
+  end
+
 end

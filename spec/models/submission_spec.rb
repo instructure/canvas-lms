@@ -792,6 +792,72 @@ describe Submission do
     end
   end
 
+  context "OriginalityReport" do
+    let(:attachment) { attachment_model }
+    let(:course) { course_model }
+    let(:submission) { submission_model }
+
+    let(:originality_report) do
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+    end
+
+    describe "#originality_data" do
+      it "generates the originality data" do
+        originality_report.originality_report_url = 'http://example.com'
+        originality_report.save!
+        expect(submission.originality_data).to eq({
+                                                    attachment.asset_string => {
+                                                      similarity_score: originality_report.originality_score,
+                                                      state: originality_report.state,
+                                                      report_url: originality_report.originality_report_url,
+                                                      status: originality_report.workflow_state
+                                                    }
+                                                  })
+      end
+
+      it "includes tii data" do
+        tii_data = {
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com',
+          status: 'scored'
+        }
+        submission.turnitin_data[attachment.asset_string] = tii_data
+        expect(submission.originality_data).to eq({
+                                                    attachment.asset_string => tii_data
+                                                  })
+      end
+
+      it "overrites the tii data with the originality data" do
+        originality_report.originality_report_url = 'http://example.com'
+        originality_report.save!
+        tii_data = {
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com/tii',
+          status: 'pending'
+        }
+        submission.turnitin_data[attachment.asset_string] = tii_data
+        expect(submission.originality_data).to eq({
+                                                    attachment.asset_string => {
+                                                      similarity_score: originality_report.originality_score,
+                                                      state: originality_report.state,
+                                                      report_url: originality_report.originality_report_url,
+                                                      status: originality_report.workflow_state
+                                                    }
+                                                  })
+      end
+
+      it "rounds the score to 2 decimal places" do
+        originality_report.originality_score = 2.94997
+        originality_report.save!
+        expect(submission.originality_data[attachment.asset_string][:similarity_score]).to eq(2.95)
+      end
+
+    end
+
+  end
+
   context "turnitin" do
 
     context "Turnitin LTI" do
