@@ -297,7 +297,16 @@ module SeleniumDriverSetup
     end
 
     def selenium_url
-      (browser == :chrome) ? CONFIG[:remote_url_chrome] : CONFIG[:remote_url_firefox]
+      case browser
+      when :firefox
+        CONFIG[:remote_url_firefox]
+      when :chrome
+        CONFIG[:remote_url_chrome]
+      when :internet_explorer, :safari
+        CONFIG[:remote_url]
+      else
+        raise "unsupported browser #{browser}"
+      end
     end
 
     def ruby_firefox_driver
