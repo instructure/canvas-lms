@@ -87,6 +87,7 @@
     "lodash": "4.16.4",
     "moment": "~2.10.6",
     "page": "visionmedia/page.js#1.6.4",
+    "parse-decimal-number": "0.1.1",
     "qs": "https://github.com/hapijs/qs.git#a341cdf2fadba5ede1ce6c95c7051f6f31f37b81",
     "react": "0.14.8",
     "react-dom": "0.14.8",
