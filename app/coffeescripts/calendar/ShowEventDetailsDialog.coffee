@@ -49,7 +49,8 @@ define [
         success: () =>
           $.publish "CommonEvent/eventDeleted", event
 
-    reserveErrorCB: (data) =>
+    reserveErrorCB: (data, request) =>
+      $.publish "CommonEvent/eventSaveFailed", @event
       for error in data when error.message is 'participant has met per-participant limit'
         errorHandled = true
         error.reschedulable = error.reservations.length == 1
@@ -72,10 +73,10 @@ define [
                        text: I18n.t 'ok', 'OK'
                        click: -> $dialog.dialog('close')
                      ]
-
       unless errorHandled
-        alert "Could not reserve event: #{data}"
-        $.publish "CommonEvent/eventSaveFailed", @event
+        # defer to the default error dialog
+        $.ajaxJSON.unhandledXHRs.push(request);
+        $.fn.defaultAjaxError.func.apply($.fn.defaultAjaxError.object, arguments)
 
     reserveSuccessCB: (cancel_existing, data) ->
       @popover.hide()
