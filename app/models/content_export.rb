@@ -308,6 +308,9 @@ class ContentExport < ActiveRecord::Base
   end
 
   def add_exported_asset(obj)
+    if for_master_migration? && settings[:primary_master_migration]
+      master_migration.master_template.ensure_tag_on_export(obj)
+    end
     return unless selective_export?
     return if qti_export? || epub_export.present?
 

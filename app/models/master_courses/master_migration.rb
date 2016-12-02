@@ -118,10 +118,12 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     ce.export_type = ContentExport::MASTER_COURSE_COPY
     ce.settings[:master_migration_type] = type
     ce.settings[:master_migration_id] = self.id # so we can find on the import side when we copy attachments
+    ce.settings[:primary_master_migration] = is_primary
     ce.user = self.user
     ce.save!
     ce.master_migration = self # don't need to reload
     ce.export_course
+    self.master_template.ensure_attachment_tags_on_export if is_primary
     ce
   end
 

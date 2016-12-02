@@ -9,9 +9,15 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   belongs_to :active_migration, :class_name => "MasterCourses::MasterMigration"
 
+  serialize :default_restrictions, Hash
+  validate :require_valid_restrictions
+
   strong_params
 
   include Canvas::SoftDeletable
+
+  include MasterCourses::TagHelper
+  self.content_tag_association = :master_content_tags
 
   scope :for_full_course, -> { where(:full_course => true) }
 
@@ -20,6 +26,12 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   def invalidate_course_cache
     if self.workflow_state_changed?
       Rails.cache.delete(self.class.course_cache_key(self.course))
+    end
+  end
+
+  def require_valid_restrictions
+    if self.default_restrictions_changed? && (self.default_restrictions.keys - [:lock_content, :lock_settings]).any?
+      self.errors.add(:default_restrictions, "Invalid settings")
     end
   end
 
@@ -42,39 +54,6 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def self.full_template_for(course)
     course.master_course_templates.active.for_full_course.first
-  end
-
-  # load all the tags into a nested index for fast searching in content_tag_for
-  def load_tags!
-    @content_tag_index = {}
-    self.master_content_tags.to_a.group_by(&:content_type).each do |content_type, typed_tags|
-      @content_tag_index[content_type] = typed_tags.index_by(&:content_id)
-    end
-    true
-  end
-
-  def content_tag_for(content)
-    return unless MasterCourses::ALLOWED_CONTENT_TYPES.include?(content.class.base_class.name)
-    if @content_tag_index
-      tag = (@content_tag_index[content.class.base_class.name] || {})[content.id]
-      unless tag
-        tag = create_content_tag_for!(content)
-        @content_tag_index[content.class.base_class.name] ||= {}
-        @content_tag_index[content.class.base_class.name][content.id] = tag
-      end
-      tag
-    else
-      self.master_content_tags.polymorphic_where(:content => content).first || create_content_tag_for!(content)
-    end
-  end
-
-  def create_content_tag_for!(content)
-    self.class.unique_constraint_retry do |retry_count|
-      tag = nil
-      tag = self.master_content_tags.polymorphic_where(:content => content).first if retry_count > 0
-      tag ||= self.master_content_tags.create!(:content => content)
-      tag
-    end
   end
 
   def migration_id_for(obj, prepend="")
@@ -100,5 +79,22 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       @last_export_at = self.master_migrations.where(:workflow_state => "completed").order("id DESC").limit(1).pluck(:exports_started_at).first
     end
     @last_export_at
+  end
+
+  def ensure_tag_on_export(obj)
+    return unless self.default_restrictions.present? # if there are no restrictions then why bother creating tags
+
+    load_tags! # does nothing if already loaded
+    content_tag_for(obj, {:restrictions => self.default_restrictions}) # set the restrictions on create if a new tag
+    # TODO: make a thing if we change the defaults at some point and want to force them on all the existing tags
+  end
+
+  def ensure_attachment_tags_on_export
+    return unless self.default_restrictions.present?
+
+    # because attachments don't get "added" to the export
+    self.course.attachments.where("file_state <> 'deleted'").each do |att|
+      ensure_tag_on_export(att)
+    end
   end
 end
