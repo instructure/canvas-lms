@@ -18,6 +18,14 @@ class Speedgrader
       f('#grading-box-extended')
     end
 
+    def top_bar
+      f("#content")
+    end
+
+    def closed_gp_notice_selector
+      "#closed_gp_notice"
+    end
+
     def visit(course, assignment)
       get "/courses/#{course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
     end
@@ -29,6 +37,7 @@ class Speedgrader
     def current_grade
       grade_input['value']
     end
+
   end
 end
 
