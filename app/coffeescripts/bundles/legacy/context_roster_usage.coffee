@@ -21,6 +21,8 @@ require [
           $access = $("#usage_report .access.blank:first").clone(true).removeClass("blank")
           access = data[idx].asset_user_access
           $access.addClass access.asset_class_name
+          $access.find('.icon').addClass access.icon
+          delete access.icon
           access.readable_name = access.readable_name or access.display_name or access.asset_code
           access.last_viewed = $.datetimeString(access.last_access)
           $access.fillTemplateData data: access

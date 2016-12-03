@@ -2,7 +2,9 @@
 <% add_crumb(t('#crumbs.people', 'People'), context_url(@context, :context_users_url))
   add_crumb(@user.name, context_url(@context, :context_user_url, @user))
   @active_tab="people"
-  add_crumb(t('#crumbs.access_report', "Access Report")) %>
+  add_crumb(t('#crumbs.access_report', "Access Report"))
+  css_bundle :roster_user_usage
+%>
 <% content_for :right_side do %>
   <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_user_url, @user) %>">
     <i class="icon-arrow-left"></i>
@@ -10,54 +12,8 @@
   </a>
 <% end %>
 <h1><%= t 'headings.user_access_report', '%{user} Access Report', :user => @user.name %></h1>
-<% content_for :stylesheets do %>
-<style>
-#usage_report table {
-  border-collapse: collapse;
-}
-#usage_report th {
-  padding: 2px 5px;
-  border-bottom: 1px dotted #888;
-}
-#usage_report td {
-  padding: 8px 5px;
-  border-bottom: 1px dotted #ccc;
-}
-#usage_report .view_score {
-  text-align: right;
-  padding-right: 20px;
-}
-#usage_report .participate_score {
-  text-align: right;
-  padding-right: 20px;
-}
-#usage_report .last_viewed {
-  white-space: nowrap;
-  font-size: 0.8em;
-}
-#usage_report .type_icon {
-  display: inline-block;
-  background: url(/images/blank.png) no-repeat left 50%;
-}
-#usage_report .wiki_page .type_icon {
-  background: url(/images/file.png) no-repeat left 50%;
-}
-#usage_report .attachment .type_icon {
-  background-image: url(/images/file_download.png);
-}
-#usage_report .discussion_topic .type_icon {
-  background-image: url(/images/word_bubble.png);
-}
-#usage_report .assignment .type_icon {
-  background-image: url(/images/assignment.png);
-}
-#usage_report .quiz .type_icon {
-  background-image: url(/images/quiz.png);
-}
-</style>
-<% end %>
 <div id="usage_report">
-<table>
+<table class="ic-Table">
   <thead>
     <tr>
       <th><%= t('table_headings.content', %{Content}) %></th>
@@ -70,7 +26,7 @@
     <% @accesses.each do |access| %>
       <tr class="access <%= access.asset_class_name %>">
         <td class="name_holder">
-          <span class="type_icon" title="<%= access.asset.class if access.asset %>"><%= image_tag "blank.png", :alt => '', :style => "height: 20px;" %></span>
+          <i class="icon <%= access.icon %>" aria-hidden="true"></i>
           <span class="readable_name"><%= access.readable_name %></span>
         </td>
         <td class="view_score"><%= round_if_whole(access.corrected_view_score) %></td>
@@ -80,7 +36,7 @@
     <% end %>
     <tr class="access blank" style="display: none;">
       <td class="name_holder">
-        <span class="type_icon"><%= image_tag "blank.png", :alt => '', :style => "height: 20px;" %></span>
+        <i class="icon" aria-hidden="true"></i>
         <span class="readable_name">&nbsp;</span>
       </td>
       <td class="view_score">&nbsp;</td>

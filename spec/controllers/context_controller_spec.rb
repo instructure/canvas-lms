@@ -319,4 +319,34 @@ describe ContextController do
       expect(@attachment.reload).not_to be_deleted
     end
   end
+
+  describe "GET 'roster_user_usage'" do
+    before(:once) do
+      page = @course.wiki.wiki_pages.create(:title => "some page")
+      AssetUserAccess.create!({
+        user_id: @student,
+        asset_code: page.asset_string,
+        context: @course,
+        category: 'pages'
+      })
+    end
+
+    it "returns accesses" do
+      user_session(@teacher)
+
+      get :roster_user_usage, course_id: @course.id, user_id: @student.id
+
+      expect(response).to be_success
+      expect(assigns[:accesses].length).to eq 1
+    end
+
+    it "returns json" do
+      user_session(@teacher)
+
+      get :roster_user_usage, course_id: @course.id, user_id: @student.id, format: :json
+
+      expect(response).to be_success
+      expect(JSON.parse(response.body.gsub("while(1);", "")).length).to eq 1
+    end
+  end
 end
