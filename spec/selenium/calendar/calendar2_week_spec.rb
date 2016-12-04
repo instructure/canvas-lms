@@ -311,11 +311,11 @@ describe "calendar2" do
       end
 
       it "should extend all day event by dragging", priority: "2", test_id: 138884 do
-        start_at_time = Time.zone.today.at_beginning_of_week.beginning_of_day
+        start_at_time = Time.zone.today.at_beginning_of_week(:sunday).beginning_of_day
         event = make_event(title: 'Event1', start: start_at_time, all_day: true)
         load_week_view
         drag_and_drop_element(f('.fc-resizer'),
-                              f('.fc-row .fc-content-skeleton td:nth-of-type(5)'))
+                              f('.fc-row .fc-content-skeleton td:nth-of-type(4)'))
         event.reload
         expect(event.end_at).to eq(start_at_time + 3.days)
       end
