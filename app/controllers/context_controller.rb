@@ -223,7 +223,8 @@ class ContextController < ApplicationController
         }
       })
       if manage_students || manage_admins
-        js_env({:ROOT_ACCOUNT_NAME => @domain_root_account.name})
+        js_env :ROOT_ACCOUNT_NAME => @domain_root_account.name,
+          :STUDENT_CONTEXT_CARDS_ENABLED => @domain_root_account.feature_enabled?(:student_context_cards)
         if @context.root_account.open_registration? || @context.root_account.grants_right?(@current_user, session, :manage_user_logins)
           js_env({:INVITE_USERS_URL => course_invite_users_url(@context)})
         end

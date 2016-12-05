@@ -47,7 +47,12 @@ define [
       json = super
       @permissionsJSON json
       @observerJSON json
+      @contextCardJSON json
       json
+
+    contextCardJSON: (json) ->
+      if enrollment = _.find(json.enrollments, (e) -> e.role == "StudentEnrollment")
+        json.course_id = enrollment.course_id
 
     permissionsJSON: (json) ->
       json.url = "#{ENV.COURSE_ROOT_URL}/users/#{@model.get('id')}"
