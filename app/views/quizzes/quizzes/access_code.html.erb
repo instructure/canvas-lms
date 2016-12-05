@@ -1,7 +1,8 @@
-<% 
+<%
   add_crumb(@quiz.quiz_title, context_url(@context, :context_quiz_url, @quiz))
   content_for :page_title, join_title(@quiz.quiz_title, @context.name)
   css_bundle :quizzes
+  js_bundle :quizzes_bundle
 %>
 
 <div style="width: 600px; margin: 10px auto;">
@@ -11,7 +12,7 @@
   <% else %>
     <%= t(:quiz_restricted, "This quiz is restricted by an access code. You'll need to ask your teacher or proctor to type in or tell you the access code in order to take the quiz.") %>
   <% end %></p>
-  <%= form_tag request.url, :method => :post do %>
+  <%= form_tag request.url, :class => "access_code_form", :method => :post do %>
     <% if params[:preview] && can_do(@quiz, @current_user, :update) %>
       <input type="hidden" name="preview" value="1"/>
     <% end %>

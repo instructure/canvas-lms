@@ -4,6 +4,7 @@ require [
   'quizzes'
   'supercalc'
   'quiz_rubric'
+  'compiled/quizzes/access_code'
 ], ($, QuizArrowApplicator) ->
 
   $('#show_question_details').on 'click', (e)->

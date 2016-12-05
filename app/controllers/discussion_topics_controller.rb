@@ -465,7 +465,8 @@ class DiscussionTopicsController < ApplicationController
       append_sis_data(js_hash)
 
       if @context.feature_enabled?(:multiple_grading_periods)
-        js_hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
+        gp_context = @context.is_a?(Group) ? @context.context : @context
+        js_hash[:active_grading_periods] = GradingPeriod.json_for(gp_context, @current_user)
       end
 
       js_env(js_hash)

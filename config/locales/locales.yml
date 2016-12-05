@@ -34,6 +34,10 @@ fr:
   locales:
     fr: Français
   bigeasy_locale: fr_FR
+fr-CA:
+  locales:
+    fr-CA: Français (Canada)
+  fullcalendar_locale: fr
 he:
   locales:
     he: עברית (crowd-sourced)

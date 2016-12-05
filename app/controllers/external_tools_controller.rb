@@ -243,8 +243,7 @@ class ExternalToolsController < ApplicationController
         return
       end
 
-      context_module = module_item.context_module
-      unless context_module
+      unless module_item.context_module_id.present?
         @context.errors.add(:module_item_id, 'The content tag with the specified id is not a content item')
         render :json => @context.errors, :status => :bad_request
         return
@@ -292,7 +291,7 @@ class ExternalToolsController < ApplicationController
     if launch_url && launch_type != 'module_item'
       @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
     elsif launch_type == 'module_item'
-      @tool = ContextExternalTool.find_external_tool(module_item.url, context_module, module_item.content_id)
+      @tool = ContextExternalTool.find_external_tool(module_item.url, @context, module_item.content_id)
     else
       return unless find_tool(tool_id, launch_type)
     end
