@@ -295,6 +295,11 @@ class AssignmentGroupsController < ApplicationController
     assignments_by_group = assignments.group_by(&:assignment_group_id)
     preloaded_attachments = user_content_attachments(assignments, context)
 
+    unless assignment_excludes.include?('has_due_date_in_closed_grading_period')
+      closed_grading_period_hash =
+        EffectiveDueDates.for_course(context, assignments).to_hash([:in_closed_grading_period])
+    end
+
     groups.map do |group|
       group.context = context
       group_assignments = assignments_by_group[group.id] || []
@@ -307,7 +312,8 @@ class AssignmentGroupsController < ApplicationController
         assignment_visibilities: assignment_visibilities(context, assignments),
         exclude_response_fields: assignment_excludes,
         include_overrides: include_overrides,
-        submissions: submissions
+        submissions: submissions,
+        closed_grading_period_hash: closed_grading_period_hash
       }
 
       assignment_group_json(group, current_user, session, params[:include], options)

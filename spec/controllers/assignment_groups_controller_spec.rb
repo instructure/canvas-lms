@@ -235,6 +235,20 @@ describe AssignmentGroupsController do
         expect(json[0]['assignments'][0]['submission']).to be_present
         expect(json[0]['assignments'][0]['submission']['id']).to eq @submission.id
       end
+
+      it 'only makes the call to get effective due dates once when assignments are included' do
+        @course.assignments.create!
+        stub = EffectiveDueDates.for_course(@course)
+        EffectiveDueDates.expects(:for_course).once.returns(stub)
+        api_call_as_user(@teacher, :get,
+          "/api/v1/courses/#{@course.id}/assignment_groups", {
+          controller: 'assignment_groups',
+          action: 'index',
+          format: 'json',
+          course_id: @course.id,
+          include: ['assignments']
+        })
+      end
     end
   end
 
