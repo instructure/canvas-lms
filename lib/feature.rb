@@ -333,7 +333,7 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,
-      development: true,
+      development: false,
       root_opt_in: false
     },
     'use_new_tree' =>

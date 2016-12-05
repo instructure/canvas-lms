@@ -4292,6 +4292,9 @@ mi:
   count_students_30e46120: 
     one: "1 ngā ākonga "
     other: "%{count} ngā ākonga "
+  count_students_in_percentile_percentile_d0adecfe: 
+    one: "1 ākonga i roto i te ōrau %{percentile}"
+    other: "%{count} Ngā ākonga i roto i te ōrau %{percentile}"
   count_students_will_get_num_points_c970fc01: 
     one: "1 ka whiwhi ngā ākonga %{num} ngā"
     other: "%{count} ka whiwhi ngā ākonga %{num} ngā"
@@ -12024,6 +12027,7 @@ mi:
       name: VeriCite
     vericite_settings: 
       default_assignment_settings: "**Taunoa Taumahi Tautuhinga**"
+      default_comments_settings: "*Ka kitea e ngā akonga te kuputuhi e whakaurutia ana i kōnei i te wā e tukuna ana te taumahi.*"
       labels: 
         account_id: "VeriCite Pūkete ID"
         comments: "Ngā Kōrero tāpaetanga"
@@ -12036,6 +12040,7 @@ mi:
         store_in_index: "Putu i roto i te taupū"
         type: "Ka taea e ngā ākonga te kite i te Pūrongo taketake"
       plagiarism_compatibility: "Pānui mo ngā monomai tinihanga hototahi"
+      pledge_description: "*Ka kitea e ngā ākonga te kuputuhi e whakaurutia ana i kōnei i te wā e tukuna ana te taumahi. Ka hiahaitia te ākonga ki te āta titiro i te pouaka mote taunaha  i mua o te tukuna. Mehemea ka waiho ātea, kaore he taunaha e kitea, hiahiatia rānei ki te tuku.*"
     webct_scraper_settings: 
       description: |-
           Mehemea kahore te wharewānanga e whakamahi i ngā "Ngohe Ako" WebCT's (me ngā kura kua tāpae i te WebCT ki roto i ā rātou mahi
@@ -14615,6 +14620,7 @@ mi:
   select_students_for_review_6e004a12: "Tīpako ākonga mō te arotake"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Tīpakohia te kōnae e hiahia ana koe ki te pāhono, tāpiri i te kōnae mā te tīpako \"Kōnae New\" ranei. "
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Tīpako te whārangi e hiahia ana koe ki te whakapā atu, ā tāpiri he whārangi hou mā te tīpako ʻWhārangi Houʻ"
+  select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Tīpako te whārangi e hiahia ana koe ki te whakapā atu ki tēnei *kōwae*, ā tāpiri he whārangi hou mā te tīpako ʻWhārangi Houʻ"
   select_type_of_prerequisite_8d6fa902: "Tīpako te momo titauhia"
   select_video_file_35b61d4e: "Tīpako Kōnae ataata"
   selected_274ce24f: "Kua tīpakohia"
