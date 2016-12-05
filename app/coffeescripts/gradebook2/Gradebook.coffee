@@ -16,7 +16,8 @@ define [
   'compiled/views/InputFilterView'
   'i18n!gradebook2'
   'compiled/gradebook2/GradebookTranslations'
-  'compiled/grade_calculator'
+  'jsx/gradebook/CourseGradeCalculator'
+  'jsx/gradebook/GradingSchemeHelper'
   'compiled/userSettings'
   'spin.js'
   'compiled/SubmissionDetailsDialog'
@@ -56,11 +57,12 @@ define [
   'jsx/context_cards/StudentContextCardTrigger'
 ], (
   $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
-  TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, GradeCalculator, UserSettings,
-  Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
-  SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape, PostGradesStore, PostGradesApp,
-  SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView,
-  GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper, GradingPeriodsAPI
+  TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
+  GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
+  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape,
+  PostGradesStore, PostGradesApp, SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate,
+  RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper,
+  GradingPeriodsAPI
 ) ->
 
   class Gradebook
@@ -679,7 +681,7 @@ define [
       percentage = 0 if isNaN(percentage)
 
       if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
-        letterGrade = GradeCalculator.letter_grade(@options.grading_standard, percentage)
+        letterGrade = GradingSchemeHelper.scoreToGrade(percentage, @options.grading_standard)
 
       templateOpts =
         score: round(val.score, round.DEFAULT)
@@ -713,7 +715,7 @@ define [
     calculateStudentGrade: (student) =>
       if student.loaded and student.initialized
         finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
-        result = GradeCalculator.calculate(
+        result = CourseGradeCalculator.calculate(
           @submissionsForStudent(student),
           @assignmentGroups,
           @options.group_weighting_scheme

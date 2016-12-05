@@ -21,7 +21,8 @@ define([
   'i18n!gradebook',
   'jquery' /* $ */,
   'underscore',
-  'compiled/grade_calculator',
+  'jsx/gradebook/CourseGradeCalculator',
+  'jsx/gradebook/GradingSchemeHelper',
   'compiled/util/round',
   'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -30,7 +31,7 @@ define([
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment, mediaCommentThumbnail */
-], function(INST, I18n, $, _, GradeCalculator, round, htmlEscape) {
+], function(INST, I18n, $, _, CourseGradeCalculator, GradingSchemeHelper, round, htmlEscape) {
 
   function updateStudentGrades() {
     var ignoreUngradedSubmissions = $("#only_consider_graded_assignments").attr('checked');
@@ -38,7 +39,7 @@ define([
     var groupWeightingScheme = ENV.group_weighting_scheme;
     var includeTotal = !ENV.exclude_total;
 
-    var calculatedGrades = GradeCalculator.calculate(
+    var calculatedGrades = CourseGradeCalculator.calculate(
       ENV.submissions,
       ENV.assignment_groups,
       groupWeightingScheme
@@ -113,7 +114,7 @@ define([
     }
 
     if(ENV.grading_scheme) {
-      $(".final_letter_grade .grade").text(GradeCalculator.letter_grade(ENV.grading_scheme, scoreAsPercent));
+      $(".final_letter_grade .grade").text(GradingSchemeHelper.scoreToGrade(scoreAsPercent, ENV.grading_scheme));
     }
 
     $(".revert_all_scores").showIf($("#grades_summary .revert_score_link").length > 0);
