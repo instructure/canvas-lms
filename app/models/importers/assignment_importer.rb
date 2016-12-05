@@ -125,6 +125,7 @@ module Importers
           assoc.summary_data[:saved_comments] ||= {}
           assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
         end
+        assoc.skip_updating_points_possible = true
         assoc.save
 
         item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"

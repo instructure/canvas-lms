@@ -19,6 +19,7 @@
 class Rubric < ActiveRecord::Base
   include Workflow
   attr_accessible :user, :rubric, :context, :points_possible, :title, :description, :reusable, :public, :free_form_criterion_comments, :hide_score_total
+  attr_writer :skip_updating_points_possible
   belongs_to :user
   belongs_to :rubric # based on another rubric
   belongs_to :context, polymorphic: [:course, :account]
