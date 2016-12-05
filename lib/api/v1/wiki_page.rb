@@ -53,7 +53,7 @@ module Api::V1::WikiPage
   end
 
   def wiki_pages_json(wiki_pages, current_user, session)
-    wiki_pages.map { |page| wiki_page_json(page, current_user, session, false) }
+    wiki_pages.map { |page| wiki_page_json(page, current_user, session, true) }
   end
 
   def wiki_page_revision_json(version, current_user, current_session, include_content = true, latest_version = nil)
