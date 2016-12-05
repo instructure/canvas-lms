@@ -146,11 +146,11 @@ class EpubExportsController < ApplicationController
   def create
     if authorized_action(EpubExport.new(course: @context), @current_user, :create)
       @course = Course.find(params[:course_id])
-      @service = EpubExports::CreateService.new(@course, @current_user)
+      @service = EpubExports::CreateService.new(@course, @current_user, :epub_export)
       status = @service.save ? 201 : 422
       respond_to do |format|
         format.json do
-          @course.latest_epub_export = @service.epub_export
+          @course.latest_epub_export = @service.offline_export
           render({
             status: status, json: course_epub_export_json(@course)
           })

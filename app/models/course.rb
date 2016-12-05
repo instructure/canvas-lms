@@ -219,8 +219,9 @@ class Course < ActiveRecord::Base
   has_many :role_overrides, :as => :context
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
-  has_many :epub_exports, -> { order("created_at DESC") }
+  has_many :epub_exports, -> { where("type IS NULL").order("created_at DESC") }
   attr_accessor :latest_epub_export
+  has_many :web_zip_exports, -> { where(type: "WebZipExport") }
   has_many :alerts, -> { preload(:criteria) }, as: :context
   has_many :appointment_group_contexts, :as => :context
   has_many :appointment_groups, :through => :appointment_group_contexts

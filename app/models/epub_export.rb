@@ -14,6 +14,8 @@ class EpubExport < ActiveRecord::Base
   has_one :job_progress, as: :context, class_name: 'Progress'
   validates :course_id, :workflow_state, presence: true
 
+  attr_accessible :course, :user, :content_export
+
   PERCENTAGE_COMPLETE = {
     created: 0,
     exported: 80,
