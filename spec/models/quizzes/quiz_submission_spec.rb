@@ -1486,7 +1486,8 @@ describe Quizzes::QuizSubmission do
 
     describe '#teachers' do
       before(:once) do
-        @quiz_submission = @quiz.quiz_submissions.create!
+        student_in_course(:active_all => true, :course => @course)
+        @quiz_submission = @quiz.quiz_submissions.create!(:user => @student)
         @active_teacher = User.create!
         @active_enrollment = @course.enroll_teacher(@active_teacher)
         @active_enrollment.accept
@@ -1523,6 +1524,14 @@ describe Quizzes::QuizSubmission do
         @active_enrollment.deactivate
         @active_enrollment.reactivate
         expect(@quiz_submission.teachers).to include @active_teacher
+      end
+
+      it "doesn't include section-restricted teachers from other sections" do
+        other_section = @course.course_sections.create!
+        other_teacher = User.create!
+        other_enrollment = @course.enroll_teacher(other_teacher, :section => other_section, :limit_privileges_to_course_section => true)
+        other_enrollment.accept
+        expect(@quiz_submission.teachers).to_not include other_teacher
       end
     end
   end

@@ -782,7 +782,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def teachers
-    quiz.context.teacher_enrollments.active_or_pending.map(&:user)
+    quiz.context.instructors_in_charge_of(user)
   end
 
   def assign_validation_token
