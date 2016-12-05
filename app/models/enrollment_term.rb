@@ -152,7 +152,7 @@ class EnrollmentTerm < ActiveRecord::Base
     # detect will cause the whole collection to load; that's fine, it's a small collection, and
     # we'll probably call enrollment_dates_for multiple times in a single request, so we want
     # it cached, rather than using .scoped which would force a re-query every time
-    override = enrollment_dates_overrides.detect { |override| override.enrollment_type == enrollment.type.to_s}
+    override = enrollment_dates_overrides.detect { |ov| ov.enrollment_type == enrollment.type.to_s}
 
     # ignore the start dates as admin
     [ override.try(:start_at) || (enrollment.admin? ? nil : start_at), override.try(:end_at) || end_at ]
@@ -160,7 +160,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
   # return the term dates applicable to the given enrollment(s)
   def overridden_term_dates(enrollments)
-    dates = enrollments.uniq { |enrollment| enrollment.type }.map { |enrollment| enrollment_dates_for(enrollment) }
+    dates = enrollments.uniq(&:type).map { |enrollment| enrollment_dates_for(enrollment) }
     start_dates = dates.map(&:first)
     end_dates = dates.map(&:last)
     [start_dates.include?(nil) ? nil : start_dates.min, end_dates.include?(nil) ? nil : end_dates.max]
@@ -182,8 +182,9 @@ class EnrollmentTerm < ActiveRecord::Base
 
   scope :active, -> { where("enrollment_terms.workflow_state<>'deleted'") }
   scope :ended, -> { where('enrollment_terms.end_at < ?', Time.now.utc) }
-  scope :started, -> { where('enrollment_terms.start_at < ?', Time.now.utc) }
+  scope :started, -> { where('enrollment_terms.start_at IS NULL OR enrollment_terms.start_at < ?', Time.now.utc) }
   scope :not_ended, -> { where('enrollment_terms.end_at IS NULL OR enrollment_terms.end_at >= ?', Time.now.utc) }
-  scope :not_started, -> { where('enrollment_terms.start_at IS NULL OR enrollment_terms.start_at > ?', Time.now.utc) }
+  scope :not_started, -> { where('enrollment_terms.start_at IS NOT NULL AND enrollment_terms.start_at > ?', Time.now.utc) }
+  scope :not_default, -> { where.not(name: EnrollmentTerm::DEFAULT_TERM_NAME)}
   scope :by_name, -> { order(best_unicode_collation_key('name')) }
 end
