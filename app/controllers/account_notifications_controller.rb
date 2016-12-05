@@ -75,7 +75,7 @@
 class AccountNotificationsController < ApplicationController
   include Api::V1::AccountNotifications
   before_filter :require_user
-  before_filter :require_account_admin, except: [:user_index, :user_close_notification]
+  before_filter :require_account_admin, except: [:user_index, :user_close_notification, :show]
 
   # @API Index of active global notification for the user
   # Returns a list of all global notifications in the account for this user
@@ -99,7 +99,7 @@ class AccountNotificationsController < ApplicationController
   #   curl -H 'Authorization: Bearer <token>' \
   #   https://<canvas>/api/v1/accounts/2/users/4/account_notifications/4
   #
-  # @returns [AccountNotification]
+  # @returns AccountNotification
   def show
     notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     notification = AccountNotification.find(params[:id])
