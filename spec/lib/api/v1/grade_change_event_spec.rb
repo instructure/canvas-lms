@@ -62,7 +62,7 @@ describe Api::V1::GradeChangeEvent do
     @domain_root_account = Account.default
 
     course_with_teacher(account: @domain_root_account)
-    course_with_student_logged_in(course: @course)
+    course_with_student(course: @course)
 
     @page_view = PageView.new { |p|
       p.assign_attributes({

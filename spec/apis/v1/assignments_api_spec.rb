@@ -337,7 +337,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
     describe "assignment bucketing" do
       before :once do
-        course_with_student_logged_in(:active_all => true)
+        course_with_student(:active_all => true)
         @student1 = @user
         @section = @course.course_sections.create!(name: "test section")
         student_in_section(@section, user: @student1)
@@ -368,6 +368,10 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         # student2 overrides
         create_section_override_for_assignment(@past_assignment, {course_section: @section2, due_at: (Time.now - 10.days)})
         create_section_override_for_assignment(@far_future_assignment, {course_section: @section2, due_at: (Time.now - 10.days)})
+      end
+
+      before :each do
+        user_session(@student1)
       end
 
       it "returns an error with an invalid bucket" do
@@ -448,9 +452,13 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       context "as an observer" do
         before :once do
           @observer = User.create
-          user_session(@observer)
           @user = @observer
         end
+
+        before :each do
+          user_session(@observer)
+        end
+
         it "should get the same results as a student when only observing one student" do
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
           @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
@@ -532,11 +540,15 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       before :once do
-        course_with_teacher_logged_in(active_all: true)
+        course_with_teacher(active_all: true)
         @assignment = @course.assignments.create(name: 'differentiated assignment')
         section = @course.course_sections.create!(name: "second test section")
         create_section_override_for_assignment(@assignment, {course_section: section})
         assignment_override_model(assignment: @assignment, set_type: 'Noop', title: 'Just a Tag')
+      end
+
+      before :each do
+        user_session(@teacher)
       end
 
       it "should include overrides if overrides flag is included in the params" do

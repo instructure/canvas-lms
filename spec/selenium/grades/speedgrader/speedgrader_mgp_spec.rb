@@ -30,6 +30,9 @@ describe "speedgrader - multiple grading periods" do
       create_multiple_grading_periods(term_name)
       add_teacher_and_student
       associate_course_to_term(term_name)
+    end
+
+    before(:each) do
       user_session(@teacher)
     end
 

@@ -36,7 +36,6 @@ describe EpubExportsController do
 
     context "with user" do
       before(:once) do
-        user_session(@student)
         @n = @student.courses.count
         @n_more = 4
         create_courses(@n_more, {
@@ -46,6 +45,10 @@ describe EpubExportsController do
         @student.enrollments.last.update_attribute(
           :workflow_state, 'completed'
         )
+      end
+
+      before(:each) do
+        user_session(@student)
       end
 
       it "should assign collection of courses and render" do

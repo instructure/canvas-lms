@@ -261,7 +261,7 @@ describe Submission do
 
   context "Discussion Topic" do
     it "should use correct date for its submitted_at value" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "some topic")
       @assignment = @course.assignments.create(:title => "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'
@@ -278,7 +278,7 @@ describe Submission do
     end
 
     it "should not create multiple versions on submission for discussion topics" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "some topic")
       @assignment = @course.assignments.create(:title => "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'

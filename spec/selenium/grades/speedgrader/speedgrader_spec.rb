@@ -528,6 +528,9 @@ describe 'Speedgrader' do
       term.update_attribute :grading_period_group, gpg
 
       @assignment = @course.assignments.create! name: "aaa", due_at: 2.years.ago
+    end
+
+    before(:each) do
       user_session(@teacher)
     end
 

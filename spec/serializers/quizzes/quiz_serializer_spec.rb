@@ -215,7 +215,7 @@ describe Quizzes::QuizSerializer do
   describe "takeable" do
     before { skip }
     before do
-      course_with_teacher_logged_in(active_all: true)
+      course_with_teacher(active_all: true)
       course_quiz(true)
       quiz_with_graded_submission([], user: @teacher, quiz: @quiz)
       @serializer = quiz_serializer(quiz_submissions: { @quiz.id => @quiz_submission })
@@ -252,11 +252,11 @@ describe Quizzes::QuizSerializer do
   describe "preview_url" do
 
     it "is only present when the user can grade the quiz" do
-      course_with_teacher_logged_in(active_all: true)
+      course_with_teacher(active_all: true)
       course_quiz(true)
       expect(quiz_serializer(scope: @teacher).as_json[:quiz][:preview_url]).
         to eq controller.send(:course_quiz_take_url, @quiz.context, @quiz, preview: '1')
-      course_with_student_logged_in(active_all: true, course: @course)
+      course_with_student(active_all: true, course: @course)
       expect(quiz_serializer(scope: @student).as_json[:quiz]).not_to have_key :preview_url
     end
   end
@@ -302,7 +302,7 @@ describe Quizzes::QuizSerializer do
       context "when user may grade" do
 
         it "sends the url for all submissions" do
-          course_with_teacher_logged_in(active_all: true)
+          course_with_teacher(active_all: true)
           quiz_with_graded_submission([], course: @course)
           serializer = quiz_serializer(scope: @teacher)
           expect(serializer.as_json[:quiz]['links']['student_quiz_submissions']).to eq(
@@ -311,7 +311,7 @@ describe Quizzes::QuizSerializer do
         end
 
         it "sends the url when no student_quiz_submissions are present" do
-          course_with_teacher_logged_in(active_all: true)
+          course_with_teacher(active_all: true)
           serializer = quiz_serializer(scope: @teacher)
           expect(serializer.as_json[:quiz]['links']['student_quiz_submissions']).to eq(
             controller.send(:api_v1_course_quiz_submissions_url, @quiz.context.id, @quiz.id)
@@ -323,7 +323,7 @@ describe Quizzes::QuizSerializer do
       context "when user may not grade" do
 
         it "sends nil" do
-          course_with_student_logged_in(active_all: true)
+          course_with_student(active_all: true)
           quiz_with_graded_submission([], user: @student, course: @course)
           serializer = quiz_serializer(scope: @student)
           expect(serializer.as_json[:quiz]['links']['student_quiz_submissions']).to be_nil
@@ -336,7 +336,7 @@ describe Quizzes::QuizSerializer do
     describe "quiz_submission" do
       before { skip }
       it "includes the quiz_submission in the response if it is present" do
-        course_with_student_logged_in(active_all: true)
+        course_with_student(active_all: true)
         quiz_with_graded_submission([], user: @student, course: @course)
         serializer = quiz_serializer(scope: @student)
         json = serializer.as_json
@@ -382,7 +382,7 @@ describe Quizzes::QuizSerializer do
     describe "submitted_students" do
       before { skip }
       it "sends nil if user can't grade" do
-        course_with_student_logged_in(active_all: true)
+        course_with_student(active_all: true)
         @quiz.unstub(:check_right?)
         @quiz.unstub(:grants_right?)
         serializer = quiz_serializer(scope: @student)
@@ -390,8 +390,8 @@ describe Quizzes::QuizSerializer do
       end
 
       it "sends a url if there are submissions and user can grade" do
-        course_with_teacher_logged_in(active_all: true)
-        course_with_student_logged_in(active_all: true, course: @course)
+        course_with_teacher(active_all: true)
+        course_with_student(active_all: true, course: @course)
         quiz_with_graded_submission([], user: @student, course: @course)
         serializer = quiz_serializer(scope: @teacher)
         expect(serializer.as_json[:quiz]['links']['submitted_students']).
@@ -407,15 +407,15 @@ describe Quizzes::QuizSerializer do
       it "sends nil if user can't grade" do
         @quiz.unstub(:check_right?)
         @quiz.unstub(:grants_right?)
-        course_with_student_logged_in(active_all: true)
+        course_with_student(active_all: true)
         serializer = quiz_serializer(scope: @student)
         expect(serializer.as_json[:quiz]['links']).not_to have_key 'unsubmitted_students'
       end
 
       it "sends a url if there are submissions and user can grade" do
-        course_with_teacher_logged_in(active_all: true)
-        course_with_student_logged_in(active_all: true, course: @course)
-        course_with_student_logged_in(active_all: true, course: @course)
+        course_with_teacher(active_all: true)
+        course_with_student(active_all: true, course: @course)
+        course_with_student(active_all: true, course: @course)
         quiz_with_graded_submission([], user: @student, course: @course)
         serializer = quiz_serializer(scope: @teacher)
         expect(serializer.as_json[:quiz]['links']['unsubmitted_students']).
@@ -486,7 +486,7 @@ describe Quizzes::QuizSerializer do
   end
 
   it 'displays overridden dates for students' do
-    course_with_student_logged_in(active_all: true)
+    course_with_student(active_all: true)
     course_quiz(true)
     serializer = quiz_serializer(scope: @student)
     student_overrides = {
@@ -550,7 +550,7 @@ describe Quizzes::QuizSerializer do
   describe "only_visible_to_overrides" do
     context "as a teacher" do
       before :once do
-        course_with_teacher_logged_in(active_all: true)
+        course_with_teacher(active_all: true)
         course_quiz(true)
       end
 
@@ -568,7 +568,7 @@ describe Quizzes::QuizSerializer do
 
     context "as a student" do
       before :once do
-        course_with_student_logged_in(active_all: true)
+        course_with_student(active_all: true)
         course_quiz(true)
       end
 

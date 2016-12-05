@@ -1942,7 +1942,7 @@ describe User do
     end
 
     it "should not include unpublished assignments" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       assignment_quiz([], :course => @course, :user => @user)
       @assignment.unpublish
       @quiz.unlock_at = 1.hour.ago
@@ -1959,7 +1959,7 @@ describe User do
     end
 
     it "should not include assignments from soft concluded courses" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
       assignment_quiz([], :course => @course, :user => @user)
       @quiz.unlock_at = nil
@@ -1973,7 +1973,7 @@ describe User do
     end
 
     it "should always have the only_visible_to_overrides attribute" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       assignment_quiz([], :course => @course, :user => @user)
       @quiz.unlock_at = nil
       @quiz.lock_at = nil
@@ -1985,7 +1985,7 @@ describe User do
 
     def create_course_with_assignment_needing_submitting(opts={})
       student = opts[:student]
-      course_with_student_logged_in(:active_all => true, :user => student)
+      course_with_student(:active_all => true, :user => student)
       @course.enrollments.each(&:destroy_permanently!) #student removed from default section
       section = @course.course_sections.create!
       student_in_section(section, user: student)
@@ -2100,7 +2100,7 @@ describe User do
 
   describe "submissions_needing_peer_review" do
     before(:each) do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       @assessor = @student
       assignment_model(course: @course, peer_reviews: true)
       @submission = submission_model(assignment: @assignment)

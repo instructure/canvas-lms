@@ -1342,7 +1342,7 @@ describe Quizzes::QuizSubmission do
     describe "#questions_regraded_since_last_attempt" do
       before :once do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
-        course_with_teacher_logged_in(active_all: true, course: @course)
+        course_with_teacher(active_all: true, course: @course)
 
         @submission = @quiz.quiz_submissions.build
         @submission.workflow_state = "complete"
