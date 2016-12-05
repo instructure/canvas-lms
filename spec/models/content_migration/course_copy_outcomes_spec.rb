@@ -321,5 +321,33 @@ describe ContentMigration do
       asmnt2 = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       expect(asmnt2.rubric.id).to eq rub.id
     end
+
+    it "should restore deleted learning outcome groups on re-copy" do
+      default = @copy_from.root_outcome_group
+      log = @copy_from.learning_outcome_groups.new
+      log.context = @copy_from
+      log.title = "outcome group"
+      log.description = "<p>Groupage</p>"
+      log.save!
+      default.adopt_outcome_group(log)
+
+      lo = @copy_from.created_learning_outcomes.new
+      lo.context = @copy_from
+      lo.short_description = "outcome1"
+      lo.workflow_state = 'active'
+      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.save!
+
+      log.add_outcome(lo)
+
+      run_course_copy
+
+      group = @copy_to.learning_outcome_groups.where(migration_id: mig_id(log)).first
+      group.destroy!
+
+      run_course_copy
+
+      expect(group.reload).to be_active
+    end
   end
 end
