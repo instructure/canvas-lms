@@ -1873,6 +1873,7 @@ class User < ActiveRecord::Base
                   AND (submission_comment_participants.participation_type = ?)
                   AND (submission_comment_participants.user_id = ?)
                   AND (submission_comments.author_id <> ?)
+                  AND (submission_comments.draft IS NOT TRUE)
                 GROUP BY submission_id
               ) AS relevant_submission_comments ON submissions.id = submission_id
               INNER JOIN #{Assignment.quoted_table_name} ON assignments.id = submissions.assignment_id

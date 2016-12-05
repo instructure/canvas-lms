@@ -1335,7 +1335,7 @@ class Submission < ActiveRecord::Base
   end
 
   def last_teacher_comment
-    submission_comments.reverse.find{|com| com.author_id != user_id}
+    submission_comments.published.reverse.find{ |com| com.author_id != user_id }
   end
 
   def has_submission?

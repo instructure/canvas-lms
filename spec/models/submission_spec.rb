@@ -1889,6 +1889,22 @@ describe Submission do
       expect(comment).not_to be_draft
     end
   end
+
+  describe "#last_teacher_comment" do
+    before(:once) do
+      submission_spec_model
+    end
+
+    it "returns the last published comment made by the teacher" do
+      @submission.add_comment(author: @teacher, comment: "how is babby formed")
+      expect(@submission.last_teacher_comment).to be_present
+    end
+
+    it "does not include draft comments" do
+      @submission.add_comment(author: @teacher, comment: "how is babby formed", draft_comment: true)
+      expect(@submission.last_teacher_comment).to be_nil
+    end
+  end
 end
 
 def submission_spec_model(opts={})
