@@ -305,7 +305,8 @@ class GradebooksController < ApplicationController
     else
       Setting.get('gradebook2.many_submissions_chunk_size', '10').to_i
     end
-    js_env  :GRADEBOOK_OPTIONS => {
+    js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+    js_env :GRADEBOOK_OPTIONS => {
       :chunk_size => chunk_size,
       :assignment_groups_url => api_v1_course_assignment_groups_url(
         @context,
@@ -337,7 +338,7 @@ class GradebooksController < ApplicationController
       :context_url => named_context_url(@context, :context_url),
       :download_assignment_submissions_url => named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", :zip => 1),
       :re_upload_submissions_url => named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
-      :context_id => @context.id,
+      :context_id => @context.id.to_s,
       :context_code => @context.asset_string,
       :context_sis_id => @context.sis_source_id,
       :group_weighting_scheme => @context.group_weighting_scheme,

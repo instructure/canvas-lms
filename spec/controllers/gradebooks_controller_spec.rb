@@ -504,6 +504,27 @@ describe GradebooksController do
       get "show", :course_id => @course.id
       assert_unauthorized
     end
+
+    context "includes student context card info in ENV" do
+      before { user_session(@teacher) }
+
+      it "includes context_id" do
+        get :show, course_id: @course.id
+        context_id = assigns[:js_env][:GRADEBOOK_OPTIONS][:context_id]
+        expect(context_id).to eq @course.id.to_param
+      end
+
+      it "doesn't enable context cards when feature is off" do
+        get :show, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq false
+      end
+
+      it "enables context cards when feature is on" do
+        @course.root_account.enable_feature! :student_context_cards
+        get :show, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
+      end
+    end
   end
 
   describe "GET 'change_gradebook_version'" do

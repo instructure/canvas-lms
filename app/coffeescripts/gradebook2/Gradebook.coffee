@@ -53,6 +53,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
+  'jsx/context_cards/StudentContextCardTrigger'
 ], (
   $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, GradeCalculator, UserSettings,
@@ -340,6 +341,8 @@ define [
         I18n.t 'inactive'
 
       student.display_name = RowStudentNameTemplate
+        student_id: student.id
+        course_id: ENV.GRADEBOOK_OPTIONS.context_id
         avatar_url: student.avatar_url
         display_name: displayName
         enrollment_status: enrollmentStatus
