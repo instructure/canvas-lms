@@ -7,9 +7,9 @@ require [
   'i18n!dashboard'
   'compiled/util/newCourseForm'
   'jst/dashboard/show_more_link'
-  'jsx/dashboard_card/RecentActivityToggle'
+  'jsx/dashboard_card/DashboardOptionsMenu'
   'jquery.disableWhileLoading'
-], (_, {View}, $, React, ReactDOM, I18n, newCourseForm, showMoreTemplate, RecentActivityToggle) ->
+], (_, {View}, $, React, ReactDOM, I18n, newCourseForm, showMoreTemplate, DashboardOptionsMenu) ->
 
   if ENV.DASHBOARD_SIDEBAR_URL
     rightSide = $('#right-side')
@@ -19,13 +19,13 @@ require [
         newCourseForm()
     )
 
-  recentActivityToggleContainer =
-    document.getElementById('RecentActivityToggle_Container')
-  if recentActivityToggleContainer?
-    toggleElement = React.createElement(RecentActivityToggle, {
+  dashboardOptionsMenuContainer =
+    document.getElementById('DashboardOptionsMenu_Container')
+  if dashboardOptionsMenuContainer?
+    dashboardOptionsMenu = React.createElement(DashboardOptionsMenu, {
       recent_activity_dashboard: ENV.PREFERENCES.recent_activity_dashboard
     })
-    ReactDOM.render(toggleElement, recentActivityToggleContainer)
+    ReactDOM.render(dashboardOptionsMenu, dashboardOptionsMenuContainer)
 
   class DashboardView extends View
 
