@@ -1,5 +1,12 @@
 <fieldset id="sis_integration_settings">
   <legend><%= t("SIS Integration Settings") %></legend>
+  <%= f.label :sis_name, t("If you wish, you can rename \"SIS\" to something more familiar to your staff") %>
+  <div class="sis-name">
+    <%= f.fields_for :settings do |settings| %>
+      <%= settings.label :sis_name, t("SIS friendly name") %>
+      <%= settings.text_field :sis_name, :value => @account.settings[:sis_name], :maxlength => 255, :disabled => !@account.root_account? %>
+    <% end %>
+  </div>
   <div>
     <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
     <%= f.label :allow_sis_import, t("SIS imports") %>

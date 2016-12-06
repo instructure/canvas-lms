@@ -68,6 +68,7 @@ describe "admin settings tab" do
     let(:sis_syncing_locked) { "#account_settings_sis_syncing_locked" }
     let(:default_grade_export) { "#account_settings_sis_default_grade_export_value" }
     let(:require_assignment_due_date) { "#account_settings_sis_require_assignment_due_date_value" }
+    let(:sis_name) { "#account_settings_sis_name" }
 
     def test_checkbox_on_off(id)
       set_checkbox_via_label(id,true)
@@ -116,10 +117,35 @@ describe "admin settings tab" do
       end
     end
 
-    context ":new_sis_integrations => true" do
+    context ":new_sis_integrations => true (sub account)" do
+      before do
+        account.set_feature_flag! :new_sis_integrations, 'on'
+        get_settings_page(sub_account)
+      end
+
+      it "should have SIS name setting disabled for sub accounts" do
+        name_setting = f(sis_name)
+        expect(name_setting.displayed?).to be_truthy
+        expect(name_setting.enabled?).to be_falsey
+      end
+    end
+
+    context ":new_sis_integrations => true (root account)" do
       before do
         account.set_feature_flag! :new_sis_integrations, 'on'
         get_settings_page(account)
+      end
+
+      it "should persist custom SIS name" do
+        custom_sis_name = "PowerSchool"
+        f(sis_name).send_keys(custom_sis_name)
+        f(".Button--primary").click
+        name = f(sis_name)
+        keep_trying_until do
+          expect(name.attribute("value")).to eq custom_sis_name
+        end
+        click_submit
+        expect(name.attribute("value")).to eq(custom_sis_name)
       end
 
       it "persists SIS import settings on refresh" do

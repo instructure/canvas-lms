@@ -193,6 +193,7 @@ describe "accounts/settings.html.erb" do
       end
 
       context "new_sis_integrations => true" do
+        let(:sis_name) { "input#account_settings_sis_name" }
         let(:allow_sis_import) { "input#account_allow_sis_import" }
         let(:sis_syncing) { "input#account_settings_sis_syncing_value" }
         let(:sis_syncing_locked) { "input#account_settings_sis_syncing_locked" }
@@ -215,6 +216,7 @@ describe "accounts/settings.html.erb" do
           it { expect(response).to     have_tag(require_assignment_due_date) }
           it { expect(response).not_to have_tag("#sis_grade_export_settings") }
           it { expect(response).not_to have_tag("#old_sis_integrations") }
+          it { expect(response).to     have_tag(sis_name) }
         end
 
         context "SIS syncing enabled" do
@@ -233,6 +235,7 @@ describe "accounts/settings.html.erb" do
               expect(response).not_to have_tag("#{sis_syncing_locked}[disabled]")
               expect(response).not_to have_tag("#{default_grade_export}[disabled]")
               expect(response).not_to have_tag("#{require_assignment_due_date}[disabled]")
+              expect(response).not_to have_tag("#{sis_name}[disabled]")
             end
           end
 
@@ -240,7 +243,7 @@ describe "accounts/settings.html.erb" do
             context "locked" do
               before do
                 @account.stubs(:sis_syncing).returns({value: true, locked: true, inherited: true })
-                do_render(current_user)
+                do_render(current_user, @account)
               end
 
               it "should disable all controls under SIS syncing" do
@@ -266,7 +269,6 @@ describe "accounts/settings.html.erb" do
             end
           end
         end
-
       end
     end
   end
