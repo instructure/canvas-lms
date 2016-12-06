@@ -36,6 +36,10 @@ class SRGB
       f('#student_information .secondary_id')
     end
 
+    def grading_period_dropdown
+      f('#grading_period_select')
+    end
+
     def student_dropdown
       f('#student_select')
     end
@@ -101,6 +105,23 @@ class SRGB
 
     def select_student(student)
       click_option(student_dropdown, student.name)
+    end
+
+    def select_grading_period(grading_period)
+      click_option(grading_period_dropdown, grading_period.title)
+    end
+
+    def enter_grade(grade)
+      replace_content(main_grade_input, grade)
+      tab_out_of_input(main_grade_input)
+    end
+
+    def current_grade
+      main_grade_input['value']
+    end
+
+    def grading_enabled?
+      main_grade_input.enabled?
     end
 
     def grade_srgb_assignment(input, grade)

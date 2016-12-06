@@ -25,7 +25,7 @@ describe "speedgrader - multiple grading periods" do
   include GradebookSetup
 
   context 'with close and end dates' do
-    before(:once) do
+    before(:each) do
       term_name = "First Term"
       create_multiple_grading_periods(term_name)
       add_teacher_and_student
