@@ -356,4 +356,22 @@ describe FilesController do
 
     expect(@folder.file_attachments.by_position_then_display_name).to eq [att2, att1]
   end
+
+  it "should allow file previews for public-to-auth courses" do
+    course(:active_all => true)
+    @course.update_attribute(:is_public_to_auth_users, true)
+
+    att = attachment_model(:uploaded_data => stub_png_data, :context => @course)
+
+    user(:active_all => true)
+    user_session(@user)
+
+    ts, sf_verifier = @user.access_verifier
+    get "/files/#{att.id}", :user_id => @user.id, :ts => ts, :sf_verifier => sf_verifier # set the file access session tokens
+    expect(session['file_access_user_id']).to be_present
+
+    get "/courses/#{@course.id}/files/#{att.id}/file_preview"
+    expect(response.body).to_not include("This file has not been unlocked yet")
+    expect(response.body).to include("/courses/#{@course.id}/files/#{att.id}")
+  end
 end
