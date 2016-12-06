@@ -177,6 +177,15 @@ define([
       }
     }).change();
 
+    $('#account_settings_sis_syncing_value,' +
+      '#account_settings_sis_default_grade_export_value,' +
+      '#account_settings_sis_assignment_name_length_value').change(function() {
+        var attr_id = $(this).attr('id');
+        var $myFieldset = $('#'+ attr_id + '_settings');
+        var iAmChecked = $(this).attr('checked');
+        $myFieldset.showIf(iAmChecked);
+    }).change();
+
     $(".turnitin_account_settings").change(function() {
       $(".confirm_turnitin_settings_link").text(I18n.t('links.turnitin.confirm_settings', "confirm Turnitin settings"));
     });

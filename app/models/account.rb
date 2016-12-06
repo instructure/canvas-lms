@@ -155,6 +155,8 @@ class Account < ActiveRecord::Base
   add_setting :sis_syncing, :boolean => true, :default => false, :inheritable => true
   add_setting :sis_default_grade_export, :boolean => true, :default => false, :inheritable => true
   add_setting :sis_require_assignment_due_date, :boolean => true, :default => false, :inheritable => true
+  add_setting :sis_assignment_name_length, :boolean => true, :default => false, :inheritable => true
+  add_setting :sis_assignment_name_length_input, :inheritable => true
 
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
   add_setting :sub_account_includes, :boolean => true, :default => false
