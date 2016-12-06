@@ -2737,9 +2737,13 @@ class CoursesController < ApplicationController
     if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
       @service = EpubExports::CreateService.new(@context, @current_user, :web_zip_export)
       @service.save
+      title = t('Course Content Downloads')
+      @page_title = title
+      add_crumb(title)
+      js_bundle :webzip_export
+      css_bundle :webzip_export
+      render :text => '<div id="course-webzip-export-app"></div>'.html_safe, :layout => true
     end
-    @page_title = t('Course Content Downloads')
-    render :text => 'Downloads'.html_safe, :layout => true
   end
   private
 
