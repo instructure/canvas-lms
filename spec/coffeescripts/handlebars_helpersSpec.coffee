@@ -253,3 +253,16 @@ define [
      shortFormatPrompt = helpers.datepickerScreenreaderPrompt('date')
      equal(shortFormatPrompt.indexOf(helpers.accessibleDateFormat()), -1)
      ok(shortFormatPrompt.indexOf(helpers.accessibleDateFormat('date')) > -1)
+
+  module 'i18n number helper',
+    setup: ->
+      @ret = '47.00%'
+      @stub(I18n, 'n').returns(@ret)
+
+  test 'proxies to I18n.localizeNumber', ->
+    num = 47
+    precision = 2
+    percentage = true
+    equal helpers.n(num, hash: {precision, percentage}), @ret
+    ok I18n.n.calledWithMatch(num, {precision, percentage})
+
