@@ -73,6 +73,7 @@ SafeYAML::OPTIONS.merge!(
         !ruby/object:URI::HTTPS
         !ruby/object:OpenObject
         !ruby/object:DateTime
+        !ruby/object:BigDecimal
       ]
 )
 

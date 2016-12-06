@@ -191,4 +191,10 @@ YAML
     plugin = Canvas::Plugin.find('canvas_cartridge_importer')
     expect(YAML.unsafe_load(YAML.dump(plugin))).to eq plugin
   end
+
+  it "should be able to dump and load BigDecimals" do
+    hash = {blah: BigDecimal.new("1.2")}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
+
 end
