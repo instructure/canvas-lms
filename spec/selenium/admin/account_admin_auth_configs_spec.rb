@@ -98,6 +98,8 @@ describe 'account authentication' do
         expect(Account.default.authentication_providers.active.count).to eq 3
         expect_new_page_load(true) do
           f('.delete_auth_link').click
+          expect(alert_present?).to be_truthy
+          accept_alert
         end
         expect(Account.default.authentication_providers.active.count).to eq 1
         expect(Account.default.authentication_providers.count).to eq 4
