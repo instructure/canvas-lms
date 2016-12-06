@@ -72,10 +72,10 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration[4.2]
   end
 
   def self.down
-    execute %{DROP TRIGGER delayed_jobs_before_insert_row_tr ON delayed_jobs}
-    execute %{DROP FUNCTION delayed_jobs_before_insert_row_tr_fn()}
-    execute %{DROP TRIGGER delayed_jobs_after_delete_row_tr ON delayed_jobs}
-    execute %{DROP FUNCTION delayed_jobs_after_delete_row_tr_fn()}
+    execute %{DROP TRIGGER delayed_jobs_before_insert_row_tr ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name}}
+    execute %{DROP FUNCTION #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')}()}
+    execute %{DROP TRIGGER delayed_jobs_after_delete_row_tr ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name}}
+    execute %{DROP FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')}()}
 
     remove_column :delayed_jobs, :next_in_strand
     remove_index :delayed_jobs, :name => 'get_delayed_jobs_index'
