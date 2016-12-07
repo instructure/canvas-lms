@@ -34,6 +34,7 @@ module Lti
                   :assignment_menu,
                   :assignment_selection,
                   :collaboration,
+                  :course_assignments_menu,
                   :course_home_sub_navigation,
                   :course_navigation,
                   :course_settings_sub_navigation,

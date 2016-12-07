@@ -472,6 +472,9 @@ describe ExternalToolsController, type: :request do
     et.module_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
     et.quiz_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz menu", display_type: 'full_width', visibility: 'admins'}
     et.wiki_page_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki page menu", display_type: 'full_width', visibility: 'admins'}
+    if context.is_a? Course
+      et.course_assignments_menu = { url: 'http://www.example.com/ims/lti/resource', text: 'course assignments menu' }
+    end
     et.context_external_tool_placements.new(:placement_type => opts[:placement]) if opts[:placement]
     et.save!
     et
@@ -660,7 +663,18 @@ describe ExternalToolsController, type: :request do
      "assignment_selection"=>nil,
      "post_grades"=>nil,
      "collaboration"=>nil,
-     "assignment_configuration"=>nil
+     "assignment_configuration"=>nil,
+     "course_assignments_menu" => begin
+       if et && et.course_assignments_menu
+         {
+           "text" => "course assignments menu",
+           "url" => "http://www.example.com/ims/lti/resource",
+           "label" => "course assignments menu",
+           "selection_width" => 800,
+           "selection_height" => 400
+         }
+       end
+     end
     }
   end
 end

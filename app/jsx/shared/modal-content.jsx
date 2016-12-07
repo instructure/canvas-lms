@@ -6,12 +6,13 @@ define([
     displayName: 'ModalContent',
     getDefaultProps(){
       return {
-        className: "ReactModal__Body"
-      }
+        className: "ReactModal__Body",
+        style: {},
+      };
     },
     render() {
       return (
-        <div className={this.props.className}>
+        <div className={this.props.className} style={this.props.style}>
           {this.props.children}
         </div>
       );

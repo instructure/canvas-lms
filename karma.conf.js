@@ -21,6 +21,7 @@ if (usingWebpack) {
   karmaFiles = [
     'spec/javascripts/support/sinon/sinon-1.17.2.js',
     'spec/javascripts/support/axe.js',
+    'spec/javascripts/support/redux/fakeStore.js',
     {pattern: 'spec/javascripts/webpack/*.bundle.test.js', included: true, served: true},
     {pattern: 'spec/javascripts/fixtures/*', included: false, served: true}
   ];
@@ -32,6 +33,7 @@ if (usingWebpack) {
     'spec/javascripts/support/sinon/sinon-1.17.2.js',
     'spec/javascripts/support/sinon/sinon-qunit-1.0.0.js',
     'spec/javascripts/support/axe.js',
+    'spec/javascripts/support/redux/fakeStore.js',
     {pattern: 'public/javascripts/*.js', included: false, served: true},
     {pattern: 'spec/javascripts/fixtures/*.html', included: false, served: true},
     {pattern: 'spec/javascripts/compiled/*.js', included: false, served: true},

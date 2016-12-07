@@ -77,6 +77,7 @@ define([
         "assignment_configuration":I18n.t("Assignment Configuration"),
         "assignment_menu":I18n.t("Assignment Menu"),
         "collaboration":I18n.t("Collaboration"),
+        "course_assignments_menu":I18n.t("Course Assignments Menu"),
         "course_home_sub_navigation":I18n.t("Course Home Sub Navigation"),
         "course_navigation":I18n.t("Course Navigation"),
         "course_settings_sub_navigation":I18n.t("Course Settings Sub Navigation"),
