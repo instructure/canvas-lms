@@ -100,9 +100,8 @@ describe "admin settings tab" do
         expect(f("body")).not_to contain_css(sis_syncing)
       end
 
-      context "SIS grade export disabled" do
+      context "SIS post grades disabled" do
         before do
-          account.set_feature_flag! :bulk_sis_grade_export, 'off'
           account.set_feature_flag! 'post_grades', 'off'
           get_settings_page(account)
         end
@@ -112,9 +111,8 @@ describe "admin settings tab" do
         end
       end
 
-      context "SIS grade export enabled" do
+      context "SIS post grades enabled" do
         before do
-          account.set_feature_flag! :bulk_sis_grade_export, 'on'
           account.set_feature_flag! 'post_grades', 'on'
           get_settings_page(account)
         end
@@ -154,9 +152,8 @@ describe "admin settings tab" do
         end
       end
 
-      context "SIS grade export disabled" do
+      context "SIS post grades disabled" do
         before do
-          account.set_feature_flag! :bulk_sis_grade_export, 'off'
           account.set_feature_flag! 'post_grades', 'off'
           get_settings_page(account)
         end
@@ -166,9 +163,8 @@ describe "admin settings tab" do
         end
       end
 
-      context "SIS grade export enabled" do
+      context "SIS post grades enabled" do
         before do
-          account.set_feature_flag! :bulk_sis_grade_export, 'on'
           account.set_feature_flag! 'post_grades', 'on'
         end
 
@@ -199,7 +195,6 @@ describe "admin settings tab" do
 
       context "root and sub-accounts" do
         before do
-          account.set_feature_flag! :bulk_sis_grade_export, 'on'
           account.set_feature_flag! 'post_grades', 'on'
         end
 

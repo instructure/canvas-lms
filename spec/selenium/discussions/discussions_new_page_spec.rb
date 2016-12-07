@@ -113,7 +113,7 @@ describe "discussions" do
       context "post to sis default setting" do
         before do
           @account = @course.root_account
-          @account.enable_feature!(:bulk_sis_grade_export)
+          @account.set_feature_flag! 'post_grades', 'on'
         end
 
         it "should default to post grades if account setting is enabled" do

@@ -164,7 +164,7 @@ describe 'creating a quiz' do
   context "post to sis default setting" do
     before do
       account_model
-      @account.enable_feature!(:bulk_sis_grade_export)
+      @account.set_feature_flag! 'post_grades', 'on'
       course_with_teacher_logged_in(:active_all => true, :account => @account)
     end
 
