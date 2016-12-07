@@ -293,11 +293,20 @@ define [
     calculate: (submissionsArray) ->
       GradeCalculator.calculate submissionsArray, @assignmentGroupsHash(), @get('weightingScheme')
 
+    submissionsForStudent: (student) ->
+      allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)
+      return allSubmissions unless @get('mgpEnabled')
+      selectedPeriodID = @get('selectedGradingPeriod.id')
+      return allSubmissions if !selectedPeriodID or selectedPeriodID == '0'
+
+      _.filter allSubmissions, (submission) =>
+        studentPeriodInfo = @get('effectiveDueDates').get(submission.assignment_id)?[submission.user_id]
+        studentPeriodInfo and studentPeriodInfo.grading_period_id == selectedPeriodID
+
     calculateStudentGrade: (student) ->
       if student.isLoaded
         finalOrCurrent = if @get('includeUngradedAssignments') then 'final' else 'current'
-        submissionsAsArray = (value for key, value of student when key.match /^assignment_(?!group)/)
-        result = @calculate(submissionsAsArray)
+        result = @calculate(@submissionsForStudent(student))
         for group in result.group_sums
           set(student, "assignment_group_#{group.group.id}", group[finalOrCurrent])
           for submissionData in group[finalOrCurrent].submissions

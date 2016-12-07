@@ -153,6 +153,56 @@ define [
       equal @srgb.get('assignments.firstObject.name'), 'Can You Eat Just One?'
       equal @srgb.get('assignments.lastObject.name'), 'Drink Water'
 
+  module "#submissionsForStudent",
+    setupThis: (options = {}) ->
+      effectiveDueDates = Ember.ObjectProxy.create(
+        content: {
+          1: { 1: { grading_period_id: "1" } },
+          2: { 1: { grading_period_id: "2" } }
+        }
+      )
+
+      defaults = {
+        mgpEnabled: false,
+        "selectedGradingPeriod.id": null,
+        effectiveDueDates
+      }
+      self = _.defaults options, defaults
+      self.get = (attribute) -> self[attribute]
+      self
+
+    setup: ->
+      @student =
+        id: "1"
+        assignment_1: { assignment_id: "1", user_id: "1", name: "yolo" }
+        assignment_2: { assignment_id: "2", user_id: "1", name: "froyo" }
+
+      setup.call this
+
+    teardown: ->
+      teardown.call this
+
+  test "returns all submissions for the student (multiple grading periods disabled)", ->
+    self = @setupThis()
+    submissions = @srgb.submissionsForStudent.call(self, @student)
+    propEqual _.pluck(submissions, "assignment_id"), ["1", "2"]
+
+  test "returns all submissions if 'All Grading Periods' is selected", ->
+    self = @setupThis(
+      mgpEnabled: true,
+      "selectedGradingPeriod.id": "0",
+    )
+    submissions = @srgb.submissionsForStudent.call(self, @student)
+    propEqual _.pluck(submissions, "assignment_id"), ["1", "2"]
+
+  test "only returns submissions due for the student in the selected grading period", ->
+    self = @setupThis(
+      mgpEnabled: true,
+      "selectedGradingPeriod.id": "2"
+    )
+    submissions = @srgb.submissionsForStudent.call(self, @student)
+    propEqual _.pluck(submissions, "assignment_id"), ["2"]
+
 
   module 'screenreader_gradebook_controller: with selected student',
     setup: ->

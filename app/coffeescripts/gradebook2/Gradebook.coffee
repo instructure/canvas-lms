@@ -208,6 +208,7 @@ define [
       _.contains(activePeriodIds, gradingPeriodId)
 
     getGradingPeriodToShow: () =>
+      return null unless @gradingPeriodsEnabled
       currentPeriodId = UserSettings.contextGet('gradebook_current_grading_period')
       if currentPeriodId && (@isAllGradingPeriods(currentPeriodId) || @gradingPeriodIsActive(currentPeriodId))
         currentPeriodId
@@ -697,11 +698,23 @@ define [
       grade = (score / possible_points) * 100
       round(grade, round.DEFAULT)
 
+    submissionsForStudent: (student) =>
+      allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)
+      return allSubmissions unless @gradingPeriodsEnabled
+      return allSubmissions if !@gradingPeriodToShow or @isAllGradingPeriods(@gradingPeriodToShow)
+
+      _.filter allSubmissions, (submission) =>
+        studentPeriodInfo = @effectiveDueDates[submission.assignment_id]?[submission.user_id]
+        studentPeriodInfo and studentPeriodInfo.grading_period_id == @gradingPeriodToShow
+
     calculateStudentGrade: (student) =>
       if student.loaded and student.initialized
         finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
-        submissionsAsArray = (value for key, value of student when key.match /^assignment_(?!group)/)
-        result = GradeCalculator.calculate(submissionsAsArray, @assignmentGroups, @options.group_weighting_scheme)
+        result = GradeCalculator.calculate(
+          @submissionsForStudent(student),
+          @assignmentGroups,
+          @options.group_weighting_scheme
+        )
         for group in result.group_sums
           student["assignment_group_#{group.group.id}"] = group[finalOrCurrent]
           for submissionData in group[finalOrCurrent].submissions
