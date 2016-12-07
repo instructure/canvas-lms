@@ -128,21 +128,33 @@ class DiscussionTopicsApiController < ApplicationController
         User.where(id: shard_ids).preload({pseudonym: :account}).to_a
       end
 
+      include_context_card_info = value_to_boolean(
+        params[:include_context_card_info]
+      )
       include_enrollment_state = params[:include_enrollment_state] && (@context.is_a?(Course) || @context.is_a?(Group)) &&
         @context.grants_right?(@current_user, session, :read_as_admin)
       enrollments = nil
-      if include_enrollment_state
+      if include_enrollment_state || include_context_card_info
         enrollment_context = @context.is_a?(Course) ? @context : @context.context
         all_enrollments = enrollment_context.enrollments.where(:user_id => participants).to_a
-        Canvas::Builders::EnrollmentDateBuilder.preload_state(all_enrollments)
+        if include_enrollment_state
+          Canvas::Builders::EnrollmentDateBuilder.preload_state(all_enrollments)
+        end
         all_enrollments = all_enrollments.group_by(&:user_id)
       end
 
+      all_enrollments ||= {}
+
       participant_info = participants.map do |participant|
         json = user_display_json(participant, @context.is_a_context? && @context)
+        enrolls = all_enrollments[participant.id] || []
         if include_enrollment_state
-          enrolls = all_enrollments[participant.id] || []
           json[:isInactive] = enrolls.any? && enrolls.all?(&:inactive?)
+        end
+
+        if include_context_card_info
+          json[:is_student] = enrolls.any? { |e| e.type == "StudentEnrollment" }
+          json[:course_id] = enrollment_context.id.to_s
         end
 
         json

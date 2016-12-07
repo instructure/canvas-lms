@@ -22,6 +22,7 @@ require [
   'rubricEditBinding'     # sets up event listener for 'rubricEditDataReady'
   'compiled/jquery/sticky'
   'compiled/jquery/ModuleSequenceFooter'
+  'jsx/context_cards/StudentContextCardTrigger'
 ], (I18n, EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, React, ReactDOM, DiscussionTopicKeyboardShortcutModal, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, DiscussionTopicToolbarView, TopicView, EntriesView, CyoeStats) ->
 
   descendants = 5
