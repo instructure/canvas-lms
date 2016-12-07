@@ -1322,7 +1322,11 @@ ActiveRecord::Associations::Builder::BelongsTo.singleton_class.prepend(SkipTouch
 
 module ReadonlyCloning
   def calculate_changes_from_defaults
-    super unless @readonly_clone # no reason to do this if we're creating a readonly clone - can take a long time with serialized columns
+    if @readonly_clone
+      @changed_attributes = @changed_attributes.dup if @changed_attributes # otherwise changes to the clone will dirty the original
+    else
+      super # no reason to do this if we're creating a readonly clone - can take a long time with serialized columns
+    end
   end
 end
 ActiveRecord::Base.prepend(ReadonlyCloning)
