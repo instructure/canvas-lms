@@ -21,14 +21,14 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
 
   def require_valid_restrictions
     # this may be changed in the future
-    if self.restrictions_changed? && (self.restrictions.keys - [:lock_content, :lock_settings]).any?
+    if self.restrictions_changed? && (self.restrictions.keys - MasterCourses::LOCK_TYPES).any?
       self.errors.add(:restrictions, "Invalid settings")
     end
   end
 
   def mark_touch_content_if_restrictions_tightened
     if !self.new_record? && self.restrictions_changed? && self.restrictions.any?{|type, locked| locked && !self.restrictions_was[type]}
-      @touch_content = true # set if either lock_content or lock_settings is true now when it wasn't before so we'll re-export and overwrite any changed content
+      @touch_content = true # set if restrictions for content or settings is true now when it wasn't before so we'll re-export and overwrite any changed content
     end
   end
 

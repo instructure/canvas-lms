@@ -407,7 +407,7 @@ class ContentMigration < ActiveRecord::Base
     end
 
     if !self.migration_settings.has_key?(:overwrite_quizzes)
-      self.migration_settings[:overwrite_quizzes] = for_course_copy? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
+      self.migration_settings[:overwrite_quizzes] = for_course_copy? || for_master_course_import? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
     end
 
     check_quiz_id_prepender

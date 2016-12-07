@@ -190,7 +190,7 @@ describe MasterCourses::MasterMigration do
       @copy_to = course
       @sub = @template.add_child_course!(@copy_to)
 
-      restrictions = {:lock_content => true, :lock_settings => false}
+      restrictions = {:content => true, :settings => false}
       @template.default_restrictions = restrictions
       @template.save!
 
@@ -211,11 +211,11 @@ describe MasterCourses::MasterMigration do
       expect(att_tag.reload.restrictions).to be_blank # should have left the old one alone
     end
 
-    it "should not overwrite  with default restrictions on export" do
+    it "should not overwrite with default restrictions on export" do
       @copy_to = course
       @sub = @template.add_child_course!(@copy_to)
 
-      restrictions = {:lock_content => true, :lock_settings => false}
+      restrictions = {:content => true, :settings => false}
       @template.default_restrictions = restrictions
       @template.save!
 
@@ -262,6 +262,47 @@ describe MasterCourses::MasterMigration do
 
       expect(@copy_to2.discussion_topics.where(:migration_id => mig_id(topic)).first).to be_present # should bring both in the full
       expect(@copy_to2.wiki.wiki_pages.where(:migration_id => mig_id(page)).first).to be_present
+    end
+
+    it "should skip master course restriction validations on import" do
+      @copy_to = course
+      @template.add_child_course!(@copy_to)
+
+      assmt = @copy_from.assignments.create!
+      topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      ann = @copy_from.announcements.create!(:message => "goodbye")
+      page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      quiz = @copy_from.quizzes.create!
+
+      # TODO: make sure that we skip the validations on each importer when we add the Restrictor and
+      # probably add more content here
+      @template.default_restrictions = {:content => true}
+      @template.save!
+
+      run_master_migration
+
+      copied_assmt = @copy_to.assignments.where(:migration_id => mig_id(assmt)).first
+      copied_topic = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
+      copied_ann = @copy_to.announcements.where(:migration_id => mig_id(ann)).first
+      copied_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+      copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+
+      new_text = "<p>some text here</p>"
+      assmt.update_attribute(:description, new_text)
+      topic.update_attribute(:message, new_text)
+      ann.update_attribute(:message, new_text)
+      page.update_attribute(:body, new_text)
+      quiz.update_attribute(:description, new_text)
+
+      [assmt, topic, ann, page, quiz].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
+
+      run_master_migration # re-copy all the content and overwrite the locked stuff
+
+      expect(copied_assmt.reload.description).to eq new_text
+      expect(copied_topic.reload.message).to eq new_text
+      expect(copied_ann.reload.message).to eq new_text
+      expect(copied_page.reload.body).to eq new_text
+      expect(copied_quiz.reload.description).to eq new_text
     end
 
     context "master courses + external migrations" do

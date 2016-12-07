@@ -28,18 +28,18 @@ describe MasterCourses::MasterContentTag do
     end
 
     it "should not touch when the tag is created" do
-      tag = @template.create_content_tag_for!(@topic, :restrictions => {:lock_content => true})
+      tag = @template.create_content_tag_for!(@topic, :restrictions => {:content => true})
       expect(@topic.reload.updated_at.to_i).to eq @time.to_i
     end
 
     it "should touch when the tag has any restriction tighted" do
-      tag = @template.create_content_tag_for!(@topic, :restrictions => {:lock_content => true})
+      tag = @template.create_content_tag_for!(@topic, :restrictions => {:content => true})
       tag.update_attribute(:restrictions, {:lock_settings => true})
       expect(@topic.reload.updated_at.to_i).to_not eq @time.to_i
     end
 
     it "should not touch when the tag has restrictions loosened" do
-      tag = @template.create_content_tag_for!(@topic, :restrictions => {:lock_settings => true})
+      tag = @template.create_content_tag_for!(@topic, :restrictions => {:settings => true})
       tag.update_attribute(:restrictions, {:lock_settings => false})
       expect(@topic.reload.updated_at.to_i).to eq @time.to_i
     end

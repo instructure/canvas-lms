@@ -225,6 +225,17 @@ class ApplicationController < ActionController::Base
   end
   helper_method :multiple_grading_periods?
 
+  def master_courses?
+    @domain_root_account && @domain_root_account.feature_enabled?(:master_courses)
+  end
+  helper_method :master_courses?
+
+  def editing_restricted?(content, edit_type=:all)
+    return false unless master_courses? && content.respond_to?(:editing_restricted?)
+    content.editing_restricted?(edit_type)
+  end
+  helper_method :editing_restricted?
+
   def tool_dimensions
     tool_dimensions = {selection_width: '100%', selection_height: '100%'}
 

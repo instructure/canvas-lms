@@ -30,7 +30,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def require_valid_restrictions
-    if self.default_restrictions_changed? && (self.default_restrictions.keys - [:lock_content, :lock_settings]).any?
+    if self.default_restrictions_changed? && (self.default_restrictions.keys - MasterCourses::LOCK_TYPES).any?
       self.errors.add(:default_restrictions, "Invalid settings")
     end
   end
@@ -58,7 +58,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def migration_id_for(obj, prepend="")
     key = obj.is_a?(ActiveRecord::Base) ? obj.global_asset_string : obj.to_s
-    "mc_#{self.shard.id}_#{self.id}_#{Digest::MD5.hexdigest(prepend + key)}"
+    "#{MasterCourses::MIGRATION_ID_PREFIX}#{self.shard.id}_#{self.id}_#{Digest::MD5.hexdigest(prepend + key)}"
   end
 
   def add_child_course!(child_course)
