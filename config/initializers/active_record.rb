@@ -122,9 +122,13 @@ class ActiveRecord::Base
     (namespaces.map(&:camelize) + [class_name.try(:classify)]).join('::')
   end
 
+  def self.asset_string(id)
+    "#{self.reflection_type_name}_#{id}"
+  end
+
   def asset_string
     @asset_string ||= {}
-    @asset_string[Shard.current] ||= "#{self.class.reflection_type_name}_#{id}"
+    @asset_string[Shard.current] ||= self.class.asset_string(id)
   end
 
   def global_asset_string
