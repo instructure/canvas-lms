@@ -202,6 +202,10 @@ module SeleniumDriverSetup
     }.freeze
 
     def set_up_display_buffer
+      # start_driver can get called again if firefox dies, but
+      # self.headless should already be good to go
+      return if headless
+
       require "headless"
 
       test_number = ENV["TEST_ENV_NUMBER"]
