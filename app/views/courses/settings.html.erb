@@ -604,7 +604,8 @@
           <input type="radio" name="move_location" value="after" id="move_location_after" class="move-nav-item-label-spacer" /><label class="move-nav-item-label-width" for="move_location_after"><%= t('move_nav_item.after', "After") %></label>
         </div>
         <div class="move-nav-item-select-spacer">
-          <select name="move_nav_item_select" id="move_nav_item_select"></select>
+          <label class="move-nav-item-label-width" for="move_nav_item_select"><%= t("Move Item") %></label>
+          <select name="move_nav_item_select" aria-label="<%= t("Move Item") %>" id="move_nav_item_select"></select>
         </div>
 
       </div>
