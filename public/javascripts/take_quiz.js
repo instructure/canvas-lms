@@ -23,7 +23,7 @@ define([
   'compiled/behaviors/autoBlurActiveInput',
   'underscore',
   'compiled/views/quizzes/LDBLoginPopup',
-  'worker!compiled/workers/quizzes/quiz_taking_police',
+  'worker-loader!compiled/workers/quizzes/quiz_taking_police',
   'compiled/quizzes/log_auditing',
   'compiled/quizzes/dump_events',
   'compiled/views/editor/KeyboardShortcuts',

@@ -1,3 +1,5 @@
+// This is only for RequireJS, webpack has worker-loader built into it.
+// can remove this once we are all-webpack
 /**
  * Adapted from https://github.com/chadly/requirejs-web-workers
  *
@@ -17,7 +19,7 @@
  *     define([ 'worker!/my_namespace/my_worker' ], function(MyWorkerFactory) {
  *       if (MyWorkerFactory) {
  *         var myWorker = new MyWorkerFactory();
- *         
+ *
  *         myWorker.postMessage("it's alive!!!");
  *       }
  *       else {
