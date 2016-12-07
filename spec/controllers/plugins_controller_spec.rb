@@ -23,12 +23,12 @@ describe PluginsController do
 
   describe "#update" do
     it "still enables plugins even with no settings posted" do
-      expect(PluginSetting.find_by(name: 'error_reporting')).to be_nil
+      expect(PluginSetting.find_by(name: 'account_reports')).to be_nil
       controller.stubs(:require_setting_site_admin).returns(true)
 
-      put 'update', id: 'error_reporting', all: 1, plugin_setting: { disabled: false }
-      expect(response).to redirect_to(plugin_path('error_reporting', all: 1))
-      ps = PluginSetting.find_by!(name: 'error_reporting')
+      put 'update', id: 'account_reports', all: 1, plugin_setting: { disabled: false }
+      expect(response).to redirect_to(plugin_path('account_reports', all: 1))
+      ps = PluginSetting.find_by!(name: 'account_reports')
       expect(ps).to be_enabled
     end
 

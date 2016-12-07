@@ -156,7 +156,6 @@ class Account < ActiveRecord::Base
 
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
   add_setting :sub_account_includes, :boolean => true, :default => false
-  add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
 
   # Help link settings
   add_setting :custom_help_links, :root_only => true

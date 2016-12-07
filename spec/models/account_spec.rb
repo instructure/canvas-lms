@@ -322,20 +322,16 @@ describe Account do
   end
 
   context "settings=" do
-    it "should filter disabled settings" do
+    it "should filter non-hash hash settings" do
       a = Account.new
-      a.settings = {'error_reporting' => 'string'}.with_indifferent_access
+      a.settings = {'sis_default_grade_export' => 'string'}.with_indifferent_access
       expect(a.settings[:error_reporting]).to eql(nil)
 
-      a.settings = {'error_reporting' => {
-        'action' => 'email',
-        'email' => 'bob@yahoo.com',
-        'extra' => 'something'
+      a.settings = {'sis_default_grade_export' => {
+        'value' => true
       }}.with_indifferent_access
-      expect(a.settings[:error_reporting]).to be_is_a(Hash)
-      expect(a.settings[:error_reporting][:action]).to eql('email')
-      expect(a.settings[:error_reporting][:email]).to eql('bob@yahoo.com')
-      expect(a.settings[:error_reporting][:extra]).to eql(nil)
+      expect(a.settings[:sis_default_grade_export]).to be_is_a(Hash)
+      expect(a.settings[:sis_default_grade_export][:value]).to eql true
     end
   end
 
