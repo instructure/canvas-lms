@@ -3982,12 +3982,33 @@ describe Assignment do
     before(:once) do
       @assignment = @course.assignments.create! points_possible: 10
       @submission = @assignment.submit_homework(@student, body: "hello")
+      @assignment.mute!
     end
 
     it "touches submissions if you mute the assignment" do
-      @assignment.mute!
       touched = @submission.reload.updated_at > @assignment.updated_at
       expect(touched).to eq true
+    end
+
+    context "calls assignment_muted_changed" do
+      it "for graded submissions" do
+        @assignment.grade_student(@student, grade: 10, grader: @teacher)
+        @called = false
+        Submission.any_instance.stubs(:assignment_muted_changed).with() do
+          @called = true
+          expect(self.submission_model).to eq @submission
+        end
+
+        @assignment.unmute!
+        expect(@called).to eq true
+      end
+
+      it "does not dispatch update for ungraded submissions" do
+        @assignment.unmute!
+        Submission.any_instance.stubs(:assignment_muted_changed).with() do
+          fail
+        end
+      end
     end
   end
 

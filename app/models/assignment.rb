@@ -290,7 +290,7 @@ class Assignment < ActiveRecord::Base
               :schedule_do_auto_peer_review_job_if_automatic_peer_review,
               :delete_empty_abandoned_children,
               :update_cached_due_dates,
-              :touch_submissions_if_muted
+              :touch_submissions_if_muted_changed
 
   has_a_broadcast_policy
 
@@ -597,11 +597,14 @@ class Assignment < ActiveRecord::Base
     all_context_module_tags.each { |tag| tag.context_module_action(user, action, points) }
   end
 
-  # this is necessary to generate new permissions cache keys for students
-  def touch_submissions_if_muted
+  def touch_submissions_if_muted_changed
     if muted_changed?
       self.class.connection.after_transaction_commit do
+        # this is necessary to generate new permissions cache keys for students
         submissions.touch_all
+
+        # this ensures live events notifications
+        submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
       end
     end
   end

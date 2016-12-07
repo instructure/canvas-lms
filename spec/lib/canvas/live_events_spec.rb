@@ -85,19 +85,13 @@ describe Canvas::LiveEvents do
     it "should set the grader to nil for an autograded quiz" do
       quiz_with_graded_submission([])
 
-      expect_event('grade_change', {
+      expect_event('grade_change', has_entries(
         submission_id: @quiz_submission.submission.global_id.to_s,
         assignment_id: @quiz_submission.submission.global_assignment_id.to_s,
-        grade: @quiz_submission.submission.grade,
-        old_grade: '0',
-        score: @quiz_submission.submission.score,
-        old_score: 0,
-        points_possible: 0.0,
-        old_points_possible: 0.0,
         grader_id: nil,
         student_id: @quiz_submission.user.global_id.to_s,
         user_id: @quiz_submission.user.global_id.to_s
-      }, course_context)
+      ), course_context)
 
       Canvas::LiveEvents.grade_changed(@quiz_submission.submission, @quiz_submission.submission.versions.current.model)
     end
@@ -106,19 +100,13 @@ describe Canvas::LiveEvents do
       course_with_student_submissions
       submission = @course.assignments.first.submissions.first
 
-      expect_event('grade_change', {
+      expect_event('grade_change', has_entries(
         submission_id: submission.global_id.to_s,
         assignment_id: submission.global_assignment_id.to_s,
-        grade: '10',
-        old_grade: nil,
-        score: 10,
-        old_score: nil,
-        points_possible: nil,
-        old_points_possible: nil,
         grader_id: @teacher.global_id.to_s,
         student_id: @student.global_id.to_s,
         user_id: @student.global_id.to_s
-      }, course_context)
+      ), course_context)
 
       submission.grader = @teacher
       submission.grade = '10'
@@ -169,7 +157,7 @@ describe Canvas::LiveEvents do
     end
 
     it "includes course context even when global course context unset" do
-      LiveEvents.expects(:get_context).returns({
+      LiveEvents.stubs(:get_context).returns({
         root_account_id: nil,
         root_account_lti_guid: nil,
         context_id: nil,
@@ -184,12 +172,63 @@ describe Canvas::LiveEvents do
     end
 
     it "includes existing context when global course context overridden" do
-      LiveEvents.expects(:get_context).returns({ foo: 'bar' })
+      LiveEvents.stubs(:get_context).returns({ foo: 'bar' })
       course_with_student_submissions
       submission = @course.assignments.first.submissions.first
 
       expect_event('grade_change', anything, has_entries({ foo: 'bar' }))
       Canvas::LiveEvents.grade_changed(submission)
+    end
+
+    context "grading_complete" do
+      before do
+        course_with_student_submissions
+      end
+
+      let(:submission) { @course.assignments.first.submissions.first }
+
+      it "is false when submission is not graded" do
+        expect_event('grade_change', has_entries(
+          grading_complete: false
+        ), course_context)
+        Canvas::LiveEvents.grade_changed(submission)
+      end
+
+      it "is true when submission is fully graded" do
+        submission.score = 0
+        submission.workflow_state = 'graded'
+
+        expect_event('grade_change', has_entries(
+          grading_complete: true
+        ), course_context)
+        Canvas::LiveEvents.grade_changed(submission)
+      end
+
+      it "is false when submission is partially graded" do
+        submission.score = 0
+        submission.workflow_state = 'pending_review'
+
+        expect_event('grade_change', has_entries(
+          grading_complete: false
+        ), course_context)
+        Canvas::LiveEvents.grade_changed(submission)
+      end
+    end
+
+    context "muted" do
+      before do
+        course_with_student_submissions
+      end
+
+      let(:submission) { @course.assignments.first.submissions.first }
+
+      it "is true when assignment is muted" do
+        submission.assignment.mute!
+        expect_event('grade_change', has_entries(
+          muted: true
+        ), course_context)
+        Canvas::LiveEvents.grade_changed(submission)
+      end
     end
   end
 

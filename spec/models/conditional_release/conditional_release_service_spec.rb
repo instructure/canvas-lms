@@ -634,29 +634,55 @@ describe ConditionalRelease::Service do
         { submissions: all_the_submissions }
       end
 
+      def expect_request_rules(submissions)
+        Service.expects(:request_rules)
+          .with(anything(), submissions_hash_for(submissions))
+          .returns([])
+      end
+
+      before do
+        course_with_student(active_all: true)
+      end
+
       context 'for cross-shard users' do
         specs_require_sharding
 
         it 'selects submissions' do
-          course_with_student(active_all: true)
           @shard1.activate do
             course_with_student(account: Account.create!, user: @student)
-            sub = submission_model(course: @course, user: @student)
-            Service.expects(:request_rules)
-              .with(anything(), submissions_hash_for(sub))
+            sub = graded_submission_model(course: @course, user: @student)
+            expect_request_rules(sub)
             Service.rules_for(@course, @student, [], nil)
           end
         end
       end
 
       it 'includes only submissions for the course' do
-        course_with_student(active_all: true)
-        submission_model(course: @course, user: @student)
+        graded_submission_model(course: @course, user: @student)
         course_with_student(user: @student)
-        sub = submission_model(course: @course, user: @student)
-        Service.expects(:request_rules)
-          .with(anything(), submissions_hash_for(sub))
+        sub = graded_submission_model(course: @course, user: @student)
+        expect_request_rules(sub)
         Service.rules_for(@course, @student, [], nil)
+      end
+
+      it 'includes only completely graded submissions' do
+        s1 = graded_submission_model(course: @course, user: @student)
+        _s2 = submission_model(course: @course, user: @student)
+        expect_request_rules(s1)
+        Service.rules_for(@course, @student, [], nil)
+      end
+
+      it 'includes only non-muted assignments' do
+        graded_submission_model(course: @course, user: @student)
+        enable_cache do
+          @submission.assignment.mute!
+          expect_request_rules([])
+          Service.rules_for(@course, @student, [], nil)
+
+          @submission.assignment.unmute!
+          expect_request_rules(@submission)
+          Service.rules_for(@course, @student, [], nil)
+        end
       end
     end
   end

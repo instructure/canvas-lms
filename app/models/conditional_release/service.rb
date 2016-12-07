@@ -287,13 +287,17 @@ module ConditionalRelease
         Context.get_account(context).root_account.domain
       end
 
-      def submissions_for(student, context)
+      def submissions_for(student, context, force: false)
         return [] unless student.present?
-
-        Rails.cache.fetch(submissions_cache_key(student)) do
+        Rails.cache.fetch(submissions_cache_key(student), force: force) do
           keys = [:id, :assignment_id, :score, :"assignments.points_possible"]
-          context.submissions.for_user(student).eager_load(:assignment)
-            .pluck(*keys).map do |values|
+          context.submissions
+                  .for_user(student)
+                  .in_workflow_state(:graded)
+                  .where(assignments: { muted: false })
+                  .eager_load(:assignment)
+                  .pluck(*keys)
+                  .map do |values|
             submission = Hash[keys.zip(values)]
             submission[:points_possible] = submission.delete(:"assignments.points_possible")
             submission
@@ -307,7 +311,7 @@ module ConditionalRelease
         assignments = assignments_for(cached[:rules]) if cached
         force_cache = rules_cache_expired?(context, cached)
         rules_data = rules_cache(context, student, force: force_cache) do
-          data = { submissions: submissions_for(student, context) }
+          data = { submissions: submissions_for(student, context, force: force_cache) }
           headers = headers_for(context, student, domain_for(context), session)
           req = request_rules(headers, data)
           {rules: req, updated_at: Time.zone.now}
@@ -393,15 +397,15 @@ module ConditionalRelease
       end
 
       def rules_cache_key(context, student)
-        ['conditional_release_rules:1', context.global_id, student.global_id].cache_key
+        ['conditional_release_rules:2', context.global_id, student.global_id].cache_key
       end
 
       def assignments_cache_key(context)
-        ['conditional_release_rules:assignments', context.global_id].cache_key
+        ['conditional_release_rules:assignments:2', context.global_id].cache_key
       end
 
       def submissions_cache_key(student)
-        ['conditional_release_submissions', student.global_id].cache_key
+        ['conditional_release_submissions:2', student.global_id].cache_key
       end
 
       def active_rules_cache_key(course)
