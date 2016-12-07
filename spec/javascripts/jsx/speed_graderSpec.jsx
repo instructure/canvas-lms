@@ -5,7 +5,7 @@ define([
   'helpers/fakeENV',
   'jsx/grading/helpers/OutlierScoreHelper',
   'compiled/userSettings',
-  'jsx/speed_grader/mgp',
+  'jsx/speed_grader/gradingPeriod',
   'jquery.ajaxJSON'
   ], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings, MGP) => {
 

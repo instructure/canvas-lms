@@ -159,8 +159,35 @@ describe GradingPeriod do
       context "where end_date equals Time.now" do
         it "does not include period" do
           Timecop.freeze(Time.zone.now.change(usec: 0)) do
-            period.update(end_date: now)
+            period.update!(end_date: now)
+            is_expected.to be_present
+          end
+        end
+      end
+
+      context "where end_date equals Time.now + 1" do
+        it "does not include period" do
+          Timecop.freeze(Time.zone.now.change(usec: 0) + 1) do
+            period.update!(end_date: now)
             is_expected.to be_empty
+          end
+        end
+      end
+
+      context "where start_date equals Time.now" do
+        it "does not include period" do
+          Timecop.freeze(Time.zone.now.change(usec: 0)) do
+            period.update!(start_date: now)
+            is_expected.to be_empty
+          end
+        end
+      end
+
+      context "where start_date equals Time.now + 1" do
+        it "does not include period" do
+          Timecop.freeze(Time.zone.now.change(usec: 0) + 1) do
+            period.update!(start_date: now)
+            is_expected.to be_present
           end
         end
       end
@@ -177,7 +204,7 @@ describe GradingPeriod do
 
   describe "close_date" do
     context "grading period group belonging to an account" do
-      it "allows setting a close_date that is different from the end_date" do
+      it "allows setting a close_date that is after the end_date" do
         grading_period = grading_period_group.grading_periods.create!(params)
         expect(grading_period.close_date).not_to eq(grading_period.end_date)
       end
@@ -187,14 +214,14 @@ describe GradingPeriod do
         expect(grading_period.close_date).to eq(grading_period.end_date)
       end
 
-      it "considers the grading period invalid if the close date is before the end date" do
+      it "is invalid if the close date is before the end date" do
         period_params = params.merge(close_date: 1.day.ago(params[:end_date]))
         grading_period = grading_period_group.grading_periods.build(period_params)
         expect(grading_period).to be_invalid
       end
 
       it "considers the grading period valid if the close date is equal to the end date" do
-        period_params = params.merge(close_date: params[:end_date])
+        period_params = params.merge(close_date: params.fetch(:end_date))
         grading_period = grading_period_group.grading_periods.build(period_params)
         expect(grading_period).to be_valid
       end
@@ -547,10 +574,19 @@ describe GradingPeriod do
         it { is_expected.to be_overlapping }
       end
 
-      context 'given a new grading period with a start_date that begins at the end_date existing grading_period' do
+      context 'given a new grading period with a start_date that is the' \
+        'end_date of existing grading_period' do
         subject { grading_period_group.grading_periods.build(start_date: start_date, end_date: end_date)}
         let(:start_date) { existing_grading_period.end_date }
         let(:end_date)   { existing_grading_period.end_date + 1.month }
+        it { is_expected.not_to be_overlapping }
+      end
+
+      context 'given a new grading period with an end_date that is the ' \
+        'start_date of existing grading_period' do
+        subject { grading_period_group.grading_periods.build(start_date: start_date, end_date: end_date)}
+        let(:start_date) { existing_grading_period.start_date - 1.month }
+        let(:end_date)   { existing_grading_period.start_date }
         it { is_expected.not_to be_overlapping }
       end
     end
@@ -560,7 +596,7 @@ describe GradingPeriod do
     end
   end
 
-  context "Soft deletion" do
+  describe "Soft deletion" do
     subject { grading_period_group.grading_periods }
     let(:creation_arguments) { [period_one, period_two] }
     let(:period_one) { { title: 'an title', start_date: 1.week.ago(now), end_date: 2.weeks.from_now(now) } }
@@ -570,26 +606,27 @@ describe GradingPeriod do
 
   describe ".in_date_range?" do
     subject(:period) do
-      grading_period_group.grading_periods.create(
+      grading_period_group.grading_periods.build(
+        title:      'a period',
         start_date: 1.week.ago(now),
         end_date:   2.weeks.from_now(now)
       )
     end
 
-    it "is in date range for a date in the period" do
-      is_expected.to be_in_date_range(period.end_date - 1.second)
+    it "is in date range for a date that equals end_date" do
+      is_expected.to be_in_date_range(period.end_date)
     end
 
     it "is not in date range for a date before the period" do
-      is_expected.not_to be_in_date_range(8.days.ago(now))
+      is_expected.not_to be_in_date_range(2.weeks.ago(now))
     end
 
     it "is not in date range for or a date after the period" do
-      is_expected.not_to be_in_date_range(15.days.from_now(now))
+      is_expected.not_to be_in_date_range(3.weeks.from_now(now))
     end
 
     it "is not in date range for a date that equals end_date" do
-      is_expected.not_to be_in_date_range(period.end_date)
+      is_expected.not_to be_in_date_range(period.start_date)
     end
   end
 

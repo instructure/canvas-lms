@@ -17,7 +17,7 @@
  */
 
 define([
-  'jsx/speed_grader/mgp',
+  'jsx/speed_grader/gradingPeriod',
   'jsx/grading/helpers/OutlierScoreHelper',
   'jsx/grading/quizzesNextSpeedGrading',
   'jst/speed_grader/student_viewed_at',

@@ -35,8 +35,8 @@ class GradingPeriod < ActiveRecord::Base
   scope :current, -> do
     period_table = GradingPeriod.arel_table
     now = Time.zone.now
-    where(period_table[:start_date].lteq(now)).
-      where(period_table[:end_date].gt(now))
+    where(period_table[:start_date].lt(now)).
+      where(period_table[:end_date].gteq(now))
   end
 
   scope :grading_periods_by, ->(context_with_ids) do
@@ -109,7 +109,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def in_date_range?(date)
-    start_date <= date && date < end_date
+    start_date < date && date <= end_date
   end
 
   def last?
@@ -163,7 +163,7 @@ class GradingPeriod < ActiveRecord::Base
 
   scope :overlaps, ->(from, to) do
     # sourced: http://c2.com/cgi/wiki?TestIfDateRangesOverlap
-    where('((start_date < ?) and (end_date > ?))', to, from)
+    where('((end_date > ?) and (start_date < ?))', from, to)
   end
 
   def not_overlapping

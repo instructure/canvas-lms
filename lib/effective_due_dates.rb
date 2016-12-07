@@ -342,7 +342,7 @@ class EffectiveDueDates
       FROM calculated_overrides overrides
       -- match the effective due date with its grading period
       LEFT OUTER JOIN applied_grading_periods periods ON
-          overrides.due_at >= periods.start_date AND overrides.due_at < periods.end_date
+          periods.start_date < overrides.due_at AND overrides.due_at <= periods.end_date
     ")
   end
 end

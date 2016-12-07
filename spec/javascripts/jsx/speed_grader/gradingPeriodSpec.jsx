@@ -1,4 +1,4 @@
-require(["jsx/speed_grader/mgp"], ({
+require(["jsx/speed_grader/gradingPeriod"], ({
   gradingPeriodForDate,
   dueDateForStudent,
   assignmentClosedForStudent,
@@ -73,7 +73,7 @@ require(["jsx/speed_grader/mgp"], ({
   });
 
   test("assignmentClosedForStudent", () => {
-    const dueAt = closedGradingPeriod.start_date
+    const dueAt = closedGradingPeriod.start_date + 1;
     ok(!assignmentClosedForStudent(student, {
       due_at: dueAt,
       gradingPeriods: gradingPeriods,

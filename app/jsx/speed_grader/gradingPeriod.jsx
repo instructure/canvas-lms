@@ -13,7 +13,7 @@ define(["underscore"], (_) => {
       return _.last(gradingPeriods);
     } else {
       return gradingPeriods.find((gp) => {
-        return date >= gp.start_date && date < gp.end_date;
+        return date > gp.start_date && date <= gp.end_date;
       });
     }
   }
