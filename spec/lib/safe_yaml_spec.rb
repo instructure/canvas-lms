@@ -197,4 +197,8 @@ YAML
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
+  it "should be able to dump and load these strings in stuff" do
+    hash = {:blah => "<<"}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
 end
