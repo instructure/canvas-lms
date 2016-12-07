@@ -38,6 +38,7 @@ testWebpackConfig.plugins = [
 testWebpackConfig.resolve.alias.qunit = 'qunitjs';
 testWebpackConfig.resolve.root.push(__dirname + '/spec/coffeescripts');
 testWebpackConfig.resolve.root.push(__dirname + '/spec/javascripts/support');
+testWebpackConfig.resolve.alias["spec/jsx"] = __dirname + '/spec/javascripts/jsx';
 
 // Some plugins use a special spec_canvas path for their specs
 testWebpackConfig.module.loaders.unshift({
