@@ -53,8 +53,6 @@ module BrandableCSS
     "ic-brand-Login-Content-inner-body-border" => lambda { I18n.t("Form Border") },
     "ic-brand-Login-Content-label-text-color" => lambda { I18n.t("Login Label") },
     "ic-brand-Login-Content-password-text-color" => lambda { I18n.t("Login Link Color") },
-    "ic-brand-Login-Content-button-bgd" => lambda { I18n.t("Login Button") },
-    "ic-brand-Login-Content-button-text" => lambda { I18n.t("Login Button Text") },
     "ic-brand-Login-footer-link-color" => lambda { I18n.t("Login Footer Link") },
     "ic-brand-Login-footer-link-color-hover" => lambda { I18n.t("Login Footer Link Hover") },
     "ic-brand-Login-instructure-logo" => lambda { I18n.t("Login Instructure Logo") }
