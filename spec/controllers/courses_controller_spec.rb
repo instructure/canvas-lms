@@ -2077,4 +2077,17 @@ describe CoursesController do
       expect(assignment.needs_grading_count).to eq original_needs_grading_count - 1
     end
   end
+
+  describe 'GET #permissions' do
+    before do
+      course_with_teacher(active_all: true)
+      user_session(@teacher)
+    end
+
+    it 'returns a json representation for provided permission keys' do
+      get :permissions, course_id: @course.id, format: :json, permissions: :manage_grades
+      json = json_parse(response.body)
+      expect(json.keys).to include 'manage_grades'
+    end
+  end
 end

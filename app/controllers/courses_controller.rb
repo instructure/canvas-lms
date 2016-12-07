@@ -2463,6 +2463,27 @@ class CoursesController < ApplicationController
     ])
   end
 
+  # @API Permissions
+  # Returns permission information for provided course & current_user
+  #
+  # @argument permissions[] [String]
+  #   List of permissions to check against authenticated user
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/<course_id>/permissions \
+  #       -H 'Authorization: Bearer <token>' \
+  #       -d 'permissions[]=manage_grades'
+  #       -d 'permissions[]=send_messages'
+  #
+  # @example_response
+  #   {'manage_grades': 'false', 'send_messages': 'true'}
+  def permissions
+    get_context
+    return unless authorized_action(@context, @current_user, :read)
+    permissions = Array(params[:permissions]).map(&:to_sym)
+    render json: @context.rights_status(@current_user, session, *permissions)
+  end
+
   def student_view
     get_context
     if authorized_action(@context, @current_user, :use_student_view)
