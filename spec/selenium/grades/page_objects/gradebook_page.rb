@@ -15,12 +15,6 @@ module Gradebook
 
       def grade_input(cell) f(".grade", cell) end
 
-      def grading_cell(x=0, y=0)
-        cell = f(".container_1")
-        cell = f(".slick-row:nth-child(#{y+1})", cell)
-        f(".slick-cell:nth-child(#{x+1})", cell)
-      end
-
       def assignment_header_selector(name)
         return ASSIGNMENT_HEADER_SELECTOR unless name
 
@@ -32,6 +26,10 @@ module Gradebook
       end
 
     public
+
+      def ungradable_selector
+        ".cannot_edit"
+      end
 
       def assignment_header(name)
         f(assignment_header_selector(name))
@@ -49,6 +47,12 @@ module Gradebook
 
       def visit_gradebook(course)
         get "/courses/#{course.id}/gradebook/change_gradebook_version?version=2"
+      end
+
+      def grading_cell(x=0, y=0)
+        cell = f(".container_1")
+        cell = f(".slick-row:nth-child(#{y+1})", cell)
+        f(".slick-cell:nth-child(#{x+1})", cell)
       end
 
       def select_grading_period(grading_period_id)

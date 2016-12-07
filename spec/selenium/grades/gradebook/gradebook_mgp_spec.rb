@@ -50,5 +50,16 @@ describe "gradebook - multiple grading periods" do
       gb_mgp_page.enter_grade("8", 0, 0)
       expect(gb_mgp_page.cell_graded?("8", 0, 0)).to be true
     end
+
+    it 'assignment in closed gp should not be gradable', test_id: 2947118, priority: "1" do
+      @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
+      gb_mgp_page.visit_gradebook(@course)
+
+      gb_mgp_page.select_grading_period(0)
+      expect(gb_mgp_page.grading_cell(0, 0)).to contain_css(gb_mgp_page.ungradable_selector)
+
+      gb_mgp_page.select_grading_period(@gp_closed.id)
+      expect(gb_mgp_page.grading_cell(0, 0)).to contain_css(gb_mgp_page.ungradable_selector)
+    end
   end
 end
