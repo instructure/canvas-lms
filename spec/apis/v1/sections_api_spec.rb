@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe SectionsController, type: :request do
   describe '#index' do
-    USER_API_FIELDS = %w(id name sortable_name short_name)
+    let(:user_api_fields) { %w(id name sortable_name short_name) }
 
     before :once do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym(:name => 'UWP'))
@@ -45,8 +45,8 @@ describe SectionsController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
                       { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => ['students'] })
       expect(json.size).to eq 2
-      expect(json.find { |s| s['name'] == section1.name }['students']).to eq api_json_response([user1], :only => USER_API_FIELDS)
-      expect(json.find { |s| s['name'] == section2.name }['students']).to eq api_json_response([user2], :only => USER_API_FIELDS)
+      expect(json.find { |s| s['name'] == section1.name }['students']).to eq api_json_response([user1], :only => user_api_fields)
+      expect(json.find { |s| s['name'] == section2.name }['students']).to eq api_json_response([user2], :only => user_api_fields)
     end
 
     it "should return the list of enrollments if 'students' and 'enrollments' flags are given" do

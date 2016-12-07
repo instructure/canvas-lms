@@ -218,7 +218,7 @@ describe Api::V1::Course do
 end
 
 describe CoursesController, type: :request do
-  USER_API_FIELDS = %w(id name sortable_name short_name)
+  let(:user_api_fields) { %w(id name sortable_name short_name) }
 
   before :once do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:name => 'UWP'))
@@ -2055,7 +2055,7 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
       expect(json.sort_by{|x| x["id"]}).to eq api_json_response([first_user, new_user],
-                                                            :only => USER_API_FIELDS).sort_by{|x| x["id"]}
+                                                            :only => user_api_fields).sort_by{|x| x["id"]}
     end
 
     it "should not include user sis id or login id for non-admins" do
@@ -2129,7 +2129,7 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
       expect(json.sort_by{|x| x["id"]}).to eq api_json_response([first_user, new_user],
-                                                            :only => USER_API_FIELDS).sort_by{|x| x["id"]}
+                                                            :only => user_api_fields).sort_by{|x| x["id"]}
 
       @course2.enroll_teacher(@user).accept!
       ro.destroy
@@ -2192,7 +2192,7 @@ describe CoursesController, type: :request do
         expected_users =
           api_json_response(
             @course1.users.select{ |u| u.name == 'TAPerson' },
-            :only => USER_API_FIELDS)
+            :only => user_api_fields)
 
         expect(sorted_users).to eq expected_users
 
@@ -2250,7 +2250,7 @@ describe CoursesController, type: :request do
         expected_users =
           api_json_response(
             @course1.users.select{ |u| ['SSS Helper', 'SSS1', 'SSS2'].include? u.name },
-            :only => USER_API_FIELDS)
+            :only => user_api_fields)
 
         expect(sorted_users).to eq expected_users.sort_by{ |x| x["id"] }
       end
@@ -2332,7 +2332,7 @@ describe CoursesController, type: :request do
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
         expected_users = @course1.users.uniq - [@test_student]
         expect(json.sort_by{|x| x["id"]}).to eq api_json_response(expected_users,
-                                                              :only => USER_API_FIELDS).sort_by{|x| x["id"]}
+                                                              :only => user_api_fields).sort_by{|x| x["id"]}
       end
 
       it "returns a list of users filtered by id if user_ids is given" do
@@ -2346,7 +2346,7 @@ describe CoursesController, type: :request do
         })
         expect(json.sort_by{|x| x["id"]}).to eq api_json_response(
           expected_users,
-          :only => USER_API_FIELDS
+          :only => user_api_fields
         ).sort_by{|x| x["id"]}
       end
 
@@ -2408,7 +2408,7 @@ describe CoursesController, type: :request do
           j = json.find { |x| x['id'] == user.id }
           expect(j.delete('enrollments').map { |e| e['id'] }.sort).
             to eq enrollments.map(&:id)
-          expect(j).to eq api_json_response(user, :only => USER_API_FIELDS)
+          expect(j).to eq api_json_response(user, :only => user_api_fields)
         }
         # expect
         check_json.call(@ta, @ta_enroll1, @ta_enroll2)
@@ -2431,7 +2431,7 @@ describe CoursesController, type: :request do
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' },
                         :enrollment_type => 'student')
         expect(json.map {|x| x["id"]}.sort).to eq api_json_response([@student1, @student2],
-                                                                :only => USER_API_FIELDS).map {|x| x["id"]}.sort
+                                                                :only => user_api_fields).map {|x| x["id"]}.sort
       end
 
       it "should accept an array of enrollment_types" do
@@ -2656,7 +2656,7 @@ describe CoursesController, type: :request do
                         { :controller => 'courses', :action => 'users', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' },
                         :enrollment_type => 'student')
         expect(json.sort_by{|x| x["id"]}).to eq api_json_response([first_user, new_user],
-                                                              :only => USER_API_FIELDS).sort_by{|x| x["id"]}
+                                                              :only => user_api_fields).sort_by{|x| x["id"]}
 
         @course2.enroll_teacher(@user).accept!
         ro.destroy
