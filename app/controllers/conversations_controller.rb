@@ -557,9 +557,6 @@ class ConversationsController < ApplicationController
   # @API Edit a conversation
   # Updates attributes for a single conversation.
   #
-  # @argument conversation[subject] [String]
-  #   Change the subject of this conversation
-  #
   # @argument conversation[workflow_state] [String, "read"|"unread"|"archived"]
   #   Change the state of this conversation
   #
