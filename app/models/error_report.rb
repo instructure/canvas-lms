@@ -228,7 +228,7 @@ error_id: #{error_report.id}
       params = {}
       params[config[:subject_param]] = error_report.subject
       params[config[:body_param]] = body
-      Net::HHTP.post_form(URI.parse(config[:url]), params)
+      Net::HTTP.post_form(URI.parse(config[:url]), params)
     elsif config[:action] == 'email' && config[:email]
       Message.create!(
         :to => config[:email],
