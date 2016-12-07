@@ -76,6 +76,7 @@ class GradebookImporter
   def parse!
     # preload a ton of data that presumably we'll be querying
     @all_assignments = @context.assignments
+      .preload(:context)
       .published
       .gradeable
       .select(ASSIGNMENT_PRELOADED_FIELDS)
