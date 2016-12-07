@@ -122,6 +122,20 @@ module Api::V1::DiscussionTopics
       group_category_id: topic.group_category_id, can_group: topic.can_group?(opts) }
     fields.merge!({context_code: topic.context_code}) if opts[:include_context_code]
 
+    if opts[:user_can_moderate]
+      parts = {}
+
+      topic.discussion_topic_participants.each do |p|
+        parts[p.user_id] = {
+          read_state: p.workflow_state,
+          unread_count: p.unread_entry_count,
+          subscribed: p.subscribed
+        }
+      end
+
+      fields[:participants] = parts
+    end
+
     locked_json(fields, topic, user, 'topic', check_policies: true, deep_check_if_needed: true)
     can_view = !fields[:lock_info].is_a?(Hash) || fields[:lock_info][:can_view]
     unless opts[:exclude_messages]
@@ -221,6 +235,10 @@ module Api::V1::DiscussionTopics
   #
   # Returns a hash.
   def discussion_entry_read_state(entry, user)
+    return {
+      read_by: entry.discussion_entry_participants.select {|p| p.workflow_state == "read" }.map(&:user_id)
+    }
+
     return {} unless user
     participant = entry.find_existing_participant(user)
 
