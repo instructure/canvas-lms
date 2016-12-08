@@ -38,6 +38,17 @@ describe SharedBrandConfigsController, type: :request do
         })
       }.to change(Account.default.shared_brand_configs, :count).by(1)
     end
+
+    it "errors if invalid" do
+      account_admin_user
+      raw_api_call(:post, url, api_args_for_create, {
+        shared_brand_config: {
+          'name' => 'New Theme',
+          'brand_config_md5' => 'INVALID'
+        }
+      })
+      assert_status(422)
+    end
   end
 
   describe "#update" do
