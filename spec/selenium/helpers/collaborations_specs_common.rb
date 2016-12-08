@@ -58,7 +58,7 @@ module CollaborationsSpecsCommon
 
     get "/courses/#{@course.id}/collaborations"
 
-    expect(ffj('.available-users:visible li')).to have_size(1)
+    expect(ffj('.available-users:visible li')).to have_size(2)
   end
 
   def select_collaborators(type)
@@ -89,7 +89,7 @@ module CollaborationsSpecsCommon
     expect(groups.count).to eq 1
     groups.first.click
     wait_for_ajaximations
-    expect(ff('.members-list li')).to have_size(1)
+    expect(ff('.members-list li')).to have_size(2)
     expect_new_page_load do
       submit_form('.edit_collaboration')
     end

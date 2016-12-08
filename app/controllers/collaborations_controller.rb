@@ -131,6 +131,7 @@ class CollaborationsController < ApplicationController
 
   include Api::V1::Collaborator
   include Api::V1::Collaboration
+  include Api::V1::User
 
   def index
     return unless authorized_action(@context, @current_user, :read) &&
@@ -150,7 +151,8 @@ class CollaborationsController < ApplicationController
     @hide_create_ui = @sunsetting_etherpad && @etherpad_only
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
            :CAN_MANAGE_GROUPS => @context.grants_right?(@current_user, session, :manage_groups),
-           :collaboration_types => Collaboration.collaboration_types
+           :collaboration_types => Collaboration.collaboration_types,
+           :POTENTIAL_COLLABORATORS_URL => polymorphic_url([:api_v1, @context, :potential_collaborators])
   end
 
   # @API List collaborations
@@ -353,6 +355,21 @@ class CollaborationsController < ApplicationController
                                  api_v1_collaboration_members_url)
 
     render :json => collaborators.map { |c| collaborator_json(c, @current_user, session, options) }
+  end
+
+  # @API List potential members
+  #
+  # List the users who can potentially be added to a collaboration in the given context.
+  #
+  # For courses, this consists of all enrolled users.  For groups, it is comprised of the
+  # group members plus the admins of the course containing the group.
+  #
+  # @returns [User]
+  def potential_collaborators
+    return unless authorized_action(@context, @current_user, :read_roster)
+    scope = @context.potential_collaborators.order(:sortable_name)
+    users = Api.paginate(scope, self, polymorphic_url([:api_v1, @context, :potential_collaborators]))
+    render :json => users.map { |u| user_json(u, @current_user, session) }
   end
 
   private

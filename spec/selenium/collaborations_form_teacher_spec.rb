@@ -56,7 +56,7 @@ describe "collaborations" do
 
         get "/courses/#{@course.id}/collaborations"
 
-        expect(ff('.available-users li').length).to eq 1
+        expect(ff('.available-users li').length).to eq 2
         expect(f('.available-users')).to_not include_text("inactive")
       end
 
