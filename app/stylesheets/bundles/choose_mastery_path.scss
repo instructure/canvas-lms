@@ -25,6 +25,17 @@
 .item-group-container .ig-list li.cpm-assignment {
   margin-bottom: -1px;
 
+  .ig-header {
+    display: flex;
+    align-items: center;
+  }
+
+  .ig-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .item_name {
     color: $ic-font-color-dark;
     font-weight: bold;
