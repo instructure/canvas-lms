@@ -153,6 +153,14 @@ describe Course do
         expect(@course).to be_soft_concluded
       end
     end
+
+    it "should test conclusion for a specific enrollment type" do
+      @term.set_overrides(@course.account, 'StudentEnrollment' => {end_at: 1.week.ago})
+      expect(@course).not_to be_soft_concluded
+      expect(@course).not_to be_concluded
+      expect(@course).to be_soft_concluded('StudentEnrollment')
+      expect(@course).to be_concluded('StudentEnrollment')
+    end
   end
 
   describe "allow_student_discussion_topics" do

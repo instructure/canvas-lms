@@ -214,7 +214,7 @@ class GroupsController < ApplicationController
 
         # Split the groups out into those in concluded courses and those not in concluded courses
         @current_groups, @previous_groups = groups.partition do |group|
-          group.context_type != 'Course' || !group.context.concluded?
+          group.context_type != 'Course' || !group.context.concluded?('StudentEnrollment')
         end
       end
 
