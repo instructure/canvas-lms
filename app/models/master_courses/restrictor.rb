@@ -17,8 +17,6 @@ module MasterCourses::Restrictor
         return # i'd raise, but i'm sure some spring thing will reload this at some point
       end
       columns = Array(columns).map(&:to_s)
-      missing = columns - self.column_names
-      raise "cannot set restrictions on missing columns" if missing.any?
       self.restricted_column_settings[edit_type] = columns
     end
   end
