@@ -13,6 +13,7 @@ require [
         backgroundColor: "#000"
         opacity: 0.7
     ).fixDialogButtons()
+    $('.ui-resizable-handle').attr('aria-hidden', true)
     callbacks = $("#add_category_form").data("callbacks") or []
     callbacks.push callback
     $("#add_category_form").data "callbacks", callbacks
