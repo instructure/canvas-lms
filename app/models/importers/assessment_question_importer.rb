@@ -54,6 +54,10 @@ module Importers
           question_bank = migration.context.assessment_question_banks.temp_record
           if bank_hash = data['assessment_question_banks'].detect{|qb_hash| qb_hash['migration_id'] == bank_mig_id}
             question_bank.title = bank_hash['title']
+            if question_bank.title && question_bank.title.length > ActiveRecord::Base.maximum_string_length
+              migration.add_warning(t("The title of the following question bank was truncated: \"%{title}\"", :title => question_bank.title))
+              question_bank.title = CanvasTextHelper.truncate_text(question_bank.title, :max_length => ActiveRecord::Base.maximum_string_length)
+            end
           end
           question_bank.title ||= default_title
           question_bank.migration_id = bank_mig_id
