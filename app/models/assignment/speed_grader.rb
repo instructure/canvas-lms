@@ -97,7 +97,7 @@ class Assignment
       end
       res[:context][:quiz] = @assignment.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-      includes = [:versions, :quiz_submission, :user, :attachment_associations, :assignment]
+      includes = [:versions, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
       key = @grading_role == :grader ? :submission_comments : :all_submission_comments
       includes << {key => {submission: {assignment: { context: :root_account }}}}
       submissions = @assignment.submissions.where(:user_id => students).preload(*includes)

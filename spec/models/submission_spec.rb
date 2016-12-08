@@ -2257,6 +2257,25 @@ describe Submission do
       expect(@submission.grader_can_grade?).to be_falsey
     end
   end
+
+  describe "#submission_history" do
+    let!(:student) {student_in_course(active_all: true).user}
+    let(:attachment) {attachment_model(filename: "submission-a.doc", :context => student)}
+    let(:submission) { @assignment.submit_homework(student, submission_type: 'online_upload',attachments: [attachment]) }
+
+    it "includes originality data" do
+      OriginalityReport.create!(submission: submission, attachment: attachment, originality_score: 1.0, workflow_state:'pending')
+      submission.originality_reports.load_target
+      expect(submission.submission_history.first.turnitin_data[attachment.asset_string][:similarity_score]).to eq 1.0
+    end
+
+    it "doesn't include the originality_data if originality_report isn't pre loaded" do
+      OriginalityReport.create!(submission: submission, attachment: attachment, originality_score: 1.0, workflow_state:'pending')
+      expect(submission.submission_history.first.turnitin_data[attachment.asset_string]).to be_nil
+    end
+
+  end
+
 end
 
 def submission_spec_model(opts={})

@@ -1088,6 +1088,9 @@ class Submission < ActiveRecord::Base
         # since vericite_data is a function, make sure you are cloning the most recent vericite_data_hash
         if self.vericiteable?
           model.turnitin_data = self.vericite_data(true)
+        # only use originality data if it's loaded, we want to avoid making N+1 queries
+        elsif self.association(:originality_reports).loaded?
+          model.turnitin_data = self.originality_data
         end
         if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
           res << model

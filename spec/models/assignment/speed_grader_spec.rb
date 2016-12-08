@@ -558,6 +558,32 @@ describe Assignment::SpeedGrader do
     end
   end
 
+  context "OriginalityReport" do
+    let_once(:test_course) do
+      test_course = course(active_course: true)
+      test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
+      test_course.enroll_student(test_student, enrollment_state: 'active')
+      test_course
+    end
+
+    let_once(:test_teacher) { User.create }
+    let_once(:test_student) { User.create }
+
+    it 'includes the OriginalityReport in the json' do
+      assignment = Assignment.create!(title: "title", context: test_course)
+      attachment = test_student.attachments.new :filename => "homework.doc"
+      attachment.content_type = "foo/bar"
+      attachment.size = 10
+      attachment.save!
+      submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
+      submission.update_attribute(:turnitin_data, {blah: 1})
+      OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
+      json = Assignment::SpeedGrader.new(assignment, test_teacher).json
+      tii_data = json['submissions'].first['submission_history'].first['submission']['turnitin_data']
+      expect(tii_data[attachment.asset_string]['state']).to eq 'acceptable'
+    end
+  end
+
   context "honoring gradebook preferences" do
     let_once(:test_course) do
       test_course = course(active_course: true)
