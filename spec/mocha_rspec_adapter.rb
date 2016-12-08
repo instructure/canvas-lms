@@ -21,7 +21,6 @@ module MochaRspecAdapter
 
   # mocha and rspec both define:
   # - anything
-  # - kind_of
   # - instance_of
 
   def anything
@@ -30,14 +29,6 @@ module MochaRspecAdapter
 
   def rspec_anything
     ::RSpec::Mocks::ArgumentMatchers::AnyArgMatcher::INSTANCE
-  end
-
-  def kind_of(klass)
-    ::Mocha::ParameterMatchers::KindOf.new(klass)
-  end
-
-  def rspec_kind_of(klass)
-    ::RSpec::Mocks::ArgumentMatchers::KindOf.new(klass)
   end
 
   def instance_of(klass)
