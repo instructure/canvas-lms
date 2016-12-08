@@ -1,6 +1,5 @@
 module MasterCourses::Restrictor
   def self.included(klass)
-    raise "class must respond to migration_id" unless klass.column_names.include?("migration_id")
     klass.cattr_accessor :restricted_column_settings
     klass.restricted_column_settings = {}
 
