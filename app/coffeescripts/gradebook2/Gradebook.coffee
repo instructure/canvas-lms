@@ -149,18 +149,18 @@ define [
         effectiveDueDatesURL: @options.effective_due_dates_url
       )
 
-      gotGroupsAndDueDates = Promise.all([
+      gotGroupsAndDueDates = $.when(
         dataLoader.gotAssignmentGroups,
         dataLoader.gotEffectiveDueDates
-      ]).then(@gotAllAssignmentGroupsAndEffectiveDueDates)
+      ).then(@gotAllAssignmentGroupsAndEffectiveDueDates)
 
       dataLoader.gotCustomColumns.then @gotCustomColumns
       dataLoader.gotStudents.then @gotAllStudents
 
-      Promise.all([
+      $.when(
         dataLoader.gotCustomColumns,
         gotGroupsAndDueDates
-      ]).then(@doSlickgridStuff)
+      ).then(@doSlickgridStuff)
 
       @studentsLoaded = dataLoader.gotStudents
       @allSubmissionsLoaded = dataLoader.gotSubmissions
@@ -244,8 +244,8 @@ define [
       @initHeader()
       @gridReady.resolve()
 
-    gotAllAssignmentGroupsAndEffectiveDueDates: ([assignmentGroups, effectiveDueDates]) =>
-      @effectiveDueDates = effectiveDueDates
+    gotAllAssignmentGroupsAndEffectiveDueDates: (assignmentGroups, dueDatesResponse) =>
+      @effectiveDueDates = dueDatesResponse[0]
       @gotAllAssignmentGroups(assignmentGroups)
 
     gotAllAssignmentGroups: (assignmentGroups) =>
