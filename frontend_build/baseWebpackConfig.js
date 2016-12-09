@@ -198,6 +198,10 @@ module.exports = {
       {
         test: /vendor\/md5/,
         loader: 'exports-loader?CryptoJS'
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
       }
     ]
   },

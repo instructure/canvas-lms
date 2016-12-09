@@ -1,6 +1,5 @@
 @import 'base/environment';
 @import 'pages/shared/feature_flags';
-@import 'vendor/jquery.jcrop';
 
 .profile_table {
   td {
@@ -263,17 +262,19 @@ li[id$=service_google_docs] {
 
 }
 
-.jcrop-holder > div > div {
-  border-radius: 100%;
-  border: 2px solid #D3D9D9;
-  box-sizing: border-box;
-  margin: -2px;
-}
-
 #disable_inbox {
   vertical-align: top;
 }
 
 a.delete_key_link {
   color: $ic-color-medium-darker;
+}
+.avatar-preview .CanvasCropper {
+  max-width: 270px;
+  max-height: 270px;
+  overflow: hidden;
+  .Cropper {
+    max-width: 100%;
+    max-height: 100%;
+  }
 }

@@ -21,8 +21,8 @@ define [
   'compiled/views/profiles/AvatarUploadBaseView'
   'jst/profiles/uploadFileView'
   'compiled/util/BlobFactory'
-  'vendor/jquery.jcrop'
-], (_, BaseView, template, BlobFactory) ->
+  'jsx/canvas_cropper/cropperMaker'
+], (_, BaseView, template, BlobFactory, CropperMaker) ->
 
   class UploadFileView extends BaseView
 
@@ -69,24 +69,18 @@ define [
       unless file.type.match(/^image/)
         alert('Invalid file type.')
         return false
-      dfd    = $.Deferred()
-      reader = new FileReader()
-      reader.onload = (e) =>
-        @showPreview(e.target.result)
-        dfd.resolve(e.target.result)
-      reader.readAsDataURL(file)
-      dfd
+      @showPreview(file)
 
-    showPreview: (dataURL) ->
-      unless dataURL.match(/^data:image/)
-        alert('Invalid file.')
-        return false
-      @preview = dataURL
+    showPreview: (file) ->
+      @file = file
       @render()
       @initCropping()
 
     hidePreview: ->
-      delete @preview
+      delete @file
+      if(@cropper)
+        @cropper.unmount()
+        delete @cropper
       @render()
 
     render: ->
@@ -116,35 +110,16 @@ define [
         h           : Math.floor(@currentCoords.h  * heightRatio)
 
     getImage: ->
-      $preview  = @$('.avatar-preview')
-      $fullSize = @$('#upload-fullsize-preview')
-      canvas    = @$('#upload-canvas')[0]
-      context   = canvas.getContext('2d')
-      d         = @imageDimensions($preview, $fullSize)
-      dfd       = $.Deferred()
+      # crop returns a Promise, but we exepct getImage to return a Deferred
+      dfd = $.Deferred()
+      @cropper.crop().then((imageBlob) -> dfd.resolve(imageBlob))
+      dfd
 
-      context.drawImage($fullSize[0], d.x, d.y, d.w, d.h, 0, 0, @avatarSize.w, @avatarSize.h)
-      dfd.resolve(BlobFactory.fromCanvas(canvas, 'image/jpeg'))
-
-    initCropping: ->
-      # some browsers need some ticks to load the image
-      wait = setInterval(=>
-        $preview = @$('.avatar-preview')
-        return unless $preview[0].complete
-        clearInterval(wait)
-
-        size     = _.min([$preview.height(), $preview.width()])
-        $preview.Jcrop(
-          aspectRatio : 1
-          setSelect   : [0, 0, size, size]
-          onSelect    : @saveCropPosition
-          minSize     : [20, 20]
-        )
-        @trigger('ready')
-      , 50) # some throttling
-
-    saveCropPosition: (coords) =>
-      @currentCoords = coords
+    initCropping: () ->
+      if(!@cropper)
+        @cropper = new CropperMaker(@$('.avatar-preview')[0], {imgFile: @file, width: @avatarSize.w, height: @avatarSize.h})
+      @cropper.render()
+      @trigger('ready')
 
     toJSON: ->
-      { hasPreview: !!@preview, previewURL: @preview }
+      { hasPreview: !!@file }
