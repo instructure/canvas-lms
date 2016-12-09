@@ -28,6 +28,7 @@ require 'rubocop_canvas/cops/specs/no_before_all'
 require 'rubocop_canvas/cops/specs/no_before_once_stubs'
 require 'rubocop_canvas/cops/specs/ensure_spec_extension'
 require 'rubocop_canvas/cops/specs/no_execute_script'
+require 'rubocop_canvas/cops/specs/no_strftime'
 require 'rubocop_canvas/cops/specs/prefer_f_over_fj'
 require 'rubocop_canvas/cops/specs/scope_helper_modules'
 
