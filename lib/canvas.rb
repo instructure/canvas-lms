@@ -208,7 +208,12 @@ module Canvas
   end
 
   def self.timeout_protection_error_ttl(service_name)
-    (Setting.get("service_#{service_name}_error_ttl", nil) || Setting.get("service_generic_error_ttl", 1.minute.to_s)).to_i
+    (Setting.get("service_#{service_name}_error_ttl", nil) ||
+     Setting.get("service_generic_error_ttl", 1.minute.to_s)).to_i
+  end
+
+  def self.timeout_protection_method(service_name)
+    Setting.get("service_#{service_name}_timeout_protection_method", nil)
   end
 
   # protection against calling external services that could timeout or misbehave.
@@ -225,10 +230,11 @@ module Canvas
     timeout = (Setting.get("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || Setting.get("service_generic_timeout", 15.seconds.to_s)).to_f
 
     if Canvas.redis_enabled?
-      redis_key = "service:timeouts:#{service_name}"
-      cutoff = (Setting.get("service_#{service_name}_cutoff", nil) || Setting.get("service_generic_cutoff", 3.to_s)).to_i
-      error_ttl = timeout_protection_error_ttl(service_name)
-      short_circuit_timeout(Canvas.redis, redis_key, timeout, cutoff, error_ttl, &block)
+      if timeout_protection_method(service_name) == "percentage"
+        percent_short_circuit_timeout(Canvas.redis, service_name, timeout, &block)
+      else
+        short_circuit_timeout(Canvas.redis, service_name, timeout, &block)
+      end
     else
       Timeout.timeout(timeout, &block)
     end
@@ -243,7 +249,15 @@ module Canvas
     return nil
   end
 
-  def self.short_circuit_timeout(redis, redis_key, timeout, cutoff, error_ttl, &block)
+  def self.timeout_protection_cutoff(service_name)
+    (Setting.get("service_#{service_name}_cutoff", nil) ||
+     Setting.get("service_generic_cutoff", 3.to_s)).to_i
+  end
+
+  def self.short_circuit_timeout(redis, service_name, timeout, &block)
+    redis_key = "service:timeouts:#{service_name}:error_count"
+    cutoff = timeout_protection_cutoff(service_name)
+
     error_count = redis.get(redis_key)
     if error_count.to_i >= cutoff
       raise TimeoutCutoff.new(error_count)
@@ -252,8 +266,58 @@ module Canvas
     begin
       Timeout.timeout(timeout, &block)
     rescue Timeout::Error => e
+      error_ttl = timeout_protection_error_ttl(service_name)
       redis.incrby(redis_key, 1)
       redis.expire(redis_key, error_ttl)
+      raise
+    end
+  end
+
+  def self.timeout_protection_failure_rate_cutoff(service_name)
+    (Setting.get("service_#{service_name}_failure_rate_cutoff", nil) ||
+     Setting.get("service_generic_failure_rate_cutoff", ".2")).to_f
+  end
+
+  def self.timeout_protection_failure_counter_window(service_name)
+    (Setting.get("service_#{service_name}_counter_window", nil) ||
+     Setting.get("service_generic_counter_window", 60.to_s)).to_i
+  end
+
+  def self.timeout_protection_failure_min_samples(service_name)
+    (Setting.get("service_#{service_name}_min_samples", nil) ||
+     Setting.get("service_generic_min_samples", 100.to_s)).to_i
+  end
+
+  def self.percent_short_circuit_timeout(redis, service_name, timeout, &block)
+    redis_key = "service:timeouts:#{service_name}:percent_counter"
+    cutoff = timeout_protection_failure_rate_cutoff(service_name)
+
+    protection_activated_key = "#{redis_key}:protection_activated"
+    protection_activated = redis.get(protection_activated_key)
+    raise TimeoutCutoff.new(cutoff) if protection_activated
+
+    counter_window = timeout_protection_failure_counter_window(service_name)
+    min_samples = timeout_protection_failure_min_samples(service_name)
+    counter = FailurePercentCounter.new(redis, redis_key, counter_window, min_samples)
+
+    failure_rate = counter.failure_rate
+    if failure_rate >= cutoff
+      # We add the key for timeout protection here, instead of in the
+      # error block below, because in a previous run, we could go over
+      # the minimum number of samples with a non-timedout call.  This
+      # has the added benefit of making the error block below much
+      # smaller.
+      error_ttl = timeout_protection_error_ttl(service_name)
+      redis.set(protection_activated_key, "true")
+      redis.expire(protection_activated_key, error_ttl)
+      raise TimeoutCutoff.new(failure_rate)
+    end
+
+    begin
+      counter.increment_count
+      Timeout.timeout(timeout, &block)
+    rescue Timeout::Error
+      counter.increment_failure
       raise
     end
   end

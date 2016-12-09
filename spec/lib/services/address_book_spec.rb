@@ -147,7 +147,7 @@ module Services
       it "uses timeout protection and returns sane value on timeout" do
         Canvas.stubs(:redis_enabled?).returns(true)
         Canvas.stubs(:redis).returns(stub())
-        Canvas.redis.stubs(:get).with("service:timeouts:address_book").returns(4)
+        Canvas.redis.stubs(:get).with("service:timeouts:address_book:error_count").returns(4)
         Rails.logger.expects(:error).with("Skipping service call due to error count: address_book 4")
         result = nil
         expect { result = Services::AddressBook.recipients(@sender) }.not_to raise_error
