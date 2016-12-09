@@ -70,6 +70,9 @@ Specs/NoExecuteScript:
   Exclude:
     - "**/spec/selenium/test_setup/**/*.rb"
 
+Specs/NoNoSuchElementError:
+  <<: *Specs
+
 Specs/NoStrftime:
   <<: *Specs
 
