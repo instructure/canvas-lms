@@ -6,6 +6,13 @@ module MasterCourses::Restrictor
     klass.extend ClassMethods
     klass.validate :check_for_restricted_column_changes
     klass.send(:attr_writer, :master_course_restrictions)
+
+    klass.after_create :create_child_content_tag
+
+    klass.after_update :mark_downstream_changes
+
+    # luckily before_update comes after before_save in case we do sneaky changes in models
+    klass.before_update :check_before_overwriting_child_content_on_import
   end
 
   module ClassMethods
@@ -20,23 +27,75 @@ module MasterCourses::Restrictor
     end
   end
 
-  def skip_master_course_validation!
-    @skip_master_course_validation = true
+  def mark_as_importing!(cm)
+    @importing_migration = cm
   end
 
   def check_for_restricted_column_changes
-    return true if new_record? || @skip_master_course_validation || !is_child_content?
+    return true if new_record? || @importing_migration || !is_child_content?
     restrictions = nil
     locked_columns = []
     self.class.base_class.restricted_column_settings.each do |type, columns|
-      next unless columns
       changed_columns = (self.changes.keys & columns)
       if changed_columns.any?
-        locked_columns << changed_columns if self.master_course_restrictions[type]
+        locked_columns += changed_columns if self.master_course_restrictions[type]
       end
     end
     if locked_columns.any?
       self.errors.add(:base, "cannot change column(s): #{locked_columns.join(", ")} - locked by Master Course")
+    end
+  end
+
+  def mark_downstream_changes
+    return if @importing_migration || !is_child_content? # don't mark changes on import
+
+    changed_columns = self.changes.keys & self.class.base_class.restricted_column_settings.values.flatten
+    if changed_columns.any?
+      MasterCourses::ChildContentTag.transaction do
+        child_tag = MasterCourses::ChildContentTag.all.polymorphic_where(:content => self).lock.first
+        if child_tag
+          new_changes = changed_columns - child_tag.downstream_changes
+          if new_changes.any?
+            child_tag.downstream_changes += new_changes
+            child_tag.save!
+          end
+        else
+          Rails.logger.warn("Child content tag was not found for #{self.class.name} #{self.id} - either this is from old code or something bad happened")
+        end
+      end
+    end
+  end
+
+  def create_child_content_tag
+    # i thought about making this a bulk insert at the end of the migration but the race conditions seemed scary
+    if @importing_migration && is_child_content?
+      @importing_migration.master_course_subscription.create_content_tag_for!(self)
+    end
+  end
+
+  def check_before_overwriting_child_content_on_import
+    return unless @importing_migration && is_child_content?
+
+    child_tag = @importing_migration.master_course_subscription.content_tag_for(self) # find or create it
+    return unless child_tag.downstream_changes.present?
+
+    restrictions = nil
+    columns_to_restore = []
+    self.class.base_class.restricted_column_settings.each do |type, columns|
+      changed_columns = (child_tag.downstream_changes & self.changes.keys & columns)
+      if changed_columns.any?
+        if self.master_course_restrictions[type] # don't overwrite downstream changes _unless_ it's locked
+          child_tag.downstream_changes -= changed_columns # remove them from the downstream changes since we overwrote
+          child_tag.save!
+        else
+          # if not locked then we should undo _all_ the changes in the category (content or settings) we were about to make
+          columns_to_restore += (self.changes.keys & columns)
+        end
+      end
+    end
+    if columns_to_restore.any?
+      Rails.logger.debug("Undoing imported changes to #{self.class} #{self.id} because changed downstream - #{columns_to_restore.join(', ')}")
+      self.restore_attributes(columns_to_restore)
     end
   end
 

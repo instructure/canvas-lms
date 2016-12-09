@@ -488,6 +488,8 @@ class ContentMigration < ActiveRecord::Base
     begin
       data = nil
       if self.for_master_course_import?
+        self.master_course_subscription.load_tags! # load child content tags
+
         # copy the attachments
         source_export = ContentExport.find(self.migration_settings[:master_course_export_id])
         self.context.copy_attachments_from_course(source_export.context, :content_export => source_export, :content_migration => self)
@@ -539,6 +541,11 @@ class ContentMigration < ActiveRecord::Base
   def update_master_migration(state)
     master_migration = MasterCourses::MasterMigration.find(self.migration_settings[:master_migration_id])
     master_migration.update_import_state!(self, state)
+  end
+
+  def master_course_subscription
+    return unless self.for_master_course_import?
+    @master_course_subscription ||= MasterCourses::ChildSubscription.find(self.migration_settings[:child_subscription_id])
   end
 
   def prepare_data(data)

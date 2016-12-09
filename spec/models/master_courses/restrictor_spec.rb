@@ -32,13 +32,6 @@ describe MasterCourses::Restrictor do
       @page_copy.save!
     end
 
-    it "should not prevent changes if validations are skipped" do
-      @tag.update_attribute(:restrictions, {:content => true})
-      @page_copy.skip_master_course_validation!
-      @page_copy.body = "another something else"
-      @page_copy.save!
-    end
-
     it "should prevent changes to content columns on content-locked objects" do
       @tag.update_attribute(:restrictions, {:content => true})
       @page_copy.body = "something else"

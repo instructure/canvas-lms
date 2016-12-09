@@ -82,8 +82,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def ensure_tag_on_export(obj)
-    return unless self.default_restrictions.present? # if there are no restrictions then why bother creating tags
-
+    # even if there are no default restrictions we should still create the tags initially so know to touch the content if we lock it later
     load_tags! # does nothing if already loaded
     content_tag_for(obj, {:restrictions => self.default_restrictions}) # set the restrictions on create if a new tag
     # TODO: make a thing if we change the defaults at some point and want to force them on all the existing tags

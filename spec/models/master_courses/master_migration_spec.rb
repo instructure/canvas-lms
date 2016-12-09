@@ -137,7 +137,7 @@ describe MasterCourses::MasterMigration do
 
       expect(@migration).to be_completed
 
-      expect(@template.master_content_tags.polymorphic_where(:content => assmt)).to_not be_exists # shouldn't bother creating tags unless we have restrictions
+      expect(@template.master_content_tags.polymorphic_where(:content => assmt).first.restrictions).to be_empty # never mind
 
       [@sub1, @sub2].each do |sub|
         sub.reload
@@ -303,6 +303,48 @@ describe MasterCourses::MasterMigration do
       expect(copied_ann.reload.message).to eq new_text
       expect(copied_page.reload.body).to eq new_text
       expect(copied_quiz.reload.description).to eq new_text
+    end
+
+    it "should not overwrite downstream changes in child course unless locked" do
+      @copy_to = course
+      sub = @template.add_child_course!(@copy_to)
+
+      # TODO: add more content here as we add the Restrictor module to more models
+      old_title = "some title"
+      page = @copy_from.wiki.wiki_pages.create!(:title => old_title, :body => "ohai")
+
+      run_master_migration
+
+      copied_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
+      child_tag = sub.child_content_tags.polymorphic_where(:content => copied_page).first
+      expect(child_tag).to be_present # should create a tag
+      new_child_text = "<p>some other text here</p>"
+      copied_page.update_attribute(:body, new_child_text)
+      child_tag.reload
+      expect(child_tag.downstream_changes).to include('body')
+
+      new_master_text = "<p>some text or something</p>"
+      page.update_attribute(:body, new_master_text)
+      new_master_title = "some new title"
+      page.update_attribute(:title, new_master_title)
+      [page].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets marked for copy
+
+      run_master_migration # re-copy all the content but don't actually overwrite the downstream change
+
+      expect(copied_page.reload.body).to eq new_child_text # should have been left alone
+      expect(copied_page.title).to eq old_title # even the title
+
+      [page].each do |c|
+        mtag = @template.content_tag_for(c)
+        Timecop.freeze(2.seconds.from_now) do
+          mtag.update_attribute(:restrictions, {:content => true}) # should touch the content
+        end
+      end
+
+      run_master_migration # re-copy all the content but this time overwrite the downstream change because we locked it
+
+      expect(copied_page.reload.body).to eq new_master_text
+      expect(copied_page.title).to eq new_master_title # even the title
     end
 
     context "master courses + external migrations" do
