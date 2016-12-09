@@ -148,14 +148,21 @@ module ConditionalRelease
     end
 
     # Returns an http response-like hash { code: string, body: string or object }
-    def self.select_mastery_path(context, current_user, student, trigger_assignment_id, assignment_set_id, session)
+    def self.select_mastery_path(context, current_user, student, trigger_assignment, assignment_set_id, session)
       return unless enabled_in_context?(context)
-      if context.blank? || student.blank? || trigger_assignment_id.blank? || assignment_set_id.blank?
+      if context.blank? || student.blank? || trigger_assignment.blank? || assignment_set_id.blank?
         return { code: '400', body: { message: 'invalid request' } }
       end
 
+      trigger_submission = trigger_assignment.submission_for_student(student)
+      if trigger_submission.blank? || !trigger_submission.graded? || trigger_assignment.muted?
+        return { code: '400', body: { message: 'invalid submission state' } }
+      end
+
       request_data = {
-        trigger_assignment: trigger_assignment_id,
+        trigger_assignment: trigger_assignment.id,
+        trigger_assignment_score: trigger_submission.score,
+        trigger_assignment_points_possible: trigger_assignment.points_possible,
         student_id: student.id,
         assignment_set_id: assignment_set_id
       }
