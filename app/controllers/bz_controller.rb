@@ -299,6 +299,8 @@ class BzController < ApplicationController
 
     @progressions = @current_user.context_module_progressions
 
+    @editable = authorized_action(@course, @current_user, :update)
+
     #@course.context_modules.active.each do |mod|
       #mod.part_id = 2
       #mod.save
@@ -332,7 +334,7 @@ class BzController < ApplicationController
       part.save
     end
 
-    redirect_to "/courses/#{@course.id}/dynamic_syllabus"
+    redirect_to "/courses/#{@course.id}/dynamic_syllabus/modules_edit"
   end
 
   def dynamic_syllabus_modules_edit
@@ -349,7 +351,20 @@ class BzController < ApplicationController
     params[:module_id].each_with_index do |module_id, idx|
       mod = ContextModule.find(module_id)
       mod.intro_text = params[:intro_text][idx]
-      mod.image_url = params[:image_url][idx]
+
+      # mod.image_url = params[:image_url][idx]
+
+      if params[:upload]["image_file_#{mod.id}"]
+        file = params[:upload]["image_file_#{mod.id}"].read
+        dirname = Rails.root.to_s + '/public/bz_dynamic_syllabus_images/'
+        filename = dirname + module_id.to_s + '.png'
+        File.open(filename, 'wb') do |f|
+          f.write(file)
+        end
+
+        mod.image_url = "/bz_dynamic_syllabus_images/#{module_id.to_s}.png"
+      end
+
       mod.part_id = (params[:part_id][idx] == '') ? nil : params[:part_id][idx]
       mod.save
     end
