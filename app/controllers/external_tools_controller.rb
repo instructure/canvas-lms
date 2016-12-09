@@ -40,6 +40,9 @@ class ExternalToolsController < ApplicationController
   # @argument selectable [Boolean]
   #   If true, then only tools that are meant to be selectable are returned
   #
+  # @argument include_parents [Boolean]
+  #   If true, then include tools installed in all accounts above the current context
+  #
   # @example_response
   #     [
   #      {
