@@ -461,6 +461,15 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
         errors["online_submission_types[online_text_entry]"] = [
           message: I18n.t 'at_least_one_submission_type', 'Please choose at least one submission type'
         ]
+      else if data.submission_type == 'online' and data.vericite_enabled == "1"
+        allow_vericite = true
+        _.select _.keys(data.submission_types), (k) ->
+          allow_vericite = allow_vericite && (data.submission_types[k] == "online_upload" || data.submission_types[k] == "online_text_entry")
+        if !allow_vericite
+          errors["online_submission_types[online_text_entry]"] = [
+            message: I18n.t 'vericite_submission_types_validation', 'VeriCite only supports file submissions and text entry'
+          ]
+
       errors
 
     _validateAllowedExtensions: (data, errors) =>
