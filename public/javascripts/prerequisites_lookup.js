@@ -55,11 +55,14 @@ define([
       for(var idx in data.modules) {
         var module = data.modules[idx];
         var $li = $("<li/>");
+        var $i = $("<i/>");
         $li.addClass('module');
         $li.click(function() {
           $(this).find("ul").toggle();
         });
         $li.toggleClass('locked', !!module.locked);
+        if (module.locked) { $i.addClass('icon-lock'); }
+        $li.append($i);
         var $h3 = $("<h3/>");
         $h3.text(module.name);
         $li.append($h3);
@@ -73,6 +76,7 @@ define([
             var $a = $("<a/>");
             $a.attr('href', pre.url);
             $a.text(pre.title);
+            $a.toggleClass('icon-lock', !pre.available);
             $pre.append($a);
             var desc = pre.requirement_description;
             if(desc) {
