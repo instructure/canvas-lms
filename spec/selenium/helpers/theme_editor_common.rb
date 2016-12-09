@@ -51,25 +51,9 @@ module ThemeEditorCommon
   def click_watermarks_and_other_images
     f('.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > h3:nth-of-type(3)').click
   end
-
-  def save_theme_button
-    fj('.Theme__header-secondary .Button.Button--primary:contains("Save theme")')
-  end
-
-  def new_theme_name_text
-    f('#new_theme_theme_name')
-  end
-
-  def theme_save_modal_save_button
-    fj('.ReactModal__Footer-Actions .Button.Button--primary:contains("Save theme")')
-  end
-
-  def apply_theme_button
-    fj('.Theme__header-primary .Button.Button--success:contains("Apply theme")')
-  end
-
+  
   def primary_color
-    f('#brand_config\\[variables\\]\\[ic-brand-primary\\]')
+    f('#brand_config\\[variables\\]\\[ic-brand-primary\\]') 
   end
 
   def primary_button
@@ -133,13 +117,13 @@ module ThemeEditorCommon
   end
 
   def all_global_navigation
-    [nav_background,
-     nav_icon,
-     nav_icon_active,
-     nav_text,
-     nav_text_active,
-     nav_avatar_border,
-     nav_badge,
+    [nav_background, 
+     nav_icon, 
+     nav_icon_active, 
+     nav_text, 
+     nav_text_active, 
+     nav_avatar_border, 
+     nav_badge, 
      logo_background]
   end
 
@@ -162,23 +146,5 @@ module ThemeEditorCommon
 
     click_watermarks_and_other_images
     all_colors(all_watermarks, color)
-  end
-
-  def preview_and_save_theme(name='test')
-    expect_new_page_load do
-      preview_your_changes
-      expect(fj('.ReactModal__Content:contains("Generating preview")')).to be_displayed
-      run_jobs
-    end
-
-    save_theme_button.click
-    expect(new_theme_name_text).to be_displayed
-    new_theme_name_text.send_keys(name)
-
-    theme_save_modal_save_button.click
-    wait_for_ajaximations
-    apply_theme_button.click
-    driver.switch_to.alert.accept
-    wait_for_ajaximations
   end
 end

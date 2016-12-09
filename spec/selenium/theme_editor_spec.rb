@@ -79,28 +79,6 @@ describe 'Theme Editor' do
     expect(f('#left-side #section-tabs .brand_configs').text).to eq 'Themes'
   end
 
-  it 'primary color can be customized', priority: "1", test_id: 246618 do
-    open_theme_editor(Account.default.id)
-    color = '#dc6969'
-    primary_color.send_keys(color)
-
-    preview_and_save_theme
-
-    # check the color actually changed
-    expect(f('a.active').style('background-color')).to eql(convert_hex_to_rgba_color(color))
-  end
-
-  it 'primary button text color can be customized', priority: "1", test_id: 246619 do
-    open_theme_editor(Account.default.id)
-    color = '#dc6969'
-    primary_button.send_keys(color)
-
-    preview_and_save_theme
-
-    # check the color actually changed
-    expect(f('.al-trigger.Button.Button--primary').style('background-color')).to eql(convert_hex_to_rgba_color(color))
-  end
-
   it 'should display the preview button when valid change is made', priority: "1", test_id: 239984 do
     open_theme_editor(Account.default.id)
 

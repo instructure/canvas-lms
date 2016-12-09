@@ -7,12 +7,6 @@ module ColorCommon
     "(#{rgb_array[0]}, #{rgb_array[1]}, #{rgb_array[2]})"
   end
 
-  def convert_hex_to_rgba_color(hex_color)
-    hex_color = hex_color[1..-1]
-    rgb_array = hex_color.scan(/../).map {|color| color.to_i(16)}
-    "rgba(#{rgb_array[0]}, #{rgb_array[1]}, #{rgb_array[2]}, 1)"
-  end
-
   def random_hex_color
     values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
     color = "#" + values.sample + values.sample + values.sample + values.sample + values.sample + values.sample
