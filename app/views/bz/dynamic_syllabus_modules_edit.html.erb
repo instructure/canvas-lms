@@ -1,31 +1,39 @@
-<h1>Course Modules for Dynamic Syllabus</h1>
+<%
+jammit_css :tinymce
+js_bundle :dynamic_syllabus
+%>
+<div class="bz-dynamic-syllabus-editor">
+  <h1>Course Modules for Dynamic Syllabus</h1>
 
-<hr />
+  <hr />
 
-<%= form_tag "/courses/#{@course.id}/dynamic_syllabus/modules_edit", {:method => :post} do %>
+  <%= form_tag "/courses/#{@course.id}/dynamic_syllabus/modules_edit", {:method => :post, :multipart => true} do %>
 
-  <% @course.context_modules.active.each do |mod| %>
-  <div>
-    <h3><%= mod.name %></h3>
-    <input type="hidden" name="module_id[]" value="<%= mod.id %>" />
-    <label>Intro text:
-      <textarea name="intro_text[]" style="width: 300px; height: 150px;">
-        <%= mod.intro_text %>
-      </textarea>
-      <br />
-    <label>Image:
-      <input type="text" name="image_url[]" value="<%= mod.image_url %>" /></label>
-      <br />
-    <label>Course Part:
-      <select name="part_id[]">
-          <option value="">-none-</option>
-        <% @course_parts.each do |part| %>
-          <option value="<%= part.id %>" <%= (part.id == mod.part_id) ? 'selected' : '' %>><%= part.title %></option>
+    <% @course.context_modules.active.each do |mod| %>
+    <div class="dynamic-syllabus-parts-editor">
+      <h3><%= mod.name %></h3>
+      <input type="hidden" name="module_id[]" value="<%= mod.id %>" />
+      <label><span>Intro text:</span>
+        <textarea class="rich-text-editor" name="intro_text[]" style="width: 300px; height: 150px;">
+          <%= mod.intro_text %>
+        </textarea>
+      <label><span>Image:</span>
+        <!-- <input type="text" name="image_url[]" value="<%= mod.image_url %>" /></label> -->
+        <%= file_field 'upload', "image_file_#{mod.id}" %>
+        <% if mod.image_url && !mod.image_url.empty? %>
+          <img style="max-width: 200px; max-height: 200px;" src="<%=mod.image_url%>" />
         <% end %>
-      </select></label>
-  </div>
+      <label><span>Course Part:</span>
+        <select name="part_id[]">
+            <option value="">-none-</option>
+          <% @course_parts.each do |part| %>
+            <option value="<%= part.id %>" <%= (part.id == mod.part_id) ? 'selected' : '' %>><%= part.title %></option>
+          <% end %>
+        </select></label>
+    </div>
+    <% end %>
+
+    <input type="submit" value="Save" />
+
   <% end %>
-
-  <input type="submit" value="Save" />
-
-<% end %>
+</div>
