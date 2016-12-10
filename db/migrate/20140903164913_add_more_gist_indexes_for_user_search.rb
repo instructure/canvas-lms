@@ -1,4 +1,4 @@
-class AddMoreGistIndexesForUserSearch < ActiveRecord::Migration
+class AddMoreGistIndexesForUserSearch < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   tag :predeploy
 

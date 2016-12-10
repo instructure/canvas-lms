@@ -64,6 +64,7 @@ module Api::V1::DiscussionTopics
   def discussion_topic_api_json(topic, context, user, session, opts = {})
     opts.reverse_merge!(
       include_assignment: true,
+      include_all_dates: false,
       override_dates: true
     )
 
@@ -79,6 +80,7 @@ module Api::V1::DiscussionTopics
       excludes = opts[:exclude_assignment_description] ? ['description'] : []
       json[:assignment] = assignment_json(topic.assignment, user, session,
         include_discussion_topic: false, override_dates: opts[:override_dates],
+        include_all_dates: opts[:include_all_dates],
         exclude_response_fields: excludes)
     end
 

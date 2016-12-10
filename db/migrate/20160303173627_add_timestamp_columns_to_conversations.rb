@@ -1,4 +1,4 @@
-class AddTimestampColumnsToConversations < ActiveRecord::Migration
+class AddTimestampColumnsToConversations < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

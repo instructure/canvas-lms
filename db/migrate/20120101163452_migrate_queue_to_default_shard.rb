@@ -1,4 +1,4 @@
-class MigrateQueueToDefaultShard < ActiveRecord::Migration
+class MigrateQueueToDefaultShard < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

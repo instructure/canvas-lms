@@ -16,7 +16,7 @@ module AcademicBenchmark
 
   class APIError < StandardError; end
 
-  def self.import(guid_or_guids)
+  def self.import(guid_or_guids, options={})
     if !AcademicBenchmark.config[:api_key] || AcademicBenchmark.config[:api_key].empty?
       raise Canvas::Migration::Error.new("Not importing academic benchmark data because no API key is set")
     end
@@ -32,11 +32,11 @@ module AcademicBenchmark
     end
 
     Array(guid_or_guids).map do |guid|
-      AcademicBenchmark.queue_migration_for_guid(guid, permissionful_user).first
+      AcademicBenchmark.queue_migration_for_guid(guid, permissionful_user, options).first
     end
   end
 
-  def self.queue_migration_for_guid(guid, user)
+  def self.queue_migration_for_guid(guid, user, options={})
     unless Account.site_admin.grants_right?(user, :manage_global_outcomes)
       raise Canvas::Migration::Error.new(I18n.t('academic_benchmark.no_permissions', "User isn't allowed to edit global outcomes"))
     end
@@ -49,6 +49,7 @@ module AcademicBenchmark
     cm.migration_settings[:no_archive_file] = true
     cm.migration_settings[:skip_import_notification] = true
     cm.migration_settings[:skip_job_progress] = true
+    cm.migration_settings[:migration_options] = options
     cm.strand = "academic_benchmark"
     cm.user = user
     cm.save!

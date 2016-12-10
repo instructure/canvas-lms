@@ -5,8 +5,9 @@ define([
   'helpers/fakeENV',
   'jsx/grading/helpers/OutlierScoreHelper',
   'compiled/userSettings',
+  'jsx/speed_grader/mgp',
   'jquery.ajaxJSON'
-  ], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings) => {
+  ], ($, SpeedGrader, SpeedgraderHelpers, fakeENV, OutlierScoreHelper, userSettings, MGP) => {
 
   module("SpeedGrader", {
     setup() {
@@ -198,6 +199,14 @@ define([
     ok(srcUrl.indexOf(encodeURIComponent(url)) > -1)
   });
 
+  test('can be fullscreened', () => {
+    let retrieveUrl = 'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22';
+    let url = 'www.example.com/lti/launch/user/4';
+    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, url);
+    let fullscreenAttr = $div.find('iframe').attr('allowfullscreen');
+    equal(fullscreenAttr, "true");
+  })
+
   module('speed_grader#getGradeToShow');
 
   test('returns an empty string if submission is null', () => {
@@ -273,4 +282,61 @@ define([
     let result = SpeedGrader.EG.getStudentNameAndGrade();
     equal(result, 'Student 6 - not graded');
   });
+
+  module('handleSubmissionSelectionChange', {
+    setup() {
+      fakeENV.setup();
+      this.originalWindowJSONData = window.jsonData;
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: "Guy B. Studying",
+        enrollments: [{
+          workflow_state: 'active'
+        }],
+        submission_state: 'not_graded',
+        submission: {
+          currentSelectedIndex: 1,
+          score: 7,
+          grade: 70,
+          submission_type: 'basic_lti_launch',
+          workflow_state: 'submitted',
+          submission_history: [
+            {
+              submission: {
+                submission_type: 'basic_lti_launch',
+                external_tool_url: 'foo'
+              }
+            },
+            {
+              submission: {
+                submission_type: 'basic_lti_launch',
+                external_tool_url: 'bar'
+              }
+            }
+          ]
+        }
+      };
+
+      window.jsonData = {
+        id: 27,
+        GROUP_GRADING_MODE: false,
+        points_possible: 10,
+        studentMap : {
+          4 : SpeedGrader.EG.currentStudent
+        }
+      };
+    },
+
+    teardown() {
+      fakeENV.teardown();
+      window.jsonData = this.originalWindowJSONData;
+    }
+  });
+
+  test('should use submission history lti launch url', () => {
+    let renderLtiLaunch = sinon.stub(SpeedGrader.EG, 'renderLtiLaunch');
+    sinon.stub(MGP, 'assignmentClosedForStudent').returns(false);
+    SpeedGrader.EG.handleSubmissionSelectionChange();
+    ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, "bar"));
+  })
 });

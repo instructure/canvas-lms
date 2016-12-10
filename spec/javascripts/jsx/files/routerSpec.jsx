@@ -1,9 +1,6 @@
 define([
-  'react',
   'jsx/files/router',
-], (React, router) => {
-
-  const TestUtils = React.addons.TestUtils;
+], (router) => {
 
   // No op for next().
   const fakeNext = () => {};

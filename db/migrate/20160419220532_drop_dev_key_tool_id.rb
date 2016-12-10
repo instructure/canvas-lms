@@ -1,4 +1,4 @@
-class DropDevKeyToolId < ActiveRecord::Migration
+class DropDevKeyToolId < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

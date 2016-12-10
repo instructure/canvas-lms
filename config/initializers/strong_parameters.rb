@@ -1,44 +1,46 @@
-class WeakParameters < ActiveSupport::HashWithIndifferentAccess
-  # stealin some code from strong params to make WeakParameters from the values
+if CANVAS_RAILS4_2
+  class WeakParameters < ActiveSupport::HashWithIndifferentAccess
+    # stealin some code from strong params to make WeakParameters from the values
 
-  def each(&block)
-    super do |key, value|
-      convert_hashes_to_parameters(key, value)
+    def each(&block)
+      super do |key, value|
+        convert_hashes_to_parameters(key, value)
+      end
+
+      super
     end
 
-    super
-  end
+    def [](key)
+      convert_hashes_to_parameters(key, super)
+    end
 
-  def [](key)
-    convert_hashes_to_parameters(key, super)
-  end
+    def fetch(key, *args)
+      convert_hashes_to_parameters(key, super, false)
+    end
 
-  def fetch(key, *args)
-    convert_hashes_to_parameters(key, super, false)
-  end
+    def delete(key, &block)
+      convert_hashes_to_parameters(key, super, false)
+    end
 
-  def delete(key, &block)
-    convert_hashes_to_parameters(key, super, false)
-  end
+    def select!(&block)
+      convert_value_to_parameters(super)
+    end
 
-  def select!(&block)
-    convert_value_to_parameters(super)
-  end
+    private
+    def convert_hashes_to_parameters(key, value, assign_if_converted=true)
+      converted = convert_value_to_parameters(value)
+      self[key] = converted if assign_if_converted && !converted.equal?(value)
+      converted
+    end
 
-  private
-  def convert_hashes_to_parameters(key, value, assign_if_converted=true)
-    converted = convert_value_to_parameters(value)
-    self[key] = converted if assign_if_converted && !converted.equal?(value)
-    converted
-  end
-
-  def convert_value_to_parameters(value)
-    if value.is_a?(Array)
-      value.map { |_| convert_value_to_parameters(_) }
-    elsif value.is_a?(WeakParameters) || !value.is_a?(Hash)
-      value
-    else
-      self.class.new(value)
+    def convert_value_to_parameters(value)
+      if value.is_a?(Array)
+        value.map { |_| convert_value_to_parameters(_) }
+      elsif value.is_a?(WeakParameters) || !value.is_a?(Hash)
+        value
+      else
+        self.class.new(value)
+      end
     end
   end
 end
@@ -124,23 +126,41 @@ ActionController::Base.class_eval do
     ArbitraryStrongishParams::ANYTHING
   end
 
-  def params
-    @_params ||= WeakParameters.new(request.parameters)
-  end
+  if CANVAS_RAILS4_2
+    def params
+      @_params ||= WeakParameters.new(request.parameters)
+    end
 
-  def strong_params
-    @_strong_params ||= ActionController::Parameters.new(request.parameters)
-  end
+    def strong_params
+      @_strong_params ||= ActionController::Parameters.new(request.parameters)
+    end
 
-  def params=(val)
-    @_strong_params = val.is_a?(Hash) ? ActionController::Parameters.new(val) : val
-    @_params = val.is_a?(Hash) ? WeakParameters.new(val) : val
+    def params=(val)
+      @_strong_params = val.is_a?(Hash) ? ActionController::Parameters.new(val) : val
+      @_params = val.is_a?(Hash) ? WeakParameters.new(val) : val
+    end
+  else
+    def strong_params
+      params
+    end
   end
 end
 
 # completely ignore attr_accessible if it's a strong parameters
 module ForbiddenAttributesProtectionWithoutAttrAccessible
   module ClassMethods
+    # temporary shims to ignore protected attributes in Rails 5 so that other Rails 5 work
+    # can continue while we're still converting models over to Rails 5
+    unless CANVAS_RAILS4_2
+      def attr_accessible(*_args)
+        raise "you didn't finish converting to strong_parameters?!" if Rails.env.production?
+      end
+
+      def attr_protected(*_args)
+        raise "you didn't finish converting to strong_parameters?!" if Rails.env.production?
+      end
+    end
+
     def strong_params
       @strong_params = true
     end
@@ -150,20 +170,22 @@ module ForbiddenAttributesProtectionWithoutAttrAccessible
     end
   end
 
-  def sanitize_for_mass_assignment(*options)
-    new_attributes = options.first
-    if new_attributes.respond_to?(:permitted?)
-      raise ActiveModel::ForbiddenAttributesError unless new_attributes.permitted?
-      new_attributes
-    elsif new_attributes.is_a?(WeakParameters) && self.class.strong_params?
-      raise ActiveModel::ForbiddenAttributesError
-    else
-      super
+  if CANVAS_RAILS4_2
+    def sanitize_for_mass_assignment(*options)
+      new_attributes = options.first
+      if new_attributes.respond_to?(:permitted?)
+        raise ActiveModel::ForbiddenAttributesError unless new_attributes.permitted?
+        new_attributes
+      elsif new_attributes.is_a?(WeakParameters) && self.class.strong_params?
+        raise ActiveModel::ForbiddenAttributesError
+      else
+        super
+      end
     end
   end
 end
 
-ActiveRecord::Base.include(ForbiddenAttributesProtectionWithoutAttrAccessible)
+ActiveRecord::Base.include(ForbiddenAttributesProtectionWithoutAttrAccessible) if CANVAS_RAILS4_2
 ActiveRecord::Base.singleton_class.include(ForbiddenAttributesProtectionWithoutAttrAccessible::ClassMethods)
 
 ActionController::ParameterMissing.class_eval do

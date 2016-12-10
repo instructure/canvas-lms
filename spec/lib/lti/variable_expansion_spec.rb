@@ -22,7 +22,6 @@ module Lti
   describe VariableExpansion do
 
     class TestExpander
-
       attr_accessor :one, :two, :three
 
       def initialize
@@ -30,7 +29,14 @@ module Lti
         @two = 2
         @three = 3
       end
+    end
 
+    it 'must accept multiple guards and combine their results with a logical AND' do
+      var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { true }, -> { true } )
+      expect(var_exp.expand(TestExpander.new)).to eq 6
+
+      var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { false }, -> { true } )
+      expect(var_exp.expand(TestExpander.new)).to eq '$test'
     end
 
     it 'expands variables' do
@@ -42,7 +48,5 @@ module Lti
       var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> {false} )
       expect(var_exp.expand(TestExpander.new)).to eq '$test'
     end
-
-
   end
 end

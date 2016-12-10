@@ -1,4 +1,4 @@
-class AddDefaultGroupStorageQuota < ActiveRecord::Migration
+class AddDefaultGroupStorageQuota < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

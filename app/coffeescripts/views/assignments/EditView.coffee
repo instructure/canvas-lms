@@ -18,13 +18,14 @@ define [
   'compiled/views/editor/KeyboardShortcuts'
   'jsx/shared/conditional_release/ConditionalRelease'
   'compiled/util/deparam'
+  'jsx/assignments/AssignmentConfigurationTools'
   'jqueryui/dialog'
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
 ], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, template,
 userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
 AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
-ConditionalRelease, deparam) ->
+ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -64,6 +65,7 @@ ConditionalRelease, deparam) ->
     GROUP_CATEGORY_BOX = '#has_group_category'
     MODERATED_GRADING_BOX = '#assignment_moderated_grading'
     CONDITIONAL_RELEASE_TARGET = '#conditional_release_target'
+    ASSIGNMENT_CONFIGURATION_TOOLS = '#assignment_configuration_tools'
 
     els: _.extend({}, @::els, do ->
       els = {}
@@ -92,6 +94,7 @@ ConditionalRelease, deparam) ->
       els["#{ASSIGNMENT_POINTS_CHANGE_WARN}"] = '$pointsChangeWarning'
       els["#{MODERATED_GRADING_BOX}"] = '$moderatedGradingBox'
       els["#{CONDITIONAL_RELEASE_TARGET}"] = '$conditionalReleaseTarget'
+      els["#{ASSIGNMENT_CONFIGURATION_TOOLS}"] = '$assignmentConfigurationTools'
       els["#{SECURE_PARAMS}"] = '$secureParams'
       els
     )
@@ -101,6 +104,7 @@ ConditionalRelease, deparam) ->
       events["click .cancel_button"] = 'handleCancel'
       events["click .save_and_publish"] = 'saveAndPublish'
       events["change #{SUBMISSION_TYPE}"] = 'handleSubmissionTypeChange'
+      events["change #{ONLINE_SUBMISSION_TYPES}"] = 'handleOnlineSubmissionTypeChange'
       events["change #{RESTRICT_FILE_UPLOADS}"] = 'handleRestrictFileUploadsChange'
       events["click #{ADVANCED_TURNITIN_SETTINGS}"] = 'showTurnitinDialog'
       events["change #{TURNITIN_ENABLED}"] = 'toggleAdvancedTurnitinSettings'
@@ -254,6 +258,13 @@ ConditionalRelease, deparam) ->
       @$externalToolSettings.toggleAccessibly subVal == 'external_tool'
       @$groupCategorySelector.toggleAccessibly subVal != 'external_tool'
       @$peerReviewsFields.toggleAccessibly subVal != 'external_tool'
+      @$assignmentConfigurationTools.toggleAccessibly subVal == 'online' && ENV.PLAGIARISM_DETECTION_PLATFORM
+      if subVal == 'online'
+        @handleOnlineSubmissionTypeChange()
+
+    handleOnlineSubmissionTypeChange: (env) =>
+      showConfigTools = @$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).attr('checked')
+      @$assignmentConfigurationTools.toggleAccessibly showConfigTools && ENV.PLAGIARISM_DETECTION_PLATFORM
 
     afterRender: =>
       # have to do these here because they're rendered by other things
@@ -261,9 +272,18 @@ ConditionalRelease, deparam) ->
       @$intraGroupPeerReviews = $("#{INTRA_GROUP_PEER_REVIEWS}")
       @$groupCategoryBox = $("#{GROUP_CATEGORY_BOX}")
 
+      @assignmentConfigurationTools = AssignmentConfigurationsTools.attach(
+            @$assignmentConfigurationTools.get(0),
+            parseInt(ENV.COURSE_ID),
+            @$secureParams.val(),
+            parseInt(ENV.SELECTED_CONFIG_TOOL_ID))
+
       @_attachEditorToDescription()
       @addTinyMCEKeyboardShortcuts()
       @handleModeratedGradingChange()
+      @handleOnlineSubmissionTypeChange()
+      @handleSubmissionTypeChange()
+
       if ENV?.HAS_GRADED_SUBMISSIONS
         @disableCheckbox(@$moderatedGradingBox, I18n.t("Moderated grading setting cannot be changed if graded submissions exist"))
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
@@ -397,7 +417,6 @@ ConditionalRelease, deparam) ->
     showErrors: (errors) ->
       # override view handles displaying override errors, remove them
       # before calling super
-      # see getFormValues in DueDateView.coffee
       delete errors.assignmentOverrides
       super(errors)
       @trigger 'show-errors', errors

@@ -1,10 +1,10 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jsx/grading/SearchGradingPeriodsField'
-], (React, ReactDOM, SearchGradingPeriodsField) => {
+], (React, ReactDOM, {Simulate}, SearchGradingPeriodsField) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
   module("SearchGradingPeriodsField", {
     renderComponent() {

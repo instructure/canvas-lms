@@ -194,7 +194,7 @@ define([
                       checked={this.isSubContextChecked(context.asset_string, section.asset_string)}
                       disabled={this.isSubContextDisabled(context.asset_string, section.asset_string)}
                     />
-                    <label htmlFor={`${section.asset_string}_checkbox`}>{section.name}</label>
+                    <label className="ContextLabel" htmlFor={`${section.asset_string}_checkbox`}>{section.name}</label>
                   </div>
                 )
             })
@@ -223,7 +223,7 @@ define([
                   checked={this.isContextChecked(context.asset_string)}
                   disabled={this.isContextDisabled(context.asset_string)}
                 />
-                <label htmlFor={inputId}>{context.name}</label>
+                <label className="ContextLabel" htmlFor={inputId}>{context.name}</label>
                 {this.renderSections(context)}
               </div>
             )

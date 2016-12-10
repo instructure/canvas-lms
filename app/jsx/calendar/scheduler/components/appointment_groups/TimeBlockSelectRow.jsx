@@ -31,9 +31,9 @@ define([
       }).isRequired,
       slotEventId: React.PropTypes.string,
       readOnly: React.PropTypes.bool,
-      onBlur: React.PropTypes.func.isRequired,
-      handleDelete: React.PropTypes.func.isRequired,
-      setData: React.PropTypes.func.isRequired
+      onBlur: React.PropTypes.func,
+      handleDelete: React.PropTypes.func,
+      setData: React.PropTypes.func
     };
 
     constructor (props) {
@@ -59,12 +59,12 @@ define([
         endTime: $(this.endTime).data('date')
       };
 
-      this.props.setData(this.props.slotEventId, data);
+      this.props.setData && this.props.setData(this.props.slotEventId, data);
     }
 
     handleDelete = (e) => {
       e.preventDefault();
-      this.props.handleDelete(this.props.slotEventId);
+      this.props.handleDelete && this.props.handleDelete(this.props.slotEventId);
     }
 
     handleFieldBlur = (e) => {
@@ -72,7 +72,7 @@ define([
       this.prepareData();
       // Only call the onBlur if it's non blank, and it's not the last one in the list.
       if (!$(e.target).data('blank') && $(e.target).closest('.TimeBlockSelectorRow').is(':last-child')) {
-        this.props.onBlur();
+        this.props.onBlur && this.props.onBlur();
       }
     }
 

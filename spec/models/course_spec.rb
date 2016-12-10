@@ -4643,3 +4643,28 @@ describe Course, "#image" do
     expect(@course.image).to be_nil
   end
 end
+
+describe Course, "#filter_users_by_permission" do
+  it "filters out course users that don't have a permission based on their enrollment roles" do
+    permission = :moderate_forum # happens to be true for ta's, but available to students
+    super_student_role = custom_student_role("superstudent", :account => Account.default)
+    Account.default.role_overrides.create!(:role => super_student_role, :permission => permission, :enabled => true)
+    unsuper_ta_role = custom_ta_role("unsuperta", :account => Account.default)
+    Account.default.role_overrides.create!(:role => unsuper_ta_role, :permission => permission, :enabled => false)
+
+    course(:active_all => true)
+    reg_student = student_in_course(:course => @course).user
+    super_student = student_in_course(:course => @course, :role => super_student_role).user
+    reg_ta = ta_in_course(:course => @course).user
+    unsuper_ta = ta_in_course(:course => @course, :role => unsuper_ta_role).user
+
+    users = [reg_student, super_student, reg_ta, unsuper_ta]
+    expect(@course.filter_users_by_permission(users, :read_forum)).to eq users # should be on by default for all
+    expect(@course.filter_users_by_permission(users, :moderate_forum)).to eq [super_student, reg_ta]
+
+    @course.complete!
+
+    expect(@course.filter_users_by_permission(users, :read_forum)).to eq users # should still work since it is a retroactive permission
+    expect(@course.filter_users_by_permission(users, :moderate_forum)).to be_empty # unlike this one
+  end
+end

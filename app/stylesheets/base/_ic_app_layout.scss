@@ -39,9 +39,35 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
   min-width: 1px;
 }
 
-.ic-app-main-content__primary {
+.ic-Layout-contentWrapper {
   box-sizing: border-box;
 }
+
+.ic-Layout-contentMain {
+  padding: $ic-sp*2;
+
+  body.is-inside-submission-frame & {
+    padding-left: $ic-sp;
+    padding-right: $ic-sp;
+  }
+
+  body.no-headers & {
+    padding-top: 0;
+  }
+
+  body.embedded & {
+    padding: 0 1em 1em;
+  }
+
+  body.ic-framed-lti-tool & {
+    padding: 0 $ic-sp*2;
+  }
+
+  body.ic-full-screen-lti-tool & {
+    padding: 0;
+  }
+}
+
 .ic-app-main-content__secondary {
   box-sizing: border-box;
   padding: $ic-sp*2;
@@ -55,7 +81,7 @@ body.course-menu-expanded {
   &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
     @include breakpoint(desktop--nav-open) { @include shared-main-content; }
   }
-  &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content__primary {
+  &:not(.ic-no-flex-layout):not(.embedded) .ic-Layout-contentWrapper {
     @include breakpoint(desktop--nav-open) {
       @include shared-primary;
     }
@@ -72,7 +98,7 @@ body:not(.course-menu-expanded) {
   &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
     @include breakpoint(desktop) { @include shared-main-content; }
   }
-  &:not(.ic-no-flex-layout):not(.embedded)  .ic-app-main-content__primary {
+  &:not(.ic-no-flex-layout):not(.embedded)  .ic-Layout-contentWrapper {
     @include breakpoint(desktop) {
       @include shared-primary;
     }
@@ -118,9 +144,15 @@ body:not(.course-menu-expanded) {
   min-height: 100vh;
 }
 
-.ic-app-main-layout-vertical {
+.ic-Layout-wrapper {
   box-sizing: border-box;
   min-height: 100vh;
+
+  body:not(.full-width):not(.outcomes) & {
+    // We want to add a max size to most pages in canvas
+    // unless it's a full-width app
+    max-width: 1366px;
+  }
 
   body:not(.ic-no-flex-layout):not(.embedded) & {
     display: flex;
@@ -134,21 +166,49 @@ body:not(.course-menu-expanded) {
   body:not(.no-headers).primary-nav-expanded & {
     margin-left: $ic-header-primary-width;
   }
+
+  body.embedded & {
+    height: 100%;
+  }
 }
 
-.ic-app-main-layout-horizontal {
+.ic-Layout-columns {
   position: relative;
+  box-sizing: border-box;
+  z-index: 10;
 
-  body:not(.ic-no-flex-layout):not(.embedded) & {
-    transition: all 0.1s ease-out;
+  body:not(.ic-no-flex-layout):not(.embedded):not(.is-inside-submission-frame) & {
     flex: 1 0 auto;
-    display: flex;
-    margin-left: 0;
+    // Fix Firefox and IE Edge issues with contents breaking out of flex container
+    min-width: 1px;
+  }
+
+  body.course-menu-expanded:not(.ic-no-flex-layout):not(.embedded):not(.is-inside-submission-frame) & {
+    margin-left: $ic-left-side-width;
+
+    &:before {
+      left: -$ic-left-side-width;
+    }
+  }
+
+  body.ic-no-flex-layout & {
+    min-height: 100vh;
+  }
+
+  body.no-headers &,
+  body.embedded & {
+    margin: 0;
+    border: 0 none;
+    background-color: transparent;
+  }
+
+  body.embedded & {
+    min-height: 0;
+    height: 100%;
   }
 
   // Theme Editor watermark gets attached to this element as a background image
   body:not(.no-headers) & {
-    z-index: 1;
 
     &:before {
       content: "";
@@ -162,29 +222,10 @@ body:not(.course-menu-expanded) {
     }
   }
 
-  body.course-menu-expanded:not(.ic-no-flex-layout):not(.embedded) & {
-    margin-left: $ic-left-side-width;
-
-    &:before {
-      left: -$ic-left-side-width;
-    }
-  }
-
-  body.ic-no-flex-layout & {
-    min-height: 100vh;
-  }
-
   // HACK workaround for IE10 and IE11 flexbox bug
   // https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview
   @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) { min-height: 93.5vh; }
-}
 
-.ic-app-main-and-right-side {
-  box-sizing: border-box;
-  flex: 1;
-
-  // Fix Firefox and IE Edge issues with contents breaking out of flex container
-  min-width: 1px;
 }
 
 .ic-app-course-menu {

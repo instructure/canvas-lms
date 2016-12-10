@@ -58,7 +58,7 @@ module Lti
       m.stubs(:polymorphic_url).returns('url')
       view_context_mock = mock('view_context')
       view_context_mock.stubs(:stylesheet_path)
-                       .returns(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
+        .returns(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
       m.stubs(:view_context).returns(view_context_mock)
       m
     end
@@ -140,10 +140,26 @@ module Lti
         expect(exp_hash[:test]).to eq 'localhost'
       end
 
+      it 'does not expand $Canvas.api.domain when the request is unset' do
+        subject.instance_variable_set(:@controller, nil)
+        subject.instance_variable_set(:@request, nil)
+        exp_hash = {test: '$Canvas.api.domain'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq '$Canvas.api.domain'
+      end
+
       it 'has substitution for $Canvas.css.common' do
         exp_hash = {test: '$Canvas.css.common'}
         subject.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 'https://localhost/path/to/common.scss'
+      end
+
+      it 'does not expand $Canvas.css.common when the controller is unset' do
+        subject.instance_variable_set(:@controller, nil)
+        subject.instance_variable_set(:@request, nil)
+        exp_hash = {test: '$Canvas.css.common'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq '$Canvas.css.common'
       end
 
       it 'has substitution for $Canvas.api.baseUrl' do
@@ -151,6 +167,14 @@ module Lti
         HostUrl.stubs(:context_host).returns('localhost')
         subject.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 'https://localhost'
+      end
+
+      it 'does not expand $Canvas.api.baseUrl when the request is unset' do
+        subject.instance_variable_set(:@controller, nil)
+        subject.instance_variable_set(:@request, nil)
+        exp_hash = {test: '$Canvas.api.baseUrl'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq '$Canvas.api.baseUrl'
       end
 
       it 'has substitution for $Canvas.account.id' do
@@ -224,6 +248,15 @@ module Lti
           controller.stubs(:polymorphic_url).returns("/api/lti/groups/#{group.id}/membership_service")
           subject.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "/api/lti/groups/1/membership_service"
+        end
+
+        it 'does not substitute $ToolProxyBinding.memberships.url when the controller is unset' do
+
+          subject.instance_variable_set(:@controller, nil)
+          subject.instance_variable_set(:@request, nil)
+          exp_hash = { test: '$ToolProxyBinding.memberships.url' }
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq '$ToolProxyBinding.memberships.url'
         end
       end
 
@@ -365,6 +398,15 @@ module Lti
           exp_hash = {test: '$Canvas.externalTool.url'}
           expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "url"
+        end
+
+        it 'does not substitute $Canvas.externalTool.url when the controller is unset' do
+
+          subject.instance_variable_set(:@controller, nil)
+          subject.instance_variable_set(:@request, nil)
+          exp_hash = {test: '$Canvas.externalTool.url'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq '$Canvas.externalTool.url'
         end
 
         it 'returns the opaque identifiers for the active groups the user is a part of' do
@@ -572,6 +614,13 @@ module Lti
           expect(exp_hash[:test]).to eq 456
         end
 
+        it 'has substitution for $Canvas.user.isRootAccountAdmin' do
+          user.stubs(:roles).returns(["root_admin"])
+          exp_hash = {test: '$Canvas.user.isRootAccountAdmin'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq true
+        end
+
         it 'has substitution for $Canvas.xuser.allRoles' do
           Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)
           substitution_helper.stubs(:all_roles).returns('Admin,User')
@@ -753,6 +802,14 @@ module Lti
           expect(exp_hash[:test]).to eq 42
         end
 
+        it 'does not expand $Canvas.masqueradingUser.id when the controller is unset' do
+          subject.instance_variable_set(:@controller, nil)
+          subject.instance_variable_set(:@request, nil)
+          exp_hash = {test: '$Canvas.masqueradingUser.id'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq '$Canvas.masqueradingUser.id'
+        end
+
         it 'has substitution for $Canvas.masqueradingUser.userId' do
           masquerading_user = User.new
           masquerading_user.stubs(:id).returns(7878)
@@ -788,6 +845,5 @@ module Lti
         end
       end
     end
-
   end
 end

@@ -117,6 +117,9 @@
   @-moz-document url-prefix() {
     overflow-x: hidden;
   }
+  a {
+    text-decoration: underline;
+  }
 
   h3, .h3 {
     margin-top: 1em;
@@ -219,7 +222,7 @@
     td, tbody th {
       background-color: $lightBackground;
     }
-    tbody th { font-weight: 500; }
+    tbody th { font-weight: bold; }
   }
   table.notifications {
     border-top: 2px solid #999;
@@ -315,7 +318,7 @@ table.summary {
     padding: $ic-sp/2;
   }
   thead th, caption {
-    font-weight: 500;
+    font-weight: bold;
     border-bottom: 1px solid $ic-border-dark;
   }
   td, tbody th {
@@ -1565,7 +1568,8 @@ body > #ui-datepicker-div {
   }
 }
 
-body.padless-content #content, #content.padless {
+body.padless-content .ic-Layout-contentMain,
+.ic-Layout-contentMain.padless {
   #sequence_footer {
     margin-left: 10px;
     margin-right: 10px;
@@ -1688,7 +1692,7 @@ form.user_content_post_form {
   margin: 4px 0;
 }
 
-.with-fixed-bottom .ic-app-main-layout-vertical {
+.with-fixed-bottom .ic-Layout-wrapper {
   padding-bottom: 60px;
   box-sizing: border-box;
 }

@@ -1,4 +1,4 @@
-class ConversationsCountFix < ActiveRecord::Migration
+class ConversationsCountFix < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

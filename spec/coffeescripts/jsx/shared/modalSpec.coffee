@@ -3,11 +3,10 @@ define [
   'jsx/shared/modal'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/shared/modal-content'
   'jsx/shared/modal-buttons'
-], ($, Modal, React, ReactDOM, ModalContent, ModalButtons) ->
-
-  TestUtils = React.addons.TestUtils
+], ($, Modal, React, ReactDOM, TestUtils, ModalContent, ModalButtons) ->
 
   module 'Modal',
     setup: ->
@@ -137,7 +136,7 @@ define [
 
   test 'removes aria-hidden from #application when closed', ->
     @component = TestUtils.renderIntoDocument(React.createElement(Modal,
-      onRequestClose: -> console.log('closed'),
+      onRequestClose: ->
       isOpen: true,
       className: 'custom_class_name'
       title: "Hello",
@@ -162,7 +161,7 @@ define [
 
   test "removes aria-hidden from custom setElement property when closed", ->
     @component = TestUtils.renderIntoDocument(React.createElement(Modal,
-      onRequestClose: -> console.log('closed'),
+      onRequestClose: ->
       appElement: $('#fixtures')[0],
       isOpen: true,
       className: 'custom_class_name'

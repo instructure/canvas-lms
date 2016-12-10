@@ -164,8 +164,8 @@ class ConferencesController < ApplicationController
     return unless tab_enabled?(@context.class::TAB_CONFERENCES)
     return unless @current_user
     conferences = @context.grants_right?(@current_user, :manage_content) ?
-      @context.web_conferences :
-      @current_user.web_conferences.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
+      @context.web_conferences.active :
+      @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
     conferences = conferences.with_config.order("created_at DESC, id DESC")
     api_request? ? api_index(conferences) : web_index(conferences)
   end

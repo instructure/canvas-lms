@@ -1,13 +1,36 @@
 @import "base/environment";
 @import "components/context_search";
 
-tr.rosterUser .avatar {
-  width: 20px;
-  height: 20px;
-  margin-top: 1px;
-  margin-right: -7px;
-  position: relative;
-  z-index: 1;
+// to reduce the avatar from displaying so large in the roster table
+.rosterUser .avatar {
+  width: $ic-sp*2;
+  height: $ic-sp*2;
+}
+
+.roster-container {
+  display: flex;
+}
+
+.roster-column {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-list {
+  list-style-type: none;
+  margin: 10px 0 0;
+}
+
+.user-list__item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.user-list__item-details {
+  margin-left: 10px;
 }
 
 .token_input {

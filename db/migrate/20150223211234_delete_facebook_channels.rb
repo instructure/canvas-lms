@@ -1,4 +1,4 @@
-class DeleteFacebookChannels < ActiveRecord::Migration
+class DeleteFacebookChannels < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

@@ -1,4 +1,4 @@
-class AddAssignmentLock < ActiveRecord::Migration
+class AddAssignmentLock < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

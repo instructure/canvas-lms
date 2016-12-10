@@ -317,8 +317,58 @@ This text has a http://www.google.com link in it...
         expect {
           first_comment.destroy
         }.to change { submission.submission_comments.count }.from(3).to(1)
-        expect(submission.submission_comments).to_not include [first_comment, second_comment]
-        expect(submission.submission_comments).to include ungrouped_comment
+        expect(submission.submission_comments.reload).not_to include first_comment, second_comment
+        expect(submission.submission_comments.reload).to include ungrouped_comment
+      end
+    end
+  end
+
+  describe 'after_update #publish_other_comments_in_this_group' do
+    context 'given a submission with several group comments' do
+      let!(:assignment) { @course.assignments.create! }
+      let!(:unrelated_assignment) { @course.assignments.create! }
+      let!(:submission) { assignment.submissions.create!(user: @user) }
+      let!(:unrelated_submission) { unrelated_assignment.submissions.create!(user: @user) }
+      let!(:first_comment) do
+        submission.submission_comments.create!(
+          group_comment_id: 'uuid',
+          comment: 'first comment',
+          draft: true
+        )
+      end
+      let!(:second_comment) do
+        submission.submission_comments.create!(
+          group_comment_id: 'uuid',
+          comment: 'second comment',
+          draft: true
+        )
+      end
+      let!(:ungrouped_comment) do
+        submission.submission_comments.create!(
+          comment: 'third comment (ungrouped)',
+          draft: true
+        )
+      end
+      let!(:unrelated_comment) do
+        unrelated_submission.submission_comments.create!(
+          comment: 'unrelated: first comment',
+          draft: true
+        )
+      end
+      let!(:unrelated_group_comment) do
+        unrelated_submission.submission_comments.create!(
+          group_comment_id: 'uuid',
+          comment: 'unrelated: second comment (grouped)',
+          draft: true
+        )
+      end
+
+      it 'updates other group comments when published' do
+        expect {
+          first_comment.update_attribute(:draft, false)
+        }.to change { SubmissionComment.published.count }.from(0).to(2)
+        expect(submission.submission_comments.published.pluck(:id)).to include first_comment.id, second_comment.id
+        expect(submission.submission_comments.published.pluck(:id)).not_to include ungrouped_comment.id
       end
     end
   end

@@ -4,6 +4,12 @@
     This will automatically assign all unassigned students as evenly as possible among the existing student groups.
     {{/t}}
   </p>
+  <div class="controls group-by-section-controls">
+    <label class="checkbox" for="group_by_section">
+      {{checkbox "group_by_section"}}
+      {{#t}}Require group members to be in the same section{{/t}}
+    </label>
+  </div>
 </div>
 <div class="form-controls">
   <button
@@ -12,5 +18,5 @@
   >{{#t "cancel"}}Cancel{{/t}}</button>
   <button
     class="btn btn-primary randomly-assign-members-confirm"
-    type='submit'>{{#t "okay"}}Okay{{/t}}</button>
+    type='submit'>{{#t}}Okay{{/t}}</button>
 </div>

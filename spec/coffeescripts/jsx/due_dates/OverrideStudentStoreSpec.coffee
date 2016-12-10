@@ -1,12 +1,10 @@
 define [
   'react'
+  'react-addons-test-utils'
   'underscore'
   'jsx/due_dates/OverrideStudentStore',
   'helpers/fakeENV'
-], (React, _, OverrideStudentStore, fakeENV) ->
-
-  Simulate = React.addons.TestUtils.Simulate
-  SimulateNative = React.addons.TestUtils.SimulateNative
+], (React, {Simulate, SimulateNative}, _, OverrideStudentStore, fakeENV) ->
 
   module 'OverrideStudentStore',
     setup: ->
@@ -25,10 +23,11 @@ define [
       @server.respondWith "GET", "/api/v1/courses/1/search_users?search_term=publiu&enrollment_type=student&include_inactive=false", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
       @server.respondWith "GET", "/api/v1/courses/1/search_users?search_term=publiu", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
       # by course
-      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=1&enrollment_type=student&include_inactive=false", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
-      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=2&enrollment_type=student&include_inactive=false", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
-      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=3&enrollment_type=student&include_inactive=false", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
-      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=4&enrollment_type=student&include_inactive=false", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
+      url = (page) -> "/api/v1/courses/1/users?per_page=50&page=" + page + "&enrollment_type=student&include_inactive=false&include%5B%5D=enrollments&include%5B%5D=group_ids"
+      @server.respondWith "GET", url(1), [200, {"Content-Type":"application/json"}, JSON.stringify([])]
+      @server.respondWith "GET", url(2), [200, {"Content-Type":"application/json"}, JSON.stringify([])]
+      @server.respondWith "GET", url(3), [200, {"Content-Type":"application/json"}, JSON.stringify([])]
+      @server.respondWith "GET", url(4), [200, {"Content-Type":"application/json"}, JSON.stringify([])]
 
     teardown: ->
       @server.restore()

@@ -3,7 +3,7 @@
 @import "vendor/_xflex.scss";
 
 
-#content {
+.ic-Layout-contentMain {
   padding: 0;
 }
 
@@ -190,7 +190,7 @@ $icon-size: 1.4rem;
   }
 }
 
-#main {
+.ic-Layout-columns {
   position: static;
   z-index: 1;
 }

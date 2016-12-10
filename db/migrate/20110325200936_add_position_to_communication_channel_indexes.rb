@@ -1,4 +1,4 @@
-class AddPositionToCommunicationChannelIndexes < ActiveRecord::Migration
+class AddPositionToCommunicationChannelIndexes < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

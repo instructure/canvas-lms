@@ -2,15 +2,15 @@ define [
   'jquery'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/files/BreadcrumbCollapsedContainer'
   'compiled/models/Folder'
   'compiled/react_files/modules/filesEnv'
   '../mockFilesENV'
   '../../helpers/stubRouterContext'
-], ($, React, ReactDOM, BreadcrumbCollapsedContainer, Folder, filesEnv, mockFilesENV, stubRouterContext) ->
-  simulate = React.addons.TestUtils.Simulate
-  simulateNative = React.addons.TestUtils.SimulateNative
-  TestUtils = React.addons.TestUtils
+], ($, React, ReactDOM, TestUtils, BreadcrumbCollapsedContainer, Folder, filesEnv, mockFilesENV, stubRouterContext) ->
+  simulate = TestUtils.Simulate
+  simulateNative = TestUtils.SimulateNative
 
   module 'BreadcrumbsCollapsedContainer',
     setup: ->

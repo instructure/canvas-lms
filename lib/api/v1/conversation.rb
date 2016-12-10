@@ -51,6 +51,9 @@ module Api::V1::Conversation
     result[:visible] = options.key?(:visible) ? options[:visible] : @set_visibility && infer_visibility(conversation)
     result[:context_name] = conversation.context_name if options[:include_context_name]
     result[:context_code] = conversation.conversation.context_code
+    if options[:include_reply_permission_check] && conversation.conversation.replies_locked_for?(current_user)
+      result[:cannot_reply] = true
+    end
     if options[:include_beta]
       result[:beta] = !!conversation.conversation.context_id
     end

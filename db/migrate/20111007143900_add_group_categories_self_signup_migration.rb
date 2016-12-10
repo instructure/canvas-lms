@@ -1,4 +1,4 @@
-class AddGroupCategoriesSelfSignupMigration < ActiveRecord::Migration
+class AddGroupCategoriesSelfSignupMigration < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

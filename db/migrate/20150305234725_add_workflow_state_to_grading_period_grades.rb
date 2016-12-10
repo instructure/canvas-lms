@@ -1,4 +1,4 @@
-class AddWorkflowStateToGradingPeriodGrades < ActiveRecord::Migration
+class AddWorkflowStateToGradingPeriodGrades < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

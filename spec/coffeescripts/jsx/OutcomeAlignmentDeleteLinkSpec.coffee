@@ -3,10 +3,9 @@ define [
   'jsx/outcomes/OutcomeAlignmentDeleteLink',
   'react'
   'react-dom'
-], ($, OutcomeAlignmentDeleteLink, React, ReactDOM) ->
-
+  'react-addons-test-utils',
+], ($, OutcomeAlignmentDeleteLink, React, ReactDOM, TestUtils) ->
   module 'OutcomeAlignmentDeleteLink',
-    TestUtils = React.addons.TestUtils
     teardown: ->
       ReactDOM.unmountComponentAtNode(@component.getDOMNode().parentNode)
 

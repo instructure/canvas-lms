@@ -88,6 +88,23 @@ describe UserObserver do
     expect(new_o_enroll).to be_active
   end
 
+  it "should not enroll the observer if the user_observer record is deleted" do
+    c1 = course(:active_all => true)
+
+    observer = user_with_pseudonym
+    student.observers << observer
+
+    uo = student.user_observers.first
+    uo.destroy!
+
+    student.reload
+    expect(student.observers).to be_empty
+
+    enroll = student_in_course(:course => c1, :user => student)
+
+    expect(observer.observer_enrollments.first).to be_nil
+  end
+
   it "should not enroll the observer in institutions where they lack a login" do
     a1 = account_model
     c1 = course(account: a1, active_all: true)

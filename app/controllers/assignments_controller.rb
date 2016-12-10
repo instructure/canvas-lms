@@ -417,27 +417,29 @@ class AssignmentsController < ApplicationController
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
 
       hash = {
-        :ASSIGNMENT_GROUPS => json_for_assignment_groups,
-        :GROUP_CATEGORIES => group_categories,
-        :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
-        :POST_TO_SIS => post_to_sis,
-        :HAS_GRADED_SUBMISSIONS => @assignment.graded_submissions_exist?,
-        :SECTION_LIST => (@context.course_sections.active.map { |section|
+        ASSIGNMENT_GROUPS: json_for_assignment_groups,
+        ASSIGNMENT_INDEX_URL: polymorphic_url([@context, :assignments]),
+        ASSIGNMENT_OVERRIDES: assignment_overrides_json(
+          @assignment.overrides_for(@current_user, ensure_set_not_empty: true),
+          @current_user
+        ),
+        COURSE_ID: @context.id,
+        GROUP_CATEGORIES: group_categories,
+        HAS_GRADED_SUBMISSIONS: @assignment.graded_submissions_exist?,
+        KALTURA_ENABLED: !!feature_enabled?(:kaltura),
+        MULTIPLE_GRADING_PERIODS_ENABLED: @context.feature_enabled?(:multiple_grading_periods),
+        PLAGIARISM_DETECTION_PLATFORM: @context.root_account.feature_enabled?(:plagiarism_detection_platform),
+        POST_TO_SIS: post_to_sis,
+        SECTION_LIST: @context.course_sections.active.map do |section|
           {
-            :id => section.id,
-            :name => section.name,
-            :start_at => section.start_at,
-            :end_at => section.end_at,
-            :override_course_and_term_dates => section.restrict_enrollments_to_section_dates
+            id: section.id,
+            name: section.name,
+            start_at: section.start_at,
+            end_at: section.end_at,
+            override_course_and_term_dates: section.restrict_enrollments_to_section_dates
           }
-        }),
-        :ASSIGNMENT_OVERRIDES =>
-          (assignment_overrides_json(
-            @assignment.overrides_for(@current_user, ensure_set_not_empty: true),
-            @current_user
-            )),
-        :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
-        :VALID_DATE_RANGE => CourseDateRange.new(@context)
+        end,
+        VALID_DATE_RANGE: CourseDateRange.new(@context)
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
@@ -448,6 +450,11 @@ class AssignmentsController < ApplicationController
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
+      hash[:SELECTED_CONFIG_TOOL_ID] = @assignment.tool_settings_tools.first.id unless @assignment.tool_settings_tools.blank?
+
+      if @context.feature_enabled?(:multiple_grading_periods)
+        hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
+      end
       append_sis_data(hash)
       js_env(hash)
       conditional_release_js_env(@assignment)
@@ -554,5 +561,4 @@ class AssignmentsController < ApplicationController
   def index_edit_params
     params.slice(*[:title, :due_at, :points_possible, :assignment_group_id, :return_to])
   end
-
 end

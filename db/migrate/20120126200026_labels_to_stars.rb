@@ -1,4 +1,4 @@
-class LabelsToStars < ActiveRecord::Migration
+class LabelsToStars < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

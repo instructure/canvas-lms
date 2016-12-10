@@ -1,4 +1,4 @@
-class AddShowCorrectAnswersLastAttemptToQuizzes < ActiveRecord::Migration
+class AddShowCorrectAnswersLastAttemptToQuizzes < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

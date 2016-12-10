@@ -1,4 +1,4 @@
-class AddMissingTooLongIndexes < ActiveRecord::Migration
+class AddMissingTooLongIndexes < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.add_index_with_check(table_name, column_name, options)

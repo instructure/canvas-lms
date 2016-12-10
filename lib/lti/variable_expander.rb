@@ -30,15 +30,16 @@ module Lti
                   :tool_setting_link_id, :tool_setting_binding_id, :tool_setting_proxy_id, :tool, :attachment,
                   :collaboration
 
-    def self.register_expansion(name, permission_groups, proc, guard = -> { true })
+    def self.register_expansion(name, permission_groups, expansion_proc, *guards)
       @expansions ||= {}
-      @expansions["$#{name}".to_sym] = VariableExpansion.new(name, permission_groups, proc, guard)
+      @expansions["$#{name}".to_sym] = VariableExpansion.new(name, permission_groups, expansion_proc, *guards)
     end
 
     def self.expansions
-      @expansions || []
+      @expansions || {}
     end
 
+    CONTROLLER_GUARD = -> { !!@controller }
     COURSE_GUARD = -> { @context.is_a? Course }
     TERM_START_DATE_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term &&
                                  @context.enrollment_term.start_at }
@@ -52,14 +53,14 @@ module Lti
     MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
     USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights}
     MEDIA_OBJECT_ID_GUARD = -> {@attachment && (@attachment.media_object || @attachment.media_entry_id )}
-    LTI1_GUARD = -> { @tool.is_a? ContextExternalTool }
-    MASQUERADING_GUARD = -> { @controller.logged_in_user != @current_user }
+    LTI1_GUARD = -> { @tool.is_a?(ContextExternalTool) }
+    MASQUERADING_GUARD = -> { !!@controller && @controller.logged_in_user != @current_user }
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
       @context = context
       @controller = controller
-      @request = controller.request
+      @request = controller.request if controller
       opts.each { |opt, val| instance_variable_set("@#{opt}", val) }
     end
 
@@ -97,7 +98,8 @@ module Lti
     #   canvas.instructure.com
     #   ```
     register_expansion 'Canvas.api.domain', [],
-                       -> { HostUrl.context_host(@root_account, @request.host) }
+                       -> { HostUrl.context_host(@root_account, @request.host) },
+                       CONTROLLER_GUARD
 
     # returns the api url for the members of the collaboration
     # @example
@@ -106,6 +108,7 @@ module Lti
     #  ```
     register_expansion 'Canvas.api.collaborationMembers.url', [],
                        -> { @controller.api_v1_collaboration_members_url(@collaboration) },
+                       CONTROLLER_GUARD,
                        COLLABORATION_GUARD
     # returns the base URL for the current context.
     # @example
@@ -113,7 +116,8 @@ module Lti
     #   https://canvas.instructure.com
     #   ```
     register_expansion 'Canvas.api.baseUrl', [],
-                       -> { "#{@request.scheme}://#{HostUrl.context_host(@root_account, @request.host)}" }
+                       -> { "#{@request.scheme}://#{HostUrl.context_host(@root_account, @request.host)}" },
+                       CONTROLLER_GUARD
 
     # returns the URL for the membership service associated with the current context
     # @example
@@ -122,6 +126,7 @@ module Lti
     #   ```
     register_expansion 'ToolProxyBinding.memberships.url', [],
                        -> { @controller.polymorphic_url([@context, :membership_service]) },
+                       CONTROLLER_GUARD,
                        -> { @context.is_a?(Course) || @context.is_a?(Group) }
 
     # returns the account id for the current context.
@@ -164,6 +169,7 @@ module Lti
     register_expansion 'Canvas.externalTool.url', [],
                        -> { @controller.named_context_url(@tool.context, :api_v1_context_external_tools_update_url,
                                                           @tool.id, include_host:true) },
+                       CONTROLLER_GUARD,
                        LTI1_GUARD
 
     # returns the URL for the external tool that was launched.
@@ -173,7 +179,8 @@ module Lti
     #   ```
     register_expansion 'Canvas.css.common', [],
                        -> { URI.parse(@request.url)
-                               .merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s }
+                               .merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s },
+                       CONTROLLER_GUARD
 
     # returns the shard id for the current context.
     # @example
@@ -353,6 +360,10 @@ module Lti
                        -> { @current_user.global_id},
                        USER_GUARD
 
+   register_expansion 'Canvas.user.isRootAccountAdmin', [],
+                      -> { @current_user.roles(@root_account).include? 'root_admin' },
+                      USER_GUARD
+
     # Substitutions for the primary pseudonym for the user for the account
     # This should hold all the SIS information for the user
     # This may not be the pseudonym the user is actually gingged in with
@@ -380,6 +391,7 @@ module Lti
     # it may not hold all the sis info needed in other launch substitutions
     register_expansion 'Canvas.logoutService.url', [],
                        -> { @controller.lti_logout_service_url(Lti::LogoutService.create_token(@tool, @current_pseudonym)) },
+                       CONTROLLER_GUARD,
                        -> { @current_pseudonym && @tool }
 
     register_expansion 'Canvas.masqueradingUser.id', [],
@@ -396,6 +408,7 @@ module Lti
 
     register_expansion 'Caliper.url', [],
                        -> { @controller.lti_caliper_url(Lti::AnalyticsService.create_token(@tool, @current_user, @context)) },
+                       CONTROLLER_GUARD,
                        -> { @current_user && @context.is_a?(Course) && @tool }
 
     register_expansion 'Canvas.course.sectionIds', [],
@@ -462,18 +475,21 @@ module Lti
 
     register_expansion 'LtiLink.custom.url', [],
                        -> { @controller.show_lti_tool_settings_url(@tool_setting_link_id) },
+                       CONTROLLER_GUARD,
                        -> { @tool_setting_link_id }
 
     register_expansion 'ToolProxyBinding.custom.url', [],
                        -> { @controller.show_lti_tool_settings_url(@tool_setting_binding_id) },
+                       CONTROLLER_GUARD,
                        -> { @tool_setting_binding_id }
 
     register_expansion 'ToolProxy.custom.url', [],
                        -> { @controller.show_lti_tool_settings_url(@tool_setting_proxy_id) },
-                       -> { @tool_setting_proxy_id }
+                       -> { !!@controller && @tool_setting_proxy_id }
 
     register_expansion 'ToolConsumerProfile.url', [],
                        -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile], tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)},
+                       CONTROLLER_GUARD,
                        -> { @tool && @tool.is_a?(Lti::ToolProxy) }
 
     register_expansion 'Canvas.file.media.id', [],
@@ -520,7 +536,5 @@ module Lti
         v.gsub(substring, (self[match] || substring).to_s)
       end
     end
-
   end
-
 end

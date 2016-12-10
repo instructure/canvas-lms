@@ -383,6 +383,10 @@ $outcome-border: 1px solid #BCC2CA;
     &:hover {
       background-color: #f7f7f7;
     }
+    &:focus {
+      outline-width: 4px;
+      outline-offset: -4px;
+    }
     .outcome-icon i {
       line-height: 40px;
     }

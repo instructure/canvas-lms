@@ -57,6 +57,12 @@
   z-index: 10;
 }
 
+.ContextLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 135px;
+}
+
 .TimeBlockSelectorRow .col-xs {
   flex-basis: auto;
 }

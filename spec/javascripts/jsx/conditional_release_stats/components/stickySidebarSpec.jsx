@@ -1,9 +1,9 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jsx/conditional_release_stats/components/sticky-sidebar',
-], (React, ReactDOM, Sidebar) => {
-  const TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, Sidebar) => {
 
   const container = document.getElementById('fixtures')
 

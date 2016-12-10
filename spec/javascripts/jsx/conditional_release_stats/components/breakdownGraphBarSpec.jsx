@@ -1,8 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/conditional_release_stats/components/breakdown-graph-bar',
-], (React, BreakdownBarComponent) => {
-  const TestUtils = React.addons.TestUtils
+], (React, TestUtils, BreakdownBarComponent) => {
 
   module('Breakdown Stats Graph Bar')
 

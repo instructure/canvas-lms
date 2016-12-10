@@ -16,20 +16,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-v1'
+require 'aws-sdk'
 
 module Services
   class NotificationService
     def self.process(global_id, body, type, to)
       return unless notification_queue.present?
 
-      notification_queue.send_message({
-        global_id: global_id,
-        type: type,
-        message: body,
-        target: to,
-        request_id: RequestContextGenerator.request_id
-      }.to_json)
+      notification_queue.send_message(message_body: {
+          global_id: global_id,
+          type: type,
+          message: body,
+          target: to,
+          request_id: RequestContextGenerator.request_id
+        }.to_json,
+        queue_url: @queue_url)
     end
 
     class << self
@@ -39,9 +40,11 @@ module Services
         return nil if config.blank?
 
         @notification_queue ||= begin
-          queue_name = config['notification_service_queue_name']
-          sqs = AWS::SQS.new(config)
-          sqs.queues.named(queue_name)
+          conf = Canvas::AWS.validate_v2_config(config, 'notification_service.yml')
+          queue_name = conf['notification_service_queue_name']
+          sqs = Aws::SQS::Client.new(conf.except('notification_service_queue_name'))
+          @queue_url = sqs.get_queue_url(queue_name: queue_name).queue_url
+          sqs
         end
       end
 

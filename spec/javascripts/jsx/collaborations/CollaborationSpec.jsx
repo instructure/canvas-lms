@@ -1,10 +1,10 @@
 define([
   'react',
+  'react-addons-test-utils',
   'react-dom',
   'jsx/collaborations/Collaboration',
   'timezone'
-], (React, ReactDOM, Collaboration, tz) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, ReactDOM, Collaboration, tz) => {
 
   module('Collaboration');
 
@@ -16,7 +16,11 @@ define([
       user_name: 'Say my name',
       updated_at: (new Date(0)).toString(),
       update_url: 'http://google.com',
-      id: 1
+      id: 1,
+      permissions: {
+        update: true,
+        "delete": true
+      }
     }
   }
 

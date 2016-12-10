@@ -1,4 +1,4 @@
-class AddCrocodocIdToUsers < ActiveRecord::Migration
+class AddCrocodocIdToUsers < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

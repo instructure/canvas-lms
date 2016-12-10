@@ -59,6 +59,30 @@ describe CourseForMenuPresenter do
       expect(h[:originalName]).to eq course.name
       expect(h[:shortName]).to eq 'nickname'
     end
+
+    context 'with Dashcard Reordering feature enabled' do
+      before(:each) do
+        @account = Account.default
+        @account.enable_feature! :dashcard_reordering
+      end
+
+      it 'returns a position if one is set' do
+        user = user_model
+        user.course_positions[course.asset_string] = 3
+        user.save!
+        cs_presenter = CourseForMenuPresenter.new(course, nil, user, @account)
+        h = cs_presenter.to_h
+        expect(h[:position]).to eq 3
+      end
+
+      it 'returns nil when no position is set' do
+        user = user_model
+        cs_presenter = CourseForMenuPresenter.new(course, nil, user, @account)
+        h = cs_presenter.to_h
+        expect(h[:position]).to eq nil
+      end
+    end
+
   end
 
   describe '#role' do

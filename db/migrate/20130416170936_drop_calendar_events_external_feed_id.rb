@@ -1,4 +1,4 @@
-class DropCalendarEventsExternalFeedId < ActiveRecord::Migration
+class DropCalendarEventsExternalFeedId < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

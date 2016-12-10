@@ -243,6 +243,13 @@ describe AccountsController do
       expect(assigns[:courses].find {|c| c.id == c2.id }.student_count).to eq c2.student_enrollments.count
 
     end
+
+    it "should sort courses as specified" do
+      account_with_admin_logged_in(account: @account)
+      course_with_teacher(:account => @account)
+      Account.any_instance.expects(:fast_all_courses).with(has_entry(order: "courses.created_at DESC"))
+      get 'show', :id => @account.id, :courses_sort_order => "created_at_desc", :format => 'html'
+    end
   end
 
   context "special account ids" do

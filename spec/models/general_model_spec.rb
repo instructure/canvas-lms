@@ -40,6 +40,8 @@ describe 'Models' do
         ActiveRecord::Base,
         Delayed::Backend::ActiveRecord::Job,
         Delayed::Backend::ActiveRecord::Job::Failed,
+        EventStream::Failure,
+        Setting,
         Switchman::Shard,
         Version,
       ]

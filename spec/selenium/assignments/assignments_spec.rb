@@ -519,6 +519,15 @@ describe "assignments" do
         expect(f("#assignment-speedgrader-link")).not_to have_class("hidden")
       end
 
+      it "should have a link to speedgrader from the show page", priority: "1", test_id: 3001903 do
+        @assignment.publish
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        speedgrader_link = f(".icon-speed-grader")
+        speedgrader_link_text = "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+        expect(speedgrader_link.attribute("href")).to include(speedgrader_link_text)
+      end
+
       it "should show publishing status on the edit page", priority: "2", test_id: 647852 do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
         wait_for_ajaximations

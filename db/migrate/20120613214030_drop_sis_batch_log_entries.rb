@@ -1,4 +1,4 @@
-class DropSisBatchLogEntries < ActiveRecord::Migration
+class DropSisBatchLogEntries < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

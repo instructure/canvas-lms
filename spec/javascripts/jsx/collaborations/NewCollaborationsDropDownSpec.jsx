@@ -1,9 +1,9 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'jsx/collaborations/NewCollaborationsDropDown'
-], (React, ReactDOM, NewCollaborationsDropDown) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, ReactDOM, TestUtils, NewCollaborationsDropDown) => {
 
   module('NewCollaborationsDropDown');
 

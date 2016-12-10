@@ -1,4 +1,4 @@
-class AddUserFollowsTable < ActiveRecord::Migration
+class AddUserFollowsTable < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

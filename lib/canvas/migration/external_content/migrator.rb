@@ -16,6 +16,7 @@ module Canvas::Migration::ExternalContent
       # should return the info we need to go retrieve the exported data later (e.g. a status url)
       def begin_exports(course, opts={})
         pending_exports = {}
+        pending_exports.merge!(Lti::ContentMigrationService.begin_exports(course, opts)) if Lti::ContentMigrationService.enabled?
         self.registered_services.each do |key, service|
           if service.applies_to_course?(course)
             begin
@@ -64,16 +65,34 @@ module Canvas::Migration::ExternalContent
 
         retry_block_for_each(pending_exports.keys) do |key|
           pending_export = pending_exports[key]
-          service = self.registered_services[key]
 
-          if service.export_completed?(pending_export)
-            service_data = service.retrieve_export(pending_export)
+          if export_completed?(pending_export, key)
+            service_data = retrieve_export_data(pending_export, key)
             exported_content[key] = Canvas::Migration::ExternalContent::Translator.new.translate_data(service_data, :export) if service_data
             true
           end
         end
 
         exported_content
+      end
+
+      # check if the export is completed, will send the message directly to the
+      # export object if it can answer the question, otherwise has the source
+      # service answer the question.
+      def export_completed?(pending_export, key)
+        if pending_export.respond_to?(:export_completed?)
+          pending_export.export_completed?
+        else
+          self.registered_services[key].export_completed?(pending_export)
+        end
+      end
+
+      def retrieve_export_data(pending_export, key)
+        if pending_export.respond_to?(:retrieve_export)
+          pending_export.retrieve_export
+        else
+          self.registered_services[key].retrieve_export(pending_export)
+        end
       end
 
       # sends back the imported content to the external services

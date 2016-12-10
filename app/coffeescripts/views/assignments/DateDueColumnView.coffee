@@ -20,11 +20,7 @@ define [
 
     toJSON: ->
       data = @model.toView()
-      data.canManage = @canManage()
       data.selector  = @model.get("id") + "_due"
       data.linkHref  = @model.htmlUrl()
       data.allDates  = @model.allDates()
       data
-
-    canManage: ->
-      ENV.PERMISSIONS.manage

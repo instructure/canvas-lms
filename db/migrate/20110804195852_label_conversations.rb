@@ -1,4 +1,4 @@
-class LabelConversations < ActiveRecord::Migration
+class LabelConversations < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

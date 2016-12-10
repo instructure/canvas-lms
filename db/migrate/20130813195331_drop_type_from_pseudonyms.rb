@@ -1,4 +1,4 @@
-class DropTypeFromPseudonyms < ActiveRecord::Migration
+class DropTypeFromPseudonyms < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

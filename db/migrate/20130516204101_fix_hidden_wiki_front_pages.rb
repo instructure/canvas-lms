@@ -1,4 +1,4 @@
-class FixHiddenWikiFrontPages < ActiveRecord::Migration
+class FixHiddenWikiFrontPages < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

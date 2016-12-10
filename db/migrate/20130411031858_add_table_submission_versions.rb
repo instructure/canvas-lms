@@ -1,4 +1,4 @@
-class AddTableSubmissionVersions < ActiveRecord::Migration
+class AddTableSubmissionVersions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

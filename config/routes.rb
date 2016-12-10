@@ -396,7 +396,10 @@ CanvasRails::Application.routes.draw do
     get 'user_notes' => 'user_notes#user_notes'
     get 'details/sis_publish' => 'courses#sis_publish_status', as: :sis_publish_status
     post 'details/sis_publish' => 'courses#publish_to_sis', as: :publish_to_sis
+
     resources :user_lists, only: :create
+    post 'invite_users' => 'users#invite_users', :as => :invite_users
+
     post 'reset' => 'courses#reset_content'
     resources :alerts
     post :student_view
@@ -849,8 +852,6 @@ CanvasRails::Application.routes.draw do
     get 'download' => 'files#show', download: '1'
   end
 
-  resources :developer_keys, only: :index # DEPRECATED
-
   resources :rubrics do
     resources :rubric_assessments, path: :assessments
   end
@@ -1280,17 +1281,6 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/authentication_providers', action: :create, as: 'account_create_ap'
       put 'accounts/:account_id/authentication_providers/:id', action: :update, as: 'account_update_ap'
       delete 'accounts/:account_id/authentication_providers/:id', action: :destroy, as: 'account_delete_ap'
-
-      # deprecated
-      get 'accounts/:account_id/account_authorization_configs/discovery_url', action: :show_discovery_url
-      put 'accounts/:account_id/account_authorization_configs/discovery_url', action: :update_discovery_url, as: 'account_update_discovery_url'
-      delete 'accounts/:account_id/account_authorization_configs/discovery_url', action: :destroy_discovery_url, as: 'account_destroy_discovery_url'
-
-      get 'accounts/:account_id/account_authorization_configs', action: :index
-      get 'accounts/:account_id/account_authorization_configs/:id', action: :show
-      post 'accounts/:account_id/account_authorization_configs', action: :create, as: 'account_create_aac'
-      put 'accounts/:account_id/account_authorization_configs/:id', action: :update, as: 'account_update_aac'
-      delete 'accounts/:account_id/account_authorization_configs/:id', action: :destroy, as: 'account_delete_aac'
     end
 
     get 'users/:user_id/page_views', controller: :page_views, action: :index, as: 'user_page_views'
@@ -1411,11 +1401,9 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :developer_keys) do
-      get 'developer_keys', action: :index # DEPRECATED
       get 'developer_keys/:id', action: :show
       delete 'developer_keys/:id', action: :destroy
       put 'developer_keys/:id', action: :update
-      post 'developer_keys', action: :create # DEPRECATED
 
       get 'accounts/:account_id/developer_keys', action: :index, as: 'account_developer_keys'
       post 'accounts/:account_id/developer_keys', action: :create
@@ -1662,6 +1650,11 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/turnitin/assignment", action: :assignment
       get "support_helpers/turnitin/pending", action: :pending
       get "support_helpers/turnitin/expired", action: :expired
+    end
+
+    scope(controller: 'support_helpers/crocodoc') do
+      get "support_helpers/crocodoc/shard", action: :shard
+      get "support_helpers/crocodoc/submission", action: :submission
     end
 
     scope(controller: :outcome_groups_api) do

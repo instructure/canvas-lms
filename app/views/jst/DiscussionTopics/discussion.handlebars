@@ -37,16 +37,8 @@
 
     <div class="discussion-due-date">
       {{#if assignment}}
-        {{#if assignment.due_at}}
-          <span class="discussion-date-type">
-            {{#t}}Due{{/t}}
-          </span>
-          <span {{ contextSensitiveDatetimeTitle assignment.due_at }}>
-            {{datetimeFormatted assignment.due_at}}
-          </span>
-        {{else}}
-          {{#t}}No Due Date{{/t}}
-        {{/if}}
+        <div class="ig-details__item assignment-date-due" data-view="date-due">
+        </div>
       {{/if}}
     </div>
 

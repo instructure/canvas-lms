@@ -1,4 +1,4 @@
-class AddOnlyVisibleToOverridesToQuizzes < ActiveRecord::Migration
+class AddOnlyVisibleToOverridesToQuizzes < ActiveRecord::Migration[4.2]
  tag :predeploy
 
   def self.up

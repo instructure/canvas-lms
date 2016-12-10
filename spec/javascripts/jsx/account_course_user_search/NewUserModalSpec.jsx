@@ -1,9 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/account_course_user_search/NewUserModal'
-], (React, NewUserModal) => {
-
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, NewUserModal) => {
 
   module('Account Course User Search NewUserModal View');
 

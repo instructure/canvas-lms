@@ -1,4 +1,4 @@
-class GrandfatherDefaultAccountInvitationPreviews < ActiveRecord::Migration
+class GrandfatherDefaultAccountInvitationPreviews < ActiveRecord::Migration[4.2]
   # yes, predeploy, so that the setting is preserved before the new code goes live
   tag :predeploy
 

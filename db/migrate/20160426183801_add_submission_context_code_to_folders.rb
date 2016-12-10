@@ -1,6 +1,6 @@
-class AddSubmissionContextCodeToFolders < ActiveRecord::Migration
+class AddSubmissionContextCodeToFolders < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
-  
+
   tag :predeploy
 
   def change

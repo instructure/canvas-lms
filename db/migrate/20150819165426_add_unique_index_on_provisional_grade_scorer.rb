@@ -1,4 +1,4 @@
-class AddUniqueIndexOnProvisionalGradeScorer < ActiveRecord::Migration
+class AddUniqueIndexOnProvisionalGradeScorer < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

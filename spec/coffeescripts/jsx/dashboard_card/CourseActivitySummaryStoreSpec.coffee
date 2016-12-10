@@ -1,9 +1,8 @@
 define [
+  'react-addons-test-utils'
   'underscore'
   'jsx/dashboard_card/CourseActivitySummaryStore'
-], (_, CourseActivitySummaryStore) ->
-
-  TestUtils = React.addons.TestUtils
+], (TestUtils, _, CourseActivitySummaryStore) ->
 
   module 'CourseActivitySummaryStore',
     setup: ->

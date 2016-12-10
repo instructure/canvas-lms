@@ -1,4 +1,4 @@
-class AllowNullWeightOnGradingPeriods < ActiveRecord::Migration
+class AllowNullWeightOnGradingPeriods < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

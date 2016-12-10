@@ -300,7 +300,9 @@ class FilesController < ApplicationController
         when 'content_type'
           "attachments.content_type"
         when 'user'
-          scope = scope.joins("LEFT OUTER JOIN #{User.quoted_table_name} ON attachments.user_id=users.id")
+        scope.primary_shard.activate do
+            scope = scope.joins("LEFT OUTER JOIN #{User.quoted_table_name} ON attachments.user_id=users.id")
+          end
           "users.sortable_name IS NULL, #{User.sortable_name_order_by_clause('users')}"
         else
           Attachment.display_name_order_by_clause('attachments')
@@ -342,7 +344,7 @@ class FilesController < ApplicationController
   def react_files
     if authorized_action(@context, @current_user, [:read, :manage_files]) && tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
-      get_all_pertinent_contexts(include_groups: true) if @context == @current_user
+      get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
 
         tool_context = if context.is_a?(Course)

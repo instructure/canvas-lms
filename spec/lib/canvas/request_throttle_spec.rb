@@ -292,21 +292,21 @@ describe 'RequestThrottle' do
         end
 
         it "clamps a negative increment to 0" do
-          now = Time.zone.now
-
-          # this is a hack to make the second Time.now call
-          # return 6 seconds in the future, which makes the
-          # final cost with leak < 0 (cuz the return is 5)
-          x = 0
-          Time.stubs(:now).returns { now + x.seconds; x += 6; }
-
-          Timecop.freeze(now) do
+          Timecop.safe_mode = false
+          Timecop.freeze('2013-01-01 3:00:00 UTC') do
             @bucket.reserve_capacity(20) do
+              # finishing 6 seconds later, so final cost with leak is < 0
+              Timecop.freeze(Time.now + 6.seconds)
               5
             end
+            Timecop.return
           end
           expect(@bucket.count).to eq 0
           expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to eq 0
+        end
+
+        after do
+          Timecop.safe_mode = true
         end
       end
     end

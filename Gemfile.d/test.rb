@@ -39,7 +39,7 @@ group :test do
     gem 'childprocess', '0.5.9', require: false
     gem 'websocket', '1.2.3', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
-  gem 'test_after_commit', '1.1.0'
+  gem 'test_after_commit', '1.1.0' if CANVAS_RAILS4_2
   gem 'testrailtagging', '0.3.7', require: false
 
   gem 'webmock', '1.22.3', require: false

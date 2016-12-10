@@ -413,9 +413,6 @@
       <% if can_manage %>
         <tr>
           <td colspan="4">
-            <% if Account.site_admin.grants_right?(@current_user, :manage_courses) && Account.root_accounts.length > 1 %>
-              <a href="#" class="move_course_link btn"><i class="icon-arrow-right"></i> <%= t('links.move_course', %{Move To Another Account}) %></a>
-            <% end %>
             <span class="course_form">
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary"><%= t('buttons.update_course', %{Update Course Details}) %></button>
@@ -630,32 +627,6 @@
   <% end %>
 </div><!-- end course details tab -->
 
-<% if Account.site_admin.grants_right?(@current_user, :manage_courses) %>
-  <div id="move_course_dialog" style="display: none;">
-    <h2><%= t('headings.move_course', %{Move the course to another root account}) %></h2>
-    <%= t('deatils.move_course', %{Select a new root account for this course.  After you move the course you'll want to specify a new department for the course as well.}) %>
-    <%= form_for :course, :url => course_url(@context), :html => {:method => :put} do |f| %>
-      <table class="formtable">
-        <tr>
-          <td>
-            <%= f.blabel :root_account_id, :en => "Root Account" %>
-          </td>
-          <td>
-            <%= f.select :root_account_id, Account.root_accounts.active.order("name DESC").select([:id, :name]).map{|a| [a.name, a.id] }, :selected => @context.root_account_id %>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <div class="button-container">
-              <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
-              <button type="submit" class="btn btn-primary"><%= t('buttons.move_course', %{Move Course}) %></button>
-            </div>
-          </td>
-        </tr>
-      </table>
-    <% end %>
-  </div>
-<% end %>
 <div id="edit_letter_grades_form" style="display: none;" data-context_code="<%= @context.asset_string %>">
   <%= render partial: "shared/grading_standard", object: @context.grading_standard, locals: {read_only: !can_manage} %>
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>

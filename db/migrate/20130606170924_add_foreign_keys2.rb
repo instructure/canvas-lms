@@ -1,4 +1,4 @@
-class AddForeignKeys2 < ActiveRecord::Migration
+class AddForeignKeys2 < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

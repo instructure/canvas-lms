@@ -1,4 +1,4 @@
-class FixImportedWikiPageWorkflow < ActiveRecord::Migration
+class FixImportedWikiPageWorkflow < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

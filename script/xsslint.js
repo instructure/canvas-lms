@@ -32,9 +32,33 @@ Linter.prototype.isSafeString = function(node) {
   return (wrapperOption.length > 0)
 }
 
+function getFilesAndDirs(root, files, dirs) {
+  root = root === "." ? "" : root + "/";
+  files = files || [];
+  dirs = dirs || [];
+  var entries = fs.readdirSync(root || ".");
+  var entry;
+  var i;
+  var len;
+  for (i = 0, len = entries.length; i < len; i++) {
+    entry = entries[i];
+    var stats = fs.lstatSync(root + entry);
+    if (stats.isSymbolicLink()) {
+    } else if (stats.isDirectory()) {
+      dirs.push(root + entry + "/");
+      getFilesAndDirs(root + entry, files, dirs);
+    } else {
+      files.push(root + entry);
+    }
+  }
+  return [files, dirs];
+}
+
 process.chdir("public/javascripts");
 var ignores = fs.readFileSync(".xssignore").toString().trim().split(/\r?\n|\r/);
-var files = globby.select(["*.js"]).reject(ignores).files;
+var candidates = getFilesAndDirs(".");
+candidates = {files: candidates[0], dirs: candidates[1]};
+var files = globby.select(["*.js"], candidates).reject(ignores).files;
 var warningCount = 0;
 
 console.log("Checking for potential XSS vulnerabilities...");

@@ -1,11 +1,11 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'underscore',
   'jsx/grading/EnrollmentTermsDropdown'
-], (React, ReactDOM, _, Dropdown) => {
+], (React, ReactDOM, {Simulate}, _, Dropdown) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
   module('EnrollmentTermsDropdown', {
     renderComponent() {

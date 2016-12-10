@@ -1,4 +1,4 @@
-class AddHasAnnotationsToCanvadocs < ActiveRecord::Migration
+class AddHasAnnotationsToCanvadocs < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

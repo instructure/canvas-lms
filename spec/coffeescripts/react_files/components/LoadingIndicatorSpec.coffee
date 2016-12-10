@@ -1,11 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/LoadingIndicator'
-], (React, ReactDOM, $, LoadingIndicator) ->
-
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, $, LoadingIndicator) ->
 
   module 'LoadingIndicator'
 

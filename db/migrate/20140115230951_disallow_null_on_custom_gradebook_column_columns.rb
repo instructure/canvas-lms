@@ -1,4 +1,4 @@
-class DisallowNullOnCustomGradebookColumnColumns < ActiveRecord::Migration
+class DisallowNullOnCustomGradebookColumnColumns < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.allow_null(frd)

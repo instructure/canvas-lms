@@ -1,0 +1,47 @@
+<fieldset id="sis_integration_settings">
+    <legend><%= t("SIS Integration Settings") %></legend>
+    <div>
+        <div>
+            <%= f.check_box :allow_sis_import, :checked => @account.allow_sis_import %>
+            <%= f.label :allow_sis_import, t("SIS imports") %>
+        </div>
+        <%= f.fields_for :settings do |settings| %>
+            <%= settings.fields_for :sis_syncing do |r| %>
+                <%
+                sis_syncing = @account.sis_syncing
+                sis_syncing_disabled = sis_syncing[:locked] && sis_syncing[:inherited]
+                %>
+                <div>
+                    <%= r.check_box :value, :checked => sis_syncing[:value],
+                        "aria-controls" => "account_settings_sis_syncing_value_settings" %>
+                    <%= r.label :value, t("SIS syncing") %>
+                </div>
+            <% end %>
+            <fieldset id="account_settings_sis_syncing_value_settings" class="ig-indent1" style="display: none;">
+                <legend class="screenreader-only"><%= t("Additional settings for SIS syncing") %></legend>
+                <% if Assignment.sis_grade_export_enabled?(@account) %>
+                    <%= f.fields_for :settings do |settings| %>
+                        <%= settings.fields_for :sis_default_grade_export do |r| %>
+                            <%
+                            hash = @account.sis_default_grade_export
+                            disabled = hash[:locked] && hash[:inherited]
+                            %>
+                            <div>
+                                <%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                                <%= r.label :value, t("\"Post Grades to SIS\" checkbox is enabled by default for assignments, graded discussions, and quizzes") %>
+                            </div>
+                            <% unless disabled %>
+                                <div>
+                                    <%= r.check_box :locked_for_sub_accounts, :checked => hash[:locked] %>
+                                    <%= r.label :locked_for_sub_accounts, t("Lock this setting for sub-accounts") %>
+                                </div>
+                            <% end %>
+                        <% end %>
+                    <% end %>
+                <% end %>
+            </fieldset>
+        <% end %>
+    </div>
+</fieldset>
+
+<%= render partial: 'sis_agent_token_auth', locals: { f: f } %>

@@ -1,4 +1,4 @@
-class CreateStateTheme < ActiveRecord::Migration
+class CreateStateTheme < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   NAME = "State U. Theme"

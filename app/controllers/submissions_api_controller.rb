@@ -247,6 +247,14 @@ class SubmissionsApiController < ApplicationController
   #   The id of the grading period in which submissions are being requested
   #   (Requires the Multiple Grading Periods account feature turned on)
   #
+  # @argument order [String, "id"|"graded_at"]
+  #   The order submissions will be returned in.  Defaults to "id".  Doesn't
+  #   affect results for "grouped" mode.
+  #
+  # @argument order_direction [String, "ascending"|"descending"]
+  #   Determines whether ordered results are retured in ascending or descending
+  #   order.  Defaults to "ascending".  Doesn't affect results for "grouped" mode.
+  #
   # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"|"course"|"user"]
   #   Associations to include with the group. `total_scores` requires the
   #   `grouped` argument.
@@ -405,7 +413,10 @@ class SubmissionsApiController < ApplicationController
         result << hash
       end
     else
-      submissions = @context.submissions.except(:order).where(:user_id => student_ids).order(:id)
+      order_by = params[:order] == "graded_at" ? "graded_at" : :id
+      order_direction = params[:order_direction] == "descending" ? "desc nulls last" : "asc"
+      order = "#{order_by} #{order_direction}"
+      submissions = @context.submissions.except(:order).where(:user_id => student_ids).order(order)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
       submissions = submissions.preload(:user)
 

@@ -167,7 +167,7 @@ describe DiscussionTopicsController do
       @locked_module.unlock_at = 2.months.from_now
       @locked_module.save!
       user_session(@student)
-      
+
       get 'index', course_id: @course.id
       expect(response).to be_success
       expect(assigns["topics"]).to include(@locked_topic)
@@ -549,11 +549,27 @@ describe DiscussionTopicsController do
       course_topic
     end
 
-    before do
+    include_context "multiple grading periods within controller" do
+      let(:course) { @course }
+      let(:teacher) { @teacher }
+      let(:request_params) { [:edit, course_id: course, id: @topic] }
+    end
+
+    it "should not explode with mgp and group context" do
+      @course.root_account.enable_feature!(:multiple_grading_periods)
       user_session(@teacher)
+      group = group_model(:context => @course)
+      group_topic = group.discussion_topics.create!(:title => "title")
+      get(:edit, group_id: group, id: group_topic)
+      expect(response).to be_success
+      expect(assigns[:js_env]).to have_key(:active_grading_periods)
     end
 
     context 'conditional-release' do
+      before do
+        user_session(@teacher)
+      end
+
       it 'should include environment variables if enabled' do
         ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
         ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'value' })

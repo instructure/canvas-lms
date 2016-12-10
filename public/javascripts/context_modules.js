@@ -26,6 +26,7 @@ define([
   'INST' /* INST */,
   'i18n!context_modules',
   'jquery' /* $ */,
+  'context_modules_helper', /* Helper */
   'jsx/shared/conditional_release/CyoeHelper',
   'compiled/views/context_modules/context_modules' /* handles the publish/unpublish state */,
   'compiled/views/modules/RelockModulesDialog',
@@ -49,7 +50,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'compiled/jquery.rails_flash_notifications'
-], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, CyoeHelper, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
+], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, Helper, CyoeHelper, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape, setupContentIds) {
 
   // TODO: AMD don't export global, use as module
   window.modules = (function() {
@@ -751,7 +752,7 @@ define([
         prereqsList += prereqs[i].name + ', ';
       }
       prereqsList = prereqsList.slice(0, -2)
-      var $prerequisitesMessage = $('<div />', {text: 'Prerequisites: ' + htmlEscape(prereqsList),'class': 'prerequisites_message'});
+      var $prerequisitesMessage = $('<div />', {text: 'Prerequisites: ' + prereqsList, 'class': 'prerequisites_message'});
       $prerequisitesDiv.append($prerequisitesMessage);
 
     }
@@ -1655,8 +1656,8 @@ define([
       $('.context_module_item .ig-row').addClass('student-view');
     }
 
-    $('.external_url_link').click(function() {
-      window.location = $(this).attr('data-item-href');
+    $('.external_url_link').click(function(event) {
+      Helper.externalUrlLinkClick(event, $(this))
     });
 
     $(".datetime_field").datetime_field();

@@ -13,7 +13,7 @@
     background-color: #f6f7f9;
     line-height: 35px;
     color: $ic-font-color--subdued;
-    font-weight: 500;
+    font-weight: bold;
   }
   .fc-row .fc-content-skeleton td, .fc-row .fc-helper-skeleton td {
     border-color: $ic-border-light;
@@ -41,7 +41,6 @@
 
     a:focus {
       outline: 0;
-      text-decoration: underline;
     }
   }
   &.carat-bottom .ui-menu-carat span {
@@ -233,8 +232,4 @@
 // to change the size/color of the event time only within the event container
 .fc-agendaWeek-view .fc-event-container a[class*="group_"] .fc-content .fc-time {
   color: $ic-font-color-dark;
-}
-// override the default fullcalendar.css to accommodate wider left border on events
-.fc-ltr .fc-time-grid .fc-event-container {
-  margin-left: 1px;
 }

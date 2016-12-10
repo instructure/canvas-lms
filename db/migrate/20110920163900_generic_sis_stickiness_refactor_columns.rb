@@ -1,4 +1,4 @@
-class GenericSisStickinessRefactorColumns < ActiveRecord::Migration
+class GenericSisStickinessRefactorColumns < ActiveRecord::Migration[4.2]
   tag :predeploy
 
 

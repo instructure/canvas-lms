@@ -1,10 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/assignments/ModeratedColumnHeader'
   'jsx/assignments/constants'
-], (React, ReactDOM, ModeratedColumnHeader, Constants) ->
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, ModeratedColumnHeader, Constants) ->
 
   module 'ModeratedColumnHeader',
     setup: ->

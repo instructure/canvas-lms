@@ -1,4 +1,4 @@
-class AddWorkflowStateToGradingStandards < ActiveRecord::Migration
+class AddWorkflowStateToGradingStandards < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

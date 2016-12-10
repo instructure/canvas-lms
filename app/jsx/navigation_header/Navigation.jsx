@@ -3,7 +3,7 @@ define([
   'jquery',
   'i18n!new_nav',
   'react',
-  'bower/react-tray/dist/react-tray',
+  'react-tray',
   'jsx/navigation_header/trays/CoursesTray',
   'jsx/navigation_header/trays/GroupsTray',
   'jsx/navigation_header/trays/AccountsTray',

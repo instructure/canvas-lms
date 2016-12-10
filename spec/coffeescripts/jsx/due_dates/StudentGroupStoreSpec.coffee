@@ -1,12 +1,9 @@
 define [
-  'react'
   'underscore'
   'jsx/due_dates/StudentGroupStore',
   'helpers/fakeENV'
-], (React, _, StudentGroupStore, fakeENV) ->
+], (_, StudentGroupStore, fakeENV) ->
 
-  Simulate = React.addons.TestUtils.Simulate
-  SimulateNative = React.addons.TestUtils.SimulateNative
 
   module 'StudentGroupStore',
     setup: ->

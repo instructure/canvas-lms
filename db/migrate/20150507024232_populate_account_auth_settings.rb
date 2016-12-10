@@ -1,4 +1,4 @@
-class PopulateAccountAuthSettings < ActiveRecord::Migration
+class PopulateAccountAuthSettings < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

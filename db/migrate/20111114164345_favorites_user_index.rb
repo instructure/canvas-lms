@@ -1,4 +1,4 @@
-class FavoritesUserIndex < ActiveRecord::Migration
+class FavoritesUserIndex < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

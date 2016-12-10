@@ -1,34 +1,24 @@
-define(function(require, exports, module) {
-  var _ = require('lodash');
-  var config = require('./config/environments/production');
-  var testConfig = require('./config/environments/test');
-  var devConfig = require('./config/environments/development');
+var config = require('./config/environments/production');
+var callbacks = [];
+var loaded;
 
-  var callbacks = [];
-  var loaded;
+if (!config) {
+  config = {};
+}
 
-  if (!config) {
-    config = {};
+config.onLoad = function(callback) {
+  if (loaded) {
+    callback();
   }
-
-  config.onLoad = function(callback) {
-    if (loaded) {
-      callback();
-    }
-    else {
-      callbacks.push(callback);
-    }
-  };
-
-  //>>excludeStart("production", pragmas.production);
-  var env = "development"
-  if(typeof(module.config) !== "undefined" && module.config().environment){
-    env = module.config().environment
+  else {
+    callbacks.push(callback);
   }
+};
 
-  var extend = _.extend;
+if (process.env.NODE_ENV !== 'production') {
+  var extend = require('lodash').extend;
   var onLoad = function() {
-    console.log('\tLoaded', env, 'config.');
+    console.log('\tLoaded', process.env.NODE_ENV, 'config.');
     loaded = true;
 
     while (callbacks.length) {
@@ -36,33 +26,17 @@ define(function(require, exports, module) {
     }
   };
 
-  console.log('Environment:', env);
+  console.log('Environment:', process.env.NODE_ENV);
 
-  // Install test config:
-  if (env === 'test') {
-    extend(config, testConfig);
+  var onEnvSpecificConfigLoaded = function (envSpecificConfig) {
+    extend(config, envSpecificConfig);
     onLoad();
   }
-  else {
-    var global = window;
-    var DEBUG = {};
-
-    // You can use this in development_local.js to expose certain modules that
-    // are hard to reach from the console. Example:
-    //
-    //   DEBUG.expose('stores/reports', 'reportStore');
-    //   DEBUG.reportStore; // ReportStore
-    DEBUG.expose = function(script, varName) {
-      require([ script ], function(__script__) {
-        DEBUG[varName] = __script__;
-      });
-    };
-
-    global.DEBUG = global.d = DEBUG;
-    extend(config, devConfig);
-    onLoad();
+  if (process.env.NODE_ENV === 'test') {
+    require([ './config/environments/test' ], onEnvSpecificConfigLoaded);
+  } else {
+    require([ './config/environments/development' ], onEnvSpecificConfigLoaded);
   }
-  //>>excludeEnd("production");
+}
 
-  return config;
-});
+module.exports = config;

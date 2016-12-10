@@ -1,4 +1,4 @@
-class SwitchToIcuSortableName < ActiveRecord::Migration
+class SwitchToIcuSortableName < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   # yes, predeploy; Rails processes will need restarted after collkey function is created
   # in order to use the new order by clause

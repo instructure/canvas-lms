@@ -1,12 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'underscore'
   'jsx/dashboard_card/RecentActivityToggle',
   'helpers/assertions'
-], (React, ReactDOM, _, RecentActivityToggle, assertions) ->
-
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, _, RecentActivityToggle, assertions) ->
 
   module 'RecentActivityToggle',
     setup: ->

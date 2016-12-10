@@ -3,10 +3,9 @@ define [
   'underscore'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/files/UsageRightsSelectBox'
-  ], ($, _, React, ReactDOM, UsageRightsSelectBox ) ->
-
-    TestUtils = React.addons.TestUtils
+  ], ($, _, React, ReactDOM, TestUtils, UsageRightsSelectBox ) ->
 
     module "UsageRightsSelectBox",
       setup: ->

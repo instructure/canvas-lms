@@ -16,8 +16,14 @@ define [
   'str/htmlEscape'
   'compiled/models/grade_summary/CalculationMethodContent'
   'jsx/gradebook/SubmissionStateMap'
+  'compiled/api/gradingPeriodsApi'
   'jquery.instructure_date_and_time'
-  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid, ic_submission_download_dialog, htmlEscape, CalculationMethodContent, SubmissionStateMap) ->
+], (
+  ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz,
+  AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid,
+  ic_submission_download_dialog, htmlEscape, CalculationMethodContent, SubmissionStateMap,
+  GradingPeriodsAPI
+) ->
 
   {get, set, setProperties} = Ember
 
@@ -93,7 +99,13 @@ define [
     mgpEnabled: get(window, 'ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled')
 
     gradingPeriods:
-      _.compact [{id: '0', title: I18n.t("all_grading_periods", "All Grading Periods")}].concat get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
+      (->
+        periods = get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
+        deserializedPeriods = GradingPeriodsAPI.deserializePeriods(periods)
+        optionForAllPeriods =
+          id: '0', title: I18n.t("all_grading_periods", "All Grading Periods")
+        _.compact([optionForAllPeriods].concat(deserializedPeriods))
+      )()
 
     lastGeneratedCsvLabel:  do () =>
       if get(window, 'ENV.GRADEBOOK_OPTIONS.gradebook_csv_progress')
@@ -178,6 +190,10 @@ define [
     weightingScheme: null
 
     ariaAnnounced: null
+
+    assignmentInClosedGradingPeriod: null
+
+    disableAssignmentGrading: null
 
     actions:
 
@@ -304,12 +320,12 @@ define [
     outcomeSelectDefaultLabel: I18n.t "no_outcome", "No Outcome Selected"
 
     submissionStateMap: (
-      periods = _.map get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods'), (gradingPeriod) =>
-        _.extend({}, gradingPeriod, closed: gradingPeriodIsClosed(gradingPeriod))
       new SubmissionStateMap(
         gradingPeriodsEnabled: !!get(window, 'ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled')
         selectedGradingPeriodID: '0'
-        gradingPeriods: periods
+        gradingPeriods: GradingPeriodsAPI.deserializePeriods(
+          get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
+        )
         isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, "admin")
       )
     )
@@ -678,6 +694,24 @@ define [
         else ['ag_position', 'position']
       @get('assignments').set('sortProperties', sort_props)
     ).observes('assignmentSort').on('init')
+
+    updateAssignmentStatusInGradingPeriod: (->
+      assignment = @get('selectedAssignment')
+
+      unless assignment
+        @set('assignmentInClosedGradingPeriod', null)
+        @set('disableAssignmentGrading', null)
+        return
+
+      @set('assignmentInClosedGradingPeriod', assignment.has_due_date_in_closed_grading_period)
+
+      # Calculate whether the current user is able to grade assignments given their role and the
+      # result of the calculations above
+      if ENV.current_user_roles? && _.contains(ENV.current_user_roles, 'admin')
+        @set('disableAssignmentGrading', false)
+      else
+        @set('disableAssignmentGrading', assignment.has_due_date_in_closed_grading_period)
+    ).observes('selectedAssignment')
 
     selectedSubmission: ((key, selectedSubmission) ->
       if arguments.length > 1

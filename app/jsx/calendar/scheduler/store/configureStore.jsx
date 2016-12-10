@@ -4,7 +4,7 @@ define([
   'redux-logger',
   '../reducer',
   './initialState'
-], function (Redux, ReduxThunk, ReduxLogger, reducer, initialState) {
+], function (Redux, {default:ReduxThunk}, ReduxLogger, reducer, initialState) {
 
   const { createStore, applyMiddleware } = Redux;
 

@@ -1,8 +1,0 @@
-v2.0.1
-Thu, 12 Jun 2014 05:19:23 GMT
-
-0e83953 [changed] don’t require textStatus
-46440df [fixed] let jqXHR object survive the fixture copy
-
-
-

@@ -43,12 +43,17 @@ define [
         collection = if is_complete then concluded else more
         collection.push(course.toJSON())
       )
+
+      group_json = @options.courses.groups.toJSON()
+      if @options.messageableOnly
+        group_json = _.filter(group_json, (g) -> g.can_message)
       data =
         defaultOption: @options.defaultOption,
         favorites: @options.courses.favorites.toJSON(),
         more: more,
         concluded: concluded,
-        groups: @options.courses.groups.toJSON()
+        groups: group_json
+
       @truncate_course_name_data(data)
       @$el.html(template(data))
       @$el.selectpicker('refresh')

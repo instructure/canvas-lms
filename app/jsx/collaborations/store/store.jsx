@@ -6,7 +6,7 @@ define([
   '../reducers/deleteCollaborationReducer',
   '../reducers/createCollaborationReducer',
   '../reducers/updateCollaborationReducer'
-], (Redux, ReduxThunk, ltiCollaboratorsReducer, listCollaborationsReducer, deleteCollaborationReducer, createCollaborationReducer, updateCollaborationReducer) => {
+], (Redux, {default:ReduxThunk}, ltiCollaboratorsReducer, listCollaborationsReducer, deleteCollaborationReducer, createCollaborationReducer, updateCollaborationReducer) => {
   const { createStore, applyMiddleware } = Redux;
 
   const createStoreWithMiddleware = applyMiddleware(

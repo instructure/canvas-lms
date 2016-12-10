@@ -1,90 +1,19 @@
-postgres:
-  image: postgres:9.3
+# See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
+version: '2'
+services:
+  web: &WEB
+    build:
+      context: .
+    links:
+      - postgres
+      - redis
 
-redis:
-  image: redis:2.6
+  jobs:
+    <<: *WEB
+    command: bundle exec script/delayed_job run
 
-# To add cassandra
-# - Uncomment this configuration
-# - Uncomment cassandra line in 'web' below
-# - Uncomment configuration in config/cassandra.yml
-# - See config/cassandra.yml.example for further setup instructions
-# cassandra:
-#   image: cassandra:2.2
-#   environment:
-#     CASSANDRA_START_RPC: 'true'
+  postgres:
+    image: postgres:9.3
 
-consul:
-  image: gliderlabs/consul-server:0.6
-  command: -node canvas-consul -bootstrap
-  environment:
-    GOMAXPROCS: "2"
-
-selenium:
-  build: ./docker-compose/seleniumff
-  ports:
-    - 5900:5900
-  environment:
-    VIRTUAL_HOST: selenium.docker
-
-kinesis:
-  image: instructure/kinesalite
-  environment:
-    VIRTUAL_HOST: kinesis.docker
-    VIRTUAL_PORT: 4567
-
-web: &WEB
-  build: ./docker-compose
-  volumes:
-    - "canvas-gems:/home/docker/.gem/ruby/2.1.0"
-    - ".:/usr/src/app"
-  links:
-    - consul
-    - postgres
-    - redis
-#    - cassandra
-    - kinesis
-    - mailcatcher
-  environment:
-    RACK_ENV: development
-    VIRTUAL_HOST: .canvas.docker
-
-jobs:
-  <<: *WEB
-  command: bundle exec script/delayed_job run
-
-guard:
-  <<: *WEB
-  command: bundle exec guard -i
-
-mailcatcher:
-  image: instructure/mailcatcher
-  environment:
-    VIRTUAL_HOST: mail.canvas.docker
-    VIRTUAL_PORT: 8080
-
-# Uncomment this entry to run qunit tests built from webpack
-# js-tests:
-#  build: ./docker-compose/karma
-#  volumes:
-#    - ".:/app"
-#  environment:
-#    NODE_ENV: CI
-
-# Uncomment this entry to run qunit tests Headlessly
-#phantomjs-tests:
-#  build: ./docker-compose/phantomjs-karma
-#  volumes:
-#    - ".:/app"
-#  environment:
-#    NODE_ENV: CI
-#    VIRTUAL_HOST: phantom.docker
-
-# Uncomment below to run the LTI test tool for integration tests
-# lti-test-tool:
-#   image: instructure/lti_tool_provider_example
-#   command: bundle exec rails s -p 8080
-#   ports:
-#     - "8080:8080"
-#   environment:
-#     VIRTUAL_HOST: lti.docker
+  redis:
+    image: redis:2.6

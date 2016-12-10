@@ -1,0 +1,49 @@
+# See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
+version: '2'
+services:
+  jobs: &BASE
+    build:
+      context: .
+    volumes:
+      - .:/usr/src/app
+      - bundler:/home/docker/.bundler/
+      - canvas-docker-gems:/home/docker/.gem/
+      - generated_1:/usr/src/app/public/javascripts/client_apps
+      - generated_2:/usr/src/app/public/dist
+      - i18nliner_node_modules:/usr/src/app/gems/canvas_i18nliner/node_modules
+      - log:/usr/src/app/log
+      - node_modules:/usr/src/app/node_modules
+      - quizzes_node_modules:/usr/src/app/client_apps/canvas_quizzes/node_modules
+      - selinimum_node_modules:/usr/src/app/gems/selinimum/node_modules
+      - tmp:/usr/src/app/tmp
+    environment: &BASE-ENV
+      RAILS_ENV: development
+      ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
+
+  guard:
+    <<: *BASE
+    command: bundle exec guard -i
+
+  web:
+    <<: *BASE
+    environment:
+      <<: *BASE-ENV
+      VIRTUAL_HOST: .canvas.docker
+
+
+  postgres:
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  bundler: {}
+  canvas-docker-gems: {}
+  generated_1: {}
+  generated_2: {}
+  i18nliner_node_modules: {}
+  log: {}
+  node_modules: {}
+  pg_data: {}
+  quizzes_node_modules: {}
+  selinimum_node_modules: {}
+  tmp: {}

@@ -56,11 +56,13 @@ define [
       assignments.pluck('id')
 
     canDelete: ->
-      !@hasAssignmentDueInClosedGradingPeriod() && !@hasFrozenAssignments()
+      !@hasAssignmentDueInClosedGradingPeriod() &&
+      !@hasFrozenAssignments()
 
     hasFrozenAssignments: ->
       @get('assignments').any (m) ->
         m.get('frozen')
 
     hasAssignmentDueInClosedGradingPeriod: ->
-      @get('has_assignment_due_in_closed_grading_period')
+      !!ENV.MULTIPLE_GRADING_PERIODS_ENABLED &&
+        @get('has_assignment_due_in_closed_grading_period')

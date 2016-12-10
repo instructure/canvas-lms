@@ -1,8 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/shared/load-more'
-], (react, LoadMore) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, LoadMore) => {
 
   module('LoadMore');
 

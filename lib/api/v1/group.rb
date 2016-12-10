@@ -67,6 +67,10 @@ module Api::V1::Group
     if includes.include?('can_access')
       hash['can_access'] = group.grants_right?(@current_user, :read)
     end
+
+    if includes.include?('can_message')
+      hash['can_message'] = group.grants_right?(@current_user, :send_messages)
+    end
     hash
   end
 

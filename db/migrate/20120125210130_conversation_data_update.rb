@@ -1,4 +1,4 @@
-class ConversationDataUpdate < ActiveRecord::Migration
+class ConversationDataUpdate < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

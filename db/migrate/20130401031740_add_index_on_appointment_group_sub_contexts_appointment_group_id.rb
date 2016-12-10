@@ -1,4 +1,4 @@
-class AddIndexOnAppointmentGroupSubContextsAppointmentGroupId < ActiveRecord::Migration
+class AddIndexOnAppointmentGroupSubContextsAppointmentGroupId < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

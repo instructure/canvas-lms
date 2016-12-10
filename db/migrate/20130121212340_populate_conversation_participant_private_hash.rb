@@ -1,4 +1,4 @@
-class PopulateConversationParticipantPrivateHash < ActiveRecord::Migration
+class PopulateConversationParticipantPrivateHash < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

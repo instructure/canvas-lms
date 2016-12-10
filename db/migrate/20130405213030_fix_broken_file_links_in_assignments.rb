@@ -1,4 +1,4 @@
-class FixBrokenFileLinksInAssignments < ActiveRecord::Migration
+class FixBrokenFileLinksInAssignments < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

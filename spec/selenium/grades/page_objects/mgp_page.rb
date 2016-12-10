@@ -12,107 +12,104 @@ module GradingStandards
     include LoginAndSessionMethods
     include SeleniumErrorRecovery
 
-    private
-      # Main page components
-      def grading_periods_tab
-        f("#grading-periods-tab")
-      end
+    # Main page components
+    def grading_periods_tab
+      f("#grading-periods-tab")
+    end
 
-      def add_set_of_grading_periods_button
-        f('button[aria-label="Add Set of Grading Periods"]')
-      end
+    def add_set_of_grading_periods_button
+      f('button[aria-label="Add Set of Grading Periods"]')
+    end
 
-      def term_dropdown
-        f('select[aria-label="Enrollment Term"]')
-      end
+    def term_dropdown
+      f('select[aria-label="Enrollment Term"]')
+    end
 
-      def search_box
-        f('.GradingPeriodSearchField input')
-      end
+    def search_box
+      f('.GradingPeriodSearchField input')
+    end
 
-      # Set components
-      def set_name_input
-        f('#set-name')
-      end
+    # Set components
+    def set_name_input
+      f('#set-name')
+    end
 
-      def term_input
-        f('input[aria-label^="Start typing to search."]')
-      end
+    def term_input
+      f('input[aria-label^="Start typing to search."]')
+    end
 
-      def create_set_button
-        fj('button:contains("Create")')
-      end
+    def create_set_button
+      fj('button:contains("Create")')
+    end
 
-      def grading_period_set_title_css
-        ".GradingPeriodSet__title"
-      end
+    def grading_period_set_title_css
+      ".GradingPeriodSet__title"
+    end
 
-      def set_title
-        f(grading_period_set_title_css)
-      end
+    def set_title
+      f(grading_period_set_title_css)
+    end
 
-      def add_grading_period_link
-        f('button[aria-label="Add Grading Period"]')
-      end
+    def add_grading_period_link
+      f('button[aria-label="Add Grading Period"]')
+    end
 
-      def delete_grading_period_set_button
-        f('#grading-period-sets button[title^="Delete "]')
-      end
+    def delete_grading_period_set_button
+      f('#grading-period-sets button[title^="Delete "]')
+    end
 
-      def edit_grading_period_set_button
-        f('#grading-period-sets button[title^="Edit "]')
-      end
+    def edit_grading_period_set_button
+      f('#grading-period-sets button[title^="Edit "]')
+    end
 
-      def edit_set_save_button
-        f('button[aria-label="Save Grading Period Set"]')
-      end
+    def edit_set_save_button
+      f('button[aria-label="Save Grading Period Set"]')
+    end
 
-      def first_collapsed_set
-        f('.GradingPeriodSet--collapsed')
-      end
+    def first_collapsed_set
+      f('.GradingPeriodSet--collapsed')
+    end
 
-      def all_sets_css
-        '.GradingPeriodSet__title'
-      end
+    def all_sets_css
+      '.GradingPeriodSet__title'
+    end
 
-      # Period components
-      def period_title_input
-        f('#title')
-      end
+    # Period components
+    def period_title_input
+      f('#title')
+    end
 
-      def start_date_input
-        f('input[data-row-key="start-date"]')
-      end
+    def start_date_input
+      f('input[data-row-key="start-date"]')
+    end
 
-      def end_date_input
-        f('input[data-row-key="end-date"]')
-      end
+    def end_date_input
+      f('input[data-row-key="end-date"]')
+    end
 
-      def close_date_input
-        f('input[data-row-key="close-date"]')
-      end
+    def close_date_input
+      f('input[data-row-key="close-date"]')
+    end
 
-      def save_period_button
-        f('button[aria-label="Save Grading Period"]')
-      end
+    def save_period_button
+      f('button[aria-label="Save Grading Period"]')
+    end
 
-      def grading_period_list
-        f('.GradingPeriodList')
-      end
+    def grading_period_list
+      f('.GradingPeriodList')
+    end
 
-      def period_css
-        '.GradingPeriodList__period span'
-      end
+    def period_css
+      '.GradingPeriodList__period span'
+    end
 
-      def period_delete_button
-        f('.GradingPeriodList .icon-trash')
-      end
+    def period_delete_button
+      f('.GradingPeriodList .icon-trash')
+    end
 
-      def period_edit_button
-        f('.GradingPeriodList .icon-edit')
-      end
-
-    public
+    def period_edit_button
+      f('.GradingPeriodList .icon-edit')
+    end
 
     def visit(account_id)
       get "/accounts/#{account_id}/grading_standards"
@@ -207,13 +204,6 @@ module GradingStandards
       end
     end
 
-    def grading_period_set_deleted?
-      f(grading_period_set_title_css, grading_periods_tab)
-      false
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-      true
-    end
-
     def all_periods
       ff(period_css)
     end
@@ -241,14 +231,6 @@ module GradingStandards
       else
         period.displayed?
       end
-    end
-
-    def grading_period_deleted?
-      create_set_button.displayed?
-      f(period_css, grading_period_list)
-      false
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-      true
     end
 
     def delete_first_grading_period(are_you_sure)

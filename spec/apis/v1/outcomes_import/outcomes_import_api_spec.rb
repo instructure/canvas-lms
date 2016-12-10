@@ -88,6 +88,22 @@ describe "Outcomes Import API", type: :request do
     )
   end
 
+  def create_full_json(json:, expected_status: 200)
+    api_call(:post, "/api/v1/global/outcomes_import",
+      {
+        controller: 'outcomes_import_api',
+        action: 'create',
+        account_id: @account.id.to_s,
+        format: 'json',
+      },
+      json,
+      { },
+      {
+        expected_status: expected_status
+      }
+            )
+  end
+
   def revoke_permission(account_user, permission)
     RoleOverride.manage_role_override(
       account_user.account,
@@ -95,6 +111,10 @@ describe "Outcomes Import API", type: :request do
       permission.to_s,
       :override => false
     )
+  end
+
+  def create_request(json)
+    {guid: "9426DCAE-734C-40D5-ABF6-FB748CD8BE65"}.merge(json)
   end
 
   context "Account" do
@@ -216,6 +236,120 @@ describe "Outcomes Import API", type: :request do
         ].each do |guid|
           expect(create_json(guid: guid)).not_to have_key("error")
         end
+      end
+
+      it "accepts valid mastery_points" do
+        %w[
+          0
+          1
+          100
+        ].each do |mastery_points|
+          expect(create_full_json(json: create_request({
+            mastery_points: mastery_points}))).not_to have_key("error")
+        end
+      end
+
+      it "rejects malformed mastery_points" do
+        %w[
+          0.1
+          a
+          1a
+        ].each do |mastery_points|
+          expect(create_full_json(json: create_request({
+            mastery_points: mastery_points}))).to have_key("error")
+        end
+      end
+
+      it "accepts valid points_possible" do
+        %w[
+          0
+          1
+          100
+        ].each do |points_possible|
+          expect(create_full_json(json: create_request({
+            points_possible: points_possible}))).not_to have_key("error")
+        end
+      end
+
+      it "rejects malformed points_possible" do
+        %w[
+          0.1
+          a
+          1a
+        ].each do |points_possible|
+          expect(create_full_json(json: create_request({
+            points_possible: points_possible}))).to have_key("error")
+        end
+      end
+
+      it "accepts valid ratings" do
+        expect(create_full_json(json: create_request({
+          ratings: [{description: "Perfect", points: 10}]}))).not_to have_key("error")
+        expect(create_full_json(json: create_request({
+          ratings: [{description: "Perfect", points: 10},
+                    {description: "Failure", points: 0}]}))).not_to have_key("error")
+      end
+
+      it "rejects malformed ratings" do
+        expect(create_full_json(json: create_request({
+          ratings: "1"}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          'ratings[][description]' => nil}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          'ratings[][description]' => "stuff"}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          'ratings[][description]' => "stuff",
+          'ratings[][points]' => nil}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          'ratings[][description]' => "stuff",
+          'ratings[][points]' => ""}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          'ratings[][description]' => "stuff",
+          'ratings[][points]' => "0.1"}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          ratings: [{description: ["stuff", "more stuff"], points: 10},
+                    {description: "Failure"}]}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          ratings: [{description: "Perfect", points: 10},
+                    {description: "Failure"}]}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          ratings: [{description: "Perfect", points: 10},
+                    {points: 0}]}))).to have_key("error")
+      end
+
+      it "accepts valid calculation methods" do
+        expect(create_full_json(json: create_request({
+          calculation_method: 'decaying_average',
+          calculation_int: 60}))).not_to have_key("error")
+        expect(create_full_json(json: create_request({
+          calculation_method: 'n_mastery',
+          calculation_int: 3}))).not_to have_key("error")
+        expect(create_full_json(json: create_request({
+          calculation_method: 'highest'}))).not_to have_key("error")
+        expect(create_full_json(json: create_request({
+          calculation_method: 'latest'}))).not_to have_key("error")
+      end
+
+      it "rejects malformed calculation methods" do
+        expect(create_full_json(json: create_request({
+          calculation_method: 'invalid calculation method',
+          calculation_int: 60}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          calculation_method: 'decaying_average'}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          calculation_method: 'decaying_average',
+          calculation_int: 200}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          calculation_method: 'n_mastery'}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          calculation_method: 'n_mastery',
+          calculation_int: 100}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          calculation_method: 'highest',
+          calculation_int: 1}))).to have_key("error")
+        expect(create_full_json(json: create_request({
+          calculation_method: 'latest',
+          calculation_int: 1}))).to have_key("error")
       end
 
       include_examples "academic benchmark config" do

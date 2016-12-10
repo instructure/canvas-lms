@@ -29,6 +29,39 @@ describe ContextExternalTool do
     expect(@account.parent_account).to eql(@root_account)
     expect(@account.root_account).to eql(@root_account)
   end
+
+  describe '#content_migration_configured?' do
+    let(:tool) do
+      ContextExternalTool.new.tap do |t|
+        t.settings = {
+          'content_migration' => {
+            'export_start_url' => 'https://lti.example.com/begin_export',
+            'import_start_url' => 'https://lti.example.com/begin_import',
+          }
+        }
+      end
+    end
+
+    it 'must return false when the content_migration key is missing from the settings hash' do
+      tool.settings.delete('content_migration')
+      expect(tool.content_migration_configured?).to eq false
+    end
+
+    it 'must return false when the content_migration key is present in the settings hash but the export_start_url sub key is missing' do
+      tool.settings['content_migration'].delete('export_start_url')
+      expect(tool.content_migration_configured?).to eq false
+    end
+
+    it 'must return false when the content_migration key is present in the settings hash but the import_start_url sub key is missing' do
+      tool.settings['content_migration'].delete('import_start_url')
+      expect(tool.content_migration_configured?).to eq false
+    end
+
+    it 'must return true when the content_migration key and all relevant sub-keys are present' do
+      expect(tool.content_migration_configured?).to eq true
+    end
+  end
+
   describe "url or domain validation" do
     it "should validate with a domain setting" do
       @tool = @course.context_external_tools.create(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -316,6 +349,18 @@ describe ContextExternalTool do
         preferred = c1.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
         expect(ContextExternalTool.find_external_tool(nil, c1, preferred.id)).to eq preferred
       end
+    end
+  end
+
+  describe "assignments" do
+    it "should have assignments" do
+      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      a = @course.assignments.create!(title: "test",
+                                        submission_types: 'external_tool',
+                                        external_tool_tag_attributes: {url: tool.url})
+      tool.tool_settings_assignments << a
+      tool.save
+      expect(tool.tool_settings_assignments).to include(a)
     end
   end
 

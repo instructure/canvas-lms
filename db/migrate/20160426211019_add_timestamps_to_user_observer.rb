@@ -1,4 +1,4 @@
-class AddTimestampsToUserObserver < ActiveRecord::Migration
+class AddTimestampsToUserObserver < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

@@ -1,8 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/collaborations/CollaborationsApp'
-], (react, CollaborationsApp) => {
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, CollaborationsApp) => {
 
   module('CollaborationsApp');
 
@@ -14,7 +14,11 @@ define([
         description: 'Im here to describe stuff',
         user_id: 1,
         user_name: 'Say my name',
-        updated_at: (new Date(0)).toString()
+        updated_at: (new Date(0)).toString(),
+        permissions: {
+          update: true,
+          "delete": true
+        }
       }]
     },
     ltiCollaborators: {

@@ -1,13 +1,17 @@
 define [
   'jquery'
   'underscore'
+  'ic-ajax'
   '../start_app'
   'ember'
   '../shared_ajax_fixtures'
   '../../controllers/screenreader_gradebook_controller'
   'compiled/userSettings'
   'vendor/jquery.ba-tinypubsub'
-], ($, _, startApp, Ember, fixtures, SRGBController, userSettings) ->
+], ($, _, ajax, startApp, Ember, fixtures, SRGBController, userSettings) ->
+
+  workAroundRaceCondition = ->
+    ajax.request()
 
   App = null
   originalIsDraft = null
@@ -50,9 +54,10 @@ define [
     equal @srgb.get('students.firstObject').name, fixtures.students[0].user.name
 
   test 'calculates assignments properly', ->
-    equal @srgb.get('assignments.length'), 7
-    ok !@srgb.get('assignments').findBy('name', 'Not Graded')
-    equal @srgb.get('assignments.firstObject').name, fixtures.assignment_groups[0].assignments[0].name
+    workAroundRaceCondition().then =>
+      equal @srgb.get('assignments.length'), 7
+      ok !@srgb.get('assignments').findBy('name', 'Not Graded')
+      equal @srgb.get('assignments.firstObject').name, fixtures.assignment_groups[0].assignments[0].name
 
   test 'calculates outcomes properly', ->
     equal @srgb.get('outcomes.length'), 2
@@ -63,12 +68,14 @@ define [
       strictEqual @srgb.get('students').findBy('id', obj.id), obj
 
   test 'assignmentGroupsHash retuns the expected hash', ->
-    _.each @srgb.assignmentGroupsHash(), (obj) =>
-      strictEqual @srgb.get('assignment_groups').findBy('id', obj.id), obj
+    workAroundRaceCondition().then =>
+      _.each @srgb.assignmentGroupsHash(), (obj) =>
+        strictEqual @srgb.get('assignment_groups').findBy('id', obj.id), obj
 
   test 'student objects have isLoaded flag set to true once submissions are loaded', ->
-    @srgb.get('students').forEach (s) ->
-      equal Ember.get(s, 'isLoaded'), true
+    workAroundRaceCondition().then =>
+      @srgb.get('students').forEach (s) ->
+        equal Ember.get(s, 'isLoaded'), true
 
   test 'displayName is hiddenName when hideStudentNames is true', ->
     @srgb.set('hideStudentNames', true)
@@ -108,35 +115,40 @@ define [
     equal @srgb.get('studentsInSelectedSection.firstObject').name, 'Buffy'
 
   test 'sorting assignments by position', ->
-    Ember.run =>
-      @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'assignment_group'))
-    equal @srgb.get('assignments.firstObject.name'), 'Z Eats Soup'
-    equal @srgb.get('assignments.lastObject.name'), 'Da Fish and Chips!'
+    workAroundRaceCondition().then =>
+      Ember.run =>
+        @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'assignment_group'))
+      equal @srgb.get('assignments.firstObject.name'), 'Z Eats Soup'
+      equal @srgb.get('assignments.lastObject.name'), 'Da Fish and Chips!'
 
   test 'updates assignment_visibility on an assignment', ->
-    assignments = @srgb.get('assignments')
-    assgn = assignments.objectAt(2)
-    @srgb.updateAssignmentVisibilities(assgn, '3')
-    ok !assgn.assignment_visibility.contains('3')
+    workAroundRaceCondition().then =>
+      assignments = @srgb.get('assignments')
+      assgn = assignments.objectAt(2)
+      @srgb.updateAssignmentVisibilities(assgn, '3')
+      ok !assgn.assignment_visibility.contains('3')
 
   test 'studentsThatCanSeeAssignment doesnt return all students', ->
-    assgn = @srgb.get('assignments.firstObject')
-    students = @srgb.studentsThatCanSeeAssignment(assgn)
-    ids = Object.keys(students)
-    equal ids.length, 1
-    equal ids[0], '1'
+    workAroundRaceCondition().then =>
+      assgn = @srgb.get('assignments.firstObject')
+      students = @srgb.studentsThatCanSeeAssignment(assgn)
+      ids = Object.keys(students)
+      equal ids.length, 1
+      equal ids[0], '1'
 
   test 'sorting assignments alphabetically', ->
-    Ember.run =>
-      @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'alpha'))
-    equal @srgb.get('assignments.firstObject.name'), 'Apples are good'
-    equal @srgb.get('assignments.lastObject.name'), 'Z Eats Soup'
+    workAroundRaceCondition().then =>
+      Ember.run =>
+        @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'alpha'))
+      equal @srgb.get('assignments.firstObject.name'), 'Apples are good'
+      equal @srgb.get('assignments.lastObject.name'), 'Z Eats Soup'
 
   test 'sorting assignments by due date', ->
-    Ember.run =>
-      @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'due_date'))
-    equal @srgb.get('assignments.firstObject.name'), 'Can You Eat Just One?'
-    equal @srgb.get('assignments.lastObject.name'), 'Drink Water'
+    workAroundRaceCondition().then =>
+      Ember.run =>
+        @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'due_date'))
+      equal @srgb.get('assignments.firstObject.name'), 'Can You Eat Just One?'
+      equal @srgb.get('assignments.lastObject.name'), 'Drink Water'
 
 
   module 'screenreader_gradebook_controller: with selected student',
@@ -154,52 +166,61 @@ define [
   module 'screenreader_gradebook_controller: with selected student, assignment, and outcome',
     setup: ->
       setup.call this
-      Ember.run =>
-        @student = @srgb.get('students.firstObject')
-        @assignment = @srgb.get('assignments.firstObject')
-        @outcome = @srgb.get('outcomes.firstObject')
-        @srgb.set('selectedStudent', @student)
-        @srgb.set('selectedAssignment', @assignment)
-        @srgb.set('selectedOutcome', @outcome)
+      @completeSetup = =>
+        Ember.run =>
+          workAroundRaceCondition().then =>
+            @student = @srgb.get('students.firstObject')
+            @assignment = @srgb.get('assignments.firstObject')
+            @outcome = @srgb.get('outcomes.firstObject')
+            @srgb.set('selectedStudent', @student)
+            @srgb.set('selectedAssignment', @assignment)
+            @srgb.set('selectedOutcome', @outcome)
 
     teardown: ->
       teardown.call this
 
   test 'assignmentDetails is computed properly', ->
-    ad = @srgb.get('assignmentDetails')
-    selectedAssignment = @srgb.get('selectedAssignment')
-    strictEqual ad.assignment, selectedAssignment
-    strictEqual ad.cnt, 1
+    @completeSetup().then =>
+      ad = @srgb.get('assignmentDetails')
+      selectedAssignment = @srgb.get('selectedAssignment')
+      strictEqual ad.assignment, selectedAssignment
+      strictEqual ad.cnt, 1
 
   test 'outcomeDetails is computed properly', ->
-    od = @srgb.get('outcomeDetails')
-    selectedOutcome = @srgb.get('selectedOutcome')
-    strictEqual od.cnt, 1
+    @completeSetup().then =>
+      od = @srgb.get('outcomeDetails')
+      selectedOutcome = @srgb.get('selectedOutcome')
+      strictEqual od.cnt, 1
 
   test 'selectedSubmission is computed properly', ->
-    selectedSubmission = @srgb.get('selectedSubmission')
-    sub = _.find(fixtures.submissions, (s) => s.user_id == @student.id)
-    submission = _.find(sub.submissions, (s) => s.assignment_id == @assignment.id)
-    _.each submission, (val, key) =>
-      equal selectedSubmission[key], val, "#{key} is the expected value on selectedSubmission"
+    @completeSetup().then =>
+      selectedSubmission = @srgb.get('selectedSubmission')
+      sub = _.find(fixtures.submissions, (s) => s.user_id == @student.id)
+      submission = _.find(sub.submissions, (s) => s.assignment_id == @assignment.id)
+      _.each submission, (val, key) =>
+        equal selectedSubmission[key], val, "#{key} is the expected value on selectedSubmission"
 
   test 'selectedSubmission sets gradeLocked', ->
-    selectedSubmission = @srgb.get('selectedSubmission')
-    equal selectedSubmission.gradeLocked, false
+    @completeSetup().then =>
+      selectedSubmission = @srgb.get('selectedSubmission')
+      equal selectedSubmission.gradeLocked, false
 
   test 'selectedSubmission sets gradeLocked for unassigned students', ->
-    @student = @srgb.get('students')[1]
-    Ember.run =>
-      @srgb.set('selectedStudent', @student)
-      selectedSubmission = @srgb.get('selectedSubmission')
-      equal selectedSubmission.gradeLocked, true
+    @completeSetup().then =>
+      @student = @srgb.get('students')[1]
+      Ember.run =>
+        @srgb.set('selectedStudent', @student)
+        selectedSubmission = @srgb.get('selectedSubmission')
+        equal selectedSubmission.gradeLocked, true
 
   module 'screenreader_gradebook_controller: with selected assignment',
     setup: ->
       setup.call this
-      @assignment = @srgb.get('assignments.firstObject')
-      Ember.run =>
-        @srgb.set('selectedAssignment', @assignment)
+      @completeSetup = =>
+        workAroundRaceCondition().then =>
+          @assignment = @srgb.get('assignments.firstObject')
+          Ember.run =>
+            @srgb.set('selectedAssignment', @assignment)
 
     teardown: ->
       @contextGetStub.restore()
@@ -207,40 +228,62 @@ define [
       Ember.run App, 'destroy'
 
   test 'gets the submission types', ->
-    equal @srgb.get('assignmentSubmissionTypes'), 'None'
-    Ember.run =>
-      assignments = @srgb.get('assignments')
-      @srgb.set('selectedAssignment', assignments.objectAt(1))
-    equal @srgb.get('assignmentSubmissionTypes'), 'Online URL, Online text entry'
+    @completeSetup().then =>
+      equal @srgb.get('assignmentSubmissionTypes'), 'None'
+      Ember.run =>
+        assignments = @srgb.get('assignments')
+        @srgb.set('selectedAssignment', assignments.objectAt(1))
+      equal @srgb.get('assignmentSubmissionTypes'), 'Online URL, Online text entry'
+
+  test 'assignmentInClosedGradingPeriod returns false when the selected assignment does not have
+    a due date in a closed grading period', ->
+    @completeSetup().then =>
+      Ember.run =>
+        assignment = @srgb.get('assignments.lastObject')
+        assignment.has_due_date_in_closed_grading_period = false
+        @srgb.set('selectedAssignment', assignment)
+      equal @srgb.get('assignmentInClosedGradingPeriod'), false
+
+  test 'assignmentInClosedGradingPeriod returns true when the selected assignment has
+    a due date in a closed grading period', ->
+    @completeSetup().then =>
+      Ember.run =>
+        assignment = @srgb.get('assignments.lastObject')
+        assignment.has_due_date_in_closed_grading_period = true
+        @srgb.set('selectedAssignment', assignment)
+      equal @srgb.get('assignmentInClosedGradingPeriod'), true
 
   module 'screenreader_gradebook_controller:draftState',
     setup: ->
       setup.call this, true
-      Ember.run =>
-        @srgb.get('assignment_groups').pushObject
-          id: '100'
-          name: 'Silent Assignments'
-          position: 2
-          assignments: [
-            {
-              id: '21'
-              name: 'Unpublished Assignment'
-              points_possible: 10
-              grading_type: "percent"
-              submission_types: ["none"]
-              due_at: null
-              position: 6
-              assignment_group_id:'4'
-              published: false
-            }
-          ]
+      @completeSetup = =>
+        workAroundRaceCondition().then =>
+          Ember.run =>
+            @srgb.get('assignment_groups').pushObject
+              id: '100'
+              name: 'Silent Assignments'
+              position: 2
+              assignments: [
+                {
+                  id: '21'
+                  name: 'Unpublished Assignment'
+                  points_possible: 10
+                  grading_type: "percent"
+                  submission_types: ["none"]
+                  due_at: null
+                  position: 6
+                  assignment_group_id:'4'
+                  published: false
+                }
+              ]
 
     teardown: ->
       teardown.call this
 
   test 'calculates assignments properly', ->
-    equal @srgb.get('assignments.length'), 7
-    ok !@srgb.get('assignments').findBy('name', 'Unpublished Assignment')
+    @completeSetup().then =>
+      equal @srgb.get('assignments.length'), 7
+      ok !@srgb.get('assignments').findBy('name', 'Unpublished Assignment')
 
 
   calc_stub = {
@@ -318,14 +361,16 @@ define [
       calculationSetup.call this
 
   test 'calculates final grade', ->
-    equal @srgb.get('students.firstObject.total_percent'), 79.55
+    workAroundRaceCondition().then =>
+      equal @srgb.get('students.firstObject.total_percent'), 79.55
 
   module 'grade calc with 0s',
     setup: ->
       calculationSetup.call this, calc_stub_with_0_possible
 
   test 'calculates final grade', ->
-    equal @srgb.get('students.firstObject.total_percent'), 0
+    workAroundRaceCondition().then =>
+      equal @srgb.get('students.firstObject.total_percent'), 0
 
 
   module 'screenreader_gradebook_controller: notes computed props',
@@ -448,13 +493,14 @@ define [
       equal @srgb.get('selectedSubmissionHidden'), false
 
   test 'selectedSubmissionHidden is true when students dont have visibility', ->
-    student = @srgb.get('students').objectAt(2)
-    assignment = @srgb.get('assignments.firstObject')
+    workAroundRaceCondition().then =>
+      student = @srgb.get('students').objectAt(2)
+      assignment = @srgb.get('assignments.firstObject')
 
-    Ember.run =>
-      @srgb.set('selectedAssignment', assignment)
-      @srgb.set('selectedStudent', student)
-      equal @srgb.get('selectedSubmissionHidden'), true
+      Ember.run =>
+        @srgb.set('selectedAssignment', assignment)
+        @srgb.set('selectedStudent', student)
+        equal @srgb.get('selectedSubmissionHidden'), true
 
   module 'screenreader_gradebook_controller: selectedOutcomeResult',
     setup: -> setup.call @

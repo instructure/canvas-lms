@@ -1,4 +1,4 @@
-class FixEnrollmentRootAccountId < ActiveRecord::Migration
+class FixEnrollmentRootAccountId < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

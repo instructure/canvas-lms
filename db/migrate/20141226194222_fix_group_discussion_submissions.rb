@@ -1,4 +1,4 @@
-class FixGroupDiscussionSubmissions < ActiveRecord::Migration
+class FixGroupDiscussionSubmissions < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

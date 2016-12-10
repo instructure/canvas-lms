@@ -1,4 +1,4 @@
-class LengthenContextExternalToolsUrl < ActiveRecord::Migration
+class LengthenContextExternalToolsUrl < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

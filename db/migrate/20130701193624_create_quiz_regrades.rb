@@ -1,4 +1,4 @@
-class CreateQuizRegrades < ActiveRecord::Migration
+class CreateQuizRegrades < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

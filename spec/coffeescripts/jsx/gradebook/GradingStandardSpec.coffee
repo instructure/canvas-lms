@@ -1,11 +1,10 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/grading/gradingStandard'
-], (React, ReactDOM, $, GradingStandard) ->
-
-  Simulate = React.addons.TestUtils.Simulate
+], (React, ReactDOM, {Simulate}, $, GradingStandard) ->
 
   module 'GradingStandard not being edited',
     setup: ->

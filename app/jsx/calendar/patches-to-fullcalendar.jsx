@@ -1,5 +1,5 @@
 define([
-	'bower/fullcalendar/dist/fullcalendar',
+	'fullcalendar',
 	'str/htmlEscape'
 ], function(fullCalendar, htmlEscape) {
 

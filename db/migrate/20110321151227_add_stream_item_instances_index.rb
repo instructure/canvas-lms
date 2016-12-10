@@ -1,4 +1,4 @@
-class AddStreamItemInstancesIndex < ActiveRecord::Migration
+class AddStreamItemInstancesIndex < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

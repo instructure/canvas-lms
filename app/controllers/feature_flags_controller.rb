@@ -263,7 +263,7 @@ class FeatureFlagsController < ApplicationController
         end
         render json: feature_flag_json(new_flag, @context, @current_user, session)
       else
-        render json: new_flag.errors.to_json, status: :bad_request
+        render json: new_flag.errors, status: :bad_request
       end
     end
   end

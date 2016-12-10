@@ -4,6 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../cc_spec_helper')
 require 'tmpdir'
 
 describe "Standard Common Cartridge importing" do
+
   context 'in a cartridge' do
     before(:once) do
       archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/asmnt_example.zip")
@@ -33,18 +34,23 @@ describe "Standard Common Cartridge importing" do
     it "should import multiple question banks"
   end
 
+  def import_from_file(filename)
+    archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/#{filename}")
+    unzipped_file_path = create_temp_dir!
+    @course = course
+    @migration = ContentMigration.create(:context => @course)
+    converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi',
+      :base_download_dir=>unzipped_file_path, :content_migration => @migration)
+    converter.convert
+    @course_data = converter.course.with_indifferent_access
+
+    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+  end
+
   context 'in a flat file' do
     before(:once) do
-      archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/flat_imsmanifest.xml")
-      unzipped_file_path = create_temp_dir!
-      converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
-      converter.convert
-      @course_data = converter.course.with_indifferent_access
-
-      @course = course
-      @migration = ContentMigration.create(:context => @course)
-      @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+      import_from_file("flat_imsmanifest.xml")
     end
 
     it "should import assignments" do
@@ -86,21 +92,11 @@ describe "Standard Common Cartridge importing" do
       att = @course.attachments.where(migration_id: 'Resource5').first
       expect(att.locked?).to eq true
     end
-
   end
 
   context 'variant support' do
     before(:once) do
-      archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/flat_imsmanifest_with_variants.xml")
-      unzipped_file_path = create_temp_dir!
-      converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
-      converter.convert
-      @course_data = converter.course.with_indifferent_access
-
-      @course = course
-      @migration = ContentMigration.create(:context => @course)
-      @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+      import_from_file("flat_imsmanifest_with_variants.xml")
     end
 
     it "should import supported variant" do
@@ -127,7 +123,14 @@ describe "Standard Common Cartridge importing" do
       expect(m.content_tags[4].url).to match /loop(1|2)/
       # also, the import finished executing. :)
     end
+  end
 
+  context "flat manifest with curriculum standards" do
+    it "should produce a warning" do
+      import_from_file("flat_imsmanifest_with_curriculum.xml")
+      issues = @migration.migration_issues.pluck(:description)
+      expect(issues.any?{|i| i.include?("This package includes Curriculum Standards")}).to be_truthy
+    end
   end
 
   context 'flat manifest with qti' do
@@ -149,7 +152,8 @@ describe "Standard Common Cartridge importing" do
     end
 
     it "should import assessments from qti inside the manifest" do
-      expect(@migration.migration_issues.count).to eq 0
+      expect(@migration.migration_issues.count).to eq 1
+      expect(@migration.migration_issues.first.description).to include("This package includes the question type, Pattern Match")
 
       expect(@course.quizzes.count).to eq 1
       q = @course.quizzes.first

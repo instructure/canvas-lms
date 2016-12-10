@@ -1,4 +1,4 @@
-class AddTurnitinIdToCourses < ActiveRecord::Migration
+class AddTurnitinIdToCourses < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

@@ -1,0 +1,32 @@
+{
+    "migration_id":"res00046",
+    "url":"",
+    "description":"This is a learning unit. I don't know what that is",
+    "show_item":true,
+    "alternate_migration_id":"_116785_1",
+    "end_date":1274124600000,
+    "start_date":1268854200000,
+    "bb8_type":"x-bb-lesson",
+    "created_date":1268854390000,
+    "title":"A learning Unit",
+    "updated_date":1269536208000,
+    "is_folder":true,
+    "items":[
+      {
+        "type": "folder",
+        "bb8_type": "x-bb-folder",
+        "is_folder": true,
+        "title": "Subfolder",
+        "sub_items": [
+            {
+              "migration_id": "res00796",
+              "bb8_type": "x-bb-externallink",
+              "type": "linked_resource",
+              "title": "Don't delete me, bro",
+              "url": "https:\/\/example.com",
+              "linked_resource_type": "URL_TYPE"
+            }
+        ]
+      }
+    ]
+}

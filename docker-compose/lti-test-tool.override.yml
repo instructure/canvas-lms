@@ -1,0 +1,16 @@
+# to use this add docker-compose/lti-test-tool.override.yml
+# to your COMPOSE_FILE var in .env
+
+version: '2'
+services:
+  web:
+    links:
+      - lti-test-tool
+
+  lti-test-tool:
+    image: instructure/lti_tool_provider_example
+    command: bundle exec rails s -p 8080
+    ports:
+      - "8080:8080"
+    environment:
+      VIRTUAL_HOST: lti.docker

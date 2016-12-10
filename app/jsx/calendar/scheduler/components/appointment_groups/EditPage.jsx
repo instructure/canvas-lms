@@ -2,6 +2,7 @@ define([
   'jquery',
   'react',
   'i18n!appointment_groups',
+  'instructure-ui/Breadcrumb',
   'instructure-ui/Button',
   'instructure-ui/Grid',
   'instructure-ui/ScreenReaderContent',
@@ -12,10 +13,10 @@ define([
   './ContextSelector',
   './TimeBlockSelector',
   'compiled/jquery.rails_flash_notifications',
-  'jquery.instructure_forms'
-], ($, React, I18n, {default: Button}, {default: Grid, GridCol, GridRow}, {default: ScreenReaderContent}, axios, AppointmentGroupList, EventDataSource, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
-
-  const parseFormValues = (data) => ({
+  'jquery.instructure_forms',
+  'jquery.instructure_date_and_time'
+], ($, React, I18n, { default: Breadcrumb, BreadcrumbLink }, { default: Button }, { default: Grid, GridCol, GridRow }, { default: ScreenReaderContent }, axios, AppointmentGroupList, EventDataSource, MessageParticipantsDialog, ContextSelector, TimeBlockSelector) => {
+  const parseFormValues = data => ({
     description: data.description,
     location: data.location_name,
     title: data.title,
@@ -34,7 +35,7 @@ define([
         startTime: appointment.start_at,
         endTime: appointment.end_at
       },
-      slotEventId: appointment.id
+      slotEventId: appointment.id.toString(),
     }));
   }
 
@@ -53,7 +54,9 @@ define([
       super(props)
       this.state = {
         appointmentGroup: {
-          title: ''
+          title: '',
+          context_codes: [],
+          sub_context_codes: [],
         },
         formValues: {},
         contexts: [],
@@ -189,6 +192,14 @@ define([
     render() {
       return (
         <div className="EditPage">
+          <Breadcrumb label={I18n.t('You are here:')}>
+            <BreadcrumbLink href="/calendar">{I18n.t('Calendar')}</BreadcrumbLink>
+            <BreadcrumbLink>
+              {I18n.t('Edit %{pageTitle}', {
+                pageTitle: this.state.appointmentGroup.title
+              })}
+            </BreadcrumbLink>
+          </Breadcrumb>
           <ScreenReaderContent>
             <h1>
               {I18n.t('Edit %{pageTitle}', {
@@ -250,7 +261,7 @@ define([
               />
             </div>
             <div className="ic-Form-control">
-              <label className="ic-Label" htmlFor="description">{I18n.t('Description')}</label>
+              <label className="ic-Label" htmlFor="description">{I18n.t('Details')}</label>
               <textarea
                 className="ic-Input"
                 type="text"
@@ -332,7 +343,7 @@ define([
             </div>
             <div className="ic-Form-control">
               <span className="ic-Label" htmlFor="appointments">{I18n.t('Appointments')}</span>
-              <Button onClick={this.messageStudents} disabled={this.state.appointmentGroup.appointments_count === 0}>{I18n.t('Message Students')}</Button>
+              <Button ref={(c) => { this.messageStudentsButton = c }} onClick={this.messageStudents} disabled={this.state.appointmentGroup.appointments_count === 0}>{I18n.t('Message Students')}</Button>
               <AppointmentGroupList appointmentGroup={this.state.appointmentGroup} />
             </div>
           </form>

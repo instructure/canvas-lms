@@ -18,7 +18,7 @@ define [
   'compiled/gradebook2/GradebookTranslations'
   'compiled/grade_calculator'
   'compiled/userSettings'
-  'vendor/spin'
+  'spin.js'
   'compiled/SubmissionDetailsDialog'
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
   'compiled/gradebook2/GradeDisplayWarningDialog'
@@ -36,7 +36,8 @@ define [
   'compiled/views/gradebook/SectionMenuView'
   'compiled/views/gradebook/GradingPeriodMenuView'
   'compiled/gradebook2/GradebookKeyboardNav'
-  'jsx/gradebook/grid/helpers/columnArranger'
+  'jsx/gradebook/shared/helpers/assignmentHelper'
+  'compiled/api/gradingPeriodsApi'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
@@ -52,14 +53,14 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor,
-KeyboardNavDialog, KeyboardNavTemplate, Slick, TotalColumnHeaderView, round,
-InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, GradeCalculator, UserSettings,
-Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
-GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
-GradebookHeaderMenu, NumberCompare, htmlEscape, PostGradesStore, PostGradesApp,
-SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate,
-SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
+], (
+  $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
+  TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, GradeCalculator, UserSettings,
+  Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
+  SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape, PostGradesStore, PostGradesApp,
+  SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView,
+  GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper, GradingPeriodsAPI
+) ->
 
   class Gradebook
     columnWidths =
@@ -97,8 +98,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
       @totalColumnInFront = UserSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
       @gradingPeriodsEnabled = @options.multiple_grading_periods_enabled
-      @gradingPeriods = _.map @options.active_grading_periods, (gradingPeriod) =>
-        _.extend({}, gradingPeriod, closed: @gradingPeriodIsClosed(gradingPeriod))
+      @gradingPeriods = GradingPeriodsAPI.deserializePeriods(@options.active_grading_periods)
       @gradingPeriodToShow = @getGradingPeriodToShow()
       @submissionStateMap = new SubmissionStateMap
         gradingPeriodsEnabled: @gradingPeriodsEnabled
@@ -440,7 +440,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
     compareAssignmentDueDates: (a, b) ->
       firstAssignment = a.object
       secondAssignment = b.object
-      ColumnArranger.compareByDueDate(firstAssignment, secondAssignment)
+      assignmentHelper.compareByDueDate(firstAssignment, secondAssignment)
 
     makeCompareAssignmentCustomOrderFn: (sortOrder) =>
       sortMap = {}
@@ -802,7 +802,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
       else if assignment.points_possible?
         htmlLines.push htmlEscape(I18n.t('points_out_of', "out of %{points_possible}", points_possible: assignment.points_possible))
 
-      $hoveredCell.data('tooltip', $("<span />",
+      $hoveredCell.data 'tooltip', $("<span />",
         class: 'gradebook-tooltip'
         css:
           left: offset.left - 15
@@ -811,7 +811,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
           display: 'block'
         html: $.raw(htmlLines.join('<br />'))
       ).appendTo('body')
-      .css('top', (i, top) -> parseInt(top) - $(this).outerHeight()))
+      .css('top', (i, top) -> parseInt(top) - $(this).outerHeight())
 
     unhoverMinimizedCell: (event) ->
       if $tooltip = $(this).data('tooltip')
@@ -845,6 +845,23 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
 
       @grid.getEditorLock().commitCurrentEdit()
 
+    cellCommentClickHandler: (event) ->
+      event.preventDefault()
+      return false if $(@grid.getActiveCellNode()).hasClass("cannot_edit")
+      currentTargetElement = $(event.currentTarget)
+      # Access these data attributes individually instead of using currentTargetElement.data()
+      # so they stay strings.  Strange things have happened here with long numbers:
+      # parseInt("61890000000013319") = 61890000000013320
+      data =
+        assignmentId: currentTargetElement.attr('data-assignment-id'),
+        userId: currentTargetElement.attr('data-user-id')
+      $(@grid.getActiveCellNode()).removeClass('editable')
+      assignment = @assignments[data.assignmentId]
+      student = @student(data.userId)
+      opts = @options
+
+      SubmissionDetailsDialog.open assignment, student, opts
+
     onGridInit: () ->
       tooltipTexts = {}
       # TODO: this "if @spinner" crap is necessary because the outcome
@@ -875,11 +892,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
             $(this).removeClass('hover focus')
             $(this).find('div.gradebook-tooltip').removeClass('first-row')
         .delegate '.gradebook-cell-comment', 'click.gradebook', (event) =>
-          event.preventDefault()
-          return false if $(@grid.getActiveCellNode()).hasClass("cannot_edit")
-          data = $(event.currentTarget).data()
-          $(@grid.getActiveCellNode()).removeClass('editable')
-          SubmissionDetailsDialog.open @assignments[data.assignmentId], @student(data.userId.toString()), @options
+          @cellCommentClickHandler(event)
         .delegate '.minimized',
           'mouseenter' : @hoverMinimizedCell,
           'mouseleave' : @unhoverMinimizedCell

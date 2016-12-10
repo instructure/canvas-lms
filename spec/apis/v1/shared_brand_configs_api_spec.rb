@@ -67,6 +67,13 @@ describe SharedBrandConfigsController, type: :request do
       }.to_not change(Account.default.shared_brand_configs, :count)
       expect(Account.default.shared_brand_configs.find(shared_config.id).name).to eq('Updated Name')
     end
+
+    it "returns invalid for a bad md5" do
+      account_admin_user
+      json = api_call(:put, url, api_args_for_update, {
+        shared_brand_config: { brand_config_md5: 'abc' }
+      }, {}, expected_status: 422)
+    end
   end
 
   describe  "#destroy" do

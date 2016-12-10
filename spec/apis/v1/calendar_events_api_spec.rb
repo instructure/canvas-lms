@@ -215,6 +215,36 @@ describe CalendarEventsApiController, type: :request do
       expect(json.first['title']).to eq "from unrelated one"
     end
 
+    it "should allow account admins to view section-specific events" do
+      event = @course.calendar_events.build(:title => 'event', :child_event_data =>
+        {"0" => {:start_at => "2012-01-09 12:00:00", :end_at => "2012-01-09 13:00:00", :context_code => @course.default_section.asset_string}})
+      event.updating_user = @teacher
+      event.save!
+      account_admin_user(:active_all => true)
+
+      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+        :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-19'})
+
+      expect(json.detect{|e| e['id'] == event.child_events.first.id}).to be_present
+    end
+
+    it "doesn't allow account admins to view events for courses they don't have access to" do
+      sub_account1 = Account.default.sub_accounts.create!
+      course_with_teacher(:active_all => true, :account => sub_account1)
+      event = @course.calendar_events.build(:title => 'event', :child_event_data =>
+        {"0" => {:start_at => "2012-01-09 12:00:00", :end_at => "2012-01-09 13:00:00", :context_code => @course.default_section.asset_string}})
+      event.updating_user = @teacher
+      event.save!
+
+      sub_account2 = Account.default.sub_accounts.create!
+      account_admin_user(:active_all => true, :account => sub_account2)
+
+      api_call(:get, "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}", {
+        :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+        :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-19'}, {}, {}, {:expected_status => 401})
+    end
+
     def public_course_query(options = {})
       yield @course if block_given?
       @course.save!

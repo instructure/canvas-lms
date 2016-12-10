@@ -1,4 +1,4 @@
-class CreateInitialQuizSubmissionEventPartitions < ActiveRecord::Migration
+class CreateInitialQuizSubmissionEventPartitions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up

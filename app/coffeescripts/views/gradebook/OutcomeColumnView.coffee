@@ -3,7 +3,7 @@ define [
   'Backbone'
   'compiled/util/Popover'
   'compiled/models/grade_summary/Outcome'
-  'vendor/d3.v3'
+  'd3'
   'jst/outcomes/outcomePopover'
 ], (_, {View}, Popover, Outcome, d3, popover_template) ->
 

@@ -134,16 +134,19 @@ $contentBoxPadding:         8px;
 // Once all of those have been adjusted to use the new variable we can get rid of this
 $ic-line-height: 1.5;
 
-$ic-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$ic-font-weight: 500; // instead of "bold"
+$ic-font-family: "LatoWeb", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+$ic-font-family-fallback: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+$ic-font-weight: bold; // we can phase this var out now we're on Lato
 
 $ic-font-size: 14px;
 
-$ic-font-size--xlarge:   28px;
-$ic-font-size--large:    23px;
-$ic-font-size--medium:   16px;
-$ic-font-size--small:    14px;
-$ic-font-size--xsmall:   12px;
+$ic-font-size--xlarge:   $ic-font-size + 14;
+$ic-font-size--large:    $ic-font-size + 9;
+$ic-font-size--medium:   $ic-font-size + 2;
+$ic-font-size--small:    $ic-font-size;
+$ic-font-size--xsmall:   $ic-font-size - 2;
 
 /* Legacy variables. Discontinue to use these: */
 $h1-font-size:  23px;

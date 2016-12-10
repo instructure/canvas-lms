@@ -9,11 +9,12 @@
       padding: 0;
     }
 
-    .ic-app-main-layout-vertical {
+    .ic-Layout-wrapper {
       min-width: 0 !important;
     }
 
-    #wrapper, #main {
+    .ic-Layout-wrapper,
+    .ic-Layout-columns {
       position: absolute;
       top: 0;
       left: 0;

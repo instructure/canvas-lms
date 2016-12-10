@@ -1,4 +1,4 @@
-class AddCassandraGradeChangeAuditorTables < ActiveRecord::Migration
+class AddCassandraGradeChangeAuditorTables < ActiveRecord::Migration[4.2]
  tag :predeploy
 
   include Canvas::Cassandra::Migration

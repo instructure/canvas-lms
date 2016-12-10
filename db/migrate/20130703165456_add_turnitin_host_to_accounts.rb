@@ -1,4 +1,4 @@
-class AddTurnitinHostToAccounts < ActiveRecord::Migration
+class AddTurnitinHostToAccounts < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

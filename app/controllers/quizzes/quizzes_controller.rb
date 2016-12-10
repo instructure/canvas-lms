@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -21,6 +21,7 @@ class Quizzes::QuizzesController < ApplicationController
   include Api::V1::AssignmentOverride
   include KalturaHelper
   include ::Filters::Quizzes
+  include SubmittablesGradingPeriodProtection
 
   # If Quiz#one_time_results is on, this flag must be set whenever we've
   # rendered the submission results to the student so that the results can be
@@ -303,8 +304,14 @@ class Quizzes::QuizzesController < ApplicationController
         :REGRADE_OPTIONS => regrade_options,
         :quiz_max_combination_count => QUIZ_MAX_COMBINATION_COUNT,
         :SHOW_QUIZ_ALT_TEXT_WARNING => true,
-        :VALID_DATE_RANGE => CourseDateRange.new(@context)
+        :VALID_DATE_RANGE => CourseDateRange.new(@context),
+        :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods)
       }
+
+      if @context.feature_enabled?(:multiple_grading_periods)
+        hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
+      end
+
       append_sis_data(hash)
       js_env(hash)
 
@@ -316,6 +323,15 @@ class Quizzes::QuizzesController < ApplicationController
 
   def create
     if authorized_action(@context.quizzes.temp_record, @current_user, :create)
+      @quiz = @context.quizzes.build
+
+      return render_forbidden unless grading_periods_allow_submittable_create?(@quiz, params[:quiz])
+      overrides = delete_override_params
+
+      if overrides
+        return render_forbidden unless grading_periods_allow_assignment_overrides_batch_create?(@quiz, overrides)
+      end
+
       params[:quiz][:title] = nil if params[:quiz][:title] == "undefined"
       params[:quiz][:title] ||= t(:default_title, "New Quiz")
       params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'
@@ -336,10 +352,8 @@ class Quizzes::QuizzesController < ApplicationController
         params[:quiz][:assignment_id] = nil unless @assignment
         params[:quiz][:title] = @assignment.title if @assignment
       end
-      @quiz = @context.quizzes.build
       @quiz.content_being_saved_by(@current_user)
       @quiz.infer_times
-      overrides = delete_override_params
       @quiz.transaction do
         @quiz.update_attributes!(params[:quiz])
         batch_update_assignment_overrides(@quiz, overrides, @current_user) unless overrides.nil?
@@ -363,7 +377,21 @@ class Quizzes::QuizzesController < ApplicationController
     n = Time.now.to_f
     if authorized_action(@quiz, @current_user, :update)
       params[:quiz] ||= {}
-      params[:quiz][:title] = t(:default_title, "New Quiz") if params[:quiz][:title] == "undefined"
+
+      return render_forbidden unless grading_periods_allow_submittable_update?(
+        @quiz, params[:quiz], flash_message: true
+      )
+      overrides = delete_override_params
+
+      if overrides
+        prepared_batch = prepare_assignment_overrides_for_batch_update(@quiz, overrides, @current_user)
+        batch_update_allowed = grading_periods_allow_assignment_overrides_batch_update?(
+          @quiz, prepared_batch, flash_message: true
+        )
+        return render_forbidden unless batch_update_allowed
+      end
+
+      params[:quiz][:title] = t("New Quiz") if params[:quiz][:title] == "undefined"
       params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'
       params[:quiz][:access_code] = nil if params[:quiz][:access_code] == ""
       if params[:quiz][:quiz_type] == 'assignment' || params[:quiz][:quiz_type] == 'graded_survey' #'new' && params[:quiz][:assignment_group_id]
@@ -385,7 +413,6 @@ class Quizzes::QuizzesController < ApplicationController
       # TODO: API for Quiz overrides!
       respond_to do |format|
         @quiz.transaction do
-          overrides = delete_override_params
           notify_of_update = value_to_boolean(params[:quiz][:notify_of_update])
           params[:quiz][:notify_of_update] = false
 
@@ -400,6 +427,7 @@ class Quizzes::QuizzesController < ApplicationController
           end
 
           auto_publish = @quiz.published?
+
           @quiz.with_versioning(auto_publish) do
             # using attributes= here so we don't need to make an extra
             # database call to get the times right after save!
@@ -418,7 +446,7 @@ class Quizzes::QuizzesController < ApplicationController
             @quiz.assignment.save
           end
 
-          batch_update_assignment_overrides(@quiz, overrides, @current_user) unless overrides.nil?
+          perform_batch_update_assignment_overrides(@quiz, prepared_batch) unless overrides.nil?
 
           # quiz.rb restricts all assignment broadcasts if notify_of_update is
           # false, so we do the same here
@@ -428,21 +456,23 @@ class Quizzes::QuizzesController < ApplicationController
           @quiz.reload
 
           if params[:quiz][:time_limit].present?
-            @quiz.send_later_if_production_enqueue_args(:update_quiz_submission_end_at_times, { :priority => Delayed::HIGH_PRIORITY } )
+            @quiz.send_later_if_production_enqueue_args(:update_quiz_submission_end_at_times, {
+              priority: Delayed::HIGH_PRIORITY
+            })
           end
 
           @quiz.publish! if params[:publish]
         end
-        flash[:notice] = t('notices.quiz_updated', "Quiz successfully updated")
+        flash[:notice] = t("Quiz successfully updated")
         format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
-        format.json { render :json => @quiz.as_json(:include => {:assignment => {:include => :assignment_group}}) }
+        format.json { render json: @quiz.as_json(include: {assignment: {include: :assignment_group}}) }
       end
     end
   rescue
     respond_to do |format|
-      flash[:error] = t('errors.quiz_update_failed', "Quiz failed to update")
+      flash[:error] = t("Quiz failed to update")
       format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
-      format.json { render :json => @quiz.errors, :status => :bad_request }
+      format.json { render json: @quiz.errors, status: :bad_request }
     end
   end
 
@@ -756,7 +786,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def delete_override_params
     # nil represents the fact that we don't want to update the overrides
-    return nil unless params[:quiz].has_key?(:assignment_overrides)
+    return nil unless params[:quiz].key?(:assignment_overrides)
     overrides = params[:quiz].delete(:assignment_overrides)
     overrides = deserialize_overrides(overrides)
 
@@ -769,7 +799,7 @@ class Quizzes::QuizzesController < ApplicationController
       session[:return_to] = course_quiz_path(@context, @quiz)
       redirect_to login_path
     end
-    return @current_user.present?
+    @current_user.present?
   end
 
   def setup_headless
@@ -799,7 +829,7 @@ class Quizzes::QuizzesController < ApplicationController
     @headers = false
     @show_left_side = false
     @padless = true
-    return true
+    true
   end
 
   # use this for all redirects while taking a quiz -- it'll add params to tell
@@ -916,6 +946,17 @@ class Quizzes::QuizzesController < ApplicationController
       Quizzes::QuizSubmission.where({ id: submission }).update_all({
         has_seen_results: true
       })
+    end
+  end
+
+  def render_forbidden
+    if @quiz.new_record?
+      render json: @quiz.errors, status: :forbidden
+    else
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
+        format.json { render json: @quiz.errors, status: :forbidden }
+      end
     end
   end
 end

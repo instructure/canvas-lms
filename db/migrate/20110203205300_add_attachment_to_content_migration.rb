@@ -1,4 +1,4 @@
-class AddAttachmentToContentMigration < ActiveRecord::Migration
+class AddAttachmentToContentMigration < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

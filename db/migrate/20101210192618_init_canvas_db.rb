@@ -17,7 +17,7 @@
 #
 
 # rubocop:disable Migration/PrimaryKey
-class InitCanvasDb < ActiveRecord::Migration
+class InitCanvasDb < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

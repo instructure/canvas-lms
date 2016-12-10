@@ -22,12 +22,7 @@
       <label for="enrollment_term"><%= before_label('show_users_for_term', 'Show users with enrollments in the term') %></label><br />
       <%= form_tag(account_users_path, :method => :get) do %>
         <input name="focus" type="hidden" value="enrollment_term_id"/>
-        <select id="enrollment_term_id" name="enrollment_term_id">
-          <option value=''>--</option>
-          <%= options_from_collection_for_select(@enrollment_terms,
-                                                 :id, :name,
-                                                 params[:enrollment_term_id].to_i) %>
-        </select>
+        <%= render :partial => 'shared/enrollment_term_select', :locals => { :terms => @enrollment_terms, :selected_id => params[:enrollment_term_id] && params[:enrollment_term_id].to_i } %>
       <% end %>
     </div>
   <% end %>

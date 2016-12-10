@@ -17,7 +17,7 @@ define [
 ], ($, _, fcUtil, I18n, htmlEscape, commonEventFactory, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate, sectionCheckboxesTemplate, ContextSelector, preventDefault) ->
 
   class EditAppointmentGroupDetails
-    constructor: (selector, @apptGroup, @contexts, @closeCB, @useBetterScheduler) ->
+    constructor: (selector, @apptGroup, @contexts, @closeCB, @event, @useBetterScheduler) ->
       @currentContextInfo = null
       @appointment_group = _.extend(
         {use_group_signup: @apptGroup.participant_type is 'Group'}
@@ -71,7 +71,7 @@ define [
 
       # make sure this is the spot
       timeBlocks = ([fcUtil.wrap(appt.start_at), fcUtil.wrap(appt.end_at), true] for appt in @apptGroup.appointments || [] )
-      @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body"), @form.find(".splitter"), timeBlocks)
+      @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body"), @form.find(".splitter"), timeBlocks, { date: @event && @event.date })
 
       @form.find('[name="slot_duration"]').change (e) =>
         if @form.find('[name="autosplit_option"]').is(":checked")

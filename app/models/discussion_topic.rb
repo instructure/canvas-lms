@@ -438,7 +438,7 @@ class DiscussionTopic < ActiveRecord::Base
   def child_topic_for(user)
     group_ids = user.group_memberships.active.pluck(:group_id) &
       context.groups.active.pluck(:id)
-    child_topics.where(context_id: group_ids, context_type: 'Group').first
+    child_topics.active.where(context_id: group_ids, context_type: 'Group').first
   end
 
   def change_child_topic_subscribed_state(new_state, current_user)
@@ -914,8 +914,24 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  def active_participants_include_tas_and_teachers(include_observers=false)
+    participants = active_participants(include_observers)
+    if self.context.is_a?(Group) && !self.context.course.nil?
+      participants += self.context.course.teachers
+      participants += self.context.course.tas
+      participants = participants.compact.uniq
+    end
+    participants
+  end
+
   def users_with_permissions(users)
-    users.select{|u| self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)}
+    permission = self.is_announcement ? :read_announcements : :read_forum
+    if self.course.is_a?(Course)
+      self.course.filter_users_by_permission(users, permission)
+    else
+      # sucks to be an account-level group
+      users.select{|u| self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)}
+    end
   end
 
   def course

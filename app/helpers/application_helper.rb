@@ -583,8 +583,12 @@ module ApplicationHelper
   def map_courses_for_menu(courses, opts={})
     mapped = courses.map do |course|
       tabs = opts[:include_section_tabs] && available_section_tabs(course)
-      presenter = CourseForMenuPresenter.new(course, tabs, @current_user)
+      presenter = CourseForMenuPresenter.new(course, tabs, @current_user, @domain_root_account)
       presenter.to_h
+    end
+
+    if @domain_root_account.feature_enabled?(:dashcard_reordering)
+      mapped = mapped.sort_by {|h| h[:position] || ::CanvasSort::Last}
     end
 
     mapped

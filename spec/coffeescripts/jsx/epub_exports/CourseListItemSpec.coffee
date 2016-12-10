@@ -1,10 +1,10 @@
 define [
-  'underscore'
-  'react'
-  'react-dom'
+  'underscore',
+  'react',
+  'react-dom',
+  'react-addons-test-utils',
   'jsx/epub_exports/CourseListItem'
-], (_, React, ReactDOM, CourseListItem, I18n) ->
-  TestUtils = React.addons.TestUtils
+], (_, React, ReactDOM, TestUtils, CourseListItem, I18n) ->
 
   module 'CourseListItemSpec',
     setup: ->

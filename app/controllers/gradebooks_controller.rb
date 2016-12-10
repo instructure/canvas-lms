@@ -36,7 +36,8 @@ class GradebooksController < ApplicationController
   MAX_POST_GRADES_TOOLS = 10
 
   def grade_summary
-    @presenter = GradeSummaryPresenter.new(@context, @current_user, params[:id], presenter_options)
+    set_current_grading_period if multiple_grading_periods?
+    @presenter = grade_summary_presenter
     # do this as the very first thing, if the current user is a
     # teacher in the course and they are not trying to view another
     # user's grades, redirect them to the gradebook
@@ -57,10 +58,8 @@ class GradebooksController < ApplicationController
 
     add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url,
                                                          @presenter.student_id))
-
     gp_id = nil
     if multiple_grading_periods?
-      set_current_grading_period
       @grading_periods = active_grading_periods_json
       gp_id = @current_grading_period_id unless view_all_grading_periods?
     end
@@ -68,7 +67,7 @@ class GradebooksController < ApplicationController
     @exclude_total = exclude_total?(@context)
     Shackles.activate(:slave) do
       # run these queries on the slave database for speed
-      @presenter.assignments(grading_period_id: gp_id)
+      @presenter.assignments
       @presenter.groups_assignments = groups_as_assignments(@presenter.groups,
                                                             :out_of_final => true,
                                                             :exclude_total => @exclude_total)
@@ -198,11 +197,10 @@ class GradebooksController < ApplicationController
       set_js_env
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
-      gradebook_version = @context.feature_enabled?(:gradebook_performance) ? :react_gradebook : :gradebook2
 
       case @current_user.preferred_gradebook_version
       when "2"
-        render gradebook_version
+        render :gradebook2
         return
       when "srgb"
         render :screenreader
@@ -374,7 +372,6 @@ class GradebooksController < ApplicationController
       :gradebook_column_size_settings_url => change_gradebook_column_size_course_gradebook_url,
       :gradebook_column_order_settings => @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
       :gradebook_column_order_settings_url => save_gradebook_column_order_course_gradebook_url,
-      :gradebook_performance_enabled => @context.feature_enabled?(:gradebook_performance),
       :all_grading_periods_totals => @context.feature_enabled?(:all_grading_periods_totals),
       :sections => sections_json(@context.active_course_sections, @current_user, session),
       :settings_update_url => api_v1_course_gradebook_settings_update_url(@context),
@@ -761,10 +758,29 @@ class GradebooksController < ApplicationController
     @assignment.submission_types.include?('online_upload')
   end
 
+  def grade_summary_presenter
+    options = presenter_options
+    if options.key?(:grading_period_id)
+      GradingPeriodGradeSummaryPresenter.new(@context, @current_user, params[:id], options)
+    else
+      GradeSummaryPresenter.new(@context, @current_user, params[:id], options)
+    end
+  end
+
   def presenter_options
-    order_preferences = @current_user && @current_user.preferences[:course_grades_assignment_order]
-    saved_order = order_preferences && @context && order_preferences[@context.id]
-    saved_order ? { assignment_order: saved_order } : {}
+    options = {}
+    return options unless @context.present?
+
+    if @current_grading_period_id.present? && !view_all_grading_periods? && multiple_grading_periods?
+      options[:grading_period_id] = @current_grading_period_id
+    end
+
+    return options unless @current_user.present?
+
+    order_preferences = @current_user.preferences[:course_grades_assignment_order]
+    saved_order = order_preferences && order_preferences[@context.id]
+    options[:assignment_order] = saved_order if saved_order.present?
+    options
   end
 
   def custom_course_users_api_url(include_concluded: false, include_inactive: false, per_page:)

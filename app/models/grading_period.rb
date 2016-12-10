@@ -126,6 +126,7 @@ class GradingPeriod < ActiveRecord::Base
   def closed?
     Time.zone.now > close_date
   end
+  alias_method :is_closed, :closed?
 
   def overlapping?
     overlaps.active.exists?
@@ -150,7 +151,7 @@ class GradingPeriod < ActiveRecord::Base
     as_json(
       only: [:id, :title, :start_date, :end_date, :close_date],
       permissions: { user: user },
-      methods: :is_last
+      methods: [:is_last, :is_closed],
     ).fetch(:grading_period)
   end
 

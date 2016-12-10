@@ -1,4 +1,4 @@
-class SubmissionPointsPossibleFixData < ActiveRecord::Migration
+class SubmissionPointsPossibleFixData < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

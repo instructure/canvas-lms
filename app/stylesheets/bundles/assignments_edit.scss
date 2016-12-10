@@ -110,6 +110,14 @@ div.form-column-right, div.overrides-column-right {
   }
 }
 
+#assignment_configuration_tools .form-column-right {
+  padding-left: 4px;
+  iframe.tool_launch {
+    margin: 15px 0px 0px 0px;
+    width: 100%;
+  }
+}
+
 .assignment-edit-group-alert, .assignment-edit-external-tool-alert{
   margin: 15px 20px 0;
 }

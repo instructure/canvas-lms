@@ -53,7 +53,6 @@ define([
               this.props.nicknameInfo.onNicknameChange(data.nickname || data.name);
             },
             error: () => {
-              console.log('Error setting course nickname');
             }
         });
       }

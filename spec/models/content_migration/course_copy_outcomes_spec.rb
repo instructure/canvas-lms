@@ -228,7 +228,7 @@ describe ContentMigration do
       @cm.outcome_to_id_map = {}
       Importers::RubricImporter.import_from_migration(hash, @cm)
 
-      expect(@cm.warnings).to eq ["The external Rubric couldn't be found for \"root rubric\", creating a copy."]
+      expect(@cm.warnings).to be_empty
 
       new_rubric = @copy_to.rubrics.first
       expect(new_rubric.id).not_to eq 0

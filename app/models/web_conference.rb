@@ -432,7 +432,7 @@ class WebConference < ActiveRecord::Base
     end
   end
 
-  scope :active, -> { all }
+  scope :active, -> { where(:conference_type => WebConference.plugins.map{|p| p.id.classify}) }
 
   def as_json(options={})
     url = options.delete(:url)

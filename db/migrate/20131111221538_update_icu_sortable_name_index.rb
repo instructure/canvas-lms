@@ -1,4 +1,4 @@
-class UpdateIcuSortableNameIndex < ActiveRecord::Migration
+class UpdateIcuSortableNameIndex < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   disable_ddl_transaction!

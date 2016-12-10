@@ -1,4 +1,4 @@
-class DropBeforeQuizSubmissionTypesColumn < ActiveRecord::Migration
+class DropBeforeQuizSubmissionTypesColumn < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

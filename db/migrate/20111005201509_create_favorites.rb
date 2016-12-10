@@ -1,4 +1,4 @@
-class CreateFavorites < ActiveRecord::Migration
+class CreateFavorites < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

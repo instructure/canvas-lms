@@ -9,7 +9,7 @@ define([
   'jquery.instructure_forms', /* errorBox */
 ], (I18n, _, $, React, BackboneState, PaginatedUserCheckList, InfiniteScroll) => {
   var NewGroupDialog = React.createClass({
-    mixins: [BackboneState, React.addons.LinkedStateMixin, InfiniteScroll],
+    mixins: [BackboneState, InfiniteScroll],
 
     loadMore() {
       this.props.loadMore();
@@ -55,13 +55,25 @@ define([
                 <tr>
                   <td><label htmlFor="group_name">{I18n.t('Group Name')}</label></td>
                   <td>
-                    <input id="groupName" ref="nameInput" type="text" name="name" maxLength="200" valueLink={this.linkState('name')}/>
+                    <input
+                      id="groupName"
+                      ref="nameInput"
+                      type="text"
+                      name="name"
+                      maxLength="200"
+                      value={this.state.name}
+                      onChange={event => this.setState({name: event.target.value})}
+                    />
                   </td>
                 </tr>
                 <tr>
                   <td><label htmlFor="">{I18n.t('Joining')}</label></td>
                   <td>
-                    <select id="joinLevelSelect" valueLink={this.linkState('joinLevel')}>
+                    <select
+                      id="joinLevelSelect"
+                      value={this.state.joinLevel}
+                      onChange={event => this.setState({joinLevel: event.target.value})}
+                    >
                       <option value="parent_context_auto_join">{I18n.t('Course members are free to join')}</option>
                       <option value="invitation_only">{I18n.t('Membership by invitation only')}</option>
                     </select>

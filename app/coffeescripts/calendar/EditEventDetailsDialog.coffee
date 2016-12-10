@@ -106,6 +106,7 @@ define [
                                                                          group,
                                                                          _.filter(@event.allPossibleContexts, (c) -> c.can_create_appointment_groups),
                                                                          @closeCB,
+                                                                         @event,
                                                                          @betterScheduler)
           dialog.find("#edit_appointment_group_form_holder").data('form-widget', @appointmentGroupDetailsForm)
 

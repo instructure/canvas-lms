@@ -1,4 +1,4 @@
-class DropCommunicationChannelPushColumns < ActiveRecord::Migration
+class DropCommunicationChannelPushColumns < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

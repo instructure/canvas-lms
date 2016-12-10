@@ -482,6 +482,15 @@ describe User do
     expect(@user.recent_feedback(:contexts => [@course])).not_to be_empty
   end
 
+  it "should include recent feedback for student view users" do
+    @course = course_model
+    @course.offer!
+    @assignment = @course.assignments.create :title => "Test Assignment", :points_possible => 10
+    test_student = @course.student_view_student
+    @assignment.grade_student test_student, :grade => 9
+    expect(test_student.recent_feedback).not_to be_empty
+  end
+
   it "should not include recent feedback for unpublished assignments" do
     create_course_with_student_and_assignment
     @assignment.grade_student @user, :grade => 9
@@ -1362,7 +1371,7 @@ describe User do
       (1..3).each do |x|
         course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
         @courses << course
-        @user.favorites.create!(context: course)
+        @user.favorites.first_or_create!(:context_type => "Course", :context_id => course)
       end
 
       @user.save!
@@ -1387,7 +1396,7 @@ describe User do
         (4..6).each do |x|
           course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true, :account => account2).course
           @courses << course
-          @user.favorites.create!(context: course)
+          @user.favorites.first_or_create!(:context_type => "Course", :context_id => course)
         end
       end
 
@@ -1395,6 +1404,23 @@ describe User do
         @user.favorites.by("Course").where("id % 2 = 0").destroy_all
         expect(@user.menu_courses.size).to eql(@courses.length / 2)
       end
+    end
+  end
+
+  describe "adding to favorites on enrollment" do
+    it "doesn't add a favorite if no course favorites already exist" do
+      course_with_student(:active_all => true)
+      expect(@student.favorites.count).to eq 0
+    end
+
+    it "adds a favorite if any course favorites already exist" do
+      u = User.create!
+
+      c1 = course_with_student(:active_all => true, :user => u).course
+      u.favorites.create!(:context_type => "Course", :context_id => c1)
+
+      c2 = course_with_student(:active_all => true, :user => u).course
+      expect(u.favorites.where(:context_type => "Course", :context_id => c2).exists?).to eq true
     end
   end
 

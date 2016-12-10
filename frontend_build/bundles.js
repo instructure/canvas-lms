@@ -115,8 +115,6 @@ entries['instructure-common'] = [
 
 entries['vendor'] = [
   'Backbone',
-  'bower/classnames/index',
-  'bower/handlebars/handlebars.runtime',
   'handlebars',
   'jquery',
   'jquery.ajaxJSON',
@@ -131,9 +129,8 @@ entries['vendor'] = [
   'react-modal',
   'underscore',
   'vendor/backbone-identity-map',
-  'vendor/backbone',
+  'backbone',
   'vendor/date',
-  'vendor/d3.v3',
   'vendor/graphael',
   'vendor/i18n',
   'vendor/i18n_js_extension',
@@ -145,7 +142,6 @@ entries['vendor'] = [
   'vendor/jquery.scrollTo',
   'vendor/mediaelement-and-player',
   'vendor/raphael',
-  'vendor/redux',
   'vendor/slickgrid/slick.grid',
   'vendor/slickgrid/slick.editors',
   'vendor/slickgrid/plugins/slick.rowselectionmodel',

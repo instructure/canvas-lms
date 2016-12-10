@@ -1,4 +1,4 @@
-class AddRequirementCountToContextModules < ActiveRecord::Migration
+class AddRequirementCountToContextModules < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

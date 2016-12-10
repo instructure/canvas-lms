@@ -128,7 +128,9 @@ class AssignmentOverride < ActiveRecord::Base
 
     if ActiveRecord::Relation === visible_ids
       column = visible_ids.klass == User ? :id : visible_ids.select_values.first
-      scope = scope.joins("INNER JOIN #{visible_ids.klass.quoted_table_name} ON assignment_override_students.user_id=#{visible_ids.klass.table_name}.#{column}")
+      scope = scope.primary_shard.activate {
+        scope.joins("INNER JOIN #{visible_ids.klass.quoted_table_name} ON assignment_override_students.user_id=#{visible_ids.klass.table_name}.#{column}")
+      }
       return scope.merge(visible_ids.except(:select))
     end
 

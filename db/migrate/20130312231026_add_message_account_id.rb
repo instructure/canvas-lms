@@ -1,4 +1,4 @@
-class AddMessageAccountId < ActiveRecord::Migration
+class AddMessageAccountId < ActiveRecord::Migration[4.2]
   tag :predeploy
   disable_ddl_transaction!
 

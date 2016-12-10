@@ -1,4 +1,4 @@
-class DropTypeFromUsers < ActiveRecord::Migration
+class DropTypeFromUsers < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

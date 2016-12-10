@@ -1,4 +1,4 @@
-class DropUnusedIndices2 < ActiveRecord::Migration
+class DropUnusedIndices2 < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def change

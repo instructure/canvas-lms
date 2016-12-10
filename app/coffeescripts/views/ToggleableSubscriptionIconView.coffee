@@ -26,7 +26,7 @@ define [
       position: my: 'center bottom', at: 'center top-10', collision: 'none'
       tooltipClass: 'center bottom vertical'
 
-    events: { 'click', 'hover', 'focus', 'blur' }
+    events: { 'click', 'keyclick' : 'click', 'hover', 'focus', 'blur' }
 
     initialize: ->
       @model.on('change:subscribed', @render)

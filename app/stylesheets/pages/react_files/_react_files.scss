@@ -12,7 +12,7 @@ $ef-thumbnail-size: 36px;
 }
 
 body.files {
-  #content { padding-top: 0; }
+  .ic-Layout-contentMain { padding-top: 0; }
   .ic-app-nav-toggle-and-crumbs {
     /* display: none; */
     &.ic-app-nav-toggle-and-crumbs--files { display: flex; }

@@ -24,16 +24,22 @@ module Lti
 
     attr_reader :name, :permission_groups
 
-    def initialize(name, permission_groups, proc, guard = -> {true})
+    def initialize(name, permission_groups, expansion_proc, *guards)
       @name = name
       @permission_groups = permission_groups
-      @proc = proc
-      @guard = guard
+      @expansion_proc = expansion_proc
+      @guards = guards
+      @guards << -> { true } if @guards.empty?
     end
 
     def expand(expander)
-      expander.instance_exec(&@guard) ? expander.instance_exec(&@proc) : "$#{name}"
+      expand_for?(expander) ? expander.instance_exec(&@expansion_proc) : "$#{name}"
     end
 
+    private
+    def expand_for?(expander)
+      @guards.map {|guard| expander.instance_exec(&guard) }.
+        inject { |memo, obj| memo && obj }
+    end
   end
 end

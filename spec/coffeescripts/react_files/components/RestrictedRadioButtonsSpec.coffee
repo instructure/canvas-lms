@@ -1,12 +1,11 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'jsx/files/RestrictedRadioButtons'
   'compiled/models/Folder'
-], (React, ReactDOM, $, RestrictedRadioButtons, Folder) ->
-
-  Simulate = React.addons.TestUtils.Simulate
+], (React, ReactDOM, {Simulate}, $, RestrictedRadioButtons, Folder) ->
 
   module 'RestrictedRadioButtons',
     setup: ->

@@ -1,4 +1,4 @@
-class DropUnencryptedTwitterSettings < ActiveRecord::Migration
+class DropUnencryptedTwitterSettings < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

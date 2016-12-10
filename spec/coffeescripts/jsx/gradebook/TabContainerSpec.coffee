@@ -1,13 +1,12 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jquery'
   'underscore'
   'jsx/grading/tabContainer'
   'jqueryui/tabs'
-], (React, ReactDOM, $, _, TabContainer) ->
-
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, $, _, TabContainer) ->
 
   module 'TabContainer',
     renderComponent: (props) ->

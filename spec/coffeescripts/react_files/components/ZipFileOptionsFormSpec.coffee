@@ -3,10 +3,9 @@ define [
   'underscore'
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/files/ZipFileOptionsForm'
-  ], ($, _, React, ReactDOM, ZipFileOptionsForm ) ->
-
-    TestUtils = React.addons.TestUtils
+  ], ($, _, React, ReactDOM, TestUtils, ZipFileOptionsForm ) ->
 
     module "ZipFileOptionsForm"
 
@@ -41,7 +40,6 @@ define [
       props = {
         fileOptions: {file: 'the_file_obj' }
         onZipOptionsResolved: (options)->
-          console.log("Called With ", options)
           zipOptionsResolvedStub(options)
       }
 

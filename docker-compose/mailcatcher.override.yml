@@ -1,0 +1,14 @@
+# to use this add docker-compose/mailcatcher.override.yml
+# to your COMPOSE_FILE var in .env
+
+version: '2'
+services:
+  web: &WEB
+    links:
+      - mailcatcher
+
+  mailcatcher:
+    image: instructure/mailcatcher
+    environment:
+      VIRTUAL_HOST: mail.canvas.docker
+      VIRTUAL_PORT: 8080

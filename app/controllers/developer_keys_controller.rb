@@ -19,12 +19,13 @@
 class DeveloperKeysController < ApplicationController
   before_filter :set_key, only: [:update, :destroy ]
   before_filter :require_manage_developer_keys
-  before_filter :set_keys, only: [:index]
 
   include Api::V1::DeveloperKey
 
   def index
-    @keys = Api.paginate(@keys, self, developer_keys_url)
+    scope = @context.site_admin? ? DeveloperKey : @context.developer_keys
+    scope = scope.nondeleted.preload(:account).order("id DESC")
+    @keys = Api.paginate(scope, self, account_developer_keys_url(@context))
     respond_to do |format|
       format.html do
         set_navigation
@@ -68,16 +69,6 @@ class DeveloperKeysController < ApplicationController
   private
   def set_key
     @key = DeveloperKey.nondeleted.find(params[:id])
-  end
-
-  def set_keys
-    # this can be simplified once we remove the non-account index route
-    if params[:account_id] && @context != Account.site_admin
-      @keys = @context.developer_keys.nondeleted.preload(:account).order("id DESC")
-    else
-      @context = Account.site_admin
-      @keys = DeveloperKey.nondeleted.preload(:account).order("id DESC")
-    end
   end
 
   def account_context

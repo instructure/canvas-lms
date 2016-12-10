@@ -1,5 +1,5 @@
 # This migration comes from switchman (originally 20130328212039)
-class CreateSwitchmanShards < ActiveRecord::Migration
+class CreateSwitchmanShards < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

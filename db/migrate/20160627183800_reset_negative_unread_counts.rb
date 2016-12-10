@@ -1,4 +1,4 @@
-class ResetNegativeUnreadCounts < ActiveRecord::Migration
+class ResetNegativeUnreadCounts < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

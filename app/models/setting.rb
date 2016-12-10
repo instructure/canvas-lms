@@ -19,8 +19,6 @@
 class Setting < ActiveRecord::Base
   self.shard_category = :unsharded if self.respond_to?(:shard_category=)
 
-  attr_accessible :name, :value
-
   @@cache = {}
   @@yaml_cache = {}
 

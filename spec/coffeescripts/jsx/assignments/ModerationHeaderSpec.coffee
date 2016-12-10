@@ -1,10 +1,9 @@
 define [
   'react'
   'react-dom'
+  'react-addons-test-utils'
   'jsx/assignments/ModerationHeader'
-], (React, ReactDOM, Header) ->
-
-  TestUtils = React.addons.TestUtils
+], (React, ReactDOM, TestUtils, Header) ->
 
   module 'ModerationHeader',
     setup: ->

@@ -215,3 +215,23 @@
     background-position: -193px -32px;
   }
 }
+
+// implemented to make new profile page use flex for layout //
+.ic-Profile-layout {
+  display: flex;
+  padding: $ic-sp;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ic-Profile-layout__Primary {
+  flex: 2;
+    @include breakpoint(desktop) {
+    flex: 3;
+  }
+}
+
+.ic-Profile-layout__Secondary {
+  flex: 1;
+  text-align: right;
+}

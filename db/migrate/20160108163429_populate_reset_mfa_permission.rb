@@ -1,4 +1,4 @@
-class PopulateResetMfaPermission < ActiveRecord::Migration
+class PopulateResetMfaPermission < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

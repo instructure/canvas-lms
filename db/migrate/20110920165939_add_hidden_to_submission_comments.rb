@@ -1,4 +1,4 @@
-class AddHiddenToSubmissionComments < ActiveRecord::Migration
+class AddHiddenToSubmissionComments < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

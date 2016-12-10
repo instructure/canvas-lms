@@ -1,7 +1,5 @@
-%w[read write delete exist? generate].each do |method|
-  ActiveSupport::Notifications.subscribe("cache_#{method}.active_support") do |_name, start, finish, _id, options|
-    key = options[:key]
-    elapsed_time = finish - start
-    Rails.logger.debug("CacheStore: #{method} #{key.inspect} #{"%.4f" % elapsed_time}")
-  end
+ActiveSupport::Notifications.subscribe("cache_generate.active_support") do |_name, start, finish, _id, _options|
+  elapsed_time = finish - start
+  # used by Redis::Client#log_request_response added in lib/canvas/redis.rb
+  Thread.current[:last_cache_generate] = elapsed_time
 end

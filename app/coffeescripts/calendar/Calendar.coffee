@@ -13,7 +13,7 @@ define [
   'compiled/util/fcUtil'
   'compiled/userSettings'
   'compiled/util/hsvToRgb'
-  'bower/color-slicer/dist/color-slicer'
+  'color-slicer'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/commonEventFactory'
@@ -29,7 +29,8 @@ define [
   'compiled/calendar/CalendarEventFilter'
   'jsx/calendar/scheduler/actions'
 
-  'fullcalendar-with-lang-all'
+  'fullcalendar'
+  'fullcalendar/dist/lang-all'
   'jsx/calendar/patches-to-fullcalendar'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
@@ -252,7 +253,9 @@ define [
 
       reservedText = ""
       if event.isAppointmentGroupEvent()
-        if event.reservedUsers == ""
+        if event.appointmentGroupEventStatus == "Reserved"
+          reservedText = "\n\n#{I18n.t('Reserved By You')}"
+        else if event.reservedUsers == ""
             reservedText = "\n\n#{I18n.t('Unreserved')}"
         else
           reservedText = "\n\n#{I18n.t('Reserved By: ')} #{event.reservedUsers}"

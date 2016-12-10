@@ -1,7 +1,7 @@
 define([
   'react',
   'i18n!epub_exports',
-  'bower/classnames/index',
+  'classnames',
   'underscore',
   'jsx/epub_exports/CourseStore'
 ], function(React, I18n, classnames, _, CourseEpubExportStore){

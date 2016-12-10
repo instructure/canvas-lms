@@ -1,11 +1,11 @@
 <% content_for :page_title, @user_data[:short_name] %>
 
-<div class="ic-Layout">
-  <div class="ic-Layout__Primary">
+<div class="ic-Profile-layout">
+  <div class="ic-Profile-layout__Primary">
     <%= render 'shared/profile' %>
   </div>
 
-  <div class="ic-Layout__Secondary">
+  <div class="ic-Profile-layout__Secondary">
     <% if @user_data[:can_edit] && !can_do(@domain_root_account, @current_user, :manage) %>
       <button data-event="editProfile" class="hide-if-editing Button"><i class="icon-edit"></i> <%= t('edit_profile', 'Edit Profile') %></button>
       <button data-event="cancelEditProfile" class="show-if-editing Button"><i class="icon-edit"></i> <%= t('cancel_editing', 'Cancel Editing') %></button>
@@ -28,4 +28,3 @@
   </div>
 
 </div>
-

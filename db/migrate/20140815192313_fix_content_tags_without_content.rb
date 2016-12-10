@@ -1,4 +1,4 @@
-class FixContentTagsWithoutContent < ActiveRecord::Migration
+class FixContentTagsWithoutContent < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

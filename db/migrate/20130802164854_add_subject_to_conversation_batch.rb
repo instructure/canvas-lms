@@ -1,4 +1,4 @@
-class AddSubjectToConversationBatch < ActiveRecord::Migration
+class AddSubjectToConversationBatch < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

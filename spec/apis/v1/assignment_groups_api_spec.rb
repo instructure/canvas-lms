@@ -732,7 +732,8 @@ describe AssignmentGroupsApiController, type: :request do
     context "when an assignment is due in a closed grading period" do
       let(:call_update) do
         -> (params, expected_status) do
-          api_call(
+          api_call_as_user(
+            @current_user,
             :put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",
             {
               controller: 'assignment_groups_api',
@@ -762,7 +763,7 @@ describe AssignmentGroupsApiController, type: :request do
 
       context "as a teacher" do
         before :each do
-          user_session(@teacher)
+          @current_user = @teacher
           @assignment = @course.assignments.create!({
             title: 'assignment', assignment_group: @assignment_group, due_at: 1.week.ago
           })
@@ -815,8 +816,7 @@ describe AssignmentGroupsApiController, type: :request do
           @course.assignments.create!({
             title: 'assignment', assignment_group: @assignment_group, due_at: 1.week.ago
           })
-          admin = account_admin_user(account: @course.root_account)
-          user_session(admin)
+          @current_user = account_admin_user(account: @course.root_account)
           call_update.call({ group_weight: 75 }, 200)
           expect(@assignment_group.reload.group_weight).to eq(75)
         end

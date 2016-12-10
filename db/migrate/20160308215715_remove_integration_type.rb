@@ -1,4 +1,4 @@
-class RemoveIntegrationType < ActiveRecord::Migration
+class RemoveIntegrationType < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

@@ -1,4 +1,4 @@
-class AddForeignKeys6 < ActiveRecord::Migration
+class AddForeignKeys6 < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   tag :postdeploy
 

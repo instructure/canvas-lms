@@ -1,4 +1,4 @@
-class RemoveScribdAccount < ActiveRecord::Migration
+class RemoveScribdAccount < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up

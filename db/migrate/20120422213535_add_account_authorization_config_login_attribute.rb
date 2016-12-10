@@ -1,4 +1,4 @@
-class AddAccountAuthorizationConfigLoginAttribute < ActiveRecord::Migration
+class AddAccountAuthorizationConfigLoginAttribute < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

@@ -1,4 +1,4 @@
-class MultipleGradingPeriodsDataMigration < ActiveRecord::Migration
+class MultipleGradingPeriodsDataMigration < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up

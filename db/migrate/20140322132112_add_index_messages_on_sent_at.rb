@@ -1,4 +1,4 @@
-class AddIndexMessagesOnSentAt < ActiveRecord::Migration
+class AddIndexMessagesOnSentAt < ActiveRecord::Migration[4.2]
   tag :postdeploy
   disable_ddl_transaction!
 

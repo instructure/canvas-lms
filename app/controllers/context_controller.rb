@@ -222,11 +222,17 @@ class ContextController < ApplicationController
           :pendingInvitationsCount => @context.invited_count_visible_to(@current_user)
         }
       })
+      if manage_students || manage_admins
+        js_env({:ROOT_ACCOUNT_NAME => @domain_root_account.name})
+        if @context.root_account.open_registration? || @context.root_account.grants_right?(@current_user, session, :manage_user_logins)
+          js_env({:INVITE_USERS_URL => course_invite_users_url(@context)})
+        end
+      end
     elsif @context.is_a?(Group)
       if @context.grants_right?(@current_user, :read_as_admin)
-        @users = @context.participating_users.order_by_sortable_name.uniq
+        @users = @context.participating_users.uniq.order_by_sortable_name
       else
-        @users = @context.participating_users_in_context(sort: true).uniq
+        @users = @context.participating_users_in_context(sort: true).uniq.order_by_sortable_name
       end
       @primary_users = { t('roster.group_members', 'Group Members') => @users }
       if course = @context.context.try(:is_a?, Course) && @context.context

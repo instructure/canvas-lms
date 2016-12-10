@@ -95,10 +95,7 @@ module Api::V1::User
       # been called with {group_memberships: true} in opts
       if includes.include?('group_ids')
         context_group_ids = get_context_groups(context)
-        user_group_ids = user.group_memberships.loaded ?
-          user.group_memberships.map(&:group_id) :
-          user.group_memberships.pluck(:group_id)
-        json[:group_ids] = context_group_ids & user_group_ids
+        json[:group_ids] = context_group_ids & group_ids(user)
       end
 
       json[:locale] = user.locale if includes.include?('locale')
@@ -319,5 +316,13 @@ module Api::V1::User
 
   def sis_pseudonym_for(user)
     SisPseudonym.for(user, @domain_root_account, @domain_root_account.trust_exists?)
+  end
+
+  def group_ids(user)
+    if user.group_memberships.loaded?
+      user.group_memberships.map(&:group_id)
+    else
+      user.group_memberships.pluck(:group_id)
+    end
   end
 end

@@ -35,7 +35,10 @@ $ic-Login-confirmation-bgd: #34444f;
 ////////////////////////////////////////
 // New Login Styles
 ////////////////////////////////////////
-#content {padding: 0;}
+.ic-Layout-contentMain {
+  padding: 0;
+}
+
 body.ic-Login-Body { // apply the background to the body element so that you don't see white bg as you scroll
   background-color: $ic-brand-Login-body-bgd-color;
   background-image:
@@ -110,6 +113,9 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 
 .ic-Login-header__logo {
   flex: 0 0 160px;
+  // Fix Firefox bug where flexed container doesn't
+  // constrain its contents
+  min-width: 1px;
 }
 
 .ic-Login-header__links {
@@ -161,7 +167,6 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 //////////
 .ic-Login__forgot-text {
   color: $ic-brand-Login-Content-password-text-color;
-  font-weight: 300;
   @include fontSize($ic-font-size--small);
   padding: 0 0 $ic-sp*2 0;
   margin: 0;
@@ -220,10 +225,10 @@ body.ic-Login-Body #footer.ic-Login-footer {
 .ic-Login__register-banner {
 
   .ic-Login__banner-title {
-    font-weight: 300;
+    font-weight: normal;
   }
   .ic-Login__banner-subtitle {
-    font-weight: 700;
+    font-weight: bold;
   }
 }
 //////////

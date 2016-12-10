@@ -1,9 +1,8 @@
 define([
   'react',
+  'react-addons-test-utils',
   'jsx/course_settings/components/UploadArea',
-], (React, UploadArea) => {
-
-  const TestUtils = React.addons.TestUtils;
+], (React, TestUtils, UploadArea) => {
 
   module('UploadArea Component');
 

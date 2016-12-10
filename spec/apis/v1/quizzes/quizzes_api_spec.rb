@@ -424,6 +424,107 @@ describe Quizzes::QuizzesApiController, type: :request do
         end
       end
     end
+
+    context "with multiple grading periods enabled" do
+      def call_create(params, expected_status)
+        api_call_as_user(
+          @current_user,
+          :post, "/api/v1/courses/#{@course.id}/quizzes",
+          {
+            controller: "quizzes/quizzes_api",
+            action: "create",
+            format: "json",
+            course_id: @course.id.to_s
+          },
+          { quiz: { title: "Example Title", quiz_type: "assignment" }.merge(params) },
+          {},
+          { expected_status: expected_status }
+        )
+      end
+
+      before :once do
+        teacher_in_course(active_all: true)
+        @course.root_account.enable_feature!(:multiple_grading_periods)
+        grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+        term = @course.enrollment_term
+        term.grading_period_group = grading_period_group
+        term.save!
+        Factories::GradingPeriodHelper.new.create_for_group(grading_period_group, {
+          start_date: 2.weeks.ago, end_date: 2.days.ago, close_date: 1.day.ago
+        })
+        account_admin_user(account: @course.root_account)
+      end
+
+      context "when the user is a teacher" do
+        before :each do
+          @current_user = @teacher
+        end
+
+        it "allows setting the due date in an open grading period" do
+          due_date = 3.days.from_now.iso8601
+          call_create({ due_at: due_date }, 200)
+          json = JSON.parse response.body
+          quiz = Quizzes::Quiz.find(json["id"])
+          expect(quiz.due_at).to eq due_date
+        end
+
+        it "does not allow setting the due date in a closed grading period" do
+          call_create({ due_at: 3.days.ago.iso8601 }, 403)
+          json = JSON.parse response.body
+          expect(json["errors"].keys).to include "due_at"
+        end
+
+        it "allows setting the due date in a closed grading period when only visible to overrides" do
+          due_date = 3.days.ago.iso8601
+          call_create({ due_at: due_date, only_visible_to_overrides: true }, 200)
+          json = JSON.parse response.body
+          quiz = Quizzes::Quiz.find(json["id"])
+          expect(quiz.due_at).to eq due_date
+        end
+
+        it "does not allow a nil due date when the last grading period is closed" do
+          call_create({ due_at: nil }, 403)
+          json = JSON.parse response.body
+          expect(json["errors"].keys).to include "due_at"
+        end
+
+        it "allows a due date in a closed grading period when the quiz is not graded" do
+          due_date = 3.days.ago.iso8601
+          call_create({ due_at: due_date, quiz_type: "survey" }, 200)
+          json = JSON.parse response.body
+          quiz = Quizzes::Quiz.find(json["id"])
+          expect(quiz.due_at).to eq due_date
+        end
+
+        it "allows a nil due date when not graded and the last grading period is closed" do
+          call_create({ due_at: nil, quiz_type: "survey" }, 200)
+          json = JSON.parse response.body
+          quiz = Quizzes::Quiz.find(json["id"])
+          expect(quiz.due_at).to be_nil
+        end
+      end
+
+      context "when the user is an admin" do
+        before :each do
+          @current_user = @admin
+        end
+
+        it "allows setting the due date in a closed grading period" do
+          due_date = 3.days.ago.iso8601
+          call_create({ title: "Example Quiz", due_at: 3.days.ago.iso8601 }, 200)
+          json = JSON.parse response.body
+          quiz = Quizzes::Quiz.find(json["id"])
+          expect(quiz.due_at).to eq due_date
+        end
+
+        it "allows a nil due date when the last grading period is closed" do
+          call_create({ title: "Example Quiz", due_at: nil }, 200)
+          json = JSON.parse response.body
+          quiz = Quizzes::Quiz.find(json["id"])
+          expect(quiz.due_at).to eq nil
+        end
+      end
+    end
   end
 
   describe "DELETE /courses/:course_id/quizzes/id (destroy)" do
@@ -629,6 +730,216 @@ describe Quizzes::QuizzesApiController, type: :request do
         it 'should discard values less than -1' do
           api_update_quiz({'allowed_attempts' => -1}, {'allowed_attempts' => -25})
           expect(updated_quiz.allowed_attempts).to eq -1
+        end
+      end
+    end
+
+    context "with multiple grading periods enabled" do
+      def create_quiz(attr)
+        @course.quizzes.create!({ title: "Example Quiz", quiz_type: "assignment" }.merge(attr))
+      end
+
+      def override_for_date(date)
+        override = @quiz.assignment_overrides.build
+        override.set_type = "CourseSection"
+        override.due_at = date
+        override.due_at_overridden = true
+        override.set_id = @course.course_sections.first
+        override.save!
+        override
+      end
+
+      def call_update(params, expected_status)
+        api_call_as_user(
+          @current_user,
+          :put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
+          {
+            controller: "quizzes/quizzes_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            id: @quiz.to_param
+          },
+          { quiz: params },
+          {},
+          { expected_status: expected_status }
+        )
+      end
+
+      before :once do
+        teacher_in_course(active_all: true)
+        @course.root_account.enable_feature!(:multiple_grading_periods)
+        grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+        term = @course.enrollment_term
+        term.grading_period_group = grading_period_group
+        term.save!
+        Factories::GradingPeriodHelper.new.create_for_group(grading_period_group, {
+          start_date: 2.weeks.ago, end_date: 2.days.ago, close_date: 1.day.ago
+        })
+        account_admin_user(account: @course.root_account)
+      end
+
+      context "when the user is a teacher" do
+        before :each do
+          @current_user = @teacher
+        end
+
+        it "allows changing the due date to another date in an open grading period" do
+          due_date = 3.days.from_now.iso8601
+          @quiz = create_quiz(due_at: 7.days.from_now)
+          call_update({ due_at: due_date }, 200)
+          expect(@quiz.reload.due_at).to eq due_date
+        end
+
+        it "allows changing the due date when the quiz is only visible to overrides" do
+          due_date = 3.days.from_now.iso8601
+          @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: true)
+          call_update({ due_at: due_date }, 200)
+          expect(@quiz.reload.due_at).to eq due_date
+        end
+
+        it "allows disabling only_visible_to_overrides when due in an open grading period" do
+          @quiz = create_quiz(due_at: 3.days.from_now, only_visible_to_overrides: true)
+          call_update({ only_visible_to_overrides: false }, 200)
+          expect(@quiz.reload.only_visible_to_overrides).to eql false
+        end
+
+        it "allows enabling only_visible_to_overrides when due in an open grading period" do
+          @quiz = create_quiz(due_at: 3.days.from_now, only_visible_to_overrides: false)
+          call_update({ only_visible_to_overrides: true }, 200)
+          expect(@quiz.reload.only_visible_to_overrides).to eql true
+        end
+
+        it "does not allow disabling only_visible_to_overrides when due in a closed grading period" do
+          @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: true)
+          call_update({ only_visible_to_overrides: false }, 403)
+          expect(@quiz.reload.only_visible_to_overrides).to eql true
+          json = JSON.parse response.body
+          expect(json["errors"].keys).to include "due_at"
+        end
+
+        it "does not allow enabling only_visible_to_overrides when due in a closed grading period" do
+          @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: false)
+          call_update({ only_visible_to_overrides: true }, 403)
+          expect(@quiz.reload.only_visible_to_overrides).to eql false
+          json = JSON.parse response.body
+          expect(json["errors"].keys).to include "only_visible_to_overrides"
+        end
+
+        it "allows disabling only_visible_to_overrides when changing due date to an open grading period" do
+          due_date = 3.days.from_now.iso8601
+          @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: true)
+          call_update({ due_at: due_date, only_visible_to_overrides: false }, 200)
+          expect(@quiz.reload.only_visible_to_overrides).to eql false
+          expect(@quiz.due_at).to eq due_date
+        end
+
+        it "does not allow changing the due date on a quiz due in a closed grading period" do
+          due_date = 3.days.ago
+          @quiz = create_quiz(due_at: due_date)
+          call_update({ due_at: 3.days.from_now.iso8601 }, 403)
+          expect(@quiz.reload.due_at).to eq due_date
+          json = JSON.parse response.body
+          expect(json["errors"].keys).to include "due_at"
+        end
+
+        it "does not allow changing the due date to a date within a closed grading period" do
+          due_date = 3.days.from_now
+          @quiz = create_quiz(due_at: due_date)
+          call_update({ due_at: 3.days.ago.iso8601 }, 403)
+          expect(@quiz.reload.due_at).to eq due_date
+          json = JSON.parse response.body
+          expect(json["errors"].keys).to include "due_at"
+        end
+
+        it "does not allow unsetting the due date when the last grading period is closed" do
+          due_date = 3.days.from_now
+          @quiz = create_quiz(due_at: due_date)
+          call_update({ due_at: nil }, 403)
+          expect(@quiz.reload.due_at).to eq due_date
+          json = JSON.parse response.body
+          expect(json["errors"].keys).to include "due_at"
+        end
+
+        it "succeeds when the due date is set to the same value" do
+          due_date = 3.days.ago.iso8601
+          @quiz = create_quiz(due_at: due_date)
+          call_update({ due_at: due_date }, 200)
+          expect(@quiz.reload.due_at).to eq due_date
+        end
+
+        it "succeeds when the due date is not changed" do
+          due_date = 3.days.ago.iso8601
+          @quiz = create_quiz(due_at: due_date)
+          call_update({ name: "Updated Quiz" }, 200)
+          expect(@quiz.reload.due_at).to eq due_date
+        end
+
+        it "allows changing the due date when the quiz is not graded" do
+          due_date = 3.days.ago.iso8601
+          @quiz = create_quiz(due_at: 7.days.from_now, quiz_type: "survey")
+          call_update({ due_at: due_date }, 200)
+          expect(@quiz.reload.due_at).to eq due_date
+        end
+
+        it "allows unsetting the due date when not graded and the last grading period is closed" do
+          @quiz = create_quiz(due_at: 3.days.from_now, quiz_type: "survey")
+          call_update({ due_at: nil }, 200)
+          expect(@quiz.reload.due_at).to be_nil
+        end
+
+        it "allows changing the due date on a quiz with an override due in a closed grading period" do
+          due_date = 7.days.from_now.iso8601
+          @quiz = create_quiz(due_at: 7.days.from_now)
+          override_for_date(3.days.ago)
+          call_update({ due_at: due_date }, 200)
+          expect(@quiz.reload.due_at).to eq due_date
+        end
+      end
+
+      context "when the user is an admin" do
+        before :each do
+          @current_user = @admin
+        end
+
+        it "does not allow disabling only_visible_to_overrides when due in a closed grading period" do
+          @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: true)
+          call_update({ only_visible_to_overrides: false }, 200)
+          expect(@quiz.reload.only_visible_to_overrides).to eql false
+        end
+
+        it "does not allow enabling only_visible_to_overrides when due in a closed grading period" do
+          @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: false)
+          call_update({ only_visible_to_overrides: true }, 200)
+          expect(@quiz.reload.only_visible_to_overrides).to eql true
+        end
+
+        it "allows changing the due date on a quiz due in a closed grading period" do
+          due_date = 3.days.from_now.iso8601
+          @quiz = create_quiz(due_at: 3.days.ago)
+          call_update({ due_at: due_date }, 200)
+          expect(@quiz.reload.due_at).to eq due_date
+        end
+
+        it "allows changing the due date on a quiz with an override due in a closed grading period" do
+          due_date = 3.days.from_now.iso8601
+          @quiz = create_quiz(due_at: 7.days.from_now)
+          override_for_date(3.days.ago)
+          call_update({ due_at: due_date }, 200)
+          expect(@quiz.reload.due_at).to eq due_date
+        end
+
+        it "allows changing the due date to a date within a closed grading period" do
+          due_date = 3.days.ago.iso8601
+          @quiz = create_quiz(due_at: 3.days.from_now)
+          call_update({ due_at: due_date }, 200)
+          expect(@quiz.reload.due_at).to eq due_date
+        end
+
+        it "allows unsetting the due date when the last grading period is closed" do
+          @quiz = create_quiz(due_at: 3.days.from_now)
+          call_update({ due_at: nil }, 200)
+          expect(@quiz.reload.due_at).to eq nil
         end
       end
     end

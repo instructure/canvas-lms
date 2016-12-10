@@ -81,7 +81,7 @@ module CanvasRails
     # Activate observers that should always be running
     config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer, :conditional_release_observer ]
 
-    config.active_record.whitelist_attributes = false
+    config.active_record.whitelist_attributes = false if CANVAS_RAILS4_2
 
     config.active_record.raise_in_transactional_callbacks = true # may as well opt into the new behavior
 
@@ -104,11 +104,12 @@ module CanvasRails
     # we don't know what middleware to make SessionsTimeout follow until after
     # we've loaded config/initializers/session_store.rb
     initializer("extend_middleware_stack", after: "load_config_initializers") do |app|
+      request_throttle_position = CANVAS_RAILS4_2 ? 'ActionDispatch::ParamsParser' : 'Rack::Head'
       app.config.middleware.insert_before(config.session_store, 'LoadAccount')
       app.config.middleware.insert_before(config.session_store, 'SessionsTimeout')
       app.config.middleware.swap('ActionDispatch::RequestId', 'RequestContextGenerator')
       app.config.middleware.insert_after(config.session_store, 'RequestContextSession')
-      app.config.middleware.insert_before('ActionDispatch::ParamsParser', 'RequestThrottle')
+      app.config.middleware.insert_before(request_throttle_position, 'RequestThrottle')
       app.config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
     end
 
@@ -136,7 +137,9 @@ module CanvasRails
 
             raise "Canvas requires PostgreSQL 9.3 or newer" unless postgresql_version >= 90300
 
-            ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID::Money.precision = (postgresql_version >= 80300) ? 19 : 10
+            if CANVAS_RAILS4_2
+              ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID::Money.precision = (postgresql_version >= 80300) ? 19 : 10
+            end
 
             configure_connection
 
@@ -230,12 +233,7 @@ module CanvasRails
       end
     end
 
-    if Rails.env.development? && !ENV['DISABLED_BETTER_ERRORS']
-      require 'better_errors'
-      require 'binding_of_caller'
-    else
-      config.exceptions_app = ExceptionsApp.new
-    end
+    config.exceptions_app = ExceptionsApp.new
 
     config.before_initialize do
       config.action_controller.asset_host = Canvas::Cdn.method(:asset_host_for)

@@ -1,14 +1,14 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'underscore',
   'jquery',
   'jsx/grading/GradingPeriodSetCollection',
   'compiled/api/gradingPeriodSetsApi',
   'compiled/api/enrollmentTermsApi'
-], (React, ReactDOM, _, $, SetCollection, setsApi, termsApi) => {
+], (React, ReactDOM, {Simulate}, _, $, SetCollection, setsApi, termsApi) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
   const assertDisabled = function(component) {
     let $el = ReactDOM.findDOMNode(component);

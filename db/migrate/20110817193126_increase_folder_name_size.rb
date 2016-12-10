@@ -1,4 +1,4 @@
-class IncreaseFolderNameSize < ActiveRecord::Migration
+class IncreaseFolderNameSize < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

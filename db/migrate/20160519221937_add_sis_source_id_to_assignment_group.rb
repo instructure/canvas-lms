@@ -1,4 +1,4 @@
-class AddSisSourceIdToAssignmentGroup < ActiveRecord::Migration
+class AddSisSourceIdToAssignmentGroup < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change

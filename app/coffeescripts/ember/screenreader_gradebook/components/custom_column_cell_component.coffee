@@ -2,7 +2,7 @@ define [
   'ember'
   'underscore'
   'compiled/gradebook2/GradebookHelpers'
-  'jsx/gradebook/grid/constants'
+  'jsx/gradebook/shared/constants'
 ], (Ember, _, GradebookHelpers, GradebookConstants) ->
 
   CustomColumnCellComponent = Ember.Component.extend

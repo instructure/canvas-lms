@@ -1,11 +1,15 @@
 define([
   'react',
   'react-dom',
+  'react-addons-test-utils',
   'underscore',
-  'jsx/grading/GradingPeriodForm'
-], (React, ReactDOM, _, GradingPeriodForm) => {
+  'jsx/grading/GradingPeriodForm',
+  'vendor/timezone/America/Chicago',
+  'timezone',
+  'helpers/fakeENV'
+], (React, ReactDOM, {Simulate}, _, GradingPeriodForm, chicago, tz,
+  fakeENV) => {
   const wrapper = document.getElementById('fixtures');
-  const Simulate = React.addons.TestUtils.Simulate;
 
   const examplePeriod = {
     id: '1',
@@ -106,6 +110,21 @@ define([
     endDateInput.dispatchEvent(new Event("change"));
     equal(form.refs.endDate.refs.dateInput.value, 'Jan 7 at 12pm');
     equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7 at 12pm');
+  });
+
+  test("given a different content timezone, local and server time are shown", function() {
+    tz.preload('America/Chicago', chicago);
+    fakeENV.setup({TIMEZONE: 'America/Denver', CONTEXT_TIMEZONE: 'America/Chicago'});
+    const form = this.renderComponent();
+    const datetimeSuggestList = ReactDOM.findDOMNode(form).querySelectorAll('.datetime_suggest');
+    equal(datetimeSuggestList.length, 6);
+    fakeENV.teardown();
+  });
+
+  test("given the same timezone, local and server time are not shown", function() {
+    const form = this.renderComponent();
+    const datetimeSuggestList = ReactDOM.findDOMNode(form).querySelectorAll('.datetime_suggest');
+    equal(datetimeSuggestList.length, 0);
   });
 
   test("calls the 'onSave' callback when the save button is clicked", function() {

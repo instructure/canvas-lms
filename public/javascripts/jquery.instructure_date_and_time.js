@@ -62,10 +62,18 @@ define([
     return tz.format(d1, '%F') == tz.format(d2, '%F');
   };
   $.dateString = function(date, options) {
-    if (date == null) return "";
+    if (date == null) return '';
     var timezone = options && options.timezone;
     var format = options && options.format;
-    format = (format !== 'medium') && $.sameYear(date, new Date()) ? 'date.formats.short' : 'date.formats.medium';
+
+    if (format === 'full') {
+      format = 'date.formats.full'
+    } else if (format !== 'medium' && $.sameYear(date, new Date())) {
+      format = 'date.formats.short'
+    } else {
+      format = 'date.formats.medium'
+    }
+
     if (typeof timezone == 'string' || timezone instanceof String) {
       return tz.format(date, format, timezone) || '';
     } else {

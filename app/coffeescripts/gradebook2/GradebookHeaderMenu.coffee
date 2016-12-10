@@ -10,13 +10,17 @@ define [
   'jst/re_upload_submissions_form'
   'underscore'
   'compiled/behaviors/authenticity_token'
-  'jsx/gradebook/grid/helpers/messageStudentsWhoHelper'
+  'jsx/gradebook/shared/helpers/messageStudentsWhoHelper'
   'jquery.instructure_forms'
   'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'compiled/jquery.kylemenu'
-], (I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter, SetDefaultGradeDialog, CurveGradesDialog, gradebookHeaderMenuTemplate, re_upload_submissions_form, _, authenticity_token, MessageStudentsWhoHelper) ->
+], (
+  I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter, SetDefaultGradeDialog,
+  CurveGradesDialog, gradebookHeaderMenuTemplate, re_upload_submissions_form, _, authenticity_token,
+  MessageStudentsWhoHelper
+) ->
 
   class GradebookHeaderMenu
     constructor: (@assignment, @$trigger, @gradebook) ->
@@ -26,6 +30,7 @@ define [
       templateLocals.speedGraderUrl = null unless @gradebook.options.speed_grader_enabled
 
       @gradebook.allSubmissionsLoaded.done =>
+        # Reset the cache in case the user clicked on the menu while waiting for data
         @allSubmissionsLoaded = true
 
       @$menu = $(gradebookHeaderMenuTemplate(templateLocals)).insertAfter(@$trigger)
@@ -48,15 +53,8 @@ define [
               @gradebook.grid.editActiveCell()
             ), 0)
         )
-        .bind('popupopen',  =>
-          @$menu.find("[data-action=#{action}]").showIf(condition) for action, condition of {
-            showAssignmentDetails: @allSubmissionsLoaded
-            messageStudentsWho:    @allSubmissionsLoaded
-            setDefaultGrade:       @allSubmissionsLoaded
-            curveGrades:           @allSubmissionsLoaded && @assignment.grading_type != 'pass_fail' && @assignment.points_possible
-            downloadSubmissions:   "#{@assignment.submission_types}".match(/(online_upload|online_text_entry|online_url)/) && @assignment.has_submitted_submissions
-            reuploadSubmissions:   @gradebook.options.gradebook_is_editable && @assignment.submissions_downloads > 0
-          }
+        .bind('popupopen', =>
+          @menuPopupOpenHandler(@$menu)
         )
         .popup('open')
 
@@ -67,6 +65,38 @@ define [
           a.muted = status
           @gradebook.setAssignmentWarnings()
       )
+
+    menuPopupOpenHandler: (menu) ->
+      # Hide any menu options that haven't had their dependencies met yet
+      @hideMenuActionsWithUnmetDependencies(menu)
+
+      # Disable menu options if needed
+      @disableUnavailableMenuActions(menu) unless @isCurrentUserAdmin()
+
+
+    hideMenuActionsWithUnmetDependencies: (menu) ->
+      menu.find("[data-action=#{action}]").showIf(condition) for action, condition of {
+        showAssignmentDetails: @allSubmissionsLoaded
+        messageStudentsWho:    @allSubmissionsLoaded
+        setDefaultGrade:       @allSubmissionsLoaded
+        curveGrades:           @allSubmissionsLoaded && @assignment.grading_type != 'pass_fail' && @assignment.points_possible
+        downloadSubmissions:   "#{@assignment.submission_types}".match(/(online_upload|online_text_entry|online_url)/) && @assignment.has_submitted_submissions
+        reuploadSubmissions:   @gradebook.options.gradebook_is_editable && @assignment.submissions_downloads > 0
+      }
+
+    disableUnavailableMenuActions: (menu) ->
+      return false unless menu? && @assignment?.has_due_date_in_closed_grading_period
+
+      actionsToDisable = ['curveGrades', 'setDefaultGrade']
+
+      for actionToDisable in actionsToDisable
+        menuItem = menu.find("[data-action=#{actionToDisable}]")
+        menuItem.addClass('ui-state-disabled')
+        menuItem.attr('aria-disabled', true)
+      true
+
+    isCurrentUserAdmin: () ->
+      _.contains(ENV.current_user_roles, 'admin')
 
     showAssignmentDetails: (opts={
       assignment:@assignment,
@@ -96,14 +126,32 @@ define [
       students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
       context_id:@gradebook.options.context_id
       selected_section: @gradebook.sectionToShow
+      isAdmin: @isCurrentUserAdmin()
     }) =>
+      if !opts.isAdmin && opts.assignment.has_due_date_in_closed_grading_period
+        $.flashError(
+          I18n.t(
+            "Unable to set default grade because this assignment is due in " +
+            "a closed grading period for at least one student"
+          )
+        )
+        return
       new SetDefaultGradeDialog(opts)
 
     curveGrades: (opts={
       assignment:@assignment,
       students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
       context_url:@gradebook.options.context_url
+      isAdmin: @isCurrentUserAdmin()
     }) =>
+      if !opts.isAdmin && opts.assignment.has_due_date_in_closed_grading_period
+        $.flashError(
+          I18n.t(
+            "Unable to curve grades because this assignment is due in " +
+            "a closed grading period for at least one student"
+          )
+        )
+        return
       new CurveGradesDialog(opts)
 
     downloadSubmissions: =>

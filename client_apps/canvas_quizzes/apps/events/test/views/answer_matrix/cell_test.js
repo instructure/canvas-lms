@@ -1,7 +1,6 @@
 define(function(require) {
   var Subject = require('jsx!views/answer_matrix/cell');
   var K = require('constants');
-  var $ = require('canvas_packages/jquery');
 
   describe('Views::AnswerMatrix::Cell', function() {
     this.reactSuite({

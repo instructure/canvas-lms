@@ -1,4 +1,4 @@
-class AddAssignmentDueDateOverrideNotifications < ActiveRecord::Migration
+class AddAssignmentDueDateOverrideNotifications < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up

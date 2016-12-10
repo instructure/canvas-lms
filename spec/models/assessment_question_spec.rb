@@ -217,16 +217,19 @@ describe AssessmentQuestion do
     end
 
     it 'should find and update an out of date quiz_question' do
-      qq = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
+      aq = assessment_question
+      qq = AssessmentQuestion.find_or_create_quiz_questions([aq], quiz.id, nil).first
 
-      assessment_question.name = 'changed'
-      assessment_question.with_versioning(&:save!)
+      aq = AssessmentQuestion.find(aq)
+      aq.name = 'changed'
+      aq.with_versioning(&:save!)
 
-      expect(qq.assessment_question_version).to_not eql(assessment_question.version_number)
+      expect(qq.assessment_question_version).to_not eql(aq.version_number)
 
-      qq2 = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
+      qq2 = AssessmentQuestion.find_or_create_quiz_questions([aq], quiz.id, nil).first
+      aq = AssessmentQuestion.find(aq)
       expect(qq.assessment_question_version).to_not eql(qq2.assessment_question_version)
-      expect(qq2.assessment_question_version).to eql(assessment_question.version_number)
+      expect(qq2.assessment_question_version).to eql(aq.version_number)
     end
 
     it "grabs the first match by ID order" do

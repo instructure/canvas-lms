@@ -241,7 +241,9 @@ define [
     deepEqual assignment.assignmentGroupId(), 12
     deepEqual assignment.get('assignment_group_id'), 12
 
-  module "Assignment#canDelete"
+  module "Assignment#canDelete",
+    setup: -> fakeENV.setup()
+    teardown: -> fakeENV.teardown()
 
   test "returns false if 'frozen' is true", ->
     assignment = new Assignment name: 'foo'
@@ -249,11 +251,13 @@ define [
     deepEqual assignment.canDelete(), false
 
   test "returns false if 'has_due_date_in_closed_grading_period' is true", ->
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
     assignment = new Assignment name: 'foo'
     assignment.set 'has_due_date_in_closed_grading_period', true
     deepEqual assignment.canDelete(), false
 
   test "returns true if 'frozen' and 'has_due_date_in_closed_grading_period' are false", ->
+    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
     assignment = new Assignment name: 'foo'
     assignment.set 'frozen', false
     assignment.set 'has_due_date_in_closed_grading_period', false
@@ -262,11 +266,13 @@ define [
   module "Assignment#hasDueDateInClosedGradingPeriod"
 
   test "returns the value of 'has_due_date_in_closed_grading_period'", ->
+    fakeENV.setup(MULTIPLE_GRADING_PERIODS_ENABLED: true)
     assignment = new Assignment name: 'foo'
     assignment.set 'has_due_date_in_closed_grading_period', true
     deepEqual assignment.hasDueDateInClosedGradingPeriod(), true
     assignment.set 'has_due_date_in_closed_grading_period', false
     deepEqual assignment.hasDueDateInClosedGradingPeriod(), false
+    fakeENV.teardown()
 
   module "Assignment#gradingType as a setter"
 
@@ -450,6 +456,40 @@ define [
   test "gets empty due dates when there are no dates", ->
     assignment = new Assignment
     deepEqual assignment.allDates(), []
+
+  module "Assignment#inGradingPeriod",
+    setup: ->
+      @gradingPeriod =
+        id: "1"
+        title: "Fall"
+        startDate: new Date("2013-07-01 11:13:00")
+        endDate: new Date("2013-10-01 11:13:00")
+        closeDate: new Date("2013-10-05 11:13:00")
+        isLast: true
+        isClosed: true
+
+      @dateInPeriod = new Date("2013-08-20 11:13:00")
+      @dateOutsidePeriod = new Date("2013-01-20 11:13:00")
+
+  test "returns true if the assignment has a due_at in the given period", ->
+    assignment = new Assignment
+    assignment.set 'due_at', @dateInPeriod
+    equal assignment.inGradingPeriod(@gradingPeriod), true
+
+  test "returns false if the assignment has a due_at outside the given period", ->
+    assignment = new Assignment
+    assignment.set 'due_at', @dateOutsidePeriod
+    equal assignment.inGradingPeriod(@gradingPeriod), false
+
+  test "returns true if the assignment has a date group in the given period", ->
+    dates = [new DateGroup(due_at: @dateInPeriod, title: "Everyone")]
+    assignment = new Assignment all_dates: dates
+    equal assignment.inGradingPeriod(@gradingPeriod), true
+
+  test "returns false if the assignment does not have a date group in the given period", ->
+    dates = [new DateGroup(due_at: @dateOutsidePeriod, title: "Everyone")]
+    assignment = new Assignment all_dates: dates
+    equal assignment.inGradingPeriod(@gradingPeriod), false
 
   module "Assignment#singleSectionDueDate",
     setup: -> fakeENV.setup()

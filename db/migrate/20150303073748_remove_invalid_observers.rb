@@ -1,4 +1,4 @@
-class RemoveInvalidObservers < ActiveRecord::Migration
+class RemoveInvalidObservers < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up
