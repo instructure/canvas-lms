@@ -23,7 +23,7 @@ const STUFF_TO_REV = [
 
   // Special Cases:
 
-  // These guys have links in their css to images from their own dir
+  // These files have links in their css to images from their own dir
   'public/javascripts/vendor/slickgrid/**/*',
   'public/javascripts/symlink_to_node_modules/tinymce/skins/lightgray/**/*',
 

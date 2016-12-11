@@ -22,7 +22,7 @@ define [
   'jqueryui/dialog'
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
-], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, template,
+], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, EditViewTemplate,
 userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
 AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
 ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
@@ -31,7 +31,7 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
 
   class EditView extends ValidatedFormView
 
-    template: template
+    template: EditViewTemplate
 
     dontRenableAfterSaveSuccess: true
 
@@ -292,6 +292,9 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
           @$conditionalReleaseTarget.get(0),
           I18n.t('assignment'),
           ENV.CONDITIONAL_RELEASE_ENV)
+
+      @disableFields() if @assignment.inClosedGradingPeriod()
+
       this
 
     toJSON: =>
@@ -531,3 +534,26 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
         assignmentData = @getFormData()
         @conditionalReleaseEditor.updateAssignment(assignmentData)
         @assignmentUpToDate = true
+
+    disableFields: ->
+      ignoreFields = [
+        "#overrides-wrapper *"
+        "#submission_type_fields *"
+        "#assignment_peer_reviews_fields *"
+        "#assignment_description"
+        "#assignment_notify_of_update"
+      ]
+      ignoreFilter = ignoreFields.map((field) -> "not(#{field})").join(":")
+
+      @$el.find(":radio:#{ignoreFilter}").click(@ignoreClickHandler)
+      @$el.find(":checkbox:#{ignoreFilter}").click(@ignoreClickHandler)
+      @$el.find("select:#{ignoreFilter}").each(@lockSelectValueHandler)
+
+    ignoreClickHandler: (event) ->
+      event.preventDefault()
+
+    lockSelectValueHandler: ->
+      lockedValue = this.value
+      $(this).change (event) ->
+        this.value = lockedValue
+        event.stopPropagation()

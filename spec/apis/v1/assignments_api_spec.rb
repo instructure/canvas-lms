@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require_relative '../api_spec_helper'
+require_relative '../locked_spec'
+require_relative '../../sharding_spec_helper'
 
 describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
   include Api
@@ -94,10 +94,10 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       )
     end
 
-    it "includes has_due_date_in_closed_grading_period in returned json" do
+    it "includes in_closed_grading_period in returned json" do
       @course.assignments.create!(title: "Example Assignment")
       json = api_get_assignments_index_from_course(@course)
-      expect(json.first).to have_key('has_due_date_in_closed_grading_period')
+      expect(json.first).to have_key('in_closed_grading_period')
     end
 
     it "sorts the returned list of assignments" do
@@ -517,15 +517,14 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         expect(@json['published']).to be_falsey
       end
 
-      it "includes has_due_date_in_closed_grading_period in returned json" do
+      it "includes in_closed_grading_period in returned json" do
         @course.assignments.create!(title: "Example Assignment")
         json = api_get_assignment_in_course(@assignment, @course)
-        expect(json).to have_key('has_due_date_in_closed_grading_period')
+        expect(json).to have_key('in_closed_grading_period')
       end
     end
 
     describe "differentiated assignments" do
-
       def setup_DA
         @course_section = @course.course_sections.create
         @student1, @student2, @student3 = create_users(3, return_type: :record)
@@ -920,8 +919,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         'group_category_id' => group_category.id,
         'turnitin_enabled' => true,
         'vericite_enabled' => true,
-        'grading_type' => 'points',
-        'muted' => 'true'
+        'grading_type' => 'points'
       }
     end
 
@@ -929,7 +927,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       course_with_teacher(:active_all => true)
     end
 
-    it 'should respect post_to_sis default' do
+    it 'serializes post_to_sis when true' do
       a = @course.account
       a.settings[:sis_default_grade_export] = {locked: false, value: true}
       a.save!
@@ -937,8 +935,14 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       group_category = @course.group_categories.create!(name: "foo")
       json = api_create_assignment_in_course(@course, create_assignment_json(group, group_category))
       expect(json['post_to_sis']).to eq true
+    end
+
+    it "serializes post_to_sis when false" do
+      a = @course.account
       a.settings[:sis_default_grade_export] = {locked: false, value: false}
       a.save!
+      group = @course.assignment_groups.create!({name: "first group"})
+      group_category = @course.group_categories.create!(name: "foo")
       json = api_create_assignment_in_course(@course, create_assignment_json(group, group_category))
       expect(json['post_to_sis']).to eq false
     end
@@ -998,7 +1002,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       @course.any_instantiation.expects(:vericite_enabled?).
         at_least_once.returns true
       @json = api_create_assignment_in_course(@course,
-        create_assignment_json(@group, @group_category)
+        create_assignment_json(@group, @group_category).merge({'muted' => 'true'})
        )
       @group_category.reload
       @assignment = Assignment.find @json['id']
@@ -1604,7 +1608,11 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
             format: "json",
             course_id: @course.id.to_s
           },
-          { assignment: create_assignment_json(@group, @group_category).merge(params) },
+          {
+            assignment: create_assignment_json(@group, @group_category)
+             .merge(params)
+             .except("muted")
+          },
           {},
           { expected_status: expected_status }
         )
@@ -2571,16 +2579,16 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "succeeds when the assignment due date is set to the same value" do
-          due_date = 3.days.ago.iso8601
-          @assignment = create_assignment(due_at: due_date)
-          call_update({ due_at: due_date }, 201)
-          expect(@assignment.reload.due_at).to eq due_date
+          due_date = 3.days.ago
+          @assignment = create_assignment(due_at: due_date.iso8601, time_zone_edited: due_date.zone)
+          call_update({ due_at: due_date.iso8601 }, 201)
+          expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
         it "succeeds when the assignment due date is not changed" do
           due_date = 3.days.ago.iso8601
           @assignment = create_assignment(due_at: due_date)
-          call_update({ name: "Updated Assignment" }, 201)
+          call_update({ description: "Updated Description" }, 201)
           expect(@assignment.reload.due_at).to eq due_date
         end
 
@@ -2598,11 +2606,11 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "allows changing the due date on an assignment with an override due in a closed grading period" do
-          due_date = 7.days.from_now.iso8601
-          @assignment = create_assignment(due_at: 3.days.from_now)
+          due_date = 7.days.from_now
+          @assignment = create_assignment(due_at: 3.days.from_now.iso8601, time_zone_edited: due_date.zone)
           override_for_date(3.days.ago)
-          call_update({ due_at: due_date }, 201)
-          expect(@assignment.reload.due_at).to eq due_date
+          call_update({ due_at: due_date.iso8601 }, 201)
+          expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
         it "allows adding an override with a due date in an open grading period" do
@@ -2695,10 +2703,10 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "allows changing the due date on an assignment due in a closed grading period" do
-          due_date = 3.days.from_now.iso8601
-          @assignment = create_assignment(due_at: 3.days.ago)
-          call_update({ due_at: due_date }, 201)
-          expect(@assignment.reload.due_at).to eq due_date
+          due_date = 3.days.from_now
+          @assignment = create_assignment(due_at: 3.days.ago.iso8601, time_zone_edited: due_date.zone)
+          call_update({ due_at: due_date.iso8601 }, 201)
+          expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
         it "allows changing the due date to a date within a closed grading period" do
@@ -2715,11 +2723,11 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "allows changing the due date on an assignment with an override due in a closed grading period" do
-          due_date = 3.days.from_now.iso8601
-          @assignment = create_assignment(due_at: 7.days.from_now)
+          due_date = 3.days.from_now
+          @assignment = create_assignment(due_at: 7.days.from_now.iso8601, time_zone_edited: due_date.zone)
           override_for_date(3.days.ago)
-          call_update({ due_at: due_date }, 201)
-          expect(@assignment.reload.due_at).to eq due_date
+          call_update({ due_at: due_date.iso8601 }, 201)
+          expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
         it "allows adding an override with a due date in a closed grading period" do

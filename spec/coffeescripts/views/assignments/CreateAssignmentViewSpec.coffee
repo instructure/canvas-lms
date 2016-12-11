@@ -239,12 +239,10 @@ define [
     @stub(view, 'currentUserIsAdmin', -> true)
     equal view.disableDueAt(), false
 
-  test "disableDueAt returns true if the user is not an admin and the assignment has " +
-  "a due date in a closed grading period", ->
-    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
+  test "disableDueAt returns true if the user is not an admin and the assignment has a due date in a closed grading period", ->
     view = createView(@assignment1)
     @stub(view, 'currentUserIsAdmin', -> false)
-    @stub(view.model, 'hasDueDateInClosedGradingPeriod', -> true)
+    @stub(view.model, 'inClosedGradingPeriod', -> true)
     equal view.disableDueAt(), true
 
   test "openAgain doesn't add datetime for multiple dates", ->
@@ -308,7 +306,6 @@ define [
     equal errors["due_at"][0]["message"], "Due date cannot fall in a closed grading period"
 
   test "does not require due_at to be in an open grading period if it is being changed and the user is an admin", ->
-    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
     ENV.active_grading_periods = [{
       id: "1"
       start_date: "2103-07-01T06:00:00Z"

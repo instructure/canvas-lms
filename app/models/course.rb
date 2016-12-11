@@ -3112,16 +3112,13 @@ class Course < ActiveRecord::Base
     @nickname = nickname_for(user, nil)
   end
 
-  # delegate but with #assignment_in_closed_grading_period?
-  delegate :in_closed_grading_period?, to: :effective_due_dates, prefix: 'assignment'
-
   def any_assignment_in_closed_grading_period?
-    # delegate but with a slightly different name
     effective_due_dates.any_in_closed_grading_period?
   end
+
+  private
 
   def effective_due_dates
     @effective_due_dates ||= EffectiveDueDates.for_course(self)
   end
-  private :effective_due_dates
 end

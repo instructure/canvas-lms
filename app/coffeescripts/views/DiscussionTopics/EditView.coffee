@@ -110,6 +110,7 @@ ConditionalRelease, deparam) ->
         canModerate: @permissions.CAN_MODERATE
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
+        inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
       json.assignment = json.assignment.toView()
       json
 
@@ -189,6 +190,7 @@ ConditionalRelease, deparam) ->
         sectionLabel: @messages.group_category_section_label
         fieldLabel: @messages.group_category_field_label
         lockedMessage: @messages.group_locked_message
+        inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
 
       @groupCategorySelector.render()
 

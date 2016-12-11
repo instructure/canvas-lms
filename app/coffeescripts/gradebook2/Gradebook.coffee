@@ -1644,7 +1644,7 @@ define [
       selectedPeriodId = @getGradingPeriodToShow()
       @isAllGradingPeriods(selectedPeriodId)
 
-    fieldsToExcludeFromAssignments: ['description', 'needs_grading_count', 'has_due_date_in_closed_grading_period']
+    fieldsToExcludeFromAssignments: ['description', 'needs_grading_count', 'in_closed_grading_period']
 
     studentsUrl: ->
       switch
