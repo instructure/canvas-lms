@@ -428,13 +428,13 @@ describe AssignmentGroup do
     end
   end
 
-  describe '#has_assignment_due_in_closed_grading_period?' do
+  describe '#any_assignment_in_closed_grading_period?' do
     it 'calls EffectiveDueDates#in_closed_grading_period?' do
       assignment_group_model
       edd = EffectiveDueDates.for_course(@ag.context, @ag.published_assignments)
       EffectiveDueDates.expects(:for_course).with(@ag.context, @ag.published_assignments).returns(edd)
       edd.expects(:any_in_closed_grading_period?).returns(true)
-      expect(@ag.has_assignment_due_in_closed_grading_period?).to eq(true)
+      expect(@ag.any_assignment_in_closed_grading_period?).to eq(true)
     end
   end
 end

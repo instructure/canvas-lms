@@ -76,6 +76,15 @@ class Assignment < ActiveRecord::Base
   validate :moderation_setting_ok?
   validates :lti_context_id, presence: true, uniqueness: true
 
+  after_save :clear_effective_due_dates_memo
+
+  def clear_effective_due_dates_memo
+    return if @effective_due_dates.nil?
+    if due_at_changed? || active_assignment_overrides.any?(&:due_at_changed?)
+      @effective_due_dates = nil
+    end
+  end
+
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url, content_tyupe, content_id, and new_tab params, the other accessible
     # params don't apply to an content tag being used as an external_tool_tag
@@ -2137,8 +2146,13 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def graded?
+  def gradeable?
     submission_types != 'not_graded' && submission_types != 'wiki_page'
+  end
+  alias graded? gradeable?
+
+  def gradeable_was?
+    submission_types_was != 'not_graded' && submission_types_was != 'wiki_page'
   end
 
   def active?

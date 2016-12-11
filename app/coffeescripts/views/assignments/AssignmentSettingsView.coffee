@@ -35,7 +35,8 @@ define [
       @addAssignmentGroups()
 
     canChangeWeights: ->
-      @userIsAdmin or !_.any(@assignmentGroups.models, (ag) -> ag.hasAssignmentDueInClosedGradingPeriod())
+      @userIsAdmin or !_.any @assignmentGroups.models, (ag) ->
+        ag.anyAssignmentInClosedGradingPeriod()
 
     submit: (event) ->
       if @canChangeWeights()

@@ -73,3 +73,4 @@ define [
       frozenAttributes: @parentModel.frozenAttributes()
       nested: @nested
       preventNotGraded: @preventNotGraded
+      inClosedGradingPeriod: @parentModel.inClosedGradingPeriod

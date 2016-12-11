@@ -50,7 +50,7 @@ module Api::V1::AssignmentGroup
         Assignment.preload_context_module_tags(assignments) # running this again is fine
       end
 
-      unless opts[:exclude_response_fields].include?('has_due_date_in_closed_grading_period')
+      unless opts[:exclude_response_fields].include?('in_closed_grading_period')
         closed_grading_period_hash = opts[:closed_grading_period_hash] ||
           EffectiveDueDates.for_course(group.context, assignments).to_hash([:in_closed_grading_period])
       end
@@ -58,7 +58,7 @@ module Api::V1::AssignmentGroup
       hash['assignments'] = assignments.map { |a|
         overrides = opts[:overrides].select{|override| override.assignment_id == a.id } unless opts[:overrides].nil?
         a.context = group.context
-        exclude_fields = opts[:exclude_response_fields] | ['has_due_date_in_closed_grading_period'] #array union
+        exclude_fields = opts[:exclude_response_fields] | ['in_closed_grading_period'] #array union
         assignment = assignment_json(a, user, session,
           include_discussion_topic: includes.include?('discussion_topic'),
           include_all_dates: includes.include?('all_dates'),
@@ -74,9 +74,9 @@ module Api::V1::AssignmentGroup
           submission: includes.include?('submission') ? opts[:submissions][a.id] : nil
         )
 
-        unless opts[:exclude_response_fields].include?('has_due_date_in_closed_grading_period')
+        unless opts[:exclude_response_fields].include?('in_closed_grading_period')
           assignment_closed_grading_period_hash = closed_grading_period_hash[assignment[:id]] || {}
-          assignment['has_due_date_in_closed_grading_period'] =
+          assignment['in_closed_grading_period'] =
             assignment_closed_grading_period_hash.any? do |_, student_grading_period_status|
               student_grading_period_status[:in_closed_grading_period]
             end
@@ -84,9 +84,9 @@ module Api::V1::AssignmentGroup
         assignment
       }
 
-      unless opts[:exclude_response_fields].include?('has_due_date_in_closed_grading_period')
-        hash['has_assignment_due_in_closed_grading_period'] =
-          hash["assignments"].any?{ |assn| assn["has_due_date_in_closed_grading_period"] }
+      unless opts[:exclude_response_fields].include?('in_closed_grading_period')
+        hash['any_assignment_in_closed_grading_period'] =
+          hash["assignments"].any?{ |assn| assn["in_closed_grading_period"] }
       end
     end
 

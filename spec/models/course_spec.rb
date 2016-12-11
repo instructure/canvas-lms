@@ -4697,16 +4697,6 @@ describe Course, "#filter_users_by_permission" do
   end
 end
 
-describe Course, '#assignment_in_closed_grading_period?' do
-  it 'delegates to EffectiveDueDates#in_closed_grading_period?' do
-    test_course = Course.create!
-    edd = EffectiveDueDates.for_course(test_course)
-    EffectiveDueDates.expects(:for_course).with(test_course).returns(edd)
-    edd.expects(:in_closed_grading_period?).with(7).returns(true)
-    expect(test_course.assignment_in_closed_grading_period?(7)).to eq(true)
-  end
-end
-
 describe Course, '#any_assignment_in_closed_grading_period?' do
   it 'delegates to EffectiveDueDates#any_in_closed_grading_period?' do
     test_course = Course.create!

@@ -333,7 +333,7 @@ define [
     assignment_groups: []
 
     fetchAssignmentGroups: (->
-      params = { exclude_response_fields: ['has_due_date_in_closed_grading_period'] }
+      params = { exclude_response_fields: ['in_closed_grading_period'] }
       gpId = @get('selectedGradingPeriod.id')
       if @get('mgpEnabled') && gpId != '0'
         params.grading_period_id = gpId

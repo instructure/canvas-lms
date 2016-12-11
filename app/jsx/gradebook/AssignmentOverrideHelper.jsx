@@ -64,7 +64,7 @@ define([
 
     _.each(students, function(student) {
       if (dates[student.id] === undefined && !assignment.only_visible_to_overrides) {
-        dates[student.id] = assignment.due_at;
+        dates[student.id] = tz.parse(assignment.due_at);
       }
     });
 

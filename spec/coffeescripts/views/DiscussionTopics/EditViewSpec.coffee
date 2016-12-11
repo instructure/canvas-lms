@@ -59,7 +59,7 @@ GroupCategorySelector, fakeENV, RichContentEditor) ->
     EditView.prototype.loadNewEditor.call()
     ok lne.firstCall.args[1].manageParent, 'manageParent flag should be set'
 
-  test 'does error message show on assignment point change with submissions', ->
+  test 'shows error message on assignment point change with submissions', ->
     view = @editView
       withAssignment: true,
       assignmentOpts: { has_submitted_submissions: true }

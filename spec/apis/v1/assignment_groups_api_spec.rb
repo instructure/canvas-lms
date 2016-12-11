@@ -162,7 +162,7 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group2',
         'position' => 7,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(@a3,@user,session),
           controller.assignment_json(@a4,@user,session, include_discussion_topic: true)
@@ -174,7 +174,7 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(@a1,@user,session),
           controller.assignment_json(@a2,@user,session)
@@ -385,7 +385,7 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(a1, @user,session),
           controller.assignment_json(a2, @user,session)
@@ -426,7 +426,7 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(a1, @user,session, include_all_dates: true),
           controller.assignment_json(a2, @user,session, include_all_dates: true)

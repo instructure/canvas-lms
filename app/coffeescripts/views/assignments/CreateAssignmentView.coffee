@@ -88,14 +88,13 @@ define [
         canChooseType: @assignmentGroup?
         uniqLabel: uniqLabel
         disableDueAt: @disableDueAt()
-        isInClosedPeriod: @model.hasDueDateInClosedGradingPeriod()
+        isInClosedPeriod: @model.inClosedGradingPeriod()
 
     currentUserIsAdmin: ->
       _.contains(ENV.current_user_roles, "admin")
 
     disableDueAt: ->
-      _.contains(@model.frozenAttributes(), "due_at") ||
-        (!@currentUserIsAdmin() && @model.hasDueDateInClosedGradingPeriod())
+      _.contains(@model.frozenAttributes(), "due_at") || @model.inClosedGradingPeriod()
 
     openAgain: ->
       super

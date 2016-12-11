@@ -1,9 +1,15 @@
 <div id="edit_assignment_wrapper">
   {{#if frozen}}
     <div class="alert alert-info">
-      <i class="icon-warning"></i> {{#t "warnings.assignment_is_frozen"}}Some settings have been administratively locked.{{/t}}
+      <i class="icon-warning"></i> {{#t}}Some settings have been administratively locked.{{/t}}
     </div>
   {{/if}}
+  {{#if inClosedGradingPeriod}}
+    <div class="alert alert-info">
+      <i class="icon-warning"></i> {{#t}}Some settings have been disabled because the assignment is in a closed grading period.{{/t}}
+    </div>
+  {{/if}}
+
 
   <div class="control-group">
     <div>
@@ -57,6 +63,9 @@
         name="points_possible"
         value="{{pointsPossible}}"
         type="text"
+        {{#if inClosedGradingPeriod}}
+          readonly
+        {{/if}}
         {{disabledIfIncludes frozenAttributes "points_possible"}}/>
         <div aria-live="polite" role="alert">
           <div id=point_change_warning class="alert">
@@ -81,10 +90,19 @@
     <div class="form-column-left"></div>
     <div id="omit-from-final-grade" class="form-column-right" style="margin-top: 14px;">
       <label class="checkbox">
-        {{checkbox "omitFromFinalGrade"
-          id="assignment_omit_from_final_grade"
-          name="omit_from_final_grade"
-        }}
+        {{#if inClosedGradingPeriod}}
+          {{checkbox "omitFromFinalGrade"
+            id="assignment_omit_from_final_grade"
+            name="omit_from_final_grade"
+            readonly="readonly"
+            aria-readonly="true"
+          }}
+        {{else}}
+          {{checkbox "omitFromFinalGrade"
+            id="assignment_omit_from_final_grade"
+            name="omit_from_final_grade"
+          }}
+        {{/if}}
         {{#t}}Do not count this assignment towards the final grade{{/t}}
       </label>
     </div>

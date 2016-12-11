@@ -3,7 +3,7 @@
 You can use Docker in your development environment for a more seamless
 way to get started developing Canvas.
 
-*Note for previous docker for canvas development users**
+**Note for previous docker for canvas development users**
 If you have a `docker-compose.override.yml`, you'll need to update it to version 2 or delete it.
 
 ## Recommendations
