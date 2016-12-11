@@ -10,8 +10,8 @@ module Canvas
         require 'aws-sdk-v1'
         @folder = folder
         @config = Canvas::Cdn.config
-        @s3 = AWS::S3.new(access_key_id: config.aws_access_key_id,
-                          secret_access_key: config.aws_secret_access_key)
+        @s3 = ::AWS::S3.new(access_key_id: config.aws_access_key_id,
+                            secret_access_key: config.aws_secret_access_key)
         @bucket = @s3.buckets[config.bucket]
         @mutex = Mutex.new
       end
