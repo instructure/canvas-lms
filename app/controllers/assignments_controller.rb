@@ -164,6 +164,8 @@ class AssignmentsController < ApplicationController
       js_env({
         :ASSIGNMENT_TITLE => @assignment.title,
         :GRADES_PUBLISHED => @assignment.grades_published?,
+        :COURSE_ID => @context.id,
+        :STUDENT_CONTEXT_CARDS_ENABLED => @domain_root_account.feature_enabled?(:student_context_cards),
         :URLS => {
           :student_submissions_url => polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
           :publish_grades_url => api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id}),
