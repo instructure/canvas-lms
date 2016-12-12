@@ -1,28 +1,16 @@
-// TODO: right now, whenever someone require's 'moment', we have
-// an alias set up in both our baseWebpackConfig.js and our require_js.rb config
-// so it actually requires this file. once we are all-webpack, we should not load
-// all of the locales and just load the one they need with something like this:
+// Custom moment.js locale for maori
+// see baseWebpackConfig.js and moment_requireJS.js for how this is pulled in
 
-// // in baseWebpackConfig
-// new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+(function (global, factory) {
+   typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('moment')) :
 
-// // in entry
-// const moment = require('moment')
-// const loadMomentLocale = ENV.MOMENT_LOCALE && new Promise(resolve => {
-//   if (ENV.MOMENT_LOCALE == 'mi-nz') {
-//     require(['custom_moment_locales/mi_nz'], () => resolve())
-//   }
-//   require('bundle!moment/locale/' + ENV.MOMENT_LOCALE + '.js')(() => {
-//     moment().locale(ENV.MOMENT_LOCALE)
-//     resolve()
-//   })
-// })
-// loadMomentLocale.then(function(){
-//   // run any code that uses moment
-// }
+   // We use this symlink sillyness instead of just define(['moment']...) to work around a circular dependency
+   // issue with moment_requireJS.js. Can delete this line when we are all-webpack
+   typeof define === 'function' && define.amd ? define(['symlink_to_node_modules/moment/min/moment-with-locales'], factory) :
 
-define(['node_modules-version-of-moment'], function(moment) {
-  // Include locale that is not a part of momentjs proper.
+   factory(global.moment)
+}(this, function (moment) { 'use strict';
+
   var mi_nz = moment.defineLocale('mi-nz', {
     months: 'Kohi-tāte_Hui-tanguru_Poutū-te-rangi_Paenga-whāwhā_Haratua_Pipiri_Hōngoingoi_Here-turi-kōkā_Mahuru_Whiringa-ā-nuku_Whiringa-ā-rangi_Hakihea'.split('_'),
     monthsShort: 'Kohi_Hui_Pou_Pae_Hara_Pipi_Hōngoi_Here_Mahu_Whi-nu_Whi-ra_Haki'.split('_'),
@@ -64,5 +52,6 @@ define(['node_modules-version-of-moment'], function(moment) {
     ordinal: '%dº'
   });
 
-  return moment;
-});
+  return mi_nz;
+
+}));

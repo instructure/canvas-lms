@@ -15,6 +15,7 @@ define [
   'compiled/gradezilla/TotalColumnHeaderView'
   'compiled/util/round'
   'compiled/views/InputFilterView'
+  'i18nObj'
   'i18n!gradezilla'
   'compiled/gradezilla/GradebookTranslations'
   'jsx/gradezilla/CourseGradeCalculator'
@@ -57,7 +58,7 @@ define [
   'jsx/context_cards/StudentContextCardTrigger'
 ], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor,
   KeyboardNavDialog, KeyboardNavTemplate, Slick, GradingPeriodsAPI,
-  TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS,
+  TotalColumnHeaderView, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
   CourseGradeCalculator, GradingSchemeHelper, UserSettings, Spinner,
   SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
   GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
@@ -1484,7 +1485,7 @@ define [
 
     localeSort: (a, b) ->
       (a || "").localeCompare b || "",
-        window.I18n.locale,
+        i18nObj.locale,
         sensitivity: 'accent', numeric: true
 
     gradeSort: (a, b, field, asc) =>

@@ -694,6 +694,7 @@ describe ApplicationHelper do
       helper.stubs(:js_bundles).returns([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
     end
     it "creates the correct javascript tags" do
+      helper.stubs(:use_webpack?).returns(false)
       base_url = helper.use_optimized_js? ? '/optimized' : '/javascripts'
       expect(helper.include_js_bundles).to eq %{
 <script src="#{base_url}/compiled/bundles/some_bundle.js"></script>
@@ -704,13 +705,35 @@ describe ApplicationHelper do
 
     it "creates the correct javascript tags with webpack enabled" do
       helper.stubs(:use_webpack?).returns(true)
-      base_url = helper.use_optimized_js? ? "/webpack-dist-optimized" : "/webpack-dist"
+      helper.stubs(:js_env).returns({
+        BIGEASY_LOCALE: 'nb_NO',
+        MOMENT_LOCALE: 'nb',
+        TIMEZONE: 'America/La_Paz',
+        CONTEXT_TIMEZONE: 'America/Denver'
+      })
+      base_url = helper.use_optimized_js? ? 'dist/webpack-production' : 'dist/webpack-dev'
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/vendor.js').returns('vendor_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/vendor/timezone/America/La_Paz.js').returns('La_Paz_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/vendor/timezone/America/Denver.js').returns('Denver_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/vendor/timezone/nb_NO.js').returns('nb_NO_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/moment/locale/nb.js').returns('nb_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/appBootstrap.js').returns('app_bootstrap_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/common.js').returns('common_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/some_bundle.js').returns('some_bundle_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/some_plugin-some_plugin_bundle.js').returns('plugin_url')
+      Canvas::Cdn::RevManifest.stubs(:webpack_url_for).with(base_url + '/another_bundle.js').returns('another_bundle_url')
+
       expect(helper.include_js_bundles).to eq %{
-<script src="#{base_url}/vendor.bundle.js"></script>
-<script src="#{base_url}/instructure-common.bundle.js"></script>
-<script src="#{base_url}/some_bundle.bundle.js"></script>
-<script src="#{base_url}/some_plugin-some_plugin_bundle.bundle.js"></script>
-<script src="#{base_url}/another_bundle.bundle.js"></script>
+<script src="/vendor_url"></script>
+<script src="/La_Paz_url"></script>
+<script src="/Denver_url"></script>
+<script src="/nb_NO_url"></script>
+<script src="/nb_url"></script>
+<script src="/app_bootstrap_url"></script>
+<script src="/common_url"></script>
+<script src="/some_bundle_url"></script>
+<script src="/plugin_url"></script>
+<script src="/another_bundle_url"></script>
       }.strip
     end
   end
