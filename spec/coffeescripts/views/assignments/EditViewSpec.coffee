@@ -314,12 +314,9 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
-      @oldAddGroupCategory = window.addGroupCategory
-      window.addGroupCategory = @stub()
 
     teardown: ->
       fakeENV.teardown()
-      window.addGroupCategory = @oldAddGroupCategory
       document.getElementById("fixtures").innerHTML = ""
 
     editView: ->

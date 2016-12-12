@@ -463,6 +463,7 @@ class AssignmentsController < ApplicationController
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
       end
       append_sis_data(hash)
+      hash[:allow_self_signup] = true if context.is_a?(Course) # for group creation
       js_env(hash)
       conditional_release_js_env(@assignment)
       render :edit

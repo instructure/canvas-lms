@@ -79,7 +79,7 @@ module AssignmentsCommon
   end
 
   def submit_assignment_form
-    expect_new_page_load { f('.btn-primary[type=submit]').click }
+    expect_new_page_load { f('#edit_assignment_form .btn-primary[type=submit]').click }
     wait_for_ajaximations
   end
 

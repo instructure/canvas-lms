@@ -176,7 +176,7 @@ module FilesCommon
       ff(".name.text")[3].click
       ff(".btn-primary")[3].click
     elsif insert_into == :discussion
-      ff(".btn-primary")[2].click
+      f("#edit_discussion_form_buttons .btn-primary").click
     else
       f(".btn-primary").click
     end

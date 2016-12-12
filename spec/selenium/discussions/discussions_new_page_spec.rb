@@ -97,7 +97,7 @@ describe "discussions" do
           f('input[type=checkbox][name="assignment[set_assignment]"]').click
           f('#has_group_category').click
           close_visible_dialog
-          f('.btn-primary[type=submit]').click
+          f('#edit_discussion_form_buttons .btn-primary[type=submit]').click
           wait_for_ajaximations
           keep_trying_until do
             expect(driver.execute_script(

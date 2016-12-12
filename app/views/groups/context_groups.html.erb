@@ -6,7 +6,6 @@
   <% js_bundle :react_groups %>
 <% else %>
 
-<% js_bundle :groups %>
 <div id="group_categories_tabs" class="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all">
   <ul class='collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all'>
   <li class="ui-state-default ui-corner-top"><a href="<%= context_url(@context, :context_users_url) %>"><%=t('student_groups_tabs_everyone',"Everyone") %></a></li>
