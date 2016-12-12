@@ -392,7 +392,8 @@ END
       state: 'hidden',
       beta: true,
       development: true,
-      root_opt_in: true
+      root_opt_in: true,
+      touch_context: true
     },
     'rich_content_service' =>
     {
@@ -455,7 +456,8 @@ END
       applies_to: 'Course',
       state: 'hidden',
       development: false,
-      root_opt_in: true
+      root_opt_in: true,
+      touch_context: true
     },
     'new_annotations' =>
     {
