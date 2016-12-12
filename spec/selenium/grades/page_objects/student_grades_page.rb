@@ -33,4 +33,8 @@ class StudentGradesPage
   def assignment_titles
     ff(assignment_titles_css).map(&:text)
   end
+
+  def assignment_row(assignment)
+    f("#submission_#{assignment.id}")
+  end
 end

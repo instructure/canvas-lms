@@ -1,9 +1,13 @@
 require_relative '../../helpers/gradebook2_common'
 require_relative './gradebook_student_common'
+require_relative '../setup/gradebook_setup'
+require_relative '../page_objects/student_grades_page'
+
 
 describe 'Student Gradebook' do
   include_context "in-process server selenium tests"
   include Gradebook2Common
+  include GradebookSetup
 
   let(:assignments) do
     assignments = []
@@ -16,6 +20,8 @@ describe 'Student Gradebook' do
     end
     assignments
   end
+
+  let(:student_grades_page) { StudentGradesPage.new }
 
   grades = [
     5, 10, 15,
@@ -136,6 +142,27 @@ describe 'Student Gradebook' do
 
     f('#only_consider_graded_assignments_wrapper').click
     expect(f('.final_grade .grade').text).to eq '66.67%'
+  end
+
+  it 'follows grade dropping rules', test_id: 164009, priority: '1' do
+    add_teacher_and_student
+    @group = @course.assignment_groups.create!(name: 'Group1', rules: 'drop_lowest:1')
+
+    a1 = @course.assignments.create!(points_possible: 20, title: "Assignment 1", assignment_group: @group)
+    a2 = @course.assignments.create!(points_possible: 20, title: "Assignment 2", assignment_group: @group)
+    a3 = @course.assignments.create!(points_possible: 40, title: "Assignment 3", assignment_group: @group)
+
+    a1.grade_student(@student, grade: 15, grader: @teacher)
+    a2.grade_student(@student, grade: 10, grader: @teacher)
+    a3.grade_student(@student, grade: 19, grader: @teacher)
+
+    user_session(@teacher)
+    student_grades_page.visit_as_teacher(@course, @student)
+    expect(student_grades_page.assignment_row(a3)).to have_class 'dropped'
+
+    user_session(@student)
+    student_grades_page.visit_as_student(@course)
+    expect(student_grades_page.assignment_row(a3)).to have_class 'dropped'
   end
 
   context 'Comments' do
