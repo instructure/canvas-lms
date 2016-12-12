@@ -537,7 +537,9 @@ class Submission < ActiveRecord::Base
         status: originality_report.workflow_state
       }
     end
-    turnitin_data.merge(data)
+    ret_val = turnitin_data.merge(data)
+    ret_val.delete(:provider)
+    ret_val
   end
 
   def turnitin_assets

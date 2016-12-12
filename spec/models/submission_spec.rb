@@ -854,6 +854,20 @@ describe Submission do
         expect(submission.originality_data[attachment.asset_string][:similarity_score]).to eq(2.95)
       end
 
+      it "filters out :provider key and value" do
+         originality_report.originality_report_url = 'http://example.com'
+        originality_report.save!
+        tii_data = {
+          provider: 'vericite',
+          similarity_score: 10,
+          state: 'acceptable',
+          report_url: 'http://example.com/tii',
+          status: 'pending'
+        }
+        submission.turnitin_data[attachment.asset_string] = tii_data
+        expect(submission.originality_data).not_to include :vericite
+      end
+
     end
 
     describe '#originality_report_url' do

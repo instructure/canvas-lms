@@ -31,9 +31,11 @@ define [
     extractDataForTurnitin: (submission, key, urlPrefix) ->
       data = submission?.turnitin_data
       type = "turnitin"
-      if !data? || data.provider == 'vericite'
+      if !data? || (submission?.vericite_data && submission?.vericite_data.provider == 'vericite')
         data = submission?.vericite_data
         type = "vericite"
+      if submission?.has_originality_report
+        type = "originality_report"
       return {} unless data and data[key] and data[key].similarity_score?
       data = data[key]
       data.state = "#{data.state || 'no'}_score"

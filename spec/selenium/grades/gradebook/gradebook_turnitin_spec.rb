@@ -8,6 +8,7 @@ describe "gradebook2 - turnitin" do
   before(:each) { user_session(@teacher) }
 
   it "should show turnitin data" do
+    @first_assignment.update_attribute(:turnitin_enabled, true)
     s1 = @first_assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'asdf')
     s1.update_attribute :turnitin_data, {
       "submission_#{s1.id}" => {

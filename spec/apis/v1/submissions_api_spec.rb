@@ -1196,11 +1196,45 @@ describe 'Submissions API', type: :request do
     expect(json.first['integration_id']).to eq 'xyz'
   end
 
-  it "returns turnitin data if present" do
+  it "returns vericite data if present and vericite is enabled for the assignment" do
     student = user(:active_all => true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, vericite_enabled: true)
+    a1.turnitin_settings = {:originality_report_visibility => 'after_grading'}
+    a1.save!
+    submission = submit_homework(a1, student)
+    sample_vericite_data = {
+      :last_processed_attempt=>1,
+      "attachment_504177"=> {
+        :web_overlap=>73,
+        :publication_overlap=>0,
+        :error=>true,
+        :student_overlap=>100,
+        :state=>"failure",
+        :similarity_score=>100,
+        :object_id=>"123345"
+      },
+      provider: 'vericite'
+    }
+    submission.turnitin_data = sample_vericite_data
+    submission.save!
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
+    expect(json).to have_key 'vericite_data'
+    sample_vericite_data.delete :last_processed_attempt
+    expect(json['vericite_data']).to eq sample_vericite_data.with_indifferent_access
+  end
+
+  it "returns turnitin data if present and turnitin is enabled for the assignment" do
+    student = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, turnitin_enabled: true)
     a1.turnitin_settings = {:originality_report_visibility => 'after_grading'}
     a1.save!
     submission = submit_homework(a1, student)
@@ -1346,6 +1380,56 @@ describe 'Submissions API', type: :request do
             { student_ids: [@student1.to_param],
               order: "graded_at", order_direction: "descending" })
       expect(json.map { |a| a["assignment_id"] }).to eq [@a2.id, @a1.id, @a3.id]
+    end
+
+    context 'OriginalityReport' do
+      it 'includes has_originality_report if the submission has an originality_report' do
+        attachment_model
+        course active_all: true
+        student_in_course active_all: true
+        teacher_in_course active_all: true
+        @assignment = @course.assignments.create!(title: "some assignment",
+                                                assignment_group: @group,
+                                                points_possible: 12,
+                                                tool_settings_tool: @tool)
+        @attachment.context = @student
+        @attachment.save!
+        submission = @assignment.submit_homework(@student, attachments: [@attachment])
+        OriginalityReport.create!(attachment: @attachment,
+                                  submission: submission,
+                                  workflow_state: 'pending',
+                                  originality_score: 0.1)
+
+        user_session(@teacher)
+        json = api_call(:get,
+                "/api/v1/courses/#{@course.id}/students/submissions.json",
+                { :controller => 'submissions_api', :action => 'for_students',
+                  :format => 'json', :course_id => @course.to_param },
+                { :student_ids => [@student.to_param] })
+        expect(json.first).to have_key 'has_originality_report'
+      end
+
+      it 'does not include has_originality_report if the submission has no originality_report' do
+        attachment_model
+        course active_all: true
+        student_in_course active_all: true
+        teacher_in_course active_all: true
+        @assignment = @course.assignments.create!(title: "some assignment",
+                                                assignment_group: @group,
+                                                points_possible: 12,
+                                                tool_settings_tool: @tool)
+        @attachment.context = @student
+        @attachment.save!
+        @assignment.submit_homework(@student, attachments: [@attachment])
+
+        user_session(@teacher)
+        json = api_call(:get,
+                "/api/v1/courses/#{@course.id}/students/submissions.json",
+                { :controller => 'submissions_api', :action => 'for_students',
+                  :format => 'json', :course_id => @course.to_param },
+                { :student_ids => [@student.to_param] })
+        expect(json.first).not_to have_key 'has_originality_report'
+      end
     end
   end
 
