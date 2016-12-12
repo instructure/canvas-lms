@@ -10,7 +10,7 @@
 
 <%= asset.title.titleize %>
 
-<%= CanvasTextHelper.truncate_text(html_to_text(asset.body, :base_url => dashboard_url), :max_length => 200) %>
+<%= html_to_text(asset.body, :base_url => dashboard_url) %>
 
 
 <%= t :link_message, "You can review it here: %{link}", :link => content(:link) %>
