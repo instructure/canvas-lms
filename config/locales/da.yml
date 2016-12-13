@@ -5376,13 +5376,13 @@ da:
         - Fr
         - Lø
     day_names: 
-      - Søndag
-      - Mandag
-      - Tirsdag
-      - Onsdag
-      - Torsdag
-      - Fredag
-      - Lørdag
+      - søndag
+      - mandag
+      - tirsdag
+      - onsdag
+      - torsdag
+      - fredag
+      - lørdag
     days: 
       today: "I dag"
       today_lower: "I dag"
@@ -16412,7 +16412,7 @@ da:
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%k:%M"
+      tiny_on_the_hour: "%-k:%M"
     less_than_a_minute_ago: "for mindre en et minut siden"
     pm: pm
     ranges: 
