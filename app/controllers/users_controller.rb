@@ -346,23 +346,22 @@ class UsersController < ApplicationController
         end
       else
         begin
-          twitter = Twitter::Connection.new(oauth_request.token, oauth_request.secret)
-          access_token = twitter.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
-          service_user_id, service_user_name = twitter.get_service_user(access_token)
-          if oauth_request.user
-            UserService.register(
-              :service => "twitter",
-              :access_token => access_token,
-              :user => oauth_request.user,
-              :service_domain => "twitter.com",
-              :service_user_id => service_user_id,
-              :service_user_name => service_user_name
-            )
-            oauth_request.destroy
-          else
-            session[:oauth_twitter_access_token_token] = access_token.token
-            session[:oauth_twitter_access_token_secret] = access_token.secret
-          end
+          raise "No OAuth Twitter User" unless oauth_request.user
+
+          twitter = Twitter::Connection.from_request_token(
+            oauth_request.token,
+            oauth_request.secret,
+            params[:oauth_verifier]
+          )
+          UserService.register(
+            :service => "twitter",
+            :access_token => twitter.access_token,
+            :user => oauth_request.user,
+            :service_domain => "twitter.com",
+            :service_user_id => twitter.service_user_id,
+            :service_user_name => twitter.service_user_name
+          )
+          oauth_request.destroy
 
           flash[:notice] = t('twitter_added', "Twitter access authorized!")
         rescue => e
