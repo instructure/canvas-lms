@@ -45,12 +45,16 @@ define(['axios'], (axios) => {
       .catch(() => {})
     }
 
+    MAX_SUBMISSIONS = 10
+
     loadRecentlyGradedSubmissions(studentId, courseId) {
       return axios.get(
         `/api/v1/courses/${courseId}/students/submissions?student_ids[]=${studentId}&order=graded_at&order_direction=descending&include[]=assignment&per_page=20`
       ).then(result => {
-        const submissions = result.data.filter(s => s.graded_at).slice(0, 10);
-        this.setState({submissions});
+        const submissions = result.data
+          .filter(s => s.grade != null)
+          .slice(0, this.MAX_SUBMISSIONS)
+        this.setState({submissions})
       })
       .catch(() => {})
     }

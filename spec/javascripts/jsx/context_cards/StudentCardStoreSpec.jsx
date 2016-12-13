@@ -1,5 +1,5 @@
 define(['jsx/context_cards/StudentCardStore'], (StudentCardStore) => {
-  const gradedSubmission = {graded_at: new Date(), id: 2};
+  const gradedSubmission = {graded_at: new Date(), id: 2, grade: "5"};
 
   module("StudentCardStore", {
     setup() {
@@ -16,8 +16,9 @@ define(['jsx/context_cards/StudentCardStore'], (StudentCardStore) => {
       this.server.respondWith(
         /\/api\/v1\/courses\/\d+\/students\/submissions/,
         JSON.stringify([
+          {graded_at: new Date(), id: 3, grade: null},
           {graded_at: null, id: 1},
-          gradedSubmission
+          gradedSubmission,
         ])
       );
       this.server.respondWith(
