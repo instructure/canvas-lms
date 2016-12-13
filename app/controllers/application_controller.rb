@@ -1990,7 +1990,7 @@ class ApplicationController < ActionController::Base
       hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)
       hash[:WIKI_PAGE_HISTORY_PATH] = named_context_url(@context, :context_wiki_page_revisions_path, @page)
 
-      if @context.is_a?(Course) && @context.grants_right?(@current_user, :read)
+      if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read)
         hash[:COURSE_ID] = @context.id
         hash[:MODULES_PATH] = polymorphic_path([@context, :context_modules])
       end
