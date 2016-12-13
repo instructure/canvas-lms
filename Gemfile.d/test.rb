@@ -5,7 +5,7 @@ group :test do
     gem 'rails-dom-testing', '2.0.1'
   end
 
-  gem 'gergich', '0.1.8', require: false
+  gem 'gergich', '0.1.10', require: false
   gem 'testingbot', require: false
   gem 'brakeman', require: false
   # simplecov 0.10.0 shows significantly less coverage.
