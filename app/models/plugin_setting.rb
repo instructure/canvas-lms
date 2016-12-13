@@ -124,7 +124,7 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def self.settings_cache_key(name)
-    ["settings_for_plugin3", name].cache_key
+    ["settings_for_plugin4", name].cache_key
   end
 
   def clear_cache
