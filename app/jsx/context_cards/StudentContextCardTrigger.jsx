@@ -14,6 +14,7 @@ define([
         event.preventDefault();
         const container = document.getElementById('StudentContextTray__Container')
         const store = new StudentCardStore(student_id, course_id)
+        store.loadDataForStudent()
         ReactDOM.render(
           <StudentContextTray
             courseId={course_id}

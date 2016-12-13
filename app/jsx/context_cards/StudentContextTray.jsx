@@ -70,22 +70,31 @@ define([
      */
 
     componentDidMount () {
-      this.props.store.onChange = () => {
-        this.setState({
-          analytics: this.props.store.state.analytics,
-          course: this.props.store.state.course,
-          isLoading: this.props.store.state.loading,
-          submissions: this.props.store.state.submissions,
-          user: this.props.store.state.user
-        })
+      this.props.store.onChange = this.onChange
+    }
+
+    componentWillReceiveProps(nextProps) {
+      if (nextProps.store !== this.props.store) {
+        this.props.store.onChange = null
+        nextProps.store.onChange = this.onChange
+        this.setState({isLoading: true})
       }
-      this.setState({isLoading: true})
-      this.props.store.loadDataForStudent()
     }
 
     /**
      * Handlers
      */
+
+    onChange = (e) => {
+      const {store} = this.props;
+      this.setState({
+        analytics: store.state.analytics,
+        course: store.state.course,
+        isLoading: store.state.loading,
+        submissions: store.state.submissions,
+        user: store.state.user
+      })
+    }
 
     handleRequestClose = (e) => {
       e.preventDefault()

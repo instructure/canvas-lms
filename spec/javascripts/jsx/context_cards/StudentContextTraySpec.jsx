@@ -14,7 +14,6 @@ define([
 
     hooks.beforeEach(() => {
       store = new StudentCardStore(courseId, studentId)
-      sinon.stub(store, 'loadDataForStudent')
       subject = TestUtils.renderIntoDocument(
         <StudentContextTray
           store={store}
@@ -24,8 +23,6 @@ define([
       )
     })
     hooks.afterEach(() => {
-      store.loadDataForStudent.restore()
-
       if (subject) {
         const componentNode = ReactDOM.findDOMNode(subject)
         if (componentNode) {
@@ -36,16 +33,23 @@ define([
     })
 
     test('change on store should setState on component', () => {
-      subject = TestUtils.renderIntoDocument(
-        <StudentContextTray
-          store={store}
-          courseId={courseId}
-          studentId={studentId}
-        />
-      )
       sinon.spy(subject, 'setState')
       store.setState({
         user: {name: 'username'}
+      })
+      ok(subject.setState.calledOnce)
+      subject.setState.restore()
+    })
+
+    test("changing store should call setState", () => {
+      const student2 = { id: '2', shortName: "Bob" }
+      const store2 = new StudentCardStore(courseId, student2.id)
+      store2.state.user = student2
+      sinon.spy(subject, 'setState')
+      subject.componentWillReceiveProps({
+        store: store2,
+        course: courseId,
+        studentId: student2.id
       })
       ok(subject.setState.calledOnce)
       subject.setState.restore()
