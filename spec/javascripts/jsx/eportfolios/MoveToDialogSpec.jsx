@@ -86,15 +86,20 @@ define([
     TestUtils.Simulate.click(button)
   })
 
-  test('handles aria-hides app element on open and close', () => {
+  test('handles aria-hides app element on open and close', (assert) => {
+    const done = assert.async()
     notOk(appRoot.getAttribute('aria-hidden'))
     mountDialog({
       appElement: appRoot
     })
-    ok(appRoot.getAttribute('aria-hidden'))
 
-    const button = document.getElementById('MoveToDialog__cancel')
-    TestUtils.Simulate.click(button)
-    notOk(appRoot.getAttribute('aria-hidden'))
+    setTimeout(() => {
+      ok(appRoot.getAttribute('aria-hidden'))
+
+      const button = document.getElementById('MoveToDialog__cancel')
+      TestUtils.Simulate.click(button)
+      notOk(appRoot.getAttribute('aria-hidden'))
+      done()
+    }, 1)
   })
 })
