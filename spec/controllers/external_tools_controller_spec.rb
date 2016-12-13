@@ -572,7 +572,18 @@ describe ExternalToolsController do
         @tool.save!
 
         get :show, course_id: @course.id, id: @tool.id, launch_type: 'migration_selection'
-        expect(assigns[:lti_launch].resource_url).to eq 'http://www.instructure.com/test?first=rory&last=williams'
+        expect(assigns[:lti_launch].params['first']).to be_nil
+      end
+
+      it "does not copy query params to POST if oauth_compliant tool setting is enabled" do
+        user_session(@teacher)
+        @course.root_account.disable_feature!(:disable_lti_post_only)
+        @tool.url = 'http://www.instructure.com/test?first=rory&last=williams'
+        @tool.settings[:oauth_compliant] = true
+        @tool.save!
+
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'migration_selection'
+        expect(assigns[:lti_launch].params['first']).to be_nil
       end
     end
   end
@@ -1161,6 +1172,9 @@ describe ExternalToolsController do
         <lticm:property name="selection_width">500</lticm:property>
         <lticm:property name="selection_height">300</lticm:property>
       </lticm:options>
+      <lticm:property name="oauth_compliant">
+       true
+      </lticm:property>
     </blti:extensions>
     <cartridge_bundle identifierref="BLTI001_Bundle"/>
     <cartridge_icon identifierref="BLTI001_Icon"/>
@@ -1177,6 +1191,7 @@ describe ExternalToolsController do
       expect(assigns[:tool].shared_secret).to eq "secret"
       expect(assigns[:tool].not_selectable).to be_truthy
       expect(assigns[:tool].has_placement?(:editor_button)).to be_truthy
+      expect(assigns[:tool].settings[:oauth_compliant]).to be_truthy
     end
 
     it "should handle advanced xml configurations with no url or domain set" do

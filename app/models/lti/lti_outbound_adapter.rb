@@ -66,7 +66,7 @@ module Lti
         @tool_launch.url,
         @tool.consumer_key,
         @tool.shared_secret,
-        @root_account.feature_enabled?(:disable_lti_post_only))
+        @root_account.feature_enabled?(:disable_lti_post_only) || @tool.extension_setting(:oauth_compliant))
     end
 
     def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
