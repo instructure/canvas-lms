@@ -138,7 +138,6 @@ describe "admin settings tab" do
 
         context "SIS syncing => true" do
           before do
-            account.set_feature_flag! :bulk_sis_grade_export, 'on'
             account.set_feature_flag! 'post_grades', 'on'
             account.settings = { sis_syncing: { value: true } }
             account.save
