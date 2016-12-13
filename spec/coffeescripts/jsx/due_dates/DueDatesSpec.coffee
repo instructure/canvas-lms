@@ -16,6 +16,7 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
+      @server = sinon.fakeServer.create()
       @override1 = new AssignmentOverride name: "Plebs", course_section_id: "1", due_at: null
       @override2 = new AssignmentOverride name: "Patricians", course_section_id: "2", due_at: "2015-04-05"
       @override3 = new AssignmentOverride name: "Students", student_ids: ["1","3"], due_at: null
@@ -41,6 +42,7 @@ define [
 
     teardown: ->
       ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dueDates).parentNode)
+      @server.restore()
       fakeENV.teardown()
 
   test 'renders', ->
@@ -135,6 +137,7 @@ define [
   module 'DueDates with Multiple Grading Periods enabled',
     setup: ->
       fakeENV.setup()
+      @server = sinon.fakeServer.create()
       ENV.context_asset_string = "course_1"
       ENV.current_user_roles = ["teacher"]
       overrides = [
@@ -256,6 +259,7 @@ define [
 
     teardown: ->
       ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dueDates).parentNode)
+      @server.restore()
       fakeENV.teardown()
 
   test 'sets inputs to readonly for overrides in closed grading periods', ->
@@ -288,6 +292,7 @@ define [
   module 'DueDates render callbacks',
     setup: ->
       fakeENV.setup()
+      @server = sinon.fakeServer.create()
       ENV.context_asset_string = "course_1"
       @override = new AssignmentOverride name: "Students", student_ids: ["1", "3"], due_at: null
 
@@ -306,6 +311,7 @@ define [
         dueAt: null
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
 
   test 'fetchAdhocStudents does not fire until state is set', ->
