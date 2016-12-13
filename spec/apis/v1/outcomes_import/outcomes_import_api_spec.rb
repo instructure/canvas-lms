@@ -82,6 +82,23 @@ describe "Outcomes Import API", type: :request do
             )
   end
 
+  def status_json(migration_id:, expected_status: 200)
+    api_call(:get, "/api/v1/global/outcomes_import/migration_status/#{migration_id}",
+      {
+        controller: 'outcomes_import_api',
+        action: 'migration_status',
+        account_id: @account.id.to_s,
+        format: 'json',
+        migration_id: migration_id
+      },
+      { },
+      { },
+      {
+        expected_status: expected_status
+      }
+    )
+  end
+
   def revoke_permission(account_user, permission)
     RoleOverride.manage_role_override(
       account_user.account,
@@ -352,6 +369,26 @@ describe "Outcomes Import API", type: :request do
           expect(create_full_json(json: create_request({
             calculation_method: 'latest',
             calculation_int: 1}))).to have_key("error")
+        end
+      end
+
+      context "status" do
+        it "requires valid migration id" do
+          expect(status_json(migration_id: 1)["error"]).to match(/no content migration matching id/i)
+        end
+        it "check valid migration id" do
+          cm_mock = mock("content_migration", {
+            id: 2,
+            context_id: 1,
+            created_at: Time.zone.now,
+            attachment: nil,
+            for_course_copy?: false,
+            job_progress: nil,
+            migration_type: nil
+            })
+          cm_mock.stubs(:migration_issues).returns([])
+          ContentMigration.stubs(:find).with('2').returns(cm_mock)
+          expect(status_json(migration_id: 2)["migration_issues_count"]).to eq 0
         end
       end
     end
