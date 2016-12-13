@@ -124,6 +124,15 @@ module BasicLTI
         @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > url').try(:content)
       end
 
+      def result_data_download_url
+        url = @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > downloadUrl').try(:content)
+        name = @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > documentName').try(:content)
+        return {
+          url: url,
+          name: name
+        } if url && name
+      end
+
       def result_data_launch_url
         @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > ltiLaunchUrl').try(:content)
       end
@@ -204,13 +213,29 @@ module BasicLTI
         elsif (url = result_data_url)
           submission_hash[:url] = url
           submission_hash[:submission_type] = 'online_url'
+        elsif (result_data = result_data_download_url)
+          url = result_data[:url]
+          attachment = assignment.attachments.create!(
+            display_name: result_data[:name],
+            file_state: 'deleted',
+            workflow_state: 'unattached',
+            user: user
+          )
+
+          job_options = {
+            :priority => Delayed::LOW_PRIORITY,
+            :max_attempts => 1,
+            :n_strand => 'file_download'
+          }
+          attachment.send_later_enqueue_args(:clone_url, job_options, url, 'rename', true)
+          submission_hash[:attachments] = [attachment]
+          submission_hash[:submission_type] = 'online_upload'
         elsif (launch_url = result_data_launch_url)
           submission_hash[:url] = launch_url
           submission_hash[:submission_type] = 'basic_lti_launch'
         elsif !existing_submission || existing_submission.submission_type.blank?
           submission_hash[:submission_type] = 'external_tool'
         end
-
 
         if raw_score
           submission_hash[:grade] = raw_score
