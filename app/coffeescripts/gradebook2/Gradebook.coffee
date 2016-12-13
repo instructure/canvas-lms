@@ -17,6 +17,7 @@ define [
   'i18n!gradebook2'
   'compiled/gradebook2/GradebookTranslations'
   'jsx/gradebook/CourseGradeCalculator'
+  'jsx/gradebook/EffectiveDueDates'
   'jsx/gradebook/GradingSchemeHelper'
   'compiled/userSettings'
   'spin.js'
@@ -58,11 +59,11 @@ define [
 ], (
   $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
-  GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
-  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape,
-  PostGradesStore, PostGradesApp, SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate,
-  RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper,
-  GradingPeriodsAPI
+  EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog,
+  AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
+  GradebookHeaderMenu, NumberCompare, htmlEscape, PostGradesStore, PostGradesApp, SubmissionStateMap,
+  ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView,
+  GradebookKeyboardNav, assignmentHelper, GradingPeriodsAPI
 ) ->
 
   class Gradebook
@@ -714,17 +715,23 @@ define [
 
     calculateStudentGrade: (student) =>
       if student.loaded and student.initialized
-        finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
-        result = CourseGradeCalculator.calculate(
+        gradingPeriods = @gradingPeriods if @gradingPeriodsEnabled
+        effectiveDueDates = EffectiveDueDates.scopeToUser(@effectiveDueDates, student.id) if @gradingPeriodsEnabled
+
+        grades = CourseGradeCalculator.calculate(
           @submissionsForStudent(student),
           @assignmentGroups,
-          @options.group_weighting_scheme
+          @options.group_weighting_scheme,
+          gradingPeriods,
+          effectiveDueDates
         )
-        for group in result.group_sums
+
+        finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
+        for group in grades.group_sums
           student["assignment_group_#{group.group.id}"] = group[finalOrCurrent]
           for submissionData in group[finalOrCurrent].submissions
             submissionData.submission.drop = submissionData.drop
-        student["total_grade"] = result[finalOrCurrent]
+        student["total_grade"] = grades[finalOrCurrent]
 
         @addDroppedClass(student)
 

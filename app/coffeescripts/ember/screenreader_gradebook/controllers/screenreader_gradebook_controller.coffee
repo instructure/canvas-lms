@@ -11,6 +11,7 @@ define [
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
   'jsx/gradebook/CourseGradeCalculator'
+  'jsx/gradebook/EffectiveDueDates'
   'compiled/gradebook2/OutcomeGradebookGrid'
   '../../shared/components/ic_submission_download_dialog_component'
   'str/htmlEscape'
@@ -19,10 +20,9 @@ define [
   'compiled/api/gradingPeriodsApi'
   'jquery.instructure_date_and_time'
 ], (
-  ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz,
-  AssignmentDetailsDialog, AssignmentMuter, CourseGradeCalculator, outcomeGrid,
-  ic_submission_download_dialog, htmlEscape, CalculationMethodContent, SubmissionStateMap,
-  GradingPeriodsAPI
+  ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog,
+  AssignmentMuter, CourseGradeCalculator, EffectiveDueDates, outcomeGrid, ic_submission_download_dialog,
+  htmlEscape, CalculationMethodContent, SubmissionStateMap, GradingPeriodsAPI
 ) ->
 
   {get, set, setProperties} = Ember
@@ -97,6 +97,12 @@ define [
     submissionsUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.submissions_url')
 
     mgpEnabled: get(window, 'ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled')
+
+    gradingPeriodData:
+      (->
+        periods = get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
+        GradingPeriodsAPI.deserializePeriods(periods)
+      )()
 
     gradingPeriods:
       (->
@@ -290,8 +296,14 @@ define [
         id != userId
       set(assignment, 'assignment_visibility', filteredVisibilities)
 
-    calculate: (submissionsArray) ->
-      CourseGradeCalculator.calculate submissionsArray, @assignmentGroupsHash(), @get('weightingScheme')
+    calculate: (student) ->
+      mgpEnabled = @get('mgpEnabled')
+      submissions = @submissionsForStudent(student)
+      assignmentGroups = @assignmentGroupsHash()
+      weightingScheme = @get('weightingScheme')
+      gradingPeriods = @gradingPeriodData if mgpEnabled
+      effectiveDueDates = EffectiveDueDates.scopeToUser(@get('effectiveDueDates.content'), student.id) if mgpEnabled
+      CourseGradeCalculator.calculate(submissions, assignmentGroups, weightingScheme, gradingPeriods, effectiveDueDates)
 
     submissionsForStudent: (student) ->
       allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)
@@ -306,22 +318,25 @@ define [
     calculateStudentGrade: (student) ->
       if student.isLoaded
         finalOrCurrent = if @get('includeUngradedAssignments') then 'final' else 'current'
-        result = @calculate(@submissionsForStudent(student))
-        for group in result.group_sums
+        grades = @calculate(student)
+        for group in grades.group_sums
           set(student, "assignment_group_#{group.group.id}", group[finalOrCurrent])
           for submissionData in group[finalOrCurrent].submissions
             set(submissionData.submission, 'drop', submissionData.drop)
-        result = result[finalOrCurrent]
+        grades = grades[finalOrCurrent]
 
-        percent = round (result.score / result.possible * 100), 2
+        percent = round (grades.score / grades.possible * 100), 2
         percent = 0 if isNaN(percent)
         setProperties student,
-          total_grade: result
+          total_grade: grades
           total_percent: percent
 
     calculateAllGrades: (->
       @get('students').forEach (student) => @calculateStudentGrade student
-    ).observes('includeUngradedAssignments','groupsAreWeighted', 'assignment_groups.@each.group_weight')
+    ).observes(
+      'includeUngradedAssignments','groupsAreWeighted', 'assignment_groups.@each.group_weight',
+      'effectiveDueDates.isLoaded'
+    )
 
     sectionSelectDefaultLabel: I18n.t "all_sections", "All Sections"
     studentSelectDefaultLabel: I18n.t "no_student", "No Student Selected"

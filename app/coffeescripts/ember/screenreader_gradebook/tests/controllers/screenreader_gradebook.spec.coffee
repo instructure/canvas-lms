@@ -7,8 +7,9 @@ define [
   '../shared_ajax_fixtures'
   '../../controllers/screenreader_gradebook_controller'
   'compiled/userSettings'
+  'jsx/gradebook/CourseGradeCalculator'
   'vendor/jquery.ba-tinypubsub'
-], ($, _, ajax, startApp, Ember, fixtures, SRGBController, userSettings) ->
+], ($, _, ajax, startApp, Ember, fixtures, SRGBController, userSettings, CourseGradeCalculator) ->
 
   workAroundRaceCondition = ->
     ajax.request()
@@ -436,6 +437,52 @@ define [
     workAroundRaceCondition().then =>
       equal @srgb.get('students.firstObject.total_percent'), 0
 
+  module 'screenreader_gradebook_controller: calculate',
+    setupThis:(options = {}) ->
+      assignments = [{ id: 201, points_possible: 10, omit_from_final_grade: false }]
+      submissions = [{ assignment_id: 201, score: 10 }]
+      assignmentGroupsHash = { 301: { id: 301, group_weight: 60, rules: {}, assignments } }
+      props = _.defaults options,
+        mgpEnabled: true
+        gradingPeriodData: [{ id: 701, weight: 50 }, { id: 702, weight: 50 }]
+        weightingScheme: 'points'
+        'effectiveDueDates.content': { 201: { 101: { grading_period_id: '701' } } }
+      _.extend {}, props,
+        get: (attr) -> props[attr]
+        submissionsForStudent: () -> submissions
+        assignmentGroupsHash: () -> assignmentGroupsHash
+
+    setup: ->
+      @calculate = SRGBController.prototype.calculate
+
+  test "calculates grades using properties from the gradebook", ->
+    self = @setupThis()
+    @stub(CourseGradeCalculator, 'calculate').returns('expected')
+    grades = @calculate.call(self, id: '101', loaded: true)
+    equal(grades, 'expected')
+    args = CourseGradeCalculator.calculate.getCall(0).args
+    equal(args[0], self.submissionsForStudent())
+    equal(args[1], self.assignmentGroupsHash())
+    equal(args[2], self.get('weightingScheme'))
+    equal(args[3], self.gradingPeriodData)
+
+  test "scopes effective due dates to the user", ->
+    self = @setupThis()
+    @stub(CourseGradeCalculator, 'calculate')
+    @calculate.call(self, id: '101', loaded: true)
+    dueDates = CourseGradeCalculator.calculate.getCall(0).args[4]
+    deepEqual(dueDates, 201: { grading_period_id: '701' })
+
+  test "calculates grades without grading period data grading periods are disabled", ->
+    self = @setupThis(mgpEnabled: false)
+    @stub(CourseGradeCalculator, 'calculate')
+    @calculate.call(self, id: '101', loaded: true)
+    args = CourseGradeCalculator.calculate.getCall(0).args
+    equal(args[0], self.submissionsForStudent())
+    equal(args[1], self.assignmentGroupsHash())
+    equal(args[2], self.get('weightingScheme'))
+    equal(args[3], undefined)
+    equal(args[4], undefined)
 
   module 'screenreader_gradebook_controller: notes computed props',
     setup: ->

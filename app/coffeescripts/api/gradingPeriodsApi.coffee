@@ -15,6 +15,7 @@ define [
         start_date: period.startDate
         end_date: period.endDate
         close_date: period.closeDate
+        weight: period.weight
       }
     grading_periods: serialized
 
@@ -30,6 +31,7 @@ define [
         closeDate: new Date(period.close_date || period.end_date)
         isLast: period.is_last
         isClosed: period.is_closed
+        weight: period.weight
       }
 
   batchUpdate: (setId, periods) ->

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014-2016 Instructure, Inc.
+# Copyright (C) 2014 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -199,6 +199,11 @@ describe GradingPeriod do
     it "includes the close_date in the returned object" do
       json = grading_period.as_json_with_user_permissions(User.new)
       expect(json).to have_key("close_date")
+    end
+
+    it "includes the weight in the returned object" do
+      json = grading_period.as_json_with_user_permissions(User.new)
+      expect(json).to have_key("weight")
     end
   end
 

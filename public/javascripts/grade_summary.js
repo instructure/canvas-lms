@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Instructure, Inc.
+ * Copyright (C) 2011 - 2016 Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -22,6 +22,7 @@ define([
   'jquery' /* $ */,
   'underscore',
   'jsx/gradebook/CourseGradeCalculator',
+  'jsx/gradebook/EffectiveDueDates',
   'jsx/gradebook/GradingSchemeHelper',
   'compiled/util/round',
   'str/htmlEscape',
@@ -31,7 +32,24 @@ define([
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment, mediaCommentThumbnail */
-], function(INST, I18n, $, _, CourseGradeCalculator, GradingSchemeHelper, round, htmlEscape) {
+], function (INST, I18n, $, _, CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, round, htmlEscape) {
+  function calculateGrades () {
+    if (ENV.effective_due_dates) {
+      return CourseGradeCalculator.calculate(
+        ENV.submissions,
+        ENV.assignment_groups,
+        ENV.group_weighting_scheme,
+        ENV.grading_periods,
+        EffectiveDueDates.scopeToUser(ENV.effective_due_dates, ENV.student_id)
+      );
+    }
+
+    return CourseGradeCalculator.calculate(
+      ENV.submissions,
+      ENV.assignment_groups,
+      ENV.group_weighting_scheme
+    );
+  }
 
   function updateStudentGrades() {
     var ignoreUngradedSubmissions = $("#only_consider_graded_assignments").attr('checked');
@@ -39,11 +57,7 @@ define([
     var groupWeightingScheme = ENV.group_weighting_scheme;
     var includeTotal = !ENV.exclude_total;
 
-    var calculatedGrades = CourseGradeCalculator.calculate(
-      ENV.submissions,
-      ENV.assignment_groups,
-      groupWeightingScheme
-    );
+    var calculatedGrades = calculateGrades();
 
     $('.dropped').attr('aria-label', "");
     $('.dropped').attr('title', "");
@@ -113,7 +127,7 @@ define([
       $.screenReaderFlashMessageExclusive(msg);
     }
 
-    if(ENV.grading_scheme) {
+    if (ENV.grading_scheme) {
       $(".final_letter_grade .grade").text(GradingSchemeHelper.scoreToGrade(scoreAsPercent, ENV.grading_scheme));
     }
 
@@ -420,6 +434,7 @@ define([
 
   return {
     setup: setup,
-    calculateTotals: calculateTotals
+    calculateTotals: calculateTotals,
+    calculateGrades: calculateGrades
   }
 });

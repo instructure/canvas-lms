@@ -323,6 +323,13 @@ describe GradebooksController do
         get 'grade_summary', :course_id => @course.id, :id => @student.id, grading_period_id: 1
         expect(assigns[:exclude_total]).to eq false
       end
+
+      it "assigns values for grade calculator to ENV" do
+        user_session(@teacher)
+        get 'grade_summary', :course_id => @course.id, :id => @student.id
+        expect(assigns[:js_env][:grading_periods]).not_to be_nil
+        expect(assigns[:js_env][:effective_due_dates]).not_to be_nil
+      end
     end
 
     context "with assignment due date overrides" do

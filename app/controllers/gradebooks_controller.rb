@@ -62,6 +62,7 @@ class GradebooksController < ApplicationController
     if multiple_grading_periods?
       @grading_periods = active_grading_periods_json
       gp_id = @current_grading_period_id unless view_all_grading_periods?
+      effective_due_dates = EffectiveDueDates.new(@context).to_hash
     end
 
     @exclude_total = exclude_total?(@context)
@@ -89,7 +90,6 @@ class GradebooksController < ApplicationController
 
     grading_period = @grading_periods && @grading_periods.find { |period| period[:id] == gp_id }
 
-
     ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
 
     grading_scheme = @context.grading_standard.try(:data) ||
@@ -101,6 +101,8 @@ class GradebooksController < ApplicationController
            show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
            grading_scheme: grading_scheme,
            grading_period: grading_period,
+           grading_periods: @grading_periods,
+           effective_due_dates: effective_due_dates,
            exclude_total: @exclude_total,
            student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
            student_id: @presenter.student_id)

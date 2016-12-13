@@ -4,7 +4,66 @@ define [
   'underscore'
   'timezone'
   'compiled/SubmissionDetailsDialog'
-], (Gradebook, DataLoader, _, tz, SubmissionDetailsDialog) ->
+  'jsx/gradebook/CourseGradeCalculator'
+], (Gradebook, DataLoader, _, tz, SubmissionDetailsDialog, CourseGradeCalculator) ->
+  module "Gradebook2#calculateStudentGrade",
+    setupThis:(options = {}) ->
+      assignments = [{ id: 201, points_possible: 10, omit_from_final_grade: false }]
+      submissions = [{ assignment_id: 201, score: 10 }]
+      defaults = {
+        gradingPeriodsEnabled: true
+        assignmentGroups: [{ id: 301, group_weight: 60, rules: {}, assignments }]
+        options: { group_weighting_scheme: 'points' }
+        gradingPeriods: [{ id: 701, weight: 50 }, { id: 702, weight: 50 }]
+        effectiveDueDates: { 201: { 101: { grading_period_id: '701' } } }
+        submissionsForStudent: () ->
+          submissions
+        addDroppedClass: () ->
+      }
+      _.defaults options, defaults
+
+    setup: ->
+      @calculate = Gradebook.prototype.calculateStudentGrade
+
+  test "calculates grades using properties from the gradebook", ->
+    self = @setupThis()
+    @stub(CourseGradeCalculator, 'calculate').returns(group_sums: [])
+    @calculate.call(self, id: '101', loaded: true, initialized: true)
+    args = CourseGradeCalculator.calculate.getCall(0).args
+    equal(args[0], self.submissionsForStudent())
+    equal(args[1], self.assignmentGroups)
+    equal(args[2], self.options.group_weighting_scheme)
+    equal(args[3], self.gradingPeriods)
+
+  test "scopes effective due dates to the user", ->
+    self = @setupThis()
+    @stub(CourseGradeCalculator, 'calculate').returns(group_sums: [])
+    @calculate.call(self, id: '101', loaded: true, initialized: true)
+    dueDates = CourseGradeCalculator.calculate.getCall(0).args[4]
+    deepEqual(dueDates, 201: { grading_period_id: '701' })
+
+  test "calculates grades without grading period data grading periods are disabled", ->
+    self = @setupThis(gradingPeriodsEnabled: false)
+    @stub(CourseGradeCalculator, 'calculate').returns(group_sums: [])
+    @calculate.call(self, id: '101', loaded: true, initialized: true)
+    args = CourseGradeCalculator.calculate.getCall(0).args
+    equal(args[0], self.submissionsForStudent())
+    equal(args[1], self.assignmentGroups)
+    equal(args[2], self.options.group_weighting_scheme)
+    equal(args[3], undefined)
+    equal(args[4], undefined)
+
+  test "does not calculate when the student is not loaded", ->
+    self = @setupThis(gradingPeriodsEnabled: false)
+    @stub(CourseGradeCalculator, 'calculate').returns(group_sums: [])
+    @calculate.call(self, id: '101', loaded: false, initialized: true)
+    notOk(CourseGradeCalculator.calculate.called)
+
+  test "does not calculate when the student is not initialized", ->
+    self = @setupThis(gradingPeriodsEnabled: false)
+    @stub(CourseGradeCalculator, 'calculate').returns(group_sums: [])
+    @calculate.call(self, id: '101', loaded: true, initialized: false)
+    notOk(CourseGradeCalculator.calculate.called)
 
   module "Gradebook2#gradeSort"
 

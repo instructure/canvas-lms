@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015-2016 Instructure, Inc.
+# Copyright (C) 2015 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -149,7 +149,7 @@ class GradingPeriod < ActiveRecord::Base
 
   def as_json_with_user_permissions(user)
     as_json(
-      only: [:id, :title, :start_date, :end_date, :close_date],
+      only: [:id, :title, :start_date, :end_date, :close_date, :weight],
       permissions: { user: user },
       methods: [:is_last, :is_closed],
     ).fetch(:grading_period)

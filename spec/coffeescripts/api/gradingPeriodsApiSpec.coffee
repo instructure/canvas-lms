@@ -12,7 +12,8 @@ define [
       endDate: new Date("2015-10-31T12:00:00Z"),
       closeDate: new Date("2015-11-07T12:00:00Z"),
       isClosed: true,
-      isLast: false
+      isLast: false,
+      weight: 40
     },{
       id: "2",
       title: "Q2",
@@ -20,7 +21,8 @@ define [
       endDate: new Date("2015-12-31T12:00:00Z"),
       closeDate: new Date("2016-01-07T12:00:00Z"),
       isClosed: true,
-      isLast: true
+      isLast: true,
+      weight: 60
     }
   ]
 
@@ -31,13 +33,15 @@ define [
         title: "Q1",
         start_date: new Date("2015-09-01T12:00:00Z"),
         end_date: new Date("2015-10-31T12:00:00Z"),
-        close_date: new Date("2015-11-07T12:00:00Z")
+        close_date: new Date("2015-11-07T12:00:00Z"),
+        weight: 40
       },{
         id: "2",
         title: "Q2",
         start_date: new Date("2015-11-01T12:00:00Z"),
         end_date: new Date("2015-12-31T12:00:00Z"),
-        close_date: new Date("2016-01-07T12:00:00Z")
+        close_date: new Date("2016-01-07T12:00:00Z"),
+        weight: 60
       }
     ]
   }
@@ -51,7 +55,8 @@ define [
         end_date: "2015-10-31T12:00:00Z",
         close_date: "2015-11-07T12:00:00Z",
         is_closed: true,
-        is_last: false
+        is_last: false,
+        weight: 40
       },{
         id: "2",
         title: "Q2",
@@ -59,7 +64,8 @@ define [
         end_date: "2015-12-31T12:00:00Z",
         close_date: "2016-01-07T12:00:00Z",
         is_closed: true,
-        is_last: true
+        is_last: true,
+        weight: 60
       }
     ]
   }
@@ -92,7 +98,8 @@ define [
           title: "Q1",
           start_date: new Date("2015-09-01T12:00:00Z"),
           end_date: new Date("2015-10-31T12:00:00Z"),
-          close_date: null
+          close_date: null,
+          weight: 40
         }
       ]
     }
