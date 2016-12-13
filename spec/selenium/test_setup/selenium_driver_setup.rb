@@ -608,3 +608,11 @@ Selenium::WebDriver::Firefox::Binary.class_eval do
     $DEBUG = nil
   end
 end
+
+
+# make Wait play nicely with Timecop
+module Selenium::WebDriver::Wait::Time
+  def self.now
+    ::Time.now_without_mock_time
+  end
+end
