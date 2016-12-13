@@ -1798,6 +1798,11 @@ CanvasRails::Application.routes.draw do
       }
     end
 
+    scope(controller: :web_zip_exports) do
+      get 'courses/:course_id/web_zip_exports', action: :index, as: "web_zip_exports"
+      get 'courses/:course_id/web_zip_exports/:id', action: :show
+    end
+
     scope(controller: :grading_standards_api) do
       get 'courses/:course_id/grading_standards', action: :context_index
       get 'accounts/:account_id/grading_standards', action: :context_index

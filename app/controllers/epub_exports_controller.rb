@@ -111,12 +111,12 @@ class EpubExportsController < ApplicationController
     end
   end
 
-  # API List courses with their latest ePub export
+  # @API List courses with their latest ePub export
   #
   # Lists all courses a user is actively participating in,
   # and the latest ePub export associated with the user & course.
   #
-  # @return [CourseEpubExport]
+  # @returns [CourseEpubExport]
   def index
     @presenter = EpubExports::CourseEpubExportsPresenter.new(@current_user)
     @courses = @presenter.courses
@@ -131,7 +131,7 @@ class EpubExportsController < ApplicationController
     end
   end
 
-  # API Create ePub Export
+  # @API Create ePub Export
   #
   # Begin an ePub export for a course.
   #
