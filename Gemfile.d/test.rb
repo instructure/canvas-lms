@@ -46,8 +46,8 @@ group :test do
   gem 'webmock', '1.22.3', require: false
     gem 'addressable', '2.3.8', require: false
     gem 'crack', '0.4.3', require: false
-  gem 'yard', '0.8.7.6'
-  gem 'yard-appendix', '>=0.1.8'
+  gem 'yard', '0.9.5'
+  gem 'yard-appendix', '0.1.8'
   gem 'timecop', '0.8.1'
   gem 'jira_ref_parser', '1.0.1'
   gem 'headless', '2.3.1', require: false
