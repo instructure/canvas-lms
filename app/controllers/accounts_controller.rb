@@ -894,7 +894,7 @@ class AccountsController < ApplicationController
         @courses = []
         @query = (params[:course] && params[:course][:name]) || params[:term]
         if @context && @context.is_a?(Account) && @query
-          @courses = @context.courses_name_like(@query, :term => @term, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
+          @courses = @context.courses_name_like(@query, :order => sort_order, :term => @term, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
         end
       end
       respond_to do |format|

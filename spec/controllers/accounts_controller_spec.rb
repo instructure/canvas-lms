@@ -250,6 +250,16 @@ describe AccountsController do
       Account.any_instance.expects(:fast_all_courses).with(has_entry(order: "courses.created_at DESC"))
       get 'show', :id => @account.id, :courses_sort_order => "created_at_desc", :format => 'html'
     end
+
+    it 'can search and sort simultaneously' do
+      account_with_admin_logged_in(account: @account)
+      @account.courses.create! name: 'blah A'
+      @account.courses.create! name: 'blah C'
+      @account.courses.create! name: 'blah B'
+      @account.courses.create! name: 'bleh Z'
+      get 'courses', :account_id => @account.id, :course => { :name => 'blah' }, :courses_sort_order => 'name_desc', :format => 'html'
+      expect(assigns['courses'].map(&:name)).to eq(['blah C', 'blah B', 'blah A'])
+    end
   end
 
   context "special account ids" do
