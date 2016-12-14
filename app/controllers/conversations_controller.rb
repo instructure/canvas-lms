@@ -349,9 +349,6 @@ class ConversationsController < ApplicationController
 
       context_type = context.class.name
       context_id = context.id
-      if %w{Course Group}.include?(context_type)
-        return unless authorized_action(context, @current_user, [:send_messages, :send_messages_all])
-      end
     end
 
     params[:recipients].each do |recipient|
