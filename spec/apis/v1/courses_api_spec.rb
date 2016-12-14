@@ -1249,7 +1249,8 @@ describe CoursesController, type: :request do
     end
     context "an authorized user" do
       it "should be able to reset a course" do
-        Auditors::Course.expects(:record_reset).once.with(@course, anything, @user, anything)
+        expect(Auditors::Course).to receive(:record_reset).once.
+          with(@course, rspec_anything, @user, rspec_anything)
 
         json = api_call(:post, @path, @params)
         @course.reload
@@ -3042,7 +3043,8 @@ describe CoursesController, type: :request do
     end
 
     it "should update settings" do
-      Auditors::Course.expects(:record_updated).with(anything, anything, anything, source: :api)
+      expect(Auditors::Course).to receive(:record_updated).
+        with(rspec_anything, rspec_anything, rspec_anything, source: :api)
 
       json = api_call(:put, "/api/v1/courses/#{@course.id}/settings", {
         :controller => 'courses',
