@@ -25,6 +25,7 @@
     "max-len": ["warn", {"code": 140}],
     "no-continue": ["off"],
     "no-plusplus": ["off"],
+    "object-curly-spacing": ["off"],
     "semi": ["off"],
     "space-before-function-paren": ["error", "always"],
     "import/no-amd": ["off"],
