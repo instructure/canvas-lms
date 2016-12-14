@@ -6,6 +6,10 @@ describe MasterCourses::MasterMigration do
     @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
   end
 
+  before :each do
+    skip unless Qti.qti_enabled?
+  end
+
   describe "start_new_migration!" do
     it "should queue a migration" do
       user_factory
@@ -273,6 +277,9 @@ describe MasterCourses::MasterMigration do
       ann = @copy_from.announcements.create!(:message => "goodbye")
       page = @copy_from.wiki.wiki_pages.create!(:title => "wiki", :body => "ohai")
       quiz = @copy_from.quizzes.create!
+      qq = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      aq = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
 
       # TODO: make sure that we skip the validations on each importer when we add the Restrictor and
       # probably add more content here
@@ -286,6 +293,9 @@ describe MasterCourses::MasterMigration do
       copied_ann = @copy_to.announcements.where(:migration_id => mig_id(ann)).first
       copied_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
       copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      copied_qq = copied_quiz.quiz_questions.where(:migration_id => mig_id(qq)).first
+      copied_bank = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank)).first
+      copied_aq = copied_bank.assessment_questions.where(:migration_id => mig_id(aq)).first
 
       new_text = "<p>some text here</p>"
       assmt.update_attribute(:description, new_text)
@@ -294,7 +304,14 @@ describe MasterCourses::MasterMigration do
       page.update_attribute(:body, new_text)
       quiz.update_attribute(:description, new_text)
 
-      [assmt, topic, ann, page, quiz].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
+      plain_text = 'plain text'
+      qq.question_data = qq.question_data.tap{|qd| qd['question_text'] = plain_text}
+      qq.save!
+      bank.update_attribute(:title, plain_text)
+      aq.question_data['question_text'] = plain_text
+      aq.save!
+
+      [assmt, topic, ann, page, quiz, bank].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
 
       run_master_migration # re-copy all the content and overwrite the locked stuff
 
@@ -303,6 +320,9 @@ describe MasterCourses::MasterMigration do
       expect(copied_ann.reload.message).to eq new_text
       expect(copied_page.reload.body).to eq new_text
       expect(copied_quiz.reload.description).to eq new_text
+      expect(copied_qq.reload.question_data['question_text']).to eq plain_text
+      expect(copied_bank.reload.title).to eq plain_text
+      expect(copied_aq.reload.question_data['question_text']).to eq plain_text
     end
 
     it "should not overwrite downstream changes in child course unless locked" do
@@ -345,6 +365,55 @@ describe MasterCourses::MasterMigration do
 
       expect(copied_page.reload.body).to eq new_master_text
       expect(copied_page.title).to eq new_master_title # even the title
+    end
+
+    it "should count downstream changes to quiz/assessment questions as changes in quiz/bank content" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      #TODO: quizzes and quiz questions
+      #quiz = @copy_from.quizzes.create!
+      #qq = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      aq = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+
+      run_master_migration
+
+      #copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      #copied_qq = copied_quiz.quiz_questions.where(:migration_id => mig_id(qq)).first
+      copied_bank = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank)).first
+      copied_aq = copied_bank.assessment_questions.where(:migration_id => mig_id(aq)).first
+
+      new_child_text = "some childish text"
+      copied_aq.question_data['question_text'] = new_child_text
+      copied_aq.save!
+
+      bank_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_bank).first
+      expect(bank_child_tag.downstream_changes).to include("assessment_questions_content") # treats all assessment questions like a column
+
+      new_master_text = "some mastery text"
+      bank.update_attribute(:title, new_master_text)
+      aq.question_data['question_text'] = new_master_text
+      aq.save!
+
+      [bank].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
+
+      run_master_migration # re-copy all the content - but don't actually overwrite anything because it got changed downstream
+
+      expect(copied_bank.reload.title).to_not eq new_master_text
+      expect(copied_aq.reload.question_data['question_text']).to_not eq new_master_text
+
+      [bank].each do |c|
+        mtag = @template.content_tag_for(c)
+        Timecop.freeze(2.seconds.from_now) do
+          mtag.update_attribute(:restrictions, {:content => true}) # should touch the content
+        end
+      end
+
+      run_master_migration # re-copy all the content - and this time overwrite everything because it's locked
+
+      expect(copied_bank.reload.title).to eq new_master_text
+      expect(copied_aq.reload.question_data['question_text']).to eq new_master_text
     end
 
     context "master courses + external migrations" do

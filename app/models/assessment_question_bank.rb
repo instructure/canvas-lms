@@ -29,6 +29,9 @@ class AssessmentQuestionBank < ActiveRecord::Base
   after_save :update_alignments
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
 
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:title]
+
   workflow do
     state :active
     state :deleted

@@ -61,17 +61,31 @@ module Importers
           end
           question_bank.title ||= default_title
           question_bank.migration_id = bank_mig_id
-          question_bank.save!
-          migration.add_imported_item(question_bank)
-          bank_map[question_bank.migration_id] = question_bank
+        elsif data['assessment_question_banks']
+          if bank_hash = data['assessment_question_banks'].detect{|qb_hash| qb_hash['migration_id'] == question_bank.migration_id}
+            question_bank.title = bank_hash['title'] # we should update the title i guess?
+          end
         end
 
         if question_bank.workflow_state == 'deleted'
           question_bank.workflow_state = 'active'
+        end
+
+        question_bank.mark_as_importing!(migration)
+        if question_bank.new_record?
+          question_bank.save!
+          migration.add_imported_item(question_bank)
+          bank_map[question_bank.migration_id] = question_bank
+        elsif question_bank.changed?
           question_bank.save!
         end
 
         begin
+          if migration.for_master_course_import?
+            # don't overwrite any existing assessment question content if the bank or any questions have been updated downstream
+            next if question['assessment_question_id'] && question_bank.edit_types_locked_for_overwrite_on_import.include?(:content)
+          end
+
           question = self.import_from_migration(question, migration.context, migration, question_bank)
           question_data[:aq_data][question['migration_id']] = question
         rescue

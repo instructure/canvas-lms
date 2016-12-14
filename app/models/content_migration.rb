@@ -491,6 +491,7 @@ class ContentMigration < ActiveRecord::Base
       data = nil
       if self.for_master_course_import?
         self.master_course_subscription.load_tags! # load child content tags
+        self.master_course_subscription.master_template.preload_restrictions!
 
         # copy the attachments
         source_export = ContentExport.find(self.migration_settings[:master_course_export_id])
@@ -567,7 +568,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def for_course_copy?
-    self.migration_type && self.migration_type == 'course_copy_importer'
+    self.migration_type == 'course_copy_importer' || for_master_course_import?
   end
 
   def for_master_course_import?

@@ -110,4 +110,18 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       ensure_tag_on_export(att)
     end
   end
+
+  def preload_restrictions!
+    @preloaded_restrictions ||= begin
+      index = {}
+      self.master_content_tags.pluck(:migration_id, :restrictions).each do |mig_id, restrictions|
+        index[mig_id] = restrictions
+      end
+      index
+    end
+  end
+
+  def find_preloaded_restriction(migration_id)
+    @preloaded_restrictions[migration_id]
+  end
 end
