@@ -125,6 +125,7 @@
     <%= render :partial => 'assignments/assignments_list_right_side', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_right_side', :locals => {:course_home => true} %>
+hi there
   <% else %>
     <% locals = {:title => t("Coming Up"), :contexts_to_link_to => @context, :upcoming => true, :period => :one_week} %>
     <% if @current_user %>
@@ -207,6 +208,7 @@
           <small>&emsp;[ <%= link_to t('front_page_not_set', 'Front page must be set first'), polymorphic_url([@context, :wiki_pages]) %> ]</small>
         <% end %>
       </div>
+      <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="dynamic_syllabus" <%= 'checked' if @context.default_view == 'dynamic_syllabus' %>>Dynamic Syllabus</label></div>
       <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="modules" <%= 'checked' if @context.default_view == 'modules' %>><%= t('draft_state.options.modules', %{Course Modules}) %></label></div>
       <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="assignments" <%= 'checked' if @context.default_view == 'assignments' %>><%= t('draft_state.options.assignments', %{Assignments List}) %></label></div>
       <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="syllabus" <%= 'checked' if @context.default_view == 'syllabus' %>><%= t('draft_state.options.syllabus', %{Syllabus}) %></label></div>
@@ -236,6 +238,8 @@
     %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>
+  <% elsif @course_home_view == 'dynamic_syllabus' %>
+    <%= render :partial => 'bz/dynamic_syllabus', :locals => {:course_home => true} %>
   <% else %>
     <%= render :partial => 'shared/dashboard_messages' %>
     <%= render :partial => 'shared/recent_activity' %>

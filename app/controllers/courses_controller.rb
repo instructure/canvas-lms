@@ -1548,6 +1548,11 @@ class CoursesController < ApplicationController
         @events = filter_other_sections_from_events(@events)
         @undated_events = @events.select {|e| e.start_at == nil}
         @dates = (@events.select {|e| e.start_at != nil}).map {|e| e.start_at.to_date}.uniq.sort.sort
+      when 'dynamic_syllabus'
+        @course = @context
+        @progressions = @current_user.context_module_progressions
+        @editable = authorized_action(@course, @current_user, :update)
+        #redirect_to "/courses/#{@context.id}/dynamic_syllabus"
       else
         @active_tab = "home"
         if @context.grants_right?(@current_user, session, :manage_groups)
