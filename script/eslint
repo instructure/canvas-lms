@@ -31,9 +31,8 @@ comments = dr_diff.comments(format: "eslint",
                             include_git_dir_in_output: !gerrit_patchset?)
 
 # This section should be removed when we start -2ing patchsets
-puts comments
 comments = comments.map do |comment|
-  comment[:severity] = 'warning'
+  comment[:severity] = 'warn'
   comment
 end
 puts comments
