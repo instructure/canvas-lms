@@ -236,12 +236,9 @@ class UsersController < ApplicationController
       )
       redirect_to request_token.authorize_url
     elsif params[:service] == "linked_in"
-      linkedin_connection = LinkedIn::Connection.new
+      success_url = oauth_success_url(:service => 'linked_in')
+      request_token = LinkedIn::Connection.request_token(success_url)
 
-      request_token = linkedin_connection.request_token(oauth_success_url(:service => 'linked_in'))
-
-      session[:oauth_linked_in_request_token_token] = request_token.token
-      session[:oauth_linked_in_request_token_secret] = request_token.secret
       OauthRequest.create(
         :service => 'linked_in',
         :token => request_token.token,
@@ -318,26 +315,24 @@ class UsersController < ApplicationController
     else
      if params[:service] == "linked_in"
         begin
-          linkedin_connection = LinkedIn::Connection.new
-          token = session.delete(:oauth_linked_in_request_token_token)
-          secret = session.delete(:oauth_linked_in_request_token_secret)
-          access_token = linkedin_connection.get_access_token(token, secret, params[:oauth_verifier])
-          service_user_id, service_user_name, service_user_url = linkedin_connection.get_service_user_info(access_token)
+          raise "No OAuth LinkedIn User" unless oauth_request.user
 
-          if oauth_request.user
-            UserService.register(
-              :service => "linked_in",
-              :access_token => access_token,
-              :user => oauth_request.user,
-              :service_domain => "linked_in.com",
-              :service_user_id => service_user_id,
-              :service_user_name => service_user_name,
-              :service_user_url => service_user_url
-            )
-          else
-            session[:oauth_linked_in_access_token_token] = access_token.token
-            session[:oauth_linked_in_access_token_secret] = access_token.secret
-          end
+          linkedin = LinkedIn::Connection.from_request_token(
+            oauth_request.token,
+            oauth_request.secret,
+            params[:oauth_verifier]
+          )
+
+          UserService.register(
+            :service => "linked_in",
+            :access_token => linkedin.access_token,
+            :user => oauth_request.user,
+            :service_domain => "linked_in.com",
+            :service_user_id => linkedin.service_user_id,
+            :service_user_name => linkedin.service_user_name,
+            :service_user_url => linkedin.service_user_url
+          )
+          oauth_request.destroy
 
           flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
         rescue => e
