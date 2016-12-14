@@ -6,7 +6,7 @@
   <div class="course <%= 'unpublished' if course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) %>">
     <div class="name">
       <a href="<%= course_path(course ? course.id : "{{ id }}") %>" class="name"><%= (course && course.name) || nbsp %></a>
-      <%= image_tag "hammer.png", :title => t(:course_unpublished_title, "This course hasn't been published yet"), :alt => t(:course_unpublished_tooltip, "Unpublished"), :class => "unpublished_icon", :style => (course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) ? "" : "display: none;") %>
+      <i class="icon-unpublish" title="<%= t(:course_unpublished_title, "This course hasn't been published yet") %>" style="<%= (course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) ? "" : "display: none;") %>"></i>
     </div>
     <% if course %>
     <div class="details ellipsis">

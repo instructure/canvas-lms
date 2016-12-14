@@ -354,8 +354,13 @@ table.formtable td {
     font-size: 1.1em;
     font-weight: bold;
   }
-  .unpublished .name a {
-    color: $ic-font-color--subdued;
+  .unpublished {
+    .name a {
+      color: $ic-font-color--subdued;
+    }
+    i {
+      color: $ic-font-color--subdued;
+    }
   }
   .details {
     font-size: 0.8em;

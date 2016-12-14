@@ -4,7 +4,7 @@
     <span class="name" title="<%= enrollment.long_name(@current_user) %>">
       <%= enrollment.long_name(@current_user) %>
       <% if enrollment.course.created? || enrollment.course.claimed? %>
-        <%= image_tag "hammer.png", :title => t('course_not_published', "This course hasn't been published yet"), :alt => t('unpublished', "Unpublished"), :class => "unpublished_icon" %>
+        <i class="icon-unpublish" title="<%= t('course_not_published', "This course hasn't been published yet") %>"></i>
       <% end %>
     </span>
 
