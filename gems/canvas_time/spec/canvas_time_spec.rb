@@ -1,3 +1,4 @@
+# encoding: ASCII-8BIT
 #
 # Copyright (C) 2013 Instructure, Inc.
 #
@@ -22,10 +23,7 @@ describe 'Time Marshal override' do
   it "should preserve the old marshalling for post-1900 dates" do
     raw_time = Time.zone.parse('2013-02-16 05:43:21.15Z').time
     dumped = Marshal.dump(raw_time)
-    # Rails 3 adds an instance variable of UTC time zone, so we can't do
-    # an exact match. I confirmed that Rails 2 can still load and safely
-    # ignores the extra instance variable
-    dumped.should =~ /:\tTime\r\x05F\x1C\xC0\xF0IR\xAD/n
+    dumped.should be_include(":\tTime\r\x05F\x1C#{0xc0.chr}#{0xf0.chr}IR#{0xad.chr}")
     reloaded = Marshal.load(dumped)
     reloaded.should == raw_time
   end
