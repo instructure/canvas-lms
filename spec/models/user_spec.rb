@@ -1763,13 +1763,13 @@ describe User do
 
         it "should be able to filter section events after fetching" do
           # trigger the after db filtering
-          Setting.stubs(:get).with('filter_events_by_section_code_threshold', anything).returns(0)
+          allow(Setting).to receive(:get).with('filter_events_by_section_code_threshold', rspec_anything).and_return(0)
           @course.enroll_student(@student, :section => @sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
           expect(@student.upcoming_events(:limit => 2)).to eq [@events[1]]
         end
 
         it "should use the old behavior as a fallback" do
-          Setting.stubs(:get).with('filter_events_by_section_code_threshold', anything).returns(0)
+          allow(Setting).to receive(:get).with('filter_events_by_section_code_threshold', rspec_anything).and_return(0)
           # the optimized call will retrieve the first two events, and then filter them out
           # since it didn't retrieve enough events it will use the old code as a fallback
           @course.enroll_student(@student, :section => @sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
