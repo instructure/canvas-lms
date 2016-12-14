@@ -13,7 +13,7 @@
   <% if (defined? message) && message %>
     <p><%= t('error', 'Error:') %> <%= message %></p>
   <% end %>
-  <a href="#" style="font-size: 1.2em;" class="submit_error_link discussion-topic"><%= t('#links.errors.4xx_feedback', %{Click here to tell us what you were looking for.}) %></a>
+  <a href="#" style="font-size: 1.2em;" class="icon-discussion submit_error_link discussion-topic"><%= t('#links.errors.4xx_feedback', %{Click here to tell us what you were looking for.}) %></a>
   <%= render :partial => "shared/errors/error_form.html", :locals => {:status => response.status, :error_category => '400'} %>
 </div>
 
