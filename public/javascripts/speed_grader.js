@@ -130,6 +130,7 @@ define([
       $submission_file_hidden = $("#submission_file_hidden").removeAttr('id').detach(),
       $assignment_submission_url = $("#assignment_submission_url"),
       $assignment_submission_turnitin_report_url = $("#assignment_submission_turnitin_report_url"),
+      $assignment_submission_originality_report_url = $("#assignment_submission_originality_report_url"),
       $assignment_submission_resubmit_to_turnitin_url = $("#assignment_submission_resubmit_to_turnitin_url"),
       $assignment_submission_vericite_report_url = $("#assignment_submission_vericite_report_url"),
       $assignment_submission_resubmit_to_vericite_url = $("#assignment_submission_resubmit_to_vericite_url"),
@@ -1419,9 +1420,13 @@ define([
 
       // build up new values based on this asset
       if (turnitinAsset.status == 'scored' || (turnitinAsset.status == null && turnitinAsset.similarity_score != null)) {
+        var urlContainer = SpeedgraderHelpers.urlContainer(submission,
+                                                           $assignment_submission_turnitin_report_url,
+                                                           $assignment_submission_originality_report_url)
+
         $turnitinScoreContainer.html(turnitinScoreTemplate({
           state: (turnitinAsset.state || 'no') + '_score',
-          reportUrl: $.replaceTags($assignment_submission_turnitin_report_url.attr('href'), { user_id: submission.user_id, asset_string: assetString }),
+          reportUrl: $.replaceTags(urlContainer.attr('href'), { user_id: submission.user_id, asset_string: assetString }),
           tooltip: I18n.t('turnitin.tooltip.score', 'Turnitin Similarity Score - See detailed report'),
           score: turnitinAsset.similarity_score + '%'
         }));

@@ -23,6 +23,12 @@ define([
   'jquery.instructure_date_and_time'
 ], function($, _, I18n) {
   var speedgraderHelpers = {
+    urlContainer: function(submission, defaultEl, originalityReportEl) {
+      if (submission.has_originality_report) {
+        return originalityReportEl
+      }
+      return defaultEl
+    },
 
     buildIframe: function(src, options){
       options = options || {};
