@@ -1,10 +1,10 @@
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.rb')
 
 describe AddressBook::Service do
   before :each do
-    Canvas::DynamicSettings.stubs(:from_cache).
-      with("address-book", anything).
-      returns({'app-host' => 'http://test.host'})
+    allow(Canvas::DynamicSettings).to receive(:from_cache).
+      with("address-book", rspec_anything).
+      and_return({'app-host' => 'http://test.host'})
 
     @sender = user_model
     @address_book = AddressBook::Service.new(@sender)
@@ -23,7 +23,7 @@ describe AddressBook::Service do
       end
       [user.global_id, result]
     }.flatten]
-    Services::AddressBook.stubs(method).with(*args).returns(returns)
+    allow(Services::AddressBook).to receive(method).with(*args).and_return(returns)
   end
 
   describe "known_users" do
@@ -89,13 +89,13 @@ describe AddressBook::Service do
       end
 
       it "skips course roles in unshared courses when absent" do
-        Services::AddressBook.expects(:roles_in_context).never
+        expect(Services::AddressBook).to receive(:roles_in_context).never
         @address_book.known_users([@recipient])
         expect(@address_book.common_courses(@recipient)).not_to include(@course.id)
       end
 
       it "skips group memberships in unshared groups when absent" do
-        Services::AddressBook.expects(:roles_in_context).never
+        expect(Services::AddressBook).to receive(:roles_in_context).never
         @address_book.known_users([@recipient])
         expect(@address_book.common_groups(@recipient)).not_to include(@group.id)
       end
@@ -281,9 +281,9 @@ describe AddressBook::Service do
   describe "count_in_context" do
     before :each do
       @course = course_model
-      Services::AddressBook.stubs(:count_in_context).
+      allow(Services::AddressBook).to receive(:count_in_context).
         with(@sender, @course.global_asset_string).
-        returns(3)
+        and_return(3)
     end
 
     it "returns count from service" do
