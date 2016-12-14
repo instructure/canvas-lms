@@ -13,6 +13,9 @@
   class="assignment-name {{#if assignment.muted}}muted{{/if}}"
   href="{{href}}"
 >
+  {{#if assignment.muted}}
+    <i class="icon-muted" role="presentation"></i>
+  {{/if}}
   {{#unless assignment.muted}}
     {{#ifAny assignment.omit_from_final_grade assignment.invalid}}
       <i class="icon-warning"></i>

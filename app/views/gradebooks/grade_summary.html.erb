@@ -207,7 +207,7 @@
               <% end %>
             >
               <% if assignment.muted? %>
-                <%= image_tag "sound_mute.png", :alt => t("#gradebooks.grade.muted", "Muted"), :class => "muted_icon" %>
+                <i class="icon-muted" title="<%= t("#gradebooks.grade.muted", "Muted") %>"></i>
               <% else %>
                 <span class="screenreader-only" role="link">
                   <%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>
@@ -516,7 +516,7 @@
 </table>
 </div>
 <% if @presenter.has_muted_assignments? %>
-  <small><%= image_tag "sound_mute.png", :alt => "" %><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
+  <small><i class="icon-muted" role="presentation"></i><%= t(:student_mute_legend, "Your instructor is working on grades. While your instructor is working on grades, grade and comment information is unavailable.") %></small>
 <% end %>
 <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
 <%= render :partial => "shared/rubric_criterion_dialog" %>
