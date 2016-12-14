@@ -198,11 +198,8 @@ define([
 
       test('sets state.hideAlert to true', () => {
         notOk(subject.state.hideAlert, 'precondition')
-        Promise.resolve().then(() => {
-          TestUtils.Simulate.click(closeButton)
-        }).then(() => {
-          ok(subject.state.hideAlert)
-        })
+        TestUtils.Simulate.click(closeButton)
+        ok(subject.state.hideAlert)
       })
     })
 
@@ -393,11 +390,8 @@ define([
       test('marks sending as false', () => {
         ok(subject.state.sending, 'precondition, is sending')
 
-        Promise.resolve().then(() => {
-          subject.handleResponseError(errorResponse)
-        }).then(() => {
-          ok(!subject.state.sending)
-        })
+        subject.handleResponseError(errorResponse)
+        ok(!subject.state.sending)
       })
     })
 
