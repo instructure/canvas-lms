@@ -237,6 +237,28 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
+    it "should require permissions for sending to other students" do
+      user_session(@student)
+
+      new_user = User.create
+      enrollment = @course.enroll_student(new_user)
+      enrollment.workflow_state = 'active'
+      enrollment.save
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+
+      post 'create', :recipients => [new_user.id.to_s], :body => "yo", :context_code => @course.asset_string
+      expect(response).to_not be_success
+    end
+
+    it "should allow sending to instructors even if permissions are disabled" do
+      user_session(@student)
+      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+
+      post 'create', :recipients => [@teacher.id.to_s], :body => "yo", :context_code => @course.asset_string
+      expect(response).to be_success
+      expect(assigns[:conversation]).not_to be_nil
+    end
+
     it "should not add the wrong tags in a certain terrible cached edge case" do
       # tl;dr - not including the updated_at when we instantiate the users
       # can cause us to grab stale conversation_context_codes
