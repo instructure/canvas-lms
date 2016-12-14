@@ -375,7 +375,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
-        expect(Canvas::Twilio).to receive(:deliver).with('+18015550100', rspec_anything, from_recipient_country: true)
+        expect(Canvas::Twilio).to receive(:deliver).with('+18015550100', anything, from_recipient_country: true)
         @message.deliver
         @message.reload
         expect(@message.workflow_state).to eq('sent')

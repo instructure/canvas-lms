@@ -30,7 +30,7 @@ describe Quizzes::QuizEligibility do
     allow(course).to receive(:enrollment_term).and_return(term)
     allow(quiz).to receive(:grants_right?).and_return(true)
     allow(quiz).to receive(:grants_right?).
-      with(rspec_anything, rspec_anything, :manage).and_return(false)
+      with(anything, anything, :manage).and_return(false)
   end
 
   describe '#eligible?' do
@@ -38,7 +38,7 @@ describe Quizzes::QuizEligibility do
     it 'always returns true if the user is a teacher' do
       allow(quiz).to receive(:grants_right?).and_return(false)
       allow(quiz).to receive(:grants_right?).
-        with(rspec_anything, rspec_anything, :manage).and_return(true)
+        with(anything, anything, :manage).and_return(true)
       expect(eligibility.eligible?).to be_truthy
       expect(eligibility.potentially_eligible?).to be_truthy
     end

@@ -341,7 +341,7 @@ describe FilesController do
     attachment_model(:uploaded_data => stub_png_data)
     sz = "640x>"
     expect(@attachment.any_instantiation).to receive(:create_or_update_thumbnail).
-      with(rspec_anything, sz, sz) { @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data) }
+      with(anything, sz, sz) { @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data) }
     get "/images/thumbnails/#{@attachment.id}/#{@attachment.uuid}?size=640x#{URI.encode '>'}"
     thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
     expect(response).to redirect_to(thumb.authenticated_s3_url)

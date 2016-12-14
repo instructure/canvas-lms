@@ -67,18 +67,18 @@ describe BigBlueButtonConference do
     end
 
     it "should recreate the conference" do
-      expect(@conference).to receive(:send_request).with(:create, rspec_anything).and_return(true)
+      expect(@conference).to receive(:send_request).with(:create, anything).and_return(true)
 
       expect(@conference.craft_url(@user)).to match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
 
       # load a new instance to clear out @conference_active
       @conference = WebConference.find(@conference.id)
-      expect(@conference).to receive(:send_request).with(:create, rspec_anything).and_return(true)
+      expect(@conference).to receive(:send_request).with(:create, anything).and_return(true)
       expect(@conference.craft_url(@user)).to match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
     end
 
     it "should not recreate the conference if it is active" do
-      expect(@conference).to receive(:send_request).once.with(:create, rspec_anything).and_return(true)
+      expect(@conference).to receive(:send_request).once.with(:create, anything).and_return(true)
       @conference.initiate_conference
       expect(@conference.active?).to be_truthy
       expect(@conference.craft_url(@user)).to match(/\Ahttp:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)

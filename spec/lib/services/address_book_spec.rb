@@ -15,7 +15,7 @@ module Services
 
     def expect_request(url_matcher, options={})
       body = options[:body] || {}
-      header_matcher = options[:headers] || rspec_anything
+      header_matcher = options[:headers] || anything
       expect(CanvasHttp).to receive(:get).
         with(url_matcher, header_matcher).
         and_return(double(body: body.to_json, code: 200))
@@ -23,7 +23,7 @@ module Services
 
     def stub_response(url_matcher, body, options={})
       status = options[:status] || 200
-      header_matcher = options[:headers] || rspec_anything
+      header_matcher = options[:headers] || anything
       allow(CanvasHttp).to receive(:get).
         with(url_matcher, header_matcher).
         and_return(double(body: body.to_json, code: status))
@@ -52,7 +52,7 @@ module Services
       it "includes an Authorization header with JWT in request" do
         Timecop.freeze do
           jwt = Services::AddressBook.jwt
-          expect_request(rspec_anything, headers: hash_including('Authorization' => %r{Bearer #{jwt}}))
+          expect_request(anything, headers: hash_including('Authorization' => %r{Bearer #{jwt}}))
           Services::AddressBook.recipients(sender: @sender)
         end
       end
@@ -126,7 +126,7 @@ module Services
       end
 
       it "reshapes results returned from service endpoint" do
-        stub_response(rspec_anything, {
+        stub_response(anything, {
           '10000000000002' => [
             { 'context_type' => 'course', 'context_id' => '10000000000001', 'roles' => ['TeacherEnrollment'] }
           ],
@@ -159,7 +159,7 @@ module Services
       end
 
       it "reports errors in service request but then returns sane value" do
-        stub_response(rspec_anything, { 'errors' => { 'something' => 'went wrong' } }, status: 400)
+        stub_response(anything, { 'errors' => { 'something' => 'went wrong' } }, status: 400)
         expect(Canvas::Errors).to receive(:capture)
         result = nil
         expect { result = Services::AddressBook.recipients(@sender) }.not_to raise_error
@@ -189,7 +189,7 @@ module Services
       end
 
       it "extracts count from response from service endpoint" do
-        stub_response(rspec_anything, @response)
+        stub_response(anything, @response)
         count = Services::AddressBook.count_recipients(sender: @sender, context: @course)
         expect(count).to eql(@count)
       end
@@ -284,7 +284,7 @@ module Services
       end
 
       it "returns the count from count_recipients call" do
-        expect_request(rspec_anything, body: @response)
+        expect_request(anything, body: @response)
         count = Services::AddressBook.count_in_context(@sender, 'course_1')
         expect(count).to eql(@count)
       end
@@ -330,7 +330,7 @@ module Services
       end
 
       it "returns both result and finished flag" do
-        stub_response(rspec_anything, {
+        stub_response(anything, {
           '10000000000002' => [
             { 'context_type' => 'course', 'context_id' => '10000000000001', 'roles' => ['TeacherEnrollment'] }
           ],

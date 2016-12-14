@@ -1036,7 +1036,7 @@ describe Attachment do
 
     it "should rename root attachments and update children" do
       expect(@new_object).to receive(:exists?).and_return(false)
-      expect(@old_object).to receive(:copy_to).with(@root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), rspec_anything)
+      expect(@old_object).to receive(:copy_to).with(@root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), anything)
       @root.change_namespace(@new_account.file_namespace)
       expect(@root.namespace).to eq @new_account.file_namespace
       expect(@child.reload.namespace).to eq @root.namespace
@@ -1109,7 +1109,7 @@ describe Attachment do
       thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
       expect(thumb).to eq nil
 
-      expect(@attachment).to receive(:create_or_update_thumbnail).with(rspec_anything, sz, sz) { 
+      expect(@attachment).to receive(:create_or_update_thumbnail).with(anything, sz, sz) { 
         @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data)
       }
       url = @attachment.thumbnail_url(:size => "640x>")
@@ -1120,7 +1120,7 @@ describe Attachment do
     end
 
     it "should use the existing thumbnail if present" do
-      expect(@attachment).to receive(:create_or_update_thumbnail).with(rspec_anything, sz, sz) {
+      expect(@attachment).to receive(:create_or_update_thumbnail).with(anything, sz, sz) {
         @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data)
       }
       url = @attachment.thumbnail_url(:size => "640x>")

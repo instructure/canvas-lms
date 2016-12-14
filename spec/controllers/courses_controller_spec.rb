@@ -1287,7 +1287,7 @@ describe CoursesController do
       changes["lock_all_announcements"] = [ nil, true ]
 
       expect(Auditors::Course).to receive(:record_created).
-        with(rspec_anything, rspec_anything, changes, rspec_anything)
+        with(anything, anything, changes, anything)
 
       post 'create', { :account_id => @account.id, :course =>
           { :name => course.name, :lock_all_announcements => true } }
@@ -1399,7 +1399,7 @@ describe CoursesController do
       }
 
       expect(Auditors::Course).to receive(:record_updated).
-        with(rspec_anything, rspec_anything, changes, source: :manual)
+        with(anything, anything, changes, source: :manual)
 
       put 'update', :id => @course.id, :course => {
         :name => changes["name"].last,
@@ -1598,7 +1598,7 @@ describe CoursesController do
       expect(@course.reload).to be_completed
       expect(@course.conclude_at).to be <= Time.now
       expect(Auditors::Course).to receive(:record_unconcluded).
-        with(rspec_anything, rspec_anything, source: :manual)
+        with(anything, anything, source: :manual)
 
       post 'unconclude', :course_id => @course.id
       expect(response).to be_redirect
@@ -1848,7 +1848,7 @@ describe CoursesController do
     it "should log reset audit event" do
       user_session(@teacher)
       expect(Auditors::Course).to receive(:record_reset).once.
-        with(@course, rspec_anything, @user, rspec_anything)
+        with(@course, anything, @user, anything)
       post 'reset_content', :course_id => @course.id
     end
   end

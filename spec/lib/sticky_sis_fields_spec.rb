@@ -302,7 +302,7 @@ describe StickySisFields do
                                 :root_account => Account.default,
                                 :enrollment_term => Account.default.default_enrollment_term)
     expect(ac.stuck_sis_fields).to eq [].to_set
-    expect(ac).to receive(:write_attribute).with(:stuck_sis_fields, rspec_anything).never
+    expect(ac).to receive(:write_attribute).with(:stuck_sis_fields, anything).never
     ac.save!
     ac.add_sis_stickiness(:name)
     ac.clear_sis_stickiness(:name)
