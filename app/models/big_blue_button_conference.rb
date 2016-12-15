@@ -21,15 +21,21 @@ require 'nokogiri'
 class BigBlueButtonConference < WebConference
   include ActionDispatch::Routing::PolymorphicRoutes
   include CanvasRails::Application.routes.url_helpers
-  after_destroy :end_meeting
-  after_destroy :delete_all_recordings
+  before_destroy :end_meeting
+  before_destroy :delete_all_recordings
+
+  RECORDING_OPTIONS = {
+    1 => t('settings_show_option','Show record option'),
+    2 => t('settings_hide_option','Hide record option (true by default)'),
+    3 => t('settings_record_everything','Record everything')
+  }
 
   user_setting_field :record, {
     name: ->{ t('recording_setting', 'Recording') },
     description: ->{ t('recording_setting_enabled_description', 'Enable recording for this conference') },
     type: :boolean,
-    default: false,
-    visible: ->{ WebConference.config(BigBlueButtonConference.to_s)[:recording_enabled] },
+    default: ->{ WebConference.config(BigBlueButtonConference.to_s) ? WebConference.config(BigBlueButtonConference.to_s)[:recording_option_enabled] : false },
+    visible: ->{ WebConference.config(BigBlueButtonConference.to_s) ? WebConference.config(BigBlueButtonConference.to_s)[:recording_options][:text]=='show_record_option' : false },
   }
 
   def initiate_conference
@@ -44,19 +50,35 @@ class BigBlueButtonConference < WebConference
       settings[:user_key] = 8.times.map{ chars[chars.size * rand] }.join
       settings[:admin_key] = 8.times.map{ chars[chars.size * rand] }.join until settings[:admin_key] && settings[:admin_key] != settings[:user_key]
     end
-    settings[:record] &&= config[:recording_enabled]
     current_host = URI(settings[:default_return_url] || "http://www.instructure.com").host
-    send_request(:create, {
+
+    requestBody = {
       :meetingID => conference_key,
       :name => title,
       :voiceBridge => "%020d" % self.global_id,
       :attendeePW => settings[:user_key],
       :moderatorPW => settings[:admin_key],
-      :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
-      :record => settings[:record] ? "true" : "false",
-      :welcome => settings[:record] ? t("This conference may be recorded.") : "",
-      "meta_canvas-recording-ready-url" => recording_ready_url(current_host)
-    }) or return nil
+      :logoutURL => settings[:default_return_url] ? "javascript:window.close()" : "http://www.instructure.com",
+      :welcome => config[:recording_enabled] ? t("This conference may be recorded.") : ""
+    }
+    requestBody["meta_bn-recording-ready-url"] = recording_ready_url(current_host)
+
+    if config[:recording_enabled]
+      case config[:recording_options][:text]
+      when 'show_record_option'
+        requestBody[:record] = settings[:record]
+      when 'hide_record_option'
+        requestBody[:record] = true
+      when 'record_everything'
+        requestBody[:record] = true
+        requestBody[:autoStartRecording] = true
+        requestBody[:allowStartStopRecording] = false
+      end
+    else
+      requestBody[:record] = false
+    end
+
+    send_request(:create, requestBody) or return nil
     @conference_active = true
     save
     conference_key
@@ -97,8 +119,14 @@ class BigBlueButtonConference < WebConference
   end
 
   def delete_all_recordings
-    fetch_recordings.map do |recording|
-      delete_recording recording[:recordID]
+    recordings = fetch_recordings.map!{ |recording| recording[:recordID] }
+    if recordings.length > 1 && recordings.length < 10
+      response = send_request(:deleteRecordings, {
+        :recordID => recordings.join(",")
+        })
+      response[:deleted] if response
+    elsif recordings.length == 1 || recordings.length >= 10
+      recordings.each{ |recording_id| delete_recording(recording_id) }
     end
   end
 
@@ -112,9 +140,7 @@ class BigBlueButtonConference < WebConference
   def retouch?
     # If we've queried the room status recently, use that result to determine if
     # we need to recreate it.
-    if !@conference_active.nil?
-      return !@conference_active
-    end
+    return !@conference_active unless @conference_active.nil?
 
     # BBB removes chat rooms that have been idle fairly quickly.
     # There's no harm in "creating" a room that already exists; the api will
@@ -132,15 +158,17 @@ class BigBlueButtonConference < WebConference
   end
 
   def end_meeting
-    response = send_request(:end, {
-      :meetingID => conference_key,
-      :password => settings[(type == :user ? :user_key : :admin_key)],
-      })
-    response[:ended] if response
+    if self.ended_at.nil?
+      response = send_request(:end, {
+        :meetingID => conference_key,
+        :password => settings[(type == :user ? :user_key : :admin_key)],
+        })
+      response[:ended] if response
+    end
   end
 
   def fetch_recordings
-    return [] unless conference_key && settings[:record]
+    return [] unless conference_key && config[:recording_enabled]
     response = send_request(:getRecordings, {
       :meetingID => conference_key,
       })
@@ -149,17 +177,23 @@ class BigBlueButtonConference < WebConference
     Array(result)
   end
 
-  def delete_recording(recording_id)
-    response = send_request(:deleteRecordings, {
-      :recordID => recording_id,
-      })
-    response[:deleted] if response
-  end
-
   def generate_request(action, options)
     query_string = options.to_query
     query_string << ("&checksum=" + Digest::SHA1.hexdigest(action.to_s + query_string + config[:secret_dec]))
-    "http://#{config[:domain]}/bigbluebutton/api/#{action}?#{query_string}"
+    returnUrl = config[:domain]
+    returnUrl.slice!(-1) if returnUrl[-1]=="/"
+    unless returnUrl.include?("http://") && returnUrl.include?("/api")
+      if returnUrl.include?("http://") && !returnUrl.include?("/api")
+        returnUrl = returnUrl.include?("/bigbluebutton") ? "#{returnUrl}/api" : "#{returnUrl}/bigbluebutton/api"
+      elsif !returnUrl.include?("http://") && returnUrl.include?("/api")
+        #We assume that we have a URL in the type "domain/bigbluebutton/api"
+        returnUrl = "http://#{returnUrl}"
+      else
+        #For URLs only including the IP address
+        returnUrl = "http://#{returnUrl}/bigbluebutton/api"
+      end
+    end
+    "#{returnUrl}/#{action}?#{query_string}"
   end
 
   def send_request(action, options)
