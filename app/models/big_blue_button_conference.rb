@@ -109,12 +109,27 @@ class BigBlueButtonConference < WebConference
 
   def recordings
     fetch_recordings.map do |recording|
-      recording_format = recording.fetch(:playback, {}).fetch(:format, {})
-      {
-        recording_id:     recording[:recordID],
-        duration_minutes: recording_format[:length].to_i,
-        playback_url:     recording_format[:url],
+      recording_formats = recording.fetch(:playback, {})
+      recordingObj = {
+        recording_id:       recording[:recordID],
+        recording_vendor:   "big_blue_button",
+        published:          recording[:published]=="true" ? true : false,
+        protected:          recording[:protected] ? recording[:protected]=="true" ? true : false : nil,
+        ended_at:           recording[:endTime].to_i,
+        duration_minutes:   recording_formats.first[:length].to_i,
+        recording_formats:  [],
+        images:             []
       }
+      recording_formats.each do |recording_format|
+        recordingObj[:recording_formats] << {
+          type:             recording_format[:type].capitalize,
+          playback_url:     recording_format[:url]
+        }
+        if recording_format[:preview] && recording_format[:preview][:images] && recording_format[:preview][:images].length > recordingObj[:images].length
+          recordingObj[:images] = recording_format[:preview][:images]
+        end
+      end
+      recordingObj
     end
   end
 
@@ -128,6 +143,54 @@ class BigBlueButtonConference < WebConference
     elsif recordings.length == 1 || recordings.length >= 10
       recordings.each{ |recording_id| delete_recording(recording_id) }
     end
+  end
+
+  def delete_recording(recording_id)
+    response = send_request(:deleteRecordings, {
+      :recordID => recording_id,
+      })
+    response[:deleted] if response
+  end
+
+  def publish_recording(recording_id, publish)
+    send_request(:publishRecordings, {
+      :recordID => recording_id,
+      :publish  => publish
+      })
+    response = { :published => "false", :recording_formats => [] }
+    if publish=="true"
+      recording = nil
+      begin
+        response_recordings = send_request(:getRecordings, {
+        :meetingID => conference_key
+        })
+        recording = response_recordings[:recordings].find{ |r| r[:recordID]==recording_id }
+        sleep(10) if recording[:published]=="false"
+      end while recording.nil? || recording[:published]=="false"
+
+      if recording[:published]=="true"
+        recording[:playback].each{ |formats| response[:recording_formats] << { :type => formats[:type].capitalize, :url => formats[:url] } }
+        response[:published]="true"
+        response
+      end
+    else
+      response if response
+    end
+  end
+
+  def protect_recording(recording_id, protect)
+    send_request(:updateRecordings, {
+      :recordID => recording_id,
+      :protect  => protect
+      })
+
+    response_recordings = send_request(:getRecordings, {
+    :meetingID => conference_key
+    })
+    recording = response_recordings[:recordings].find{ |r| r[:recordID]==recording_id }
+    response = { :protected=> recording[:protected], :recording_formats => [] }
+    recording[:playback].each{ |formats| response[:recording_formats] << { :type => formats[:type].capitalize, :url => formats[:url] } }
+    response if response
   end
 
   def close
@@ -183,15 +246,15 @@ class BigBlueButtonConference < WebConference
     returnUrl = config[:domain]
     returnUrl.slice!(-1) if returnUrl[-1]=="/"
     unless returnUrl.include?("http://") && returnUrl.include?("/api")
-      if returnUrl.include?("http://") && !returnUrl.include?("/api")
-        returnUrl = returnUrl.include?("/bigbluebutton") ? "#{returnUrl}/api" : "#{returnUrl}/bigbluebutton/api"
-      elsif !returnUrl.include?("http://") && returnUrl.include?("/api")
-        #We assume that we have a URL in the type "domain/bigbluebutton/api"
-        returnUrl = "http://#{returnUrl}"
-      else
-        #For URLs only including the IP address
-        returnUrl = "http://#{returnUrl}/bigbluebutton/api"
-      end
+      returnUrl = if returnUrl.include?("http://") && !returnUrl.include?("/api")
+                    returnUrl.include?("/bigbluebutton") ? "#{returnUrl}/api" : "#{returnUrl}/bigbluebutton/api"
+                  elsif !returnUrl.include?("http://") && returnUrl.include?("/api")
+                    #We assume that we have a URL in the type "domain/bigbluebutton/api"
+                    "http://#{returnUrl}"
+                  else
+                    #For URLs only including the IP address
+                    "http://#{returnUrl}/bigbluebutton/api"
+                  end
     end
     "#{returnUrl}/#{action}?#{query_string}"
   end
@@ -236,11 +299,21 @@ class BigBlueButtonConference < WebConference
       nil
     # If no child_elements, this is probably a text node, so just return its content
     elsif child_elements.empty?
-      node.content
+      if node.name == "image"
+        {
+          :width            =>  node.attributes["width"].value,
+          :height           =>  node.attributes["height"].value,
+          :title            =>  node.attributes["alt"].value,
+          :thumbnail_url    =>  node.content
+        }
+      else
+        node.content
+      end
     # The BBB API follows the pattern where a plural element (ie <bars>)
     # contains many singular elements (ie <bar>) and nothing else. Detect this
     # and return an array to be assigned to the plural element.
-    elsif node.name.singularize == child_elements.first.name
+    # Also if the node name is playback, so that it returns an array of all the available recording formats
+    elsif node.name.singularize == child_elements.first.name || node.name=="playback"
       child_elements.map { |child| xml_to_value(child) }
     # otherwise, make a hash of the child elements
     else

@@ -81,3 +81,36 @@ header:not(.ic-app-header) {
   margin: 0;
   border-radius: 3px;
 }
+
+.recording-thumbnails{
+  text-align: left;
+  small{
+    display: block;
+  }
+
+  img + small{
+    margin-top: 5px;
+  }
+
+  img{
+    padding: 4px;
+    background-color: white;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+  }
+
+  .recording-thumbnail{
+    width: 60px;
+    display: inline-block;
+  }
+
+  img:hover + .large-thumbnail{
+    display: inline-block;
+    position: absolute;
+    z-index: 1;
+  }
+
+  .large-thumbnail{
+    display: none;
+  }
+}
