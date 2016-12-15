@@ -31,10 +31,17 @@ RSpec.configure do |c|
   c.include LtiSpecHelper, :include_lti_spec_helpers
 
   c.around(:each) do |example|
-    Timeout::timeout(180) do
-      Rails.logger.info "STARTING SPEC #{example.full_description}"
-      example.run
+    record_spec_info(example) do
+      Timeout::timeout(180) do
+        Rails.logger.info "STARTING SPEC #{example.full_description}"
+        example.run
+      end
     end
+  end
+
+  # TODO: spec failure pages for everything, not just selenium
+  def record_spec_info(*)
+    yield
   end
 end
 
