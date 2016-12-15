@@ -103,6 +103,17 @@ describe "assignments" do
         user: reviewed
       })
     }
+    let!(:submissionReviewer) {
+      submission_model({
+        assignment: assignment,
+        body: 'submission body reviewer',
+        course: review_course,
+        grade: "5",
+        score: "5",
+        submission_type: 'online_text_entry',
+        user: reviewer
+      })
+    }
     let!(:comment) {
       submission_comment_model({
         author: reviewer,
@@ -183,5 +194,45 @@ describe "assignments" do
         expect(f("#rubric_assessment_option_#{assessment.id}")).to include_text(assessment.assessor_name)
       end
     end
+
+    context 'when peer review and plagiarism are enabled' do
+      before(:each) {
+        user_logged_in(user: reviewer)
+        # assignment settings
+        assignment.vericite_enabled = true
+        turnitin_settings = {}
+        turnitin_settings[:originality_report_visibility] = "immediate"
+        turnitin_settings[:exclude_quoted] = '1'
+        turnitin_settings[:created] = true
+        turnitin_settings[:s_view_report] = '1'
+        turnitin_settings[:s_paper_check] = '1'
+        turnitin_settings[:internet_check] = '1'
+        turnitin_settings[:current] = true
+        turnitin_settings[:vericite] = true
+        assignment.turnitin_settings = turnitin_settings
+        # submission settings
+        turnitin_data = {}
+        turnitin_data[:provider] = :vericite
+        turnitin_data[:last_processed_attempt] = 1
+        submission_data = {}
+        submission_data[:status] = "scored"
+        submission_data[:object_id] = "canvas/1/25/5/ee0486b43afa304201c1d8dd44ec2da3d76dd86c"
+        submission_data[:submit_time] = Time.now.to_i
+        submission_data[:similarity_score_check_time] = 1481569668
+        submission_data[:similarity_score_time] = Time.now.to_i
+        submission_data[:similarity_score] = Time.now.to_i
+        submission_data[:similarity_score] = 100
+        submission_data[:state] = "none"
+        turnitin_data["submission_" + submission.id.to_s] = submission_data
+        submission.turnitin_data = turnitin_data
+        submission.turnitin_data_changed!
+        submission.save!
+      }
+      it 'should show the plagiarism report link for reviewer', priority: "1", test_id: 216392 do
+        get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
+        expect(f(".turnitin_similarity_score")).to be_displayed
+      end
+    end
+
   end
 end

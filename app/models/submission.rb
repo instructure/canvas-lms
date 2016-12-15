@@ -327,13 +327,15 @@ class Submission < ActiveRecord::Base
       plagData = self.vericite_data_hash
       @submit_to_vericite = false
       settings = assignment.vericite_settings
+      type_can_peer_review = true
     else
       plagData = self.turnitin_data
       @submit_to_turnitin = false
       settings = assignment.turnitin_settings
+      type_can_peer_review = false
     end
     return plagData &&
-    user_can_read_grade?(user, session) &&
+    (user_can_read_grade?(user, session) || (type_can_peer_review && user_can_peer_review_plagiarism?(user))) &&
     (assignment.context.grants_right?(user, session, :manage_grades) ||
       case settings[:originality_report_visibility]
        when 'immediate' then true
@@ -343,6 +345,18 @@ class Submission < ActiveRecord::Base
        when 'never' then false
       end
     )
+  end
+
+  def user_can_peer_review_plagiarism?(user)
+    assignment.peer_reviews &&
+    assignment.current_submissions_and_assessors[:submissions].select{ |submission|
+      # first filter by submissions for the requested reviewer
+      user.id == submission.user_id &&
+      submission.assigned_assessments
+    }.any? {|submission|
+      # next filter the assigned assessments by the submission user_id being reviewed
+      submission.assigned_assessments.any? {|review| user_id == review.user_id}
+    }
   end
 
   def user_can_read_grade?(user, session=nil)
