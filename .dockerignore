@@ -23,6 +23,7 @@ public/javascripts/compiled/
 public/javascripts/jst/
 public/javascripts/jsx/
 public/javascripts/translations/
+!public/javascripts/translations/_core_en.js
 public/optimized/
 public/webpack-dist/
 public/webpack-dist-optimized/
