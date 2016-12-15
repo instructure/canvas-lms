@@ -130,6 +130,8 @@ class Submission < ActiveRecord::Base
 
 
   # see #needs_grading?
+  # When changing these conditions, consider updating index_submissions_on_assignment_id
+  # to maintain performance.
   def self.needs_grading_conditions
     conditions = <<-SQL
       submissions.submission_type IS NOT NULL
@@ -159,8 +161,19 @@ class Submission < ActiveRecord::Base
     needs_grading? != needs_grading?(:was)
   end
 
-  scope :needs_grading, -> { where(needs_grading_conditions) }
+  scope :needs_grading, -> {
+    s_name = quoted_table_name
+    e_name = Enrollment.quoted_table_name
+    joins("INNER JOIN #{e_name} ON #{s_name}.user_id=#{e_name}.user_id")
+    .where(needs_grading_conditions)
+    .where(Enrollment.active_student_conditions)
+    .distinct
+  }
 
+  scope :needs_grading_count, -> {
+    select("COUNT(#{quoted_table_name}.id)")
+    .needs_grading
+  }
 
   sanitize_field :body, CanvasSanitize::SANITIZE
 

@@ -1,0 +1,23 @@
+{
+    "ignored_warnings": [
+      {
+        "note": "Enrollment.active_student_conditions accepts no user input",
+        "warning_type": "SQL Injection",
+        "warning_code": 0,
+        "fingerprint": "f4e920699a6767e36d0e54f5c1ccd7a638a3654e8bef6e3ee6fbccffba76c345",
+        "message": "Possible SQL injection",
+        "file": "app/models/submission.rb",
+        "line": 169,
+        "link": "http://brakemanscanner.org/docs/warning_types/sql_injection/",
+        "code": "joins(\"INNER JOIN #{Enrollment.quoted_table_name} ON #{quoted_table_name}.user_id=#{Enrollment.quoted_table_name}.user_id\").where(needs_grading_conditions).where(Enrollment.active_student_conditions)",
+        "render_path": null,
+        "location": {
+          "type": "method",
+          "class": "Submission",
+          "method": "needs_grading"
+        },
+        "user_input": "Enrollment.active_student_conditions",
+        "confidence": "High"
+      }
+    ]
+}

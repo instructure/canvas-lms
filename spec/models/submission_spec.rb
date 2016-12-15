@@ -2327,9 +2327,41 @@ describe Submission do
       OriginalityReport.create!(submission: submission, attachment: attachment, originality_score: 1.0, workflow_state:'pending')
       expect(submission.submission_history.first.turnitin_data[attachment.asset_string]).to be_nil
     end
-
   end
 
+  describe ".needs_grading" do
+    before :once do
+      @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'asdf')
+    end
+
+    it "includes submission that has not been graded" do
+      expect(Submission.needs_grading.count).to eq(1)
+    end
+
+    it "includes submission by enrolled student" do
+      @student.enrollments.take!.complete
+      expect(Submission.needs_grading.count).to eq(0)
+      @course.enroll_student(@student).accept
+      expect(Submission.needs_grading.count).to eq(1)
+    end
+
+    it "includes submission by user with multiple enrollments in the course only once" do
+      another_section = @course.course_sections.create(name: 'two')
+      @course.enroll_student(@student, section: another_section, allow_multiple_enrollments: true).accept
+      expect(Submission.needs_grading.count).to eq(1)
+    end
+
+    it "does not include submission that has been graded" do
+      @assignment.grade_student(@student, grade: '100', grader: @teacher)
+      expect(Submission.needs_grading.count).to eq(0)
+    end
+
+    it "does not include submission by non-student user" do
+      @student.enrollments.take!.complete
+      @course.enroll_user(@student, 'TaEnrollment').accept
+      expect(Submission.needs_grading.count).to eq(0)
+    end
+  end
 end
 
 def submission_spec_model(opts={})
