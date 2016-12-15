@@ -305,6 +305,16 @@ describe "Accounts API", type: :request do
       expect(@a1.restrict_student_past_view).to eq({:value => true, :locked => false})
     end
 
+    it "should update services" do
+      expect(@a1.service_enabled?(:avatars)).to be_falsey
+      json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+        { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+        { :account => {:services => {:avatars => "1"}}})
+
+      expect(json['services']['avatars']).to be_truthy
+      expect(Account.find(@a1.id).service_enabled?(:avatars)).to be_truthy
+    end
+
     it "should not update with a blank name" do
       @a1.name = "blah"
       @a1.save!

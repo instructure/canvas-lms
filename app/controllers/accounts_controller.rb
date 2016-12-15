@@ -111,11 +111,12 @@ class AccountsController < ApplicationController
   # students and even teachers will get an empty list in response, only
   # account admins can view the accounts that they are in.
   #
-  # @argument include[] [String, "lti_guid"|"registration_settings"]
+  # @argument include[] [String, "lti_guid"|"registration_settings"|"services"]
   #   Array of additional information to include.
   #
   #   "lti_guid":: the 'tool_consumer_instance_guid' that will be sent for this account on LTI launches
   #   "registration_settings":: returns info about the privacy policy and terms of use
+  #   "services":: returns services and whether they are enabled (requires account management permissions)
   #
   # @returns [Account]
   def index
@@ -405,7 +406,18 @@ class AccountsController < ApplicationController
   def update_api
     if authorized_action(@account, @current_user, [:manage_account_settings, :manage_storage_quotas])
       account_params = params[:account].present? ? strong_account_params : {}
+      includes = Array(params[:includes]) || []
       unauthorized = false
+
+      if params[:account][:services]
+        if authorized_action(@account, @current_user, :manage_account_settings)
+          params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
+            @account.set_service_availability(key, value_to_boolean(value))
+          end
+          includes << 'services'
+          params[:account].delete :services
+        end
+      end
 
       # account settings (:manage_account_settings)
       account_settings = account_params.select {|k, v| [:name, :default_time_zone, :settings].include?(k.to_sym)}.with_indifferent_access
@@ -453,7 +465,7 @@ class AccountsController < ApplicationController
 
         if success
           # Successfully completed
-          render :json => account_json(@account, @current_user, session, params[:includes] || [])
+          render :json => account_json(@account, @current_user, session, includes)
         else
           # Failed (hopefully with errors)
           render :json => @account.errors, :status => :bad_request
@@ -505,6 +517,9 @@ class AccountsController < ApplicationController
   #
   # @argument account[settings][restrict_student_future_listing][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
+  #
+  # @argument account[services] [Hash]
+  #   Give this a set of keys and boolean values to enable or disable services matching the keys
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id> \
