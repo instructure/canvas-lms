@@ -24,10 +24,22 @@
       <a class="btn module_progressions_link" href="<%= progressions_course_context_modules_path(@context) %>"><%= t('links.student_progress', 'View Progress') %></a>
     <% end %>
     <% if @context.allow_web_export_download? %>
-      <a class="btn offline_web_export" href="<%= context_url(@context, :context_offline_web_exports_url) %>">
-        <i class="icon-download" role="presentation"></i>
-        <%= t("Download Course Content") %>
-      </a>
+      <span class="offline_web_export_view">
+        <%= form_tag(context_url(@context, :context_start_offline_web_export_url)) do %>
+          <button type="submit" class="btn offline_web_export">
+            <i class="icon-download" role="presentation"></i>
+            <%= t("Download Course Content") %>
+          </button>
+        <% end %>
+        <% if @last_web_export %>
+          <small class="muted">
+            <%= t("Last Download: ") %>
+            <a href="<%= context_url(@context, :context_offline_web_exports_url) %>">
+              <%= datetime_string(force_zone(@last_web_export.created_at)) %>
+            </a>
+          </small>
+        <% end %>
+      </span>
     <% end %>
     <% if @can_edit %>
       <button class="btn btn-primary add_module_link">
