@@ -24,5 +24,14 @@ describe WebZipExport do
       web_zip_export.generate_without_send_later
       expect(web_zip_export.generating?).to be_truthy
     end
+
+    it 'should create and associate an attachment' do
+      web_zip_export.export_without_send_later
+      web_zip_export.content_export.export_without_send_later
+      expect(web_zip_export.zip_attachment).to be_nil, 'precondition'
+      expect{web_zip_export.convert_to_offline_web_zip_without_send_later}.to change{Attachment.count}.by(1)
+      web_zip_export.reload
+      expect(web_zip_export.zip_attachment).not_to be_nil
+    end
   end
 end
