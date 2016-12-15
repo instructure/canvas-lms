@@ -8055,7 +8055,7 @@ zh-Hant:
     how_is_this_affecting_you: 問題對您造成什麼影響？
     i_cant_get_things_done_until_i_hear_back_from_you: 在收到您的回覆之前，我無法把事情做好
     i_need_some_help_but_its_not_urgent: 我需要一些支援，但並不緊急
-    include_a_link_to_a_screencast_or_screenshot_using_something_like_jing: 使用類似*Jing*的內容將鏈接設置到熒幕錄影/熒幕截圖上。
+    include_a_link_to_a_screencast_or_screenshot_using_something_like_jing: "使用 *Jing* 或者類似軟件，將連結加入到螢幕錄影／螢幕截圖上。"
     instructor_question: 向您的導師問一個問題
     instructor_question_sub: 問題已提交給您的導師
     just_a_casual_question_comment_idea_suggestion: 只是隨意的問題、評論、想法或建議
@@ -8259,7 +8259,7 @@ zh-Hant:
   inactivate_user_35f6d9d7: 阻止用戶使用
   inactive_cd40317f: 不活躍
   inbox_bb245a60: 收件箱
-  include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: 使用類似*Jing*的內容將鏈接設置到熒幕錄影/熒幕截圖上。
+  include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "使用 *Jing* 或者類似軟件，將連結加入到螢幕錄影／螢幕截圖上。"
   include_deleted_enrollments_1c87684a: 包括已刪除的註冊
   include_deleted_objects_3cced3b5: 包括已刪除的對象；
   include_scores_when_alerting_about_grade_changes_623ec201: 當提示成績變動時一併顯示分數。
