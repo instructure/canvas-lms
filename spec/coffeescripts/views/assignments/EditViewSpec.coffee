@@ -242,6 +242,7 @@ define [
     view = @editView(in_closed_grading_period: true)
     view.$el.appendTo $('#fixtures')
 
+    ok view.$el.find('#assignment_name').attr('readonly')
     ok view.$el.find('#assignment_points_possible').attr('readonly')
     ok view.$el.find('#assignment_group_id').attr('readonly')
     equal view.$el.find('#assignment_group_id').attr('aria-readonly'), 'true'
@@ -300,6 +301,7 @@ define [
     view = @editView()
     view.$el.appendTo $('#fixtures')
 
+    notOk view.$el.find('#assignment_name').attr('readonly')
     notOk view.$el.find('#assignment_points_possible').attr('readonly')
     notOk view.$el.find('#assignment_group_id').attr('readonly')
     notOk view.$el.find('#assignment_group_id').attr('aria-readonly')
