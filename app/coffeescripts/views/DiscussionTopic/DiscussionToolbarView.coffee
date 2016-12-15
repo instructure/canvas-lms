@@ -12,11 +12,13 @@ define [
     els:
       '#discussion-search': '$searchInput'
       '#onlyUnread': '$unread'
+      '#showDeleted': '$deleted'
       '.disableWhileFiltering': '$disableWhileFiltering'
 
     events:
       'keyup #discussion-search': 'filterBySearch'
       'change #onlyUnread': 'toggleUnread'
+      'change #showDeleted': 'toggleDeleted'
       'click #collapseAll': 'collapseAll'
       'click #expandAll': 'expandAll'
 
@@ -26,6 +28,7 @@ define [
 
     afterRender: ->
       @$unread.button()
+      @$deleted.button()
 
     filter: @::afterRender
 
@@ -51,6 +54,9 @@ define [
         @model.set 'unread', @$unread.prop 'checked'
         @maybeDisableFields()
       , 50
+
+    toggleDeleted: ->
+      @trigger 'showDeleted', @$deleted.prop('checked')
 
     collapseAll: ->
       @model.set 'collapsed', true

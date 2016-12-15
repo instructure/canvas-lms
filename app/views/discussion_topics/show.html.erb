@@ -285,6 +285,12 @@
                 aria-labelledby="onlyUnreadAccessibleLabel"/>
               <label for="onlyUnread" aria-hidden="true"><%= t('unread', 'Unread') %></label>
 
+              <% if can_do(@context, @current_user, :moderate_forum) %>
+                <span class="screenreader-only" id="showDeletedAccessibleLabel"><%= t("Show deleted replies") %></span>
+                <input type="checkbox" id="showDeleted" aria-labelledby="showDeletedAccessibleLabel"/>
+                <label for="showDeleted" aria-hidden="true" title="Show deleted replies"><i class="icon-eye"></i></label>
+              <% end %>
+
               &nbsp; &nbsp;
               <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
                 <%= image_tag 'discussions/collapse_icon.png', :alt => t('collapse_replies', 'Collapse replies') %>

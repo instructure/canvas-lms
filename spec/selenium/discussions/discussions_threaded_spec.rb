@@ -190,6 +190,7 @@ describe "threaded discussions" do
     entry_text = 'new entry'
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
 
+    fj('label[for="showDeleted"]').click()
     add_reply(entry_text)
     entry = DiscussionEntry.last
     delete_entry(entry)
