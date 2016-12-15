@@ -244,6 +244,7 @@ describe LearningOutcomeGroup do
       expect(active_child_groups).not_to be_empty
 
       group1.destroy
+      group1.reload
 
       active_child_outcomes = group1.child_outcome_links.select{|ol| ol.workflow_state == "active"}
       active_child_groups = group1.child_outcome_groups.active

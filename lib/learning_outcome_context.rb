@@ -1,6 +1,8 @@
 module LearningOutcomeContext
   def self.included(klass)
     if klass < ActiveRecord::Base
+      klass.has_many :linked_learning_outcomes, -> { where(content_tags: { content_type: 'LearningOutcome' }) }, through: :learning_outcome_links, source: :learning_outcome_content
+      klass.has_many :learning_outcome_links, -> { where("content_tags.tag_type='learning_outcome_association' AND content_tags.workflow_state<>'deleted'") }, as: :context, class_name: 'ContentTag'
       klass.has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context
       klass.has_many :learning_outcome_groups, :as => :context
       klass.send :include, InstanceMethods
@@ -13,16 +15,6 @@ module LearningOutcomeContext
     # once they're updated, this shim removed. DO NOT USE in new code.
     def learning_outcomes
       created_learning_outcomes
-    end
-
-    def linked_learning_outcomes(opts={})
-      ids_in_context = self.learning_outcome_links.pluck(:content_id)
-      outcome_ids = opts[:outcome_ids] ? ids_in_context & opts[:outcome_ids] : ids_in_context
-      LearningOutcome.active.where(id: outcome_ids)
-    end
-
-    def learning_outcome_links
-      ContentTag.active.from("(#{content_tag_query.to_sql} UNION #{outcome_link_query.to_sql}) AS content_tags")
     end
 
     # return the outcome but only if it's available in either the context or one
@@ -64,41 +56,5 @@ module LearningOutcomeContext
       LearningOutcomeGroup.find_or_create_root(self, force)
     end
 
-    private
-
-    def content_tag_query
-      ContentTag.where("
-        content_tags.tag_type = 'learning_outcome_association'
-        AND content_tags.context_id = '#{self.id}'").
-        select(
-          'learning_outcome_id,
-          content_id,
-          associated_asset_id,
-          associated_asset_type,
-          workflow_state,
-          content_type,
-          context_type,
-          context_id,
-          tag_type,
-          id'
-        )
-    end
-
-    def outcome_link_query
-      OutcomeLink.select("
-        outcome_links.learning_outcome_id,
-        outcome_links.learning_outcome_id       AS content_id,
-        outcome_links.learning_outcome_group_id AS associated_asset_id,
-        'LearningOutcome'                       AS associated_asset_type,
-        outcome_links.workflow_state            AS workflow_state,
-        'LearningOutcome'                       AS content_type,
-        NULL                                    AS tag_type,
-        NULL                                    AS context_type,
-        '#{self.id}'                            AS context_id,
-        outcome_links.id").joins("
-          INNER JOIN #{LearningOutcomeGroup.quoted_table_name} log ON log.context_id = #{self.id}
-          AND log.context_type = '#{self.class}'").
-        where("log.id = outcome_links.learning_outcome_group_id")
-    end
   end
 end
