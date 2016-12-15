@@ -389,8 +389,10 @@ class ContentMigration < ActiveRecord::Base
         job = self.send_later_enqueue_args(:queue_migration, {:no_delay => true, :run_at => run_at},
           plugin, retry_count: retry_count + 1, expires_at: expires_at)
 
-        self.job_progress.delayed_job_id = job.id
-        self.job_progress.save!
+        if self.job_progress
+          self.job_progress.delayed_job_id = job.id
+          self.job_progress.save!
+        end
       end
 
       return true
@@ -849,7 +851,7 @@ class ContentMigration < ActiveRecord::Base
   def check_for_blocked_migration
     if self.workflow_state_changed? && %w(pre_process_error exported imported failed).include?(workflow_state)
       if self.context && (next_cm = self.context.content_migrations.where(:workflow_state => 'queued').order(:id).first)
-        job_id = next_cm.job_progress.delayed_job_id
+        job_id = next_cm.job_progress.try(:delayed_job_id)
         if job_id && (job = Delayed::Job.where(:id => job_id, :locked_at => nil).first)
           job.run_at = Time.now # it's okay to try it again now
           job.save

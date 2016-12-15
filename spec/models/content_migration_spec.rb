@@ -463,6 +463,36 @@ describe ContentMigration do
 
   end
 
+  context "migrations with skip_job_progress enabled" do
+    before :once do
+      @account = Account.create!(:name => 'account')
+    end
+    def create_ab_cm
+      cm = ContentMigration.new(:context => @account)
+      cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
+      cm.migration_settings[:import_immediately] = true
+      cm.migration_settings[:no_archive_file] = true
+      cm.migration_settings[:skip_import_notification] = true
+      cm.migration_settings[:skip_job_progress] = true
+      cm.save!
+      cm
+    end
+    it "should not throw an error when checking if blocked by current migration" do
+      cm = create_ab_cm
+      cm.queue_migration
+      cm = create_ab_cm
+      expect(cm.blocked_by_current_migration?(nil, 0, nil)).to be_truthy
+    end
+    it "should not throw an error checking for blocked migrations on save" do
+      cm1 = create_ab_cm
+      cm1.queue_migration
+      cm2 = create_ab_cm
+      cm2.queue_migration
+      cm1.workflow_state = 'imported'
+      cm1.save!
+    end
+  end
+
   it "expires migration jobs after 48 hours" do
     course_with_teacher
     cm = ContentMigration.new(:context => @course, :user => @teacher)
