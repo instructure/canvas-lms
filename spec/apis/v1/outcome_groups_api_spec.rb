@@ -288,7 +288,7 @@ describe "Outcome Groups API", type: :request do
       expect(json.map {|j| j['outcome']['id']}).to eq expected_outcome_ids
     end
 
-    context "outcome link object" do
+    context "assessed trait on outcome link object" do
       let(:check_outcome) do
         ->(outcome, can_edit) do
           expect(outcome).to eq({
@@ -305,16 +305,13 @@ describe "Outcome Groups API", type: :request do
       end
 
       let(:check_outcome_link) do
-        ->(params) do
-          context = params[:context]
-          group = params[:group]
-          expect(params[:outcome_link]).to eq({
-            "context_type" => context.class.to_s,
+        ->(outcome_link, context, group, assessed, can_edit, can_unlink) do
+          expect(outcome_link).to eq({
+          "context_type" => context.class.to_s,
             "context_id" => context.id,
             "url" => polymorphic_path([:api_v1, context, :outcome_link], :id => group.id, :outcome_id => @outcome.id),
-            "assessed" => params[:assessed],
-            "can_unlink" => params[:can_unlink],
-            "native" => params[:native],
+            "assessed" => assessed,
+            "can_unlink" => can_unlink,
             "outcome_group" => {
               "id" => group.id,
               "title" => group.title,
@@ -322,13 +319,13 @@ describe "Outcome Groups API", type: :request do
               "url" => polymorphic_path([:api_v1, context, :outcome_group], :id => group.id),
               "subgroups_url" => polymorphic_path([:api_v1, context, :outcome_group_subgroups], :id => group.id),
               "outcomes_url" => polymorphic_path([:api_v1, context, :outcome_group_outcomes], :id => group.id),
-              "can_edit" => params[:can_edit]
+              "can_edit" => can_edit
             }
           })
         end
       end
 
-      it "assessed trait when outcome is not assessed" do
+      it "outcome is not assessed" do
         expect(@outcome).not_to be_assessed
 
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
@@ -339,18 +336,17 @@ describe "Outcome Groups API", type: :request do
 
         check_outcome.call(json.last["outcome"], true)
 
-        check_outcome_link.call({
-          outcome_link: json.last.tap{|j| j.delete("outcome")},
-          context: @account,
-          group: @group,
-          assessed: false,
-          can_edit: true,
-          can_unlink: true,
-          native: true
-        })
+        check_outcome_link.call(
+          json.last.tap{|j| j.delete("outcome")},
+          @account,
+          @group,
+          false,
+          true,
+          true
+        )
       end
 
-      it "assessed trait when outcome is assessed" do
+      it "outcome is assessed" do
         course_with_teacher(active_all: true)
         student_in_course(context: @course)
         @course.root_outcome_group.add_outcome(@outcome)
@@ -371,34 +367,14 @@ describe "Outcome Groups API", type: :request do
         check_outcome.call(json.last["outcome"], false)
 
         # Account context should never be assessed
-        check_outcome_link.call({
-          outcome_link: json.last.tap{ |j| j.delete("outcome") },
-          context: @account,
-          group: @account.root_outcome_group,
-          assessed: false,
-          can_edit: false,
-          can_unlink: false,
-          native: true
-        })
-      end
-
-      it 'native trait when outcome is not native to context' do
-        course_with_teacher(active_all: true)
-        @course.root_outcome_group.add_outcome(@outcome)
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_group_links",
-                   controller: 'outcome_groups_api',
-                   action: 'link_index',
-                   course_id: @course.id,
-                   format: 'json')
-        check_outcome_link.call({
-          outcome_link: json.last.tap{ |j| j.delete("outcome") },
-          context: @course,
-          group: @course.root_outcome_group,
-          assessed: false,
-          can_edit: true,
-          can_unlink: true,
-          native: false
-        })
+        check_outcome_link.call(
+          json.last.tap{ |j| j.delete("outcome") },
+          @account,
+          @account.root_outcome_group,
+          false,
+          false,
+          false
+        )
       end
     end
   end
@@ -820,7 +796,6 @@ describe "Outcome Groups API", type: :request do
           "url" => polymorphic_path([:api_v1, @account, :outcome_link], :id => @group.id, :outcome_id => outcome.id),
           "assessed" => false,
           "can_unlink" => true,
-          "native" => true,
           "outcome_group" => {
             "id" => @group.id,
             "title" => @group.title,
@@ -932,16 +907,13 @@ describe "Outcome Groups API", type: :request do
       end
 
       let(:check_outcome_link) do
-        ->(params) do
-          context = params[:context]
-          group = params[:group]
-          expect(params[:outcome_link]).to eq({
-            "context_type" => context.class.to_s,
+        ->(outcome_link, context, group, assessed, can_unlink) do
+          expect(outcome_link).to eq({
+          "context_type" => context.class.to_s,
             "context_id" => context.id,
             "url" => polymorphic_path([:api_v1, context, :outcome_link], :id => group.id, :outcome_id => @outcome.id),
-            "assessed" => params[:assessed],
-            "can_unlink" => params[:can_unlink],
-            "native" => params[:native],
+            "assessed" => assessed,
+            "can_unlink" => can_unlink,
             "outcome_group" => {
               "id" => group.id,
               "title" => group.title,
@@ -949,7 +921,7 @@ describe "Outcome Groups API", type: :request do
               "url" => polymorphic_path([:api_v1, context, :outcome_group], :id => group.id),
               "subgroups_url" => polymorphic_path([:api_v1, context, :outcome_group_subgroups], :id => group.id),
               "outcomes_url" => polymorphic_path([:api_v1, context, :outcome_group_outcomes], :id => group.id),
-              "can_edit" => !params[:assessed]
+              "can_edit" => !assessed
             }
           })
         end
@@ -969,14 +941,7 @@ describe "Outcome Groups API", type: :request do
         )
 
         check_outcome.call(json.first["outcome"])
-        check_outcome_link.call({
-          outcome_link: json.first.tap{|j| j.delete("outcome")},
-          context: @account,
-          group: @group,
-          assessed: false,
-          can_unlink: true,
-          native: true
-        })
+        check_outcome_link.call(json.first.tap{|j| j.delete("outcome")}, @account, @group, false, true)
       end
 
       it "outcome is assessed" do
@@ -1004,14 +969,13 @@ describe "Outcome Groups API", type: :request do
 
         check_outcome.call(json.first["outcome"])
 
-        check_outcome_link.call({
-          outcome_link: json.first.tap{ |j| j.delete("outcome") },
-          context: @course,
-          group: @course.root_outcome_group,
-          assessed: true,
-          can_unlink: false,
-          native: false
-        })
+        check_outcome_link.call(
+          json.first.tap{ |j| j.delete("outcome") },
+          @course,
+          @course.root_outcome_group,
+          true,
+          false
+        )
       end
 
       it "should return can_unlink of 'false' if it cannot unlink" do
@@ -1032,14 +996,13 @@ describe "Outcome Groups API", type: :request do
           :format => 'json'
         )
 
-        check_outcome_link.call({
-          outcome_link: json.first.tap{ |j| j.delete("outcome") },
-          context: @course,
-          group: @course.root_outcome_group,
-          assessed: false,
-          can_unlink: false,
-          native: false
-        })
+        check_outcome_link.call(
+          json.first.tap{ |j| j.delete("outcome") },
+          @course,
+          @course.root_outcome_group,
+          false,
+          false
+        )
       end
     end
   end
@@ -1100,7 +1063,7 @@ describe "Outcome Groups API", type: :request do
                      :id => @group.id.to_s,
                      :outcome_id => @outcome.id.to_s,
                      :format => 'json')
-        expect(@group.child_outcome_links({active_only: true}).size).to eq 1
+        expect(@group.child_outcome_links(true).size).to eq 1
         expect(@group.child_outcome_links.first.content).to eq @outcome
       end
 
@@ -1118,7 +1081,6 @@ describe "Outcome Groups API", type: :request do
           "url" => polymorphic_path([:api_v1, @account, :outcome_link], :id => @group.id, :outcome_id => @outcome.id),
           "assessed" => false,
           "can_unlink" => true,
-          "native" => false,
           "outcome_group" => {
             "id" => @group.id,
             "title" => @group.title,
@@ -1440,7 +1402,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "should unlink the outcome from the group" do
-      expect(@group.child_outcome_links.size).to eq 1
+      expect(@group.child_outcome_links.active.size).to eq 1
       api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    :controller => 'outcome_groups_api',
                    :action => 'unlink',
@@ -1448,7 +1410,7 @@ describe "Outcome Groups API", type: :request do
                    :id => @group.id.to_s,
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
-      expect(@group.child_outcome_links.size).to eq 0
+      expect(@group.child_outcome_links.active.size).to eq 0
     end
 
     it "should return json of the removed link" do

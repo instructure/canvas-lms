@@ -107,11 +107,6 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
-#         "native": {
-#           "description": "whether the outcome is native to the current context",
-#           "example": true,
-#           "type": "boolean"
-#         },
 #         "assessed": {
 #           "description": "whether this outcome has been used to assess a student",
 #           "example": true,

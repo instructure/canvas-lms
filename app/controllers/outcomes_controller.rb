@@ -150,7 +150,7 @@ class OutcomesController < ApplicationController
     # (adopt_outcome_link) and adding a new link (add_outcome). as is, you
     # can't add a second link to the same outcome under a new group. but just
     # refactoring the model layer for now...
-    if outcome_link = @group.find_link_by_outcome_id(@outcome_id)
+    if outcome_link = @group.child_outcome_links.where(content_id: @outcome.id).first
       @group.adopt_outcome_link(outcome_link)
     else
       @group.add_outcome(@outcome)

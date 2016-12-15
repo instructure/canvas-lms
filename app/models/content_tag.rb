@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class ContentTag < ActiveRecord::Base
+  class LastLinkToOutcomeNotDestroyed < StandardError
+  end
+
   TABLED_CONTENT_TYPES = ['Attachment', 'Assignment', 'WikiPage', 'Quizzes::Quiz', 'LearningOutcome', 'DiscussionTopic',
     'Rubric', 'ContextExternalTool', 'LearningOutcomeGroup', 'AssessmentQuestionBank', 'LiveAssessments::Assessment', 'Lti::MessageHandler'].freeze
   TABLELESS_CONTENT_TYPES = ['ContextModuleSubHeader', 'ExternalUrl'].freeze
@@ -23,8 +26,6 @@ class ContentTag < ActiveRecord::Base
 
   include Workflow
   include SearchTermHelper
-  include OutcomeLinkHelper
-
   belongs_to :content, :polymorphic => true
   validates_inclusion_of :content_type, :allow_nil => true, :in => CONTENT_TYPES
   belongs_to :context, polymorphic:
@@ -279,6 +280,35 @@ class ContentTag < ActiveRecord::Base
     ContentTag.where(context_id: asset, context_type: asset.class.to_s).each{|t| t.destroy }
   end
 
+  def can_destroy?
+    # if it's a learning outcome link...
+    if self.tag_type == 'learning_outcome_association'
+      # and there are no other links to the same outcome in the same context...
+      outcome = self.content
+      other_link = ContentTag.learning_outcome_links.active.
+        where(:context_type => self.context_type, :context_id => self.context_id, :content_id => outcome).
+        where("id<>?", self).first
+      if !other_link
+        # and there are alignments to the outcome (in the link's context for
+        # foreign links, in any context for native links)
+        alignment_conditions = { :learning_outcome_id => outcome.id }
+        native = outcome.context_type == self.context_type && outcome.context_id == self.context_id
+        if native
+          @should_destroy_outcome = true
+        else
+          alignment_conditions[:context_id] = self.context_id
+          alignment_conditions[:context_type] = self.context_type
+        end
+
+        if ContentTag.learning_outcome_alignments.active.where(alignment_conditions).exists?
+          # then don't let them delete the link
+          return false
+        end
+      end
+    end
+    true
+  end
+
   alias_method :destroy_permanently!, :destroy
   def destroy
     unless can_destroy?
@@ -403,7 +433,6 @@ class ContentTag < ActiveRecord::Base
   }
   scope :learning_outcome_alignments, -> { where(:tag_type => 'learning_outcome') }
   scope :learning_outcome_links, -> { where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome') }
-  scope :outcome_links_for_context, lambda { |context| learning_outcome_links.for_context(context) }
 
   # Scopes For Differentiated Assignment Filtering:
 
@@ -455,6 +484,15 @@ class ContentTag < ActiveRecord::Base
            AND asv.user_id = ANY( '{?}'::INT8[] )
     ",course_ids,course_ids,course_ids,user_ids)
   }
+
+  # only intended for learning outcome links
+  def self.outcome_title_order_by_clause
+    best_unicode_collation_key("learning_outcomes.short_description")
+  end
+
+  def self.order_by_outcome_title
+    eager_load(:learning_outcome_content).order(outcome_title_order_by_clause)
+  end
 
   def visible_to_user?(user, opts=nil)
     return unless self.context_module
