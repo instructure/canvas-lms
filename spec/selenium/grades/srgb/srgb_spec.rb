@@ -25,6 +25,7 @@ describe "Screenreader Gradebook" do
 
   def basic_setup(num=1)
     init_course_with_students num
+    user_session(@teacher)
     @course.assignments.create!(
       title: 'Test 1',
       submission_types: 'online_text_entry',
@@ -35,6 +36,7 @@ describe "Screenreader Gradebook" do
 
   def simple_setup(student_number = 2)
     init_course_with_students student_number
+    user_session(@teacher)
     @course.assignment_groups.create! name: 'Group 1'
     @course.assignment_groups.create! name: 'Group 2'
     @assign1 = @course.assignments.create!(
@@ -62,7 +64,6 @@ describe "Screenreader Gradebook" do
     simple_setup
     simple_grade
     srgb_page.visit(@course.id)
-    wait_for_ajaximations
 
     student_dropdown_options = ['No Student Selected', @students[0].name, @students[1].name]
     expect(get_options('#student_select').map(&:text)).to eq student_dropdown_options
@@ -78,27 +79,28 @@ describe "Screenreader Gradebook" do
 
   it 'can select a student using buttons', priority: '1', test_id: 163997 do
     init_course_with_students 3
+    user_session(@teacher)
     srgb_page.visit(@course.id)
 
     # first student
     expect(srgb_page.previous_student.attribute 'disabled').to be_truthy
     srgb_page.next_student.click
-    expect(f('#student_information .student_selection').text).to eq @students[0].name
+    expect(f('#student_information .student_selection')).to include_text @students[0].name
 
     # second student
     srgb_page.next_student.click
-    expect(f('#student_information .student_selection').text).to eq @students[1].name
+    expect(f('#student_information .student_selection')).to include_text @students[1].name
 
     # third student
     srgb_page.next_student.click
     expect(srgb_page.next_student.attribute 'disabled').to be_truthy
-    expect(f('#student_information .student_selection').text).to eq @students[2].name
+    expect(f('#student_information .student_selection')).to include_text @students[2].name
     expect(srgb_page.previous_student).to eq driver.switch_to.active_element
 
     # click twice to go back to first student
     srgb_page.previous_student.click
     srgb_page.previous_student.click
-    expect(f('#student_information .student_selection').text).to eq @students[0].name
+    expect(f('#student_information .student_selection')).to include_text @students[0].name
     expect(srgb_page.next_student).to eq driver.switch_to.active_element
   end
 
@@ -159,8 +161,8 @@ describe "Screenreader Gradebook" do
 
     expect(get_options('#assignment_select').map(&:text)).to eq ['No Assignment Selected', a1.name, a2.name]
     click_option '#assignment_select', a1.name
-    expect(f('#assignment_information .assignment_selection').text).to eq a1.name
-    expect(f('#assignment_information').text).to include 'Online text entry'
+    expect(f('#assignment_information .assignment_selection')).to include_text a1.name
+    expect(f('#assignment_information')).to include_text 'Online text entry'
   end
 
   it 'displays/removes warning message for resubmitted assignments', priority: '1', test_id: 164000 do
@@ -183,7 +185,6 @@ describe "Screenreader Gradebook" do
     expect(f('p.resubmitted')).to be_displayed
 
     replace_content f('#student_and_assignment_grade'), "15\t"
-    wait_for_ajaximations
     expect(f("#content")).not_to contain_css('p.resubmitted')
   end
 
@@ -206,13 +207,13 @@ describe "Screenreader Gradebook" do
     click_option '#student_select', @students[0].name
     click_option '#assignment_select', a1.name
     expect(f('#student_and_assignment_grade')).to have_value grades[0]
-    expect(f('#student_information .total-grade').text).to eq "75% (#{grades[0]} / 20 points)"
+    expect(f('#student_information .total-grade')).to include_text "75% (#{grades[0]} / 20 points)"
 
     click_option '#assignment_select', a2.name
     f('#student_and_assignment_grade').clear
     f('#student_and_assignment_grade').send_keys grades[1], :return
     get default_gradebook
-    expect(f('.canvas_1 .slick-row .slick-cell:nth-of-type(2)').text).to eq grades[1]
+    expect(f('.canvas_1 .slick-row .slick-cell:nth-of-type(2)')).to include_text grades[1]
   end
 
   it 'can mute assignments', priority: '1', test_id: 164001 do
@@ -222,9 +223,8 @@ describe "Screenreader Gradebook" do
     click_option '#student_select', @students[0].name
     click_option '#assignment_select', assignment.name
     f('#assignment_muted_check').click
-    wait_for_ajaximations
     fj('.ui-dialog:visible [data-action="mute"]').click
-    wait_for_ajaximations
+    wait_for_ajax_requests
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
     expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'true')
@@ -241,9 +241,8 @@ describe "Screenreader Gradebook" do
     click_option '#student_select', @students[0].name
     click_option '#assignment_select', assignment.name
     f('#assignment_muted_check').click
-    wait_for_ajaximations
     fj('.ui-dialog:visible [data-action="unmute"]').click
-    wait_for_ajaximations
+    wait_for_ajax_requests
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
     expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'false')
@@ -258,13 +257,11 @@ describe "Screenreader Gradebook" do
 
     click_option '#assignment_select', 'Test 1'
     f('#message_students').click
-    wait_for_ajaximations
     expect(f('#message_students_dialog')).to be_displayed
 
     f('#body').send_keys('Hello!')
     driver.action.send_keys(:tab).perform
     driver.action.send_keys(:enter).perform
-    wait_for_ajaximations
     expect(f('#message_students_dialog')).not_to be_displayed
   end
 
@@ -288,13 +285,17 @@ describe "Screenreader Gradebook" do
     srgb_page.visit(@course.id)
     click_option '#student_select', @students[0].name
     click_option '#assignment_select', assignment.name
-    expect(f('#assignment_information p:nth-of-type(2)').text).to eq 'Graded submissions: 2'
+    expect(f('#assignment_information p:nth-of-type(2)')).to include_text 'Graded submissions: 2'
     expect(ff('#assignment_information table td').map(&:text)).to eq ['20', '10', '15', '5']
   end
 
   context "as a teacher" do
-    before(:each) do
+    before(:once) do
       gradebook_data_setup
+    end
+
+    before(:each) do
+      user_session(@teacher)
     end
 
     it "switches to srgb", priority: '1', test_id: 615682 do
@@ -332,7 +333,7 @@ describe "Screenreader Gradebook" do
     it 'shows all drop down options', priority: '2', test_id: 615702 do
       srgb_page.visit(@course.id)
       arrange_assignments.click
-      expect(arrange_assignments.text).to eq("By Assignment Group and Position\nAlphabetically\nBy Due Date")
+      expect(arrange_assignments).to include_text("By Assignment Group and Position\nAlphabetically\nBy Due Date")
     end
 
     it "should focus on accessible elements when setting default grades", priority: '1', test_id: 209991 do

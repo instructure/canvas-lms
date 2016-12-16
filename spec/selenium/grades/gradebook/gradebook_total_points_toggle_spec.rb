@@ -4,7 +4,9 @@ describe "gradebook2 - total points toggle" do
   include_context "in-process server selenium tests"
   include Gradebook2Common
 
-  let!(:setup) { gradebook_data_setup }
+  before(:once) { gradebook_data_setup }
+  before(:each) { user_session(@teacher) }
+  after(:each) { clear_local_storage }
 
   def should_show_percentages
     ff(".slick-row .slick-cell:nth-child(5)").each { |total| expect(total.text).to match(/%/) }
@@ -64,7 +66,7 @@ describe "gradebook2 - total points toggle" do
     get "/courses/#{@course.id}/gradebook2"
     open_display_dialog
     dialog = fj('.ui-dialog:visible')
-    expect(dialog.text).to match(/Warning/)
+    expect(dialog).to include_text("Warning")
   end
 
   it 'should allow toggling display by points or percent', priority: "1", test_id: 164012 do
@@ -72,11 +74,11 @@ describe "gradebook2 - total points toggle" do
     should_show_percentages
     toggle_grade_display
 
-    wait_for_ajaximations
+    wait_for_ajax_requests
     should_show_points(15, 10, 10)
 
     toggle_grade_display
-    wait_for_ajaximations
+    wait_for_ajax_requests
     should_show_percentages
   end
 

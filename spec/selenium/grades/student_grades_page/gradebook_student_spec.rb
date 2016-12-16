@@ -89,6 +89,7 @@ describe 'Student Gradebook' do
 
   it 'shows assignment details', priority: '1', test_id: 164023 do
     init_course_with_students 3
+    user_session(@teacher)
 
     means = []
     [0, 3, 6].each do |i|
@@ -113,9 +114,9 @@ describe 'Student Gradebook' do
 
     expectations.each_with_index do |expectation, index|
       i = index * 4 # each detail row has 4 items, we only want the first 3
-      expect(details[i].text).to eq "Mean: #{expectation[:mean]}"
-      expect(details[i + 1].text).to eq "High: #{expectation[:high]}"
-      expect(details[i + 2].text).to eq "Low: #{expectation[:low]}"
+      expect(details[i]).to include_text "Mean: #{expectation[:mean]}"
+      expect(details[i + 1]).to include_text "High: #{expectation[:high]}"
+      expect(details[i + 2]).to include_text "Low: #{expectation[:low]}"
     end
 
     f('#show_all_details_button').click
@@ -133,15 +134,16 @@ describe 'Student Gradebook' do
 
   it 'calculates grades based on graded assignments', priority: '1', test_id: 164025 do
     init_course_with_students
+    user_session(@teacher)
 
     assignments[0].grade_student @students[0], grade: 20, grader: @teacher
     assignments[1].grade_student @students[0], grade: 20, grader: @teacher
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    expect(f('.final_grade .grade').text).to eq '100%'
+    expect(f('.final_grade .grade')).to include_text '100%'
 
     f('#only_consider_graded_assignments_wrapper').click
-    expect(f('.final_grade .grade').text).to eq '66.67%'
+    expect(f('.final_grade .grade')).to include_text '66.67%'
   end
 
   it 'follows grade dropping rules', test_id: 164009, priority: '1' do
@@ -167,20 +169,20 @@ describe 'Student Gradebook' do
 
   context 'Comments' do
     # create a course, publish and enroll teacher and student
-    let(:test_course) { course() }
-    let(:teacher) { user(active_all: true) }
-    let(:student) { user(active_all: true) }
-    let!(:published_course) do
+    let_once(:test_course) { course() }
+    let_once(:teacher) { user(active_all: true) }
+    let_once(:student) { user(active_all: true) }
+    let_once(:published_course) do
       test_course.workflow_state = 'available'
       test_course.save!
       test_course
     end
-    let!(:enroll_teacher_and_students) do
+    let_once(:enroll_teacher_and_students) do
       published_course.enroll_teacher(teacher).accept!
       published_course.enroll_student(student, enrollment_state: 'active')
     end
     # create an assignment and submit as a student
-    let(:assignment) do
+    let_once(:assignment) do
       published_course.assignments.create!(
         title: 'Assignment Yay',
         grading_type: 'points',
@@ -188,8 +190,8 @@ describe 'Student Gradebook' do
         submission_types: 'online_upload'
       )
     end
-    let(:file_attachment) { attachment_model(:content_type => 'application/pdf', :context => student) }
-    let!(:student_submission) do
+    let_once(:file_attachment) { attachment_model(:content_type => 'application/pdf', :context => student) }
+    let_once(:student_submission) do
       assignment.submit_homework(
         student,
         submission_type: 'online_upload',
@@ -197,7 +199,7 @@ describe 'Student Gradebook' do
       )
     end
     # leave a comment as a teacher
-    let!(:teacher_comment) { student_submission.submission_comments.create!(comment: 'good job')}
+    let_once(:teacher_comment) { student_submission.submission_comments.create!(comment: 'good job')}
 
     it 'should display comments from a teacher on student grades page', priority: "1", test_id: 537621 do
       user_session(student)

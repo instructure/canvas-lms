@@ -46,6 +46,7 @@ describe 'Speedgrader' do
   context 'grading' do
     it 'complete/incomplete', priority: "1", test_id: 164014 do
       init_course_with_students 2
+      user_session(@teacher)
 
       @assignment = @course.assignments.create!(
         title: 'Complete?',
@@ -63,6 +64,7 @@ describe 'Speedgrader' do
 
     it 'should display letter grades correctly', priority: "1", test_id: 164015 do
       init_course_with_students 2
+      user_session(@teacher)
 
       @assignment = create_assignment_with_type('letter_grade')
       @assignment.grade_student @students[0], grade: 'A', grader: @teacher
@@ -79,6 +81,7 @@ describe 'Speedgrader' do
 
     it 'should display percent grades correctly', priority: "1", test_id: 164202 do
       init_course_with_students 2
+      user_session(@teacher)
 
       @assignment = create_assignment_with_type('percent')
       @assignment.grade_student @students[0], grade: 15, grader: @teacher
@@ -95,6 +98,7 @@ describe 'Speedgrader' do
 
     it 'should display points grades correctly', priority: "1", test_id: 164203 do
       init_course_with_students 2
+      user_session(@teacher)
 
       @assignment = create_assignment_with_type('points')
       @assignment.grade_student @students[0], grade: 15, grader: @teacher
@@ -111,6 +115,7 @@ describe 'Speedgrader' do
 
     it 'should display gpa scale grades correctly', priority: "1", test_id: 164204 do
       init_course_with_students 2
+      user_session(@teacher)
 
       @assignment = create_assignment_with_type('gpa_scale')
       @assignment.grade_student @students[0], grade: 'A', grader: @teacher
@@ -126,12 +131,14 @@ describe 'Speedgrader' do
     end
 
     context 'quizzes' do
-      before(:each) do
+      before(:once) do
         init_course_with_students
-        quiz = seed_quiz_with_submission
+        @quiz = seed_quiz_with_submission
+      end
 
+      before(:each) do
         user_session(@teacher)
-        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@quiz.assignment_id}"
         driver.switch_to.frame f('#speedgrader_iframe')
       end
 
@@ -151,10 +158,14 @@ describe 'Speedgrader' do
     end
 
     context 'pass/fail assignment grading' do
-      before :each do
+      before :once do
         init_course_with_students 1
         @assignment = @course.assignments.create!(grading_type: 'pass_fail', points_possible: 0)
         @assignment.grade_student(@students[0], grade: 'pass', grader: @teacher)
+      end
+
+      before :each do
+        user_session(@teacher)
       end
 
       it 'should allow pass grade on assignments worth 0 points', priority: "1", test_id: 400127 do
@@ -174,7 +185,7 @@ describe 'Speedgrader' do
     end
 
     context 'Using a rubric saves grades' do
-      before do
+      before :once do
         init_course_with_students
         @teacher = @user
         @assignment = @course.assignments.create!(
@@ -190,12 +201,15 @@ describe 'Speedgrader' do
         rubric.save!
         rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
         rubric.reload
+      end
 
+      before :each do
+        user_session(@teacher)
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
         f('button.toggle_full_rubric').click
         [f('#rating_rat1'), f('#rating_rat5')].each(&:click)
         f('button.save_rubric_button').click
-        wait_for_ajaximations
+        wait_for_ajax_requests
       end
 
       it 'in speedgrader', priority: "1", test_id: 164016 do
@@ -207,8 +221,8 @@ describe 'Speedgrader' do
         get "/courses/#{@course.id}/grades/#{@students[0].id}"
         f("#submission_#{@assignment.id}  i.icon-rubric").click
 
-        expect(f('#criterion_crit1 span.criterion_rating_points').text).to eq '10'
-        expect(f('#criterion_crit2 span.criterion_rating_points').text).to eq '5'
+        expect(f('#criterion_crit1 span.criterion_rating_points')).to include_text '10'
+        expect(f('#criterion_crit2 span.criterion_rating_points')).to include_text '5'
       end
 
       it 'in submissions page', priority: "1", test_id: 217612 do
@@ -222,7 +236,6 @@ describe 'Speedgrader' do
         replace_content f('#criterion_crit1 input.criterion_points'), '5'
         scroll_into_view('button.save_rubric_button')
         f('button.save_rubric_button').click
-        wait_for_ajaximations
 
         el = f("#student_grading_#{@assignment.id}")
         expect(el).to have_value '10'
@@ -248,7 +261,7 @@ describe 'Speedgrader' do
         f('a.assess_submission_link').click
 
         expect(f('#rating_rat2')).to have_class('selected')
-        expect(f('#rating_rat2 .points').text).to eq('5')
+        expect(f('#rating_rat2 .points')).to include_text('5')
       end
     end
   end
@@ -257,6 +270,7 @@ describe 'Speedgrader' do
     it 'should update grades for all students in group', priority: "1", test_id: 164017 do
       skip "Skipped because this spec fails if not run in foreground\nThis is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
       init_course_with_students 5
+      user_session(@teacher)
       seed_groups 1, 1
       scores = [5, 7, 10]
 
@@ -292,11 +306,11 @@ describe 'Speedgrader' do
       # Expected "10"
       # Got "-"
 
-      expect(cells[0].text).to eq '10'
-      expect(cells[3].text).to eq '10'
-      expect(cells[6].text).to eq '10'
-      expect(cells[9].text).to eq '5'
-      expect(cells[12].text).to eq '7'
+      expect(cells[0]).to include_text '10'
+      expect(cells[3]).to include_text '10'
+      expect(cells[6]).to include_text '10'
+      expect(cells[9]).to include_text '5'
+      expect(cells[12]).to include_text '7'
     end
   end
 
@@ -309,7 +323,7 @@ describe 'Speedgrader' do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
 
       driver.switch_to.frame f('#speedgrader_iframe')
-      expect(f('header.quiz-header').text).to include quiz.title
+      expect(f('header.quiz-header')).to include_text quiz.title
       expect(f("#content")).not_to contain_css('#quiz-nav-inner-wrapper')
 
       @teacher.preferences[:enable_speedgrader_grade_by_question] = true
@@ -317,10 +331,10 @@ describe 'Speedgrader' do
       refresh_page
 
       driver.switch_to.frame f('#speedgrader_iframe')
-      expect(f('header.quiz-header').text).to include quiz.title
+      expect(f('header.quiz-header')).to include_text quiz.title
       expect(f('#quiz-nav-inner-wrapper')).to be_displayed
       nav = ff('.quiz-nav-li')
-      expect(nav.length).to eq 4
+      expect(nav).to have_size 4
     end
 
     it 'scrolls nav bar and to questions', priority: "1", test_id: 164020 do
@@ -336,10 +350,10 @@ describe 'Speedgrader' do
 
       driver.switch_to.frame f('#speedgrader_iframe')
       wrapper = f('#quiz-nav-inner-wrapper')
-      expect(f('header.quiz-header').text).to include quiz.title
+      expect(f('header.quiz-header')).to include_text quiz.title
 
       expect(wrapper).to be_displayed
-      expect(ff('.quiz-nav-li').length).to eq 40
+      expect(ff('.quiz-nav-li')).to have_size 40
 
       # check scrolling
       first_left = wrapper.css_value('left').to_f
@@ -376,21 +390,28 @@ describe 'Speedgrader' do
       replace_content list[index], "1", :tab_out => true
     end
     expect_new_page_load {f('button.update-scores').click}
-    expect(f('#after_fudge_points_total').text).to eq '3'
+    expect(f('#after_fudge_points_total')).to include_text '3'
 
     replace_content f('#fudge_points_entry'), "7", :tab_out => true
     expect_new_page_load {f('button.update-scores').click}
-    expect(f('#after_fudge_points_total').text).to eq '10'
+    expect(f('#after_fudge_points_total')).to include_text '10'
   end
 
   context 'Student drop-down' do
-    before :each do
+    before :once do
       init_course_with_students 2
-      assignment = create_assignment_with_type('letter_grade')
+      @assignment = create_assignment_with_type('letter_grade')
+    end
 
+    before :each do
+      user_session(@teacher)
       # see first student
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(f(selectedStudent)).to include_text(@students[0].name)
+    end
+
+    after :each do
+      clear_local_storage
     end
 
     let(:selectedStudent) {'span.ui-selectmenu-item-header'}
@@ -471,7 +492,6 @@ describe 'Speedgrader' do
       get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
       f('#submission_to_view').click
       click_option('#submission_to_view', '0', :value)
-      wait_for_ajaximations
       expect(f('#submission_files_list .submission-file .display_name')).to include_text('unknown.loser')
     end
   end

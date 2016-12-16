@@ -4,7 +4,8 @@ describe "gradebook2 - concluded courses and enrollments" do
   include_context "in-process server selenium tests"
   include Gradebook2Common
 
-  let!(:setup) { gradebook_data_setup }
+  before(:once) { gradebook_data_setup }
+  before(:each) { user_session(@teacher) }
   let(:conclude_student_1) { @student_1.enrollments.where(course_id: @course).first.conclude }
   let(:deactivate_student_1) { @student_1.enrollments.where(course_id: @course).first.deactivate }
 
@@ -19,7 +20,6 @@ describe "gradebook2 - concluded courses and enrollments" do
     it "persists settings for displaying inactive enrollments", priority: "2", test_id: 1372593 do
       get course_gradebook2_path(@course)
       f('#gradebook_settings').click
-      wait_for_ajaximations
       expect { f('label[for="show_inactive_enrollments"]').click }
         .to change { gradebook_settings_for_course.call(@teacher, @course)}
         .from(nil)
@@ -32,7 +32,6 @@ describe "gradebook2 - concluded courses and enrollments" do
     it "persists settings for displaying concluded enrollments", priority: "2", test_id: 1372592 do
       get course_gradebook2_path(@course)
       f('#gradebook_settings').click
-      wait_for_ajaximations
       expect { f('label[for="show_concluded_enrollments"]').click }
         .to change { gradebook_settings_for_course.call(@teacher, @course) }
         .from(nil)
@@ -103,7 +102,7 @@ describe "gradebook2 - concluded courses and enrollments" do
       @course.complete!
       get "/courses/#{@course.id}/gradebook2"
       cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
-      expect(cell.text).to eq '10'
+      expect(cell).to include_text '10'
       cell.click
       expect(cell).not_to contain_css('.grade') # no input box for entry
     end

@@ -5,8 +5,16 @@ describe "outcome gradebook" do
   include Gradebook2Common
 
   context "as a teacher" do
-    before(:each) do
+    before(:once) do
       gradebook_data_setup
+    end
+
+    before(:each) do
+      user_session(@teacher)
+    end
+
+    after(:each) do
+      clear_local_storage
     end
 
     it "should not be visible by default" do
@@ -21,24 +29,21 @@ describe "outcome gradebook" do
 
       it "should be visible" do
         get "/courses/#{@course.id}/gradebook2"
-        expect(ff('.gradebook-navigation').length).to eq 1
+        expect(ff('.gradebook-navigation')).to have_size 1
 
         f('a[data-id=outcome]').click
-        wait_for_ajaximations
         expect(f('.outcome-gradebook-container')).not_to be_nil
       end
 
       it "should allow showing only a certain section" do
         get "/courses/#{@course.id}/gradebook2"
         f('a[data-id=outcome]').click
-        wait_for_ajaximations
 
-        expect(ff('.outcome-student-cell-content').length).to eq 3
+        expect(ff('.outcome-student-cell-content')).to have_size 3
 
         choose_section = ->(name) do
           fj('.section-select-button:visible').click
-          wait_for_js
-          ffj('.section-select-menu:visible a').find { |a| a.text.include? name }.click
+          fj(".section-select-menu:visible a:contains('#{name}')").click
           wait_for_js
         end
 
@@ -48,29 +53,27 @@ describe "outcome gradebook" do
         choose_section.call @other_section.name
         expect(fj('.section-select-button:visible')).to include_text(@other_section.name)
 
-        expect(ff('.outcome-student-cell-content').length).to eq 1
+        expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # verify that it remembers the section to show across page loads
         get "/courses/#{@course.id}/gradebook2"
         expect(fj('.section-select-button:visible')).to include_text @other_section.name
-        expect(ff('.outcome-student-cell-content').length).to eq 1
+        expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # now verify that you can set it back
 
         fj('.section-select-button:visible').click
-        wait_for_ajaximations
         expect(fj('.section-select-menu:visible')).to be_displayed
         f("label[for='section_option_']").click
         expect(fj('.section-select-button:visible')).to include_text "All Sections"
 
-        expect(ff('.outcome-student-cell-content').length).to eq 3
+        expect(ff('.outcome-student-cell-content')).to have_size 3
       end
 
       it "should handle multiple enrollments correctly" do
         @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
 
         get "/courses/#{@course.id}/gradebook2"
-        wait_for_ajaximations
 
         meta_cells = find_slick_cells(0, f('.grid-canvas'))
         expect(meta_cells[0]).to include_text @course.default_section.display_name

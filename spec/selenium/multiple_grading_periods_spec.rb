@@ -27,8 +27,16 @@ describe "interaction with multiple grading periods" do
   let(:get_gradebook) { get "/courses/#{@course.id}/gradebook" }
 
   context "gradebook" do
-    before :each do
+    before :once do
       gradebook_data_setup(grading_periods: [:future, :current])
+    end
+
+    before :each do
+      user_session(@teacher)
+    end
+
+    after :each do
+      clear_local_storage
     end
 
     it "should display the correct grading period based on the GET param" do

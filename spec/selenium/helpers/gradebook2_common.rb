@@ -68,7 +68,7 @@ module Gradebook2Common
     end
   end
   def init_course_with_students(num = 1)
-    course_with_teacher_logged_in
+    course_with_teacher(active_all: true)
 
     @students = []
     (1..num).each do |i|
@@ -176,7 +176,7 @@ module Gradebook2Common
 
   def data_setup_as_observer
     user_with_pseudonym
-    course_with_observer_logged_in user: @user
+    course_with_observer user: @user, active_all: true
     @course.observers=[@observer]
     assignment_setup_defaults
     assignment_setup
@@ -203,7 +203,7 @@ module Gradebook2Common
   end
 
   def assignment_setup(opts={})
-    course_with_teacher_logged_in(opts)
+    course_with_teacher({active_all: true}.merge(opts))
     @course.grading_standard_enabled = true
     @course.save!
     @course.reload

@@ -4,11 +4,14 @@ describe "gradebook2" do
   include_context "in-process server selenium tests"
   include Gradebook2Common
 
-  let!(:setup) { gradebook_data_setup }
-
-  before do
+  before(:once) do
+    gradebook_data_setup
     @page_size = 5
     Setting.set 'api_max_per_page', @page_size
+  end
+
+  before do
+    user_session(@teacher)
   end
 
   def test_n_students(n)

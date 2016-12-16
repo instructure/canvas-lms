@@ -7,6 +7,7 @@ describe "gradebook2" do
   context "as an observer" do
     before(:each) do
       data_setup_as_observer
+      user_session(@teacher)
     end
 
     it "should allow observer to see grade totals" do

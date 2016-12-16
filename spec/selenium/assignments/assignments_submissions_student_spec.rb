@@ -11,13 +11,17 @@ describe "submissions" do
 
   context 'as a student' do
 
-    before(:each) do
+    before(:once) do
       @due_date = Time.now.utc + 2.days
-      course_with_student_logged_in
+      course_with_student(active_all: true)
       @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => @due_date)
       @second_assignment = @course.assignments.create!(:title => 'assignment 2', :name => 'assignment 2', :due_at => nil)
       @third_assignment = @course.assignments.create!(:title => 'assignment 3', :name => 'assignment 3', :due_at => nil)
       @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => @due_date - 1.day)
+    end
+
+    before(:each) do
+      user_session(@student)
     end
 
     it "should let a student submit a text entry", priority: "1", test_id: 56015 do
@@ -108,9 +112,7 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       f('.submit_assignment_link').click
-      wait_for_ajaximations
       f('#submit_file_button').click
-      wait_for_ajaximations
       expect_flash_message :error
 
       # navigate off the page and dismiss the alert box to avoid problems
@@ -129,10 +131,8 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       f('.submit_assignment_link').click
-      wait_for_ajaximations
       f('.submission_attachment input').send_keys(fullpath)
       f('#submit_file_button').click
-      wait_for_ajaximations
       expect_flash_message :error
 
       # navigate off the page and dismiss the alert box to avoid problems
@@ -150,14 +150,13 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       f('.submit_assignment_link').click
-      wait_for_ajaximations
 
       # Select an assignment that has a wrong file extension
       filename, fullpath, data = get_file("testfile1.txt")
       f('.submission_attachment input').send_keys(fullpath)
 
       # Check that the error is being reported
-      expect(f('.bad_ext_msg').text() =~ /This\sfile\stype\sis\snot\sallowed/).to be_truthy
+      expect(f('.bad_ext_msg')).to include_text("This file type is not allowed")
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests
@@ -176,7 +175,7 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       # expect
       expect(f('#sidebar_content .details')).to include_text "Not Turned In!"
-      expect(f('.submit_assignment_link').text).to eq "Submit Assignment"
+      expect(f('.submit_assignment_link')).to include_text "Submit Assignment"
     end
 
     it "should not show as turned in or not turned in when assignment doesn't expect a submission", priority: "1", test_id: 237025 do
@@ -213,12 +212,10 @@ describe "submissions" do
       @assignment.update_attributes(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
-      wait_for_ajaximations
       assignment_form = f('#submit_online_text_entry_form')
       wait_for_tiny(assignment_form)
 
       submit_form(assignment_form)
-      wait_for_ajaximations
 
       # it should not actually submit and pop up an error message
       expect(ff('.error_box')[1]).to include_text('Required')
@@ -228,8 +225,7 @@ describe "submissions" do
       # now make sure it works
       type_in_tiny('#submission_body', 'now it is not blank')
       submit_form(assignment_form)
-      wait_for_ajaximations
-      expect(Submission.count).to eq 1
+      expect { Submission.count }.to become 1
     end
 
     it "should not allow a submission with only comments", priority: "1", test_id: 237027 do
@@ -320,7 +316,6 @@ describe "submissions" do
 
         # Enter Submission Details page
         fj(".forward:contains('Submission Details')").click
-        wait_for_ajaximations
 
         # Expect preview link to exist
         driver.switch_to.frame(f('#preview_frame'))
@@ -329,8 +324,6 @@ describe "submissions" do
     end
 
     describe 'uploaded files for submission' do
-      include_context "in-process server selenium tests"
-
       def fixture_file_path(file)
         path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil
         return "#{path}#{file}"
@@ -343,12 +336,8 @@ describe "submissions" do
       it "should allow uploaded files to be used for submission", priority: "1", test_id: 237030 do
         local_storage!
 
-        user_with_pseudonym :username => "nobody2@example.com",
-                            :password => "asdfasdf2"
-        course_with_student_logged_in :user => @user
-        create_session @pseudonym
         add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
-                 @user, "html-editing-test.html")
+                 @student, "html-editing-test.html")
         File.read(fixture_file_path("files/html-editing-test.html"))
         assignment = @course.assignments.create!(:title => 'assignment 1',
                                                  :name => 'assignment 1',
@@ -356,15 +345,13 @@ describe "submissions" do
                                                  :allowed_extensions => '.html')
         get "/courses/#{@course.id}/assignments/#{assignment.id}"
         f('.submit_assignment_link').click
-        wait_for_ajaximations
         f('.toggle_uploaded_files_link').click
-        wait_for_ajaximations
+        wait_for_animations
 
         # traverse the tree
         f('#uploaded_files > ul > li.folder > .sign').click
         expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
         f('#uploaded_files > ul > li.folder .file .name').click
-        wait_for_ajaximations
 
         expect_new_page_load { f('#submit_file_button').click }
 
@@ -378,12 +365,8 @@ describe "submissions" do
 
         local_storage!
 
-        user_with_pseudonym :username => "nobody2@example.com",
-                            :password => "asdfasdf2"
-        course_with_student_logged_in :user => @user
-        create_session @pseudonym
         add_file(fixture_file_upload(FIXTURE_FN, 'application/x-sh'),
-                 @user, FILENAME)
+                 @student, FILENAME)
         File.read(fixture_file_path(FIXTURE_FN))
         assignment = @course.assignments.create!(:title => 'assignment 1',
                                                  :name => 'assignment 1',
@@ -391,15 +374,13 @@ describe "submissions" do
                                                  :allowed_extensions => ['txt'])
         get "/courses/#{@course.id}/assignments/#{assignment.id}"
         f('.submit_assignment_link').click
-        wait_for_ajaximations
         f('.toggle_uploaded_files_link').click
-        wait_for_ajaximations
+        wait_for_animations
 
         # traverse the tree
         f('#uploaded_files > ul > li.folder > .sign').click
         expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
         f('#uploaded_files > ul > li.folder .file .name').click
-        wait_for_ajaximations
         f('#submit_file_button').click
 
         # Make sure the flash message is being displayed
@@ -445,10 +426,10 @@ describe "submissions" do
 
       assignments.size.times do |i|
         get "/courses/#{@course.id}/assignments/#{assignments[i].id}"
-        expect(f("#sidebar_content .header").text).to eq 'Excused!'
+        expect(f("#sidebar_content .header")).to include_text 'Excused!'
 
         get "/courses/#{@course.id}/assignments/#{assignments[i].id}/submissions/#{@students[0].id}"
-        expect(f("#content .submission_details .published_grade").text).to eq 'Excused'
+        expect(f("#content .submission_details .published_grade")).to include_text 'Excused'
       end
     end
 
@@ -462,7 +443,7 @@ describe "submissions" do
       @assignment.grade_student @student, excuse: 1, grader: @teacher
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(f("#content")).not_to contain_css('a.submit_assignment_link')
-      expect(f('#assignment_show .assignment-title').text).to eq 'assignment 1'
+      expect(f('#assignment_show .assignment-title')).to include_text 'assignment 1'
     end
   end
 end
