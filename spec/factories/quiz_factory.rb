@@ -256,15 +256,19 @@ module Factories
     @quiz
   end
 
-  # The block should return the submission_data. A block is used so
-  # that we have access to the @questions variable that is created
-  # in this method
+  # The block should return the submission_data. We pass the newly created
+  # questions to the block (legacy code uses @questions)
   def quiz_with_graded_submission(questions, opts={}, &block)
     assignment_quiz(questions, opts)
-    @quiz_submission = @quiz.generate_submission(@user)
-    @quiz_submission.mark_completed
-    @quiz_submission.submission_data = yield if block_given?
-    Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
+    @quiz_submission = graded_submission(@quiz, @user, &block)
+  end
+
+  def graded_submission(quiz, user)
+    quiz_submission = quiz.generate_submission(user)
+    quiz_submission.mark_completed
+    quiz_submission.submission_data = yield(quiz.quiz_questions.order(:id)) if block_given?
+    Quizzes::SubmissionGrader.new(quiz_submission).grade_submission
+    quiz_submission
   end
 
   def survey_with_submission(questions, &block)
