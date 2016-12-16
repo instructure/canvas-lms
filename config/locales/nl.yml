@@ -5363,27 +5363,27 @@ nl:
       - za
     abbr_month_names: 
       - ~
-      - jan
-      - feb
-      - mrt
-      - apr
-      - mei
-      - jun
-      - jul
-      - aug
-      - sep
-      - okt
-      - nov
-      - dec
+      - Jan
+      - Feb
+      - Mrt
+      - Apr
+      - Mei
+      - Jun
+      - Jul
+      - Aug
+      - Sep
+      - Okt
+      - Nov
+      - Dec
     datepicker: 
       column_headings: 
-        - Zo
-        - Ma
-        - Di
-        - Wo
-        - Do
-        - Vr
-        - Za
+        - zo
+        - ma
+        - di
+        - wo
+        - do
+        - vr
+        - za
     day_names: 
       - zondag
       - maandag
@@ -5414,18 +5414,18 @@ nl:
       weekday: "%A"
     month_names: 
       - ~
-      - januari
-      - februari
-      - maart
-      - april
-      - mei
-      - juni
-      - juli
-      - augustus
-      - september
-      - oktober
-      - november
-      - december
+      - Januari
+      - Februari
+      - Maart
+      - April
+      - Mei
+      - Juni
+      - Juli
+      - Augustus
+      - September
+      - Oktober
+      - November
+      - December
   date_created_87e265bc: "Datum aangemaakt"
   date_ee500367: Datum
   date_error_7b38f8ff: "Foute datum"
