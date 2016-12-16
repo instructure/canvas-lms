@@ -5345,15 +5345,15 @@ da:
   data_set_identifier_data_set_id_c228b5df: "Identifikator til datasæt: %{data_set_id}"
   date: 
     abbr_day_names: 
-      - Søn
-      - Man
-      - Tirs
-      - Onsd
-      - Tors
-      - Fre
-      - Lør
+      - søn
+      - man
+      - tirs
+      - onsd
+      - tors
+      - fre
+      - lør
     abbr_month_names: 
-      - ugyldig
+      - ~
       - Jan
       - Feb
       - Mar
@@ -5368,13 +5368,13 @@ da:
       - Dec
     datepicker: 
       column_headings: 
-        - Sø
-        - Ma
-        - Ti
-        - "On"
-        - To
-        - Fr
-        - Lø
+        - sø
+        - ma
+        - ti
+        - "on"
+        - to
+        - fr
+        - lø
     day_names: 
       - søndag
       - mandag
@@ -5404,7 +5404,7 @@ da:
       short_with_weekday: "%A, %b %-d"
       weekday: "%A"
     month_names: 
-      - ugyldig
+      - ~
       - Januar
       - Februar
       - Marts
