@@ -101,6 +101,17 @@ define [
 
     ok event.iconType() == 'calendar-reserved'
 
+  test 'Returns "calendar-reserved" when the appointmentGroupEventStatus is "Reserved"', ->
+    event = commonEventFactory
+      title: 'some title'
+      start_at: '2016-12-01T12:30:00Z'
+      appointment_group_url: 'http://some_url'
+    ,
+      ['course_1']
+
+    event.appointmentGroupEventStatus = "Reserved"
+    ok event.iconType() == 'calendar-reserved'
+
   test 'Returns "calendar-month" for other situations', ->
     event = commonEventFactory
       title: 'some title'
