@@ -111,8 +111,7 @@ module Gradebook2Common
   def find_slick_cells(row_index, element)
     grid = element
     rows = grid.find_elements(:css, '.slick-row')
-    row_cells = rows[row_index].find_elements(:css, '.slick-cell')
-    row_cells
+    ff('.slick-cell', rows[row_index])
   end
 
   def edit_grade(cell, grade)
