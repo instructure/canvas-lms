@@ -55,10 +55,13 @@
       </tr><tr>
         <td><%= blabel :attachment, :uploaded_data, :en => "File", id: 'attachmentLabel' %></td>
         <td>
-          <a href="#" class="add add_another_file_link"> <%= t 'links.add_another_file', "Add Another File" %> </a>
+          <a href="#" class="add_another_file_link">
+            <i class="icon-add" aria-hidden="true"></i>
+            <%= t 'links.add_another_file', "Add Another File" %>
+          </a>
           <div id="submission_attachment_blank" class="submission_attachment" style="display: none;">
             <input aria-labelledby="attachmentLabel" type="file" name="attachments[-1][uploaded_data]" class="input-file"/>
-            <a href="#" class="remove_attachment_link no-hover" style="display: none;"><%= image_tag "delete_circle.png", alt: t('remove empty attachment') %></a>
+            <a href="#" class="remove_attachment_link no-hover" style="display: none;"><i class="icon-end" aria-hidden="true"></i><span class="screenreader-only"><%= t('remove empty attachment')%></span></a>
             <% if @assignment.allowed_extensions.present? -%>
               <div class='bad_ext_msg error_message' style="display: none">
                 <%= t 'errors.unacceptable_file_type', "This file type is not allowed. Accepted file types are: %{allowed_extensions_list}", :allowed_extensions_list => @assignment.allowed_extensions.to_sentence %>
@@ -219,7 +222,7 @@
              !@current_user.gmail.match(%r{@#{@domain_root_account.settings[:google_docs_domain]}$}) %>
           <div id="submit_google_doc_form">
             <p class="alert alert-error">
-              <i class="icon-warning"></i>
+              <i class="icon-warning" aria-hidden="true"></i>
               <%= t(:invalid_google_docs_domain, 'Invalid domain') %>
             </p>
 

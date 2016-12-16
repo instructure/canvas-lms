@@ -14,9 +14,11 @@
   <% elsif @assignment.expects_submission? %>
     <div class="header">
       <% if @current_user_submission.has_submission? %>
-        <%= image_tag "graded.png", :alt => '' %> <%= t 'titles.submission_turned_in', "Turned In!" %>
+        <i class="icon-check" aria-hidden="true"></i>
+        <%= t 'titles.submission_turned_in', "Turned In!" %>
       <% else %>
-        <%= image_tag "not_graded.png", :alt => '' %> <%= t 'titles.submission_not_turned_in', "Not Turned In!" %>
+        <i class="icon-x" aria-hidden="true"></i>
+        <%= t 'titles.submission_not_turned_in', "Not Turned In!" %>
       <% end %>
     </div>
   <% end %>
@@ -29,24 +31,31 @@
       <% end %>
     </span>
 
-    <a href="<%= context_url(@assignment.context, :context_assignment_submission_url, @assignment.id, @current_user.id) %>" class="forward">
-      <%= t 'links.submission.details', "Submission Details" %>
-    </a>
+    <div>
+      <a href="<%= context_url(@assignment.context, :context_assignment_submission_url, @assignment.id, @current_user.id)  %>">
+        <%= t 'links.submission.details', "Submission Details" %>
+      </a>
+    </div>
 
     <% if @current_user_submission.submission_type == "online_url" %>
-      <a href="<%= @current_user_submission.url %>" target="_new" class='link'>
-        <%= t 'links.submission.view_original_page', "View the Original Page" %>
-      </a>
+      <div>
+        <a href="<%= @current_user_submission.url %>" target="_new" id="view-original-link">
+          <%= t 'links.submission.view_original_page', "View the Original Page" %>
+        </a>
+      </div>
     <% elsif @current_user_submission.submission_type == "online_upload" %>
       <% @current_user_submission.attachments.each do |attachment| %>
-        <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :download => attachment.id) %>" class='file-big'>
-          <%= t 'links.submission.download_attachment', "Download %{attachment_display_name}", {
-            :attachment_display_name => attachment.display_name
-          } %>
-        </a>
+        <div>
+          <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :download => attachment.id) %>">
+            <%= t 'links.submission.download_attachment', "Download %{attachment_display_name}", {
+              :attachment_display_name => attachment.display_name
+            } %>
+          </a>
+        </div>
       <% end %>
     <% elsif @current_user_submission.submission_type == "online_quiz" %>
-      <a href="<%= context_url(@assignment.context, :context_quiz_url, @assignment.quiz.id) %>" target="_new" class='quiz'>
+      <a href="<%= context_url(@assignment.context, :context_quiz_url, @assignment.quiz.id) %>" target="_new">
+        <i class="icon-quiz" aria-hidden="true"></i>
         <%= @assignment.quiz.survey? ? t('links.submission.view_survey', "View the Survey Submission") :
           t('links.submission.view_quiz', "View the Quiz Submission") %>
       </a>
@@ -69,7 +78,8 @@
       <% end %>
 
       <% if @current_user_submission.rubric_assessment %>
-        <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id) %>#rubric" class='rubric'>
+        <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id) %>#rubric" class='Submission__Link--has-icon'>
+          <i class="icon-rubric" aria-hidden="true"></i>
           <%= t 'links.view_rubric_evaluation', "View Rubric Evaluation" %>
         </a>
       <% end %>
@@ -78,7 +88,7 @@
     <% if @assignment.has_peer_reviews? && @current_user_submission.user == @current_user %>
       <h4><%= t 'titles.assigned_peer_reviews', "Assigned Peer Reviews" %></h4>
 
-      <ul class="unstyled_list">
+      <ul class="unstyled_list Submission__List">
         <li style="<%= hidden unless @current_user_submission.assigned_assessments.empty? %>"><%= t 'labels.none_assigned', "None Assigned" %></li>
         <% @current_user_submission.assigned_assessments.each do |assessment| %>
           <li><%= student_peer_review_link_for @context, @assignment, assessment %></li>
