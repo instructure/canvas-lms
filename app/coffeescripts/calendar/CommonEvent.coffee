@@ -134,7 +134,7 @@ define [
       if type = @assignmentType()
         type
       else if ENV.CALENDAR.BETTER_SCHEDULER
-        if @isAppointmentGroupEvent() && @isAppointmentGroupFilledEvent()
+        if @isAppointmentGroupEvent() && (@isAppointmentGroupFilledEvent() || @appointmentGroupEventStatus == "Reserved")
           'calendar-reserved'
         else if @isAppointmentGroupEvent()
           'calendar-add'
