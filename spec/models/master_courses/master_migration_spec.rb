@@ -333,9 +333,11 @@ describe MasterCourses::MasterMigration do
       # TODO: add more content here as we add the Restrictor module to more models
       old_title = "some title"
       page = @copy_from.wiki.wiki_pages.create!(:title => old_title, :body => "ohai")
+      assignment = @copy_from.assignments.create!(:title => old_title, :description => "kthnx")
 
       run_master_migration
 
+      # WikiPage
       copied_page = @copy_to.wiki.wiki_pages.where(:migration_id => mig_id(page)).first
       child_tag = sub.child_content_tags.polymorphic_where(:content => copied_page).first
       expect(child_tag).to be_present # should create a tag
@@ -348,14 +350,33 @@ describe MasterCourses::MasterMigration do
       page.update_attribute(:body, new_master_text)
       new_master_title = "some new title"
       page.update_attribute(:title, new_master_title)
-      [page].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets marked for copy
+
+      # Assignment
+      copied_assignment = @copy_to.assignments.where(:migration_id => mig_id(assignment)).first
+      child_tag = sub.child_content_tags.polymorphic_where(:content => copied_assignment).first
+      expect(child_tag).to be_present # should create a tag
+      new_child_text = "<p>some other text here</p>"
+      copied_assignment.update_attribute(:description, new_child_text)
+      child_tag.reload
+      expect(child_tag.downstream_changes).to include('description')
+
+      new_master_text = "<p>some text or something</p>"
+      assignment.update_attribute(:description, new_master_text)
+      new_master_title = "some new title"
+      assignment.update_attribute(:title, new_master_title)
+
+      # Ensure each object gets marked for copy
+      [page, assignment].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)}
 
       run_master_migration # re-copy all the content but don't actually overwrite the downstream change
 
       expect(copied_page.reload.body).to eq new_child_text # should have been left alone
       expect(copied_page.title).to eq old_title # even the title
 
-      [page].each do |c|
+      expect(copied_assignment.reload.description).to eq new_child_text # should have been left alone
+      expect(copied_assignment.title).to eq old_title # even the title
+
+      [page, assignment].each do |c|
         mtag = @template.content_tag_for(c)
         Timecop.freeze(2.seconds.from_now) do
           mtag.update_attribute(:restrictions, {:content => true}) # should touch the content
@@ -364,6 +385,8 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration # re-copy all the content but this time overwrite the downstream change because we locked it
 
+      expect(copied_assignment.reload.description).to eq new_master_text
+      expect(copied_assignment.title).to eq new_master_title
       expect(copied_page.reload.body).to eq new_master_text
       expect(copied_page.title).to eq new_master_title # even the title
     end

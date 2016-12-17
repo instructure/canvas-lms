@@ -33,6 +33,9 @@ module Importers
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.assignments.temp_record #new(:context => context)
+      
+      item.mark_as_importing!(migration)
+
       item.title = hash[:title]
       item.title = I18n.t('untitled assignment') if item.title.blank?
       item.migration_id = hash[:migration_id]
