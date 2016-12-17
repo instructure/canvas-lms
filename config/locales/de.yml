@@ -5345,13 +5345,13 @@ de:
   data_set_identifier_data_set_id_c228b5df: "Daten-Set Identifier: %{data_set_id}"
   date: 
     abbr_day_names: 
-      - So
-      - Mo
-      - Di
-      - Mi
-      - Do
-      - Fr
-      - Sa
+      - so
+      - mo
+      - di
+      - mi
+      - do
+      - fr
+      - sa
     abbr_month_names: 
       - ~
       - Jan
@@ -5368,13 +5368,13 @@ de:
       - Dez
     datepicker: 
       column_headings: 
-        - Son
-        - Mon
-        - Die
-        - Mit
-        - Don
-        - Fre
-        - Sam
+        - son
+        - mon
+        - die
+        - mit
+        - don
+        - fre
+        - sam
     day_names: 
       - sonntag
       - montag
