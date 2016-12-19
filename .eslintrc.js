@@ -17,5 +17,5 @@ module.exports = {
     "sourceType": "module"
   },
   "parser": "babel-eslint",
-  "rules": require('./eslintrc.common.js').rules
+  "rules": require('./.eslintrc.common.js').rules
 };
