@@ -1,10 +1,11 @@
 define([
   'underscore',
+  'jquery',
   'react',
   'jsx/shared/modal',
   'jsx/shared/modal-content',
   'jsx/shared/modal-buttons',
-], function (_, React, Modal, ModalContent, ModalButtons) {
+], function (_, $, React, Modal, ModalContent, ModalButtons) {
   return React.createClass({
     displayName: 'ExternalToolModalLauncher',
 
@@ -17,7 +18,21 @@ define([
       launchType: React.PropTypes.string.isRequired,
     },
 
-    getIframeSrc() {
+    componentDidMount () {
+      $(window).on('externalContentReady', this.onExternalToolCompleted);
+      $(window).on('externalContentCancel', this.onExternalToolCompleted);
+    },
+
+    componentWillUnmount () {
+      $(window).off('externalContentReady', this.onExternalToolCompleted);
+      $(window).off('externalContentCancel', this.onExternalToolCompleted);
+    },
+
+    onExternalToolCompleted () {
+      this.props.onRequestClose();
+    },
+
+    getIframeSrc () {
       if (this.props.isOpen && this.props.tool) {
         return [
           '/', this.props.contextType, 's/',
@@ -29,7 +44,7 @@ define([
       }
     },
 
-    getLaunchDimensions() {
+    getLaunchDimensions () {
       const dimensions = {
         'width': 700,
         'height': 700,
@@ -56,27 +71,27 @@ define([
       return dimensions;
     },
 
-    getModalLaunchStyle(dimensions) {
+    getModalLaunchStyle (dimensions) {
       return {
         ...dimensions,
         border: 'none',
       };
     },
 
-    getModalBodyStyle(dimensions) {
+    getModalBodyStyle (dimensions) {
       return {
         ...dimensions,
         padding: 0,
       };
     },
 
-    getModalStyle(dimensions) {
+    getModalStyle (dimensions) {
       return {
         width: dimensions.width,
       };
     },
 
-    render() {
+    render () {
       const dimensions = this.getLaunchDimensions();
 
       return (
