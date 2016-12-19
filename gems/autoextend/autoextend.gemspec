@@ -15,6 +15,8 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '~> 2.0'
 
+  spec.add_development_dependency "byebug"
   spec.add_development_dependency "minitest"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "activesupport", "<5.1"
 end

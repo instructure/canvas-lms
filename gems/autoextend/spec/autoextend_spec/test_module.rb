@@ -1,0 +1,3 @@
+module AutoextendSpec::TestModule
+
+end
