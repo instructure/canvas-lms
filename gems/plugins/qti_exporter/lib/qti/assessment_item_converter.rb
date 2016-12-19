@@ -89,13 +89,14 @@ class AssessmentItemConverter
       type = @opts[:custom_type] || @migration_type || @type
       unless ['fill_in_multiple_blanks_question', 'canvas_matching', 'matching_question',
               'multiple_dropdowns_question', 'respondus_matching'].include?(type)
-        selectors << 'itemBody > choiceInteraction > prompt'
+        selectors << 'itemBody choiceInteraction > prompt'
         selectors << 'itemBody > extendedTextInteraction > prompt'
       end
 
       text_nodes = @doc.css(selectors.join(','))
       text_nodes = text_nodes.reject{|node| node.inner_html.strip.empty? ||
-        EXCLUDED_QUESTION_TEXT_CLASSES.any?{|c| c.casecmp(node['class'].to_s) == 0}}
+        EXCLUDED_QUESTION_TEXT_CLASSES.any?{|c| c.casecmp(node['class'].to_s) == 0} ||
+        node.at_css('choiceInteraction')}
 
       if text_nodes.length > 0
         @question[:question_text] = ''
