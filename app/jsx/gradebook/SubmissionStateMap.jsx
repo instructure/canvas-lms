@@ -1,7 +1,7 @@
 define([
   'underscore',
   'timezone',
-  'i18n!gradebook2',
+  'i18n!gradebook',
   'jsx/grading/helpers/GradingPeriodsHelper'
 ], function(_, tz, I18n, GradingPeriodsHelper) {
 

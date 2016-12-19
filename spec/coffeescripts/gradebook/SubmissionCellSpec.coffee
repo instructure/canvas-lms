@@ -1,5 +1,5 @@
 define [
-  'compiled/gradebook2/SubmissionCell'
+  'compiled/gradebook/SubmissionCell'
   'str/htmlEscape'
   'jquery'
 ], (SubmissionCell, htmlEscape, $) ->

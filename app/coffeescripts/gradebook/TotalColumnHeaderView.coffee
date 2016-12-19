@@ -2,7 +2,7 @@
 define [
   'jquery'
   'Backbone'
-  'jst/gradebook2/total_column_header'
+  'jst/gradebook/total_column_header'
 ], ($, Backbone, template) ->
 
   class TotalColumnHeaderView extends Backbone.View

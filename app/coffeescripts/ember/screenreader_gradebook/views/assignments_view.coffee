@@ -1,7 +1,7 @@
 define [
   'ember'
   'underscore'
-  'compiled/gradebook2/GradebookHeaderMenu'
+  'compiled/gradebook/GradebookHeaderMenu'
   'compiled/SubmissionDetailsDialog'
 ], (Ember, _, GradebookHeaderMenu, SubmissionDetailsDialog) ->
 

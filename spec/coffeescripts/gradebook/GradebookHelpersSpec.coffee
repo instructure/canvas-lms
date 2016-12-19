@@ -1,5 +1,5 @@
 define [
-  'compiled/gradebook2/GradebookHelpers'
+  'compiled/gradebook/GradebookHelpers'
   'jsx/gradebook/shared/constants'
 ], (GradebookHelpers, GradebookConstants) ->
   module "GradebookHelpers#noErrorsOnPage",

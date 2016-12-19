@@ -1,12 +1,12 @@
 define [
-  'i18n!gradebook2'
+  'i18n!gradebook'
   'jquery'
   'underscore'
   'compiled/views/gradebook/HeaderFilterView'
   'compiled/views/gradebook/OutcomeColumnView'
   'compiled/util/NumberCompare'
-  'jst/gradebook2/outcome_gradebook_cell'
-  'jst/gradebook2/outcome_gradebook_student_cell'
+  'jst/gradebook/outcome_gradebook_cell'
+  'jst/gradebook/outcome_gradebook_student_cell'
   'jsx/context_cards/StudentContextCardTrigger'
 ], (I18n, $, _, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
 

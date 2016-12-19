@@ -2,7 +2,7 @@ require [
   'jquery'
   'Backbone'
   'compiled/userSettings'
-  'compiled/gradebook2/Gradebook'
+  'compiled/gradebook/Gradebook'
   'compiled/views/gradebook/NavigationPillView'
   'compiled/views/gradebook/OutcomeGradebookView'
 ], ($, Backbone, userSettings, Gradebook, NavigationPillView, OutcomeGradebookView) ->

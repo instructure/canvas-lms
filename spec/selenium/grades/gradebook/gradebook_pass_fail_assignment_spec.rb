@@ -1,8 +1,8 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2" do
+describe "gradebook" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   context 'pass/fail assignment grading' do
     before :once do
@@ -16,13 +16,13 @@ describe "gradebook2" do
     end
 
     it 'should allow pass grade on assignments worth 0 points', priority: "1", test_id: 330310 do
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(f('button.gradebook-checkbox.gradebook-checkbox-pass')).to include_text('pass')
     end
 
     it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419288 do
       @assignment.update_attributes(points_possible: 1)
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(f('button.gradebook-checkbox.gradebook-checkbox-pass')).to include_text('pass')
     end
   end

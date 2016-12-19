@@ -150,6 +150,8 @@ CanvasRails::Application.routes.draw do
     end
   end
 
+  get '/courses/:course_id/gradebook2', to: redirect('/courses/%{course_id}/gradebook')
+
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
   # these resources also apply to groups and individual users.  We call
@@ -207,7 +209,6 @@ CanvasRails::Application.routes.draw do
     end
 
     resource :gradebook_csv, only: [:show]
-    get 'gradebook2' => "gradebooks#gradebook2"
 
     get 'attendance' => 'gradebooks#attendance'
     get 'attendance/:user_id' => 'gradebooks#attendance', as: :attendance_user

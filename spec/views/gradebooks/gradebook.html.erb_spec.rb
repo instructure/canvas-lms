@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/gradebooks/gradebook2" do
+describe "/gradebooks/gradebook" do
 
   def test_grade_publishing(course_allows, permissions_allow)
     course_with_student
@@ -36,7 +36,7 @@ describe "/gradebooks/gradebook2" do
     end
     @course.expects(:allows_grade_publishing_by).with(@user).returns(course_allows)
     @course.expects(:grants_any_right?).returns(permissions_allow) if course_allows
-    render "/gradebooks/gradebook2"
+    render "/gradebooks/gradebook"
     expect(response).not_to be_nil
     if course_allows && permissions_allow
       expect(response.body).to match /Publish grades to SIS/
@@ -71,7 +71,7 @@ describe "/gradebooks/gradebook2" do
     end
 
     it "should allow uploading scores for courses" do
-      render "/gradebooks/gradebook2"
+      render "/gradebooks/gradebook"
       expect(response).not_to be_nil
       expect(response.body).to match /Import/
     end
@@ -80,7 +80,7 @@ describe "/gradebooks/gradebook2" do
       @course.large_roster = true
       @course.save!
       @course.reload
-      render "/gradebooks/gradebook2"
+      render "/gradebooks/gradebook"
       expect(response).not_to be_nil
       expect(response.body).not_to match /Import/
     end

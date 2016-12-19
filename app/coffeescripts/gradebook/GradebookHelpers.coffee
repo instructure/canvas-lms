@@ -1,6 +1,6 @@
 define [
   'jquery'
-  'i18n!gradebook2'
+  'i18n!gradebook'
   'jsx/gradebook/shared/constants'
 ], ($, I18n, GradebookConstants) ->
   FLASH_ERROR_CLASS: '.ic-flash-error'

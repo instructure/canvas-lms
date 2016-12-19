@@ -1,4 +1,4 @@
-define(['jsx/gradebook2/DataLoader', 'underscore'], (DataLoader, _) => {
+define(['jsx/gradebook/DataLoader', 'underscore'], (DataLoader, _) => {
   module("Gradebook Data Loader", (hooks) => {
     let savedTrackEvent;
     let fakeXhr;

@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-module Gradebook2Common
+module GradebookCommon
   shared_context 'gradebook_components' do
     let(:gradebook_settings_cog) { f('#gradebook_settings') }
     let(:show_notes) { fj('li a:contains("Show Notes Column")') }

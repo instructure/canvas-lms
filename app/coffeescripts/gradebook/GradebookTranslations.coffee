@@ -1,4 +1,4 @@
-define ['i18n!gradebook2'], (I18n) ->
+define ['i18n!gradebook'], (I18n) ->
  GRADEBOOK_TRANSLATIONS =
     submission_tooltip_dropped: I18n.t('Dropped for grading purposes')
     submission_tooltip_late: I18n.t('Submitted late')

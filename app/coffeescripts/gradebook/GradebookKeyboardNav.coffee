@@ -17,8 +17,8 @@
 #
 
 define [
-  'i18n!gradebook2'
-  'compiled/gradebook2/GradebookTranslations'
+  'i18n!gradebook'
+  'compiled/gradebook/GradebookTranslations'
   'jquery.keycodes' # keycodes
 ], (I18n, GRADEBOOK_TRANSLATIONS) ->
   class GradebookKeyboardNav

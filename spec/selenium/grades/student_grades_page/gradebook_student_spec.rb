@@ -1,4 +1,4 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative './gradebook_student_common'
 require_relative '../setup/gradebook_setup'
 require_relative '../page_objects/student_grades_page'
@@ -6,7 +6,7 @@ require_relative '../page_objects/student_grades_page'
 
 describe 'Student Gradebook' do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
   include GradebookSetup
 
   let(:assignments) do

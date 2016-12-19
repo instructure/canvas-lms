@@ -1,7 +1,7 @@
 define [
   'jquery'
   'compiled/models/Assignment'
-  'compiled/gradebook2/SetDefaultGradeDialog'
+  'compiled/gradebook/SetDefaultGradeDialog'
   'jst/SetDefaultGradeDialog'
 ], ($, Assignment, SetDefaultGradeDialog) ->
 

@@ -1,8 +1,8 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2 - turnitin" do
+describe "gradebook - turnitin" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
@@ -31,7 +31,7 @@ describe "gradebook2 - turnitin" do
       }
     }
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     icons = ff('.gradebook-cell-turnitin')
     expect(icons).to have_size 2
 

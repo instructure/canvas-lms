@@ -1,12 +1,12 @@
 define [
-  'compiled/gradebook2/Gradebook'
-  'jsx/gradebook2/DataLoader'
+  'compiled/gradebook/Gradebook'
+  'jsx/gradebook/DataLoader'
   'underscore'
   'timezone'
   'compiled/SubmissionDetailsDialog'
 ], (Gradebook, DataLoader, _, tz, SubmissionDetailsDialog) ->
 
-  module "Gradebook2#gradeSort"
+  module "Gradebook#gradeSort"
 
   test "gradeSort - total_grade", ->
     gradeSort = (showTotalGradeAsPoints, a, b, field, asc) ->
@@ -44,7 +44,7 @@ define [
     indexedOverrides: Gradebook.prototype.indexedOverrides
     indexedGradingPeriods: _.indexBy(@gradingPeriods, 'id')
 
-  module "Gradebook2#hideAggregateColumns",
+  module "Gradebook#hideAggregateColumns",
     setupThis: (options) ->
       customOptions = options || {}
       defaults =

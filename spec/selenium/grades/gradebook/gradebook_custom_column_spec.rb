@@ -1,8 +1,8 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2 - custom columns" do
+describe "gradebook - custom columns" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
@@ -26,7 +26,7 @@ describe "gradebook2 - custom columns" do
       d.content = "123456"
     end.save!
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     expect(header(3)).to include_text col.title
     expect(ff(".container_0 .slick-header-column").map(&:text).join).not_to include hidden.title
@@ -34,7 +34,7 @@ describe "gradebook2 - custom columns" do
   end
 
   it "lets you show and hide the teacher notes column", priority: "1", test_id: 164008 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     has_notes_column = lambda do
       ff(".container_0 .slick-header-column").any? { |h| h.text == "Notes" }

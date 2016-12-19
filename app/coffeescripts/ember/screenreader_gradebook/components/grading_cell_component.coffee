@@ -1,7 +1,7 @@
 define [
   'i18n!grading_cell'
-  'compiled/gradebook2/GradebookTranslations'
-  'compiled/gradebook2/GradebookHelpers'
+  'compiled/gradebook/GradebookTranslations'
+  'compiled/gradebook/GradebookHelpers'
   'jsx/grading/helpers/OutlierScoreHelper'
   'underscore'
   'ember'

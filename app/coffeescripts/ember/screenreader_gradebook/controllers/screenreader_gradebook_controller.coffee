@@ -11,7 +11,7 @@ define [
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
   'jsx/gradebook/CourseGradeCalculator'
-  'compiled/gradebook2/OutcomeGradebookGrid'
+  'compiled/gradebook/OutcomeGradebookGrid'
   '../../shared/components/ic_submission_download_dialog_component'
   'str/htmlEscape'
   'compiled/models/grade_summary/CalculationMethodContent'

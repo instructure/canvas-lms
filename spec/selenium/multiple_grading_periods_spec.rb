@@ -17,11 +17,11 @@
 #
 
 require_relative './common'
-require_relative './helpers/gradebook2_common'
+require_relative './helpers/gradebook_common'
 
 describe "interaction with multiple grading periods" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:get_gradebook) { get "/courses/#{@course.id}/gradebook" }

@@ -1,9 +1,9 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/groups_common'
 
-describe "gradebook2" do
+describe "gradebook" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
   include GroupsCommon
 
   before(:once) { gradebook_data_setup }
@@ -12,7 +12,7 @@ describe "gradebook2" do
   it "should handle multiple enrollments correctly" do
     @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     meta_cells = find_slick_cells(0, f('.grid-canvas'))
     expect(meta_cells[0]).to include_text @course.default_section.display_name
@@ -28,7 +28,7 @@ describe "gradebook2" do
   end
 
   it "should allow showing only a certain section", priority: "1", test_id: 210024 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     # grade the first assignment
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 1)
@@ -39,7 +39,7 @@ describe "gradebook2" do
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
 
     # verify that it remembers the section to show across page loads
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(fj('.section-select-button:visible')).to include_text @other_section.name
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')).to include_text '1'
 

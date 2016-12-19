@@ -1,4 +1,4 @@
-define(['compiled/gradebook2/Gradebook',
+define(['compiled/gradebook/Gradebook',
   "underscore",
   "helpers/fakeENV",
 ], (Gradebook, _, fakeENV) => {

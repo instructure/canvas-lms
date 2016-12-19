@@ -200,17 +200,13 @@ class GradebooksController < ApplicationController
 
       case @current_user.preferred_gradebook_version
       when "2"
-        render :gradebook2
+        render :gradebook
         return
       when "srgb"
         render :screenreader
         return
       end
     end
-  end
-
-  def gradebook2
-    redirect_to action: :show
   end
 
   def post_grades_tools
@@ -718,15 +714,6 @@ class GradebooksController < ApplicationController
     js_env :total_grade_warning => warning if warning
   end
   private :set_gradebook_warnings
-
-
-  def assignment_groups_json(opts={})
-    @context.assignment_groups.active.preload(:published_assignments).map { |g|
-      assignment_group_json(g, @current_user, session, ['assignments'], {
-        stringify_json_ids: opts[:stringify_json_ids] || stringify_json_ids?
-      })
-    }
-  end
 
   private
 

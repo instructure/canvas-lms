@@ -1,5 +1,5 @@
 define [
-  'i18n!gradebook2'
+  'i18n!gradebook'
   'jquery'
   'jst/CurveGradesDialog'
   'str/htmlEscape'

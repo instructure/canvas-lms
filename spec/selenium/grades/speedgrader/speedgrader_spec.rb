@@ -1,5 +1,5 @@
 require_relative "../../common"
-require_relative "../../helpers/gradebook2_common"
+require_relative "../../helpers/gradebook_common"
 require_relative "../../helpers/groups_common"
 require_relative "../../helpers/assignments_common"
 require_relative "../../helpers/quizzes_common"
@@ -9,7 +9,7 @@ require_relative "../page_objects/speedgrader_page"
 describe 'Speedgrader' do
   include_context "in-process server selenium tests"
   include QuizzesCommon
-  include Gradebook2Common
+  include GradebookCommon
   include GroupsCommon
   include AssignmentsCommon
   include SpeedGraderCommon

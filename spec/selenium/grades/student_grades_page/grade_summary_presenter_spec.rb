@@ -1,5 +1,5 @@
 require_relative '../../common'
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
 describe GradeSummaryPresenter do
   include_context 'in-process server selenium tests'

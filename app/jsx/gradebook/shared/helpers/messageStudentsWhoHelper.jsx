@@ -1,6 +1,6 @@
 define([
   'underscore',
-  'i18n!gradebook2',
+  'i18n!gradebook',
 ], function (_, I18n) {
   var MessageStudentsWhoHelper = {
     settings: function(assignment, students) {

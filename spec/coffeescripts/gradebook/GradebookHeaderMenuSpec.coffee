@@ -2,9 +2,9 @@ define [
   'jquery'
   'underscore'
   'helpers/fakeENV'
-  'compiled/gradebook2/GradebookHeaderMenu'
-  'compiled/gradebook2/SetDefaultGradeDialog'
-  'compiled/gradebook2/CurveGradesDialog'
+  'compiled/gradebook/GradebookHeaderMenu'
+  'compiled/gradebook/SetDefaultGradeDialog'
+  'compiled/gradebook/CurveGradesDialog'
 ], ($, _, fakeENV, GradebookHeaderMenu, SetDefaultGradeDialog, CurveGradesDialog) ->
 
   module 'GradebookHeaderMenu#menuPopupOpenHandler',

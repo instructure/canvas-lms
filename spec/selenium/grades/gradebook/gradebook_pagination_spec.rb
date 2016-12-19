@@ -1,8 +1,8 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2" do
+describe "gradebook" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   before(:once) do
     gradebook_data_setup
@@ -16,7 +16,7 @@ describe "gradebook2" do
 
   def test_n_students(n)
     create_users_in_course @course, n
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     f('.gradebook_filter input').send_keys n
     expect(ff('.student-name')).to have_size 1
     expect(f('.student-name')).to include_text "user #{n}"

@@ -1,7 +1,7 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2 - post grades to SIS" do
-  include Gradebook2Common
+describe "gradebook - post grades to SIS" do
+  include GradebookCommon
   include_context "in-process server selenium tests"
 
   before(:once) do
@@ -23,7 +23,7 @@ describe "gradebook2 - post grades to SIS" do
   end
 
   it "should not be visible by default", priority: "1", test_id: 244958 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(f("body")).not_to contain_css('.post-grades-placeholder')
   end
 
@@ -31,7 +31,7 @@ describe "gradebook2 - post grades to SIS" do
     Account.default.set_feature_flag!('post_grades', 'on')
     @course.sis_source_id = 'xyz'
     @course.save
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(ff('.post-grades-placeholder')).to have_size 1
   end
 
@@ -41,7 +41,7 @@ describe "gradebook2 - post grades to SIS" do
     @course.sis_source_id = 'xyz'
     @course.save
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     f('a[data-id=outcome]').click
     expect(f('.post-grades-placeholder')).not_to be_displayed
@@ -55,7 +55,7 @@ describe "gradebook2 - post grades to SIS" do
     Account.default.set_feature_flag!('post_grades', 'on')
     @course.sis_source_id = 'xyz'
     @course.save
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(f('.post-grades-placeholder > button')).to be_displayed
     f('.post-grades-placeholder > button').click
     expect(f('.post-grades-dialog')).to be_displayed
@@ -83,7 +83,7 @@ describe "gradebook2 - post grades to SIS" do
     it "should show when a post_grades lti tool is installed", priority: "1", test_id: 244960 do
       create_post_grades_tool
 
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(f('button.external-tools-dialog')).to be_displayed
       f('button.external-tools-dialog').click
       expect(f('iframe.post-grades-frame')).to be_displayed
@@ -96,7 +96,7 @@ describe "gradebook2 - post grades to SIS" do
       course.assignments.create!(name: 'Assignment1', post_to_sis: true)
       create_post_grades_tool(course: course)
 
-      get "/courses/#{course.id}/gradebook2"
+      get "/courses/#{course.id}/gradebook"
       expect(f('button.external-tools-dialog')).to be_displayed
       f('button.external-tools-dialog').click
       expect(f('iframe.post-grades-frame')).to be_displayed
@@ -105,7 +105,7 @@ describe "gradebook2 - post grades to SIS" do
     it "should not hide post grades lti button when section selected", priority: "1", test_id: 248027 do
       create_post_grades_tool
 
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(f('button.external-tools-dialog')).to be_displayed
 
       f('button.section-select-button').click
@@ -118,7 +118,7 @@ describe "gradebook2 - post grades to SIS" do
         create_post_grades_tool(name: "test tool #{i}")
       end
 
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(ff('li.external-tools-dialog')).to have_size(10)
       expect(f('#post_grades .icon-mini-arrow-down')).to be_displayed
       move_to_click('button#post_grades')
@@ -131,7 +131,7 @@ describe "gradebook2 - post grades to SIS" do
         create_post_grades_tool(name: "test tool #{i}")
       end
 
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(ff('li.external-tools-dialog')).to have_size(10)
 
       f('button.section-select-button').click
@@ -145,7 +145,7 @@ describe "gradebook2 - post grades to SIS" do
         create_post_grades_tool(name: "test tool #{i}")
       end
 
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(ff('li.external-tools-dialog')).to have_size(11)
       # check for ellipsis (we only display top 10 added tools)
       expect(ff('li.external-tools-dialog.ellip')).to have_size(1)
@@ -161,7 +161,7 @@ describe "gradebook2 - post grades to SIS" do
 
       create_post_grades_tool
 
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(f('li.post-grades-placeholder > a')).to be_present
       expect(f('li.external-tools-dialog')).to be_present
 
@@ -192,7 +192,7 @@ describe "gradebook2 - post grades to SIS" do
 
       create_post_grades_tool
 
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(f('li.post-grades-placeholder > a')).to be_present
       expect(f('li.external-tools-dialog')).to be_present
 

@@ -484,7 +484,7 @@ describe GradebooksController do
       it "redirects to Grid View with a friendly URL" do
         @teacher.preferences[:gradebook_version] = "2"
         get "show", :course_id => @course.id
-        expect(response).to render_template("gradebook2")
+        expect(response).to render_template("gradebook")
       end
 
       it "redirects to Individual View with a friendly URL" do
@@ -528,7 +528,7 @@ describe GradebooksController do
   end
 
   describe "GET 'change_gradebook_version'" do
-    it 'switches to gradebook2 if clicked' do
+    it 'switches to gradebook if clicked' do
       user_session(@teacher)
       get 'grade_summary', :course_id => @course.id, :id => nil
 

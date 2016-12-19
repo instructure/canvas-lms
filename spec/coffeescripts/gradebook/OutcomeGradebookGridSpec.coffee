@@ -1,8 +1,8 @@
 define [
   'underscore'
-  'compiled/gradebook2/OutcomeGradebookGrid'
+  'compiled/gradebook/OutcomeGradebookGrid'
   'helpers/fakeENV'
-  'i18n!gradebook2'
+  'i18n!gradebook'
 ], (_, Grid,fakeENV) ->
 
   module 'OutcomeGradebookGrid',

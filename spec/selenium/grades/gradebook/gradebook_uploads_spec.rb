@@ -67,7 +67,7 @@ describe "gradebook uploads" do
     assignment2 = @course.assignments.create!(:title => "Assignment 2")
     assignment2.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook2.csv",
+    filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1,Assignment 2",
           "User,#{@student.id},,10,9")
     @upload_element.send_keys(fullpath)
@@ -122,7 +122,7 @@ describe "gradebook uploads" do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    _filename, fullpath, _data = gradebook_file("gradebook2.csv",
+    _filename, fullpath, _data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 2,Assignment 1",
           "User,#{@student.id},,,10")
     @upload_element.send_keys(fullpath)
@@ -269,7 +269,7 @@ describe "gradebook uploads" do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook2.csv",
+    filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,9")
 
@@ -286,7 +286,7 @@ describe "gradebook uploads" do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook2.csv",
+    filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,")
 
@@ -303,7 +303,7 @@ describe "gradebook uploads" do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook2.csv",
+    filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,100")
 
@@ -320,7 +320,7 @@ describe "gradebook uploads" do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
-    filename, fullpath, data = gradebook_file("gradebook2.csv",
+    filename, fullpath, data = gradebook_file("gradebook.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,EX")
 

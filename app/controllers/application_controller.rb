@@ -1804,14 +1804,14 @@ class ApplicationController < ActionController::Base
   #
   # Bundles are defined in app/coffeescripts/bundles/<bundle>.coffee
   #
-  # usage: js_bundle :gradebook2
+  # usage: js_bundle :gradebook
   #
   # Only allows multiple arguments to support old usage of jammit_js
   #
   # Optional :plugin named parameter allows you to specify a plugin which
   # contains the bundle. Example:
   #
-  # js_bundle :gradebook2, :plugin => :my_feature
+  # js_bundle :gradebook, :plugin => :my_feature
   #
   # will look for the bundle in
   # /plugins/my_feature/(optimized|javascripts)/compiled/bundles/ rather than

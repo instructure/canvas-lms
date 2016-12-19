@@ -1,10 +1,10 @@
 define [
   'jquery'
   'underscore'
-  'compiled/gradebook2/GradebookTranslations'
+  'compiled/gradebook/GradebookTranslations'
   'jsx/grading/helpers/OutlierScoreHelper'
   'str/htmlEscape'
-  'compiled/gradebook2/Turnitin'
+  'compiled/gradebook/Turnitin'
   'compiled/util/round'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers' # raw

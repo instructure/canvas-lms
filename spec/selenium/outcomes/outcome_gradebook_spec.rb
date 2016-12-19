@@ -1,8 +1,8 @@
-require_relative '../helpers/gradebook2_common'
+require_relative '../helpers/gradebook_common'
 
 describe "outcome gradebook" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   context "as a teacher" do
     before(:once) do
@@ -18,7 +18,7 @@ describe "outcome gradebook" do
     end
 
     it "should not be visible by default" do
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(f("#content")).not_to contain_css('.gradebook-navigation')
     end
 
@@ -28,7 +28,7 @@ describe "outcome gradebook" do
       end
 
       it "should be visible" do
-        get "/courses/#{@course.id}/gradebook2"
+        get "/courses/#{@course.id}/gradebook"
         expect(ff('.gradebook-navigation')).to have_size 1
 
         f('a[data-id=outcome]').click
@@ -36,7 +36,7 @@ describe "outcome gradebook" do
       end
 
       it "should allow showing only a certain section" do
-        get "/courses/#{@course.id}/gradebook2"
+        get "/courses/#{@course.id}/gradebook"
         f('a[data-id=outcome]').click
 
         expect(ff('.outcome-student-cell-content')).to have_size 3
@@ -56,7 +56,7 @@ describe "outcome gradebook" do
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # verify that it remembers the section to show across page loads
-        get "/courses/#{@course.id}/gradebook2"
+        get "/courses/#{@course.id}/gradebook"
         expect(fj('.section-select-button:visible')).to include_text @other_section.name
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
@@ -73,7 +73,7 @@ describe "outcome gradebook" do
       it "should handle multiple enrollments correctly" do
         @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
 
-        get "/courses/#{@course.id}/gradebook2"
+        get "/courses/#{@course.id}/gradebook"
 
         meta_cells = find_slick_cells(0, f('.grid-canvas'))
         expect(meta_cells[0]).to include_text @course.default_section.display_name
