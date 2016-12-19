@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../common'
 
 module GradebookCommon
   shared_context 'gradebook_components' do
@@ -8,11 +8,11 @@ module GradebookCommon
     let(:hide_notes) { f(".hide") }
   end
   shared_context 'reusable_course' do
-    let(:test_course) { course_factory(active_course: true) }
-    let(:teacher)     { user_factory(active_all: true) }
-    let(:student)     { user_factory(active_all: true) }
-    let(:concluded_student) { user_factory(name: 'Stewie Griffin', active_all: true) }
-    let(:observer)    { user_factory(active_all: true) }
+    let(:test_course)       { course_factory(active_course: true) }
+    let(:teacher)           { user_factory(active_all: true) }
+    let(:student)           { user_factory(active_all: true) }
+    let(:concluded_student) { user_factory(name: 'Concluded Student', active_all: true) }
+    let(:observer)          { user_factory(active_all: true) }
     let(:enroll_teacher_and_students) do
       test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
       test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')

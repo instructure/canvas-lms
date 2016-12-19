@@ -19,7 +19,7 @@
 define [
   'i18n!gradebook'
   'compiled/gradebook/GradebookTranslations'
-  'jquery.keycodes' # keycodes
+  'jquery.keycodes'
 ], (I18n, GRADEBOOK_TRANSLATIONS) ->
   class GradebookKeyboardNav
     constructor: (@slickGrid, @$grid) ->

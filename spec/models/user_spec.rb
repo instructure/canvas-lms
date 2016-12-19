@@ -2640,22 +2640,20 @@ describe User do
 
   describe "preferred_gradebook_version" do
     let(:user) { User.new }
-    let(:course) { double('course') }
     subject { user.preferred_gradebook_version }
 
-    context "prefers gb2" do
-      before { user.stubs(:preferences => { :gradebook_version => '2' }) }
-      it { is_expected.to eq '2' }
+    it "prefers gb2" do
+      user.preferences[:gradebook_version] = '2'
+      is_expected.to eq '2'
     end
 
-    context "prefers srgb" do
-      before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
-      it { is_expected.to eq 'srgb' }
+    it "prefers srgb " do
+      user.preferences[:gradebook_version] = 'srgb'
+      is_expected.to eq 'srgb'
     end
 
-    context "nil preference" do
-      before { user.stubs(:preferences => { :gradebook_version => nil }) }
-      it { is_expected.to eq '2' }
+    it "returns '2' when not set" do
+      is_expected.to eq '2'
     end
   end
 
@@ -2682,7 +2680,7 @@ describe User do
     it "excludes collkey" do
       # Ruby 1.9 does not like html that includes the collkey, so
       # don't ship it to the page (even as json).
-      user = User.create!
+      User.create!
       users = User.order_by_sortable_name
       expect(users.first.as_json['user'].keys).not_to include('collkey')
     end

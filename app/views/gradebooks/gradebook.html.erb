@@ -57,7 +57,20 @@
           <% end %>
         <% end %>
       </div>
-      <a href="<%= context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb") %>" class="Button individual-view-button" id="change_gradebook_version_link_holder" type="button"><%= t("Individual View") %></a>
+      <a
+        href="<%= context_url(@context, :change_gradebook_version_context_gradebook_url, version: "srgb") %>"
+        class="Button individual-view-button"
+        id="change_gradebook_version_link_holder"
+        type="button"
+      ><%= t("Individual View") %></a>
+      <% if @context.root_account.feature_enabled?(:gradezilla) %>
+        <a
+          href="<%= context_url(@context, :change_gradebook_version_context_gradebook_url, version: "gradezilla") %>"
+          class="Button individual-view-button"
+          id="change_gradebook_version_gradezilla"
+          type="button"
+        ><%= t("Gradezilla") %></a>
+      <% end %>
       <div class="section-button-placeholder"></div>
     </div>
   </div>

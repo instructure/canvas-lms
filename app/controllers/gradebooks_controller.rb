@@ -198,13 +198,15 @@ class GradebooksController < ApplicationController
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
 
-      case @current_user.preferred_gradebook_version
-      when "2"
-        render :gradebook
-        return
-      when "srgb"
-        render :screenreader
-        return
+      version = @current_user.preferred_gradebook_version
+      if version == '2'
+        render :gradebook and return
+      elsif version == "gradezilla" && @context.root_account.feature_enabled?(:gradezilla)
+        render :gradezilla and return
+      elsif version == "srgb"
+        render :screenreader and return
+      else
+        render :gradebook and return
       end
     end
   end

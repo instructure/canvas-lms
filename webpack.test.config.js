@@ -3,8 +3,7 @@ var I18nPlugin = require("./frontend_build/i18nPlugin");
 var ClientAppsPlugin = require("./frontend_build/clientAppPlugin");
 var CompiledReferencePlugin = require("./frontend_build/CompiledReferencePlugin");
 
-var baseWebpackConfig = require("./frontend_build/baseWebpackConfig");
-var testWebpackConfig = baseWebpackConfig;
+var testWebpackConfig = require("./frontend_build/baseWebpackConfig");
 var jspecEnv = require('./spec/jspec_env');
 
 // the ember specs don't play nice with the rest,
