@@ -205,7 +205,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def context
-    pseudonym.try(:account)
+    pseudonym&.account || user.pseudonym&.account
   end
 
   # Public: Determine if this channel is the product of an SIS import.
