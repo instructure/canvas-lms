@@ -81,6 +81,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
 
   def self.clean_up_for_assignment(assignment)
     return unless assignment.context_type == "Course"
+    return if assignment.new_record?
 
     valid_student_ids = Enrollment
       .where(course_id: assignment.context_id)
