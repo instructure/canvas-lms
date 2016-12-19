@@ -236,8 +236,6 @@ class AddBackDefaultStringLimitsP2 < ActiveRecord::Migration[4.2]
     add_string_limit_if_missing :oauth_requests, :original_host_with_port
     add_string_limit_if_missing :oauth_requests, :service
 
-    add_string_limit_if_missing :outcome_links, :workflow_state
-
     add_string_limit_if_missing :page_comments, :page_type
 
     add_string_limit_if_missing :page_views, :request_id
