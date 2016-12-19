@@ -315,45 +315,32 @@ describe 'Speedgrader' do
   end
 
   context 'grade by question' do
-    it 'displays question navigation bar when setting is enabled', priority: "1", test_id: 164019 do
+    before(:once) do
       init_course_with_students
-
-      quiz = seed_quiz_with_submission
-      user_session(@teacher)
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
-
-      driver.switch_to.frame f('#speedgrader_iframe')
-      expect(f('header.quiz-header')).to include_text quiz.title
-      expect(f("#content")).not_to contain_css('#quiz-nav-inner-wrapper')
-
       @teacher.preferences[:enable_speedgrader_grade_by_question] = true
       @teacher.save!
-      refresh_page
+    end
 
+    let_once(:quiz) { seed_quiz_with_submission(6) }
+
+    before(:each) do
+      user_session(@teacher)
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
+    end
+
+    it 'displays question navigation bar when setting is enabled', priority: "1", test_id: 164019 do
       driver.switch_to.frame f('#speedgrader_iframe')
       expect(f('header.quiz-header')).to include_text quiz.title
       expect(f('#quiz-nav-inner-wrapper')).to be_displayed
       nav = ff('.quiz-nav-li')
-      expect(nav).to have_size 4
+      expect(nav).to have_size 24
     end
 
     it 'scrolls nav bar and to questions', priority: "1", test_id: 164020 do
       skip_if_chrome('broken')
-      init_course_with_students
-
-      quiz = seed_quiz_with_submission(10)
-
-      @teacher.preferences[:enable_speedgrader_grade_by_question] = true
-      @teacher.save!
-      user_session(@teacher)
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
 
       driver.switch_to.frame f('#speedgrader_iframe')
       wrapper = f('#quiz-nav-inner-wrapper')
-      expect(f('header.quiz-header')).to include_text quiz.title
-
-      expect(wrapper).to be_displayed
-      expect(ff('.quiz-nav-li')).to have_size 40
 
       # check scrolling
       first_left = wrapper.css_value('left').to_f
@@ -364,37 +351,20 @@ describe 'Speedgrader' do
 
       # check anchors
       anchors = ff('#quiz-nav-inner-wrapper li a')
-
-      [17, 25, 33].each do |index|
-        data_id = anchors[index].attribute 'data-id'
-        anchors[index].click
-        wait_for_animations
-        expect(f("#question_#{data_id}")).to have_class 'selected_single_question'
-      end
+      data_id = anchors[1].attribute 'data-id'
+      anchors[1].click
+      expect(f("#question_#{data_id}")).to have_class 'selected_single_question'
     end
-  end
 
-  it 'updates scores', priority: "1", test_id: 164021 do
-    init_course_with_students
-    quiz = seed_quiz_with_submission(10)
+    it 'updates scores', priority: "1", test_id: 164021 do
+      driver.switch_to.frame f('#speedgrader_iframe')
+      list = ff('#questions .user_points input')
+      replace_content list[1], "1", :tab_out => true
+      replace_content f('#fudge_points_entry'), "7", :tab_out => true
 
-    @teacher.preferences[:enable_speedgrader_grade_by_question] = true
-    @teacher.save!
-    user_session(@teacher)
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
-
-    driver.switch_to.frame f('#speedgrader_iframe')
-    list = ff('#questions .user_points input')
-    [9, 17, 25].each do |index|
-      driver.execute_script("$('#questions .user_points input').focus()")
-      replace_content list[index], "1", :tab_out => true
+      expect_new_page_load {f('button.update-scores').click}
+      expect(f('#after_fudge_points_total')).to include_text '8'
     end
-    expect_new_page_load {f('button.update-scores').click}
-    expect(f('#after_fudge_points_total')).to include_text '3'
-
-    replace_content f('#fudge_points_entry'), "7", :tab_out => true
-    expect_new_page_load {f('button.update-scores').click}
-    expect(f('#after_fudge_points_total')).to include_text '10'
   end
 
   context 'Student drop-down' do
