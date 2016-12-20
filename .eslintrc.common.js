@@ -17,5 +17,8 @@ module.exports = {
     "space-before-function-paren": [2, "always"],
     "import/no-amd": [0],
     "import/no-extraneous-dependencies": [2, {"devDependencies": true}]
+  },
+  globals: {
+    "ENV": true
   }
 };

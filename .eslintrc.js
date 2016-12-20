@@ -5,9 +5,7 @@ module.exports = {
     "browser": true
   },
   "extends": "airbnb",
-  "globals": {
-    "ENV": true
-  },
+  "globals": require('./.eslintrc.common.js').globals,
   "parserOptions": {
     "ecmaVersion": 7,
     "ecmaFeatures": {
