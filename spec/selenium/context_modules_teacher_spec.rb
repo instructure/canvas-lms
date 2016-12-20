@@ -429,49 +429,25 @@ describe "context modules" do
       expect(fj('.alert.alert-error:visible').text).to eq "An external tool can't be saved without a URL."
     end
 
-    it "should add 2 modules with the first one as a prerequisite" do
+    it "shows the added pre requisites in the header of a module", priority: "1", test_id: 250297 do
+      add_modules_and_set_prerequisites
       get "/courses/#{@course.id}/modules"
-      first_module_name = 'First Module'
-      second_module_name = 'Second Module'
-      third_module_name = 'Third Module'
-      add_module(first_module_name)
-      add_module(second_module_name)
+      expect(f('.item-group-condensed:nth-of-type(3) .ig-header .prerequisites_message').text).
+        to eq "Prerequisites: #{@module1.name}, #{@module2.name}"
+    end
 
-      #adding second module - can't use add_module method because a prerequisite needs to be added to this module
-      add_form = new_module_form
-      replace_content(add_form.find_element(:id, 'context_module_name'), third_module_name)
-      # add first prerequisite
-      f('.ui-dialog .add_prerequisite_link').click
-      wait_for_ajaximations
-      click_option('.criterion select', "#{first_module_name}")
-      # add second prerequisite
-      f('.ui-dialog .add_prerequisite_link').click
-      wait_for_ajaximations
-      click_option('.criterion select:last', "#{second_module_name}")
-      submit_form(add_form)
-
-      wait_for_ajaximations
-      expect(fj('.prerequisites_message:first').text).to eq "Prerequisites: First Module, Second Module"
-
-      mod1 = @course.context_modules.where(:name => first_module_name).first
-      mod3 = @course.context_modules.where(:name => third_module_name).first
-
-      move_to_click("#context_module_#{mod3.id}")
-      f("#context_module_#{mod3.id} .ig-header-admin .al-trigger").click
-      f("#context_module_#{mod3.id} .edit_module_link").click
+    it "shows the added prerequisites when editing a module" do
+      add_modules_and_set_prerequisites
+      get "/courses/#{@course.id}/modules"
+      move_to_click("#context_module_#{@module3.id}")
+      f("#context_module_#{@module3.id} .ig-header-admin .al-trigger").click
+      f("#context_module_#{@module3.id} .edit_module_link").click
+      add_form = f('#add_context_module_form')
       expect(add_form).to be_displayed
       wait_for_ajaximations
-      prereq_select = fj('.criterion select')
+      prereq_select = f('.criterion select')
       option = first_selected_option(prereq_select)
-      expect(option.text).to eq first_module_name
-
-      ff('.cancel_button', dialog_for(add_form)).last.click
-      wait_for_ajaximations
-      mod3.publish!
-
-      # should bring up relock dialog on publish
-      f("#context_module_#{mod1.id} .publish-icon").click
-      test_relock
+      expect(option.text).to eq "#{@module1.name}"
     end
 
     it "does not have a prerequisites section when creating the first module" do
