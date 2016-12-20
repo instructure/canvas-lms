@@ -207,6 +207,15 @@ define [
 
       SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false, student: student, classes: "gpa_scale_cell", isLocked: !!opts.isLocked, tooltip: opts.tooltip})
 
+  passFailMessage = (text) ->
+    switch text
+      when 'EX' then GRADEBOOK_TRANSLATIONS.submission_excused
+      when '' then GRADEBOOK_TRANSLATIONS.submission_blank
+      else GRADEBOOK_TRANSLATIONS["submission_#{text}"]
+
+  iconClassFromSubmission = (submission) ->
+    { pass: 'icon-check', complete: 'icon-check', fail: 'icon-x', incomplete: 'icon-x' }[submission.grade] || 'icon-undefined'
+
   class SubmissionCell.pass_fail extends SubmissionCell
 
     states = ['pass', 'fail', '']
@@ -215,9 +224,6 @@ define [
         "EX"
       else
         { pass: 'pass', complete: 'pass', fail: 'fail', incomplete: 'fail' }[submission.grade] || ''
-
-    iconClassFromSubmission = (submission) ->
-      { pass: 'icon-check', complete: 'icon-check', fail: 'icon-x', incomplete: 'icon-x' }[submission.grade] || ''
 
     checkboxButtonTemplate = (iconClass) ->
       if _.isEmpty(iconClass)
@@ -239,7 +245,7 @@ define [
           data-value="#{htmlEscape cssClass}"
           class="Button Button--icon-action gradebook-checkbox gradebook-checkbox-#{htmlEscape cssClass} #{htmlEscape(editable)}"
           type="button"
-          aria-label="#{htmlEscape cssClass}"><span class="screenreader-only">#{htmlEscape cssClass}</span>#{checkboxButtonTemplate(iconClass)}</button>
+          aria-label="#{htmlEscape cssClass}"><span class="screenreader-only">#{htmlEscape(passFailMessage(cssClass))}</span>#{checkboxButtonTemplate(iconClass)}</button>
         """, options)
 
     @formatter: (row, col, submission, assignment, student, opts={}) ->
@@ -254,7 +260,7 @@ define [
         editable: true})
       ).appendTo(@opts.container)
       @$input = @$wrapper.find('.gradebook-checkbox')
-        .bind('click keypress', (event) =>
+        .bind('click', (event) =>
           event.preventDefault()
           currentValue = @$input.data('value')
           if currentValue is 'pass'
@@ -273,7 +279,12 @@ define [
       @$input
         .removeClass('gradebook-checkbox-pass gradebook-checkbox-fail')
         .addClass('gradebook-checkbox-' + classFromSubmission(grade: newValue))
+        .addClass('dontblur')
+        .attr('aria-label', passFailMessage(newValue))
         .data('value', newValue)
+      @$input.find('i')
+        .removeClass()
+        .addClass(iconClassFromSubmission(grade: newValue))
 
     loadValue: () ->
       @val = @opts.item[@opts.column.field].grade || ""

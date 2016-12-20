@@ -176,3 +176,31 @@ define [
   test "#pass_fail.formatter, tooltip adds your text to the special classes", ->
     submissionCellResponse = SubmissionCell.pass_fail.formatter(0, 0, { grade: "complete" }, {}, {}, { tooltip: "dora_the_explorer" })
     ok submissionCellResponse.indexOf("dora_the_explorer") > -1
+
+
+  module "Pass/Fail SubmissionCell",
+    setup: ->
+      opts =
+        item:
+          foo: {}
+        column:
+          field: 'foo'
+          object:
+            points_possible: 100
+        assignment: {}
+        container: $('#fixtures')[0]
+      @cell = new SubmissionCell.pass_fail opts
+      @cell.$input = $("<button><i></i></button>")
+    teardown: -> $('#fixtures').empty()
+
+  test "#pass_fail#transitionValue adds the 'dontblur' class so the user can continue toggling pass/fail state", ->
+    @cell.transitionValue("pass")
+    ok @cell.$input.hasClass('dontblur')
+
+  test "#pass_fail#transitionValue changes the aria-label to match the currently selected option", ->
+    @cell.transitionValue('fail')
+    equal @cell.$input.attr('aria-label'), 'fail'
+
+  test "#pass_fail#transitionValue updates the icon class", ->
+    @cell.transitionValue('pass')
+    ok @cell.$input.find('i').hasClass('icon-check')
