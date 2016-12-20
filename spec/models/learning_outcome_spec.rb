@@ -1005,4 +1005,39 @@ describe LearningOutcome do
       end
     end
   end
+
+  context 'enable new guid columns' do
+    before :once do
+      assignment_model
+      @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+    end
+
+    it "should read vendor_guid_2" do
+      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      expect(@outcome.vendor_guid).to be_nil
+      @outcome.vendor_guid = "GUID-XXXX"
+      @outcome.save!
+      expect(@outcome.vendor_guid).to eql "GUID-XXXX"
+      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(true)
+      expect(@outcome.vendor_guid).to eql "GUID-XXXX"
+      @outcome.write_attribute('vendor_guid_2', "GUID-YYYY")
+      expect(@outcome.vendor_guid).to eql "GUID-YYYY"
+      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      expect(@outcome.vendor_guid).to eql "GUID-XXXX"
+    end
+
+    it "should read migration_id_2" do
+      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      expect(@outcome.migration_id).to be_nil
+      @outcome.migration_id = "GUID-XXXX"
+      @outcome.save!
+      expect(@outcome.migration_id).to eql "GUID-XXXX"
+      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(true)
+      expect(@outcome.migration_id).to eql "GUID-XXXX"
+      @outcome.write_attribute('migration_id_2', "GUID-YYYY")
+      expect(@outcome.migration_id).to eql "GUID-YYYY"
+      AcademicBenchmark.stubs(:use_new_guid_columns?).returns(false)
+      expect(@outcome.migration_id).to eql "GUID-XXXX"
+    end
+  end
 end

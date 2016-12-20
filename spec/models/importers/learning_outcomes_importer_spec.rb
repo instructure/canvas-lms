@@ -49,6 +49,20 @@ describe "Importing Learning Outcomes" do
     expect(@context.learning_outcomes.count).to eq 2
   end
 
+  it "should not generate a new outcome when one already exists with the same guid" do
+    existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
+    identifier = existing_outcome.migration_id
+    lo_data = @data["learning_outcomes"].find{|lo| lo["migration_id"] == identifier }
+    AcademicBenchmark.stubs(:use_new_guid_columns?).returns(true)
+    Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration)
+    expect(@context.learning_outcomes.count).to eq 2
+    existing_outcome.write_attribute('migration_id_2', "7321d12e-3705-430d-9dfd-2511b0c73c14")
+    existing_outcome.save!
+    lo_data[:migration_id] = "7321d12e-3705-430d-9dfd-2511b0c73c14"
+    Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration)
+    expect(@context.learning_outcomes.count).to eq 2
+  end
+
   it "change calculation method, calculation int and rubric criterion" do
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     expect(existing_outcome.calculation_method).to eq "highest"
