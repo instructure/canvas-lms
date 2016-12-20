@@ -7,7 +7,7 @@ describe "context modules" do
 
   context "as a teacher", priority: "1" do
     before(:once) do
-      course(:active_course => true)
+      course_with_teacher(active_all: true)
       # have to add quiz and assignment to be able to add them to a new module
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
       @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
@@ -24,7 +24,7 @@ describe "context modules" do
     end
 
     before(:each) do
-      course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
+      user_session(@teacher)
     end
 
     def module_with_two_items
@@ -736,94 +736,104 @@ describe "context modules" do
     end
 
     context "Keyboard Accessibility", priority: "1" do
-      it "should set focus to the first drag handle after the + Module button" do
-        # Add two modules, so the drag handles show up.
-        course_module
-        course_module
-        get "/courses/#{@course.id}/modules"
-
-        driver.execute_script("$('.add_module_link').focus()")
-        add_module_link = f('.add_module_link')
-        add_module_link.send_keys("\t")
-        first_handle = f('.icon-drag-handle')
-        check_element_has_focus(first_handle)
-
-      end
-
-      it "should use the keyboard shortcuts to navigate through modules and module items" do
-        skip_if_chrome('research - focus on HTML')
-        # Test these shortcuts (access menu by pressing comma key):
-        # Up : Previous Module/Item
-        # Down : Next Module/Item
-        # Space : Move Module/Item
-        # k : Previous Module/Item
-        # j : Next Module/Item
-        # e : Edit Module/Item
-        # d : Delete Current Module/Item
-        # i : Increase Indent
-        # o : Decrease Indent
-        # n : New Module
-
+      before :once do
         modules = create_modules(2, true)
         modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
         modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
         modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
+      end
+
+      before :each do
         get "/courses/#{@course.id}/modules"
 
-        context_modules = ff('.context_module .icon-drag-handle')
-        context_module_items = ff('.context_module_item a.title')
+        # focus the first item
+        f('html').send_keys("j")
+      end
+
+      def send_keys(*keys)
+        driver.switch_to.active_element.send_keys(*keys)
+      end
+
+      let(:context_modules) { ff('.context_module .icon-drag-handle') }
+      let(:context_module_items) { ff('.context_module_item a.title') }
+
+      it "should set focus to the first drag handle after the + Module button" do
+        add_module_link = f('.add_module_link')
+        add_module_link.send_keys("\t")
+        first_handle = f('.icon-drag-handle')
+        check_element_has_focus(first_handle)
+      end
+
+      # Test these shortcuts (access menu by pressing comma key):
+      # Up : Previous Module/Item
+      # Down : Next Module/Item
+      # Space : Move Module/Item
+      # k : Previous Module/Item
+      # j : Next Module/Item
+      # e : Edit Module/Item
+      # d : Delete Current Module/Item
+      # i : Increase Indent
+      # o : Decrease Indent
+      # n : New Module
+      it "should navigate through modules and module items" do
+        skip_if_chrome('research - focus on HTML')
 
         # Navigate through modules and module items
-        f('html').send_keys("j")
         check_element_has_focus(context_modules[0])
 
-        context_modules[0].send_keys(:arrow_down)
+        send_keys(:arrow_down)
         check_element_has_focus(context_module_items[0])
 
-        context_module_items[0].send_keys("j")
+        send_keys("j")
         check_element_has_focus(context_module_items[1])
 
-        context_module_items[1].send_keys("k")
+        send_keys("k")
         check_element_has_focus(context_module_items[0])
 
-        context_module_items[0].send_keys(:arrow_up)
+        send_keys(:arrow_up)
         check_element_has_focus(context_modules[0])
+      end
 
-        # Test Edit key
-        wait_for_ajaximations(1000) # Has to wait one second before sending keys for it to work
-        context_modules[0].send_keys("e")
+      it "should edit modules" do
+        skip_if_chrome('research - focus on HTML')
+
+        send_keys("e")
         expect(f('#add_context_module_form')).to be_displayed
-        ff('.cancel_button', dialog_for(f('#add_context_module_form'))).last.click
+      end
 
-        # Test New Module key
-        wait_for_ajaximations(1000)
-        context_modules[0].send_keys("n")
+      it "should create a module" do
+        skip_if_chrome('research - focus on HTML')
+
+        send_keys("n")
         expect(f('#add_context_module_form')).to be_displayed
-        ff('.cancel_button', dialog_for(f('#add_context_module_form'))).last.click
+      end
 
-        context_modules[0].send_keys(:arrow_down)
+
+      it "should indent / outdent" do
+        skip_if_chrome('research - focus on HTML')
+
+        send_keys(:arrow_down)
         check_element_has_focus(context_module_items[0])
 
         # Test Indent / Outdent
-        expect(ff('.context_module_item')[0]).to have_class('indent_0')
+        expect(f('.context_module_item')).to have_class('indent_0')
 
-        wait_for_ajaximations(1000)
-        context_module_items[0].send_keys("i")
-        item = f('.context_module_item')
-        expect(item).to have_class('indent_1')
+        send_keys("i")
+        wait_for_ajax_requests
+        expect(f('.context_module_item')).to have_class('indent_1')
 
-        wait_for_ajaximations(1000)
-        ff('.context_module_item a.title')[0].send_keys("o")
-        item = f('.context_module_item')
-        expect(item).to have_class('indent_0')
+        send_keys("o")
+        wait_for_ajax_requests
+        expect(f('.context_module_item')).to have_class('indent_0')
+      end
+
+      it "should delete" do
+        skip_if_chrome('research - focus on HTML')
 
         # Test Delete key
-        wait_for_ajaximations(1000)
-        new_first_module_item = ff('.context_module_item')[1]
-        ff('.context_module_item')[0].send_keys("d")
+        send_keys("d")
         driver.switch_to.alert.accept
-        expect(ff('.context_module_item')).to have_size(3) # wait for draggy clone to disappear
-        expect(f('.context_module_item')).to eq(new_first_module_item)
+        expect(context_module_items).to have_size(2)
       end
     end
 

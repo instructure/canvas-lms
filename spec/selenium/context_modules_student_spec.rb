@@ -94,22 +94,13 @@ describe "context modules" do
 
     it "moves a student through context modules in sequential order", priority: "2", test_id: 126742 do
       go_to_modules
+      validate_context_module_status_icon(@module_1.id, @no_icon)
+      validate_context_module_status_icon(@module_2.id, @locked_icon)
 
       #sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
       validate_context_module_status_icon(@module_1.id, @completed_icon)
       validate_context_module_status_icon(@module_2.id, @no_icon)
-      validate_context_module_status_icon(@module_3.id, @locked_icon)
-
-      navigate_to_module_item(1, @assignment_2.title)
-      validate_context_module_status_icon(@module_1.id, @completed_icon)
-      validate_context_module_status_icon(@module_2.id, @completed_icon)
-      validate_context_module_status_icon(@module_3.id, @no_icon)
-
-      navigate_to_module_item(2, @quiz_1.title)
-      validate_context_module_status_icon(@module_1.id, @completed_icon)
-      validate_context_module_status_icon(@module_2.id, @completed_icon)
-      validate_context_module_status_icon(@module_3.id, @completed_icon)
     end
 
     it "should not cache a changed module requirement" do
@@ -260,24 +251,13 @@ describe "context modules" do
       expect(f('#module_prerequisites_list')).to be_displayed
 
       go_to_modules
+      validate_context_module_status_icon(@module_1.id, @no_icon)
+      validate_context_module_status_icon(@module_2.id, @locked_icon)
 
       #sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
       validate_context_module_status_icon(@module_1.id, @completed_icon)
       validate_context_module_status_icon(@module_2.id, @no_icon)
-      validate_context_module_status_icon(@module_3.id, @locked_icon)
-
-      navigate_to_module_item(1, @assignment_2.title)
-      validate_context_module_status_icon(@module_1.id, @completed_icon)
-      validate_context_module_status_icon(@module_2.id, @completed_icon)
-      validate_context_module_status_icon(@module_3.id, @no_icon)
-
-      scroll_page_to_bottom
-
-      navigate_to_module_item(2, @quiz_1.title)
-      validate_context_module_status_icon(@module_1.id, @completed_icon)
-      validate_context_module_status_icon(@module_2.id, @completed_icon)
-      validate_context_module_status_icon(@module_3.id, @completed_icon)
     end
 
     context "next and previous buttons", priority: "2" do
