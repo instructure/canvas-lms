@@ -522,6 +522,7 @@ describe Account do
       account.role_overrides.create!(:permission => 'read_reports', :role => (k == :site_admin ? @sa_role : @root_role), :enabled => true)
       account.role_overrides.create!(:permission => 'reset_any_mfa', :role => @sa_role, :enabled => true)
       # clear caches
+      account.tap{|a| a.settings[:mfa_settings] = :optional; a.save!}
       v[:account] = Account.find(account)
     end
     RoleOverride.clear_cached_contexts

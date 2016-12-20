@@ -457,7 +457,7 @@ describe "Roles API", type: :request do
           "manage_courses", "manage_files", "manage_grades", "manage_groups",
           "manage_interaction_alerts", "manage_outcomes",
           "manage_role_overrides", "manage_sections", "manage_sis",
-          "manage_students", "manage_user_logins", "manage_user_notes",
+          "manage_students", "manage_user_logins",
           "manage_wiki", "moderate_forum", "post_to_forum",
           "read_course_content", "read_course_list", "read_forum",
           "read_question_banks", "read_reports", "read_roster",

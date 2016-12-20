@@ -211,27 +211,6 @@ describe RoleOverride do
     end
   end
 
-  describe ":if checks" do
-    it "should apply to courses" do
-      course(:active_all => true)
-      @course.expects(:enable_user_notes).once.returns(true)
-      expect(@course.grants_right?(@teacher, :manage_user_notes)).to be_truthy
-      @course.clear_permissions_cache(@user)
-      @course.expects(:enable_user_notes).once.returns(false)
-      expect(@course.grants_right?(@teacher, :manage_user_notes)).to be_falsey
-    end
-
-    it "should apply to accounts" do
-      a = Account.default
-      account_admin_user(:active_all => true)
-      a.expects(:enable_user_notes).once.returns(true)
-      expect(a.grants_right?(@user, :manage_user_notes)).to be_truthy
-      a.clear_permissions_cache(@user)
-      a.expects(:enable_user_notes).once.returns(false)
-      expect(a.grants_right?(@user, :manage_user_notes)).to be_falsey
-    end
-  end
-
   describe "#permissions_for" do
     before :once do
       @account = account_model(:parent_account => Account.default)
@@ -485,6 +464,26 @@ describe RoleOverride do
       expect(RoleOverride.enabled_for?(Account.site_admin, :manage_role_overrides, role)).to eq [:self]
       # applying to Default Account, should be disabled
       expect(RoleOverride.enabled_for?(Account.default, :manage_role_overrides, role)).to eq []
+    end
+
+    context "with account allows" do
+      before :once do
+        @role = Account.default.roles.build(:name => 'role')
+        @role.base_role_type = 'AccountMembership'
+        @role.save!
+        RoleOverride.create!(:context => Account.default, :permission => 'manage_user_notes', :role => @role, :enabled => true)
+      end
+
+      it "should ignore permissions with account_allows off" do
+        expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to eq []
+        expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to eq []
+      end
+
+      it "should allow with account_allows on" do
+        Account.default.tap{|a| a.enable_user_notes = true; a.save!}
+        expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to_not eq []
+        expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to_not eq []
+      end
     end
   end
 
