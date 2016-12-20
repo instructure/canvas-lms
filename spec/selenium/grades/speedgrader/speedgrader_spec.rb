@@ -4,6 +4,7 @@ require_relative "../../helpers/groups_common"
 require_relative "../../helpers/assignments_common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../../helpers/speed_grader_common"
+require_relative "../page_objects/speedgrader_page"
 
 describe 'Speedgrader' do
   include_context "in-process server selenium tests"
@@ -40,7 +41,7 @@ describe 'Speedgrader' do
 
   def let_speedgrader_load
     wait = Selenium::WebDriver::Wait.new(timeout: 5)
-    wait.until { f("#grading-box-extended").attribute('value') != "" }
+    wait.until { Speedgrader.grade_input.attribute('value') != "" }
   end
 
   context 'grading' do
@@ -57,9 +58,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended')).to have_value 'complete'
-      f('#next-student-button').click
-      expect(f('#grading-box-extended')).to have_value 'incomplete'
+      expect(Speedgrader.grade_input).to have_value 'complete'
+      Speedgrader.click_next_student_btn
+      expect(Speedgrader.grade_input).to have_value 'incomplete'
     end
 
     it 'should display letter grades correctly', priority: "1", test_id: 164015 do
@@ -72,9 +73,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended')).to have_value 'A'
-      f('#next-student-button').click
-      expect(f('#grading-box-extended')).to have_value 'C'
+      expect(Speedgrader.grade_input).to have_value 'A'
+      Speedgrader.click_next_student_btn
+      expect(Speedgrader.grade_input).to have_value 'C'
 
       clear_grade_and_validate
     end
@@ -89,9 +90,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended')).to have_value '75'
-      f('#next-student-button').click
-      expect(f('#grading-box-extended')).to have_value '50'
+      expect(Speedgrader.grade_input).to have_value '75'
+      Speedgrader.click_next_student_btn
+      expect(Speedgrader.grade_input).to have_value '50'
 
       clear_grade_and_validate
     end
@@ -106,9 +107,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended')).to have_value '15'
-      f('#next-student-button').click
-      expect(f('#grading-box-extended')).to have_value '10'
+      expect(Speedgrader.grade_input).to have_value '15'
+      Speedgrader.click_next_student_btn
+      expect(Speedgrader.grade_input).to have_value '10'
 
       clear_grade_and_validate
     end
@@ -123,9 +124,10 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended')).to have_value 'A'
-      f('#next-student-button').click
-      expect(f('#grading-box-extended')).to have_value 'D'
+
+      expect(Speedgrader.grade_input).to have_value 'A'
+      Speedgrader.click_next_student_btn
+      expect(Speedgrader.grade_input).to have_value 'D'
 
       clear_grade_and_validate
     end
@@ -171,7 +173,7 @@ describe 'Speedgrader' do
       it 'should allow pass grade on assignments worth 0 points', priority: "1", test_id: 400127 do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
         let_speedgrader_load
-        expect(f('#grading-box-extended')['value']).to eq('complete')
+        expect(Speedgrader.grade_input['value']).to eq('complete')
         expect(f('#grade_container label')).to include_text('(0 / 0)')
       end
 
@@ -179,7 +181,7 @@ describe 'Speedgrader' do
         @assignment.update_attributes(points_possible: 1)
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
         let_speedgrader_load
-        expect(f('#grading-box-extended')['value']).to eq('complete')
+        expect(Speedgrader.grade_input['value']).to eq('complete')
         expect(f('#grade_container label')).to include_text('(1 / 1)')
       end
     end
@@ -213,7 +215,7 @@ describe 'Speedgrader' do
       end
 
       it 'in speedgrader', priority: "1", test_id: 164016 do
-        expect(f('#grading-box-extended')).to have_value '15'
+        expect(Speedgrader.grade_input).to have_value '15'
         expect(f('#grading span.rubric_total')).to include_text '15'
       end
 
@@ -241,6 +243,7 @@ describe 'Speedgrader' do
         expect(el).to have_value '10'
       end
     end
+
     context 'Using a rubric to grade' do
       it 'should display correct grades from a student perspective', priority: "1", test_id: 164205 do
         course_with_student_logged_in(active_all: true)
@@ -296,7 +299,7 @@ describe 'Speedgrader' do
       options.each_with_index do |option, i|
         f('#students_selectmenu-button').click
         option.click
-        f('#grading-box-extended').send_keys scores[i]
+        Speedgrader.grade_input.send_keys scores[i]
       end
 
       get "/courses/#{@course.id}/gradebook"
@@ -369,7 +372,7 @@ describe 'Speedgrader' do
 
   context 'Student drop-down' do
     before :once do
-      init_course_with_students 2
+      init_course_with_students 3
       @assignment = create_assignment_with_type('letter_grade')
     end
 
@@ -377,22 +380,21 @@ describe 'Speedgrader' do
       user_session(@teacher)
       # see first student
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      expect(f(selectedStudent)).to include_text(@students[0].name)
+      expect(Speedgrader.selected_student).to include_text(@students[0].name)
     end
 
     after :each do
       clear_local_storage
     end
 
-    let(:selectedStudent) {'span.ui-selectmenu-item-header'}
-    let(:studentXofXlabel) {'#x_of_x_students_frd'}
-    let(:studentDropdownMenu) {'div.ui-selectmenu-menu.ui-selectmenu-open'}
-    let(:studentDropdown) {'a.ui-selectmenu'}
     let(:next_) {'.next'}
     let(:previous) {'.prev'}
 
     it 'has working next and previous arrows ', priority: "1", test_id: 164018 do
       # click next to second student
+      expect(cycle_students_correctly(next_))
+
+      # click next to third student
       expect(cycle_students_correctly(next_))
 
       # go bak to the first student
@@ -403,25 +405,58 @@ describe 'Speedgrader' do
       # click next to second student
       expect(cycle_students_correctly(next_))
 
+      # click next to third student
+      expect(cycle_students_correctly(next_))
+
       # wrap around to the first student
       expect(cycle_students_correctly(next_))
     end
 
     it 'list all students', priority: "1", test_id: 164206 do
-      f(studentDropdown).click
+      Speedgrader.click_students_dropdown
 
-      expect(f(studentDropdownMenu)).to include_text(@students[0].name)
-      expect(f(studentDropdownMenu)).to include_text(@students[1].name)
+      expect(Speedgrader.student_dropdown_menu).to include_text(@students[0].name)
+      expect(Speedgrader.student_dropdown_menu).to include_text(@students[1].name)
+      expect(Speedgrader.student_dropdown_menu).to include_text(@students[2].name)
     end
 
     it 'list alias when hide student name is selected', priority: "2", test_id: 164208 do
-      f('#settings_link').click
-      f('#hide_student_names').click
+      Speedgrader.click_settings_link
+      Speedgrader.select_hide_student_names
+
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
 
-      f(studentDropdown).click
-      expect(f(studentDropdownMenu)).to include_text('Student 1')
-      expect(f(studentDropdownMenu)).to include_text('Student 2')
+      Speedgrader.click_students_dropdown
+
+      expect(Speedgrader.student_dropdown_menu).to include_text(@students[0].name)
+      expect(Speedgrader.student_dropdown_menu).to include_text(@students[1].name)
+      expect(Speedgrader.student_dropdown_menu).to include_text(@students[2].name)
+    end
+
+    # speedgrader student dropdown shows assignment submission status symbols next to student names
+    it 'has symbols indicating assignment submission status', priority: "1", test_id: 283502 do
+      # grade 2 out of 3 assignments; student3 wont be submitting and wont be graded as well
+      @assignment.grade_student(@students[0], grade: 15, grader: @teacher)
+      @assignment.grade_student(@students[1], grade: 10, grader: @teacher)
+
+      # resubmit only as student_2
+      Timecop.travel(1.hour.from_now) do
+        @assignment.submit_homework(
+          @students[1],
+          submission_type: 'online_text_entry',
+          body: 're-submitting!'
+        )
+
+      refresh_page
+      wait_for_ajaximations
+
+      Speedgrader.click_students_dropdown
+      student_options = Speedgrader.student_dropdown_menu.find_elements(tag_name:'li')
+
+      expect(student_options[0]).to have_class("graded")
+      expect(student_options[1]).to have_class("resubmitted")
+      expect(student_options[2]).to have_class("not_submitted")
+      end
     end
   end
 
