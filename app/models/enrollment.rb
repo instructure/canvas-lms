@@ -820,6 +820,8 @@ class Enrollment < ActiveRecord::Base
     self.workflow_state = 'active'
     self.completed_at = nil
     self.save
+    scores.unscoped.each(&:undestroy)
+    true
   end
 
   def re_send_confirmation!
