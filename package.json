@@ -101,7 +101,7 @@
     "react-addons-pure-render-mixin": "0.14.8",
     "react-addons-test-utils": "0.14.8",
     "react-addons-update": "0.14.8",
-    "react-modal": "1.3.0",
+    "react-modal": "1.6.4",
     "react-redux": "4.4.5",
     "react-select-box": "https://github.com/instructure-react/react-select-box.git#b1ddd39223d48793fbe3dc4e87aca00d57197b5f",
     "react-tabs": "0.8.2",
