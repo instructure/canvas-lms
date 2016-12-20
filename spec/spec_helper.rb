@@ -32,7 +32,7 @@ RSpec.configure do |c|
 
   c.around(:each) do |example|
     record_spec_info(example) do
-      Timeout::timeout(180) do
+      Timeout::timeout(60) do
         Rails.logger.info "STARTING SPEC #{example.full_description}"
         example.run
       end
