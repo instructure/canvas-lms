@@ -29,7 +29,6 @@ RSpec.configure do |c|
   c.raise_errors_for_deprecations!
   c.color = true
   c.include LtiSpecHelper, :include_lti_spec_helpers
-
   c.around(:each) do |example|
     record_spec_info(example) do
       Timeout::timeout(60) do
