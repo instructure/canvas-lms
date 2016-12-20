@@ -95,24 +95,24 @@ module Api::V1::AssignmentGroup
     hash
   end
 
-  def update_assignment_group(assignment_group, params, action)
+  def update_assignment_group(assignment_group, params)
     return nil unless params.is_a?(ActionController::Parameters)
 
     integration_data_keys = params["integration_data"].nil? ? {} : params["integration_data"].keys
-    permitted_params = params.permit(*API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS,
+    update_params = params.permit(*API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS,
                                    "integration_data": integration_data_keys)
-    update_params = JSON(permitted_params.to_json).deep_symbolize_keys
-
-    if rules = params.delete('rules')
+    rules = params.delete('rules')
+    if rules
       assignment_group.rules_hash = rules
     end
 
-    if action == :update && !update_params[:integration_data].nil?
-      assignment_group.integration_data = assignment_group.integration_data.deep_merge(update_params[:integration_data])
-      updated_attributes = update_params.except(:integration_data)
-      assignment_group.attributes = updated_attributes
-    else
-      assignment_group.attributes = update_params
-    end
+    assignment_group.integration_data = assignment_group.integration_data.to_h.merge(
+      update_params[:integration_data].to_h
+    )
+
+    updated_attributes = update_params.except(:integration_data)
+    assignment_group.attributes = updated_attributes
+
+    assignment_group
   end
 end

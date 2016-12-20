@@ -219,7 +219,9 @@ class AssignmentGroupsController < ApplicationController
     @assignment_group = @context.assignment_groups.find(params[:id])
     if authorized_action(@assignment_group, @current_user, :update)
       respond_to do |format|
-        if @assignment_group.update_attributes(assignment_group_params)
+        updated = update_assignment_group(@assignment_group, strong_params['assignment_group'])
+        if updated.present? && updated.save
+          @assignment_group = updated
           flash[:notice] = t 'notices.updated', 'Assignment Group was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
           format.json { render :json => @assignment_group.as_json(:permissions => {:user => @current_user, :session => session}), :status => :ok }

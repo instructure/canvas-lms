@@ -700,7 +700,8 @@ describe AssignmentGroupsApiController, type: :request do
     end
 
     it 'should create an assignment_group with integration_data' do
-      params = {'name' => 'Some group 2', 'position' => 1, 'integration_data'=> {'oh'=> 'hello', 'whats' => 'up'}}
+      params = {'name' => 'Some group 2', 'position' => 1,
+                'integration_data'=> {'oh'=> 'hello', 'whats' => 'up'}}
       response = api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
         controller: 'assignment_groups_api',
         action: 'create',
@@ -740,7 +741,7 @@ describe AssignmentGroupsApiController, type: :request do
       course_with_teacher(active_all: true)
       @assignment_group = @course.assignment_groups.create!(name: 'Some group',
                                                             position: 1,
-                                                            integration_data: {:oh => 'hello'})
+                                                            integration_data: {"oh" => 'hello'})
     end
 
     it 'should update an assignment group' do
@@ -769,7 +770,7 @@ describe AssignmentGroupsApiController, type: :request do
         params)
 
       @assignment_group.reload
-      expect(@assignment_group.integration_data).to eq({:oh=>'hello', :too=>'much tuna'})
+      expect(@assignment_group.integration_data).to eq({"oh" => 'hello', "too" => 'much tuna'})
     end
 
     it 'should update an assignment group without integration_data' do
@@ -784,7 +785,7 @@ describe AssignmentGroupsApiController, type: :request do
 
       @assignment_group.reload
       expect(@assignment_group.name).to eq 'updating name'
-      expect(@assignment_group.integration_data).to eq({:oh=>'hello'})
+      expect(@assignment_group.integration_data).to eq({"oh" => 'hello'})
     end
 
     it 'should not update an assignment groups integration_data with invalid data and return the correct message' do

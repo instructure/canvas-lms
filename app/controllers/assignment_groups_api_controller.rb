@@ -91,7 +91,8 @@ class AssignmentGroupsApiController < ApplicationController
       unless valid_integration_data?(strong_params)
         return render :json => 'Invalid integration data', :status => :bad_request
       end
-      updated = update_assignment_group(@assignment_group, strong_params, :create)
+
+      updated = update_assignment_group(@assignment_group, strong_params)
       process_assignment_group(updated)
     end
   end
@@ -107,10 +108,12 @@ class AssignmentGroupsApiController < ApplicationController
       unless valid_integration_data?(strong_params)
         return render :json => 'Invalid integration data', :status => :bad_request
       end
-      updated = update_assignment_group(@assignment_group, strong_params, :update)
+
+      updated = update_assignment_group(@assignment_group, strong_params)
       unless can_update_assignment_group?(@assignment_group)
         return render_unauthorized_action
       end
+
       process_assignment_group(updated)
     end
   end

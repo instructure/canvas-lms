@@ -564,7 +564,7 @@ describe AssignmentGroupsController do
 
     it 'updates group' do
       user_session(@teacher)
-      group_integration_data = {'something'=> 'else', 'foo'=> {'bar'=> 'baz'}}
+      group_integration_data = {'something' => 'else', 'foo' => 'bar'}
       put 'update', :course_id => @course.id,
                     :id => @group.id,
                     :assignment_group => {:name => name,
@@ -576,18 +576,22 @@ describe AssignmentGroupsController do
       expect(assigns[:assignment_group].integration_data).to eql(group_integration_data)
     end
 
-    it 'updates group with integration_data' do
+    it 'updates group with existing integration_data' do
+      existing_integration_data = {'existing' => 'data'}
+      @group.integration_data = existing_integration_data
+      @group.save
+
       user_session(@teacher)
-      group_integration_data = {'oh'=> 'hello', 'hi'=> 'there'}
+      new_integration_data = {'oh'=> 'hello', 'hi'=> 'there'}
       put 'update', :course_id => @course.id,
           :id => @group.id,
           :assignment_group => {:name => name,
                                 :sis_source_id => '5678',
-                                :integration_data => group_integration_data}
-      expect(assigns[:assignment_group]).to eql(@group)
-      expect(assigns[:assignment_group].name).to eql('new group name')
-      expect(assigns[:assignment_group].sis_source_id).to eql('5678')
-      expect(assigns[:assignment_group].integration_data).to eql(group_integration_data)
+                                :integration_data => new_integration_data}
+
+      expect(AssignmentGroup.find(@group.id).integration_data).to eq(
+        existing_integration_data.merge(new_integration_data)
+      )
     end
 
     it 'updates a group with no integration_data' do
