@@ -26,15 +26,23 @@ module Quizzes
         where(user_id: @qs.user.id).
         first_or_initialize
 
-      # Create a question scoped outcome result linked to the quiz_result.
-      question_result = quiz_result.learning_outcome_question_results.for_associated_asset(question).first_or_initialize
-
-      # update the result with stuff from the quiz submission's question result
+      # get data from quiz submission's question result to ensure result should be generated
       cached_question = @qs.quiz_data.detect { |q| q[:assessment_question_id] == question.id }
       cached_answer = @qs.submission_data.detect { |q| q[:question_id] == cached_question[:id] }
       raise "Could not find valid question" unless cached_question
       raise "Could not find valid answer" unless cached_answer
 
+      # Create a question scoped outcome result linked to the quiz_result.
+      question_result = quiz_result.learning_outcome_question_results.for_associated_asset(question).first_or_initialize
+
+      # do not create a result if no points are possible.
+      if cached_question['points_possible'] == 0
+        # destroy any existing results that might be persisted if points possible were not always 0
+        question_result.destroy if question_result.persisted?
+        return
+      end
+
+      # update the result with stuff from the quiz submission's question result
       question_result.learning_outcome = quiz_result.learning_outcome
 
       # mastery
@@ -77,11 +85,19 @@ module Quizzes
           [cached_question, cached_answer]
         end
 
-        result.score = cached_questions_and_answers.map(&:last).
-          map { |h| h[:points] }.
-          inject(:+)
         result.possible = cached_questions_and_answers.map(&:first).
           map { |h| h['points_possible']}.
+          inject(:+)
+
+        # do not create a result if no points are possible.
+        if result.possible == 0
+          # destroy any existing results that might be persisted if points possible were not always 0
+          result.destroy if result.persisted?
+          next
+        end
+
+        result.score = cached_questions_and_answers.map(&:last).
+          map { |h| h[:points] }.
           inject(:+)
 
         result.calculate_percent!
