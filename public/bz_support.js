@@ -24,6 +24,8 @@ function bzRetainedInfoSetup() {
   function bzChangeRetainedItem(ta, value) {
     if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
       ta.checked = (value == "yes") ? true : false;
+    else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "radio")
+      ta.checked = (value == ta.value) ? true : false;
     else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA")
       ta.value = value;
     else
@@ -54,6 +56,9 @@ function bzRetainedInfoSetup() {
         var http = new XMLHttpRequest();
         http.open("POST", "/bz/user_retained_data", true);
         var value = ta.value;
+        if(ta.getAttribute("type") == "radio")
+          if(!ta.checked)
+            return; // we only want to actually save the one that is checked
         if(ta.getAttribute("type") == "checkbox")
           value = ta.checked ? "yes" : "";
         var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value);

@@ -22,9 +22,26 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
       label = document.createElement("label");
       label.innerHTML = "<span>Type:</span> ";
       var type = document.createElement("select");
-      type.innerHTML = "<option value=\"input\">Single-line text</option><option value=\"textarea\">Multi-line text box</option><option value=\"checkbox\">Check box</option>";
+      type.innerHTML = "<option value=\"input\">Single-line text</option><option value=\"textarea\">Multi-line text box</option><option value=\"checkbox\">Check box</option><option value=\"radio\">Radio boxes</option>";
       label.appendChild(type);
       div.appendChild(label);
+
+      label = document.createElement("label");
+      label.innerHTML = "<span>Values:</span> ";
+      var values = document.createElement("textarea");
+      label.appendChild(values);
+      div.appendChild(label);
+
+      var valuesLabel = label;
+      valuesLabel.style.display = "none";
+
+      type.onchange = function() {
+        if(type.options[type.selectedIndex].value == "radio")
+          valuesLabel.style.display = "";
+        else
+          valuesLabel.style.display = "none";
+      };
+
 
 
       var i = document.createElement("button");
@@ -42,7 +59,7 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
       i.className = "submit";
       i.innerHTML = "Insert";
       i.onclick = function() {
-            callback(name.value, type.options[type.selectedIndex].value);
+            callback(name.value, type.options[type.selectedIndex].value, values.value.split("\n"));
             dialog.parentNode.removeChild(dialog);
       };
       div.appendChild(i);
@@ -52,13 +69,22 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
     }
 
     ed.addCommand('bzRetainedField', function() {
-      showFieldDialog("Add Magic Field Editor", function(name, type) {
+      showFieldDialog("Add Magic Field Editor", function(name, type, values) {
         name = name.replace(/</g, '&lt;');
         name = name.replace(/"/g, '&quot;');
 
         if(type == "checkbox")
           ed.selection.setContent('<input type="checkbox" data-bz-retained="'+name+'" />');
-        else if(type == "input")
+        else if(type == "radio") {
+          for(var i = 0; i < values.length; i++) {
+            var v = values[i].
+              replace("&", "&amp;").
+              replace("<", "&lt;").
+              replace(">", "&gt;").
+              replace("\"", "&quot;");
+            ed.selection.setContent('<input type="radio" value="'+v+'" data-bz-retained="'+name+'" /> ' + v + '<br>');
+          }
+        } else if(type == "input")
           ed.selection.setContent('<input type="text" data-bz-retained="'+name+'" />');
         else if(type == "textarea")
           ed.selection.setContent('<textarea data-bz-retained="'+name+'">&#8291;</textarea>');
