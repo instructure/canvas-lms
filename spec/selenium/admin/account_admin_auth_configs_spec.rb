@@ -37,10 +37,13 @@ describe 'account authentication' do
   describe 'identity provider' do
 
     context 'ldap' do
+
+      let!(:ldap_aac) { AccountAuthorizationConfig::LDAP }
+
       it 'should allow creation of config', priority: "1", test_id: 250262 do
         add_ldap_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(ldap_aac.active.count).to eq 1 }
+        config = ldap_aac.active.last
         expect(config.auth_host).to eq 'host.example.dev'
         expect(config.auth_port).to eq 1
         expect(config.auth_over_tls).to eq 'simple_tls'
@@ -48,13 +51,11 @@ describe 'account authentication' do
         expect(config.auth_filter).to eq 'filter'
         expect(config.auth_username).to eq 'username'
         expect(config.auth_decrypted_password).to eq 'password'
-
-        expect(Account.default.authentication_providers.active.count).to eq 2
       end
 
       it 'should allow update of config', priority: "1", test_id: 250263 do
         add_ldap_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = ldap_aac.active.last.id
         ldap_form = f("#edit_ldap#{config_id}")
         ldap_form.find_element(:id, 'authentication_provider_auth_host').clear
         ldap_form.find_element(:id, 'authentication_provider_auth_port').clear
@@ -65,8 +66,8 @@ describe 'account authentication' do
         ldap_form.find_element(:id, 'authentication_provider_auth_password').send_keys('newpassword')
         ldap_form.find("button[type='submit']").click
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(ldap_aac.active.count).to eq 1 }
+        config = ldap_aac.active.last
         expect(config.auth_host).to eq ''
         expect(config.auth_port).to eq nil
         expect(config.auth_over_tls).to eq nil
@@ -78,12 +79,12 @@ describe 'account authentication' do
 
       it 'should allow deletion of config', priority: "1", test_id: 250264 do
         add_ldap_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = ldap_aac.active.last.id
         config = "#delete-aac-#{config_id}"
         expect_new_page_load(true) do
           f(config).click
         end
-        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(ldap_aac.active.count).to eq 0
       end
 
       it 'should allow creation of multiple configs', priority: "2", test_id: 268056 do
@@ -96,14 +97,14 @@ describe 'account authentication' do
       it 'should allow deletion of multiple configs', priority: "2", test_id: 250265 do
         add_ldap_config(1)
         add_ldap_config(2)
-        expect(Account.default.authentication_providers.active.count).to eq 3
+        keep_trying_until { expect(ldap_aac.active.count).to eq 2 }
         expect_new_page_load(true) do
           f('.delete_auth_link').click
           expect(alert_present?).to be_truthy
           accept_alert
         end
-        expect(Account.default.authentication_providers.active.count).to eq 1
-        expect(Account.default.authentication_providers.count).to eq 4
+        expect(ldap_aac.active.count).to eq 0
+        expect(ldap_aac.count).to eq 2
       end
     end
 
@@ -573,39 +574,42 @@ describe 'account authentication' do
     end
 
     context 'microsoft' do
+
+      let!(:microsoft_aac) { AccountAuthorizationConfig::Microsoft }
+
       it 'should allow creation of config', priority: "2" do
-        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(microsoft_aac.active.count).to eq 0
         add_microsoft_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(microsoft_aac.active.count).to eq 1 }
+        config = microsoft_aac.active.last
         expect(config.entity_id).to eq '1234'
         expect(config.login_attribute).to eq 'sub'
       end
 
       it 'should allow update of config', priority: "2" do
         add_microsoft_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = microsoft_aac.active.last.id
 
         microsoft_form = f("#edit_microsoft#{config_id}")
         microsoft_form.find_element(:id, 'authentication_provider_application_id').clear
         microsoft_form.find("button[type='submit']").click
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(microsoft_aac.active.count).to eq 1 }
+        config = microsoft_aac.active.last
         expect(config.entity_id).to eq ''
         expect(config.login_attribute).to eq 'sub'
       end
 
       it 'should allow deletion of config', priority: "2" do
         add_microsoft_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = microsoft_aac.active.last.id
         config = "#delete-aac-#{config_id}"
         expect_new_page_load(true) do
           f(config).click
         end
 
-        expect(Account.default.authentication_providers.active.count).to eq 1
-        expect(Account.default.authentication_providers.count).to eq 2
+        expect(microsoft_aac.active.count).to eq 0
+        expect(microsoft_aac.count).to eq 1
       end
     end
 
