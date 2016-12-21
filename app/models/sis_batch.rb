@@ -187,6 +187,14 @@ class SisBatch < ActiveRecord::Base
     SisBatch.not_started.where(id: self).update_all(workflow_state: 'aborted')
   end
 
+  def self.abort_all_pending_for_account(account)
+    self.transaction do
+      account.sis_batches.not_started.lock(:no_key_update).order(:id).find_in_batches do |batch|
+        SisBatch.where(id: batch).update_all(workflow_state: 'aborted', progress: 100)
+      end
+    end
+  end
+
   scope :not_started, -> { where(workflow_state: ['initializing', 'created']) }
   scope :needs_processing, -> { where(:workflow_state => 'created').order(:created_at) }
   scope :importing, -> { where(workflow_state: ['importing', 'cleanup_batch']) }
