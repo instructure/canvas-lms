@@ -300,8 +300,12 @@ module Importers
         item.migration_id = hash[:migration_id]
         item.new_tab = hash[:new_tab]
         item.position = (context_module.item_migration_position ||= context_module.content_tags.not_deleted.map(&:position).compact.max || 0)
-        if hash[:workflow_state] && !item.sync_workflow_state_to_asset? && !['active', 'published'].include?(item.workflow_state)
-          item.workflow_state = hash[:workflow_state]
+        if hash[:workflow_state]
+          if item.sync_workflow_state_to_asset?
+            item.workflow_state = item.asset_workflow_state if item.deleted? && hash[:workflow_state] != 'deleted'
+          elsif !['active', 'published'].include?(item.workflow_state)
+            item.workflow_state = hash[:workflow_state]
+          end
         end
         context_module.item_migration_position += 1
         item.save!

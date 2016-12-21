@@ -643,6 +643,27 @@ describe ContentMigration do
       expect(new_tag2).to be_unpublished
     end
 
+    it "should restore deleted module items on re-import" do
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag1 = mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
+      tag2 = mod.add_item({:id => page.id, :type => 'wiki_page', :indent => 1})
+
+      run_course_copy
+
+      new_mod = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+      new_mod.destroy!
+
+      run_course_copy
+
+      new_mod.reload
+      expect(new_mod).to_not be_deleted
+      new_mod.content_tags.each do |new_tag|
+        expect(new_tag).to_not be_deleted
+      end
+    end
+
     it "should copy over published tableless module items" do
       mod = @copy_from.context_modules.create!(:name => "some module")
       tag1 = mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
