@@ -396,45 +396,81 @@ describe "submissions" do
   end
 
   context 'Excused assignment' do
-    let (:assignments) do
-      assignments = []
-      3.times do |i|
-        assignments << assignment = @course.assignments.create!(title: "Assignment #{i}", submission_types: 'online_text_entry', points_possible: 20)
-        assignment.submit_homework(@students[0], {submission_type: 'online_text_entry'}) unless i == 2
-      end
-
-      # Checks to see if types other than online show up as excused.
-      ['none', 'on_paper'].each do |type|
-        assignments << @course.assignments.create!(title: "Assignment #{type}", submission_types: type, points_possible: 20)
-      end
-
-      assignments[1].grade_student @students[0], grade: 10, grader: @teacher
-
-      assignments.each do |assignment|
-        assignment.grade_student @students[0], excuse: true, grader: @teacher
-      end
-
-      return assignments
+    before :once do
+      course_with_student(active_all: true)
     end
 
-    it 'indicates as excused in submission details page', priority: "1", test_id: 201937 do
-      init_course_with_students
+    before :each do
+      user_session @student
+    end
 
-      user_session @students[0]
+    shared_examples "shows as excused" do
+      before :each do
+        assignment.grade_student @student, excuse: true, grader: @teacher
+      end
 
-      get "/courses/#{@course.id}/assignments"
-
-      assignments.size.times do |i|
-        get "/courses/#{@course.id}/assignments/#{assignments[i].id}"
+      it 'indicates as excused on the assignment page', priority: "1", test_id: 201937 do
+        get "/courses/#{@course.id}/assignments/#{assignment.id}"
         expect(f("#sidebar_content .header")).to include_text 'Excused!'
+      end
 
-        get "/courses/#{@course.id}/assignments/#{assignments[i].id}/submissions/#{@students[0].id}"
+      it 'indicates as excused on the submission details page', priority: "1", test_id: 201937 do
+         get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
         expect(f("#content .submission_details .published_grade")).to include_text 'Excused'
       end
     end
 
+    context "an ungraded online assignment" do
+      let_once(:assignment) do
+        @course.assignments.create!(title: "Assignment", submission_types: 'online_text_entry', points_possible: 20)
+      end
+
+      before(:once) do
+        assignment.submit_homework(@student, {submission_type: 'online_text_entry'})
+        assignment.grade_student @student, excuse: true, grader: @teacher
+      end
+
+      include_examples "shows as excused"
+    end
+
+    context "a previously graded online assignment" do
+      let_once(:assignment) do
+        @course.assignments.create!(title: "Assignment", submission_types: 'online_text_entry', points_possible: 20)
+      end
+
+      before(:once) do
+        assignment.submit_homework(@student, {submission_type: 'online_text_entry'})
+        assignment.grade_student @student, excuse: true, grader: @teacher
+      end
+
+      include_examples "shows as excused"
+    end
+
+    context "an unsubmitted online assignment" do
+      let_once(:assignment) do
+        @course.assignments.create!(title: "Assignment", submission_types: 'online_text_entry', points_possible: 20)
+      end
+
+      include_examples "shows as excused"
+    end
+
+    context "an assignment with no submission type" do
+      let_once(:assignment) do
+        @course.assignments.create!(title: "Assignment", submission_types: 'none', points_possible: 20)
+      end
+
+      include_examples "shows as excused"
+    end
+
+    context "an on_paper assignment" do
+      let_once(:assignment) do
+        @course.assignments.create!(title: "Assignment", submission_types: 'on_paper', points_possible: 20)
+      end
+
+      include_examples "shows as excused"
+    end
+
     it 'does not allow submissions', priority: "1", test_id: 197048 do
-      course_with_student_logged_in
       @assignment = @course.assignments.create!(
         title: 'assignment 1',
         submission_types: 'online_text_entry'
