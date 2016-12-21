@@ -21,7 +21,7 @@ class SRGB
     end
 
     def notes_field
-      f('#student_information textarea')
+      fj('#student_information textarea:visible:not([disabled])')
     end
 
     def final_grade

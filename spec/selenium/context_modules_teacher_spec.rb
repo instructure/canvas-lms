@@ -135,19 +135,19 @@ describe "context modules" do
 
       f('.ig-header-admin  .al-trigger').click
       hover_and_click('#context_modules .edit_module_link')
-      wait_for_ajax_requests
+      wait_for_animations
       expect(f('#add_context_module_form')).to be_displayed
       f('.add_completion_criterion_link').click
-      assignment_picker = fj('.assignment_picker:visible')
+      wait_for_animations
+      fj(".assignment_picker:visible option[value='#{content_tag_1.id}']").click
+      wait_for_js # the action above might be changing the element underneath between finding and clicking
+      fj('.assignment_requirement_picker:visible option[value="min_score"]').click
+      expect(f("body")).to contain_jqcss(".points_possible_parent:visible")
 
-      assignment_picker.find_element(:css, "option[value='#{content_tag_1.id}']").click
-      requirement_picker = fj('.assignment_requirement_picker:visible')
-      requirement_picker.find_element(:css, 'option[value="min_score"]').click
-      expect(driver.execute_script('return $(".points_possible_parent:visible").length')).to be > 0
-
-      assignment_picker.find_element(:css, "option[value='#{content_tag_2.id}']").click
-      requirement_picker.find_element(:css, 'option[value="min_score"]').click
-      expect(driver.execute_script('return $(".points_possible_parent:visible").length')).to eq 0
+      fj(".assignment_picker:visible option[value='#{content_tag_2.id}']").click
+      wait_for_js # the action above might be changing the element underneath between finding and clicking
+      fj('.assignment_requirement_picker:visible option[value="min_score"]').click
+      expect(f("body")).not_to contain_jqcss(".points_possible_parent:visible")
     end
 
     it "should add and remove completion criteria" do
