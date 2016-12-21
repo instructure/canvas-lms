@@ -1830,6 +1830,19 @@ define([
         allowfullscreen: true
       });
       $iframe_holder.html($.raw(iframe)).show();
+      this.fitImgToIframe();
+    },
+
+    // if the iframe is only an img, set its max-width and height to 100%
+    fitImgToIframe: function () {
+      $iframe_holder.find('iframe').load(this.resizeImg);
+    },
+
+    resizeImg: function () {
+      var iframeContent = $(this).contents().find('body').children();
+      if (iframeContent.length === 1 && iframeContent.first().is('img')) {
+        iframeContent.attr('style', 'max-width: 100%; max-height: 100%;');
+      }
     },
 
     renderLtiLaunch: function($div, urlBase, externalToolUrl) {
@@ -1909,6 +1922,7 @@ define([
         $iframe_holder.html(
           $.raw(iframe)
         ).show();
+        this.fitImgToIframe();
       }
     },
 

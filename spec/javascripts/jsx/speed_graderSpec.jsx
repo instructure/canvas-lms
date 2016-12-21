@@ -328,6 +328,33 @@ define([
     ok(typeof SpeedGrader.EG.loadSubmissionPreview === 'function');
   })
 
+  module('resizeImg', {
+    setup () {
+      fakeENV.setup();
+      $div = $("<div id='iframe_holder'><iframe src='about:blank'></iframe></div>");
+      $('#fixtures').html($div);
+    },
+
+    teardown () {
+      fakeENV.teardown();
+      $('#fixtures').empty();
+    }
+  });
+
+  test('resizes images', () => {
+    const $body = $('#iframe_holder').find('iframe').contents().find('body');
+    $body.html('<img src="#" />');
+    SpeedGrader.EG.resizeImg.call($('#iframe_holder').find('iframe').get(0));
+    equal($body.find('img').attr('style'), 'max-width: 100%; max-height: 100%;');
+  });
+
+  test('does not resize other types of content', () => {
+    const $body = $('#iframe_holder').find('iframe').contents().find('body');
+    $body.html('<p>This is more than an img.</p><img src="#" />');
+    SpeedGrader.EG.resizeImg.call($('#iframe_holder').find('iframe').get(0));
+    notEqual($body.find('img').attr('style'), 'max-width: 100%; max-height: 100%;');
+  });
+
   module('emptyIframeHolder', {
     setup() {
       fakeENV.setup();
