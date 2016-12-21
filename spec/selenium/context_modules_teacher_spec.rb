@@ -744,6 +744,7 @@ describe "context modules" do
       end
 
       before :each do
+        skip_if_chrome('skipped - research find html')
         get "/courses/#{@course.id}/modules"
 
         # focus the first item
@@ -776,7 +777,6 @@ describe "context modules" do
       # o : Decrease Indent
       # n : New Module
       it "should navigate through modules and module items" do
-        skip_if_chrome('research - focus on HTML')
 
         # Navigate through modules and module items
         check_element_has_focus(context_modules[0])
@@ -795,14 +795,12 @@ describe "context modules" do
       end
 
       it "should edit modules" do
-        skip_if_chrome('research - focus on HTML')
 
         send_keys("e")
         expect(f('#add_context_module_form')).to be_displayed
       end
 
       it "should create a module" do
-        skip_if_chrome('research - focus on HTML')
 
         send_keys("n")
         expect(f('#add_context_module_form')).to be_displayed
@@ -810,7 +808,6 @@ describe "context modules" do
 
 
       it "should indent / outdent" do
-        skip_if_chrome('research - focus on HTML')
 
         send_keys(:arrow_down)
         check_element_has_focus(context_module_items[0])
@@ -828,7 +825,6 @@ describe "context modules" do
       end
 
       it "should delete" do
-        skip_if_chrome('research - focus on HTML')
 
         # Test Delete key
         send_keys("d")
