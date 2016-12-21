@@ -5461,7 +5461,7 @@ pl:
         - Niedz
         - Pon
         - Wt
-        - Śr
+        - " Śar"
         - Czw
         - Pt
         - Sob
@@ -5504,7 +5504,7 @@ pl:
       - Lipiec
       - Sierpień
       - Wrzesień
-      - Paźadziernik
+      - Październik
       - Listopad
       - Grudzień
   date_created_87e265bc: "Data utworzenia"
