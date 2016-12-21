@@ -16868,7 +16868,7 @@ ru:
       long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%-k:%M"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "меньше минуты назад"
     pm: pm
     ranges: 
