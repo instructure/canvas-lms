@@ -118,7 +118,7 @@ class WebZipExportsController < ApplicationController
   def index
     return unless authorized_action(@context, @current_user, :read)
 
-    user_web_zips = @context.web_zip_exports.visible_to(@current_user)
+    user_web_zips = @context.web_zip_exports.visible_to(@current_user).order("created_at DESC")
     web_zips_json = Api.paginate(user_web_zips, self, api_v1_web_zip_exports_url).map do |web_zip|
       web_zip_export_json(web_zip)
     end
