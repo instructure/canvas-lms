@@ -95,6 +95,19 @@ describe SisBatch do
       SisBatch.process_all_for_account(@a1)
       [b1, b2, b4].each { |batch| expect([:imported, :imported_with_messages]).to be_include(batch.reload.state) }
     end
+
+    it 'should abort non processed sis_batches when aborted' do
+      process_csv_data([%{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,active
+}])
+      expect(@account.all_courses.where(sis_source_id: 'test_1').take.workflow_state).to eq 'claimed'
+      batch = process_csv_data([%{course_id,short_name,long_name,account_id,term_id,status
+test_1,TC 101,Test Course 101,,term1,deleted
+}], workflow_state: 'aborted')
+      expect(batch.progress).to eq 100
+      expect(batch.workflow_state).to eq 'aborted'
+      expect(@account.all_courses.where(sis_source_id: 'test_1').take.workflow_state).to eq 'claimed'
+    end
   end
 
   it "should schedule in the future if configured" do

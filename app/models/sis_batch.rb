@@ -91,6 +91,7 @@ class SisBatch < ActiveRecord::Base
     state :cleanup_batch
     state :imported
     state :imported_with_messages
+    state :aborted
     state :failed
     state :failed_with_messages
   end
@@ -150,6 +151,11 @@ class SisBatch < ActiveRecord::Base
   # can rename this to something more sensible.
   def process_without_send_later
     self.options ||= {}
+    if self.workflow_state == 'aborted'
+      self.progress = 100
+      self.save
+      return
+    end
     if self.workflow_state == 'created'
       self.workflow_state = :importing
       self.progress = 0
