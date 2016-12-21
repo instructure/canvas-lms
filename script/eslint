@@ -35,7 +35,6 @@ comments = comments.map do |comment|
   comment[:severity] = 'warn'
   comment
 end
-puts comments
 
 unless comments.size >  0
   puts "-- -- -- -- -- -- -- -- -- -- --"
