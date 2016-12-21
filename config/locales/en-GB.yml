@@ -4561,7 +4561,7 @@ en-GB:
       indexed: Indexed
       integration_id: "Integration Id"
       is_public: "Is Public"
-      large_roster: "Large Roster"
+      large_roster: "Large schedule"
       license: Licence
       locale: Locale
       lock_all_announcements: "Lock All Announcements"
