@@ -79,11 +79,10 @@ describe 'account authentication' do
 
       it 'should allow deletion of config', priority: "1", test_id: 250264 do
         add_ldap_config
-        config_id = ldap_aac.active.last.id
-        config = "#delete-aac-#{config_id}"
-        expect_new_page_load(true) do
-          f(config).click
-        end
+        f("#delete-aac-#{ldap_aac.active.last.id}").click
+        accept_alert
+        wait_for_ajax_requests
+
         expect(ldap_aac.active.count).to eq 0
       end
 
@@ -98,21 +97,24 @@ describe 'account authentication' do
         add_ldap_config(1)
         add_ldap_config(2)
         keep_trying_until { expect(ldap_aac.active.count).to eq 2 }
-        expect_new_page_load(true) do
-          f('.delete_auth_link').click
-          expect(alert_present?).to be_truthy
-          accept_alert
-        end
+        f('.delete_auth_link').click
+        expect(alert_present?).to be_truthy
+        accept_alert
+        wait_for_ajax_requests
+
         expect(ldap_aac.active.count).to eq 0
         expect(ldap_aac.count).to eq 2
       end
     end
 
     context 'saml' do
+
+      let!(:saml_aac) { AccountAuthorizationConfig::SAML }
+
       it 'should allow creation of config', priority: "1", test_id: 250266 do
         add_saml_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(saml_aac.active.count).to eq 1 }
+        config = saml_aac.active.last
         expect(config.idp_entity_id).to eq 'entity.example.dev'
         expect(config.log_in_url).to eq 'login.example.dev'
         expect(config.log_out_url).to eq 'logout.example.dev'
@@ -125,7 +127,7 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "1", test_id: 250267 do
         add_saml_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = saml_aac.active.last.id
         saml_form = f("#edit_saml#{config_id}")
         f("#authentication_provider_idp_entity_id").clear
         f("#authentication_provider_log_in_url").clear
@@ -133,8 +135,8 @@ describe 'account authentication' do
         f("#authentication_provider_certificate_fingerprint").clear
         saml_form.find("button[type='submit']").click
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(saml_aac.active.count).to eq 1 }
+        config = saml_aac.active.last
         expect(config.idp_entity_id).to eq ''
         expect(config.log_in_url).to eq ''
         expect(config.log_out_url).to eq ''
@@ -147,14 +149,12 @@ describe 'account authentication' do
 
       it 'should allow deletion of config', priority: "1", test_id: 250268 do
         add_saml_config
-        config_id = Account.default.authentication_providers.active.last.id
-        config = "#delete-aac-#{config_id}"
-        expect_new_page_load(true) do
-          f(config).click
-        end
+        f("#delete-aac-#{saml_aac.active.last.id}").click
+        accept_alert
+        wait_for_ajax_requests
 
-        expect(Account.default.authentication_providers.active.count).to eq 1
-        expect(Account.default.authentication_providers.count).to eq 2
+        expect(saml_aac.active.count).to eq 0
+        expect(saml_aac.count).to eq 1
       end
 
       context 'debugging' do
@@ -320,77 +320,82 @@ describe 'account authentication' do
     end
 
     context 'cas' do
+
+      let!(:cas_aac) { AccountAuthorizationConfig::CAS }
+
       it 'should allow creation of config', priority: "1", test_id: 250272 do
         add_cas_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(cas_aac.active.count).to eq 1 }
+        config = cas_aac.active.last
         expect(config.auth_base).to eq 'http://auth.base.dev'
       end
 
       it 'should allow update of config', priority: "1", test_id: 250273 do
         add_cas_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = cas_aac.active.last.id
         cas_form = f("#edit_cas#{config_id}")
         cas_form.find('#authentication_provider_auth_base').clear
         cas_form.find("button[type='submit']").click
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(cas_aac.active.count).to eq 1 }
+        config = cas_aac.active.last
         expect(config.auth_base).to eq ''
       end
 
       it 'should allow deletion of config', priority: "1", test_id: 250274 do
         add_cas_config
-        config_id = Account.default.authentication_providers.active.last.id
-        config = "#delete-aac-#{config_id}"
-        expect_new_page_load(true) do
-          f(config).click
-        end
+        f("#delete-aac-#{cas_aac.active.last.id}").click
+        accept_alert
+        wait_for_ajax_requests
 
-        expect(Account.default.authentication_providers.active.count).to eq 1
-        expect(Account.default.authentication_providers.count).to eq 2
+        expect(cas_aac.active.count).to eq 0
+        expect(cas_aac.count).to eq 1
       end
     end
 
     context 'facebook' do
+
+      let!(:facebook_aac) { AccountAuthorizationConfig::Facebook }
+
       it 'should allow creation of config', priority: "2", test_id: 250275 do
         add_facebook_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(facebook_aac.active.count).to eq 1 }
+        config = facebook_aac.active.last
         expect(config.entity_id).to eq '123'
         expect(config.login_attribute).to eq 'id'
       end
 
       it 'should allow update of config', priority: "2", test_id: 250276 do
         add_facebook_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = facebook_aac.active.last.id
         facebook_form = f("#edit_facebook#{config_id}")
         f("#authentication_provider_app_id").clear
         facebook_form.find("button[type='submit']").click
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(facebook_aac.active.count).to eq 1 }
+        config = facebook_aac.active.last
         expect(config.entity_id).to eq ''
       end
 
       it 'should allow deletion of config', priority: "2", test_id: 250277 do
         add_facebook_config
-        config_id = Account.default.authentication_providers.active.last.id
-        config = "#delete-aac-#{config_id}"
-        expect_new_page_load(true) do
-          f(config).click
-        end
+        f("#delete-aac-#{facebook_aac.active.last.id}").click
+        accept_alert
+        wait_for_ajax_requests
 
-        expect(Account.default.authentication_providers.active.count).to eq 1
-        expect(Account.default.authentication_providers.count).to eq 2
+        expect(facebook_aac.active.count).to eq 0
+        expect(facebook_aac.count).to eq 1
       end
     end
 
     context 'github' do
+
+      let!(:github_aac) { AccountAuthorizationConfig::GitHub }
+
       it 'should allow creation of config', priority: "2", test_id: 250278 do
         add_github_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(github_aac.active.count).to eq 1 }
+        config = github_aac.active.last
         expect(config.auth_host).to eq 'github.com'
         expect(config.entity_id).to eq '1234'
         expect(config.login_attribute).to eq 'id'
@@ -398,14 +403,14 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "2", test_id: 250279 do
         add_github_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = github_aac.active.last.id
         github_form = f("#edit_github#{config_id}")
         github_form.find_element(:id, 'authentication_provider_domain').clear
         github_form.find_element(:id, 'authentication_provider_client_id').clear
         github_form.find("button[type='submit']").click
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(github_aac.active.count).to eq 1 }
+        config = github_aac.active.last
         expect(config.auth_host).to eq ''
         expect(config.entity_id).to eq ''
         expect(config.login_attribute).to eq 'id'
@@ -413,92 +418,95 @@ describe 'account authentication' do
 
       it 'should allow deletion of config', priority: "2", test_id: 250280 do
         add_github_config
-        config_id = Account.default.authentication_providers.active.last.id
-        config = "#delete-aac-#{config_id}"
-        expect_new_page_load(true) do
-          f(config).click
-        end
+        f("#delete-aac-#{github_aac.active.last.id}").click
+        accept_alert
+        wait_for_ajax_requests
 
-        expect(Account.default.authentication_providers.active.count).to eq 1
-        expect(Account.default.authentication_providers.count).to eq 2
+        expect(github_aac.active.count).to eq 0
+        expect(github_aac.count).to eq 1
       end
     end
 
     context 'google' do
+
+      let!(:google_aac) { AccountAuthorizationConfig::Google }
+
       it 'should allow creation of config', priority: "2", test_id: 250281 do
         add_google_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(google_aac.active.count).to eq 1 }
+        config = google_aac.active.last
         expect(config.entity_id).to eq '1234'
         expect(config.login_attribute).to eq 'sub'
       end
 
       it 'should allow update of config', priority: "2", test_id: 250282 do
         add_google_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = google_aac.active.last.id
         google_form = f("#edit_google#{config_id}")
         google_form.find_element(:id, 'authentication_provider_client_id').clear
         google_form.find("button[type='submit']").click
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(google_aac.active.count).to eq 1 }
+        config = google_aac.active.last
         expect(config.entity_id).to eq ''
         expect(config.login_attribute).to eq 'sub'
       end
 
       it 'should allow deletion of config', priority: "2", test_id: 250283 do
         add_google_config
-        config_id = Account.default.authentication_providers.active.last.id
-        config = "#delete-aac-#{config_id}"
-        expect_new_page_load(true) do
-          f(config).click
-        end
+        f("#delete-aac-#{google_aac.active.last.id}").click
+        accept_alert
+        wait_for_ajax_requests
 
-        expect(Account.default.authentication_providers.active.count).to eq 1
-        expect(Account.default.authentication_providers.count).to eq 2
+        expect(google_aac.active.count).to eq 0
+        expect(google_aac.count).to eq 1
       end
     end
 
     context 'linkedin' do
+
+      let!(:linkedin_aac) { AccountAuthorizationConfig::LinkedIn }
+
       it 'should allow creation of config', priority: "2", test_id: 250284 do
         add_linkedin_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(linkedin_aac.active.count).to eq 1 }
+        config = linkedin_aac.active.last
         expect(config.entity_id).to eq '1234'
         expect(config.login_attribute).to eq 'id'
       end
 
       it 'should allow update of config', priority: "2", test_id: 250285 do
         add_linkedin_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = linkedin_aac.active.last.id
         linkedin_form = f("#edit_linkedin#{config_id}")
         linkedin_form.find_element(:id, 'authentication_provider_client_id').clear
         linkedin_form.find("button[type='submit']").click
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(linkedin_aac.active.count).to eq 1 }
+        config = linkedin_aac.active.last
         expect(config.entity_id).to eq ''
         expect(config.login_attribute).to eq 'id'
       end
 
       it 'should allow deletion of config', priority: "2", test_id: 250286 do
         add_linkedin_config
-        config_id = Account.default.authentication_providers.active.last.id
-        config = "#delete-aac-#{config_id}"
-        expect_new_page_load(true) do
-          f(config).click
-        end
+        f("#delete-aac-#{linkedin_aac.active.last.id}").click
+        accept_alert
+        wait_for_ajax_requests
 
-        expect(Account.default.authentication_providers.active.count).to eq 1
-        expect(Account.default.authentication_providers.count).to eq 2
+        expect(linkedin_aac.active.count).to eq 0
+        expect(linkedin_aac.count).to eq 1
       end
     end
 
     context 'openid connect' do
+
+      let!(:openid_aac) { AccountAuthorizationConfig::OpenIDConnect }
+
       it 'should allow creation of config', priority: "2", test_id: 250287 do
         add_openid_connect_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(openid_aac.active.count).to eq 1 }
+        config = openid_aac.active.last
         expect(config.entity_id).to eq '1234'
         expect(config.log_in_url).to eq 'http://authorize.url.dev'
         expect(config.auth_base).to eq 'http://token.url.dev'
@@ -508,7 +516,7 @@ describe 'account authentication' do
 
       it 'should allow update of config', priority: "2", test_id: 250288 do
         add_openid_connect_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = openid_aac.active.last.id
         openid_connect_form = f("#edit_openid_connect#{config_id}")
         openid_connect_form.find_element(:id, 'authentication_provider_client_id').clear
         f("#authentication_provider_authorize_url").clear
@@ -516,8 +524,8 @@ describe 'account authentication' do
         f("#authentication_provider_scope").clear
         openid_connect_form.find("button[type='submit']").click
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(openid_aac.active.count).to eq 1 }
+        config = openid_aac.active.last
         expect(config.entity_id).to eq ''
         expect(config.log_in_url).to eq ''
         expect(config.auth_base).to eq ''
@@ -527,49 +535,48 @@ describe 'account authentication' do
 
       it 'should allow deletion of config', priority: "2", test_id: 250289 do
         add_openid_connect_config
-        config_id = Account.default.authentication_providers.active.last.id
-        config = "#delete-aac-#{config_id}"
-        expect_new_page_load(true) do
-          f(config).click
-        end
+        f("#delete-aac-#{openid_aac.active.last.id}").click
+        accept_alert
+        wait_for_ajax_requests
 
-        expect(Account.default.authentication_providers.active.count).to eq 1
-        expect(Account.default.authentication_providers.count).to eq 2
+        expect(openid_aac.active.count).to eq 0
+        expect(openid_aac.count).to eq 1
       end
     end
 
     context 'twitter' do
+
+      let!(:twitter_aac) { AccountAuthorizationConfig::Twitter }
+
       it 'should allow creation of config', priority: "2", test_id: 250290 do
         add_twitter_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(twitter_aac.active.count).to eq 1 }
+        config = twitter_aac.active.last
         expect(config.entity_id).to eq '1234'
         expect(config.login_attribute).to eq 'user_id'
       end
 
       it 'should allow update of config', priority: "2", test_id: 250291 do
         add_twitter_config
-        config_id = Account.default.authentication_providers.active.last.id
+        config_id = twitter_aac.active.last.id
         twitter_form = f("#edit_twitter#{config_id}")
         twitter_form.find_element(:id, 'authentication_provider_consumer_key').clear
         twitter_form.find("button[type='submit']").click
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
-        config = Account.default.authentication_providers.active.last
+        keep_trying_until { expect(twitter_aac.active.count).to eq 1 }
+        config = twitter_aac.active.last
         expect(config.entity_id).to eq ''
         expect(config.login_attribute).to eq 'user_id'
       end
 
       it 'should allow deletion of config', priority: "2", test_id: 250292 do
         add_twitter_config
-        config_id = Account.default.authentication_providers.active.last.id
-        config = "#delete-aac-#{config_id}"
-        expect_new_page_load(true) do
-          f(config).click
-        end
+        f("#delete-aac-#{twitter_aac.active.last.id}").click
+        accept_alert
+        wait_for_ajax_requests
 
-        expect(Account.default.authentication_providers.active.count).to eq 1
-        expect(Account.default.authentication_providers.count).to eq 2
+        expect(twitter_aac.active.count).to eq 0
+        expect(twitter_aac.count).to eq 1
       end
     end
 
@@ -602,11 +609,9 @@ describe 'account authentication' do
 
       it 'should allow deletion of config', priority: "2" do
         add_microsoft_config
-        config_id = microsoft_aac.active.last.id
-        config = "#delete-aac-#{config_id}"
-        expect_new_page_load(true) do
-          f(config).click
-        end
+        f("#delete-aac-#{microsoft_aac.active.last.id}").click
+        accept_alert
+        wait_for_ajax_requests
 
         expect(microsoft_aac.active.count).to eq 0
         expect(microsoft_aac.count).to eq 1
