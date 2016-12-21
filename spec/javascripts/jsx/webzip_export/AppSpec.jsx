@@ -56,46 +56,53 @@ define([
     })
   })
 
-  module('datesAndLinksFromAPI')
-
-  test('returns a JS object with webzip created_at dates and webzip export attachment urls', () => {
-    const data = [{
-      created_at: '2017-01-03T15:55Z',
-      zip_attachment: {url: 'http://example.com/stuff'},
-      workflow_state: 'generated',
-    },
-    {
-      created_at: '1776-12-25T22:00Z',
-      zip_attachment: {url: 'http://example.com/washingtoncrossingdelaware'},
-      workflow_state: 'generated',
-    }]
-    const formatted = WebZipExportApp.datesAndLinksFromAPI(data)
-    const expected = [{
-      date: '1776-12-25T22:00Z',
-      link: 'http://example.com/washingtoncrossingdelaware'
-    },
-    {
-      date: '2017-01-03T15:55Z',
-      link: 'http://example.com/stuff'
-    }]
-    deepEqual(formatted, expected)
-  })
-
-  test('does not include items with a workflow_state other than generated', () => {
+  test('renders progress bar', (assert) => {
+    const done = assert.async()
     const data = [{
       created_at: '2017-01-03T15:55Z',
       zip_attachment: {url: 'http://example.com/stuff'},
       workflow_state: 'generating',
+    }]
+    moxios.stubRequest('/api/v1/courses/2/web_zip_exports', {
+      status: 200,
+      responseText: data
+    })
+    ENV.context_asset_string = 'courses_2'
+    const tree = enzyme.shallow(<WebZipExportApp />)
+    tree.instance().componentDidMount()
+    moxios.wait(() => {
+      const node = tree.find('ExportInProgress')
+      ok(node.exists())
+      done()
+    })
+  })
+
+  module('webZipFormat')
+
+  test('returns a JS object with necessary info', () => {
+    const data = [{
+      created_at: '2017-01-03T15:55Z',
+      zip_attachment: {url: 'http://example.com/stuff'},
+      workflow_state: 'generated',
+      progress_id: '123'
     },
     {
       created_at: '1776-12-25T22:00Z',
       zip_attachment: {url: 'http://example.com/washingtoncrossingdelaware'},
       workflow_state: 'generated',
+      progress_id: '124'
     }]
-    const formatted = WebZipExportApp.datesAndLinksFromAPI(data)
+    const formatted = WebZipExportApp.webZipFormat(data)
     const expected = [{
       date: '1776-12-25T22:00Z',
-      link: 'http://example.com/washingtoncrossingdelaware'
+      link: 'http://example.com/washingtoncrossingdelaware',
+      workflowState: 'generated',
+      progressId: '124'
+    }, {
+      date: '2017-01-03T15:55Z',
+      link: 'http://example.com/stuff',
+      workflowState: 'generated',
+      progressId: '123'
     }]
     deepEqual(formatted, expected)
   })

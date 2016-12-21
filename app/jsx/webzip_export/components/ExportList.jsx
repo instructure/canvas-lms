@@ -6,7 +6,7 @@ define([
     static propTypes = {
       exports: React.PropTypes.arrayOf(React.PropTypes.shape({
         date: React.PropTypes.string.isRequired,
-        link: React.PropTypes.string.isRequired,
+        link: React.PropTypes.string.isRequired
       })).isRequired
     }
 
@@ -18,7 +18,7 @@ define([
 
     render () {
       return (
-        <ul className={'webzipexport__list'}>
+        <ul className="webzipexport__list">
           {this.renderExportListItems()}
         </ul>
       )
