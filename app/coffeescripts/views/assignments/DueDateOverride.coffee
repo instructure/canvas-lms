@@ -44,12 +44,12 @@ define [
 
     validateBeforeSave: (data, errors) =>
       return errors unless data
-      errors = @validateDates(data, errors)
+      errors = @validateDatetimes(data, errors)
       errors = @validateTokenInput(data,errors)
       errors = @validateGroupOverrides(data,errors)
       errors
 
-    validateDates: (data, errors) =>
+    validateDatetimes: (data, errors) =>
       checkedRows = []
       for override in data.assignment_overrides
         continue if _.contains(checkedRows, override.rowKey)
@@ -60,7 +60,7 @@ define [
           gradingPeriods: @gradingPeriods
           userIsAdmin: _.contains(ENV.current_user_roles, "admin")
         })
-        rowErrors = dateValidator.validateDates()
+        rowErrors = dateValidator.validateDatetimes()
         errors = _.extend(errors, rowErrors)
         for own element, msg of rowErrors
           $dateInput = $('[data-date-type="'+element+'"][data-row-key="'+override.rowKey+'"]')

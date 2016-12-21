@@ -158,7 +158,7 @@ define [
         gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)
         userIsAdmin: @currentUserIsAdmin()
       )
-      errs = dateValidator.validateDates()
+      errs = dateValidator.validateDatetimes()
 
       return errors if _.isEmpty(errs)
 

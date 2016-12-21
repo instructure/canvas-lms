@@ -34,7 +34,7 @@ define [
       @gradingPeriods = params.gradingPeriods
       @userIsAdmin = params.userIsAdmin
 
-    validateDates: ->
+    validateDatetimes: ->
       lockAt = @data.lock_at
       unlockAt = @data.unlock_at
       dueAt = @data.due_at
@@ -42,30 +42,30 @@ define [
 
       currentDateRange = if section then @getSectionRange(section) else @dateRange
 
-      datesToValidate = []
+      datetimesToValidate = []
 
       if currentDateRange.start_at?.date
-        datesToValidate.push {
+        datetimesToValidate.push {
           date: currentDateRange.start_at.date,
           validationDates: {"due_at": dueAt, "unlock_at": unlockAt},
           range: "start_range",
           type: currentDateRange.start_at.date_context
         }
       if currentDateRange.end_at?.date
-        datesToValidate.push {
+        datetimesToValidate.push {
           date: currentDateRange.end_at.date,
           validationDates: {"due_at": dueAt, "lock_at": lockAt},
           range: "end_range",
           type: currentDateRange.end_at.date_context
         }
       if dueAt
-        datesToValidate.push {
+        datetimesToValidate.push {
           date: dueAt,
           validationDates: {"lock_at": lockAt},
           range: "start_range",
           type: "due"
         }
-        datesToValidate.push {
+        datetimesToValidate.push {
           date: dueAt,
           validationDates: {"unlock_at": unlockAt},
           range: "end_range",
@@ -73,20 +73,20 @@ define [
         }
 
       if @multipleGradingPeriodsEnabled && !@userIsAdmin && @data.persisted == false
-        datesToValidate.push {
+        datetimesToValidate.push {
           date: dueAt,
           range: "grading_period_range",
         }
 
       if lockAt
-        datesToValidate.push {
+        datetimesToValidate.push {
           date: lockAt,
           validationDates: {"unlock_at": unlockAt},
           range: "end_range",
           type: "lock"
         }
       errs = {}
-      @_validateDateSequences(datesToValidate, errs)
+      @_validateDatetimeSequences(datetimesToValidate, errs)
 
     getSectionRange:(section) ->
       return @dateRange unless section.override_course_and_term_dates
@@ -98,9 +98,9 @@ define [
 
       @dateRange
 
-    _validateMultipleGradingPeriodsDate: (date, errs) =>
+    _validateMultipleGradingPeriods: (date, errs) =>
       helper = new GradingPeriodsHelper(@gradingPeriods)
-      dueAt = if date == null then null else new Date(@_calendarDate(date))
+      dueAt = if date == null then null else new Date(@_formatDatetime(date))
       return unless helper.isDateInClosedGradingPeriod(dueAt)
 
       earliestDate = helper.earliestValidDueDate
@@ -110,24 +110,24 @@ define [
       else
         errs["due_at"] = I18n.t("Due date cannot fall in a closed grading period")
 
-    _validateDateSequences: (datesToValidate, errs) =>
-      for dateSet in datesToValidate
-        if dateSet.range == "grading_period_range"
-          @_validateMultipleGradingPeriodsDate(dateSet.date, errs)
-        else if dateSet.date
-          switch dateSet.range
+    _validateDatetimeSequences: (datetimesToValidate, errs) =>
+      for datetimeSet in datetimesToValidate
+        if datetimeSet.range == "grading_period_range"
+          @_validateMultipleGradingPeriods(datetimeSet.date, errs)
+        else if datetimeSet.date
+          switch datetimeSet.range
             when "start_range"
-              _.each dateSet.validationDates, (validationDate, dateType) =>
-                if validationDate && @_calendarDate(dateSet.date) > @_calendarDate(validationDate)
-                  errs[dateType] = DATE_RANGE_ERRORS[dateType][dateSet.range][dateSet.type]
+              _.each datetimeSet.validationDates, (validationDate, dateType) =>
+                if validationDate && @_formatDatetime(datetimeSet.date) > @_formatDatetime(validationDate)
+                  errs[dateType] = DATE_RANGE_ERRORS[dateType][datetimeSet.range][datetimeSet.type]
             when "end_range"
-              _.each dateSet.validationDates, (validationDate, dateType) =>
-                if validationDate && @_calendarDate(dateSet.date) < @_calendarDate(validationDate)
-                  errs[dateType] = DATE_RANGE_ERRORS[dateType][dateSet.range][dateSet.type]
+              _.each datetimeSet.validationDates, (validationDate, dateType) =>
+                if validationDate && @_formatDatetime(datetimeSet.date) < @_formatDatetime(validationDate)
+                  errs[dateType] = DATE_RANGE_ERRORS[dateType][datetimeSet.range][datetimeSet.type]
       errs
 
-    _calendarDate: (date) ->
-      tz.format(tz.parse(date), "%F")
+    _formatDatetime: (date) ->
+      tz.format(tz.parse(date), "%F %R")
 
     DATE_RANGE_ERRORS = {
       "due_at": {
