@@ -5332,44 +5332,44 @@ mi:
   data_set_identifier_data_set_id_c228b5df: "Raraunga Tautuhi Kaitāutu: %{data_set_id}"
   date: 
     abbr_day_names: 
-      - Sun
-      - Mon
-      - Turei
-      - Wenerei
-      - Thu
-      - Paraire
-      - Rahoroi
+      - Rāt
+      - Man
+      - Tūr
+      - Wen
+      - Tāi
+      - Par
+      - Hāt
     abbr_month_names: 
       - ~
-      - Jan
-      - Feb
-      - Mar
-      - Apr
+      - Hān
+      - Pēp
+      - Māe
+      - Āpe
       - Mei
-      - Jun
-      - Jul
-      - Aug
-      - Sep
-      - Oct
-      - Nov
-      - Dec
+      - Hun
+      - Hūr
+      - Āku
+      - Hep
+      - Oke
+      - Noe
+      - Tīh
     datepicker: 
       column_headings: 
-        - Su
-        - Mo
-        - Tu
-        - matou
-        - Th
-        - Fr
-        - Sa
+        - Rā
+        - Ma
+        - Tū
+        - We
+        - Tā
+        - Pa
+        - Hā
     day_names: 
-      - Sabati
-      - Monire
-      - Rātū
+      - Rātapu
+      - Mane
+      - Tūrei
       - Wenerei
-      - Rāpare
+      - Tāite
       - Paraire
-      - Rāhoroi
+      - Hātarei
     days: 
       today: "I teie mahana"
       today_lower: "i teie mahana"
@@ -5392,18 +5392,18 @@ mi:
       weekday: "%A"
     month_names: 
       - ~
-      - January
-      - February
-      - March
-      - Aperira
+      - Hānuere
+      - Pēpuere
+      - Māehe
+      - Āperira
       - Mei
       - Hune
       - Hūrae
-      - August
-      - Mahuru
+      - Ākuhata
+      - Hepetema
       - Oketopa
-      - Whiringa
-      - Hakihea
+      - Noema
+      - Tīhema
   date_created_87e265bc: "rā i waihangatia"
   date_ee500367: Rā
   date_error_7b38f8ff: "rā Hapa"
