@@ -260,6 +260,50 @@ define [
     assignment.set 'in_closed_grading_period', false
     equal assignment.canDelete(), true
 
+  module "Assignment#canMove as teacher",
+    setup: -> fakeENV.setup({
+      current_user_roles: ['teacher']
+    })
+    teardown: -> fakeENV.teardown()
+
+  test "returns false if grading period is closed", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'in_closed_grading_period', true
+    equal assignment.canMove(), false
+
+  test "returns false if grading period not closed but group id is locked", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'in_closed_grading_period', false
+    assignment.set 'in_closed_grading_period', ['assignment_group_id']
+    equal assignment.canMove(), false
+
+  test "returns true if grading period not closed and and group id is not locked", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'in_closed_grading_period', false
+    equal assignment.canMove(), true
+
+  module "Assignment#canMove as admin",
+    setup: -> fakeENV.setup({
+      current_user_roles: ['admin']
+    })
+    teardown: -> fakeENV.teardown()
+
+  test "returns true if grading period is closed", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'in_closed_grading_period', true
+    equal assignment.canMove(), true
+
+  test "returns true if grading period not closed but group id is locked", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'in_closed_grading_period', false
+    assignment.set 'in_closed_grading_period', ['assignment_group_id']
+    equal assignment.canMove(), true
+
+  test "returns true if grading period not closed and and group id is not locked", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'in_closed_grading_period', false
+    equal assignment.canMove(), true
+
   module "Assignment#inClosedGradingPeriod as a non admin",
     setup: -> fakeENV.setup({
       current_user_roles: ['teacher']

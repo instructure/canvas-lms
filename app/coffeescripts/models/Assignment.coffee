@@ -95,6 +95,9 @@ define [
     canDelete: =>
       not @inClosedGradingPeriod() and not @frozen()
 
+    canMove: =>
+      not @inClosedGradingPeriod() and not _.include(@frozenAttributes(), 'assignment_group_id')
+
     freezeOnCopy: =>
       @get('freeze_on_copy')
 
