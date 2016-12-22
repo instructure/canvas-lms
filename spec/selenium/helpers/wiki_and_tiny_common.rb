@@ -119,6 +119,7 @@ module WikiAndTinyCommon
 
   def add_canvas_image(el, folder, filename)
     dialog = activate_editor_embed_image(el)
+    scroll_into_view('a[href="#tabUploaded"]')
     f('a[href="#tabUploaded"]', dialog).click
     expect(f('.treeLabel', dialog)).to be_displayed
     folder_el = ff('.treeLabel', dialog).detect { |e| e.text == folder }
