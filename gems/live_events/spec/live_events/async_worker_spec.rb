@@ -21,7 +21,7 @@ require 'spec_helper'
 describe LiveEvents::AsyncWorker do
   before(:each) do
     LiveEvents.max_queue_size = -> { 100 }
-    LiveEvents.logger = mock()
+    LiveEvents.logger = double()
     @worker = LiveEvents::AsyncWorker.new(false)
   end
 
