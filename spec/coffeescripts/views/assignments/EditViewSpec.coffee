@@ -310,6 +310,25 @@ define [
     notOk view.$el.find('#has_group_category').attr('readonly')
     notOk view.$el.find('#has_group_category').attr('aria-readonly')
 
+  module 'EditView: handleGroupCategoryChange',
+    setup: ->
+      fakeENV.setup()
+      ENV.COURSE_ID = 1
+
+    teardown: ->
+      fakeENV.teardown()
+      document.getElementById('fixtures').innerHTML = ''
+
+    editView: ->
+      editView.apply(this, arguments)
+
+  test 'calls handleModeratedGradingChange', ->
+    view = @editView()
+    spy = @spy(view, 'handleModeratedGradingChange')
+    view.handleGroupCategoryChange()
+
+    ok spy.calledOnce
+
   module 'EditView: group category inClosedGradingPeriod',
     setup: ->
       fakeENV.setup()

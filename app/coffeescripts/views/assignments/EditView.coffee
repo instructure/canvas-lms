@@ -113,7 +113,6 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
       events["click #{EXTERNAL_TOOLS_URL}_find"] = 'showExternalToolsDialog'
       events["change #assignment_points_possible"] = 'handlePointsChange'
       events["change #{PEER_REVIEWS_BOX}"] = 'handleModeratedGradingChange'
-      events["change #{GROUP_CATEGORY_BOX}"] = 'handleModeratedGradingChange'
       events["change #{MODERATED_GRADING_BOX}"] = 'handleModeratedGradingChange'
       events["change #{GROUP_CATEGORY_BOX}"] = 'handleGroupCategoryChange'
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
@@ -166,14 +165,15 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
       @checkboxAccessibleAdvisory(box).text(message)
 
     enableCheckbox: (box) ->
-      if box.prop("disabled")
-        box.removeProp("disabled").parent().timeoutTooltip().timeoutTooltip('disable').removeAttr('data-tooltip').removeAttr('title')
+      if box.prop('disabled')
+        box.prop('disabled', false).parent().timeoutTooltip().timeoutTooltip('disable').removeAttr('data-tooltip').removeAttr('title')
         @setImplicitCheckboxValue(box, '0')
         @checkboxAccessibleAdvisory(box).text('')
 
     handleGroupCategoryChange: ->
       isGrouped = @$groupCategoryBox.prop('checked')
       @$intraGroupPeerReviews.toggleAccessibly(isGrouped)
+      @handleModeratedGradingChange()
 
     handleModeratedGradingChange: =>
       if !ENV?.HAS_GRADED_SUBMISSIONS
