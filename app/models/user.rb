@@ -72,7 +72,7 @@ class User < ActiveRecord::Base
   has_many :associated_root_accounts, -> { order("user_account_associations.depth").where(accounts: { parent_account_id: nil }) }, source: :account, through: :user_account_associations
   has_many :developer_keys
   has_many :access_tokens, -> { preload(:developer_key) }
-  has_many :context_external_tools, -> { order(:name) }, as: :context, dependent: :destroy
+  has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
 
   has_many :student_enrollments
   has_many :ta_enrollments
@@ -83,23 +83,23 @@ class User < ActiveRecord::Base
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
   has_one :pseudonym, -> { where("pseudonyms.workflow_state<>'deleted'").order(:position) }
   has_many :attachments, :as => 'context', :dependent => :destroy
-  has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, class_name: 'Attachment'
-  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, class_name: 'Assignment'
+  has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
+  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Assignment'
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :assignment_student_visibilities
   has_many :quiz_student_visibilities, :class_name => 'Quizzes::QuizStudentVisibility'
-  has_many :folders, -> { order('folders.name') }, as: 'context'
-  has_many :submissions_folders, -> { where.not(:folders => {:submission_context_code => nil}) }, as: 'context', class_name: 'Folder'
-  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context
-  has_many :calendar_events, -> { preload(:parent_event) }, as: 'context', dependent: :destroy
+  has_many :folders, -> { order('folders.name') }, as: :context, inverse_of: :context
+  has_many :submissions_folders, -> { where.not(:folders => {:submission_context_code => nil}) }, as: :context, inverse_of: :context, class_name: 'Folder'
+  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
+  has_many :calendar_events, -> { preload(:parent_event) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :eportfolios, :dependent => :destroy
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :dashboard_messages, -> { where(to: "dashboard", workflow_state: 'dashboard').order('created_at DESC') }, class_name: 'Message', dependent: :destroy
   has_many :collaborations, -> { order('created_at DESC') }
   has_many :user_services, -> { order('created_at') }, dependent: :destroy
-  has_many :rubric_associations, -> { preload(:rubric).order('rubric_associations.created_at DESC') }, as: :context
+  has_many :rubric_associations, -> { preload(:rubric).order('rubric_associations.created_at DESC') }, as: :context, inverse_of: :context
   has_many :rubrics
-  has_many :context_rubrics, :as => :context, :class_name => 'Rubric'
+  has_many :context_rubrics, :as => :context, :inverse_of => :context, :class_name => 'Rubric'
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }
   has_many :context_module_progressions
   has_many :assessment_question_bank_users
@@ -117,7 +117,7 @@ class User < ActiveRecord::Base
   has_many :web_conferences, :through => :web_conference_participants
   has_many :account_users
   has_many :accounts, :through => :account_users
-  has_many :media_objects, :as => :context
+  has_many :media_objects, :as => :context, :inverse_of => :context
   has_many :user_generated_media_objects, :class_name => 'MediaObject'
   has_many :user_notes
   has_many :account_reports
@@ -128,10 +128,10 @@ class User < ActiveRecord::Base
   has_many :messages
   has_many :sis_batches
   has_many :sis_post_grades_statuses
-  has_many :content_migrations, :as => :context
-  has_many :content_exports, :as => :context
+  has_many :content_migrations, :as => :context, :inverse_of => :context
+  has_many :content_exports, :as => :context, :inverse_of => :context
   has_many :usage_rights,
-    as: :context,
+    as: :context, inverse_of: :context,
     class_name: 'UsageRights',
     dependent: :destroy
   has_many :gradebook_csvs, dependent: :destroy
@@ -139,7 +139,7 @@ class User < ActiveRecord::Base
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
 
-  has_many :progresses, :as => :context
+  has_many :progresses, :as => :context, :inverse_of => :context
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
