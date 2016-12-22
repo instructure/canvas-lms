@@ -443,8 +443,7 @@ class SisImportsApiController < ApplicationController
   def show
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       @batch = @account.sis_batches.find(params[:id])
-      raise "Sis Import not found" unless @batch
-      render :json => @batch
+      render json: @batch
     end
   end
 
