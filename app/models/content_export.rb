@@ -22,7 +22,7 @@ class ContentExport < ActiveRecord::Base
   belongs_to :user
   belongs_to :attachment
   belongs_to :content_migration
-  has_many :attachments, :as => :context, :dependent => :destroy
+  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_one :epub_export
   has_a_broadcast_policy
   serialize :settings
@@ -31,7 +31,7 @@ class ContentExport < ActiveRecord::Base
 
   validates_presence_of :context_id, :workflow_state
 
-  has_one :job_progress, :class_name => 'Progress', :as => :context
+  has_one :job_progress, :class_name => 'Progress', :as => :context, :inverse_of => :context
 
   #export types
   COMMON_CARTRIDGE = 'common_cartridge'
