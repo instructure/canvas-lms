@@ -1841,7 +1841,7 @@ define([
     resizeImg: function () {
       var iframeContent = $(this).contents().find('body').children();
       if (iframeContent.length === 1 && iframeContent.first().is('img')) {
-        iframeContent.attr('style', 'max-width: 100%; max-height: 100%;');
+        iframeContent.attr('style', 'max-width: 100vw; max-height: 100vh;');
       }
     },
 

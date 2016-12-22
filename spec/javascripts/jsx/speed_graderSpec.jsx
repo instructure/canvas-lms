@@ -345,14 +345,14 @@ define([
     const $body = $('#iframe_holder').find('iframe').contents().find('body');
     $body.html('<img src="#" />');
     SpeedGrader.EG.resizeImg.call($('#iframe_holder').find('iframe').get(0));
-    equal($body.find('img').attr('style'), 'max-width: 100%; max-height: 100%;');
+    equal($body.find('img').attr('style'), 'max-width: 100vw; max-height: 100vh;');
   });
 
   test('does not resize other types of content', () => {
     const $body = $('#iframe_holder').find('iframe').contents().find('body');
     $body.html('<p>This is more than an img.</p><img src="#" />');
     SpeedGrader.EG.resizeImg.call($('#iframe_holder').find('iframe').get(0));
-    notEqual($body.find('img').attr('style'), 'max-width: 100%; max-height: 100%;');
+    notEqual($body.find('img').attr('style'), 'max-width: 100vw; max-height: 100vh;');
   });
 
   module('emptyIframeHolder', {
