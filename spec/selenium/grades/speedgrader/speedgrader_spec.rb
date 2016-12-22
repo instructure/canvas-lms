@@ -45,92 +45,46 @@ describe 'Speedgrader' do
   end
 
   context 'grading' do
-    it 'complete/incomplete', priority: "1", test_id: 164014 do
-      init_course_with_students 2
-      user_session(@teacher)
 
-      @assignment = @course.assignments.create!(
-        title: 'Complete?',
-        grading_type: 'pass_fail'
-      )
-      @assignment.grade_student @students[0], grade: 'complete', grader: @teacher
-      @assignment.grade_student @students[1], grade: 'incomplete', grader: @teacher
+    context 'should display grades correctly' do
 
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-      let_speedgrader_load
-      expect(Speedgrader.grade_input).to have_value 'complete'
-      Speedgrader.click_next_student_btn
-      expect(Speedgrader.grade_input).to have_value 'incomplete'
+      before(:each) do
+        init_course_with_students 2
+        user_session(@teacher)
+      end
+
+      it 'complete/incomplete', priority: "1", test_id: 164014 do
+        @assignment = @course.assignments.create!(
+          title: 'Complete?',
+          grading_type: 'pass_fail'
+        )
+        @assignment.grade_student @students[0], grade: 'complete', grader: @teacher
+        @assignment.grade_student @students[1], grade: 'incomplete', grader: @teacher
+
+        grader_speedgrader_assignment('complete', 'incomplete', false)
+      end
+
+      it 'letter grades', priority: "1", test_id: 164015 do
+        create_assignment_type_and_grade('letter_grade', 'A', 'C')
+        grader_speedgrader_assignment('A', 'C')
+      end
+
+      it 'percent grades', priority: "1", test_id: 164202 do
+        create_assignment_type_and_grade('percent', 15, 10)
+        grader_speedgrader_assignment('75', '50')
+      end
+
+      it 'points grades', priority: "1", test_id: 164203 do
+        create_assignment_type_and_grade('points', 15, 10)
+        grader_speedgrader_assignment('15', '10')
+      end
+
+      it 'gpa scale grades', priority: "1", test_id: 164204 do
+        create_assignment_type_and_grade('gpa_scale', 'A', 'D')
+        grader_speedgrader_assignment('A', 'D')
+      end
     end
 
-    it 'should display letter grades correctly', priority: "1", test_id: 164015 do
-      init_course_with_students 2
-      user_session(@teacher)
-
-      @assignment = create_assignment_with_type('letter_grade')
-      @assignment.grade_student @students[0], grade: 'A', grader: @teacher
-      @assignment.grade_student @students[1], grade: 'C', grader: @teacher
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-      let_speedgrader_load
-      expect(Speedgrader.grade_input).to have_value 'A'
-      Speedgrader.click_next_student_btn
-      expect(Speedgrader.grade_input).to have_value 'C'
-
-      clear_grade_and_validate
-    end
-
-    it 'should display percent grades correctly', priority: "1", test_id: 164202 do
-      init_course_with_students 2
-      user_session(@teacher)
-
-      @assignment = create_assignment_with_type('percent')
-      @assignment.grade_student @students[0], grade: 15, grader: @teacher
-      @assignment.grade_student @students[1], grade: 10, grader: @teacher
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-      let_speedgrader_load
-      expect(Speedgrader.grade_input).to have_value '75'
-      Speedgrader.click_next_student_btn
-      expect(Speedgrader.grade_input).to have_value '50'
-
-      clear_grade_and_validate
-    end
-
-    it 'should display points grades correctly', priority: "1", test_id: 164203 do
-      init_course_with_students 2
-      user_session(@teacher)
-
-      @assignment = create_assignment_with_type('points')
-      @assignment.grade_student @students[0], grade: 15, grader: @teacher
-      @assignment.grade_student @students[1], grade: 10, grader: @teacher
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-      let_speedgrader_load
-      expect(Speedgrader.grade_input).to have_value '15'
-      Speedgrader.click_next_student_btn
-      expect(Speedgrader.grade_input).to have_value '10'
-
-      clear_grade_and_validate
-    end
-
-    it 'should display gpa scale grades correctly', priority: "1", test_id: 164204 do
-      init_course_with_students 2
-      user_session(@teacher)
-
-      @assignment = create_assignment_with_type('gpa_scale')
-      @assignment.grade_student @students[0], grade: 'A', grader: @teacher
-      @assignment.grade_student @students[1], grade: 'D', grader: @teacher
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-      let_speedgrader_load
-
-      expect(Speedgrader.grade_input).to have_value 'A'
-      Speedgrader.click_next_student_btn
-      expect(Speedgrader.grade_input).to have_value 'D'
-
-      clear_grade_and_validate
-    end
 
     context 'quizzes' do
       before(:once) do
@@ -413,11 +367,7 @@ describe 'Speedgrader' do
     end
 
     it 'list all students', priority: "1", test_id: 164206 do
-      Speedgrader.click_students_dropdown
-
-      expect(Speedgrader.student_dropdown_menu).to include_text(@students[0].name)
-      expect(Speedgrader.student_dropdown_menu).to include_text(@students[1].name)
-      expect(Speedgrader.student_dropdown_menu).to include_text(@students[2].name)
+      validate_speedgrader_student_list
     end
 
     it 'list alias when hide student name is selected', priority: "2", test_id: 164208 do
@@ -426,11 +376,7 @@ describe 'Speedgrader' do
 
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
 
-      Speedgrader.click_students_dropdown
-
-      expect(Speedgrader.student_dropdown_menu).to include_text(@students[0].name)
-      expect(Speedgrader.student_dropdown_menu).to include_text(@students[1].name)
-      expect(Speedgrader.student_dropdown_menu).to include_text(@students[2].name)
+      validate_speedgrader_student_list
     end
 
     # speedgrader student dropdown shows assignment submission status symbols next to student names
@@ -440,6 +386,7 @@ describe 'Speedgrader' do
       @assignment.grade_student(@students[1], grade: 10, grader: @teacher)
 
       # resubmit only as student_2
+
       Timecop.travel(1.hour.from_now) do
         @assignment.submit_homework(
           @students[1],
@@ -447,15 +394,14 @@ describe 'Speedgrader' do
           body: 're-submitting!'
         )
 
-      refresh_page
-      wait_for_ajaximations
+        refresh_page
+        wait_for_ajaximations
 
-      Speedgrader.click_students_dropdown
-      student_options = Speedgrader.student_dropdown_menu.find_elements(tag_name:'li')
+        Speedgrader.click_students_dropdown
+        student_options = Speedgrader.student_dropdown_menu.find_elements(tag_name:'li')
 
-      expect(student_options[0]).to have_class("graded")
-      expect(student_options[1]).to have_class("resubmitted")
-      expect(student_options[2]).to have_class("not_submitted")
+        graded = ["graded","resubmitted","not_submitted"]
+        (0..2).each{|num| expect(student_options[num]).to have_class(graded[num])}
       end
     end
   end
@@ -564,5 +510,29 @@ describe 'Speedgrader' do
       expect(f("#grade_container input")["readonly"]).to eq "true"
       expect(f("#closed_gp_notice")).to be_displayed
     end
+  end
+
+  private
+
+  def grader_speedgrader_assignment(grade1, grade2, clear_grade=true)
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+
+    let_speedgrader_load
+    expect(Speedgrader.grade_input).to have_value grade1
+    Speedgrader.click_next_student_btn
+    expect(Speedgrader.grade_input).to have_value grade2
+
+    clear_grade_and_validate if clear_grade
+  end
+
+  def create_assignment_type_and_grade(assignment_type, grade1, grade2)
+    @assignment = create_assignment_with_type(assignment_type)
+    @assignment.grade_student @students[0], grade: grade1, grader: @teacher
+    @assignment.grade_student @students[1], grade: grade2, grader: @teacher
+  end
+
+  def validate_speedgrader_student_list
+    Speedgrader.click_students_dropdown
+    (0..2).each{|num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name)}
   end
 end
