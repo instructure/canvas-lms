@@ -222,6 +222,11 @@ describe "Api::V1::Assignment" do
           expect(api).to be_assignment_editable_fields_valid(assignment, user)
         end
 
+        it "is valid if peer_review_count changed" do
+          assignment.peer_review_count = 500
+          expect(api).to be_assignment_editable_fields_valid(assignment, user)
+        end
+
         it "is valid if anonymous_peer_reviews changed" do
           assignment.toggle(:anonymous_peer_reviews)
           expect(api).to be_assignment_editable_fields_valid(assignment, user)

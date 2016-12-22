@@ -56,7 +56,6 @@ define [
           model: dueDateList
           views: {}
 
-    app.enableCheckbox = () -> {}
     app.render()
 
   module 'EditView',
@@ -353,6 +352,40 @@ define [
     notOk view.$("#has_group_category").prop("disabled")
     notOk view.$("#assignment_group_category_id").prop("disabled")
     notOk view.$("[type=checkbox][name=grade_group_students_individually]").prop("disabled")
+
+  module 'EditView: enableCheckbox',
+    setup: ->
+      fakeENV.setup()
+      ENV.COURSE_ID = 1
+      $.fn.extend
+        timeoutTooltip: ->
+          return this
+
+    teardown: ->
+      fakeENV.teardown()
+      document.getElementById('fixtures').innerHTML = ''
+      delete $.fn.timeoutTooltip
+
+    editView: ->
+      editView.apply(this, arguments)
+
+  test 'enables checkbox', ->
+    view = @editView()
+    @stub(view.$('#assignment_peer_reviews'), 'parent').returns(view.$('#assignment_peer_reviews'))
+
+    view.$('#assignment_peer_reviews').prop('disabled', true)
+    view.enableCheckbox(view.$('#assignment_peer_reviews'))
+
+    notOk view.$('#assignment_peer_reviews').prop('disabled')
+
+  test 'does nothing if assignment is in closed grading period', ->
+    view = @editView()
+    @stub(view.assignment, 'inClosedGradingPeriod').returns true
+
+    view.$('#assignment_peer_reviews').prop('disabled', true)
+    view.enableCheckbox(view.$('#assignment_peer_reviews'))
+
+    ok view.$('#assignment_peer_reviews').prop('disabled')
 
   module 'EditView: setDefaultsIfNew',
     setup: ->
