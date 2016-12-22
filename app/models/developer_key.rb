@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-v1'
+require 'aws-sdk'
 
 class DeveloperKey < ActiveRecord::Base
   include CustomValidations
@@ -159,7 +159,7 @@ class DeveloperKey < ActiveRecord::Base
     if !defined?(@sns)
       settings = ConfigFile.load('sns')
       @sns = nil
-      @sns = AWS::SNS.new(settings) if settings
+      @sns = Aws::SNS::Client.new(settings) if settings
     end
     @sns
   end

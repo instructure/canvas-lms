@@ -33,7 +33,7 @@ describe "gradebook2" do
 
     it "should gray out cells after removing a score which removes visibility" do
       selector = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l5'
-      @da_assignment.grade_student(@student_1, :grade => 42)
+      @da_assignment.grade_student(@student_1, grade: 42, grader: @teacher)
       @override.destroy
       get "/courses/#{@course.id}/gradebook"
       edit_grade(selector, '')

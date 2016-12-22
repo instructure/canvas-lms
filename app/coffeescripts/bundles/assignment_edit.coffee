@@ -36,6 +36,7 @@ require [
   groupCategorySelector = new GroupCategorySelector
     parentModel: assignment
     groupCategories: ENV?.GROUP_CATEGORIES || []
+    inClosedGradingPeriod: assignment.inClosedGradingPeriod()
   peerReviewsSelector = new PeerReviewsSelector
     parentModel: assignment
 

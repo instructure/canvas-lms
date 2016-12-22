@@ -530,7 +530,32 @@ describe DiscussionTopicsController do
         get 'show', :course_id => @course.id, :id => @topic.id
         expect(assigns[:initial_post_required]).to be_falsey
       end
+    end
 
+    context "student context cards" do
+      before(:once) do
+        course_topic user: @teacher
+        @course.root_account.enable_feature! :student_context_cards
+      end
+
+      it "is disabed for students" do
+        user_session(@student)
+        get :show, course_id: @course.id, id: @topic.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
+      end
+
+      it "is disabled for teachers when feature_flag is off" do
+        @course.root_account.disable_feature! :student_context_cards
+        user_session(@teacher)
+        get :show, course_id: @course.id, id: @topic.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
+      end
+
+      it "is enabled for teachers when feature_flag is on" do
+        user_session(@teacher)
+        get :show, course_id: @course.id, id: @topic.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
+      end
     end
 
   end

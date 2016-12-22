@@ -28,6 +28,8 @@ define [
     App = startApp()
     Ember.run =>
       @srgb = SRGBController.create()
+      effectiveDueDates = Ember.ObjectProxy.create(content: clone fixtures.effectiveDueDates)
+      Ember.setProperties effectiveDueDates, { isLoaded: true }
       @srgb.set('model', {
         enrollments: Ember.ArrayProxy.create(content: clone fixtures.students)
         assignment_groups: Ember.ArrayProxy.create(content: [])
@@ -35,6 +37,7 @@ define [
         sections: Ember.ArrayProxy.create(content: clone fixtures.sections)
         outcomes: Ember.ArrayProxy.create(content: clone fixtures.outcomes)
         outcome_rollups: Ember.ArrayProxy.create(content: clone fixtures.outcome_rollups)
+        effectiveDueDates: effectiveDueDates
       })
 
   teardown = ->
@@ -150,18 +153,79 @@ define [
       equal @srgb.get('assignments.firstObject.name'), 'Can You Eat Just One?'
       equal @srgb.get('assignments.lastObject.name'), 'Drink Water'
 
+  module "#submissionsForStudent",
+    setupThis: (options = {}) ->
+      effectiveDueDates = Ember.ObjectProxy.create(
+        content: {
+          1: { 1: { grading_period_id: "1" } },
+          2: { 1: { grading_period_id: "2" } }
+        }
+      )
+
+      defaults = {
+        mgpEnabled: false,
+        "selectedGradingPeriod.id": null,
+        effectiveDueDates
+      }
+      self = _.defaults options, defaults
+      self.get = (attribute) -> self[attribute]
+      self
+
+    setup: ->
+      @student =
+        id: "1"
+        assignment_1: { assignment_id: "1", user_id: "1", name: "yolo" }
+        assignment_2: { assignment_id: "2", user_id: "1", name: "froyo" }
+
+      setup.call this
+
+    teardown: ->
+      teardown.call this
+
+  test "returns all submissions for the student (multiple grading periods disabled)", ->
+    self = @setupThis()
+    submissions = @srgb.submissionsForStudent.call(self, @student)
+    propEqual _.pluck(submissions, "assignment_id"), ["1", "2"]
+
+  test "returns all submissions if 'All Grading Periods' is selected", ->
+    self = @setupThis(
+      mgpEnabled: true,
+      "selectedGradingPeriod.id": "0",
+    )
+    submissions = @srgb.submissionsForStudent.call(self, @student)
+    propEqual _.pluck(submissions, "assignment_id"), ["1", "2"]
+
+  test "only returns submissions due for the student in the selected grading period", ->
+    self = @setupThis(
+      mgpEnabled: true,
+      "selectedGradingPeriod.id": "2"
+    )
+    submissions = @srgb.submissionsForStudent.call(self, @student)
+    propEqual _.pluck(submissions, "assignment_id"), ["2"]
+
 
   module 'screenreader_gradebook_controller: with selected student',
     setup: ->
       setup.call this
-      Ember.run =>
-        student = @srgb.get('students.firstObject')
-        @srgb.set('selectedStudent', student)
+      @completeSetup = =>
+        workAroundRaceCondition().then =>
+          Ember.run =>
+            @srgb.set('selectedGradingPeriod', { id: '3' })
+            @srgb.set('assignment_groups', Ember.ArrayProxy.create(content: clone fixtures.assignment_groups))
+            @srgb.set('assignment_groups.isLoaded', true)
+            student = @srgb.get('students.firstObject')
+            @srgb.set('selectedStudent', student)
     teardown: ->
       teardown.call this
 
   test 'selectedSubmission should be null when just selectedStudent is set', ->
-    strictEqual @srgb.get('selectedSubmission'), null
+    @completeSetup().then =>
+      strictEqual @srgb.get('selectedSubmission'), null
+
+  test 'assignments excludes any due for the selected student in a different grading period', ->
+    @srgb.mgpEnabled = true
+    @completeSetup().then =>
+      deepEqual(@srgb.get('assignments').mapBy('id'), ['3'])
 
   module 'screenreader_gradebook_controller: with selected student, assignment, and outcome',
     setup: ->
@@ -240,7 +304,7 @@ define [
     @completeSetup().then =>
       Ember.run =>
         assignment = @srgb.get('assignments.lastObject')
-        assignment.has_due_date_in_closed_grading_period = false
+        assignment.inClosedGradingPeriod = false
         @srgb.set('selectedAssignment', assignment)
       equal @srgb.get('assignmentInClosedGradingPeriod'), false
 
@@ -249,7 +313,7 @@ define [
     @completeSetup().then =>
       Ember.run =>
         assignment = @srgb.get('assignments.lastObject')
-        assignment.has_due_date_in_closed_grading_period = true
+        assignment.inClosedGradingPeriod = true
         @srgb.set('selectedAssignment', assignment)
       equal @srgb.get('assignmentInClosedGradingPeriod'), true
 

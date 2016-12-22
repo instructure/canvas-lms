@@ -572,7 +572,7 @@ module ApplicationHelper
     parts.join(t('#title_separator', ': '))
   end
 
-  def cache(name = {}, options = nil, &block)
+  def cache(name = {}, options = {}, &block)
     unless options && options[:no_locale]
       name = name.cache_key if name.respond_to?(:cache_key)
       name = name + "/#{I18n.locale}" if name.is_a?(String)

@@ -59,7 +59,7 @@ class FilePreviewsController < ApplicationController
         formats: [:html]
     end
     if authorized_action(@file, @current_user, :read)
-      unless @file.grants_right?(@current_user, :download)
+      unless @file.grants_right?(@current_user, session, :download)
         @lock_info = @file.locked_for?(@current_user)
         return render template: 'file_previews/lock_explanation', layout: false
       end

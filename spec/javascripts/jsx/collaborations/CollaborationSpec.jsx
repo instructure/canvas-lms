@@ -16,7 +16,11 @@ define([
       user_name: 'Say my name',
       updated_at: (new Date(0)).toString(),
       update_url: 'http://google.com',
-      id: 1
+      id: 1,
+      permissions: {
+        update: true,
+        "delete": true
+      }
     }
   }
 

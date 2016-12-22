@@ -8,38 +8,38 @@ define([
   'jsx/groups/mixins/InfiniteScroll',
   'jquery.instructure_forms', /* errorBox */
 ], (I18n, _, $, React, BackboneState, PaginatedUserCheckList, InfiniteScroll) => {
-  var NewGroupDialog = React.createClass({
+  const NewGroupDialog = React.createClass({
     mixins: [BackboneState, InfiniteScroll],
 
-    loadMore() {
-      this.props.loadMore();
+    loadMore () {
+      this.props.loadMore()
     },
 
-    getInitialState() {
+    getInitialState () {
       return {
         userCollection: this.props.userCollection,
         checked: [],
         name: '',
-        joinLevel: 'parent_context_auto_join'
-      };
-    },
-
-    handleFormSubmit: function(e){
-      e.preventDefault()
-      if (this.state.name.length == 0) {
-        $(this.refs.nameInput.getDOMNode()).errorBox(I18n.t('Group name is required'));
-      } else {
-        this.props.createGroup(this.state.name, this.state.joinLevel, this.state.checked);
-        this.props.closeDialog(e);
+        joinLevel: 'parent_context_auto_join',
       }
     },
 
-    _onUserCheck(user, isChecked) {
-      this.setState({checked: isChecked ? this.state.checked.concat(user.id) : _.without(this.state.checked, user.id)});
+    handleFormSubmit: function(e) {
+      e.preventDefault()
+      if (this.state.name.length === 0) {
+        $(this.refs.nameInput).errorBox(I18n.t('Group name is required'))
+      } else {
+        this.props.createGroup(this.state.name, this.state.joinLevel, this.state.checked)
+        this.props.closeDialog(e)
+      }
     },
 
-    render() {
-      var users = this.state.userCollection.toJSON().filter((u) => u.id !== ENV.current_user_id);
+    _onUserCheck (user, isChecked) {
+      this.setState({checked: isChecked ? this.state.checked.concat(user.id) : _.without(this.state.checked, user.id)})
+    },
+
+    render () {
+      const users = this.state.userCollection.toJSON().filter((u) => u.id !== ENV.current_user_id)
       return (
         <div id="add_group_form">
           <form className="form-dialog" onSubmit={this.handleFormSubmit}>
@@ -52,43 +52,45 @@ define([
                 more focused project.`)}
               </p>
               <table className="formtable">
-                <tr>
-                  <td><label htmlFor="group_name">{I18n.t('Group Name')}</label></td>
-                  <td>
-                    <input
-                      id="groupName"
-                      ref="nameInput"
-                      type="text"
-                      name="name"
-                      maxLength="200"
-                      value={this.state.name}
-                      onChange={event => this.setState({name: event.target.value})}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td><label htmlFor="">{I18n.t('Joining')}</label></td>
-                  <td>
-                    <select
-                      id="joinLevelSelect"
-                      value={this.state.joinLevel}
-                      onChange={event => this.setState({joinLevel: event.target.value})}
-                    >
-                      <option value="parent_context_auto_join">{I18n.t('Course members are free to join')}</option>
-                      <option value="invitation_only">{I18n.t('Membership by invitation only')}</option>
-                    </select>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <label htmlFor="">{I18n.t('Invite')}</label>
-                  </td>
-                  <td>
-                    <PaginatedUserCheckList checked={this.state.checked}
-                                            users={users}
-                                            onUserCheck={this._onUserCheck} />
-                  </td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td><label htmlFor="group_name">{I18n.t('Group Name')}</label></td>
+                    <td>
+                      <input
+                        id="groupName"
+                        ref="nameInput"
+                        type="text"
+                        name="name"
+                        maxLength="200"
+                        value={this.state.name}
+                        onChange={event => this.setState({name: event.target.value})}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label htmlFor="">{I18n.t('Joining')}</label></td>
+                    <td>
+                      <select
+                        id="joinLevelSelect"
+                        value={this.state.joinLevel}
+                        onChange={event => this.setState({joinLevel: event.target.value})}
+                      >
+                        <option value="parent_context_auto_join">{I18n.t('Course members are free to join')}</option>
+                        <option value="invitation_only">{I18n.t('Membership by invitation only')}</option>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <label htmlFor="">{I18n.t('Invite')}</label>
+                    </td>
+                    <td>
+                      <PaginatedUserCheckList checked={this.state.checked}
+                                              users={users}
+                                              onUserCheck={this._onUserCheck} />
+                    </td>
+                  </tr>
+                </tbody>
               </table>
             </div>
             <div className="form-controls">
@@ -97,9 +99,9 @@ define([
             </div>
           </form>
         </div>
-      );
+      )
     }
-  });
+  })
 
-  return NewGroupDialog;
-});
+  return NewGroupDialog
+})

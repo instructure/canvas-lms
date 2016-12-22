@@ -62,8 +62,8 @@ describe 'omit from final grade assignments' do
   context 'in gradebook' do
     before(:each) do
       enroll_teacher_and_students
-      assignment_1.grade_student(student, grade: 10)
-      assignment_3.grade_student(student, grade: 5)
+      assignment_1.grade_student(student, grade: 10, grader: teacher)
+      assignment_3.grade_student(student, grade: 5, grader: teacher)
       user_session(teacher)
       get "/courses/#{test_course.id}/gradebook"
     end
@@ -81,8 +81,8 @@ describe 'omit from final grade assignments' do
   context 'as a student' do
     before(:each) do
       enroll_teacher_and_students
-      assignment_1.grade_student(student, grade: 10)
-      assignment_3.grade_student(student, grade: 5)
+      assignment_1.grade_student(student, grade: 10, grader: teacher)
+      assignment_3.grade_student(student, grade: 5, grader: teacher)
       user_session(student)
       get "/courses/#{test_course.id}/grades"
     end

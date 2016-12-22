@@ -38,6 +38,7 @@ define [
     @optionProperty 'sectionLabel'
     @optionProperty 'fieldLabel'
     @optionProperty 'lockedMessage'
+    @optionProperty 'inClosedGradingPeriod'
 
     render: =>
       selectedID = @parentModel.groupCategoryId()
@@ -102,6 +103,7 @@ define [
 
       nested: @nested
       prefix: 'assignment' if @nested
+      inClosedGradingPeriod: @inClosedGradingPeriod
 
     filterFormData: (data) =>
       hasGroupCategory = data.has_group_category

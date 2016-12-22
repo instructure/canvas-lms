@@ -64,9 +64,10 @@ module DiscussionsCommon
 
     if attachment.present?
       filename, fullpath, data = get_file(attachment)
-      @last_entry.find_element(:css, '.discussion-reply-add-attachment').click
+      f('#ui-id-2').click
       wait_for_ajaximations
-      @last_entry.find_element(:css, '.discussion-reply-attachments input').send_keys(fullpath)
+      f('#editor_tabs_3 > div:nth-child(3) > a').click
+      f('#attachment_uploaded_data').send_keys(fullpath)
     end
 
     submit_form(@last_entry.find_element(:css, ".discussion-reply-form"))

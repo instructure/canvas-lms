@@ -162,7 +162,7 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group2',
         'position' => 7,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(@a3,@user,session),
           controller.assignment_json(@a4,@user,session, include_discussion_topic: true)
@@ -174,7 +174,7 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(@a1,@user,session),
           controller.assignment_json(@a2,@user,session)
@@ -237,9 +237,11 @@ describe AssignmentGroupsController, type: :request do
       @user.enrollments.each(&:destroy_permanently!)
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @user)
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
       # make a1 and a3 visible
       create_section_override_for_assignment(@a1, course_section: @section)
-      @a3.grade_student(@user, {grade: 10})
+      @a3.grade_student(@user, grade: 10, grader: @teacher)
 
       [@a1, @a2, @a3, @a4].each(&:reload)
 
@@ -325,8 +327,8 @@ describe AssignmentGroupsController, type: :request do
           course_id: @course.id, grading_period_id: @gp_future.id,
           assignment_group_id: @group1.id, include: ['assignments', 'submission']
         }
-        @group1_assignment_future.grade_student(student, grade: 10)
-        @group1_assignment_today.grade_student(student, grade: 8)
+        @group1_assignment_future.grade_student(student, grade: 10, grader: @teacher)
+        @group1_assignment_today.grade_student(student, grade: 8, grader: @teacher)
         json = api_call_as_user(student, :get, api_path, api_settings)
         expect(json["assignments"].length).to eq(1)
         expect(json["assignments"].first["submission"]).to be_present
@@ -383,7 +385,7 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(a1, @user,session),
           controller.assignment_json(a2, @user,session)
@@ -424,7 +426,7 @@ describe AssignmentGroupsController, type: :request do
         'name' => 'group1',
         'position' => 10,
         'rules' => {},
-        'has_assignment_due_in_closed_grading_period' => false,
+        'any_assignment_in_closed_grading_period' => false,
         'assignments' => [
           controller.assignment_json(a1, @user,session, include_all_dates: true),
           controller.assignment_json(a2, @user,session, include_all_dates: true)
@@ -560,9 +562,11 @@ describe AssignmentGroupsApiController, type: :request do
 
       it 'should include submission when flag is present' do
         student_in_course(active_all: true)
+        teacher_in_course(active_all: true, course: @course)
         @submission = bare_submission_model(@assignment, @student, {
           score: '25',
           grade: '25',
+          grader: @teacher,
           submitted_at: Time.zone.now
         })
 
@@ -752,9 +756,7 @@ describe AssignmentGroupsApiController, type: :request do
       before :once do
         @course.root_account.enable_feature!(:multiple_grading_periods)
         @grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
-        term = @course.enrollment_term
-        term.grading_period_group = @grading_period_group
-        term.save!
+        @grading_period_group.enrollment_terms << @course.enrollment_term
         Factories::GradingPeriodHelper.new.create_for_group(@grading_period_group, {
           start_date: 2.weeks.ago, end_date: 2.days.ago, close_date: 1.day.ago
         })
@@ -764,8 +766,12 @@ describe AssignmentGroupsApiController, type: :request do
       context "as a teacher" do
         before :each do
           @current_user = @teacher
+          student_in_course(course: @course, active_all: true)
           @assignment = @course.assignments.create!({
-            title: 'assignment', assignment_group: @assignment_group, due_at: 1.week.ago
+            title: 'assignment',
+            assignment_group: @assignment_group,
+            due_at: 1.week.ago,
+            workflow_state: 'published'
           })
         end
 

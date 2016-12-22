@@ -150,7 +150,6 @@ class AssignmentGroupsApiController < ApplicationController
   def can_update_assignment_group?(assignment_group)
     return true if @context.account_membership_allows(@current_user)
     return true unless assignment_group.group_weight_changed? || assignment_group.rules_changed?
-    return true unless @context.feature_enabled?(:multiple_grading_periods)
-    !assignment_group.has_assignment_due_in_closed_grading_period?
+    !assignment_group.any_assignment_in_closed_grading_period?
   end
 end

@@ -353,8 +353,9 @@ describe GradebookImporter do
 
   it "does not include assignments that don't have any grade changes" do
     course_with_student
+    course_with_teacher(course: @course)
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
-    @assignment1.grade_student(@student, :grade => 10)
+    @assignment1.grade_student(@student, grade: 10, grader: @teacher)
     importer_with_rows(
         "Student,ID,Section,Assignment 1",
         ",#{@student.id},,10"
@@ -365,7 +366,7 @@ describe GradebookImporter do
   it "includes assignments that the grade changed for an existing user" do
     course_with_student(active_all: true)
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
-    @assignment1.grade_student(@student, :grade => 8)
+    @assignment1.grade_student(@student, grade: 8, grader: @teacher)
     importer_with_rows(
         "Student,ID,Section,Assignment 1",
         ",#{@student.id},,10"
@@ -436,8 +437,8 @@ describe GradebookImporter do
     end
 
     it "ignores submissions for students without visibility" do
-      @assignment_one.grade_student(@student_one, :grade => "3")
-      @assignment_two.grade_student(@student_two, :grade => "3")
+      @assignment_one.grade_student(@student_one, grade: "3", grader: @teacher)
+      @assignment_two.grade_student(@student_two, grade: "3", grader: @teacher)
       importer_with_rows(
         "Student,ID,Section,a1,a2",
         ",#{@student_one.id},#{@section_one.id},7,9",
@@ -475,7 +476,7 @@ describe GradebookImporter do
       group = account.grading_period_groups.create!
       group.enrollment_terms << @course.enrollment_term
       @now = Time.zone.now
-      group.grading_periods.create!(
+      @closed_period = group.grading_periods.create!(
         title: "Closed Period",
         start_date: 3.months.ago(@now),
         end_date: 1.month.ago(@now),
@@ -535,8 +536,10 @@ describe GradebookImporter do
 
         context "submissions already exist" do
           before(:once) do
-            @closed_assignment.grade_student(@student, grade: 8)
-            @open_assignment.grade_student(@student, grade: 8)
+            Timecop.freeze(@closed_period.end_date - 1.day) do
+              @closed_assignment.grade_student(@student, grade: 8, grader: @teacher)
+            end
+            @open_assignment.grade_student(@student, grade: 8, grader: @teacher)
           end
 
           it "does not include submissions that fall in closed grading periods" do
@@ -621,8 +624,10 @@ describe GradebookImporter do
 
         context "submissions already exist" do
           before(:once) do
-            @closed_assignment.grade_student(@student, grade: 8)
-            @open_assignment.grade_student(@student, grade: 8)
+            Timecop.freeze(@closed_period.end_date - 1.day) do
+              @closed_assignment.grade_student(@student, grade: 8, grader: @teacher)
+              @open_assignment.grade_student(@student, grade: 8, grader: @teacher)
+            end
           end
 
           it "does not include submissions that fall in closed grading periods" do

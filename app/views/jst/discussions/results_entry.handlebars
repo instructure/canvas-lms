@@ -13,8 +13,7 @@
       <div class="discussion-header-content right-of-avatar">
         <div class="discussion-header-right">
           <div class="discussion-title">
-            <a {{#if author.html_url}}href="{{author.html_url}}" data-bypass{{/if}} class="author {{#unless author.id}}unknown{{/unless}}" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author}}{{#if author.url}} href="{{author.url}}" {{/if}}{{/if}} class="author">{{#if author}}{{author.display_name}}{{else}}{{#t "unknown_author"}}Unknown Author{{/t}}{{/if}}</a>
-            {{#if author.isInactive}}<span class="label" title="{{#t}}This user is currently not able to access the course{{/t}}">{{#t}}inactive{{/t}}</span>{{/if}}
+            {{>discussions/author_link}}
           </div>
           <div class="discussion-pubdate hide-if-collapsed">{{friendlyDatetime updated_at pubdate=true contextSensitive=true}}</div>
         </div>

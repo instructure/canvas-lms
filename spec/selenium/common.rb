@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require "selenium-webdriver"
 require "socket"
@@ -38,21 +37,6 @@ elsif ENV["TESTRAIL_ENTRY_RUN_ID"]
 end
 
 Dir[File.dirname(__FILE__) + '/test_setup/common_helper_methods/*.rb'].each {|file| require file }
-
-include I18nUtilities
-
-$selenium_config = ConfigFile.load("selenium") || {}
-SERVER_IP = $selenium_config[:server_ip] || UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
-BIND_ADDRESS = $selenium_config[:bind_address] || '0.0.0.0'
-SECONDS_UNTIL_GIVING_UP = 20
-MAX_SERVER_START_TIME = 15
-
-#NEED BETTER variable handling
-THIS_ENV = ENV['TEST_ENV_NUMBER'].present? ? ENV['TEST_ENV_NUMBER'].to_i : 1
-WEBSERVER = (ENV['WEBSERVER'] || 'thin').freeze
-
-$server_port = nil
-$app_host_and_port = nil
 
 module SeleniumErrorRecovery
   class RecoverableException < StandardError
@@ -82,35 +66,33 @@ module SeleniumErrorRecovery
       puts "Error: got `#{exception}`, aborting"
       RSpec.world.wants_to_quit = true
     when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout
-      if $selenium_driver && !RSpec.world.wants_to_quit && exception.backtrace.grep(/selenium-webdriver/).present?
-        puts "SELENIUM: webdriver is misbehaving.  Will try to re-initialize."
+      return false if RSpec.world.wants_to_quit
+      return false unless exception.backtrace.grep(/selenium-webdriver/).present?
 
-        if $firefox_log
-          # give firefox a moment to wrap up stuff
-          sleep 2
-
-          if $firefox_process.exited?
-            puts "firefox exited with #{$firefox_process.exit_code}"
-          else
-            puts "firefox is still running, killing it"
-            $firefox_process.stop
-          end
-
-          puts "firefox log:"
-          $firefox_log.rewind
-          puts $firefox_log.read
-        end
-
-        $selenium_driver = nil
-        return true
-      end
+      puts "SELENIUM: webdriver is misbehaving.  Will try to re-initialize."
+      SeleniumDriverSetup.reset!
+      return true
     end
     false
   end
 end
 RSpec::Core::Example.prepend(SeleniumErrorRecovery)
 
-shared_context "in-process server selenium tests" do
+if defined?(TestQueue::Runner::RSpec::LazyGroups)
+  # because test-queue's lazy loading requires this file *after* the before
+  # :suite hooks run, we can't do this in such a hook... so just do it as
+  # soon as this file is required. the TEST_ENV_NUMBER check ensures the
+  # background file loader doesn't also fire up firefox and a webserver
+  SeleniumDriverSetup.run if ENV["TEST_ENV_NUMBER"]
+else
+  RSpec.configure do |config|
+    config.before :suite do
+      SeleniumDriverSetup.run
+    end
+  end
+end
+
+module SeleniumDependencies
   include SeleniumDriverSetup
   include OtherHelperMethods
   include CustomSeleniumActions
@@ -122,6 +104,10 @@ shared_context "in-process server selenium tests" do
   include CustomDateHelpers
   include LoginAndSessionMethods
   include SeleniumErrorRecovery
+end
+
+shared_context "in-process server selenium tests" do
+  include SeleniumDependencies
 
   # set up so you can use rails urls helpers in your selenium tests
   include Rails.application.routes.url_helpers
@@ -131,17 +117,11 @@ shared_context "in-process server selenium tests" do
     driver.ready_for_interaction = false # need to `get` before we do anything selenium-y in a spec
   end
 
-  prepend_before :all do
-    $in_proc_webserver_shutdown ||= SeleniumDriverSetup.start_webserver(WEBSERVER)
-  end
-
   append_before :all do
     retry_count = 0
     begin
-      $selenium_driver ||= setup_selenium
-      default_url_options[:host] = $app_host_and_port
-      close_modal_if_present
-      resize_screen_to_normal
+      default_url_options[:host] = app_host_and_port
+      close_modal_if_present { resize_screen_to_normal }
     rescue
       if maybe_recover_from_exception($ERROR_INFO) && (retry_count += 1) < 3
         retry
@@ -159,8 +139,8 @@ shared_context "in-process server selenium tests" do
   before do
     raise "all specs need to use transactional fixtures" unless self.use_transactional_fixtures
 
-    HostUrl.stubs(:default_host).returns($app_host_and_port)
-    HostUrl.stubs(:file_host).returns($app_host_and_port)
+    HostUrl.stubs(:default_host).returns(app_host_and_port)
+    HostUrl.stubs(:file_host).returns(app_host_and_port)
   end
 
   # tricksy tricksy. grab the current connection, and then always return the same one
@@ -198,8 +178,8 @@ shared_context "in-process server selenium tests" do
     end
   end
 
-  before do |example|
-    start_capturing_video
+  before do
+    SeleniumDriverSetup.start_capturing_video
   end
 
   after(:each) do |example|
@@ -214,27 +194,8 @@ shared_context "in-process server selenium tests" do
     ensure
       exception = $ERROR_INFO || example.exception
       SeleniumDriverSetup.note_recent_spec_run(example, exception)
-      record_errors(example, exception, Rails.logger.captured_messages)
+      SeleniumDriverSetup.record_errors(example, exception, Rails.logger.captured_messages)
       SeleniumDriverSetup.disallow_requests!
     end
-  end
-
-  RSpec.configure do |config|
-    config.after :suite do
-      $selenium_driver.close rescue nil
-      $selenium_driver.quit rescue nil
-    end
-  end
-end
-
-# get some extra verbose logging from firefox for when things go wrong
-Selenium::WebDriver::Firefox::Binary.class_eval do
-  def execute(*extra_args)
-    args = [self.class.path, '-no-remote'] + extra_args
-    $firefox_process = @process = ChildProcess.build(*args)
-    $firefox_log = @process.io.stdout = @process.io.stderr = Tempfile.new("firefox")
-    $DEBUG = true
-    @process.start
-    $DEBUG = nil
   end
 end

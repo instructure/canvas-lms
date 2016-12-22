@@ -15,6 +15,25 @@ module Canvas::LiveEvents
     })
   end
 
+  def self.get_course_data(course)
+    {
+      course_id: course.id,
+      account_id: course.account_id,
+      name: course.name,
+      created_at: course.created_at,
+      updated_at: course.updated_at,
+      workflow_state: course.workflow_state
+    }
+  end
+
+  def self.course_created(course)
+    post_event_stringified('course_created', get_course_data(course))
+  end
+
+  def self.course_updated(course)
+    post_event_stringified('course_updated', get_course_data(course))
+  end
+
   def self.course_syllabus_updated(course, old_syllabus_body)
     post_event_stringified('syllabus_updated', {
       course_id: course.global_id,
@@ -149,6 +168,25 @@ module Canvas::LiveEvents
 
   def self.submission_updated(submission)
     post_event_stringified('submission_updated', get_submission_data(submission))
+  end
+
+  def self.get_user_data(user)
+    {
+      user_id: user.id,
+      name: user.name,
+      short_name: user.short_name,
+      workflow_state: user.workflow_state,
+      created_at: user.created_at,
+      updated_at: user.updated_at
+    }
+  end
+
+  def self.user_created(user)
+    post_event_stringified('user_created', get_user_data(user))
+  end
+
+  def self.user_updated(user)
+    post_event_stringified('user_updated', get_user_data(user))
   end
 
   def self.get_enrollment_data(enrollment)

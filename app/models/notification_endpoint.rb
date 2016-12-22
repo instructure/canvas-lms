@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-v1'
+require 'aws-sdk'
 
 class NotificationEndpoint < ActiveRecord::Base
   attr_accessible :token, :arn
@@ -38,13 +38,12 @@ class NotificationEndpoint < ActiveRecord::Base
   DIFFERENT_ATTRIBUTES_ERROR_REGEX = %r{^Invalid parameter: Token Reason: Endpoint (.*) already exists with the same Token, but different attributes.$}
 
   def sns_client
-    DeveloperKey.sns.client
+    DeveloperKey.sns
   end
 
   def endpoint_attributes
     @endpoint_attributes ||= begin
-      response = sns_client.get_endpoint_attributes(endpoint_arn: self.arn)
-      response[:attributes]
+      sns_client.get_endpoint_attributes(endpoint_arn: self.arn).attributes
     end
   end
 
@@ -52,7 +51,7 @@ class NotificationEndpoint < ActiveRecord::Base
     begin
       endpoint_attributes
       true
-    rescue AWS::SNS::Errors::NotFound
+    rescue Aws::SNS::Errors::NotFound
       false
     end
   end
@@ -78,7 +77,7 @@ class NotificationEndpoint < ActiveRecord::Base
         custom_user_data: access_token.global_id.to_s
       )
       self.arn = response[:endpoint_arn]
-    rescue AWS::SNS::Errors::InvalidParameter => e
+    rescue Aws::SNS::Errors::InvalidParameter => e
       # parse already existing with different access_token from the response message
       raise unless DIFFERENT_ATTRIBUTES_ERROR_REGEX.match(e.message)
       self.arn = $1

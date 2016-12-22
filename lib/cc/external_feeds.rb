@@ -27,7 +27,7 @@ module CC
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::EXTERNAL_FEEDS)
         document = Builder::XmlMarkup.new(:target=>feed_file, :indent=>2)
       end
-      
+
       document.instruct!
       document.externalFeeds(
               "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -36,7 +36,7 @@ module CC
       ) do |feeds_node|
         @course.external_feeds.each do |feed|
           next unless export_object?(feed)
-          migration_id = CCHelper.create_key(feed)
+          migration_id = create_key(feed)
           feeds_node.externalFeed(:identifier=>migration_id) do |feed_node|
             feed_node.title feed.title if feed.title
             feed_node.url feed.url
@@ -45,7 +45,7 @@ module CC
           end
         end
       end
-      
+
       feed_file.close if feed_file
       rel_path
     end

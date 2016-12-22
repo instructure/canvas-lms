@@ -614,7 +614,7 @@ class User < ActiveRecord::Base
   def visible_groups
     @visible_groups ||= begin
       enrollments = self.cached_current_enrollments(preload_dates: true, preload_courses: true)
-      visible_groups = self.current_groups.select do |group|
+      self.current_groups.select do |group|
         group.context_type != 'Course' || enrollments.any? do |en|
           en.course == group.context && !(en.inactive? || en.completed?) && (en.admin? || en.course.available?)
         end
@@ -1361,8 +1361,12 @@ class User < ActiveRecord::Base
     preferences[:custom_colors] ||= {}
   end
 
-  def course_positions
-    preferences[:course_positions] ||= {}
+  def dashboard_positions
+    preferences[:dashboard_positions] ||= {}
+  end
+
+  def dashboard_positions=(new_positions)
+    preferences[:dashboard_positions] = new_positions
   end
 
   def course_nicknames
@@ -1869,6 +1873,7 @@ class User < ActiveRecord::Base
                   AND (submission_comment_participants.participation_type = ?)
                   AND (submission_comment_participants.user_id = ?)
                   AND (submission_comments.author_id <> ?)
+                  AND (submission_comments.draft IS NOT TRUE)
                 GROUP BY submission_id
               ) AS relevant_submission_comments ON submissions.id = submission_id
               INNER JOIN #{Assignment.quoted_table_name} ON assignments.id = submissions.assignment_id
@@ -2488,7 +2493,8 @@ class User < ActiveRecord::Base
     else
       # this terribleness is so we try to make sure that the newest courses show up in the menu
       @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).
-        sort_by{ |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }.first(12).
+        sort_by{ |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }.
+        first(Setting.get('menu_course_limit', '20').to_i).
         sort_by{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
     end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)

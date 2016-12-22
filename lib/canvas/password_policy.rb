@@ -22,7 +22,7 @@ module Canvas
         # :max_repeats => nil,
         # :max_sequence => nil,
         # :disallow_common_passwords => false,
-        :min_length => 6
+        :min_length => 8
       }
     end
 

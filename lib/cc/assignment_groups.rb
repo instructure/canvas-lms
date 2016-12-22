@@ -39,7 +39,7 @@ module CC
           next unless export_object?(group)
           add_exported_asset(group)
 
-          migration_id = CCHelper.create_key(group)
+          migration_id = create_key(group)
           groups_node.assignmentGroup(:identifier=>migration_id) do |group_node|
             group_node.title group.name
             group_node.position group.position
@@ -60,7 +60,7 @@ module CC
                   rules_node.rule do |rule_node|
                     rule_node.drop_type rule.first
                     if rule.first == 'never_drop'
-                      rule_node.identifierref CCHelper.create_key(a)
+                      rule_node.identifierref create_key(a)
                     else
                       rule_node.drop_count rule.last
                     end

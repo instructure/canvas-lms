@@ -1302,7 +1302,7 @@ describe Quizzes::Quiz do
     before(:once) { @quiz = @course.quizzes.create! title: 'Test Quiz' }
 
     it "returns the regrade for the quiz and quiz version" do
-      course_with_teacher_logged_in(active_all: true, course: @course)
+      course_with_teacher(active_all: true, course: @course)
       question = @quiz.quiz_questions.create(question_data: { question_text: "test 1" })
 
       regrade = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
@@ -1311,7 +1311,7 @@ describe Quizzes::Quiz do
     end
 
     it "should not return disabled regrade options" do
-      course_with_teacher_logged_in(active_all: true, course: @course)
+      course_with_teacher(active_all: true, course: @course)
       question = @quiz.quiz_questions.create(question_data: { question_text: "test 1" })
 
       regrade = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
@@ -1325,7 +1325,7 @@ describe Quizzes::Quiz do
     before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
 
     it "returns the correct question ids" do
-      course_with_teacher_logged_in(active_all: true, course: @course)
+      course_with_teacher(active_all: true, course: @course)
       q = @quiz.quiz_questions.create!
       regrade = Quizzes::QuizRegrade.create!(quiz: @quiz, quiz_version: @quiz.version_number, user: @teacher)
       rq = regrade.quiz_question_regrades.create! quiz_question_id: q.id, regrade_option: 'current_correct_only'
@@ -1336,7 +1336,7 @@ describe Quizzes::Quiz do
   describe "#regrade_if_published" do
 
     it "queues a job to regrade if there are current question regrades" do
-      course_with_teacher_logged_in(course: @course, active_all: true)
+      course_with_teacher(course: @course, active_all: true)
       quiz = @course.quizzes.create!
       q = quiz.quiz_questions.create!
       regrade = Quizzes::QuizRegrade.create!(quiz: quiz, quiz_version: quiz.version_number, user: @teacher)
@@ -1349,7 +1349,7 @@ describe Quizzes::Quiz do
     end
 
     it "does not queue a job to regrade when no current question regrades" do
-      course_with_teacher_logged_in(course: @course, active_all: true)
+      course_with_teacher(course: @course, active_all: true)
       Quizzes::QuizRegrader::Regrader.expects(:send_later).never
       quiz = @course.quizzes.create!
       quiz.save!
@@ -1358,7 +1358,7 @@ describe Quizzes::Quiz do
 
   describe "#questions_regraded_since" do
     before :once do
-      course_with_teacher_logged_in(active_all: true)
+      course_with_teacher(active_all: true)
       @quiz = @course.quizzes.create!
     end
 
@@ -1713,7 +1713,7 @@ describe Quizzes::Quiz do
     end
 
     it "doesn't let students submit quizzes that are excused" do
-      @quiz.assignment.grade_student(@student, excuse: true)
+      @quiz.assignment.grade_student(@student, excuse: true, grader: @teacher)
       expect(@quiz.grants_right?(@student, :submit)).to eq false
       expect(@quiz.grants_right?(@student, :read)).to eq true
     end

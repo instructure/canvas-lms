@@ -55,6 +55,7 @@ SafeYAML::OPTIONS.merge!(
         !float#exp
         !float#inf
         !str
+        tag:yaml.org,2002:str
         !timestamp
         !timestamp#iso8601
         !timestamp#spaced
@@ -73,6 +74,7 @@ SafeYAML::OPTIONS.merge!(
         !ruby/object:URI::HTTPS
         !ruby/object:OpenObject
         !ruby/object:DateTime
+        !ruby/object:BigDecimal
       ]
 )
 

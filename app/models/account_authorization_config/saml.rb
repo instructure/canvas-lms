@@ -120,7 +120,11 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   end
 
   def self.saml_default_entity_id_for_account(account)
-    "http://#{HostUrl.context_host(account)}/saml2"
+    if !account.settings[:saml_entity_id]
+      account.settings[:saml_entity_id] = "http://#{HostUrl.context_host(account)}/saml2"
+      account.save!
+    end
+    account.settings[:saml_entity_id]
   end
 
   def saml_default_entity_id

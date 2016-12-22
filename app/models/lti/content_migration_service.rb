@@ -16,14 +16,13 @@
 
 module Lti
   module ContentMigrationService
+    KEY_REGEX = /\Alti_(?<id>\d+)\z/
+
     def self.enabled?
       Setting.get('enable_lti_content_migration', 'false') == 'true'
     end
 
     def self.begin_exports(course, options = {})
-      # TODO: handle selectivity
-      # if opts[:selective]... app/models/conditional_release/migration_service.rb:10
-
       # Select tools with proper configs
       configured_tools = []
       Shackles.activate(:slave) do
@@ -35,12 +34,18 @@ module Lti
       exports = {}
 
       configured_tools.each do |tool|
-        migrator = Lti::ContentMigrationService::Migrator.new(course, tool)
+        migrator = Lti::ContentMigrationService::Exporter.new(course, tool, options)
         migrator.start!
         exports["lti_#{tool.id}"] = migrator if migrator.successfully_started?
       end
 
       exports
+    end
+
+    def self.importer_for(key)
+      match = KEY_REGEX.match(key)
+      return unless match
+      Lti::ContentMigrationService::Importer.new(match[:id].to_i)
     end
   end
 end

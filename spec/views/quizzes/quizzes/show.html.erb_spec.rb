@@ -29,13 +29,13 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "should render a notice instead of grades if muted" do
-    course_with_student_logged_in(:active_all => true)
+    course_with_student(:active_all => true)
     quiz = @course.quizzes.create
     quiz.workflow_state = "available"
     quiz.save!
     quiz.reload
     quiz.assignment.mute!
-    quiz.assignment.grade_student(@student, :grade => 5)
+    quiz.assignment.grade_student(@student, grade: 5, grader: @teacher)
     submission = quiz.quiz_submissions.create
     submission.score = 5
     submission.user = @student
@@ -51,7 +51,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "doesn't warn students if quiz is published" do
-    course_with_student_logged_in(:active_all => true)
+    course_with_student(:active_all => true)
     quiz = @course.quizzes.build
     quiz.publish!
     assigns[:quiz] = quiz
@@ -61,7 +61,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "should show header bar and publish button" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     assigns[:quiz] = @course.quizzes.create!
 
     view_context
@@ -72,7 +72,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "should show unpublished quiz changes to instructors" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher(:active_all => true)
     @quiz = @course.quizzes.create!
     @quiz.workflow_state = "available"
     @quiz.save!
@@ -91,7 +91,7 @@ describe "/quizzes/quizzes/show" do
   it "should hide points possible for ungraded surveys" do
     points = 5
 
-    course_with_teacher_logged_in(active_all: true)
+    course_with_teacher(active_all: true)
     @quiz = @course.quizzes.create!(quiz_type: "survey", points_possible: points)
 
     assigns[:quiz] = @quiz
@@ -105,7 +105,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it 'should render teacher partial for teachers' do
-    course_with_teacher_logged_in(active_all: true)
+    course_with_teacher(active_all: true)
     view_context
     assigns[:quiz] = @course.quizzes.create!
     render 'quizzes/quizzes/show'
@@ -114,7 +114,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it 'should render student partial for students' do
-    course_with_student_logged_in(active_all: true)
+    course_with_student(active_all: true)
     quiz = @course.quizzes.build
     quiz.publish!
     assigns[:quiz] = quiz
@@ -125,13 +125,13 @@ describe "/quizzes/quizzes/show" do
   end
 
   it 'should render draft version warning' do
-    course_with_student_logged_in(active_all: true)
+    course_with_student(active_all: true)
     quiz = @course.quizzes.create
     quiz.workflow_state = 'available'
     quiz.save!
     quiz.reload
     quiz.assignment.mute!
-    quiz.assignment.grade_student(@student, grade: 5)
+    quiz.assignment.grade_student(@student, grade: 5, grader: @teacher)
     submission = quiz.quiz_submissions.create
     submission.score = 5
     submission.user = @student

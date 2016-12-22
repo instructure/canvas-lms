@@ -21,6 +21,20 @@ define([
   var OverrideStudentStore = createStore($.extend(true, {}, initialStoreState))
 
   // -------------------
+  //   Private Methods
+  // -------------------
+
+  function studentEnrollments(student) {
+    return _.filter(student.enrollments, function(enrollment) {
+      return enrollment.type === "StudentEnrollment" || enrollment.type === "StudentViewEnrollment";
+    });
+  }
+
+  function sectionIDs(enrollments) {
+    return _.map(enrollments, enrollment => enrollment.course_section_id);
+  }
+
+  // -------------------
   //      Fetching
   // -------------------
 
@@ -33,7 +47,7 @@ define([
 
     var getUsersPath = this.getContextPath() + "/users"
     $.getJSON(getUsersPath,
-      {user_ids: givenIds, enrollment_type: "student"},
+      {user_ids: givenIds, enrollment_type: "student", include: ["enrollments", "group_ids"]},
       this._fetchStudentsByIDSuccessHandler.bind(this, {})
     )
   }
@@ -58,7 +72,7 @@ define([
     })
 
     $.getJSON(searchUsersPath,
-      {search_term: nameString, enrollment_type: "student", include_inactive: false},
+      {search_term: nameString, enrollment_type: "student", include_inactive: false, include: ["enrollments", "group_ids"]},
       this._fetchStudentsByNameSuccessHandler.bind(this, {nameString: nameString}),
       this._fetchStudentsByNameErrorHandler.bind(this, {nameString: nameString})
     )
@@ -100,14 +114,6 @@ define([
   }
 
   OverrideStudentStore._fetchStudentsForCourseSuccessHandler = function(opts, items, status, xhr){
-    _.each(items, function(student) {
-      student.enrollments = _.filter(student.enrollments, function(e) {
-        return e.type === "StudentEnrollment" || e.type === "StudentViewEnrollment"
-      });
-
-      student.sections = _.map(student.enrollments, enrollment => enrollment.course_section_id);
-    });
-
     this.addStudents(items)
 
     var links = parseLinkHeader(xhr)
@@ -125,6 +131,10 @@ define([
   }
 
   OverrideStudentStore.addStudents = function(newlyFetchedStudents){
+    _.each(newlyFetchedStudents, (student) => {
+      student.enrollments = studentEnrollments(student);
+      student.sections = sectionIDs(student.enrollments);
+    });
     let newStudentsHash = _.indexBy(newlyFetchedStudents, (student) => student.id)
     let newStudentState = _.extend(newStudentsHash, this.getState().students)
     this.setState({

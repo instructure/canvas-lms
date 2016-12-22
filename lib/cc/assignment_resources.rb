@@ -43,7 +43,7 @@ module CC
     def add_assignment(assignment)
       add_exported_asset(assignment)
 
-      migration_id = CCHelper.create_key(assignment)
+      migration_id = create_key(assignment)
 
       lo_folder = File.join(@export_dir, migration_id)
       FileUtils::mkdir_p lo_folder
@@ -158,6 +158,7 @@ module CC
     end
 
     def self.create_canvas_assignment(node, assignment, manifest = nil)
+      key_generator = manifest || CCHelper
       node.title assignment.title
       node.due_at CCHelper::ims_datetime(assignment.due_at) if assignment.due_at
       node.lock_at CCHelper::ims_datetime(assignment.lock_at) if assignment.lock_at
@@ -167,10 +168,10 @@ module CC
       end
       node.all_day_date CCHelper::ims_date(assignment.all_day_date) if assignment.all_day_date
       node.peer_reviews_due_at CCHelper::ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
-      node.assignment_group_identifierref CCHelper.create_key(assignment.assignment_group) if assignment.assignment_group && (!manifest || manifest.export_object?(assignment.assignment_group))
+      node.assignment_group_identifierref key_generator.create_key(assignment.assignment_group) if assignment.assignment_group && (!manifest || manifest.export_object?(assignment.assignment_group))
       if assignment.grading_standard
         if assignment.grading_standard.context == assignment.context
-          node.grading_standard_identifierref CCHelper.create_key(assignment.grading_standard) if (!manifest || manifest.export_object?(assignment.grading_standard))
+          node.grading_standard_identifierref key_generator.create_key(assignment.grading_standard) if (!manifest || manifest.export_object?(assignment.grading_standard))
         else
           node.grading_standard_external_identifier assignment.grading_standard.id
         end
@@ -178,7 +179,7 @@ module CC
       node.workflow_state assignment.workflow_state
       if assignment.rubric
         assoc = assignment.rubric_association
-        node.rubric_identifierref CCHelper.create_key(assignment.rubric)
+        node.rubric_identifierref key_generator.create_key(assignment.rubric)
         if assignment.rubric && assignment.rubric.context != assignment.context
           node.rubric_external_identifier assignment.rubric.id
         end
@@ -197,10 +198,15 @@ module CC
       node.assignment_overrides do |ao_node|
         # Quizzes export their own overrides
         assignment.assignment_overrides.active.where(set_type: 'Noop', quiz_id: nil).each do |o|
-          ao_node.override(o.slice(:set_type, :set_id, :title))
+          override_attrs = o.slice(:set_type, :set_id, :title)
+          AssignmentOverride.overridden_dates.each do |field|
+            next unless o.send("#{field}_overridden")
+            override_attrs[field] = o[field]
+          end
+          ao_node.override(override_attrs)
         end
       end
-      node.quiz_identifierref CCHelper.create_key(assignment.quiz) if assignment.quiz
+      node.quiz_identifierref key_generator.create_key(assignment.quiz) if assignment.quiz
       node.allowed_extensions assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?
       node.has_group_category assignment.has_group_category?
       node.group_category assignment.group_category.try :name if assignment.group_category
@@ -215,7 +221,7 @@ module CC
       if assignment.external_tool_tag
         if (content = assignment.external_tool_tag.content) && content.is_a?(ContextExternalTool)
           if content.context == assignment.context
-            node.external_tool_identifierref CCHelper.create_key(content)
+            node.external_tool_identifierref key_generator.create_key(content)
           else
             node.external_tool_external_identifier content.id
           end

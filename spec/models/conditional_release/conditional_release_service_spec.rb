@@ -121,7 +121,7 @@ describe ConditionalRelease::Service do
         protocol: 'foo', host: 'bar', rules_path: 'rules'
       })
       Service.stubs(:active_rules).returns([])
-      course_with_student_logged_in(active_all: true)
+      course_with_student(active_all: true)
     end
 
     it 'returns no jwt or env if not enabled' do
@@ -199,7 +199,7 @@ describe ConditionalRelease::Service do
     end
 
     it 'returns a student jwt for a student viewing a course' do
-      course_with_student_logged_in(active_all: true)
+      course_with_student(active_all: true)
       jwt = Service.jwt_for(@course, @student, 'foo.bar')
       claims = get_claims jwt
       expect(claims[:sub]).to eq @student.id.to_s
@@ -255,7 +255,7 @@ describe ConditionalRelease::Service do
     end
 
     it 'succeeds when a session is specified' do
-      course_with_student_logged_in(active_all: true)
+      course_with_student(active_all: true)
       session = { permissions_key: 'foobar' }
       jwt = Service.jwt_for(@course, @student, 'foo.bar', session: session)
       claims = get_claims jwt
@@ -263,7 +263,7 @@ describe ConditionalRelease::Service do
     end
 
     it 'includes a canvas auth jwt' do
-      course_with_student_logged_in(active_all: true)
+      course_with_student(active_all: true)
       jwt = Service.jwt_for(@course, @student, 'foo.bar')
       claims = get_claims jwt
       expect(claims[:canvas_token]).not_to be nil
@@ -280,7 +280,7 @@ describe ConditionalRelease::Service do
     end
 
     before(:once) do
-      course_with_student_logged_in(active_all: true)
+      course_with_student(active_all: true)
     end
 
     it 'make http request to service' do
@@ -454,7 +454,7 @@ describe ConditionalRelease::Service do
     end
 
     before(:once) do
-      course_with_student_logged_in
+      course_with_student
       @a1, @a2, @a3 = 3.times.map { assignment_model course: @course }
     end
 
@@ -550,6 +550,18 @@ describe ConditionalRelease::Service do
           Service.rules_for(@course, @student, [], nil)
 
           @a1.title = 'updated'
+          @a1.save!
+
+          expect_cyoe_request '200', @a1
+          Service.rules_for(@course, @student, [], nil)
+        end
+      end
+
+      it 'does not use the cache if assignments are saved' do
+        enable_cache do
+          expect_cyoe_request '200', @a1
+          Service.rules_for(@course, @student, [], nil)
+
           @a1.save!
 
           expect_cyoe_request '200', @a1

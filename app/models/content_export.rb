@@ -27,6 +27,8 @@ class ContentExport < ActiveRecord::Base
   has_a_broadcast_policy
   serialize :settings
   attr_accessible :context, :export_type, :user, :selected_content, :progress
+
+  attr_writer :master_migration
   validates_presence_of :context_id, :workflow_state
 
   has_one :job_progress, :class_name => 'Progress', :as => :context
@@ -34,6 +36,7 @@ class ContentExport < ActiveRecord::Base
   #export types
   COMMON_CARTRIDGE = 'common_cartridge'
   COURSE_COPY = 'course_copy'
+  MASTER_COURSE_COPY = 'master_course_copy'
   QTI = 'qti'
   USER_DATA = 'user_data'
   ZIP = 'zip'
@@ -188,7 +191,15 @@ class ContentExport < ActiveRecord::Base
   end
 
   def for_course_copy?
-    self.export_type == COURSE_COPY
+    self.export_type == COURSE_COPY || self.export_type == MASTER_COURSE_COPY
+  end
+
+  def for_master_migration?
+    self.export_type == MASTER_COURSE_COPY
+  end
+
+  def master_migration
+    @master_migration ||= MasterCourses::MasterMigration.find(settings[:master_migration_id])
   end
 
   def common_cartridge?
@@ -227,6 +238,14 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
+  def create_key(obj, prepend="")
+    if for_master_migration?
+      master_migration.master_template.migration_id_for(obj, prepend) # because i'm too scared to use normal migration ids
+    else
+      CC::CCHelper.create_key(obj, prepend)
+    end
+  end
+
   # Method Summary
   #   Takes in an ActiveRecord object. Determines if the item being
   #   checked should be exported or not.
@@ -235,6 +254,8 @@ class ContentExport < ActiveRecord::Base
   def export_object?(obj, asset_type=nil)
     return false unless obj
     return true unless selective_export?
+
+    return master_migration.export_object?(obj) if for_master_migration?
 
     # because Announcement.table_name == 'discussion_topics'
     if obj.is_a?(Announcement)
@@ -264,7 +285,7 @@ class ContentExport < ActiveRecord::Base
 
   def add_item_to_export(obj, type=nil)
     return unless obj && (type || obj.class.respond_to?(:table_name))
-    return unless selective_export?
+    return unless selective_export? && !for_master_migration?
 
     asset_type = type || obj.class.table_name
     selected_content[asset_type] ||= {}
@@ -273,7 +294,11 @@ class ContentExport < ActiveRecord::Base
 
   def selective_export?
     if @selective_export.nil?
-      @selective_export = !(selected_content.empty? || is_set?(selected_content[:everything]))
+      if for_master_migration?
+        @selective_export = (settings[:master_migration_type] == :selective)
+      else
+        @selective_export = !(selected_content.empty? || is_set?(selected_content[:everything]))
+      end
     end
     @selective_export
   end
@@ -283,6 +308,9 @@ class ContentExport < ActiveRecord::Base
   end
 
   def add_exported_asset(obj)
+    if for_master_migration? && settings[:primary_master_migration]
+      master_migration.master_template.ensure_tag_on_export(obj)
+    end
     return unless selective_export?
     return if qti_export? || epub_export.present?
 
@@ -337,7 +365,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
-  scope :not_for_copy, -> { where("content_exports.export_type<>?", COURSE_COPY) }
+  scope :not_for_copy, -> { where("content_exports.export_type NOT IN (?)", [COURSE_COPY, MASTER_COURSE_COPY]) }
   scope :common_cartridge, -> { where(export_type: COMMON_CARTRIDGE) }
   scope :qti, -> { where(export_type: QTI) }
   scope :course_copy, -> { where(export_type: COURSE_COPY) }

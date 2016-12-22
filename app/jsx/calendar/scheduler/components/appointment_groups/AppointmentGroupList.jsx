@@ -4,37 +4,66 @@ define([
   'i18n!appointment_groups',
   'jsx/shared/FriendlyDatetime',
   'compiled/util/natcompare',
+  'instructure-icons/react/Line/IconCalendarAddLine',
+  'instructure-icons/react/Line/IconCalendarReservedLine',
   'jquery',
   'jquery.instructure_date_and_time'
-], (React, classnames, I18n, FriendlyDatetime, natcompare, $) => {
+], (React, classnames, I18n, FriendlyDatetime, natcompare, { default: IconCalendarAddLine }, { default: IconCalendarReservedLine }, $) => {
+  const renderAppointment = (appointment, participantList = '') => {
+    const timeLabel = I18n.t('%{start_time} to %{end_time}', {
+      start_time: $.timeString(appointment.start_at),
+      end_time: $.timeString(appointment.end_at)
+    })
+
+    const isReserved = appointment.child_events && appointment.child_events.length > 0;
+
+    const badgeClasses = classnames({
+      AppointmentGroupList__Badge: true,
+      'AppointmentGroupList__Badge--reserved': isReserved,
+      'AppointmentGroupList__Badge--unreserved': !isReserved
+    })
+
+    const rowClasses = classnames({
+      AppointmentGroupList__Appointment: true,
+      'AppointmentGroupList__Appointment--reserved': isReserved,
+      'AppointmentGroupList__Appointment--unreserved': !isReserved
+    });
+
+    const iconClasses = classnames({
+      AppointmentGroupList__Icon: true,
+      'AppointmentGroupList__Icon--reserved': isReserved,
+      'AppointmentGroupList__Icon--unreserved': !isReserved
+    })
+
+    const statusText = (isReserved) ?
+                       I18n.t('Reserved') :
+                       I18n.t('Available')
+
+    return (
+      <div key={appointment.id} className={rowClasses}>
+        <div>
+          <span className={iconClasses}>
+            {
+              (isReserved) ? <IconCalendarReservedLine /> : <IconCalendarAddLine />
+            }
+          </span>
+          <span className="pad-box-micro AppointmentGroupList__Appointment-timeLabel">{timeLabel}</span>
+          <span className={badgeClasses}>{statusText}</span>
+          <span className="pad-box-micro AppointmentGroupList__Appointment-label">{participantList}</span>
+        </div>
+      </div>
+    )
+  }
+
   return class AppointmentGroupList extends React.Component {
     static propTypes = {
       appointmentGroup: React.PropTypes.object,
     }
 
-    renderAppointment (appointment, statusLabel) {
-      const timeLabel = I18n.t('%{start_time} to %{end_time}', { start_time: $.timeString(appointment.start_at), end_time: $.timeString(appointment.end_at) })
-      const label = statusLabel ? `${timeLabel} - ${statusLabel}` : timeLabel
-
-      const reservedClass = classnames({
-        AppointmentGroupList__unreserved: !appointment.reserved,
-        AppointmentGroupList__reserved: appointment.reserved,
-      })
-
-      return (
-        <div key={appointment.id} className="AppointmentGroupList__Appointment">
-          <div className={reservedClass}>
-            <i className="icon-calendar-month" />
-            <span className="pad-box-micro AppointmentGroupList__Appointment-label">{label}</span>
-          </div>
-        </div>
-      )
-    }
-
     renderAppointmentList () {
       const { appointmentGroup } = this.props
       return (appointmentGroup.appointments || []).map((appointment) => {
-        let statusLabel = null
+        let participantList = null
 
         if (!appointment.reserved) {
           if (appointment.child_events.length) {
@@ -47,13 +76,11 @@ define([
               sorted.push(I18n.t('Available'))
             }
 
-            statusLabel = sorted.join('; ')
-          } else {
-            statusLabel = I18n.t('Available')
+            participantList = sorted.join('; ')
           }
         }
 
-        return this.renderAppointment(appointment, statusLabel)
+        return renderAppointment(appointment, participantList)
       })
     }
 

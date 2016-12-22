@@ -1,15 +1,23 @@
 define([
   'underscore'
 ], function (_) {
-  const getDueDateFromAssignment = function (assignment) {
+  function uniqueEffectiveDueDates(assignment) {
+    const dueDates = _.map(assignment.effectiveDueDates, function(dueDateInfo) {
+      const dueAt = dueDateInfo.due_at;
+      return dueAt ? new Date(dueAt) : dueAt;
+    });
+
+    return _.uniq(dueDates, date => date ? date.toString() : date);
+  }
+
+  function getDueDateFromAssignment(assignment) {
     if (assignment.due_at) {
       return new Date(assignment.due_at);
     }
-    const overrides = assignment.overrides;
-    if (!overrides || overrides.length > 1) { return null }
-    const overrideWithDueAt = _.find(overrides, override => override.due_at);
-    return overrideWithDueAt ? new Date(overrideWithDueAt.due_at) : null;
-  };
+
+    const dueDates = uniqueEffectiveDueDates(assignment);
+    return dueDates.length === 1 ? dueDates[0] : null;
+  }
 
   const assignmentHelper = {
     compareByDueDate (a, b) {
@@ -20,8 +28,10 @@ define([
       if (aDateIsNull && !bDateIsNull) { return 1 }
       if (!aDateIsNull && bDateIsNull) { return -1 }
       if (aDateIsNull && bDateIsNull) {
-        if (this.hasMultipleDueDates(a) && !this.hasMultipleDueDates(b)) { return -1 }
-        if (!this.hasMultipleDueDates(a) && this.hasMultipleDueDates(b)) { return 1 }
+        const aHasMultipleDates = this.hasMultipleDueDates(a);
+        const bHasMultipleDates = this.hasMultipleDueDates(b);
+        if (aHasMultipleDates && !bHasMultipleDates) { return -1 }
+        if (!aHasMultipleDates && bHasMultipleDates) { return 1 }
       }
       aDate = +aDate;
       bDate = +bDate;
@@ -35,11 +45,7 @@ define([
     },
 
     hasMultipleDueDates (assignment) {
-      return !!(
-        assignment.has_overrides &&
-          assignment.overrides &&
-          assignment.overrides.length > 1
-      );
+      return uniqueEffectiveDueDates(assignment).length > 1;
     },
 
     getComparator (arrangeBy) {

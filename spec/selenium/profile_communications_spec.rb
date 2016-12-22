@@ -71,7 +71,7 @@ describe "profile communication settings" do
 
   let(:sns_response) { stub(data: {endpointarn: 'endpointarn'}) }
   let(:sns_client) { stub(create_platform_endpoint: sns_response) }
-  let(:sns_developer_key_sns_field) { stub(client: sns_client) }
+  let(:sns_developer_key_sns_field) { sns_client }
 
   let(:sns_developer_key) do
     DeveloperKey.stubs(:sns).returns(sns_developer_key_sns_field)

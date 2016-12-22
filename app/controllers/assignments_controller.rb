@@ -46,6 +46,8 @@ class AssignmentsController < ApplicationController
       @context.require_assignment_group
       set_js_assignment_data # in application_controller.rb, because the assignments page can be shared with the course home
 
+      js_env(WEIGHT_FINAL_GRADES: @context.apply_group_weights?)
+
       respond_to do |format|
         format.html do
           @padless = true
@@ -450,7 +452,10 @@ class AssignmentsController < ApplicationController
       hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
-      hash[:SELECTED_CONFIG_TOOL_ID] = @assignment.tool_settings_tools.first.id unless @assignment.tool_settings_tools.blank?
+
+      selected_tool = @assignment.tool_settings_tool
+      hash[:SELECTED_CONFIG_TOOL_ID] = selected_tool ? selected_tool.id : nil
+      hash[:SELECTED_CONFIG_TOOL_TYPE] = selected_tool ? selected_tool.class.to_s : nil
 
       if @context.feature_enabled?(:multiple_grading_periods)
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)

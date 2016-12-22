@@ -944,7 +944,7 @@ describe "Files API", type: :request do
 
   describe "quota" do
     let_once(:t_course) do
-      course_with_teacher_logged_in active_all: true
+      course_with_teacher active_all: true
       @course.storage_quota = 111.megabytes
       @course.save
       attachment_model context: @course, size: 33.megabytes
@@ -953,6 +953,10 @@ describe "Files API", type: :request do
 
     let_once(:t_teacher) do
       t_course.teachers.first
+    end
+
+    before(:each) do
+      user_session(@teacher)
     end
 
     it "should return total and used quota" do

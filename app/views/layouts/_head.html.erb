@@ -39,7 +39,7 @@
   <%=
     # Load the fontface observer for lato async and as fast as possible so it doesn't flicker with fallback font.
     # That's why we don't load it in a 'require' at the bottom of the page
-    javascript_include_tag("#{js_base_url}/vendor/lato-fontfaceobserver.js", async: true)
+    javascript_include_tag("vendor/lato-fontfaceobserver.js", async: true)
   %>
   <%= yield :meta_tags %>
   <%= include_custom_meta_tags %>

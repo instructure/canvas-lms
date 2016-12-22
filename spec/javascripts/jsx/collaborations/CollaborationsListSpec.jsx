@@ -12,14 +12,22 @@ define([
     description: 'Im here to describe stuff',
     user_id: 1,
     user_name: 'Say my name',
-    updated_at: (new Date(0)).toString()
+    updated_at: (new Date(0)).toString(),
+    permissions: {
+      update: true,
+      "delete": true
+    }
   }, {
     id: 2,
     title: 'Hello there',
     description: 'Im here to describe stuff',
     user_id: 1,
     user_name: 'Say my name',
-    updated_at: (new Date(0)).toString()
+    updated_at: (new Date(0)).toString(),
+    permissions: {
+      update: true,
+      "delete": true
+    }
   }];
 
   let collaborationsState = {

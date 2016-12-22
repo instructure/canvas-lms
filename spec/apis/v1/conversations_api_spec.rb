@@ -2113,4 +2113,81 @@ describe ConversationsController, type: :request do
     end
   end
 
+  context 'restore_message' do
+    before :once do
+      @me = nil
+      @c1 = conversation(@bob)
+
+      account_admin_user(:account => Account.site_admin)
+    end
+
+    before :each do
+      @c1.remove_messages(:all)
+      @c1.message_count = 0
+      @c1.last_message_at = nil
+      @c1.save!
+    end
+
+    it 'returns an error when the conversation_message_id is not provided' do
+      @c1.all_messages.first()
+
+      raw_api_call(:put, "/api/v1/conversations/restore",
+              { :controller => "conversations", :action => "restore_message", :format => "json",
+                :user_id => @bob.id, :conversation_id => @c1.conversation_id })
+
+      expect(response.status).to eql 400
+    end
+
+    it 'returns an error when the user_id is not provided' do
+      @c1.all_messages.first()
+
+      raw_api_call(:put, "/api/v1/conversations/restore",
+              { :controller => "conversations", :action => "restore_message", :format => "json",
+                :conversation_id => @c1.conversation_id, :conversation_message_id => message.id })
+
+      expect(response.status).to eql 400
+    end
+
+    it 'returns an error when the conversation_id is not provided' do
+      @c1.all_messages.first()
+
+      raw_api_call(:put, "/api/v1/conversations/restore",
+              { :controller => "conversations", :action => "restore_message", :format => "json",
+                :user_id => @bob.id, :conversation_message_id => message.id })
+
+      expect(response.status).to eql 400
+    end
+
+    it 'restores the message' do
+      message = @c1.all_messages.first()
+
+      json = api_call(:put, "/api/v1/conversations/restore",
+              { :controller => "conversations", :action => "restore_message", :format => "json",
+                :user_id => @bob.id, :message_id => message.id, :conversation_id => @c1.conversation_id })
+
+      expect(response.status).to eql 200
+
+      cmp = ConversationMessageParticipant.where(:user_id => @bob.id).where(:conversation_message_id => message.id).first()
+      expect(cmp.workflow_state).to eql "active"
+      expect(cmp.deleted_at).to eql nil
+    end
+
+    it 'updates the message count and last_message_at on the conversation' do
+      expect(@c1.message_count).to eql 0
+      expect(@c1.last_message_at).to eql nil
+
+      message = @c1.all_messages.first()
+
+      json = api_call(:put, "/api/v1/conversations/restore",
+              { :controller => "conversations", :action => "restore_message", :format => "json",
+                :user_id => @bob.id, :message_id => message.id, :conversation_id => @c1.conversation_id })
+
+      expect(response.status).to eql 200
+
+      @c1.reload()
+      expect(@c1.message_count).to eql 1
+      expect(@c1.last_message_at).to eql message.created_at
+    end
+  end
+
 end

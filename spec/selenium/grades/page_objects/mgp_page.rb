@@ -1,16 +1,6 @@
 module GradingStandards
   class MultipleGradingPeriods
-    include SeleniumDriverSetup
-    include OtherHelperMethods
-    include CustomSeleniumActions
-    include CustomAlertActions
-    include CustomPageLoaders
-    include CustomScreenActions
-    include CustomValidators
-    include CustomWaitMethods
-    include CustomDateHelpers
-    include LoginAndSessionMethods
-    include SeleniumErrorRecovery
+    include SeleniumDependencies
 
     # Main page components
     def grading_periods_tab

@@ -9,79 +9,101 @@ def log_time(name, &block)
   time
 end
 
+def parallel_processes
+  processes = (ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count).to_i
+  puts "working in #{processes} processes"
+  processes
+end
+
 namespace :canvas do
   desc "Compresses static assets"
   task :compress_assets do
     assets = FileList.new('public/**/*.js', 'public/**/*.css')
+    mutex = Mutex.new
     before_bytes = 0
     after_bytes = 0
     processed = 0
-    assets.each do |asset|
+
+    require 'parallel'
+
+    Parallel.each(assets, in_threads: parallel_processes, progress: 'compressing assets') do |asset|
       asset_compressed = "#{asset}.gz"
       unless File.exists?(asset_compressed)
         `gzip --best --stdout "#{asset}" > "#{asset_compressed}"`
-        before_bytes += File::Stat.new(asset).size
-        after_bytes += File::Stat.new(asset_compressed).size
-        processed += 1
+        mutex.synchronize do
+          before_bytes += File::Stat.new(asset).size
+          after_bytes += File::Stat.new(asset_compressed).size
+          processed += 1
+        end
       end
     end
     puts "Compressed #{processed} assets, #{before_bytes} -> #{after_bytes} bytes (#{"%.0f" % ((before_bytes.to_f - after_bytes.to_f) / before_bytes * 100)}% reduction)"
   end
 
   desc "Compile javascript and css assets."
-  task :compile_assets, :generate_documentation, :check_syntax, :compile_styleguide, :build_js do |t, args|
-    # :check_syntax is currently a dummy argument that isn't used.
-    args.with_defaults(:generate_documentation => true, :check_syntax => false, :compile_styleguide => true, :build_js => true)
-    truthy_values = [true, 'true', '1']
-    generate_documentation = truthy_values.include?(args[:generate_documentation])
-    compile_styleguide = truthy_values.include?(args[:compile_styleguide])
-    build_js = truthy_values.include?(args[:build_js])
+  task :compile_assets do |t, args|
+    require_relative "../../config/initializers/webpack"
 
-    if ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
+    # opt out
+    npm_install = ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
+    compile_css = ENV["COMPILE_ASSETS_CSS"] != "0"
+    build_styleguide = ENV["COMPILE_ASSETS_STYLEGUIDE"] != "0"
+    build_js = ENV["COMPILE_ASSETS_BUILD_JS"] != "0"
+    build_api_docs = ENV["COMPILE_ASSETS_API_DOCS"] != "0"
+
+    # opt in
+    webpack_and_rjs = ENV["COMPILE_ASSETS_WEBPACK_RJS_FALLBACK"] == "1"
+
+    if npm_install
       log_time('Making sure node_modules are up to date') {
         Rake::Task['js:npm_install'].invoke
       }
     end
 
-    if ENV["COMPILE_ASSETS_CSS"] != "0"
+    if compile_css
       # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
       # to exist before we run handlebars stuff, so we have to do this first
       Rake::Task['css:compile'].invoke
     end
 
     require 'parallel'
-    processes = (ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count).to_i
-    puts "working in #{processes} processes"
 
     tasks = Hash.new
 
-    if compile_styleguide
+    if build_styleguide
       tasks["css:styleguide"] = -> {
         Rake::Task['css:styleguide'].invoke
       }
     end
 
     # TODO: Once webpack is the only way, remove js:build
-    if build_js
-      tasks["compile coffee, js 18n, run r.js optimizer, and webpack"] = -> {
-        prereqs = ['js:generate', 'i18n:generate_js']
-        prereqs.each do |name|
-          log_time(name) { Rake::Task[name].invoke }
-        end
-        # webpack and js:build can run concurrently
-        Parallel.each(['js:build', 'js:webpack'], :in_threads => processes.to_i) do |name|
-          log_time(name) { Rake::Task[name].invoke }
+    if CANVAS_WEBPACK
+      build_js_msg = build_js ? ", js 18n, run webpack" : ""
+      msg = webpack_and_rjs ? ", r.js optimizer" : ""
+      tasks["compile coffee/jsx#{build_js_msg}#{msg}"] = -> {
+        log_time('js:generate') { Rake::Task['js:generate'].invoke }
+        if build_js
+          log_time('i18n:generate_js') { Rake::Task['i18n:generate_js'].invoke }
+          ptasks = ['js:webpack']
+          ptasks << 'js:build' if webpack_and_rjs
+          # webpack and js:build can run concurrently
+          Parallel.each(ptasks, in_threads: parallel_processes) do |name|
+            log_time(name) { Rake::Task[name].invoke }
+          end
         end
       }
     else
-      tasks["compile coffee"] = -> {
-        ['js:generate'].each do |name|
-          log_time(name) { Rake::Task[name].invoke }
+      msg = build_js ? ", js i18n, r.js optimizer" : ""
+      tasks["compile coffee/jsx#{msg}"] = -> {
+        log_time('js:generate') { Rake::Task['js:generate'].invoke }
+        if build_js
+          log_time('i18n:generate_js') { Rake::Task['i18n:generate_js'].invoke }
+          log_time('js:build') { Rake::Task['js:build'].invoke }
         end
       }
     end
 
-    if generate_documentation
+    if build_api_docs
       tasks["Generate documentation [yardoc]"] = -> {
         Rake::Task['doc:api'].invoke
       }
@@ -89,7 +111,7 @@ namespace :canvas do
 
     times = nil
     real_time = Benchmark.realtime do
-      times = Parallel.map(tasks, :in_processes => processes.to_i) do |name, lamduh|
+      times = Parallel.map(tasks, :in_processes => parallel_processes) do |name, lamduh|
         log_time(name) { lamduh.call }
       end
     end
@@ -97,6 +119,15 @@ namespace :canvas do
     puts "Finished compiling assets in #{real_time}. parallelism saved #{combined_time - real_time} (#{real_time.to_f / combined_time.to_f * 100.0}%)"
 
     log_time("gulp rev") { Rake::Task['js:gulp_rev'].invoke }
+  end
+
+  desc "Just compile css and js for development"
+  task :compile_assets_dev do
+    ENV["COMPILE_ASSETS_NPM_INSTALL"] = "0"
+    ENV["COMPILE_ASSETS_STYLEGUIDE"] = "0"
+    ENV["COMPILE_ASSETS_BUILD_JS"] = "0"
+    ENV["COMPILE_ASSETS_API_DOCS"] = "0"
+    Rake::Task['canvas:compile_assets'].invoke
   end
 end
 

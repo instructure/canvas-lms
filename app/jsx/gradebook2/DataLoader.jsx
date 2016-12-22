@@ -9,6 +9,9 @@ define(['jquery', 'jsx/shared/CheatDepaginator', 'underscore'], ($, cheaterDepag
   const getSections = (url) => {
     return $.ajaxJSON(url, "GET", {});
   };
+  const getEffectiveDueDates = (url) => {
+    return $.ajaxJSON(url, "GET", {});
+  };
 
   // submission loading is tricky
   let pendingStudentsForSubmissions;
@@ -100,6 +103,7 @@ define(['jquery', 'jsx/shared/CheatDepaginator', 'underscore'], ($, cheaterDepag
 
   const loadGradebookData = (opts) => {
     const gotAssignmentGroups = getAssignmentGroups(opts.assignmentGroupsURL, opts.assignmentGroupsParams);
+    const gotEffectiveDueDates = getEffectiveDueDates(opts.effectiveDueDatesURL);
     const gotCustomColumns = getCustomColumns(opts.customColumnsURL);
     const gotStudents = getStudents(opts.studentsURL, opts.studentsParams, opts.studentsPageCb);
     const gotSubmissions = getSubmissions(opts.submissionsURL, opts.submissionsParams, opts.submissionsChunkCb, opts.submissionsChunkSize);
@@ -115,6 +119,7 @@ define(['jquery', 'jsx/shared/CheatDepaginator', 'underscore'], ($, cheaterDepag
       gotStudents: gotStudents,
       gotSubmissions: gotSubmissions,
       gotCustomColumnData: gotCustomColumnData,
+      gotEffectiveDueDates: gotEffectiveDueDates,
     };
   };
 

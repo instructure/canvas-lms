@@ -18,7 +18,8 @@
 
     <% if @presenter.auth? %>
       <%= link_to(account_remove_all_authentication_providers_url(@account),
-          confirm: t(:delete_auth_confirmation, "Are you sure? Users may not be able to log in if this is removed."),
+          data: { confirm: t(:delete_auth_confirmation,
+            'Are you sure? Users may not be able to log in if this is removed.') },
           method: :delete,
           class: "delete_auth_link btn icon-trash button-sidebar-wide") do %>
           <%= t(:delete_auth_link, "Remove All Authentication") %>

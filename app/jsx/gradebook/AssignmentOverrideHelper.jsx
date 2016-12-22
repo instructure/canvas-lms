@@ -12,8 +12,8 @@ define([
     const groups = {};
 
     _.each(students, function(student) {
-      student.sections.forEach(sectionID => sections[sectionID] = addStudentID(student, sections[sectionID]));
-      student.group_ids.forEach(groupID => groups[groupID] = addStudentID(student, groups[groupID]));
+      _.each(student.sections, sectionID => sections[sectionID] = addStudentID(student, sections[sectionID]));
+      _.each(student.group_ids, groupID => groups[groupID] = addStudentID(student, groups[groupID]));
     });
 
     return { studentIDsInSections: sections, studentIDsInGroups: groups };
@@ -64,7 +64,7 @@ define([
 
     _.each(students, function(student) {
       if (dates[student.id] === undefined && !assignment.only_visible_to_overrides) {
-        dates[student.id] = assignment.due_at;
+        dates[student.id] = tz.parse(assignment.due_at);
       }
     });
 

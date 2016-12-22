@@ -24,9 +24,9 @@ describe GradebookUploadsController do
   def course_with_graded_student
     @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
     @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-    @assignment.grade_student(@user, :grade => "10")
+    @assignment.grade_student(@user, grade: "10", grader: @teacher)
     @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
-    @assignment2.grade_student(@user, :grade => "8")
+    @assignment2.grade_student(@user, grade: "8", grader: @teacher)
     @course.recompute_student_scores
     @user.reload
     @course.reload

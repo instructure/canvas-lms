@@ -5,8 +5,9 @@ group :test do
     gem 'rails-dom-testing', '2.0.1'
   end
 
-  gem 'gergich', '0.1.6', require: false
+  gem 'gergich', '0.1.8', require: false
   gem 'testingbot', require: false
+  gem 'brakeman', require: false
   # simplecov 0.10.0 shows significantly less coverage.
   # ensure the coverage build shows accurate data
   # before upgrading past 0.9.2. (CNVS-32826)
@@ -48,7 +49,7 @@ group :test do
   gem 'yard', '0.8.7.6'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.8.1'
-  gem 'jira_ref_parser', '1.0.0'
+  gem 'jira_ref_parser', '1.0.1'
   gem 'headless', '2.3.1', require: false
   gem 'escape_code', '0.2'
 end

@@ -37,100 +37,13 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # didn't quite work.
   alias :parent_outcome_group :learning_outcome_group
 
-  def infer_defaults
-    self.context ||= self.parent_outcome_group && self.parent_outcome_group.context
-    if self.context && !self.context.learning_outcome_groups.empty? && !building_default
-      default = self.context.root_outcome_group
-      self.learning_outcome_group_id ||= default.id unless self == default
-    end
-    true
-  end
-
   workflow do
     state :active
     state :deleted
   end
 
-  # create a shim for plugins that use this defunct method. this is TEMPORARY.
-  # the plugins should update to use the new layout, and once they're updated,
-  # this shim removed. DO NOT USE in new code.
-  def sorted_content
-    # the existing code that requires this shim only occurs when there are
-    # either subgroups or outcomes under the group, but not both. and they're
-    # from a migration, so the expected order is the migration order.
-    subgroups = self.child_outcome_groups.sort_by{ |group| group.migration_id }
-    return subgroups unless subgroups.empty?
-
-    self.child_outcome_links.map{ |link| link.content }.sort_by{ |outcome| outcome.migration_id }
-  end
-
-  def reorder_content(orders)
-    orders ||= {}
-    orders = orders.map{|asset_string, position| asset_string}
-    orders += self.child_outcome_groups.map(&:asset_string)
-    orders += self.child_outcome_links.map(&:asset_string)
-    orders = orders.compact.uniq
-
-    # build the updates
-    outcome_group_ids = []
-    outcome_link_ids = []
-    orders.each do |asset_string|
-      if asset_string =~ /learning_outcome_group_(\d*)/
-        outcome_group_id = $1.to_i
-        next if is_ancestor?(outcome_group_id)
-        outcome_group_ids << outcome_group_id
-      elsif asset_string =~ /content_tag_(\d*)/
-        outcome_link_id = $1.to_i
-        outcome_link_ids << outcome_link_id
-      end
-    end
-
-    # update outcome groups
-    unless outcome_group_ids.empty?
-      LearningOutcomeGroup.
-          where(id: outcome_group_ids, context_type: context_type, context_id: context_id).
-          update_all(learning_outcome_group_id: self)
-    end
-
-    # update outcome links
-    unless outcome_link_ids.empty?
-      ContentTag.
-          where(id: outcome_link_ids, context_type: context_type, context_id: context_id).
-          update_all(associated_asset_id: self)
-    end
-
-    orders
-  end
-
   def parent_ids
     [learning_outcome_group_id]
-  end
-
-  # this finds all the ids of the ancestors avoiding relation loops
-  # because of old broken behavior a group can have multiple parents, including itself
-  def ancestor_ids
-    if !@ancestor_ids
-      @ancestor_ids = [self.id]
-
-      ids_to_check = parent_ids - @ancestor_ids
-      until ids_to_check.empty?
-        @ancestor_ids += ids_to_check
-
-        new_ids = []
-        ids_to_check.each do |id|
-          group = LearningOutcomeGroup.for_context(self.context).active.where(id: id).first
-          new_ids += group.parent_ids if group
-        end
-
-        ids_to_check = new_ids.uniq - @ancestor_ids
-      end
-    end
-
-    @ancestor_ids
-  end
-
-  def is_ancestor?(id)
-    ancestor_ids.member?(id)
   end
 
   # adds a new link to an outcome to this group. does nothing if a link already
@@ -256,14 +169,52 @@ class LearningOutcomeGroup < ActiveRecord::Base
     find_or_create_root(nil, force)
   end
 
-  def self.title_order_by_clause(table = nil)
-    col = table ? "#{table}.title" : "title"
-    best_unicode_collation_key(col)
-  end
-
   def self.order_by_title
     scope = self
     scope = scope.select("learning_outcome_groups.*") if !all.select_values.present?
     scope.select(title_order_by_clause).order(title_order_by_clause)
+  end
+
+  private
+
+  def infer_defaults
+    self.context ||= self.parent_outcome_group && self.parent_outcome_group.context
+    if self.context && !self.context.learning_outcome_groups.empty? && !building_default
+      default = self.context.root_outcome_group
+      self.learning_outcome_group_id ||= default.id unless self == default
+    end
+    true
+  end
+
+  # this finds all the ids of the ancestors avoiding relation loops
+  # because of old broken behavior a group can have multiple parents, including itself
+  def ancestor_ids
+    unless @ancestor_ids
+      @ancestor_ids = [self.id]
+
+      ids_to_check = parent_ids - @ancestor_ids
+      until ids_to_check.empty?
+        @ancestor_ids += ids_to_check
+
+        new_ids = []
+        ids_to_check.each do |id|
+          group = LearningOutcomeGroup.for_context(self.context).active.where(id: id).first
+          new_ids += group.parent_ids if group
+        end
+
+        ids_to_check = new_ids.uniq - @ancestor_ids
+      end
+    end
+
+    @ancestor_ids
+  end
+
+  def is_ancestor?(id)
+    ancestor_ids.member?(id)
+  end
+
+  private_class_method def self.title_order_by_clause(table = nil)
+    col = table ? "#{table}.title" : "title"
+    best_unicode_collation_key(col)
   end
 end

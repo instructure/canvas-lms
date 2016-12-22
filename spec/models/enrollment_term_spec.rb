@@ -169,4 +169,73 @@ describe EnrollmentTerm do
       end
     end
   end
+
+  describe "scopes" do
+    before(:once) do
+      @root_account = account_model
+      @terms = {}
+
+      scopes = [{
+        name: :active,
+        criteria: nil
+      },
+      {
+        name: :ended,
+        criteria: {
+          end_at: 10.days.ago
+        }
+      },
+      {
+        name: :started,
+        criteria: {
+          start_at: 10.days.ago
+        }
+      },
+      {
+        name: :not_ended_1,
+        criteria: {
+          end_at: 10.days.from_now
+        }
+      },
+      {
+        name: :not_ended_2,
+        criteria: {
+          end_at: nil
+        }
+      },
+      {
+        name: :not_started,
+        criteria: {
+          start_at: 10.days.from_now
+        }
+      }]
+
+      scopes.each do |scope|
+        @terms[scope[:name]] = @root_account.enrollment_terms.create!(scope[:criteria])
+        course_with_teacher(active_course: true, active_enrollment: true)
+        @course.enrollment_term_id = @terms[scope[:name]].id
+        @course.save!
+      end
+    end
+
+    it "should limit by active terms" do
+      expect(@root_account.enrollment_terms.active.pluck(:id).sort).to eq((@terms.values.map(&:id) << @root_account.default_enrollment_term.id).sort)
+    end
+
+    it "should limit by ended terms" do
+      expect(@root_account.enrollment_terms.ended.pluck(:id)).to eq([@terms[:ended].id])
+    end
+
+    it "should limit by started terms" do
+      expect(@root_account.enrollment_terms.started.pluck(:id)).to eq([@terms[:started].id])
+    end
+
+    it "should limit by not ended terms" do
+      expect(@root_account.enrollment_terms.not_ended.pluck(:id).sort).to eq(([@terms[:active].id, @terms[:started].id, @terms[:not_started].id, @terms[:not_ended_1].id, @terms[:not_ended_2].id, @root_account.default_enrollment_term.id]).sort)
+    end
+
+    it "should limit by not started terms" do
+      expect(@root_account.enrollment_terms.not_started.pluck(:id).sort).to eq([@terms[:not_started].id, @terms[:active].id, @terms[:ended].id, @terms[:not_ended_1].id, @terms[:not_ended_2].id, @root_account.default_enrollment_term.id].sort)
+    end
+  end
 end

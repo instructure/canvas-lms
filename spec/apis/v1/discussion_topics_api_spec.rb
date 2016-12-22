@@ -2277,6 +2277,16 @@ describe DiscussionTopicsController, type: :request do
       expect(v1_r0['updated_at']).to eq @reply3.updated_at.as_json
     end
 
+    it "can include extra information for context cards" do
+      topic_with_nested_replies
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+                      {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, include_new_entries: "1", include_context_card_info: "1"})
+      participants = json["participants"]
+      expect(participants.map { |p| p["course_id"] }).to eq [@course.to_param, @course.to_param]
+      expect(participants.find { |p| !p["is_student"] }["id"]).to eq @teacher.id
+      expect(participants.find { |p| p["is_student"] }["id"]).to eq @student.id
+    end
+
     context "with mobile overrides" do
       before :once do
         course_with_teacher(:active_all => true)

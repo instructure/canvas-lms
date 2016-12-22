@@ -564,7 +564,7 @@ describe "context modules" do
       end
 
       def grade_assignment(score)
-        @assignment_4.grade_student(@user, :grade => score)
+        @assignment_4.grade_student(@user, grade: score, grader: @teacher)
       end
 
       it "should show a completed icon when module item is completed", priority: "1", test_id: 250546 do

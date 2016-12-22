@@ -10,7 +10,7 @@ describe "courses" do
     @assignment = @course.assignments.new(:title => "some assignment")
     @assignment.workflow_state = "published"
     @assignment.save
-    @submission = @assignment.grade_student(@student, { :grade => 3 }).first
+    @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
   end
 
   it "should show badges in the left nav of a course" do

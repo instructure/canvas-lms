@@ -2,24 +2,20 @@
   position: relative;
   width: 240px;
   display: inline-block;
-  background-color: #fff;
-  border-radius: 4px;
+  background-color: $ic-color-light;
+  border-radius: $borderRadius;
+  border: 1px solid $ic-border-color;
   text-align: left;
   box-shadow: 0 0 2px rgba(0, 0, 0, .3);
 }
 .react-select-box {
-  padding: 15px 0;
+  padding: $ic-sp 0;
   display: inline-block;
   cursor: pointer;
   border: none;
   width: 100%;
   text-align: left;
   background-color: transparent;
-}
-
-.react-select-box:focus {
-  outline: 0;
-  box-shadow: 0 0 4px #0493D1;
 }
 
 .react-select-box:before {
@@ -29,38 +25,38 @@
   height: 20px;
   top: 15px;
   right: 34px;
-  border-left: 1px solid #CBD2D7;
+  border-left: 1px solid $ic-border-color;
 }
 
 .react-select-box:after {
   content: ' ';
   position: absolute;
   z-index: 1;
-  top: 23px;
+  top: 20px;
   right: 13px;
-  border-top: 6px solid #7B8E9B;
+  border-top: 6px solid $ic-color-dark;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
 }
 
 .react-select-box-label,
 .react-select-box-option {
-  line-height: 16px;
+  line-height: $ic-line-height;
   @include fontSize($ic-font-size--xsmall);
   font-weight: bold;
-  color: #7B8E9B;
+  color: $ic-font-color-dark;
 }
 
 .react-select-box-label {
-  padding: 0 40px 0 20px;
+  padding: 0 $ic-sp*4 0 $ic-sp;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #0493D1;
+  color: $ic-font-color-dark;
 }
 
 .react-select-box-empty .react-select-box-label {
-  color: #7B8E9B;
+  color: $ic-font-color-dark;
 }
 
 .react-select-box-click-outside-layer {
@@ -78,22 +74,22 @@
   right: 0;
   width: 35px;
   height: 20px;
-  background-color: #fff;
+  background-color: $ic-color-light;
   text-indent: -9999em;
   z-index: 3;
   border: none;
-
 }
+
 .react-select-box-clear:before {
   content: '×';
   position: absolute;
   top: 2px;
   left: 10px;
   z-index: 1;
-  background-color: #7B8E9B;
+  background-color: $ic-color-medium;
   border-radius: 100%;
   @include fontSize(13px);
-  color: #fff;
+  color: $ic-font-color-light;
   line-height: 1;
   width: 15px;
   height: 15px;
@@ -101,18 +97,13 @@
   text-align: center;
 }
 
-.react-select-box-clear:hover,
-.react-select-box-clear:focus {
-  outline: 0;
-}
-
 .react-select-box-clear:hover:before,
 .react-select-box-clear:focus:before {
-  background-color: #0493D1;
+  background-color: $ic-brand-primary;
 }
 
 .react-select-box-hidden {
-  display: none
+  display: none;
 }
 
 .react-select-box-options {
@@ -123,9 +114,8 @@
   top: 100%;
   left: 0;
   z-index: 4;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, .3);
+  background-color: $ic-color-light;
+  border-radius: $borderRadius;
 }
 
 .react-select-box-options-list {
@@ -135,21 +125,22 @@
 }
 
 .react-select-box-option {
-  padding: 10px 20px;
+  padding: $ic-sp;
   margin: 0;
   cursor: pointer;
   display: block;
-  line-height: 1.2;
+  line-height: $ic-line-height;
   text-decoration: none;
 }
 
 .react-select-box-option:hover {
-  color: #0493D1;
-  background-color: #f4f4f4;
+  color: $ic-font-color-light;
+  background-color: $ic-brand-primary;
+  text-decoration: none;
 }
 
 .react-select-box-option-selected {
-  color: #CBD2D7;
+  color: $ic-color-medium-light;
 }
 
 .react-select-box-multi .react-select-box-option {
@@ -168,8 +159,8 @@
   height: 12px;
   width: 12px;
   margin-right: 10px;
-  border: 1px solid #7B8E9B;
-  background: #f9f9f9;
+  border: 1px solid $ic-border-color;
+  background: $ic-color-medium-light;
   vertical-align: middle;
 }
 
@@ -179,18 +170,18 @@
 
 
 .react-select-box-multi .react-select-box-option-selected {
-  color: #1F3344;
+  color: $ic-font-color-dark;
 }
 
 .react-select-box-option:focus,
 .react-select-box-option-focused {
-  color: #0493D1;
+  color: $ic-font-color-light;
   outline: 0;
-  background-color: #DDE2E5;
+  background-color: $ic-brand-primary;
 }
 
 .react-select-box-close {
-  color: #0493D1;
+  color: $ic-brand-primary;
   text-transform: uppercase;
   background-color: transparent;
   border: none;
@@ -209,7 +200,7 @@
 }
 
 .react-select-box-empty .react-select-box-close {
-  color: #CBD2D7;
+  color: $ic-font-color-dark;
 }
 
 .react-select-box-native {

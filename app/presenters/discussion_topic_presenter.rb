@@ -76,9 +76,9 @@ class DiscussionTopicPresenter
   #
   # Returns a boolean.
   def comments_disabled?
-    !!((topic.is_a?(Announcement) &&
+    !!(topic.is_a?(Announcement) &&
       topic.context.is_a?(Course) &&
-      topic.context.settings[:lock_all_announcements]))
+      topic.context.settings[:lock_all_announcements])
   end
 
   # Public: Determine if the discussion's context has a large roster flag set.
@@ -98,4 +98,27 @@ class DiscussionTopicPresenter
   def allows_speed_grader?
     !large_roster? && topic.assignment.published?
   end
+
+  def author_link_attrs
+    attrs = {
+      class: "author",
+      title: I18n.t("Author's Name"),
+    }
+
+    if topic.context.is_a?(Course)
+      student_enrollment = topic.user.enrollments.active.where(
+        course_id: topic.context.id,
+        type: "StudentEnrollment",
+      ).first
+
+      if student_enrollment
+        attrs[:"data-student_id"] = student_enrollment.user_id
+        attrs[:"data-course_id"] = student_enrollment.course_id
+        attrs[:class] << " student_context_card_trigger"
+      end
+    end
+
+    attrs
+  end
+
 end

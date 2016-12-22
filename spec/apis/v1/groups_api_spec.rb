@@ -932,8 +932,12 @@ describe "Groups API", type: :request do
 
   describe "/preview_html" do
     before :once do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher(:active_all => true)
       @group = @course.groups.create!(:name => 'Group 1')
+    end
+
+    before :each do
+      user_session @teacher
     end
 
     it "should sanitize html and process links" do

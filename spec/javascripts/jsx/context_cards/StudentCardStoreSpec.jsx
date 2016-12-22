@@ -6,7 +6,7 @@ define(['jsx/context_cards/StudentCardStore'], (StudentCardStore) => {
       this.server = sinon.fakeServer.create();
 
       this.server.respondWith(
-        /\/api\/v1\/courses\/\d+$/,
+        /\/api\/v1\/courses\/\d+/,
         JSON.stringify({name: "Awesome Course"})
       );
       this.server.respondWith(
@@ -48,10 +48,12 @@ define(['jsx/context_cards/StudentCardStore'], (StudentCardStore) => {
       }
     });
     store.onChange = spy;
+    store.loadDataForStudent()
   });
 
   test("state is correct after loading", function(assert) {
     const store = new StudentCardStore(2, 1);
+    store.loadDataForStudent()
     const done = assert.async();
     store.onChange = (state) => {
       if (state.loading === false) {

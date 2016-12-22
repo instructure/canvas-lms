@@ -56,23 +56,27 @@ describe 'Theme Editor' do
   end
 
   it 'should close after preview (no changes saved)', priority: "1", test_id: 239984 do
+    # since npm modules arent installed in worker nodes this needs to get installed to not fail on
+    # those nodes
+    BrandConfig.any_instance.stubs(:compile_css!).returns(true)
     open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
     expect(driver.title).to include 'Theme Editor'
     f('.Theme__editor-color-block_input-text').send_keys('#dc6969')
-    preview_your_changes
-    run_jobs
-    expect(fj('.ReactModalPortal h3:contains("Generating preview")')).to be_displayed
-    exit_btn = fj('.Theme__header button:contains("Exit")')
 
-    keep_trying_until do
-      exit_btn.click
-      driver.switch_to.alert.accept
-      assert_flash_notice_message(/Theme editor changes have been cancelled/)
-      expect(driver.current_url).to end_with("/accounts/#{Account.default.id}/brand_configs")
-      expect(f('#left-side #section-tabs .brand_configs').text).to eq 'Themes'
+    expect_new_page_load do
+      preview_your_changes
+      expect(fj('.ReactModal__Content:contains("Generating preview")')).to be_displayed
+      run_jobs
     end
+
+    exit_btn = fj('.Theme__header button:contains("Exit")')
+    exit_btn.click
+    driver.switch_to.alert.accept
+    assert_flash_notice_message(/Theme editor changes have been cancelled/)
+    expect(driver.current_url).to end_with("/accounts/#{Account.default.id}/brand_configs")
+    expect(f('#left-side #section-tabs .brand_configs').text).to eq 'Themes'
   end
 
   it 'should display the preview button when valid change is made', priority: "1", test_id: 239984 do

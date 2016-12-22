@@ -34,6 +34,7 @@ require [
   'compiled/views/courses/roster/RosterTabsView'
   'compiled/views/courses/roster/ResendInvitationsView'
   'jquery'
+  'jsx/context_cards/StudentContextCardTrigger'
 ], (I18n, {Model}, CreateUserList, Role, CreateUsersView, RoleSelectView, rosterUsersTemplate, RosterUserCollection, RolesCollection, SectionCollection, GroupCategoryCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, RosterTabsView, ResendInvitationsView, $) ->
 
   fetchOptions =

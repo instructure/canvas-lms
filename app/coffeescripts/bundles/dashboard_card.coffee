@@ -4,8 +4,8 @@ require [
   'react'
   'react-dom'
   'jsx/dashboard_card/DashboardCardBox',
-  'jsx/dashboard_card/getDroppableDashboardCardBox',
-], ($, _, React, ReactDOM, DashboardCardBox, getDroppableDashboardCardBox) ->
+  'jsx/dashboard_card/getDroppableDashboardCardBox'
+], ($, _, React, ReactDOM, DashboardCardBox, getDroppableDashboardCardBox, StudentContextTray, StudentCardStore) ->
 
   component = if ENV.DASHBOARD_REORDERING_ENABLED then getDroppableDashboardCardBox() else DashboardCardBox
 
@@ -16,3 +16,4 @@ require [
 
   dashboardContainer = document.getElementById('DashboardCard_Container')
   ReactDOM.render(element, dashboardContainer)
+

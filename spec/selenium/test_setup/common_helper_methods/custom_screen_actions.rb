@@ -52,6 +52,6 @@ module CustomScreenActions
       driver.close
     end
     driver.switch_to.window(driver.window_handles.first)
-    focus_viewport(driver)
+    SeleniumDriverSetup.focus_viewport
   end
 end

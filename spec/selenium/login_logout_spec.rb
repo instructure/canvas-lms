@@ -51,7 +51,7 @@ describe "login logout test" do
   end
 
   it "should prompt must be logged in message when accessing permission based pages while not logged in", priority: "2" do
-    expected_url = app_host + "/login/canvas"
+    expected_url = app_url + "/login/canvas"
     get "/grades"
     assert_flash_warning_message /You must be logged in to access this page/
     expect(driver.current_url).to eq expected_url

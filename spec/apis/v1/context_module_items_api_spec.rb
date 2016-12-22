@@ -991,6 +991,14 @@ describe "Module Items API", type: :request do
           expect(json['assignments'].map {|a| a['id']}).to eq assignment_ids.reverse
           expect(json['items']).to eq []
         end
+
+        it 'should return only published assignments' do
+          assignment_ids = create_assignments([@course.id], 5)
+          Assignment.find(assignment_ids.last).unpublish!
+          cyoe_returns assignment_ids
+          json = call_select_mastery_path @assignment_tag, 100, @student.id
+          expect(json['assignments'].map {|a| a['id']}).to eq assignment_ids[0..-2]
+        end
       end
     end
   end

@@ -399,7 +399,7 @@ define([
     });
 
     $("#course_custom_course_visibility").ready(function(event) {
-      if($("#course_custom_course_visibility")[0].checked) {
+      if($("#course_custom_course_visibility").prop('checked')) {
         $("#customize_course_visibility").toggle(true);
       } else {
         $("#customize_course_visibility").toggle(false);
@@ -429,6 +429,10 @@ define([
         }
       });
       $('#customize_course_visibility select').val($(current).val())
+    });
+
+    $("#course_show_announcements_on_home_page").change(function(event) {
+      $("#course_home_page_announcement_limit").prop("disabled", !$(this).prop('checked'))
     });
   });
 });

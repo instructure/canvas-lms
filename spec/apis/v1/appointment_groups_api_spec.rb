@@ -190,6 +190,17 @@ describe AppointmentGroupsController, type: :request do
     expect(cjson.first['user']['id']).to eql @student1.id
   end
 
+  it 'should include all associated context codes, if requested' do
+    ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
+
+    json = api_call(:get, "/api/v1/appointment_groups/#{ag.id}?include[]=all_context_codes", {
+                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s, :include => ['all_context_codes']})
+    expect(json.keys.sort).to eql((expected_fields + ['all_context_codes', 'appointments']).sort)
+    expect(json['id']).to eql ag.id
+    ccs = json['all_context_codes']
+    expect(ccs).to eql [@course.asset_string]
+  end
+
   it 'should get a manageable appointment group' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
 

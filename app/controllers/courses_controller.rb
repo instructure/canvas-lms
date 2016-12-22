@@ -300,9 +300,9 @@ class CoursesController < ApplicationController
   include CustomSidebarLinksHelper
   include SyllabusHelper
 
-  before_filter :require_user, :only => [:index, :activity_stream, :activity_stream_summary]
+  before_filter :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates]
   before_filter :require_user_or_observer, :only=>[:user_index]
-  before_filter :require_context, :only => [:roster, :locks, :create_file, :ping]
+  before_filter :require_context, :only => [:roster, :locks, :create_file, :ping, :effective_due_dates, :offline_web_exports]
   skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
 
   include Api::V1::Course
@@ -1194,6 +1194,12 @@ class CoursesController < ApplicationController
   # @argument restrict_student_future_view [Boolean]
   #   Restrict students from viewing courses before start date
   #
+  # @argument show_announcements_on_home_page [Boolean]
+  #   Show the most recent announcements on the Course home page (if a Wiki, defaults to five announcements, configurable via home_page_announcement_limit)
+  #
+  # @argument home_page_announcement_limit [Integer]
+  #   Limit the number of announcements on the home page if enabled via show_announcements_on_home_page
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
   #     -X PUT \
@@ -1215,7 +1221,9 @@ class CoursesController < ApplicationController
       :hide_distribution_graphs,
       :lock_all_announcements,
       :restrict_student_past_view,
-      :restrict_student_future_view
+      :restrict_student_future_view,
+      :show_announcements_on_home_page,
+      :home_page_announcement_limit
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
     @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
@@ -1612,7 +1620,7 @@ class CoursesController < ApplicationController
         @wiki = @context.wiki
         @page = @wiki.front_page
         set_js_rights [:wiki, :page]
-        set_js_wiki_data :course_home => true
+        set_js_wiki_data :course_home => true, :show_announcements => @context.show_announcements_on_home_page?
         @padless = true
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
@@ -2412,6 +2420,49 @@ class CoursesController < ApplicationController
     end
   end
 
+  # @API Get effective due dates
+  # For each assignment in the course, returns each assigned student's ID
+  # and their corresponding due date along with some Multiple Grading Periods
+  # data. Returns a collection with keys representing assignment IDs and values
+  # as a collection containing keys representing student IDs and values representing
+  # the student's effective due_at, the grading_period_id of which the due_at falls
+  # in, and whether or not the grading period is closed (in_closed_grading_period)
+  #
+  # @argument assignment_ids[] [Optional, String]
+  # The list of assignment IDs for which effective student due dates are
+  # requested. If not provided, all assignments in the course will be used.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/<course_id>/effective_due_dates
+  #     -X GET \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "1": {
+  #        "14": { "due_at": "2015-09-05", "grading_period_id": null, "in_closed_grading_period": false },
+  #        "15": { due_at: null, "grading_period_id": 3, "in_closed_grading_period": true }
+  #     },
+  #     "2": {
+  #        "14": { "due_at": "2015-08-05", "grading_period_id": 3, "in_closed_grading_period": true }
+  #     }
+  #   }
+  # @returns {EffectiveDueDates}
+  def effective_due_dates
+    return unless authorized_action(@context, @current_user, :read_as_admin)
+
+    assignment_ids = effective_due_dates_params[:assignment_ids]
+    if assignment_ids.present?
+      due_dates = EffectiveDueDates.for_course(@context, assignment_ids)
+    else
+      due_dates = EffectiveDueDates.for_course(@context)
+    end
+
+    render json: due_dates.to_hash([
+      :due_at, :grading_period_id, :in_closed_grading_period
+    ])
+  end
+
   def student_view
     get_context
     if authorized_action(@context, @current_user, :use_student_view)
@@ -2678,9 +2729,17 @@ class CoursesController < ApplicationController
   def can_change_group_weighting_scheme?
     return true unless @course.feature_enabled?(:multiple_grading_periods)
     return true if @course.account_membership_allows(@current_user)
-    periods = GradingPeriod.for(@course)
-    @course.active_assignments.preload(:active_assignment_overrides).none? do |assignment|
-      assignment.due_for_any_student_in_closed_grading_period?(periods)
-    end
+    !@course.any_assignment_in_closed_grading_period?
+  end
+
+  def offline_web_exports
+    return render status: 404, template: 'shared/errors/404_message' unless @context.allow_web_export_download?
+    @page_title = t('Course Content Downloads')
+    render :text => 'Downloads'.html_safe, :layout => true
+  end
+  private
+
+  def effective_due_dates_params
+    strong_params.permit(assignment_ids: [])
   end
 end

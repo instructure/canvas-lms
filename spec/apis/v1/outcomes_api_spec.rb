@@ -90,7 +90,7 @@ describe "Outcomes API", type: :request do
     @e = @course.enroll_student(@student)
     @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
     @assignment.reload
-    @submission = @assignment.grade_student(@student, :grade => "10").first
+    @submission = @assignment.grade_student(@student, grade: "10", grader: @teacher).first
     @assessment = @a.assess({
       :user => @student,
       :assessor => @teacher,

@@ -1,30 +1,41 @@
 ///
   /// How to update Icons
   //
-  // TL;DR
+  //  The Instructure Icons repo is available at
+  //  https://github.com/instructure/instructure-icons
   //
-  // Add your new svg(s) to "public/fonts/icons/"
-  // Add your new icon markup to this template public/fonts/icons/_canvas-icons.scss
-  // Rebuild icon font with `bundle exec rake icons:compile`
+  //  - Add your new icon to the repo and release
+  //  - Update the instructure-icons version in package.json
   //
-  // Details
-  //
-  // Help! I cant see my icon in "/styleguide"!
-  //  make sure you updated the template above
-  //
-  // I can see my entry in "/styleguide", but it looks like an unsupported unicode character (an empty rectangle or a square with hex in it)
-  //  Try doing a clean, rebuild, then restart your server
-  //  `bundle exec rake brand_configs:clean canvas:compile_assets`
-  //
-  // I can see my entry in "/styleguide", but it is completely empty where the icon should be
-  //  Your stylesheet isn't being loaded properly.
-  //  make sure your svg should 512x512
-  //  clear your browser cache
-  //
-  // More info can be found at <https://gollum.instructure.com/frontend-basics/canvas-icon-font>
 ///
 
 /* @styleguide Icons
+
+Canvas uses <a href="https://github.com/instructure/instructure-icons">Instructure Icons</a> for its icon library. There are various ways that you can bring icons into Canvas, including as a React component, or from our the icon font.
+
+## Comprehensive Icon Listing
+
+For a complete list of Instructure Icons go to <a href="http://instructure.github.io/instructure-icons/">http://instructure.github.io/instructure-icons</a>
+
+## Light vs Solid
+
+There are two weights to our icons: line or solid. Canvas defaults to solid, however, if you want to use the same icon as a line varient you can add the `icon-Line` utility class.
+
+```html
+<a class="icon-add icon-Line" href="whatever">Add Stuff</a>
+```
+
+## Using as a React Component
+
+```javascript
+import { IconAddLine } from 'instructure-icons'
+
+function MyComponent () {
+  return <IconAddLine />
+}
+```
+
+## Using the Icon Font
 
 ### Icons in links
 
@@ -45,294 +56,52 @@
 
 Either use `<a>` with icon desired icon class added or insert `<i>` inside `<button>` and set to desired icon class
 
-### All icons
-
-<div class="row-fluid">
-  <span class="span3"><i class="icon-stats"></i> icon-stats</span>
-  <span class="span3"><i class="icon-paperclip"></i> icon-paperclip</span>
-  <span class="span3"><i class="icon-media"></i> icon-media</span>
-  <span class="span3"><i class="icon-address-book"></i> icon-address-book</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-reset"></i> icon-reset</span>
-  <span class="span3"><i class="icon-announcement"></i> icon-announcement</span>
-  <span class="span3"><i class="icon-analytics"></i> icon-analytics</span>
-  <span class="span3"><i class="icon-student-view"></i> icon-student-view</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-calendar-day"></i> icon-calendar-day</span>
-  <span class="span3"><i class="icon-trash"></i> icon-trash</span>
-  <span class="span3"><i class="icon-speed-grader"></i> icon-speed-grader</span>
-  <span class="span3"><i class="icon-copy-course"></i> icon-copy-course</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-export-content"></i> icon-export-content</span>
-  <span class="span3"><i class="icon-import-content"></i> icon-import-content</span>
-  <span class="span3"><i class="icon-discussion"></i> icon-discussion</span>
-  <span class="span3"><i class="icon-discussion-reply"></i> icon-discussion-reply</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-peer-review"></i> icon-peer-review</span>
-  <span class="span3"><i class="icon-discussion-new"></i> icon-discussion-new</span>
-  <span class="span3"><i class="icon-edit"></i> icon-edit</span>
-  <span class="span3"><i class="icon-home"></i> icon-home</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-settings"></i> icon-settings</span>
-  <span class="span3"><i class="icon-compose"></i> icon-compose</span>
-  <span class="span3"><i class="icon-flag"></i> icon-flag</span>
-  <span class="span3"><i class="icon-video"></i> icon-video</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-audio"></i> icon-audio</span>
-  <span class="span3"><i class="icon-outdent"></i> icon-outdent</span>
-  <span class="span3"><i class="icon-indent"></i> icon-indent</span>
-  <span class="span3"><i class="icon-outdent2"></i> icon-outdent2</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-indent2"></i> icon-indent2</span>
-  <span class="span3"><i class="icon-forward"></i> icon-forward</span>
-  <span class="span3"><i class="icon-warning"></i> icon-warning</span>
-  <span class="span3"><i class="icon-filmstrip"></i> icon-filmstrip</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-rubric"></i> icon-rubric</span>
-  <span class="span3"><i class="icon-rubric-dark"></i> icon-rubric-dark</span>
-  <span class="span3"><i class="icon-check-plus"></i> icon-check-plus</span>
-  <span class="span3"><i class="icon-rss"></i> icon-rss</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-rss-add"></i> icon-rss-add</span>
-  <span class="span3"><i class="icon-quiz"></i> icon-quiz</span>
-  <span class="span3"><i class="icon-question"></i> icon-question</span>
-  <span class="span3"><i class="icon-drop-down"></i> icon-drop-down</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-minimize"></i> icon-minimize</span>
-  <span class="span3"><i class="icon-end"></i> icon-end</span>
-  <span class="span3"><i class="icon-add"></i> icon-add</span>
-  <span class="span3"><i class="icon-info"></i> icon-info</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-check"></i> icon-check</span>
-  <span class="span3"><i class="icon-clock"></i> icon-clock</span>
-  <span class="span3"><i class="icon-calendar-month"></i> icon-calendar-month</span>
-  <span class="span3"><i class="icon-x"></i> icon-x</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-refresh"></i> icon-refresh</span>
-  <span class="span3"><i class="icon-off"></i> icon-off</span>
-  <span class="span3"><i class="icon-updown"></i> icon-updown</span>
-  <span class="span3"><i class="icon-user-add"></i> icon-user-add</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-group"></i> icon-group</span>
-  <span class="span3"><i class="icon-star"></i> icon-star</span>
-  <span class="span3"><i class="icon-star-light"></i> icon-star-light</span>
-  <span class="span3"><i class="icon-replied"></i> icon-replied</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-hour-glass"></i> icon-hour-glass</span>
-  <span class="span3"><i class="icon-assignment"></i> icon-assignment</span>
-  <span class="span3"><i class="icon-message"></i> icon-message</span>
-  <span class="span3"><i class="icon-note-dark"></i> icon-note-dark</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-note-light"></i> icon-note-light</span>
-  <span class="span3"><i class="icon-tag"></i> icon-tag</span>
-  <span class="span3"><i class="icon-next-unread"></i> icon-next-unread</span>
-  <span class="span3"><i class="icon-search"></i> icon-search</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-lock"></i> icon-lock</span>
-  <span class="span3"><i class="icon-unlock"></i> icon-unlock</span>
-  <span class="span3"><i class="icon-folder"></i> icon-folder</span>
-  <span class="span3"><i class="icon-toggle-right"></i> icon-toggle-right</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-toggle-left"></i> icon-toggle-left</span>
-  <span class="span3"><i class="icon-link"></i> icon-link</span>
-  <span class="span3"><i class="icon-lti"></i> icon-lti</span>
-  <span class="span3"><i class="icon-text"></i> icon-text</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-timer"></i> icon-timer</span>
-  <span class="span3"><i class="icon-pin"></i> icon-pin</span>
-  <span class="span3"><i class="icon-like"></i> icon-like</span>
-  <span class="span3"><i class="icon-collection-save"></i> icon-collection-save</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-collection"></i> icon-collection</span>
-  <span class="span3"><i class="icon-group-new"></i> icon-group-new</span>
-  <span class="span3"><i class="icon-group-new-dark"></i> icon-group-new-dark</span>
-  <span class="span3"><i class="icon-user"></i> icon-user</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-standards"></i> icon-standards</span>
-  <span class="span3"><i class="icon-search-address-book"></i> icon-search-address-book</span>
-  <span class="span3"><i class="icon-facebook"></i> icon-facebook</span>
-  <span class="span3"><i class="icon-facebook-boxed"></i> icon-facebook-boxed</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-linkedin"></i> icon-linkedin</span>
-  <span class="span3"><i class="icon-twitter"></i> icon-twitter</span>
-  <span class="span3"><i class="icon-twitter-boxed"></i> icon-twitter-boxed</span>
-  <span class="span3"><i class="icon-github"></i> icon-github</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-skype"></i> icon-skype</span>
-  <span class="span3"><i class="icon-wordpress"></i> icon-wordpress</span>
-  <span class="span3"><i class="icon-pinterest"></i> icon-pinterest</span>
-  <span class="span3"><i class="icon-gradebook"></i> icon-gradebook</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-document"></i> icon-document</span>
-  <span class="span3"><i class="icon-module"></i> icon-module</span>
-  <span class="span3"><i class="icon-mini-arrow-up"></i> icon-mini-arrow-up</span>
-  <span class="span3"><i class="icon-mini-arrow-down"></i> icon-mini-arrow-down</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-mini-arrow-left"></i> icon-mini-arrow-left</span>
-  <span class="span3"><i class="icon-mini-arrow-right"></i> icon-mini-arrow-right</span>
-  <span class="span3"><i class="icon-arrow-up"></i> icon-arrow-up</span>
-  <span class="span3"><i class="icon-arrow-down"></i> icon-arrow-down</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-arrow-left"></i> icon-arrow-left</span>
-  <span class="span3"><i class="icon-arrow-right"></i> icon-arrow-right</span>
-  <span class="span3"><i class="icon-email"></i> icon-email</span>
-  <span class="span3"><i class="icon-instructure"></i> icon-instructure</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-ms-word"></i> icon-ms-word</span>
-  <span class="span3"><i class="icon-ms-excel"></i> icon-ms-excel</span>
-  <span class="span3"><i class="icon-ms-ppt"></i> icon-ms-ppt</span>
-  <span class="span3"><i class="icon-pdf"></i> icon-pdf</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-apple"></i> icon-apple</span>
-  <span class="span3"><i class="icon-windows"></i> icon-windows</span>
-  <span class="span3"><i class="icon-android"></i> icon-android</span>
-  <span class="span3"><i class="icon-heart"></i> icon-heart</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-upload"></i> icon-upload</span>
-  <span class="span3"><i class="icon-download"></i> icon-download</span>
-  <span class="span3"><i class="icon-text-left"></i> icon-text-left</span>
-  <span class="span3"><i class="icon-text-center"></i> icon-text-center</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-text-right"></i> icon-text-right</span>
-  <span class="span3"><i class="icon-mature"></i> icon-mature</span>
-  <span class="span3"><i class="icon-prerequisite"></i> icon-prerequisite</span>
-  <span class="span3"><i class="icon-educators"></i> icon-educators</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-calendar-days"></i> icon-calendar-days</span>
-  <span class="span3"><i class="icon-materials-required"></i> icon-materials-required</span>
-  <span class="span3"><i class="icon-not-graded"></i> icon-not-graded</span>
-  <span class="span3"><i class="icon-peer-graded"></i> icon-peer-graded</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-bookmark"></i> icon-bookmark</span>
-  <span class="span3"><i class="icon-printer"></i> icon-printer</span>
-  <span class="span3"><i class="icon-image"></i> icon-image</span>
-  <span class="span3"><i class="icon-expand"></i> icon-expand</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-collapse"></i> icon-collapse</span>
-  <span class="span3"><i class="icon-invitation"></i> icon-invitation</span>
-  <span class="span3"><i class="icon-muted"></i> icon-muted</span>
-  <span class="span3"><i class="icon-unmuted"></i> icon-unmuted</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-plus"></i> icon-plus</span>
-  <span class="span3"><i class="icon-zipped"></i> icon-zipped</span>
-  <span class="span3"><i class="icon-publish"></i> icon-publish</span>
-  <span class="span3"><i class="icon-unpublish"></i> icon-unpublish</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-unpublished"></i> icon-unpublished</span>
-  <span class="span3"><i class="icon-discussion-check"></i> icon-discussion-check</span>
-  <span class="span3"><i class="icon-discussion-reply-2"></i> icon-discussion-reply-2</span>
-  <span class="span3"><i class="icon-discussion-search"></i> icon-discussion-search</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-discussion-x"></i> icon-discussion-x</span>
-  <span class="span3"><i class="icon-mark-as-read"></i> icon-mark-as-read</span>
-  <span class="span3"><i class="icon-more"></i> icon-more</span>
-  <span class="span3"><i class="icon-syllabus"></i> icon-syllabus</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-settings-2"></i> icon-settings-2</span>
-  <span class="span3"><i class="icon-reply-2"></i> icon-reply-2</span>
-  <span class="span3"><i class="icon-reply-all-2"></i> icon-reply-all-2</span>
-  <span class="span3"><i class="icon-drag-handle"></i> icon-drag-handle</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-remove-from-collection"></i> icon-remove-from-collection</span>
-  <span class="span3"><i class="icon-arrow-open-right"></i> icon-arrow-open-right</span>
-  <span class="span3"><i class="icon-arrow-open-left"></i> icon-arrow-open-left</span>
-  <span class="span3"><i class="icon-hamburger"></i> icon-hamburger</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-expand-items"></i> icon-expand-items</span>
-  <span class="span3"><i class="icon-forward"></i> icon-forward</span>
-  <span class="span3"><i class="icon-target"></i> icon-target</span>
-  <span class="span3"><i class="icon-quiz-stats-avg"></i> icon-quiz-stats-avg</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-quiz-stats-low"></i> icon-quiz-stats-low</span>
-  <span class="span3"><i class="icon-quiz-stats-high"></i> icon-quiz-stats-high</span>
-  <span class="span3"><i class="icon-quiz-stats-deviation"></i> icon-quiz-stats-deviation</span>
-  <span class="span3"><i class="icon-quiz-stats-time"></i> icon-quiz-stats-time</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-cloud-lock"></i> icon-cloud-lock</span>
-  <span class="span3"><i class="icon-eye"></i> icon-eye</span>
-  <span class="span3"><i class="icon-files-copyright"></i> icon-files-copyright</span>
-  <span class="span3"><i class="icon-files-creative-commons"></i> icon-files-creative-commons</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-files-fair-use"></i> icon-files-fair-use</span>
-  <span class="span3"><i class="icon-files-obtained-permission"></i>icon-files-obtained-permission</span>
-  <span class="span3"><i class="icon-files-public-domain"></i> icon-files-public-domain</span>
-  <span class="span3"><i class="icon-folder-locked"></i> icon-folder-locked</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-import"></i> icon-import</span>
-  <span class="span3"><i class="icon-export"></i> icon-export</span>
-  <span class="span3"><i class="icon-equella"></i> icon-equella</span>
-  <span class="span3"><i class="icon-equation"></i> icon-equation</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-commons"></i> icon-commons</span>
-  <span class="span3"><i class="icon-post-to-sis"></i> icon-post-to-sis</span>
-  <span class="span3"><i class="icon-masquerade"></i> icon-masquerade</span>
-  <span class="span3"><i class="icon-table"></i> icon-table</span>
-</div>
-<div class="row-fluid">
-  <span class="span3"><i class="icon-keyboard-shortcuts"></i> icon-keyboard-shortcuts</span>
-  <span class="span3"><i class="icon-mastery-path"></i> icon-mastery-path</span>
-</div>
 */
 
+@import "../../../node_modules/instructure-icons/fonts/Line/InstructureIcons-Line_icon-map.scss";
+@import "../../../node_modules/instructure-icons/fonts/Solid/InstructureIcons-Solid_icon-map.scss";
 
-@font-face {
-  font-family: "canvas-icons";
-  src:  url('/fonts/canvas/canvas-icons.eot');
-  src:  url('/fonts/canvas/canvas-icons.eot?#iefix') format('embedded-opentype'),
-        url('/fonts/canvas/canvas-icons.woff') format('woff'),
-        url('/fonts/canvas/canvas-icons.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+$icon_default: "Solid";
+
+// this could be refactored if/when sass allows for variable interpolation
+$icon_index: (
+  "Line": $icons-Line,
+  "Solid": $icons-Solid
+);
+
+@mixin InstIconFontFace($variant) {
+  @font-face {
+    font-family: "InstructureIcons-#{$variant}";
+    src: url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.eot');
+    src: url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.eot?#iefix') format('eot'),
+      url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.woff') format('woff'),
+      url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.ttf') format('truetype'),
+      url('/fonts/instructure_icons/#{$variant}/InstructureIcons-#{$variant}.svg#InstructureIcons-#{$variant}') format('svg');
+    font-weight: normal;
+    font-style: normal;
+  }
 }
 
+@each $variant, $icon_map in $icon_index {
+  @include InstIconFontFace($variant);
 
-i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-]{
+  i[class*=icon-].icon-#{$variant},
+  i[class^=icon-].icon-#{$variant},
+  a[class*=icon-].icon-#{$variant},
+  a[class^=icon-].icon-#{$variant} {
+    &:before {
+      font-family: "InstructureIcons-#{$variant}";
+    }
+  }
+}
 
+i[class*=icon-],
+i[class^=icon-],
+a[class*=icon-],
+a[class^=icon-] {
+  font-size: 16px;
   &:before {
-    font-family: "canvas-icons";
+    font-family: "InstructureIcons-#{$icon_default}";
     display: inline-block;
     vertical-align: middle;
     line-height: 1;
@@ -342,7 +111,7 @@ i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-]{
 
     // the specific reason for this being in the :before and not part of the <i> was to get
     // .input-appends to work with .btns that had an <i> icon in them.
-    font-size: 16px;
+    font-size: 1rem;
 
     // override any properties in the cascade that might make the font display incorrectly
     text-transform: none !important;
@@ -355,21 +124,27 @@ i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-]{
 i[class*=icon-], i[class^=icon-] {
   display: inline-block;
   font-style: normal !important;
-  width: 16px; height: 16px; line-height: 16px;
+  width: 1rem;
+  height: 1rem;
+  line-height: 1;
 
   // adjust icon sizes to look good with our large-size button class
   .btn-large &,
   .Button--large & {
-    width: 18px; height: 18px; line-height: 18px;
-    &:before{ font-size: 18px }
+    width: 1.125rem;
+    height: 1.125rem;
+    line-height: 1;
+    &:before{ font-size: 1.125rem; }
   }
 
   // most icons do not look good this small, so use sparingly.
   // this should only be used for things like: icon-settings and icon-mini-arrow-down
   .btn-mini &,
   .Button--mini {
-    width: 12px; height: 12px; line-height: 12px;
-    &:before{ font-size: 12px }
+    width: 0.75rem;
+    height: 0.75rem;
+    line-height: 1;
+    &:before{ font-size: 0.75rem; }
   }
 
 }
@@ -400,199 +175,20 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 
 }
 
-.icon-add:before { content: "\f100"; }
-.icon-address-book:before { content: "\f101"; }
-.icon-analytics:before { content: "\f102"; }
-.icon-android:before { content: "\f103"; }
-.icon-announcement:before { content: "\f104"; }
-.icon-apple:before { content: "\f105"; }
-.icon-arrow-down:before { content: "\f106"; }
-.icon-arrow-left:before { content: "\f107"; }
-.icon-arrow-open-left:before { content: "\f108"; }
-.icon-arrow-open-right:before { content: "\f109"; }
-.icon-arrow-right:before { content: "\f10a"; }
-.icon-arrow-up:before { content: "\f10b"; }
-.icon-assignment:before { content: "\f10c"; }
-.icon-audio:before { content: "\f10d"; }
-.icon-bookmark:before { content: "\f10e"; }
-.icon-calendar-day:before { content: "\f10f"; }
-.icon-calendar-days:before { content: "\f110"; }
-.icon-calendar-month:before { content: "\f111"; }
-.icon-check:before { content: "\f112"; }
-.icon-check-dark:before { content: "\f113"; }
-.icon-check-mark:before { content: "\f114"; }
-.icon-check-plus:before { content: "\f115"; }
-.icon-clock:before { content: "\f116"; }
-.icon-cloud-lock:before { content: "\f117"; }
-.icon-collapse:before { content: "\f118"; }
-.icon-collection:before { content: "\f119"; }
-.icon-collection-save:before { content: "\f11a"; }
-.icon-commons:before { content: "\f1b7"; }
-.icon-complete:before { content: "\f11b"; }
-.icon-compose:before { content: "\f11c"; }
-.icon-copy-course:before { content: "\f11d"; }
-.icon-discussion:before { content: "\f11e"; }
-.icon-discussion-check:before { content: "\f11f"; }
-.icon-discussion-new:before { content: "\f120"; }
-.icon-discussion-reply:before { content: "\f121"; }
-.icon-discussion-reply-2:before { content: "\f122"; }
-.icon-discussion-reply-dark:before { content: "\f123"; }
-.icon-discussion-search:before { content: "\f124"; }
-.icon-discussion-x:before { content: "\f125"; }
-.icon-document:before { content: "\f126"; }
-.icon-download:before { content: "\f127"; }
-.icon-drag-handle:before { content: "\f128"; }
-.icon-drop-down:before { content: "\f129"; }
-.icon-edit:before { content: "\f12a"; }
-.icon-educators:before { content: "\f12b"; }
-.icon-email:before { content: "\f12c"; }
-.icon-empty:before { content: "\f12d"; }
-.icon-end:before { content: "\f12e"; }
-.icon-equation:before { content: "\f1b5"; }
-.icon-equella:before { content: "\f1b6"; }
-.icon-expand:before { content: "\f12f"; }
-.icon-expand-items:before { content: "\f130"; }
-.icon-export:before { content: "\f1b3"; }
-.icon-export-content:before { content: "\f131"; }
-.icon-eye:before { content: "\f132"; }
-.icon-facebook:before { content: "\f133"; }
-.icon-facebook-boxed:before { content: "\f134"; }
-.icon-files-copyright:before { content: "\f135"; }
-.icon-files-creative-commons:before { content: "\f136"; }
-.icon-files-fair-use:before { content: "\f137"; }
-.icon-files-obtained-permission:before { content: "\f138"; }
-.icon-files-public-domain:before { content: "\f139"; }
-.icon-filmstrip:before { content: "\f13a"; }
-.icon-flag:before { content: "\f13b"; }
-.icon-folder:before { content: "\f13c"; }
-.icon-folder-locked:before { content: "\f1bc"; }
-.icon-forward:before { content: "\f13d"; }
-.icon-github:before { content: "\f13e"; }
-.icon-gradebook:before { content: "\f13f"; }
-.icon-gradebook-export:before { content: "\f140"; }
-.icon-gradebook-import:before { content: "\f141"; }
-.icon-group:before { content: "\f142"; }
-.icon-group-new:before { content: "\f143"; }
-.icon-group-new-dark:before { content: "\f144"; }
-.icon-hamburger:before { content: "\f145"; }
-.icon-heart:before { content: "\f146"; }
-.icon-home:before { content: "\f147"; }
-.icon-hour-glass:before { content: "\f148"; }
-.icon-image:before { content: "\f149"; }
-.icon-import:before { content: "\f1b4"; }
-.icon-import-content:before { content: "\f14a"; }
-.icon-indent:before { content: "\f14b"; }
-.icon-indent2:before { content: "\f14c"; }
-.icon-info:before { content: "\f14d"; }
-.icon-instructure:before { content: "\f14e"; }
-.icon-invitation:before { content: "\f14f"; }
-.icon-keyboard-shortcuts:before { content: "\f1bd"; }
-.icon-like:before { content: "\f150"; }
-.icon-link:before { content: "\f151"; }
-.icon-linkedin:before { content: "\f152"; }
-.icon-lock:before { content: "\f153"; }
-.icon-lti:before { content: "\f154"; }
-.icon-mark-as-read:before { content: "\f155"; }
-.icon-masquerade:before { content: "\f1b9"; }
-.icon-mastery-path:before { content: "\f1be"; }
-.icon-materials-required:before { content: "\f156"; }
-.icon-materials-required-light:before { content: "\f157"; }
-.icon-mature:before { content: "\f158"; }
-.icon-mature-light:before { content: "\f159"; }
-.icon-media:before { content: "\f15a"; }
-.icon-message:before { content: "\f15b"; }
-.icon-mini-arrow-down:before { content: "\f15c"; }
-.icon-mini-arrow-left:before { content: "\f15d"; }
-.icon-mini-arrow-right:before { content: "\f15e"; }
-.icon-mini-arrow-up:before { content: "\f15f"; }
-.icon-minimize:before { content: "\f160"; }
-.icon-module:before { content: "\f161"; }
-.icon-more:before { content: "\f162"; }
-.icon-ms-excel:before { content: "\f163"; }
-.icon-ms-ppt:before { content: "\f164"; }
-.icon-ms-word:before { content: "\f165"; }
-.icon-muted:before { content: "\f166"; }
-.icon-next-unread:before { content: "\f167"; }
-.icon-not-graded:before { content: "\f168"; }
-.icon-note-dark:before { content: "\f169"; }
-.icon-note-light:before { content: "\f16a"; }
-.icon-off:before { content: "\f16b"; }
-.icon-outdent:before { content: "\f16c"; }
-.icon-outdent2:before { content: "\f16d"; }
-.icon-paperclip:before { content: "\f16e"; }
-.icon-partial:before { content: "\f16f"; }
-.icon-pdf:before { content: "\f170"; }
-.icon-peer-graded:before { content: "\f171"; }
-.icon-peer-review:before { content: "\f172"; }
-.icon-pin:before { content: "\f173"; }
-.icon-pinterest:before { content: "\f174"; }
-.icon-plus:before { content: "\f175"; }
-.icon-post-to-sis:before { content: "\f1b8"; }
-.icon-prerequisite:before { content: "\f176"; }
-.icon-printer:before { content: "\f177"; }
-.icon-publish:before { content: "\f178"; }
-.icon-question:before { content: "\f179"; }
-.icon-quiz:before { content: "\f17a"; }
-.icon-quiz-stats-avg:before { content: "\f17b"; }
-.icon-quiz-stats-deviation:before { content: "\f17c"; }
-.icon-quiz-stats-high:before { content: "\f17d"; }
-.icon-quiz-stats-low:before { content: "\f17e"; }
-.icon-quiz-stats-time:before { content: "\f17f"; }
-.icon-refresh:before { content: "\f180"; }
-.icon-remove-from-collection:before { content: "\f181"; }
-.icon-replied:before { content: "\f182"; }
-.icon-reply-2:before { content: "\f183"; }
-.icon-reply-all-2:before { content: "\f184"; }
-.icon-reset:before { content: "\f185"; }
-.icon-rss:before { content: "\f186"; }
-.icon-rss-add:before { content: "\f187"; }
-.icon-rubric:before { content: "\f188"; }
-.icon-rubric-dark:before { content: "\f189"; }
-.icon-search:before { content: "\f18a"; }
-.icon-search-address-book:before { content: "\f18b"; }
-.icon-settings:before { content: "\f18c"; }
-.icon-settings-2:before { content: "\f18d"; }
-.icon-skype:before { content: "\f18e"; }
-.icon-speed-grader:before { content: "\f18f"; }
-.icon-standards:before { content: "\f190"; }
-.icon-star:before { content: "\f191"; }
-.icon-star-light:before { content: "\f1bb"; }
-.icon-stats:before { content: "\f192"; }
-.icon-student-view:before { content: "\f193"; }
-.icon-syllabus:before { content: "\f194"; }
-.icon-table:before { content: "\f1ba"; }
-.icon-tag:before { content: "\f195"; }
-.icon-target:before { content: "\f196"; }
-.icon-text:before { content: "\f197"; }
-.icon-text-center:before { content: "\f198"; }
-.icon-text-left:before { content: "\f199"; }
-.icon-text-right:before { content: "\f19a"; }
-.icon-timer:before { content: "\f19b"; }
-.icon-toggle-left:before { content: "\f19c"; }
-.icon-toggle-right:before { content: "\f19d"; }
-.icon-trash:before { content: "\f1a0"; }
-.icon-trouble:before { content: "\f1a1"; }
-.icon-twitter:before { content: "\f1a2"; }
-.icon-twitter-boxed:before { content: "\f1a3"; }
-.icon-unknown2:before { content: "\f1a4"; }
-.icon-unlock:before { content: "\f1a5"; }
-.icon-unmuted:before { content: "\f1a6"; }
-.icon-unpublish:before { content: "\f1a7"; }
-.icon-unpublished:before { content: "\f1a8"; }
-.icon-updown:before { content: "\f1a9"; }
-.icon-upload:before { content: "\f1aa"; }
-.icon-user:before { content: "\f1ab"; }
-.icon-user-add:before { content: "\f1ac"; }
-.icon-video:before { content: "\f1ad"; }
-.icon-warning:before { content: "\f1ae"; }
-.icon-windows:before { content: "\f1af"; }
-.icon-wordpress:before { content: "\f1b0"; }
-.icon-x:before { content: "\f1b1"; }
-.icon-zipped:before { content: "\f1b2"; }
+@each $variant, $icon_map in $icon_index {
 
-// conversations_new uses bootstrap-select to show a dropdown picker of which
-// course to show messages for, bootstrap-select adds the markup <i class="icon-ok...>
-// to designate which item in the menu is selected. we want that to use our .icon-check
-// icon, but since we don't control the markup it adds, we can't tell it to use .icon-check
-// instead, we just have .icon-ok copy .icon-check's styles here
-.icon-ok {@extend .icon-check}
+  @if ($variant == $icon_default) {
+    @each $icon_name, $unicode in $icon_map {
+      .icon-#{$icon_name}:before {
+        content: $unicode;
+      }
+    }
+  }
+  @else {
+    @each $icon_name, $unicode in $icon_map {
+      .icon-#{$icon_name}.icon-#{$variant}:before {
+        content: $unicode;
+      }
+    }
+  }
+}

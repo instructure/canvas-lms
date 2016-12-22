@@ -311,7 +311,7 @@ END
       {
           display_name: -> { I18n.t('Enable new SIS integration settings') },
           description:  -> { I18n.t('Make new settings for SIS integrations visible and active') },
-          applies_to: 'RootAccount',
+          applies_to: 'Account',
           state: 'hidden',
           root_opt_in: true,
           beta: true
@@ -494,16 +494,14 @@ END
       beta: true,
       development: true,
     },
-    'offline_web_export' =>
+     'student_context_cards' =>
     {
-      display_name: -> { I18n.t('Offline Web Export') },
-      description: -> { I18n.t(<<END) },
-      This enables a course setting to allow students to export the course as an offline web zip folder
-END
-      applies_to: 'Account',
-      state: 'hidden',
+      display_name: -> { I18n.t('Student Context Card') },
+      description: -> { I18n.t('Enable student context card links') },
+      applies_to: "RootAccount",
+      state: "hidden_in_prod",
       beta: true,
-      development: true
+      development: true,
     }
   )
 

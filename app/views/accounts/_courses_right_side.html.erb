@@ -5,7 +5,7 @@
     <div class="rs-margin-bottom">
       <form method="get">
         <% if term_count > 1 %>
-          <label for="enrollment_term"><%= before_label(t(:enrollment_term_label, "Show courses from the term")) %></label><br />
+          <label for="enrollment_term_id"><%= before_label(t(:enrollment_term_label, "Show courses from the term")) %></label><br />
           <%= render :partial => 'shared/enrollment_term_select', :locals => { :terms => @root_account.enrollment_terms.active, :selected_id => @term && @term.id } %>
           <br />
         <% end %>
@@ -21,7 +21,7 @@
         <label for="courses_sort_order"><%= t("Sort:") %></label>
         <select name="courses_sort_order" aria-labelledby="course-sort-description">
           <% @courses_sort_orders.each do |order| %>
-            <option value="<%= order[:key] %>" <%= "selected" if params[:courses_sort_order] == order[:key] %>>
+            <option value="<%= order[:key] %>" <%= "selected" if @current_user.preferences[:course_sort] == order[:key] %>>
               <%= order[:label].call %>
             </option>
           <% end %>

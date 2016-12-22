@@ -77,11 +77,11 @@ describe "profile" do
     expect(errorboxes.any? { |errorbox| errorbox.text =~ /Can't exceed 255 characters/ }).to be_truthy
   end
 
-  it "rejects passwords shorter than 6 characters", priority: "2", test_id: 1055503 do
+  it "rejects passwords shorter than 8 characters", priority: "2", test_id: 1055503 do
     log_in_to_settings
     change_password('asdfasdf', SecureRandom.hex(2))
     errorboxes = ff('.error_text')
-    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Must be at least 6 characters/ }).to be_truthy
+    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Must be at least 8 characters/ }).to be_truthy
   end
 
   context "non password tests" do
@@ -233,12 +233,12 @@ describe "profile" do
     it "should generate a new access token with an expiration", priority: "2", test_id: 588919 do
       Timecop.freeze do
         get "/profile/settings"
-        generate_access_token_with_expiration(2.days.from_now.strftime("%m/%d/%Y"))
+        generate_access_token_with_expiration(format_date_for_view(2.days.from_now, :medium))
         close_visible_dialog
         # some jquery replaces the 'never' with the expiration which makes it hard to select until refresh
         driver.navigate.refresh
-        expect(f('.access_token .expires')).to include_text(2.days.from_now.strftime("%b %d at 12am"))
       end
+      expect(f('.access_token .expires')).to include_text(format_time_for_view(2.days.from_now.midnight))
     end
 
     it "should regenerate a new access token", priority: "2", test_id: 588920 do

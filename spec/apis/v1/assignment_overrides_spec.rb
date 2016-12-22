@@ -786,8 +786,8 @@ describe AssignmentOverridesController, type: :request do
 
         student1 = @student
         student2 = student_in_course(:course => @course).user
-        other_assignment.grade_student(student1, grade: 10)
-        other_assignment.grade_student(student2, grade: 10)
+        other_assignment.grade_student(student1, grade: 10, grader: @teacher)
+        other_assignment.grade_student(student2, grade: 10, grader: @teacher)
 
         e1 = student1.enrollments.first
         e2 = student2.enrollments.first

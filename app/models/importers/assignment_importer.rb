@@ -132,11 +132,18 @@ module Importers
 
       if hash[:assignment_overrides]
         hash[:assignment_overrides].each do |o|
-          override = item.assignment_overrides.build
+          override = item.assignment_overrides.where(o.slice(:set_type, :set_id)).first
+          override ||= item.assignment_overrides.build
           override.set_type = o[:set_type]
           override.title = o[:title]
           override.set_id = o[:set_id]
+          AssignmentOverride.overridden_dates.each do |field|
+            next unless o.key?(field)
+            override.send "override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
+          end
           override.save!
+          migration.add_imported_item(override,
+            key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
       end
 

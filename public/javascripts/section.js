@@ -13,7 +13,8 @@ define([
   'jqueryui/autocomplete' /* /\.autocomplete/ */,
   'compiled/PaginatedList',
   'jst/courses/section/enrollment',
-  'compiled/presenters/sectionEnrollmentPresenter'
+  'compiled/presenters/sectionEnrollmentPresenter',
+  'jsx/context_cards/StudentContextCardTrigger'
 ], function(I18n, $, _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, PaginatedList, enrollmentTemplate, sectionEnrollmentPresenter) {
 
   $(document).ready(function() {

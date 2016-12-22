@@ -27,6 +27,11 @@
     fieldset {
       margin: 2em 0;
     }
+    fieldset.nested {
+      margin-top: 0;
+      margin-left: 20px
+    }
+
     legend{
       font-size: 1.1em;
     }
@@ -190,7 +195,7 @@ TEXT
                   <% disabled = hash[:locked] && hash[:inherited] %>
                   <tr>
                     <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                      <%= r.label :restrict_student_future_view, :en => "Restrict students from accessing courses before start date" %>
+                      <%= r.label :value , t("Restrict students from accessing courses before start date") %>
                     </td>
                   </tr>
                   <% unless disabled %>
@@ -226,7 +231,25 @@ TEXT
                   <% disabled = hash[:locked] && hash[:inherited] %>
                   <tr>
                     <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                      <%= r.label :restrict_student_past_view, :en => "Restrict students from accessing courses after end date" %>
+                      <%= r.label :value, t("Restrict students from accessing courses after end date") %>
+                    </td>
+                  </tr>
+                  <% unless disabled %>
+                    <tr>
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+
+                <%= settings.fields_for :lock_all_announcements do |r| %>
+                  <% hash = @account.lock_all_announcements %>
+                  <% disabled = hash[:locked] && hash[:inherited] %>
+                  <tr>
+                    <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                      <%= r.label :lock_all_announcements, :en => "Disable comments on announcements" %>
                     </td>
                   </tr>
                   <% unless disabled %>
@@ -278,10 +301,8 @@ TEXT
               <tbody id="ip_filters">
                 <% ((@account.settings[:ip_filters] || {}).sort_by(&:first) << [nil, nil]).each do |name, filter| %>
                   <tr class="ip_filter <%= raw ' blank" style="display: none;' if name.nil? %>">
-                    <td><%= before_label(t(:ip_filter_name_label, "Name")) %></td>
-                    <td><input type="text" class="name" value="<%= name %>"/></td>
-                    <td><%= before_label(t(:ip_filter_filter_label, "Filter")) %></td>
-                    <td><input type="text" class="value" value="<%= filter %>" maxlength="255"/></td>
+                    <td> <label> <%= t("Name:") %></label> <input aria-label="<%= t("Name") %>" type="text" class="name" value="<%= name %>"/></td>
+                    <td> <label> <%= t("Filter:") %></label> <input aria-label="<%= t("Filter") %>" type="text" class="value" value="<%= filter %>" maxlength="255"/></td>
                     <td>
                       <a href="#" title="<%= t(:quiz_ip_filters_delete, "Remove Filter") %>" class="delete_filter_link"><i class="icon-end standalone-icon"></i></a>
                     </td>
@@ -603,7 +624,7 @@ acknowledge that you have read and agreed to the
               </tr>
               <tr>
                 <td><%= t 'notifications.email_date', 'Date' %></td>
-                <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
+                <td><%= datetime_string(Time.zone.now) %></td>
               </tr>
               <tr>
                 <td><%= t 'notifications.email_to', 'To' %></td>
@@ -643,7 +664,7 @@ acknowledge that you have read and agreed to the
               </tr>
               <tr>
                 <td><%= t 'notifications.email_date', 'Date' %></td>
-                <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
+                <td><%= datetime_string(Time.zone.now) %></td>
               </tr>
               <tr>
                 <td><%= t 'notifications.email_to', 'To' %></td>
@@ -1029,7 +1050,7 @@ acknowledge that you have read and agreed to the
                   (<%= extra_text %>)
                 <% end %>
                 <% if last_complete.workflow_state == 'complete' %>
-                  <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id) %>
+                  <%= link_to "<i class='icon-download'></i>".html_safe, context_url(last_complete.account, :context_file_download_url, last_complete.attachment.id), 'aria-label' => t('Download Report'), 'title' => t('Download Report') %>
                 <% end %>
               <% else %>
                 <%= t 'report_last_run_never', 'Never' %>

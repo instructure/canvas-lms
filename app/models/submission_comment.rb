@@ -47,9 +47,7 @@ class SubmissionComment < ActiveRecord::Base
 
   scope :visible, -> { where(:hidden => false) }
   scope :draft, -> { where(draft: true) }
-  scope :published, -> {
-    where(SubmissionComment.arel_table[:draft].eq(nil).or(SubmissionComment.arel_table[:draft].eq(false)))
-  }
+  scope :published, -> { where("submission_comments.draft IS NOT TRUE") }
   scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
   scope :for_final_grade, -> { where(:provisional_grade_id => nil) }
   scope :for_provisional_grade, ->(id) { where(:provisional_grade_id => id) }

@@ -810,8 +810,11 @@ describe FilesController do
       end
 
       before :once do
-        user_session(@student)
         submit_file
+      end
+
+      before :each do
+        user_session(@student)
       end
 
       it "should not delete" do

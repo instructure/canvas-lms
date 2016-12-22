@@ -8,7 +8,7 @@ describe "gradebook2" do
     before :each do
       init_course_with_students 1
       @assignment = @course.assignments.create!(grading_type: 'pass_fail', points_possible: 0)
-      @assignment.grade_student(@students[0], grade: 'pass')
+      @assignment.grade_student(@students[0], grade: 'pass', grader: @teacher)
     end
 
     it 'should allow pass grade on assignments worth 0 points', priority: "1", test_id: 330310 do

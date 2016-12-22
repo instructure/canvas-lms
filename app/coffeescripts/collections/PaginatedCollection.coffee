@@ -129,4 +129,3 @@ define [
         links[key] = val
         links
       , {}
-

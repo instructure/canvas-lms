@@ -1,3 +1,5 @@
+@import "components/ic-badge";
+
 .EditPage {
   .EditPage__Header {
     border-bottom: 1px solid $ic-border-light;
@@ -43,8 +45,32 @@
   margin-left: 30px;
 }
 
-.AppointmentGroupList__unreserved {
-  opacity: 0.5;
+.AppointmentGroupList__Appointment-timeLabel {
+  display: inline-block;
+  width: 130px;
+}
+
+.AppointmentGroupList__Badge--unreserved {
+  @include ic-badge-maker(20px, $ic-color-medium-light, $ic-color-dark);
+  border: 1px solid $ic-border-light;
+}
+
+.AppointmentGroupList__Badge--reserved {
+  @include ic-badge-maker(20px, $ic-color-success, $ic-color-light);
+  border: 1px solid $ic-border-light;
+}
+
+.AppointmentGroupList__Icon--reserved {
+  color: $ic-color-success;
+}
+
+.AppointmentGroupList__Icon--unreserved {
+  color: $ic-color-medium;
+}
+
+.AppointmentGroupList__Badge {
+  min-width: 70px;
+  margin-right: 10px;
 }
 
 .ContextSelector__Dropdown {

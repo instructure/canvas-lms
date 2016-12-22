@@ -1,5 +1,15 @@
-define(['compiled/gradebook2/Gradebook', "underscore"], (Gradebook, _) => {
-  module("addRow");
+define(['compiled/gradebook2/Gradebook',
+  "underscore",
+  "helpers/fakeENV",
+], (Gradebook, _, fakeENV) => {
+  module("addRow", {
+    setup: function() {
+      fakeENV.setup({
+        GRADEBOOK_OPTIONS: { context_id: 1 },
+      });
+    },
+    teardown: () => fakeENV.teardown(),
+  });
 
   test("doesn't add filtered out users", () => {
     const gb = {

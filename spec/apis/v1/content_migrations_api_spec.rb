@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe ContentMigrationsController, type: :request do
   before :once do
-    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @migration_url = "/api/v1/courses/#{@course.id}/content_migrations"
     @params = { :controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param}
 
@@ -31,6 +31,10 @@ describe ContentMigrationsController, type: :request do
     @migration.started_at = 1.week.ago
     @migration.finished_at = 1.day.ago
     @migration.save!
+  end
+
+  before :each do
+    user_session @teacher
   end
 
   describe 'index' do

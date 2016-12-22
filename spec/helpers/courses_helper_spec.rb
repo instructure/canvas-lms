@@ -101,7 +101,7 @@ describe CoursesHelper do
       it "should return a no new submissions tooltip if some assignments have been submitted and graded" do
         expects(:t).with('#courses.recent_event.no_new_submissions', 'no new submissions').returns('no new submissions')
         @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry", :body => "xyz" })
-        @assignment.grade_student(@student_one, :grade => 5)
+        @assignment.grade_student(@student_one, grade: 5, grader: @teacher)
         check_icon_data("no new submissions", "Assignment", "icon-assignment")
       end
 
@@ -109,7 +109,7 @@ describe CoursesHelper do
         expects(:t).with('#courses.recent_event.all_graded', 'all graded').returns('all graded')
         [@student_one, @student_two].each do |student|
           @assignment.submit_homework(student, { :submission_type => "online_text_entry", :body => "bod" })
-          @assignment.grade_student(student, :grade => 5)
+          @assignment.grade_student(student, grade: 5, grader: @teacher)
         end
         check_icon_data("all graded", "Assignment", "icon-assignment")
       end

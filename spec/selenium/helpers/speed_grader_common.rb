@@ -45,11 +45,6 @@ module SpeedGraderCommon
     @assignment.submit_homework(student, :submission_type => :online_upload, :attachments => [attachment])
   end
 
-  def submit_and_grade_homework(student, grade)
-    @assignment.submit_homework(student)
-    @assignment.grade_student(student, :grade => grade)
-  end
-
   # Creates a dummy rubric and scores its criteria as specified in the parameters (passed as strings)
   def setup_and_grade_rubric(score1, score2)
     student_submission
@@ -68,8 +63,8 @@ module SpeedGraderCommon
   end
 
   def clear_grade_and_validate
-    @assignment.grade_student @students[0], {grade: ''}
-    @assignment.grade_student @students[1], {grade: ''}
+    @assignment.grade_student @students[0], grade: '', grader: @teacher
+    @assignment.grade_student @students[1], grade: '', grader: @teacher
 
     refresh_page
     expect(f('#grading-box-extended')).to have_value ''

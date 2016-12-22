@@ -324,6 +324,15 @@ module Lti
           expect(params['custom_default']).to eq 'Canvas.api.baseUrl'
         end
 
+        it 'adds params from secure_params' do
+          lti_assignment_id = SecureRandom.uuid
+          jwt = Canvas::Security.create_jwt({lti_assignment_id: lti_assignment_id})
+          get 'basic_lti_launch_request', account_id: account.id,
+            message_handler_id: message_handler.id, secure_params: jwt
+          params = assigns[:lti_launch].params.with_indifferent_access
+          expect(params['ext_lti_assignment_id']).to eq lti_assignment_id
+        end
+
       end
 
       describe "resource link" do

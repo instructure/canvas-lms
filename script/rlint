@@ -48,7 +48,7 @@ dr_diff = DrDiff::Manager.new(git_dir: git_dir, sha: env_sha)
 ruby_files = dr_diff.files(/\.rb$/)
 
 if ruby_files.size == 0
-  puts "No ruby file changes found!"
+  puts "No ruby file changes found, skipping Rubocop check!"
   exit 0
 end
 

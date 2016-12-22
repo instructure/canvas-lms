@@ -810,9 +810,11 @@ describe EnrollmentsApiController, type: :request do
               last      = @course.assignments.create! due_at: 1.month.from_now
               no_due_at = @course.assignments.create!
 
-              first.grade_student @user, grade: 7
-              last.grade_student @user, grade: 10
-              no_due_at.grade_student @user, grade: 1
+              Timecop.freeze(@first_grading_period.end_date - 1.day) do
+                first.grade_student @user, grade: 7, grader: @teacher
+              end
+              last.grade_student @user, grade: 10, grader: @teacher
+              no_due_at.grade_student @user, grade: 1, grader: @teacher
             end
 
             describe "provides a grade summary" do
@@ -850,8 +852,10 @@ describe EnrollmentsApiController, type: :request do
         end
 
         it "returns grades for the requested grading period for courses" do
-          @assignment_in_first_period.grade_student(@student, grade: 10)
-          @assignment_in_last_period.grade_student(@student, grade: 0)
+          Timecop.freeze(@first_grading_period.end_date - 1.day) do
+            @assignment_in_first_period.grade_student(@student, grade: 10, grader: @teacher)
+          end
+          @assignment_in_last_period.grade_student(@student, grade: 0, grader: @teacher)
 
           student_grade = lambda do |json|
             student_json = json.find { |e|

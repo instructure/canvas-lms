@@ -1,6 +1,8 @@
+# to use this add docker-compose/selenium.override.yml
+# to your COMPOSE_FILE var in .env
+
 version: '2'
 services:
-
   selenium-firefox:
     build: ./docker-compose/selenium-firefox
     ports:

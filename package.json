@@ -9,7 +9,8 @@
   "dependencies": {
     "brandable_css": "0.0.67",
     "fullcalendar": "https://github.com/ryankshaw/fullcalendar.git#aa686b36d10cee1e1e3ec7c7784145e46667d47d",
-    "instructure-ui": "0.17.3",
+    "instructure-ui": "0.18.2",
+    "instructure-icons": "~0.0.14",
     "tinymce": "4.1.9"
   },
   "devDependencies": "the first group is all the things our build tooling needs",
@@ -58,6 +59,7 @@
     "karma-requirejs": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
+    "moxios": "^0.3.0",
     "on-build-webpack": "^0.1.0",
     "phantomjs-prebuilt": "^2.1.4",
     "qunitjs": "^1.14.0",
@@ -109,6 +111,7 @@
   "repository": "instructure/canvas-lms",
   "scripts": {
     "test": "./node_modules/karma/bin/karma start --browsers Chrome --single-run",
+    "test-watch": "./node_modules/karma/bin/karma start --browsers Chrome",
     "compress": "node script/compress.js",
     "preinstall": "script/gem_npm install",
     "preupdate": "script/gem_npm update",
@@ -118,6 +121,8 @@
     "webpack-test": "NODE_ENV=test webpack --progress --color --config webpack.test.config.js",
     "webpack-test-ember": "NODE_ENV=test WEBPACK_TEST_BUNDLE=ember webpack --progress --color --config webpack.test.config.js",
     "webpack-test-watch": "NODE_ENV=test webpack --progress --color --watch --config webpack.test.config.js",
-    "webpack-production": "NODE_ENV=production webpack --progress --color --config webpack.production.config.js"
+    "webpack-production": "NODE_ENV=production webpack --progress --color --config webpack.production.config.js",
+    "jspec": "./spec/jspec.sh",
+    "jspec-watch": "./spec/jspec.sh --watch"
   }
 }

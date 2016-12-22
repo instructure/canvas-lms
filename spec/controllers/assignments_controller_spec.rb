@@ -54,6 +54,13 @@ describe AssignmentsController do
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
+    it "should set WEIGHT_FINAL_GRADES in js_env" do
+      user_session @teacher
+      get 'index', course_id: @course.id
+
+      expect(assigns[:js_env][:WEIGHT_FINAL_GRADES]).to eq(@course.apply_group_weights?)
+    end
+
     context "draft state" do
       it "should create a default group if none exist" do
         user_session(@student)
@@ -384,13 +391,54 @@ describe AssignmentsController do
     it "bootstraps the correct assignment info to js_env" do
       user_session(@teacher)
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
-      @assignment.tool_settings_tools = [tool]
+      @assignment.tool_settings_tool = tool
 
       get 'edit', :course_id => @course.id, :id => @assignment.id
       expect(assigns[:js_env][:ASSIGNMENT]['id']).to eq @assignment.id
       expect(assigns[:js_env][:ASSIGNMENT_OVERRIDES]).to eq []
       expect(assigns[:js_env][:COURSE_ID]).to eq @course.id
       expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_ID]).to eq tool.id
+      expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_TYPE]).to eq tool.class.to_s
+    end
+
+    it "bootstraps the correct message_handler id for LTI 2 tools to js_env" do
+      user_session(@teacher)
+      account = @course.account
+      product_family = Lti::ProductFamily.create(
+        vendor_code: '123',
+        product_code: 'abc',
+        vendor_name: 'acme',
+        root_account: account
+      )
+
+      tool_proxy = Lti:: ToolProxy.create(
+        shared_secret: 'shared_secret',
+        guid: 'guid',
+        product_version: '1.0beta',
+        lti_version: 'LTI-2p0',
+        product_family: product_family,
+        context: @course,
+        workflow_state: 'active',
+        raw_data: 'some raw data'
+      )
+
+      resource_handler = Lti::ResourceHandler.create(
+        resource_type_code: 'code',
+        name: 'resource name',
+        tool_proxy: tool_proxy
+      )
+
+      message_handler = Lti::MessageHandler.create(
+        message_type: 'message_type',
+        launch_path: 'https://samplelaunch/blti',
+        resource_handler: resource_handler
+      )
+
+      Lti::ToolProxyBinding.create(context: @course, tool_proxy: tool_proxy)
+      @assignment.tool_settings_tool = message_handler
+
+      get 'edit', :course_id => @course.id, :id => @assignment.id
+      expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_ID]).to eq message_handler.id
     end
 
     context "redirects" do

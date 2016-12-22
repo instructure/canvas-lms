@@ -27,6 +27,31 @@ describe MasterCourses::MasterTemplate do
     end
   end
 
+  describe "is_master_course?" do
+    def check
+      MasterCourses::MasterTemplate.is_master_course?(@course)
+    end
+
+    it "should cache the result" do
+      enable_cache do
+        expect(check).to be_falsey
+        @course.expects(:master_course_templates).never
+        expect(check).to be_falsey
+        expect(MasterCourses::MasterTemplate.is_master_course?(@course.id)).to be_falsey # should work with ids too
+      end
+    end
+
+    it "should invalidate the cache when set as master course" do
+      enable_cache do
+        expect(check).to be_falsey
+        template = MasterCourses::MasterTemplate.set_as_master_course(@course) # invalidate on create
+        expect(check).to be_truthy
+        template.destroy! # and on workflow_state change
+        expect(check).to be_falsey
+      end
+    end
+  end
+
   describe "content_tag_for" do
     before :once do
       @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
@@ -89,6 +114,14 @@ describe MasterCourses::MasterTemplate do
       new_root_account = Account.create!
       new_course = course(:account => new_root_account)
       expect { template.add_child_course!(new_course) }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
+  describe "master_migrations" do
+    it "should be able to create a migration" do
+      template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      mig = template.master_migrations.create!
+      expect(mig.master_template).to eq template
     end
   end
 end

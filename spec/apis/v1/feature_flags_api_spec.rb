@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../../sharding_spec_helper'
 
 describe "Feature Flags API", type: :request do
   let_once(:t_site_admin) { Account.site_admin }
@@ -266,6 +267,22 @@ describe "Feature Flags API", type: :request do
                { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'course_feature', state: 'off' })
       flag.reload
       expect(flag).not_to be_enabled
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should not explode with cross-shard updating" do
+        @shard1.activate do
+          user
+        end
+
+        flag = @user.feature_flags.create! feature: 'user_feature', state: 'on'
+        api_call_as_user(@user, :put, "/api/v1/users/#{@user.id}/features/flags/user_feature?state=off",
+          { controller: 'feature_flags', action: 'update', format: 'json', user_id: @user.id, feature: 'user_feature', state: 'off' })
+        flag.reload
+        expect(flag).not_to be_enabled
+      end
     end
 
     it "should refuse to update if the canvas default locks the feature" do

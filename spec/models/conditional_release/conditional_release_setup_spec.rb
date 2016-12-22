@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe ConditionalRelease::Setup do
-  Service = ConditionalRelease::Service
+  let(:service) { ConditionalRelease::Service }
 
   def stub_config
     ConfigFile.stubs(:load).returns({
@@ -35,7 +35,7 @@ describe ConditionalRelease::Setup do
     user = User.new(name: 'Conditional Release API', sortable_name: 'API, Conditional Release')
     user.workflow_state = "registered"
 
-    pseudo = user.pseudonyms.build(account: account, unique_id: Service.unique_id)
+    pseudo = user.pseudonyms.build(account: account, unique_id: service.unique_id)
     pseudo.workflow_state = "active"
     pseudo.user = user
     user.save!
@@ -54,7 +54,7 @@ describe ConditionalRelease::Setup do
 
 
   def get_api_user_details(account)
-    pseudo = Pseudonym.active.where(account: account.root_account, unique_id: Service.unique_id)
+    pseudo = Pseudonym.active.where(account: account.root_account, unique_id: service.unique_id)
     user = pseudo.first.user if pseudo.present?
     token = user.access_tokens.where(purpose: "Conditional Release Service API Token") if user.present?
 
@@ -67,19 +67,19 @@ describe ConditionalRelease::Setup do
     @sub_account = account_model parent_account: @root_account
     @course = course account: @sub_account, active_all: true
     @user = user_with_pseudonym account: @root_account
-    Service.stubs(:jwt_for).returns("some.jwt.thing")
-    Service.stubs(:unique_id).returns("unique@cyoe.id")
+    service.stubs(:jwt_for).returns("some.jwt.thing")
+    service.stubs(:unique_id).returns("unique@cyoe.id")
     Feature.stubs(:definitions).returns({
       'conditional_release' => Feature.new(feature: 'conditional_release', applies_to: 'Account')
     })
     @cyoe_feature = Feature.definitions['conditional_release']
-    Service.stubs(:configured?).returns(true)
+    service.stubs(:configured?).returns(true)
     @setup = ConditionalRelease::Setup.new(@account.id, @user.id)
   end
 
   describe "#activate!" do
     it "should not run if the Conditional Release service isn't configured" do
-      Service.stubs(:configured?).returns(false)
+      service.stubs(:configured?).returns(false)
       @setup.expects(:create_token!).never
       @setup.expects(:send_later_enqueue_args).never
       @setup.activate!
@@ -168,12 +168,12 @@ describe ConditionalRelease::Setup do
       it "should destroy the api user for conditional release if the request fails" do
         @test.send :create_token!
 
-        pseudonym = Pseudonym.active.find_by(account_id: @root_account.id, unique_id: Service.unique_id)
+        pseudonym = Pseudonym.active.find_by(account_id: @root_account.id, unique_id: service.unique_id)
         expect(pseudonym.present?).to be_truthy
 
         @test.send :post_to_service rescue nil
 
-        pseudonym = Pseudonym.active.find_by(account_id: @root_account.id, unique_id: Service.unique_id)
+        pseudonym = Pseudonym.active.find_by(account_id: @root_account.id, unique_id: service.unique_id)
         expect(pseudonym.present?).to be_falsey
       end
 

@@ -623,12 +623,12 @@ describe UsersController do
     end
     let!(:assignment1) do
       assignment = assignment_model(course: test_course, due_at: Time.zone.now, points_possible: 10)
-      assignment.grade_student(student, grade: '40%')
+      assignment.grade_student(student, grade: '40%', grader: @teacher)
     end
 
     let!(:assignment2) do
       assignment = assignment_model(course: test_course, due_at: 3.months.from_now, points_possible: 100)
-      assignment.grade_student(student, grade: '100%')
+      assignment.grade_student(student, grade: '100%', grader: @teacher)
     end
 
     context "as a student" do
@@ -949,9 +949,9 @@ describe UsersController do
       @s2 = student_in_course(:active_user => true).user
       @test_student = @course.student_view_student
       @assignment = assignment_model(:course => @course, :points_possible => 5)
-      @assignment.grade_student(@s1, :grade => 3)
-      @assignment.grade_student(@s2, :grade => 4)
-      @assignment.grade_student(@test_student, :grade => 5)
+      @assignment.grade_student(@s1, grade: 3, grader: @teacher)
+      @assignment.grade_student(@s2, grade: 4, grader: @teacher)
+      @assignment.grade_student(@test_student, grade: 5, grader: @teacher)
 
       get 'grades'
       expect(assigns[:presenter].course_grade_summaries[@course.id]).to eq({ :score => 70, :students => 2 })

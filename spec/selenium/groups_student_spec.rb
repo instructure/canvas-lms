@@ -67,7 +67,6 @@ describe "student groups" do
       end
 
       it "should show students in the course", priority: "1", test_id: 180675 do
-        skip "CNVS-32742 - teachers currently showing in list"
         expected_student_list = ["Test Student 1", "Test Student 2", "Test Student 3",
                                  "Test Student 4", "Test Student 5"]
         student_list = ff(".checkbox")

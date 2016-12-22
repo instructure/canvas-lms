@@ -169,7 +169,7 @@ describe UsersController, type: :request do
   end
 
   it "should ignore excused assignments for students" do
-    @a1.grade_student(@me, excuse: true)
+    @a1.grade_student(@me, excuse: true, grader: @teacher)
 
     json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
       :controller => "courses", :action => "todo_items",

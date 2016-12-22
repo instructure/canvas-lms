@@ -1,7 +1,8 @@
 define [
   'compiled/calendar/CommonEvent'
   'compiled/calendar/commonEventFactory'
-], (CommonEvent, commonEventFactory) ->
+  'helpers/fakeENV'
+], (CommonEvent, commonEventFactory, fakeENV) ->
   module "CommonEvent",
     setup: ->
     teardown: ->
@@ -67,3 +68,55 @@ define [
     ,
       [{asset_string: 'course_2'}]
     notOk event == null
+
+
+  module 'CommonEvent#iconType',
+    setup: ->
+      fakeENV.setup({
+        CALENDAR: {
+          BETTER_SCHEDULER: true
+        }
+      })
+    teardown: ->
+      fakeENV.teardown()
+
+  test 'Returns "calendar-add" for non-filled groups', ->
+    event = commonEventFactory
+      title: 'some title'
+      start_at: '2016-12-01T12:30:00Z'
+      appointment_group_url: 'http://some_url'
+    ,
+      ['course_1']
+
+    ok event.iconType() == 'calendar-add'
+
+  test 'Returns "calendar-reserved" for filled groups', ->
+    event = commonEventFactory
+      title: 'some title'
+      start_at: '2016-12-01T12:30:00Z'
+      appointment_group_url: 'http://some_url'
+      child_events: [{}]
+    ,
+      ['course_1']
+
+    ok event.iconType() == 'calendar-reserved'
+
+  test 'Returns "calendar-reserved" when the appointmentGroupEventStatus is "Reserved"', ->
+    event = commonEventFactory
+      title: 'some title'
+      start_at: '2016-12-01T12:30:00Z'
+      appointment_group_url: 'http://some_url'
+    ,
+      ['course_1']
+
+    event.appointmentGroupEventStatus = "Reserved"
+    ok event.iconType() == 'calendar-reserved'
+
+  test 'Returns "calendar-month" for other situations', ->
+    event = commonEventFactory
+      title: 'some title'
+      start_at: '2016-12-01T12:30:00Z'
+    ,
+      ['course_1']
+
+    ok event.iconType() == 'calendar-month'

@@ -30,7 +30,7 @@ class CourseForMenuPresenter
       id: course.id,
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
       imagesEnabled: course.feature_enabled?(:course_card_images),
-      position: (@context && @context.feature_enabled?(:dashcard_reordering)) ? @user.course_positions[course.asset_string] : nil,
+      position: (@context && @context.feature_enabled?(:dashcard_reordering)) ? @user.dashboard_positions[course.asset_string] : nil,
       links: available_section_tabs.map do |tab|
         presenter = SectionTabPresenter.new(tab, course)
         presenter.to_h

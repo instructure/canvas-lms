@@ -68,7 +68,7 @@ describe CourseForMenuPresenter do
 
       it 'returns a position if one is set' do
         user = user_model
-        user.course_positions[course.asset_string] = 3
+        user.dashboard_positions[course.asset_string] = 3
         user.save!
         cs_presenter = CourseForMenuPresenter.new(course, nil, user, @account)
         h = cs_presenter.to_h

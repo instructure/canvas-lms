@@ -766,7 +766,9 @@ define [
       @schedulerState = newState
       if changed
         @refetchEvents()
-        @findNextAppointment() if @schedulerState.inFindAppointmentMode
+        if @schedulerState.inFindAppointmentMode
+          @findNextAppointment()
+          @ensureCourseVisible(@schedulerState.selectedCourse)
         @loadAgendaView() if (@currentView == 'agenda')
 
     findAppointmentModeGroups: () =>
@@ -774,6 +776,9 @@ define [
         @reservable_appointment_groups[@schedulerState.selectedCourse.asset_string] || []
       else
         []
+
+    ensureCourseVisible: (course) ->
+      $.publish('Calendar/ensureCourseVisible', course.asset_string)
 
     visibleDateRange: () =>
       range = {}

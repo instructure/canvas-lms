@@ -60,7 +60,7 @@ describe Auditors::GradeChange do
     it "should include event for nil grader" do
       # We don't want to index events for nil graders.
 
-      @submission = @assignment.grade_student(@student, grade: 6).first
+      @submission = @assignment.grade_student(@student, grade: 6, grader: @teacher).first
       @event = Auditors::GradeChange.record(@submission)
 
       expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)

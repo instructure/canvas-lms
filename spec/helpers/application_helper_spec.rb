@@ -732,9 +732,9 @@ describe ApplicationHelper do
         course2.enroll_student(user)
         course3.enroll_student(user)
         courses = [course1, course2, course3]
-        user.course_positions[course1.asset_string] = 3
-        user.course_positions[course2.asset_string] = 2
-        user.course_positions[course3.asset_string] = 1
+        user.dashboard_positions[course1.asset_string] = 3
+        user.dashboard_positions[course2.asset_string] = 2
+        user.dashboard_positions[course3.asset_string] = 1
         user.save!
         @current_user = user
         mapped_courses = map_courses_for_menu(courses)

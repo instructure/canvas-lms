@@ -7,6 +7,7 @@ var bundleEntries = require("./bundles");
 var BundleExtensionsPlugin = require("./BundleExtensionsPlugin");
 var WebpackOnBuildPlugin = require('on-build-webpack');
 var path = require('path');
+var WebpackHooks = require('./webpackHooks')
 require('babel-polyfill')
 
 module.exports = {
@@ -28,6 +29,7 @@ module.exports = {
       'node_modules-version-of-backbone': __dirname + '/../node_modules/backbone',
       'node_modules-version-of-moment': __dirname + '/../node_modules/moment',
       'node_modules-version-of-react-modal': __dirname + '/../node_modules/react-modal',
+      lodash: __dirname + '/../node_modules/lodash',
 
       // once we are all-webpack we should remove this line and just change all the 'require's
       // to instructure-ui compnentns to have the right path
@@ -195,6 +197,7 @@ module.exports = {
         child_process.spawn("gulp", ["rev"]);
       }
     }),
+    new WebpackHooks(),
     new webpack.PrefetchPlugin("./app/coffeescripts/calendar/ContextSelector.coffee"),
     new webpack.PrefetchPlugin("./app/coffeescripts/calendar/TimeBlockRow.coffee"),
     new webpack.PrefetchPlugin("./app/coffeescripts/react_files/components/FolderTree.coffee"),
@@ -214,6 +217,7 @@ module.exports = {
     new webpack.PrefetchPlugin("./app/jsx/dashboard_card/DashboardCard.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/due_dates/DueDates.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/due_dates/DueDateCalendarPicker.jsx"),
+    new webpack.PrefetchPlugin("./app/jsx/eportfolios/MoveToDialog.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/epub_exports/CourseListItem.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/external_apps/components/AppDetails.jsx"),
     new webpack.PrefetchPlugin("./app/jsx/external_apps/components/AppList.jsx"),

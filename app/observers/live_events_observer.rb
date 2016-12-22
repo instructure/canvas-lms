@@ -11,6 +11,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :assignment,
           :submission,
           :attachment,
+          :user,
           :user_account_association,
           :account_notification
 
@@ -22,6 +23,7 @@ class LiveEventsObserver < ActiveRecord::Observer
       if changes["syllabus_body"]
         Canvas::LiveEvents.course_syllabus_updated(obj, changes["syllabus_body"].first)
       end
+      Canvas::LiveEvents.course_updated(obj)
     when Enrollment
       Canvas::LiveEvents.enrollment_updated(obj)
     when EnrollmentState
@@ -44,6 +46,8 @@ class LiveEventsObserver < ActiveRecord::Observer
       end
     when Submission
       Canvas::LiveEvents.submission_updated(obj)
+    when User
+      Canvas::LiveEvents.user_updated(obj)
     end
     end
   end
@@ -51,6 +55,8 @@ class LiveEventsObserver < ActiveRecord::Observer
   def after_create(obj)
     obj.class.connection.after_transaction_commit do
     case obj
+    when Course
+      Canvas::LiveEvents.course_created(obj)
     when DiscussionEntry
       Canvas::LiveEvents.discussion_entry_created(obj)
     when DiscussionTopic
@@ -79,6 +85,8 @@ class LiveEventsObserver < ActiveRecord::Observer
       end
     when AccountNotification
       Canvas::LiveEvents.account_notification_created(obj)
+    when User
+      Canvas::LiveEvents.user_created(obj)
     end
     end
   end

@@ -59,7 +59,9 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f(".fc-month-view")).to include_text(@da_assignment.title)
       end
       it "should show assignments with a graded submission" do
-        @da_assignment.grade_student(@student, {:grade => 10})
+        @teacher = User.create!
+        @course.enroll_teacher(@teacher)
+        @da_assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/calendar"
         f("#undated-events-button").click
         wait_for_ajaximations
@@ -121,7 +123,9 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f(".fc-month-view")).to include_text(@da_assignment.title)
       end
       it "should show assignments with a graded submission" do
-        @da_assignment.grade_student(@student, {:grade => 10})
+        @teacher = User.create!
+        @course.enroll_teacher(@teacher)
+        @da_assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/calendar"
         f("#undated-events-button").click
         wait_for_ajaximations

@@ -72,6 +72,8 @@
   .context_list_context {
     overflow: inherit;
     list-style: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
     margin: 0;
     padding: 3px 0;
     cursor: pointer;

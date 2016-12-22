@@ -214,7 +214,7 @@ describe 'Submissions API', type: :request do
 
     it "does not show grades or hidden comments to students on muted assignments" do
       @a1.mute!
-      @a1.grade_student(@student1, :grade => 5)
+      @a1.grade_student(@student1, grade: 5, grader: @teacher)
 
       @a1.update_submission(@student1, :hidden => false, :comment => "visible comment")
       @a1.update_submission(@student1, :hidden => true, :comment => "hidden comment")
@@ -288,7 +288,7 @@ describe 'Submissions API', type: :request do
 
     it "does not show rubric assessments to students on muted assignments" do
       @a1.mute!
-      sub = @a1.grade_student(@student1, :grade => 5).first
+      sub = @a1.grade_student(@student1, grade: 5, grader: @teacher).first
 
       rubric = rubric_model(
         :user => @teacher,
@@ -748,7 +748,7 @@ describe 'Submissions API', type: :request do
     @course.enroll_student(@student).accept!
     a1 = @course.assignments.create!(:title => 'assignment1', :points_possible => 15)
     submit_homework(a1, @student)
-    a1.grade_student(@student, {:grade => 15})
+    a1.grade_student(@student, grade: 15, grader: @teacher)
     json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{@student.id}.json",
                   { :controller => "submissions_api", :action => "show",
                     :format => "json", :course_id => @course.id.to_s,
@@ -1239,7 +1239,7 @@ describe 'Submissions API', type: :request do
     expect(json).not_to have_key 'turnitin_data'
 
     # as student after grading
-    a1.grade_student(student, {:grade => 11})
+    a1.grade_student(student, grade: 11, grader: @teacher)
     @user = student
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
@@ -1334,8 +1334,8 @@ describe 'Submissions API', type: :request do
     end
 
     it "can return assignments based on graded_at time", priority: "1", test_id: 2989899 do
-      @a2.grade_student @student1, grade: 10
-      @a1.grade_student @student1, grade: 5
+      @a2.grade_student @student1, grade: 10, grader: @teacher
+      @a1.grade_student @student1, grade: 5, grader: @teacher
       @a3 = @course.assignments.create! title: "a3"
       @a3.submit_homework @student1, body: "hello"
       Submission.where(assignment_id: @a2).update_all(graded_at: 1.hour.from_now)
@@ -1485,7 +1485,7 @@ describe 'Submissions API', type: :request do
         it "does not return the submissons if the student is not in the overriden section and has a submission with no grade" do
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
-          @assignment.grade_student(@student, grade: nil)
+          @assignment.grade_student(@student, grade: nil, grader: @teacher)
 
           json = call_to_for_students(as_student: true)
 
@@ -1495,7 +1495,7 @@ describe 'Submissions API', type: :request do
         it "returns the submissons if the student is not in the overriden section but has a graded submission" do
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
-          @assignment.grade_student(@student, grade: 5)
+          @assignment.grade_student(@student, grade: 5, grader: @teacher)
 
           json = call_to_for_students(as_student: true)
 
@@ -1522,7 +1522,7 @@ describe 'Submissions API', type: :request do
         it "does not return the submissons if the observed student is not in the overriden section and has a submission with no grade" do
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
-          @assignment.grade_student(@student, grade: nil)
+          @assignment.grade_student(@student, grade: nil, grader: @teacher)
 
           json = call_to_for_students(as_observer: true)
 
@@ -1532,7 +1532,7 @@ describe 'Submissions API', type: :request do
         it "returns the submissons if the observed student is not in the overriden section but has a graded submission" do
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
-          @assignment.grade_student(@student, grade: 5)
+          @assignment.grade_student(@student, grade: 5, grader: @teacher)
 
           json = call_to_for_students(as_observer: true)
 
@@ -1621,7 +1621,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "returns the submission if it is graded" do
-          @assignment.grade_student(@student, grade: 5)
+          @assignment.grade_student(@student, grade: 5, grader: @teacher)
           json = call_to_submissions_show(as_student: true)
 
           expect(json["assignment_id"]).not_to be_nil
@@ -1769,11 +1769,11 @@ describe 'Submissions API', type: :request do
       @student3 = student_in_course(:active_all => true).user
       @assignment1 = @course.assignments.create! :title => 'assignment1', :grading_type => 'points', :points_possible => 15
       @assignment2 = @course.assignments.create! :title => 'assignment2', :grading_type => 'points', :points_possible => 25
-      bare_submission_model @assignment1, @student1, grade: 15, score: 15
-      bare_submission_model @assignment2, @student1, grade: 25, score: 25
-      bare_submission_model @assignment1, @student2, grade: 10, score: 10
-      bare_submission_model @assignment2, @student2, grade: 20, score: 20
-      bare_submission_model @assignment1, @student3, grade: 20, score: 20
+      bare_submission_model @assignment1, @student1, grade: 15, grader: @teacher, score: 15
+      bare_submission_model @assignment2, @student1, grade: 25, grader: @teacher, score: 25
+      bare_submission_model @assignment1, @student2, grade: 10, grader: @teacher, score: 10
+      bare_submission_model @assignment2, @student2, grade: 20, grader: @teacher, score: 20
+      bare_submission_model @assignment1, @student3, grade: 20, grader: @teacher, score: 20
     end
 
     context "teacher" do
@@ -1932,7 +1932,7 @@ describe 'Submissions API', type: :request do
         before :once do
           @course.enroll_student(@observer, :allow_multiple_enrollments => true).accept!
           submit_homework(@assignment1, @observer)
-          @assignment1.grade_student(@observer, grade: 5)
+          @assignment1.grade_student(@observer, grade: 5, grader: @teacher)
         end
 
         it "allows an observer that is a student to view his own and his observees submissions" do
@@ -2072,7 +2072,7 @@ describe 'Submissions API', type: :request do
     end
 
     it "can unexcuse assignments" do
-      @assignment.grade_student(@student, excuse: true)
+      @assignment.grade_student(@student, excuse: true, grader: @teacher)
       submission = @assignment.submission_for_student(@student)
       expect(submission).to be_excused
 
@@ -2355,6 +2355,7 @@ describe 'Submissions API', type: :request do
     submission = a1.find_or_create_submission(student)
     expect(submission).not_to be_new_record
     submission.grade = 'A'
+    submission.grader = @teacher
     submission.save!
 
     json = api_call(:put,
@@ -2634,7 +2635,7 @@ describe 'Submissions API', type: :request do
     course_with_teacher(:active_all => true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
-    @assignment.grade_student(student, { :grade => '10' })
+    @assignment.grade_student(student, grade: '10', grader: @teacher)
     expect(Submission.count).to eq 1
     @submission = Submission.first
     expect(@submission.grade).to eq '10'
@@ -3106,13 +3107,42 @@ describe 'Submissions API', type: :request do
                       attachments: [crocodocable_attachment_model(context: @student)])
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a.id}/submissions?include[]=submission_history",
-                    {course_id: @course.id.to_s, assignment_id: a.id.to_s,
-                     action: 'index', controller: 'submissions_api', format: 'json',
-                     include: %w[submission_history]})
+                    { course_id: @course.id.to_s, assignment_id: a.id.to_s,
+                      action: 'index', controller: 'submissions_api', format: 'json',
+                      include: %w[submission_history] })
 
     expect(json[0]["submission_history"][0]["attachments"][0]["preview_url"]).to match(
       /canvadoc_session/
     )
+  end
+
+  it "includes crocodoc whitelist ids in the preview url for attachments" do
+    Canvas::Crocodoc.stubs(:config).returns({a: 1})
+
+    course_with_teacher_logged_in active_all: true
+    student_in_course active_all: true
+    @user = @teacher
+    assignment = @course.assignments.create!(moderated_grading: true)
+    submission = assignment.submit_homework(@student, submission_type: 'online_upload',
+      attachments: [crocodocable_attachment_model(context: @student)])
+    provisional_grade = submission.find_or_create_provisional_grade!(@teacher, score: 1)
+    assignment.moderated_grading_selections.create! do |s|
+      s.student = @student
+      s.provisional_grade = provisional_grade
+    end
+    assignment.update(grades_published_at: 1.hour.ago)
+    submission.reload
+    submission.attachments.first.create_crocodoc_document(uuid: '1234',
+                                                          process_state: 'PROCESSED')
+
+    url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions?include[]=submission_history"
+    json = api_call(:get, url, { course_id: @course.id.to_s, assignment_id: assignment.id.to_s,
+                      action: 'index', controller: 'submissions_api', format: 'json',
+                      include: %w[submission_history] })
+
+    result_url = json.first.fetch("submission_history").first.fetch("attachments").first.
+      fetch("preview_url")
+    expect(result_url).to match(/crocodoc_ids%22:\[1,2\]/)
   end
 
 
@@ -3378,7 +3408,7 @@ describe 'Submissions API', type: :request do
     end
 
     it "maintains grade when updating comments" do
-      @a1.grade_student(@student1, :grade => '5%')
+      @a1.grade_student(@student1, grade: '5%', grader: @teacher)
 
       grade_data = {
         :grade_data => {
@@ -3397,7 +3427,7 @@ describe 'Submissions API', type: :request do
     end
 
     it "nils grade when receiving empty posted_grade" do
-      @a1.grade_student(@student1, :grade => '5%')
+      @a1.grade_student(@student1, grade: '5%', grader: @teacher)
 
       grade_data = {
         :grade_data => {

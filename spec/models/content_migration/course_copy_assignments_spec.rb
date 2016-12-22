@@ -524,13 +524,27 @@ describe ContentMigration do
 
       it "should copy only noop overrides" do
         assignment_override_model(assignment: @assignment, set_type: 'ADHOC')
-        assignment_override_model(assignment: @assignment, set_type: 'Noop', set_id: 1, title: 'Tag 1')
-        assignment_override_model(assignment: @assignment, set_type: 'Noop', set_id: nil, title: 'Tag 2')
+        assignment_override_model(assignment: @assignment, set_type: 'Noop',
+          set_id: 1, title: 'Tag 1')
+        assignment_override_model(assignment: @assignment, set_type: 'Noop',
+          set_id: nil, title: 'Tag 2')
         run_course_copy
         to_assignment = @copy_to.assignments.first
         expect(to_assignment.assignment_overrides.length).to eq 2
         expect(to_assignment.assignment_overrides.detect{ |o| o.set_id == 1 }.title).to eq 'Tag 1'
-        expect(to_assignment.assignment_overrides.detect{ |o| o.set_id == nil }.title).to eq 'Tag 2'
+        expect(to_assignment.assignment_overrides.detect{ |o| o.set_id.nil? }.title).to eq 'Tag 2'
+      end
+
+      it "should copy dates" do
+        due_at = 1.hour.from_now.round
+        assignment_override_model(assignment: @assignment, set_type: 'Noop',
+          set_id: 1, title: 'Tag 1', due_at: due_at)
+        run_course_copy
+        to_override = @copy_to.assignments.first.assignment_overrides.first
+        expect(to_override.title).to eq 'Tag 1'
+        expect(to_override.due_at).to eq due_at
+        expect(to_override.due_at_overridden).to eq true
+        expect(to_override.unlock_at_overridden).to eq false
       end
     end
   end

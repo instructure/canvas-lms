@@ -34,9 +34,8 @@ module SubmittablesGradingPeriodProtection
     end
 
     return true if submittable.only_visible_to_overrides && submittable.only_visible_to_overrides_was
+    return true unless date_in_closed_grading_period?(submittable.due_at)
 
-    to_closed_grading_period = date_in_closed_grading_period?(submittable.due_at)
-    return true unless to_closed_grading_period
 
     apply_error(submittable, :due_at, ERROR_MESSAGES[:change_due_at_to_closed], flash_message)
     false

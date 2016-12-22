@@ -308,20 +308,30 @@ describe "Default Account Reports" do
         @course3.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
         @course3.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
 
+        teacher = User.create!
+        @course2.enroll_teacher(teacher)
+        @course3.enroll_teacher(teacher)
+
         # set up assignments
         past_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.ago
         future_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.from_now
-        past_assignment.grade_student(@user2, grade: 25)
-        past_assignment.grade_student(@user4, grade: 75)
-        future_assignment.grade_student(@user2, grade: 75)
-        future_assignment.grade_student(@user4, grade: 25)
+
+        Timecop.freeze(past.end_date - 1.day) do
+          past_assignment.grade_student(@user2, grade: 25, grader: teacher)
+          past_assignment.grade_student(@user4, grade: 75, grader: teacher)
+        end
+        future_assignment.grade_student(@user2, grade: 75, grader: teacher)
+        future_assignment.grade_student(@user4, grade: 25, grader: teacher)
 
         past_assignment = @course3.assignments.create! points_possible: 100, due_at: 3.days.ago
         future_assignment = @course3.assignments.create! points_possible: 100, due_at: 3.days.from_now
-        past_assignment.grade_student(@user2, grade: 75)
-        past_assignment.grade_student(@user4, grade: 25)
-        future_assignment.grade_student(@user2, grade: 25)
-        future_assignment.grade_student(@user4, grade: 75)
+
+        Timecop.freeze(past.end_date - 1.day) do
+          past_assignment.grade_student(@user2, grade: 75, grader: teacher)
+          past_assignment.grade_student(@user4, grade: 25, grader: teacher)
+        end
+        future_assignment.grade_student(@user2, grade: 25, grader: teacher)
+        future_assignment.grade_student(@user4, grade: 75, grader: teacher)
       end
 
       it "reports mgp grades" do

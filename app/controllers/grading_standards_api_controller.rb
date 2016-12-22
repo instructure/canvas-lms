@@ -153,7 +153,7 @@ class GradingStandardsApiController < ApplicationController
   #   curl https://<canvas>/api/v1/courses/1/grading_standards \
   #     -H 'Authorization: Bearer <token>'
   #
-  # @returns [Grading Standard]
+  # @returns [GradingStandard]
   def context_index
     if authorized_action(@context, @current_user, :read)
       grading_standards_json = @context.grading_standards.map do |g|

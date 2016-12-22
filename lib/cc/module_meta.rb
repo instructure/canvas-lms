@@ -50,7 +50,7 @@ module CC
 
           add_exported_asset(cm)
 
-          mod_migration_id = CCHelper.create_key(cm)
+          mod_migration_id = create_key(cm)
           # context modules are in order and a pre-req can only reference
           # a previous module, so just adding as we go is okay
           module_id_map[cm.id] = mod_migration_id
@@ -78,7 +78,7 @@ module CC
             ct_id_map = {}
             m_node.items do |items_node|
               cm.content_tags.not_deleted.each do |ct|
-                ct_migration_id = CCHelper.create_key(ct)
+                ct_migration_id = create_key(ct)
                 ct_id_map[ct.id] = ct_migration_id
                 items_node.item(:identifier=>ct_migration_id) do |item_node|
                   unless ['ContextModuleSubHeader', 'ExternalUrl'].member? ct.content_type
@@ -87,7 +87,7 @@ module CC
                   item_node.content_type ct.content_type
                   item_node.workflow_state ct.workflow_state
                   item_node.title ct.title
-                  item_node.identifierref CCHelper.create_key(ct.content_or_self) unless ct.content_type == 'ContextModuleSubHeader'
+                  item_node.identifierref create_key(ct.content_or_self) unless ct.content_type == 'ContextModuleSubHeader'
                   if ct.content_type == "ContextExternalTool"
                     item_node.url ct.url
                     if ct.content && ct.content.context != @course

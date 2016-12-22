@@ -1,12 +1,12 @@
 define [
   'require'
   'compiled/models/FilesystemObject'
-  'underscore'
   'vendor/backbone-identity-map'
   'compiled/collections/PaginatedCollection'
   'compiled/collections/FilesCollection'
   'compiled/util/natcompare'
-], (require, FilesystemObject, _, identityMapMixin, PaginatedCollection, FilesCollection, natcompare) ->
+  'jsx/shared/helpers/urlHelper'
+], (require, FilesystemObject, identityMapMixin, PaginatedCollection, FilesCollection, natcompare, urlHelper) ->
 
 
   Folder = identityMapMixin class __Folder extends FilesystemObject
@@ -91,7 +91,7 @@ define [
     filesEnv = null
     urlPath: ->
       relativePath = (@get('full_name') or '').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
-
+      relativePath = urlHelper.encodeSpecialChars(relativePath)
       relativePath = relativePath.split('/').map((component) ->
         encodeURIComponent(component)
       ).join('/')
@@ -107,6 +107,8 @@ define [
       relativePath
 
     @resolvePath = (contextType, contextId, folderPath) ->
+      folderPath = urlHelper.decodeSpecialChars(folderPath)
+
       url = "/api/v1/#{contextType}/#{contextId}/folders/by_path#{folderPath}"
       $.get(url).pipe (folders) ->
         folders.map (folderAttrs) ->
@@ -170,7 +172,7 @@ define [
 
     parse: (response) ->
       if response
-        _.each response, (folder) =>
+        response.forEach (folder) =>
           folder.contentTypes = @parentFolder.contentTypes
           folder.useVerifiers = @parentFolder.useVerifiers
       super

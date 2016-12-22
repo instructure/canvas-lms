@@ -188,7 +188,7 @@ module Importers
             event.reload
             event.start_at = shift_date(event.start_at, shift_options)
             event.end_at = shift_date(event.end_at, shift_options)
-            event.all_day_date = shift_date(event.all_day_date.to_datetime, shift_options).to_date if event.all_day_date
+            event.all_day_date = shift_date(event.all_day_date.to_datetime, shift_options).try(:to_date) if event.all_day_date
             event.save_without_broadcasting
           end
 
@@ -201,6 +201,15 @@ module Importers
             event.hide_correct_answers_at = shift_date(event.hide_correct_answers_at, shift_options)
             event.saved_by = :migration
             event.save
+          end
+
+          migration.imported_migration_items_by_class(AssignmentOverride).each do |event|
+            AssignmentOverride.overridden_dates.each do |field|
+              date = event.send(field)
+              next unless date
+              event.send("#{field}=", shift_date(date, shift_options))
+            end
+            event.save_without_broadcasting
           end
 
           migration.imported_migration_items_by_class(ContextModule).each do |event|
@@ -273,6 +282,16 @@ module Importers
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
       course.settings_will_change! unless atts.empty?
+
+      # superhax to force new wiki front page if home view changed
+      if settings['default_view'] && settings['default_view'] != course.default_view && data[:wikis]
+        if page_hash = data[:wikis].detect{|h| h[:front_page]}
+          if page = migration.find_imported_migration_item(WikiPage, page_hash[:migration_id])
+            page.set_as_front_page!
+          end
+        end
+      end
+
       settings.slice(*atts.map(&:to_s)).each do |key, val|
         course.send("#{key}=", val)
       end

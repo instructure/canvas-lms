@@ -136,13 +136,9 @@ describe "better_file_browsing" do
     end
 
     it "should search for a file", priority: "2", test_id: 220355 do
-      edit_name_from_cog_icon("b_file1.txt")
-      wait_for_ajaximations
-      f("input[type='search']").send_keys "b_fi"
-      driver.action.send_keys(:return).perform
-      # Unable to find matching line from backtrace error is encountered if refresh_page is not used
-      refresh_page
-      expect(all_files_folders.count).to eq 2
+      expect(all_files_folders).to have_size 3
+      f("input[type='search']").send_keys "b_fi", :return
+      expect(all_files_folders).to have_size 1
     end
   end
 

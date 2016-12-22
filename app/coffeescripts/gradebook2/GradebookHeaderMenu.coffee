@@ -16,11 +16,13 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'compiled/jquery.kylemenu'
-], (
-  I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter, SetDefaultGradeDialog,
-  CurveGradesDialog, gradebookHeaderMenuTemplate, re_upload_submissions_form, _, authenticity_token,
-  MessageStudentsWhoHelper
-) ->
+], (I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter,
+  SetDefaultGradeDialog, CurveGradesDialog, gradebookHeaderMenuTemplate,
+  re_upload_submissions_form, _, authenticity_token,
+  MessageStudentsWhoHelper) ->
+
+  isAdmin = () ->
+    ENV.current_user_roles.includes('admin')
 
   class GradebookHeaderMenu
     constructor: (@assignment, @$trigger, @gradebook) ->
@@ -71,7 +73,7 @@ define [
       @hideMenuActionsWithUnmetDependencies(menu)
 
       # Disable menu options if needed
-      @disableUnavailableMenuActions(menu) unless @isCurrentUserAdmin()
+      @disableUnavailableMenuActions(menu) unless isAdmin()
 
 
     hideMenuActionsWithUnmetDependencies: (menu) ->
@@ -85,7 +87,8 @@ define [
       }
 
     disableUnavailableMenuActions: (menu) ->
-      return false unless menu? && @assignment?.has_due_date_in_closed_grading_period
+      return unless menu?
+      return unless @assignment?.inClosedGradingPeriod
 
       actionsToDisable = ['curveGrades', 'setDefaultGrade']
 
@@ -93,10 +96,6 @@ define [
         menuItem = menu.find("[data-action=#{actionToDisable}]")
         menuItem.addClass('ui-state-disabled')
         menuItem.attr('aria-disabled', true)
-      true
-
-    isCurrentUserAdmin: () ->
-      _.contains(ENV.current_user_roles, 'admin')
 
     showAssignmentDetails: (opts={
       assignment:@assignment,
@@ -121,38 +120,31 @@ define [
       settings = MessageStudentsWhoHelper.settings(assignment, students)
       messageStudents(settings)
 
-    setDefaultGrade: (opts={
-      assignment:@assignment,
-      students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
-      context_id:@gradebook.options.context_id
+    setDefaultGrade: (opts = {
+      assignment: @assignment,
+      students: @gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
+      context_id: @gradebook.options.context_id
       selected_section: @gradebook.sectionToShow
-      isAdmin: @isCurrentUserAdmin()
+      isAdmin: isAdmin()
     }) =>
-      if !opts.isAdmin && opts.assignment.has_due_date_in_closed_grading_period
-        $.flashError(
-          I18n.t(
-            "Unable to set default grade because this assignment is due in " +
-            "a closed grading period for at least one student"
-          )
-        )
-        return
-      new SetDefaultGradeDialog(opts)
+      if isAdmin() or not opts.assignment.inClosedGradingPeriod
+        new SetDefaultGradeDialog(opts)
+      else
+        $.flashError(I18n.t("Unable to set default grade because this " +
+          "assignment is due in a closed grading period for at least one student"))
 
-    curveGrades: (opts={
-      assignment:@assignment,
-      students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
-      context_url:@gradebook.options.context_url
-      isAdmin: @isCurrentUserAdmin()
+    curveGrades: (opts = {
+      assignment: @assignment,
+      students: @gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment),
+      context_url: @gradebook.options.context_url
+      isAdmin: isAdmin()
     }) =>
-      if !opts.isAdmin && opts.assignment.has_due_date_in_closed_grading_period
-        $.flashError(
-          I18n.t(
-            "Unable to curve grades because this assignment is due in " +
-            "a closed grading period for at least one student"
-          )
-        )
-        return
-      new CurveGradesDialog(opts)
+      if isAdmin() or not opts.assignment.inClosedGradingPeriod
+        new CurveGradesDialog(opts)
+      else
+        $.flashError(I18n.t("Unable to curve grades because this " +
+          "assignment is due in a closed grading period for at least " +
+          "one student"))
 
     downloadSubmissions: =>
       url = $.replaceTags @gradebook.options.download_assignment_submissions_url, "assignment_id", @assignment.id

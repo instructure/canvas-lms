@@ -2,6 +2,8 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
   belongs_to :child_course, :class_name => "Course"
 
+  has_many :child_content_tags, :class_name => "MasterCourses::ChildContentTag", :inverse_of => :child_subscription
+
   strong_params
 
   validate :require_same_root_account
@@ -15,4 +17,8 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   end
 
   include Canvas::SoftDeletable
+
+  include MasterCourses::TagHelper
+  self.content_tag_association = :child_content_tags
+
 end

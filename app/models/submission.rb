@@ -24,6 +24,31 @@ class Submission < ActiveRecord::Base
   include SendToStream
   include Workflow
 
+  GRADE_STATUS_MESSAGES_MAP = {
+    success: {
+      status: true
+    }.freeze,
+    account_admin: {
+      status: true
+    }.freeze,
+    unpublished: {
+      status: false,
+      message: I18n.t('This assignment is still unpublished')
+    }.freeze,
+    not_autograded: {
+      status: false,
+      message: I18n.t('This submission is not being autograded')
+    }.freeze,
+    cant_manage_grades: {
+      status: false,
+      message: I18n.t("You don't have permission to manage grades for this course")
+    }.freeze,
+    assignment_in_closed_grading_period: {
+      status: false,
+      message: I18n.t('This assignment is in a closed grading period for this student')
+    }.freeze
+  }.freeze
+
   attr_protected :submitted_at
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
@@ -66,6 +91,7 @@ class Submission < ActiveRecord::Base
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :published_grade, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_as_url :url
+  validate :ensure_grader_can_grade
 
   scope :with_comments, -> { preload(:submission_comments) }
   scope :after, lambda { |date| where("submissions.created_at>?", date) }
@@ -138,7 +164,8 @@ class Submission < ActiveRecord::Base
   sanitize_field :body, CanvasSanitize::SANITIZE
 
   attr_accessor :saved_by,
-                :assignment_changed_not_sub
+                :assignment_changed_not_sub,
+                :grading_error_message
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
   before_save :prep_for_submitting_to_turnitin
@@ -231,7 +258,17 @@ class Submission < ActiveRecord::Base
       self.assignment.published? &&
         self.assignment.context.grants_right?(user, session, :manage_grades)
     end
-    can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
+    can :read and can :comment and can :make_group_comment and can :read_grade
+
+    given do |user, _session|
+      can_grade?(user)
+    end
+    can :grade
+
+    given do
+      can_autograde?
+    end
+    can :autograde
 
     given do |user, session|
       self.assignment.user_can_read_grades?(user, session)
@@ -1064,6 +1101,77 @@ class Submission < ActiveRecord::Base
     true
   end
 
+  def ensure_grader_can_grade
+    return true if grader_can_grade?
+
+    error_msg = I18n.t(
+      'cannot be changed at this time: %{grading_error}',
+      { grading_error: grading_error_message }
+    )
+    errors.add(:grade, error_msg)
+    false
+  end
+
+  def grader_can_grade?
+    return true unless grade_changed?
+    return true if autograded? && grants_right?(nil, :autograde)
+    return true if grants_right?(grader, :grade)
+
+    false
+  end
+
+  def can_autograde?
+    result = GRADE_STATUS_MESSAGES_MAP[can_autograde_symbolic_status]
+    result ||= { status: false, message: I18n.t('Cannot autograde at this time') }
+
+    can_autograde_status, @grading_error_message = result[:status], result[:message]
+
+    can_autograde_status
+  end
+  private :can_autograde?
+
+  def can_autograde_symbolic_status
+    return :unpublished unless assignment.published?
+    return :not_autograded if grader_id >= 0
+
+    student_id = user_id || self.user.try(:id)
+
+    if assignment.in_closed_grading_period_for_student?(student_id)
+      :assignment_in_closed_grading_period
+    else
+      :success
+    end
+  end
+  private :can_autograde_symbolic_status
+
+  def can_grade?(user = nil)
+    user ||= grader
+    result = GRADE_STATUS_MESSAGES_MAP[can_grade_symbolic_status(user)]
+    result ||= { status: false, message: I18n.t('Cannot grade at this time') }
+
+    can_grade_status, @grading_error_message = result[:status], result[:message]
+
+    can_grade_status
+  end
+  private :can_grade?
+
+  def can_grade_symbolic_status(user = nil)
+    user ||= grader
+
+    return :unpublished unless assignment.published?
+    return :cant_manage_grades unless context.grants_right?(user, nil, :manage_grades)
+    return :account_admin if context.account_membership_allows(user)
+
+    student_id = self.user_id || self.user.try(:id)
+
+    if assignment.in_closed_grading_period_for_student?(student_id)
+      :assignment_in_closed_grading_period
+    else
+      :success
+    end
+  end
+  private :can_grade_symbolic_status
+
   def queue_websnap
     if !self.attachment_id && @url_changed && self.url && self.submission_type == 'online_url'
       self.send_later_enqueue_args(:get_web_snapshot, { :priority => Delayed::LOW_PRIORITY })
@@ -1335,7 +1443,7 @@ class Submission < ActiveRecord::Base
   end
 
   def last_teacher_comment
-    submission_comments.reverse.find{|com| com.author_id != user_id}
+    submission_comments.published.reverse.find{ |com| com.author_id != user_id }
   end
 
   def has_submission?

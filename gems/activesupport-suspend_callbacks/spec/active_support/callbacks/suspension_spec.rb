@@ -159,5 +159,22 @@ describe ActiveSupport::Callbacks::Suspension do
         end
       end
     end
+
+    it "should keep class suspensions independent per thread" do
+      @instance.expects(:validate).never
+      @instance.expects(:publish).once
+
+      @class.suspend_callbacks(:validate) do
+        Thread.new do
+          @instance2 = @class.new
+          @instance2.expects(:validate).once
+          @instance2.expects(:publish).once
+          @instance2.save
+        end.join
+
+       @instance.save
+      end
+    end
+
   end
 end

@@ -13,8 +13,8 @@ describe "gradebook2 - Grading History" do
     end
 
     it 'toggles and displays grading history', priority: "2", test_id: 602872 do
-      assignment_1.grade_student(student, grade: 8)
-      assignment_1.grade_student(student, grade: 10)
+      assignment_1.grade_student(student, grade: 8, grader: teacher)
+      assignment_1.grade_student(student, grade: 10, grader: teacher)
 
       get "/courses/#{test_course.id}/gradebook/history"
 
@@ -27,8 +27,8 @@ describe "gradebook2 - Grading History" do
     end
 
     it 'displays and reverts excused grades', priority: "1", test_id: 606308 do
-      assignment_1.grade_student(student, excuse: true)
-      assignment_1.grade_student(student, grade: 15)
+      assignment_1.grade_student(student, excuse: true, grader: teacher)
+      assignment_1.grade_student(student, grade: 15, grader: teacher)
 
       get "/courses/#{test_course.id}/gradebook/history"
       f('.assignment_header').click
@@ -38,7 +38,7 @@ describe "gradebook2 - Grading History" do
       changed_values = ff('.assignment_details td').map(& :text)
       expect(changed_values).to eq ['EX', '15', '15']
 
-      assignment_1.grade_student(student, {grade: 10})
+      assignment_1.grade_student(student, grade: 10, grader: teacher)
       refresh_page
       f('.assignment_header').click
       wait_for_ajaximations

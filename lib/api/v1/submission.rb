@@ -136,6 +136,7 @@ module Api::V1::Submission
       turnitin_hash.delete(:last_processed_attempt)
       hash['turnitin_data'] = turnitin_hash
     end
+
     if attempt.vericite_data(false).present? && attempt.can_view_plagiarism_report('vericite', @current_user, session)
       vericite_hash = attempt.vericite_data(false).dup
       vericite_hash.delete(:last_processed_attempt)
@@ -149,7 +150,8 @@ module Api::V1::Submission
         attachment.skip_submission_attachment_lock_checks = true
         atjson = attachment_json(attachment, user, {},
                                  submission_attachment: true,
-                                 include: ['preview_url'])
+                                 include: ['preview_url'],
+                                 crocodoc_ids: attempt.crocodoc_whitelist)
         attachment.skip_submission_attachment_lock_checks = false
         atjson
       end.compact unless attachments.blank?

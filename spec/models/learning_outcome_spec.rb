@@ -59,7 +59,7 @@ describe LearningOutcome do
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
-      @submission = @assignment.grade_student(@user, :grade => "10").first
+      @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher).first
       @assessment = @a.assess({
         :user => @user,
         :assessor => @user,
@@ -260,7 +260,7 @@ describe LearningOutcome do
       @assignment.reload
       expect(@assignment.learning_outcome_alignments.count).to eql(1)
       expect(@assignment.rubric_association).not_to be_nil
-      @submission = @assignment.grade_student(@user, :grade => "10").first
+      @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher).first
       @assessment = @a.assess({
         :user => @user,
         :assessor => @user,
@@ -348,7 +348,7 @@ describe LearningOutcome do
       @alignment.reload
       expect(@alignment).to have_rubric_association
 
-      @submission = @assignment.grade_student(@user, :grade => "10").first
+      @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher).first
       expect(@outcome.learning_outcome_results).to be_empty
       @assessment = @a.assess({
         :user => @user,
@@ -415,7 +415,7 @@ describe LearningOutcome do
       expect(@alignment.learning_outcome).not_to be_deleted
       expect(@alignment).to have_rubric_association
       @assignment.reload
-      @submission = @assignment.grade_student(@user, :grade => "10").first
+      @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher).first
       @assessment = @a.assess({
         :user => @user,
         :assessor => @user,
@@ -915,9 +915,11 @@ describe LearningOutcome do
         rubric = add_or_get_rubric(outcome)
         user = user(:active_all => true)
         context.enroll_student(user)
+        teacher = user(active_all: true)
+        context.enroll_teacher(teacher)
         a = rubric.associate_with(assignment, context, :purpose => 'grading')
         assignment.reload
-        submission = assignment.grade_student(user, :grade => "10").first
+        submission = assignment.grade_student(user, grade: "10", grader: teacher).first
         a.assess({
           :user => user,
           :assessor => user,

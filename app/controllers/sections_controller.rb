@@ -298,9 +298,11 @@ class SectionsController < ApplicationController
           @completed_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'completed').count
           @pending_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => %w{invited pending}).count
           @student_enrollments_count = @section.enrollments.not_fake.where(:type => 'StudentEnrollment').count
+          can_manage_students = @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users)
           js_env(
+            :STUDENT_CONTEXT_CARDS_ENABLED => can_manage_students && @domain_root_account.feature_enabled?(:student_context_cards),
             :PERMISSIONS => {
-              :manage_students => @context.grants_right?(@current_user, session, :manage_students) || @context.grants_right?(@current_user, session, :manage_admin_users),
+              :manage_students => can_manage_students,
               :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings)
             })
         end

@@ -121,7 +121,7 @@ module CustomWaitMethods
     SeleniumDriverSetup.request_mutex.synchronize { yield }
   end
 
-  def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
+  def keep_trying_until(seconds = SeleniumDriverSetup::SECONDS_UNTIL_GIVING_UP)
     frd_error = Selenium::WebDriver::Error::TimeOutError
     wait_for(timeout: seconds, method: :keep_trying_until) do
       begin

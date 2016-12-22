@@ -554,6 +554,23 @@ define [
     { outcome_id: '2', user_id: '2', score: 3 }
   ]
 
+  effectiveDueDates =
+    1:
+      1:
+        due_at: '2013-09-15T10:00:00Z'
+        grading_period_id: '2'
+        in_closed_grading_period: true
+    2:
+      2:
+        due_at: '2013-09-15T10:00:00Z'
+        grading_period_id: '2'
+        in_closed_grading_period: true
+    3:
+      1:
+        due_at: '2013-12-01T10:00:00Z'
+        grading_period_id: '3'
+        in_closed_grading_period: false
+
   custom_columns: customColumns
   set_default_grade_response: default_grade_response
   students: students
@@ -563,6 +580,7 @@ define [
   sections: sections
   outcomes: outcomes
   outcome_rollups: outcomeRollups
+  effectiveDueDates: effectiveDueDates
   create: (overrides) ->
 
     window.ENV =
@@ -570,6 +588,7 @@ define [
         current_user_id: 1
         context_asset_string: 'course_1'
         GRADEBOOK_OPTIONS: {
+          effective_due_dates_url: '/api/v1/courses/1/effective_due_dates'
           enrollments_url: '/api/v1/enrollments'
           enrollments_with_concluded_url: '/api/v1/concluded_enrollments'
           assignment_groups_url: '/api/v1/assignment_groups'
@@ -585,8 +604,39 @@ define [
           outcome_gradebook_enabled: true
           outcome_links_url: 'api/v1/courses/1/outcome_group_links'
           outcome_rollups_url: 'api/v1/courses/1/outcome_rollups'
+          active_grading_periods: [
+            {
+              id: '1'
+              title: 'Fall Period 1'
+              start_date: '2013-08-01T00:00:00Z'
+              end_date: '2013-09-01T00:00:00Z'
+              close_date: '2013-09-08T00:00:00Z'
+              is_closed: true
+            }
+            {
+              id: '2'
+              title: 'Fall Period 2'
+              start_date: '2013-09-01T00:00:00Z'
+              end_date: '2013-11-01T00:00:00Z'
+              close_date: '2013-11-08T00:00:00Z'
+              is_closed: true
+            }
+            {
+              id: '3'
+              title: 'Fall Period 3'
+              start_date: '2013-11-01T00:00:00Z'
+              end_date: '2014-01-01T00:00:00Z'
+              close_date: '2014-01-08T00:00:00Z'
+              is_closed: false
+            }
+          ]
         }
       }
+
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.effective_due_dates_url,
+      response: clone effectiveDueDates
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: 'success'
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.enrollments_url,
       response: clone students
