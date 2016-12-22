@@ -70,7 +70,7 @@ module SeleniumExtensions
     def find_element(*)
       FinderWaiting.wait_for method: :find_element do
         super
-      end
+      end or raise Selenium::WebDriver::Error::NoSuchElementError
     end
     alias_method :first, :find_element
 
