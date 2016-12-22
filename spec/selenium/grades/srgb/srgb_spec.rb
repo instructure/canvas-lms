@@ -336,6 +336,17 @@ describe "Screenreader Gradebook" do
       expect(arrange_assignments).to include_text("By Assignment Group and Position\nAlphabetically\nBy Due Date")
     end
 
+    it 'keeps the assignment arrangement choice between reloads' do
+      srgb_page.visit(@course.id)
+
+      %w/assignment_group alpha due_date/.each do |assignment_order|
+        srgb_page.sort_assignments_by(assignment_order)
+        refresh_page
+
+        expect(srgb_page.assignment_sort_order).to eq(assignment_order)
+      end
+    end
+
     it "should focus on accessible elements when setting default grades", priority: '1', test_id: 209991 do
       srgb_page.visit(@course.id)
       srgb_page.select_assignment(@second_assignment)
