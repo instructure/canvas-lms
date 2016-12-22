@@ -63,6 +63,7 @@ module Api::V1::Assignment
     description
     submission_types
     peer_reviews
+    peer_review_count
     anonymous_peer_reviews
     peer_reviews_due_at
     automatic_peer_reviews

@@ -167,6 +167,8 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
 
     enableCheckbox: (box) ->
       if box.prop("disabled")
+        return if @assignment.inClosedGradingPeriod()
+
         box.removeProp("disabled").parent().timeoutTooltip().timeoutTooltip('disable').removeAttr('data-tooltip').removeAttr('title')
         @setImplicitCheckboxValue(box, '0')
         @checkboxAccessibleAdvisory(box).text('')
@@ -542,6 +544,7 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
 
     ignoreClickHandler: (event) ->
       event.preventDefault()
+      event.stopPropagation()
 
     lockSelectValueHandler: ->
       lockedValue = this.value
