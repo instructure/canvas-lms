@@ -52,11 +52,11 @@ describe IncomingMailProcessor::Pop3Mailbox do
         :password => "secret-user-password",
       })
 
-      @mailbox.server.should eql "pop3.server.com"
-      @mailbox.port.should eql 1234
-      @mailbox.ssl.should eql "truthy-value"
-      @mailbox.username.should eql "user@server.com"
-      @mailbox.password.should eql "secret-user-password"
+      expect(@mailbox.server).to eql "pop3.server.com"
+      expect(@mailbox.port).to eql 1234
+      expect(@mailbox.ssl).to eql "truthy-value"
+      expect(@mailbox.username).to eql "user@server.com"
+      expect(@mailbox.password).to eql "secret-user-password"
     end
   end
 
@@ -99,7 +99,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
 
   describe '#unprocessed_message_count' do
     it "should return nil" do
-      IncomingMailProcessor::Pop3Mailbox.new(default_config).unprocessed_message_count.should be_nil
+      expect(IncomingMailProcessor::Pop3Mailbox.new(default_config).unprocessed_message_count).to be_nil
     end
   end
 
@@ -121,7 +121,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
         yielded_values << [message_id, body]
       end
 
-      yielded_values.should eql [[foo, "foo body"], [bar, "bar body"], [baz, "baz body"]]
+      expect(yielded_values).to eql [[foo, "foo body"], [bar, "bar body"], [baz, "baz body"]]
     end
 
     it "retrieves messages using a stride and offset" do
@@ -136,13 +136,13 @@ describe IncomingMailProcessor::Pop3Mailbox do
       @mailbox.each_message(stride: 2, offset: 0) do |message_id, body|
         yielded_values << [message_id, body]
       end
-      yielded_values.should eql [[bar, "bar body"], [baz, "baz body"]]
+      expect(yielded_values).to eql [[bar, "bar body"], [baz, "baz body"]]
 
       yielded_values = []
       @mailbox.each_message(stride: 2, offset: 1) do |message_id, body|
         yielded_values << [message_id, body]
       end
-      yielded_values.should eql [[foo, "foo body"]]
+      expect(yielded_values).to eql [[foo, "foo body"]]
     end
 
     context "with simple foo message" do

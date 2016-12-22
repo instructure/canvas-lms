@@ -33,12 +33,12 @@ describe IncomingMailProcessor::DirectoryMailbox do
 
   it "should connect if folder exists" do
     expect(@mailbox).to receive(:folder_exists?).with(default_config[:folder]).and_return(true)
-    expect { @mailbox.connect}.to_not raise_error
+    expect { @mailbox.connect }.to_not raise_error
   end
 
   it "should raise on connect if folder does not exist" do
     expect(@mailbox).to receive(:folder_exists?).with(default_config[:folder]).and_return(false)
-    expect { @mailbox.connect }.to raise_error
+    expect { @mailbox.connect }.to raise_error(/Folder .* does not exist/)
   end
 
   describe ".each_message" do
@@ -58,7 +58,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
       @mailbox.each_message do |*values|
         yielded_values << values
       end
-      yielded_values.should eql [["foo", "foo body"], ["bar", "bar body"], ["baz", "baz body"], ]
+      expect(yielded_values).to eql [["foo", "foo body"], ["bar", "bar body"], ["baz", "baz body"], ]
     end
 
     it "iterates with stride and offset" do
@@ -79,19 +79,19 @@ describe IncomingMailProcessor::DirectoryMailbox do
       @mailbox.each_message(stride: 2, offset: 0) do |*values|
         yielded_values << values
       end
-      yielded_values.should eql [["bar", "bar body"], ["baz", "baz body"], ]
+      expect(yielded_values).to eql [["bar", "bar body"], ["baz", "baz body"], ]
 
       yielded_values = []
       @mailbox.each_message(stride: 2, offset: 1) do |*values|
         yielded_values << values
       end
-      yielded_values.should eql [["foo", "foo body"]]
+      expect(yielded_values).to eql [["foo", "foo body"]]
     end
   end
 
   describe '#unprocessed_message_count' do
     it "should return nil" do
-      @mailbox.unprocessed_message_count.should be_nil
+      expect(@mailbox.unprocessed_message_count).to be_nil
     end
   end
 

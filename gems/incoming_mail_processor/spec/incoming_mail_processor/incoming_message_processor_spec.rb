@@ -77,10 +77,10 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     message = get_processed_message(filename)
 
     text_body =  message.body.strip
-    text_body.should == get_expected_text(filename).strip
+    expect(text_body).to eq(get_expected_text(filename).strip)
 
     html_body =  message.html_body.strip
-    html_body.should == get_expected_html(filename).strip
+    expect(html_body).to eq(get_expected_html(filename).strip)
   end
 
   def get_processed_message(name)
@@ -121,21 +121,21 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     it "should consult .poll_interval and .ignore_stdin for backwards compatibility" do
       IncomingMessageProcessor.logger = logger
       IncomingMessageProcessor.configure('poll_interval' => 0, 'ignore_stdin' => true)
-      IncomingMessageProcessor.run_periodically?.should be_truthy
+      expect(IncomingMessageProcessor.run_periodically?).to be_truthy
 
       IncomingMessageProcessor.configure('poll_interval' => 0, 'ignore_stdin' => false)
-      IncomingMessageProcessor.run_periodically?.should be_falsey
+      expect(IncomingMessageProcessor.run_periodically?).to be_falsey
 
       IncomingMessageProcessor.configure('poll_interval' => 42, 'ignore_stdin' => true)
-      IncomingMessageProcessor.run_periodically?.should be_falsey
+      expect(IncomingMessageProcessor.run_periodically?).to be_falsey
     end
 
     it "should use 'run_periodically' configuration setting" do
       IncomingMessageProcessor.configure({})
-      IncomingMessageProcessor.run_periodically?.should be_falsey
+      expect(IncomingMessageProcessor.run_periodically?).to be_falsey
 
       IncomingMessageProcessor.configure('run_periodically' => true)
-      IncomingMessageProcessor.run_periodically?.should be_truthy
+      expect(IncomingMessageProcessor.run_periodically?).to be_truthy
     end
   end
 
@@ -149,8 +149,8 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
           content_type 'text/plain; charset=UTF-8'
           body "he\xffllo".force_encoding(Encoding::BINARY) }, '')
 
-      message_handler.body.should == "hello"
-      message_handler.html_body.should == "hello"
+      expect(message_handler.body).to eq("hello")
+      expect(message_handler.html_body).to eq("hello")
     end
 
     it "should convert another charset to UTF-8" do
@@ -161,8 +161,8 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
 
       comparison_string = "\xe3\x82\xa1"
       comparison_string.force_encoding("UTF-8")
-      message_handler.body.should == comparison_string
-      message_handler.html_body.should == comparison_string
+      expect(message_handler.body).to eq(comparison_string)
+      expect(message_handler.html_body).to eq(comparison_string)
     end
 
     it "should pick up html from a multipart" do
@@ -175,8 +175,8 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
             body '<h1>This is HTML</h1>'
           end
         }, '')
-      message_handler.body.should == 'This is plain text'
-      message_handler.html_body.should == '<h1>This is HTML</h1>'
+      expect(message_handler.body).to eq('This is plain text')
+      expect(message_handler.html_body).to eq('<h1>This is HTML</h1>')
     end
 
     it "should not send a bounce reply when the incoming message is an auto-response" do
@@ -193,8 +193,8 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
           content_type 'text/html; charset=UTF-8'
           body '<h1>This is HTML</h1>'
         }, '')
-      message_handler.body.should == "************\nThis is HTML\n************"
-      message_handler.html_body.should == '<h1>This is HTML</h1>'
+      expect(message_handler.body).to eq("************\nThis is HTML\n************")
+      expect(message_handler.html_body).to eq('<h1>This is HTML</h1>')
     end
 
     it "creates missing text part from html part" do
@@ -204,8 +204,8 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
             body '<h1>This is HTML</h1>'
           end
         }, '')
-      message_handler.body.should == "************\nThis is HTML\n************"
-      message_handler.html_body.should == '<h1>This is HTML</h1>'
+      expect(message_handler.body).to eq("************\nThis is HTML\n************")
+      expect(message_handler.html_body).to eq('<h1>This is HTML</h1>')
     end
 
     it "works with multipart emails with no html part" do
@@ -229,8 +229,8 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
           content_type nil
           body "hello" }, '')
 
-      message_handler.body.should == "hello"
-      message_handler.html_body.should == "hello"
+      expect(message_handler.body).to eq("hello")
+      expect(message_handler.html_body).to eq("hello")
     end
 
     context "reporting stats" do
@@ -504,15 +504,15 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       }
       IncomingMessageProcessor.configure(config)
       accounts = IncomingMessageProcessor.mailbox_accounts
-      accounts.size.should eql 3
+      expect(accounts.size).to eql 3
       protocols = accounts.map(&:protocol)
-      protocols.count.should eql 3
-      protocols.count(:imap).should eql 2
-      protocols.count(:directory).should eql 1
+      expect(protocols.count).to eql 3
+      expect(protocols.count(:imap)).to eql 2
+      expect(protocols.count(:directory)).to eql 1
       usernames = accounts.map(&:config).map{ |c| c[:username] }
-      usernames.count('foo').should eql 1
-      usernames.count('bar').should eql 1
-      usernames.count(nil).should eql 1
+      expect(usernames.count('foo')).to eql 1
+      expect(usernames.count('bar')).to eql 1
+      expect(usernames.count(nil)).to eql 1
     end
 
     it "should not try to load messages with invalid address tag" do
@@ -522,7 +522,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       expect(account).to receive(:address).and_return('user@example.com')
       expect(message).to receive(:to).and_return(['user@example.com'])
       result = IncomingMessageProcessor.extract_address_tag(message, account)
-      result.should == false
+      expect(result).to eq(false)
     end
   end
 
@@ -565,7 +565,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       err = MockErrorReporter.new
       expect(err).to receive(:log_exception).once
       IncomingMessageProcessor.new(message_handler, err).process
-      processed_second.should be_truthy
+      expect(processed_second).to be_truthy
     end
   end
 end

@@ -59,23 +59,23 @@ describe IncomingMailProcessor::ImapMailbox do
         :password => "secret-user-password",
       })
 
-      @mailbox.server.should eql "imap.server.com"
-      @mailbox.port.should eql 1234
-      @mailbox.ssl.should eql "truthy-value"
-      @mailbox.filter.should eql ["ALL"]
-      @mailbox.username.should eql "user@server.com"
-      @mailbox.password.should eql "secret-user-password"
+      expect(@mailbox.server).to eql "imap.server.com"
+      expect(@mailbox.port).to eql 1234
+      expect(@mailbox.ssl).to eql "truthy-value"
+      expect(@mailbox.filter).to eql ["ALL"]
+      expect(@mailbox.username).to eql "user@server.com"
+      expect(@mailbox.password).to eql "secret-user-password"
     end
 
     it "should accept non-array filter" do
       @mailbox = IncomingMailProcessor::ImapMailbox.new(:filter => "BLAH")
-      @mailbox.filter.should eql ["BLAH"]
+      expect(@mailbox.filter).to eql ["BLAH"]
     end
 
     it "should accept folder parameter" do
       # this isn't necessary for gmail, but just in case
       @mailbox = IncomingMailProcessor::ImapMailbox.new(:folder => "inbox")
-      @mailbox.folder.should eql "inbox"
+      expect(@mailbox.folder).to eql "inbox"
     end
 
   end
@@ -90,12 +90,12 @@ describe IncomingMailProcessor::ImapMailbox do
   describe '#unprocessed_message_count' do
     it 'returns zero if there are no messages' do
       expect(@imap_mock).to receive(:search).with(["X-GM-RAW", "label:unread"]).once.and_return([])
-      @mailbox.unprocessed_message_count.should eql 0
+      expect(@mailbox.unprocessed_message_count).to eql 0
     end
 
     it 'returns the number of messages if there are any' do
       expect(@imap_mock).to receive(:search).with(["X-GM-RAW", "label:unread"]).once.and_return([1,2,3,58,42])
-      @mailbox.unprocessed_message_count.should eql 5
+      expect(@mailbox.unprocessed_message_count).to eql 5
     end
   end
 
@@ -124,7 +124,7 @@ describe IncomingMailProcessor::ImapMailbox do
       @mailbox.each_message do |message_id, message_body|
         yielded_values << [message_id, message_body]
       end
-      yielded_values.should eql [[1, "foo"], [2, "bar"], [3, "baz"]]
+      expect(yielded_values).to eql [[1, "foo"], [2, "bar"], [3, "baz"]]
     end
 
     it "retrieves messages uses stride and offset" do
@@ -141,13 +141,13 @@ describe IncomingMailProcessor::ImapMailbox do
       @mailbox.each_message(stride: 2, offset: 0) do |message_id, message_body|
         yielded_values << [message_id, message_body]
       end
-      yielded_values.should eql [[2, "bar"]]
+      expect(yielded_values).to eql [[2, "bar"]]
 
       yielded_values = []
       @mailbox.each_message(stride: 2, offset: 1) do |message_id, message_body|
         yielded_values << [message_id, message_body]
       end
-      yielded_values.should eql [[1, "foo"], [3, "baz"]]
+      expect(yielded_values).to eql [[1, "foo"], [3, "baz"]]
     end
 
     it "should delete a retrieved message" do
@@ -208,7 +208,7 @@ describe IncomingMailProcessor::ImapMailbox do
   describe "timeouts" do
     it "should use timeout method on connect call" do
       @mailbox.set_timeout_method { raise Timeout::Error }
-      lambda { @mailbox.connect }.should raise_error(Timeout::Error)
+      expect { @mailbox.connect }.to raise_error(Timeout::Error)
     end
     # if these work, others are likely wrapped with timeouts as well because of wrap_with_timeout
 
@@ -226,7 +226,7 @@ describe IncomingMailProcessor::ImapMailbox do
       rescue SyntaxError => e
         exception_propegated = true
       end
-      exception_propegated.should be_truthy
+      expect(exception_propegated).to be_truthy
     end
   end
 end
