@@ -5376,13 +5376,13 @@ de:
         - Fre
         - Sam
     day_names: 
-      - Sonntag
-      - Montag
-      - Dienstag
-      - Mittwoch
-      - Donnerstag
-      - Freitag
-      - Samstag
+      - sonntag
+      - montag
+      - dienstag
+      - mittwoch
+      - donnerstag
+      - freitag
+      - samstag
     days: 
       today: Heute
       today_lower: heute

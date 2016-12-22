@@ -5376,13 +5376,13 @@ da:
         - Fr
         - Lø
     day_names: 
-      - Søndag
-      - Mandag
-      - Tirsdag
-      - Onsdag
-      - Torsdag
-      - Fredag
-      - Lørdag
+      - søndag
+      - mandag
+      - tirsdag
+      - onsdag
+      - torsdag
+      - fredag
+      - lørdag
     days: 
       today: "I dag"
       today_lower: "I dag"

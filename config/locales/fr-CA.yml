@@ -50,7 +50,7 @@ fr-CA:
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Un dépôt de valeur/clé pratique d'un serveur d'information intéressante sur l'environnement de l'utilisateur effectuant une observation"
   a_message_is_required_129e1814: "Message obligatoire"
   a_name_for_this_set_is_required_222bad23: "Un nom pour cet ensemble est requis"
-  a_new_assignment_has_been_created_for_your_course__12b72639: "Un nouveau travail a été créé pour votre cours, %{course_name}"
+  a_new_assignment_has_been_created_for_your_course__12b72639: "Un nouveau tâche a été créé pour votre cours, %{course_name}"
   a_problem_occurred_adding_reviewers_57b083d9: "Un problème est survenu lors de l'ajout d'examinateurs."
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Un tableau contenant le nom du système de notation et des boutons permettant de modifier ou supprimer ce système."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Un tableau regroupant réponses et brèves statistiques concernant les choix de réponse des étudiants."
@@ -111,7 +111,7 @@ fr-CA:
     tab_sub_accounts: Sous-comptes
     tab_terms: Trimestres
     tab_users: Utilisateurs
-    turnitin_pledge: "Le travail envoyé est le résultat de mon travail personnel et individuel."
+    turnitin_pledge: "Le tâche envoyé est le résultat de mon travail personnel et individuel."
   account_97b34646: Compte
   account_authorization_config: 
     default_delegated_login_handle_name: Connexion
@@ -258,9 +258,9 @@ fr-CA:
     report_header_assessment_question_id: "ID de question d’évaluation"
     report_header_assessment_title: "Titre d’évaluation"
     report_header_assessment_type: "Type d’évaluation"
-    report_header_assignment_id: "ID de travail"
-    report_header_assignment_title: "Titre du travail"
-    report_header_assignment_url: "URL du travail"
+    report_header_assignment_id: "ID de tâche"
+    report_header_assignment_title: "Titre de la tâche"
+    report_header_assignment_url: "URL de la tâche"
     report_header_associated_user_id: associated_user_id
     report_header_attempt: tentative
     report_header_canvas_account_id: canvas_account_id
@@ -517,7 +517,7 @@ fr-CA:
       grade_change_logging_content: 
         find: Rechercher
         grade_change_activity: "Activité de modification des notes"
-        message_assignment_id: "ID de travail "
+        message_assignment_id: "ID de tâche"
         message_course_id: "ID de cours"
       grade_change_logging_item: 
         blank_placeholder: "-"
@@ -527,7 +527,7 @@ fr-CA:
         yes-abbreviation: o
       grade_change_logging_results: 
         Anonymous: Anonyme
-        Assignment: Travail
+        Assignment: Tâche
         Course: Cours
         Grader: Correcteur
         Student: Étudiant
@@ -740,7 +740,7 @@ fr-CA:
       account_reports: 
         outcomes: 
           description: 
-            text: "Ce rapport répertorie les acquis de tous les étudiants. Le fichier CSV résultant contient une ligne par combinaison utilisateur-acquis et affiche les détails, dont le travail associé."
+            text: "Ce rapport répertorie les acquis de tous les étudiants. Le fichier CSV résultant contient une ligne par combinaison utilisateur-acquis et affiche les détails, dont le tâche associé."
     outcome_results_csv_parameters: 
       account_reports: 
         outcomes: 
@@ -980,7 +980,7 @@ fr-CA:
       tab_reports: Rapports
       tab_settings: Paramètres
       transifex_message: "Rejoindre la [Canvas Translation Community](%{transifex_url})"
-      turnitin_comments_help: "ces commentaires seront affichés à l’intention des étudiants lors de l’envoi d’un travail validé par Turnitin."
+      turnitin_comments_help: "ces commentaires seront affichés à l’intention des étudiants lors de l’envoi d’une tâche validé par Turnitin."
       turnitin_pledge_help: "les étudiants doivent cocher une case pour marquer leur accord avec cet engagement"
       turnitin_settings_title: "Paramètres de Turnitin"
       update_settings_button: "Mettre à jour les paramètres"
@@ -1129,7 +1129,7 @@ fr-CA:
       account_reports: 
         student_assignment_map: 
           description: 
-            text: "Ce rapport répertorie les acquis de tous les étudiants. Le fichier CSV résultant contient une ligne par combinaison utilisateur-acquis et affiche les détails, dont le travail associé. Il donne les résultats uniquement pour les tâches et n’inclut pas ceux des banques de questions."
+            text: "Ce rapport répertorie les acquis de tous les étudiants. Le fichier CSV résultant contient une ligne par combinaison utilisateur-acquis et affiche les détails, dont le tâche associé. Il donne les résultats uniquement pour les tâches et n’inclut pas ceux des banques de questions."
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
@@ -1139,7 +1139,7 @@ fr-CA:
       account_reports: 
         default: 
           students_with_no_submissions: 
-            text: "Ce rapport répertorie tous les étudiants inscrits à un cours pour un trimestre donné et n’ayant rendu aucun travail pendant la période indiquée. Il contient une ligne par inscription répondant aux critères. La période ne peut pas excéder deux semaines."
+            text: "Ce rapport répertorie tous les étudiants inscrits à un cours pour un trimestre donné et n’ayant rendu aucune tâche pendant la période indiquée. Il contient une ligne par inscription répondant aux critères. La période ne peut pas excéder deux semaines."
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1245,11 +1245,11 @@ fr-CA:
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Ajouter un examinateur pour les étudiants sélectionnés"
   add_account_admins_99c03c9e: "Ajouter des administrateurs de compte"
   add_alert_b2729c99: "Ajouter une alerte"
-  add_an_assignment_fb73942e: "Ajouter un travail"
+  add_an_assignment_fb73942e: "Ajouter une tâche"
   add_an_identity_provider_to_this_account_c2644478: "Ajouter un fournisseur d'identité à ce compte :"
-  add_another_assignment_fc5c908f: "Ajouter un autre travail"
+  add_another_assignment_fc5c908f: "Ajouter un autre tâche"
   add_app_baf540f: "Ajouter une application"
-  add_assignment_to_name_caf173b0: "Ajouter le travail à %{name}"
+  add_assignment_to_name_caf173b0: "Ajouter le tâche à %{name}"
   add_attachment_93868828: "Ajouter une pièce jointe"
   add_attribute_6d6d4a65: "Ajouter un attribut"
   add_bank: 
@@ -1370,20 +1370,20 @@ fr-CA:
   all_start_dates_must_be_before_the_end_date_d949eca9: "Toutes les dates de début doivent être antérieures à la date de fin"
   all_students_have_taken_the_quiz_b558f8b4: "Tous les étudiants ont complété le questionnaire"
   all_students_have_taken_the_survey_494f9f42: "Tous les étudiants ont répondu à l’enquête"
-  all_submissions_must_have_a_selected_grade_3a84e5a9: "Chaque soumission doit avoir une note sélectionnée."
+  all_submissions_must_have_a_selected_grade_3a84e5a9: "Chaque envoi doit avoir une note sélectionnée."
   all_terms_cd27b0fb: "Tous les trimestres"
-  allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Autoriser un modérateur à réviser plusieurs notes indépendantes pour les remises sélectionnés"
+  allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Autoriser un modérateur à réviser plusieurs notes indépendantes pour les envois sélectionnés"
   allow_bulk_grade_export_to_sis_e11a6e66: "Permet l'exportation globale des notes vers le SIS "
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Autoriser les images de cours d'être assignées à un cours et utilisées sur les cartes du tableau de bord."
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Permettre aux cartes du tableau de bord d’être triées pour chaque utilisateur."
   allow_in_mastery_paths_5332c786: "Autoriser dans les parcours de maîtrise"
-  allow_intra_group_peer_reviews_53f1e455: "Autoriser les évaluations entre élèves de même groupe"
+  allow_intra_group_peer_reviews_53f1e455: "Autoriser les évaluations entre étudiants de même groupe"
   allow_lor_tools: "Autoriser les utilisateurs à voir et utiliser des outils externes configurés pour LOR."
   allow_multiple_attempts_e67a0a37: "Autoriser plusieurs tentatives"
   allow_opt_out_of_inbox: "Permet aux utilisateurs de sortir de la boîte de réception des conversations. Cela aura les conséquences suivantes : tous les messages et notifications des conversations seront envoyés sous forme d’alertes ASAP à l’adresse courriel principale de l’utilisateur, et le symbole des messages non lus de la boîte de réception des conversations et les préférences de notification seront masqués."
   allow_reorder_dashboard_cards_78215947: "Permettre le tri des cartes de tableau de bord"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Permettre aux étudiants de voir qui s'est inscrit et pour quels créneaux horaires."
-  allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Autoriser les élèves à voir qui est inscrit aux créneaux"
+  allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Autoriser les étudiants à voir qui est inscrit aux créneaux"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Autoriser la capacité d'envoyer des notifications par notre file d'expédition"
   allowed_attempts_4e229caa: "Tentatives autorisées"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permettre aux enseignants de marquer les données de notes comme prêtes à une exportation globale pour leurs intégrations au système d'information des étudiants."
@@ -1485,7 +1485,7 @@ fr-CA:
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "La notation anonyme oblige le masquage des noms des étudiants dans SpeedGrader™"
   anonymous_user: "Utilisateur anonyme"
   anonymous_user_d984b9ce: "Utilisateur anonyme"
-  another_assignment_name_369f8481: "Un autre nom de travail"
+  another_assignment_name_369f8481: "Un autre nom de tâche"
   another_configuration_is_currently_selected_select_95b394e: "Une autre configuration est actuellement sélectionnée. Le fait de choisir cette configuration va désactiver l'autre."
   answer_address_book_queries_through_76842372: "Répondre aux requêtes du carnet d'adresses par"
   answer_answerid_97fc4afc: "Réponse %{answerId}"
@@ -1644,11 +1644,11 @@ fr-CA:
     titles: 
       gpa_scale_explainer: "Qu’est-ce que le système de notation américain GPA?"
       grading_scheme_info: "Afficher/Modifier le système de notation"
-  assignment_976578a8: Travail
-  assignment_comments_e43ed898: "Commentaires sur le travail"
+  assignment_976578a8: Tâche
+  assignment_comments_e43ed898: "Commentaires sur le tâche"
   assignment_configuration_4153cb88: "Configuration des tâches"
-  assignment_created_assignment_name_course_name_324a5639: "Travail créé - %{assignment_name}, %{course_name}"
-  assignment_d8387b78: travail
+  assignment_created_assignment_name_course_name_324a5639: "Tâche créé - %{assignment_name}, %{course_name}"
+  assignment_d8387b78: tâche
   assignment_details: 
     no_graded_submissions: "Pas d’envois notés"
   assignment_details_dialog: 
@@ -1667,7 +1667,7 @@ fr-CA:
     default_name: Tâches
     default_title: Tâches
   assignment_group_1a781505: "Groupe de tâches"
-  assignment_group_was_saved_successfully_5caa27d3: "Le groupe de travail a été sauvegardé avec succès"
+  assignment_group_was_saved_successfully_5caa27d3: "Le groupe de tâche a été sauvegardé avec succès"
   assignment_group_weights_and_drop_rules_can_t_be_e_7b5f305d: "Les poids des groupes de devoirs et les règles d'échec ne peuvent être édités car il y a des devoirs dans l'un de ces groupes dont la date de clôture est passée."
   assignment_group_weights_can_t_be_edited_because_t_b6b591ae: "Les poids des groupes de devoirs ne peuvent être édités car il y a des devoirs dans l'un de ces groupes dont la date de clôture est passée."
   assignment_group_weights_dialog: 
@@ -1687,8 +1687,8 @@ fr-CA:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: "Vous ne pouvez pas supprimer un groupe contenant une activité verrouillée."
-  assignment_menu_91fe3716: "Menu du travail"
-  assignment_muted_4cb590a4: "Travail assigné silencieux"
+  assignment_menu_91fe3716: "Menu de la tâche"
+  assignment_muted_4cb590a4: "Tâche silencieux"
   assignment_muter: 
     mute_assignment: "Tâche silencieuse"
     muting_assignment: "Tâche en mode silencieux..."
@@ -1696,7 +1696,7 @@ fr-CA:
     unmute_button: "Annuler une tâche silencieuse"
     unmute_dialog: "Cette tâche est actuellement en mode silencieux. Cela signifie que les étudiants ne peuvent pas voir leurs notes ni leurs corrections. Voulez-vous annuler la tâche silencieuse maintenant?"
     unmuting_assignment: "Réactiver le son pour la tâche..."
-  assignment_name_b2d87383: "Nom du travail"
+  assignment_name_b2d87383: "Nom de la tâche"
   assignment_name_course_name_is_now_due_55613e9b: "%{assignment_name}, %{course_name}, est maintenant dû"
   assignment_name_course_name_no_longer_has_a_due_da_a37b6a7c: "%{assignment_name}, %{course_name}, n'a plus de date d'échéance"
   assignment_name_course_name_override_is_now_due_ed5ce1e: "%{assignment_name}, %{course_name} (%{override}) est maintenant dû"
@@ -1707,8 +1707,8 @@ fr-CA:
       one: "%{count} étudiant"
       other: "%{count} étudiants"
   assignment_path_selected_e80191d1: "Chemin du devoir sélectionné"
-  assignment_selection_6bff05c4: "Sélection du travail"
-  assignment_was_deleted_8320d26d: "Le travail a été supprimé"
+  assignment_selection_6bff05c4: "Sélection de la tâche"
+  assignment_was_deleted_8320d26d: "Le tâche a été supprimé"
   assignment_weights_d4bcf9ab: "Importance des tâches"
   assignments: 
     assignment_group_create_dialog: 
@@ -1729,11 +1729,11 @@ fr-CA:
     assignment_list_item: 
       delete: Supprimer
     assignment_list_item_score: 
-      assignment_grading_type_is_not_graded: "Ce travail ne sera pas noté."
-      assignment_not_yet_graded_screenreader: "Travail pas encore noté. %{pointsPossible} points possibles."
+      assignment_grading_type_is_not_graded: "Cette tâche ne sera pas noté."
+      assignment_not_yet_graded_screenreader: "Tâche pas encore noté. %{pointsPossible} points possibles."
       empty_points_possible: "-/%{pointsPossible} points"
       no_submission: "Aucun envoi"
-      no_submission_for_assignment_screenreader: "Pas d’envoi pour ce travail. %{pointsPossible} points possibles."
+      no_submission_for_assignment_screenreader: "Pas d’envoi pour cette tâche. %{pointsPossible} points possibles."
       not_yet_graded: "*Pas encore noté*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} points"
       score_with_points_possible_screenreader: "Résultat : %{score} sur %{pointsPossible} points."
@@ -1752,7 +1752,7 @@ fr-CA:
     complete: Terminé
     confirm_delete_group: "Voulez-vous vraiment supprimer ce groupe de tâches?"
     create_assignment: 
-      assignment: Travail
+      assignment: Tâche
       assignment_due_at: "Échéance :"
       assignment_name: "Nom :"
       assignment_points: "Points :"
@@ -1796,7 +1796,7 @@ fr-CA:
       options: 
         select_group: "Sélectionner un groupe"
       tooltips: 
-        target_group: "Sélectionner un groupe vers lequel déplacer ce travail"
+        target_group: "Sélectionner un groupe vers lequel déplacer cette tâche"
       warnings: 
         delete_assignment_group: "Vous êtes sur le point de supprimer *%{name}*, qui contient **%{assignment_count}** tâches."
       would_you_like: "Souhaitez-vous :"
@@ -1807,7 +1807,7 @@ fr-CA:
       one: "Ôter la note la plus faible"
       other: "Ôter les %{count} notes les plus faibles"
     edit_view: 
-      assignment_name: "Nom du travail"
+      assignment_name: "Nom de la tâche"
       buttons: 
         save: Enregistrer
         save_and_publish: "Sauvegarder et publier"
@@ -1815,7 +1815,7 @@ fr-CA:
       freeze_properties: "Verrouiller les propriétés de la tâche lors de la copie"
       notify_content_change: "Informer les utilisateurs que ce contenu a changé"
       points_possible: Points
-      post_to_sis: "Inclure les notes de ce travail lors de la publication dans le Système d’informations sur les étudiants de votre établissement"
+      post_to_sis: "Inclure les notes de cette tâche lors de la publication dans le Système d’informations sur les étudiants de votre établissement"
       warnings: 
         assignment_is_frozen: "Certains paramètres ont été verrouillés par l’administrateur."
     errors: 
@@ -1838,14 +1838,14 @@ fr-CA:
     grade_assignment: 
       buttons: 
         upload_files: "Téléverser des fichiers"
-      graded_count: "%{graded_count} *sur* %{total} tâches notées"
+      graded_count: "%{graded_count} *sur* %{total} envois notées"
       links: 
-        download_submissions: "Télécharger les tâches"
+        download_submissions: "Télécharger les envois"
         peer_reviews: "Révisions par les pairs"
-        reupload_submissions: "Téléverser de nouveau les tâches"
+        reupload_submissions: "Téléverser de nouveau les envois"
       resubmission_count: 
         one: "1 tâche non notée réenvoyée"
-        other: "%{count} tâches non notées réenvoyées"
+        other: "%{count}  tâches non notées réenvoyées"
       speed_grader: SpeedGrader™
       titles: 
         related_items: "Éléments apparentés"
@@ -1857,9 +1857,9 @@ fr-CA:
     grading_type_selector: 
       display_grade_as: "Afficher la note en tant que"
       gpa_scale_explainer: "Le GPA, système de notation américain, est conçu pour les établissements qui utilisent l’échelle 4.0 (ou 5.0/6.0) pour tous les tâches. Il équivaut au système de notation avec les lettres, mais avec des différences importantes :"
-      gpa_scale_input_explainer: "Les notes sont calculées selon l’échelle 4.0. Par exemple, si un travail est sur 100 points, attribuer 4.0 donne 100 %, 3.0 donne 87 %, etc."
+      gpa_scale_input_explainer: "Les notes sont calculées selon l’échelle 4.0. Par exemple, si une tâche est sur 100 points, attribuer 4.0 donne 100 %, 3.0 donne 87 %, etc."
       gpa_scale_letters_explainer: "Des lettres peuvent être utilisées en plus des chiffres pour les notes."
-      gpa_scale_percentage_explainer: "Vous ne pouvez pas attribuer directement des points, mais vous pouvez indiquer des pourcentages. Par exemple, pour un travail noté sur 50 points, vous ne pouvez pas inscrire 40, vous devez indiquer 80 %."
+      gpa_scale_percentage_explainer: "Vous ne pouvez pas attribuer directement des points, mais vous pouvez indiquer des pourcentages. Par exemple, pour une tâche noté sur 50 points, vous ne pouvez pas inscrire 40, vous devez indiquer 80 %."
       gpa_scale_recommendation: "À moins que votre établissement utilise l'échelle 4.0 (ou 5.0/6.0) pour la notation, Canvas conseille d’afficher les notes sous forme de lettres."
       gpa_scale_scores_explainer: "Les seules notes acceptées sont celles qui sont prédéfinies dans le système de notation."
       gpa_scale_title: "« Qu’est-ce que le système de notation GPA? »"
@@ -1873,8 +1873,8 @@ fr-CA:
       view_grading_scheme: "Voir le système de notation"
     group_category_selector: 
       grade_group_students_individually: "Attribuer les notes individuellement à chaque étudiant"
-      group_assignment_header: "Travail de groupe"
-      group_category_locked_explanation: "Les étudiants ont déjà envoyé leur travail personnel, aussi il est impossible de changer les paramètres de groupe."
+      group_assignment_header: "Tâche de groupe"
+      group_category_locked_explanation: "Les étudiants ont déjà envoyé leur tâche personnel, aussi il est impossible de changer les paramètres de groupe."
       group_set: "Ensemble de groupes"
       is_group_assignment: "Ceci est une tâche pour un groupe"
     group_comment: 
@@ -1882,26 +1882,26 @@ fr-CA:
         group_comment: "Envoyer un commentaire au groupe complet"
     group_submission_reminder: 
       warnings: 
-        group_submission: "Notez que ce travail comptera pour chacune des personnes dans votre groupe %{group_type}."
+        group_submission: "Notez que ce envoi comptera pour chacune des personnes dans votre groupe %{group_type}."
     higher_than_max: "Vous ne pouvez pas utiliser une valeur supérieure au nombre de tâches"
     incomplete: "Non terminé"
     index_view: 
-      add_assignment: Travail
+      add_assignment: Tâche
       add_group: Groupe
       assignments: Tâches
       assignments_settings: "Paramètres des tâches"
       assignments_settings_screenreader: "Paramètres des tâches"
-      search_for_assignment: "Rechercher un travail"
-      title_add_assignment: "Ajouter un travail"
+      search_for_assignment: "Rechercher une tâche"
+      title_add_assignment: "Ajouter une tâche"
       title_add_group: "Ajouter un groupe de tâches"
     invalid_file_retrieval: "Un problème s’est produit pendant la récupération du fichier envoyé depuis cet outil."
-    keyboard_add_item: "Ajouter un travail personnel au groupe sélectionné"
+    keyboard_add_item: "Ajouter une tâche personnel au groupe sélectionné"
     keyboard_close_menu: "Fermer la boîte de dialogue"
-    keyboard_del_item: "Supprimer le travail ou le groupe actuel"
-    keyboard_edit_item: "Modifier le travail ou le groupe actuel"
-    keyboard_next_item: "Se concentrer sur le prochain travail ou groupe"
-    keyboard_prev_item: "Se concentrer sur le travail ou groupe précédent"
-    keyboard_show_assign: "Afficher l’aperçu complet du travail sélectionné"
+    keyboard_del_item: "Supprimer le tâche ou le groupe actuel"
+    keyboard_edit_item: "Modifier le tâche ou le groupe actuel"
+    keyboard_next_item: "Se concentrer sur le prochain tâche ou groupe"
+    keyboard_prev_item: "Se concentrer sur le tâche ou groupe précédent"
+    keyboard_show_assign: "Afficher l’aperçu complet de la tâche sélectionné"
     keycodes: 
       add_item: a
       close_menu: Échap
@@ -1930,17 +1930,17 @@ fr-CA:
     no_assignments_search: 
       aria_assignments: Tâches
       assignments: Tâches
-      no_assignments_found: "Aucun travail trouvé"
+      no_assignments_found: "Aucune tâche trouvé"
     no_name_error: "Le nom est obligatoire."
     no_tools_found: "Aucun outil trouvé"
     non_number: "Vous devez utiliser un nombre"
     notices: 
       assignment_delete: "Cette tâche a été supprimée"
-      assignment_not_available: "Le travail que vous avez demandé n’est pas disponible pour votre section de cours."
+      assignment_not_available: "Le tâche que vous avez demandé n’est pas disponible pour votre section de cours."
       created: "La tâche a été créée."
       updated: "La tâche a été mise à jour."
     overdue_assignments: "Tâches en retard"
-    past_assignments: "Anciens tâches"
+    past_assignments: "Anciennes tâches"
     peer_review_assignment: 
       titles: 
         remind_reviewer: "Rappeler à %{user} les évaluations"
@@ -1951,7 +1951,7 @@ fr-CA:
         add: Ajouter
         assign_peer_reviews: "Attribuer des révisions aux pairs"
       descriptions: 
-        automatically_assign_reviews: "Vous pouvez attribuer des tâches à réviser aux autres utilisateurs qui en ont déjà envoyées à réviser, mais qui n’ont pas encore reçu de révisions, en cliquant sur le bouton ci-dessous."
+        automatically_assign_reviews: "Vous pouvez attribuer des travaux à réviser aux autres utilisateurs qui en ont déjà envoyées à réviser, mais qui n’ont pas encore reçu de révisions, en cliquant sur le bouton ci-dessous."
       details: "À gauche, vous pouvez apercevoir la liste des étudiants pour cette tâche, mais également les envois d’étudiants qu’ils ont reçus à réviser."
       links: 
         assign_peer_review: "Donner à %{student} un autre envoi à évaluer"
@@ -2012,7 +2012,7 @@ fr-CA:
       manage: Gérer
       messages: 
         locked: "Cette tâche est actuellement verrouillée."
-      new_assignment: "Nouveau travail"
+      new_assignment: "Nouveau tâche"
       no_due_date: "Pas de date d’échéance"
       no_points: Aucun
       no_submission: Aucune
@@ -2086,11 +2086,11 @@ fr-CA:
       comments_placeholder: Commentaires...
       errors: 
         unacceptable_file_type: "Ce type de fichier n’est pas autorisé. Les types de fichiers acceptés sont : %{allowed_extensions_list}"
-      gmail_restriction_description: "Votre compte a restreint les envois Google Doc aux comptes Google du domaine %{domain}. Pour envoyer ce travail avec un document Google Doc, vous devrez reconfigurer l’intégration de Google Docs sur la page de vos paramètres d’utilisateur."
+      gmail_restriction_description: "Votre compte a restreint les envois Google Doc aux comptes Google du domaine %{domain}. Pour envoyer cette tâche avec un document Google Doc, vous devrez reconfigurer l’intégration de Google Docs sur la page de vos paramètres d’utilisateur."
       instructions: 
         from_external_tool: "Sélectionnez un outil dans la liste ci-dessous pour le charger et envoyer une ressource qu’il fournit."
         google_docs: "Sélectionnez le fichier dans la liste ci-dessous."
-        media_recording: "Utilisez le lien ci-dessous pour enregistrer votre envoi. Cliquez sur Enregistrer lorsque vous avez terminé et que vous êtes prêt à envoyer votre travail."
+        media_recording: "Utilisez le lien ci-dessous pour enregistrer votre envoi. Cliquez sur Enregistrer lorsque vous avez terminé et que vous êtes prêt à envoyer votre tâche."
         online_text_entry: "Copiez et collez ou saisissez votre envoi ici."
         online_url: "Copiez et collez le lien vers le site Web que vous souhaitez envoyer pour cette tâche."
       invalid_google_docs_domain: "Domaine non valide"
@@ -2112,7 +2112,7 @@ fr-CA:
       messages: 
         google_drives_auth_required: "Pour pouvoir envoyer vos tâches directement depuis Google Drive, vous devez autoriser Canvas à accéder à votre compte Google Drive :"
         media_recording_ready: "L’envoi est prêt. Cliquez sur « Envoyer une tâche » pour terminer."
-        media_recordings_disabled: "Les enregistrements multimédias ne sont pas acceptés par le site Canvas et vous ne pourrez pas envoyer ce type de travail. Contactez votre instructeur afin qu’il change les paramètres pour cette tâche, ou votre administrateur système afin qu’il autorise les enregistrements multimédias."
+        media_recordings_disabled: "Les enregistrements multimédias ne sont pas acceptés par le site Canvas et vous ne pourrez pas envoyer ce type de tâche. Contactez votre instructeur afin qu’il change les paramètres pour cette tâche, ou votre administrateur système afin qu’il autorise les enregistrements multimédias."
         submitting: "Envoi en cours…"
         uploading: "Récupération d’une copie de votre Google Docs à envoyer pour cette tâche. Cette opération peut durer quelques instants en fonction de la taille du fichier..."
       no_files: "Aucun fichier"
@@ -2177,7 +2177,7 @@ fr-CA:
         originality_report_visible_immediately: Immédiatement
         settings_exclude_fewer_than_count: "Moins de %{wordsInput} mots"
         settings_exclude_less_than_percent: "Moins de %{percentInput} du document"
-    undated_assignments: "Tâches non datés"
+    undated_assignments: "Tâches non datées"
     upcoming_assignments: "Prochaines tâches"
     veri_cite_settings_dialog: 
       buttons: 
@@ -2186,7 +2186,7 @@ fr-CA:
         originality_report_never: Jamais
         originality_report_visibility: "Les étudiants peuvent voir le rapport d’origine"
         originality_report_visible_after_due_date: "Après la date d’échéance"
-        originality_report_visible_after_grading: "Après que le travail soit noté"
+        originality_report_visible_after_grading: "Après que le tâche soit noté"
         originality_report_visible_immediately: Immédiatement
   assignments_1e02582c: Tâches
   assignments_api: 
@@ -2519,7 +2519,7 @@ fr-CA:
       scheduler_explanation_student_paragraph_2: "Aucun de vos enseignants n’a créé de rendez-vous auxquels vous pouvez vous inscrire. Si quelqu’un crée un événement, vous en serez informé et vous pourrez vous y inscrire."
       scheduler_explanation_teacher_header: "Vous n’avez créé aucun groupe de rendez-vous; vous ne pouvez vous inscrire à aucun groupe."
       scheduler_explanation_teacher_paragraph_1: "Voici l’outil de planification. Vous pouvez l’utiliser pour créer des groupes de rendez-vous auxquels vos étudiants peuvent s’inscrire."
-      scheduler_explanation_teacher_paragraph_2: "Par exemple, supposons que vous souhaitiez revoir le travail sur table de la mi-trimestre avec chaque étudiant du cours. Vous créez un nouveau groupe de rendez-vous, vous indiquez les dates et heures auxquelles vous êtes disponibles, vous demandez à l’outil de répartir ce temps en tranches horaires de 15 minutes et vous n’autorisez qu’un seul étudiant par tranche horaire."
+      scheduler_explanation_teacher_paragraph_2: "Par exemple, supposons que vous souhaitiez revoir le tâche sur table de la mi-trimestre avec chaque étudiant du cours. Vous créez un nouveau groupe de rendez-vous, vous indiquez les dates et heures auxquelles vous êtes disponibles, vous demandez à l’outil de répartir ce temps en tranches horaires de 15 minutes et vous n’autorisez qu’un seul étudiant par tranche horaire."
       scheduler_explanation_teacher_paragraph_3: "Les étudiants seront avisés et verront qu’ils doivent s’inscrire à l’une des tranches horaires indiquées. Un calendrier avec les tranches horaires disponibles s’affichera au-dessus de toutes les activités de leurs autres calendriers pour qu’ils choisissent un horaire qui leur convient."
       scheduler_explanation_teacher_paragraph_4: "* Commencez en cliquant sur le bouton « Créer un groupe de rendez-vous » sur la droite. *"
       signed_up_for: "*Le groupe de rendez-vous *%{title} auquel vous êtes inscrit"
@@ -2623,7 +2623,7 @@ fr-CA:
     edit_event: 
       tabs: 
         appointment_group: "Groupe de rendez-vous"
-        assignment: Travail
+        assignment: Tâche
         event: Événement
     end_before_start_error: "L’heure de début doit être antérieure à l’heure de fin."
     ends_in_past_error: "Impossible de créer un créneau de rendez-vous qui se termine dans le passé"
@@ -2647,7 +2647,7 @@ fr-CA:
     event_event_title: "Intitulé de l’événement :"
     event_on_this_day: "Un événement est prévu à cette date."
     event_type: 
-      assignment: Travail
+      assignment: Tâche
       discussion: Discussion
       event: Événement
       quiz: Questionnaire
@@ -2678,7 +2678,7 @@ fr-CA:
     ok: OK
     open_appointment_on_this_day: "Il y a un rendez-vous disponible à cette date."
     prompts: 
-      delete_assignment: "Voulez-vous vraiment supprimer ce travail?"
+      delete_assignment: "Voulez-vous vraiment supprimer cette tâche?"
       delete_event: "Voulez-vous vraiment supprimer cet événement?"
       delete_override: "Voulez-vous vraiment supprimer le changement apporté pour cette tâche?"
       unreserve_event: "Voulez-vous vraiment supprimer votre réservation relative à cet événement?"
@@ -2788,9 +2788,9 @@ fr-CA:
   can_interact_with_users_in_their_section_only_48cb8c43: "Interaction avec les utilisateurs possible dans leur section uniquement"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Impossible de supprimer les alignements d’après des associations de barème. Pour supprimer ces associations, vous devez enlever la ligne du barème des contenus."
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Ne peut effectuer de comparaison sur plus d'un seul fichier du même type"
-  can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Ne peut être retiré de la publication si des étudiants ont déposé leur candidature"
-  can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Ne peut retirer %{item_name} de la publication si des étudiants ont déposé leur candidature"
-  can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Ne peut retirer %{name} de la publication si des étudiants ont déposé leur candidature"
+  can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Ne peut être retiré de la publication si des étudiants ont envois"
+  can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Ne peut retirer %{item_name} de la publication si des étudiants ont envois"
+  can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Ne peut retirer %{name} de la publication si des étudiants ont envois"
   canada_1_921df67a: "Canada (+1)"
   cancel_caeb1e68: Annuler
   cancel_custom_link_creation_39ec70bd: "Annuler la création du lien personnalisé"
@@ -2841,11 +2841,11 @@ fr-CA:
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas ne possède pas de compte pour l’utilisateur : %{user}"
   canvas_error_report_ff678539: "Rapport d'erreur Canvas"
   canvas_introduction_video_2d81f3ad: "Vidéo d'introduction à Canvas"
-  canvas_parent_improved_description: "Ce paramètre permet de choisir si les parents qui créent leur propre compte parent Canvas peuvent communiquer avec les élèves de votre établissement à l'aide de l'application mobile Canvas Parent. Remarque : Les parents enregistrés en tant qu'Observateurs Canvas peuvent utiliser l'application mobile Canvas Parent même si cette fonction est réglée sur désactivée."
+  canvas_parent_improved_description: "Ce paramètre permet de choisir si les parents qui créent leur propre compte parent Canvas peuvent communiquer avec les étudiants de votre établissement à l'aide de l'application mobile Canvas Parent. Remarque : Les parents enregistrés en tant qu'Observateurs Canvas peuvent utiliser l'application mobile Canvas Parent même si cette fonction est réglée sur désactivée."
   canvas_revision_unknown: Inconnu
   canvas_ticketing_email_connector_27e253ae: "Connecteur de billetterie courriel Canvas"
   canvas_ticketing_web_post_connector_11158897: "Connecteur de billetterie d'article Web Canvas"
-  careful_changes_to_group_membership_will_apply_to__19a9089c: "Attention! Les modifications d'adhésion au groupe s'appliqueront aux groupes qui possèdent déjà des soumissions de tâches. De ce fait, les soumissions de tâches en groupe pourraient de pas s'aligner correctement. Voudriez-vous créer un nouvel ensemble de groupes destiné aux tâches futurs?"
+  careful_changes_to_group_membership_will_apply_to__19a9089c: "Attention! Les modifications d'adhésion au groupe s'appliqueront aux groupes qui possèdent déjà des envois de tâches. De ce fait, les envois de tâches en groupe pourraient de pas s'aligner correctement. Voudriez-vous créer un nouvel ensemble de groupes destiné aux tâches futurs?"
   cas_url_4ba2843e: "URL du CAS"
   catalog_already_enabled_56478a3c: "Catalogue déjà activé"
   catalog_name_46d37909: "Nom du catalogue"
@@ -2874,12 +2874,12 @@ fr-CA:
   change_name_to_568374c8: "Modifier « %{name} » en"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
-      update_assignment_points: "Laisser le nombre total de points du travail sur %{assignmentPoints} et celui de la rubrique sur %{rubricPoints} résultera en un score maximum possible de %{toPercentage_pointRatio} pour les soumissions d'étudiant notées avec la rubrique."
+      update_assignment_points: "Laisser le nombre total de points de la tâche sur %{assignmentPoints} et celui de la rubrique sur %{rubricPoints} résultera en un score maximum possible de %{toPercentage_pointRatio} pour les envois d'étudiant notées avec la rubrique."
     titles: 
-      update_assignment_points: "Modifier le nombre de points du travail pour l'aligner avec la rubrique?"
+      update_assignment_points: "Modifier le nombre de points de la tâche pour l'aligner avec la rubrique?"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Les modifications s'appliqueront même si vous quittez cette page."
   changes_you_made_may_not_be_saved_4e8db973: "Les changements effectués ne seront peut-être pas sauvegardés."
-  chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "Charte des notes de l'élève pour chaque travail"
+  chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "Charte des notes de l'étudiant pour chaque tâche"
   chat_2153c6b7: Clavardage
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Le cours dépendant doit appartenir au même compte racine que le cours maître"
   child_s_username_dde3aa9: "Nom d'utilisateur de votre enfant"
@@ -2889,10 +2889,10 @@ fr-CA:
   choose_a_csv_file_to_upload_9644480c: "Choisissez un fichier CSV à téléverser :"
   choose_a_timezone_d9c52998: "Choisir un fuseau horaire"
   choose_an_authentication_service_47dc8875: "Choisissez un service d’authentification"
-  choose_assignment_b0132c5e: "-- Choisir un travail --"
-  choose_assignment_group_9e7de13c: "Choisir un groupe de travail assigné"
-  choose_assignment_path_8ea55f3a: "Choisir un chemin de travail assigné"
-  choose_assignment_set_415f1b3: "Choisir un ensemble de tâches assignés"
+  choose_assignment_b0132c5e: "-- Choisir une tâche --"
+  choose_assignment_group_9e7de13c: "Choisir un groupe de tâche"
+  choose_assignment_path_8ea55f3a: "Choisir un chemin de tâche assigné"
+  choose_assignment_set_415f1b3: "Choisir un ensemble de tâches"
   choose_attribute_to_add_866e128d: "Choisissez un attribut à ajouter"
   choose_image_e5ee5d7a: "Choisir une image"
   choose_student_1513fcd1: "-- Choisir un étudiant --"
@@ -3005,14 +3005,14 @@ fr-CA:
           **Qu’entendons-nous par collaborations?** Nous parlons d'outils en ligne pour
           travailler ensemble sur un document partagé. Vous pouvez utiliser des ressources telles
           [Google Docs](%{google_url})
-          pour travailler de manière collaborative sur des tâches telles que des essais de groupe ou des prises de note partagées. Cette page est
+          pour travailler de manière collaborative sur des travaux telles que des essais de groupe ou des prises de note partagées. Cette page est
           un emplacement qui garde facilement trace de ces collaborations, et permet aussi
           de les configurer sans avoir à échanger de courriels.
       description_teacher: |-
           **Qu’entendons-nous par collaborations?** Nous parlons d'outils en ligne que la plupart
           de vos étudiants connaissent probablement déjà. Les étudiants peuvent utiliser des ressources telles
           [Google Docs](%{google_url})
-          pour travailler de manière collaborative sur des tâches telles que des essais de groupe ou des prises de note partagées. Cette page leur propose
+          pour travailler de manière collaborative sur des travaux telles que des essais de groupe ou des prises de note partagées. Cette page leur propose
           (et à vous aussi) un emplacement pour facilement garder trace de ces collaborations, et permet aussi
           de les configurer sans avoir à échanger de courriels.
       how_to_start_a_new_collaboration: "Pour en savoir plus sur un type particulier de collaboration, cliquez sur « Démarrer une nouvelle collaboration », puis choisissez le type voulu dans la liste déroulante."
@@ -3033,8 +3033,8 @@ fr-CA:
       resolution: "Contactez l'auteur et laissez-lui savoir."
     titles: 
       delete: "Supprimer la collaboration?"
-  collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: "Les collaborations sont des outils en ligne pour travailler en équipe sur des tâches telles que des prises de notes ou des écrits de groupe. Pour en commencer une, il suffit de cliquer le bouton « + Collaboration »."
-  collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Les collaborations sont des outils en ligne pour travailler en équipe sur des tâches telles que des prises de notes ou des écrits de groupe. Commencez par ajouter une application de collaboration."
+  collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: "Les collaborations sont des outils en ligne pour travailler en équipe sur des travaux telles que des prises de notes ou des écrits de groupe. Pour en commencer une, il suffit de cliquer le bouton « + Collaboration »."
+  collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Les collaborations sont des outils en ligne pour travailler en équipe sur des travaux telles que des prises de notes ou des écrits de groupe. Commencez par ajouter une application de collaboration."
   collapse_group_c2af7cad: "Réduire le groupe"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Réduire la liste des membres du groupe %{groupName}"
   collapse_subdiscussion_89af1f5c: "Réduire la sous-discussion"
@@ -3219,7 +3219,7 @@ fr-CA:
       message: 
         export_started: "Le processus d’exportation a commencé. Cette opération peut prendre un certain temps avec les cours volumineux. *Vous pouvez quitter la page* et vous recevrez un courriel lorsque l’exportation sera terminée."
       no_submissions: "Vous n’avez actuellement aucun envoi à exporter."
-      user_data_exports: "Télécharger les tâches"
+      user_data_exports: "Télécharger les envois"
     labels: 
       new_export: "Nouvelle exportation :"
     links: 
@@ -3631,7 +3631,7 @@ fr-CA:
         title: 
           min_score: "Les étudiants doivent obtenir au moins %{min_score} à cet élément avant que le module ne soit considéré comme terminé"
           must_contribute: "Les étudiants doivent participer à cet élément avant que ce module soit considéré comme terminé"
-          must_submit: "Les étudiants doivent envoyer ce travail avant que ce module soit considéré comme terminé"
+          must_submit: "Les étudiants doivent envoyer cette tâche avant que ce module soit considéré comme terminé"
           must_view: "Les étudiants doivent consulter cet élément avant que ce module soit considéré comme terminé"
       indent: 
         ? "n"
@@ -3662,7 +3662,7 @@ fr-CA:
       requirements: 
         must_contribute: "contribuer à la page"
         must_score_at_least: "obtenir au moins"
-        must_submit: "envoyer le travail personnel"
+        must_submit: "envoyer le tâche personnel"
         must_view: "afficher l’élément"
       select_module: 
         instructions: "Sélectionner le module"
@@ -3939,13 +3939,13 @@ fr-CA:
   couldn_t_update_standards_for_authority_auth_81206187: "Impossible de mettre à jour les critères de l'autorisation %{auth}"
   count_alignments_7d98ee41: "*%{count}* Alignements"
   count_assignments_found_17520826: 
-    one: "1 travail trouvé."
+    one: "1 tâche trouvé."
     other: "%{count} tâches trouvés."
-    zero: "Aucun travail correspondant trouvé."
+    zero: "Aucune tâche correspondant trouvé."
   count_assignments_with_errors_e8f3c18c: 
-    one: "1 travail avec des erreurs"
+    one: "1 tâche avec des erreurs"
     other: "%{count} tâches avec des erreurs"
-    zero: "Aucun travail avec des erreurs. Cliquez sur Continuer."
+    zero: "Aucune tâche avec des erreurs. Cliquez sur Continuer."
   count_comments_cb137ab8: 
     one: "1 commentaire"
     other: "%{count} commentaires"
@@ -3988,8 +3988,8 @@ fr-CA:
     one: "1 étudiant"
     other: "%{count} étudiants"
   count_students_in_percentile_percentile_d0adecfe: 
-    one: "1 élève dans le centile %{percentile}. "
-    other: "%{count} élèves dans le centile %{percentile}. "
+    one: "1 étudiant dans le centile %{percentile}. "
+    other: "%{count} étudiants dans le centile %{percentile}. "
   count_students_will_get_num_points_c970fc01: 
     one: "1 étudiant obtiendra %{num} points"
     other: "%{count} étudiants obtiendront %{num} points"
@@ -3997,8 +3997,8 @@ fr-CA:
     one: "%{count} sous-module"
     other: "%{count} sous-modules"
   count_submissions_need_grading_d34bae25: 
-    one: "1 soumission doit être notée"
-    other: "%{count} soumissions doivent être notées"
+    one: "1 envoi doit être notée"
+    other: "%{count} envois doivent être notées"
   country_is_required_b0afbf52: "Le pays est requis"
   course: 
     access_denied: "Accès refusé"
@@ -4590,7 +4590,7 @@ fr-CA:
       tooltips: 
         cannot_unpublish_course: "Vous ne pouvez pas annuler la publication de ce cours s’il y a des envois notés"
       transifex_message: "Rejoindre la [Canvas Translation Community](%{transifex_url})"
-      turnitin: "ces commentaires seront affichés à l’intention des étudiants lors de l’envoi d’un travail validé par Turnitin."
+      turnitin: "ces commentaires seront affichés à l’intention des étudiants lors de l’envoi d’une tâche validé par Turnitin."
       view_grading_scheme: "afficher le système de notation"
       wiki_editing_roles_change_existing: "Change les pages actuellement modifiables par « %{current_setting} » par « %{new_setting} »."
     settings_sidebar: 
@@ -4726,7 +4726,7 @@ fr-CA:
   create_132b3be1: Créer
   create_a_new_account_4cf7c0f9: "Créer un nouveau compte"
   create_account_263ec6: "Créer un compte"
-  create_assignment_68532ceb: "Créer un travail"
+  create_assignment_68532ceb: "Créer une tâche"
   create_failed_15d07ad4: "La création a échoué"
   create_new_e0946c49: "Créer nouveau"
   create_slots_71dbb2f8: "Créer des créneaux"
@@ -4738,7 +4738,7 @@ fr-CA:
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Créé par SIS"
   created_group_group_name_2097306b: "A créé le groupe %{group_name}"
-  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Le fait de créer un Export de soumissions vous permettra de télécharger un fichier zip contenant toutes vos soumissions de tâches, de tous vos cours, présents et passés. Ce fichier pourrait être conséquent, donc cette opération pourrait prendre un moment. Vous pouvez naviguer sur d'autres pages et y revenir ultérieurement."
+  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Le fait de créer un Export de envois vous permettra de télécharger un fichier zip contenant toutes vos envois de tâches, de tous vos cours, présents et passés. Ce fichier pourrait être conséquent, donc cette opération pourrait prendre un moment. Vous pouvez naviguer sur d'autres pages et y revenir ultérieurement."
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Licence Creative Commons :"
   creative_commons_licenses_7d557d9a: "Licences Creative Commons"
@@ -4828,7 +4828,7 @@ fr-CA:
         ratio: "Ratio d’étudiants ayant donné des réponses erronées"
   current_367624e9: Actuel
   current_courses_d5287d50: "Cours actuels"
-  current_grading_scheme_for_this_assignment_d525463e: "Le plan de notation actuel pour ce travail"
+  current_grading_scheme_for_this_assignment_d525463e: "Le plan de notation actuel pour cette tâche"
   current_letter_grade_50f4ebb1: "Note actuelle (en lettre)"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Score actuel de maîtrise : %{score} sur %{mastery_points}"
   current_provider_6c3f7f96: "Fournisseur actuel"
@@ -4845,7 +4845,7 @@ fr-CA:
     curve_average: "Entrez une note moyenne pour la courbe pour *%{assignment.name}*. Le graphique affiche sa meilleure proposition de normalisation des notes en fonction des notes actuelles des étudiants."
     curve_grade_for_assignment: "Courbe des notes pour %{assignment.name}"
     labels: 
-      assign_blanks: "Attribuer un zéro aux tâches non envoyées"
+      assign_blanks: "Attribuer un zéro aux travaux non envoyées"
     out_of_points_possible: "sur %{assignment.points_possible}"
     this_is_permanent: "La courbe de notation ne peut pas être annulée. Les historiques restent disponibles, mais l’action relative à la courbe est irréversible."
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "L'utilisation de CSS ou Javascript personnalisé peut créer des problèmes d'accessibilité ou des conflits lors des prochaines mises à jour de Canvas!"
@@ -4866,11 +4866,11 @@ fr-CA:
       one: "Développer %{count} annonce"
       other: "Développer %{count} annonces"
     assignments_collapse: 
-      one: "Réduire %{count} notification de travail"
-      other: "Réduire %{count} notifications de travail"
+      one: "Réduire %{count} notification de tâche"
+      other: "Réduire %{count} notifications de tâche"
     assignments_expand: 
-      one: "Développer %{count} notification de travail"
-      other: "Développer %{count} notifications de travail"
+      one: "Développer %{count} notification de tâche"
+      other: "Développer %{count} notifications de tâche"
     confirm: 
       close: |-
           Voulez-vous vraiment mettre fin à cette conférence?
@@ -4927,13 +4927,13 @@ fr-CA:
         - Ven
         - Sam
     day_names: 
-      - Dimanche
-      - Lundi
-      - Mardi
-      - Mercredi
-      - Jeudi
-      - Vendredi
-      - Samedi
+      - dimanche
+      - lundi
+      - mardi
+      - mercredi
+      - jeudi
+      - vendredi
+      - samedi
     days: 
       today: Aujourd’hui
       today_lower: aujourd’hui
@@ -5042,8 +5042,8 @@ fr-CA:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Définissez le texte qui s’affichera avant et après le déroulant et créez un ensemble de réponses possibles."
   delay_posting_this_topic_until_aa483eec: "Retarder la publication de ce sujet jusqu'à"
   delete_a6efa79d: Supprimer
-  delete_assignment_group_7c3b01c4: "Supprimer le groupe du travail"
-  delete_assignment_name_deec56e3: "Supprimer le travail %{name}"
+  delete_assignment_group_7c3b01c4: "Supprimer le groupe de la tâche"
+  delete_assignment_name_deec56e3: "Supprimer le tâche %{name}"
   delete_comment_a71040c3: "Supprimer le commentaire"
   delete_current_message_5da0221a: "Supprimer le message actuel"
   delete_current_module_item_21fefc54: "Supprimer le module/l'élément actuel"
@@ -5210,8 +5210,8 @@ fr-CA:
   discussion_entry: 
     atom_no_author: "Aucun auteur"
     default_user_name: "Nom d’utilisateur"
-  discussion_group_category_locked: "Un travail de discussion ne peut pas être utilisé pour définir des catégories de groupe. Il faut utiliser la discussion à la place."
-  discussion_submission_781d5d33: "Soumission de la discussion"
+  discussion_group_category_locked: "Une tâche de discussion ne peut pas être utilisé pour définir des catégories de groupe. Il faut utiliser la discussion à la place."
+  discussion_submission_781d5d33: "Envoi de la discussion"
   discussion_topic: 
     atom_no_author: "Aucun auteur"
     default_title: "Sans titre"
@@ -5482,7 +5482,7 @@ fr-CA:
   district_id_6f408184: "ID du district"
   divide_into_equal_slots_of_input_value_minutes_fca83452: "Diviser en créneaux égaux de %{input_value} minutes. "
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Diviser en créneaux horaires égaux de %{num_minutes} minutes. *Go*"
-  do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ne pas compter ce travail dans le calcul de la note finale"
+  do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ne pas compter cette tâche dans le calcul de la note finale"
   domain_3b54c511: Domaine
   domain_is_required_1d4c8b25: "Un domaine doit être indiqué"
   don_t_move_lti_query_params_to_post_body_5c80e037: "Ne déplacez pas les paramètres de requête LTI dans le corps du MESSAGE"
@@ -5498,7 +5498,7 @@ fr-CA:
   download_item_analysis_report_statuslabel_8c9387ec: "Télécharger le rapport d'analyse d'élément %{statusLabel}"
   download_scores_generated_on_date_ff5b9cd2: "Télécharger les notes générées le %{date}"
   download_student_analysis_report_statuslabel_1471c8c2: "Télécharger le rapport d'analyse d'étudiant %{statusLabel}"
-  download_submissions_7454665f: "Télécharger les tâches"
+  download_submissions_7454665f: "Télécharger les envois"
   download_this_file_669f9174: "Télécharger ce fichier"
   downloading_course_content_allows_access_to_conten_164d9336: "Télécharger le contenu du cours permet d'y accéder sans être connecté. Le contenu peut inclure des fichiers, des pages, des évaluations, des sujets de discussion ou encore des questionnaires. Cliquez sur « Générer au format ePub » pour chaque cours puis ouvrir avec un logiciel eReader pour le visualiser."
   draft_comment_b2376ea4: "Ébaucher un commentaire"
@@ -5549,9 +5549,9 @@ fr-CA:
   ecollege_name: "Convertisseur Ecollege"
   ecuador_593_dfcc235a: "Équateur (+593)"
   edit_app_b0cc1c17: "Modifier l’application"
-  edit_assignment_ebf22a72: "Modifier le travail"
-  edit_assignment_group_c04c4af0: "Modifier le groupe du travail"
-  edit_assignment_name_a8f7fae1: "Modifier le travail %{name}"
+  edit_assignment_ebf22a72: "Modifier le tâche"
+  edit_assignment_group_c04c4af0: "Modifier le groupe de la tâche"
+  edit_assignment_name_a8f7fae1: "Modifier le tâche %{name}"
   edit_assignment_name_mastery_paths_40b50541: "Modifier le devoir de Chemin de Réussite %{name}"
   edit_c5fbea07: Modifier
   edit_conference_title_6e234815: "Modifier « %{conference_title} »"
@@ -5752,7 +5752,7 @@ fr-CA:
     confirm_delete_message: "Voulez-vous vraiment supprimer ce message?"
     confirm_delete_page: "Supprimer cette page et tout son contenu?"
     confirm_delete_section: "Supprimer cette section et toutes ses pages?"
-    default_description: "Envoi de mon travail %{assignment} pour %{course}."
+    default_description: "Envoi de ma tâche %{assignment} pour %{course}."
     eportfolio_settings: "Paramètres du portefeuille électronique"
     errors: 
       compiling: "Erreur lors de la compilation du portefeuille électronique Veuillez réessayer dans quelques instants."
@@ -6073,7 +6073,7 @@ fr-CA:
   example_item_scores_6726c689: "Exemple de note d’élément"
   example_school_of_rock_41f32c31: "exemple : « School of Rock » (école de rock)"
   exceeds_mastery_1f995dce: "Surpasse le niveau de Maîtrise"
-  excuse_this_assignment_for_the_selected_student_af04e132: "Dispenser l'étudiant sélectionné de faire ce travail"
+  excuse_this_assignment_for_the_selected_student_af04e132: "Dispenser l'étudiant sélectionné de faire cette tâche"
   excused_5877183c: "Pas obligatoire!"
   excused_cf8792eb: "Pas obligatoire"
   exit_d0c7b013: Sortir
@@ -6136,7 +6136,7 @@ fr-CA:
       delete_tool: "Supprimer l'outil"
       edit_tool: "Modifier l'outil"
       editor_button_configured: "Touche de l’éditeur configurée"
-      homework_submission_configured: "L’envoi du travail à la maison est maintenant configuré."
+      homework_submission_configured: "L’envoi de la tâche personnel est maintenant configuré."
       labels: 
         consumer_key: "Code client"
         description: Description
@@ -6226,7 +6226,7 @@ fr-CA:
     published_status: "Date de publication"
     restricted_status: "Disponible du %{from_date} au %{until_date}"
     unpublished_status: "Non publié"
-  file_upload_submission_740711f: "Soumission d'un fichier mis en ligne"
+  file_upload_submission_740711f: "Envoi d'un fichier mis en ligne"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} a été publié avec le droit d’utilisation suivant : %{usage_right}"
   filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} pourcent téléversés"
   filename_uploaded_successfully_edd8e825: "Téléversement de %{fileName} réussi!"
@@ -6382,8 +6382,8 @@ fr-CA:
   gradebook: 
     alerts: 
       no_active_students: "Il n’y a aucun étudiant actif dans ce cours ou aucun d’entre eux ne peut être noté par vous."
-      no_students_in_groups_back: "Les envois relatifs à ce travail ne peuvent malheureusement pas être notés dans Speedgrader parce qu’il n’y a pas d’utilisateur attribué. Veuillez attribuer des utilisateurs à cet ensemble de groupes et réessayer. Cliquez sur OK pour revenir en arrière."
-      no_students_in_groups_close: "Les envois relatifs à ce travail ne peuvent malheureusement pas être notés dans Speedgrader parce qu’il n’y a pas d’utilisateur attribué. Veuillez attribuer des utilisateurs à cet ensemble de groupes et réessayer. Cliquez sur OK pour fermer cette fenêtre."
+      no_students_in_groups_back: "Les envois relatifs à cette tâche ne peuvent malheureusement pas être notés dans Speedgrader parce qu’il n’y a pas d’utilisateur attribué. Veuillez attribuer des utilisateurs à cet ensemble de groupes et réessayer. Cliquez sur OK pour revenir en arrière."
+      no_students_in_groups_close: "Les envois relatifs à cette tâche ne peuvent malheureusement pas être notés dans Speedgrader parce qu’il n’y a pas d’utilisateur attribué. Veuillez attribuer des utilisateurs à cet ensemble de groupes et réessayer. Cliquez sur OK pour fermer cette fenêtre."
       no_students_in_section: "Impossible de trouver des étudiants dans cette section; retour à l’affichage de toutes les sections."
     allow_message: "Cliquez sur le bouton Autoriser pour démarrer l’enregistrement."
     begin_record_prompt: "Cliquez sur le bouton Enregistrer pour commencer."
@@ -6440,7 +6440,7 @@ fr-CA:
         score: "Cote de similitude de Turnitin - Voir le rapport détaillé"
     unmute_assignment: "Annuler une tâche silencieuse"
     vericite: 
-      error_message: "Une erreur est survenue pendant la soumission à VeriCite. Veuillez soumettre à nouveau le fichier avant de contacter le support."
+      error_message: "Une erreur est survenue pendant l'envoi à VeriCite. Veuillez soumettre à nouveau le fichier avant de contacter le support."
       info_message: "Ce fichier est encore en cours de traitement par VeriCite. Veuillez revenir plus tard pour voir le score."
       resubmitting: "Renvoi en cours..."
       tooltip: 
@@ -6473,9 +6473,9 @@ fr-CA:
     gradebook_header_menu: 
       assignment_details: "Détails de l'évaluation"
       curve_grades: "Courbe des notes"
-      download_submissions: "Télécharger les tâches"
+      download_submissions: "Télécharger les envois"
       message_students_who: "Envoyer un message aux étudiants qui..."
-      re_upload_submissions: "Téléverser de nouveau les tâches"
+      re_upload_submissions: "Téléverser de nouveau les envois"
       set_default_grade: "Définir la note par défaut"
       speedgrader: SpeedGrader
     header_filter: 
@@ -6488,7 +6488,7 @@ fr-CA:
       one: "Le résultat n'inclut pas %{groups} car il n'a pas de points possibles"
       other: "Le résultat n'inclut pas %{groups} car ils n'ont pas de points possibles"
     keyboard_assignment_desc: "Accéder à la page détaillée des tâches en cours"
-    keyboard_close_menu: "Fermer le menu du travail actif en cours"
+    keyboard_close_menu: "Fermer le menu de la tâche actif en cours"
     keyboard_comment_desc: "Commentaire sur l’envoi en cours"
     keyboard_menu_desc: "Ouvrir le menu pour obtenir la colonne des tâches actifs"
     keyboard_sort_desc: "Trier la grille en fonction de la colonne active"
@@ -6670,7 +6670,7 @@ fr-CA:
     no_assignments_have_points_warning: "Ne peut calculer le résultat tant qu'une évaluation n'a pas de points possibles"
     notices: 
       unauthorized: "Vous n’êtes pas autorisé à afficher la participation pour ce cours"
-      updated: "L’envoi du travail a été mis à jour."
+      updated: "L’envoi de la tâche a été mis à jour."
       uploaded: 
         one: "Fichiers et commentaires créés pour 1 envoi"
         other: "Fichiers et commentaires créés pour %{count} envois"
@@ -6687,7 +6687,7 @@ fr-CA:
       headers: 
         anonymous_submission: "Les réponses de cet étudiant sont masquées du fait que cette tâche est anonyme."
         assessment: Évaluation
-        no_group_submission: "Ce groupe n’a pas d’envoi pour ce travail"
+        no_group_submission: "Ce groupe n’a pas d’envoi pour cette tâche"
         no_submission: "Cet étudiant n’a pas d’envoi pour cette tâche"
         submission: "Cet étudiant a envoyé la tâche."
       keycode_descriptions: 
@@ -6723,7 +6723,7 @@ fr-CA:
       sort_by: 
         status: "par statut d’envoi (nécessite une notation, non envoyé, etc.)"
         student_name: "par nom d’étudiant (ordre alphabétique)"
-        submitted_at: "la date d’envoi du travail"
+        submitted_at: "la date d’envoi de la tâche"
       titles: 
         not_newest: "utilisez la liste déroulante ci-dessus pour choisir un autre envoi à afficher"
         preview_file: "Aperçu du fichier"
@@ -6732,7 +6732,7 @@ fr-CA:
     speedgrader_enabled_only_for_published_content: "SpeedGrader est activé uniquement pour le contenu publié."
     student_attendance: 
       headers: 
-        assignment: Travail
+        assignment: tâches
         mark: Marquer
         no_attendance: Participation
         student_attendance: "Participation de %{user}"
@@ -6826,11 +6826,11 @@ fr-CA:
       grading_scheme_info: "Afficher/Modifier le système de notation"
   grading_type_type_7d8b42d7: "Type de notation : %{type}"
   graph_bar_b5daa23d: Histogramme
-  graph_of_grades_for_each_assignment_4c44d4d1: "Graphique des notes pour chaque travail"
+  graph_of_grades_for_each_assignment_4c44d4d1: "Graphique des notes pour chaque tâche"
   graph_of_student_page_views_and_participation_over_4a1d4803: "Graphique des pages visitées par l'étudiant et de sa participation dans le temps"
   graph_of_student_page_views_by_category_7cb49887: "Graphique des pages visitées par l'étudiant organisées par catégorie"
   graph_of_the_distribution_of_grades_in_the_departm_30445777: "Graphique de la distribution des notes dans le département"
-  graph_showing_the_fraction_of_on_time_submissions__735e47db: "Graphique démontrant la fraction de soumissions effectuées dans le temps imparti pour chaque travail"
+  graph_showing_the_fraction_of_on_time_submissions__735e47db: "Graphique démontrant la fraction de envois effectuées dans le temps imparti pour chaque tâche"
   graphs_89fcfeb: Graphiques
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Parfait, vous avez donc un cours. Et maintenant? Eh bien, avant de le dévoiler au monde entier, vous voulez peut-être le vérifier et vous assurer que vous avez bien présenté les bases. Parcourez la liste sur la gauche pour garantir que votre cours est prêt à être utilisé."
   green_15af4778: Vert
@@ -6867,7 +6867,7 @@ fr-CA:
     name_too_long: "Saisissez un nom de catégorie plus court"
     name_unavailable: "%{name} est déjà utilisé."
     self_signup_for_courses: "L’auto-inscription ne peut être activée que pour les groupes ou les communautés de cours"
-  group_category_locked: "Impossible de changer la catégorie du groupe, parce que les étudiants ont déjà effectué des envois en rapport avec ce travail"
+  group_category_locked: "Impossible de changer la catégorie du groupe, parce que les étudiants ont déjà effectué des envois en rapport avec cette tâche"
   group_details_e51122f1: "Détails du groupe"
   group_group_name_is_for_a_different_section_4d84d256: "Le groupe %{group_name} est destiné à une autre section"
   group_group_name_is_full_297880d6: "Le groupe %{group_name} est complet"
@@ -7301,7 +7301,7 @@ fr-CA:
   high_score_47924c1a: "Bonne : %{score}"
   highest_28ad71e6: "La plus élevée"
   highest_score_e080551e: "Meilleure note"
-  homework_submission_172e8354: "Soumission du travail personnel"
+  homework_submission_172e8354: "Envoi de la tâche personnel"
   honduras_504_af7aa636: "Honduras (+504)"
   hong_kong_852_98e3b3fe: "Hongkong (+852)"
   host_8be927e0: Hôte
@@ -7318,12 +7318,12 @@ fr-CA:
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "J’ai besoin d’aide, mais ce n’est pas urgent"
   icon_215a1dc6: Icône
   icons: 
-    discussion_submission: "Soumission de la discussion"
-    file_upload_submission: "Soumission d'un fichier mis en ligne"
+    discussion_submission: "Envoi de la discussion"
+    file_upload_submission: "Envoi d'un fichier mis en ligne"
     media_submission: "Envoi de contenu multimédia"
     online_url_submission: "Envoi en ligne (URL)"
-    quiz_submission: "Soumission du questionnaire"
-    text_entry_submission: "Soumission d’une saisie de texte"
+    quiz_submission: "Envoi du questionnaire"
+    text_entry_submission: "Envoi d’une saisie de texte"
   id_ac7afadf: ID
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "Cet ID est déjà utilisé pour ce compte et ce fournisseur d'authentification "
   idp_entity_id_25c51837: "ID de l'entité IdP"
@@ -7333,28 +7333,28 @@ fr-CA:
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Si l'option est activée, les paramètres de requête ne seront pas copiés dans le corps du billet lors d'un lancement LTI."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(En l’absence de sélection, envoyer à toutes les personnes listées dans le compte)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(En l’absence de sélection, envoyer à toutes les personnes listées dans le sous-compte)"
-  if_you_change_an_assignment_s_points_possible_you__25a0edad: "Si vous changez le nombre de points possibles d'un travail assigné, vous devrez le renoter."
-  if_you_change_an_assignment_s_points_possible_you__dba531cb: "Si vous changez le nombre de points possibles d'un travail assigné, vous devrez renoter chacune de ses copies soumises."
+  if_you_change_an_assignment_s_points_possible_you__25a0edad: "Si vous changez le nombre de points possibles d'une tâche, vous devrez le renoter."
+  if_you_change_an_assignment_s_points_possible_you__dba531cb: "Si vous changez le nombre de points possibles d'une tâche, vous devrez renoter chacune de ses envois."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Si vous ne sélectionnez pas les droits d’utilisation maintenant, ce fichier restera non publié une fois transmis."
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "Si vous activez cette fonctionnalité, assurez vous que votre compte Salesforce ait ces champs personnalisés ajoutés avec exactement les mêmes noms dans la colonne de gauche du tableau"
   if_you_keep_having_problems_click_the_link_link_be_a4d695eb: "Si le problème persistait, cliquez le lien « %{link} » ci-dessous pour effectuer une recherche dans les guides ou pour nous expliquer votre problème."
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Si vous quittez, le téléchargement du fichier zip qui se prépare sera annulé."
   if_you_made_changes_to_the_student_submission_file_e006d49b: |-
-      Si vous aviez apporté des modifications aux fichiers soumis par l’étudiant
+      Si vous aviez apporté des modifications aux envois par l’étudiant
       que vous auriez téléchargés précédemment, il vous suffit de les recompresser
       puis de téléverser le fichier zip résultant accompagné du formulaire ci-dessous.
-      Les étudiants verront les fichiers modifiés dans la zone des commentaires de leur soumission.
+      Les étudiants verront les fichiers modifiés dans la zone des commentaires de leur envois.
       
       *Assurez-vous de ne pas modifier les noms des fichiers soumis afin que nous puissions les reconnaître.*
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Si vous avez utilisé un autre système de gestion des cours, vous avez probablement des éléments à transférer dans Canvas. Nous pouvons vous guider tout au long de la migration de votre contenu vers Canvas."
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "Si vous désirez conserver vos commentaires non soumis, veuillez les sauvegarder avant de quitter cette page."
   ignore_91750df8: Ignorer
-  ignore_assignment_738b3c99: "Ignorer le travail"
+  ignore_assignment_738b3c99: "Ignorer le tâche"
   ignore_name_55edc6fe: "Ignorer %{name}"
   ignore_these_3940f6f5: "Ignorer ceux-ci"
   ignore_this_assignment_b7a71f80: "Ignorer cette tâche"
   ignore_until_new_mark_935e00a2: "Ignorer jusqu'à une nouvelle note"
-  ignore_until_new_submission_90ba19b7: "Ignorer jusqu’à une nouvelle soumission"
+  ignore_until_new_submission_90ba19b7: "Ignorer jusqu’à une nouvelle envoi"
   image_8ad06: Image
   image_id_is_not_a_valid_id_7dd6bad6: "image_id n'est pas un ID valide"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url et image_id ne peuvent pas être définis ensemble."
@@ -7375,7 +7375,7 @@ fr-CA:
     errors: 
       import: 
         external_tool_url: "L’URL pour la tâche de l’outil externe %{assignment_name} n’est pas valide."
-        grading_standard_not_found: "Le travail %{title} faisait référence à un système de notation qui est introuvable dans la série de comptes du cours cible."
+        grading_standard_not_found: "Le tâche %{title} faisait référence à un système de notation qui est introuvable dans la série de comptes du cours cible."
     imported_assignments_group: "Tâches importés"
   importers/context_external_tool_importer: 
     external_tool_attention_needed: "Les paramètres de sécurité de l’outil externe « %{tool_name} » doivent être définis dans les paramètres du cours."
@@ -7409,7 +7409,7 @@ fr-CA:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inclure les notes lors de message d'alerte à propos des notations.
       Si votre courriel n'était pas une adresse officielle de votre institution, il se pourrait que des données sensibles soient envoyées hors du réseau de votre institution.
-  include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inclure les notes de ce travail lors de la publication dans le Système d’informations sur les étudiants de votre établissement"
+  include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inclure les notes de cette tâche lors de la publication dans le Système d’informations sur les étudiants de votre établissement"
   include_unpublished_assignments_83ebbaec: "Inclure les évaluations non publiées"
   include_unpublished_courses_7a0e7aab: "Inclure les cours non publiés"
   incorrect_answer_7c17e63b: "Réponse incorrecte"
@@ -7510,7 +7510,7 @@ fr-CA:
   invalid_authenticity_token_b753558c: "Jeton d’authentification non valide"
   invalid_aws_configuration_e8a6ae0f: "Configuration AWS non valide"
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "Fichier CSV invalide. Impossible de mettre à jour les notes."
-  invalid_points_possible: "La valeur des points possibles pour ce travail doit être zéro ou un nombre entier positif."
+  invalid_points_possible: "La valeur des points possibles pour cette tâche doit être zéro ou un nombre entier positif."
   invalid_recipient_name_56b22b86: "Nom de destinataire non valide."
   invalid_state_parameter_7a5aa108: "Paramètre d’état non valide"
   invalid_url_in_xml: "URL non valide dans le XML. Les signes « & » doivent être précédés d’un caractère d’échappement."
@@ -7528,7 +7528,7 @@ fr-CA:
   item_complete_d334fd43: "(élément complété)"
   item_incomplete_d6a16040: "(élément incomplet)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} n'est pas actuellement pris en charge"
-  item_type_assignment_13a1132e: "Type d'élément : Travail à faire"
+  item_type_assignment_13a1132e: "Type d'élément : Tâche à faire"
   item_type_choice_aebcf2ef: "Type d'élément : Choix"
   item_type_discussion_e3ddae9b: "Type d'élément : Discussion"
   item_type_document_493ac5b0: "Type d'élément : Document"
@@ -7613,7 +7613,7 @@ fr-CA:
       Des fonctions, des paramètres  et des styles qui sont mieux adaptés à un environnement K-12. Pour le moment, cela
       applique uniquement quelques changements de style, mais d’autres éléments propres au niveau K-12 peuvent être ajoutés par la suite.
   k_2521301c: k
-  keep_submissions_anonymous_5cbaf419: "Conserver l'anonymat des soumissions"
+  keep_submissions_anonymous_5cbaf419: "Conserver l'anonymat des envois"
   keyboard_instructions_e032939f: "Instructions clavier"
   keyboard_nav_dialog: 
     esc_key_notification: "Appuyer sur la touche ESC avant d'utiliser des raccourcis clavier lorsque vous naviguez la grille du relevé de notes."
@@ -7700,10 +7700,10 @@ fr-CA:
       status_unauthorized: "non autorisé"
     basic_lti: 
       bad_score: "Le résultat n’est pas compris entre 0 et 1."
-      no_points_comment: "Un outil externe a tenté de donner à cette tâche la note %{grade}, mais l’opération a échoué car il n’est pas possible d’attribuer des points à ce travail."
+      no_points_comment: "Un outil externe a tenté de donner à cette tâche la note %{grade}, mais l’opération a échoué car il n’est pas possible d’attribuer des points à cette tâche."
       no_points_possible: "Pas de points possibles pour cette tâche."
       no_score: "Aucun résultat donné"
-      no_submission_created: "Cette demande de résultat n’a pas abouti à la création d’un nouvel envoi de travail personnel."
+      no_submission_created: "Cette demande de résultat n’a pas abouti à la création d’un nouvel envoi de tâche personnel."
     canvas: 
       migration: 
         announcements: Annonces
@@ -7759,7 +7759,7 @@ fr-CA:
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Limiter à %{num_appointments} le nombre de rendez-vous au(x)quel(s) les participants peuvent assister ."
   limit_search_to_activity_after_c1ac2449: "Limiter la recherche d'activité postérieure à"
   limit_search_to_activity_before_e05aad05: "Limiter la recherche d'activité antérieure à"
-  limit_students_to_attend_input_value_slot_s_9a5bf576: "Limiter les élèves à un maximum de %{input_value} créneau(x). "
+  limit_students_to_attend_input_value_slot_s_9a5bf576: "Limiter les étudiant à un maximum de %{input_value} créneau(x). "
   link_7262adec: Lien
   link_color_55f8b835: "Couleur du lien"
   link_description_4355ca82: "Description du lien"
@@ -7785,7 +7785,7 @@ fr-CA:
   link_title_189888b7: "Titre du lien"
   link_url_a213671c: "URL du lien"
   link_url_cf96376: "URL du lien"
-  linked_assignment_message: "lié au travail « %{title} »"
+  linked_assignment_message: "lié au tâche « %{title} »"
   linked_discussion_topic_message: "lié au sujet de discussion « %{title} »"
   linked_quiz_message: "lié au questionnaire « %{title} »"
   linked_with_wiki_page_title_b17c3521: "relié à la page Wiki « %{title} »"
@@ -7966,8 +7966,8 @@ fr-CA:
   master_courses_2aaa4841: "Cours maîtres"
   mastery_paths_breakdown_6e0b5fce: "Répartition des parcours de maîtrise"
   mastery_paths_cc4096c2: "Parcours de maîtrise"
-  mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Le score de maîtrise reflète la meilleure note obtenue sur un travail ou un questionnaire noté."
-  mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Le niveau de maîtrise reflète le dernier travail ou questionnaire noté."
+  mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Le score de maîtrise reflète la meilleure note obtenue sur une tâche ou un questionnaire noté."
+  mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Le niveau de maîtrise reflète le dernier tâche ou questionnaire noté."
   matching_left_side_900f860b: "Correspond au côté gauche"
   matching_right_side_920e71b2: "Correspond au côté droit"
   mathquill: 
@@ -7982,7 +7982,7 @@ fr-CA:
   max_users_groups_per_appointment_867c505b: "Nombre max. d'utilisateurs/groupes par rendez-vous"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Nombre maximum de rendez-vous auxquels un participant peut assister"
   media_comment_e494a952: "Commentaire multimédia"
-  media_comment_submission_14e224dc: "Soumission du commentaire multimédia"
+  media_comment_submission_14e224dc: "Envoi du commentaire multimédia"
   media_comments: 
     alerts: 
       kaltura_disabled: "Kaltura a été désactivé pour ce site Canvas."
@@ -8021,7 +8021,7 @@ fr-CA:
     uploading: Chargement...
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Le média est en attente de conversion, veuillez essayer à nouveau dans un court instant."
   media_recording_77cddc52: "Enregistrement Multimédia"
-  media_recording_submission_b7fd1491: "Soumission d'un enregistrement multimédia"
+  media_recording_submission_b7fd1491: "Envoi d'un enregistrement multimédia"
   media_recordings_749aef6d: "Enregistrements multimédias"
   median_ed291842: Médiane
   median_score_4657e907: "Moyenne : %{score}"
@@ -8041,7 +8041,7 @@ fr-CA:
   message_body_1f782712: "Corps du message"
   message_sent_9ff3a79d: "Message envoyé!"
   message_sent_f4cba0c: "Message envoyé."
-  message_student_f12b37a6: "Contacter un élève"
+  message_student_f12b37a6: "Contacter un étudiant"
   message_students: 
     message_student: "Envoyer un message aux étudiants pour le cours %{course_name}"
     send_message: "Envoyer le message"
@@ -8467,36 +8467,36 @@ fr-CA:
         html: 
           assignment_graded: "Tâche notée : %{assignment_name}, %{course_name}"
           link: "Cliquez ici pour afficher la tâche"
-          the_assignment_is_graded: "Le travail %{assignment_name} a été noté."
+          the_assignment_is_graded: "Le tâche %{assignment_name} a été noté."
         labels: 
           view_here: "Vous pouvez le consulter ici"
-        the_assignment_is_graded: "Le travail %{assignment_name} a été noté."
+        the_assignment_is_graded: "Le tâche %{assignment_name} a été noté."
       sms: 
         assignment_is_graded: "%{assignment_name}, %{course_name} a été noté."
         more_info_at: "Informations complémentaires sur %{web_address}"
       summary: 
         assignment_graded: "Tâche notée : %{assignment_name}, %{course_name}"
-        the_assignment_is_graded: "Le travail %{assignment_name} a été noté."
+        the_assignment_is_graded: "Le tâche %{assignment_name} a été noté."
       twitter: 
         assignment_graded: "Alerte Canvas - Noté : %{assignment_name}, %{course_name}"
     assignment_locked: "Cette tâche est actuellement verrouillée."
     assignment_locked_at: "Cette tâche a été verrouillée le %{at}"
     assignment_locked_module: "Cette tâche fait partie du module *%{module}* et n’a pas encore été déverrouillée."
     assignment_locked_until: "Cette tâche est verrouillée jusqu’au %{date}."
-    assignment_module_time_locked: "Ce travail fait partie du module *%{module}*, lequel est verrouillé jusqu’à %{time}."
+    assignment_module_time_locked: "Cette tâche fait partie du module *%{module}*, lequel est verrouillé jusqu’à %{time}."
     assignment_resubmitted: 
       email: 
         html: 
           link: "Cliquez ici pour voir l’envoi"
           user_resubmitted: "Renvoi : %{user_name}, %{assignment_name}"
-          user_resubmitted_sentence: "%{user_name} vient de renvoyer le travail %{assignment_name} du cours %{course_name}"
+          user_resubmitted_sentence: "%{user_name} vient de renvoyer le tâche %{assignment_name} du cours %{course_name}"
         labels: 
           view_submission: "Vous pouvez afficher l’envoi ici"
         user_resubmitted: "Renvoi : %{user_name}, %{assignment_name}"
-        user_resubmitted_sentence: "%{user_name} vient de renvoyer le travail %{assignment_name} du cours %{course_name}"
+        user_resubmitted_sentence: "%{user_name} vient de renvoyer le tâche %{assignment_name} du cours %{course_name}"
       sms: 
         more_info_at: "Informations complémentaires sur %{web_address}"
-        user_resubmitted: "%{user_name} vient de remettre (à nouveau) son travail %{assignment_name}"
+        user_resubmitted: "%{user_name} vient de remettre (à nouveau) son tâche %{assignment_name}"
       summary: 
         turned_in_at: "remis : %{submission_date}"
         user_resubmitted: "Renvoi : %{user_name}, %{assignment_name}"
@@ -8507,14 +8507,14 @@ fr-CA:
         html: 
           link: "Cliquez ici pour voir l’envoi"
           user_submitted: "Envoi : %{user_name}, %{assignment_name}"
-          user_submitted_sentence: "%{user_name} vient d’envoyer le travail %{assignment_name} du cours %{course_name}"
+          user_submitted_sentence: "%{user_name} vient d’envoyer le tâche %{assignment_name} du cours %{course_name}"
         labels: 
           view_submission: "Vous pouvez afficher l’envoi ici"
         user_submitted: "Envoi : %{user_name}, %{assignment_name}"
-        user_submitted_sentence: "%{user_name} vient d’envoyer le travail %{assignment_name} du cours %{course_name}"
+        user_submitted_sentence: "%{user_name} vient d’envoyer le tâche %{assignment_name} du cours %{course_name}"
       sms: 
         more_info_at: "Informations complémentaires sur %{web_address}"
-        user_submitted: "%{user_name} vient de remettre son travail %{assignment_name}"
+        user_submitted: "%{user_name} vient de remettre son tâche %{assignment_name}"
       summary: 
         turned_in_at: "remis : %{submission_date}"
         user_submitted: "Envoi : %{user_name}, %{assignment_name}"
@@ -8524,18 +8524,18 @@ fr-CA:
       email: 
         html: 
           link: "Cliquez ici pour voir l’envoi"
-          user_resubmitted_sentence: "%{user_name} vient d’envoyer en retard le travail %{assignment_name} du cours %{course_name}"
-          user_submitted: "Travail en retard : %{user_name}, %{assignment_name}"
+          user_resubmitted_sentence: "%{user_name} vient d’envoyer en retard le tâche %{assignment_name} du cours %{course_name}"
+          user_submitted: "Tâche en retard : %{user_name}, %{assignment_name}"
         labels: 
           view_submission: "Vous pouvez afficher l’envoi ici"
-        user_resubmitted_sentence: "%{user_name} vient d’envoyer en retard le travail %{assignment_name} du cours %{course_name}"
-        user_submitted: "Travail en retard : %{user_name}, %{assignment_name}"
+        user_resubmitted_sentence: "%{user_name} vient d’envoyer en retard le tâche %{assignment_name} du cours %{course_name}"
+        user_submitted: "Tâche en retard : %{user_name}, %{assignment_name}"
       sms: 
         more_info_at: "Informations complémentaires sur %{web_address}"
-        user_submitted: "%{user_name} vient de remettre (en retard) son travail %{assignment_name}"
+        user_submitted: "%{user_name} vient de remettre (en retard) son tâche %{assignment_name}"
       summary: 
         turned_in_at: "remis : %{submission_date}"
-        user_submitted: "Travail en retard : %{user_name}, %{assignment_name}"
+        user_submitted: "Tâche en retard : %{user_name}, %{assignment_name}"
       twitter: 
         user_submitted: "Alerte Canvas - Envoi en retard : %{user_name}, %{assignment_name}"
     assignment_unmuted: 
@@ -8548,8 +8548,8 @@ fr-CA:
         html: 
           body: "Votre instructeur a modifié la note et ajouté des commentaires à %{title}. Ces changements sont maintenant visibles."
           link: "Vous pouvez le consulter ici"
-          subject: "Travail sorti du mode silencieux : %{title}, %{course}"
-        subject: "Travail sorti du mode silencieux : %{title}, %{course}"
+          subject: "Tâche sorti du mode silencieux : %{title}, %{course}"
+        subject: "Tâche sorti du mode silencieux : %{title}, %{course}"
       sms: 
         body: |-
             Votre formateur a publié des notes et des commentaires pour %{title}, %{course}.
@@ -8941,17 +8941,17 @@ fr-CA:
         body: "Le groupe %{group_name} vient de remettre un envoi en retard pour %{assignment_name} du cours %{course_name}."
         html: 
           body: "Le groupe %{group_name} vient de remettre un envoi en retard pour %{assignment_name} du cours %{course_name}."
-          subject: "Travail en retard : %{group_name}, %{assignment_name}"
+          subject: "Tâche en retard : %{group_name}, %{assignment_name}"
           view_submission_here: "Vous pouvez afficher l’envoi ici"
         labels: 
           view_submission_here: "Vous pouvez afficher l’envoi ici"
-        subject: "Travail en retard : %{group_name}, %{assignment_name}"
+        subject: "Tâche en retard : %{group_name}, %{assignment_name}"
       sms: 
         more_info: "Informations complémentaires sur %{web_address}"
-        subject: "%{group_name} vient de remettre (en retard) son travail %{assignment_name}"
+        subject: "%{group_name} vient de remettre (en retard) son tâche %{assignment_name}"
       summary: 
         body: "Le groupe %{group_name} a remis un envoi en retard pour %{assignment_name} du cours %{course_name}."
-        subject: "Travail en retard : %{group_name}, %{assignment_name}"
+        subject: "Tâche en retard : %{group_name}, %{assignment_name}"
       twitter: 
         subject: "Alerte Canvas - Envoi groupé en retard : %{group_name}, %{assignment_name}"
     group_membership_accepted: 
@@ -9398,15 +9398,15 @@ fr-CA:
         html: 
           body: "%{author} vient d’ajouter un commentaire sur l’envoi de %{user} pour %{assignment}."
           link_message: "Cliquez ici pour voir le commentaire"
-          subject: "Commentaire sur le travail envoyé : %{user}, %{assignment}, %{context}"
+          subject: "Commentaire sur le tâche envoyé : %{user}, %{assignment}, %{context}"
           submission_comment_link_message: "Vous pouvez voir les détails de l’envoi en utilisant le lien ci-dessous ou répondre à ce commentaire en répondant à ce message."
-        subject: "Commentaire sur le travail envoyé : %{user}, %{assignment}, %{context}"
+        subject: "Commentaire sur le tâche envoyé : %{user}, %{assignment}, %{context}"
       sms: 
         body: "Nouveau commentaire de %{author} pour %{assignment}, %{user}, %{context}."
         more_info: "Informations complémentaires sur %{url}"
       summary: 
         body: "%{author} vient d’ajouter un commentaire sur l’envoi de %{user} pour %{assignment}."
-        subject: "Commentaire sur le travail envoyé : %{user}, %{assignment}, %{context}"
+        subject: "Commentaire sur le tâche envoyé : %{user}, %{assignment}, %{context}"
       twitter: 
         tweet: "Alerte Canvas - Commentaire : %{author} pour %{assignment}, %{user}, %{context}."
     submission_comment_for_teacher: 
@@ -9417,26 +9417,26 @@ fr-CA:
           link_message: "Vous pouvez consulter les détails de l’envoi en cliquant sur ce lien :"
           review_submission: "Cliquez ici pour revoir l’envoi"
           someone: Quelqu’un
-          subject: "Commentaire sur le travail envoyé : %{user}, %{assignment}, %{context}"
+          subject: "Commentaire sur le tâche envoyé : %{user}, %{assignment}, %{context}"
         someone: Quelqu’un
-        subject: "Commentaire sur le travail envoyé : %{user}, %{assignment}, %{context}"
+        subject: "Commentaire sur le tâche envoyé : %{user}, %{assignment}, %{context}"
       sms: 
         more_info: "Informations complémentaires sur %{url}"
         sms_body: "Nouveau commentaire de %{author} pour %{assignment}, %{user}, %{context}."
       summary: 
         body: "%{author} vient d’ajouter un commentaire sur l’envoi de %{user} pour %{assignment}."
         someone: Quelqu’un
-        subject: "Commentaire sur le travail envoyé : %{user}, %{assignment}, %{context}"
+        subject: "Commentaire sur le tâche envoyé : %{user}, %{assignment}, %{context}"
       twitter: 
         tweet: "Alerte Canvas - Commentaire : %{author} pour %{assignment}, %{user}, %{context}."
     submission_grade_changed: 
       email: 
-        body: "La note de votre travail %{assignment_title} a été modifiée."
-        excused: "Ce travail a été mis de côté."
+        body: "La note de votre tâche %{assignment_title} a été modifiée."
+        excused: "Cette tâche a été mis de côté."
         html: 
-          body: "La note de votre travail %{assignment_title} a été modifiée."
-          excused: "Ce travail a été mis de côté."
-          link_message: "Vous pouvez consulter le travail ici"
+          body: "La note de votre tâche %{assignment_title} a été modifiée."
+          excused: "Cette tâche a été mis de côté."
+          link_message: "Vous pouvez consulter le tâche ici"
           no_date_set: "Aucune date définie"
           not_applicable: N/D
           regraded_date: "renoté le : %{date}"
@@ -9473,14 +9473,14 @@ fr-CA:
         tweet: "Alerte Canvas - Modification de note : %{date}"
     submission_graded: 
       email: 
-        body: "Votre travail %{assignment} a été noté."
-        excused: "Ce travail a été mis de côté."
+        body: "Votre tâche %{assignment} a été noté."
+        excused: "Cette tâche a été mis de côté."
         graded_date: "noté le : %{date}"
         html: 
-          body: "Votre travail %{assignment} a été noté."
-          excused: "Ce travail a été mis de côté."
+          body: "Votre tâche %{assignment} a été noté."
+          excused: "Cette tâche a été mis de côté."
           graded_date: "noté le : %{date}"
-          link_message: "Vous pouvez consulter le travail ici"
+          link_message: "Vous pouvez consulter le tâche ici"
           no_date_set: "Aucune date définie"
           not_applicable: N/D
           score: "note : %{score} sur %{total}"
@@ -9614,7 +9614,7 @@ fr-CA:
   migration: 
     announcement_type: Annonce
     assignment_group_type: "Groupe de tâches"
-    assignment_type: Travail
+    assignment_type: Tâche
     calendar_event_type: "Événement de calendrier"
     discussion_topic_type: "Sujet de discussion"
     ecollege: 
@@ -9637,7 +9637,7 @@ fr-CA:
       valid_workflow_state: "Un état de flux de travail valide doit être envoyé."
   migration_selection_5f1c5f55: "Sélection de la migration"
   mini_calendar_fe8003e4: "Mini calendrier"
-  minimize_global_navigation_2d839351: "Minimiser la navigation mondiale"
+  minimize_global_navigation_2d839351: "Minimiser la navigation globale"
   minimum_score_e6d1c134: "Score minimum"
   minutes_4aee5a41: Minutes
   minutes_per_slot_5b7169e5: "Minutes par créneau horaire"
@@ -9676,10 +9676,10 @@ fr-CA:
   module_navigation_97043417: "Navigation module"
   modules: 
     assignments_to_grade: 
-      one: "1 travail comporte des envois non notés"
+      one: "1 tâche comporte des envois non notés"
       other: "%{count} tâches comportent des envois non notés"
     assignments_to_post: 
-      one: "Vous êtes prêt à publier 1 travail."
+      one: "Vous êtes prêt à publier 1 tâche."
       other: "Vous êtes prêt à publier %{count} tâches."
     continue: Continuer
     progression_module_collection: 
@@ -9707,13 +9707,13 @@ fr-CA:
   more_courses_5ebbe998: "Cours supplémentaires"
   more_info_at_course_name_56dc8c10: "Informations complémentaires sur %{course_name}"
   more_information_3dfb76b5: "Plus d'informations"
-  more_than_999_submissions_need_grading_bc087dd0: "Plus de 999 soumissions doivent être notées"
+  more_than_999_submissions_need_grading_bc087dd0: "Plus de 999 envois doivent être notées"
   more_than_a19b440: "%{more_than}+"
   most_recent_result_counts_as_calculation_int_of_ma_a734a4db: "Le résultat le plus récent compte pour %{calculation_int} % du score de maîtrise, la moyenne de tous les autres résultats compte pour %{remainder} % restant du score total. S'il n'y avait qu'un seul résultat, son unique score sera rendu."
   most_recent_score_13a87e8c: "Note la plus récente"
   move_abf00365: Déplacer
-  move_assignment_group_46e09fc3: "Déplacer le groupe du travail"
-  move_assignment_name_aa253f26: "Déplacer le travail %{name}"
+  move_assignment_group_46e09fc3: "Déplacer le groupe de tâches"
+  move_assignment_name_aa253f26: "Déplacer le tâche %{name}"
   move_dialog: 
     cancel: Annuler
     save: Enregistrer
@@ -9774,7 +9774,7 @@ fr-CA:
     students_will_see: "Les étudiants pourront voir que cette tâche est en mode silencieux."
     submission_comments: "Commentaires sur l’envoi"
     sure_you_want_to_mute: "Voulez-vous vraiment mettre cette tâche en mode silencieux? Tant qu’elle sera en mode silencieux, les étudiants ne reçoivent pas de nouvelles notifications ni ne peuvent en afficher :"
-  mute_unmute_assignment_62608e44: "Désactiver/Réactiver le travail"
+  mute_unmute_assignment_62608e44: "Désactiver/Réactiver le tâche"
   muted_283cfa0f: (muet)
   my_dashboard_b724020: "Mon tableau de bord"
   my_themes_b72217b8: "Mes thèmes"
@@ -9812,8 +9812,8 @@ fr-CA:
   new_announcement_23af4598: "Nouvelle annonce"
   new_announcement_title_course_da7c0ca6: "Nouvelle annonce %{title}, %{course}"
   new_appointment_timeslots_are_available_for_signup_a3e3f964: "De nouveaux créneaux horaires sont ouverts aux inscriptions"
-  new_assignment_2a984756: "Nouveau travail"
-  new_assignment_for_course_name_f71dd337: "Nouveau travail pour %{course_name}"
+  new_assignment_2a984756: "Nouveau tâche"
+  new_assignment_for_course_name_f71dd337: "Nouveau tâche pour %{course_name}"
   new_comment_for_discussion_topic_course_38febf3b: "Nouveau commentaire pour %{discussion_topic}, %{course}"
   new_comment_on_announcement_discussion_topic_cours_7905b782: "Nouveau commentaire sur l’annonce %{discussion_topic}, %{course}"
   new_conference_8b483024: "Nouvelle conférence"
@@ -9841,7 +9841,7 @@ fr-CA:
   next_steps_ce0f0d0c: "Étapes suivantes"
   nickname_1e6da3ad: "Pseudonyme :"
   nickname_7df95b09: "Surnom :"
-  no_assignment_name_adbb215b: "Pas de nom de travail"
+  no_assignment_name_adbb215b: "Pas de nom de tâche"
   no_associated_terms_13bacefc: "Aucune période associée"
   no_collaboration_apps_3bbd30ce: "Pas d'application de collaboration"
   no_content_has_been_added_f36bab43: "* Aucun contenu n’a été ajouté"
@@ -9901,7 +9901,7 @@ fr-CA:
   nothing_to_split_off_of_this_user_28ba9dd5: "Rien à détacher de cet utilisateur"
   notice_concluded_student_6d416c4: "Notice : Étudiant ayant terminé"
   notice_inactive_student_bcc4248a: "Notice : Étudiant inactif"
-  notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: "Note : La période de notation est fermée pour cet élève"
+  notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: "Note : La période de notation est fermée pour cet étudiant"
   notification: 
     added_to_conversation_description: "Vous êtes ajouté à une conversation"
     added_to_conversation_display: "Ajouté à la conversation"
@@ -9963,15 +9963,15 @@ fr-CA:
     discussion_display: Discussion
     discussion_post_description: "Nouveau billet dans un sujet de discussion auquel vous êtes inscrit"
     discussion_post_display: "Billet de discussion"
-    due_date_description: "La date d’échéance du travail a changé"
+    due_date_description: "La date d’échéance de la tâche a changé"
     due_date_display: "Date d’échéance"
     files_description: "Nouveau fichier ajouté à votre cours"
     files_display: Fichiers
     grading_description: |-
         Inclus :
         
-        * Note enregistrée/modifiée du travail/de la soumission
-        * Note transparente du travail
+        * Note enregistrée/modifiée de la tâche/de l'envoi
+        * Note transparente de la tâche
         * Changement du coefficient de la note
     grading_display: Notation
     grading_policies_description: "Modification des règles de notation du cours"
@@ -10035,7 +10035,7 @@ fr-CA:
       event_date_changed: "Changement de date de l’événement"
       forgot_password: "Mot de passe oublié"
       grade_weight_changed: "Coefficient modifié"
-      group_assignment_submitted_late: "Travail de groupe envoyé en retard"
+      group_assignment_submitted_late: "Tâche de groupe envoyé en retard"
       group_membership_accepted: "Adhésion au groupe acceptée"
       group_membership_rejected: "Adhésion au groupe rejetée"
       merge_email_communication_channel: "Fusionner le canal de communication par courriel"
@@ -10087,7 +10087,7 @@ fr-CA:
         
         Inscription de rendez-vous d’étudiant
     student_appointment_display: "Inscriptions des étudiants aux rendez-vous"
-    submission_comment_description: "Commentaire sur l’envoi du travail"
+    submission_comment_description: "Commentaire sur l’envoi de la tâche"
     submission_comment_display: "Commentaire sur l’envoi"
     web_conference_recording_ready: "Un enregistrement de conférence est prêt"
   notification_preferences: 
@@ -10212,7 +10212,7 @@ fr-CA:
   on_paper_46d0ba36: "Sur papier"
   on_time_17ca5ad9: "À temps"
   on_time_percent_eebffe38: "Dans les temps : %{percent}"
-  once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Une fois que cette fonctionnalité est rendue active, vous ne pourrez plus la désactiver. Assurez-vous d'être prêt à activer le dossier à soumissions avant de continuer."
+  once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Une fois que cette fonctionnalité est rendue active, vous ne pourrez plus la désactiver. Assurez-vous d'être prêt à activer le dossier à envois avant de continuer."
   one_per_line_format_name_value_79647700: "Un par ligne. Format : name=value"
   online_submission_type_file_uploads_24910d74: "Type d'envoi en ligne - téléversement de fichiers"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Type d'envoi en ligne - téléversement de fichiers - Limiter les types de fichiers à téléverser"
@@ -10246,8 +10246,8 @@ fr-CA:
     : Oui
   options_3ab0ea65: Options
   orange_81386a62: Orange
-  orbis_report_header_assignment_id: "ID de travail"
-  orbis_report_header_assignment_title: "Titre du travail"
+  orbis_report_header_assignment_id: "ID de tâche"
+  orbis_report_header_assignment_title: "Titre de la tâche"
   orbis_report_header_canvas_course_id: "ID du cours"
   orbis_report_header_course_name: "Nom du cours"
   orbis_report_header_course_sis_id: "ID de SIS du cours"
@@ -10324,7 +10324,7 @@ fr-CA:
       instructions: 
         main: 
           manage: 
-            description: "*Les résultats sont créés ici pour suivre la progression des élèves dans un cours. Pour commencer, regardez la barre de menus en haut. Cliquez sur le bouton « Nouveau » pour créer un nouveau résultat, ou sur le bouton « Nouveau groupe » pour créer un nouveau groupe où classer vos résultats. Le bouton « Chercher » vous permet d’utiliser les résultats qui ont été créés par votre région ou votre institution. Lorsque vous créez et utilisez les résultats, vous pouvez utiliser le volet sur la gauche pour les parcourir. Vous pouvez les faire glisser et les déposer à différents niveaux pour créer une arborescence.* *Mieux encore : Canvas vous permet d’ajouter des résultats dans vos barèmes et ainsi d’évaluer la progression lorsque vous notez les tâches. Une fois que vous avez défini les résultats, cliquez sur « Gérer les barèmes » pour commencer à utiliser vos résultats pour vos notations.*"
+            description: "*Les résultats sont créés ici pour suivre la progression des étudiants dans un cours. Pour commencer, regardez la barre de menus en haut. Cliquez sur le bouton « Nouveau » pour créer un nouveau résultat, ou sur le bouton « Nouveau groupe » pour créer un nouveau groupe où classer vos résultats. Le bouton « Chercher » vous permet d’utiliser les résultats qui ont été créés par votre région ou votre institution. Lorsque vous créez et utilisez les résultats, vous pouvez utiliser le volet sur la gauche pour les parcourir. Vous pouvez les faire glisser et les déposer à différents niveaux pour créer une arborescence.* *Mieux encore : Canvas vous permet d’ajouter des résultats dans vos barèmes et ainsi d’évaluer la progression lorsque vous notez les tâches. Une fois que vous avez défini les résultats, cliquez sur « Gérer les barèmes » pour commencer à utiliser vos résultats pour vos notations.*"
             title: "Définition des résultats"
     mastery_error: "Doit être supérieur ou égal à 0"
     missing_outcome: "Impossible de trouver ce résultat d’apprentissage"
@@ -10401,7 +10401,7 @@ fr-CA:
     blank_override: "Vous devez sélectionner un(e) étudiant(e) ou une section"
     everyone: Tous
     everyone_else: "Tous les autres"
-    invalid_group_override: "Vous ne pouvez pas faire d'affectation à un groupe hors de l'ensemble de groupe du travail"
+    invalid_group_override: "Vous ne pouvez pas faire d'affectation à un groupe hors de l'ensemble de groupe de la tâche"
     overrides: 
       everyone: Tous
   own_copyright_cc59db55: "Détenteur des droits d’auteur"
@@ -10591,7 +10591,7 @@ fr-CA:
       description: "Activer Crocodoc comme option d’aperçu de document "
       name: Crocodoc
     crocodoc_settings: 
-      description: "Ce plugiciel s’intègre à Crocodoc pour fournir un mode de prévisualisation de document HTML5 qui permet aux enseignants et aux élèves d’annoter les documents."
+      description: "Ce plugiciel s’intègre à Crocodoc pour fournir un mode de prévisualisation de document HTML5 qui permet aux enseignants et aux étudiants d’annoter les documents."
       labels: 
         api_key: "Clé API Crocodoc "
     custom_ticketing_email_settings: 
@@ -10756,7 +10756,7 @@ fr-CA:
         domain_settings: "Paramètres du domaine"
         misc_settings: "Paramètres divers"
         ui_conf_ids: "ID de configuration de l’IU"
-      hide_rte_button_note: "(toujours là pour les conversations/SpeedGrader/envois de tâches personnels en enregistrements multimédias)"
+      hide_rte_button_note: "(toujours là pour les conversations/SpeedGrader/envois de tâches personnelles en enregistrements multimédias)"
       hints: 
         domain: "Pour les comptes hébergés, utilisez www.kaltura.com."
         resource_domain: "Pour les comptes hébergés, utilisez cdn.kaltura.com."
@@ -10886,7 +10886,7 @@ fr-CA:
       name: VeriCite
     vericite_settings: 
       default_assignment_settings: "**Paramètres de tâche par défaut**"
-      default_comments_settings: "*Le texte entré ici sera affiché aux élèves lorsqu'ils soumettront un travail.*"
+      default_comments_settings: "*Le texte entré ici sera affiché aux étudiants lorsqu'ils soumettront une tâche.*"
       labels: 
         account_id: "ID de compte VeriCite"
         comments: "Commentaires sur l’envoi"
@@ -10899,7 +10899,7 @@ fr-CA:
         store_in_index: "Stocker dans l'index"
         type: "Les étudiants peuvent voir le rapport d’origine"
       plagiarism_compatibility: "Note de compatibilité des plug-ins anti-plagiat :"
-      pledge_description: "*Le texte indiqué ici sera affiché aux élèves qui soumettent un devoir. Pour soumettre son devoir, l'élève devra cocher une case l'engageant. Si vous laissez cet espace vide, aucun texte d'engagement n'est présenté ou demandé avant la soumission.*"
+      pledge_description: "*Le texte indiqué ici sera affiché aux étudiants qui soumettent un devoir. Pour soumettre son devoir, l'étudiant devra cocher une case l'engageant. Si vous laissez cet espace vide, aucun texte d'engagement n'est présenté ou demandé avant l'envoi.*"
     webct_scraper_settings: 
       description: |-
           Les institutions qui n’utilisent pas les modules d’apprentissage de WebCT (y compris les établissements ayant adopté une version de WebCT
@@ -11485,7 +11485,7 @@ fr-CA:
       give_everyone_full_credit: "Tout le monde reçoit tous les points pour cette question."
       no_scores_reduced: "Attribuez des points pour les réponses qui ont été rectifiées et celles qui étaient correctes (*les notes ne pourront pas baisser*)"
       regrade_disabled: "Il n’est pas possible de recalculer la note de cette question, parce qu’une réponse a été retirée ou le type de question a changé après un envoi effectué par un étudiant."
-      regrade_options: "Choisir une option de re-notation pour les étudiants qui ont déjà répondu au questionnaire. Canvas va re-noter toutes vos soumissions une fois que vous aurez sauvegardé le questionnaire (le notes des étudiants POURRAIENT en être affectées)."
+      regrade_options: "Choisir une option de re-notation pour les étudiants qui ont déjà répondu au questionnaire. Canvas va re-noter toutes vos envois une fois que vous aurez sauvegardé le questionnaire (le notes des étudiants POURRAIENT en être affectées)."
       some_scores_reduced: "Attribuez des points uniquement pour la réponse correcte (*la note de certains étudiants pourra baisser*)"
       update_question_without_regrading: "Actualiser la question sans reclassement"
   quiz_40ee61b1: questionnaire
@@ -11619,7 +11619,7 @@ fr-CA:
     title: "Statistiques du questionnaire"
     unknown_answer: "Autre chose"
     user_names: "Noms d'utilisateurs"
-  quiz_submission_dca0c013: "Soumission du questionnaire"
+  quiz_submission_dca0c013: "Envoi du questionnaire"
   quiz_successfully_updated_ece5c63d: "Le questionnaire a bien été mis à jour"
   quiz_title_4b50ade9: "Titre du questionnaire"
   quiz_type_be1633db: "Type de questionnaire"
@@ -11650,7 +11650,7 @@ fr-CA:
       saving: Enregistrement...
       update_group: "Mettre à jour un groupe"
       update_question: "Mettre à jour une question"
-    cant_unpublish_when_students_submit: "Ne peut être retiré de la publication si des étudiants ont déposé leur candidature"
+    cant_unpublish_when_students_submit: "Ne peut être retiré de la publication si des étudiants ont envois"
     choose_option: "[ Choisir ]"
     confirms: 
       delete_answer: "Êtes-vous certain? La suppression de réponses pour une question associée à des envois rend impossible la rectification de la notation de cette question."
@@ -11694,7 +11694,7 @@ fr-CA:
         files_removed: "%{display_name} a été retiré."
     final_answer: "Réponse finale"
     headers: 
-      assignment_quizzes: "Questionnaires pour un travail"
+      assignment_quizzes: "Questionnaires pour une tâche"
       practice_quizzes: "Questionnaires d’entraînement"
       surveys: Enquêtes
     index: 
@@ -11802,7 +11802,7 @@ fr-CA:
       types: 
         quiz: Questionnaire
         survey: Enquête
-    quiz_attempts_length_error: "Pour un questionnaire, les tentatives sont limitées à 3 chiffres. Si vous souhaitez accorder aux élèves des tentatives illimitées, ne cochez pas la case « Autoriser plusieurs tentatives » proposée sur la gauche."
+    quiz_attempts_length_error: "Pour un questionnaire, les tentatives sont limitées à 3 chiffres. Si vous souhaitez accorder aux étudiants des tentatives illimitées, ne cochez pas la case « Autoriser plusieurs tentatives » proposée sur la gauche."
     quiz_attempts_nan_error: "Les tentatives relatives aux questionnaires ne peuvent être spécifiées qu’avec des nombres."
     quiz_group: 
       errors: 
@@ -12509,11 +12509,11 @@ fr-CA:
   radio_button_option_2_31e50043: "Bouton radio option 2"
   range_56b2f310: Gamme
   range_name_90614433: "Nom de la plage"
-  rangestudents_out_of_totalstudents_students_e5ee60e1: "%{rangeStudents} sur %{totalStudents} élèves"
+  rangestudents_out_of_totalstudents_students_e5ee60e1: "%{rangeStudents} sur %{totalStudents} étudiants"
   ratio_answered_correctly_b0c1e7d: "%{ratio} % ont répondu correctement"
   ratio_responded_correctly_6d890107: "%{ratio} % ont répondu correctement"
   re_activate_user_f7d77c9a: "Réactiver l'utilisateur"
-  re_submit_assignment_b3e2bd28: "Renvoyer le travail"
+  re_submit_assignment_b3e2bd28: "Renvoyer le tâche"
   re_upload_submissions_form: 
     buttons: 
       upload: "Téléverser des fichiers"
@@ -12922,15 +12922,15 @@ fr-CA:
         points_possible: "Points possibles"
         submission_types: "Types d’envoi :"
       index: 
-        assignment_in_speedgrader: "Voir ce travail dans SpeedGrader"
-        assignment_info: "Informations sur le travail"
-        empty_assignment_selection: "Sélectionnez un travail pour afficher des informations complémentaires ici."
+        assignment_in_speedgrader: "Voir cette tâche dans SpeedGrader"
+        assignment_info: "Informations sur le tâche"
+        empty_assignment_selection: "Sélectionnez une tâche pour afficher des informations complémentaires ici."
     components: 
       final_grade: 
         final_grade: "Note finale :"
     content_selection: 
       assignment: 
-        select_assignment: "Sélectionner un travail"
+        select_assignment: "Sélectionner une tâche"
       header: 
         content_selection: "Sélection de contenu"
       outcome: 
@@ -12938,14 +12938,14 @@ fr-CA:
       student: 
         select_student: "Sélectionner un étudiant"
     grading: 
-      empty_submission_selection: "Sélectionnez un étudiant et un travail pour afficher et modifier les notes."
+      empty_submission_selection: "Sélectionnez un étudiant et une tâche pour afficher et modifier les notes."
       grade_for: "Note pour : %{name}"
       grading: Notation
       is_dropped: "Actuellement cette note est ignorée pour cet étudiant."
       is_late: "Cet envoi a été effectué en retard."
       submission_details: "Informations de l’envoi"
-      submission_hidden: "Ce travail n’est pas disponible pour cet étudiant et ne sera pas inclus dans sa note."
-      was_resubmitted: "Ce travail a été renvoyé depuis qu’il a été noté."
+      submission_hidden: "Cette tâche n’est pas disponible pour cet étudiant et ne sera pas inclus dans sa note."
+      was_resubmitted: "Cette tâche a été renvoyé depuis qu’il a été noté."
     header: 
       gradebook_individual_view: "Relevé de notes : Vue individuelle"
       save_instructions: "Remarque : Les notes seront enregistrées automatiquement dès que le curseur quittera le champ."
@@ -13148,7 +13148,7 @@ fr-CA:
     buttons: 
       add_item: "Ajouter un élément"
     errors: 
-      assignment_name_blank: "Le nom du travail ne peut pas être vide."
+      assignment_name_blank: "Le nom de la tâche ne peut pas être vide."
       external_tool_url: "Impossible d’enregistrer un outil externe sans URL."
       failed_to_create_item: "Échec de création d’un élément"
       loading_failed: "Échec du chargement"
@@ -13173,7 +13173,7 @@ fr-CA:
   select_one_of_the_options_c8b0c6e4: "Sélectionnez l'une de ces options :"
   select_prerequisite_module_57894963: "Sélectionnez un module prérequis"
   select_prerequite_module_e9042bb0: "Sélectionnez un module prérequis"
-  select_student_name_caaff244: "Sélectionner un élève %{name}"
+  select_student_name_caaff244: "Sélectionner un étudiant %{name}"
   select_students_for_review_6e004a12: "Sélectionner les étudiants à examiner"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Sélectionnez le fichier que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau fichier »."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Sélectionnez la page que vous souhaitez associer, ou ajoutez une nouvelle page en sélectionnant « Nouvelle page »."
@@ -13288,7 +13288,7 @@ fr-CA:
         record_type: "Type d'enregistrement"
         ret_val: "URL de retour"
   settings_5aa0fd0c: Paramètres
-  settings_for_assignment_name_c19565e1: "Réglages pour le travail %{name} "
+  settings_for_assignment_name_c19565e1: "Réglages pour le tâche %{name} "
   setup_checklist_eb8b00b8: "Liste de vérification de la configuration"
   shared: 
     account_notification: 
@@ -13691,9 +13691,9 @@ fr-CA:
         linked_to_learning_outcome: "Ce critère est lié à un résultat d’apprentissage"
     select_content_dialog: 
       add_to_module: "Ajouter %{item} au *module*"
-      assignment_item: Travail
-      assignment_item_select_label: "Sélectionnez le travail que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau travail »."
-      assignment_notice: "Sélectionnez le travail que vous souhaitez associer à ce *module*, ou ajoutez une tâche en sélectionnant Nouvelle tâche."
+      assignment_item: Tâche
+      assignment_item_select_label: "Sélectionnez le tâche que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau tâche »."
+      assignment_notice: "Sélectionnez le tâche que vous souhaitez associer à ce *module*, ou ajoutez une tâche en sélectionnant « Nouvelle tâche »."
       content_page_item: "Page de contenu"
       discussion_item: Discussion
       discussion_topic_select_label: "Sélectionnez le sujet que vous souhaitez associer, ou ajoutez-en un en choisissant « Nouveau sujet »."
@@ -13709,7 +13709,7 @@ fr-CA:
         other: "*Retrait %{count} niveaux*"
         zero: "*Pas de retrait*"
       labels: 
-        assignment_name: "Nom du travail"
+        assignment_name: "Nom de la tâche"
         file: Fichier
         folder: Dossier
         header: En-tête
@@ -13720,7 +13720,7 @@ fr-CA:
         topic_name: "Nom du sujet"
         url: URL
         wiki_page_name: "Nom de la page"
-        wiki_page_namem: "Nom du travail"
+        wiki_page_namem: "Nom de la tâche"
       loading: Chargement...
       new_assignment_option: "[ Nouvelle tâche]"
       new_page_option: "[ Nouvelle page ]"
@@ -13740,7 +13740,7 @@ fr-CA:
       bouncing_communication_channels: "Il y a apparemment un problème avec l'une de vos méthodes de contact. Veuillez vérifier votre *Page des paramètres*."
       javascript_required: "Votre module JavaScript doit être activé pour pouvoir accéder à ce site."
     submission_comment: 
-      assignment: Travail
+      assignment: Tâche
       grading_alt: notation
       submission_comment: "Commentaire sur l’envoi"
     terms_required: 
@@ -13972,7 +13972,7 @@ fr-CA:
       forward: Transférer
   some_assignments_could_not_be_created_because_they_d91f2f21: "Certains devoirs n'ont pas pu être créés car ils auraient lieu pendant une période non ouverte à la notation."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Certaines conférences de cette page sont masquées à cause d'erreurs lors de la récupération de leur statut"
-  some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Certaines soumissions ne peuvent être notées ; les changements apportés aux notes de ces soumissions ont été ignorés."
+  some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Certaines envois ne peuvent être notées ; les changements apportés aux notes de ces envois ont été ignorés."
   someone: Quelqu’un
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Quelque chose ne fonctionne pas, mais je peux outrepasser cela pour le moment"
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Problème lors de la réactivation de l’utilisateur. Veuillez réessayer ultérieurement."
@@ -14021,7 +14021,7 @@ fr-CA:
       other: "Remarque : le résultat n’inclut pas les tâches des groupes %{list_of_group_names}, parce qu’ils n’ont pas de points possibles."
     media_recordin: "Enregistrement multimédia"
     next_object: "%{type} suivant"
-    no_assignment: "Aucun travail sélectionné"
+    no_assignment: "Aucune tâche sélectionné"
     no_outcome: "Aucun résultat sélectionné"
     no_student: "Aucun étudiant sélectionné"
     none: Aucun
@@ -14072,7 +14072,7 @@ fr-CA:
   student_extensions_d35a907: "Prolongations pour l’étudiant"
   student_id: "ID de l’étudiant"
   student_id_7cc45fb5: "ID de l’étudiant"
-  student_id_a61d78c7: "Identifiant élève"
+  student_id_a61d78c7: "Identifiant étudiant"
   student_interactions_report_7717b685: "Rapport d’interactions d’étudiant"
   student_messages_b0a242d: "Messages des étudiants"
   student_must_complete_one_of_these_requirements_6046eb3a: "L'étudiant doit terminer l'une de ces exigences"
@@ -14085,7 +14085,7 @@ fr-CA:
       leurs progrès dans les différents apprentissages du cours. Ces acquis sont présentés
       dans un format analogue à un relevé de notes et la progression est indiquée à la fois sous la
       forme d’une valeur numérique et avec les appréciations maîtrisé/presque maîtrisé/soutien.
-  student_sis_6721040e: "Sis de l'élève"
+  student_sis_6721040e: "Sis de l'étudiant"
   student_sis_d9f0cd39: "SIS d’étudiant"
   student_viewed_document_9065adb8: "L'étudiant a vu le document"
   students_1b8cd07b: Étudiants
@@ -14093,7 +14093,7 @@ fr-CA:
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Les étudiants ne peuvent plus voir les réponses du questionnaire après la fin du cours"
   students_have_either_already_taken_or_started_taki_a076336: "Des étudiants ont déjà commencé ou terminé ce questionnaire, soyez donc prudent lorsque vous désirez le modifier. Si vous modifiez l'une des questions d'une manière importante, pensez éventuellement à réévaluer les étudiants qui auraient complété l’ancienne version de ce questionnaire."
   students_must_complete_all_of_these_requirements_15fa97f7: "Les étudiants doivent remplir toutes ces exigences"
-  students_must_sign_up_in_groups_681206ac: "Les élèves doivent s'inscrire en groupes"
+  students_must_sign_up_in_groups_681206ac: "Les étudiants doivent s'inscrire en groupes"
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Étudiants ayant répondu au questionnaire (%{count})"
     other: "Étudiants ayant répondu au questionnaire (%{count})"
@@ -14210,7 +14210,7 @@ fr-CA:
         show_assessment_by: "Afficher l’évaluation par"
       late_submission: "(en retard)"
       links: 
-        resubmit: "Renvoyer le travail"
+        resubmit: "Renvoyer le tâche"
         submit: "Envoyer une tâche"
       media_comment: "Commentaire multimédia"
       media_comment_link: "Ceci est un commentaire multimédia, *cliquez ici pour l’afficher*"
@@ -14234,12 +14234,12 @@ fr-CA:
     show_preview: 
       anonymous_username: "Cet étudiant"
       discussion_submission_description: "Les envois pour cette tâche sont publiés dans la discussion la concernant. Ci-dessous se trouvent les billets de la discussion pour %{user}, mais vous pouvez aussi *afficher la discussion complète*."
-      discussion_submission_description_without_link: "Les envois concernant ce travail sont publiés dans la discussion associée. Ci-dessous figurent les contributions à la discussion publiées pour %{user}."
+      discussion_submission_description_without_link: "Les envois concernant cette tâche sont publiés dans la discussion associée. Ci-dessous figurent les contributions à la discussion publiées pour %{user}."
       entry_no_image: "Gardez à l’esprit que cette page peut avoir été modifiée depuis l’envoi d’origine."
       entry_with_image: "Nous avons inclus une capture d'écran de la page au moment où elle a été envoyée."
       external_url_submission: "Cet envoi correspond à une URL vers une page externe."
       group_discussion_submission_description: "Les envois relatifs à cette tâche sont publiés dans la discussion du groupe associé à cette tâche. Vous voyez ci-dessous les contributions destinées à  %{user}, mais vous pouvez aussi *afficher la discussion complète du groupe*."
-      group_discussion_submission_description_without_link: "Les envois concernant ce travail sont publiés dans la discussion associée et pour ce groupe. Ci-dessous figurent les contributions à la discussion publiées pour %{user}."
+      group_discussion_submission_description_without_link: "Les envois concernant cette tâche sont publiés dans la discussion associée et pour ce groupe. Ci-dessous figurent les contributions à la discussion publiées pour %{user}."
       media_comment_link: "Cet envoi est un enregistrement multimédia. *cliquez ici pour afficher*."
       no_files: "Aucun fichier n’a été téléverseé pour cet envoi"
       no_preview_available: "Aucun aperçu disponible"
@@ -14262,12 +14262,12 @@ fr-CA:
     submission_download: 
       download_message: "**Les envois de l’étudiant sont réunis** et comprimés dans un fichier zip. L’opération peut prendre plus ou moins de temps en fonction de la taille et du nombre d’envois."
       gathering_files: "Collecte des fichiers..."
-  submissions_11e96106: Tâches
-  submissions_folder_9db8dadf: "Dossier des soumissions"
-  submissions_folders_must_be_created_in_user_or_gro_aba44f76: "les dossiers de soumissions doivent être créés dans un contexte d'utilisateur ou de groupe"
+  submissions_11e96106: Envois
+  submissions_folder_9db8dadf: "Dossier des envois"
+  submissions_folders_must_be_created_in_user_or_gro_aba44f76: "les dossiers de envois doivent être créés dans un contexte d'utilisateur ou de groupe"
   submit_a3cc6859: Envoyer
   submit_a_feature_idea_2d4baa3d: "Soumettre une idée de fonctionnalité"
-  submit_assignment_5799b4e3: "Soumettre un travail"
+  submit_assignment_5799b4e3: "Soumettre une tâche"
   submit_media_file_f334c1ba: "Envoyer un fichier multimédia"
   submit_ticket_5515ffd: "Soumettre le billet"
   submitted_at_4d5ea3aa: "Envoyé à "
@@ -14424,7 +14424,7 @@ fr-CA:
       timespan: "%{start_at} *à* %{end_at}"
   terms_35d91184: "Périodes :"
   text_document_eacbcdb7: "Document de texte"
-  text_entry_submission_7b0ae0c5: "Soumission d’une saisie de texte"
+  text_entry_submission_7b0ae0c5: "Envoi d’une saisie de texte"
   text_entry_submission_cannot_be_empty_3d187cae: "Envoi d’une entrée de texte ne peut être vide"
   text_input_d3480b8c: "Saisie de texte"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Ce compte utilisateur a été supprimé. Veuillez contacter votre administrateur système pour la réactivation de votre compte."
@@ -14441,8 +14441,8 @@ fr-CA:
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "L’onglet Fichiers permet de partager des diapositives de conférence, des documents d’exemples, des aides à l’étude -- tout ce que vos étudiants sont susceptibles de télécharger. La mise en ligne et l’organisation de vos fichiers sont des tâches simples dans Canvas. Nous vous expliquerons comment."
   the_following_fields_are_invalid_fields_b3565800: "Les champs suivants ne sont pas valides : %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Le nom complet d'hôte de l'instance de compte (quelquechose.instructure.com, par exemple)"
-  the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "La note de ce travail ne se synchronisera pas au système d'information étudiant."
-  the_grade_for_this_assignment_will_sync_to_the_stu_5d32cedb: "La note de ce travail sera synchronisée au système d'information étudiant."
+  the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "La note de cette tâche ne se synchronisera pas au système d'information étudiant."
+  the_grade_for_this_assignment_will_sync_to_the_stu_5d32cedb: "La note de cette tâche sera synchronisée au système d'information étudiant."
   the_grading_period_set_was_deleted_cce5d8f6: "L'ensemble de périodes de notation a été supprimé"
   the_grading_period_set_was_updated_successfully_d8dd5d0f: "L'ensemble de périodes de notation a bien été mis à jour."
   the_grading_period_was_deleted_7814a349: "La période de notation a été supprimée"
@@ -14498,24 +14498,24 @@ fr-CA:
   there_was_a_problem_logging_in_at_institution_5a298155: "Il y a eu un problème de connexion à %{institution}"
   there_was_a_problem_saving_the_grading_period_243bed6c: "Un problème s’est produit lors de la sauvegarde de la période de notation"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Un problème s’est produit lors de l’enregistrement du système de notation"
-  there_was_a_problem_submitting_your_set_27ca2ed0: "Un problème est survenu lors de la soumission de votre ensemble"
+  there_was_a_problem_submitting_your_set_27ca2ed0: "Un problème est survenu lors de l'envoi de votre ensemble"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Une erreur s'est produite générant le lancement de l'outil"
   there_was_an_error_in_processing_your_request_6513a49a: "Erreur lors du traitement de votre demande"
   there_was_an_error_removing_the_image_c83acffe: "Une erreur est survenue lors de la suppression de l'image"
   there_was_an_error_retrieving_the_course_image_d7ea094d: "Une erreur est survenue lors de la récupération de l'image du cours"
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Une erreur s’est produite lors de la sauvegarde des modifications du cours"
   there_was_an_error_setting_usage_rights_53739e1d: "Une erreur s’est produite lors de la définition des droits d’utilisation."
-  there_was_an_error_updating_this_assignment_please_59fc608d: "Une erreur s’est produite pendant la mise à jour de ce travail assigné. Veuillez réactualiser la page et réessayer."
+  there_was_an_error_updating_this_assignment_please_59fc608d: "Une erreur s’est produite pendant la mise à jour de cette tâche. Veuillez réactualiser la page et réessayer."
   there_was_an_error_uploading_the_image_932fc4ce: "Une erreur est survenue lors du téléversement de l'image"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Une erreur s’est produite avec votre requête; veuillez essayer une recherche différente."
   there_were_errors_with_the_form_errors_ab5b559a: "Des erreurs se sont produites avec le formulaire : %{errors}"
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "Cette action a été désactivée par votre administrateur."
-  this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Ce travail ne compte pas dans le calcul de la note finale."
-  this_assignment_has_been_excused_87f1dc13: "Ce travail a été mis de côté."
-  this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Ce travail est abandonné et ne sera pas pris en compte dans le calcul du total"
-  this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Ce travail n'est pas obligatoire et ne sera pas pris en compte dans le calcul du total"
+  this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Cette tâche ne compte pas dans le calcul de la note finale."
+  this_assignment_has_been_excused_87f1dc13: "Cette tâche a été mis de côté."
+  this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Cette tâche est abandonné et ne sera pas pris en compte dans le calcul du total"
+  this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Cette tâche n'est pas obligatoire et ne sera pas pris en compte dans le calcul du total"
   this_assignment_is_overdue_a44bea3b: "Cette évaluation est en retard"
-  this_assignment_will_no_longer_count_towards_your__a6eb6778: "Ce travail ne comptera plus dans votre note."
+  this_assignment_will_no_longer_count_towards_your__a6eb6778: "Cette tâche ne comptera plus dans votre note."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Cette pièce jointe a été retirée par l'auteur."
   this_conference_may_be_recorded_f76deeeb: "Cette conférence pourrait être enregistrée."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Il n’est pas possible d’ajouter ce cours au menu des cours pour le moment."
@@ -14542,7 +14542,7 @@ fr-CA:
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Ceci est la note actuellement choisie pour cette étudiant."
   this_is_the_default_email_address_f3c421fb: "Ceci est l'adresse courriel par défaut"
   this_is_your_current_theme_4331709b: "C'est votre thème actuel"
-  this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "Cet élément réapparaîtra lorsqu'une nouvelle soumission sera effectuée."
+  this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "Cet élément réapparaîtra lorsqu'une nouvelle envoi sera effectuée."
   this_item_will_reappear_when_there_are_new_grades__8f9e5383: "Cet élément réapparaîtra lorsqu'il y aura de nouvelles notes à modérer."
   this_login_is_for_provider_6f17462: "Cette connexion est pour %{provider}"
   this_message_includes_media_comments_to_listen_or__5fc98641: "Ce message inclut des commentaires multimédias. Pour les écouter ou y répondre, cliquer ce lien : %{link}."
@@ -14571,10 +14571,10 @@ fr-CA:
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "Cet étudiant vient juste de recevoir une note exceptionnellement élevée."
   this_student_was_just_awarded_negative_points_55741a37: "Cet étudiant vient juste de recevoir des points négatifs."
   this_student_wrote_f1a3f22d: "Cet étudiant a écrit :"
-  this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Cette remise a déjà été notée et est prête à être modérée."
-  this_submission_is_in_a_closed_grading_period_cc9ecb8a: "Cette soumission se trouve dans une période non ouverte à la notation"
-  this_submission_is_in_another_grading_period_36bc720b: "Cette soumission se trouve dans une autre période de notation"
-  this_submission_is_not_in_any_grading_period_cbbd2f8: "Cette soumission ne se trouve dans aucune période de notation"
+  this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Cette envoi a déjà été notée et est prête à être modérée."
+  this_submission_is_in_a_closed_grading_period_cc9ecb8a: "Cette envoi se trouve dans une période non ouverte à la notation"
+  this_submission_is_in_another_grading_period_36bc720b: "Cette envoi se trouve dans une autre période de notation"
+  this_submission_is_not_in_any_grading_period_cbbd2f8: "Cette envoi ne se trouve dans aucune période de notation"
   this_topic_is_closed_for_comments_3dd10c00: "Ce sujet ne reçoit plus de commentaires."
   this_topic_is_closed_for_comments_5bacad6: "Ce sujet est fermé aux commentaires"
   this_topic_is_used_for_grading_efc6ca89: "Ce sujet est utilisé pour la notation."
@@ -14601,7 +14601,7 @@ fr-CA:
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "il y a moins d’une minute"
     pm: pm
     ranges: 
@@ -14864,7 +14864,7 @@ fr-CA:
   turnitin_settings: 
     originality_report_never: Jamais
     originality_report_visible_after_due_date: "Après la date d’échéance"
-    originality_report_visible_after_grading: "Après que le travail soit noté"
+    originality_report_visible_after_grading: "Après que le tâche soit noté"
     originality_report_visible_immediately: Immédiatement
   twitter_fcef6b54: Twitter
   type_c8106334: Type
@@ -14932,7 +14932,7 @@ fr-CA:
   unsupported_package: "Paquetage de contenu non pris en charge"
   until_4a1f8cda: Jusqu’au
   until_date_949017c4: "Jusqu’au %{date}"
-  untitled_assignment_59354b34: "travail sans titre"
+  untitled_assignment_59354b34: "tâche sans titre"
   unused_courses_title: "Cours non utilisés"
   up_c553575d: Haut
   update_4d8ee62: "Mettre à jour"
@@ -14947,14 +14947,14 @@ fr-CA:
   upload_drop_zone: 
     drop_to_upload: "Déposer les éléments à mettre en ligne"
   upload_failed_quota_exceeded_ff3af659: "Téléversement a échoué, quota dépassé"
-  upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Téléverser les fichiers soumis avec des tâches dans un dossier en lecture seule dédié aux soumissions"
+  upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Téléverser les fichiers soumis avec des tâches dans un dossier en lecture seule dédié aux envois"
   upload_media_ce31135a: "Téléverser un fichier multimédia"
   upload_successful_ca47465f: "Téléversement réussi"
   upper_limit_of_range_c454a8f2: "Limite supérieure de la plage"
   upper_lower_56cad16c: "%{upper} – %{lower}"
   url_cc9398ca: "URL :"
   url_is_required_4689ed84: "L'URL est requise"
-  url_submission_f76327e3: "Soumission d'URL"
+  url_submission_f76327e3: "Envoi d'URL"
   url_type_3ece27d2: "Type d'URL"
   uruguay_598_866a5ef3: "Uruguay (+598)"
   usage_right_ff96f3e2: "Droit d’utilisation :"
@@ -15397,16 +15397,16 @@ fr-CA:
   view_in_speedgrader_773b9d81: "Voir dans SpeedGrader"
   view_name_app_62a2ad8e: "Voir l’application %{name}"
   view_next_file_a8a4a885: "Visualiser le fichier suivant"
-  view_next_student_9fc72fef: "voir l'élève suivant"
+  view_next_student_9fc72fef: "voir l'étudiant suivant"
   view_previous_file_b846db4f: "Visualiser le fichier précédent"
-  view_previous_student_90000459: "voir l'élève précédent"
+  view_previous_student_90000459: "voir l'étudiant précédent"
   view_prior_enrollments_9b519b25: "Afficher les inscriptions préalables"
   view_question_banks_188a9e0f: "Voir les banques de questions"
-  view_range_student_details_8116d68a: "Voir les détails de l'ensemble d'élèves"
+  view_range_student_details_8116d68a: "Voir les détails de l'ensemble d'étudiant"
   view_rubric_evaluation_b1b0db2a: "Afficher l’évaluation par barème"
   view_scoring_details_9fb7a0a5: "Voir les détails des scores"
-  view_student_submission_5beaf78: "Voir la soumission de l'élève"
-  view_submission_ff3da5d: "Voir la soumission"
+  view_student_submission_5beaf78: "Voir l'envoi de l'étudiant"
+  view_submission_ff3da5d: "Voir l'envoi"
   view_the_assignment_e61ca4fc: "Afficher la tâche"
   view_toolname_placements_4a5724d1: "Afficher les placements de %{toolName}"
   view_user_groups_538f22b4: "Afficher les groupes d’utilisateurs"
@@ -15659,9 +15659,9 @@ fr-CA:
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Vous pouvez vérifier les détails du groupe en cliquant ce lien : %{link}"
   you_can_disable_this_feature_d5e61373: "Vous pouvez désactiver cette fonctionnalité"
   you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "Vous pouvez vous connecter directement avec ce fournisseur en allant sur %{url}"
-  you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "Vous pouvez répondre à ce commentaire en répondant à ce message, ou consulter les détails de la soumission en cliquant ce lien : %{link}."
+  you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "Vous pouvez répondre à ce commentaire en répondant à ce message, ou consulter les détails de l'envoi en cliquant ce lien : %{link}."
   you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "Vous pouvez répondre à ce message dans Canvas en répondant directement à ce message, ou en cliquant ce lien : %{link}."
-  you_can_review_the_submission_details_by_clicking__9abc5515: "Vous pouvez consulter les détails de la soumission en cliquant ce lien : %{link}."
+  you_can_review_the_submission_details_by_clicking__9abc5515: "Vous pouvez consulter les détails de l'envoi en cliquant ce lien : %{link}."
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "Vous pouvez voir les détails du groupe en cliquant ce lien : %{link}."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Vous ne pouvez pas supprimer un sous-compte qui contient des cours."
   you_can_try_to_log_in_again_2b23ef0f: "Vous pouvez essayer de *vous connecter à nouveau*."
@@ -15686,7 +15686,7 @@ fr-CA:
   you_just_sent_a_message_in_canvas_86b4945c: "Vous venez juste d’envoyer un message dans Canvas"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Vous en voudrez vous aussi. Quel est l’intérêt de dispenser un cours si personne n’écoute?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Vous aurez besoin d'un jeton d'actualisation, suivez les étapes présentées à ce lien, vous pourriez vouloir l'aide d'un expert technique"
-  you_may_not_see_all_comments_right_now_because_the_96cf2051: "Tous les commentaires ne sont pas visibles actuellement car le travail est en cours de notation."
+  you_may_not_see_all_comments_right_now_because_the_96cf2051: "Tous les commentaires ne sont pas visibles actuellement car le tâche est en cours de notation."
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Vous voudrez peut-être attribuer quelques AE pour vous aider avec le cours. Les AE peuvent noter les envois des étudiants, aider à modérer les discussions et même mettre à jour les dates d’échéance et les détails des tâches pour vous."
   you_must_agree_to_the_terms_99723f97: "Vous devez accepter les conditions."
   you_must_allow_at_least_one_appointment_per_partic_c142139c: "Vous devez autoriser au moins un rendez-vous par participant."

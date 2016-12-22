@@ -66,8 +66,8 @@ fr:
     bad_response_all: "Impossible de mettre à jour les critères."
     no_api_key: "Une clé d’API est requise pour utiliser Academic Benchmark."
     no_authority: "Impossible de trouver une autorité à mettre à jour"
-    no_file: "Aucun fichier de résultat ou d’autorité fourni"
-    no_permissions: "L’utilisateur n’est pas autorisé à modifier les résultats  globaux. "
+    no_file: "Aucun fichier d'acquis ou d’autorité fourni"
+    no_permissions: "L’utilisateur n’est pas autorisé à modifier les acquis globaux. "
     no_perms: "L’utilisateur n’est pas autorisé à modifier les acquis globaux. "
     plugin_settings: 
       api_url_description: "(par ex. %{url})"
@@ -1304,8 +1304,8 @@ fr:
   add_a_custom_help_link_4328252f: "Ajouter un lien d'aide personnalisé"
   add_a_new_announcement_878b717f: "Ajouter une nouvelle annonce"
   add_a_new_course_4a041207: "Ajouter un nouveau cours"
-  add_a_new_outcome_cbdbe96c: "Ajouter un nouveau résultat"
-  add_a_new_outcome_group_e3fab2fc: "Ajouter un nouveau groupe de résultats"
+  add_a_new_outcome_cbdbe96c: "Ajouter un nouvel acquis"
+  add_a_new_outcome_group_e3fab2fc: "Ajouter un nouveau groupe d'acquis"
   add_a_new_user_c440d053: "Ajouter un nouvel utilisateur"
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Ajouter un examinateur pour les étudiants sélectionnés"
   add_account_admins_99c03c9e: "Ajouter des administrateurs de compte"
@@ -1365,7 +1365,7 @@ fr:
   add_users_to_name_b8109bbb: "Ajouter des utilisateurs à %{name} "
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Ajoutez vos travaux. Vous pouvez simplement créer une longue liste ou les organiser dans des groupes, et même spécifier des pondérations pour chacun de ces groupes."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Ajoutez l'identifiant dans le champ personnalisé de votre Zendesk pour chacun des éléments suivants (les champs sans identifiant ne seront pas enregistrés) : "
-  additional_outcomes_options_6df428f1: "Options de résultats supplémentaires"
+  additional_outcomes_options_6df428f1: "Options d'acquis supplémentaires"
   additional_settings_for_sis_syncing_f926973e: "Paramètres supplémentaires pour la synchronisation SIS"
   addressbook_microservice_a4940422: "AddressBook microservice"
   admin_4d3ba42f: Administrateur
@@ -3145,7 +3145,7 @@ fr:
   choose_usage_rights_33683854: "Choisir les droits d’utilisation..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' n'est pas une couleur valide."
   clear_2084585f: Effacer
-  click_for_more_details_on_this_outcome_8c018d2f: "cliquer pour plus de détails sur ce résultat"
+  click_for_more_details_on_this_outcome_8c018d2f: "cliquer pour plus de détails sur cet acquis"
   click_here_for_an_account_9536cb36: "Cliquez ici pour avoir un compte"
   click_here_it_s_free_eeccb9cb: "Cliquez ici, c'est gratuit !"
   click_here_on_the_calendar_link_c9965631: "Cliquez ici sur le lien *Calendrier*"
@@ -4564,7 +4564,7 @@ fr:
   course_name_successfully_added_48116a50: "%{course_name} a été ajouté avec succès !"
   course_navigation_dd035109: "Navigation du cours"
   course_option_links_a79d263d: "Liens des options du cours"
-  course_outcomes_7dc1cbc7: "Résultats du cours"
+  course_outcomes_7dc1cbc7: "Acquis du cours"
   course_pages_449f1dd4: "Pages du cours"
   course_people_3058c948: "Personnes du cours"
   course_quizzes_c337653c: "Questionnaires du cours"
@@ -5202,7 +5202,7 @@ fr:
     media: Multimédia
     messages: Messages
     modules: Modules
-    outcomes: Résultats
+    outcomes: Acquis
     people: Personnes
     plugins: Plugins
     prior_users: "Utilisateurs précédents"
@@ -5382,13 +5382,13 @@ fr:
         - Ven
         - Sam
     day_names: 
-      - Dimanche
-      - Lundi
-      - Mardi
-      - Mercredi
-      - Jeudi
-      - Vendredi
-      - Samedi
+      - dimanche
+      - lundi
+      - mardi
+      - mercredi
+      - jeudi
+      - vendredi
+      - samedi
     days: 
       today: Aujourd’hui
       today_lower: aujourd’hui
@@ -5508,8 +5508,8 @@ fr:
   delete_grading_scheme_6b308832: "Supprimer le système de notation"
   delete_group_86c381ec: "Supprimer le groupe"
   delete_my_account_41060aad: "Supprimer mon compte"
-  delete_outcome_cc6546f1: "Supprimer le résultat"
-  delete_outcome_group_6b399d34: "Supprimer le groupe de résultats"
+  delete_outcome_cc6546f1: "Supprimer l'acquis"
+  delete_outcome_group_6b399d34: "Supprimer le groupe d'acquis"
   delete_quiz_142b8099: "Supprimer le questionnaire"
   delete_requirement_bce2d943: "Supprimer l'exigence"
   delete_rubric_9b66412d: "Supprimer la rubrique"
@@ -6095,8 +6095,8 @@ fr:
   edit_mastery_paths_for_title_label_41d81451: "Modifier les Chemins de Réussite pour %{title_label}"
   edit_module_item_83258f6d: "Modifier le module/l'élément"
   edit_name_cbdef0c2: "Modifier %{name}"
-  edit_outcome_867a0381: "Modifier le résultat"
-  edit_outcome_group_f82e0210: "Modifier le groupe de résultats"
+  edit_outcome_867a0381: "Modifier l'acquis"
+  edit_outcome_group_f82e0210: "Modifier le groupe d'acquis"
   edit_pagetitle_cd8abab9: "Modifier %{pageTitle}"
   edit_permissions_for_count_items_d65e3855: 
     one: "Modifier les autorisations pour : %{itemName}"
@@ -6628,7 +6628,7 @@ fr:
   exit_d0c7b013: Sortir
   exit_theme_editor_9ddd41bb: "Sortir de l'éditeur de thème"
   expand_collapse_title_outcome_group_239f0a9d: "développer/réduire le groupe de résultats %{title}"
-  expand_collapse_title_outcome_group_student_meets__46ffef48: "Développer/réduire le groupe de résultat %{title}, l'élève atteint les critères de réussite pour %{mastery_count} sur %{count} résultats"
+  expand_collapse_title_outcome_group_student_meets__46ffef48: "Développer/réduire le groupe d'acquis %{title}, l'élève atteint les critères de réussite pour %{mastery_count} sur %{count} résultats"
   expand_global_navigation_2c28d5d4: "Développer la navigation globale"
   expand_group_53765272: "Développer le groupe"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Développer la liste des membres du groupe %{groupName}"
@@ -6967,7 +6967,7 @@ fr:
   final_score_61e15cf3: "note finale"
   find_8d605019: Trouver
   find_an_existing_grading_scheme_d836ea: "Trouver un système de notation existant"
-  find_an_outcome_919328e6: "Trouver un résultat"
+  find_an_outcome_919328e6: "Trouver un acquis"
   find_appointment_85d6922e: "Trouver un devoir"
   find_flickr_image_view: 
     find_cc_on_flickr: "Trouver des images Creative Commons sur Flickr"
@@ -6975,13 +6975,13 @@ fr:
   find_ip_address_filter_96ec70bb: "Trouver le filtre d’adresses IP"
   find_outcome: 
     errors: 
-      outcome_retrieval_failed: "Erreur inattendue lors de la récupération des résultats. Veuillez réessayer."
+      outcome_retrieval_failed: "Erreur inattendue lors de la récupération des acquis. Veuillez réessayer."
     messages: 
-      loading_outcomes: "Chargement des résultats..."
-      no_outcomes_found: "Aucun résultat trouvé"
-      no_rubric_outcomes_found: "Aucun résultat sous forme de barème trouvé"
+      loading_outcomes: "Chargement des acquis..."
+      no_outcomes_found: "Aucun acquis trouvé"
+      no_rubric_outcomes_found: "Aucun acquis sous forme de barème trouvé"
     titles: 
-      find_outcome: "Chercher un résultat"
+      find_outcome: "Chercher un acquis"
   find_questions_4930b38f: "Trouver des questions"
   finished_19aaf6f5: Terminé
   finland_1f322b39: Finlande
@@ -7341,7 +7341,7 @@ fr:
       close_rubric: "Fermer le barème"
       close_score: Fermer
       close_score_screenreader: "Fermer les détails des résultats"
-      collapse: "Réduire tous les groupes de résultats pour la maîtrise de l’apprentissage"
+      collapse: "Réduire tous les groupes d'acquis pour la maîtrise de l’apprentissage"
       collapse_title: Réduire
       comment_count: 
         one: 1 commentaire
@@ -7349,7 +7349,7 @@ fr:
       comment_count_screenreader: "Lire les commentaires"
       comments: Commentaires
       disabled_for_student_view: "Les résultats des tests d’étudiant ne sont pas inclus dans les statistiques des notes."
-      expand: "Développer tous les groupes de résultats pour la maîtrise de l’apprentissage"
+      expand: "Développer tous les groupes d'acquis pour la maîtrise de l’apprentissage"
       expand_title: Développer
       for_course: "Pour le cours"
       grading_in_progress: "L’instructeur travaille sur les notes"
@@ -8598,7 +8598,7 @@ fr:
       no_points_comment: "Un outil externe a tenté de donner à cette tâche la note %{grade}, mais l’opération a échoué car il n’est pas possible d’attribuer des points à ce travail."
       no_points_possible: "Pas de points possibles pour cette tâche."
       no_score: "Aucun résultat donné"
-      no_submission_created: "Cette demande de résultat n’a pas abouti à la création d’un nouvel envoi de travail personnel."
+      no_submission_created: "Cette demande d'acquis n’a pas abouti à la création d’un nouvel envoi de travail personnel."
     canvas: 
       migration: 
         announcements: Annonces
@@ -10953,8 +10953,8 @@ fr:
   move_module_item_77754119: "Déplacer le module/l'élément"
   move_module_item_after_bbcfe2d6: "Déplacer l'élément de module après"
   move_module_item_before_13e940eb: "Déplacer l'élément de module avant"
-  move_outcome_ce497e6c: "Déplacer le résultat"
-  move_outcome_group_cfa1a505: "Déplacer le groupe de résultats"
+  move_outcome_ce497e6c: "Déplacer l'acquis"
+  move_outcome_group_cfa1a505: "Déplacer le groupe d'acquis"
   move_text_down_7176acd4: "Déplacer %{text} vers le bas"
   move_text_up_91fb4241: "Déplacer %{text} vers le haut"
   move_this_item_41145b2d: "Déplacer cet élément"
@@ -11064,8 +11064,8 @@ fr:
   new_group_category_66be9cbd: "Nouvelle catégorie de groupe"
   new_group_set_7241a581: "Nouvel ensemble de groupes"
   new_module_4e9287e4: "Nouveau module"
-  new_outcome_7fba8c7d: "Nouveau résultat"
-  new_outcome_group_af59f145: "Nouveau groupe de résultats"
+  new_outcome_7fba8c7d: "Nouvel acquis"
+  new_outcome_group_af59f145: "Nouveau groupe d'acquis"
   new_question_9107c469: "Nouvelle question"
   new_question_group_d9306280: "Nouveau groupe de questions"
   new_quiz_34aacba6: "Nouveau questionnaire"
@@ -11545,15 +11545,15 @@ fr:
   other_ddacb37d: autre
   other_timezones_42530564: "D'autres fuseaux horaires"
   outcome_groups: 
-    invalid_file: "Fichier de groupe de résultat non valide"
+    invalid_file: "Fichier de groupe d'acquis non valide"
   outcome_groups_api: 
-    account_group_description: "Groupe de résultats au niveau des comptes."
+    account_group_description: "Groupe d'acquis au niveau des comptes."
   outcome_path_mastery_points: "Points pour la maîtrise de %{path} "
   outcome_path_result: "%{path} – Résultat"
   outcome_results: 
-    outcomes_filename: Résultats
-  outcome_results_title: Résultats
-  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Résultat : %{title} a le statut %{statusTooltip}"
+    outcomes_filename: Acquis
+  outcome_results_title: Acquis
+  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Acquis : %{title} a le statut %{statusTooltip}"
   outcomes: 
     account_standards: "Critères du compte"
     account_standards_description: "Sur la gauche, vous voyez les critères que votre institution a établis et que vous devez utiliser dans vos cours."
@@ -11563,13 +11563,13 @@ fr:
         back: Précédent
         find: Rechercher
         new_group: Groupe
-        new_outcome: Résultat
+        new_outcome: Acquis
     common_core: "Principaux critères communs"
-    common_core_description: "Sur la gauche se trouve l’arborescence de dossiers de résultats habituelle pour chaque groupe de critères nationaux communs. Cela vous permet d’inclure facilement n’importe lequel de ces critères de base pour la notation dans vos cours."
+    common_core_description: "Sur la gauche se trouve l’arborescence de dossiers d'acquis habituelle pour chaque groupe de critères nationaux communs. Cela vous permet d’inclure facilement n’importe lequel de ces critères de base pour la notation dans vos cours."
     confirm: 
       delete: "Voulez-vous vraiment supprimer ?"
       import_group: "Importer le groupe « %{group} » dans le groupe « %{target} » ?"
-      import_outcome: "Importer le résultat « %{outcome} » dans le groupe « %{target} » ?"
+      import_outcome: "Importer l'acquis « %{outcome} » dans le groupe « %{target} » ?"
     criteria: 
       does_not_meet_expectations: "Ne répond pas aux attentes"
       exceeds_expectations: "Dépasse les attentes"
@@ -11585,8 +11585,8 @@ fr:
       pts: points
       rating_description: "Description de la notation du critère"
     dont_import: "Impossible d’importer ce groupe."
-    failed_outcome_creation: "Échec de création du résultat"
-    failed_outcome_update: "Échec de la mise à jour du résultat"
+    failed_outcome_creation: "Échec de création d'acquis"
+    failed_outcome_update: "Échec de la mise à jour d'acquis"
     find_instructions: 
       instructions: 
         find: 
@@ -11606,10 +11606,10 @@ fr:
       instructions: 
         main: 
           manage: 
-            description: "*Les résultats sont créés ici pour suivre la progression des élèves dans un cours. Pour commencer, regardez la barre de menus en haut. Cliquez sur le bouton Nouveau pour créer un nouveau résultat, ou sur le bouton Nouveau groupe pour créer un nouveau groupe où classer vos résultats. Le bouton Chercher vous permet d’utiliser les résultats qui ont été créés par votre région ou votre institution. Lorsque vous créez et utilisez les résultats, vous pouvez utiliser le volet sur la gauche pour les parcourir. Vous pouvez les faire glisser et les déposer à différents niveaux pour créer une arborescence.* *Mieux encore : Canvas vous permet d’ajouter des résultats dans vos barèmes et ainsi d’évaluer la progression lorsque vous notez les tâches. Une fois que vous avez défini les résultats, cliquez sur Gérer les barèmes pour commencer à utiliser vos résultats pour vos notations.*"
-            title: "Définition des résultats"
+            description: "*Les acquis sont créés ici pour suivre la progression des élèves dans un cours. Pour commencer, regardez la barre de menus en haut. Cliquez sur le bouton « Nouveau » pour créer un nouvel acquis, ou sur le bouton « Nouveau groupe » pour créer un nouveau groupe où classer vos acquis Le bouton « Chercher » vous permet d’utiliser les acquis qui ont été créés par votre région ou votre institution. Lorsque vous créez et utilisez les acquis vous pouvez utiliser le volet sur la gauche pour les parcourir. Vous pouvez les faire glisser et les déposer à différents niveaux pour créer une arborescence.* *Mieux encore : Canvas vous permet d’ajouter des acquis dans vos barèmes et ainsi d’évaluer la progression lorsque vous notez les tâches. Une fois que vous avez défini les acquis cliquez sur « Gérer les barèmes » pour commencer à utiliser vos acquis pour vos notations.*"
+            title: "Définition des acquis"
     mastery_error: "Doit être supérieur ou égal à 0"
-    missing_outcome: "Impossible de trouver ce résultat d’apprentissage"
+    missing_outcome: "Impossible de trouver cet acquis d’apprentissage"
     new_outcome_group: "Nouveau groupe de résultats"
     outcome: 
       links: 
@@ -11622,17 +11622,17 @@ fr:
         total: "%{points_possible} points"
       total_points: "Total de points"
       use_for_scoring: "Utiliser ce critère pour la notation"
-    outcome_criterion: "Critère de résultat d’apprentissage"
+    outcome_criterion: "Critère d'acquis d’apprentissage"
     outcome_form: 
       calculation_method: "Méthode de calcul"
       criterion: "Notes du critère"
-      criterion_dialog: "Les résultats de l’apprentissage peuvent être ajoutés aux barèmes des tâches afin d’évaluer aisément la maîtrise des résultats basée sur des tâches spécifiques. Lorsque vous définissez un résultat d’apprentissage, vous devez également spécifier un critère à utiliser lors de la création des barèmes des tâches. Définissez autant de colonnes de barème que nécessaires, puis spécifiez un niveau qui permettra de définir la maîtrise de ce résultat."
+      criterion_dialog: "Les acquis de l’apprentissage peuvent être ajoutés aux barèmes des tâches afin d’évaluer aisément la maîtrise des acquis basée sur des tâches spécifiques. Lorsque vous définissez un acquis d’apprentissage, vous devez également spécifier un critère à utiliser lors de la création des barèmes des tâches. Définissez autant de colonnes de barème que nécessaires, puis spécifiez un niveau qui permettra de définir la maîtrise de cet acquis."
       criterion_info_link: "Cliquez pour en savoir plus sur les notations des critères"
-      description: "Décrire ce résultat"
+      description: "Décrire cet acquis"
       display_name: "Pseudonyme (facultatif)"
       mastery: "Progression à"
       points: "%{points_possible} points"
-      title: "Attribuer un nom à ce résultat"
+      title: "Attribuer un nom à cet acquis"
       total_points: "Total de points"
     outcome_group: 
       links: 
@@ -11645,7 +11645,7 @@ fr:
       mastery_set_at: "Niveau de maîtrise défini à"
       no_results: "(pas de résultats)"
     outcome_result: 
-      all_outcomes: "tous les résultats de cet étudiant"
+      all_outcomes: "tous les acquis de cet étudiant"
       attempt_info: "tentative #%{attempt_number}, %{attempt_date}"
       outcome_mastered: maîtrisé
       scoring: "%{points} sur %{possible_points}"
@@ -11654,12 +11654,12 @@ fr:
       no_artifacts: "Aucun artefact"
     state_standards: "Normes nationales"
     state_standards_description: "Sur la gauche vous voyez un dossier pour chaque région avec les critères à jour. Cela vous permet d’inclure facilement les critères en vigueur pour la notation de vos cours."
-    successful_outcome_creation: "Le résultat a été créé."
-    successful_outcome_delete: "Le résultat a été supprimé."
-    successful_outcome_removal: "Le résultat a été supprimé."
-    successful_outcome_update: "Le résultat a été mis à jour."
+    successful_outcome_creation: "L'acquis a été créé."
+    successful_outcome_delete: "L'acquis a été supprimé."
+    successful_outcome_removal: "L'acquis a été supprimé."
+    successful_outcome_update: "L'acquis a été mis à jour."
     titles: 
-      find_outcomes: "Chercher des résultats"
+      find_outcomes: "Chercher des acquis"
     top_level: "Niveau supérieur %{context} "
     user_outcome_results: 
       artifacts: 
@@ -11673,13 +11673,13 @@ fr:
         see_results: "Voir les résultats de %{user_name} pour"
       mastery: "Maîtrise sur la dernière tentative"
       no_mastery: "Aucune maîtrise sur la dernière tentative"
-      outcomes_for: "Résultats pour %{user_name}"
+      outcomes_for: "Acquis pour %{user_name}"
       score_out_of_possible: "%{score}* sur %{possible}*"
       short_title: 
         attempts: Tentatives
         average_percent: "Pourcentage de la moyenne"
         latest_score: "Dernière note"
-        outcome: Résultat
+        outcome: Acquis
   overrides: 
     blank_override: "Vous devez sélectionner un(e) étudiant(e) ou une section"
     everyone: Tous
@@ -12732,7 +12732,7 @@ fr:
   question_9121487: Question
   question_answered: "Réponse donnée"
   question_bank: 
-    align_outcomes: "Aligner les résultats"
+    align_outcomes: "Aligner les acquis"
     already_bookmarked: "Déjà ajouté aux signets"
     bookmark_failed: "Échec du signet"
     bookmarking: "Création du signet..."
@@ -12762,11 +12762,11 @@ fr:
     move_questions: "Déplacer les questions"
     multiple_questions: "Plusieurs questions"
     question_bank: "Banque de questions"
-    remove_outcome_from_bank: "Voulez-vous vraiment supprimer ce résultat de la banque ?"
+    remove_outcome_from_bank: "Voulez-vous vraiment supprimer cet acquis de la banque ?"
     title: 
       move_copy_questions: "Déplacer/Copier les questions"
-    update_outcomes_fail: "Échec de la mise à jour des résultats"
-    updating_outcomes: "Mise à jour des résultats..."
+    update_outcomes_fail: "Échec de la mise à jour des acquis"
+    updating_outcomes: "Mise à jour des acquis..."
   question_banks: 
     bank_fail: "Échec de création de la banque de questions."
     bank_success: "La banque de questions a été créée."
@@ -12810,14 +12810,14 @@ fr:
         move_questions: "Déplacer plusieurs questions"
       edit_warning: "Notez que, la modification des modèles de questions ne mettra pas à jour automatiquement les questionnaires qui utilisent déjà ces questions."
       headings: 
-        aligned_outcomes: "Résultats alignés"
+        aligned_outcomes: "Acquis alignés"
       labels: 
         keep_copy: "Conserver également une copie dans cette banque de questions"
         new_bank_name: "Nouveau nom de banque"
         new_question_bank: "Nouvelle banque de questions"
         title: "Nom de la banque"
       links: 
-        align_outcome: "Aligner le résultat"
+        align_outcome: "Aligner l'acquis"
         more_questions: "questions supplémentaires"
       loading_banks: "Chargement des banques..."
       mastery_threshold: "maîtrise à %{threshold_percentage}"
@@ -14316,12 +14316,12 @@ fr:
       manage_feature_flags: "Activer ou désactiver des fonctionnalités au niveau des comptes"
       manage_files: "Gérer (ajouter/modifier/supprimer) des fichiers de cours"
       manage_frozen_assignment: "Gérer (modifier/supprimer) les tâches bloquées"
-      manage_global_outcomes: "Gérer les résultats globaux"
+      manage_global_outcomes: "Gérer les acquis globaux"
       manage_grades: "Modifier des notes"
       manage_groups: "Gérer (créer/modifier/supprimer) des groupes"
       manage_interaction_alerts: "Gérer les alertes"
       manage_links: "Gérer les rôles et les liens de confiance"
-      manage_outcomes: "Gérer les résultats d’apprentissage"
+      manage_outcomes: "Gérer les acquis d’apprentissage"
       manage_role_overrides: "Gérer les autorisations"
       manage_rubrics: "Créer et modifier des barèmes d’évaluation"
       manage_sections: "Gérer (créer/modifier/supprimer) des sections de cours"
@@ -14552,7 +14552,7 @@ fr:
       header: 
         content_selection: "Sélection de contenu"
       outcome: 
-        select_outcome: "Sélectionner un résultat"
+        select_outcome: "Sélectionner un acquis"
       student: 
         select_student: "Sélectionner un étudiant"
     grading: 
@@ -14571,7 +14571,7 @@ fr:
     learning_mastery: 
       download_results: "Télécharger les résultats (.csv)"
       empty_student_selection: "Sélectionnez un étudiant pour afficher des informations complémentaires ici."
-      empty_submission_selection: "Sélectionnez un étudiant et un résultat pour afficher les résultats."
+      empty_submission_selection: "Sélectionnez un étudiant et un acquis pour afficher les résultats."
       hide_student_names_label: "Masquer les noms des étudiants"
       result: Résultats
       result_for: "Résultat pour :"
@@ -14581,10 +14581,10 @@ fr:
       student_info: "Informations sur l’étudiant"
     outcome_information: 
       avg_score: "Note moyenne"
-      empty_outcome_selection: "Sélectionnez un résultat pour afficher des informations complémentaires ici."
+      empty_outcome_selection: "Sélectionnez un acquis pour afficher des informations complémentaires ici."
       high_score: "Bonne note"
       low_score: "Note faible"
-      outcome_info: "Informations sur le résultat"
+      outcome_info: "Informations sur l'acquis"
       result_sub_count: "Résultats globaux :"
     screenreader_gradebook: 
       assignments: Tâches
@@ -15089,7 +15089,7 @@ fr:
         events: Événements
     find_outcome: 
       buttons: 
-        add_outcome: "Ajouter un résultat"
+        add_outcome: "Ajouter un acquis"
       labels: 
         criterion_ratings: "Notes du critère"
         master_level: "définir la maîtrise sur une note supérieure ou égale à"
@@ -15308,7 +15308,7 @@ fr:
         edit: "Modifier un barème"
         find_a_rubric: "Chercher un barème"
         find_another_rubric: "Chercher un autre barème"
-        find_outcome: "Chercher un résultat"
+        find_outcome: "Chercher un acquis"
         find_rubric: "Chercher un barème"
       messages: 
         locked: "Impossible de modifier un barème lorsqu’il est en cours d’utilisation."
@@ -15350,7 +15350,7 @@ fr:
       points_label: Points
       points_out_of2: "%{points}/%{total} points"
       titles: 
-        linked_to_learning_outcome: "Ce critère est lié à un résultat d’apprentissage"
+        linked_to_learning_outcome: "Ce critère est lié à un acquis d’apprentissage"
     rubric_criterion_dialog: 
       buttons: 
         update_comments: "Mettre à jour les commentaires"
@@ -15394,7 +15394,7 @@ fr:
       out_of_points: "%{points}/%{total} points"
       titles: 
         full_comments: "Cliquez pour afficher tous les commentaires"
-        linked_to_learning_outcome: "Ce critère est lié à un résultat d’apprentissage"
+        linked_to_learning_outcome: "Ce critère est lié à un acquis d’apprentissage"
     select_content_dialog: 
       add_to_module: "Ajouter %{item} au *module*"
       assignment_item: Tâche
@@ -15780,7 +15780,7 @@ fr:
     media_recordin: "Enregistrement multimédia"
     next_object: "%{type} suivant"
     no_assignment: "Aucun travail sélectionné"
-    no_outcome: "Aucun résultat sélectionné"
+    no_outcome: "Aucun acquis sélectionné"
     no_student: "Aucun étudiant sélectionné"
     none: Aucun
     notes: Remarques
@@ -16132,7 +16132,7 @@ fr:
     logout: Déconnexion
     modules: Modules
     observees: Observer
-    outcomes: Résultats
+    outcomes: Acquis
     pages: Pages
     people: Personnes
     profile: Profil
@@ -16269,7 +16269,7 @@ fr:
       En vous remerciant,
       L'équipe de support de Canvas
   the_module_item_is_locked_27fe420b: "L’élément de module est verrouillé."
-  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Les notes les plus récentes pour l'utilisateur %{current_user_name} et le résultat %{outcome_name}."
+  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Les notes les plus récentes pour l'utilisateur %{current_user_name} et l'acquis %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Le prochain rendez-vous disponible dans ce cours est le *%{date}*"
   the_profile_picture_has_been_reported_d609d6dd: "L'image du profile a été signalée"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Le fichier Academic Benchmark fourni contient une erreur"
@@ -16364,8 +16364,8 @@ fr:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Cela est très probablement dû au fait que vous avez importé le contenu du cours sans ses fichiers associés."
   this_name_appears_in_sorted_lists_dccbd84b: "Ce nom apparaît dans des listes triées."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Ce nom sera utilisé par les enseignants pour la notation."
-  this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Ce résultat a été utilisé pour évaluer un étudiant et ne peut plus être mis à jour"
-  this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Ce résultat a été utilisé pour évaluer un étudiant et ne peut ni être modifié, ni être supprimé. "
+  this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Cet acquis a été utilisé pour évaluer un étudiant et ne peut plus être mis à jour"
+  this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Cet acquis a été utilisé pour évaluer un étudiant et ne peut ni être modifié, ni être supprimé. "
   this_package_includes_apip_file_s_which_are_not_co_b50b30a7: "Ce paquet contient des fichiers APIP, incompatibles avec Canvas. Ces fichiers n'ont pas été inclus dans l'import."
   this_package_includes_curriculum_standards_which_a_1a137060: "Ce paquet contient des normes de cursus, incompatibles avec Canvas. Elles n'ont pas été incluses dans l'import."
   this_package_includes_epub3_file_s_which_are_not_c_bbafef30: "Ce paquet contient des fichiers EPub3, incompatibles avec Canvas. Ces fichiers n'ont pas été inclus dans l'import."
@@ -16616,9 +16616,9 @@ fr:
     discussion: Discussion
     discussions: Discussions
     error_reports: "Rapports d’erreur"
-    learning_outcomes: "Résultats d’apprentissage"
+    learning_outcomes: "Acquis d’apprentissage"
     messages: Messages
-    outcome_artifacts: "Artefacts de résultats"
+    outcome_artifacts: "Artefacts d'acquis"
     people: Personnes
     view_in_separate_window: "Afficher dans une fenêtre séparée"
   tls_7a2eaba5: TLS
@@ -17193,7 +17193,7 @@ fr:
       none_yet: Aucun.
       page_header_title: "Profil utilisateur"
       page_views: "Consultation de pages"
-      see_outcomes: "Voir les résultats pour %{user}"
+      see_outcomes: "Voir les acquis pour %{user}"
     teacher_activity: 
       crumbs: 
         interaction_report: "Rapport des interactions d’étudiant"
@@ -17564,8 +17564,8 @@ fr:
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Vous avez modifié les questions de ce questionnaire.* Ces changements ne seront visibles pour les étudiants que lorsque vous aurez enregistré le questionnaire."
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "Vous n'avez pas configuré d'application de collaboration. Discutez avec votre professeur pour obtenir quelques paramètres."
   you_have_no_ltis_configured_to_create_collaboratio_5cad28dd: "Vous n'avez pas de LTI configurés avec lesquels créer des collaborations. Discutez avec votre professeur pour en préparer quelques uns. "
-  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Vous n’avez pas de résultats. *Cliquez ici* pour en créer un."
-  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Vous n’avez pas de résultats. Cliquez ici pour accéder à la page des résultats."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Vous n’avez pas d'acquis. *Cliquez ici* pour en créer un."
+  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Vous n’avez pas d'acquis. Cliquez ici pour accéder à la page des résultats."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Vous avez atteint le nombre maximum de webhooks défini par la limite du compte (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Vous avez atteint le nombre maximum de webhooks défini par la limite de l’utilisateur (%{max})"
   you_have_submitted_the_assignment_7ef8a51a: "Vous avez envoyé le travail"

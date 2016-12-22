@@ -82,4 +82,37 @@ define([
   test('returns the assignment due date for students without overrides', function() {
     equal(this.dueDates[2].getTime(), this.dates.may.getTime())
   });
+
+  module('AssignmentOverrideHelper#effectiveDueDatesForAssignment - students without sections and group_ids', {
+    setup() {
+      this.assignment = { due_at: new Date('2009-05-03T02:57:42.000Z'), only_visible_to_overrides: false };
+      this.overrides = [];
+    }
+  });
+
+  test('does not throw an error if students do not have a `sections` attribute', function() {
+    const students = [{ id: '1', group_ids: ['3'] }];
+    let errorThrown = false;
+
+    try {
+      AssignmentOverrideHelper.effectiveDueDatesForAssignment(this.assignment, this.overrides, students);
+    } catch(e) {
+      errorThrown = true;
+    }
+
+    notOk(errorThrown);
+  });
+
+  test('does not throw an error if students do not have a `group_ids` attribute', function() {
+    const students = [{ id: '1', sections: ['1'] }];
+    let errorThrown = false;
+
+    try {
+      AssignmentOverrideHelper.effectiveDueDatesForAssignment(this.assignment, this.overrides, students);
+    } catch(e) {
+      errorThrown = true;
+    }
+
+    notOk(errorThrown);
+  });
 });

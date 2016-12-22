@@ -5433,13 +5433,13 @@ sv:
     formats: 
       date_at_time: "%b %-d at %l:%M%P"
       default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-l:%M%P"
-      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
-      long: "%B %-d, %Y"
+      full: "%Y %b %-d, %-k:%M"
+      full_with_weekday: "%a %Y %b %-d, %-k:%M"
+      long: "%Y %B %-d,"
       long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
+      medium: "%Y %b %-d,"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
+      medium_with_weekday: "%a %Y %b %-d,"
       short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
@@ -16496,10 +16496,10 @@ sv:
     event: "%{date} kl %{time}"
     formats: 
       default: "%a, %d %b %Y %H:%M:%S %z"
-      long: "%B %d, %Y %H:%M"
+      long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%-k:%M"
     less_than_a_minute_ago: "mindre än en minut sen"
     pm: pm
     ranges: 

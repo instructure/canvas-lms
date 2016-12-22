@@ -16310,7 +16310,7 @@ zh-Hant:
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: 不到一分鐘以前
     pm: 下午
     ranges: 

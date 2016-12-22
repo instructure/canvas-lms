@@ -5348,13 +5348,13 @@ es:
   data_set_identifier_data_set_id_c228b5df: "Identificador de la serie de datos: %{data_set_id}"
   date: 
     abbr_day_names: 
-      - Dom
-      - Lun
-      - Mar
-      - Mie
-      - Jue
-      - Vie
-      - Sab
+      - dom
+      - lun
+      - mar
+      - mie
+      - jue
+      - vie
+      - sab
     abbr_month_names: 
       - ~
       - Ene
@@ -5379,13 +5379,13 @@ es:
         - Vi
         - Sa
     day_names: 
-      - Domingo
-      - Lunes
-      - Martes
-      - Miercoles
-      - Jueves
-      - Viernes
-      - Sabado
+      - domingo
+      - lunes
+      - martes
+      - miercoles
+      - jueves
+      - viernes
+      - sabado
     days: 
       today: Hoy
       today_lower: hoy
