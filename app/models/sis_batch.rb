@@ -173,7 +173,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   scope :needs_processing, -> { where(:workflow_state => 'created').order(:created_at) }
-  scope :importing, -> { where(:workflow_state => 'importing') }
+  scope :importing, -> { where(workflow_state: ['importing', 'cleanup_batch']) }
   scope :succeeded, -> { where(:workflow_state => %w[imported imported_with_messages]) }
 
   def self.process_all_for_account(account)
