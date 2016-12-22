@@ -39,7 +39,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
       end
     end
 
-    Net::POP3.stubs(:new).returns(@pop_mock)
+    allow(Net::POP3).to receive(:new).and_return(@pop_mock)
   end
 
   describe "#initialize" do
@@ -67,8 +67,8 @@ describe IncomingMailProcessor::Pop3Mailbox do
 
     it "should connect to the server" do
       config = default_config.merge(:ssl => false, :port => 110)
-      Net::POP3.expects(:new).with(config[:server], config[:port]).returns(@pop_mock)
-      @pop_mock.expects(:start).with(config[:username], config[:password])
+      expect(Net::POP3).to receive(:new).with(config[:server], config[:port]).and_return(@pop_mock)
+      expect(@pop_mock).to receive(:start).with(config[:username], config[:password])
 
       @mailbox = IncomingMailProcessor::Pop3Mailbox.new(config)
       @mailbox.connect
@@ -77,9 +77,9 @@ describe IncomingMailProcessor::Pop3Mailbox do
     it "should use ssl if configured" do
       config = default_config.merge(:ssl => true, :port => 995)
 
-      Net::POP3.expects(:new).with(config[:server], config[:port]).returns(@pop_mock)
-      @pop_mock.expects(:enable_ssl).with(OpenSSL::SSL::VERIFY_NONE)
-      @pop_mock.expects(:start).with(config[:username], config[:password])
+      expect(Net::POP3).to receive(:new).with(config[:server], config[:port]).and_return(@pop_mock)
+      expect(@pop_mock).to receive(:enable_ssl).with(OpenSSL::SSL::VERIFY_NONE)
+      expect(@pop_mock).to receive(:start).with(config[:username], config[:password])
 
       @mailbox = IncomingMailProcessor::Pop3Mailbox.new(config)
       @mailbox.connect
@@ -89,7 +89,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
   describe "#disconnect" do
     it "should disconnect" do
       mock_net_pop
-      @pop_mock.expects(:finish)
+      expect(@pop_mock).to receive(:finish)
 
       @mailbox = IncomingMailProcessor::Pop3Mailbox.new(default_config)
       @mailbox.connect
@@ -111,10 +111,10 @@ describe IncomingMailProcessor::Pop3Mailbox do
     end
 
     it "should retrieve and yield messages" do
-      foo = mock(pop: "foo body")
-      bar = mock(pop: "bar body")
-      baz = mock(pop: "baz body")
-      @pop_mock.expects(:mails).returns([foo, bar, baz])
+      foo = double(pop: "foo body")
+      bar = double(pop: "bar body")
+      baz = double(pop: "baz body")
+      expect(@pop_mock).to receive(:mails).and_return([foo, bar, baz])
 
       yielded_values = []
       @mailbox.each_message do |message_id, body|
@@ -126,11 +126,11 @@ describe IncomingMailProcessor::Pop3Mailbox do
 
     it "retrieves messages using a stride and offset" do
       foo, bar, baz = ["foo", "bar", "baz"].map do |msg|
-        m = mock(pop: "#{msg} body")
-        m.expects(:uidl).twice.returns(msg)
+        m = double(pop: "#{msg} body")
+        expect(m).to receive(:uidl).twice.and_return(msg)
         m
       end
-      @pop_mock.expects(:mails).twice.returns([foo, bar, baz])
+      expect(@pop_mock).to receive(:mails).twice.and_return([foo, bar, baz])
 
       yielded_values = []
       @mailbox.each_message(stride: 2, offset: 0) do |message_id, body|
@@ -147,19 +147,19 @@ describe IncomingMailProcessor::Pop3Mailbox do
 
     context "with simple foo message" do
       before do
-        @foo = mock(pop: "foo body")
-        @pop_mock.expects(:mails).returns([@foo])
+        @foo = double(pop: "foo body")
+        expect(@pop_mock).to receive(:mails).and_return([@foo])
       end
 
       it "should delete when asked" do
-        @foo.expects(:delete)
+        expect(@foo).to receive(:delete)
         @mailbox.each_message do |message_id, body|
           @mailbox.delete_message(message_id)
         end
       end
 
       it "should delete when asked to move" do
-        @foo.expects(:delete)
+        expect(@foo).to receive(:delete)
         @mailbox.each_message do |message_id, body|
           @mailbox.move_message(message_id, "anything")
         end

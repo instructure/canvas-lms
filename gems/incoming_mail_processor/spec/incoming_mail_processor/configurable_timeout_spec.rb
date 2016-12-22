@@ -47,8 +47,8 @@ describe IncomingMailProcessor::ConfigurableTimeout do
       block.call
     end
     @tester.with_timeout { block_called = true }
-    method_called.should be_true
-    block_called.should be_true
+    method_called.should be_truthy
+    block_called.should be_truthy
   end
 
   it "should return what the timeout method returns" do

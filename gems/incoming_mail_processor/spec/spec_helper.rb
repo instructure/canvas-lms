@@ -5,7 +5,7 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
-require 'mocha/api'
+require 'byebug'
 require 'timecop'
 require 'incoming_mail_processor/mailbox_spec_helper'
 require 'incoming_mail_processor'
@@ -13,10 +13,8 @@ require 'incoming_mail_processor'
 Dir.glob(File.expand_path(File.join(__FILE__, '..', 'support', '*'))).each { |file| require file }
 
 RSpec.configure do |config|
-  config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
-  config.mock_framework = :mocha
 
   # Run specs in random order to surface order dependencies. If you find an
   # order dependency and want to debug it, you can fix the order by providing
