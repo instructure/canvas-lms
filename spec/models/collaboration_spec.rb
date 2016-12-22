@@ -87,13 +87,16 @@ describe Collaboration do
   end
 
   context "a collaboration with collaborators" do
-    before :each do
+    before :once do
       PluginSetting.create!(:name => "etherpad", :settings => {})
+      @other_user = user_with_pseudonym(:active_all => true)
       @users  = (1..4).map { user_with_pseudonym(:active_all => true) }
-      @groups = [group_model]
+      course_factory(:active_all => true)
+      @users.each { |u| @course.enroll_student(u) }
+      @groups = [group_model(:context => @course)]
       @groups.first.add_user(@users.last, 'active')
-      @collaboration = Collaboration.new(:title => 'Test collaboration',
-                                         :user  => @users.first)
+      @collaboration = @course.collaborations.new(:title => 'Test collaboration',
+                                                  :user  => @users.first)
       @collaboration.type = 'EtherpadCollaboration'
       @collaboration.save!
     end
@@ -119,6 +122,26 @@ describe Collaboration do
       @collaboration.reload
 
       expect(@collaboration.collaborators.map(&:group_id).compact).to eq @groups.map(&:id)
+    end
+
+    it "doesn't add users outside the course" do
+      @collaboration.update_members([@other_user])
+      @collaboration.reload
+      expect(@collaboration.collaborators.pluck(:user_id)).not_to include @other_user.id
+    end
+
+    it "doesn't add groups outside the course" do
+      other_group = @course.account.groups.create! :name => 'eh'
+      @collaboration.update_members([], [other_group])
+      @collaboration.reload
+      expect(@collaboration.collaborators.pluck(:group_id)).not_to include other_group.id
+    end
+
+    it "allows course admins (and group members) to be added to a group collaboration" do
+      gc = @groups.first.collaborations.create! :title => 'derp', :user => @teacher
+      gc.update_members([@teacher, @users.first, @users.last])
+      users = gc.reload.collaborators.pluck(:user_id)
+      expect(users).to match_array([@teacher.id, @users.last.id])
     end
   end
 
