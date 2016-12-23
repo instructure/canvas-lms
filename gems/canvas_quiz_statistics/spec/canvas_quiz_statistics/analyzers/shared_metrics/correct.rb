@@ -10,6 +10,6 @@ shared_examples '[:correct]' do
       { correct: 'defined' }
     ])
 
-    stats[:correct].should == 2
+    expect(stats[:correct]).to eq(2)
   end
 end

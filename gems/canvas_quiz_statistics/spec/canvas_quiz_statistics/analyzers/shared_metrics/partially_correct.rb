@@ -5,6 +5,6 @@ shared_examples '[:partially_correct]' do
       { correct: "partial" }
     ])
 
-    stats[:partially_correct].should == 1
+    expect(stats[:partially_correct]).to eq(1)
   end
 end

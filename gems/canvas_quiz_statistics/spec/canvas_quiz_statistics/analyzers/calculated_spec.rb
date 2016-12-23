@@ -5,7 +5,7 @@ describe CanvasQuizStatistics::Analyzers::Calculated do
   subject { described_class.new(question_data) }
 
   it 'should not blow up when no responses are provided' do
-    expect { subject.run([]).should be_present }.to_not raise_error
+    expect { expect(subject.run([])).to be_present }.to_not raise_error
   end
 
   describe '[:graded]' do
@@ -15,7 +15,7 @@ describe CanvasQuizStatistics::Analyzers::Calculated do
         { correct: false }, { correct: 'false' }, {}
       ])
 
-      output[:graded].should == 2
+      expect(output[:graded]).to eq(2)
     end
   end
 end

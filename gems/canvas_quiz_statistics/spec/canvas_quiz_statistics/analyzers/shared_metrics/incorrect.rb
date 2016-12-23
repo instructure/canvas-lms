@@ -11,6 +11,6 @@ shared_examples '[:incorrect]' do
       { correct: 'defined' }
     ])
 
-    stats[:incorrect].should == 3
+    expect(stats[:incorrect]).to eq(3)
   end
 end

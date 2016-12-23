@@ -20,7 +20,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
           end
         end
 
-        Apple.new({}).run([ {}, {} ]).should == { something: 2 }
+        expect(Apple.new({}).run([ {}, {} ])).to eq({ something: 2 })
 
         unset Apple
       end
@@ -38,8 +38,8 @@ describe CanvasQuizStatistics::Analyzers::Base do
           end
         end
 
-        Apple.new({}).run([{}]).should == { something: 1 }
-        Orange.new({}).run([{}]).should == { something_else: 1 }
+        expect(Apple.new({}).run([{}])).to eq({ something: 1 })
+        expect(Orange.new({}).run([{}])).to eq({ something_else: 1 })
 
         unset Apple, Orange
       end
@@ -58,7 +58,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
 
           responses = [{ color: 'Red' }, { color: 'Green' }]
 
-          Apple.new({}).run(responses).should == { something: 'Red, Green' }
+          expect(Apple.new({}).run(responses)).to eq({ something: 'Red, Green' })
 
           unset Apple
         end
@@ -81,8 +81,8 @@ describe CanvasQuizStatistics::Analyzers::Base do
           end
         end
 
-        Apple.new({}).run([{}]).should == { something: 1 }
-        Orange.new({}).run([{}]).should == { something: 1, something_else: 1 }
+        expect(Apple.new({}).run([{}])).to eq({ something: 1 })
+        expect(Orange.new({}).run([{}])).to eq({ something: 1, something_else: 1 })
 
         unset Apple, Orange
       end
@@ -104,8 +104,8 @@ describe CanvasQuizStatistics::Analyzers::Base do
           end
         end
 
-        Apple.new({}).run([{}]).should == { something: 1 }
-        Orange.new({}).run([{}]).should == { something: 1, something_else: 1 }
+        expect(Apple.new({}).run([{}])).to eq({ something: 1 })
+        expect(Orange.new({}).run([{}])).to eq({ something: 1, something_else: 1 })
 
         unset Apple, Orange
       end
