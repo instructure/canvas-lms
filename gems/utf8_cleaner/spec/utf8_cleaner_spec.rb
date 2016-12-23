@@ -34,7 +34,7 @@ describe Utf8Cleaner do
 
     test_strings.each do |input, output|
       input = input.dup.force_encoding("UTF-8")
-      Utf8Cleaner.strip_invalid_utf8(input).should == output
+      expect(Utf8Cleaner.strip_invalid_utf8(input)).to eq(output)
     end
   end
 
@@ -50,17 +50,17 @@ answers:
     oHRleHSg
 YAML
       answer = data['answers'][0]['text']
-      answer.valid_encoding?.should be_false
+      expect(answer.valid_encoding?).to be_falsey
       Utf8Cleaner.recursively_strip_invalid_utf8!(data, true)
-      answer.should == "two"
-      answer.encoding.should == Encoding::UTF_8
-      answer.valid_encoding?.should be_true
+      expect(answer).to eq("two")
+      expect(answer.encoding).to eq(Encoding::UTF_8)
+      expect(answer.valid_encoding?).to be_truthy
 
       # in some edge cases, Syck will return a string as ASCII-8BIT if it's not valid UTF-8
       # so we added a force_encoding step to recursively_strip_invalid_utf8!
       ascii = data['answers'][0]['valid_ascii']
-      ascii.should == 'text'
-      ascii.encoding.should == Encoding::UTF_8
+      expect(ascii).to eq('text')
+      expect(ascii.encoding).to eq(Encoding::UTF_8)
     end
   end
 end

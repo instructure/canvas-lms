@@ -23,9 +23,9 @@ describe 'Time Marshal override' do
   it "should preserve the old marshalling for post-1900 dates" do
     raw_time = Time.zone.parse('2013-02-16 05:43:21.15Z').time
     dumped = Marshal.dump(raw_time)
-    dumped.should be_include(":\tTime\r\x05F\x1C#{0xc0.chr}#{0xf0.chr}IR#{0xad.chr}")
+    expect(dumped).to be_include(":\tTime\r\x05F\x1C#{0xc0.chr}#{0xf0.chr}IR#{0xad.chr}")
     reloaded = Marshal.load(dumped)
-    reloaded.should == raw_time
+    expect(reloaded).to eq(raw_time)
   end
 
   it "should not fail for pre-1900 dates" do
@@ -33,16 +33,16 @@ describe 'Time Marshal override' do
     raw_time = old_time.time
     dumped = Marshal.dump(raw_time)
     # the last character differs between ruby 1.9 and ruby 2.1
-    dumped[0..-2].should == "\x04\bIu:\tTime!pre1900:0010-05-13T04:12:51Z\x06:\x06E"
-    %w{F T}.should be_include(dumped[-1])
+    expect(dumped[0..-2]).to eq("\x04\bIu:\tTime!pre1900:0010-05-13T04:12:51Z\x06:\x06E")
+    expect(%w{F T}).to be_include(dumped[-1])
     dumped[-1] = 'F'
     reloaded = Marshal.load(dumped)
-    reloaded.should == raw_time
+    expect(reloaded).to eq(raw_time)
     dumped[-1] = 'T'
     reloaded = Marshal.load(dumped)
-    reloaded.should == raw_time
+    expect(reloaded).to eq(raw_time)
     # confirm it works for TimeWithZone as well
-    Marshal.load(Marshal.dump(old_time)).should == old_time
+    expect(Marshal.load(Marshal.dump(old_time))).to eq(old_time)
   end
 end
 

@@ -29,16 +29,16 @@ describe Multipart::Post do
     file.rewind
     query, header = subject.prepare_query(:a => "string", :b => file)
     params = parse_params(query, header)
-    params["a"].should == "string"
-    params["b"][:filename].should == File.basename(file.path)
-    params["b"][:tempfile].read.should == "file on disk"
+    expect(params["a"]).to eq("string")
+    expect(params["b"][:filename]).to eq(File.basename(file.path))
+    expect(params["b"][:tempfile].read).to eq("file on disk")
   end
 
   it "should prepare_query with a StringIO" do
     query, header = subject.prepare_query(:a => "string", :b => StringIO.new("file in mem"))
     params = parse_params(query, header)
-    params["a"].should == "string"
-    params["b"][:filename].should == "b"
-    params["b"][:tempfile].read.should == "file in mem"
+    expect(params["a"]).to eq("string")
+    expect(params["b"][:filename]).to eq("b")
+    expect(params["b"][:tempfile].read).to eq("file in mem")
   end
 end

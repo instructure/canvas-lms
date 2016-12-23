@@ -20,7 +20,7 @@ require 'spec_helper'
 
 describe CanvasKaltura::ClientV3 do
   def create_config(opts={})
-    CanvasKaltura::ClientV3.stub(:config) {
+    allow(CanvasKaltura::ClientV3).to receive(:config) {
       {
       'domain'          => 'www.instructuremedia.com',
       'resource_domain' => 'www.instructuremedia.com',
@@ -132,19 +132,20 @@ describe CanvasKaltura::ClientV3 do
     end
 
     it "should sort by descending bitrate but deprioritize sources with suspiciously high bitrates" do
-      @kaltura.sort_source_list(
+      expect(@kaltura.sort_source_list(
           [
               {:fileExt => 'mp4', :bitrate => '180', :isOriginal => '1'},
               {:fileExt => 'mp4', :bitrate => '120', :isOriginal => '0'},
               {:fileExt => 'mp4', :bitrate => '5000', :isOriginal => '0'},
               {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '0'},
-          ]).should ==
+          ])).to eq(
           [
               {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '0'},
               {:fileExt => 'mp4', :bitrate => '120', :isOriginal => '0'},
               {:fileExt => 'mp4', :bitrate => '5000', :isOriginal => '0'},
               {:fileExt => 'mp4', :bitrate => '180', :isOriginal => '1'},
           ]
+      )
     end
   end
 
@@ -278,7 +279,7 @@ describe CanvasKaltura::ClientV3 do
 
       media_info = @kaltura.mediaGet(0)
 
-      media_info[:name].should == "Movie on 1-31-13 at 7.27 PM.mov"
+      expect(media_info[:name]).to eq("Movie on 1-31-13 at 7.27 PM.mov")
     end
 
   end
@@ -301,7 +302,7 @@ describe CanvasKaltura::ClientV3 do
 
       media_info = @kaltura.mediaUpdate(0,{})
 
-      media_info[:name].should == media_name
+      expect(media_info[:name]).to eq(media_name)
     end
   end
 

@@ -87,18 +87,18 @@ describe LtiOutbound::ToolLaunch do
   end
 
   let(:controller) do
-    request_mock = mock('request')
-    request_mock.stub(:host).returns('/my/url')
-    request_mock.stub(:scheme).returns('https')
-    controller = mock('controller')
-    controller.stub(:request).returns(request_mock)
-    controller.stub(:logged_in_user).returns(@user)
+    request_mock = double('request')
+    allow(request_mock).to receive(:host).returns('/my/url')
+    allow(request_mock).to receive(:scheme).returns('https')
+    controller = double('controller')
+    allow(controller).to receive(:request).returns(request_mock)
+    allow(controller).to receive(:logged_in_user).returns(@user)
     controller
   end
 
   let(:variable_expander) do
-    m = mock('variable_expander')
-    m.stub(:expand_variables!){ |hash| hash }
+    m = double('variable_expander')
+    allow(m).to receive(:expand_variables!){ |hash| hash }
     m
   end
 
@@ -117,7 +117,7 @@ describe LtiOutbound::ToolLaunch do
   describe '#generate' do
     it 'generates correct parameters' do
       I18n.config.available_locales_set << :en
-      I18n.stub(:localizer).and_return(-> { :en })
+      allow(I18n).to receive(:localizer).and_return(-> { :en })
 
       hash = tool_launch.generate
 
@@ -193,7 +193,7 @@ describe LtiOutbound::ToolLaunch do
 
     it 'sets the locale if I18n.localizer exists' do
       I18n.config.available_locales_set << :es
-      I18n.stub(:localizer).and_return(-> { :es })
+      allow(I18n).to receive(:localizer).and_return(-> { :es })
       hash = tool_launch.generate
 
       expect(hash['launch_presentation_locale']).to eq :es

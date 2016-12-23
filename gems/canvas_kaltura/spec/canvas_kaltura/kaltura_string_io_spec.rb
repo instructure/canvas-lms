@@ -21,7 +21,7 @@ require 'spec_helper'
 describe CanvasKaltura::KalturaStringIO do
   it "should set path" do
     io = CanvasKaltura::KalturaStringIO.new("hey there", "custom_path.csv")
-    io.path.should == "custom_path.csv"
+    expect(io.path).to eq("custom_path.csv")
   end
 
 end
