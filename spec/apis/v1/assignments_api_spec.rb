@@ -2921,6 +2921,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           'topic_children' => [],
           'locked' => false,
           'can_lock' => true,
+          'can_unlock' => true,
           'locked_for_user' => false,
           'root_topic_id' => @topic.root_topic_id,
           'podcast_url' => nil,
