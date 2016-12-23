@@ -302,7 +302,7 @@ describe "speed grader" do
   context 'Crocodocable Submissions' do
     # set up course and users
     let(:test_course) { @course }
-    let(:student)     { user(active_all: true) }
+    let(:student)     { user_factory(active_all: true) }
     let!(:crocodoc_plugin) { PluginSetting.create! name: "crocodoc", settings: {api_key: "abc123"} }
     let!(:enroll_student) do
       test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')

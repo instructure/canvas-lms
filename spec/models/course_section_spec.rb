@@ -390,7 +390,7 @@ describe CourseSection, "moving to new course" do
     before :once do
       course(:active_all => true)
       @section = @course.course_sections.create!
-      @enrollment = @course.enroll_student(user(:active_all => true), :section => @section)
+      @enrollment = @course.enroll_student(user_factory(:active_all => true), :section => @section)
     end
 
     it "should not invalidate unless something date-related changes" do

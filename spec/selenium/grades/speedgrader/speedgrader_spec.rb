@@ -409,8 +409,8 @@ describe 'Speedgrader' do
   context 'submissions' do
     # set up course and users
     let(:test_course) { course() }
-    let(:teacher)     { user(active_all: true) }
-    let(:student)     { user(active_all: true) }
+    let(:teacher)     { user_factory(active_all: true) }
+    let(:student)     { user_factory(active_all: true) }
     let!(:enroll_teacher_and_students) do
       test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
       test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
@@ -450,8 +450,8 @@ describe 'Speedgrader' do
   context 'speedgrader nav bar' do
     # set up course, users and assignment
     let(:test_course) { course() }
-    let(:teacher)     { user(active_all: true) }
-    let(:student)     { user(active_all: true) }
+    let(:teacher)     { user_factory(active_all: true) }
+    let(:student)     { user_factory(active_all: true) }
     let!(:enroll_teacher_and_students) do
       test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
       test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')

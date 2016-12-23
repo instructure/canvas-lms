@@ -56,7 +56,7 @@ describe ConversationMessage do
     end
 
     it "should format an author line without shared contexts" do
-      user
+      user_factory
       @conversation = @teacher.initiate_conversation([@user])
       message = add_message
       expect(message.author_short_name_with_shared_contexts(@user)).to eq "#{message.author.short_name}"
@@ -262,7 +262,7 @@ describe ConversationMessage do
 
     it "should set has_attachments if there are forwareded attachments" do
       a = attachment_model(:context => @teacher, :folder => @teacher.conversation_attachments_folder)
-      m1 = @teacher.initiate_conversation([user]).add_message("ohai", :attachment_ids => [a.id])
+      m1 = @teacher.initiate_conversation([user_factory]).add_message("ohai", :attachment_ids => [a.id])
       m2 = @teacher.initiate_conversation([@student]).add_message("lulz", :forwarded_message_ids => [m1.id])
       expect(m2.read_attribute(:has_attachments)).to be_truthy
       expect(m2.conversation.reload.has_attachments).to be_truthy
@@ -287,7 +287,7 @@ describe ConversationMessage do
       mc.media_id = 'asdf'
       mc.context = mc.user = @teacher
       mc.save
-      m1 = @teacher.initiate_conversation([user]).add_message("ohai", :media_comment => mc)
+      m1 = @teacher.initiate_conversation([user_factory]).add_message("ohai", :media_comment => mc)
       m2 = @teacher.initiate_conversation([@student]).add_message("lulz", :forwarded_message_ids => [m1.id])
       expect(m2.read_attribute(:has_media_objects)).to be_truthy
       expect(m2.conversation.reload.has_media_objects).to be_truthy

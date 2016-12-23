@@ -28,7 +28,7 @@ describe "/shared/_wiki_sidebar" do
   end
   
   it "should render in user context" do
-    user
+    user_factory
     view_context(@user, @user)
     render :partial => "shared/wiki_sidebar"
     expect(response).not_to be_nil

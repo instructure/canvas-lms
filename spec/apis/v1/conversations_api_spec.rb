@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConversationsController, type: :request do
   before :once do
-    @other = user(active_all: true)
+    @other = user_factory(active_all: true)
 
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))
     @course.update_attribute(:name, "the course")

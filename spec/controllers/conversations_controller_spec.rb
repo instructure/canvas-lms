@@ -157,8 +157,8 @@ describe ConversationsController do
         a = Account.default
         @student = user_with_pseudonym(:active_all => true)
         course_with_student(:active_all => true, :account => a, :user => @student)
-        @student.initiate_conversation([user]).add_message('test1', :root_account_id => a.id)
-        @student.initiate_conversation([user]).add_message('test2') # no root account, so teacher can't see it
+        @student.initiate_conversation([user_factory]).add_message('test1', :root_account_id => a.id)
+        @student.initiate_conversation([user_factory]).add_message('test2') # no root account, so teacher can't see it
 
         course_with_teacher(:active_all => true, :account => a)
         a.account_users.create!(user: @user)
@@ -266,8 +266,8 @@ describe ConversationsController do
       enable_cache do
         course1 = course(:active_all => true)
 
-        student1 = user(:active_user => true)
-        student2 = user(:active_user => true)
+        student1 = user_factory(active_user: true)
+        student2 = user_factory(active_user: true)
 
         Timecop.freeze(5.seconds.ago) do
           course1.enroll_user(student1, "StudentEnrollment").accept!
@@ -697,9 +697,9 @@ describe ConversationsController do
       it "should list conversation_ids across shards" do
         users = []
         # Create three users on different shards
-        users << user(:name => 'a')
-        @shard1.activate { users << user(:name => 'b') }
-        @shard2.activate { users << user(:name => 'c') }
+        users << user_factory(:name => 'a')
+        @shard1.activate { users << user_factory(:name => 'b') }
+        @shard2.activate { users << user_factory(:name => 'c') }
 
         Shard.default.activate do
           # Default shard conversation
@@ -740,8 +740,8 @@ describe ConversationsController do
     describe "show" do
       it "should find conversations across shards" do
         users = []
-        users << user(:name => 'a')
-        @shard1.activate { users << user(:name => 'b') }
+        users << user_factory(:name => 'a')
+        @shard1.activate { users << user_factory(:name => 'b') }
 
         @shard1.activate do
           @conversation = Conversation.initiate(users, false)

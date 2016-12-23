@@ -340,7 +340,7 @@ describe AccountsController do
     end
 
     it "should allow site_admin to update certain settings" do
-      user
+      user_factory
       user_session(@user)
       @account = Account.create!
       Account.site_admin.account_users.create!(user: @user)
@@ -362,7 +362,7 @@ describe AccountsController do
                                        { name: 'test1', description: '', expose_to_ui: :setting, default: false })
       AccountServices.register_service(:test2,
                                        { name: 'test2', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { false } })
-      user_session(user)
+      user_session(user_factory)
       @account = Account.create!
       AccountServices.register_service(:test3,
                                        { name: 'test3', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |_, account| account == @account } })
@@ -383,7 +383,7 @@ describe AccountsController do
     describe "quotas" do
       before :once do
         @account = Account.create!
-        user
+        user_factory
         @account.default_storage_quota_mb = 123
         @account.default_user_storage_quota_mb = 45
         @account.default_group_storage_quota_mb = 9001
@@ -542,7 +542,7 @@ describe AccountsController do
       end
 
       before do
-        user
+        user_factory
         user_session(@user)
         @account = Account.create!
         Account.site_admin.account_users.create!(user: @user)
@@ -605,7 +605,7 @@ describe AccountsController do
   end
 
   def admin_logged_in(account)
-    user_session(user)
+    user_session(user_factory)
     Account.site_admin.account_users.create!(user: @user)
     account_with_admin_logged_in(account: account)
   end
@@ -639,7 +639,7 @@ describe AccountsController do
 
     it "should properly remove sections from includes" do
       @s1 = @course.course_sections.create!
-      @course.enroll_student(user(:active_all => true), :section => @s1, :allow_multiple_enrollments => true)
+      @course.enroll_student(user_factory(:active_all => true), :section => @s1, :allow_multiple_enrollments => true)
 
       admin_logged_in(@account)
       get 'courses_api', :account_id => @account.id, :include => [:sections]

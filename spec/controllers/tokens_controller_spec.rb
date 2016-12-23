@@ -27,7 +27,7 @@ describe TokensController do
     end
     
     it "should allow creating an access token" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       post 'create', :access_token => {:purpose => "test", :expires_at => "jun 1 2011"}
       expect(response).to be_success
@@ -38,7 +38,7 @@ describe TokensController do
     end
 
     it "should not allow creating an access token while masquerading" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       Account.site_admin.account_users.create!(user: @user)
       session[:become_user_id] = user_with_pseudonym.id
@@ -48,7 +48,7 @@ describe TokensController do
     end
 
     it "should not allow explicitly setting the token value" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       post 'create', :access_token => {:purpose => "test", :expires_at => "jun 1 2011", :token => "mytoken"}
       expect(response).to be_success
@@ -67,7 +67,7 @@ describe TokensController do
     end
     
     it "should allow deleting an access token" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       token = @user.access_tokens.create!
       expect(token.user_id).to eq @user.id
@@ -77,7 +77,7 @@ describe TokensController do
     end
 
     it "should not allow deleting an access token while masquerading" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       token = @user.access_tokens.create!
       expect(token.user_id).to eq @user.id
@@ -89,7 +89,7 @@ describe TokensController do
     end
 
     it "should not allow deleting someone else's access token" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       user2 = User.create!
       token = user2.access_tokens.create!
@@ -104,7 +104,7 @@ describe TokensController do
     end
     
     it "should allow retrieving an access token, but not give the full token string" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       token = @user.access_tokens.new
       token.developer_key = DeveloperKey.default
@@ -118,7 +118,7 @@ describe TokensController do
     end
     
     it "should not include token for protected tokens" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       key = DeveloperKey.create!
       token = @user.access_tokens.create!(developer_key: key)
@@ -131,7 +131,7 @@ describe TokensController do
     end
     
     it "should not allow retrieving someone else's access token" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       user2 = User.create!
       token = user2.access_tokens.create!
@@ -141,7 +141,7 @@ describe TokensController do
     end
     
     it "should allow updating a token" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       token = @user.access_tokens.new
       token.developer_key = DeveloperKey.default
@@ -156,7 +156,7 @@ describe TokensController do
     end
 
     it "should allow regenerating an unprotected token" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       token = @user.access_tokens.new
       token.developer_key = DeveloperKey.default
@@ -171,7 +171,7 @@ describe TokensController do
     end
 
     it "should not allow regenerating a token while masquerading" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       token = @user.access_tokens.new
       token.developer_key = DeveloperKey.default
@@ -185,7 +185,7 @@ describe TokensController do
     end
 
     it "should not allow regenerating a protected token" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       key = DeveloperKey.create!
       token = @user.access_tokens.create!(developer_key: key)
@@ -199,7 +199,7 @@ describe TokensController do
     end
     
     it "should not allow updating someone else's token" do
-      user(:active_user => true)
+      user_factory(active_user: true)
       user_session(@user)
       user2 = User.create!
       token = user2.access_tokens.create!

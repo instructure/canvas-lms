@@ -45,7 +45,7 @@ describe "LTI integration tests" do
     end
   }
 
-  let_once(:canvas_user) { user(name: 'Shorty McLongishname') }
+  let_once(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
 
   let_once(:canvas_course) {
     course(active_course: true, course_name: 'my course').tap do |course|
@@ -465,7 +465,7 @@ describe "LTI integration tests" do
         tag.content_type = 'ContextExternalTool'
         tag.save!
       end
-      user
+      user_factory
       @course.enroll_student(@user)
 
       source_id = @tool.shard.activate do

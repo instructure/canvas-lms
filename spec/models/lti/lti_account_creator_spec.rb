@@ -34,7 +34,7 @@ describe Lti::LtiAccountCreator do
       canvas_tool.stubs(:opaque_identifier_for).returns('opaque_id')
     end
   end
-  let(:canvas_user) { user(name: 'Shorty McLongishname') }
+  let(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
   let(:canvas_account) do
     Account.create!.tap do |account|
       account.name = 'account_name'

@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "communication_channels/confirm.html.erb" do
   before do
-    user
+    user_factory
     assigns[:user] = @user
     assigns[:communication_channel] = @cc = @communication_channel = @user.communication_channels.create!(:path => 'johndoe@example.com')
     assigns[:nonce] = @cc.confirmation_code

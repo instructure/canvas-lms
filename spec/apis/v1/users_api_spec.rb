@@ -127,7 +127,7 @@ describe Api::V1::User do
       student = User.create!(:name => 'User')
       student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
 
-      teacher = user
+      teacher = user_factory
       course1 = course(:active_all => true)
       course1.enroll_user(teacher, "TeacherEnrollment").accept!
       course2 = course(:active_all => true)
@@ -157,7 +157,7 @@ describe Api::V1::User do
       student = User.create!(:name => 'User')
       student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
 
-      teacher = user
+      teacher = user_factory
       course1 = course(:active_all => true)
       course1.enroll_user(teacher, "TeacherEnrollment").accept!
       course2 = course(:active_all => true)
@@ -838,7 +838,7 @@ describe "Users API", type: :request do
 
     context "as a non-administrator" do
       before :once do
-        user(active_all: true)
+        user_factory(active_all: true)
       end
 
       it "should not let you create a user if self_registration is off" do
@@ -954,7 +954,7 @@ describe "Users API", type: :request do
 
     context "as an anonymous user" do
       before :each do
-        user(active_all: true)
+        user_factory(active_all: true)
         @user = nil
       end
 
@@ -1226,7 +1226,7 @@ describe "Users API", type: :request do
 
     context "an unauthorized user" do
       it "should receive a 401" do
-        user
+        user_factory
         raw_api_call(:put, @path, @path_options, {
           :user => { :name => 'Gob Bluth' }
         })
@@ -1281,7 +1281,7 @@ describe "Users API", type: :request do
       end
 
       it "should receive 401 if updating another user's settings" do
-        @course.enroll_student(user).accept!
+        @course.enroll_student(user_factory).accept!
         raw_api_call(:put, path, path_options, manual_mark_as_read: true)
         expect(response.code).to eq '401'
       end
@@ -1418,7 +1418,7 @@ describe "Users API", type: :request do
 
     context 'an unauthorized user' do
       it "should receive a 401" do
-        user
+        user_factory
         raw_api_call(:delete, @path, @path_options)
         expect(response.code).to eql '401'
       end
@@ -1543,7 +1543,7 @@ describe "Users API", type: :request do
   describe 'Custom Colors' do
     before :each do
       @a = Account.default
-      @u = user(:active_all => true)
+      @u = user_factory(active_all: true)
       @a.account_users.create!(user: @u)
     end
 
@@ -1676,7 +1676,7 @@ describe "Users API", type: :request do
   describe "dashboard positions" do
     before :each do
       @a = Account.default
-      @u = user(:active_all => true)
+      @u = user_factory(active_all: true)
       @a.account_users.create!(user: @u)
     end
 
@@ -1813,7 +1813,7 @@ describe "Users API", type: :request do
   describe 'missing submissions' do
     before :once do
       course_with_student(active_all: true)
-      @observer = user(active_all: true, active_state: 'active')
+      @observer = user_factory(active_all: true, active_state: 'active')
       @observer.user_observees.create do |uo|
         uo.user_id = @student.id
       end

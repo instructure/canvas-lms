@@ -136,7 +136,7 @@ describe CommunicationChannelsController do
       before :once do
         @account = Account.create!
         course(:active_all => 1, :account => @account)
-        user
+        user_factory
       end
 
       it "should show a pre-registered user the confirmation form" do
@@ -414,7 +414,7 @@ describe CommunicationChannelsController do
       it "should allow the user to pick a new pseudonym if a conflict already exists" do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
         course(:active_all => 1)
-        user
+        user_factory
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -431,7 +431,7 @@ describe CommunicationChannelsController do
       it "should force the user to provide a unique_id if a conflict already exists" do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
         course(:active_all => 1)
-        user
+        user_factory
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -539,7 +539,7 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:active_all => 1, :account => @account1, :username => 'jt@instructure.com')
 
         course(:active_all => 1, :account => @account2)
-        user
+        user_factory
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_user(@user)
@@ -555,7 +555,7 @@ describe CommunicationChannelsController do
         @old_user = @user
 
         course(:active_all => 1, :account => @account2)
-        user
+        user_factory
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_user(@user)

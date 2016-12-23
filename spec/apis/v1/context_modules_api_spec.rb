@@ -872,7 +872,7 @@ describe "Modules API", type: :request do
 
   context "unauthorized user" do
     before do
-      user
+      user_factory
     end
 
     it "should check permissions" do

@@ -63,7 +63,7 @@ describe "context modules" do
     end
 
     it "should not lock modules for observers" do
-      @course.enroll_user(user, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      @course.enroll_user(user_factory, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
       user_session(@user)
 
       go_to_modules

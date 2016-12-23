@@ -269,7 +269,7 @@ describe DiscussionEntry do
     before :once do
       course_with_student(:active_all => true)
       @author = @user
-      @reader = user()
+      @reader = user_factory()
       @course.enroll_student(@author)
       @course.enroll_student(@reader)
 

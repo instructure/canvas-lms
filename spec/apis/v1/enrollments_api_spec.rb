@@ -404,7 +404,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should not enroll a user lacking a pseudonym on the course's account" do
-        foreign_user = user
+        foreign_user = user_factory
         api_call_as_user @admin, :post, @path, @path_options, { :enrollment => { :user_id => foreign_user.id } }, {},
                  { expected_status: 404 }
       end
@@ -1340,7 +1340,7 @@ describe EnrollmentsApiController, type: :request do
     context "a student" do
       it "should list all members of a course" do
         current_user = @user
-        enrollment = @course.enroll_user(user)
+        enrollment = @course.enroll_user(user_factory)
         enrollment.accept!
 
         @user = current_user
@@ -1622,12 +1622,12 @@ describe EnrollmentsApiController, type: :request do
 
     context "a parent observer using parent app" do
       before :once do
-        @student = user(active_all: true, active_state: 'active')
+        @student = user_factory(active_all: true, active_state: 'active')
         3.times do
           course
           @course.enroll_student(@student, enrollment_state: 'active')
         end
-        @observer = user(active_all: true, active_state: 'active')
+        @observer = user_factory(active_all: true, active_state: 'active')
         @observer.user_observees.create do |uo|
           uo.user_id = @student.id
         end
@@ -1642,7 +1642,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should not authorize the parent to see other students' enrollments" do
-        @other_student = user(active_all: true, active_state: 'active')
+        @other_student = user_factory(active_all: true, active_state: 'active')
         @user = @observer
         path = "/api/v1/users/#{@other_student.id}/enrollments"
         params = { :controller => "enrollments_api", :action => "index", :user_id => @other_student.id.to_param, :format => "json" }
@@ -1658,7 +1658,7 @@ describe EnrollmentsApiController, type: :request do
         it "returns enrollments from the course's shard" do
           pend_with_bullet
 
-          @shard1.activate { @user = user(active_user: true) }
+          @shard1.activate { @user = user_factory(active_user: true) }
 
           account_admin_user(account: @course.account, user: @user)
 

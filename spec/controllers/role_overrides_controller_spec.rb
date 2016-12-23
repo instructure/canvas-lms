@@ -183,7 +183,7 @@ describe RoleOverridesController do
 
         context "for a non-admin" do
           it "is false" do
-            user_session(user(account: @account))
+            user_session(user_factory(account: @account))
             get 'check_account_permission', :account_id => @account.id, :permission => 'manage_catalog'
             expect(json['granted']).to eq(false)
           end

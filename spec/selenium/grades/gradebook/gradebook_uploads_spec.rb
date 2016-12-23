@@ -5,7 +5,7 @@ describe "gradebook uploads" do
 
   before do
     course_with_teacher_logged_in(:active_all => 1, :username => 'teacher@example.com')
-    @student = user(:username => 'student@example.com', :active_all => 1)
+    @student = user_factory(:username => 'student@example.com', :active_all => 1)
     @course.enroll_student(@student).accept!
 
     get "/courses/#{@course.id}/gradebook_uploads/new"

@@ -76,7 +76,7 @@ describe PseudonymsController do
     describe "forgot password" do
       before :once do
         Notification.create(:name => 'Forgot Password')
-        user
+        user_factory
       end
 
       it "should send password-change email for a registered user" do

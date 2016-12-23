@@ -125,7 +125,7 @@ describe ContentMigration do
     end
 
     it "should keep date-locked files locked" do
-      student = user
+      student = user_factory
       @copy_from.enroll_student(student)
       att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from, :lock_at => 1.month.ago, :unlock_at => 1.month.from_now)
       expect(att.grants_right?(student, :download)).to be_falsey

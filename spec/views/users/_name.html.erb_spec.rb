@@ -42,7 +42,7 @@ describe "/users/name" do
   end
 
   it "should not allow deletes for managed pseudonyms without correct privileges" do
-    @admin = user :account => Account.default
+    @admin = user_factory :account => Account.default
     course_with_student :account => Account.default
     managed_pseudonym(@student, :account => account_model)
     view_context(Account.default, @admin)
@@ -53,7 +53,7 @@ describe "/users/name" do
   end
 
   it "should not allow deletes for unmanaged pseudonyms without correct privileges" do
-    @admin = user :account => Account.default
+    @admin = user_factory :account => Account.default
     course_with_student :account => Account.default
     view_context(Account.default, @admin)
     assigns[:user] = @student

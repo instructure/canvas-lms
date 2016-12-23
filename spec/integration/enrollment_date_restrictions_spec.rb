@@ -73,7 +73,7 @@ describe "enrollment_date_restrictions" do
     @course2 = course(:active_all => 1)
     @course3 = course(:active_all => 1)
     @course4 = course(:active_all => 1)
-    user(:active_all => 1)
+    user_factory(active_all: true)
 
     @course1.start_at = 4.days.ago
     @course1.conclude_at = 2.days.ago

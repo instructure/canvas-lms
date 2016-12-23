@@ -388,10 +388,10 @@ describe UserMerge do
     end
 
     it "should move conversations to the new user" do
-      c1 = user1.initiate_conversation([user, user]) # group conversation
+      c1 = user1.initiate_conversation([user_factory, user_factory]) # group conversation
       c1.add_message("hello")
       c1.update_attribute(:workflow_state, 'unread')
-      c2 = user1.initiate_conversation([user]) # private conversation
+      c2 = user1.initiate_conversation([user_factory]) # private conversation
       c2.add_message("hello")
       c2.update_attribute(:workflow_state, 'unread')
       old_private_hash = c2.conversation.private_hash

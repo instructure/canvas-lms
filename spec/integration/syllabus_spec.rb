@@ -120,7 +120,7 @@ describe "syllabus" do
 
   context "as an authenticated non-course user" do
     before :each do
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
     end
 
@@ -133,7 +133,7 @@ describe "syllabus" do
 
   context "as an authenticated non-course user" do
     before :each do
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
     end
 
@@ -144,7 +144,7 @@ describe "syllabus" do
     course.public_syllabus_to_auth = true
     course.public_syllabus = false
     course.save
-    user(:active_user => true)
+    user_factory(active_user: true)
     user_session(@user)
 
   end

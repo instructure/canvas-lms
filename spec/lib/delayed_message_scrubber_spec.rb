@@ -46,7 +46,7 @@ describe DelayedMessageScrubber do
     before(:each) do
       @context      = course
       @notification = Notification.create!(name: 'Test Notification', category: 'Test')
-      @recipient    = user
+      @recipient    = user_factory
 
       @recipient.communication_channels.create!(path_type: 'email', path: 'user@example.com')
     end

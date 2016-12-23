@@ -71,9 +71,9 @@ describe ActiveRecord::Base do
     before :once do
       @c1 = course(:name => 'course1', :active_course => true)
       @c2 = course(:name => 'course2', :active_course => true)
-      u1 = user(:name => 'user1', :active_user => true)
-      u2 = user(:name => 'user2', :active_user => true)
-      u3 = user(:name => 'user3', :active_user => true)
+      u1 = user_factory(:name => 'user1', :active_user => true)
+      u2 = user_factory(:name => 'user2', :active_user => true)
+      u3 = user_factory(:name => 'user3', :active_user => true)
       @e1 = @c1.enroll_student(u1, :enrollment_state => 'active')
       @e2 = @c1.enroll_student(u2, :enrollment_state => 'active')
       @e3 = @c1.enroll_student(u3, :enrollment_state => 'active')

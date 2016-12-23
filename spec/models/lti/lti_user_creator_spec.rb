@@ -26,8 +26,8 @@ describe Lti::LtiUserCreator do
       end
     end
 
-    let(:canvas_user) { user(name: 'Shorty McLongishname') }
-    let(:canvas_user2) { user(name: 'Observer Dude') }
+    let(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
+    let(:canvas_user2) { user_factory(name: 'Observer Dude') }
     let(:root_account) { Account.create! }
 
     it 'converts a canvas user to an lti user' do

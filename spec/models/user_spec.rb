@@ -413,7 +413,7 @@ describe User do
       specs_require_sharding
 
       it "should create associations for a user in multiple shards" do
-        user
+        user_factory
         Account.site_admin.account_users.create!(user: @user)
         expect(@user.user_account_associations.map(&:account)).to eq [Account.site_admin]
 
@@ -512,7 +512,7 @@ describe User do
   describe '#courses_with_primary_enrollment' do
 
     it "should return appropriate courses with primary enrollment" do
-      user
+      user_factory
       @course1 = course(:course_name => "course", :active_course => true)
       @course1.enroll_user(@user, 'StudentEnrollment', :enrollment_state => 'active')
 
@@ -555,8 +555,8 @@ describe User do
     end
 
     it "includes invitations to temporary users" do
-      user1 = user
-      user2 = user
+      user1 = user_factory
+      user2 = user_factory
       c1 = course(name: 'a', active_course: true)
       e = c1.enroll_teacher(user1)
       user2.stubs(:temporary_invitations).returns([e])
@@ -1352,7 +1352,7 @@ describe User do
     it "should include temporary invitations" do
       user_with_pseudonym(:active_all => 1)
       @user1 = @user
-      user
+      user_factory
       @user2 = @user
       @user2.update_attribute(:workflow_state, 'creation_pending')
       @user2.communication_channels.create!(:path => @cc.path)
@@ -1428,7 +1428,7 @@ describe User do
     it "should include temporary invitations" do
       user_with_pseudonym(:active_all => 1)
       @user1 = @user
-      user
+      user_factory
       @user2 = @user
       @user2.update_attribute(:workflow_state, 'creation_pending')
       @user2.communication_channels.create!(:path => @cc.path)
@@ -1487,7 +1487,7 @@ describe User do
     describe 'with cross-sharding' do
       specs_require_sharding
       it "should only search trusted shards" do
-        @user = user(:active_all => 1, :account => @account1)
+        @user = user_factory(active_all: true, :account => @account1)
         @shard1.activate do
           @account2 = Account.create!
           @pseudonym1 = pseudonym(@user, :account => @account2)
@@ -1553,7 +1553,7 @@ describe User do
 
     it "should not create a new one when there are no viable candidates" do
       # no pseudonyms
-      user
+      user_factory
       expect(@user.find_or_initialize_pseudonym_for_account(@account1)).to be_nil
 
       # auto-generated password
@@ -1616,13 +1616,13 @@ describe User do
     end
 
     it "should not allow a registered user with an existing enrollment but no pseudonym" do
-      user active_all: true
+      user_factory active_all: true
       @course.enroll_student(@user)
       expect(@user.can_be_enrolled_in_course?(@course)).to be_falsey
     end
 
     it "should not allow a user with neither an enrollment nor a pseudonym" do
-      user active_all: true
+      user_factory active_all: true
       expect(@user.can_be_enrolled_in_course?(@course)).to be_falsey
     end
   end
@@ -1744,7 +1744,7 @@ describe User do
       context "after db section context_code filtering" do
         before do
           course_with_teacher(:active_all => true)
-          @student = user(:active_user => true)
+          @student = user_factory(active_user: true)
           @sections = []
           @events = []
           3.times { @sections << @course.course_sections.create! }
@@ -2022,7 +2022,7 @@ describe User do
       specs_require_sharding
 
       it "includes assignments from other shards" do
-        student = @shard1.activate { user }
+        student = @shard1.activate { user_factory }
         assignment = create_course_with_assignment_needing_submitting(student: student, override: true)
         expect(student.assignments_needing_submitting).to eq [assignment]
       end
@@ -2094,7 +2094,7 @@ describe User do
     context "sharding" do
       specs_require_sharding
       it "includes quizzes from other shards" do
-        other_user = @shard1.activate { user }
+        other_user = @shard1.activate { user_factory }
         student_in_course :course => @course, :user => other_user, :active_all => true
         expect(other_user.ungraded_quizzes_needing_submitting).to include @quiz
       end
@@ -2192,7 +2192,7 @@ describe User do
   end
 
   describe "quota" do
-    before(:once) { user }
+    before(:once) { user_factory }
     it "should default to User.default_storage_quota" do
       expect(@user.quota).to eql User.default_storage_quota
     end
@@ -2585,7 +2585,7 @@ describe User do
     specs_require_sharding
 
     it "should include accounts from multiple shards" do
-      user
+      user_factory
       Account.site_admin.account_users.create!(user: @user)
       @shard1.activate do
         @account2 = Account.create!
@@ -2596,7 +2596,7 @@ describe User do
     end
 
     it "should exclude deleted accounts" do
-      user
+      user_factory
       Account.site_admin.account_users.create!(user: @user)
       @shard1.activate do
         @account2 = Account.create!
@@ -2839,7 +2839,7 @@ describe User do
 
       it "should check for associated accounts on shards the user shares with the seeker" do
         # create target user on defualt shard
-        target = user()
+        target = user_factory()
         # create account on another shard
         account = @shard1.activate{ Account.create! }
         # associate target user with that account
@@ -2851,7 +2851,7 @@ describe User do
       end
 
       it 'checks all shards, even if not actually associated' do
-        target = user()
+        target = user_factory()
         # create account on another shard
         account = @shard1.activate{ Account.create! }
         # associate target user with that account
@@ -2867,7 +2867,7 @@ describe User do
 
   describe "#conversation_context_codes" do
     before :once do
-      @user = user(:active_all => true)
+      @user = user_factory(active_all: true)
       course_with_student(:user => @user, :active_all => true)
       group_with_user(:user => @user, :active_all => true)
     end
@@ -3043,7 +3043,7 @@ describe User do
 
     it "should include account groups" do
       account = account_model(:parent_account => Account.default)
-      student = user active_all: true
+      student = user_factory active_all: true
       @group = Group.create! context: account, name: "GroupOne"
       @group.users << student
       @group.save!
@@ -3053,7 +3053,7 @@ describe User do
 
   describe 'roles' do
     before(:once) do
-      user(active_all: true)
+      user_factory(active_all: true)
       course(active_course: true)
       @account = Account.default
     end
@@ -3114,7 +3114,7 @@ describe User do
   end
 
   it "should change avatar state on reporting" do
-    user
+    user_factory
     @user.report_avatar_image!
     @user.reload
     expect(@user.avatar_state).to eq :reported

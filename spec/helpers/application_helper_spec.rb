@@ -72,7 +72,7 @@ describe ApplicationHelper do
     Account.default.update_attribute(:settings, { :teachers_can_create_courses => true, :students_can_create_courses => true })
     @domain_root_account = Account.default
     expect(show_user_create_course_button(nil)).to be_falsey
-    user
+    user_factory
     expect(show_user_create_course_button(@user)).to be_falsey
     course_with_teacher
     expect(show_user_create_course_button(@teacher)).to be_truthy
@@ -326,15 +326,15 @@ describe ApplicationHelper do
         end
 
         it "should fall-back to @domain_root_account's branding if I'm logged in but not enrolled in anything" do
-          @current_user = user
+          @current_user = user_factory
           output = helper.include_account_css
           expect(output).to have_tag 'link'
           expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root']]
         end
 
         it "should load custom css even for high contrast users" do
-          @current_user = user
-          user.enable_feature!(:high_contrast)
+          @current_user = user_factory
+          user_factory.enable_feature!(:high_contrast)
           @context = @grandchild_account
           output = helper.include_account_css
           expect(output).to have_tag 'link'
@@ -387,8 +387,8 @@ describe ApplicationHelper do
           end
 
           it "should load custom js even for high contrast users" do
-            @current_user = user
-            user.enable_feature!(:high_contrast)
+            @current_user = user_factory
+            user_factory.enable_feature!(:high_contrast)
             output = helper.include_account_js
             expect(output).to have_tag 'script'
             expect(output).to match(/#{Regexp.quote('["https:\/\/example.com\/root\/account.js"].forEach')}/)
@@ -489,7 +489,7 @@ describe ApplicationHelper do
 
   describe "collection_cache_key" do
     it "should generate a cache key, changing when an element cache_key changes" do
-      collection = [user, user, user]
+      collection = [user_factory, user_factory, user_factory]
       key1 = collection_cache_key(collection)
       key2 = collection_cache_key(collection)
       expect(key1).to eq key2
@@ -535,7 +535,7 @@ describe ApplicationHelper do
 
       context "with a user logged in" do
         before :each do
-          @current_user = user
+          @current_user = user_factory
         end
 
         it "returns the custom dashboard_url with the current user's id" do
@@ -665,7 +665,7 @@ describe ApplicationHelper do
   describe "active_brand_config" do
 
     it "returns nil if user prefers high contrast" do
-      @current_user = user
+      @current_user = user_factory
       @current_user.enable_feature!(:high_contrast)
       expect(helper.send(:active_brand_config)).to be_nil
     end

@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe StreamItem do
   it "should not infer a user_id for DiscussionTopic" do
-    user
+    user_factory
     context = Course.create!
     dt = DiscussionTopic.create!(:context => context)
     dt.generate_stream_items([@user])
@@ -44,7 +44,7 @@ describe StreamItem do
   end
 
   it "doesn't unlink discussion entries from their topics" do
-    user
+    user_factory
     context = Course.create!
     dt = DiscussionTopic.create!(:context => context, :require_initial_post => true)
     de = dt.root_discussion_entries.create!

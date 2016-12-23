@@ -274,7 +274,7 @@ describe "Feature Flags API", type: :request do
 
       it "should not explode with cross-shard updating" do
         @shard1.activate do
-          user
+          user_factory
         end
 
         flag = @user.feature_flags.create! feature: 'user_feature', state: 'on'

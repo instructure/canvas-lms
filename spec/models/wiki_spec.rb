@@ -73,7 +73,7 @@ describe Wiki do
   context 'set policy' do
     before :once do
       @course.offer!
-      user :active_all => true
+      user_factory :active_all => true
     end
 
     it 'should give read rights to public courses' do

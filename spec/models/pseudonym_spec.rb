@@ -154,7 +154,7 @@ describe Pseudonym do
   end
 
   it "should change a blank sis_user_id to nil" do
-    user
+    user_factory
     pseudonym = Pseudonym.new(:user => @user, :unique_id => 'test@example.com', :password => 'passwd123')
     pseudonym.password_confirmation = 'passwd123'
     pseudonym.sis_user_id = ''

@@ -61,7 +61,7 @@ describe 'Student Gradebook' do
 
       scores = []
       if role == 'observer'
-        observer = user(name: 'Observer', active_all: true, active_state: 'active')
+        observer = user_factory(name: 'Observer', active_all: true, active_state: 'active')
         [course1, course2, course3].each do |course|
 
           enrollment = ObserverEnrollment.new(user: observer,
@@ -170,8 +170,8 @@ describe 'Student Gradebook' do
   context 'Comments' do
     # create a course, publish and enroll teacher and student
     let_once(:test_course) { course() }
-    let_once(:teacher) { user(active_all: true) }
-    let_once(:student) { user(active_all: true) }
+    let_once(:teacher) { user_factory(active_all: true) }
+    let_once(:student) { user_factory(active_all: true) }
     let_once(:published_course) do
       test_course.workflow_state = 'available'
       test_course.save!

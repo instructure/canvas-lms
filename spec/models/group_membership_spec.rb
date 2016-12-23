@@ -330,7 +330,7 @@ describe GroupMembership do
       DueDateCacher.expects(:recompute_course).with { |course_id, assignment_ids|
         course_id == @course.id && assignment_ids.sort == [@assignments[0].id, @assignments[1].id].sort
       }.once
-      @group.group_memberships.create(:user => user)
+      @group.group_memberships.create(:user => user_factory)
     end
 
     it "triggers a batch when membership is deleted" do
@@ -351,7 +351,7 @@ describe GroupMembership do
       DueDateCacher.expects(:recompute).never
       DueDateCacher.expects(:recompute_course).never
       @group = Account.default.groups.create!(:name => 'Group!')
-      @group.group_memberships.create!(:user => user)
+      @group.group_memberships.create!(:user => user_factory)
     end
   end
 end

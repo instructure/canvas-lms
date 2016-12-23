@@ -38,7 +38,7 @@ describe UsersController, type: :request do
     # an assignment i created, and a student who submits the assignment (needs_grading)
     @a2 = Assignment.create!(:context => @teacher_course, :due_at => 1.day.from_now, :title => 'text', :submission_types => 'online_text_entry', :points_possible => 15)
     @me = @user
-    student = user(:active_all => true)
+    student = user_factory(active_all: true)
     @user = @me
     @teacher_course.enroll_student(student).accept!
     @sub = @a2.reload.submit_homework(student, :submission_type => 'online_text_entry', :body => 'done')
@@ -71,7 +71,7 @@ describe UsersController, type: :request do
 
   def another_submission
     @me = @user
-    student2 = user(:active_all => true)
+    student2 = user_factory(active_all: true)
     @user = @me
     @teacher_course.enroll_student(student2).accept!
     @sub2 = @a2.reload.submit_homework(student2,

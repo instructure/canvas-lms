@@ -30,12 +30,12 @@ module Factories
   end
 
   def eportfolio(opts={})
-    user(opts) unless @user
+    user_factory(opts) unless @user
     @portfolio = @user.eportfolios.create!
   end
 
   def eportfolio_with_user(opts={})
-    user(opts)
+    user_factory(opts)
     eportfolio(opts)
   end
 end

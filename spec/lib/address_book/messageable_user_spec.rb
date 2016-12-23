@@ -133,7 +133,7 @@ describe AddressBook::MessageableUser do
         enrollment = @shard1.activate{ teacher_in_course(active_all: true) }
         teacher = enrollment.user
         course = enrollment.course
-        student = @shard2.activate{ user(active_all: true) }
+        student = @shard2.activate{ user_factory(active_all: true) }
         student_in_course(course: course, user: student, active_all: true)
         address_book = AddressBook::MessageableUser.new(teacher)
         known_users = address_book.known_users([student])
@@ -153,7 +153,7 @@ describe AddressBook::MessageableUser do
 
     it "returns nil if not known" do
       teacher = teacher_in_course(active_all: true).user
-      other = user(active_all: true)
+      other = user_factory(active_all: true)
       address_book = AddressBook::MessageableUser.new(teacher)
       known_user = address_book.known_user(other)
       expect(known_user).to be_nil
@@ -174,8 +174,8 @@ describe AddressBook::MessageableUser do
 
   describe "common_groups" do
     it "pulls the corresponding MessageableUser's common_groups" do
-      sender = user(active_all: true)
-      recipient = user(active_all: true)
+      sender = user_factory(active_all: true)
+      recipient = user_factory(active_all: true)
       group = group()
       group.add_user(sender, 'accepted')
       group.add_user(recipient, 'accepted')
@@ -246,7 +246,7 @@ describe AddressBook::MessageableUser do
         enrollment = @shard1.activate{ teacher_in_course(active_all: true) }
         @teacher = enrollment.user
         @course = enrollment.course
-        @student = @shard2.activate{ user(active_all: true) }
+        @student = @shard2.activate{ user_factory(active_all: true) }
         student_in_course(course: @course, user: @student, active_all: true)
       end
 

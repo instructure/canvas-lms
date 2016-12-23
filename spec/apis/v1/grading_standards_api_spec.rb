@@ -115,7 +115,7 @@ describe GradingStandardsApiController, type: :request do
       @resource_path = "/api/v1/accounts/#{@account.id}/grading_standards"
       @resource_params = { :controller => 'grading_standards_api', :action => 'create', :format => 'json', :account_id => @account.id.to_s }
       @course = course(name: 'grading standard course')
-      user
+      user_factory
       enrollment = @course.enroll_teacher(@user)
       enrollment.accept!
     end

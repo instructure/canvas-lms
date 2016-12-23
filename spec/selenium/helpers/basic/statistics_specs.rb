@@ -53,7 +53,7 @@ shared_examples_for "statistics basic tests" do
   it "should validate recently logged-in courses display" do
     course = Course.create!(:name => 'new course', :account => account)
     course.offer!
-    student = user(:active_user => true)
+    student = user_factory(active_user: true)
     pseudonym = student.pseudonyms.create!(:unique_id => 'student@example.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf')
     course.enroll_user(student, 'StudentEnrollment').accept!
     login_as(pseudonym.unique_id, 'asdfasdf')

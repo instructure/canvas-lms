@@ -145,7 +145,7 @@ describe DiscussionTopicsController, type: :request do
 
   context "create topic" do
     it "should check permissions" do
-      @user = user(:active_all => true)
+      @user = user_factory(active_all: true)
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
                {:title => "hai", :message => "test message"}, {}, :expected_status => 401)
@@ -514,7 +514,7 @@ describe DiscussionTopicsController, type: :request do
 
     describe "PUT 'update'" do
       it "should require authorization" do
-        @user = user(:active_all => true)
+        @user = user_factory(active_all: true)
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                  {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
                  {:title => "hai", :message => "test message"}, {}, :expected_status => 401)
@@ -898,7 +898,7 @@ describe DiscussionTopicsController, type: :request do
 
     describe "DELETE 'destroy'" do
       it "should require authorization" do
-        @user = user(:active_all => true)
+        @user = user_factory(active_all: true)
         api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                  {:controller => "discussion_topics", :action => "destroy", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
                  {}, {}, :expected_status => 401)
@@ -1557,7 +1557,7 @@ describe DiscussionTopicsController, type: :request do
     before(:once) do
       course_with_student(:active_all => true)
 
-      @observer = user(:name => "Observer", :active_all => true)
+      @observer = user_factory(:name => "Observer", :active_all => true)
       e = @course.enroll_user(@observer, 'ObserverEnrollment')
       e.associated_user = @student
       e.save

@@ -2,7 +2,7 @@ require_relative "../spec_helper"
 
 describe DataFixup::SycknessCleanser do
   it "should remove the syckness" do
-    user
+    user_factory
     @user.preferences = {:bloop => "blah"}
     @user.save!
 

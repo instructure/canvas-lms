@@ -116,7 +116,7 @@ describe UsersController do
 
       it "should show activity for students located on another shard" do
         @shard1.activate do
-          @student = user(:name => "im2spoopy4u")
+          @student = user_factory(:name => "im2spoopy4u")
         end
         course_with_student(:course => @course, :user => @student, :active_all => true)
 
@@ -177,7 +177,7 @@ describe UsersController do
       role = custom_account_role('custom', :account => @account)
       RoleOverride.create!(:context => @account, :permission => 'read_roster',
                            :role => role, :enabled => true)
-      @account.account_users.create!(user: user, role: role)
+      @account.account_users.create!(user: user_factory, role: role)
       user_session(@user)
 
       get "/users/#{@student.id}"
@@ -190,7 +190,7 @@ describe UsersController do
       role = custom_account_role('custom', :account => @account)
       RoleOverride.create!(:context => @account, :permission => 'read_roster',
                            :role => role, :enabled => true)
-      @account.account_users.create!(user: user, role: role)
+      @account.account_users.create!(user: user_factory, role: role)
       user_session(@user)
 
       get "/courses/#{@course.id}/users/#{@student.id}"

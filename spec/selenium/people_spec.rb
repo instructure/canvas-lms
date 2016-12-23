@@ -391,7 +391,7 @@ describe "people" do
     end
 
     it "should remove a student from a section", priority: "1", test_id: 296461 do
-     @student = user
+     @student = user_factory
      @course.enroll_student(@student, allow_multiple_enrollments: true)
      @course.enroll_student(@student, section: @section2, allow_multiple_enrollments: true)
      get "/courses/#{@course.id}/users"
@@ -435,7 +435,7 @@ describe "people" do
     course_with_admin_logged_in
     sec1 = @course.course_sections.create!(name: "section1")
     sec2 = @course.course_sections.create!(name: "section2")
-    @student = user
+    @student = user_factory
     e1 = @course.enroll_student(@student, section: sec1, allow_multiple_enrollments: true)
     @course.enroll_student(@student, section: sec2, allow_multiple_enrollments: true)
     Enrollment.where(:id => e1).update_all(:total_activity_time => 900)
@@ -486,7 +486,7 @@ describe "people" do
     end
 
     it "should not let observers with associated users have their roles changed" do
-      student = user
+      student = user_factory
       @course.enroll_student(student)
       @course.enroll_user(@teacher, "ObserverEnrollment", :allow_multiple_enrollments => true, :associated_user_id => student.id)
 

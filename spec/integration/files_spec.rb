@@ -363,7 +363,7 @@ describe FilesController do
 
     att = attachment_model(:uploaded_data => stub_png_data, :context => @course)
 
-    user(:active_all => true)
+    user_factory(active_all: true)
     user_session(@user)
 
     ts, sf_verifier = @user.access_verifier

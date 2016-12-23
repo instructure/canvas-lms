@@ -649,7 +649,7 @@ describe ExternalToolsController do
     end
 
     it "should remove query params when post_only is set" do
-      u = user(:active_all => true)
+      u = user_factory(active_all: true)
       account.account_users.create!(user: u)
       user_session(@user)
 
@@ -660,7 +660,7 @@ describe ExternalToolsController do
     end
 
     it "should not remove query params when post_only is not set" do
-      u = user(:active_all => true)
+      u = user_factory(active_all: true)
       account.account_users.create!(user: u)
       user_session(@user)
 
@@ -670,7 +670,7 @@ describe ExternalToolsController do
     end
 
     it "adds params from secure_params" do
-      u = user(:active_all => true)
+      u = user_factory(active_all: true)
       account.account_users.create!(user: u)
       user_session(@user)
       tool.save!
@@ -690,7 +690,7 @@ describe ExternalToolsController do
       end
 
       it "lets you specify the selection_type" do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!( user: u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -700,7 +700,7 @@ describe ExternalToolsController do
       end
 
       it "creates a content-item return url with an id" do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -711,7 +711,7 @@ describe ExternalToolsController do
       end
 
       it "sets the auto_create param to true" do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -721,7 +721,7 @@ describe ExternalToolsController do
       end
 
       it "sets the accept_unsigned param to false" do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -731,7 +731,7 @@ describe ExternalToolsController do
       end
 
       it "adds a data element with a jwt that contains the id if a content_item_id param is present " do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -743,7 +743,7 @@ describe ExternalToolsController do
       end
 
       it "adds a data element with a jwt that contains the consumer_key if a content_item_id param is present " do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
@@ -755,7 +755,7 @@ describe ExternalToolsController do
       end
 
       it 'adds to the data element the default launch url' do
-        u = user(active_all: true)
+        u = user_factory(active_all: true)
         account.account_users.create!(user:u)
         user_session u
         tool.collaboration = { message_type: 'ContentItemSelectionRequest' }

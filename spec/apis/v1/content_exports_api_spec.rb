@@ -22,7 +22,7 @@ require 'nokogiri'
 
 describe ContentExportsApiController, type: :request do
   let_once(:t_teacher) do
-    user(active_all: true)
+    user_factory(active_all: true)
   end
 
   let_once(:t_course) do
@@ -66,7 +66,7 @@ describe ContentExportsApiController, type: :request do
 
   describe "index" do
     it "should check permissions" do
-      random_user = user active_all: true
+      random_user = user_factory active_all: true
       api_call_as_user(random_user, :get, "/api/v1/courses/#{t_course.id}/content_exports",
         { controller: 'content_exports_api', action: 'index', format: 'json', course_id: t_course.to_param },
         {}, {}, { expected_status: 401 })

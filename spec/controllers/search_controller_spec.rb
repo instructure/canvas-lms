@@ -85,7 +85,7 @@ describe SearchController do
 
     context "with admin_context" do
       it "should return nothing if the user doesn't have rights" do
-        user_session(user)
+        user_session(user_factory)
         course(:active_all => true).course_sections.create(:name => "other section")
         expect(response).to be_success
 

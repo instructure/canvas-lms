@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe UserObserver do
-  let_once(:student) { user }
+  let_once(:student) { user_factory }
 
   it "should not allow a user to observe oneself" do
     expect { student.observers << student }.to raise_error(ActiveRecord::RecordInvalid)

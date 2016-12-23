@@ -81,7 +81,7 @@ describe DiscussionTopic do
   context "permissions" do
     before :each do
       @teacher1 = @teacher
-      @teacher2 = user
+      @teacher2 = user_factory
       teacher_in_course(:course => @course, :user => @teacher2, :active_all => true)
 
       @topic = @course.discussion_topics.create!(:user => @teacher1)
@@ -204,7 +204,7 @@ describe DiscussionTopic do
 
     it "should be visible to all teachers in the course" do
       @topic.update_attribute(:delayed_post_at, Time.now + 1.day)
-      new_teacher = user
+      new_teacher = user_factory
       @course.enroll_teacher(new_teacher).accept!
       expect(@topic.visible_for?(new_teacher)).to be_truthy
     end
@@ -835,7 +835,7 @@ describe DiscussionTopic do
 
   context "posting first to view" do
     before(:once) do
-      @observer = user(:active_all => true)
+      @observer = user_factory(active_all: true)
       @context = @course
       discussion_topic_model
       @topic.require_initial_post = true
@@ -971,7 +971,7 @@ describe DiscussionTopic do
         end
 
         it "filters observers if their student cant see" do
-          @observer = user(:active_all => true, :name => "Observer")
+          @observer = user_factory(active_all: true, :name => "Observer")
           observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
           observer_enrollment.update_attribute(:associated_user_id, @student.id)
           @topic.subscribe(@observer)
@@ -981,7 +981,7 @@ describe DiscussionTopic do
         end
 
         it "doesnt filter for observers with no student" do
-          @observer = user(:active_all => true)
+          @observer = user_factory(active_all: true)
           observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
           @topic.subscribe(@observer)
           expect(@topic.subscribers).to include(@observer)

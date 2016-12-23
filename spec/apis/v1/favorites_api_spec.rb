@@ -19,7 +19,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Favorites API", type: :request do
   before :once do
-    user(active_all: true)
+    user_factory(active_all: true)
     @courses = create_courses(6, enroll_user: @user, enrollment_type: "StudentEnrollment", return_type: :record)
   end
 

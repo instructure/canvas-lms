@@ -111,7 +111,7 @@ describe ContentMigration do
     end
 
     it "should import into a user" do
-      user
+      user_factory
       test_zip_import(@user)
     end
 
@@ -142,7 +142,7 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user
+      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
@@ -177,7 +177,7 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user
+      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
@@ -210,7 +210,7 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user
+      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
@@ -247,7 +247,7 @@ describe ContentMigration do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
-      @user = user
+      @user = user_factory
       account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'

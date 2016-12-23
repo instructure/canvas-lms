@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/pseudonyms/confirm_change_password" do
   it "should render" do
-    user
+    user_factory
     assigns[:user] = @user
     assigns[:current_user] = @user
     assigns[:pseudonym] = @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaabb", :password_confirmation => "asdfaabb")

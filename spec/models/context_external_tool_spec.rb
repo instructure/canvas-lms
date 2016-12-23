@@ -1043,7 +1043,7 @@ describe ContextExternalTool do
     end
 
     describe ".visible?" do
-      let(:u) {user}
+      let(:u) {user_factory}
       let(:admin) {account_admin_user(account:c.root_account)}
       let(:c) {course(active_course:true)}
       let(:student) do
@@ -1117,16 +1117,16 @@ describe ContextExternalTool do
         @admin = account_admin_user()
 
         course_with_teacher(:active_all => true, :account => Account.default)
-        @teacher = user(:active_all => true)
+        @teacher = user_factory(active_all: true)
         @course.enroll_teacher(@teacher).accept!
 
-        @designer = user(:active_all => true)
+        @designer = user_factory(active_all: true)
         @course.enroll_designer(@designer).accept!
 
-        @ta = user(:active_all => true)
+        @ta = user_factory(active_all: true)
         @course.enroll_ta(@ta).accept!
 
-        @student = user(:active_all => true)
+        @student = user_factory(active_all: true)
         @course.enroll_student(@student).accept!
 
         expect(tool.grants_right?(@admin, :update_manually)).to be_truthy

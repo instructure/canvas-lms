@@ -1516,7 +1516,7 @@ describe "Module Items API", type: :request do
 
   context "unauthorized user" do
     before :once do
-      user
+      user_factory
     end
 
     it "should check permissions" do

@@ -212,7 +212,7 @@ describe "Roles API", type: :request do
       before :once do
         @role = custom_teacher_role(@role_name, :account => @account)
         course1 = Course.create!(:name => "blah", :account => @account)
-        user1 = user()
+        user1 = user_factory()
 
         enrollment1 = course1.enroll_user(user1, 'TeacherEnrollment', :role => @role)
         enrollment1.invite

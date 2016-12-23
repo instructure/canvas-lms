@@ -4036,7 +4036,7 @@ def setup_assignment_with_students
   @graded_notify = Notification.create!(:name => "Submission Graded")
   @grade_change_notify = Notification.create!(:name => "Submission Grade Changed")
   @stu1 = @student
-  @course.enroll_student(@stu2 = user)
+  @course.enroll_student(@stu2 = user_factory)
   @assignment = @course.assignments.create(:title => "asdf", :points_possible => 10)
   @sub1 = @assignment.grade_student(@stu1, grade: 9, grader: @teacher).first
   expect(@sub1.score).to eq 9

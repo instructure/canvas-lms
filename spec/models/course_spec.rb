@@ -290,9 +290,9 @@ describe Course do
       account_admin_user_with_role_changes(:role => @role2, :role_changes => {:manage_sis => true, :change_course_state => true})
       @admin2 = @admin
       course_with_teacher(:active_all => true)
-      @designer = user(:active_all => true)
+      @designer = user_factory(active_all: true)
       @course.enroll_designer(@designer).accept!
-      @ta = user(:active_all => true)
+      @ta = user_factory(active_all: true)
       @course.enroll_ta(@ta).accept!
 
       # active, non-sis course
@@ -348,7 +348,7 @@ describe Course do
       account_admin_user_with_role_changes(:role => @role2, :role_changes => {:manage_sis => true})
       @admin2 = @admin
       course_with_teacher(:active_all => true)
-      @designer = user(:active_all => true)
+      @designer = user_factory(active_all: true)
       @course.enroll_designer(@designer).accept!
 
       Account.default.role_overrides.create!(:role => teacher_role, :permission => :change_course_state, :enabled => false)
@@ -403,9 +403,9 @@ describe Course do
       account_admin_user_with_role_changes(:role => @role2, :role_changes => {:manage_sis => true})
       @admin2 = @admin
       course_with_teacher(:active_all => true)
-      @designer = user(:active_all => true)
+      @designer = user_factory(active_all: true)
       @course.enroll_designer(@designer).accept!
-      @ta = user(:active_all => true)
+      @ta = user_factory(active_all: true)
       @course.enroll_ta(@ta).accept!
 
       # active, non-sis course
@@ -455,16 +455,16 @@ describe Course do
 
     it "should grant create_tool_manually to the proper individuals" do
       course_with_teacher(:active_all => true)
-      @teacher = user(:active_all => true)
+      @teacher = user_factory(active_all: true)
       @course.enroll_teacher(@teacher).accept!
 
-      @ta = user(:active_all => true)
+      @ta = user_factory(active_all: true)
       @course.enroll_ta(@ta).accept!
 
-      @designer = user(:active_all => true)
+      @designer = user_factory(active_all: true)
       @course.enroll_designer(@designer).accept!
 
-      @student = user(:active_all => true)
+      @student = user_factory(active_all: true)
       @course.enroll_student(@student).accept!
 
       clear_permissions_cache
@@ -512,7 +512,7 @@ describe Course do
     context "as a designer" do
       let_once :c do
         course(:active_all => 1)
-        @designer = user(:active_all => 1)
+        @designer = user_factory(active_all: true)
         @enrollment = @course.enroll_designer(@designer)
         @enrollment.accept!
         @course
@@ -1240,7 +1240,7 @@ describe Course, "gradebook_to_csv" do
       add_section(section_name)
       sections << @course_section
     end
-    3.times {|i| students << student_in_section(sections[0], :user => user(:name => "Student #{i}")) }
+    3.times {|i| students << student_in_section(sections[0], :user => user_factory(:name => "Student #{i}")) }
 
     @course.enroll_user(students[0], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
     @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
@@ -1292,7 +1292,7 @@ describe Course, "gradebook_to_csv" do
     student_in_course(:user => @user1)
     @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com')
     student_in_course(:user => @user2)
-    @user3 = user(:active_all => true, :name => 'JT')
+    @user3 = user_factory(active_all: true, :name => 'JT')
     student_in_course(:user => @user3)
     @user1.pseudonym.sis_user_id = "SISUSERID"
     @user1.pseudonym.save!
@@ -1335,7 +1335,7 @@ describe Course, "gradebook_to_csv" do
     account2 = account_model
     @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com', :account => account2)
     student_in_course(:user => @user2)
-    @user3 = user(:active_all => true, :name => 'JT')
+    @user3 = user_factory(active_all: true, :name => 'JT')
     student_in_course(:user => @user3)
     @user1.pseudonym.sis_user_id = "SISUSERID"
     @user1.pseudonym.save!
@@ -1444,7 +1444,7 @@ describe Course, "gradebook_to_csv" do
       student_in_course(:user => @user1)
       @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com')
       student_in_course(:user => @user2)
-      @user3 = user(:active_all => true, :name => 'JT')
+      @user3 = user_factory(active_all: true, :name => 'JT')
       student_in_course(:user => @user3)
       @user1.pseudonym.sis_user_id = "SISUSERID"
       @user1.pseudonym.save!
@@ -1783,7 +1783,7 @@ describe Course, "tabs_available" do
     before :once do
       course_with_student(:active_all => true)
       @student = @user
-      user(:active_all => true)
+      user_factory(active_all: true)
       @oe = @course.enroll_user(@user, 'ObserverEnrollment')
       @oe.accept
       @oe.associated_user_id = @student.id
@@ -1842,13 +1842,13 @@ describe Course, "tabs_available" do
     end
 
     it "should not show announcements to a user not enrolled in the class" do
-      user
+      user_factory
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
       expect(tab_ids).not_to include(Course::TAB_ANNOUNCEMENTS)
     end
 
     it "should show the announcements tab to an enrolled user" do
-      @course.enroll_student(user).accept!
+      @course.enroll_student(user_factory).accept!
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
       expect(tab_ids).to include(Course::TAB_ANNOUNCEMENTS)
     end
@@ -1859,13 +1859,13 @@ describe Course, "tabs_available" do
    end
 
     it "should not show outcomes to a user not enrolled in the class" do
-      user
+      user_factory
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
       expect(tab_ids).not_to include(Course::TAB_OUTCOMES)
     end
 
     it "should show the outcomes tab to an enrolled user" do
-      @course.enroll_student(user).accept!
+      @course.enroll_student(user_factory).accept!
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
       expect(tab_ids).to include(Course::TAB_OUTCOMES)
     end
@@ -2387,7 +2387,7 @@ describe Course, 'grade_publishing' do
         plugin_settings = Course.valid_grade_export_types["instructure_csv"]
         Course.stubs(:valid_grade_export_types).returns(plugin_settings.merge({
           "instructure_csv" => { :requires_grading_standard => false, :requires_publishing_pseudonym => true }}))
-        @user = user
+        @user = user_factory
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint"
         expect(lambda {@course.send_final_grades_to_endpoint @user}).to raise_error("publishing disallowed for this publishing user")
@@ -2399,7 +2399,7 @@ describe Course, 'grade_publishing' do
         plugin_settings = Course.valid_grade_export_types["instructure_csv"]
         Course.stubs(:valid_grade_export_types).returns(plugin_settings.merge({
           "instructure_csv" => { :requires_grading_standard => true, :requires_publishing_pseudonym => false }}))
-        @user = user
+        @user = user_factory
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint"
         expect(lambda {@course.send_final_grades_to_endpoint @user}).to raise_error("grade publishing requires a grading standard")
@@ -3785,15 +3785,15 @@ describe Course do
       account.save!
       course
       expect(@course.user_list_search_mode_for(nil)).to eq :open
-      expect(@course.user_list_search_mode_for(user)).to eq :open
+      expect(@course.user_list_search_mode_for(user_factory)).to eq :open
     end
 
     it "should be preferred for account admins" do
       account = Account.default
       course
       expect(@course.user_list_search_mode_for(nil)).to eq :closed
-      expect(@course.user_list_search_mode_for(user)).to eq :closed
-      user
+      expect(@course.user_list_search_mode_for(user_factory)).to eq :closed
+      user_factory
       account.account_users.create!(user: @user)
       expect(@course.user_list_search_mode_for(@user)).to eq :preferred
     end
@@ -3806,7 +3806,7 @@ describe Course do
       account.authentication_providers.first.move_to_bottom
       course(account: account)
       expect(@course.user_list_search_mode_for(nil)).to eq :preferred
-      expect(@course.user_list_search_mode_for(user)).to eq :preferred
+      expect(@course.user_list_search_mode_for(user_factory)).to eq :preferred
     end
   end
 end
@@ -3955,7 +3955,7 @@ describe Course do
           acct = Account.create!
           course_with_student(:active_all => 1, :account => acct)
         end
-        @site_admin = user
+        @site_admin = user_factory
         site_admin = Account.site_admin
         site_admin.account_users.create!(user: @user)
 
@@ -3987,7 +3987,7 @@ describe Course do
       end
 
       @shard2.activate do
-        user(:active_user => true)
+        user_factory(active_user: true)
       end
 
       student_in_course(:user => @user, :active_all => true)
@@ -4208,7 +4208,7 @@ describe Course do
 
     it "should not set an active enrollment back to invited on re-enrollment" do
       course(:active_all => true)
-      user
+      user_factory
       enrollment = @course.enroll_user(@user)
       enrollment.accept!
 
@@ -4252,7 +4252,7 @@ describe Course do
     context "unique enrollments" do
       before :once do
         course(active_all: true)
-        user
+        user_factory
         @section2 = @course.course_sections.create!
         @course.enroll_user(@user, 'StudentEnrollment', section: @course.default_section).reject!
         @course.enroll_user(@user, 'StudentEnrollment', section: @section2, allow_multiple_enrollments: true).reject!
@@ -4274,7 +4274,7 @@ describe Course do
     describe "already_enrolled" do
       before :once do
         course
-        user
+        user_factory
       end
 
       it "should not be set for a new enrollment" do
@@ -4291,7 +4291,7 @@ describe Course do
       before :once do
         @account = Account.default
         course
-        user
+        user_factory
         @lazy_role = custom_student_role('LazyStudent')
         @honor_role = custom_student_role('HonorStudent') # ba-dum-tssh
       end

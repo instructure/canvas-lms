@@ -59,7 +59,7 @@ module Factories
 
   def course_with_user(enrollment_type, opts={})
     @course = opts[:course] || course(opts)
-    @user = opts[:user] || @course.shard.activate { user(opts) }
+    @user = opts[:user] || @course.shard.activate { user_factory(opts) }
     @enrollment = @course.enroll_user(@user, enrollment_type, opts)
     @user.save!
     @enrollment.course = @course # set the reverse association

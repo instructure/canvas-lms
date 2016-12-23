@@ -3,9 +3,9 @@ require_relative '../spec_helper'
 describe DataFixup::FixRubricAssessmentYAML do
   it 'should fix-up comments_html strings that were improperly serialized' do
     assignment_model
-    @teacher = user(:active_all => true)
+    @teacher = user_factory(active_all: true)
     @course.enroll_teacher(@teacher).accept
-    @student = user(:active_all => true)
+    @student = user_factory(active_all: true)
     @course.enroll_student(@student).accept
     rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)

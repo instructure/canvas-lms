@@ -70,9 +70,9 @@ describe RoleOverride do
     c2 = course(:account => a2, :active_course => true)
 
     role = custom_student_role("some role", :account => a1)
-    u1 = user
+    u1 = user_factory
     c1.enroll_student(u1, :role => role)
-    u2 = user
+    u2 = user_factory
     c2.enroll_student(u2, :role => role)
 
     ro = RoleOverride.create!(:context => a1, :permission => 'moderate_forum',

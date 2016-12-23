@@ -1470,7 +1470,7 @@ describe Enrollment do
     end
 
     it "should return candidate enrollments" do
-      user
+      user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
       @user.communication_channels.create!(:path => 'jt@instructure.com')
       @course.enroll_user(@user)
@@ -1479,27 +1479,27 @@ describe Enrollment do
 
     it "should not return non-candidate enrollments" do
       # mismatched e-mail
-      user
+      user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
       @user.communication_channels.create!(:path => 'bob@instructure.com')
       @course.enroll_user(@user)
       # registered user
-      user
+      user_factory
       @user.communication_channels.create!(:path => 'jt@instructure.com')
       @user.register!
       @course.enroll_user(@user)
       # active e-mail
-      user
+      user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
       @user.communication_channels.create!(:path => 'jt@instructure.com') { |cc| cc.workflow_state = 'active' }
       @course.enroll_user(@user)
       # accepted enrollment
-      user
+      user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
       @user.communication_channels.create!(:path => 'jt@instructure.com')
       @course.enroll_user(@user).accept
       # rejected enrollment
-      user
+      user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
       @user.communication_channels.create!(:path => 'jt@instructure.com')
       @course.enroll_user(@user).reject
@@ -1512,7 +1512,7 @@ describe Enrollment do
     it "should uncache temporary user invitations when state changes" do
       enable_cache do
         course(:active_all => 1)
-        user
+        user_factory
         @user.update_attribute(:workflow_state, 'creation_pending')
         @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_user(@user)
@@ -1569,14 +1569,14 @@ describe Enrollment do
       describe "cached_temporary_invitations" do
         before :once do
           course(:active_all => 1)
-          user
+          user_factory
           @user.update_attribute(:workflow_state, 'creation_pending')
           @user.communication_channels.create!(:path => 'jt@instructure.com')
           @enrollment1 = @course.enroll_user(@user)
           @shard1.activate do
             account = Account.create!
             course(:active_all => 1, :account => account)
-            user
+            user_factory
             @user.update_attribute(:workflow_state, 'creation_pending')
             @user.communication_channels.create!(:path => 'jt@instructure.com')
             @enrollment2 = @course.enroll_user(@user)
@@ -1808,7 +1808,7 @@ describe Enrollment do
 
   describe 'observing users' do
     before :once do
-      @student = user(:active_all => true)
+      @student = user_factory(active_all: true)
       @parent = user_with_pseudonym(:active_all => true)
       @student.observers << @parent
     end
@@ -1954,13 +1954,13 @@ describe Enrollment do
     it "triggers a batch when enrollment is created" do
       DueDateCacher.expects(:recompute).never
       DueDateCacher.expects(:recompute_course).with(@course)
-      @course.enroll_student(user)
+      @course.enroll_student(user_factory)
     end
 
     it "does not trigger a batch when enrollment is not student" do
       DueDateCacher.expects(:recompute).never
       DueDateCacher.expects(:recompute_course).never
-      @course.enroll_teacher(user)
+      @course.enroll_teacher(user_factory)
     end
 
     it "triggers a batch when enrollment is deleted" do
@@ -2051,7 +2051,7 @@ describe Enrollment do
   describe "readable_state_based_on_date" do
     before :once do
       course(:active_all => true)
-      @enrollment = @course.enroll_student(user)
+      @enrollment = @course.enroll_student(user_factory)
       @enrollment.accept!
     end
 
@@ -2103,7 +2103,7 @@ describe Enrollment do
     it "should create a user_account_association when restoring a deleted enrollment" do
       sub_account = Account.default.sub_accounts.create!
       course = Course.create!(:account => sub_account)
-      @enrollment = course.enroll_student(user)
+      @enrollment = course.enroll_student(user_factory)
       expect(@user.user_account_associations.where(account: sub_account).exists?).to eq true
 
       @enrollment.destroy
@@ -2115,7 +2115,7 @@ describe Enrollment do
   end
 
   it "should order by state based on date correctly" do
-    u = user(:active_all => true)
+    u = user_factory(active_all: true)
     c1 = course(:active_all => true)
     c1.start_at = 1.day.from_now
     c1.conclude_at = 2.days.from_now

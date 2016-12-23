@@ -63,9 +63,9 @@ describe Submission do
 
     describe "permissions" do
       before(:once) do
-        @admin = user(active_all: true)
+        @admin = user_factory(active_all: true)
         @root_account.account_users.create!(user: @admin)
-        @teacher = user(active_all: true)
+        @teacher = user_factory(active_all: true)
         @context.enroll_teacher(@teacher)
       end
 
@@ -86,7 +86,7 @@ describe Submission do
           end
 
           it "has not have grade permissions if the user is non-root account admin without manage_grades permissions" do
-            @student = user(active_all: true)
+            @student = user_factory(active_all: true)
             @context.enroll_student(@student)
             expect(@submission.grants_right?(@student, :grade)).to eq(false)
           end
@@ -108,7 +108,7 @@ describe Submission do
           end
 
           it "has not have grade permissions if the user is non-root account admin without manage_grades permissions" do
-            @student = user(active_all: true)
+            @student = user_factory(active_all: true)
             @context.enroll_student(@student)
             expect(@submission.grants_right?(@student, :grade)).to eq(false)
           end
@@ -186,7 +186,7 @@ describe Submission do
 
   it "should ensure the media object exists" do
     assignment_model
-    se = @course.enroll_student(user)
+    se = @course.enroll_student(user_factory)
     MediaObject.expects(:ensure_media_object).with("fake", { :context => se.user, :user => se.user })
     @submission = @assignment.submit_homework(se.user, :media_comment_id => "fake", :media_comment_type => "audio")
   end
@@ -1759,7 +1759,7 @@ describe Submission do
 
     before(:each) do
       student_in_course(active_all: true)
-      @student2 = user
+      @student2 = user_factory
       @course.enroll_student(@student2).accept!
       @assignment = peer_review_assignment
       @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
@@ -1889,7 +1889,7 @@ describe Submission do
     specs_require_sharding
     it "should work" do
       @shard1.activate do
-        @student = user(:active_user => true)
+        @student = user_factory(active_user: true)
         @attachment = Attachment.create! uploaded_data: StringIO.new('blah'), context: @student, filename: 'blah.txt'
       end
       course(:active_all => true)

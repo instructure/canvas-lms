@@ -111,7 +111,7 @@ describe "Pages API", type: :request do
     end
 
     example 'does not create a version when just the user_id changes' do
-      user1 = user(:active_all => true)
+      user1 = user_factory(active_all: true)
       @page.user_id = user1.id
       @page.title = 'New Title'
       @page.save!
@@ -119,7 +119,7 @@ describe "Pages API", type: :request do
       current_version = @page.current_version.model
       expect(current_version.user_id).to eq user1.id
 
-      user2 = user(:active_all => true)
+      user2 = user_factory(active_all: true)
       @page.user_id = user2.id
       @page.save!
       expect(@page.versions.count).to eq 2

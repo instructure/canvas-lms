@@ -23,7 +23,7 @@ describe 'FixUserConversationsCountsForAll' do
   describe "up" do
     it "should fix incorrect entries and correctly count already correct entries" do
       # Setup user with correct unread_conversations_count (2 unread convos)
-      u1 = user
+      u1 = user_factory
       2.times do
         c = u1.initiate_conversation([u1], false)
         c.add_message('Hello')
@@ -33,7 +33,7 @@ describe 'FixUserConversationsCountsForAll' do
       # unread_conversations_count == 2
 
       # Setup user with wrong unread_conversations_count (negative)
-      u2 = user
+      u2 = user_factory
       1.times do
         c = u2.initiate_conversation([u2], false)
         c.add_message('Hello')
@@ -44,7 +44,7 @@ describe 'FixUserConversationsCountsForAll' do
       u2.update_attribute(:unread_conversations_count, -3)
 
       # Setup user with wrong unread_conversations_count (too many)
-      u3 = user
+      u3 = user_factory
       3.times do
         c = u3.initiate_conversation([u3], false)
         c.add_message('Hello')
@@ -63,7 +63,7 @@ describe 'FixUserConversationsCountsForAll' do
 
     it "should not count deleted entries" do
       # Setup user with some deleted conversations
-      u1 = user
+      u1 = user_factory
       2.times do
         c = u1.initiate_conversation([u1], false)
         c.add_message('Hello')
@@ -80,7 +80,7 @@ describe 'FixUserConversationsCountsForAll' do
       # unread_conversations_count == 2
 
       # Setup user with only deleted conversations (should have count 0)
-      u2 = user
+      u2 = user_factory
       3.times do
         c = u2.initiate_conversation([u2], false)
         c.add_message('Hello')

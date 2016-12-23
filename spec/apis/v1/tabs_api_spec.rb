@@ -22,7 +22,7 @@ describe TabsController, type: :request do
   describe 'index' do
     it "should require read permissions on the context" do
       course(:active_all => true)
-      user(:active_all => true)
+      user_factory(active_all: true)
       api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                       { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
                       { :include => ['external']},

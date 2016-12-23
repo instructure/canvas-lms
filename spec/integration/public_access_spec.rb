@@ -22,7 +22,7 @@ context "accessing public content" do
         assert_unauthorized
       end
 
-      user
+      user_factory
       user_session(@user)
 
       Timecop.freeze(5.seconds.ago) do

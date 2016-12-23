@@ -783,7 +783,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       it "shows unpublished assignments to teachers" do
-        user
+        user_factory
         @enrollment = @course.enroll_user(@user, 'TeacherEnrollment')
         @enrollment.course = @course # set the reverse association
 

@@ -26,7 +26,7 @@ describe GradebooksController do
     student_in_course active_all: true
     @student_enrollment = @enrollment
 
-    user(:active_all => true)
+    user_factory(active_all: true)
     @observer = @user
     @oe = @course.enroll_user(@user, 'ObserverEnrollment')
     @oe.accept
@@ -77,7 +77,7 @@ describe GradebooksController do
     end
 
     it "does not allow access for wrong user" do
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
       get 'grade_summary', :course_id => @course.id, :id => nil
       assert_unauthorized
@@ -93,7 +93,7 @@ describe GradebooksController do
     end
 
     it "does not allow access for a linked student" do
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
       @se = @course.enroll_student(@user)
       @se.accept

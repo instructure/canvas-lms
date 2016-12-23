@@ -91,7 +91,7 @@ describe "context modules" do
     end
 
     it "should show multiple student progressions to observers" do
-      @observer = user
+      @observer = user_factory
       @course.enroll_user(@observer, 'ObserverEnrollment', {:allow_multiple_enrollments => true,
                                                             :associated_user_id => @students[0].id})
       @course.enroll_user(@observer, 'ObserverEnrollment', {:allow_multiple_enrollments => true,

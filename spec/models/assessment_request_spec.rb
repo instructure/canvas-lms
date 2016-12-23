@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe AssessmentRequest do
   describe "workflow" do
     let_once(:request) do
-      user
+      user_factory
       course
       assignment = @course.assignments.create!
       submission = assignment.find_or_create_submission(@user)
@@ -64,9 +64,9 @@ describe AssessmentRequest do
 
     before :once do
       assignment_model
-      @teacher = user(:active_all => true)
+      @teacher = user_factory(active_all: true)
       @course.enroll_teacher(@teacher).accept
-      @student = user(:active_all => true)
+      @student = user_factory(active_all: true)
       @course.enroll_student(@student).accept
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)

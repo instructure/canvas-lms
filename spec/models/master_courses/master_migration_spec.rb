@@ -8,7 +8,7 @@ describe MasterCourses::MasterMigration do
 
   describe "start_new_migration!" do
     it "should queue a migration" do
-      user
+      user_factory
       MasterCourses::MasterMigration.any_instance.expects(:queue_export_job).once
       mig = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
       expect(mig.id).to be_present

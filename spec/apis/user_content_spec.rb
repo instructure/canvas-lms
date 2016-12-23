@@ -422,7 +422,7 @@ describe UserContent, type: :request do
 
     context "with verified user-context file links" do
       before do
-        user
+        user_factory
         attachment_model :context => @user
       end
 
@@ -446,7 +446,7 @@ describe UserContent, type: :request do
 
     context "with verified user-context file links" do
       before do
-        user
+        user_factory
         attachment_model :context => @user
       end
 

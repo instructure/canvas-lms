@@ -27,7 +27,7 @@ describe "/assignments/_syllabus_content" do
         course :active_all => true
       when :non_enrolled_user
         course :active_all => true
-        user
+        user_factory
       when :enrolled_user
         course_with_student :active_all => true
       end

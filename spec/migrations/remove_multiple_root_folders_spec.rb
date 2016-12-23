@@ -25,7 +25,7 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
         when 0
           context = course
         when 1
-          context = user
+          context = user_factory
         when 2
           context = group
         when 3

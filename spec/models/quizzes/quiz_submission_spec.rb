@@ -278,7 +278,7 @@ describe Quizzes::QuizSubmission do
 
         @quiz.publish!
 
-        quiz_submission = @quiz.generate_submission(user)
+        quiz_submission = @quiz.generate_submission(user_factory)
         quiz_submission.backup_submission_data({
           "question_#{qq1.id}" => "1",
           "question_#{qq2.id}" => "",
@@ -298,7 +298,7 @@ describe Quizzes::QuizSubmission do
 
           true_answer = question.question_data['answers'].find { |answer| answer['text'] == 'True' }
           false_answer = question.question_data['answers'].find { |answer| answer['text'] == 'False' }
-          quiz_submission = @quiz.generate_submission(user)
+          quiz_submission = @quiz.generate_submission(user_factory)
           quiz_submission.backup_submission_data({
             "question_#{question.id}" => true_answer['id'],
             :"_question_#{question.id}_read" => true
@@ -842,7 +842,7 @@ describe Quizzes::QuizSubmission do
     context "permissions" do
       it "should allow read to observers" do
         course_with_student(:active_all => true)
-        @observer = user
+        @observer = user_factory
         oe = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active')
         oe.update_attribute(:associated_user, @user)
         @quiz = @course.quizzes.create!

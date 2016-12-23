@@ -98,7 +98,7 @@ describe "new account course search" do
 
   it "should show teachers" do
     course(:account => @account)
-    user(:name => "some teacher")
+    user_factory(:name => "some teacher")
     teacher_in_course(:course => @course, :user => @user)
 
     get "/accounts/#{@account.id}"

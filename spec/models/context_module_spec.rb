@@ -505,7 +505,7 @@ describe ContextModule do
       expect(@module2.prerequisites).not_to be_empty
       expect(@module2.available_for?(@student, :tag => @tag2, :deep_check_if_needed => true)).to be_falsey
 
-      @course.enroll_user(user, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      @course.enroll_user(user_factory, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
       user_session(@user)
 
       expect(@module2.available_for?(@user, :tag => @tag2, :deep_check_if_needed => true)).to be_truthy

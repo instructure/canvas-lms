@@ -40,9 +40,9 @@ describe ContextController do
     end
 
     it "should only show active group members to students" do
-      active_student = user
+      active_student = user_factory
       @course.enroll_student(active_student).accept!
-      inactive_student = user
+      inactive_student = user_factory
       @course.enroll_student(inactive_student).deactivate
 
       @group = @course.groups.create!
@@ -56,9 +56,9 @@ describe ContextController do
     end
 
     it "should only show active course instructors to students" do
-      active_teacher = user
+      active_teacher = user_factory
       @course.enroll_teacher(active_teacher).accept!
-      inactive_teacher = user
+      inactive_teacher = user_factory
       @course.enroll_teacher(inactive_teacher).deactivate
 
       @group = @course.groups.create!
@@ -71,9 +71,9 @@ describe ContextController do
     end
 
     it "should show all group members to admins" do
-      active_student = user
+      active_student = user_factory
       @course.enroll_student(active_student).accept!
-      inactive_student = user
+      inactive_student = user_factory
       @course.enroll_student(inactive_student).deactivate
 
       @group = @course.groups.create!
@@ -119,7 +119,7 @@ describe ContextController do
 
     it "should assign variables" do
       user_session(@teacher)
-      @enrollment = @course.enroll_student(user(:active_all => true))
+      @enrollment = @course.enroll_student(user_factory(:active_all => true))
       @enrollment.accept!
       @student = @enrollment.user
       get 'roster_user', :course_id => @course.id, :id => @student.id

@@ -81,8 +81,8 @@ describe AssessmentQuestionBank do
   end
 
   it "should allow user read access through question bank users" do
-    user
-    @bank.assessment_question_bank_users.create!(:user => user)
+    user_factory
+    @bank.assessment_question_bank_users.create!(:user => user_factory)
     expect(@course.grants_right?(@user, :manage_assignments)).to be_falsey
     expect(@bank.grants_right?(@user, :read)).to be_truthy
   end

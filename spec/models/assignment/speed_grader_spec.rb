@@ -482,7 +482,7 @@ describe Assignment::SpeedGrader do
           }
         })
 
-      @other_student = user(:active_all => true)
+      @other_student = user_factory(active_all: true)
       student_in_course(:course => @course, :user => @other_student, :active_all => true)
     end
 

@@ -93,7 +93,7 @@ describe LocaleSelection do
       I18n.config.clear_available_locales_set
       @root_account = Account.create
       @account = Account.create(:parent_account => @root_account)
-      user
+      user_factory
       course
       @course.account = @account
       @course.save

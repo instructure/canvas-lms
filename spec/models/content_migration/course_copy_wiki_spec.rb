@@ -11,7 +11,7 @@ describe ContentMigration do
 
       page_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
       page_to.body = "something else"
-      page_to.user = user
+      page_to.user = user_factory
       page_to.save!
 
       run_course_copy
