@@ -1022,8 +1022,14 @@ class ConversationsController < ApplicationController
   end
 
   def infer_scope
-    filter_mode = (params[:filter_mode].respond_to?(:to_sym) && params[:filter_mode].to_sym) || :or
-    return render_error('filter_mode', 'invalid') if ![:or, :and].include?(filter_mode)
+    # John Stauffacher (john.stauffacher@gmail.com) prevents an unsafe cast to sym 
+    if params[:filter_mode].respond_to?(:to_sym)
+    	if ['or','and'].include? params[:filter_mode]
+    		filter_mode = (params[:filter_mode].respond_to?(:to_sym) && params[:filter_mode].to_sym) 
+    	else
+    		return render_error('filter_mode', 'invalid')
+	end
+    end
 
     @conversations_scope = case params[:scope]
       when 'unread'
