@@ -54,7 +54,7 @@ describe "assignments" do
     end
 
     it "allows an account admin who is also a student to submit a peer review", priority: "2", test_id: 216383 do
-      course(active_course: true)
+      course_factory(active_course: true)
       admin_logged_in(account: @course.root_account)
       student_in_course(user: @admin)
       @student = student_in_course.user
@@ -81,7 +81,7 @@ describe "assignments" do
   end
 
   describe 'with anonymous peer reviews' do
-    let!(:review_course) { course(active_all: true) }
+    let!(:review_course) { course_factory(active_all: true) }
     let!(:teacher) { review_course.teachers.first }
     let!(:reviewed) { student_in_course(active_all: true).user }
     let!(:reviewer) { student_in_course(active_all: true).user }

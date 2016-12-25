@@ -465,7 +465,7 @@ describe "people" do
 
   context "editing role" do
     before :once do
-      course
+      course_factory
       @section = @course.course_sections.create!(name: "section1")
 
       @teacher = user_with_pseudonym(:active_all => true)

@@ -300,7 +300,7 @@ describe "courses" do
 
     it "should only show users that a user has permissions to view" do
       # Set up the test
-      course(:active_course => true)
+      course_factory(active_course: true)
       %w[One Two].each do |name|
         section = @course.course_sections.create!(:name => name)
         @course.enroll_student(user_factory, :section => section).accept!
@@ -479,7 +479,7 @@ describe "courses" do
   end
 
   it "shouldn't cache unauth permissions for semi-public courses from sessionless permission checks" do
-    course(:active_all => true)
+    course_factory(active_all: true)
     @course.update_attribute(:is_public_to_auth_users, true)
 
     user_factory(active_all: true)

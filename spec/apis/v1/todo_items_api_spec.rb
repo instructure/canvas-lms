@@ -30,7 +30,7 @@ describe UsersController, type: :request do
   before :once do
     @teacher = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
     @teacher_course = @course
-    @student_course = course(:active_all => true)
+    @student_course = course_factory(active_all: true)
     @student_course.enroll_student(@user).accept!
     # an assignment i need to submit (needs_submitting)
     @a1 = Assignment.create!(:context => @student_course, :due_at => 6.days.from_now, :title => 'required work', :submission_types => 'online_text_entry', :points_possible => 10)

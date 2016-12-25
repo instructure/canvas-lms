@@ -614,7 +614,7 @@ describe SubmissionsController do
 
   describe 'GET originality_report' do
     let_once(:test_course) do
-      test_course = course(active_course: true)
+      test_course = course_factory(active_course: true)
       test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
       test_course.enroll_student(test_student, enrollment_state: 'active')
       test_course

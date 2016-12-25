@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe MasterCourses::MasterTemplate do
   before :once do
-    course
+    course_factory
   end
 
   describe "set_as_master_course" do
@@ -93,7 +93,7 @@ describe MasterCourses::MasterTemplate do
   describe "child subscriptions" do
     it "should be able to add other courses as 'child' courses" do
       template = MasterCourses::MasterTemplate.set_as_master_course(@course)
-      new_course = course
+      new_course = course_factory
       sub = template.add_child_course!(new_course)
       expect(sub.child_course).to eq new_course
       expect(sub.master_template).to eq template
@@ -112,7 +112,7 @@ describe MasterCourses::MasterTemplate do
     it "should require child courses to belong to the same root account" do
       template = MasterCourses::MasterTemplate.set_as_master_course(@course)
       new_root_account = Account.create!
-      new_course = course(:account => new_root_account)
+      new_course = course_factory(:account => new_root_account)
       expect { template.add_child_course!(new_course) }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end

@@ -191,7 +191,7 @@ module Lti
 
         it "doesn't allow a student to reregister an app" do
           course_with_student_logged_in(active_all:true)
-          get 'reregistration', course_id: course.id, tool_proxy_id: tool_proxy.id
+          get 'reregistration', course_id: course_factory.id, tool_proxy_id: tool_proxy.id
           expect(response.code).to eq '404'
         end
 

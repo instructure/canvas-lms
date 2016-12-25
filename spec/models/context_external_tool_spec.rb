@@ -1045,7 +1045,7 @@ describe ContextExternalTool do
     describe ".visible?" do
       let(:u) {user_factory}
       let(:admin) {account_admin_user(account:c.root_account)}
-      let(:c) {course(active_course:true)}
+      let(:c) {course_factory(active_course:true)}
       let(:student) do
         student = factory_with_protected_attributes(User, valid_user_attributes)
         e = c.enroll_student(student)

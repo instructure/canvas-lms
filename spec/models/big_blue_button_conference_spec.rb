@@ -34,7 +34,7 @@ describe BigBlueButtonConference do
       @conference = BigBlueButtonConference.create!(
         :title => "my conference",
         :user => @user,
-        :context => course
+        :context => course_factory
       )
     end
 
@@ -109,7 +109,7 @@ describe BigBlueButtonConference do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => true }
       bbb.user = user_factory
-      bbb.context = course
+      bbb.context = course_factory
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         expect(verb).to eql :create
@@ -122,7 +122,7 @@ describe BigBlueButtonConference do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => false }
       bbb.user = user_factory
-      bbb.context = course
+      bbb.context = course_factory
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         expect(verb).to eql :create
@@ -136,7 +136,7 @@ describe BigBlueButtonConference do
       bbb.stubs(:conference_key).returns('12345')
       bbb.user_settings = { record: true }
       bbb.user = user_factory
-      bbb.context = course
+      bbb.context = course_factory
       bbb.save!
       response = {returncode: 'SUCCESS', recordings: "\n  ",
                   messageKey: 'noRecordings', message: 'There are not
@@ -149,7 +149,7 @@ describe BigBlueButtonConference do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => false }
       bbb.user = user_factory
-      bbb.context = course
+      bbb.context = course_factory
 
       # set some vars so it thinks it's been created and doesn't do an api call
       bbb.conference_key = 'test'
@@ -187,7 +187,7 @@ describe BigBlueButtonConference do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => true }
       bbb.user = user_factory
-      bbb.context = course
+      bbb.context = course_factory
       bbb.save!
       bbb.expects(:send_request).with do |verb, options|
         expect(verb).to eql :create

@@ -136,12 +136,12 @@ describe ContextController do
 
       it 'allows merged users from other shards to be referenced' do
         user1 = user_model
-        course1 = course(:active_all => 1)
+        course1 = course_factory(active_all: true)
         course1.enroll_user(user1)
 
         @shard2.activate do
           @user2 = user_model
-          @course2 = course(:active_all => 1)
+          @course2 = course_factory(active_all: true)
           @course2.enroll_user(@user2)
         end
 

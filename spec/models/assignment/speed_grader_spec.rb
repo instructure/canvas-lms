@@ -140,7 +140,7 @@ describe Assignment::SpeedGrader do
 
   context "students and active course sections" do
     before(:once) do
-      @course = course(:active_course => true)
+      @course = course_factory(active_course: true)
       @teacher, @student1, @student2 = (1..3).map{User.create}
       @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
       @course.enroll_teacher(@teacher)
@@ -560,7 +560,7 @@ describe Assignment::SpeedGrader do
 
   context "OriginalityReport" do
     let_once(:test_course) do
-      test_course = course(active_course: true)
+      test_course = course_factory(active_course: true)
       test_course.enroll_teacher(test_teacher, enrollment_state: 'active')
       test_course.enroll_student(test_student, enrollment_state: 'active')
       test_course
@@ -586,7 +586,7 @@ describe Assignment::SpeedGrader do
 
   context "honoring gradebook preferences" do
     let_once(:test_course) do
-      test_course = course(active_course: true)
+      test_course = course_factory(active_course: true)
       test_course.enroll_teacher(teacher, enrollment_state: 'active')
       test_course.enroll_student(active_student, enrollment_state: 'active')
       test_course.enroll_student(inactive_student, enrollment_state: 'inactive')

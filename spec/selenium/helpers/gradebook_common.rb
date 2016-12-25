@@ -8,7 +8,7 @@ module GradebookCommon
     let(:hide_notes) { f(".hide") }
   end
   shared_context 'reusable_course' do
-    let(:test_course) { course(active_course: true) }
+    let(:test_course) { course_factory(active_course: true) }
     let(:teacher)     { user_factory(active_all: true) }
     let(:student)     { user_factory(active_all: true) }
     let(:concluded_student) { user_factory(name: 'Stewie Griffin', active_all: true) }

@@ -22,7 +22,7 @@
 module Factories
   def grading_periods(options = {})
     Account.default.set_feature_flag! :multiple_grading_periods, 'on'
-    course = options[:context] || @course || course()
+    course = options[:context] || @course || course_factory()
     count = options[:count] || 2
 
     grading_period_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)

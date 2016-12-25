@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Polling::Poll do
   before :once do
-    course
+    course_factory
     teacher_in_course(course: @course, active_all: true)
   end
 

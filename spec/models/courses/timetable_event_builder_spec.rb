@@ -2,7 +2,7 @@ require_relative('../../spec_helper')
 
 describe Courses::TimetableEventBuilder do
   describe "#process_and_validate_timetables" do
-    let(:builder) { described_class.new(course: course) }
+    let(:builder) { described_class.new(course: course_factory) }
 
     it "should require valid start and end times" do
       tt_hash = {:weekdays => 'monday', :start_time => "hoopyfrood", :end_time => "42 oclock",
@@ -30,7 +30,7 @@ describe Courses::TimetableEventBuilder do
   end
 
   describe "#generate_event_hashes" do
-    let(:builder) { described_class.new(course: course) }
+    let(:builder) { described_class.new(course: course_factory) }
 
     it "should generate a bunch of event hashes" do
       builder.course.tap do |c|
@@ -75,7 +75,7 @@ describe Courses::TimetableEventBuilder do
   end
 
   describe "#process_and_validate_event_hashes" do
-    let(:builder) { described_class.new(course: course) }
+    let(:builder) { described_class.new(course: course_factory) }
 
     it "should require start_at and end_at" do
       event_hash = {}
@@ -97,7 +97,7 @@ describe Courses::TimetableEventBuilder do
 
   describe "#create_or_update_events" do
     before :once do
-      course
+      course_factory
       @section = @course.course_sections.create!
       @course_builder = described_class.new(course: @course)
       @section_builder = described_class.new(course: @course, course_section: @section)

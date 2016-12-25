@@ -23,7 +23,7 @@ describe Quizzes::SubmissionGrader do
 
   context 'with course and quiz' do
   before(:once) do
-    course
+    course_factory
     @quiz = @course.quizzes.create!
   end
 

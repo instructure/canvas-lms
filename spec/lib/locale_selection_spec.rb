@@ -94,7 +94,7 @@ describe LocaleSelection do
       @root_account = Account.create
       @account = Account.create(:parent_account => @root_account)
       user_factory
-      course
+      course_factory
       @course.account = @account
       @course.save
     end

@@ -23,7 +23,7 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
     12.times do |x|
       case x % 4
         when 0
-          context = course
+          context = course_factory
         when 1
           context = user_factory
         when 2

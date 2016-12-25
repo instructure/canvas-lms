@@ -221,7 +221,7 @@ describe Role do
     end
 
     it "should get counts for all roles" do
-      course(:account => @sub_account)
+      course_factory(:account => @sub_account)
 
       @base_types.each do |bt|
         @course.enroll_user(user_factory, bt)
@@ -239,7 +239,7 @@ describe Role do
 
     describe "Role.role_data" do
       it "returns the roles with custom roles flattened as siblings to the main roles" do
-        course(:account => @sub_account)
+        course_factory(:account => @sub_account)
 
         @base_types.each do |bt|
           @course.enroll_user(user_factory, bt)

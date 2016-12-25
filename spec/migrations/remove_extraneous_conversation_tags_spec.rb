@@ -24,7 +24,7 @@ describe 'DataFixup::RemoveExtraneousConversationTags' do
     @u1 = student_in_course(:active_all => true).user
     @u2 = student_in_course(:active_all => true, :course => @course).user
     @course1 = @course
-    @course2 = course(:active_all => true)
+    @course2 = course_factory(active_all: true)
     @course2.enroll_student(@u1).update_attribute(:workflow_state, 'active')
     @conversation = Conversation.initiate([@u1, @u2], true)
     @conversation.add_message(@u1, 'test', :tags => [@course1.asset_string])

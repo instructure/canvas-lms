@@ -22,7 +22,7 @@ describe UserContent::FilesHandler do
   let(:is_public) { false }
   let(:in_app) { false }
   let(:attachment) do
-    attachment_with_context(course(active_all:true), {
+    attachment_with_context(course_factory(active_all:true), {
       filename: 'test.mp4',
       content_type: 'video'
     })

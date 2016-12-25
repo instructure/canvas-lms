@@ -52,7 +52,7 @@ describe "Default Account Reports" do
     @course1.enrollment_term_id = @term1.id
     @course1.sis_source_id = "SIS_COURSE_ID_1"
     @course1.save!
-    @course2 = course(:course_name => 'Math 101', :account => @account, :active_course => true)
+    @course2 = course_factory(:course_name => 'Math 101', :account => @account, :active_course => true)
 
     @enrollment1 = @course1.enroll_user(@user1, 'StudentEnrollment', :enrollment_state => :active)
     @enrollment2 = @course1.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :completed)
@@ -304,7 +304,7 @@ describe "Default Account Reports" do
         past   = gpg.grading_periods.create! title: "Past", start_date: 1.week.ago, end_date: 1.day.ago
         future = gpg.grading_periods.create! title: "Future", start_date: 1.day.from_now, end_date: 1.week.from_now
 
-        @course3 = course(:course_name => 'Fun 404', :account => @account, :active_course => true)
+        @course3 = course_factory(:course_name => 'Fun 404', :account => @account, :active_course => true)
         @course3.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
         @course3.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
 

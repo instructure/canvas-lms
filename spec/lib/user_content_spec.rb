@@ -106,7 +106,7 @@ describe UserContent do
     end
 
     it "should not grant public access to locked files" do
-      course
+      course_factory
       att1 = attachment_model(context: @course)
       att2 = attachment_model(context: @course)
       att2.update_attribute(:locked, true)

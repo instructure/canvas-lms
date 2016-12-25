@@ -24,7 +24,7 @@ describe Quizzes::SubmissionManager do
     let(:test_user) { user_factory }
 
     before(:each) do
-      course
+      course_factory
       @quiz = @course.quizzes.create! :title => "hello"
     end
 

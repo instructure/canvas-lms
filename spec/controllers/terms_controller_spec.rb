@@ -54,7 +54,7 @@ describe TermsController do
     user_session(@user)
 
     @term = @account.enrollment_terms.create!
-    course account: @account
+    course_factory account: @account
     @course.enrollment_term = @term
     @course.save!
 

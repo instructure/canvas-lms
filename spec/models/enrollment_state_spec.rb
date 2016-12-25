@@ -4,7 +4,7 @@ describe EnrollmentState do
 
   describe "#enrollments_needing_calculation" do
     it "should find enrollments that need calculation" do
-      course
+      course_factory
       normal_enroll = student_in_course(:course => @course)
 
       invalidated_enroll1 = student_in_course(:course => @course)
@@ -16,7 +16,7 @@ describe EnrollmentState do
     end
 
     it "should be able to use a scope" do
-      course
+      course_factory
       enroll = student_in_course(:course => @course)
       EnrollmentState.where(:enrollment_id => enroll).update_all(:state_is_current => false)
 
@@ -27,7 +27,7 @@ describe EnrollmentState do
 
   describe "#process_states_for" do
     before :once do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @enrollment = student_in_course(:course => @course)
     end
 
@@ -56,11 +56,11 @@ describe EnrollmentState do
 
   describe "state invalidation" do
     it "should invalidate enrollments after enrollment term date change" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       other_enroll = student_in_course(:course => @course)
 
       term = Account.default.enrollment_terms.create!
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.enrollment_term = term
       @course.save!
       term_enroll = student_in_course(:course => @course)
@@ -86,7 +86,7 @@ describe EnrollmentState do
 
     it "should invalidate enrollments after enrollment term role-specific date change" do
       term = Account.default.enrollment_terms.create!
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.enrollment_term = term
       @course.save!
       other_enroll = teacher_in_course(:course => @course)
@@ -112,7 +112,7 @@ describe EnrollmentState do
     end
 
     it "should invalidate enrollments after course date changes" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
       enroll = student_in_course(:course => @course)
@@ -134,7 +134,7 @@ describe EnrollmentState do
     end
 
     it "should invalidate enrollments even if they have null lock versions (i.e. already exist before db migration)" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
       enroll = student_in_course(:course => @course)
@@ -158,7 +158,7 @@ describe EnrollmentState do
     end
 
     it "should invalidate enrollments after changing course setting overriding term dates" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       enroll = student_in_course(:course => @course)
       enroll_state = enroll.enrollment_state
 
@@ -184,7 +184,7 @@ describe EnrollmentState do
     end
 
     it "should invalidate enrollments after changing course section dates" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       other_enroll = student_in_course(:course => @course)
 
       section = @course.course_sections.create!
@@ -218,7 +218,7 @@ describe EnrollmentState do
     end
 
     it "should invalidate access for future students when account future access settings are changed" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       other_enroll = student_in_course(:course => @course)
       other_state = other_enroll.enrollment_state
 
@@ -249,13 +249,13 @@ describe EnrollmentState do
     end
 
     it "should invalidate access for past students when past access settings are changed" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       other_enroll = student_in_course(:course => @course)
       other_state = other_enroll.enrollment_state
 
       sub_account = Account.default.sub_accounts.create!
 
-      course(:active_all => true, :account => sub_account)
+      course_factory(active_all: true, :account => sub_account)
       @course.start_at = 3.days.ago
       @course.conclude_at = 2.days.ago
       @course.restrict_enrollments_to_course_dates = true
@@ -281,7 +281,7 @@ describe EnrollmentState do
     end
 
     it "should invalidate access when course access settings change" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.start_at = 3.days.from_now
       @course.conclude_at = 4.days.from_now
       @course.restrict_enrollments_to_course_dates = true
@@ -307,7 +307,7 @@ describe EnrollmentState do
 
   describe "#recalculate_expired_states" do
     it "should recalculate expired states" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.start_at = 3.days.from_now
       end_at = 5.days.from_now
       @course.conclude_at = end_at

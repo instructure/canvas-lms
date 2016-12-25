@@ -1466,7 +1466,7 @@ describe Enrollment do
 
   describe "for_email" do
     before :once do
-      course(:active_all => 1)
+      course_factory(active_all: true)
     end
 
     it "should return candidate enrollments" do
@@ -1511,7 +1511,7 @@ describe Enrollment do
   describe "cached_temporary_invitations" do
     it "should uncache temporary user invitations when state changes" do
       enable_cache do
-        course(:active_all => 1)
+        course_factory(active_all: true)
         user_factory
         @user.update_attribute(:workflow_state, 'creation_pending')
         @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -1568,14 +1568,14 @@ describe Enrollment do
 
       describe "cached_temporary_invitations" do
         before :once do
-          course(:active_all => 1)
+          course_factory(active_all: true)
           user_factory
           @user.update_attribute(:workflow_state, 'creation_pending')
           @user.communication_channels.create!(:path => 'jt@instructure.com')
           @enrollment1 = @course.enroll_user(@user)
           @shard1.activate do
             account = Account.create!
-            course(:active_all => 1, :account => account)
+            course_factory(active_all: true, :account => account)
             user_factory
             @user.update_attribute(:workflow_state, 'creation_pending')
             @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -1825,7 +1825,7 @@ describe Enrollment do
     end
 
     it 'should default observer enrollments to "active" state' do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.enroll_student(@student, :enrollment_state => 'invited')
       pe = @parent.observer_enrollments.where(course_id: @course).first
       expect(pe).not_to be_nil
@@ -2050,7 +2050,7 @@ describe Enrollment do
 
   describe "readable_state_based_on_date" do
     before :once do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @enrollment = @course.enroll_student(user_factory)
       @enrollment.accept!
     end
@@ -2116,7 +2116,7 @@ describe Enrollment do
 
   it "should order by state based on date correctly" do
     u = user_factory(active_all: true)
-    c1 = course(:active_all => true)
+    c1 = course_factory(active_all: true)
     c1.start_at = 1.day.from_now
     c1.conclude_at = 2.days.from_now
     c1.restrict_enrollments_to_course_dates = true
@@ -2124,14 +2124,14 @@ describe Enrollment do
     c1.save!
     restricted_enroll = c1.enroll_student(u)
 
-    c2 = course(:active_all => true)
+    c2 = course_factory(active_all: true)
     c2.start_at = 1.day.from_now
     c2.conclude_at = 2.days.from_now
     c2.restrict_enrollments_to_course_dates = true
     c2.save!
     future_enroll = c2.enroll_student(u)
 
-    c3 = course(:active_all => true)
+    c3 = course_factory(active_all: true)
     active_enroll = c3.enroll_student(u)
 
     [restricted_enroll, future_enroll, active_enroll].each do |e|

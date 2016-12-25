@@ -24,7 +24,7 @@ describe SearchHelper do
 
   context "load_all_contexts" do
     it "should return requested permissions" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @current_user = @teacher
       
       load_all_contexts

@@ -190,7 +190,7 @@ describe GroupCategory do
   it "can pass through selfsignup info given (enabled, restricted)" do
     @category = GroupCategory.new
     @category.name = "foo"
-    @category.context = course()
+    @category.context = course_factory()
     @category.self_signup = 'enabled'
     expect(@category.self_signup?).to be_truthy
     expect(@category.unrestricted_self_signup?).to be_truthy

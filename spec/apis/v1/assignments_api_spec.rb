@@ -595,7 +595,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
       context "as a student" do
         before :once do
-          course(:active_all => true)
+          course_factory(active_all: true)
           setup_DA
         end
 
@@ -617,7 +617,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
       context "as an observer" do
         before :once do
-          course(:active_all => true)
+          course_factory(active_all: true)
           setup_DA
           @observer = User.create
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @course.course_sections.first, :enrollment_state => 'active', :allow_multiple_enrollments => true)

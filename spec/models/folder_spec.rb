@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Folder do
   before(:once) do
-    course
+    course_factory
   end
 
   it "should create a new instance given valid attributes" do

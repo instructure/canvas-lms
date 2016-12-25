@@ -1800,7 +1800,7 @@ describe CoursesController, type: :request do
       @role = Account.default.roles.build :name => 'SuperTeacher'
       @role.base_role_type = 'TeacherEnrollment'
       @role.save!
-      @course3 = course
+      @course3 = course_factory
       @course3.enroll_user(@me, 'TeacherEnrollment', { :role => @role, :active_all => true })
     end
 
@@ -1831,10 +1831,10 @@ describe CoursesController, type: :request do
       @course2.restrict_enrollments_to_course_dates = true
       @course2.save! # pending_active
 
-      @course3 = course(:active_all => true)
+      @course3 = course_factory(active_all: true)
       @course3.enroll_user(@me, 'StudentEnrollment') #invited
 
-      @course4 = course(:active_all => true)
+      @course4 = course_factory(active_all: true)
       @course4.enroll_user(@me, 'StudentEnrollment')
       @course4.start_at = 2.days.ago
       @course4.conclude_at = 1.day.ago
@@ -1894,9 +1894,9 @@ describe CoursesController, type: :request do
       @role = Account.default.roles.build :name => 'SuperTeacher'
       @role.base_role_type = 'TeacherEnrollment'
       @role.save!
-      @course3 = course
+      @course3 = course_factory
       @course3.enroll_user(@me, 'TeacherEnrollment', { :role => @role, :active_all => true })
-      @course4 = course
+      @course4 = course_factory
       @course4.enroll_user(@me, 'TaEnrollment')
       @course4.workflow_state = 'created'
       @course4.save
@@ -2839,7 +2839,7 @@ describe CoursesController, type: :request do
     it "should not find courses in other root accounts" do
       acct = account_model(:name => 'root')
       acct.account_users.create!(user: @user)
-      course(:account => acct)
+      course_factory(:account => acct)
       @course.update_attribute('sis_source_id', 'OTHER-SIS')
       raw_api_call(:get, "/api/v1/courses/sis_course_id:OTHER-SIS",
                    :controller => "courses", :action => "show", :id => "sis_course_id:OTHER-SIS", :format => "json")

@@ -22,7 +22,7 @@ describe AssessmentRequest do
   describe "workflow" do
     let_once(:request) do
       user_factory
-      course
+      course_factory
       assignment = @course.assignments.create!
       submission = assignment.find_or_create_submission(@user)
 

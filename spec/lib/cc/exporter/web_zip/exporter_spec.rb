@@ -10,7 +10,7 @@ describe "Exporter" do
     end
 
     @attachment = Attachment.create({
-      context: course,
+      context: course_factory,
       filename: 'exportable-test-file',
       uploaded_data: File.open(cartridge_path)
     })

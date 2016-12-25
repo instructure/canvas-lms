@@ -49,7 +49,7 @@ describe GroupMembership do
   end
 
   it "should not be valid if the group is full" do
-    course
+    course_factory
     category = @course.group_categories.build(:name => "category 1")
     category.group_limit = 2
     category.save!
@@ -299,7 +299,7 @@ describe GroupMembership do
   end
 
   it 'updates group leadership as membership changes' do
-    course
+    course_factory
     @category = @course.group_categories.build(:name => "category 1")
     @category.save!
     @group = @category.groups.create!(:context => @course)
@@ -312,7 +312,7 @@ describe GroupMembership do
 
   describe "updating cached due dates" do
     before :once do
-      course
+      course_factory
       @group_category = @course.group_categories.create!(:name => "category")
       @membership = group_with_user(:group_context => @course, :group_category => @group_category)
 

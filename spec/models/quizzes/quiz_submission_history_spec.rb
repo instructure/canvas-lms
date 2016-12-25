@@ -23,7 +23,7 @@ describe Quizzes::QuizSubmissionHistory do
 
   context "submissions with history" do
     before :once do
-      course
+      course_factory
       @quiz       = @course.quizzes.create!
       @submission = @quiz.quiz_submissions.new
 

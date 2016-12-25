@@ -434,7 +434,7 @@ describe Pseudonym do
 
     let(:bob) { student_in_course(
       user: student_in_course(account: account2).user,
-      course: course(account: account1)).user }
+      course: course_factory(account: account1)).user }
 
     let(:charlie) { student_in_course(account: account2).user }
 

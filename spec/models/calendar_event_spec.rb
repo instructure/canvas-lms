@@ -210,7 +210,7 @@ describe CalendarEvent do
       end
 
       it "should not add verifiers to files unless course or attachment is public" do
-        attachment_model(:context => course)
+        attachment_model(:context => course_factory)
         html = %{<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>}
         calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => html)
         ev = @event.to_ics(in_own_calendar: false)

@@ -7,7 +7,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
   let(:report_type) { 'student_analysis' }
   include_examples "Quizzes::QuizStatistics::Report"
-  before(:once) { course }
+  before(:once) { course_factory }
 
   def csv(opts = {}, quiz = @quiz)
     stats = quiz.statistics_csv('student_analysis', opts)
@@ -479,7 +479,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   it 'should not count student view submissions' do
-    @course = course(active_all: true)
+    @course = course_factory(active_all: true)
     fake_student = @course.student_view_student
     q = @course.quizzes.create!
     q.update_attribute(:published_at, Time.now)

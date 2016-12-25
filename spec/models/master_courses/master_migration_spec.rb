@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe MasterCourses::MasterMigration do
   before :once do
-    course
+    course_factory
     @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
   end
 
@@ -60,7 +60,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "shouldn't count deleted subscriptions" do
-      other_course = course
+      other_course = course_factory
       sub = @template.add_child_course!(other_course)
       sub.destroy!
 
@@ -69,7 +69,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "should record errors" do
-      other_course = course
+      other_course = course_factory
       @template.add_child_course!(other_course)
       @migration.stubs(:create_export).raises "oh neos"
       expect { @migration.perform_exports }.to raise_error("oh neos")
@@ -80,7 +80,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "should do a full export by default" do
-      new_course = course
+      new_course = course_factory
       new_sub = @template.add_child_course!(new_course)
 
       @migration.expects(:export_to_child_courses).with(:full, [new_sub], true)
@@ -88,7 +88,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "should do a selective export based on subscriptions" do
-      old_course = course
+      old_course = course_factory
       sel_sub = @template.add_child_course!(old_course)
       sel_sub.update_attribute(:use_selective_copy, true)
 
@@ -97,9 +97,9 @@ describe MasterCourses::MasterMigration do
     end
 
     it "should do two exports if needed" do
-      new_course = course
+      new_course = course_factory
       new_sub = @template.add_child_course!(new_course)
-      old_course = course
+      old_course = course_factory
       sel_sub = @template.add_child_course!(old_course)
       sel_sub.update_attribute(:use_selective_copy, true)
 
@@ -125,9 +125,9 @@ describe MasterCourses::MasterMigration do
     end
 
     it "should create an export once and import in each child course" do
-      @copy_to1 = course
+      @copy_to1 = course_factory
       @sub1 = @template.add_child_course!(@copy_to1)
-      @copy_to2 = course
+      @copy_to2 = course_factory
       @sub2 = @template.add_child_course!(@copy_to2)
 
       assmt = @copy_from.assignments.create!(:name => "some assignment")
@@ -153,7 +153,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "should copy selectively on second time" do
-      @copy_to = course
+      @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
       topic = @copy_from.discussion_topics.create!(:title => "some title")
@@ -187,7 +187,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "should create master content tags with default restrictions on export" do
-      @copy_to = course
+      @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
       restrictions = {:content => true, :settings => false}
@@ -212,7 +212,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "should not overwrite with default restrictions on export" do
-      @copy_to = course
+      @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
       restrictions = {:content => true, :settings => false}
@@ -237,7 +237,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "should create two exports (one selective and one full) if needed" do
-      @copy_to1 = course
+      @copy_to1 = course_factory
       @template.add_child_course!(@copy_to1)
 
       topic = @copy_from.discussion_topics.create!(:title => "some title")
@@ -251,7 +251,7 @@ describe MasterCourses::MasterMigration do
 
       page = @copy_from.wiki.wiki_pages.create!(:title => "another title")
 
-      @copy_to2 = course
+      @copy_to2 = course_factory
       @template.add_child_course!(@copy_to2) # new child course - needs full update
 
       run_master_migration
@@ -265,7 +265,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "should skip master course restriction validations on import" do
-      @copy_to = course
+      @copy_to = course_factory
       @template.add_child_course!(@copy_to)
 
       assmt = @copy_from.assignments.create!
@@ -306,7 +306,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "should not overwrite downstream changes in child course unless locked" do
-      @copy_to = course
+      @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
       # TODO: add more content here as we add the Restrictor module to more models
@@ -361,7 +361,7 @@ describe MasterCourses::MasterMigration do
       end
 
       it "should work" do
-        @copy_to = course
+        @copy_to = course_factory
         @template.add_child_course!(@copy_to)
 
         assmt = @copy_from.assignments.create!

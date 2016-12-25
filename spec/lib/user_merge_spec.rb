@@ -5,8 +5,8 @@ describe UserMerge do
   describe 'with simple users' do
     let!(:user1) { user_model }
     let!(:user2) { user_model }
-    let(:course1) { course(:active_all => true) }
-    let(:course2) { course(:active_all => true) }
+    let(:course1) { course_factory(active_all: true) }
+    let(:course2) { course_factory(active_all: true) }
 
     it 'should delete the old user' do
       UserMerge.from(user2).into(user1)
@@ -591,7 +591,7 @@ describe UserMerge do
     end
 
     it "should update other appropriate versions" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       wiki_page = @course.wiki.wiki_pages.create(:title => "Hi", :user_id => user2.id)
       ra = rubric_assessment_model(:context => @course, :user => user2)
 
@@ -771,7 +771,7 @@ describe UserMerge do
     end
 
     it "should move user attachments and handle duplicates" do
-      course
+      course_factory
       # FileSystemBackend is not namespace-aware, so the same id+name in
       # different shards (e.g. root_attachment and its copy) can cause
       # :boom: ... set high ids for things that get copied, so their
@@ -826,7 +826,7 @@ describe UserMerge do
         email = 'foo@example.com'
 
         enable_cache do
-          course
+          course_factory
           @course.offer!
 
           # create an active enrollment (usually through an SIS import)

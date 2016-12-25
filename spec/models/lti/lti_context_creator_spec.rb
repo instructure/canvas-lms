@@ -81,7 +81,7 @@ describe Lti::LtiContextCreator do
 
     describe "for a canvas course" do
       let(:canvas_course) do
-        course(active_course: true, course_name: 'my course').tap do |course|
+        course_factory(active_course: true, course_name: 'my course').tap do |course|
           course.course_code = 'abc'
           course.sis_source_id = 'sis_id'
           course.root_account = root_account

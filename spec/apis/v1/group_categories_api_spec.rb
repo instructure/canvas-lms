@@ -45,7 +45,7 @@ describe "Group Categories API", type: :request do
 
   describe "course group categories" do
     before :once do
-      @course = course(:course_name => 'Math 101', :account => @account, :active_course => true)
+      @course = course_factory(:course_name => 'Math 101', :account => @account, :active_course => true)
       @category = GroupCategory.student_organized_for(@course)
     end
 

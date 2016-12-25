@@ -230,7 +230,7 @@ describe DiscussionTopic do
 
     context "participants with teachers and tas" do
       before(:once) do
-        group_course = course(:active_course => true)
+        group_course = course_factory(active_course: true)
         @group_student, @group_ta, @group_teacher = create_users(3, return_type: :record)
         @not_group_student, @group_designer = create_users(2, return_type: :record)
         group_course.enroll_teacher(@group_teacher).accept!
@@ -258,7 +258,7 @@ describe DiscussionTopic do
 
     context "differentiated assignements" do
       before do
-        @course = course(:active_course => true)
+        @course = course_factory(active_course: true)
         discussion_topic_model(:user => @teacher, :context => @course)
         @course.enroll_teacher(@teacher).accept!
         @course_section = @course.course_sections.create

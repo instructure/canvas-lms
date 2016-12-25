@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../lib/canvas/draft_state
 describe Quizzes::Quiz do
 
   before :once do
-    course
+    course_factory
   end
 
   describe ".mark_quiz_edited" do
@@ -1918,7 +1918,7 @@ describe Quizzes::Quiz do
 
   describe "restore" do
     before do
-      course
+      course_factory
     end
 
     it "should restore to published state if there are student submissions" do

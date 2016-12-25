@@ -128,9 +128,9 @@ describe Api::V1::User do
       student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
 
       teacher = user_factory
-      course1 = course(:active_all => true)
+      course1 = course_factory(active_all: true)
       course1.enroll_user(teacher, "TeacherEnrollment").accept!
-      course2 = course(:active_all => true)
+      course2 = course_factory(active_all: true)
       course2.enroll_user(teacher, "StudentEnrollment").accept!
 
       expect(@test_api.user_json(student, teacher, {}, [], course1)).to eq({
@@ -158,9 +158,9 @@ describe Api::V1::User do
       student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
 
       teacher = user_factory
-      course1 = course(:active_all => true)
+      course1 = course_factory(active_all: true)
       course1.enroll_user(teacher, "TeacherEnrollment").accept!
-      course2 = course(:active_all => true)
+      course2 = course_factory(active_all: true)
       course2.enroll_user(teacher, "StudentEnrollment").accept!
       group1 = course1.groups.create!(:name => 'Group 1')
       group2 = course2.groups.create!(:name => 'Group 2')
@@ -1720,8 +1720,8 @@ describe "Users API", type: :request do
 
     describe "PUT dashboard positions" do
       it "should allow setting dashboard positions" do
-        course1 = course(:active_all => true)
-        course2 = course(:active_all => true)
+        course1 = course_factory(active_all: true)
+        course2 = course_factory(active_all: true)
         json = api_call(
           :put,
           "/api/v1/users/#{@user.id}/dashboard_positions",
@@ -1745,7 +1745,7 @@ describe "Users API", type: :request do
       end
 
       it "should not allow creating entries for entities that do not exist" do
-        course1 = course(:active_all => true)
+        course1 = course_factory(active_all: true)
         course1.enroll_user(@user, "TeacherEnrollment").accept!
         api_call(
           :put,
@@ -1767,7 +1767,7 @@ describe "Users API", type: :request do
       it "should not allow creating entries for entities that the user doesn't have read access to" do
         course_with_student(:active_all => true)
         course1 = @course
-        course2 = course
+        course2 = course_factory
 
         api_call(
           :put,
@@ -1787,8 +1787,8 @@ describe "Users API", type: :request do
       end
 
       it "should not allow setting positions to strings" do
-        course1 = course(:active_all => true)
-        course2 = course(:active_all => true)
+        course1 = course_factory(active_all: true)
+        course2 = course_factory(active_all: true)
 
         api_call(
           :put,

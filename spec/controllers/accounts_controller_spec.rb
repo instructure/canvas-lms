@@ -209,7 +209,7 @@ describe AccountsController do
     it "should count total courses correctly" do
       account = Account.create!
       account_with_admin_logged_in(account: account)
-      course(account: account)
+      course_factory(account: account)
       @course.course_sections.create!
       @course.course_sections.create!
       @course.update_account_associations
@@ -613,8 +613,8 @@ describe AccountsController do
   describe "#account_courses" do
     before do
       @account = Account.create!
-      @c1 = course(account: @account, name: "foo")
-      @c2 = course(account: @account, name: "bar")
+      @c1 = course_factory(account: @account, name: "foo")
+      @c2 = course_factory(account: @account, name: "bar")
     end
 
     it "should not allow get a list of courses with no permissions" do

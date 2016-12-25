@@ -50,7 +50,7 @@ describe "Pages API", type: :request do
   end
 
   before :once do
-    course
+    course_factory
     @course.offer!
     @wiki = @course.wiki
     @wiki.set_front_page_url!('front-page')
@@ -1036,7 +1036,7 @@ describe "Pages API", type: :request do
     end
 
     it "should deny access to wiki in an unenrolled course" do
-      other_course = course
+      other_course = course_factory
       other_course.offer!
       other_wiki = other_course.wiki
       other_wiki.set_front_page_url!('front-page')
@@ -1054,7 +1054,7 @@ describe "Pages API", type: :request do
     end
 
     it "should allow access to a wiki in a public unenrolled course" do
-      other_course = course
+      other_course = course_factory
       other_course.is_public = true
       other_course.offer!
       other_wiki = other_course.wiki

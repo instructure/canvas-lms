@@ -105,7 +105,7 @@ describe GradebooksController do
 
     it "does not allow access for an observer linked in a different course" do
       @course1 = @course
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course2 = @course
 
       user_session(@observer)
@@ -542,7 +542,7 @@ describe GradebooksController do
 
   describe "POST 'submissions_zip_upload'" do
     it "requires authentication" do
-      course
+      course_factory
       assignment_model
       post 'submissions_zip_upload', :course_id => @course.id, :assignment_id => @assignment.id, :submissions_zip => 'dummy'
       assert_unauthorized

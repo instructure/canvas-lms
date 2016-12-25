@@ -421,7 +421,7 @@ describe GradeSummaryPresenter do
 
   describe "#student_enrollment_for" do
     let(:gspcourse) do
-      course
+      course_factory
     end
 
     let(:teacher) do

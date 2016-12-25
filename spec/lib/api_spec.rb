@@ -170,7 +170,7 @@ describe Api do
     end
 
     it "should find course by lti_context_id" do
-      lti_course = course
+      lti_course = course_factory
       lti_course.lti_context_id = Canvas::Security.hmac_sha1(lti_course.asset_string.to_s, 'key')
       lti_course.save!
       expect(@api.api_find(Course, "lti_context_id:#{lti_course.lti_context_id}")).to eq lti_course
@@ -703,7 +703,7 @@ describe Api do
     end
 
     it "should add context to files and remove verifier parameters" do
-      course
+      course_factory
       attachment_model(:context => @course)
 
       html = %{<div>

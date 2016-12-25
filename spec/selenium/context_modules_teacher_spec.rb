@@ -978,7 +978,7 @@ describe "context modules" do
 
   context "as a teacher through course home page (set to modules)", priority: "1" do
     before(:once) do
-      course(:active_course => true)
+      course_factory(active_course: true)
       @course.default_view = 'modules'
       @course.save!
     end
@@ -1104,7 +1104,7 @@ describe "context modules" do
 
   context "as a teacher" do
     before(:once) do
-      course(:active_course => true)
+      course_factory(active_course: true)
     end
 
     before(:each) do

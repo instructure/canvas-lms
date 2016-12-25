@@ -651,7 +651,7 @@ describe "security" do
       it "read_course_list" do
         add_permission :view_statistics
 
-        course
+        course_factory
         get "/accounts/#{Account.default.id}"
         expect(response).to be_redirect
 
@@ -758,7 +758,7 @@ describe "security" do
 
     describe 'course' do
       before (:each) do
-        course(:active_all => 1)
+        course_factory(active_all: true)
         Account.default.update_attribute(:settings, { :no_enrollments_can_create_courses => false })
       end
 

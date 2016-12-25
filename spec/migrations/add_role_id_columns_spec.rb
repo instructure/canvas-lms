@@ -120,8 +120,8 @@ describe 'AddRoleIdColumns', shared_db: false do
     it "should convert enrollment role_name column to role_id" do
       @user = user_factory
       @course_role2.update_attribute(:workflow_state, "inactive")
-      ssa1_course = course(:account => @sub_sub_account)
-      sa2_course = course(:account => @sub_account2)
+      ssa1_course = course_factory(:account => @sub_sub_account)
+      sa2_course = course_factory(:account => @sub_account2)
 
       # shares same name as @course_role2, but belongs to @sub_account2
       course_role2_lookalike = create_role(@sub_account2, "courserole2", 'StudentEnrollment')

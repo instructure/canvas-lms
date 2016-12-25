@@ -23,7 +23,7 @@ require 'nokogiri'
 describe "External Tools" do
   describe "Assignments" do
     before do
-      course(:active_all => true)
+      course_factory(active_all: true)
       assignment_model(:course => @course, :submission_types => "external_tool", :points_possible => 25)
       @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
       @tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")

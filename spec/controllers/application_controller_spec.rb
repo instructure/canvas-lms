@@ -694,10 +694,10 @@ describe ApplicationController do
   describe "#get_all_pertinent_contexts" do
     it "doesn't show unpublished courses to students" do
       student = user_factory(active_all: true)
-      c1 = course
+      c1 = course_factory
       e = c1.enroll_student(student)
       e.update_attribute(:workflow_state, 'active')
-      c2 = course(:active_all => true)
+      c2 = course_factory(active_all: true)
       c2.enroll_student(student).accept!
 
       controller.instance_variable_set(:@context, student)

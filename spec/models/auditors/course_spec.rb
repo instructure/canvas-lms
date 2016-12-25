@@ -120,7 +120,7 @@ describe Auditors::Course do
     end
 
     it "should log copied event" do
-      @course, @copy_course = @course, course(:active_all => true)
+      @course, @copy_course = @course, course_factory(active_all: true)
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copy_course, @teacher, source: :api)
 
       expect(@from_event.course).to eq @copy_course
@@ -133,7 +133,7 @@ describe Auditors::Course do
     end
 
     it "should log reset event" do
-      @course, @new_course = @course, course(:active_all => true)
+      @course, @new_course = @course, course_factory(active_all: true)
       @from_event, @to_event = Auditors::Course.record_reset(@course, @new_course, @teacher, source: :api)
 
       expect(@from_event.course).to eq @new_course

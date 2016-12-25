@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe MasterCourses::Restrictor do
   before :once do
-    @copy_from = course
+    @copy_from = course_factory
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
     @original_page = @copy_from.wiki.wiki_pages.create!(:title => "blah", :body => "bloo")
     @tag = @template.create_content_tag_for!(@original_page)
 
-    @copy_to = course
+    @copy_to = course_factory
     @page_copy = @copy_to.wiki.wiki_pages.new(:title => "blah", :body => "bloo") # just create a copy directly instead of doing a real migraiton
     @page_copy.migration_id = @tag.migration_id
     @page_copy.save!

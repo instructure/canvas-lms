@@ -275,7 +275,7 @@ describe ContentExportsApiController, type: :request do
         expect(export.job_progress).to be_completed
         expect(export.attachment).not_to be_nil
 
-        course
+        course_factory
         cm = @course.content_migrations.new
         cm.attachment = export.attachment
         cm.migration_type = "canvas_cartridge_importer"
@@ -315,7 +315,7 @@ describe ContentExportsApiController, type: :request do
         expect(export.job_progress).to be_completed
         expect(export.attachment).not_to be_nil
 
-        course
+        course_factory
         cm = @course.content_migrations.new
         cm.attachment = export.attachment
         cm.migration_type = "canvas_cartridge_importer"
@@ -366,7 +366,7 @@ describe ContentExportsApiController, type: :request do
         run_jobs
 
         export.reload
-        course
+        course_factory
         cm = @course.content_migrations.new
         cm.attachment = export.attachment
         cm.migration_type = "canvas_cartridge_importer"
@@ -425,7 +425,7 @@ describe ContentExportsApiController, type: :request do
         run_jobs
 
         export.reload
-        course
+        course_factory
         cm = @course.content_migrations.new
         cm.attachment = export.attachment
         cm.migration_type = "canvas_cartridge_importer"
@@ -455,7 +455,7 @@ describe ContentExportsApiController, type: :request do
         run_jobs
 
         export.reload
-        course
+        course_factory
         cm = @course.content_migrations.new
         cm.attachment = export.attachment
         cm.migration_type = "canvas_cartridge_importer"

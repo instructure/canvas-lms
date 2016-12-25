@@ -1235,7 +1235,7 @@ describe Submission do
     # see redmine #6048
 
     # set up the data to have a submission with a quiz submission with multiple versions
-    course
+    course_factory
     quiz = @course.quizzes.create!
     quiz_submission = quiz.generate_submission @user, false
     quiz_submission.save
@@ -1892,7 +1892,7 @@ describe Submission do
         @student = user_factory(active_user: true)
         @attachment = Attachment.create! uploaded_data: StringIO.new('blah'), context: @student, filename: 'blah.txt'
       end
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.enroll_user(@student, "StudentEnrollment").accept!
       @assignment = @course.assignments.create!
 

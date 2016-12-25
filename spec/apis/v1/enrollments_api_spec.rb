@@ -25,7 +25,7 @@ describe EnrollmentsApiController, type: :request do
     context "an admin user" do
       before :once do
         account_admin_user(:active_all => true)
-        course(:active_course => true)
+        course_factory(active_course: true)
         @unenrolled_user = user_with_pseudonym
         @section         = @course.course_sections.create!
         @path            = "/api/v1/courses/#{@course.id}/enrollments"
@@ -504,7 +504,7 @@ describe EnrollmentsApiController, type: :request do
 
         it "should derive roles from parent accounts" do
           sub_account = Account.create!(:name => 'sub', :parent_account => @course.account)
-          course(:account => sub_account)
+          course_factory(:account => sub_account)
 
           expect(@course.account.roles.active.where(:name => 'newrole').first).to be_nil
           course_role = @course.account.get_course_role_by_name('newrole')
@@ -536,7 +536,7 @@ describe EnrollmentsApiController, type: :request do
       before :once do
         course_with_teacher(:active_all => true)
         @course_with_teacher    = @course
-        @course_wo_teacher      = course
+        @course_wo_teacher      = course_factory
         @course                 = @course_with_teacher
         @unenrolled_user        = user_with_pseudonym
         @section                = @course.course_sections.create
@@ -635,7 +635,7 @@ describe EnrollmentsApiController, type: :request do
     context "self enrollment" do
       before :once do
         Account.default.allow_self_enrollment!
-        course(active_all: true)
+        course_factory(active_all: true)
         @course.update_attribute(:self_enrollment, true)
         @unenrolled_user = user_with_pseudonym
         @path = "/api/v1/courses/#{@course.id}/enrollments"
@@ -1122,7 +1122,7 @@ describe EnrollmentsApiController, type: :request do
         it "should not include ids from different contexts" do
           original_course = @course
 
-          course(:active_all => true, :user => @user)
+          course_factory(active_all: true, :user => @user)
           group2 = @course.groups.create!(:name => "My Group")
           group2.add_user(@student, 'accepted', true)
 
@@ -1190,9 +1190,9 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should return enrollments for unpublished courses" do
-        course
+        course_factory
         @course.claim
-        enrollment = course.enroll_student(@student)
+        enrollment = course_factory.enroll_student(@student)
         enrollment.update_attribute(:workflow_state, 'active')
 
         # without a state[] filter
@@ -1208,7 +1208,7 @@ describe EnrollmentsApiController, type: :request do
       it "should not return enrollments from other accounts" do
         # enroll the user in a course in another account
         account = Account.create!(:name => 'Account Two')
-        course = course(:account => account, :course_name => 'Account Two Course', :active_course => true)
+        course = course_factory(:account => account, :course_name => 'Account Two Course', :active_course => true)
         course.enroll_user(@student).accept!
 
         json = api_call(:get, @user_path, @user_params)
@@ -1251,7 +1251,7 @@ describe EnrollmentsApiController, type: :request do
         context "user context" do
           before :once do
             @original_course = @course
-            course.offer!
+            course_factory.offer!
             @role = @course.account.roles.build :name => 'CustomStudent'
             @role.base_role_type = 'StudentEnrollment'
             @role.save!
@@ -1479,9 +1479,9 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should not show enrollments for courses that aren't published" do
-        course
+        course_factory
         @course.claim
-        enrollment = course.enroll_student(@user)
+        enrollment = course_factory.enroll_student(@user)
         enrollment.update_attribute(:workflow_state, 'active')
 
         # Request w/o a state[] filter.
@@ -1495,9 +1495,9 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should show enrollments for courses that aren't published if state[]=current_and_future" do
-        course
+        course_factory
         @course.claim
-        enrollment = course.enroll_student(@user)
+        enrollment = course_factory.enroll_student(@user)
         enrollment.update_attribute(:workflow_state, 'active')
 
         json = api_call(:get, @user_path,
@@ -1506,9 +1506,9 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should accept multiple state[] filters" do
-        course
+        course_factory
         @course.offer!
-        enrollment = course.enroll_student(@user)
+        enrollment = course_factory.enroll_student(@user)
         enrollment.update_attribute(:workflow_state, 'completed')
 
         json = api_call(:get, @user_path,
@@ -1624,7 +1624,7 @@ describe EnrollmentsApiController, type: :request do
       before :once do
         @student = user_factory(active_all: true, active_state: 'active')
         3.times do
-          course
+          course_factory
           @course.enroll_student(@student, enrollment_state: 'active')
         end
         @observer = user_factory(active_all: true, active_state: 'active')

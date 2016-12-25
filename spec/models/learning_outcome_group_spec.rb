@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe LearningOutcomeGroup do
 
   before :each do
-    course
+    course_factory
     @root = @course.root_outcome_group
   end
 

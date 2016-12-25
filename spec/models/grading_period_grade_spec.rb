@@ -20,7 +20,7 @@ require_relative '../spec_helper'
 
 describe GradingPeriodGrade do
   context "Soft deletion" do
-    let(:student) { User.create.student_enrollments.create! course: course }
+    let(:student) { User.create.student_enrollments.create! course: course_factory }
 
     let(:account) { Account.create }
     let(:group) { Factories::GradingPeriodGroupHelper.new.create_for_account(account) }

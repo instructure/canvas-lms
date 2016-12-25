@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContextModule do
   def course_module
-    @course = course(:active_all => true)
+    @course = course_factory(active_all: true)
     @module = @course.context_modules.create!(:name => "some module")
   end
 
@@ -134,7 +134,7 @@ describe ContextModule do
     it "should not allow adding invalid prerequisites" do
       course_module
       @module2 = @course.context_modules.build(:name => "next module")
-      invalid = course().context_modules.build(:name => "nope")
+      invalid = course_factory().context_modules.build(:name => "nope")
       @module2.prerequisites = "module_#{@module.id},module_#{invalid.id}"
 
       expect(@module2.prerequisites).to be_is_a(Array)
@@ -1191,7 +1191,7 @@ describe ContextModule do
 
   describe "restore" do
     it "should restore to unpublished state" do
-      course
+      course_factory
       @module = @course.context_modules.create!
       @module.destroy
       @module.restore
@@ -1201,7 +1201,7 @@ describe ContextModule do
 
   describe "#relock_warning?" do
     before :each do
-      course(:active_all => true)
+      course_factory(active_all: true)
     end
 
     it "should be true when adding a prerequisite" do

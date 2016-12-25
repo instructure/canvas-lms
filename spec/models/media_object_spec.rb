@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe MediaObject do
   context "loading with legacy support" do
     it "should load by either media_id or old_media_id" do
-      course
+      course_factory
       mo = factory_with_protected_attributes(MediaObject, :media_id => '0_abcdefgh', :old_media_id => '1_01234567', :context => @course)
 
       expect(MediaObject.by_media_id('0_abcdefgh').first).to eq mo
@@ -35,7 +35,7 @@ describe MediaObject do
 
   describe ".build_media_objects" do
     it "should delete attachments created temporarily for import" do
-      course
+      course_factory
       folder = Folder.assert_path(CC::CCHelper::MEDIA_OBJECTS_FOLDER, @course)
       @a1 = attachment_model(:folder => folder, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @a2 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
@@ -51,7 +51,7 @@ describe MediaObject do
     end
 
     it "should build media objects from attachment_id" do
-      course
+      course_factory
       @a1 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @a3 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @a4 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))

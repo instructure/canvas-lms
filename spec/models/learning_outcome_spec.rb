@@ -651,7 +651,7 @@ describe LearningOutcome do
 
     context "non-global outcome" do
       before :once do
-        course(:active_course => 1)
+        course_factory(:active_course => 1)
         @outcome = @course.created_learning_outcomes.create!(:title => 'non-global outcome')
       end
 

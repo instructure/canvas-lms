@@ -148,7 +148,7 @@ describe "communication_channels/confirm.html.erb" do
 
   context "invitations" do
     before do
-      course(:active_all => true)
+      course_factory(active_all: true)
       assigns[:course] = @course
       assigns[:enrollment] = @enrollment = @course.enroll_user(@user)
     end

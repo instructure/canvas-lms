@@ -87,7 +87,7 @@ describe ConversationsController do
     it "should return conversations matching the specified filter" do
       user_session(@student)
       @c1 = conversation
-      @other_course = course(:active_all => true)
+      @other_course = course_factory(active_all: true)
       enrollment = @other_course.enroll_student(@user)
       enrollment.workflow_state = 'active'
       enrollment.save!
@@ -104,7 +104,7 @@ describe ConversationsController do
       user_session(@student)
       @course1 = @course
       @c1 = conversation(:course => @course1)
-      @course2 = course(:active_all => true)
+      @course2 = course_factory(active_all: true)
       enrollment = @course2.enroll_student(@user)
       enrollment.workflow_state = 'active'
       enrollment.save!
@@ -131,7 +131,7 @@ describe ConversationsController do
     it "should return conversations matching a user filter" do
       user_session(@student)
       @c1 = conversation
-      @other_course = course(:active_all => true)
+      @other_course = course_factory(active_all: true)
       enrollment = @other_course.enroll_student(@user)
       enrollment.workflow_state = 'active'
       enrollment.save!
@@ -264,7 +264,7 @@ describe ConversationsController do
       # can cause us to grab stale conversation_context_codes
       # which screws everything up
       enable_cache do
-        course1 = course(:active_all => true)
+        course1 = course_factory(active_all: true)
 
         student1 = user_factory(active_user: true)
         student2 = user_factory(active_user: true)
@@ -279,7 +279,7 @@ describe ConversationsController do
           expect(response).to be_success
         end
 
-        course2 = course(:active_all => true)
+        course2 = course_factory(active_all: true)
         course2.enroll_user(student2, "StudentEnrollment").accept!
         course2.enroll_user(student1, "StudentEnrollment").accept!
         user_session(User.find(student1.id)) # clear process local enrollment cache
@@ -379,9 +379,9 @@ describe ConversationsController do
     it "should correctly infer context tags" do
       course_with_teacher_logged_in(:active_all => true)
       @course1 = @course
-      @course2 = course(:active_all => true)
+      @course2 = course_factory(active_all: true)
       @course2.enroll_teacher(@user).accept
-      @course3 = course(:active_all => true)
+      @course3 = course_factory(active_all: true)
       @course3.enroll_student(@user)
       @group1 = @course1.groups.create!
       @group2 = @course1.groups.create!

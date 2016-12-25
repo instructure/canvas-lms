@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 context "accessing public content" do
   before :each do
-    course(:active_all => true)
+    course_factory(active_all: true)
     @course.update_attribute(:is_public, true)
     @course.update_attribute(:is_public_to_auth_users, true)
   end

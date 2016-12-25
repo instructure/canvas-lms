@@ -193,7 +193,7 @@ describe CalendarEventsApiController, type: :request do
       contexts = [@course.asset_string]
 
       # second context the user cannot access
-      course()
+      course_factory()
       @course.calendar_events.create(:title => "unauthorized_course", :start_at => '2012-01-08 12:00:00')
       contexts.push(@course.asset_string)
 
@@ -267,7 +267,7 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it "should not allow anonymous users to access a non-public context" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       public_course_query(:opts => {:expected_status => 401})
     end
 
@@ -386,7 +386,7 @@ describe CalendarEventsApiController, type: :request do
 
       context "basic scenarios" do
         before :once do
-          course(:active_all => true)
+          course_factory(active_all: true)
           @teacher = @course.admins.first
           student_in_course :course => @course, :user => @me, :active_all => true
         end
@@ -578,7 +578,7 @@ describe CalendarEventsApiController, type: :request do
           Notification.create! :name => 'Appointment Canceled By User', :category => "TestImmediately"
 
           if as_student
-            course(:active_all => true)
+            course_factory(active_all: true)
             @teacher = @course.admins.first
             student_in_course :course => @course, :user => @me, :active_all => true
 
@@ -745,7 +745,7 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it 'should enforce permissions' do
-      event = course.calendar_events.create(:title => 'event')
+      event = course_factory.calendar_events.create(:title => 'event')
       raw_api_call(:get, "/api/v1/calendar_events/#{event.id}", {
         :controller => 'calendar_events_api', :action => 'show', :id => event.id.to_s, :format => 'json'})
       expect(JSON.parse(response.body)['status']).to eq 'unauthorized'
@@ -1357,7 +1357,7 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it 'should enforce permissions' do
-      assignment = course.assignments.create(:title => 'event')
+      assignment = course_factory.assignments.create(:title => 'event')
       raw_api_call(:get, "/api/v1/calendar_events/assignment_#{assignment.id}", {
         :controller => 'calendar_events_api', :action => 'show', :id => "assignment_#{assignment.id}", :format => 'json'})
       expect(JSON.parse(response.body)['status']).to eq 'unauthorized'
@@ -1852,7 +1852,7 @@ describe CalendarEventsApiController, type: :request do
             context 'when in different courses' do
               before(:each) do
                 @course1 = @course
-                @course2 = course(:active_all => true)
+                @course2 = course_factory(active_all: true)
 
                 @assignment1 = @default_assignment
                 @assignment2 = @course2.assignments.create!(:title => 'Override2', :due_at => '2012-01-13 12:00:00Z')

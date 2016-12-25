@@ -20,14 +20,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ObserverEnrollment do
   before do
-    @course1 = course(:active_all => 1)
+    @course1 = course_factory(active_all: true)
     @student = user_factory
     @observer = user_factory
     @student_enrollment = @course1.enroll_student(@student)
     @observer_enrollment = @course1.enroll_user(@observer, 'ObserverEnrollment')
     @observer_enrollment.update_attribute(:associated_user_id, @student.id)
 
-    @course2 = course(:active_all => 1)
+    @course2 = course_factory(active_all: true)
     @student_enrollment2 = @course2.enroll_student(@student)
     @observer_enrollment2 = @course2.enroll_user(@observer, 'ObserverEnrollment')
     @observer_enrollment2.update_attribute(:associated_user_id, @student.id)

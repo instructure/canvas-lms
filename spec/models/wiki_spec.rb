@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Wiki do
   before :once do
-    course
+    course_factory
     @wiki = @course.wiki
   end
 

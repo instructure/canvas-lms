@@ -17,7 +17,7 @@
 #
 
 module Factories
-  def course(opts={})
+  def course_factory(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do
       @course = Course.create!(:name => opts[:course_name], :account => account, :is_public => !!opts[:is_public])
@@ -34,7 +34,6 @@ module Factories
     end
     @course
   end
-  alias_method :course_factory, :course
 
   def course_model(opts={})
     allow_reusable = opts.delete :reusable
@@ -58,7 +57,7 @@ module Factories
   end
 
   def course_with_user(enrollment_type, opts={})
-    @course = opts[:course] || course(opts)
+    @course = opts[:course] || course_factory(opts)
     @user = opts[:user] || @course.shard.activate { user_factory(opts) }
     @enrollment = @course.enroll_user(@user, enrollment_type, opts)
     @user.save!

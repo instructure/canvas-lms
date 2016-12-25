@@ -6,7 +6,7 @@ describe "context modules" do
 
   context "as an observer" do
     before(:each) do
-      @course = course(:active_all => true)
+      @course = course_factory(active_all: true)
       @student = user_factory(active_all: true, :active_state => 'active')
       @observer = user_factory(active_all: true, :active_state => 'active')
 

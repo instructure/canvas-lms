@@ -25,14 +25,14 @@ describe "course" do
   # normally this would be a controller test, but there is a some code in the
   # views that i need to not explode
   it "should not require authorization for public courses" do
-    course(:active_all => true)
+    course_factory(active_all: true)
     @course.update_attribute(:is_public, true)
     get "/courses/#{@course.id}"
     expect(response).to be_success
   end
 
   it "should load syllabus on public course with no user logged in" do
-    course(:active_all => true)
+    course_factory(active_all: true)
     @course.update_attribute(:is_public, true)
     get "/courses/#{@course.id}/assignments/syllabus"
     expect(response).to be_success
@@ -40,7 +40,7 @@ describe "course" do
 
   it "should show the migration-in-progress notice" do
     enable_cache do
-      course(active_all: true)
+      course_factory(active_all: true)
       user_session(@teacher)
       migration = @course.content_migrations.build
       migration.migration_settings[:import_in_progress_notice] = '1'
@@ -62,7 +62,7 @@ describe "course" do
 
   it "should not show the migration-in-progress notice to students" do
     enable_cache do
-      course(active_all: true)
+      course_factory(active_all: true)
       student_in_course active_all: true
       user_session(@student)
       migration = @course.content_migrations.build

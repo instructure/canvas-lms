@@ -954,7 +954,7 @@ describe Account do
     end
 
     it "should grant :read_outcomes to enrollees in account courses" do
-      course(:account => Account.default)
+      course_factory(:account => Account.default)
       teacher_in_course
       student_in_course
       expect(Account.default.grants_right?(@teacher, :read_outcomes)).to be_truthy
@@ -962,7 +962,7 @@ describe Account do
     end
 
     it "should grant :read_outcomes to enrollees in subaccount courses" do
-      course(:account => Account.default.sub_accounts.create!)
+      course_factory(:account => Account.default.sub_accounts.create!)
       teacher_in_course
       student_in_course
       expect(Account.default.grants_right?(@teacher, :read_outcomes)).to be_truthy

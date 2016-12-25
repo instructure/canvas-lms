@@ -15,7 +15,7 @@ describe "Standard Common Cartridge importing" do
       @course_data['all_files_export'] ||= {}
       @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
-      @course = course
+      @course = course_factory
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
@@ -37,7 +37,7 @@ describe "Standard Common Cartridge importing" do
   def import_from_file(filename)
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/#{filename}")
     unzipped_file_path = create_temp_dir!
-    @course = course
+    @course = course_factory
     @migration = ContentMigration.create(:context => @course)
     converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi',
       :base_download_dir=>unzipped_file_path, :content_migration => @migration)
@@ -145,7 +145,7 @@ describe "Standard Common Cartridge importing" do
       @course_data['all_files_export'] ||= {}
       @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
-      @course = course
+      @course = course_factory
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)

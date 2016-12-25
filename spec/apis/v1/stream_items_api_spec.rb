@@ -78,7 +78,7 @@ describe UsersController, type: :request do
       @student = user_factory(active_all: true)
       @shard1.activate do
         @account = Account.create!
-        course(:active_all => true, :account => @account)
+        course_factory(active_all: true, :account => @account)
         @course.enroll_student(@student).accept!
         @context = @course
         discussion_topic_model
@@ -107,7 +107,7 @@ describe UsersController, type: :request do
 
     it "should find cross-shard submission comments" do
       @student = user_factory(active_all: true)
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.enroll_student(@student).accept!
       @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
       @shard1.activate do

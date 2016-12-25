@@ -48,7 +48,7 @@ describe "LTI integration tests" do
   let_once(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
 
   let_once(:canvas_course) {
-    course(active_course: true, course_name: 'my course').tap do |course|
+    course_factory(active_course: true, course_name: 'my course').tap do |course|
       course.course_code = 'abc'
       course.sis_source_id = 'course_sis_id'
       course.root_account = root_account

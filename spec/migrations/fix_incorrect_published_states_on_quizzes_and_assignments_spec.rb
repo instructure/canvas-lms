@@ -21,7 +21,7 @@ require 'db/migrate/20140616202420_fix_incorrect_published_states_for_quizzes_an
 
 describe 'FixIncorrectPublishedStatesOnQuizzesAndAssignments' do
   it "should update the right assignments" do
-    course(:active_all => true)
+    course_factory(active_all: true)
     a1 = @course.assignments.create!(:name => 'hi')
     expect(a1.workflow_state).to eq "published"
 
@@ -46,7 +46,7 @@ describe 'FixIncorrectPublishedStatesOnQuizzesAndAssignments' do
   end
 
   it "should update the right quizzes" do
-    course(active_all: true)
+    course_factory(active_all: true)
     q1 = @course.quizzes.create! title: 'this'
     expect(q1.workflow_state).to eq 'created'
 

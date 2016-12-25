@@ -194,7 +194,7 @@ describe FilesController do
 
     context "file menu tool visibility" do
       before do
-        course(:active_all => true)
+        course_factory(active_all: true)
         @tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
         @tool.file_menu = {
           :visibility => "admins"
@@ -1030,7 +1030,7 @@ describe FilesController do
         @shard1.activate do
           @student = user_factory(active_user: true)
         end
-        course(:active_all => true, :account => account)
+        course_factory(active_all: true, :account => account)
         @course.enroll_user(@student, "StudentEnrollment").accept!
         @assignment = @course.assignments.create!(:title => 'upload_assignment', :submission_types => 'online_upload')
 

@@ -19,7 +19,7 @@ describe "conversations new" do
   context 'submission comment stream items' do
     before do
       @course1 = @course
-      @course2 = course(active_course: true)
+      @course2 = course_factory(active_course: true)
       teacher_in_course(user: @teacher, course: @course2, active_all: true)
       student_in_course(user: @s1, active_all: true, course: @course1)
       student_in_course(user: @s2, active_all: true, course: @course2)

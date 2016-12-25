@@ -69,8 +69,8 @@ describe ActiveRecord::Base do
 
   describe "find in batches" do
     before :once do
-      @c1 = course(:name => 'course1', :active_course => true)
-      @c2 = course(:name => 'course2', :active_course => true)
+      @c1 = course_factory(:name => 'course1', :active_course => true)
+      @c2 = course_factory(:name => 'course2', :active_course => true)
       u1 = user_factory(:name => 'user1', :active_user => true)
       u2 = user_factory(:name => 'user2', :active_user => true)
       u3 = user_factory(:name => 'user3', :active_user => true)

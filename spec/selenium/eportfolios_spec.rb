@@ -159,7 +159,7 @@ describe "eportfolios file upload" do
                                    :username => "student@example.com",
                                    :password => @password
     @student.save!
-    @course = course :active_course => true
+    @course = course_factory :active_course => true
     @course.enroll_student(@student).accept!
     @course.reload
     eportfolio_model({:user => @user, :name => "student content"})

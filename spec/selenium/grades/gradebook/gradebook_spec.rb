@@ -291,7 +291,7 @@ describe "gradebook" do
 
   context 'grading quiz submissions' do
     # set up course and users
-    let(:test_course) { course() }
+    let(:test_course) { course_factory() }
     let(:teacher)     { user_factory(active_all: true) }
     let(:student)     { user_factory(active_all: true) }
     let!(:enroll_teacher_and_students) do

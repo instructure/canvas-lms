@@ -326,7 +326,7 @@ describe 'Submissions API', type: :request do
     it "does not find sections in other root accounts" do
       acct = account_model(:name => 'other root')
       @first_course = @course
-      course(:active_all => true, :account => acct)
+      course_factory(active_all: true, :account => acct)
       @course.default_section.update_attribute('sis_source_id', 'my-section-sis-id')
       json = api_call(:get,
             "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions",
@@ -1385,7 +1385,7 @@ describe 'Submissions API', type: :request do
     context 'OriginalityReport' do
       it 'includes has_originality_report if the submission has an originality_report' do
         attachment_model
-        course active_all: true
+        course_factory active_all: true
         student_in_course active_all: true
         teacher_in_course active_all: true
         @assignment = @course.assignments.create!(title: "some assignment",
@@ -1411,7 +1411,7 @@ describe 'Submissions API', type: :request do
 
       it 'does not include has_originality_report if the submission has no originality_report' do
         attachment_model
-        course active_all: true
+        course_factory active_all: true
         student_in_course active_all: true
         teacher_in_course active_all: true
         @assignment = @course.assignments.create!(title: "some assignment",
@@ -3611,7 +3611,7 @@ describe 'Submissions API', type: :request do
   end
   describe '#index' do
     context 'grouped_submissions' do
-      let(:test_course) { course() }
+      let(:test_course) { course_factory() }
       let(:teacher)   { user_factory(active_all: true) }
       let(:student1)  { user_factory(active_all: true) }
       let(:student2)  { user_factory(active_all: true) }

@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe Importers::CalendarEventImporter do
 
-  let_once(:migration_course) { course(active_all: true) }
+  let_once(:migration_course) { course_factory(active_all: true) }
 
   let(:migration) { migration_course.content_migrations.create! }
 

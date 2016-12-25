@@ -270,8 +270,8 @@ describe "MessageableUser::Calculator" do
 
     describe "#uncached_group_ids_in_courses" do
       it "should include active groups in the courses" do
-        course1 = course
-        course2 = course
+        course1 = course_factory
+        course2 = course_factory
         group1 = group(:group_context => course1)
         group2 = group(:group_context => course2)
         ids = @calculator.uncached_group_ids_in_courses([course1, course2])
@@ -280,14 +280,14 @@ describe "MessageableUser::Calculator" do
       end
 
       it "should not include deleted groups in the courses" do
-        course
+        course_factory
         group(:group_context => @course).destroy
         expect(@calculator.uncached_group_ids_in_courses([@course])).not_to include(@group.id)
       end
 
       it "should not include groups in other courses" do
-        course1 = course
-        course2 = course
+        course1 = course_factory
+        course2 = course_factory
         group(:group_context => course1)
         expect(@calculator.uncached_group_ids_in_courses([course2])).not_to include(@group.id)
       end
@@ -471,8 +471,8 @@ describe "MessageableUser::Calculator" do
     before do
       @account1 = @shard1.activate{ Account.create! }
       @account2 = @shard2.activate{ Account.create! }
-      @course1 = course(:account => @account1, :active_all => 1)
-      @course2 = course(:account => @account2, :active_all => 1)
+      @course1 = course_factory(:account => @account1, :active_all => 1)
+      @course2 = course_factory(:account => @account2, :active_all => 1)
       course_with_student(:course => @course1, :user => @viewing_user, :active_all => 1)
       course_with_student(:course => @course2, :user => @viewing_user, :active_all => 1)
     end
@@ -1224,7 +1224,7 @@ describe "MessageableUser::Calculator" do
 
         it "should properly interpret and translate exclude_ids" do
           @shard1.activate do
-            course(:account => Account.create!, :active_all => true)
+            course_factory(:account => Account.create!, :active_all => true)
             student_in_course(:user => @viewing_user, :active_all => true)
           end
 

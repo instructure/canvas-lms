@@ -33,7 +33,7 @@ describe ContentMigration do
 
   context "import_object?" do
     before :once do
-      course
+      course_factory
       @cm = ContentMigration.new(context: @course)
     end
 

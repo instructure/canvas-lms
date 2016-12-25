@@ -174,7 +174,7 @@ describe "scheduler" do
 
       first_course = @course
 
-      other_course = course
+      other_course = course_factory
       other_course.enroll_teacher(@teacher).accept!
       other_course.offer
       other_course.enroll_student(student1).accept!

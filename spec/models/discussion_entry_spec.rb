@@ -60,7 +60,7 @@ describe DiscussionEntry do
   end
 
   it "should preserve parent_id if valid" do
-    course
+    course_factory
     entry = topic.discussion_entries.create!
     sub_entry = topic.discussion_entries.build
     sub_entry.parent_id = entry.id

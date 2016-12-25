@@ -22,7 +22,7 @@ describe 'Originality Reports API', type: :request do
   before :each do
     attachment_model
 
-    course(active_all: true)
+    course_factory(active_all: true)
     student_in_course active_all: true
     teacher_in_course active_all: true
 

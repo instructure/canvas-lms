@@ -576,7 +576,7 @@ describe Conversation do
         u2 = student_in_course(:active_all => true, :course => @course).user
         u3 = user_factory
         @course1 = @course
-        @course2 = course(:active_all => true)
+        @course2 = course_factory(active_all: true)
         @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1, u2, u3], false)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string, @course2.asset_string])
@@ -599,7 +599,7 @@ describe Conversation do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
-        @course2 = course(:active_all => true)
+        @course2 = course_factory(active_all: true)
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
@@ -614,7 +614,7 @@ describe Conversation do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
-        @course2 = course(:active_all => true)
+        @course2 = course_factory(active_all: true)
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
@@ -629,8 +629,8 @@ describe Conversation do
         specs_require_sharding
 
         it "should set all tags on the other shard's participants" do
-          course1 = @shard1.activate{ course(:account => Account.create!, :active_all => true) }
-          course2 = @shard2.activate{ course(:account => Account.create!, :active_all => true) }
+          course1 = @shard1.activate{ course_factory(:account => Account.create!, :active_all => true) }
+          course2 = @shard2.activate{ course_factory(:account => Account.create!, :active_all => true) }
           user1 = student_in_course(:course => course1, :active_all => true).user
           user2 = student_in_course(:course => course2, :active_all => true).user
           student_in_course(:course => course2, :user => user1, :active_all => true)
@@ -665,8 +665,8 @@ describe Conversation do
     end
 
     context "subsequent tags" do
-      let_once(:course1) { @course1 = course(active_all: true) }
-      let_once(:course2) { @course2 = course(active_all: true) }
+      let_once(:course1) { @course1 = course_factory(active_all: true) }
+      let_once(:course2) { @course2 = course_factory(active_all: true) }
       let_once(:u1) { student_in_course(active_all: true, course: course1).user }
       let_once(:u2) { student_in_course(active_all: true, course: course1).user }
       let_once(:u3) { student_in_course(active_all: true, course: course2).user }
@@ -711,8 +711,8 @@ describe Conversation do
     end
 
     context "private conversations" do
-      let_once(:course1) { @course1 = course(active_all: true) }
-      let_once(:course2) { @course2 = course(active_all: true) }
+      let_once(:course1) { @course1 = course_factory(active_all: true) }
+      let_once(:course2) { @course2 = course_factory(active_all: true) }
       let_once(:u1) { student_in_course(active_all: true, course: course1).user }
       let_once(:u2) { student_in_course(active_all: true, course: course1).user }
 
@@ -757,8 +757,8 @@ describe Conversation do
     end
 
     context "group conversations" do
-      let_once(:course1) { @course1 = course(active_all: true) }
-      let_once(:course2) { @course2 = course(active_all: true) }
+      let_once(:course1) { @course1 = course_factory(active_all: true) }
+      let_once(:course2) { @course2 = course_factory(active_all: true) }
       let_once(:u1) { student_in_course(active_all: true, course: course1).user }
       let_once(:u2) { student_in_course(active_all: true, course: course1).user }
 
@@ -811,7 +811,7 @@ describe Conversation do
         @u1 = student_in_course(:active_all => true).user
         @u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
-        @course2 = course(:active_all => true)
+        @course2 = course_factory(active_all: true)
         @course2.enroll_student(@u2).update_attribute(:workflow_state, 'active')
         @u3 = student_in_course(:active_all => true, :course => @course2).user
         @conversation = Conversation.initiate([@u1, @u2, @u3], false)
@@ -863,14 +863,14 @@ describe Conversation do
         conversation = Conversation.initiate([@teacher, @student], true)
         conversation.add_message(@teacher, 'first message')
 
-        new_course = course
+        new_course = course_factory
         new_course.offer!
         new_course.enroll_teacher(@teacher).accept!
         new_course.enroll_student(@student).accept!
 
         @old_course.complete!
 
-        third_course = course
+        third_course = course_factory
         third_course.offer!
         third_course.enroll_teacher(@teacher).accept!
 
@@ -889,11 +889,11 @@ describe Conversation do
 
         @old_course.complete!
 
-        teacher_course = course
+        teacher_course = course_factory
         teacher_course.offer!
         teacher_course.enroll_teacher(@teacher).accept!
 
-        student_course = course
+        student_course = course_factory
         student_course.offer!
         student_course.enroll_student(@student).accept!
 
@@ -906,7 +906,7 @@ describe Conversation do
       end
 
       it "should use concluded tags from multiple courses" do
-        old_course2 = course
+        old_course2 = course_factory
 
         old_course2.offer!
         old_course2.enroll_teacher(@teacher).accept!
@@ -917,11 +917,11 @@ describe Conversation do
 
         [@old_course, old_course2].each { |c| c.complete! }
 
-        teacher_course = course
+        teacher_course = course_factory
         teacher_course.offer!
         teacher_course.enroll_teacher(@teacher).accept!
 
-        student_course = course
+        student_course = course_factory
         student_course.offer!
         student_course.enroll_student(@student).accept!
 
@@ -960,7 +960,7 @@ describe Conversation do
         @old_course.complete!
         old_group.destroy
 
-        new_course = course
+        new_course = course_factory
         new_course.offer!
         [student1, student2].each { |s| new_course.enroll_student(s).accept! }
         new_group = Group.create!(:context => new_course)
@@ -995,7 +995,7 @@ describe Conversation do
     end
 
     it "includes the context's root account when initiating" do
-      new_course = course
+      new_course = course_factory
       conversation = Conversation.initiate([], false, context_type: 'Course', context_id: new_course.id)
       expect(conversation.root_account_ids).to eql [new_course.root_account_id]
     end
@@ -1006,7 +1006,7 @@ describe Conversation do
       it "should use global ids" do
         @shard1.activate do
           @account = account_model
-          new_course = course(:account => @account)
+          new_course = course_factory(:account => @account)
           u1 = user_factory
           u2 = user_factory
           conversation = Conversation.initiate([u1, u2], false, context_type: 'Course', context_id: new_course.id)
