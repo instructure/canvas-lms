@@ -29,6 +29,7 @@ group :test do
   gem 'rspec-collection_matchers', '1.1.2'
 
   gem 'rubocop', require: false
+    gem 'rainbow', '2.1.0', require: false
   gem 'rubocop-rspec', require: false
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
 
