@@ -468,6 +468,7 @@ class Account < ActiveRecord::Base
     columns = "courses.id, courses.name, courses.workflow_state, courses.course_code, courses.sis_source_id, courses.enrollment_term_id"
     associated_courses = self.associated_courses.active.order(opts[:order])
     associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
+    associated_courses = associated_courses.master_courses if opts[:only_master_courses]
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
     associated_courses = yield associated_courses if block_given?
     associated_courses.limit(opts[:limit]).active_first.select(columns).to_a

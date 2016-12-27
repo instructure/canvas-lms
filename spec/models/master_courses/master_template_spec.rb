@@ -124,4 +124,34 @@ describe MasterCourses::MasterTemplate do
       expect(mig.master_template).to eq template
     end
   end
+
+  describe "preload_index_data" do
+    it "should preload child subscription counts and last_export_at" do
+      t1 = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      t2 = MasterCourses::MasterTemplate.set_as_master_course(Course.create!)
+      t3 = MasterCourses::MasterTemplate.set_as_master_course(Course.create!)
+
+      t1.add_child_course!(Course.create!)
+      3.times do
+        t2.add_child_course!(Course.create!)
+      end
+
+      time1 = 2.days.ago
+      time2 = 1.day.ago
+      t1.master_migrations.create!(:exports_started_at => time1, :workflow_state => 'completed')
+      t1.master_migrations.create!(:exports_started_at => time2, :workflow_state => 'completed')
+      t2.master_migrations.create!(:exports_started_at => time1, :workflow_state => 'completed')
+
+      MasterCourses::MasterTemplate.preload_index_data([t1, t2, t3])
+
+      expect(t1.child_course_count).to eq 1
+      expect(t2.child_course_count).to eq 3
+      expect(t3.child_course_count).to eq 0
+
+      expect(t1.instance_variable_get(:@last_export_at)).to eq time2
+      expect(t2.instance_variable_get(:@last_export_at)).to eq time1
+      expect(t3.instance_variable_defined?(:@last_export_at)).to be_truthy
+      expect(t3.instance_variable_get(:@last_export_at)).to be_nil
+    end
+  end
 end

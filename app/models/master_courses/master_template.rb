@@ -14,6 +14,9 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   strong_params
 
+  attr_accessor :child_course_count
+  attr_writer :last_export_at
+
   include Canvas::SoftDeletable
 
   include MasterCourses::TagHelper
@@ -54,6 +57,17 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def self.full_template_for(course)
     course.master_course_templates.active.for_full_course.first
+  end
+
+  def self.preload_index_data(templates)
+    child_counts = MasterCourses::ChildSubscription.active.where(:master_template_id => templates).group(:master_template_id).count
+    last_export_times = Hash[MasterCourses::MasterMigration.where(:master_template_id => templates, :workflow_state => "completed").
+      order("master_template_id, id DESC").pluck("DISTINCT ON (master_template_id) master_template_id, exports_started_at")]
+
+    templates.each do |template|
+      template.child_course_count = child_counts[template.id] || 0
+      template.last_export_at = last_export_times[template.id]
+    end
   end
 
   def migration_id_for(obj, prepend="")
