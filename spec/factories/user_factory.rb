@@ -64,6 +64,7 @@ module Factories
     @cc = communication_channel(@user, opts) if opts[:active_cc]
     @user
   end
+  alias_method :user_factory, :user
 
   def user_with_pseudonym(opts={})
     user(opts) unless opts[:user]

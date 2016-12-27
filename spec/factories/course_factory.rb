@@ -34,6 +34,7 @@ module Factories
     end
     @course
   end
+  alias_method :course_factory, :course
 
   def course_model(opts={})
     allow_reusable = opts.delete :reusable
