@@ -23,7 +23,7 @@ module Api::V1::Attachment
   include Api::V1::UsageRights
 
   def can_view_hidden_files?(context=@context, user=@current_user, session=nil)
-    context.grants_any_right?(user, session, :manage_files, :read_as_admin)
+    context.grants_any_right?(user, session, :manage_files, :read_as_admin, :manage_contents)
   end
 
   def attachments_json(files, user, url_options = {}, options = {})
