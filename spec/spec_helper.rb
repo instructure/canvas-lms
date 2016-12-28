@@ -936,3 +936,18 @@ end
 Dir[Rails.root+'{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
   require f
 end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    # Choose a test framework:
+    with.test_framework :rspec
+
+    # Choose one or more libraries:
+    with.library :active_record
+    with.library :active_model
+    # Disable the action_controller matchers until shoulda-matchers supports new compound matchers
+    # with.library :action_controller
+    # Or, choose the following (which implies all of the above):
+    # with.library :rails
+  end
+end
