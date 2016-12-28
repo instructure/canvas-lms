@@ -59,15 +59,7 @@ describe MasterCourses::CollectionRestrictor do
       expect(@aq.editing_restricted?(:content)).to be_truthy
       expect(@aq.editing_restricted?(:settings)).to be_falsey
       expect(@aq.editing_restricted?(:any)).to be_truthy
-      expect(@aq.editing_restricted?(:all)).to be_falsey
-    end
-
-    it "should return true if fully locked" do
-      @tag.update_attribute(:restrictions, {:content => true, :settings => true})
-      expect(@aq.editing_restricted?(:content)).to be_truthy
-      expect(@aq.editing_restricted?(:settings)).to be_truthy
-      expect(@aq.editing_restricted?(:any)).to be_truthy
-      expect(@aq.editing_restricted?(:all)).to be_truthy
+      expect(@aq.editing_restricted?(:all)).to be_truthy # in retrospect - if we're only classifying content as restricted then this should probably be true
     end
   end
 end

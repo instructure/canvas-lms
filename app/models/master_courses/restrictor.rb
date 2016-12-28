@@ -58,9 +58,9 @@ module MasterCourses::Restrictor
 
       case edit_type
       when :all
-        MasterCourses::LOCK_TYPES.all?{|type| restrictions[type]}
+        self.class.base_class.restricted_column_settings.keys.all?{|type| restrictions[type]} # make it possible to only have restrictions on one type
       when :any
-        MasterCourses::LOCK_TYPES.any?{|type| restrictions[type]}
+        self.class.base_class.restricted_column_settings.keys.any?{|type| restrictions[type]}
       when *MasterCourses::LOCK_TYPES
         !!restrictions[edit_type]
       else
@@ -137,6 +137,7 @@ module MasterCourses::Restrictor
         locked_types << type
       end
     end
+
     locked_types
   end
 
