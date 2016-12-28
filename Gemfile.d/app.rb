@@ -73,8 +73,8 @@ gem 'netaddr', '1.5.0', require: false
 gem 'nokogiri', '1.6.6.2.20150813143452', require: false, github: 'codekitchen/nokogiri', ref: 'd47e53f885'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', require: false
-gem 'parallel', '1.6.2', require: false
-  gem 'ruby-progressbar', '1.7.5', require: false #used to show progress of S3Uploader
+gem 'parallel', '1.10.0', require: false
+  gem 'ruby-progressbar', '1.8.1', require: false #used to show progress of S3Uploader
 gem 'retriable', '1.4.1'
 gem 'rake', '12.0.0'
 gem 'ratom-nokogiri', '0.10.4', require: false
