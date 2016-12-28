@@ -250,17 +250,16 @@ define [
     ok view.$el.find('#has_group_category').attr('readonly')
     equal view.$el.find('#has_group_category').attr('aria-readonly'), 'true'
 
-  test 'ignoreClickHandler is called for a disabled checkbox', ->
+  test 'disableCheckbox is called for a disabled checkbox', ->
     view = @editView(in_closed_grading_period: true)
     view.$el.appendTo $('#fixtures')
     $('<input type="checkbox" id="checkbox_fixture"/>').appendTo $(view.$el)
 
     # because we're stubbing so late we must call disableFields() again
-    ignoreClickHandlerStub =  @stub view, 'ignoreClickHandler'
+    disableCheckboxStub =  @stub view, 'disableCheckbox'
     view.disableFields()
 
-    view.$el.find('#checkbox_fixture').click()
-    equal ignoreClickHandlerStub.calledOnce, true
+    equal disableCheckboxStub.called, true
 
   test 'ignoreClickHandler is called for a disabled radio', ->
     view = @editView(in_closed_grading_period: true)

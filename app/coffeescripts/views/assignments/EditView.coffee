@@ -549,8 +549,10 @@ define [
       ]
       ignoreFilter = ignoreFields.map((field) -> "not(#{field})").join(":")
 
+      self = this
+      @$el.find(":checkbox:#{ignoreFilter}").each ->
+        self.disableCheckbox($(this), I18n.t("Cannot be edited for assignments in closed grading periods"))
       @$el.find(":radio:#{ignoreFilter}").click(@ignoreClickHandler)
-      @$el.find(":checkbox:#{ignoreFilter}").click(@ignoreClickHandler)
       @$el.find("select:#{ignoreFilter}").each(@lockSelectValueHandler)
 
     ignoreClickHandler: (event) ->
