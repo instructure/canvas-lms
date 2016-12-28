@@ -23,6 +23,7 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
     end
 
     it 'shows the due dates for Section B', priority: "2", test_id: 315651 do
+      skip "time bomb CNVS-34081"
       validate_vdd_quiz_tooltip_dates(
         '.date-due',
         "#{@section_b.name}\n#{format_date_for_view(@due_at_b)}"
