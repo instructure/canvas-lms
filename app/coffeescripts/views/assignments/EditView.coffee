@@ -22,10 +22,12 @@ define [
   'jqueryui/dialog'
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
+  'compiled/behaviors/tooltip'
 ], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, EditViewTemplate,
-userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
-AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
-ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
+  userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog,
+  preventDefault, MissingDateDialog, AssignmentGroupSelector,
+  GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
+  ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
 
   RichContentEditor.preloadRemoteModule()
 

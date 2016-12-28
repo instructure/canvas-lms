@@ -357,14 +357,10 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
-      $.fn.extend
-        timeoutTooltip: ->
-          return this
 
     teardown: ->
       fakeENV.teardown()
       document.getElementById('fixtures').innerHTML = ''
-      delete $.fn.timeoutTooltip
 
     editView: ->
       editView.apply(this, arguments)
