@@ -33,6 +33,10 @@ class DiscussionTopic < ActiveRecord::Base
   include ContextModuleItem
   include SearchTermHelper
   include Submittable
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:title, :message]
+  restrict_columns :settings, [:delayed_post_at, :require_initial_post, :discussion_type,
+                               :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating]
 
   attr_accessible(
     :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
