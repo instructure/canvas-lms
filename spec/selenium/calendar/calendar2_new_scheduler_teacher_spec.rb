@@ -84,6 +84,12 @@ describe "scheduler" do
         f('.pull-right .group_details').click
         expect(f('.EditPage')).to include_text("Edit new appointment group")
       end
+
+      it 'does not show the Find Appointment button for the teacher', priority: "1", test_id: 2936794 do
+        create_appointment_group title: "appointment1"
+        get "/calendar"
+        expect(f('#select-course-component')).not_to contain_css("#FindAppointmentButton")
+      end
     end
 
     context 'when the New Scheduler feature flag is turned off' do
