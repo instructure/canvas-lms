@@ -39,8 +39,10 @@ module RuboCop
       DEFAULT_FILE = File.expand_path("../../config/default.yml", __FILE__)
 
       def self.defaults!
-        hash = YAML.load_file(DEFAULT_FILE)
-        config = ConfigLoader.merge_with_default(hash, DEFAULT_FILE)
+        path = File.absolute_path(DEFAULT_FILE)
+        hash = ConfigLoader.send(:load_yaml_configuration, path)
+        config = Config.new(hash, path)
+        config = ConfigLoader.merge_with_default(config, path)
 
         ConfigLoader.instance_variable_set(:@default_configuration, config)
       end
