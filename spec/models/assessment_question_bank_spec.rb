@@ -46,7 +46,6 @@ describe AssessmentQuestionBank do
     end
 
     it "should exclude specified questions" do
-      [@q1.id, @q2.id, @q3.id, @q4.id, @q5.id, @q6.id, @q7.id, @q8.id, @q9.id, @q10.id]
       selected_ids = @bank.select_for_submission(@quiz.id, nil, 10, [@q1.id, @q10.id]).map(&:assessment_question_id)
 
       expect(selected_ids.include?(@q1.id)).to be_falsey
@@ -77,6 +76,13 @@ describe AssessmentQuestionBank do
       # shouldn't pick the same one over and over again
       # yes, technically there's a 0.000000000000000001% chance this will fail spontaneously - sue me
       expect(aq_ids.uniq.count > 1).to be_truthy
+    end
+
+    it "processes questions in :id sorted order" do
+      AssessmentQuestion.expects(:find_or_create_quiz_questions).with do |aqs, _, _, _|
+        aqs == aqs.sort_by(&:id)
+      end.returns([])
+      @bank.select_for_submission(@quiz.id, nil, 10)
     end
   end
 
