@@ -20,6 +20,13 @@ testWebpackConfig.plugins = testWebpackConfig.plugins.concat([
   new webpack.DefinePlugin(jspecEnv)
 ]);
 
+// These externals are necessary for Enzyme
+// See http://airbnb.io/enzyme/docs/guides/webpack.html
+testWebpackConfig.externals = testWebpackConfig.externals || {};
+testWebpackConfig.externals['react-dom/server'] = 'window';
+testWebpackConfig.externals['react/lib/ReactContext'] = 'true';
+testWebpackConfig.externals['react/lib/ExecutionEnvironment'] = 'true';
+
 testWebpackConfig.resolve.alias.qunit = 'qunitjs';
 testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/coffeescripts'))
 testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/javascripts/support'))

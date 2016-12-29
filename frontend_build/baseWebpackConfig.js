@@ -182,7 +182,6 @@ module.exports = {
       },
       {
         test: /\.json$/,
-        include: path.resolve(__dirname, '../public/javascripts'),
         exclude: /public\/javascripts\/vendor/,
         loader: 'json-loader'
       },
@@ -236,7 +235,7 @@ module.exports = {
     // in test mode, we do include all possible timezones in vendor/timezone/* into
     // the main bundle (see timezone_core.js). There are a few files in that dir
     // that are not js files, tell webpack to ignore them.
-    new webpack.IgnorePlugin(/(CHANGELOG|LICENSE|README|\.md|package.json)$/)
+    new webpack.IgnorePlugin(/(CHANGELOG|LICENSE|README|\.md|package.json)$/, /vendor\/timezone/)
 
   ] : [
 

@@ -16,6 +16,8 @@ vendor
 
 # vendor package in analytics
 /plugins/analytics/react-bootstrap-table.js
+# vendor package for enzyme
+enzyme_requireJS.js
 
 # need better hinting, skipping this atm due to false positives in vendor code
 /client_apps

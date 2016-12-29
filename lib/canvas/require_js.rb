@@ -42,6 +42,7 @@ module Canvas
           'react-addons-pure-render-mixin' => 'react-addons-pure-render-mixin_requireJS',
           'react-addons-test-utils' => 'react-addons-test-utils_requireJS',
           'react-addons-update' => 'react-addons-update_requireJS',
+          'enzyme' => 'enzyme_requireJS',
           :instructureicons => 'instructure-icons/',
           'parse-decimal-number' => 'parse-decimal-number_requireJS'
         }.update(cache_busting ? cache_busting_paths : {}).
