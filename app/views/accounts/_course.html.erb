@@ -24,7 +24,7 @@
       </div>
       <% if master_template %>
         <strong><%= t('Blueprint Course') %></strong>
-        <% if master_template.last_export_at %><br><%= t('Last Pushed Update: %{last_export_at}', :last_export_at => datetime_string(master_template.last_export_at)) %><% end %>
+        <% if master_template.last_export_completed_at %><br><%= t('Last Pushed Update: %{last_export_at}', :last_export_at => datetime_string(master_template.last_export_completed_at)) %><% end %>
         <%# TODO: add master_template.child_course_count here somewhere when we have a frd name %>
       <% else %>
         <% teacher_names_new = teacher_names[0, 2] %>

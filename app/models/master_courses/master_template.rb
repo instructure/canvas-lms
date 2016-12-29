@@ -15,7 +15,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   strong_params
 
   attr_accessor :child_course_count
-  attr_writer :last_export_at
+  attr_writer :last_export_completed_at
 
   include Canvas::SoftDeletable
 
@@ -62,11 +62,11 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   def self.preload_index_data(templates)
     child_counts = MasterCourses::ChildSubscription.active.where(:master_template_id => templates).group(:master_template_id).count
     last_export_times = Hash[MasterCourses::MasterMigration.where(:master_template_id => templates, :workflow_state => "completed").
-      order("master_template_id, id DESC").pluck("DISTINCT ON (master_template_id) master_template_id, exports_started_at")]
+      order("master_template_id, id DESC").pluck("DISTINCT ON (master_template_id) master_template_id, imports_completed_at")]
 
     templates.each do |template|
       template.child_course_count = child_counts[template.id] || 0
-      template.last_export_at = last_export_times[template.id]
+      template.last_export_completed_at = last_export_times[template.id]
     end
   end
 
@@ -88,11 +88,18 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     self.active_migration && self.active_migration.still_running?
   end
 
-  def last_export_at
-    unless defined?(@last_export_at)
-      @last_export_at = self.master_migrations.where(:workflow_state => "completed").order("id DESC").limit(1).pluck(:exports_started_at).first
+  def last_export_started_at
+    unless defined?(@last_export_started_at)
+      @last_export_started_at = self.master_migrations.where(:workflow_state => "completed").order("id DESC").limit(1).pluck(:exports_started_at).first
     end
-    @last_export_at
+    @last_export_started_at
+  end
+
+  def last_export_completed_at
+    unless defined?(@last_export_completed_at)
+      @last_export_completed_at = self.master_migrations.where(:workflow_state => "completed").order("id DESC").limit(1).pluck(:imports_completed_at).first
+    end
+    @last_export_completed_at
   end
 
   def ensure_tag_on_export(obj)

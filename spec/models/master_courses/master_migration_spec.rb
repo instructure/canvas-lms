@@ -140,6 +140,7 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       expect(@migration).to be_completed
+      expect(@migration.imports_completed_at).to be_present
 
       expect(@template.master_content_tags.polymorphic_where(:content => assmt).first.restrictions).to be_empty # never mind
 
