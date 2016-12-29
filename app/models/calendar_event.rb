@@ -27,6 +27,11 @@ class CalendarEvent < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
   strong_params
+
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:title, :description]
+  restrict_columns :settings, [:location_name, :location_address, :start_at, :end_at, :all_day, :all_day_date]
+
   attr_accessor :cancel_reason, :imported
 
   sanitize_field :description, CanvasSanitize::SANITIZE
