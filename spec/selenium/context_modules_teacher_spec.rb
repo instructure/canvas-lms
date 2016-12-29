@@ -619,6 +619,39 @@ describe "context modules" do
       expect(tag.indent).to eq 1
     end
 
+    context "edit dialog" do
+      before :each do
+        @mod = create_modules(2, true)
+        @mod[0].add_item({id: @assignment.id, type: 'assignment'})
+        @mod[0].add_item({id: @assignment2.id, type: 'assignment'})
+        get "/courses/#{@course.id}/modules"
+      end
+
+      it "shows all items are completed radio button", priority: "1", test_id: 248023 do
+        f("#context_module_#{@mod[0].id} .ig-header-admin .al-trigger").click
+        hover_and_click("#context_module_#{@mod[0].id} .edit_module_link")
+        f('.add-item .add_completion_criterion_link').click
+        expect(f('.ic-Radio')).to contain_css("input[type=radio][id = context_module_requirement_count_]")
+        expect(f('.ic-Radio .ic-Label').text).to eq('Students must complete all of these requirements')
+      end
+
+      it "shows complete one of these items radio button", priority: "1", test_id: 250294 do
+        f("#context_module_#{@mod[0].id} .ig-header-admin .al-trigger").click
+        hover_and_click("#context_module_#{@mod[0].id} .edit_module_link")
+        f('.add-item .add_completion_criterion_link').click
+        expect(ff('.ic-Radio')[1]).to contain_css("input[type=radio][id = context_module_requirement_count_1]")
+        expect(ff('.ic-Radio .ic-Label')[1].text).to eq('Student must complete one of these requirements')
+      end
+
+      it "does not show the radio buttons for module with no items", priority: "1", test_id: 3028275 do
+        f("#context_module_#{@mod[1].id} .ig-header-admin .al-trigger").click
+        hover_and_click("#context_module_#{@mod[1].id} .edit_module_link")
+        expect(f('.ic-Radio .ic-Label').text).not_to include('Students must complete all of these requirements')
+        expect(f('.ic-Radio .ic-Label').text).not_to include('Student must complete one of these requirements')
+        expect(f('.completion_entry .no_items_message').text).to eq('No items in module')
+      end
+    end
+
     context "module item cog focus management", priority: "1" do
 
       before :each do
