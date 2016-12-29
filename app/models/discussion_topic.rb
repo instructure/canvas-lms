@@ -564,7 +564,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def can_unlock?
     # Only used for course/account setting to lock replies to announcements
-    !is_announcement || (is_announcement && !self.course&.lock_all_announcements)
+    self.new_record? || !self.is_announcement || (self.is_announcement && !self.course&.lock_all_announcements)
   end
 
   def lock(opts = {})

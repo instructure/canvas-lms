@@ -14,7 +14,7 @@ define([
     static propTypes = {
       announcements: React.PropTypes.arrayOf(
         React.PropTypes.shape({
-          id: React.PropTypes.number.isRequired,
+          id: React.PropTypes.string.isRequired,
           title: React.PropTypes.string.isRequired,
           message: React.PropTypes.string.isRequired,
           posted_at: React.PropTypes.string.isRequired,
