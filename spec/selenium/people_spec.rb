@@ -232,7 +232,7 @@ describe "people" do
       dialog = open_student_group_dialog
       replace_content(f('#new_category_name'), 'new group')
       dialog.find_element(:css, '#enable_self_signup').click
-      fj('input[name="create_group_count"]:visible').send_keys(group_count)
+      replace_content(fj('input[name="create_group_count"]:visible'), group_count)
       submit_form('.group-category-create')
       wait_for_ajaximations
       expect(@course.groups.count).to eq 4
@@ -250,7 +250,7 @@ describe "people" do
       dialog = open_student_group_dialog
       replace_content(f('#new_category_name'), 'new group')
       dialog.find_element(:css, '#split_groups').click
-      fj('input[name="create_group_count"]:visible').send_keys(group_count)
+      replace_content(fj('input[name="create_group_count"]:visible'), group_count)
       expect(@course.groups.count).to eq 0
       submit_form('.group-category-create')
       wait_for_ajaximations
