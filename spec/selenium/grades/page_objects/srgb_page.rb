@@ -62,6 +62,10 @@ class SRGB
       f("#set_default_grade")
     end
 
+    def curve_grade_button
+      f('#curve_grades')
+    end
+
     # global checkboxes
     def ungraded_as_zero
       f('#ungraded')
@@ -103,6 +107,10 @@ class SRGB
 
     def speedgrader_link
       f('#assignment-speedgrader-link a')
+    end
+
+    def assignment_scores
+      f('#assignment_information .ic-Table tbody tr')
     end
 
     def visit(course_id)
@@ -167,6 +175,7 @@ class SRGB
     def assignment_sort_order_selector
       'select#arrange_assignments'
     end
+
   end
 end
 
