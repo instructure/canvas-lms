@@ -619,6 +619,74 @@ describe Submission do
     end
   end
 
+  describe 'computation of scores' do
+    before(:once) do
+      @assignment.update!(points_possible: 10)
+      @submission = Submission.create!(@valid_attributes)
+    end
+
+    let(:scores) do
+      enrollment = Enrollment.where(user_id: @submission.user_id, course_id: @submission.context).first
+      enrollment.scores.order(:grading_period_id)
+    end
+
+    let(:grading_period_scores) do
+      scores.where.not(grading_period_id: nil)
+    end
+
+    it 'recomputes course scores when the submission score changes' do
+      expect { @submission.update!(score: 5) }.to change {
+        scores.pluck(:current_score)
+      }.from([nil]).to([50.0])
+    end
+
+    context 'Multiple Grading Periods' do
+      before(:once) do
+        @now = Time.zone.now
+        course = @submission.context
+        assignment_outside_of_period = course.assignments.create!(
+          due_at: 10.days.from_now(@now),
+          points_possible: 10
+        )
+        assignment_outside_of_period.grade_student(@user, grade: 8, grader: @teacher)
+        @assignment.update!(due_at: @now)
+        @root_account = course.root_account
+        @root_account.enable_feature!(:multiple_grading_periods)
+        group = @root_account.grading_period_groups.create!
+        group.enrollment_terms << course.enrollment_term
+        @grading_period = group.grading_periods.create!(
+          title: 'Current Grading Period',
+          start_date: 5.days.ago(@now),
+          end_date: 5.days.from_now(@now)
+        )
+      end
+
+      it 'updates the course score and grading period score if a submission ' \
+      'in a grading period is graded' do
+        expect { @submission.update!(score: 5) }.to change {
+          scores.pluck(:current_score)
+        }.from([nil, 80.0]).to([50.0, 65.0])
+      end
+
+      it 'keeps grading period scores updated even if the feature flag is disabled' do
+        @submission.update!(score: 10)
+        @root_account.disable_feature!(:multiple_grading_periods)
+        expect { @submission.update!(score: 5) }.to change {
+          grading_period_scores.pluck(:current_score)
+        }.from([100.0]).to([50.0])
+      end
+
+      it 'only updates the course score (not the grading period score) if a submission ' \
+      'not in a grading period is graded' do
+        day_after_grading_period_ends = 1.day.from_now(@grading_period.end_date)
+        @assignment.update!(due_at: day_after_grading_period_ends)
+        expect { @submission.update!(score: 5) }.to change {
+          scores.pluck(:current_score)
+        }.from([nil, 80.0]).to([nil, 65.0])
+      end
+    end
+  end
+
   describe '#can_grade?' do
     before(:each) do
       @account = Account.new

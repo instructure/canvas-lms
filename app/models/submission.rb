@@ -398,7 +398,19 @@ class Submission < ActiveRecord::Base
       else
         Rails.logger.info "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
         self.class.connection.after_transaction_commit do
-          Enrollment.send_later_if_production_enqueue_args(:recompute_final_score, { run_at: 3.seconds.from_now }, self.user_id, self.context.id)
+          effective_due_dates = EffectiveDueDates.new(self.context, self.assignment_id)
+          grading_period_id = effective_due_dates.grading_period_id_for(
+            student_id: self.user_id,
+            assignment_id: self.assignment_id
+          )
+          Enrollment.send_later_if_production_enqueue_args(
+            :recompute_final_score,
+            { run_at: 3.seconds.from_now },
+            self.user_id,
+            self.context.id,
+            grading_period_id: grading_period_id,
+            update_all_grading_period_scores: false
+          )
         end
       end
       self.assignment.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score) if self.assignment

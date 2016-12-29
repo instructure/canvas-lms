@@ -32,6 +32,8 @@ class GradingPeriod < ActiveRecord::Base
   before_validation :adjust_close_date_for_course_period
   before_validation :ensure_close_date
 
+  after_save :recompute_scores, if: :dates_changed?
+
   scope :current, -> do
     period_table = GradingPeriod.arel_table
     now = Time.zone.now
@@ -207,5 +209,20 @@ class GradingPeriod < ActiveRecord::Base
     if close_date.present? && end_date.present? && close_date < end_date
       errors.add(:close_date, t('must be on or after end date'))
     end
+  end
+
+  def recompute_scores
+    if course_group?
+      courses = [grading_period_group.course]
+    else
+      term_ids = grading_period_group.enrollment_terms.pluck(:id)
+      courses = Course.where(enrollment_term_id: term_ids)
+    end
+    # Course#recompute_student_scores is asynchronous
+    courses.each { |course| course.recompute_student_scores(grading_period_id: self.id) }
+  end
+
+  def dates_changed?
+    start_date_changed? || end_date_changed?
   end
 end

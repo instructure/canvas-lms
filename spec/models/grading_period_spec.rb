@@ -23,14 +23,14 @@ describe GradingPeriod do
 
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:account) { Account.create! }
-  let(:course) { Course.create! }
+  let(:course) { account.courses.create! }
   let(:grading_period_group) do
     group = account.grading_period_groups.create!(title: "A Group")
-    group.enrollment_terms << course.enrollment_term
+    term = course.enrollment_term
+    group.enrollment_terms << term
     group
   end
   let(:now) { Time.zone.now.change(usec: 0) }
-
   let(:params) do
     {
       title: 'A Grading Period',
@@ -193,7 +193,6 @@ describe GradingPeriod do
       end
     end
   end
-
 
   describe "#as_json_with_user_permissions" do
     it "includes the close_date in the returned object" do
@@ -689,6 +688,41 @@ describe GradingPeriod do
     it "can persist double precision values" do
       subject.update!(weight: 1.5)
       expect(subject.reload.weight).to eql 1.5
+    end
+  end
+
+  describe 'grading period scores' do
+    before do
+      student_in_course(course: course, active_all: true)
+      teacher_in_course(course: course, active_all: true)
+      @assignment = course.assignments.create!(due_at: 10.days.from_now(now), points_possible: 10)
+      @assignment.grade_student(@student, grade: 8, grader: @teacher)
+    end
+
+    it 'creates scores for the grading period upon its creation' do
+      expect{ grading_period.save! }.to change{ Score.count }.from(1).to(2)
+    end
+
+    it 'updates grading period scores when the grading period end date is changed' do
+      grading_period.save!
+      expect do
+        day_after_assignment_is_due = 1.day.from_now(@assignment.due_at)
+        grading_period.update!(
+          end_date: day_after_assignment_is_due,
+          close_date: day_after_assignment_is_due
+        )
+      end.to change{
+        Score.where(grading_period_id: grading_period).first.current_score
+      }.from(nil).to(80.0)
+    end
+
+    it 'updates grading period scores when the grading period start date is changed' do
+      day_before_grading_period_starts = 1.day.ago(grading_period.start_date)
+      @assignment.update!(due_at: day_before_grading_period_starts)
+      grading_period.save!
+      expect{ grading_period.update!(start_date: 1.day.ago(@assignment.due_at)) }.to change{
+        Score.where(grading_period_id: grading_period).first.current_score
+      }.from(nil).to(80.0)
     end
   end
 end
