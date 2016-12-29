@@ -25,11 +25,7 @@ testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/coffeescrip
 testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/javascripts/support'))
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')
 
-testWebpackConfig.module.rules = [{
-  test: /(jsx.*(\.js$|\.jsx$)|\.coffee$|public\/javascripts\/.*\.js$)/,
-  exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|compiled|jst|jsx|translations|vendor))/,
-  loader: 'istanbul-instrumenter-loader'
-}, {
+testWebpackConfig.module.rules.unshift({
   test: [
     /\/spec\/coffeescripts\//,
     /\/spec_canvas\/coffeescripts\//,
@@ -48,7 +44,17 @@ testWebpackConfig.module.rules = [{
     'imports-loader?start=>qunit.start',
     'qunitDependencyLoader'
   ]
-}].concat(testWebpackConfig.module.rules);
+})
+
+// For easier local debugging in karma, only add istambul cruft if running on jenkins
+// or you've explicity set the "JS_CODE_COVERAGE" environment variable
+if (process.env.JENKINS_HOME || process.env.JS_CODE_COVERAGE) {
+  testWebpackConfig.module.rules.unshift({
+    test: /(jsx.*(\.js$|\.jsx$)|\.coffee$|public\/javascripts\/.*\.js$)/,
+    exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|compiled|jst|jsx|translations|vendor))/,
+    loader: 'istanbul-instrumenter-loader'
+  })
+}
 
 testWebpackConfig.module.noParse = testWebpackConfig.module.noParse.concat([
   /\/sinon-1.17.2.js/,
