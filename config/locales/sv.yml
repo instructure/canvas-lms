@@ -5417,44 +5417,44 @@ sv:
   data_set_identifier_data_set_id_c228b5df: "Datamängdsidentifierare: %{data_set_id}"
   date: 
     abbr_day_names: 
-      - Sön
-      - Mån
-      - Tis
-      - Ons
-      - Tors
-      - Fre
-      - Lör
+      - sön
+      - mån
+      - tis
+      - ons
+      - tors
+      - fre
+      - lör
     abbr_month_names: 
       - ~
-      - Jan
-      - Feb
-      - Mar
-      - Apr
-      - Maj
-      - Jun
-      - Jul
-      - Aug
-      - Sep
-      - Okt
-      - Nov
-      - Dec
+      - jan
+      - feb
+      - mar
+      - apr
+      - maj
+      - jun
+      - jul
+      - aug
+      - sep
+      - okt
+      - nov
+      - dec
     datepicker: 
       column_headings: 
-        - S
-        - M
-        - Ti
-        - O
-        - To
-        - F
-        - L
+        - s
+        - m
+        - ti
+        - o
+        - to
+        - f
+        - l
     day_names: 
-      - Söndag
-      - Måndag
-      - Tisdag
-      - Onsdag
-      - Torsdag
-      - Fredag
-      - Lördag
+      - söndag
+      - måndag
+      - tisdag
+      - onsdag
+      - torsdag
+      - fredag
+      - lördag
     days: 
       today: Idag
       today_lower: idag
@@ -5477,18 +5477,18 @@ sv:
       weekday: "%A"
     month_names: 
       - ~
-      - Januari
-      - Februari
-      - Mars
-      - April
-      - Maj
-      - Juni
-      - Juli
-      - Augusti
-      - September
-      - Oktober
-      - November
-      - December
+      - januari
+      - februari
+      - mars
+      - april
+      - maj
+      - juni
+      - juli
+      - augusti
+      - september
+      - oktober
+      - november
+      - december
   date_created_87e265bc: "Datum skapat"
   date_ee500367: Datum
   date_error_7b38f8ff: "Datum fel"
