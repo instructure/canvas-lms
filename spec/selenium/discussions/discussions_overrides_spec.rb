@@ -30,6 +30,10 @@ describe "discussions overrides" do
   end
 
   describe "set overrides" do
+    around do |example|
+      Timecop.freeze(Time.zone.local(2016,12,15,10,0,0), &example)
+    end
+
     before do
       default_due_at = Time.zone.now.advance(days:1).round
       override_due_at = Time.zone.now.advance(days:2).round
