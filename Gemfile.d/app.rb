@@ -96,7 +96,8 @@ gem 'useragent', '0.16.8', require: false
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
 gem 'sentry-raven', '0.15.6', require: false
-gem 'canvas_statsd', '1.0.7'
+gem 'canvas_statsd', '1.0.8'
+  gem 'statsd-ruby', '1.3.0', require: false
   gem 'aroi', '0.0.4', require: false
 gem 'diplomat', '1.0.0', require: false
 gem 'gepub'
