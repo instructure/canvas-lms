@@ -23,23 +23,23 @@
 #
 
 require 'guard'
-require 'guard/guard'
+require 'guard/plugin'
 require 'guard/watcher'
 require 'coffee_script'
 
 module Guard
 
-  class CoffeeScript < Guard
+  class CoffeeScript < Plugin
 
     module Formatter
       class << self
-        def info(message, options = { }); ::Guard::UI.info(message, options); end
+        def info(message, options = {}); ::Guard::UI.info(message, options); end
 
-        def error(message, options = { }); ::Guard::UI.error(color(message, ';31'), options); end
+        def error(message, options = {}); ::Guard::UI.error(color(message, ';31'), options); end
 
-        def success(message, options = { }); ::Guard::UI.info(color(message, ';32'), options); end
+        def success(message, options = {}); ::Guard::UI.info(color(message, ';32'), options); end
 
-        def notify(message, options = { }); ::Guard::Notifier.notify(message, options); end
+        def notify(message, options = {}); ::Guard::Notifier.notify(message, options); end
         private
         def color(text, color_code); ::Guard::UI.send(:color_enabled?) ? "\e[0#{ color_code }m#{ text }\e[0m" : text; end
       end
@@ -54,7 +54,6 @@ module Guard
             compile_files(plugin_files, watchers, options.merge(:output => "#{prefix}#{options[:output]}"))
           end
           notify_result(changed_files, errors, options)
-
           [changed_files, errors.empty?]
         end
 
@@ -62,7 +61,7 @@ module Guard
 
         def partition_by_plugin(files, &block)
           groupings = files.inject({}) { |hash, file|
-            prefix = file =~ %r{\Avendor/plugins/.*?/} ? $& : ''
+            prefix = file =~ %r{\Agems/plugins/.*?/} ? $& : ''
             hash[prefix] ||= []
             hash[prefix] << file
             hash
@@ -143,7 +142,7 @@ module Guard
           directories = { }
 
           watchers.product(files).each do |watcher, file|
-            if matches = file.match(watcher.pattern)
+            if matches = watcher.pattern.match(file)
               target = matches[1] ? File.join(options[:output], File.dirname(matches[1])).gsub(/\/\.$/, '') : options[:output]
               if directories[target]
                 directories[target] << file
@@ -177,16 +176,16 @@ module Guard
         :all_on_start => false
     }
 
-    def initialize(watchers = [], options = {})
-      watchers = [] if !watchers
+    def initialize(options = {})
+      options[:watchers] ||= []
       defaults = DEFAULT_OPTIONS.clone
 
       if options[:input]
         defaults.merge!({ :output => options[:input] })
-        watchers << ::Guard::Watcher.new(%r{\A(?:vendor/plugins/.*?/)?#{ Regexp.escape(options.delete(:input)) }/(.+\.coffee)\z})
+        options[:watchers] << ::Guard::Watcher.new(%r{\A(?:gems/plugins/.*?/)?#{ Regexp.escape(options.delete(:input)) }/(.+\.coffee)\z})
       end
 
-      super(watchers, defaults.merge(options))
+      super(defaults.merge(options))
     end
 
     def start
@@ -194,17 +193,16 @@ module Guard
     end
 
     def run_all
-      run_on_change(Watcher.match_files(self, Dir.glob(File.join('**/*/**', '*.coffee'))))
+      run_on_modifications(Watcher.match_files(self, Dir.glob(File.join('**/*/**', '*.coffee'))))
     end
 
-    def run_on_change(paths)
+    def run_on_modifications(paths)
       changed_files, success = Runner.run(clean(paths), watchers, options)
-      notify changed_files
 
       throw :task_has_failed unless success
     end
 
-    def run_on_deletion(paths)
+    def run_on_removals(paths)
       clean(paths).each do |file|
         javascript = file.gsub(/(js\.coffee|coffee)$/, 'js')
         File.remove(javascript) if File.exist?(javascript)
@@ -213,18 +211,10 @@ module Guard
 
     private
 
-    def notify(changed_files)
-      ::Guard.guards.each do |guard|
-        paths = Watcher.match_files(guard, changed_files)
-        guard.run_on_change paths unless paths.empty?
-      end
-    end
-
     def clean(paths)
       paths.uniq!
       paths.compact!
       paths.select { |p| p =~ /.coffee$/ && File.exist?(p) }
     end
-
   end
 end

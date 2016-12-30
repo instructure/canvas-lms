@@ -1,15 +1,18 @@
 require 'guard'
-require 'guard/guard'
+require 'guard/plugin'
 
 module Guard
-  class JSX < Guard
+  class JSX < Plugin
 
-    def initialize(watchers=[], options={})
-      super([::Guard::Watcher.new(%r{app/jsx/.*}),
-             ::Guard::Watcher.new(%r{spec/javascripts/jsx/.*})], {})
+    def initialize(options={})
+      options[:watchers] = [
+        ::Guard::Watcher.new(%r{app/jsx/.*}),
+        ::Guard::Watcher.new(%r{spec/javascripts/jsx/.*})
+      ]
+      super(options)
     end
 
-    def run_on_change(paths)
+    def run_on_modifications(paths)
       # naive right now, will be better when we rework the front-end build
       run_all
     end
@@ -24,4 +27,3 @@ module Guard
 
   end
 end
-

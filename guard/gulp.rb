@@ -2,9 +2,9 @@ require 'guard'
 require 'guard/plugin'
 
 module Guard
-  class BrandableCSS < Plugin
+  class Gulp < Plugin
     def start
-      @pid = spawn("./node_modules/.bin/brandable_css --watch")
+      @pid = spawn("./node_modules/.bin/gulp watch")
     end
 
     def stop
