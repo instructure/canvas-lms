@@ -21,12 +21,12 @@ group :test do
   gem 'mocha', github: 'maneframe/mocha', ref: 'bb8813fbb4cc589d7c58073d93983722d61b6919', require: false
     gem 'metaclass', '0.0.4', require: false
   gem 'thin', '1.7.0'
-    gem 'eventmachine', '1.2.0.1', require: false
+    gem 'eventmachine', '1.2.1', require: false
 
   gem 'rspec', '3.5.0'
   gem 'rspec_around_all', '0.2.0'
   gem 'rspec-rails', '3.5.2'
-  gem 'rspec-collection_matchers', '1.1.2'
+  gem 'rspec-collection_matchers', '1.1.3'
 
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
     gem 'rubocop', '0.46.0', require: false

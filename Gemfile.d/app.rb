@@ -43,7 +43,7 @@ gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.11.6'
   gem 'rufus-scheduler', '3.2.2', require: false
 gem 'ffi', '1.9.14', require: false
-gem 'hairtrigger', '0.2.15'
+gem 'hairtrigger', '0.2.17'
   gem 'ruby2ruby', '2.0.8', require: false
   gem 'ruby_parser', '3.8.3', require: false
 gem 'hashery', '2.1.2', require: false
@@ -67,7 +67,7 @@ gem 'marginalia', '1.4.0', require: false
 gem 'mime-types', '1.25.1', require: 'mime/types'
 gem 'mini_magick', '4.2.7'
 gem 'multi_json', '1.12.1'
-gem 'netaddr', '1.5.0', require: false
+gem 'netaddr', '1.5.1', require: false
 gem 'nokogiri', '1.6.6.2.20150813143452', require: false, github: 'codekitchen/nokogiri', ref: 'd47e53f885'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', require: false
@@ -81,7 +81,7 @@ gem 'ritex', '1.0.1', require: false
 
 gem 'rotp', '1.6.1', require: false
 gem 'net-ldap', '0.10.1', require: false
-gem 'ruby-duration', '3.2.0', require: false
+gem 'ruby-duration', '3.2.3', require: false
 gem 'ruby-saml-mod', '0.3.1'
 gem 'saml2', '1.0.7', require: false
   gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '57d071040cc4649db9f158e09bbcea028271a4a6'
@@ -91,7 +91,7 @@ gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.1.0', require: false
 gem 'shackles', '1.3.0'
 
-gem 'useragent', '0.16.7', require: false
+gem 'useragent', '0.16.8', require: false
 
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
