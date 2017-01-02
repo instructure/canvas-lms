@@ -47,7 +47,7 @@ gem 'ffi', '1.9.14', require: false
 gem 'hairtrigger', '0.2.15'
   gem 'ruby2ruby', '2.0.8', require: false
   gem 'ruby_parser', '3.8.3', require: false
-gem 'hashery', '1.3.0', require: false
+gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.8', require: false
 gem 'httparty', '0.14.0'
 gem 'i18n', '0.7.0'
