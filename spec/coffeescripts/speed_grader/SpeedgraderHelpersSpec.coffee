@@ -155,7 +155,7 @@ define [
   test "returns resubmitted data for graded_then_resubmitted", ->
     @student.submission_state = 'resubmitted'
     state = SpeedgraderHelpers.classNameBasedOnStudent(@student)
-    deepEqual(state, raw: 'resubmitted', formatted: 'graded, then resubmitted (Oct 13 at 12:22pm)')
+    deepEqual(state, raw: 'resubmitted', formatted: 'graded, then resubmitted (Oct 13, 2016 at 12:22pm)')
 
   module "SpeedgraderHelpers#submissionState",
     setup: ->
