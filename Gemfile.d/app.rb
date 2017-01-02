@@ -33,7 +33,6 @@ gem 'folio-pagination', '0.0.11', require: 'folio/rails'
 gem "after_transaction_commit", '1.1.0'
 gem "aws-sdk", '2.6.7', require: false
 gem "aws-sdk-v1", '1.66.0', require: false
-  gem 'uuidtools', '2.1.4', require: false
 gem 'barby', '0.6.5', require: false
   gem 'rqrcode', '0.10.1', require: false
   gem 'chunky_png', '1.3.8', require: false
@@ -67,7 +66,6 @@ gem 'mail', '2.5.4', require: false
 gem 'marginalia', '1.4.0', require: false
 gem 'mime-types', '1.25.1', require: 'mime/types'
 gem 'mini_magick', '4.2.7'
-  gem 'subexec', '0.0.4', require: false
 gem 'multi_json', '1.12.1'
 gem 'netaddr', '1.5.0', require: false
 gem 'nokogiri', '1.6.6.2.20150813143452', require: false, github: 'codekitchen/nokogiri', ref: 'd47e53f885'
