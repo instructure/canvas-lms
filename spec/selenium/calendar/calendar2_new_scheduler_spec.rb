@@ -36,7 +36,12 @@ describe "scheduler" do
 
     it 'shows appointment slots on calendar in Find Appointment mode', priority: "1", test_id: 2925320 do
       open_select_courses_modal(@course1.name)
-      expect(ff('.fc-content .fc-title')[2]).to include_text(@app3.title)
+      # the order they come back could vary depending on whether they split
+      # days, but we expect them all to be rendered
+      titles = [@app1.title, @app1.title, @app3.title]
+      ff('.fc-content .fc-title').sort_by(&:text).zip(titles).each do |node, title|
+        expect(node).to include_text(title)
+      end
       close_select_courses_modal
 
       # open again to see if appointment group spanning two content appears on selecting the other course also
