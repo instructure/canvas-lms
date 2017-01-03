@@ -460,6 +460,7 @@ describe AssignmentsController do
 
       it "to wiki page" do
         Course.any_instance.stubs(:feature_enabled?).with(:conditional_release).returns(true)
+        Course.any_instance.stubs(:feature_enabled?).with(:multiple_grading_periods).returns(false)
         wiki_page_assignment_model course: @course
         get 'edit', :course_id => @course.id, :id => @page.assignment.id
         expect(response).to redirect_to controller.edit_course_wiki_page_path(@course, @page)

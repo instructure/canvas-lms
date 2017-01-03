@@ -160,7 +160,7 @@ describe GradingPeriod do
 
       context "where end_date equals Time.now" do
         it "does not include period" do
-          Timecop.freeze(Time.zone.now.change(usec: 0)) do
+          Timecop.freeze(now.change(usec: 0)) do
             period.update!(end_date: now)
             is_expected.to be_present
           end
@@ -169,7 +169,7 @@ describe GradingPeriod do
 
       context "where end_date equals Time.now + 1" do
         it "does not include period" do
-          Timecop.freeze(Time.zone.now.change(usec: 0) + 1) do
+          Timecop.freeze(now.change(usec: 0) + 1) do
             period.update!(end_date: now)
             is_expected.to be_empty
           end
@@ -178,7 +178,7 @@ describe GradingPeriod do
 
       context "where start_date equals Time.now" do
         it "does not include period" do
-          Timecop.freeze(Time.zone.now.change(usec: 0)) do
+          Timecop.freeze(now.change(usec: 0)) do
             period.update!(start_date: now)
             is_expected.to be_empty
           end
@@ -187,7 +187,7 @@ describe GradingPeriod do
 
       context "where start_date equals Time.now + 1" do
         it "does not include period" do
-          Timecop.freeze(Time.zone.now.change(usec: 0) + 1) do
+          Timecop.freeze(now.change(usec: 0) + 1) do
             period.update!(start_date: now)
             is_expected.to be_present
           end
