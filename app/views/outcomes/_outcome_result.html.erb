@@ -18,7 +18,7 @@
           :possible_points => raw("<span class=\"possible\">#{outcome_result.try_rescue(:possible) || nbsp}</span>")
     %>
     <% if outcome_result && outcome_result.mastery? %>
-      <span class="mastery">(<%= image_tag "graded.16px.png", :alt => t("Graded") %> <%= t :outcome_mastered, 'mastered' %>)</span>
+      <span class="mastery">(<i class="icon-check" aria-hidden="true"></i><%= t :outcome_mastered, 'mastered' %>)</span>
     <% end %>
   </div>
   <div class="last_attempt">

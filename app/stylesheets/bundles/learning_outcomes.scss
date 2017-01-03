@@ -306,3 +306,30 @@ table.criterion .insert {
 .outcomes-calculation-int-italics {
   font-style: italic;
 }
+#alignments {
+  margin-left: 0;
+}
+#alignments .alignment {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $ic-sp/2;
+  border-bottom: 1px solid $ic-border-light;
+}
+#alignments .header {
+  flex: 4;
+}
+#alignments .locked_alignment_link {
+  color: $ic-font-color--subdued;
+}
+#alignments .delete_alignment_link {
+  flex: 1;
+}
+#outcome_results_list {
+  margin-left: 0;
+}
+#outcome_results_list .outcome_result {
+  list-style: none;
+  padding: $ic-sp 0;
+}

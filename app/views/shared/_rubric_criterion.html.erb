@@ -14,7 +14,8 @@
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if learning_outcome_criterion %>" style="<%= hidden unless criterion %>">
   <td class="criterion_description hover-container">
     <div class="container">
-      <%= image_tag "flagged_question.png", :class => "learning_outcome_flag", :alt => t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %>
+      <i class="learning_outcome_flag icon-outcomes" aria-hidden="true"></i>
+      <span class="screenreader-only"><%= t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %></span>
       <span class="description criterion_description_value"><%= description %></span>
       <span class="learning_outcome_id" style="display: none;"><%= criterion.try(:learning_outcome_id) %></span>
       <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
