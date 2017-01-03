@@ -68,7 +68,10 @@ class ErrorReport < ActiveRecord::Base
       @exception = exception
       message = exception.to_s rescue exception.class.name
       backtrace = Array(exception.backtrace)
+      limit = 10
       while (exception = exception.cause)
+        limit -= 1
+        break if limit == 0
         cause = exception.to_s rescue exception.class.name
         message += " caused by #{cause}"
         new_backtrace = Array(exception.backtrace)

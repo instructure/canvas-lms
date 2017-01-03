@@ -1,10 +1,11 @@
 define([
   'underscore',
+  'jquery',
   'timezone',
   'i18n!gradebook2',
   'jsx/gradebook/AssignmentOverrideHelper',
   'jsx/grading/helpers/GradingPeriodsHelper'
-], function(_, tz, I18n, AssignmentOverrideHelper, GradingPeriodsHelper) {
+], function(_, $, tz, I18n, AssignmentOverrideHelper, GradingPeriodsHelper) {
 
   const TOOLTIP_KEYS = {
     NOT_IN_ANY_GP: "not_in_any_grading_period",
@@ -71,7 +72,7 @@ define([
 
     setup(students, assignments) {
       const newOverrides = indexOverrides(assignments, students);
-      this.overrides = Object.assign(this.overrides, newOverrides);
+      this.overrides = $.extend(true, this.overrides, newOverrides);
 
       students.forEach((student) => {
         this.submissionCellMap[student.id] = {};
