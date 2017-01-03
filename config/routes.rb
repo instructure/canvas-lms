@@ -1667,6 +1667,7 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/turnitin/assignment", action: :assignment
       get "support_helpers/turnitin/pending", action: :pending
       get "support_helpers/turnitin/expired", action: :expired
+      get "support_helpers/turnitin/refresh_lti_attachment", action: :lti_attachment
     end
 
     scope(controller: 'support_helpers/crocodoc') do

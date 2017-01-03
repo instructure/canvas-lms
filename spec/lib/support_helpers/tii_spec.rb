@@ -316,6 +316,20 @@ describe SupportHelpers::Tii do
     end
   end
 
+  describe SupportHelpers::Tii::LtiAttachmentFixer do
+    let(:submission) {submission_model}
+    let(:attachment) {attachment_model}
+
+    describe "#fix" do
+      it 'refreshes the attachments' do
+        Turnitin::AttachmentManager.expects(:update_attachment).with(submission, attachment)
+        fixer = SupportHelpers::Tii::LtiAttachmentFixer.new('email', nil, submission.id, attachment.id)
+        fixer.fix()
+      end
+    end
+
+  end
+
   # TODO: uncomment these once we figure out what the sql queries should
   # like on StuckInPendingFixer and ExpiredAccountFixer
   # describe "StuckInPendingFixer" do
