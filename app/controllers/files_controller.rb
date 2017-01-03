@@ -110,7 +110,7 @@ require 'securerandom'
 class FilesController < ApplicationController
   before_filter :require_user, only: :create_pending
   before_filter :require_context, except: [
-    :assessment_question_show, :image_thumbnail, :show_thumbnail, :preflight,
+    :assessment_question_show, :image_thumbnail, :show_thumbnail,
     :create_pending, :s3_success, :show, :api_create, :api_create_success, :api_create_success_cors,
     :api_show, :api_index, :destroy, :api_update, :api_file_status, :public_url
   ]
@@ -692,19 +692,6 @@ class FilesController < ApplicationController
       #set cache to expoire in 1 day, max-age take seconds, and Expires takes a date
       response.headers["Cache-Control"] = "private, max-age=86400"
       response.headers["Expires"] = 1.day.from_now.httpdate
-    end
-  end
-
-  def preflight
-    @context = Context.find_by_asset_string(params[:context_code])
-    if authorized_action(@context, @current_user, :manage_files)
-      @current_folder = Folder.find_folder(@context, params[:folder_id])
-      if @current_folder
-        params[:filenames] = [] if params[:filenames].blank?
-        return render :json => {
-          :duplicates => @current_folder.active_file_attachments.map(&:display_name) & params[:filenames]
-        }
-      end
     end
   end
 
