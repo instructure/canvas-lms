@@ -179,6 +179,7 @@ describe "threaded discussions" do
     reply_text = "this is a reply"
     add_reply(reply_text)
     subentry = DiscussionEntry.last
+    wait_for_ajaximations # Chrome sometimes gives NoSuchElementError without this wait
 
     expect(f("#entry-#{entry.id} #entry-#{subentry.id}")).to be_truthy, "precondition"
     edit_entry(entry, edit_text)
