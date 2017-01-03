@@ -44,7 +44,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
         post :create, {
           account_id: root_account.to_param,
           enrollment_term_ids: [enrollment_term.to_param],
-          grading_period_set: group_helper.valid_attributes
+          grading_period_set: group_helper.valid_attributes(weighted: true)
         }, valid_session
       end
 
@@ -58,6 +58,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
           set_json = json_parse.fetch('grading_period_set')
           expect(response.status).to eql Rack::Utils.status_code(:created)
           expect(set_json["title"]).to eql group_helper.valid_attributes[:title]
+          expect(set_json["weighted"]).to be true
         end
       end
 
@@ -87,7 +88,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
     end
 
     describe "PATCH #update" do
-      let(:new_attributes) { { title: 'An updated title!' } }
+      let(:new_attributes) { { title: 'An updated title!', weighted: false } }
       let(:grading_period_set) { group_helper.create_for_account(root_account) }
 
       context "with valid params" do
@@ -104,6 +105,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
           patch_update
           grading_period_set.reload
           expect(grading_period_set.title).to eql new_attributes.fetch(:title)
+          expect(grading_period_set.weighted).to eql new_attributes.fetch(:weighted)
         end
 
         it "returns no content" do

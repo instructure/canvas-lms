@@ -4,6 +4,7 @@ class GradingPeriodSetSerializer < Canvas::APISerializer
 
   attributes :id,
              :title,
+             :weighted,
              :account_id,
              :course_id,
              :grading_periods,
