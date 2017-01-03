@@ -1052,6 +1052,19 @@ describe ConversationsController, type: :request do
       expect(json["cannot_reply"]).to eq true
     end
 
+    it "should not explode on account group conversations" do
+      @user = @billy
+      group
+      @group.add_user(@bob)
+      @group.add_user(@billy)
+      conversation = conversation(@bob, :sender => @billy, :context_type => "Group", :context_id => @group.id)
+
+      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
+        { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :format => 'json' })
+
+      expect(json["cannot_reply"]).to_not be_truthy
+    end
+
     it "should still include attachment verifiers when using session auth" do
       conversation = conversation(@bob)
       attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
