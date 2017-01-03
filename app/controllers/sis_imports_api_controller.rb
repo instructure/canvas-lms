@@ -146,6 +146,7 @@
 #               "cleanup_batch",
 #               "imported",
 #               "imported_with_messages",
+#               "aborted",
 #               "failed_with_messages",
 #               "failed"
 #             ]
@@ -444,6 +445,25 @@ class SisImportsApiController < ApplicationController
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       @batch = @account.sis_batches.find(params[:id])
       render json: @batch
+    end
+  end
+
+  # @API Abort SIS import
+  #
+  # Abort an already created but not processed or processing SIS import.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>/abort \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns SisImport
+  def abort
+    if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
+      SisBatch.transaction do
+        @batch = @account.sis_batches.not_started.lock.find(params[:id])
+        @batch.abort_batch
+      end
+      render json: @batch.reload
     end
   end
 

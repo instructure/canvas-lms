@@ -1176,6 +1176,7 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/sis_imports', action: :create
       get 'accounts/:account_id/sis_imports/:id', action: :show
       get 'accounts/:account_id/sis_imports', action: :index, as: "account_sis_imports"
+      put 'accounts/:account_id/sis_imports/:id/abort', action: :abort
     end
 
     scope(controller: :users) do

@@ -150,27 +150,32 @@ class SisBatch < ActiveRecord::Base
   # once no SisBatch#process_without_send_later jobs are being created anymore, we
   # can rename this to something more sensible.
   def process_without_send_later
-    self.options ||= {}
-    if self.workflow_state == 'aborted'
-      self.progress = 100
+    self.class.transaction do
+      self.options ||= {}
+      if self.workflow_state == 'aborted'
+        self.progress = 100
+        self.save
+        return
+      end
+      if self.workflow_state == 'created'
+        self.workflow_state = :importing
+        self.progress = 0
+        self.started_at = Time.now.utc
+        self.save
+      else
+        return
+      end
+    end
+
+    import_scheme = SisBatch.valid_import_types[self.data[:import_type]]
+    if import_scheme.nil?
+      self.data[:error_message] = t 'errors.unrecorgnized_type', "Unrecognized import type"
+      self.workflow_state = :failed
       self.save
       return
     end
-    if self.workflow_state == 'created'
-      self.workflow_state = :importing
-      self.progress = 0
-      self.started_at = Time.now.utc
-      self.save
 
-      import_scheme = SisBatch.valid_import_types[self.data[:import_type]]
-      if import_scheme.nil?
-        self.data[:error_message] = t 'errors.unrecorgnized_type', "Unrecognized import type"
-        self.workflow_state = :failed
-        self.save
-      else
-        import_scheme[:callback].call(self)
-      end
-    end
+    import_scheme[:callback].call(self)
   rescue => e
     self.data[:error_message] = e.to_s
     self.data[:stack_trace] = "#{e}\n#{e.backtrace.join("\n")}"
@@ -178,6 +183,11 @@ class SisBatch < ActiveRecord::Base
     self.save
   end
 
+  def abort_batch
+    SisBatch.not_started.where(id: self).update_all(workflow_state: 'aborted')
+  end
+
+  scope :not_started, -> { where(workflow_state: ['initializing', 'created']) }
   scope :needs_processing, -> { where(:workflow_state => 'created').order(:created_at) }
   scope :importing, -> { where(workflow_state: ['importing', 'cleanup_batch']) }
   scope :succeeded, -> { where(:workflow_state => %w[imported imported_with_messages]) }
