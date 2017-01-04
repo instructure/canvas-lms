@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_dependency "canvas/errors/info"
 module Canvas
   class Errors
     describe Info do

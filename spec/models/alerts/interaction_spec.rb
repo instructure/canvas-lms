@@ -17,9 +17,10 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '../../../spec_helper.rb')
+require_dependency "alerts/interaction"
 
 module Alerts
-  describe Alerts::Interaction do
+  describe Interaction do
     before :once do
       course_with_teacher(:active_all => 1)
       @teacher = @user

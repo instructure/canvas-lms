@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require_dependency "lti/tool_proxy_binding"
 
 module Lti
 describe ToolProxyBinding do

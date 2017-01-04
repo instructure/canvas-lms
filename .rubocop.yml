@@ -4,6 +4,9 @@ require:
   # exec", such as from most editors/IDEs.
   - ./gems/rubocop-canvas/lib/rubocop_canvas
 
+AllCops:
+  TargetRubyVersion: 2.3
+
 # our style changes: disabling style rules we aren't interested in
 Style/StringLiterals:
   Enabled: false

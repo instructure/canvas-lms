@@ -17,6 +17,7 @@
 #
 #
 require_relative "../../spec_helper.rb"
+require_dependency "assignments/needs_grading_count_query"
 
 module Assignments
   describe NeedsGradingCountQuery do

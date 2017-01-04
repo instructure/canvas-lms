@@ -108,3 +108,9 @@ Specs/ScopeHelperModules:
   Include:
     - "**/spec/**/*.rb"
     - "**/spec_canvas/**/*.rb"
+
+Specs/DeterministicDescribedClasses:
+  Enabled: true
+  Include:
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
