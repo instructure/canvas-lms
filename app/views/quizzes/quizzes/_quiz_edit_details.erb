@@ -112,7 +112,7 @@
               <label class="checkbox" for="never_hide_results">
                 <span data-tooltip title="<%= t('Students cannot view quiz responses after course concludes') %>">
                   <input id="never_hide_results" type="checkbox" disabled="disable" />
-                  <%= t("Let Students See Their Quiz Responses") %>
+                  <%= t("Let Students See Their Quiz Responses (Incorrect Questions Will Be Marked in Student Feedback)") %>
                 </span>
               </label>
             </div>
@@ -121,7 +121,7 @@
               <label class="checkbox" for="never_hide_results">
                 <input type="hidden" name="quiz[hide_results][never]" value="0"/>
                 <input type="checkbox" name="quiz[hide_results][never]" value="1" id="never_hide_results" <%= 'checked' if @quiz.hide_results != 'always' %> />
-                <%= t("Let Students See Their Quiz Responses") %>
+                <%= t("Let Students See Their Quiz Responses (Incorrect Questions Will Be Marked in Student Feedback)") %>
               </label>
               <div class="show_quiz_results_options options">
                 <div id="hide_results_only_after_last_holder">
