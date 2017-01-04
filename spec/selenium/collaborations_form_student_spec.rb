@@ -75,9 +75,7 @@ describe "collaborations" do
 
         user_session(@student)
         get "/courses/#{@course.id}/collaborations"
-        if link = f('.ic-flash-success .close_link')
-          link.click
-        end
+        dismiss_flash_messages
 
         move_to_click('label[for=groups-filter-btn-new]')
         wait_for_ajaximations
