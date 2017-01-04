@@ -252,4 +252,23 @@ describe "dashboard" do
       end
     end
   end
+
+  context 'as a teacher in an unpublished course' do
+    before do
+      course_with_teacher_logged_in(:active_course => false)
+    end
+
+    it 'should not show an unpublished assignment for an unpublished course', priority: "2", test_id: 56003 do
+      name = 'venkman'
+      due_date = Time.zone.now.utc + 2.days
+      assignment = @course.assignments.create(:name => name, :submission_types => 'online', :due_at => due_date, :lock_at => Time.zone.now, :unlock_at => due_date)
+
+      get '/'
+      expect(f('.coming_up')).to include_text(name)
+
+      assignment.unpublish
+      get '/'
+      expect(f('.coming_up')).not_to include_text(name)
+    end
+  end
 end
