@@ -2638,7 +2638,7 @@ da:
     update: Opdatering
     view_account_roster: "Vis kontoliste"
     view_course_roster: "Vis kursusliste"
-  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "So standard er alle links aktiveret til et kursus. De studerende kan ikke se links til sektioner uden indhold. Hvis du for eksempel ikke har oprettet nogen quizzer, kan de ikke se quizzernes link. Du kan sortere og udtrykkeligt deaktivere disse links, hvis der findes områder i kurset, som de studerende ikke skal have adgang til."
+  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle links aktiveret til et kursus. De studerende kan ikke se links til sektioner uden indhold. Hvis du for eksempel ikke har oprettet nogen quizzer, kan de ikke se quizzernes link. Du kan sortere og udtrykkeligt deaktivere disse links, hvis der findes områder i kurset, som de studerende ikke skal have adgang til."
   by_lti_2_registration_url_e421e523: "Fra LTI 2 Registration URL"
   by_url_a163275e: "Efter URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
