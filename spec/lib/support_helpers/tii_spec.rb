@@ -404,10 +404,12 @@ describe SupportHelpers::Tii do
 
   let_once(:course) do
     course = course_model
-    course.account.turnitin_account_id = 99
-    course.account.turnitin_shared_secret = "sekret"
-    course.account.turnitin_host = "turn.it.in"
-    course.account.save
+    account = course.account
+    account.turnitin_account_id = 99
+    account.turnitin_shared_secret = "sekret"
+    account.turnitin_host = "turn.it.in"
+    account.settings[:enable_turnitin] = true
+    account.save!
     course
   end
 

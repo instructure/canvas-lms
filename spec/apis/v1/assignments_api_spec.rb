@@ -2175,6 +2175,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         acct = @course.account
         acct.turnitin_account_id = 0
         acct.turnitin_shared_secret = "blah"
+        acct.settings[:enable_turnitin] = true
         acct.save!
       end
 
@@ -3385,12 +3386,15 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
     end
 
     context "when turnitin_enabled is true on the context" do
-      before {
-        @course.account.update_attributes! turnitin_account_id: 1234,
-                                                turnitin_shared_secret: 'foo',
-                                                turnitin_host: 'example.com'
+      before(:once) do
+        account = @course.account
+        account.turnitin_account_id = 1234
+        account.turnitin_shared_secret = 'foo'
+        account.turnitin_host = 'example.com'
+        account.settings[:enable_turnitin] = true
+        account.save!
         @assignment.reload
-      }
+      end
 
       it "contains a turnitin_enabled key" do
         expect(result.has_key?('turnitin_enabled')).to eq true

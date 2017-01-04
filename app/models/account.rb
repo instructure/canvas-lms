@@ -190,6 +190,7 @@ class Account < ActiveRecord::Base
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
+  add_setting :enable_turnitin, :boolean => true, :default => false
   add_setting :mfa_settings, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
@@ -1278,7 +1279,10 @@ class Account < ActiveRecord::Base
   def turnitin_settings
     return @turnitin_settings if defined?(@turnitin_settings)
     if self.turnitin_account_id.present? && self.turnitin_shared_secret.present?
-      @turnitin_settings = [self.turnitin_account_id, self.turnitin_shared_secret, self.turnitin_host]
+      if settings[:enable_turnitin]
+        @turnitin_settings = [self.turnitin_account_id, self.turnitin_shared_secret,
+                              self.turnitin_host]
+      end
     else
       @turnitin_settings = self.parent_account.try(:turnitin_settings)
     end

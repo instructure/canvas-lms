@@ -8,6 +8,7 @@ describe "assignments turn it in" do
     account = Account.default
     account.turnitin_account_id = 'asdf'
     account.turnitin_shared_secret = 'asdf'
+    account.settings[:enable_turnitin] = true
     account.save!
   end
 
