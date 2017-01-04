@@ -155,6 +155,24 @@ describe SisImportsApiController, type: :request do
     })
   end
 
+  it 'should abort batch on abort' do
+    batch = @account.sis_batches.create
+    api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",
+             {controller: 'sis_imports_api', action: 'abort', format: 'json',
+              account_id: @account.id.to_s, id: batch.id.to_s})
+    expect(batch.reload.workflow_state).to eq 'aborted'
+  end
+
+  it 'should not asploid if there is no batch' do
+    batch = @account.sis_batches.create
+    SisBatch.where(id: batch).update_all(workflow_state: 'importing')
+    raw_api_call(:put,
+                 "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",
+                 {controller: 'sis_imports_api', action: 'abort', format: 'json',
+                  account_id: @account.id.to_s, id: batch.id.to_s})
+    assert_status(404)
+  end
+
   it "should skip the job for skip_sis_jobs_account_ids" do
     Setting.set('skip_sis_jobs_account_ids', "fake,#{@account.global_id}")
     expect {

@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe GradeSummaryAssignmentPresenter do
   before :each do
     attachment_model
-    course(active_all: true)
+    course_factory(active_all: true)
     student_in_course active_all: true
     teacher_in_course active_all: true
     @assignment = @course.assignments.create!(title: "some assignment",

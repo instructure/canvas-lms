@@ -27,7 +27,7 @@ describe "/context_modules/index" do
   end
 
   it "should render" do
-    course
+    course_factory
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
     render 'context_modules/index'
@@ -35,7 +35,7 @@ describe "/context_modules/index" do
   end
 
   it "should show content_tags" do
-    course
+    course_factory
     context_module = @course.context_modules.create!
     module_item = context_module.add_item :type => 'context_module_sub_header'
     module_item.publish! if module_item.unpublished?
@@ -67,7 +67,7 @@ describe "/context_modules/index" do
   end
 
   it "should not show deleted content_tags" do
-    course
+    course_factory
     context_module = @course.context_modules.create!
     module_item = context_module.add_item :type => 'context_module_sub_header'
     module_item.destroy
@@ -80,7 +80,7 @@ describe "/context_modules/index" do
   end
 
   it "does not show download course content if setting is disabled" do
-    course
+    course_factory
     view_context(@course, @user)
     assigns[:modules] = @course.context_modules.active
     render 'context_modules/index'
@@ -90,8 +90,8 @@ describe "/context_modules/index" do
   end
 
   it "shows download course content if settings are enabled" do
-    course
-    acct = course.root_account
+    course_factory
+    acct = @course.root_account
     acct.settings[:enable_offline_web_export] = true
     acct.save!
     view_context(@course, @user)

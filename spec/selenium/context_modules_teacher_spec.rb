@@ -135,19 +135,19 @@ describe "context modules" do
 
       f('.ig-header-admin  .al-trigger').click
       hover_and_click('#context_modules .edit_module_link')
-      wait_for_ajax_requests
+      wait_for_animations
       expect(f('#add_context_module_form')).to be_displayed
       f('.add_completion_criterion_link').click
-      assignment_picker = fj('.assignment_picker:visible')
+      wait_for_animations
+      fj(".assignment_picker:visible option[value='#{content_tag_1.id}']").click
+      wait_for_js # the action above might be changing the element underneath between finding and clicking
+      fj('.assignment_requirement_picker:visible option[value="min_score"]').click
+      expect(f("body")).to contain_jqcss(".points_possible_parent:visible")
 
-      assignment_picker.find_element(:css, "option[value='#{content_tag_1.id}']").click
-      requirement_picker = fj('.assignment_requirement_picker:visible')
-      requirement_picker.find_element(:css, 'option[value="min_score"]').click
-      expect(driver.execute_script('return $(".points_possible_parent:visible").length')).to be > 0
-
-      assignment_picker.find_element(:css, "option[value='#{content_tag_2.id}']").click
-      requirement_picker.find_element(:css, 'option[value="min_score"]').click
-      expect(driver.execute_script('return $(".points_possible_parent:visible").length')).to eq 0
+      fj(".assignment_picker:visible option[value='#{content_tag_2.id}']").click
+      wait_for_js # the action above might be changing the element underneath between finding and clicking
+      fj('.assignment_requirement_picker:visible option[value="min_score"]').click
+      expect(f("body")).not_to contain_jqcss(".points_possible_parent:visible")
     end
 
     it "should add and remove completion criteria" do
@@ -429,49 +429,25 @@ describe "context modules" do
       expect(fj('.alert.alert-error:visible').text).to eq "An external tool can't be saved without a URL."
     end
 
-    it "should add 2 modules with the first one as a prerequisite" do
+    it "shows the added pre requisites in the header of a module", priority: "1", test_id: 250297 do
+      add_modules_and_set_prerequisites
       get "/courses/#{@course.id}/modules"
-      first_module_name = 'First Module'
-      second_module_name = 'Second Module'
-      third_module_name = 'Third Module'
-      add_module(first_module_name)
-      add_module(second_module_name)
+      expect(f('.item-group-condensed:nth-of-type(3) .ig-header .prerequisites_message').text).
+        to eq "Prerequisites: #{@module1.name}, #{@module2.name}"
+    end
 
-      #adding second module - can't use add_module method because a prerequisite needs to be added to this module
-      add_form = new_module_form
-      replace_content(add_form.find_element(:id, 'context_module_name'), third_module_name)
-      # add first prerequisite
-      f('.ui-dialog .add_prerequisite_link').click
-      wait_for_ajaximations
-      click_option('.criterion select', "#{first_module_name}")
-      # add second prerequisite
-      f('.ui-dialog .add_prerequisite_link').click
-      wait_for_ajaximations
-      click_option('.criterion select:last', "#{second_module_name}")
-      submit_form(add_form)
-
-      wait_for_ajaximations
-      expect(fj('.prerequisites_message:first').text).to eq "Prerequisites: First Module, Second Module"
-
-      mod1 = @course.context_modules.where(:name => first_module_name).first
-      mod3 = @course.context_modules.where(:name => third_module_name).first
-
-      move_to_click("#context_module_#{mod3.id}")
-      f("#context_module_#{mod3.id} .ig-header-admin .al-trigger").click
-      f("#context_module_#{mod3.id} .edit_module_link").click
+    it "shows the added prerequisites when editing a module" do
+      add_modules_and_set_prerequisites
+      get "/courses/#{@course.id}/modules"
+      move_to_click("#context_module_#{@module3.id}")
+      f("#context_module_#{@module3.id} .ig-header-admin .al-trigger").click
+      f("#context_module_#{@module3.id} .edit_module_link").click
+      add_form = f('#add_context_module_form')
       expect(add_form).to be_displayed
       wait_for_ajaximations
-      prereq_select = fj('.criterion select')
+      prereq_select = f('.criterion select')
       option = first_selected_option(prereq_select)
-      expect(option.text).to eq first_module_name
-
-      ff('.cancel_button', dialog_for(add_form)).last.click
-      wait_for_ajaximations
-      mod3.publish!
-
-      # should bring up relock dialog on publish
-      f("#context_module_#{mod1.id} .publish-icon").click
-      test_relock
+      expect(option.text).to eq "#{@module1.name}"
     end
 
     it "does not have a prerequisites section when creating the first module" do
@@ -641,6 +617,39 @@ describe "context modules" do
 
       tag.reload
       expect(tag.indent).to eq 1
+    end
+
+    context "edit dialog" do
+      before :each do
+        @mod = create_modules(2, true)
+        @mod[0].add_item({id: @assignment.id, type: 'assignment'})
+        @mod[0].add_item({id: @assignment2.id, type: 'assignment'})
+        get "/courses/#{@course.id}/modules"
+      end
+
+      it "shows all items are completed radio button", priority: "1", test_id: 248023 do
+        f("#context_module_#{@mod[0].id} .ig-header-admin .al-trigger").click
+        hover_and_click("#context_module_#{@mod[0].id} .edit_module_link")
+        f('.add-item .add_completion_criterion_link').click
+        expect(f('.ic-Radio')).to contain_css("input[type=radio][id = context_module_requirement_count_]")
+        expect(f('.ic-Radio .ic-Label').text).to eq('Students must complete all of these requirements')
+      end
+
+      it "shows complete one of these items radio button", priority: "1", test_id: 250294 do
+        f("#context_module_#{@mod[0].id} .ig-header-admin .al-trigger").click
+        hover_and_click("#context_module_#{@mod[0].id} .edit_module_link")
+        f('.add-item .add_completion_criterion_link').click
+        expect(ff('.ic-Radio')[1]).to contain_css("input[type=radio][id = context_module_requirement_count_1]")
+        expect(ff('.ic-Radio .ic-Label')[1].text).to eq('Student must complete one of these requirements')
+      end
+
+      it "does not show the radio buttons for module with no items", priority: "1", test_id: 3028275 do
+        f("#context_module_#{@mod[1].id} .ig-header-admin .al-trigger").click
+        hover_and_click("#context_module_#{@mod[1].id} .edit_module_link")
+        expect(f('.ic-Radio .ic-Label').text).not_to include('Students must complete all of these requirements')
+        expect(f('.ic-Radio .ic-Label').text).not_to include('Student must complete one of these requirements')
+        expect(f('.completion_entry .no_items_message').text).to eq('No items in module')
+      end
     end
 
     context "module item cog focus management", priority: "1" do
@@ -1002,7 +1011,7 @@ describe "context modules" do
 
   context "as a teacher through course home page (set to modules)", priority: "1" do
     before(:once) do
-      course(:active_course => true)
+      course_factory(active_course: true)
       @course.default_view = 'modules'
       @course.save!
     end
@@ -1128,7 +1137,7 @@ describe "context modules" do
 
   context "as a teacher" do
     before(:once) do
-      course(:active_course => true)
+      course_factory(active_course: true)
     end
 
     before(:each) do

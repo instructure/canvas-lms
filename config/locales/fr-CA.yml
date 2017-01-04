@@ -14684,7 +14684,7 @@ fr-CA:
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%l:%M%P"
-      tiny_on_the_hour: "%-k:%M"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "il y a moins d’une minute"
     pm: pm
     ranges: 

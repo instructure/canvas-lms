@@ -109,7 +109,7 @@ describe SIS::CSV::TermImporter do
 
     t1 = @account.enrollment_terms.where(sis_source_id: 'T001').first
 
-    course(:account => @account)
+    course_factory(:account => @account)
     @course.enrollment_term = t1
     @course.save!
 

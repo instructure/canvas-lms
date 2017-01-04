@@ -144,7 +144,6 @@ define([
         $link.find(".message").text(I18n.t('bookmarking', "Bookmarking..."));
         $.ajaxJSON($(this).attr('href'), 'POST', {}, function(data) {
           $link.find('.message').text(I18n.t('already_bookmarked', 'Already Bookmarked'));
-          $link.find("img").attr('src', $link.find("img").attr('src').replace("bookmark_gray.png", "bookmark.png"));
           $link.attr('disabled', true);
         }, function() {
           $link.find(".message").text(I18n.t('bookmark_failed', "Bookmark Failed"));

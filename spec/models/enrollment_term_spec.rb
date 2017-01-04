@@ -89,7 +89,7 @@ describe EnrollmentTerm do
   describe "overridden_term_dates" do
     before(:once) do
       account_model
-      course account: @account
+      course_factory account: @account
       @term = @account.enrollment_terms.create!
     end
 
@@ -127,7 +127,7 @@ describe EnrollmentTerm do
 
     it "should not be able to delete an enrollment term with active courses" do
       @term = @account.enrollment_terms.create!
-      course account: @account
+      course_factory account: @account
       @course.enrollment_term = @term
       @course.save!
 

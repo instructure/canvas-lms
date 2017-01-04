@@ -125,7 +125,7 @@ describe Quizzes::QuizSubmissionService do
           quiz.context = Account.default.courses.new
 
           quiz.context.save!
-          participant.user = user
+          participant.user = user_factory
           quiz.context.enroll_user(participant.user)
 
           quiz.stubs(:grants_right?).returns(true)

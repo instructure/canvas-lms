@@ -24,12 +24,12 @@ describe Lti::LtiOutboundAdapter do
   let(:return_url) { '/return/url' }
   let(:user) { User.new }
   let(:resource_type) { :lti_launch_type }
-  let(:tool_url) { '/tool/launch/url' }
+  let(:tool_url) { 'http://www.tool.com/launch/url?firstname=rory' }
 
   let(:tool) {
     ContextExternalTool.new.tap do |tool|
       tool.stubs(:id).returns('tool_id')
-      tool.url = '/tool/launch/url'
+      tool.url = tool_url
     end
   }
 
@@ -206,6 +206,13 @@ describe Lti::LtiOutboundAdapter do
       LtiOutbound::ToolLaunch.stubs(:new).returns(tool_launch)
       adapter.prepare_tool_launch(return_url, variable_expander)
       adapter.generate_post_payload
+    end
+
+    it "does not copy query params to the post body if oauth_compliant tool setting is enabled" do
+      tool.settings = {oauth_compliant: true}
+      adapter.prepare_tool_launch(return_url, variable_expander)
+      payload = adapter.generate_post_payload
+      expect(payload['firstname']).to be_nil
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do

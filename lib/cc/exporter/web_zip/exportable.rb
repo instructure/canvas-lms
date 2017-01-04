@@ -7,9 +7,9 @@ module CC::Exporter::WebZip
     def convert_to_offline_web_zip
       exporter = CC::Exporter::WebZip::Exporter.new(content_cartridge.open, false)
       zip = CC::Exporter::WebZip::ZipPackage.new(exporter)
-      result = zip.create
+      file_path = zip.create || zip.empty_zip_file
       exporter.cleanup_files
-      result
+      file_path
     end
   end
 end

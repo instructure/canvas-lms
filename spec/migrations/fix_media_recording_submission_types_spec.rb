@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe DataFixup::FixMediaRecordingSubmissionTypes do
   it 'should fix bad submission types' do
     # set up data
-    course(:active_all => true, :name => 'Test course')
+    course_factory(active_all: true, :name => 'Test course')
     assign1 = @course.assignments.create!({
       :name => '1',
       :submission_types => 'online_recording,online_media_recording,online_text_entry'

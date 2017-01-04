@@ -6,7 +6,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
   context "wiki and tiny files as a student" do
     before(:each) do
-      course(:active_all => true, :name => 'wiki course')
+      course_factory(active_all: true, :name => 'wiki course')
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
       @teacher = user_with_pseudonym(:active_user => true, :username => 'teacher@example.com', :name => 'teacher@example.com', :password => 'asdfasdf')
       @course.enroll_student(@student).accept

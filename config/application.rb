@@ -195,7 +195,7 @@ module CanvasRails
       #
       # Easiest way to avoid the warning for now is to patch thor
       def validate_default_type!
-        return if switch_name == "--serializer"
+        return if switch_name == "--serializer" 
         super
       end
     end

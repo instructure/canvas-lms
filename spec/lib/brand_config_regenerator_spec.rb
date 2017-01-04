@@ -42,7 +42,7 @@ describe BrandConfigRegenerator do
       brand_config_md5: second_config.md5
     )
 
-    regenerator = BrandConfigRegenerator.new(@parent_account, user, new_brand_config)
+    regenerator = BrandConfigRegenerator.new(@parent_account, user_factory, new_brand_config)
 
     # 5 = 2 "inheriting" accounts + 3 "inheriting" shared configs
     brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(5)
@@ -80,7 +80,7 @@ describe BrandConfigRegenerator do
     child_config.save!
     @child_account.save!
 
-    regenerator = BrandConfigRegenerator.new(@parent_account, user, new_brand_config)
+    regenerator = BrandConfigRegenerator.new(@parent_account, user_factory, new_brand_config)
 
     brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(4)
     Delayed::Testing.drain
@@ -93,7 +93,7 @@ describe BrandConfigRegenerator do
   it "handles reverting to default (nil) theme correctly" do
     setup_account_family_with_configs
 
-    regenerator = BrandConfigRegenerator.new(@parent_account, user, nil)
+    regenerator = BrandConfigRegenerator.new(@parent_account, user_factory, nil)
 
     brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(4)
     Delayed::Testing.drain
@@ -114,7 +114,7 @@ describe BrandConfigRegenerator do
     site_admin_config = BrandConfig.for(variables: {"ic-brand-primary" => "orange"})
     site_admin_config.save!
 
-    regenerator = BrandConfigRegenerator.new(Account.site_admin, user, new_brand_config)
+    regenerator = BrandConfigRegenerator.new(Account.site_admin, user_factory, new_brand_config)
 
     # 6 = 3 "inheriting" accounts = 3 "inheriting" shared configs
     brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(6)

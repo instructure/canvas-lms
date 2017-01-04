@@ -289,7 +289,7 @@ describe "courses" do
       # Set up the course with > 50 users (to test scrolling)
       create_users_in_course @course, 60
 
-      @course.enroll_user(user, 'TaEnrollment')
+      @course.enroll_user(user_factory, 'TaEnrollment')
 
       # Test that the page loads properly the first time.
       get "/courses/#{@course.id}/users"
@@ -300,10 +300,10 @@ describe "courses" do
 
     it "should only show users that a user has permissions to view" do
       # Set up the test
-      course(:active_course => true)
+      course_factory(active_course: true)
       %w[One Two].each do |name|
         section = @course.course_sections.create!(:name => name)
-        @course.enroll_student(user, :section => section).accept!
+        @course.enroll_student(user_factory, :section => section).accept!
       end
       user_logged_in
       enrollment = @course.enroll_ta(@user)
@@ -319,7 +319,7 @@ describe "courses" do
 
     it "should display users section name" do
       course_with_teacher_logged_in(:active_all => true)
-      user1, user2 = [user, user]
+      user1, user2 = [user_factory, user_factory]
       section1 = @course.course_sections.create!(:name => 'One')
       section2 = @course.course_sections.create!(:name => 'Two')
       @course.enroll_student(user1, :section => section1).accept!
@@ -479,10 +479,10 @@ describe "courses" do
   end
 
   it "shouldn't cache unauth permissions for semi-public courses from sessionless permission checks" do
-    course(:active_all => true)
+    course_factory(active_all: true)
     @course.update_attribute(:is_public_to_auth_users, true)
 
-    user(:active_all => true)
+    user_factory(active_all: true)
     user_session(@user)
 
     enable_cache do

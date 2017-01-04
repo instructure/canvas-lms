@@ -290,14 +290,17 @@ describe GradingPeriod do
   end
 
   describe "#destroy" do
-    before { subject.destroy }
-
-    it "marks workflow as deleted" do
-      expect(subject.workflow_state).to eq "deleted"
+    it_behaves_like "soft deletion" do
+      let(:creation_arguments) { params }
+      subject { grading_period_group.grading_periods }
     end
 
-    it "does not destroy" do
-      expect(subject).not_to be_destroyed
+    it "calls destroy on associated scores" do
+      course = Course.create!
+      enrollment = student_in_course(course: course)
+      score = enrollment.scores.create!(grading_period: grading_period)
+      grading_period.destroy
+      expect(score.reload).to be_deleted
     end
   end
 

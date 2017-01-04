@@ -22,7 +22,7 @@ class GradingPeriod < ActiveRecord::Base
   attr_accessible :weight, :start_date, :end_date, :close_date, :title
 
   belongs_to :grading_period_group, inverse_of: :grading_periods
-  has_many :grading_period_grades, dependent: :destroy
+  has_many :scores, -> { active }, dependent: :destroy
 
   validates :title, :start_date, :end_date, :close_date, :grading_period_group_id, presence: true
   validate :start_date_is_before_end_date

@@ -680,7 +680,7 @@ class RoleOverride < ActiveRecord::Base
           'TeacherEnrollment',
           'AccountAdmin'
         ],
-        :if => :enable_user_notes
+        :account_allows => lambda {|a| a.root_account.enable_user_notes}
       },
       :read_course_content => {
         :label => lambda { t('permissions.read_course_content', "View course content") },
@@ -873,13 +873,14 @@ class RoleOverride < ActiveRecord::Base
         default_data[:account_allows].call(context.root_account)))
 
     base_role = role.base_role_type
+    locked = !default_data[:available_to].include?(base_role) || !account_allows
 
     generated_permission = {
       :account_allows => account_allows,
       :permission =>  default_data,
       :enabled    =>  account_allows && (default_data[:true_for].include?(base_role) ? [:self, :descendants] : false),
-      :locked     => !default_data[:available_to].include?(base_role),
-      :readonly   => !default_data[:available_to].include?(base_role),
+      :locked     => locked,
+      :readonly   => locked,
       :explicit   => false,
       :base_role_type => base_role,
       :enrollment_type => role.name,
@@ -896,7 +897,7 @@ class RoleOverride < ActiveRecord::Base
     end
 
     # cannot be overridden; don't bother looking for overrides
-    return generated_permission if generated_permission[:locked]
+    return generated_permission if locked
 
     @@role_override_chain ||= {}
     overrides = @@role_override_chain[permissionless_key] ||= begin

@@ -324,7 +324,7 @@ describe Attachment do
 
   context "ensure_media_object" do
     before :once do
-      @course = course
+      @course = course_factory
       @attachment = @course.attachments.build(:filename => 'foo.mp4')
       @attachment.content_type = 'video'
     end
@@ -417,7 +417,7 @@ describe Attachment do
     end
 
     it "should not show up in the context list after being destroyed" do
-      @course = course
+      @course = course_factory
       expect(@course).not_to be_nil
       a = attachment_model(:uploaded_data => default_uploaded_data, :context => @course)
       expect(a.filename).to eql("doc.doc")
@@ -513,7 +513,7 @@ describe Attachment do
   context "clone_for" do
     it "should clone to another context" do
       a = attachment_model(:filename => "blech.ppt")
-      course
+      course_factory
       new_a = a.clone_for(@course)
       expect(new_a.context).not_to eql(a.context)
       expect(new_a.filename).to eql(a.filename)
@@ -523,7 +523,7 @@ describe Attachment do
     it "should link the thumbnail" do
       a = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
       expect(a.thumbnail).not_to be_nil
-      course
+      course_factory
       new_a = a.clone_for(@course)
       expect(new_a.thumbnail).not_to be_nil
       expect(new_a.thumbnail_url).not_to be_nil
@@ -534,7 +534,7 @@ describe Attachment do
       a = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
       expect(a.root_attachment_id).to be_nil
       coursea = @course
-      @context = courseb = course
+      @context = courseb = course_factory
       b = a.clone_for(courseb, nil, :overwrite => true)
       b.save
       expect(b.context).to eq courseb
@@ -550,7 +550,7 @@ describe Attachment do
       new_b = b.clone_for(courseb, nil, :overwrite => true)
       expect(new_b.root_attachment_id).to eq a.id
 
-      @context = coursec = course
+      @context = coursec = course_factory
       c = b.clone_for(coursec, nil, :overwrite => true)
       expect(c.root_attachment).to eq a
 
@@ -568,7 +568,7 @@ describe Attachment do
       a = attachment_model(uploaded_data: stub_png_data, content_type: 'image/png')
       expect(a.root_attachment_id).to be_nil
       coursea = @course
-      @context = courseb = course
+      @context = courseb = course_factory
 
       # emulate the situation where a namespace doesn't match what
       # infer_namespace now returns
@@ -1140,7 +1140,7 @@ describe Attachment do
   describe "thumbnail source image size limitation" do
     before(:once) do
       local_storage! # s3 attachment data is stubbed out, so there is no image to identify the size of
-      course
+      course_factory
     end
 
     it 'creates thumbnails for smaller images' do
@@ -1286,7 +1286,7 @@ describe Attachment do
     end
 
     it "should not fail if the attachment context does not have participants" do
-      cm = ContentMigration.create!(:context => course)
+      cm = ContentMigration.create!(:context => course_factory)
       attachment_model(:context => cm, :uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
 
       Attachment.where(:id => @attachment).update_all(:need_notify => true)
@@ -1535,7 +1535,7 @@ describe Attachment do
     it "should infer the correct namespace from the root attachment" do
       local_storage!
       Rails.env.stubs(:development?).returns(true)
-      course
+      course_factory
       a1 = attachment_model(context: @course, uploaded_data: default_uploaded_data)
       a2 = attachment_model(context: @course, uploaded_data: default_uploaded_data)
       expect(a2.root_attachment).to eql(a1)
@@ -1544,7 +1544,7 @@ describe Attachment do
   end
 
   it "should be able to add a hidden attachment as a context module item" do
-    course
+    course_factory
     att = attachment_model(context: @course, uploaded_data: default_uploaded_data)
     att.hidden = true
     att.save!
@@ -1581,14 +1581,14 @@ describe Attachment do
   describe 'local storage' do
     it 'should properly sanitie a filename containing a slash' do
       local_storage!
-      course
+      course_factory
       a = attachment_model(filename: 'ENGL_100_/_ENGL_200.csv')
       expect(a.filename).to eql('ENGL_100___ENGL_200.csv')
     end
 
     it 'should still properly escape the same filename on s3' do
       s3_storage!
-      course
+      course_factory
       a = attachment_model(filename: 'ENGL_100_/_ENGL_200.csv')
       expect(a.filename).to eql('ENGL_100_%2F_ENGL_200.csv')
     end
@@ -1596,7 +1596,7 @@ describe Attachment do
 
   describe "preview_params" do
     it "includes crocodoc_ids only when a whitelist is given" do
-      course :active_all => true
+      course_factory :active_all => true
       att = attachment_model
       expect(att.send :preview_params, @teacher, 'document/msword').not_to include 'crocodoc_ids'
       expect(att.send :preview_params, @teacher, 'document/msword', [1]).to include 'crocodoc_ids'

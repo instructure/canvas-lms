@@ -201,7 +201,7 @@ describe DueDateCacher do
     context "adhoc override" do
       before do
         @student1 = @student
-        @student2 = user
+        @student2 = user_factory
         @course.enroll_student(@student2, :enrollment_state => 'active')
 
         assignment_override_model(
@@ -228,7 +228,7 @@ describe DueDateCacher do
     context "section override" do
       before do
         @student1 = @student
-        @student2 = user
+        @student2 = user_factory
 
         add_section('second section')
         @course.enroll_student(@student2, :enrollment_state => 'active', :section => @course_section)
@@ -265,7 +265,7 @@ describe DueDateCacher do
     context "group override" do
       before do
         @student1 = @student
-        @student2 = user
+        @student2 = user_factory
         @course.enroll_student(@student2, :enrollment_state => 'active')
 
         @assignment.group_category = group_category
@@ -362,8 +362,8 @@ describe DueDateCacher do
     context "multiple submissions with selective overrides" do
       before do
         @student1 = @student
-        @student2 = user
-        @student3 = user
+        @student2 = user_factory
+        @student3 = user_factory
 
         add_section('second section')
         @course.enroll_student(@student2, :enrollment_state => 'active', :section => @course_section)

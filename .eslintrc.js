@@ -1,11 +1,10 @@
-module.exports = {
+module.exports = Object.assign({
   "env": {
     "es6": true,
     "amd": true,
     "browser": true
   },
   "extends": "airbnb",
-  "globals": require('./.eslintrc.common.js').globals,
   "parserOptions": {
     "ecmaVersion": 7,
     "ecmaFeatures": {
@@ -14,6 +13,5 @@ module.exports = {
     },
     "sourceType": "module"
   },
-  "parser": "babel-eslint",
-  "rules": require('./.eslintrc.common.js').rules
-};
+  "parser": "babel-eslint"
+}, require('./.eslintrc.common.js'))

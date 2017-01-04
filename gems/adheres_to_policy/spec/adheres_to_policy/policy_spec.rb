@@ -20,16 +20,16 @@ require 'spec_helper'
 
 describe AdheresToPolicy::Policy, "set_policy" do
   it "should take a block" do
-    lambda {
+    expect {
       Class.new do
         extend AdheresToPolicy::ClassMethods
         set_policy { 1 + 1 }
       end
-    }.should_not raise_error
+    }.not_to raise_error
   end
 
   it "should allow multiple calls" do
-    lambda {
+    expect {
       Class.new do
         extend AdheresToPolicy::ClassMethods
 
@@ -37,7 +37,7 @@ describe AdheresToPolicy::Policy, "set_policy" do
           set_policy { 1 + 1 }
         end
       end
-    }.should_not raise_error
+    }.not_to raise_error
   end
 
   context "available_rights" do
@@ -60,8 +60,8 @@ describe AdheresToPolicy::Policy, "set_policy" do
 
   describe '#add_rights' do
     it 'should add rights to parents' do
-      right = mock
-      condition = mock
+      right = double
+      condition = double
       parent = AdheresToPolicy::Policy.new(nil, nil)
       policy = AdheresToPolicy::Policy.new(parent, nil)
 

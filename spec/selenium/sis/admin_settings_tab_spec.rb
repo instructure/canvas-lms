@@ -46,24 +46,17 @@ describe "admin settings tab" do
     it "should test SIS Agent Token Authentication", priority: "2", test_id: 132577 do
       course_with_admin_logged_in(:account => Account.site_admin)
       sis_token = "canvas"
-      go_to_feature_options(Account.site_admin)
-      move_to_click("label[for=ff_allowed_post_grades]")
-      go_to_feature_options(account)
-      move_to_click("label[for=ff_allowed_post_grades]")
-      f("#tab-settings-link").click
-      # SIS Agent Token Authentication will not appear without refresh
-      refresh_page
+      account.enable_feature!(:post_grades)
+
+      get_settings_page(account)
       expect(f("#add_sis_app_token")).to be_displayed
       expect(f("#account_settings_sis_app_token")).to be_displayed
       f("#account_settings_sis_app_token").send_keys(sis_token)
       f(".Button--primary").click
       token = f("#account_settings_sis_app_token")
-      keep_trying_until do
-        expect(token.attribute("value")).to eq sis_token
-      end
-      go_to_feature_options(account)
-      move_to_click("label[for=ff_off_post_grades]")
-      f('#tab-settings-link').click
+      expect(token).to have_value(sis_token)
+
+      account.disable_feature!(:post_grades)
       refresh_page
       expect(f("#account_settings")).not_to contain_css("#account_settings_sis_app_token")
     end

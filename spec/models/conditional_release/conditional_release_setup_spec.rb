@@ -65,7 +65,7 @@ describe ConditionalRelease::Setup do
     stub_config
     @root_account = account_model
     @sub_account = account_model parent_account: @root_account
-    @course = course account: @sub_account, active_all: true
+    @course = course_factory account: @sub_account, active_all: true
     @user = user_with_pseudonym account: @root_account
     service.stubs(:jwt_for).returns("some.jwt.thing")
     service.stubs(:unique_id).returns("unique@cyoe.id")
@@ -188,7 +188,7 @@ describe ConditionalRelease::Setup do
   describe "#create_token!" do
     before :each do
       @t_new_account = account_model
-      @t_new_course = course account: @t_new_account, active_all: true
+      @t_new_course = course_factory account: @t_new_account, active_all: true
       @t_new_user = user_with_pseudonym account: @t_new_account
     end
 

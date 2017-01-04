@@ -499,6 +499,10 @@ li.quiz {
     // Don't display the "move"  icon since the the new order change isn't persisted for a bank. #10148
 
   }
+  .icon-bookmark,
+  .icon-remove-bookmark {
+    color: $ic-color-medium-darker;
+  }
 }
 
 .question_holder {

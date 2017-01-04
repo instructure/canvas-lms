@@ -1,4 +1,5 @@
 require_relative "../../spec_helper"
+require_dependency "services/rich_content"
 
 module Services
   describe RichContent do

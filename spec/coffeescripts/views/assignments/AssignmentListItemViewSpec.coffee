@@ -485,22 +485,22 @@ define [
     ok json.canMove
     notOk view.className().includes('sort-disabled')
 
-  test 'can move when canManage is true and the model can be deleted', ->
-    @stub(@model, 'canDelete').returns(true)
+  test 'can move when canManage is true and the assignment group id is not locked', ->
+    @stub(@model, 'canMove').returns(true)
     view = createView(@model, userIsAdmin: false, canManage: true)
     json = view.toJSON()
     ok json.canMove
     notOk view.className().includes('sort-disabled')
 
-  test 'cannot move when canManage is true but the model cannot be deleted', ->
-    @stub(@model, 'canDelete').returns(false)
+  test 'cannot move when canManage is true but the assignment group id is locked', ->
+    @stub(@model, 'canMove').returns(false)
     view = createView(@model, userIsAdmin: false, canManage: true)
     json = view.toJSON()
     notOk json.canMove
     ok view.className().includes('sort-disabled')
 
-  test 'cannot move when canManage is false but the model can be deleted', ->
-    @stub(@model, 'canDelete').returns(true)
+  test 'cannot move when canManage is false but the assignment group id is not locked', ->
+    @stub(@model, 'canMove').returns(true)
     view = createView(@model, userIsAdmin: false, canManage: false)
     json = view.toJSON()
     notOk json.canMove

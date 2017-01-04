@@ -12,7 +12,7 @@ define [
   'compiled/AssignmentMuter'
   'jsx/gradebook/CourseGradeCalculator'
   'jsx/gradebook/EffectiveDueDates'
-  'compiled/gradebook2/OutcomeGradebookGrid'
+  'compiled/gradebook/OutcomeGradebookGrid'
   '../../shared/components/ic_submission_download_dialog_component'
   'str/htmlEscape'
   'compiled/models/grade_summary/CalculationMethodContent'

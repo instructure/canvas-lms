@@ -1,10 +1,6 @@
 module MasterCourses::Restrictor
   def self.included(klass)
-    klass.cattr_accessor :restricted_column_settings
-    klass.restricted_column_settings = {}
-
-    klass.extend ClassMethods
-    klass.validate :check_for_restricted_column_changes
+    klass.include(CommonMethods)
     klass.send(:attr_writer, :master_course_restrictions)
 
     klass.after_create :create_child_content_tag
@@ -15,41 +11,68 @@ module MasterCourses::Restrictor
     klass.before_update :check_before_overwriting_child_content_on_import
   end
 
-  module ClassMethods
-    def restrict_columns(edit_type, columns)
-      raise "invalid restriction type" unless MasterCourses::LOCK_TYPES.include?(edit_type)
-      if self.restricted_column_settings[edit_type] # already set
-        Rails.logger.warn("column restrictions for class #{self.name}, type #{edit_type} are already set")
-        return # i'd raise, but i'm sure some spring thing will reload this at some point
-      end
-      columns = Array(columns).map(&:to_s)
-      self.restricted_column_settings[edit_type] = columns
+  module CommonMethods # i didn't want to copypaste all this into the collection one
+    def self.included(klass)
+      klass.cattr_accessor :restricted_column_settings
+      klass.restricted_column_settings = {}
+
+      klass.extend ClassMethods
+      klass.validate :check_for_restricted_column_changes
     end
-  end
 
-  def mark_as_importing!(cm)
-    @importing_migration = cm
-  end
-
-  def check_for_restricted_column_changes
-    return true if new_record? || @importing_migration || !is_child_content?
-    restrictions = nil
-    locked_columns = []
-    self.class.base_class.restricted_column_settings.each do |type, columns|
-      changed_columns = (self.changes.keys & columns)
-      if changed_columns.any?
-        locked_columns += changed_columns if self.master_course_restrictions[type]
+    module ClassMethods
+      def restrict_columns(edit_type, columns)
+        raise "invalid restriction type" unless MasterCourses::LOCK_TYPES.include?(edit_type)
+        columns = Array(columns).map(&:to_s)
+        current = self.restricted_column_settings[edit_type] || []
+        self.restricted_column_settings[edit_type] = (current + columns).uniq
       end
     end
-    if locked_columns.any?
-      self.errors.add(:base, "cannot change column(s): #{locked_columns.join(", ")} - locked by Master Course")
+
+    def mark_as_importing!(cm)
+      @importing_migration = cm
+    end
+
+    def check_for_restricted_column_changes
+      return true if @importing_migration || !is_child_content?
+      return true if new_record? && !self.respond_to?(:owner_for_restrictions) # shouldn't be able to create new collection items if owner is locked
+
+      restrictions = nil
+      locked_columns = []
+      self.class.base_class.restricted_column_settings.each do |type, columns|
+        changed_columns = (self.changes.keys & columns)
+        if changed_columns.any?
+          locked_columns += changed_columns if self.master_course_restrictions[type]
+        end
+      end
+      if locked_columns.any?
+        self.errors.add(:base, "cannot change column(s): #{locked_columns.join(", ")} - locked by Master Course")
+      end
+    end
+
+    def editing_restricted?(edit_type=:all) # edit_type can be :all, :any, or a specific type: :content, :settings
+      return false unless is_child_content?
+
+      restrictions = self.master_course_restrictions
+      return false unless restrictions.present?
+
+      case edit_type
+      when :all
+        self.class.base_class.restricted_column_settings.keys.all?{|type| restrictions[type]} # make it possible to only have restrictions on one type
+      when :any
+        self.class.base_class.restricted_column_settings.keys.any?{|type| restrictions[type]}
+      when *MasterCourses::LOCK_TYPES
+        !!restrictions[edit_type]
+      else
+        raise "invalid edit type"
+      end
     end
   end
 
-  def mark_downstream_changes
+  def mark_downstream_changes(changed_columns=nil)
     return if @importing_migration || !is_child_content? # don't mark changes on import
 
-    changed_columns = self.changes.keys & self.class.base_class.restricted_column_settings.values.flatten
+    changed_columns ||= self.changes.keys & self.class.base_class.restricted_column_settings.values.flatten
     if changed_columns.any?
       MasterCourses::ChildContentTag.transaction do
         child_tag = MasterCourses::ChildContentTag.all.polymorphic_where(:content => self).lock.first
@@ -82,7 +105,7 @@ module MasterCourses::Restrictor
     restrictions = nil
     columns_to_restore = []
     self.class.base_class.restricted_column_settings.each do |type, columns|
-      changed_columns = (child_tag.downstream_changes & self.changes.keys & columns)
+      changed_columns = (child_tag.downstream_changes & columns) # should unlink all changes if _any_ in the category has been changed
       if changed_columns.any?
         if self.master_course_restrictions[type] # don't overwrite downstream changes _unless_ it's locked
           child_tag.downstream_changes -= changed_columns # remove them from the downstream changes since we overwrote
@@ -99,22 +122,23 @@ module MasterCourses::Restrictor
     end
   end
 
-  def editing_restricted?(edit_type=:all) # edit_type can be :all, :any, or a specific type: :content, :settings
-    return false unless is_child_content?
+  def edit_types_locked_for_overwrite_on_import
+    return [] unless @importing_migration && is_child_content?
+    # this is just a read-only method to check whether we _can_ overwrite
+    # should help on import when checking on collection items that aren't instantiated
+    # e.g. assessment questions in a bank
 
-    restrictions = self.master_course_restrictions
-    return false unless restrictions.present?
+    child_tag = @importing_migration.master_course_subscription.content_tag_for(self)
+    return [] unless child_tag.downstream_changes.present?
 
-    case edit_type
-    when :all
-      MasterCourses::LOCK_TYPES.all?{|type| restrictions[type]}
-    when :any
-      MasterCourses::LOCK_TYPES.any?{|type| restrictions[type]}
-    when *MasterCourses::LOCK_TYPES
-      !!restrictions[edit_type]
-    else
-      raise "invalid edit type"
+    locked_types = []
+    self.class.base_class.restricted_column_settings.each do |type, columns|
+      if (child_tag.downstream_changes & columns).any?
+        locked_types << type
+      end
     end
+
+    locked_types
   end
 
   def is_child_content?
@@ -122,7 +146,15 @@ module MasterCourses::Restrictor
   end
 
   def master_course_restrictions
-    @master_course_restrictions ||= MasterCourses::MasterContentTag.where(:migration_id => self.migration_id).pluck(:restrictions).first || {}
+    @master_course_restrictions ||= find_master_course_restrictions || {}
+  end
+
+  def find_master_course_restrictions
+    if @importing_migration
+      @importing_migration.master_course_subscription.master_template.find_preloaded_restriction(self.migration_id) # for extra speeds on import
+    else
+      MasterCourses::MasterContentTag.where(:migration_id => self.migration_id).pluck(:restrictions).first
+    end
   end
 
   def master_course_restrictions_loaded?

@@ -8,8 +8,8 @@ describe Api::V1::SisAssignment do
   subject { SisAssignmentHarness.new }
 
   context "#sis_assignments_json" do
-    let(:course_1) { course }
-    let(:assignment_1) { assignment_model(course: course) }
+    let(:course_1) { course_factory }
+    let(:assignment_1) { assignment_model(course: course_factory) }
     let(:assignment_with_context) { Assignment.new }
 
     let(:assignment_override_1) do

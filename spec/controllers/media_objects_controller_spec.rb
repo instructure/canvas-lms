@@ -43,8 +43,8 @@ describe MediaObjectsController do
     
     it "should retrieve info about a 'deleted' MediaObject" do
       deleted_media_id = '0_deadbeef'
-      course
-      media_object = course.media_objects.build :media_id => deleted_media_id
+      course_factory
+      media_object = course_factory.media_objects.build :media_id => deleted_media_id
       media_object.workflow_state = 'deleted'
       media_object.save!
       

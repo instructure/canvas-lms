@@ -23,7 +23,7 @@ describe KalturaMediaFileHandler do
     let(:kaltura_config) { {} }
     let(:kaltura_client) { mock('CanvasKaltura::ClientV3') }
     let(:files_sent_to_kaltura) { [] }
-    let(:uploading_user) { user }
+    let(:uploading_user) { user_factory }
     let(:attachment_context) { uploading_user }
     let(:attachment) { attachment_obj_with_context(attachment_context, user: uploading_user) }
     let(:wait_for_completion) { false }

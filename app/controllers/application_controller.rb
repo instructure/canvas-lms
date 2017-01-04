@@ -1804,14 +1804,14 @@ class ApplicationController < ActionController::Base
   #
   # Bundles are defined in app/coffeescripts/bundles/<bundle>.coffee
   #
-  # usage: js_bundle :gradebook2
+  # usage: js_bundle :gradebook
   #
   # Only allows multiple arguments to support old usage of jammit_js
   #
   # Optional :plugin named parameter allows you to specify a plugin which
   # contains the bundle. Example:
   #
-  # js_bundle :gradebook2, :plugin => :my_feature
+  # js_bundle :gradebook, :plugin => :my_feature
   #
   # will look for the bundle in
   # /plugins/my_feature/(optimized|javascripts)/compiled/bundles/ rather than
@@ -1985,7 +1985,8 @@ class ApplicationController < ActionController::Base
     end
 
     if @page
-      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true)
+      check_for_restrictions = master_courses? && @context.wiki.grants_right?(@current_user, :manage)
+      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true, :include_master_course_restrictions => check_for_restrictions)
       hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? StringifyIds.stringify_id(current_version.number) : nil
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
       hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)

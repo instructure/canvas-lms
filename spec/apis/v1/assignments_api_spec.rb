@@ -595,7 +595,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
       context "as a student" do
         before :once do
-          course(:active_all => true)
+          course_factory(active_all: true)
           setup_DA
         end
 
@@ -617,7 +617,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
       context "as an observer" do
         before :once do
-          course(:active_all => true)
+          course_factory(active_all: true)
           setup_DA
           @observer = User.create
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @course.course_sections.first, :enrollment_state => 'active', :allow_multiple_enrollments => true)
@@ -721,7 +721,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
     it "returns due dates as they apply to the user" do
       course_with_student(active_all: true)
       @user = @student
-      @student.enrollments.map(&:destroy_permanently!)
+      @student.enrollments.each(&:destroy_permanently!)
       @assignment = @course.assignments.create!(title: "Test Assignment", description: "public stuff")
       @section = @course.course_sections.create!(name: "afternoon delight")
       @course.enroll_user(@student, "StudentEnrollment", section: @section, enrollment_state: :active)
@@ -735,7 +735,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
     it "returns original assignment due dates" do
       course_with_student(:active_all => true)
       @user = @teacher
-      @student.enrollments.map(&:destroy_permanently!)
+      @student.enrollments.each(&:destroy_permanently!)
       @assignment = @course.assignments.create!(
         :title => "Test Assignment",
         :description => "public stuff",
@@ -783,7 +783,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       it "shows unpublished assignments to teachers" do
-        user
+        user_factory
         @enrollment = @course.enroll_user(@user, 'TeacherEnrollment')
         @enrollment.course = @course # set the reverse association
 
@@ -2921,6 +2921,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           'topic_children' => [],
           'locked' => false,
           'can_lock' => true,
+          'can_unlock' => true,
           'locked_for_user' => false,
           'root_topic_id' => @topic.root_topic_id,
           'podcast_url' => nil,
@@ -2974,7 +2975,8 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       it "returns the dates for assignment as they apply to the user" do
-        @student.enrollments.map(&:destroy_permanently!)
+        Score.where(enrollment_id: @student.enrollments).delete_all
+        @student.enrollments.each(&:destroy_permanently!)
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",
           :description => "public stuff"
@@ -2991,7 +2993,8 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       it "returns original assignment due dates" do
-        @student.enrollments.map(&:destroy_permanently!)
+        Score.where(enrollment_id: @student.enrollments).delete_all
+        @student.enrollments.each(&:destroy_permanently!)
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",
           :description => "public stuff",

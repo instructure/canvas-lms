@@ -517,6 +517,20 @@ describe AssignmentGroupsApiController, type: :request do
   include Api::V1::Assignment
   include AssignmentGroupsApiSpecHelper
 
+  let(:name)             { "Awesome group name" }
+  let(:position)         { 1 }
+  let(:integration_data) { {"my existing" => "data", "more" => "data"} }
+
+  let(:params) do
+    {
+      'name'             => name,
+      'position'         => position,
+      'integration_data' => integration_data
+    }
+  end
+
+  let(:invalid_integration_data) { 'invalid integration data format' }
+
   context '#show' do
 
     before :once do
@@ -680,51 +694,43 @@ describe AssignmentGroupsApiController, type: :request do
 
       expect(json['rules']).to eq rules
     end
-
   end
+
+
   context '#create' do
     before do
       course_with_teacher(active_all: true)
     end
 
     it 'should create an assignment_group' do
-      params = {'name' => 'Some group', 'position' => 1}
-      expect {
-        api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
-          controller: 'assignment_groups_api',
-          action: 'create',
-          format: 'json',
-          course_id: @course.id.to_s},
-          params)
-      }.to change(AssignmentGroup, :count).by(1)
-    end
-
-    it 'should create an assignment_group with integration_data' do
-      params = {'name' => 'Some group 2', 'position' => 1,
-                'integration_data'=> {'oh'=> 'hello', 'whats' => 'up'}}
-      response = api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
+      api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
         controller: 'assignment_groups_api',
-        action: 'create',
-        format: 'json',
-        course_id: @course.id.to_s},
-                      params)
-      expect(response['integration_data']).to eq({'oh'=> 'hello', 'whats' => 'up'})
-    end
-
-    it 'should not create an assignment_group with invalid integration_data and respond with the correct message' do
-      params = {'name' => 'Some group 2', 'position' => 1, 'integration_data'=> 'boo'}
-      expect do
-        api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
-          controller: 'assignment_groups_api',
           action: 'create',
           format: 'json',
           course_id: @course.id.to_s},
           params)
-      end.to raise_error("Invalid integration data")
+      assignment_group = AssignmentGroup.last
+      expect(assignment_group.name).to eq(name)
+      expect(assignment_group.position).to eq(position)
+      expect(assignment_group.integration_data).to eq(integration_data)
     end
 
-    it 'should not create an assignment_group with invalid integration_data and respond with the correct status code' do
-      params = {'name' => 'Some group 2', 'position' => 1, 'integration_data'=> 'baz'}
+    it 'does not create an assignment_group with invalid integration_data' do
+      params['integration_data'] = invalid_integration_data
+
+      expect do
+        raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
+          controller: 'assignment_groups_api',
+            action: 'create',
+            format: 'json',
+            course_id: @course.id.to_s},
+            params)
+      end.to change(AssignmentGroup, :count).by(0)
+    end
+
+    it 'responds with a 400 when invalid integration_data is included' do
+      params['integration_data'] = invalid_integration_data
+
       response = raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
         controller: 'assignment_groups_api',
         action: 'create',

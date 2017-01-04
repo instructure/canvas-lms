@@ -41,7 +41,7 @@ define([
     equal(form.refs.title.value, 'Q1');
     equal(form.refs.startDate.refs.dateInput.value, 'Nov 1, 2015 at 12pm');
     equal(form.refs.endDate.refs.dateInput.value, 'Dec 31, 2015 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7 at 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 at 12pm');
   });
 
   test('renders with the save button enabled', function() {
@@ -86,7 +86,7 @@ define([
     endDateInput.value = 'Dec 30, 2015 at 12pm';
     endDateInput.dispatchEvent(new Event("change"));
     equal(form.refs.endDate.refs.dateInput.value, 'Dec 30, 2015 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7 at 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 at 12pm');
   });
 
   test("preserves 'closeDate' when already set and 'endDate' changes to match, then changes again", function() {
@@ -97,7 +97,7 @@ define([
     endDateInput.value = 'Dec 30, 2015 at 12pm';
     endDateInput.dispatchEvent(new Event("change"));
     equal(form.refs.endDate.refs.dateInput.value, 'Dec 30, 2015 at 12pm');
-    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7 at 12pm');
+    equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 at 12pm');
   });
 
   test("auto-updates 'closeDate' when cleared and 'endDate' changes", function() {

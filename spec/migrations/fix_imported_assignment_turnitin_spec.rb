@@ -4,7 +4,7 @@ describe DataFixup::FixImportedAssignmentTurnitin do
   it 'should fix turnitin_settings for imported assignments (that have no submissions)' do
     a1 = assignment_model
     a2 = assignment_model
-    u = user(:active_all => true)
+    u = user_factory(active_all: true)
     a2.context.enroll_student(u)
     a3 = assignment_model
 

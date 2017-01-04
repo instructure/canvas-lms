@@ -1,8 +1,8 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2 - total points toggle" do
+describe "gradebook - total points toggle" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
@@ -19,7 +19,7 @@ describe "gradebook2 - total points toggle" do
       expect(total.text).to match(/\A#{expected_points.shift}$/) unless total.text.length < 1
     end
   end
-  
+
   def open_display_dialog
     f("#total_dropdown").click
     f(".toggle_percent").click
@@ -45,7 +45,7 @@ describe "gradebook2 - total points toggle" do
     @course.show_total_grade_as_points = true
     @course.save!
     @course.reload
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     should_show_points(15, 10, 10)
   end
@@ -58,19 +58,19 @@ describe "gradebook2 - total points toggle" do
     group.group_weight = 50
     group.save!
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     should_show_percentages
   end
 
   it "should warn the teacher that studens will see a change" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     open_display_dialog
     dialog = fj('.ui-dialog:visible')
     expect(dialog).to include_text("Warning")
   end
 
   it 'should allow toggling display by points or percent', priority: "1", test_id: 164012 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     should_show_percentages
     toggle_grade_display
 
@@ -98,7 +98,7 @@ describe "gradebook2 - total points toggle" do
   end
 
   it 'should not show the warning once dont show is checked' do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     open_display_dialog
     close_dialog_and_dont_show_again
 

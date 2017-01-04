@@ -26,7 +26,7 @@ describe Api::V1::Course do
 
   describe "#course_settings_json" do
   	it "should return course settings hash" do
-  		course
+  		course_factory
   		grading_standard = grading_standard_for(@course)
   		@course.grading_standard = grading_standard
   		@course.save
@@ -41,7 +41,7 @@ describe Api::V1::Course do
 
   describe "#course_json" do
     it "should work for a logged-out user" do
-      course
+      course_factory
       hash = course_json(@course, nil, nil, [], nil)
       expect(hash['id']).to be_present
     end

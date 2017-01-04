@@ -88,7 +88,7 @@ describe GradingPeriodGroup do
     end
 
     it "is not able to mass-assign the course id" do
-      course = course()
+      course = course_factory()
       grading_period_group = GradingPeriodGroup.new(valid_attributes.merge(course_id: course.id))
       expect(grading_period_group.course_id).to be_nil
       expect(grading_period_group.course).to be_nil

@@ -1,4 +1,5 @@
 require File.expand_path('../../spec_helper', File.dirname(__FILE__))
+require_dependency "broadcast_policies/wiki_page_policy"
 
 module BroadcastPolicies
   describe WikiPagePolicy do

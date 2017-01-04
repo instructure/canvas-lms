@@ -19,7 +19,7 @@ module GradebookSetup
   end
 
   def add_teacher_and_student
-    course(active_all: true)
+    course_factory(active_all: true)
     student_in_course
   end
 

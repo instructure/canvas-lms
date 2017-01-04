@@ -22,7 +22,7 @@ describe UserContent::FilesHandler do
   let(:is_public) { false }
   let(:in_app) { false }
   let(:attachment) do
-    attachment_with_context(course(active_all:true), {
+    attachment_with_context(course_factory(active_all:true), {
       filename: 'test.mp4',
       content_type: 'video'
     })
@@ -126,7 +126,7 @@ describe UserContent::FilesHandler do
       end
 
       context 'user does not have download rights' do
-        let(:current_user) { user }
+        let(:current_user) { user_factory }
 
         it 'returns match_url with preview=1' do
           expect(processed_url).to eq "#{match_url}&no_preview=1"

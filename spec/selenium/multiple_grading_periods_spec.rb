@@ -17,11 +17,11 @@
 #
 
 require_relative './common'
-require_relative './helpers/gradebook2_common'
+require_relative './helpers/gradebook_common'
 
 describe "interaction with multiple grading periods" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:get_gradebook) { get "/courses/#{@course.id}/gradebook" }
@@ -103,7 +103,7 @@ describe "interaction with multiple grading periods" do
 
     context 'assignment index page' do
       let(:account) { Account.default }
-      let(:teacher) { user(active_all: true) }
+      let(:teacher) { user_factory(active_all: true) }
       let!(:enroll_teacher) { test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active') }
       let!(:enable_mgp_flag) { account.enable_feature!(:multiple_grading_periods) }
       let!(:enable_course_mgp_flag) { test_course.enable_feature!(:multiple_grading_periods) }
@@ -142,8 +142,8 @@ describe "interaction with multiple grading periods" do
   context 'student view' do
     let(:account) { Account.default }
     let(:test_course) { account.courses.create!(name: 'New Course') }
-    let(:student) { user(active_all: true) }
-    let(:teacher) { user(active_all: true) }
+    let(:student) { user_factory(active_all: true) }
+    let(:teacher) { user_factory(active_all: true) }
     let!(:enroll_teacher) { test_course.enroll_teacher(teacher) }
     let!(:enroll_student) { test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active') }
     let!(:enable_mgp_flag) { account.enable_feature!(:multiple_grading_periods) }

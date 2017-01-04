@@ -4,8 +4,8 @@ describe JwtsController do
   describe "#generate" do
     include_context "JWT setup"
 
-    let(:token_user){ user(active_user: true) }
-    let(:other_user){ user(active_user: true) }
+    let(:token_user){ user_factory(active_user: true) }
+    let(:other_user){ user_factory(active_user: true) }
 
     it "requires being logged in" do
       post 'create'

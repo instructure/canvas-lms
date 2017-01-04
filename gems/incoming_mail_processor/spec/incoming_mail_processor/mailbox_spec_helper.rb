@@ -19,11 +19,11 @@
 shared_examples_for 'Mailbox' do
 
   describe "Mailbox interface" do
-    it { should respond_to :connect }
-    it { should respond_to :each_message }
-    it { should respond_to :delete_message }
-    it { should respond_to :move_message }
-    it { should respond_to :disconnect }
-    it { should respond_to :set_timeout_method }
+    it { is_expected.to respond_to :connect }
+    it { is_expected.to respond_to :each_message }
+    it { is_expected.to respond_to :delete_message }
+    it { is_expected.to respond_to :move_message }
+    it { is_expected.to respond_to :disconnect }
+    it { is_expected.to respond_to :set_timeout_method }
   end
 end

@@ -26,8 +26,8 @@ describe "new account course search" do
   end
 
   it "should hide courses without enrollments if checked" do
-    empty_course = course(:account => @account, :course_name => "no enrollments")
-    not_empty_course = course(:account => @account, :course_name => "yess enrollments", :active_all => true)
+    empty_course = course_factory(:account => @account, :course_name => "no enrollments")
+    not_empty_course = course_factory(:account => @account, :course_name => "yess enrollments", :active_all => true)
     student_in_course(:course => not_empty_course, :active_all => true)
 
     get "/accounts/#{@account.id}"
@@ -47,7 +47,7 @@ describe "new account course search" do
 
   it "should paginate" do
     11.times do |x|
-      course(:account => @account, :course_name => "course #{x + 1}")
+      course_factory(:account => @account, :course_name => "course_factory #{x + 1}")
     end
 
     get "/accounts/#{@account.id}"
@@ -64,11 +64,11 @@ describe "new account course search" do
   it "should search by term" do
 
     term = @account.enrollment_terms.create!(:name => "some term")
-    term_course = course(:account => @account, :course_name => "term course")
+    term_course = course_factory(:account => @account, :course_name => "term course_factory")
     term_course.enrollment_term = term
     term_course.save!
 
-    other_course = course(:account => @account, :course_name => "other course")
+    other_course = course_factory(:account => @account, :course_name => "other course_factory")
 
     get "/accounts/#{@account.id}"
 
@@ -82,8 +82,8 @@ describe "new account course search" do
   end
 
   it "should search by name" do
-    match_course = course(:account => @account, :course_name => "course with a search term")
-    not_match_course = course(:account => @account, :course_name => "diffrient cuorse")
+    match_course = course_factory(:account => @account, :course_name => "course_factory with a search term")
+    not_match_course = course_factory(:account => @account, :course_name => "diffrient cuorse")
 
     get "/accounts/#{@account.id}"
 
@@ -97,8 +97,8 @@ describe "new account course search" do
   end
 
   it "should show teachers" do
-    course(:account => @account)
-    user(:name => "some teacher")
+    course_factory(:account => @account)
+    user_factory(:name => "some teacher")
     teacher_in_course(:course => @course, :user => @user)
 
     get "/accounts/#{@account.id}"
@@ -113,7 +113,7 @@ describe "new account course search" do
     role = custom_student_role(custom_name, :account => @account)
 
     @account.role_overrides.create!(:permission => "manage_admin_users", :enabled => false, :role => admin_role)
-    course(:account => @account)
+    course_factory(:account => @account)
 
     get "/accounts/#{@account.id}"
 

@@ -53,7 +53,7 @@ nb:
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Et praktisk nøkkel/verdi utslipp av mye interessant miljøinfo for rapporteringsbrukeren"
   a_message_is_required_129e1814: "En melding er påkrevd"
   a_name_for_this_set_is_required_222bad23: "Et navn for dette settet er påkrevd"
-  a_new_assignment_has_been_created_for_your_course__12b72639: "Et ny oppgave har blitt opprettet for kurset ditt, %{course_name}"
+  a_new_assignment_has_been_created_for_your_course__12b72639: "Et ny oppgave har blitt opprettet for emnet ditt, %{course_name}"
   a_problem_occurred_adding_reviewers_57b083d9: "Det oppsto et problem ved tillegging av anmeldere. "
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabell som inneholder navnet på karakterskalaen og ikoner for å redigere eller slette skalaen."
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "En tabell som inneholder navnet på karakteroversikten og knapper for å redigere eller slette rader."
@@ -81,7 +81,7 @@ nb:
   accept_2fdd362e: Godta
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "Godkjente formater: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Godkjente formater: svg, png, jpg, gif"
-  accepted_user_role_type_course_course_2ce91589: "Akseptert: %{user}, %{role_type}, kurs, %{course}"
+  accepted_user_role_type_course_course_2ce91589: "Akseptert: %{user}, %{role_type}, emne, %{course}"
   access_token_3be22221: Tilgangssymbol
   access_token_is_valid_until_d2f048cf: "Tilgangssymbol er gyldig frem til"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tilgangssymbol kan brukes for å tillate andre applikasjoner til å gjøre API-oppkall på dine vegne. Du kan også generere tilgangssymboler og bruke *Canvas Open API* for å finne på dine egne integrasjoner."
@@ -98,13 +98,13 @@ nb:
     feedback_coach: " "
     feedback_coach_sub: "Få hjelp fra en Canvas-ekspert"
     feedback_feature_request_sub: "Har du en idé om hvordan Canvas kan forbedres?"
-    manually_created_courses: "Manuelt innlagte kurs"
+    manually_created_courses: "Manuelt innlagte emne"
     root_account_cant_have_sis_id: "SIS IDer kan ikke settes på rot-kontoer"
     sis_id_in_use: "SIS ID \"%{sis_id}\" er allerede i bruk"
     tab_admin_tools: Administratorverktøy
     tab_authentication: Autentisering
     tab_brand_configs: Tema
-    tab_courses: Kurs
+    tab_courses: Emne
     tab_developer_keys: Utviklernøkler
     tab_faculty_journal: Lærerprotokoll
     tab_grading_standards: Karaktersetting
@@ -231,7 +231,7 @@ nb:
       discovery_url_description: "Om en oppdagelse-URL er satt, vil Canvas videresende alle brukere til den URL-adressen når de trenger å bli autentisert. Siden vil deretter trenge å hjelpe brukeren med og finne ut hvor de trenger å gå for å logge inn. Om ingen oppdagelse-URL er konfigurert, vil den første konfigurasjonen bli brukt for å forsøke å autentisere brukeren."
       login_handle_name_description: "Etiketten som brukes for unike innloggingsidentifikatorer. Eksempler: Innlogging, Brukernavn, Student ID, osv."
       unknown_user_url_description: "URL-adressen å omdirigere til når en autentisert bruker ikke er funnet i Canvas."
-  account_course_and_user_search_22bf297a: "Konto kurs- og brukersøk"
+  account_course_and_user_search_22bf297a: "Konto emne- og brukersøk"
   account_domain_78f43049: Konto-domene
   account_id_2c3b4f15: konto-ID
   account_id_f6e26867: Konto-ID
@@ -251,7 +251,7 @@ nb:
   account_reports: 
     default: 
       all_terms: "Alle semestre"
-      course_text: "For kurs: %{course};"
+      course_text: "For emne: %{course};"
       description: 
         header: Eksempel
       end_text: "Slutt: %{end_at};"
@@ -287,12 +287,12 @@ nb:
     report_header_canvas_term_id: canvas_term_id
     report_header_canvas_user_id: canvas_user_id
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
-    report_header_course: kurs
+    report_header_course: emne
     report_header_course__id: course_id
-    report_header_course_id: "kurs id"
-    report_header_course_name: kursnavn
-    report_header_course_sis: "kurs sis"
-    report_header_course_sis_id: "kurs sis id"
+    report_header_course_id: "emne id"
+    report_header_course_name: emnenavn
+    report_header_course_sis: "emne sis"
+    report_header_course_sis_id: "emne sis id"
     report_header_created_at: opprettet
     report_header_current_score: "gjeldende resultat"
     report_header_email: e-post
@@ -366,7 +366,7 @@ nb:
       delete_announcement: "Er du sikker på at du vil slette denne kunngjøringen?"
       global_announcement: "Du må bekrefte den globale kunngjøringen"
       remove_account_admin: "Er du sikker på at du vil fjerne denne kontoadministratoren?"
-    course: Kurs
+    course: Emne
     custom_text_blank: "[Tilpasset tekst]"
     help_menu_name_too_long: "Hjelpemenynavn er for langt"
     links: 
@@ -394,11 +394,11 @@ nb:
     account_quotas_updated: "Kontokvoter oppdatert"
     account_user: 
       remove_admin_tooltip: "Fjern denne administratoren"
-    add_course_button: "Legg til kurs"
-    add_course_dialog_title: "Legg til et nytt kurs"
+    add_course_button: "Legg til emne"
+    add_course_dialog_title: "Legg til et nytt emne"
     add_course_or_user: 
-      add_course_button: "Legg til kurs"
-      add_course_link: "Nytt kurs"
+      add_course_button: "Legg til emne"
+      add_course_link: "Nytt emne"
       add_user_button: "Legg til bruker"
       add_user_link: "Ny bruker"
       display_name_help: "Alle vil se dette navnet i diskusjoner, beskjeder og kommentarer."
@@ -408,7 +408,7 @@ nb:
         course_code: Referansekode
         enrollment_term_id: Påmeldingssemester
         full_name: "Fullt navn"
-        name: Kursnavn
+        name: Emnenavn
         path: E-post
         send_confirmation: "Send e-post til brukeren om at det er opprettet en brukerkonto"
         short_name: "Navn som skal vises"
@@ -418,7 +418,7 @@ nb:
       unique_id_label_1: "%{label}:"
     add_user_button: "Legg til bruker"
     add_user_dialog_title: "Legg til ny bruker"
-    adding_course_message: "Legger til kurs…"
+    adding_course_message: "Legger til emne…"
     adding_user_message: "Legger til bruker…"
     additional_settings: 
       account_status: Kontostatus
@@ -444,7 +444,7 @@ nb:
       admin_tools: 
         tab_labels: 
           admin_tools_logging: Logging
-          restore_course: "Gjenopprett kurs"
+          restore_course: "Gjenopprett emne"
         view_messages: "Vis varsler"
       admin_tools_cumb: Administratorverktøy
       admin_tools_title: Administratorverktøy
@@ -469,7 +469,7 @@ nb:
       comm_messages_search_results: 
         no_messages_found: "Ingen beskjeder funnet"
       course_logging_content: 
-        course_activity: Kursaktivitet
+        course_activity: Emneaktivitet
         find: Finn
       course_logging_details: 
         Field: Felt
@@ -500,28 +500,28 @@ nb:
         time: Tid
         user: Bruker
       course_search_form: 
-        course_id: "Kurs ID"
+        course_id: "Emne ID"
         labels: 
-          find_deleted_course: "Søk etter et slettet kurs ved hjelp av ID"
-        select_default: "Velg et kurs"
-        select_label: "Velg et kurs"
+          find_deleted_course: "Søk etter et slettet emne ved hjelp av ID"
+        select_default: "Velg et emne"
+        select_label: "Velg et emne"
       course_search_results: 
-        error_message: "Et slettet kurs med den ID-en kunne ikke finnes for denne kontoen."
-        info_text: "Påmeldinger til dette kurset må gjenopprettes manuelt."
+        error_message: "Et slettet emne med den ID-en kunne ikke finnes for denne kontoen."
+        info_text: "Påmeldinger til dette emnet må gjenopprettes manuelt."
         labels: 
           account_id: "Konto-ID:"
           account_id2: "Konto-ID:"
-          coures_id1: "Kurs-ID:"
-          coures_id2: "Kurs-ID:"
-          course_code1: "Kurskode:"
-          course_code2: "Kurskode:"
+          coures_id1: "Emne-ID:"
+          coures_id2: "Emne-ID:"
+          course_code1: "Emnekode:"
+          course_code2: "Emnekode:"
           restore_btn: Gjenopprett
         notdeleted_restore: 
           add_enrollments: "Legg til påmeldinger"
           header_subtext: "(Ikke slettet)"
-          view_course: "Vis kurs"
+          view_course: "Vis emne"
         successful_restore: 
-          view_course: "Vis kurs"
+          view_course: "Vis emne"
         successfull_restore: 
           add_enrollments: "Legg til påmeldinger"
           subtext: "Hva vil du gjøre videre?"
@@ -532,7 +532,7 @@ nb:
         find: Finn
         grade_change_activity: Karkaterendring
         message_assignment_id: Oppgave-ID
-        message_course_id: Kurs-ID
+        message_course_id: Emne-ID
       grade_change_logging_item: 
         blank_placeholder: "-"
         event_type: 
@@ -542,7 +542,7 @@ nb:
       grade_change_logging_results: 
         Anonymous: "Anonym "
         Assignment: Oppgave
-        Course: Kurs
+        Course: Emne
         Grader: Sensor
         Student: Student
         To: Til
@@ -552,7 +552,7 @@ nb:
         time: Tid
       logging_content_pane: 
         authentication: "Inn- og utloggingsaktivitet"
-        course: Kursaktivitet
+        course: Emneaktivitet
         grade_change: Karkaterendring
         select_default: "Velg en loggtype"
         select_label: "Velg en loggtype å søke i."
@@ -619,7 +619,7 @@ nb:
           filter_online: 
             check_box: "Kun nettkurs"
     confirm_delete_user: 
-      confirm_delete: "Er du sikker på at du vil slette denne brukeren fra kontoen %{account}? Dette vil fjerne brukerens data (inkludert vurderinger) fra alle kurs og grupper. Prosessen kan ikke gjøres om."
+      confirm_delete: "Er du sikker på at du vil slette denne brukeren fra kontoen %{account}? Dette vil fjerne brukerens data (inkludert vurderinger) fra alle emne og grupper. Prosessen kan ikke gjøres om."
       delete_button: "Slett %{user}"
       page_title: "Bekreft sletting"
       title: "Bekreft sletting av %{user} fra %{account}"
@@ -629,7 +629,7 @@ nb:
     consortium_users: 
       user_search_label: Brukersøk
     course: 
-      course_unpublished_title: "Dette kurset er ikke publisert enda"
+      course_unpublished_title: "Dette emnet er ikke publisert enda"
       course_unpublished_tooltip: "Ikke publisert"
       homepage_link: Hjemmeside
       more_count: 
@@ -643,33 +643,33 @@ nb:
         one: "1 Student"
         other: "%{count} studenter"
       teachers_label: Lærere
-    course_add_failed_message: "Legg til kurs mislyktes, prøv igjen"
+    course_add_failed_message: "Legg til emne mislyktes, prøv igjen"
     course_added_message: "%{course} ble lagt til!"
     course_selector_parameters: 
       account_reports: 
         linn_benton: 
           course_ids: 
             text: "course_ids:"
-    course_type: kurs
+    course_type: emne
     courses: 
-      courses_crumb: Kurs
+      courses_crumb: Emne
       no_results_message: "Ingen resultater funnet"
-      page_title: "Kurs-søkeresultater for \"%{query}\""
+      page_title: "Emne-søkeresultater for \"%{query}\""
       search_results_crumb: "Søkeresultater for \"%{query}\""
       title: "Søkeresultater for \"%{query}\" "
     courses_right_side: 
       all_terms: "Alle semestre"
-      course_filtering: Kursfiltrering
-      enrollment_term_label: "Vis kurs fra semesteret"
-      filter_label: "Finn et kurs"
+      course_filtering: Emnefiltrering
+      enrollment_term_label: "Vis emne fra semesteret"
+      filter_label: "Finn et emne"
       go_button: Gå
-      hide_enrollmentless_courses: "Skjul kurs uten påmeldinger"
+      hide_enrollmentless_courses: "Skjul emne uten påmeldinger"
     crumb_statistics: Statistikk
     custom_grade_export_csv_parameters: 
       account_reports: 
         ross: 
           parameters: 
-            note: "Kurs med skjulte oppgaver vil muligens ikke reflektere resultatene i denne rapporten."
+            note: "Emne med skjulte oppgaver vil muligens ikke reflektere resultatene i denne rapporten."
     custom_outcomes_csv_parameters: 
       account_reports: 
         edison: 
@@ -704,7 +704,7 @@ nb:
       account_reports: 
         default: 
           description: 
-            text: "Denne rapporten viser studentenes endelige vurderinger i en gitt termin. Resultatene i csv-filen vil ha en rad per registrering, og vil vise den nåværende og endelige vurderingen som viser i kursets vurderingerbok."
+            text: "Denne rapporten viser studentenes endelige vurderinger i en gitt termin. Resultatene i csv-filen vil ha en rad per registrering, og vil vise den nåværende og endelige vurderingen som viser i vurderingerbok for emne."
     group_type: gruppe
     include_deleted_parameter: 
       account_reports: 
@@ -732,10 +732,10 @@ nb:
         samuel_merrit_university: 
           course: 
             sis: 
-              text: "SIS-ID for kurs"
-            text: "Kurs ID"
+              text: "SIS-ID for emne"
+            text: "Emne ID"
           parameters: 
-            note1: "Kurs-ID kan forbli tom for å kjøre rapporten for alle kurs i semesteret."
+            note1: "Emne-ID kan forbli tom for å kjøre rapporten for alle emne i semesteret."
     lti_report_csv_description: 
       account_reports: 
         default: 
@@ -760,7 +760,7 @@ nb:
       account_reports: 
         outcomes: 
           course: 
-            radio: Kurs
+            radio: Emne
           order: 
             label: Rekkefølge
           outcome: 
@@ -771,7 +771,7 @@ nb:
       account_reports: 
         penn_harris: 
           parameters: 
-            note: "Kurs med skjulte oppgaver vil muligens ikke reflektere resultatene i denne rapporten."
+            note: "Emne med skjulte oppgaver vil muligens ikke reflektere resultatene i denne rapporten."
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -781,7 +781,7 @@ nb:
       account_reports: 
         default: 
           public_courses: 
-            text: "Denne rapporten viser alle kurs som ikke er slettet i et gitt semester som er publisert. Den resulterende CSV-filen vil ha én rad per kurs og vil vise kurs-id-en, kursets sis-id, kursets kortnavn, kursets navn og kursets start- og sluttdatoer."
+            text: "Denne rapporten viser alle emne som ikke er slettet i et gitt semester som er publisert. Den resulterende CSV-filen vil ha én rad per kurs og vil vise emne-id-en, sis-id for emne, kortnavn for emne, navn for emne og start for emne- og sluttdatoer."
     quota_integer_required: "Et helt tall kreves"
     quota_must_be_positive: "Verdien må være positiv"
     quota_not_updated: "Kvoten ble ikke oppdatert"
@@ -791,7 +791,7 @@ nb:
       account_reports: 
         default: 
           recently_deleted_courses: 
-            text: "Denne rapporten viser alle kursene i et gitt semester som har blitt slettet de siste 30 dagene. Den resulterende CSV-filen vil ha én rad per kurs, og vil vise kurs-ID-en, kursets SIS-ID, kursets kortnavn, kursets navn og kursets start- og sluttdatoer."
+            text: "Denne rapporten viser alle emnene i et gitt semester som har blitt slettet de siste 30 dagene. Den resulterende CSV-filen vil ha én rad per kurs, og vil vise emne-ID-en, SIS-ID for emne, kortnavn for emne, navn for emne og start for emne- og sluttdatoer."
     retry_login: "Prøv å logge inn på nytt"
     root_accounts: 
       labels: 
@@ -865,10 +865,10 @@ nb:
       confirm_global_announcement: "Denne kunngjøringen vil vises til *alle* Canvas-brukere. Bekreft at du ønsker å opprette den."
       confirm_turnitin_settings_link: "bekreft Turnitin-innstillinger"
       course_roles: "Kursroller:"
-      create_courses_description: "(Kontoadministratorer kan alltid lage kurs)"
-      create_courses_title: "Hvem kan legge til nye kurs"
+      create_courses_description: "(Kontoadministratorer kan alltid lage emne)"
+      create_courses_title: "Hvem kan legge til nye emne"
       custom_links_to_include_in_the_help_dialog_popup: "Tilpassede lenker for inkludering i hjelpdialogen"
-      default_language_description: "Dette vil overstyre alle nettleser- og OS-språkinnstillinger. Foretrukket språk kan fremdeles velges på kurs- og bruker-nivå."
+      default_language_description: "Dette vil overstyre alle nettleser- og OS-språkinnstillinger. Foretrukket språk kan fremdeles velges på emne- og bruker-nivå."
       delete: slett
       delete_announcement_tooltip: "Slett denne kunngjøringen"
       email_notification_from_description: "Denne innstillingen lar administratoren merke \"Fra\"-feltet på alle varsler sendt fra Canvas for denne kontoen."
@@ -931,7 +931,7 @@ nb:
         help_link_url: URL
         include_students_in_global_survey: "Inkluder studenter i globale spørreundersøkelser"
         lock_all_announcements: "Slå av kommentarer på kunngjøringer"
-        locked: "Lås denne innstillingen for underkonti og kurs"
+        locked: "Lås denne innstillingen for underkonti og emne"
         locked_for_sub_accounts: "Lås denne innstillingen for underkontoer"
         login_handle_name: "Logg inn Etikett"
         message: Beskjed
@@ -943,9 +943,9 @@ nb:
         originality_report_visibility: "Studentene kan se originalitetsrapporten"
         outgoing_email_default_name_option_custom: "Egendefinert \"Fra\"-navn"
         outgoing_email_default_name_option_default: "Standard Canvas-innstilling"
-        prevent_course_renaming_by_teachers: "Ikke la lærere endre navn på kursene sine"
-        restrict_quiz_questions: "Forhindre studentene fra å se testspørsmålene etter at kurset er over"
-        restrict_student_future_listing: "Begrense studentene fra å se fremtidige kurs i påmeldingsliste"
+        prevent_course_renaming_by_teachers: "Ikke la lærere endre navn på emnene sine"
+        restrict_quiz_questions: "Forhindre studentene fra å se testspørsmålene etter at emnet er over"
+        restrict_student_future_listing: "Begrense studentene fra å se fremtidige emne i påmeldingsliste"
         restrict_student_future_view: "Begrense studentene fra å få tilgang til kursene før oppstartsdato"
         restrict_student_past_view: "Begrense studentene fra å få tilgang til kursene etter sluttdato"
         role_id: "Legg til flere"
@@ -981,9 +981,9 @@ nb:
         manual_quotas_title: "Manuelt justerbare kvoter"
         megabytes: megabyte
         megabytes_tooltip: megabyte
-        select_type_courses: "Kurs ID"
+        select_type_courses: "Emne ID"
         select_type_groups: Gruppe-ID
-        select_type_label: "Finn kurs eller gruppe"
+        select_type_label: "Finn emne eller gruppe"
         update_button: "Oppdater kvote"
       never_allow_self_enrollment_option: Aldri
       no_enrollment_roles: "Brukere uten påmelding på kurs"
@@ -996,10 +996,10 @@ nb:
         example: "Eksempel:"
         external_services: "Varslinger sendt til eksterne tjenester"
         external_services_label: "Vis pop-up advarsel en gang på innstillingssiden for oppgavevarsling."
-        external_services_warning: "Merknad: Enkelte varslinger kan inneholde konfidensiell informasjon. Ved å velge å motta oppgavevarsler på en annen e-postadresse enn den fra din institusjon, kan dette føre til at sensitiv Canvas kurs-og gruppeinformasjon sendes utenfor det institusjonelle systemet."
+        external_services_warning: "Merknad: Enkelte varslinger kan inneholde konfidensiell informasjon. Ved å velge å motta oppgavevarsler på en annen e-postadresse enn den fra din institusjon, kan dette føre til at sensitiv Canvas emne-og gruppeinformasjon sendes utenfor det institusjonelle systemet."
         external_services_warning_label: "Innhold i pop-up melding:"
         from: Fra
-        sample_subject: "Karakter endret: inkluder undersøkelsen, test kurset"
+        sample_subject: "Karakter endret: inkluder undersøkelsen, test emnet"
         subject: Emne
       open_registration_delegated_warning_message: "En ekstern identitetsleverandør er slått på, og brukere som er opprettet via åpen registrering kan muligens ikke logge inn dersom ikke den eksterne identitetsleverandørens innloggingsskjema har en lenke tilbake til %{url}."
       open_registration_delegated_warning_tooltip: "En ekstern identitetsleverandør er slått på"
@@ -1016,7 +1016,7 @@ nb:
       quiz_ip_filters_title: "IP-addressefiltre for test"
       quotas: 
         default_account_quota_title: "Standard kontokvoter"
-        default_course_storage_quota: Kurskvote
+        default_course_storage_quota: Emnekvote
         default_group_storage_quota: Gruppekvote
         default_user_storage_quota: Brukerkvote
         megabytes: megabyte
@@ -1030,8 +1030,8 @@ nb:
           optional: Valgfri
           required: Obligatorisk
           required_for_admins: "Påkrevd for admin"
-      self_enroll_for_any_courses_option: "For ethvert kurs"
-      self_enroll_for_manually_created_courses_option: "Manuelt opprettede kurs"
+      self_enroll_for_any_courses_option: "For ethvert emne"
+      self_enroll_for_manually_created_courses_option: "Manuelt opprettede emne"
       settings_crumb: Innstillinger
       survey_announcement: "Dette er en kunngjøring av en undersøkelse. Den vil bli sendt til 1 / %{denominator} av brukerne i påslåtte kontoer for hver måned den er aktiv."
       tab_admins: Admin
@@ -1048,26 +1048,26 @@ nb:
       turnitin_settings_title: Turnitin-innstillinger
       update_settings_button: "Oppdater Innstillinger"
     show: 
-      courses_crumb: Kurs
-      no_courses_account_message: "Det er ingen kurs i denne kontoen"
-      no_courses_term_message: "Det er ingen kurs i dette semesteret"
+      courses_crumb: Emne
+      no_courses_account_message: "Det er ingen emne i denne kontoen"
+      no_courses_term_message: "Det er ingen emne i dette semesteret"
       subtitle_term: "For semesteret **%{term}**"
-      title: "Kurs i denne kontoen"
-      too_many_courses_message: "Det er for mange kurs å vise (%{count}). Bruk dialogboksen til høyre for å finne et spesifikt kurs."
+      title: "Emne i denne kontoen"
+      too_many_courses_message: "Det er for mange emne å vise (%{count}). Bruk dialogboksen til høyre for å finne et spesifikt emne."
     single_course_ag_selector_parameters: 
       account_reports: 
         linn_benton: 
           assignment_group_id: 
             text: "Oppgave Gruppe Id:"
           course_id: 
-            text: "Kurs Id:"
+            text: "Emne Id:"
     sis_agent_token_auth: 
       labels: 
         sis_app_token: "SIS Agent symbol"
         sis_app_url: "SIS App URL"
     sis_batch_counts: 
       accounts_label: Kontoer
-      courses_label: Kurs
+      courses_label: Emne
       crosslists_label: Krysslister
       enrollments_label: Påmeldinger
       group_enrollments: Gruppepåmeldinger
@@ -1083,14 +1083,14 @@ nb:
       account_reports: 
         sis_export: 
           description: 
-            text: "SIS eksportrapport: Denne rapporten vil eksportere alle nødvendige filer for brukere, kontoer, semestre, kurs, avdelinger, påmeldinger, grupper, gruppemedlemskap og kryssoppføringer for en SIS-import i sine respektive kategorier. Dette vil kun hente frem oppføringer opprettet eller endret gjennom SIS."
+            text: "SIS eksportrapport: Denne rapporten vil eksportere alle nødvendige filer for brukere, kontoer, semestre, emne, avdelinger, påmeldinger, grupper, gruppemedlemskap og kryssoppføringer for en SIS-import i sine respektive kategorier. Dette vil kun hente frem oppføringer opprettet eller endret gjennom SIS."
     sis_export_csv_parameters: 
       account_reports: 
         default: 
           accounts: 
             check_box: "CSV for kontoer"
           courses: 
-            check_box: "CSV for kurs"
+            check_box: "CSV for emne"
           enrollments: 
             check_box: "CSV over påmeldinger"
           group_membership: 
@@ -1108,12 +1108,12 @@ nb:
             check_box: "X list CSV"
         sis_default: 
           parameters: 
-            note: "*Semesterinnstillinger virker kun på kurs, seksjoner, påmeldinger, og X list CSV filer."
+            note: "*Semesterinnstillinger virker kun på emne, seksjoner, påmeldinger, og X list CSV filer."
     sis_import: 
       add_sis_stickiness_instructions: "Med dette alternativet valgt, vil endringer som gjøres i denne SIS-import bli behandlet som om de er UI endringer, samt forebygge påfølgende ikke-overordnede SIS importer fra å endre feltene som er endret her."
       add_sis_stickiness_label: "Prosesser som UI-endringer"
       batch_import_instructions: |-
-          Hvis dette er valgt, vil dette slette alt for dette semesteret, som inkluderer alle kurs og påmeldinger som ikke er i den valgte importfilen ovenfor.
+          Hvis dette er valgt, vil dette slette alt for dette semesteret, som inkluderer alle emne og påmeldinger som ikke er i den valgte importfilen ovenfor.
           Se dokumentasjonen for detaljer.
       batch_mode_label: "Dette er en full batch-oppdatering"
       clear_sis_stickiness_instructions: "Med dette alternativet valgt, vil alle feltene i alle poster berørt av denne SIS-importen kunne endres i fremtidige ikke-overordnet SIS-import."
@@ -1155,7 +1155,7 @@ nb:
       heading_date: Dato
       heading_value: Verdi
       labels: 
-        courses: Kurs
+        courses: Emne
         generated_at: Generert
         media_storage: Medie
         students: Studenter
@@ -1173,10 +1173,10 @@ nb:
       over_time_link: "over tid"
       page_header_title: Kontostatistikk
       page_title: "Statistikk for %{account}"
-      recently_created_courses_title: "Nylig opprettede kurs"
-      recently_ended_courses_title: "Nylig avsluttede kurs"
+      recently_created_courses_title: "Nylig opprettede emne"
+      recently_ended_courses_title: "Nylig avsluttede emne"
       recently_logged_in_users_title: "Nylig innloggede brukere"
-      recently_started_courses_title: "Nylig startede kurs"
+      recently_started_courses_title: "Nylig startede emne"
       started_at: "startet %{at}"
       title_data_point_over_time: "%{data_point} over tid"
       uploaded_data: 
@@ -1187,7 +1187,7 @@ nb:
       account_reports: 
         orbis: 
           parameters: 
-            note: "Kurs med skjulte oppgaver vil muligens ikke reflektere resultatene i denne rapporten."
+            note: "Emne med skjulte oppgaver vil muligens ikke reflektere resultatene i denne rapporten."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
@@ -1202,12 +1202,12 @@ nb:
       account_reports: 
         pearson: 
           outcome: 
-            text: "Kursets SIS-ID:"
+            text: "SIS-ID for Emne:"
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
           students_with_no_submissions: 
-            text: "Dette er en rapport over alle studenter påmeldt i et kurs i et gitt semester som ikke har levert besvarelse innenfor gitte datoer. Rapporten inneholder en rad pr påmeldt student som tilfredsstiller kriteriet. Tidsperioden kan ikke være lenger enn to uker."
+            text: "Dette er en rapport over alle studenter påmeldt i et emne i et gitt semester som ikke har levert besvarelse innenfor gitte datoer. Rapporten inneholder en rad pr påmeldt student som tilfredsstiller kriteriet. Tidsperioden kan ikke være lenger enn to uker."
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1221,10 +1221,10 @@ nb:
       account_reports: 
         tempe: 
           course: 
-            text: "Kurs ID"
+            text: "Emne ID"
           parameters: 
-            note1: "Kurs-ID kan forbli tom for å kjøre rapporten for alle kurs i semesteret."
-            note2: "Kurs med skjulte oppgaver vil muligens ikke reflektere resultatene i denne rapporten."
+            note1: "Emne-ID kan forbli tom for å kjøre rapporten for alle kurs i semesteret."
+            note2: "Emne med skjulte oppgaver vil muligens ikke reflektere resultatene i denne rapporten."
     terms_parameters: 
       account_reports: 
         default: 

@@ -1,10 +1,10 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/assignment_overrides'
 
 describe "assignment column headers" do
   include_context "in-process server selenium tests"
   include AssignmentOverridesSeleniumHelper
-  include Gradebook2Common
+  include GradebookCommon
 
   before(:once) do
     gradebook_data_setup
@@ -17,7 +17,7 @@ describe "assignment column headers" do
   end
 
   it "should validate row sorting works when first column is clicked", priority: "1", test_id: 220023  do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     first_column = f('.slick-column-name')
     first_column.click
     meta_cells = find_slick_cells(0, f('#gradebook_grid  .container_0'))
@@ -29,13 +29,13 @@ describe "assignment column headers" do
   end
 
   it "should have a tooltip with the assignment name", priority: "1", test_id: 220025 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(f(@header_selector)["title"]).to eq @assignment.title
   end
 
   it "should handle a ton of assignments without wrapping the slick-header", priority: "1", test_id: 220026 do
     create_assignments([@course.id], 100, title: 'a really long assignment name, o look how long I am this is so cool')
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     # being 38px high means it did not wrap
     expect(f("#gradebook_grid .slick-header-columns").size.height).to eq 38
   end
@@ -47,7 +47,7 @@ describe "assignment column headers" do
       customOrder: ["#{@third_assignment.id}", "#{@second_assignment.id}", "#{@first_assignment.id}"]
     }
     @user.save!
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0]).to include_text '-'
     expect(first_row_cells[1]).to include_text @assignment_2_points
@@ -76,7 +76,7 @@ describe "assignment column headers" do
       })
     @fourth_assignment.grade_student(@student_1, grade: 150, grader: @teacher)
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0]).to include_text '-'
@@ -95,7 +95,7 @@ describe "assignment column headers" do
 
     @first_assignment.destroy
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0]).to include_text '-'
@@ -103,7 +103,7 @@ describe "assignment column headers" do
   end
 
   it "should validate show attendance columns option", priority: "1", test_id: 220034 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     f('#gradebook_settings').click
     f('#show_attendance').find_element(:xpath, '..').click
     headers = ff('.slick-header')
@@ -113,7 +113,7 @@ describe "assignment column headers" do
   end
 
   it "should show letter grade in total column", priority: "1", test_id: 220035 do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .letter-grade-points')).to include_text("A")
     edit_grade('#gradebook_grid .slick-row:nth-child(2) .l2', '50')
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(2) .total-cell .letter-grade-points')).to include_text("A")

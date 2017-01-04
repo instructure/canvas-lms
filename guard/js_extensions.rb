@@ -1,15 +1,16 @@
 require 'guard'
-require 'guard/guard'
+require 'guard/plugin'
 require 'lib/canvas/require_js/plugin_extension'
 
 module Guard
-  class JsExtensions < Guard
-    def initialize(watchers = [], options = {})
-      pattern = %r{vendor/plugins/[^/]+/app/coffeescripts/extensions/(.+\.coffee)$}
-      super [::Guard::Watcher.new(pattern)], options
+  class JsExtensions < Plugin
+    def initialize(options = {})
+      pattern = %r{gems/plugins/[^/]+/app/coffeescripts/extensions/(.+\.coffee)$}
+      options[:watchers] = [::Guard::Watcher.new(pattern)]
+      super(options)
     end
 
-    def run_on_additions(paths)
+    def run_on_modifications(paths)
       UI.info "Generating plugin extensions for #{paths.join(", ")}"
       paths.each do |path|
         path = path.gsub(%r{.*?/extensions/}, '')

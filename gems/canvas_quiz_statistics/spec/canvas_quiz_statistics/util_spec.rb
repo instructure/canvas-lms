@@ -5,48 +5,48 @@ describe CanvasQuizStatistics::Util do
 
   describe '#deep_symbolize_keys' do
     it 'does nothing on anything but a Hash' do
-      Util.deep_symbolize_keys(5).should == 5
-      Util.deep_symbolize_keys([]).should == []
-      Util.deep_symbolize_keys(nil).should == nil
+      expect(Util.deep_symbolize_keys(5)).to eq(5)
+      expect(Util.deep_symbolize_keys([])).to eq([])
+      expect(Util.deep_symbolize_keys(nil)).to eq(nil)
     end
 
     it 'should symbolize top-level keys' do
-      Util.deep_symbolize_keys({ 'a' => 'b', c: 'd' }).should == {
+      expect(Util.deep_symbolize_keys({ 'a' => 'b', c: 'd' })).to eq({
         a: 'b',
         c: 'd'
-      }
+      })
     end
 
     it 'should symbolize keys of nested hashes' do
-      Util.deep_symbolize_keys({
+      expect(Util.deep_symbolize_keys({
         'e' => {
           'f' => 'g',
           h: 'i'
         }
-      }).should == {
+      })).to eq({
         e: {
           f: 'g',
           h: 'i'
         }
-      }
+      })
     end
 
     it 'should symbolize keys of hashes inside arrays' do
-      Util.deep_symbolize_keys({
+      expect(Util.deep_symbolize_keys({
         'e' => [{
           'f' => 'g',
           h: 'i'
         }]
-      }).should == {
+      })).to eq({
         e: [{
           f: 'g',
           h: 'i'
         }]
-      }
+      })
     end
 
     it 'should symbolize all sorts of things' do
-      Util.deep_symbolize_keys({
+      expect(Util.deep_symbolize_keys({
         item1: 'value1',
         "item2" => 'value2',
         hash: {
@@ -57,7 +57,7 @@ describe CanvasQuizStatistics::Util do
           "item5" => 'value5',
           item6: 'value6'
         }]
-      }).should == {
+      })).to eq({
         item1: 'value1',
         item2: 'value2',
         hash: {
@@ -68,26 +68,26 @@ describe CanvasQuizStatistics::Util do
           item5: 'value5',
           item6: 'value6'
         }]
-      }
+      })
     end
 
     it 'should work with numbers for keys' do
-      Util.deep_symbolize_keys({
+      expect(Util.deep_symbolize_keys({
         "1" => "first",
         "2" => "second"
-      }).should == {
+      })).to eq({
         :"1" => "first",
         :"2" => "second"
-      }
+      })
     end
 
     it 'should skip nils and items that cant be symbolized' do
-      Util.deep_symbolize_keys({ nil => 'foo' }).should == { nil => 'foo' }
+      expect(Util.deep_symbolize_keys({ nil => 'foo' })).to eq({ nil => 'foo' })
     end
 
     it 'should only munge hashes' do
-      Util.deep_symbolize_keys([]).should == []
-      Util.deep_symbolize_keys([{ 'foo' => 'bar' }]).should == [{ 'foo' => 'bar' }]
+      expect(Util.deep_symbolize_keys([])).to eq([])
+      expect(Util.deep_symbolize_keys([{ 'foo' => 'bar' }])).to eq([{ 'foo' => 'bar' }])
     end
   end
 end

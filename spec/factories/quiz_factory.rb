@@ -239,8 +239,8 @@ module Factories
   end
 
   def assignment_quiz(questions, opts={})
-    course = opts[:course] || course(:active_course => true)
-    user = opts[:user] || user(:active_user => true)
+    course = opts[:course] || course_factory(active_course: true)
+    user = opts[:user] || user_factory(:active_user => true)
     course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any? { |e| e.course_id == course.id }
     @assignment = course.assignments.create(title: opts.fetch(:title, "Test Assignment"))
     @assignment.workflow_state = "published"

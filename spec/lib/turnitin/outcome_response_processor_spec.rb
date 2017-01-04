@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require_dependency "turnitin/outcome_response_processor"
 
 module Turnitin
   describe OutcomeResponseProcessor do

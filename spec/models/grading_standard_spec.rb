@@ -45,6 +45,13 @@ describe GradingStandard do
     end
   end
 
+  describe 'validations' do
+    it 'does not throw an error if `data` is not supplied' do
+      standard = GradingStandard.new()
+      expect { standard.valid? }.not_to raise_error
+    end
+  end
+
   it "should upgrade the standard scheme from v1 to v2" do
     converted = GradingStandard.upgrade_data(@default_standard_v1, 1)
     default = GradingStandard.default_grading_standard

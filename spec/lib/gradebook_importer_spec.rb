@@ -336,7 +336,7 @@ describe GradebookImporter do
     e = student_in_course
     e.update_attribute :workflow_state, 'completed'
     concluded_student = @student
-    @student2 = user
+    @student2 = user_factory
     @course.enroll_student(@student2)
     importer_with_rows(
         "Student,ID,Section,Assignment 1",

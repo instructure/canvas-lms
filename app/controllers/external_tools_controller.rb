@@ -634,7 +634,7 @@ class ExternalToolsController < ApplicationController
       lti_launch.resource_url,
       tool.consumer_key,
       tool.shared_secret,
-      @context.root_account.feature_enabled?(:disable_lti_post_only)
+      @context.root_account.feature_enabled?(:disable_lti_post_only) || tool.extension_setting(:oauth_compliant)
     )
     lti_launch.link_text = tool.label_for(placement.to_sym)
     lti_launch.analytics_id = tool.tool_id
@@ -721,7 +721,7 @@ class ExternalToolsController < ApplicationController
       lti_launch.resource_url,
       tool.consumer_key,
       tool.shared_secret,
-      @context.root_account.feature_enabled?(:disable_lti_post_only)
+      @context.root_account.feature_enabled?(:disable_lti_post_only) || tool.extension_setting(:oauth_compliant)
     )
     lti_launch.link_text = tool.label_for(placement.to_sym, I18n.locale)
     lti_launch.analytics_id = tool.tool_id
@@ -922,6 +922,10 @@ class ExternalToolsController < ApplicationController
   #   Default: false, if set to true the tool won't show up in the external tool
   #   selection UI in modules and assignments
   #
+  # @argument oauth_compliant [Boolean]
+  #   Default: false, if set to true LTI query params will not be copied to the
+  #   post body.
+  #
   # @example_request
   #
   #   This would create a tool on this course with two custom fields and a course navigation tab
@@ -1111,7 +1115,8 @@ class ExternalToolsController < ApplicationController
   def set_tool_attributes(tool, params)
     attrs = Lti::ResourcePlacement::PLACEMENTS
     attrs += [:name, :description, :url, :icon_url, :canvas_icon_class, :domain, :privacy_level, :consumer_key, :shared_secret,
-              :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id]
+              :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id,
+              :oauth_compliant]
     attrs.each do |prop|
       tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
     end

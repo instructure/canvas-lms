@@ -4,6 +4,12 @@
 */
 
 module.exports = {
+  globals: {
+    "ENV": true
+  },
+  plugins: [
+    "promise"
+  ],
   // 0 - off, 1 - warning, 2 - error
   rules: {
     "comma-dangle": [2, "only-multiline"],
@@ -16,9 +22,7 @@ module.exports = {
     "semi": [0],
     "space-before-function-paren": [2, "always"],
     "import/no-amd": [0],
-    "import/no-extraneous-dependencies": [2, {"devDependencies": true}]
-  },
-  globals: {
-    "ENV": true
+    "import/no-extraneous-dependencies": [2, {"devDependencies": true}],
+    "promise/avoid-new": [0],
   }
 };

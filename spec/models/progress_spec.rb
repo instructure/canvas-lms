@@ -36,7 +36,7 @@ describe Progress do
 
     before { Jerbs.flag = nil }
 
-    let(:progress) { Progress.create!(tag: "test", context: user) }
+    let(:progress) { Progress.create!(tag: "test", context: user_factory) }
 
     it "should update the progress while running the job" do
       progress.process_job(Jerbs, :succeed, {}, :flag)

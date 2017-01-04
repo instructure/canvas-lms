@@ -7,11 +7,11 @@ describe 'A file with a know extension' do
   end
   
   it 'should have an extension' do
-    File.extname(@file.path).should == '.jpg'
+    expect(File.extname(@file.path)).to eq('.jpg')
   end
   
   it 'should have a mime type' do
-   File.mime_type?(@file).should == "image/jpeg"
+   expect(File.mime_type?(@file)).to eq("image/jpeg")
   end
   
 end
@@ -23,11 +23,11 @@ describe 'A file with anunknow extension' do
   end
   
   it 'should have an extension' do
-    File.extname(@file.path).should == '.unknown'
+    expect(File.extname(@file.path)).to eq('.unknown')
   end
   
   it 'should have an unkwown  mime type' do
-   File.mime_type?(@file).should == "unknown/unknown"
+   expect(File.mime_type?(@file)).to eq("unknown/unknown")
   end
   
 end
@@ -39,7 +39,7 @@ describe 'A valid file path' do
   end
   
   it 'should have a mime type' do
-    File.mime_type?(@file_path).should == "image/png"
+    expect(File.mime_type?(@file_path)).to eq("image/png")
   end
   
 end
@@ -51,6 +51,6 @@ describe "An unknown extension" do
     end
     
     it 'should have an unknown mime type' do
-      File.mime_type?(@file_path).should == "unknown/unknown"
+      expect(File.mime_type?(@file_path)).to eq("unknown/unknown")
     end
 end

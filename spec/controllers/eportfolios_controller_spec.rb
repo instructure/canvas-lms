@@ -29,7 +29,7 @@ describe EportfoliosController do
 
 
   before :once do
-    user(:active_all => true)
+    user_factory(active_all: true)
   end
 
   describe "GET 'user_index'" do
@@ -172,7 +172,7 @@ describe EportfoliosController do
         end
 
         it "should not get set when portfolio owner is not visible to user" do
-          user_session user(active_all: true)
+          user_session user_factory(active_all: true)
           get 'show', :id => @portfolio.id
           expect(assigns[:owner_url]).to be_nil
         end

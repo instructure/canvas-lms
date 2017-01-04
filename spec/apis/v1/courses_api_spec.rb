@@ -690,7 +690,7 @@ describe CoursesController, type: :request do
           @role = custom_account_role 'lamer', :account => @account
           @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
                                           :role => @role
-          user
+          user_factory
           @account.account_users.create!(user: @user, role: @role)
         end
 
@@ -1031,7 +1031,7 @@ describe CoursesController, type: :request do
 
     context "a teacher" do
       before :once do
-        user
+        user_factory
         enrollment = @course.enroll_teacher(@user)
         enrollment.accept!
         @new_values['course'].delete('sis_course_id')
@@ -1172,7 +1172,7 @@ describe CoursesController, type: :request do
     end
 
     context "an unauthorized user" do
-      before { user }
+      before { user_factory }
 
       it "should return 401 unauthorized" do
         raw_api_call(:put, @path, @params, @new_values)
@@ -1800,7 +1800,7 @@ describe CoursesController, type: :request do
       @role = Account.default.roles.build :name => 'SuperTeacher'
       @role.base_role_type = 'TeacherEnrollment'
       @role.save!
-      @course3 = course
+      @course3 = course_factory
       @course3.enroll_user(@me, 'TeacherEnrollment', { :role => @role, :active_all => true })
     end
 
@@ -1831,10 +1831,10 @@ describe CoursesController, type: :request do
       @course2.restrict_enrollments_to_course_dates = true
       @course2.save! # pending_active
 
-      @course3 = course(:active_all => true)
+      @course3 = course_factory(active_all: true)
       @course3.enroll_user(@me, 'StudentEnrollment') #invited
 
-      @course4 = course(:active_all => true)
+      @course4 = course_factory(active_all: true)
       @course4.enroll_user(@me, 'StudentEnrollment')
       @course4.start_at = 2.days.ago
       @course4.conclude_at = 1.day.ago
@@ -1861,10 +1861,10 @@ describe CoursesController, type: :request do
     end
 
     it "should return active observed student enrollments if requested" do
-      @student = user(:active_all => true)
+      @student = user_factory(active_all: true)
       @student_enroll = @course1.enroll_user(@student, "StudentEnrollment")
       @student_enroll.accept!
-      @observer = user(:active_all => true)
+      @observer = user_factory(active_all: true)
       @course1.enroll_user(@observer, "ObserverEnrollment", :associated_user_id => @student.id)
 
       json = api_call_as_user(@observer, :get,
@@ -1894,9 +1894,9 @@ describe CoursesController, type: :request do
       @role = Account.default.roles.build :name => 'SuperTeacher'
       @role.base_role_type = 'TeacherEnrollment'
       @role.save!
-      @course3 = course
+      @course3 = course_factory
       @course3.enroll_user(@me, 'TeacherEnrollment', { :role => @role, :active_all => true })
-      @course4 = course
+      @course4 = course_factory
       @course4.enroll_user(@me, 'TaEnrollment')
       @course4.workflow_state = 'created'
       @course4.save
@@ -2155,13 +2155,13 @@ describe CoursesController, type: :request do
     before :once do
       @section1 = @course1.default_section
       @section2 = @course1.course_sections.create!(:name => 'Section B')
-      @ta = user(:name => 'TAPerson')
+      @ta = user_factory(:name => 'TAPerson')
       @ta.communication_channels.create!(:path => 'ta@ta.com') { |cc| cc.workflow_state = 'confirmed' }
       @ta_enroll1 = @course1.enroll_user(@ta, 'TaEnrollment', :section => @section1)
       @ta_enroll2 = @course1.enroll_user(@ta, 'TaEnrollment', :section => @section2, :allow_multiple_enrollments => true)
 
-      @student1 = user(:name => 'SSS1')
-      @student2 = user(:name => 'SSS2')
+      @student1 = user_factory(:name => 'SSS1')
+      @student2 = user_factory(:name => 'SSS2')
       @student1_enroll = @course1.enroll_user(@student1, 'StudentEnrollment', :section => @section1)
       @student2_enroll = @course1.enroll_user(@student2, 'StudentEnrollment', :section => @section2)
 
@@ -2238,10 +2238,10 @@ describe CoursesController, type: :request do
       end
 
       it "accepts a list of enrollment_types" do
-        ta2 = user(:name => 'SSS Helper')
+        ta2 = user_factory(:name => 'SSS Helper')
         ta2_enroll1 = @course1.enroll_user(ta2, 'TaEnrollment', :section => @section1)
 
-        student3 = user(:name => 'T1')
+        student3 = user_factory(:name => 'T1')
         student3_enroll = @course1.enroll_user(student3, 'StudentEnrollment', :section => @section2)
 
         json = api_call(:get, api_url, api_route, :search_term => "SSS", :enrollment_type => ["student","ta"])
@@ -2447,7 +2447,7 @@ describe CoursesController, type: :request do
           role = Account.default.roles.build :name => 'EliteStudent'
           role.base_role_type = 'StudentEnrollment'
           role.save!
-          @student3 = user(:name => 'S3')
+          @student3 = user_factory(:name => 'S3')
           @student3_enroll = @course1.enroll_user(@student3, 'StudentEnrollment', { :role => role })
         end
 
@@ -2489,7 +2489,7 @@ describe CoursesController, type: :request do
           @role = Account.default.roles.build :name => 'EliteStudent'
           @role.base_role_type = 'StudentEnrollment'
           @role.save!
-          @student3 = user(:name => 'S3')
+          @student3 = user_factory(:name => 'S3')
           @student3_enroll = @course1.enroll_user(@student3, 'StudentEnrollment', { :role => @role })
         end
 
@@ -2600,7 +2600,7 @@ describe CoursesController, type: :request do
           @other_user.pseudonym.update_attribute(:sis_user_id, 'mysis_8675309')
           @course1.enroll_student(@other_user).accept!
 
-          @user = user
+          @user = user_factory
           @course1.enroll_student(@user).accept!
         end
 
@@ -2713,8 +2713,8 @@ describe CoursesController, type: :request do
       @student2.name = "student 2"
       @student2.save!
 
-      observer1 = user
-      observer2 = user
+      observer1 = user_factory
+      observer2 = user_factory
 
       @course1.enroll_user(observer1, "ObserverEnrollment", :associated_user_id => @student1.id)
       @course1.enroll_user(observer2, "ObserverEnrollment", :associated_user_id => @student2.id)
@@ -2839,7 +2839,7 @@ describe CoursesController, type: :request do
     it "should not find courses in other root accounts" do
       acct = account_model(:name => 'root')
       acct.account_users.create!(user: @user)
-      course(:account => acct)
+      course_factory(:account => acct)
       @course.update_attribute('sis_source_id', 'OTHER-SIS')
       raw_api_call(:get, "/api/v1/courses/sis_course_id:OTHER-SIS",
                    :controller => "courses", :action => "show", :id => "sis_course_id:OTHER-SIS", :format => "json")
@@ -3141,7 +3141,7 @@ describe CoursesController, type: :request do
     end
 
     it "should require permission to preview" do
-      @user = user
+      @user = user_factory
       api_call(:post, "/api/v1/courses/#{@course.id}/preview_html",
                       { :controller => 'courses', :action => 'preview_html', :course_id => @course.to_param, :format => 'json' },
                       { :html => ""}, {}, {:expected_status => 401})

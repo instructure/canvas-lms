@@ -213,7 +213,7 @@ describe 'Provisional Grades API', type: :request do
 
           sel = @assignment.moderated_grading_selections.create!(:student => @student)
 
-          @other_ta = user :active_user => true
+          @other_ta = user_factory :active_user => true
           @course.enroll_ta @other_ta, :enrollment_state => 'active'
           @assignment.grade_student(@student, { :grader => @other_ta, :score => 90, :provisional => true })
 

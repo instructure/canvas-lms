@@ -22,12 +22,12 @@ require 'db/migrate/20111209171640_recalculate_muted_assignments.rb'
 describe 'RecalculateMutedAssignments' do
   describe "up" do
     it "should work" do
-      c1 = course
+      c1 = course_factory
       a1 = c1.assignments.create!(:title => "Test Assignment")
       c1.any_instantiation
       c1.expects(:recompute_student_scores).never
       
-      c2 = course
+      c2 = course_factory
       a2 = c2.assignments.create!(:title => "Test Assignment2")
       a2.mute!
       c2.any_instantiation

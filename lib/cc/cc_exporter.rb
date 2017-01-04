@@ -23,7 +23,7 @@ module CC
 
     ZIP_DIR = 'zip_dir'
 
-    attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy
+    attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy, :for_master_migration
     delegate :add_error, :add_item_to_export, :to => :@content_export, :allow_nil => true
 
     def initialize(content_export, opts={})

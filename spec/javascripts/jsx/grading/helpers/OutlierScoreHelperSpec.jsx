@@ -1,6 +1,6 @@
 define([
   'jsx/grading/helpers/OutlierScoreHelper',
-  'compiled/gradebook2/GradebookTranslations'
+  'compiled/gradebook/GradebookTranslations'
 ], (OutlierScoreHelper, GRADEBOOK_TRANSLATIONS) => {
 
   module('#hasWarning', () => {

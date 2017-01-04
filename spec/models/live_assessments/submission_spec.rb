@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe LiveAssessments::Submission do
-  let_once(:assessment_context) { course(active_all: true) }
+  let_once(:assessment_context) { course_factory(active_all: true) }
   let(:outcome) do
     outcome = assessment_context.created_learning_outcomes.create!(:description => 'this is a test outcome', :short_description => 'test outcome')
     assessment_context.root_outcome_group.add_outcome(outcome)

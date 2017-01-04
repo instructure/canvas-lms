@@ -1,8 +1,8 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2" do
+describe "gradebook" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   let(:extra_setup) { }
   let(:active_element) { driver.switch_to.active_element }
@@ -14,7 +14,7 @@ describe "gradebook2" do
   before(:each) do
     extra_setup
     user_session(@teacher)
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
   end
 
   context "export menu" do

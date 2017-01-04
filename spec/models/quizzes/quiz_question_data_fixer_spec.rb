@@ -52,7 +52,7 @@ describe Quizzes::QuizQuestionDataFixer do
   end
 
   let_once(:bank) do
-    course
+    course_factory
     bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
   end
 

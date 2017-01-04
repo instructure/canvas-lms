@@ -215,18 +215,18 @@ describe WikiPage do
     end
 
     it 'is not true for users who are not in the course (if it is not public)' do
-      course(:active_all => true)
+      course_factory(active_all: true)
       page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'public')
-      user(:active_all => true)
+      user_factory(active_all: true)
       expect(page.can_edit_page?(@user)).to be_falsey
     end
 
     it 'is true for users who are not in the course (if it is public)' do
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course.is_public = true
       @course.save!
       page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'public')
-      user(:active_all => true)
+      user_factory(active_all: true)
       expect(page.can_edit_page?(@user)).to be_truthy
     end
   end
@@ -274,7 +274,7 @@ describe WikiPage do
 
   context 'set policy' do
     before :once do
-      course :active_all => true
+      course_factory :active_all => true
     end
 
     context 'admins' do
@@ -466,7 +466,7 @@ describe WikiPage do
   end
 
   describe "destroy" do
-    before (:once) { course }
+    before (:once) { course_factory }
 
     it "should destroy its assignment if enabled" do
       @course.enable_feature!(:conditional_release)
@@ -494,7 +494,7 @@ describe WikiPage do
   end
 
   describe "restore" do
-    before (:once) { course }
+    before (:once) { course_factory }
 
     it "should restore to unpublished state" do
       @page = @course.wiki.wiki_pages.create! title: 'dot dot dot'
@@ -588,7 +588,7 @@ describe WikiPage do
   describe 'revised_at' do
     before(:once) do
       Timecop.freeze(1.hour.ago) do
-        course
+        course_factory
         @page = @course.wiki.wiki_pages.create! title: 'page'
         @old_timestamp = @page.revised_at
       end
@@ -615,7 +615,7 @@ describe WikiPage do
 
   describe "visible_to_students_in_course_with_da" do
     before :once do
-      @course = course(:active_course => true)
+      @course = course_factory(active_course: true)
       @page_unassigned = wiki_page_model(:title => "plain old page", :course => @course)
       @page_assigned = wiki_page_model(:title => "page with assignment", :course => @course)
       @student1, @student2 = create_users(2, return_type: :record)

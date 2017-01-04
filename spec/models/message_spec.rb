@@ -34,7 +34,7 @@ describe Message do
   describe '#populate body' do
     it 'should save an html body if a template exists' do
       Message.any_instance.expects(:apply_html_template).returns('template')
-      user         = user(:active_all => true)
+      user         = user_factory(active_all: true)
       account_user = AccountUser.create!(:account => account_model, :user => user)
       message      = generate_message(:account_user_notification, :email, account_user)
 
@@ -45,7 +45,7 @@ describe Message do
       Message.any_instance.expects(:load_html_template).returns <<-ZOMGXSS
         <b>Your content</b>: <%= "<script>alert()</script>" %>
       ZOMGXSS
-      user         = user(:active_all => true)
+      user         = user_factory(active_all: true)
       account_user = AccountUser.create!(:account => account_model, :user => user)
       message      = generate_message(:account_user_notification, :email, account_user)
 
@@ -159,9 +159,9 @@ describe Message do
 
   context "named scopes" do
     it "should be able to get messages in any state" do
-      m1 = message_model(:workflow_state => 'bounced', :user => user)
-      m2 = message_model(:workflow_state => 'sent', :user => user)
-      m3 = message_model(:workflow_state => 'sending', :user => user)
+      m1 = message_model(:workflow_state => 'bounced', :user => user_factory)
+      m2 = message_model(:workflow_state => 'sent', :user => user_factory)
+      m3 = message_model(:workflow_state => 'sending', :user => user_factory)
       expect(Message.in_state(:bounced)).to eq [m1]
       expect(Message.in_state([:bounced, :sent]).sort_by(&:id)).to eq [m1, m2].sort_by(&:id)
       expect(Message.in_state([:bounced, :sent])).not_to be_include(m3)
@@ -175,7 +175,7 @@ describe Message do
     end
 
     it "should have a list of messages to dispatch" do
-      message_model(:dispatch_at => Time.now - 1, :workflow_state => 'staged', :to => 'somebody', :user => user)
+      message_model(:dispatch_at => Time.now - 1, :workflow_state => 'staged', :to => 'somebody', :user => user_factory)
       expect(Message.to_dispatch).to eq [@message]
     end
 
@@ -192,7 +192,7 @@ describe Message do
     end
 
     it "should offer staged messages (waiting to be dispatched)" do
-      message_model(:dispatch_at => Time.now + 100, :user => user)
+      message_model(:dispatch_at => Time.now + 100, :user => user_factory)
       expect(Message.staged).to eq [@message]
     end
 
@@ -200,7 +200,7 @@ describe Message do
       Message.any_instance.stubs(:stage_message)
       Message.workflow_spec.states.each do |state_symbol, state|
         Message.destroy_all
-        message = message_model(:workflow_state => state_symbol.to_s, :user => user, :to => 'nobody')
+        message = message_model(:workflow_state => state_symbol.to_s, :user => user_factory, :to => 'nobody')
         if state.events.any?{ |event_symbol, event| event.transitions_to == :cancelled }
           expect(Message.cancellable).to eq [message]
         else
@@ -211,7 +211,7 @@ describe Message do
   end
 
   it "should go back to the staged state if sending fails" do
-    message_model(:dispatch_at => Time.now - 1, :workflow_state => 'sending', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user)
+    message_model(:dispatch_at => Time.now - 1, :workflow_state => 'sending', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory)
     @message.errored_dispatch
     expect(@message.workflow_state).to eq 'staged'
     expect(@message.dispatch_at).to be > Time.now + 4.minutes
@@ -219,7 +219,7 @@ describe Message do
 
   describe "#deliver" do
     it "should not deliver if canceled" do
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
       @message.cancel
       @message.expects(:deliver_via_email).never
       Mailer.expects(:create_message).never
@@ -228,17 +228,17 @@ describe Message do
     end
 
     it "should log errors and raise based on error type" do
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
       Mailer.expects(:create_message).raises("something went wrong")
       ErrorReport.expects(:log_exception)
       expect { @message.deliver }.to raise_exception("something went wrong")
 
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
       Mailer.expects(:create_message).raises(Timeout::Error.new)
       ErrorReport.expects(:log_exception).never
       expect { @message.deliver }.to raise_exception(Timeout::Error)
 
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
       Mailer.expects(:create_message).raises("450 recipient address rejected")
       ErrorReport.expects(:log_exception).never
       expect(@message.deliver).to eq false

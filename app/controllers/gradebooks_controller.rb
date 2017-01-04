@@ -200,19 +200,17 @@ class GradebooksController < ApplicationController
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
 
-      case @current_user.preferred_gradebook_version
-      when "2"
-        render :gradebook2
-        return
-      when "srgb"
-        render :screenreader
-        return
+      version = @current_user.preferred_gradebook_version
+      if version == '2'
+        render :gradebook and return
+      elsif version == "gradezilla" && @context.root_account.feature_enabled?(:gradezilla)
+        render :gradezilla and return
+      elsif version == "srgb"
+        render :screenreader and return
+      else
+        render :gradebook and return
       end
     end
-  end
-
-  def gradebook2
-    redirect_to action: :show
   end
 
   def post_grades_tools
@@ -720,15 +718,6 @@ class GradebooksController < ApplicationController
     js_env :total_grade_warning => warning if warning
   end
   private :set_gradebook_warnings
-
-
-  def assignment_groups_json(opts={})
-    @context.assignment_groups.active.preload(:published_assignments).map { |g|
-      assignment_group_json(g, @current_user, session, ['assignments'], {
-        stringify_json_ids: opts[:stringify_json_ids] || stringify_json_ids?
-      })
-    }
-  end
 
   private
 

@@ -37,8 +37,8 @@ describe AdheresToPolicy::Condition do
     end
 
     it 'evaluates the condition in the context of the object' do
-      object = mock
-      thing = mock
+      object = double
+      thing = double
       expect(thing).to receive(:happened).with(object)
 
       condition = AdheresToPolicy::Condition.new(proc {
@@ -48,9 +48,9 @@ describe AdheresToPolicy::Condition do
     end
 
     it 'passes in the user and session' do
-      user = mock
-      session = mock
-      thing = mock
+      user = double
+      session = double
+      thing = double
       expect(thing).to receive(:happened).with(user, session)
 
       condition = AdheresToPolicy::Condition.new(proc { |user, session|
@@ -60,15 +60,15 @@ describe AdheresToPolicy::Condition do
     end
 
     it 'works with lambdas with only one argument' do
-      user = mock
-      thing = mock
+      user = double
+      thing = double
       expect(thing).to receive(:happened).with(user)
 
       condition = AdheresToPolicy::Condition.new((lambda { |user|
         thing.happened(user)
       }))
 
-      condition.applies?(nil, user, mock)
+      condition.applies?(nil, user, double)
     end
   end
 end

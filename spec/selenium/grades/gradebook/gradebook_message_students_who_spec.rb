@@ -1,9 +1,9 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/groups_common'
 
-describe "gradebook2 - message students who" do
+describe "gradebook - message students who" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
   include GroupsCommon
 
   before(:once) { gradebook_data_setup }
@@ -12,7 +12,7 @@ describe "gradebook2 - message students who" do
   it "should send messages" do
     message_text = "This is a message"
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(2)
     f('[data-action="messageStudentsWho"]').click
@@ -36,7 +36,7 @@ describe "gradebook2 - message students who" do
     # student 3 has neither submitted nor been graded
 
     message_text = "This is a message"
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     open_assignment_options(2)
     f('[data-action="messageStudentsWho"]').click
     expect {
@@ -51,7 +51,7 @@ describe "gradebook2 - message students who" do
 
   it "should send messages when Scored more than X points" do
     message_text = "This is a message"
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(1)
     f('[data-action="messageStudentsWho"]').click
@@ -72,7 +72,7 @@ describe "gradebook2 - message students who" do
     submission = @third_assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 3')
     submission.save!
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     # set grade for first student, 3rd assignment
     # l4 because the the first two columns are part of the same grid
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l4', 0)
@@ -93,7 +93,7 @@ describe "gradebook2 - message students who" do
   it "should create separate conversations" do
     message_text = "This is a message"
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(2)
     f('[data-action="messageStudentsWho"]').click
@@ -107,7 +107,7 @@ describe "gradebook2 - message students who" do
   end
 
   it "allows the teacher to remove students from the message" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(1)
     f('[data-action="messageStudentsWho"]').click
@@ -137,7 +137,7 @@ describe "gradebook2 - message students who" do
   end
 
   it "disables the submit button if all students are filtered out" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(1)
     f('[data-action="messageStudentsWho"]').click
@@ -154,7 +154,7 @@ describe "gradebook2 - message students who" do
   end
 
   it "disables the submit button if all students are manually removed" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(1)
     f('[data-action="messageStudentsWho"]').click
@@ -183,7 +183,7 @@ describe "gradebook2 - message students who" do
     en.deactivate
 
     message_text = "This is a message"
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     open_assignment_options(1)
     f('[data-action="messageStudentsWho"]').click

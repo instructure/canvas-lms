@@ -9,7 +9,7 @@ describe GradeSummaryPresenter do
       let(:assignment) { assignment_model(:course => course) }
 
       before do
-        user
+        user_factory
         enrollment = StudentEnrollment.create!(:course => course, :user => @user)
         enrollment.update_attribute(:workflow_state, 'active')
         course.update_attribute(:workflow_state, 'available')
@@ -421,7 +421,7 @@ describe GradeSummaryPresenter do
 
   describe "#student_enrollment_for" do
     let(:gspcourse) do
-      course
+      course_factory
     end
 
     let(:teacher) do

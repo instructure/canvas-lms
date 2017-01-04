@@ -210,7 +210,7 @@ describe CalendarEvent do
       end
 
       it "should not add verifiers to files unless course or attachment is public" do
-        attachment_model(:context => course)
+        attachment_model(:context => course_factory)
         html = %{<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>}
         calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => html)
         ev = @event.to_ics(in_own_calendar: false)
@@ -286,7 +286,7 @@ describe CalendarEvent do
     end
 
     it "should return events implicitly tied to the contexts (via effective_context_string)" do
-      @teacher = user
+      @teacher = user_factory
       @course.enroll_teacher(@teacher).accept!
       course1 = @course
       course_with_teacher(:user => @teacher)
@@ -336,9 +336,9 @@ describe CalendarEvent do
       Notification.create(:name => 'New Event Created', :category => "TestImmediately")
       Notification.create(:name => 'Event Date Changed', :category => "TestImmediately")
       course_with_student(:active_all => true)
-      @teacher = user(:active_all => true)
+      @teacher = user_factory(active_all: true)
       @course.enroll_teacher(@teacher).accept!
-      channel = @student.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
+      channel = @student.communication_channels.create(:path => "test_channel_email_#{user_factory.id}", :path_type => "email")
       channel.confirm
     end
 
@@ -438,7 +438,7 @@ describe CalendarEvent do
         Notification.create(:name => 'Appointment Reserved By User', :category => "TestImmediately")
         Notification.create(:name => 'Appointment Reserved For User', :category => "TestImmediately")
 
-        @teacher = user(:active_all => true)
+        @teacher = user_factory(active_all: true)
         @course.enroll_teacher(@teacher).accept!
 
         student_in_course(:course => @course, :active_all => true)
@@ -633,7 +633,7 @@ describe CalendarEvent do
     end
 
     it "should enforce the group category" do
-      teacher = user(:active_all => true)
+      teacher = user_factory(active_all: true)
       @course.enroll_teacher(teacher).accept!
       c1 = group_category
       g1 = c1.groups.create(:context => @course)
@@ -661,7 +661,7 @@ describe CalendarEvent do
       expect { @appointment.reserve_for(@user, @user) }.not_to raise_error
 
       # just a teacher
-      user(:active_all => true)
+      user_factory(active_all: true)
       @course.enroll_teacher(@user).accept!
       expect(@ag.eligible_participant?(@user)).to be_falsey
       expect { @appointment.reserve_for(@user, @user) }.to raise_error
@@ -760,7 +760,7 @@ describe CalendarEvent do
     it "should delete child events when deleting the parent" do
       calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
       child = @event.child_events.build
-      child.context = user
+      child.context = user_factory
       child.save!
 
       @event.destroy
@@ -893,7 +893,7 @@ describe CalendarEvent do
       it "should copy cascaded attributes when creating a child event" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
-        child.context = user
+        child.context = user_factory
         child.save!
         expect(child.start_at).to be_nil
         expect(child.title).to eql @event.title
@@ -902,7 +902,7 @@ describe CalendarEvent do
       it "should update cascaded attributes on the child events whenever the parent is updated" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
-        child.context = user
+        child.context = user_factory
         child.save!
         child.reload
         orig_start_at = child.start_at
@@ -917,7 +917,7 @@ describe CalendarEvent do
       it "should disregard attempted changes to cascaded attributes" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
-        child.context = user
+        child.context = user_factory
         child.save!
         child.reload
         orig_start_at = child.start_at
@@ -934,7 +934,7 @@ describe CalendarEvent do
       it "should copy all attributes when creating a locked child event" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
-        child.context = user
+        child.context = user_factory
         child.workflow_state = :locked
         child.save!
         expect(child.start_at).to eql @event.start_at
@@ -944,7 +944,7 @@ describe CalendarEvent do
       it "should update locked child events whenever the parent is updated" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
-        child.context = user
+        child.context = user_factory
         child.workflow_state = :locked
         child.save!
 
@@ -956,7 +956,7 @@ describe CalendarEvent do
       it "should disregard attempted changes to locked attributes" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
-        child.context = user
+        child.context = user_factory
         child.workflow_state = :locked
         child.save!
 
@@ -970,7 +970,7 @@ describe CalendarEvent do
         @event.workflow_state = :locked
         @event.save!
         child = @event.child_events.build
-        child.context = user
+        child.context = user_factory
         child.workflow_state = :locked
         child.save!
 

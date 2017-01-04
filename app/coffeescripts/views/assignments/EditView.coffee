@@ -22,10 +22,12 @@ define [
   'jqueryui/dialog'
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
+  'compiled/behaviors/tooltip'
 ], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, EditViewTemplate,
-userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
-AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
-ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
+  userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog,
+  preventDefault, MissingDateDialog, AssignmentGroupSelector,
+  GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
+  ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -113,7 +115,6 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
       events["click #{EXTERNAL_TOOLS_URL}_find"] = 'showExternalToolsDialog'
       events["change #assignment_points_possible"] = 'handlePointsChange'
       events["change #{PEER_REVIEWS_BOX}"] = 'handleModeratedGradingChange'
-      events["change #{GROUP_CATEGORY_BOX}"] = 'handleModeratedGradingChange'
       events["change #{MODERATED_GRADING_BOX}"] = 'handleModeratedGradingChange'
       events["change #{GROUP_CATEGORY_BOX}"] = 'handleGroupCategoryChange'
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
@@ -166,14 +167,17 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
       @checkboxAccessibleAdvisory(box).text(message)
 
     enableCheckbox: (box) ->
-      if box.prop("disabled")
-        box.removeProp("disabled").parent().timeoutTooltip().timeoutTooltip('disable').removeAttr('data-tooltip').removeAttr('title')
+      if box.prop('disabled')
+        return if @assignment.inClosedGradingPeriod()
+
+        box.prop('disabled', false).parent().timeoutTooltip().timeoutTooltip('disable').removeAttr('data-tooltip').removeAttr('title')
         @setImplicitCheckboxValue(box, '0')
         @checkboxAccessibleAdvisory(box).text('')
 
     handleGroupCategoryChange: ->
       isGrouped = @$groupCategoryBox.prop('checked')
       @$intraGroupPeerReviews.toggleAccessibly(isGrouped)
+      @handleModeratedGradingChange()
 
     handleModeratedGradingChange: =>
       if !ENV?.HAS_GRADED_SUBMISSIONS
@@ -545,12 +549,15 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
       ]
       ignoreFilter = ignoreFields.map((field) -> "not(#{field})").join(":")
 
+      self = this
+      @$el.find(":checkbox:#{ignoreFilter}").each ->
+        self.disableCheckbox($(this), I18n.t("Cannot be edited for assignments in closed grading periods"))
       @$el.find(":radio:#{ignoreFilter}").click(@ignoreClickHandler)
-      @$el.find(":checkbox:#{ignoreFilter}").click(@ignoreClickHandler)
       @$el.find("select:#{ignoreFilter}").each(@lockSelectValueHandler)
 
     ignoreClickHandler: (event) ->
       event.preventDefault()
+      event.stopPropagation()
 
     lockSelectValueHandler: ->
       lockedValue = this.value

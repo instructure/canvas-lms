@@ -638,7 +638,7 @@ describe "Files API", type: :request do
     end
 
     it "should 404 with wrong context" do
-      course
+      course_factory
       user_session(@user)
       opts = @file_path_options.merge(:course_id => @course.id.to_param)
       api_call(:get, "/api/v1/courses/#{@course.id}/files/#{@att.id}", opts, {}, {}, :expected_status => 404)

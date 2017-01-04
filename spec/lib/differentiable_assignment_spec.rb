@@ -155,7 +155,7 @@ shared_examples_for "a differentiable_object" do
     it "should not filter if user not in course" do
       original_user = @user
       # override @user and @course
-      student_in_course(:course => course)
+      student_in_course(:course => course_factory)
       @user = original_user
       expect(call_filter).to eq :not_filtered
     end

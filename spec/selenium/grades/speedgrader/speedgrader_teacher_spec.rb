@@ -1,13 +1,13 @@
 require_relative "../../common"
 require_relative "../../helpers/speed_grader_common"
-require_relative "../../helpers/gradebook2_common"
+require_relative "../../helpers/gradebook_common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../../helpers/groups_common"
 
 describe "speed grader" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
-  include Gradebook2Common
+  include GradebookCommon
   include SpeedGraderCommon
   include GroupsCommon
 
@@ -302,7 +302,7 @@ describe "speed grader" do
   context 'Crocodocable Submissions' do
     # set up course and users
     let(:test_course) { @course }
-    let(:student)     { user(active_all: true) }
+    let(:student)     { user_factory(active_all: true) }
     let!(:crocodoc_plugin) { PluginSetting.create! name: "crocodoc", settings: {api_key: "abc123"} }
     let!(:enroll_student) do
       test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')

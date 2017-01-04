@@ -129,7 +129,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def export_object?(obj)
     return false unless obj
-    last_export_at = self.master_template.last_export_at
+    last_export_at = self.master_template.last_export_started_at
     last_export_at.nil? || obj.updated_at >= last_export_at
   end
 
@@ -181,6 +181,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
         # all imports are done
         if self.import_results.values.all?{|r| r[:state] == 'completed'}
           self.workflow_state = 'completed'
+          self.imports_completed_at = Time.now
         else
           self.workflow_state = 'imports_failed'
         end

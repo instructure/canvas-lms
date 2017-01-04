@@ -1,4 +1,4 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative './gradebook_student_common'
 require_relative '../setup/gradebook_setup'
 require_relative '../page_objects/student_grades_page'
@@ -6,7 +6,7 @@ require_relative '../page_objects/student_grades_page'
 
 describe 'Student Gradebook' do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
   include GradebookSetup
 
   let(:assignments) do
@@ -61,7 +61,7 @@ describe 'Student Gradebook' do
 
       scores = []
       if role == 'observer'
-        observer = user(name: 'Observer', active_all: true, active_state: 'active')
+        observer = user_factory(name: 'Observer', active_all: true, active_state: 'active')
         [course1, course2, course3].each do |course|
 
           enrollment = ObserverEnrollment.new(user: observer,
@@ -169,9 +169,9 @@ describe 'Student Gradebook' do
 
   context 'Comments' do
     # create a course, publish and enroll teacher and student
-    let_once(:test_course) { course() }
-    let_once(:teacher) { user(active_all: true) }
-    let_once(:student) { user(active_all: true) }
+    let_once(:test_course) { course_factory() }
+    let_once(:teacher) { user_factory(active_all: true) }
+    let_once(:student) { user_factory(active_all: true) }
     let_once(:published_course) do
       test_course.workflow_state = 'available'
       test_course.save!

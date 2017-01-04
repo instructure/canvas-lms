@@ -1,4 +1,4 @@
-define ['compiled/gradebook2/Turnitin'], (Turnitin) ->
+define ['compiled/gradebook/Turnitin'], (Turnitin) ->
 
   submissionWithReport = null
 

@@ -17,6 +17,7 @@
 #
 
 require 'spec_helper'
+require_dependency "api/html/track_tag"
 
 module Api
   module Html

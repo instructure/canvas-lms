@@ -55,7 +55,7 @@ describe LearningOutcome do
         }
       ]
       @rubric.save!
-      @user = user(:active_all => true)
+      @user = user_factory(active_all: true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
@@ -254,7 +254,7 @@ describe LearningOutcome do
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
-      @user = user(:active_all => true)
+      @user = user_factory(active_all: true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
@@ -338,7 +338,7 @@ describe LearningOutcome do
 
       expect(@rubric.learning_outcome_alignments).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
-      @user = user(:active_all => true)
+      @user = user_factory(active_all: true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
@@ -406,7 +406,7 @@ describe LearningOutcome do
 
       expect(@rubric.learning_outcome_alignments).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
-      @user = user(:active_all => true)
+      @user = user_factory(active_all: true)
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
@@ -651,7 +651,7 @@ describe LearningOutcome do
 
     context "non-global outcome" do
       before :once do
-        course(:active_course => 1)
+        course_factory(:active_course => 1)
         @outcome = @course.created_learning_outcomes.create!(:title => 'non-global outcome')
       end
 
@@ -913,9 +913,9 @@ describe LearningOutcome do
       ->(outcome, context) do
         assignment = assignment_model(context: context)
         rubric = add_or_get_rubric(outcome)
-        user = user(:active_all => true)
+        user = user_factory(active_all: true)
         context.enroll_student(user)
-        teacher = user(active_all: true)
+        teacher = user_factory(active_all: true)
         context.enroll_teacher(teacher)
         a = rubric.associate_with(assignment, context, :purpose => 'grading')
         assignment.reload

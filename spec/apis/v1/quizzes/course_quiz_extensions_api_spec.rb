@@ -19,7 +19,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::CourseQuizExtensionsController, type: :request do
   before :once do
-    course
+    course_factory
     @quizzes = [1,2].map do |n|
       quiz = @course.quizzes.create!(:title => "quiz#{n}")
       quiz.publish!

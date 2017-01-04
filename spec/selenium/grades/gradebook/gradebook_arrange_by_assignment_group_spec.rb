@@ -1,10 +1,10 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/assignment_overrides'
 
-describe "gradebook2 - arrange by assignment group" do
+describe "gradebook - arrange by assignment group" do
   include_context "in-process server selenium tests"
   include AssignmentOverridesSeleniumHelper
-  include Gradebook2Common
+  include GradebookCommon
 
   before(:once) do
     gradebook_data_setup
@@ -13,7 +13,7 @@ describe "gradebook2 - arrange by assignment group" do
 
   before(:each) do
     user_session(@teacher)
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
   end
 
   it "should default to arrange columns by assignment group", priority: "1", test_id: 220028 do
@@ -45,7 +45,7 @@ describe "gradebook2 - arrange by assignment group" do
     expect(arrange_settings.call.last.find_element(:xpath, '..')).not_to be_displayed
 
     # Setting should stick (not be messed up) after reload
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0]).to include_text @assignment_1_points

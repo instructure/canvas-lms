@@ -1,9 +1,8 @@
 require 'guard'
-require 'guard/guard'
+require 'guard/plugin'
 
 module Guard
-  class BrandableCSS < Guard
-
+  class BrandableCSS < Plugin
     def start
       @pid = spawn("./node_modules/.bin/brandable_css --watch")
     end

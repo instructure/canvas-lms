@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/context_modules/url_show" do
   it "should render" do
-    course
+    course_factory
     view_context(@course, @user)
     @module = @course.context_modules.create!(:name => 'teh module')
     @tag = @module.add_item(:type => 'external_url',

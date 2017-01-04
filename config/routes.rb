@@ -150,6 +150,8 @@ CanvasRails::Application.routes.draw do
     end
   end
 
+  get '/courses/:course_id/gradebook2', to: redirect('/courses/%{course_id}/gradebook')
+
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
   # these resources also apply to groups and individual users.  We call
@@ -207,7 +209,6 @@ CanvasRails::Application.routes.draw do
     end
 
     resource :gradebook_csv, only: [:show]
-    get 'gradebook2' => "gradebooks#gradebook2"
 
     get 'attendance' => 'gradebooks#attendance'
     get 'attendance/:user_id' => 'gradebooks#attendance', as: :attendance_user
@@ -815,7 +816,6 @@ CanvasRails::Application.routes.draw do
   get "files/search", controller: 'files', action: 'react_files', format: false
   get 'files/s3_success/:id' => 'files#s3_success', as: :s3_success
   get 'files/:id/public_url' => 'files#public_url', as: :public_url
-  get 'files/preflight' => 'files#preflight', as: :file_preflight
   post 'files/pending' => 'files#create_pending', as: :file_create_pending
   resources :assignments, only: :index do
     resources :files, only: [] do
@@ -1175,6 +1175,7 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/sis_imports', action: :create
       get 'accounts/:account_id/sis_imports/:id', action: :show
       get 'accounts/:account_id/sis_imports', action: :index, as: "account_sis_imports"
+      put 'accounts/:account_id/sis_imports/:id/abort', action: :abort
     end
 
     scope(controller: :users) do

@@ -5386,44 +5386,44 @@ pt-BR:
   data_set_identifier_data_set_id_c228b5df: "Identificador do conjunto de dados: %{data_set_id}"
   date: 
     abbr_day_names: 
-      - Dom
-      - Seg
-      - Ter
-      - Qua
-      - Qui
-      - Sex
-      - Sáb
+      - dom
+      - seg
+      - ter
+      - qua
+      - qui
+      - sex
+      - sáb
     abbr_month_names: 
       - ~
-      - Jan
-      - Fev
-      - Mar
-      - Abr
-      - Mai
-      - Jun
-      - Jul
-      - Ago
-      - Set
-      - Out
-      - Nov
-      - Dez
+      - jan
+      - fev
+      - mar
+      - abr
+      - mai
+      - jun
+      - jul
+      - ago
+      - set
+      - out
+      - nov
+      - dez
     datepicker: 
       column_headings: 
-        - Dom
-        - Seg
-        - Ter
-        - Qua
-        - Qui
-        - Sex
-        - Sab
+        - dom
+        - seg
+        - ter
+        - qua
+        - qui
+        - sex
+        - sab
     day_names: 
-      - Domingo
-      - Segunda-feira
-      - Terça-feira
-      - Quarta-feira
-      - Quinta-feira
-      - Sexta-feira
-      - Sábado
+      - domingo
+      - segunda-feira
+      - terça-feira
+      - quarta-feira
+      - quinta-feira
+      - sexta-feira
+      - sábado
     days: 
       today: Hoje
       today_lower: hoje
@@ -5446,18 +5446,18 @@ pt-BR:
       weekday: "%A"
     month_names: 
       - ~
-      - Janeiro
-      - Fevereiro
-      - Março
-      - Abril
-      - Maio
-      - Junho
-      - Julho
-      - Agosto
-      - Setembro
-      - Outubro
-      - Novembro
-      - Dezembro
+      - janeiro
+      - fevereiro
+      - março
+      - abril
+      - maio
+      - junho
+      - julho
+      - agosto
+      - setembro
+      - outubro
+      - novembro
+      - dezembro
   date_created_87e265bc: "Data de Criação"
   date_ee500367: Data
   date_error_7b38f8ff: "Erro de data"
@@ -16521,7 +16521,7 @@ pt-BR:
       long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
       tiny: "%k:%M"
-      tiny_on_the_hour: "%-k:%M"
+      tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: "há menos de um minuto"
     pm: pm
     ranges: 

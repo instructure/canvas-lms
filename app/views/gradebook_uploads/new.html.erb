@@ -1,4 +1,7 @@
-<% content_for :page_title do %><%= join_title t('titles.new_upload', "Upload Gradebook"), @context.name %><% end %>
+<% title = join_title t("Upload Gradebook"), @context.name %>
+<% content_for :page_title, title %>
+
+<h1><%= title %></h1>
 
 <%= form_for [@context, GradebookUpload.new], html: {multipart: true, title: t("Choose a CSV file to upload:")} do |f| %>
   <p aria-hidden="true">

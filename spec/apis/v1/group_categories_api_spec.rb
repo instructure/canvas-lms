@@ -45,7 +45,7 @@ describe "Group Categories API", type: :request do
 
   describe "course group categories" do
     before :once do
-      @course = course(:course_name => 'Math 101', :account => @account, :active_course => true)
+      @course = course_factory(:course_name => 'Math 101', :account => @account, :active_course => true)
       @category = GroupCategory.student_organized_for(@course)
     end
 
@@ -61,10 +61,10 @@ describe "Group Categories API", type: :request do
       end
 
       before :once do
-        @user = user(:name => "joe mcCool")
+        @user = user_factory(:name => "joe mcCool")
         @course.enroll_user(@user,'TeacherEnrollment',:enrollment_state => :active)
 
-        @user_waldo = user(:name => "waldo")
+        @user_waldo = user_factory(:name => "waldo")
         @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
 
 
@@ -79,7 +79,7 @@ describe "Group Categories API", type: :request do
                                                      :course_id => @course.to_param),
                         { 'name' => 'category', 'split_group_count' => 3 })
 
-        @user_antisocial = user(:name => "antisocial")
+        @user_antisocial = user_factory(:name => "antisocial")
         @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
 
         @category2 = GroupCategory.find(json["id"])
@@ -100,7 +100,7 @@ describe "Group Categories API", type: :request do
       end
 
       it "should return 401 for users outside the group_category" do
-        user  # ?
+        user_factory  # ?
         raw_api_call(:get, api_url, api_route)
         expect(response.code).to eq '401'
       end
@@ -137,7 +137,7 @@ describe "Group Categories API", type: :request do
 
       it "should include custom student roles in search" do
         teacher = @user
-        custom_student = user(name: "blah")
+        custom_student = user_factory(name: "blah")
         role = custom_student_role('CustomStudent', :account => @course.account)
         @course.enroll_user(custom_student, 'StudentEnrollment', role: role)
         json = api_call_as_user(teacher, :get, api_url, api_route)
@@ -148,7 +148,7 @@ describe "Group Categories API", type: :request do
     describe "teacher actions with no group" do
       before :once do
         @name = 'some group name'
-        @user = user(:name => "joe mcCool")
+        @user = user_factory(:name => "joe mcCool")
         @course.enroll_user(@user,'TeacherEnrollment',:enrollment_state => :active)
       end
 
@@ -362,7 +362,7 @@ describe "Group Categories API", type: :request do
 
     describe "student actions" do
       before :once do
-        @user = user(:name => "derrik hans")
+        @user = user_factory(:name => "derrik hans")
         @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
       end
 

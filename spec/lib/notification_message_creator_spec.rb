@@ -134,7 +134,7 @@ describe NotificationMessageCreator do
     end
 
     it "should not send dispatch messages for pre-registered users" do
-      course
+      course_factory
       notification_model
       u1 = user_model(:name => "user 2")
       u1.communication_channels.create(:path => "user2@example.com").confirm!
@@ -161,7 +161,7 @@ describe NotificationMessageCreator do
     end
 
     it "should send dashboard and dispatch messages for registered users based on default policies" do
-      course
+      course_factory
       notification_model(:category => 'TestImmediately')
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
       u1.communication_channels.create(:path => "user1@example.com").confirm!
@@ -237,7 +237,7 @@ describe NotificationMessageCreator do
     end
 
     it "should send dashboard (but not dispatch messages) for registered users based on default policies" do
-      course
+      course_factory
       notification_model(:category => 'TestNever', :name => "Show In Feed")
       expect(@notification.default_frequency).to eql("never")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
@@ -250,7 +250,7 @@ describe NotificationMessageCreator do
     end
 
     it "should not send dashboard messages for non-feed or non-dashboard messages" do
-      course
+      course_factory
       notification_model(:category => 'TestNever', :name => "Don't Show In Feed")
       expect(@notification.default_frequency).to eql("never")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
@@ -423,7 +423,7 @@ describe NotificationMessageCreator do
     end
 
     it "should respect course locales" do
-      course
+      course_factory
       I18n.backend.stub(es: {messages: {test_name: {email: {subject: 'El Tigre Chino'}}}}) do
         I18n.config.available_locales_set.merge([:es, 'es'])
         @course.enroll_teacher(@user).accept!
@@ -435,7 +435,7 @@ describe NotificationMessageCreator do
     end
 
     it "should respect account locales" do
-      course
+      course_factory
       I18n.backend.stub(es: {messages: {test_name: {email: {subject: 'El Tigre Chino'}}}}) do
         I18n.config.available_locales_set.merge([:es, 'es'])
         @course.account.update_attribute(:default_locale, 'es')
@@ -493,7 +493,7 @@ describe NotificationMessageCreator do
         @cs_account = Account.new
         @cs_account.settings[:outgoing_email_default_name] = "OutgoingName"
         @cs_account.save!
-        course(:active_all => true, :account => @cs_account)
+        course_factory(active_all: true, :account => @cs_account)
         @course.enroll_student(@user).accept!
         assignment_model(:course => @course)
       end

@@ -1,8 +1,8 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2" do
+describe "gradebook" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   context "differentiated assignments" do
     before :once do

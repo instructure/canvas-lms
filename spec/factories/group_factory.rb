@@ -37,7 +37,7 @@ module Factories
 
   def group_with_user(opts={})
     group(opts)
-    u = opts[:user] || user(opts)
+    u = opts[:user] || user_factory(opts)
     workflow_state = opts[:active_all] ? 'accepted' : nil
     @group.add_user(u, workflow_state, opts[:moderator])
   end

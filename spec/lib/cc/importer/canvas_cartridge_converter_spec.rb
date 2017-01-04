@@ -1409,7 +1409,7 @@ describe "cc assignment extensions" do
     converter.export
     @course_data = converter.course.with_indifferent_access
 
-    @course = course
+    @course = course_factory
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_type = "canvas_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
@@ -1454,7 +1454,7 @@ describe "matching question reordering" do
     converter.export
     @course_data = converter.course.with_indifferent_access
 
-    @course = course
+    @course = course_factory
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_type = "common_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
@@ -1495,7 +1495,7 @@ describe "matching question reordering" do
       converter.export
       @course_data = converter.course.with_indifferent_access
 
-      @course = course
+      @course = course_factory
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_type = "canvas_cartridge_importer"
     end

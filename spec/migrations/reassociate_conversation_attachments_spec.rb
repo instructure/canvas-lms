@@ -24,7 +24,7 @@ describe 'ReassociateConversationAttachments' do
     it "should work" do
       c = Conversation.create!
 
-      u1 = user
+      u1 = user_factory
       cm1 = c.conversation_messages.build
       cm1.author_id = u1.id
       cm1.body = ''
@@ -36,7 +36,7 @@ describe 'ReassociateConversationAttachments' do
       u1.conversation_attachments_folder
       expect(u1.folders.map(&:name).sort).to eql ["conversation attachments", "my files"]
 
-      u2 = user
+      u2 = user_factory
       cm2 = c.conversation_messages.build
       cm2.author_id = u2.id
       cm2.body = ''

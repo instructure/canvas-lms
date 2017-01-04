@@ -1,10 +1,10 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 require_relative '../../helpers/assignment_overrides'
 
-describe "gradebook2 - arrange by due date" do
+describe "gradebook - arrange by due date" do
   include_context "in-process server selenium tests"
   include AssignmentOverridesSeleniumHelper
-  include Gradebook2Common
+  include GradebookCommon
 
   before(:once) do
     gradebook_data_setup
@@ -13,7 +13,7 @@ describe "gradebook2 - arrange by due date" do
 
   before(:each) do
     user_session(@teacher)
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
   end
 
   it "should validate arrange columns by due date option", priority: "1", test_id: 220027 do
@@ -28,7 +28,7 @@ describe "gradebook2 - arrange by due date" do
     expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
 
     # Setting should stick after reload
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0]).to include_text expected_text
 
@@ -55,7 +55,7 @@ describe "gradebook2 - arrange by due date" do
     f('#gradebook_settings').click
     f("a[data-arrange-columns-by='due_date']").click
     # since due date changes in assignments don't reflect in column sorting without a refresh
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(1)')).to include_text(assignment3.title)
     expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(2)')).to include_text(assignment2.title)
     expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(3)')).to include_text(@assignment.title)

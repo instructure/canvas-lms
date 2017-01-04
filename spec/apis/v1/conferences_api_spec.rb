@@ -105,8 +105,8 @@ describe "Conferences API", type: :request do
     end
 
     let(:conference) do
-      BigBlueButtonConference.create!(context: course,
-                                      user: user,
+      BigBlueButtonConference.create!(context: course_factory,
+                                      user: user_factory,
                                       conference_key: "conf_key")
     end
 

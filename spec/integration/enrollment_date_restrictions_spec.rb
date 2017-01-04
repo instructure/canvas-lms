@@ -27,10 +27,10 @@ describe "enrollment_date_restrictions" do
 
   it "should not list inactive enrollments in the course list" do
     @student = user_with_pseudonym
-    @enrollment1 = course(:course_name => "Course 1", :active_all => 1)
+    @enrollment1 = course_factory(:course_name => "Course 1", :active_all => 1)
     e1 = student_in_course(:user => @student, :active_all => 1)
 
-    @enrollment2 = course(:course_name => "Course 2", :active_all => 1)
+    @enrollment2 = course_factory(:course_name => "Course 2", :active_all => 1)
 
     @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => true)
     e2 = student_in_course(:user => @student, :active_all => 1)
@@ -69,11 +69,11 @@ describe "enrollment_date_restrictions" do
   end
 
   it "should not show date inactive/completed courses in grades" do
-    @course1 = course(:active_all => 1)
-    @course2 = course(:active_all => 1)
-    @course3 = course(:active_all => 1)
-    @course4 = course(:active_all => 1)
-    user(:active_all => 1)
+    @course1 = course_factory(active_all: true)
+    @course2 = course_factory(active_all: true)
+    @course3 = course_factory(active_all: true)
+    @course4 = course_factory(active_all: true)
+    user_factory(active_all: true)
 
     @course1.start_at = 4.days.ago
     @course1.conclude_at = 2.days.ago

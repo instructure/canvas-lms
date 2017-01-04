@@ -39,42 +39,45 @@ describe BookmarkedCollection::SimpleBookmarker do
 
   context "#bookmark_for" do
     it "should be comparable" do
-      @bookmarker.bookmark_for(@bob).should be_respond_to(:<=>)
+      expect(@bookmarker.bookmark_for(@bob)).to be_respond_to(:<=>)
     end
 
     it "should match the columns, in order" do
-      @bookmarker.bookmark_for(@bob).should == [@bob.name, @bob.id]
+      expect(@bookmarker.bookmark_for(@bob)).to eq([@bob.name, @bob.id])
     end
   end
 
   context "#validate" do
     it "should validate the bookmark and its contents" do
-      @bookmarker.validate({name: "bob", id: 1}).should be_false
-      @bookmarker.validate(["bob"]).should be_false
-      @bookmarker.validate(["bob", "1"]).should be_false
-      @bookmarker.validate(["bob", 1]).should be_true
+      expect(@bookmarker.validate({name: "bob", id: 1})).to be_falsey
+      expect(@bookmarker.validate(["bob"])).to be_falsey
+      expect(@bookmarker.validate(["bob", "1"])).to be_falsey
+      expect(@bookmarker.validate(["bob", 1])).to be_truthy
     end
   end
 
   context "#restrict_scope" do
     it "should order correctly" do
       pager = double(current_bookmark: nil)
-      @bookmarker.restrict_scope(@example_class, pager).should ==
+      expect(@bookmarker.restrict_scope(@example_class, pager)).to eq(
         [@bill, @bob, @bob2, @bobby, @joe]
+      )
     end
 
     it "should start after the bookmark" do
       bookmark = @bookmarker.bookmark_for(@bob2)
       pager = double(current_bookmark: bookmark, include_bookmark: false)
-      @bookmarker.restrict_scope(@example_class, pager).should ==
+      expect(@bookmarker.restrict_scope(@example_class, pager)).to eq(
         [@bobby, @joe]
+      )
     end
 
     it "should include the bookmark iff include_bookmark" do
       bookmark = @bookmarker.bookmark_for(@bob2)
       pager = double(current_bookmark: bookmark, include_bookmark: true)
-      @bookmarker.restrict_scope(@example_class, pager).should ==
+      expect(@bookmarker.restrict_scope(@example_class, pager)).to eq(
         [@bob2, @bobby, @joe]
+      )
     end
   end
 end

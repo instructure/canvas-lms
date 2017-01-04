@@ -17,9 +17,10 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '../../../spec_helper.rb')
+require_dependency "alerts/interaction"
 
 module Alerts
-  describe Alerts::Interaction do
+  describe Interaction do
     before :once do
       course_with_teacher(:active_all => 1)
       @teacher = @user
@@ -103,12 +104,12 @@ module Alerts
       end
 
       it "returns false for old conversation messages" do
-        @conversation = @teacher.initiate_conversation([@student, user])
+        @conversation = @teacher.initiate_conversation([@student, user_factory])
         message = @conversation.add_message("hello")
         message.created_at = Time.now - 30.days
         message.save!
         @course.start_at = Time.now - 30.days
-        @conversation.add_participants([user])
+        @conversation.add_participants([user_factory])
         expect(@conversation.messages.length).to eq 2
 
         interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])

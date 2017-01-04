@@ -178,6 +178,7 @@ class Assignment
           json['submission_history'] = json['submission_history'].map do |version|
             version.as_json(only: submission_fields,
                             methods: [:versioned_attachments, :late, :external_tool_url]).tap do |version_json|
+              version_json['submission']['has_originality_report'] = version.originality_reports.present?
               if version_json['submission'] && version_json['submission']['versioned_attachments']
                 version_json['submission']['versioned_attachments'].map! do |a|
                   if @grading_role == :moderator

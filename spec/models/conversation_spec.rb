@@ -19,8 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Conversation do
-  let_once(:sender) { user }
-  let_once(:recipient) { user }
+  let_once(:sender) { user_factory }
+  let_once(:recipient) { user_factory }
 
   context "initiation" do
     it "should set private_hash for private conversations" do
@@ -58,9 +58,9 @@ describe Conversation do
 
       it "should create the conversation on the appropriate shard" do
         users = []
-        users << user(:name => 'a')
-        @shard1.activate { users << user(:name => 'b') }
-        @shard2.activate { users << user(:name => 'c') }
+        users << user_factory(:name => 'a')
+        @shard1.activate { users << user_factory(:name => 'b') }
+        @shard2.activate { users << user_factory(:name => 'c') }
         Shard.with_each_shard([Shard.default, @shard1, @shard2]) do
           conversation = Conversation.initiate(users, false)
           expect(conversation.shard).to eq Shard.current
@@ -77,8 +77,8 @@ describe Conversation do
       end
 
       it "should re-use a private conversation from any shard" do
-        users = [user]
-        @shard1.activate { users << user }
+        users = [user_factory]
+        @shard1.activate { users << user_factory }
         conversation = Conversation.initiate(users, true)
         expect(Conversation.initiate(users, true)).to eq conversation
         @shard1.activate do
@@ -91,8 +91,8 @@ describe Conversation do
 
       it "should re-use a private conversation from an unrelated shard" do
         users = []
-        @shard1.activate { users << user }
-        @shard2.activate { users << user }
+        @shard1.activate { users << user_factory }
+        @shard2.activate { users << user_factory }
         conversation = Conversation.initiate(users, true)
         expect(Conversation.initiate(users, true)).to eq conversation
         @shard1.activate do
@@ -108,14 +108,14 @@ describe Conversation do
   context "adding participants" do
     it "should not add participants to private conversations" do
       root_convo = Conversation.initiate([sender, recipient], true)
-      expect{ root_convo.add_participants(sender, [user]) }.to raise_error
+      expect{ root_convo.add_participants(sender, [user_factory]) }.to raise_error
     end
 
     it "should add new participants to group conversations and give them all messages" do
       root_convo = Conversation.initiate([sender, recipient], false)
       root_convo.add_message(sender, 'test')
 
-      new_guy = user
+      new_guy = user_factory
       expect{ root_convo.add_participants(sender, [new_guy]) }.not_to raise_error
       expect(root_convo.participants(true).size).to eq 3
 
@@ -135,7 +135,7 @@ describe Conversation do
       sender.conversations.first.remove_messages(msgs[0])
       sender.conversations.first.delete_messages(msgs[1])
 
-      new_guy = user
+      new_guy = user_factory
       root_convo.add_participants(sender, [new_guy])
       # -1 for hard delete msg, +1 for generated message. soft deleted should still be added.
       expect(new_guy.conversations.first.messages.size).to eql(msgs.size - 1 + 1)
@@ -152,7 +152,7 @@ describe Conversation do
       root_convo = Conversation.initiate([sender, recipient], false)
       root_convo.add_message(sender, 'test')
 
-      new_guy = user
+      new_guy = user_factory
       old_updated_at = new_guy.updated_at
       root_convo.add_participants(sender, [new_guy])
       expect(new_guy.reload.updated_at).not_to eql old_updated_at
@@ -163,14 +163,14 @@ describe Conversation do
 
       it "should add participants to the proper shards" do
         users = []
-        users << user(:name => 'a')
-        users << user(:name => 'b')
-        users << user(:name => 'c')
+        users << user_factory(:name => 'a')
+        users << user_factory(:name => 'b')
+        users << user_factory(:name => 'c')
         conversation = Conversation.initiate(users, false)
         conversation.add_message(users.first, 'test')
         expect(conversation.conversation_participants.size).to eq 3
         @shard1.activate do
-          users << user(:name => 'd')
+          users << user_factory(:name => 'd')
           conversation.add_participants(users.first, [users.last])
           expect(conversation.conversation_participants(:reload).size).to eq 4
           expect(conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }).to be_truthy
@@ -178,7 +178,7 @@ describe Conversation do
           expect(conversation.participants(true).map(&:id)).to eq users.map(&:id)
         end
         @shard2.activate do
-          users << user(:name => 'e')
+          users << user_factory(:name => 'e')
           conversation.add_participants(users.first, users[-2..-1])
           expect(conversation.conversation_participants(:reload).size).to eq 5
           expect(conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }).to be_truthy
@@ -193,8 +193,8 @@ describe Conversation do
     shared_examples_for "message counts" do
       before :once do
         (@shard1 || Shard.default).activate do
-          @sender = user
-          @recipient = user
+          @sender = user_factory
+          @recipient = user_factory
         end
       end
       it "should increment when adding messages" do
@@ -240,10 +240,10 @@ describe Conversation do
     shared_examples_for "unread counts" do
       before :once do
         (@shard1 || Shard.default).activate do
-          @sender = user
-          @unread_guy = @recipient = user
-          @subscribed_guy = user
-          @unsubscribed_guy = user
+          @sender = user_factory
+          @unread_guy = @recipient = user_factory
+          @subscribed_guy = user_factory
+          @unsubscribed_guy = user_factory
         end
       end
 
@@ -338,8 +338,8 @@ describe Conversation do
 
   context "subscription" do
     it "should mark-as-read when unsubscribing iff it was unread" do
-      subscription_guy = user
-      archive_guy = user
+      subscription_guy = user_factory
+      archive_guy = user_factory
       root_convo = Conversation.initiate([sender, archive_guy, subscription_guy], false)
       root_convo.add_message(sender, 'test')
 
@@ -355,9 +355,9 @@ describe Conversation do
     end
 
     it "should mark-as-unread when re-subscribing iff there are newer messages" do
-      flip_flopper_guy = user
-      subscription_guy = user
-      archive_guy = user
+      flip_flopper_guy = user_factory
+      subscription_guy = user_factory
+      archive_guy = user_factory
       root_convo = Conversation.initiate([sender, flip_flopper_guy, archive_guy, subscription_guy], false)
       root_convo.add_message(sender, 'test')
 
@@ -389,8 +389,8 @@ describe Conversation do
     end
 
     it "should not toggle read/unread until the subscription change is saved" do
-      subscription_guy = user
-      root_convo = Conversation.initiate([sender, user, subscription_guy], false)
+      subscription_guy = user_factory
+      root_convo = Conversation.initiate([sender, user_factory, subscription_guy], false)
       root_convo.add_message(sender, 'test')
 
       expect(subscription_guy.reload.unread_conversations_count).to eql 1
@@ -574,9 +574,9 @@ describe Conversation do
       it "should ignore explicit context tags not shared by at least two participants" do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
-        u3 = user
+        u3 = user_factory
         @course1 = @course
-        @course2 = course(:active_all => true)
+        @course2 = course_factory(active_all: true)
         @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1, u2, u3], false)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string, @course2.asset_string])
@@ -586,7 +586,7 @@ describe Conversation do
       it "should save all visible tags on the conversation_participant" do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
-        u3 = user
+        u3 = user_factory
         conversation = Conversation.initiate([u1, u2, u3], false)
         conversation.add_message(u1, 'test', :tags => [@course.asset_string])
         expect(conversation.tags).to eql [@course.asset_string]
@@ -599,7 +599,7 @@ describe Conversation do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
-        @course2 = course(:active_all => true)
+        @course2 = course_factory(active_all: true)
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
@@ -614,7 +614,7 @@ describe Conversation do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
-        @course2 = course(:active_all => true)
+        @course2 = course_factory(active_all: true)
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
@@ -629,8 +629,8 @@ describe Conversation do
         specs_require_sharding
 
         it "should set all tags on the other shard's participants" do
-          course1 = @shard1.activate{ course(:account => Account.create!, :active_all => true) }
-          course2 = @shard2.activate{ course(:account => Account.create!, :active_all => true) }
+          course1 = @shard1.activate{ course_factory(:account => Account.create!, :active_all => true) }
+          course2 = @shard2.activate{ course_factory(:account => Account.create!, :active_all => true) }
           user1 = student_in_course(:course => course1, :active_all => true).user
           user2 = student_in_course(:course => course2, :active_all => true).user
           student_in_course(:course => course2, :user => user1, :active_all => true)
@@ -665,8 +665,8 @@ describe Conversation do
     end
 
     context "subsequent tags" do
-      let_once(:course1) { @course1 = course(active_all: true) }
-      let_once(:course2) { @course2 = course(active_all: true) }
+      let_once(:course1) { @course1 = course_factory(active_all: true) }
+      let_once(:course2) { @course2 = course_factory(active_all: true) }
       let_once(:u1) { student_in_course(active_all: true, course: course1).user }
       let_once(:u2) { student_in_course(active_all: true, course: course1).user }
       let_once(:u3) { student_in_course(active_all: true, course: course2).user }
@@ -711,8 +711,8 @@ describe Conversation do
     end
 
     context "private conversations" do
-      let_once(:course1) { @course1 = course(active_all: true) }
-      let_once(:course2) { @course2 = course(active_all: true) }
+      let_once(:course1) { @course1 = course_factory(active_all: true) }
+      let_once(:course2) { @course2 = course_factory(active_all: true) }
       let_once(:u1) { student_in_course(active_all: true, course: course1).user }
       let_once(:u2) { student_in_course(active_all: true, course: course1).user }
 
@@ -757,8 +757,8 @@ describe Conversation do
     end
 
     context "group conversations" do
-      let_once(:course1) { @course1 = course(active_all: true) }
-      let_once(:course2) { @course2 = course(active_all: true) }
+      let_once(:course1) { @course1 = course_factory(active_all: true) }
+      let_once(:course2) { @course2 = course_factory(active_all: true) }
       let_once(:u1) { student_in_course(active_all: true, course: course1).user }
       let_once(:u2) { student_in_course(active_all: true, course: course1).user }
 
@@ -811,7 +811,7 @@ describe Conversation do
         @u1 = student_in_course(:active_all => true).user
         @u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
-        @course2 = course(:active_all => true)
+        @course2 = course_factory(active_all: true)
         @course2.enroll_student(@u2).update_attribute(:workflow_state, 'active')
         @u3 = student_in_course(:active_all => true, :course => @course2).user
         @conversation = Conversation.initiate([@u1, @u2, @u3], false)
@@ -863,14 +863,14 @@ describe Conversation do
         conversation = Conversation.initiate([@teacher, @student], true)
         conversation.add_message(@teacher, 'first message')
 
-        new_course = course
+        new_course = course_factory
         new_course.offer!
         new_course.enroll_teacher(@teacher).accept!
         new_course.enroll_student(@student).accept!
 
         @old_course.complete!
 
-        third_course = course
+        third_course = course_factory
         third_course.offer!
         third_course.enroll_teacher(@teacher).accept!
 
@@ -889,11 +889,11 @@ describe Conversation do
 
         @old_course.complete!
 
-        teacher_course = course
+        teacher_course = course_factory
         teacher_course.offer!
         teacher_course.enroll_teacher(@teacher).accept!
 
-        student_course = course
+        student_course = course_factory
         student_course.offer!
         student_course.enroll_student(@student).accept!
 
@@ -906,7 +906,7 @@ describe Conversation do
       end
 
       it "should use concluded tags from multiple courses" do
-        old_course2 = course
+        old_course2 = course_factory
 
         old_course2.offer!
         old_course2.enroll_teacher(@teacher).accept!
@@ -917,11 +917,11 @@ describe Conversation do
 
         [@old_course, old_course2].each { |c| c.complete! }
 
-        teacher_course = course
+        teacher_course = course_factory
         teacher_course.offer!
         teacher_course.enroll_teacher(@teacher).accept!
 
-        student_course = course
+        student_course = course_factory
         student_course.offer!
         student_course.enroll_student(@student).accept!
 
@@ -960,7 +960,7 @@ describe Conversation do
         @old_course.complete!
         old_group.destroy
 
-        new_course = course
+        new_course = course_factory
         new_course.offer!
         [student1, student2].each { |s| new_course.enroll_student(s).accept! }
         new_group = Group.create!(:context => new_course)
@@ -986,8 +986,8 @@ describe Conversation do
     end
 
     it "should be saved on the conversation when adding a message" do
-      u1 = user
-      u2 = user
+      u1 = user_factory
+      u2 = user_factory
       conversation = Conversation.initiate([u1, u2], true)
       conversation.add_message(u1, 'ohai', :root_account_id => 1)
       conversation.add_message(u2, 'ohai yourself', :root_account_id => 2)
@@ -995,7 +995,7 @@ describe Conversation do
     end
 
     it "includes the context's root account when initiating" do
-      new_course = course
+      new_course = course_factory
       conversation = Conversation.initiate([], false, context_type: 'Course', context_id: new_course.id)
       expect(conversation.root_account_ids).to eql [new_course.root_account_id]
     end
@@ -1006,9 +1006,9 @@ describe Conversation do
       it "should use global ids" do
         @shard1.activate do
           @account = account_model
-          new_course = course(:account => @account)
-          u1 = user
-          u2 = user
+          new_course = course_factory(:account => @account)
+          u1 = user_factory
+          u2 = user_factory
           conversation = Conversation.initiate([u1, u2], false, context_type: 'Course', context_id: new_course.id)
           expect(conversation.root_account_ids).to eql [@account.global_id]
 

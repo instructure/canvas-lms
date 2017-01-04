@@ -17,6 +17,7 @@
 #
 #
 require_relative "../../spec_helper.rb"
+require_dependency "assignments/scoped_to_user"
 
 module Assignments
   describe ScopedToUser do

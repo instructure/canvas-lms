@@ -1,8 +1,8 @@
-require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook_common'
 
-describe "gradebook2 - concluded courses and enrollments" do
+describe "gradebook - concluded courses and enrollments" do
   include_context "in-process server selenium tests"
-  include Gradebook2Common
+  include GradebookCommon
 
   before(:once) { gradebook_data_setup }
   before(:each) { user_session(@teacher) }
@@ -18,7 +18,7 @@ describe "gradebook2 - concluded courses and enrollments" do
     end
 
     it "persists settings for displaying inactive enrollments", priority: "2", test_id: 1372593 do
-      get course_gradebook2_path(@course)
+      get course_gradebook_path(@course)
       f('#gradebook_settings').click
       expect { f('label[for="show_inactive_enrollments"]').click }
         .to change { gradebook_settings_for_course.call(@teacher, @course)}
@@ -30,7 +30,7 @@ describe "gradebook2 - concluded courses and enrollments" do
     end
 
     it "persists settings for displaying concluded enrollments", priority: "2", test_id: 1372592 do
-      get course_gradebook2_path(@course)
+      get course_gradebook_path(@course)
       f('#gradebook_settings').click
       expect { f('label[for="show_concluded_enrollments"]').click }
         .to change { gradebook_settings_for_course.call(@teacher, @course) }
@@ -45,13 +45,13 @@ describe "gradebook2 - concluded courses and enrollments" do
       conclude_student_1
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
     it "shows/hides concluded enrollments when checked/unchecked in settings cog", priority: "1", test_id: 164223 do
       conclude_student_1
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
 
       # show concluded
       expect_new_page_load do
@@ -72,13 +72,13 @@ describe "gradebook2 - concluded courses and enrollments" do
       deactivate_student_1
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(ff('.student-name')).to have_size @course.students.count
     end
 
     it "shows/hides inactive enrollments when checked/unchecked in settings cog", priority: "1", test_id: 1102066 do
       deactivate_student_1
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
 
       # show deactivated
       expect_new_page_load do
@@ -100,7 +100,7 @@ describe "gradebook2 - concluded courses and enrollments" do
   context "concluded course" do
     it "does not allow editing grades", priority: "1", test_id: 210027 do
       @course.complete!
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
       expect(cell).to include_text '10'
       cell.click

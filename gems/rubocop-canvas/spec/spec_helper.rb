@@ -1,4 +1,6 @@
 require 'rubocop'
+require 'rubocop/rspec/support'
+require 'rubocop_canvas'
 
 RSpec.configure do |config|
   config.order = :random
@@ -11,8 +13,3 @@ RSpec.configure do |config|
     mocks.syntax = :expect # Disable `should_receive` and `stub`
   end
 end
-
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'support/cop_helper'
-require 'rubocop_canvas'

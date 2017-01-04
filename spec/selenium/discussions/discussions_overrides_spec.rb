@@ -30,6 +30,10 @@ describe "discussions overrides" do
   end
 
   describe "set overrides" do
+    around do |example|
+      Timecop.freeze(Time.zone.local(2016,12,15,10,0,0), &example)
+    end
+
     before do
       default_due_at = Time.zone.now.advance(days:1).round
       override_due_at = Time.zone.now.advance(days:2).round
@@ -90,6 +94,7 @@ describe "discussions overrides" do
       end
 
       it "should show due dates in mouse hover in the assignments index page", priority: "2", test_id: 114318 do
+        skip "fragile spec, timebomb CNVS-34081"
         get "/courses/#{@course.id}/assignments"
         hover_text = "Everyone else\n#{@default_due}\nNew Section\n#{@override_due}"
         hover f('.assignment-date-due .vdd_tooltip_link')
@@ -113,7 +118,7 @@ describe "discussions overrides" do
       it "should list the discussions in main dashboard page", priority: "2", test_id: 632022 do
         course_with_admin_logged_in(course: @course)
         get ""
-        expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\n#{course.short_name}\nMultiple Due Dates")
+        expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\n#{course_factory.short_name}\nMultiple Due Dates")
       end
     end
   end

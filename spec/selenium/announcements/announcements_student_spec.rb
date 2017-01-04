@@ -10,7 +10,7 @@ describe "announcements" do
     student_2_entry = 'reply from student 2'
     topic_title = 'new replies hidden until post topic'
 
-    course
+    course_factory
     @course.offer
     student = user_with_pseudonym(:unique_id => 'student@example.com', :password => password, :active_user => true)
     teacher = user_with_pseudonym(:unique_id => 'teacher@example.com', :password => password, :active_user => true)

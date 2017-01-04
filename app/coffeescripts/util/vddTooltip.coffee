@@ -1,4 +1,4 @@
-define ['jquery'], ($) ->
+define ['jquery', 'jqueryui/tooltip'], ($) ->
   ->
     $('.vdd_tooltip_link').tooltip
       position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},

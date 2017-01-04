@@ -6,12 +6,8 @@ describe "i18n js" do
   before (:each) do
     course_with_teacher_logged_in
     get "/"
-    if CANVAS_WEBPACK
-      # I18n will already be exposed in webpack land
-    else
-      # get I18n and _ global for all the tests
-      driver.execute_script "require(['i18nObj', 'underscore'], function (I18n, _) { window.I18n = I18n; window._ = _; });"
-    end
+    # get I18n global for all the tests
+    driver.execute_script "require(['i18nObj'], function (I18n) { window.I18n = I18n });"
   end
 
   context "strftime" do

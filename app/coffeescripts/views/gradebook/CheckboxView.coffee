@@ -1,6 +1,6 @@
 define [
   'Backbone',
-  'jst/gradebook2/checkbox_view'
+  'jst/gradebook/checkbox_view'
 ], ({View}, template) ->
 
   class CheckboxView extends View

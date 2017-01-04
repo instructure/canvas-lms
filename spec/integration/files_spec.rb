@@ -358,12 +358,12 @@ describe FilesController do
   end
 
   it "should allow file previews for public-to-auth courses" do
-    course(:active_all => true)
+    course_factory(active_all: true)
     @course.update_attribute(:is_public_to_auth_users, true)
 
     att = attachment_model(:uploaded_data => stub_png_data, :context => @course)
 
-    user(:active_all => true)
+    user_factory(active_all: true)
     user_session(@user)
 
     ts, sf_verifier = @user.access_verifier

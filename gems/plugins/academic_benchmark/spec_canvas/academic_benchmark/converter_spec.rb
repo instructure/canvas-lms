@@ -105,7 +105,7 @@ describe AcademicBenchmark::Converter do
   end
   let(:root_account) { Account.site_admin }
   let(:admin_user) { account_admin_user(account: root_account, active_all: true) }
-  let(:regular_user) { user(name: "regular user", short_name: "user") }
+  let(:regular_user) { user_factory(name: "regular user", short_name: "user") }
   let(:migration_settings) do
     {
       authority: @authority_guid,

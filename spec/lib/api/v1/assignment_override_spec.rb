@@ -136,8 +136,8 @@ describe "Api::V1::AssignmentOverride" do
         @section_visible = @course.active_course_sections.second
 
         @student_invisible = student_in_section(@section_invisible)
-        @student_visible = student_in_section(@section_visible, user: user)
-        @teacher = teacher_in_section(@section_visible, user: user)
+        @student_visible = student_in_section(@section_visible, user: user_factory)
+        @teacher = teacher_in_section(@section_visible, user: user_factory)
 
         enrollment = @teacher.enrollments.first
         enrollment.limit_privileges_to_course_section = true
@@ -185,7 +185,7 @@ describe "Api::V1::AssignmentOverride" do
         @section_visible = @course.active_course_sections.second
 
         @student_invisible = student_in_section(@section_invisible)
-        @student_visible = student_in_section(@section_visible, user: user)
+        @student_visible = student_in_section(@section_visible, user: user_factory)
       end
 
       context '#invisble_users_and_overrides_for_user' do

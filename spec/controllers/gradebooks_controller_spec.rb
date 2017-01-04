@@ -26,7 +26,7 @@ describe GradebooksController do
     student_in_course active_all: true
     @student_enrollment = @enrollment
 
-    user(:active_all => true)
+    user_factory(active_all: true)
     @observer = @user
     @oe = @course.enroll_user(@user, 'ObserverEnrollment')
     @oe.accept
@@ -77,7 +77,7 @@ describe GradebooksController do
     end
 
     it "does not allow access for wrong user" do
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
       get 'grade_summary', :course_id => @course.id, :id => nil
       assert_unauthorized
@@ -93,7 +93,7 @@ describe GradebooksController do
     end
 
     it "does not allow access for a linked student" do
-      user(:active_all => true)
+      user_factory(active_all: true)
       user_session(@user)
       @se = @course.enroll_student(@user)
       @se.accept
@@ -105,7 +105,7 @@ describe GradebooksController do
 
     it "does not allow access for an observer linked in a different course" do
       @course1 = @course
-      course(:active_all => true)
+      course_factory(active_all: true)
       @course2 = @course
 
       user_session(@observer)
@@ -491,7 +491,7 @@ describe GradebooksController do
       it "redirects to Grid View with a friendly URL" do
         @teacher.preferences[:gradebook_version] = "2"
         get "show", :course_id => @course.id
-        expect(response).to render_template("gradebook2")
+        expect(response).to render_template("gradebook")
       end
 
       it "redirects to Individual View with a friendly URL" do
@@ -535,7 +535,7 @@ describe GradebooksController do
   end
 
   describe "GET 'change_gradebook_version'" do
-    it 'switches to gradebook2 if clicked' do
+    it 'switches to gradebook if clicked' do
       user_session(@teacher)
       get 'grade_summary', :course_id => @course.id, :id => nil
 
@@ -549,7 +549,7 @@ describe GradebooksController do
 
   describe "POST 'submissions_zip_upload'" do
     it "requires authentication" do
-      course
+      course_factory
       assignment_model
       post 'submissions_zip_upload', :course_id => @course.id, :assignment_id => @assignment.id, :submissions_zip => 'dummy'
       assert_unauthorized

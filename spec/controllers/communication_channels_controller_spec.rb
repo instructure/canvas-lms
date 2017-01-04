@@ -135,8 +135,8 @@ describe CommunicationChannelsController do
     describe "open registration" do
       before :once do
         @account = Account.create!
-        course(:active_all => 1, :account => @account)
-        user
+        course_factory(active_all: true, :account => @account)
+        user_factory
       end
 
       it "should show a pre-registered user the confirmation form" do
@@ -372,7 +372,7 @@ describe CommunicationChannelsController do
       end
 
       it "should show the confirm form for old creation_pending users that have a pseudonym" do
-        course(:active_all => 1)
+        course_factory(active_all: true)
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -386,7 +386,7 @@ describe CommunicationChannelsController do
       end
 
       it "should work for old creation_pending users that have a pseudonym" do
-        course(:active_all => 1)
+        course_factory(active_all: true)
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -413,8 +413,8 @@ describe CommunicationChannelsController do
 
       it "should allow the user to pick a new pseudonym if a conflict already exists" do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
-        course(:active_all => 1)
-        user
+        course_factory(active_all: true)
+        user_factory
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -430,8 +430,8 @@ describe CommunicationChannelsController do
 
       it "should force the user to provide a unique_id if a conflict already exists" do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
-        course(:active_all => 1)
-        user
+        course_factory(active_all: true)
+        user_factory
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -538,8 +538,8 @@ describe CommunicationChannelsController do
         @account1.authentication_providers.create!(:auth_type => 'cas')
         user_with_pseudonym(:active_all => 1, :account => @account1, :username => 'jt@instructure.com')
 
-        course(:active_all => 1, :account => @account2)
-        user
+        course_factory(active_all: true, :account => @account2)
+        user_factory
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_user(@user)
@@ -554,8 +554,8 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
         @old_user = @user
 
-        course(:active_all => 1, :account => @account2)
-        user
+        course_factory(active_all: true, :account => @account2)
+        user_factory
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @enrollment = @course.enroll_user(@user)
@@ -1174,7 +1174,7 @@ describe CommunicationChannelsController do
   end
 
   it "should re-send enrollment invitation for an invited user" do
-    course(:active_all => true)
+    course_factory(active_all: true)
     @enrollment = @course.enroll_user(@user)
     expect(@enrollment.context).to eql(@course)
     Notification.create(:name => 'Enrollment Invitation')
@@ -1188,7 +1188,7 @@ describe CommunicationChannelsController do
   context "cross-shard user" do
     specs_require_sharding
     it "should re-send enrollment invitation for a cross-shard user" do
-      course(:active_all => true)
+      course_factory(active_all: true)
       enrollment = nil
       @shard1.activate do
         user_with_pseudonym :active_cc => true

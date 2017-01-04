@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ShardedBookmarkedCollection do
   before(:each) do
-    @user = user(active_user: true)
+    @user = user_factory(active_user: true)
     @user.account_users.create! account: Account.create!
     @user.account_users.create! account: Account.create! { |a| a.workflow_state = 'deleted' }
   end
