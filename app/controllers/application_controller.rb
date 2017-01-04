@@ -1055,61 +1055,77 @@ class ApplicationController < ActionController::Base
 
     user = @current_user || (@accessed_asset && @accessed_asset[:user])
     if user && @log_page_views != false
-      updated_fields = params.slice(:interaction_seconds)
-      if request.xhr? && params[:page_view_token] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
-        RequestContextGenerator.store_interaction_seconds_update(params[:page_view_token], updated_fields[:interaction_seconds])
-
-        page_view_info = PageView.decode_token(params[:page_view_token])
-        @page_view = PageView.find_for_update(page_view_info[:request_id])
-        if @page_view
-          if @page_view.id
-            response.headers["X-Canvas-Page-View-Update-Url"] = page_view_path(
-              @page_view.id, page_view_token: @page_view.token)
-          end
-          @page_view.do_update(updated_fields)
-          @page_view_update = true
-        end
-      end
-      # If we're logging the asset access, and it's either a participatory action
-      # or it's not an update to an already-existing page_view.  We check to make sure
-      # it's not an update because if the page_view already existed, we don't want to
-      # double-count it as multiple views when it's really just a single view.
-
-      if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
-        @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
-        @accessed_asset[:level] ||= 'view'
-        @access.log @context, @accessed_asset
-
-        if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
-          generate_page_view(user)
-        end
-
-        if @page_view
-          @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
-          @page_view.asset_user_access = @access
-        end
-
-        @page_view_update = true
-      end
-      if @page_view && !request.xhr? && request.get? && (response.content_type || "").to_s.match(/html/)
-        @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
-        @page_view_update = true
-      end
-      if @page_view && @page_view_update
-        @page_view.context = @context if !@page_view.context_id && PageView::CONTEXT_TYPES.include?(@context.class.name)
-        @page_view.account_id = @domain_root_account.id
-        @page_view.developer_key_id = @access_token.try(:developer_key_id)
-        @page_view.store
-        RequestContextGenerator.store_page_view_meta(@page_view)
-      end
+      add_interaction_seconds
+      log_participation(user)
+      log_gets
+      finalize_page_view
     else
       @page_view.destroy if @page_view && !@page_view.new_record?
     end
+
   rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
     Canvas::Errors.capture_exception(:page_view, e)
     logger.error "Pageview error!"
     raise e if Rails.env.development?
     true
+  end
+
+  def add_interaction_seconds
+    updated_fields = params.slice(:interaction_seconds)
+    if request.xhr? && params[:page_view_token] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
+      RequestContextGenerator.store_interaction_seconds_update(params[:page_view_token], updated_fields[:interaction_seconds])
+
+      page_view_info = PageView.decode_token(params[:page_view_token])
+      @page_view = PageView.find_for_update(page_view_info[:request_id])
+      if @page_view
+        if @page_view.id
+          response.headers["X-Canvas-Page-View-Update-Url"] = page_view_path(
+            @page_view.id, page_view_token: @page_view.token)
+        end
+        @page_view.do_update(updated_fields)
+        @page_view_update = true
+      end
+    end
+  end
+
+  def log_participation(user)
+    # If we're logging the asset access, and it's either a participatory action
+    # or it's not an update to an already-existing page_view.  We check to make sure
+    # it's not an update because if the page_view already existed, we don't want to
+    # double-count it as multiple views when it's really just a single view.
+    if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
+      @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
+      @accessed_asset[:level] ||= 'view'
+      @access.log @context, @accessed_asset
+
+      if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
+        generate_page_view(user)
+      end
+
+      if @page_view
+        @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
+        @page_view.asset_user_access = @access
+      end
+
+      @page_view_update = true
+    end
+  end
+
+  def log_gets
+    if @page_view && !request.xhr? && request.get? && ((response.content_type || "").to_s.match(/html/))
+      @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
+      @page_view_update = true
+    end
+  end
+
+  def finalize_page_view
+    if @page_view && @page_view_update
+      @page_view.context = @context if !@page_view.context_id && PageView::CONTEXT_TYPES.include?(@context.class.name)
+      @page_view.account_id = @domain_root_account.id
+      @page_view.developer_key_id = @access_token.try(:developer_key_id)
+      @page_view.store
+      RequestContextGenerator.store_page_view_meta(@page_view)
+    end
   end
 
   rescue_from Exception, :with => :rescue_exception
