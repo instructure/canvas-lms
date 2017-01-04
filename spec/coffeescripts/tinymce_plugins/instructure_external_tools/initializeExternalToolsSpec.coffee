@@ -86,3 +86,20 @@ define [
       }
     }] } )
     ok externalContentReadySpy.notCalled
+
+  test 'includes the tab-helper element', ->
+    $dialog = ExternalToolsPlugin.buttonSelected(@buttonSpy, @fakeEditor)
+    ok $($dialog).find('#tab-helper').length
+
+  test 'tab-helper element is not visible after it has been blurred', ->
+    $dialog = ExternalToolsPlugin.buttonSelected(@buttonSpy, @fakeEditor)
+    $tabHelper = $($dialog).find('#tab-helper')
+    $($tabHelper).focus()
+    $($tabHelper).blur()
+    equal $($tabHelper).height(), 0
+
+  test 'tab-helper element is visible when focused', ->
+    $dialog = ExternalToolsPlugin.buttonSelected(@buttonSpy, @fakeEditor)
+    $tabHelper = $($dialog).find('#tab-helper')
+    $($tabHelper).focus()
+    equal $($tabHelper).height(), 35

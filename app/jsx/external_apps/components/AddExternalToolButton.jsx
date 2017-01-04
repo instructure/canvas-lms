@@ -120,7 +120,15 @@ define([
         if (this.state.isLti2 && this.state.tool.app_id) {
           return <Lti2Permissions ref="lti2Permissions" tool={this.state.tool} handleCancelLti2={this.handleCancelLti2} handleActivateLti2={this.handleActivateLti2} />;
         } else if (this.state.isLti2) {
-          return <Lti2Iframe ref="lti2Iframe" handleInstall={this.handleLti2ToolInstalled} registrationUrl={this.state.lti2RegistrationUrl} />;
+          return (
+            <Lti2Iframe ref="lti2Iframe" handleInstall={this.handleLti2ToolInstalled} registrationUrl={this.state.lti2RegistrationUrl} >
+              <div className="ReactModal__Footer">
+                <div id="footer-close-button" className="ReactModal__Footer-Actions">
+                  <button type="button" className="Button" onClick={this.closeModal}>{I18n.t('Close')}</button>
+                </div>
+              </div>
+            </Lti2Iframe>
+          );
         } else {
           return (
             <ConfigurationForm ref="configurationForm" tool={this.state.tool} configurationType="manual" handleSubmit={this.createTool}>
@@ -169,7 +177,7 @@ define([
                 </div>
               </div>
 
-             {this.renderForm()}
+              {this.renderForm()}
             </div>
           </Modal>
         </span>
