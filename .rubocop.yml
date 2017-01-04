@@ -108,6 +108,9 @@ Style/VariableNumber:
   Enabled: false
 Style/SpaceInLambdaLiteral:
   Enabled: false
+# We may want to enable this when we start working toward Ruby 3
+Style/FrozenStringLiteralComment:
+  Enabled: false
 
 # this isn't good for us because of how we pin dependencies
 Bundler/OrderedGems:
@@ -165,9 +168,13 @@ RSpec/InstanceVariable:
   Enabled: false
 RSpec/ExampleWording:
   Enabled: false
+RSpec/ExampleLength:
+  Max: 16
 RSpec/DescribedClass:
   Enabled: false
 RSpec/DescribeClass:
   Enabled: false
 Style/HashSyntax:
+  Enabled: false
+RSpec/MultipleExpectations:
   Enabled: false
