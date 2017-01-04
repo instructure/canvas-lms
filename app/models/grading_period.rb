@@ -215,20 +215,19 @@ class GradingPeriod < ActiveRecord::Base
       courses = [grading_period_group.course]
     else
       term_ids = grading_period_group.enrollment_terms.pluck(:id)
-      courses = Course.where(enrollment_term_id: term_ids)
-    end
-
-    if time_boundaries_changed?
-      # different assignments could fall in this period now,
-      # we need to recalculate its scores
-      calculator_opts = { grading_period_id: id }
-    elsif weight_actually_changed?
-      # only weight changed, we just need to recompute the overall course score
-      calculator_opts = { update_all_grading_period_scores: false }
+      courses = Course.active.where(enrollment_term_id: term_ids)
     end
 
     courses.each do |course|
-      GradeCalculator.send_later_if_production(:recompute_final_score, course.student_ids, course.id, calculator_opts)
+      course.recompute_student_scores(
+        # different assignments could fall in this period if time
+        # boundaries changed so we need to recalculate scores.
+        # otherwise, weight must have changed, in which case we
+        # do not need to recompute the grading period scores (we
+        # only need to recompute the overall course score)
+        grading_period_id: time_boundaries_changed? ? id : nil,
+        update_all_grading_period_scores: false
+      )
     end
   end
 

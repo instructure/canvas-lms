@@ -112,6 +112,19 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
           patch_update
           expect(response.status).to eql Rack::Utils.status_code(:no_content)
         end
+
+        it 'recomputes grades when an enrollment term is removed from the set' do
+          term = root_account.enrollment_terms.create!
+          root_account.courses.create!(enrollment_term: term)
+          grading_period_set.enrollment_terms << term
+          Enrollment.expects(:recompute_final_score).once
+          patch :update, {
+            account_id: root_account.to_param,
+            id: grading_period_set.to_param,
+            enrollment_term_ids: [],
+            grading_period_set: new_attributes
+          }, valid_session
+        end
       end
 
       it "defaults enrollment_term_ids to empty array" do

@@ -449,4 +449,23 @@ describe GradingPeriodGroup do
       end
     end
   end
+
+  describe 'computation of course scores' do
+    before(:once) do
+      @grading_period_set = account.grading_period_groups.create!(valid_attributes)
+      term = account.enrollment_terms.create!
+      @grading_period_set.enrollment_terms << term
+      account.courses.create!(enrollment_term: term)
+    end
+
+    it 'recomputes course scores when the weighted attribute is changed' do
+      Enrollment.expects(:recompute_final_score).once
+      @grading_period_set.update!(weighted: true)
+    end
+
+    it 'does not recompute course scores when the weighted attribute is not changed' do
+      Enrollment.expects(:recompute_final_score).never
+      @grading_period_set.update!(title: 'The Best Set')
+    end
+  end
 end

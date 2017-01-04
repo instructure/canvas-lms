@@ -26,6 +26,7 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   validate :associated_with_course_or_root_account, if: :active?
 
+  after_save :recompute_course_scores, if: :weighted_changed?
   after_destroy :dissociate_enrollment_terms
 
   set_policy do
@@ -67,6 +68,12 @@ class GradingPeriodGroup < ActiveRecord::Base
   end
 
   private
+
+  def recompute_course_scores
+    return course.recompute_student_scores(update_all_grading_period_scores: false) if course_id.present?
+
+    enrollment_terms.each { |term| term.recompute_course_scores(update_all_grading_period_scores: false) }
+  end
 
   def associated_with_course_or_root_account
     if course_id.blank? && account_id.blank?

@@ -1034,10 +1034,15 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def recompute_student_scores(student_ids = nil, grading_period_id: nil)
+  def recompute_student_scores(student_ids = nil, grading_period_id: nil, update_all_grading_period_scores: true)
     student_ids ||= self.student_ids
     Rails.logger.info "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
-    Enrollment.recompute_final_score(student_ids, self.id, grading_period_id: grading_period_id)
+    Enrollment.recompute_final_score(
+      student_ids,
+      self.id,
+      grading_period_id: grading_period_id,
+      update_all_grading_period_scores: update_all_grading_period_scores
+    )
   end
   handle_asynchronously_if_production :recompute_student_scores,
     :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }

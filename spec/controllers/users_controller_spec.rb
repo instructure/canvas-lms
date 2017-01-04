@@ -632,13 +632,13 @@ describe UsersController do
     end
 
     context "as a student" do
-      it "returns the grade and the total for the student, filtered by the grading period" do
+      it "returns the grade for the student, filtered by the grading period" do
         user_session(student)
         get('grades_for_student', grading_period_id: grading_period.id,
           enrollment_id: student_enrollment.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 40, 'total' => 4, 'possible' => 10, 'hide_final_grades' => false}
+        expected_response = {'grade' => 40.0, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
 
         grading_period.end_date = 4.months.from_now
@@ -648,7 +648,7 @@ describe UsersController do
           enrollment_id: student_enrollment.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expected_response = {'grade' => 94.55, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
       end
 
@@ -660,7 +660,7 @@ describe UsersController do
           enrollment_id: student_enrollment.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expected_response = {'grade' => 94.55, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
       end
 
@@ -686,7 +686,7 @@ describe UsersController do
           grading_period_id: grading_period.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 40, 'total' => 4, 'possible' => 10, 'hide_final_grades' => false}
+        expected_response = {'grade' => 40.0, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
 
         grading_period.end_date = 4.months.from_now
@@ -696,7 +696,7 @@ describe UsersController do
           enrollment_id: student_enrollment.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expected_response = {'grade' => 94.55, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
       end
 
@@ -709,7 +709,7 @@ describe UsersController do
           enrollment_id: student_enrollment.id)
 
         expect(response).to be_ok
-        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expected_response = {'grade' => 94.55, 'hide_final_grades' => false}
         expect(json_parse(response.body)).to eq expected_response
       end
 
@@ -859,6 +859,18 @@ describe UsersController do
               expect(selected_period_id).to eq grading_period.global_id
             end
 
+            it "returns the grade for the current grading period, if one exists " \
+              "and no grading period is passed in" do
+              assignment = test_course.assignments.create!(
+                due_at: 3.days.from_now(grading_period.end_date),
+                points_possible: 10
+              )
+              assignment.grade_student(test_student, grader: test_course.teachers.first, grade: 10)
+              user_session(test_student)
+              get :grades
+              expect(assigns[:grades][:student_enrollments][test_course.id]).to be_nil
+            end
+
             it "returns 0 (signifying 'All Grading Periods') if no current " \
             "grading period exists and no grading period parameter is passed in" do
               grading_period.start_date = 1.month.from_now
@@ -868,6 +880,19 @@ describe UsersController do
 
               selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
               expect(selected_period_id).to eq 0
+            end
+
+            it "returns the grade for 'All Grading Periods' if no current " \
+              "grading period exists and no grading period is passed in" do
+              grading_period.update!(start_date: 1.month.from_now)
+              assignment = test_course.assignments.create!(
+                due_at: 3.days.from_now(grading_period.end_date),
+                points_possible: 10
+              )
+              assignment.grade_student(test_student, grader: test_course.teachers.first, grade: 10)
+              user_session(test_student)
+              get :grades
+              expect(assigns[:grades][:student_enrollments][test_course.id]).to eq(100.0)
             end
 
             it "returns the grading_period_id passed in, if one is provided along with a course_id" do
