@@ -488,4 +488,14 @@ class AppointmentGroup < ActiveRecord::Base
   def context_codes
     appointment_group_contexts.map(&:context_code)
   end
+
+  def users_with_reservations_through_group
+    appointments_participants
+      .joins("INNER JOIN #{GroupMembership.quoted_table_name} " \
+             "ON group_memberships.group_id = calendar_events.context_id " \
+             "and calendar_events.context_type = 'Group'")
+      .where("group_memberships.workflow_state <> 'deleted'")
+      .pluck("group_memberships.user_id")
+  end
+
 end
