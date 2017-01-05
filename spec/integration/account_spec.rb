@@ -33,11 +33,11 @@ describe AccountsController do
       expect(response).to be_success
       expect(response.body).not_to eq ""
     end
-    
+
     it "should use the correct entity_id" do
       HostUrl.stubs(:default_host).returns('bob.cody.instructure.com')
       @aac = @account.authentication_providers.create!(:auth_type => "saml")
-      
+
       get "/saml_meta_data"
       expect(response).to be_success
       doc = Nokogiri::XML(response.body)
@@ -85,5 +85,28 @@ describe AccountsController do
 
     doc = Nokogiri::HTML(response.body)
     expect(doc.at_css(".course .details").text).to include("1 Student")
+  end
+
+  it 'shows special master/blueprint course stuff in course index' do
+    @domain_root_account = Account.default
+    Account.default.enable_feature!(:master_courses)
+    account_admin_user
+    user_session(@user)
+
+    bc = course_factory(:course_name => "blooprint")
+    template = MasterCourses::MasterTemplate.set_as_master_course(bc)
+    2.times do
+      template.add_child_course!(course_factory)
+    end
+    time = DateTime.parse("2016-05-12 22:00 UTC")
+    template.master_migrations.create!(:imports_completed_at => time, :workflow_state => 'completed')
+
+    get "/accounts/#{Account.default.id}?only_master_courses=1"
+
+    doc = Nokogiri::HTML(response.body)
+    text = doc.at_css(".course .details").text
+    expect(text).to include("Blueprint Course")
+    expect(text).to include("Last Pushed Update: May 12")
+    expect(text).to include("2 Associated Courses")
   end
 end

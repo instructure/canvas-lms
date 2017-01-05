@@ -25,7 +25,7 @@
       <% if master_template %>
         <strong><%= t('Blueprint Course') %></strong>
         <% if master_template.last_export_completed_at %><br><%= t('Last Pushed Update: %{last_export_at}', :last_export_at => datetime_string(master_template.last_export_completed_at)) %><% end %>
-        <%# TODO: add master_template.child_course_count here somewhere when we have a frd name %>
+        <br><%= t(:associated_count, {:one => "1 Associated Course", :other => "%{count} Associated Courses"}, :count => master_template.child_course_count) %>
       <% else %>
         <% teacher_names_new = teacher_names[0, 2] %>
         <% teacher_names_new << t(:more_count, { :one => "1 more", :other => "%{count} more" }, :count => teacher_names.length - 2) if teacher_names.length > 2 %>
