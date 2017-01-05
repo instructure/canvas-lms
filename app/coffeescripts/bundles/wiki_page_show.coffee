@@ -19,11 +19,6 @@ require [
       document.querySelector(target)
     )
 
-  sortByPosting = (a, b) ->
-    aPosted = a.delayed_post_at || a.posted_at
-    bPosted = b.delayed_post_at || b.posted_at
-    natcompare.strings(bPosted, aPosted)
-
   $ ->
     $('#content').on('click', '#mark-as-done-checkbox', ->
       MarkAsDone.toggle(this)
@@ -54,7 +49,7 @@ require [
 
     axios.get("/api/v1/announcements?context_codes[]=course_#{ENV.COURSE_ID}&per_page=#{ENV.ANNOUNCEMENT_LIMIT || 3}&page=1&start_date=1900-01-01&end_date=2100-12-31")
     .then (response) =>
-      renderReactComponent AnnouncementList, '#announcements_on_home_page', announcements: response.data.sort(sortByPosting).map (a) ->
+      renderReactComponent AnnouncementList, '#announcements_on_home_page', announcements: response.data.map (a) ->
           id: a.id,
           title: a.title,
           message: a.message,
