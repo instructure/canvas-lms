@@ -146,9 +146,11 @@ END
     'underline_all_links' =>
     {
       display_name: -> { I18n.t('Underline Links') },
-      description: -> { I18n.t('Display all text links in Canvas as *underlined text*.',
-        wrapper: { '*' => '<span class="feature-detail-underline">\1</span>' }
-      )},
+      description: -> { I18n.t('underline_all_links_description', <<-END, wrapper: { '*' => '<span class="feature-detail-underline">\1</span>' })},
+Underline Links displays hyperlinks in navigation menus, the Dashboard, and page sidebars as
+*underlined text*. This feature option does not apply to user-generated content links in the
+Rich Content Editor, which always underlines links for all users.
+END
       applies_to: 'User',
       state: 'allowed',
       beta: true
