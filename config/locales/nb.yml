@@ -5431,7 +5431,7 @@ nb:
       long_with_weekday: "%A %-d. %B"
       medium: "%-d %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
+      medium_with_weekday: "%a %-d %b %Y"
       short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
