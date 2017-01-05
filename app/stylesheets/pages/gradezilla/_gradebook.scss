@@ -195,6 +195,36 @@ $cell_height: 33px;
   }
 }
 
+.Gradebook__ColumnHeaderContent {
+  bottom: 0;
+  display: flex;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.Gradebook__ColumnHeaderDetail {
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.Gradebook__ColumnHeaderAction {
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.Gradebook__ColumnHeaderDetail,
+.Gradebook__ColumnHeaderAction {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .odd .slick-cell {
   background-color: #f5f6f7;
 }
