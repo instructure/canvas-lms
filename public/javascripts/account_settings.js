@@ -25,6 +25,15 @@ define([
     });
   }
 
+  function addUsersLink (event) {
+    event.preventDefault();
+    var $enroll_users_form = $('#enroll_users_form');
+    $(this).hide();
+    $enroll_users_form.show();
+    $('html,body').scrollTo($enroll_users_form);
+    $enroll_users_form.find('#admin_role_id').focus().select();
+  }
+
   $(document).ready(function() {
     checkFutureListingSetting = function() {
 
@@ -206,14 +215,7 @@ define([
     });
 
     // Admins tab
-    $(".add_users_link").click(function(event) {
-        var $enroll_users_form = $("#enroll_users_form");
-        $(this).hide();
-        event.preventDefault();
-        $enroll_users_form.show();
-        $("html,body").scrollTo($enroll_users_form);
-        $enroll_users_form.find("textarea").focus().select();
-      });
+    $(".add_users_link").click(addUsersLink);
 
     $(".open_report_description_link").click(openReportDescriptionLink);
 
@@ -308,6 +310,7 @@ define([
   });
 
   return {
+    addUsersLink: addUsersLink,
     openReportDescriptionLink: openReportDescriptionLink
   }
 
