@@ -2624,6 +2624,7 @@ class Course < ActiveRecord::Base
           tab[:visibility] = default_tab[:visibility]
           tab[:external] = default_tab[:external]
           tab[:icon] = default_tab[:icon]
+          tab[:target] = default_tab[:target] if default_tab[:target]
           tab[:screenreader] = default_tab[:screenreader]
           default_tabs.delete_if {|t| t[:id] == tab[:id] }
           external_tabs.delete_if {|t| t[:id] == tab[:id] }
