@@ -2,10 +2,9 @@ define([
   'react',
   'react-dom',
   'react-addons-test-utils',
-  'jquery',
   'underscore',
   'jsx/grading/EditGradingPeriodSetForm'
-], (React, ReactDOM, {Simulate}, $, _, GradingPeriodSetForm) => {
+], (React, ReactDOM, {Simulate}, _, GradingPeriodSetForm) => {
   const wrapper = document.getElementById('fixtures');
 
   const assertDisabled = function(component) {
@@ -18,7 +17,7 @@ define([
     notEqual($el.getAttribute('aria-disabled'), 'true');
   };
 
-  const exampleSet = { id: "1", title: "Fall 2015" };
+  const exampleSet = { id: "1", title: "Fall 2015", weighted: true };
 
   module('EditGradingPeriodSetForm', {
     renderComponent(opts={}) {
@@ -61,7 +60,15 @@ define([
   test('uses attributes from the given set', function() {
     let form = this.renderComponent();
     equal(ReactDOM.findDOMNode(form.refs.title).value, "Fall 2015");
+    equal(form.weightedCheckbox.checked, true);
     equal(form.state.set.id, "1");
+  });
+
+  test('updates weighted state when checkbox is clicked', function() {
+    const form = this.renderComponent();
+    equal(form.state.set.weighted, true);
+    form.weightedCheckbox.handleChange({ target: { checked: false } });
+    equal(form.state.set.weighted, false);
   });
 
   test('uses associated enrollment terms to update set state', function() {

@@ -3,11 +3,12 @@ define([
   'underscore',
   'jquery',
   'instructure-ui/Button',
+  'instructure-ui/Checkbox',
   'i18n!grading_periods',
   'compiled/api/gradingPeriodSetsApi',
   'jsx/grading/EnrollmentTermInput',
   'compiled/jquery.rails_flash_notifications'
-], function(React, _, $, { default: Button }, I18n, setsApi, EnrollmentTermInput) {
+], function(React, _, $, { default: Button }, { default: Checkbox }, I18n, setsApi, EnrollmentTermInput) {
 
   let NewGradingPeriodSetForm = React.createClass({
     propTypes: {
@@ -24,6 +25,7 @@ define([
       return {
         buttonsDisabled: false,
         title: "",
+        weighted: false,
         selectedEnrollmentTermIDs: []
       };
     },
@@ -55,7 +57,7 @@ define([
       event.preventDefault();
       this.setState({ buttonsDisabled: true }, () => {
         if(this.isValid()) {
-          let set = { title: this.state.title.trim() };
+          let set = { title: this.state.title.trim(), weighted: this.state.weighted };
           set.enrollmentTermIDs = this.state.selectedEnrollmentTermIDs;
           setsApi.create(set)
                  .then(this.submitSucceeded)
@@ -80,6 +82,10 @@ define([
       this.setState({ title: event.target.value });
     },
 
+    onSetWeightedChange(event) {
+      this.setState({ weighted: event.target.checked });
+    },
+
     render() {
       return (
         <div className="GradingPeriodSetForm pad-box">
@@ -100,6 +106,15 @@ define([
                   selectedIDs                  = {this.state.selectedEnrollmentTermIDs}
                   setSelectedEnrollmentTermIDs = {this.setSelectedEnrollmentTermIDs}
                 />
+                <div className="ic-Input">
+                  <Checkbox
+                    ref={(ref) => { this.weightedCheckbox = ref }}
+                    label={I18n.t('Weighted grading periods')}
+                    value="weighted"
+                    checked={this.state.weighted}
+                    onChange={this.onSetWeightedChange}
+                  />
+                </div>
               </div>
             </div>
             <div className="grid-row">

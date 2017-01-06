@@ -23,6 +23,7 @@ define([
     grading_period_set: {
       id: "81",
       title: "Example Set!",
+      weighted: false,
       grading_periods: [],
       permissions: { read: true, update: true, delete: true, create: true },
       created_at: "2013-06-03T02:57:42Z"
@@ -86,6 +87,13 @@ define([
     this.stub(form, 'isValid', () => true);
     Simulate.click(ReactDOM.findDOMNode(form.refs.createButton));
     assertDisabled(form.refs.cancelButton);
+  });
+
+  test('updates weighted state when checkbox is clicked', function() {
+    const form = this.renderComponent();
+    equal(form.state.weighted, false);
+    form.weightedCheckbox.handleChange({ target: { checked: true } });
+    equal(form.state.weighted, true);
   });
 
   asyncTest('re-enables the cancel button when the ajax call fails', function() {

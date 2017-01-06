@@ -17,7 +17,7 @@ define [
     $.replaceTags(ENV.GRADING_PERIOD_SET_UPDATE_URL, 'id', id)
 
   serializeSet = (set) =>
-    grading_period_set: { title: set.title },
+    grading_period_set: { title: set.title, weighted: set.weighted },
     enrollment_term_ids: set.enrollmentTermIDs
 
   deserializePeriods = (periods) =>
@@ -36,6 +36,7 @@ define [
     {
       id: set.id.toString()
       title: gradingPeriodSetTitle(set)
+      weighted: set.weighted || false
       gradingPeriods: deserializePeriods(set.grading_periods)
       permissions: set.permissions
       createdAt: new Date(set.created_at)
