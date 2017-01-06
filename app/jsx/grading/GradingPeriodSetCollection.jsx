@@ -35,10 +35,6 @@ define([
     });
   };
 
-  const getShowGradingPeriodSetRef = function(set) {
-    return "show-grading-period-set-" + set.id;
-  };
-
   const getEditGradingPeriodSetRef = function(set) {
     return "edit-grading-period-set-" + set.id;
   };
@@ -75,7 +71,7 @@ define([
     componentDidUpdate(prevProps, prevState) {
       if (prevState.editSet.id && (prevState.editSet.id !== this.state.editSet.id)) {
         let set = {id: prevState.editSet.id};
-        this.refs[getShowGradingPeriodSetRef(set)].refs.editButton.focus();
+        this.refs[this.getShowGradingPeriodSetRef(set)].refs.editButton.focus();
       }
     },
 
@@ -240,9 +236,9 @@ define([
       if (index < 1) {
         return this.refs.addSetFormButton;
       } else {
-        const setRef = getShowGradingPeriodSetRef(this.state.sets[index - 1]);
+        const setRef = this.getShowGradingPeriodSetRef(this.state.sets[index - 1]);
         const setToFocus = this.refs[setRef];
-        return setToFocus.refs.title;
+        return setToFocus.refs.editButton;
       }
     },
 
@@ -295,6 +291,10 @@ define([
       this.setState({ editSet: {id: null, saving: false} });
     },
 
+    getShowGradingPeriodSetRef(set) {
+      return "show-grading-period-set-" + set.id;
+    },
+
     renderEditGradingPeriodSetForm(set) {
       let cancelCallback = () => {
         this.closeEditSetForm(set.id);
@@ -341,7 +341,7 @@ define([
           return (
             <GradingPeriodSet
               key             = {set.id}
-              ref             = {getShowGradingPeriodSetRef(set)}
+              ref             = {this.getShowGradingPeriodSetRef(set)}
               set             = {set}
               gradingPeriods  = {set.gradingPeriods}
               urls            = {urls}
