@@ -168,8 +168,7 @@ describe ContentMigration do
       attrs = [:turnitin_enabled, :vericite_enabled, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
           :grade_group_students_individually, :allowed_extensions,
-          :position, :peer_review_count, :muted, :omit_from_final_grade,
-          :only_visible_to_overrides]
+          :position, :peer_review_count, :muted, :omit_from_final_grade]
 
       run_course_copy
 
@@ -177,6 +176,7 @@ describe ContentMigration do
       attrs.each do |attr|
         expect(@assignment[attr]).to eq new_assignment[attr]
       end
+      expect(new_assignment.only_visible_to_overrides).to be_falsey
     end
 
     it "should copy group assignment setting" do
@@ -531,8 +531,11 @@ describe ContentMigration do
           set_id: 1, title: 'Tag 1')
         assignment_override_model(assignment: @assignment, set_type: 'Noop',
           set_id: nil, title: 'Tag 2')
+        @assignment.only_visible_to_overrides = true
+        @assignment.save!
         run_course_copy
         to_assignment = @copy_to.assignments.first
+        expect(to_assignment.only_visible_to_overrides).to be_truthy
         expect(to_assignment.assignment_overrides.length).to eq 2
         expect(to_assignment.assignment_overrides.detect{ |o| o.set_id == 1 }.title).to eq 'Tag 1'
         expect(to_assignment.assignment_overrides.detect{ |o| o.set_id.nil? }.title).to eq 'Tag 2'
