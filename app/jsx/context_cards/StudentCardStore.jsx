@@ -13,7 +13,8 @@ define(['axios'], (axios) => {
           manage_grades: false,
           send_messages: false,
           view_all_grades: false,
-          view_analytics: false
+          view_analytics: false,
+          become_user: false,
         }
       };
     }

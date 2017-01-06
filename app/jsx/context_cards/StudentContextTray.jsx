@@ -206,7 +206,10 @@ define([
               ) : (
                 <div>
                   <header className="StudentContextTray-Header">
-                    <Avatar user={this.state.user} />
+                    <Avatar user={this.state.user}
+                      canMasquerade={this.state.permissions.become_user}
+                      courseId={this.props.courseId}
+                    />
 
                     <div className="StudentContextTray-Header__Layout">
                       <div className="StudentContextTray-Header__Content">
