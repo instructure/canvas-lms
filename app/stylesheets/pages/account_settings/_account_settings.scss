@@ -184,3 +184,7 @@
 .hidden_form {
   display: none;
 }
+
+textarea#account_notification_message, .edit_notification_form textarea {
+  width: 500px;
+}
