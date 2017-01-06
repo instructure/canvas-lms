@@ -342,7 +342,10 @@ class ProfileController < ApplicationController
         pseudonymed = false
         if params[:default_email_id].present?
           @email_channel = @user.communication_channels.email.where(id: params[:default_email_id]).first
-          @email_channel.move_to_top if @email_channel
+          if @email_channel
+            @email_channel.move_to_top
+            @user.clear_email_cache!
+          end
         end
         if params[:pseudonym]
           pseudonym_params = strong_params[:pseudonym].permit(:password, :password_confirmation, :unique_id)

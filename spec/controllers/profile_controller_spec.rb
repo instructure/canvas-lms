@@ -84,6 +84,17 @@ describe ProfileController do
       expect(@cc.reload.position).to eq 2
     end
 
+    it "should clear email cache" do
+      enable_cache do
+        @user.email # prime cache
+        user_session(@user, @pseudonym)
+        @cc2 = @user.communication_channels.create!(:path => 'email2@example.com')
+        put 'update', :user_id => @user.id, :default_email_id => @cc2.id, :format => 'json'
+        expect(response).to be_success
+        expect(@user.email).to eq @cc2.path
+      end
+    end
+
     it "should allow changing the default e-mail address and nothing else (name changing disabled)" do
       @account = Account.default
       @account.settings = { :users_can_edit_name => false }
