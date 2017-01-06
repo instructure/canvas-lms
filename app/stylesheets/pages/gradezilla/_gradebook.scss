@@ -122,31 +122,10 @@ $cell_height: 33px;
     color: #2f2a34;
     text-shadow: white 0 0 1px;
   }
-  a.assignment-name {
-    font-weight: normal;
-
-    text-shadow: white 0 0 1px;
-    //this is for the ellipses
+  .assignment-name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    @if $use_high_contrast {
-      &:hover, &:focus { text-decoration: underline; }
-    }
-    @else { color: $ic-link-color; }
-  }
-  .muted i {
-    color: $ic-color-medium-darker;
-  }
-  .assignment-points-possible {
-    font-weight: normal;
-    @include fontSize(12px);
-    margin: {
-      left: 10px;
-      right: 14px;
-    };
-    // If high contrast, default to regular dark text
-    @if $use_high_contrast == false { color: lighten($ic-font-color-dark, 15%); }
   }
   .gradebook-header-drop {
     //put it above the "out of"
