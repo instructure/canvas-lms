@@ -6,6 +6,7 @@ class Linter
   DEFAULT_OPTIONS = {
     append_files_to_command: false,
     boyscout_mode: true,
+    campsite_mode: true,
     comment_post_processing: proc {},
     env_sha: ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION'],
     file_regex: /./,
@@ -51,6 +52,7 @@ class Linter
 
   attr_reader :append_files_to_command,
               :boyscout_mode,
+              :campsite_mode,
               :command,
               :comment_post_processing,
               :default_boyscout_mode,
@@ -75,7 +77,7 @@ class Linter
   end
 
   def dr_diff
-    @dr_diff ||= ::DrDiff::Manager.new(git_dir: git_dir, sha: env_sha)
+    @dr_diff ||= ::DrDiff::Manager.new(git_dir: git_dir, sha: env_sha, campsite: campsite_mode)
   end
 
   def files

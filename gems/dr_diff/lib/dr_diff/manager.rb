@@ -6,12 +6,16 @@ module DrDiff
     attr_reader :git_dir
     private :git_dir
 
+    attr_reader :campsite
+    private :campsite
+
     # all levels: %w(error warn info)
     SEVERE_LEVELS = %w(error warn).freeze
 
-    def initialize(git: nil, git_dir: nil, sha: nil)
+    def initialize(git: nil, git_dir: nil, sha: nil, campsite: true)
       @git_dir = git_dir
       @git = git || GitProxy.new(git_dir: git_dir, sha: sha)
+      @campsite = campsite
     end
 
     def files(regex = /./)
@@ -32,7 +36,7 @@ module DrDiff
                  severe_levels: SEVERE_LEVELS)
 
       command_comments = CommandCapture.run(format, command)
-      diff = DiffParser.new(git.diff)
+      diff = DiffParser.new(git.diff, true, campsite)
 
       result = []
 
