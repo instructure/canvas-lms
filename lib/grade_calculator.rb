@@ -147,6 +147,13 @@ class GradeCalculator
     end
   end
 
+  def number_or_null(score)
+    # GradeCalculator sometimes divides by 0 somewhere,
+    # resulting in NaN. Treat that as null here
+    score = nil if score.try(:nan?)
+    score || 'NULL'
+  end
+
   def save_scores
     raise "Can't save scores when ignore_muted is false" unless @ignore_muted
 
@@ -164,7 +171,7 @@ class GradeCalculator
               current_score = CASE enrollment_id
                 #{@current_updates.map do |user_id, score|
                   enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{score || 'NULL'}"
+                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
                   end.join(' ')
                 end.join(' ')}
                 ELSE current_score
@@ -172,7 +179,7 @@ class GradeCalculator
               final_score = CASE enrollment_id
                 #{@final_updates.map do |user_id, score|
                   enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{score || 'NULL'}"
+                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
                   end.join(' ')
                 end.join(' ')}
                 ELSE final_score
@@ -190,7 +197,7 @@ class GradeCalculator
               CASE enrollments.id
                 #{@current_updates.map do |user_id, score|
                   enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{score || 'NULL'}"
+                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
                   end.join(' ')
                 end.join(' ')}
                 ELSE NULL
@@ -198,7 +205,7 @@ class GradeCalculator
               CASE enrollments.id
                 #{@final_updates.map do |user_id, score|
                   enrollments_by_user[user_id].map do |enrollment|
-                    "WHEN #{enrollment.id} THEN #{score || 'NULL'}"
+                    "WHEN #{enrollment.id} THEN #{number_or_null(score)}"
                   end.join(' ')
                 end.join(' ')}
                 ELSE NULL

@@ -456,6 +456,26 @@ describe GradeCalculator do
     end
   end
 
+  describe '#number_or_null' do
+    it "should return a valid score" do
+      calc = GradeCalculator.new [@user.id], @course.id
+      score = 23.4
+      expect(calc.send(:number_or_null, score)).to eql(score)
+    end
+
+    it "should convert NaN to NULL" do
+      calc = GradeCalculator.new [@user.id], @course.id
+      score = 0/0.0
+      expect(calc.send(:number_or_null, score)).to eql('NULL')
+    end
+
+    it "should convert nil to NULL" do
+      calc = GradeCalculator.new [@user.id], @course.id
+      score = nil
+      expect(calc.send(:number_or_null, score)).to eql('NULL')
+    end
+  end
+
   describe '#compute_and_save_scores' do
     before(:once) do
       @first_period, @second_period = grading_periods(count: 2)
