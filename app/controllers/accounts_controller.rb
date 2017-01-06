@@ -105,6 +105,7 @@ class AccountsController < ApplicationController
   include CustomSidebarLinksHelper
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
+  SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
 
   # @API List accounts
   # List accounts that the current user can view or manage.  Typically,
@@ -427,11 +428,19 @@ class AccountsController < ApplicationController
       unless account_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_account_settings)
           if account_settings[:settings]
-            account_settings[:settings].slice!(:restrict_student_past_view, :restrict_student_future_view, :restrict_student_future_listing, :lock_all_announcements, :sis_assignment_name_length_input)
+            account_settings[:settings].slice!(:restrict_student_past_view,
+                                               :restrict_student_future_view,
+                                               :restrict_student_future_listing,
+                                               :lock_all_announcements,
+                                               :sis_assignment_name_length_input)
             sis_name_length_setting = account_settings[:settings][:sis_assignment_name_length_input]
             if sis_name_length_setting
               value = sis_name_length_setting[:value]
-              sis_name_length_setting[:value] = (value.to_i.to_s == value.to_s && value.to_i <= 255) ? value : 255
+              if value.to_i.to_s == value.to_s && value.to_i <= SIS_ASSINGMENT_NAME_LENGTH_DEFAULT && value.to_i >= 0
+                sis_name_length_setting[:value] = value
+              else
+                sis_name_length_setting[:value] = SIS_ASSINGMENT_NAME_LENGTH_DEFAULT
+              end
             end
           end
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
