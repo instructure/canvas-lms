@@ -207,6 +207,7 @@ describe "accounts/settings.html.erb" do
 
         context "should show settings to regular admin user" do
           before do
+            @account.enable_feature!(:post_grades)
             do_render(current_user)
           end
 
@@ -245,6 +246,7 @@ describe "accounts/settings.html.erb" do
           context "for sub-accounts (inherited)" do
             context "locked" do
               before do
+                @account.enable_feature!(:post_grades)
                 @account.stubs(:sis_syncing).returns({value: true, locked: true, inherited: true })
                 do_render(current_user, @account)
               end
