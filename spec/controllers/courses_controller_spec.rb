@@ -113,6 +113,23 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
       end
 
+      it "should prioritize completed enrollments over inactive ones" do
+        course_with_student(:active_all => true)
+        old_enroll = @student.enrollments.first
+
+        section2 = @course.course_sections.create!
+        inactive_enroll = @course.enroll_student(@student, :section => section2, :allow_multiple_enrollments => true)
+        inactive_enroll.deactivate
+
+        @course.update_attributes(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
+
+        user_session(@student)
+
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:past_enrollments]).to eq [old_enroll]
+      end
+
       it "should include 'active' enrollments whose term is past" do
         @student = user_factory
 
