@@ -19,24 +19,29 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'alert' do
+describe 'enrollment_notification' do
   before :once do
-    course_with_student
-    @alert = @course.alerts.create!(recipients: [:student],
-                                    criteria: [
-                                      criterion_type: 'Interaction',
-                                      threshold: 7
-                                    ])
-    @enrollment = @course.enrollments.first
+    course_with_student(active_all: true)
   end
 
-  let(:asset) { @alert }
-  let(:notification_name) { :alert }
-  let(:message_data) do
-    {
-      asset_context: @enrollment
-    }
-  end
+  let(:notification_name) { :enrollment_notification }
+  let(:asset) { @enrollment }
 
   include_examples "a message"
+
+  context ".email" do
+    let(:path_type) { :email }
+
+    context "creation_pending student" do
+      before :once do
+        @student.communication_channels.create!(path: 'jacob@instructure.com')
+      end
+
+      let(:asset) { @enrollment }
+
+      it "should render" do
+        generate_message(:enrollment_notification, :email, asset)
+      end
+    end
+  end
 end

@@ -19,24 +19,25 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'alert' do
+describe 'new_account_user' do
   before :once do
-    course_with_student
-    @alert = @course.alerts.create!(recipients: [:student],
-                                    criteria: [
-                                      criterion_type: 'Interaction',
-                                      threshold: 7
-                                    ])
-    @enrollment = @course.enrollments.first
+    account = Account.create!(:name => "some account", :settings => {:outgoing_email_default_name => "Custom From"})
+    user_model
+    @account_user = account.account_users.create!(user: @user)
   end
 
-  let(:asset) { @alert }
-  let(:notification_name) { :alert }
-  let(:message_data) do
-    {
-      asset_context: @enrollment
-    }
-  end
+  let(:notification_name) { :new_account_user }
+  let(:asset) { @account_user }
 
   include_examples "a message"
+
+  context ".email" do
+    let(:path_type) { :email }
+
+    it "should use the custom From: setting" do
+      msg = generate_message(notification_name, path_type, asset)
+      msg.save
+      expect(msg.from_name).to eq "Custom From"
+    end
+  end
 end

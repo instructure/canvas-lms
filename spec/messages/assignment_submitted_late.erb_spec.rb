@@ -19,24 +19,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'alert' do
+describe 'assignment_submitted_late' do
   before :once do
-    course_with_student
-    @alert = @course.alerts.create!(recipients: [:student],
-                                    criteria: [
-                                      criterion_type: 'Interaction',
-                                      threshold: 7
-                                    ])
-    @enrollment = @course.enrollments.first
+    submission_model
   end
 
-  let(:asset) { @alert }
-  let(:notification_name) { :alert }
-  let(:message_data) do
-    {
-      asset_context: @enrollment
-    }
-  end
+  let(:asset) { @submission }
+  let(:notification_name) { :assignment_submitted_late }
 
   include_examples "a message"
 end

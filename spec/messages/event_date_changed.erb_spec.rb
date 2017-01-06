@@ -19,24 +19,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'alert' do
+describe 'event_date_changed' do
   before :once do
-    course_with_student
-    @alert = @course.alerts.create!(recipients: [:student],
-                                    criteria: [
-                                      criterion_type: 'Interaction',
-                                      threshold: 7
-                                    ])
-    @enrollment = @course.enrollments.first
+    calendar_event_model
   end
 
-  let(:asset) { @alert }
-  let(:notification_name) { :alert }
-  let(:message_data) do
-    {
-      asset_context: @enrollment
-    }
-  end
+  let(:asset) { @event }
+  let(:notification_name) { :event_date_changed }
 
   include_examples "a message"
 end

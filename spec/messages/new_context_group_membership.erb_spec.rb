@@ -19,24 +19,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'alert' do
+describe 'new_context_group_membership' do
   before :once do
-    course_with_student
-    @alert = @course.alerts.create!(recipients: [:student],
-                                    criteria: [
-                                      criterion_type: 'Interaction',
-                                      threshold: 7
-                                    ])
-    @enrollment = @course.enrollments.first
+    course_model(:reusable => true)
+    group = @course.groups.create!(:name => "some group")
+    user_model
+    @membership = group.add_user(@user)
   end
 
-  let(:asset) { @alert }
-  let(:notification_name) { :alert }
-  let(:message_data) do
-    {
-      asset_context: @enrollment
-    }
-  end
+  let(:asset) { @membership }
+  let(:notification_name) { :new_context_group_membership }
 
   include_examples "a message"
 end

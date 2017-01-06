@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,24 +19,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'alert' do
+describe 'pseudonym_registration' do
   before :once do
-    course_with_student
-    @alert = @course.alerts.create!(recipients: [:student],
-                                    criteria: [
-                                      criterion_type: 'Interaction',
-                                      threshold: 7
-                                    ])
-    @enrollment = @course.enrollments.first
+    pseudonym_model
   end
 
-  let(:asset) { @alert }
-  let(:notification_name) { :alert }
+  let(:asset) { @pseudonym }
   let(:message_data) do
-    {
-      asset_context: @enrollment
-    }
+    { user: @user }
   end
+  let(:notification_name) { :pseudonym_registration }
 
   include_examples "a message"
 end

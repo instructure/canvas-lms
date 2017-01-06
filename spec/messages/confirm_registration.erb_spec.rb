@@ -19,24 +19,19 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'alert' do
+describe 'confirm_registration' do
   before :once do
-    course_with_student
-    @alert = @course.alerts.create!(recipients: [:student],
-                                    criteria: [
-                                      criterion_type: 'Interaction',
-                                      threshold: 7
-                                    ])
-    @enrollment = @course.enrollments.first
+    user_factory
+    @pseudonym = @user.pseudonyms.create!(unique_id: 'unique@example.com',
+                                          password: 'password',
+                                          password_confirmation: 'password')
+    @object = @user.communication_channels.create!(path_type: 'email',
+                                                   path: 'bob@example.com',
+                                                   user: @user)
   end
 
-  let(:asset) { @alert }
-  let(:notification_name) { :alert }
-  let(:message_data) do
-    {
-      asset_context: @enrollment
-    }
-  end
+  let(:asset) { @object }
+  let(:notification_name) { :confirm_registration }
 
   include_examples "a message"
 end

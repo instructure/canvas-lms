@@ -19,24 +19,35 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'alert' do
+describe 'assignment_created' do
   before :once do
-    course_with_student
-    @alert = @course.alerts.create!(recipients: [:student],
-                                    criteria: [
-                                      criterion_type: 'Interaction',
-                                      threshold: 7
-                                    ])
-    @enrollment = @course.enrollments.first
+    assignment_model(:title => "Quiz 2")
   end
 
-  let(:asset) { @alert }
-  let(:notification_name) { :alert }
-  let(:message_data) do
-    {
-      asset_context: @enrollment
-    }
+  let(:notification_name) { :assignment_created }
+  let(:asset) { @assignment }
+
+  context ".email" do
+    let(:path_type) { :email }
+    it "should render" do
+      msg = generate_message(notification_name, path_type, asset)
+      expect(msg.subject).to match(/Quiz 2/)
+      expect(msg.body).to match(/Quiz 2/)
+      expect(msg.body).to match(Regexp.new(@course.name))
+    end
   end
 
-  include_examples "a message"
+  context ".sms" do
+    let(:path_type) { :sms }
+    it "should render" do
+      generate_message(notification_name, path_type, asset)
+    end
+  end
+
+  context ".summary" do
+    let(:path_type) { :summary }
+    it "should render" do
+      generate_message(notification_name, path_type, asset)
+    end
+  end
 end

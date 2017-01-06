@@ -19,24 +19,19 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'alert' do
+describe 'rubric_assessment_submission_reminder' do
   before :once do
-    course_with_student
-    @alert = @course.alerts.create!(recipients: [:student],
-                                    criteria: [
-                                      criterion_type: 'Interaction',
-                                      threshold: 7
-                                    ])
-    @enrollment = @course.enrollments.first
+    user_model
+    rubric_assessment_model(user: @user)
+    @submission = @course.assignments.first.submissions.create!(user: @user)
+    @object = @rubric_association.assessment_requests.create!(user: @user,
+                                                              asset: @submission,
+                                                              assessor: @user,
+                                                              assessor_asset: @submission)
   end
 
-  let(:asset) { @alert }
-  let(:notification_name) { :alert }
-  let(:message_data) do
-    {
-      asset_context: @enrollment
-    }
-  end
+  let(:asset) { @object }
+  let(:notification_name) { :rubric_assessment_submission_reminder }
 
   include_examples "a message"
 end
