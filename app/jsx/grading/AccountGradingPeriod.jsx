@@ -15,10 +15,12 @@ define([
       period: Types.shape({
         id:        Types.string.isRequired,
         title:     Types.string.isRequired,
+        weight:    Types.number,
         startDate: Types.instanceOf(Date).isRequired,
         endDate:   Types.instanceOf(Date).isRequired,
         closeDate: Types.instanceOf(Date).isRequired
       }).isRequired,
+      weighted: Types.bool,
       onEdit: Types.func.isRequired,
       actionsDisabled: Types.bool,
       readOnly: Types.bool.isRequired,
@@ -91,13 +93,13 @@ define([
       }
     },
 
-    dateWithTimezone(date) {
-      const displayDatetime = DateHelper.formatDatetimeForDisplay(date);
-
-      if(ENV.CONTEXT_TIMEZONE === ENV.TIMEZONE) {
-        return displayDatetime;
-      } else {
-        return `${displayDatetime} ${tz.format(date, '%Z')}`;
+    renderWeight() {
+      if (this.props.weighted) {
+        return (
+          <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
+            <span ref="weight">{ I18n.t("Weight:") } { I18n.n(this.props.period.weight, {percentage: true}) }</span>
+          </div>
+        );
       }
     },
 
@@ -105,18 +107,19 @@ define([
       return (
         <div className="GradingPeriodList__period">
           <div className="GradingPeriodList__period__attributes grid-row">
-            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
+            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-4">
               <span ref="title">{this.props.period.title}</span>
             </div>
-            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
-              <span ref="startDate">{I18n.t("Start Date:")} {this.dateWithTimezone(this.props.period.startDate)}</span>
+            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
+              <span ref="startDate">{I18n.t("Starts:")} {DateHelper.formatDateForDisplay(this.props.period.startDate)}</span>
             </div>
-            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
-              <span ref="endDate">{I18n.t("End Date:")} {this.dateWithTimezone(this.props.period.endDate)}</span>
+            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
+              <span ref="endDate">{I18n.t("Ends:")} {DateHelper.formatDateForDisplay(this.props.period.endDate)}</span>
             </div>
-            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-3">
-              <span ref="closeDate">{I18n.t("Close Date:")} {this.dateWithTimezone(this.props.period.closeDate)}</span>
+            <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
+              <span ref="closeDate">{I18n.t("Closes:")} {DateHelper.formatDateForDisplay(this.props.period.closeDate)}</span>
             </div>
+            {this.renderWeight()}
           </div>
           <div className="GradingPeriodList__period__actions">
             {this.renderEditButton()}

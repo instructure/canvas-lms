@@ -25,6 +25,7 @@ class GradingPeriod < ActiveRecord::Base
   has_many :scores, -> { active }, dependent: :destroy
 
   validates :title, :start_date, :end_date, :close_date, :grading_period_group_id, presence: true
+  validates :weight, numericality: true, allow_nil: true
   validate :start_date_is_before_end_date
   validate :close_date_is_on_or_after_end_date
   validate :not_overlapping, unless: :skip_not_overlapping_validator?
@@ -32,7 +33,7 @@ class GradingPeriod < ActiveRecord::Base
   before_validation :adjust_close_date_for_course_period
   before_validation :ensure_close_date
 
-  after_save :recompute_scores, if: :dates_changed?
+  after_save :recompute_scores, if: :dates_or_weight_changed?
 
   scope :current, -> do
     period_table = GradingPeriod.arel_table
@@ -218,11 +219,30 @@ class GradingPeriod < ActiveRecord::Base
       term_ids = grading_period_group.enrollment_terms.pluck(:id)
       courses = Course.where(enrollment_term_id: term_ids)
     end
-    # Course#recompute_student_scores is asynchronous
-    courses.each { |course| course.recompute_student_scores(grading_period_id: self.id) }
+
+    if time_boundaries_changed?
+      # different assignments could fall in this period now,
+      # we need to recalculate its scores
+      calculator_opts = { grading_period_id: id }
+    elsif weight_actually_changed?
+      # only weight changed, we just need to recompute the overall course score
+      calculator_opts = { update_all_grading_period_scores: false }
+    end
+
+    courses.each do |course|
+      GradeCalculator.send_later_if_production(:recompute_final_score, course.student_ids, course.id, calculator_opts)
+    end
   end
 
-  def dates_changed?
+  def weight_actually_changed?
+    grading_period_group.weighted && weight_changed?
+  end
+
+  def time_boundaries_changed?
     start_date_changed? || end_date_changed?
+  end
+
+  def dates_or_weight_changed?
+    time_boundaries_changed? || weight_actually_changed?
   end
 end

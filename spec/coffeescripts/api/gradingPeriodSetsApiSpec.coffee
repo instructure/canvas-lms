@@ -14,13 +14,15 @@ define [
           title: "Q1",
           startDate: new Date("2015-09-01T12:00:00Z"),
           endDate: new Date("2015-10-31T12:00:00Z"),
-          closeDate: new Date("2015-11-07T12:00:00Z")
+          closeDate: new Date("2015-11-07T12:00:00Z"),
+          weight: 43.5
         },{
           id: "2",
           title: "Q2",
           startDate: new Date("2015-11-01T12:00:00Z"),
           endDate: new Date("2015-12-31T12:00:00Z"),
-          closeDate: new Date("2016-01-07T12:00:00Z")
+          closeDate: new Date("2016-01-07T12:00:00Z"),
+          weight: null
         }
       ],
       permissions: { read: true, create: true, update: true, delete: true },
@@ -47,13 +49,15 @@ define [
             title: "Q1",
             start_date: new Date("2015-09-01T12:00:00Z"),
             end_date: new Date("2015-10-31T12:00:00Z"),
-            close_date: new Date("2015-11-07T12:00:00Z")
+            close_date: new Date("2015-11-07T12:00:00Z"),
+            weight: 43.5
           },{
             id: "2",
             title: "Q2",
             start_date: new Date("2015-11-01T12:00:00Z"),
             end_date: new Date("2015-12-31T12:00:00Z"),
-            close_date: new Date("2016-01-07T12:00:00Z")
+            close_date: new Date("2016-01-07T12:00:00Z"),
+            weight: null
           }
         ],
         permissions: { read: true, create: true, update: true, delete: true },
@@ -120,12 +124,14 @@ define [
       grading_period_sets: [
         id: "1"
         title: "Fall 2015"
+        weighted: false
         grading_periods: [{
           id: "1",
           title: "Q1",
           start_date: new Date("2015-09-01T12:00:00Z"),
           end_date: new Date("2015-10-31T12:00:00Z"),
-          close_date: null
+          close_date: null,
+          weight: null
         }]
         permissions: { read: true, create: true, update: true, delete: true }
         created_at: "2015-11-29T12:00:00Z"
@@ -227,13 +233,15 @@ define [
           title: "Q1",
           start_date: new Date("2015-09-01T12:00:00Z"),
           end_date: new Date("2015-10-31T12:00:00Z"),
-          close_date: new Date("2015-11-07T12:00:00Z")
+          close_date: new Date("2015-11-07T12:00:00Z"),
+          weight: 40
         },{
           id: "2",
           title: "Q2",
           start_date: new Date("2015-11-01T12:00:00Z"),
           end_date: new Date("2015-12-31T12:00:00Z"),
-          close_date: null
+          close_date: null,
+          weight: 60
         }
       ],
       permissions: { read: true, create: true, update: true, delete: true }

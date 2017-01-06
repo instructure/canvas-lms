@@ -14,6 +14,7 @@ define([
   const examplePeriod = {
     id: '1',
     title: 'Q1',
+    weight: 30,
     startDate: new Date("2015-11-01T12:00:00Z"),
     endDate: new Date("2015-12-31T12:00:00Z"),
     closeDate: new Date("2016-01-07T12:00:00Z")
@@ -23,6 +24,7 @@ define([
     renderComponent: function(opts={}) {
       const defaults = {
         period: examplePeriod,
+        weighted: true,
         disabled: false,
         onSave:   () => {},
         onCancel: () => {}
@@ -42,6 +44,12 @@ define([
     equal(form.refs.startDate.refs.dateInput.value, 'Nov 1, 2015 at 12pm');
     equal(form.refs.endDate.refs.dateInput.value, 'Dec 31, 2015 at 12pm');
     equal(form.refs.closeDate.refs.dateInput.value, 'Jan 7, 2016 at 12pm');
+    equal(form.weightInput.value, '30');
+  });
+
+  test("does not render weighted input if weighted is false", function() {
+    const form = this.renderComponent({weighted: false});
+    equal(form.weightInput, null);
   });
 
   test('renders with the save button enabled', function() {
@@ -145,7 +153,8 @@ define([
       title: 'Q1',
       startDate: new Date("2015-11-01T12:00:00Z"),
       endDate: new Date("2015-12-31T12:00:00Z"),
-      closeDate: new Date("2016-01-07T12:00:00Z")
+      closeDate: new Date("2016-01-07T12:00:00Z"),
+      weight: 30
     });
   });
 

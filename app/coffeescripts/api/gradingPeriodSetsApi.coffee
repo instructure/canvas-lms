@@ -25,6 +25,7 @@ define [
       {
         id: period.id.toString()
         title: period.title
+        weight: period.weight
         startDate: new Date(period.start_date)
         endDate: new Date(period.end_date)
         # TODO: After the close_date data fixup has run, this can become:

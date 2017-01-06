@@ -38,18 +38,21 @@ define([
     {
       id: "1",
       title: "We did it! We did it! We did it! #dora #boots",
+      weight: 33,
       startDate: new Date("2015-01-01T20:11:00+00:00"),
       endDate: new Date("2015-03-01T00:00:00+00:00"),
       closeDate: new Date("2015-03-01T00:00:00+00:00")
     },{
       id: "3",
       title: "Como estas?",
+      weight: 25.75,
       startDate: new Date("2014-11-01T20:11:00+00:00"),
       endDate: new Date("2014-11-11T00:00:00+00:00"),
       closeDate: new Date("2014-11-11T00:00:00+00:00")
     },{
       id: "2",
       title: "Swiper no swiping!",
+      weight: 0,
       startDate: new Date("2015-04-01T20:11:00+00:00"),
       endDate: new Date("2015-05-01T00:00:00+00:00"),
       closeDate: new Date("2015-05-01T00:00:00+00:00")
@@ -59,6 +62,7 @@ define([
   const examplePeriod = {
     id: "4",
     title: "Example Period",
+    weight: 25,
     startDate: new Date("2015-03-02T20:11:00+00:00"),
     endDate: new Date("2015-03-03T00:00:00+00:00"),
     closeDate: new Date("2015-03-03T00:00:00+00:00")
@@ -68,6 +72,7 @@ define([
     set: {
       id: "1",
       title: "Example Set",
+      weighted: true
     },
     terms: [],
     onEdit: function(){},
@@ -407,6 +412,22 @@ define([
     ok(set.refs.editPeriodForm, "form is still visible");
   });
 
+  test('does not save a grading period with a negative weight', function() {
+    let period = {
+      id: "1",
+      title: "Some valid title",
+      weight: -50,
+      startDate: new Date("2015-03-02T20:11:00+00:00"),
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
   test('does not save a grading period without a valid startDate', function() {
     let period = {
       title: "Period without Start Date",
@@ -710,6 +731,22 @@ define([
   test('does not save a grading period without a title', function() {
     let period = {
       title: "",
+      startDate: new Date("2015-03-02T20:11:00+00:00"),
+      endDate: new Date("2015-03-03T00:00:00+00:00"),
+      closeDate: new Date("2015-03-03T00:00:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.newPeriodForm, "form is still visible");
+  });
+
+  test('does not save a grading period with a negative weight', function() {
+    let period = {
+      id: "1",
+      title: "Some valid title",
+      weight: -50,
       startDate: new Date("2015-03-02T20:11:00+00:00"),
       endDate: new Date("2015-03-03T00:00:00+00:00"),
       closeDate: new Date("2015-03-03T00:00:00+00:00")
