@@ -467,4 +467,20 @@ class SisImportsApiController < ApplicationController
     end
   end
 
+  # @API Abort all pending SIS imports
+  #
+  # Abort already created but not processed or processing SIS imports.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports/abort_all_pending \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns boolean
+  def abort_all_pending
+    if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
+      SisBatch.abort_all_pending_for_account(@account)
+      render json: {aborted: true}
+    end
+  end
+
 end

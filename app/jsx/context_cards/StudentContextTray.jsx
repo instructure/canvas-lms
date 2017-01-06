@@ -5,6 +5,7 @@ define([
   './Avatar',
   './LastActivity',
   './MetricsList',
+  './Rating',
   './SectionInfo',
   './SubmissionProgressBars',
   'jsx/shared/MessageStudents',
@@ -20,6 +21,7 @@ define([
    Avatar,
    LastActivity,
    MetricsList,
+   Rating,
    SectionInfo,
    SubmissionProgressBars,
    MessageStudents,
@@ -226,6 +228,23 @@ define([
                   ) : null}
                   <MetricsList user={this.state.user} analytics={this.state.analytics} />
                   <SubmissionProgressBars submissions={this.state.submissions} />
+
+                  {Object.keys(this.state.analytics).length > 0 ? (
+                    <section
+                      className="StudentContextTray__Section StudentContextTray-Ratings">
+                      <Heading level="h4" tag="h3" border="bottom">
+                        {I18n.t("Activity Compared to Class")}
+                      </Heading>
+                      <div className="StudentContextTray-Ratings__Layout">
+                        <Rating analytics={this.state.analytics}
+                          label={I18n.t('Participation')}
+                          metricName='participations_level' />
+                        <Rating analytics={this.state.analytics}
+                          label={I18n.t('Page Views')}
+                          metricName='page_views_level' />
+                      </div>
+                    </section>
+                  ) : null}
                 </div>
               )}
             </aside>

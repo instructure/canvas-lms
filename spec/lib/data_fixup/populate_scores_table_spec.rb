@@ -52,19 +52,17 @@ describe DataFixup::PopulateScoresTable do
     @student2_enrollment.scores.create!(grading_period_id: nil, final_score: 29.3)
     create_grading_periods_for(@course2)
     gp = @course2.grading_periods.first
-    @student3_enrollment.scores.create!(grading_period: gp, final_score: 100.3)
-
-    expect { DataFixup::PopulateScoresTable.run }.to change { Score.count }.from(2).to(5)
-                                                .and change { @student1_enrollment.scores.count }.from(0).to(1)
+    @student3_enrollment.scores.where(grading_period: gp).first.update(final_score: 100.3)
+    @student3_enrollment.scores.where(grading_period_id: nil).first.delete
+    expect { DataFixup::PopulateScoresTable.run }.to change { Score.count }.from(4).to(6)
                                                 .and change { @student3_enrollment.scores.count }.from(1).to(2)
-                                                .and change { @student4_enrollment.scores.count }.from(0).to(1)
     expect(Score.where(grading_period: nil).pluck(:current_score, :final_score)).to match_array(
       [[76.3, 24], [nil, 29.3], [56.5, nil], [nil, nil]]
     )
-    expect(Score.pluck(:grading_period_id)).to match_array([nil, nil, gp.id, nil, nil])
+    expect(Score.pluck(:grading_period_id)).to match_array([nil, nil, gp.id, gp.id, nil, nil])
   end
 
-  it "creates Score object for each grading period" do
+  it "creates Score object for each grading period, if one doesn't already exist" do
     grader1 = teacher_in_course(course: @course1, active_all: true).user
     grader2 = teacher_in_course(course: @course2, active_all: true).user
     group1 = @course1.grading_period_groups.create!
@@ -83,6 +81,7 @@ describe DataFixup::PopulateScoresTable do
     assignment3.grade_student(@student4_enrollment.user, grader: grader2, score: 20)
     assignment4 = @course2.assignments.create!(due_at: 6.months.ago, points_possible: 100)
     assignment4.grade_student(@student3_enrollment.user, grader: grader2, score: 30)
+    Score.where.not(grading_period_id: nil).delete_all
 
     expect { DataFixup::PopulateScoresTable.run }.to change { Score.count }.from(4).to(10)
                                                 .and change { @student1_enrollment.scores.count }.from(1).to(3)

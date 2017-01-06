@@ -326,10 +326,7 @@ module OutcomeCommon
     # submit
     f(".submit_button").click
     wait_for_ajaximations
-
-    if link = f('.ic-flash-success .close_link')
-      link.click
-    end
+    dismiss_flash_messages
 
     # create nested group
     f('.add_outcome_group').click

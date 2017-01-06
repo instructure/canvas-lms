@@ -76,6 +76,7 @@ describe "conversations new" do
       replace_content(f('textarea'),'FJ Body text 2')
       wait_for_ajaximations
       f('.send_button').click
+      wait_for_ajaximations
       time = format_time_for_view(UserNote.last.updated_at)
       get student_user_notes_url
       expect(f('.subject').text).to eq 'FJ Title 2'

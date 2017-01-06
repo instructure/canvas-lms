@@ -29,6 +29,7 @@ describe 'quizzes question creation' do
 
       quiz.reload
       refresh_page # make sure the quizzes load up from the database
+      dismiss_flash_messages # clears success flash message if exists
       click_questions_tab
       3.times do |i|
         expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_truthy

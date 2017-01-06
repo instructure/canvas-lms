@@ -30,6 +30,7 @@ define [
   'compiled/gradezilla/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
   'str/htmlEscape'
+  'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
@@ -62,7 +63,7 @@ define [
   CourseGradeCalculator, GradingSchemeHelper, UserSettings, Spinner,
   SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
   GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
-  GradebookHeaderMenu, NumberCompare, htmlEscape, PostGradesStore,
+  GradebookHeaderMenu, NumberCompare, htmlEscape, StudentColumnHeader, PostGradesStore,
   PostGradesApp, SubmissionStateMap, ColumnHeaderTemplate,
   GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView,
   GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
@@ -758,7 +759,7 @@ define [
       @renderTotalHeader()
       $headers = $('#gradebook_grid .container_1').find('.slick-header-columns')
       originalItemsSelector = $headers.sortable 'option', 'items'
-      onlyAssignmentColsSelector = '> *:not([id*="assignment_group"]):not([id*="total_grade"])'
+      onlyAssignmentColsSelector = '> *:not([id*="assignment_group"]):not([id*="total_grade"]):not([id*=student])'
       (makeOnlyAssignmentsSortable = ->
         $headers.sortable 'option', 'items', onlyAssignmentColsSelector
         $notAssignments = $(originalItemsSelector, $headers).not($(onlyAssignmentColsSelector, $headers))
@@ -863,10 +864,12 @@ define [
     # conjunction with a click listener on <body />. When we 'blur' the grid
     # by clicking outside of it, save the current field.
     onGridBlur: (e) =>
-      if e.target.className.match(/cell|slick/) or !@grid.getActiveCell
+      className = e.target.className.baseVal or ''
+
+      if className.match(/cell|slick/) or !@grid.getActiveCell
         return
 
-      if e.target.className is 'grade' and @grid.getCellEditor() instanceof SubmissionCell.out_of
+      if className is 'grade' and @grid.getCellEditor() instanceof SubmissionCell.out_of
         # We can assume that a user clicked the up or down arrows on the
         # number input, we want to allow them to keep doing that.
         return
@@ -1073,7 +1076,8 @@ define [
         $(".gradebook_filter").show()
 
         cols = @grid.getColumns()
-        col.sortable = true for col in cols
+        for col in cols
+          col.sortable = true unless col.neverSort
         @grid.setColumns(cols)
         @renderTotalHeader()
         @initHeaderDropMenus()
@@ -1082,6 +1086,10 @@ define [
       @userFilter.on 'input', @onUserFilterInput
 
       @initGradebookExporter()
+
+    initStudentColumnHeader: (obj) =>
+      component = React.createElement(StudentColumnHeader, {}, null)
+      ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
 
     initGradebookExporter: () =>
       self = this
@@ -1278,15 +1286,15 @@ define [
 
       @parentColumns = [
         id: 'student'
-        name: htmlEscape I18n.t 'student_name', 'Student Name'
         field: 'display_name'
         width: studentColumnWidth
         cssClass: "meta-cell"
         resizable: true
+        neverSort: true
         formatter: @htmlContentFormatter
       ,
         id: 'secondary_identifier'
-        name: htmlEscape I18n.t 'secondary_id', 'Secondary ID'
+        name: htmlEscape I18n.t('Secondary ID')
         field: 'secondary_identifier'
         width: identifierColumnWidth
         cssClass: "meta-cell secondary_identifier_cell"
@@ -1331,6 +1339,7 @@ define [
               .unbind('gridready.render')
               .bind('gridready.render', => @grid.invalidate() )
         columnDef
+
       if @hideAggregateColumns()
         @aggregateColumns = []
       else
@@ -1376,8 +1385,10 @@ define [
           cssClass: if @totalColumnInFront then 'meta-cell' else 'total-cell'
           type: 'total_grade'
 
-        (if @totalColumnInFront then @parentColumns else
-          @aggregateColumns).push total_column
+        if @totalColumnInFront
+          @parentColumns.push total_column
+        else
+          @aggregateColumns.push total_column
 
       $widthTester.remove()
 
@@ -1423,11 +1434,16 @@ define [
         # TODO: start editing automatically when a number or letter is typed
         false
 
+      @grid.onHeaderCellRendered.subscribe @onHeaderCellRendered
       @grid.onColumnsReordered.subscribe @onColumnsReordered
       @grid.onBeforeEditCell.subscribe @onBeforeEditCell
       @grid.onColumnsResized.subscribe @onColumnsResized
 
       @onGridInit()
+
+    onHeaderCellRendered: (event, obj) =>
+      if obj.column.id == 'student'
+        @initStudentColumnHeader(obj)
 
     onColumnsResized: (event, obj) =>
       grid = obj.grid

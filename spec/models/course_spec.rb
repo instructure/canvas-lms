@@ -1607,6 +1607,26 @@ describe Course, "tabs_available" do
       expect(available_tabs.length).to eq default_tabs.length
     end
 
+    it "should not omit the target attribute for an external tool tab that is part of the tab configuration list" do
+      @tool = @course.context_external_tools.create!(name: "a", domain: "example.com", consumer_key: "key", shared_secret: "secret")
+      @tool.course_navigation = {
+        "canvas_icon_class"=>"test-icon",
+        "icon_url"=>"https://example.com/a.png",
+        "text"=>"Test Tool",
+        "windowTarget"=>"_blank",
+        "url"=>"https://example.com/launch"
+      }
+      @tool.save!
+      tab_id = "context_external_tool_#{@tool.id}"
+
+      @course.tab_configuration = [{"id" => tab_id}]
+      @course.tabs_available(@user).each do |tab|
+        puts tab.inspect
+      end
+      tab = @course.tabs_available(@user).select { |t| t[:id] == tab_id }.first
+      expect(tab[:target]).to eq("_blank")
+    end
+
     it "should remove ids for tabs not in the default list" do
       @course.tab_configuration = [{'id' => 912}]
       expect(@course.tabs_available(@user).map{|t| t[:id] }).not_to be_include(912)

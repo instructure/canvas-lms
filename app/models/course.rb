@@ -705,6 +705,10 @@ class Course < ActiveRecord::Base
 
   scope :master_courses, -> { joins(:master_course_templates).where.not(MasterCourses::MasterTemplate.table_name => {:workflow_state => 'deleted'}) }
 
+  def potential_collaborators
+    current_users
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
     p.to { participating_students_by_date + participating_observers_by_date }
@@ -1079,10 +1083,10 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def recompute_student_scores(student_ids = nil)
+  def recompute_student_scores(student_ids = nil, grading_period_id: nil)
     student_ids ||= self.student_ids
     Rails.logger.info "GRADES: recomputing scores in course=#{global_id} students=#{student_ids.inspect}"
-    Enrollment.recompute_final_score(student_ids, self.id)
+    Enrollment.recompute_final_score(student_ids, self.id, grading_period_id: grading_period_id)
   end
   handle_asynchronously_if_production :recompute_student_scores,
     :singleton => proc { |c| "recompute_student_scores:#{ c.global_id }" }
@@ -2620,6 +2624,7 @@ class Course < ActiveRecord::Base
           tab[:visibility] = default_tab[:visibility]
           tab[:external] = default_tab[:external]
           tab[:icon] = default_tab[:icon]
+          tab[:target] = default_tab[:target] if default_tab[:target]
           tab[:screenreader] = default_tab[:screenreader]
           default_tabs.delete_if {|t| t[:id] == tab[:id] }
           external_tabs.delete_if {|t| t[:id] == tab[:id] }

@@ -23,7 +23,10 @@ describe "Gradezilla - concluded courses and enrollments" do
     it "persists settings for displaying inactive enrollments", priority: "2", test_id: 1372593 do
       get course_gradebook_path(@course)
       f('#gradebook_settings').click
-      expect { f('label[for="show_inactive_enrollments"]').click }
+      expect do
+        f('label[for="show_inactive_enrollments"]').click
+        wait_for_ajax_requests
+      end
         .to change { gradebook_settings_for_course.call(@teacher, @course)}
         .from(nil)
         .to({
@@ -35,7 +38,10 @@ describe "Gradezilla - concluded courses and enrollments" do
     it "persists settings for displaying concluded enrollments", priority: "2", test_id: 1372592 do
       get course_gradebook_path(@course)
       f('#gradebook_settings').click
-      expect { f('label[for="show_concluded_enrollments"]').click }
+      expect do
+          f('label[for="show_concluded_enrollments"]').click
+          wait_for_ajax_requests
+      end
         .to change { gradebook_settings_for_course.call(@teacher, @course) }
         .from(nil)
         .to({

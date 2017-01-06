@@ -89,7 +89,6 @@ module CollaborationsSpecsCommon
     expect(groups.count).to eq 1
     groups.first.click
     wait_for_ajaximations
-
     expect(ff('.members-list li')).to have_size(1)
     expect_new_page_load do
       submit_form('.edit_collaboration')

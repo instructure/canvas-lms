@@ -2203,7 +2203,7 @@ da:
       links: 
         add_rubric: Vurderingskriterie
         assign_rubric: "Tildel Rubric"
-        edit: Redigere
+        edit: Rediger
       manage: Administrér
       messages: 
         locked: "Opgaven er låst på nuværende tidspunkt."
@@ -2748,7 +2748,7 @@ da:
     appointment_group_deletion_details: "Sletning af den sletter også eventuelle aftaler, som de studerende har meldt sig til."
     appointment_group_list: 
       delete: Slette
-      edit: Redigere
+      edit: Rediger
       location: "Sted:"
       manage: "Administrér %{title} aftalegruppe"
       message_groups: "Send besked til grupper, der ..."
@@ -2877,7 +2877,7 @@ da:
       details: "Nærmere oplysninger"
       links: 
         delete: Slette
-        edit: Redigere
+        edit: Rediger
         reserve: Reserver
         unreserve: "Slet reservering"
       location: Sted
@@ -3447,7 +3447,7 @@ da:
     multiple_urls_message: "Der findes flere tilgængelige %{type}-sider til denne konference. Du skal vælge en:"
     new_conference: 
       delete: Slette
-      edit: Redigere
+      edit: Rediger
       end_it_now: Slut
       in_progress: "I gang"
       join: Deltag
@@ -3818,7 +3818,7 @@ da:
         message_user: "Send besked"
         more_about_this_user: "Mere om denne bruger"
         more_user_details: "flere brugeroplysninger ..."
-        remove_avatar: "Slet avatarbillede"
+        remove_avatar: "Slet billede"
         report_avatar: "Indberet upassende billede"
         restore_enrollment: "Gendan denne tilmelding"
         student_teacher_activity: "Interaktioner med dig"
@@ -4000,11 +4000,11 @@ da:
         add_item: "Tilføj indhold"
         text: 
           delete_module: Slette
-          edit_module: Redigere
+          edit_module: Rediger
           move_module: "Flyt til ..."
         title: 
           delete_module: "Slet dette modul"
-          edit_module: Redigere
+          edit_module: Rediger
           move_module: "Flyt dette modul"
           student_progress: "Se de studerendes fremskridt for dette modul"
       manager_module: "Administrer modul"
@@ -4939,7 +4939,7 @@ da:
       images: 
         alt: 
           delete: Slette
-          edit: Redigere
+          edit: Rediger
       keycode_descriptions: 
         next_navigation_link: "Vælg næste navigationslink"
         previous_navigation_link: "Vælg forrige navigationslink"
@@ -5764,7 +5764,7 @@ da:
     edit: 
       new_assignment: "Ny opgave"
       new_quiz: "Ny quiz"
-    edit_crumb: Redigere
+    edit_crumb: Rediger
     edit_view: 
       allow_liking: "Tillad 'synes godt om'"
       allow_threaded_replies: "Tillad trådede svar"
@@ -5874,7 +5874,7 @@ da:
       delete_current_message: "Slet nuværende besked"
       discussion_atom_feed_title: "Diskussion Atom Feed"
       discussion_podcast_feed_title: "Diskussion Podcast Feed"
-      edit: Redigere
+      edit: Rediger
       edit_current_message: "Rediger nuværende besked"
       edited_by: "Dette emne blev redigeret af %{user}"
       expand_replies: "Udvid svar"
@@ -5949,7 +5949,7 @@ da:
       authors_name: Forfatternavn
       collapsible_subdiscussion: "Sammenfold under-diskussion"
       delete: Slette
-      edit: Redigere
+      edit: Rediger
       edited_comment: "Redigeret af *%{editor.display_name}* den %{edited_at}"
       go_to_parent: "Gå til overordnet"
       go_to_topic: "Gå til emne"
@@ -6114,7 +6114,7 @@ da:
   edit_assignment_group_c04c4af0: "Rediger opgavegruppe"
   edit_assignment_name_a8f7fae1: "Rediger opgave %{name}"
   edit_assignment_name_mastery_paths_40b50541: "Rediger opgave %{name} læringsstier"
-  edit_c5fbea07: Redigere
+  edit_c5fbea07: Rediger
   edit_conference_title_6e234815: "Rediger \"%{conference_title}\""
   edit_course_role_3b992fc2: "Rediger kursusrolle"
   edit_current_message_da650d4c: "Rediger aktuel besked"
@@ -7986,7 +7986,7 @@ da:
         add_group: "Opret Gruppe"
         category_settings: Indstillinger
         delete_category_option: Slette
-        edit_category_option: Redigere
+        edit_category_option: Rediger
         group: Gruppe
         group_limit_blurb: "Grupper begrænses til *%{group_limit}* medlemmer."
         message_all_unassigned_option: "Send besked til alle studerende uden tildeling"
@@ -8009,7 +8009,7 @@ da:
       group_detail: 
         add_user_to_group: "Tildel bruger til gruppe"
         group_delete: Slette
-        group_edit: Redigere
+        group_edit: Rediger
         group_full: Fuld
         group_leader: Gruppeleder
         group_settings: Indstillinger
@@ -13913,7 +13913,7 @@ da:
           no_time_limit: "Ingen tidsbegrænsning"
           warning_icon: Advarsel
         links: 
-          edit: Redigere
+          edit: Rediger
           keep_editing_this_quiz: "Bliv ved med at redigere quizzen"
           keep_editing_this_survey: "Bliv ved med at redigere spørgeundersøgelsen"
           message_students_who: "Send besked til studerende, der ..."
@@ -17213,11 +17213,11 @@ da:
       will_be_deleted: slettes
       will_be_kept: beholdes
     name: 
-      become: Bliver
+      become: Forklæd
       buttons: 
         update_details: Opdateringsdetaljer
       delete_from_account: "Slet fra %{account}"
-      edit: Redigere
+      edit: Rediger
       labels: 
         default_email: "Standard e-mail"
         display_name: "Vis navn"
@@ -17230,7 +17230,7 @@ da:
         time_zone: Tidszone
       merge_with_another_user: "Foren med anden bruger"
       none: ingen
-      remove_avatar: "Slet avatarbillede"
+      remove_avatar: "Slet billede"
       report_naughtiness: "Indberet upassende billede"
       titles: 
         edit_user_details: "Rediger brugeroplysninger"
@@ -17463,7 +17463,7 @@ da:
         select_folder_for_uploads: "Vælg mappe til filuploads"
     wiki_page: 
       buttons: 
-        edit: Redigere
+        edit: Rediger
         view_all_pages: "Se alle Sider"
       delete_wiki: Slette
       labels: 
@@ -17514,7 +17514,7 @@ da:
         front_page: Forside
       menu: 
         delete: Slette
-        edit: Redigere
+        edit: Rediger
         settings: Indstillinger
         use_front_page: "Brug som forside"
     wiki_page_revision: 

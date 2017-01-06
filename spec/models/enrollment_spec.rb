@@ -134,7 +134,7 @@ describe Enrollment do
         expect(@enrollment.computed_current_score).to eq 95.5
       end
 
-      it 'ignores grading period scores' do
+      it 'ignores grading period scores when passed no arguments' do
         @enrollment.scores.create!(current_score: 80.3, grading_period: period)
         expect(@enrollment.computed_current_score).to eq 95.5
       end
@@ -144,11 +144,23 @@ describe Enrollment do
         score.destroy
         expect(@enrollment.computed_current_score).to eq 95.5
       end
+
+      it 'computes current score for a given grading period id' do
+        @enrollment.scores.create!(current_score: 80.3)
+        @enrollment.scores.create!(current_score: 70.6, grading_period: period)
+        current_score = @enrollment.computed_current_score(grading_period_id: period.id)
+        expect(current_score).to eq 70.6
+      end
+
+      it 'returns nil if a grading period score is requested and does not exist' do
+        current_score = @enrollment.computed_current_score(grading_period_id: period.id)
+        expect(current_score).to eq nil
+      end
     end
 
     describe '#computed_current_grade' do
       before(:each) do
-        Course.any_instance.expects(:grading_standard_enabled?).at_least_once.returns(true)
+        Course.any_instance.stubs(:grading_standard_enabled?).returns(true)
       end
 
       it 'uses the value from the associated score object, if one exists' do
@@ -160,7 +172,7 @@ describe Enrollment do
         expect(@enrollment.computed_current_grade).to eq 'A'
       end
 
-      it 'ignores grading period grades' do
+      it 'ignores grading period grades when passed no arguments' do
         @enrollment.scores.create!(current_score: 80.3, grading_period: period)
         expect(@enrollment.computed_current_grade).to eq 'A'
       end
@@ -169,6 +181,18 @@ describe Enrollment do
         score = @enrollment.scores.create!(current_score: 80.3)
         score.destroy
         expect(@enrollment.computed_current_grade).to eq 'A'
+      end
+
+      it 'computes current grade for a given grading period id' do
+        @enrollment.scores.create!(current_score: 80.3)
+        @enrollment.scores.create!(current_score: 70.6, grading_period: period)
+        current_grade = @enrollment.computed_current_grade(grading_period_id: period.id)
+        expect(current_grade).to eq 'C-'
+      end
+
+      it 'returns nil if a grading period grade is requested and does not exist' do
+        current_grade = @enrollment.computed_current_grade(grading_period_id: period.id)
+        expect(current_grade).to eq nil
       end
     end
 
@@ -226,7 +250,7 @@ describe Enrollment do
         expect(@enrollment.computed_final_score).to eq 95.5
       end
 
-      it 'ignores grading period scores' do
+      it 'ignores grading period scores when passed no arguments' do
         @enrollment.scores.create!(final_score: 80.3, grading_period: period)
         expect(@enrollment.computed_final_score).to eq 95.5
       end
@@ -236,11 +260,23 @@ describe Enrollment do
         score.destroy
         expect(@enrollment.computed_final_score).to eq 95.5
       end
+
+      it 'computes final score for a given grading period id' do
+        @enrollment.scores.create!(final_score: 80.3)
+        @enrollment.scores.create!(final_score: 70.6, grading_period: period)
+        final_score = @enrollment.computed_final_score(grading_period_id: period.id)
+        expect(final_score).to eq 70.6
+      end
+
+      it 'returns nil if a grading period score is requested and does not exist' do
+        final_score = @enrollment.computed_final_score(grading_period_id: period.id)
+        expect(final_score).to eq nil
+      end
     end
 
     describe '#computed_final_grade' do
       before(:each) do
-        Course.any_instance.expects(:grading_standard_enabled?).at_least_once.returns(true)
+        Course.any_instance.stubs(:grading_standard_enabled?).returns(true)
       end
 
       it 'uses the value from the associated score object, if one exists' do
@@ -252,7 +288,7 @@ describe Enrollment do
         expect(@enrollment.computed_final_grade).to eq 'A'
       end
 
-      it 'ignores grading period grades' do
+      it 'ignores grading period grades when passed no arguments' do
         @enrollment.scores.create!(final_score: 80.3, grading_period: period)
         expect(@enrollment.computed_final_grade).to eq 'A'
       end
@@ -261,6 +297,18 @@ describe Enrollment do
         score = @enrollment.scores.create!(final_score: 80.3)
         score.destroy
         expect(@enrollment.computed_final_grade).to eq 'A'
+      end
+
+      it 'computes final grade for a given grading period id' do
+        @enrollment.scores.create!(final_score: 80.3)
+        @enrollment.scores.create!(final_score: 70.6, grading_period: period)
+        final_grade = @enrollment.computed_final_grade(grading_period_id: period.id)
+        expect(final_grade).to eq 'C-'
+      end
+
+      it 'returns nil if a grading period grade is requested and does not exist' do
+        final_grade = @enrollment.computed_final_grade(grading_period_id: period.id)
+        expect(final_grade).to eq nil
       end
     end
   end
