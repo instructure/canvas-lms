@@ -8476,7 +8476,7 @@ zh-Hant:
         delete: 刪除
         hold: 保留
         select_all: 全選
-        un_hold: 解除保留
+        un_hold: 恢復
       headings: 
         jobs_list: 工作清單
         popular_tags: 熱門標籤
