@@ -80,7 +80,15 @@
           <option value="blank" {{selectedIf originalGroupRemoved}}></option>
         </select>
         <div>
-          <button class="Button" type="button" id="create_group_category_id" {{disabledIf groupCategoryIdDisabled}}>{{#t}}New Group Category{{/t}}</button>
+          <button
+            class="Button"
+            type="button"
+            id="create_group_category_id"
+            {{disabledIf inClosedGradingPeriod}}
+            {{disabledIf groupCategoryIdDisabled}}
+            >
+            {{#t}}New Group Category{{/t}}
+          </button>
         </div>
       </div>
     </div>

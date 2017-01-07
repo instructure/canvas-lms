@@ -283,6 +283,15 @@ class Group < ActiveRecord::Base
   scope :by_name, -> { order(Bookmarker.order_by) }
   scope :uncategorized, -> { where("groups.group_category_id IS NULL") }
 
+  def potential_collaborators
+    if context.is_a?(Course)
+      # >99.9% of groups have fewer than 100 members
+      User.where(id: participating_group_memberships.pluck(:user_id) + context.participating_admins.pluck(:id))
+    else
+      participating_users
+    end
+  end
+
   def full_name
     res = before_label(self.name) + " "
     res += (self.context.course_code rescue self.context.name) if self.context

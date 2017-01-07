@@ -2514,8 +2514,8 @@ zh-Hant:
   bookmark_service: 
     default_title: 無標題
   bookmark_this_question_bank_dc414a82: 將此題庫加為書籤
-  bounce_count_reset_c4c2218f: 跳變計數器已重置！
-  bounce_reason_689ed4c6: 跳變原因
+  bounce_count_reset_c4c2218f: 退信計數器已重置！
+  bounce_reason_689ed4c6: 退信原因
   brazil_55_34103ffa: "巴西 (+55)"
   brazil_c1d6e73a: 巴西
   breadcrumb_1_cb3c504: "Breadcrumb 控件1"
@@ -3460,7 +3460,7 @@ zh-Hant:
       inaccessible: 警告：此頁面包含協力廠商內容，熒幕讀取程式無法訪問。
     show: 
       buttons: 
-        close: 現在就編輯
+        close: 現在結束
         join: 現在就加入
     type_disabled_error: "不再為此 Canvas 網站啟用這種類型的會議"
   config_url_e96ceaf3: "配置 URL"
@@ -5415,15 +5415,15 @@ zh-Hant:
       tomorrow: 明天
       yesterday: 昨天
     formats: 
-      date_at_time: "%b %-d at %l:%M%P"
+      date_at_time: "%b %-d at %k:%M"
       default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-l:%M%P"
-      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
-      long: "%B %-d, %Y"
+      full: "%b %-d, %Y %-k:%M"
+      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      long: "%Y %B %-d"
       long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
-      medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
+      medium: "%Y %b %-d"
+      medium_month: "%Y %b"
+      medium_with_weekday: "%a %Y %b %-d"
       short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
@@ -5447,7 +5447,7 @@ zh-Hant:
   date_ee500367: 日期
   date_error_7b38f8ff: 日期錯誤
   date_modified_e1c8ac8f: 修改日期
-  date_of_most_recent_bounce_b23d0119: 最近一次跳變的日期
+  date_of_most_recent_bounce_b23d0119: 最近一次退信的日期
   datepicker: 
     errors: 
       not_a_date: 那不是日期！
@@ -6824,7 +6824,7 @@ zh-Hant:
   failed_to_submit_draft_comment_1de83451: 提交草稿評論失敗
   fair_38e62237: 良好
   fair_score_554e2558: 良好分數
-  fair_use_bee47d77: 良好使用
+  fair_use_bee47d77: 公平使用
   fall_grading_period_current_score_d48c7f78: 秋季評分時段當前分數
   fall_grading_period_final_score_56d96a8f: 秋季評分時段最終分數
   fall_grading_period_id_74ef68e: "秋季評分時段 ID"
@@ -8476,7 +8476,7 @@ zh-Hant:
         delete: 刪除
         hold: 保留
         select_all: 全選
-        un_hold: 解除保留
+        un_hold: 恢復
       headings: 
         jobs_list: 工作清單
         popular_tags: 熱門標籤
@@ -12948,13 +12948,13 @@ zh-Hant:
       audible_bracket_aced: 該等級的所有學生均回答正確。
       audible_bracket_failed: 該等級的所有學生均未給出正確答案。
       audible_chart_description: "該表列出了該班級各等級學生回答問題的結果。等級是按分數劃分的。高等為分數最高的 27%，中等為中間的 46%，低等為分數最低的 27%。"
-      audible_discrimination_index: "辨別力指數：%{number}。"
+      audible_discrimination_index: "鑒別指數：%{number}。"
       audible_middle_bracket: 中等：
       audible_response_ratio_distribution: "該等級 %{correct_ratio}% 學生回答正確。"
       audible_top_bracket: 高等：
-      discrimination_index: 辨別力指數
-      discrimination_index_dialog_title: 辨別力指數圖
-      discrimination_index_dialog_trigger: 瞭解更多關於辨別力指數的內容。
+      discrimination_index: 鑒別指數
+      discrimination_index_dialog_title: 鑒別指數圖
+      discrimination_index_dialog_trigger: 瞭解更多關於鑒別指數的內容。
     discrimination_index_help: "* 該度量標準提供了具體的方法，以區分（或辨別）在考試中獲得好成績和差成績的學生。* ** 根據整個測驗分數，將學生分為三組，并顯示各組中哪些學生回答正確。** *** ****按一下此處，瞭解更多資訊。**** ***"
     download_submissions: 下載所有文檔
     duration_in_hours: 
@@ -14228,8 +14228,8 @@ zh-Hant:
   reserved_f247b60b: 已預約
   reset_95a81614: 重設
   reset_multi_factor_authentication_2b63a558: 重設多因素驗證
-  reset_this_contact_method_s_bounce_count_3845ecf4: 重設這個聯繫方式的跳變計數
-  reset_this_email_address_s_bounce_count_d81d8fd9: 重設這個電郵地址的跳變計數
+  reset_this_contact_method_s_bounce_count_3845ecf4: 重設這個聯繫方式的退信計數
+  reset_this_email_address_s_bounce_count_d81d8fd9: 重設這個電郵地址的退信計數
   respondus_lockdown_browser_support_413352eb: "Respondus LockDown 瀏覽器支援"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -16391,7 +16391,7 @@ zh-Hant:
       default: "%a, %d %b %Y %H:%M:%S %z"
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
+      tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: 不到一分鐘以前
     pm: 下午

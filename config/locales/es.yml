@@ -5387,27 +5387,27 @@ es:
       - sab
     abbr_month_names: 
       - ~
-      - Ene
-      - Feb
-      - Mar
-      - Abr
-      - May
-      - Jun
-      - Jul
-      - Ago
-      - Sep
-      - Oct
-      - Nov
-      - Dic
+      - ene
+      - feb
+      - mar
+      - abr
+      - may
+      - jun
+      - jul
+      - ago
+      - sep
+      - oct
+      - nov
+      - dic
     datepicker: 
       column_headings: 
-        - Do
-        - Lu
-        - Ma
-        - Mi
-        - Ju
-        - Vi
-        - Sa
+        - do
+        - lu
+        - ma
+        - mi
+        - ju
+        - vi
+        - sa
     day_names: 
       - domingo
       - lunes
@@ -5438,18 +5438,18 @@ es:
       weekday: "%A"
     month_names: 
       - ~
-      - Enero
-      - Febrero
-      - Marzo
-      - Abril
-      - Mayo
-      - Junio
-      - Julio
-      - Agosto
-      - Septiembre
-      - Octubre
-      - Noviembre
-      - Diciembre
+      - enero
+      - febrero
+      - marzo
+      - abril
+      - mayo
+      - junio
+      - julio
+      - agosto
+      - septiembre
+      - octubre
+      - noviembre
+      - diciembre
   date_created_87e265bc: "Fecha Creada"
   date_ee500367: Fecha
   date_error_7b38f8ff: "Error en la fecha"

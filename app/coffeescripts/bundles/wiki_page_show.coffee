@@ -4,13 +4,14 @@ require [
   'compiled/models/WikiPage'
   'compiled/views/wiki/WikiPageView'
   'compiled/util/markAsDone'
+  'compiled/util/natcompare'
   'react'
   'react-dom'
   'axios'
   'jsx/announcements/AnnouncementList'
   'instructure-ui/Spinner'
   'compiled/jquery/ModuleSequenceFooter'
-], ($, I18n, WikiPage, WikiPageView, MarkAsDone, React, ReactDOM, axios, AnnouncementList, { default: Spinner }) ->
+], ($, I18n, WikiPage, WikiPageView, MarkAsDone, natcompare, React, ReactDOM, axios, AnnouncementList, { default: Spinner }) ->
 
   renderReactComponent = (component, target, props) ->
     ReactDOM.render(
@@ -46,11 +47,11 @@ require [
   if ENV.SHOW_ANNOUNCEMENTS
     renderReactComponent Spinner, '#announcements_on_home_page', {title: I18n.t('Loading Announcements'), size: 'small'}
 
-    axios.get("/api/v1/announcements?context_codes[]=course_#{ENV.COURSE_ID}&per_page=#{ENV.ANNOUNCEMENT_LIMIT || 3}&page=1")
+    axios.get("/api/v1/announcements?context_codes[]=course_#{ENV.COURSE_ID}&per_page=#{ENV.ANNOUNCEMENT_LIMIT || 3}&page=1&start_date=1900-01-01&end_date=2100-12-31")
     .then (response) =>
       renderReactComponent AnnouncementList, '#announcements_on_home_page', announcements: response.data.map (a) ->
-        id: a.id,
-        title: a.title,
-        message: a.message,
-        posted_at: a.posted_at,
-        url: a.url
+          id: a.id,
+          title: a.title,
+          message: a.message,
+          posted_at: a.delayed_post_at || a.posted_at,
+          url: a.url

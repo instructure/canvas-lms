@@ -635,11 +635,13 @@ describe ExternalToolsController do
 
     it "should return a variable expansion for a collaboration" do
       user_session(@teacher)
-      collab = ExternalToolCollaboration.create!(
+      collab = ExternalToolCollaboration.new(
         title: "my collab",
         user: @teacher,
         url: 'http://www.example.com'
       )
+      collab.context = @course
+      collab.save!
       tool = new_valid_tool(@course)
       tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
       tool.settings[:custom_fields] = { 'collaboration_url' => '$Canvas.api.collaborationMembers.url' }
@@ -682,11 +684,14 @@ describe ExternalToolsController do
 
     context 'collaborations' do
       let(:collab) do
-        collab = ExternalToolCollaboration.create!(
+        collab = ExternalToolCollaboration.new(
           title: "my collab",
           user: @teacher,
           url: 'http://www.example.com'
         )
+        collab.context = @course
+        collab.save!
+        collab
       end
 
       it "lets you specify the selection_type" do

@@ -1694,6 +1694,15 @@ describe DiscussionTopic do
       expect(@topic.workflow_state).to eql 'active'
       expect(@topic.locked?).to be_falsey
     end
+
+    it "should use course setting for `lock_all_announcements` if set" do
+      @course.lock_all_announcements = true
+      @course.save!
+      announcement = @course.announcements.create!(message: "Lock this")
+      expect(announcement.locked?).to be_truthy
+      expect{announcement.unlock!}.to raise_error
+      expect(announcement.locked?).to be_truthy
+    end
   end
 
   describe "update_order" do

@@ -562,6 +562,11 @@ class DiscussionTopic < ActiveRecord::Base
     !(self.assignment.try(:due_at) && self.assignment.due_at > Time.now)
   end
 
+  def can_unlock?
+    # Only used for course/account setting to lock replies to announcements
+    self.new_record? || !self.is_announcement || (self.is_announcement && !self.course&.lock_all_announcements)
+  end
+
   def lock(opts = {})
     raise "cannot lock before due date" unless can_lock?
     self.locked = true
@@ -570,6 +575,7 @@ class DiscussionTopic < ActiveRecord::Base
   alias_method :lock!, :lock
 
   def unlock(opts = {})
+    raise "cannot unlock due to course setting" unless can_unlock?
     self.locked = false
     self.workflow_state = 'active' if self.workflow_state == 'locked'
     save! unless opts[:without_save]
