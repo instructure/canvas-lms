@@ -699,6 +699,12 @@ class Course < ActiveRecord::Base
 
   scope :deleted, -> { where(:workflow_state => 'deleted') }
 
+  scope :master_courses, -> { joins(:master_course_templates).where.not(MasterCourses::MasterTemplate.table_name => {:workflow_state => 'deleted'}) }
+
+  def potential_collaborators
+    current_users
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
     p.to { participating_students_by_date + participating_observers_by_date }

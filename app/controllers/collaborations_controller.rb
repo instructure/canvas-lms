@@ -318,7 +318,7 @@ class CollaborationsController < ApplicationController
     visibility = content_item['ext_canvas_visibility']
     lti_user_ids = visibility && visibility['users'] || []
     lti_group_ids = visibility && visibility['groups'] || []
-    users = User.where(lti_context_id: lti_user_ids)
+    users = User.where(lti_context_id: lti_user_ids).to_a
     group_ids = Group.where(lti_context_id: lti_group_ids).map(&:id)
     [users, group_ids]
   end
