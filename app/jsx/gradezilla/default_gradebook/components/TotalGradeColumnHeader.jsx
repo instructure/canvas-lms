@@ -15,13 +15,13 @@ define([
   // TODO: remove this rule when this component begins using internal state
   /* eslint-disable react/prefer-stateless-function */
 
-  class StudentColumnHeader extends React.Component {
+  class TotalGradeColumnHeader extends React.Component {
     render () {
       return (
         <div className="Gradebook__ColumnHeaderContent">
           <span className="Gradebook__ColumnHeaderDetail">
             <Typography weight="normal" style="normal" size="small">
-              { I18n.t('Student Name') }
+              { I18n.t('Total') }
             </Typography>
           </span>
 
@@ -30,19 +30,20 @@ define([
             trigger={
               <span className="Gradebook__ColumnHeaderAction">
                 <Typography weight="bold" style="normal" size="large" color="brand">
-                  <IconMoreSolid title={I18n.t('Student Name Options')} />
+                  <IconMoreSolid title={I18n.t('Total Options')} />
                 </Typography>
               </span>
             }
           >
-            <MenuItem>Item 1</MenuItem>
-            <MenuItem>Item 2</MenuItem>
-            <MenuItem>Item 3</MenuItem>
+            <MenuItem>{ I18n.t('Message Students Who...') }</MenuItem>
+            <MenuItem>{ I18n.t('Display as Points') }</MenuItem>
+            <MenuItem>{ I18n.t('Move to End') }</MenuItem>
+            <MenuItem>{ I18n.t('Adjust Final Grade') }</MenuItem>
           </PopoverMenu>
         </div>
       );
     }
   }
 
-  return StudentColumnHeader;
+  return TotalGradeColumnHeader;
 });
