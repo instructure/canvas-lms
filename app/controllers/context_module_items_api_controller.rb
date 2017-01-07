@@ -514,8 +514,8 @@ class ContextModuleItemsApiController < ApplicationController
 
       Assignment.preload_context_module_tags(assignments)
 
-      # match cyoe order
-      assignments = assignments.index_by(&:id).values_at(*assignment_ids)
+      # match cyoe order, omit unpublished or deleted assignments
+      assignments = assignments.index_by(&:id).values_at(*assignment_ids).compact
 
       # grab locally relevant module items
       items = assignments.map(&:all_context_module_tags).flatten.select{|a| a.context_module_id == @module.id}

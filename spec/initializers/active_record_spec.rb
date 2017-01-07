@@ -200,6 +200,12 @@ module ActiveRecord
     end
   end
 
+  describe ".asset_string" do
+    it "generates a string with the reflection_type_name and id" do
+      expect(User.asset_string(3)).to eq('user_3')
+    end
+  end
+
   describe Relation do
     describe "lock_with_exclusive_smarts" do
       let(:scope){ User.active }

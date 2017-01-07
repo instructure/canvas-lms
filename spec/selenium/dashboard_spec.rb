@@ -355,7 +355,7 @@ describe "dashboard" do
 
     it "should show recent feedback and it should work", priority: "1", test_id: 216373 do
       assign = @course.assignments.create!(:title => 'hi', :due_at => 1.day.ago, :points_possible => 5)
-      assign.grade_student(@student, :grade => '4')
+      assign.grade_student(@student, grade: '4', grader: @teacher)
 
       get "/"
       wait_for_ajaximations

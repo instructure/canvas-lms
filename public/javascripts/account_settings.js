@@ -166,7 +166,10 @@ define([
       });
     });
 
-    $("#turnitin, #enable_equella, #account_settings_sis_syncing_value").change(function() {
+    $("#turnitin, " +
+      "#enable_equella, " +
+      "#account_settings_sis_syncing_value, " +
+      "#account_settings_sis_default_grade_export_value").change(function() {
       var $myFieldset = $('#'+ $(this).attr('id') + '_settings'),
           iAmChecked = $(this).attr('checked');
       $myFieldset.showIf(iAmChecked);

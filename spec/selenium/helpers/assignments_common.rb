@@ -217,9 +217,9 @@ module AssignmentsCommon
   end
 
   def click_cog_to_edit
-    ffj('.al-trigger')[1].click
+    ff('.al-trigger')[2].click
     wait_for_ajaximations
-    fj('.edit_assignment').click
+    f('.edit_assignment').click
     wait_for_ajaximations
   end
 

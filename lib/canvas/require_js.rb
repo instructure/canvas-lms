@@ -43,6 +43,7 @@ module Canvas
           'react-addons-pure-render-mixin' => 'react-addons-pure-render-mixin_requireJS',
           'react-addons-test-utils' => 'react-addons-test-utils_requireJS',
           'react-addons-update' => 'react-addons-update_requireJS',
+          :instructureicons => 'instructure-icons/'
         }.update(cache_busting ? cache_busting_paths : {}).
           update(plugin_paths).
           update(Canvas::RequireJs::PluginExtension.paths).
@@ -75,6 +76,7 @@ module Canvas
           {name: 'instructure-ui',     location: 'symlink_to_node_modules/instructure-ui/dist', main: 'instructure-ui'},
           {name: 'instructure-icons',  location: 'symlink_to_node_modules/instructure-icons', main: 'react/index'},
           {name: 'lodash',             location: 'symlink_to_node_modules/lodash', main: 'lodash'},
+          {name: 'moxios',             location: 'symlink_to_node_modules/moxios', main: 'dist/moxios'},
           {name: 'page',               location: 'symlink_to_node_modules/page', main: 'page'},
           {name: 'qs',                 location: 'symlink_to_node_modules/qs', main: 'dist/qs'},
           {name: 'react',              location: 'symlink_to_node_modules/react', main: 'dist/react-with-addons'},

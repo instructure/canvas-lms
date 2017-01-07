@@ -36,6 +36,49 @@ module SchedulerCommon
     replace_content(edit_form.find_element(:css, '.end_time'), '3')
   end
 
+  def scheduler_setup
+    create_courses_and_enroll_users
+    create_appointment_groups_for_courses
+  end
+
+  def create_courses_and_enroll_users
+    @course1 = course_model(name: "First Course").tap(&:offer!)
+    @course2 = course_model(name: "Second Course").tap(&:offer!)
+    @course3 = course_model(name: "Third Course").tap(&:offer!)
+    create_users_and_enroll
+  end
+
+  def create_users_and_enroll
+    @student1 = User.create!(name: 'Student 1')
+    @student2 = User.create!(name: 'Student 2')
+    @student3 = User.create!(name: 'Student 3')
+    @course1.enroll_student(@student1).accept!
+    @course3.enroll_student(@student1).accept!
+    @course2.enroll_student(@student2).accept!
+    @course3.enroll_student(@student3).accept!
+  end
+
+  def create_appointment_groups_for_courses
+    @app1 = AppointmentGroup.create!(appointment_params(title: "Appointment 1", contexts: [@course1]))
+    @app1.publish!
+    @app2 = AppointmentGroup.create!(appointment_params(title: "Appointment 2", contexts: [@course2]))
+    @app2.publish!
+    @app3 = AppointmentGroup.create!(appointment_params(title: "Appointment 3", contexts: [@course1, @course2]))
+    @app3.publish!
+  end
+
+  def appointment_params(opts={})
+    {
+        title: opts[:title],
+        contexts: opts[:contexts],
+        new_appointments: [
+          [opts[:start_at] || Time.zone.now + 1.hour, 
+           opts[:end_at] || Time.zone.now + 3.hours],
+        ],
+        participants_per_appointment: opts[:participants] || 4
+    }
+  end
+
   def submit_appointment_group_form(publish = true)
     save, save_and_publish = ff('.ui-dialog-buttonset .ui-button')
     if publish

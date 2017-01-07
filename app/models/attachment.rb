@@ -251,8 +251,8 @@ class Attachment < ActiveRecord::Base
   attr_accessor :clone_updated
   def clone_for(context, dup=nil, options={})
     if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save!
+      self.cloned_item = ClonedItem.create(:original_item => self) # do we even use this for anything?
+      Attachment.where(:id => self).update_all(:cloned_item_id => self.cloned_item.id) # don't touch it for no reason
     end
     existing = context.attachments.active.find_by_id(self)
     existing ||= self.cloned_item_id ? context.attachments.active.where(cloned_item_id: self.cloned_item_id).first : nil
@@ -271,7 +271,7 @@ class Attachment < ActiveRecord::Base
       dup.root_attachment_id = self.root_attachment_id || self.id
     end
     dup.context = context
-    dup.migration_id = CC::CCHelper.create_key(self)
+    dup.migration_id = options[:migration_id] || CC::CCHelper.create_key(self)
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end
@@ -888,12 +888,12 @@ class Attachment < ActiveRecord::Base
     h.number_to_human_size(self.size) rescue "size unknown"
   end
 
-  def download_url
-    authenticated_s3_url(:expires => url_ttl, :response_content_disposition => "attachment; " + disposition_filename)
+  def download_url(ttl = url_ttl)
+    authenticated_s3_url(expires: ttl, response_content_disposition: "attachment; " + disposition_filename)
   end
 
-  def inline_url
-    authenticated_s3_url(:expires => url_ttl, :response_content_disposition => "inline; " + disposition_filename)
+  def inline_url(ttl = url_ttl)
+    authenticated_s3_url(expires: ttl, response_content_disposition: "inline; " + disposition_filename)
   end
 
   def url_ttl

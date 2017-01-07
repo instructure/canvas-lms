@@ -38,7 +38,7 @@ describe Lti::ContentItemResponse do
   describe '#initialize' do
     it 'raises an error if an invalid id is passed in' do
       expect { subject({ assignments: [0] }) }.to(
-        raise_error(Lti::InvalidMediaTypeError )
+        raise_error(Lti::Errors::InvalidMediaTypeError )
       )
     end
 
@@ -51,7 +51,7 @@ describe Lti::ContentItemResponse do
           { "assignments" => [assign1.id] },
           'blah'
         )
-      }.to raise_error(Lti::UnsupportedExportTypeError)
+      }.to raise_error(Lti::Errors::UnsupportedExportTypeError)
     end
   end
 

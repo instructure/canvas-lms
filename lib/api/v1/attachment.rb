@@ -105,7 +105,7 @@ module Api::V1::Attachment
       hash['user'] = user_display_json(attachment.user, context)
     end
     if includes.include? 'preview_url'
-      hash['preview_url'] = attachment.crocodoc_url(user) ||
+      hash['preview_url'] = attachment.crocodoc_url(user, options[:crocodoc_ids]) ||
                             attachment.canvadoc_url(user)
     end
     if includes.include? 'enhanced_preview_url'

@@ -1,11 +1,9 @@
 define([
   'underscore',
-  'jquery',
   'timezone',
   'i18n!gradebook2',
-  'jsx/gradebook/AssignmentOverrideHelper',
   'jsx/grading/helpers/GradingPeriodsHelper'
-], function(_, $, tz, I18n, AssignmentOverrideHelper, GradingPeriodsHelper) {
+], function(_, tz, I18n, GradingPeriodsHelper) {
 
   const TOOLTIP_KEYS = {
     NOT_IN_ANY_GP: "not_in_any_grading_period",
@@ -19,40 +17,33 @@ define([
     return _.contains(assignment.assignment_visibility, student.id);
   }
 
-  function indexOverrides(assignments, students) {
-    return _.reduce(assignments, function(overrides, assignment) {
-      overrides[assignment.id] =
-        AssignmentOverrideHelper.effectiveDueDatesForAssignment(
-          assignment, assignment.overrides, students
-        );
-      return overrides;
-    }, {});
-  }
-
-  function cellMapForSubmission(assignment, student, effectiveDueAt, gradingPeriodsEnabled, selectedGradingPeriodID, gradingPeriods, isAdmin) {
+  function cellMapForSubmission(assignment, student, gradingPeriodsEnabled, selectedGradingPeriodID, isAdmin) {
     if (!visibleToStudent(assignment, student)) {
       return { locked: true, hideGrade: true, tooltip: TOOLTIP_KEYS.NONE };
     } else if (gradingPeriodsEnabled) {
-      return cellMappingsForMultipleGradingPeriods(assignment, student, effectiveDueAt, selectedGradingPeriodID, gradingPeriods, isAdmin);
+      return cellMappingsForMultipleGradingPeriods(assignment, student, selectedGradingPeriodID, isAdmin);
     } else {
       return { locked: false, hideGrade: false, tooltip: TOOLTIP_KEYS.NONE };
     }
   }
 
-  function cellMappingsForMultipleGradingPeriods(assignment, student, effectiveDueAt, selectedGradingPeriodID, gradingPeriods, isAdmin) {
+  function submissionGradingPeriodInformation(assignment, student) {
+    const submissionInfo = assignment.effectiveDueDates[student.id] || {};
+    return {
+      gradingPeriodID: submissionInfo.grading_period_id,
+      inClosedGradingPeriod: submissionInfo.in_closed_grading_period
+    };
+  }
+
+  function cellMappingsForMultipleGradingPeriods(assignment, student, selectedGradingPeriodID, isAdmin) {
     const specificPeriodSelected = !GradingPeriodsHelper.isAllGradingPeriods(selectedGradingPeriodID);
+    const { gradingPeriodID, inClosedGradingPeriod } = submissionGradingPeriodInformation(assignment, student);
 
-    if (effectiveDueAt === undefined) {
-      const tooltip = specificPeriodSelected ? TOOLTIP_KEYS.NOT_IN_ANY_GP : TOOLTIP_KEYS.NONE;
-      return { locked: specificPeriodSelected, hideGrade: specificPeriodSelected, tooltip };
-    }
-
-    const gradingPeriod = new GradingPeriodsHelper(gradingPeriods).gradingPeriodForDueAt(effectiveDueAt);
-    if (specificPeriodSelected && !gradingPeriod) {
+    if (specificPeriodSelected && !gradingPeriodID) {
       return { locked: true, hideGrade: true, tooltip: TOOLTIP_KEYS.NOT_IN_ANY_GP };
-    } else if (specificPeriodSelected && selectedGradingPeriodID !== gradingPeriod.id) {
+    } else if (specificPeriodSelected && selectedGradingPeriodID != gradingPeriodID) {
       return { locked: true, hideGrade: true, tooltip: TOOLTIP_KEYS.IN_ANOTHER_GP };
-    } else if (!isAdmin && (gradingPeriod || {}).isClosed) {
+    } else if (!isAdmin && inClosedGradingPeriod) {
       return { locked: true, hideGrade: false, tooltip: TOOLTIP_KEYS.IN_CLOSED_GP };
     } else {
       return { locked: false, hideGrade: false, tooltip: TOOLTIP_KEYS.NONE };
@@ -60,20 +51,15 @@ define([
   }
 
   class SubmissionState {
-    constructor({ gradingPeriodsEnabled, selectedGradingPeriodID, gradingPeriods, isAdmin }) {
+    constructor({ gradingPeriodsEnabled, selectedGradingPeriodID, isAdmin }) {
       this.gradingPeriodsEnabled = gradingPeriodsEnabled;
       this.selectedGradingPeriodID = selectedGradingPeriodID;
-      this.gradingPeriods = gradingPeriods;
       this.isAdmin = isAdmin;
-      this.overrides = {};
       this.submissionCellMap = {};
       this.submissionMap = {};
     }
 
     setup(students, assignments) {
-      const newOverrides = indexOverrides(assignments, students);
-      this.overrides = $.extend(true, this.overrides, newOverrides);
-
       students.forEach((student) => {
         this.submissionCellMap[student.id] = {};
         this.submissionMap[student.id] = {};
@@ -88,10 +74,8 @@ define([
       const params = [
         assignment,
         student,
-        this.overrides[assignment.id][student.id],
         this.gradingPeriodsEnabled,
         this.selectedGradingPeriodID,
-        this.gradingPeriods,
         this.isAdmin
       ];
 

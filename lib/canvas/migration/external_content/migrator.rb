@@ -60,7 +60,7 @@ module Canvas::Migration::ExternalContent
       end
 
       # retrieves data from each service to be saved as JSON in the exported package
-      def retrieve_exported_content(pending_exports)
+      def retrieve_exported_content(content_export, pending_exports)
         exported_content = {}
 
         retry_block_for_each(pending_exports.keys) do |key|
@@ -68,7 +68,7 @@ module Canvas::Migration::ExternalContent
 
           if export_completed?(pending_export, key)
             service_data = retrieve_export_data(pending_export, key)
-            exported_content[key] = Canvas::Migration::ExternalContent::Translator.new.translate_data(service_data, :export) if service_data
+            exported_content[key] = Canvas::Migration::ExternalContent::Translator.new(content_export: content_export).translate_data(service_data, :export) if service_data
             true
           end
         end
@@ -97,11 +97,11 @@ module Canvas::Migration::ExternalContent
 
       # sends back the imported content to the external services
       def send_imported_content(migration, imported_content)
-        imported_content = Canvas::Migration::ExternalContent::Translator.new(migration).translate_data(imported_content, :import)
+        imported_content = Canvas::Migration::ExternalContent::Translator.new(content_migration: migration).translate_data(imported_content, :import)
 
         pending_imports = {}
         imported_content.each do |key, content|
-          service = self.registered_services[key]
+          service = import_service_for(key)
           if service
             begin
               if import = service.send_imported_content(migration.context, content)
@@ -115,10 +115,23 @@ module Canvas::Migration::ExternalContent
         ensure_imports_completed(pending_imports)
       end
 
+      private def import_service_for(key)
+        if Lti::ContentMigrationService::KEY_REGEX  =~ key
+          Lti::ContentMigrationService.importer_for(key)
+        else
+          self.registered_services[key]
+        end
+      end
+
       def ensure_imports_completed(pending_imports)
         # keep pinging until they're all finished
         retry_block_for_each(pending_imports.keys) do |key|
-          self.registered_services[key].import_completed?(pending_imports[key])
+          import_data = pending_imports[key]
+          if import_data.respond_to?(:import_completed?)
+            import_data.import_completed?
+          else
+            self.registered_services[key].import_completed?(import_data)
+          end
         end
       end
     end

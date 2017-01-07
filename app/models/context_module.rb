@@ -204,7 +204,15 @@ class ContextModule < ActiveRecord::Base
 
   def publish_items!
     self.content_tags.each do |tag|
-      tag.publish if tag.unpublished?
+      if tag.unpublished?
+        if tag.content_type == 'Attachment'
+          tag.content.set_publish_state_for_usage_rights
+          tag.content.save!
+          tag.publish if tag.content.published?
+        else
+          tag.publish
+        end
+      end
       tag.update_asset_workflow_state!
     end
   end

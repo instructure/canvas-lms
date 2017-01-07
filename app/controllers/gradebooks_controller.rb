@@ -299,13 +299,14 @@ class GradebooksController < ApplicationController
     @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(:teacher_notes=> true).first
-    ag_includes = [:assignments, :assignment_visibility, 'overrides']
+    ag_includes = [:assignments, :assignment_visibility]
     chunk_size = if @context.assignments.published.count < Setting.get('gradebook2.assignments_threshold', '20').to_i
       Setting.get('gradebook2.submissions_chunk_size', '35').to_i
     else
       Setting.get('gradebook2.many_submissions_chunk_size', '10').to_i
     end
-    js_env  :GRADEBOOK_OPTIONS => {
+    js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
+    js_env :GRADEBOOK_OPTIONS => {
       :chunk_size => chunk_size,
       :assignment_groups_url => api_v1_course_assignment_groups_url(
         @context,
@@ -315,6 +316,7 @@ class GradebooksController < ApplicationController
       ),
       :sections_url => api_v1_course_sections_url(@context),
       :course_url => api_v1_course_url(@context),
+      :effective_due_dates_url => api_v1_course_effective_due_dates_url(@context),
       :enrollments_url => custom_course_enrollments_api_url(per_page: per_page),
       :enrollments_with_concluded_url =>
         custom_course_enrollments_api_url(include_concluded: true, per_page: per_page),
@@ -336,7 +338,7 @@ class GradebooksController < ApplicationController
       :context_url => named_context_url(@context, :context_url),
       :download_assignment_submissions_url => named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", :zip => 1),
       :re_upload_submissions_url => named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
-      :context_id => @context.id,
+      :context_id => @context.id.to_s,
       :context_code => @context.asset_string,
       :context_sis_id => @context.sis_source_id,
       :group_weighting_scheme => @context.group_weighting_scheme,
@@ -421,6 +423,7 @@ class GradebooksController < ApplicationController
         s[:assignment_id]
       }).index_by(&:id)
 
+      request_error_status = nil
       @submissions = []
       submissions.compact.each do |submission|
         @assignment = assignments[submission[:assignment_id].to_i]
@@ -469,6 +472,7 @@ class GradebooksController < ApplicationController
           end
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
+          request_error_status = e.status_code
           @error_message = e.to_s
         end
       end
@@ -488,9 +492,11 @@ class GradebooksController < ApplicationController
           }
         else
           flash[:error] = t('errors.submission_failed', "Submission was unsuccessful: %{error}", :error => @error_message || t('errors.submission_failed_default', 'Submission Failed'))
+          request_error_status ||= :bad_request
+
           format.html { render :show, course_id: @assignment.context.id }
-          format.json { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
-          format.text { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
+          format.json { render json: { errors: { base: @error_message } }, status: request_error_status }
+          format.text { render json: { errors: { base: @error_message } }, status: request_error_status }
         end
       end
     end

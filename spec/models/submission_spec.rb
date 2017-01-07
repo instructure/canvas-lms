@@ -22,16 +22,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe Submission do
   before(:once) do
-    course_with_student(active_all: true)
+    course_with_teacher(active_all: true)
+    course_with_student(active_all: true, course: @course)
     @context = @course
     @assignment = @context.assignments.new(:title => "some assignment")
     @assignment.workflow_state = "published"
     @assignment.save
     @valid_attributes = {
-      :assignment_id => @assignment.id,
-      :user_id => @user.id,
-      :grade => "1.5",
-      :url => "www.instructure.com"
+      assignment_id: @assignment.id,
+      user_id: @user.id,
+      grade: "1.5",
+      grader: @teacher,
+      url: "www.instructure.com"
     }
   end
 
@@ -261,7 +263,7 @@ describe Submission do
 
   context "Discussion Topic" do
     it "should use correct date for its submitted_at value" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "some topic")
       @assignment = @course.assignments.create(:title => "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'
@@ -278,7 +280,7 @@ describe Submission do
     end
 
     it "should not create multiple versions on submission for discussion topics" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "some topic")
       @assignment = @course.assignments.create(:title => "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'
@@ -417,7 +419,7 @@ describe Submission do
         @cc = @user.communication_channels.create :path => "somewhere"
         @assignment.mute!
         expect {
-          @submission = @assignment.grade_student(@user, :grade => 10)[0]
+          @submission = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0]
         }.to change StreamItemInstance, :count
         expect(@user.stream_item_instances.last).to be_hidden
       end
@@ -426,7 +428,7 @@ describe Submission do
         submission_spec_model
         @cc = @user.communication_channels.create :path => "somewhere"
         expect {
-          @submission = @assignment.grade_student(@user, :grade => 10)[0]
+          @submission = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0]
         }.to change StreamItemInstance, :count
         expect(@user.stream_item_instances.last).not_to be_hidden
         @assignment.mute!
@@ -486,7 +488,7 @@ describe Submission do
       submission_spec_model
       @cc = @user.communication_channels.create :path => "somewhere"
       expect {
-        @assignment.grade_student(@user, :grade => 10)
+        @assignment.grade_student(@user, grade: 10, grader: @teacher)
       }.to change StreamItemInstance, :count
     end
 
@@ -496,7 +498,7 @@ describe Submission do
       @cc = @user.communication_channels.create :path => "somewhere"
       @assignment.mute!
       expect {
-        @assignment.grade_student(@user, :grade => 10)
+        @assignment.grade_student(@user, grade: 10, grader: @teacher)
       }.to change StreamItemInstance, :count
 
       @assignment.unmute!
@@ -514,10 +516,10 @@ describe Submission do
         submission_spec_model
 
         @cc = @user.communication_channels.create(:path => "somewhere")
-        s = @assignment.grade_student(@user, :grade => 10)[0] #@submission
-        s.graded_at = Time.parse("Jan 1 2000")
+        s = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0] # @submission
+        s.graded_at = Time.zone.parse("Jan 1 2000")
         s.save
-        @submission = @assignment.grade_student(@user, :grade => 9)[0]
+        @submission = @assignment.grade_student(@user, grade: 9, grader: @teacher)[0]
         expect(@submission).to eql(s)
         expect(@submission.messages_sent).to be_include('Submission Grade Changed')
       end
@@ -531,10 +533,10 @@ describe Submission do
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         @cc = @user.communication_channels.create(:path => "somewhere")
-        s = @assignment.grade_student(@user, :grade => 10)[0] #@submission
-        s.graded_at = Time.parse("Jan 1 2000")
+        s = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0] # @submission
+        s.graded_at = Time.zone.parse("Jan 1 2000")
         s.save
-        @submission = @assignment.grade_student(@user, :grade => 9)[0]
+        @submission = @assignment.grade_student(@user, grade: 9, grader: @teacher)[0]
         expect(@submission).to eql(s)
         expect(@submission.messages_sent).not_to include('Submission Grade Changed')
       end
@@ -547,8 +549,8 @@ describe Submission do
         submission_spec_model
 
         @cc = @user.communication_channels.create(:path => "somewhere")
-        s = @assignment.grade_student(@user, :grade => 10)[0] #@submission
-        @submission = @assignment.grade_student(@user, :grade => 9)[0]
+        s = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0] # @submission
+        @submission = @assignment.grade_student(@user, grade: 9, grader: @teacher)[0]
         expect(@submission).to eql(s)
         expect(@submission.messages_sent).not_to be_include('Submission Grade Changed')
         expect(@submission.messages_sent).to be_include('Submission Graded')
@@ -562,10 +564,10 @@ describe Submission do
         submission_spec_model
 
         @cc = @user.communication_channels.create(:path => "somewhere")
-        s = @assignment.grade_student(@user, :grade => 10)[0] #@submission
-        s.graded_at = Time.parse("Jan 1 2000")
+        s = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0] # @submission
+        s.graded_at = Time.zone.parse("Jan 1 2000")
         s.save
-        @submission = @assignment.grade_student(@user, :grade => 9)[0]
+        @submission = @assignment.grade_student(@user, grade: 9, grader: @teacher)[0]
         expect(@submission).to eql(s)
         expect(@submission.messages_sent).not_to be_include('Submission Grade Changed')
 
@@ -578,10 +580,214 @@ describe Submission do
         submission_spec_model
 
         @cc = @user.communication_channels.create(:path => "somewhere")
-        s = @assignment.grade_student(@user, :grade => 10)[0] #@submission
-        @submission = @assignment.grade_student(@user, :grade => 9)[0]
+        s = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0] # @submission
+        @submission = @assignment.grade_student(@user, grade: 9, grader: @teacher)[0]
         expect(@submission).to eql(s)
         expect(@submission.messages_sent).not_to be_include('Submission Grade Changed')
+      end
+    end
+  end
+
+  describe "permission policy" do
+    describe "can :grade" do
+      before(:each) do
+        @submission = Submission.new
+        @grader = User.new
+      end
+
+      it "delegates to can_grade?" do
+        [true, false].each do |value|
+          @submission.stubs(:can_grade?).with(@grader).returns(value)
+
+          expect(@submission.grants_right?(@grader, :grade)).to eq(value)
+        end
+      end
+    end
+
+    describe "can :autograde" do
+      before(:each) do
+        @submission = Submission.new
+      end
+
+      it "delegates to can_autograde?" do
+        [true, false].each do |value|
+          @submission.stubs(:can_autograde?).returns(value)
+
+          expect(@submission.grants_right?(nil, :autograde)).to eq(value)
+        end
+      end
+    end
+  end
+
+  describe '#can_grade?' do
+    before(:each) do
+      @account = Account.new
+      @course = Course.new(account: @account)
+      @assignment = Assignment.new(course: @course)
+      @submission = Submission.new(assignment: @assignment)
+
+      @grader = User.new
+      @grader.id = 10
+      @student = User.new
+      @student.id = 42
+
+      @course.stubs(:account_membership_allows).with(@grader).returns(true)
+      @course.stubs(:grants_right?).with(@grader, nil, :manage_grades).returns(true)
+
+      @assignment.course = @course
+      @assignment.stubs(:published?).returns(true)
+      @assignment.stubs(:in_closed_grading_period_for_student?).with(42).returns(false)
+
+      @submission.grader = @grader
+      @submission.user = @student
+    end
+
+    it 'returns true for published assignments if the grader is a teacher who is allowed to
+        manage grades' do
+      expect(@submission.grants_right?(@grader, :grade)).to be_truthy
+    end
+
+    context 'when assignment is unpublished' do
+      before(:each) do
+        @assignment.stubs(:published?).returns(false)
+
+        @status = @submission.grants_right?(@grader, :grade)
+      end
+
+      it 'returns false' do
+        expect(@status).to be_falsey
+      end
+
+      it 'sets an appropriate error message' do
+        expect(@submission.grading_error_message).to include('unpublished')
+      end
+    end
+
+    context 'when the grader does not have the right to manage grades for the course' do
+      before(:each) do
+        @course.stubs(:grants_right?).with(@grader, nil, :manage_grades).returns(false)
+
+        @status = @submission.grants_right?(@grader, :grade)
+      end
+
+      it 'returns false' do
+        expect(@status).to be_falsey
+      end
+
+      it 'sets an appropriate error message' do
+        expect(@submission.grading_error_message).to include('manage grades')
+      end
+    end
+
+    context 'when the grader is a teacher and the assignment is in a closed grading period' do
+      before(:each) do
+        @course.stubs(:account_membership_allows).with(@grader).returns(false)
+        @assignment.stubs(:in_closed_grading_period_for_student?).with(42).returns(true)
+
+        @status = @submission.grants_right?(@grader, :grade)
+      end
+
+      it 'returns false' do
+        expect(@status).to be_falsey
+      end
+
+      it 'sets an appropriate error message' do
+        expect(@submission.grading_error_message).to include('closed grading period')
+      end
+    end
+
+    context "when grader_id is a teacher's id and the assignment is in a closed grading period" do
+      before(:each) do
+        @course.stubs(:account_membership_allows).with(@grader).returns(false)
+        @assignment.stubs(:in_closed_grading_period_for_student?).with(42).returns(true)
+        @submission.grader = nil
+        @submission.grader_id = 10
+
+        @status = @submission.grants_right?(@grader, :grade)
+      end
+
+      it 'returns false' do
+        expect(@status).to be_falsey
+      end
+
+      it 'sets an appropriate error message' do
+        expect(@submission.grading_error_message).to include('closed grading period')
+      end
+    end
+
+    it 'returns true if the grader is an admin even if the assignment is in
+        a closed grading period' do
+      @course.stubs(:account_membership_allows).with(@grader).returns(true)
+      @assignment.stubs(:in_closed_grading_period_for_student?).with(10).returns(false)
+
+      expect(@submission.grants_right?(@grader, :grade)).to be_truthy
+    end
+  end
+
+  describe '#can_autograde?' do
+    before(:each) do
+      @account = Account.new
+      @course = Course.new(account: @account)
+      @assignment = Assignment.new(course: @course)
+      @submission = Submission.new(assignment: @assignment)
+
+      @submission.grader_id = -1
+      @submission.user_id = 10
+
+      @assignment.stubs(:published?).returns(true)
+      @assignment.stubs(:in_closed_grading_period_for_student?).with(10).returns(false)
+    end
+
+    it 'returns true for published assignments with an autograder and when the assignment is not
+        in a closed grading period' do
+      expect(@submission.grants_right?(nil, :autograde)).to be_truthy
+    end
+
+    context 'when assignment is unpublished' do
+      before(:each) do
+        @assignment.stubs(:published?).returns(false)
+
+        @status = @submission.grants_right?(nil, :autograde)
+      end
+
+      it 'returns false' do
+        expect(@status).to be_falsey
+      end
+
+      it 'sets an appropriate error message' do
+        expect(@submission.grading_error_message).to include('unpublished')
+      end
+    end
+
+    context 'when the grader is not an autograder' do
+      before(:each) do
+        @submission.grader_id = 1
+
+        @status = @submission.grants_right?(nil, :autograde)
+      end
+
+      it 'returns false' do
+        expect(@status).to be_falsey
+      end
+
+      it 'sets an appropriate error message' do
+        expect(@submission.grading_error_message).to include('autograded')
+      end
+    end
+
+    context 'when the assignment is in a closed grading period for the student' do
+      before(:each) do
+        @assignment.stubs(:in_closed_grading_period_for_student?).with(10).returns(true)
+
+        @status = @submission.grants_right?(nil, :autograde)
+      end
+
+      it 'returns false' do
+        expect(@status).to be_falsey
+      end
+
+      it 'sets an appropriate error message' do
+        expect(@submission.grading_error_message).to include('closed grading period')
       end
     end
   end
@@ -991,13 +1197,13 @@ describe Submission do
     end
 
     it "should be unread after assignment is graded" do
-      @submission = @assignment.grade_student(@user, { :grade => 3 }).first
+      @submission = @assignment.grade_student(@user, grade: 3, grader: @teacher).first
       expect(@submission.unread?(@user)).to be_truthy
     end
 
     it "should be unread after submission is graded" do
       @assignment.submit_homework(@user)
-      @submission = @assignment.grade_student(@user, { :grade => 3 }).first
+      @submission = @assignment.grade_student(@user, grade: 3, grader: @teacher).first
       expect(@submission.unread?(@user)).to be_truthy
     end
 
@@ -1081,7 +1287,7 @@ describe Submission do
     end
 
     it "is true for graded assignments" do
-      submission, _ = @assignment.grade_student(@user, grade: 1)
+      submission = @assignment.grade_student(@user, grade: 1, grader: @teacher)[0]
       expect(submission).to be_graded
     end
 
@@ -1616,7 +1822,7 @@ describe Submission do
     end
 
     it "should maintain grade when only updating comments" do
-      @a1.grade_student(@u1, :grade => 3)
+      @a1.grade_student(@u1, grade: 3, grader: @teacher)
       Submission.process_bulk_update(@progress, @course, nil, @teacher,
                                      {
                                        @a1.id => {
@@ -1628,7 +1834,7 @@ describe Submission do
     end
 
     it "should nil grade when receiving empty posted_grade" do
-      @a1.grade_student(@u1, :grade => 3)
+      @a1.grade_student(@u1, grade: 3, grader: @teacher)
       Submission.process_bulk_update(@progress, @course, nil, @teacher,
                                      {
                                        @a1.id => {
@@ -1887,6 +2093,102 @@ describe Submission do
       comment = @submission.add_comment(author: @teacher, comment: '42', draft_comment: false)
 
       expect(comment).not_to be_draft
+    end
+  end
+
+  describe "#last_teacher_comment" do
+    before(:once) do
+      submission_spec_model
+    end
+
+    it "returns the last published comment made by the teacher" do
+      @submission.add_comment(author: @teacher, comment: "how is babby formed")
+      expect(@submission.last_teacher_comment).to be_present
+    end
+
+    it "does not include draft comments" do
+      @submission.add_comment(author: @teacher, comment: "how is babby formed", draft_comment: true)
+      expect(@submission.last_teacher_comment).to be_nil
+    end
+  end
+
+  describe '#ensure_grader_can_grade' do
+    before(:each) do
+      @submission = Submission.new()
+    end
+
+    context 'when #grader_can_grade? returns true' do
+      before(:each) do
+        @submission.expects(:grader_can_grade?).returns(true)
+      end
+
+      it 'returns true' do
+        expect(@submission.ensure_grader_can_grade).to be_truthy
+      end
+
+      it 'does not add any errors to @submission' do
+        @submission.ensure_grader_can_grade
+
+        expect(@submission.errors.full_messages).to be_empty
+      end
+    end
+
+    context 'when #grader_can_grade? returns false' do
+      before(:each) do
+        @submission.expects(:grader_can_grade?).returns(false)
+      end
+
+      it 'returns false' do
+        expect(@submission.ensure_grader_can_grade).to be_falsey
+      end
+
+      it 'adds an error to the :grade field' do
+        @submission.ensure_grader_can_grade
+
+        expect(@submission.errors[:grade]).not_to be_empty
+      end
+    end
+  end
+
+  describe '#grader_can_grade?' do
+    before(:each) do
+      @submission = Submission.new()
+    end
+
+    it "returns true if grade hasn't been changed" do
+      @submission.expects(:grade_changed?).returns(false)
+
+      expect(@submission.grader_can_grade?).to be_truthy
+    end
+
+    it "returns true if the submission is autograded and the submission can be autograded" do
+      @submission.expects(:grade_changed?).returns(true)
+
+      @submission.expects(:autograded?).returns(true)
+      @submission.expects(:grants_right?).with(nil, :autograde).returns(true)
+
+      expect(@submission.grader_can_grade?).to be_truthy
+    end
+
+    it "returns true if the submission isn't autograded but can still be graded" do
+      @submission.expects(:grade_changed?).returns(true)
+      @submission.expects(:autograded?).returns(false)
+
+      @submission.grader = @grader = User.new
+
+      @submission.expects(:grants_right?).with(@grader, :grade).returns(true)
+
+      expect(@submission.grader_can_grade?).to be_truthy
+    end
+
+    it "returns false if the grade changed but the submission can't be graded at all" do
+      @submission.grader = @grader = User.new
+
+      @submission.expects(:grade_changed?).returns(true)
+      @submission.expects(:autograded?).returns(false)
+      @submission.expects(:grants_right?).with(@grader, :grade).returns(false)
+
+      expect(@submission.grader_can_grade?).to be_falsey
     end
   end
 end

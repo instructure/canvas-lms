@@ -6,14 +6,29 @@
   <div class="border border-trbl border-round">
     {{!-- Group Assignment selection --}}
     <label class="checkbox flush" for="has_group_category">
-      {{checkbox "has_group_category"
-      id="has_group_category"
-      prefix=prefix
-      checked=groupCategoryId
-      aria-role="option"
-      aria-checked=ariaChecked
-      aria-controls="group_category_options"
-      disabled=hasGroupCategoryDisabled}}
+      {{#if inClosedGradingPeriod}}
+        {{checkbox "has_group_category"
+          id="has_group_category"
+          prefix=prefix
+          checked=groupCategoryId
+          aria-role="option"
+          aria-checked=ariaChecked
+          aria-controls="group_category_options"
+          readonly="readonly"
+          aria-readonly="true"
+          disabled=hasGroupCategoryDisabled
+        }}
+      {{else}}
+        {{checkbox "has_group_category"
+          id="has_group_category"
+          prefix=prefix
+          checked=groupCategoryId
+          aria-role="option"
+          aria-checked=ariaChecked
+          aria-controls="group_category_options"
+          disabled=hasGroupCategoryDisabled
+        }}
+      {{/if}}
       {{#if fieldLabel}}{{fieldLabel}}{{else}}{{#t "is_group_assignment"}}This is a Group Assignment{{/t}}{{/if}}
     </label>
 
@@ -22,11 +37,23 @@
       <div class="nested">
         {{#unless hideGradeIndividually}}
           <label class="checkbox" for="assignment_grade_students_individually">
-            {{checkbox "grade_group_students_individually"
-              id="assignment_grade_students_individually"
-              prefix=prefix
-              checked=gradeGroupStudentsIndividually
-              disabled=gradeIndividuallyDisabled}}
+            {{#if inClosedGradingPeriod}}
+              {{checkbox "grade_group_students_individually"
+                id="assignment_grade_students_individually"
+                prefix=prefix
+                checked=gradeGroupStudentsIndividually
+                readonly="readonly"
+                aria-readonly="true"
+                disabled=gradeIndividuallyDisabled
+              }}
+            {{else}}
+              {{checkbox "grade_group_students_individually"
+                id="assignment_grade_students_individually"
+                prefix=prefix
+                checked=gradeGroupStudentsIndividually
+                disabled=gradeIndividuallyDisabled
+              }}
+            {{/if}}
             {{#t "grade_group_students_individually"}}
               Assign Grades to Each Student Individually
             {{/t}}
@@ -39,6 +66,10 @@
         </label>
         <select id="assignment_group_category_id"
           name="{{#if nested}}assignment[group_category_id]{{else}}group_category_id{{/if}}"
+          {{#if inClosedGradingPeriod}}
+            readonly
+            aria-readonly="true"
+          {{/if}}
           aria-labelledby="assignment_group_category_id_label"
           {{disabledIf groupCategoryIdDisabled}}>
           {{#each groupCategories}}
@@ -49,7 +80,15 @@
           <option value="blank" {{selectedIf originalGroupRemoved}}></option>
         </select>
         <div>
-          <button class="Button" type="button" id="create_group_category_id" {{disabledIf groupCategoryIdDisabled}}>{{#t}}New Group Category{{/t}}</button>
+          <button
+            class="Button"
+            type="button"
+            id="create_group_category_id"
+            {{disabledIf inClosedGradingPeriod}}
+            {{disabledIf groupCategoryIdDisabled}}
+            >
+            {{#t}}New Group Category{{/t}}
+          </button>
         </div>
       </div>
     </div>

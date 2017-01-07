@@ -219,6 +219,7 @@ describe AssignmentGroupsController do
         @submission = bare_submission_model(@assignment, @student, {
           score: '25',
           grade: '25',
+          grader: @teacher,
           submitted_at: Time.zone.now
         })
       end
@@ -234,6 +235,20 @@ describe AssignmentGroupsController do
         })
         expect(json[0]['assignments'][0]['submission']).to be_present
         expect(json[0]['assignments'][0]['submission']['id']).to eq @submission.id
+      end
+
+      it 'only makes the call to get effective due dates once when assignments are included' do
+        @course.assignments.create!
+        stub = EffectiveDueDates.for_course(@course)
+        EffectiveDueDates.expects(:for_course).once.returns(stub)
+        api_call_as_user(@teacher, :get,
+          "/api/v1/courses/#{@course.id}/assignment_groups", {
+          controller: 'assignment_groups',
+          action: 'index',
+          format: 'json',
+          course_id: @course.id,
+          include: ['assignments']
+        })
       end
     end
   end
@@ -324,6 +339,24 @@ describe AssignmentGroupsController do
         expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment2.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
+      end
+
+      it 'allows assignments with no effective due date in a closed grading period to be moved into different groups' do
+        user_session(@teacher)
+        student = @course.students.first
+
+        override = @assignment2.assignment_overrides.create!(due_at: 1.month.from_now, due_at_overridden: true)
+        override.assignment_override_students.create!(user: student)
+
+        @order = "#{@assignment3.id},#{@assignment2.id}"
+
+        post :reorder_assignments, course_id: @course.id, assignment_group_id: @group2.id, order: @order
+        expect(response).to be_success
+        expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
+        expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
+        expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
+        expect(@assignment2.position).to eql(2)
+        expect(@assignment3.position).to eql(1)
       end
 
       it 'allows assignments not in closed grading periods to be moved into different assignment groups' do

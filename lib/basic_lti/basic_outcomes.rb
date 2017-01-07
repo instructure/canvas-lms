@@ -124,6 +124,15 @@ module BasicLTI
         @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > url').try(:content)
       end
 
+      def result_data_download_url
+        url = @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > downloadUrl').try(:content)
+        name = @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > documentName').try(:content)
+        return {
+          url: url,
+          name: name
+        } if url && name
+      end
+
       def result_data_launch_url
         @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > ltiLaunchUrl').try(:content)
       end
@@ -204,6 +213,23 @@ module BasicLTI
         elsif (url = result_data_url)
           submission_hash[:url] = url
           submission_hash[:submission_type] = 'online_url'
+        elsif (result_data = result_data_download_url)
+          url = result_data[:url]
+          attachment = assignment.attachments.create!(
+            display_name: result_data[:name],
+            file_state: 'deleted',
+            workflow_state: 'unattached',
+            user: user
+          )
+
+          job_options = {
+            :priority => Delayed::LOW_PRIORITY,
+            :max_attempts => 1,
+            :n_strand => 'file_download'
+          }
+          attachment.send_later_enqueue_args(:clone_url, job_options, url, 'rename', true)
+          submission_hash[:attachments] = [attachment]
+          submission_hash[:submission_type] = 'online_upload'
         elsif (launch_url = result_data_launch_url)
           submission_hash[:url] = launch_url
           submission_hash[:submission_type] = 'basic_lti_launch'
@@ -211,12 +237,13 @@ module BasicLTI
           submission_hash[:submission_type] = 'external_tool'
         end
 
-
         if raw_score
           submission_hash[:grade] = raw_score
+          submission_hash[:grader_id] = -_tool.id
         elsif new_score
           if (0.0 .. 1.0).include?(new_score)
             submission_hash[:grade] = "#{round_if_whole(new_score * 100)}%"
+            submission_hash[:grader_id] = -_tool.id
           else
             error_message = I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1")
           end
@@ -245,6 +272,7 @@ to because the assignment has no points possible.
 
           if new_score || raw_score
             submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
+            submission_hash[:grader_id] = -_tool.id
             @submission = assignment.grade_student(user, submission_hash).first
           end
 
@@ -261,8 +289,8 @@ to because the assignment has no points possible.
         true
       end
 
-      def handle_deleteResult(tool, course, assignment, user)
-        assignment.grade_student(user, :grade => nil)
+      def handle_deleteResult(tool, _course, assignment, user)
+        assignment.grade_student(user, :grade => nil, grader_id: -tool.id)
         self.body = "<deleteResultResponse />"
         true
       end

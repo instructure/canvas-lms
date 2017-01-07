@@ -522,6 +522,7 @@ class OutcomeGroupsApiController < ApplicationController
 
     @outcome_group = context_outcome_groups.find(params[:id])
     @outcome_link = @outcome_group.child_outcome_links.active.where(content_id: params[:outcome_id]).first
+
     raise ActiveRecord::RecordNotFound unless @outcome_link
     begin
       @outcome_link.destroy

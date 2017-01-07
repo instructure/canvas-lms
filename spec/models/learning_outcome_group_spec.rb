@@ -19,52 +19,238 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcomeGroup do
-  
+
   before :each do
     course
     @root = @course.root_outcome_group
   end
-  
-  it "should not create multiple default groups" do
-    group = @course.root_outcome_group
-    expect(group).to eq @root
-  end
-  
-  it "should not add itself as a child" do
-    expect(@root.child_outcome_groups.count).to eq 0
-    @root.adopt_outcome_group(LearningOutcomeGroup.find(@root.id))
-    expect(@root.child_outcome_groups.count).to eq 0
-  end
-  
-  it "should not let adopt_outcome_group cause disgusting ancestral relations" do
-    group = @course.learning_outcome_groups.create!(:title => 'groupage')
-    group2 = @course.learning_outcome_groups.create!(:title => 'groupage2')
-    @root.adopt_outcome_group(group)
-    @root.adopt_outcome_group(group2)
-    
-    group.adopt_outcome_group(group2)
-    expect(group.child_outcome_groups.count).to eq 1
-    expect(@root.child_outcome_groups.count).to eq 1
 
-    # shouldn't work because group is already group2's parent
-    group2.adopt_outcome_group(group)
-    expect(group2.child_outcome_groups.count).to eq 0
-    expect(group.child_outcome_groups.count).to eq 1
-    expect(@root.child_outcome_groups.count).to eq 1
+  def long_text(max = 65535)
+    text = ''
+    (0...max+1).each do |num|
+      text.concat(num.to_s)
+    end
+    text
   end
 
-  it "should allowing touching the context to be skipped" do
-    group = @course.learning_outcome_groups.create!(:title => 'groupage')
-    group.add_outcome @course.created_learning_outcomes.create!(:title => 'o1')
-    group.add_outcome @course.created_learning_outcomes.create!(:title => 'o2')
-    group.add_outcome @course.created_learning_outcomes.create!(:title => 'o3')
+  context 'object creation' do
+    it "does not create multiple default groups" do
+      group = @course.root_outcome_group
+      expect(group).to eq @root
+    end
 
-    time = 1.hour.ago
-    Course.where(:id => @course).update_all(:updated_at => time)
+    it "does not add itself as a child" do
+      expect(@root.child_outcome_groups.count).to eq 0
+      @root.adopt_outcome_group(LearningOutcomeGroup.find(@root.id))
+      expect(@root.child_outcome_groups.count).to eq 0
+    end
 
-    group.skip_tag_touch = true
-    group.destroy
+    it "does not let adopt_outcome_group cause disgusting ancestral relations" do
+      group = @course.learning_outcome_groups.create!(:title => 'groupage')
+      group2 = @course.learning_outcome_groups.create!(:title => 'groupage2')
+      @root.adopt_outcome_group(group)
+      @root.adopt_outcome_group(group2)
 
-    expect(@course.reload.updated_at.to_i).to eq time.to_i
+      group.adopt_outcome_group(group2)
+      expect(group.child_outcome_groups.count).to eq 1
+      expect(@root.child_outcome_groups.count).to eq 1
+
+      # shouldn't work because group is already group2's parent
+      group2.adopt_outcome_group(group)
+      expect(group2.child_outcome_groups.count).to eq 0
+      expect(group.child_outcome_groups.count).to eq 1
+      expect(@root.child_outcome_groups.count).to eq 1
+    end
+
+    it "allows touching the context to be skipped" do
+      group = @course.learning_outcome_groups.create!(:title => 'groupage')
+      group.add_outcome @course.created_learning_outcomes.create!(:title => 'o1')
+      group.add_outcome @course.created_learning_outcomes.create!(:title => 'o2')
+      group.add_outcome @course.created_learning_outcomes.create!(:title => 'o3')
+
+      time = 1.hour.ago
+      Course.where(:id => @course).update_all(:updated_at => time)
+
+      group.skip_tag_touch = true
+      group.destroy
+
+      expect(@course.reload.updated_at.to_i).to eq time.to_i
+    end
+
+    it 'validates presense of title' do
+      expect{ @course.learning_outcome_groups.create! }.to raise_error(
+        ActiveRecord::RecordInvalid, "Validation failed: Title can't be blank"
+      )
+    end
+
+    it 'validates length of title' do
+      expect{ @course.learning_outcome_groups.create!(title: long_text(255)) }.to raise_error(
+        ActiveRecord::RecordInvalid,
+        "Validation failed: Title is too long (maximum is 255 characters)"
+      )
+    end
+
+    it 'validates length of description' do
+      expect{ @course.learning_outcome_groups.create!(title: 'foobar', description: long_text) }.to raise_error(
+        ActiveRecord::RecordInvalid,
+        "Validation failed: Description is too long (maximum is 65535 characters)"
+      )
+    end
+  end
+
+  describe '#parent_ids' do
+    it 'returns non-empty array' do
+      group = @course.learning_outcome_groups.create!(:title => 'groupage')
+
+      expect(group.parent_ids).to be_a_kind_of(Array)
+      expect(group.parent_ids).not_to be_empty
+    end
+
+    it 'correctly references parents' do
+      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
+      child_outcome_group = group1.add_outcome_group(group2)
+
+      expect(child_outcome_group.parent_ids).to include(group1.id)
+    end
+  end
+
+  describe '#add_outcome' do
+    it 'creates a link between the group and an outcome' do
+      group = @course.learning_outcome_groups.create!(:title => 'groupage')
+      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+
+      expect(group.child_outcome_links.map(&:content_id)).not_to include(outcome.id)
+      group.add_outcome(outcome)
+      expect(group.child_outcome_links.map(&:content_id)).to include(outcome.id)
+    end
+
+    it 'no-ops if a link already exists' do
+      group = @course.learning_outcome_groups.create!(:title => 'groupage')
+      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+
+      group.add_outcome(outcome)
+      expect(group.child_outcome_links.count).to eq(1)
+
+      group.add_outcome(outcome)
+      expect(group.child_outcome_links.count).to eq(1)
+    end
+  end
+
+  describe '#add_outcome_group' do
+    it 'adds a child outcome group and copies all contents' do
+      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
+      outcome1 = @course.created_learning_outcomes.create!(:title => 'o1')
+      group2.add_outcome(outcome1)
+
+      expect(group1.child_outcome_groups).to be_empty
+
+      child_outcome_group = group1.add_outcome_group(group2)
+
+      expect(child_outcome_group.title).to eq(group2.title)
+      expect(child_outcome_group.child_outcome_links.map(&:content_id)).to eq(
+        group2.child_outcome_links.map(&:content_id)
+      )
+    end
+  end
+
+  describe '#adopt_outcome_link' do
+    it 'moves an existing outcome link from to this group if groups in same context' do
+      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
+      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      outcome_link = group2.add_outcome(outcome)
+
+      expect(outcome_link.associated_asset).to eq(group2)
+
+      group1.adopt_outcome_link(outcome_link)
+
+      expect(outcome_link.associated_asset).to eq(group1)
+    end
+
+    it 'no-ops if group is already owner' do
+      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      outcome_link = group1.add_outcome(outcome)
+
+      expect(outcome_link.associated_asset).to eq(group1)
+
+      expect{ group1.adopt_outcome_link(outcome_link) }.
+        not_to change{ outcome_link.associated_asset }
+    end
+  end
+
+  describe '#adopt_outcome_group' do
+    it 'moves an existing outcome link from to this group if groups in same context' do
+      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
+
+      expect(group2.parent_outcome_group).not_to eq(group1)
+
+      group1.adopt_outcome_group(group2)
+
+      expect(group2.parent_outcome_group).to eq(group1)
+    end
+
+    it 'no-ops if group is already parent' do
+      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+
+      expect{ group1.adopt_outcome_group(group1) }.
+        not_to change{ group1.learning_outcome_group_id }
+    end
+  end
+
+  describe '.for_context' do
+    it 'returns all learning outcome groups for a context' do
+      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      expect(LearningOutcomeGroup.for_context(@course)).to include(group1)
+    end
+  end
+
+  describe '.global_root_outcome_group' do
+    it 'finds or creates a root outcome group' do
+      expect(LearningOutcomeGroup.global_root_outcome_group.title).to eq("ROOT")
+      expect(LearningOutcomeGroup.global_root_outcome_group.parent_outcome_group).to be_nil
+    end
+  end
+
+  describe '.find_or_create_root' do
+    it 'finds or creates a root outcome group of a given context' do
+      root = LearningOutcomeGroup.find_or_create_root(nil, true)
+      expect(root.title).to eq("ROOT")
+
+      course_root = LearningOutcomeGroup.find_or_create_root(@course, true)
+      expect(course_root.title).to eq("Unnamed Course")
+
+      expect(root).not_to eq(course_root)
+    end
+  end
+
+  describe '#destroy' do
+    it 'destroys all children links' do
+      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
+      outcome1 = @course.created_learning_outcomes.create!(:title => 'o1')
+      outcome2 = @course.created_learning_outcomes.create!(:title => 'o2')
+
+      group1.add_outcome(outcome1)
+      group2.add_outcome(outcome2)
+      group1.add_outcome_group(group2)
+
+      active_child_outcomes = group1.child_outcome_links.select{|ol| ol.workflow_state == "active"}
+      active_child_groups = group1.child_outcome_groups.active
+      expect(active_child_outcomes).not_to be_empty
+      expect(active_child_groups).not_to be_empty
+
+      group1.destroy
+      group1.reload
+
+      active_child_outcomes = group1.child_outcome_links.select{|ol| ol.workflow_state == "active"}
+      active_child_groups = group1.child_outcome_groups.active
+      expect(group1.workflow_state).to eq('deleted')
+      expect(active_child_outcomes).to be_empty
+      expect(active_child_groups).to be_empty
+    end
   end
 end

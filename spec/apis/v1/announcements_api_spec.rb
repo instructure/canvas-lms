@@ -27,6 +27,17 @@ describe "Announcements API", type: :request do
     @ann1.posted_at = 7.days.ago
     @ann1.save!
 
+    # For testing chronological ordering
+    @anns = []
+
+    1.upto(5) do |i|
+      ann = @course1.announcements.build :title => "Accountment 1.#{i}", message: i
+      ann.posted_at = (7 - i).days.ago # To make them more recent each time
+      ann.save!
+
+      @anns << ann
+    end
+
     course_with_teacher :active_all => true, :user => @teacher
     student_in_course :active_enrollment => true, :user => @student
     @course2 = @course
@@ -62,7 +73,7 @@ describe "Announcements API", type: :request do
     it "returns announcements for the the surrounding 14 days by default" do
       json = api_call_as_user(@teacher, :get, "/api/v1/announcements",
                       @params.merge(:context_codes => [ "course_#{@course1.id}", "course_#{@course2.id}" ]))
-      expect(json.length).to eq 1
+      expect(json.length).to eq 6
       expect(json[0]['context_code']).to eq "course_#{@course1.id}"
     end
 
@@ -72,10 +83,11 @@ describe "Announcements API", type: :request do
       json = api_call_as_user(@teacher, :get, "/api/v1/announcements",
                       @params.merge(:context_codes => [ "course_#{@course1.id}", "course_#{@course2.id}" ],
                                     :start_date => start_date, :end_date => end_date))
-      expect(json.length).to eq 2
-      expect(json.map { |e| [e['context_code'], e['id']] }).to match_array(
-        [["course_#{@course1.id}", @ann1.id], ["course_#{@course2.id}", @ann2.id]]
-      )
+
+      all_anns = @anns.map { |e| [e['context_code'], e['id']] }
+      all_anns.concat([["course_#{@course1.id}", @ann1.id], ["course_#{@course2.id}", @ann2.id]])
+      expect(json.length).to eq 7
+      expect(json.map { |e| [e['context_code'], e['id']] }).to match_array all_anns
     end
 
     it "validates date formats" do
@@ -106,6 +118,14 @@ describe "Announcements API", type: :request do
       expect(next_link).to match /\/api\/v1\/announcements/
       expect(next_link).to include "page=2"
     end
+
+    it "orders by reverse chronological order" do
+      json = api_call_as_user(@teacher, :get, "/api/v1/announcements",
+                      @params.merge(:context_codes => [ "course_#{@course1.id}" ]))
+      expect(json.length).to eq 6
+      expect(json[0]['context_code']).to eq "course_#{@course1.id}"
+      expect(json.map { |thing| thing['id'] }).to eq @anns.map(&:id).reverse << @ann1.id
+    end
   end
 
   context "as student" do
@@ -115,8 +135,8 @@ describe "Announcements API", type: :request do
       json = api_call_as_user(@student, :get, "/api/v1/announcements",
                       @params.merge(:context_codes => [ "course_#{@course1.id}", "course_#{@course2.id}" ],
                                     :start_date => start_date, :end_date => end_date))
-      expect(json.length).to eq 1
-      expect(json.map { |thing| thing['id'] }).to eq [@ann1.id]
+      expect(json.length).to eq 6
+      expect(json.map { |thing| thing['id'] }).to eq @anns.map(&:id).reverse << @ann1.id
     end
 
     it "excludes 'active' announcements with future `delayed_post_at`" do
@@ -126,8 +146,8 @@ describe "Announcements API", type: :request do
       json = api_call_as_user(@student, :get, "/api/v1/announcements",
                       @params.merge(:context_codes => [ "course_#{@course1.id}", "course_#{@course2.id}" ],
                                     :start_date => start_date, :end_date => end_date))
-      expect(json.length).to eq 1
-      expect(json.map { |thing| thing['id'] }).to eq [@ann1.id]
+      expect(json.length).to eq 6
+      expect(json.map { |thing| thing['id'] }).to eq @anns.map(&:id).reverse << @ann1.id
     end
 
 
@@ -139,8 +159,8 @@ describe "Announcements API", type: :request do
       json = api_call_as_user(@student, :get, "/api/v1/announcements",
                       @params.merge(:context_codes => [ "course_#{@course1.id}", "course_#{@course2.id}" ],
                                     :start_date => start_date, :end_date => end_date))
-      expect(json.length).to eq 1
-      expect(json.map { |thing| thing['id'] }).to eq [@ann1.id]
+      expect(json.length).to eq 6
+      expect(json.map { |thing| thing['id'] }).to eq @anns.map(&:id).reverse << @ann1.id
     end
 
     it "excludes courses not in the context_ids list" do

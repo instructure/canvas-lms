@@ -68,6 +68,15 @@ describe Api::V1::User do
       )
     end
 
+    it 'only loads pseudonyms for the user once, even if there are multiple enrollments' do
+      sis_stub = SisPseudonym.for(@student, @course, true)
+      SisPseudonym.expects(:for).once.returns(sis_stub)
+      ta_enrollment = ta_in_course(user: @student, course: @course)
+      teacher_enrollment = teacher_in_course(user: @student, course: @course)
+      @test_api.current_user = @admin
+      @test_api.user_json(@student, @admin, {}, [], @course, [ta_enrollment, teacher_enrollment])
+    end
+
     it 'should support optionally including group_ids' do
       @group = @course.groups.create!(:name => "My Group")
       @group.add_user(@student, 'accepted', true)
@@ -1661,6 +1670,143 @@ describe "Users API", type: :request do
         )
         expect(json['hexcode']).to eq '#ababab'
       end
+    end
+  end
+
+  describe "dashboard positions" do
+    before :each do
+      @a = Account.default
+      @u = user(:active_all => true)
+      @a.account_users.create!(user: @u)
+    end
+
+    describe "GET dashboard positions" do
+      before :each do
+        @user.preferences[:dashboard_positions] = {
+          "course_1" => 3,
+          "course_2" => 1,
+          "course_3" => 2
+        }
+        @user.save!
+      end
+
+      it "should return dashboard postions for a user" do
+        json = api_call(
+          :get,
+          "/api/v1/users/#{@user.id}/dashboard_positions",
+          { controller: "users", action: "get_dashboard_positions", format: "json",
+            id: @user.to_param
+          },
+          {:expected_status => 200}
+        )
+        expect(json["dashboard_positions"].size).to eq 3
+      end
+
+      it "should return an empty if the user has no ordering set" do
+        @user.preferences.delete(:dashboard_positions)
+        @user.save!
+
+        json = api_call(
+          :get,
+          "/api/v1/users/#{@user.id}/dashboard_positions",
+          { controller: "users", action: "get_dashboard_positions", format: "json",
+            id: @user.to_param
+          },
+          {:expected_status => 200}
+        )
+        expect(json["dashboard_positions"].size).to eq 0
+      end
+    end
+
+    describe "PUT dashboard positions" do
+      it "should allow setting dashboard positions" do
+        course1 = course(:active_all => true)
+        course2 = course(:active_all => true)
+        json = api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/dashboard_positions",
+          { controller: "users", action: "set_dashboard_positions", format: "json",
+            id: @user.to_param
+          },
+          {
+            dashboard_positions: {
+              "course_#{course1.id}" => 3,
+              "course_#{course2.id}" => 1,
+            }
+          },
+          {},
+          {:expected_status => 200}
+        )
+        expected = {
+          "course_#{course1.id}" => "3",
+          "course_#{course2.id}" => "1",
+        }
+        expect(json["dashboard_positions"]).to eq expected
+      end
+
+      it "should not allow creating entries for entities that do not exist" do
+        course1 = course(:active_all => true)
+        course1.enroll_user(@user, "TeacherEnrollment").accept!
+        api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/dashboard_positions",
+          { controller: "users", action: "set_dashboard_positions", format: "json",
+            id: @user.to_param
+          },
+          {
+            dashboard_positions: {
+              "course_#{course1.id}" => 3,
+              "course_100001" => 1,
+            }
+          },
+          {},
+          {:expected_status => 404}
+        )
+      end
+
+      it "should not allow creating entries for entities that the user doesn't have read access to" do
+        course_with_student(:active_all => true)
+        course1 = @course
+        course2 = course
+
+        api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/dashboard_positions",
+          { controller: "users", action: "set_dashboard_positions", format: "json",
+            id: @user.to_param
+          },
+          {
+            dashboard_positions: {
+              "course_#{course1.id}" => 3,
+              "course_#{course2.id}" => 1,
+            }
+          },
+          {},
+          {:expected_status => 401}
+        )
+      end
+
+      it "should not allow setting positions to strings" do
+        course1 = course(:active_all => true)
+        course2 = course(:active_all => true)
+
+        api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/dashboard_positions",
+          { controller: "users", action: "set_dashboard_positions", format: "json",
+            id: @user.to_param
+          },
+          {
+            dashboard_positions: {
+              "course_#{course1.id}" => "top",
+              "course_#{course2.id}" => 1,
+            }
+          },
+          {},
+          {:expected_status => 400}
+        )
+      end
+
     end
   end
 

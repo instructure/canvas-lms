@@ -29,10 +29,10 @@ class AssignmentApiHarness
 end
 
 describe "Api::V1::Assignment" do
+  subject(:api) { AssignmentApiHarness.new }
+  let(:assignment) { assignment_model }
 
   describe "#assignment_json" do
-    let(:api) { AssignmentApiHarness.new }
-    let(:assignment) { assignment_model }
     let(:user) { user_model }
     let(:session) { Object.new }
 
@@ -128,6 +128,125 @@ describe "Api::V1::Assignment" do
     it "#vericite_settings_hash returns a Hash with indifferent access" do
       vericite_hash = assignment.vericite_settings_hash(test_params)
       expect(vericite_hash).to be_instance_of(HashWithIndifferentAccess)
+    end
+  end
+
+  describe "#assignment_editable_fields_valid?" do
+    let(:user) { Object.new }
+    let(:course) { Course.new }
+    let(:assignment) do
+      Assignment.new do |a|
+        a.title = 'foo'
+        a.submission_types = 'online'
+        a.course = course
+      end
+    end
+
+    context "given a user who is an admin" do
+      before do
+        course.expects(:account_membership_allows).returns(true)
+      end
+
+      it "is valid when user is an account admin" do
+        is_expected.to be_assignment_editable_fields_valid(assignment, user)
+      end
+    end
+
+    context "given a user who is not an admin" do
+      before do
+        assignment.course.expects(:account_membership_allows).returns(false)
+      end
+
+      it "is valid when not in a closed grading period" do
+        assignment.expects(:in_closed_grading_period?).returns(false)
+        is_expected.to be_assignment_editable_fields_valid(assignment, user)
+      end
+
+      context "in a closed grading period" do
+        let(:course) { Course.create! }
+        let(:assignment) do
+          course.assignments.create!(title: 'First Title', submission_types: 'online_quiz')
+        end
+
+        before do
+          assignment.expects(:in_closed_grading_period?).returns(true)
+        end
+
+        it "is valid when it was not gradeable and is still not gradeable " \
+          "(!gradeable_was? && !gradeable?)" do
+          assignment.update!(submission_types: 'not_gradeable')
+          assignment.submission_types = 'wiki_page'
+          expect(api).to be_assignment_editable_fields_valid(assignment, user)
+        end
+
+        it "is invalid when it was gradeable and is now not gradeable" do
+          assignment.update!(submission_types: 'online')
+          assignment.title = 'Changed Title'
+          assignment.submission_types = 'not_graded'
+          expect(api).not_to be_assignment_editable_fields_valid(assignment, user)
+        end
+
+        it "is invalid when it was not gradeable and is now gradeable" do
+          assignment.update!(submission_types: 'not_gradeable')
+          assignment.title = 'Changed Title'
+          assignment.submission_types = 'online_quiz'
+          expect(api).not_to be_assignment_editable_fields_valid(assignment, user)
+        end
+
+        it "is invalid when it was gradeable and is still gradeable" do
+          assignment.update!(submission_types: 'on_paper')
+          assignment.title = 'Changed Title'
+          assignment.submission_types = 'online_upload'
+          expect(api).not_to be_assignment_editable_fields_valid(assignment, user)
+        end
+
+        it "detects changes to title and responds with those errors on the name field" do
+          assignment.title = 'Changed Title'
+          expect(api).not_to be_assignment_editable_fields_valid(assignment, user)
+          expect(assignment.errors).to include :name
+        end
+
+        it "is valid if description changed" do
+          assignment.description = "changing the description is allowed!"
+          expect(api).to be_assignment_editable_fields_valid(assignment, user)
+          expect(assignment.errors).to be_empty
+        end
+
+        it "is valid if submission_types changed" do
+          assignment.submission_types = 'on_paper'
+          expect(api).to be_assignment_editable_fields_valid(assignment, user)
+        end
+
+        it "is valid if peer_reviews changed" do
+          assignment.toggle(:peer_reviews)
+          expect(api).to be_assignment_editable_fields_valid(assignment, user)
+        end
+
+        it "is valid if peer_review_count changed" do
+          assignment.peer_review_count = 500
+          expect(api).to be_assignment_editable_fields_valid(assignment, user)
+        end
+
+        it "is valid if anonymous_peer_reviews changed" do
+          assignment.toggle(:anonymous_peer_reviews)
+          expect(api).to be_assignment_editable_fields_valid(assignment, user)
+        end
+
+        it "is valid if peer_reviews_due_at changed" do
+          assignment.peer_reviews_due_at = Time.zone.now
+          expect(api).to be_assignment_editable_fields_valid(assignment, user)
+        end
+
+        it "is valid if automatic_peer_reivews changed" do
+          assignment.toggle(:automatic_peer_reviews)
+          expect(api).to be_assignment_editable_fields_valid(assignment, user)
+        end
+
+        it "is valid if allowed_extensions changed" do
+          assignment.allowed_extensions = ["docx"]
+          expect(api).to be_assignment_editable_fields_valid(assignment, user)
+        end
+      end
     end
   end
 end

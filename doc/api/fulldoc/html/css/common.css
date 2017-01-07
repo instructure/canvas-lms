@@ -319,6 +319,7 @@ table.request-params td {
   vertical-align: text-top;
   font-family: Monaco, Lucida Console, monospace;
   font-size: 12px;
+  word-wrap: break-word;
 }
 table.request-params td.param-desc {
   font-family: "Helvetica Neue", Helvetica;

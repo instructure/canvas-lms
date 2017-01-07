@@ -117,7 +117,7 @@
   @-moz-document url-prefix() {
     overflow-x: hidden;
   }
-  a {
+  a:not(.btn, .Button) {
     text-decoration: underline;
   }
 
@@ -259,6 +259,10 @@
     }
   }
   .events_list, .to-do-list {
+    word-break: break-all;
+    word-wrap: break-word;
+    hyphens: auto;
+
     li.event, li.todo {
       i.icon-check {
         color: $ic-color-success;

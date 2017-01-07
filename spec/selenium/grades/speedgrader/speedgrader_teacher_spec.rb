@@ -182,7 +182,7 @@ describe "speed grader" do
     s2.update_attribute :name, "B"
     s3.update_attribute :name, "C"
 
-    @assignment.grade_student s1, score: 10
+    @assignment.grade_student s1, score: 10, grader: @teacher
     @assignment.find_or_create_submission(s2).tap { |submission|
       submission.student_entered_score = 5
     }.save!

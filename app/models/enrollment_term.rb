@@ -182,6 +182,8 @@ class EnrollmentTerm < ActiveRecord::Base
 
   scope :active, -> { where("enrollment_terms.workflow_state<>'deleted'") }
   scope :ended, -> { where('enrollment_terms.end_at < ?', Time.now.utc) }
+  scope :started, -> { where('enrollment_terms.start_at < ?', Time.now.utc) }
   scope :not_ended, -> { where('enrollment_terms.end_at IS NULL OR enrollment_terms.end_at >= ?', Time.now.utc) }
+  scope :not_started, -> { where('enrollment_terms.start_at IS NULL OR enrollment_terms.start_at > ?', Time.now.utc) }
   scope :by_name, -> { order(best_unicode_collation_key('name')) }
 end

@@ -21,6 +21,11 @@ require 'csv'
 class GradebookImporter
   include GradebookTransformer
 
+  ASSIGNMENT_PRELOADED_FIELDS = %i/
+    id title points_possible grading_type updated_at context_id context_type group_category_id
+    created_at due_at only_visible_to_overrides
+  /.freeze
+
   class NegativeId
     class << self
       def generate
@@ -74,7 +79,7 @@ class GradebookImporter
       .preload(:context)
       .published
       .gradeable
-      .select([:id, :title, :points_possible, :grading_type, :updated_at, :context_id, :context_type, :group_category_id, :created_at, :due_at])
+      .select(ASSIGNMENT_PRELOADED_FIELDS)
       .index_by(&:id)
     @all_students = @context.all_students
       .select(['users.id', :name, :sortable_name, 'users.updated_at'])

@@ -20,10 +20,6 @@
 # Likewise, all the methods added will be available for all controllers.
 
 module Lti
-  class UnauthorizedError < StandardError; end
-  class UnsupportedExportTypeError < StandardError; end
-  class UnsupportedMessageTypeError < StandardError; end
-  class InvalidMediaTypeError < StandardError; end
 
   class ContentItemResponse
 
@@ -37,8 +33,8 @@ module Lti
       @media_types = media_types.with_indifferent_access
       @export_type = export_type || 'common_cartridge' #legacy API behavior defaults to common cartridge
 
-      raise Lti::InvalidMediaTypeError unless media_types_valid?
-      raise Lti::UnsupportedExportTypeError unless SUPPORTED_EXPORT_TYPES.include? @export_type
+      raise Lti::Errors::InvalidMediaTypeError unless media_types_valid?
+      raise Lti::Errors::UnsupportedExportTypeError unless SUPPORTED_EXPORT_TYPES.include? @export_type
     end
 
     def query_params
@@ -92,7 +88,7 @@ module Lti
         elsif @file.context.is_a?(Group)
           raise ActiveRecord::RecordNotFound unless @file.context.context == @context
         end
-        raise Lti::UnauthorizedError if @file.locked_for?(@current_user, check_policies: true)
+        raise Lti::Errors::UnauthorizedError if @file.locked_for?(@current_user, check_policies: true)
       end
       @file
     end
@@ -133,7 +129,7 @@ module Lti
         when 'ContentItemSelection'
           content_item_selection_json
         else
-          raise Lti::UnsupportedMessageTypeError
+          raise Lti::Errors::UnsupportedMessageTypeError
       end
     end
 

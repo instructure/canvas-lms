@@ -382,6 +382,7 @@ CanvasRails::Application.routes.draw do
     end
 
     resources :content_exports, only: [:create, :index, :destroy, :show]
+    get 'offline_web_exports' => 'courses#offline_web_exports'
     get 'modules/items/assignment_info' => 'context_modules#content_tag_assignment_data', as: :context_modules_assignment_info
     get 'modules/items/:id' => 'context_modules#item_redirect', as: :context_modules_item_redirect
     get 'modules/items/:id/edit_mastery_paths' => 'context_modules#item_redirect_mastery_paths'
@@ -912,6 +913,7 @@ CanvasRails::Application.routes.draw do
 
       post 'courses/:course_id/reset_content', :action => :reset_content
       get  'users/:user_id/courses', action: :user_index, as: 'user_courses'
+      get 'courses/:course_id/effective_due_dates', action: :effective_due_dates, as: 'course_effective_due_dates'
     end
 
     scope(controller: :account_notifications) do
@@ -1036,6 +1038,12 @@ CanvasRails::Application.routes.draw do
         post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/update_grades", action: :bulk_update
       end
       get "courses/:course_id/assignments/:assignment_id/gradeable_students", action: :gradeable_students, as: "course_assignment_gradeable_students"
+    end
+
+    scope(controller: :originality_reports_api) do
+      post "assignments/:assignment_id/submissions/:submission_id/originality_report", action: :create
+      put "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :update
+      get "assignments/:assignment_id/submissions/:submission_id/originality_report/:id", action: :show
     end
 
     scope(controller: :provisional_grades) do
@@ -1164,8 +1172,10 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :sis_imports_api) do
       post 'accounts/:account_id/sis_imports', action: :create
+      put 'accounts/:account_id/sis_imports/abort_all_pending', action: :abort_all_pending
       get 'accounts/:account_id/sis_imports/:id', action: :show
       get 'accounts/:account_id/sis_imports', action: :index, as: "account_sis_imports"
+      put 'accounts/:account_id/sis_imports/:id/abort', action: :abort
     end
 
     scope(controller: :users) do
@@ -1204,6 +1214,9 @@ CanvasRails::Application.routes.draw do
       get 'users/:id/colors', controller: 'users', action: 'get_custom_colors'
       get 'users/:id/colors/:asset_string', controller: 'users', action: 'get_custom_color'
       put 'users/:id/colors/:asset_string', controller: 'users', action: 'set_custom_color'
+
+      get 'users/:id/dashboard_positions', controller: 'users', action: 'get_dashboard_positions'
+      put 'users/:id/dashboard_positions', controller: 'users', action: 'set_dashboard_positions'
 
       put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
@@ -1295,6 +1308,7 @@ CanvasRails::Application.routes.draw do
       get 'conversations', action: :index, as: 'conversations'
       post 'conversations', action: :create
       get 'conversations/deleted', action: :deleted_index, as: 'deleted_conversations'
+      put 'conversations/restore', action: :restore_message
       post 'conversations/mark_all_as_read', action: :mark_all_as_read
       get 'conversations/batches', action: :batches, as: 'conversations_batches'
       get 'conversations/unread_count', action: :unread_count

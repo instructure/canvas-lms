@@ -189,8 +189,8 @@ define([
       if (!link.text) {
         $.flashError(I18n.t('Please enter a name for this link.'));
         return false;
-      } else if (!link.url || !/((http|ftp)s?:\/\/)|(tel\:).+/.test(link.url) ) {
-        $.flashError(I18n.t('Please enter a valid URL. Protocol is required (e.g. http://, https://, ftp://, tel:).'));
+      } else if (!link.url || !/((http|ftp)s?:\/\/)|(tel\:)|(mailto\:).+/.test(link.url) ) {
+        $.flashError(I18n.t('Please enter a valid URL. Protocol is required (e.g. http://, https://, ftp://, tel:, mailto:).'));
         return false;
       } else if (!link.available_to || link.available_to.length < 1) {
         $.flashError(I18n.t('Please select a user role for this link.'))

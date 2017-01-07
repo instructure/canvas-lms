@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe BrandConfigsController do
-  before :each do
+  before :once do
     @account = Account.default
     @bc = BrandConfig.create(variables: {"ic-brand-primary" => "#321"})
   end
@@ -37,6 +37,15 @@ describe BrandConfigsController do
       user_session(user)
       get 'index', account_id: @account.id
       assert_status(401)
+    end
+
+    it 'requires branding enabled on the account' do
+      subaccount = @account.sub_accounts.create!(name: "sub")
+      admin = account_admin_user(account: @account)
+      user_session(admin)
+      get 'index', account_id: subaccount.id
+      assert_status(302)
+      expect(flash[:error]).to match(/cannot edit themes/)
     end
   end
 
@@ -88,10 +97,10 @@ describe BrandConfigsController do
   end
 
   describe '#create' do
-    let (:bcin) { { variables: { "ic-brand-primary" => "#000000" } } }
+    let_once(:admin) { account_admin_user(account: @account) }
+    let(:bcin) { { variables: { "ic-brand-primary" => "#000000" } } }
 
     it "should allow authorized admin to create" do
-      admin = account_admin_user(account: @account)
       user_session(admin)
       post 'create', account_id: @account.id, brand_config: bcin
       assert_status(200)
@@ -107,7 +116,6 @@ describe BrandConfigsController do
     end
 
     it 'should return an existing brand config' do
-      admin = account_admin_user(account: @account)
       user_session(admin)
       post 'create', account_id: @account.id, brand_config: { 
         variables: {
@@ -117,6 +125,16 @@ describe BrandConfigsController do
       assert_status(200)
       json = JSON.parse(response.body)
       expect(json['brand_config']['md5']).to eq @bc.md5
+    end
+
+    it 'should upload a js file successfully' do
+      user_session(admin)
+      tf = Tempfile.new('test.js')
+      uf = ActionDispatch::Http::UploadedFile.new(tempfile: tf)
+      post 'create', account_id: @account.id, brand_config: bcin, js_overrides: uf
+      assert_status(200)
+      json = JSON.parse(response.body)
+      expect(json['brand_config']['js_overrides']).to be_present
     end
   end
 
@@ -145,6 +163,19 @@ describe BrandConfigsController do
       user_session(admin)
       post 'save_to_account', account_id: @account.id
       assert_status(200)
+    end
+
+    it 'should regenerate sub accounts' do
+      subbc = BrandConfig.create(variables: {"ic-brand-primary" => "#111"})
+      @account.sub_accounts.create!(name: "Sub", brand_config_md5: subbc.md5)
+
+      admin = account_admin_user(account: @account)
+      user_session(admin)
+      session[:brand_config_md5] = @bc.md5
+      post 'save_to_account', account_id: @account.id
+      assert_status(200)
+      json = JSON.parse(response.body)
+      expect(json['subAccountProgresses']).to be_present
     end
 
     it 'should not allow non admin access' do

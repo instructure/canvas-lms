@@ -114,7 +114,7 @@ describe UsersController, type: :request do
         @teacher = user(:active_all => true)
       end
       @course.enroll_teacher(@teacher).accept!
-      @sub = @assignment.grade_student(@student, { :grade => nil }).first
+      @sub = @assignment.grade_student(@student, grade: nil, grader: @teacher).first
       @sub.workflow_state = 'submitted'
       @sub.submission_comments.create!(:comment => 'c1', :author => @teacher, :recipient_id => @student.id)
       @sub.submission_comments.create!(:comment => 'c2', :author => @student, :recipient_id => @teacher.id)
@@ -456,7 +456,7 @@ describe UsersController, type: :request do
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
-    @sub = @assignment.grade_student(@user, { :grade => nil }).first
+    @sub = @assignment.grade_student(@user, grade: nil, grader: @teacher).first
     @sub.workflow_state = 'submitted'
     @sub.submission_comments.create!(:comment => 'c1', :author => @teacher, :recipient_id => @user.id)
     @sub.submission_comments.create!(:comment => 'c2', :author => @user, :recipient_id => @teacher.id)
@@ -480,7 +480,7 @@ describe UsersController, type: :request do
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => nil,
       'excused' => nil,
-      'grader_id' => nil,
+      'grader_id' => @teacher.id,
       'graded_at' => nil,
       'score' => nil,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
@@ -564,7 +564,7 @@ describe UsersController, type: :request do
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
-    @sub = @assignment.grade_student(@user, { :grade => '12' }).first
+    @sub = @assignment.grade_student(@user, grade: '12', grader: @teacher).first
     @sub.workflow_state = 'submitted'
     @sub.save!
     json = api_call(:get, "/api/v1/users/activity_stream.json",
@@ -580,7 +580,7 @@ describe UsersController, type: :request do
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
-    @sub = @assignment.grade_student(@user, { :grade => nil }).first
+    @sub = @assignment.grade_student(@user, grade: nil, grader: @teacher).first
     @sub.workflow_state = 'submitted'
     @sub.save!
     json = api_call(:get, "/api/v1/users/activity_stream.json",

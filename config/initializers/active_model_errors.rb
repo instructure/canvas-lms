@@ -104,6 +104,14 @@ module ActiveModel
                message: message)
       end
     end
+
+    module AutosaveAssociation
+      def _ensure_no_duplicate_errors
+        errors.error_collection.keys.each do |attribute|
+          errors[attribute].uniq!
+        end
+      end
+    end
   end
 end
 
@@ -117,3 +125,6 @@ ActiveModel::BetterErrors.formatter = ActiveModel::BetterErrors::InstructureForm
 # backwards compatibility with all the existing Canvas code that expects the
 # old format. The ApiReporter is specifically activated by the API error
 # response code.
+
+# make better errors compatible with Rails 5
+ActiveRecord::Base.include(ActiveModel::BetterErrors::AutosaveAssociation) unless CANVAS_RAILS4_2

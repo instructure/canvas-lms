@@ -429,6 +429,7 @@ class OutcomeResultsController < ApplicationController
         # need to instead look at the uniqueness of the associating content tag's
         # context and outcome id in order to ensure we get the correct result
         # from the query without rendering the reject! check moot
+
         @outcomes = ContentTag.learning_outcome_links.active.joins(:learning_outcome_content)
           .where(content_id: outcome_ids, context_type: @context.class_name, context_id: @context.id)
           .to_a.uniq{|tag| [tag.context, tag.content_id]}.map(&:learning_outcome_content)

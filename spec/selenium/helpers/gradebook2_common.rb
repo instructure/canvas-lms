@@ -255,15 +255,15 @@ module Gradebook2Common
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
     @assignment.reload
     @assignment.submit_homework(@student_1, :body => 'student 1 submission assignment 1')
-    @assignment.grade_student(@student_1, :grade => 10)
+    @assignment.grade_student(@student_1, grade: 10, grader: @teacher)
 
     # second student submission for assignment 1
     student_2_submission = @assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 1')
-    @assignment.grade_student(@student_2, :grade => 5)
+    @assignment.grade_student(@student_2, grade: 5, grader: @teacher)
 
     # third student submission for assignment 1
     @student_3_submission = @assignment.submit_homework(@student_3, :body => 'student 3 submission assignment 1')
-    @assignment.grade_student(@student_3, :grade => 5)
+    @assignment.grade_student(@student_3, grade: 5, grader: @teacher)
 
     # second assignment data
     @second_assignment = assignment_model({
@@ -279,7 +279,7 @@ module Gradebook2Common
     # all students get a 5 on assignment 2
     @all_students.each do |s|
       @second_assignment.submit_homework(s, :body => "#{s.name} submission assignment 2")
-      @second_assignment.grade_student(s, :grade => 5)
+      @second_assignment.grade_student(s, grade: 5, grader: @teacher)
     end
 
     # third assignment data

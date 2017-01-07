@@ -97,6 +97,11 @@ module ConditionalRelease
       clear_cache_with_key(active_rules_reverse_cache_key(course))
     end
 
+    def self.clear_applied_rules_cache(course)
+      return unless course.present?
+      clear_cache_with_key(assignments_cache_key(course))
+    end
+
     def self.clear_submissions_cache_for(user)
       return unless user.present?
       clear_cache_with_key(submissions_cache_key(user))
@@ -293,10 +298,8 @@ module ConditionalRelease
         return [] if context.blank? || student.blank?
         cached = rules_cache(context, student)
         assignments = assignments_for(cached[:rules]) if cached
-        cache_expired = newer_than_cache?(content_tags.select(&:content), cached) ||
-                        newer_than_cache?(assignments, cached)
-
-        rules_data = rules_cache(context, student, force: cache_expired) do
+        force_cache = rules_cache_expired?(context, cached)
+        rules_data = rules_cache(context, student, force: force_cache) do
           data = { submissions: submissions_for(student, context) }
           headers = headers_for(context, student, domain_for(context), session)
           req = request_rules(headers, data)
@@ -313,9 +316,15 @@ module ConditionalRelease
         Rails.cache.fetch(rules_cache_key(context, student), force: force, &block)
       end
 
-      def newer_than_cache?(items, cache)
-        cache && cache.key?(:updated_at) && items &&
-        items.detect { |item| item.updated_at > cache[:updated_at] }.present?
+      def rules_cache_expired?(context, cache)
+        assignment_timestamp = Rails.cache.fetch(assignments_cache_key(context)) do
+          Time.zone.now
+        end
+        if cache && cache.key?(:updated_at)
+          assignment_timestamp > cache[:updated_at]
+        else
+          true
+        end
       end
 
       def request_rules(headers, data)
@@ -378,6 +387,10 @@ module ConditionalRelease
 
       def rules_cache_key(context, student)
         ['conditional_release_rules:1', context.global_id, student.global_id].cache_key
+      end
+
+      def assignments_cache_key(context)
+        ['conditional_release_rules:assignments', context.global_id].cache_key
       end
 
       def submissions_cache_key(student)

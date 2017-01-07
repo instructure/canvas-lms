@@ -29,6 +29,7 @@ describe 'Student Gradebook' do
       course_with_student_logged_in({course_name: 'Course A'})
       course1 = @course
       student = @user
+      @teacher = User.create!
 
       course_with_user 'StudentEnrollment', {user: student, course_name: 'Course B', active_all: true}
       course2 = @course
@@ -36,8 +37,8 @@ describe 'Student Gradebook' do
       course3 = @course
 
       gi = 0
-
       [course1, course2, course3].each do |course|
+        course.enroll_teacher(@teacher)
         assignments = []
 
         (1..3).each do |i|
@@ -46,7 +47,7 @@ describe 'Student Gradebook' do
             title: "Assignment #{i}",
             points_possible: 20
           )
-          assignment.grade_student student, {grade: grades[gi]}
+          assignment.grade_student(student, grade: grades[gi], grader: @teacher)
           assignments.push assignment
           gi += 1
         end
@@ -97,7 +98,7 @@ describe 'Student Gradebook' do
     ]
 
     grades.each_with_index do |grade, index|
-      assignments[index / 3].grade_student @students[index % 3], {grade: grade}
+      assignments[index / 3].grade_student @students[index % 3], grade: grade, grader: @teacher
     end
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
@@ -127,8 +128,8 @@ describe 'Student Gradebook' do
   it 'calculates grades based on graded assignments', priority: '1', test_id: 164025 do
     init_course_with_students
 
-    assignments[0].grade_student @students[0], {grade: 20}
-    assignments[1].grade_student @students[0], {grade: 20}
+    assignments[0].grade_student @students[0], grade: 20, grader: @teacher
+    assignments[1].grade_student @students[0], grade: 20, grader: @teacher
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
     expect(f('.final_grade .grade').text).to eq '100%'

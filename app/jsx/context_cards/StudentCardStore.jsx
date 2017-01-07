@@ -1,6 +1,8 @@
 define(['axios'], (axios) => {
   class StudentCardStore {
     constructor(studentId, courseId) {
+      this.studentId = studentId
+      this.courseId = courseId
       this.state = {
         loading: true,
         user: {},
@@ -8,37 +10,39 @@ define(['axios'], (axios) => {
         submissions: [],
         analytics: {}
       };
-      this.loadDataForStudent(studentId, courseId);
     }
 
     getState() {
       return this.state;
     }
 
-    loadDataForStudent(studentId, courseId) {
+    loadDataForStudent() {
       Promise.all([
-        this.loadCourse(courseId),
-        this.loadUser(studentId, courseId),
-        this.loadAnalytics(studentId, courseId),
-        this.loadRecentlyGradedSubmissions(studentId, courseId)
+        this.loadCourse(this.courseId),
+        this.loadUser(this.studentId, this.courseId),
+        this.loadAnalytics(this.studentId, this.courseId),
+        this.loadRecentlyGradedSubmissions(this.studentId, this.courseId)
       ]).then(() => this.setState({loading: false}))
     }
 
     loadCourse(courseId) {
-      return axios.get(`/api/v1/courses/${courseId}`)
+      return axios.get(`/api/v1/courses/${courseId}?include[]=sections`)
         .then(response => this.setState({course: response.data}))
+        .catch(() => {})
     }
 
     loadUser(studentId, courseId) {
       return axios.get(
         `/api/v1/courses/${courseId}/users/${studentId}?include[]=avatar_url&include[]=enrollments`
       ).then(response => this.setState({user: response.data}))
+      .catch(() => {})
     }
 
     loadAnalytics(studentId, courseId) {
       return axios.get(
         `/api/v1/courses/${courseId}/analytics/student_summaries?student_id=${studentId}`
       ).then(response => this.setState({analytics: response.data[0]}))
+      .catch(() => {})
     }
 
     loadRecentlyGradedSubmissions(studentId, courseId) {
@@ -47,7 +51,8 @@ define(['axios'], (axios) => {
       ).then(result => {
         const submissions = result.data.filter(s => s.graded_at).slice(0, 10);
         this.setState({submissions});
-      });
+      })
+      .catch(() => {})
     }
 
     setState(newState) {

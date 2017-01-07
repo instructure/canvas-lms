@@ -55,5 +55,6 @@ module LearningOutcomeContext
     def root_outcome_group(force=true)
       LearningOutcomeGroup.find_or_create_root(self, force)
     end
+
   end
 end

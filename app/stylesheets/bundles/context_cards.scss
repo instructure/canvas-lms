@@ -1,0 +1,105 @@
+@import "base/environment";
+@import "components/message_students";
+
+.StudentContextTray {
+  width: 18.75rem;
+  box-sizing: border-box;
+  padding: $ic-sp*3 $ic-sp*1.5 $ic-sp;
+
+  @include breakpoint(tablet) {
+    width: 21rem;
+    padding-left: $ic-sp*2;
+    padding-right: $ic-sp*2;
+  }
+
+  // Bump the content up a bit if there's an avatar image
+  &--withAvatar {
+    padding-top: -($ic-sp);
+  }
+}
+
+.StudentContextTray__Avatar,
+.StudentContextTray__Spinner {
+  text-align: center;
+  margin-bottom: $ic-sp;
+}
+
+.StudentContextTray-Header {
+  margin-bottom: $ic-sp * 1.5;
+}
+
+.StudentContextTray-Header__Layout {
+  display: flex;
+}
+
+.StudentContextTray-Header__Content {
+  flex: 1;
+  min-width: 1px;
+  box-sizing: border-box;
+  padding-right: $ic-sp * 2;
+}
+
+.StudentContextTray-Header__Actions {
+  min-width: 1px;
+  @include overwrite-default-icon-size(1.25rem);
+}
+
+.StudentContextTray-Header__Name {
+  margin-top: 0.125rem;
+  margin-bottom: $ic-sp * 0.75;
+}
+
+.StudentContextTray-Header__NameLink {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.StudentContextTray-Header__CourseName {
+  margin-bottom: $ic-sp / 3;
+}
+
+.StudentContextTray__Section {
+  margin-bottom: $ic-sp * 2;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.StudentContextTray-QuickLinks {
+  display: flex;
+}
+
+.StudentContextTray-QuickLinks__Link {
+  flex: 1;
+  box-sizing: border-box;
+  padding: 0 $ic-sp / 2;
+
+  &:first-of-type {
+    padding-left: 0;
+  }
+
+  &:last-of-type {
+    padding-right: 0;
+  }
+}
+
+.StudentContextTray-Progress__Bar {
+  margin-top: $ic-sp * 0.75;
+}
+
+.StudentContextTray-Ratings__Layout {
+  display: flex;
+  justify-content: space-around;
+  padding-top: $ic-sp;
+}
+
+.StudentContextTray-Rating {
+  text-align: center;
+}
+
+.StudentContextTray-Rating__Stars {
+  margin-top: $ic-sp / 3;
+}

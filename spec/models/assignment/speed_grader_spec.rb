@@ -257,7 +257,7 @@ describe Assignment::SpeedGrader do
     it 'chooses the student with turnitin data to represent' do
       turnitin_submissions = @groups.map do |group|
         rep = group.users.shuffle.first
-        turnitin_submission, *others = @assignment.grade_student(rep, grade: 10)
+        turnitin_submission = @assignment.grade_student(rep, grade: 10, grader: @teacher)[0]
         turnitin_submission.update_attribute :turnitin_data, {blah: 1}
         turnitin_submission
       end
@@ -272,7 +272,7 @@ describe Assignment::SpeedGrader do
 
     it 'prefers people with submissions' do
       g1, _ = @groups
-      @assignment.grade_student(g1.users.first, score: 10)
+      @assignment.grade_student(g1.users.first, score: 10, grader: @teacher)
       g1rep = g1.users.shuffle.first
       s = @assignment.submission_for_student(g1rep)
       s.update_attribute :submission_type, 'online_upload'
@@ -287,7 +287,7 @@ describe Assignment::SpeedGrader do
         body: 'hi'
       })
       others.each { |u|
-        @assignment.grade_student(u, excuse: true)
+        @assignment.grade_student(u, excuse: true, grader: @teacher)
       }
       expect(@assignment.representatives(@teacher)).to include g1rep
     end
@@ -381,7 +381,7 @@ describe Assignment::SpeedGrader do
       quiz.offer
 
       assignment = quiz.assignment
-      assignment.grade_student(@student, grade: 1)
+      assignment.grade_student(@student, grade: 1, grader: @teacher)
       json = Assignment::SpeedGrader.new(assignment, @teacher).json
       expect(json[:submissions].all? { |s|
         s.has_key? 'submission_history'

@@ -94,11 +94,11 @@
     </table>
   </td>
   <td class="links">
-    <a href="#" class="edit_term_link no-hover"><i class="icon-edit standalone-icon"></i></a>
+    <a href="#" class="edit_term_link no-hover" title="<%= t 'Edit Term %{name}', name: term.try(:name) %>"><i class="icon-edit standalone-icon" aria-hidden="true"></i></a>
     <% if term && @course_counts_by_term[term.id].to_i > 0 %>
-      <a href="#" class="cant_delete_term_link no-hover"><i class="icon-end standalone-icon"></i></a>
+      <a href="#" class="cant_delete_term_link no-hover" title="<%= t 'Delete Term %{name}', name: term.try(:name) %>"><i class="icon-end standalone-icon" aria-hidden="true"></i></a>
     <% elsif term != @context.default_enrollment_term %>
-      <a href="#" class="delete_term_link no-hover"><i class="icon-trash standalone-icon"></i></a>
+      <a href="#" class="delete_term_link no-hover" title="<%= t 'Delete Term %{name}', name: term.try(:name) %>"><i class="icon-trash standalone-icon" aria-hidden="true"></i></a>
     <% end %>
   </td>
 </tr>

@@ -322,20 +322,16 @@ describe Account do
   end
 
   context "settings=" do
-    it "should filter disabled settings" do
+    it "should filter non-hash hash settings" do
       a = Account.new
-      a.settings = {'error_reporting' => 'string'}.with_indifferent_access
+      a.settings = {'sis_default_grade_export' => 'string'}.with_indifferent_access
       expect(a.settings[:error_reporting]).to eql(nil)
 
-      a.settings = {'error_reporting' => {
-        'action' => 'email',
-        'email' => 'bob@yahoo.com',
-        'extra' => 'something'
+      a.settings = {'sis_default_grade_export' => {
+        'value' => true
       }}.with_indifferent_access
-      expect(a.settings[:error_reporting]).to be_is_a(Hash)
-      expect(a.settings[:error_reporting][:action]).to eql('email')
-      expect(a.settings[:error_reporting][:email]).to eql('bob@yahoo.com')
-      expect(a.settings[:error_reporting][:extra]).to eql(nil)
+      expect(a.settings[:sis_default_grade_export]).to be_is_a(Hash)
+      expect(a.settings[:sis_default_grade_export][:value]).to eql true
     end
   end
 
@@ -1414,47 +1410,67 @@ describe Account do
       expected = {:locked => false, :value => false}
       [@account, @sub1, @sub2].each do |a|
         expect(a.restrict_student_future_view).to eq expected
+        expect(a.lock_all_announcements).to eq expected
       end
     end
 
     it "should be able to lock values for sub-accounts" do
       @sub1.settings[:restrict_student_future_view] = {:locked => true, :value => true}
+      @sub1.settings[:lock_all_announcements] = {:locked => true, :value => true}
       @sub1.save!
       # should ignore the subaccount's wishes
       @sub2.settings[:restrict_student_future_view] = {:locked => true, :value => false}
+      @sub2.settings[:lock_all_announcements] = {:locked => true, :value => false}
       @sub2.save!
 
       expect(@account.restrict_student_future_view).to eq({:locked => false, :value => false})
+      expect(@account.lock_all_announcements).to eq({:locked => false, :value => false})
+
       expect(@sub1.restrict_student_future_view).to eq({:locked => true, :value => true})
+      expect(@sub1.lock_all_announcements).to eq({:locked => true, :value => true})
+
       expect(@sub2.restrict_student_future_view).to eq({:locked => true, :value => true, :inherited => true})
+      expect(@sub2.lock_all_announcements).to eq({:locked => true, :value => true, :inherited => true})
     end
 
     it "should grandfather old pre-hash values in" do
       @account.settings[:restrict_student_future_view] = true
+      @account.settings[:lock_all_announcements] = true
       @account.save!
       @sub2.settings[:restrict_student_future_view] = false
+      @sub2.settings[:lock_all_announcements] = false
       @sub2.save!
 
       expect(@account.restrict_student_future_view).to eq({:locked => false, :value => true})
+      expect(@account.lock_all_announcements).to eq({:locked => false, :value => true})
+
       expect(@sub1.restrict_student_future_view).to eq({:locked => false, :value => true, :inherited => true})
+      expect(@sub1.lock_all_announcements).to eq({:locked => false, :value => true, :inherited => true})
+
       expect(@sub2.restrict_student_future_view).to eq({:locked => false, :value => false})
+      expect(@sub2.lock_all_announcements).to eq({:locked => false, :value => false})
     end
 
     it "should translate string values in mass-assignment" do
       settings = @account.settings
       settings[:restrict_student_future_view] = {"value" => "1", "locked" => "0"}
+      settings[:lock_all_announcements] = {"value" => "1", "locked" => "0"}
       @account.settings = settings
       @account.save!
+
       expect(@account.restrict_student_future_view).to eq({:locked => false, :value => true})
+      expect(@account.lock_all_announcements).to eq({:locked => false, :value => true})
     end
 
     context "caching" do
       specs_require_sharding
       it "should clear cached values correctly" do
         enable_cache do
-          [@account, @sub1, @sub2].each(&:restrict_student_future_view) # preload the cached values
+          # preload the cached values
+          [@account, @sub1, @sub2].each(&:restrict_student_future_view)
+          [@account, @sub1, @sub2].each(&:lock_all_announcements)
 
-          @sub1.settings = @sub1.settings.merge(:restrict_student_future_view => {:locked => true, :value => true})
+          @sub1.settings = @sub1.settings.merge(:restrict_student_future_view => {:locked => true, :value => true}, :lock_all_announcements => {:locked => true, :value => true})
           @sub1.save!
 
           # hard reload
@@ -1463,8 +1479,13 @@ describe Account do
           @sub2 = Account.find(@sub2.id)
 
           expect(@account.restrict_student_future_view).to eq({:locked => false, :value => false})
+          expect(@account.lock_all_announcements).to eq({:locked => false, :value => false})
+
           expect(@sub1.restrict_student_future_view).to eq({:locked => true, :value => true})
+          expect(@sub1.lock_all_announcements).to eq({:locked => true, :value => true})
+
           expect(@sub2.restrict_student_future_view).to eq({:locked => true, :value => true, :inherited => true})
+          expect(@sub2.lock_all_announcements).to eq({:locked => true, :value => true, :inherited => true})
         end
       end
     end

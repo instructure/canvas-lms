@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe 'Moderated Grades API', type: :request do
   before :once do
-    course_with_teacher_logged_in active_all: true
+    course_with_teacher active_all: true
     sec1 = @course.course_sections.create!(:name => "section 1")
     sec2 = @course.course_sections.create!(:name => "section 2")
     @assignment = @course.assignments.create! name: "asdf"
@@ -33,6 +33,10 @@ describe 'Moderated Grades API', type: :request do
     @course.enroll_student(@student3, :section => sec2, :allow_multiple_enrollments => true)
     @user = @teacher
     @assignment.moderated_grading_selections.create! student: @student1
+  end
+
+  before :each do
+    user_session @teacher
   end
 
   describe '#index' do

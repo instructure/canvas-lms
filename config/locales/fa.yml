@@ -6945,6 +6945,8 @@ fa:
     students_who: 
       havent_been_graded: "نمره گذاری نشده است"
       havent_submitted_yet: "هنوز ارسال نکرده است"
+      no_grade_for: "نمره ای برای {assignment}% وجود ندارد"
+      no_submission_for: "مورد ارسالی برای {assignment}% وجود ندارد"
       not_submitted_yet: "هنوز ارسال نکرده است"
       scored_less_than: "نمره گذاری شده کمتر از"
       scored_less_than_on: "نمره کمتر از  %{cutoff} در %{assignment} "

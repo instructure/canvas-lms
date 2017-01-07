@@ -1,5 +1,6 @@
 require_relative '../../helpers/gradebook2_common'
 require_relative '../page_objects/gradebook_page'
+require_relative '../page_objects/grading_curve_page'
 
 describe "editing grades" do
   include_context "in-process server selenium tests"
@@ -190,9 +191,9 @@ describe "editing grades" do
 
     open_assignment_options(0)
     f('[data-action="curveGrades"]').click
-    curve_form = f('#curve_grade_dialog')
-    set_value(curve_form.find_element(:css, '#middle_score'), curved_grade_text)
-    fj('.ui-dialog-buttonset .ui-button:contains("Curve Grades")').click
+    curve_form = GradingCurvePage.new
+    curve_form.edit_grade_curve(curved_grade_text)
+    curve_form.curve_grade_submit
     accept_alert
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text).to eq curved_grade_text
   end
@@ -216,7 +217,7 @@ describe "editing grades" do
   it "should not factor non graded assignments into group total", priority: "1", test_id: 220323 do
     expected_totals = [@student_1_total_ignoring_ungraded, @student_2_total_ignoring_ungraded]
     ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')
-    @ungraded_assignment.grade_student(@student_1, :grade => 20)
+    @ungraded_assignment.grade_student(@student_1, grade: 20, grader: @teacher)
     ungraded_submission.save!
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations

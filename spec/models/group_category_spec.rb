@@ -492,13 +492,18 @@ describe GroupCategory do
 
       it "should try to smartishly distribute users" do
         # can't keep things perfectly evenly distributed, but we can try our best
-        expect(test_group_distribution([2, 3, 14, 11], 10)).to eq [[2], [3], [4, 4, 3, 3], [3, 3, 3, 2]]
+        expect(test_group_distribution([2, 3, 14, 11], 10)).to eq [[2], [3], [3, 3, 3, 3, 2], [4, 4, 3]]
       end
 
       it "should not split up groups twice in a row" do
         # my original implementation would have made split the last section up into 5 groups
         # because it still had the largest remainder after splitting once
-        expect(test_group_distribution([5, 5, 9, 11], 10)).to eq [[3, 2], [5], [3, 3, 3], [3, 3, 3, 2]]
+        expect(test_group_distribution([5, 5, 9, 11], 10)).to eq [[5], [3, 2], [3, 3, 3], [3, 3, 3, 2]]
+        expect(test_group_distribution([9, 5, 5, 11], 10)).to eq [[3, 3, 3], [5], [3, 2], [3, 3, 3, 2]] # order shouldn't matter - should split the big one first
+      end
+
+      it "should not split up a small section (with comparitively large group sizes) if it would be smarter to not" do
+        expect(test_group_distribution([8, 8, 30, 8, 8], 10)).to eq [[8], [8], [5, 5, 5, 5, 5, 5], [8], [8]] # would rather go to size 5 in the big section than size 4 in the other
       end
     end
 

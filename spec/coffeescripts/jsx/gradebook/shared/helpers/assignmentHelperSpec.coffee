@@ -23,13 +23,13 @@ define [
 
   generateAssignment = (options) ->
     options = options || {}
-    _.defaults(options, { name: 'assignment', due_at: new Date('Mon May 11 2015') })
+    _.defaults(options, { name: 'assignment', due_at: new Date('Mon May 11 2015'), effectiveDueDates: {} })
 
-  generateOverrides = ->
-    [
-      { title: 'section 1', due_at: new Date('Mon May 11 2015') },
-      { title: 'section 2', due_at: new Date('Tue May 12 2015') }
-    ]
+  generateEffectiveDueDates = ->
+    '1':
+      due_at: 'Mon May 11 2015'
+    '2':
+      due_at: 'Tue May 12 2015'
 
   test 'compares assignments by due date', ->
     assignment1 = generateAssignment()
@@ -68,9 +68,9 @@ define [
     ok comparisonVal > 0
 
   test 'compares by due date overrides if dates are both null', ->
-    assignment1 = generateAssignment({ due_at: null, has_overrides: true })
-    assignment1.overrides = generateOverrides()
-    assignment2 = generateAssignment({ due_at: null, has_overrides: false })
+    assignment1 = generateAssignment({ due_at: null })
+    assignment1.effectiveDueDates = generateEffectiveDueDates()
+    assignment2 = generateAssignment({ due_at: null })
     comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
     ok comparisonVal < 0
 
@@ -78,42 +78,36 @@ define [
     assignment = {}
     notOk assignmentHelper.hasMultipleDueDates(assignment)
 
-  test 'hasMultipleDueDates returns false when provided just has_overrides', ->
-    assignment = { has_overrides: true }
-    notOk assignmentHelper.hasMultipleDueDates(assignment)
-
-  test 'hasMultipleDueDates returns false when provided an empty overrides', ->
-    assignment = { has_overrides: true, overrides: [] }
-    notOk assignmentHelper.hasMultipleDueDates(assignment)
-
-  test 'hasMultipleDueDates returns false when provided overrides with a length of 1', ->
-    assignment = { has_overrides: true, overrides: [{ title: 'section 1' }] }
+  test 'hasMultipleDueDates returns false when there is only 1 unique effective due date', ->
+    assignment = generateAssignment(due_at: null)
+    assignment.effectiveDueDates = { '1': { due_at: 'Mon May 11 2015' } }
     notOk assignmentHelper.hasMultipleDueDates(assignment)
 
   test 'hasMultipleDueDates returns true when provided overrides with a length greater than 1', ->
-    overrides = [{ title: 'section 1' }, { title: 'section 2' }]
-    assignment = { has_overrides: true, overrides: overrides }
+    assignment = generateAssignment(due_at: null)
+    assignment.effectiveDueDates = generateEffectiveDueDates()
     ok assignmentHelper.hasMultipleDueDates(assignment)
 
   test 'treats assignments with a single override with a null date as' +
   '"greater" than assignments with multiple overrides', ->
-    assignment1 = generateAssignment({ due_at: null, has_overrides: true })
-    assignment1.overrides = [
-      { title: 'section 1', due_at: null }
-    ]
-    assignment2 = generateAssignment({ due_at: null, has_overrides: true })
-    assignment2.overrides = [
-      { title: 'section 1', due_at: null },
-      { title: 'section 2', due_at: null }
-    ]
+    assignment1 = generateAssignment({ due_at: null })
+    assignment1.effectiveDueDates = { '1': { due_at: null } }
+    assignment2 = generateAssignment({ due_at: null })
+    assignment2.effectiveDueDates =
+      '1': { due_at: null },
+      '2': { due_at: 'Mon May 11 2015' }
     comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
     ok comparisonVal > 0
 
   test 'compares by name if dates are both null and both have multiple overrides', ->
-    assignment1 = { name: 'Banana', due_at: null, has_overrides: true }
-    assignment1.overrides = generateOverrides()
-    assignment2 = { name: 'Apple', due_at: null, has_overrides: true }
-    assignment2.overrides = generateOverrides()
+    assignment1 = { name: 'Banana', due_at: null }
+    assignment1.effectiveDueDates =
+      '1': { due_at: null },
+      '2': { due_at: 'Mon May 11 2015' }
+    assignment2 = { name: 'Apple', due_at: null }
+    assignment2.effectiveDueDates =
+      '1': { due_at: null },
+      '2': { due_at: 'Mon May 11 2015' }
     comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
     ok comparisonVal > 0
 
@@ -122,8 +116,8 @@ define [
     ok comparisonVal < 0
 
   test 'compares by name if dates are both null and neither have due date overrides', ->
-    assignment1 = { name: 'Banana', due_at: null, has_overrides: false }
-    assignment2 = { name: 'Apple', due_at: null, has_overrides: false }
+    assignment1 = { name: 'Banana', due_at: null }
+    assignment2 = { name: 'Apple', due_at: null }
     comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
     ok comparisonVal > 0
 
@@ -156,36 +150,6 @@ define [
     assignment2.due_at = '2015-05-05T06:59:00Z'
     comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
     ok comparisonVal > 0
-
-  test 'handles an override and an assignment due_ats passed in as strings', ->
-    assignment1 = generateAssignment({ due_at: null, has_overrides: true })
-    assignment1.overrides = [{ title: 'section 1', due_at: '2015-05-05T06:59:00Z' }]
-    assignment2 = generateAssignment({ due_at: '2015-05-11T06:59:00Z' })
-    comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
-    ok comparisonVal < 0
-
-    assignment2.due_at = '2015-04-05T06:59:00Z'
-    comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
-    ok comparisonVal > 0
-
-  test 'handles two assignments each with only a single override, and override due_ats passed in as strings', ->
-    assignment1 = generateAssignment({ due_at: null, has_overrides: true })
-    assignment1.overrides = [{ title: 'section 1', due_at: '2015-05-05T06:59:00Z' }]
-    assignment2 = generateAssignment({ due_at: null, has_overrides: true })
-    assignment2.overrides = [{ title: 'section 2', due_at: '2015-05-10T06:59:00Z' }]
-    comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
-    ok comparisonVal < 0
-
-    assignment2.overrides[0].due_at = '2015-04-05T06:59:00Z'
-    comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
-    ok comparisonVal > 0
-
-  test 'handles assignments with "has_overrides" set to true but without an overrides array', ->
-    assignment1 = generateAssignment({ due_at: null, has_overrides: true })
-    assignment1.overrides = null
-    assignment2 = generateAssignment({ due_at: null, has_overrides: false })
-    comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
-    ok comparisonVal == 0
 
   module 'assignmentHelper#compareByAssignmentGroup',
     setup: ->

@@ -190,7 +190,9 @@
               <h1 class="discussion-title"><%= @topic.title %></h1>
               <div class="discussion-subtitle">
                 <% if @topic.user %>
-                  <a class="author" href="<%= context_url(@topic.context, :context_user_url, @topic.user_id) %>" title="<%= t :authors_name, "Author's name" %>"><%= context_user_name(@topic.context, @topic.user) %></a>
+                  <%= link_to context_user_name(@topic.context, @topic.user),
+                                                context_url(@topic.context, :context_user_url, @topic.user_id),
+                                                @presenter.author_link_attrs %>
                 <% end %>
               </div>
               <% if @topic.root_topic.try(:context) && @topic.root_topic.try(:context) != @context %>

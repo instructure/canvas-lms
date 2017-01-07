@@ -97,12 +97,12 @@ module AccountReports
             AND lol.context_type = 'Account'
             AND lol.tag_type = 'learning_outcome_association'
             AND lol.workflow_state != 'deleted'
-          LEFT JOIN #{LearningOutcomeResult.quoted_table_name} r ON (r.user_id=pseudonyms.user_id
-                                                   AND r.content_tag_id = ct.id)
-          LEFT JOIN #{Submission.quoted_table_name} sub ON sub.assignment_id = a.id
+            LEFT JOIN #{LearningOutcomeResult.quoted_table_name} r ON (r.user_id=pseudonyms.user_id
+              AND r.content_tag_id = ct.id)
+            LEFT JOIN #{Submission.quoted_table_name} sub ON sub.assignment_id = a.id
             AND sub.user_id = pseudonyms.user_id", parameters])).
-        where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
-               AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
+              where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
+                AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
 
       unless @include_deleted
         students = students.where("pseudonyms.workflow_state<>'deleted' AND c.workflow_state='available'")

@@ -336,10 +336,11 @@ describe Quizzes::QuizSubmission do
     context "explicitly setting grade" do
 
       before(:once) do
-        course_with_student
+        course_with_teacher
+        course_with_student(course: @course)
         @quiz = @course.quizzes.create!
         @quiz.generate_quiz_data
-        @quiz.published_at = Time.now
+        @quiz.published_at = Time.zone.now
         @quiz.workflow_state = 'available'
         @quiz.scoring_policy = "keep_highest"
         @quiz.save!
@@ -355,7 +356,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "it should adjust the fudge points" do
-        @assignment.grade_student(@user, {:grade => 3})
+        @assignment.grade_student(@user, grade: 3, grader: @teacher)
 
         @quiz_sub.reload
         expect(@quiz_sub.score).to eq 3
@@ -381,7 +382,7 @@ describe Quizzes::QuizSubmission do
         expect(@submission.score).to eq 5
         expect(@submission.grade).to eq "5"
 
-        @assignment.grade_student(@user, {:grade => 3})
+        @assignment.grade_student(@user, grade: 3, grader: @teacher)
         @quiz_sub.reload
         expect(@quiz_sub.score).to eq 3
         expect(@quiz_sub.kept_score).to eq 3
@@ -396,7 +397,7 @@ describe Quizzes::QuizSubmission do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
         @quiz_sub.with_versioning(true, &:save!)
-        @assignment.grade_student(@user, {:grade => 3})
+        @assignment.grade_student(@user, grade: 3, grader: @teacher)
         @quiz_sub.reload
         expect(@quiz_sub.manually_scored).to be_truthy
 
@@ -412,11 +413,11 @@ describe Quizzes::QuizSubmission do
       end
 
       it "should add a version to the submission" do
-        @assignment.grade_student(@user, {:grade => 3})
+        @assignment.grade_student(@user, grade: 3, grader: @teacher)
         @submission.reload
         expect(@submission.versions.count).to eq 2
         expect(@submission.score).to eq 3
-        @assignment.grade_student(@user, {:grade => 6})
+        @assignment.grade_student(@user, grade: 6, grader: @teacher)
         @submission.reload
         expect(@submission.versions.count).to eq 3
         expect(@submission.score).to eq 6
@@ -427,7 +428,7 @@ describe Quizzes::QuizSubmission do
         @quiz_sub.attempt = 2
         @quiz_sub.with_versioning(true, &:save!)
         @quiz.generate_submission(@user)
-        @assignment.grade_student(@user, {:grade => 3})
+        @assignment.grade_student(@user, grade: 3, grader: @teacher)
 
         expect(@quiz_sub.reload.score).to be_nil
         expect(@quiz_sub.kept_score).to eq 3
@@ -1342,7 +1343,7 @@ describe Quizzes::QuizSubmission do
     describe "#questions_regraded_since_last_attempt" do
       before :once do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
-        course_with_teacher_logged_in(active_all: true, course: @course)
+        course_with_teacher(active_all: true, course: @course)
 
         @submission = @quiz.quiz_submissions.build
         @submission.workflow_state = "complete"
@@ -1486,7 +1487,8 @@ describe Quizzes::QuizSubmission do
 
     describe '#teachers' do
       before(:once) do
-        @quiz_submission = @quiz.quiz_submissions.create!
+        student_in_course(:active_all => true, :course => @course)
+        @quiz_submission = @quiz.quiz_submissions.create!(:user => @student)
         @active_teacher = User.create!
         @active_enrollment = @course.enroll_teacher(@active_teacher)
         @active_enrollment.accept
@@ -1523,6 +1525,14 @@ describe Quizzes::QuizSubmission do
         @active_enrollment.deactivate
         @active_enrollment.reactivate
         expect(@quiz_submission.teachers).to include @active_teacher
+      end
+
+      it "doesn't include section-restricted teachers from other sections" do
+        other_section = @course.course_sections.create!
+        other_teacher = User.create!
+        other_enrollment = @course.enroll_teacher(other_teacher, :section => other_section, :limit_privileges_to_course_section => true)
+        other_enrollment.accept
+        expect(@quiz_submission.teachers).to_not include other_teacher
       end
     end
   end

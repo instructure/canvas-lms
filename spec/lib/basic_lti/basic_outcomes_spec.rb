@@ -289,7 +289,8 @@ describe BasicLTI::BasicOutcomes do
         submission = assignment.grade_student(
           @user,
           {
-            grade: "92%"
+            grade: "92%",
+            grader_id: -1
           }).first
         xml.css('resultData').remove
         BasicLTI::BasicOutcomes.process_request(tool, xml)
@@ -336,6 +337,21 @@ describe BasicLTI::BasicOutcomes do
         expect(submission.reload.versions.count).to eq 2
       end
 
+      it "creates a new submission if result_data_download_url is sent" do
+        submission = assignment.submit_homework(
+          @user,
+          {
+            submission_type: "online_text_entry",
+            body: "sample text",
+            grade: "92%"
+          })
+        xml.css('resultScore').remove
+        xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(submission.reload.versions.count).to eq 2
+        expect(submission.assignment.attachments.count).to eq 1
+      end
+
       it "doesn't change the submission type if only the score is sent" do
         submission_type = 'online_text_entry'
         submission = assignment.submit_homework(
@@ -349,10 +365,6 @@ describe BasicLTI::BasicOutcomes do
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(submission.reload.submission_type).to eq submission_type
       end
-
     end
-
-
-
   end
 end

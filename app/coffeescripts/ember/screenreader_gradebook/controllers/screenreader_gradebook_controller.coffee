@@ -293,11 +293,20 @@ define [
     calculate: (submissionsArray) ->
       GradeCalculator.calculate submissionsArray, @assignmentGroupsHash(), @get('weightingScheme')
 
+    submissionsForStudent: (student) ->
+      allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)
+      return allSubmissions unless @get('mgpEnabled')
+      selectedPeriodID = @get('selectedGradingPeriod.id')
+      return allSubmissions if !selectedPeriodID or selectedPeriodID == '0'
+
+      _.filter allSubmissions, (submission) =>
+        studentPeriodInfo = @get('effectiveDueDates').get(submission.assignment_id)?[submission.user_id]
+        studentPeriodInfo and studentPeriodInfo.grading_period_id == selectedPeriodID
+
     calculateStudentGrade: (student) ->
       if student.isLoaded
         finalOrCurrent = if @get('includeUngradedAssignments') then 'final' else 'current'
-        submissionsAsArray = (value for key, value of student when key.match /^assignment_(?!group)/)
-        result = @calculate(submissionsAsArray)
+        result = @calculate(@submissionsForStudent(student))
         for group in result.group_sums
           set(student, "assignment_group_#{group.group.id}", group[finalOrCurrent])
           for submissionData in group[finalOrCurrent].submissions
@@ -319,31 +328,17 @@ define [
     assignmentSelectDefaultLabel: I18n.t "no_assignment", "No Assignment Selected"
     outcomeSelectDefaultLabel: I18n.t "no_outcome", "No Outcome Selected"
 
-    submissionStateMap: (
-      new SubmissionStateMap(
-        gradingPeriodsEnabled: !!get(window, 'ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled')
-        selectedGradingPeriodID: '0'
-        gradingPeriods: GradingPeriodsAPI.deserializePeriods(
-          get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
-        )
-        isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, "admin")
-      )
-    )
+    submissionStateMap: null
 
     assignment_groups: []
 
     fetchAssignmentGroups: (->
-      params = {}
+      params = { exclude_response_fields: ['in_closed_grading_period'] }
       gpId = @get('selectedGradingPeriod.id')
       if @get('mgpEnabled') && gpId != '0'
-        params =
-          grading_period_id: gpId
+        params.grading_period_id = gpId
       @set('assignment_groups', [])
-      array = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin,
-        content: []
-        sortProperties: ['ag_position', 'position']
-      )
-      @set('assignments', array)
+      @set('assignmentsFromGroups', [])
       Ember.run.once =>
         fetchAllPages(get(window, 'ENV.GRADEBOOK_OPTIONS.assignment_groups_url'), records: @get('assignment_groups'), data: params)
     ).observes('selectedGradingPeriod').on('init')
@@ -550,16 +545,28 @@ define [
       submission.submitted_at = tz.parse(submission.submitted_at)
       set(student, "assignment_#{submission.assignment_id}", submission)
 
-    assignments: Ember.ArrayProxy.createWithMixins(Ember.SortableMixin,
+    assignmentsFromGroups: []
+
+    assignments: Ember.ArrayProxy.createWithMixins(
+      Ember.SortableMixin, {
         content: []
         sortProperties: ['ag_position', 'position']
-      )
+      }
+    )
 
-    processAssignment: (as, assignmentGroups) ->
+    processAssignment: (as, assignmentGroups, effectiveDueDates) ->
       assignmentGroup = assignmentGroups.findBy('id', as.assignment_group_id)
       set as, 'sortable_name', as.name.toLowerCase()
       set as, 'ag_position', assignmentGroup.position
       set as, 'noPointsPossibleWarning', assignmentGroup.invalid
+
+      if effectiveDueDates?
+        dueDates = effectiveDueDates.get(as.id) || {}
+        set as, 'effectiveDueDates', dueDates
+        set as, 'inClosedGradingPeriod', _.any(dueDates, (date) => date.in_closed_grading_period)
+      else
+        set as, 'effectiveDueDates', {}
+        set as, 'inClosedGradingPeriod', false
 
       if as.due_at
         due_at = tz.parse(as.due_at)
@@ -612,27 +619,56 @@ define [
         {count: @get('invalidGroupNames').length, list_of_group_names: @get('invalidGroupNames').join(" or ")})
     ).property('invalidGroupNames')
 
-    populateAssignments: (->
+    populateAssignmentsFromGroups: (->
+      return unless @get('assignment_groups.isLoaded') and !@get('assignment_groups.isLoading')
       assignmentGroups = @get('assignment_groups')
       assignments = _.flatten(assignmentGroups.mapBy 'assignments')
-      assignmentsProxy =  @get('assignments')
+      assignmentList = []
+      effectiveDueDates = @get('effectiveDueDates') if @get('effectiveDueDates.isLoaded')
       assignments.forEach (as) =>
-        return if assignmentsProxy.findBy('id', as.id)
-        @processAssignment(as, assignmentGroups)
-
+        @processAssignment(as, assignmentGroups, effectiveDueDates)
         shouldRemoveAssignment = (as.published is false) or
           as.submission_types.contains 'not_graded' or
           as.submission_types.contains 'attendance' and !@get('showAttendance')
         if shouldRemoveAssignment
           assignmentGroups.findBy('id', as.assignment_group_id).assignments.removeObject as
         else
-          assignmentsProxy.addObject as
-    ).observes('assignment_groups', 'assignment_groups.@each')
+          assignmentList.push(as)
+      @set('assignmentsFromGroups', assignmentList)
+    ).observes('assignment_groups.isLoaded', 'assignment_groups.isLoading', 'effectiveDueDates.isLoaded')
+
+    populateAssignments: (->
+      assignmentsFromGroups = @get('assignmentsFromGroups')
+      assignments = @get('assignments')
+      selectedStudent = @get('selectedStudent')
+      submissionStateMap = @get('submissionStateMap')
+
+      proxy = Ember.ArrayProxy.createWithMixins(
+        Ember.SortableMixin, { content: [] }
+      )
+
+      effectiveDueDatesLoaded = @get('effectiveDueDates.isLoaded')
+      if selectedStudent?
+        assignmentsFromGroups.forEach (assignment) =>
+          submissionCriteria = { assignment_id: assignment.id, user_id: selectedStudent.id }
+          unless effectiveDueDatesLoaded && submissionStateMap?.getSubmissionState(submissionCriteria)?.hideGrade
+            proxy.addObject(assignment)
+      else
+        proxy.addObjects(assignmentsFromGroups)
+
+      proxy.set('sortProperties', @get('assignments.sortProperties'))
+      @set('assignments', proxy)
+    ).observes('assignmentsFromGroups', 'selectedStudent')
 
     populateSubmissionStateMap: (->
-      return unless @get('enrollments.isLoaded') && @get('assignment_groups.isLoaded')
-      @submissionStateMap.setup(@get('students').toArray(), @get('assignments').toArray())
-    ).observes('enrollments.isLoaded', 'assignment_groups.isLoaded')
+      map = new SubmissionStateMap(
+        gradingPeriodsEnabled: !!@mgpEnabled
+        selectedGradingPeriodID: @get('selectedGradingPeriod.id') || '0'
+        isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, "admin")
+      )
+      map.setup(@get('students').toArray(), @get('assignmentsFromGroups').toArray())
+      @set('submissionStateMap', map)
+    ).observes('enrollments.isLoaded', 'assignmentsFromGroups')
 
     includeUngradedAssignments: (->
       userSettings.contextGet('include_ungraded_assignments') or false
@@ -703,14 +739,14 @@ define [
         @set('disableAssignmentGrading', null)
         return
 
-      @set('assignmentInClosedGradingPeriod', assignment.has_due_date_in_closed_grading_period)
+      @set('assignmentInClosedGradingPeriod', assignment.inClosedGradingPeriod)
 
       # Calculate whether the current user is able to grade assignments given their role and the
       # result of the calculations above
       if ENV.current_user_roles? && _.contains(ENV.current_user_roles, 'admin')
         @set('disableAssignmentGrading', false)
       else
-        @set('disableAssignmentGrading', assignment.has_due_date_in_closed_grading_period)
+        @set('disableAssignmentGrading', assignment.inClosedGradingPeriod)
     ).observes('selectedAssignment')
 
     selectedSubmission: ((key, selectedSubmission) ->
@@ -728,7 +764,7 @@ define [
           hidden: !@differentiatedAssignmentVisibleToStudent(assignment, student.id)
           grade_matches_current_submission: true
         }
-      submissionState = @submissionStateMap.getSubmissionState(selectedSubmission) || {}
+      submissionState = @submissionStateMap?.getSubmissionState(selectedSubmission) || {}
       selectedSubmission.gradeLocked = submissionState.locked
       selectedSubmission
     ).property('selectedStudent', 'selectedAssignment')

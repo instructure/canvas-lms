@@ -338,7 +338,9 @@
   align-items: center;
   background-color: $ic-font-color--subdued;
   color: $ic-color-light;
-
+  &::before {
+    font-size: 1rem;
+  }
   .ig-published:not(.student-view) & {
     background-color: $ic-color-success;
   }

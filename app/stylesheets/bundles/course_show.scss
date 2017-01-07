@@ -23,3 +23,21 @@
   @include fontSize(17.5px);
   line-height: 20px;
 }
+
+#announcements_on_home_page {
+  padding: 20px 0;
+  text-align: center;
+}
+
+.AnnouncementList {
+  margin: 0 auto 40px;
+  text-align: left;
+
+  &__posted-at {
+    width: 20%;
+  }
+
+  &__message {
+    width: 80%;
+  }
+}

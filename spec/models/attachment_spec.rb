@@ -840,6 +840,15 @@ describe Attachment do
       course_model
     end
 
+    it 'should allow custom ttl for download_url' do
+      attachment = attachment_with_context(@course, :display_name => 'foo')
+      attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save
+      attachment.expects(:authenticated_s3_url).with(has_entry(:expires => 86400))
+      attachment.download_url
+      attachment.expects(:authenticated_s3_url).with(has_entry(:expires => 172800))
+      attachment.download_url(2.days.to_i)
+    end
+
     it "should include response-content-disposition" do
       attachment = attachment_with_context(@course, :display_name => 'foo')
       attachment.expects(:authenticated_s3_url).at_least(0) # allow other calls due to, e.g., save

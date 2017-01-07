@@ -195,8 +195,8 @@ describe GradebooksController do
         @course.assignments.create! name: "blah#{i}", points_possible: 10
       }
       a1.mute!
-      a1.grade_student(@student, grade: 10)
-      a2.grade_student(@student, grade: 5)
+      a1.grade_student(@student, grade: 10, grader: @teacher)
+      a2.grade_student(@student, grade: 5, grader: @teacher)
       get 'grade_summary', course_id: @course.id, id: @student.id
       expected =
       expect(assigns[:js_env][:submissions].sort_by { |s|
@@ -209,7 +209,7 @@ describe GradebooksController do
     it "includes necessary attributes on the submissions" do
       user_session(@student)
       assignment = @course.assignments.create!(points_possible: 10)
-      assignment.grade_student(@student, grade: 10)
+      assignment.grade_student(@student, grade: 10, grader: @teacher)
       get('grade_summary', course_id: @course.id, id: @student.id)
       submission = assigns[:js_env][:submissions].first
       expect(submission).to include :excused
@@ -503,6 +503,27 @@ describe GradebooksController do
     it "renders the unauthorized page without gradebook authorization" do
       get "show", :course_id => @course.id
       assert_unauthorized
+    end
+
+    context "includes student context card info in ENV" do
+      before { user_session(@teacher) }
+
+      it "includes context_id" do
+        get :show, course_id: @course.id
+        context_id = assigns[:js_env][:GRADEBOOK_OPTIONS][:context_id]
+        expect(context_id).to eq @course.id.to_param
+      end
+
+      it "doesn't enable context cards when feature is off" do
+        get :show, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq false
+      end
+
+      it "enables context cards when feature is on" do
+        @course.root_account.enable_feature! :student_context_cards
+        get :show, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
+      end
     end
   end
 

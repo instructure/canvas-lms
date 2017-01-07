@@ -83,7 +83,7 @@ describe "Outcome Groups API", type: :request do
     context.enroll_student(user) unless context.student_enrollments.exists?(user_id: user.id)
     a = rubric.associate_with(assignment, context, :purpose => 'grading')
     assignment.reload
-    submission = assignment.grade_student(user, :grade => "10").first
+    submission = assignment.grade_student(user, grade: "10", grader: @teacher).first
     a.assess({
       :user => user,
       :assessor => user,
@@ -307,7 +307,7 @@ describe "Outcome Groups API", type: :request do
       let(:check_outcome_link) do
         ->(outcome_link, context, group, assessed, can_edit, can_unlink) do
           expect(outcome_link).to eq({
-            "context_type" => context.class.to_s,
+          "context_type" => context.class.to_s,
             "context_id" => context.id,
             "url" => polymorphic_path([:api_v1, context, :outcome_link], :id => group.id, :outcome_id => @outcome.id),
             "assessed" => assessed,
@@ -909,7 +909,7 @@ describe "Outcome Groups API", type: :request do
       let(:check_outcome_link) do
         ->(outcome_link, context, group, assessed, can_unlink) do
           expect(outcome_link).to eq({
-            "context_type" => context.class.to_s,
+          "context_type" => context.class.to_s,
             "context_id" => context.id,
             "url" => polymorphic_path([:api_v1, context, :outcome_link], :id => group.id, :outcome_id => @outcome.id),
             "assessed" => assessed,

@@ -324,6 +324,7 @@ describe DiscussionTopicsController, type: :request do
        "discussion_type" => 'side_comment',
        "locked" => false,
        "can_lock" => true,
+       "can_unlock" => true,
        "locked_for_user" => false,
        "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
        "permissions" => {"delete" => true, "attach" => true, "update" => true, "reply" => true},
@@ -1135,6 +1136,7 @@ describe DiscussionTopicsController, type: :request do
       "permissions" => {"delete" => true, "attach" => true, "update" => true, "reply" => true},
       "locked" => false,
       "can_lock" => true,
+      "can_unlock" => true,
       "locked_for_user" => false,
       "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!,
       "group_category_id" => nil,
@@ -2275,6 +2277,16 @@ describe DiscussionTopicsController, type: :request do
       expect(v1_r0['parent_id']).to eq @root2.id
       expect(v1_r0['created_at']).to eq @reply3.created_at.as_json
       expect(v1_r0['updated_at']).to eq @reply3.updated_at.as_json
+    end
+
+    it "can include extra information for context cards" do
+      topic_with_nested_replies
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+                      {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, include_new_entries: "1", include_context_card_info: "1"})
+      participants = json["participants"]
+      expect(participants.map { |p| p["course_id"] }).to eq [@course.to_param, @course.to_param]
+      expect(participants.find { |p| !p["is_student"] }["id"]).to eq @teacher.id
+      expect(participants.find { |p| p["is_student"] }["id"]).to eq @student.id
     end
 
     context "with mobile overrides" do

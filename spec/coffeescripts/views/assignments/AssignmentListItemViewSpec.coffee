@@ -120,7 +120,10 @@ define [
       ["First", "Second"]
 
   genSetup = (model=assignment1()) ->
-    fakeENV.setup(PERMISSIONS: {manage: false})
+    fakeENV.setup(
+      current_user_roles: ['teacher'],
+      PERMISSIONS: {manage: false}
+    )
     @model = model
     @submission = new Submission
     @view = createView(@model, canManage: false)
@@ -135,7 +138,9 @@ define [
 
   module 'AssignmentListItemViewSpec',
     setup: ->
-      fakeENV.setup()
+      fakeENV.setup({
+        current_user_roles: ['teacher']
+      })
       genSetup.call @
       @snapshot = tz.snapshot()
       I18nStubber.pushFrame()
@@ -201,8 +206,7 @@ define [
     ok view.delete.called
 
   test 'does not attempt to delete an assignment due in a closed grading period', ->
-    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
-    @model.set('has_due_date_in_closed_grading_period', true)
+    @model.set('in_closed_grading_period', true)
     view = createView(@model)
 
     @stub(window, "confirm", -> true )
@@ -317,15 +321,13 @@ define [
     ok view.$("#assignment_#{@model.id} a.delete_assignment.disabled").length
 
   test "disallows deleting assignments due in closed grading periods", ->
-    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
-    @model.set('has_due_date_in_closed_grading_period', true)
+    @model.set('in_closed_grading_period', true)
     view = createView(@model)
     ok view.$("#assignment_#{@model.id} a.delete_assignment.disabled").length
 
   test "allows deleting non-frozen assignments not due in closed grading periods", ->
-    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
     @model.set('frozen', false)
-    @model.set('has_due_date_in_closed_grading_period', false)
+    @model.set('in_closed_grading_period', false)
     view = createView(@model)
     ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
 
@@ -335,8 +337,7 @@ define [
     ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
 
   test "allows deleting assignments due in closed grading periods for admins", ->
-    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
-    @model.set('has_assignment_due_in_closed_grading_period', true)
+    @model.set('any_assignment_in_closed_grading_period', true)
     view = createView(@model, userIsAdmin: true)
     ok view.$("#assignment_#{@model.id} a.delete_assignment:not(.disabled)").length
 
@@ -484,22 +485,22 @@ define [
     ok json.canMove
     notOk view.className().includes('sort-disabled')
 
-  test 'can move when canManage is true and the model can be deleted', ->
-    @stub(@model, 'canDelete').returns(true)
+  test 'can move when canManage is true and the assignment group id is not locked', ->
+    @stub(@model, 'canMove').returns(true)
     view = createView(@model, userIsAdmin: false, canManage: true)
     json = view.toJSON()
     ok json.canMove
     notOk view.className().includes('sort-disabled')
 
-  test 'cannot move when canManage is true but the model cannot be deleted', ->
-    @stub(@model, 'canDelete').returns(false)
+  test 'cannot move when canManage is true but the assignment group id is locked', ->
+    @stub(@model, 'canMove').returns(false)
     view = createView(@model, userIsAdmin: false, canManage: true)
     json = view.toJSON()
     notOk json.canMove
     ok view.className().includes('sort-disabled')
 
-  test 'cannot move when canManage is false but the model can be deleted', ->
-    @stub(@model, 'canDelete').returns(true)
+  test 'cannot move when canManage is false but the assignment group id is not locked', ->
+    @stub(@model, 'canMove').returns(true)
     view = createView(@model, userIsAdmin: false, canManage: false)
     json = view.toJSON()
     notOk json.canMove
@@ -581,7 +582,12 @@ define [
 
   module 'AssignListItemViewSpec - mastery paths menu option',
     setup: ->
-      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+      fakeENV.setup({
+        current_user_roles: ['teacher'],
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: true
+      })
+    teardown: ->
+      fakeENV.teardown()
 
   test 'does not render for assignment if cyoe off', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
@@ -651,20 +657,25 @@ define [
 
   module 'AssignListItemViewSpec - mastery paths link',
     setup: ->
-      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-      ENV.CONDITIONAL_RELEASE_ENV = {
-        active_rules: [{
-          trigger_assignment: '1',
-          scoring_ranges: [
-            {
-              assignment_sets: [
-                { assignments: [{ assignment_id: '2' }] },
-              ],
-            },
-          ],
-        }],
-      }
+      fakeENV.setup({
+        current_user_roles: ['teacher'],
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
+        CONDITIONAL_RELEASE_ENV: {
+          active_rules: [{
+            trigger_assignment: '1',
+            scoring_ranges: [
+              {
+                assignment_sets: [
+                  { assignments: [{ assignment_id: '2' }] },
+                ],
+              },
+            ],
+          }],
+        }
+      })
       CyoeHelper.reloadEnv()
+    teardown: ->
+      fakeENV.teardown()
 
   test 'does not render for assignment if cyoe off', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
@@ -696,20 +707,25 @@ define [
 
   module 'AssignListItemViewSpec - mastery paths icon',
     setup: ->
-      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
-      ENV.CONDITIONAL_RELEASE_ENV = {
-        active_rules: [{
-          trigger_assignment: '1',
-          scoring_ranges: [
-            {
-              assignment_sets: [
-                { assignments: [{ assignment_id: '2' }] },
-              ],
-            },
-          ],
-        }],
-      }
+      fakeENV.setup({
+        current_user_roles: ['teacher'],
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
+        CONDITIONAL_RELEASE_ENV: {
+          active_rules: [{
+            trigger_assignment: '1',
+            scoring_ranges: [
+              {
+                assignment_sets: [
+                  { assignments: [{ assignment_id: '2' }] },
+                ],
+              },
+            ],
+          }],
+        }
+      })
       CyoeHelper.reloadEnv()
+    teardown: ->
+      fakeENV.teardown()
 
   test 'does not render for assignment if cyoe off', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false

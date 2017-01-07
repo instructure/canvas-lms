@@ -46,7 +46,7 @@ module CC
 
           @added_attachment_ids << file.id
           path = File.join(folder_names, file.display_name)
-          migration_id = CCHelper.create_key(file)
+          migration_id = create_key(file)
           if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename
             files_with_metadata[:files] << [file, migration_id]
           end
@@ -148,7 +148,7 @@ module CC
 
     def process_media_tracks(tracks, media_file_migration_id, media_obj, video_path)
       media_obj.media_tracks.each do |mt|
-        track_id = CCHelper.create_key(mt.content)
+        track_id = create_key(mt.content)
         mt_path = video_path + ".#{mt.locale}.#{mt.kind}"
         @zip_file.get_output_stream(mt_path) do |stream|
           stream.write mt.content
@@ -219,7 +219,7 @@ module CC
       html_content_exporter.used_media_objects.each do |obj|
         next if @added_attachment_ids.include?(obj.attachment_id)
         begin
-          migration_id = CCHelper.create_key(obj)
+          migration_id = create_key(obj)
           info = html_content_exporter.media_object_infos[obj.id]
           next unless info && info[:asset]
 

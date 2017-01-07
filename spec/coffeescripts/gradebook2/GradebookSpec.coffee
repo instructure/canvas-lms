@@ -141,6 +141,50 @@ define [
   test "includes 'needs_grading_count' in the response", ->
     ok _.contains(@excludedFields, 'needs_grading_count')
 
+  module "Gradebook#submissionsForStudent",
+    setupThis: (options = {}) ->
+      effectiveDueDates = {
+        1: { 1: { grading_period_id: "1" } },
+        2: { 1: { grading_period_id: "2" } }
+      }
+
+      defaults = {
+        gradingPeriodsEnabled: false,
+        gradingPeriodToShow: null,
+        isAllGradingPeriods: -> false,
+        effectiveDueDates
+      }
+      _.defaults options, defaults
+
+    setup: ->
+      @student =
+        id: "1"
+        assignment_1: { assignment_id: "1", user_id: "1", name: "yolo" }
+        assignment_2: { assignment_id: "2", user_id: "1", name: "froyo" }
+      @submissionsForStudent = Gradebook.prototype.submissionsForStudent
+
+  test "returns all submissions for the student (multiple grading periods disabled)", ->
+    self = @setupThis()
+    submissions = @submissionsForStudent.call(self, @student)
+    propEqual _.pluck(submissions, "assignment_id"), ["1", "2"]
+
+  test "returns all submissions if 'All Grading Periods' is selected", ->
+    self = @setupThis(
+      gradingPeriodsEnabled: true,
+      gradingPeriodToShow: "0",
+      isAllGradingPeriods: -> true
+    )
+    submissions = @submissionsForStudent.call(self, @student)
+    propEqual _.pluck(submissions, "assignment_id"), ["1", "2"]
+
+  test "only returns submissions due for the student in the selected grading period", ->
+    self = @setupThis(
+      gradingPeriodsEnabled: true,
+      gradingPeriodToShow: "2"
+    )
+    submissions = @submissionsForStudent.call(self, @student)
+    propEqual _.pluck(submissions, "assignment_id"), ["2"]
+
   module 'Gradebook#studentsUrl',
     setupThis:(options) ->
       options = options || {}

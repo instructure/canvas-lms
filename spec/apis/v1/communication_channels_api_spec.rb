@@ -199,9 +199,7 @@ describe 'CommunicationChannels API', type: :request do
 
         it "should work" do
           client = mock()
-          sns = mock()
-          sns.stubs(:client).returns(client)
-          DeveloperKey.stubs(:sns).returns(sns)
+          DeveloperKey.stubs(:sns).returns(client)
           dk = DeveloperKey.default
           dk.sns_arn = 'apparn'
           dk.save!

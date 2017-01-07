@@ -213,9 +213,14 @@ class AssignmentOverride < ActiveRecord::Base
     (override.assignment || override.quiz).context.enrollments_visible_to(user)
   end
 
-  override :due_at
-  override :unlock_at
-  override :lock_at
+  OVERRIDDEN_DATES = %i(due_at unlock_at lock_at).freeze
+  OVERRIDDEN_DATES.each do |field|
+    override field
+  end
+
+  def self.overridden_dates
+    OVERRIDDEN_DATES
+  end
 
   def due_at=(new_due_at)
     new_due_at = CanvasTime.fancy_midnight(new_due_at)

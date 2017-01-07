@@ -9,7 +9,13 @@
     {{/if}}
     <a href="/confirmations/{{user_id}}/re_send/{{user_id}}?enrollment_id={{id}}" class="re_send_confirmation_url" style="display: none;">&nbsp;</a>
   </span>
-  <a href="/courses/{{course_id}}/users/{{user_id}}" class="name">{{user.sortable_name}}</a>
+  <a href="/courses/{{course_id}}/users/{{user_id}}"
+     {{#ifEqual type "StudentEnrollment"}}
+     data-course_id={{course_id}}
+     data-student_id={{user_id}}
+     {{/ifEqual}}
+     class="name {{#ifEqual type "StudentEnrollment"}}student_context_card_trigger{{/ifEqual}}"
+     >{{user.sortable_name}}</a>
   <div class="short_name">{{user.short_name}}</div>
   <div class="enrollment_type">{{typeLabel}}</div>
   <div class="email">{{user.login_id}}</div>

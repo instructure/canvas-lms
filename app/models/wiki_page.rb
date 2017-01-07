@@ -35,6 +35,10 @@ class WikiPage < ActiveRecord::Base
 
   include SearchTermHelper
 
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:body, :title]
+  restrict_columns :settings, [:editing_roles]
+
   after_update :post_to_pandapub_when_revised
 
   belongs_to :wiki, :touch => true

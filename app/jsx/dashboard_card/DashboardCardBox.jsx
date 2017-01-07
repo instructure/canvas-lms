@@ -4,7 +4,8 @@ define([
   './DashboardCard',
   './DraggableDashboardCard',
   './DashboardCardBackgroundStore',
-], ($, React, DashboardCard, DraggableDashboardCard, DashboardCardBackgroundStore) => {
+  './MovementUtils'
+], ($, React, DashboardCard, DraggableDashboardCard, DashboardCardBackgroundStore, MovementUtils) => {
   const DashboardCardBox = React.createClass({
 
     displayName: 'DashboardCardBox',
@@ -42,12 +43,18 @@ define([
 
     moveCard (assetString, atIndex) {
       const cardIndex = this.state.courseCards.findIndex(card => card.assetString === assetString);
-      const newCards = this.state.courseCards.slice();
+      let newCards = this.state.courseCards.slice();
       newCards.splice(atIndex, 0, newCards.splice(cardIndex, 1)[0]);
+      newCards = newCards.map((card, index) => {
+        const newCard = Object.assign({}, card);
+        newCard.position = index;
+        return newCard;
+      });
       this.setState({
         courseCards: newCards
+      }, () => {
+        MovementUtils.updatePositions(this.state.courseCards, window.ENV.current_user_id);
       });
-
     },
 
     colorsUpdated: function(){
@@ -69,7 +76,7 @@ define([
     },
 
     getOriginalIndex (assetString) {
-      return this.props.courseCards.findIndex(c => c.assetString === assetString);
+      return this.state.courseCards.findIndex(c => c.assetString === assetString);
     },
 
     render: function () {
@@ -95,6 +102,7 @@ define([
             position={position}
             currentIndex={index}
             moveCard={this.moveCard}
+            totalCards={this.state.courseCards.length}
           />
         );
       });

@@ -56,7 +56,7 @@ module CC
     end
 
     def process_outcome_group(node, group)
-      migration_id = CCHelper.create_key(group)
+      migration_id = create_key(group)
       node.learningOutcomeGroup(:identifier=>migration_id) do |group_node|
         group_node.title group.title unless group.title.blank?
         group_node.description @html_exporter.html_content(group.description) unless group.description.blank?
@@ -83,7 +83,7 @@ module CC
 
       add_exported_asset(item)
 
-      migration_id = CCHelper.create_key(item)
+      migration_id = create_key(item)
       node.learningOutcome(:identifier=>migration_id) do |out_node|
         out_node.title item.short_description if item.short_description.present?
         out_node.description @html_exporter.html_content(item.description) if item.description.present?
@@ -100,7 +100,7 @@ module CC
             item.alignments.each do |alignment|
               alignments_node.alignment do |alignment_node|
                 alignment_node.content_type alignment.content_type
-                alignment_node.content_id CCHelper.create_key(alignment.content)
+                alignment_node.content_id create_key(alignment.content)
                 alignment_node.mastery_type alignment.tag
                 alignment_node.mastery_score alignment.mastery_score
                 alignment_node.position alignment.position

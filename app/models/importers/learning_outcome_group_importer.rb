@@ -24,6 +24,7 @@ module Importers
         item ||= context.learning_outcome_groups.temp_record
         item.context = context
       end
+      item.workflow_state = 'active' # restore deleted ones
       item.migration_id = hash[:migration_id]
       item.title = hash[:title]
       item.description = hash[:description]

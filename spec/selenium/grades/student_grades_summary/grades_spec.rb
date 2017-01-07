@@ -31,7 +31,7 @@ describe "grades" do
     @assignment.reload
 
     @submission = @first_assignment.submit_homework(@student_1, :body => 'student first submission')
-    @first_assignment.grade_student(@user, :grade => 2)
+    @first_assignment.grade_student(@user, grade: 2, grader: @teacher)
     @assessment = @association.assess({
       :user => @student_1,
       :assessor => @teacher,
@@ -55,7 +55,7 @@ describe "grades" do
 
     #second student submission
     @student_2_submission = @first_assignment.submit_homework(@student_2, :body => 'second student second submission')
-    @first_assignment.grade_student(@student_2, :grade => 4)
+    @first_assignment.grade_student(@student_2, grade: 4, grader: @teacher)
     @student_2_submission.score = 3
     @submission.save!
 
@@ -72,7 +72,7 @@ describe "grades" do
 
     @second_association = @rubric.associate_with(@second_assignment, @course, :purpose => 'grading')
     @second_submission = @second_assignment.submit_homework(@student_1, :body => 'student second submission')
-    @second_assignment.grade_student(@student_1, :grade => 2)
+    @second_assignment.grade_student(@student_1, grade: 2, grader: @teacher)
     @second_submission.save!
 
     #third assignment data
@@ -120,7 +120,7 @@ describe "grades" do
       it "should be available to student view student", priority: "1", test_id: 229448 do
         @fake_student = @course.student_view_student
         @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
-        @first_assignment.grade_student(@fake_student, :grade => 8)
+        @first_assignment.grade_student(@fake_student, grade: 8, grader: @teacher)
 
         enter_student_view
         get "/courses/#{@course.id}/grades"
@@ -206,7 +206,7 @@ describe "grades" do
         :muted => 'true'
       })
       @another_submission = @another_assignment.submit_homework(@student_1, :body => 'student second submission')
-      @another_assignment.grade_student(@student_1, :grade => 81)
+      @another_assignment.grade_student(@student_1, grade: 81, grader: @teacher)
       @another_submission.save!
       get "/courses/#{@course.id}/grades"
       expect(f('.score_value').text).to eq ''
@@ -215,7 +215,7 @@ describe "grades" do
     it "should display assignment statistics", priority: "1", test_id: 229664 do
       5.times do
         s = student_in_course(:active_all => true).user
-        @first_assignment.grade_student(s, :grade => 4)
+        @first_assignment.grade_student(s, grade: 4, grader: @teacher)
       end
 
       get "/courses/#{@course.id}/grades"
@@ -245,18 +245,18 @@ describe "grades" do
       expect(comment_row).to include_text('Anonymous User')
     end
 
-    it "should not show assignment statistics on assignments with less than 5 submissions", 
+    it "should not show assignment statistics on assignments with less than 5 submissions",
         priority: "1", test_id: 229667 do
       get "/courses/#{@course.id}/grades"
       expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")
     end
 
-    it "should not show assignment statistics on assignments when it is diabled on the course", 
+    it "should not show assignment statistics on assignments when it is diabled on the course",
         priority: "1", test_id: 229668 do
       # get up to a point where statistics can be shown
       5.times do
         s = student_in_course(:active_all => true).user
-        @first_assignment.grade_student(s, :grade => 4)
+        @first_assignment.grade_student(s, grade: 4, grader: @teacher)
       end
 
       # but then prevent them at the course level

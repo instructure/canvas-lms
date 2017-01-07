@@ -44,5 +44,3 @@ else
   require 'colorize'
   comments.each { |comment| pretty_comment(comment) }
 end
-
-exit(1)

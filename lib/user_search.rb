@@ -107,7 +107,7 @@ module UserSearch
          WHERE communication_channels.user_id = users.id
            AND communication_channels.path_type = ?
            AND #{like_condition('communication_channels.path')}
-           AND communication_channels.workflow_state='active'))
+           AND communication_channels.workflow_state in ('active', 'unconfirmed')))
     SQL
   end
 

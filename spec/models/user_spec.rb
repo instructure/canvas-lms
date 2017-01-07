@@ -472,13 +472,13 @@ describe User do
   it "should not include recent feedback for muted assignments" do
     create_course_with_student_and_assignment
     @assignment.mute!
-    @assignment.grade_student @student, :grade => 9
+    @assignment.grade_student @student, grade: 9, grader: @teacher
     expect(@user.recent_feedback).to be_empty
   end
 
   it "should include recent feedback for unmuted assignments" do
     create_course_with_student_and_assignment
-    @assignment.grade_student @user, :grade => 9
+    @assignment.grade_student @user, grade: 9, grader: @teacher
     expect(@user.recent_feedback(:contexts => [@course])).not_to be_empty
   end
 
@@ -487,13 +487,13 @@ describe User do
     @course.offer!
     @assignment = @course.assignments.create :title => "Test Assignment", :points_possible => 10
     test_student = @course.student_view_student
-    @assignment.grade_student test_student, :grade => 9
+    @assignment.grade_student test_student, grade: 9, grader: @teacher
     expect(test_student.recent_feedback).not_to be_empty
   end
 
   it "should not include recent feedback for unpublished assignments" do
     create_course_with_student_and_assignment
-    @assignment.grade_student @user, :grade => 9
+    @assignment.grade_student @user, grade: 9, grader: @teacher
     @assignment.unpublish
     expect(@user.recent_feedback(:contexts => [@course])).to be_empty
   end
@@ -503,7 +503,7 @@ describe User do
     other_teacher = @teacher
     teacher = teacher_in_course(:active_all => true).user
     student = student_in_course(:active_all => true).user
-    sub = @assignment.grade_student(student, :grade => 9).first
+    sub = @assignment.grade_student(student, grade: 9, grader: @teacher).first
     sub.submission_comments.create!(:comment => 'c1', :author => other_teacher, :recipient_id => student.id)
     sub.save!
     expect(teacher.recent_feedback(:contexts => [@course])).to be_empty
@@ -1942,7 +1942,7 @@ describe User do
     end
 
     it "should not include unpublished assignments" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       assignment_quiz([], :course => @course, :user => @user)
       @assignment.unpublish
       @quiz.unlock_at = 1.hour.ago
@@ -1959,7 +1959,7 @@ describe User do
     end
 
     it "should not include assignments from soft concluded courses" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
       assignment_quiz([], :course => @course, :user => @user)
       @quiz.unlock_at = nil
@@ -1973,7 +1973,7 @@ describe User do
     end
 
     it "should always have the only_visible_to_overrides attribute" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       assignment_quiz([], :course => @course, :user => @user)
       @quiz.unlock_at = nil
       @quiz.lock_at = nil
@@ -1985,7 +1985,7 @@ describe User do
 
     def create_course_with_assignment_needing_submitting(opts={})
       student = opts[:student]
-      course_with_student_logged_in(:active_all => true, :user => student)
+      course_with_student(:active_all => true, :user => student)
       @course.enrollments.each(&:destroy_permanently!) #student removed from default section
       section = @course.course_sections.create!
       student_in_section(section, user: student)
@@ -2100,7 +2100,7 @@ describe User do
 
   describe "submissions_needing_peer_review" do
     before(:each) do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       @assessor = @student
       assignment_model(course: @course, peer_reviews: true)
       @submission = submission_model(assignment: @assignment)
@@ -2424,13 +2424,13 @@ describe User do
       expect(@teacher.assignments_needing_grading).to be_include(@course2.assignments.first)
 
       # grade one submission for one assignment; these numbers don't change
-      @course1.assignments.first.grade_student(@studentA, :grade => "1")
+      @course1.assignments.first.grade_student(@studentA, grade: "1", grader: @teacher)
       expect(@teacher.assignments_needing_grading.size).to eql(2)
       expect(@teacher.assignments_needing_grading).to be_include(@course1.assignments.first)
       expect(@teacher.assignments_needing_grading).to be_include(@course2.assignments.first)
 
       # grade the other submission; now course1's assignment no longer needs grading
-      @course1.assignments.first.grade_student(@studentB, :grade => "1")
+      @course1.assignments.first.grade_student(@studentB, grade: "1", grader: @teacher)
       @teacher = User.find(@teacher.id)
       expect(@teacher.assignments_needing_grading.size).to eql(1)
       expect(@teacher.assignments_needing_grading).to be_include(@course2.assignments.first)
@@ -2443,8 +2443,8 @@ describe User do
 
       # grade student A's submissions in both courses; now course1's assignment
       # should not show up because the TA doesn't have access to studentB's submission
-      @course1.assignments.first.grade_student(@studentA, :grade => "1")
-      @course2.assignments.first.grade_student(@studentA, :grade => "1")
+      @course1.assignments.first.grade_student(@studentA, grade: "1", grader: @teacher)
+      @course2.assignments.first.grade_student(@studentA, grade: "1", grader: @teacher)
       @ta = User.find(@ta.id)
       expect(@ta.assignments_needing_grading.size).to eql(1)
       expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)

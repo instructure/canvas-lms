@@ -19,38 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ErrorReport do
-  it "should send emails if configured" do
-    account_model
-    PluginSetting.create!(:name => 'error_reporting', :settings => {
-      :action => 'email',
-      :email => 'nobody@nowhere.com'
-    })
-    report = ErrorReport.new
-    report.account = @account
-    report.message = "test"
-    report.subject = "subject"
-    report.save!
-    report.send_to_external
-    m = Message.last
-    expect(m).not_to be_nil
-    expect(m.to).to eql("nobody@nowhere.com")
-  end
-
-  it "should not send emails if not configured" do
-    account_model
-    report = ErrorReport.new
-    report.account = @account
-    report.message = "test"
-    report.subject = "subject"
-    report.save!
-    report.send_to_external
-    m = Message.last
-    expect(!!(m && m.to == "nobody@nowhere.com")).to eql(false)
-  end
-
   describe ".log_exception_from_canvas_errors" do
     it "should not fail with invalid UTF-8" do
-      data = { extra: { message: "he\xffllo" } }
+      message = "he"
+      message << 255.chr
+      message << "llo"
+      data = { extra: { message: message } }
       described_class.log_exception_from_canvas_errors('my error', data)
     end
 

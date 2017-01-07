@@ -105,7 +105,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     end
 
     def survey_with_logged_out_submission
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher(:active_all => true)
 
       @assignment = @course.assignments.create(:title => "Test Assignment")
       @assignment.workflow_state = "available"

@@ -82,7 +82,7 @@ module Lti
         tool_proxy = resource_handler.tool_proxy
         # TODO: create scope for query
         if tool_proxy.workflow_state == 'active'
-          message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(
+          launch_params = {
             launch_url: message_handler.launch_path,
             oauth_consumer_key: tool_proxy.guid,
             lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
@@ -92,7 +92,12 @@ module Lti
             launch_presentation_locale: I18n.locale || I18n.default_locale.to_s,
             roles: Lti::SubstitutionsHelper.new(@context, @domain_root_account, @current_user).all_roles('lis2'),
             launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
-          )
+          }
+          if params[:secure_params].present?
+            secure_params = Canvas::Security.decode_jwt(params[:secure_params])
+            launch_params.merge!({ext_lti_assignment_id: secure_params[:lti_assignment_id]}) if secure_params[:lti_assignment_id].present?
+          end
+          message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_params)
           message.user_id = Lti::Asset.opaque_identifier_for(@current_user) if @current_user
           @active_tab = message_handler.asset_string
           @lti_launch = Launch.new

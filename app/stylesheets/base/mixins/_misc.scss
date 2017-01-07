@@ -19,7 +19,7 @@
 // for hover states where the background color of the parent changes
 
 @mixin firefox-white-space-bug-fix-gradient($fade-out-color) {
-  background: linear-gradient(to right, rgba(255,255,255,0) 0%,$fade-out-color 75%);  
+  background: linear-gradient(to right, rgba(255,255,255,0) 0%,$fade-out-color 75%);
 }
 
 @mixin firefox-white-space-bug-fix($gradient-color: $ic-color-light, $gradient-color-hover: null) {

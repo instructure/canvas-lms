@@ -320,6 +320,19 @@ describe DiscussionTopic do
           expect(@topic.active_participants_with_visibility.include?(@student2)).to be_falsey
         end
 
+        it "should not grant reply permissions to group if course is concluded" do
+          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          group_category = @course.group_categories.create(:name => "new cat")
+          @group = @course.groups.create(:name => "group", :group_category => group_category)
+          @group.add_user(@student1)
+          @course.complete!
+          @topic = @group.discussion_topics.create(:title => "group topic")
+          @topic.save!
+
+          expect(@topic.context).to eq(@group)
+          expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies].sort
+        end
+
         it "should work for subtopics for graded assignments" do
           group_discussion_assignment
           ct = @topic.child_topics.first
@@ -1090,7 +1103,7 @@ describe DiscussionTopic do
       submissions = Submission.where(user_id: @student, assignment_id: assignment).to_a
       expect(submissions.count).to eq 1
       student_submission = submissions.first
-      assignment.grade_student(@student, {:grade => 9})
+      assignment.grade_student(@student, grade: 9, grader: @teacher)
       student_submission.reload
       expect(student_submission.workflow_state).to eq 'graded'
 
@@ -1225,7 +1238,7 @@ describe DiscussionTopic do
       @topic.reply_from(:user => @student, :text => "entry")
       @student.reload
 
-      @assignment.grade_student(@student, :grade => 1)
+      @assignment.grade_student(@student, grade: 1, grader: @teacher)
       @submission = Submission.where(:user_id => @student, :assignment_id => @assignment).first
       expect(@submission.workflow_state).to eq 'graded'
 
@@ -1680,6 +1693,15 @@ describe DiscussionTopic do
       @topic.unlock!
       expect(@topic.workflow_state).to eql 'active'
       expect(@topic.locked?).to be_falsey
+    end
+
+    it "should use course setting for `lock_all_announcements` if set" do
+      @course.lock_all_announcements = true
+      @course.save!
+      announcement = @course.announcements.create!(message: "Lock this")
+      expect(announcement.locked?).to be_truthy
+      expect{announcement.unlock!}.to raise_error
+      expect(announcement.locked?).to be_truthy
     end
   end
 

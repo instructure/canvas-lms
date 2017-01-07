@@ -494,4 +494,22 @@ describe "courses" do
       expect(f('#course_home_content')).to be_displayed
     end
   end
+
+  it "should display announcements on course home page if enabled and is wiki" do
+    course_with_teacher_logged_in :active_all => true
+
+    get "/courses/#{@course.id}"
+
+    expect(element_exists?('#announcements_on_home_page')).to be_falsey
+
+    @course.default_view = "wiki"
+    @course.show_announcements_on_home_page = true
+    @course.home_page_announcement_limit = 5
+    @course.save!
+    @course.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
+
+    get "/courses/#{@course.id}"
+
+    expect(f('#announcements_on_home_page')).to be_displayed
+  end
 end

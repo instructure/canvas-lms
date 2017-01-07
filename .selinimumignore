@@ -16,10 +16,11 @@
 *.eot
 *.sh
 
+
 *.rubocop.yml
 
 /.dockerignore
-/.fontcustom-manifest.json
+
 /.selinimumignore
 /.stylelintrc
 /app/stylesheets/brandable_variables.json

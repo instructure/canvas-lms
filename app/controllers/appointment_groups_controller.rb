@@ -228,7 +228,7 @@ class AppointmentGroupsController < ApplicationController
   # @argument include_past_appointments [Boolean]
   #   Defaults to false. If true, includes past appointment groups
   #
-  # @argument include[] ["appointments"|"child_events"|"participant_count"|"reserved_times"]
+  # @argument include[] ["appointments"|"child_events"|"participant_count"|"reserved_times"|"all_context_codes"]
   #   Array of additional information to include.
   #
   #   "appointments":: calendar event time slots for this appointment group
@@ -236,6 +236,7 @@ class AppointmentGroupsController < ApplicationController
   #   "participant_count":: number of reservations
   #   "reserved_times":: the event id, start time and end time of reservations
   #                      the current user has made)
+  #   "all_context_codes":: all context codes associated with this appointment group
   def index
     return web_index unless request.format == :json
 
@@ -363,12 +364,13 @@ class AppointmentGroupsController < ApplicationController
   #
   # Returns information for a single appointment group
   #
-  # @argument include[] ["child_events"|"appointments"]
-  #   Array of additional information to include. Ssee include[] argument of
+  # @argument include[] ["child_events"|"appointments"|"all_context_codes"]
+  #   Array of additional information to include. See include[] argument of
   #   "List appointment groups" action.
   #
   #   "child_events":: reservations of time slots time slots
   #   "appointments":: will always be returned
+  #   "all_context_codes":: all context codes associated with this appointment group
   def show
     if authorized_action(@group, @current_user, :read)
       return web_show unless request.format == :json

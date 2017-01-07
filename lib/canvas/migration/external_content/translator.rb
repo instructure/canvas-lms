@@ -1,9 +1,10 @@
 module Canvas::Migration::ExternalContent
   class Translator
 
-    attr_reader :content_migration
-    def initialize(cm=nil)
-      @content_migration = cm
+    attr_reader :content_migration, :content_export
+    def initialize(content_migration: nil, content_export: nil)
+      @content_migration = content_migration
+      @content_export = content_export
     end
 
     # recursively searches for keys matching our special format -
@@ -71,7 +72,11 @@ module Canvas::Migration::ExternalContent
     end
 
     def get_migration_id_from_canvas_id(obj_class, canvas_id)
-      CC::CCHelper.create_key("#{obj_class.reflection_type_name}_#{canvas_id}")
+      if content_export && content_export.for_master_migration?
+        content_export.create_key("#{obj_class.reflection_type_name}_#{Shard.global_id_for(canvas_id)}")
+      else
+        CC::CCHelper.create_key("#{obj_class.reflection_type_name}_#{canvas_id}")
+      end
     end
 
     NOT_FOUND = "$OBJECT_NOT_FOUND"

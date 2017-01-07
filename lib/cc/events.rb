@@ -39,7 +39,7 @@ module CC
         calendar_event_scope.each do |event|
           next unless export_object?(event)
           add_exported_asset(event)
-          migration_id = CCHelper.create_key(event)
+          migration_id = create_key(event)
           events_node.event(:identifier=>migration_id) do |event_node|
             event_node.title event.title unless event.title.blank?
             event_node.description @html_exporter.html_content(event.description)

@@ -56,4 +56,15 @@ describe "Importing wikis" do
     expect(wiki.body =~ /\/courses\/\d+\/pages\/course-glossary-i-j-k-l-m/).not_to be_nil
     expect(wiki.body =~ /\/courses\/\d+\/pages\/course-glossary-n-o-p-q-r/).not_to be_nil
   end
+
+  it 'should resurrect deleted pages' do
+    data = get_import_data('bb9', 'wiki')
+    context = get_import_context('bb9')
+    migration = context.content_migrations.create!
+    Importers::WikiPageImporter.import_from_migration(data, context, migration)
+    page = context.wiki.wiki_pages.last
+    page.destroy
+    Importers::WikiPageImporter.import_from_migration(data, context, migration)
+    expect(page.reload).not_to be_deleted
+  end
 end

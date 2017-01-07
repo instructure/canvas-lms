@@ -71,6 +71,29 @@ Note that the actual bodies of events may include more fields than
 what's described in this document. Those fields are subject to change.
 
 
+#### `course_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `course_id` | The Canvas id of the created course. |
+| `account_id` | The Account id of the created course. |
+| `name` | The name the created course. |
+| `created_at` | The time at which this course was created. |
+| `updated_at` | The time at which this course was last modified in any way. |
+| `workflow_state` | The state of the course. |
+
+#### `course_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `course_id` | The Canvas id of the updated course. |
+| `account_id` | The Account id of the created course. |
+| `name` | The name the updated course. |
+| `created_at` | The time at which this course was created. |
+| `updated_at` | The time at which this course was last modified in any way. |
+| `workflow_state` | The state of the course. |
+
+
 #### `syllabus_updated`
 
 | Field | Description |
@@ -288,6 +311,30 @@ by `asset_type` and `asset_id`.
 | `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
 | `url` | The URL of the submission (for 'online_url' submissions) |
 | `attempt` | This is the submission attempt number. |
+
+
+#### `user_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of user. |
+| `name` | Name of user. |
+| `short_name` | Short name of user. |
+| `workflow_state` | State of the user. |
+| `created_at` | The time at which this user was created. |
+| `updated_at` | The time at which this user was last modified in any way. |
+
+
+#### `user_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of user. |
+| `name` | Name of user. |
+| `short_name` | Short name of user. |
+| `workflow_state` | State of the user. |
+| `created_at` | The time at which this user was created. |
+| `updated_at` | The time at which this user was last modified in any way. |
 
 
 #### `enrollment_created`

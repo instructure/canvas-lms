@@ -2,18 +2,16 @@
   <% @categories.each do |c| %>
     <li id="section_<%= c.id %>" class="section <%= "active" if c == @category %>">
       <span class="section_url">
-        <button type="button" class="Button Button--link edit_section_link" title="<%= t("Rename this Section") %>"><i aria-hidden="true" class="icon-edit standalon-icon"></i><span class="screenreader-only"><%= t("Rename %{c.name} Section") %></span></button>
-        <a class="name" href="<%= c.slug.presence && eportfolio_named_category_path(c.eportfolio, c.slug) %>"><%= c.name %></a>
-        <a href="<%= eportfolio_category_path(c.eportfolio, c.id) %>" class="remove_section_link"><i class="icon-trash standalone-icon" aria-hidden="true"></i><span class="screenreader-only"><%= t("Remove %{c.name} Section") %></span></a>
+        <a class="name edit_section_link" href="<%= c.slug.presence && eportfolio_named_category_path(c.eportfolio, c.slug) %>"><%= c.name %></a>
+        <%= render partial: 'eportfolios/section_settings', locals: { title: c.name, section_url: eportfolio_category_path(c.eportfolio, c.id) } %>
       </span>
       <a class="rename_section_url" href="<%= eportfolio_category_path(c.eportfolio, c.id) %>" style="display: none;"></a>
     </li>
   <% end %>
   <li id="section_blank" class="section unsaved" style="display: none;">
     <span class="section_url">
-      <button class="Button Button--link edit_section_link" title="<%= t("Rename this Section") %>"><i class="icon-edit standalone-icon" aria-hidden="true"></i><span class="screenreader-only"><%= t("Rename this Section") %></span></button>
-      <a class="name" href="<%= eportfolio_named_category_path(@portfolio, "{{ slug }}") %>"><%= t("Section Name") %></a>
-      <a href="<%= eportfolio_category_path(@portfolio.id, "{{ id }}") %>" class="remove_section_link"><i class="icon-trash standalone-icon" aria-hidden="true"></i><span class="screenreader-only"><%= t('Remove this Section') %></span></a>
+      <a class="name edit_section_link" href="<%= eportfolio_named_category_path(@portfolio, "{{ slug }}") %>"><%= t("Section Name") %></a>
+      <%= render partial: 'eportfolios/section_settings', locals: { title: t("Section Name"), section_url: eportfolio_category_path(@portfolio.id, "{{ id }}") } %>
     </span>
     <a class="rename_section_url" style="display: none;" href="<%= eportfolio_category_path(@portfolio, "{{ id }}") %>"></a>
   </li>

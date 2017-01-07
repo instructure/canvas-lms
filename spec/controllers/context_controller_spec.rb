@@ -84,6 +84,31 @@ describe ContextController do
       get 'roster', :group_id => @group.id
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [@student.id, active_student.id, inactive_student.id]
     end
+
+    context "student content cards" do
+      before(:once) do
+        @course.root_account.enable_feature! :student_context_cards
+      end
+
+      it "is disabled when feature_flag is off" do
+        @course.root_account.disable_feature! :student_context_cards
+        user_session(@teacher)
+        get :roster, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
+      end
+
+      it "is enabled for teachers when feature_flag is on" do
+        user_session(@teacher)
+        get :roster, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be true
+      end
+
+      it "is always disabled for students" do
+        user_session(@student)
+        get :roster, course_id: @course.id
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be_falsey
+      end
+    end
   end
 
   describe "GET 'roster_user'" do

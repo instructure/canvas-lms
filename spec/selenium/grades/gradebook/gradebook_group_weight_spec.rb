@@ -48,8 +48,8 @@ describe "group weights" do
   end
 
   it 'should show total column as points' do
-    @assignment1.grade_student @student, :grade => 20
-    @assignment2.grade_student @student, :grade => 5
+    @assignment1.grade_student @student, grade: 20, grader: @teacher
+    @assignment2.grade_student @student, grade: 5, grader: @teacher
 
     @course.show_total_grade_as_points = true
     @course.update_attributes(:group_weighting_scheme => 'points')
@@ -60,8 +60,8 @@ describe "group weights" do
   end
 
   it 'should show total column as percent' do
-    @assignment1.grade_student @student, :grade => 20
-    @assignment2.grade_student @student, :grade => 5
+    @assignment1.grade_student @student, grade: 20, grader: @teacher
+    @assignment2.grade_student @student, grade: 5, grader: @teacher
 
     @course.show_total_grade_as_points = false
     @course.update_attributes(:group_weighting_scheme => 'percent')

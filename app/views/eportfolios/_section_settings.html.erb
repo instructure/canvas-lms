@@ -1,0 +1,18 @@
+<div class="al-dropdown__container section_settings_menu" style="position: relative;">
+  <a class="al-trigger" data-popup-within="#wrapper" role="button" href="#">
+    <i class="icon-settings"></i>
+    <i class="icon-mini-arrow-down"></i>
+    <span class="screenreader-only settings-label"><%= t("Settings for %{title}", title: title) %></span>
+  </a>
+  <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+    <li role="presentation">
+      <a href="#" class="edit_section_link icon-edit" tabindex="-1" role="menuitem" title="<%= t("Rename this section") %>"><%= t("Rename") %></a>
+    </li>
+    <li role="presentation">
+      <a href="<%= section_url %>" class="remove_section_link icon-trash" tabindex="-1" role="menuitem" title="<%= t("Delete this section") %>"><%= t("Delete") %></a>
+    </li>
+    <li role="presentation">
+      <a href="#" class="move_section_link icon-updown" tabindex="-1" role="menuitem" title="<%= t("Move this section") %>"><%= t("Move to...") %></a>
+    </li>
+  </ul>
+</div>

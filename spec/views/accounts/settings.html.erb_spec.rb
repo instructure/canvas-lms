@@ -120,8 +120,9 @@ describe "accounts/settings.html.erb" do
       assigns[:announcements] = AccountNotification.none.paginate
     end
 
-    def do_render(user)
-      view_context(@account,user)
+    def do_render(user,account=nil)
+      account = @account unless account
+      view_context(account,user)
       render
     end
 
@@ -161,6 +162,7 @@ describe "accounts/settings.html.erb" do
       let(:current_user) { account_admin_user }
       before do
         @account = Account.default
+        @subaccount = @account.sub_accounts.create!(:name => 'sub-account')
 
         assigns[:account] = @account
         assigns[:root_account] = @account
@@ -191,68 +193,80 @@ describe "accounts/settings.html.erb" do
       end
 
       context "new_sis_integrations => true" do
+        let(:allow_sis_import) { "input#account_allow_sis_import" }
+        let(:sis_syncing) { "input#account_settings_sis_syncing_value" }
+        let(:sis_syncing_locked) { "input#account_settings_sis_syncing_locked" }
+        let(:default_grade_export) { "#account_settings_sis_default_grade_export_value" }
+        let(:require_assignment_due_date) { "#account_settings_sis_require_assignment_due_date_value" }
+
         before do
           @account.stubs(:feature_enabled?).with(:new_sis_integrations).returns(true)
         end
 
         context "should show settings to regular admin user" do
           before do
-            do_render(account_admin_user)
+            do_render(current_user)
           end
 
           it { expect(response).to     have_tag("#sis_integration_settings") }
-          it { expect(response).to     have_tag("#account_allow_sis_import") }
-          it { expect(response).to     have_tag("#account_settings_sis_syncing_value") }
+          it { expect(response).to     have_tag(allow_sis_import) }
+          it { expect(response).to     have_tag(sis_syncing) }
+          it { expect(response).to     have_tag(sis_syncing_locked) }
+          it { expect(response).to     have_tag(require_assignment_due_date) }
           it { expect(response).not_to have_tag("#sis_grade_export_settings") }
           it { expect(response).not_to have_tag("#old_sis_integrations") }
         end
 
-        context "SIS grade export enabled" do
+        context "SIS syncing enabled" do
           before do
-            Assignment.expects(:sis_grade_export_enabled?).returns(true)
+            Assignment.stubs(:sis_grade_export_enabled?).returns(true)
           end
 
-          it "should include default grade export settings" do
-            do_render(account_admin_user)
-            expect(response).to have_tag("input#account_settings_sis_default_grade_export_value")
-          end
-
-          context "account settings inherited" do
+          context "for root account" do
             before do
-              @account.expects(:sis_default_grade_export).returns({ value: true, locked: true, inherited: true })
+              @account.stubs(:sis_syncing).returns({value: true, locked: true})
+              do_render(current_user)
             end
 
-            it "should not include sub-checkbox" do
-              do_render(account_admin_user)
-              expect(response).not_to have_tag(
-                "input#account_settings_sis_default_grade_export_locked_for_sub_accounts"
-              )
+            it "should enable all controls under SIS syncing" do
+              expect(response).not_to have_tag("#{sis_syncing}[disabled]")
+              expect(response).not_to have_tag("#{sis_syncing_locked}[disabled]")
+              expect(response).not_to have_tag("#{default_grade_export}[disabled]")
+              expect(response).not_to have_tag("#{require_assignment_due_date}[disabled]")
             end
           end
 
-          context "account settings not inherited" do
-            before do
-              @account.expects(:sis_default_grade_export).returns({ value: true, locked: true, inherited: false })
+          context "for sub-accounts (inherited)" do
+            context "locked" do
+              before do
+                @account.stubs(:sis_syncing).returns({value: true, locked: true, inherited: true })
+                do_render(current_user)
+              end
+
+              it "should disable all controls under SIS syncing" do
+                expect(response).to have_tag("#{sis_syncing}[disabled]")
+                expect(response).to have_tag("#{sis_syncing_locked}[disabled]")
+                expect(response).to have_tag("#{default_grade_export}[disabled]")
+                expect(response).to have_tag("#{require_assignment_due_date}[disabled]")
+              end
             end
 
-            it "should include sub-checkbox" do
-              do_render(account_admin_user)
-              expect(response).to have_tag("input#account_settings_sis_default_grade_export_locked_for_sub_accounts")
+            context "not locked" do
+              before do
+                @account.stubs(:sis_syncing).returns({value: true, locked: false, inherited: true })
+                do_render(current_user)
+              end
+
+              it "should enable all controls under SIS syncing" do
+                expect(response).not_to have_tag("#{sis_syncing}[disabled]")
+                expect(response).not_to have_tag("#{sis_syncing_locked}[disabled]")
+                expect(response).not_to have_tag("#{default_grade_export}[disabled]")
+                expect(response).not_to have_tag("#{require_assignment_due_date}[disabled]")
+              end
             end
           end
         end
 
-        context "SIS grade export not enabled" do
-          before do
-            Assignment.expects(:sis_grade_export_enabled?).returns(false)
-            do_render(account_admin_user)
-          end
-
-          it "should not include default grade export settings" do
-            expect(response).not_to have_tag("input#account_settings_sis_default_grade_export_value")
-            expect(response).not_to have_tag("input#account_settings_sis_default_grade_export_locked_for_sub_accounts")
-          end
-        end
       end
     end
   end

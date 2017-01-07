@@ -24,7 +24,7 @@ module CC
         next unless export_object?(tool)
         add_exported_asset(tool)
 
-        migration_id = CCHelper::create_key(tool)
+        migration_id = create_key(tool)
 
         lti_file_name = "#{migration_id}.xml"
         lti_path = File.join(@export_dir, lti_file_name)

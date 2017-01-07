@@ -332,15 +332,28 @@
             <%= (format_options.detect{|text, key| key == @context.course_format} || format_options.first).first %>
           <% end %>
         </td>
-      </tr><tr>
+      </tr>
+      <tr>
         <td class="form-label"><label for="course_epub_export"><%= before_label('course_epub_export', %{Epub Export}) %></label></td>
-        <td colspan="3" id="course_visibility">
+        <td colspan="3" id="epub_export">
           <div>
             <%= f.check_box :organize_epub_by_content_type, :disabled => !can_manage %>
             <%= f.label :organize_epub_by_content_type, t("Organize epub by content type (default is by module).") %>
           </div>
         </td>
-      </tr><tr>
+      </tr>
+      <% if @context.root_account.enable_offline_web_export? %>
+        <tr>
+          <td class="form-label"><label for="course_offline_export"><%= before_label('course_offline_export', %{Offline Course}) %></label></td>
+          <td colspan="3" id="offline_web_export">
+            <div>
+              <%= f.check_box :enable_offline_web_export, :disabled => !can_manage %>
+              <%= f.label :enable_offline_web_export, t("Allow course content to be downloaded and viewed offline") %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      <tr>
         <td class="form-label"><label for="course_public_description"><%= before_label('course_description', %{Description}) %></label></td>
         <td colspan="3">
           <%= f.text_area :public_description, :style => "height: 100px;", :disabled => !can_manage %>
@@ -382,6 +395,10 @@
               <%= f.label :open_enrollment, :en => "Add a \"Join this Course\" link to the course home page" %><br/>
               </div>
             <% end %>
+            <%= f.check_box :show_announcements_on_home_page, :disabled => !can_manage %>
+            <%= f.label :show_announcements_on_home_page, :en => "Show recent announcements on Course home page" %><br/>
+            <%= f.select :home_page_announcement_limit, options_for_select(1..15, @context.home_page_announcement_limit || 3), {}, {:disabled => !can_manage || !@context.show_announcements_on_home_page?, :style => 'width: 75px'} %>
+            <%= f.label :home_page_announcement_limit, :en => 'Number of announcements shown on the homepage' %><br/>
             <%= f.check_box :allow_student_forum_attachments, :disabled => !can_manage %>
             <%= f.label :allow_student_forum_attachments, :en => "Let students attach files to discussions" %><br/>
             <%= f.check_box :allow_student_discussion_topics, :disabled => !can_manage %>
@@ -394,7 +411,7 @@
             <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
             <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>
             <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
-            <%= f.check_box :lock_all_announcements, :disabled => !can_manage %>
+            <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
             <%= label_tag :course_lock_all_announcements, :en => 'Disable comments on announcements' %><br />
             <%= f.select :default_wiki_editing_roles, [
               [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
@@ -587,7 +604,8 @@
           <input type="radio" name="move_location" value="after" id="move_location_after" class="move-nav-item-label-spacer" /><label class="move-nav-item-label-width" for="move_location_after"><%= t('move_nav_item.after', "After") %></label>
         </div>
         <div class="move-nav-item-select-spacer">
-          <select name="move_nav_item_select" id="move_nav_item_select"></select>
+          <label class="move-nav-item-label-width" for="move_nav_item_select"><%= t("Move Item") %></label>
+          <select name="move_nav_item_select" aria-label="<%= t("Move Item") %>" id="move_nav_item_select"></select>
         </div>
 
       </div>

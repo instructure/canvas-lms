@@ -7,8 +7,10 @@ define([
   'jsx/dashboard_card/DraggableDashboardCard',
   'jsx/dashboard_card/getDroppableDashboardCardBox',
   'jsx/dashboard_card/DashboardCardBox',
+  'jsx/dashboard_card/DashboardCard',
+  'jsx/dashboard_card/DashboardCardMovementMenu',
   'helpers/fakeENV'
-], (React, ReactDOM, TestUtils, { DragDropContext }, ReactDndTestBackend, DraggableDashboardCard, getDroppableDashboardCardBox, DashboardCardBox, fakeENV) => {
+], (React, ReactDOM, TestUtils, { DragDropContext }, ReactDndTestBackend, DraggableDashboardCard, getDroppableDashboardCardBox, DashboardCardBox, DashboardCard, DashboardCardMovementMenu, fakeENV) => {
   let cards;
   let fakeServer;
 
@@ -82,14 +84,29 @@ define([
     const backend = root.getManager().getBackend();
     const renderedCardComponents = TestUtils.scryRenderedComponentsWithType(root, DraggableDashboardCard);
     const sourceHandlerId = renderedCardComponents[0].getDecoratedComponentInstance().getHandlerId();
-    const targetHandlerId = renderedCardComponents[1].getHandlerId()
+    const targetHandlerId = renderedCardComponents[1].getHandlerId();
 
     backend.simulateBeginDrag([sourceHandlerId]);
     backend.simulateHover([targetHandlerId]);
     backend.simulateDrop();
 
-    const renderedAfterDragNDrop = TestUtils.scryRenderedDOMComponentsWithClass(root, 'ic-DashboardCard')
-    equal(renderedAfterDragNDrop[0].getAttribute('aria-label'), 'Intermediate Dashcarding')
-    equal(renderedAfterDragNDrop[1].getAttribute('aria-label'), 'Intro to Dashcards 1')
-  })
+    const renderedAfterDragNDrop = TestUtils.scryRenderedDOMComponentsWithClass(root, 'ic-DashboardCard');
+    equal(renderedAfterDragNDrop[0].getAttribute('aria-label'), 'Intermediate Dashcarding');
+    equal(renderedAfterDragNDrop[1].getAttribute('aria-label'), 'Intro to Dashcards 1');
+  });
+
+  test('DashboardCard renders a DashboardCardMovementMenu when reordering is enabled', () => {
+    const props = cards[0];
+    const card = TestUtils.renderIntoDocument(
+      <DashboardCard
+        connectDragSource={el => el}
+        connectDropTarget={el => el}
+        reorderingEnabled
+        {...props}
+      />
+    );
+
+    const menuComponent = TestUtils.findRenderedComponentWithType(card, DashboardCardMovementMenu);
+    ok(menuComponent);
+  });
 });

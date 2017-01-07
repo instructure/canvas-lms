@@ -12,6 +12,7 @@
 
 .bundle/
 .byebug_history
+.env
 /.yardoc/
 /app/coffeescripts/ember/*/main.coffee
 /app/coffeescripts/ember/screenreader_gradebook/templates/**/*.js

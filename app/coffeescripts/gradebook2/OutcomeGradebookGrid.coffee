@@ -7,6 +7,7 @@ define [
   'compiled/util/NumberCompare'
   'jst/gradebook2/outcome_gradebook_cell'
   'jst/gradebook2/outcome_gradebook_student_cell'
+  'jsx/context_cards/StudentContextCardTrigger'
 ], (I18n, $, _, HeaderFilterView, OutcomeColumnView, numberCompare, cellTemplate, studentCellTemplate) ->
 
   ###
@@ -346,7 +347,7 @@ define [
         cellTemplate(score: Math.round(value * 100.0) / 100.0, className: className, masteryScore: outcome.mastery_points)
 
       studentCell: (row, cell, value, columnDef, dataContext) ->
-        studentCellTemplate(value)
+        studentCellTemplate(_.extend value, course_id: ENV.GRADEBOOK_OPTIONS.context_id)
 
       # Public: Create a string class name for the given score.
       #

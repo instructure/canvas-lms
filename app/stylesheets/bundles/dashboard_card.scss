@@ -68,7 +68,7 @@ $ic-DashboardCard-toggle-size: 60px;
 
 .ic-DashboardCard__header_image {
   background-size: cover;
-  background-position: center center; 
+  background-position: center center;
   background-repeat: no-repeat;
 }
 
@@ -165,6 +165,12 @@ $ic-DashboardCard-toggle-size: 60px;
     }
     &:hover { color: $ic-DashboardCard-action-hover-font-color; }
   }
+}
+
+.DashboardCardMovementMenu {
+  position: absolute;
+  top: 6px;
+  right: 32px;
 }
 
 

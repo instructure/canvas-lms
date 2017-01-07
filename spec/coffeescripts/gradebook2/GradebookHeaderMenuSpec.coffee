@@ -5,27 +5,7 @@ define [
   'compiled/gradebook2/GradebookHeaderMenu'
   'compiled/gradebook2/SetDefaultGradeDialog'
   'compiled/gradebook2/CurveGradesDialog'
-], (
-  $, _, fakeENV, GradebookHeaderMenu, SetDefaultGradeDialog, CurveGradesDialog
-) ->
-
-  module 'GradebookHeaderMenu#isCurrentUserAdmin',
-    setup: ->
-      fakeENV.setup()
-      @isCurrentUserAdmin = GradebookHeaderMenu.prototype.isCurrentUserAdmin
-
-    teardown: ->
-      fakeENV.teardown()
-
-  test 'returns false if ENV.current_user_roles exists but does not contain the admin role', ->
-    ENV.current_user_roles = ['forty_two', 'plebian']
-
-    equal @isCurrentUserAdmin(), false
-
-  test 'returns true if ENV.current_user_roles contains the admin role', ->
-    ENV.current_user_roles = ['admin']
-
-    equal @isCurrentUserAdmin(), true
+], ($, _, fakeENV, GradebookHeaderMenu, SetDefaultGradeDialog, CurveGradesDialog) ->
 
   module 'GradebookHeaderMenu#menuPopupOpenHandler',
     setup: ->
@@ -36,33 +16,26 @@ define [
       @menu = 'mockMenu'
 
     teardown: ->
+      fakeENV.teardown()
 
-  test 'calls @hideMenuActionsWithUnmetDependencies with the passed in menu when
-    @isCurrentUserAdmin returns true', ->
-    @isCurrentUserAdmin = @stub().returns(true)
+  test 'calls @hideMenuActionsWithUnmetDependencies when isAdmin', ->
+    fakeENV.setup({current_user_roles: ['admin']})
     @menuPopupOpenHandler()
-
     ok @hideMenuActionsWithUnmetDependencies.called
 
-  test 'calls @hideMenuActionsWithUnmetDependencies with the passed in menu when
-    @isCurrentUserAdmin returns false', ->
-    @isCurrentUserAdmin = @stub().returns(false)
+  test 'calls @hideMenuActionsWithUnmetDependencies when not isAdmin', ->
+    fakeENV.setup({current_user_roles: []})
     @menuPopupOpenHandler()
-
     ok @hideMenuActionsWithUnmetDependencies.called
 
-  test 'does not call @disableUnavailableMenuActions with the passed in menu when
-    @isCurrentUserAdmin returns true', ->
-    @isCurrentUserAdmin = @stub().returns(true)
+  test 'does not call @disableUnavailableMenuActions when isAdmin', ->
+    fakeENV.setup({current_user_roles: ['admin']})
     @menuPopupOpenHandler()
-
     notOk @disableUnavailableMenuActions.called
 
-  test 'calls @disableUnavailableMenuActions with the passed in menu when
-    @isCurrentUserAdmin returns false', ->
-    @isCurrentUserAdmin = @stub().returns(false)
+  test 'calls @disableUnavailableMenuActions when not isAdmin', ->
+    fakeENV.setup({current_user_roles: []})
     @menuPopupOpenHandler()
-
     ok @disableUnavailableMenuActions.called
 
   module 'GradebookHeaderMenu#hideMenuActionsWithUnmetDependencies',
@@ -189,7 +162,11 @@ define [
 
   module 'GradebookHeaderMenu#disableUnavailableMenuActions',
     setup: ->
-      fakeENV.setup()
+      fakeENV.setup({
+        GRADEBOOK_OPTIONS: {
+          multiple_grading_periods_enabled: true
+        }
+      })
       @disableUnavailableMenuActions = GradebookHeaderMenu.prototype.disableUnavailableMenuActions
 
       @menuElement = document.createElement('ul')
@@ -211,53 +188,51 @@ define [
     disabledMenuItems: (root) ->
       root.find('.ui-state-disabled')
 
-  test 'returns false when not given a menu', ->
-    equal @disableUnavailableMenuActions(), false
-
   test 'disables 0 menu items when given a menu but @assignment does not exist', ->
-    equal @disableUnavailableMenuActions(@menu), false
+    @disableUnavailableMenuActions(@menu)
     equal @disabledMenuItems(@menu).length, 0
 
-  test 'disables 0 menu items when given a menu and @assignment which does not have
-    has_due_date_in_closed_grading_period set', ->
+  test 'disables 0 menu items when given a menu and @assignment which does not have inClosedGradingPeriod set', ->
     @assignment = {}
 
-    equal @disableUnavailableMenuActions(@menu), false
+    @disableUnavailableMenuActions(@menu)
     equal @disabledMenuItems(@menu).length, 0
 
-  test 'disables 0 menu items when given a menu and @assignment which has
-    has_due_date_in_closed_grading_period set', ->
+  test 'disables 0 menu items when given a menu and @assignment which has inClosedGradingPeriod set', ->
     @assignment = {
-      has_due_date_in_closed_grading_period: false
+      inClosedGradingPeriod: false
     }
 
-    equal @disableUnavailableMenuActions(@menu), false
+    @disableUnavailableMenuActions(@menu)
     equal @disabledMenuItems(@menu).length, 0
 
-  test 'disables the curveGrades and setDefaultGrade menu items when given a menu and @assignment
-    which _does_ have has_due_date_in_closed_grading_period set', ->
+  test 'given an assignment in closed grading period, disable curveGrades and setDefaultGrade menu items', ->
     @assignment = {
-      has_due_date_in_closed_grading_period: true
+      inClosedGradingPeriod: true
     }
 
-    equal @disableUnavailableMenuActions(@menu), true
+    @disableUnavailableMenuActions(@menu)
 
     disabledMenuItems = @disabledMenuItems(@menu)
     equal disabledMenuItems.length, 2
     equal disabledMenuItems[0].getAttribute('data-action'), 'curveGrades'
     equal disabledMenuItems[1].getAttribute('data-action'), 'setDefaultGrade'
-    ok disabledMenuItems[0].getAttribute('aria-disabled'), true
-    ok disabledMenuItems[1].getAttribute('aria-disabled'), true
+    ok disabledMenuItems[0].getAttribute('aria-disabled')
+    ok disabledMenuItems[1].getAttribute('aria-disabled')
 
   module 'GradebookHeaderMenu#setDefaultGrade',
     setup: ->
-      fakeENV.setup()
+      fakeENV.setup({
+        GRADEBOOK_OPTIONS: {
+          multiple_grading_periods_enabled: true
+        },
+        current_user_roles: ['admin']
+      })
       @setDefaultGrade = GradebookHeaderMenu.prototype.setDefaultGrade
 
       @options = {
-        isAdmin: true
         assignment: {
-          has_due_date_in_closed_grading_period: false
+          inClosedGradingPeriod: false
         }
       }
       @spy($, 'flashError')
@@ -266,44 +241,48 @@ define [
     teardown: ->
       fakeENV.teardown()
 
-  test 'calls the SetDefaultGradeDialog when isAdmin is true and assignment has no due date in
-    a closed grading period', ->
-    @setDefaultGrade(@options)
+  test 'calls the SetDefaultGradeDialog when isAdmin is true and assignment ' +
+    'has no due date in a closed grading period', ->
+      @setDefaultGrade(@options)
 
-    ok @dialogStub.called
+      ok @dialogStub.called
 
-  test 'calls the SetDefaultGradeDialog when isAdmin is true and assignment does have a due date in
-    a closed grading period', ->
-    @options.assignment.has_due_date_in_closed_grading_period = true
-    @setDefaultGrade(@options)
+  test 'calls the SetDefaultGradeDialog when isAdmin is true and assignment ' +
+    'does have a due date in a closed grading period', ->
+      @options.assignment.inClosedGradingPeriod = true
+      @setDefaultGrade(@options)
 
-    ok @dialogStub.called
+      ok @dialogStub.called
 
-  test 'calls the SetDefaultGradeDialog when isAdmin is false and assignment has no due date in
-    a closed grading period', ->
-    @options.isAdmin = false
-    @setDefaultGrade(@options)
+  test 'calls the SetDefaultGradeDialog when isAdmin is false and assignment ' +
+    'has no due date in a closed grading period', ->
+      ENV.current_user_roles = []
+      @setDefaultGrade(@options)
 
-    ok @dialogStub.called
+      ok @dialogStub.called
 
-  test 'calls the flashError when isAdmin is false and assignment does have a due date in
-    a closed grading period', ->
-    @options.isAdmin = false
-    @options.assignment.has_due_date_in_closed_grading_period = true
-    @setDefaultGrade(@options)
+  test 'calls the flashError when isAdmin is false and assignment does have ' +
+    'a due date in a closed grading period', ->
+      ENV.current_user_roles = []
+      @options.assignment.inClosedGradingPeriod = true
+      @setDefaultGrade(@options)
 
-    notOk @dialogStub.called
-    ok $.flashError.called
+      notOk @dialogStub.called
+      ok $.flashError.called
 
   module 'GradebookHeaderMenu#curveGrades',
     setup: ->
-      fakeENV.setup()
+      fakeENV.setup({
+        GRADEBOOK_OPTIONS: {
+          multiple_grading_periods_enabled: true
+        },
+        current_user_roles: ['admin']
+      })
       @curveGrades = GradebookHeaderMenu.prototype.curveGrades
 
       @options = {
-        isAdmin: true
         assignment: {
-          has_due_date_in_closed_grading_period: false
+          inClosedGradingPeriod: false
         }
       }
       @spy($, 'flashError')
@@ -312,31 +291,31 @@ define [
     teardown: ->
       fakeENV.teardown()
 
-  test 'calls the CurveGradesDialog when isAdmin is true and assignment has no due date in
-    a closed grading period', ->
-    @curveGrades(@options)
+  test 'calls the CurveGradesDialog when isAdmin is true and assignment has ' +
+    'no due date in a closed grading period', ->
+      @curveGrades(@options)
 
-    ok @dialogStub.called
+      ok @dialogStub.called
 
-  test 'calls the CurveGradesDialog when isAdmin is true and assignment does have a due date in
-    a closed grading period', ->
-    @options.assignment.has_due_date_in_closed_grading_period = true
-    @curveGrades(@options)
+  test 'calls the CurveGradesDialog when isAdmin is true and assignment ' +
+    'does have a due date in a closed grading period', ->
+      @options.assignment.inClosedGradingPeriod = true
+      @curveGrades(@options)
 
-    ok @dialogStub.called
+      ok @dialogStub.called
 
-  test 'calls the CurveGradesDialog when isAdmin is false and assignment has no due date in
-    a closed grading period', ->
-    @options.isAdmin = false
-    @curveGrades(@options)
+  test 'calls the CurveGradesDialog when isAdmin is false and assignment ' +
+    'has no due date in a closed grading period', ->
+      ENV.current_user_roles = []
+      @curveGrades(@options)
 
-    ok @dialogStub.called
+      ok @dialogStub.called
 
-  test 'calls the flashError when isAdmin is false and assignment does have a due date in
-    a closed grading period', ->
-    @options.isAdmin = false
-    @options.assignment.has_due_date_in_closed_grading_period = true
-    @curveGrades(@options)
+  test 'calls flashError when isAdmin is false and assignment does have ' +
+    'a due date in a closed grading period', ->
+      ENV.current_user_roles = []
+      @options.assignment.inClosedGradingPeriod = true
+      @curveGrades(@options)
 
-    notOk @dialogStub.called
-    ok $.flashError.called
+      notOk @dialogStub.called
+      ok $.flashError.called

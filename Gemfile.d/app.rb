@@ -16,7 +16,7 @@ gem 'builder', '3.2.2'
 gem 'tzinfo', '1.2.2'
 gem 'oj_mimic_json', require: false
 
-gem 'encrypted_cookie_store-instructure', '1.1.12', require: 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.2.2', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.5.0'
@@ -24,7 +24,7 @@ gem 'authlogic', '3.5.0'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.8.0'
+gem 'switchman', '1.9.2'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
@@ -41,12 +41,12 @@ gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.4', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.11.5'
+gem 'inst-jobs', '0.11.6'
   gem 'rufus-scheduler', '3.2.2', require: false
 gem 'ffi', '1.9.14', require: false
 gem 'hairtrigger', '0.2.15'
   gem 'ruby2ruby', '2.0.8', require: false
-  gem 'ruby_parser', '3.7.0', require: false
+  gem 'ruby_parser', '3.8.3', require: false
 gem 'hashery', '1.3.0', require: false
 gem 'highline', '1.7.8', require: false
 gem 'httparty', '0.14.0'
@@ -75,8 +75,7 @@ gem 'nokogiri', '1.6.6.2.20150813143452', require: false, github: 'codekitchen/n
 gem 'oauth-instructure', '0.4.10', require: false
 gem 'parallel', '1.6.2', require: false
   gem 'ruby-progressbar', '1.7.5', require: false #used to show progress of S3Uploader
-gem 'flamegraph', '0.1.0', require: false
-  gem 'stackprof', '0.2.9', require: false
+gem 'retriable', '1.4.1'
 gem 'rake', '11.3.0'
 gem 'ratom-nokogiri', '0.10.4', require: false
 gem 'rdiscount', '1.6.8', require: false

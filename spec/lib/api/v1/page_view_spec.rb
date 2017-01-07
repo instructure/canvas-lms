@@ -28,7 +28,7 @@ describe Api::V1::PageView do
     @domain_root_account = Account.default
 
     course_with_teacher(account: @domain_root_account)
-    course_with_student_logged_in(course: @course)
+    course_with_student(course: @course)
 
     @page_views = []
     (1..5).each do |i|

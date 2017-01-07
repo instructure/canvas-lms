@@ -295,7 +295,7 @@ class FeatureFlagsController < ApplicationController
 
   def create_or_update_feature_flag(attributes, current_flag = nil)
     FeatureFlag.unique_constraint_retry do
-      new_flag = @context.feature_flags.find(current_flag) if current_flag &&
+      new_flag = @context.feature_flags.find(current_flag.id) if current_flag &&
           !current_flag.default? && !current_flag.new_record? &&
           current_flag.context_type == @context.class.name && current_flag.context_id == @context.id
       new_flag ||= @context.feature_flags.build

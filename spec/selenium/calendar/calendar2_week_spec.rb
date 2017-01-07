@@ -221,10 +221,17 @@ describe "calendar2" do
       # Drag and drop event resizer from first event onto assignment icon
       load_week_view
       expect(ff('.fc-view-container .icon-calendar-month')).to have_size(1)
-      drag_and_drop_element(f('.fc-end-resizer'), f('.icon-assignment'))
 
-      # Verify Event now ends at assignment start time + 30 minutes
-      expect(event1.reload.end_at).to eql(midnight + 12.hours + 30.minutes)
+      # Calendar currently has post loading javascript that places the calendar event
+      # In the correct place, however we don't have a wait_ajax_animation that waits
+      # Long enough for this spec to pass given that we drag too soon causing it to fail
+      disable_implicit_wait do
+        keep_trying_until(10) do
+          # Verify Event now ends at assignment start time + 30 minutes
+          drag_and_drop_element(f('.fc-end-resizer'), f('.icon-assignment'))
+          expect(event1.reload.end_at).to eql(midnight + 12.hours + 30.minutes)
+        end
+      end
     end
 
     it "should make event all-day by dragging", priority: "1", test_id: 138866 do
@@ -304,11 +311,11 @@ describe "calendar2" do
       end
 
       it "should extend all day event by dragging", priority: "2", test_id: 138884 do
-        start_at_time = Time.zone.today.at_beginning_of_week.beginning_of_day
+        start_at_time = Time.zone.today.at_beginning_of_week(:sunday).beginning_of_day
         event = make_event(title: 'Event1', start: start_at_time, all_day: true)
         load_week_view
         drag_and_drop_element(f('.fc-resizer'),
-                              f('.fc-row .fc-content-skeleton td:nth-of-type(5)'))
+                              f('.fc-row .fc-content-skeleton td:nth-of-type(4)'))
         event.reload
         expect(event.end_at).to eq(start_at_time + 3.days)
       end

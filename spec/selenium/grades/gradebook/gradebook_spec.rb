@@ -177,9 +177,9 @@ describe "gradebook2" do
     project_group = group_assignment.group_category.groups.create!(:name => 'g1', :context => @course)
     project_group.users << @student_1
     graded_assignment.submissions.create(:user => @student)
-    graded_assignment.grade_student @student_1, :grade => 10 # 10 points possible
+    graded_assignment.grade_student @student_1, grade: 10, grader: @teacher # 10 points possible
     group_assignment.submissions.create(:user => @student)
-    group_assignment.grade_student @student_1, :grade => 2 # 0 points possible
+    group_assignment.grade_student @student_1, grade: 2, grader: @teacher # 0 points possible
 
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations

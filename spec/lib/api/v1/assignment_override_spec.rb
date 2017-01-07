@@ -50,8 +50,9 @@ describe "Api::V1::AssignmentOverride" do
 
   describe "interpret_batch_assignment_overrides_data" do
     before(:once) do
-      course_with_teacher(:active_all => true)
-      @a, @b = 2.times.map { assignment_model(:course => @course, :group_category => 'category') }
+      course_with_teacher(active_all: true)
+      @a = assignment_model(course: @course, group_category: 'category1')
+      @b = assignment_model(course: @course, group_category: 'category2')
       @a1, @a2 = 2.times.map do
         create_section_override_for_assignment @a, course_section: @course.course_sections.create!
       end

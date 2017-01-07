@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 describe "admin settings tab" do
   include_context "in-process server selenium tests"
   let(:account) { Account.default }
+  let(:sub_account) { account.sub_accounts.create!(:name => 'sub-account') }
 
   before :each do
     user_logged_in(:user => site_admin_user(account: account))
@@ -71,7 +72,9 @@ describe "admin settings tab" do
   context "SIS Integration Settings" do
     let(:allow_sis_import) { "#account_allow_sis_import" }
     let(:sis_syncing) { "#account_settings_sis_syncing_value" }
+    let(:sis_syncing_locked) { "#account_settings_sis_syncing_locked" }
     let(:default_grade_export) { "#account_settings_sis_default_grade_export_value" }
+    let(:require_assignment_due_date) { "#account_settings_sis_require_assignment_due_date_value" }
 
     def test_checkbox_on_off(id)
       set_checkbox_via_label(id,true)
@@ -128,13 +131,27 @@ describe "admin settings tab" do
         get_settings_page(account)
       end
 
-
       it "persists SIS import settings on refresh" do
         test_checkbox_on_off(allow_sis_import)
       end
 
-      it "persists SIS syncing settings on refresh" do
-        test_checkbox_on_off(sis_syncing)
+      context "persists SIS syncing settings on refresh" do
+        it { test_checkbox_on_off(sis_syncing) }
+
+        context "SIS syncing => true" do
+          before do
+            account.set_feature_flag! :bulk_sis_grade_export, 'on'
+            account.set_feature_flag! 'post_grades', 'on'
+            account.settings = { sis_syncing: { value: true } }
+            account.save
+            get_settings_page(account)
+          end
+
+          it { test_checkbox_on_off(sis_syncing_locked) }
+          it { set_checkbox_via_label(default_grade_export,true)
+               click_submit
+               test_checkbox_on_off(require_assignment_due_date) }
+        end
       end
 
       context "SIS grade export disabled" do
@@ -158,7 +175,7 @@ describe "admin settings tab" do
         context "SIS syncing => false" do
           before do
             account.settings = { sis_syncing: { value: false } }
-           account.save
+            account.save
             get_settings_page(account)
           end
 
@@ -179,6 +196,45 @@ describe "admin settings tab" do
           end
         end
       end
+
+      context "root and sub-accounts" do
+        before do
+          account.set_feature_flag! :bulk_sis_grade_export, 'on'
+          account.set_feature_flag! 'post_grades', 'on'
+        end
+
+        context "unlocked for sub-accounts" do
+          before do
+            account.settings = { sis_syncing: { value: true, locked: false } }
+            account.save
+          end
+
+          it "allows SIS integration settings to change in sub-account" do
+            get_settings_page(sub_account)
+            expect(f(sis_syncing)).not_to be_disabled
+            expect(f(sis_syncing_locked)).not_to be_disabled
+            expect(f(require_assignment_due_date)).not_to be_disabled
+            expect(f(default_grade_export)).not_to be_disabled
+          end
+        end
+
+        context "locked for sub-accounts" do
+          before do
+            account.settings = { sis_syncing: { value: true, locked: true } }
+            account.save
+          end
+
+          it "doesn't allow SIS integration settings to change in sub-account" do
+            get_settings_page(sub_account)
+            expect(f(sis_syncing)).to be_disabled
+            expect(f(sis_syncing_locked)).to be_disabled
+            expect(f(require_assignment_due_date)).to be_disabled
+            expect(f(default_grade_export)).to be_disabled
+          end
+        end
+
+      end
+
     end
   end
 end

@@ -103,6 +103,7 @@ define [
       @preventWrappingAcrossDates()
 
     formatTime: (datetime, allDay=false) ->
+      return null unless datetime
       datetime = fcUtil.unwrap(datetime)
       if allDay
         formattedHtml = $.dateString(datetime)
@@ -130,7 +131,17 @@ define [
       return 'assignment'
 
     iconType: ->
-      if type = @assignmentType() then type else 'calendar-month'
+      if type = @assignmentType()
+        type
+      else if ENV.CALENDAR.BETTER_SCHEDULER
+        if @isAppointmentGroupEvent() && (@isAppointmentGroupFilledEvent() || @appointmentGroupEventStatus == "Reserved")
+          'calendar-reserved'
+        else if @isAppointmentGroupEvent()
+          'calendar-add'
+        else
+          'calendar-month'
+      else
+        'calendar-month'
 
     isOnCalendar: (context_code) ->
       @calendarEvent.all_context_codes.match(///\b#{context_code}\b///)

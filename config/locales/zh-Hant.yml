@@ -43,6 +43,7 @@ zh-Hant:
   LongTextEditor: 
     cancel: 取消
     save: 保存
+  _at_the_bottom__4360f2b4: "-- 在底部 --"
   _b4455c8b: "%"
   _section_not_synced_yet_cd07d0dd: "-- 章節尚未同步"
   _start_from_a_template__a03ea3b3: "-- 從模板啓動 --"
@@ -925,6 +926,7 @@ zh-Hant:
         help_link_text: 要顯示的連結文字
         help_link_url: URL
         include_students_in_global_survey: 包含全域調查中的學生
+        lock_all_announcements: 停用關於公告的評論
         locked: 為子帳戶和課程鎖定此設置
         locked_for_sub_accounts: 為子帳戶鎖定此設置
         login_handle_name: 登入標籤
@@ -1190,6 +1192,11 @@ zh-Hant:
         auburn: 
           pseudonym_ids: 
             field: "假名 ID"
+    student_progress_custom_report_csv_parameters: 
+      account_reports: 
+        pearson: 
+          outcome: 
+            text: "課程 SIS ID："
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
@@ -1341,6 +1348,7 @@ zh-Hant:
   add_new_announcement_ddacd624: 添加新通告
   add_new_group_7ac49f31: 添加新群組
   add_new_set_of_due_dates_e8e240f: 添加新的截止日期
+  add_new_term_d2217c0d: 添加新學期
   add_people_7ee4b2ec: 添加人員
   add_quiz_ip_filter_c7b37dc5: "添加測驗 IP 篩選器"
   add_recipient_ff135ed7: 添加收件者
@@ -1361,6 +1369,7 @@ zh-Hant:
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "為以下每個項目添加您的 Zendesk instance 自定義字段 ID （沒有 ID 的字段將無法記錄）："
   additional_outcomes_options_6df428f1: 額外的結果選項
   additional_settings_for_sis_syncing_f926973e: "額外的 SIS 同步化設定"
+  additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "額外 SIS 同步作業、測驗及討論區設定"
   addressbook_microservice_a4940422: "AddressBook Microservice"
   admin_4d3ba42f: 管理員
   admins_3e1dce15: 管理員
@@ -1440,6 +1449,7 @@ zh-Hant:
   all_terms_cd27b0fb: 所有學期
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: 允許檢閲人檢視特定任務所獲的多個獨立評分
   allow_bulk_grade_export_to_sis_e11a6e66: "允許批量導出成績到 SIS"
+  allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: 允許下載課程內容及離線查看
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: 允許課程影像分配到某個課程，並應用於儀表板。
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: 允許課程影像被分配給課程並應用於儀表板。
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: 允許每個使用者重新排列計分卡。
@@ -1656,6 +1666,7 @@ zh-Hant:
   archive_selected_d64506ca: 已選存檔
   are_you_sure_26795d3c: 您是否確定？
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: 是否確定要取消？您所做的變更或未能貯存。
+  are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "您是否確定要取消與 %{name} 的預約？"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: 您確定希望複製到最終分數嗎？新分數會改寫現有的分數。
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: 是否確定要關閉該使用者？該使用者在非活躍狀態下將無法參與課程。
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
@@ -1667,6 +1678,7 @@ zh-Hant:
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: 您是否確定要刪除這個評分時段組？
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: 是否確定要刪除此評分時段？
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: 是否確定要刪除此評分方案？
+  are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: 您是否確定要刪除此事件的預約？
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: 您是否確定要這樣做？其將無法撤銷，並且將會覆蓋成績單中的分數。
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: 是否確定要阻止該用戶活動？該用戶將無法參加課程。
   are_you_sure_you_want_to_publish_this_comment_26989c2f: 是否確定要公佈此註解？
@@ -1778,6 +1790,7 @@ zh-Hant:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: 無法刪除含有鎖定任務的群組。
+  assignment_groups_weight_2f1a5a7c: 作業小組佔分
   assignment_menu_91fe3716: 任務功能表
   assignment_muted_4cb590a4: 任務已靜音
   assignment_muter: 
@@ -2059,6 +2072,8 @@ zh-Hant:
       assignments: 任務
       assignments_settings: 任務設置
       assignments_settings_screenreader: 任務設置
+      grading_weight_settings: 作業小組佔分
+      grading_weight_settings_screenreader: 作業小組佔分
       search_for_assignment: 搜索任務
       title_add_assignment: 添加任務
       title_add_group: 添加任務群組
@@ -2386,6 +2401,7 @@ zh-Hant:
     invalid_submission_types: 無效的提交件類型
   assignments_in_this_group_have_no_points_possible__3cd35922: 此群組中的任務無可能分數，無法包含在成績計算中
   assignments_in_this_group_have_no_points_possible__ab0adb72: 該群組的任務無分數，不能計入評分計算。
+  assignments_settings_30613d0c: 任務設定
   associated_account_course_id_d87a01c5: "相關帳戶/課程 ID"
   associated_account_name_91854e37: 相關帳戶名稱
   associated_course_name_9b5b1945: 相關課程名稱
@@ -2431,6 +2447,7 @@ zh-Hant:
     login: 登入
     logout: 登出
   authentication_with_provider_was_successful_but_no_6a194137: "使用 %{provider} 的驗證成功，但未能提供唯一的 Id，以用於登入 Canvas。"
+  author_s_name_b35e905a: 作者姓名
   authorize_e3f25bb4: 授權
   available_8606e40c: 可用
   available_after_unlock_at_b5682224: "在 %{unlock_at} 之後可用"
@@ -2490,14 +2507,15 @@ zh-Hant:
     no_manifest: "此 Blackboard .zip 在根目錄中沒有 imsmanifest.xml 文檔。"
   blocked_by_running_migration_d8a57cb7: 受到運行遷移阻礙
   blue_daf8fea9: 藍色
+  body_9f663faf: 主體
   body_shadow_d36e8c2e: 主體陰影
   bolivia_567898d8: 玻利維亞
   bolivia_591_9b8a7a5c: "玻利維亞 (+591)"
   bookmark_service: 
     default_title: 無標題
   bookmark_this_question_bank_dc414a82: 將此題庫加為書籤
-  bounce_count_reset_c4c2218f: 跳變計數器已重置！
-  bounce_reason_689ed4c6: 跳變原因
+  bounce_count_reset_c4c2218f: 退信計數器已重置！
+  bounce_reason_689ed4c6: 退信原因
   brazil_55_34103ffa: "巴西 (+55)"
   brazil_c1d6e73a: 巴西
   breadcrumb_1_cb3c504: "Breadcrumb 控件1"
@@ -3022,8 +3040,10 @@ zh-Hant:
   canada_aec587fa: 加拿大
   cancel_caeb1e68: 取消
   cancel_custom_link_creation_39ec70bd: 撤銷自定義連結創建
+  cannot_autograde_at_this_time_a146ad9d: 這次不能進行自動評分
   cannot_be_associated_with_a_different_account_ac863be2: 無法關聯於不同的帳戶
   cannot_be_associated_with_different_accounts_f461814f: 無法關聯於不同的賬戶
+  cannot_be_changed_at_this_time_grading_error_88f5a96b: "這次不能進行變更：%{grading_error}"
   cannot_be_empty_when_course_id_is_nil_and_account__ca96a97e: "當 course_id 和 account_id 都為零時，不能為零"
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "當 account_id 為零時，不能為零"
   cannot_be_nil_when_course_id_is_nil_f539388: "當 course_id 為零時，不能為零"
@@ -3035,6 +3055,7 @@ zh-Hant:
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: 無法變更在封閉評分期內到期的到期日
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: 如文檔已被作爲任務部分提交，則無法刪除該文檔
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: 無法刪除到期日在封閉評分期內的重寫
+  cannot_grade_at_this_time_489744b0: 這次不能進行評分
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: 無法為課節設限，除非組內沒有成員亦沒有限組員人數
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: 在封閉評分期內，使用者無法設定「只可檢視重寫到期日」
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: 無法將重寫到期日設定為封閉評分期內的日期
@@ -3078,6 +3099,7 @@ zh-Hant:
   canvas_ticketing_email_connector_27e253ae: "Canvas 票務電子郵件連接器"
   canvas_ticketing_web_post_connector_11158897: "Canvas 票務網頁後連接器"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas 將在您儲存測驗後重新評分所有提交件，這可能需要幾分鐘的時間。"
+  card_movement_menu_for_title_b94c09af: "卡移動選單%{title}"
   careful_changes_to_group_membership_will_apply_to__19a9089c: 請注意！對群組成員的改動會應用于已經提交任務的群組。由此造成的結果可能是群組任務提交不一致。您確定希望為未來的任務創建一個新群組集合嗎？
   cas_url_4ba2843e: "CAS URL"
   catalog_already_enabled_56478a3c: "Catalog 目錄已採用"
@@ -3139,6 +3161,7 @@ zh-Hant:
   click_here_on_the_calendar_link_c9965631: "在此處點擊 *月曆* 連結"
   click_here_to_see_the_file_79e2b366: 按一下此處以檢視文檔。
   click_here_to_view_ec8cb2fd: 按一下此處以檢視
+  click_to_edit_drag_to_reorder_ab725681: 按一下以編輯，拖放以重新排序
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: 如果學生選擇此答案，則按一下以為其輸入評論
   click_to_load_a020891b: （按一下以載入）
   click_to_modify_89fa26aa: 按一下進行修改
@@ -3437,7 +3460,7 @@ zh-Hant:
       inaccessible: 警告：此頁面包含協力廠商內容，熒幕讀取程式無法訪問。
     show: 
       buttons: 
-        close: 現在就編輯
+        close: 現在結束
         join: 現在就加入
     type_disabled_error: "不再為此 Canvas 網站啟用這種類型的會議"
   config_url_e96ceaf3: "配置 URL"
@@ -3449,11 +3472,14 @@ zh-Hant:
   configure_tool_app_3b1bb50b: "配置 %{tool} 應用程式？"
   configure_toolname_app_651371be: "配置 %{toolName} 應用程式"
   confirm_contact_method_29d6fe4b: 確認聯絡方式
+  confirm_deletion_b2efe7d4: 確認刪除
   confirm_dialog: 
     cancel: 取消
     submit: 提交
   confirm_dialog_component: 
     ok: 確定
+  confirm_removal_a9bb889: 確認移除
+  confirm_reservation_removal_e6350e7c: 確認預約移除
   confirmation_code_required_22984955: 確認代碼（必填）
   confirmation_failed_please_try_again_ae566d37: 確認失敗。請再試一次。
   consumer_key_57d9fcf1: 消費者密鑰
@@ -4412,6 +4438,7 @@ zh-Hant:
   course_collaborations_dadb327e: 課程協作
   course_conferences_3d914c96: 課程會議
   course_content_a92eca20: 課程內容
+  course_content_downloads_6cb31802: 下載課程內容
   course_copy_argument_error: 課程複製需要有源課程。
   course_copy_description: "用於複製 canvas 課程的遷移外掛程式"
   course_copy_display: 課程複製
@@ -4930,6 +4957,7 @@ zh-Hant:
         course_format: 格式
         course_lock_all_announcements: 停用關於通告的評論
         course_name: 名稱
+        course_offline_export: 離線課程
         course_section_name: 添加新章節
         course_status_published: 課程已發佈
         course_status_unpublished: 課程未發佈
@@ -4940,6 +4968,7 @@ zh-Hant:
         grading_standard_enabled: 啟用課程評分方案
         hide_distribution_graphs: 隱藏成績分配圖，以使學生看不到
         hide_final_grades: 隱藏學生成績匯總總計
+        home_page_announcement_limit: 首頁顯示的通告數目
         image: 影像
         indexed: 將本課程包括在公共課程索引中
         is_public_to_auth_users: 讓已驗證用戶看到此課程
@@ -4952,6 +4981,7 @@ zh-Hant:
         restrict_student_past_view: 限制學生在結束日期之後檢視課程
         root_account: 根帳戶
         root_account_id: 根帳戶
+        show_announcements_on_home_page: 在課程主頁上顯示最近通告
         sis_source_id: "SIS ID"
         start_at: 開始
         storage_quota: 文檔儲存
@@ -5385,15 +5415,15 @@ zh-Hant:
       tomorrow: 明天
       yesterday: 昨天
     formats: 
-      date_at_time: "%b %-d at %l:%M%P"
+      date_at_time: "%b %-d at %k:%M"
       default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-l:%M%P"
-      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
-      long: "%B %-d, %Y"
+      full: "%b %-d, %Y %-k:%M"
+      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      long: "%Y %B %-d"
       long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
-      medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
+      medium: "%Y %b %-d"
+      medium_month: "%Y %b"
+      medium_with_weekday: "%a %Y %b %-d"
       short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
@@ -5417,7 +5447,7 @@ zh-Hant:
   date_ee500367: 日期
   date_error_7b38f8ff: 日期錯誤
   date_modified_e1c8ac8f: 修改日期
-  date_of_most_recent_bounce_b23d0119: 最近一次跳變的日期
+  date_of_most_recent_bounce_b23d0119: 最近一次退信的日期
   datepicker: 
     errors: 
       not_a_date: 那不是日期！
@@ -5482,6 +5512,7 @@ zh-Hant:
   default_grade_cannot_be_set_to_ex_723caa59: "默認評分不可設置為 %{ex}"
   default_question_name: 問題
   default_question_text: 問題文字
+  default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "默認 SIS 同步作業、測驗及討論區設定"
   default_template_f2a759ed: 預設範本
   default_templates_are_used_as_starting_points_for__f06f9e33: 預設範本是創建新主題的起點，不可刪除。
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: 定義下拉式清單前後的文字，並創建一組可能的答案。
@@ -5505,12 +5536,15 @@ zh-Hant:
   delete_rubric_9b66412d: 刪除評估量表
   delete_selected_a023ccf8: 刪除所選項
   delete_survey_56fddbbd: 刪除調查
+  delete_term_name_f707abc9: "刪除學期%{name}"
   delete_theme_bdb70d25: 刪除主題
   delete_this_announcement_fbb4643: 刪除此通告
   delete_this_answer_f1802eaa: 刪除此答案
   delete_this_collaboration_4f20b698: 刪除此協作
   delete_this_feed_67d5d924: 刪除此摘要
+  delete_this_page_509f2baf: 刪除此頁面
   delete_this_question_8f955ceb: 刪除此問題
+  delete_this_section_380338: 刪除此分班
   delete_this_theme_46d95edc: 確定要刪除該主題？
   delete_this_token_f5962a4f: 刪除此令牌
   delete_time_range_e14461a0: 刪除時間範圍
@@ -5892,6 +5926,9 @@ zh-Hant:
   discussion_topics_b35ac745: 討論主題
   discussions: 
     are_your_sure_delete: 是否確定要刪除此輸入項目？
+    author_link: 
+      authors_name: 作者姓名
+      unknown_author: ">未知作者"
     cant_subscribe_not_in_group: 您必須在該群組才可訂閱
     cant_subscribe_not_in_group_set: 您必須在相關群組才可訂閱
     closed_for_comments: 已結束以徵求評論
@@ -5981,6 +6018,7 @@ zh-Hant:
   divide_into_equal_slots_of_input_value_minutes_fca83452: "將時段等分成 %{input_value} 分鐘。"
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "將時閒段平均分爲 %{num_minutes} 分鐘. *前往*"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: 不要將這個任務計入最終評分
+  do_nothing_9672b478: 什麼也不做
   domain_3b54c511: 網域
   domain_is_required_1d4c8b25: 網域為必填
   don_t_move_lti_query_params_to_post_body_21744487: 不要將LTI查詢參數移入POST主體
@@ -5996,6 +6034,7 @@ zh-Hant:
   download_course_content_7f66edc9: 下載課程内容
   download_epub_757cf0af: "下載 ePub 文檔"
   download_item_analysis_report_statuslabel_8c9387ec: "下載項目分析報告 %{statusLabel} "
+  download_report_77164f62: 下載報告
   download_scores_generated_on_date_ff5b9cd2: "下載生成於 %{date} 的分數報告"
   download_student_analysis_report_statuslabel_1471c8c2: "下載學生分析報告 %{statusLabel}"
   download_submissions_7454665f: 下載提交件
@@ -6112,6 +6151,7 @@ zh-Hant:
       criterion_long_description: 標準完整描述
       find_existing_rubric: 尋找現有題目
   edit_survey_b0d6890d: 編輯調查
+  edit_term_name_29a8a322: "編輯學期%{name}"
   edit_text_27d8aa3d: "編輯%{text}"
   edit_this_announcement_ae6e17b3: 編輯此通告
   edit_this_collaboration_393b1a9a: 編輯此協作
@@ -6208,6 +6248,7 @@ zh-Hant:
   enable_new_sis_integration_settings_ab6780a4: "啟用新的 SIS 集成設定"
   enable_or_condition_for_modules_a16f02d8: "為模塊啓用\"或\"條件 "
   enable_reregistration_for_lti_2_b2a10444: "允許 LTI 2 再次註冊"
+  enable_student_context_card_links_eba2f2c5: 開啟學生群組卡連結
   enable_the_creation_of_master_courses_8205b155: 啟用設立主課程
   enable_the_plagiarism_detection_platform_7c3b6195: 啟用抄襲檢測平台
   enabled_links_be110215: 已啟用的連接
@@ -6783,7 +6824,7 @@ zh-Hant:
   failed_to_submit_draft_comment_1de83451: 提交草稿評論失敗
   fair_38e62237: 良好
   fair_score_554e2558: 良好分數
-  fair_use_bee47d77: 良好使用
+  fair_use_bee47d77: 公平使用
   fall_grading_period_current_score_d48c7f78: 秋季評分時段當前分數
   fall_grading_period_final_score_56d96a8f: 秋季評分時段最終分數
   fall_grading_period_id_74ef68e: "秋季評分時段 ID"
@@ -6931,6 +6972,7 @@ zh-Hant:
   files_uploaded_519844ed: 文檔已上傳
   fill_in_the_blank_read_surrounding_text_1a6c73c7: 填空，閱讀周圍文字
   filled_5d8c39e: 已填充
+  filter_9df28e5b: 過濾器：
   filter_announcements_by_unread_495eeeb3: 透過『未讀取』篩選器對通告進行篩選
   filter_by_ip_address_40965f66: "按 IP 地址篩選"
   filter_by_name_34cbe139: 按名稱篩選
@@ -7013,6 +7055,7 @@ zh-Hant:
   full_name_83cf5453: 全名
   full_name_is_required_8efbdc84: 必須提供全名
   future_5416ea92: 未來
+  future_terms_7fba2ae6: 未來學期
   generate_epub_80e89ea4: "生成 ePub 文檔"
   generate_item_analysis_report_statuslabel_16e02c8: "生成項目分析報告 %{statusLabel} "
   generate_student_analysis_report_statuslabel_aecdc4dc: "生成學生分析報告 %{statusLabel}"
@@ -7054,6 +7097,7 @@ zh-Hant:
   goto_previous_page_85b2fa49: 前往前一頁
   gpa_scale_6710e2ee: "GPA 比例"
   gpa_scale_a6d1cdea: "GPA 量表系統"
+  grade_10d1e5a1: "%{grade}"
   grade_9c6f076d: 成績
   grade_assignment_7c1abc11: "成績 %{assignment}"
   grade_display_warning_dialog: 
@@ -8055,7 +8099,7 @@ zh-Hant:
     how_is_this_affecting_you: 問題對您造成什麼影響？
     i_cant_get_things_done_until_i_hear_back_from_you: 在收到您的回覆之前，我無法把事情做好
     i_need_some_help_but_its_not_urgent: 我需要一些支援，但並不緊急
-    include_a_link_to_a_screencast_or_screenshot_using_something_like_jing: 使用類似*Jing*的內容將鏈接設置到熒幕錄影/熒幕截圖上。
+    include_a_link_to_a_screencast_or_screenshot_using_something_like_jing: "使用 *Jing* 或者類似軟件，將連結加入到螢幕錄影／螢幕截圖上。"
     instructor_question: 向您的導師問一個問題
     instructor_question_sub: 問題已提交給您的導師
     just_a_casual_question_comment_idea_suggestion: 只是隨意的問題、評論、想法或建議
@@ -8259,7 +8303,7 @@ zh-Hant:
   inactivate_user_35f6d9d7: 阻止用戶使用
   inactive_cd40317f: 不活躍
   inbox_bb245a60: 收件箱
-  include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: 使用類似*Jing*的內容將鏈接設置到熒幕錄影/熒幕截圖上。
+  include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "使用 *Jing* 或者類似軟件，將連結加入到螢幕錄影／螢幕截圖上。"
   include_deleted_enrollments_1c87684a: 包括已刪除的註冊
   include_deleted_objects_3cced3b5: 包括已刪除的對象；
   include_scores_when_alerting_about_grade_changes_623ec201: 當提示成績變動時一併顯示分數。
@@ -8432,7 +8476,7 @@ zh-Hant:
         delete: 刪除
         hold: 保留
         select_all: 全選
-        un_hold: 解除保留
+        un_hold: 恢復
       headings: 
         jobs_list: 工作清單
         popular_tags: 熱門標籤
@@ -8490,7 +8534,9 @@ zh-Hant:
     lock_module_until: 鎖定直至
   last_enrollment_activity_10fe15ba: 上次註冊活動
   last_item_79583712: 最後一個項目：
+  last_length_graded_items_6db7374e: "上一個 %{length} 評分項目"
   last_login_54565109: 上次登入
+  last_login_b7bc0479: 上一次登入：
   last_modified_by_ca4bb5e1: 最後一次修改者為
   last_name_303122f3: 姓氏
   last_post_display_last_reply_at_b9896355: "最後發布%{display_last_reply_at}"
@@ -8676,6 +8722,7 @@ zh-Hant:
   load_more_9ca37ccc: 載入更多…
   loaded_more_collaborations_13f1d630: 載入更多協作。
   loading_25990131: 正在載入...
+  loading_announcements_b927a86c: 通告載入中
   loading_bde52856: 正在載入
   loading_courses_bd1bffe: 正在載入課程…
   loading_data_ecd89ba: 載入資料中..
@@ -10692,6 +10739,7 @@ zh-Hant:
   mobile_homescreen_icon_f85d6b63: 手機主屏圖標
   mobile_javascript_file_c429158d: "移動端 JavaScript 檔案"
   modal_dialog_add_to_course_aec33759: 模態對話：添加到課程
+  modal_dialog_header_source_16ec3ac1: "模態對話%{header} %{source}"
   model_is_already_located_in_newgroup_e5cea361: "%{model} 已位於 %{newGroup} 之中"
   moderate_assignment_ccb00173: "調整 %{assignment}"
   moderate_assignment_name_cf59e0a7: "調整 %{assignment_name}"
@@ -10889,6 +10937,8 @@ zh-Hant:
     where_to_move: "您希望將 *%{name}* 移動至何處？"
   move_dialog_select: 
     move_to_end: "-- 在底部 --"
+  move_item_e94a8103: 移動項目
+  move_left_8c364375: 左移
   move_module_after_31fc870b: 移前單元
   move_module_before_32153dc8: 移後單元
   move_module_item_77754119: 移動單元/項目
@@ -10896,14 +10946,21 @@ zh-Hant:
   move_module_item_before_13e940eb: 移後單元項目
   move_outcome_ce497e6c: 移動成果
   move_outcome_group_cfa1a505: 移動成果群組
+  move_page_e25b123d: 移動內容頁
+  move_right_e4ddc6bf: 右移
+  move_section_d3866941: 移動分班
   move_text_down_7176acd4: "向下移動%{text} "
   move_text_up_91fb4241: "向上移動%{text} "
   move_this_item_41145b2d: 移動此項目
+  move_this_page_4a05c813: 移動此內容頁
+  move_this_section_890bee38: 移動此分班
   move_to_9b91c6e0: 移至...
   move_to_dde1a5e1: 移動到...
   move_to_end_fef2fa15: 移至結尾
   move_to_front_7eae2e90: 移至前面
   move_to_front_bf6f0194: 移至前面
+  move_to_the_beginning_636b342c: 移至開始
+  move_to_the_end_bc05abf6: 移至結束
   moving_a4d552df: 正在移動…
   multi_factor_authentication_configured_865b1bde: 多因素驗證已配置
   multiple_ba5220cd: 多個
@@ -11076,6 +11133,7 @@ zh-Hant:
   not_starred_subject_click_to_star_4ea6eb64: "未加星標的『%{subject}』項目，點一下以添加星標。"
   not_submitted_7d05fdb4: 未提交
   not_yet_completed_345a0bca: 尚未完成
+  note_8b73ce09: 注釋
   note_for_differentiated_group_topics_some_threads__90adbb21: 注意：為區別群組話題，有些進程可能沒有分配任何學生。
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "注意：根據測試版更新周期，測試版 URL 的發佈可能需要等待一週的時間。"
   note_length_cannot_exceed_maxlength_characters_82798b1: "筆記不能超過 %{maxLength} 個字元。"
@@ -11382,6 +11440,7 @@ zh-Hant:
   number_between_1_and_16_inclusive_31f5468d: "數值在 1 至 16 之間"
   number_of_allowed_attempts_3d10b740: 允許的嘗試次數
   number_of_respondents_e1e7e8b: 回應的數量
+  number_of_scores_to_ignore_for_each_student_fb94e818: 每個學生忽略的分數
   o_224cf405: o
   oauth2_provider: 
     auth: 
@@ -11636,6 +11695,7 @@ zh-Hant:
   page_comments: 
     errors: 
       create_failed: 評論創建失敗
+  page_name_21defa75: 頁面名稱
   page_name_is_required_d8c2736e: 需要輸入頁面名稱
   page_not_found_2b0d05f5: 頁面未找到
   page_views: 
@@ -11736,6 +11796,7 @@ zh-Hant:
   pin_cdbc9f8f: 釘選
   pink_68ad45cb: 粉色
   place_b128fa94: 放置
+  place_section_before_5b45714e: "在 \"%{section}\" 前放置："
   placements_5b5e056b: 配置
   plagiarism_detection_platform_6ce67e66: 抄襲探測平台
   plain_text_e3ab33aa: 純文字
@@ -11745,12 +11806,14 @@ zh-Hant:
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "請將到期日訂在今天或以後的日子%{earliestDate}"
   please_enter_a_name_for_this_link_318f01a4: 請為此連結輸入名稱。
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: 請輸入三個或更多字元的搜索字詞
+  please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "請輸入有效的 URL必須有協議 (例如  http://, https://, ftp://, tel:, mailto:)。"
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "請輸入有效的 URL需要輸入協定 (例如 http://, https://, ftp://, tel:)。"
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "請輸入一個有效的 URL. 協議為必填 (例如 http://, https://, ftp://)。"
   please_enter_your_label_name_7745272d: "請輸入您的 %{label_name}："
   please_enter_your_label_name_and_password_5c56be80: "請輸入您的 %{label_name} 和密碼："
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: 請讓他們知道您正在瀏覽哪一頁以及您已點開的連結。
   please_let_them_know_which_page_you_were_viewing_a_c9816406: 請讓他們知道您正在瀏覽哪一頁，以及您已點開的連結。
+  please_provide_a_field_e5a7d0b3: "請提供%{field}"
   please_select_a_group_set_for_this_assignment_e1da63d3: 請為此任務選擇一個群組
   please_select_a_user_role_for_this_link_9fb4e655: 請為此連結選擇使用者角色。
   please_select_one_f931e883: 請選擇一項
@@ -12204,6 +12267,7 @@ zh-Hant:
       GradingAssignment、GradingAssignmentScore。
   post_grades_to_sis_97ece878: "發佈成績至 SIS"
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "在作業、已評分的討論和隨堂測驗部分，『發佈成績到 SIS』選項默認為開啟。"
+  posted_at_4cfce2c3: "%{posted_at}"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: 練習測驗
   prerequisites_49659f16: 先決條件：
@@ -12884,13 +12948,13 @@ zh-Hant:
       audible_bracket_aced: 該等級的所有學生均回答正確。
       audible_bracket_failed: 該等級的所有學生均未給出正確答案。
       audible_chart_description: "該表列出了該班級各等級學生回答問題的結果。等級是按分數劃分的。高等為分數最高的 27%，中等為中間的 46%，低等為分數最低的 27%。"
-      audible_discrimination_index: "辨別力指數：%{number}。"
+      audible_discrimination_index: "鑒別指數：%{number}。"
       audible_middle_bracket: 中等：
       audible_response_ratio_distribution: "該等級 %{correct_ratio}% 學生回答正確。"
       audible_top_bracket: 高等：
-      discrimination_index: 辨別力指數
-      discrimination_index_dialog_title: 辨別力指數圖
-      discrimination_index_dialog_trigger: 瞭解更多關於辨別力指數的內容。
+      discrimination_index: 鑒別指數
+      discrimination_index_dialog_title: 鑒別指數圖
+      discrimination_index_dialog_trigger: 瞭解更多關於鑒別指數的內容。
     discrimination_index_help: "* 該度量標準提供了具體的方法，以區分（或辨別）在考試中獲得好成績和差成績的學生。* ** 根據整個測驗分數，將學生分為三組，并顯示各組中哪些學生回答正確。** *** ****按一下此處，瞭解更多資訊。**** ***"
     download_submissions: 下載所有文檔
     duration_in_hours: 
@@ -14048,6 +14112,7 @@ zh-Hant:
     view: 檢視
   read_comments_3fcc7590: 讀取評論
   recaptcha_not_configured_3a6ef9ee: "Recaptcha 未配置"
+  recent_announcements_8becc59c: 最近的通告
   recent_student: 
     last_logged_in: "上次登入時間為 %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} 衰減平均分"
@@ -14136,7 +14201,9 @@ zh-Hant:
   removed_user_as_group_leader_bb69330f: "作為群組領導者刪除%{user}"
   rename_45608f54: 重命名
   rename_c_name_section_e0e92c97: "重命名 %{c.name} 章節"
+  rename_this_page_554f0583: 重新命名此內容頁
   rename_this_section_73065edd: 重命名此章節
+  rename_this_section_bcbb6741: 重新命名此分班
   replace_e61834a7: 替換
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: 用更豐富易用的新文件夾樹取代現有文件夾樹。
   reply_from_name: "%{name} 透過 Canvas 通知"
@@ -14145,6 +14212,7 @@ zh-Hant:
   reply_to_main_discussion_29823888: 回復主要討論
   reply_to_topic_12412b0f: 回復主題
   require_an_access_code_600e06e8: 需要訪問碼
+  require_assignment_due_date_778b200d: 規定作業截止日期
   require_group_members_to_be_in_the_same_section_7f6c36af: 要求群組成員必須在同一個章節
   require_respondus_lockdown_browser_31425b3a: "需要 Respondus LockDown 瀏覽器"
   require_usage_rights_for_uploaded_files_4507865b: 要求用於已上傳文檔的使用權
@@ -14154,13 +14222,14 @@ zh-Hant:
   requirement_subject_7cfac6c8: 要求主題
   reregister_9ab95a57: 再註冊
   reregister_toolname_3dde0bfc: "再註冊%{toolName}"
+  reschedule_9f780bb8: 重新​​排程
   reserved_by_d563e7d2: "由 保留："
   reserved_by_you_cd03b62d: 由你保留
   reserved_f247b60b: 已預約
   reset_95a81614: 重設
   reset_multi_factor_authentication_2b63a558: 重設多因素驗證
-  reset_this_contact_method_s_bounce_count_3845ecf4: 重設這個聯繫方式的跳變計數
-  reset_this_email_address_s_bounce_count_d81d8fd9: 重設這個電郵地址的跳變計數
+  reset_this_contact_method_s_bounce_count_3845ecf4: 重設這個聯繫方式的退信計數
+  reset_this_email_address_s_bounce_count_d81d8fd9: 重設這個電郵地址的退信計數
   respondus_lockdown_browser_support_413352eb: "Respondus LockDown 瀏覽器支援"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -14183,6 +14252,8 @@ zh-Hant:
         description: 解除發佈
     options_2: 
       description: 排程學生可用性
+  restrict_students_from_accessing_courses_after_end_7dd66bce: 限制學生在結束日期之後訪問課程
+  restrict_students_from_accessing_courses_before_st_f7c22c00: 限制學生在開始日期之前訪問課程
   restricted_access_d3e99a39: 訪問受限
   resubmitted_since_last_graded_8484d285: 上次評分後重新提交
   resume_quiz_afeceb87: 繼續測驗
@@ -14597,6 +14668,7 @@ zh-Hant:
   section_id_6f73f3d5: "章節 ID"
   section_id_b5aad4a7: "章節 ID"
   section_name_b6d82574: 章節名稱
+  section_section_names_98f172e6: "分班：%{section_names}"
   section_sis_2a80d2fa: "章節 Sis"
   section_sis_94511bcd: "章節 SIS"
   section_starts_at_65eaed1: 章節開始日期
@@ -14753,6 +14825,7 @@ zh-Hant:
       not_available_yet: 我們將在課程開始之前儘快向您發送電子郵件。
   self_registration_156392d6: 自行註冊
   send_a_message_to_the_teacher_1ae115b6: 發送郵件給教師
+  send_a_message_to_this_student_ec46b8dd: 向此學生發送訊息
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "發送自定義欄位 (除非使用 Canvas zendesk，否則取消核取)"
   send_e3bd0ed0: 發送
   send_message_6ccc90e8: 發送訊息
@@ -14817,6 +14890,7 @@ zh-Hant:
         ret_val: "返回 URL"
   settings_5aa0fd0c: 設置
   settings_for_assignment_name_c19565e1: "任務 %{name} 的設置"
+  settings_for_title_d3ca495: " 的設定%{title}"
   setup_checklist_eb8b00b8: 設置清單
   shared: 
     account_notification: 
@@ -15626,6 +15700,7 @@ zh-Hant:
     android_banner_view_button: 查看
   some_assignments_could_not_be_created_because_they_d91f2f21: 由於某些任務將進入評分階段，因此無法創建。
   some_conferences_on_this_page_are_hidden_because_o_789684fd: 由於在讀取狀態時出現錯誤，本頁一些會議被隱藏
+  some_module_items_could_not_be_published_e4be3c0: 部分單元項目不能發佈
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: 某些提交不能評分；這些提交的分數改變已被忽略。
   someone: 某人
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: 有些地方出現了問題，但我現在可以採取應變措施
@@ -15734,6 +15809,7 @@ zh-Hant:
   student_5da6bfd1: 學生
   student_921b864d: 學生
   student_assignment_outcome_map_title: 學生能力
+  student_context_card_ad59967e: 學生群組卡
   student_extensions_d35a907: 學生延期
   student_groups_desc: 這為帳戶啟用新學生群組頁面。新頁面用於提供更動態的群組註冊體驗。
   student_id: "學生 ID"
@@ -15813,6 +15889,7 @@ zh-Hant:
   subaccount_91f4c279: 子帳戶
   subdomain_url_1e43b6f0: 子域URL
   subject_114b2e98: 主題
+  subject_must_contain_fewer_than_255_characters_2e72cd02: "主題不得多於 255 個字符。"
   subject_reply_to: "回復：%{subject}"
   submission: 
     atom_no_author: 無作者
@@ -16172,6 +16249,7 @@ zh-Hant:
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: 使用排程工具，您可以設置時閒段，供學生（或學生群組）報名。按一下下面的按鈕以開始。
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: 問題的嚴重性，由使用者從下拉菜單中進行選擇。
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "iOS/Android 設備的捷徑圖示。180x180 png "
+  the_specified_file_with_file_id_already_has_an_ori_bd30758c: "此特定檔案 file_id 已有原創檢測報告。"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "指定的使用者 (%{id}) 不是這門課程的學生"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: 指定的使用者不是這門課程的學生
   the_state_parameter_is_required_ffadf213: 需要狀態參數
@@ -16200,6 +16278,7 @@ zh-Hant:
   there_was_a_problem_logging_in_at_institution_5a298155: "登入 %{institution} 時出現問題"
   there_was_a_problem_saving_the_grading_period_243bed6c: 在保存評分時段時出現了一個問題
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: 在保存評分方案時發生了一個問題
+  there_was_a_problem_sending_your_message_22b249a5: 發送訊息時出現錯誤。
   there_was_a_problem_submitting_your_set_27ca2ed0: 提交您的組時遇到問題
   there_was_an_error_generating_the_tool_launch_fb3f47ac: 創建工具啟動時出現錯誤
   there_was_an_error_in_processing_your_request_6513a49a: 處理您的要求時發生錯誤
@@ -16218,7 +16297,9 @@ zh-Hant:
   this_assignment_has_been_excused_87f1dc13: 此任務已被免除。
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: 該任務已被取消，不予計入總評分。
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: 該任務已被免除，不予計入總評分
+  this_assignment_is_in_a_closed_grading_period_for__a22bb4ed: 此作業正處於此學生的已關閉評分期。
   this_assignment_is_overdue_a44bea3b: 此任務已過期
+  this_assignment_is_still_unpublished_a9185624: 此作業仍未發佈。
   this_assignment_will_no_longer_count_towards_your__a6eb6778: 該任務不再計入您的成績。
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: 作者取消了發佈此附件。
   this_conference_may_be_recorded_f76deeeb: 此次會議可能被記錄下來。
@@ -16282,6 +16363,7 @@ zh-Hant:
   this_submission_has_already_been_graded_and_is_rea_8ec61c52: 提交的文檔已被評分，可供分數審核。
   this_submission_is_in_a_closed_grading_period_cc9ecb8a: 此提交正進行評分階段
   this_submission_is_in_another_grading_period_36bc720b: 此提交正進行另一評分階段
+  this_submission_is_not_being_autograded_4fd68d32: 此提交項目不會被自動評分。
   this_submission_is_not_in_any_grading_period_cbbd2f8: 此提交沒有任何評分階段
   this_topic_is_closed_for_comments_3dd10c00: 此主題已結束，以徵求評論。
   this_topic_is_closed_for_comments_5bacad6: 已結束此主題以徵求意見
@@ -16309,7 +16391,7 @@ zh-Hant:
       default: "%a, %d %b %Y %H:%M:%S %z"
       long: "%B %d, %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%l:%M%P"
+      tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
     less_than_a_minute_ago: 不到一分鐘以前
     pm: 下午
@@ -17124,7 +17206,7 @@ zh-Hant:
       no_courses_message: |-
           您沒有任何課程，所以，這個頁面現在不會處於很活躍的狀態。
           在您創建或者註冊了課程之後，您將會開始看到來自您班級的所有交談。
-      unpublished_courses_message: 您已經註冊了尚未開始的一個或多個課程。在這些課程可用之後，您將在此處以及頂部導覽看到相關的資訊。在此期間，您可隨時報名參加更多的課程，或創建您的個人檔案。
+      unpublished_courses_message: 您已在一個或多個未開始的課程中註冊。當課程可用時，您可在此及左邊的導航看到相關資訊。同時，請自由參與更多課程或設立個人檔案。
       welcome_to_happiness: "歡迎使用 Canvas！"
   users_d1b60cb0: 使用者
   users_matching_search_term_c604db9e: "使用者符合『%{search_term}』"
@@ -17144,6 +17226,7 @@ zh-Hant:
   video_player_b371005: 視訊播放器
   view_analytics_91a3b7a: 檢視分析
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: 在表格而非圖表中檢視分析性數據
+  view_announcement_e431195c: 檢視通告
   view_announcements_b6d6d819: 檢視通告
   view_app_center_6c89a3fe: 檢視應用程式中心
   view_app_configurations_52b52441: 檢視應用程式配置
@@ -17195,6 +17278,7 @@ zh-Hant:
   watermark_opacity_ce3d3097: 水印透光度
   watermarks_other_images_e970fc6a: 水印和其他影像
   we_emailed_a_confirmation_link_to_email_address_cl_e5f1d2ae: "我們透過電子郵件發送了一個確認連結至 %{email_address}。按一下電子郵件中的鏈接，以完成註冊。請務必檢查您的垃圾郵件箱，以防其被過濾。"
+  we_re_sending_your_message_d586da: 我們正在發送您的訊息...
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: 很抱歉，登入發生錯誤，請檢查您孩子的密碼並再試一次。
   we_sent_a_four_character_confirmation_code_to_sms__a1123db0: "我們傳送了四個字元的確認碼至 %{sms_number}。輸入以下代碼來啟動此簡訊號碼。"
   we_were_unable_to_activate_the_app_578defe7: 我們無法激活該應用程式。
@@ -17449,6 +17533,7 @@ zh-Hant:
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: 您無權訪問所請求的測驗。
   you_do_not_have_access_to_the_requested_resource_316ce49a: 您無權訪問要求的資源。
   you_do_not_have_permission_to_publish_this_course_ff361c82: 您沒有發佈此課程的許可。
+  you_don_t_have_permission_to_manage_grades_for_thi_a9a1be3a: 您沒有權限管理本課程的成績。
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: 您已獲得關於此嘗試的額外時間
   you_have_changed_the_progression_requirements_for__6772bc89: 您已更改某一活動課程的進度要求。可能有些學生的進度已達到此單元、以及基於單元的其他單元的進度要求。
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*您已對此測驗中的問題進行了更改。*在保存此測驗之前，學生將不會看到這些更改。"
@@ -17543,6 +17628,7 @@ zh-Hant:
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "您的文檔正上傳到成績冊，您可以在任何時候離開這個頁面。如果您有一個很大的 CSV 文件，您的更改可能需要幾分鐘來更新。為了避免覆蓋任何數據，在進行任何額外更改之前，請確認上傳已完成，而且您的成績冊是正確的。"
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "您的檔案正被上傳到成績冊，您可以在任何時候離開這個頁面。如果您又一個大的 CSV 文件，您的更改可能需要幾分鐘來更新。為了避免覆蓋任何數據，請在進行任何額外更改之前確認上傳已完成而且您的成績冊是正確的。"
   your_message_has_been_sent_thank_you_e0284316: 您的訊息已發送。謝謝您！
+  your_message_was_sent_977f6583: 您的訊息已經發出。
   your_name_7665e1d8: 您的名稱
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: 您的個人資料照片無法上傳。您可能已超過上傳限制。
   your_search_encountered_the_following_errors_fc3e5e7f: 

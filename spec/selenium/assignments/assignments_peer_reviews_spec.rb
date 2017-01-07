@@ -136,19 +136,19 @@ describe "assignments" do
 
       it 'should block reviewer name on assignments page', priority: "1", test_id: 216384 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}"
-        expect(f("#comment-#{comment.id} .signature")).to include_text(t("Anonymous User"))
+        expect(f("#comment-#{comment.id} .signature")).to include_text("Anonymous User")
       end
 
       it 'should hide comment reviewer name on submission page', priority: "1", test_id: 216385 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
-        expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(t("Anonymous User"))
+        expect(f("#submission_comment_#{comment.id} .author_name")).to include_text("Anonymous User")
       end
 
       it 'should hide comment reviewer name on rubric popup', priority: "1", test_id: 216386 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         f('.assess_submission_link').click
         wait_for_animations
-        expect(f("#rubric_assessment_option_#{assessment.id}")).to include_text(t("Anonymous User"))
+        expect(f("#rubric_assessment_option_#{assessment.id}")).to include_text("Anonymous User")
       end
     end
 

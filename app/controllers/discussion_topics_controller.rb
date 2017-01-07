@@ -609,6 +609,10 @@ class DiscussionTopicsController < ApplicationController
 
             js_hash = {:DISCUSSION => env_hash}
             js_hash[:CONTEXT_ACTION_SOURCE] = :discussion_topic
+            js_hash[:STUDENT_CONTEXT_CARDS_ENABLED] = @context.is_a?(Course) &&
+              @domain_root_account.feature_enabled?(:student_context_cards) &&
+              @context.grants_right?(@current_user, session, :manage)
+
             append_sis_data(js_hash)
             js_env(js_hash)
             conditional_release_js_env(@topic.assignment, includes: [:rule])

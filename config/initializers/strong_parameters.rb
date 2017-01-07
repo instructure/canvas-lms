@@ -48,7 +48,7 @@ end
 module ArbitraryStrongishParams
   ANYTHING = Object.new.freeze
 
-  def initialize(attributes = nil)
+  def initialize(attributes = (CANVAS_RAILS4_2 ? nil : {}))
     @anythings = {}.with_indifferent_access
     super
   end
@@ -107,7 +107,7 @@ module ArbitraryStrongishParams
     end
   end
 
-  def convert_hashes_to_parameters(key, value, assign_if_converted=true)
+  def convert_hashes_to_parameters(key, value, *args)
     return value if @anythings.key?(key)
     super
   end

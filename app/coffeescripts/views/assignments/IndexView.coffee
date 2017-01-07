@@ -40,6 +40,7 @@ define [
     toJSON: ->
       json = super
       json.course_home = ENV.COURSE_HOME
+      json.weight_final_grades = ENV.WEIGHT_FINAL_GRADES
       json
 
     afterRender: ->

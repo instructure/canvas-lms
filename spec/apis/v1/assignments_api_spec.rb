@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require_relative '../api_spec_helper'
+require_relative '../locked_spec'
+require_relative '../../sharding_spec_helper'
 
 describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
   include Api
@@ -48,6 +48,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
                                        user,
                                        score: '99',
                                        grade: '99',
+                                       grader: @teacher,
                                        submitted_at: now,
                                        grade_matches_current_submission: true
     return assignment,submission
@@ -93,10 +94,10 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       )
     end
 
-    it "includes has_due_date_in_closed_grading_period in returned json" do
+    it "includes in_closed_grading_period in returned json" do
       @course.assignments.create!(title: "Example Assignment")
       json = api_get_assignments_index_from_course(@course)
-      expect(json.first).to have_key('has_due_date_in_closed_grading_period')
+      expect(json.first).to have_key('in_closed_grading_period')
     end
 
     it "sorts the returned list of assignments" do
@@ -337,7 +338,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
     describe "assignment bucketing" do
       before :once do
-        course_with_student_logged_in(:active_all => true)
+        course_with_student(:active_all => true)
         @student1 = @user
         @section = @course.course_sections.create!(name: "test section")
         student_in_section(@section, user: @student1)
@@ -368,6 +369,10 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         # student2 overrides
         create_section_override_for_assignment(@past_assignment, {course_section: @section2, due_at: (Time.now - 10.days)})
         create_section_override_for_assignment(@far_future_assignment, {course_section: @section2, due_at: (Time.now - 10.days)})
+      end
+
+      before :each do
+        user_session(@student1)
       end
 
       it "returns an error with an invalid bucket" do
@@ -448,9 +453,13 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       context "as an observer" do
         before :once do
           @observer = User.create
-          user_session(@observer)
           @user = @observer
         end
+
+        before :each do
+          user_session(@observer)
+        end
+
         it "should get the same results as a student when only observing one student" do
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
           @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
@@ -508,15 +517,14 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         expect(@json['published']).to be_falsey
       end
 
-      it "includes has_due_date_in_closed_grading_period in returned json" do
+      it "includes in_closed_grading_period in returned json" do
         @course.assignments.create!(title: "Example Assignment")
         json = api_get_assignment_in_course(@assignment, @course)
-        expect(json).to have_key('has_due_date_in_closed_grading_period')
+        expect(json).to have_key('in_closed_grading_period')
       end
     end
 
     describe "differentiated assignments" do
-
       def setup_DA
         @course_section = @course.course_sections.create
         @student1, @student2, @student3 = create_users(3, return_type: :record)
@@ -532,11 +540,15 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       before :once do
-        course_with_teacher_logged_in(active_all: true)
+        course_with_teacher(active_all: true)
         @assignment = @course.assignments.create(name: 'differentiated assignment')
         section = @course.course_sections.create!(name: "second test section")
         create_section_override_for_assignment(@assignment, {course_section: section})
         assignment_override_model(assignment: @assignment, set_type: 'Noop', title: 'Just a Tag')
+      end
+
+      before :each do
+        user_session(@teacher)
       end
 
       it "should include overrides if overrides flag is included in the params" do
@@ -907,8 +919,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         'group_category_id' => group_category.id,
         'turnitin_enabled' => true,
         'vericite_enabled' => true,
-        'grading_type' => 'points',
-        'muted' => 'true'
+        'grading_type' => 'points'
       }
     end
 
@@ -916,7 +927,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       course_with_teacher(:active_all => true)
     end
 
-    it 'should respect post_to_sis default' do
+    it 'serializes post_to_sis when true' do
       a = @course.account
       a.settings[:sis_default_grade_export] = {locked: false, value: true}
       a.save!
@@ -924,8 +935,14 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       group_category = @course.group_categories.create!(name: "foo")
       json = api_create_assignment_in_course(@course, create_assignment_json(group, group_category))
       expect(json['post_to_sis']).to eq true
+    end
+
+    it "serializes post_to_sis when false" do
+      a = @course.account
       a.settings[:sis_default_grade_export] = {locked: false, value: false}
       a.save!
+      group = @course.assignment_groups.create!({name: "first group"})
+      group_category = @course.group_categories.create!(name: "foo")
       json = api_create_assignment_in_course(@course, create_assignment_json(group, group_category))
       expect(json['post_to_sis']).to eq false
     end
@@ -985,7 +1002,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       @course.any_instantiation.expects(:vericite_enabled?).
         at_least_once.returns true
       @json = api_create_assignment_in_course(@course,
-        create_assignment_json(@group, @group_category)
+        create_assignment_json(@group, @group_category).merge({'muted' => 'true'})
        )
       @group_category.reload
       @assignment = Assignment.find @json['id']
@@ -1095,27 +1112,121 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(a.lti_context_id).to eq(lti_assignment_id)
     end
 
-    it "sets the configuration tool if one is provided" do
+    it "sets the configuration LTI 1 tool if one is provided" do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       api_create_assignment_in_course(@course, {
         'description' => 'description',
         'assignmentConfigurationTool' => tool.id,
+        'configuration_tool_type' => 'ContextExternalTool',
         'submission_type' => 'online',
         'submission_types' => ['online_upload']
       })
 
       a = Assignment.last
-      expect(a.tool_settings_tools).to include(tool)
+      expect(a.tool_settings_tool).to eq(tool)
+    end
+
+    it "sets the configuration an LTI 2 tool in account context" do
+      account = @course.account
+      product_family = Lti::ProductFamily.create(
+        vendor_code: '123',
+        product_code: 'abc',
+        vendor_name: 'acme',
+        root_account: account
+      )
+
+      tool_proxy = Lti:: ToolProxy.create(
+        shared_secret: 'shared_secret',
+        guid: 'guid',
+        product_version: '1.0beta',
+        lti_version: 'LTI-2p0',
+        product_family: product_family,
+        context: account,
+        workflow_state: 'active',
+        raw_data: 'some raw data'
+      )
+
+      resource_handler = Lti::ResourceHandler.create(
+        resource_type_code: 'code',
+        name: 'resource name',
+        tool_proxy: tool_proxy
+      )
+
+      message_handler = Lti::MessageHandler.create(
+        message_type: 'message_type',
+        launch_path: 'https://samplelaunch/blti',
+        resource_handler: resource_handler
+      )
+
+      Lti::ToolProxyBinding.create(context: account, tool_proxy: tool_proxy)
+
+      api_create_assignment_in_course(@course, {
+        'description' => 'description',
+        'assignmentConfigurationTool' => message_handler.id,
+        'configuration_tool_type' => 'Lti::MessageHandler',
+        'submission_type' => 'online',
+        'submission_types' => ['online_upload']
+      })
+
+      a = Assignment.last
+      expect(a.tool_settings_tool).to eq(message_handler)
+    end
+
+    it "sets the configuration an LTI 2 tool in course context" do
+      account = @course.account
+      product_family = Lti::ProductFamily.create(
+        vendor_code: '123',
+        product_code: 'abc',
+        vendor_name: 'acme',
+        root_account: account
+      )
+
+      tool_proxy = Lti:: ToolProxy.create(
+        shared_secret: 'shared_secret',
+        guid: 'guid',
+        product_version: '1.0beta',
+        lti_version: 'LTI-2p0',
+        product_family: product_family,
+        context: @course,
+        workflow_state: 'active',
+        raw_data: 'some raw data'
+      )
+
+      resource_handler = Lti::ResourceHandler.create(
+        resource_type_code: 'code',
+        name: 'resource name',
+        tool_proxy: tool_proxy
+      )
+
+      message_handler = Lti::MessageHandler.create(
+        message_type: 'message_type',
+        launch_path: 'https://samplelaunch/blti',
+        resource_handler: resource_handler
+      )
+
+      Lti::ToolProxyBinding.create(context: @course, tool_proxy: tool_proxy)
+
+      api_create_assignment_in_course(@course, {
+        'description' => 'description',
+        'assignmentConfigurationTool' => message_handler.id,
+        'configuration_tool_type' => 'Lti::MessageHandler',
+        'submission_type' => 'online',
+        'submission_types' => ['online_upload']
+      })
+
+      a = Assignment.last
+      expect(a.tool_settings_tool).to eq(message_handler)
     end
 
     it "does not set the configuration tool if the submission type is not online with uploads" do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       api_create_assignment_in_course(@course, {'description' => 'description',
-        'assignmentConfigurationTool' => tool.id
+        'assignmentConfigurationTool' => tool.id,
+        'configuration_tool_type' => 'ContextExternalTool'
       })
 
       a = Assignment.last
-      expect(a.tool_settings_tools).not_to include(tool)
+      expect(a.tool_settings_tool).not_to eq(tool)
     end
 
     it "should allow valid submission types as an array" do
@@ -1497,7 +1608,11 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
             format: "json",
             course_id: @course.id.to_s
           },
-          { assignment: create_assignment_json(@group, @group_category).merge(params) },
+          {
+            assignment: create_assignment_json(@group, @group_category)
+             .merge(params)
+             .except("muted")
+          },
           {},
           { expected_status: expected_status }
         )
@@ -2464,16 +2579,16 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "succeeds when the assignment due date is set to the same value" do
-          due_date = 3.days.ago.iso8601
-          @assignment = create_assignment(due_at: due_date)
-          call_update({ due_at: due_date }, 201)
-          expect(@assignment.reload.due_at).to eq due_date
+          due_date = 3.days.ago
+          @assignment = create_assignment(due_at: due_date.iso8601, time_zone_edited: due_date.zone)
+          call_update({ due_at: due_date.iso8601 }, 201)
+          expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
         it "succeeds when the assignment due date is not changed" do
           due_date = 3.days.ago.iso8601
           @assignment = create_assignment(due_at: due_date)
-          call_update({ name: "Updated Assignment" }, 201)
+          call_update({ description: "Updated Description" }, 201)
           expect(@assignment.reload.due_at).to eq due_date
         end
 
@@ -2491,11 +2606,11 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "allows changing the due date on an assignment with an override due in a closed grading period" do
-          due_date = 7.days.from_now.iso8601
-          @assignment = create_assignment(due_at: 3.days.from_now)
+          due_date = 7.days.from_now
+          @assignment = create_assignment(due_at: 3.days.from_now.iso8601, time_zone_edited: due_date.zone)
           override_for_date(3.days.ago)
-          call_update({ due_at: due_date }, 201)
-          expect(@assignment.reload.due_at).to eq due_date
+          call_update({ due_at: due_date.iso8601 }, 201)
+          expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
         it "allows adding an override with a due date in an open grading period" do
@@ -2588,10 +2703,10 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "allows changing the due date on an assignment due in a closed grading period" do
-          due_date = 3.days.from_now.iso8601
-          @assignment = create_assignment(due_at: 3.days.ago)
-          call_update({ due_at: due_date }, 201)
-          expect(@assignment.reload.due_at).to eq due_date
+          due_date = 3.days.from_now
+          @assignment = create_assignment(due_at: 3.days.ago.iso8601, time_zone_edited: due_date.zone)
+          call_update({ due_at: due_date.iso8601 }, 201)
+          expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
         it "allows changing the due date to a date within a closed grading period" do
@@ -2608,11 +2723,11 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
         end
 
         it "allows changing the due date on an assignment with an override due in a closed grading period" do
-          due_date = 3.days.from_now.iso8601
-          @assignment = create_assignment(due_at: 7.days.from_now)
+          due_date = 3.days.from_now
+          @assignment = create_assignment(due_at: 7.days.from_now.iso8601, time_zone_edited: due_date.zone)
           override_for_date(3.days.ago)
-          call_update({ due_at: due_date }, 201)
-          expect(@assignment.reload.due_at).to eq due_date
+          call_update({ due_at: due_date.iso8601 }, 201)
+          expect(@assignment.reload.due_at).to eq due_date.iso8601
         end
 
         it "allows adding an override with a due date in a closed grading period" do
@@ -2806,6 +2921,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           'topic_children' => [],
           'locked' => false,
           'can_lock' => true,
+          'can_unlock' => true,
           'locked_for_user' => false,
           'root_topic_id' => @topic.root_topic_id,
           'podcast_url' => nil,
@@ -3403,7 +3519,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
          "grade" => "99",
          "grade_matches_current_submission" => true,
          "graded_at" => nil,
-         "grader_id" => nil,
+         "grader_id" => @teacher.id,
          "id" => @submission.id,
          "score" => 99,
          "submission_type" => nil,
@@ -3433,7 +3549,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
          "grade" => "99",
          "grade_matches_current_submission" => true,
          "graded_at" => nil,
-         "grader_id" => nil,
+         "grader_id" => @teacher.id,
          "id" => @submission.id,
          "score" => 99,
          "submission_type" => nil,

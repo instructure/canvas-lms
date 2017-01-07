@@ -4,8 +4,14 @@
 version: '2'
 services:
   js-tests:
-   build: ./docker-compose/karma
-   volumes:
-     - ".:/app"
-   environment:
-     NODE_ENV: CI
+    build: ./docker-compose/karma
+    volumes:
+      - .:/app
+      - generated_1:/app/public/javascripts/client_apps
+      - generated_2:/app/public/dist
+      - i18nliner_node_modules:/app/gems/canvas_i18nliner/node_modules
+      - node_modules:/app/node_modules
+      - quizzes_node_modules:/app/client_apps/canvas_quizzes/node_modules
+      - selinimum_node_modules:/app/gems/selinimum/node_modules
+    environment:
+      NODE_ENV: CI

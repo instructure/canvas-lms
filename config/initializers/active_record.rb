@@ -122,9 +122,13 @@ class ActiveRecord::Base
     (namespaces.map(&:camelize) + [class_name.try(:classify)]).join('::')
   end
 
+  def self.asset_string(id)
+    "#{self.reflection_type_name}_#{id}"
+  end
+
   def asset_string
     @asset_string ||= {}
-    @asset_string[Shard.current] ||= "#{self.class.reflection_type_name}_#{id}"
+    @asset_string[Shard.current] ||= self.class.asset_string(id)
   end
 
   def global_asset_string
@@ -907,82 +911,91 @@ module UpdateAndDeleteWithJoins
   end
 
   def update_all(updates, *args)
-    if joins_values.any?
-      case connection.adapter_name
-        when 'PostgreSQL'
-          stmt = Arel::UpdateManager.new(arel.engine)
+    return super if joins_values.empty?
 
-          stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
-          from = from_value.try(:first)
-          stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
-          stmt.key = table[primary_key]
+    stmt = Arel::UpdateManager.new(arel.engine)
 
-          sql = stmt.to_sql
+    stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
+    from = from_value.try(:first)
+    stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
+    stmt.key = table[primary_key]
 
-          collector = Arel::Collectors::Bind.new
-          arel.join_sources.each do |node|
-            connection.visitor.accept(node, collector)
-          end
-          join_sql = collector.compile(arel.bind_values.map{|bvs| connection.quote(*bvs.reverse)})
-          tables, join_conditions = deconstruct_joins(join_sql)
+    sql = stmt.to_sql
 
-          unless tables.empty?
-            sql.concat(' FROM ')
-            sql.concat(tables.join(', '))
-            sql.concat(' ')
-          end
-
-          scope = self
-          join_conditions.each { |join| scope = scope.where(join) }
-          binds = scope.bind_values.dup
-          sql_string = Arel::Collectors::Bind.new
-          scope.arel.constraints.map do |node|
-            connection.visitor.accept(node, sql_string)
-          end
-          sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
-
-          connection.update(sql, "#{name} Update")
-        else
-          super
-      end
-    else
-      super
+    collector = Arel::Collectors::Bind.new
+    arel.join_sources.each do |node|
+      connection.visitor.accept(node, collector)
     end
+    join_sql = collector.compile(arel.bind_values.map{|bvs| connection.quote(*bvs.reverse)})
+    tables, join_conditions = deconstruct_joins(join_sql)
+
+    unless tables.empty?
+      sql.concat(' FROM ')
+      sql.concat(tables.join(', '))
+      sql.concat(' ')
+    end
+
+    scope = self
+    join_conditions.each { |join| scope = scope.where(join) }
+
+    if CANVAS_RAILS4_2
+      binds = scope.bind_values.dup
+      sql_string = Arel::Collectors::Bind.new
+      scope.arel.constraints.each do |node|
+        connection.visitor.accept(node, sql_string)
+      end
+      sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
+    else
+      binds = scope.bound_attributes
+      binds = connection.prepare_binds_for_database(binds)
+      binds.map! { |value| connection.quote(value) }
+      sql_string = Arel::Collectors::Bind.new
+      scope.arel.constraints.each do |node|
+        connection.visitor.accept(node, sql_string)
+      end
+      sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
+    end
+
+    connection.update(sql, "#{name} Update")
   end
 
   def delete_all(conditions = nil, *args)
-    if joins_values.any?
-      if conditions
-        where(conditions).delete_all
-      else
-        case connection.adapter_name
-          when 'PostgreSQL'
-            sql = "DELETE FROM #{quoted_table_name} "
+    return super if joins_values.empty?
 
-            join_sql = arel.join_sources.map(&:to_sql).join(" ")
-            tables, join_conditions = deconstruct_joins(join_sql)
-
-            sql.concat('USING ')
-            sql.concat(tables.join(', '))
-            sql.concat(' ')
-
-            scope = self
-            join_conditions.each { |join| scope = scope.where(join) }
-
-            binds = scope.bind_values.dup
-            sql_string = Arel::Collectors::Bind.new
-            scope.arel.constraints.map do |node|
-              connection.visitor.accept(node, sql_string)
-            end
-            sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
-          else
-            raise "Joins in delete not supported!"
-        end
-
-        connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
-      end
+    if conditions
+      where(conditions).delete_all
     else
-      super
+      sql = "DELETE FROM #{quoted_table_name} "
+
+      join_sql = arel.join_sources.map(&:to_sql).join(" ")
+      tables, join_conditions = deconstruct_joins(join_sql)
+
+      sql.concat('USING ')
+      sql.concat(tables.join(', '))
+      sql.concat(' ')
+
+      scope = self
+      join_conditions.each { |join| scope = scope.where(join) }
+
+      if CANVAS_RAILS4_2
+        binds = scope.bind_values.dup
+        sql_string = Arel::Collectors::Bind.new
+        scope.arel.constraints.each do |node|
+          connection.visitor.accept(node, sql_string)
+        end
+        sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
+      else
+        binds = scope.bound_attributes
+        binds = connection.prepare_binds_for_database(binds)
+        binds.map! { |value| connection.quote(value) }
+        sql_string = Arel::Collectors::Bind.new
+        scope.arel.constraints.each do |node|
+          connection.visitor.accept(node, sql_string)
+        end
+        sql.concat('WHERE ' + sql_string.substitute_binds(binds).join)
+      end
+
+      connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
     end
   end
 end

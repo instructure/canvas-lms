@@ -92,7 +92,7 @@ describe Rubric do
       @a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
       @assignment.reload
       expect(@assignment.learning_outcome_alignments).not_to be_empty
-      @submission = @assignment.grade_student(@user, :grade => "10").first
+      @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher).first
       @assessment = @a.assess({
         :user => @user,
         :assessor => @user,

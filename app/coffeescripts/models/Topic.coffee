@@ -29,7 +29,7 @@ define [
       entry_ratings: {}
 
     url: ->
-      "#{@get 'root_url'}?include_new_entries=1&include_enrollment_state=1"
+      "#{@get 'root_url'}?include_new_entries=1&include_enrollment_state=1&include_context_card_info=1"
 
     fetch: (options = {}) ->
       loader = new BackoffPoller @url(), (data, xhr) =>

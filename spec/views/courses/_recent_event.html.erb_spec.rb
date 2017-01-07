@@ -39,7 +39,7 @@ describe "/courses/_recent_event" do
   end
 
   it "shows the context when asked to" do
-    course_with_student_logged_in
+    course_with_student
     event = @course.calendar_events.create(title: "some assignment", start_at: Time.zone.now)
 
     render partial: "courses/recent_event", object: event, locals: {is_hidden: false, show_context: true}
@@ -48,7 +48,7 @@ describe "/courses/_recent_event" do
   end
 
   it "doesn't show the context when not asked to" do
-    course_with_student_logged_in
+    course_with_student
     event = @course.calendar_events.create(title: "some assignment", start_at: Time.zone.now)
 
     render partial: "courses/recent_event", object: event, locals: {is_hidden: false}
@@ -70,7 +70,7 @@ describe "/courses/_recent_event" do
     end
 
     it 'shows the grade for a graded assignment' do
-      @assignment.grade_student(@user, grade: 7)
+      @assignment.grade_student(@user, grade: 7, grader: @teacher)
 
       render partial: "courses/recent_event", object: @assignment, locals: {is_hidden: false}
 

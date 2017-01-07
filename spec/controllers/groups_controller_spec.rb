@@ -134,6 +134,15 @@ describe GroupsController do
       expect(assigns[:previous_groups]).to eq([])
     end
 
+    it 'should put groups in courses in terms concluded for students in "previous groups"' do
+      @course.enrollment_term.set_overrides(@course.account, 'StudentEnrollment' => {end_at: 1.week.ago})
+      group_with_user(group_context: @course, user: @student, active_all: true)
+      user_session(@student)
+      get 'index'
+      expect(assigns[:current_groups]).to eq([])
+      expect(assigns[:previous_groups]).to eq([@group])
+    end
+
     describe 'pagination' do
       before :once do
         group_with_user(:group_context => @course, :user => @student, :active_all => true)

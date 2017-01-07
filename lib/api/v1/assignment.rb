@@ -59,8 +59,36 @@ module Api::V1::Assignment
     )
   }.freeze
 
+  EDITABLE_ATTRS_IN_CLOSED_GRADING_PERIOD = %w[
+    description
+    submission_types
+    peer_reviews
+    peer_review_count
+    anonymous_peer_reviews
+    peer_reviews_due_at
+    automatic_peer_reviews
+    allowed_extensions
+    due_at
+    only_visible_to_overrides
+  ].freeze
+
   def assignments_json(assignments, user, session, opts = {})
-    assignments.map{ |assignment| assignment_json(assignment, user, session, opts) }
+    # check if all assignments being serialized belong to the same course
+    contexts = assignments.map {|a| [a.context_id, a.context_type] }.uniq
+    if contexts.length == 1
+      # if so, calculate their effective due dates in one go, rather than individually
+      opts[:exclude_response_fields] ||= []
+      opts[:exclude_response_fields] << 'in_closed_grading_period'
+      due_dates = EffectiveDueDates.for_course(assignments.first.context, assignments)
+    end
+
+    assignments.map do |assignment|
+      json = assignment_json(assignment, user, session, opts)
+      unless json.key? 'in_closed_grading_period'
+        json['in_closed_grading_period'] = due_dates.in_closed_grading_period?(assignment)
+      end
+      json
+    end
   end
 
   def assignment_json(assignment, user, session, opts = {})
@@ -89,8 +117,10 @@ module Api::V1::Assignment
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
-    hash['has_due_date_in_closed_grading_period'] =
-      assignment.due_for_any_student_in_closed_grading_period?
+
+    unless opts[:exclude_response_fields].include?('in_closed_grading_period')
+      hash['in_closed_grading_period'] = assignment.in_closed_grading_period?
+    end
 
     if !opts[:overrides].blank?
       hash['overrides'] = assignment_overrides_json(opts[:overrides], user)
@@ -396,7 +426,7 @@ module Api::V1::Assignment
     ""
   ].freeze
 
-  def valid_submission_types?(assignment, assignment_params)
+  def submission_types_valid?(assignment, assignment_params)
     return true if assignment_params['submission_types'].nil?
     assignment_params['submission_types'] = Array(assignment_params['submission_types'])
 
@@ -414,7 +444,7 @@ module Api::V1::Assignment
   end
 
   # validate that date and times are iso8601
-  def valid_assignment_dates?(assignment, assignment_params)
+  def assignment_dates_valid?(assignment, assignment_params)
     errors = ['due_at', 'lock_at', 'unlock_at', 'peer_reviews_assign_at'].map do |v|
       if assignment_params[v].present? && assignment_params[v] !~ Api::ISO8601_REGEX
         assignment.errors.add("assignment[#{v}]",
@@ -427,7 +457,7 @@ module Api::V1::Assignment
     errors.compact.empty?
   end
 
-  def valid_assignment_group_id?(assignment, assignment_params)
+  def assignment_group_id_valid?(assignment, assignment_params)
     ag_id = assignment_params["assignment_group_id"].presence
     # if ag_id is a non-numeric string, ag_id.to_i will == 0
     if ag_id and ag_id.to_i <= 0
@@ -438,7 +468,25 @@ module Api::V1::Assignment
     end
   end
 
-  def update_from_params(assignment, assignment_params, user, context = assignment.context, new_record: false)
+  def assignment_editable_fields_valid?(assignment, user)
+    return true if assignment.context.account_membership_allows(user)
+    # if not in closed grading period editable fields are valid
+    return true unless assignment.in_closed_grading_period?
+    # if assignment was not and is still not gradeable fields are valid
+    return true unless assignment.gradeable_was? || assignment.gradeable?
+
+    impermissible_changes = assignment.changes.keys - EDITABLE_ATTRS_IN_CLOSED_GRADING_PERIOD
+    # backend is title, frontend is name
+    impermissible_changes << "name" if impermissible_changes.delete("title")
+    return true unless impermissible_changes.present?
+
+    impermissible_changes.each do |change|
+      assignment.errors.add(change, I18n.t("cannot be changed because this assignment is due in a closed grading period"))
+    end
+    false
+  end
+
+  def update_from_params(assignment, assignment_params, user, context = assignment.context)
     update_params = assignment_params.permit(allowed_assignment_input_fields)
 
     if update_params.key?('peer_reviews_assign_at')
@@ -534,7 +582,7 @@ module Api::V1::Assignment
     end
 
     post_to_sis = assignment_params.key?('post_to_sis') ? value_to_boolean(assignment_params['post_to_sis']) : nil
-    if new_record && (post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(context))
+    if assignment.new_record? && (post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(context))
       # set the default setting if it is not included.
       assignment.post_to_sis = context.account.sis_default_grade_export[:value]
     elsif !post_to_sis.nil?
@@ -619,26 +667,26 @@ module Api::V1::Assignment
       old_assignment.id = assignment.id
     end
 
-    if assignment_params[:secure_params] && !old_assignment
+    if assignment_params[:secure_params] && assignment.new_record?
       secure_params = Canvas::Security.decode_jwt assignment_params[:secure_params]
       assignment.lti_context_id = secure_params[:lti_assignment_id]
     end
 
-    apply_external_tool_settings(assignment, assignment_params, context)
-
+    apply_external_tool_settings(assignment, assignment_params)
     overrides = pull_overrides_from_params(assignment_params)
+    invalid = { valid: false }
+    return invalid unless update_parameters_valid?(assignment, assignment_params, overrides)
 
-    if update_parameters_valid?(assignment, assignment_params, overrides)
-      {
-        assignment: update_from_params(assignment, assignment_params, user, context, new_record: !old_assignment),
-        overrides: overrides,
-        old_assignment: old_assignment,
-        notify_of_update: assignment_params[:notify_of_update],
-        valid: true
-      }
-    else
-      { valid: false }
-    end
+    updated_assignment = update_from_params(assignment, assignment_params, user, context)
+    return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
+
+    {
+      assignment: assignment,
+      overrides: overrides,
+      old_assignment: old_assignment,
+      notify_of_update: assignment_params[:notify_of_update],
+      valid: true
+    }
   end
 
   def create_api_assignment_with_overrides(prepared_update, user)
@@ -681,18 +729,31 @@ module Api::V1::Assignment
   end
 
   def update_parameters_valid?(assignment, assignment_params, overrides)
-    (!overrides || overrides.is_a?(Array)) &&
-      valid_assignment_group_id?(assignment, assignment_params) &&
-      valid_assignment_dates?(assignment, assignment_params) &&
-      valid_submission_types?(assignment, assignment_params)
+    return false unless !overrides || overrides.is_a?(Array)
+    return false unless assignment_group_id_valid?(assignment, assignment_params)
+    return false unless assignment_dates_valid?(assignment, assignment_params)
+    return false unless submission_types_valid?(assignment, assignment_params)
+    true
   end
 
-  def apply_external_tool_settings(assignment, assignment_params, context)
+  def apply_external_tool_settings(assignment, assignment_params)
     if plagiarism_capable?(assignment_params)
-      tool_id = assignment_params['assignmentConfigurationTool'].to_i
-      tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
-      assignment.tool_settings_tools = [tool] if tool
+      tool = assignment_configuration_tool(assignment_params)
+      assignment.tool_settings_tool = tool
     end
+  end
+
+  def assignment_configuration_tool(assignment_params)
+    tool_id = assignment_params['assignmentConfigurationTool'].to_i
+    tool = nil
+    if assignment_params['configuration_tool_type'] == 'ContextExternalTool'
+      tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
+    elsif assignment_params['configuration_tool_type'] == 'Lti::MessageHandler'
+      mh = Lti::MessageHandler.find(tool_id)
+      mh_context = mh.resource_handler.tool_proxy.context
+      tool = mh if mh_context == @context || mh_context == @context.account || mh_context == @context.root_account
+    end
+    tool
   end
 
   def plagiarism_capable?(assignment_params)

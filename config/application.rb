@@ -106,7 +106,6 @@ module CanvasRails
     initializer("extend_middleware_stack", after: "load_config_initializers") do |app|
       request_throttle_position = CANVAS_RAILS4_2 ? 'ActionDispatch::ParamsParser' : 'Rack::Head'
       app.config.middleware.insert_before(config.session_store, 'LoadAccount')
-      app.config.middleware.insert_before(config.session_store, 'SessionsTimeout')
       app.config.middleware.swap('ActionDispatch::RequestId', 'RequestContextGenerator')
       app.config.middleware.insert_after(config.session_store, 'RequestContextSession')
       app.config.middleware.insert_before(request_throttle_position, 'RequestThrottle')
