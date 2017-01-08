@@ -47,7 +47,7 @@ require [
   if ENV.SHOW_ANNOUNCEMENTS
     renderReactComponent Spinner, '#announcements_on_home_page', {title: I18n.t('Loading Announcements'), size: 'small'}
 
-    axios.get("/api/v1/announcements?context_codes[]=course_#{ENV.COURSE_ID}&per_page=#{ENV.ANNOUNCEMENT_LIMIT || 3}&page=1&start_date=1900-01-01&end_date=2100-12-31")
+    axios.get("/api/v1/announcements?context_codes[]=course_#{ENV.COURSE_ID}&per_page=#{ENV.ANNOUNCEMENT_LIMIT || 3}&page=1&start_date=1900-01-01&end_date=#{new Date().toISOString()}&active_only=true")
     .then (response) =>
       renderReactComponent AnnouncementList, '#announcements_on_home_page', announcements: response.data.map (a) ->
           id: a.id,
