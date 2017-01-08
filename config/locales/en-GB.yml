@@ -3860,7 +3860,7 @@ en-GB:
       links: 
         alt: 
           skype_status: "skype status"
-        back_to_roster: "Back to schedule"
+        back_to_roster: "Back to roster"
         link_existing_service_account: "Link existing account"
         link_service: "Link web services to my account"
         sign_up_for_service: "Sign up"
@@ -4561,7 +4561,7 @@ en-GB:
       indexed: Indexed
       integration_id: "Integration Id"
       is_public: "Is Public"
-      large_roster: "Large schedule"
+      large_roster: "Large roster"
       license: Licence
       locale: Locale
       lock_all_announcements: "Lock All Announcements"
@@ -4605,7 +4605,7 @@ en-GB:
     restore_error: "There was an error attempting to restore the course. Course was not restored."
   course_role_role_type_119c2f64: "Course role: %{role_type}"
   course_roles_1314f962: "Course roles"
-  course_roster_78f70e97: "Course schedule"
+  course_roster_78f70e97: "Course roster"
   course_search: 
     cant_be_blank: "Can't be blank"
   course_section: 
@@ -5071,7 +5071,7 @@ en-GB:
     show: 
       change_home_page: Change
       details: 
-        confirm_unenroll: "Are you sure you want to unenrol in this course? You will no longer be able to see the course schedule or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications."
+        confirm_unenroll: "Are you sure you want to unenrol in this course? You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications."
       draft_state: 
         buttons: 
           cancel: Cancel
@@ -7764,7 +7764,7 @@ en-GB:
   group_name_group_people_e9d548c1: "%{group_name} - Group people"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} in %{group_category_name} group category"
   group_name_is_required_5547bc0b: "Group name is required"
-  group_roster_1846bf84: "Group schedule"
+  group_roster_1846bf84: "Group roster"
   group_set_name_2aed2347: "Group set name"
   group_settings: 
     invitation_sent: "Invitation sent"
@@ -7920,7 +7920,7 @@ en-GB:
       member: 
         one: "1 member"
         other: "%{count} members"
-      member_tooltip_show: "View group schedule"
+      member_tooltip_show: "View group roster"
       no_members: "No members"
       one: "1 Group"
       other: "%{count} groups"
@@ -7931,7 +7931,7 @@ en-GB:
       heading_current_groups: "Current groups"
       heading_previous_groups: "Previous Groups"
       no_groups: "No groups"
-    loading: "loading group schedule..."
+    loading: "loading group roster..."
     manage: 
       add_unassigned_menu: 
         add_unassigned_student: "Add unassigned student"
@@ -8071,8 +8071,8 @@ en-GB:
     member: 
       one: "1 member"
       other: "%{count} members"
-    member_tooltip_hide: "Hide group schedule"
-    member_tooltip_show: "View group schedule"
+    member_tooltip_hide: "Hide group roster"
+    member_tooltip_show: "View group roster"
     membership_pending: 
       group_join_request: "Group join request"
       group_join_request_info: "This group has received your request to join. You'll be notified once they accept or reject your request."
