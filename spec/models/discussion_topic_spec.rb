@@ -333,6 +333,37 @@ describe DiscussionTopic do
           expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies].sort
         end
 
+        it "should not grant reply permissions to group if group isn't active" do
+          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          group_category = @course.group_categories.create(:name => "new cat")
+          @group = @course.groups.create(:name => "group", :group_category => group_category)
+          @group.add_user(@student1)
+          @topic = @group.discussion_topics.create(:title => "group topic")
+          @topic.save!
+          @group.destroy
+
+          expect(@topic.reload.context).to eq(@group.reload)
+          expect((@topic.check_policy(@student1) & @relevant_permissions).sort).to eq [:read, :read_replies].sort
+        end
+
+        it "should grant reply permissions to teachers if course is claimed" do
+          course = course_factory(active_course: false)
+          discussion_topic_model(:user => @teacher, :context => course)
+          course.enroll_teacher(@teacher).accept!
+          course.enroll_student(@student1)
+
+          @relevant_permissions = [:read, :reply, :update, :delete, :read_replies]
+          group_category = course.group_categories.create(:name => "new cat")
+          @group = course.groups.create(:name => "group", :group_category => group_category)
+          @group.add_user(@student1)
+          @topic = @group.discussion_topics.create(:title => "group topic")
+          @topic.save!
+
+          expect(@topic.context).to eq(@group)
+          expect((@topic.check_policy(@teacher) & @relevant_permissions).sort).to eq @relevant_permissions.sort
+          expect((@topic.check_policy(@student1) & @relevant_permissions)).to be_empty
+        end
+
         it "should work for subtopics for graded assignments" do
           group_discussion_assignment
           ct = @topic.child_topics.first

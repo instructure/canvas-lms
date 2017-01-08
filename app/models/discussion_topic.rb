@@ -776,7 +776,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.grants_right?(user, :read) }
     can :read_replies
 
-    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) && self.context_available?}
+    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) && !has_concluded_contexts?}
     can :reply
 
     given { |user| self.user && self.user == user && self.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) && context.grants_right?(user, :participate_as_student) }
@@ -786,7 +786,7 @@ class DiscussionTopic < ActiveRecord::Base
     can :delete
 
     given { |user, session| !self.locked_for?(user, :check_policies => true) &&
-        self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user) && self.context_available?}
+        self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user) && !has_concluded_contexts?}
     can :reply and can :read
 
     given { |user, session|
@@ -948,6 +948,10 @@ class DiscussionTopic < ActiveRecord::Base
     @course ||= context.is_a?(Group) ? context.context : context
   end
 
+  def group
+    @group ||= context.is_a?(Group) ? context : nil
+  end
+
   def active_participants_with_visibility
     return active_participants if !self.for_assignment?
     users_with_visibility = self.assignment.students_with_visibility.pluck(:id)
@@ -1048,16 +1052,8 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def context_available?
-    return false unless self.context
-    case self.context
-    when Course
-      self.context.available? && (!self.context.respond_to?(:concluded?) || !self.context.concluded?)
-    when Group
-      self.context.context_available?
-    else
-      true
-    end
+  def has_concluded_contexts?
+    course.concluded? || (group && !group.available?)
   end
 
   # Public: Determine if the discussion topic is locked for a specific user. The topic is locked when the
