@@ -96,6 +96,9 @@ module Importers
         item = outcome
       end
 
+      log = hash[:learning_outcome_group] || context.root_outcome_group
+      log.add_outcome(item)
+
       if hash[:alignments]
         alignments = hash[:alignments].sort_by{|a| a[:position].to_i}
         alignments.each do |alignment|
@@ -115,9 +118,6 @@ module Importers
           end
         end
       end
-
-      log = hash[:learning_outcome_group] || context.root_outcome_group
-      log.add_outcome(item)
 
       migration.outcome_to_id_map[hash[:migration_id]] = item.id
 
