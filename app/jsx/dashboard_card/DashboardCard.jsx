@@ -20,6 +20,7 @@ define([
     displayName: 'DashboardCard',
 
     propTypes: {
+      backgroundColor: React.PropTypes.string.isRequired,
       courseId: React.PropTypes.string,
       shortName: React.PropTypes.string,
       originalName: React.PropTypes.string,
@@ -67,7 +68,7 @@ define([
 
     componentDidMount: function() {
       CourseActivitySummaryStore.addChangeListener(this.handleStoreChange)
-      this.parentNode = this.getDOMNode();
+      this.parentNode = this.cardDiv
     },
 
     componentWillUnmount: function() {
@@ -105,7 +106,7 @@ define([
     doneEditing: function(){
       if(this.isMounted()) {
         this.setState({editing: false})
-        this.refs.settingsToggle.getDOMNode().focus();
+        this.settingsToggle.focus();
       }
     },
 
@@ -158,15 +159,15 @@ define([
     colorPickerIfEditing: function(){
       return (
         <DashboardColorPicker
-          isOpen            = {this.state.editing}
-          elementID         = {this.colorPickerID()}
-          parentNode        = {this.parentNode}
-          doneEditing       = {this.doneEditing}
-          handleColorChange = {this.handleColorChange}
-          assetString       = {this.props.assetString}
-          settingsToggle    = {this.refs.settingsToggle}
-          backgroundColor   = {this.props.backgroundColor}
-          nicknameInfo      = {this.state.nicknameInfo}
+          isOpen={this.state.editing}
+          elementID={this.colorPickerID()}
+          parentNode={this.parentNode}
+          doneEditing={this.doneEditing}
+          handleColorChange={this.handleColorChange}
+          assetString={this.props.assetString}
+          settingsToggle={this.settingsToggle}
+          backgroundColor={this.props.backgroundColor}
+          nicknameInfo={this.state.nicknameInfo}
         />
       );
     },
@@ -273,11 +274,12 @@ define([
               />
             )}
             <button
-              aria-expanded = {this.state.editing}
-              aria-controls = {this.colorPickerID()}
+              aria-expanded={this.state.editing}
+              aria-controls={this.colorPickerID()}
               className="Button Button--icon-action-rev ic-DashboardCard__header-button"
               onClick={this.settingsClick}
-              ref="settingsToggle">
+              ref={(c) => { this.settingsToggle = c; }}
+            >
               <i className="icon-compose icon-Line" aria-hidden="true" />
                 <span className="screenreader-only">
                   { I18n.t("Choose a color or course nickname for %{course}", { course: this.state.nicknameInfo.nickname}) }
