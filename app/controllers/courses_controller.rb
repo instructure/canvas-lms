@@ -2765,7 +2765,7 @@ class CoursesController < ApplicationController
   def offline_web_exports
     return render status: 404, template: 'shared/errors/404_message' unless @context.allow_web_export_download?
     if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
-      title = t('Course Content Downloads')
+      title = t('Exported Package History')
       @page_title = title
       add_crumb(title)
       js_bundle :webzip_export

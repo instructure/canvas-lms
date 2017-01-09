@@ -7,7 +7,7 @@ define([
   module('ExportInProgress')
 
   test('renders the ExportInProgress component', () => {
-    const webzip = {progress_id: '117'}
+    const webzip = {progressId: '117'}
     const tree = enzyme.shallow(<ExportInProgress webzip={webzip} loadExports={() => {}} />)
 
     const node = tree.find('.webzipexport__inprogress')
@@ -16,7 +16,7 @@ define([
   })
 
   test('doesnt render when completed is true', () => {
-    const webzip = {progress_id: '117'}
+    const webzip = {progressId: '117'}
     const tree = enzyme.shallow(<ExportInProgress webzip={webzip} loadExports={() => {}} />)
 
     tree.setState({completed: true})
