@@ -324,7 +324,7 @@ describe DiscussionTopicsController, type: :request do
        "discussion_type" => 'side_comment',
        "locked" => false,
        "can_lock" => true,
-       "can_unlock" => true,
+       "comments_disabled" => false,
        "locked_for_user" => false,
        "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
        "permissions" => {"delete" => true, "attach" => true, "update" => true, "reply" => true},
@@ -463,7 +463,7 @@ describe DiscussionTopicsController, type: :request do
 
         # get rid of random characters in podcast url
         json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
-        expect(json).to eq response_json.merge("subscribed" => @topic.subscribed?(@user))
+        expect(json.sort.to_h).to eq response_json.merge("subscribed" => @topic.subscribed?(@user)).sort.to_h
       end
 
       it "should require course to be published for students" do
@@ -1136,7 +1136,7 @@ describe DiscussionTopicsController, type: :request do
       "permissions" => {"delete" => true, "attach" => true, "update" => true, "reply" => true},
       "locked" => false,
       "can_lock" => true,
-      "can_unlock" => true,
+      "comments_disabled" => false,
       "locked_for_user" => false,
       "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!,
       "group_category_id" => nil,
@@ -1145,7 +1145,7 @@ describe DiscussionTopicsController, type: :request do
       "only_graders_can_rate" => nil,
       "sort_by_rating" => nil,
     }
-    expect(json).to eq expected
+    expect(json.sort.to_h).to eq expected.sort.to_h
   end
 
   it "should paginate and return proper pagination headers for groups" do
