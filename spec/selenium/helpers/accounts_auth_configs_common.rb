@@ -2,12 +2,7 @@ require_relative "../common"
 
 module AccountsAuthConfigsCommon
   def add_auth_type(auth_type)
-    f("#add-authentication-provider button").click
-    ff("#add-authentication-provider a").each do |link|
-      if link.text == auth_type
-        link.click
-      end
-    end
+    click_option("#add-authentication-provider select", auth_type)
   end
 
   def add_sso_config

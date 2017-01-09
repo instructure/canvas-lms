@@ -1,63 +1,69 @@
 define([
   'react',
   'i18n!account_authorization_configs',
-  'react-select-box',
-  'jquery' /* $ */
-], function(React, I18n, SelectBox, $) {
+  'instructure-ui/Select',
+], (React, I18n, { default: Select }) => {
+  class AuthTypePicker extends React.Component {
 
-
-  var AuthTypePicker = React.createClass({
-
-    displayName: 'AuthTypePicker',
-
-    propTypes: {
-      authTypes: React.PropTypes.array.isRequired,
+    static propTypes = {
+      authTypes: React.PropTypes.arrayOf(React.PropTypes.shape({
+        value: React.PropTypes.string,
+        name: React.PropTypes.string
+      })).isRequired,
       onChange: React.PropTypes.func
-    },
+    };
 
-    getInitialState: function(){
-      return { authType: null };
-    },
+    static defaultProps = {
+      authTypes: [],
+      onChange () {}
+    };
 
-    getDefaultProps: function(){
-      return {
-        authTypes: [],
-        onChange: function(){}
+    constructor (props) {
+      super(props);
+      this.state = {
+        authType: 'default'
       };
-    },
+    }
 
-    handleChange: function(authType){
-      this.setState({authType: authType});
+    handleChange = (event) => {
+      const authType = event.target.value;
+      this.setState({ authType });
       this.props.onChange(authType);
-    },
+    }
 
-    renderAuthTypeOptions: function(){
-      return this.props.authTypes.map( (authType) => {
-        return( <option key={authType['value']}
-                        value={authType['value']}>
-                  {authType['name']}
-                </option> );
-      });
-    },
+    renderAuthTypeOptions () {
+      return this.props.authTypes.map(authType => (
+        <option
+          key={authType.value}
+          value={authType.value}
+        >
+          {authType.name}
+        </option>
+      ));
+    }
 
-    render: function(){
+    render () {
+      const label = (
+        <span className="add" style={{ display: 'block' }}>
+          {I18n.t('Add an identity provider to this account:')}
+        </span>
+      )
 
       return (
         <div>
-          <span className="add" style={ { display: 'block' }}>
-            {I18n.t("Add an identity provider to this account:")}
-          </span>
-          <SelectBox label={I18n.t("Choose an authentication service")}
-                     id='add_auth_select'
-                     onChange={this.handleChange}>
+          <Select
+            label={label}
+            id="add_auth_select"
+            onChange={this.handleChange}
+            value={this.state.authType}
+          >
             {this.renderAuthTypeOptions()}
-          </SelectBox>
+          </Select>
         </div>
       );
     }
 
-  });
+  }
 
   return AuthTypePicker;
-
 });
