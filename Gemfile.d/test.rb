@@ -25,6 +25,7 @@ group :test do
   gem 'rspec_around_all', '0.2.0'
   gem 'rspec-rails', '3.5.2'
   gem 'rspec-collection_matchers', '1.1.3'
+  gem 'shoulda-matchers', '3.1.1'
 
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
     gem 'rubocop', '0.46.0', require: false

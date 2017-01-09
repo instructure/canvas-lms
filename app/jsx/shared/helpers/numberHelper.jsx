@@ -7,7 +7,13 @@ define([
     _parseNumber: parseNumber,
 
     parse (input) {
-      let num = helper._parseNumber(input, {
+      if (input == null) {
+        return NaN
+      } else if (typeof input === 'number') {
+        return input
+      }
+
+      let num = helper._parseNumber(String(input), {
         thousands: I18n.lookup('number.format.delimiter'),
         decimal: I18n.lookup('number.format.separator')
       })

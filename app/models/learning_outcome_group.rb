@@ -18,6 +18,7 @@
 
 class LearningOutcomeGroup < ActiveRecord::Base
   include Workflow
+  include OutcomeAttributes
   attr_accessible :context, :title, :description, :learning_outcome_group, :vendor_guid
   belongs_to :learning_outcome_group
   has_many :child_outcome_groups, :class_name => 'LearningOutcomeGroup', :foreign_key => "learning_outcome_group_id"

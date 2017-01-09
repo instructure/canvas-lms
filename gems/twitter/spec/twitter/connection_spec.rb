@@ -23,4 +23,18 @@ describe Twitter::Connection do
     end
   end
 
+  describe ".config_check" do
+    it "checks new key/secret" do
+      settings = { api_key: "key", secret_key: "secret" }
+
+      config = double(call: {})
+      Twitter::Connection.config = config
+      consumer = double(get_request_token: "token")
+      expect(OAuth::Consumer).to receive(:new).
+        with("key", "secret", anything).and_return(consumer)
+
+      expect(Twitter::Connection.config_check(settings)).to be_nil
+    end
+  end
+
 end

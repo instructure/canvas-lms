@@ -94,7 +94,6 @@ describe "discussions overrides" do
       end
 
       it "should show due dates in mouse hover in the assignments index page", priority: "2", test_id: 114318 do
-        skip "fragile spec, timebomb CNVS-34081"
         get "/courses/#{@course.id}/assignments"
         hover_text = "Everyone else\n#{@default_due}\nNew Section\n#{@override_due}"
         hover f('.assignment-date-due .vdd_tooltip_link')

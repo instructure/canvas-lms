@@ -20,7 +20,7 @@ define([
 
   const tabbableDate = (ref, date) => {
     let formattedDate = DateHelper.formatDatetimeForDisplay(date);
-    return <span ref={ref} className="GradingPeriod__Action" tabIndex="0">{ formattedDate }</span>;
+    return <span ref={ref} className="GradingPeriod__Action">{ formattedDate }</span>;
   };
 
   const renderActions = ({ props, onDeleteGradingPeriod }) => {
@@ -117,7 +117,7 @@ define([
         return (
           <div>
             <span className="screenreader-only">{I18n.t("Grading Period Name")}</span>
-            <span ref="title" tabIndex="0">{this.props.title}</span>
+            <span ref="title">{this.props.title}</span>
           </div>
         );
       }

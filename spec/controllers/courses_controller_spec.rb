@@ -2077,4 +2077,30 @@ describe CoursesController do
       expect(assignment.needs_grading_count).to eq original_needs_grading_count - 1
     end
   end
+
+  describe 'GET #permissions' do
+    before do
+      course_with_teacher(active_all: true)
+      user_session(@teacher)
+    end
+
+    it 'returns a json representation for provided permission keys' do
+      get :permissions, course_id: @course.id, format: :json, permissions: :manage_grades
+      json = json_parse(response.body)
+      expect(json.keys).to include 'manage_grades'
+    end
+  end
+
+  describe "POST start_offline_web_export" do
+    it "starts a web zip export" do
+      course_with_student_logged_in(active_all: true)
+      @course.root_account.settings[:enable_offline_web_export] = true
+      @course.root_account.save!
+      @course.update_attribute(:enable_offline_web_export, true)
+      @course.save!
+      expect { post 'start_offline_web_export', course_id: @course.id }
+      .to change { @course.reload.web_zip_exports.count }.by(1)
+      expect(response).to be_redirect
+    end
+  end
 end

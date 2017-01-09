@@ -124,8 +124,7 @@ class GradebooksController < ApplicationController
 
   def light_weight_ags_json(assignment_groups, opts={})
     assignment_groups.map do |ag|
-      visible_assignments = ag.visible_assignments(opts[:student] || @current_user)
-                              .reject(&:muted?)
+      visible_assignments = ag.visible_assignments(opts[:student] || @current_user).to_a
 
       if multiple_grading_periods? && @current_grading_period_id && !view_all_grading_periods?
         current_period = GradingPeriod.for(@context).find_by(id: @current_grading_period_id)
@@ -138,7 +137,8 @@ class GradebooksController < ApplicationController
           submission_types: a.submission_types_array,
           points_possible: a.points_possible,
           due_at: a.due_at,
-          omit_from_final_grade: a.omit_from_final_grade?
+          omit_from_final_grade: a.omit_from_final_grade?,
+          muted: a.muted?
         }
       end
 

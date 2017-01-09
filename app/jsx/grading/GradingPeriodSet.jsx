@@ -269,11 +269,13 @@ define([
       if (!this.props.readOnly && this.props.permissions.update) {
         let disabled = isActionsDisabled(this.state, this.props);
         return (
-          <Button ref="editButton"
-                  variant="icon"
-                  disabled={disabled}
-                  onClick={this.editSet}
-                  title={I18n.t("Edit %{title}", { title: this.props.set.title })}>
+          <Button
+            ref="editButton"
+            variant="icon"
+            disabled={disabled}
+            onClick={this.editSet}
+            title={I18n.t("Edit %{title}", { title: this.props.set.title })}
+          >
             <span className="screenreader-only">
               {I18n.t("Edit %{title}", { title: this.props.set.title })}
             </span>
@@ -407,13 +409,13 @@ define([
                         aria-label="Toggle grading period visibility">
                   <i className={"icon-mini-arrow-" + arrow}/>
                 </button>
-                <h2 ref="title" tabIndex="0" className="GradingPeriodSet__title">
+                <h2 ref="title" className="GradingPeriodSet__title">
                   {this.props.set.title}
                 </h2>
               </div>
               {this.renderEditAndDeleteButtons()}
             </div>
-            <div className="EnrollmentTerms__list" tabIndex="0">
+            <div className="EnrollmentTerms__list">
               {this.termNames()}
             </div>
           </div>

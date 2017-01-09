@@ -189,6 +189,15 @@ describe GradebooksController do
       expect(assigns[:js_env][:assignment_groups].first[:assignments].first["discussion_topic"]).to be_nil
     end
 
+    it "includes muted assignments" do
+      user_session(@student)
+      assignment = @course.assignments.create!(title: "Example Assignment")
+      assignment.mute!
+      get 'grade_summary', course_id: @course.id, id: @student.id
+      expect(assigns[:js_env][:assignment_groups].first[:assignments].size).to eq 1
+      expect(assigns[:js_env][:assignment_groups].first[:assignments].first[:muted]).to eq true
+    end
+
     it "does not leak muted scores" do
       user_session(@student)
       a1, a2 = 2.times.map { |i|
@@ -862,7 +871,8 @@ describe GradebooksController do
               id: a.id,
               points_possible: 10,
               submission_types: ['online_upload'],
-              omit_from_final_grade: true
+              omit_from_final_grade: true,
+              muted: false
             }
           ],
         },
@@ -894,7 +904,8 @@ describe GradebooksController do
             due_at: nil,
             points_possible: 10,
             submission_types: ['online_upload'],
-            omit_from_final_grade: false
+            omit_from_final_grade: false,
+            muted: false
           }
         ],
       },

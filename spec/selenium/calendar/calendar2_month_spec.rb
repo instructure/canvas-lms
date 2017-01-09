@@ -187,7 +187,6 @@ describe "calendar2" do
         end
 
         it "should extend event to multiple days by draging", priority: "2", test_id: 419527 do
-          skip "fragile spec, timebomb CNVS-34081"
           create_middle_day_event
           date_of_middle_day = find_middle_day.attribute('data-date')
           date_of_next_day = (date_of_middle_day.to_datetime + 1.day).strftime('%Y-%m-%d')

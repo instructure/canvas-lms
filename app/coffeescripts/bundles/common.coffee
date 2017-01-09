@@ -43,7 +43,10 @@ require [
 
   helpDialog.initTriggers()
 
-  $('#skip_navigation_link').on 'click', ->
+  $('#skip_navigation_link').on 'click', (event) ->
+    # preventDefault so we dont change the hash
+    # this will make nested apps that use the hash happy
+    event.preventDefault()
     $($(this).attr('href')).attr('tabindex', -1).focus()
 
   # show and hide the courses vertical menu when the user clicks the hamburger button

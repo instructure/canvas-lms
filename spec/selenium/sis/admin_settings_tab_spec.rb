@@ -69,6 +69,8 @@ describe "admin settings tab" do
     let(:default_grade_export) { "#account_settings_sis_default_grade_export_value" }
     let(:require_assignment_due_date) { "#account_settings_sis_require_assignment_due_date_value" }
     let(:sis_name) { "#account_settings_sis_name" }
+    let(:assignment_name_length) { "#account_settings_sis_assignment_name_length_value" }
+    let(:assignment_name_length_input) { "#account_settings_sis_assignment_name_length_input_value" }
 
     def test_checkbox_on_off(id)
       set_checkbox_via_label(id,true)
@@ -164,9 +166,33 @@ describe "admin settings tab" do
           end
 
           it { test_checkbox_on_off(sis_syncing_locked) }
-          it { set_checkbox_via_label(default_grade_export,true)
-               click_submit
-               test_checkbox_on_off(require_assignment_due_date) }
+          it "toggles require assignment due date" do
+             set_checkbox_via_label(default_grade_export,true)
+             click_submit
+             test_checkbox_on_off(require_assignment_due_date)
+          end
+
+          it "toggles assignment name length" do
+            set_checkbox_via_label(default_grade_export,true)
+            click_submit
+            test_checkbox_on_off(assignment_name_length)
+          end
+
+          it "should test sis assignment name length" do
+            set_checkbox_via_label(default_grade_export,true)
+            click_submit
+            set_checkbox_via_label(assignment_name_length,true)
+            click_submit
+            name_length = 123
+            f("#account_settings_sis_assignment_name_length_input_value").send_keys(name_length)
+            f(".Button--primary").click
+            length = f("#account_settings_sis_assignment_name_length_input_value")
+            keep_trying_until do
+              expect(length.attribute("value")).to eq name_length.to_s
+            end
+            refresh_page
+            expect(length.attribute("value")).to eq(name_length.to_s)
+          end
         end
       end
 
@@ -227,6 +253,7 @@ describe "admin settings tab" do
             expect(f(sis_syncing)).not_to be_disabled
             expect(f(sis_syncing_locked)).not_to be_disabled
             expect(f(require_assignment_due_date)).not_to be_disabled
+            expect(f(assignment_name_length)).not_to be_disabled
             expect(f(default_grade_export)).not_to be_disabled
           end
         end
@@ -242,6 +269,7 @@ describe "admin settings tab" do
             expect(f(sis_syncing)).to be_disabled
             expect(f(sis_syncing_locked)).to be_disabled
             expect(f(require_assignment_due_date)).to be_disabled
+            expect(f(assignment_name_length)).to be_disabled
             expect(f(default_grade_export)).to be_disabled
           end
         end

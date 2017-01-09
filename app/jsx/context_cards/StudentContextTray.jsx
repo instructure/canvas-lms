@@ -2,6 +2,7 @@ define([
   'react',
   'i18n!student_context_tray',
   'jsx/shared/FriendlyDatetime',
+  './StudentCardStore',
   './Avatar',
   './LastActivity',
   './MetricsList',
@@ -18,6 +19,7 @@ define([
   'instructure-ui/Spinner',
   'instructure-ui/Tray'
 ], function(React, I18n, FriendlyDatetime,
+   StudentCardStore,
    Avatar,
    LastActivity,
    MetricsList,
@@ -46,12 +48,26 @@ define([
         React.PropTypes.number
       ]),
       isOpen: React.PropTypes.bool,
-      store: React.PropTypes.object.isRequired,
-      onClose: React.PropTypes.func
+      store: React.PropTypes.instanceOf(StudentCardStore),
+      onClose: React.PropTypes.func,
+      isLoading: React.PropTypes.bool
     }
 
     static defaultProps = {
       isOpen: false
+    }
+
+    static renderQuickLink (label, url, showIf) {
+      return showIf() ? (
+        <div className="StudentContextTray-QuickLinks__Link">
+          <Button
+            href={url}
+            variant="ghost" size="small" isBlock
+          >
+            {label}
+          </Button>
+        </div>
+      ) : null
     }
 
     constructor (props) {
@@ -62,6 +78,7 @@ define([
         isLoading: this.props.isLoading,
         isOpen: this.props.isOpen,
         messageFormOpen: false,
+        permissions: {},
         submissions: [],
         user: {}
       }
@@ -93,6 +110,7 @@ define([
         analytics: store.state.analytics,
         course: store.state.course,
         isLoading: store.state.loading,
+        permissions: store.state.permissions,
         submissions: store.state.submissions,
         user: store.state.user
       })
@@ -123,6 +141,31 @@ define([
      * Renderers
      */
 
+    renderQuickLinks () {
+      return (this.state.user.short_name && (
+        this.state.permissions.manage_grades ||
+        this.state.permissions.view_all_grades ||
+        this.state.permissions.view_analytics
+      )) ? (
+        <section
+          className="StudentContextTray__Section StudentContextTray-QuickLinks"
+        >
+          {StudentContextTray.renderQuickLink(
+            I18n.t('Grades'),
+            `/courses/${this.props.courseId}/grades/${this.props.studentId}`,
+            () =>
+              this.state.permissions.manage_grades ||
+              this.state.permissions.view_all_grades
+          )}
+          {StudentContextTray.renderQuickLink(
+            I18n.t('Analytics'),
+            `/courses/${this.props.courseId}/analytics/users/${this.props.studentId}`,
+            () => this.state.permissions.view_analytics
+          )}
+        </section>
+      ) : null
+    }
+
     render () {
       return (
         <div>
@@ -139,7 +182,8 @@ define([
             />
           ) : null}
 
-          <Tray isDismissable
+          <Tray
+            isDismissable={!this.state.isLoading}
             closeButtonLabel={I18n.t('Close')}
             isOpen={this.state.isOpen}
             onRequestClose={this.handleRequestClose}
@@ -162,7 +206,10 @@ define([
               ) : (
                 <div>
                   <header className="StudentContextTray-Header">
-                    <Avatar user={this.state.user} />
+                    <Avatar user={this.state.user}
+                      canMasquerade={this.state.permissions.become_user}
+                      courseId={this.props.courseId}
+                    />
 
                     <div className="StudentContextTray-Header__Layout">
                       <div className="StudentContextTray-Header__Content">
@@ -191,41 +238,25 @@ define([
                           <LastActivity user={this.state.user} />
                         </Typography>
                       </div>
-                      <div className="StudentContextTray-Header__Actions">
-                        <Button variant="link" size="small"
-                          onClick={this.handleMessageButtonClick}>
-                          <ScreenReaderContent>
-                            {I18n.t("Send a message to this student")}
-                          </ScreenReaderContent>
+                      {this.state.permissions.send_messages ? (
+                        <div className="StudentContextTray-Header__Actions">
+                          <Button
+                            variant="link" size="small"
+                            onClick={this.handleMessageButtonClick}
+                          >
+                            <ScreenReaderContent>
+                              {I18n.t('Send a message to this student')}
+                            </ScreenReaderContent>
 
-                          {/* Note: replace with instructure-icon */}
-                          <i className="icon-email" aria-hidden="true" />
+                            {/* Note: replace with instructure-icon */}
+                            <i className="icon-email" aria-hidden="true" />
 
-                        </Button>
-                      </div>
+                          </Button>
+                        </div>
+                      ) : null }
                     </div>
                   </header>
-                  {this.state.user.short_name ? (
-                    <section
-                      className="StudentContextTray__Section StudentContextTray-QuickLinks">
-                      <div className="StudentContextTray-QuickLinks__Link">
-                        <Button
-                          href={`/courses/${this.props.courseId}/grades/${this.props.studentId}`}
-                          variant="ghost" size="small" isBlock
-                        >
-                          {I18n.t('Grades')}
-                        </Button>
-                      </div>
-                      <div className="StudentContextTray-QuickLinks__Link">
-                        <Button
-                          href={`/courses/${this.props.courseId}/analytics/users/${this.props.studentId}`}
-                          variant="ghost" size="small" isBlock
-                        >
-                          {I18n.t('Analytics')}
-                        </Button>
-                      </div>
-                    </section>
-                  ) : null}
+                  {this.renderQuickLinks()}
                   <MetricsList user={this.state.user} analytics={this.state.analytics} />
                   <SubmissionProgressBars submissions={this.state.submissions} />
 

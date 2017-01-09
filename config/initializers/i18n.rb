@@ -9,7 +9,6 @@ else
   load_path << (Rails.root + "config/locales/locales.yml").to_s # add it at the end, to trump any weird/invalid stuff in locale-specific files
 end
 
-Rails.application.config.i18n.backend = I18nema::Backend.new
 Rails.application.config.i18n.enforce_available_locales = true
 Rails.application.config.i18n.fallbacks = true
 
@@ -29,13 +28,13 @@ module DontTrustI18nPluralizations
     super
   end
 end
-I18nema::Backend.include(DontTrustI18nPluralizations)
+I18n::Backend::Simple.include(DontTrustI18nPluralizations)
 
 module CalculateDeprecatedFallbacks
   def reload!
     super
     I18n.available_locales.each do |locale|
-      if (deprecated_for = I18n.backend.direct_lookup(locale.to_s, 'deprecated_for'))
+      if (deprecated_for = I18n.backend.send(:lookup, locale.to_s, 'deprecated_for'))
         I18n.fallbacks[locale] = I18n.fallbacks[deprecated_for.to_sym]
       end
     end
@@ -192,15 +191,15 @@ I18n.send(:extend, Module.new {
   alias :t :translate
 
   def bigeasy_locale
-    backend.direct_lookup(locale.to_s, "bigeasy_locale") || locale.to_s.tr('-', '_')
+    backend.send(:lookup, locale.to_s, "bigeasy_locale") || locale.to_s.tr('-', '_')
   end
 
   def fullcalendar_locale
-    backend.direct_lookup(locale.to_s, "fullcalendar_locale") || locale.to_s.downcase
+    backend.send(:lookup, locale.to_s, "fullcalendar_locale") || locale.to_s.downcase
   end
 
   def moment_locale
-    backend.direct_lookup(locale.to_s, "moment_locale") || locale.to_s.downcase
+    backend.send(:lookup, locale.to_s, "moment_locale") || locale.to_s.downcase
   end
 })
 

@@ -385,6 +385,7 @@ CanvasRails::Application.routes.draw do
 
     resources :content_exports, only: [:create, :index, :destroy, :show]
     get 'offline_web_exports' => 'courses#offline_web_exports'
+    post 'start_offline_web_export' => 'courses#start_offline_web_export'
     get 'modules/items/assignment_info' => 'context_modules#content_tag_assignment_data', as: :context_modules_assignment_info
     get 'modules/items/:id' => 'context_modules#item_redirect', as: :context_modules_item_redirect
     get 'modules/items/:id/edit_mastery_paths' => 'context_modules#item_redirect_mastery_paths'
@@ -915,6 +916,7 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/reset_content', :action => :reset_content
       get  'users/:user_id/courses', action: :user_index, as: 'user_courses'
       get 'courses/:course_id/effective_due_dates', action: :effective_due_dates, as: 'course_effective_due_dates'
+      get 'courses/:course_id/permissions', action: :permissions
     end
 
     scope(controller: :account_notifications) do
@@ -1665,6 +1667,7 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/turnitin/assignment", action: :assignment
       get "support_helpers/turnitin/pending", action: :pending
       get "support_helpers/turnitin/expired", action: :expired
+      get "support_helpers/turnitin/refresh_lti_attachment", action: :lti_attachment
     end
 
     scope(controller: 'support_helpers/crocodoc') do

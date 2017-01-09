@@ -2,6 +2,7 @@ require_dependency 'importers'
 
 module Importers
   class LearningOutcomeGroupImporter < Importer
+    extend OutcomeImporter
 
     self.item_class = LearningOutcomeGroup
 
@@ -10,8 +11,8 @@ module Importers
       if hash[:is_global_standard]
         if Account.site_admin.grants_right?(migration.user, :manage_global_outcomes)
           hash[:parent_group] ||= LearningOutcomeGroup.global_root_outcome_group
-          item ||= LearningOutcomeGroup.global.where(migration_id: hash[:migration_id]).first if hash[:migration_id]
-          item ||= LearningOutcomeGroup.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
+          item ||= LearningOutcomeGroup.global.where(migration_clause(hash[:migration_id])).first if hash[:migration_id]
+          item ||= LearningOutcomeGroup.global.where(vendor_clause(hash[:vendor_guid])).first if hash[:vendor_guid]
           item ||= LearningOutcomeGroup.new
         else
           migration.add_warning(t(:no_global_permission, %{You're not allowed to manage global outcomes, can't add "%{title}"}, :title => hash[:title]))
@@ -20,7 +21,8 @@ module Importers
       else
         context = migration.context
         root_outcome_group = context.root_outcome_group
-        item ||= LearningOutcomeGroup.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
+        item ||= LearningOutcomeGroup.where(context_id: context, context_type: context.class.to_s).
+          where(migration_clause(hash[:migration_id])).first if hash[:migration_id]
         item ||= context.learning_outcome_groups.temp_record
         item.context = context
       end

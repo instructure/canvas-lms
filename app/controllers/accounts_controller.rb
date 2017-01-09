@@ -427,7 +427,12 @@ class AccountsController < ApplicationController
       unless account_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_account_settings)
           if account_settings[:settings]
-            account_settings[:settings].slice!(:restrict_student_past_view, :restrict_student_future_view, :restrict_student_future_listing, :lock_all_announcements)
+            account_settings[:settings].slice!(:restrict_student_past_view, :restrict_student_future_view, :restrict_student_future_listing, :lock_all_announcements, :sis_assignment_name_length_input)
+            sis_name_length_setting = account_settings[:settings][:sis_assignment_name_length_input]
+            if sis_name_length_setting
+              value = sis_name_length_setting[:value]
+              sis_name_length_setting[:value] = (value.to_i.to_s == value.to_s && value.to_i <= 255) ? value : 255
+            end
           end
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
           @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
@@ -594,6 +599,7 @@ class AccountsController < ApplicationController
             :enable_alerts,
             :enable_eportfolios,
             :enable_profiles,
+            :enable_turnitin,
             :show_scheduler,
             :global_includes,
             :gmail_domain

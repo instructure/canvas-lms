@@ -27,8 +27,8 @@ describe "i18n js" do
       skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
       skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
       core_keys = I18nTasks::Utils::CORE_KEYS
-      core_translations = Hash[I18n.available_locales.map(&:to_s).map do |locale|
-        [locale.to_s, I18n.backend.direct_lookup(locale).slice(*core_keys)]
+      core_translations = Hash[I18n.available_locales.map do |locale|
+        [locale.to_s, I18n.backend.send(:translations)[locale].slice(*core_keys)]
       end].deep_stringify_keys
 
       expect(driver.execute_script(<<-JS)).to eq core_translations

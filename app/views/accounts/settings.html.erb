@@ -29,9 +29,8 @@
     }
     fieldset.nested {
       margin-top: 0;
-      margin-left: 20px
+      margin-left: 20px;
     }
-
     legend{
       font-size: 1.1em;
     }
@@ -434,11 +433,13 @@ TEXT
                 <input type="checkbox" id="enable_equella" <%= 'checked' if !@account.settings[:equella_endpoint].blank? %> />
                 <label for="enable_equella"><%= t 'labels.equella', 'Equella' %></label>
               </div>
+            <% end %>
+            <% if @account.grants_right?(@current_user, :manage_site_settings) %>
               <div>
-                <input type="checkbox" name="turnitin" id="turnitin" <%= 'checked' unless @account.turnitin_account_id.blank? %> />
-                <label for="turnitin"><%= t 'labels.turnitin', 'Turnitin' %></label>
+                <%= settings.check_box :enable_turnitin, :checked => @account.settings[:enable_turnitin] %>
+                <%= settings.label :enable_turnitin, :en => "Turnitin" %>
               </div>
-             <% end %>
+            <% end %>
           <% end %>
           <%= f.fields_for :services do |services| %>
             <% Account.services_exposed_to_ui_hash(:setting, @current_user, @account).sort_by { |k,h| Canvas::ICU.collation_key(h[:name]) }.each do |key, service| %>
@@ -482,51 +483,53 @@ TEXT
             <% end %>
           </fieldset>
 
-          <fieldset id="turnitin_settings" style="display: none;">
-            <legend><%= t(:turnitin_settings_title, "Turnitin Settings") %></legend>
-            <table class="formtable">
-              <tr>
-                <td><%= f.blabel :turnitin_account_id, :en => "Turnitin Account ID" %></td>
-                <td><%= f.text_field :turnitin_account_id, :class => "turnitin_account_settings" %></td>
-              </tr>
-              <tr>
-                <td><%= f.blabel :turnitin_shared_secret, :en => "Turnitin Shared Secret" %></td>
-                <td><%= f.text_field :turnitin_shared_secret, :class => "turnitin_account_settings" %></td>
-              </tr>
-              <tr>
-                <td><%= f.blabel :turnitin_host, :en => "Turnitin Host" %></td>
-                <td><%= f.text_field :turnitin_host, :class => "turnitin_account_settings", :placeholder => "api.turnitin.com" %></td>
-              </tr>
-              <tr>
-                <td>&nbsp;</td>
-                <td>
-                  <a href="<%= account_turnitin_confirmation_path(@account) %>" class="confirm_turnitin_settings_link Button">
-                    <%= t(:confirm_turnitin_settings_link, "confirm Turnitin settings") %>
-                  </a>
-                </td>
-              </tr>
-              <tr>
-                <td><%= f.blabel :turnitin_comments, :en => "Submission Comments" %></td>
-                <td>
-                  <span style="font-size: 0.9em;"><%= t(:turnitin_comments_help, "these comments will be shown to students when submitting a Turnitin-enabled assignment") %></span>
-                  <%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %>
-                </td>
-              </tr>
-              <tr>
-                <td><%= f.blabel :turnitin_pledge, :en => "Turnitin Pledge" %></td>
-                <td>
-                  <span style="font-size: 0.9em;"><%= t(:turnitin_pledge_help, "students must check a box acknowledging that they agree with this pledge") %></span>
-                  <%= f.text_area :turnitin_pledge, :style => "width: 90%; height: 50px;" %>
-                </td>
-              </tr>
-              <tr>
-                <td><%= f.blabel :originality_report_visibility, :en => "Students can see the originality report" %></td>
-                <td>
-                  <%= f.select :turnitin_originality, options_for_select(turnitin_originality_options, @account.turnitin_originality)%>
-                </td>
-              </tr>
-            </table>
-          </fieldset>
+          <% if @account.settings[:enable_turnitin] %>
+            <fieldset id="turnitin_settings">
+              <legend><%= t(:turnitin_settings_title, "Turnitin Settings") %></legend>
+              <table class="formtable">
+                <tr>
+                  <td><%= f.blabel :turnitin_account_id, :en => "Turnitin Account ID" %></td>
+                  <td><%= f.text_field :turnitin_account_id, :class => "turnitin_account_settings" %></td>
+                </tr>
+                <tr>
+                  <td><%= f.blabel :turnitin_shared_secret, :en => "Turnitin Shared Secret" %></td>
+                  <td><%= f.text_field :turnitin_shared_secret, :class => "turnitin_account_settings" %></td>
+                </tr>
+                <tr>
+                  <td><%= f.blabel :turnitin_host, :en => "Turnitin Host" %></td>
+                  <td><%= f.text_field :turnitin_host, :class => "turnitin_account_settings", :placeholder => "api.turnitin.com" %></td>
+                </tr>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>
+                    <a href="<%= account_turnitin_confirmation_path(@account) %>" class="confirm_turnitin_settings_link Button">
+                      <%= t(:confirm_turnitin_settings_link, "confirm Turnitin settings") %>
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td><%= f.blabel :turnitin_comments, :en => "Submission Comments" %></td>
+                  <td>
+                    <span style="font-size: 0.9em;"><%= t(:turnitin_comments_help, "these comments will be shown to students when submitting a Turnitin-enabled assignment") %></span>
+                    <%= f.text_area :turnitin_comments, :style => "width: 90%; height: 50px;" %>
+                  </td>
+                </tr>
+                <tr>
+                  <td><%= f.blabel :turnitin_pledge, :en => "Turnitin Pledge" %></td>
+                  <td>
+                    <span style="font-size: 0.9em;"><%= t(:turnitin_pledge_help, "students must check a box acknowledging that they agree with this pledge") %></span>
+                    <%= f.text_area :turnitin_pledge, :style => "width: 90%; height: 50px;" %>
+                  </td>
+                </tr>
+                <tr>
+                  <td><%= f.blabel :originality_report_visibility, :en => "Students can see the originality report" %></td>
+                  <td>
+                    <%= f.select :turnitin_originality, options_for_select(turnitin_originality_options, @account.turnitin_originality)%>
+                  </td>
+                </tr>
+              </table>
+            </fieldset>
+          <% end %>
         <% end %>
 
         <% if @account.root_account? and not (exposed_services = Account.services_exposed_to_ui_hash(:service, @current_user)).empty? %>

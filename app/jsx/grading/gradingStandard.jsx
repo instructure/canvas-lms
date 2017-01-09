@@ -156,7 +156,7 @@ function(React, ReactDOM , update, DataRow, $, I18n, _, splitAssetString) {
     renderTitle: function() {
       if(this.props.editing){
         return (
-          <div className="pull-left" tabIndex="0">
+          <div className="pull-left">
             <input type="text" onChange={this.changeTitle}
                    name="grading_standard[title]" className="scheme_name" title={I18n.t("Grading standard title")}
                    value={this.state.editingStandard.title} ref="title"/>
@@ -164,7 +164,7 @@ function(React, ReactDOM , update, DataRow, $, I18n, _, splitAssetString) {
         );
       }
       return (
-        <div className="pull-left" tabIndex="0">
+        <div className="pull-left">
           <div className="title" ref="title">
             <span className="screenreader-only">{I18n.t("Grading standard title")}</span>
             {this.props.standard.title}

@@ -48,5 +48,4 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-gem 'syck', '1.0.4'
 gem 'iconv', '1.0.4'
