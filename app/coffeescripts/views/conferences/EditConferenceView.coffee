@@ -136,6 +136,12 @@ define [
             userSettings.push(val)
 
         )
+      if $('#web_conference_conference_type option:selected').text()=='BigBlueButton'
+        $('.all_users_checkbox').prop('checked', ENV.bbb_config.invitations_enabled )
+        if !ENV.bbb_config.invitations_enabled
+          $("#members_list").show()
+      else
+        $('.all_users_checkbox').prop('checked', conferenceData.inviteAll )
 
       @$('.web_conference_user_settings').html(userSettingOptionsTemplate(
         settings: userSettings,

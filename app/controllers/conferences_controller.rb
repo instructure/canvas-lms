@@ -195,6 +195,7 @@ class ConferencesController < ApplicationController
       default_conference: default_conference_json(@context, @current_user, session),
       conference_type_details: conference_types_json(WebConference.conference_types),
       users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
+      bbb_config: WebConference.config(BigBlueButtonConference.to_s)
     )
     flash[:error] = t('Some conferences on this page are hidden because of errors while retrieving their status') if @errors
   end
@@ -340,6 +341,42 @@ class ConferencesController < ApplicationController
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_conferences_url) }
         format.json { render :json => @conference }
+      end
+    end
+  end
+
+  def publish_recording
+    if authorized_action(@conference, @current_user, :delete)
+      @conference.transaction do
+        @response = @conference.publish_recording(params[:recording_id], params[:publish])
+      end
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_conferences_url) }
+        format.json { render :json => @response }
+      end
+    end
+  end
+
+  def delete_recording
+    if authorized_action(@conference, @current_user, :delete)
+      @conference.transaction do
+        @conference.delete_recording(params[:recording_id])
+      end
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_conferences_url) }
+        format.json { render :json => @conference }
+      end
+    end
+  end
+
+  def protect_recording
+    if authorized_action(@conference, @current_user, :delete)
+      @conference.transaction do
+        @response = @conference.protect_recording(params[:recording_id], params[:protect])
+      end
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_conferences_url) }
+        format.json { render :json => @response }
       end
     end
   end
