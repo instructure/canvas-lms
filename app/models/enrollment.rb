@@ -820,7 +820,7 @@ class Enrollment < ActiveRecord::Base
     self.workflow_state = 'active'
     self.completed_at = nil
     self.save
-    scores.unscoped.each(&:undestroy)
+    Score.where(enrollment_id: self, workflow_state: :deleted).find_each(&:undestroy)
     true
   end
 
