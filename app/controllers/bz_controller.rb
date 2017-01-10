@@ -326,8 +326,10 @@ class BzController < ApplicationController
       part.title = params[:part_title][idx]
       next if part.title == ''
       part.intro = params[:part_intro][idx]
-      part.task_box_title = params[:task_box_title][idx]
-      part.task_box_intro = params[:task_box_intro][idx]
+      # The task box is removed for now, but I'm keeping the code
+      # in case we want a custom section in it later.
+      #part.task_box_title = params[:task_box_title][idx]
+      #part.task_box_intro = params[:task_box_intro][idx]
       part.course_id = @course.id
       part.position = idx
 
@@ -354,7 +356,7 @@ class BzController < ApplicationController
 
       # mod.image_url = params[:image_url][idx]
 
-      if params[:upload]["image_file_#{mod.id}"]
+      if params[:upload] && params[:upload]["image_file_#{mod.id}"]
         file = params[:upload]["image_file_#{mod.id}"].read
         dirname = Rails.root.to_s + '/public/bz_dynamic_syllabus_images/'
         filename = dirname + module_id.to_s + '.png'

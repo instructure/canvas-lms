@@ -1,6 +1,6 @@
 tinymce.create('tinymce.plugins.BZRetainedFields', {
   init : function(ed, url) {
-    function showFieldDialog(header, callback) {
+    function showFieldDialog(header, callback, editing) {
       var dialog = document.createElement("div");
       dialog.setAttribute("id", "bz-retained-field-dialog-holder");
       var div = document.createElement("div");
@@ -21,8 +21,13 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
 
       label = document.createElement("label");
       label.innerHTML = "<span>Type:</span> ";
+
       var type = document.createElement("select");
-      type.innerHTML = "<option value=\"input\">Single-line text</option><option value=\"textarea\">Multi-line text box</option><option value=\"checkbox\">Check box</option><option value=\"radio\">Radio boxes</option>";
+      var typeHtml = "<option value=\"input\">Single-line text</option><option value=\"textarea\">Multi-line text box</option><option value=\"checkbox\">Check box</option>";
+      if(editing)
+      	typeHtml += "<option value=\"radio\">Radio boxes</option>";
+      type.innerHTML = typeHtml;
+
       label.appendChild(type);
       div.appendChild(label);
 
@@ -88,7 +93,7 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
           ed.selection.setContent('<input type="text" data-bz-retained="'+name+'" />');
         else if(type == "textarea")
           ed.selection.setContent('<textarea data-bz-retained="'+name+'">&#8291;</textarea>');
-      });
+      }, true);
     });
     ed.addCommand('bzRetainedFieldView', function() {
       showFieldDialog("Add Magic Field Viewer", function(name, type) {
@@ -98,7 +103,7 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
           ed.selection.setContent('<input type="checkbox" readonly="readonly" data-bz-retained="'+name+'" />');
         else
           ed.selection.setContent('<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class=\"bz-magic-viewer\" data-bz-retained="'+name+'"/>');
-      });
+      }, false);
     });
     ed.addButton('bz_retained_field', {
       title: 'Add Retained Field Edit Box',

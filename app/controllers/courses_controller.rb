@@ -1551,7 +1551,7 @@ class CoursesController < ApplicationController
       when 'dynamic_syllabus'
         @course = @context
         @progressions = @current_user.context_module_progressions
-        @editable = authorized_action(@course, @current_user, :update)
+        @editable = @course.grants_right?(@current_user, session, :update)
         #redirect_to "/courses/#{@context.id}/dynamic_syllabus"
       else
         @active_tab = "home"
