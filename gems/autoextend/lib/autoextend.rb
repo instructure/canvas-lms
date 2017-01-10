@@ -114,9 +114,21 @@ end
 
 module Autoextend::ActiveSupport
   module Dependencies
+    def notify_autoextend_of_new_constant(constant)
+      Autoextend.const_added(constant, source: :'ActiveSupport::Dependencies')
+      # check for nested constants
+      constant.constants(false).each do |child|
+        child_const = constant.const_get(child, false)
+        next unless child_const.is_a?(Module)
+        notify_autoextend_of_new_constant(child_const)
+      end
+    end
+
     def new_constants_in(*_descs)
-      super.each do |constant|
-        Autoextend.const_added(constant, source: :'ActiveSupport::Dependencies')
+      super.each do |constant_name|
+        constant = Object.const_get(constant_name, false)
+        next unless constant.is_a?(Module)
+        notify_autoextend_of_new_constant(constant)
       end
     end
 
