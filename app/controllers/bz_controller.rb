@@ -356,7 +356,7 @@ class BzController < ApplicationController
 
       # mod.image_url = params[:image_url][idx]
 
-      if params[:upload]["image_file_#{mod.id}"]
+      if params[:upload] && params[:upload]["image_file_#{mod.id}"]
         file = params[:upload]["image_file_#{mod.id}"].read
         dirname = Rails.root.to_s + '/public/bz_dynamic_syllabus_images/'
         filename = dirname + module_id.to_s + '.png'
