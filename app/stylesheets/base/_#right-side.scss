@@ -18,8 +18,8 @@
     overflow: hidden;
     line-height: 1.2em;
     border-bottom: 1px solid $ic-border-light;
-    padding-bottom: $ic-sp;
-    margin: 0 0 $ic-sp;
+    padding-bottom: $ic-sp / 3;
+    margin: 0 0 $ic-sp / 2;
     font-weight: bold;
   }
 }
@@ -30,12 +30,12 @@
 
 #right-side .right-side-list {
   @include reset-list;
-  margin: 0 0 $ic-sp;
+  margin: -($ic-sp / 2) 0 $ic-sp;
   li {
     a{
       @include fontSize($ic-font-size--xsmall);
-      padding-top: 4px;
-      padding-bottom: 4px;
+      padding-top: $ic-sp * 0.75;
+      padding-bottom: $ic-sp * 0.75;
       display: flex;
       border-bottom: 1px solid #d6d6d6;
       @if $use_high_contrast {
@@ -58,10 +58,8 @@
       }
       // this is to give todo and event icons some breathing room
       > i {
-          width: 40px;
-          min-width: 40px;
+          min-width: $ic-sp * 2;
           padding-right: $ic-sp;
-          text-align: right;
           box-sizing: border-box;
           color: lighten( $grayDark, 15% );
       }
@@ -79,6 +77,7 @@
     b, em, p {
       font-weight: normal;
       display: block;
+      line-height: $ic-label-line-height;
     }
     p, .more_link {
       @include fontSize(12px);
@@ -146,7 +145,7 @@
 }
 
 #right-side .todo-list-header {
-  margin-top: 21px;
+  margin-top: 29px; // magic number to align with header bottom border
 }
 #right-side .right-side-list .todo-badge-wrapper {
   display: inline-block;
@@ -160,8 +159,9 @@
 #right-side .right-side-list .disable_item_link {
   position: absolute;
   right: 0;
-  top: 2px;
+  top: $ic-sp / 2;
   z-index: 2;
+  padding: 0;
 }
 
 @mixin sidebar-logo {display: block;}
