@@ -37,6 +37,8 @@ class CanvadocSessionsController < ApplicationController
         opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
       end
 
+      opts[:wants_annotation] = true if params['wants_annotation'] == 'true'
+
       # We can't set the pdfjs preference here during upload because with
       # only an attachment object we lack the requisite context
       attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?

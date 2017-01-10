@@ -349,7 +349,8 @@ describe BasicLTI::BasicOutcomes do
         xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(submission.reload.versions.count).to eq 2
-        expect(submission.assignment.attachments.count).to eq 1
+        expect(submission.attachments.count).to eq 1
+        expect(submission.attachments.first.display_name).to eq "face.doc"
       end
 
       it "doesn't change the submission type if only the score is sent" do
