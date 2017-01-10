@@ -781,7 +781,7 @@ nb:
       account_reports: 
         default: 
           public_courses: 
-            text: "Denne rapporten viser alle emne som ikke er slettet i et gitt semester som er publisert. Den resulterende CSV-filen vil ha én rad per emne og vil vise emne-id-en, sis-id for emne, kortnavn for emne, navn for emne og start for emne- og sluttdatoer."
+            text: "Denne rapporten viser alle emne som ikke er slettet i et gitt semester som er publisert. Den resulterende CSV-filen vil ha én rad per emne og vil vise emne-id-en, sis-id for emner, kortnavn for emner, navn for emner og start for emner- og sluttdatoer."
     quota_integer_required: "Et helt tall kreves"
     quota_must_be_positive: "Verdien må være positiv"
     quota_not_updated: "Kvoten ble ikke oppdatert"
@@ -791,7 +791,7 @@ nb:
       account_reports: 
         default: 
           recently_deleted_courses: 
-            text: "Denne rapporten viser alle emnene i et gitt semester som har blitt slettet de siste 30 dagene. Den resulterende CSV-filen vil ha én rad per emne, og vil vise emne-ID-en, SIS-ID for emne, kortnavn for emne, navn for emne og start for emne- og sluttdatoer."
+            text: "Denne rapporten viser alle emnene i et gitt semester som har blitt slettet de siste 30 dagene. Den resulterende CSV-filen vil ha én rad per emne, og vil vise emne-ID-en, SIS-ID for emner, kortnavn for emner, navn for emner og start for emner- og sluttdatoer."
     retry_login: "Prøv å logge inn på nytt"
     root_accounts: 
       labels: 
@@ -1202,7 +1202,7 @@ nb:
       account_reports: 
         pearson: 
           outcome: 
-            text: "SIS-ID for Emne:"
+            text: "SIS-ID for emne:"
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
@@ -1241,7 +1241,7 @@ nb:
       account_reports: 
         default: 
           unpublishd_courses: 
-            text: "Denne rapporten viser alle emne i et gitt semester som ikke er publisert. Den resulterende CSV-filen vil ha én rad per emne og vil vise emne-ID-en, SIS-ID for emne, kortnavn for emne, navn for emne og start for emne- og sluttdatoer."
+            text: "Denne rapporten viser alle emne i et gitt semester som ikke er publisert. Den resulterende CSV-filen vil ha én rad per emne og vil vise emne-ID-en, SIS-ID for emner, kortnavn for emner, navn for emner og start for emner- og sluttdatoer."
     unrecognized_time_zone: "'%{timezone}' gjenkjennes ikke som tidssone"
     unused_courses_csv_description: 
       account_reports: 
@@ -2334,7 +2334,7 @@ nb:
         media_recordings_disabled: "Medieopptak er ikke aktivert for denne Canvaskontoen."
       upload_or_choose_file: "Last opp en fil, eller velg en fil du har lastet opp tidligere."
     syllabus: 
-      page_title: "Emneoversikt for %{course}"
+      page_title: "Emneoversikt %{course}"
     syllabus_content: 
       buttons: 
         update_syllabus: "Oppdater emneoversikt"
@@ -2355,7 +2355,7 @@ nb:
         edit_syllabus_description: Rediger
         jump_to_today: "Hopp til i dag"
       titles: 
-        course_syllabus: Emnepensum
+        course_syllabus: Emneoversikt
     syllabus_right_side: 
       links: 
         edit_syllabus_description: "Rediger pensumbeskrivelsen"
@@ -2558,7 +2558,7 @@ nb:
       migration_cancelled_on: "Avbrutt %{date}"
       migration_failed_on: "Mislyktes %{date}"
       migration_finished_on: "Fullført %{date}"
-      migration_queueing: "De enkelte emneflyttinger settes i kø for å kjøres."
+      migration_queueing: "De enkelte flyttinger for emne settes i kø for å kjøres."
       migration_started_at: "Samlet flytting startet %{time}"
       migration_waiting: "Den samlede flyttingen venter på tur."
       see_results: "Se resultater"
@@ -3006,7 +3006,7 @@ nb:
       calendar_feed_instructions: "Kopier lenken nedenfor og lim den inn i hvilket som helst kalenderapp som aksepterer iCal strøm (Google Calendar, iCal, Outlook, etc.)"
       calendars: Kalendere
       feed_dialog_title: Kalenderstrøm
-      feed_title: "Emnekalender Atom-strøm"
+      feed_title: "Kalender Atom-strøm for emne"
       links: 
         feed: "klikk her for å se strømmen"
       page_title_header: Kalender
@@ -3036,7 +3036,7 @@ nb:
         new: "Opprett en ny hendelse"
   calendars_a756c286: Kalendere
   calendars_toggle_list_visibility_488db143: "Synligheten av vekslelisten på kalendre"
-  can_create_rename_and_edit_course_pages_by_default_f9ad4253: "Kan opprette, endre navn på og redigere emnesider som standard"
+  can_create_rename_and_edit_course_pages_by_default_f9ad4253: "Kan opprette, endre navn på og redigere sider for emne som standard"
   can_interact_with_users_in_their_section_only_48cb8c43: "Kan kun samhandle med brukere i sin seksjon"
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan ikke regne ut karakter før en oppgave har oppnåelige poeng"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikke slette justeringer basert på rubrikk foreninger. For å fjerne disse assosiasjonene må du fjerne raden fra eiendelens rubrikk"
@@ -3144,7 +3144,7 @@ nb:
   changes_you_made_may_not_be_saved_4e8db973: "Det kan hende at endringene dine ikke ble lagret."
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "Diagram over studentenes karakterer på hvert oppgave"
   chat_2153c6b7: Chat
-  child_course_must_belong_to_the_same_root_account__66ed7b8e: "Begynneremnet må tilhøre samme hovedkontoen som det videregående emnet"
+  child_course_must_belong_to_the_same_root_account__66ed7b8e: "Underemnet må tilhøre samme hovedkontoen som det videregående emnet"
   child_s_username_dde3aa9: "Barnets brukernavn"
   chile_56_88238b47: "Chile (+56)"
   chile_9081cde6: Chile
@@ -3428,7 +3428,7 @@ nb:
       duration: Varighet
       duration_in_minutes: minutter
       invite_all: 
-        course: "Inviter alle emnemedlemmer"
+        course: "Inviter alle medlemmer for emne"
         group: "Inviter alle gruppemedlemmer"
       long_running: "Ingen tidsbegrensning (for langvarige konferanser)"
       members: Medlemmer
@@ -4438,13 +4438,13 @@ nb:
   course_8dcfb195: emne
   course_and_user_search_ebc1ae41: "Kurs- og brukersøk"
   course_announcements_76b07340: Emnekunngjøringer
-  course_assignments_833b8cf1: Emneoppgaver
+  course_assignments_833b8cf1: "Oppgaver for emne"
   course_atom_feed_9d95214e: "Emne Atom-strøm"
-  course_calendar_7d3cba7b: Emnekalender
+  course_calendar_7d3cba7b: "Kalender for emne"
   course_card_color_region_for_course_c356a69c: "Emne kortfarge region for %{course}"
   course_catalog_4cc7c8ce: Emnekatalog
   course_collaborations_dadb327e: Emnesamarbeid
-  course_conferences_3d914c96: Emnekonferanser
+  course_conferences_3d914c96: "Konferanser for emne"
   course_content_a92eca20: Emneinnhold
   course_content_downloads_6cb31802: "Nedlasting av emneinnhold"
   course_copy_argument_error: "En emnekopi krever et kilde-emne."
@@ -4464,7 +4464,7 @@ nb:
       assignments: "Feil ved eksport av enkelte oppgaver"
       canvas_meta: "Feil ved eksport av Canvas-spesifikke metadata"
       course_export: "Avvik ved kjøring av eksport for emne"
-      course_settings: "Feil ved eksport av emneinnstillinger"
+      course_settings: "Feil ved eksport av innstillinger for emne"
       events: "Feil ved eksport av kalender hendelse"
       external_feeds: "Feil ved eksport av ekstern informasjonsstrøm"
       file: "Eksport av filen \"%{file_name}\" feilet"
@@ -4496,13 +4496,13 @@ nb:
       file: "Ukjent fil"
       topic: "Ukjent tema"
       wiki_page: "Ukjent wikiside"
-  course_files_62deb8f8: Emnefiler
+  course_files_62deb8f8: "Filer for emne"
   course_grades_22adc27e: Emne-Karakterer
   course_home_4c4c0107: "Emne hjem"
   course_home_sub_navigation_b1ee6b03: Emnenavigering
   course_id_8bd2a21c: Kurs-ID
   course_id_a7c924d5: "emne id"
-  course_id_b0bc82d4: Emne-ID
+  course_id_b0bc82d4: "Emne ID"
   course_image_for_course_cfbb08df: "Emnebilde for %{course}"
   course_image_settings_eba3ec55: Emnebilde-innstillinger
   course_implemented_apps_fa658f5a: "Emne-implementerte applikasjoner"
@@ -4532,7 +4532,7 @@ nb:
       unconcluded: "Ikke avgjort"
       updated: Oppdatert
     field_label: 
-      abstract_course_id: "Abstrakt emne-Id"
+      abstract_course_id: "Abstrakt emne ID"
       account_id: Konto-ID
       allow_student_discussion_editing: "Tillat redigering av deltagerdiskusjoner"
       allow_student_discussion_topics: "Tillat tema for student-diskusjoner"
@@ -4583,14 +4583,14 @@ nb:
       wiki_id: Wiki-ID
       workflow_state: "Arbeidsflyt status"
   course_members_are_free_to_join_9b2603d4: "Emnedeltagere kan delta"
-  course_modules_795cb95e: Emnemoduler
+  course_modules_795cb95e: "Moduler for emne"
   course_name_63b973d1: Wmnenavn
   course_name_is_required_90919349: "Wmnenavn er påkrevd"
   course_name_successfully_added_48116a50: "%{course_name} ble lagt til!"
   course_navigation_dd035109: Emnenavigering
   course_option_links_a79d263d: "Lenker for emnevalg"
   course_outcomes_7dc1cbc7: "Læringsmål i emnet"
-  course_pages_449f1dd4: Emnesider
+  course_pages_449f1dd4: "Sider for emne"
   course_people_3058c948: "Personer på emnet"
   course_quizzes_c337653c: Emne-quiz
   course_restore: 
@@ -4650,12 +4650,12 @@ nb:
   course_settings_sub_navigation_b95deae: "Innstillinger-undernavigering for emne"
   course_setup_wizard_is_showing_a7c087c1: "Emne Oppsett Veiviser viser."
   course_sis_7ae8f649: "emne sis"
-  course_sis_df8b379: Emne-SIS
+  course_sis_df8b379: "Emne SIS"
   course_starts_at_3a01f9da: "Emne begynner "
   course_statistics: 
     unknown: ukjent
   course_storage_391e1bd: "Lagringsplass for emner"
-  course_syllabus_5de1b0af: "Oversikt for emne"
+  course_syllabus_5de1b0af: Emneoversikt
   course_users: 
     greater_than_three: "Skriv inn søkeord med tre eller flere tegn"
     unknown_error: "Noe gikk galt med søket ditt. Prøv igjen"
@@ -4790,7 +4790,7 @@ nb:
       titles: 
         courses: Emne
         rss: 
-          course_announcements: "Emnekunngjøringer Atom-strøm"
+          course_announcements: "Kunngjøringer Atom-strøm for emne"
     link_enrollment: 
       buttons: 
         link: "Lenke til Student"
@@ -5010,7 +5010,7 @@ nb:
         after: "Etter at"
         before: Før
         or: ELLER
-      nav_items_keyboard_drag_and_drop: "Advarsel: For bedre tilgjengelighet i bestilling Emnenavigeringselementer, kan du bruke Flytt til dialogen alternativet i menyen."
+      nav_items_keyboard_drag_and_drop: "Advarsel: For bedre tilgjengelighet i bestilling Navigeringselementer for emne, kan du bruke Flytt til dialogen alternativet i menyen."
       no_language_preference: "Ikke angitt (brukerinnstilt, standard er %{language})"
       none: Ingen
       page_title: Emnedetaljer
@@ -5041,21 +5041,21 @@ nb:
       wiki_editing_roles_change_existing: "Endre sider som er redigerbare av \"%{current_setting}\" til \"%{new_setting}\"."
     settings_sidebar: 
       buttons: 
-        reset: "Tilbakestill innhold for emne"
+        reset: "Tilbakestill emneinnhold"
         unconclude: "Angre avsluttingen av emnet"
       headings: 
         current_users: "Gjeldende brukere"
       help: 
-        reset_course_content: "Tilbakestilling av innhold for emne sletter permanent alle tilhørende oppgaver, diskusjoner, tester, moduler, rubrikk, vurderingsveiledning, sider, filer, læringsresultat, spørsmålsbanker, samarbeid, konferanser eller alt annet innhold. Denne handlingen er irreversibel, og dataene *kan ikke* gjenopprettes. Er du sikker på at du vil fortsette?"
+        reset_course_content: "Tilbakestilling av emneinnhold sletter permanent alle tilhørende oppgaver, diskusjoner, tester, moduler, rubrikk, vurderingsveiledning, sider, filer, læringsresultat, spørsmålsbanker, samarbeid, konferanser eller alt annet innhold. Denne handlingen er irreversibel, og dataene *kan ikke* gjenopprettes. Er du sikker på at du vil fortsette?"
       links: 
-        calendar: Emnekalender
+        calendar: "Kalender for emne"
         conclude: "Avslutt dette emnet"
         copy: "Kopier dette emnet"
         delete: "Slett dette emnet permanent"
-        export_content: "Eksporter innhold for emne"
+        export_content: "Eksporter emneinnhold"
         import: "Importer innhold til dette emnet"
         new_badge: Ny
-        reset: "Tilbakestill innhold for emne"
+        reset: "Tilbakestill emneinnhold"
         stats: Emnestatistikk
         student_view: Studentvisning
       role: 
@@ -5076,7 +5076,7 @@ nb:
           assignments: Oppgaveliste
           course_activity_stream: "Aktivitetsstrøm for emner"
           custom_page: "Sider forside"
-          modules: Emnemoduler
+          modules: "Moduler for emne"
           syllabus: Emneoversikt
       empty_body: "Uten innhold"
       front_page_not_set: "Forsiden må etableres først"
@@ -5780,7 +5780,7 @@ nb:
         save_and_publish: "Lagre og publiser"
       delay_posting: "Avvent posting"
       enable_podcast_feed: "Slå på podkaststrøm"
-      include_replies_in_podcast_feed: "Inkluder svar fra studenter i podcastfeed"
+      include_replies_in_podcast_feed: "Inkluder svar fra studenter i podcast-strøm"
       only_graders_can_like: "Kun de som setter karakterer kan like"
       options: Valg
       page_header_title: "Ny diskusjon"
@@ -6039,7 +6039,7 @@ nb:
   download_as_zip_5dae7f19: "Last ned som ZIP"
   download_associated_files_f35dcb5e: "Last ned tilknyttede filer"
   download_c7ffdfb9: "Last ned"
-  download_course_content_7f66edc9: "Last ned innhold for emne"
+  download_course_content_7f66edc9: "Last ned emneinnhold"
   download_epub_757cf0af: "Last ned ePub"
   download_item_analysis_report_statuslabel_8c9387ec: "Last ned element-analyserapport %{statusLabel}"
   download_report_77164f62: "Last ned rapport"
@@ -6296,7 +6296,7 @@ nb:
       pending: Avventer
       rejected: Avslått
   enrollmentNames: 
-    course_designer: Emnedesigner
+    course_designer: "Designer for emne"
     observer: Observatør
     student: Student
     teacher: Lærer
@@ -7027,7 +7027,7 @@ nb:
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, og %{others_count} andre"
   flash_6afbf65a: Blitz
   folder: 
-    course_content_folder_name: "innhold for emne"
+    course_content_folder_name: emneinnhold
     default_folder_name: "Ny Mappe"
     errors: 
       invalid_recursion: "En mappe kan ikke være sin egen overordnete mappe"
@@ -8164,7 +8164,7 @@ nb:
       conversation_details: Samtaledetaljer
       conversation_label: "Gå til Samtaler"
       discussion_details: Diskusjonsdetaljer
-      discussion_label: "Gå til emnediskusjoner"
+      discussion_label: "Gå til diskusjoner for emne"
       peer_review_details: Fagfellevurderingsdetaljer
       peer_review_label: "Gå til fagfellevurderinger for emner"
       x_more: "%{x} mer ..."
@@ -9665,16 +9665,16 @@ nb:
         html: 
           body2: "Et problem oppsto under eksport av emnet *%{course}*. Vennligst gjør systemadministratoren din oppmerksom på det, og gi ham/henne følgende eksport-ID:"
           link: "Klikk for å se eksporter"
-          subject: "Emneeksport feilet: %{course}"
-        subject: "Emneeksport feilet: %{course}"
+          subject: "Eksport for emne feilet: %{course}"
+        subject: "Eksport for emne feilet: %{course}"
     content_export_finished: 
       email: 
         body: "Eksport av Innholdet ditt for \"%{course}\" er ferdig."
         html: 
           body2: "Din eksport for emne av *%{course}* er fullført."
           link: "Klikk for å se eksporter"
-          subject: "Emneeksport ferdig: %{course}"
-        subject: "Emneeksport ferdig: %{course}"
+          subject: "Eksport for emne ferdig: %{course}"
+        subject: "Eksport for emne: %{course}"
     content_locked: "Denne testen er for tiden låst."
     content_locked_at: "Innholdet ble låst %{at}."
     content_locked_module: "Dette innholdet er del av modulen *%{module}* og er ikke tilgjengelig enda."
@@ -9814,8 +9814,8 @@ nb:
           body_ta: "%{user} aksepterte nylig invitasjonen om å delta i kurset, %{course}, som LA."
           body_teacher: "%{user}  aksepterte nylig invitasjonen om å delta i kurset, %{course}, som faglærer."
           details: "Se oversikten over gjeldende påmeldinger"
-          subject: "%{user} aksepterte invitasjonen for emne"
-        subject: "%{user} aksepterte invitasjonen for emne"
+          subject: "%{user} aksepterte emneinvitasjon"
+        subject: "%{user} aksepterte emneinvitasjon"
       sms: 
         body_designer: "%{user} aksepterte invitasjonen som designer til kurset, %{course}"
         body_observer: "%{user} aksepterte invitasjonen som observatør til kurset, %{course}"
@@ -9829,7 +9829,7 @@ nb:
         body_student: "%{user} aksepterte nylig invitasjonen om å delta i kurset, %{course}, som student."
         body_ta: "%{user} aksepterte nylig invitasjonen om å delta i kurset, %{course}, som LA."
         body_teacher: "%{user} aksepterte nylig invitasjonen om å delta i kurset, %{course}, som faglærer."
-        subject: "%{user} aksepterte invitasjonen for emne"
+        subject: "%{user} aksepterte emneinvitasjon"
       twitter: 
         body: "Canvas Varsel - Akseptert: %{user}, %{enrollment_type}, kurs, %{course}"
     enrollment_invitation: 
@@ -9850,14 +9850,14 @@ nb:
           link: "Klikk her for å vise emnesiden"
           name: Navn
           none: ingen
-          subject: "Invitasjon for emne"
+          subject: Emneinvitasjon
           username: Brukernavn
         labels: 
           email: E-post
           name: Navn
           username: Brukernavn
         none: ingen
-        subject: "Invitasjon for emne"
+        subject: Emneinvitasjon
       sms: 
         body_designer: "Du er invitert til kurset som designer."
         body_observer: "Du er invitert til kurset som observatør."
@@ -9876,7 +9876,7 @@ nb:
         body_student: "Du er invitert til å delta i kurset, %{course}, som student."
         body_ta: "Du er invitert til å delta i kurset, %{course}, som LA."
         body_teacher: "Du er invitert til å delta i kurset, %{course}, som faglærer."
-        subject: "Invitasjon for emne"
+        subject: Emneinvitasjon
       twitter: 
         body: "Canvas varsel - invitert: kurs som %{enrollment_type}"
     enrollment_notification: 
@@ -9949,14 +9949,14 @@ nb:
           name: Navn
           none: ingen
           participate_in_class: "Du har blitt invitert til å delta i en klasse på %{website}"
-          subject: "Invitasjon for emne"
+          subject: Emneinvitasjon
           username: Brukernavn
         labels: 
           email: E-post
           name: Navn
           username: Brukernavn
         none: ingen
-        subject: "Invitasjon for emne"
+        subject: Emneinvitasjon
       sms: 
         body_designer: "Du er invitert til kurset som designer."
         body_observer: "Du er invitert til kurset som observatør."
@@ -9975,7 +9975,7 @@ nb:
         body_student: "Du er invitert til å delta i et kurs på %{website}. Kurset heter %{course}, og du er invitert til å delta som student."
         body_ta: "Du er invitert til å delta i et kurs på %{website}. Kurset heter %{course}, og du er invitert til å delta som LA."
         body_teacher: "Du er invitert til å delta i et kurs på %{website}. Kurset heter %{course}, og du er invitert til å delta som faglærer."
-        subject: "Invitasjon for emne"
+        subject: Emneinvitasjon
       twitter: 
         body: "Canvas varsel - invitert: kurs som %{enrollment_type}"
     event_date_changed: 
@@ -11243,7 +11243,7 @@ nb:
       appointment_cancelations: Avtalekanselleringer
       appointment_signups: Avtalepåmeldinger
       calendar: Kalender
-      course_content: "Innhold for emne"
+      course_content: Emneinnhold
       discussion: Diskusjon
       discussion_entry: DiscussionEntry
       due_date: Forfallsdato
@@ -11266,12 +11266,12 @@ nb:
     conversation_message_description: "Nye innboksmeldinger"
     conversation_message_display: Samtalemeldinger
     course_content_description: |-
-        Endre til innhold for emne:
+        Endre til emneinnhold:
         
         * WikiPage
         * Testinnhold
         * Oppgaveinnhold
-    course_content_display: "Innhold for emne"
+    course_content_display: Emneinnhold
     discussion_description: "Nytt diskusjonstema i emnet ditt"
     discussion_display: Diskusjon
     discussion_post_description: "Ny diskusjonspost i et tema du abonnerer på"
@@ -12254,13 +12254,13 @@ nb:
     webct_scraper_settings: 
       description: |-
           Dersom institusjonen ikke bruker WebCT "Læringsmoduler" (inkludert institusjoner som adopterte WebCT
-          før versjon 4.0, når modulene ble gjort tilgjengelig), kan emneflyttinger forbedres ved å importere "Emneinnholdet"
+          før versjon 4.0, når modulene ble gjort tilgjengelig), kan flyttinger for emne forbedres ved å importere "Emneinnholdet"
           som Canvas-moduler i stedet for "Læringsmoduler". Denne siden gjør det mulig å sette standard oppførsel for WebCT-migrator
           med hensyn til innholdsmoduler. Det er viktig å huske på at mens individuelle emneflyttinger beholder muligheten
           til å velge, vil samlet flytting alltid benytte verdien som er konfigurert her, og kan ikke endres for hver flytting.
       labels: 
-        allow_outline_selection: "Vis valget for å bruke Innhold for emne som moduler i flytteveiviseren"
-        folders_as_outline: "Bruk WebCT \"Innhold for emne\" for moduler som standard"
+        allow_outline_selection: "Vis valget for å bruke Emneinnhold som Moduler i flytteveiviseren"
+        folders_as_outline: "Bruk WebCT \"Emneinnhold\" for moduler som standard"
     wimba: 
       description: "Støtte for Wimba-nettkonferanse"
       name: Wimba
@@ -12727,7 +12727,7 @@ nb:
       link_invalid: "Lenken du brukte er ikke lenger gyldig. Om du ikke kan logge inn, klikk på \"Kan du ikke passordet ditt?\" for å nullstille passordet."
       password_changed: "Passord endret"
   public_a749f507: Offentlig
-  public_course_index_59270e80: "Offentlig oversikt for emne"
+  public_course_index_59270e80: "Offentlig emneoversikt"
   public_courses_title: "Offentlige emne"
   public_domain_112ed397: "Åpent område"
   publish_5211dca3: Publiser
@@ -12751,7 +12751,7 @@ nb:
     unpublish: Avpubliser
     unpublish_click: "fjernet fra publisering, klikk for å publisere"
     unpublishing: "Fjerner publisering…"
-  publish_the_course_f2f6ef80: "Publiser Emne"
+  publish_the_course_f2f6ef80: "Publiser emne"
   publishable: 
     cant_unpublish: "Kan ikke fjerne publisering"
   publishableModuleItem: 
@@ -14355,12 +14355,12 @@ nb:
       manage_calendar: "Legg til, rediger og slett hendelser i emnekalenderen"
       manage_canvasnet_courses: "Administrer emne i Canvas Network"
       manage_catalog: "Administrer katalog"
-      manage_content: "Administrer alt innhold for emne"
+      manage_content: "Administrer alt emneinnhold"
       manage_courses: "Administrer ( legg til / rediger / slett ) emne"
       manage_demos: "Administrer demoer"
       manage_developer_keys: "Administrer utviklernøkler"
       manage_feature_flags: "Slå av eller på funksjoner på kontonivå"
-      manage_files: "Administrer ( legg til / rediger / slett ) emnefiler"
+      manage_files: "Administrer ( legg til / rediger / slett ) filer for emne"
       manage_frozen_assignment: "Administrer (rediger / slett) oppgaver som er satt på vent"
       manage_global_outcomes: "Administrer globale læringsmål"
       manage_grades: "Rediger karakterer"
@@ -14370,7 +14370,7 @@ nb:
       manage_outcomes: "Administrer læringsresultat"
       manage_role_overrides: "Administrer tillatelser"
       manage_rubrics: "Opprett og rediger vurderingsveiledninger"
-      manage_sections: "Administrer (opprett/rediger/slett) emne seksjoner"
+      manage_sections: "Administrer (opprett/rediger/slett) seksjoner for emne"
       manage_sis: "Administrere SIS-data"
       manage_site_settings: "Administrer innstillinger for programtillegg og de som gjelder for hele installasjonen"
       manage_storage_quotas: "Administrer lagringsplass kvoter"
@@ -14382,7 +14382,7 @@ nb:
       managed_jobs: "Administrer bakgrunnsjobber"
       moderate_form: "Moderer diskusjoner ( slett/redigere andres post, lås temaer)"
       post_to_forum: "Poste innlegg i diskusjoner"
-      read_course_content: "Vis innhold for emne"
+      read_course_content: "Vis emneinnhold"
       read_course_list: "Vis liste over emne"
       read_forum: "Vis diskusjoner"
       read_messages: "Vis varsler sendt til brukerne"
@@ -14459,10 +14459,10 @@ nb:
       add_role: "Legg til rolle"
     roles_override_index: 
       account_roles: Kontoroller
-      course_roles: Emneroller
+      course_roles: "Roller for emne"
       page_header_title: Kontotillatelser
   rootFoldersFinder: 
-    course_files: Emnefiler
+    course_files: "Filer for emne"
     group_files: Gruppefiler
     my_files: "Mine filer"
   root_accounts_cc035dcf: Rot-kontoer
@@ -14712,7 +14712,7 @@ nb:
   section: 
     confirms: 
       delete_enrollment: "Er du sikker på at du vil slette denne påmeldingen permanent?"
-    default_course_name: "Emne-ID \"%{course_id}\""
+    default_course_name: "Emne ID \"%{course_id}\""
     enrolled_as_designer: "påmeldt som designer"
     enrolled_as_limited_designer: "påmeldt som designer med tilgang begrenset til en seksjon"
     enrolled_as_limited_observer: "påmeldt som ovbservatør med tilgang begrenset til en seksjon"
@@ -15601,7 +15601,7 @@ nb:
         modules_page: Moduler
         new_page: "Lenke til en ny side"
         quizzes: "Liste over tester"
-        syllabus: "Oversikt for emne"
+        syllabus: Emneoversikt
         upload_file: "Last opp en ny fil"
         upload_image: "Last opp et nytt bilde"
         users_page: Personer
@@ -16146,9 +16146,9 @@ nb:
   switch_to_table_view_3aae9919: "Bytt til tabellvisning"
   switzerland_41_f861e414: "Sveits (+41)"
   switzerland_f4f7137c: Sveits
-  syllabus: "Oversikt for emne"
+  syllabus: Emneoversikt
   syllabus_f191f65b: Emneoversikt
-  syllabus_visibility_options_a81ef419: "Valg for pensumsynlighet"
+  syllabus_visibility_options_a81ef419: "Valg for emneoversiktsynlighet"
   system_default_language_28a1052d: "Systemstandard (%{language})"
   tab_1_3d6b3fb: "Fane 1"
   tab_1_content_8944c219: "Fane 1 innhold"
@@ -16413,13 +16413,13 @@ nb:
   this_message_includes_media_comments_to_listen_or__5fc98641: "Denne meldingen inneholder medie-kommentarer. Klikk på denne lenken for å høre eller svare: %{link}."
   this_module_is_locked_until_completing_all_of_the__ddf06070: "Denne modulen er låst inntil alle kravene for de følgende modulene er fullført: %{prerequisites}"
   this_module_is_locked_until_datetime_b2486751: "Denne modulen er låst inntil %{datetime}"
-  this_most_likely_happened_because_you_imported_cou_a78ea880: "Dette skjedde sannsynligvis fordi du importerte innhold for emne uten de tilknyttede filene."
+  this_most_likely_happened_because_you_imported_cou_a78ea880: "Dette skjedde sannsynligvis fordi du importerte emneinnhold uten de tilknyttede filene."
   this_name_appears_in_sorted_lists_dccbd84b: "Dette navnet vises i sorterte lister."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Dette navnet vil brukes av foreleser for karaktersetting."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Dette læringsmålet har blitt brukt til å vurdere en student og kan ikke lenger bli oppdatert"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dette læringsmålet har blitt brukt til å vurdere en student og kan ikke redigeres eller slettes"
   this_package_includes_apip_file_s_which_are_not_co_b50b30a7: "Denne pakken inneholder APIP-fil(er) som ikke er kompatible med Canvas og som ikke ble inkludert(e) i importen."
-  this_package_includes_curriculum_standards_which_a_1a137060: "Denne pakken inneholder standarder for pensum som ikke er kompatible med Canvas og som ikke ble inkludert(e) i importen."
+  this_package_includes_curriculum_standards_which_a_1a137060: "Denne pakken inneholder standarder for oversikt som ikke er kompatible med Canvas og som ikke ble inkludert i importen."
   this_package_includes_epub3_file_s_which_are_not_c_bbafef30: "Denne pakken inneholder EPub3-fil(er) som ikke er kompatible med Canvas og som ikke ble inkludert(e) i importen."
   this_package_includes_iwb_file_s_which_are_not_com_6e3c37d2: "Denne pakken inneholder JWB-fil(er) som ikke er kompatible med Canvas og som ikke ble inkludert(e) i importen."
   this_package_includes_the_question_type_pattern_ma_ce3dadc6: "Denne pakken inkluderer spørsmålstypen, Pattern Match, som ikke er kompatibel med Canvas. Vil har konvertert spørsmålstypen til utfylling av tomme felt"
@@ -16432,7 +16432,7 @@ nb:
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Denne opptakeren bruker Flash. Som et resultat finner du det kanskje enklere å foreta et opptak på din lokale maskin, og deretter bruke 'last opp media' fanen for å laste den opp."
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "Denne rapporten viser alle emnene i en gitt termin. Den resulterende csv-filen vil ha en rad per emne, og vil vise emne-id, emne sis-id, kortnavn for emner, emnenavnet, konto-id, konto sis-id, kontonavn, benyttet lagringsplass i MB og summen av alle filer i MB. Benyttet lagringsplass reflekterer alle filene som går mot emnekvoten. Summen av alle filene i emnet er summen av alle filene som er i emnet uansett påvirkninger på emnekvoten."
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "Denne rapporten viser alle kursene i et gitt semester. Den resulterende CSV-filen vil ha en rad per kurs, og vil vise kurs-ID, kursets SIS-ID, kursets kortnavn, kursets navn, konto-ID, kontoens SIS-ID, kontonavn og brukt lagringsplass i MB."
-  this_report_shows_grading_period_grades_and_overal_a86346a: "Denne rapporten viser karakterene for vurderingsperioden (og generelle emnekarakterer) for hver påmeldt student i et gitt semester. Den resulterende csv-filen vil ha én rad per brukerpåmelding."
+  this_report_shows_grading_period_grades_and_overal_a86346a: "Denne rapporten viser karakterene for vurderingsperioden (og generelle karakterer for emne) for hver påmeldt student i et gitt semester. Den resulterende csv-filen vil ha én rad per brukerpåmelding."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denne testsiden inneholder vanlige UI elementer i Canvas for å hjelpe deg å bygge din egendefinerte merkevare. Når du begynner å gjøre endringer i fargeverdiene og bilder i venstre sidemeny, vil du se en * forhåndsvise endringene * knapp. Klikk på den for å oppdatere denne siden og se hvordan endringene ser ut."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Svarene fra denne studenten er skult ettersom oppgaven er anonym."
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "Denne studenten fikk akkurat en uvanlig høy karakter."
@@ -17387,7 +17387,7 @@ nb:
   what_does_provisioning_only_mean_eac9a4a1: "Hva betyr kun klargjøring?"
   what_should_the_csv_file_look_like_985a59ac: "Hvordan bør en CSV fil se ut?"
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "Når aktivert, kan globale JavaScript og CSS-filer lastes opp i *%{t_theme_editor}*."
-  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Når personer besøker emnet, er dette siden de får se. Du kan sette den til å vise en aktivitetsstrøm, listen over emnemoduler, en oversikt for emne, eller en tilpasset side du skriver selv. Standarden er selvfølgelig aktivitetsstrøm for emne."
+  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Når personer besøker emnet, er dette siden de får se. Du kan sette den til å vise en aktivitetsstrøm, listen over emnemoduler, en emneoversikt, eller en tilpasset side du skriver selv. Standarden er selvfølgelig aktivitetsstrøm for emne."
   whenever_b943b119: "når som helst"
   where_would_you_like_to_move_title_fabd6e8f: "Hvor vil du flytte %{title}?"
   which_course_is_this_question_about_f819a158: "Hvilket emne gjelder spørsmålet?"
