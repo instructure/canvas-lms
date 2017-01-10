@@ -8,9 +8,12 @@
 
   can_manage_courses = can_do(@context.account, @current_user, :manage_courses)
   can_rename_course = can_manage_courses || (can_manage && !@context.root_account.settings[:prevent_course_renaming_by_teachers])
+  can_manage_master_courses = can_manage_courses && can_do(@context.account, @current_user, :manage_master_courses)
   has_multiple_sections = @context.course_sections.active.count > 1
 
   can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
+
+  is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
 %>
 
 <% content_for :right_side do %>
@@ -97,6 +100,19 @@
           <% end %>
         </td>
       </tr>
+      <% if @context.root_account.feature_enabled?(:master_courses) %>
+      <tr>
+        <td class="form-label nobr"><%= f.blabel :blueprint_course, :en => "Blueprint Course" %></td>
+        <td class="nobr">
+          <% if can_manage_master_courses %>
+            <%= f.check_box :master_course, :checked => is_master_course %>
+            <%= f.label :master_course, :en => "Enable course as a Blueprint Course" %>
+          <% else %>
+            <span id="course_master_course"><%= is_master_course ? t("Yes") : t("No") %></span>
+          <% end %>
+        </td>
+      </tr>
+      <% end %>
       <tr>
         <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
         <td>

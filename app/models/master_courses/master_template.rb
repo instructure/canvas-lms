@@ -49,7 +49,16 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def self.set_as_master_course(course)
     self.unique_constraint_retry do
-      course.master_course_templates.active.for_full_course.first_or_create
+      template = course.master_course_templates.for_full_course.first_or_create
+      template.undestroy unless template.active?
+      template
+    end
+  end
+
+  def self.remove_as_master_course(course)
+    self.unique_constraint_retry do
+      template = course.master_course_templates.active.for_full_course.first
+      template.destroy && template if template.present?
     end
   end
 

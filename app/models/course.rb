@@ -28,7 +28,7 @@ class Course < ActiveRecord::Base
   include ContentLicenses
   include TurnitinID
 
-  attr_accessor :teacher_names
+  attr_accessor :teacher_names, :master_course
   attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation
 
   time_zone_attribute :time_zone
