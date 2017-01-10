@@ -38,6 +38,7 @@ describe 'Models' do
   it "protects attributes somehow" do
     ignore_classes = [
         ActiveRecord::Base,
+        CASClient::Tickets::Storage::CasPgtiou,
         Delayed::Backend::ActiveRecord::Job,
         Delayed::Backend::ActiveRecord::Job::Failed,
         EventStream::Failure,
