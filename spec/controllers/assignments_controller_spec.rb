@@ -28,7 +28,11 @@ describe AssignmentsController do
   def course_assignment(course = nil)
     course ||= @course
     @group = course.assignment_groups.create(:name => "some group")
-    @assignment = course.assignments.create(:title => "some assignment", :assignment_group => @group)
+    @assignment = course.assignments.create(
+      :title => "some assignment",
+      :assignment_group => @group,
+      :due_at => Time.zone.now + 1.week
+    )
     expect(@assignment.assignment_group).to eql(@group)
     expect(@group.assignments).to be_include(@assignment)
     @assignment

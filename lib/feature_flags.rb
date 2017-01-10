@@ -137,5 +137,5 @@ module FeatureFlags
 
     @feature_flag_cache[feature] = retval
   end
-
 end
+

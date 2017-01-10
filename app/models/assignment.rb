@@ -77,6 +77,7 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
+  validate :due_date_ok?
   validate :discussion_group_ok?
   validate :positive_points_possible?
   validate :moderation_setting_ok?
@@ -133,6 +134,12 @@ class Assignment < ActiveRecord::Base
     if group_category_id_changed?
       errors.add :group_category_id, I18n.t("group_category_locked",
                                             "The group category can't be changed because students have already submitted on this assignment")
+    end
+  end
+
+  def due_date_ok?
+    if sis_require_assignment_due_date? && self.post_to_sis.present? && self.due_at.blank?
+      errors.add(:due_at, I18n.t("due_at", "The Due date cannot be blank when Post to Sis is checked"))
     end
   end
 
@@ -2299,4 +2306,12 @@ class Assignment < ActiveRecord::Base
       self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, {:singleton => "assignment_overrides_changed_#{self.global_id}"})
     end
   end
+
+  private
+
+  def sis_require_assignment_due_date?
+    self.try(:context).try(:account).try(:sis_require_assignment_due_date).try(:[], :value) &&
+    self.try(:context).try(:feature_enabled?, 'new_sis_integrations').present?
+  end
 end
+

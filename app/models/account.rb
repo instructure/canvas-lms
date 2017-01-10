@@ -269,7 +269,6 @@ class Account < ActiveRecord::Base
     end
   end
 
-
   def mfa_settings
     settings[:mfa_settings].try(:to_sym) || :disabled
   end

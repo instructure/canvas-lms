@@ -262,6 +262,7 @@ class Course < ActiveRecord::Base
       end
     end
   end
+
   def self.skip_updating_account_associations?
     !!@skip_updating_account_associations
   end
