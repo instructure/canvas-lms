@@ -7,7 +7,7 @@ class Linter
     append_files_to_command: false,
     boyscout_mode: true,
     campsite_mode: true,
-    comment_post_processing: proc {},
+    comment_post_processing: proc { |comments| comments },
     env_sha: ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION'],
     file_regex: /./,
     gerrit_patchset: !!ENV['GERRIT_PATCHSET_REVISION'],
@@ -100,7 +100,9 @@ class Linter
   end
 
   def publish_comments
-    unless comments.size > 0
+    processed_comments = comment_post_processing.call(comments)
+
+    unless processed_comments.size > 0
       puts "-- -- -- -- -- -- -- -- -- -- --"
       puts "No relevant #{linter_name} errors found!"
       puts "-- -- -- -- -- -- -- -- -- -- --"
@@ -108,9 +110,9 @@ class Linter
     end
 
     if gerrit_patchset
-      publish_gergich_comments(comments)
+      publish_gergich_comments(processed_comments)
     else
-      publish_local_comments(comments)
+      publish_local_comments(processed_comments)
     end
   end
 
