@@ -1861,10 +1861,10 @@ da:
       settings: Indstillinger
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: "Denne opgave tildeles ikke en karakter."
-      assignment_not_yet_graded_screenreader: "Opgave endnu ikke bedømt. %{pointsPossible} mulige points."
+      assignment_not_yet_graded_screenreader: "Opgave endnu ikke bedømt. %{pointsPossible} mulige point."
       empty_points_possible: "-/%{pointsPossible} pts"
       no_submission: "Ingen aflevering"
-      no_submission_for_assignment_screenreader: "Inge aflevering for denne opgave. %{pointsPossible} mulige points."
+      no_submission_for_assignment_screenreader: "Inge aflevering for denne opgave. %{pointsPossible} mulige point."
       not_yet_graded: "*Endnu ikke bedømt*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
       score_with_points_possible_screenreader: "Score: %{score} ud af %{pointsPossible} points."
@@ -2179,7 +2179,7 @@ da:
       peer_reviews_assign_at_explanation: "Skal ligge efter deadline. Hvis tom, bruges deadline."
       peer_reviews_header: "Peer reviews"
       reviews_per_user: "Evalueringer pr. bruger"
-    points_possible_number: "Mulige points skal være et tal"
+    points_possible_number: "Mulige point skal være et tal"
     positive_number: "Du skal bruge et positivt tal"
     redirect_page: 
       redirect_message: |-
@@ -2400,7 +2400,7 @@ da:
     invalid_date_time: "Ugyldig dato og klokkeslæt for %{attribute}"
     invalid_submission_types: "Ugyldige afleveringstyper"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Opgaver i denne gruppe har ingen mulige point, og kan ikke inkluderes i karakterberegning"
-  assignments_in_this_group_have_no_points_possible__ab0adb72: "Opgaver i denne gruppe har ingen mulige points og kan ikke inkluderes i karakterberegningen."
+  assignments_in_this_group_have_no_points_possible__ab0adb72: "Opgaver i denne gruppe har ingen mulige point og kan ikke inkluderes i karakterberegningen."
   assignments_settings_30613d0c: Opgaveindstillinger
   associated_account_course_id_d87a01c5: "Tilknyttet konto-/kursus-id"
   associated_account_name_91854e37: "Tilknyttet kontonavn"
@@ -5722,7 +5722,7 @@ da:
       for: Til
       graded_discussion_and_points: 
         one: "Dette er en bedømt diskussion: *1 muligt point*"
-        other: "Dette er en bedømt diskussion: *%{count} mulige points*"
+        other: "Dette er en bedømt diskussion: *%{count} mulige point*"
       show_due_dates: "Vis deadlines"
       until: Indtil
     cannot_unpublish_with_replies: "Kan ikke annullere offentliggørelsen, hvis der findes svar fra studerende"
@@ -5780,7 +5780,7 @@ da:
       only_graders_can_like: "Kun bedømmere kan 'synes godt om'"
       options: Valgmuligheder
       page_header_title: "Ny diskussion"
-      points_possible: "Mulige points"
+      points_possible: "Mulige point"
       post_at: "Læg alle ud"
       save: Gem
       saving: "Gemmer ..."
@@ -5853,7 +5853,7 @@ da:
     peer_reviews: 
       due_date: "forfalden %{date}"
       peer_review_alert: "Du er blevet udpeget til et peer review for %{person}"
-    points_possible_number: "Mulige points skal være et tal"
+    points_possible_number: "Mulige point skal være et tal"
     published_button: 
       buttons: 
         not_published: "Ikke offentliggjort"
@@ -6142,8 +6142,8 @@ da:
       update_rubric: "Opdater Rubric"
     change: Skift
     discussion_points_possible: 
-      one: "%{count} mulige points"
-      other: "%{count} mulige points"
+      one: "%{count} mulige point"
+      other: "%{count} mulige point"
     errors: 
       load_rubrics_failed: "Det mislykkedes at indlæse Rubric, prøv igen"
     leave_different: "Efterlad anderledes"
@@ -7483,8 +7483,8 @@ da:
         submission_graded: "%{graded_date} af %{grader}"
     invalid_assignment_groups_warning: 
       one: "Scoren inkluderer ikke %{groups}, fordi den ikke har mulige points"
-      other: "Scoren inkluderer ikke %{groups}, fordi de ikke har mulige points"
-    no_assignments_have_points_warning: "Kan ikke beregne score, før en opgave har mulige points"
+      other: "Scoren inkluderer ikke %{groups}, fordi de ikke har mulige point"
+    no_assignments_have_points_warning: "Kan ikke beregne score, før en opgave har mulige point"
     notices: 
       unauthorized: "Du er ikke autoriseret til at se deltagelsen for dette kursus"
       updated: "Opgaveaflevering blev opdateret."
@@ -7639,7 +7639,7 @@ da:
     grade_incomplete: Ufuldstændig
     grade_ungraded: "Ikke bedømt"
     out_of: "(out of %{points})"
-    out_of_nil: "Ingen mulige points"
+    out_of_nil: "Ingen mulige point"
     out_of_with_score: "(%{score} ud af %{points})"
   grading_period: 
     errors: 
@@ -8254,7 +8254,7 @@ da:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Send til alle i hele underkontoen, hvis der ikke vælges nogen)"
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "Hvis du ændrer en opgaves mulige points, vil eksisterende karakterer automatisk blive skaleret."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Hvis du ændrer en opgaves mulige point, skal du bedømme opgaven igen."
-  if_you_change_an_assignment_s_points_possible_you__dba531cb: "Hvis du ændrer en opgaves mulige points, skal du bedømme enhver indesnedelse igen."
+  if_you_change_an_assignment_s_points_possible_you__dba531cb: "Hvis du ændrer en opgaves mulige point, skal du bedømme enhver indesnedelse igen."
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "Hvis du konfigurere indstillinger, så du ikke kan logge ind, kan du få direkte adgang via normal Canvas login via %{url}"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Hvis du ikke vælger brugsrettigheder nu, annulleres filens offentliggørelse efter upload."
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "Hvis du aktiverer denne funktion, skal du sikre, at din salesforce-konto tilføjer disse brugertilpassede felter på korrekt måde med navnene i tabellens venstre kolonne."
@@ -8446,7 +8446,7 @@ da:
   invalid_aws_configuration_e8a6ae0f: "Ugyldig AWS-konfiguration"
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "Ugyldig CSV-fil. Karakterer kunne ikke opdateres."
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Ugyldig csv-fil, karakterer kunne ikke opdateres."
-  invalid_points_possible: "Værdien af mulige points til denne opgave skal være nul eller større."
+  invalid_points_possible: "Værdien af mulige point til denne opgave skal være nul eller større."
   invalid_recipient_name_56b22b86: "Ugyldigt modtagernavn."
   invalid_state_parameter_7a5aa108: "Ugyldig status parameter"
   invalid_url_in_xml: "Ugyldigt url i xml. &-tegnet skal undgås."
@@ -8650,8 +8650,8 @@ da:
       bad_score: "Score ligger ikke mellem 0 og 1"
       no_points_comment: |-
           Et ekstern værktøj forsøgte at bedømme denne opgave som %{grade}, men mislykkedes,
-          fordi opgaven ikke har nogen mulige points.
-      no_points_possible: "Opgaven har ingen mulige points."
+          fordi opgaven ikke har nogen mulige point.
+      no_points_possible: "Opgaven har ingen mulige point."
       no_score: "Der er ikke givet score"
       no_submission_created: "Der kunne ikke oprettes ny aflevering af hjemmearbejde med denne anmodning om læringsmål."
     canvas: 
@@ -11173,7 +11173,7 @@ da:
   no_migration_file: "Påkrævet fil til indholdsoverførsel."
   no_password_was_given_472222e5: "Der blev ikke angivet adgangskode"
   no_placements_enabled_f705f28: "Der er ikke aktiveret placeringer"
-  no_points_possible_368669d: "Ingen mulige points"
+  no_points_possible_368669d: "Ingen mulige point"
   no_results_found_58717065: "Der blev ikke fundet resultater"
   no_score_yet_c94e919b: "Ingen score endnu"
   no_students_dd8de9f0: "Ingen studerende"
@@ -11602,7 +11602,7 @@ da:
   orbis_report_header_course_name: Kursusnavn
   orbis_report_header_course_sis_id: "Kursus SIS-id"
   orbis_report_header_date_submitted: afleveringsdato
-  orbis_report_header_points_possible: "Mulige points"
+  orbis_report_header_points_possible: "Mulige point"
   orbis_report_header_student_canvas_id: "Canvas bruger-id"
   orbis_report_header_student_name: "Den studerendes navn"
   orbis_report_header_student_sis_id: "bruger sis"
@@ -11694,7 +11694,7 @@ da:
     outcome_form: 
       calculation_method: Beregningsmetode
       criterion: Vurderingskriteriescore
-      criterion_dialog: "Læringsmål kan tilknyttes Rubrics. Når du definerer et læringsmål, skal du også definere vurderingskriterier for læringsmålet. Vurderingskriterierne anvendes i opbygningen af Rubrics. Definer så mange vurderingskriterier, som du har brug for og specificer afgrænsningen mellem dem."
+      criterion_dialog: "Læringsmål kan tilknyttes Rubrics. Når du definerer et læringsmål, skal du også definere kriterier for læringsmålet. Vurderingskriterierne anvendes i opbygningen af Rubrics. Definer så mange vurderingskriterier, som du har brug for og specificer afgrænsningen mellem dem."
       criterion_info_link: "Klik for at læse om kriteriebedømmelser"
       description: "Beskriv dette læringsmål"
       display_name: "Venligt navn (valgfrit)"
@@ -12316,10 +12316,10 @@ da:
   points_bceb5005: points
   points_n_e0b20623: "Points %{n}"
   points_points_b6b422e2: "Points: %{points}"
-  points_possible_1c0b3445: "Mulige points"
-  points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Mulige points skal være 0 eller mere for valgt bedømmelsestype"
+  points_possible_1c0b3445: "Mulige point"
+  points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Mulige point skal være 0 eller mere for valgt bedømmelsestype"
   points_pts_e5596bf7: "%{points} Point"
-  pointspossible_points_possible_964c8592: "%{pointsPossible} mulige points"
+  pointspossible_points_possible_964c8592: "%{pointsPossible} mulige point"
   pointspossible_pts_624a6733: "%{pointsPossible} pts"
   poland_48_e77cc14d: "Polen (+48)"
   poland_b43b9d20: Polen
@@ -13843,8 +13843,8 @@ da:
         labels: 
           final_score: "Endelig score"
           fudge_points: "Snyd med pointene"
-          fudge_points_changed_points_quiz: "Siden %{user} tog denne quiz, er antallet af mulige points blevet ændret med %{difference}. Du kan justere for denne ændring og tilføje positive eller negative points manuelt ved brug af dette felt."
-          fudge_points_changed_points_survey: "Siden %{user} deltog i denne spørgeundersøgelse, er antallet af mulige points blevet ændret med %{difference}. Du kan justere for denne ændring og tilføje positive eller negative points manuelt ved brug af dette felt."
+          fudge_points_changed_points_quiz: "Siden %{user} tog denne quiz, er antallet af mulige point blevet ændret med %{difference}. Du kan justere for denne ændring og tilføje positive eller negative points manuelt ved brug af dette felt."
+          fudge_points_changed_points_survey: "Siden %{user} deltog i denne spørgeundersøgelse, er antallet af mulige point blevet ændret med %{difference}. Du kan justere for denne ændring og tilføje positive eller negative points manuelt ved brug af dette felt."
           fudge_points_generic_explanation: "Du kan justere scoren manuelt ved at føje positive eller negative points til dette felt."
           questions_need_review: "Følgende spørgsmål skal evalueres"
           quiz_score: Quizscore
@@ -14528,7 +14528,7 @@ da:
       page_title: Rubric
       points_possible: 
         one: "1 muligt point"
-        other: "%{count} mulige points"
+        other: "%{count} mulige point"
       user_rubrics: "Rubrics for bruger"
     loading: "Indlæser ..."
     show: 
@@ -14549,8 +14549,8 @@ da:
         user_rubrics: "Rubrics for bruger"
       page_title: Rubric
       points_possible: 
-        one: "mulige points"
-        other: "Mulige points"
+        one: "mulige point"
+        other: "mulige point"
       prompts: 
         are_you_sure_delete: "Er du sikker op, at du ønsker at slette denne Rubric? Ethvert kursus, der for øjeblikket er tilknyttet med denne Rubric, vil stadig have adgang til den, men ingen nye kurser vil være i stand til at benytte den."
         are_you_sure_remove: "Er du sikker på, at du ønsker at fjerne denne Rubric fra din liste?"
@@ -14602,8 +14602,8 @@ da:
         graded_sub_count: "Bedømte opgaver:"
         high_score: "Høj score"
         low_score: "Lav score"
-        no_points: "Ingen mulige points"
-        points_possible: "Mulige points"
+        no_points: "Ingen mulige point"
+        points_possible: "Mulige point"
         submission_types: "Afleveringstyper:"
       index: 
         assignment_in_speedgrader: "Se denne opgave i SpeedGrader"
@@ -15365,7 +15365,7 @@ da:
       defaults: 
         rubric_title: "En Rubric"
       headers: 
-        criteria: Vurderingskriterier
+        criteria: Kriterier
         points: Pts
         ratings: Bedømmelser
       labels: 
@@ -15432,10 +15432,10 @@ da:
     rubric_dialog: 
       buttons: 
         use_this_rubric: "Brug denne Rubric"
-      criterion_count: "%{count} vurderingskriterier"
+      criterion_count: "%{count} kriterier"
       links: 
         manage_rubrics: "Administrér Rubrics"
-      points_possible: "%{points} mulige points"
+      points_possible: "%{points} mulige point"
       titles: 
         find_a_rubric: "Find en Rubric"
     rubric_forms: 
@@ -15448,7 +15448,7 @@ da:
         title: Titel
       headers: 
         assessment: Vurdering
-        criteria: Vurderingskriterier
+        criteria: Kriterier
       labels: 
         total_points: "Samlede points"
       points_out_of: "*%{points}* ud af **%{total}**"
@@ -15848,7 +15848,7 @@ da:
     final_point_ratio: "%{pointRatio} points"
     invalid_group_warning: 
       one: "Bemærk: Scoren inkluderer ikke opgaver fra gruppen %{list_of_group_names}, fordi den ikke har mulige points."
-      other: "Bemærk: Scoren inkluderer ikke opgaver fra grupperne %{list_of_group_names}, fordi de ikke har mulige points."
+      other: "Bemærk: Scoren inkluderer ikke opgaver fra grupperne %{list_of_group_names}, fordi de ikke har mulige point."
     media_recordin: Medieoptagelse
     next_object: "Næste %{type}"
     no_assignment: "Der er ikke valgt nogen opgave"
