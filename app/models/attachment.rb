@@ -680,7 +680,7 @@ class Attachment < ActiveRecord::Base
       end
     elsif method == :overwrite
       atts.update_all(:replacement_attachment_id => self) # so we can find the new file in content links
-      copy_access_attributes!(atts.first) unless atts.empty?
+      copy_access_attributes!(atts) unless atts.empty?
       atts.each do |a|
         # update content tags to refer to the new file
         ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(:content_id => self)
@@ -694,7 +694,9 @@ class Attachment < ActiveRecord::Base
     return deleted_attachments
   end
 
-  def copy_access_attributes!(source)
+  def copy_access_attributes!(source_attachments)
+    self.could_be_locked = true if source_attachments.any?(&:could_be_locked?)
+    source = source_attachments.first
     self.file_state = 'hidden' if source.file_state == 'hidden'
     self.locked = source.locked
     self.unlock_at = source.unlock_at
