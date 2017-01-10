@@ -165,7 +165,7 @@ define([], function(){
    *   representing the buttons to appear on the n-th line of the toolbar
    */
   EditorConfig.prototype.balanceButtons = function(instructure_buttons){
-    var instBtnGroup = "table,instructure_links,unlink" + instructure_buttons;
+    var instBtnGroup = "table,instructure_links,link,unlink" + instructure_buttons;
     var buttons1 = "";
     var buttons2 = "";
     var buttons3 = "";
