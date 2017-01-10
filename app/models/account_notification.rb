@@ -1,6 +1,4 @@
 class AccountNotification < ActiveRecord::Base
-  strong_params
-
   validates_presence_of :start_at, :end_at, :subject, :message, :account_id
   validate :validate_dates
   belongs_to :account, :touch => true

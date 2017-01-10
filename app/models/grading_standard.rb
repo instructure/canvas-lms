@@ -19,8 +19,6 @@
 class GradingStandard < ActiveRecord::Base
   include Workflow
 
-  strong_params
-
   belongs_to :context, polymorphic: [:account, :course]
   belongs_to :user
   has_many :assignments

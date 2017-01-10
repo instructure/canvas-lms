@@ -21,8 +21,6 @@ class CommunicationChannel < ActiveRecord::Base
   # as independent of pseudonyms
   include Workflow
 
-  strong_params
-
   serialize :last_bounce_details
   serialize :last_transient_bounce_details
 

@@ -19,8 +19,6 @@
 require 'atom'
 
 class Wiki < ActiveRecord::Base
-  strong_params
-
   has_many :wiki_pages, :dependent => :destroy
 
   before_save :set_has_no_front_page_default

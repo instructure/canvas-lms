@@ -23,8 +23,6 @@ class Progress < ActiveRecord::Base
        { context_user: 'User', quiz_statistics: 'Quizzes::QuizStatistics' }]
   belongs_to :user
 
-  strong_params
-
   validates_presence_of :context_id
   validates_presence_of :context_type
   validates_presence_of :tag

@@ -18,7 +18,6 @@
 
 class ContentParticipationCount < ActiveRecord::Base
   ACCESSIBLE_ATTRIBUTES = [:context, :user, :content_type, :unread_count].freeze
-  strong_params
 
   belongs_to :context, polymorphic: [:course]
   belongs_to :user

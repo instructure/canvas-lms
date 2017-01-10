@@ -17,8 +17,6 @@
 #
 
 class Collaborator < ActiveRecord::Base
-  strong_params
-
   belongs_to :collaboration
   belongs_to :group
   belongs_to :user

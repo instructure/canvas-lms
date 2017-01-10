@@ -20,7 +20,6 @@ class ContentParticipation < ActiveRecord::Base
   include Workflow
 
   ACCESSIBLE_ATTRIBUTES = [:content, :user, :workflow_state].freeze
-  strong_params
 
   belongs_to :content, polymorphic: [:submission]
   belongs_to :user

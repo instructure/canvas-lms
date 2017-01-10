@@ -23,7 +23,6 @@ class Group < ActiveRecord::Base
   include Workflow
   include CustomValidations
 
-  strong_params
   validates :context_id, :context_type, :account_id, :root_account_id, :workflow_state, :uuid, presence: true
   validates_allowed_transitions :is_public, false => true
 

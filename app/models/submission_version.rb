@@ -17,9 +17,6 @@
 #
 
 class SubmissionVersion < ActiveRecord::Base
-  #attr_accessible :context_id, :context_type, :user_id, :assignment_id, :version_id
-  strong_params
-
   belongs_to :assignment
   belongs_to :context, polymorphic: [:course]
   belongs_to :version

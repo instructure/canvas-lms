@@ -17,7 +17,6 @@
 #
 
 class FeatureFlag < ActiveRecord::Base
-  strong_params
   belongs_to :context, polymorphic: [:account, :course, :user]
 
   validate :valid_state, :feature_applies

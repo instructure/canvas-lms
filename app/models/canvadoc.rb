@@ -17,8 +17,6 @@
 #
 
 class Canvadoc < ActiveRecord::Base
-  strong_params
-
   belongs_to :attachment
 
   has_many :canvadocs_submissions

@@ -7,5 +7,4 @@ class ModeratedGrading::Selection < ActiveRecord::Base
 
   validates :student_id, uniqueness: { scope: :assignment_id }
 
-  strong_params
 end

@@ -34,8 +34,6 @@ class Conversation < ActiveRecord::Base
     @participants
   end
 
-  strong_params
-
   def reload(options = nil)
     @current_context_strings = {}
     @participants = nil

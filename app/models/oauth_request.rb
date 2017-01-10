@@ -19,7 +19,5 @@
 class OauthRequest < ActiveRecord::Base
   belongs_to :user
 
-  strong_params
-
   def self.serialization_excludes; [:secret, :user_secret]; end
 end

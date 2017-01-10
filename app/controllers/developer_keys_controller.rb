@@ -47,7 +47,7 @@ class DeveloperKeysController < ApplicationController
 
   def update
     @key.process_event!(params[:developer_key].delete(:event)) if params[:developer_key].key?(:event)
-    @key.attributes = developer_key_params
+    @key.attributes = developer_key_params unless params[:developer_key].empty?
     if @key.save
       render :json => developer_key_json(@key, @current_user, session, account_context)
     else

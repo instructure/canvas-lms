@@ -915,7 +915,7 @@ class ConversationsController < ApplicationController
   # @returns Progress
   def batch_update
     conversation_ids = params[:conversation_ids]
-    update_params = params.slice(:event).with_indifferent_access
+    update_params = params.slice(:event).to_hash.with_indifferent_access
 
     allowed_events = %w(mark_as_read mark_as_unread star unstar archive destroy)
     return render(:json => {:message => 'conversation_ids not specified'}, :status => :bad_request) unless params[:conversation_ids].is_a?(Array)

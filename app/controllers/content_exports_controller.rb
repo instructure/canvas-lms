@@ -50,7 +50,7 @@ class ContentExportsController < ApplicationController
       if @context.is_a?(Course)
         if params[:export_type] == 'qti'
           export.export_type = ContentExport::QTI
-          export.selected_content = params[:copy]
+          export.selected_content = params[:copy].to_hash.with_indifferent_access
         else
           export.export_type = ContentExport::COMMON_CARTRIDGE
           export.selected_content = { :everything => true }

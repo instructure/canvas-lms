@@ -37,7 +37,6 @@ class ContentMigration < ActiveRecord::Base
 
   DATE_FORMAT = "%m/%d/%Y"
 
-  strong_params
   attr_accessor :imported_migration_items, :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position
 
   workflow do

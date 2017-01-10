@@ -25,8 +25,6 @@ class Folder < ActiveRecord::Base
   end
   include Workflow
 
-  strong_params
-
   ROOT_FOLDER_NAME = "course files"
   PROFILE_PICS_FOLDER_NAME = "profile pictures"
   MY_FILES_FOLDER_NAME = "my files"

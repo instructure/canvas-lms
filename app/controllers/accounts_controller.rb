@@ -557,7 +557,7 @@ class AccountsController < ApplicationController
         if custom_help_links
           sorted_help_links = custom_help_links.select{|_k, h| h['state'] != 'deleted' && h['state'] != 'new'}.sort_by{|_k, h| _k.to_i}
           @account.settings[:custom_help_links] = sorted_help_links.map do |index_with_hash|
-            hash = index_with_hash[1]
+            hash = index_with_hash[1].to_hash.with_indifferent_access
             hash.delete('state')
             hash.assert_valid_keys ["text", "subtext", "url", "available_to", "type"]
             hash

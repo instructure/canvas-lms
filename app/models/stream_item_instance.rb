@@ -25,8 +25,6 @@ class StreamItemInstance < ActiveRecord::Base
 
   validates_presence_of :stream_item_id, :user_id, :context_id, :context_type
 
-  strong_params
-
   before_save :set_context_code
   def set_context_code
     self.context_type ||= stream_item.context_type

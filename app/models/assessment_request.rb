@@ -19,7 +19,6 @@
 class AssessmentRequest < ActiveRecord::Base
   include Workflow
   include SendToStream
-  strong_params
 
   belongs_to :user
   belongs_to :asset, polymorphic: [:submission]

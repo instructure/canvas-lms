@@ -17,8 +17,6 @@
 #
 
 class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
-  strong_params
-
   include CanvasPartman::Concerns::Partitioned
 
   # An event describing the student choosing an answer to a question.

@@ -17,8 +17,6 @@
 
 module Lti
   class ToolSetting < ActiveRecord::Base
-    strong_params
-
     belongs_to :tool_proxy
     belongs_to :context, polymorphic: [:course, :account]
 

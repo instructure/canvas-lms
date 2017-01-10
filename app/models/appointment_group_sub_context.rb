@@ -20,8 +20,6 @@ class AppointmentGroupSubContext < ActiveRecord::Base
   belongs_to :appointment_group
   belongs_to :sub_context, polymorphic: [:group_category, :course_section]
 
-  strong_params
-
   validates_each :sub_context do |record, attr, value|
     if record.participant_type == 'User'
       record.errors.add(attr, t('errors.invalid_course_section', 'Invalid course section')) unless value.blank? || value.is_a?(CourseSection) && record.appointment_group.contexts.any? { |c| c == value.course }

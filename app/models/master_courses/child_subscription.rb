@@ -4,8 +4,6 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
 
   has_many :child_content_tags, :class_name => "MasterCourses::ChildContentTag", :inverse_of => :child_subscription
 
-  strong_params
-
   validate :require_same_root_account
 
   def require_same_root_account

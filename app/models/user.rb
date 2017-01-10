@@ -30,7 +30,6 @@ class User < ActiveRecord::Base
 
   include Context
 
-  strong_params
   attr_accessor :previous_id, :menu_data, :gradebook_importer_submissions, :prior_enrollment
 
   before_save :infer_defaults

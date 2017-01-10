@@ -19,8 +19,6 @@
 class Thumbnail < ActiveRecord::Base
   belongs_to :attachment, :foreign_key => "parent_id"
 
-  attr_protected
-
   # the ":keep_profile => true" part is in here so that we tell mini_magic to not try to pass the command line option -strip.
   # this is because on the servers we are actually using graphics_magic not image_magic's mogrify and graphics_magick doesn't
   # support -strip. you'd get something like:

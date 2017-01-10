@@ -20,7 +20,6 @@ require 'atom'
 
 class Account < ActiveRecord::Base
   include Context
-  strong_params
 
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
 

@@ -1,5 +1,4 @@
 class OriginalityReport < ActiveRecord::Base
-  strong_params
   belongs_to :submission
   belongs_to :attachment
   belongs_to :originality_report_attachment, class_name: "Attachment"

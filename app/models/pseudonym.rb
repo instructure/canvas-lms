@@ -19,8 +19,6 @@
 class Pseudonym < ActiveRecord::Base
   include Workflow
 
-  strong_params
-
   has_many :session_persistence_tokens
   belongs_to :account
   belongs_to :user

@@ -3,8 +3,6 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
 
   belongs_to :quiz_regrade, class_name: 'Quizzes::QuizRegrade'
 
-  strong_params
-
   validates_presence_of :quiz_regrade_id
 
   def self.perform(regrade)

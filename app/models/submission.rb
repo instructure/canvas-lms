@@ -49,7 +49,6 @@ class Submission < ActiveRecord::Base
     }.freeze
   }.freeze
 
-  attr_protected :submitted_at
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
                 :skip_grade_calc

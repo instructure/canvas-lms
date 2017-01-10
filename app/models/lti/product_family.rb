@@ -19,8 +19,6 @@
 module Lti
   class ProductFamily < ActiveRecord::Base
 
-    strong_params
-
     belongs_to :root_account, class_name: 'Account'
     has_many :tool_proxies, class_name: "Lti::ToolProxy", dependent: :destroy
 

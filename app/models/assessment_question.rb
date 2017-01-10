@@ -18,7 +18,6 @@
 
 class AssessmentQuestion < ActiveRecord::Base
   include Workflow
-  strong_params
 
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion'
   has_many :attachments, :as => :context

@@ -23,7 +23,6 @@ class RubricAssessment < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
 
-  strong_params
   belongs_to :rubric
   belongs_to :rubric_association
   belongs_to :user

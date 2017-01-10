@@ -206,6 +206,7 @@ class CustomDataController < ApplicationController
 
     data = params[:data]
     render(json: {message: 'no data specified'}, status: :bad_request) and return if data.nil?
+    data = data.to_hash.with_indifferent_access if data.is_a?(ActionController::Parameters)
 
     begin
       overwrite = cd.set_data(@scope, data)

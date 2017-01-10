@@ -22,7 +22,6 @@ module Lti
     BASIC_LTI_LAUNCH_REQUEST = 'basic-lti-launch-request'.freeze
     TOOL_PROXY_REREGISTRATION_REQUEST = 'ToolProxyRegistrationRequest'.freeze
 
-    strong_params
     attr_readonly :created_at
 
     belongs_to :resource_handler, class_name: "Lti::ResourceHandler", :foreign_key => :resource_handler_id

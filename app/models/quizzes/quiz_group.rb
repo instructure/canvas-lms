@@ -19,7 +19,6 @@
 class Quizzes::QuizGroup < ActiveRecord::Base
   self.table_name = 'quiz_groups'
 
-  strong_params
   attr_readonly :quiz_id
 
   belongs_to :quiz, class_name: 'Quizzes::Quiz'

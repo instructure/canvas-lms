@@ -24,6 +24,4 @@ class ClonedItem < ActiveRecord::Base
   has_many :attachments, -> { order(:id) }
   has_many :discussion_topics, -> { order(:id) }
   has_many :wiki_pages, -> { order(:id) }
-
-  strong_params
 end

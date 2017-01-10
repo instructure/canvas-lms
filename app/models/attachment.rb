@@ -25,7 +25,6 @@ class Attachment < ActiveRecord::Base
     col = table ? "#{table}.display_name" : 'display_name'
     best_unicode_collation_key(col)
   end
-  strong_params
 
   PERMITTED_ATTRIBUTES = [:filename, :display_name, :locked, :position, :lock_at,
     :unlock_at, :uploaded_data, :hidden, :viewed_at].freeze
@@ -266,7 +265,7 @@ class Attachment < ActiveRecord::Base
 
     excluded_atts = EXCLUDED_COPY_ATTRIBUTES
     excluded_atts += ["locked", "hidden"] if dup == existing
-    dup.assign_attributes(self.attributes.except(*excluded_atts), :without_protection => true)
+    dup.assign_attributes(self.attributes.except(*excluded_atts))
 
     dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
@@ -1635,7 +1634,7 @@ class Attachment < ActiveRecord::Base
           end
         else
           new_attachment = Attachment.new
-          new_attachment.assign_attributes(attachment.attributes.except(*EXCLUDED_COPY_ATTRIBUTES), :without_protection => true)
+          new_attachment.assign_attributes(attachment.attributes.except(*EXCLUDED_COPY_ATTRIBUTES))
 
           new_attachment.user_id = to_context.id if to_context.is_a? User
           new_attachment.context = to_context

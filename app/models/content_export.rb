@@ -27,8 +27,6 @@ class ContentExport < ActiveRecord::Base
   has_a_broadcast_policy
   serialize :settings
 
-  strong_params
-
   attr_writer :master_migration
 
   validates_presence_of :context_id, :workflow_state

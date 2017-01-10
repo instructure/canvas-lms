@@ -17,7 +17,6 @@
 #
 
 class ExternalFeed < ActiveRecord::Base
-  strong_params
   belongs_to :user
   belongs_to :context, polymorphic: [:course, :group]
 

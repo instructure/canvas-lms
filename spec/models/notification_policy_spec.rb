@@ -79,7 +79,7 @@ describe NotificationPolicy do
     Message.any_instance.stubs(:get_template).returns("here's a free <%= data.favorite_soda %>")
     class DataTest < ActiveRecord::Base
       self.table_name = :courses
-      attr_protected
+
       has_a_broadcast_policy
       set_broadcast_policy do
         dispatch :hello

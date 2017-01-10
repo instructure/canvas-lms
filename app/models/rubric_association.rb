@@ -23,7 +23,6 @@
 class RubricAssociation < ActiveRecord::Base
   attr_accessor :skip_updating_points_possible
 
-  strong_params
   belongs_to :rubric
   belongs_to :association_object, polymorphic: [:account, :course, :assignment],
              foreign_type: :association_type, foreign_key: :association_id,

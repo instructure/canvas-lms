@@ -105,7 +105,7 @@ describe LearningOutcomeResult do
       learning_outcome_result.assign_attributes({
         assessed_at: @assessed_at,
         submitted_at: nil
-      }, without_protection: true)
+      })
       expect(learning_outcome_result.submitted_or_assessed_at).to eq(@assessed_at)
     end
 

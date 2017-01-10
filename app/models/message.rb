@@ -43,8 +43,6 @@ class Message < ActiveRecord::Base
   belongs_to :root_account, :class_name => 'Account'
   has_many   :attachments, :as => :context
 
-  strong_params
-
   attr_writer :delayed_messages
   attr_accessor :output_buffer
 

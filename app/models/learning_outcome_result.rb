@@ -39,8 +39,6 @@ class LearningOutcomeResult < ActiveRecord::Base
 
   before_save :infer_defaults
 
-  strong_params
-
   def calculate_percent!
     scale_data = scale_params
     if needs_scale?(scale_data) && self.score && self.possible

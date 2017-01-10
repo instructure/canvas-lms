@@ -22,8 +22,6 @@ class ReportSnapshot < ActiveRecord::Base
 
   belongs_to :account
 
-  strong_params
-
   after_create :push_to_instructure_if_collection_enabled
   before_save :serialize_data
 
