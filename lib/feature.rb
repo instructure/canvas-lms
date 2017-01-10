@@ -504,7 +504,14 @@ END
       state: "hidden_in_prod",
       beta: true,
       development: true,
-    }
+    },
+    'modules_home_page' =>
+    {
+      display_name: -> { I18n.t('Modules Home Page') },
+      description: -> { I18n.t('Default to modules for the course home page') },
+      applies_to: "RootAccount",
+      beta: true,
+    },
   )
 
   def self.definitions

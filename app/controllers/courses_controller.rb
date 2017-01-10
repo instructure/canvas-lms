@@ -1608,11 +1608,12 @@ class CoursesController < ApplicationController
       add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
       set_badge_counts_for(@context, @current_user, @current_enrollment)
 
-      @course_home_view = (params[:view] == "feed" && 'feed') || @context.default_view || 'feed'
+      @course_home_view = "feed" if params[:view] == "feed"
+      @course_home_view ||= @context.default_view || @context.default_home_page
 
       # make sure the wiki front page exists
-      if @course_home_view == 'wiki'
-        @course_home_view = 'feed' if @context.wiki.front_page.nil?
+      if @course_home_view == 'wiki'&& @context.wiki.front_page.nil?
+        @course_home_view = @context.default_home_page
       end
 
       @contexts = [@context]
