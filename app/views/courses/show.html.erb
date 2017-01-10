@@ -240,6 +240,21 @@ hi there
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>
   <% elsif @course_home_view == 'dynamic_syllabus' %>
     <%= render :partial => 'bz/dynamic_syllabus', :locals => {:course_home => true} %>
+    <script>
+      document.body.className = document.body.className.replace("with-right-side", "");
+      var oldWindowOnloadBZ = window.onload;
+      window.onload = function() {
+        var rs = document.getElementById("right-side");
+        var tpb = document.getElementById("bz-task-part-box");
+        tpb.innerHTML = rs.innerHTML;
+        // moving the buttons to the bottom of the html too so I can float it right
+        var co = tpb.querySelector(".course-options");
+        co.parentNode.removeChild(co);
+        tpb.appendChild(co);
+        if(oldWindowOnloadBZ)
+          oldWindowOnloadBZ();
+      };
+    </script>
   <% else %>
     <%= render :partial => 'shared/dashboard_messages' %>
     <%= render :partial => 'shared/recent_activity' %>

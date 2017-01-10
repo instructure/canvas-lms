@@ -13,16 +13,21 @@
     Modules need images and intro text added.
   -->
 
+  <div class="bz-course-part-task-box" id="bz-task-part-box"> </div>
+
   <% CoursePart.where(:course_id => @course.id).order(:position, :id).each do |part| %>
   <% part_count = 0 %>
   <div class="bz-course-part">
     <h2><%= part.title %></h2>
     <p><%= part.intro ? part.intro.html_safe : '' %></p>
 
+    <% if false %>
+    <!-- commented as it isn't used in this version -->
     <div class="bz-course-part-task-box">
       <h3><%= part.task_box_title %></h3>
       <div><%= part.task_box_intro ? part.task_box_intro.html_safe : "" %></div>
     </div>
+    <% end %>
 
     <% @course.context_modules.active.where(:part_id => part.id).each do |mod| %>
     <% part_count += 1 %>
