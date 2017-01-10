@@ -37,7 +37,7 @@
       <h3><%= part_count %> <%= mod.name %></h3>
       <div><%= mod.intro_text ? mod.intro_text.html_safe : '' %></div>
       <% if progress.workflow_state == 'completed' %>
-        <span class="bz-button-pick-up">Completed</span>
+        <a href="/courses/<%= @course.id %>/modules/items/<%= progress.current_position_tag_without_progress.id %>" class="bz-button-pick-up">Completed</a>
       <% elsif progress.workflow_state == 'locked' %>
         <!-- locked, no button needed -->
       <% else %>
