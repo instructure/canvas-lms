@@ -612,30 +612,30 @@ define [
 
   test 'it attaches assignment configuration component', ->
     view = @editView()
-    equal view.$assignmentConfigurationTools.children().size(), 1
+    equal view.$similarityDetectionTools.children().size(), 1
 
   test 'it is hidden if submission type is not online with a file upload', ->
     view = @editView()
     view.$el.appendTo $('#fixtures')
-    equal view.$('#assignment_configuration_tools').css('display'), 'none'
+    equal view.$('#similarity_detection_tools').css('display'), 'none'
 
     view.$('#assignment_submission_type').val('on_paper')
     view.handleSubmissionTypeChange()
-    equal view.$('#assignment_configuration_tools').css('display'), 'none'
+    equal view.$('#similarity_detection_tools').css('display'), 'none'
 
     view.$('#assignment_submission_type').val('external_tool')
     view.handleSubmissionTypeChange()
-    equal view.$('#assignment_configuration_tools').css('display'), 'none'
+    equal view.$('#similarity_detection_tools').css('display'), 'none'
 
     view.$('#assignment_submission_type').val('online')
     view.$('#assignment_online_upload').attr('checked', false)
     view.handleSubmissionTypeChange()
-    equal view.$('#assignment_configuration_tools').css('display'), 'none'
+    equal view.$('#similarity_detection_tools').css('display'), 'none'
 
     view.$('#assignment_submission_type').val('online')
     view.$('#assignment_online_upload').attr('checked', true)
     view.handleSubmissionTypeChange()
-    equal view.$('#assignment_configuration_tools').css('display'), 'block'
+    equal view.$('#similarity_detection_tools').css('display'), 'block'
 
   test 'it is hidden if the plagiarism_detection_platform flag is disabled', ->
     ENV.PLAGIARISM_DETECTION_PLATFORM = false
@@ -643,4 +643,4 @@ define [
     view.$('#assignment_submission_type').val('online')
     view.$('#assignment_online_upload').attr('checked', true)
     view.handleSubmissionTypeChange()
-    equal view.$('#assignment_configuration_tools').css('display'), 'none'
+    equal view.$('#similarity_detection_tools').css('display'), 'none'

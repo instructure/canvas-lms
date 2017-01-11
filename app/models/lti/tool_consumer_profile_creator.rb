@@ -17,7 +17,7 @@ module Lti
           Canvas.placements.assignmentSelection
           Canvas.placements.linkSelection
           Canvas.placements.postGrades
-          Canvas.placements.assignmentConfiguration
+          Canvas.placements.similarityDetection
           User.username
           Person.email.primary
           vnd.Canvas.Person.email.sis

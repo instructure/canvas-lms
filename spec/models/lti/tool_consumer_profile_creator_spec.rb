@@ -121,8 +121,8 @@ module Lti
           expect(subject.create.capability_offered).to include 'Canvas.placements.courseNavigation'
         end
 
-        it 'adds the Canvas.placements.assignmentConfiguration capability' do
-          expect(subject.create.capability_offered).to include 'Canvas.placements.assignmentConfiguration'
+        it 'adds the Canvas.placements.similarityDetection capability' do
+          expect(subject.create.capability_offered).to include 'Canvas.placements.similarityDetection'
         end
 
 

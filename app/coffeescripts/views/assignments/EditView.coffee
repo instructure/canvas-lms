@@ -27,7 +27,7 @@ define [
   userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog,
   preventDefault, MissingDateDialog, AssignmentGroupSelector,
   GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts,
-  ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
+  ConditionalRelease, deparam, SimilarityDetectionTools) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -67,7 +67,7 @@ define [
     GROUP_CATEGORY_BOX = '#has_group_category'
     MODERATED_GRADING_BOX = '#assignment_moderated_grading'
     CONDITIONAL_RELEASE_TARGET = '#conditional_release_target'
-    ASSIGNMENT_CONFIGURATION_TOOLS = '#assignment_configuration_tools'
+    SIMILARITY_DETECTION_TOOLS = '#similarity_detection_tools'
 
     els: _.extend({}, @::els, do ->
       els = {}
@@ -96,7 +96,7 @@ define [
       els["#{ASSIGNMENT_POINTS_CHANGE_WARN}"] = '$pointsChangeWarning'
       els["#{MODERATED_GRADING_BOX}"] = '$moderatedGradingBox'
       els["#{CONDITIONAL_RELEASE_TARGET}"] = '$conditionalReleaseTarget'
-      els["#{ASSIGNMENT_CONFIGURATION_TOOLS}"] = '$assignmentConfigurationTools'
+      els["#{SIMILARITY_DETECTION_TOOLS}"] = '$similarityDetectionTools'
       els["#{SECURE_PARAMS}"] = '$secureParams'
       els
     )
@@ -262,13 +262,13 @@ define [
       @$externalToolSettings.toggleAccessibly subVal == 'external_tool'
       @$groupCategorySelector.toggleAccessibly subVal != 'external_tool'
       @$peerReviewsFields.toggleAccessibly subVal != 'external_tool'
-      @$assignmentConfigurationTools.toggleAccessibly subVal == 'online' && ENV.PLAGIARISM_DETECTION_PLATFORM
+      @$similarityDetectionTools.toggleAccessibly subVal == 'online' && ENV.PLAGIARISM_DETECTION_PLATFORM
       if subVal == 'online'
         @handleOnlineSubmissionTypeChange()
 
     handleOnlineSubmissionTypeChange: (env) =>
       showConfigTools = @$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).attr('checked')
-      @$assignmentConfigurationTools.toggleAccessibly showConfigTools && ENV.PLAGIARISM_DETECTION_PLATFORM
+      @$similarityDetectionTools.toggleAccessibly showConfigTools && ENV.PLAGIARISM_DETECTION_PLATFORM
 
     afterRender: =>
       # have to do these here because they're rendered by other things
@@ -276,8 +276,8 @@ define [
       @$intraGroupPeerReviews = $("#{INTRA_GROUP_PEER_REVIEWS}")
       @$groupCategoryBox = $("#{GROUP_CATEGORY_BOX}")
 
-      @assignmentConfigurationTools = AssignmentConfigurationsTools.attach(
-            @$assignmentConfigurationTools.get(0),
+      @similarityDetectionTools = SimilarityDetectionTools.attach(
+            @$similarityDetectionTools.get(0),
             parseInt(ENV.COURSE_ID),
             @$secureParams.val(),
             parseInt(ENV.SELECTED_CONFIG_TOOL_ID),

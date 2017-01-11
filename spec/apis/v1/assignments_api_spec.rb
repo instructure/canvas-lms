@@ -1124,7 +1124,7 @@ describe AssignmentsApiController, type: :request do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       api_create_assignment_in_course(@course, {
         'description' => 'description',
-        'assignmentConfigurationTool' => tool.id,
+        'similarityDetectionTool' => tool.id,
         'configuration_tool_type' => 'ContextExternalTool',
         'submission_type' => 'online',
         'submission_types' => ['online_upload']
@@ -1134,7 +1134,7 @@ describe AssignmentsApiController, type: :request do
       expect(a.tool_settings_tool).to eq(tool)
     end
 
-    it "sets the configuration an LTI 2 tool in account context" do
+    it "sets the configuration LTI 2 tool in account context" do
       account = @course.account
       product_family = Lti::ProductFamily.create(
         vendor_code: '123',
@@ -1170,7 +1170,7 @@ describe AssignmentsApiController, type: :request do
 
       api_create_assignment_in_course(@course, {
         'description' => 'description',
-        'assignmentConfigurationTool' => message_handler.id,
+        'similarityDetectionTool' => message_handler.id,
         'configuration_tool_type' => 'Lti::MessageHandler',
         'submission_type' => 'online',
         'submission_types' => ['online_upload']
@@ -1216,7 +1216,7 @@ describe AssignmentsApiController, type: :request do
 
       api_create_assignment_in_course(@course, {
         'description' => 'description',
-        'assignmentConfigurationTool' => message_handler.id,
+        'similarityDetectionTool' => message_handler.id,
         'configuration_tool_type' => 'Lti::MessageHandler',
         'submission_type' => 'online',
         'submission_types' => ['online_upload']
@@ -1229,7 +1229,7 @@ describe AssignmentsApiController, type: :request do
     it "does not set the configuration tool if the submission type is not online with uploads" do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       api_create_assignment_in_course(@course, {'description' => 'description',
-        'assignmentConfigurationTool' => tool.id,
+        'similarityDetectionTool' => tool.id,
         'configuration_tool_type' => 'ContextExternalTool'
       })
 
