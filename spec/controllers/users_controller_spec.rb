@@ -1345,6 +1345,22 @@ describe UsersController do
     end
   end
 
+  describe '#toggle_hide_dashcard_color_overlays' do
+    it 'updates user preference based on value provided' do
+      course_factory
+      user_factory(active_all: true)
+      user_session(@user)
+
+      expect(@user.preferences[:hide_dashcard_color_overlays]).to be_falsy
+
+      post :toggle_hide_dashcard_color_overlays
+
+      expect(@user.reload.preferences[:hide_dashcard_color_overlays]).to be_truthy
+      expect(response).to be_success
+      expect(JSON.parse(response.body)).to be_empty
+    end
+  end
+
   describe '#dashboard_view' do
     before(:each) do
       course_factory

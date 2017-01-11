@@ -11,6 +11,7 @@ import MovementUtils from './MovementUtils'
     propTypes: {
       courseCards: React.PropTypes.array,
       reorderingEnabled: React.PropTypes.bool,
+      hideColorOverlays: React.PropTypes.bool,
       connectDropTarget: React.PropTypes.func
     },
 
@@ -35,7 +36,8 @@ import MovementUtils from './MovementUtils'
 
     getDefaultProps: function () {
       return {
-        courseCards: []
+        courseCards: [],
+        hideColorOverlays: false
       };
     },
 
@@ -97,6 +99,7 @@ import MovementUtils from './MovementUtils'
             image={card.image}
             imagesEnabled={card.imagesEnabled}
             reorderingEnabled={this.props.reorderingEnabled}
+            hideColorOverlays={this.props.hideColorOverlays}
             position={position}
             currentIndex={index}
             moveCard={this.moveCard}

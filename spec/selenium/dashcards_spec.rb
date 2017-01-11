@@ -142,7 +142,7 @@ describe 'dashcards' do
         @course1.save!
         get '/'
         # as course codes are always displayed in upper case
-        expect(f('.ic-DashboardCard__header-subtitle').text).to eq(@course1.course_code.upcase)
+        expect(f('.ic-DashboardCard__header-subtitle').text).to eq(@course1.course_code)
       end
     end
 

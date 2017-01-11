@@ -22,6 +22,7 @@ if (dashboardOptionsMenuContainer) {
   ReactDOM.render(
     <DashboardOptionsMenu
       recent_activity_dashboard={ENV.PREFERENCES.recent_activity_dashboard}
+      hide_dashcard_color_overlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
       planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
       planner_selected={ENV.PREFERENCES.show_planner}
     />,

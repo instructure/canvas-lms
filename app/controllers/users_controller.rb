@@ -158,8 +158,9 @@ class UsersController < ApplicationController
 
   before_action :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
-    :user_dashboard, :toggle_recent_activity_dashboard, :masquerade, :external_tool,
-    :dashboard_sidebar, :settings, :activity_stream, :activity_stream_summary]
+    :user_dashboard, :toggle_recent_activity_dashboard, :toggle_hide_dashcard_color_overlays,
+    :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
+    :activity_stream_summary]
   before_action :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
@@ -484,6 +485,7 @@ class UsersController < ApplicationController
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
         :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard],
+        :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
         :custom_colors => @current_user.custom_colors,
         :show_planner => show_planner?
       },
@@ -540,6 +542,13 @@ class UsersController < ApplicationController
   def toggle_recent_activity_dashboard
     @current_user.preferences[:recent_activity_dashboard] =
       !@current_user.preferences[:recent_activity_dashboard]
+    @current_user.save!
+    render json: {}
+  end
+
+  def toggle_hide_dashcard_color_overlays
+    @current_user.preferences[:hide_dashcard_color_overlays] =
+      !@current_user.preferences[:hide_dashcard_color_overlays]
     @current_user.save!
     render json: {}
   end
