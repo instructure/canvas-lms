@@ -514,6 +514,12 @@ describe GradeCalculator do
       expect(grading_period_scores).to match_array([25.0, 75.0])
     end
 
+    it 'restores and updates previously deleted scores' do
+      overall_course_score.destroy
+      GradeCalculator.new(@student.id, @course).compute_and_save_scores
+      expect(overall_course_score.reload).to be_active
+    end
+
     context 'grading period is provided' do
       it 'updates the grading period score' do
         GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
@@ -537,6 +543,13 @@ describe GradeCalculator do
           @student.id, @course, grading_period: @first_period, update_course_score: false
         ).compute_and_save_scores
         expect(overall_course_score.current_score).to eq(50.0)
+      end
+      
+      it 'does not restore previously deleted score if grading period is deleted too' do
+        score = scores.where(grading_period_id: @first_period).first
+        @first_period.destroy
+        GradeCalculator.new(@student.id, @course, grading_period: @first_period).compute_and_save_scores
+        expect(score.reload).to be_deleted
       end
     end
   end
