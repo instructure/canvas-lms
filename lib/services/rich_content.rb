@@ -38,9 +38,9 @@ module Services
           RICH_CONTENT_APP_HOST: settings["app-host"],
           RICH_CONTENT_CDN_HOST: settings["cdn-host"]
         }
-      rescue Faraday::ConnectionFailed,
-             Faraday::ClientError,
-             Canvas::DynamicSettings::ConsulError => e
+      rescue Imperium::TimeoutError,
+        Imperium::UnableToConnectError,
+        Canvas::DynamicSettings::ConsulError => e
         Canvas::Errors.capture_exception(:rce_flag, e)
         {
           RICH_CONTENT_APP_HOST: "error",

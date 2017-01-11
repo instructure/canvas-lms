@@ -3,7 +3,7 @@ module ConsulInitializer
     if settings_hash.present?
       begin
         Canvas::DynamicSettings.config = settings_hash
-      rescue Faraday::ConnectionFailed, Faraday::ClientError
+      rescue Imperium::UnableToConnectError
         logger.warn("INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail")
       end
     end

@@ -51,10 +51,7 @@ module Services
 
       def settings
         Canvas::DynamicSettings.from_cache("live-events-subscription-service", expires_in: 5.minutes)
-      rescue Faraday::ConnectionFailed,
-             Faraday::ClientError,
-             Canvas::DynamicSettings::ConsulError,
-             Diplomat::KeyNotFound => e
+      rescue Imperium::TimeoutError => e
         Canvas::Errors.capture_exception(:live_events_subscription, e)
         nil
       end

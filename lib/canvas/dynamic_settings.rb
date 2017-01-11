@@ -1,13 +1,28 @@
-require 'diplomat'
+# Copyright (C) 2015-2017 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+require 'imperium'
 
 module Canvas
   class DynamicSettings
 
-    class ConsulError < StandardError
-    end
+    class Error < StandardError; end
+    class ConsulError < Error; end
 
+    CONSUL_READ_OPTIONS = %i{recurse stale}.freeze
     KV_NAMESPACE = "config/canvas".freeze
-    TIMEOUT_INTERVAL = 3.freeze
 
     class << self
       attr_accessor :config, :cache, :fallback_data
@@ -15,11 +30,15 @@ module Canvas
       def config=(conf_hash)
         @config = conf_hash
         if conf_hash.present?
-          Diplomat.configure do |diplomat_conf|
-            protocol = conf_hash.fetch("ssl", true) ? "https" : "http"
-            host_and_port = "#{conf_hash.fetch('host')}:#{conf_hash.fetch('port')}"
-            diplomat_conf.url = "#{protocol}://#{host_and_port}"
-            diplomat_conf.acl_token = conf_hash.fetch("acl_token", nil)
+          Imperium.configure do |config|
+            config.ssl = conf_hash.fetch('ssl', true)
+            config.host = conf_hash.fetch('host')
+            config.port = conf_hash.fetch('port')
+            config.token = conf_hash.fetch('acl_token', nil)
+
+            config.connect_timeout = conf_hash['connect_timeout'] if conf_hash['connect_timeout']
+            config.send_timeout = conf_hash['send_timeout'] if conf_hash['send_timeout']
+            config.receive_timeout = conf_hash['receive_timeout'] if conf_hash['receive_timeout']
           end
 
           init_data = conf_hash.fetch("init_values", {})
@@ -32,10 +51,7 @@ module Canvas
           return fallback_data.fetch(key) if fallback_data.present?
           raise(ConsulError, "Unable to contact consul without config")
         else
-          config_records = store_get(key)
-          config_records.each_with_object({}) do |node, hash|
-            hash[node[:key].split("/").last] = node[:value]
-          end
+          store_get(key)
         end
       end
 
@@ -51,6 +67,10 @@ module Canvas
         value = self.find(key)
         set_in_cache(key, value)
         value
+      end
+
+      def kv_client
+        Imperium::KV.default_client
       end
 
       def reset_cache!(hard: false)
@@ -78,58 +98,38 @@ module Canvas
             store_put("#{parent_key}/#{child_key}", value)
           end
         end
-      rescue Timeout::Error
+      rescue Imperium::TimeoutError
         return false
       end
 
       def store_get(key)
-        begin
-          # store all values that we get here to
-          # kind-of recover in case of big failure
-          @strategic_reserve ||= {}
-          consul_value = Timeout.timeout(TIMEOUT_INTERVAL) do
-            diplomat_get(key)
-          end
+        # store all values that we get here to
+        # kind-of recover in case of big failure
+        @strategic_reserve ||= {}
+        consul_value = consul_get(key)
 
-          @strategic_reserve[key] = consul_value
-          consul_value
-        rescue Faraday::ConnectionFailed,
-               Faraday::ClientError,
-               Timeout::Error,
-               TimeoutCutoff => exception
-          if @strategic_reserve.key?(key)
-            # we have an old value for this key, log the error but recover
-            Canvas::Errors.capture_exception(:consul, exception)
-            return @strategic_reserve[key]
-          else
-            # didn't have an old value cached, raise the error
-            raise
-          end
+        @strategic_reserve[key] = consul_value
+        consul_value
+      rescue Imperium::TimeoutError
+        if @strategic_reserve.key?(key)
+          # we have an old value for this key, log the error but recover
+          Canvas::Errors.capture_exception(:consul, exception)
+          return @strategic_reserve[key]
+        else
+          # didn't have an old value cached, raise the error
+          raise
         end
       end
 
       def store_put(key, value)
-        Timeout.timeout(TIMEOUT_INTERVAL) do
-          Diplomat::Kv.put("#{KV_NAMESPACE}/#{key}", value)
-        end
+        kv_client.put("#{KV_NAMESPACE}/#{key}", value)
       end
 
-      def diplomat_get(key)
+      def consul_get(key)
         parent_key = "#{KV_NAMESPACE}/#{key}"
-        read_options = {recurse: true, consistency: 'stale'}
-        diplomat_val = Diplomat::Kv.get(parent_key, read_options)
-        if diplomat_val && !diplomat_val.is_a?(Array)
-          diplomat_val = []
-          Diplomat::Kv.get(parent_key, read_options.merge({keys: true})).each do |full_key|
-            diplomat_val << {
-              key: full_key,
-              value: Diplomat::Kv.get(full_key, read_options)
-            }
-          end
-        end
-        diplomat_val
+        consul_response = kv_client.get(parent_key, *CONSUL_READ_OPTIONS)
+        consul_response.values
       end
     end
-
   end
 end

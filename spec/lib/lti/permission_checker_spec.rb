@@ -5,7 +5,6 @@ describe Lti::PermissionChecker do
   include_context 'lti2_spec_helper'
 
   describe ".authorized_lti2_action?" do
-
     it "is true if the tool is authorized for the context" do
       expect(Lti::PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: account)).to eq true
     end
@@ -17,6 +16,15 @@ describe Lti::PermissionChecker do
     context "assignment" do
       before :each do
         AssignmentConfigurationToolLookup.any_instance.stubs(:create_subscription).returns true
+        @original_fallback = Canvas::DynamicSettings.fallback_data
+        Canvas::DynamicSettings.fallback_data = {
+          'canvas' => {},
+          'live-events-subscription-service' => {},
+        }
+      end
+
+      after :each do
+        Canvas::DynamicSettings.fallback_data = @original_fallback
       end
 
       let(:assignment) do
@@ -37,5 +45,4 @@ describe Lti::PermissionChecker do
       end
     end
   end
-
 end

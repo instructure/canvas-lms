@@ -96,9 +96,7 @@ module Services
       def setting(key)
         settings = Canvas::DynamicSettings.from_cache("address-book", expires_in: 5.minutes)
         settings[key]
-      rescue Faraday::ConnectionFailed,
-             Faraday::ClientError,
-             Canvas::DynamicSettings::ConsulError => e
+      rescue Imperium::TimeoutError => e
         Canvas::Errors.capture_exception(:address_book, e)
         nil
       end

@@ -349,5 +349,4 @@ module Canvas::Security
       Canvas::DynamicSettings.from_cache("canvas")["signing-secret"]
     end
   end
-
 end

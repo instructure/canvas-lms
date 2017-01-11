@@ -94,8 +94,8 @@ gem 'sentry-raven', '0.15.6', require: false
 gem 'canvas_statsd', '2.0.4'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.4', require: false
-gem 'diplomat', '1.0.0', require: false
 gem 'gepub', '0.7.0beta3', github: 'ccutrer/gepub', ref: '7cea2f4912f15d89bc9e9cb9d4c51e5f491c2328'
+gem 'imperium', '0.1.3', require: false
 gem 'academic_benchmarks', '0.0.9', require: false
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'

@@ -1,6 +1,6 @@
 require_relative "../../spec_helper"
-require 'diplomat'
 require_dependency "canvas/dynamic_settings"
+require 'imperium/testing' # Not loaded by default
 
 module Canvas
   describe DynamicSettings do
@@ -9,10 +9,9 @@ module Canvas
     end
 
     after do
-      Diplomat::Kv.unstub(:put)
       begin
         DynamicSettings.config = @cached_config
-      rescue Faraday::ConnectionFailed
+      rescue Imperium::UnableToConnectError
         # don't fail the test if there is no consul running
       end
       Canvas::DynamicSettings.reset_cache!
@@ -20,10 +19,10 @@ module Canvas
     end
 
     let(:parent_key){ "rich-content-service" }
-    let(:diplomat_read_options){ { recurse: true, consistency: 'stale' } }
+    let(:imperium_read_options){ [:recurse, :stale] }
+    let(:kv_client) { DynamicSettings.kv_client }
 
     describe ".config=" do
-
       let(:valid_config) do
         {
           "host"      =>"consul",
@@ -33,31 +32,45 @@ module Canvas
         }
       end
 
-      it "configures diplomat when config is set" do
-        Diplomat::Kv.stubs(:put)
+      it "configures imperium when config is set" do
+        DynamicSettings.kv_client.stubs(:put)
         DynamicSettings.config = valid_config
-        expect(Diplomat.configuration.url).to eq("https://consul:8500")
+        expect(Imperium.configuration.url.to_s).to eq("https://consul:8500")
       end
 
       it "sends initial config data by de-nesting a hash into keys" do
-        init_data = {
-          "rich-content-service" => {
-            "app-host" => "rce.docker",
-            "cdn-host" => "rce.docker"
+        config = valid_config.merge({
+          'init_values' => {
+            "rich-content-service" => {
+              "app-host" => "rce.docker",
+              "cdn-host" => "rce.docker"
+            }
           }
-        }
-
-        Diplomat::Kv.expects(:put)
-          .with("config/canvas/rich-content-service/app-host", "rce.docker")
-          .at_least_once
-        Diplomat::Kv.expects(:put)
-          .with("config/canvas/rich-content-service/cdn-host", "rce.docker")
-          .at_least_once
-
-        DynamicSettings.config = valid_config.merge({
-          "init_values" => init_data
         })
 
+        expect(kv_client).to receive(:put)
+          .with("config/canvas/rich-content-service/app-host", "rce.docker")
+          .and_return(true)
+        expect(kv_client).to receive(:put)
+          .with("config/canvas/rich-content-service/cdn-host", "rce.docker")
+          .and_return(true)
+        # This is super gross but the alternative is to use expect_any_instance
+        allow(Imperium::Client).to receive(:reset_default_clients).and_return(true)
+
+        DynamicSettings.config = config
+      end
+
+      it 'must pass through timeout settings to the underlying library' do
+        DynamicSettings.config = valid_config.merge({
+          'connect_timeout' => 1,
+          'send_timeout' => 2,
+          'receive_timeout' => 3,
+        })
+
+        client_config = kv_client.config
+        expect(client_config.connect_timeout).to eq 1
+        expect(client_config.send_timeout).to eq 2
+        expect(client_config.receive_timeout).to eq 3
       end
     end
 
@@ -67,14 +80,17 @@ module Canvas
         before(:each) do
           DynamicSettings.config = {} # just to be not nil
           DynamicSettings.fallback_data = nil
-          Diplomat::Kv.stubs(:put)
-          Diplomat::Kv.stubs(:get).
-            with("config/canvas/#{parent_key}", diplomat_read_options).
-            returns(
-              [
-                { key: "#{parent_key}/app-host", value: "rce.insops.com"},
-                { key: "#{parent_key}/cdn-host", value: "asdfasdf.cloudfront.com"}
-              ]
+          allow(kv_client).to receive(:get)
+            .with("config/canvas/#{parent_key}", *imperium_read_options)
+            .and_return(
+              Imperium::Testing.kv_get_response(
+                body: [
+                  { Key: "config/canvas/#{parent_key}/app-host", Value: "rce.insops.com"},
+                  { Key: "config/canvas/#{parent_key}/cdn-host", Value: "asdfasdf.cloudfront.com"}
+                ],
+                options: imperium_read_options,
+                prefix: "config/canvas/#{parent_key}"
+              )
             )
         end
 
@@ -86,30 +102,13 @@ module Canvas
           })
         end
 
-        it "handles config sets with only one value" do
-          # consul has some interesting behavior with single values, so we have to
-          # crawl by key
-          Diplomat::Kv.stubs(:get).
-            with("config/canvas/single-parent", diplomat_read_options.merge({keys: true})).
-            returns(["config/canvas/single-parent/single-key"])
-          Diplomat::Kv.stubs(:get).
-            with("config/canvas/single-parent", diplomat_read_options).
-            returns("single-value")
-          Diplomat::Kv.stubs(:get).
-            with("config/canvas/single-parent/single-key", diplomat_read_options).
-            returns("single-value")
-          rce_settings = DynamicSettings.find("single-parent")
-          expect(rce_settings).to eq({"single-key" => "single-value"})
-        end
-
-
         it "uses the last found value on catastrophic outage" do
           DynamicSettings.reset_cache!(hard: true)
           DynamicSettings.find(parent_key)
           # some values are now stored in case of connection failure
-          Diplomat::Kv.stubs(:get).
-            with("config/canvas/#{parent_key}", diplomat_read_options).
-            raises(Faraday::ConnectionFailed, "could not contact consul")
+          allow(kv_client).to receive(:get)
+            .with("config/canvas/#{parent_key}", imperium_read_options)
+            .and_raise(Imperium::ConnectTimeout, "could not contact consul")
 
           rce_settings = DynamicSettings.find(parent_key)
           expect(rce_settings).to eq({
@@ -120,12 +119,12 @@ module Canvas
 
         it "cant recover with no value cached for connection failure" do
           DynamicSettings.reset_cache!(hard: true)
-          Diplomat::Kv.stubs(:get).
-            with("config/canvas/#{parent_key}", diplomat_read_options).
-            raises(Faraday::ConnectionFailed, "could not contact consul")
+          allow(kv_client).to receive(:get)
+            .with("config/canvas/#{parent_key}", *imperium_read_options)
+            .and_raise(Imperium::ConnectTimeout)
 
           expect{ DynamicSettings.find(parent_key) }.to(
-            raise_error(Faraday::ConnectionFailed)
+            raise_error(Imperium::ConnectTimeout)
           )
         end
       end
@@ -163,19 +162,35 @@ module Canvas
       after(:each){ DynamicSettings.reset_cache! }
 
       def stub_consul_with(value)
-        Diplomat::Kv.stubs(:get).with("config/canvas/#{parent_key}", diplomat_read_options).returns(
-          [{ key: "#{parent_key}/app-host", value: value}]
-        )
+        allow(kv_client).to receive(:get)
+          .with("config/canvas/#{parent_key}", *imperium_read_options)
+          .and_return(
+            Imperium::Testing.kv_get_response(
+              body: [
+                { Key: "config/canvas/#{parent_key}/app-host", Value: value},
+              ],
+              options: imperium_read_options,
+              prefix: "config/canvas/#{parent_key}"
+            )
+          )
       end
 
       it "only queries consul the first time" do
-        Diplomat::Kv.expects(:get).
-          with("config/canvas/#{parent_key}", diplomat_read_options).
-          once. # and only once, going to hit it several times
-          returns([{ key: "#{parent_key}/app-host", value: "rce.insops.com"}])
+        allow(kv_client).to receive(:get)
+          .with("config/canvas/#{parent_key}", *imperium_read_options)
+          .once # and only once, going to hit it several times
+          .and_return(
+            Imperium::Testing.kv_get_response(
+              body: [
+                { Key: "config/canvas/#{parent_key}/app-host", Value: 'rce.insops.net'},
+              ],
+              options: imperium_read_options,
+              prefix: "config/canvas/#{parent_key}"
+            )
+          )
         5.times{ DynamicSettings.from_cache(parent_key) }
         value = DynamicSettings.from_cache(parent_key)
-        expect(value["app-host"]).to eq("rce.insops.com")
+        expect(value["app-host"]).to eq("rce.insops.net")
       end
 
       it "definitely doesnt pickup new values once cached" do
@@ -242,24 +257,20 @@ module Canvas
         end
 
         it "still returns old values if connection fails after timeout" do
-          Diplomat::Kv.stubs(:get).
-            with("config/canvas/#{parent_key}", diplomat_read_options).
-            raises(Faraday::ConnectionFailed, "could not contact consul")
-          value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
-          expect(value["app-host"]).to eq("rce.insops.com")
+          Imperium::KV.stubs(:get).
+            with("config/canvas/#{parent_key}", imperium_read_options).
+            raises(Imperium::TimeoutError, "could not contact consul")
+            value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
+            expect(value["app-host"]).to eq("rce.insops.com")
         end
 
         it "returns old value during connection timeout" do
-
-          Timeout.stubs(:timeout).with(DynamicSettings::TIMEOUT_INTERVAL).
-            raises(Timeout::Error, 'consul took too long')
+          Imperium::KV.stubs(:get).
+            raises(Imperium::TimeoutError, "could not contact consul")
           value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
           expect(value["app-host"]).to eq("rce.insops.com")
         end
-
       end
     end
-
-
   end
 end
