@@ -5381,27 +5381,27 @@ fr:
   data_set_identifier_data_set_id_c228b5df: "Identifiant d'ensemble de données : %{data_set_id}"
   date: 
     abbr_day_names: 
-      - dim.
-      - lun.
-      - mar.
-      - mer.
-      - jeu.
-      - ven.
-      - sam.
+      - dim
+      - lun
+      - mar
+      - mer
+      - jeu
+      - ven
+      - sam
     abbr_month_names: 
       - ~
-      - Janv.
-      - Févr.
+      - Janv
+      - Févr
       - Mars
-      - Avr.
+      - Avr
       - Mai
       - Juin
-      - Juil.
+      - Juil
       - Août
-      - Sept.
-      - Oct.
-      - Nov.
-      - Déc.
+      - Sept
+      - Oct
+      - Nov
+      - Déc
     datepicker: 
       column_headings: 
         - dim
@@ -11464,9 +11464,9 @@ fr:
         strip_insignificant_zeros: false
         unit: $
     format: 
-      delimiter: ","
+      delimiter: " "
       precision: 3
-      separator: "."
+      separator: ","
       significant: false
       strip_insignificant_zeros: false
     human: 
