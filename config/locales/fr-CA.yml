@@ -4926,13 +4926,13 @@ fr-CA:
   data_set_identifier_data_set_id_c228b5df: "Identifiant d'ensemble de données : %{data_set_id}"
   date: 
     abbr_day_names: 
-      - dim.
-      - lun.
-      - mar.
-      - mer.
-      - jeu.
-      - ven.
-      - sam.
+      - dim
+      - lun
+      - mar
+      - mer
+      - jeu
+      - ven
+      - sam
     abbr_month_names: 
       - ~
       - Jan
@@ -10206,8 +10206,8 @@ fr-CA:
         separator: "."
         unit: $
     format: 
-      delimiter: ","
-      separator: "."
+      delimiter: " "
+      separator: ","
     human: 
       decimal_units: 
         format: "%n %u"
