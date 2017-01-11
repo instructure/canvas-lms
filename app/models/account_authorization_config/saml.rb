@@ -17,6 +17,7 @@
 #
 
 require 'saml2'
+require 'uri'
 
 class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def self.sti_name
@@ -164,11 +165,11 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     end
   end
 
-  def saml_settings(current_host=nil)
+  def saml_settings(current_host=nil, return_to=nil)
     return nil unless self.auth_type == 'saml'
 
     unless @saml_settings
-      @saml_settings = self.class.saml_settings_for_account(self.account, current_host)
+      @saml_settings = self.class.saml_settings_for_account(self.account, current_host, return_to)
 
       @saml_settings.idp_sso_target_url = self.log_in_url
       @saml_settings.idp_slo_target_url = self.log_out_url
@@ -181,15 +182,19 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     @saml_settings
   end
 
-  def self.saml_settings_for_account(account, current_host=nil)
+  def self.saml_settings_for_account(account, current_host=nil, return_to=nil)
     app_config = ConfigFile.load('saml') || {}
     domains = HostUrl.context_hosts(account, current_host)
+
+    suffix = "/login/saml"
+
+    suffix += "?return_to=#{URI::escape(return_to)}" if return_to
 
     settings = Onelogin::Saml::Settings.new
     settings.sp_slo_url = "#{HostUrl.protocol}://#{domains.first}/login/saml/logout"
     settings.assertion_consumer_service_url = domains.flat_map do |domain|
       [
-        "#{HostUrl.protocol}://#{domain}/login/saml"
+        "#{HostUrl.protocol}://#{domain}#{suffix}"
       ]
     end
     settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'

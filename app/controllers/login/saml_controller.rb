@@ -32,7 +32,7 @@ class Login::SamlController < ApplicationController
       session[:return_to] = params[:return_to]
     end
 
-    auth_redirect(aac)
+    auth_redirect(aac, params[:return_to])
   end
 
   def create
@@ -43,6 +43,10 @@ class Login::SamlController < ApplicationController
       logger.error "saml_consume request with no SAMLResponse parameter"
       flash[:delegated_message] = login_error_message
       return redirect_to login_url
+    end
+
+    if params.has_key? :return_to
+      session[:return_to] = params[:return_to]
     end
 
     # Break up the SAMLResponse into chunks for logging (a truncated version was probably already
@@ -309,9 +313,9 @@ class Login::SamlController < ApplicationController
     CanvasStatsd::Statsd.increment("saml.#{CanvasStatsd::Statsd.escape(request.host)}.#{key}")
   end
 
-  def auth_redirect(aac)
+  def auth_redirect(aac, return_to = nil)
     increment_saml_stat("login_attempt")
-    settings = aac.saml_settings(request.host_with_port)
+    settings = aac.saml_settings(request.host_with_port, return_to)
     request = Onelogin::Saml::AuthRequest.new(settings)
     forward_url = request.generate_request
     if aac.debugging? && !aac.debug_get(:request_id)
