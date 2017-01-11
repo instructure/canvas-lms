@@ -905,4 +905,29 @@ describe GradebooksController do
     ]
     end
   end
+  
+  describe '#external_tool_detail' do
+    let(:tool) do
+      {
+        name: 'test lti',
+        placements: {
+          post_grades: {
+            canvas_launch_url: 'http://example.com/lti/post_grades',
+            launch_width: 100,
+            launch_height: 100
+          }
+        }
+      }
+    end
+    
+    it 'maps a tool to launch details' do
+      expect(@controller.external_tool_detail(tool)).to eql(
+        data_url: 'http://example.com/lti/post_grades',
+        name: 'test lti',
+        type: :lti,
+        data_width: 100,
+        data_height: 100
+      )
+    end
+  end
 end

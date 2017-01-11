@@ -125,7 +125,9 @@ define [
       $('li.external-tools-dialog > a[data-url], button.external-tools-dialog').on 'click keyclick', (event) ->
         postGradesDialog = new PostGradesFrameDialog({
           returnFocusTo: $('#post_grades'),
-          baseUrl: $(event.target).attr('data-url')
+          baseUrl: $(event.target).attr('data-url'),
+          launchHeight: $(event.target).attr('data-height'),
+          launchWidth: $(event.target).attr('data-width'),
         })
         postGradesDialog.open()
 

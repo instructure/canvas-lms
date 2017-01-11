@@ -41,7 +41,11 @@
               <% @post_grades_tools.each do |tool| %>
                 <% case tool[:type] %>
                 <% when :lti %>
-                  <li class="external-tools-dialog"><a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:data_url]%>"><%= tool[:name]%></a></li>
+                  <li class="external-tools-dialog">
+                    <a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:data_url]%>" data-width="<%= tool[:data_width]%>" data-height="<%= tool[:data_height]%>">
+                      <%= tool[:name]%>
+                    </a>
+                  </li>
                 <% when :post_grades %>
                   <li class="post-grades-placeholder in-menu"></li>
                 <% end %>
@@ -50,7 +54,7 @@
           <% elsif @post_grades_tools.count == 1 %>
             <% case @post_grades_tools[0][:type] %>
             <% when :lti %>
-            <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-url="<%= @post_grades_tools[0][:data_url]%>"><%= @post_grades_tools[0][:name]%></button>
+            <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-url="<%= @post_grades_tools[0][:data_url]%>" data-width="<%= @post_grades_tools[0][:data_width]%>" data-height="<%= @post_grades_tools[0][:data_height]%>"><%= @post_grades_tools[0][:name]%></button>
             <% when :post_grades %>
             <span class="post-grades-placeholder"></span>
             <% end %>
@@ -113,9 +117,11 @@
               <% @post_grades_tools.each do |tool| %>
                 <% case tool[:type] %>
                 <% when :lti %>
-                  <li class="external-tools-dialog"><a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:data_url]%>"><%= tool[:name]%></a></li>
+                <li class="external-tools-dialog">
+                  <a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:data_url]%>" data-width="<%= tool[:data_width]%>" data-height="<%= tool[:data_height]%>"><%= tool[:name]%></a>
+                </li>
                 <% when :post_grades %>
-                  <li class="post-grades-placeholder in-menu"></li>
+                <li class="post-grades-placeholder in-menu"></li>
                 <% end %>
               <% end %>
             <% end %>
