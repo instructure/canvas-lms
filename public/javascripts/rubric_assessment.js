@@ -21,13 +21,13 @@ define([
   'str/htmlEscape',
   'compiled/str/TextHelper',
   'compiled/util/round',
+  'jsx/shared/helpers/numberHelper',
   'jquery.instructure_forms' /* fillFormData */,
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(I18n, $, htmlEscape, TextHelper, round) {
-
+], function (I18n, $, htmlEscape, TextHelper, round, numberHelper) {
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 window.rubricAssessment = {
   init: function(){
@@ -39,7 +39,7 @@ window.rubricAssessment = {
       })
       .delegate(".long_description_link", 'click', function(event) {
         event.preventDefault();
-        if(!$(this).parents(".rubric").hasClass('editing')) {
+        if (!$(this).parents('.rubric').hasClass('editing')) {
           var data = $(this).parents(".criterion").getTemplateData({textValues: ['long_description', 'description']}),
               is_learning_outcome = $(this).parents(".criterion").hasClass("learning_outcome_criterion");
           $("#rubric_long_description_dialog")
@@ -53,7 +53,7 @@ window.rubricAssessment = {
         }
       })
       .delegate(".criterion .saved_custom_rating", 'change', function() {
-        if($(this).parents(".rubric").hasClass('assessing')) { 
+        if ($(this).parents('.rubric').hasClass('assessing')) {
           var val = $(this).val();
           if(val && val.length > 0) {
             $(this).parents(".custom_ratings_entry").find(".custom_rating_field").val(unescape(val));
@@ -106,11 +106,13 @@ window.rubricAssessment = {
           }
           var total = 0;
           $obj.parents(".rubric").find(".criterion:visible:not(.ignore_criterion_for_scoring) .criterion_points").each(function() {
-            var val = parseFloat($(this).val(), 10);
-            if(isNaN(val)) { val = 0; }
-            total += val;
+            var criterionPoints = numberHelper.parse($(this).val(), 10);
+            if (isNaN(criterionPoints)) {
+              criterionPoints = 0;
+            }
+            total += criterionPoints;
           });
-          total = round(total, round.DEFAULT)
+          total = I18n.n(round(total, round.DEFAULT))
           $obj.parents(".rubric").find(".rubric_total").text(total);
         }
       });
@@ -140,7 +142,7 @@ window.rubricAssessment = {
       $rubric_criterion_comments_dialog.find(".criterion_description").focus();
     });
 
-    $rubric_criterion_comments_dialog.find(".save_button").click(function(event) { 
+    $rubric_criterion_comments_dialog.find('.save_button').click(function () {
       var comments   = $rubric_criterion_comments_dialog.find("textarea.criterion_comments").val(),
           $criterion = $rubric_criterion_comments_dialog.data('current_rating');
       if($criterion) {
@@ -174,7 +176,7 @@ window.rubricAssessment = {
           $ratingsContainers.css('height', (maxHeight - 10) + 'px');
         }
       });
-      $("html,body").scrollTop(scrollTop); 
+      $('html,body').scrollTop(scrollTop);
     }
   },
 
@@ -186,7 +188,7 @@ window.rubricAssessment = {
     $rubric.find(".criterion:not(.blank)").each(function() {
       var id = $(this).attr('id');
       var pre = "rubric_assessment[" + id + "]";
-      var points = $(this).find(".criterion_points").val();
+      var points = numberHelper.parse($(this).find('.criterion_points').val());
       data[pre + "[points]"] = !isNaN(points) ? points : undefined
       if($(this).find(".rating.selected")) {
         data[pre + "[description]"] = $(this).find(".rating.selected .description").text();
@@ -269,7 +271,10 @@ window.rubricAssessment = {
         $criterion
           .find(".custom_rating_field").val(comments).end()
           .find(".custom_rating_comments").html(comments_html).end()
-          .find(".criterion_points").val(rating.points).change().end()
+          .find('.criterion_points')
+          .val(I18n.n(rating.points))
+          .change()
+          .end()
           .find(".criterion_rating_points_holder").showIf(rating.points || rating.points === 0).end()
           .find(".criterion_rating_points").text(rating.points).end()
           .find(".custom_rating").text(comments).end()
@@ -285,7 +290,7 @@ window.rubricAssessment = {
           total += rating.points;
         }
       }
-      total = round(total, round.DEFAULT)
+      total = I18n.n(round(total, round.DEFAULT));
       $rubric.find(".rubric_total").text(total);
     }
   },
@@ -302,7 +307,9 @@ window.rubricAssessment = {
         $rubricSummary.find("#criterion_" + rating.criterion_id)
           .find(".rating").hide().end()
           .find(".rating_" + rating.id).show().end()
-          .find(".criterion_points").text(rating.points).end()
+          .find('.criterion_points')
+          .text(I18n.n(rating.points))
+          .end()
           .find(".ignore_for_scoring").showIf(rating.ignore_for_scoring);
         if(ratingHasScore(rating) && !$rubricSummary.hasClass('free_form')){
           $rubricSummary.find("#criterion_" + rating.criterion_id)
@@ -315,7 +322,7 @@ window.rubricAssessment = {
           total += rating.points;
         }
       }
-      total = round(total, round.DEFAULT)
+      total = I18n.n(round(total, round.DEFAULT));
       $rubricSummary.show().find(".rubric_total").text(total);
       $rubricSummary.closest(".edit").show();
     }

@@ -13,9 +13,14 @@
 <% end %>
 
 <% if assignment.grading_type == "points" %>
-  <%= t('#gradebooks.out_of_points_possible', "out of %{points_possible}", :points_possible => round_if_whole(assignment.points_possible)) %>
+  <%=
+    t(
+      "out of %{points_possible}",
+      points_possible: I18n.n(round_if_whole(assignment.points_possible))
+    )
+  %>
 <% elsif  assignment.grading_type != "gpa_scale" %>
-  (<span class="score">&nbsp;</span> / <%= round_if_whole(assignment.points_possible) %>)
+  (<span class="score">&nbsp;</span> / <%= I18n.n(round_if_whole(assignment.points_possible)) %>)
 <% end %>
 
 </label>
