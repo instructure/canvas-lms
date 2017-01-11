@@ -5432,7 +5432,7 @@ en-GB:
       yesterday: Yesterday
     formats: 
       date_at_time: "%-d %b at %k:%M"
-      default: "%Y-%m-%d"
+      default: "%d-%m-%Y"
       full: "%-d %b %Y %-k:%M"
       full_with_weekday: "%a, %-d %b %Y %-k:%M"
       long: "%-d %B %Y"
