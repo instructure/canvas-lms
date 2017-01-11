@@ -78,7 +78,7 @@ define([
 
   const personReadyToEnrollShape = {
     user_name: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
+    email: PropTypes.string,
     address: PropTypes.string,
     account_name: PropTypes.string,
     account_id: PropTypes.number,

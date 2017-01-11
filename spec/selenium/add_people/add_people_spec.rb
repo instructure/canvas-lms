@@ -51,7 +51,7 @@ describe "add_people" do
       # there should be 1 row in the missing table (baz)
       expect(ff('.addpeople__peoplevalidationissues tbody tr')).to have_size(1)
 
-      # force next button into view, then click it
+      # click the next button
       f("#addpeople_next").click
 
       # there should be 2 rows in the ready to add table (foo, bar)
@@ -65,6 +65,38 @@ describe "add_people" do
 
       # there should be 2 more people in this course
       expect(ff("tbody.collectionViewItems tr")).to have_size(enrollee_count + 2)
+    end
+
+    it "should tell our user when not adding any users to the course" do
+        get "/courses/#{@course.id}/users"
+
+        # open the dialog
+        f('a#addUsers').click
+        expect(f(".addpeople")).to be_displayed
+
+        # search for some gibberish
+        replace_content(f(".addpeople__peoplesearch textarea"), "jibberish")
+
+        # click next button
+        f("#addpeople_next").click
+
+        # the validation issues panel is displayed
+        expect(f(".addpeople__peoplevalidationissues")).to be_displayed
+
+        # click the next button
+        f("#addpeople_next").click
+
+        # the people ready panel is displayed
+        people_ready_panel = f('.addpeople__peoplereadylist')
+        expect(people_ready_panel).to be_displayed
+
+        # no table
+        tables = find_all('.addpeople__peoplereadylist table')
+        expect(tables).to have_size(0)
+
+        # the message_user_path
+        msg = fj(".addpeople__peoplereadylist:contains('No users were selected to add to the course')")
+        expect(msg).to be_displayed
     end
   end
 end
