@@ -5385,8 +5385,8 @@ de:
     abbr_month_names: 
       - ~
       - Jan
-      - Febr
-      - Mrz
+      - Feb
+      - März
       - Apr
       - Mai
       - Jun
@@ -11430,9 +11430,9 @@ de:
         strip_insignificant_zeros: false
         unit: $
     format: 
-      delimiter: ","
+      delimiter: "."
       precision: 3
-      separator: "."
+      separator: ","
       significant: false
       strip_insignificant_zeros: false
     human: 
