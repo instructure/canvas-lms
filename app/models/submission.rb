@@ -257,12 +257,10 @@ class Submission < ActiveRecord::Base
         (
           self.assignment.context.student_enrollments.where(
             user_id: user,
-            associated_user_id: self.user,
             workflow_state: 'active'
           ).exists?  ||
           self.assignment.context.teacher_enrollments.where(
             user_id: user,
-            associated_user_id: self.user,
             workflow_state: 'active'
           ).exists?
         )
