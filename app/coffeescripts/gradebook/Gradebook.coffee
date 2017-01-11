@@ -707,10 +707,10 @@ define [
         letterGrade = GradingSchemeHelper.scoreToGrade(percentage, @options.grading_standard)
 
       templateOpts =
-        score: round(val.score, round.DEFAULT)
-        possible: round(val.possible, round.DEFAULT)
+        score: I18n.n(round(val.score, round.DEFAULT))
+        possible: I18n.n(round(val.possible, round.DEFAULT))
         letterGrade: letterGrade
-        percentage: percentage
+        percentage: I18n.n(round(percentage, round.DEFAULT), percentage: true)
       if columnDef.type == 'total_grade'
         templateOpts.warning = @totalGradeWarning
         templateOpts.lastColumn = true

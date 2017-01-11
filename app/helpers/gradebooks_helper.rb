@@ -121,9 +121,13 @@ module GradebooksHelper
     when 'pass_fail'
       pass_fail_icon(score, grade)
     when 'percent'
-      grade
+      if grade.nil?
+        '-'
+      else
+        I18n.n grade.to_f, percentage: true
+      end
     when 'points'
-      round_if_whole(score.to_f.round(2))
+      I18n.n round_if_whole(score.to_f.round(2))
     when 'gpa_scale', 'letter_grade'
       nil
     end

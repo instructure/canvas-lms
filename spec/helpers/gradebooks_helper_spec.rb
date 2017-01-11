@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe GradebooksHelper do
-  FakeAssignment = Struct.new(:grading_type, :quiz).freeze
+  FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible).freeze
   FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
                               :workflow_state, :excused?).freeze
   FakeQuiz = Struct.new(:survey, :anonymous_submissions) do
@@ -184,7 +184,7 @@ describe GradebooksHelper do
       context 'and the assignment is a percentage grade' do
         it 'must output the percentage' do
           assignment.grading_type = 'percent'
-          submission.grade = '42.5%'
+          submission.grade = '42.5'
           expect(score_display).to eq '42.5%'
         end
       end
@@ -194,7 +194,7 @@ describe GradebooksHelper do
           assignment.grading_type = 'points'
           submission.grade = '42.3542'
           submission.score = 42.3542
-          expect(score_display).to eq 42.35
+          expect(score_display).to eq '42.35'
         end
       end
 

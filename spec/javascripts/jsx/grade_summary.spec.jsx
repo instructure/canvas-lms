@@ -17,12 +17,13 @@
  */
 
 define([
+  'i18n!gradebook',
   'lodash',
   'jquery',
   'helpers/fakeENV',
   'jsx/gradebook/CourseGradeCalculator',
   'grade_summary'
-], (_, $, fakeENV, CourseGradeCalculator, grade_summary) => { // eslint-disable-line camelcase
+], (i18n, _, $, fakeENV, CourseGradeCalculator, grade_summary) => { // eslint-disable-line camelcase
   function createAssignmentGroups () {
     return [
       { id: '301', assignments: [{ id: '201', muted: false }, { id: '202', muted: true }] },
@@ -162,6 +163,72 @@ define([
     grade_summary.calculateTotals(this.calculatedGrades, this.currentOrFinal, this.groupWeightingScheme);
 
     notOk(this.screenReaderFlashMessageExclusive.called);
+  });
+
+  test('displays grades localized', function () {
+    const sandbox = sinon.sandbox.create();
+    sandbox.stub(i18n, 'n', function () { return 'I18n number'; });
+    grade_summary.calculateTotals(this.calculatedGrades, this.currentOrFinal, this.groupWeightingScheme);
+
+    notOk($('.score_teaser').text().indexOf('I18n number') === -1);
+
+    sandbox.restore();
+  });
+
+  module('grade_summary.canBeConvertedToGrade');
+
+  test('returns false when possible is nonpositive', function () {
+    notOk(grade_summary.canBeConvertedToGrade(1, 0));
+  });
+
+  test('returns false when score is NaN', function () {
+    notOk(grade_summary.canBeConvertedToGrade(NaN, 1));
+  });
+
+  test('returns true when score is a number and possible is positive', function () {
+    ok(grade_summary.canBeConvertedToGrade(1, 1));
+  });
+
+  module('grade_summary.calculatePercentGrade');
+
+  test('returns properly computed and rounded value', function () {
+    const percentGrade = grade_summary.calculatePercentGrade(1, 3);
+    ok(percentGrade === 33.33);
+  });
+
+  module('grade_summary.formatPercentGrade');
+
+  test('returns i18ned number value', function () {
+    const sandbox = sinon.sandbox.create();
+    sandbox.stub(i18n, 'n', function () { return 'formatted number'; });
+    const formattedPercentGrade = grade_summary.formatPercentGrade(33.33);
+
+    ok(formattedPercentGrade === 'formatted number');
+
+    sandbox.restore();
+  });
+
+  module('grade_summary.calculateGrade');
+
+  test('returns N/A when canBeConvertedToGrade returns false', function () {
+    const sandbox = sinon.sandbox.create();
+    sandbox.stub(grade_summary, 'canBeConvertedToGrade', function () { return false; });
+    const calculatedGrade = grade_summary.calculateGrade(1, 1);
+
+    ok(calculatedGrade === 'N/A');
+
+    sandbox.restore();
+  });
+
+  test('composes formatPercentGrade and calculatePercentGrade', function () {
+    const sandbox = sinon.sandbox.create();
+    sandbox.stub(grade_summary, 'calculatePercentGrade', function () { return 'percentGrade'; });
+    sandbox.stub(grade_summary, 'formatPercentGrade', function (val) { return `formatted:${val}`; });
+    const calculatedGrade = grade_summary.calculateGrade(1, 1);
+
+    ok(calculatedGrade === 'formatted:percentGrade');
+
+    sandbox.restore();
   });
 
   module('grade_summary.listAssignmentGroupsForGradeCalculation', {
