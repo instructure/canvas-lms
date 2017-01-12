@@ -59,3 +59,47 @@
     }
   }
 }
+.duplicate_div{
+  float: left;
+  display: inline-block;
+  margin: 0 5px;
+  line-height: 38px;
+  width: 35px;
+  text-align: right;
+}
+.duplicate_td{
+  vertical-align: top;
+  padding-left: 20px;
+  min-width: 300px;
+}
+#duplicate_interval{
+  width: 50px;
+  float: left;
+  display: inline-block;
+  margin: 0 5px;
+}
+.duplicate_for_div{
+  float: left;
+  display: inline-block;
+  margin: 0 5px;
+  line-height: 38px;
+  width: 35px;
+  text-align: right;
+}
+#duplicate_count{
+  width: 50px;
+  float: left;
+  display: inline-block;
+  margin: 0 5px;
+}
+.occurences_div{
+  float: left;
+  display: inline-block;
+  margin: 0 5px;
+  line-height: 38px;
+}
+.duplicate_tooltip_td{
+  vertical-align: top;
+  padding-left: 20px;
+  width: 35px;
+}

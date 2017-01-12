@@ -118,6 +118,51 @@ describe ContentMigration do
       expect(@copy_to.attachments.where(migration_id: mig_id(att1)).first.usage_rights).to eq(usage_rights)
     end
 
+    it "should preserve locked date restrictions on export/import" do
+      att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att.unlock_at = 2.days.from_now
+      att.lock_at = 3.days.from_now
+      att.save!
+
+      run_export_and_import
+
+      copy = @copy_to.attachments.where(migration_id: mig_id(att)).first
+      expect(copy.unlock_at.to_i).to eq att.unlock_at.to_i
+      expect(copy.lock_at.to_i).to eq att.lock_at.to_i
+    end
+
+    it "should preserve terrible folder names on export/import" do
+      root = Folder.root_folders(@copy_from).first
+      sub = root.sub_folders.create!(:name => ".sadness", :context => @copy_from)
+
+      att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => sub, :context => @copy_from)
+
+      run_export_and_import
+
+      copy_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
+      expect(copy_att.filename).to eq "1.txt"
+      copy_sub = copy_att.folder
+      expect(copy_sub.name).to eq ".sadness"
+    end
+
+    it "should preserve module items for hidden files on course copy" do
+      att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att.hidden = true
+      att.save!
+
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag = mod.add_item({:id => att.id, :type => 'attachment'})
+
+      run_course_copy
+
+      copy_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
+      expect(copy_att.hidden).to be_truthy
+
+      copy_mod = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+      copy_tag = copy_mod.content_tags.first
+      expect(copy_tag.content).to eq copy_att
+    end
+
     it "should preserve usage rights on export/import" do
       att1 = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att2 = Attachment.create!(:filename => '2.txt', :uploaded_data => StringIO.new('2'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)

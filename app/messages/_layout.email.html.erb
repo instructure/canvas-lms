@@ -42,8 +42,8 @@
             <td style="padding: 0; border-collapse: collapse;">
               <table cellpadding="0" cellspacing="0" align="center" border="0">
                 <tr style="font-size: 11px; color: #a8b9c6; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top">
-                  <% if content(:footer_link) %>
-                    <td width="375" align="right">
+                  <% if !content(:footer_link).blank? %>
+                    <td width="375" align="center">
                     <%= content(:footer_link).html_safe %></td>
                     <td width="50" align="center"> | </td>
                   <% end %>

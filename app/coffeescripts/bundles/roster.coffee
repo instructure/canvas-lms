@@ -37,7 +37,7 @@ require [
 ], (I18n, {Model}, CreateUserList, Role, CreateUsersView, RoleSelectView, rosterUsersTemplate, RosterUserCollection, RolesCollection, SectionCollection, GroupCategoryCollection, InputFilterView, PaginatedCollectionView, RosterUserView, RosterView, RosterTabsView, ResendInvitationsView, $) ->
 
   fetchOptions =
-    include: ['avatar_url', 'enrollments', 'email', 'observed_users']
+    include: ['avatar_url', 'enrollments', 'email', 'observed_users', 'can_be_removed', 'custom_links']
     per_page: 50
   users = new RosterUserCollection null,
     course_id: ENV.context_asset_string.split('_')[1]
@@ -53,6 +53,7 @@ require [
     itemViewOptions:
       course: ENV.course
     canViewLoginIdColumn: ENV.permissions.manage_admin_users or ENV.permissions.manage_students
+    canViewSisIdColumn: ENV.permissions.read_sis
     buffer: 1000
     template: rosterUsersTemplate
   roleSelectView = new RoleSelectView

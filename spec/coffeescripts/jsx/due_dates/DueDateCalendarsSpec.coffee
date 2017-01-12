@@ -20,7 +20,8 @@ define [
         overrides: [{get: (->), set:(->)}]
         sections: {}
 
-      @dueDateCalendars = React.render(DueDateCalendars(props), $('<div>').appendTo('body')[0])
+      DueDateCalendarsElement = React.createElement(DueDateCalendars, props)
+      @dueDateCalendars = React.render(DueDateCalendarsElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()

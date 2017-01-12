@@ -1,10 +1,8 @@
-/** @jsx React.DOM */
-
 define([
   'i18n!student_groups',
   'underscore',
   'jquery',
-  'old_unsupported_dont_use_react',
+  'react',
   'compiled/models/Group',
   'compiled/collections/UserCollection',
   'compiled/collections/ContextGroupCollection',
@@ -44,7 +42,7 @@ define([
         $dialog.dialog('close');
       };
 
-      React.renderComponent(<ManageGroupDialog userCollection={this.state.userCollection}
+      React.render(<ManageGroupDialog userCollection={this.state.userCollection}
                                                checked={_.map(group.users, (u) => u.id)}
                                                groupId={group.id}
                                                name={group.name}
@@ -73,7 +71,7 @@ define([
         $dialog.dialog('close');
       };
 
-      React.renderComponent(<NewGroupDialog userCollection={this.state.userCollection}
+      React.render(<NewGroupDialog userCollection={this.state.userCollection}
                                             createGroup={this.createGroup}
                                             closeDialog={closeDialog}
                                             loadMore={() => this._loadMore(this.state.userCollection)} />, $dialog[0])
@@ -145,10 +143,11 @@ define([
     },
 
     leave(group) {
-      $.ajaxJSON(`/api/v1/groups/${group.id}/memberships/self`,
+      var dfd = $.ajaxJSON(`/api/v1/groups/${group.id}/memberships/self`,
                  'DELETE',
                  {},
                  () => this._onLeave(group));
+      $(React.findDOMNode(this.refs.panel)).disableWhileLoading(dfd);
     },
 
 
@@ -166,17 +165,18 @@ define([
     },
 
     join(group) {
-      $.ajaxJSON(`/api/v1/groups/${group.id}/memberships`,
+      var dfd = $.ajaxJSON(`/api/v1/groups/${group.id}/memberships`,
                  'POST',
                  {user_id: 'self'},
                  () => this._onJoin(group),
                  // This is making an assumption that when the current user can't join a group it is likely beacuse a student
                  // from another section joined that group after the page loaded for the current user
                  () => this._extendAttribute(this.state.groupCollection.get(group.id), "permissions", {join: false}));
+      $(React.findDOMNode(this.refs.panel)).disableWhileLoading(dfd);
     },
 
     _filter(group) {
-      filter = this.state.filter.toLowerCase();
+      var filter = this.state.filter.toLowerCase();
       return (!filter ||
               group.name.toLowerCase().indexOf(filter) > -1 ||
               group.users.some(u => u.name.toLowerCase().indexOf(filter) > -1));
@@ -211,7 +211,7 @@ define([
             <div className="pull-right group-categories-actions">
               {newGroupButton}
             </div>
-            <div className="roster-tab tab-panel">
+            <div className="roster-tab tab-panel" ref="panel">
               <Filter onChange={(e) => this.setState({filter: e.target.value})} />
               <PaginatedGroupList loading={this.state.groupCollection.fetchingNextPage}
                                   groups={filteredGroups}

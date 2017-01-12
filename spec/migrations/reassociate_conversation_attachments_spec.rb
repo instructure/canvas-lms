@@ -51,11 +51,11 @@ describe 'ReassociateConversationAttachments' do
 
       u1.reload
       expect(u1.folders.map(&:name).sort).to eql ["conversation attachments", "my files"]
-      expect(u1.conversation_attachments_folder.attachments).to eql [a1]
+      expect(u1.conversation_attachments_folder.attachments.to_a).to match_array [a1]
       cm1.reload
       a1.reload
-      expect(cm1.attachment_ids).to eql a1.id.to_s
-      expect(cm1.attachments).to eql [a1]
+      expect(cm1.attachment_ids).to eql [a1.id]
+      expect(cm1.attachments.to_a).to match_array [a1]
       expect(a1.context).to eql u1
       expect(a1.folder).to eql u1.conversation_attachments_folder
 
@@ -65,8 +65,8 @@ describe 'ReassociateConversationAttachments' do
       cm2.reload
       a2.reload
       a3.reload
-      expect(cm2.attachment_ids.split(',').map(&:to_i).sort).to eql [a2.id, a3.id]
-      expect(cm2.attachments).to eql [a2, a3]
+      expect(cm2.attachment_ids.sort).to eql [a2.id, a3.id]
+      expect(cm2.attachments.to_a).to match_array [a2, a3]
       expect(a2.context).to eql u2
       expect(a2.folder).to eql u2.conversation_attachments_folder
       expect(a3.context).to eql u2

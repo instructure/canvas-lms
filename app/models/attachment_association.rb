@@ -18,7 +18,6 @@
 
 class AttachmentAssociation < ActiveRecord::Base
   belongs_to :attachment
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['ConversationMessage', 'Submission', 'Course', 'Group']
+  belongs_to :context, polymorphic: [:conversation_message, :submission, :course, :group]
   attr_accessible :attachment, :context
 end

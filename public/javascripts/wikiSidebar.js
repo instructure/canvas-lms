@@ -44,17 +44,23 @@ define([
       $wiki_sidebar_select_folder_dialog,
       treeItemCount=0;
 
-  // unlikely, but there's a chance this domready call will happen after other
-  // scripts try to call methods on wikiSidebar, need to re-architect this a bit
-  $(function(){
-    $editor_tabs = $("#editor_tabs");
-    $tree1 = $editor_tabs.find('ul#tree1');
-    $image_list = $editor_tabs.find('#editor_tabs_4 .image_list');
-    $course_show_secondary = $("#course_show_secondary");
-    $sidebar_upload_image_form = $("form#sidebar_upload_image_form");
-    $sidebar_upload_file_form = $("form#sidebar_upload_file_form");
-    $wiki_sidebar_select_folder_dialog = $("#wiki_sidebar_select_folder_dialog");
-  });
+  // cache all the above jquery selections so we're not doing it over and over
+  // (and can confirm they worked with return value). at a minimum, the cache
+  // will be ensured during init, which should be the first call that needs
+  // them (if you're calling e.g. show/hide before init, shame on you).
+  var cacheElements = function() {
+    // don't redo the work if they've already been loaded
+    if ($editor_tabs === undefined || $editor_tabs.length == 0) {
+      $editor_tabs = $("#editor_tabs");
+      $tree1 = $editor_tabs.find('ul#tree1');
+      $image_list = $editor_tabs.find('#editor_tabs_4 .image_list');
+      $course_show_secondary = $("#course_show_secondary");
+      $sidebar_upload_image_form = $("form#sidebar_upload_image_form");
+      $sidebar_upload_file_form = $("form#sidebar_upload_file_form");
+      $wiki_sidebar_select_folder_dialog = $("#wiki_sidebar_select_folder_dialog");
+    }
+    return $editor_tabs.length > 0;
+  }
 
   var wikiSidebar = {
     // Generate a new tree item id. Type can be either 'file' or 'folder'
@@ -252,6 +258,12 @@ define([
       }
     },
     init: function() {
+      // cache the elements if they haven't been yet. if they can't be cached
+      // yet, warn about it
+      if (!cacheElements()) {
+        console.warn("called wikiSidebar.init() before $('#editor_tabs') was on the page");
+      }
+
       wikiSidebar.inited = true;
 
       UsageRights.render('#usage-rights');

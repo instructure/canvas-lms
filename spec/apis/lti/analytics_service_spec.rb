@@ -99,8 +99,6 @@ describe LtiApiController, type: :request do
         expect(page_view.url).to eq body[:object][:id]
         expect(page_view.interaction_seconds).to eq 600
       end
-
-      after { Setting.set 'enable_page_views', 'false' }
     end
 
     it "should handle requests without durations" do
@@ -191,8 +189,6 @@ describe LtiApiController, type: :request do
         expect(page_view.url).to eq body['object']['@id']
         expect(page_view.interaction_seconds).to eq 600
       end
-
-      after { Setting.set 'enable_page_views', 'false' }
     end
 
     it "should handle requests without durations" do

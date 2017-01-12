@@ -227,7 +227,8 @@
 #         "question_types": {
 #           "description": "List of question types in the quiz",
 #           "example": ["mutliple_choice", "essay"],
-#           "type": "array"
+#           "type": "array",
+#           "items": {"type": "string"}
 #         }
 #       }
 #     }
@@ -277,10 +278,10 @@
 #
 class Quizzes::QuizzesApiController < ApplicationController
   include Api::V1::Quiz
-  include Filters::Quizzes
+  include ::Filters::Quizzes
 
   before_filter :require_context
-  before_filter :require_quiz, :only => [:show, :update, :destroy, :reorder]
+  before_filter :require_quiz, :only => [:show, :update, :destroy, :reorder, :validate_access_code]
   before_filter :check_differentiated_assignments, :only => [:show]
 
   # @API List quizzes in a course
@@ -291,7 +292,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   The partial title of the quizzes to match and return.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/quizzes \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/quizzes \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [Quiz]
@@ -306,14 +307,7 @@ class Quizzes::QuizzesApiController < ApplicationController
       value = Rails.cache.fetch(cache_key) do
         api_route = api_v1_course_quizzes_url(@context)
         scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
-
-        if @context.feature_enabled?(:differentiated_assignments)
-          scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
-        end
-
-        unless @context.grants_right?(@current_user, session, :manage_assignments)
-          scope = scope.available
-        end
+        scope = Quizzes::ScopedToUser.new(@context, @current_user, scope).scope
 
         if accepts_jsonapi?
           {
@@ -390,13 +384,13 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   until they submit the last attempt for the quiz.
   #   Defaults to false.
   #
-  # @argument quiz[show_correct_answers_at] [Timestamp]
+  # @argument quiz[show_correct_answers_at] [DateTime]
   #   Only valid if show_correct_answers=true
   #   If set, the correct answers will be visible by students only after this
   #   date, otherwise the correct answers are visible once the student hands in
   #   their quiz submission.
   #
-  # @argument quiz[hide_correct_answers_at] [Timestamp]
+  # @argument quiz[hide_correct_answers_at] [DateTime]
   #   Only valid if show_correct_answers=true
   #   If set, the correct answers will stop being visible once this date has
   #   passed. Otherwise, the correct answers will be visible indefinitely.
@@ -437,15 +431,15 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   For no IP filter restriction, set to null.
   #   Defaults to null.
   #
-  # @argument quiz[due_at] [Timestamp]
+  # @argument quiz[due_at] [DateTime]
   #   The day/time the quiz is due.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
-  # @argument quiz[lock_at] [Timestamp]
+  # @argument quiz[lock_at] [DateTime]
   #   The day/time the quiz is locked for students.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
-  # @argument quiz[unlock_at] [Timestamp]
+  # @argument quiz[unlock_at] [DateTime]
   #   The day/time the quiz is unlocked for students.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
@@ -463,7 +457,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   #
   # @returns Quiz
   def create
-    if authorized_action(@context.quizzes.scoped.new, @current_user, :create)
+    if authorized_action(@context.quizzes.temp_record, @current_user, :create)
       @quiz = @context.quizzes.build
       update_api_quiz(@quiz, params)
       unless @quiz.new_record?
@@ -537,6 +531,26 @@ class Quizzes::QuizzesApiController < ApplicationController
     end
   end
 
+  # @API Validate quiz access code
+  # @beta
+  #
+  # Accepts an access code and returns a boolean indicating whether that access code is correct
+  #
+  # @argument access_code [Required, String]
+  #   The access code being validated
+  #
+  # @returns boolean
+  def validate_access_code
+    if authorized_action(@quiz, @current_user, :read)
+      correct = if @quiz.access_code.present?
+                  @quiz.access_code == params[:access_code]
+                else
+                  false
+                end
+      render json: correct
+    end
+  end
+
   private
 
   def render_json
@@ -548,7 +562,6 @@ class Quizzes::QuizzesApiController < ApplicationController
   end
 
   def check_differentiated_assignments
-    return true unless da_on = @context.feature_enabled?(:differentiated_assignments)
-    return render_unauthorized_action if @current_user && !@quiz.visible_to_user?(@current_user, differentiated_assignments: da_on)
+    return render_unauthorized_action if @current_user && !@quiz.visible_to_user?(@current_user)
   end
 end

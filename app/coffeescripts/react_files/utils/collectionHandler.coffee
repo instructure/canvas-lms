@@ -1,7 +1,7 @@
 #
 # Handles navigation through a collection.
 #
-define [], ->
+define ['Backbone'], (Backbone) ->
 
   CollectionHandler =
 

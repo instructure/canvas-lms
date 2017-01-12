@@ -1,14 +1,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "dashboard" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "as a student" do
     before (:each) do
       course_with_student_logged_in(:active_all => true)
     end
 
-    it "should display calendar events in the coming up list" do
+    it "should display calendar events in the coming up list", priority: "1", test_id: 216392 do
       calendar_event_model({
                                :title => "super fun party",
                                :description => 'celebrating stuff',
@@ -19,7 +19,7 @@ describe "dashboard" do
       expect(f('.events_list .event a')).to include_text(@event.title)
     end
 
-    it "should put locked graded discussions / quizzes in the coming up list only" do
+    it "should put locked graded discussions / quizzes in the coming up list only", priority: "1", test_id: 216393 do
       check_list_text = ->(list_element, text, should_have_text = true) do
         if should_have_text
           expect(list_element).to include_text(text)
@@ -38,22 +38,23 @@ describe "dashboard" do
       get "/"
 
       # No "To Do" list shown
-      expect(f('.right-side-list.to-do-list')).to be_nil
+      expect(f("#content")).not_to contain_css('.right-side-list.to-do-list')
       coming_up_list = f('.right-side-list.events')
 
       2.times { |i| check_list_text.call(coming_up_list, names[i]) }
     end
 
-    it "should display assignment in to do list" do
+    it "should display assignment in coming up list", priority: "1", test_id: 216394 do
       due_date = Time.now.utc + 2.days
       @assignment = assignment_model({:due_at => due_date, :course => @course})
       get "/"
-      expect(f('.events_list .event a')).to include_text(@assignment.title)
+      event = f('.events_list .event a')
+      expect(event).to include_text(@assignment.title)
       # use jQuery to get the text since selenium can't figure it out when the elements aren't displayed
-      expect(driver.execute_script("return $('.event a .tooltip_text').text()")).to match(@course.short_name)
+      expect(event).to include_text(@course.short_name)
     end
 
-    it "should display quiz submissions with essay questions as submitted in coming up list" do
+    it "should display quiz submissions with essay questions with points in coming up list", priority: "1", test_id: 216395 do
       quiz_with_graded_submission([:question_data => {:id => 31,
                                                       :name => "Quiz Essay Question 1",
                                                       :question_type => 'essay_question',
@@ -70,9 +71,7 @@ describe "dashboard" do
       @assignment.save!
 
       get "/"
-      keep_trying_until { expect(ffj(".events_list .event .tooltip_wrap").size).to be > 0 }
-      driver.execute_script("$('.events_list .event .tooltip_wrap, .events_list .event .tooltip_text').css('visibility', 'visible')")
-      expect(f('.events_list .event .tooltip_wrap')).to include_text 'submitted'
+      expect(f('.events_list .event-details')).to include_text '10 points'
     end
   end
 end

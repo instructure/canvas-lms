@@ -19,47 +19,42 @@
 module Api::V1::CalendarEvent
   include Api::V1::Json
   include Api::V1::Assignment
+  include Api::V1::Submission
   include Api::V1::AssignmentOverride
   include Api::V1::User
   include Api::V1::Course
   include Api::V1::Group
 
   def event_json(event, user, session, options={})
-    hash = if event.is_a?(CalendarEvent)
+    hash = if event.is_a?(::CalendarEvent)
       calendar_event_json(event, user, session, options)
     else
-      assignment_event_json(event, user, session)
+      assignment_event_json(event, user, session, options)
     end
     hash
   end
 
   def calendar_event_json(event, user, session, options={})
-    include = options[:include] || ['child_events']
+    excludes = options[:excludes] || []
+    include = options[:include]
+    include ||= excludes.include?('child_events') ? [] : ['child_events']
+
     context = (options[:context] || event.context)
+    duplicates = options[:duplicates] || []
     participant = nil
 
-    hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state google_calendar_id))
+    hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state comments google_calendar_id))
+    hash['type'] = 'event'
     if event.context_type == "CourseSection"
       hash['title'] += " (#{context.name})"
-      hash['description'] = api_user_content(event.description, event.context.course)
+      hash['description'] = api_user_content(event.description, event.context.course) unless excludes.include?('description')
     else
-      hash['description'] = api_user_content(event.description, context)
+      hash['description'] = api_user_content(event.description, context) unless excludes.include?('description')
     end
 
     appointment_group = options[:appointment_group]
     appointment_group ||= AppointmentGroup.find(options[:appointment_group_id]) if options[:appointment_group_id]
     appointment_group ||= event.appointment_group
-
-    if event.effective_context_code
-      if appointment_group
-        codes_for_user = appointment_group.context_codes_for_user(user)
-        hash['context_code'] = (event.effective_context_code.split(',') & codes_for_user).first
-        hash['effective_context_code'] = hash['context_code']
-      else
-        hash['effective_context_code'] = event.effective_context_code
-      end
-    end
-    hash['context_code'] ||= event.context_code
 
     # force it to load
     include_child_events = include.include?('child_events')
@@ -68,6 +63,26 @@ module Api::V1::CalendarEvent
     else
       hash["child_events_count"] = options[:child_events_count] || event.child_events.size
     end
+
+    if event.effective_context_code
+      if appointment_group && include_child_events
+        common_context_codes = common_ag_context_codes(appointment_group, user, event)
+        effective_context_code = (event.effective_context_code.split(',') & common_context_codes).first
+        if effective_context_code
+          hash['context_code'] = hash['effective_context_code'] = effective_context_code
+        else
+          # the teacher has no courses in common with the signups
+          include_child_events = false
+          hash["child_events"] = []
+          hash["child_events_count"] = 0
+          hash['effective_context_code'] = event.effective_context_code
+        end
+      else
+        hash['effective_context_code'] = event.effective_context_code
+      end
+    end
+    hash['context_code'] ||= event.context_code
+
     hash['parent_event_id'] = event.parent_calendar_event_id
     # events are hidden when section-specific events override them
     # but if nobody is logged in, no sections apply, so show the base event
@@ -92,6 +107,7 @@ module Api::V1::CalendarEvent
         participant = context.participant_for(user)
         participant_child_events = event.child_events_for(participant)
         hash['reserved'] = (Array === participant_child_events ? participant_child_events.present? : participant_child_events.exists?)
+        hash['reserve_comments'] = participant_child_events.map(&:comments).compact.join(", ")
         hash['reserve_url'] = api_v1_calendar_event_reserve_url(event, participant)
       else
         hash['reserve_url'] = api_v1_calendar_event_reserve_url(event, '{{ id }}')
@@ -109,7 +125,7 @@ module Api::V1::CalendarEvent
         events = can_read_child_events ? event.child_events.to_a : event.child_events_for(participant)
 
         # do some preloads
-        ActiveRecord::Associations::Preloader.new(events, :context).run
+        ActiveRecord::Associations::Preloader.new.preload(events, :context)
         if events.first.context.is_a?(User) && user_json_is_admin?(@context, user)
           user_json_preloads(events.map(&:context))
         end
@@ -132,24 +148,27 @@ module Api::V1::CalendarEvent
 
     hash['url'] = api_v1_calendar_event_url(event) if options.has_key?(:url_override) ? options[:url_override] || hash['own_reservation'] : event.grants_right?(user, session, :read)
     hash['html_url'] = calendar_url_for(options[:effective_context] || event.effective_context, :event => event)
+    hash['duplicates'] = duplicates
     hash
   end
 
-  def assignment_event_json(assignment, user, session)
+  def assignment_event_json(assignment, user, session, options={})
+    excludes = options[:excludes] || []
     hash = api_json(assignment, user, session, :only => %w(created_at updated_at title all_day all_day_date workflow_state))
-    hash['description'] = api_user_content(assignment.description, assignment.context)
+    hash['description'] = api_user_content(assignment.description, assignment.context) unless excludes.include?('description')
     hash['id'] = "assignment_#{assignment.id}"
-    hash['assignment'] = assignment_json(assignment, user, session, override_dates: false)
+    hash['type'] = 'assignment'
+
+    if excludes.include?('assignment')
+      hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
+    else
+      hash['assignment'] = assignment_json(assignment, user, session, override_dates: false, submission: options[:submission])
+      hash['html_url'] = hash['assignment']['html_url'] if hash['assignment'].include?('html_url')
+    end
     hash['context_code'] = assignment.context_code
     hash['start_at'] = hash['end_at'] = assignment.due_at
     hash['url'] = api_v1_calendar_event_url("assignment_#{assignment.id}")
-    hash['html_url'] = hash['assignment']['html_url'] if hash['assignment'].include?('html_url')
-    if assignment.assignment_overrides_filtered
-      hash['assignment_overrides'] = assignment.assignment_overrides_filtered.map { |o| assignment_override_json(o) }
-    #if assignment.applied_overrides.present?
-      #hash['assignment_overrides'] = assignment.applied_overrides.map { |o| assignment_override_json(o) }
-    #end
-    elsif assignment.applied_overrides.present?
+    if assignment.applied_overrides.present?
       hash['assignment_overrides'] = assignment.applied_overrides.map { |o| assignment_override_json(o) }
     end
     hash
@@ -176,7 +195,7 @@ module Api::V1::CalendarEvent
     if include.include?('appointments')
       if include.include?('child_events')
         all_child_events = group.appointments.map(&:child_events).flatten
-        ActiveRecord::Associations::Preloader.new(all_child_events, :context).run
+        ActiveRecord::Associations::Preloader.new.preload(all_child_events, :context)
         user_json_preloads(all_child_events.map(&:context)) if !all_child_events.empty? && all_child_events.first.context.is_a?(User) && user_json_is_admin?(@context, user)
       end
       hash['appointments'] = group.appointments.map { |event| calendar_event_json(event, user, session,
@@ -194,4 +213,28 @@ module Api::V1::CalendarEvent
   ensure
     @context = orig_context
   end
+
+  private
+
+  # find context codes shared by the viewing user and the user signed up,
+  # falling back on the viewing user's contexts if no users are signed up
+  def common_ag_context_codes(appointment_group, user, event)
+    codes_for_user = appointment_group.context_codes_for_user(user)
+
+    event_user = event.user || infer_user_from_child_events(event.child_events)
+    if event_user
+      codes_for_event_user = appointment_group.context_codes_for_user(event_user)
+      return codes_for_user & codes_for_event_user
+    end
+    codes_for_user
+  end
+
+  # for an AG in multiple courses, if all students signing up for a slot are in the same course,
+  # put the event on that course's calendar
+  def infer_user_from_child_events(child_events)
+    unique_user_ids = child_events.map(&:user_id).uniq
+    return child_events.first.user if unique_user_ids.length == 1
+    nil
+  end
+
 end

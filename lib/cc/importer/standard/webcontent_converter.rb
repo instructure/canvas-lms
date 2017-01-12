@@ -20,7 +20,15 @@ module CC::Importer::Standard
     include CC::Importer
 
     def create_file_map
+      new_assignments = []
       resources_by_type(WEBCONTENT, "associatedcontent").each do |res|
+        if res[:intended_use] == "assignment"
+          path = get_full_path(res[:href])
+          if path && File.exists?(path) && Attachment.mimetype(path) =~ /html/
+            new_assignments << {:migration_id => res[:migration_id], :description => File.read(path)}
+          end
+        end
+
         main_file = {}
         main_file[:migration_id] = res[:migration_id]
         main_file[:path_name] = res[:href]
@@ -52,6 +60,11 @@ module CC::Importer::Standard
           add_course_file(main_file, true)
         end
       end
+
+      new_assignments.each do |a|
+        a[:description] = replace_urls(a[:description])
+        @course[:assignments] << a
+      end
     end
 
     def package_course_files(file_map)
@@ -78,6 +91,5 @@ module CC::Importer::Standard
 
       File.expand_path(zip_file)
     end
-
   end
 end

@@ -1,25 +1,31 @@
-<% content_for :page_title, t(:edit_assignment, "Edit Assignment") %>
+<% if @assignment.title.nil? %>
+  <% content_for :page_title, t("Create Assignment") %>
+<% else %>
+  <% content_for :page_title, t("Edit Assignment") %>
+<% end %>
 <% content_for :right_side do %>
   <%= render "shared/wiki_sidebar" %>
 <% end %>
 
 <%
-  jammit_css :assignments, :assignments_edit, :tinymce
+  css_bundle :assignments, :assignments_edit, :tinymce
   js_bundle :assignment_edit
 %>
 
-<div id="edit_assignment_header" class="header-bar">
-</div>
-
+<% if ConditionalRelease::Service.enabled_in_context?(@context) %>
+<div id="edit_assignment_header-cr" class="header-bar"></div>
+<% else %>
+<div id="edit_assignment_header" class="header-bar"></div>
 <div id="edit_assignment_wrapper">
   <form id="edit_assignment_form" class="form-horizontal bootstrap-form">
   </form>
 </div>
+<% end %>
 
 <%= render "groups/add_group_category" %>
 <%= render "shared/select_content_dialog", :only => [:external_tools], lti_app_placements: [Lti::ResourcePlacement::ASSIGNMENT_SELECTION, Lti::ResourcePlacement::RESOURCE_SELECTION] %>
 <div id="edit_letter_grades_form" style="display: none;">
-  <%= render partial: "shared/grading_standard", object: @assignment.grading_standard %>
+  <%= render partial: "shared/grading_standard", object: @assignment.grading_standard, locals: {read_only: false} %>
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
 </div>

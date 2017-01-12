@@ -1,18 +1,15 @@
 shared_examples_for "question bank basic tests" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   before (:each) do
     admin_logged_in
     get url
   end
 
   def add_question_bank(title = 'bank 1')
-    question_bank_title = keep_trying_until do
-      f(".add_bank_link").click
-      wait_for_ajaximations
-      question_bank_title = f("#assessment_question_bank_title")
-      expect(question_bank_title).to be_displayed
-      question_bank_title
-    end
+    f(".add_bank_link").click
+    wait_for_ajaximations
+    question_bank_title = f("#assessment_question_bank_title")
+    expect(question_bank_title).to be_displayed
     question_bank_title.send_keys(title, :return)
     wait_for_ajaximations
     question_bank = AssessmentQuestionBank.where(title: title).first
@@ -32,10 +29,11 @@ shared_examples_for "question bank basic tests" do
 
   it "should un-bookmark a question bank" do
     question_bank = add_question_bank
-    expect(fj(".bookmark_bank_link img:visible")).to have_attribute(:alt, "Bookmark")
+    expect(fj(".bookmark_bank_link img:visible")['src']).to include('bookmark')
+    expect(fj(".bookmark_bank_link img:visible")['src']).to_not include('bookmark_gray')
     fj(".bookmark_bank_link:visible").click
     wait_for_ajaximations
-    expect(fj(".bookmark_bank_link img:visible")).to have_attribute(:alt, "Bookmark_gray")
+    expect(fj(".bookmark_bank_link img:visible")['src']).to include('bookmark_gray')
     question_bank.reload
     expect(question_bank.bookmarked_for?(User.last)).to be_falsey
   end
@@ -43,6 +41,7 @@ shared_examples_for "question bank basic tests" do
   it "should edit a question bank" do
     new_title = "bank 2"
     question_bank = add_question_bank
+    wait_for_ajaximations
     f("#questions .edit_bank_link").click
     wait_for_ajaximations
     f("#assessment_question_bank_title").send_keys(new_title, :return)
@@ -56,11 +55,7 @@ shared_examples_for "question bank basic tests" do
     question_bank = add_question_bank
     f("#questions .delete_bank_link").click
     driver.switch_to.alert.accept
-    wait_for_ajaximations
-    question_bank.reload
-    keep_trying_until do
-      expect(question_bank.workflow_state).to eq "deleted"
-      expect(f("#questions .title")).to be_nil
-    end
+    keep_trying_until { question_bank.reload.workflow_state == "deleted" }
+    expect(f("#content")).not_to contain_css("#questions .title")
   end
 end

@@ -1,3 +1,4 @@
+<% access_token ||= nil %>
 <tr class="access_token <%= 'blank' unless access_token %>" style="<%= hidden unless access_token %>">
   <td class="app_name"><%= access_token.try(:app_name) || t(:default_app_name, "No App") %></td>
   <td class="purpose"><%= access_token.try(:purpose) || nbsp %></td>
@@ -17,7 +18,7 @@
   </td>
   <td class="links">
     <% unless @real_current_user %>
-      <a href="#" class="delete_key_link" rel="<%= profile_token_url(access_token.try(:id) || "{{ id }}") %>" title="<%= t('titles.delete_this_token', "Delete this Token") %>"><%= image_tag "delete.png" %></a>
+      <a href="#" class="delete_key_link" rel="<%= profile_token_url(access_token.try(:id) || "{{ id }}") %>" title="<%= t('titles.delete_this_token', "Delete this Token") %>"><%= image_tag "delete.png", :alt => t('Delete this Token') %></a>
     <% end %>
   </td>
 </tr>

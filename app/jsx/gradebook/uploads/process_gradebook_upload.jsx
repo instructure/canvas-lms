@@ -1,6 +1,4 @@
-/** @jsx React.DOM */
-
-define(['underscore', 'i18n!gradebok_upload'], function(_, I18n) {
+define(['underscore', 'i18n!gradebok_upload', 'compiled/userSettings'], function(_, I18n, userSettings) {
 
   var processGradebookUpload = function(uploadedGradebook) {
     return makeNewAssignments(uploadedGradebook)
@@ -49,11 +47,14 @@ define(['underscore', 'i18n!gradebok_upload'], function(_, I18n) {
         if (submission.original_grade === submission.grade) return; // no change
 
         bulkGradeData[assignmentId] = bulkGradeData[assignmentId] || {};
-        bulkGradeData[assignmentId][userId] = {posted_grade: submission.grade};
+        bulkGradeData[assignmentId][userId] = ((submission.grade || "").toUpperCase() === "EX") ?
+          {excuse: true} :
+          {posted_grade: submission.grade};
       });
     });
 
-    return $.ajaxJSON(ENV.bulk_update_path, "POST", {grade_data: bulkGradeData})
+    return $.ajaxJSON(ENV.bulk_update_path, "POST", JSON.stringify({grade_data: bulkGradeData}),
+                      null, null, {contentType: 'application/json'});
   };
 
 
@@ -68,6 +69,9 @@ define(['underscore', 'i18n!gradebok_upload'], function(_, I18n) {
           progress.workflow_state == "failed") {
         $("#gradebook_grid_form").text(I18n.t("Done."));
         dfd.resolve();
+        if (progress.workflow_state === "completed") {
+          userSettings.contextSet('gradebookUploadComplete', true);
+        }
         window.location = ENV.gradebook_path;
       } else {
         setTimeout(function() {

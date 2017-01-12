@@ -33,7 +33,7 @@ define [
       @attachModel()
 
     attachModel: ->
-      @model.on('change:starred', => @$starBtn.toggleClass('active'))
+      @model.on('change:starred', @setStarBtnChecked)
       @model.on('change:workflow_state', => @$readBtn.toggleClass('read', @model.get('workflow_state') isnt 'unread'))
       @model.on('change:selected', (m) => @$el.toggleClass('active', m.get('selected')))
 
@@ -55,13 +55,17 @@ define [
     deselect: (modifier) ->
       @model.set('selected', false) if modifier
 
+    setStarBtnChecked: =>
+      @$starBtn.attr
+        'aria-checked': @model.starred()
+        title: if @model.starred() then @messages.unstar else @messages.star
+      @$starBtn.toggleClass('active', @model.starred())
+
     toggleStar: (e) ->
       e.preventDefault()
       @model.toggleStarred()
       @model.save()
-      @$starBtn.attr
-        'aria-checked': @model.starred()
-        title: if @model.starred() then @messages.unstar else @messages.star
+      @setStarBtnChecked()
 
     toggleRead: (e) ->
       e.preventDefault()

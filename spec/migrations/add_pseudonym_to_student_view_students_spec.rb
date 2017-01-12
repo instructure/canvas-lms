@@ -36,8 +36,8 @@ describe "AddPseudonymToStudentViewStudents" do
     @fake3 = @c3.student_view_student
 
     # remove these two students' pseudonyms
-    @fake2.pseudonym.destroy!
-    @fake3.pseudonym.destroy!
+    @fake2.pseudonym.destroy_permanently!
+    @fake3.pseudonym.destroy_permanently!
 
     expect(@fake1.reload.pseudonym).not_to be_nil
     expect(@fake2.reload.pseudonym).to be_nil

@@ -21,6 +21,7 @@ module Api::V1::Course
   include Api::V1::EnrollmentTerm
   include Api::V1::SectionEnrollments
   include Api::V1::PostGradesStatus
+  include Api::V1::User
 
   def course_settings_json(course)
     settings = {}
@@ -71,15 +72,25 @@ module Api::V1::Course
   #   }
   #
   def course_json(course, user, session, includes, enrollments)
+    if includes.include?('access_restricted_by_date') && enrollments && enrollments.all?(&:inactive?)
+      return {'id' => course.id, 'access_restricted_by_date' => true}
+    end
+
     Api::V1::CourseJson.to_hash(course, user, includes, enrollments) do |builder, allowed_attributes, methods, permissions_to_include|
       hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?('term')
       hash['course_progress'] = CourseProgress.new(course, user).to_json if includes.include?('course_progress')
       hash['apply_assignment_group_weights'] = course.apply_group_weights?
       hash['sections'] = section_enrollments_json(enrollments) if includes.include?('sections')
-      hash['total_students'] = course.students.count if includes.include?('total_students')
+      hash['total_students'] = course.student_count || course.students.count if includes.include?('total_students')
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
+      hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
+      hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')
       add_helper_dependant_entries(hash, course, builder)
+      apply_nickname(hash, course, user) if user
+
+      # return hash from the block for additional processing in Api::V1::CourseJson
+      hash
     end
   end
 
@@ -103,6 +114,15 @@ module Api::V1::Course
     hash['calendar'] = { 'ics' => "#{feeds_calendar_url(course.feed_code)}.ics" }
     hash['syllabus_body'] = api_user_content(course.syllabus_body, course) if builder.include_syllabus
     hash['html_url'] = course_url(course, :host => HostUrl.context_host(course, request.try(:host_with_port))) if builder.include_url
+    hash
+  end
+
+  def apply_nickname(hash, course, user)
+    nickname = user.course_nickname(course)
+    if nickname
+      hash['original_name'] = hash['name']
+      hash['name'] = nickname
+    end
     hash
   end
 

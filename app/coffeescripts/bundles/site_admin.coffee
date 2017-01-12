@@ -1,2 +1,0 @@
-require ['site_admin']
-

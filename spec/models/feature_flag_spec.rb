@@ -29,7 +29,8 @@ describe FeatureFlag do
       'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account'),
       'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course'),
       'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User'),
-      'hidden_feature' => Feature.new(feature: 'hidden_feature', state: 'hidden', applies_to: 'Course')
+      'hidden_feature' => Feature.new(feature: 'hidden_feature', state: 'hidden', applies_to: 'Course'),
+      'hidden_root_opt_in_feature' => Feature.new(feature: 'hidden_feature', state: 'hidden', applies_to: 'Course', root_opt_in: true)
     })
   end
 
@@ -59,15 +60,6 @@ describe FeatureFlag do
       flag = t_sub_account.feature_flags.build(feature: 'root_account_feature')
       expect(flag).not_to be_valid
     end
-
-    it "should validate the locking account is in the chain" do
-      flag = t_course.feature_flags.build(feature: 'course_feature', state: 'on', locking_account: t_sub_account)
-      expect(flag).to be_valid
-
-      other_account = account_model
-      flag = t_course.feature_flags.build(feature: 'course_feature', state: 'on', locking_account: other_account)
-      expect(flag).not_to be_valid
-    end
   end
 
   describe "locked?" do
@@ -86,27 +78,6 @@ describe FeatureFlag do
 
       it "should be true in a lower context" do
         expect(t_flag.locked?(t_sub_account)).to be_truthy
-      end
-
-      describe "locking_account" do
-        before do
-          t_flag.locking_account = Account.site_admin
-          t_flag.save!
-        end
-
-        it "should be false if the user has privileges" do
-          site_admin_user
-          expect(t_flag.locked?(t_root_account, @user)).to be_falsey
-        end
-
-        it "should be true if the user does not have privileges" do
-          account_admin_user account: t_root_account
-          expect(t_flag.locked?(t_root_account, @user)).to be_truthy
-        end
-
-        it "should be true if the user is unspecified" do
-          expect(t_flag.locked?(t_root_account)).to be_truthy
-        end
       end
     end
   end
@@ -137,6 +108,11 @@ describe FeatureFlag do
       t_root_account.allow_feature! :hidden_feature
       t_sub_account.enable_feature! :hidden_feature
       expect(t_sub_account.lookup_feature_flag(:hidden_feature)).not_to be_unhides_feature
+    end
+
+    it "should be true on a sub-account root-opt-in feature flag with no root or site admin flags set" do
+      t_course.enable_feature! :hidden_root_opt_in_feature
+      expect(t_course.feature_flag(:hidden_root_opt_in_feature)).to be_unhides_feature
     end
   end
 end

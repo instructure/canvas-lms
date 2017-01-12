@@ -59,6 +59,145 @@ shared_examples_for "an object whose dates are overridable" do
     end
   end
 
+  describe "assignment overrides_for" do
+    before do
+      student_in_course(:course => course)
+    end
+
+    context "with adhoc" do
+      before do
+        override.override_due_at(7.days.from_now)
+        override.set_type = "ADHOC"
+        override.save!
+
+      end
+
+      it "returns adhoc overrides when active students enrolled in adhoc set" do
+        override_student = override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+
+        expect(overridable.overrides_for(@student, ensure_set_not_empty: true).size).to eq 1
+      end
+
+      it "returns nothing when no active students enrolled in adhoc set" do
+        expect(overridable.overrides_for(@student, ensure_set_not_empty: true)).to be_empty
+      end
+
+      it "returns nothing when active students enrolled in adhoc set removed" do
+        override_student = override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+
+        expect(overridable.overrides_for(@student, ensure_set_not_empty: true).size).to eq 1
+
+        override_student.user.enrollments.delete_all
+
+        expect(overridable.overrides_for(@student, ensure_set_not_empty: true)).to be_empty
+      end
+    end
+  end
+
+  describe "override teacher visibility" do
+    context "when teacher restricted" do
+      before do
+        2.times{ course.course_sections.create! }
+        @section_invisible = course.active_course_sections[2]
+        @section_visible = course.active_course_sections.second
+
+        @student_invisible = student_in_section(@section_invisible)
+        @student_visible = student_in_section(@section_visible, user: user)
+        @teacher = teacher_in_section(@section_visible, user: user)
+
+        enrollment = @teacher.enrollments.first
+        enrollment.limit_privileges_to_course_section = true
+        enrollment.save!
+      end
+
+      it "returns empty for overrides of student in other section" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_invisible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher)).to be_empty
+      end
+
+      it "returns not empty for overrides of student in same section" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_visible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher)).to_not be_empty
+      end
+
+      it "returns the correct student for override with students in same and different section" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_visible
+        @override_student.save!
+
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_invisible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher).size).to eq 1
+        ov = overridable.overrides_for(@teacher).first
+        s_id = ov.assignment_override_students.first.user_id
+        expect(s_id).to eq @student_visible.id
+      end
+    end
+
+    context "when teacher not restricted" do
+      before do
+        course.course_sections.create!
+        course.course_sections.create!
+        @section_invisible = course.active_course_sections[2]
+        @section_visible = course.active_course_sections.second
+
+        @student_invisible = student_in_section(@section_invisible)
+        @student_visible = student_in_section(@section_visible, user: user)
+        @teacher = teacher_in_section(@section_visible, user: user)
+      end
+
+      it "returns not empty for overrides of student in other section" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_invisible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher)).to_not be_empty
+      end
+
+      it "returns not empty for overrides of student in same section" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_visible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher)).to_not be_empty
+      end
+
+      it "returns single override for students in different sections" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_visible
+        @override_student.save!
+
+        @override_student = override.assignment_override_students.build
+        @override_student.user = student_in_section(@section_visible)
+        @override_student.save!
+
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_invisible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher).size).to eq 1
+      end
+    end
+  end
+
   describe "has_overrides?" do
     subject { overridable.has_overrides? }
 
@@ -105,6 +244,17 @@ shared_examples_for "an object whose dates are overridable" do
         overridable.reload
         expect(overridable.all_dates_visible_to(@teacher).size).to eq 2
       end
+
+      it "doesn't duplicate adhoc overrides in list" do
+        override.set_type = "ADHOC"
+        2.times { override.assignment_override_students.create(user: student_in_section(course.active_course_sections.first)) }
+        override.title = nil
+        override.save!
+
+        dates_hash = overridable.dates_hash_visible_to(@teacher)
+        expect(dates_hash.size).to eq 3
+        expect(dates_hash.map{ |d| d[:title] }).to eq [nil, "Summer session", "2 students"]
+      end
     end
 
     context "as a student" do
@@ -141,12 +291,8 @@ shared_examples_for "an object whose dates are overridable" do
         course.enroll_user(@observer, "ObserverEnrollment")
         override.delete
       end
-      it "returns a date with DA off" do
-        course.disable_feature!(:differentiated_assignments)
-        expect(overridable.all_dates_visible_to(@observer).size).to eq 1
-      end
-      it "returns a date with DA on" do
-        course.enable_feature!(:differentiated_assignments)
+
+      it "returns a date with DA" do
         expect(overridable.all_dates_visible_to(@observer).size).to eq 1
       end
     end
@@ -322,41 +468,27 @@ shared_examples_for "an object whose dates are overridable" do
       course_with_student(:course => course)
     end
 
-    context "when feature flag is off" do
-      it "returns false" do
+    it "returns false when there is no assignment" do
+      if overridable_type == :quiz
+        as = overridable.assignment
+        overridable.assignment = nil # a survey quiz
         expect(overridable.differentiated_assignments_applies?).to be_falsey
       end
     end
 
-    context "when feature flag is on" do
-      before do
-        course.enable_feature!(:differentiated_assignments)
+    it "returns the value of only_visible_to_overrides on the assignment" do
+      if overridable_type == :quiz && overridable.try(:assignment) # not a survey quiz
+        overridable.assignment.only_visible_to_overrides = true
+        expect(overridable.differentiated_assignments_applies?).to be_truthy
+        overridable.assignment.only_visible_to_overrides = false
+        expect(overridable.differentiated_assignments_applies?).to be_falsey
+      elsif overridable_type == :assignment
+        overridable.only_visible_to_overrides = true
+        expect(overridable.differentiated_assignments_applies?).to be_truthy
+        overridable.only_visible_to_overrides = false
+        expect(overridable.differentiated_assignments_applies?).to be_falsey
       end
-
-      it "returns false when there is no assignment" do
-        if overridable_type == :quiz
-          as = overridable.assignment
-          overridable.assignment = nil # a survey quiz
-          expect(overridable.differentiated_assignments_applies?).to be_falsey
-        end
-      end
-
-      it "returns the value of only_visible_to_overrides on the assignment" do
-        if overridable_type == :quiz && overridable.try(:assignment) # not a survey quiz
-          overridable.assignment.only_visible_to_overrides = true
-          expect(overridable.differentiated_assignments_applies?).to be_truthy
-          overridable.assignment.only_visible_to_overrides = false
-          expect(overridable.differentiated_assignments_applies?).to be_falsey
-        elsif overridable_type == :assignment
-          overridable.only_visible_to_overrides = true
-          expect(overridable.differentiated_assignments_applies?).to be_truthy
-          overridable.only_visible_to_overrides = false
-          expect(overridable.differentiated_assignments_applies?).to be_falsey
-        end
-      end
-
     end
-
   end
 end
 

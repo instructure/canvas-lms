@@ -18,15 +18,15 @@ define [
       @ev.currentTarget = @$a.get(0)
 
   test 'sort delegates to the collection sortByField', ->
-    sortByFieldStub = sinon.stub(@collection, 'sortByField')
+    sortByFieldStub = @stub(@collection, 'sortByField')
 
     @view.sort(@ev)
     ok sortByFieldStub.calledOnce, 'collection sortByField called once'
 
   test 'view disabled while sorting', ->
     dfd = $.Deferred()
-    fetchStub = sinon.stub(@collection, 'fetch').returns(dfd)
-    disableWhileLoadingStub = sinon.stub(@view.$el, 'disableWhileLoading')
+    @stub(@collection, 'fetch').returns(dfd)
+    disableWhileLoadingStub = @stub(@view.$el, 'disableWhileLoading')
 
     @view.sort(@ev)
     ok disableWhileLoadingStub.calledOnce, 'disableWhileLoading called once'
@@ -34,15 +34,15 @@ define [
 
   test 'view disabled while sorting again', ->
     dfd = $.Deferred()
-    fetchStub = sinon.stub(@collection, 'fetch').returns(dfd)
-    disableWhileLoadingStub = sinon.stub(@view.$el, 'disableWhileLoading')
+    @stub(@collection, 'fetch').returns(dfd)
+    disableWhileLoadingStub = @stub(@view.$el, 'disableWhileLoading')
 
     @view.sort(@ev)
     ok disableWhileLoadingStub.calledOnce, 'disableWhileLoading called once'
     ok disableWhileLoadingStub.calledWith(dfd), 'disableWhileLoading called with correct deferred object'
 
   test 'renderSortHeaders called when sorting changes', ->
-    renderSortHeadersStub = sinon.stub(@view, 'renderSortHeaders')
+    renderSortHeadersStub = @stub(@view, 'renderSortHeaders')
 
     @collection.trigger('sortChanged', 'created_at')
     ok renderSortHeadersStub.calledOnce, 'renderSortHeaders called once'

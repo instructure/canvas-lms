@@ -2,19 +2,14 @@
 define(function(require) {
   var React = require('react');
   var I18n = require('i18n!quiz_statistics');
-  var ToggleDetailsButton = require('jsx!./toggle_details_button');
   var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');
-  var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');
 
   var QuestionHeader = React.createClass({
     getDefaultProps: function() {
       return {
         position: 1,
         responseCount: 0,
-        participantCount: 0,
-        onToggleDetails: null,
-        expandable: true,
-        asideContents: false
+        participantCount: 0
       };
     },
 
@@ -38,25 +33,6 @@ define(function(require) {
               total: this.props.participantCount
             })}
           </span>
-
-          <div className="pull-right">
-            {this.props.expandable &&
-              <SightedUserContent>
-                <ToggleDetailsButton
-                  onClick={this.props.onToggleDetails}
-                  expanded={this.props.expanded} />
-              </SightedUserContent>
-            }
-
-            {this.props.asideContents}
-          </div>
-
-          {/* hide from SR since it's been read earlier */}
-          <div
-            className="question-text"
-            aria-hidden
-            dangerouslySetInnerHTML={{ __html: this.props.questionText }}
-            />
         </header>
       );
     }

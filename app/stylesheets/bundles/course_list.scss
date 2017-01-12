@@ -1,53 +1,56 @@
-table.course-list-table
-{
-   &.table-layout-fixed {
-      table-layout: fixed;
-   }
-   td.course-list-star-column {
-      width: 3%;
-      padding-left: 15px;
-      color: #eee;
-      text-shadow: -1px 0 #eee, 0 1px #eee, 1px 0 #eee, 0 -1px #eee;
-   }
-   td.course-list-enrolled-as-column {
-      width: 20%;
-      text-align: right;
-      padding-right: 15px;
-   }
-   td.course-list-course-title-column {
-      width: 57%;
+@import "base/environment";
 
-   }
-   td.course-list-unpublished-column {
-      width: 20%;
-   }
-   td.course-list-no-left-border {
-      border-left: 0;
-   }
+.course-list-table {
+  table-layout: fixed;
+  white-space: nowrap;
 
-   .course-list-not-favoritable {
-      width: 60%;
-   }
+  /* Column widths are based on these cells */
+  .course-list-star-column {
+    width: 3%;
+    &.course-list-favorite-icon {
+      color: $ic-color-icon-disabled;
+    }
+  }
+  .course-list-term-column,
+  .course-list-enrolled-as-column {
+    width: 15%;
+  }
+.course-list-published-column {
+    width: 7%;
+  }
+  .course-list-nickname-column {
+    width: 25%;
+  }
+  .course-list-course-title-column,
+  .course-list-not-favoritable,
+  .course-list-group-column {
+    width: 35%;
+  }
+  .course-list-no-left-border {
+    border-left: 0;
+  }
+  .course-list-table-row:hover {
+    background-color: $lightBackground;
+  }
+}
 
-   .course-list-table-row:hover {
-      background-color: #eee;
-   }
+.course-list-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .course-list-favorite-course {
-   color: #ffdba1;
-   text-shadow: none;
+  color: $ic-color-alert;
 }
 
-.course-list-label-hollow {
-   background: none;
-   border: 2px solid #999;
-   color: #999;
-   text-shadow: none;
+.content--hasMarginTop {
+  margin-top: $ic-sp*2;
 }
 
-.course-list-term {
-   color: #555;
-   font-size: 10px;
-   font-style: italic;
+.course-color-block:before {
+  content:'\25A0';
+  @include fontSize(21px);
+  padding-right: $ic-sp/2;
+  vertical-align: baseline;
 }

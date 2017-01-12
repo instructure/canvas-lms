@@ -26,7 +26,7 @@ describe FileInContext do
     @course.save!
     @course.reload
   end
-  
+
   context "#attach" do
     it "should create files with the supplied filename escaped for s3" do
       # This horrible hack is because we need Attachment to behave like S3 in this case, as far as filename
@@ -35,6 +35,7 @@ describe FileInContext do
       # to test S3), we fake out just the part we care about. Also, we can't use Mocha because we need the
       # argument of the method. This will be fixed when we've refactored Attachment to allow dynamically
       # switching between S3 and local.
+      s3_storage!
       unbound_method = Attachment.instance_method(:filename=)
       class Attachment; def filename=(new_name); write_attribute :filename, sanitize_filename(new_name); end; end
       filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures files escaping_test[0].txt)))

@@ -105,7 +105,7 @@ define([
 
   var scrollSideBarIsBound = false;
   $.scrollSidebar = function(){
-    if(!scrollSideBarIsBound){
+    if(!scrollSideBarIsBound && !ENV.use_new_styles){
       var $right_side = $("#right-side"),
           $main = $('#main'),
           $not_right_side = $("#not_right_side"),

@@ -52,6 +52,9 @@ define [
         @_poller.setOnData => throttledPoll()
         @_poller.start()
 
+    startPolling: ->
+      @_poller.start() if @_poller
+
     stopPolling: ->
       @_poller.stop() if @_poller
 

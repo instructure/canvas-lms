@@ -1,40 +1,73 @@
 // # encoding: UTF-8
 @media print {
 
+  html, body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: black !important;
+    font-size: 10pt;
+    background: transparent none !important;
+  }
+
   // just add this class to anything you dont want to be printed
   .no-print,
   #header,
   #footer,
   #right-side-wrapper,
   #left-side {
-    display: none !important; }
+    display: none !important;
+  }
 
   #main,
   #wrapper {
     margin: 0 !important;
-    border: 0 none !important; }
+    border: 0 none !important;
+  }
 
-  html, body {
-    font-family: Arial, Helvetica, sans-serif;
-    color: black !important;
-    font-size: 10pt;
-    background: transparent none !important; }
+  @if $use_new_styles {
+    #wrapper-container,
+    .ic-app-main-layout-horizontal { margin-left: 0 !important; }
+  }
 
   // this is for firefox, if things dont have overflow:visible then it wont print any more than one page.
-  #wrapper-container, #content , #wiki_show_view_main {
-    overflow: visible !important; }
+  #wrapper-container,
+  #content,
+  #wiki_show_view_main {
+    overflow: visible !important;
+  }
+
+  // for new UI, override flex layout for FF, or else you hit:
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=258397
+  @if $use_new_styles {
+    .ic-app-main-layout-vertical,
+    .ic-app-main-layout-horizontal,
+    .ic-app-main-and-right-side,
+    .ic-app-main-content {
+      display: block !important;
+    }
+  }
 
   #content {
     width: auto;
     // the padding:0 here is to revert the padding added by .with-scrolling-right-side, &.with-sidebar-pinned-to-bottom
     padding: 0 !important;
     .fill_height_div {
-      overflow: visible !important; } }
+      overflow: visible !important;
+    }
+  }
 
   a {
     &:link, &:visited {
       font-weight: bold;
-      text-decoration: underline; } }
+      text-decoration: underline;
+    }
+    &:link:after, &:visited:after {
+      content: " (" attr(href) ") ";
+      font-size: 90%;
+    }
+    &[href^="/"]:after, &[href^="#"]:after {
+      content: "";
+    }
+  }
 
   #breadcrumbs {
     margin: 0; padding: 0;
@@ -46,23 +79,23 @@
         margin: 0; padding: 0;
         padding-left: 10px;
         &:after {
-          content: "   →   "; }
+          content: "   →   ";
+        }
         &:last-child:after {
-          content: ""; }
+          content: "";
+        }
         &:first-of-type {
-          padding-left: 0; }  
+          padding-left: 0;
+        }  
         &.home {
-          display: none; } }
+          display: none;
+        }
+      }
       a {
         text-decoration: none !important;
-        padding-right: 10px; } } }
-
-  a {
-    &:link:after, &:visited:after {
-      content: " (" attr(href) ") ";
-      font-size: 90%; }
-    &[href^="/"]:after, &[href^="#"]:after {
-      content: ""; }
+        padding-right: 10px;
+      }
+    }
   }
   
 }

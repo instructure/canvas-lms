@@ -1,7 +1,9 @@
 define [
   'ember'
   'underscore'
-], (Ember, _) ->
+  'compiled/gradebook2/GradebookHelpers'
+  'jsx/gradebook/grid/constants'
+], (Ember, _, GradebookHelpers, GradebookConstants) ->
 
   CustomColumnCellComponent = Ember.Component.extend
 
@@ -44,6 +46,14 @@ define [
         data:"column_data[content]": value
 
       xhr.then @boundSaveSuccess
+
+    textAreaInput: ((event) ->
+      note = event.target.value
+      if GradebookHelpers.textareaIsGreaterThanMaxLength(note.length)
+        event.target.value = note.substring(0, GradebookConstants.MAX_NOTE_LENGTH)
+        showError = GradebookHelpers.maxLengthErrorShouldBeShown(note.length)
+        GradebookHelpers.flashMaxLengthError() if showError
+    ).on('input')
 
     bindSave: (->
       @boundSaveSuccess = _.bind(@onSaveSuccess, this)

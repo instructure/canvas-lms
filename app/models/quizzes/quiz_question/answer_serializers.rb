@@ -16,7 +16,11 @@ module Quizzes::QuizQuestion::AnswerSerializers
 
       klass = question_type.gsub(/_question$/, '').demodulize.camelize
 
-      "Quizzes::QuizQuestion::AnswerSerializers::#{klass}".constantize.new(question)
+      begin
+        "Quizzes::QuizQuestion::AnswerSerializers::#{klass}".constantize.new(question)
+      rescue NameError
+        Quizzes::QuizQuestion::AnswerSerializers::Unknown.new(question)
+      end
     end
   end
 end

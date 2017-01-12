@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe "Assessment Question import from hash" do
-  
+
   SYSTEMS.each do |system|
     QUESTIONS.each do |q|
       if import_data_exists? [system, 'quiz'], q[0]
@@ -68,7 +68,7 @@ describe "Assessment Question import from hash" do
     data = {'assessment_questions' => {'assessment_questions' => [q]}}
     migration = ContentMigration.create!(:context => context)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
-    
+
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title:  q[:question_bank_name]).first
     expect(bank.assessment_questions.count).to eq 1
     expect(bank.assessment_questions.first.migration_id).to eq q[:migration_id]
@@ -139,7 +139,7 @@ describe "Assessment Question import from hash" do
     question_data[:aq_data][question[:migration_id]] = context.assessment_questions.where(migration_id: question[:migration_id]).first
 
     quiz = get_import_data 'cengage', 'quiz'
-    Importers::QuizImporter.import_from_migration(quiz, context, nil, question_data)
+    Importers::QuizImporter.import_from_migration(quiz, context, migration, question_data)
     quiz = context.quizzes.where(migration_id: quiz[:migration_id]).first
 
     group = quiz.quiz_groups.first
@@ -150,7 +150,7 @@ end
 
 def test_question_import(hash_name, system, question_type=nil)
   question_type ||= "#{hash_name}_question"
-  q = get_import_data [system, 'quiz'], hash_name 
+  q = get_import_data [system, 'quiz'], hash_name
 #  q[:question_type].should == question_type
   context = get_import_context(system)
   data = {'assessment_questions' => {'assessment_questions' => [q]}}

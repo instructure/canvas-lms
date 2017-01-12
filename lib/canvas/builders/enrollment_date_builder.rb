@@ -31,12 +31,12 @@ class EnrollmentDateBuilder
   def self.preload(enrollments)
     return if enrollments.empty?
     courses_loaded = enrollments.first.association(:course).loaded?
-    ActiveRecord::Associations::Preloader.new(enrollments, :course).run unless courses_loaded
+    ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)unless courses_loaded
 
     to_preload = enrollments.reject { |e| fetch(e) }
     return if to_preload.empty?
-    ActiveRecord::Associations::Preloader.new(to_preload, :course_section).run
-    ActiveRecord::Associations::Preloader.new(to_preload.map(&:course).uniq, :enrollment_term).run
+    ActiveRecord::Associations::Preloader.new.preload(to_preload, :course_section)
+    ActiveRecord::Associations::Preloader.new.preload(to_preload.map(&:course).uniq, :enrollment_term)
     to_preload.each { |e| build(e) }
   end
 
@@ -45,7 +45,9 @@ class EnrollmentDateBuilder
   end
 
   def self.fetch(enrollment)
-    result = Rails.cache.fetch(cache_key(enrollment))
+    result = RequestCache.cache('enrollment_dates', enrollment) do
+      Rails.cache.read(cache_key(enrollment))
+    end
     enrollment.instance_variable_set(:@enrollment_dates, result)
   end
 
@@ -70,6 +72,10 @@ class EnrollmentDateBuilder
       add_term_dates
     else
       @enrollment_dates << default_dates
+    end
+
+    RequestCache.cache('enrollment_dates', self) do
+      @enrollment_dates
     end
 
     Rails.cache.write(cache_key, @enrollment_dates)

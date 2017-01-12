@@ -53,20 +53,4 @@ describe Progress do
       expect(progress.reload).to be_failed
     end
   end
-
-  describe '.context_type' do
-    it 'returns the correct representation of a quiz statistics relation' do
-      stats = Quizzes::QuizStatistics.create!(report_type: 'student_analysis')
-
-      progress = Progress.create!(tag: "test", context: stats)
-      progress.context = stats
-      progress.save
-
-      expect(progress.context_type).to eq "Quizzes::QuizStatistics"
-
-      Progress.where(id: progress).update_all(context_type: 'QuizStatistics')
-
-      expect(Progress.find(progress.id).context_type).to eq 'Quizzes::QuizStatistics'
-    end
-  end
 end

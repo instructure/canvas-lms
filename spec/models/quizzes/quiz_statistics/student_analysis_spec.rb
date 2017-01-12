@@ -79,6 +79,25 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats[:submission_scores]).to eq({ 50 => 1, 57 => 1, 67 => 1 })
   end
 
+  it 'should create quiz statistics with essay questions and anonymous submissions' do
+    @user1 = User.create! :name => "some_user 1"
+    student_in_course :course => @course, :user => @user1
+    quiz = @course.quizzes.create!
+    quiz.update_attributes(:published_at => Time.zone.now, :quiz_type => 'survey', :anonymous_submissions => true)
+    quiz.quiz_questions.create!(question_data: essay_question_data)
+    quiz.generate_quiz_data
+    quiz.save
+    qs = quiz.generate_submission(@user1)
+    qs.submission_data = { "question_#{quiz.quiz_data[0][:id]}" => "Essay response user 1" }
+    qs.workflow_state = 'complete'
+    qs.save
+    expect do
+      quiz.quiz_statistics.build(:report_type => 'student_analysis',
+                                 :includes_all_versions => true,
+                                 :anonymous => true).report.generate(false)
+    end.to_not raise_error
+  end
+
   context "csv" do
 
     def temporary_user_code
@@ -96,7 +115,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       @quiz.anonymous_submissions = false
       @quiz.quiz_type = "survey"
 
-      #make questions
+      # make questions
       questions = [{:question_data => { :name => "test 1" }},
         {:question_data => { :name => "test 2" }},
         {:question_data => { :name => "test 3" }},
@@ -143,7 +162,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     end
 
     it 'should have sections in quiz statistics_csv' do
-      #enroll user in multiple sections
+      # enroll user in multiple sections
       pseudonym(@student)
       @student.pseudonym.sis_user_id = "user_sis_id_01"
       @student.pseudonym.save!
@@ -158,7 +177,6 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       # one complete submission
       qs = @quiz.generate_submission(@student)
       Quizzes::SubmissionGrader.new(qs).grade_submission
-
       stats = CSV.parse(csv(:include_all_versions => true))
       expect(stats.last[0]).to eq "nobody@example.com"
       expect(stats.last[1]).to eq @student.id.to_s
@@ -176,6 +194,42 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       section_sis_ids = splitter.call(stats.last[5])
       expect(section_sis_ids).to include("SISSection02")
       expect(section_sis_ids).to include("SISSection01")
+    end
+
+    it 'should use sections in quiz statistics generate' do
+      # enroll user in multiple sections
+      pseudonym(@student)
+      @student.pseudonym.sis_user_id = "user_sis_id_01"
+      @student.pseudonym.save!
+      section1 = @course.course_sections.first
+      section1.sis_source_id = 'SISSection01'
+      section1.save!
+      section2 = CourseSection.new(:course => @course, :name => "section2")
+      section2.sis_source_id = 'SISSection02'
+      section2.save!
+      @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active',
+                          :allow_multiple_enrollments => true, :section => section2)
+      @student.save!
+
+      question = @quiz.quiz_questions.create!({
+                                              question_data: {
+                                                name: 'q1',
+                                                points_possible: 30,
+                                                question_type: 'essay_question',
+                                                question_text: 'ohai mark'
+                                              }
+                                             })
+      @quiz.generate_quiz_data
+      @quiz.save!
+
+      # one complete submission
+      qs = @quiz.generate_submission(@student)
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+      stats = @quiz.quiz_statistics.build(
+        :report_type => 'student_analysis',
+        :includes_all_versions => true
+        ).report.generate(true, {:section_ids=> section2.id})
+      expect(stats[:questions][0][1]["answers"][0]["responses"]).to eq 1
     end
 
     it 'should deal with incomplete fill-in-multiple-blanks questions' do
@@ -225,17 +279,35 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect(stats.last[9]).to eq '5'
     end
 
+    it 'should not error out when no answers are present in a calculated_question' do
+      @quiz.quiz_questions.create!(:question_data => { :name => "calculated_question",
+        :question_type => 'calculated_question',
+        :question_text => "[num1]"
+      })
+
+      @quiz.generate_quiz_data
+      @quiz.save!
+
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = {
+        "question_#{@quiz.quiz_questions[1].id}" => 'Pretend this is an essay question!'
+      }
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+
+      expect { @quiz.statistics_csv('student_analysis', {}) }.not_to raise_error
+    end
+
     it 'should include primary domain if trust exists' do
       account2 = Account.create!
       HostUrl.stubs(:context_host).returns('school')
       HostUrl.expects(:context_host).with(account2).returns('school1')
-      @student.pseudonyms.scoped.delete_all
+      @student.pseudonyms.scope.delete_all
       account2.pseudonyms.create!(user: @student, unique_id: 'user') { |p| p.sis_user_id = 'sisid' }
       @quiz.context.root_account.any_instantiation.stubs(:trust_exists?).returns(true)
       @quiz.context.root_account.any_instantiation.stubs(:trusted_account_ids).returns([account2.id])
 
       qs = @quiz.generate_submission(@student)
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
       stats = CSV.parse(csv(:include_all_versions => true))
       expect(stats[1][3]).to eq 'school1'
     end
@@ -318,6 +390,23 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats.last[9]).to eq "lolcats,lolrus"
   end
 
+  it 'should not strip things that look like tags from essay questions' do
+    student_in_course(:active_all => true)
+    q = @course.quizzes.create!
+    q.update_attribute(:published_at, Time.zone.now)
+    q.quiz_questions.create!(question_data: essay_question_data)
+    q.generate_quiz_data
+    q.save
+    qs = q.generate_submission(@student)
+    qs.submission_data = {
+      "question_#{q.quiz_data[0][:id]}" => "<p class=\"p1\"><span class=\"s1\">&lt;&gt; &lt; &gt; WHERE rental_duration &gt;= 6 AND rating &lt;&gt; 'R' 1 &lt; 3 &gt; 2</span></p>"
+    }
+    Quizzes::SubmissionGrader.new(qs).grade_submission
+
+    stats = CSV.parse(csv({}, q))
+    expect(stats.last[7]).to eq "<> < > WHERE rental_duration >= 6 AND rating <> 'R' 1 < 3 > 2"
+  end
+
   it 'should strip tags from all student-provided answers' do
     student_in_course(:active_all => true)
     q = @course.quizzes.create!
@@ -369,6 +458,24 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
     stats = q.statistics
     expect(stats[:unique_submission_count]).to eq 0
+  end
+
+  it 'should not show student names for anonymous submissions' do
+    student_in_course(:active_all => true)
+    q = @course.quizzes.create!
+    q.update_attributes(:published_at => Time.zone.now, :quiz_type => 'survey', :anonymous_submissions => true)
+    q.quiz_questions.create!(:question_data => {:name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100'}, {'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0'}]})
+    q.generate_quiz_data
+    q.save
+    qs = q.generate_submission(@student)
+    qs.submission_data = {
+        "question_#{q.quiz_data[0][:id]}" => "#{q.quiz_data[0][:answers][0][:id]}"
+    }
+    Quizzes::SubmissionGrader.new(qs).grade_submission
+
+    stats = q.statistics
+
+    expect(stats[:questions].first.last[:user_ids].first).to eq nil
   end
 
   it 'should not count student view submissions' do

@@ -4,6 +4,7 @@ module Canvas
       policy = record.account.password_policy
       value = value.to_s
       record.errors.add attr, "too_short" if policy[:min_length] > value.length
+      record.errors.add attr, "too_long" if value.length > Setting.get('password_policy_max_length', '255').to_i
       record.errors.add attr, "common" if policy[:disallow_common_passwords] && COMMON_PASSWORDS.include?(value.downcase)
       # same char repeated
       record.errors.add attr, "repeated" if policy[:max_repeats] && value =~ /(.)\1{#{policy[:max_repeats]},}/

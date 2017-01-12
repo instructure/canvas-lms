@@ -36,6 +36,23 @@ define [
       rowKey: 1
     )
 
+  test 'new token with group id is handled properly', ->
+    initialOverrides = []
+    tokenToAdd = {type: "group", group_id: 1}
+
+    newOverrides = TokenActions.handleTokenAdd(
+      tokenToAdd,
+      initialOverrides,
+      1, #rowKey
+      {due_at: new Date(2012, 1, 1)} #dates
+    )
+
+    @assertTimesEqual(newOverrides[0], due_at: new Date(2012, 1, 1) )
+    @assertValuesEqual(newOverrides[0],
+      group_id: 1
+      rowKey: 1
+    )
+
   test 'new token with student id is handled properly with no adhoc', ->
     initialOverrides = []
     tokenToAdd = {type: "student", id: 1}
@@ -112,6 +129,18 @@ define [
 
     deepEqual newOverrides, []
 
+  test 'removing token with group id is handled properly', ->
+    initialOverrideAttrs = {group_id: 2, due_at: new Date(2012, 1, 1), rowKey: 1}
+    initialOverrides = [new AssignmentOverride(initialOverrideAttrs)]
+    tokenToRemove = {type: "section", group_id: 2}
+
+    newOverrides = TokenActions.handleTokenRemove(
+      tokenToRemove,
+      initialOverrides
+    )
+
+    deepEqual newOverrides, []
+
   test 'removing token with student id is handled properly when only student in adhoc', ->
     initialOverrideAttrs = {student_ids: [1], due_at: new Date(2012, 1, 1), rowKey: 1}
     initialOverrides = [new AssignmentOverride(initialOverrideAttrs)]
@@ -141,4 +170,3 @@ define [
       student_ids: [2]
       rowKey: 1
     )
-

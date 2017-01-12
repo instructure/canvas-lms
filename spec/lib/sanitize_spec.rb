@@ -102,6 +102,18 @@ describe Sanitize do
     expect(res).to eq %{<font face="Comic Sans MS" color="blue" size="3">hello</font>}
   end
 
+  it "should allow valid MathML" do
+    str = %{<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></math>}
+    res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+    expect(res).to eq str
+  end
+
+  it "should strip invalid attributes from MathML" do
+    str = %{<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi foo="bar">a</mi><mo>+</mo><mi>b</mi></mrow></math>}
+    res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+    expect(res).not_to match(/foo/)
+  end
+
   it "should remove and not escape contents of style tags" do
     str = %{<p><style type="text/css">pleaseignoreme: blahblahblah</style>but not me</p>}
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)

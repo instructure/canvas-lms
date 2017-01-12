@@ -23,7 +23,7 @@ module Quizzes
     attributes :id
 
     def_delegators :@controller,
-      :course_quiz_quiz_submission_url
+      :course_quiz_quiz_submission_url, :course_quiz_history_url
 
     def serializable_object(options={})
       return super unless object

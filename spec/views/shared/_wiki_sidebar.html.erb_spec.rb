@@ -33,5 +33,12 @@ describe "/shared/_wiki_sidebar" do
     render :partial => "shared/wiki_sidebar"
     expect(response).not_to be_nil
   end
-end
 
+  it "correctly checks wiki permissions" do
+    course_with_teacher
+    view_context
+    render :partial => "shared/wiki_sidebar"
+    expect(response).not_to be_nil
+    expect(response).to match(/new_page_link/)
+  end
+end

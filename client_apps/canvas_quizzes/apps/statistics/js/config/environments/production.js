@@ -28,6 +28,12 @@ define({
   quizReportsUrl: undefined,
 
   /**
+   * @cfg {String} courseSectionsUrl
+   * Canvas API endpoint for querying the current course sections.
+   */
+  courseSectionsUrl: undefined,
+
+  /**
    * @cfg {Boolean} [includesAllVersions=true]
    * Whether we should get the statistics and quiz reports for all versions
    * of the quiz, instead of the latest.

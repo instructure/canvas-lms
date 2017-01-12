@@ -113,6 +113,15 @@ namespace :canvas do
     compile_css = truthy_values.include?(args[:compile_css])
     build_js = truthy_values.include?(args[:build_js])
 
+    log_time('Making sure node_modules are up to date') {
+      raise 'error running npm install' unless `npm install`
+    }
+
+    # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
+    # to exist before we run handlebars stuff, so we have to do this first
+    require 'lib/brandable_css'
+    log_time('compile css (including custom brands)') { BrandableCSS.compile_all! }
+
     require 'parallel'
     processes = (ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count).to_i
     puts "working in #{processes} processes"
@@ -120,25 +129,20 @@ namespace :canvas do
     tasks = Hash.new
 
     if compile_css
-      tasks["Compile sass and make jammit css bundles"] = -> {
-        log_time('npm run compile-sass') do
-          half_of_avilable_cores = (processes / 2).ceil.to_s
-          raise unless system({"CANVAS_SASS_STYLE" => "compressed", "CANVAS_BUILD_CONCURRENCY" => half_of_avilable_cores}, "npm run compile-sass")
-        end
-
-        log_time("Jammit") do
-          require 'jammit'
-          Jammit.package!
-        end
-      }
       tasks["css:styleguide"] = -> {
         Rake::Task['css:styleguide'].invoke
       }
     end
 
+    # TODO: Once webpack is the only way, remove js:build
     if build_js
-      tasks["compile coffee, js 18n, and run r.js optimizer"] = -> {
-        ['js:generate', 'i18n:generate_js', 'js:build'].each do |name|
+      tasks["compile coffee, js 18n, run r.js optimizer, and webpack"] = -> {
+        prereqs = ['js:generate', 'i18n:generate_js']
+        prereqs.each do |name|
+          log_time(name) { Rake::Task[name].invoke }
+        end
+        # webpack and js:build can run concurrently
+        Parallel.each(['js:build', 'js:webpack'], :in_threads => processes.to_i) do |name|
           log_time(name) { Rake::Task[name].invoke }
         end
       }
@@ -170,6 +174,7 @@ namespace :canvas do
     end
     combined_time = times.reduce(:+)
     puts "Finished compiling assets in #{real_time}. parallelism saved #{combined_time - real_time} (#{real_time.to_f / combined_time.to_f * 100.0}%)"
+    raise "Error reving files" unless system('node_modules/.bin/gulp rev')
   end
 
   desc "Check static assets and generate api documentation."
@@ -212,7 +217,7 @@ namespace :lint do
   end
 end
 
-if Rails.version < '4.1'
+if CANVAS_RAILS4_0
   old_task = Rake::Task['db:_dump']
   old_actions = old_task.actions.dup
   old_task.actions.clear
@@ -229,7 +234,8 @@ end
 namespace :db do
   desc "Shows pending db migrations."
   task :pending_migrations => :environment do
-    pending_migrations = ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations
+    migrations = ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths)
+    pending_migrations = ActiveRecord::Migrator.new(:up, migrations).pending_migrations
     pending_migrations.each do |pending_migration|
       tags = pending_migration.tags
       tags = " (#{tags.join(', ')})" unless tags.empty?
@@ -237,15 +243,23 @@ namespace :db do
     end
   end
 
+  desc "Shows skipped db migrations."
+  task :skipped_migrations => :environment do
+    migrations = ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths)
+    skipped_migrations = ActiveRecord::Migrator.new(:up, migrations).skipped_migrations
+    skipped_migrations.each do |skipped_migration|
+      tags = skipped_migration.tags
+      tags = " (#{tags.join(', ')})" unless tags.empty?
+      puts '  %4d %s%s' % [skipped_migration.version, skipped_migration.name, tags]
+    end
+  end
+
   namespace :migrate do
     desc "Run all pending predeploy migrations"
     task :predeploy => [:environment, :load_config] do
-      ActiveRecord::Migrator.new(:up, "db/migrate/", nil).migrate(:predeploy)
-    end
-
-    desc "Run all pending postdeploy migrations"
-    task :postdeploy => [:environment, :load_config] do
-      ActiveRecord::Migrator.new(:up, "db/migrate/", nil).migrate(:postdeploy)
+      migrations = ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths)
+      migrations = migrations.select { |m| m.tags.include?(:predeploy) }
+      ActiveRecord::Migrator.new(:up, migrations).migrate
     end
   end
 
@@ -255,16 +269,16 @@ namespace :db do
       raise "Run with RAILS_ENV=test" unless Rails.env.test?
       config = ActiveRecord::Base.configurations['test']
       queue = config['queue']
-      drop_database(queue) if queue rescue nil
-      drop_database(config) rescue nil
+      ActiveRecord::Tasks::DatabaseTasks.drop(queue) if queue rescue nil
+      ActiveRecord::Tasks::DatabaseTasks.drop(config) rescue nil
       Canvas::Cassandra::DatabaseBuilder.config_names.each do |cass_config|
         db = Canvas::Cassandra::DatabaseBuilder.from_config(cass_config)
         db.tables.each do |table|
           db.execute("DROP TABLE #{table}")
         end
       end
-      create_database(queue) if queue
-      create_database(config)
+      ActiveRecord::Tasks::DatabaseTasks.create(queue) if queue
+      ActiveRecord::Tasks::DatabaseTasks.create(config)
       ::ActiveRecord::Base.connection.schema_cache.clear!
       ::ActiveRecord::Base.descendants.each(&:reset_column_information)
       Rake::Task['db:migrate'].invoke
@@ -283,6 +297,6 @@ Switchman::Rake.filter_database_servers do |servers, block|
   block.call(servers)
 end
 
-%w{db:pending_migrations db:migrate:predeploy db:migrate:postdeploy}.each { |task_name| Switchman::Rake.shardify_task(task_name) }
+%w{db:pending_migrations db:skipped_migrations db:migrate:predeploy}.each { |task_name| Switchman::Rake.shardify_task(task_name) }
 
 end

@@ -289,7 +289,7 @@ ul.submission_list.instTree li.submission.leaf {
     .section_url {
       color: #4b7092;
       display: block;
-      font-size: 14px;
+      @include fontSize(14px);
       padding: 5px 0 5px 25px;
       border-bottom: 1px solid lighten(#C6C6C6, 4%);
       &:hover, &:focus {
@@ -313,7 +313,7 @@ ul.submission_list.instTree li.submission.leaf {
       z-index: 11;
       padding: 7px 0 7px 23px;
       // color: #2C4C5E
-   
+
     }
   }
   li.hidden {
@@ -326,7 +326,7 @@ ul.submission_list.instTree li.submission.leaf {
 .eportfolio-name {
   padding: 10px;
   h3, .h3 {
-    font-size: 14px;
+    @include fontSize(14px);
     margin: 0;
     line-height: normal;
     padding: 0;

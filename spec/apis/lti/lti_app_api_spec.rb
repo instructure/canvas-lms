@@ -17,12 +17,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../lti_spec_helper.rb')
 
 module Lti
-  describe LtiAppsController, type: :request do
+  describe LtiAppsController, :include_lti_spec_helpers, type: :request do
 
-    let (:account) { Account.create }
+    let(:account) { Account.create }
     describe '#launch_definitions' do
 
       before do

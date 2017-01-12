@@ -74,6 +74,13 @@ module IncomingMailProcessor
       delete_message(message_id)
     end
 
+    def unprocessed_message_count
+      connect
+      @imap.select("INBOX")
+      length = @imap.search(["X-GM-RAW", "label:unread"]).length
+      disconnect
+      length
+    end
   end
 
 end

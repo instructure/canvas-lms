@@ -1,8 +1,6 @@
 shared_examples_for 'Textual Answer Serializers' do
-  MaxLength = Quizzes::QuizQuestion::AnswerSerializers::Util::MaxTextualAnswerLength
-
   it '[auto] should reject an answer that is too long' do
-    input = 'a' * (MaxLength+1)
+    input = 'a' * (Quizzes::QuizQuestion::AnswerSerializers::Util::MaxTextualAnswerLength+1)
     input = format(input) if respond_to?(:format)
 
     rc = subject.serialize(input)

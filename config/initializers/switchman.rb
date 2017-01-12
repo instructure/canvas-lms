@@ -1,94 +1,118 @@
-Rails.application.config.to_prepare do
+Rails.application.config.after_initialize do
   Switchman.cache = -> { MultiCache.cache }
 
-  Switchman::Shard.class_eval do
-    class << self
-      alias :birth :default unless instance_methods.include?(:birth)
-
-      def current_with_delayed_jobs(category=:default)
-        if category == :delayed_jobs
-          active_shards[category] || current_without_delayed_jobs(:default).delayed_jobs_shard
-        else
-          current_without_delayed_jobs(category)
+  # WillPaginate needs to allow args to Relation#to_a
+  WillPaginate::ActiveRecord::RelationMethods.class_eval do
+    def to_a(*args)
+      if current_page.nil? then super # workaround for Active Record 3.0
+      else
+        ::WillPaginate::Collection.create(current_page, limit_value) do |col|
+          col.replace super
+          col.total_entries ||= total_entries
         end
-      end
-      alias_method_chain :current, :delayed_jobs
-
-      def activate_with_delayed_jobs!(categories)
-        if !categories[:delayed_jobs] && categories[:default] && !@skip_delayed_job_auto_activation
-          skip_delayed_job_auto_activation do
-            categories[:delayed_jobs] = categories[:default].delayed_jobs_shard
-          end
-        end
-        activate_without_delayed_jobs!(categories)
-      end
-      alias_method_chain :activate!, :delayed_jobs
-
-      def skip_delayed_job_auto_activation
-        was = @skip_delayed_job_auto_activation
-        @skip_delayed_job_auto_activation = true
-        yield
-      ensure
-        @skip_delayed_job_auto_activation = was
       end
     end
+  end
 
+  module Canvas
+    module Shard
+      module ClassMethods
+        def current(category=:default)
+          if category == :delayed_jobs
+            active_shards[category] || super(:default).delayed_jobs_shard
+          else
+            super
+          end
+        end
+
+        def activate!(categories)
+          if !@skip_delayed_job_auto_activation && !categories[:delayed_jobs] &&
+              categories[:default] && categories[:default] != active_shards[:default] # only activate if it changed
+            skip_delayed_job_auto_activation do
+              categories[:delayed_jobs] = categories[:default].delayed_jobs_shard
+            end
+          end
+          super
+        end
+
+        def skip_delayed_job_auto_activation
+          was = @skip_delayed_job_auto_activation
+          @skip_delayed_job_auto_activation = true
+          yield
+        ensure
+          @skip_delayed_job_auto_activation = was
+        end
+      end
+
+      module IncludedClassMethods
+        def birth
+          default
+        end
+      end
+
+      def clear_cache
+        self.class.connection.after_transaction_commit { super }
+      end
+
+      def settings
+        return {} unless self.class.columns_hash.key?('settings')
+        s = super
+        unless s.is_a?(Hash) || s.nil?
+          s = s.unserialize(s.value)
+        end
+        if s.nil?
+          self.settings = s = {}
+        end
+
+        salt = s.delete(:encryption_key_salt)
+        secret = s.delete(:encryption_key_enc)
+        if secret || salt
+          if secret && salt
+            s[:encryption_key] = Canvas::Security.decrypt_password(secret, salt, 'shard_encryption_key')
+          end
+          self.settings = s
+        end
+
+        s
+      end
+
+      def delayed_jobs_shard
+        shard = Switchman::Shard.lookup(self.delayed_jobs_shard_id) if self.read_attribute(:delayed_jobs_shard_id)
+        shard || self.database_server.try(:delayed_jobs_shard, self)
+      end
+
+      def encrypt_settings
+        s = self.settings.dup
+        if encryption_key = s.delete(:encryption_key)
+          secret, salt = Canvas::Security.encrypt_password(encryption_key, 'shard_encryption_key')
+          s[:encryption_key_enc] = secret
+          s[:encryption_key_salt] = salt
+        end
+        if s != self.settings
+          self.settings = s
+        end
+        s
+      end
+    end
+  end
+
+  Switchman::Shard.prepend(Canvas::Shard)
+  Switchman::Shard.singleton_class.prepend(Canvas::Shard::ClassMethods)
+  Switchman::Shard.singleton_class.include(Canvas::Shard::IncludedClassMethods)
+
+  Switchman::Shard.class_eval do
     self.primary_key = "id"
     reset_column_information # make sure that the id column object knows it is the primary key
 
-    # make sure settings attribute is loaded, so that on class reload we don't get into a state
-    # that it thinks it's serialized, but the data isn't set up right
-    default.is_a?(self) && default.settings
     serialize :settings, Hash
+
     # the default shard was already loaded, but didn't deserialize it
-    if default.is_a?(self)
-      settings = ActiveRecord::AttributeMethods::Serialization::Attribute.new(serialized_attributes['settings'],
-                                                                   default.read_attribute('settings'),
-                                                                   :serialized).unserialized_value
+    if default.is_a?(self) && default.instance_variable_get(:@attributes)['settings'].is_a?(String)
+      settings = serialized_attributes['settings'].load(default.read_attribute('settings'))
       default.settings = settings
     end
 
     before_save :encrypt_settings
-
-    def settings
-      return {} unless self.class.columns_hash.key?('settings')
-      s = super
-      unless s.is_a?(Hash) || s.nil?
-        s = s.unserialize
-      end
-      if s.nil?
-        self.settings = s = {}
-      end
-
-      salt = s.delete(:encryption_key_salt)
-      secret = s.delete(:encryption_key_enc)
-      if secret || salt
-        if secret && salt
-          s[:encryption_key] = Canvas::Security.decrypt_password(secret, salt, 'shard_encryption_key')
-        end
-        self.settings = s
-      end
-
-      s
-    end
-
-    def encrypt_settings
-      s = self.settings.dup
-      if encryption_key = s.delete(:encryption_key)
-        secret, salt = Canvas::Security.encrypt_password(encryption_key, 'shard_encryption_key')
-        s[:encryption_key_enc] = secret
-        s[:encryption_key_salt] = salt
-      end
-      if s != self.settings
-        self.settings = s
-      end
-      s
-    end
-
-    def delayed_jobs_shard
-      shard = Shard.lookup(self.delayed_jobs_shard_id) if self.read_attribute(:delayed_jobs_shard_id)
-      shard || self.database_server.try(:delayed_jobs_shard, self)
-    end
 
     delegate :in_current_region?, to: :database_server
 
@@ -104,7 +128,7 @@ Rails.application.config.to_prepare do
     scope :in_current_region, -> do
       @current_region_scope ||=
         if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
-          scoped
+          all
         else
           in_region(ApplicationController.region)
         end
@@ -135,6 +159,20 @@ Rails.application.config.to_prepare do
         @in_current_region = !config[:region] || !ApplicationController.region || config[:region] == ApplicationController.region
       end
       @in_current_region
+    end
+
+    def self.send_in_each_region(klass, method, enqueue_args = {}, *args)
+      klass.send(method, *args)
+      regions = Set.new
+      regions << Shard.current.database_server.config[:region]
+      all.each do |db|
+        next if regions.include?(db.config[:region]) || !db.config[:region]
+        next if db.shards.empty?
+        regions << db.config[:region]
+        db.shards.first.activate do
+          klass.send_later_enqueue_args(method, enqueue_args, *args)
+        end
+      end
     end
   end
 

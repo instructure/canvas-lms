@@ -78,8 +78,15 @@ define [
         @trigger 'submit'
         saveDfd
       else
-        @showErrors errors
-        null
+        # focus on the first element with an error for accessibility
+        first_error = (_.keys(errors)[0])
+        @findField(first_error).focus()
+        # short timeout to ensure alerts are properly read after focus change.
+        window.setTimeout((=>
+          @showErrors errors
+          null
+        ), 50)
+
 
     ##
     # Converts the form to an object. Override this if the form's input names

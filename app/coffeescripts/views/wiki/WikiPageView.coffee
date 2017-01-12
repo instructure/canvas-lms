@@ -38,6 +38,7 @@ define [
     @optionProperty 'course_id'
     @optionProperty 'course_home'
     @optionProperty 'course_title'
+    @optionProperty 'display_show_all_pages'
 
     initialize: ->
       @model.on 'change', => @render()
@@ -90,10 +91,12 @@ define [
 
     afterRender: ->
       super
+      $(".header-bar-outer-container .header-bar-right").append($("#mark-as-done-checkbox"))
       @navigateToLinkAnchor()
       @reloadView = new WikiPageReloadView
         el: @$pageChangedAlert
         model: @model
+        interval: 150000
         reloadMessage: I18n.t 'reload_viewing_page', 'This page has changed since you started viewing it. *Reload*', wrapper: '<a class="reload" href="#">$1</a>'
       @reloadView.on 'changed', =>
         @$headerBarOuterContainer.addClass('page-changed')
@@ -122,6 +125,7 @@ define [
       json.course_home = @course_home
       json.course_title = @course_title
       json.CAN =
+        VIEW_ALL_PAGES: !!@display_show_all_pages || !!@WIKI_RIGHTS.manage
         VIEW_PAGES: !!@WIKI_RIGHTS.read
         PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == 'courses'
         VIEW_UNPUBLISHED: !!@WIKI_RIGHTS.manage || !!@WIKI_RIGHTS.view_unpublished_items

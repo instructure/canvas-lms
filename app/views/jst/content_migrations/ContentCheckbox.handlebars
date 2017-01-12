@@ -10,12 +10,32 @@
       {{#if screenreaderType}}<span class="screenreader-only">({{screenreaderType}})</span>{{/if}}
 
       {{#if count}}
-      <span data-bind="count">({{count}})</span>
+        <span data-bind="count">({{count}})</span>
+      {{/if}}
+      {{#if sub_count}}
+        <span class="sub_count">({{sub_count}})</span>
       {{/if}}
     </label>
   </div>
 
   <ul role="group">
+    {{#if showModuleOptions}}
+      <li>
+        <div class="module_options" id="module-options-{{cid}}">
+          <div class="ic-Form-control ic-Form-control--radio ic-Form-control--radio-inline">
+            <div class="ic-Radio">
+              <input id="module-option-1-{{cid}}" type="radio" name="module-option-group-{{cid}}" value="one" checked="checked">
+              <label for="module-option-1-{{cid}}" class="ic-Label">Import as one module</label>
+            </div>
+            <div class="ic-Radio">
+              <input id="module-option-2-{{cid}}" type="radio" name="module-option-group-{{cid}}" value="separate">
+              <label for="module-option-2-{{cid}}" class="ic-Label">Import sub-modules separately</label>
+            </div>
+          </div>
+        </div>
+      </li>
+    {{/if}}
+
     <li data-content="sublevelCheckboxes">
   </ul>
 {{else}}

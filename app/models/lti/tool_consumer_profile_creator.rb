@@ -1,5 +1,9 @@
+require 'ims/lti'
+
 module Lti
   class ToolConsumerProfileCreator
+
+    TCP_UUID = "339b6700-e4cb-47c5-a54f-3ee0064921a9".freeze # Hard coded until we start persisting the tcp
 
     CAPABILITIES = %w(
           basic-lti-launch-request
@@ -12,6 +16,7 @@ module Lti
           Canvas.placements.courseNavigation
           Canvas.placements.assignmentSelection
           Canvas.placements.linkSelection
+          Canvas.placements.postGrades
           User.username
           Person.email.primary
           Person.name.given
@@ -21,6 +26,7 @@ module Lti
           Person.sourcedId
           Membership.role
           ToolConsumerProfile.url
+          OAuth.splitSecret
         ).freeze
 
     SERVICES = [
@@ -32,7 +38,7 @@ module Lti
       },
       {
         id: 'ToolProxy.item',
-        endpoint: 'api/lti/tool_proxy/{tool_proxy_guid',
+        endpoint: 'api/lti/tool_proxy/{tool_proxy_guid}',
         format: ['application/vnd.ims.lti.v2.toolproxy+json'],
         action: ['GET']
       },
@@ -68,11 +74,15 @@ module Lti
     def create
       profile = IMS::LTI::Models::ToolConsumerProfile.new
       profile.id = @tcp_url
-      profile.lti_version = IMS::LTI::Models::ToolConsumerProfile::LTI_VERSION_2P0
+      profile.lti_version = IMS::LTI::Models::ToolConsumerProfile::LTI_VERSION_2P1
       profile.product_instance = create_product_instance
       profile.service_offered = services
-      profile.capability_offered = CAPABILITIES
-      profile.guid = '339b6700-e4cb-47c5-a54f-3ee0064921a9' #Hard coded until we start persisting the tcp
+      profile.capability_offered = CAPABILITIES.dup
+      profile.guid = TCP_UUID
+
+      if @root_account.feature_enabled?(:lti2_rereg)
+        profile.capability_offered << IMS::LTI::Models::Messages::ToolProxyReregistrationRequest::MESSAGE_TYPE
+      end
 
       profile
     end

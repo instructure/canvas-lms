@@ -7,6 +7,7 @@ define [
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/assignments/DateAvailableColumnView'
   'compiled/views/assignments/CreateAssignmentView'
+  'compiled/views/SisButtonView'
   'compiled/views/MoveDialogView'
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentListItem'
@@ -15,7 +16,8 @@ define [
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
   'jqueryui/tooltip'
   'compiled/behaviors/tooltip'
-], (I18n, Backbone, $, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
+  'compiled/jquery.rails_flash_notifications'
+], (I18n, Backbone, $, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
 
   class AssignmentListItemView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
@@ -27,7 +29,8 @@ define [
     @child 'dateDueColumnView',       '[data-view=date-due]'
     @child 'dateAvailableColumnView', '[data-view=date-available]'
     @child 'editAssignmentView',      '[data-view=edit-assignment]'
-    @child 'moveAssignmentView', '[data-view=moveAssignment]'
+    @child 'sisButtonView',           '[data-view=sis-button]'
+    @child 'moveAssignmentView',      '[data-view=moveAssignment]'
 
     els:
       '.edit_assignment': '$editAssignmentButton'
@@ -62,12 +65,17 @@ define [
 
     initializeChildViews: ->
       @publishIconView    = false
+      @sisButtonView = false
       @editAssignmentView = false
       @dateAvailableColumnView = false
       @moveAssignmentView = false
 
       if @canManage()
-        @publishIconView    = new PublishIconView(model: @model)
+        @publishIconView    = new PublishIconView({
+          model: @model,
+          publishText: I18n.t("Unpublished. Click to publish %{name}", name: @model.get('name')),
+          unpublishText: I18n.t("Published. Click to unpublish %{name}", name: @model.get('name'))
+        })
         @editAssignmentView = new CreateAssignmentView(model: @model)
         @moveAssignmentView = new MoveDialogView
           model: @model
@@ -79,6 +87,9 @@ define [
           closeTarget: @$el.find('a[id*=manage_link]')
           saveURL: -> "#{ENV.URLS.assignment_sort_base_url}/#{@parentListView.value()}/reorder"
 
+        if @model.postToSISEnabled()
+          @sisButtonView = new SisButtonView(model: @model)
+
       @dateDueColumnView       = new DateDueColumnView(model: @model)
       @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
 
@@ -89,6 +100,7 @@ define [
     render: ->
       @toggleHidden(@model, @model.get('hidden'))
       @publishIconView.remove()         if @publishIconView
+      @sisButtonView.remove()           if @sisButtonView
       @editAssignmentView.remove()      if @editAssignmentView
       @dateDueColumnView.remove()       if @dateDueColumnView
       @dateAvailableColumnView.remove() if @dateAvailableColumnView
@@ -182,7 +194,8 @@ define [
         @focusOnGroupByID(id)
 
     delete: ->
-      @model.destroy()
+      @model.destroy success: =>
+        $.screenReaderFlashMessage(I18n.t('Assignment was deleted'))
       @$el.remove()
 
     canManage: ->
@@ -230,7 +243,6 @@ define [
         json.submission.pointsPossible = json.pointsPossible if json.submission?
 
       json.submission.gradingType = json.gradingType if json.submission?
-
 
       if json.gradingType is 'not_graded'
         json.hideGrade = true

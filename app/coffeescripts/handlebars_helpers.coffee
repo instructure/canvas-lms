@@ -9,13 +9,13 @@ define [
   'compiled/util/semanticDateRange'
   'compiled/util/dateSelect'
   'compiled/util/mimeClass'
-  'compiled/str/convertApiUserContent'
+  'compiled/str/apiUserContent'
   'compiled/str/TextHelper'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'translations/_core_en'
-], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
+], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, apiUserContent, textHelper) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (args..., options) ->
@@ -68,6 +68,16 @@ define [
 
     hiddenUnless : (condition) -> " display:none; " unless condition
 
+    hiddenIfExists : (condition) -> " display:none; " if condition?
+
+    hiddenUnlessExists : (condition) -> " display:none; " unless condition?
+
+    ifExists: (condition, options) ->
+      if condition?
+        options.fn @
+      else
+        options.inverse @
+
     semanticDateRange : ->
       new Handlebars.SafeString semanticDateRange arguments...
 
@@ -98,7 +108,12 @@ define [
       else
         timeTitle = htmlEscape $.datetimeString(datetime)
 
-      new Handlebars.SafeString "<time data-tooltip data-html-tooltip-title='#{htmlEscape timeTitle}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>#{$.friendlyDatetime(fudged)}</time>"
+      new Handlebars.SafeString """
+        <time data-tooltip data-html-tooltip-title='#{htmlEscape timeTitle}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>
+          <span aria-hidden='true'>#{$.friendlyDatetime(fudged)}</span>
+          <span class='screenreader-only'>#{htmlEscape timeTitle}</span>
+        </time>
+      """
 
 
     fudge: (datetime) ->
@@ -120,8 +135,8 @@ define [
     # stored elsewhere).
 
     # expects: anything that $.datetimeString can handle
-    datetimeFormatted : (datetime, localized=true) ->
-      $.datetimeString(datetime, {localized: localized})
+    datetimeFormatted : (datetime) ->
+      $.datetimeString(datetime)
 
     # Strips the time information from the datetime and accounts for the user's
     # timezone preference. expects: anything tz() can handle
@@ -166,6 +181,15 @@ define [
       return '' unless date
       I18n.l "time.formats.#{i18n_format}", new Date(date.getTime() + ((date.getTimezoneOffset()*60 - -ENV['TIMEZONE_OFFSET'])*1000))
 
+    # convert a moment to a string, using the given i18n format in the date.formats namespace
+    fcMomentToDateString : (date = '', i18n_format) ->
+      return '' unless date
+      tz.format(fcUtil.unwrap(date), "date.formats.#{i18n_format}")
+
+    # convert a moment to a time string, using the given i18n format in the time.formats namespace
+    fcMomentToString : (date = '', i18n_format) ->
+      return '' unless date
+      tz.format(fcUtil.unwrap(date), "time.formats.#{i18n_format}")
 
     tTimeHours : (date = '') ->
       if date.getMinutes() == 0 and date.getSeconds() == 0
@@ -223,7 +247,7 @@ define [
     # use this method to process any user content fields returned in api responses
     # this is important to handle object/embed tags safely, and to properly display audio/video tags
     convertApiUserContent: (html, {hash}) ->
-      content = convertApiUserContent(html, hash)
+      content = apiUserContent.convert(html, hash)
       # if the content is going to get picked up by tinymce, do not mark as safe
       # because we WANT it to be escaped again.
       content = new Handlebars.SafeString content unless hash and hash.forEditing
@@ -275,6 +299,20 @@ define [
       for arg in args
         return fn(this) if arg
       inverse(this)
+
+    # runs block if the argument is null or undefined
+    # usage:
+    # {{#ifNull arg}}
+    #   arg was null
+    # {{else}}
+    #   arg is not null
+    # {{/ifNull}}
+    ifNull: ->
+      [args..., {fn, inverse}] = arguments
+      arg = args[0]
+      if arg?
+        return inverse(this)
+      fn(this)
 
     # {{#eachWithIndex records}}
     #   <li class="legend_item{{_index}}"><span></span>{{Name}}</li>

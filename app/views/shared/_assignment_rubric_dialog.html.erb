@@ -1,13 +1,17 @@
 <div id="rubrics" class="rubric_dialog" style="display: none; margin-bottom: 10px;">
   <% if @assignment.rubric_association && @assignment.rubric_association.rubric %>
-    <%= render :partial => "shared/rubric", :object => @assignment.rubric_association.rubric, :locals => {:association => @assignment, :rubric_association => @assignment.rubric_association, :editable => can_do(@assignment, @current_user, :update), :has_assessments => !@assignment.rubric_association.rubric_assessments.empty?, :edit_view => true} %>
+    <%= render :partial => "shared/rubric", :object => @assignment.rubric_association.rubric,
+        :locals => {:association => @assignment,
+            :rubric_association => @assignment.rubric_association,
+            :editable => can_do(@assignment, @current_user, :update),
+            :has_assessments => !@assignment.rubric_association.rubric_assessments.empty?, :edit_view => true} %>
   <% end %>
   <div style="display: none;" id="rubric_parameters">
     <input type="hidden" name="rubric_association[association_type]" value="Assignment"/>
     <input type="hidden" name="rubric_association[association_id]" value="<%= @assignment.id %>"/>
     <input type="hidden" name="rubric_association[purpose]" value="grading"/>
   </div>
-  <div class="assignment_points_possible" style="display: none;"><%= @assignment.points_possible %></div>
+  <div class="assignment_points_possible" style="display: none;"><%= round_if_whole(@assignment.points_possible) %></div>
   <% if can_do(@assignment, @current_user, :update) %>
     <%= render :partial => "shared/rubric_dialog", :locals => {:assignment => @assignment, :rubric => @assignment.rubric_association && @assignment.rubric_association.rubric} %>
   <% end %>
@@ -20,13 +24,13 @@
     </div>
     <%= render :partial => "shared/rubric_forms" %>
   <% end %>
-  <a href="#" class="btn add_rubric_link" style="margin-top: 20px; <%= hidden if @assignment && @assignment.rubric_association %>"><%= image_tag "rubric.png" %> <%= t 'links.add_rubric', "Add Rubric" %></a>
+  <a href="#" class="btn add_rubric_link" style="margin-top: 20px; <%= hidden if @assignment && @assignment.rubric_association %>"><%= image_tag "rubric.png", :alt => '' %> <%= t 'links.add_rubric', "Add Rubric" %></a>
 </div>
 
 <script>
   window.ENV = window.ENV || {};
   window.ENV.ROOT_OUTCOME_GROUP = <%= raw @root_outcome_group %>;
-  require(['compiled/bundles/edit_rubric'])
+  var event = document.createEvent('Event');
+  event.initEvent('rubricEditDataReady', true, true);
+  document.dispatchEvent(event)
 </script>
-
-

@@ -17,12 +17,13 @@
 #
 module CC
   module WikiResources
-    
+
     def add_wiki_pages
       wiki_folder = File.join(@export_dir, CCHelper::WIKI_FOLDER)
       FileUtils::mkdir_p wiki_folder
-      
-      @course.wiki.wiki_pages.not_deleted.each do |page|
+
+      scope = @course.wiki.wiki_pages.not_deleted
+      WikiPages::ScopedToUser.new(@course, @user, scope).scope.each do |page|
         next unless export_object?(page)
         begin
           migration_id = CCHelper.create_key(page)
@@ -34,6 +35,7 @@ module CC
           meta_fields[:notify_of_update] = page.notify_of_update
           meta_fields[:workflow_state] = page.workflow_state
           meta_fields[:front_page] = page.is_front_page?
+          meta_fields[:module_locked] = page.locked_by_module_item?(@user, true).present?
 
           File.open(path, 'w') do |file|
             file << @html_exporter.html_page(page.body, page.title, meta_fields)

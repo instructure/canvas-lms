@@ -21,12 +21,13 @@ module Api
 
   # find id in collection, by either id or sis_*_id
   # if the collection is over the users table, `self` is replaced by @current_user.id
-  def api_find(collection, id, options = {account: nil})
-    options = options.merge limit: 1
-    api_find_all(collection, [id], options).first || raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with API id '#{id}'")
+  def api_find(collection, id, account: nil)
+    result = api_find_all(collection, [id], account: account).first
+    raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with API id '#{id}'") unless result
+    result
   end
 
-  def api_find_all(collection, ids, options = { limit: nil, account: nil })
+  def api_find_all(collection, ids, account: nil)
     if collection.table_name == User.table_name && @current_user
       ids = ids.map{|id| id == 'self' ? @current_user.id : id }
     end
@@ -52,9 +53,12 @@ module Api
           @domain_root_account.default_enrollment_term
         when 'current'
           if !current_term
-            current_terms = @domain_root_account.enrollment_terms.active.
-                where("(start_at<=? OR start_at IS NULL) AND (end_at >=? OR end_at IS NULL) AND NOT (start_at IS NULL AND end_at IS NULL)", Time.now.utc, Time.now.utc).
-                limit(2).to_a
+            current_terms = @domain_root_account
+             .enrollment_terms
+             .active
+             .where("(start_at<=? OR start_at IS NULL) AND (end_at >=? OR end_at IS NULL) AND NOT (start_at IS NULL AND end_at IS NULL)", Time.now.utc, Time.now.utc)
+              .limit(2)
+              .to_a
             current_term = current_terms.length == 1 ? current_terms.first : :nil
           end
           current_term == :nil ? nil : current_term
@@ -63,10 +67,7 @@ module Api
         end
       end
     end
-    find_params = Api.sis_find_params_for_collection(collection, ids, options[:account] || @domain_root_account, @current_user)
-    return [] if find_params == :not_found
-    find_params[:limit] = options[:limit] unless options[:limit].nil?
-    return collection.all(find_params)
+    Api.sis_relation_for_collection(collection, ids, account || @domain_root_account, @current_user)
   end
 
   # map a list of ids and/or sis ids to plain ids.
@@ -75,14 +76,14 @@ module Api
   # returned in the result.
   def self.map_ids(ids, collection, root_account, current_user = nil)
     sis_mapping = sis_find_sis_mapping_for_collection(collection)
-    columns = sis_parse_ids(ids, sis_mapping[:lookups], current_user)
+    columns = sis_parse_ids(ids, sis_mapping[:lookups], current_user,
+                            root_account: root_account)
     result = columns.delete(sis_mapping[:lookups]["id"]) || []
     unless columns.empty?
-      find_params = sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, root_account)
-      return result if find_params == :not_found
-      # pluck ignores include
-      find_params[:joins] = find_params.delete(:include) if find_params[:include]
-      result.concat collection.scoped(find_params).pluck(:id)
+      relation = relation_for_sis_mapping_and_columns(collection, columns, sis_mapping, root_account)
+      # pluck ignores eager_load
+      relation = relation.joins(*relation.eager_load_values) if relation.eager_load_values.present?
+      result.concat relation.pluck(:id)
       result.uniq!
     end
     result
@@ -90,30 +91,49 @@ module Api
 
   SIS_MAPPINGS = {
     'courses' =>
-      { :lookups => { 'sis_course_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id', 'lti_context_id' => 'lti_context_id' },
-        :is_not_scoped_to_account => ['id'].to_set,
-        :scope => 'root_account_id' },
+      { :lookups => { 'sis_course_id' => 'sis_source_id',
+                      'id' => 'id',
+                      'sis_integration_id' => 'integration_id',
+                      'lti_context_id' => 'lti_context_id' }.freeze,
+        :is_not_scoped_to_account => ['id'].freeze,
+        :scope => 'root_account_id' }.freeze,
     'enrollment_terms' =>
-      { :lookups => { 'sis_term_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id' },
-        :is_not_scoped_to_account => ['id'].to_set,
-        :scope => 'root_account_id' },
+      { :lookups => { 'sis_term_id' => 'sis_source_id',
+                      'id' => 'id',
+                      'sis_integration_id' => 'integration_id' }.freeze,
+        :is_not_scoped_to_account => ['id'].freeze,
+        :scope => 'root_account_id' }.freeze,
     'users' =>
-      { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id', 'id' => 'users.id', 'sis_integration_id' => 'pseudonyms.integration_id', 'lti_context_id' => 'users.lti_context_id', 'lti_user_id' => 'users.lti_context_id' },
-        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id'].to_set,
+      { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id',
+                      'sis_login_id' => {
+                          column: 'LOWER(pseudonyms.unique_id)',
+                          transform: ->(id) { QuotedValue.new("LOWER(#{Pseudonym.connection.quote(id)})") }
+                      },
+                      'id' => 'users.id',
+                      'sis_integration_id' => 'pseudonyms.integration_id',
+                      'lti_context_id' => 'users.lti_context_id',
+                      'lti_user_id' => 'users.lti_context_id' }.freeze,
+        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id'].freeze,
         :scope => 'pseudonyms.account_id',
-        :joins => [:pseudonym] },
+        :joins => :pseudonym }.freeze,
     'accounts' =>
-      { :lookups => { 'sis_account_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id', 'lti_context_id' => 'lti_context_id' },
-        :is_not_scoped_to_account => ['id', 'lti_context_id'].to_set,
-        :scope => 'root_account_id' },
+      { :lookups => { 'sis_account_id' => 'sis_source_id',
+                      'id' => 'id',
+                      'sis_integration_id' => 'integration_id',
+                      'lti_context_id' => 'lti_context_id' }.freeze,
+        :is_not_scoped_to_account => ['id', 'lti_context_id'].freeze,
+        :scope => 'root_account_id' }.freeze,
     'course_sections' =>
-      { :lookups => { 'sis_section_id' => 'sis_source_id', 'id' => 'id' , 'sis_integration_id' => 'integration_id' },
-        :is_not_scoped_to_account => ['id'].to_set,
-        :scope => 'root_account_id' },
+      { :lookups => { 'sis_section_id' => 'sis_source_id',
+                      'id' => 'id',
+                      'sis_integration_id' => 'integration_id' }.freeze,
+        :is_not_scoped_to_account => ['id'].freeze,
+        :scope => 'root_account_id' }.freeze,
     'groups' =>
-        { :lookups => { 'sis_group_id' => 'sis_source_id', 'id' => 'id' },
-          :is_not_scoped_to_account => ['id'].to_set,
-          :scope => 'root_account_id' },
+        { :lookups => { 'sis_group_id' => 'sis_source_id',
+                        'id' => 'id' }.freeze,
+          :is_not_scoped_to_account => ['id'].freeze,
+          :scope => 'root_account_id' }.freeze,
   }.freeze
 
   # (digits in 2**63-1) - 1, so that any ID representable in MAX_ID_LENGTH
@@ -122,7 +142,8 @@ module Api
   MAX_ID_LENGTH = 18
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
 
-  def self.sis_parse_id(id, lookups, current_user = nil)
+  def self.sis_parse_id(id, lookups, _current_user = nil,
+                        root_account: nil)
     # returns column_name, column_value
     return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
     id = id.to_s.strip
@@ -140,14 +161,20 @@ module Api
 
     column = lookups[sis_column]
     return nil, nil unless column
+    if column.is_a?(Hash)
+      sis_id = column[:transform].call(sis_id)
+      column = column[:column]
+    end
     return column, sis_id
   end
 
-  def self.sis_parse_ids(ids, lookups, current_user = nil)
+  def self.sis_parse_ids(ids, lookups, current_user = nil, root_account: nil)
     # returns {column_name => [column_value,...].uniq, ...}
     columns = {}
     ids.compact.each do |id|
-      column, sis_id = sis_parse_id(id, lookups, current_user)
+      column, sis_id = sis_parse_id(id, lookups,
+                                    current_user,
+                                    root_account: root_account)
       next unless column && sis_id
       columns[column] ||= []
       columns[column] << sis_id
@@ -170,23 +197,33 @@ module Api
         raise(ArgumentError, "need to add support for table name: #{collection.table_name}")
   end
 
-  def self.sis_find_params_for_collection(collection, ids, sis_root_account, current_user = nil)
-    return sis_find_params_for_sis_mapping(sis_find_sis_mapping_for_collection(collection), ids, sis_root_account, current_user)
+  def self.sis_relation_for_collection(collection, ids, sis_root_account, current_user = nil)
+    relation_for_sis_mapping(collection,
+                             sis_find_sis_mapping_for_collection(collection),
+                             ids,
+                             sis_root_account,
+                             current_user)
   end
 
-  def self.sis_find_params_for_sis_mapping(sis_mapping, ids, sis_root_account, current_user = nil)
-    return sis_make_params_for_sis_mapping_and_columns(sis_parse_ids(ids, sis_mapping[:lookups], current_user), sis_mapping, sis_root_account)
+  def self.relation_for_sis_mapping(relation, sis_mapping, ids, sis_root_account, current_user = nil)
+    relation_for_sis_mapping_and_columns(relation,
+                                         sis_parse_ids(ids,
+                                                       sis_mapping[:lookups],
+                                                       current_user,
+                                                       root_account: sis_root_account),
+                                         sis_mapping,
+                                         sis_root_account)
   end
 
-  def self.sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, sis_root_account)
+  def self.relation_for_sis_mapping_and_columns(relation, columns, sis_mapping, sis_root_account)
     raise ArgumentError, "sis_root_account required for lookups" unless sis_root_account.is_a?(Account)
 
-    return :not_found if columns.empty?
+    return relation.none if columns.empty?
 
     not_scoped_to_account = sis_mapping[:is_not_scoped_to_account] || []
 
     if columns.length == 1 && not_scoped_to_account.include?(columns.keys.first)
-      find_params = {:conditions => columns}
+      relation = relation.where(columns)
     else
       args = []
       query = []
@@ -216,21 +253,25 @@ module Api
       end
 
       args.unshift(query.join(" OR "))
-      find_params = { :conditions => args }
+      relation = relation.where(*args)
     end
 
-    find_params[:include] = sis_mapping[:joins] if sis_mapping[:joins]
-    return find_params
+    relation = relation.eager_load(sis_mapping[:joins]) if sis_mapping[:joins]
+    relation
   end
 
   def self.max_per_page
     Setting.get('api_max_per_page', '50').to_i
   end
 
+  def self.per_page
+    Setting.get('api_per_page', '10').to_i
+  end
+
   def self.per_page_for(controller, options={})
-    per_page = controller.params[:per_page] || options[:default] || Setting.get('api_per_page', '10')
+    per_page_requested = controller.params[:per_page] || options[:default] || per_page
     max = options[:max] || max_per_page
-    [[per_page.to_i, 1].max, max.to_i].min
+    [[per_page_requested.to_i, 1].max, max.to_i].min
   end
 
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
@@ -250,10 +291,12 @@ module Api
 
   # Returns collection as the first return value, and the meta information hash
   # as the second return value
-  def self.jsonapi_paginate(collection, controller, base_url, pagination_args={})
+  def self.jsonapi_paginate(collection, controller, base_url, pagination_args = {})
     collection = paginate_collection!(collection, controller, pagination_args)
     meta = jsonapi_meta(collection, controller, base_url)
-
+    hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
+    links = build_links_from_hash(hash)
+    controller.response.headers["Link"] = links.join(',') if links.length > 0
     return collection, meta
   end
 
@@ -356,7 +399,7 @@ module Api
     media_object_or_hash = OpenStruct.new(media_object_or_hash) if media_object_or_hash.is_a?(Hash)
     {
       'content-type' => "#{media_object_or_hash.media_type}/mp4",
-      'display_name' => media_object_or_hash.title,
+      'display_name' => media_object_or_hash.title.presence || media_object_or_hash.user_entered_title,
       'media_id' => media_object_or_hash.media_id,
       'media_type' => media_object_or_hash.media_type,
       'url' => user_media_download_url(:user_id => @current_user.id,
@@ -367,14 +410,16 @@ module Api
   end
 
 
-  def api_bulk_load_user_content_attachments(htmls, context = @context, user = @current_user)
-    rewriter = UserContent::HtmlRewriter.new(context, user)
-    attachment_ids = []
-    rewriter.set_handler('files') do |m|
-      attachment_ids << m.obj_id if m.obj_id
-    end
+  def api_bulk_load_user_content_attachments(htmls, context = nil)
 
-    htmls.each { |html| rewriter.translate_content(html) }
+    regex = context ? %r{/#{context.class.name.tableize}/#{context.id}/files/(\d+)} : %r{/files/(\d+)}
+
+    attachment_ids = []
+    htmls.compact.each do |html|
+      html.scan(regex).each do |match|
+        attachment_ids << match.first
+      end
+    end
 
     if attachment_ids.blank?
       {}
@@ -384,7 +429,8 @@ module Api
                     else
                       context.attachments.where(id: attachment_ids)
                     end
-      attachments.index_by(&:id)
+
+      attachments.preload(:context).index_by(&:id)
     end
   end
 
@@ -397,8 +443,14 @@ module Api
 
   def resolve_placeholders(content)
     host, protocol = get_host_and_protocol_from_request
-    # content is a json-encoded string; slashes are escaped
-    content.gsub("#{PLACEHOLDER_PROTOCOL}:\\/\\/#{PLACEHOLDER_HOST}", "#{protocol}:\\/\\/#{host}")
+    # content is a json-encoded string; slashes are escaped (at least in Rails 4.0)
+    content.gsub("#{PLACEHOLDER_PROTOCOL}:\\/\\/#{PLACEHOLDER_HOST}", "#{protocol}:\\/\\/#{host}").
+            gsub("#{PLACEHOLDER_PROTOCOL}://#{PLACEHOLDER_HOST}", "#{protocol}://#{host}")
+  end
+
+  def user_can_download_attachment?(attachment, context, user)
+    # checking on the context first can improve performance when checking many attachments for admins
+    (context && context.grants_any_right?(user, :manage_files, :read_as_admin)) || attachment.grants_right?(user, nil, :download)
   end
 
   def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {}, is_public=false)
@@ -428,7 +480,7 @@ module Api
                 end
       end
 
-      unless obj && ((is_public && !obj.locked_for?(user)) || obj.grants_right?(user, nil, :download))
+      unless obj && !obj.deleted? && ((is_public && !obj.locked_for?(user)) || user_can_download_attachment?(obj, context, user))
         if obj && obj.previewable_media? && (uri = URI.parse(match.url) rescue nil)
           uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
           next uri.to_s
@@ -457,7 +509,9 @@ module Api
     html = rewriter.translate_content(html)
 
     url_helper = Html::UrlProxy.new(self, context, host, protocol)
-    Html::Content.rewrite_outgoing(html, url_helper) 
+    account = Context.get_account(context) || @domain_root_account
+    include_mobile = !(respond_to?(:in_app?, true) && in_app?)
+    Html::Content.rewrite_outgoing(html, account, url_helper, include_mobile: include_mobile)
   end
 
   # This removes the verifier parameters that are added to attachment links by api_user_content
@@ -523,38 +577,6 @@ module Api
     end
     return nil unless api_type
     @inverse_map[api_type.downcase]
-  end
-
-  def self.recursively_stringify_json_ids(value, opts = {})
-    case value
-    when Hash
-      stringify_json_ids(value, opts)
-      value.each_value { |v| recursively_stringify_json_ids(v, opts) if v.is_a?(Hash) || v.is_a?(Array) }
-    when Array
-      value.each { |v| recursively_stringify_json_ids(v, opts) if v.is_a?(Hash) || v.is_a?(Array) }
-    end
-    value
-  end
-
-  def self.stringify_json_ids(value, opts = {})
-    return unless value.is_a?(Hash)
-    value.keys.each do |key|
-      if key =~ /(^|_)id$/
-        # id, foo_id, etc.
-        value[key] = stringify_json_id(value[key], opts)
-      elsif key =~ /(^|_)ids$/ && value[key].is_a?(Array)
-        # ids, foo_ids, etc.
-        value[key].map!{ |id| stringify_json_id(id, opts) }
-      end
-    end
-  end
-
-  def self.stringify_json_id(id, opts = {})
-    if opts[:reverse]
-      id.is_a?(String) ? id.to_i : id
-    else
-      id.is_a?(Integer) ? id.to_s : id
-    end
   end
 
   def accepts_jsonapi?

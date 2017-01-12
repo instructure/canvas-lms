@@ -100,4 +100,28 @@ describe QuestionBanksController do
       expect(@teacher.reload.assessment_question_banks).not_to include @bank
     end
   end
+
+  describe "#show" do
+    before :once do
+      course_with_teacher
+      @bank = @course.assessment_question_banks.create!
+    end
+
+    before :each do
+      user_session(@teacher)
+    end
+
+    subject do
+      get :show, course_id: @course.id, id: @bank.id
+    end
+
+    it 'renders show template' do
+      expect(subject).to render_template(:show)
+    end
+
+    it 'adds CONTEXT_URL_ROOT to js env' do
+      subject
+      expect(assigns[:js_env]).to have_key :CONTEXT_URL_ROOT
+    end
+  end
 end

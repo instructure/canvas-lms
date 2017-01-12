@@ -1,18 +1,24 @@
 # Put this in config/application.rb
 require File.expand_path('../boot', __FILE__)
 
-unless CANVAS_RAILS3
-  require "rails/all"
-  Bundler.require(*Rails.groups)
-else
-  require "active_record/railtie"
-  require "action_controller/railtie"
-  require "action_mailer/railtie"
-  require "active_resource/railtie"
-  Bundler.require(:default, Rails.env) if defined?(Bundler)
-end
+require_relative '../lib/canvas_yaml'
 
-if Rails.version < '4.1'
+# Yes, it doesn't seem DRY to list these both in the if and else
+# but this used to be "require 'rails/all'" which included sprockets.
+# I needed to explicitly opt-out of sprockets but since I'm not sure
+# about the other frameworks, I left this so it would be exactly the same
+# as "require 'rails/all'" but without sprockets--even though it is a little
+# different then the rails 3 else block. If the difference is not intended,
+# they can be pulled out of the if/else
+require "active_record/railtie"
+require "action_controller/railtie"
+require "action_mailer/railtie"
+# require "sprockets/railtie" # Do not enable the Rails Asset Pipeline
+require "rails/test_unit/railtie"
+
+Bundler.require(*Rails.groups)
+
+if CANVAS_RAILS4_0
   ActiveRecord::Base.class_eval do
     mattr_accessor :dump_schema_after_migration, instance_writer: false
     self.dump_schema_after_migration = true
@@ -28,9 +34,8 @@ module CanvasRails
     config.filter_parameters.concat LoggingFilter.filtered_parameters
     config.action_dispatch.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
     config.action_dispatch.rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
-    if CANVAS_RAILS3
-      config.action_dispatch.rescue_responses['ActionController::ParameterMissing'] = 400
-    end
+    config.action_dispatch.default_headers['X-UA-Compatible'] = "IE=Edge,chrome=1"
+    config.action_dispatch.default_headers.delete('X-Frame-Options')
 
     config.app_generators do |c|
       c.test_framework :rspec
@@ -52,8 +57,11 @@ module CanvasRails
     log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
     opts = {}
     require 'canvas_logger'
-    log_level = (CANVAS_RAILS3 ? ActiveSupport::BufferedLogger : ActiveSupport::Logger).const_get(log_config['log_level'].to_s.upcase)
+
+    config.log_level = log_config['log_level']
+    log_level = ActiveSupport::Logger.const_get(config.log_level.to_s.upcase)
     opts[:skip_thread_context] = true if log_config['log_context'] == false
+
     case log_config["logger"]
       when "syslog"
         require 'syslog_wrapper'
@@ -80,12 +88,21 @@ module CanvasRails
     # Activate observers that should always be running
     config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer ]
 
+    config.active_record.whitelist_attributes = false
+
+    unless CANVAS_RAILS4_0
+      config.active_record.raise_in_transactional_callbacks = true # may as well opt into the new behavior
+    end
+    config.active_support.encode_big_decimal_as_string = false
+
     config.autoload_paths += %W(#{Rails.root}/app/middleware
                             #{Rails.root}/app/observers
                             #{Rails.root}/app/presenters
                             #{Rails.root}/app/services
                             #{Rails.root}/app/serializers
                             #{Rails.root}/app/presenters)
+
+    config.autoload_once_paths << Rails.root.join("app/middleware")
 
     # prevent directory->module inference in these directories from wreaking
     # havoc on the app (e.g. stylesheets/base -> ::Base)
@@ -97,8 +114,9 @@ module CanvasRails
     initializer("extend_middleware_stack", after: "load_config_initializers") do |app|
       app.config.middleware.insert_before(config.session_store, 'LoadAccount')
       app.config.middleware.insert_before(config.session_store, 'SessionsTimeout')
-      app.config.middleware.swap('ActionDispatch::RequestId', "RequestContextGenerator")
-      app.config.middleware.insert_before('ActionDispatch::ParamsParser', 'Canvas::RequestThrottle')
+      app.config.middleware.swap('ActionDispatch::RequestId', 'RequestContextGenerator')
+      app.config.middleware.insert_after(config.session_store, 'RequestContextSession')
+      app.config.middleware.insert_before('ActionDispatch::ParamsParser', 'RequestThrottle')
       app.config.middleware.insert_before('Rack::MethodOverride', 'PreventNonMultipartParse')
     end
 
@@ -107,69 +125,77 @@ module CanvasRails
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
     end
 
-    if CANVAS_RAILS3
-      # This patch is perfectly placed to go in as soon as the PostgreSQLAdapter
-      # is required for the first time, but before it's actually used.
-      #
-      # This patch won't be required in Rails >= 4.0.0, which supports params such as
-      # connect_timeout.
-      ActiveRecord::Base::ConnectionSpecification.class_eval do
-        def initialize_with_postgresql_patches(config, adapter_method)
-          initialize_without_postgresql_patches(config, adapter_method)
-          if adapter_method == "postgresql_connection" && !defined?(@@postgresql_patches_applied)
-            ActiveRecord::Base.class_eval do
-              def self.postgresql_connection(config) # :nodoc:
-                config = config.symbolize_keys
-                config[:user] ||= config.delete(:username) if config.key?(:username)
+    module PostgreSQLEarlyExtensions
+      def initialize(connection, logger, connection_parameters, config)
+        unless config.key?(:prepared_statements)
+          config = config.dup
+          config[:prepared_statements] = false
+        end
+        super(connection, logger, connection_parameters, config)
+      end
 
-                if config.key?(:database)
-                  config[:dbname] = config[:database]
-                else
-                  raise ArgumentError, "No database specified. Missing argument: database."
-                end
-                conn_params = config.slice(:host, :port, :dbname, :user, :password, :connect_timeout)
+      def connect
+        hosts = Array(@connection_parameters[:host]).presence || [nil]
+        hosts.each_with_index do |host, index|
+          begin
+            connection_parameters = @connection_parameters.dup
+            connection_parameters[:host] = host
+            @connection = PGconn.connect(connection_parameters)
 
-                # The postgres drivers don't allow the creation of an unconnected PGconn object,
-                # so just pass a nil connection object for the time being.
-                ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new(nil, logger, [conn_params], config)
-              end
+            ActiveSupport::Deprecation.warn("Canvas will require PostgreSQL 9.3 or newer, starting with the next stable release") unless postgresql_version >= 90300
+
+            if CANVAS_RAILS4_0
+              ActiveRecord::ConnectionAdapters::PostgreSQLColumn.money_precision = (postgresql_version >= 80300) ? 19 : 10
+            else
+              ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID::Money.precision = (postgresql_version >= 80300) ? 19 : 10
             end
-            @@postgresql_patches_applied = true
+
+            configure_connection
+
+            break
+          rescue ::PG::Error => error
+            if !CANVAS_RAILS4_0 && error.message.include?("does not exist")
+              raise ActiveRecord::NoDatabaseError.new(error.message, error)
+            elsif index == hosts.length - 1
+              raise
+            end
+            # else try next host
           end
         end
-        alias_method_chain :initialize, :postgresql_patches unless private_instance_methods.include?(:initialize_without_postgresql_patches)
       end
     end
 
-    # We need to make sure that safe_yaml is loaded *after* the YAML engine
-    # is switched to Syck (which DelayedJob needs for now). Otherwise we
-    # won't have access to (safe|unsafe)_load.
-    require 'yaml'
-    if RUBY_VERSION >= '2.0.0'
-      require 'syck'
-    end
-    YAML::ENGINE.yamler = 'syck' if defined?(YAML::ENGINE)
-    require 'safe_yaml'
-    YAML.enable_symbol_parsing!
-    # We don't need to be reminded that safe loads are being used everywhere.
-    SafeYAML::OPTIONS[:suppress_warnings] = true
+    Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
+                    PostgreSQLEarlyExtensions,
+                    method: :prepend)
 
-    # This tag whitelist is syck specific. We'll need to tweak it when we upgrade to psych.
-    # See the tests in spec/lib/safe_yaml_spec.rb
-        YAML.whitelist.add(*%w[
-      tag:ruby.yaml.org,2002:symbol
-      tag:yaml.org,2002:timestamp
-      tag:yaml.org,2002:map:HashWithIndifferentAccess
-      tag:yaml.org,2002:map:ActiveSupport::HashWithIndifferentAccess
-      tag:ruby.yaml.org,2002:hash:ActiveSupport::HashWithIndifferentAccess
-      tag:ruby.yaml.org,2002:object:OpenStruct
-      tag:ruby.yaml.org,2002:object:Scribd::Document
-      tag:ruby.yaml.org,2002:object:Mime::Type
-      tag:ruby.yaml.org,2002:object:URI::HTTP
-      tag:ruby.yaml.org,2002:object:URI::HTTPS
-      tag:ruby.yaml.org,2002:object:OpenObject
-    ])
-    YAML.whitelist.add('tag:ruby.yaml.org,2002:object:Class') { |classname| Canvas::Migration.valid_converter_classes.include?(classname) }
+    SafeYAML.singleton_class.send(:attr_accessor, :safe_parsing)
+    module SafeYAMLWithFlag
+      def load(*args)
+        previous, self.safe_parsing = safe_parsing, true
+        super
+      ensure
+        self.safe_parsing = previous
+      end
+    end
+    SafeYAML.singleton_class.prepend(SafeYAMLWithFlag)
+
+    # safe_yaml can't whitelist specific instances of scalar values, so just override the loading
+    # here, and do a weird check
+    YAML.add_ruby_type("object:Class") do |_type, val|
+      if SafeYAML.safe_parsing && !Canvas::Migration.valid_converter_classes.include?(val)
+        raise "Cannot load class #{val} from YAML"
+      end
+      val.constantize
+    end
+
+    # TODO: Use this instead of the above block when we switch to Psych
+    Psych.add_domain_type("ruby/object", "Class") do |_type, val|
+      if SafeYAML.safe_parsing && !Canvas::Migration.valid_converter_classes.include?(val)
+        raise "Cannot load class #{val} from YAML"
+      end
+      val.constantize
+    end
 
     # Extend any base classes, even gem classes
     Dir.glob("#{Rails.root}/lib/ext/**/*.rb").each { |file| require file }
@@ -211,11 +237,20 @@ module CanvasRails
 
     class ExceptionsApp
       def call(env)
-        @app_controller ||= ActionDispatch::Routing::RouteSet::Dispatcher.new.controller(:controller => 'application')
+        @app_controller ||= ActionDispatch::Routing::RouteSet::Dispatcher.new({}).controller(:controller => 'application')
         @app_controller.action('rescue_action_dispatch_exception').call(env)
       end
     end
 
     config.exceptions_app = ExceptionsApp.new
+
+    config.before_initialize do
+      config.action_controller.asset_host = Canvas::Cdn.method(:asset_host_for)
+    end
+
+    if config.action_dispatch.rack_cache != false
+      config.action_dispatch.rack_cache[:ignore_headers] =
+        %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
+    end
   end
 end

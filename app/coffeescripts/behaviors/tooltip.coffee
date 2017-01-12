@@ -21,6 +21,41 @@ define [
   'jqueryui/tooltip'
 ], (_, $, htmlEscape) ->
 
+  tooltipsToShortCirtuit = {}
+  shortCircutTooltip = (target) ->
+    tooltipsToShortCirtuit[target] || tooltipsToShortCirtuit[target[0]]
+
+  tooltipUtils = {
+
+    setPosition: (opts)->
+      caret = ->
+        if opts.tooltipClass?.match('popover')
+          30
+        else
+          5
+      collision = (if opts.force_position is "true" then "none" else "flipfit")
+      positions =
+        right:
+          my: "left center"
+          at: "right+#{caret()} center"
+          collision: collision
+        left:
+          my: "right center"
+          at: "left-#{caret()} center"
+          collision: collision
+        top:
+          my: "center bottom"
+          at: "center top-#{caret()}"
+          collision: collision
+        bottom:
+          my: "center top"
+          at: "center bottom+#{caret()}"
+          collision: collision
+      if opts.position of positions
+        opts.position = positions[opts.position]
+
+  }
+
   # create a custom widget that inherits from the default jQuery UI
   # tooltip but extends the open method with a setTimeout wrapper so
   # that our browser can scroll to the tabbed focus element before
@@ -28,6 +63,8 @@ define [
   do ($) ->
     $.widget "custom.timeoutTooltip", $.ui.tooltip,
       _open: ( event, target, content ) ->
+        return null if shortCircutTooltip(target)
+
         # Converts arguments to an array
         args = Array.prototype.slice.call(arguments, 0)
         args.splice(2, 1, htmlEscape(content).toString())
@@ -84,32 +121,6 @@ define [
         feedback.important
       ].join(' '))
 
-  setPosition = (opts) ->
-    caret = ->
-      if opts.tooltipClass?.match('popover')
-        30
-      else
-        5
-    positions =
-      right:
-        my: "left center"
-        at: "right+#{caret()} center"
-        collision: 'flipfit flipfit'
-      left:
-        my: "right center"
-        at: "left-#{caret()} center"
-        collision: 'flipfit flipfit'
-      top:
-        my: "center bottom"
-        at: "center top-#{caret()}"
-        collision: 'flipfit flipfit'
-      bottom:
-        my: "center top"
-        at: "center bottom+#{caret()}"
-        collision: 'flipfit flipfit'
-    if opts.position of positions
-      opts.position = positions[opts.position]
-
   $('body').on 'mouseenter focusin', '[data-tooltip]', (event) ->
     $this = $(this)
     opts = $this.data('tooltip')
@@ -120,7 +131,7 @@ define [
       opts = position: opts
     opts ||= {}
     opts.position ||= 'top'
-    setPosition opts
+    tooltipUtils.setPosition(opts)
     if opts.collision
       opts.position.collision = opts.collision
 
@@ -138,3 +149,14 @@ define [
       .timeoutTooltip(opts)
       .timeoutTooltip('open')
       .click -> $this.timeoutTooltip('close')
+
+  restartTooltip = (event) ->
+    tooltipsToShortCirtuit[event.target] = false
+
+  stopTooltip = (event) ->
+    tooltipsToShortCirtuit[event.target] = true
+
+  $(this).bind("detachTooltip", stopTooltip);
+  $(this).bind("reattachTooltip", restartTooltip);
+
+  return tooltipUtils

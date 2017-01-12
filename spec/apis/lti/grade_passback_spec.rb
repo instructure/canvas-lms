@@ -32,6 +32,34 @@ describe LtiApiController, type: :request do
     tag.save!
   end
 
+  def check_error_response(message, check_generated_sig=true)
+    expect(response.body.strip).to_not be_empty, "Should not have an empty response body"
+
+    json = JSON.parse response.body
+    expect(json["errors"][0]["message"]).to eq message
+    expect(json["error_report_id"]).to be > 0
+
+    data = error_data(json)
+
+    expect(data.key?('oauth_signature')).to be true
+    expect(data.key?('oauth_signature_method')).to be true
+    expect(data.key?('oauth_nonce')).to be true
+    expect(data.key?('oauth_timestamp')).to be true
+    expect(data.key?('generated_signature')).to be true if check_generated_sig
+
+    expect(data['oauth_signature']).to_not be_empty
+    expect(data['oauth_signature_method']).to_not be_empty
+    expect(data['oauth_nonce']).to_not be_empty
+    expect(data['oauth_timestamp']).to_not be_empty
+    expect(data['generated_signature']).to_not be_empty if check_generated_sig
+  end
+
+  def error_data(json=nil)
+    json ||= JSON.parse response.body
+    error_report = ErrorReport.find json["error_report_id"]
+    error_report.data
+  end
+
   def make_call(opts = {})
     opts['path'] ||= "/api/lti/v1/tools/#{@tool.id}/grade_passback"
     opts['key'] ||= @tool.consumer_key
@@ -39,10 +67,17 @@ describe LtiApiController, type: :request do
     opts['content-type'] ||= 'application/xml'
     consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "https://www.example.com", :signature_method => "HMAC-SHA1")
     req = consumer.create_signed_request(:post, opts['path'], nil, :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'])
+
+    auth = req['Authorization']
+    if opts['override_signature_method']
+      auth.gsub! "HMAC-SHA1", opts['override_signature_method']
+    end
+
     req.body = opts['body'] if opts['body']
     post "https://www.example.com#{req.path}",
       req.body,
-      { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
+      { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
+
   end
 
   def source_id
@@ -63,9 +98,48 @@ describe LtiApiController, type: :request do
     assert_status(415)
   end
 
-  it "should require the correct shared secret" do
-    make_call('secret' => 'bad secret is bad')
-    assert_status(401)
+  context "OAuth Requests" do
+    it "should fail on invalid signature method" do
+      make_call('override_signature_method' => 'BawkBawk256')
+      check_error_response("Invalid authorization header", false)
+      data = error_data
+
+      expect(data['error_class']).to eq "OAuth::Signature::UnknownSignatureMethod"
+      assert_status(401)
+    end
+
+    it "should require the correct shared secret" do
+      make_call('secret' => 'bad secret is bad')
+      check_error_response("Invalid authorization header")
+
+      data = error_data
+      expect(data['error_class']).to eq "OAuth::Unauthorized"
+
+      assert_status(401)
+    end
+
+    if Canvas.redis_enabled?
+      it "should not allow the same nonce to be used more than once" do
+        make_call('nonce' => 'not_so_random', 'content-type' => 'none')
+        assert_status(415)
+        make_call('nonce' => 'not_so_random', 'content-type' => 'none')
+        assert_status(401)
+        check_error_response("Duplicate nonce detected")
+      end
+    end
+
+    it "should block timestamps more than 90 minutes old" do
+      # the 90 minutes value is suggested by the LTI spec
+      make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'none')
+      assert_status(401)
+      expect(response.body).to match(/expired/i)
+      check_error_response("Timestamp too old or too far in the future, request has expired")
+    end
+
+    context "Error reports" do
+      context "Oauth 1" do
+      end
+    end
   end
 
   def replace_result(opts={})
@@ -75,7 +149,7 @@ describe LtiApiController, type: :request do
     raw_score = opts[:raw_score]
 
     sourceid ||= source_id()
-    
+
     score_xml = ''
     if score
       score_xml = <<-XML
@@ -95,7 +169,7 @@ describe LtiApiController, type: :request do
           </resultTotalScore>
       XML
     end
-    
+
     result_data_xml = ''
     if result_data && !result_data.empty?
       result_data_xml = "<resultData>\n"
@@ -104,7 +178,7 @@ describe LtiApiController, type: :request do
       end
       result_data_xml += "\n</resultData>\n"
     end
-    
+
     body = <<-XML
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -185,8 +259,12 @@ XML
     expect(response.content_type).to eq 'application/xml'
     xml = Nokogiri::XML.parse(response.body)
     expect(xml.at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content).to eq failure_type
-    expect(xml.at_css('imsx_description').content).to eq error_message if error_message
     expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
+    desc = xml.at_css('imsx_description').content.match(/(?<description>.+)\n\[EID_(?<error_report>[^\]]+)\]/)
+    expect(desc[:description]).to eq error_message if error_message
+    expect(desc[:error_report]).to_not be_empty
+
+
   end
 
   def check_success
@@ -196,7 +274,7 @@ XML
   end
 
   describe "replaceResult" do
-    
+
     def verify_xml(response)
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'success'
@@ -204,14 +282,14 @@ XML
       expect(xml.at_css('imsx_operationRefIdentifier').content).to eq 'replaceResult'
       expect(xml.at_css('imsx_POXBody *:first').name).to eq 'replaceResultResponse'
     end
-    
+
     it "should allow updating the submission score" do
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
       make_call('body' => replace_result(score: '0.6'))
       check_success
-      
+
       verify_xml(response)
-      
+
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission).to be_present
       expect(submission).to be_graded
@@ -219,65 +297,65 @@ XML
       expect(submission.submission_type).to eql 'external_tool'
       expect(submission.score).to eq 12
     end
-    
+
     it "should set the submission data text" do
       make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:text =>"oioi"}))
       check_success
-    
+
       verify_xml(response)
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission.score).to eq 12
       expect(submission.body).to eq "oioi"
     end
-    
+
     it "should set complex submission text" do
       text = CGI::escapeHTML("<p>stuff</p>")
       make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:text => "<![CDATA[#{text}]]>" }))
       check_success
-    
+
       verify_xml(response)
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission.submission_type).to eq 'online_text_entry'
       expect(submission.body).to eq text
     end
-    
+
     it "should set the submission data url" do
       make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:url =>"http://www.example.com/lti"}))
       check_success
-    
+
       verify_xml(response)
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission.submission_type).to eq 'online_url'
       expect(submission.score).to eq 12
       expect(submission.url).to eq "http://www.example.com/lti"
     end
-    
+
     it "should set the submission data text even with no score" do
       make_call('body' => replace_result(score: nil, sourceid: nil, result_data: {:text =>"oioi"}))
       check_success
-    
+
       verify_xml(response)
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission.score).to eq nil
       expect(submission.body).to eq "oioi"
     end
-    
+
     it "should fail if no score and not submission data" do
       make_call('body' => replace_result(score: nil, sourceid: nil))
       expect(response).to be_success
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
-      expect(xml.at_css('imsx_description').content).to eq "No score given"
+      expect(xml.at_css('imsx_description').content).to match /^No score given/
 
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
     end
-    
+
     it "should fail if bad score given" do
       make_call('body' => replace_result(score: '1.5', sourceid: nil))
       expect(response).to be_success
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
-      expect(xml.at_css('imsx_description').content).to eq "Score is not between 0 and 1"
+      expect(xml.at_css('imsx_description').content).to match /^Score is not between 0 and 1/
 
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
     end
@@ -288,8 +366,22 @@ XML
       expect(response).to be_success
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
-      expect(xml.at_css('imsx_description').content).to eq "Assignment has no points possible."
+      expect(xml.at_css('imsx_description').content).to match /^Assignment has no points possible\./
     end
+
+    it "should pass if assignment has 0 points possible" do
+      @assignment.update_attributes(:points_possible => 0, :grading_type => 'percent')
+      make_call('body' => replace_result(score: '0.75', sourceid: nil))
+      check_success
+
+      submission = @assignment.submissions.where(user_id: @student).first
+      expect(submission).to be_present
+      expect(submission).to be_graded
+      expect(submission).to be_submitted_at
+      expect(submission.submission_type).to eql 'external_tool'
+      expect(submission.score).to eq 0
+    end
+
 
     it "should notify users if it fails because the assignment has no points" do
       @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
@@ -329,6 +421,56 @@ to because the assignment has no points possible.
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
       make_call('body' => replace_result(score: "OHAI SCORES"))
       check_failure('failure')
+    end
+
+    context "pass_fail zero point assignments" do
+      it "should succeed with incomplete grade when score < 1" do
+        @assignment.update_attributes(:points_possible => 10, :grading_type => 'pass_fail')
+        make_call('body' => replace_result(score: '0.75', sourceid: nil))
+        check_success
+
+        verify_xml(response)
+
+        submission = @assignment.submissions.where(user_id: @student).first
+        expect(submission).to be_present
+        expect(submission).to be_graded
+        expect(submission).to be_submitted_at
+        expect(submission.submission_type).to eql 'external_tool'
+        expect(submission.score).to eq 0
+        expect(submission.grade).to eq 'incomplete'
+      end
+
+      it "should succeed with incomplete grade when score < 1 for a 0 point assignment" do
+        @assignment.update_attributes(:points_possible => 0, :grading_type => 'pass_fail')
+        make_call('body' => replace_result(score: '0.75', sourceid: nil))
+        check_success
+
+        verify_xml(response)
+
+        submission = @assignment.submissions.where(user_id: @student).first
+        expect(submission).to be_present
+        expect(submission).to be_graded
+        expect(submission).to be_submitted_at
+        expect(submission.submission_type).to eql 'external_tool'
+        expect(submission.score).to eq 0
+        expect(submission.grade).to eq 'incomplete'
+      end
+
+      it "should succeed with complete grade when score = 1" do
+        @assignment.update_attributes(:points_possible => 0, :grading_type => 'pass_fail')
+        make_call('body' => replace_result(score: '1', sourceid: nil))
+        check_success
+
+        verify_xml(response)
+
+        submission = @assignment.submissions.where(user_id: @student).first
+        expect(submission).to be_present
+        expect(submission).to be_graded
+        expect(submission).to be_submitted_at
+        expect(submission.submission_type).to eql 'external_tool'
+        expect(submission.score).to eq 0
+        expect(submission.grade).to eq 'complete'
+      end
     end
 
     context "sending raw score" do
@@ -425,7 +567,7 @@ to because the assignment has no points possible.
 
   it "should reject if the assignment doesn't use this tool" do
     tool = @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
-    @assignment.external_tool_tag.destroy!
+    @assignment.external_tool_tag.destroy_permanently!
     @assignment.external_tool_tag = nil
     tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
     tag.content_type = 'ContextExternalTool'
@@ -436,7 +578,7 @@ to because the assignment has no points possible.
 
   it "should be unsupported if the assignment switched to a new tool with the same shared secret" do
     tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
-    @assignment.external_tool_tag.destroy!
+    @assignment.external_tool_tag.destroy_permanently!
     @assignment.external_tool_tag = nil
     tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
     tag.content_type = 'ContextExternalTool'
@@ -447,7 +589,7 @@ to because the assignment has no points possible.
 
   it "should reject if the assignment is no longer a tool assignment" do
     @assignment.update_attributes(:submission_types => 'online_upload')
-    @assignment.reload.external_tool_tag.destroy!
+    @assignment.reload.external_tool_tag.destroy_permanently!
     make_call('body' => replace_result(score: '0.5'))
     check_failure('failure', 'Assignment is no longer associated with this tool')
   end
@@ -455,23 +597,6 @@ to because the assignment has no points possible.
   it "should verify the sourcedid is correct for this tool launch" do
     make_call('body' => replace_result(score: '0.6', sourceid: 'BAD SOURCE ID'))
     check_failure('failure', 'Invalid sourcedid')
-  end
-
-  if Canvas.redis_enabled?
-    it "should not allow the same nonce to be used more than once" do
-      make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-      assert_status(415)
-      make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-      assert_status(401)
-      expect(response.body).to match(/nonce/i)
-    end
-  end
-
-  it "should block timestamps more than 90 minutes old" do
-    # the 90 minutes value is suggested by the LTI spec
-    make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'none')
-    assert_status(401)
-    expect(response.body).to match(/expired/i)
   end
 
   it "fails if course is deleted" do
@@ -654,7 +779,7 @@ to because the assignment has no points possible.
 
     it "should reject if the assignment doesn't use this tool" do
       tool = @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
-      @assignment.external_tool_tag.destroy!
+      @assignment.external_tool_tag.destroy_permanently!
       @assignment.external_tool_tag = nil
       tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
       tag.content_type = 'ContextExternalTool'
@@ -665,7 +790,7 @@ to because the assignment has no points possible.
 
     it "should be unsupported if the assignment switched to a new tool with the same shared secret" do
       tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
-      @assignment.external_tool_tag.destroy!
+      @assignment.external_tool_tag.destroy_permanently!
       @assignment.external_tool_tag = nil
       tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
       tag.content_type = 'ContextExternalTool'
@@ -676,7 +801,7 @@ to because the assignment has no points possible.
 
     it "should reject if the assignment is no longer a tool assignment" do
       @assignment.update_attributes(:submission_types => 'online_upload')
-      @assignment.reload.external_tool_tag.destroy!
+      @assignment.reload.external_tool_tag.destroy_permanently!
       make_call('body' => update_result('0.5'))
       check_failure
     end

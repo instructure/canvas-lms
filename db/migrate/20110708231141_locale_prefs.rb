@@ -1,4 +1,6 @@
 class LocalePrefs < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :users, :locale, :string
     add_column :users, :browser_locale, :string

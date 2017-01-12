@@ -1,4 +1,4 @@
-require([ 'canvas_quizzes/core/dispatcher' ], function(Dispatcher) {
+require([ 'core/dispatcher' ], function(Dispatcher) {
   var global = this;
 
   /**

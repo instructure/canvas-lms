@@ -117,6 +117,7 @@ define([
               htmlValues: ['question_text']
             });
             $question.data('question', question);
+	    $question.find(".assessment_question_id").text(question.id);
             $("#questions").append($question);
             $question.show();
           }
@@ -296,6 +297,7 @@ define([
           width: 600,
           title: I18n.t('title.move_copy_questions', "Move/Copy Questions")
         });
+        $dialog.parent().find('.ui-dialog-titlebar-close').focus();
       });
       $("#move_question_dialog .submit_button").click(function() {
         var $dialog = $("#move_question_dialog");

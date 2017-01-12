@@ -5,9 +5,9 @@ require [
   'compiled/collections/DiscussionTopicsCollection'
   'compiled/views/DiscussionTopics/DiscussionListView'
   'compiled/views/DiscussionTopics/IndexView'
-], (I18n, _, {Router}, DiscussionTopicsCollection, DiscussionListView, IndexView) ->
+], (I18n, _, Backbone, DiscussionTopicsCollection, DiscussionListView, IndexView) ->
 
-  class DiscussionIndexRouter extends Router
+  class DiscussionIndexRouter extends Backbone.Router
 
     # Public: I18n strings.
     messages:
@@ -58,7 +58,7 @@ require [
     # Returns nothing.
     fetchDiscussions: ->
       pipeline = new DiscussionTopicsCollection
-      pipeline.fetch(data: {order_by: 'recent_activity', per_page: 50})
+      pipeline.fetch(data: {plain_messages: true, exclude_assignment_descriptions: true, order_by: 'recent_activity', per_page: 50})
       pipeline.on('fetch', @_onPipelineLoad)
       pipeline.on('fetched:last', @_onPipelineEnd)
 

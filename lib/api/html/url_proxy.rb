@@ -64,6 +64,12 @@ module Api
         # Get quiz
         %r{^/courses/(#{ID})/quizzes/(#{ID})$} => ['Quiz', :api_v1_course_quiz_url, :course_id, :id],
 
+        # List modules
+        %r{^/courses/(#{ID})/modules$} => ['[Module]', :api_v1_course_context_modules_url, :course_id],
+
+        # Get module
+        %r{^/courses/(#{ID})/modules/(#{ID})$} => ['Module', :api_v1_course_context_module_url, :course_id, :id],
+
         # Launch LTI tool
         %r{^/courses/(#{ID})/external_tools/retrieve\?url=(.*)$} => ['SessionlessLaunchUrl', :api_v1_course_external_tool_sessionless_launch_url, :course_id, :url],
     }.freeze
@@ -81,8 +87,19 @@ module Api
         proxy.media_object_thumbnail_url(media_id, width: 550, height: 448, type: 3, host: host, protocol: protocol)
       end
 
+      def media_context
+        case context
+        when Group
+          context.context
+        when CourseSection
+          context.course
+        else
+          context
+        end
+      end
+
       def media_redirect_url(media_id, media_type)
-        proxy.polymorphic_url([context, :media_download], entryId: media_id, media_type: media_type, redirect: '1', host: host, protocol: protocol)
+        proxy.polymorphic_url([media_context, :media_download], entryId: media_id, media_type: media_type, redirect: '1', host: host, protocol: protocol)
       end
 
       # rewrite any html attributes that are urls but just absolute paths, to

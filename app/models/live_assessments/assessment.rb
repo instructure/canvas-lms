@@ -20,11 +20,11 @@ module LiveAssessments
   class Assessment < ActiveRecord::Base
     attr_accessible :context, :key, :title
 
-    belongs_to :context, polymorphic: true
+    belongs_to :context, polymorphic: [:course]
     has_many :submissions, class_name: 'LiveAssessments::Submission'
     has_many :results, class_name: 'LiveAssessments::Result'
 
-    has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
+    has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, class_name: 'ContentTag'
 
     validates_presence_of :context_id, :context_type, :key, :title
     validates_length_of :title, maximum: maximum_string_length
@@ -47,7 +47,7 @@ module LiveAssessments
         users.each do |user|
           submission = submissions.where(user_id: user.id).first_or_initialize
 
-          user_results = results.for_user(user).all
+          user_results = results.for_user(user).to_a
           next unless user_results.any?
           submission.possible = user_results.count
           submission.score = user_results.count(&:passed)

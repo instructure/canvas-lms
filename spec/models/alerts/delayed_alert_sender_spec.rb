@@ -39,7 +39,7 @@ module Alerts
         it "should not trigger any alerts for courses with no alerts" do
           course = mock('Course')
           course.stubs(:available?).returns(true)
-          course.stubs(:alerts).returns(stub(:all => []))
+          course.stubs(:alerts).returns([])
           Notification.any_instance.expects(:create_message).never
 
           DelayedAlertSender.evaluate_for_course(course, nil)

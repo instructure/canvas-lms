@@ -85,17 +85,11 @@ class ReportSnapshot < ActiveRecord::Base
       collection_type = Setting.get("usage_statistics_collection", "opt_out")
       return if collection_type  == "opt_out"
       
-      installation_uuid = Setting.get("installation_uuid", "")
-      if installation_uuid == ""
-        installation_uuid = CanvasSlug.generate_securish_uuid
-        Setting.set("installation_uuid", installation_uuid)
-      end
-  
       require 'lib/ssl_common'
       
       data = {
           "collection_type" => collection_type,
-          "installation_uuid" => installation_uuid,
+          "installation_uuid" => Canvas.installation_uuid,
           "report_type" => self.report_type,
           "data" => read_attribute(:data),
           "rails_env" => Rails.env

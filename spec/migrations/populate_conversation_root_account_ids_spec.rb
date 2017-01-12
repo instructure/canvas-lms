@@ -41,7 +41,7 @@ describe 'PopulateConversationRootAccountIds' do
       c2 = course(:account => a2)
       cn2 = Conversation.initiate([u, u2], true)
       cn2.add_message(u, "test")
-      Conversation.connection.execute "INSERT INTO context_messages(context_id, context_type) VALUES(#{c2.id}, 'Course')"
+      Conversation.connection.execute "INSERT INTO #{Conversation.connection.quote_table_name('context_messages')}(context_id, context_type) VALUES(#{c2.id}, 'Course')"
       cn2.conversation_messages.update_all("context_message_id = (SELECT id FROM context_messages ORDER BY id DESC LIMIT 1)")
       expect(cn2.root_account_ids).to eql []
 
@@ -52,7 +52,7 @@ describe 'PopulateConversationRootAccountIds' do
       
       cn3 = Conversation.initiate([u, u3], true)
       cn3.add_message(u, "test")
-      Conversation.connection.execute "INSERT INTO context_messages(context_id, context_type) VALUES(#{g3.id}, 'Group')"
+      Conversation.connection.execute "INSERT INTO #{Conversation.connection.quote_table_name('context_messages')}(context_id, context_type) VALUES(#{g3.id}, 'Group')"
       cn3.conversation_messages.update_all("context_message_id = (SELECT id FROM context_messages ORDER BY id DESC LIMIT 1)")
       expect(cn3.root_account_ids).to eql []
 

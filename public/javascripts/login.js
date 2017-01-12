@@ -1,4 +1,4 @@
-require([
+define([
   'i18n!pseudonyms.login' /* I18n.t */,
   'jquery' /* $ */,
   'str/htmlEscape',
@@ -12,7 +12,9 @@ require([
 
   $("#coenrollment_link").click(function(event) {
     event.preventDefault();
-    signupDialog('parentDialog', I18n.t("parent_signup", "Parent Signup"));
+    var template = $(this).data('template');
+    var path = $(this).data('path');
+    signupDialog(template, I18n.t("parent_signup", "Parent Signup"), path);
   });
   $("#register_link").click(function(){
     $.trackPageview("/clicked_register_on_login_form");
@@ -34,16 +36,6 @@ require([
       $(this).loadingImage('remove');
     }
   });
-  $(".forgot_password_link").click(function(event) {
-    event.preventDefault();
-    $("#login_form").hide();
-    $("#forgot_password_form").show();
-  });
-  $(".login_link").click(function(event) {
-    event.preventDefault();
-    $("#login_form").show();
-    $("#forgot_password_form").hide();
-  });
 
   $("#login_form")
     .submit(function(event) {
@@ -61,8 +53,5 @@ require([
         success = false;
       }
       return success;
-    })
-    .find(":text:first")
-      .focus().select();
+    });
 });
-

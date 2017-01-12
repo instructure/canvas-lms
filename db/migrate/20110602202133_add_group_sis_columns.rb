@@ -1,4 +1,6 @@
 class AddGroupSisColumns < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :groups, :sis_source_id, :string
     add_column :groups, :sis_name, :string

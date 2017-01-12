@@ -42,6 +42,13 @@
             {{#t "edit_category_option"}}Edit{{/t}}
           </a>
         </li>
+        {{#ifEqual ENV.group_user_type "student"}}
+        <li>
+          <a href="#" class="icon-copy-course clone-category">
+            {{#t}}Clone Group Set{{/t}}
+          </a>
+        </li>
+        {{/ifEqual}}
         <li>
           <a href="#" class="icon-trash delete-category">
             {{#t "delete_category_option"}}Delete{{/t}}

@@ -4,7 +4,7 @@
     <rubric>
       <flow_mat>
         <material>
-          <mattext d2l_2p0:isdisplayed="yes" texttype="text/html"/>
+          <mattext d2l_2p0:isdisplayed="yes" texttype="text/html">&lt;p&gt;description&lt;/p&gt;</mattext>
         </material>
       </flow_mat>
     </rubric>
@@ -20,7 +20,7 @@
       </flow_mat>
     </presentation_material>
     <assess_procextension>
-      <d2l_2p0:intro_message d2l_2p0:isdisplayed="yes" texttype="text/html"/>
+      <d2l_2p0:intro_message d2l_2p0:isdisplayed="yes" texttype="text/html">&lt;p&gt;introduction&lt;/p&gt;</d2l_2p0:intro_message>
       <category ident="2914" d2l_2p0:sortorder="81">Week 01</category>
       <grade_item d2l_2p0:is_autoexport="yes" resource_code="sooner_pro-96483">435646</grade_item>
       <d2l_2p0:disable_right_click>no</d2l_2p0:disable_right_click>

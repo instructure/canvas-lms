@@ -29,10 +29,10 @@ describe 'AddContextToContentExports' do
       RemoveCourseIdFromContentExports.down
       AddContextToContentExports.down
 
-      ContentExport.connection.execute "INSERT INTO content_exports(course_id, workflow_state, created_at, updated_at) VALUES(#{course1.id}, '', '2014-07-07', '2014-07-07')"
+      ContentExport.connection.execute "INSERT INTO #{ContentExport.quoted_table_name}(course_id, workflow_state, created_at, updated_at) VALUES(#{course1.id}, '', '2014-07-07', '2014-07-07')"
 
       AddContextToContentExports.up
-      ContentExport.connection.execute "INSERT INTO content_exports(course_id, workflow_state, created_at, updated_at) VALUES(#{course2.id}, '', '2014-07-07', '2014-07-07')"
+      ContentExport.connection.execute "INSERT INTO #{ContentExport.quoted_table_name}(course_id, workflow_state, created_at, updated_at) VALUES(#{course2.id}, '', '2014-07-07', '2014-07-07')"
       RemoveCourseIdFromContentExports.up
 
       ce1 = course1.content_exports.first

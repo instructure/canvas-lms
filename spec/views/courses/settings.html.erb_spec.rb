@@ -59,9 +59,9 @@ describe "courses/settings.html.erb" do
 
     it "should show grade export when enabled" do
       admin = account_admin_user(:account => @course.root_account)
-      @course.expects(:allows_grade_publishing_by).with(admin).returns(true)
       view_context(@course, admin)
       assigns[:current_user] = admin
+      assigns[:publishing_enabled] = true
       render
       expect(response.body).to match /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
       expect(response.body).to match /<div id="tab-grade-publishing">/
@@ -69,9 +69,9 @@ describe "courses/settings.html.erb" do
 
     it "should not show grade export when disabled" do
       admin = account_admin_user(:account => @course.root_account)
-      @course.expects(:allows_grade_publishing_by).with(admin).returns(false)
       view_context(@course, admin)
       assigns[:current_user] = admin
+      assigns[:publishing_enabled] = false
       render
       expect(response.body).not_to match /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
       expect(response.body).not_to match /<div id="tab-grade-publishing">/

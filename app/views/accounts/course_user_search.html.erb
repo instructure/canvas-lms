@@ -1,0 +1,9 @@
+<%
+  @active_tab = "search"
+  content_for :page_title, @account.name
+  add_crumb t("Search"), account_path(@account)
+  js_bundle :account_course_user_search
+  css_bundle :account_course_user_search
+  js_env ACCOUNT_ID: @account.id,
+         PERMISSIONS: @permissions
+%>

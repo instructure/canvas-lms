@@ -130,14 +130,19 @@
 #           "description": "The current state of the quiz submission. Possible values: ['untaken'|'pending_review'|'complete'|'settings_only'|'preview'].",
 #           "example": "untaken",
 #           "type": "string"
+#         },
+#         "overdue_and_needs_submission": {
+#           "description": "Indicates whether the quiz submission is overdue and needs submission",
+#           "example": "false",
+#           "type": "boolean"
 #         }
 #       }
 #     }
 #
 class Quizzes::QuizSubmissionsApiController < ApplicationController
   include Api::V1::QuizSubmission
-  include Filters::Quizzes
-  include Filters::QuizSubmissions
+  include ::Filters::Quizzes
+  include ::Filters::QuizSubmissions
 
   before_filter :require_user, :require_context, :require_quiz
   before_filter :require_overridden_quiz, :except => [ :index ]
@@ -162,18 +167,31 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   def index
     quiz_submissions = if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       # teachers have access to all student submissions
-      Api.paginate @quiz.quiz_submissions.where(:user_id => visible_user_ids),
+      visible_student_ids = @context.apply_enrollment_visibility(@context.student_enrollments, @current_user).pluck(:user_id)
+      Api.paginate @quiz.quiz_submissions.where(:user_id => visible_student_ids),
         self,
         api_v1_course_quiz_submissions_url(@context, @quiz)
     elsif @quiz.grants_right?(@current_user, session, :submit)
-      # students have access only to their own
-      @quiz.quiz_submissions.where(:user_id => @current_user)
+      # students have access only to their own submissions, both in progress, or completed`
+      submission = @quiz.quiz_submissions.where(:user_id => @current_user).first
+      if submission
+        if submission.workflow_state == "untaken"
+          [submission]
+        else
+          submission.submitted_attempts
+        end
+      else
+        []
+      end
     end
 
-    if !quiz_submissions
-      render_unauthorized_action
-    else
+    if quiz_submissions
+      # trigger delayed grading job for all submission id's which needs grading
+      quiz_submissions_ids = quiz_submissions.map(&:id).uniq
+      Quizzes::OutstandingQuizSubmissionManager.new(@quiz).send_later_if_production(:grade_by_ids, quiz_submissions_ids)
       serialize_and_render quiz_submissions
+    else
+      render_unauthorized_action
     end
   end
 
@@ -230,6 +248,10 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
     quiz_submission = if previewing?
       @service.create_preview(@quiz, session)
     else
+      if module_locked?
+        raise RequestError.new("you are not allowed to participate in this quiz", 400)
+      end
+
       @service.create(@quiz)
     end
 
@@ -379,13 +401,12 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
 
   private
 
-  def previewing?
-    !!params[:preview]
+  def module_locked?
+    @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
   end
 
-  def visible_user_ids(opts = {})
-    scope = @context.enrollments_visible_to(@current_user, opts)
-    scope.pluck(:user_id)
+  def previewing?
+    !!params[:preview]
   end
 
   def serialize_and_render(quiz_submissions)

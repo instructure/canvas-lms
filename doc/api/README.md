@@ -17,6 +17,8 @@ All API responses are in <a href="http://www.json.org/">JSON format</a>.
 
 All integer ids in Canvas are 64 bit integers.
 
+All boolean parameters can be passed as true/false, t/f, yes/no, y/n, on/off, or 1/0. When using JSON format, a literal true/false is preferred, rather than as a string.
+
 For POST and PUT requests, parameters are sent using standard
 <a href="http://www.w3.org/TR/html4/interact/forms.html#h-17.13.4">HTML form
 encoding</a> (the application/x-www-form-urlencoded content type).
@@ -25,11 +27,15 @@ POST and PUT requests may also optionally be sent in <a href="http://www.json.or
 
 As an example, this HTML form request:
 
-    name=test+name&file_ids[]=1&file_ids[]=2&sub[name]=foo&sub[message]=bar
+```bash
+name=test+name&file_ids[]=1&file_ids[]=2&sub[name]=foo&sub[message]=bar&flag=y
+```
 
 would translate into this JSON request:
 
-    { "name": "test name", "file_ids": [1,2], "sub": { "name": "foo", "message": "bar" } }
+```json
+{ "name": "test name", "file_ids": [1,2], "sub": { "name": "foo", "message": "bar" }, "flag": true }
+```
 
 With either encoding, all timestamps are sent and returned in ISO 8601 format (UTC time zone):
 
@@ -44,11 +50,15 @@ query string or POST parameters is also supported.
 
 OAuth2 Token sent in header:
 
-    curl -H "Authorization: Bearer <ACCESS-TOKEN>" https://canvas.instructure.com/api/v1/courses
+```bash
+curl -H "Authorization: Bearer <ACCESS-TOKEN>" "https://canvas.instructure.com/api/v1/courses"
+```
 
 OAuth2 Token sent in query string:
 
-    curl https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>
+```bash
+curl "https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>"
+```
 
 Read more about <a href="oauth.html">OAuth2 and how to get access tokens.</a>
 
@@ -73,5 +83,6 @@ itself. You can generate this documentation yourself if you've set up a
 local Canvas environment following the instructions on <a href="https://www.github.com/instructure/canvas-lms/wiki">Github</a>,
 run the following command from your Canvas directory:
 
-    bundle exec rake doc:api
-
+```bash
+bundle exec rake doc:api
+```

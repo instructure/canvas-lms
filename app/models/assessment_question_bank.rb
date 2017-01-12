@@ -19,15 +19,11 @@
 class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
   attr_accessible :context, :title, :user, :alignments
-  EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :title, :workflow_state, :deleted_at, :created_at, :updated_at]
 
-  EXPORTABLE_ASSOCIATIONS = [:context, :assessment_questions, :assessment_question_bank_users, :learning_outcome_alignments, :quiz_groups]
-
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
-  has_many :assessment_questions, :order => 'name, position, created_at'
+  belongs_to :context, polymorphic: [:account, :course]
+  has_many :assessment_questions, -> { order('assessment_questions.name, assessment_questions.position, assessment_questions.created_at') }
   has_many :assessment_question_bank_users
-  has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
+  has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, class_name: 'ContentTag'
   has_many :quiz_groups, class_name: 'Quizzes::QuizGroup'
   before_save :infer_defaults
   after_save :update_alignments
@@ -39,8 +35,11 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   set_policy do
-    given{|user, session| self.context.grants_right?(user, session, :manage_assignments) }
+    given{|user, session| self.context.grants_right?(user, session, :read_question_banks) && self.context.grants_right?(user, session, :manage_assignments) }
     can :read and can :create and can :update and can :delete and can :manage
+
+    given{|user, session| self.context.grants_right?(user, session, :read_question_banks) }
+    can :read
 
     given{|user| user && self.assessment_question_bank_users.where(:user_id => user).exists? }
     can :read
@@ -124,15 +123,19 @@ class AssessmentQuestionBank < ActiveRecord::Base
   def select_for_submission(quiz_id, count, exclude_ids=[], exclude_qq_ids=[])
     ids = self.assessment_questions.active.pluck(:id)
     ids = (ids - exclude_ids).shuffle[0...count]
-    questions = ids.empty? ? [] : AssessmentQuestion.where(id: ids).shuffle
-    questions.map do |aq|
+    questions = ids.empty? ? [] : AssessmentQuestion.where(id: ids).order(:id)
+    quiz_questions = questions.map do |aq|
       aq.find_or_create_quiz_question(quiz_id, exclude_qq_ids)
     end
+    # it's important that this shuffle come after the db updates, otherwise
+    # this can cause deadlocks when run in a transaction
+    quiz_questions.shuffle
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
+    self.deleted_at = Time.now.utc
     self.save
   end
 

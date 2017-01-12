@@ -1,12 +1,13 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/LoadingIndicator'
+  'jsx/files/LoadingIndicator'
 ], (React, $, LoadingIndicator) ->
 
   TestUtils = React.addons.TestUtils
 
-  module 'LoadingIndicator',
+  module 'LoadingIndicator'
+
   test 'display none if no props supplied', ->
     loadingIndicator = React.createFactory(LoadingIndicator)
     rendered = TestUtils.renderIntoDocument(loadingIndicator())

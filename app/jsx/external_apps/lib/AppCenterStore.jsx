@@ -1,5 +1,3 @@
-/** @jsx */
-
 define([
   'i18n!external_tools',
   'jquery',

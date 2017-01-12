@@ -9,7 +9,7 @@
   <% if @tag.try(:new_tab) %>
     <%= t :new_tab, "This site needs to be opened in a new browser window." %>
     <div>
-      <a id="open_url_button" target="_blank" role="link" class="btn external"
+      <a id="open_url_button" target="_blank" class="btn external"
          href="<%= @tag.url %>"
          title="<%= t("Open %{title} in a new window", :title => @tag.title) %>"
          aria-label="<%= t("Open %{title} in a new window", :title => @tag.title) %>">

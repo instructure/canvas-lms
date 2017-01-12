@@ -4,7 +4,7 @@
 
 ## Regular Tabs
 
-Our default tabs come complete with a panel attached to the tabs that displays the content inside each tab. 
+Our default tabs come complete with a panel attached to the tabs that displays the content inside each tab.
 
 jQueryUI adds all the classes, once you initialize the tabs using the script and markup.
 
@@ -25,7 +25,7 @@ jQueryUI adds all the classes, once you initialize the tabs using the script and
 
 ## Minimal Tabs
 
-Don't want the bordered box around each tab panel? 
+Don't want the bordered box around each tab panel?
 
 Simply add the **.ui-tabs-minimal** class to the parent tab element.
 
@@ -57,7 +57,7 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
   }
   .ui-tabs-nav {
     border-bottom-color: $ic-border-light;
-    li { 
+    li {
       background: transparent;
       border-color: transparent;
       box-shadow: none;
@@ -68,10 +68,10 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         padding: 8px 14px;
         text-shadow: none;
         @if $use_high_contrast { text-decoration: underline; }
-        &:focus { 
+        &:focus {
           @if $use_high_contrast { @include ic-focus-variant($ic-link-color, -4px); }
-          @else { 
-            text-decoration: underline; 
+          @else {
+            text-decoration: underline;
             outline: none;
           }
         }
@@ -86,7 +86,7 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         a {
           color: $ic-color-dark;
           @if $use_high_contrast { text-decoration: none; }
-          
+
           // special handling for Calendar tabs with solid-color header backgrounds
           #edit_event & { color: $ic-link-color; }
         }
@@ -98,10 +98,10 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
         background: $ic-color-light;
         a {
           @if $use_high_contrast { @include ic-focus-variant($ic-link-color, -4px); }
-          @else { 
+          @else {
             text-decoration: underline;
-            outline: none; 
-          }  
+            outline: none;
+          }
         }
       }
       &.ui-tabs-active,
@@ -118,11 +118,21 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
       }
     }
   }
+
   &.ui-tabs--mini {
     .ui-tabs-nav {
-      li { 
+      li {
         a { padding: 4px 8px; }
       }
+    }
+  }
+
+  &.ui-tabs-minimal {
+    .ui-tabs-panel {
+      border-width: 0;
+      padding-left: 0;
+      padding-right: 0;
+      padding-bottom: 0;
     }
   }
 }

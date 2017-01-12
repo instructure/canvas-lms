@@ -19,24 +19,19 @@
 class DelayedNotification < ActiveRecord::Base
   include Workflow
 
-  belongs_to :asset, :polymorphic => true
-  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['AssessmentRequest', 'Attachment',
-    'ContentMigration', 'ContentExport', 'Collaborator', 'Submission', 'Assignment',
-    'CommunicationChannel', 'CalendarEvent', 'ConversationMessage', 'DiscussionEntry',
-    'SubmissionComment', 'Quizzes::QuizSubmission', 'DiscussionTopic', 'Course', 'Enrollment',
-    'WikiPage', 'GroupMembership', 'WebConference']
+  belongs_to :asset, polymorphic:
+    [:assessment_request, :attachment, :content_migration, :content_export, :collaborator, :submission,
+     :assignment, :communication_channel, :calendar_event, :conversation_message, :discussion_entry,
+     :submission_comment, { quiz_submission: 'Quizzes::QuizSubmission' }, :discussion_topic, :course, :enrollment,
+     :wiki_page, :group_membership, :web_conference], polymorphic_prefix: true, exhaustive: false
   include NotificationPreloader
-  belongs_to :asset_context, :polymorphic => true
-  validates_inclusion_of :asset_context_type, :allow_nil => true, :in => ['Account', 'Group', 'Course']
+  belongs_to :asset_context, polymorphic: [:account, :group, :course]
 
   attr_accessible :asset, :notification, :recipient_keys, :asset_context, :data
   attr_accessor :data
   validates_presence_of :notification_id, :asset_id, :asset_type, :workflow_state
 
   serialize :recipient_keys
-
-  include PolymorphicTypeOverride
-  override_polymorphic_types asset_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
 
   workflow do
     state :to_be_processed do
@@ -81,7 +76,7 @@ class DelayedNotification < ActiveRecord::Base
     lookups.each do |klass, ids|
       includes = []
       includes = [:user] if klass == CommunicationChannel
-      res += klass.where(:id => ids).includes(includes).all rescue []
+      res += klass.where(:id => ids).preload(includes).to_a rescue []
     end
     @to_list = res.uniq
   end

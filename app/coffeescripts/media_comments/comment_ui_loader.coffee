@@ -1,7 +1,8 @@
 define [
   'jquery',
   'i18n!media_comments'
-], ($, I18n) ->
+  'jst/MediaComments'
+], ($, I18n, mediaCommentsTemplate) ->
 
   ###
   # Loads html partial for display within the uploader
@@ -9,6 +10,5 @@ define [
   class CommentUiLoader
 
     loadTabs: (readyFunction) ->
-      $.get "/partials/_media_comments.html", (html) ->
-        readyFunction(html)
-        $("#media_comment_dialog")
+      readyFunction(mediaCommentsTemplate())
+      $("#media_comment_dialog")

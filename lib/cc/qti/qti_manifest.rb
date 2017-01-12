@@ -19,7 +19,7 @@ module CC
 module QTI
   class QTIManifest
     include CC::CCHelper
-    
+
     attr_accessor :exporter
     delegate :add_error, :set_progress, :export_object?, :qti_export?, :course, :user, :to => :exporter
     delegate :referenced_files, :to => :@html_exporter
@@ -33,11 +33,11 @@ module QTI
                                                          :track_referenced_files => true,
                                                          :media_object_flavor => Setting.get('exporter_media_object_flavor', nil).presence)
     end
-    
+
     def export_dir
       @exporter.export_dir
     end
-    
+
     def zip_file
       @exporter.zip_file
     end
@@ -60,12 +60,12 @@ module QTI
                          "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                          "xsi:schemaLocation"=>"http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1 http://www.imsglobal.org/xsd/imscp_v1p1.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lomresource_v1p0.xsd http://www.imsglobal.org/xsd/imsmd_v1p2 http://www.imsglobal.org/xsd/imsmd_v1p2p2.xsd"
       ) do |manifest_node|
-        
+
         manifest_node.metadata do |md|
           create_metadata(md)
         end
         set_progress(5)
-        
+
         manifest_node.organizations
 
         manifest_node.resources do |resources|
@@ -82,7 +82,7 @@ module QTI
             att = course.attachments.find_by_id(file_id)
             next unless att
 
-            path = att.full_display_path.gsub("course files/", '')
+            path = att.full_display_path.sub("course files/", '')
             zipper.add_attachment_to_zip(att, @exporter.zip_file, path)
 
             resources.resource(
@@ -96,7 +96,7 @@ module QTI
 
         end
       end #manifest
-      
+
       # write any errors to the manifest file
       if @exporter.errors.length > 0
         @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", :export_id => @exporter.export_id)

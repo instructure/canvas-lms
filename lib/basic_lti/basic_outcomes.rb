@@ -20,21 +20,34 @@ require 'nokogiri'
 
 module BasicLTI
   module BasicOutcomes
-    class Unauthorized < Exception;
+    class Unauthorized < StandardError
+      def response_status
+        401
+      end
     end
 
-    class InvalidSourceId < Exception;
+
+    class InvalidRequest < StandardError
+      def response_status
+        415
+      end
+    end
+
+    class InvalidSourceId < StandardError
     end
 
     SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
 
     def self.decode_source_id(tool, sourceid)
       tool.shard.activate do
+        raise InvalidSourceId, 'Invalid sourcedid' if sourceid.blank?
         md = sourceid.match(SOURCE_ID_REGEX)
         raise InvalidSourceId, 'Invalid sourcedid' unless md
         new_encoding = [md[1], md[2], md[3], md[4]].join('-')
-        return false unless Canvas::Security.verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
-        return false unless tool.id == md[1].to_i
+        raise InvalidSourceId, 'Invalid signature' unless Canvas::Security.
+            verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
+
+        raise InvalidSourceId, 'Tool is invalid' unless tool.id == md[1].to_i
         course = Course.active.where(id: md[2]).first
         raise InvalidSourceId, 'Course is invalid' unless course
 
@@ -45,7 +58,8 @@ module BasicLTI
         raise InvalidSourceId, 'Assignment is invalid' unless assignment
 
         tag = assignment.external_tool_tag if assignment
-        raise InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag and tool.matches_url?(tag.url, false) and tool.workflow_state != 'deleted'
+        raise InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag and tool.
+            matches_url?(tag.url, false) and tool.workflow_state != 'deleted'
 
         return course, assignment, user
       end
@@ -56,6 +70,7 @@ module BasicLTI
 
       unless res.handle_request(tool)
         res.code_major = 'unsupported'
+        res.description = 'Request could not be handled. ¯\_(ツ)_/¯'
       end
       return res
     end
@@ -65,11 +80,13 @@ module BasicLTI
 
       unless res.handle_request(tool)
         res.code_major = 'unsupported'
+        res.description = 'Legacy request could not be handled. ¯\_(ツ)_/¯'
       end
       return res
     end
 
     class LtiResponse
+      include TextHelper
       attr_accessor :code_major, :severity, :description, :body
 
       def initialize(lti_request)
@@ -107,6 +124,10 @@ module BasicLTI
         @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > url').try(:content)
       end
 
+      def result_data_launch_url
+        @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > ltiLaunchUrl').try(:content)
+      end
+
       def to_xml
         xml = LtiResponse.envelope.dup
         xml.at_css('imsx_POXHeader imsx_statusInfo imsx_codeMajor').content = code_major
@@ -130,8 +151,8 @@ module BasicLTI
               <imsx_codeMajor></imsx_codeMajor>
               <imsx_severity>status</imsx_severity>
               <imsx_description></imsx_description>
-              <imsx_messageRefIdentifier></imsx_messageRefIdentifier> 
-              <imsx_operationRefIdentifier></imsx_operationRefIdentifier> 
+              <imsx_messageRefIdentifier></imsx_messageRefIdentifier>
+              <imsx_operationRefIdentifier></imsx_operationRefIdentifier>
             </imsx_statusInfo>
           </imsx_POXResponseHeaderInfo>
         </imsx_POXHeader>
@@ -144,13 +165,15 @@ module BasicLTI
       end
 
       def handle_request(tool)
+        #check if we recognize the xml structure
+        return false unless operation_ref_identifier
         # verify the lis_result_sourcedid param, which will be a canvas-signed
         # tuple of (course, assignment, user) to ensure that only this launch of
         # the tool is attempting to modify this data.
         source_id = self.sourcedid
 
         begin
-          course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id) if source_id
+          course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
         rescue InvalidSourceId => e
           self.code_major = 'failure'
           self.description = e.to_s
@@ -167,7 +190,7 @@ module BasicLTI
 
       protected
 
-      def handle_replaceResult(tool, course, assignment, user)
+      def handle_replaceResult(_tool, _course, assignment, user)
         text_value = self.result_score
         new_score = Float(text_value) rescue false
         raw_score = Float(self.result_total_score) rescue false
@@ -177,27 +200,31 @@ module BasicLTI
         if text = result_data_text
           submission_hash[:body] = text
           submission_hash[:submission_type] = 'online_text_entry'
-        elsif url = result_data_url
+        elsif (url = result_data_url)
           submission_hash[:url] = url
           submission_hash[:submission_type] = 'online_url'
+        elsif (launch_url = result_data_launch_url)
+          submission_hash[:url] = launch_url
+          submission_hash[:submission_type] = 'basic_lti_launch'
         end
+
+        old_submission = assignment.submissions.where(user_id: user.id).first
 
         if raw_score
           submission_hash[:grade] = raw_score
         elsif new_score
           if (0.0 .. 1.0).include?(new_score)
-            submission_hash[:grade] = "#{new_score * 100}%"
+            submission_hash[:grade] = "#{round_if_whole(new_score * 100)}%"
           else
             error_message = I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1")
           end
-        elsif !text && !url
+        elsif !text && !url && !launch_url
           error_message = I18n.t('lib.basic_lti.no_score', "No score given")
         end
-
         if error_message
           self.code_major = 'failure'
           self.description = error_message
-        elsif assignment.points_possible.nil?
+        elsif assignment.grading_type != "pass_fail" && (assignment.points_possible.nil?)
 
           unless submission = Submission.where(user_id: user.id, assignment_id: assignment).first
             submission = Submission.create!(submission_hash.merge(:user => user,
@@ -215,10 +242,13 @@ to because the assignment has no points possible.
           end
 
           if new_score || raw_score
+            submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
             @submission = assignment.grade_student(user, submission_hash).first
           end
 
-          unless @submission
+          if @submission
+            @submission.save
+          else
             self.code_major = 'failure'
             self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
           end

@@ -82,6 +82,16 @@ describe Quizzes::QuizSubmissionHistory do
         expect(models.length).to eq 2
         expect(models.first).to be_a(Quizzes::QuizSubmission)
       end
+
+      it "should return the submission itself as the latest attempt" do
+        @submission.extra_attempts = 1
+        @submission.save! # doesn't add a new version
+
+        attempts = Quizzes::QuizSubmissionHistory.new(@submission)
+
+        models = attempts.version_models
+        expect(models.last.extra_attempts).to eq 1
+      end
     end
 
     describe "#kept" do
@@ -115,21 +125,5 @@ describe Quizzes::QuizSubmissionHistory do
         expect(qs).to be_a(Quizzes::QuizSubmission)
       end
     end
-  end
-
-  it "should not lose string encodings" do
-    @quiz       = course.quizzes.create!
-    @submission = @quiz.quiz_submissions.new
-
-    @submission.submission_data = [{data: "\b饭馆"}]
-
-    @submission.workflow_state = "complete"
-    @submission.score = 5.0
-    @submission.attempt = 1
-    @submission.with_versioning(true, &:save!)
-
-    @submission.reload
-    expect(@submission.submission_data[0][:data].encoding).to be(Encoding.find('UTF-8'))
-    expect(@submission.versions[0].model.submission_data[0][:data].encoding).to be(Encoding.find('UTF-8'))
   end
 end

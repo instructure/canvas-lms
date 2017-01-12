@@ -12,7 +12,7 @@ module Alerts
         (student[:last_interaction] ||= {})[author_id.to_i] = date
       end
       scope = ConversationMessage.
-          joins('INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id').
+          joins("INNER JOIN #{ConversationParticipant.quoted_table_name} ON conversation_participants.conversation_id=conversation_messages.conversation_id").
           where(:conversation_messages => { :author_id => teacher_ids, :generated => false }, :conversation_participants => { :user_id => student_ids })
       last_message_dates = scope.group('conversation_participants.user_id', 'conversation_messages.author_id').maximum(:created_at)
       last_message_dates.each do |key, date|

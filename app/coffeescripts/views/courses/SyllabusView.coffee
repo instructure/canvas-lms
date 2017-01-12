@@ -103,16 +103,14 @@ define [
       dateCollator = (memo, json) ->
         related_id = json['related_id']
         related_id ?= json['id']
-        if json['assignment']
-          type = 'assignment'
+        if json['type'] == 'assignment'
           html_url = json['html_url'] if html_url_for_assignment
         else
-          type = 'event'
           html_url = json['html_url'] if html_url_for_event
         title = json['title']
         start_at = $.fudgeDateForProfileTimezone(Date.parse(json['start_at'])) if json['start_at']
         end_at = $.fudgeDateForProfileTimezone(Date.parse(json['end_at'])) if json['end_at']
-        due_at = $.fudgeDateForProfileTimezone(Date.parse(json['assignment']['due_at'])) if json['assignment']?['due_at']
+        due_at = start_at if json['type'] == 'assignment'
 
         override = null
         _.each json.assignment_overrides ? [], (ov) ->
@@ -140,7 +138,7 @@ define [
 
         lastEvent =
           'related_id': related_id
-          'type': type
+          'type': json['type']
           'title': title
           'html_url': html_url
           'start_at': start_at

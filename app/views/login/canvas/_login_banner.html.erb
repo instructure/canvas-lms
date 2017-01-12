@@ -1,0 +1,31 @@
+<% hide_self_reg_banner ||= false %>
+
+<% if @domain_root_account && @domain_root_account.self_registration? && !hide_self_reg_banner %>
+  <% if @domain_root_account.self_registration_type == 'observer' %>
+    <% js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings']),
+              :PASSWORD_POLICY => @domain_root_account.password_policy %>
+    <%= link_to '#',
+          :id => 'coenrollment_link',
+          :class => (use_new_styles? ? "ic-Login__link ic-Login__register-banner" : "register_banner"),
+          data: reg_link_data(@domain_root_account.parent_auth_type)  do %>
+      <div class="ic-Login__banner-title">
+        <%= t('Parent of a Canvas User?') %>
+      </div>
+      <div class="ic-Login__banner-subtitle">
+        <%= t('Click Here For an Account') %>
+      </div>
+    <% end %>
+  <% else %>
+    <%= link_to Setting.get("registration_link", "/register_from_website"),
+                :id => 'register_link',
+                :class => (use_new_styles? ? "ic-Login__link ic-Login__register-banner" : "not_external register_banner") do %>
+      <div class="ic-Login__banner-title">
+        <%= t('Need a Canvas Account?') %>
+      </div>
+      <div class="ic-Login__banner-subtitle">
+        <%= t("Click Here, It's Free!") %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+

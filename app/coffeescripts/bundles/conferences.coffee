@@ -63,21 +63,28 @@ require [
         20000
       )
 
-      $('.new-conference-btn').on('click', (event) =>
-        conference = new Conference(_.clone(ENV.default_conference))
-        conference.once('startSync', => @currentConferences.unshift(conference))
-        @edit(conference)
-      )
+      $('.new-conference-btn').on('click', (event) => @create())
 
     index: ->
       @editView.close()
 
-    edit: (conference) =>
-      if typeof conference == 'string'
-        conference = @currentConferences.get(conference)
+    create: ->
+      conference = new Conference(_.clone(ENV.default_conference))
+      conference.once('startSync', => @currentConferences.unshift(conference))
+      if conference.get('permissions').create
+        @editView.show(conference)
+
+    edit: (conference) ->
+      conference = @currentConferences.get(conference) || @concludedConferences.get(conference)
       return unless conference
-      @editConferenceId = conference.get('id')
-      @editView.show(conference)
+
+      if conference.get('permissions').update
+        @editConferenceId = conference.get('id')
+        @editView.show(conference)
+      else
+        # reached when a user without edit permissions navigates
+        # to a specific conference's url directly
+        $("#conf_#{conference.get('id')}")[0].scrollIntoView()
 
     close: (conference) =>
       @currentConferences.remove(conference)

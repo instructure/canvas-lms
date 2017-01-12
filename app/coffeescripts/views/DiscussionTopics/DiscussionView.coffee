@@ -25,6 +25,8 @@ define [
       delete:       I18n.t('delete', 'Delete')
       user_subscribed: I18n.t('subscribed_hint', 'You are subscribed to this topic. Click to unsubscribe.')
       user_unsubscribed: I18n.t('unsubscribed_hint', 'You are not subscribed to this topic. Click to subscribe.')
+      deleteSuccessful: I18n.t('flash.removed', 'Discussion Topic successfully deleted.')
+      deleteFail: I18n.t('flash.fail', 'Discussion Topic deletion failed.')
 
     events:
       'click .icon-lock':  'toggleLocked'
@@ -99,8 +101,11 @@ define [
     #
     # Returns nothing.
     delete: ->
-      @model.destroy()
-      @$el.remove()
+      @model.destroy
+        success : =>
+          $.flashMessage @messages.deleteSuccessful
+        error : =>
+          $.flashError @messages.deleteFail
 
     goToPrevItem: =>
       if @previousDiscussionInGroup()?

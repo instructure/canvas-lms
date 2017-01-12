@@ -66,7 +66,7 @@ class DropRoleNameColumns < ActiveRecord::Migration
     add_column :enrollments, :role_name, :string
     add_column :role_overrides, :enrollment_type, :string
 
-    remove_index :enrollments, :name => 'index_account_notification_roles_on_role_id'
+    remove_index :account_notification_roles, :name => 'index_account_notification_roles_on_role_id'
     add_index :account_notification_roles, [:account_notification_id, :role_type], :unique => true, :name => "idx_acount_notification_roles"
 
     remove_index :enrollments, :name => 'index_enrollments_on_user_type_role_section_associated_user'

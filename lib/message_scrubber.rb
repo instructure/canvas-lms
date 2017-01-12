@@ -89,7 +89,7 @@ class MessageScrubber
   #
   # Returns a column name string.
   def filter_attribute
-    'sent_at'
+    'updated_at'
   end
 
   # Internal: The class object to delete records from (e.g. 'Message').

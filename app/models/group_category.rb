@@ -21,19 +21,11 @@ class GroupCategory < ActiveRecord::Base
   attr_reader :create_group_count
   attr_accessor :assign_unassigned_members
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
+  belongs_to :context, polymorphic: [:course, :account]
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
   has_many :progresses, :as => 'context', :dependent => :destroy
-  has_many :discussion_topics
-  has_one :current_progress, :as => 'context', :class_name => 'Progress', :conditions => "workflow_state IN ('queued','running')", :order => 'created_at'
-
-  EXPORTABLE_ATTRIBUTES = [ :id, :context_id, :context_type, :name, :role,
-    :deleted_at, :self_signup, :group_limit, :auto_leader
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:context, :groups, :assignments]
+  has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: 'context', class_name: 'Progress'
 
   after_save :auto_create_groups
   after_update :update_groups_max_membership
@@ -82,7 +74,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   Bookmarker = BookmarkedCollection::SimpleBookmarker.new(GroupCategory, :name, :id)
-  
+
   scope :by_name, -> { order(Bookmarker.order_by) }
   scope :active, -> { where(:deleted_at => nil) }
   scope :other_than, lambda { |cat| where("group_categories.id<>?", cat.id || 0) }
@@ -194,14 +186,18 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def group_for(user)
-    groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).first
+    shard.activate do
+      groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).take
+    end
   end
 
   def is_member?(user)
-    groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).any?
+    shard.activate do
+      groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).exists?
+    end
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     # TODO: this is kinda redundant with the :dependent => :destroy on the
     # groups association, but that doesn't get called since we override
@@ -217,7 +213,8 @@ class GroupCategory < ActiveRecord::Base
       complete_progress
       return []
     end
-
+    members = members.to_a
+    groups = groups.to_a
     ##
     # new memberships to be returned
     new_memberships = []
@@ -355,11 +352,14 @@ class GroupCategory < ActiveRecord::Base
     end
 
     if self.auto_leader
-      groups.each{|group| GroupLeadership.new(group).auto_assign!(auto_leader) }
+      groups.each do |group|
+        group.users.reload
+        GroupLeadership.new(group).auto_assign!(auto_leader)
+      end
     end
 
     if !groups.empty?
-      Group.where(:id => groups.map(&:id)).update_all(:updated_at => Time.now.utc)
+      Group.where(id: groups).touch_all
       if context_type == 'Course'
         DueDateCacher.recompute_course(context_id, Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id))
       end
@@ -404,9 +404,33 @@ class GroupCategory < ActiveRecord::Base
     send_later_enqueue_args :assign_unassigned_members, :priority => Delayed::LOW_PRIORITY
   end
 
+  def clone_groups_and_memberships(new_group_category)
+    groups.preload(:group_memberships).find_each do |group|
+      new_group = group.dup
+      new_group.group_category = new_group_category
+      [:sis_batch_id, :sis_source_id, :uuid, :wiki_id].each do |attr|
+        new_group[attr] = nil
+      end
+      new_group.save!
+
+      group.group_memberships.find_each do |group_membership|
+        new_group_membership = group_membership.dup
+        new_group_membership.uuid = nil
+        new_group_membership.group = new_group
+        new_group_membership.save!
+      end
+    end
+  end
+
   set_policy do
     given { |user, session| context.grants_right?(user, session, :read) }
     can :read
+  end
+
+  def discussion_topics
+    self.shard.activate do
+      DiscussionTopic.where(context_type: self.context_type, context_id: self.context_id, group_category_id: self)
+    end
   end
 
   protected

@@ -16,11 +16,13 @@
       <hr>
       <ul title="{{#t "items"}}Items to complete{{/t}}" aria-label="{{#t "items"}}Items to complete{{/t}}">
         {{#each items}}
-          {{#unless this.completion_requirement.completed}}
-            <li class="ig-text">
-              <i class="{{this.icon_class}}" aria-hidden="true"></i> {{this.title}}
-            </li>
-          {{/unless}}
+          {{#if this.completion_requirement}}
+            {{#unless this.completion_requirement.completed}}
+              <li class="ig-text">
+                <i class="{{this.icon_class}}" aria-hidden="true"></i> {{this.title}}
+              </li>
+            {{/unless}}
+          {{/if}}
         {{/each}}
       </ul>
     </div>

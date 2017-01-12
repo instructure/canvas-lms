@@ -1,10 +1,12 @@
 define [
+  'i18n!quizzes'
   'jquery'
   'underscore'
   'Backbone'
   'compiled/views/quizzes/QuizItemGroupView'
   'jst/quizzes/IndexView'
-], ($, _, Backbone, QuizItemGroupView, template) ->
+  'compiled/jquery.rails_flash_notifications'
+], (I18n, $, _, Backbone, QuizItemGroupView, template) ->
 
   class IndexView extends Backbone.View
     template: template
@@ -37,8 +39,27 @@ define [
 
     keyUpSearch: _.debounce ->
       @filterResults()
+      @announceCount()
     , 200
 
     filterResults: =>
       _.each @views(), (view) =>
         view.filterResults($('#searchTerm').val())
+
+    announceCount: =>
+      searchTerm = $('#searchTerm').val()
+      return if searchTerm == '' || searchTerm == null
+
+      matchingQuizCount = _.reduce(@views(), (runningCount, view) =>
+        return runningCount + view.matchingCount(searchTerm)
+      , 0)
+      @announceMatchingQuizzes(matchingQuizCount)
+
+    announceMatchingQuizzes: (numQuizzes) ->
+      msg = I18n.t({
+          one: "1 quiz found."
+          other: "%{count} quizzes found."
+          zero: "No matching quizzes found."
+        }, count: numQuizzes
+      )
+      $.screenReaderFlashMessageExclusive(msg)

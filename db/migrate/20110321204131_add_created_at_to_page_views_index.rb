@@ -1,4 +1,6 @@
 class AddCreatedAtToPageViewsIndex < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     remove_index :page_views, :column => :account_id
     add_index :page_views, [ :account_id, :created_at ]

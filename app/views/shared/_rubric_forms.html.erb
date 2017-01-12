@@ -2,8 +2,8 @@
   <form id="edit_criterion_form" class="form-inline no-margin-bottom">
     <input type="text" aria-label="<%= t('criteria_description_label', "Description of criterion") %>" class="criterion_description" style="min-width: 100px; width: 90%;" name="description"/>
     <div class="button-container">
-      <button type="submit" class="ok_button btn btn-mini btn-primary"><%= t '#buttons.ok', "OK" %></button>
       <button type="button" class="cancel_button btn btn-mini"><%= t '#buttons.cancel', "Cancel" %></button>
+      <button type="submit" class="ok_button btn btn-mini btn-primary"><%= t '#buttons.ok', "OK" %></button>
     </div>
   </form>
 </div>
@@ -12,8 +12,8 @@
     <input type="text" class="rating_description" style="min-width: 100px; width: 90%;" name="description"/>
     <div>
       <%= t :points, "%{points} pts", :points => '<input type="text" size="2" name="points" class="no-margin-bottom span1" />'.html_safe %>
-      <button type="submit" class="ok_button btn btn-mini btn-primary"><%= t '#buttons.ok', "OK" %></button>
       <button type="button" class="cancel_button btn btn-mini button-secondary"><%= t '#buttons.cancel', "Cancel" %></button>
+      <button type="submit" class="ok_button btn btn-mini btn-primary"><%= t '#buttons.ok', "OK" %></button>
     </div>
   </form>
 </div>

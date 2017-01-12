@@ -64,7 +64,7 @@ class ChoiceInteraction < AssessmentItemConverter
     @question[:answers].each do |ans|
       correct_answers += 1 if ans[:weight] and ans[:weight] > 0
     end
-    
+
     # If the question is worth zero points its correct answer's weight might
     # be zero even though it's correct. The convention is that the score is set
     # instead of added to. So set that answer to correct in that case.
@@ -93,7 +93,7 @@ class ChoiceInteraction < AssessmentItemConverter
         answer[:weight] = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
         answer[:id] = unique_local_id
         answer[:migration_id] = choice['identifier']
-        
+
         if feedback = choice.at_css('feedbackInline')
           # weird Angel feedback
           answer[:text] = choice.children.first.text.strip
@@ -109,7 +109,7 @@ class ChoiceInteraction < AssessmentItemConverter
             end
           end
         end
-        
+
         if answer[:text] == ""
           if answer[:migration_id] =~ /true|false/i
             answer[:text] = clear_html(answer[:migration_id])
@@ -156,6 +156,9 @@ class ChoiceInteraction < AssessmentItemConverter
           answer = answers_hash["#{blank_id}_#{migration_id}"]
           answer[:weight] = get_response_weight(cond)
         end
+      elsif @doc.at_css('instructureField[name="bb_question_type"][value="Multiple Answer"]') &&
+            @doc.at_css('responseIf > and > match')
+        process_blackboard_9_multiple_answers(answers_hash)
       elsif cond.at_css('match variable[identifier=RESP_MC]') or cond.at_css('match variable[identifier=response]')
         migration_id = cond.at_css('match baseValue[baseType=identifier]').text.strip()
         migration_id = migration_id.sub('.', '_') if is_either_or
@@ -193,14 +196,19 @@ class ChoiceInteraction < AssessmentItemConverter
             if answer
               answer[:weight] = get_response_weight(r_if)
               answer[:feedback_id] ||= get_feedback_id(r_if)
-              
+
               #flag whether this answer was set or added to
               if @use_set_var_set_as_correct
                 if answer[:weight] == 0 && r_if.at_css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]')
                   answer[:zero_weight_set_not_summed] = true
                 end
               end
-              
+            end
+          end
+          unless @question[:points_possible]
+            que_scores = cond.css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]')
+            if que_scores.any?
+              @question[:points_possible] = que_scores.map{|q| q.text.to_i }.max
             end
           end
         end
@@ -220,7 +228,7 @@ class ChoiceInteraction < AssessmentItemConverter
   # parses the wight of a response to determine whether it is a correct response
   def get_response_weight(cond)
     weight = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
-    
+
     if sum = cond.at_css('setOutcomeValue[identifier=SCORE] sum baseValue[baseType]')
       #it'll only be true if the score is a sum > 0
       weight = get_base_value(sum)
@@ -254,8 +262,34 @@ class ChoiceInteraction < AssessmentItemConverter
     else
       @log.warn "The type of the weight value was not recognized, defaulting to: #{AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT}"
     end
-    
+
     weight
+  end
+
+  # BB9 does these questions a little differently, so we will special-case them
+  def process_blackboard_9_multiple_answers(answers_hash)
+    and_node = @doc.at_css('responseIf > and')
+    matches = and_node.css('> match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip() }
+    not_matches = and_node.css('> not match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip() }
+    get_real_blackboard_match_ids(answers_hash, matches, not_matches).each do |migration_id|
+      answer = answers_hash[migration_id]
+      answer[:weight] = get_response_weight(and_node.parent)
+      answer[:feedback_id] ||= get_feedback_id(and_node.parent)
+    end
+  end
+
+  # in a blackboard multiple-answer example given to us by a customer,
+  # the answers had ids `answer_1` through `answer_4`,
+  # but the response conditions referred to `answer_0` through `answer_3`...
+  # so if this happens, sort the IDs and match by position. :P
+  def get_real_blackboard_match_ids(answers_hash, matches, not_matches)
+    actual_answer_ids = answers_hash.keys.uniq.sort
+    putative_answer_ids = (matches + not_matches).uniq.sort
+    if (putative_answer_ids - actual_answer_ids).empty?
+      matches
+    else
+      matches.map { |bad_id| actual_answer_ids[putative_answer_ids.index(bad_id)] }
+    end
   end
 
 end

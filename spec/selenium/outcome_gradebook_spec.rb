@@ -1,7 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 describe "outcome gradebook" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include Gradebook2Common
 
   context "as a teacher" do
     before(:each) do
@@ -10,7 +11,7 @@ describe "outcome gradebook" do
 
     it "should not be visible by default" do
       get "/courses/#{@course.id}/gradebook2"
-      expect(ff('.gradebook-navigation').length).to eq 0
+      expect(f("#content")).not_to contain_css('.gradebook-navigation')
     end
 
     context "when enabled" do
@@ -58,9 +59,9 @@ describe "outcome gradebook" do
 
         fj('.section-select-button:visible').click
         wait_for_ajaximations
-        keep_trying_until { expect(fj('.section-select-menu:visible')).to be_displayed }
-        fj("label[for='section_option_#{''}']").click
-        keep_trying_until { expect(fj('.section-select-button:visible')).to include_text "All Sections" }
+        expect(fj('.section-select-menu:visible')).to be_displayed
+        f("label[for='section_option_']").click
+        expect(fj('.section-select-button:visible')).to include_text "All Sections"
 
         expect(ff('.outcome-student-cell-content').length).to eq 3
       end

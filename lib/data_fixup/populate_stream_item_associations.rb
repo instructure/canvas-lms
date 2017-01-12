@@ -3,7 +3,7 @@ module DataFixup::PopulateStreamItemAssociations
     while true
       batch = StreamItem.connection.select_all(<<-SQL)
         SELECT id, context_type, context_id, context_code, asset_type, asset_id, item_asset_string
-        FROM stream_items
+        FROM #{StreamItem.quoted_table_name}
         WHERE (context_type IS NULL AND context_code IS NOT NULL) OR
               (asset_type IS NULL AND item_asset_string IS NOT NULL)
         LIMIT 1000
@@ -35,7 +35,7 @@ SQL
     while true
       batch = StreamItemInstance.connection.select_all(<<-SQL)
         SELECT id, context_type, context_id, context_code
-        FROM stream_items
+        FROM #{StreamItem.quoted_table_name}
         WHERE context_type IS NULL AND context_code IS NOT NULL
         LIMIT 1000
 SQL

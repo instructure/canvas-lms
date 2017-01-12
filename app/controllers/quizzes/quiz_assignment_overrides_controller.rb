@@ -92,7 +92,7 @@
 #       }
 #     }
 class Quizzes::QuizAssignmentOverridesController < ApplicationController
-  include Filters::Quizzes
+  include ::Filters::Quizzes
 
   before_filter :require_course, only: [ :index ]
   skip_around_filter :set_locale, only: [ :index ]
@@ -127,13 +127,11 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
     api_route = api_v1_course_quiz_assignment_overrides_url(@course)
     quiz_ids = (Array(params[:quiz_assignment_overrides])[0] || {})[:quiz_ids]
 
-    scope = @course.quizzes.active.includes([ :assignment ])
+    scope = @course.quizzes.active.preload(:assignment)
     scope = scope.where(id: quiz_ids) if quiz_ids.present?
     scope = scope.available unless can_manage
 
-    if @course.feature_enabled?(:differentiated_assignments)
-      scope = DifferentiableAssignment.scope_filter(scope, @current_user, @course)
-    end
+    scope = DifferentiableAssignment.scope_filter(scope, @current_user, @course)
 
     quizzes = Api.paginate(scope, self, api_route)
 

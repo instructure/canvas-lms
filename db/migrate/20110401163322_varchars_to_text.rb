@@ -1,4 +1,6 @@
 class VarcharsToText < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     change_column :assessment_question_banks, :title, :text
     change_column :assessment_questions, :name, :text

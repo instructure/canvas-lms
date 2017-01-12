@@ -43,10 +43,18 @@ describe FeatureFlags do
     expect(t_sub_account.feature_enabled?(:account_feature)).to be_truthy
   end
 
-  it "should report feature_allowed? correctly" do
-    expect(t_sub_account.feature_allowed?(:account_feature)).to be_truthy
-    expect(t_root_account.feature_allowed?(:root_account_feature)).to be_falsey
-    expect(t_course.feature_allowed?(:course_feature)).to be_truthy
+  describe "#feature_allowed?" do
+    it "returns true if the feature is 'on' or 'allowed', and false otherwise" do
+      expect(t_sub_account.feature_allowed?(:account_feature)).to be_truthy
+      expect(t_root_account.feature_allowed?(:root_account_feature)).to be_falsey
+      expect(t_course.feature_allowed?(:course_feature)).to be_truthy
+    end
+
+    it "returns true if the feature is 'allowed', and false otherwise when passed exclude_enabled: true" do
+      expect(t_sub_account.feature_allowed?(:account_feature, exclude_enabled: true)).to be_falsey
+      expect(t_root_account.feature_allowed?(:root_account_feature, exclude_enabled: true)).to be_falsey
+      expect(t_course.feature_allowed?(:course_feature, exclude_enabled: true)).to be_truthy
+    end
   end
 
   describe "lookup_feature_flag" do

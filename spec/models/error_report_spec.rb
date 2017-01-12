@@ -48,9 +48,31 @@ describe ErrorReport do
     expect(!!(m && m.to == "nobody@nowhere.com")).to eql(false)
   end
 
-  it "should not fail with invalid UTF-8" do
-    data = { extra: { message: "he\xffllo" } }
-    described_class.log_exception_from_canvas_errors('my error', data)
+  describe ".log_exception_from_canvas_errors" do
+    it "should not fail with invalid UTF-8" do
+      data = { extra: { message: "he\xffllo" } }
+      described_class.log_exception_from_canvas_errors('my error', data)
+    end
+
+    it "uses an empty hash as a default for errors with no extra data" do
+      data = { tags: { a: "b" } }
+      expect { described_class.log_exception_from_canvas_errors('my error', data) }.
+        to_not raise_error
+    end
+
+    it "should use class name for category" do
+      e = Exception.new("error")
+      report = described_class.log_exception_from_canvas_errors(e, {extra:{}})
+      expect(report.category).to eq(e.class.name)
+    end
+
+
+    it "ignores error classes that it's configured to overlook" do
+      class ErrorReportSpecException < StandardError; end
+      described_class.configure_to_ignore(["ErrorReportSpecException"])
+      report = described_class.log_exception_from_canvas_errors(ErrorReportSpecException.new, {})
+      expect(report).to be_nil
+    end
   end
 
   it "should return categories" do
@@ -69,12 +91,6 @@ describe ErrorReport do
     report = ErrorReport.new
     report.url = "https://www.instructure.example.com?access_token=abcdef"
     expect(report.url).to eq "https://www.instructure.example.com?access_token=[FILTERED]"
-  end
-
-  it "should use class name for category" do
-    e = Exception.new("error")
-    report = described_class.log_exception_from_canvas_errors(e, {extra:{}})
-    expect(report.category).to eq(e.class.name)
   end
 
   it "should filter params" do
@@ -103,4 +119,10 @@ describe ErrorReport do
     expect(report.data["request_parameters"]).to eq({ "client_secret" => "[FILTERED]" }.inspect)
   end
 
+  it "should not try to assign protected fields" do
+    report = described_class.new
+    report.assign_data(id: 1)
+    expect(report.id).to be_nil
+    expect(report.data["id"]).to eq 1
+  end
 end

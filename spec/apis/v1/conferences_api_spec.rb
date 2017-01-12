@@ -113,7 +113,7 @@ describe "Conferences API", type: :request do
     let(:course_id) { conference.context.id }
 
     let(:path) do
-      "api/v1/courses/#{course_id}/conferences/#{conference.id}/recording_ready"
+      "/api/v1/courses/#{course_id}/conferences/#{conference.id}/recording_ready"
     end
 
     let(:params) do
@@ -124,7 +124,8 @@ describe "Conferences API", type: :request do
 
     it 'should mark the recording as ready' do
       payload = {meeting_id: conference.conference_key}
-      body_params = {signed_parameters: JWT.encode(payload, conference.config[:secret_dec])}
+      jwt = Canvas::Security.create_jwt(payload, nil, conference.config[:secret_dec])
+      body_params = {signed_parameters: jwt}
 
       raw_api_call(:post, path, params, body_params)
       expect(response.status).to eq 202
@@ -132,7 +133,8 @@ describe "Conferences API", type: :request do
 
     it 'should error if the secret key is wrong' do
       payload = {meeting_id: conference.conference_key}
-      body_params = {signed_parameters: JWT.encode(payload, "wrong_key")}
+      jwt = Canvas::Security.create_jwt(payload, nil, "wrong_key")
+      body_params = {signed_parameters: jwt}
 
       raw_api_call(:post, path, params, body_params)
       expect(response.status).to eq 401
@@ -140,7 +142,8 @@ describe "Conferences API", type: :request do
 
     it 'should error if the conference_key is wrong' do
       payload = {meeting_id: "wrong_conference_key"}
-      body_params = {signed_parameters: JWT.encode(payload, conference.config[:secret_dec])}
+      jwt = Canvas::Security.create_jwt(payload, nil, conference.config[:secret_dec])
+      body_params = {signed_parameters: jwt}
 
       raw_api_call(:post, path, params, body_params)
       expect(response.status).to eq 422

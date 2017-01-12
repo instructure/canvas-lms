@@ -25,7 +25,7 @@ define([
   'timezone',
   'compiled/userSettings',
   'str/htmlEscape',
-  'wikiSidebar',
+  'jsx/shared/rce/RichContentEditor',
   'instructure_helper',
   'jqueryui/draggable',
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -43,7 +43,6 @@ define([
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'compiled/jquery/fixDialogButtons',
   'compiled/jquery/mediaCommentThumbnail',
-  'tinymce.editor_box' /* editorBox */,
   'vendor/date' /* Date.parse */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
@@ -52,9 +51,10 @@ define([
   'jqueryui/tabs' /* /\.tabs/ */,
   'compiled/behaviors/trackEvent',
   'compiled/badge_counts',
-  'vendor/jquery.placeholder',
-  'compiled/smartbanner'
-], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, wikiSidebar) {
+  'vendor/jquery.placeholder'
+], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, RichContentEditor) {
+
+  RichContentEditor.preloadRemoteModule()
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
@@ -217,20 +217,6 @@ define([
       }
     });
 
-    $(".custom_search_results_link").click(function(event) {
-      event.preventDefault();
-      var $dialog = $("#custom_search_results_dialog");
-      $dialog.dialog({
-        title: I18n.t('titles.search_for_open_resources', "Search for Open Resources"),
-        width: 600,
-        height: 400
-      });
-      var control = $dialog.data('searchControl');
-      if(control) {
-        control.execute($("title").text());
-      }
-    });
-
     $("a.equella_content_link").live('click', function(event) {
       event.preventDefault();
       var $dialog = $("#equella_preview_dialog");
@@ -325,6 +311,7 @@ define([
             .addClass('external')
             .html('<span>' + $(this).html() + '</span>')
             .attr('target', '_blank')
+            .attr('rel', 'noreferrer')
             .append('<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' + $.raw(externalLink) + '"/>')
             .append('<span class="screenreader-only">&nbsp;(' + $.raw(externalLink) + ')</span>');
         }).end()
@@ -493,22 +480,16 @@ define([
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      $editor.editorBox();
-      $editor.editorBox('focus', true);
-      if(wikiSidebar) {
-        wikiSidebar.attachToEditor($editor);
-        $("#sidebar_content").hide();
-        wikiSidebar.show();
-      }
+      RichContentEditor.initSidebar({
+        show: function() { $('#sidebar_content').hide() },
+        hide: function() { $('#sidebar_content').show() }
+      })
+      RichContentEditor.loadNewEditor($editor, { focus: true })
     }).bind('richTextEnd', function(event, $editor) {
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      $editor.editorBox('destroy');
-      if(wikiSidebar) {
-        $("#sidebar_content").show();
-        wikiSidebar.hide();
-      }
+      RichContentEditor.destroyRCE($editor);
     });
 
     $(".cant_record_link").click(function(event) {
@@ -868,14 +849,18 @@ define([
       event.preventDefault();
       var $item = $(this).parents("li, div.topic_message").last();
       var $prevItem = $(this).closest('.to-do-list > li').prev()
-      var toFocus = ($prevItem.find('.al-trigger').length && $prevItem.find('.al-trigger')) ||
-                    $('.event-list-view-calendar')
+      var toFocus = ($prevItem.find('.disable-todo-item-link').length && $prevItem.find('.disable-todo-item-link')) ||
+                    $('.todo-list-header')
       var url = $(this).data('api-href');
+      var flashMessage = $(this).data('flash-message');
       function remove(delete_url) {
         $item.confirmDelete({
           url: delete_url,
           noMessage: true,
           success: function() {
+            if (flashMessage) {
+              $.flashMessage(flashMessage);
+            }
             $(this).slideUp(function() {
               $(this).remove();
               toFocus.focus();
@@ -893,12 +878,14 @@ define([
     setTimeout(function() {
       $("#content a:external,#content a.explicit_external_link").each(function(){
         $(this)
+          .not(".open_in_a_new_tab")
           .not(":has(img)")
           .not(".not_external")
           .addClass('external')
           .children("span.ui-icon-extlink").remove().end()
           .html('<span>' + $(this).html() + '</span>')
           .attr('target', '_blank')
+          .attr('rel', 'noreferrer')
           .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
       });
     }, 2000);

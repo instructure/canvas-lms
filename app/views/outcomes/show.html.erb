@@ -1,11 +1,11 @@
 <%
-  jammit_css :learning_outcomes
+  css_bundle :learning_outcomes
   js_bundle :react_outcome_alignment
   content_for :page_title, @outcome.short_description
 %>
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_outcomes_url) %>"><%= image_tag "back.png" %> <%= t "#buttons.back_to_outcomes", "Back to Outcomes" %></a>
+    <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_outcomes_url) %>"><%= image_tag "back.png", :alt => '' %> <%= t "#buttons.back_to_outcomes", "Back to Outcomes" %></a>
   </div>
 <% end %>
 

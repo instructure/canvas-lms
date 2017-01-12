@@ -21,7 +21,7 @@ class AccountAuthorizationConfig::Delegated < AccountAuthorizationConfig
 
   def disable_open_registration
     if self.account.open_registration?
-      self.account.settings = { :open_registration => false, :self_registration => false }
+      self.account.settings[:open_registration] = false
       self.account.save!
     end
   end

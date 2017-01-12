@@ -101,7 +101,7 @@ describe "Outcome Reports" do
 
     it "should run the Student Competency report" do
 
-      parsed = read_report(@type)
+      parsed = read_report(@type, {order: [0, 1]})
 
       expect(parsed[0][0]).to eq @user2.sortable_name
       expect(parsed[0][1]).to eq @user2.id.to_s
@@ -128,11 +128,11 @@ describe "Outcome Reports" do
       expect(parsed[1][3]).to eq @assignment.title
       expect(parsed[1][4]).to eq @assignment.id.to_s
       expect(parsed[1][5]).to eq @submission.submitted_at.iso8601
-      expect(parsed[1][6]).to eq @submission.grade.to_s
+      expect(parsed[1][6]).to eq @submission.grade.to_f.to_s
       expect(parsed[1][7]).to eq @outcome.short_description
       expect(parsed[1][8]).to eq @outcome.id.to_s
       expect(parsed[1][9]).to eq '1'
-      expect(parsed[1][10]).to eq '2'
+      expect(parsed[1][10]).to eq '2.0'
       expect(parsed[1][11]).to eq @course1.name
       expect(parsed[1][12]).to eq @course1.id.to_s
       expect(parsed[1][13]).to eq @course1.sis_source_id
@@ -178,12 +178,11 @@ describe "Outcome Reports" do
       @outcome.save!
       outcome_group.add_outcome(@outcome)
 
-      param = {}
-      parsed = read_report(@type, {params: param, account: sub_account})
+      parsed = read_report(@type, {order: [0, 1], account: sub_account})
       expect(parsed[1]).to eq [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
                            @assignment.title, @assignment.id.to_s,
-                           @submission.submitted_at.iso8601, @submission.grade.to_s,
-                           @outcome.short_description, @outcome.id.to_s, '1', '2',
+                           @submission.submitted_at.iso8601, @submission.grade.to_f.to_s,
+                           @outcome.short_description, @outcome.id.to_s, '1', '2.0',
                            @course1.name, @course1.id.to_s, @course1.sis_source_id,
                            @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
@@ -204,13 +203,13 @@ describe "Outcome Reports" do
       param = {}
       param["include_deleted"] = true
       report = run_report(@type, {params: param})
-      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects: true;"
-      parsed = parse_report(report)
+      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
+      parsed = parse_report(report, {order: 0})
 
       expect(parsed[1]).to eq [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
                            @assignment.title, @assignment.id.to_s,
-                           @submission.submitted_at.iso8601, @submission.grade.to_s,
-                           @outcome.short_description, @outcome.id.to_s, '1', '2',
+                           @submission.submitted_at.iso8601, @submission.grade.to_f.to_s,
+                           @outcome.short_description, @outcome.id.to_s, '1', '2.0',
                            @course1.name, @course1.id.to_s, @course1.sis_source_id,
                            @section.name, @section.id.to_s, @section.sis_source_id,
                            "https://#{HostUrl.context_host(@course1)}/courses/#{@course1.id}/assignments/#{@assignment.id}"]
@@ -235,7 +234,7 @@ describe "Outcome Reports" do
       lor.score = @submission.score
       lor.save!
 
-      parsed = read_report(@type)
+      parsed = read_report(@type, {order: 0})
       expect(parsed.length).to eq 2
     end
   end
@@ -255,11 +254,11 @@ describe "Outcome Reports" do
       expect(parsed[0][4]).to eq @assignment.id.to_s
       expect(parsed[0][5]).to eq 'assignment'
       expect(parsed[0][6]).to eq @submission.submitted_at.iso8601
-      expect(parsed[0][7]).to eq @submission.grade.to_s
+      expect(parsed[0][7]).to eq @submission.grade.to_f.to_s
       expect(parsed[0][8]).to eq @outcome.short_description
       expect(parsed[0][9]).to eq @outcome.id.to_s
       expect(parsed[0][10]).to eq '1'
-      expect(parsed[0][11]).to eq '2'
+      expect(parsed[0][11]).to eq '2.0'
       expect(parsed[0][12]).to eq nil
       expect(parsed[0][13]).to eq nil
       expect(parsed[0][14]).to eq @course1.name
@@ -299,11 +298,11 @@ describe "Outcome Reports" do
       expect(parsed[2][4]).to eq @assignment.id.to_s
       expect(parsed[2][5]).to eq 'assignment'
       expect(parsed[2][6]).to eq @submission.submitted_at.iso8601
-      expect(parsed[2][7]).to eq @submission.grade.to_s
+      expect(parsed[2][7]).to eq @submission.grade.to_f.to_s
       expect(parsed[2][8]).to eq @outcome.short_description
       expect(parsed[2][9]).to eq @outcome.id.to_s
       expect(parsed[2][10]).to eq '1'
-      expect(parsed[2][11]).to eq '2'
+      expect(parsed[2][11]).to eq '2.0'
       expect(parsed[2][12]).to eq nil
       expect(parsed[2][13]).to eq nil
       expect(parsed[2][14]).to eq @course1.name
@@ -321,7 +320,7 @@ describe "Outcome Reports" do
       expect(parsed[0][8]).to eq outcome.short_description
       expect(parsed[0][9]).to eq outcome.id.to_s
       expect(parsed[0][10]).to eq '1'
-      expect(parsed[0][11]).to eq '1'
+      expect(parsed[0][11]).to eq '1.0'
       expect(parsed[0][12]).to eq 'question 1'
       expect(parsed[0][13]).to eq q1.assessment_question.id.to_s
       expect(parsed[0][14]).to eq @course1.name
@@ -339,7 +338,7 @@ describe "Outcome Reports" do
       expect(parsed[1][8]).to eq outcome.short_description
       expect(parsed[1][9]).to eq outcome.id.to_s
       expect(parsed[1][10]).to eq '1'
-      expect(parsed[1][11]).to eq '0'
+      expect(parsed[1][11]).to eq '0.0'
       expect(parsed[1][12]).to eq 'question 2'
       expect(parsed[1][13]).to eq q2.assessment_question.id.to_s
       expect(parsed[1][14]).to eq @course1.name
@@ -364,16 +363,16 @@ describe "Outcome Reports" do
 
       parsed = read_report(@type, {order: [0, 13]})
       expect(parsed[0][6]).to eq sub.finished_at.iso8601
-      expect(parsed[0][7]).to eq sub.score.to_s
+      expect(parsed[0][7]).to eq sub.score.to_f.to_s
       expect(parsed[1][6]).to eq sub.finished_at.iso8601
-      expect(parsed[1][7]).to eq sub.score.to_s
+      expect(parsed[1][7]).to eq sub.score.to_f.to_s
     end
 
     it 'should include in extra text if option is set' do
       param = {}
       param["include_deleted"] = true
       report = run_report(@type, {params: param})
-      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects: true;"
+      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
     end
   end
 end

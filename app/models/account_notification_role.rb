@@ -18,7 +18,6 @@
 
 class AccountNotificationRole < ActiveRecord::Base
   attr_accessible :account_notification_id, :role
-  EXPORTABLE_ATTRIBUTES = [:account_notification_id, :role_id]
   belongs_to :account_notification
 
   belongs_to :role

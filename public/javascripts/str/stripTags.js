@@ -16,7 +16,5 @@ define(["jquery"], function() {
   return function(html) {
     return $stripDiv.html(html).text();
   }
-
-  return stripTags;
 });
 

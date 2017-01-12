@@ -29,6 +29,7 @@ module IncomingMailProcessor
       :imap => IncomingMailProcessor::ImapMailbox,
       :directory => IncomingMailProcessor::DirectoryMailbox,
       :pop3 => IncomingMailProcessor::Pop3Mailbox,
+      :sqs => IncomingMailProcessor::SqsMailbox,
     }.freeze
 
     ImportantHeaders = %w(To From Subject Content-Type)
@@ -52,6 +53,11 @@ module IncomingMailProcessor
       settings.workers || 1
     end
 
+    # True if we should launch N workers per mailbox, false to just launch N workers overall
+    def self.dedicated_workers_per_mailbox
+      settings.dedicated_workers_per_mailbox.nil? ? false : settings.dedicated_workers_per_mailbox
+    end
+
     def self.run_periodically?
       if settings.run_periodically.nil?
         # check backwards compatibility settings
@@ -62,7 +68,14 @@ module IncomingMailProcessor
     end
 
     def process(opts={})
-      self.class.mailbox_accounts.each do |account|
+      if opts[:mailbox_account_address]
+        # Find the one with that address, or do nothing if none exists (probably means we're in the middle of a deploy)
+        accounts_to_process = self.class.mailbox_accounts.select { |a| a.address == opts[:mailbox_account_address] }
+      else
+        accounts_to_process = self.class.mailbox_accounts
+      end
+
+      accounts_to_process.each do |account|
         mailbox = self.class.create_mailbox(account)
         mailbox_opts = {}
         mailbox_opts = {offset: opts[:worker_id], stride: self.class.workers} if opts[:worker_id] && self.class.workers > 1
@@ -75,7 +88,11 @@ module IncomingMailProcessor
 
       body, html_body = extract_body(incoming_message)
 
-      @message_handler.handle(mailbox_account.address, body, html_body, incoming_message, tag)
+      handle = @message_handler.handle(mailbox_account.address, body, html_body, incoming_message, tag)
+
+      report_stats(incoming_message, mailbox_account)
+
+      handle
     end
 
     private
@@ -90,7 +107,7 @@ module IncomingMailProcessor
         text_body = self.class.utf8ify(text_part.body.decoded, text_part.charset) if text_part
       else
         case incoming_message.mime_type
-        when 'text/plain'
+        when 'text/plain', nil
           text_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
         when 'text/html'
           html_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
@@ -108,6 +125,21 @@ module IncomingMailProcessor
       end
 
       return text_body, html_body
+    end
+
+    def report_stats(incoming_message, mailbox_account)
+      CanvasStatsd::Statsd.increment("incoming_mail_processor.incoming_message_processed.#{mailbox_account.escaped_address}")
+
+      age = age(incoming_message)
+      if age
+        stat_name = "incoming_mail_processor.message_age.#{mailbox_account.escaped_address}"
+        CanvasStatsd::Statsd.timing(stat_name, age)
+      end
+    end
+
+    def age(message)
+      datetime = message.date
+      (Time.now - datetime).to_i * 1000 if datetime # age in ms, please
     end
 
     def self.mailbox_keys
@@ -151,7 +183,7 @@ module IncomingMailProcessor
       flat_account_configs = flatten_account_configs(account_configs)
       self.mailbox_accounts = flat_account_configs.map do |mailbox_protocol, mailbox_config|
         error_folder = mailbox_config.delete(:error_folder)
-        address = mailbox_config[:username]
+        address = mailbox_config[:address] || mailbox_config[:username]
         IncomingMailProcessor::MailboxAccount.new({
           :protocol => mailbox_protocol.to_sym,
           :config => mailbox_config,

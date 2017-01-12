@@ -19,6 +19,23 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+def new_valid_tool(course)
+  tool = course.context_external_tools.new(
+      name: "bob",
+      consumer_key: "bob",
+      shared_secret: "bob",
+      tool_id: 'some_tool',
+      privacy_level: 'public'
+  )
+  tool.url = "http://www.example.com/basic_lti"
+  tool.resource_selection = {
+      :url => "http://#{HostUrl.default_host}/selection_test",
+      :selection_width => 400,
+      :selection_height => 400}
+  tool.save!
+  tool
+end
+
 describe FilesController do
   def course_folder
     @folder = @course.folders.create!(:name => "a folder", :workflow_state => "visible")
@@ -164,6 +181,46 @@ describe FilesController do
       group_with_user_logged_in(:group_context => Account.default)
       get 'index', :group_id => @group.id
       expect(response).to be_success
+    end
+
+    it "should not show external tools in a group context" do
+      group_with_user_logged_in(:group_context => Account.default)
+      new_valid_tool(@course)
+      user_file
+      @file.context = @group
+      get 'index', :group_id => @group.id
+      expect(assigns[:js_env][:FILES_CONTEXTS][0][:file_menu_tools]).to eq []
+    end
+
+    context "file menu tool visibility" do
+      before do
+        course(:active_all => true)
+        @tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @tool.file_menu = {
+          :visibility => "admins"
+        }
+        @tool.save!
+        Account.default.enable_feature!(:lor_for_account)
+      end
+
+      before :each do
+        user(:active_all => true)
+        user_session(@user)
+      end
+
+      it "should show restricted external tools to teachers" do
+        @course.enroll_teacher(@user).accept!
+
+        get 'index', :course_id => @course.id
+        expect(assigns[:js_env][:FILES_CONTEXTS][0][:file_menu_tools].count).to eq 1
+      end
+
+      it "should not show restricted external tools to students" do
+        @course.enroll_student(@user).accept!
+
+        get 'index', :course_id => @course.id
+        expect(assigns[:js_env][:FILES_CONTEXTS][0][:file_menu_tools]).to eq []
+      end
     end
 
     describe 'across shards' do
@@ -367,6 +424,14 @@ describe FilesController do
         expect(@module.evaluate_for(@student).state).to eql(:completed)
       end
 
+      it "should mark media files viewed when rendering html with file_preview" do
+        @file = attachment_model(:context => @course, :uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
+        file_in_a_module
+        get 'show', :course_id => @course.id, :id => @file.id, :format => :html
+        @module.reload
+        expect(@module.evaluate_for(@student).state).to eql(:completed)
+      end
+
       it "should redirect to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
         owned_file = course_file
         owned_file.display_name = 'holla'
@@ -389,7 +454,7 @@ describe FilesController do
         expect(assigns(:attachment)).to eq new_file
       end
 
-      it "doesnt leak the name of unowned deleted files" do
+      it "does not leak the name of unowned deleted files" do
         unowned_file = @file
         unowned_file.display_name = 'holla'
         unowned_file.save
@@ -398,6 +463,28 @@ describe FilesController do
         get 'show', :course_id => @course.id, :id => unowned_file.id
         expect(response.status).to eq(404)
         expect(assigns(:not_found_message)).to eq("This file has been deleted")
+      end
+
+      it "does not blow up for logged out users" do
+        unowned_file = @file
+        unowned_file.display_name = 'holla'
+        unowned_file.save
+        unowned_file.destroy
+
+        remove_user_session
+        get 'show', :course_id => @course.id, :id => unowned_file.id
+        expect(response.status).to eq(404)
+        expect(assigns(:not_found_message)).to eq("This file has been deleted")
+      end
+
+      it "should view file when student's submission was deleted" do
+        @assignment = @course.assignments.create!(title: 'upload_assignment', submission_types: 'online_upload')
+        attachment_model context: @student
+        @assignment.submit_homework @student, attachments: [@attachment]
+        # create an orphaned attachment_association
+        @assignment.submissions.delete_all
+        get 'show', user_id: @student.id, id: @attachment.id, download_frd: 1
+        expect(response).to be_success
       end
     end
 
@@ -486,24 +573,16 @@ describe FilesController do
       expect(response).to render_template("shared/errors/file_not_found")
     end
 
+    it "should render file_not_found even if the format is non-html" do
+      get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+".css", :format => 'css'
+      expect(response).to render_template("shared/errors/file_not_found")
+    end
+
     it "should ignore bad file_ids" do
       get "show_relative", :file_id => @file.id + 1, :course_id => @course.id, :file_path => @file.full_display_path
       expect(response).to be_redirect
       get "show_relative", :file_id => "blah", :course_id => @course.id, :file_path => @file.full_display_path
       expect(response).to be_redirect
-    end
-  end
-
-  describe "GET 'new'" do
-    it "should require authorization" do
-      get 'new', :course_id => @course.id
-      assert_unauthorized
-    end
-
-    it "should assign variables" do
-      user_session(@teacher)
-      get 'new', :course_id => @course.id
-      expect(assigns[:attachment]).not_to be_nil
     end
   end
 
@@ -519,6 +598,28 @@ describe FilesController do
       expect(response).to be_redirect
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment].display_name).to eql("bob")
+    end
+
+    it "should create unpublished files if usage rights required" do
+      @course.account.allow_feature! :usage_rights_required
+      @course.enable_feature! :usage_rights_required
+      user_session(@teacher)
+      post 'create', :course_id => @course.id, :attachment => {:display_name => "wat", :uploaded_data => io}
+      expect(assigns[:attachment]).to be_locked
+    end
+
+    it "should reject an upload that would exceed quota" do
+      user_session(@teacher)
+      Setting.set('user_default_quota', 7) # seven... seven bytes.
+      post 'create', :user_id => @teacher.id, :format => :json, :attachment => {:display_name => "bob", :uploaded_data => io}
+      expect(response.status).to eq 400
+      expect(response.body).to include 'quota exceeded'
+    end
+
+    it "refuses to create a file in a submissions folder" do
+      user_session(@student)
+      post 'create', :user_id => @student.id, :format => :json, :attachment => {:display_name => 'blah', :uploaded_data => io, :folder_id => @student.submissions_folder.id}
+      expect(response.status).to eq 401
     end
 
     context "sharding" do
@@ -577,6 +678,28 @@ describe FilesController do
       expect(@file.folder).to eql(@folder)
     end
 
+    context "submissions folder" do
+      before(:once) do
+        @student = user_model
+        @root_folder = Folder.root_folders(@student).first
+        @file = attachment_model(:context => @user, :uploaded_data => default_uploaded_data, :folder => @root_folder)
+        @sub_folder = @student.submissions_folder
+        @sub_file = attachment_model(:context => @user, :uploaded_data => default_uploaded_data, :folder => @sub_folder)
+      end
+
+      it "should not move a file into a submissions folder" do
+        user_session(@student)
+        put 'update', :user_id => @student.id, :id => @file.id, :attachment => { :folder_id => @sub_folder.id }, :format => 'json'
+        expect(response.status).to eq 401
+      end
+
+      it "should not move a file out of a submissions folder" do
+        user_session(@student)
+        put 'update', :user_id => @student.id, :id => @sub_file.id, :attachment => { :folder_id => @root_folder.id }, :format => 'json'
+        expect(response.status).to eq 401
+      end
+    end
+
     it "should replace content and update user_id" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
@@ -611,20 +734,49 @@ describe FilesController do
   end
 
   describe "DELETE 'destroy'" do
-    before :once do
-      course_file
+    context "authorization" do
+      before :once do
+        course_file
+      end
+
+      it "should require authorization" do
+        delete 'destroy', :course_id => @course.id, :id => @file.id
+        expect(response.body).to eql("{\"message\":\"Unauthorized to delete this file\"}")
+        expect(assigns[:attachment].file_state).to eq 'available'
+      end
+
+      it "should delete file" do
+        user_session(@teacher)
+        delete 'destroy', :course_id => @course.id, :id => @file.id
+        expect(response).to be_redirect
+        expect(assigns[:attachment]).to eql(@file)
+        expect(assigns[:attachment].file_state).to eq 'deleted'
+      end
     end
 
-    it "should require authorization" do
-      delete 'destroy', :course_id => @course.id, :id => @file.id
+    it "refuses to delete a file in a submissions folder" do
+      file = @student.attachments.create! :display_name => 'blah', :uploaded_data => default_uploaded_data, :folder => @student.submissions_folder
+      delete 'destroy', :user_id => @student.id, :id => file.id
+      expect(response.status).to eq 401
     end
 
-    it "should delete file" do
-      user_session(@teacher)
-      delete 'destroy', :course_id => @course.id, :id => @file.id
-      expect(response).to be_redirect
-      expect(assigns[:attachment]).to eql(@file)
-      expect(assigns[:attachment].file_state).to eq 'deleted'
+    context "file that has been submitted" do
+      def submit_file
+        assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
+        @file = attachment_model(:context => @user, :uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'))
+        assignment.submit_homework(@student, :attachments => [@file])
+      end
+
+      before :once do
+        user_session(@student)
+        submit_file
+      end
+
+      it "should not delete" do
+        delete 'destroy', :id => @file.id
+        expect(response.body).to eql("{\"message\":\"Cannot delete a file that has been submitted as part of an assignment\"}")
+        expect(assigns[:attachment].file_state).to eq 'available'
+      end
     end
   end
 
@@ -758,6 +910,50 @@ describe FilesController do
       expect(assigns[:attachment].locked).to be_truthy
     end
 
+    it "refuses to create a file in a submissions folder" do
+      user_session(@student)
+      post 'create_pending', {:attachment => {
+        :context_code => @student.asset_string,
+        :filename => 'test.txt',
+        :folder_id => @student.submissions_folder.id
+      }}
+      expect(response.status).to eq 401
+    end
+
+    it "creates a file in the submissions folder if intent=='submit' and the feature is enabled" do
+      @course.root_account.enable_feature! :submissions_folder
+      user_session(@student)
+      assignment = @course.assignments.create!(:submission_types => 'online_upload')
+      post 'create_pending', {:attachment => {
+        :context_code => assignment.context_code,
+        :asset_string => assignment.asset_string,
+        :filename => 'test.txt',
+        :intent => 'submit'
+      }}
+      f = assigns[:attachment].folder
+      expect(f.submission_context_code).to eq @course.asset_string
+    end
+
+    it "uses a submissions folder for group assignments when the feature is enabled" do
+      @course.root_account.enable_feature! :submissions_folder
+      user_session(@student)
+      category = group_category
+      assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
+      group = category.groups.create(:context => @course)
+      group.add_user(@student)
+      user_session(@student)
+      post 'create_pending', {:attachment => {
+        :context_code => @course.asset_string,
+        :asset_string => assignment.asset_string,
+        :intent => 'submit',
+        :filename => "bob.txt"
+      }}
+      expect(response).to be_success
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment].context).to eq group
+      expect(assigns[:attachment].folder).to be_for_submissions
+    end
+
     context "sharding" do
       specs_require_sharding
 
@@ -838,13 +1034,24 @@ describe FilesController do
       expect(@attachment.open.read).to eq File.read(File.join(ActionController::TestCase.fixture_path, 'courses.yml'))
     end
 
+    it "opens up cors headers" do
+      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      post "api_create", params[:upload_params].merge(:file => @content)
+      expect(response.header["Access-Control-Allow-Origin"]).to eq "*"
+    end
+
+    it "has a preflight point for options requests (mostly safari)" do
+      process :api_create_success_cors, 'OPTIONS', id: ""
+      expect(response.header['Access-Control-Allow-Headers']).to eq('Origin, X-Requested-With, Content-Type, Accept, Authorization, Accept-Encoding')
+    end
+
     it "should reject a blank policy" do
       post "api_create", { :file => @content }
       assert_status(400)
     end
 
     it "should reject an expired policy" do
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "", :expiration => -60)
+      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "", :expiration => -60.seconds)
       post "api_create", params[:upload_params].merge({ :file => @content })
       assert_status(400)
     end
@@ -906,6 +1113,16 @@ describe FilesController do
         otherfile = attachment_model
         get "public_url", :id => otherfile, :submission_id => @submission.id
         assert_unauthorized
+      end
+
+      it "allows downloading an attachment to a previous version" do
+        old_file = @attachment
+        new_file = attachment_model(:context => @student)
+        @assignment.submit_homework @student, :attachments => [new_file]
+        get "public_url", :id => old_file.id, :submission_id => @submission.id
+        expect(response).to be_success
+        data = json_parse
+        expect(data).to eq({ "public_url" => old_file.authenticated_s3_url })
       end
     end
   end

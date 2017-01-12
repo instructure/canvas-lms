@@ -1,35 +1,29 @@
-<% 
+<%
   @show_cc_prefs = @current_pseudonym &&
     @current_pseudonym.login_count < 10 &&
     @current_user &&
     !@current_user.fake_student? &&
     !@current_user.used_feature?(:cc_prefs)
 %>
-
 <% if @show_cc_prefs %>
-<div class="global-message image-block">
-  <div class="image-block-image">
-    <i class="information-icon"></i>
-    <span class="hidden-inline-text">
+<div class="ic-notification">
+  <div class="ic-notification__icon" role="presentation">
+    <i class="icon-info"></i>
+    <span class="screenreader-only">
       <%= accessible_message_icon_text("information") %>
     </span>
   </div>
-  <div class="image-block-content">
-    <div class="title">
-      <%= link_to(t('titles.configure_com_prefs', 'Configure Communication Preferences'), communication_profile_path) %>
+  <div class="ic-notification__content">
+    <div class="ic-notification__message">
+      <h4 class="ic-notification__title">
+        <%= t("Notifications") %>.
+      </h4>
+      <span class="notification_message">
+        <%= t("Tell us how and when you would like to be notified of events in Canvas.") %>
+      </span>
     </div>
-    <div class="message">
-      <p><%= t('comm_preferences_instructions', %{
-      Now that you're registered with Canvas, you might want to configure what
-      notifications you'll receive as your courses progress.
-      Canvas is flexible enough to let you choose how and for what
-      events you'd like to be notified.
-      When things happen in your courses you can choose to be emailed
-      or texted to your cell immediately, daily or weekly.
-      }) %></p>
-    </div>
-    <div class="buttons">
-      <%= link_to(t('buttons.configure', 'Configure Communication Preferences'), communication_profile_path, :class => "btn", :role => "button") %>
+    <div class="ic-notification__actions">
+      <%= link_to(t("Notification Preferences"), communication_profile_path, :class => "Button Button--small Button--primary", :role => "button") %>
     </div>
   </div>
 </div>

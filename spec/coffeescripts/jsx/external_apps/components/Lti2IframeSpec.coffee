@@ -8,13 +8,13 @@ define [
   wrapper = document.getElementById('fixtures')
 
   createElement = (data) ->
-    Lti2Iframe({
+    React.createElement(Lti2Iframe, {
       registrationUrl: data.registrationUrl
       handleInstall: data.handleInstall
     })
 
   renderComponent = (data) ->
-    React.renderComponent(createElement(data), wrapper)
+    React.render(createElement(data), wrapper)
 
   module 'ExternalApps.Lti2Iframe',
     teardown: ->

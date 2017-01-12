@@ -4,7 +4,7 @@
    for_context ||= false
    context = @context
    context = context.context if context.is_a?(Group)
-   show_grading = !@assignment || @assignment.submission_types != 'online_quiz' 
+   show_grading = !@assignment || @assignment.submission_types != 'online_quiz'
    rubric_association = assessment.rubric_association if assessment
 %>
 <% cache(['rubric_render3',
@@ -92,7 +92,7 @@
     <div class="editing" style="text-align: left">
       <label for="rubric-title"><%= t('title', "Title:") %></label>
       <input id="rubric-title" type="text" class="no-margin-bottom" name="title" value="<%= rubric.title rescue t('defaults.rubric_title', "Some Rubric") %>" style="width: 200px;" maxlength="255" aria-label="<%= t('title', "Title:") %>"/>
-      <a href="<%= search_rubrics_url(:q => "") %>" style="display: none;"><%= image_tag "find.png" %> <%= t 'links.find_rubric', "Find Rubric" %></a>
+      <a href="<%= search_rubrics_url(:q => "") %>" style="display: none;"><%= image_tag "find.png", :alt => '' %> <%= t 'links.find_rubric', "Find Rubric" %></a>
       <% if rubric_association && !rubric_association.rubric_assessments.empty? %>
         <div class="editing" style="font-size: 0.8em;"><%= t 'messages.rubric_in_use',
                                                              { :one => "Keep in mind that 1 student has already been assessed using this rubric.  Changing it will affect their evaluation.",
@@ -115,10 +115,10 @@
 </caption>
 <thead>
   <tr>
-    <th><%= t 'headers.criteria', "Criteria" %></th>
-    <th><%= t 'headers.ratings', "Ratings" %></th>
-    <th><%= t 'headers.points', "Pts" %></th>
-    <th class="editing">&nbsp;</th>
+    <th scope="col"><%= t 'headers.criteria', "Criteria" %></th>
+    <th scope="col"><%= t 'headers.ratings', "Ratings" %></th>
+    <th scope="col"><%= t 'headers.points', "Pts" %></th>
+    <th scope="col" class="editing">&nbsp;</th>
   </tr>
 </thead>
 <tbody>
@@ -140,7 +140,7 @@
         </span>
       </div>
       <div style="float: left;" class="editing">
-      <a href="#" class="icon-add add_criterion_link"><%= t 'links.add_criterion', "Add Criterion" %></a>
+      <a href="#" aria-label='<%= t("Add Criterion") %>' class="icon-plus add_criterion_link"><%= t("Criterion") %></a>
       &nbsp;&nbsp;<a href="#" class="icon-search find_outcome_link outcome"><%= t 'links.find_outcome', "Find Outcome" %></a>
       </div>
       <div class="clear"></div>

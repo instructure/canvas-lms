@@ -19,7 +19,7 @@
 module SIS
   module CSV
     class GroupMembershipImporter < CSVBaseImporter
-      def self.is_group_membership_csv?(row)
+      def self.group_membership_csv?(row)
         row.include?('group_id') && row.include?('user_id')
       end
 

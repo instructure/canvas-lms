@@ -22,11 +22,12 @@ define [
   'underscore'
   'compiled/views/ValidatedFormView'
   'compiled/views/editor/KeyboardShortcuts'
-  'tinymce.editor_box'
+  'jsx/shared/rce/RichContentEditor'
   'compiled/jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
-  'compiled/tinymce',
-], (I18n, $, _, ValidatedFormView, RCEKeyboardShortcuts) ->
+], (I18n, $, _, ValidatedFormView, RCEKeyboardShortcuts, RichContentEditor) ->
+
+  RichContentEditor.preloadRemoteModule()
 
   # Superclass for OutcomeView and OutcomeGroupView.
   # This view is used to show, add, edit, and delete outcomes and groups.
@@ -80,7 +81,8 @@ define [
           @render()
       super
 
-    _cleanUpTiny: => @$el.find('[name="description"]').editorBox 'destroy'
+    _cleanUpTiny: =>
+      RichContentEditor.destroyRCE(@$el.find('[name="description"]'))
 
     submit: (e) =>
       e.preventDefault()
@@ -109,7 +111,7 @@ define [
 
     getTinyMceCode: ->
       textarea = @$('textarea')
-      textarea.val textarea.editorBox 'get_code'
+      textarea.val(RichContentEditor.callOnRCE(textarea, 'get_code'))
 
     setModelUrl: ->
       @model.setUrlTo switch @state
@@ -174,7 +176,7 @@ define [
     setupTinyMCEViewSwitcher: =>
       $('.rte_switch_views_link').click (e) =>
         e.preventDefault()
-        @$('textarea').editorBox 'toggle'
+        RichContentEditor.callOnRCE(@$('textarea'), 'toggle')
         # hide the clicked link, and show the other toggle link.
         $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
 
@@ -185,16 +187,22 @@ define [
     # Called from subclasses in render.
     readyForm: ->
       setTimeout =>
-        @$('textarea').editorBox() # tinymce initializer
+        RichContentEditor.loadNewEditor(@$('textarea'), {
+          getRenderingTarget: (t) ->
+            wrappedTextarea = $(t).wrap( "<div id='parent-of-#{t.id}'></div>").get( 0 )
+            wrappedTextarea.parentNode
+        }) # tinymce initializer
         @setupTinyMCEViewSwitcher()
         @addTinyMCEKeyboardShortcuts()
         @$('input:first').focus()
 
     readOnly: ->
-      @_readOnly || ! @model.get 'can_edit'
+      @_readOnly || !@model.get('can_edit')
 
     updateTitle: (e) =>
       @model.set 'title', e.currentTarget.value
 
     tinymceExists: =>
-      return @$el.find('[name="description"]').length > 0 and @$el.find('[name="description"]').editorBox('exists?')
+      localElExists = @$el.find('[name="description"]').length > 0
+      editorElExists = RichContentEditor.callOnRCE(@$el.find('[name="description"]'), 'exists?')
+      return (localElExists and editorElExists)

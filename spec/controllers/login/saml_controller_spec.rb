@@ -41,14 +41,19 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
-           process: nil
+           process: nil,
+           issuer: "saml_entity"
           )
     )
 
     controller.request.env['canvas.domain_root_account'] = account1
+    session[:sentinel] = true
     post :create, :SAMLResponse => "foo"
+    expect(session[:sentinel]).to be_nil
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(session[:saml_unique_id]).to eq unique_id
     expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user1.pseudonyms.first
@@ -65,6 +70,35 @@ describe Login::SamlController do
     expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user2.pseudonyms.first
   end
 
+  it "does not enforce a valid entity id" do
+    unique_id = 'foo@example.com'
+
+    account1 = account_with_saml
+    user1 = user_with_pseudonym({:active_all => true, :username => unique_id})
+    @pseudonym.account = account1
+    @pseudonym.save!
+
+    Onelogin::Saml::Response.stubs(:new).returns(
+        stub('response',
+             is_valid?: true,
+             success_status?: true,
+             name_id: unique_id,
+             name_identifier_format: nil,
+             name_qualifier: nil,
+             sp_name_qualifier: nil,
+             session_index: nil,
+             process: nil,
+             issuer: "such a lie"
+        )
+    )
+
+    controller.request.env['canvas.domain_root_account'] = account1
+    post :create, :SAMLResponse => "foo"
+    expect(response).to redirect_to(dashboard_url(:login_success => 1))
+    expect(session[:saml_unique_id]).to eq unique_id
+    expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user1.pseudonyms.first
+  end
+
   it "should redirect when a user is authenticated but is not found in canvas" do
     unique_id = 'foo@example.com'
 
@@ -75,9 +109,12 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
-           process: nil
+           process: nil,
+           issuer: "saml_entity"
           )
     )
 
@@ -91,9 +128,8 @@ describe Login::SamlController do
     expect(flash[:delegated_message]).to_not be_nil
     expect(session[:saml_unique_id]).to be_nil
 
-    aac = account.account_authorization_configs.first
-    aac.unknown_user_url = ''
-    aac.save!
+    account.unknown_user_url = ''
+    account.save!
     controller.instance_variable_set(:@aac, nil)
     post :create, :SAMLResponse => "foo"
     expect(response).to redirect_to(login_url)
@@ -102,12 +138,44 @@ describe Login::SamlController do
 
     # Redirect to a specifiec url
     unknown_user_url = "https://example.com/unknown_user"
-    aac.unknown_user_url = unknown_user_url
-    aac.save!
+    account.unknown_user_url = unknown_user_url
+    account.save!
     controller.instance_variable_set(:@aac, nil)
     post :create, :SAMLResponse => "foo"
     expect(response).to redirect_to(unknown_user_url)
     expect(session[:saml_unique_id]).to be_nil
+  end
+
+  it "creates an unfound user when JIT provisioning is enabled" do
+    unique_id = 'foo@example.com'
+
+    account = account_with_saml
+    ap = account.authentication_providers.first
+    ap.update_attribute(:jit_provisioning, true)
+
+    Onelogin::Saml::Response.stubs(:new).returns(
+      stub('response',
+           is_valid?: true,
+           success_status?: true,
+           name_id: unique_id,
+           name_identifier_format: nil,
+           name_qualifier: nil,
+           sp_name_qualifier: nil,
+           session_index: nil,
+           process: nil,
+           issuer: "saml_entity"
+          ))
+
+    # We dont want to log them out of everything.
+    controller.expects(:logout_user_action).never
+    controller.request.env['canvas.domain_root_account'] = account
+
+    expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+    # Default to Login url if set to nil or blank
+    post :create, :SAMLResponse => "foo"
+    expect(response).to redirect_to(dashboard_url(login_success: 1))
+    p = account.pseudonyms.active.by_unique_id(unique_id).first!
+    expect(p.authentication_provider).to eq ap
   end
 
   context "multiple authorization configs" do
@@ -115,21 +183,23 @@ describe Login::SamlController do
       @account = Account.create!
       @unique_id = 'foo@example.com'
       @user1 = user_with_pseudonym(:active_all => true, :username => @unique_id, :account => @account)
-      @account.account_authorization_configs.create!(:auth_type => 'saml', :identifier_format => 'uid')
+      @account.authentication_providers.create!(:auth_type => 'saml', :identifier_format => 'uid')
 
-      @aac2 = @account.account_authorization_configs.build(auth_type: 'saml')
+      @aac2 = @account.authentication_providers.build(auth_type: 'saml')
       @aac2.idp_entity_id = "https://example.com/idp1"
       @aac2.log_out_url = "https://example.com/idp1/slo"
       @aac2.save!
 
       @stub_hash = {
-          :issuer => @aac2.idp_entity_id,
-          :is_valid? => true,
-          :success_status? => true,
-          :name_id => @unique_id,
-          :name_qualifier => nil,
-          :session_index => nil,
-          :process => nil
+          issuer: @aac2.idp_entity_id,
+          is_valid?: true,
+          success_status?: true,
+          name_id: @unique_id,
+          name_identifier_format: nil,
+          name_qualifier: nil,
+          sp_name_qualifier: nil,
+          session_index: nil,
+          process: nil,
       }
     end
 
@@ -157,7 +227,7 @@ describe Login::SamlController do
       @account = account_with_saml(:saml_log_in_url => "https://example.com/idp1/sli")
       @unique_id = 'foo@example.com'
       @user1 = user_with_pseudonym(:active_all => true, :username => @unique_id, :account => @account)
-      @aac1 = @account.account_authorization_configs.first
+      @aac1 = @account.authentication_providers.first
       @aac1.idp_entity_id = "https://example.com/idp1"
       @aac1.log_out_url = "https://example.com/idp1/slo"
       @aac1.save!
@@ -174,7 +244,9 @@ describe Login::SamlController do
         is_valid?: true,
         success_status?: true,
         name_id: @unique_id,
+        name_identifier_format: nil,
         name_qualifier: nil,
+        sp_name_qualifier: nil,
         session_index: nil,
         process: nil
       }
@@ -202,7 +274,9 @@ describe Login::SamlController do
       it "redirects to login screen with message if no AAC found" do
         @stub_hash[:issuer] = "hahahahahahaha"
 
+        session[:sentinel] = true
         post_create
+        expect(session[:sentinel]).to eq true
 
         expect(response).to redirect_to(login_url)
         expect(flash[:delegated_message]).to eq "The institution you logged in from is not configured on this account."
@@ -285,6 +359,19 @@ describe Login::SamlController do
           expect(response).to be_redirect
           expect(response.location).to match %r{^https://example.com/idp2/slo\?SAMLResponse=}
         end
+
+        it "returns bad request if SAMLRequest parameter doesn't match an AAC" do
+          @stub_hash[:id] = '_42'
+          @stub_hash[:issuer] = "hahahahahahaha"
+          Onelogin::Saml::LogoutRequest.stubs(:parse).returns(
+            stub('request', @stub_hash)
+          )
+
+          controller.request.env['canvas.domain_root_account'] = @account
+          get :destroy, :SAMLRequest => "foo"
+
+          expect(response.status).to eq 400
+        end
       end
     end
   end
@@ -300,6 +387,22 @@ describe Login::SamlController do
       get :destroy, :SAMLResponse => "foo", :RelayState => "/courses"
       expect(response.status).to eq 400
     end
+
+    it "renders an error if the IdP fails the request" do
+      Account.default.authentication_providers.create!(auth_type: 'saml',
+                                                       idp_entity_id: 'http://adfs.ryana.local/adfs/services/trust')
+      get :destroy,
+          SAMLResponse: <<SAML.delete("\n")
+fZLBboMwDIZfBeUOIRQojSjS1F4qdZe26mGXKSSmQ6IJi5Npe/sF0A6Vpp7iWP7j359To7gPIz+am/H
+uBDgajRAd9lvynrFCdmm1ioG1Ks6rTRpvKiXidbtismrbTIEk0RUs9kZvSZakJDogejhodEK7kEpZGa
+d5nJWXjPG05Pk6yTerNxLtAV2vhZuVH86NyCm1P0KLpA9q66XzFhJp7nQwt17TyeYUBpck2k0mpwbea
+m4E9si1uANyJ/n55fXIgxculyLuNY4g+64HFfzpvxkvZktk1ZVMMdaWKwVtCkURTiZLpYo8S/NCyIJl
+Xb6e5vy+Dxr5TOt539EaZ6QZSFPPNOwifS4SiGAnGqSZaAQYQnWYLEQGI8UwJ2io+uolIA2I0NV06dD
+UyxbPTjiPj7edURBdxeDhuQOcq/kJPn3YDVgS0aamj+/S/z5L8ws=
+SAML
+      expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).not_to be_nil
+    end
   end
 
   context "login attributes" do
@@ -311,7 +414,7 @@ describe Login::SamlController do
       @pseudonym.account = @account
       @pseudonym.save!
 
-      @aac = @account.account_authorization_config
+      @aac = @account.authentication_providers.first
     end
 
     it "should use the eduPersonPrincipalName attribute with the domain stripped" do
@@ -323,9 +426,12 @@ describe Login::SamlController do
              is_valid?: true,
              success_status?: true,
              name_id: nil,
+             name_identifier_format: nil,
              name_qualifier: nil,
+             sp_name_qualifier: nil,
              session_index: nil,
              process: nil,
+             issuer: "saml_entity",
              saml_attributes: {
                  'eduPersonPrincipalName' => "#{@unique_id}@example.edu"
              }
@@ -347,9 +453,12 @@ describe Login::SamlController do
              is_valid?: true,
              success_status?: true,
              name_id: @unique_id,
+             name_identifier_format: nil,
              name_qualifier: nil,
+             sp_name_qualifier: nil,
              session_index: nil,
-             process: nil
+             process: nil,
+             issuer: "saml_entity"
             )
       )
 
@@ -364,7 +473,7 @@ describe Login::SamlController do
     unique_id = 'foo'
 
     account = account_with_saml
-    @aac = @account.account_authorization_config
+    @aac = @account.authentication_providers.first
     @aac.login_attribute = 'eduPersonPrincipalName_stripped'
     @aac.save
 
@@ -377,9 +486,12 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: nil,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
+           issuer: "saml_entity",
            saml_attributes: {
              'eduPersonPrincipalName' => "#{unique_id}@example.edu"
            }
@@ -405,9 +517,12 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
-           process: nil
+           process: nil,
+           issuer: "saml_entity"
           )
     )
 
@@ -422,7 +537,8 @@ describe Login::SamlController do
 
     account_with_saml
 
-    @aac = @account.account_authorization_config
+    @aac = @account.authentication_providers.first
+    @aac.idp_entity_id = 'http://phpsite/simplesaml/saml2/idp/metadata.php'
     @aac.login_attribute = 'eduPersonPrincipalName'
     @aac.certificate_fingerprint = 'AF:E7:1C:28:EF:74:0B:C8:74:25:BE:13:A2:26:3D:37:97:1D:A1:F9'
     @aac.save

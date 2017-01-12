@@ -35,7 +35,7 @@ describe Lti::LtiUserCreator do
       sub_account = Account.create!
       sub_account.root_account = root_account
       sub_account.save!
-      pseudonym = pseudonym(canvas_user, account: sub_account, username: 'login_id')
+      pseudonym = pseudonym(canvas_user, account: sub_account.root_account, username: 'login_id')
 
       pseudonym.sis_user_id = 'sis id!'
       pseudonym.save!

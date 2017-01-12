@@ -7,22 +7,11 @@
 
 #main {
   position: absolute;
-  bottom: 0;
+  top: 0; bottom: 0;
   margin-bottom: 0;
   display: none;
   box-sizing: border-box;
-  @if $use_new_styles {
-    top: 0 !important; // need a more elegant way of doing this
-    left: $ic-header-primary-width - $ic-sp;
-    width: calc(100% - (#{$ic-header-primary-width} - #{$ic-sp}) );
-    @include breakpoint(wide) { 
-      left: $ic-header-primary-width;
-      width: calc(100% - #{$ic-header-primary-width});
-    }
-  }
-  @else {
-    width: 100%;  
-  }
+  width: 100%;
 }
 
 #footer {
@@ -30,11 +19,11 @@
 }
 
 #content {
-  overflow:visible;
-}
-
-#content.container-fluid {
-  padding: 0;
+  overflow: visible;
+  @if $use_new_styles { padding: 0; }
+  @else {
+    &.container-fluid { padding: 0; }
+  }
 }
 
 .conversations {
@@ -45,14 +34,17 @@
 .conversations .panel {
   box-sizing: border-box;
   height: 58px;
-  
+
   @if $use_new_styles {
     background: $lightBackground;
     border-bottom: 1px solid $ic-border-light;
     height: 112px;
     padding: $ic-sp;
-    @include breakpoint(wide) { 
-      height: 62px; 
+    // TODO: revisit when breakpoint fixed
+    // until we have a better breakpoint for desktop
+    // need to put in direct amount for better ux
+    @media only screen and (min-width: 1200px) {
+      height: 62px;
       display: flex;
       align-items: center;
       padding-bottom: 0;
@@ -60,7 +52,10 @@
     }
     .panel__primary {
       margin-bottom: $ic-sp;
-      @include breakpoint(wide) {
+      // TODO: revisit when breakpoint fixed
+      // until we have a better breakpoint for desktop
+      // need to put in direct amount for better ux
+      @media only screen and (min-width: 1200px) {
         margin-bottom: 0;
         flex: 1;
         white-space: nowrap;
@@ -71,8 +66,11 @@
       }
     }
     .panel__secondary {
-      @include breakpoint(wide) { white-space: nowrap; }
-      > div { 
+      // TODO: revisit when breakpoint fixed
+      // until we have a better breakpoint for desktop
+      // need to put in direct amount for better ux
+      @media only screen and (min-width: 1200px) { white-space: nowrap; }
+      > div {
         display: inline-block;
         vertical-align: middle;
         white-space: nowrap;
@@ -113,7 +111,7 @@
 .filters {
   @if $use_new_styles { margin-right: $ic-sp; }
   @else { margin-right: 50px; }
-  
+
 
   /* TODO: make sure we still need this with the frd filters (may not be selects) */
   select {
@@ -157,17 +155,25 @@
 }
 
 .search .ac {
-  float: left;
-  width: 250px;
   display: block;
+  @if $use_new_styles == false {
+    float: left;
+    width: 250px;
+  }
 
   .ac-input-box {
-    border-radius: 16px 0 0 16px;
     float: left;
-    width: 205px;
     min-height: 0;
     height: 38px;
-    padding: 7px 12px;
+    padding: 6px 12px;
+    @if $use_new_styles {
+      box-sizing: border-box;
+      width: 205px;
+    }
+    @else {
+      border-radius: 16px 0 0 16px;
+      width: 203px;
+    }
 
     .ac-placeholder {
       top: 0;
@@ -188,8 +194,8 @@
   }
 
   .btn {
-    border-radius: 0 16px 16px 0;
     float: left;
+    @if $use_new_styles == false { border-radius: 0 16px 16px 0; }
   }
 }
 
@@ -198,7 +204,7 @@
   bottom: 0;
   @if $use_new_styles {
     top: 112px;
-    @include breakpoint(wide) { top: 62px; }
+    @media only screen and (min-width: 1200px) { top: 62px; }
   }
   @else { top: 58px; }
 }
@@ -213,13 +219,13 @@
   .list-header {
     color: darken($ic-color-neutral, 50);
     padding: 3px 12px;
-    @if $use_new_styles { 
+    @if $use_new_styles {
       background: $lightBackground;
       border-bottom: 1px solid $ic-border-light;
     }
     @else {
       background: #f3f3f3;
-      border-bottom: 1px solid #bfbfbf; 
+      border-bottom: 1px solid #bfbfbf;
     }
   }
 
@@ -230,7 +236,7 @@
   }
 
   .messages > li {
-    background: #fff;    
+    background: #fff;
     box-sizing: border-box;
     cursor: pointer;
     height: 100px;
@@ -251,7 +257,6 @@
     }
     &:hover .message-actions a, .message-actions a:focus {
       left: 0;
-      outline: none;
     }
   }
 
@@ -264,7 +269,7 @@
   }
 
   h2.author {
-    font-size: 13px;
+    @include fontSize(13px);
     font-weight: bold;
     line-height: 20px;
     margin: 0px;
@@ -283,7 +288,7 @@
   }
 
   p {
-    font-size: 12px;
+    @include fontSize($ic-font-size--xsmall);
     line-height: 16px;
     margin-bottom: 8px;
   }
@@ -302,12 +307,12 @@
 
 h3.subject {
  margin: 0px 0px 8px 0;
- font-size: 13px;
+ @include fontSize(13px);
  line-height: 20px;
 }
 
 h2.subject {
-  font-size: 13px;
+  @include fontSize(13px);
   font-weight: bold;
   margin: 0px;
 }
@@ -321,11 +326,11 @@ h2.subject {
 }
 
 .message-count {
-  font-size: 11px;
+  @include fontSize(11px);
   position: absolute;
   right: 13px;
   top: 43%;
-  background-color: $ic-brand-secondary;
+  background-color: $ic-color-dark;
   text-shadow: none;
 }
 
@@ -343,7 +348,7 @@ h2.subject {
   }
 
   .read-state {
-    background: $ic-brand-secondary;
+    background: $ic-color-dark;
     border-radius: 5px;
     box-sizing: border-box;
     display: inline-block;
@@ -368,10 +373,10 @@ h2.subject {
   }
 
   .star-btn {
-    color: $ic-brand-secondary;
+    color: $ic-color-dark;
     display: inline-block;
     font-family: 'Hiragino Kaku Gothic Pro', 'Lucida Sans Unicode', 'Arial Unicode MS';
-    font-size: 16px;
+    @include fontSize($ic-font-size--medium);
     left: -9999em;
 
     &:hover {
@@ -437,7 +442,7 @@ h2.subject {
   .no-messages {
     color: #bbbbbb;
     display: block;
-    font-size: 20px;
+    @include fontSize(20px);
     font-weight: bold;
     margin-top: 5%;
     text-align: center;
@@ -450,7 +455,7 @@ h2.subject {
       width: 100%;
 
       &:before {
-        font-size: 120px;
+        @include fontSize(120px);
       }
     }
   }
@@ -474,7 +479,7 @@ h2.subject {
   }
 
   .message-content > li {
-    
+
     margin: 0 12px;
     padding: 24px 0;
     @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
@@ -579,9 +584,6 @@ h2.subject {
 }
 
 i.icon-ok:before {
-  // this is why we need the component loaded into the compiler sheet
-  // TODO: fix it so we're not using bootstrap.js and their classes
-  @extend .icon-check:before;
   vertical-align: baseline;
 }
 

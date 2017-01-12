@@ -19,17 +19,12 @@
 class GradingStandard < ActiveRecord::Base
   include Workflow
 
-  attr_accessible :title, :standard_data
+  attr_accessible :title, :standard_data, :data
 
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, polymorphic: [:account, :course]
   belongs_to :user
   has_many :assignments
 
-
-  EXPORTABLE_ATTRIBUTES = [:id, :title, :data, :context_id, :context_type, :created_at, :updated_at, :user_id, :usage_count, :context_code, :workflow_state, :version]
-  EXPORTABLE_ASSOCIATIONS = [:context, :user, :assignments]
-
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
   validates_presence_of :context_id, :context_type, :workflow_state, :data
   validate :valid_grading_scheme_data
 
@@ -68,7 +63,7 @@ class GradingStandard < ActiveRecord::Base
   VERSION = 2
 
   set_policy do
-    given { |user| self.context.grants_right?(user, :manage) }
+    given { |user| self.context.grants_right?(user, :manage_grades) }
     can :manage
   end
 
@@ -83,7 +78,10 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def ordered_scheme
-    @ordered_scheme ||= grading_scheme.to_a.sort_by { |_, percent| -percent }
+    # Convert to BigDecimal so we don't get weird float behavior: 0.545 * 100 (gives 54.50000000000001 with floats)
+    @ordered_scheme ||= grading_scheme.to_a.
+        map { |grade_letter, percent| [grade_letter, BigDecimal.new(percent.to_s)] }.
+        sort_by { |_, percent| -percent }
   end
 
   def place_in_scheme(key_name)
@@ -122,7 +120,8 @@ class GradingStandard < ActiveRecord::Base
     score = 0 if score < 0
     # assign the highest grade whose min cutoff is less than the score
     # if score is less than all scheme cutoffs, assign the lowest grade
-    ordered_scheme.max_by {|grade_name, lower_bound| score >= lower_bound * 100 ? lower_bound : -lower_bound }[0]
+    score = BigDecimal.new(score.to_s) # Cast this to a BigDecimal too or comparisons get wonky
+    ordered_scheme.max_by {|_, lower_bound| score >= lower_bound * 100 ? lower_bound : -lower_bound }[0]
   end
 
   def data=(new_val)
@@ -184,7 +183,7 @@ class GradingStandard < ActiveRecord::Base
     res
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.save
@@ -219,7 +218,7 @@ class GradingStandard < ActiveRecord::Base
   def self.default_instance
     gs = GradingStandard.new()
     gs.data = default_grading_scheme
-    gs.title = "Default Grading Standard"
+    gs.title = "Default Grading Scheme"
     gs
   end
 

@@ -26,7 +26,8 @@ describe "/groups/index" do
     assigns[:categories] = []
     assigns[:students] = [@user]
     assigns[:memberships] = []
-    assigns[:groups] = []
+    assigns[:current_groups] = []
+    assigns[:previous_groups] = []
     render "groups/index"
     expect(response).not_to be_nil
   end
@@ -38,9 +39,10 @@ describe "/groups/index" do
     assigns[:categories] = []
     assigns[:students] = [@user]
     assigns[:memberships] = []
-    assigns[:groups] = [@group]
+    assigns[:current_groups] = [@group]
+    assigns[:previous_groups] = []
     render "groups/index"
     doc = Nokogiri::HTML.parse(response.body)
-    expect(doc.at_css('ul.context_list li:first span.subtitle').text).to eq @course.name
+    expect(doc.at_css('#my_groups_table td:nth-child(2) span.group-course-name').text).to eq @course.name
   end
 end

@@ -17,8 +17,11 @@ define [
 
     togglePercent: =>
       @options.toggleShowingPoints()
-      @render()
       false
+
+    switchTotalDisplay: (showAsPoints) =>
+      @options.showingPoints = showAsPoints
+      @render()
 
     moveColumn: =>
       @options.moveTotalColumn()

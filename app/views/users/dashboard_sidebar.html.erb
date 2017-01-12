@@ -1,4 +1,11 @@
-<%= render :partial => 'courses/assignments_needing_grading', :locals => {:contexts => nil} %>
+<%# Customer-brandable dashboard right-sidebar logo %>
+<% if use_new_styles? && brand_variable("ic-brand-right-sidebar-logo") != "" %>
+<div class="ic-sidebar-logo">
+  <%= image_tag(brand_variable("ic-brand-right-sidebar-logo"), :class => "ic-sidebar-logo__image", :alt => "Canvas by Instructure") %>
+</div>
+<% end %>
+
+<%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil} %>
 <% locals = {
     :title => t('coming_up', "Coming Up"),
     :period => :one_week,
@@ -10,12 +17,18 @@
 <% if @show_recent_feedback %>
 <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('recent_feedback', "Recent Feedback"), :period => :two_weeks, :show_context => true, :is_recent_feedback => true} %>
 <% end %>
-<% if show_user_create_course_button(@current_user) %>
 <div class="rs-margin-lr">
-<button type="button"
-        id="start_new_course"
-        class="element_toggler btn button-sidebar-wide"
-        aria-controls="new_course_form"><%= t('start_new_course', 'Start a New Course') %></button>
-<%= render :partial => 'shared/new_course_form' %>
+  <% if show_user_create_course_button(@current_user) %>
+    <button type="button"
+            id="start_new_course"
+            class="element_toggler btn button-sidebar-wide"
+            aria-controls="new_course_form"><%= t('start_new_course', 'Start a New Course') %></button>
+    <%= render :partial => 'shared/new_course_form' %>
+  <% end %>
+
+  <% if use_new_styles? %>
+    <a href="<%= grades_path %>" class="Button button-sidebar-wide">
+    <%= t('View Grades') %>
+    </a>
+  <% end %>
 </div>
-<% end %>

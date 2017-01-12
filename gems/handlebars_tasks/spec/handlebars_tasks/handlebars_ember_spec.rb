@@ -7,23 +7,28 @@ define(["ember","compiled/ember/shared/helpers/common"], function(Ember) {
   Ember.TEMPLATES['%s'] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  
+
 
 
   data.buffer.push("foo");
-  
+
 });
 });
   END
 
   describe EmberHbs do
     describe "#compile_template" do
+      def strip_js(str)
+        str.gsub(/\s+/, '').gsub(/\/\*[^\*\/]*\*\//, '')
+      end
+
       it "outputs a precompiled template wrapped in AMD and registers with Ember.TEMPLATES" do
         require 'tempfile'
         file = Tempfile.new("foo")
         file.write "foo"
         file.close
-        EmberHbs::compile_template(file.path).should == expected_precompiled_template % EmberHbs::parse_name(file.path)
+        expected = strip_js(expected_precompiled_template % EmberHbs::parse_name(file.path))
+        strip_js(EmberHbs::compile_template(file.path)).should eq expected
         file.unlink
       end
     end

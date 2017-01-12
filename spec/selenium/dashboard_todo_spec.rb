@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "dashboard" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "as a student" do
 
@@ -9,7 +9,7 @@ describe "dashboard" do
       course_with_student_logged_in(:active_all => true)
     end
 
-    it "should limit the number of visible items in the to do list" do
+    it "should limit the number of visible items in the to do list", priority: "1", test_id: 216405 do
       due_date = Time.now.utc + 2.days
       20.times do
         assignment_model :due_at => due_date, :course => @course, :submission_types => 'online_text_entry'
@@ -17,13 +17,13 @@ describe "dashboard" do
 
       get "/"
 
-      keep_trying_until { expect(ffj(".to-do-list li:visible").size).to eq 5 + 1 } # +1 is the see more link
+      expect(ffj(".to-do-list li:visible")).to have_size(5 + 1) # +1 is the see more link
       f(".more_link").click
       wait_for_ajaximations
-      expect(ffj(".to-do-list li:visible").size).to eq 20
+      expect(ffj(".to-do-list li:visible")).to have_size(20)
     end
 
-    it "should display assignments to do in to do list for a student" do
+    it "should display assignments to do in to do list for a student", priority: "1", test_id: 216406 do
       notification_model(:name => 'Assignment Due Date Changed')
       notification_policy_model(:notification_id => @notification.id)
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
@@ -33,6 +33,7 @@ describe "dashboard" do
 
       get "/"
 
+      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
       #verify assignment changed notice is in messages
       f('.stream-assignment .stream_header').click
       expect(f('#assignment-details')).to include_text('Assignment Due Date Changed')
@@ -41,7 +42,7 @@ describe "dashboard" do
       expect(f('.coming_up')).to include_text(assignment.title)
     end
 
-    it "should not display assignments for soft-concluded courses in to do list for a student" do
+    it "should not display assignments for soft-concluded courses in to do list for a student", priority: "1", test_id: 216407 do
       notification_model(:name => 'Assignment Due Date Changed')
       notification_policy_model(:notification_id => @notification.id)
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
@@ -50,17 +51,18 @@ describe "dashboard" do
       assignment.save!
 
       Timecop.freeze(1.hour.ago) do
+        @course.start_at = 1.month.ago
         @course.soft_conclude!
         @course.save!
       end
 
       get "/"
 
-      expect(f('.to-do-list')).to be_nil
+      expect(f("#content")).not_to contain_css('.to-do-list')
       expect(f('.coming_up')).to_not include_text(assignment.title)
     end
 
-    it "should allow to do list items to be ignored" do
+    it "should allow to do list items to be ignored", priority: "1", test_id: 216408 do
       notification_model(:name => 'Assignment Due Date Changed')
       notification_policy_model(:notification_id => @notification.id)
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
@@ -73,11 +75,11 @@ describe "dashboard" do
       expect(f('.to-do-list > li')).to include_text(assignment.submission_action_string)
       f('.to-do-list .disable_item_link').click
       wait_for_ajaximations
-      expect(f('.to-do-list > li')).to be_nil
+      expect(f("#content")).not_to contain_css('.to-do-list > li')
 
       get "/"
 
-      expect(f('.to-do-list')).to be_nil
+      expect(f("#content")).not_to contain_css('.to-do-list')
     end
 
   end

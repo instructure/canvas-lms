@@ -3,73 +3,91 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/outcome_common')
 
-describe "account admin outcomes", priority: 2 do
-  include_examples "in-process server selenium tests"
+describe "account admin outcomes" do
+  include_context "in-process server selenium tests"
+  include OutcomeCommon
+
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
   let(:who_to_login) { 'admin' }
   let(:account) { Account.default }
   describe "course outcomes" do
-    before (:each) do
+    before(:each) do
+      RoleOverride.create!(:context => account, :permission => 'manage_courses',
+        :role => admin_role, :enabled => false) # should not manage_courses permission
       course_with_admin_logged_in
+    end
+
+    it "should be able to manage course rubrics" do
+      get "/courses/#{@course.id}/outcomes"
+      expect_new_page_load { f('.manage_rubrics').click }
+
+      expect(f('.add_rubric_link')).to be_displayed
     end
 
     context "create/edit/delete outcomes" do
 
-      it "should create a learning outcome with a new rating (root level)" do
+      it "should create a learning outcome with a new rating (root level)", priority: "1", test_id: 250229 do
         should_create_a_learning_outcome_with_a_new_rating_root_level
       end
 
-      it "should create a learning outcome (nested)" do
+      it "should create a learning outcome (nested)", priority: "1", test_id: 250230 do
         should_create_a_learning_outcome_nested
       end
 
-      it "should edit a learning outcome and delete a rating" do
-        skip('193')
+      it "should edit a learning outcome and delete a rating", priority: "1", test_id: 250231 do
         should_edit_a_learning_outcome_and_delete_a_rating
       end
 
-      it "should delete a learning outcome" do
+      it "should delete a learning outcome", priority: "1", test_id: 250232 do
         should_delete_a_learning_outcome
       end
 
-      it "should validate mastery points" do
+      it "should validate mastery points", priority: "1", test_id: 250233 do
         should_validate_mastery_points
       end
 
-      it "should_validate_calculation_method_dropdown", test_id: 162376 do
+      it "should_validate_calculation_method_dropdown", priority: "2", test_id: 250234 do
         should_validate_calculation_method_dropdown
       end
 
-      it "should validate decaying average", test_id: 162377 do
-        should_validate_decaying_average
+      it "should validate decaying average_above_range", priority: "2", test_id: 250235 do
+        should_validate_decaying_average_above_range
       end
 
-      it "should validate n mastery", test_id: 162378 do
-        should_validate_n_mastery
+      it "should validate decaying average_below_range", priority: "2", test_id: 299445 do
+         should_validate_decaying_average_below_range
+      end
+
+      it "should validate n mastery_above_range", priority: "2", test_id: 299447 do
+        should_validate_n_mastery_above_range
+      end
+
+      it "should validate n mastery_below_range", priority: "2", test_id: 250236 do
+        should_validate_n_mastery_below_range
       end
     end
 
     context "create/edit/delete outcome groups" do
 
-      it "should create an outcome group (root level)" do
+      it "should create an outcome group (root level)", priority: "2", test_id: 56016 do
         should_create_an_outcome_group_root_level
       end
 
-      it "should create a learning outcome with a new rating (nested)" do
-        should_create_a_learning_outcome_with_a_new_rating_nested
+      it "should create an outcome group (nested)", priority: "2", test_id: 250237 do
+        should_create_an_outcome_group_nested
       end
 
-      it "should edit an outcome group" do
+      it "should edit an outcome group", priority: "2", test_id: 114335  do
         should_edit_an_outcome_group
       end
 
-      it "should delete an outcome group" do
+      it "should delete an outcome group", priority: "2", test_id: 250238 do
         should_delete_an_outcome_group
       end
     end
 
     describe "find/import dialog" do
-      it "should not allow importing top level groups" do
+      it "should not allow importing top level groups", priority: "2", test_id: 250239 do
         get outcome_url
         wait_for_ajaximations
 

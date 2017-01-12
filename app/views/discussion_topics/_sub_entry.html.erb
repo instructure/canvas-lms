@@ -1,4 +1,7 @@
-<% entry = sub_entry || nil; hide_entry ||= false; entry_context ||= entry ? entry.context : parent_entry.context %>
+<%
+   hide_entry ||= false
+   entry_context ||= entry ? entry.context : parent_entry.context
+%>
 <div id="<%= "entry_#{entry.id}" if entry %>" style="<%= hidden unless entry %>" class="communication_sub_message <%= 'toggled_communication_sub_message' if hide_entry %> <%= 'blank' unless entry %> can_be_marked_as_read <%= entry ? entry.read_state(@current_user) : 'read' %>" data-mark-read-url="<%= entry && context_url(entry_context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, entry.discussion_topic, entry)%>">
   <div class="header">
     <div class="header_title">
@@ -7,7 +10,7 @@
       </a>
     </div>
     <div class="link_box">
-      <a href="<%= context_url(entry_context, :context_discussion_entry_url, entry ? entry.id : "{{ id }}") %>" class="delete_entry_link disabled_link"><%= image_tag "delete.png" %></a>
+      <a href="<%= context_url(entry_context, :context_discussion_entry_url, entry ? entry.id : "{{ id }}") %>" class="delete_entry_link disabled_link"><%= image_tag "delete.png", :alt => t('Delete') %></a>
     </div>
     <div class="post_date time_ago_date" data-timestamp="<%= entry.try_rescue(:created_at).try_rescue(:iso8601) %>"><%= datetime_string(entry.try_rescue(:created_at)) || nbsp %></div>
     <div class="clear"></div>

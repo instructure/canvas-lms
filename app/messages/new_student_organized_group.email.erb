@@ -16,5 +16,4 @@
     end
 %>
 
-<%= t :details, "You can see details for this group by clicking the link below:" %>
-<%= content :link %>
+<%= t("You can see details for this group by clicking this link: %{link}.", link: content(:link)) %>

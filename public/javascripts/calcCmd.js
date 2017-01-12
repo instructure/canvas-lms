@@ -205,7 +205,7 @@ define([
         } else if(item.token == 'divide') {
           var left = round2.pop();
           var right = round1[idx + 1];
-          round2.push(numberItem(compute(left) / compute(right)));
+            round2.push(numberItem(compute(left) / compute(right)));
         } else {
           round2.push(round1[idx]);
           round2.push(round1[idx + 1]);
@@ -423,7 +423,7 @@ define([
       for(var idx = 0; idx < args.length; idx++) {
         list.push(args[idx]);
       }
-      return list.sort();
+      return list.sort(function(a, b) {return a - b;});
     }, I18n.t('sort.description', "Returns the list of values, sorted from lowest to highest"), ["sort(a,b,c...)", "sort(list)"]);
     f('reverse', function(x) {
       var args = make_list(arguments);

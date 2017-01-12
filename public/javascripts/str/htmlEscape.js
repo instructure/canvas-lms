@@ -1,6 +1,4 @@
-define(['INST', 'jquery'], function(INST, $) {
-  var dummy = $('<div/>');
-
+define(['INST'], function(INST) {
   function SafeString(string) {
     this.string = (typeof string === 'string' ? string : "" + string);
   }
@@ -8,10 +6,23 @@ define(['INST', 'jquery'], function(INST, $) {
     return this.string;
   };
 
+  var ENTITIES = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '/': '&#x2F;',
+    '`': '&#x60;',  // for old versions of IE
+    '=': '&#x3D;'   // in case of unquoted attributes
+  };
+
   var htmlEscape = function(str) {
     // ideally we should wrap this in a SafeString, but this is how it has
     // always worked :-/
-    return dummy.text(str).html();
+    return str.replace(/[&<>"'\/`=]/g, function(c) {
+        return ENTITIES[c];
+    });
   }
 
   // Escapes HTML tags from string, or object string props of `strOrObject`.

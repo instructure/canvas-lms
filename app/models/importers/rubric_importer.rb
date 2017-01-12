@@ -1,3 +1,5 @@
+require_dependency 'importers'
+
 module Importers
   class RubricImporter < Importer
 
@@ -60,7 +62,7 @@ module Importers
           end
         end
 
-        migration.add_imported_item(item) if migration
+        migration.add_imported_item(item)
         item.save!
       end
 

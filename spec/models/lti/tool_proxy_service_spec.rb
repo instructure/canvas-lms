@@ -153,22 +153,35 @@ module Lti
         it 'creates default placements when none are specified' do
           tool_proxy = subject.process_tool_proxy_json(tool_proxy_fixture, account, tool_proxy_guid)
           rh = tool_proxy.resources.first
-          expect(rh.placements).to include_placements %w(assignment_selection link_selection)
+          expect(rh.message_handlers.first.placements).to include_placements %w(assignment_selection link_selection)
         end
 
         it "doesn't include defaults placements when one is provided" do
           tp_json = JSON.parse(tool_proxy_fixture)
-          tp_json["tool_profile"]["resource_handler"][0]["ext_placements"] = ['Canvas.placements.courseNavigation']
+          tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.courseNavigation']
           tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
           rh = tool_proxy.resources.first
-          expect(rh.placements).to only_include_placement "course_navigation"
+          expect(rh.message_handlers.first.placements).to only_include_placement "course_navigation"
+        end
+
+        it "adds placements from message_handler enabled_capabilities to message_hanlder" do
+          tp_json = JSON.parse(tool_proxy_fixture)
+          tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.courseNavigation']
+          tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
+          rh = tool_proxy.resources.first
+          expect(rh.message_handlers.count).to eq 1
+          expect(rh.message_handlers.first.placements).to only_include_placement "course_navigation"
         end
 
         it "handles non-valid placements" do
           tp_json = JSON.parse(tool_proxy_fixture)
-          tp_json["tool_profile"]["resource_handler"][0]["ext_placements"] = ['Canvas.placements.invalid']
-          tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
-          expect(tool_proxy.resources.first.placements.size).to eq 0
+          tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.invalid']
+          begin
+            tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
+          rescue Lti::ToolProxyService::InvalidToolProxyError => proxy_error
+            puts proxy_error.message
+          end
+          expect(tool_proxy).to eq nil
         end
 
       end
@@ -207,7 +220,34 @@ module Lti
         end
       end
 
-    end
+      it 'creates a split secret' do
+        tp_half_secret = SecureRandom.hex(64)
+        tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+        tp.enabled_capability = ['OAuth.splitSecret']
+        tp.security_contract.shared_secret = nil
+        tp.security_contract.tp_half_shared_secret = tp_half_secret
+        tool_proxy = subject.process_tool_proxy_json(tp.as_json, account, tool_proxy_guid)
+        expect(subject.tc_half_secret).to_not be_nil
+        expect(tool_proxy.shared_secret).to eq(subject.tc_half_secret + tp_half_secret)
+      end
 
+      it 'requires the "OAuth.splitSecret" capability for split secret' do
+        tp_half_secret = SecureRandom.hex(64)
+        tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+        tp.enabled_capability = []
+        tp.security_contract.shared_secret = nil
+        tp.security_contract.tp_half_shared_secret = tp_half_secret
+        expect { subject.process_tool_proxy_json(tp.as_json, account, tool_proxy_guid) }
+          .to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid SecurityContract') do |exception|
+          expect(JSON.parse(exception.to_json)).to eq({
+                                                        "invalid_security_contract" => [
+                                                          "shared_secret",
+                                                          "tp_half_shared_secret"
+                                                        ],
+                                                        "error"=>"Invalid SecurityContract"
+                                                      })
+        end
+      end
+    end
   end
 end

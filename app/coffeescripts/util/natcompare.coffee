@@ -1,6 +1,9 @@
 define [], ->
   strings: (x, y) ->
-    x.localeCompare(y, window.I18n.locale || 'en-US', { sensitivity: 'accent', ignorePunctuation: true, numeric: true})
+    locale = window.I18n.locale || 'en-US'
+    locale_map = {'zh_Hant': 'zh-Hant'}
+    locale = locale_map[locale] || locale
+    x.localeCompare(y, locale, { sensitivity: 'accent', ignorePunctuation: true, numeric: true})
 
   by: (f) ->
     return (x, y) =>

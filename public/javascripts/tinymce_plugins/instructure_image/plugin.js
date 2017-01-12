@@ -24,7 +24,7 @@ define([
       ed.addButton('instructure_image', {
         title : htmlEscape(I18n.t('embed_image', 'Embed Image')),
         cmd : 'mceInstructureImage',
-        image : url + '/img/button.gif',
+        icon : 'image',
         onPostRender: function(){
           // highlight our button when an image is selected
           var btn = this;

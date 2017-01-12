@@ -38,7 +38,7 @@ $new-total-border-radius: 3px;
     border-radius: $new-total-border-radius;
     padding: 0 $new-total-padding;
     font-weight: bold;
-    font-size: 11px;
+    @include fontSize(11px);
     float: left;
     color: white;
   }

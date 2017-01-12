@@ -3,6 +3,9 @@
 // - compiler-gradebook2.scss
 
 #message_students_dialog {
+  .button-container {
+    text-align: right;
+  }
   .student_list {
     max-height: 100px;
     overflow: auto;
@@ -21,6 +24,16 @@
         padding-left: 5px;
         font-size: 0.9em;
         color: #444;
+      }
+      &:hover .remove-button {
+        color: #444;
+      }
+      .remove-button {
+        padding: 0px;
+        color: #9ac;
+        &:focus {
+          color: #444;
+        }
       }
     }
     &.show_score {

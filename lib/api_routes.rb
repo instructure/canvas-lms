@@ -23,6 +23,9 @@ require 'action_controller'
 
 CanvasRails::Application.routes.disable_clear_and_finalize = true
 
+# we need this for a route contstraint
+require 'lib/lti/re_reg_constraint'
+
 # load routing files, including those in plugins
 require 'config/routes'
 Dir.glob('{gems,vendor}/plugins/*/config/routes.rb').each do |plugin_routes|

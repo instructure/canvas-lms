@@ -7,12 +7,16 @@
 ].cache_key) do %>
 <div class="details">
   <h3><%= t 'titles.submission', "Submission" %></h3>
-  <% if @assignment.expects_submission? %>
+  <% if @current_user_submission.excused? %>
+    <div class="header">
+      <%= t "Excused!" %>
+     </div>
+  <% elsif @assignment.expects_submission? %>
     <div class="header">
       <% if @current_user_submission.has_submission? %>
-        <%= image_tag "graded.png" %> <%= t 'titles.submission_turned_in', "Turned In!" %>
+        <%= image_tag "graded.png", :alt => '' %> <%= t 'titles.submission_turned_in', "Turned In!" %>
       <% else %>
-        <%= image_tag "not_graded.png" %> <%= t 'titles.submission_not_turned_in', "Not Turned In!" %>
+        <%= image_tag "not_graded.png", :alt => '' %> <%= t 'titles.submission_not_turned_in', "Not Turned In!" %>
       <% end %>
     </div>
   <% end %>
@@ -50,13 +54,18 @@
 
     <div class="module">
       <% if @current_user_submission.grade && !@assignment.muted? %>
-        <span>
-          <%= t 'labels.grade', "Grade: %{grade} *(%{points_possible} pts possible)*", {
+        <% if @current_user_submission.excused? %>
+          <span><%= t "This assignment has been excused." %></span>
+        <% else %>
+          <div><%= t 'labels.grade', "Grade: %{grade} *(%{points_possible} pts possible)*", {
             :grade => @current_user_submission.grade,
-            :points_possible => @assignment.points_possible,
+            :points_possible => round_if_whole(@assignment.points_possible),
             :wrapper => '<span style="font-size: 0.8em;">\1</span>'
-          } %>
-        </span>
+          } %></div>
+          <div><%= t 'labels.graded_anonymously', "Graded Anonymously: %{value}", {
+            :value => @current_user_submission.graded_anonymously ? t('labels.yes', "yes") : t('labels.no', "no")
+          } %></div>
+        <% end %>
       <% end %>
 
       <% if @current_user_submission.rubric_assessment %>
@@ -78,40 +87,33 @@
     <% end %>
 
     <div class="comments module">
-      <h4><%= t 'titles.comments', "Comments:" %> </h4>
+      <% if @assignment.muted? %>
+        <p><%= t 'You may not see all comments right now because the assignment is currently being graded.' %></p>
+      <% else %>
+        <h4><%= t 'titles.comments', "Comments:" %> </h4>
 
-      <% visible_comments = @current_user_submission.visible_submission_comments -%>
-      <%= t('messages.no_comments', "No Comments") if visible_comments.empty? %>
-      <% visible_comments.each do |comment| %>
-        <div id="comment-<%= comment.id %>" class="comment">
-          <%= comment.comment %>
-          <div class="comment_attachments">
-            <% comment.attachments.each do |attachment| %>
-              <div class="comment_attachment">
-                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :comment_id => comment.id, :download => attachment.id) %>" class="comment_attachment_link <%= attachment.mime_class %>"><%= attachment.display_name %></a>
-              </div>
-            <% end %>
+        <% visible_comments = @current_user_submission.visible_submission_comments -%>
+        <%= t('messages.no_comments', "No Comments") if visible_comments.empty? %>
+        <% visible_comments.each do |comment| %>
+          <div id="comment-<%= comment.id %>" class="comment">
+            <%= comment.comment %>
+            <div class="comment_attachments">
+              <% comment.attachments.each do |attachment| %>
+                <div class="comment_attachment">
+                  <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :comment_id => comment.id, :download => attachment.id) %>" class="comment_attachment_link <%= attachment.mime_class %>"><%= attachment.display_name %></a>
+                </div>
+              <% end %>
+            </div>
+            <div class="signature" style="font-size: 0.8em; text-align: right; color: #888;">
+              <%= t :comment_signature, "%{author}, %{created_at}", {
+                :author => comment_author_name_for(comment),
+                :created_at => datetime_string(comment.created_at)
+              } %>
+            </div>
           </div>
-          <div class="signature" style="font-size: 0.8em; text-align: right; color: #888;">
-            <%= t :comment_signature, "%{author}, %{created_at}", {
-              :author => comment_author_name_for(comment),
-              :created_at => datetime_string(comment.created_at)
-            } %>
-          </div>
-        </div>
+        <% end %>
       <% end %>
     </div>
   </div>
 </div>
-<% end %>
-<% if @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) %>
-  <ul class="page-action-list">
-    <li>
-      <% late = @current_user_submission && @current_user_submission.late? ? 'late' : '' %>
-      <% submit_text = @current_user_submission.has_submission? ? t('links.resubmit', "Re-submit Assignment") : t('links.submit', "Submit Assignment") %>
-      <a href="#" class="submit_assignment_link resubmit_link <%= late %>">
-        <i class='icon-add'></i> <%= submit_text %>
-      </a>
-    </li>
-  </ul>
 <% end %>

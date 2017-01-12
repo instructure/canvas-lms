@@ -4,7 +4,9 @@ module AvatarHelper
     return ["/images/messages/avatar-50.png", ''] unless user_or_id
     user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     user = user_or_id.is_a?(User) && user_or_id
-    if session["reported_#{user_id}"]
+    account = @account || @domain_root_account
+    is_admin = account && account.grants_right?(@current_user, session, :manage)
+    if session["reported_#{user_id}"] && !is_admin && !(user && user.avatar_state == :approved)
       ["/images/messages/avatar-50.png", '']
     else
       avatar_settings = @domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'
@@ -72,9 +74,14 @@ module AvatarHelper
   end
 
   def avatar_url_for_user(user, blank_fallback=false)
-    default_avatar = User.avatar_fallback_url(blank_fallback ? '/images/blank.png' : User.default_avatar_fallback)
-    url = if service_enabled?(:avatars)
-      user.avatar_url(nil, (@domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'), default_avatar)
+    default_avatar = User.avatar_fallback_url(
+        blank_fallback ? '/images/blank.png' : User.default_avatar_fallback,
+        request)
+    url = if user.account.service_enabled?(:avatars)
+      user.avatar_url(nil,
+                      (@domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'),
+                      default_avatar,
+                      request)
     else
       default_avatar
     end

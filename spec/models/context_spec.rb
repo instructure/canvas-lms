@@ -123,4 +123,26 @@ describe Context do
       end
     end
   end
+
+  describe '.get_account' do
+    it 'returns the account given' do
+      expect(Context.get_account(Account.default)).to eq(Account.default)
+    end
+
+    it "returns a course's account" do
+      expect(Context.get_account(course_model(account: Account.default))).to eq(Account.default)
+    end
+
+    it "returns a course section's course's account" do
+      expect(Context.get_account(course_model(account: Account.default).course_sections.first)).to eq(Account.default)
+    end
+
+    it "returns an account level group's account" do
+      expect(Context.get_account(group_model(context: Account.default))).to eq(Account.default)
+    end
+
+    it "returns a course level group's course's account" do
+      expect(Context.get_account(group_model(context: course_model(account: Account.default)))).to eq(Account.default)
+    end
+  end
 end

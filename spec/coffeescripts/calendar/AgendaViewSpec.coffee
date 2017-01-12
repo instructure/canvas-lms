@@ -2,6 +2,7 @@ define [
   'jquery'
   'underscore'
   'timezone'
+  'compiled/util/fcUtil'
   'vendor/timezone/America/Denver'
   'vendor/timezone/America/Juneau'
   'vendor/timezone/fr_FR'
@@ -10,7 +11,7 @@ define [
   'helpers/ajax_mocks/api/v1/calendarEvents'
   'helpers/ajax_mocks/api/v1/calendarAssignments'
   'helpers/I18nStubber'
-], ($, _, tz, denver, juneau, french, AgendaView, EventDataSource, eventResponse, assignmentResponse, I18nStubber) ->
+], ($, _, tz, fcUtil, denver, juneau, french, AgendaView, EventDataSource, eventResponse, assignmentResponse, I18nStubber) ->
   loadEventPage = (server, includeNext = false) ->
     sendCustomEvents(server, eventResponse, assignmentResponse, includeNext)
 
@@ -25,8 +26,9 @@ define [
       @container = $('<div />', id: 'agenda-wrapper').appendTo('#fixtures')
       @contexts = [{"asset_string":"user_1"}, {"asset_string":"course_2"}, {"asset_string":"group_3"}]
       @contextCodes = ["user_1", "course_2", "group_3"]
-      @startDate = new Date()
-      @startDate.setYear(2001)
+      @startDate = fcUtil.now()
+      @startDate.minute(1)
+      @startDate.year(2001)
       @dataSource = new EventDataSource(@contexts)
       @server = sinon.fakeServer.create()
       @snapshot = tz.snapshot()
@@ -80,7 +82,7 @@ define [
     _.each serialized.days, (d) ->
       ok d.events.length, 'every day has events'
 
-  test 'should omit days on page breaks', ->
+  test 'should only include days on page breaks once', ->
     view = new AgendaView(el: @container, dataSource: @dataSource)
     window.view = view
     view.fetch(@contextCodes, @startDate)
@@ -100,7 +102,7 @@ define [
       addEvents(events, date)
     sendCustomEvents(@server, JSON.stringify(events), JSON.stringify([]), true)
 
-    ok @container.find('.ig-row').length == 40, 'finds 40 ig-rows'
+    ok @container.find('.ig-row').length, 40, 'finds 40 ig-rows'
     ok @container.find('.agenda-load-btn').length
     view.loadMore({preventDefault: $.noop})
 
@@ -110,10 +112,10 @@ define [
       date.setFullYear(date.getFullYear()+1)
     sendCustomEvents(@server, JSON.stringify(events), JSON.stringify([]), false, 2)
 
-    ok @container.find('.ig-row').length == 60, 'finds 60 ig-rows'
+    equal @container.find('.ig-row').length, 70, 'finds 70 ig-rows'
 
   test 'renders non-assignment events with locale-appropriate format string', ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%k:%M'
 
@@ -125,7 +127,7 @@ define [
     ok @container.find('.ig-details').slice(2, 3).text().match(/13:00/), 'formats according to locale'
 
   test 'renders assignment events with locale-appropriate format string', ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%k:%M'
 

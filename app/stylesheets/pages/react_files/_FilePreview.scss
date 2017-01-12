@@ -12,6 +12,11 @@ $preview-html-background: whitesmoke;
 
 .ReactModal__Overlay.ReactModal__Overlay--ef-file-preview {
   background: rgba(black, 0.9);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .ReactModal__Content.ReactModal__Content--ef-file-preview {
@@ -70,7 +75,7 @@ $preview-html-background: whitesmoke;
   background-color: $preview-bg;
 }
 .ef-file-preview-header-filename {
-  font-size: 18px;
+  @include fontSize(18px);
   padding: 0;
   padding-left: 24px;
   margin: 0;
@@ -107,7 +112,7 @@ $preview-html-background: whitesmoke;
   color: darken($preview-font-color, 45);
   cursor: pointer;
   padding: 0 12px;
-  font-size: 14px;
+  @include fontSize($ic-font-size--small);
   border: none;
   text-align: center;
   align-items: center;
@@ -183,7 +188,7 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
   }
   i {
     width: auto;
-    font-size: 30px;
+    @include fontSize(30px);
     line-height: normal;
     color: $preview-font-color;
     &:before {

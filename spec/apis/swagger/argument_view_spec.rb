@@ -3,7 +3,7 @@ require 'argument_view'
 
 describe ArgumentView do
   context "type splitter" do
-    let(:view) { ArgumentView.new "" }
+    let(:view) { ArgumentView.new "arg [String]" }
 
     it "accepts no type" do
       expect(view.split_type_desc("")).to eq(
@@ -31,11 +31,10 @@ describe ArgumentView do
   end
 
   context "line parser" do
-    let(:view) { ArgumentView.new "" }
+    let(:view) { ArgumentView.new "arg [String]" }
 
-    it "compacts whitespace" do
-      parsed = view.parse_line("arg  \t[String] desc")
-      expect(parsed).to eq ["arg [String] desc", "arg", "[String]", "desc"]
+    it "raises on missing param name" do
+      expect { view.parse_line("") }.to raise_error(ArgumentError)
     end
 
     it "parses without desc" do

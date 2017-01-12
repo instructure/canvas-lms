@@ -6,7 +6,8 @@ define [
   'compiled/views/PaginatedCollectionView'
   'compiled/views/TreeItemView'
   'jst/TreeCollection'
-], (Backbone, $, _, preventDefault, PaginatedCollectionView, TreeItemView, collectionTemplate) ->
+  'str/htmlEscape'
+], (Backbone, $, _, preventDefault, PaginatedCollectionView, TreeItemView, collectionTemplate, htmlEscape) ->
 
   class TreeView extends Backbone.View
 
@@ -75,7 +76,7 @@ define [
             $('.' + _this.selectedStyleClass).each((key, element) => $(element).removeClass(@selectedStyleClass))
             $(event.target).addClass(@selectedStyleClass)
           @onClick?(event, @model)
-
+        icon_class = if @model.get('for_submissions') then 'icon-folder-locked' else 'icon-folder'
         $label = $("""
           <a
             class="treeLabel"
@@ -83,11 +84,11 @@ define [
             tabindex="-1"
           >
             <i class="icon-mini-arrow-right"></i>
-            <i class="icon-folder"></i>
+            <i class="#{htmlEscape(icon_class)}"></i>
           </a>
         """).append(@$labelInner).prependTo(@$el)
 
-        if @dndOptions
+        if @dndOptions && !@model.get('for_submissions')
           toggleActive = (makeActive) ->
             return -> $label.toggleClass('activeDragTarget', makeActive)
           $label.on

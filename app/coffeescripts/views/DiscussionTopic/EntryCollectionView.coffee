@@ -5,7 +5,8 @@ define [
   'Backbone'
   'jst/discussions/EntryCollectionView'
   'jst/discussions/entryStats'
-  'compiled/views/DiscussionTopic/EntryView'
+  'compiled/views/DiscussionTopic/EntryView',
+  'compiled/jquery/scrollIntoView'
 ], (I18n, $, walk, {View}, template, entryStatsTemplate, EntryView) ->
 
   class EntryCollectionView extends View
@@ -28,6 +29,8 @@ define [
       'click .loadNext': 'loadNextFromEvent'
 
     template: template
+
+    $window: $ window
 
     els: '.discussion-entries': 'list'
 
@@ -80,12 +83,11 @@ define [
 
     addNewView: (view) ->
       view.model.set 'new', false
-      if !@options.threaded and !@options.root
-        @list.prepend view.el
-      else
-        @list.append view.el
+      @list.append view.el
       @nestEntries()
       if not @options.root
+        @$window.scrollTo view.$el, 200
+
         view.$el.hide()
         setTimeout =>
           view.$el.fadeIn()
@@ -144,4 +146,3 @@ define [
       @renderNextLink()
 
     filter: @::afterRender
-

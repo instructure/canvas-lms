@@ -4279,6 +4279,17 @@ var ReactServerRendering = _dereq_("./ReactServerRendering");
 var ReactTextComponent = _dereq_("./ReactTextComponent");
 
 var onlyChild = _dereq_("./onlyChild");
+var invariant = _dereq_("./invariant");
+var mixInto = _dereq_("./mixInto");
+var merge = _dereq_("./merge");
+var warning = _dereq_("./warning");
+var copyProperties = _dereq_("./copyProperties");
+var instantiateReactComponent = _dereq_("./instantiateReactComponent");
+var cloneWithProps = _dereq_("./cloneWithProps");
+var ReactMarkupChecksum = _dereq_("./ReactMarkupChecksum");
+var ReactServerRenderingTransaction = _dereq_("./ReactServerRenderingTransaction");
+var cx = _dereq_("./cx");
+var ExecutionEnvironment = _dereq_("./ExecutionEnvironment");
 
 ReactDefaultInjection.inject();
 
@@ -4321,7 +4332,19 @@ var React = {
     InstanceHandles: ReactInstanceHandles,
     Mount: ReactMount,
     MultiChild: ReactMultiChild,
-    TextComponent: ReactTextComponent
+    TextComponent: ReactTextComponent,
+    invariant: invariant,
+    mixInto: mixInto,
+    merge: merge,
+    warning: warning,
+    copyProperties: copyProperties,
+    instantiateReactComponent: instantiateReactComponent,
+    cloneWithProps: cloneWithProps,
+    ReactDescriptor: ReactDescriptor,
+    ReactMarkupChecksum: ReactMarkupChecksum,
+    ReactServerRenderingTransaction: ReactServerRenderingTransaction,
+    cx: cx,
+    ExecutionEnvironment: ExecutionEnvironment
   }
 };
 
@@ -4371,7 +4394,38 @@ React.version = '0.11.0';
 
 module.exports = React;
 
-},{"./DOMPropertyOperations":12,"./EventPluginUtils":20,"./ExecutionEnvironment":22,"./ReactChildren":34,"./ReactComponent":35,"./ReactCompositeComponent":38,"./ReactContext":39,"./ReactCurrentOwner":40,"./ReactDOM":41,"./ReactDOMComponent":43,"./ReactDefaultInjection":53,"./ReactDescriptor":56,"./ReactInstanceHandles":64,"./ReactMount":67,"./ReactMultiChild":68,"./ReactPerf":71,"./ReactPropTypes":75,"./ReactServerRendering":79,"./ReactTextComponent":83,"./onlyChild":149}],30:[function(_dereq_,module,exports){
+},{
+  "./DOMPropertyOperations":12,
+  "./EventPluginUtils":20,
+  "./ExecutionEnvironment":22,
+  "./ReactChildren":34,
+  "./ReactComponent":35,
+  "./ReactCompositeComponent":38,
+  "./ReactContext":39,
+  "./ReactCurrentOwner":40,
+  "./ReactDOM":41,
+  "./ReactDOMComponent":43,
+  "./ReactDefaultInjection":53,
+  "./ReactDescriptor":56,
+  "./ReactInstanceHandles":64,
+  "./ReactMount":67,
+  "./ReactMultiChild":68,
+  "./ReactPerf":71,
+  "./ReactPropTypes":75,
+  "./ReactServerRendering":79,
+  "./ReactTextComponent":83,
+  "./onlyChild":149,
+  "./invariant":134,
+  "./mixInto":147,
+  "./merge":144,
+  "./warning":158,
+  "./copyProperties":110,
+  "./instantiateReactComponent":133,
+  "./cloneWithProps":108,
+  "./ReactMarkupChecksum":66,
+  "./ReactServerRenderingTransaction":80,
+  "./cx":114,
+}],30:[function(_dereq_,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *

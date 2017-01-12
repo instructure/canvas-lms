@@ -1,0 +1,20 @@
+[
+  {
+    "title": "United Kingdom",
+    "guid": "e13189f3",
+    "type": "country",
+    "chld": "1"
+  },
+  {
+    "title": "Australia",
+    "guid": "bb2bbbb8",
+    "type": "country",
+    "chld": "2"
+  },
+  {
+    "title": "United States",
+    "guid": "c0d8318b",
+    "type": "country",
+    "chld": "52"
+  }
+]

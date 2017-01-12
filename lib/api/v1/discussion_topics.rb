@@ -42,6 +42,7 @@ module Api::V1::DiscussionTopics
   #
   # Returns an array of hashes.
   def discussion_topics_api_json(topics, context, user, session, opts={})
+    DiscussionTopic.preload_can_unpublish(context, topics)
     topics.inject([]) do |result, topic|
       if topic.visible_for?(user)
         result << discussion_topic_api_json(topic, context, user, session, opts)
@@ -74,10 +75,11 @@ module Api::V1::DiscussionTopics
       json[:subscription_hold] = hold
     end
 
-    locked_json(json, topic, user, session)
     if opts[:include_assignment] && topic.assignment
+      excludes = opts[:exclude_assignment_description] ? ['description'] : []
       json[:assignment] = assignment_json(topic.assignment, user, session,
-        include_discussion_topic: false, override_dates: opts[:override_dates])
+        include_discussion_topic: false, override_dates: opts[:override_dates],
+        exclude_response_fields: excludes)
     end
 
     json
@@ -101,8 +103,7 @@ module Api::V1::DiscussionTopics
                     nil
                   end
 
-    { message: api_user_content(topic.message, context),
-      require_initial_post: topic.require_initial_post?,
+    fields = { require_initial_post: topic.require_initial_post?,
       user_can_see_posts: topic.user_can_see_posts?(user), podcast_url: url,
       read_state: topic.read_state(user), unread_count: topic.unread_count(user),
       subscribed: topic.subscribed?(user), topic_children: topic.child_topics.pluck(:id),
@@ -111,7 +112,19 @@ module Api::V1::DiscussionTopics
       locked: topic.locked?, can_lock: topic.can_lock?,
       author: user_display_json(topic.user, topic.context),
       html_url: html_url, url: html_url, pinned: !!topic.pinned,
-      group_category_id: topic.group_category_id, can_group: topic.can_group? }
+      group_category_id: topic.group_category_id, can_group: topic.can_group?(opts) }
+
+    locked_json(fields, topic, user, 'topic', check_policies: true, deep_check_if_needed: true)
+    can_view = !fields[:lock_info].is_a?(Hash) || fields[:lock_info][:can_view]
+    unless opts[:exclude_messages]
+      if opts[:plain_messages]
+        fields[:message] = can_view ? topic.message : lock_explanation(fields[:lock_info], 'topic', context) # used for searching by body on index
+      else
+        fields[:message] = can_view ? api_user_content(topic.message, context) : lock_explanation(fields[:lock_info], 'topic', context)
+      end
+    end
+
+    fields
   end
 
   # Public: Serialize discussion entries for returning a JSON response. This method,
@@ -127,7 +140,7 @@ module Api::V1::DiscussionTopics
   #   Recognized fields: user_name, subentries.
   #
   # Returns an array of hashes ready to be serialized.
-  def discussion_entry_api_json(entries, context, user, session, includes = [:user_name, :subentries])
+  def discussion_entry_api_json(entries, context, user, session, includes = [:user_name, :subentries, :display_user])
     entries.map do |entry|
       serialize_entry(entry, user, context, session, includes)
     end
@@ -156,6 +169,8 @@ module Api::V1::DiscussionTopics
     else
       json[:message] = api_user_content(entry.message, context, user)
     end
+
+    json[:user] = user_display_json(entry.user, context) if includes.include?(:display_user)
 
     json.merge!(discussion_entry_attachment(entry, user, context))
     json.merge!(discussion_entry_read_state(entry, user))
@@ -206,7 +221,7 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def discussion_entry_subentries(entry, user, context, session, includes)
     return {} unless includes.include?(:subentries) && entry.root_entry_id.nil?
-    replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).all
+    replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).to_a
 
     if replies.empty?
       {}
@@ -226,17 +241,17 @@ module Api::V1::DiscussionTopics
 
   def entry_pagination_url(topic)
     if @context.is_a? Course
-      api_v1_course_discussion_entries_url(@context)
+      api_v1_course_discussion_entries_url(@context, topic)
     else
-      api_v1_group_discussion_entries_url(@context)
+      api_v1_group_discussion_entries_url(@context, topic)
     end
   end
 
-  def reply_pagination_url(entry)
+  def reply_pagination_url(topic, entry)
     if @context.is_a? Course
-      api_v1_course_discussion_replies_url(@context)
+      api_v1_course_discussion_replies_url(@context, topic, entry)
     else
-      api_v1_group_discussion_replies_url(@context)
+      api_v1_group_discussion_replies_url(@context, topic, entry)
     end
   end
 end
