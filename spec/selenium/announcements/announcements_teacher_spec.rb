@@ -263,7 +263,8 @@ describe "announcements" do
       f('.discussion-reply-action').click
       entry_text = 'new entry text'
       type_in_tiny('textarea', entry_text)
-      fj("button[type=submit]").click
+      f('button[type=submit]').click
+      wait_for_ajax_requests
       expect(DiscussionEntry.last.message).to include(entry_text)
     end
 
