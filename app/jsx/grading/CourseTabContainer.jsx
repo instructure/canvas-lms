@@ -1,22 +1,14 @@
 define([
   'react',
   'jsx/grading/gradingStandardCollection',
-  'jsx/grading/GradingPeriodSetCollection',
+  'jsx/grading/gradingPeriodCollection',
   'jquery',
-  'i18n!grading_periods'
-], (React, GradingStandardCollection, GradingPeriodSetCollection, $, I18n) => {
-  const { bool, string, shape } = React.PropTypes;
-
-  class AccountTabContainer extends React.Component {
+  'i18n!external_tools',
+  'jquery.instructure_misc_plugins'
+], (React, GradingStandardCollection, GradingPeriodCollection, $, I18n) => {
+  class CourseTabContainer extends React.Component {
     static propTypes = {
-      multipleGradingPeriodsEnabled: bool.isRequired,
-      readOnly: bool.isRequired,
-      urls: shape({
-        gradingPeriodSetsURL: string.isRequired,
-        gradingPeriodsUpdateURL: string.isRequired,
-        enrollmentTermsURL: string.isRequired,
-        deleteGradingPeriodURL: string.isRequired
-      }).isRequired,
+      multipleGradingPeriodsEnabled: React.PropTypes.bool.isRequired
     }
 
     componentDidMount () {
@@ -37,10 +29,7 @@ define([
               ref={(el) => { this.gradingPeriods = el; }}
               id="grading-periods-tab"
             >
-              <GradingPeriodSetCollection
-                urls={this.props.urls}
-                readOnly={this.props.readOnly}
-              />
+              <GradingPeriodCollection />
             </div>
             <div
               ref={(el) => { this.gradingStandards = el; }}
@@ -70,5 +59,5 @@ define([
     }
   }
 
-  return AccountTabContainer;
+  return CourseTabContainer;
 });
