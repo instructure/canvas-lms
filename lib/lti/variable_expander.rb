@@ -44,6 +44,7 @@ module Lti
     TERM_START_DATE_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term &&
                                  @context.enrollment_term.start_at }
     USER_GUARD = -> { @current_user }
+    SIS_USER_GUARD = -> { @current_user && @current_user.pseudonym && @current_user.pseudonym.sis_user_id }
     PSEUDONYM_GUARD = -> { sis_pseudonym }
     ENROLLMENT_GUARD = -> { @current_user && @context.is_a?(Course) }
     ROLES_GUARD = -> { @current_user && (@context.is_a?(Course) || @context.is_a?(Account)) }
@@ -362,6 +363,18 @@ module Lti
     register_expansion 'Person.email.primary', [],
                        -> { @current_user.email },
                        USER_GUARD
+
+
+    # Returns the institution assigned email of the launching user. Only available when launched by a logged in user that was added via SIS.
+    # @example
+    #   ```
+    #   john.doe@example.com
+    #   ```
+    register_expansion 'vnd.Canvas.Person.email.sis', [],
+                       -> { @current_user.communication_channels.joins(
+                         "INNER JOIN #{Pseudonym.quoted_table_name}
+                          ON communication_channels.id=pseudonyms.sis_communication_channel_id")
+                              .limit(1).pluck(:path).first }, SIS_USER_GUARD
 
     # Returns the name of the timezone of the launching user. Only available when launched by a logged in user.
     # @example
