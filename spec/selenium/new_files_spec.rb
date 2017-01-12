@@ -200,7 +200,8 @@ describe "better_file_browsing" do
         driver.action.send_keys(:return).perform
         # Unable to find matching line from backtrace error is encountered if refresh_page is not used
         refresh_page
-        expect(all_files_folders.count).to eq 1
+        wait_for_animations
+        expect(ff('.ef-item-row')).to have_size 1
         move(file_name, 0, :cog_icon, destination)
         wait_for_ajaximations
         final_destination = destination.split('/').pop
