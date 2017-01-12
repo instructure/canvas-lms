@@ -243,7 +243,7 @@ define([
                       {this.state.permissions.send_messages ? (
                         <div className="StudentContextTray-Header__Actions">
                           <Button
-                            variant="link" size="small"
+                            variant="icon" size="small"
                             onClick={this.handleMessageButtonClick}
                           >
                             <ScreenReaderContent>
