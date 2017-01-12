@@ -5,6 +5,8 @@ require_relative "../../helpers/assignments_common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../../helpers/speed_grader_common"
 require_relative "../page_objects/speedgrader_page"
+require_relative "../../assignments/page_objects/assignment_page"
+require_relative "../../assignments/page_objects/submission_detail_page"
 
 describe 'Speedgrader' do
   include_context "in-process server selenium tests"
@@ -16,26 +18,26 @@ describe 'Speedgrader' do
 
   let(:rubric_data) do
     [
-        {
-            description: 'Awesomeness',
-            points: 10,
-            id: 'crit1',
-            ratings: [
-                {description: 'Much Awesome', points: 10, id: 'rat1'},
-                {description: 'So Awesome', points: 5, id: 'rat2'},
-                {description: 'Lame', points: 0, id: 'rat3'}
-            ]
-        },
-        {
-            description: 'Wow',
-            points: 10,
-            id: 'crit2',
-            ratings: [
-                {description: 'Much Wow', points: 10, id: 'rat4'},
-                {description: 'So Wow', points: 5, id: 'rat5'},
-                {description: 'Wow... not', points: 0, id: 'rat6'}
-            ]
-        }
+      {
+        description: 'Awesomeness',
+        points: 10,
+        id: 'crit1',
+        ratings: [
+          {description: 'Much Awesome', points: 10, id: 'rat1'},
+          {description: 'So Awesome', points: 5, id: 'rat2'},
+          {description: 'Lame', points: 0, id: 'rat3'}
+        ]
+      },
+      {
+        description: 'Wow',
+        points: 10,
+        id: 'crit2',
+        ratings: [
+          {description: 'Much Wow', points: 10, id: 'rat4'},
+          {description: 'So Wow', points: 5, id: 'rat5'},
+          {description: 'Wow... not', points: 0, id: 'rat6'}
+        ]
+      }
     ]
   end
 
@@ -116,7 +118,10 @@ describe 'Speedgrader' do
     context 'pass/fail assignment grading' do
       before :once do
         init_course_with_students 1
-        @assignment = @course.assignments.create!(grading_type: 'pass_fail', points_possible: 0)
+        @assignment = @course.assignments.create!(
+          grading_type: 'pass_fail',
+          points_possible: 0
+        )
         @assignment.grade_student(@students[0], grade: 'pass', grader: @teacher)
       end
 
@@ -145,13 +150,13 @@ describe 'Speedgrader' do
         init_course_with_students
         @teacher = @user
         @assignment = @course.assignments.create!(
-            title: 'Rubric',
-            points_possible: 20
+          title: 'Rubric',
+          points_possible: 20
         )
 
         rubric = @course.rubrics.build(
-            title: 'Everything is Awesome',
-            points_possible: 20,
+          title: 'Everything is Awesome',
+          points_possible: 20,
         )
         rubric.data = rubric_data
         rubric.save!
@@ -199,12 +204,22 @@ describe 'Speedgrader' do
     end
 
     context 'Using a rubric to grade' do
-      it 'should display correct grades from a student perspective', priority: "1", test_id: 164205 do
+      it 'should display correct grades for student', priority: "1", test_id: 164205 do
         course_with_student_logged_in(active_all: true)
         rubric_model
         @assignment = @course.assignments.create!(name: 'assignment with rubric', points_possible: 10)
-        @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
-        @submission = Submission.create!(user: @student, assignment: @assignment, submission_type: "online_text_entry", has_rubric_assessment: true)
+        @association = @rubric.associate_with(
+          @assignment,
+          @course,
+          purpose: 'grading',
+          use_for_grading: true
+        )
+        @submission = Submission.create!(
+          user: @student,
+          assignment: @assignment,
+          submission_type: "online_text_entry",
+          has_rubric_assessment: true
+        )
         @assessment = @association.assess(
           user: @student,
           assessor: @teacher,
@@ -407,43 +422,69 @@ describe 'Speedgrader' do
   end
 
   context 'submissions' do
-    # set up course and users
-    let(:test_course) { course_factory() }
-    let(:teacher)     { user_factory(active_all: true) }
-    let(:student)     { user_factory(active_all: true) }
-    let!(:enroll_teacher_and_students) do
-      test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
-      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
-    end
-    # create an assignment with online_upload type submission
-    let(:assignment) { test_course.assignments.create!( title: 'Assignment A', submission_types: 'online_text_entry,online_upload') }
-    # submit to the assignment as a student twice, one with file and other with text
-    let(:file_attachment) { attachment_model(:content_type => 'application/pdf', :context => student) }
-    let(:submit_with_attachment) do
-      assignment.submit_homework(
-        student,
-        submission_type: 'online_upload',
-        attachments: [file_attachment]
+    let(:resubmit_with_text) do
+      @assignment_for_course.submit_homework(
+        @student_in_course, submission_type: 'online_text_entry', body: 'hello!'
       )
     end
-    let(:resubmit_with_text) { assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hello!') }
+
+    # set up course, users and an assignment
+    before(:once) do
+      course_with_teacher(active_all:true)
+      @student_in_course = User.create!
+      @course.enroll_student(@student_in_course, enrollment_state: 'active')
+      @assignment_for_course = @course.assignments.create!(
+        title: 'Assignment A',
+        submission_types: 'online_text_entry,online_upload'
+      )
+    end
+
+    def submit_with_attachment
+      @file_attachment = attachment_model(:content_type => 'application/pdf', :context => @student_in_course)
+      @submission_for_student = @assignment_for_course.submit_homework(
+        @student_in_course,
+        submission_type: 'online_upload',
+        attachments: [@file_attachment]
+      )
+    end
+
+    it 'deleted comment is not visible', priority: "1", test_id: 961674 do
+      submit_with_attachment
+      @comment_text = "First comment"
+      @comment = @submission_for_student.add_comment(author: @teacher, comment: @comment_text)
+
+      # page object
+      submission_detail = SubmissionDetails.new
+
+      # student can see the new comment
+      user_session(@student_in_course)
+      submission_detail.visit_as_student(@course.id, @assignment_for_course.id, @student_in_course.id)
+      expect(submission_detail.comment_text_by_id(@comment.id)).to eq @comment_text
+
+      @comment.destroy
+
+      # student cannot see the deleted comment
+      submission_detail.visit_as_student(@course.id, @assignment_for_course.id, @student_in_course.id)
+      expect(submission_detail.comment_list_div).not_to contain_css("#submission_comment_#{@comment.id}")
+    end
+
     it 'should display the correct file submission in the right sidebar', priority: "1", test_id: 525188 do
       submit_with_attachment
-      user_session(teacher)
+      user_session(@teacher)
 
-      get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
-      expect(fj('#submission_files_list .submission-file .display_name')).to include_text('unknown.loser')
+      Speedgrader.visit(@course.id, @assignment_for_course.id)
+      expect(Speedgrader.submission_file_name.text).to eq @attachment.filename
     end
 
     it 'should display submissions in order in the submission dropdown', priority: "1", test_id: 525189 do
       Timecop.freeze(1.hour.ago) { submit_with_attachment }
       resubmit_with_text
-      user_session(teacher)
+      user_session(@teacher)
 
-      get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
-      f('#submission_to_view').click
-      click_option('#submission_to_view', '0', :value)
-      expect(f('#submission_files_list .submission-file .display_name')).to include_text('unknown.loser')
+      Speedgrader.visit(@course.id, @assignment_for_course.id)
+      Speedgrader.click_submissions_to_view
+      Speedgrader.select_option_submission_to_view('0')
+      expect(Speedgrader.submission_file_name.text).to eq @attachment.filename
     end
   end
 
@@ -492,9 +533,9 @@ describe 'Speedgrader' do
       gpg.account_id = account
       gpg.save!
       gpg.grading_periods.create! start_date: 3.years.ago,
-        end_date: 1.year.ago,
-        close_date: 1.week.ago,
-        title: "closed grading period"
+                                  end_date: 1.year.ago,
+                                  close_date: 1.week.ago,
+                                  title: "closed grading period"
       term = @course.enrollment_term
       term.update_attribute :grading_period_group, gpg
 
