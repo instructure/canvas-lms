@@ -111,7 +111,7 @@ module Api::V1::QuizSubmissionQuestion
         when "multiple_answers_question"
           data[:answer] = question.answers.each_with_object([]) do |a, out|
             key = ["answer", a[:id]].join("_").to_sym
-            if ActiveRecord::ConnectionAdapters::Column.value_to_boolean(submission_data[key])
+            if to_boolean(submission_data[key])
               out << a[:id]
             end
           end
