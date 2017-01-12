@@ -136,7 +136,7 @@ class OriginalityReportsApiController < ApplicationController
   #
   # @returns OriginalityReport
   def update
-    if authorized_action(@assignment.context, @current_user, :manage_grades)&&
+    if authorized_action(@assignment.context, @current_user, :manage_grades) &&
       @assignment.context.root_account.feature_enabled?(:plagiarism_detection_platform)
 
       if @report.update_attributes(strong_params.require(:originality_report).permit(update_attributes))
