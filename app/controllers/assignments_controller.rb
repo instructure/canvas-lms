@@ -540,7 +540,7 @@ class AssignmentsController < ApplicationController
   protected
 
   def strong_assignment_params
-    strong_params.require(:assignment).
+    params.require(:assignment).
       permit(:title, :name, :description, :due_at, :points_possible,
         :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
         :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,

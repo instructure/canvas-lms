@@ -218,6 +218,6 @@ class EportfoliosController < ApplicationController
   end
 
   def eportfolio_params
-    strong_params.require(:eportfolio).permit(:name, :public)
+    params.require(:eportfolio).permit(:name, :public)
   end
 end

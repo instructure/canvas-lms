@@ -253,7 +253,7 @@ class CollaborationsController < ApplicationController
     else
       users     = User.where(:id => Array(params[:user])).to_a
       group_ids = Array(params[:group])
-      collaboration_params = strong_params.require(:collaboration).permit(:title, :description, :url)
+      collaboration_params = params.require(:collaboration).permit(:title, :description, :url)
       collaboration_params[:user] = @current_user
       @collaboration = Collaboration.typed_collaboration_instance(params[:collaboration].delete(:collaboration_type))
       collaboration_params.delete(:url) unless @collaboration.is_a?(ExternalToolCollaboration)
@@ -287,7 +287,7 @@ class CollaborationsController < ApplicationController
       else
         users     = User.where(:id => Array(params[:user])).to_a
         group_ids = Array(params[:group])
-        @collaboration.attributes = strong_params.require(:collaboration).permit(:title, :description, :url)
+        @collaboration.attributes = params.require(:collaboration).permit(:title, :description, :url)
       end
       @collaboration.update_members(users, group_ids)
       respond_to do |format|

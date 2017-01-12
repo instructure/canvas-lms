@@ -144,6 +144,6 @@ class EportfolioEntriesController < ApplicationController
   end
 
   def eportfolio_entry_params
-    strong_params.require(:eportfolio_entry).permit(:name, :allow_comments, :show_comments)
+    params.require(:eportfolio_entry).permit(:name, :allow_comments, :show_comments)
   end
 end

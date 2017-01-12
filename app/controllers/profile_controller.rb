@@ -329,7 +329,7 @@ class ProfileController < ApplicationController
     end
 
     respond_to do |format|
-      user_params = params[:user] ? strong_params[:user].
+      user_params = params[:user] ? params[:user].
         permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
           :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate)
         : {}
@@ -348,7 +348,7 @@ class ProfileController < ApplicationController
           end
         end
         if params[:pseudonym]
-          pseudonym_params = strong_params[:pseudonym].permit(:password, :password_confirmation, :unique_id)
+          pseudonym_params = params[:pseudonym].permit(:password, :password_confirmation, :unique_id)
 
           change_password = params[:pseudonym].delete :change_password
           old_password = params[:pseudonym].delete :old_password
@@ -399,7 +399,7 @@ class ProfileController < ApplicationController
     short_name = params[:user] && params[:user][:short_name]
     @user.short_name = short_name if short_name && @user.user_can_edit_name?
     if params[:user_profile]
-      user_profile_params = strong_params[:user_profile].permit(:title, :bio)
+      user_profile_params = params[:user_profile].permit(:title, :bio)
       user_profile_params.delete(:title) unless @user.user_can_edit_name?
       @profile.attributes = user_profile_params
     end

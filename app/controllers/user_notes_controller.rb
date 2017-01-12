@@ -58,7 +58,7 @@ class UserNotesController < ApplicationController
   end
 
   def create
-    user_note_params = params[:user_note] ? strong_params[:user_note].permit(:note, :title, :creator, :user_id) : {}
+    user_note_params = params[:user_note] ? params[:user_note].permit(:note, :title, :creator, :user_id) : {}
 
     user_note_params[:user] = User.where(id: user_note_params.delete(:user_id)).first if user_note_params[:user_id]
     user_note_params[:user] ||= User.where(id: params[:user_id]).first

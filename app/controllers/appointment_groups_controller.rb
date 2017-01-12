@@ -579,7 +579,7 @@ class AppointmentGroupsController < ApplicationController
   end
 
   def appointment_group_params
-    strong_params.require(:appointment_group).permit(:title, :description, :location_name, :location_address, :participants_per_appointment,
+    params.require(:appointment_group).permit(:title, :description, :location_name, :location_address, :participants_per_appointment,
       :min_appointments_per_participant, :max_appointments_per_participant, :participant_visibility, :cancel_reason,
       :sub_context_codes => [], :new_appointments => strong_anything)
   end

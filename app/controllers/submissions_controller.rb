@@ -575,7 +575,7 @@ class SubmissionsController < ApplicationController
       if params[:attachments]
         attachments = []
         params[:attachments].keys.each do |idx|
-          attachment = strong_params[:attachments][idx].permit(Attachment.permitted_attributes)
+          attachment = params[:attachments][idx].permit(Attachment.permitted_attributes)
           attachment[:user] = @current_user
           attachments << @assignment.attachments.create(attachment)
         end

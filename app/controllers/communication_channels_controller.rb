@@ -338,10 +338,10 @@ class CommunicationChannelsController < ApplicationController
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
         if @pseudonym && params[:register]
           @user.require_acceptance_of_terms = require_terms?
-          @user.attributes = strong_params[:user].permit(:time_zone, :subscribe_to_emails, :terms_of_use) if strong_params[:user]
+          @user.attributes = params[:user].permit(:time_zone, :subscribe_to_emails, :terms_of_use) if params[:user]
 
           if params[:pseudonym]
-            pseudonym_params = strong_params[:pseudonym].permit(:password, :password_confirmation, :unique_id)
+            pseudonym_params = params[:pseudonym].permit(:password, :password_confirmation, :unique_id)
             if @pseudonym.unique_id.present?
               pseudonym_params.delete(:unique_id)
             end

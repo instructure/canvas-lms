@@ -1097,9 +1097,9 @@ class AccountsController < ApplicationController
   end
 
   def strong_account_params
-    # i'm doing this instead of normal strong_params because we do too much hackery to the weak params, especially in plugins
+    # i'm doing this instead of normal params because we do too much hackery to the weak params, especially in plugins
     # and it breaks when we enforce inherited weak parameters (because we're not actually editing request.parameters anymore)
-    ActionController::Parameters.new(params).require(:account).permit(*permitted_account_attributes)
+    params.require(:account).permit(*permitted_account_attributes)
   end
 
   def sort_order

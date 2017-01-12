@@ -228,7 +228,7 @@ class OutcomesApiController < ApplicationController
       )
     end
 
-    @outcome.update_attributes(strong_params.permit(*DIRECT_PARAMS))
+    @outcome.update_attributes(params.permit(*DIRECT_PARAMS))
     update_outcome_criterion(@outcome) if params[:mastery_points] || params[:ratings]
 
     if @outcome.save

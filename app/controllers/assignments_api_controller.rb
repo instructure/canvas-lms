@@ -861,7 +861,7 @@ class AssignmentsApiController < ApplicationController
     @assignment.workflow_state = 'unpublished'
     if authorized_action(@assignment, @current_user, :create)
       @assignment.content_being_saved_by(@current_user)
-      result = create_api_assignment(@assignment, strong_params.require(:assignment), @current_user, @context)
+      result = create_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
       render_create_or_update_result(result)
     end
   end
@@ -1016,7 +1016,7 @@ class AssignmentsApiController < ApplicationController
     @assignment = @context.active_assignments.api_id(params[:id])
     if authorized_action(@assignment, @current_user, :update)
       @assignment.content_being_saved_by(@current_user)
-      result = update_api_assignment(@assignment, strong_params.require(:assignment), @current_user, @context)
+      result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
       render_create_or_update_result(result)
     end
   end

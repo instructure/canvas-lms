@@ -300,7 +300,7 @@ module Polling
     end
 
     def get_poll_session_params
-      strong_params.require(:poll_sessions)[0].permit(:course_id, :course_section_id, :has_public_results)
+      params.require(:poll_sessions)[0].permit(:course_id, :course_section_id, :has_public_results)
     end
   end
 end

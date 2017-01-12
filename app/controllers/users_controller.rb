@@ -1564,8 +1564,8 @@ class UsersController < ApplicationController
   #
   # @returns User
   def update
-    strong_params[:user] ||= {}
-    user_params = strong_params[:user]
+    params[:user] ||= {}
+    user_params = params[:user]
     @user = api_request? ?
       api_find(User, params[:id]) :
       params[:id] ? api_find(User, params[:id]) : @current_user
@@ -2252,7 +2252,7 @@ class UsersController < ApplicationController
     end
 
     if params[:user]
-      user_params = strong_params[:user].
+      user_params = params[:user].
         permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
           :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use,
           :self_enrollment_code, :initial_enrollment_type)
@@ -2308,8 +2308,8 @@ class UsersController < ApplicationController
     # pre-populate the reverse association
     @pseudonym.user = @user
 
-    pseudonym_params = strong_params[:pseudonym] ?
-      strong_params[:pseudonym].permit(:password, :password_confirmation, :unique_id) : {}
+    pseudonym_params = params[:pseudonym] ?
+      params[:pseudonym].permit(:password, :password_confirmation, :unique_id) : {}
     # don't require password_confirmation on api calls
     pseudonym_params[:password_confirmation] = pseudonym_params[:password] if api_request?
     # don't allow password setting for new users that are not self-enrolling

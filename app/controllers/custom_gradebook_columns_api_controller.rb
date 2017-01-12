@@ -141,6 +141,6 @@ class CustomGradebookColumnsApiController < ApplicationController
   end
 
   def column_params
-    strong_params.require(:column).permit(:title, :position, :teacher_notes, :hidden)
+    params.require(:column).permit(:title, :position, :teacher_notes, :hidden)
   end
 end

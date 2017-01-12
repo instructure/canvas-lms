@@ -409,7 +409,7 @@ class GradebooksController < ApplicationController
       end
 
       submissions = if params[:submissions]
-                      params[:submissions].map{|k, v| v} # apparently .values doesn't pass on the strong_params
+                      params[:submissions].map{|k, v| v} # apparently .values doesn't pass on the params
                     else
                       [params[:submission]]
                     end
@@ -436,7 +436,7 @@ class GradebooksController < ApplicationController
         if params[:attachments]
           attachments = []
           params[:attachments].keys.each do |idx|
-            attachment = strong_params[:attachments][idx].permit(Attachment.permitted_attributes)
+            attachment = params[:attachments][idx].permit(Attachment.permitted_attributes)
             attachment[:user] = @current_user
             attachments << @assignment.attachments.create(attachment)
           end

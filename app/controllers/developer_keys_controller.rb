@@ -88,6 +88,6 @@ class DeveloperKeysController < ApplicationController
   end
 
   def developer_key_params
-    strong_params.require(:developer_key).permit(:api_key, :name, :icon_url, :redirect_uri, :redirect_uris, :email, :auto_expire_tokens)
+    params.require(:developer_key).permit(:api_key, :name, :icon_url, :redirect_uri, :redirect_uris, :email, :auto_expire_tokens)
   end
 end

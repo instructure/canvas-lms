@@ -48,7 +48,7 @@ class CalendarEventsController < ApplicationController
   def new
     @event = @context.calendar_events.temp_record
     add_crumb(t('crumbs.new', "New Calendar Event"), named_context_url(@context, :new_context_calendar_event_url))
-    @event.assign_attributes(strong_params.permit(:title, :start_at, :end_at, :location_name, :location_address))
+    @event.assign_attributes(params.permit(:title, :start_at, :end_at, :location_name, :location_address))
     js_env(:RECURRING_CALENDAR_EVENTS_ENABLED => feature_context.feature_enabled?(:recurring_calendar_events))
     authorized_action(@event, @current_user, :create)
   end
@@ -74,7 +74,7 @@ class CalendarEventsController < ApplicationController
   def edit
     @event = @context.calendar_events.find(params[:id])
     if @event.grants_right?(@current_user, session, :update)
-      @event.update_attributes!(strong_params.permit(:title, :start_at, :end_at, :location_name, :location_address))
+      @event.update_attributes!(params.permit(:title, :start_at, :end_at, :location_name, :location_address))
     end
     if authorized_action(@event, @current_user, :update_content)
       render :new
@@ -128,7 +128,7 @@ class CalendarEventsController < ApplicationController
   end
 
   def calendar_event_params
-    strong_params.require(:calendar_event).
+    params.require(:calendar_event).
       permit(CalendarEvent.permitted_attributes + [:child_event_data => strong_anything])
   end
 end

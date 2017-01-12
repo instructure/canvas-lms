@@ -964,6 +964,6 @@ class Quizzes::QuizzesController < ApplicationController
   protected
 
   def get_quiz_params
-    params[:quiz] ? strong_params[:quiz].permit(API_ALLOWED_QUIZ_INPUT_FIELDS[:only]) : {}
+    params[:quiz] ? params[:quiz].permit(API_ALLOWED_QUIZ_INPUT_FIELDS[:only]) : {}
   end
 end

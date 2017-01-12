@@ -205,7 +205,7 @@ module Polling
     end
 
     def get_poll_choice_params
-      strong_params.require(:poll_choices)[0].permit(:text, :is_correct, :position)
+      params.require(:poll_choices)[0].permit(:text, :is_correct, :position)
     end
 
   end

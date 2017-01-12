@@ -109,7 +109,7 @@ class TermsController < ApplicationController
       return render :json => {:message => "Invalid SIS ID"}, :status => :bad_request
     end
     handle_sis_id_param(sis_id)
-    if @term.update_attributes(strong_params.require(:enrollment_term).permit(:name, :start_at, :end_at))
+    if @term.update_attributes(params.require(:enrollment_term).permit(:name, :start_at, :end_at))
       @term.set_overrides(@context, overrides)
       render :json => serialized_term
     else

@@ -77,29 +77,11 @@ module ArbitraryStrongishParams
 end
 ActionController::Parameters.prepend(ArbitraryStrongishParams)
 
-# default to *non* strong parameters
 ActionController::Base.class_eval do
   def strong_anything
     ArbitraryStrongishParams::ANYTHING
   end
-
-  def strong_params
-    params
-  end
 end
-
-# completely ignore attr_accessible if it's a strong parameters
-module ForbiddenAttributesProtectionWithoutAttrAccessible
-  module ClassMethods
-    def strong_params
-    end
-
-    def strong_params?
-      true
-    end
-  end
-end
-ActiveRecord::Base.singleton_class.include(ForbiddenAttributesProtectionWithoutAttrAccessible::ClassMethods)
 
 ActionController::ParameterMissing.class_eval do
   def skip_error_report?; true; end

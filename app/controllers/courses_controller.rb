@@ -1212,7 +1212,7 @@ class CoursesController < ApplicationController
     return unless authorized_action(@course, @current_user, :update)
 
     old_settings = @course.settings
-    @course.attributes = strong_params.permit(
+    @course.attributes = params.permit(
       :allow_student_discussion_topics,
       :allow_student_forum_attachments,
       :allow_student_discussion_editing,
@@ -1910,7 +1910,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read) &&
       authorized_action(@context, @current_user, :read_as_admin)
-      args = strong_params.require(:course).permit(:name, :course_code)
+      args = params.require(:course).permit(:name, :course_code)
       account = @context.account
       if params[:course][:account_id]
         account = Account.find(params[:course][:account_id])
@@ -2779,12 +2779,12 @@ class CoursesController < ApplicationController
   private
 
   def effective_due_dates_params
-    strong_params.permit(assignment_ids: [])
+    params.permit(assignment_ids: [])
   end
 
   def course_params
-    return {} unless strong_params[:course]
-    strong_params[:course].permit(:name, :group_weighting_scheme, :start_at, :conclude_at,
+    return {} unless params[:course]
+    params[:course].permit(:name, :group_weighting_scheme, :start_at, :conclude_at,
       :grading_standard_id, :is_public, :is_public_to_auth_users, :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :public_description, :allow_student_forum_attachments, :allow_student_discussion_topics, :allow_student_discussion_editing,
       :show_total_grade_as_points, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view,

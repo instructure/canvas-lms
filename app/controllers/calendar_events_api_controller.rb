@@ -1270,7 +1270,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def calendar_event_params
-    strong_params.require(:calendar_event).
+    params.require(:calendar_event).
       permit(CalendarEvent.permitted_attributes + [:child_event_data => strong_anything])
   end
 end

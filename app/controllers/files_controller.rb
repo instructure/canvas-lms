@@ -1153,6 +1153,6 @@ class FilesController < ApplicationController
   end
 
   def strong_attachment_params
-    strong_params.require(:attachment).permit(:display_name, :locked, :lock_at, :unlock_at, :uploaded_data, :hidden)
+    params.require(:attachment).permit(:display_name, :locked, :lock_at, :unlock_at, :uploaded_data, :hidden)
   end
 end
