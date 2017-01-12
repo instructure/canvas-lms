@@ -5,7 +5,7 @@
   content_for :page_title, join_title(t(:page_title, "Import Content"), @context.name)
   js_bundle :content_migration
   js_env :FOLDER_OPTIONS => folders_as_options(root_folders, :all_folders => folders)
-  jammit_css :content_migrations
+  css_bundle :content_migrations
 %>
 
 <form id="migrationConverterContainer" class="form-horizontal"></form>

@@ -185,4 +185,18 @@ describe LocaleSelection do
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :context => @account, :user => @user, :session_locale => 'zh')).to eql('de')
     end
   end
+
+  describe "available_locales" do
+    it "does not include custom locales" do
+      I18n.stubs(:available_locales).returns([:en, :ja])
+      I18n.stubs(:t).with(:locales, locale: :en).returns(en: 'English')
+      I18n.stubs(:t).with(:custom, locale: :en).returns(nil)
+      I18n.stubs(:t).with(:locales, locale: :ja).returns(ja: 'Japanese')
+      I18n.stubs(:t).with(:custom, locale: :ja).returns(true)
+      expect(ls.available_locales).to eq('en' => 'English')
+
+      PluginSetting.create!(name: 'i18n', settings: { 'ja' => true })
+      expect(ls.available_locales).to eq('en' => 'English', 'ja' => 'Japanese')
+    end
+  end
 end

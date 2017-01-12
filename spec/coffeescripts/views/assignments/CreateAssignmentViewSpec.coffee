@@ -16,24 +16,12 @@ define [
 
   fixtures = $('#fixtures')
 
-  assignment1 = ->
-    new Assignment(buildAssignment1())
-
-  assignment2 = ->
-    new Assignment(buildAssignment2())
-
-  assignment3 = ->
-    new Assignment(buildAssignment3())
-
-  assignment4 = ->
-    new Assignment(buildAssignment4())
-
   buildAssignment1 = ->
     date1 =
-      "due_at": new Date("August 28, 2013").toISOString()
+      "due_at": new Date("2103-08-28T00:00:00").toISOString()
       "title":"Summer Session"
     date2 =
-      "due_at": new Date("August 28, 2013").toISOString()
+      "due_at": new Date("2103-08-28T00:00:00").toISOString()
       "title":"Winter Session"
 
     buildAssignment(
@@ -75,6 +63,16 @@ define [
       "position":4
     )
 
+  buildAssignment5 = ->
+    buildAssignment(
+      "id": 6
+      "name": "Page assignment"
+      "submission_types":['wiki_page']
+      "grading_type": "not_graded"
+      "points_possible": null
+      "position": 5
+    )
+
   buildAssignment = (options) ->
     options ?= {}
 
@@ -111,10 +109,11 @@ define [
 
   module 'CreateAssignmentView',
     setup: ->
-      @assignment1 = assignment1()
-      @assignment2 = assignment2()
-      @assignment3 = assignment3()
-      @assignment4 = assignment4()
+      @assignment1 = new Assignment(buildAssignment1())
+      @assignment2 = new Assignment(buildAssignment2())
+      @assignment3 = new Assignment(buildAssignment3())
+      @assignment4 = new Assignment(buildAssignment4())
+      @assignment5 = new Assignment(buildAssignment5())
       @group       = assignmentGroup()
 
       @snapshot = tz.snapshot()
@@ -155,8 +154,13 @@ define [
     equal view.$("#ag_1_assignment_type").length, 0
     equal view.$("#assign_1_assignment_type").length, 0
 
+  test "render hides date picker and points_possible for pages", ->
+    view = createView(@assignment5)
+    equal view.$('.date_field_container').length, 0
+    equal view.$('input[name=points_possible]').length, 0
+
   test "onSaveSuccess adds model to assignment group for creation", ->
-    sinon.stub( DialogFormView.prototype, "close", -> )
+    @stub(DialogFormView.prototype, "close", ->)
 
     equal @group.get("assignments").length, 2
 
@@ -165,10 +169,8 @@ define [
 
     equal @group.get("assignments").length, 3
 
-    DialogFormView.prototype.close.restore()
-
   test "the form is cleared after adding an assignment", ->
-    sinon.stub( DialogFormView.prototype, "close", -> )
+    @stub(DialogFormView.prototype, "close", ->)
 
     view = createView(@group)
     view.onSaveSuccess()
@@ -176,27 +178,22 @@ define [
     equal view.$("#ag_#{@group.id}_assignment_name").val(), ""
     equal view.$("#ag_#{@group.id}_assignment_points").val(), "0"
 
-    DialogFormView.prototype.close.restore()
-
   test "moreOptions redirects to new page for creation", ->
-    sinon.stub( CreateAssignmentView.prototype, "newAssignmentUrl", -> )
-    sinon.stub( CreateAssignmentView.prototype, "redirectTo",       -> )
+    @stub(CreateAssignmentView.prototype, "newAssignmentUrl", ->)
+    @stub(CreateAssignmentView.prototype, "redirectTo", ->)
 
     view = createView(@group)
     view.moreOptions()
 
     ok view.redirectTo.called
-    CreateAssignmentView.prototype.newAssignmentUrl.restore()
-    CreateAssignmentView.prototype.redirectTo.restore()
 
   test "moreOptions redirects to edit page for editing", ->
-    sinon.stub( CreateAssignmentView.prototype, "redirectTo", -> )
+    @stub(CreateAssignmentView.prototype, "redirectTo", ->)
 
     view = createView(@assignment1)
     view.moreOptions()
 
     ok view.redirectTo.called
-    CreateAssignmentView.prototype.redirectTo.restore()
 
   test "generateNewAssignment builds new assignment model", ->
     view = createView(@group)
@@ -224,28 +221,22 @@ define [
     ok !json.canChooseType
 
   test "openAgain doesn't add datetime for multiple dates", ->
-    sinon.stub( DialogFormView.prototype, "openAgain", -> )
-    sinon.spy $.fn, "datetime_field"
+    @stub(DialogFormView.prototype, "openAgain", ->)
+    @spy $.fn, "datetime_field"
 
     view = createView(@assignment1)
     view.openAgain()
 
     ok $.fn.datetime_field.notCalled
 
-    $.fn.datetime_field.restore()
-    DialogFormView.prototype.openAgain.restore()
-
   test "openAgain adds datetime picker", ->
-    sinon.stub( DialogFormView.prototype, "openAgain", -> )
-    sinon.spy $.fn, "datetime_field"
+    @stub(DialogFormView.prototype, "openAgain", ->)
+    @spy $.fn, "datetime_field"
 
     view = createView(@assignment2)
     view.openAgain()
 
     ok $.fn.datetime_field.called
-
-    $.fn.datetime_field.restore()
-    DialogFormView.prototype.openAgain.restore()
 
   test "requires name to save assignment", ->
     view = createView(@assignment3)
@@ -256,6 +247,25 @@ define [
     ok errors["name"]
     equal errors["name"].length, 1
     equal errors["name"][0]["message"], "Name is required!"
+
+  test "requires a name < 255 chars to save assignment", ->
+    view = createView(@assignment3)
+    l1 = 'aaaaaaaaaa'
+    l2 = l1 + l1 + l1 + l1 + l1 + l1
+    l3 = l2 + l2 + l2 + l2 + l2 + l2
+    ok l3.length > 255
+
+    errors = view.validateBeforeSave(name: l3, [])
+    ok errors["name"]
+    equal errors["name"].length, 1
+    equal errors["name"][0]["message"], "Name is too long"
+
+  test "don't validate name if it is frozen", ->
+    view = createView(@assignment3)
+    @assignment3.set('frozen_attributes', ['title'])
+
+    errors = view.validateBeforeSave({}, [])
+    ok !errors["name"]
 
   test 'rejects a letter for points_possible', ->
     view = createView(@assignment3)
@@ -272,9 +282,12 @@ define [
     equal data.submission_types, 'none'
 
   test 'validates due date against date range', ->
+    start_at = {date: new Date("August 20, 2013").toISOString(), date_context: "term"}
+    end_at = {date: new Date("August 30, 2013").toISOString(), date_context: "course"}
+
     ENV.VALID_DATE_RANGE = {
-      start_at: {date: new Date("August 20, 2013").toISOString(), date_context: "term"}
-      end_at: {date: new Date("August 30, 2013").toISOString(), date_context: "course"}
+      start_at: start_at
+      end_at: end_at
     }
     view = createView(@assignment3)
     data =
@@ -289,6 +302,9 @@ define [
     errors = view.validateBeforeSave(data, [])
     ok errors["due_at"]
     equal errors['due_at'][0]['message'], 'Due date cannot be before term start'
+
+    equal start_at, ENV.VALID_DATE_RANGE.start_at
+    equal end_at,   ENV.VALID_DATE_RANGE.end_at
 
   test 'validates due date for lock and unlock', ->
     view = createView(@assignment4)
@@ -308,7 +324,7 @@ define [
     equal errors['due_at'][0]['message'], 'Due date cannot be before unlock date'
 
   test "renders due dates with locale-appropriate format string", ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR',
       'date.formats.short': '%-d %b'

@@ -1,4 +1,6 @@
 class CreateContextExternalTools < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_table :context_external_tools do |t|
       t.integer :context_id, :limit => 8

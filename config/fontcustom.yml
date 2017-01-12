@@ -6,10 +6,10 @@ force: false
 debug: false
 quiet: false
 input:
-  vectors: public/font/icons            
-  templates: public/font/icons
+  vectors: public/fonts/icons
+  templates: public/fonts/icons
 output:
-  fonts: public/font/canvas
+  fonts: public/fonts/canvas
   css: app/stylesheets/components
 templates: 
   - _canvas-icons.scss

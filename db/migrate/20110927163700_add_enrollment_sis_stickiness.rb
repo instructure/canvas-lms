@@ -1,4 +1,6 @@
 class AddEnrollmentSisStickiness < ActiveRecord::Migration
+  tag :predeploy
+
 
   def self.up
     add_column :enrollments, :stuck_sis_fields, :text

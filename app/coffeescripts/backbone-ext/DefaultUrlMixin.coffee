@@ -17,10 +17,9 @@ define [
   _contextPath: ->
     assetString = @contextAssetString || ENV.context_asset_string
     [contextType, contextId] = splitAssetString assetString
-    "#{contextType}/#{contextId}"
+    "#{encodeURIComponent(contextType)}/#{encodeURIComponent(contextId)}"
 
   _defaultUrl: ->
     resourceName = @resourceName || @model::resourceName
     throw new Error "Must define a `resourceName` property on collection or model prototype to use defaultUrl" unless resourceName
     "/api/v1/#{@_contextPath()}/#{resourceName}"
-

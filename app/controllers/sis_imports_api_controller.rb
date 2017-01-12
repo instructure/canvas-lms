@@ -31,8 +31,8 @@
 #           "type": "string"
 #         },
 #         "supplied_batches": {
-#           "description": "Which file were included in the SIS import",
-#           "example": "[\"term\", \"course\", \"section\", \"user\", \"enrollment\"]",
+#           "description": "Which files were included in the SIS import",
+#           "example": ["term", "course", "section", "user", "enrollment"],
 #           "type": "array",
 #           "items": { "type": "string" }
 #         },
@@ -91,6 +91,21 @@
 #         "grade_publishing_results": {
 #           "example": 0,
 #           "type": "integer"
+#         },
+#         "batch_courses_deleted": {
+#           "description": "the number of courses that were removed because they were not included in the batch for batch_mode imports. Only included if courses were deleted",
+#           "example": 11,
+#           "type": "integer"
+#         },
+#         "batch_sections_deleted": {
+#           "description": "the number of sections that were removed because they were not included in the batch for batch_mode imports. Only included if sections were deleted",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "batch_enrollments_deleted": {
+#           "description": "the number of enrollments that were removed because they were not included in the batch for batch_mode imports. Only included if enrollments were deleted",
+#           "example": 150,
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -121,12 +136,14 @@
 #           "type": "datetime"
 #         },
 #         "workflow_state": {
-#           "description": "The current state of the SIS import. - 'created': The SIS import has been created.\n - 'importing': The SIS import is currently processing.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.",
+#           "description": "The current state of the SIS import. - 'created': The SIS import has been created.\n - 'importing': The SIS import is currently processing.\n - 'cleanup_batch': The SIS import is currently cleaning up courses, sections, and enrollments not included in the batch for batch_mode imports.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.",
 #           "example": "imported",
 #           "type": "string",
 #           "allowableValues": {
 #             "values": [
 #               "created",
+#               "importing",
+#               "cleanup_batch",
 #               "imported",
 #               "imported_with_messages",
 #               "failed_with_messages",
@@ -139,24 +156,26 @@
 #           "$ref": "SisImportData"
 #         },
 #         "progress": {
-#           "description": "The progress of the SIS import.",
+#           "description": "The progress of the SIS import. The progress will reset when using batch_mode and have a different progress for the cleanup stage",
 #           "example": "100",
 #           "type": "string"
 #         },
 #         "processing_warnings": {
 #           "description": "Only imports that are complete will get this data. An array of CSV_file/warning_message pairs.",
-#           "example": "[['students.csv','user John Doe has already claimed john_doe's requested login information, skipping'], ...]",
+#           "example": [["students.csv","user John Doe has already claimed john_doe's requested login information, skipping"]],
 #           "type": "array",
 #           "items": {
-#             "type": "string"
+#             "type": "array",
+#             "items": {"type": "string"}
 #           }
 #         },
 #         "processing_errors": {
 #           "description": "An array of CSV_file/error_message pairs.",
-#           "example": "[['students.csv','Error while importing CSV. Please contact support.'], ...]",
+#           "example": [["students.csv","Error while importing CSV. Please contact support."]],
 #           "type": "array",
 #           "items": {
-#             "type": "string"
+#             "type": "array",
+#             "items": {"type": "string"}
 #           }
 #         },
 #         "batch_mode": {
@@ -202,8 +221,8 @@ class SisImportsApiController < ApplicationController
   before_filter :check_account
 
   def check_account
-    raise "SIS imports can only be executed on root accounts" unless @account.root_account?
-    raise "SIS imports can only be executed on enabled accounts" unless @account.allow_sis_import
+    return render json: {errors: ["SIS imports can only be executed on root accounts"]}, status: :bad_request unless @account.root_account?
+    return render json: {errors: ["SIS imports are not enabled for this account"]}, status: :forbidden unless @account.allow_sis_import
   end
 
   # @API Get SIS import list
@@ -219,12 +238,12 @@ class SisImportsApiController < ApplicationController
   #
   # @returns [SisImport]
   def index
-    if authorized_action(@account, @current_user, :manage_sis)
+    if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       scope = @account.sis_batches.order('created_at DESC')
-      if created_since = CanvasTime.try_parse(params[:created_since])
+      if (created_since = CanvasTime.try_parse(params[:created_since]))
         scope = scope.where("created_at > ?", created_since)
       end
-      @batches = Api.paginate(scope, self, url_for({action: :index, controller: :sis_imports_api}))
+      @batches = Api.paginate(scope, self, api_v1_account_sis_imports_url)
       render :json => ({ sis_imports: @batches})
     end
   end
@@ -321,7 +340,7 @@ class SisImportsApiController < ApplicationController
   #
   # @returns SisImport
   def create
-    if authorized_action(@account, @current_user, :manage_sis)
+    if authorized_action(@account, @current_user, :import_sis)
       params[:import_type] ||= 'instructure_csv'
       raise "invalid import type parameter" unless SisBatch.valid_import_types.has_key?(params[:import_type])
 
@@ -414,7 +433,7 @@ class SisImportsApiController < ApplicationController
   #
   # @returns SisImport
   def show
-    if authorized_action(@account, @current_user, :manage_sis)
+    if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       @batch = SisBatch.find(params[:id])
       raise "Sis Import not found" unless @batch
       raise "Batch does not match account" unless @batch.account.id == @account.id

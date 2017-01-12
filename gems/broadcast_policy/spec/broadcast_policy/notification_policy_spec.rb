@@ -10,6 +10,7 @@ describe BroadcastPolicy::NotificationPolicy do
   end
 
   let(:test_notification) { double(:test_notification) }
+  let(:test_connection_class) { Class.new { def after_transaction_commit; yield; end } }
 
   before(:each) do
     BroadcastPolicy.notifier = MockNotifier.new
@@ -17,7 +18,7 @@ describe BroadcastPolicy::NotificationPolicy do
   end
 
   it "should call the notifier" do
-    record = double('test record', skip_broadcasts: false)
+    record = double('test record', skip_broadcasts: false, class: double(connection: test_connection_class.new))
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages.count).to eq(1)
   end
@@ -30,29 +31,29 @@ describe BroadcastPolicy::NotificationPolicy do
 
   it "should not send if conditions are not met" do
     record = double('test object', skip_broadcasts: false)
-    subject.whenever = ->(r) { false }
+    subject.whenever = ->(_) { false }
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to be_empty
   end
 
   it "should not send if there is not a recipient list" do
-    record = double('test object', skip_broadcasts: false)
-    subject.to = ->(r) { nil }
+    record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
+    subject.to = ->(_) { nil }
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to be_empty
   end
 
-  it "should not send if there isn't a proper context" do
-    record = double('test object', skip_broadcasts: false)
-    subject.context = ->(r) { raise Error.new }
+  it "should send even if there isn't a context" do
+    record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
+    subject.context = ->(_) { nil }
     subject.broadcast(record)
-    expect(BroadcastPolicy.notifier.messages).to be_empty
+    expect(BroadcastPolicy.notifier.messages).to_not be_empty
   end
 
-  it "should not send if there isn't proper data" do
-    record = double('test object', skip_broadcasts: false)
-    subject.data = ->(r) { raise Error.new }
+  it "should send even if there isn't data" do
+    record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
+    subject.data = ->(_) { nil }
     subject.broadcast(record)
-    expect(BroadcastPolicy.notifier.messages).to be_empty
+    expect(BroadcastPolicy.notifier.messages).to_not be_empty
   end
-end 
+end

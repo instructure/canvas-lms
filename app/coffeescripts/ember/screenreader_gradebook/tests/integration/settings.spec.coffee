@@ -9,10 +9,9 @@ define [
 
   App = null
 
-  fixtures.create()
-
   module 'global settings',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')
@@ -58,4 +57,3 @@ define [
       click("#concluded_enrollments").then =>
         enrollments = @controller.get('enrollments')
         ok enrollments.content.length > 1
-

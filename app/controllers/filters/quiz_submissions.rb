@@ -23,13 +23,17 @@ module Filters::QuizSubmissions
     @quiz = @quiz.overridden_for(@current_user)
   end
 
-  def require_quiz_submission
+  def require_quiz_submission(active: false)
     query = {}
     scope = @quiz ? @quiz.quiz_submissions : Quizzes::QuizSubmission
     id = if params.has_key?(:quiz_submission_id)
       params[:quiz_submission_id]
     else
       params[:id]
+    end
+
+    if active
+      scope = scope.not_settings_only
     end
 
     if id.to_s == 'self'
@@ -39,11 +43,16 @@ module Filters::QuizSubmissions
     end
 
     unless @quiz_submission = scope.where(query).first
+      # TODO: Should be a 404 Not Found, not a 500 error
       raise ActiveRecord::RecordNotFound.new('Quiz Submission not found')
     end
 
     @quiz_submission.ensure_question_reference_integrity!
     @quiz_submission
+  end
+
+  def require_active_quiz_submission
+    require_quiz_submission(active: true)
   end
 
   def retrieve_quiz_submission_attempt!(attempt)

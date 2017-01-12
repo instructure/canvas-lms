@@ -5,7 +5,7 @@
   position:absolute;
   z-index:$zindexTooltip;
   display: block;
-  font-size: 11px;
+  @include fontSize(11px);
   max-width: 200px;
   padding: 3px 8px;
   color: $fcTooltip;
@@ -67,8 +67,4 @@
   &.top.horizontal:before {
     top: 5px;
   }
-}
-
-.ie .ui-tooltip:before {
-  border: none;
 }

@@ -1,7 +1,6 @@
 // PUTTING STUFF IN THIS FILE IS CONSIDERED BAD!
-// you should put it in it's own css file named after
+// you should put it in its own css file named after
 // the React Component you're using it in.
-
 
 $ef-thumbnail-size: 36px;
 
@@ -12,26 +11,92 @@ $ef-thumbnail-size: 36px;
   }
 }
 
+body.files {
+  #content { padding-top: 0; }
+  @if $use_new_styles {
+    .ic-app-nav-toggle-and-crumbs {
+      /* display: none; */
+      &.ic-app-nav-toggle-and-crumbs--files { display: flex; }
+    }
+  }
+}
 
+.ic-app-nav-toggle-and-crumbs.ic-app-nav-toggle-and-crumbs--files {
+  margin-left: 0; margin-right: 0;
+}
 
-.ef-main-buttons{
+// hides the course menu hamburger in the personal files breadcrumb
+body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
+  > .ic-app-course-nav-toggle {
+    display: none;
+  }
+}
+
+.ef-main-buttons {
   .ui-buttonset, .ui-button {
     display: inline-block;
   }
 }
 
-.ef-header{
-  padding: $ic-content-padding $ic-content-padding 8px;
-  border-bottom: 1px solid $ic-border-color;
-  > * {
-    display: block;
-    margin-bottom: 0
+.ef-header {
+  @if $use_new_styles {
+    padding: $ic-sp*2 0 $ic-sp;
+    border-bottom: 1px solid $ic-border-light;
   }
-  input[type='search'] {
-    box-sizing: border-box;
-    width: 100%;
-    height: auto;
+  @else {
+    padding: $ic-sp;
+    border-bottom: 1px solid $ic-border-color;
   }
+  @include breakpoint(desktop) {
+    display: flex;
+    align-items: center;
+  }
+  .ui-buttonset {
+    margin: 0;
+  }
+  & .ui-button:first-child {
+    border-top-left-radius: $borderRadius;
+    border-bottom-left-radius: $borderRadius;
+  }
+  & .ui-button:last-child {
+    border-top-right-radius: $borderRadius;
+    border-bottom-right-radius: $borderRadius;
+  }
+}
+
+.ef-search-form {
+  margin-bottom: $ic-sp/2;
+  @include breakpoint(desktop) {
+    margin-bottom: 0;
+    flex: 0 0 $ic-sp*31;
+    &.ef-search-form--showing-buttons {
+      @if $use_new_styles { flex: 0 0 $ic-sp*19; }
+      @else { flex: 0 0 $ic-sp*20; }
+    }
+  }
+}
+
+.ef-selected-count {
+  @include fontSize($ic-font-size--xsmall);
+  font-style: italic;
+  white-space: nowrap;
+  padding-left: $ic-sp;
+}
+
+.ef-header__secondary {
+  display: flex;
+  align-items: center;
+  @include breakpoint(desktop) {
+    flex: 1;
+    margin-left: $ic-sp;
+  }
+}
+
+.ef-actions {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  > * { margin-left: $ic-sp/3; }
 }
 
 .ef-main{
@@ -39,14 +104,30 @@ $ef-thumbnail-size: 36px;
   display: flex;
 
   .ef-folder-content{
-    border-right: 1px solid $ic-border-color;
     display: flex;
     flex-direction: column;
-    flex: 1 1 0;
+    flex: 1 1 0%;
     padding: 0px;
+    @if $use_new_styles { border-right: 1px solid $ic-border-light; }
+    @else { border-right: 1px solid $ic-border-color; }
+    overflow-x: auto;
 
     .tree {
-      margin: 10px
+      margin: 10px;
+      @include fontSize($ic-font-size);
+      li {
+        a {
+          display: flex;
+          align-items: center; // so icons et all, align vertically
+          padding: 2px;
+          i {
+            flex: 0 0 auto;
+          }
+          span {
+            flex: 1 1 auto;
+          }
+        }
+      }
     }
 
     [aria-selected=true] > .ef-folder-header{
@@ -55,8 +136,14 @@ $ef-thumbnail-size: 36px;
     }
 
     .ef-folder-header{
-      padding-top: 5px;
-      padding-bottom: 5px;
+      @if $use_new_styles {
+        padding-top: $ic-sp/3;
+        padding-bottom: $ic-sp/3;
+      }
+      @else {
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
 
       &:hover{
         background-color: #f2f2f2;
@@ -65,7 +152,7 @@ $ef-thumbnail-size: 36px;
 
     .ef-folder-list{
       flex: 10 10 0;
-      font-size: 12px;
+      @include fontSize($ic-font-size--xsmall);
       overflow: auto;
     }
 
@@ -75,7 +162,7 @@ $ef-thumbnail-size: 36px;
       justify-content: flex-start;
       flex: 1 1 0;
       height: 30px;
-      font-size: 16px;
+      @include fontSize($ic-font-size--medium);
       border-top: 1px solid $ic-border-color;
       padding-left: 20px;
     }
@@ -85,41 +172,58 @@ $ef-thumbnail-size: 36px;
   position: relative;
   margin: 10px;
   flex: 3;
+  // long file names cause this container, of all things, to expand unreasonably even after they get elided. Work
+  // around that for the moment with this.
+  max-width: 75%;
   display: flex;
   flex-direction: column;
 
 }
 .ef-directory-header{
   display: flex;
-  padding: 5px;
-  border-bottom: 1px solid $ic-border-color;
   align-items: center;
+  @if $use_new_styles {
+    border-bottom: 1px solid $ic-border-light;
+    padding: $ic-sp/3;
+  }
+  @else {
+    border-bottom: 1px solid $ic-border-color;
+    padding: 5px;
+  }
 }
 
 .ef-plain-link, .ef-plain-link:hover { color: $ic-font-color-dark; }
-
 
 .ef-item-row{
   display: flex;
   padding: 5px;
   user-select: none; /* so that we can shift-click to select */
   margin-bottom: 1px;
-  border-radius: 3px;
   line-height: $ef-thumbnail-size;
   box-sizing: border-box;
   @if $use_high_contrast { border: 1px solid transparent; }
-  
+
   // :hover style needs to be before 'selected' so item that is both hovered and selected gets selected color
   &:hover {
-    @if $use_high_contrast { 
+    @if $use_high_contrast {
       border-color: $ic-color-dark;
       border-style: dotted;
     }
     @else { background-color: $ic-bg-light-primary; }
   }
-  &.ef-item-selected { 
-    @if $use_high_contrast { border-color: $ic-brand-primary; }
-    @else { background-color: darken($ic-bg-light-primary, 4%); } 
+  &.ef-item-selected {
+    background-color: $ic-bg-light-primary;
+    position: relative;
+    &::before {
+      // adds blue border
+      content: '';
+      position: absolute;
+      left: 0;
+      top:0;
+      width: 4px;
+      height: 100%;
+      background: $ic-brand-primary;
+    }
   }
 
   .al-trigger { opacity: 0 }
@@ -141,7 +245,7 @@ $ef-thumbnail-size: 36px;
 
 .ef-big-icon {
   width: $ef-thumbnail-size !important;
-  color: $ic-font-color-dark;
+  color: $ic-color-dark;
   &:before {
     font-size: $ef-thumbnail-size - 7px !important;
   }
@@ -192,7 +296,7 @@ $ef-thumbnail-size: 36px;
 
 .ef-links-col{
   display: flex;
-  flex: 0 0 63px;
+  flex: 2 0 63px;
 }
 
 .ef-thumbnail {
@@ -223,35 +327,12 @@ $ef-thumbnail-size: 36px;
   }
 }
 
-
 .file-rename-form__form-label {
   float: left;
   margin-top: 5px;
   padding-right: 5px;
 }
 
-.progress-bar__bar-container {
-  height: 9px;
-  margin-bottom: 12px;
-  border: solid $ic-brand-primary 1px;
-  border-radius: 20px;
-  margin-top: 10px;
-
-  &.almost-done {
-    border: solid $ic-color-success 1px;
-  }
-}
-.progress-bar__bar {
-  position: relative;
-  background: $ic-brand-primary;
-  border: none;
-  height: 9px;
-  border-radius: 20px;
-
-  &.almost-done {
-    background: $ic-color-success;
-  }
-}
 .current_uploads {
   border-radius: 10px;
   border: dashed $ic-color-neutral 2px;
@@ -297,7 +378,9 @@ $ef-thumbnail-size: 36px;
 
 // Hack, Hack, Hack!
 // to make sure that there is space for the ItemCog menu to appear below the bottom thing in the list of files
-#footer { min-height: 80px }
+@if $use_new_styles == false {
+  #footer { min-height: 80px }
+}
 
 .form-controls {
   .btn {

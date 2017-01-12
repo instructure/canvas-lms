@@ -134,6 +134,7 @@ define [
     teardown: ->
       @clock.restore()
       @el.remove()
+      $(".customListGhost").remove()
 
   test 'should open and close', ->
     @list.close()
@@ -195,4 +196,3 @@ define [
 #    @list.reset()
 #    length = @list.targetList.children().length
 #    equal length, originalLength, 'targetList items restored'
-

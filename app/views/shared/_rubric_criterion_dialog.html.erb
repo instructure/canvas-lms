@@ -4,8 +4,8 @@
   <div class="editing">
     <textarea class="long_description" aria-label="<%= t 'labels.long_description', "Long Description" %>" name="long_description" style="width: 370px;"></textarea>
     <div class="button-container">
-      <button type="button" class="btn save_button"><%= t 'buttons.update_description', "Update Description" %></button>
       <button type="button" class="btn btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+      <button type="button" class="btn save_button"><%= t 'buttons.update_description', "Update Description" %></button>
     </div>
   </div>
   <div class="displaying">
@@ -23,14 +23,14 @@
     <label for="criterion_comments_textarea">
       <%= before_label :additional_comments, "Additional Comments" %>
     </label>
-    <textarea 
+    <textarea
       id="criterion_comments_textarea"
       class="criterion_comments"
       name="criterion_comments"
       style="width: 370px;"></textarea>
     <div class="button-container">
-      <button type="button" class="btn save_button"><%= t 'buttons.update_comments', "Update Comments" %></button>
       <button type="button" class="btn btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+      <button type="button" class="btn save_button"><%= t 'buttons.update_comments', "Update Comments" %></button>
     </div>
   </div>
   <div class="displaying">

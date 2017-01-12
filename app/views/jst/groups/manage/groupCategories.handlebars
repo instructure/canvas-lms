@@ -1,11 +1,14 @@
 <h1 class="screenreader-only">{{#t 'headings.groups'}}Groups{{/t}}</h1>
-
 <div class='empty-groupset-instructions'>
-  <div class='pull-right group-categories-actions'>
-    <button id='add-group-set' class='btn btn-primary' title="{{#t 'add_group_set'}}Add Group Set{{/t}}"><i class='icon-plus'></i> {{#t 'group_set'}}Group Set{{/t}}</button>
-  </div>
   {{#ifEqual ENV.group_user_type "student"}}
-    <h2>{{#t 'headings.course_groups'}}Student Groups{{/t}}</h2>
+  <div class='ic-Action-header'>
+    <div class='ic-Action-header__Primary'>
+      <h2>{{#t 'headings.course_groups'}}Student Groups{{/t}}</h2>
+    </div>
+    <div class='ic-Action-header__Secondary'>
+      <button id='add-group-set' class='btn btn-primary' title="{{#t 'add_group_set'}}Add Group Set{{/t}}"><i class='icon-plus'></i> {{#t 'group_set'}}Group Set{{/t}}</button>
+    </div>
+  </div>
     <p>
       {{#t 'course_group_explanation'}}
         Student groups are a useful way to organize students for things like group projects or
@@ -22,7 +25,14 @@
     {{/t}}
     </p>
   {{else}}
-    <h2>{{#t 'headings.account_groups'}}Account-level Student Groups{{/t}}</h2>
+  <div class='ic-Action-header'>
+    <div class='ic-Action-header__Primary'>
+      <h2>{{#t 'headings.account_groups'}}Account-level Student Groups{{/t}}</h2>
+    </div>
+    <div class='ic-Action-header__Secondary'>
+      <button id='add-group-set' class='btn btn-primary' title="{{#t 'add_group_set'}}Add Group Set{{/t}}"><i class='icon-plus'></i> {{#t 'group_set'}}Group Set{{/t}}</button>
+    </div>
+  </div>
     <p>{{#t 'account_group_explanation'}}
       Account-level student groups are a good way to group students without being
       tied to a specific course. Every student group gets their own calendar, discussion
@@ -32,11 +42,11 @@
     </p>
   {{/ifEqual}}
 </div>
-<div style="display:none">
-  {{#if isCourse}}
-  <li class="static"><a href="/courses/{{context_id}}/users">{{#t 'tabs.everyone'}}Everyone{{/t}}</a></li>
-  {{/if}}
-</div>
+  <div style="display:none">
+    {{#if isCourse}}
+    <li class="static"><a href="/courses/{{context_id}}/users">{{#t 'tabs.everyone'}}Everyone{{/t}}</a></li>
+    {{/if}}
+  </div>
 <div id="group_categories_tabs" class="ui-tabs-minimal">
   <ul class='collectionViewItems'>
   </ul>

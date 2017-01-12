@@ -1,17 +1,19 @@
 <% if show_welcome_message? %>
-<div class="global-message image-block">
-  <div class="image-block-image">
-    <i class="information-icon"></i>
-    <span class="hidden-inline-text">
+<div class="ic-notification">
+  <div class="ic-notification__icon" role="presentation">
+    <i class="icon-info"></i>
+    <span class="screenreader-only">
       <%= accessible_message_icon_text("information") %>
     </span>
   </div>
-  <div class="image-block-content">
-    <div class="title">
-      <%= t('welcome_to_happiness', 'Welcome to Canvas!') %>
-    </div>
-    <div class="message">
-      <p><%= welcome_message %></p>
+  <div class="ic-notification__content">
+    <div class="ic-notification__message">
+      <h4 class="ic-notification__title">
+        <%= t('welcome_to_happiness', 'Welcome to Canvas!') %>
+      </h4>
+      <span class="notification_message">
+        <%= welcome_message %>
+      <span>
     </div>
   </div>
 </div>

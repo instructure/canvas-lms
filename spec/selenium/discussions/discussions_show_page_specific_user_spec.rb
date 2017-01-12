@@ -1,7 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_common')
 
 describe "discussions" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include DiscussionsCommon
 
   let(:course) { course_model.tap{|course| course.offer!} }
   let(:student) { student_in_course(course: course, name: 'student', active_all: true).user }
@@ -22,6 +23,14 @@ describe "discussions" do
   end
   let(:entry) { topic.discussion_entries.create!(user: teacher, message: 'teacher entry') }
 
+  let(:group) do
+    @category1 = course.group_categories.create!(name: "category 1")
+    @category1.configure_self_signup(true, false)
+    @category1.save!
+    @g1 = course.groups.create!(name: "some group", group_category: @category1)
+    @g1.save!
+  end
+
   context "on the show page" do
     let(:url) { "/courses/#{course.id}/discussion_topics/#{topic.id}/" }
 
@@ -32,14 +41,14 @@ describe "discussions" do
         user_session(student)
       end
 
-      it "should not show admin options in gear menu to students who've created a discussion" do
+      it "should not show admin options in gear menu to students who've created a discussion", priority: "1", test_id: 150472 do
         entry
         get url
         expect(f('.headerBar .admin-links')).not_to be_nil
         expect(f('.mark_all_as_read')).not_to be_nil
         #f('.mark_all_as_unread').should_not be_nil
-        expect(f('.delete_discussion')).to be_nil
-        expect(f('.discussion_locked_toggler')).to be_nil
+        expect(f("#content")).not_to contain_css('.delete_discussion')
+        expect(f("#content")).not_to contain_css('.discussion_locked_toggler')
       end
 
       it "should validate a group assignment discussion" do
@@ -50,7 +59,7 @@ describe "discussions" do
       context "teacher topic" do
         let(:topic) { teacher_topic }
 
-        it "should allow students to reply to a discussion even if they cannot create a topic" do
+        it "should allow students to reply to a discussion even if they cannot create a topic", priority: "2", test_id: 344535 do
           course.allow_student_discussion_topics = false
           course.save!
           get url
@@ -60,12 +69,14 @@ describe "discussions" do
           expect(f('#content')).to include_text(new_student_entry_text)
         end
 
-        it "should display the subscribe button after an initial post" do
+        it "should display the subscribe button after an initial post", priority: "1", test_id: 150484 do
           topic.unsubscribe(student)
           topic.require_initial_post = true
           topic.save!
 
           get url
+
+          wait_for_ajaximations
           expect(f('.topic-unsubscribe-button')).not_to be_displayed
           expect(f('.topic-subscribe-button')).not_to be_displayed
 
@@ -77,7 +88,7 @@ describe "discussions" do
           expect(f('.topic-unsubscribe-button')).to be_displayed
         end
 
-        it "should validate that a student can see it and reply to a discussion" do
+        it "should validate that a student can see it and reply to a discussion", priority: "1", test_id: 150475 do
           new_student_entry_text = 'new student entry'
           get url
           expect(f('.message_wrapper')).to include_text('teacher')
@@ -86,7 +97,7 @@ describe "discussions" do
           expect(f('#content')).to include_text(new_student_entry_text)
         end
 
-        it "should let students post to a post-first discussion" do
+        it "should let students post to a post-first discussion", priority: "1", test_id: 150476 do
           new_student_entry_text = 'new student entry'
           topic.require_initial_post = true
           topic.save
@@ -102,10 +113,60 @@ describe "discussions" do
           expect(entries[1]).to include_text(new_student_entry_text)
         end
 
-        it "should not show discussion creation time" do
+        it "should not show discussion creation time", priority: "2", test_id: 344536 do
           get url
-          expect(f("#discussion_topic time")).to be_nil
+          expect(f("#content")).not_to contain_css("#discussion_topic time")
         end
+
+        context "locked discussions" do
+          before :each do
+            topic.lock_at = 5.seconds.from_now
+            topic.save!
+          end
+
+          it "should not let students reply to a locked discussion", priority: "1", test_id: 150481 do
+            get url
+            expect(f('.discussion-reply-action')).to be_present
+            sleep(5.seconds)
+            refresh_page
+            expect(f('#discussion_container').text).to include('This topic was locked')
+            expect(f("#content")).not_to contain_css('.discussion-reply-action')
+          end
+
+          it "should not let students reply for a locked group discussion", priority: "1", test_id: 150482 do
+            group
+            @g1.add_user student
+            topic.group_category = @category1
+            topic.save!
+            get url
+            expect(f('.discussion-reply-action')).to be_present
+            sleep(5.seconds)
+            refresh_page
+            expect(f('#discussion_container').text).to include('This topic was locked')
+            expect(f("#content")).not_to contain_css('.discussion-reply-action')
+            topic.lock_at = nil
+            topic.save!
+            refresh_page
+            expect(f('.discussion-reply-action')).to be_present
+          end
+        end
+      end
+
+      it "should not show when users are inactive" do
+        other_student = student_in_course(course: course, name: 'student', active_all: true).user
+        topic.reply_from(:user => other_student, :text => "reply")
+
+        other_student.student_enrollments.each(&:deactivate)
+
+        get url
+        wait_for_ajaximations
+
+        expect(f(".discussion-entries .entry-header .discussion-title")).to_not include_text("inactive")
+
+        replace_content(f('#discussion-search'), 'reply')
+        wait_for_ajaximations
+
+        expect(f("#filterResults .entry-header .discussion-title")).to_not include_text("inactive")
       end
     end
 
@@ -117,8 +178,52 @@ describe "discussions" do
         user_session(teacher)
       end
 
+      it "should create a group discussion", priority: "1", test_id: 150473 do
+        group
+        get "/courses/#{course.id}/discussion_topics"
+        expect_new_page_load{f('#new-discussion-btn').click}
+        f('#discussion-title').send_keys('New Discussion')
+        type_in_tiny 'textarea[name=message]', 'Discussion topic message'
+        f('#has_group_category').click
+        drop_down = get_options('#assignment_group_category_id').map(&:text).map(&:strip)
+        expect(drop_down).to include('category 1')
+        click_option('#assignment_group_category_id', @category1.name)
+        expect_new_page_load {submit_form('.form-actions')}
+        expect(f('#discussion_container').text).to include("Since this is a group discussion,"\
+                                                  " each group has its own conversation for this topic."\
+                                                  " Here are the ones you have access to:\nsome group")
+      end
+
+      it "should create a graded discussion", priority: "1", test_id: 150477 do
+        assignment_group
+        get "/courses/#{course.id}/discussion_topics"
+        expect_new_page_load{f('#new-discussion-btn').click}
+        f('#discussion-title').send_keys('New Discussion')
+        type_in_tiny 'textarea[name=message]', 'Discussion topic message'
+        expect(f('#availability_options')).to be_displayed
+        f('#use_for_grading').click
+        wait_for_ajaximations
+        expect(f('#availability_options')).to_not be_displayed
+        f('#discussion_topic_assignment_points_possible').send_keys('10')
+        wait_for_ajaximations
+        click_option('#assignment_group_id', assignment_group.name)
+        expect_new_page_load {submit_form('.form-actions')}
+        expect(f('#discussion_container').text).to include('This is a graded discussion: 10 points possible')
+      end
+
+      it "should show attachment", priority: "1", test_id: 150478 do
+        get "/courses/#{course.id}/discussion_topics"
+        expect_new_page_load{f('#new-discussion-btn').click}
+        filename, fullpath, _data = get_file("graded.png")
+        f('#discussion-title').send_keys('New Discussion')
+        f('input[name=attachment]').send_keys(fullpath)
+        type_in_tiny('textarea[name=message]', 'file attachment discussion')
+        expect_new_page_load {submit_form('.form-actions')}
+        expect(f('.image').text).to include(filename)
+      end
+
       describe "rubrics" do
-        it "should change points when used for grading" do
+        it "should change points when used for grading", priority: "1", test_id: 344537 do
           resize_screen_to_default
           get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}"
           wait_for_ajax_requests
@@ -132,7 +237,7 @@ describe "discussions" do
           new_points = get_value(".criterion_points")
           dialog = fj(".ui-dialog:visible")
 
-          keep_trying_until { expect(fj(".grading_rubric_checkbox:visible")).to be_displayed }
+          expect(fj(".grading_rubric_checkbox:visible")).to be_displayed
           set_value fj(".grading_rubric_checkbox:visible", dialog), true
 
           fj(".save_button:visible", dialog).click
@@ -148,21 +253,20 @@ describe "discussions" do
         end
       end
 
-      it "should escape correctly when posting an attachment" do
+      it "should escape correctly when posting an attachment", priority: "2", test_id: 344538 do
         get url
         message = "message that needs escaping ' \" & !@#^&*()$%{}[];: blah"
         add_reply(message, 'graded.png')
         expect(@last_entry.find_element(:css, '.message').text).to eq message
       end
 
-      it "should reply as a student and validate teacher can see reply" do
-        skip "figure out delayed jobs"
+      it "should reply as a student and validate teacher can see reply", priority: "1", test_id: 150479 do
         entry = topic.discussion_entries.create!(:user => student, :message => 'new entry from student')
         get url
         expect(f("#entry-#{entry.id}")).to include_text('new entry from student')
       end
 
-      it "should clear lock_at when manually triggering unlock" do
+      it "should clear lock_at when manually triggering unlock", priority: "1", test_id: 344539 do
         topic.delayed_post_at = 10.days.ago
         topic.lock_at         = 5.days.ago
         topic.locked          = true
@@ -180,7 +284,7 @@ describe "discussions" do
         expect(topic.locked?).to be_falsey
       end
 
-      it "should allow publishing and unpublishing from a topic's page" do
+      it "should allow publishing and unpublishing from a topic's page", priority: "1", test_id: 344540 do
         topic.workflow_state = 'unpublished'
         topic.save!
         expect(topic.published?).to be_falsey
@@ -195,19 +299,19 @@ describe "discussions" do
         expect(topic.published?).to be_falsey
       end
 
-      it "should edit a topic" do
+      it "should edit a topic", priority: "1", test_id: 150480 do
         edit_name = 'edited discussion name'
         get url
         expect_new_page_load { f(".edit-btn").click }
-
+        clear_content('input[name=title]')
         edit(edit_name, 'edit message')
       end
 
-      it "should validate closing the discussion for comments" do
+      it "should validate closing the discussion for comments", priority: "2", test_id: 344541 do
         get url
         f("#discussion-managebar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
-        expect(f('.discussion-fyi').text).to eq 'This topic is closed for comments'
+        expect(f('.discussion-fyi').text).to eq 'This topic is closed for comments.'
         expect(DiscussionTopic.last.locked?).to be_truthy
 
         expect(ff('.discussion-reply-action')).to_not be_empty # should let teachers reply
@@ -215,10 +319,10 @@ describe "discussions" do
         student_in_course(:course => @course, :active_all => true)
         user_session(@student)
         get url
-        expect(ff('.discussion-reply-action')).to be_empty
+        expect(f("#content")).not_to contain_css('.discussion-reply-action')
       end
 
-      it "should validate reopening the discussion for comments" do
+      it "should validate reopening the discussion for comments", priority: "2", test_id: 344542 do
         topic.lock!
         get url
         f("#discussion-managebar .al-trigger").click
@@ -228,7 +332,7 @@ describe "discussions" do
         expect(DiscussionTopic.last.locked?).to be_falsey
       end
 
-      it "should show discussion creation time" do
+      it "should show discussion creation time", priority: "2", test_id: 344543 do
         get url
         expect(f("#discussion_topic time")).not_to be_nil
       end
@@ -236,7 +340,7 @@ describe "discussions" do
       context "graded" do
         let(:topic) { assignment_topic }
 
-        it "should hide the speedgrader in large courses" do
+        it "should hide the speedgrader in large courses", priority: "2", test_id: 344544 do
           course.large_roster = true
           course.save!
           get url
@@ -247,16 +351,17 @@ describe "discussions" do
       end
 
       context "in student view" do
-        it "should allow student view student to read/post" do
+        it "should allow student view student to read/post", priority:"2", test_id: 344545 do
+          skip_if_chrome('Can not get to student view in Chrome')
           enter_student_view
           get url
-          expect(get_all_replies.count).to eq 0
+          expect(f("#content")).not_to contain_css("#discussion_subentries .discussion_entry")
           add_reply
           expect(get_all_replies.count).to eq 1
         end
 
         # note: this isn't desirable, but it's the way it is for this release
-        it "should show student view posts to teacher and other students" do
+        it "should show student view posts to teacher and other students", priority: "2", test_id: 344546 do
           fake_student = course.student_view_student
           entry = topic.reply_from(:user => fake_student, :text => 'i am a figment of your imagination')
           topic.create_materialized_view
@@ -265,6 +370,22 @@ describe "discussions" do
           wait_for_ajaximations
           expect(get_all_replies.first).to include_text fake_student.name
         end
+      end
+
+      it "should show when users are inactive" do
+        topic.reply_from(:user => student, :text => "reply")
+
+        student.student_enrollments.each(&:deactivate)
+
+        get url
+        wait_for_ajaximations
+
+        expect(f(".discussion-entries .entry-header .discussion-title")).to include_text("inactive")
+
+        replace_content(f('#discussion-search'), 'reply')
+        wait_for_ajaximations
+
+        expect(f("#filterResults .entry-header .discussion-title")).to include_text("inactive")
       end
     end
 

@@ -3,7 +3,7 @@
   add_crumb t("#crumbs.messages", "Messages")
 %>
 
-<% jammit_css :messages %>
+<% css_bundle :messages %>
 <% js_bundle  :messages %>
 
 <h1><%= t('titles.messages', 'Messages for %{name}', :name => @context.name) %></h1>

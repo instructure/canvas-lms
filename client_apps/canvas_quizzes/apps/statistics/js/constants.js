@@ -6,6 +6,7 @@ define({
     'id',
     'points_possible',
     'speed_grader_url',
+    'anonymous_survey',
     'quiz_submissions_zip_url',
   ],
 
@@ -26,6 +27,7 @@ define({
     'responses',
     'answers',
     'position',
+    'user_names',
 
     // multiple-choice & true/false
     'answered_student_count',
@@ -46,7 +48,7 @@ define({
 
     // Essay
     'full_credit',
-    'point_distribution',
+    'point_distribution'
   ],
 
   POINT_BISERIAL_ATTRS: [

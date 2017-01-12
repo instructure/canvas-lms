@@ -1,3 +1,5 @@
+require_dependency 'importers'
+
 module Importers
   class LearningOutcomeImporter < Importer
 
@@ -59,7 +61,7 @@ module Importers
           end
         else
           item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
-          item ||= context.created_learning_outcomes.new
+          item ||= context.created_learning_outcomes.temp_record
           item.context = context
         end
         item.migration_id = hash[:migration_id]
@@ -80,7 +82,7 @@ module Importers
 
         item.save!
 
-        migration.add_imported_item(item) if migration
+        migration.add_imported_item(item)
       else
         item = outcome
       end

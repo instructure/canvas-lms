@@ -10,7 +10,7 @@ define [
     fixDialogButtons: false
     title: I18n.t 'delete_dialog_title', 'Delete Wiki Page'
     width: 400
-    height: 160
+    height: 'auto'
 
   class WikiPageDeleteDialog extends DialogFormView
     setViewProperties: false

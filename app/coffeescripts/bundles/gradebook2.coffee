@@ -2,10 +2,11 @@ require [
   'jquery'
   'Backbone'
   'compiled/userSettings'
+  'compiled/gradebook2/ReactGradebook'
   'compiled/gradebook2/Gradebook'
   'compiled/views/gradebook/NavigationPillView'
   'compiled/views/gradebook/OutcomeGradebookView'
-], ($, Backbone, userSettings, Gradebook, NavigationPillView, OutcomeGradebookView) ->
+], ($, Backbone, userSettings, ReactGradebook, Gradebook, NavigationPillView, OutcomeGradebookView) ->
 
   class GradebookRouter extends Backbone.Router
     routes:
@@ -13,11 +14,19 @@ require [
       'tab-:viewName': 'tab'
 
     initialize: ->
-      @isLoaded      = false
+      @isLoaded = false
       @views = {}
-      @views.assignment = new Gradebook(ENV.GRADEBOOK_OPTIONS)
+      @gradebook_performance_enabled = ENV.GRADEBOOK_OPTIONS.gradebook_performance_enabled
+      @views.assignment = @gradebook()
+
       if ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled
         @views.outcome = @initOutcomes()
+
+    gradebook: ->
+      if @gradebook_performance_enabled
+        new ReactGradebook(ENV.GRADEBOOK_OPTIONS)
+      else
+        new Gradebook(ENV.GRADEBOOK_OPTIONS)
 
     initOutcomes: ->
       book = new OutcomeGradebookView(
@@ -38,7 +47,7 @@ require [
       @navigation.setActiveView(viewName) if @navigation
       $('.assignment-gradebook-container, .outcome-gradebook-container').addClass('hidden')
       $(".#{viewName}-gradebook-container").removeClass('hidden')
-      @views[viewName].onShow()
+      @views[viewName].onShow() unless @gradebook_performance_enabled
       userSettings.contextSet 'gradebook_tab', viewName
 
   @router = new GradebookRouter

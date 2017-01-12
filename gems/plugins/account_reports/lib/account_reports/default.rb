@@ -19,6 +19,9 @@
 module AccountReports
   module Default
 
+    # when adding new reports to this file make sure to add a migration to
+    # enable the new report for all accounts with DataFixup::AddNewDefaultReport
+
     def self.student_assignment_outcome_map_csv(account_report)
       OutcomeReports.new(account_report).student_assignment_outcome_map
     end
@@ -47,6 +50,10 @@ module AccountReports
       CourseReports.new(account_report).public_courses
     end
 
+    def self.course_storage_csv(account_report)
+      CourseReports.new(account_report).course_storage
+    end
+
     def self.unused_courses_csv(account_report)
       CourseReports.new(account_report).unused_courses
     end
@@ -67,5 +74,16 @@ module AccountReports
       StudentReports.new(account_report).last_user_access
     end
 
+    def self.last_enrollment_activity_csv(account_report)
+      StudentReports.new(account_report).last_enrollment_activity
+    end
+
+    def self.user_access_tokens_csv(account_report)
+      StudentReports.new(account_report).user_access_tokens
+    end
+
+    def self.lti_report_csv(account_report)
+      LtiReports.new(account_report).lti_report
+    end
   end
 end

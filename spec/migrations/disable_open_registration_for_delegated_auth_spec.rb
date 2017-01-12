@@ -27,9 +27,9 @@ describe 'DisableOpenRegistrationForDelegatedAuth' do
       @ldap_account = Account.create!
       @normal_account = Account.create!
       @all_accounts = [@cas_account, @saml_account, @ldap_account, @normal_account]
-      @cas_account.account_authorization_configs.create!(:auth_type => 'cas')
-      @saml_account.account_authorization_configs.create!(:auth_type => 'saml')
-      @ldap_account.account_authorization_configs.create!(:auth_type => 'ldap')
+      @cas_account.authentication_providers.create!(:auth_type => 'cas')
+      @saml_account.authentication_providers.create!(:auth_type => 'saml')
+      @ldap_account.authentication_providers.create!(:auth_type => 'ldap')
       @all_accounts.each do |account|
         # have to bypass the settings= logic for weeding these out since they don't
         # apply

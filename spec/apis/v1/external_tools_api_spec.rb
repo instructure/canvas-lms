@@ -25,6 +25,7 @@ describe ExternalToolsController, type: :request do
   describe "in a course" do
     before(:once) do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      @group = group_model(:context => @course)
     end
 
     it "should show an external tool" do
@@ -37,6 +38,10 @@ describe ExternalToolsController, type: :request do
 
     it "should return external tools" do
       index_call(@course)
+    end
+
+    it "should return filtered external tools" do
+      index_call_with_placment(@course, "collaboration")
     end
 
     it "should search for external tools by name" do
@@ -103,7 +108,7 @@ describe ExternalToolsController, type: :request do
           expect(code).to eq 401
         end
 
-        it "returns a service unavailible if redis isn't availiable" do
+        it "returns a service unavailable if redis isn't available" do
           Canvas.stubs(:redis_enabled?).returns(false)
           params = {id: tool.id.to_s}
           code = get_raw_sessionless_launch_url(@course, 'course', params)
@@ -196,12 +201,19 @@ describe ExternalToolsController, type: :request do
 
       end
     end
+
+    describe "in a group" do
+      it "should return course level external tools" do
+        group_index_call(@group)
+      end
+    end
   end
 
   describe "in an account" do
     before(:once) do
       account_admin_user(:active_all => true, :user => user_with_pseudonym)
       @account = @user.account
+      @group = group_model(:context => @account)
     end
 
     it "should show an external tool" do
@@ -268,6 +280,12 @@ describe ExternalToolsController, type: :request do
         end
       end
     end
+
+    describe "in a group" do
+      it "should return account level external tools" do
+        group_index_call(@group)
+      end
+    end
   end
 
 
@@ -286,6 +304,17 @@ describe ExternalToolsController, type: :request do
     assert_status(404)
   end
 
+  def group_index_call(group)
+    et = tool_with_everything(group.context)
+
+    json = api_call(:get, "/api/v1/groups/#{group.id}/external_tools?include_parents=true",
+                    {:controller => 'external_tools', :action => 'index', :format => 'json',
+                     :group_id => group.id.to_s, :include_parents => true})
+
+    expect(json.size).to eq 1
+    expect(HashDiff.diff(json.first, example_json(et))).to eq []
+  end
+
   def index_call(context, type="course")
     et = tool_with_everything(context)
 
@@ -295,6 +324,18 @@ describe ExternalToolsController, type: :request do
 
     expect(json.size).to eq 1
     expect(HashDiff.diff(json.first, example_json(et))).to eq []
+  end
+
+  def index_call_with_placment(context, placement, type="course")
+    tool_with_everything(context)
+    et_with_placement = tool_with_everything(context, {:placement => placement})
+
+    json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json",
+                    {:controller => 'external_tools', :action => 'index', :format => 'json', :placement => placement,
+                     :"#{type}_id" => context.id.to_s})
+
+    expect(json.size).to eq 1
+    expect(HashDiff.diff(json.first, example_json(et_with_placement))).to eq []
   end
 
   def search_call(context, type="course")
@@ -424,6 +465,7 @@ describe ExternalToolsController, type: :request do
     et.module_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
     et.quiz_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz menu", display_type: 'full_width', visibility: 'admins'}
     et.wiki_page_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki page menu", display_type: 'full_width', visibility: 'admins'}
+    et.context_external_tool_placements.new(:placement_type => opts[:placement]) if opts[:placement]
     et.save!
     et
   end
@@ -608,7 +650,9 @@ describe ExternalToolsController, type: :request do
           "selection_height"=>400,
           "selection_width"=>800},
      "link_selection"=>nil,
-     "assignment_selection"=>nil
+     "assignment_selection"=>nil,
+     "post_grades"=>nil,
+     "collaboration"=>nil
     }
   end
 end

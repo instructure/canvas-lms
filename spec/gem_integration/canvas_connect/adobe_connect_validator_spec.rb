@@ -28,7 +28,7 @@ describe Canvas::Plugins::Validators::AdobeConnectValidator do
   end
 
   it 'should error on missing keys' do
-    plugin_setting.expects(:errors).returns(stub(:add_to_base => true))
+    plugin_setting.expects(:errors).returns(stub(add: true))
     expect(subject.validate({:domain => 'example.com'}, plugin_setting)).to be_falsey
   end
 

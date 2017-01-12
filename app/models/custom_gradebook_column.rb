@@ -25,11 +25,9 @@ class CustomGradebookColumn < ActiveRecord::Base
 
   attr_accessible :title, :position, :teacher_notes, :hidden
 
-  EXPORTABLE_ATTRIBUTES = [:id, :title, :position, :workflow_state, :course_id, :created_at, :updated_at, :teacher_notes]
-  EXPORTABLE_ASSOCIATIONS = [:course, :custom_gradebook_column_data]
-
-  validates_presence_of :title
-  validates_length_of :title, :maximum => maximum_string_length,
+  validates :title, presence: true
+  validates :teacher_notes, inclusion: { in: [true, false], message: "teacher_notes must be true or false" }
+  validates :title, length: { maximum: maximum_string_length },
     :allow_nil => true
 
   workflow do
@@ -54,7 +52,7 @@ class CustomGradebookColumn < ActiveRecord::Base
                             "active"
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
     save!

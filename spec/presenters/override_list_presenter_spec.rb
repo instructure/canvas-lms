@@ -8,11 +8,11 @@ describe OverrideListPresenter do
     AssignmentOverrideApplicator.stubs(:assignment_overridden_for).
       with(assignment,nil).returns assignment
     assignment.stubs(:has_active_overrides?).returns true
-    Timecop.freeze(Time.local(2013,3,13,0,0))
   end
 
-  after { Timecop.return }
-
+  around do |example|
+    Timecop.freeze(Time.zone.local(2013,3,13,0,0), &example)
+  end
 
   let(:assignment) { Assignment.new :title => "Testing" }
   let(:user) { User.new :name => "Testing" }
@@ -170,7 +170,7 @@ describe OverrideListPresenter do
 
       before do
         assignment.stubs(:context).
-          returns stub(:active_course_sections => sections)
+          returns stub(:active_section_count => sections.count)
         assignment.stubs(:all_dates_visible_to).with(user).
           returns dates_visible_to_user
         @visible_due_dates = presenter.visible_due_dates
@@ -206,7 +206,7 @@ describe OverrideListPresenter do
 
       before do
         assignment.stubs(:context).
-          returns stub(:active_course_sections => sections)
+          returns stub(:active_section_count => sections.count)
         assignment.stubs(:all_dates_visible_to).with(user).
           returns dates_visible
         @visible_due_dates = presenter.visible_due_dates

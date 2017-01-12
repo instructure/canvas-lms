@@ -123,6 +123,15 @@
 #         "outcome": {
 #           "description": "an abbreviated Outcome object representing the outcome linked into the containing outcome group.",
 #           "$ref": "Outcome"
+#         },
+#         "assessed": {
+#           "description": "whether this outcome has been used to assess a student in the context of this outcome link.  In other words, this will be set to true if the context is a course, and a student has been assessed with this outcome in that course.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "can_unlink": {
+#           "description": "whether this outcome link is manageable and is not the last link to an aligned outcome",
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -189,9 +198,7 @@ class OutcomeGroupsApiController < ApplicationController
       outcome_params[:assessed_outcomes] = ret
     end
 
-    render json: links.map { |link|
-      outcome_link_json(link, @current_user, session, outcome_params)
-    }
+    render json: outcome_links_json(links, @current_user, session, outcome_params)
   end
 
   # @API Show an outcome group
@@ -314,6 +321,10 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # List the immediate OutcomeLink children of the outcome group. Paginated.
   #
+  # @argument outcome_style [Optional, String]
+  #   The detail level of the outcomes. Defaults to "abbrev".
+  #   Specify "full" for more information.
+  #
   # @returns [OutcomeLink]
   #
   def outcomes
@@ -333,11 +344,13 @@ class OutcomeGroupsApiController < ApplicationController
       link.context = @outcome_group.context
     end
 
+    outcome_params = params.slice(:outcome_style)
+
     # preload the links' outcomes' contexts.
-    ActiveRecord::Associations::Preloader.new(@links, :learning_outcome_content => :context).run
+    ActiveRecord::Associations::Preloader.new.preload(@links, :learning_outcome_content => :context)
 
     # render to json and serve
-    render :json => @links.map{ |link| outcome_link_json(link, @current_user, session) }
+    render :json => outcome_links_json(@links, @current_user, session, outcome_params)
   end
 
   # Intentionally undocumented in the API. Used by the UI to show a list of

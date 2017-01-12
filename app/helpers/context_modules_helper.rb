@@ -17,11 +17,10 @@
 #
 
 module ContextModulesHelper
-  def cache_if_module(context_module, editable, differentiated_assignments, user, context, &block)
+  def cache_if_module(context_module, editable, user, context, &block)
     if context_module
-      visible_assignments = (differentiated_assignments && user) ? user.assignment_and_quiz_visibilities(context) : []
-      cache_key_items = ['context_module_render_11_', context_module.cache_key, editable, true, Time.zone]
-      cache_key_items << Digest::MD5.hexdigest(visible_assignments.to_s) if differentiated_assignments
+      visible_assignments = user ? user.assignment_and_quiz_visibilities(context) : []
+      cache_key_items = ['context_module_render_16_', context_module.cache_key, editable, true, Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
       if user
         # Our per-section things also needs to be checked in the cache -
         # both user sections and course tags, both of which may change
@@ -44,11 +43,25 @@ module ContextModulesHelper
     cache_key
   end
 
+  def preload_can_unpublish(context, modules)
+    items = modules.map(&:content_tags).flatten.map(&:content)
+    asmnts = items.select{|item| item.is_a?(Assignment)}
+    topics = items.select{|item| item.is_a?(DiscussionTopic)}
+    quizzes = items.select{|item| item.is_a?(Quizzes::Quiz)}
+    wiki_pages = items.select{|item| item.is_a?(WikiPage)}
+
+    assmnt_ids_with_subs = Assignment.assignment_ids_with_submissions(context.assignments.pluck(:id))
+    Assignment.preload_can_unpublish(asmnts, assmnt_ids_with_subs)
+    DiscussionTopic.preload_can_unpublish(context, topics, assmnt_ids_with_subs)
+    Quizzes::Quiz.preload_can_unpublish(quizzes, assmnt_ids_with_subs)
+    WikiPage.preload_can_unpublish(context, wiki_pages)
+  end
+
   def module_item_publishable_id(item)
     if item.nil?
       ''
-    elsif (item.content_type_class == 'wiki_page')
-      "page_id:#{item.content.id}"
+    elsif (item.content_type == 'WikiPage')
+      item.content.url
     else
       (item.content && item.content.respond_to?(:published?) ? item.content.id : item.id)
     end
@@ -56,6 +69,10 @@ module ContextModulesHelper
 
   def module_item_publishable?(item)
     true
+  end
+
+  def prerequisite_list(prerequisites)
+    prerequisites.map {|p| p[:name]}.join(', ')
   end
 
   def module_item_unpublishable?(item)

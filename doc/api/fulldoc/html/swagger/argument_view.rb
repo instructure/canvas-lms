@@ -15,50 +15,26 @@ class ArgumentView < HashView
   end
 
   def parse_line(line)
-    clean_line = line.gsub(/\s+/m, " ")
-    name, remaining = clean_line.scan(/^([^\s]+)(.*)$/).first
-    name.strip! if @name
-    if remaining
-      type, desc = split_type_desc(remaining)
-      # type = format(type.strip.gsub('[', '').gsub(']', '')) if type
-      type.strip! if type
-      desc.strip! if desc
-    end
-    [clean_line, name, type, desc]
+    name, remaining = (line || "").split(/\s/, 2)
+    raise(ArgumentError, "param name missing:\n#{line}") unless name
+    name.strip!
+    type, desc = split_type_desc(remaining || "")
+    type.strip!
+    desc.strip!
+    [line, name, type, desc]
   end
 
-  # Atrocious use of regex to parse out type signatures such as:
-  # "[[Integer], Optional] The IDs of the override's target students."
   def split_type_desc(str)
-    type_desc_parts_to_pair(
-      str.strip.
-      # turn "] ," into "],"
-      gsub(/\]\s+,/, '],').
-      # put "|||" between type and desc
-      sub(/[^,] /){ |s| s[0] == ']' ? s[0] + '|||' : s }.
-      # split on "|||"
-      split('|||')
-    )
+    # This regex is impossible to read, basically we're splitting the string up
+    # into the first [bracketed] section, which might contain internal brackets,
+    # and then the rest of the string.
+    md = str.strip.match(%r{\A(\[[\w ,\[\]\|"]+\])?\s*(.+)?}m)
+    [md[1] || DEFAULT_TYPE, md[2] || DEFAULT_DESC]
   end
 
-  def type_desc_parts_to_pair(parts)
-    case parts.size
-    when 0 then [DEFAULT_TYPE, DEFAULT_DESC]
-    when 1 then
-      if parts.first.include?('[') and parts.first.include?(']')
-        [parts.first, DEFAULT_DESC]
-      else
-        [DEFAULT_TYPE, parts.first]
-      end
-    when 2 then
-      parts
-    else
-      raise "Too many parts while splitting type and description: #{parts.inspect}"
-    end
-  end
-
-  def name
-    format(@name.gsub('[]', ''))
+  def name(json: true)
+    name = json ? @name.gsub('[]', '') : @name
+    format(name)
   end
 
   def desc
@@ -102,7 +78,8 @@ class ArgumentView < HashView
   end
 
   def swagger_type
-    (types.first || 'string').downcase
+    type = (types.first || 'string')
+    builtin?(type) ? type.downcase : type
   end
 
   def swagger_format
@@ -132,7 +109,7 @@ class ArgumentView < HashView
   end
 
   def builtin?(type)
-    ["string", "integer"].include?(type)
+    ["string", "integer", "boolean", "number"].include?(type.downcase)
   end
 
   def to_swagger
@@ -165,5 +142,5 @@ class ArgumentView < HashView
       "types"    => types,
       "optional" => optional?,
     }
-  end    
+  end
 end

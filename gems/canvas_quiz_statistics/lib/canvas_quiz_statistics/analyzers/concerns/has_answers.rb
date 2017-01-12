@@ -58,6 +58,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
           end
         end
 
+        answer[:user_names] << response[:user_name]
         answer[:responses] += 1
       end
     end
@@ -95,7 +96,8 @@ module CanvasQuizStatistics::Analyzers::Concerns
         id: "#{id}",
         text: text.to_s,
         correct: correct,
-        responses: 0
+        responses: 0,
+        user_names: []
       }
     end
 

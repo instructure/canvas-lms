@@ -6,7 +6,7 @@ module Quizzes
     # quiz statistics.
     #
     # This is what you should pass to this serializer!!!
-    class Input < Struct.new(:quiz, :student_analysis, :item_analysis)
+    class Input < Struct.new(:quiz, :options, :student_analysis, :item_analysis)
       include ActiveModel::SerializerSupport
     end
 
@@ -18,7 +18,6 @@ module Quizzes
       # two entities, an id doesn't make much sense, but we'll use the id of the
       # StudentAnalysis when needed
       :id,
-
       :url,
       :html_url,
 
@@ -34,6 +33,7 @@ module Quizzes
       :includes_all_versions,
 
       :points_possible,
+      :anonymous_survey,
 
       :speed_grader_url,
       :quiz_submissions_zip_url,
@@ -130,6 +130,10 @@ module Quizzes
       quiz.points_possible
     end
 
+    def anonymous_survey
+      quiz.anonymous_survey?
+    end
+
     def speed_grader_url
       if show_speed_grader?
         speed_grader_course_gradebook_url(quiz.context, {
@@ -149,11 +153,11 @@ module Quizzes
     end
 
     def student_analysis_report
-      @student_analysis_report ||= object[:student_analysis].report.generate(false)
+      @student_analysis_report ||= object[:student_analysis].report.generate(false, object.options)
     end
 
     def item_analysis_report
-      @item_analysis_report ||= object[:item_analysis].report.generate(false)
+      @item_analysis_report ||= object[:item_analysis].report.generate(false, object.options)
     end
 
     def quiz

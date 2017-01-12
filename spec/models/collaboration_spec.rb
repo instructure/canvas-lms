@@ -20,14 +20,35 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Collaboration do
   context "collaboration_class" do
-    it "should by default not have any collaborations" do
-      expect(Collaboration.any_collaborations_configured?).to be_falsey
-      expect(Collaboration.collaboration_types).to eq []
+
+    describe ".any_collaborations_configured?" do
+      let(:context) {course}
+      it "should by default not have any collaborations" do
+        expect(Collaboration.any_collaborations_configured?(context)).to be_falsey
+        expect(Collaboration.collaboration_types).to eq []
+      end
+
+      it "returns true if an external tool with a collaboration placment exists" do
+        tool = context.context_external_tools.new(
+            name: "bob",
+            consumer_key: "bob",
+            shared_secret: "bob",
+            tool_id: 'some_tool',
+            privacy_level: 'public'
+        )
+        tool.url = "http://www.example.com/basic_lti"
+        tool.collaboration = {
+            :url => "http://#{HostUrl.default_host}/selection_test",
+            :selection_width => 400,
+            :selection_height => 400}
+        tool.save!
+        expect(Collaboration.any_collaborations_configured?(context)).to eq true
+      end
     end
 
     it "should allow google docs collaborations" do
       expect(Collaboration.collaboration_class('GoogleDocs')).to eql(nil)
-      plugin_setting = PluginSetting.new(:name => "google_docs", :settings => {})
+      plugin_setting = PluginSetting.new(:name => "google_drive", :settings => {})
       plugin_setting.save!
       expect(Collaboration.collaboration_class('GoogleDocs')).to eql(GoogleDocsCollaboration)
       plugin_setting.disabled = true
@@ -55,10 +76,9 @@ describe Collaboration do
       google_docs_collaboration_model
     end
 
-    it "should be able to parse the data stored as an Atom entry" do
+    it "should be able to parse the data stored as JSON" do
       ae = @collaboration.parse_data
-      expect(ae).to be_is_a(Atom::Entry)
-      expect(ae.title).to eql('Biology 100 Collaboration')
+      expect(ae['title']).to eql('Biology 100 Collaboration')
     end
 
     it "should be able to get the title from the data" do

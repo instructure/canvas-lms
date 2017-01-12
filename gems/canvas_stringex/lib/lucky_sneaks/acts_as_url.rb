@@ -7,21 +7,21 @@ module LuckySneaks
     module ClassMethods # :doc:
       # Creates a callback to automatically create an url-friendly representation
       # of the <tt>attribute</tt> argument. Example:
-      # 
+      #
       #   act_as_url :title
-      # 
+      #
       # will use the string contents of the <tt>title</tt> attribute
       # to create the permalink. <strong>Note:</strong> you can also use a non-database-backed
       # method to supply the string contents for the permalink. Just use that method's name
       # as the argument as you would an attribute.
-      # 
+      #
       # The default attribute <tt>acts_as_url</tt> uses to save the permalink is <tt>url</tt>
       # but this can be changed in the options hash. Available options are:
-      # 
+      #
       # <tt>:url_attribute</tt>:: The name of the attribute to use for storing the generated url string.
       #                           Default is <tt>:url</tt>
       # <tt>:scope</tt>:: The name of model attribute to scope unique urls to. There is no default here.
-      # <tt>:only_when_blank</tt>:: If true, the url generation will only happen when <tt>:url_attribute</tt> is 
+      # <tt>:only_when_blank</tt>:: If true, the url generation will only happen when <tt>:url_attribute</tt> is
       #                             blank. Default is false (meaning url generation will happen always)
       # <tt>:sync_url</tt>:: If set to true, the url field will be updated when changes are made to the
       #                      attribute it is based on. Default is false.
@@ -54,7 +54,7 @@ module LuckySneaks
       # Initialize the url fields for the records that need it. Designed for people who add
       # <tt>acts_as_url</tt> support once there's already development/production data they'd
       # like to keep around.
-      # 
+      #
       # Note: This method can get very expensive, very fast. If you're planning on using this
       # on a large selection, you will get much better results writing your own version with
       # using pagination.
@@ -80,7 +80,7 @@ module LuckySneaks
         conditions.first << " and #{self.class.scope_for_url} = ?"
         conditions << send(self.class.scope_for_url)
       end
-      url_owners = self.class.where(conditions).all
+      url_owners = self.class.where(conditions).to_a
       if url_owners.size > 0
         n = 1
         while url_owners.detect { |u| u.send(url_attribute) == "#{base_url}-#{n}" }

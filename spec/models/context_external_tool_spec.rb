@@ -35,20 +35,20 @@ describe ContextExternalTool do
       expect(@tool).not_to be_new_record
       expect(@tool.errors).to be_empty
     end
-    
+
     it "should validate with a url setting" do
       @tool = @course.context_external_tools.create(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
       expect(@tool).not_to be_new_record
       expect(@tool.errors).to be_empty
     end
-    
+
     it "should validate with a canvas lti extension url setting" do
       @tool = @course.context_external_tools.new(:name => "a", :consumer_key => '12345', :shared_secret => 'secret')
       @tool.editor_button = {
-        "icon_url"=>"http://www.example.com/favicon.ico", 
+        "icon_url"=>"http://www.example.com/favicon.ico",
         "text"=>"Example",
         "url"=>"http://www.example.com",
-        "selection_height"=>400, 
+        "selection_height"=>400,
         "selection_width"=>600
       }
       @tool.save
@@ -146,13 +146,13 @@ describe ContextExternalTool do
       @found_tool = ContextExternalTool.find_external_tool("http://google.com/is/cool", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
-    
+
     it "should match on a subdomain" do
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/is/cool", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
-    
+
     it "should not match on non-matching domains" do
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tool2 = @course.context_external_tools.create!(:name => "a", :domain => "www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -161,14 +161,14 @@ describe ContextExternalTool do
       @found_tool = ContextExternalTool.find_external_tool("http://sgoogle.com/is/cool", Course.find(@course.id))
       expect(@found_tool).to eql(nil)
     end
-    
+
     it "should not match on the closest matching domain" do
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tool2 = @course.context_external_tools.create!(:name => "a", :domain => "www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @found_tool = ContextExternalTool.find_external_tool("http://www.www.google.com/is/cool", Course.find(@course.id))
       expect(@found_tool).to eql(@tool2)
     end
-    
+
     it "should match on exact url" do
       @tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com/coolness", :consumer_key => '12345', :shared_secret => 'secret')
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/coolness", Course.find(@course.id))
@@ -209,7 +209,7 @@ describe ContextExternalTool do
       expect(ContextExternalTool.find_external_tool("http://google.com/is/cool", Course.find(@course.id))).to eql(@tool)
       expect(ContextExternalTool.find_external_tool("http://www.google.com/coolness", Course.find(@course.id))).to eql(@tool)
     end
-    
+
     it "should find the context's tool matching on url first" do
       @tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -220,7 +220,7 @@ describe ContextExternalTool do
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
-    
+
     it "should find the nearest account's tool matching on url if there are no url-matching context tools" do
       @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tool = @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -230,7 +230,7 @@ describe ContextExternalTool do
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
-    
+
     it "should find the root account's tool matching on url before matching by domain on the course" do
       @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @account.context_external_tools.create!(:name => "d", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -239,7 +239,7 @@ describe ContextExternalTool do
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
-    
+
     it "should find the context's tool matching on domain if no url-matching tools are found" do
       @tool = @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @account.context_external_tools.create!(:name => "d", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -247,72 +247,78 @@ describe ContextExternalTool do
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
-    
+
     it "should find the nearest account's tool matching on domain if no url-matching tools are found" do
       @tool = @account.context_external_tools.create!(:name => "c", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @root_account.context_external_tools.create!(:name => "e", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
-    
+
     it "should find the root account's tool matching on domain if no url-matching tools are found" do
       @tool = @root_account.context_external_tools.create!(:name => "e", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com/", Course.find(@course.id))
       expect(@found_tool).to eql(@tool)
     end
-    
-    it "should find the preferred tool if there are two matching-priority tools" do
-      @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @tool2 = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1.id)
-      expect(@found_tool).to eql(@tool1)
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool2.id)
-      expect(@found_tool).to eql(@tool2)
-      @tool1.destroy
-      @tool2.destroy
-      
-      @tool1 = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @tool2 = @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1.id)
-      expect(@found_tool).to eql(@tool1)
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool2.id)
-      expect(@found_tool).to eql(@tool2)
-    end
-    
-    it "should find the preferred tool even if there is a higher priority tool configured" do
-      @tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @preferred = @root_account.context_external_tools.create!(:name => "f", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
 
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
-      expect(@found_tool).to eql(@preferred)
-    end
-    
-    it "should not find the preferred tool if it is deleted" do
-      @preferred = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @preferred.destroy
-      @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @tool = @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @account.context_external_tools.create!(:name => "d", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @root_account.context_external_tools.create!(:name => "e", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @root_account.context_external_tools.create!(:name => "f", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
-      expect(@found_tool).to eql(@tool)
-    end
+    context 'preferred_tool_id' do
+      it "should find the preferred tool if there are two matching-priority tools" do
+        @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @tool2 = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1.id)
+        expect(@found_tool).to eql(@tool1)
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool2.id)
+        expect(@found_tool).to eql(@tool2)
+        @tool1.destroy
+        @tool2.destroy
 
-    it "should not return preferred tool outside of context chain" do
-      preferred = @root_account.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      expect(ContextExternalTool.find_external_tool("http://www.google.com", @course, preferred.id)).to eq preferred
-    end
+        @tool1 = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @tool2 = @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1.id)
+        expect(@found_tool).to eql(@tool1)
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool2.id)
+        expect(@found_tool).to eql(@tool2)
+      end
 
-    it "should not return preferred tool if url doesn't match" do
-      c1 = @course
-      c2 = course_model
-      preferred = c1.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      expect(ContextExternalTool.find_external_tool("http://example.com", c2, preferred.id)).to be_nil
-    end
+      it "should find the preferred tool even if there is a higher priority tool configured" do
+        @tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @preferred = @root_account.context_external_tools.create!(:name => "f", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
 
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
+        expect(@found_tool).to eql(@preferred)
+      end
+
+      it "should not find the preferred tool if it is deleted" do
+        @preferred = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @preferred.destroy
+        @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @tool = @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @account.context_external_tools.create!(:name => "d", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @root_account.context_external_tools.create!(:name => "e", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @root_account.context_external_tools.create!(:name => "f", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
+        expect(@found_tool).to eql(@tool)
+      end
+
+      it "should not return preferred tool outside of context chain" do
+        preferred = @root_account.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        expect(ContextExternalTool.find_external_tool("http://www.google.com", @course, preferred.id)).to eq preferred
+      end
+
+      it "should not return preferred tool if url doesn't match" do
+        c1 = @course
+        preferred = c1.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        expect(ContextExternalTool.find_external_tool("http://example.com", c1, preferred.id)).to be_nil
+      end
+
+      it "should return the preferred tool if the url is nil" do
+        c1 = @course
+        preferred = c1.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        expect(ContextExternalTool.find_external_tool(nil, c1, preferred.id)).to eq preferred
+      end
+    end
   end
-  
+
   describe "custom fields" do
     it "should parse custom_fields_string from a text field" do
       tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
@@ -323,7 +329,7 @@ describe ContextExternalTool do
       expect(tool.custom_fields['bT^@!#n_40']).to eq '123'
       expect(tool.custom_fields['c']).to eq nil
     end
-    
+
     it "should return custom_fields_string as a text-formatted field" do
       tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'a' => '123', 'b' => '456'})
       fields_string = tool.custom_fields_string
@@ -433,40 +439,11 @@ describe ContextExternalTool do
 
   end
 
-  describe "find_integration_for" do
-    it "should return nil if there are no matching integrations" do
-      at  = @account.context_external_tools.create!(name: 'at', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      ait = @account.context_external_tools.create!(name: 'ait', integration_type: 'other', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      ct  = @course.context_external_tools.create!(name: 'ct', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      cit = @course.context_external_tools.create!(name: 'cit', integration_type: 'other', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      integration = ContextExternalTool.find_integration_for(@course, 'testing')
-      expect(integration).to be_nil
-    end
-
-    it "should find the integration in the specified context" do
-      at  = @account.context_external_tools.create!(name: 'at', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      ait = @account.context_external_tools.create!(name: 'ait', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      ct  = @course.context_external_tools.create!(name: 'ct', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      cit = @course.context_external_tools.create!(name: 'cit', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      integration = ContextExternalTool.find_integration_for(@course, 'testing')
-      expect(integration.id).to eq cit.id
-    end
-
-    it "should find the integration in the nearest context" do
-      at  = @account.context_external_tools.create!(name: 'at', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      ait = @account.context_external_tools.create!(name: 'ait', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      rt  = @root_account.context_external_tools.create!(name: 'rt', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      rit = @root_account.context_external_tools.create!(name: 'rit', integration_type: 'testing', url: 'http://example.com', consumer_key: '12345', shared_secret: 'secret')
-      integration = ContextExternalTool.find_integration_for(@course, 'testing')
-      expect(integration.id).to eq ait.id
-    end
-  end
-  
   describe "infer_defaults" do
     def new_external_tool
       @root_account.context_external_tools.new(:name => "t", :consumer_key => '12345', :shared_secret => 'secret', :domain => "google.com")
     end
-    
+
     it "should require valid configuration for user navigation settings" do
       tool = new_external_tool
       tool.settings = {:user_navigation => {:bob => 'asfd'}}
@@ -476,7 +453,7 @@ describe ContextExternalTool do
       tool.save
       expect(tool.user_navigation).not_to be_nil
     end
-    
+
     it "should require valid configuration for course navigation settings" do
       tool = new_external_tool
       tool.settings = {:course_navigation => {:bob => 'asfd'}}
@@ -486,7 +463,7 @@ describe ContextExternalTool do
       tool.save
       expect(tool.course_navigation).not_to be_nil
     end
-    
+
     it "should require valid configuration for account navigation settings" do
       tool = new_external_tool
       tool.settings = {:account_navigation => {:bob => 'asfd'}}
@@ -496,7 +473,7 @@ describe ContextExternalTool do
       tool.save
       expect(tool.account_navigation).not_to be_nil
     end
-    
+
     it "should require valid configuration for resource selection settings" do
       tool = new_external_tool
       tool.settings = {:resource_selection => {:bob => 'asfd'}}
@@ -506,7 +483,7 @@ describe ContextExternalTool do
       tool.save
       expect(tool.resource_selection).not_to be_nil
     end
-    
+
     it "should require valid configuration for editor button settings" do
       tool = new_external_tool
       tool.settings = {:editor_button => {:bob => 'asfd'}}
@@ -519,7 +496,7 @@ describe ContextExternalTool do
       tool.save
       expect(tool.editor_button).not_to be_nil
     end
-    
+
     it "should set user_navigation if navigation configured" do
       tool = new_external_tool
       tool.settings = {:user_navigation => {:url => "http://www.example.com"}}
@@ -527,7 +504,7 @@ describe ContextExternalTool do
       tool.save
       expect(tool.has_placement?(:user_navigation)).to be_truthy
     end
-    
+
     it "should set course_navigation if navigation configured" do
       tool = new_external_tool
       tool.settings = {:course_navigation => {:url => "http://www.example.com"}}
@@ -713,8 +690,30 @@ describe ContextExternalTool do
       expect(url).to eql(ContextExternalTool.standardize_url("http://www.google.com/?b=2&a=1"))
       expect(url).to eql(ContextExternalTool.standardize_url("www.google.com/?b=2&a=1"))
     end
+
+    it 'handles underscores in the domain' do
+      url = ContextExternalTool.standardize_url("http://sub_underscore.google.com?a=1&b=2")
+      expect(url).to eql('http://sub_underscore.google.com/?a=1&b=2')
+    end
+
   end
-  
+
+  describe "default_label" do
+    append_before(:each) do
+      @tool = @root_account.context_external_tools.new(:consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com", :name => "tool name")
+    end
+
+    it "returns the default label if no language or name is specified" do
+      expect(@tool.default_label).to eq 'tool name'
+    end
+
+    it "returns the localized label if a locale is specified" do
+      @tool.settings = {:text => 'tool label', :url => "http://example.com", :text => 'course nav', :labels => {'en-US' => 'english nav'}}
+      @tool.save!
+      expect(@tool.default_label('en-US')).to eq 'english nav'
+    end
+  end
+
   describe "label_for" do
     append_before(:each) do
       @tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
@@ -724,19 +723,19 @@ describe ContextExternalTool do
       @tool.save!
       expect(@tool.label_for(nil)).to eq 'tool'
     end
-    
+
     it "should return the tool name if nothing is configured on the sent key" do
       @tool.settings = {:course_navigation => {:bob => 'asfd'}}
       @tool.save!
       expect(@tool.label_for(:course_navigation)).to eq 'tool'
     end
-    
+
     it "should return the tool's 'text' value if no key is sent" do
       @tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav'}}
       @tool.save!
       expect(@tool.label_for(nil)).to eq 'tool label'
     end
-    
+
     it "should return the tool's 'text' value if no 'text' value is set for the sent key" do
       @tool.settings = {:text => 'tool label', :course_navigation => {:bob => 'asdf'}}
       @tool.save!
@@ -748,27 +747,27 @@ describe ContextExternalTool do
       @tool.save!
       expect(@tool.label_for(:course_navigation, 'en')).to eq 'translated tool label'
     end
-    
+
     it "should return the setting's 'text' value for the sent key if available" do
       @tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav'}}
       @tool.save!
       expect(@tool.label_for(:course_navigation)).to eq 'course nav'
     end
-    
+
     it "should return the locale-specific label if specified and matching exactly" do
       @tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav', :labels => {'en-US' => 'english nav'}}}
       @tool.save!
       expect(@tool.label_for(:course_navigation, 'en-US')).to eq 'english nav'
       expect(@tool.label_for(:course_navigation, 'es')).to eq 'course nav'
     end
-    
+
     it "should return the locale-specific label if specified and matching based on general locale" do
       @tool.settings = {:text => 'tool label', :course_navigation => {:url => "http://example.com", :text => 'course nav', :labels => {'en' => 'english nav'}}}
       @tool.save!
       expect(@tool.label_for(:course_navigation, 'en-US')).to eq 'english nav'
     end
   end
-  
+
   describe "find_for" do
     before :once do
       course_model
@@ -777,7 +776,7 @@ describe ContextExternalTool do
     def new_external_tool(context)
       context.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "google.com")
     end
-    
+
     it "should find the tool if it's attached to the course" do
       tool = new_external_tool @course
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
@@ -785,7 +784,7 @@ describe ContextExternalTool do
       expect(ContextExternalTool.find_for(tool.id, @course, :course_navigation)).to eq tool
       expect { ContextExternalTool.find_for(tool.id, @course, :user_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
-    
+
     it "should find the tool if it's attached to the course's account" do
       tool = new_external_tool @course.account
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
@@ -793,7 +792,7 @@ describe ContextExternalTool do
       expect(ContextExternalTool.find_for(tool.id, @course, :course_navigation)).to eq tool
       expect { ContextExternalTool.find_for(tool.id, @course, :user_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
-    
+
     it "should find the tool if it's attached to the course's root account" do
       tool = new_external_tool @course.root_account
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
@@ -801,7 +800,7 @@ describe ContextExternalTool do
       expect(ContextExternalTool.find_for(tool.id, @course, :course_navigation)).to eq tool
       expect { ContextExternalTool.find_for(tool.id, @course, :user_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
-    
+
     it "should not find the tool if it's attached to a sub-account" do
       @account = @course.account.sub_accounts.create!(:name => "sub-account")
       tool = new_external_tool @account
@@ -809,7 +808,7 @@ describe ContextExternalTool do
       tool.save!
       expect { ContextExternalTool.find_for(tool.id, @course, :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
-    
+
     it "should not find the tool if it's attached to another course" do
       @course2 = @course
       @course = course_model
@@ -818,7 +817,7 @@ describe ContextExternalTool do
       tool.save!
       expect { ContextExternalTool.find_for(tool.id, @course, :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
-    
+
     it "should not find the tool if it's not enabled for the correct navigation type" do
       tool = new_external_tool @course
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
@@ -848,6 +847,16 @@ describe ContextExternalTool do
       @course.reload
       expect(@course.lti_context_id).to eq 'dummy_context_id'
     end
+
+    it 'should use the global_asset_id for new assets that are stored in the db' do
+      expect(@course.lti_context_id).to eq nil
+      @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      context_id = Lti::Asset.global_context_id_for(@course)
+      @tool.opaque_identifier_for(@course)
+      @course.reload
+      expect(@course.lti_context_id).to eq context_id
+    end
+
   end
 
   describe "global navigation" do
@@ -950,6 +959,93 @@ describe ContextExternalTool do
         tool.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
         tool.save!
         expect(tool.has_placement?(:link_selection)).to eq false
+      end
+
+    end
+
+    describe ".find_tool_for_assignment" do
+
+      let(:tool) do
+        @course.context_external_tools.create(
+            name: "a",
+            consumer_key: '12345',
+            shared_secret: 'secret',
+            url: 'http://example.com/launch'
+        )
+      end
+
+      it 'finds the tool from an assignment' do
+        a = @course.assignments.create!(title: "test",
+                                        submission_types: 'external_tool',
+                                        external_tool_tag_attributes: {url: tool.url})
+        expect(described_class.tool_for_assignment(a)).to eq tool
+      end
+
+      it 'returns nil if there is no content tag' do
+        a = @course.assignments.create!(title: "test",
+                                        submission_types: 'external_tool')
+        expect(described_class.tool_for_assignment(a)).to be_nil
+      end
+
+    end
+
+    describe ".visible?" do
+      let(:u) {user}
+      let(:admin) {account_admin_user(account:c.root_account)}
+      let(:c) {course(active_course:true)}
+      let(:student) do
+        student = factory_with_protected_attributes(User, valid_user_attributes)
+        e = c.enroll_student(student)
+        e.invite
+        e.accept
+        student
+      end
+      let(:teacher) do
+        teacher = factory_with_protected_attributes(User, valid_user_attributes)
+        e = c.enroll_teacher(teacher)
+        e.invite
+        e.accept
+        teacher
+      end
+
+      it 'returns true for public visibility' do
+        expect(described_class.visible?('public', u, c)).to be true
+      end
+
+      it 'returns false for non members if visibility is members' do
+        expect(described_class.visible?('members', u, c)).to be false
+      end
+
+      it 'returns true for members visibility if a student in the course' do
+        expect(described_class.visible?('members', student, c)).to be true
+      end
+
+      it 'returns true for members visibility if a teacher in the course' do
+        expect(described_class.visible?('members', teacher, c)).to be true
+      end
+
+      it 'returns true for admins visibility if a teacher' do
+        expect(described_class.visible?('admins', teacher, c)).to be true
+      end
+
+      it 'returns true for admins visibility if an admin' do
+        expect(described_class.visible?('admins', admin, c)).to be true
+      end
+
+      it 'returns false for admins visibility if a student' do
+        expect(described_class.visible?('admins', student, c)).to be false
+      end
+
+      it 'returns false for admins visibility if a non member user' do
+        expect(described_class.visible?('admins', u, c)).to be false
+      end
+
+      it 'returns true if visibility is invalid' do
+        expect(described_class.visible?('true', u, c)).to be true
+      end
+
+      it 'returns true if visibility is nil' do
+        expect(described_class.visible?(nil, u, c)).to be true
       end
 
     end

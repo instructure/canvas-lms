@@ -162,7 +162,11 @@ describe UserSearch do
         end
 
         describe 'searching on emails' do
-          before { user.communication_channels.create!(:path => 'the.giver@example.com', :path_type => CommunicationChannel::TYPE_EMAIL) }
+          let(:cc) { user.communication_channels.create!(path: 'the.giver@example.com') }
+
+          before do
+            cc.confirm!
+          end
 
           it 'matches against an email' do
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq [user]
@@ -175,7 +179,12 @@ describe UserSearch do
           end
 
           it 'will not match channels where the type is not email' do
-            user.communication_channels.last.update_attributes!(:path_type => CommunicationChannel::TYPE_TWITTER)
+            cc.update_attributes!(:path_type => CommunicationChannel::TYPE_TWITTER)
+            expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
+          end
+
+          it "doesn't match retired channels" do
+            cc.retire!
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end
         end
@@ -251,6 +260,15 @@ describe UserSearch do
       student = User.create!
       bad_scope = lambda { UserSearch.scope_for(course, student, :enrollment_type => 'all') }
       expect(bad_scope).to raise_error(ArgumentError, 'Invalid Enrollment Type')
+    end
+
+    it "doesn't explode with group context" do
+      course_with_student
+      group = @course.groups.create!
+      group.add_user(@student)
+      account_admin_user
+      expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['student']).to_a).to eq [@student]
+      expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['teacher']).to_a).to be_empty
     end
   end
 end

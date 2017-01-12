@@ -1,12 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "help dialog" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "no user logged in" do
     it "should work with no logged in user" do
       Setting.set('show_feedback_link', 'true')
-      destroy_session(true)
       get("/login")
       f('#footer .help_dialog_trigger').click
       wait_for_ajaximations
@@ -15,12 +14,11 @@ describe "help dialog" do
 
     it "should no longer show a browser warning for IE" do
       Setting.set('show_feedback_link', 'true')
-      destroy_session(true)
       get("/login")
       driver.execute_script("window.INST.browser = {ie: true, version: 8}")
       f('#footer .help_dialog_trigger').click
       wait_for_ajaximations
-      expect(flash_message_present?(:error)).to be_falsey
+      expect_no_flash_message :error
     end
   end
 
@@ -31,13 +29,13 @@ describe "help dialog" do
 
     it "should show the Help dialog when help is clicked and feedback is enabled" do
       get "/dashboard"
-      expect(element_exists("#help-dialog")).to be_falsey
-      expect(ff('.help_dialog_trigger').length).to eq 0
+      expect(f("body")).not_to contain_css('#help-dialog')
+      expect(f("#content")).not_to contain_css('.help_dialog_trigger')
 
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
-      expect(ff('.help_dialog_trigger').length).to eq 2
-      expect(element_exists("#help-dialog")).to be_falsey
+      expect(ff('.help_dialog_trigger').length).to eq(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? 1 : 2)
+      expect(f("body")).not_to contain_css('#help-dialog')
       f('.help_dialog_trigger').click
       wait_for_ajaximations
       expect(f("#help-dialog")).to be_displayed
@@ -57,20 +55,20 @@ describe "help dialog" do
       get "/dashboard"
       link = f('.support_url')
       expect(link['href']).to eq support_url
-      expect(link['class']).not_to match 'help_dialog_trigger'
+      expect(link).not_to have_class 'help_dialog_trigger'
 
       # if show_feedback_link is true hijack clicks on the footer help link to show help dialog
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
-      f("#footer-links a[href='#{support_url}']").click
-      wait_for_ajaximations
+      f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.ic-app-header__menu-list-link.support_url' : "#footer-links a[href='#{support_url}']").click
       expect(f("#help-dialog")).to be_displayed
     end
 
     it "should allow sending the teacher a message" do
       Setting.set('show_feedback_link', 'true')
+      course_with_ta(course: @course)
       get "/courses/#{@course.id}"
-      expect(element_exists("#help-dialog")).to be_falsey
+      expect(f("body")).not_to contain_css("#help-dialog")
       trigger = f('.help_dialog_trigger')
       expect(trigger).to be_displayed
       trigger.click
@@ -86,37 +84,17 @@ describe "help dialog" do
       wait_for_ajaximations
       expect(feedback_form).not_to be_displayed
       cm = ConversationMessage.last
-      expect(cm.recipients).to eq @course.instructors
+      expect(cm.recipients).to match_array @course.instructors
+      expect(cm.recipients.count).to eq 2
       expect(cm.body).to match(/test message/)
     end
 
-    it "should allow submitting a ticket" do
-      skip('193')
-      Setting.set('show_feedback_link', 'true')
-      get "/dashboard"
-      f('.help_dialog_trigger').click
-      wait_for_ajaximations
-      create_ticket_link = f("#help-dialog a[href='#create_ticket']")
-      expect(create_ticket_link).to be_displayed
-      create_ticket_link.click
-      create_ticket_form = f("#help-dialog #create_ticket")
-      create_ticket_form.find_element(:css, 'input[name="error[subject]"]').send_keys('test subject')
-      create_ticket_form.find_element(:css, 'textarea[name="error[comments]"]').send_keys('test comments')
-      severity = 'blocks_what_i_need_to_do'
-      set_value(create_ticket_form.find_element(:css, '[name="error[user_perceived_severity]"]'), severity)
-      submit_form(create_ticket_form)
-      wait_for_ajaximations
-      expect(create_ticket_form).not_to be_displayed
-      er = ErrorReport.last
-      expect(er.subject).to eq 'test subject'
-      expect(er.comments).to eq 'test comments'
-      expect(er.data['user_perceived_severity']).to eq severity
-      expect(er.guess_email).to eq @user.email
-    end
+    # TODO reimplement per CNVS-29608, but make sure we're testing at the right level
+    it "should allow submitting a ticket"
   end
 
   context "help dialog as a teacher" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in(:active_all => true)
     end
 
@@ -126,7 +104,7 @@ describe "help dialog" do
       f('.help_dialog_trigger').click
       wait_for_ajaximations
       expect(f("#help-dialog")).to be_displayed
-      expect(element_exists("#help-dialog a[href='#teacher_feedback']")).to be_falsey
+      expect(f("#help-dialog")).not_to contain_css("a[href='#teacher_feedback']")
     end
 
     it "should show the Help dialog on the speedGrader when help is clicked and feedback is enabled" do
@@ -135,7 +113,7 @@ describe "help dialog" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
-      expect(ff('.help_dialog_trigger').length).to eq 0
+      expect(f("#content")).not_to contain_css('.help_dialog_trigger')
 
       Setting.set('show_feedback_link', 'true')
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"

@@ -271,7 +271,7 @@
 #         },
 #         "prerequisite_module_ids": {
 #           "description": "IDs of Modules that must be completed before this one is unlocked",
-#           "example": "\[121, 122\]",
+#           "example": [121, 122],
 #           "type": "array",
 #           "items": {"type": "integer"}
 #         },
@@ -287,7 +287,6 @@
 #         },
 #         "items": {
 #           "description": "The contents of this module, as an array of Module Items. (Present only if requested via include[]=items AND the module is not deemed too large by Canvas.)",
-#           "example": "\[\]",
 #           "type": "array",
 #           "items": { "$ref": "ModuleItem" }
 #         },
@@ -358,7 +357,7 @@ class ContextModulesApiController < ApplicationController
       scope = ContextModule.search_by_attribute(scope, :name, params[:search_term]) unless includes.include?('items')
       modules = Api.paginate(scope, self, route)
 
-      ActiveRecord::Associations::Preloader.new(modules, content_tags: :content) if includes.include?('items')
+      ActiveRecord::Associations::Preloader.new.preload(modules, content_tags: :content) if includes.include?('items')
 
       if @student
         modules_and_progressions = modules.map { |m| [m, m.evaluate_for(@student)] }
@@ -371,8 +370,8 @@ class ContextModulesApiController < ApplicationController
         opts[:search_term] = params[:search_term]
       end
 
-      if @context.feature_enabled?(:differentiated_assignments) && includes.include?('items')
-        user_ids = (@student || @current_user).id
+      if includes.include?('items')
+        user_ids = [(@student || @current_user).id]
 
         if @context.user_has_been_observer?(@student || @current_user)
           opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(self.context, (@student || @current_user) )
@@ -417,7 +416,7 @@ class ContextModulesApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@student || @current_user).find(params[:id])
       includes = Array(params[:include])
-      ActiveRecord::Associations::Preloader.new(mod, content_tags: :content).run if includes.include?('items')
+      ActiveRecord::Associations::Preloader.new.preload(mod, content_tags: :content) if includes.include?('items')
       prog = @student ? mod.evaluate_for(@student) : nil
       render :json => module_json(mod, @student || @current_user, session, prog, includes)
     end
@@ -436,12 +435,12 @@ class ContextModulesApiController < ApplicationController
   # @response_field completed A list of IDs for modules that were updated.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/modules \  
-  #       -X PUT \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules \
+  #       -X PUT \
   #       -H 'Authorization: Bearer <token>' \
   #       -d 'event=delete' \
-  #       -d 'module_ids[]=1' \ 
-  #       -d 'module_ids[]=2' 
+  #       -d 'module_ids[]=1' \
+  #       -d 'module_ids[]=2'
   #
   # @example_response
   #    {
@@ -515,7 +514,7 @@ class ContextModulesApiController < ApplicationController
   #
   # @returns Module
   def create
-    if authorized_action(@context.context_modules.scoped.new, @current_user, :create)
+    if authorized_action(@context.context_modules.temp_record, @current_user, :create)
       return render :json => {:message => "missing module parameter"}, :status => :bad_request unless params[:module]
       return render :json => {:message => "missing module name"}, :status => :bad_request unless params[:module][:name].present?
 

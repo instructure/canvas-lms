@@ -53,6 +53,7 @@ $(document).ready(function() {
     var $bank = $link.parents(".question_bank");
     $.ajaxJSON($(this).attr('href'), 'POST', {}, function(data) {
       $bank.find(".bookmark_bank_link").toggle();
+      $bank.find(".bookmark_bank_link:visible:first").focus();
     });
   });
   $(".question_bank .edit_bank_link").click(function(event) {
@@ -71,12 +72,15 @@ $(document).ready(function() {
     $form.fillFormData(data, {object_name: 'assessment_question_bank'});
     $form.find(":text:visible:first").focus().select();
   });
-  $("#edit_bank_form .bank_name_box").keycodes('return esc', function(event) {
+  $("#edit_bank_form .bank_name_box").keycodes('return esc tab', function(event) {
     if(event.keyString == 'esc') {
       $(this).parents(".question_bank").addClass('dont_save')
       $(this).blur();
     } else if(event.keyString == 'return') {
       $("#edit_bank_form").submit();
+    } else if(event.keyString == 'tab') {
+      $('nav#breadcrumbs a:visible:first').focus()
+      event.preventDefault();
     }
   });
   $("#edit_bank_form .bank_name_box").blur(function() {
@@ -116,6 +120,7 @@ $(document).ready(function() {
         data: bank,
         hrefValues: ['id']
       })
+      $bank.find('a.title')[0].focus()
     },
     error: function(data, $bank) {
       $bank.loadingImage('remove');

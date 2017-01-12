@@ -1,11 +1,14 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative 'common'
+require_relative 'helpers/notifications_common'
+include NotificationsCommon
+
 
 describe "dashboard" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   shared_examples_for 'load events list' do
-    it "should load events list sidebar", :priority => "2" do
-      driver.navigate.to(app_host)
+    it "should load events list sidebar", priority: "2", test_id: 210275 do
+      get "/"
       wait_for_ajaximations
       expect(f('.events_list')).to be_displayed
     end
@@ -32,15 +35,17 @@ describe "dashboard" do
       expect(items.first.hidden).to eq false
 
       get url
+      f('#dashboardToggleButton').click if url == '/' && ENV['CANVAS_FORCE_USE_NEW_STYLES']
       click_recent_activity_header
       item_selector = '#announcement-details tbody tr'
       expect(ff(item_selector).size).to eq 1
       f('#announcement-details .ignore-item').click
-      keep_trying_until { expect(ff(item_selector).size).to eq 0 }
+      expect(f("#content")).not_to contain_css(item_selector)
 
       # should still be gone on reload
       get url
-      expect(ff(item_selector).size).to eq 0
+      f('#dashboardToggleButton').click if url == '/' && ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      expect(f("#content")).not_to contain_css(item_selector)
 
       expect(@user.recent_stream_items.size).to eq 0
       expect(items.first.reload.hidden).to eq true
@@ -48,15 +53,15 @@ describe "dashboard" do
 
     it_should_behave_like 'load events list'
 
-    it "should allow hiding a stream item on the dashboard" do
+    it "should allow hiding a stream item on the dashboard", priority: "1", test_id: 215577 do
       test_hiding("/")
     end
 
-    it "should allow hiding a stream item on the course page" do
+    it "should allow hiding a stream item on the course page", priority: "1", test_id: 215578 do
       test_hiding("/courses/#{@course.to_param}")
     end
 
-    it "should not show stream items for deleted objects" do
+    it "should not show stream items for deleted objects", priority: "1", test_id: 215579 do
       enable_cache do
         announcement = create_announcement
         item_selector = '#announcement-details tbody tr'
@@ -66,6 +71,7 @@ describe "dashboard" do
           expect(items.first.hidden).to eq false
 
           get "/"
+          f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
 
           click_recent_activity_header
           expect(ff(item_selector).size).to eq 1
@@ -74,8 +80,19 @@ describe "dashboard" do
         announcement.destroy
 
         get "/"
-        expect(f('.no-recent-messages')).to include_text('No Recent Messages')
+        expect(f('.no_recent_messages')).to include_text('No Recent Messages')
       end
+    end
+
+    it "should not show announcement stream items without permissions" do
+      @course.account.role_overrides.create!(:role => student_role, :permission => 'read_announcements', :enabled => false)
+
+      announcement = create_announcement
+      item_selector = '#announcement-details tbody tr'
+
+      get "/"
+      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      expect(f('.no_recent_messages')).to include_text('No Recent Messages')
     end
 
     def click_recent_activity_header(type='announcement')
@@ -101,9 +118,10 @@ describe "dashboard" do
       JS
     end
 
-    it "should expand/collapse recent activity category" do
+    it "should expand/collapse recent activity category", priority: "1", test_id: 215580 do
       create_announcement
       get '/'
+      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
       assert_recent_activity_category_closed
       click_recent_activity_header
       assert_recent_activity_category_is_open
@@ -111,9 +129,10 @@ describe "dashboard" do
       assert_recent_activity_category_closed
     end
 
-    it "should not expand category when a course/group link is clicked" do
+    it "should not expand category when a course/group link is clicked", priority: "2", test_id: 215581 do
       create_announcement
       get '/'
+      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
       assert_recent_activity_category_closed
       disable_recent_activity_header_course_link
       click_recent_activity_course_link
@@ -123,7 +142,7 @@ describe "dashboard" do
     it "should update the item count on stream item hide"
     it "should remove the stream item category if all items are removed"
 
-    it "should show conversation stream items on the dashboard" do
+    it "should show conversation stream items on the dashboard", priority: "1", test_id: 197536 do
       c = User.create.initiate_conversation([@user, User.create])
       c.add_message('test')
       c.add_participants([User.create])
@@ -132,10 +151,20 @@ describe "dashboard" do
       expect(items.size).to eq 1
 
       get "/"
+      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
       expect(ff('#conversation-details tbody tr').size).to eq 1
     end
 
-    it "should show account notifications on the dashboard" do
+    it "shows an assignment stream item under Recent Activity in dashboard", priority: "1", test_id: 108725 do
+      NotificationsCommon.setup_notification(@student, name: 'Assignment Created')
+      assignment_model({:submission_types => ['online_text_entry'], :course => @course})
+      get "/"
+      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      find('.toggle-details').click
+      expect(fj('.fake-link:contains("Unnamed")')).to be_present
+    end
+
+    it "should show account notifications on the dashboard", priority: "1", test_id: 215582 do
       a1 = @course.account.announcements.create!(:subject => 'test',
                                                  :message => "hey there",
                                                  :start_at => Date.today - 1.day,
@@ -146,32 +175,33 @@ describe "dashboard" do
                                                  :end_at => Date.today + 1.day)
 
       get "/"
-      messages = ffj("#dashboard .global-message .message.user_content")
+      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      messages = ffj("#dashboard .account_notification .notification_message")
       expect(messages.size).to eq 2
       expect(messages[0].text).to eq a1.message
       expect(messages[1].text).to eq a2.message
     end
 
-    it "should interpolate the user's domain in global notifications" do
+    it "should interpolate the user's domain in global notifications", priority: "1", test_id: 215583 do
       announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?some_GET_parameter_by_which_to_differentiate_results={{ACCOUNT_DOMAIN}}",
                                                            :subject => 'test',
                                                            :start_at => Date.today,
                                                            :end_at => Date.today + 1.day)
 
       get "/"
-      expect(fj("#dashboard .global-message .message.user_content").text).to eq announcement.message.gsub("{{ACCOUNT_DOMAIN}}", @course.account.domain)
+      expect(fj("#dashboard .account_notification .notification_message").text).to eq announcement.message.gsub("{{ACCOUNT_DOMAIN}}", @course.account.domain)
     end
 
-    it "should interpolate the user's id in global notifications" do
+    it "should interpolate the user's id in global notifications", priority: "1", test_id: 215584 do
       announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?surveys_are_not_really_anonymous={{CANVAS_USER_ID}}",
                                                            :subject => 'test',
                                                            :start_at => Date.today,
                                                            :end_at => Date.today + 1.day)
       get "/"
-      expect(fj("#dashboard .global-message .message.user_content").text).to eq announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
+      expect(fj("#dashboard .account_notification .notification_message").text).to eq announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
     end
 
-    it "should show appointment stream items on the dashboard" do
+    it "should show appointment stream items on the dashboard", priority: "2", test_id: 215585 do
       skip "we need to add this stuff back in"
       Notification.create(:name => 'Appointment Group Published', :category => "Appointment Availability")
       Notification.create(:name => 'Appointment Group Updated', :category => "Appointment Availability")
@@ -196,68 +226,66 @@ describe "dashboard" do
       expect(ffj(".communication_message.message_group_#{@group.id}").size).to eq 1
     end
 
-    it "should display course name in course menu" do
-      @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
-      Enrollment.update_all(:created_at => 1.minute.ago)
+    describe "course menu" do
+      before do
+        @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
+        Enrollment.update_all(:created_at => 1.minute.ago)
+        get "/"
+      end
 
-      get "/"
-      driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-      wait_for_ajaximations
-      expect(f('#courses_menu_item')).to include_text('My Courses')
-      expect(f('#courses_menu_item')).to include_text(@course.name)
-    end
+      it "should display course name in course menu", priority: "1", test_id: 215586 do
+        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+          f('#global_nav_courses_link').click
+          expect(fj(".ReactTray__headline:contains('Courses')")).to be_displayed
+          wait_for_ajax_requests
+          expect(fj(".ReactTray-list-item a:contains('#{@course.name}')")).to be_displayed
+        else
+          driver.execute_script %{$('#courses_menu_item').addClass('hover');}
+          expect(f('#courses_menu_item')).to include_text('My Courses')
+          expect(f('#courses_menu_item')).to include_text(@course.name)
+        end
+      end
 
-    it "should display should display student groups in course menu" do
-      skip('broken')
-      group = Group.create!(:name => "group1", :context => @course)
-      group.add_user(@user)
-      @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
-      Enrollment.update_all(:created_at => 1.minute.ago)
+      it "should display student groups in header nav", priority: "2", test_id: 215587 do
+        group = Group.create!(:name => "group1", :context => @course)
+        group.add_user(@user)
 
-      get "/"
-      driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-      wait_for_ajaximations
-      expect(f('#courses_menu_item')).to include_text(group.name)
-      expect(f('#courses_menu_item')).to include_text('Current Groups')
-    end
+        get "/"
 
-    it "should present /courses as the href of the courses nav item" do
-      @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
-      Enrollment.update_all(:created_at => 1.minute.ago)
+        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+          f('#global_nav_groups_link').click
+          expect(fj(".ReactTray__headline:contains('Groups')")).to be_displayed
+          wait_for_ajax_requests
+          expect(fj(".ReactTray-list-item a:contains('#{group.name}')")).to be_displayed
+        else
+          driver.execute_script %{$('#courses_menu_item').addClass('hover');}
+          expect(f('#courses_menu_item')).to include_text(group.name)
+          expect(f('#courses_menu_item')).to include_text('Current Groups')
+        end
+      end
 
-      get '/'
+      it "should present /courses as the href of the courses nav item", priority: "2", test_id: 215612 do
+        expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_courses_link' : '#courses_menu_item a').attribute('href')).to match(/\/courses$/)
+      end
 
-      keep_trying_until do
-        expect(f('#courses_menu_item a').attribute('href')).to include('courses')
+      it "should only open the courses menu when clicking the courses nav item", priority: "1", test_id: 215613 do
+        f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_courses_link' : '#courses_menu_item a').click
+        expect(driver.current_url).not_to match(/\/courses$/)
+      end
+
+      it "should go to a course when clicking a course link from the menu", priority: "1", test_id: 215614 do
+        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+          f('#global_nav_courses_link').click
+          fj(".ReactTray-list-item a:contains('#{@course.name}')").click
+        else
+          driver.execute_script %{$('#courses_menu_item').addClass('hover');}
+          fj("#courses_menu_item a[href='/courses/#{@course.id}']").click
+        end
+        expect(driver.current_url).to match "/courses/#{@course.id}"
       end
     end
 
-    it "should only open the courses menu when clicking the courses nav item" do
-      @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
-      Enrollment.update_all(:created_at => 1.minute.ago)
-
-      get '/'
-
-      f('#courses_menu_item a').click
-      path = driver.execute_script %{ return window.location.pathname;}
-      expect(path).not_to eq '/courses'
-    end
-
-    it "should go to a course when clicking a course link from the menu" do
-      @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
-      Enrollment.update_all(:created_at => 1.minute.ago)
-
-      get '/'
-
-      driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-      wait_for_ajaximations
-
-      fj("#courses_menu_item a[href='/courses/#{@course.id}']").click
-      path = driver.execute_script %{ return window.location.pathname;}
-      expect(path).to eq "/courses/#{@course.id}"
-    end
-
-    it "should display scheduled web conference in stream" do
+    it "should display scheduled web conference in stream", priority: "1", test_id: 216354 do
       PluginSetting.create!(:name => "wimba", :settings => {"domain" => "wimba.instructure.com"})
 
       # NOTE: recently changed the behavior here: conferences only display on
@@ -271,10 +299,10 @@ describe "dashboard" do
       @conference.save!
 
       get "/courses/#{@course.to_param}"
-      expect(f('.conference .message')).to include_text(@conference.title)
+      expect(f('.conference .notification_message')).to include_text(@conference.title)
     end
 
-    it "should end conferences from stream" do
+    it "should end conferences from stream", priority: "1", test_id: 216355 do
       PluginSetting.create!(:name => "wimba", :settings => {"domain" => "wimba.instructure.com"})
 
       course_with_teacher_logged_in
@@ -297,7 +325,7 @@ describe "dashboard" do
       expect(@conference).to be_finished
     end
 
-    it "should create an announcement for the first course that is not visible in the second course" do
+    it "should create an announcement for the first course that is not visible in the second course", priority: "1", test_id: 216356 do
       @context = @course
       announcement_model({:title => "hey all read this k", :message => "announcement"})
       @second_course = Course.create!(:name => 'second course')
@@ -315,13 +343,13 @@ describe "dashboard" do
       Enrollment.update_all(:created_at => 1.minute.ago) # need to make created_at and updated_at different
 
       get "/"
-      expect(f('.no-recent-messages')).to be_nil
+      expect(f("#content")).not_to contain_css('.no_recent_messages')
 
       get "/courses/#{@second_course.id}"
-      expect(f('.no-recent-messages')).to include_text('No Recent Messages')
+      expect(f('.no_recent_messages')).to include_text('No Recent Messages')
     end
 
-    it "should validate the functionality of soft concluded courses in dropdown" do
+    it "should validate the functionality of soft concluded courses in dropdown", priority: "1", test_id: 216372 do
       course_with_student(:active_all => true, :course_name => "a_soft_concluded_course", :user => @user)
       c1 = @course
       c1.conclude_at = 1.week.ago
@@ -330,25 +358,60 @@ describe "dashboard" do
       c1.save!
       get "/"
 
-      driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-      item = fj('#menu_enrollments')
-      expect(item).to be_displayed
-      expect(item).not_to include_text(c1.name)
+      if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+        f('#global_nav_courses_link').click
+        expect(fj(".ReactTray__headline:contains('Courses')")).to be_displayed
+        expect(f(".ReactTray__link-list")).not_to include_text(c1.name)
+      else
+        driver.execute_script %{$('#courses_menu_item').addClass('hover');}
+        item = fj('#menu_enrollments')
+        expect(item).to be_displayed
+        expect(item).not_to include_text(c1.name)
+      end
     end
 
-    it "should show recent feedback and it should work" do
+    it "should show recent feedback and it should work", priority: "1", test_id: 216373 do
       assign = @course.assignments.create!(:title => 'hi', :due_at => 1.day.ago, :points_possible => 5)
       assign.grade_student(@student, :grade => '4')
 
       get "/"
       wait_for_ajaximations
 
-      expect(f('.recent_feedback a').attribute('href')).to match /courses\/#{@course.id}\/assignments\/#{assign.id}\/submissions\/#{@student.id}/
+      expect(f('.recent_feedback a')).to have_attribute("href", /courses\/#{@course.id}\/assignments\/#{assign.id}\/submissions\/#{@student.id}/)
       f('.recent_feedback a').click
       wait_for_ajaximations
 
       # submission page should load
       expect(f('h2').text).to eq "Submission Details"
+    end
+
+    it "should validate the functionality of soft concluded courses on courses page", priority: "1", test_id: 216374 do
+      term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.month.ago, :end_at => 1.week.ago)
+      term.root_account_id = @course.root_account_id
+      term.save!
+      c1 = @course
+      c1.name = 'a_soft_concluded_course'
+      c1.update_attributes!(:enrollment_term => term)
+      c1.reload
+      get "/courses"
+      expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
+    end
+
+    context "course menu customization" do
+
+      it "should always have a link to the courses page (with customizations)", priority: "1", test_id: 216378 do
+        course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true})
+        get "/"
+        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+          f('#global_nav_courses_link').click
+          expect(fj('.ReactTray-list-item a:contains("All Courses")')).to be_present
+        else
+          course_menu_item = f("#courses_menu_item")
+          hover(course_menu_item)
+          expect(course_menu_item).to include_text('My Courses')
+          expect(course_menu_item).to include_text('View All or Customize')
+        end
+      end
     end
   end
 
@@ -360,26 +423,54 @@ describe "dashboard" do
 
     it_should_behave_like 'load events list'
 
-    it "should validate the functionality of soft concluded courses on courses page" do
-      term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.month.ago, :end_at => 1.week.ago)
-      term.root_account_id = @course.root_account_id
-      term.save!
-      c1 = @course
-      c1.name = 'a_soft_concluded_course'
-      c1.update_attributes!(:enrollment_term => term)
-      c1.reload
+    context "restricted future courses" do
+      before :once do
+        term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.week.from_now, :end_at => 1.month.from_now)
+        term.root_account_id = Account.default.id
+        term.save!
+        course_with_student(:active_all => true)
+        @c1 = @course
+        @c1.name = 'a future course'
+        @c1.update_attributes!(:enrollment_term => term)
 
-      get "/courses"
-      expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
+        course_with_student(:active_course => true, :user => @student)
+        @c2 = @course
+        @c2.name = "a restricted future course"
+        @c2.restrict_student_future_view = true
+        @c2.update_attributes!(:enrollment_term => term)
+      end
+
+      before do
+        user_session(@student)
+      end
+
+      it "should show future courses (even if restricted) to students on courses page" do
+        get "/courses"
+        expect(fj("#future_enrollments_table a[href='/courses/#{@c1.id}']")).to include_text(@c1.name)
+
+        expect(f("#content")).not_to contain_css("#future_enrollments_table a[href='/courses/#{@c2.id}']") # should not have a link
+        expect(f("#future_enrollments_table")).to include_text(@c2.name) # but should still show restricted future enrollment
+      end
+
+      it "should not show restricted future courses to students on courses page if configured on account" do
+        a = @c2.account
+        a.settings[:restrict_student_future_listing] = {:value => true}
+        a.save!
+        get "/courses"
+        expect(fj("#future_enrollments_table a[href='/courses/#{@c1.id}']")).to include_text(@c1.name)
+        expect(f("#future_enrollments_table")).to_not include_text(@c2.name) # shouldn't be included at all
+      end
     end
 
-    it "should display assignment to grade in to do list for a teacher" do
+    it "should display assignment to grade in to do list for a teacher", priority: "1", test_id: 216376 do
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
       assignment.reload
       assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
       assignment.reload
+
+      User.where(:id => @teacher).update_all(:updated_at => 1.day.ago) # ensure cache refresh
       enable_cache do
         get "/"
 
@@ -391,42 +482,7 @@ describe "dashboard" do
         get "/"
 
         #verify todo list is updated
-        expect(f('.to-do-list > li')).to be_nil
-      end
-    end
-
-    it "should show submitted essay quizzes in the todo list" do
-      quiz_title = 'new quiz'
-      student_in_course(:active_all => true)
-      q = @course.quizzes.create!(:title => quiz_title)
-      q.quiz_questions.create!(:question_data => {:id => 31, :name => "Quiz Essay Question 1", :question_type => 'essay_question', :question_text => 'qq1', :points_possible => 10})
-      q.generate_quiz_data
-      q.workflow_state = 'available'
-      q.save
-      q.reload
-      qs = q.generate_submission(@user)
-      qs.mark_completed
-      qs.submission_data = {"question_31" => "<p>abeawebawebae</p>", "question_text" => "qq1"}
-      Quizzes::SubmissionGrader.new(qs).grade_submission
-      get "/"
-
-      todo_list = f('.to-do-list')
-      expect(todo_list).not_to be_nil
-      expect(todo_list).to include_text(quiz_title)
-    end
-
-    context "course menu customization" do
-
-      it "should always have a link to the courses page (with customizations)" do
-        20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
-
-        get "/"
-
-        driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-        wait_for_ajaximations
-
-        expect(fj('#courses_menu_item')).to include_text('My Courses')
-        expect(fj('#courses_menu_item')).to include_text('View All or Customize')
+        expect(f("#content")).not_to contain_css('.to-do-list > li')
       end
     end
   end

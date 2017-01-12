@@ -24,7 +24,7 @@ module Canvas
 
   class Plugin
     @registered_plugins = {}
-    
+
     attr_accessor :meta, :settings
     attr_reader :id, :tag
 
@@ -55,16 +55,24 @@ module Canvas
       find(str)
     end
 
+    def encode_with(coder)
+      coder['id'] = self.id.to_s
+    end
+
+    Psych.add_domain_type("ruby/object", "Canvas::Plugin") do |_type, val|
+      Canvas::Plugin.find(val.id)
+    end
+
     def default_settings
       settings = @meta[:settings]
       settings = settings.call if settings.respond_to?(:call)
       settings
     end
-    
+
     def saved_settings
       PluginSetting.settings_for_plugin(self.id, self)
     end
-    
+
     def settings
       saved_settings
     end
@@ -98,15 +106,15 @@ module Canvas
     def validator
       @meta[:validator]
     end
-    
+
     def version
       @meta[:version]
     end
-    
+
     def settings_partial
       @meta[:settings_partial]
     end
-    
+
     def has_settings_partial?
       !meta[:settings_partial].blank?
     end
@@ -135,16 +143,16 @@ module Canvas
     # add any errors that it would like.
     def validate_settings(plugin_setting, settings)
       if validator
-        validator_module = Canvas::Plugins::Validators.const_defined?(validator) && Canvas::Plugins::Validators.const_get(validator)
-        if validator_module && validator_module.respond_to?(:validate)
-          res = validator_module.validate(settings, plugin_setting)
-          if res.is_a?(Hash)
-            plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
-          else
-            false
-          end
-        else
+        begin
+          validator_module = Canvas::Plugins::Validators.const_get(validator)
+        rescue NameError
           plugin_setting.errors.add(:base, "provided validator #{validator} failed to load")
+          return false
+        end
+        res = validator_module.validate(settings, plugin_setting)
+        if res.is_a?(Hash)
+          plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
+        else
           false
         end
       else
@@ -158,7 +166,7 @@ module Canvas
       p.meta.merge! meta
       @registered_plugins[p.id] = p
     end
-    
+
     def self.all
       @registered_plugins.values.sort_by(&:name)
     end
@@ -178,14 +186,14 @@ module Canvas
 
     def self.value_to_boolean(value)
       if value.is_a?(String) || value.is_a?(Symbol)
-        return true if ["yes", "true", "on"].include?(value.to_s.downcase)
-        return false if ["no", "false", "off"].include?(value.to_s.downcase)
+        return true if ["yes", "y", "true", "t", "on", "1"].include?(value.to_s.downcase)
+        return false if ["no", "n", "false", "f", "off", "0"].include?(value.to_s.downcase)
       end
       return value if [true, false].include?(value)
       return value.to_i != 0
     end
   end
-  
+
   module Plugins
     module Validators
     end

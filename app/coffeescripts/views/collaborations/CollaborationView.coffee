@@ -23,7 +23,8 @@ define [
   'Backbone'
   'compiled/views/collaborations/CollaboratorPickerView'
   'jst/collaborations/edit'
-], (I18n, $, {extend}, {View}, CollaboratorPickerView, editForm) ->
+  'jst/collaborations/EditIframe'
+], (I18n, $, {extend}, {View}, CollaboratorPickerView, editForm, editIframe) ->
 
   class CollaborationView extends View
     events:
@@ -53,6 +54,13 @@ define [
           e.preventDefault()
           @onCloseForm(e)
 
+    iframeTemplate: ({url}) ->
+      $iframe = $(editIframe({id: @id, url: url}))
+      $iframe.on 'keydown', (e) =>
+        if e.which == 27
+          e.preventDefault()
+          @onCloseForm(e)
+
     # Internal: Confirm deleting of a Google Docs collaboration.
     #
     # Returns nothing.
@@ -75,6 +83,7 @@ define [
         url: url
 
     delete: =>
+      $.screenReaderFlashMessage(I18n.t('Collaboration was deleted'));
       @$el.slideUp(=> @$el.remove())
       @trigger('delete', this)
       otherDeleteLinks = $('.delete_collaboration_link').toArray()
@@ -92,14 +101,20 @@ define [
     # Returns nothing.
     onEdit: (e) ->
       e.preventDefault()
-      $form = @formTemplate
-        action: $(e.currentTarget).attr('href')
-        className: @$el.attr('class')
-        data: @$el.getTemplateData(textValues: ['title', 'description'])
-      @$el.children().hide()
-      @$el.append($form)
-      @addCollaboratorPicker($form)
-      $form.find('[name="collaboration[title]"]').focus()
+      if this.$el.attr('data-update-launch-url')
+        $iframe = @iframeTemplate
+          url: this.$el.attr('data-update-launch-url')
+        @$el.children().hide()
+        @$el.append($iframe)
+      else
+        $form = @formTemplate
+          action: $(e.currentTarget).attr('href')
+          className: @$el.attr('class')
+          data: @$el.getTemplateData(textValues: ['title', 'description'])
+        @$el.children().hide()
+        @$el.append($form)
+        @addCollaboratorPicker($form)
+        $form.find('[name="collaboration[title]"]').focus()
 
     # Internal: Delete the collaboration.
     #

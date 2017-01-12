@@ -2,7 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 
 describe "assignments" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include AssignmentsCommon
 
   def click_away_accept_alert
     f('#section-tabs .home').click
@@ -16,7 +17,7 @@ describe "assignments" do
   end
 
   context "as a student" do
-    before (:each) do
+    before(:each) do
       course_with_student_logged_in
     end
 
@@ -38,17 +39,17 @@ describe "assignments" do
       @assignment.update_attributes(:submission_types => 'not_graded')
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      expect(f('.submit_assignment_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
     it "should validate on paper submission assignment type" do
       update_assignment_attributes(@assignment, :submission_types, 'on_paper', false)
-      expect(f('.submit_assignment_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
     it "should validate no submission assignment type" do
       update_assignment_attributes(@assignment, :submission_types, nil, false)
-      expect(f('.submit_assignment_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
     it "should validate that website url submissions are allowed" do
@@ -78,5 +79,4 @@ describe "assignments" do
       expect(f('#tool_content')).to be_displayed
     end
   end
-
 end

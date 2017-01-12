@@ -1,0 +1,55 @@
+
+<% content_for :keyboard_navigation do %>
+  <ul class="navigation_list" tabindex="-1">
+    <li>
+      <span class="keycode"><%= t('Up') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("Previous Module/Item") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('Down') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("Next Module/Item") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('Space') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("Move Module/Item") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('j') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("Previous Module/Item") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('k') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("Next Module/Item") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('e') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("Edit Module/Item") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('d') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("Delete Current Module/Item") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('i') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("Increase Indent") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('o') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("Decrease Indent") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('n') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("New Module") %></span>
+    </li>
+  </ul>
+<% end %>

@@ -1,7 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "course people" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+
+  before(:all) do
+    # in the people table, the kyle menu can be off the screen
+    # and uninteractable if the window is too small
+    driver.manage.window.maximize
+  end
 
   before (:each) do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
@@ -12,7 +18,7 @@ describe "course people" do
   def add_user(email, type, section_name=nil)
     get "/courses/#{@course.id}/users"
     add_button = f('#addUsers')
-    keep_trying_until { expect(add_button).to be_displayed }
+    expect(add_button).to be_displayed
     add_button.click
     wait_for_ajaximations
 
@@ -49,17 +55,21 @@ describe "course people" do
       get "/courses/#{@course.id}/users"
     end
 
-    def kyle_menu(user, role = nil)
+    def kyle_menu_css(user, role = nil)
       if role
         role_name = if role.respond_to?(:name)
           role.name
         else
           role
         end
-        f("#user_#{user.id}.#{role_name} .admin-links")
+        "#user_#{user.id}.#{role_name} .admin-links"
       else
-        f("#user_#{user.id} .admin-links")
+        "#user_#{user.id} .admin-links"
       end
+    end
+
+    def kyle_menu(user, role = nil)
+      f(kyle_menu_css(user, role))
     end
 
     def open_kyle_menu(user, role = nil)
@@ -89,9 +99,9 @@ describe "course people" do
       expect(f('.roster')).not_to include_text(username)
     end
 
-    def add_user_to_second_section(role=nil)
+    def add_user_to_second_section(role = nil, enrollment_state = 'invited')
       role ||= student_role
-      student_in_course(:user => user_with_pseudonym, :role => role)
+      student_in_course(:user => user_with_pseudonym, :role => role, :enrollment_state => enrollment_state)
       section_name = 'Another Section'
       add_section(section_name)
       # open tab
@@ -107,13 +117,19 @@ describe "course people" do
       expect(ff("#user_#{@student.id} .section").length).to eq 2
       @student.reload
       @student.enrollments.each{|e|expect(e.role_id).to eq role.id}
+      @student.enrollments.each{|e|expect(e.workflow_state).to eq enrollment_state}
     end
 
     it "should add a user without custom role to another section" do
       add_user_to_second_section
     end
 
+    it "adds an active enrollment to another section if the user has already accepted their enrollment" do
+      add_user_to_second_section(nil, 'active')
+    end
+
     it "should add a user to a second (active) section in a concluded course" do
+      @course.start_at = 2.days.ago
       @course.conclude_at = 1.day.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
@@ -150,13 +166,40 @@ describe "course people" do
       # open dialog
       open_kyle_menu(@student)
       # when
-      link = f("#ui-id-4")
+      links = ff(".admin-links li a")
+      link = links.detect{|link| link.text.include?("User Details")}
       href = link['href']
       link.click
       wait_for_ajaximations
       wait_for_ajax_requests
       # expect
       expect(driver.current_url).to include(href)
+    end
+
+    it "should be able to deactivate and reactivate users" do
+      username = "user@example.com"
+      student_in_course(:name => username, :active_all => true)
+
+      go_to_people_page
+      cog = open_kyle_menu(@student)
+      link = f('a[data-event="deactivateUser"]', cog)
+      expect(link).to include_text("Deactivate User")
+      link.click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+
+      expect(f("#user_#{@student.id} span.label")).to include_text("inactive")
+      @enrollment.reload
+      expect(@enrollment.workflow_state).to eq 'inactive'
+
+      cog = open_kyle_menu(@student)
+      link = f('a[data-event="reactivateUser"]', cog)
+      expect(link).to include_text("Re-activate User")
+      link.click
+      wait_for_ajaximations
+      expect(f("#content")).not_to contain_css("#user_#{@student.id} span.label")
+      @enrollment.reload
+      expect(@enrollment.workflow_state).to eq 'active'
     end
 
     def use_link_dialog(observer, role = nil)
@@ -193,8 +236,8 @@ describe "course people" do
       go_to_people_page
 
       observer_row = ff("#user_#{obs.id}").map(&:text).join(',')
-      expect(observer_row).to include_text students[0].name
-      expect(observer_row).to include_text students[1].name
+      expect(observer_row).to include students[0].name
+      expect(observer_row).to include students[1].name
       # remove an observer
       use_link_dialog(obs) do
         fj("#link_students input:visible").send_keys(:backspace)
@@ -246,17 +289,17 @@ describe "course people" do
         go_to_people_page
 
         # should NOT see remove link for teacher
-        expect(kyle_menu(@teacher)).to be_nil
+        expect(f("#content")).not_to contain_css(kyle_menu_css(@teacher))
         # should see remove link for student
         cog = open_kyle_menu @student
-        expect(fj('a[data-event="removeFromCourse"]', cog)).not_to be_nil
+        expect(f('a[data-event="removeFromCourse"]', cog)).not_to be_nil
       end
     end
 
     it "should not show the student view student" do
       @fake_student = @course.student_view_student
       go_to_people_page
-      expect(ff(".student_enrollments #user_#{@fake_student.id}")).to be_empty
+      expect(f("#content")).not_to contain_css(".student_enrollments #user_#{@fake_student.id}")
     end
 
     context "multiple enrollments" do
@@ -309,20 +352,6 @@ describe "course people" do
           send "custom_#{base_type}_role", "custom"
           add_user(user.name, "custom")
           expect(f("#user_#{user.id} .admin-links")).not_to be_nil
-        end
-
-        if base_type == 'teacher' || base_type == 'ta'
-          it "should show section limited checkbox for custom #{base_type} enrollments" do
-            send "custom_#{base_type}_role", "custom"
-            select_new_role_type("custom")
-            expect(f('#limit_privileges_to_course_section')).to be_displayed
-          end
-        else
-          it "should not show section limited checkbox for custom #{base_type} enrollments" do
-            send "custom_#{base_type}_role", "custom"
-            select_new_role_type("custom")
-            expect(f('#limit_privileges_to_course_section')).not_to be_displayed
-          end
         end
       end
     end

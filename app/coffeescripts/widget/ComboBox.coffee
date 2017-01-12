@@ -4,7 +4,6 @@ define [
   'Backbone'
   'jst/ComboBox'
   'str/htmlEscape'
-  'vendor/ui.selectmenu'
 ], ($, _, Backbone, template, htmlEscape) ->
 
   ##
@@ -33,18 +32,12 @@ define [
 
       # construct dom tree and cache relevant pieces
       @$el = $ template()
-      @$container = $('.ui-combobox-container', @$el)
       @$prev = $('.ui-combobox-prev', @$el)
       @$next = $('.ui-combobox-next', @$el)
-      @$menu = $('select', @$container)
+      @$menu = $('select', @$el)
 
       # populate and instantiate the selectmenu
       @$menu.append (_.map @items, @_buildOption)...
-      @$menu.selectmenu
-        style: 'dropdown'
-        width: '230px'
-        format: @_formatOption
-      @$selectmenu = @$menu.data('selectmenu').list
 
       # set initial selection
       @select opts.selected if opts.selected?
@@ -59,7 +52,7 @@ define [
     # Select a specific item by value.
     select: (value) ->
       oldIndex = @_index()
-      @$menu.selectmenu "value", value
+      @$menu.val value
 
       # setting the value directly doesn't fire the change event, so we'll
       # trigger it ourselves, but only if there was an actual change.
@@ -117,9 +110,3 @@ define [
     # Build an <option> tag for an item.
     _buildOption: (item) =>
       "<option value='#{htmlEscape @_value item}'>#{htmlEscape @_label item}</option>"
-
-    ##
-    # @api private
-    # Convert an option label to the displayed selectmenu item.
-    _formatOption: (label) =>
-      "<span class='ui-selectmenu-item'>#{htmlEscape label}</span>"

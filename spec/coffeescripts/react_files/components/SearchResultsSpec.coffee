@@ -1,11 +1,10 @@
 define [
+  '../mockFilesENV'
   'jquery'
   'react'
-  'react-router'
   'compiled/react_files/components/SearchResults'
   'compiled/collections/FilesCollection'
-  'compiled/react_files/routes'
-], ($, React, Router, SearchResults, FilesCollection, routes) ->
+], (mockFilesENV, $, React, SearchResults, FilesCollection) ->
 
   module 'SearchResults#render',
     setup: ->
@@ -29,4 +28,3 @@ define [
   #     React.unmountComponentAtNode(container)
   #     @server.restore()
   #     start()
-

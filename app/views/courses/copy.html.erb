@@ -17,12 +17,40 @@
     <div class="controls"><%= f.text_field :course_code, :value => @context.course_code %></div>
   </div>
   <div class="control-group">
-    <label class="control-label"><strong><%= t('start_at', 'Start Date') %></strong></label>
-    <div class="controls"><%= f.text_field :start_at, :class => 'datetime_field', :style => "width: 165px;", :value => unlocalized_datetime_string(@context.start_at, :verbose) %></div>
+    <label class="control-label">
+      <strong><%= t('start_at', 'Start Date') %></strong>
+    </label>
+    <label class="screenreader-only" id="course_starts_at_label">
+      <%= t("Course starts at") %>
+      <%= datepicker_screenreader_prompt %>
+    </label>
+    <div class="controls">
+      <%= f.text_field :start_at,
+                       class: 'datetime_field',
+                       style: "width: 165px;",
+                       value: datetime_string(@context.start_at, :verbose),
+                       "aria-labelledby" => "course_starts_at_label",
+                       "data-tooltip" => "",
+                       title: accessible_date_format %>
+    </div>
   </div>
   <div class="control-group">
-    <label class="control-label"><strong><%= t('conclude_at', 'End Date') %></strong></label>
-    <div class="controls"><%= f.text_field :conclude_at, :class => 'datetime_field', :style => "width: 165px;", :value => unlocalized_datetime_string(@context.conclude_at, :verbose) %></div>
+    <label class="control-label">
+      <strong><%= t('conclude_at', 'End Date') %></strong>
+    </label>
+    <label class="screenreader-only" id="course_ends_at_label">
+      <%= t("Course ends at") %>
+      <%= datepicker_screenreader_prompt %>
+    </label>
+    <div class="controls">
+      <%= f.text_field :conclude_at,
+                       class: 'datetime_field',
+                       style: "width: 165px;",
+                       value: datetime_string(@context.conclude_at, :verbose),
+                       "aria-labelledby" => "course_ends_at_label",
+                       "data-tooltip" => "",
+                       title: accessible_date_format %>
+    </div>
   </div>
   <% if can_do(@context.account, @current_user, :manage_courses) %>
     <div class="control-group">

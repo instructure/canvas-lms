@@ -80,12 +80,19 @@ define [
       @$tree.find('[role=treeitem]').not($to).attr('aria-selected', false).removeClass(@focusStyleClass)
       $to.attr 'aria-selected', true
       $to.addClass(@focusStyleClass)
-      $.screenReaderFlashMessageExclusive($to.attr('aria-label'))
+      if (label = $to.attr('aria-label'))
+        $.screenReaderFlashMessageExclusive(label)
+
       toId = $to.attr 'id'
       if not toId
         toId = _.uniqueId 'treenode-'
         $to.attr 'id', toId
       @$tree.attr 'aria-activedescendant', toId
+
+      if $to[0].scrollIntoViewIfNeeded
+        $to[0].scrollIntoViewIfNeeded()
+      else
+        $to[0].scrollIntoView()
 
 
     # focus the first item in the tree.

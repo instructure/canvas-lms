@@ -25,9 +25,8 @@ module CanvasBreachMitigation
         masked_authenticity_token(cookies)
       end
 
-      def valid_authenticity_token?(session, cookies, encoded_masked_token)
-        (session[:_csrf_token] && Base64.strict_decode64(session[:_csrf_token]) == unmasked_token(encoded_masked_token)) ||
-            unmasked_token(cookies['_csrf_token']) == unmasked_token(encoded_masked_token)
+      def valid_authenticity_token?(cookies, encoded_masked_token)
+        unmasked_token(cookies['_csrf_token']) == unmasked_token(encoded_masked_token)
       end
 
       def masked_token(token)

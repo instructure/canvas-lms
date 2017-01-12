@@ -112,8 +112,8 @@ module Twitter
     end
 
     def self.config=(config)
-      if !config.is_a?(Proc)
-        raise "Config must be a Proc"
+      if !config.respond_to?(:call)
+        raise "Config must respond to #call"
       end
       @config = config
     end

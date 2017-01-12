@@ -1,8 +1,9 @@
 <% content_for :page_title do %><%= join_title @page.name, @category.name, @portfolio.name %><% end %>
 <%
   js_bundle :eportfolio
-  jammit_css :tinymce
+  css_bundle :tinymce
   @no_left_side_list_view = true
+  js_env({ SECTION_COUNT_IDX: @page.content_sections.count })
 %>
 
 <% content_for :auto_discovery do %>
@@ -116,7 +117,7 @@
         <a href="<%= eportfolio_entry_preview_submission_path(@portfolio, @page, submission.id) %>" style="display: none;" class="submission_preview_url"></a>
         <div style="float: right; font-size: 0.8em; color: #aaa; margin-right: 20px; margin-top: 0.5em;">
           <%= datetime_string(submission.submitted_at || submission.updated_at) %>
-          &nbsp;<a href="<%= context_url(submission.assignment.context, :context_assignment_submission_url, submission.assignment_id, @portfolio.user.id) %>" target="_blank" class="no-hover view_submission_url"><%= image_tag "popout.png", :title => t('titles.view_submission', "View the Submission") %></a>
+          &nbsp;<a href="<%= context_url(submission.assignment.context, :context_assignment_submission_url, submission.assignment_id, @portfolio.user.id) %>" target="_blank" class="no-hover view_submission_url"><%= image_tag "popout.png", :alt => t('titles.view_submission', "View the Submission") %></a>
         </div>
         <span class="text" style="font-size: 1.2em;">
           <span class="text assignment_title"><%= submission.assignment.title %></span>
@@ -205,16 +206,14 @@
   <div style="float: right; display: none;"><a href="#" class="edit_content_link icon-edit"><%= edit_link_text %></a></div>
   <% end %>
   <h2 id="eportfolio_entry_<%= @page.id %>"><span class="name"><%= @page.name %></span></h2>
-  <% idx = 1 %>
   <%= form_for @page, :url => eportfolio_entry_url(@portfolio, @page), :html => {:id => "edit_page_form" } do |f| %>
   <div class="form_content">
     <%= f.label :name, before_label(:page_name, "Page Name") %>
     <%= f.text_field :name %>
   </div>
   <div id="page_content">
-    <% @page.content_sections.each do |c| %>
+    <% @page.content_sections.each_with_index do |c, idx| %>
       <%= render :partial => "eportfolios/page_section", :object => c, :locals => {:idx => idx} %>
-      <% idx = idx + 1 %>
     <% end %>
   </div>
   <div class="form_content">
@@ -249,11 +248,6 @@
   </table>
   <% end %>
   <%= render :partial => "eportfolios/page_section", :object => nil, :locals => {:idx => "blank"} %>
-  <% js_block do %>
-  <script>
-  var sectionCountIdx = <%= idx %>;
-  </script>
-  <% end %>
   <% if can_do(@portfolio, @current_user, :manage) %>
   <div id="edit_content_templates" style="display: none;">
     <div class="edit_rich_text_content form_content" style="display: none;">
@@ -297,24 +291,27 @@
         </div><br/>
         <%= before_label(:file_upload, "Or upload a new file") %><br/>
         <%= file_field :attachment, :uploaded_data, :class => "file_upload", :style => "padding-left: 50px;" %>
-        <div style="font-size: 0.8em; margin-left: 20px;"><%= t(:upload_limit, "limit 50MB per file") %></div>
+        <div style="font-size: 0.8em; margin-left: 20px;">
+          <%= t("%{file_size_limit} user file quota applies",
+                file_size_limit: number_to_human_size(@current_user.quota)) %>
+        </div>
       </div>
       <div class='button-container button-container-right-aligned'>
         <button type="button" class="upload_file_button btn btn-small"><%= t('buttons.upload_file', "Select/Upload File") %></button>
-        <button type="button" class="cancel_content_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+        <button type="button" class="cancel_content_button btn btn-small"><%= t('#buttons.cancel', "Cancel") %></button>
       </div>
     </div>
     <div class="loading_submission" style="text-align: center;">
-      <%= image_tag "ajax-loader-bar.gif" %><br/>
+      <%= image_tag "ajax-loader-bar.gif", :alt => '' %><br/>
       <%= before_label(:loading_submission, "Loading Submission") %><span class="submission_name">&nbsp;</span>...
     </div>
     <div class="uploading_file" style="text-align: center;">
-      <%= image_tag "ajax-loader-bar.gif" %><br/>
+      <%= image_tag "ajax-loader-bar.gif", :alt => '' %><br/>
       <%= before_label(:uploading_file, "Uploading") %><span class="file_name">&nbsp;</span>...
     </div>
     <%= form_for :attachment, :url => context_url(@portfolio.user, :controller => :files, :action => :create, :format => "text"), :html => {:id => "upload_file_form"} do |f| %>
     <% end %>
-    <iframe class="submission_preview" style="border: 1px solid #aaa; width: 95%; height: 300px; display: block; margin-left: auto; margin-right: auto;" src="about:blank">
+    <iframe class="submission_preview" style="border: 1px solid #aaa; width: 95%; height: 300px; display: block; margin-left: auto; margin-right: auto;" src="about:blank" title="<%= t('Preview') %>">
     </iframe>
   </div>
   <div style="display: none;">
@@ -338,8 +335,8 @@
   </tr>
   <tr>
     <td colspan="2" class="button-container">
-      <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
       <button type="submit" class="btn btn-primary"><%= t('buttons.update_eportfolio', "Update ePortfolio") %></button>
+      <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
     </td>
   <td>
 </table>
@@ -415,7 +412,7 @@
   <a href="<%= eportfolio_entry_view_file_path(@portfolio.id, @page.id, "{{ uuid }}") %>" class="eportfolio_download_url">&nbsp;</a>
   <div id="eportfolio_category_id"><%= @category.id %></div>
   <div id="eportfolio_view_image" style="text-align: center;">
-    <a href="#" class="eportfolio_download" title="<%= t('links.view_original', "View the Original File") %>"><img src="#" class="eportfolio_image"/><a/>
+    <a href="#" class="eportfolio_download" title="<%= t('links.view_original', "View the Original File") %>"><img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="eportfolio_image"/><a/>
   </div>
   <div id="eportfolio_download_file" style="text-align: center;">
     <a href="#" class="eportfolio_download"><%= t('links.download_file', "Click here to download %{filename}", :filename => raw('<span class="filename">&nbsp;</span>')) %></a>

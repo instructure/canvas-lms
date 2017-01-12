@@ -83,6 +83,11 @@ define [
       data = @$form.getFormData()
       return unless data['recipients[]'] and data['body']
 
+      data['bulk_message'] = true if data['recipients[]'].length > ENV.CALENDAR.MAX_GROUP_CONVERSATION_SIZE
+
+      if @group
+        data['tags'] = @group.context_codes
+
       deferred = $.ajaxJSON '/conversations', 'POST', data, @messageSent, @messageFailed
       @$form.disableWhileLoading(deferred, buttons: ['[data-text-while-loading] .ui-button-text'])
 

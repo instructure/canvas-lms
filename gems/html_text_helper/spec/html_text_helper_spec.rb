@@ -54,7 +54,12 @@ describe HtmlTextHelper do
       str = th.format_message("click here: http://www.instructure.com/courses/1/pages/informação").first
       html = Nokogiri::HTML::DocumentFragment.parse(str)
       link = html.css('a').first
-      link['href'].should == "http://www.instructure.com/courses/1/pages/informa%C3%A7%C3%A3o"
+      link['href'].should == "http://www.instructure.com/courses/1/pages/informação"
+
+      str = th.format_message("click here: http://www.instructure.com/courses/1/pages#anchor").first
+      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      link = html.css('a').first
+      link['href'].should == "http://www.instructure.com/courses/1/pages#anchor"
 
       str = th.format_message("click here: http://www.instructure.com/'onclick=alert(document.cookie)//\nnewline").first
       html = Nokogiri::HTML::DocumentFragment.parse(str)
@@ -176,6 +181,10 @@ EOS
       th.html_to_text('<script>script script script</script>text<link rel="stuff">').should == "text"
     end
 
+    it "should strip unclosed tags" do
+      th.html_to_text('<iframe src="javascript:alert(document.domain)"<h1>text</h1>').should == "text"
+    end
+
     it "should strip other tags but leave their text" do
       th.html_to_text("text<span>span text</span>").should == "textspan text"
     end
@@ -241,6 +250,20 @@ EOS
       html          = th.html_to_simple_html(original_html, base_url: 'http://example.com')
 
       html.should match(%r{http://example.com/relative/link})
+    end
+  end
+
+  context "banner" do
+    it "should add a banner above and below the text equal to text length" do
+      th.banner('hi', char: '#').should eq "##\nhi\n##"
+    end
+
+    it "should default to '*' if not char is passed" do
+      th.banner('hi').should eq "**\nhi\n**"
+    end
+
+    it "should return the input text if it is nil or empty" do
+      th.banner('').should eq ''
     end
   end
 

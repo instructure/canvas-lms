@@ -5,6 +5,10 @@ module DataFixup::AddRoleOverridesForNewPermission
   # suddenly no longer be able to add account admins anymore until this is run)
 
   def self.run(base_permission, new_permission)
+    [base_permission, new_permission].each do |perm|
+      raise "#{perm} is not a valid permission" unless RoleOverride.permissions.keys.include?(perm.to_sym)
+    end
+
     RoleOverride.where(:permission => base_permission).find_in_batches do |base_overrides|
       # just in case
       new_overrides = RoleOverride.where(:permission => new_permission, :context_id => base_overrides.map(&:context_id))

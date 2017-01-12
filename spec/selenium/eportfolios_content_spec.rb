@@ -2,7 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/eportfolios_common')
 
 describe "add content box" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include EportfoliosCommon
 
   before(:each) do
     course_with_student_logged_in
@@ -18,7 +19,7 @@ describe "add content box" do
 
   it "should click on the How Do I..? button" do
     f(".wizard_popup_link").click
-    keep_trying_until { expect(f("#wizard_box .wizard_options_list")).to be_displayed }
+    expect(f("#wizard_box .wizard_options_list")).to be_displayed
   end
 
   it "should add rich text content" do
@@ -31,7 +32,7 @@ describe "add content box" do
   end
 
   it "should add a user file" do
-    keep_trying_until { expect(f('.add_file_link')).to be_displayed } 
+    expect(f('.add_file_link')).to be_displayed
     f('.add_file_link').click
     wait_for_ajaximations
     fj('.file_list:visible .sign:visible').click
@@ -57,7 +58,7 @@ describe "add content box" do
       @html_content="<b>student</b>"
       f(".add_html_link").click
       wait_for_ajaximations
-      f("#edit_page_section_1").send_keys(@html_content)
+      f("#edit_page_section_0").send_keys(@html_content)
     end
 
     def add_html
@@ -98,13 +99,13 @@ describe "add content box" do
     it "should delete the html content" do
       add_html
       f("#right-side .edit_content_link").click
-      hover_and_click("#page_section_1 .delete_page_section_link")
+      hover_and_click("#page_section_0 .delete_page_section_link")
       accept_alert
       wait_for_ajaximations
       submit_form(".form_content")
       wait_for_ajaximations
       expect(@eportfolio.eportfolio_entries.first.content[0]).to eq "No Content Added Yet"
-      expect(f("#edit_page_section_1")).to be_nil
+      expect(f("#content")).not_to contain_css("#edit_page_section_0")
     end
 
     it "should delete html comment" do
@@ -113,17 +114,8 @@ describe "add content box" do
       f(".delete_comment_link").click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      expect(f("#page_comments .message")).to be_nil
+      expect(f("#content")).not_to contain_css("#page_comments .message")
       expect(PageComment.count).to eq 0
     end
-  end
-
-  it "should add a course submission" do
-    skip('fragile')
-    f(".add_submission_link").click
-    wait_for_ajaximations
-    keep_trying_until { expect(f(".submission_list")).to include_text(@assignment.title) }
-    f(".select_submission_button").click
-    submit_form(".form_content")
   end
 end

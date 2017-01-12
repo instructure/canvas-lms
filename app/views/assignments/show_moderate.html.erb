@@ -1,0 +1,9 @@
+<%
+  content_for :page_title, @assignment.title
+  content_for :right_side, render(:partial => "assignment_sidebar")
+
+  css_bundle :assignment_moderation
+  js_bundle :assignment_moderation
+%>
+
+<div id="assignment_moderation"></div>

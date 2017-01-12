@@ -45,7 +45,7 @@ module ActiveRecord
             end
 
             def list_scope_base
-              self.class.base_class.scoped
+              self.class.base_class.all
             end
             RUBY
           else
@@ -64,7 +64,7 @@ module ActiveRecord
             # expand assocations to their foreign keys
             new_scope = {}
             scope.each do |k, v|
-              if reflection = reflections[k]
+              if reflection = reflections[CANVAS_RAILS4_0 ? k : k.to_s]
                 key = reflection.foreign_key
                 new_scope[key] = v
                 if reflection.options[:polymorphic]
@@ -243,7 +243,7 @@ module ActiveRecord
         def update_order(ids)
           updates = []
           done_ids = Set.new
-          id_column = connection.quote_column_name(self.class.primary_key)
+          id_column = self.class.connection.quote_column_name(self.class.primary_key)
           ids.each do |id|
             id = id.to_i
             next unless id > 0

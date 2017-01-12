@@ -64,35 +64,46 @@
 
 .custom_help_link {
   border-top: 1px solid #ccc;
+  padding-top: $ic-sp;
+
   .delete {
     float: right;
   }
 }
 
-.announcements_list {
-  .alert {
-    color: #666;
+.announcement-details-post-info {
+  display: flex;
+}
+
+.announcement-details-post-info__datetime {
+  flex: 1;
+  box-sizing: border-box;
+  padding-right: $ic-sp;
+  font-weight: 500;
+}
+
+.announcement-details-roles {
+  margin-top: $ic-sp;
+}
+
+.announcements_list_item {
+  background: $ic-bg-light-neutral;
+  margin-bottom: $ic-sp*2;
+  padding: $ic-sp*2;
+  .edit_notification_form {
+    margin-top: $ic-sp*2;
+    padding-top: $ic-sp*2;
+    border-top: 1px solid $ic-border-light;
   }
-  .subject {
-    font-size: 13px;
-    font-weight: bold;
-    img {
-      padding-right: 5px;
-    }
-  }
-  .message {
-    font-size: 11px;
-  }
-  .announcement-details {
-    margin-top: 10px;
-  }
+
 }
 
 #self_registration_type_radios {
   margin-left: 1.5em;
 }
 
-#account_settings, .account_settings {
+#account_settings,
+.account_settings {
   .unbreakable {
     white-space: nowrap;
   }
@@ -121,13 +132,24 @@
       vertical-align: -3px;
     }
   }
+  .account_settings__help-text {
+    font-size: 90%;
+    color: $ic-font-color--subdued;
+  }
 }
 
 #account_settings_tabs {
-  legend {
-    font-size: 15px;
+  legend:not(.ic-Legend) {
+    @include fontSize(15px);
     font-weight: bold;
   }
+  .alert {
+    padding-top: 0;
+    margin-left: -5px;
+  }
+}
+#global_includes_warning_message_wrapper:not(.alert) #global_includes_warning_message {
+  display: none;
 }
 
 #survey_announcement_field {
@@ -135,11 +157,16 @@
   input#account_notification_months_in_display_cycle {
     width: 25px;
     padding: 0;
-    margin-top: 6px;
+    margin-top: 0;
+    margin-bottom: 0;
   }
 }
 
 .account_settings td.sub_checkbox {
   padding-left: 20px;
   padding-top: 0px;
+}
+
+.hidden_form {
+  display: none;
 }

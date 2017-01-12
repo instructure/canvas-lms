@@ -30,20 +30,59 @@ define [
     if content.hasOwnProperty('html') then content.html else htmlEscape(content)
 
   screenReaderFlashBox = (type, content) ->
-    $screenreader_node = $("""
-      <span>#{escapeContent(content)}</span>
-    """)
+    # nothing to do here if $screenreader_holder is not yet defined
+    if $screenreader_holder.length > 0
+      existing_nodes = $screenreader_holder.find('span')
+      if existing_nodes.length > 0 && content.string
+        message_text = content.string
+        matching_node = _.find existing_nodes, (node) ->
+                          $(node).text() == message_text
+        if matching_node
+          # need to remove and re-add error for accessibility, and to ensure
+          # duplicate errors/messages do not pile up
+          $(matching_node).remove()
 
+    $screenreader_node = $("""
+        <span>#{escapeContent(content)}</span>
+      """)
     $screenreader_node.appendTo($screenreader_holder)
-    # By not removing these in a timely manner, they can stack up and become repetitive
-    window.setTimeout((-> $screenreader_node.remove()), 1000)
+    # We are removing all the attributes and readding them due to Jaws inability
+    # to communicate with IE.  If we were to just remove the element out right
+    # NVDA would interrupt itself, however if we were to hide element Jaws will
+    # read the element multiple times.
+    window.setTimeout((->
+      $screenreader_node.parent().each(->
+        attributes = $.extend(true, {}, this.attributes);
+        i = attributes.length;
+        while( i-- )
+          this.removeAttributeNode(attributes[i])
+
+        $screenreader_node.remove()
+        parentNode = this
+        Array.prototype.forEach.call(attributes,(attribute) ->
+          $(parentNode).attr(attribute.name, attribute.value))
+        )
+      ), 7000)
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
+    if type is "success"
+      icon = "check"
+    else if type is "warning" || type is "error"
+      icon = "warning"
+    else
+      icon = "info"
     $node = $("""
       <li class="ic-flash-#{htmlEscape(type)}">
-        <i></i>
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-#{htmlEscape(icon)}"></i>
+        </div>
         #{escapeContent(content)}
-        <a href="#" class="close_link icon-end">#{htmlEscape I18n.t("close", "Close")}</a>
+        <button type="button" class="Button Button--icon-action close_link">
+          <span class="screenreader-only">
+            #{htmlEscape I18n.t("close", "Close")}
+          </span>
+          <i class="icon-x" aria-hidden="true"></i>
+        </button>
       </li>
     """)
 
@@ -78,9 +117,11 @@ define [
   # updating it with new content.  Makes it so the SR only reads this one
   # message.
   $.screenReaderFlashMessageExclusive = (content) ->
-    $screenreader_holder.html("""
-      <span>#{escapeContent(content)}</span>
-    """)
+    # nothing to do here if $screenreader_holder is not yet defined
+    if $screenreader_holder.length > 0
+      $screenreader_holder.html("""
+        <span>#{escapeContent(content)}</span>
+      """)
 
   $.initFlashContainer = ->
     initFlashContainer()

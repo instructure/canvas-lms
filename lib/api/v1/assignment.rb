@@ -43,6 +43,7 @@ module Api::V1::Assignment
       grade_group_students_individually
       group_category_id
       grading_standard_id
+      moderated_grading
     )
   }.freeze
 
@@ -65,16 +66,15 @@ module Api::V1::Assignment
       include_all_dates: false,
       override_dates: true,
       needs_grading_count_by_section: false,
-      exclude_description: false
+      exclude_response_fields: []
     )
 
     if opts[:override_dates] && !assignment.new_record?
       assignment = assignment.overridden_for(user)
-
     end
 
     fields = assignment.new_record? ? API_ASSIGNMENT_NEW_RECORD_FIELDS : API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS
-    if opts[:exclude_description]
+    if opts[:exclude_response_fields].include?('description')
       fields_copy = fields[:only].dup
       fields_copy.delete("description")
       fields = {only: fields_copy}
@@ -87,7 +87,7 @@ module Api::V1::Assignment
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
 
     if !opts[:overrides].blank?
-      hash['overrides'] = assignment_overrides_json(opts[:overrides])
+      hash['overrides'] = assignment_overrides_json(opts[:overrides], user)
     end
 
     if !assignment.user_submitted.nil?
@@ -109,16 +109,19 @@ module Api::V1::Assignment
 
     # use already generated hash['description'] because it is filtered by
     # Assignment#filter_attributes_for_user when the assignment is locked
-    unless opts[:exclude_description]
+    unless opts[:exclude_response_fields].include?('description')
       hash['description'] = api_user_content(hash['description'],
                                              @context || assignment.context,
                                              user,
                                              opts[:preloaded_user_content_attachments] || {})
     end
 
+    can_manage = assignment.context.grants_any_right?(user, :manage, :manage_grades, :manage_assignments)
     hash['muted'] = assignment.muted?
     hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
-    hash['has_overrides'] = assignment.has_overrides?
+    if can_manage
+      hash['has_overrides'] = assignment.has_overrides?
+    end
 
     if assignment.external_tool? && assignment.external_tool_tag.present?
       external_tool_tag = assignment.external_tool_tag
@@ -137,8 +140,9 @@ module Api::V1::Assignment
       hash['peer_reviews_assign_at'] = assignment.peer_reviews_assign_at
     end
 
-    if assignment.grants_right?(user, :grade)
-      query = Assignments::NeedsGradingCountQuery.new(assignment, user)
+    include_needs_grading_count = opts[:exclude_response_fields].exclude?('needs_grading_count')
+    if include_needs_grading_count && assignment.context.grants_right?(user, :manage_grades)
+      query = Assignments::NeedsGradingCountQuery.new(assignment, user, opts[:needs_grading_course_proxy])
       if opts[:needs_grading_count_by_section]
         hash['needs_grading_count_by_section'] = query.count_by_section
       end
@@ -152,7 +156,6 @@ module Api::V1::Assignment
 
     if assignment.quiz
       hash['quiz_id'] = assignment.quiz.id
-      hash['hide_download_submissions_button'] = !assignment.quiz.has_file_upload_question?
       hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
     end
 
@@ -160,32 +163,34 @@ module Api::V1::Assignment
       hash['allowed_extensions'] = assignment.allowed_extensions
     end
 
-    if assignment.rubric_association
-      hash['use_rubric_for_grading'] = !!assignment.rubric_association.use_for_grading
-      if assignment.rubric_association.rubric
-        hash['free_form_criterion_comments'] = !!assignment.rubric_association.rubric.free_form_criterion_comments
+    unless opts[:exclude_response_fields].include?('rubric')
+      if assignment.rubric_association
+        hash['use_rubric_for_grading'] = !!assignment.rubric_association.use_for_grading
+        if assignment.rubric_association.rubric
+          hash['free_form_criterion_comments'] = !!assignment.rubric_association.rubric.free_form_criterion_comments
+        end
       end
-    end
 
-    if assignment.rubric
-      rubric = assignment.rubric
-      hash['rubric'] = rubric.data.map do |row|
-        row_hash = row.slice(:id, :points, :description, :long_description)
-        row_hash["ratings"] = row[:ratings].map do |c|
-          c.slice(:id, :points, :description)
+      if assignment.rubric
+        rubric = assignment.rubric
+        hash['rubric'] = rubric.data.map do |row|
+          row_hash = row.slice(:id, :points, :description, :long_description)
+          row_hash["ratings"] = row[:ratings].map do |c|
+            c.slice(:id, :points, :description)
+          end
+          if row[:learning_outcome_id] && outcome = LearningOutcome.where(id: row[:learning_outcome_id]).first
+            row_hash["outcome_id"] = outcome.id
+            row_hash["vendor_guid"] = outcome.vendor_guid
+          end
+          row_hash
         end
-        if row[:learning_outcome_id] && outcome = LearningOutcome.where(id: row[:learning_outcome_id]).first
-          row_hash["outcome_id"] = outcome.id
-          row_hash["vendor_guid"] = outcome.vendor_guid
-        end
-        row_hash
+        hash['rubric_settings'] = {
+          'id' => rubric.id,
+          'title' => rubric.title,
+          'points_possible' => rubric.points_possible,
+          'free_form_criterion_comments' => !!rubric.free_form_criterion_comments
+        }
       end
-      hash['rubric_settings'] = {
-        'id' => rubric.id,
-        'title' => rubric.title,
-        'points_possible' => rubric.points_possible,
-        'free_form_criterion_comments' => !!rubric.free_form_criterion_comments
-      }
     end
 
     if opts[:include_discussion_topic] && assignment.discussion_topic
@@ -195,7 +200,7 @@ module Api::V1::Assignment
         assignment.discussion_topic.context,
         user,
         session,
-        include_assignment: false)
+        include_assignment: false, exclude_messages: opts[:exclude_response_fields].include?('description'))
     end
 
     if opts[:include_all_dates] && assignment.assignment_overrides
@@ -212,18 +217,22 @@ module Api::V1::Assignment
     end
 
     hash['published'] = ! assignment.unpublished?
-    hash['unpublishable'] = assignment.can_unpublish?
+    if can_manage
+      hash['unpublishable'] = assignment.can_unpublish?
+    end
 
-    if opts[:differentiated_assignments_enabled] || (opts[:differentiated_assignments_enabled] != false && assignment.context.feature_enabled?(:differentiated_assignments))
-      hash['only_visible_to_overrides'] = value_to_boolean(assignment.only_visible_to_overrides)
+    hash['only_visible_to_overrides'] = value_to_boolean(assignment.only_visible_to_overrides)
 
-      if opts[:include_visibility]
-        hash['assignment_visibility'] = (opts[:assignment_visibilities] || assignment.students_with_visibility.pluck(:id).uniq).map(&:to_s)
-      end
+    if opts[:include_visibility]
+      hash['assignment_visibility'] = (opts[:assignment_visibilities] || assignment.students_with_visibility.pluck(:id).uniq).map(&:to_s)
     end
 
     if submission = opts[:submission]
-      hash['submission'] = submission_json(submission,assignment,user,session)
+      if submission.is_a?(Array)
+        hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session) }
+      else
+        hash['submission'] = submission_json(submission, assignment, user, session)
+      end
     end
 
     if opts[:bucket]
@@ -319,26 +328,44 @@ module Api::V1::Assignment
     if overrides
       assignment.transaction do
         assignment.save_without_broadcasting!
-        batch_update_assignment_overrides(assignment, overrides)
+        batch_update_assignment_overrides(assignment, overrides, user)
       end
+
       assignment.do_notifications!(old_assignment, assignment_params[:notify_of_update])
     else
       assignment.save!
     end
 
     return true
+    # some values need to be removed before sending the error
   rescue ActiveRecord::RecordInvalid
     return false
   end
 
-  API_ALLOWED_SUBMISSION_TYPES = ["online_quiz", "none", "on_paper", "discussion_topic", "external_tool", "online_upload", "online_text_entry", "online_url", "media_recording", "not_graded", ""]
+  API_ALLOWED_SUBMISSION_TYPES = [
+    "online_quiz",
+    "none",
+    "on_paper",
+    "discussion_topic",
+    "external_tool",
+    "online_upload",
+    "online_text_entry",
+    "online_url",
+    "media_recording",
+    "not_graded",
+    "wiki_page",
+    ""
+  ].freeze
 
   def valid_submission_types?(assignment, assignment_params)
     return true if assignment_params['submission_types'].nil?
     assignment_params['submission_types'] = Array(assignment_params['submission_types'])
 
     if assignment_params['submission_types'].present? &&
-      !assignment_params['submission_types'].all? { |s| API_ALLOWED_SUBMISSION_TYPES.include?(s) }
+      !assignment_params['submission_types'].all? do |s|
+        return false if s == 'wiki_page' && !self.context.try(:feature_enabled?, :conditional_release)
+        API_ALLOWED_SUBMISSION_TYPES.include?(s)
+      end
         assignment.errors.add('assignment[submission_types]',
           I18n.t('assignments_api.invalid_submission_types',
             'Invalid submission types'))
@@ -418,7 +445,12 @@ module Api::V1::Assignment
     end
 
     if assignment_params.key? "muted"
-      assignment.muted = value_to_boolean(assignment_params.delete("muted"))
+      muted = value_to_boolean(assignment_params.delete("muted"))
+      if muted
+        assignment.mute!
+      else
+        assignment.unmute!
+      end
     end
 
     if assignment.context.grants_right?(user, :manage_sis)
@@ -463,22 +495,65 @@ module Api::V1::Assignment
       assignment.workflow_state = published ? 'published' : 'unpublished'
     end
 
-    if assignment.context.feature_enabled?(:differentiated_assignments)
-      if assignment_params.has_key? "only_visible_to_overrides"
-        assignment.only_visible_to_overrides = value_to_boolean(assignment_params['only_visible_to_overrides'])
-      end
+    if assignment_params.has_key? "only_visible_to_overrides"
+      assignment.only_visible_to_overrides = value_to_boolean(assignment_params['only_visible_to_overrides'])
     end
 
-    if assignment.context.feature_enabled?(:post_grades)
-      if assignment_params.has_key? "post_to_sis"
-        assignment.post_to_sis = value_to_boolean(assignment_params['post_to_sis'])
-      end
+    post_to_sis = assignment_params.key?('post_to_sis') ? value_to_boolean(assignment_params['post_to_sis']) : nil
+    unless post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(assignment.context)
+      assignment.post_to_sis = post_to_sis
     end
+
+    if assignment_params.key?('moderated_grading')
+      assignment.moderated_grading = value_to_boolean(assignment_params['moderated_grading'])
+    end
+
     assignment.updating_user = user
     assignment.attributes = update_params
     assignment.infer_times
 
     assignment
+  end
+
+  def submissions_hash(include_params, assignments, submissions_for_user=nil)
+    return {} unless include_params.include?('submission')
+    has_observed_users = include_params.include?("observed_users")
+
+    subs_list = if submissions_for_user
+      assignment_ids = assignments.map(&:id).to_set
+      submissions_for_user.select{ |s|
+        assignment_ids.include?(s.assignment_id)
+      }
+    else
+      users = current_user_and_observed(include_observed: has_observed_users)
+      @context.submissions.
+        where(:assignment_id => assignments.map(&:id)).
+        for_user(users)
+    end
+
+    if has_observed_users
+      # assignment id -> array. even if <2 results for a given
+      # assignment, we want to consistently return an array when
+      # include[]=observed_users was supplied
+      hash = Hash.new { |h,k| h[k] = [] }
+      subs_list.each { |s| hash[s.assignment_id] << s }
+    else
+      # assignment id -> specific submission. never return an array when
+      # include[]=observed_users was _not_ supplied
+      hash = Hash[subs_list.map{|s| [s.assignment_id, s]}]
+    end
+    hash
+  end
+
+  # Returns an array containing the current user.  If
+  # include_observed: true is passed also returns any observees if
+  # the current user is an observer
+  def current_user_and_observed(opts = { include_observed: false })
+    user_and_observees = Array(@current_user)
+    if opts[:include_observed] && @context_enrollment.observer?
+      user_and_observees.concat(ObserverEnrollment.observed_students(@context, @current_user).keys)
+    end
+    user_and_observees
   end
 
   private

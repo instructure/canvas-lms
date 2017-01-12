@@ -2,7 +2,7 @@
   <% if @just_viewing_one_course %>
   <div class="rs-margin-lr rs-margin-top">
     <% if @courses.length == 1 && can_do(@courses.first, @current_user, :participate_as_student) %>
-      <a href="<%= context_url(@context, :context_grades_url) %>" class="btn button-sidebar-wide"><%= image_tag "grading_icon.png" %> <%= t 'links.see_current_grades', "See my grades so far" %></a>
+      <a href="<%= context_url(@context, :context_grades_url) %>" class="btn button-sidebar-wide"><%= image_tag "grading_icon.png", :alt => '' %> <%= t 'links.see_current_grades', "See my grades so far" %></a>
     <% end %>
   </div>
   <% end %>

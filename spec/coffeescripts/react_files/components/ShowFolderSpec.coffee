@@ -1,12 +1,11 @@
 define [
+  '../mockFilesENV'
   'underscore'
   'react'
-  'react-router'
-  'compiled/react_files/components/ShowFolder'
+  'jsx/files/ShowFolder'
   'compiled/models/Folder'
   'compiled/react_files/components/FolderChild'
-  'compiled/react_files/routes'
-], (_, React, Router, ShowFolder, Folder, FolderChild, routes) ->
+], (mockFilesENV, _, React, ShowFolder, Folder, FolderChild) ->
 
   # module 'ShowFolder',
   #   setup: ->
@@ -61,11 +60,9 @@ define [
   #   expect(2)
   #   folder = new Folder()
   #   @makeComponent(currentFolder:folder)
-  #   forceUpdateSpy = sinon.spy(@component, 'forceUpdate')
+  #   forceUpdateSpy = @spy(@component, 'forceUpdate')
   #   folder.folders.trigger('some event')
   #   equal folder.folders._events.all[0].callback, @component.debouncedForceUpdate
   #   setTimeout ->
   #     ok forceUpdateSpy.calledOnce, 'eventually calls force update after some event was triggered on child collection'
-  #     forceUpdateSpy.restore()
   #     start()
-

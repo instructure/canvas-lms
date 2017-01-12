@@ -1,0 +1,24 @@
+{
+  "name": "react-tabs",
+  "version": "0.4.1",
+  "homepage": "https://github.com/rackt/react-tabs",
+  "authors": [
+    "Matt Zabriskie"
+  ],
+  "description": "React tabs component",
+  "main": "./dist/react-tabs.js",
+  "keywords": [
+    "react",
+    "tabs"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "build",
+    "examples",
+    "lib",
+    "node_modules",
+    "specs",
+    "package.json"
+  ]
+}

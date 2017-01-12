@@ -1,7 +1,16 @@
+Datafixup/EagerLoad: &Datafixup
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+    - "**/lib/data_fixup/*.rb"
+
 Lint/FreezeConstants:
   Enabled: true
 
-Rails/SmartTimeZone:
+Lint/NoFileUtilsRmRf:
+  Enabled: true
+
+Lint/NoSleep:
   Enabled: true
 
 Migration/ConcurrentIndex: &Migration
@@ -9,8 +18,26 @@ Migration/ConcurrentIndex: &Migration
   Include:
     - "**/db/migrate/*.rb"
 
-Migration/SendLater:
-  <<: *Migration
+Migration/ModelBehavior:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+    - "lib/data_fixup/*.rb"
+  Whitelist: [
+    Canvas
+    DataFixup
+    Switchman
+    Shard
+    Account.default
+    Account.site_admin
+    *.quoted_table_name
+    *.connection
+    *.transaction
+    *.find_ids_in_batches
+    *.find_ids_in_ranges
+    *.update_all
+    *.delete_all
+  ]
 
 Migration/PrimaryKey:
   <<: *Migration
@@ -18,8 +45,29 @@ Migration/PrimaryKey:
 Migration/RemoveColumn:
   <<: *Migration
 
-Datafixup/FindIds:
+Migration/SendLater:
+  <<: *Migration
+
+Rails/SmartTimeZone:
+  Enabled: true
+
+Specs/EnsureSpecExtension: &Specs
   Enabled: true
   Include:
-    - "**/db/migrate/*.rb"
-    - "**/lib/data_fixup/*.rb"
+    - "**/spec/**/*.rb"
+    - "**/spec_canvas/**/*.rb"
+
+Specs/NoBeforeAll:
+  <<: *Specs
+
+Specs/NoBeforeOnceStubs:
+  <<: *Specs
+
+Specs/NoExecuteScript:
+  <<: *Specs
+
+Specs/PreferFOverFj:
+  <<: *Specs
+
+Specs/ScopeHelperModules:
+  <<: *Specs

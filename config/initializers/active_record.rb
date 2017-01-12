@@ -1,23 +1,19 @@
 require 'active_support/callbacks/suspension'
 
 class ActiveRecord::Base
-  def write_attribute(attr_name, *args)
-    if CANVAS_RAILS3
-      column = column_for_attribute(attr_name)
+  self.cache_timestamp_format = :usec
 
-      unless column || @attributes.has_key?(attr_name)
-        raise "You're trying to create an attribute `#{attr_name}'. Writing arbitrary " \
-              "attributes on a model is deprecated. Please just use `attr_writer` etc." \
-              "from #{caller.first}"
-      end
-    end
-
-    value = super
-    value.is_a?(ActiveRecord::AttributeMethods::Serialization::Attribute) ? value.value : value
-  end
+  public :write_attribute
 
   class << self
-    delegate :distinct_on, to: :scoped
+    delegate :distinct_on, :find_ids_in_batches, :find_ids_in_ranges, to: :all
+
+    attr_accessor :in_migration
+  end
+
+  def read_or_initialize_attribute(attr_name, default_value)
+    # have to read the attribute again because serialized attributes in Rails 4.2 get duped
+    read_attribute(attr_name) || (write_attribute(attr_name, default_value) && read_attribute(attr_name))
   end
 
   alias :clone :dup
@@ -53,29 +49,25 @@ class ActiveRecord::Base
 
   def self.all_models
     return @all_models if @all_models.present?
-    @all_models = (ActiveRecord::Base.send(:subclasses) +
-                   ActiveRecord::Base.models_from_files +
+    @all_models = (ActiveRecord::Base.models_from_files +
                    [Version]).compact.uniq.reject { |model|
-      !(model.superclass == ActiveRecord::Base || model.superclass.abstract_class?) ||
-      (model.respond_to?(:tableless?) && model.tableless?) ||
+      (model < Tableless) ||
       model.abstract_class?
     }
   end
 
   def self.models_from_files
-    @from_files ||= Dir[
-      "#{Rails.root}/app/models/**/*.rb",
-      "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
-      "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
-    ].sort.collect { |file|
-      model = begin
-          file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
-        rescue NameError, LoadError
-          next
-        end
-      next unless model < ActiveRecord::Base
-      model
-    }
+    @from_files ||= begin
+      Dir[
+        "#{Rails.root}/app/models/**/*.rb",
+        "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
+        "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
+      ].sort.each do |file|
+        next if const_defined?(file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize)
+        ActiveSupport::Dependencies.require_or_load(file)
+      end
+      ActiveRecord::Base.descendants
+    end
   end
 
   def self.maximum_text_length
@@ -209,7 +201,7 @@ class ActiveRecord::Base
   def touch_context
     return if (@@skip_touch_context ||= false || @skip_touch_context ||= false)
     if self.respond_to?(:context_type) && self.respond_to?(:context_id) && self.context_type && self.context_id
-      self.context_type.constantize.update_all({ updated_at: Time.now.utc }, { id: self.context_id })
+      self.context_type.constantize.where(id: self.context_id).update_all(updated_at: Time.now.utc)
     end
   rescue
     Canvas::Errors.capture_exception(:touch_context, $ERROR_INFO)
@@ -218,10 +210,10 @@ class ActiveRecord::Base
   def touch_user
     if self.respond_to?(:user_id) && self.user_id
       shard = self.user.shard
-      User.update_all({ :updated_at => Time.now.utc }, { :id => self.user_id })
+      User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
       User.connection.after_transaction_commit do
         shard.activate do
-          User.update_all({ :updated_at => Time.now.utc }, { :id => self.user_id })
+          User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
         end if shard != Shard.current
         User.invalidate_cache(self.user_id)
       end
@@ -265,8 +257,10 @@ class ActiveRecord::Base
     # We are in the process of migrating away from including the root in all our
     # json serializations at all. Once that's done, we can remove this and the
     # monkey patch to Serialzer, below.
+
+    # ^hahahahahahaha
     unless options.key?(:include_root)
-      options[:include_root] = ActiveRecord::Base.include_root_in_json
+      options[:include_root] = true
     end
 
     hash = serializable_hash(options)
@@ -349,15 +343,8 @@ class ActiveRecord::Base
   end
 
   def self.like_condition(value, pattern = '?', downcase = true)
-    case connection.adapter_name
-      when 'SQLite'
-        # sqlite is always case-insensitive, and you must specify the escape char
-        "#{value} LIKE #{pattern} ESCAPE '\\'"
-      else
-        # postgres is always case-sensitive (mysql depends on the collation)
-        value = "LOWER(#{value})" if downcase
-        "#{value} LIKE #{pattern}"
-    end
+    value = "LOWER(#{value})" if downcase
+    "#{value} LIKE #{pattern}"
   end
 
   def self.best_unicode_collation_key(col)
@@ -368,16 +355,15 @@ class ActiveRecord::Base
       # If that extension isn't around, casting to a bytea sucks for international characters,
       # but at least it's consistent, and orders commas before letters so you don't end up with
       # Johnson, Bob sorting before Johns, Jimmy
-      @collkey ||= connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i
-      if @collkey == 0
-        "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
+      unless instance_variable_defined?(:@collkey)
+        @collkey = connection.extension_installed?(:pg_collkey)
+      end
+      if @collkey
+        "#{@collkey}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 0, true)"
       else
-        "collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 0, true)"
+        "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
       end
     else
-      # Not yet optimized for other dbs (MySQL's default collation is case insensitive;
-      # SQLite can have custom collations inserted, but probably not worth the effort
-      # since no one will actually use SQLite in a production install of Canvas)
       col
     end
   end
@@ -388,31 +374,19 @@ class ActiveRecord::Base
     num_days = options[:num_days] || 20
     min_date = (options[:min_date] || max_date.advance(:days => -(num_days-1))).midnight
 
-    # if the db can't do (named) timezones, we do the best we can (dates on the
-    # other side of dst will be wrong though)
     offset = max_date.utc_offset
 
-    expression = case connection.adapter_name
-    when 'MySQL', 'Mysql2'
-      # TODO: detect mysql named timezone support and use it
-      offset = "%s%02d:%02d" % [offset < 0 ? "-" : "+", offset.abs / 3600, offset.abs % 3600]
-      "DATE(CONVERT_TZ(#{column}, '+00:00', '#{offset}'))"
-    when /sqlite/
-      "DATE(STRFTIME('%s', #{column}) + #{offset}, 'unixepoch')"
-    when 'PostgreSQL'
-      "((#{column} || '-00')::TIMESTAMPTZ AT TIME ZONE '#{Time.zone.tzinfo.name}')::DATE"
-    end
+    expression = "((#{column} || '-00')::TIMESTAMPTZ AT TIME ZONE '#{Time.zone.tzinfo.name}')::DATE"
 
-    result = count(
-      :conditions => [
+    result = where(
         "#{column} >= ? AND #{column} < ?",
         min_date,
         max_date.advance(:days => 1)
-      ],
-      :group => expression,
-      :order => expression
-    )
-    # mysql gives us date keys, sqlite/postgres don't
+      ).
+      group(expression).
+      order(expression).
+      count
+
     return result if result.keys.first.is_a?(Date)
     Hash[result.map { |date, count|
       [Time.zone.parse(date).to_date, count]
@@ -432,27 +406,26 @@ class ActiveRecord::Base
     }
   end
 
-  def self.distinct(column, options={})
+  def self.distinct_values(column, include_nil: false)
     column = column.to_s
-    options = {:include_nil => false}.merge(options)
 
     result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       sql = ''
-      sql << "SELECT NULL AS #{column} WHERE EXISTS(SELECT * FROM #{table_name} WHERE #{column} IS NULL) UNION ALL (" if options[:include_nil]
+      sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
       sql << <<-SQL
         WITH RECURSIVE t AS (
-          SELECT MIN(#{column}) AS #{column} FROM #{table_name}
+          SELECT MIN(#{column}) AS #{column} FROM #{quoted_table_name}
           UNION ALL
-          SELECT (SELECT MIN(#{column}) FROM #{table_name} WHERE #{column} > t.#{column})
+          SELECT (SELECT MIN(#{column}) FROM #{quoted_table_name} WHERE #{column} > t.#{column})
           FROM t
           WHERE t.#{column} IS NOT NULL
         )
         SELECT #{column} FROM t WHERE #{column} IS NOT NULL
       SQL
-      sql << ")" if options[:include_nil]
+      sql << ")" if include_nil
       find_by_sql(sql)
     else
-      conditions = "#{column} IS NOT NULL" unless options[:include_nil]
+      conditions = "#{column} IS NOT NULL" unless include_nil
       find(:all, :select => "DISTINCT #{column}", :conditions => conditions, :order => column)
     end
     result.map(&column.to_sym)
@@ -473,39 +446,89 @@ class ActiveRecord::Base
   end
 
   # set up class-specific getters/setters for a polymorphic association, e.g.
-  #   belongs_to :context, :polymorphic => true, :types => [:course, :account]
-  def self.belongs_to(name, options={})
-    if types = options.delete(:types)
-      add_polymorph_methods(name, Array(types))
+  #   belongs_to :context, polymorphic: [:course, :account]
+  def self.belongs_to(name, scope = nil, options={})
+    options = scope if scope.is_a?(Hash)
+    polymorphic_prefix = options.delete(:polymorphic_prefix)
+    exhaustive = options.delete(:exhaustive)
+
+    if CANVAS_RAILS4_0
+      reflection = super
+    else
+      reflection = super[name.to_s]
     end
-    super
+
+    if reflection.options[:polymorphic].is_a?(Array) ||
+        reflection.options[:polymorphic].is_a?(Hash)
+      reflection.options[:exhaustive] = exhaustive
+      reflection.options[:polymorphic_prefix] = polymorphic_prefix
+      add_polymorph_methods(reflection)
+    end
+    reflection
   end
 
-  def self.add_polymorph_methods(generic, specifics)
-    specifics.each do |specific|
-      next if method_defined?(specific.to_sym)
-      class_name = specific.to_s.classify
-      correct_type = "#{generic}_type && self.class.send(:compute_type, #{generic}_type) <= #{class_name}"
+  def self.add_polymorph_methods(reflection)
+    unless @polymorph_module
+      @polymorph_module = Module.new
+      include(@polymorph_module)
+    end
 
-      class_eval <<-CODE
-      def #{specific}
-        #{generic} if #{correct_type}
+    specifics = []
+    Array.wrap(reflection.options[:polymorphic]).map do |name|
+      if name.is_a?(Hash)
+        specifics.concat(name.to_a)
+      else
+        specifics << [name, name.to_s.camelize]
       end
+    end
 
-      def #{specific}=(val)
-        if val.nil?
-          # we don't want to unset it if it's currently some other type, i.e.
-          # foo.bar = Bar.new
-          # foo.baz = nil
-          # foo.bar.should_not be_nil
-          self.#{generic} = nil if #{correct_type}
-        elsif val.is_a?(#{class_name})
-          self.#{generic} = val
-        else
-          raise ArgumentError, "argument is not a #{class_name}"
+    unless reflection.options[:exhaustive] == false
+      specific_classes = specifics.map(&:last).sort
+      validates reflection.foreign_type, inclusion: { in: specific_classes }, allow_nil: true
+
+      @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+        def #{reflection.name}=(record)
+          if record && [#{specific_classes.join(', ')}].none? { |klass| record.is_a?(klass) }
+            message = "one of #{specific_classes.join(', ')} expected, got \#{record.class}"
+            raise ActiveRecord::AssociationTypeMismatch, message
+          end
+          super
         end
+      RUBY
+    end
+
+    if reflection.options[:polymorphic_prefix] == true
+      prefix = "#{reflection.name}_"
+    elsif reflection.options[:polymorphic_prefix]
+      prefix = "#{reflection.options[:polymorphic_prefix]}_"
+    end
+
+    specifics.each do |(name, class_name)|
+      # ensure we capture this class's table name
+      table_name = self.table_name
+      belongs_to :"#{prefix}#{name}", -> { where(table_name => { reflection.foreign_type => class_name }) },
+                 foreign_key: reflection.foreign_key,
+                 class_name: class_name
+
+      correct_type = "#{reflection.foreign_type} && self.class.send(:compute_type, #{reflection.foreign_type}) <= #{class_name}"
+
+      @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{prefix}#{name}
+        #{reflection.name} if #{correct_type}
       end
-      CODE
+
+      def #{prefix}#{name}=(record)
+        # we don't want to unset it if it's currently some other type, i.e.
+        # foo.bar = Bar.new
+        # foo.baz = nil
+        # foo.bar.should_not be_nil
+        return if record.nil? && !(#{correct_type})
+        association(:#{prefix}#{name}).send(:raise_on_type_mismatch!, record) if record
+
+        self.#{reflection.name} = record
+      end
+
+      RUBY
     end
   end
 
@@ -515,67 +538,35 @@ class ActiveRecord::Base
     # transaction (savepoint) ensures we don't mess up things for the outer
     # transaction. useful for possible race conditions where we don't want to
     # take a lock (e.g. when we create a submission).
-    retries.times do
+    retries.times do |retry_count|
       begin
-        result = transaction(:requires_new => true) { uncached { yield } }
+        result = transaction(:requires_new => true) { uncached { yield(retry_count) } }
         connection.clear_query_cache
         return result
       rescue ActiveRecord::RecordNotUnique
       end
     end
-    result = transaction(:requires_new => true) { uncached { yield } }
+    result = transaction(:requires_new => true) { uncached { yield(retries) } }
     connection.clear_query_cache
     result
   end
 
-  # returns batch_size ids at a time, working through the primary key from
-  # smallest to largest.
-  #
-  # note this does a raw connection.select_values, so it doesn't work with scopes
-  def self.find_ids_in_batches(options = {})
-    batch_size = options[:batch_size] || 1000
-    scope = except(:select).select(primary_key).reorder(primary_key).limit(batch_size)
-    ids = connection.select_values(scope.to_sql)
-    ids = ids.map(&:to_i) unless options[:no_integer_cast]
-    while ids.present?
-      yield ids
-      break if ids.size < batch_size
-      last_value = ids.last
-      ids = connection.select_values(scope.where("#{primary_key}>?", last_value).to_sql)
-      ids = ids.map(&:to_i) unless options[:no_integer_cast]
+  def self.current_xlog_location
+    Shard.current(shard_category).database_server.unshackle do
+      Shackles.activate(:master) do
+        connection.select_value("SELECT pg_current_xlog_location()")
+      end
     end
   end
 
-  # returns 2 ids at a time (the min and the max of a range), working through
-  # the primary key from smallest to largest.
-  def self.find_ids_in_ranges(options = {})
-    batch_size = options[:batch_size].try(:to_i) || 1000
-    subquery_scope = self.scoped.except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(batch_size)
-    ids = connection.select_rows("select min(id), max(id) from (#{subquery_scope.to_sql}) as subquery").first
-    while ids.first.present?
-      ids.map!(&:to_i) if columns_hash[primary_key.to_s].type == :integer
-      yield(*ids)
-      last_value = ids.last
-      next_subquery_scope = subquery_scope.where(["#{quoted_table_name}.#{primary_key}>?", last_value])
-      ids = connection.select_rows("select min(id), max(id) from (#{next_subquery_scope.to_sql}) as subquery").first
-    end
-  end
+  def self.wait_for_replication(start: nil)
+    return unless Shackles.activate(:slave) { connection.readonly? }
 
-  class << self
-    def deconstruct_joins(joins_sql=nil)
-      unless joins_sql
-        joins_sql = ''
-        add_joins!(joins_sql, nil)
+    start ||= current_xlog_location
+    Shackles.activate(:slave) do
+      while connection.select_value("SELECT pg_last_xlog_replay_location()") < start
+        sleep 0.1
       end
-      tables = []
-      join_conditions = []
-      joins_sql.strip.split('INNER JOIN')[1..-1].each do |join|
-        # this could probably be improved
-        raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/
-        tables << $1
-        join_conditions << $2
-      end
-      [tables, join_conditions]
     end
   end
 
@@ -592,33 +583,33 @@ class ActiveRecord::Base
   def save_without_callbacks
     suspend_callbacks(kind: [:validation, :save, (new_record? ? :create : :update)]) { save }
   end
-
-  if Rails.version < '4'
-    scope :none, -> { {:conditions => ["?", false]} }
-  end
 end
 
-unless defined? OpenDataExport
-  # allow an exportable option that we don't actually do anything with, because our open-source build may not contain OpenDataExport
-  if CANVAS_RAILS3
-    ActiveRecord::Associations::Builder::Association.class_eval do
-      ([self] + self.descendants).each { |klass| klass.valid_options << :exportable }
-    end
-  else
-    ActiveRecord::Associations::Builder::Association.valid_options << :exportable
-  end
-end
+if CANVAS_RAILS4_0
+  ActiveRecord::Associations::Builder::Association::DEPRECATED_OPTIONS.concat([:preload, :eager_load])
 
-if defined? ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
-  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
-    def readonly?(table = nil, column = nil)
-      return @readonly unless @readonly.nil?
-      @readonly = (select_value("SELECT pg_is_in_recovery();") == "t")
+  module ForceDeprecationAsError
+    def initialize(*args)
+      old_behavior = ActiveSupport::Deprecation.behavior
+      ActiveSupport::Deprecation.behavior = :raise
+      super
+    ensure
+      ActiveSupport::Deprecation.behavior = old_behavior
     end
   end
+  ActiveRecord::Associations::Builder::Association.prepend(ForceDeprecationAsError)
 end
 
 ActiveRecord::Relation.class_eval do
+  def includes(*args)
+    return super if args.empty? || args == [nil]
+    raise "Use preload or eager_load instead of includes"
+  end
+
+  def where!(*args)
+    raise "where!.not doesn't work in Rails 4.2" if args.empty?
+    super
+  end
 
   def select_values_necessitate_temp_table?
     return false unless select_values.present?
@@ -645,9 +636,7 @@ ActiveRecord::Relation.class_eval do
       raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key") if options[:start]
       self.activate { find_in_batches_with_temp_table(options, &block) }
     else
-      find_in_batches_without_usefulness(options) do |batch|
-        klass.send(:with_exclusive_scope) { yield batch }
-      end
+      find_in_batches_without_usefulness(options, &block)
     end
   end
   alias_method_chain :find_in_batches, :usefulness
@@ -656,7 +645,8 @@ ActiveRecord::Relation.class_eval do
     (connection.adapter_name == 'PostgreSQL' &&
       (Shackles.environment == :slave ||
         connection.readonly? ||
-        connection.open_transactions > (Rails.env.test? ? 1 : 0)))
+        (!Rails.env.test? && connection.open_transactions > 0) ||
+        in_transaction_in_test?))
   end
 
   def find_in_batches_with_cursor(options = {})
@@ -666,33 +656,58 @@ ActiveRecord::Relation.class_eval do
         sql = to_sql
         cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
         connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
-        includes = includes_values
-        klass.send(:with_exclusive_scope) do
+        includes = includes_values + preload_values
+        klass.unscoped do
           batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           while !batch.empty?
-            ActiveRecord::Associations::Preloader.new(batch, includes).run if includes
+            ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
             yield batch
             break if batch.size < batch_size
             batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           end
         end
-        # not ensure; if the transaction rolls back due to another exception, it will
-        # automatically close
-        connection.execute("CLOSE #{cursor}")
+      ensure
+        unless $!.is_a?(ActiveRecord::StatementInvalid)
+          connection.execute("CLOSE #{cursor}")
+        end
       end
     end
   end
 
+  # determines if someone started a transaction in addition to the spec fixture transaction
+  # impossible to just count open transactions, cause by default it won't nest a transaction
+  # unless specifically requested
+  def in_transaction_in_test?
+    return false unless Rails.env.test?
+    transaction_method = ActiveRecord::ConnectionAdapters::DatabaseStatements.instance_method(:transaction).source_location.first
+    # don't anchor the end of the regex; test_after_commit does an alias_method_chain, thus
+    # changing the name (and source location) of this method
+    transaction_regex = /^#{Regexp.escape(transaction_method)}:\d+:in `transaction/.freeze
+    # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
+    !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
+  end
+
   def find_in_batches_with_temp_table(options = {})
+    can_do_it = Rails.env.production? || ActiveRecord::Base.in_migration || in_transaction_in_test?
+    raise "find_in_batches_with_temp_table probably won't work outside a migration
+           and outside a transaction. Unfortunately, it's impossible to automatically
+           determine a better way to do it that will work correctly. You can try
+           switching to slave first (then switching to master if you modify anything
+           inside your loop), wrapping in a transaction (but be wary of locking records
+           for the duration of your query if you do any writes in your loop), or not
+           forcing find_in_batches to use a temp table (avoiding custom selects,
+           group, or order)." unless can_do_it
+
     if options[:pluck]
       pluck = Array(options[:pluck])
       pluck_for_select = pluck.map do |column_name|
         if column_name.is_a?(Symbol) && column_names.include?(column_name.to_s)
-          "#{connection.quote_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
+          "#{connection.quote_local_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
         else
           column_name.to_s
         end
       end
+      pluck = pluck.map(&:to_s)
     end
     batch_size = options[:batch_size] || 1000
     if pluck
@@ -709,9 +724,9 @@ ActiveRecord::Relation.class_eval do
         when 'PostgreSQL'
           begin
             old_proc = connection.raw_connection.set_notice_processor {}
-            if pluck && pluck.length == 1 && pluck.first.to_s == primary_key.to_s
-              connection.add_index table, primary_key, name: index
-              index = primary_key
+            if pluck && pluck.any?{|p| p == primary_key.to_s}
+              connection.execute("CREATE INDEX #{connection.quote_local_table_name(index)} ON #{connection.quote_local_table_name(table)}(#{connection.quote_column_name(primary_key)})")
+              index = primary_key.to_s
             else
               pluck.unshift(index) if pluck
               connection.execute "ALTER TABLE #{table}
@@ -720,33 +735,33 @@ ActiveRecord::Relation.class_eval do
           ensure
             connection.raw_connection.set_notice_processor(&old_proc) if old_proc
           end
-        when 'MySQL', 'Mysql2'
-          pluck.unshift(index) if pluck
-          connection.execute "ALTER TABLE #{table}
-                             ADD temp_primary_key MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT"
-        when 'SQLite'
-          # Sqlite always has an implicit primary key
-          index = 'rowid'
         else
           raise "Temp tables not supported!"
       end
 
-      includes = includes_values
-      klass.send(:with_exclusive_scope) do
+      includes = includes_values + preload_values
+      klass.unscoped do
+
+        quoted_plucks = pluck && pluck.map do |column_name|
+          # Rails 4.2 is going to try to quote them anyway but unfortunately not to the temp table, so just make it explicit
+          column_names.include?(column_name) ?
+            "#{connection.quote_local_table_name(table)}.#{connection.quote_column_name(column_name)}" : column_name
+        end
+
         if pluck
-          batch = klass.from(table).order(index).limit(batch_size).pluck(pluck)
+          batch = klass.from(table).order(index).limit(batch_size).pluck(*quoted_plucks)
         else
           sql = "SELECT * FROM #{table} ORDER BY #{index} LIMIT #{batch_size}"
           batch = klass.find_by_sql(sql)
         end
         while !batch.empty?
-          ActiveRecord::Associations::Preloader.new(batch, includes).run if includes
+          ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
           yield batch
           break if batch.size < batch_size
 
           if pluck
-            last_value = pluck.length == 1 ? batch.last : batch.last[index]
-            batch = klass.from(table).order(index).where("#{index} > ?", last_value).limit(batch_size).pluck(pluck)
+            last_value = pluck.length == 1 ? batch.last : batch.last[pluck.index(index)]
+            batch = klass.from(table).order(index).where("#{index} > ?", last_value).limit(batch_size).pluck(*quoted_plucks)
           else
             last_value = batch.last[index]
             sql = "SELECT *
@@ -759,96 +774,11 @@ ActiveRecord::Relation.class_eval do
         end
       end
     ensure
-      temporary = "TEMPORARY " if connection.adapter_name == 'Mysql2'
-      connection.execute "DROP #{temporary}TABLE #{table}"
-    end
-  end
-
-  def update_all_with_joins(updates, conditions = nil, options = {})
-    if joins_values.any?
-      if conditions
-        where(conditions).update_all
-      else
-        case connection.adapter_name
-        when 'PostgreSQL'
-          stmt = Arel::UpdateManager.new(arel.engine)
-
-          stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
-          stmt.table(table)
-          stmt.key = table[primary_key]
-
-          sql = stmt.to_sql
-
-          tables, join_conditions = deconstruct_joins(arel.join_sql.to_s)
-
-          unless tables.empty?
-            sql.concat(' FROM ')
-            sql.concat(tables.join(', '))
-            sql.concat(' ')
-          end
-
-          scope = self
-          join_conditions.each { |join| scope = scope.where(join) }
-          sql.concat(scope.arel.where_sql.to_s)
-          connection.update(sql, "#{name} Update")
-        else
-          update_all_without_joins(updates, conditions, options)
-        end
-      end
-    else
-      update_all_without_joins(updates, conditions, options)
-    end
-  end
-  alias_method_chain :update_all, :joins
-
-  def delete_all_with_joins(conditions = nil)
-    if joins_values.any?
-      if conditions
-        where(conditions).delete_all
-      else
-        case connection.adapter_name
-        when 'PostgreSQL'
-          sql = "DELETE FROM #{quoted_table_name} "
-
-          tables, join_conditions = deconstruct_joins(arel.join_sql.to_s)
-
-          sql.concat('USING ')
-          sql.concat(tables.join(', '))
-          sql.concat(' ')
-
-          scope = self
-          join_conditions.each { |join| scope = scope.where(join) }
-          sql.concat(scope.arel.where_sql.to_s)
-        when 'MySQL', 'Mysql2'
-          sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql} #{arel.where_sql}"
-        else
-          raise "Joins in delete not supported!"
-        end
-
-        connection.delete(sql, "#{name} Delete all")
-      end
-    else
-      delete_all_without_joins(conditions)
-    end
-  end
-  alias_method_chain :delete_all, :joins
-
-  def delete_all_with_limit(conditions = nil)
-    if limit_value
-      case connection.adapter_name
-      when 'MySQL', 'Mysql2'
-        v = arel.visitor
-        sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.where_sql}
-            ORDER BY #{arel.orders.map { |x| v.send(:visit, x) }.join(', ')} LIMIT #{v.send(:visit, arel.limit)}"
-        return connection.delete(sql, "#{name} Delete all")
-      else
-        scope = scoped.except(:select).select("#{quoted_table_name}.#{primary_key}")
-        return unscoped.where(primary_key => scope).delete_all
+      if !$!.is_a?(ActiveRecord::StatementInvalid) || connection.open_transactions == 0
+        connection.execute "DROP TABLE #{table}"
       end
     end
-    delete_all_without_limit(conditions)
   end
-  alias_method_chain :delete_all, :limit
 
   def lock_with_exclusive_smarts(lock_type = true)
     if lock_type == :no_key_update
@@ -860,22 +790,6 @@ ActiveRecord::Relation.class_eval do
     lock_without_exclusive_smarts(lock_type)
   end
   alias_method_chain :lock, :exclusive_smarts
-
-  def with_each_shard(*args)
-    scope = self
-    if self.respond_to?(:proxy_association) && (owner = self.proxy_association.try(:owner)) && self.shard_category != :explicit
-      scope = scope.shard(owner)
-    end
-    scope = scope.shard(args) if args.any?
-    if block_given?
-      ret = scope.activate{ |rel|
-        yield(rel)
-      }
-      Array(ret)
-    else
-      scope.to_a
-    end
-  end
 
   def polymorphic_where(args)
     raise ArgumentError unless args.length == 1
@@ -896,19 +810,24 @@ ActiveRecord::Relation.class_eval do
       personal_space -= 1
       # truncate to seconds
       bound = Time.at(Time.now.to_i - personal_space).utc
-      scope = scope.where("updated_at<?", bound)
+      scope = scope.where("#{connection.quote_local_table_name(table_name)}.updated_at<?", bound)
     end
     scope
   end
 
   def touch_all
-    not_recently_touched.update_all(updated_at: Time.now.utc)
+    self.activate do |relation|
+      relation.transaction do
+        ids_to_touch = relation.not_recently_touched.lock(:no_key_update).order(:id).pluck(:id)
+        unscoped.where(id: ids_to_touch).update_all(updated_at: Time.now.utc)
+      end
+    end
   end
 
   def distinct_on(*args)
     args.map! do |column_name|
       if column_name.is_a?(Symbol) && column_names.include?(column_name.to_s)
-        "#{connection.quote_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
+        "#{connection.quote_local_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
       else
         column_name.to_s
       end
@@ -917,11 +836,8 @@ ActiveRecord::Relation.class_eval do
     relation = clone
     old_select = relation.select_values
     relation.select_values = ["DISTINCT ON (#{args.join(', ')}) "]
-    if CANVAS_RAILS3
-      relation.uniq_value = false
-    else
-      relation.distinct_value = false
-    end
+    relation.distinct_value = false
+
     if old_select.empty?
       relation.select_values.first << "*"
     else
@@ -936,51 +852,193 @@ ActiveRecord::Relation.class_eval do
   def union(*scopes)
     uniq_identifier = "#{table_name}.#{primary_key}"
     scopes << self
-    sub_query = (scopes).map {|s| s.except(:select).select(uniq_identifier).to_sql}.join(" UNION ALL ")
+    sub_query = (scopes).map {|s| s.except(:select, :order).select(uniq_identifier).to_sql}.join(" UNION ALL ")
     engine.where("#{uniq_identifier} IN (#{sub_query})")
+  end
+
+  # returns batch_size ids at a time, working through the primary key from
+  # smallest to largest.
+  #
+  # note this does a raw connection.select_values, so it doesn't work with scopes
+  def find_ids_in_batches(options = {})
+    batch_size = options[:batch_size] || 1000
+    key = "#{quoted_table_name}.#{primary_key}"
+    scope = except(:select).select(key).reorder(key).limit(batch_size)
+    ids = connection.select_values(scope.to_sql)
+    ids = ids.map(&:to_i) unless options[:no_integer_cast]
+    while ids.present?
+      yield ids
+      break if ids.size < batch_size
+      last_value = ids.last
+      ids = connection.select_values(scope.where("#{key}>?", last_value).to_sql)
+      ids = ids.map(&:to_i) unless options[:no_integer_cast]
+    end
+  end
+
+  # returns 2 ids at a time (the min and the max of a range), working through
+  # the primary key from smallest to largest.
+  def find_ids_in_ranges(options = {})
+    batch_size = options[:batch_size].try(:to_i) || 1000
+    subquery_scope = except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(batch_size)
+    subquery_scope = subquery_scope.where("#{quoted_table_name}.#{primary_key} <= ?", options[:end_at]) if options[:end_at]
+
+    first_subquery_scope = options[:start_at] ? subquery_scope.where("#{quoted_table_name}.#{primary_key} >= ?", options[:start_at]) : subquery_scope
+    ids = connection.select_rows("select min(id), max(id) from (#{first_subquery_scope.to_sql}) as subquery").first
+
+    while ids.first.present?
+      ids.map!(&:to_i) if columns_hash[primary_key.to_s].type == :integer
+      yield(*ids)
+      last_value = ids.last
+      next_subquery_scope = subquery_scope.where(["#{quoted_table_name}.#{primary_key}>?", last_value])
+      ids = connection.select_rows("select min(id), max(id) from (#{next_subquery_scope.to_sql}) as subquery").first
+    end
   end
 end
 
-ActiveRecord::Associations::CollectionProxy.class_eval do
-  delegate :with_each_shard, :to => :scoped
+module UpdateAndDeleteWithJoins
+  def deconstruct_joins(joins_sql=nil)
+    unless joins_sql
+      joins_sql = ''
+      add_joins!(joins_sql, nil)
+    end
+    tables = []
+    join_conditions = []
+    joins_sql.strip.split('INNER JOIN')[1..-1].each do |join|
+      # this could probably be improved
+      raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_\.]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/
+      tables << $1
+      join_conditions << $2
+    end
+    [tables, join_conditions]
+  end
 
+  def update_all(updates, *args)
+    if joins_values.any?
+      case connection.adapter_name
+        when 'PostgreSQL'
+          stmt = Arel::UpdateManager.new(arel.engine)
+
+          stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
+          from = from_value.try(:first)
+          stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
+          stmt.key = table[primary_key]
+
+          sql = stmt.to_sql
+
+          join_sql = nil
+          if CANVAS_RAILS4_0
+            join_sql = arel.join_sql.to_s
+          else
+            collector = Arel::Collectors::Bind.new
+            arel.join_sources.each do |node|
+              connection.visitor.accept(node, collector)
+            end
+            join_sql = collector.compile(arel.bind_values.map{|bvs| connection.quote(*bvs.reverse)})
+          end
+          tables, join_conditions = deconstruct_joins(join_sql)
+
+          unless tables.empty?
+            sql.concat(' FROM ')
+            sql.concat(tables.join(', '))
+            sql.concat(' ')
+          end
+
+          scope = self
+          join_conditions.each { |join| scope = scope.where(join) }
+          binds = scope.bind_values.dup
+          if CANVAS_RAILS4_0
+            where_statements = scope.arel.constraints.map do |node|
+              connection.visitor.accept(node) do
+                connection.quote(*binds.shift.reverse)
+              end
+            end
+            sql.concat('WHERE ' + where_statements.join(' AND '))
+          else
+            sql_string = Arel::Collectors::Bind.new
+            scope.arel.constraints.map do |node|
+              connection.visitor.accept(node, sql_string)
+            end
+            sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
+          end
+
+          connection.update(sql, "#{name} Update")
+        else
+          super
+      end
+    else
+      super
+    end
+  end
+
+  def delete_all(conditions = nil, *args)
+    if joins_values.any?
+      if conditions
+        where(conditions).delete_all
+      else
+        case connection.adapter_name
+          when 'PostgreSQL'
+            sql = "DELETE FROM #{quoted_table_name} "
+
+            join_sql = CANVAS_RAILS4_0 ? arel.join_sql.to_s : arel.join_sources.map(&:to_sql).join(" ")
+            tables, join_conditions = deconstruct_joins(join_sql)
+
+            sql.concat('USING ')
+            sql.concat(tables.join(', '))
+            sql.concat(' ')
+
+            scope = self
+            join_conditions.each { |join| scope = scope.where(join) }
+
+            binds = scope.bind_values.dup
+            if CANVAS_RAILS4_0
+              where_statements = scope.arel.constraints.map do |node|
+                connection.visitor.accept(node) do
+                  connection.quote(*binds.shift.reverse)
+                end
+              end
+              sql.concat('WHERE ' + where_statements.join(' AND '))
+            else
+              sql_string = Arel::Collectors::Bind.new
+              scope.arel.constraints.map do |node|
+                connection.visitor.accept(node, sql_string)
+              end
+              sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
+            end
+          else
+            raise "Joins in delete not supported!"
+        end
+
+        connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
+      end
+    else
+      super
+    end
+  end
+end
+ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)
+
+module DeleteAllWithLimit
+  def delete_all(*args)
+    if limit_value || offset_value
+      scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
+      return unscoped.where(primary_key => scope).delete_all
+    end
+    super
+  end
+end
+ActiveRecord::Relation.prepend(DeleteAllWithLimit)
+
+ActiveRecord::Associations::CollectionProxy.class_eval do
   def respond_to?(name, include_private = false)
     return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(name)
     super ||
       (load_target && target.respond_to?(name, include_private)) ||
       proxy_association.klass.respond_to?(name, include_private)
   end
-end
 
-ActiveRecord::Associations::CollectionAssociation.class_eval do
-  def scoped
-    scope = super
-    proxy_association = self
-    scope.extending do
-      define_method(:proxy_association) { proxy_association }
-    end
-  end
-end
-
-if CANVAS_RAILS3
-  ActiveRecord::Persistence.module_eval do
-    def nondefaulted_attribute_names
-      attribute_names.select do |attr|
-        read_attribute(attr) != column_for_attribute(attr).try(:default)
-      end
-    end
-
-    def create
-      attributes_values = arel_attributes_values(!id.nil?, true, nondefaulted_attribute_names)
-
-      new_id = self.class.unscoped.insert attributes_values
-
-      self.id ||= new_id if self.class.primary_key
-
-      ActiveRecord::IdentityMap.add(self) if ActiveRecord::IdentityMap.enabled?
-      @new_record = false
-      id
-    end
+  def temp_record(*args)
+    # creates a record with attributes like a child record but is not added to the collection for autosaving
+    klass.unscoped.merge(scope).new(*args)
   end
 end
 
@@ -1035,267 +1093,11 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   end
 end
 
-module MySQLAdapterExtensions
-  def self.included(klass)
-    klass::NATIVE_DATABASE_TYPES[:primary_key] = "bigint DEFAULT NULL auto_increment PRIMARY KEY".freeze
-    klass.alias_method_chain :configure_connection, :pg_compat
-  end
-
-  def rename_index(table_name, old_name, new_name)
-    if version[0] >= 5 && version[1] >= 7
-      return execute "ALTER TABLE #{quote_table_name(table_name)} RENAME INDEX #{quote_column_name(old_name)} TO #{quote_table_name(new_name)}";
-    else
-      old_index_def = indexes(table_name).detect { |i| i.name == old_name }
-      return unless old_index_def
-      add_index(table_name, old_index_def.columns, :name => new_name, :unique => old_index_def.unique)
-      remove_index(table_name, :name => old_name)
-    end
-  end
-
-  def bulk_insert(table_name, records)
-    keys = records.first.keys
-    quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-    execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
-                records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
-  end
-
-  def add_column_with_foreign_key_check(table, name, type, options = {})
-    Canvas.active_record_foreign_key_check(name, type, options) unless adapter_name == 'Sqlite'
-    add_column_without_foreign_key_check(table, name, type, options)
-  end
-
-  def configure_connection_with_pg_compat
-    configure_connection_without_pg_compat
-    execute "SET SESSION SQL_MODE='PIPES_AS_CONCAT'"
-  end
-
-  def func(name, *args)
-    case name
-      when :group_concat
-        "group_concat(#{func_arg_esc(args.first)} SEPARATOR #{quote(args[1] || ',')})"
-      else
-        super
-    end
-  end
-end
-
-if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
-  ActiveRecord::ConnectionAdapters::MysqlAdapter.send(:include, MySQLAdapterExtensions)
-end
-if defined?(ActiveRecord::ConnectionAdapters::Mysql2Adapter)
-  ActiveRecord::ConnectionAdapters::Mysql2Adapter.send(:include, MySQLAdapterExtensions)
-end
-
-if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
-  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
-    def bulk_insert(table_name, records)
-      keys = records.first.keys
-      quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-      execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
-      raw_connection.put_copy_data records.inject(''){ |result, record|
-        result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
-      }
-      ActiveRecord::Base.connection.clear_query_cache
-      raw_connection.put_copy_end
-    end
-
-    def quote_text(value)
-      if value.nil?
-        "\\N"
-      else
-        hash = {"\n" => "\\n", "\r" => "\\r", "\t" => "\\t", "\\" => "\\\\"}
-        value.to_s.gsub(/[\n\r\t\\]/){ |c| hash[c] }
-      end
-    end
-
-    def supports_delayed_constraint_validation?
-      postgresql_version >= 90100
-    end
-
-    def add_foreign_key_with_delayed_validation(from_table, to_table, options = {})
-      raise ArgumentError, "Cannot specify custom options with :delay_validation" if options[:options] && options[:delay_validation]
-
-      options.delete(:delay_validation) unless supports_delayed_constraint_validation?
-      # pointless if we're in a transaction
-      options.delete(:delay_validation) if open_transactions > 0
-      column  = options[:column] || "#{to_table.to_s.singularize}_id"
-      foreign_key_name = foreign_key_name(from_table, column, options)
-
-      if options[:delay_validation]
-        options[:options] = 'NOT VALID'
-        # NOT VALID doesn't fully work through 9.3 at least, so prime the cache to make
-        # it as fast as possible. Note that a NOT EXISTS would be faster, but this is
-        # the query postgres does for the VALIDATE CONSTRAINT, so we want exactly this
-        # query to be warm
-        execute("SELECT fk.#{column} FROM #{from_table} fk LEFT OUTER JOIN #{to_table} pk ON fk.#{column}=pk.id WHERE pk.id IS NULL AND fk.#{column} IS NOT NULL LIMIT 1")
-      end
-
-      add_foreign_key_without_delayed_validation(from_table, to_table, options)
-
-      execute("ALTER TABLE #{quote_table_name(from_table)} VALIDATE CONSTRAINT #{quote_column_name(foreign_key_name)}") if options[:delay_validation]
-    end
-    alias_method_chain :add_foreign_key, :delayed_validation
-
-    def rename_index(table_name, old_name, new_name)
-      return execute "ALTER INDEX #{quote_column_name(old_name)} RENAME TO #{quote_table_name(new_name)}";
-    end
-
-    # have to replace the entire method to support concurrent
-    def add_index(table_name, column_name, options = {})
-      column_names = Array(column_name)
-      index_name   = index_name(table_name, :column => column_names)
-
-      if Hash === options # legacy support, since this param was a string
-        index_type = options[:unique] ? "UNIQUE" : ""
-        index_name = options[:name].to_s if options[:name]
-        concurrently = "CONCURRENTLY " if options[:algorithm] == :concurrently && self.open_transactions == 0
-        conditions = options[:where]
-        if conditions
-          sql_conditions = options[:where]
-          unless sql_conditions.is_a?(String)
-            model_class = table_name.classify.constantize rescue nil
-            model_class ||= ActiveRecord::Base.all_models.detect{|m| m.table_name.to_s == table_name.to_s}
-            model_class ||= ActiveRecord::Base
-            sql_conditions = model_class.send(:sanitize_sql, conditions, table_name.to_s.dup)
-          end
-          conditions = " WHERE #{sql_conditions}"
-        end
-      else
-        index_type = options
-      end
-
-      if index_name.length > index_name_length
-        warning = "Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters. Skipping."
-        @logger.warn(warning)
-        raise warning unless Rails.env.production?
-        return
-      end
-      if index_exists?(table_name, index_name, false)
-        @logger.warn("Index name '#{index_name}' on table '#{table_name}' already exists. Skipping.")
-        return
-      end
-      quoted_column_names = quoted_columns_for_index(column_names, options).join(", ")
-
-      execute "CREATE #{index_type} INDEX #{concurrently}#{quote_column_name(index_name)} ON #{quote_table_name(table_name)} (#{quoted_column_names})#{conditions}"
-    end
-
-    def set_standard_conforming_strings_with_version_check
-      set_standard_conforming_strings_without_version_check unless postgresql_version >= 90100
-    end
-    alias_method_chain :set_standard_conforming_strings, :version_check
-
-    # we always use the default sequence name, so override it to not actually query the db
-    # (also, it doesn't matter if you're using PG 8.2+)
-    def default_sequence_name(table, pk)
-      "#{table}_#{pk}_seq"
-    end
-  end
-
-end
-
 ActiveRecord::Associations::HasOneAssociation.class_eval do
   def create_scope
-    scope = scoped.scope_for_create.stringify_keys
+    scope = self.scope.scope_for_create.stringify_keys
     scope = scope.except(klass.primary_key) unless klass.primary_key.to_s == reflection.foreign_key.to_s
     scope
-  end
-end
-
-# See https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/66-true-false-conditions-broken-for-sqlite#ticket-66-9
-# The default 't' and 'f' are no good, since sqlite treats them both as 0 in boolean logic.
-# This patch makes it so you can do stuff like:
-#   :conditions => "active"
-# instead of having to do:
-#   :conditions => ["active = ?", true]
-if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
-  ActiveRecord::ConnectionAdapters::SQLiteAdapter.class_eval do
-    def quoted_true
-      '1'
-    end
-
-    def quoted_false
-      '0'
-    end
-  end
-end
-
-# postgres doesn't support limit on text columns, but it does on varchars. assuming we don't exceed
-# the varchar limit, change the type. otherwise drop the limit. not a big deal since we already
-# have max length validations in the models.
-if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
-  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
-    def type_to_sql_with_text_to_varchar(type, limit = nil, *args)
-      if type == :text && limit
-        if limit <= 10485760
-          type = :string
-        else
-          limit = nil
-        end
-      end
-      type_to_sql_without_text_to_varchar(type, limit, *args)
-    end
-    alias_method_chain :type_to_sql, :text_to_varchar
-  end
-end
-
-if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
-  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
-    def func(name, *args)
-      case name
-        when :group_concat
-          "string_agg((#{func_arg_esc(args.first)})::text, #{quote(args[1] || ',')})"
-        else
-          super
-      end
-    end
-
-    def group_by(*columns)
-      # although postgres 9.1 lets you omit columns that are functionally
-      # dependent on the primary keys, that's only true if the FROM items are
-      # all tables (i.e. not subselects). to keep things simple, we always
-      # specify all columns for postgres
-      infer_group_by_columns(columns).flatten.join(', ')
-    end
-
-    # ActiveRecord 3.2 ignores indexes if it cannot parse the column names
-    # (for instance when using functions like LOWER)
-    # this will lead to problems if we try to remove the index (index_exists? will return false)
-    def indexes(table_name)
-      result = query(<<-SQL, 'SCHEMA')
-         SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid
-         FROM pg_class t
-         INNER JOIN pg_index d ON t.oid = d.indrelid
-         INNER JOIN pg_class i ON d.indexrelid = i.oid
-         WHERE i.relkind = 'i'
-           AND d.indisprimary = 'f'
-           AND t.relname = '#{table_name}'
-           AND i.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = ANY (current_schemas(false)) )
-        ORDER BY i.relname
-      SQL
-
-      result.map do |row|
-        index_name = row[0]
-        unique = row[1] == 't'
-        indkey = row[2].split(" ")
-        inddef = row[3]
-        oid = row[4]
-
-        columns = Hash[query(<<-SQL, "SCHEMA")]
-        SELECT a.attnum, a.attname
-        FROM pg_attribute a
-        WHERE a.attrelid = #{oid}
-        AND a.attnum IN (#{indkey.join(",")})
-        SQL
-
-        column_names = columns.values_at(*indkey).compact
-
-        # add info on sort order for columns (only desc order is explicitly specified, asc is the default)
-        desc_order_columns = inddef.scan(/(\w+) DESC/).flatten
-        orders = desc_order_columns.any? ? Hash[desc_order_columns.map {|order_column| [order_column, :desc]}] : {}
-
-        ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, [], orders)
-      end
-    end
   end
 end
 
@@ -1305,14 +1107,6 @@ class ActiveRecord::Migration
   DEPLOY_TAGS = [:predeploy, :postdeploy]
 
   class << self
-    if CANVAS_RAILS3
-      attr_accessor :disable_ddl_transaction
-
-      def disable_ddl_transaction!
-        @disable_ddl_transaction = true
-      end
-    end
-
     def tag(*tags)
       raise "invalid tags #{tags.inspect}" unless tags - VALID_TAGS == []
       (@tags ||= []).concat(tags).uniq!
@@ -1339,12 +1133,6 @@ class ActiveRecord::Migration
     end
   end
 
-  if CANVAS_RAILS3
-    def disable_ddl_transaction
-      self.class.disable_ddl_transaction
-    end
-  end
-
   def tags
     self.class.tags
   end
@@ -1352,9 +1140,6 @@ end
 
 class ActiveRecord::MigrationProxy
   delegate :connection, :tags, to: :migration
-  if CANVAS_RAILS3
-    delegate :disable_ddl_transaction, to: :migration
-  end
 
   def runnable?
     !migration.respond_to?(:runnable?) || migration.runnable?
@@ -1363,121 +1148,62 @@ class ActiveRecord::MigrationProxy
   def load_migration
     load(filename)
     @migration = name.constantize
-    raise "#{self.name} (#{self.version}) is not tagged as predeploy or postdeploy!" if (@migration.tags & ActiveRecord::Migration::DEPLOY_TAGS).empty? && self.version > 20120217214153
+    raise "#{self.name} (#{self.version}) is not tagged as exactly one of predeploy or postdeploy!" unless (@migration.tags & ActiveRecord::Migration::DEPLOY_TAGS).length == 1
     @migration
   end
 end
 
-class ActiveRecord::Migrator
-  cattr_accessor :migrated_versions
-
-  def self.migrations_paths
-    @@migration_paths ||= []
+module MigratorCache
+  def migrations(paths)
+    @@migrations_hash ||= {}
+    @@migrations_hash[paths] ||= super
   end
 
-  def migrations
-    @@migrations ||= begin
-      @migrations_path ||= File.join(Rails.root, 'db/migrate')
-      files = ([@migrations_path].compact + self.class.migrations_paths).uniq.
-        map { |p| Dir["#{p}/[0-9]*_*.rb"] }.flatten
-
-      migrations = files.inject([]) do |klasses, file|
-        version, name, scope = file.scan(/([0-9]+)_([_a-z0-9]*)\.?([_a-z0-9]*)?\.rb\z/).first
-
-        raise ActiveRecord::IllegalMigrationNameError.new(file) unless version
-        version = version.to_i
-
-        if klasses.detect { |m| m.version == version }
-          raise ActiveRecord::DuplicateMigrationVersionError.new(version)
-        end
-
-        if klasses.detect { |m| m.name == name.camelize }
-          raise ActiveRecord::DuplicateMigrationNameError.new(name.camelize)
-        end
-
-        klasses << ActiveRecord::MigrationProxy.new(name.camelize, version, file, scope)
-        klasses
-      end
-
-      migrations = migrations.sort_by(&:version)
-      down? ? migrations.reverse : migrations
-    end
-  end
-
-  def pending_migrations_with_runnable
-    pending_migrations_without_runnable.reject { |m| !m.runnable? }
-  end
-  alias_method_chain :pending_migrations, :runnable
-
-  def migrate(tag = nil)
-    current = migrations.detect { |m| m.version == current_version }
-    target = migrations.detect { |m| m.version == @target_version }
-
-    if target.nil? && !@target_version.nil? && @target_version > 0
-      raise UnknownMigrationVersionError.new(@target_version)
-    end
-
-    start = up? ? 0 : (migrations.index(current) || 0)
-    finish = migrations.index(target) || migrations.size - 1
-    runnable = migrations[start..finish]
-
-    # skip the last migration if we're headed down, but not ALL the way down
-    runnable.pop if down? && !target.nil?
-
-    runnable.each do |migration|
-      ActiveRecord::Base.logger.info "Migrating to #{migration.name} (#{migration.version})"
-
-      # On our way up, we skip migrating the ones we've already migrated
-      next if up? && migrated.include?(migration.version.to_i)
-
-      # On our way down, we skip reverting the ones we've never migrated
-      if down? && !migrated.include?(migration.version.to_i)
-        migration.announce 'never migrated, skipping'; migration.write
-        next
-      end
-
-      next if !tag.nil? && !migration.tags.include?(tag)
-      next if !migration.runnable?
-
-      begin
-        if down? && !Rails.env.test? && !$confirmed_migrate_down
-          require 'highline'
-          if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
-            raise("Revert not confirmed")
-          end
-          $confirmed_migrate_down = true if $1.downcase == 'a'
-        end
-
-        ddl_transaction(migration) do
-          self.class.migrated_versions = @migrated_versions
-          migration.migrate(@direction)
-          @migrated_versions = self.class.migrated_versions
-          record_version_state_after_migrating(migration.version) unless tag == :predeploy && migration.tags.include?(:postdeploy)
-        end
-      rescue => e
-        canceled_msg = use_transaction?(migration)? "this and " : ""
-        raise StandardError, "An error has occurred, #{canceled_msg}all later migrations canceled:\n\n#{e}", e.backtrace
-      end
-    end
-  end
-
-  if CANVAS_RAILS3
-    def ddl_transaction(migration)
-      if use_transaction?(migration)
-        migration.connection.transaction { yield }
-      else
-        yield
-      end
-    end
-
-    def use_transaction?(migration)
-      !migration.disable_ddl_transaction && migration.connection.supports_ddl_transactions?
-    end
+  def migrations_paths
+    @@migrations_paths ||= [File.join(Rails.root, "db/migrate")]
   end
 end
+ActiveRecord::Migrator.singleton_class.prepend(MigratorCache)
 
-ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('vendor', 'plugins', '*', 'db', 'migrate')]
+module Migrator
+  def skipped_migrations
+    pending_migrations(call_super: true).reject(&:runnable?)
+  end
+
+  def pending_migrations(call_super: false)
+    return super() if call_super
+    super().select(&:runnable?)
+  end
+
+  def runnable
+    super.select(&:runnable?)
+  end
+
+  def execute_migration_in_transaction(migration, direct)
+    old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
+    if defined?(Marginalia)
+      old_migration_name, Marginalia::Comment.migration = Marginalia::Comment.migration, migration.name
+    end
+    if down? && !Rails.env.test? && !$confirmed_migrate_down
+      require 'highline'
+      if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
+        raise("Revert not confirmed")
+      end
+      $confirmed_migrate_down = true if $1.downcase == 'a'
+    end
+
+    super
+  ensure
+    ActiveRecord::Base.in_migration = old_in_migration
+    Marginalia::Comment.migration = old_migration_name if defined?(Marginalia)
+  end
+end
+ActiveRecord::Migrator.prepend(Migrator)
+
 ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plugins', '*', 'db', 'migrate')]
+
+ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths
+
 ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   def add_index_with_length_raise(table_name, column_name, options = {})
     unless options[:name].to_s =~ /^temp_/
@@ -1487,7 +1213,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
       if index_name.length > index_name_length
         raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters.")
       end
-      if index_exists?(table_name, index_name, false)
+      if index_exists?(table_name, column_names, :name => index_name)
         raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' already exists.")
       end
     end
@@ -1498,13 +1224,14 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   # in anticipation of having to re-run migrations due to integrity violations or
   # killing stuff that is holding locks too long
   def add_foreign_key_if_not_exists(from_table, to_table, options = {})
-    column  = options[:column] || "#{to_table.to_s.singularize}_id"
+    options[:column] ||= "#{to_table.to_s.singularize}_id"
+    column = options[:column]
     case self.adapter_name
-    when 'SQLite'; return
     when 'PostgreSQL'
-      foreign_key_name = foreign_key_name(from_table, column, options)
+      foreign_key_name = CANVAS_RAILS4_0 ? foreign_key_name(from_table, column, options) : foreign_key_name(from_table, options)
       query = supports_delayed_constraint_validation? ? 'convalidated' : 'conname'
-      value = select_value("SELECT #{query} FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=current_schema()")
+      schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
+      value = select_value("SELECT #{query} FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}")
       if supports_delayed_constraint_validation? && value == 'f'
         execute("ALTER TABLE #{quote_table_name(from_table)} DROP CONSTRAINT #{quote_table_name(foreign_key_name)}")
       elsif value
@@ -1523,130 +1250,186 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     begin
       remove_foreign_key(table, options)
     rescue ActiveRecord::StatementInvalid => e
-      raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist|Mysql2?::Error: Error on rename/
+      raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist/
     end
   end
 
   # does a query first to make the actual constraint adding fast
   def change_column_null_with_less_locking(table, column)
-    execute("SELECT COUNT(*) FROM #{table} WHERE #{column} IS NULL") if open_transactions == 0
+    execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL") if open_transactions == 0
     change_column_null table, column, false
   end
-
-  def index_exists_with_options?(table_name, column_name, options = {})
-    if options.is_a?(Hash)
-      index_exists_without_options?(table_name, column_name, options)
-    else
-      # in ActiveRecord 2.3, the second argument is index_name
-      name = column_name.to_s
-      index_exists_without_options?(table_name, nil, {:name => name})
-    end
-  end
-  alias_method_chain :index_exists?, :options
-
-  # in ActiveRecord 3.2, it will raise an ArgumentError if the index doesn't exist
-  def remove_index(table_name, options)
-    name = index_name(table_name, options)
-    unless index_exists?(table_name, nil, {:name => name})
-      @logger.warn("Index name '#{name}' on table '#{table_name}' does not exist. Skipping.")
-      return
-    end
-    remove_index!(table_name, name)
-  end
-
 end
 
-if CANVAS_RAILS3
-  ActiveRecord::Associations::CollectionAssociation.class_eval do
-    # CollectionAssociation implements uniq for :uniq option, in its
-    # own special way. re-implement, but as a relation if it's not an
-    # internal use of it
-    def uniq(records = true)
-      if records.is_a?(Array)
-        records.uniq
-      else
-        scoped.uniq(records)
-      end
-    end
-  end
-else
-  ActiveRecord::Associations::CollectionAssociation.class_eval do
-    # CollectionAssociation implements uniq for :uniq option, in its
-    # own special way. re-implement, but as a relation
-    def distinct
-      scope.distinct
-    end
-  end
-end
-
-if Rails.version >= '3' && Rails.version < '4'
-  ActiveRecord::Sanitization::ClassMethods.module_eval do
-    def quote_bound_value_with_relations(value, c = connection)
-      if ActiveRecord::Relation === value
-        value.to_sql
-      else
-        quote_bound_value_without_relations(value, c)
-      end
-    end
-    alias_method_chain :quote_bound_value, :relations
-  end
-end
-
-if Rails.version < '4'
-  klass = ActiveRecord::ConnectionAdapters::Mysql2Column if defined?(ActiveRecord::ConnectionAdapters::Mysql2Column)
-  klass = ActiveRecord::ConnectionAdapter::AbstractMysqlAdapter::Column if defined?(ActiveRecord::ConnectionAdapter::AbstractMysqlAdapter::Column)
-  if klass
-    klass.class_eval do
-      def extract_default(default)
-        if sql_type =~ /blob/i || type == :text
-          if default.blank?
-            # CHANGED - don't believe the '' default
-            return nil
-          else
-            raise ArgumentError, "#{type} columns cannot have a default value: #{default.inspect}"
-          end
-        elsif missing_default_forged_as_empty_string?(default)
-          nil
-        else
-          super
-        end
-      end
-    end
+ActiveRecord::Associations::CollectionAssociation.class_eval do
+  # CollectionAssociation implements uniq for :uniq option, in its
+  # own special way. re-implement, but as a relation
+  def distinct
+    scope.distinct
   end
 end
 
 module UnscopeCallbacks
-  def run_callbacks(kind)
-    scope = self.class.unscoped
-    scope.default_scoped = true
-    scope.scoping { super }
+  if CANVAS_RAILS4_0
+    def run_callbacks(kind)
+      scope = self.class.base_class.unscoped
+      scope.default_scoped = true
+      scope.scoping { super }
+    end
+  else
+    def __run_callbacks__(*args)
+      scope = self.class.base_class.unscoped
+      scope.scoping { super }
+    end
   end
 end
-
 ActiveRecord::Base.send(:include, UnscopeCallbacks)
 
-if CANVAS_RAILS3
-  [ActiveRecord::DynamicFinderMatch, ActiveRecord::DynamicScopeMatch].each do |klass|
-    klass.class_eval do
-      class << self
-        def match_with_discard(method)
-          result = match_without_discard(method)
-          return nil if result && (result.is_a?(ActiveRecord::DynamicScopeMatch) || result.finder != :first || result.instantiator? || result.bang?)
-          result
-        end
-        alias_method_chain :match, :discard
+ActiveRecord::DynamicMatchers::Method.class_eval do
+  class << self
+    def match_with_discard(model, name)
+      result = match_without_discard(model, name)
+      return nil if result && !result.is_a?(ActiveRecord::DynamicMatchers::FindBy)
+      result
+    end
+    alias_method_chain :match, :discard
+  end
+end
+
+if CANVAS_RAILS4_0
+  module PreloaderShim
+    def initialize(*args)
+      super unless args.empty?
+    end
+
+    def preload(*args)
+      if args.size == 1
+        super
+      else
+        records, associations, preload_scope = args
+        @records       = Array.wrap(records).compact.uniq
+        @associations  = Array.wrap(associations)
+        @preload_scope = preload_scope || ActiveRecord::Relation.new(nil, nil)
+        run
       end
     end
   end
-else
-  ActiveRecord::DynamicMatchers::Method.class_eval do
-    class << self
-      def match_with_discard(model, name)
-        result = match_without_discard(model, name)
-        return nil if result && !result.is_a?(ActiveRecord::DynamicMatchers::FindBy)
-        result
+
+  ActiveRecord::Associations::Preloader.send(:prepend, PreloaderShim)
+end
+
+unless CANVAS_RAILS4_0
+  # see https://github.com/rails/rails/issues/18659
+  class AttributesDefiner
+    # defines attribute methods when loaded through Marshal
+    def initialize(klass)
+      @klass = klass
+    end
+
+    def marshal_dump
+      @klass
+    end
+
+    def marshal_load(klass)
+      klass.define_attribute_methods
+      @klass = klass
+    end
+  end
+
+  module DefineAttributeMethods
+    def init_internals
+      @define_attributes_helper = AttributesDefiner.new(self.class)
+      super
+    end
+  end
+  ActiveRecord::Base.include(DefineAttributeMethods)
+end
+
+module SkipTouchCallbacks
+  module Base
+    def skip_touch_callbacks(name)
+      if CANVAS_RAILS4_0
+        self.suspend_callbacks("(belongs_to_touch_after_save_or_destroy_for_#{name})") do
+          yield
+        end
+      else
+        @skip_touch_callbacks ||= Set.new
+        if @skip_touch_callbacks.include?(name)
+          yield
+        else
+          @skip_touch_callbacks << name
+          yield
+          @skip_touch_callbacks.delete(name)
+        end
       end
-      alias_method_chain :match, :discard
+    end
+
+    def touch_callbacks_skipped?(name)
+      (@skip_touch_callbacks && @skip_touch_callbacks.include?(name)) ||
+        (self.superclass < ActiveRecord::Base && self.superclass.touch_callbacks_skipped?(name))
+    end
+  end
+
+  module BelongsTo
+    def touch_record(o, foreign_key, name, *args)
+      return if o.class.touch_callbacks_skipped?(name)
+      super
     end
   end
 end
+ActiveRecord::Base.singleton_class.include(SkipTouchCallbacks::Base)
+
+# This code is copied directly out of ActiveRecord with the exception of 2 lines.
+# The reason we need it it comes down to page views and other "Shardless" classes.
+# PageView is a class that we don’t store data for in postgres, but instead in Cassandra.
+# So it doesn't have a true "shard", but for the purposes of the AR interface in switchman,
+# it's "shard" is the birth shard, and the "conn" line here was pulling a connection
+# to it just to do bind variable merging (which doesn't actually need a real
+# postgres connection).  In Rails 4.2 this won't be a problem anymore,
+# so yank this monkey patch when we're on Rails 4.2
+module MultiMergeWithoutConnection
+  def merge_multi_values
+    lhs_wheres = relation.where_values
+    rhs_wheres = values[:where] || []
+
+    lhs_binds  = relation.bind_values
+    rhs_binds  = values[:bind] || []
+
+    removed, kept = partition_overwrites(lhs_wheres, rhs_wheres)
+
+    where_values = kept + rhs_wheres
+    bind_values  = filter_binds(lhs_binds, removed) + rhs_binds
+
+    # conn = relation.klass.connection
+    # commented because we don't actually need a connection to substitute
+    bv_index = 0
+    where_values.map! do |node|
+      if Arel::Nodes::Equality === node && Arel::Nodes::BindParam === node.right
+        # substitute = conn.substitute_at(bind_values[bv_index].first, bv_index)
+        # commented so we can just pull in the BindParam class and use it directly
+        # rather than establishing a connection to the db first.
+        substitute = Arel::Nodes::BindParam.new "$#{bv_index + 1}"
+        bv_index += 1
+        Arel::Nodes::Equality.new(node.left, substitute)
+      else
+        node
+      end
+    end
+
+    relation.where_values = where_values
+    relation.bind_values  = bind_values
+
+    if values[:reordering]
+      # override any order specified in the original relation
+      relation.reorder! values[:order]
+    elsif values[:order]
+      # merge in order_values from r
+      relation.order! values[:order]
+    end
+
+    relation.extend(*values[:extending]) unless values[:extending].blank?
+  end
+end
+ActiveRecord::Relation::Merger.prepend(MultiMergeWithoutConnection) if CANVAS_RAILS4_0
+
+ActiveRecord::Associations::Builder::BelongsTo.singleton_class.prepend(SkipTouchCallbacks::BelongsTo) unless CANVAS_RAILS4_0

@@ -18,6 +18,7 @@
 
 class CalendarEventsController < ApplicationController
   before_filter :require_context
+  before_filter :rich_content_service_config, only: [:new, :edit]
 
   add_crumb(proc { t(:'#crumbs.calendar_events', "Calendar Events")}, :only => [:show, :new, :edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
 
@@ -32,7 +33,7 @@ class CalendarEventsController < ApplicationController
     end
     if authorized_action(@event, @current_user, :read)
       # If param specifies to open event on calendar, redirect to view
-      if params[:calendar] == '1'
+      if params[:calendar] == '1' || @context.is_a?(CourseSection)
         return redirect_to calendar_url_for(@event.effective_context, :event => @event)
       end
       log_asset_access(@event, "calendar", "calendar")
@@ -45,10 +46,10 @@ class CalendarEventsController < ApplicationController
 
 
   def new
-    @event = @context.calendar_events.scoped.new
+    @event = @context.calendar_events.temp_record
     add_crumb(t('crumbs.new', "New Calendar Event"), named_context_url(@context, :new_context_calendar_event_url))
     @event.assign_attributes(params.slice(:title, :start_at, :end_at, :location_name, :location_address))
-    js_env(:DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments))
+    js_env(:RECURRING_CALENDAR_EVENTS_ENABLED => @context.feature_enabled?(:recurring_calendar_events))
     authorized_action(@event, @current_user, :create)
   end
 
@@ -75,7 +76,6 @@ class CalendarEventsController < ApplicationController
     if @event.grants_right?(@current_user, session, :update)
       @event.update_attributes!(params.slice(:title, :start_at, :end_at, :location_name, :location_address))
     end
-    js_env(:DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments))
     if authorized_action(@event, @current_user, :update_content)
       render :new
     end
@@ -112,4 +112,8 @@ class CalendarEventsController < ApplicationController
     end
   end
 
+  protected
+  def rich_content_service_config
+    rce_js_env(:sidebar)
+  end
 end

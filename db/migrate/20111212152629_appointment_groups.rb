@@ -1,4 +1,6 @@
 class AppointmentGroups < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_table :appointment_groups do |t|
       t.string :title

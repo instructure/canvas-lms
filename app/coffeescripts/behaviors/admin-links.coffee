@@ -5,7 +5,7 @@ define [
 
   # this is a behaviour that will automatically set up a set of .admin-links
   # when the button is clicked, see _admin_links.scss for markup
-  $(document).on 'mousedown mouseup click keydown', '.al-trigger', (event) ->
+  $(document).on 'mousedown click keydown', '.al-trigger', (event) ->
     $trigger = $(this)
     return if $trigger.data('kyleMenu')
     opts = $.extend {noButton: true}, $trigger.data('kyleMenuOptions')
@@ -17,5 +17,4 @@ define [
           at: $trigger.data('popup-at')
           within: $trigger.data('popup-within')
     new KyleMenu($trigger, opts)
-
     $trigger.trigger(event)

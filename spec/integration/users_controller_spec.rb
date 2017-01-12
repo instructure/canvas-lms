@@ -170,12 +170,12 @@ describe UsersController do
       assert_status(401)
     end
 
-    it "should show user to account users that have the view_statistics permission" do
+    it "should show user to account users that have the read_roster permission" do
       account_model
       student_in_course(:account => @account)
 
       role = custom_account_role('custom', :account => @account)
-      RoleOverride.create!(:context => @account, :permission => 'view_statistics',
+      RoleOverride.create!(:context => @account, :permission => 'read_roster',
                            :role => role, :enabled => true)
       @account.account_users.create!(user: user, role: role)
       user_session(@user)
@@ -265,6 +265,21 @@ describe UsersController do
       course_with_student(:user => @student, :active_all => true)
 
       get grades_url
+      student_grades = Nokogiri::HTML(response.body).css('.student_grades tr')
+      expect(student_grades.length).to eq 2
+      expect(student_grades.text).to match /#{@first_course.name}/
+      expect(student_grades.text).to match /#{@course.name}/
+    end
+
+    it "should let an admin with view_all_grades view" do
+      course_with_student(:active_all => true)
+      @first_course = @course
+      course_with_student(:user => @student, :active_all => true)
+      role = custom_account_role('grade viewer', :account => Account.default)
+      account_admin_user_with_role_changes(:role => role, :role_changes => {:view_all_grades => true})
+      user_session(@user)
+
+      get "/users/#{@student.id}/grades"
       student_grades = Nokogiri::HTML(response.body).css('.student_grades tr')
       expect(student_grades.length).to eq 2
       expect(student_grades.text).to match /#{@first_course.name}/

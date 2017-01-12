@@ -1,27 +1,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "course copy" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def validate_course_main_page
-    header = f('#section-tabs-header')
+    header = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#breadcrumbs .home + li a' : '#section-tabs-header')
     expect(header).to be_displayed
     expect(header.text).to eq @course.course_code
-  end
-
-  def upload_helper
-    filename, fullpath, data = get_file('attachments.zip')
-    f('#zip_file').send_keys(fullpath)
-    submit_form('#zip_file_import_form')
-    keep_trying_until { Delayed::Job.count > 0 }
-    expect_new_page_load { Delayed::Job.last.invoke_job }
-    validate_course_main_page
-    folder = Folder.root_folders(@course).first
-    expect(folder.attachments.active.map(&:display_name)).to eq ["first_entry.txt"]
-    expect(folder.sub_folders.active.count).to eq 1
-    sub = folder.sub_folders.active.first
-    expect(sub.name).to eq "adir"
-    expect(sub.attachments.active.map(&:display_name)).to eq ["second_entry.txt"]
   end
 
   describe "course copy through course copying" do
@@ -36,7 +21,7 @@ describe "course copy" do
       get "/courses/#{@course.id}/copy"
       expect_new_page_load { f('button[type="submit"]').click }
       run_jobs
-      keep_trying_until { f('div.progressStatus span').text == 'Completed' }
+      expect(f('div.progressStatus span')).to include_text 'Completed'
 
       @new_course = Course.last
       expect(@new_course.syllabus_body).to eq @course.syllabus_body
@@ -45,29 +30,8 @@ describe "course copy" do
       expect(@new_course.wiki.wiki_pages.count).to eq 1
     end
 
-    it "should copy the course with different settings" do
-      skip("killing thread with intermittent failures")
-      enable_cache do
-        course_with_admin_logged_in
-        5.times { |i| @course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}") }
-
-        get "/courses/#{@course.id}/copy"
-        expect_new_page_load { f('button[type="submit"]').click }
-        submit_form('#copy_context_form')
-        wait_for_ajaximations
-        f('#copy_everything').click
-        wait_for_ajaximations
-
-        keep_trying_until { Canvas::Migration::Worker::CourseCopyWorker.new.perform(ContentMigration.last)}
-
-        keep_trying_until { expect(f('#copy_results > h2')).to include_text('Copy Succeeded') }
-
-        @new_course = Course.last
-        get "/courses/#{@new_course.id}"
-        expect(f(".no-recent-messages")).to include_text("No Recent Messages")
-        expect(@new_course.wiki.wiki_pages.count).to eq 5
-      end
-    end
+    # TODO reimplement per CNVS-29604, but make sure we're testing at the right level
+    it "should copy the course with different settings"
 
     it "should set the course name and code correctly" do
       course_with_admin_logged_in
@@ -146,28 +110,54 @@ describe "course copy" do
 
       expect_new_page_load { f('button[type="submit"]').click }
       run_jobs
-      keep_trying_until { f('div.progressStatus span').text == 'Completed' }
+      expect(f('div.progressStatus span')).to include_text 'Completed'
 
       @new_course = subaccount.courses.where("id <>?", @course.id).last
       expect(@new_course.syllabus_body).to eq @course.syllabus_body
     end
-  end
 
-  describe "course file imports" do
+    it "should create the new course with the default enrollment term if needed" do
+      account_model
+      @account.settings[:teachers_can_create_courses] = true
+      @account.save!
 
-    before (:each) do
-      skip('193')
-      course_with_teacher_logged_in(:course_code => 'first files course')
-      @second_course = Course.create!(:name => 'second files course')
-      @second_course.offer!
-      @second_course.enroll_teacher(@user).accept!
-      @second_course.reload
-      get "/courses/#{@course.id}/imports/files"
+      term = @account.enrollment_terms.create!
+      term.set_overrides(@account, 'TeacherEnrollment' => {:end_at => 3.days.ago})
+
+      course_with_teacher_logged_in(:account => @account, :active_all => true)
+      @course.enrollment_term = term
+      @course.syllabus_body = "<p>haha</p>"
+      @course.save!
+
+      get "/courses/#{@course.id}/settings"
+      link = f('.copy_course_link')
+      expect(link).to be_displayed
+
+      expect_new_page_load { link.click }
+
+      expect_new_page_load { f('button[type="submit"]').click }
+      run_jobs
+      expect(f('div.progressStatus span')).to include_text 'Completed'
+
+      @new_course = @account.courses.where("id <>?", @course.id).last
+      expect(@new_course.enrollment_term).to eq @account.default_enrollment_term
+      expect(@new_course.syllabus_body).to eq @course.syllabus_body
     end
 
-    it "should successfully import a zip file" do
-      upload_helper
-    end
+    it "should not be able to submit invalid course dates" do
+      course_with_admin_logged_in
 
+      get "/courses/#{@course.id}/copy"
+
+      replace_content(f('#course_start_at'), 'Aug 15, 2012')
+      replace_content(f('#course_conclude_at'), 'Jul 11, 2012', :tab_out => true)
+
+      button = f('button.btn-primary')
+      expect(button).to be_disabled
+
+      replace_content(f('#course_conclude_at'), 'Aug 30, 2012', :tab_out => true)
+
+      expect(button).not_to be_disabled
+    end
   end
 end

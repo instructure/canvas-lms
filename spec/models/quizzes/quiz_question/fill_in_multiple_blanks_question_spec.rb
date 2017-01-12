@@ -1,5 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
+require_dependency 'quizzes/quiz_question/base'
+
 describe Quizzes::QuizQuestion::FillInMultipleBlanksQuestion do
 
   let(:answer1) { {id: 1, blank_id: 'blank1', text: 'First', weight: 100} }

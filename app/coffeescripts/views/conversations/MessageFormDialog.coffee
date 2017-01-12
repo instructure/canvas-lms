@@ -178,7 +178,7 @@ define [
       @recipientView.on('changeToken', @recipientIdsChanged)
       @recipientView.on('recipientTotalChange', @recipientTotalChanged)
 
-      unless _.include(ENV.current_user_roles, 'admin')
+      unless ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT
         @$messageCourse.attr('aria-required', true)
         @recipientView.disable(true)
 
@@ -188,17 +188,19 @@ define [
         courses: @options.courses,
         defaultOption: I18n.t('select_course', 'Select course')
       )
-      @courseView.on('course', @onCourse)
       if @model
         if @model.get('context_code')
-          @courseView.setValue(@model.get('context_code'))
+          @onCourse({id: @model.get('context_code'), name: @model.get('context_name')})
         else
+          @courseView.on('course', @onCourse)
           @courseView.setValue("course_" + _.keys(@model.get('audience_contexts').courses)[0])
         @recipientView.disable(false)
       else if @launchParams
+        @courseView.on('course', @onCourse)
         @courseView.setValue(@launchParams.context) if @launchParams.context
         @recipientView.disable(false)
       else
+        @courseView.on('course', @onCourse)
         @courseView.setValue(@defaultCourse)
       if @model
         @courseView.$picker.css('display', 'none')
@@ -278,13 +280,12 @@ define [
         disableWhileLoading: true
         required: ['body']
         property_validations:
-          token_capture: => I18n.t('errors.field_is_required', "This field is required") if @recipientView and !@recipientView.tokens.length
+          token_capture: => I18n.t("Invalid recipient name.") if @recipientView and !@recipientView.tokens.length
         handle_files: (attachments, data) ->
           data.attachment_ids = (a.attachment.id for a in attachments)
           data
         processData: (formData) =>
-          unless formData.context_code
-            formData.context_code = @options.account_context_code
+          formData.context_code ||= @launchParams?.context || @options.account_context_code
           formData
         onSubmit: (@request, submitData) =>
           # close dialog after submitting the message

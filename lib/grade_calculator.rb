@@ -31,9 +31,7 @@ class GradeCalculator
     @grading_period = opts[:grading_period]
 
     assignment_scope = @course.assignments.published.gradeable
-    @assignments = @grading_period ?
-                     @grading_period.assignments(assignment_scope) :
-                     assignment_scope.all
+    @assignments = assignment_scope.to_a
 
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = {}
@@ -56,24 +54,30 @@ class GradeCalculator
         except(:order, :select).
         for_user(@user_ids).
         where(assignment_id: @assignments.map(&:id)).
-        select("submissions.id, user_id, assignment_id, score")
+        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
     submissions_by_user = @submissions.group_by(&:user_id)
 
-    scores = []
+    result = []
     @user_ids.each_slice(100) do |batched_ids|
       load_assignment_visibilities_for_users(batched_ids)
       batched_ids.each do |user_id|
         user_submissions = submissions_by_user[user_id] || []
-        if differentiated_assignments_on?
-          user_submissions.select!{|s| assignment_ids_visible_to_user(user_id).include?(s.assignment_id)}
-        end
+        user_submissions.select!{|s| assignment_ids_visible_to_user(user_id).include?(s.assignment_id)}
         current, current_groups = calculate_current_score(user_id, user_submissions)
         final, final_groups = calculate_final_score(user_id, user_submissions)
-        scores << [[current, current_groups], [final, final_groups]]
+
+        scores = {
+          current: current,
+          current_groups: current_groups,
+          final: final,
+          final_groups: final_groups
+        }
+
+        result << scores
       end
       clear_assignment_visibilities_cache
     end
-    scores
+    result
   end
 
   def compute_and_save_scores
@@ -83,15 +87,12 @@ class GradeCalculator
 
   private
 
-  def differentiated_assignments_on?
-    @differentiated_assignments_enabled ||= @course.feature_enabled?(:differentiated_assignments)
-  end
-
   def save_scores
     raise "Can't save scores when ignore_muted is false" unless @ignore_muted
 
     Course.where(:id => @course).update_all(:updated_at => Time.now.utc)
-    query = "updated_at=#{Enrollment.sanitize(Time.now.utc)}"
+    time = Enrollment.sanitize(Time.now.utc)
+    query = "updated_at=#{time}, graded_at=#{time}"
     query += ", computed_current_score=CASE user_id #{@current_updates.map { |user_id, grade| "WHEN #{user_id} THEN #{grade || "NULL"}"}.
       join(" ")} ELSE computed_current_score END"
     query += ", computed_final_score=CASE user_id #{@final_updates.map { |user_id, grade| "WHEN #{user_id} THEN #{grade || "NULL"}"}.
@@ -129,8 +130,11 @@ class GradeCalculator
   # each group
   def create_group_sums(submissions, user_id, ignore_ungraded=true)
     visible_assignments = @assignments
-    if differentiated_assignments_on?
-      visible_assignments = visible_assignments.select{|a| assignment_ids_visible_to_user(user_id).include?(a.id)}
+    visible_assignments = visible_assignments.select{|a| assignment_ids_visible_to_user(user_id).include?(a.id)}
+
+    if @grading_period
+      user = @course.users.find(user_id)
+      visible_assignments = @grading_period.assignments_for_student(visible_assignments, user)
     end
     assignments_by_group_id = visible_assignments.group_by(&:assignment_group_id)
     submissions_by_assignment_id = Hash[
@@ -146,14 +150,20 @@ class GradeCalculator
         # ignore submissions for muted assignments
         s = nil if @ignore_muted && a.muted?
 
+        # ignore pending_review quiz submissions
+        s = nil if ignore_ungraded && s.try(:pending_review?)
+
         {
-          :assignment => a,
-          :submission => s,
-          :score => s && s.score,
-          :total => a.points_possible || 0,
+          assignment: a,
+          submission: s,
+          score: s && s.score,
+          total: a.points_possible || 0,
+          excused: s && s.excused?,
         }
       end
+
       group_submissions.reject! { |s| s[:score].nil? } if ignore_ungraded
+      group_submissions.reject! { |s| s[:excused] }
       group_submissions.each { |s| s[:score] ||= 0 }
 
       logged_submissions = group_submissions.map { |s| loggable_submission(s) }
@@ -181,12 +191,7 @@ class GradeCalculator
 
   def load_assignment_visibilities_for_users(user_ids)
     @assignment_ids_visible_to_user ||= begin
-      if differentiated_assignments_on?
-        AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @course.id, user_id: user_ids)
-      else
-        assignment_ids = @assignments.map(&:id)
-        user_ids.reduce({}){|hash, id| hash[id] = assignment_ids; hash}
-      end
+      AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @course.id, user_id: user_ids)
     end
   end
 

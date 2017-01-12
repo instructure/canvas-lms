@@ -1,5 +1,6 @@
 @import "base/environment";
 @import "pages/react_files/DialogPreview";
+@import "pages/react_files/RestrictedRadioButtons";
 
 
 .permissions-dialog-form{
@@ -91,7 +92,7 @@
   }
   .module-published-button {
     color: #33802a;
-    font-size: 14px;
+    @include fontSize(14px);
     display: inline-block;
     padding-bottom: 3px;
     line-height: 22px;
@@ -171,7 +172,7 @@
   }
 
   .prereqs {
-    font-size: 14px;
+    @include fontSize(14px);
     padding: 4px 12px;
     line-height: 22px;
     display: inline-block;
@@ -256,4 +257,10 @@ tbody.sortable.empty2 {
   position: absolute;
   top: -28px;
   left: -1px;
+}
+
+#add_context_module_form {
+  .form-controls {
+    z-index: 10;
+  }
 }

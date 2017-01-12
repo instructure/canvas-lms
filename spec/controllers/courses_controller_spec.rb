@@ -65,6 +65,8 @@ describe CoursesController do
         ens << @course.enroll_teacher(@user, :section => sec2, :allow_multiple_enrollments => true)
         ens.each(&:accept!)
 
+        ens[1].conclude # the current enrollment should take precedence over the concluded one
+
         user_session(@user)
         get 'index'
         expect(response).to be_success
@@ -173,6 +175,7 @@ describe CoursesController do
         teacher_enrollment = course_with_teacher course: course1, :user => teacher
         teacher_enrollment.accept!
 
+        course1.start_at = 2.months.ago
         course1.conclude_at = 1.month.ago
         course1.save!
 
@@ -194,7 +197,6 @@ describe CoursesController do
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
 
-        $bloo = true
         user_session(teacher)
         get 'index'
         expect(response).to be_success
@@ -319,7 +321,7 @@ describe CoursesController do
         expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id]
       end
 
-      it "should be empty if the caller is a student or observer and the root account restricts students viewing courses before the start date" do
+      it "should not be empty if the caller is a student or observer and the root account restricts students viewing courses before the start date" do
         course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true
         course1.offer!
         enrollment1 = course_with_student course: course1
@@ -332,7 +334,7 @@ describe CoursesController do
         expect(response).to be_success
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
-        expect(assigns[:future_enrollments]).to be_empty
+        expect(assigns[:future_enrollments]).to eq [enrollment1]
 
         observer = user_with_pseudonym(active_all: true)
         o = @student.user_observers.build; o.observer = observer; o.save!
@@ -341,7 +343,7 @@ describe CoursesController do
         expect(response).to be_success
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
-        expect(assigns[:future_enrollments]).to be_empty
+        expect(assigns[:future_enrollments]).to eq [observer.enrollments.first]
 
         teacher = user_with_pseudonym(:active_all => true)
         teacher_enrollment = course_with_teacher course: course1, :user => teacher
@@ -410,6 +412,7 @@ describe CoursesController do
     it "does not record recent activity for unauthorize actions" do
       user_session(@student)
       @course.workflow_state = 'available'
+      @course.restrict_student_future_view = true
       @course.save!
       @enrollment.start_at = 2.days.from_now
       @enrollment.end_at = 4.days.from_now
@@ -485,8 +488,8 @@ describe CoursesController do
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @enrollment.uuid
       expect(response).to be_redirect
       expect(response).to redirect_to(course_url(@course.id))
-      expect(assigns[:pending_enrollment]).to eql(@enrollment)
-      expect(assigns[:pending_enrollment]).to be_active
+      expect(assigns[:context_enrollment]).to eql(@enrollment)
+      expect(assigns[:context_enrollment]).to be_active
     end
 
     it "should ask user to login for registered not-logged-in user" do
@@ -536,7 +539,7 @@ describe CoursesController do
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1',
         :invitation => @enrollment.uuid
 
-      expect(response).to redirect_to(courses_url)
+      expect(response).to redirect_to(course_url(@course))
       @enrollment.reload
       expect(@enrollment.workflow_state).to eq('active')
       expect(@enrollment.last_activity_at).to be(nil)
@@ -573,6 +576,7 @@ describe CoursesController do
     it "should give a helpful error message for students that can't access yet" do
       user_session(@student)
       @course.workflow_state = 'claimed'
+      @course.restrict_student_future_view = true
       @course.save!
       get 'show', :id => @course.id
       assert_status(401)
@@ -648,6 +652,7 @@ describe CoursesController do
     it "should show unauthorized/authorized to a student for a past course depending on restrict_student_past_view setting" do
       course_with_student_logged_in(:active_course => 1)
 
+      @course.start_at = 3.weeks.ago
       @course.conclude_at = 2.weeks.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.restrict_student_past_view = true
@@ -747,8 +752,8 @@ describe CoursesController do
         @course1.save!
         @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
         get 'show', :id => @course1.id
-        expect(controller.js_env[:WIKI_RIGHTS]).to eql({:read => true})
-        expect(controller.js_env[:PAGE_RIGHTS]).to eql({:read => true})
+        expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eql({:read => true})
+        expect(controller.js_env[:PAGE_RIGHTS].symbolize_keys).to eql({:read => true})
         expect(controller.js_env[:COURSE_TITLE]).to eql @course1.name
       end
 
@@ -841,6 +846,25 @@ describe CoursesController do
         expect(assigns[:context_enrollment]).to eq @enrollment
         @enrollment.reload
         expect(@enrollment).to be_active
+      end
+
+      it "should not error when previewing an unpublished course as an invited admin" do
+        @account = Account.create!
+        @account.settings[:allow_invitation_previews] = false
+        @account.save!
+
+        course(:account => @account)
+        user(:active_all => true)
+        enrollment = @course.enroll_teacher(@user, :enrollment_state => 'invited')
+        user_session(@user)
+
+        get 'show', :id => @course.id
+
+        expect(response).to be_success
+        expect(response).to render_template('show')
+        expect(assigns[:context_enrollment]).to eq enrollment
+        enrollment.reload
+        expect(enrollment).to be_invited
       end
 
       it "should ignore invitations that have been accepted (not logged in)" do
@@ -986,6 +1010,26 @@ describe CoursesController do
       expect(response.status).to eq 401
     end
 
+    context "page views enabled" do
+      before do
+        Setting.set('enable_page_views', 'db')
+        @old_thread_context = Thread.current[:context]
+        Thread.current[:context] = { request_id: SecureRandom.uuid }
+      end
+
+      after do
+        Thread.current[:context] = @old_thread_context
+      end
+
+      it "should log an AUA with membership_type" do
+        user_session(@student)
+        get 'show', :id => @course.id
+        expect(response).to be_success
+        aua = AssetUserAccess.where(user_id: @student, context_type: 'Course', context_id: @course).first
+        expect(aua.asset_category).to eq 'home'
+        expect(aua.membership_type).to eq 'StudentEnrollment'
+      end
+    end
   end
 
   describe "POST 'unenroll_user'" do
@@ -1071,6 +1115,7 @@ describe CoursesController do
 
     it "should not enroll people in soft-concluded courses" do
       user_session(@teacher)
+      @course.start_at = 2.days.ago
       @course.conclude_at = 1.day.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
@@ -1111,6 +1156,7 @@ describe CoursesController do
       expect(@course.students).to be_empty
       expect(@course.observers.map{|s| s.name}).to be_include("Sam")
       expect(@course.observers.map{|s| s.name}).to be_include("Fred")
+      expect(@course.observer_enrollments.map(&:workflow_state)).to eql(['invited', 'invited'])
     end
 
     it "will use json for limit_privileges_to_course_section param" do
@@ -1347,6 +1393,27 @@ describe CoursesController do
       end
     end
 
+    it "should let admins without course edit rights update only the syllabus body" do
+      role = custom_account_role('grade viewer', :account => Account.default)
+      account_admin_user_with_role_changes(:role => role, :role_changes => {:manage_content => true})
+      user_session(@user)
+
+      name = "some name"
+      body = "some body"
+      put 'update', :id => @course.id, :course => { :name => name, :syllabus_body => body }
+
+      @course.reload
+      expect(@course.name).to_not eq name
+      expect(@course.syllabus_body).to eq body
+    end
+
+    it "should render the show page with a flash on error" do
+      user_session(@teacher)
+      # cause the course to be invalid
+      Course.where(id: @course).update_all(start_at: Time.now.utc, conclude_at: 1.day.ago)
+      put 'update', :id => @course.id, :course => { :name => "name change" }
+      expect(flash[:error]).to match(/There was an error saving the changes to the course/)
+    end
   end
 
   describe "POST 'unconclude'" do
@@ -1764,8 +1831,9 @@ describe CoursesController do
       user_session(@teacher)
       post 'student_view', course_id: @course.id
       test_student = @course.student_view_student
-      Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_student)
+      @quiz.generate_submission(test_student)
       expect(test_student.quiz_submissions.size).not_to be_zero
+
       delete 'reset_test_student', course_id: @course.id
       test_student.reload
       expect(test_student.quiz_submissions.size).to be_zero
@@ -1777,6 +1845,18 @@ describe CoursesController do
       test_student = @course.student_view_student
       assignment = @course.assignments.create!(:workflow_state => 'published')
       assignment.grade_student test_student, { :grade => 1, :grader => @teacher }
+      expect(test_student.submissions.size).not_to be_zero
+      delete 'reset_test_student', course_id: @course.id
+      test_student.reload
+      expect(test_student.submissions.size).to be_zero
+    end
+
+    it "removes provisional grades for by the test student" do
+      user_session(@teacher)
+      post 'student_view', course_id: @course.id
+      test_student = @course.student_view_student
+      assignment = @course.assignments.create!(:workflow_state => 'published', :moderated_grading => true)
+      assignment.grade_student test_student, { :grade => 1, :grader => @teacher, :provisional => true }
       expect(test_student.submissions.size).not_to be_zero
       delete 'reset_test_student', course_id: @course.id
       test_student.reload

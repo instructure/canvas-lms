@@ -23,8 +23,8 @@ describe StreamItemsHelper do
     Notification.create!(:name => "Assignment Created", :category => "TestImmediately")
     course_with_teacher(:active_all => true)
     course_with_student(:active_all => true, :course => @course)
-    @other_user = user()
-    @another_user = user()
+    @other_user = user
+    @another_user = user
 
     @context = @course
     @discussion = discussion_topic_model
@@ -101,6 +101,34 @@ describe StreamItemsHelper do
         expect(categorized1["DiscussionTopic"][0].stream_item_id).to eq si_id
         expect(categorized2["DiscussionTopic"][0].stream_item_id).to eq si_id
       end
+
+      it "links to stream item assets should be relative to the active shard" do
+        @shard1.activate{ course_with_teacher(account: Account.create, active_all: 1) }
+        @shard2.activate{ course_with_teacher(account: Account.create, active_all: 1, user: @teacher) }
+        topic = @course.discussion_topics.create!(title: 'title')
+
+        items = @teacher.recent_stream_items
+        categorized = helper.categorize_stream_items(items, @teacher)
+        categorized1 = @shard1.activate{ helper.categorize_stream_items(items, @teacher) }
+        categorized2 = @shard2.activate{ helper.categorize_stream_items(items, @teacher) }
+        expect(categorized["DiscussionTopic"][0].path).to eq "/courses/#{Shard.short_id_for(@course.global_id)}/discussion_topics/#{Shard.short_id_for(topic.global_id)}"
+        expect(categorized1["DiscussionTopic"][0].path).to eq "/courses/#{Shard.short_id_for(@course.global_id)}/discussion_topics/#{Shard.short_id_for(topic.global_id)}"
+        expect(categorized2["DiscussionTopic"][0].path).to eq "/courses/#{@course.local_id}/discussion_topics/#{topic.local_id}"
+      end
+
+      it "links to stream item contexts should be relative to the active shard" do
+        @shard1.activate{ course_with_teacher(account: Account.create, active_all: 1) }
+        @shard2.activate{ course_with_teacher(account: Account.create, active_all: 1, user: @teacher) }
+        @course.discussion_topics.create!(title: 'title')
+
+        items = @teacher.recent_stream_items
+        categorized = helper.categorize_stream_items(items, @teacher)
+        categorized1 = @shard1.activate{ helper.categorize_stream_items(items, @teacher) }
+        categorized2 = @shard2.activate{ helper.categorize_stream_items(items, @teacher) }
+        expect(categorized["DiscussionTopic"][0].context.linked_to).to eq "/courses/#{Shard.short_id_for(@course.global_id)}/discussion_topics"
+        expect(categorized1["DiscussionTopic"][0].context.linked_to).to eq "/courses/#{Shard.short_id_for(@course.global_id)}/discussion_topics"
+        expect(categorized2["DiscussionTopic"][0].context.linked_to).to eq "/courses/#{@course.local_id}/discussion_topics"
+      end
     end
   end
 
@@ -140,6 +168,19 @@ describe StreamItemsHelper do
       expect(@categorized["Assignment"].first.summary).to match /Assignment Created/
       expect(@categorized["DiscussionTopic"].first.summary).to eq @discussion.title
       expect(@categorized["AssessmentRequest"].first.summary).to include(@assignment.title)
+    end
+
+    it 'should handle anonymous review for AssessmentRequests' do
+      @assignment.update_attribute(:anonymous_peer_reviews, true)
+      student = @student
+      assessor_submission = submission_model(assignment: @assignment, user: @other_user)
+      assessment_request = AssessmentRequest.create!(assessor: @other_user, asset: @submission,
+                                                     user: student, assessor_asset: assessor_submission)
+      assessment_request.workflow_state = 'assigned'
+      assessment_request.save
+      items = @other_user.recent_stream_items
+      @categorized = helper.categorize_stream_items(items, @other_user)
+      expect(@categorized["AssessmentRequest"].first.summary).to include('Anonymous User')
     end
   end
 end

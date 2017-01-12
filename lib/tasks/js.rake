@@ -1,9 +1,10 @@
 require 'timeout'
 require 'json'
+require_relative "../../config/initializers/webpack"
 
 namespace :js do
 
-  desc 'run testem as you develop, can use `rake js:dev <ember app name> <browser>`'
+  desc 'run Karma as you develop, can use `rake js:dev <ember app name> <browser>`'
   task :dev do
     app = ARGV[1]
     app = nil if app == 'NA'
@@ -16,7 +17,7 @@ namespace :js do
         exit
       end
     end
-    Rake::Task['js:generate_runner'].invoke
+    build_runner
     exec("node_modules/.bin/karma start --browsers #{browsers}")
   end
 
@@ -38,6 +39,17 @@ namespace :js do
     build_requirejs_config
   end
 
+  def generate_prng
+    if ENV["seed"]
+      seed = ENV["seed"].to_i
+    else
+      srand
+      seed = rand(1 << 20)
+    end
+    puts "--> randomized with seed #{seed}"
+    Random.new(seed)
+  end
+
   def build_requirejs_config
     require 'canvas/require_js'
     require 'erubis'
@@ -47,45 +59,60 @@ namespace :js do
 
     matcher = Canvas::RequireJs.matcher
     tests = Dir[
-      "public/javascripts/#{matcher}",
+      "public/javascripts/*[!bower]/#{matcher}",
       "spec/javascripts/compiled/#{matcher}",
       "spec/plugins/*/javascripts/compiled/#{matcher}"
     ].map{ |file| file.sub(/\.js$/, '').sub(/public\/javascripts\//, '') }
     File.open("#{Rails.root}/spec/javascripts/tests.js", 'w') { |f|
-      f.write("window.__TESTS__ = #{JSON.pretty_generate(tests)}")
+      f.write("window.__TESTS__ = #{JSON.pretty_generate(tests.shuffle(random: generate_prng))}")
     }
   end
 
   desc 'test javascript specs with Karma'
   task :test, :reporter do |task, args|
     reporter = args[:reporter]
-    require 'canvas/require_js'
+    if CANVAS_WEBPACK
+      Rake::Task['i18n:generate_js'].invoke
+      webpack_test_dir = Rails.root + "spec/javascripts/webpack"
+      FileUtils.rm_rf(webpack_test_dir)
+      puts "--> Bundling tests for ember apps"
+      `npm run webpack-test-ember`
+      puts "--> Running tests for ember apps"
+      test_suite(reporter)
+      FileUtils.rm_rf(webpack_test_dir)
+      puts "--> Bundling tests for canvas proper"
+      `npm run webpack-test`
+      puts "--> Running tests for canvas proper"
+      test_suite(reporter)
+    else
+      require 'canvas/require_js'
 
-    # run test for each ember app individually
-    matcher = ENV['JS_SPEC_MATCHER']
+      # run test for each ember app individually
+      matcher = ENV['JS_SPEC_MATCHER']
 
-    if matcher
-      puts "--> Matcher: #{matcher}"
-    end
-
-    if !matcher || matcher.to_s =~ %r{app/coffeescripts/ember}
-      ignored_embers = ['shared','modules'] #,'quizzes','screenreader_gradebook'
-      Dir.entries('app/coffeescripts/ember').reject { |d|
-        d.match(/^\./) || ignored_embers.include?(d)
-      }.each do |ember_app|
-        puts "--> Running tests for '#{ember_app}' ember app"
-        Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
-        test_suite(reporter)
+      if matcher
+        puts "--> Matcher: #{matcher}"
       end
-    end
 
-    # run test for non-ember apps
-    Canvas::RequireJs.matcher = nil
-    test_suite(reporter)
+      if !matcher || matcher.to_s =~ %r{app/coffeescripts/ember}
+        ignored_embers = ['shared','modules'] #,'quizzes','screenreader_gradebook'
+        Dir.entries('app/coffeescripts/ember').reject { |d|
+          d.match(/^\./) || ignored_embers.include?(d)
+        }.each do |ember_app|
+          puts "--> Running tests for '#{ember_app}' ember app"
+          Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
+          test_suite(reporter)
+        end
+      end
+
+      # run test for non-ember apps
+      Canvas::RequireJs.matcher = nil
+      test_suite(reporter)
+    end
   end
 
   def test_suite(reporter=nil)
-    if test_js_with_timeout(300,reporter) != 0 && !ENV['JS_SPEC_MATCHER']
+    if test_js_with_timeout(300,reporter) != 0 && !ENV['JS_SPEC_MATCHER'] && ENV['retry'] != 'false'
       puts "--> Karma tests failed." # retrying karma...
       raise "Karma tests failed on second attempt." if test_js_with_timeout(400,reporter) != 0
     end
@@ -102,8 +129,7 @@ namespace :js do
         end
         puts "--> executing browser tests with Karma"
         build_runner
-        karma_output = `./node_modules/karma/bin/karma start --browsers Chrome --single-run --reporters progress,#{reporter} 2>&1`
-        puts karma_output
+        system "./node_modules/karma/bin/karma start --browsers Chrome --single-run --reporters progress,#{reporter}"
 
         if $?.exitstatus != 0
           puts 'some specs failed'
@@ -239,6 +265,7 @@ namespace :js do
     threads << Thread.new do
       coffee_time = Benchmark.realtime do
         require 'coffee-script'
+        require 'parallel'
 
         if Canvas::CoffeeScript.coffee_script_binary_is_available?
           puts "--> Compiling CoffeeScript with 'coffee' binary"
@@ -247,8 +274,7 @@ namespace :js do
           Parallel.each(dirs, :in_threads => Parallel.processor_count) do |dir|
             destination = coffee_destination(dir)
             FileUtils.mkdir_p(destination)
-            flags = "-m" if ENV["CANVAS_SOURCE_MAPS"] != "0"
-            system("coffee #{flags} -c -o #{destination} #{dir}/*.coffee")
+            system("coffee -c -o #{destination} #{dir}/*.coffee")
             raise "Unable to compile coffeescripts in #{dir}" if $?.exitstatus != 0
           end
         else
@@ -263,6 +289,20 @@ namespace :js do
     end
 
     threads.each(&:join)
+  end
+
+  desc "build webpack js"
+  task :webpack do
+    if CANVAS_WEBPACK
+      if ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
+        puts "--> Building PRODUCTION webpack bundles"
+        `npm run webpack-production`
+      else
+        puts "--> Building DEVELOPMENT webpack bundles"
+        `npm run webpack-development`
+      end
+      raise "Error running js:webpack: \nABORTING" if $?.exitstatus != 0
+    end
   end
 
   desc "optimize and build js for production"
@@ -282,28 +322,41 @@ namespace :js do
     end
     puts "--> Concatenated JavaScript bundles in #{optimize_time}"
 
-    puts "--> Compressing JavaScript with UglifyJS"
-    optimize_time = Benchmark.realtime do
-      output = `npm run compress 2>&1`
-      raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
+    unless ENV["JS_BUILD_NO_UGLIFY"]
+      puts "--> Compressing JavaScript with UglifyJS"
+      optimize_time = Benchmark.realtime do
+        output = `npm run compress 2>&1`
+        raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
+      end
+      puts "--> Compressed JavaScript in #{optimize_time}"
     end
-    puts "--> Compressed JavaScript in #{optimize_time}"
   end
 
   desc "Compile React JSX to JS"
   task :jsx do
-    source = Rails.root + 'app/jsx'
-    dest = Rails.root + 'public/javascripts/jsx'
-    if Rails.env == 'development'
-      #npm_run "jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null"
-      msg = `node_modules/react-tools/bin/jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null`
-    else
-      msg = `node_modules/react-tools/bin/jsx -x jsx --harmony #{source} #{dest} 2>&1 >/dev/null`
+    # Get the canvas-lms jsx and specs to compile
+    dirs = [["#{Rails.root}/app/jsx", "#{Rails.root}/public/javascripts/jsx"],
+            ["#{Rails.root}/spec/javascripts/jsx", "#{Rails.root}/spec/javascripts/compiled"]]
+    # Get files that need compilation in plugins
+    plugin_jsx_dirs = Dir.glob("#{Rails.root}/gems/plugins/*/**/jsx")
+    plugin_jsx_dirs.each do |directory|
+      plugin_name = directory.match(/gems\/plugins\/([^\/]+)\//)[1]
+      destination = "#{Rails.root}/public/javascripts/plugins/#{plugin_name}/compiled/jsx"
+      FileUtils.mkdir_p(destination)
+      dirs << [directory, destination]
     end
 
-    unless $?.success?
-      raise msg
-    end
+    dirs.each { |source,dest|
+      if Rails.env == 'development'
+        msg = `node_modules/.bin/babel #{source} --out-dir #{dest} --source-maps inline 2>&1 >/dev/null`
+      else
+        msg = `node_modules/.bin/babel #{source} --out-dir #{dest} 2>&1 >/dev/null`
+      end
+
+      unless $?.success?
+        raise msg
+      end
+    }
   end
 
   desc "creates ember app bundles"
@@ -313,14 +366,4 @@ namespace :js do
       EmberBundle.new(app).build
     end
   end
-
-  #def npm_run(command)
-    #puts "Running npm script `#{command}`"
-    #msg = `$(npm bin)/#{command} 2>&1`
-    #unless $?.success?
-      #raise msg
-    #end
-    #msg
-  #end
-
 end

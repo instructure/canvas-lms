@@ -1,10 +1,8 @@
-/** @jsx React.DOM */
-
 define([
   'i18n!student_groups',
   'underscore',
   'jquery',
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/groups/mixins/BackboneState',
   'jsx/groups/components/PaginatedUserCheckList',
   'jsx/groups/mixins/InfiniteScroll',

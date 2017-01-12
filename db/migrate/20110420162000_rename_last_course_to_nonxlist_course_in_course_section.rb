@@ -1,4 +1,6 @@
 class RenameLastCourseToNonxlistCourseInCourseSection < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     rename_column :course_sections, :last_course_id, :nonxlist_course_id
   end

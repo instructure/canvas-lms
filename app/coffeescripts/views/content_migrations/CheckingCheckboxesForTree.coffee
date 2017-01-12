@@ -11,6 +11,7 @@ define [
 
     bindEvents: ->
       @$tree.on "change", "input[type=checkbox]", @checkboxEvents
+      @$tree.on "change", ".module_options input[type=radio]", @moduleOptionsEvents
       @$tree.on "doneFetchingCheckboxes", @doneFetchingEvents
 
     # Create events for checking and unchecking a checkbox.
@@ -32,18 +33,30 @@ define [
       @checkSiblingCheckboxes($checkbox) # start recursion up the tree for 3 state checkboxes
       @syncLinkedResource($checkbox)
 
+      if $checkbox.data('moduleCheckbox')
+        _.each @findChildrenCheckboxes(@getRootCheckbox($checkbox)), (cb) =>
+          @checkModuleOptions($(cb))
+
       # We don't want to manage the focus unless they have are trying to click and use the keyboard
       # so we foce the focus to stay on the tree if they have previously selected something in the
       # tree
       if @$tree.find("[aria-selected=true]").length
         @$tree.focus() #ensure focus always stay's on the tree
 
-    # When we are done fetching checkboxes and displaying them, we want to make sure on the initial 
-    # expantion the sublevel checkboxes are checked/unchecked according to the toplevel checkbox. 
+    moduleOptionsEvents: (event) =>
+      $radio = $(event.currentTarget)
+      $checkbox = $radio.parents('.module_options').data('checkbox')
+
+      _.each @findChildrenCheckboxes(@getRootCheckbox($checkbox)), (cb) =>
+        @checkModuleOptions($(cb))
+
+
+    # When we are done fetching checkboxes and displaying them, we want to make sure on the initial
+    # expantion the sublevel checkboxes are checked/unchecked according to the toplevel checkbox.
     # The 'checkbox' param that is being passed in should be the top level checkbox that will be
     # used to determine the state of the rest of the sub level checkboxes.
 
-    doneFetchingEvents: (event, checkbox) => 
+    doneFetchingEvents: (event, checkbox) =>
       event.stopPropagation()
       $checkbox = $(checkbox)
 
@@ -85,7 +98,7 @@ define [
 
     # Finds all children checkboxes given a checkbox
     # returns jQuery object
-    
+
     findChildrenCheckboxes: ($checkbox) ->
       $childCheckboxes = $checkbox.parents('.treeitem-heading')
                                  .siblings('[role=group]')
@@ -100,16 +113,17 @@ define [
       $parentCheckbox = @findParentCheckbox($checkbox)
       @updateTreeItemCheckedAttribute($checkbox, if indeterminate then "mixed" else $checkbox.is(':checked'))
       return unless $parentCheckbox
-      
+
       if indeterminate || !@siblingsAreTheSame($checkbox)
         $parentCheckbox.prop
           indeterminate: true
           checked: false
         @checkSiblingCheckboxes($parentCheckbox, true)
       else
+        checked = $checkbox.is(':checked')
         $parentCheckbox.prop
           indeterminate: false
-          checked: $checkbox.is(':checked')
+          checked: checked
         @checkSiblingCheckboxes($parentCheckbox, false)
 
     # Checks to see if the siblings are in the same state as the checkbox being
@@ -148,8 +162,36 @@ define [
 
       if linkedProperty
         $linkedCheckbox = @$tree.find("[name='#{linkedProperty}']")
-        @checkCheckboxes 
+        @checkCheckboxes
           checkboxes: $linkedCheckbox
           setTo: $checkbox.is(':checked')
           triggerChange: false
           afterEach: => @checkSiblingCheckboxes($linkedCheckbox) # start recursion up the tree for 3 state checkboxes
+
+    getRootCheckbox: ($checkbox) ->
+      $parent = @findParentCheckbox($checkbox)
+      if $parent
+        @getRootCheckbox($parent)
+      else
+        $checkbox
+
+    checkModuleOptions: ($checkbox) ->
+      $mo = $checkbox.data('moduleOptions')
+      return unless $mo
+
+      if @showModuleOptions($checkbox)
+        $mo.show()
+      else
+        $mo.hide()
+
+    showModuleOptions: ($checkbox) ->
+      # show the module options if the checkbox is checked and its parents allow subdivision
+      if $checkbox.is(':checked')
+        $parent = @findParentCheckbox($checkbox)
+        $parent_mo = $parent && $parent.data('moduleOptions')
+        if $parent && $parent.is(':checked') && $parent_mo
+          if $parent_mo.is(':visible') && $parent_mo.find('input[value="separate"]').is(':checked')
+            return true
+        else
+          return true
+      return false

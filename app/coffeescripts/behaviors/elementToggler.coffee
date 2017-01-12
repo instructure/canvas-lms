@@ -82,24 +82,32 @@ define [
 
     $allElementsControllingRegion.each updateTextToState( if showRegion then 'Shown' else 'Hidden' )
 
-  $(document).on 'click change keyclick', '.element_toggler[aria-controls]', (event) ->
-    $this = $(this)
 
-    if $this.is('input[type="checkbox"]')
-      return if event.type is 'click'
-      force = $this.prop('checked')
+  elementTogglerBehavior =
+    bind: ->
+      $(document).on 'click change keyclick', '.element_toggler[aria-controls]', (event) ->
+        $this = $(this)
 
-    event.preventDefault() if event.type is 'click'
+        if $this.is('input[type="checkbox"]')
+          return if event.type is 'click'
+          force = $this.prop('checked')
 
-    # allow .links inside .user_content to be elementTogglers, but only for other elements inside of
-    # that .user_content area
-    $parent = $this.closest('.user_content')
-    $parent = $(document.body) unless $parent.length
+        event.preventDefault() if event.type is 'click'
 
-    $region = $parent.find("##{$this.attr('aria-controls').replace(/\s/g, ', #')}")
-    toggleRegion($region, force, $this) if $region.length
+        # allow .links inside .user_content to be elementTogglers, but only for other elements inside of
+        # that .user_content area
+        $parent = $this.closest('.user_content')
+        $parent = $(document.body) unless $parent.length
 
-    $icon = $this.find('i[class*="icon-mini-arrow"].auto_rotate')
-    if $icon.length
-      $icon.toggleClass('icon-mini-arrow-down')
-      $icon.toggleClass('icon-mini-arrow-right')
+        $region = $parent.find("##{$this.attr('aria-controls').replace(/\s/g, ', #')}")
+        toggleRegion($region, force, $this) if $region.length
+
+        $icon = $this.find('i[class*="icon-mini-arrow"].auto_rotate')
+        if $icon.length
+          $icon.toggleClass('icon-mini-arrow-down')
+          $icon.toggleClass('icon-mini-arrow-right')
+
+
+  elementTogglerBehavior.bind()
+
+  return elementTogglerBehavior

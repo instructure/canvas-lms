@@ -1,4 +1,4 @@
-<h2 class="screenreader-outcome-title screenreader-only" tabindex="0" aria-alert="true">
+<h2 class="screenreader-outcome-title screenreader-only" tabindex="0">
   {{title}}
 </h2>
 <h2 class="title" role="presentation">
@@ -44,76 +44,44 @@
   {{/if}}
 {{/if}}
 
-<div id="calculation_method" data-calculation-method="{{calculation_method}}">{{#t}}Calculation Method{{/t}}: {{calc_method_str}}</div>
+<div id="calculation_method" data-calculation-method="{{calculation_method}}">
+  {{#t}}Calculation Method{{/t}}: {{ friendlyCalculationMethod }}
+</div>
 
 <div class="content-box">
   <div class="grid-row">
-    <div class="col-xs-2"></div>
-    <div class="col-xs-10">
-      <div class="content-box border border-trbl border-round" id="calculation_int_container">
-        <div class="grid-row" style="padding: 10px">
-          <div class="col-xs-4 border border-r" id="calculation_int_left_side">
-            <div id="calculation_int_left_side_top">
-              <span id="calculation_int_label"></span>
-              <span id="calculation_int">{{calculation_int}}</span>
-            </div>
-            <div id="calculation_int_left_side_bottom">
-              <span id="calculation_int_range_info" class="outcomes-calculation-int-italics"></span>
-            </div>
-          </div>
-          <div class="col-xs-8" id="calculation_int_right_side">
-            <div class="content-box" style="margin:0px">
-              <div class="grid-row">
-                <div class="col-xs-2">
-                  <span class="outcomes-calculation-int-italics">{{#t "example"}}Example:{{/t}}</span>
-                </div>
-                <div class="col-xs-10">
-                  <span id="calculation_int_example" class="outcomes-calculation-int-italics"></span>
-                </div>
-              </div>
-              <div class="grid-row">
-                <div class="col-xs-12">
-                  <span id="calculation_int_example_line_1" class="outcomes-calculation-int-italics"></span>
-                </div>
-              </div>
-              <div class="grid-row">
-                <div class="col-xs-12">
-                  <span id="calculation_int_example_line_2" class="outcomes-calculation-int-italics"></span>
-                </div>
-              </div>
-              <div class="grid-row">
-                <div class="col-xs-12">
-                  <span id="calculation_int_example_line_3" class="outcomes-calculation-int-italics"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Hook for OutcomeCalculationMethodFormView -->
+    <div class="col-xs-12 outcome-calculation-method-form"></div>
   </div>
 </div>
 
-{{#if assessed}}
+{{#if assessedInContext}}
   <div id="assessed_info_banner" class="alert alert-info">
-    <span>{{#t}}This outcome has been used to assess a student and cannot be edited or deleted{{/t}}</span>
+    <span>
+      {{#t}}This outcome has been used to assess a student and cannot be edited or deleted{{/t}}
+    </span>
   </div>
 {{/if}}
 
-{{#unless readOnly}}
-  <a href="#" style="float:right" class="move_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
-    {{#t}}Move Outcome{{/t}}
-  </a>
-
-  {{#if native}}
-    <a href="#" style="float:right" class="edit_button ui-button ui-widget ui-state-default ui-corner-all" role="button"
-      {{#if assessed}} disabled tabindex="-1" aria-hidden="true" {{/if}}>
-      {{#t "links.edit_outcome"}}Edit Outcome{{/t}}
-    </a>
-  {{/if}}
-
-  <a href="#" style="float:right" class="delete_button ui-button ui-widget ui-state-default ui-corner-all" role="button"
-    {{#if assessed}} disabled tabindex="-1" aria-hidden="true" {{/if}}>
-    {{#t "links.delete_outcome"}}Delete Outcome{{/t}}
-  </a>
-{{/unless}}
+{{#if can_move}}
+  <div class="pull-right">
+    <button class="move_button ui-button ui-widget ui-state-default ui-corner-all">
+      <span aria-hidden="true">{{#t}}Move{{/t}}</span>
+      <span class="screenreader-only">{{#t}}Move Outcome{{/t}}</span>
+    </button>
+    {{#if can_edit}}
+      <button class="edit_button ui-button ui-widget ui-state-default ui-corner-all"
+        {{#if assessedInContext}} disabled {{/if}}>
+        <span aria-hidden="true">{{#t "links.edit_outcome"}}Edit{{/t}}</span>
+        <span class="screenreader-only">{{#t}}Edit Outcome{{/t}}</span>
+      </button>
+    {{/if}}
+    {{#if can_remove}}
+      <button class="delete_button ui-button ui-widget ui-state-default ui-corner-all"
+        {{#if assessedInContext}} disabled {{/if}}>
+        <span aria-hidden="true">{{#t "links.delete_outcome"}}Delete{{/t}}</span>
+        <span class="screenreader-only">{{#t}}Delete Outcome{{/t}}</span>
+      </button>
+    {{/if}}
+  </div>
+{{/if}}

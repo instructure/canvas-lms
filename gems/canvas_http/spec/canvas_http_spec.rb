@@ -50,6 +50,9 @@ describe "CanvasHttp" do
       expect(http).to receive(:use_ssl=).with(true)
       expect(http).to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
       expect(http).to receive(:request).and_yield(double(body: 'Hello SSL'))
+      expect(http).to receive(:open_timeout=).with(5)
+      expect(http).to receive(:ssl_timeout=).with(5)
+      expect(http).to receive(:read_timeout=).with(30)
 
       CanvasHttp.get("https://www.example.com/a/b").body.should == "Hello SSL"
     end
@@ -66,6 +69,16 @@ describe "CanvasHttp" do
       res.body.should == "Hello"
     end
 
+    it "should follow relative redirects" do
+      stub_request(:get, "http://www.example.com/a").
+        to_return(status: 301, headers: { 'Location' => '/b'})
+      stub_request(:get, "http://www.example.com/b").
+        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+      res = CanvasHttp.get("http://www.example.com/a")
+      res.should be_a Net::HTTPOK
+      res.body.should == "Hello"
+    end
+
     it "should fail on too many redirects" do
       stub_request(:get, "http://www.example.com/a").
         to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a'})
@@ -73,6 +86,18 @@ describe "CanvasHttp" do
         to_return(status: 301, headers: { 'Location' => 'http://www.example3.com/a'})
       expect { CanvasHttp.get("http://www.example.com/a", {}, 2) }.to raise_error(CanvasHttp::TooManyRedirectsError)
     end
+
+    it "should yield requests to blocks" do
+      res = nil
+      stub_request(:get, "http://www.example.com/a/b").
+        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+      CanvasHttp.get("http://www.example.com/a/b") do |yielded_res|
+        res = yielded_res
+      end
+      res.should be_a Net::HTTPOK
+      res.body.should == "Hello"
+    end
+
   end
 
   describe ".tempfile_for_url" do

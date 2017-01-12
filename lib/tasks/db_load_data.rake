@@ -4,13 +4,14 @@ def ping
   STDOUT.sync = true
   print '.'
 end
-  
+
 def create_notification(values = {})
   ping
   Canvas::MessageHelper.create_notification(values)
 end
 
 def create_scribd_mime_type(ext, name)
+  ping
   ScribdMimeType.where(extension: ext, name: name).first_or_create
 end
 
@@ -38,55 +39,32 @@ namespace :db do
 
   desc "Make sure all scribd mime types are set up correctly"
   task :ensure_scribd_mime_types => :load_environment do
-    ping
     create_scribd_mime_type('doc', 'application/msword')
-    ping
     create_scribd_mime_type('ppt', 'application/vnd.ms-powerpoint')
-    ping
     create_scribd_mime_type('pdf', 'application/pdf')
-    ping
     create_scribd_mime_type('xls', 'application/vnd.ms-excel')
-    ping
     create_scribd_mime_type('ps', 'application/postscript')
-    ping
     create_scribd_mime_type('rtf', 'application/rtf')
-    ping
     create_scribd_mime_type('rtf', 'text/rtf')
-    ping
     create_scribd_mime_type('docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-    ping
     create_scribd_mime_type('pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
-    ping
     create_scribd_mime_type('xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    ping
     create_scribd_mime_type('ppt', 'application/mspowerpoint')
-    ping
     create_scribd_mime_type('xls', 'application/excel')
-    ping
     create_scribd_mime_type('txt', 'text/plain')
-    ping
     create_scribd_mime_type('odt', 'application/vnd.oasis.opendocument.text')
-    ping
     create_scribd_mime_type('odp', 'application/vnd.oasis.opendocument.presentation')
-    ping
     create_scribd_mime_type('ods', 'application/vnd.oasis.opendocument.spreadsheet')
-    ping
     create_scribd_mime_type('sxw', 'application/vnd.sun.xml.writer')
-    ping
     create_scribd_mime_type('sxi', 'application/vnd.sun.xml.impress')
-    ping
     create_scribd_mime_type('sxc', 'application/vnd.sun.xml.calc')
-    ping
     create_scribd_mime_type('xltx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.template')
-    ping
     create_scribd_mime_type('ppsx', 'application/vnd.openxmlformats-officedocument.presentationml.slideshow')
-    ping
     create_scribd_mime_type('potx', 'application/vnd.openxmlformats-officedocument.presentationml.template')
-    ping
     create_scribd_mime_type('dotx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.template')
-    ping
     puts 'Scribd Mime Types added'
   end
+
   desc "Make sure all message templates have notifications in the db"
   task :evaluate_notification_templates => :load_environment do
     Dir.glob(Rails.root.join('app', 'messages', '*.erb')) do |filename|
@@ -97,11 +75,11 @@ namespace :db do
         puts "No notification found in db for #{name}" unless Notification.where(name: titled).first
       end
     end
-    Notification.all.each do |n|
+    Notification.all_cached.each do |n|
       puts "No notification files found for #{n.name}" if Dir.glob(Rails.root.join('app', 'messages', "#{n.name.downcase.gsub(/\s/, '_')}.*.erb")).empty?
     end
   end
-  
+
   desc "Find or create the notifications"
   task :load_notifications => :load_environment do
     # Load the "notification_types.yml" file that provides initial values for the notifications.
@@ -120,6 +98,12 @@ namespace :db do
   task :create_default_accounts => :environment do
     Account.default(true)
     Account.site_admin(true)
+
+    # This happens by default for all root accounts, but currently happens too
+    # early in the migration run (in GrandfatherDefaultAccountInvitationPreviews)
+    # to take effect.
+    Account.default.enable_canvas_authentication
+    Account.site_admin.enable_canvas_authentication
   end
 
   desc "Create an administrator user"
@@ -180,7 +164,7 @@ namespace :db do
       end
     end
   end
-  
+
   desc "Configure usage statistics collection"
   task :configure_statistics_collection => [:load_environment] do
     gather_data = ENV["CANVAS_LMS_STATS_COLLECTION"] || ""
@@ -204,25 +188,25 @@ namespace :db do
           puts "You have opted out."
         }
       end
-    
+
       puts "You can change this feature at any time by running the rake task 'rake db:configure_statistics_collection'"
     end
-    
+
     Setting.set("usage_statistics_collection", gather_data)
     Reporting::CountsReport.process
   end
-  
+
   desc "Configure default settings"
   task :configure_default_settings => :load_environment do
     Setting.set("support_multiple_account_types", "false")
     Setting.set("show_opensource_linkback", "true")
   end
-  
+
   desc "generate data"
   task :generate_data => [:configure_default_settings, :load_notifications, :ensure_scribd_mime_types,
       :evaluate_notification_templates] do
   end
-  
+
   desc "Configure Default Account Name"
   task :configure_account_name => :load_environment do
     if (ENV['CANVAS_LMS_ACCOUNT_NAME'] || "").empty?
@@ -241,22 +225,24 @@ namespace :db do
       a.save!
     end
   end
-  
+
   desc "Create all the initial data, including notifications and admin account"
   task :load_initial_data => [:create_default_accounts, :configure_admin, :configure_account_name, :configure_statistics_collection, :generate_data] do
-   
+
     puts "\nInitial data loaded"
-    
+
   end # Task: load_initial_data
-  
+
   desc "Useful initial setup task"
-  task :initial_setup => [:generate_security_key, :migrate] do
+  task :initial_setup => [:generate_security_key] do
+    Rake::Task['db:migrate:predeploy'].invoke
+    ActiveRecord::Base.connection.schema_cache.clear!
+    ActiveRecord::Base.all_models.reject{ |m| m == Shard }.each(&:reset_column_information)
+    Rake::Task['db:migrate'].invoke
     load 'app/models/pseudonym.rb'
     ActiveRecord::Base.connection.schema_cache.clear!
     ActiveRecord::Base.all_models.reject{ |m| m == Shard }.each(&:reset_column_information)
     Rake::Task['db:load_initial_data'].invoke
   end
-  
+
 end # Namespace: db
-
-

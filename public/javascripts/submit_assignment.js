@@ -24,6 +24,7 @@ define([
   'jst/assignments/homework_submission_tool',
   'compiled/external_tools/HomeworkSubmissionLtiContainer',
   'compiled/views/editor/KeyboardShortcuts' /* TinyMCE Keyboard Shortcuts for a11y */,
+  'jsx/shared/rce/RichContentEditor',
   'compiled/jquery.rails_flash_notifications',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
@@ -32,13 +33,14 @@ define([
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */,
   'jquery.templateData' /* getTemplateData */,
   'media_comments' /* mediaComment */,
-  'compiled/tinymce',
-  'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool, HomeworkSubmissionLtiContainer, RCEKeyboardShortcuts) {
+], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool,
+     HomeworkSubmissionLtiContainer, RCEKeyboardShortcuts, RichContentEditor) {
 
   window.submissionAttachmentIndex = -1;
+
+  RichContentEditor.preloadRemoteModule();
 
   $(document).ready(function() {
     var submitting = false,
@@ -61,6 +63,7 @@ define([
     });
 
     submissionForm.submit(function(event) {
+      var self = this;
       var $turnitin = $(this).find(".turnitin_pledge");
       if($("#external_tool_submission_type").val() == "online_url_to_file") {
         event.preventDefault();
@@ -88,13 +91,31 @@ define([
         var fileElements = $(this).find('input[type=file]:visible').filter(function() {
           return $(this).val() !== '';
         });
+
+        var emptyFiles = $(this).find('input[type=file]:visible').filter(function() {
+          return this.files[0] && this.files[0].size === 0;
+        });
+
         var uploadedAttachmentIds = $(this).find('#submission_attachment_ids').val();
+
+        var reenableSubmitButton = function () {
+          $(self).find('button[type=submit]')
+              .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
+              .prop('disabled', false);
+        };
+
         // warn user if they haven't uploaded any files
         if (fileElements.length === 0 && uploadedAttachmentIds === '') {
           $.flashError(I18n.t('#errors.no_attached_file', 'You must attach at least one file to this assignment'));
-          $(this).find('button[type=submit]')
-            .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
-            .prop('disabled', false);
+          reenableSubmitButton();
+          return false;
+        }
+
+        // throw error if the user tries to upload an empty file
+        // to prevent S3 from erroring
+        if (emptyFiles.length) {
+          $.flashError(I18n.t('Attached files must be greater than 0 bytes'));
+          reenableSubmitButton();
           return false;
         }
 
@@ -182,11 +203,12 @@ define([
       $("html,body").scrollTo($("#submit_assignment"));
       createSubmitAssignmentTabs();
       homeworkSubmissionLtiContainer.loadExternalTools();
+      $("#submit_assignment_tabs li").first().focus();
     });
 
     $(".switch_text_entry_submission_views").click(function(event) {
       event.preventDefault();
-      $("#submit_online_text_entry_form textarea:first").editorBox('toggle');
+      RichContentEditor.callOnRCE($("#submit_online_text_entry_form textarea:first"), 'toggle')
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(this).siblings(".switch_text_entry_submission_views").andSelf().toggle();
     });
@@ -208,7 +230,9 @@ define([
         activate: function(event, ui) {
           if (ui.newTab.find('a').hasClass('submit_online_text_entry_option')) {
             $el = $("#submit_online_text_entry_form textarea:first");
-            if (!$el.editorBox('exists?')) { $el.editorBox(); }
+            if (!RichContentEditor.callOnRCE($el, 'exists?')) {
+              RichContentEditor.loadNewEditor($el);
+            }
           }
 
           if (ui.newTab.attr("aria-controls") === "submit_google_doc_form") {
@@ -218,7 +242,9 @@ define([
         create: function(event, ui) {
           if (ui.tab.find('a').hasClass('submit_online_text_entry_option')) {
             $el = $("#submit_online_text_entry_form textarea:first");
-            if (!$el.editorBox('exists?')) { $el.editorBox(); }
+            if (!RichContentEditor.callOnRCE($el, 'exists?')) {
+              RichContentEditor.loadNewEditor($el);
+            }
           }
 
           //list Google Docs if Google Docs tab is active
@@ -290,10 +316,14 @@ define([
 
     // Post message for anybody to listen to //
     if (window.opener) {
-      window.opener.postMessage({
-        "type": "event",
-        "payload": "done"
-      }, window.opener.location.toString());
+      try {
+        window.opener.postMessage({
+          "type": "event",
+          "payload": "done"
+        }, window.opener.location.toString());
+      } catch (e) {
+        console.error(e);
+      }
     }
 
 
@@ -325,7 +355,16 @@ define([
       // disable the submit button if any extensions are bad
       $('#submit_online_upload_form button[type=submit]').attr('disabled', !!$(".bad_ext_msg:visible").length);
     }
+    function updateRemoveLinkAltText(fileInput) {
+      var altText = I18n.t("remove empty attachment");
+      if(fileInput.val()){
+        var filename = fileInput.val().replace(/^.*?([^\\\/]*)$/, '$1');
+        altText = I18n.t("remove %{filename}", {filename: filename})
+      }
+      fileInput.parent().find('img').attr("alt", altText)
+    }
     $(".submission_attachment input[type=file]").live('change', function() {
+      updateRemoveLinkAltText($(this));
       if (ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length < 1 || $(this).val() == "")
         return;
 

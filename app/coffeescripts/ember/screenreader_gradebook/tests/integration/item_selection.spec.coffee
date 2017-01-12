@@ -6,8 +6,6 @@ define [
 
   App = null
 
-  fixtures.create()
-
   buttonDisabled = (trigger, expectedBoolean) ->
     equal find(trigger).prop('disabled'), expectedBoolean
 
@@ -28,6 +26,7 @@ define [
 
   module 'screenreader_gradebook student/assignment navigation: on page load',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')
@@ -53,6 +52,7 @@ define [
 
   module 'screenreader_gradebook student/assignment navigation: with first item selected',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')
@@ -122,6 +122,7 @@ define [
 
   module 'screenreader_gradebook student/assignment navigation: with last item selected',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')
@@ -177,6 +178,7 @@ define [
 
   module 'screenreader_gradebook assignment navigation: display update',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')
@@ -200,6 +202,7 @@ define [
 
   module 'screenreader_gradebook assignment navigation: assignment sorting',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')
@@ -272,6 +275,7 @@ define [
 
   module 'screenreader_gradebook student navigation: section selection',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')
@@ -355,6 +359,7 @@ define [
 
   module 'screenreader_gradebook student/assignment navigation: announcing selection with aria-live',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')

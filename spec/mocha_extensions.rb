@@ -49,11 +49,11 @@ class ActiveRecord::Base
     ar_obj
   end
 
-  def self.instantiate_with_any_instantiation(a)
-    if obj = @@any_instantiation[[base_class, a['id'].to_i]]
+  def self.instantiate_with_any_instantiation(*args)
+    if obj = @@any_instantiation[[base_class, args.first['id'].to_i]]
       obj
     else
-      instantiate_without_any_instantiation(a)
+      instantiate_without_any_instantiation(*args)
     end
   end
   class << self

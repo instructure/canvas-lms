@@ -6,19 +6,25 @@
         <span id="searchTermDescription" class="screenreader-only">
           {{#t}}As you type in this field, the list of results will be automatically updated.{{/t}}
         </span>
+        <label class="screenreader-only" for="searchTerm">
+          {{t "Search title, body, or author"}}
+        </label>
         <input id="searchTerm"
               aria-describedby="searchTermDescription"
               class="ic-Input"
               placeholder="{{t "Search title, body, or author"}}"
-              aria-label="{{t "Search title, body, or author"}}"
               value="{{searchTerm}}"
               type="search">
         <span id="discussionsFilter">
           <input type="checkbox"
                 id="onlyUnread"
-                aria-label="{{t "filter announcements by unread"}}"
-                {{#if onlyUnread}}checked{{/if}} /><label aria-hidden="true" for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
+                {{#if onlyUnread}}checked{{/if}} />
+          <label for="onlyUnread" class="no-button-role">
+            <span aria-hidden="true">{{#t "unread"}}Unread{{/t}}</span>
+            <span class="screenreader-only">{{t "filter announcements by unread"}}</span>
+          </label>
         </span>
+        <div id="searchResultCount" aria-live="polite" class="screenreader-only"></div>
       </div>
     </div>
     <div class="ic-Action-header__Secondary">
@@ -67,16 +73,16 @@
       <li>{{#t "try_disabling_the_unread_filters"}}Try disabling the "Unread" filter.{{/t}}</li>
     </ul>
   </div>
-  <div class="discussionTopicIndexList"></div>
+  <ul class="discussionTopicIndexList" role="list" aria-label="announcements"></ul>
 {{else}}
   {{#if lastPageFetched}}
-    <div style="margin:auto; text-align: center; margin-top: 80px">
+    <div style="margin:auto; text-align: center;  margin-top: 80px">
       <h1>
         {{#t "there_are_no_announcements_show"}}There are no announcements to show{{/t}}
       </h1>
       {{#if options.permissions.create}}
         <a href="{{new_topic_url}}" class="btn btn-large btn-primary">
-          <i class="icon-plus"></i> 
+          <i class="icon-plus"></i>
           {{#t}}Announcement{{/t}}
         </a>
       {{/if}}

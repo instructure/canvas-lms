@@ -1,39 +1,30 @@
-FROM ruby:2.1
+FROM instructure/ruby-passenger:2.1
 
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN curl -sL https://deb.nodesource.com/setup | bash -
+USER root
+RUN curl -sL https://deb.nodesource.com/setup_0.12 | bash -
 RUN  apt-get update -qq \
   && apt-get install -qqy \
-       locales \
        nodejs \
        postgresql-client \
        libxmlsec1-dev \
+       unzip \
+       fontforge \
+  && npm install -g gulp \
   && rm -rf /var/lib/apt/lists/*
 
-# Ensure UTF-8 locale
-RUN echo en_US.UTF-8 UTF-8 >> /etc/locale.gen
-RUN locale-gen en_US.UTF-8
-ENV LANG       en_US.UTF-8
-ENV LC_ALL     en_US.UTF-8
-RUN dpkg-reconfigure locales
+# We will need sfnt2woff in order to build fonts
+WORKDIR /root
+RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
+  && curl -O http://people.mozilla.org/~jkew/woff/woff-code-latest.zip \
+  && unzip woff-code-latest.zip \
+  && make \
+  && cp sfnt2woff /usr/local/bin \
+  && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
+  && gem install bundler --no-document -v 1.11.2 \
+  && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
-# Canvas requires bundler 1.7.10
-#RUN gem uninstall bundler \
-#  && gem install bundler -v 1.7.10
-# 1.7.10 has a bug preventing bundle install to work.  Error is "NoMethodError: undefined method `spec' for nil:NilClass"
-RUN gem uninstall bundler -i /usr/local/lib/ruby/gems/2.1.0 bundler \
-  && gem install bundler -v 1.7.15
-
-RUN mkdir /app
-WORKDIR /app
-
-RUN mkdir /home/docker \
- && useradd -d /home/docker docker \
- && chown -R docker:docker /home/docker /usr/local/bundle
-
-ENV PATH /usr/local/bundle/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 USER docker
+WORKDIR /usr/src/app
 
 # Note that setting the path where the gems go to /app/vendor causes them to be built to the
 # local machine since /app is mounted to the root dir on the local machine.  This is done using

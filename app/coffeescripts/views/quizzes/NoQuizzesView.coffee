@@ -1,8 +1,9 @@
 define [
   'jquery'
+  'Backbone'
   'underscore'
   'jst/quizzes/NoQuizzesView'
-], ($, _, template) ->
+], ($, Backbone, _, template) ->
 
   class ItemGroupView extends Backbone.View
     template: template

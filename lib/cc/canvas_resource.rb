@@ -27,11 +27,11 @@ module CC
 
     def add_canvas_non_cc_data
       migration_id = create_key(@course)
-      
+
       @canvas_resource_dir = File.join(@export_dir, CCHelper::COURSE_SETTINGS_DIR)
       canvas_export_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::CANVAS_EXPORT_FLAG)
       FileUtils::mkdir_p @canvas_resource_dir
-      
+
       resources = []
       resources << run_and_set_progress(:create_course_settings, nil, I18n.t('course_exports.errors.course_settings', "Failed to export course settings"), migration_id) if export_symbol?(:all_course_settings)
       resources << run_and_set_progress(:create_module_meta, nil, I18n.t('course_exports.errors.module_meta', "Failed to export module meta data"))
@@ -42,7 +42,9 @@ module CC
       resources << run_and_set_progress(:create_learning_outcomes, nil, I18n.t('course_exports.errors.learning_outcomes', "Failed to export learning outcomes"))
       resources << run_and_set_progress(:files_meta_path, nil, I18n.t('course_exports.errors.file_meta', "Failed to export file meta data"))
       resources << run_and_set_progress(:create_events, 25, I18n.t('course_exports.errors.events', "Failed to export calendar events"))
-      
+
+      File.write(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), '') # just in case an error happens later
+      resources << File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::MEDIA_TRACKS)
 
       # Create the syllabus resource
       if export_symbol?(:syllabus_body) || export_symbol?(:all_syllabus_body)
@@ -76,8 +78,8 @@ module CC
     end
 
     # Method Summary
-    #   The canvas export flag is just a txt file we can use to 
-    #   verify this is a canvas flavor of common cartridge. We 
+    #   The canvas export flag is just a txt file we can use to
+    #   verify this is a canvas flavor of common cartridge. We
     #   do this because we can't change the structure of the xml
     #   but still need some type of flag.
     def create_canvas_export_flag
@@ -91,10 +93,10 @@ A: This is un-BEAR-able
 JOKE
       canvas_export_file.close
     end
-    
+
     def create_syllabus(io_object=nil)
       syl_rel_path = nil
-      
+
       unless io_object
         syl_rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::SYLLABUS)
         path = File.join(@canvas_resource_dir, CCHelper::SYLLABUS)
@@ -102,10 +104,10 @@ JOKE
       end
       io_object << @html_exporter.html_page(@course.syllabus_body || '', "Syllabus")
       io_object.close
-        
+
       syl_rel_path
     end
-    
+
     def create_course_settings(migration_id, document=nil)
       if document
         course_file = nil

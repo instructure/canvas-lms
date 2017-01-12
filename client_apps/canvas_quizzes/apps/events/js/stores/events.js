@@ -1,7 +1,7 @@
 define(function(require) {
   var Store = require('canvas_quizzes/core/store');
+  var Dispatcher = require('../core/dispatcher');
   var Environment = require('canvas_quizzes/core/environment');
-  var ajax = require('canvas_quizzes/core/adapter').request;
   var Config = require('../config');
   var EventCollection = require('../collections/events');
   var QuestionCollection = require('../collections/questions');
@@ -155,5 +155,5 @@ define(function(require) {
         this.load();
       }
     }
-  });
+  }, Dispatcher);
 });

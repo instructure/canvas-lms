@@ -27,27 +27,18 @@ class ConversationMessage < ActiveRecord::Base
 
   belongs_to :conversation
   belongs_to :author, :class_name => 'User'
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account']
+  belongs_to :context, polymorphic: [:account]
   has_many :conversation_message_participants
   has_many :attachment_associations, :as => :context
-  has_many :attachments, :through => :attachment_associations, :order => 'attachments.created_at, attachments.id'
   # we used to attach submission comments to conversations via this asset
   # TODO: remove this column when we're sure we don't want this relation anymore
-  belongs_to :asset, :polymorphic => true, :types => :submission
-  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['Submission']
+  belongs_to :asset, polymorphic: [:submission]
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
   attr_accessible
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :conversation_id, :author_id, :created_at, :generated, :body, :forwarded_message_ids, :media_comment_id, :media_comment_type, :context_id, :context_type,
-    :asset_id, :asset_type, :attachment_ids, :has_attachments, :has_media_objects
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:conversation, :author, :context, :conversation_message_participants, :attachment_associations, :attachments, :asset]
-
   after_create :generate_user_note!
+  after_save :update_attachment_associations
 
   scope :human, -> { where("NOT generated") }
   scope :with_attachments, -> { where("attachment_ids<>'' OR has_attachments") } # TODO: simplify post-migration
@@ -81,7 +72,7 @@ class ConversationMessage < ActiveRecord::Base
 
       Shackles.activate(:slave) do
         ret = where(base_conditions).
-          joins('JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id').
+          joins("JOIN #{ConversationMessageParticipant.quoted_table_name} ON conversation_messages.id = conversation_message_id").
           select("conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags").
           order('conversation_id DESC, user_id DESC, created_at DESC').
           distinct_on(:conversation_id, :user_id).to_a
@@ -145,18 +136,30 @@ class ConversationMessage < ActiveRecord::Base
 
   # override AR association magic
   def attachment_ids
-    read_attribute :attachment_ids
+    (read_attribute(:attachment_ids) || "").split(',').map(&:to_i)
   end
 
   def attachment_ids=(ids)
-    self.attachments = author.conversation_attachments_folder.attachments.where(id: ids.map(&:to_i)).to_a
-    write_attribute(:attachment_ids, attachments.map(&:id).join(','))
+    ids = author.conversation_attachments_folder.attachments.where(id: ids.map(&:to_i)).pluck(:id) unless ids.empty?
+    write_attribute(:attachment_ids, ids.join(','))
   end
 
-  def clone
-    copy = super
-    copy.attachments = attachments
-    copy
+  def attachments
+    self.attachment_associations.map(&:attachment)
+  end
+
+  def update_attachment_associations
+    previous_attachment_ids = self.attachment_associations.pluck(:attachment_id)
+    deleted_attachment_ids = previous_attachment_ids - attachment_ids
+    new_attachment_ids = attachment_ids - previous_attachment_ids
+    self.attachment_associations.where(attachment_id: deleted_attachment_ids).find_each do |association|
+      association.destroy
+    end
+    if new_attachment_ids.any?
+      author.conversation_attachments_folder.attachments.where(id: new_attachment_ids).find_each do |attachment|
+        self.attachment_associations.create!(attachment: attachment)
+      end
+    end
   end
 
   def delete_from_participants
@@ -195,6 +198,7 @@ class ConversationMessage < ActiveRecord::Base
   def recipients
     return [] unless conversation
     subscribed = subscribed_participants.reject{ |u| u.id == self.author_id }.map{|x| x.becomes(User)}
+    ActiveRecord::Associations::Preloader.new.preload(conversation_message_participants, :user)
     participants = conversation_message_participants.map(&:user)
     subscribed & participants
   end
@@ -237,8 +241,11 @@ class ConversationMessage < ActiveRecord::Base
   def generate_user_note!
     return if skip_broadcasts
     return unless @generate_user_note
-    recipients.each do |recipient|
-      next unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
+    valid_recipients = recipients.select{|recipient| recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }}
+    return unless valid_recipients.any?
+
+    valid_recipients = User.where(:id => valid_recipients) unless CANVAS_RAILS4_0 # need to reload to get all the attributes needed for User#save
+    valid_recipients.each do |recipient|
       title = if conversation.subject
         t(:subject_specified, "Private message: %{subject}", subject: conversation.subject)
       else
@@ -258,6 +265,8 @@ class ConversationMessage < ActiveRecord::Base
     else
       shared_tags = author.conversation_context_codes(false)
       shared_tags &= recipient.conversation_context_codes(false)
+      shared_tags &= conversation.tags if conversation.tags.any?
+
       context_components = shared_tags.map{|t| ActiveRecord::Base.parse_asset_string(t)}
       context_names = Context.names_by_context_types_and_ids(context_components[0,2]).values
     end
@@ -287,7 +296,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def forwarded_messages
-    @forwarded_messages ||= forwarded_message_ids && self.class.send(:with_exclusive_scope){ self.class.where(id: forwarded_message_ids.split(',')).order('created_at DESC').to_a} || []
+    @forwarded_messages ||= forwarded_message_ids && self.class.unscoped { self.class.where(id: forwarded_message_ids.split(',')).order('created_at DESC').to_a} || []
   end
 
   def all_forwarded_messages

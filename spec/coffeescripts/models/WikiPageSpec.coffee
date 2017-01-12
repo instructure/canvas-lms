@@ -2,8 +2,8 @@ define [
   'compiled/models/WikiPage'
   'underscore'
 ], (WikiPage, _) ->
-  wikiPageObj = (options={}) -> 
-    defaults = 
+  wikiPageObj = (options={}) ->
+    defaults =
               body: "<p>content for the uploading of content</p>"
               created_at: "2013-05-10T13:18:27-06:00"
               editing_roles: "teachers"
@@ -79,7 +79,7 @@ define [
 
   test 'publish convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
-    sinon.stub wikiPage, 'save', (attributes, options) ->
+    @stub wikiPage, 'save', (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.published, true, 'published provided correctly'
@@ -87,7 +87,7 @@ define [
 
   test 'unpublish convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
-    sinon.stub wikiPage, 'save', (attributes, options) ->
+    @stub wikiPage, 'save', (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.published, false, 'published provided correctly'
@@ -95,7 +95,7 @@ define [
 
   test 'setFrontPage convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
-    sinon.stub wikiPage, 'save', (attributes, options) ->
+    @stub wikiPage, 'save', (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.front_page, true, 'front_page provided correctly'
@@ -103,7 +103,7 @@ define [
 
   test 'unsetFrontPage convenience method', 3, ->
     wikiPage = new WikiPage wikiPageObj()
-    sinon.stub wikiPage, 'save', (attributes, options) ->
+    @stub wikiPage, 'save', (attributes, options) ->
       ok attributes, 'attributes present'
       ok attributes.wiki_page, 'wiki_page present'
       strictEqual attributes.wiki_page.front_page, false, 'front_page provided correctly'

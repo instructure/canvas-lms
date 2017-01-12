@@ -132,17 +132,17 @@
       <div id="modules">
         <%= render :partial => "context_modules/context_module", :object => @module %>
         <div style="float: right; margin-top: 5px;">
-          <a href="#" class="hide_sidebar_link no-hover" title="<%= t 'links.hide_sidebar', "Hide Sidebar" %>"><%= image_tag "delete_circle.png" %></a>
+          <a href="#" class="hide_sidebar_link no-hover" title="<%= t 'links.hide_sidebar', "Hide Sidebar" %>"><%= image_tag "delete_circle.png", :alt => t('Hide Sidebar') %></a>
         </div>
       </div>
     </td>
     
     <td id="content_holder">
       <% if @attachment %>
-        <iframe name="content_preview" frameborder="0" id="content_preview" src="<%= context_url(@context, :context_file_url, @attachment.id) %>/<%= @attachment.full_path %>">
+        <iframe name="content_preview" frameborder="0" id="content_preview" src="<%= context_url(@context, :context_file_url, @attachment.id) %>/<%= @attachment.full_path %>" title="<%= t('Preview') %>">
         </iframe>
       <% elsif @tag %>
-        <iframe name="content_preview" frameborder="0" id="content_preview" src="<%= @tag.url %>">
+        <iframe name="content_preview" frameborder="0" id="content_preview" src="<%= @tag.url %>" title="<%= t('Preview') %>">
         </iframe>
       <% end %>
     </td>

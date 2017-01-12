@@ -1,4 +1,4 @@
-<form action='/api/v1/developer_keys{{#if id}}/{{id}}{{/if}}' method='{{#if id}}PUT{{else}}POST{{/if}}' class="key_form">
+<form action='{{_formAction}}{{#if id}}/{{id}}{{/if}}' method='{{#if id}}PUT{{else}}POST{{/if}}' class="key_form">
 <table class='formtable'>
     <tr>
         <td><label for='key_name'>{{#t "key_name"}}Key Name:{{/t}}</label></td>
@@ -7,10 +7,6 @@
     <tr>
         <td><label for='email'>{{#t "owner_email"}}Owner Email:{{/t}}</label></td>
         <td><input type='text' id='email' name='developer_key[email]' value='{{ email }}'/>
-    </tr>
-    <tr>
-        <td><label for='tool_id'>{{#t "tool_id"}}Tool ID:{{/t}}</label></td>
-        <td><input type='text' id='tool_id' name='developer_key[tool_id]' value='{{ tool_id }}'/>
     </tr>
     <tr>
         <td><label for='redirect_uri'>{{#t "redirect_uri"}}Redirect URI:{{/t}}</label></td>

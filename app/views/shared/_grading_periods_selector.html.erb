@@ -1,0 +1,20 @@
+<select class="grading_periods_selector content-box"
+  data-enrollment-id="<%= enrollment_id %>">
+  <option
+    value="0"
+    <%= "selected=selected" if selected_period_id == 0 %>
+    <%= "disabled=true" unless all_grading_periods_option %> >
+    <% if all_grading_periods_option %>
+      <%= t "All Grading Periods" %>
+    <% else %>
+      <%= t "Select a Grading Period..." %>
+    <% end %>
+  </option>
+  <% grading_periods.each do |gp| %>
+    <option
+      value="<%= gp[:id] %>"
+      <%= "selected=selected" if selected_period_id == gp[:id] %> >
+      <%= gp[:title] %>
+    </option>
+  <% end %>
+</select>

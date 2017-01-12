@@ -57,13 +57,15 @@ define [
 
   test 'pollForChanges performs a fetch at most every interval', ->
     revision = new WikiPageRevision {}, pageUrl: 'page-url'
-    @sandbox.useFakeTimers()
+    clock = sinon.useFakeTimers()
     @stub(revision, 'fetch').returns($.Deferred())
 
     revision.pollForChanges(5000)
     revision.pollForChanges(5000)
-    @sandbox.clock.tick(4000)
+    clock.tick(4000)
     ok !revision.fetch.called, 'not called until interval elapses'
 
-    @sandbox.clock.tick(2000)
+    clock.tick(2000)
     ok revision.fetch.calledOnce, 'called once interval elapses'
+
+    clock.restore()

@@ -89,49 +89,20 @@ module BroadcastPolicy
       fields  = opts[:fields] || []
       fields = [fields] unless fields.is_a?(Array)
 
-      begin
-        fields.map {|field| self.prior_version.send(field) != self.send(field) }.include?(true) and
-        self.workflow_state == state.to_s and
+      fields.map {|field| self.prior_version.send(field) != self.send(field) }.include?(true) &&
+        self.workflow_state == state.to_s &&
         self.prior_version.workflow_state == state.to_s
-      rescue Exception => e
-        logger.warn "Could not check if a change was made: #{e.inspect}"
-        false
-      end
-    end
-
-    def changed_in_states(states, opts={})
-      !states.select{|s| changed_in_state(s, opts)}.empty?
-    end
-
-    def remained_in_state(state)
-      begin
-        self.workflow_state == state.to_s and
-        self.prior_version.workflow_state == state.to_s
-      rescue Exception => e
-        logger.warn "Could not check if a record remained in the same state: #{e.inspect}"
-        false
-      end
     end
 
     def changed_state(new_state=nil, old_state=nil)
-      begin
-        if new_state and old_state
-          self.workflow_state == new_state.to_s and
+      if new_state && old_state
+        self.workflow_state == new_state.to_s &&
           self.prior_version.workflow_state == old_state.to_s
-        elsif new_state
-          self.workflow_state.to_s == new_state.to_s and
+      elsif new_state
+        self.workflow_state.to_s == new_state.to_s &&
           self.prior_version.workflow_state != self.workflow_state
-        else
-          self.workflow_state != self.prior_version.workflow_state
-        end
-      rescue StandardError => e
-        Canvas::Errors.capture(
-          e,
-          type: :broadcast_policy,
-          message: "Could not check if a record changed state"
-        )
-        logger.warn "Could not check if a record changed state: #{e.inspect}"
-        false
+      else
+        self.workflow_state != self.prior_version.workflow_state
       end
     end
     alias :changed_state_to :changed_state

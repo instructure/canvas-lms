@@ -18,14 +18,6 @@ define(['jquery'], function($) {
   // ============================================================================================
   INST.browser = {};
 
-  // IE detection:
-  // Versions 7, 8, and 9 are detected using conditional comments:
-  $.each([7,8,9], function(i, versionNumber) {
-    if ($('html').hasClass('ie'+versionNumber)) {
-      classifyIE(versionNumber);
-    }
-  });
-
   // Conditional comments were dropped as of IE10, so we need to sniff.
   //
   // See: http://msdn.microsoft.com/en-us/library/ie/hh801214(v=vs.85).aspx

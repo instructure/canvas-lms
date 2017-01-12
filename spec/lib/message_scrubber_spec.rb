@@ -21,12 +21,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 describe MessageScrubber do
 
   # Helpers
-  def message(sent_at)
-    message = Message.new(notification: @notification, context: @context,
+  def message(updated_at)
+    Timecop.travel(updated_at) do
+      message = Message.new(notification: @notification, context: @context,
             communication_channel: @recipient.communication_channel)
-    message.sent_at = sent_at
-    message.save!
-    message
+      message.save!
+      message
+    end
   end
 
   def old_messages(count = 2)

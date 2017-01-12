@@ -19,8 +19,10 @@
 <%= before_label :course, "Course" %> <%= courses = asset.appointment_group.participant_type == 'Group' ?
                                             asset.appointment_group.contexts.first.name  :
                                             asset.appointment_group.contexts_for_user(user).map(&:name).join(", ") %>
+<% if asset.grants_right?(user, :read) -%>
 <% if asset.appointment_group.available_slots -%>
 <%= before_label :slots_remaining, "Available time slots" %> <%= asset.appointment_group.available_slots %>
 <% end -%>
 
 <%= t :instructions, "View the appointment at the following link: %{link}", :link => content(:link) %>
+<% end -%>

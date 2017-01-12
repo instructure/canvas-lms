@@ -1,0 +1,21 @@
+production:
+  host: 10.11.12.13
+  port: 8500
+  ssl: true
+  acl_token: "xxxxxxxx-yyyy-zzzz-1111-222222222222"
+test:
+  host: some.domain
+  port: 8500
+  ssl: false
+  init_values:
+    rich-content-service:
+      app-host: rce.docker
+      cdn-host: rce.docker
+development:
+  host: consul
+  port: 8500
+  ssl: false
+  init_values:
+    rich-content-service:
+      app-host: rce.docker
+      cdn-host: rce.docker

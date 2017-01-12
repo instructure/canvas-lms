@@ -17,18 +17,17 @@
 #
 
 class DelayedMessage < ActiveRecord::Base
-  include PolymorphicTypeOverride
-  override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
-
   include NotificationPreloader
   belongs_to :notification_policy
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['DiscussionEntry', 'Assignment',
-    'SubmissionComment', 'Submission', 'ConversationMessage', 'Course', 'DiscussionTopic',
-    'Enrollment', 'Attachment', 'AssignmentOverride', 'Quizzes::QuizSubmission', 'GroupMembership',
-    'CalendarEvent', 'WikiPage', 'AssessmentRequest', 'AccountUser', 'WebConference', 'Account', 'User',
-    'AppointmentGroup', 'Collaborator', 'AccountReport', 'Quizzes::QuizRegradeRun', 'CommunicationChannel',
-    'Alert']
+  belongs_to :context, polymorphic:
+    [:discussion_entry, :assignment, :submission_comment, :submission,
+     :conversation_message, :course, :discussion_topic, :enrollment,
+     :attachment, :assignment_override, :group_membership, :calendar_event,
+     :wiki_page, :assessment_request, :account_user, :web_conference,
+     :account, :user, :appointment_group, :collaborator, :account_report,
+     :alert, { context_communication_channel: 'CommunicationChannel',
+       quiz_submission: 'Quizzes::QuizSubmission',
+       quiz_regrade_run: 'Quizzes::QuizRegradeRun'}]
   belongs_to :communication_channel
   attr_accessible :notification, :notification_policy, :frequency,
     :communication_channel, :linked_name, :name_of_topic, :link, :summary,
@@ -125,21 +124,25 @@ class DelayedMessage < ActiveRecord::Base
     return nil unless context # the context for this message has already been deleted
     notification = BroadcastPolicy.notification_finder.by_name('Summaries')
     path = HostUrl.outgoing_email_address
-    message = to.messages.build(
-      :subject => notification.subject,
-      :to => to.path,
-      :notification_name => notification.name,
-      :notification => notification,
-      :from => path,
-      :user => user
-    )
-    message.delayed_messages = delayed_messages
-    message.context = context
-    message.asset_context = context.context(user) rescue context
-    message.root_account_id = delayed_messages.first.try(:root_account_id)
-    message.delay_for = 0
-    message.parse!
-    message.save
+    root_account_id = delayed_messages.first.try(:root_account_id)
+    locale = user.locale || (root_account_id && Account.where(id: root_account_id).first.try(:default_locale))
+    I18n.with_locale(locale) do
+      message = to.messages.build(
+        :subject => notification.subject,
+        :to => to.path,
+        :notification_name => notification.name,
+        :notification => notification,
+        :from => path,
+        :user => user
+      )
+      message.delayed_messages = delayed_messages
+      message.context = context
+      message.asset_context = context.context(user) rescue context
+      message.root_account_id = root_account_id
+      message.delay_for = 0
+      message.parse!
+      message.save
+    end
   end
 
   protected

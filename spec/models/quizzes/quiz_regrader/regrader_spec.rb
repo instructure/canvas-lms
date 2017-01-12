@@ -2,8 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 
 describe Quizzes::QuizRegrader::Regrader do
 
-  before { Timecop.freeze(Time.local(2013)) }
-  after { Timecop.return }
+  around do |example|
+    Timecop.freeze(Time.zone.local(2013), &example)
+  end
 
   let(:questions) do
     1.upto(4).map do |i|

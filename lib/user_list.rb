@@ -42,23 +42,23 @@ class UserList
   #                         is used. otherwise a temporary user is created
   # * <tt>:infer</tt> - uses :open or :closed according to root_account.open_registration
   #
-  def initialize(list_in, options = {})
-    options.reverse_merge! :root_account => Account.default,
-                           :search_method => :infer,
-                           :initial_type => nil
-    @options = options
+  def initialize(list_in, root_account: Account.default,
+                 search_method: :infer, initial_type: nil,
+                 current_user: nil)
     @addresses = []
     @errors = []
     @duplicate_addresses = []
-    @root_account = @options[:root_account]
-    @search_method = @options[:search_method]
+    @root_account = root_account
+    @search_method = search_method
+    @initial_type = initial_type
     @search_method = (@root_account.open_registration? ? :open : :closed) if @search_method == :infer
+    @current_user = current_user
     parse_list(list_in)
     resolve
   end
-  
+
   attr_reader :errors, :addresses, :duplicate_addresses
-  
+
   def as_json(*options)
     {
       :users => addresses.map { |a| a.reject { |k, v| k == :shard } },
@@ -79,7 +79,7 @@ class UserList
       cc = user.communication_channels.build(:path => a[:address], :path_type => 'email')
       cc.user = user
       user.workflow_state = 'creation_pending'
-      user.initial_enrollment_type = User.initial_enrollment_type_from_text(@options[:initial_type])
+      user.initial_enrollment_type = User.initial_enrollment_type_from_text(@initial_type)
       user.save!
       user
     end
@@ -87,7 +87,7 @@ class UserList
   end
 
   private
-  
+
   def parse_single_user(path)
     return if path.blank?
 
@@ -124,7 +124,7 @@ class UserList
       nil
     end
   end
-  
+
   def quote_ends(chars, i)
     loop do
       i = i + 1
@@ -159,16 +159,21 @@ class UserList
       end
     end
   end
-  
+
   def resolve
-    all_account_ids = [@root_account.id] + @root_account.trusted_account_ids
+    trusted_account_ids = @root_account.trusted_account_ids
+    if @current_user && (!@current_user.associated_shards.include?(Account.site_admin.shard) ||
+        !Account.site_admin.pseudonyms.active.merge(@current_user.pseudonyms).exists?)
+      trusted_account_ids.delete(Account.site_admin.id)
+    end
+    all_account_ids = [@root_account.id] + trusted_account_ids
     associated_shards = @addresses.map {|x| Pseudonym.associated_shards(x[:address].downcase) }.flatten.to_set
     associated_shards << @root_account.shard
     # Search for matching pseudonyms
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
       Pseudonym.active.
-          select('unique_id AS address, (SELECT name FROM users WHERE users.id=user_id) AS name, user_id, account_id, sis_user_id').
+          select("unique_id AS address, (SELECT name FROM #{User.quoted_table_name} WHERE users.id=user_id) AS name, user_id, account_id, sis_user_id").
           where("(LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map {|x| x[:address].downcase}, @addresses.map {|x| x[:address]}, account_ids).
           map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
         addresses = @addresses.select { |a| a[:address].downcase == login[:address].downcase ||
@@ -277,6 +282,7 @@ class UserList
       address.delete :workflow_state
       address.delete :account_id
       address.delete :sis_user_id
+      address.delete :id
       # Only allow addresses that we found a user, or that we can implicitly create the user
       if address[:user_id].present?
         (@addresses.find { |a| a[:user_id] == address[:user_id] && a[:shard] == address[:shard] } ? @duplicate_addresses : @addresses) << address
@@ -292,5 +298,5 @@ class UserList
       end
     end
   end
-  
+
 end

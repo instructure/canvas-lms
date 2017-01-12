@@ -1,10 +1,11 @@
 define [
   'jquery'
   'underscore'
+  'compiled/util/fcUtil'
   'compiled/calendar/commonEventFactory'
   'jquery.ajaxJSON'
   'vendor/jquery.ba-tinypubsub'
-], ($, _, commonEventFactory) ->
+], ($, _, fcUtil, commonEventFactory) ->
 
   class
     constructor: (contexts) ->
@@ -39,7 +40,7 @@ define [
       # Note that the appointmentGroups are not cached per context, as
       # we get them all in the same request (not scoped to contexts at
       # all.) This might end up being confusing.
-      
+
       $.subscribe "CommonEvent/eventDeleted", @eventDeleted
       $.subscribe "CommonEvent/eventSaved", @eventSaved
 
@@ -80,9 +81,9 @@ define [
         return [ start, end ]
 
       for range in ranges
-        if range[0] <= start && start <= range[1]
+        if range[0] <= start < range[1]
           start = range[1]
-        if range[0] <= end && end <= range[1]
+        if range[0] < end <= range[1]
           end = range[0]
 
       [ start, end ]
@@ -116,13 +117,26 @@ define [
 
       events = []
       for id, event of contextInfo.events
-        if !event.originalStart && !start || event.originalStart >= start && event.originalStart <= end
-          events.push event
+        if @eventInRange(event, start, end)
+          events.push(event)
 
       events
 
+    eventInRange: (event, start, end) ->
+      if !event.originalStart && !start
+        # want undated, have undated, include it
+        true
+      else if !event.originalStart || !start
+        # want undated, have dated (or vice versa), skip it
+        false
+      else
+        # want dated, have dated. but when comparing to the range, remember
+        # that we made start/end be unwrapped values (down in getEvents), so
+        # unwrap event.originalStart too before comparing
+        start <= fcUtil.unwrap(event.originalStart) < end
+
     processNextRequest: (inFlightCheckKey='default') =>
-      for id, [method, args, key] of @pendingRequests
+      for [method, args, key], id in @pendingRequests
         if key == inFlightCheckKey
           @pendingRequests.splice(id, 1)
           method args...
@@ -209,10 +223,19 @@ define [
       params = { include: [ 'reserved_times', 'participant_count', 'appointments', 'child_events' ]}
       @startFetch [[ group.url, params ]], dataCB, (() => cb @cache.appointmentGroups[group.id].appointmentEvents)
 
-    getEvents: (start, end, contexts, cb, options = {}) =>
+    getEvents: (start, end, contexts, donecb, datacb, options = {}) =>
       if @inFlightRequest['default']
         @pendingRequests.push([@getEvents, arguments, 'default'])
         return
+
+      # start/end as they come from fullcalendar or AgendaView may be
+      # ambiguously-timed and/or ambiguously-zoned. that's just way too much
+      # confusion. instead, let's always works with unwrapped datetimes, so we
+      # know we're interpreting times in the context of the profile timezone,
+      # and particularly ambiguously-timed dates as midnight in the profile
+      # timezone.
+      start = fcUtil.unwrap(start) if start
+      end = fcUtil.unwrap(end) if end
 
       paramsForDatedEvents = (start, end, contexts) =>
         [ startDay, endDay ] = @requiredDateRangeForContexts(start, end, contexts)
@@ -220,10 +243,13 @@ define [
         if startDay >= endDay
           return null
 
+        # we treat end as an exclusive upper bound. the API treats it as
+        # inclusive, so we may get back some events we didn't intend. but
+        # addEventToCache handles the duplicate fine, so it's ok
         {
           context_codes: contexts
-          start_date: $.unfudgeDateForProfileTimezone(startDay).toISOString()
-          end_date: $.unfudgeDateForProfileTimezone(endDay).toISOString()
+          start_date: startDay.toISOString()
+          end_date: endDay.toISOString()
         }
 
       paramsForUndatedEvents = (contexts) =>
@@ -244,58 +270,79 @@ define [
         # Yay, this request can be satisfied by the cache
         list = @getEventsFromCache(start, end, contexts)
         list.requestID = options.requestID
-        cb list
+        datacb list if datacb?
+        donecb list
         @processNextRequest()
         return
 
       requestResults = {}
       dataCB = (data, url, params) =>
         return unless data
+        newEvents = []
         key = 'type_'+params.type
         requestResult = requestResults[key] or {events: []}
         requestResult.next = data.next
         for e in data
           event = commonEventFactory(e, @contexts)
           if event && event.object.workflow_state != 'deleted'
+            newEvents.push(event)
             requestResult.events.push(event)
-        requestResult.maxDate = _.max(requestResult.events, (e) -> e.originalStart).originalStart
+        newEvents.requestID = options.requestID
+        datacb newEvents if datacb?
         requestResults[key] = requestResult
 
       doneCB = () =>
+        # TODO: there's a rare problem in this implementation. if a full page
+        # or more of events have the same start time, then the first time one
+        # or more show up in a response, that date will be the nextPageDate. as
+        # such, all events for that date will be excluded. but then on the
+        # followup, the nextPageDate will _still_ be that date, and zero events
+        # will be included. it will then loop indefinitely in this state.
+
         # If any request had a next page, the combined results are valid
-        # only through the earliest page end date.
-        incomplete = false
-        for key, requestResult of requestResults
-          if requestResult.next
-            incomplete = true
+        # only through the earliest page end date. note that it's an exclusive
+        # upper bound, just as we treated end earlier. (this is so that it can
+        # be an inclusive lower bound on the next request)
 
-        nextPageDate = end
-        if incomplete
-          for key, requestResult of requestResults
-            if requestResult.next && requestResult.maxDate < nextPageDate
-              nextPageDate = requestResult.maxDate
-        nextPageDate.setHours(0, 0, 0) if nextPageDate
+        newEvents = []
 
-        lastKnownDate = start
+        upperBounds = []
         for key, requestResult of requestResults
+          dates = []
           for event in requestResult.events
-            if !incomplete || event.originalStart < nextPageDate
-              @addEventToCache event
-              lastKnownDate = event.originalStart if event.originalStart > lastKnownDate
-        lastKnownDate = end if !incomplete
+            newEvents.push(event)
+            if requestResult.next && event.originalStart
+              dates.push(event.originalStart)
+          if !_.isEmpty(dates)
+            upperBounds.push(_.max(dates))
+
+        # consumer of list.nextPageDate is going to expect to just be able to
+        # pass it back to getEvents as the start, so it need to be wrapped
+        # (which it is, if set, based on the events' originalStart). but for
+        # use in place of end, it needs to be unwrapped
+        if !_.isEmpty(upperBounds)
+          nextPageDate = fcUtil.clone(_.min(upperBounds))
+          end = fcUtil.unwrap(nextPageDate)
+
+        list = @getEventsFromCache(start, end, contexts)
+        datacb(list) if datacb? && list.length > 0
+
+        for event in newEvents
+          @addEventToCache event
+          if @eventInRange(event, start, end)
+            list.push(event)
 
         for context in contexts
           contextInfo = @cache.contexts[context]
           if contextInfo
             if start
-              contextInfo.fetchedRanges.push([start, lastKnownDate])
+              contextInfo.fetchedRanges.push([start, end])
             else
               contextInfo.fetchedUndated = true
 
-        list = @getEventsFromCache(start, lastKnownDate, contexts)
-        list.nextPageDate = if incomplete then nextPageDate else null
+        list.nextPageDate = nextPageDate
         list.requestID = options.requestID
-        cb list
+        donecb list
 
       @startFetch [
         [ '/api/v1/calendar_events', params ]
@@ -326,7 +373,7 @@ define [
       @startFetch [
         ["/api/v1/appointment_groups/#{appointmentGroup.id}/#{type}", {registration_status: registrationStatus}]
       ], dataCB, doneCB
-    
+
     # Starts a paginated fetch of the url/param combinations in the array. This makes
     # situations where you need to do paginated fetches of data from N different endpoints
     # a little simpler. dataCB(data, url, params) is called on every request with the data,

@@ -1,5 +1,6 @@
 require 'i18n_tasks'
 require 'i18n_extraction'
+require 'shellwords'
 
 namespace :i18n do
   desc "Verifies all translation calls"
@@ -41,8 +42,18 @@ namespace :i18n do
     yaml_dir = './config/locales/generated'
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
+    special_keys = %w{
+      locales
+      crowdsourced
+      custom
+      deprecated_for
+      bigeasy_locale
+      fullcalendar_locale
+      moment_locale
+    }.freeze
+
     File.open(Rails.root.join(yaml_file), "w") do |file|
-      file.write({'en' => @translations.except('locales', 'qualified_locale')}.ya2yaml(:syck_compatible => true))
+      file.write({'en' => @translations.except(*special_keys)}.ya2yaml(:syck_compatible => true))
     end
     print "Wrote new #{yaml_file}\n\n"
   end
@@ -58,14 +69,14 @@ namespace :i18n do
     Bundler.setup
     # for consistency in how canvas does json ... this way our specs can
     # verify _core_en is up to date
-    ActiveSupport::JSON.backend = :oj
-    MultiJson.dump_options = {:escape_mode => :xss_safe}
+    require 'config/initializers/json'
 
     # set up rails i18n paths ... normally rails env does this for us :-/
     require 'action_controller'
     require 'active_record'
     require 'will_paginate'
     I18n.load_path.unshift(*WillPaginate::I18n.load_path)
+    I18n.load_path += Dir[Rails.root.join('gems', 'plugins', '*', 'config', 'locales', '*.{rb,yml}')]
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
 
     require 'i18nema'
@@ -86,6 +97,14 @@ namespace :i18n do
     # LOCALES=hi,ja,pt,zh-hans rake i18n:generate_js
     locales += ENV['LOCALES'].split(',').map(&:to_sym) if ENV['LOCALES']
     all_translations = I18n.backend.direct_lookup
+
+    # copy "real" translations from deprecated locales
+    I18n.available_locales.each do |locale|
+      if (deprecated_for = I18n.backend.direct_lookup(locale.to_s, 'deprecated_for'))
+        all_translations[locale] = all_translations[deprecated_for.to_sym]
+      end
+    end
+
     flat_translations = all_translations.flatten_keys
 
     if locales.empty?
@@ -102,7 +121,7 @@ namespace :i18n do
 
     dump_translations = lambda do |translation_name, translations|
       file = "public/javascripts/translations/#{translation_name}.js"
-      content = I18nTasks::Utils.dump_js(translations, locales)
+      content = I18nTasks::Utils.dump_js(translations)
       if !File.exist?(file) || File.read(file) != content
         File.open(file, "w"){ |f| f.write content }
       end
@@ -404,7 +423,7 @@ HEADER
 
     transifex_url = "http://www.transifex.com/api/2/project/canvas-lms/"
     translation_url = transifex_url + "resource/canvas-lms/translation"
-    userpass = "#{user}:#{password}"
+    userpass = "#{user}:#{Shellwords.escape(password)}"
     languages.each do |lang|
       if lang.is_a?(Array)
         lang, transifex_lang = *lang

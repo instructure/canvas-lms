@@ -315,16 +315,33 @@ describe AppointmentGroup do
       # multiple contexts
       expect(@g8.grants_right?(@teacher, :manage)).to be_falsey  # not in any courses
       expect(@g8.grants_right?(@teacher2, :manage)).to be_truthy
-      expect(@g8.grants_right?(@teacher3, :manage)).to be_falsey # not in all courses
+      expect(@g8.grants_right?(@teacher3, :manage)).to be_truthy # in at least one course
 
       # multiple contexts and sub contexts
       expect(@g9.grants_right?(@teacher2, :manage)).to be_truthy
-      expect(@g9.grants_right?(@teacher3, :manage)).to be_falsey
+      expect(@g9.grants_right?(@teacher3, :manage)).to be_truthy
     end
 
     it "should ignore deleted courses when performing permissions checks" do
       @course3.destroy
+      expect(@g8.active_contexts).not_to include @course3
       expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_truthy
+    end
+
+    it "should give :manage permission even if some contexts are concluded" do
+      @course3.complete!
+      expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_truthy
+    end
+
+    it "should not give :manage permission if all contexts are (hard-)concluded" do
+      @course2.complete!
+      @course3.complete!
+      expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_falsey
+    end
+
+    it "should give :manage permission if a context is soft-concluded" do
+      @course.soft_conclude!
+      expect(@g1.reload.grants_right?(@teacher, :manage)).to be_truthy
     end
   end
 
@@ -336,6 +353,7 @@ describe AppointmentGroup do
 
       course_with_teacher(:active_all => true)
       student_in_course(:course => @course, :active_all => true)
+      course_with_observer(active_all: true, active_cc: true, course: @course, associated_user_id: @student)
 
       [@teacher, @student].each do |user|
         channel = user.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
@@ -345,31 +363,37 @@ describe AppointmentGroup do
       @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
     end
 
-    it "should notify all participants when publishing" do
+    it "should notify all participants when publishing", priority: "1", test_id: 186566 do
       @ag.publish!
       expect(@ag.messages_sent).to be_include("Appointment Group Published")
-      expect(@ag.messages_sent["Appointment Group Published"].map(&:user_id).sort.uniq).to eql [@student.id]
+      expect(@ag.messages_sent["Appointment Group Published"].map(&:user_id).sort.uniq).to eql [@student.id, @observer.id].sort
     end
 
-    it "should notify all participants when adding appointments" do
+    it "should notify all participants when adding appointments", priority: "1", test_id: 193138 do
       @ag.publish!
       @ag.update_attributes(:new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
       expect(@ag.messages_sent).to be_include("Appointment Group Updated")
-      expect(@ag.messages_sent["Appointment Group Updated"].map(&:user_id).sort.uniq).to eql [@student.id]
+      expect(@ag.messages_sent["Appointment Group Updated"].map(&:user_id).sort.uniq).to eql [@student.id, @observer.id].sort
     end
 
-    it "should notify all participants when deleting" do
+    it "should notify all participants when deleting", priority: "1", test_id: 193137 do
       @ag.publish!
       @ag.cancel_reason = "just because"
       @ag.destroy
       expect(@ag.messages_sent).to be_include("Appointment Group Deleted")
-      expect(@ag.messages_sent["Appointment Group Deleted"].map(&:user_id).sort.uniq).to eql [@student.id]
+      expect(@ag.messages_sent["Appointment Group Deleted"].map(&:user_id).sort.uniq).to eql [@student.id, @observer.id].sort
+    end
+
+    it "should not notify participants when unpublished" do
+      @ag.destroy
+      expect(@ag.messages_sent).to be_empty
     end
 
     it "should not notify participants in an unpublished course" do
       @unpublished_course = course
       @unpublished_course.enroll_user(@student, 'StudentEnrollment')
       @unpublished_course.enroll_user(@teacher, 'TeacherEnrollment')
+      @unpublished_course.enroll_user(@observer, 'ObserverEnrollment')
 
       @ag = AppointmentGroup.create!(:title => "test",
                                        :contexts => [@unpublished_course],
@@ -500,16 +524,16 @@ describe AppointmentGroup do
     it "should allow filtering on registration status" do
       @ag.appointments.first.reserve_for(@users.first, @users.first)
       expect(@ag.possible_participants).to eql @users
-      expect(@ag.possible_participants('registered')).to eql [@users.first]
-      expect(@ag.possible_participants('unregistered')).to eql [@users.last]
+      expect(@ag.possible_participants(registration_status: 'registered')).to eql [@users.first]
+      expect(@ag.possible_participants(registration_status: 'unregistered')).to eql [@users.last]
     end
 
     it "should allow filtering on registration status (for groups)" do
       @ag.appointment_group_sub_contexts.create! :sub_context => @gc, :sub_context_code => @gc.asset_string
       @ag.appointments.first.reserve_for(@group1, @users.first)
       expect(@ag.possible_participants.sort_by(&:id)).to eql [@group1, @group2].sort_by(&:id)
-      expect(@ag.possible_participants('registered')).to eql [@group1]
-      expect(@ag.possible_participants('unregistered')).to eql [@group2]
+      expect(@ag.possible_participants(registration_status: 'registered')).to eql [@group1]
+      expect(@ag.possible_participants(registration_status: 'unregistered')).to eql [@group2]
     end
   end
 

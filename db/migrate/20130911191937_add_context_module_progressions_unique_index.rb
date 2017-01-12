@@ -6,7 +6,7 @@ class AddContextModuleProgressionsUniqueIndex < ActiveRecord::Migration
     ContextModuleProgression.
         select([:user_id, :context_module_id]).
         group(:user_id, :context_module_id).
-        includes(:context_module, :user).
+        preload(:context_module, :user).
         where("user_id IS NOT NULL AND context_module_id IS NOT NULL").
         having("COUNT(*) > 1").find_each do |cmp|
       scope = ContextModuleProgression.

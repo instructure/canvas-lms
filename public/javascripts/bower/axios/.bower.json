@@ -1,0 +1,45 @@
+{
+  "name": "axios",
+  "main": "./dist/axios.js",
+  "version": "0.5.4",
+  "homepage": "https://github.com/mzabriskie/axios",
+  "authors": [
+    "Matt Zabriskie"
+  ],
+  "description": "Promise based HTTP client for the browser and node.js",
+  "moduleType": [
+    "amd",
+    "globals"
+  ],
+  "keywords": [
+    "xhr",
+    "http",
+    "ajax",
+    "promise",
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "*.iml",
+    "example",
+    "lib",
+    "node_modules",
+    "sandbox",
+    "test",
+    "CONTRIBUTING.md",
+    "Gruntfile.js",
+    "index.js",
+    "karma.conf.js",
+    "package.json"
+  ],
+  "_release": "0.5.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.5.4",
+    "commit": "f0b5713547e15f1054e0f989b9f3b0663214470b"
+  },
+  "_source": "git://github.com/mzabriskie/axios.git",
+  "_target": "~0.5.4",
+  "_originalSource": "axios"
+}

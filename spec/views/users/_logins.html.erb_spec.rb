@@ -161,4 +161,22 @@ describe "users/_logins.html.erb" do
       expect(response).not_to have_tag(".add_holder")
     end
   end
+
+  context "authentication providers" do
+    it "doesn't show an icon for SAML" do
+      account_with_saml
+      user_with_pseudonym(active_all: 1)
+      ap = @account.authentication_providers.first
+      @pseudonym.authentication_provider = ap
+      @pseudonym.save!
+
+      assigns[:domain_root_account] = @account
+      assigns[:current_user] = @user
+      assigns[:user] = @user
+      render
+
+      doc = Nokogiri::HTML(response)
+      expect(doc.at_css('.screenreader-only')).to be_nil
+    end
+  end
 end

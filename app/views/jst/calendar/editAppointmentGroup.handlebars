@@ -38,11 +38,9 @@
         </div>
         <div class="splitter">
           <p>
-            <a class="split-link btn" href="#">Split</a>
-            into slots of 
-            <input type="number" name="duration" value="30" style="width: 40px"
-              aria-label="{{t "slot_duration_label" "Minutes per slot"}}" />
-            minutes each.
+            {{#t}}
+              Divide into equal slots of {{{num_minutes}}} minutes. <a class="split-link btn" href="#">Go</a>
+            {{/t}}
           </p>
         </div>
       </div>
@@ -52,38 +50,47 @@
         <p>{{#t "appt_group_options_help1"}}Some existing reservations are over the limit you have added. These will not be affected, this change only prevents new reservations from being made.{{/t}}</p>
         <p>{{#t "appt_group_options_help2"}}You can, however, manually remove any existing reservations.{{/t}}</p>
       </div>
-      <b>Options</b>
+      <b>{{#t}}Options{{/t}}</b>
       <ul class="ag-options">
         <li>
           {{checkbox "per_slot_option" id="appointment-blocks-per-slot-option-button"
             class="appointment-blocks-per-slot-option-button" uniqid=true
           }}
-          <label for="appointment-blocks-per-slot-option-button-{{uniqid}}">Limit each time slot to</label>
-          <input type="number" name="participants_per_appointment" 
-            value="{{appointment_group.participants_per_appointment}}" min="1"
-            style="width: 40px;"
-            aria-label="{{t "participants_per_appointment_label" "Max users/groups per appointment"}}" />
-          <label for="appointment-blocks-per-slot-option-button-{{uniqid}}">
-            <span {{#ifEqual participant_type "Group"}} {{else}} style="display:none;" {{/ifEqual}} class="per_appointment_groups_label">groups.</span>
-            <span {{#ifEqual participant_type "Group"}} style="display:none;" {{/ifEqual}} class="per_appointment_users_label">users.</span>
-          </label>
+          {{#ifEqual participant_type "Group"}}
+            <label>
+              {{#t}}
+                Limit each time slot to {{{num_participants}}}
+                <span class="per_appointment_groups_label">groups.</span>
+                <span style="display:none;" class="per_appointment_users_label">users.</span>
+              {{/t}}
+            </label>
+          {{else}}
+            <label>
+              {{#t}}
+                Limit each time slot to {{{num_participants}}}
+                <span style="display:none;" class="per_appointment_groups_label">groups.</span>
+                <span class="per_appointment_users_label">users.</span>
+              {{/t}}
+            </label>
+          {{/ifEqual}}
           <a href="#" class="reservation_help hidden" title="{{#t "affect_reservations"}}How will this affect reservations?{{/t}}">
             <img alt="Help" src="/images/help.png">
           </a>
         </li>
         <li>
-          <label for="appointment-blocks-participant-visibility-button-{{uniqid}}">{{checkbox "participant_visibility" id="appointment-blocks-participant-visibility-button" uniqid=true}} Allow students to see who has signed up for time slots.</label>
+          <label for="appointment-blocks-participant-visibility-button-{{uniqid}}">{{checkbox "participant_visibility" id="appointment-blocks-participant-visibility-button" uniqid=true}} 
+            {{#t}}Allow students to see who has signed up for time slots.{{/t}}
+          </label>
         </li>
         <li>
           {{checkbox "max_appointments_per_participant_option"
             id="max-per-student-option" uniqid=true class="max-per-student-option"
           }}
-          <label for="max-per-student-option-{{uniqid}}">Limit participants to attend </label>
-          <input type="number" name="max_appointments_per_participant"
-            value="{{appointment_group.max_appointments_per_participant}}" min="1"
-            style="width: 40px"
-            aria-label="{{t "appointments_per_participant_label" "Maximum number of appointments a participant can attend"}}" />
-          <label for="max-per-student-option-{{uniqid}}">appointment(s).</label>
+          <label>
+            {{#t}}
+              Limit participants to attend {{{num_appointments}}} appointment(s).
+            {{/t}}
+          </label>
           <a href="#" class="reservation_help hidden" title="{{#t "affect_reservations"}}How will this affect reservations?{{/t}}">
             <img alt="Help" src="/images/help.png">
           </a>

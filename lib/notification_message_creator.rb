@@ -127,19 +127,21 @@ class NotificationMessageCreator
   end
 
   def build_summary_for(user, policy)
-    message = user.messages.build(message_options_for(user))
-    message.parse!('summary')
-    delayed_message = policy.delayed_messages.build(:notification => @notification,
-                                  :frequency => policy.frequency,
-                                  :communication_channel_id => policy.communication_channel_id,
-                                  :root_account_id => message.context_root_account.try(:id),
-                                  :linked_name => 'work on this link!!!',
-                                  :name_of_topic => message.subject,
-                                  :link => message.url,
-                                  :summary => message.body)
-    delayed_message.context = @asset
-    delayed_message.save! if Rails.env.test?
-    delayed_message
+    user.shard.activate do
+      message = user.messages.build(message_options_for(user))
+      message.parse!('summary')
+      delayed_message = policy.delayed_messages.build(:notification => @notification,
+                                    :frequency => policy.frequency,
+                                    :communication_channel_id => policy.communication_channel_id,
+                                    :root_account_id => message.context_root_account.try(:id),
+                                    :linked_name => 'work on this link!!!',
+                                    :name_of_topic => message.subject,
+                                    :link => message.url,
+                                    :summary => message.body)
+      delayed_message.context = @asset
+      delayed_message.save! if Rails.env.test?
+      delayed_message
+    end
   end
 
   def build_immediate_messages_for(user, channels=immediate_channels_for(user).reject(&:unconfirmed?))
@@ -258,8 +260,6 @@ class NotificationMessageCreator
   def increment_user_counts(user_id, count=1)
     @user_counts[user_id] ||= 0
     @user_counts[user_id] += count
-    @user_counts["#{user_id}_#{@notification.category_spaceless}"] ||= 0
-    @user_counts["#{user_id}_#{@notification.category_spaceless}"] += count
   end
 
   def user_asset_context(user_asset)
@@ -272,16 +272,22 @@ class NotificationMessageCreator
 
   # Finds channels for a user that should get this notification immediately
   #
-  # If the user doesn't have a policy for this notification and the default
-  # frequency is immediate, the user should get the notification by email.
+  # If the user doesn't have a policy for this notification on a non-push
+  # channel and the default frequency is immediate, the user should get the
+  # notification by email.
   # Unregistered users don't get notifications. (registration notifications
   # are a special case handled elsewhere)
   def immediate_channels_for(user)
     return [] unless user.registered?
 
-    user_has_a_policy = user.communication_channels.active.for(@notification).exists?
-    return [user.email_channel].compact if !user_has_a_policy && @notification.default_frequency == 'immediately'
-    user.communication_channels.active.for_notification_frequency(@notification, 'immediately')
+    active_channel_scope = user.communication_channels.active.for(@notification)
+    immediate_channel_scope = user.communication_channels.active.for_notification_frequency(@notification, 'immediately')
+
+    user_has_a_policy = active_channel_scope.where.not(path_type: 'push').exists?
+    if !user_has_a_policy && @notification.default_frequency == 'immediately'
+      return [user.email_channel, *immediate_channel_scope.where(path_type: 'push')].compact
+    end
+    immediate_channel_scope
   end
 
   def cancel_pending_duplicate_messages
@@ -297,8 +303,6 @@ class NotificationMessageCreator
   def too_many_messages_for?(user)
     all_messages = recent_messages_for_user(user.id) || 0
     @user_counts[user.id] = all_messages
-    for_category = recent_messages_for_user("#{user.id}_#{@notification.category_spaceless}") || 0
-    @user_counts["#{user.id}_#{@notification.category_spaceless}"] = for_category
     all_messages >= user.max_messages_per_day
   end
 
@@ -312,17 +316,9 @@ class NotificationMessageCreator
     elsif messages
       Rails.cache.write(['recent_messages_for', id].cache_key, messages, :expires_in => 1.hour)
     else
-      category = nil
       user_id = id
-      if id.is_a?(String)
-        user_id, category = id.split(/_/)
-      end
       messages = Rails.cache.fetch(['recent_messages_for', id].cache_key, :expires_in => 1.hour) do
-        lookup = Message.where("dispatch_at>? AND user_id=? AND to_email=?", 24.hours.ago, user_id, true)
-        if category
-          lookup = lookup.where(:notification_category => category.gsub(/_/, " "))
-        end
-        lookup.count
+        Message.where("dispatch_at>? AND user_id=? AND to_email=?", 24.hours.ago, user_id, true).count
       end
     end
   end

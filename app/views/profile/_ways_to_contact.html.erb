@@ -1,96 +1,79 @@
-<% content_for :stylesheets do %>
-<style>
-  .channel_list .channel .default_link {
-    opacity: 0;
-    -moz-opacity: 0;
-    filter:alpha(opacity=0);
-  }
-  .channel_list.single .hidden_for_single {
-    display: none;
-  }
-  .channel_list .channel:hover .default_link {
-    display: block;
-    opacity: 0.5;
-  }
-  .channel_list .channel.unconfirmed .default_link {
-    display: none;
-  }
-  .channel_list .channel.default .default_link,
-  .channel_list .channel.default:hover .default_link {
-    display: block;
-    opacity: 1.0;
-  }
-  .channel_list .channel.default .delete_channel_link {
-    display: none;
-  }
-  #right-side table.channel_list tr.channel.unconfirmed > td a {
-    color: #888;
-    font-style: italic;
-  }
-  .email_meta {
-    text-align: left;
-    width: 32px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-  }
-  .email_actions {
-    text-align: right;
-    white-space: nowrap;
-    width: 100%;
-  }
-  .email_channel {
-    max-width: 140px;
-    font-size: 0.8em;
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-</style>
-<% end %>
+<%
+  css_bundle :ways_to_contact
+%>
 
+<%# this needs to be reactified. badly. %>
 <h2><%= t('headers.ways_to_contact', "Ways to Contact") %></h2>
 <div class="rs-margin-lr">
-<table class="<%= 'single' if @email_channels.length <= 1 %> summary channel_list email_channels" style="width: 100%; margin-left: 0; margin-right: 0;">
-  <caption><%= t('headers.email_addresses', "Email Addresses") %></caption>
+  <table class="<%= 'single' if @email_channels.length <= 1 %> summary channel_list email_channels" style="width: 100%; margin-left: 0; margin-right: 0;">
+    <thead>
+      <tr>
+        <th><%= t("Email Addresses") %></th>
+        <th><span class="screenreader-only"><%= t("Set Email as Default") %></span></th>
+        <th><span class="screenreader-only"><%= t("Email Actions") %></span></th>
+      </tr>
+    </thead>
   <% @email_channels.each do |c| %>
-    <tr class="channel <%= "default" if c.position && c.position <= 1 %> <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym &&c.pseudonym.id %>" id="channel_<%= c.id %>">
+    <tr class="channel <%= "default" if c == @default_email_channel %> <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym &&c.pseudonym.id %>" id="channel_<%= c.id %>">
+      <th scope="row">
+        <% if c.state == :unconfirmed %>
+          <a href="#" class="path email_channel" title="<%=h c.path %>"><%= c.path %></a>
+        <% else %>
+          <p class="path email_channel"><%= c.path %></>
+        <% end %>
+      </th>
       <td class="email_meta">
-        <a href="<%= profile_url %>" class="default_link no-hover" aria-label="<%= t('titles.default_email_address_aria_label', "Default email address") %>" ><i class="icon-star standalone-icon" alt="<%= t('titles.default_email_address_alt', "Default email address") %>" title="<%= t('titles.default_email_address', "Default email address") %>"></i></a>
+        <a href="<%= profile_url %>" class="default_link no-hover" aria-label="<%= t("Set default email address") %>" >
+          <i class="icon-star standalone-icon" alt="<%= t("Set email address as default") %>" aria-hidden="true" title="<%= t("Set email address as default") %>"></i>
+          <% if c == @default_email_channel %>
+            <span class="screenreader-only default_label"><%= t("This is the default email address") %></span>
+          <% else %>
+            <span class="screenreader-only"><%= t("Set as default email address") %></span>
+          <% end %>
+          <% if c.state == :unconfirmed %>
+            <span class="screenreader-only"><%= t("This email address is unconfirmed") %></span>
+            <i class="icon-warning standalone-icon" alt="" aria-hidden="true"></i>
+          <% end %>
+        </a>
+        <span class="screenreader-only unconfirmed_text"><%= t("This email address is unconfirmed") %></span>
       </td>
-      <td>
-        <a href="#" class="path email_channel" title="<%=h c.path %>"><%= c.path %></a>
-      </td>
-      <td class="email_actions hidden_for_single">
+      <td class="email_actions">
+        <span class="hidden_for_single">
+          <% if c.state == :unconfirmed && (c.grants_right?(@current_user, :force_confirm) || (@real_current_user && c.grants_right?(@real_current_user, :force_confirm))) %>
+              <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover" aria-label="<%= t('titles.confirm_email_address_aria_label', "Confirm Email Address") %>"><i class="icon-check standalone-icon" alt="<%= t('titles.confirm_email_address_alt', "Confirm Email Address") %>" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
+          <% end %>
+          <% unless !@domain_root_account.edit_institution_email? && c.imported? %>
+            <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover" aria-label="<%= t("Remove email address") %>" ><i class="icon-trash standalone-icon" alt="<%= t("Remove email address") %>" title="<%= t("Remove email address") %>"></i></a>
+          <% end %>
+          <span class="screenreader-only cant_delete_default_text"><%= t("You cannot remove your default email address") %></span>
+          <% if c.active? && c.has_merge_candidates? %>
+            <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="merge_users_link no-hover" aria-label="<%= t('titles.merge_users_aria_label', "Another user has the same email address.  Click here to combine user accounts.") %>"><i class="icon-group-new standalone-icon" alt="<%= t('titles.merge_users_alt', "Another user has the same email address.  Click here to combine user accounts.") %>" title="<%= t('titles.merge_users', "Another user has the same email address.  Click here to combine user accounts.") %>"></i></a>
+          <% end %>
+          <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
+          <span class="channel_id" style="display: none;"><%= c.id %></span>
+          <span class="user_id" style="display: none;"><%= c.user_id %></span>
+        </span>
         <% if c.bouncing? %>
           <span class="bouncing-channel" data-tooltip="left" title="<%= t('bouncing_email', 'Canvas was unable to send email to this address. Please ensure the address is correct to continue receiving email from Canvas.') %>" aria-label="<%= t('bouncing_email', 'Canvas was unable to send email to this address. Please ensure the address is correct to continue receiving email from Canvas.') %>">
             <i class="text text-warning icon-warning"></i>
           </span>
         <% end %>
-        <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, :manage_user_details))) %>
-            <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover" aria-label="<%= t('titles.confirm_email_address_aria_label', "Confirm Email Address") %>"><i class="icon-check standalone-icon" alt="<%= t('titles.confirm_email_address_alt', "Confirm Email Address") %>" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
+        <% if c.bounce_count > 0 && (c.grants_right?(@current_user, :reset_bounce_count) || (@real_current_user && c.grants_right?(@real_current_user, :reset_bounce_count))) %>
+          <a href="<%= api_v1_reset_bounce_count_url(c.user_id, c.id) %>" class="reset_bounce_count_link no-hover" aria-label="<%= t("Reset this email address's bounce count") %>"> <i class="icon-refresh standalone-icon" alt="<%= t("Reset this email address's bounce count") %>" title="<%= t("Reset this email address's bounce count") %>"></i></a>
         <% end %>
-        <% unless !@domain_root_account.edit_institution_email? && c.imported? %>
-          <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover" aria-label= "<%= t('titles.remove_email_address_aria_label', "Remove email address") %>" ><i class="icon-trash standalone-icon" alt="<%= t('titles.remove_email_address_alt', "Remove email address") %>" title="<%= t('titles.remove_email_address', "Remove email address") %>"></i></a>
-        <% end %>
-        <% if c.active? && c.has_merge_candidates? %>
-          <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="merge_users_link no-hover" aria-label="<%= t('titles.merge_users_aria_label', "Another user has the same email address.  Click here to combine user accounts.") %>"><i class="icon-group-new standalone-icon" alt="<%= t('titles.merge_users_alt', "Another user has the same email address.  Click here to combine user accounts.") %>" title="<%= t('titles.merge_users', "Another user has the same email address.  Click here to combine user accounts.") %>"></i></a>
-        <% end %>
-        <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
-        <span class="channel_id" style="display: none;"><%= c.id %></span>
-        <span class="user_id" style="display: none;"><%= c.user_id %></span>
       </td>
     </tr>
   <% end %>
   <tr class="channel blank unconfirmed" style="display: none;">
+    <th scope="row">
+      <a href="#" class="path email_channel" title="">&nbsp;</a>
+    </th>
     <td class="email_meta">
       <a href="<%= user_profile_url(@current_user) %>" class="default_link no-hover"><i class="icon-star standalone-icon" title="<%= t('titles.default_email_address', "Default email address") %>"></i></a>
-    </td>
-    <td>
-      <a href="#" class="path email_channel" title="">&nbsp;</a>
+      <span class="screenreader-only unconfirmed_text"><%= t("This email address is unconfirmed") %></span>
     </td>
     <td class="email_actions hidden_for_single">
-      <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon"></i></a>
+      <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover" aria-label="<%= t('Remove email address') %>"><i class="icon-trash standalone-icon" alt="<%= t("Remove email address") %>" title="<%= t('Remove email address') %>"></i></a>
       <span class="pseudonym_id" style="display: none;">&nbsp;</span>
       <span class="channel_id" style="display: none;">&nbsp;</span>
       <span class="user_id" style="display: none;">&nbsp;</span>
@@ -98,7 +81,7 @@
   </tr>
   <tr>
     <td colspan="3" style="text-align: center;">
-      <a href="#" class="add_email_link icon-add"><%= t('links.add_email_address', "Add Email Address") %></a>
+      <a href="#" class="add_email_link icon-add" title="<%= t("Add Email Address") %>" aria-label="<%= t("Add Email Address") %>"><%= t('links.add_email_address', "Email Address") %></a>
     </td>
   </tr>
 </table>
@@ -119,12 +102,15 @@
           <span class="bouncing-channel" data-tooltip="left" title="<%= t('bouncing_channel', 'Canvas was unable to send messages to you using this contact method. Please ensure the contact information is correct to continue receiving messages from Canvas.') %>" aria-label="<%= t('bouncing_channel', 'Canvas was unable to send messages to you using this contact method. Please ensure the contact information is correct to continue receiving messages from Canvas.') %>">
             <i class="text text-warning icon-warning"></i>
           </span>
+          <% if c.bounce_count > 0 && (c.grants_right?(@current_user, :reset_bounce_count) || (@real_current_user && c.grants_right?(@real_current_user, :reset_bounce_count))) %>
+            <a href="<%= api_v1_reset_bounce_count_url(c.user_id, c.id) %>" class="reset_bounce_count_link no-hover" aria-label="<%= t("Reset this contact method's bounce count") %>"> <i class="icon-refresh standalone-icon" alt="<%= t("Reset this contact method's bounce count") %>" title="<%= t("Reset this contact method's bounce count") %>"></i></a>
+          <% end %>
         <% end %>
         <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, :manage_user_details))) %>
-            <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><i class="icon-check standalone-icon" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
+            <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><i class="icon-check standalone-icon" aria-hidden="true" title="<%= t('Confirm contact method') %>"></i><span class="screenreader-only"><%= t("Confirm contact method") %></span></a>
         <% end %>
         <% unless c.id == c.user.otp_communication_channel_id %>
-          <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon" style="<%= (c.first?) ? "display: none;" : "" %>" title="<%= t('titles.remove_email_address', "Remove email address") %>"></i></a>
+          <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon" title="<%= t("Remove contact method") %>" aria-hidden="true"></i><span class="screenreader-only"><%= t("Remove contact method") %></span></a>
         <% end %>
         <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
         <span class="channel_id" style="display: none;"><%= c.id %></span>
@@ -146,7 +132,7 @@
   <tfoot>
   <tr>
     <td colspan="3" style="text-align: center;">
-      <a href="#" class="add_contact_link icon-add"><%= t('links.add_contact_method', "Add Contact Method") %></a>
+      <a href="#" class="add_contact_link icon-add" title="<%= t("Add Contact Method") %>" aria-label="<%= t("Add Contact Method") %>"><%= t('links.add_contact_method', "Contact Method") %></a>
     </td>
   </tr>
   </tfoot>
@@ -162,7 +148,7 @@
     <div class="control-group">
       <%= label :communication_channel, :address, t('labels.email_address', 'Email Address'), :class => 'control-label' %>
       <div class="controls">
-        <%= email_field :communication_channel, :address %>
+        <input type="email" name="communication_channel_email" id="communication_channel_email"/>
       </div>
     </div>
 
@@ -183,17 +169,35 @@
 <% end %>
 <%= form_tag communication_channels_url, {:id => "register_sms_number", :class => 'form-horizontal'} do %>
     <input type="hidden" name="communication_channel[type]" value="sms"/>
+
+    <% if @user.account.feature_enabled?(:international_sms) %>
+      <div class="control-group">
+        <label for="communication_channel_sms_country" class='control-label'><%=t('labels.country', 'Country') %></label>
+        <div class="controls">
+          <select class="user_selected country" id="communication_channel_sms_country" name="communication_channel_sms_country">
+            <option value="undecided">[<%= t('Select Country') %>]</option>
+            <% CommunicationChannel.country_codes.each do |(numeric_code, name, use_email)| %>
+              <option value="<%= numeric_code %>" data-use-email="<%= use_email %>"><%= name %> (+<%= numeric_code %>)</option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+    <% end %>
+
     <div class="control-group">
       <label for='communication_channel_sms_number' class='control-label'><%= t('labels.cell_number', 'Cell Number') %></label>
       <div class="controls">
-        <input type="text" id='communication_channel_sms_number' class="user_selected sms_number" aria-describedby="communication_channel_sms_number_description" /><br/>
+        <input type="tel" name="communication_channel_sms_number" id='communication_channel_sms_number' class="user_selected sms_number" aria-describedby="communication_channel_sms_number_description" /><br/>
         <span style="font-size: 0.8em; color: #a44" id='communication_channel_sms_number_description' class="should_be_10_digits">
           <%= t('validations.should_be_10_digits', "should be 10-digit number") %>
+        </span>
+        <span class="intl_rates_may_apply">
+          <%= t('International text messaging rates may apply.') %>
         </span>
       </div>
     </div>
 
-    <div class="control-group">
+    <div class="control-group sms_email_group">
       <label for='communication_channel_carrier' class='control-label'><%= t('labels.carrier', 'Carrier') %></label>
       <div class="controls">
         <select class="user_selected carrier" id='communication_channel_carrier'>
@@ -206,10 +210,10 @@
       </div>
     </div>
 
-    <div class="control-group">
+    <div class="control-group sms_email_group">
       <label for='communication_channel_sms_email' class='control-label'><%= t('labels.sms_email', 'SMS Email') %></label>
       <div class="controls">
-        <%= email_field :communication_channel, :address, :id => 'communication_channel_sms_email', :class => 'sms_email' %>
+        <input type="email" name="communication_channel_sms_email" class="sms_email" id="communication_channel_sms_email" aria-describedby="communication_channel_sms_number communication_channel_carrier" />
       </div>
     </div>
 
@@ -218,8 +222,8 @@
     </div>
 <% end %>
 </div>
-<div id="confirm_email_channel" style="display: none;" class="dialog">
-  <div style="text-align: center;"><%= t(:sent_confirmation_email, <<-TEXT, :email_address => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+<div id="confirm_email_channel" style="display: none;" class="dialog" role="dialog">
+  <div style="text-align: center;"><%= t(<<-TEXT, :email_address => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
     We emailed a confirmation link to %{email_address}. Click the link in that
     email to finish registering. Make sure to check your spam box in case it
     got filtered.
@@ -233,17 +237,21 @@
     <button type="button" class="btn cancel_button"><%= t('buttons.ok_thanks', "Ok, Thanks") %></button>
   </div>
 </div>
-<%= form_tag "", {:id => "confirm_communication_channel", :style => "display: none;", :class => "dialog"} do %>
+<%= form_tag "", {:id => "confirm_communication_channel", :style => "display: none;", :class => "dialog", :role => "dialog"} do %>
   <input type="hidden" name="pseudonym_id" value=""/>
   <input type="hidden" name="channel_id" value=""/>
   <input type="hidden" name="user_id" value=""/>
-  <div id='sms_confirmation_instructions' style="text-align: center;"><%= t(:sent_confirmation_sms, <<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
-    We sent a four-character confirmation code to %{sms_number}.
-    Enter the code below to activate this sms number.
+  <div id='sms_confirmation_instructions' style="text-align: center;">
+  <%= t(<<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+    To activate SMS, enter the four-character confirmation code sent to %{sms_number}.
     TEXT
-  %></div>
+  %>
+  <br>
+  <%= t("Code is case sensitive.")%>
+  </div>
   <div style="text-align: center;">
-    <input type="text" style="width: 100px; font-size: 1.5em;" name="code" aria-labelledby='sms_confirmation_instructions'/><br/>
+    <label for="code" class="screenreader-only"><%= t("Confirmation code (required)") %></label>
+    <input type="text" style="width: 100px; font-size: 1.5em;" name="code" id="code" aria-describedby='sms_confirmation_instructions' required="true"/><br/>
     <span style="display: none;" class="channel_id">&nbsp;</span>
     <a href="<%= registration_confirmation_path("{{ code }}") %>" style="display: none;" class="register_channel_link">&nbsp;</a>
   </div>

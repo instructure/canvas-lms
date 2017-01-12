@@ -1,3 +1,5 @@
+require_dependency 'importers'
+
 module Importers
   class ContextExternalToolImporter < Importer
 
@@ -21,7 +23,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, migration=nil, item=nil)
+    def self.import_from_migration(hash, context, migration, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:external_tools_to_import] && !hash[:external_tools_to_import][hash[:migration_id]]
 
@@ -30,7 +32,7 @@ module Importers
       end
 
       item ||= ContextExternalTool.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
-      item ||= context.context_external_tools.new
+      item ||= context.context_external_tools.temp_record
       item.migration_id = hash[:migration_id]
       item.name = hash[:title]
       item.description = hash[:description]

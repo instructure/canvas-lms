@@ -1,4 +1,6 @@
 class ConversationsHasAttachmentsNotNull < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     [:conversations, :conversation_participants].each do |table|
       [:has_attachments, :has_media_objects].each do |column|

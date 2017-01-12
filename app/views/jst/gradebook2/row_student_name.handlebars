@@ -1,5 +1,7 @@
 {{>avatar}}
-<div class='student-name'><a class='student-grades-link' href="{{url}}">{{{display_name}}}</a></div>
+<div class='student-name'>
+  <a class='student-grades-link' href="{{url}}">{{{display_name}}}</a> {{#if enrollment_status}}<span title={{#t}}"This user is currently not able to access the course"{{/t}} class="label">{{enrollment_status}}</span>{{/if}}
+</div>
 <div class="student-placeholder">
   {{#t "student_placeholder"}}Student{{/t}}
 </div>

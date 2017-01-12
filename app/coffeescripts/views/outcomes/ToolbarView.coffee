@@ -37,6 +37,7 @@ define [
     goBack: (e) =>
       e.preventDefault()
       @trigger 'goBack'
+      $('.add_outcome_link').focus()
 
     addOutcome: (e) =>
       e.preventDefault()

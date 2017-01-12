@@ -40,7 +40,9 @@ describe "Groups API", type: :request do
       'role' => group.group_category.role,
       'group_category_id' => group.group_category_id,
       'storage_quota_mb' => group.storage_quota_mb,
-      'leader' => group.leader
+      'leader' => group.leader,
+      'has_submission' => group.submission?,
+      'concluded' => group.context.concluded?
     }
     if opts[:include_users]
       json['users'] = users_json(group.users, opts)
@@ -157,6 +159,51 @@ describe "Groups API", type: :request do
     expect(json.first['id']).to eq @group.id
   end
 
+  it "should not show inactive users to students" do
+    course_with_teacher(:active_all => true)
+    @group = @course.groups.create!(:name => 'New group')
+
+    inactive_user = user
+    enrollment = @course.enroll_student(inactive_user)
+    enrollment.deactivate
+    @group.add_user(inactive_user, 'accepted')
+
+    @course.enroll_student(user).accept!
+    @group.add_user(@user, 'accepted')
+
+    json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json?include[]=users",
+      @category_path_options.merge(:action => 'context_index',
+        :course_id => @course.to_param, :include => ['users']))
+
+    expect(json.first['users'].map{|u| u['id']}).to eq [@user.id]
+
+    enrollment.reactivate
+
+    json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json?include[]=users",
+      @category_path_options.merge(:action => 'context_index',
+        :course_id => @course.to_param, :include => ['users']))
+
+    expect(json.first['users'].map{|u| u['id']}).to match_array [@user.id, inactive_user.id]
+  end
+
+  it "should show inactive users to admins" do
+    course_with_teacher(:active_all => true)
+    @group = @course.groups.create!(:name => 'New group')
+
+    inactive_user = user
+    enrollment = @course.enroll_student(inactive_user)
+    enrollment.deactivate
+    @group.add_user(inactive_user, 'accepted')
+
+    @user = @teacher
+
+    json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json?include[]=users",
+      @category_path_options.merge(:action => 'context_index',
+        :course_id => @course.to_param, :include => ['users']))
+
+    expect(json.first['users'].map{|u| u['id']}).to eq [inactive_user.id]
+  end
+
   it "should allow listing all of an account's groups for account admins" do
     @account = Account.default
     sis_batch = @account.sis_batches.create
@@ -203,6 +250,15 @@ describe "Groups API", type: :request do
     json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show"))
     expect(json).to eq group_json(@community)
   end
+
+  it "should allow a member to retrieve a favorite group" do
+    @user = @member
+    json = api_call(:get, "#{@community_path}.json?include[]=favorites",
+                    @category_path_options.merge(:group_id => @community.to_param, :action => "show",
+                                                 :include => [ "favorites" ]))
+    expect(json.key?("is_favorite")).to be_truthy
+  end
+
 
   it "should include the group category" do
     @user = @member
@@ -256,7 +312,7 @@ describe "Groups API", type: :request do
   end
 
   it "should allow a teacher to create a group in a course" do
-    course_with_teacher
+    course_with_teacher(active_enrollment: true)
     @user = @teacher
     project_groups = @course.group_categories.build
     project_groups.name = "Course Project Groups"
@@ -667,13 +723,21 @@ describe "Groups API", type: :request do
       expect(@membership.workflow_state).to eq "deleted"
     end
 
+    it "should allow leaving a group using sis id using users/:user_id endpoint" do
+      @user = @member
+      @member.pseudonyms.first.update_attribute(:sis_user_id, 'my_sis_id')
+      api_call(:delete, "#{@alternate_memberships_path}/sis_user_id:my_sis_id", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => 'sis_user_id:my_sis_id', :action => "destroy"))
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
+      expect(@membership.workflow_state).to eq "deleted"
+    end
+
     it "should allow a moderator to invite people to a group" do
       @user = @moderator
       invitees = { :invitees => ["leonard@example.com", "sheldon@example.com"] }
       expect {
         @json = api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees)
       }.to change(User, :count).by(2)
-      @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).all
+      @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).to_a
       expect(@memberships.count).to eq 2
       expect(@json.sort_by{ |a| a['id'] }).to eq @memberships.map{ |gm| membership_json(gm) }
     end

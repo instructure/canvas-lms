@@ -1,0 +1,9 @@
+// first pull in the "stock" bower smartbanner css.
+@import "../../../public/javascripts/bower/jquery.smartbanner/jquery.smartbanner";
+
+// and now apply our overrides
+
+#smartbanner.android { background: #3d3d3d url('/javascripts/bower/jquery.smartbanner/dark_background_stripes.gif'); }
+#smartbanner.android .sb-button { border: none; }
+#smartbanner .sb-button { border: none; }
+#smartbanner .sb-icon { background: none; background-size: cover; box-shadow: none; }

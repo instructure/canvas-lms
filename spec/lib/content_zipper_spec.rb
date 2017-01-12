@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContentZipper do
   describe "zip_assignment" do
-    it "sanitizes user names" do
+    it "processes user names" do
       s1, s2, s3 = n_students_in_course(3)
       s1.update_attribute :sortable_name, 'some_999_, _1234_guy'
       s2.update_attribute :sortable_name, 'other 567, guy 8'
@@ -28,30 +28,61 @@ describe ContentZipper do
       [s1, s2, s3].each { |s|
         submission_model user: s, assignment: @assignment, body: "blah"
       }
-      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = @assignment
       attachment.save!
       ContentZipper.process_attachment(attachment, @teacher)
       expected_file_patterns = [
-        /other-567--guy-8/,
-        /some-999----1234-guy/,
-        /-45-/,
+        /other567guy8/,
+        /some9991234guy/,
+        /45/,
       ]
-      Zip::File.foreach(attachment.reload.full_filename) { |f|
+
+      filename = attachment.reload.full_filename
+
+      Zip::File.foreach(filename) do |f|
         expect {
           expected_file_patterns.delete_if { |expected_pattern| f.name =~ expected_pattern }
         }.to change { expected_file_patterns.size }.by(-1)
-      }
+      end
+
       expect(expected_file_patterns).to be_empty
     end
 
+    it "should ignore undownloadable submissions" do
+      course_with_student(active_all: true)
+      @user.update_attributes!(sortable_name: 'some_999_, _1234_guy')
+      assignment_model(course: @course)
+      @assignment.submission_types="online_text_entry,media_recording"
+      @assignment.save
+      my_media_object = media_object(context: @course, user: @user)
+      submission = @assignment.submit_homework(@user, {
+                                                 submission_type: "media_recording",
+                                                 media_comment_id: my_media_object.media_id,
+                                                 media_comment_type: my_media_object.media_type
+                                               })
+      submission.save
+
+      attachment = Attachment.new(display_name: 'my_download.zip')
+      attachment.user = @teacher
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = @assignment
+      attachment.save!
+      ContentZipper.process_attachment(attachment, @teacher)
+      attachment.reload
+
+      zip_file = Zip::File.open(attachment.full_filename)
+      expect(zip_file.entries).to be_empty
+      zip_file.close
+    end
+
     it "should zip up online_url submissions" do
-      course_with_student(:active_all => true)
-      @user.update_attributes!(:sortable_name => 'some_999_, _1234_guy')
-      submission_model :user => @user
-      attachment = Attachment.new(:display_name => 'my_download.zip')
+      course_with_student(active_all: true)
+      @user.update_attributes!(sortable_name: 'some_999_, _1234_guy')
+      submission_model user: @user
+      attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = @assignment
@@ -61,17 +92,17 @@ describe ContentZipper do
       expect(attachment.workflow_state).to eq 'zipped'
       Zip::File.foreach(attachment.full_filename) do |f|
         if f.file?
-          expect(f.name).to match /some-999----1234-guy/
-          expect(f.get_input_stream.read).to match(%r{This submission was a url, we&#x27;re taking you to the url link now.})
+          expect(f.name).to match /some9991234guy/
+          expect(f.get_input_stream.read).to match(%r{This submission was a url})
           expect(f.get_input_stream.read).to be_include("http://www.instructure.com/")
         end
       end
     end
 
     it "should zip up online_text_entry submissions" do
-      course_with_student(:active_all => true)
-      submission_model(:body => "hai this is my answer")
-      attachment = Attachment.new(:display_name => 'my_download.zip')
+      course_with_student(active_all: true)
+      submission_model(body: "hai this is my answer")
+      attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = @assignment
@@ -87,20 +118,25 @@ describe ContentZipper do
     end
 
     it "should only include submissions in the correct section " do
-      course_with_student(:active_all => true)
-      submission_model(:body => "hai this is my answer")
+      course_with_student(active_all: true)
+      submission_model(body: "hai this is my answer")
       @section = @course.course_sections.create!
-      @ta = user_with_pseudonym(:active_all => 1)
-      @course.enroll_user(@ta, "TaEnrollment", :limit_privileges_to_course_section => true, :section => @section)
-      attachment = Attachment.new(:display_name => 'my_download.zip')
+      @ta = user_with_pseudonym(active_all: 1)
+      @course.enroll_user(@ta, "TaEnrollment", limit_privileges_to_course_section: true, section: @section)
+      attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user = @ta
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = @assignment
       attachment.save!
       ContentZipper.process_attachment(attachment, @ta)
       attachment.reload
+      submission_count = 0
       # no submissions
-      expect(attachment.workflow_state).to eq 'errored'
+      Zip::File.foreach(attachment.full_filename) do
+        submission_count += 1
+      end
+
+      expect(submission_count).to eq 0
     end
 
     it "only includes one submission per group" do
@@ -115,7 +151,7 @@ describe ContentZipper do
       a.submit_homework(students.first, body: "group 1 submission")
       a.submit_homework(students.second, body: "group 2 submission")
 
-      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user = @teacher
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = a
@@ -123,21 +159,46 @@ describe ContentZipper do
 
       ContentZipper.process_attachment(attachment, @teacher)
       sub_count = 0
-      expected_file_names = [/group-0/, /group-1/]
+      expected_file_names = [/group0/, /group1/]
       Zip::File.foreach(attachment.full_filename) do |f|
         expect {
           expected_file_names.delete_if { |expected_name| f.name =~ expected_name }
         }.to change { expected_file_names.size }.by(-1)
       end
     end
+
+    it 'only includes un-deleted attachments' do
+      course_with_student(active_all: true)
+
+      assignment = assignment_model(course: @course)
+      att = attachment_model(uploaded_data: stub_file_data('test.txt', 'asdf', 'text/plain'), context: @student)
+      att.destroy
+
+      attachment = Attachment.new(display_name: 'my_download.zip')
+      attachment.user = @teacher
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = assignment
+      attachment.save!
+
+      ContentZipper.process_attachment(attachment, @teacher)
+
+      # assert no submissions
+      submission_count = 0
+      full_filename = attachment.full_filename
+      Zip::File.foreach(full_filename) do
+        submission_count += 1
+      end
+
+      expect(submission_count).to eq 0
+    end
   end
 
   describe "assignment_zip_filename" do
     it "should use use course and title slugs to keep filename length down" do
-      course(:active_all => true)
+      course(active_all: true)
       @course.short_name = "a" * 31
       @course.save!
-      assignment_model(:course => @course, :title => "b" * 31)
+      assignment_model(course: @course, title: "b" * 31)
 
       zipper = ContentZipper.new
       filename = zipper.assignment_zip_filename(@assignment)
@@ -148,23 +209,59 @@ describe ContentZipper do
     end
   end
 
+  describe "hard concluded course submissions" do
+    it "should still download the content" do
+      course_with_teacher
+      @assignment = assignment_model(course: @course)
+      submissions = 5.times.map.with_index do |i|
+        attachment = attachment_model(uploaded_data: stub_png_data("file_#{i}.png"), content_type: 'image/png')
+        submission_model(course: @course, assignment: @assignment, submission_type: 'online_upload', attachments: [attachment] )
+      end
+      @course.complete
+      @course.save!
+
+      @course.reload
+      @assignment.reload
+
+      zipper = ContentZipper.new
+      attachment = Attachment.new(display_name: 'my_download.zip')
+      attachment.user_id = @user.id
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = @assignment
+      attachment.save!
+      zipper.process_attachment(attachment, @user)
+
+      attachment.reload
+      expect(attachment.workflow_state).to eq 'zipped'
+      f = File.new(attachment.full_filename)
+      expect(f.size).to be > 22 # the characteristic size of an empty zip file
+    end
+  end
+
   describe "zip_folder" do
     context "checking permissions" do
       before(:each) do
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         folder = Folder.root_folders(@course).first
-        attachment_model(:uploaded_data => stub_png_data('hidden.png'), :content_type => 'image/png', :hidden => true, :folder => folder)
-        attachment_model(:uploaded_data => stub_png_data('visible.png'), :content_type => 'image/png', :folder => folder)
-        attachment_model(:uploaded_data => stub_png_data('locked.png'), :content_type => 'image/png', :folder => folder, :locked => true)
-        hidden_folder = folder.sub_folders.create!(:context => @course, :name => 'hidden', :hidden => true)
-        visible_folder = folder.sub_folders.create!(:context => @course, :name => 'visible')
-        locked_folder = folder.sub_folders.create!(:context => @course, :name => 'locked', :locked => true)
-        attachment_model(:uploaded_data => stub_png_data('sub-hidden.png'), :content_type => 'image/png', :folder => hidden_folder)
-        attachment_model(:uploaded_data => stub_png_data('sub-vis.png'), :content_type => 'image/png', :folder => visible_folder)
-        attachment_model(:uploaded_data => stub_png_data('sub-locked.png'), :content_type => 'image/png', :folder => visible_folder, :locked => true)
-        attachment_model(:uploaded_data => stub_png_data('sub-locked-vis.png'), :content_type => 'image/png', :folder => locked_folder)
+        attachment_model(uploaded_data: stub_png_data('hidden.png'),
+                         content_type: 'image/png', hidden: true, folder: folder)
+        attachment_model(uploaded_data: stub_png_data('visible.png'),
+                         content_type: 'image/png', folder: folder)
+        attachment_model(uploaded_data: stub_png_data('locked.png'),
+                         content_type: 'image/png', folder: folder, locked: true)
+        hidden_folder = folder.sub_folders.create!(context: @course, name: 'hidden', hidden: true)
+        visible_folder = folder.sub_folders.create!(context: @course, name: 'visible')
+        locked_folder = folder.sub_folders.create!(context: @course, name: 'locked', locked: true)
+        attachment_model(uploaded_data: stub_png_data('sub-hidden.png'),
+                         content_type: 'image/png', folder: hidden_folder)
+        attachment_model(uploaded_data: stub_png_data('sub-vis.png'),
+                         content_type: 'image/png', folder: visible_folder)
+        attachment_model(uploaded_data: stub_png_data('sub-locked.png'),
+                         content_type: 'image/png', folder: visible_folder, locked: true)
+        attachment_model(uploaded_data: stub_png_data('sub-locked-vis.png'),
+                         content_type: 'image/png', folder: locked_folder)
 
-        @attachment = Attachment.new(:display_name => 'my_download.zip')
+        @attachment = Attachment.new(display_name: 'my_download.zip')
         @attachment.workflow_state = 'to_be_zipped'
         @attachment.context = folder
       end
@@ -172,11 +269,29 @@ describe ContentZipper do
       def zipped_files_for_user(user=nil, check_user=true)
         @attachment.user_id = user.id if user
         @attachment.save!
-        ContentZipper.process_attachment(@attachment, user, :check_user => check_user)
+        ContentZipper.process_attachment(@attachment, user, check_user: check_user)
         names = []
         @attachment.reload
         Zip::File.foreach(@attachment.full_filename) {|f| names << f.name if f.file? }
         names.sort
+      end
+
+      context "in course with files tab hidden" do
+        before do
+          @course.tab_configuration = [{
+            id: Course::TAB_FILES,
+            hidden: true
+          }]
+          @course.save
+        end
+
+        it "should give logged in students some files" do
+          expect(zipped_files_for_user(@user)).to eq ['visible.png', 'visible/sub-vis.png'].sort
+        end
+
+        it "should give logged in teachers all files" do
+          expect(zipped_files_for_user(@teacher)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
+        end
       end
 
       context "in a private course" do
@@ -222,9 +337,9 @@ describe ContentZipper do
     end
 
     it "should not error on empty folders" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       folder = Folder.root_folders(@course).first
-      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user_id = @user.id
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = folder
@@ -235,11 +350,11 @@ describe ContentZipper do
 
     describe "error handling" do
       before :once do
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         @root = Folder.root_folders(@course).first
-        @bad_file = @course.attachments.create!(:folder => @root, :uploaded_data => StringIO.new("bad"), :filename => "bad")
+        @bad_file = @course.attachments.create!(folder: @root, uploaded_data: StringIO.new("bad"), filename: "bad")
         @bad_file.update_attribute(:filename, "not the real filename try and open this now sucka")
-        @attachment = Attachment.new(:display_name => 'my_download.zip')
+        @attachment = Attachment.new(display_name: 'my_download.zip')
         @attachment.user_id = @user.id
         @attachment.workflow_state = 'to_be_zipped'
         @attachment.context = @root
@@ -252,7 +367,7 @@ describe ContentZipper do
       end
 
       it "should skip files that couldn't be opened, without failing the download" do
-        good_file = @course.attachments.create!(:folder => @root, :uploaded_data => StringIO.new("good"), :filename => "good")
+        @course.attachments.create!(folder: @root, uploaded_data: StringIO.new("good"), filename: "good")
         ContentZipper.process_attachment(@attachment, @user)
         expect(@attachment.workflow_state).to eq 'zipped'
         expect(Zip::File.new(@attachment.full_filename).entries.map(&:name)).to eq ['good']
@@ -260,10 +375,11 @@ describe ContentZipper do
     end
 
     it "should use the display name" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       folder = Folder.root_folders(@course).first
-      attachment_model(:uploaded_data => stub_png_data('hidden.png'), :content_type => 'image/png', :folder => folder, :display_name => 'otherfile.png')
-      attachment = Attachment.new(:display_name => 'my_download.zip')
+      attachment_model(uploaded_data: stub_png_data('hidden.png'),
+                       content_type: 'image/png', folder: folder, display_name: 'otherfile.png')
+      attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user_id = @user.id
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = folder
@@ -286,11 +402,26 @@ describe ContentZipper do
   end
 
   describe "zip_eportfolio" do
-    it "should sanitize the zip file name" do
+    it "processes page entries with no content" do
       user = User.create!
-      eportfolio = user.eportfolios.create!(:name => '/../../etc/passwd')
+      eportfolio = user.eportfolios.create!(name: 'an name')
+      eportfolio.ensure_defaults
+      attachment = eportfolio.attachments.build do |attachment|
+        attachment.display_name = 'an_attachment'
+        attachment.user = user
+        attachment.workflow_state = 'to_be_zipped'
+      end
+      attachment.save!
+      expect {
+        ContentZipper.zip_eportfolio(attachment, eportfolio)
+      }.to_not raise_error
+    end
 
-      attachment = Attachment.new(:display_name => 'my_download.zip')
+    it "processes the zip file name" do
+      user = User.create!
+      eportfolio = user.eportfolios.create!(name: '/../../etc/passwd')
+
+      attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user = user
       attachment.workflow_state = 'to_be_zipped'
       attachment.context = eportfolio
@@ -304,7 +435,7 @@ describe ContentZipper do
   describe "render_eportfolio_page_content" do
     it "should return the text of the file contents" do
       user = User.create!
-      eportfolio = user.eportfolios.create!(:name => 'bestest_eportfolio_eva')
+      eportfolio = user.eportfolios.create!(name: 'bestest_eportfolio_eva')
       eportfolio.ensure_defaults
 
       contents = ContentZipper.new.render_eportfolio_page_content(eportfolio.eportfolio_entries.first, eportfolio, nil, {})
@@ -328,13 +459,13 @@ describe ContentZipper do
       attachment = Attachment.new display_name: "donuts.jpg"
       attachment.expects(:save!).once
       ContentZipper.new.update_progress(attachment,5,10)
-      expect(attachment.file_state).to eq 60 # accounts for zero-indexed arrays
+      expect(attachment.file_state.to_s).to eq '60' # accounts for zero-indexed arrays
     end
   end
 
   describe "complete_attachment" do
 
-    before { @attachment = Attachment.new :display_name => "I <3 testing.png" }
+    before { @attachment = Attachment.new display_name: "I <3 testing.png" }
     context "when attachment wasn't zipped successfully" do
       it "moves the zip attachment into an error state and save!s it" do
         @attachment.expects(:save!).once
@@ -363,8 +494,8 @@ describe ContentZipper do
   describe "zip_quiz" do
     it "delegates to a QuizSubmissionZipper" do
       course_with_teacher_logged_in(active_all: true)
-      attachment = Attachment.new(:display_name => 'download.zip')
-      quiz = Quizzes::Quiz.new(:context => @course)
+      attachment = Attachment.new(display_name: 'download.zip')
+      quiz = Quizzes::Quiz.new(context: @course)
       zipper_stub = stub
       zipper_stub.expects(:zip!).once
       attachment.context = quiz

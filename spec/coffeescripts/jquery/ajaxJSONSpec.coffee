@@ -9,6 +9,7 @@ define [
   module '$.fn.defaultAjaxError',
     setup: ->
       storedInstEnv = INST.environment
+      $.ajaxJSON.unhandledXHRs = []
 
     teardown: ->
       INST.environment = storedInstEnv
@@ -17,7 +18,7 @@ define [
     notEqual INST.environment, 'production'
     deepEqual $.ajaxJSON.unhandledXHRs, []
 
-    spy = sinon.spy()
+    spy = @spy()
     $("#fixtures").defaultAjaxError(spy)
     xhr = {status: 200, responseText: '{"status": "ok"}'}
     $.fn.defaultAjaxError.func({}, xhr)
@@ -28,7 +29,7 @@ define [
     xhr = {status: 400, responseText: '{"status": "ok"}'}
     $.ajaxJSON.unhandledXHRs.push(xhr)
 
-    spy = sinon.spy()
+    spy = @spy()
     $("#fixtures").defaultAjaxError(spy)
     $.fn.defaultAjaxError.func({}, xhr)
     ok spy.called
@@ -37,7 +38,7 @@ define [
     INST.environment = 'production'
     deepEqual $.ajaxJSON.unhandledXHRs, []
 
-    spy = sinon.spy()
+    spy = @spy()
     $("#fixtures").defaultAjaxError(spy)
     xhr = {status: 401, responseText: '{"status": "unauthenticated"}'}
     $.fn.defaultAjaxError.func({}, xhr)

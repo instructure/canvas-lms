@@ -85,7 +85,7 @@ define [
                 type: enrollment.type
                 limit_privileges_to_course_section: enrollment.limit_priveleges_to_course_section
             if enrollment.role != enrollment.type
-              data.enrollment.role = enrollment.role
+              data.enrollment.role_id = enrollment.role_id
             udfds.push $.ajaxJSON url, 'POST', data, (newEnrollment) =>
               newEnrollment.observed_user = user
               newEnrollments.push newEnrollment

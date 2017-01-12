@@ -27,11 +27,17 @@ class ApiRouteSet
   attr_accessor :mapper
 
   def self.draw(router, prefix = self.prefix, &block)
+    @@prefixes ||= Set.new
+    @@prefixes << prefix
     route_set = self.new(prefix)
     route_set.mapper = router
     route_set.instance_eval(&block)
   ensure
     route_set.mapper = nil
+  end
+
+  def self.prefixes
+    @@prefixes
   end
 
   def self.prefix
@@ -47,7 +53,7 @@ class ApiRouteSet
   end
 
   def self.api_methods_for_controller_and_action(controller, action)
-    @routes ||= self.routes_for(prefix)
+    @routes ||= self.prefixes.map{|pfx| self.routes_for(pfx)}.flatten
     @routes.find_all { |r| matches_controller_and_action?(r, controller, action) }
   end
 
@@ -77,6 +83,10 @@ class ApiRouteSet
     route(:delete, path, opts)
   end
 
+  def patch(path, opts = {})
+    route(:patch, path, opts)
+  end
+
   def resources(resource_name, opts = {}, &block)
     resource_name = resource_name.to_s
 
@@ -102,9 +112,9 @@ class ApiRouteSet
     opts[:as] ||= opts.delete(:path_name)
     opts[:as] = "#{mapper_prefix}#{opts[:as]}" if opts[:as]
     opts[:constraints] ||= {}
-    opts[:constraints][:format] = 'json'
+    opts[:constraints][:format] = 'json' if opts[:constraints].is_a? Hash
     opts[:format] = 'json'
-    mapper.send(method, "#{prefix}/#{path}(.json)", opts)
+    mapper.send(method, "#{prefix}/#{path}", opts)
   end
 
   class V1 < ::ApiRouteSet

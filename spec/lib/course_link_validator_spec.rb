@@ -80,6 +80,30 @@ describe CourseLinkValidator do
 
   end
 
+  it "should not run on assessment questions in deleted banks" do
+    CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(false) # don't actually ping the links for the specs
+    html = %{<a href='http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com'>linky</a>}
+
+    course
+    bank = @course.assessment_question_banks.create!(:title => 'bank')
+    aq = bank.assessment_questions.create!(:question_data => {'name' => 'test question',
+      'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues.count).to eq 1
+
+    bank.destroy
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues).to be_empty
+  end
+
   it "should not care if it can reach it" do
     CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(true)
 
@@ -93,4 +117,187 @@ describe CourseLinkValidator do
     expect(issues).to be_empty
   end
 
+  it "should check for deleted/unpublished objects" do
+    course
+    active = @course.assignments.create!(:title => "blah")
+    unpublished = @course.assignments.create!(:title => "blah")
+    unpublished.unpublish!
+    deleted = @course.assignments.create!(:title => "blah")
+    deleted.destroy
+
+    active_link = "/courses/#{@course.id}/assignments/#{active.id}"
+    unpublished_link = "/courses/#{@course.id}/assignments/#{unpublished.id}"
+    deleted_link = "/courses/#{@course.id}/assignments/#{deleted.id}"
+
+    message = %{
+      <a href='#{active_link}'>link</a>
+      <a href='#{unpublished_link}'>link</a>
+      <a href='#{deleted_link}'>link</a>
+    }
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    expect(links).to match_array [unpublished_link, deleted_link]
+  end
+
+  it "should work with absolute links to local objects" do
+    course
+    deleted = @course.assignments.create!(:title => "blah")
+    deleted.destroy
+
+    deleted_link = "http://#{HostUrl.default_host}/courses/#{@course.id}/assignments/#{deleted.id}"
+
+    message = "<a href='#{deleted_link}'>link</a>"
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    expect(links).to match_array [deleted_link]
+  end
+
+  it "should find links to other courses" do
+    other_course = course
+    course
+
+    link = "http://#{HostUrl.default_host}/courses/#{other_course.id}/assignments"
+
+    message = "<a href='#{link}'>link</a>"
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links]
+    expect(links.count).to eq 1
+    expect(links.first[:url]).to eq link
+    expect(links.first[:reason]).to eq :course_mismatch
+  end
+
+  it "should find links to wiki pages" do
+    course
+    active = @course.wiki.wiki_pages.create!(:title => "active and stuff")
+    unpublished = @course.wiki.wiki_pages.create!(:title => "unpub")
+    unpublished.unpublish!
+    deleted = @course.wiki.wiki_pages.create!(:title => "baleeted")
+    deleted.destroy
+
+    active_link = "/courses/#{@course.id}/pages/#{active.url}"
+    unpublished_link = "/courses/#{@course.id}/pages/#{unpublished.url}"
+    deleted_link = "/courses/#{@course.id}/pages/#{deleted.url}"
+
+    message = %{
+      <a href='#{active_link}'>link</a>
+      <a href='#{active_link}#achor'>link</a>
+      <a href='#{active_link}?query_param'>link</a>
+      <a href='#{unpublished_link}'>link</a>
+      <a href='#{deleted_link}'>link</a>
+    }
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    expect(links).to match_array [unpublished_link, deleted_link]
+  end
+
+  it "should identify typo'd canvas links" do
+    course
+    invalid_link1 = "/cupbopourses"
+    invalid_link2 = "http://#{HostUrl.default_host}/courses/#{@course.id}/pon3s"
+
+    message = %{
+      <a href='/courses'>link</a>
+      <a href='/courses/#{@course.id}/assignments/'>link</a>
+      <a href='#{invalid_link1}'>link</a>
+      <a href='#{invalid_link2}'>link</a>
+    }
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    expect(links).to match_array [invalid_link1, invalid_link2]
+  end
+
+  it "should not flag valid replaced attachments" do
+    course
+    att1 = attachment_with_context(@course, :display_name => "name")
+    att2 = attachment_with_context(@course)
+
+    att2.display_name = "name"
+    att2.handle_duplicates(:overwrite)
+    att1.reload
+    expect(att1.replacement_attachment).to eq att2
+
+    link = "/courses/#{@course.id}/files/#{att1.id}/download" # should still work because it uses att2 as a fallback
+    message = %{
+      <a href='#{link}'>link</a>
+    }
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues).to be_empty
+
+    att2.destroy # shouldn't work anymore
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    expect(links).to match_array [link]
+  end
+
+  it "should not flag links to public paths" do
+    course
+    @course.syllabus_body = %{<a href='/images/avatar-50.png'>link</a>}
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues).to be_empty
+  end
+
+  it "should flag sneaky links" do
+    course
+    @course.syllabus_body = %{<a href='/../app/models/user.rb'>link</a>}
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues.count).to eq 1
+  end
+
+  it "should not flag wiki pages with url encoding" do
+    course
+    page = @course.wiki.wiki_pages.create!(:title => "semi;colon", :body => 'sutff')
+
+    @course.syllabus_body = %{<a href='/courses/#{@course.id}/pages/#{CGI.escape(page.title)}'>link</a>}
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues).to be_empty
+  end
 end

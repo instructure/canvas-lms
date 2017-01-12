@@ -27,11 +27,15 @@ class Cacher < ActiveRecord::Observer
     case obj
     when AccountUser
       if obj.account_id == Account.site_admin.id
-        Shard.default.activate do
-          MultiCache.delete("all_site_admin_account_users3")
-        end
+        Switchman::DatabaseServer.send_in_each_region(self.class,
+                                                      :clear_all_site_admin_account_users,
+                                                      singleton: "clear_all_site_admin_account_users")
       end
     end
+  end
+
+  def self.clear_all_site_admin_account_users
+    MultiCache.delete("all_site_admin_account_users3")
   end
 
   def after_destroy(obj)

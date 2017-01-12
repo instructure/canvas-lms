@@ -20,8 +20,7 @@ require 'ims/lti'
 IMS::LTI::Models::ContentItems::ContentItem.add_attribute :canvas_url, json_key: 'canvasURL'
 
 class ExternalContentController < ApplicationController
-  before_filter :require_context, only: :success
-  protect_from_forgery :except => [:selection_test, :success]
+  protect_from_forgery :except => [:selection_test, :success], with: :exception
 
   def success
     normalize_deprecated_data!
@@ -35,6 +34,7 @@ class ExternalContentController < ApplicationController
     elsif params[:return_type] == 'oembed'
       js_env(oembed: {endpoint: params[:endpoint], url: params[:url]})
     elsif params[:service] == 'external_tool_dialog'
+      get_context
       @retrieved_data = content_items_for_canvas
     elsif params[:service] == 'external_tool_redirect'
       @hide_message = true if params[:service] == 'external_tool_redirect'
@@ -48,14 +48,20 @@ class ExternalContentController < ApplicationController
             uri = URI.parse(value)
           end
           @retrieved_data[:url] = uri.to_s
-        rescue URI::InvalidURIError
+        rescue URI::Error
           @retrieved_data[:url] = nil
         end
       end
     end
+    if params[:id]
+      message_auth = Lti::MessageAuthenticator.new(request.original_url, request.GET.merge(request.POST))
+      render_unauthorized_action and return unless message_auth.valid?
+      render_unauthorized_action and return unless json_data[:content_item_id] == params[:id]
+      render_unauthorized_action and return unless json_data[:oauth_consumer_key] == params[:oauth_consumer_key]
+    end
     @headers = false
-    js_env(retrieved_data: (@retrieved_data || {}),
-           service: params[:service])
+    js_env(retrieved_data: (@retrieved_data || {}), lti_response_messages: lti_response_messages,
+           service: params[:service], service_id: params[:id])
   end
 
 
@@ -103,8 +109,10 @@ class ExternalContentController < ApplicationController
 
   def content_items_for_canvas
     content_item_selection.map do |item|
-      if item.type == IMS::LTI::Models::ContentItems::LtiLink::TYPE
-        url_gen_params = {url: item.url}
+      item.placement_advice ||= default_placement_advice
+      if item.type == IMS::LTI::Models::ContentItems::LtiLinkItem::TYPE
+        launch_url = item.url || json_data[:default_launch_url]
+        url_gen_params = {url: launch_url}
         url_gen_params[:display] = 'borderless' if item.placement_advice.presentation_document_target == 'iframe'
         item.canvas_url = named_context_url(@context, :retrieve_context_external_tools_path, url_gen_params)
       end
@@ -121,6 +129,43 @@ class ExternalContentController < ApplicationController
       filtered_params = params.select { |k, _| %w(url text title return_type content_type height width).include? k }.with_indifferent_access
       [Lti::ContentItemConverter.convert_resource_selection(filtered_params)]
     end
+  end
+
+  def lti_response_messages
+    @lti_response_messages ||= (
+      response_messages = {}
+
+      lti_msg = param_if_set "lti_msg"
+      lti_log = param_if_set "lti_log"
+      lti_errormsg = param_if_set("lti_errormsg") {|error_msg| logger.warn error_msg}
+      lti_errorlog = param_if_set("lti_errorlog") {|error_log| logger.warn error_log}
+
+      response_messages[:lti_msg] = lti_msg if lti_msg
+      response_messages[:lti_log] = lti_log if lti_log
+      response_messages[:lti_errormsg] = lti_errormsg if lti_errormsg
+      response_messages[:lti_errorlog] = lti_errorlog if lti_errorlog
+      response_messages
+    )
+  end
+
+  def param_if_set(param_key)
+    param_value = params[param_key] && !params[param_key].empty? && params[param_key]
+    if param_value && block_given?
+      yield param_value
+    end
+    param_value
+  end
+
+  def default_placement_advice
+    IMS::LTI::Models::ContentItemPlacement.new(
+        presentation_document_target: 'default',
+        display_height: 600,
+        display_width: 800
+    )
+  end
+
+  def json_data
+    @json_data ||= ((params[:data] && Canvas::Security.decode_jwt(params[:data])) || {}).with_indifferent_access
   end
 
 end

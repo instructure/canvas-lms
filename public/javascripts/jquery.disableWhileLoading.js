@@ -78,6 +78,9 @@ define([
             });
             thingsToWaitOn.erase(myDeferred); //speed up so that $.when doesn't have to look at myDeferred any more
             myDeferred.resolve();
+            if (opts.onComplete) {
+              opts.onComplete();
+            }
           }
         });
       });

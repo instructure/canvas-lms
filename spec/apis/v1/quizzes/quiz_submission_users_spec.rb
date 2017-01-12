@@ -65,7 +65,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
     it "sends a message to submitted users" do
       sub = @quiz.generate_submission(@student)
       sub.mark_completed
-      sub.grade_submission
+      Quizzes::SubmissionGrader.new(sub).grade_submission
       expect { send_message(:submitted) }.to change { recipient_messages(:submitted) }.by 1
       expect(recipient_messages(:unsubmitted)).to eq 0
     end
@@ -129,7 +129,6 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
       it "only returns submissions of students with visibility" do
         @quiz.only_visible_to_overrides = true
         @quiz.save!
-        @course.enable_feature!(:differentiated_assignments)
 
         json = get_submitted_users(submitted: false)
         expect(response).to be_success

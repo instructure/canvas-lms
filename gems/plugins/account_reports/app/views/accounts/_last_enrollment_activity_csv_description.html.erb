@@ -1,0 +1,28 @@
+<p><%= t('account_reports.default.last_enrollment_activity.text',
+         %{This report shows the last activity on a user's enrollments.}) %></p>
+
+<h3><%= t('#account_reports.default.description.header', %{Example}) %></h3>
+
+<table class="report_example">
+  <thead>
+  <tr>
+    <th><%= t('#account_reports.report_header_user_id', %{user id}) %></th>
+    <th><%= t('#account_reports.report_header_user_name', %{user name}) %></th>
+    <th><%= t('#account_reports.report_header_last_activity_at', %{last activity at}) %></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>Danton, Georges</td>
+    <td>423945</td>
+    <td>2014-12-21T11:54:34-07:00</td>
+  </tr>
+  <tr>
+    <td>Sieyes, Emmanuel</td>
+    <td>104837</td>
+    <td>2015-12-21T11:54:34-03:00</td>
+    <td></td>
+    <td></td>
+  </tr>
+  </tbody>
+</table>

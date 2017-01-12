@@ -1,7 +1,7 @@
 define [
   'i18n!react_files'
   'jquery'
-  '../components/FileRenameForm'
+  'jsx/files/FileRenameForm'
   'react'
   '../modules/FileOptionsCollection'
 ], (I18n, $, FileRenameForm, React, FileOptionsCollection) ->
@@ -16,6 +16,8 @@ define [
         if jqXHR.status == 409
           # file already exists: prompt and retry
           React.render(React.createFactory(FileRenameForm)(
+            onClose: ->
+            closeWithX: -> dfd.reject()
             closeOnResolve: true
             fileOptions: {name: item.attributes.display_name}
             onNameConflictResolved: (opts) =>

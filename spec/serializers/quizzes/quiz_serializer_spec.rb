@@ -21,9 +21,9 @@ describe Quizzes::QuizSerializer do
   end
 
   before do
-    @context = Course.new
+    @context = Account.default.courses.new
     @context.id = 1
-    @quiz = Quizzes::Quiz.new title: 'test quiz'
+    @quiz = Quizzes::Quiz.new title: 'test quiz', description: 'default quiz description'
     @quiz.id = 1
     @quiz.context = @context
     @user = User.new
@@ -38,8 +38,8 @@ describe Quizzes::QuizSerializer do
   end
 
   [
-    :title, :description, :quiz_type, :hide_results,
-    :time_limit, :shuffle_answers, :show_correct_answers, :scoring_policy,
+    :title, :quiz_type, :hide_results, :time_limit,
+    :shuffle_answers, :show_correct_answers, :scoring_policy,
     :allowed_attempts, :one_question_at_a_time, :question_count,
     :points_possible, :cant_go_back, :access_code, :ip_filter, :due_at,
     :lock_at, :unlock_at, :published, :show_correct_answers_at,
@@ -58,6 +58,22 @@ describe Quizzes::QuizSerializer do
 
   it "serializes html_url" do
     expect(json[:html_url]).to eq 'http://example.com/courses/1/quizzes/1'
+  end
+
+  describe "description" do
+    it "serializes description with a formatter if given" do
+      @serializer = quiz_serializer(
+        serializer_options: {
+          description_formatter: -> (_) {return "description from formatter"}
+        }
+      )
+      @json = @serializer.as_json[:quiz]
+
+      expect(json[:description]).to eq "description from formatter"
+    end
+    it "returns desctiption otherwise" do
+      expect(json[:description]).to eq quiz.description
+    end
   end
 
   it "serializes speed_grader_url" do
@@ -88,16 +104,6 @@ describe Quizzes::QuizSerializer do
     expect(@serializer.as_json[:quiz]).not_to have_key :speed_grader_url
   end
 
-  it "doesn't include the access code unless the user can grade" do
-    quiz.expects(:grants_right?).with(@user, @session, :grade).
-      at_least_once.returns true
-    expect(serializer.as_json[:quiz]).to have_key :access_code
-
-    quiz.expects(:grants_right?).with(@user, @session, :grade).
-      at_least_once.returns false
-    expect(serializer.as_json[:quiz]).not_to have_key :access_code
-  end
-
   it "doesn't include the section count unless the user can grade" do
     quiz.expects(:grants_right?).with(@user, @session, :grade).
       at_least_once.returns true
@@ -121,6 +127,28 @@ describe Quizzes::QuizSerializer do
 
     quiz.expects(:grants_right?).at_least_once.returns false
     expect(serializer.as_json[:quiz]).not_to have_key :message_students_url
+  end
+
+  describe "access code" do
+    it "is included if the user can grade" do
+      quiz.expects(:grants_right?).with(@user, @session, :grade).
+        at_least_once.returns true
+      expect(serializer.as_json[:quiz]).to have_key :access_code
+    end
+
+    it "is included if the user can manage" do
+      quiz.expects(:grants_right?).with(@user, @session, :manage).
+        at_least_once.returns true
+      expect(serializer.as_json[:quiz]).to have_key :access_code
+    end
+
+    it "is not included if the user can't grade or manage" do
+      quiz.expects(:grants_right?).with(@user, @session, :grade).
+        at_least_once.returns false
+      quiz.expects(:grants_right?).with(@user, @session, :manage).
+        at_least_once.returns false
+      expect(serializer.as_json[:quiz]).not_to have_key :access_code
+    end
   end
 
   describe "id" do
@@ -241,7 +269,7 @@ describe Quizzes::QuizSerializer do
         before { skip }
 
         it "serialize the assignment group's url when present" do
-          @quiz.stubs(:context).returns course = Course.new
+          @quiz.stubs(:context).returns course = Account.default.courses.new
           course.id = 1
           @quiz.assignment_group = assignment_group = AssignmentGroup.new
           assignment_group.id = 1
@@ -319,7 +347,7 @@ describe Quizzes::QuizSerializer do
 
     describe 'quiz_reports' do
       it 'sends the url' do
-        quiz.stubs(context: Course.new.tap { |c| c.id = 3 })
+        quiz.stubs(context: Account.default.courses.new.tap { |c| c.id = 3 })
         expect(serializer.as_json[:quiz]['links']['quiz_reports']).to eq(
           controller.send(:api_v1_course_quiz_reports_url, 3, quiz.id)
         )
@@ -327,7 +355,7 @@ describe Quizzes::QuizSerializer do
 
       it 'sends the url as quiz_reports_url' do
         controller.expects(:accepts_jsonapi?).at_least_once.returns false
-        quiz.stubs(context: Course.new.tap { |c| c.id = 3 })
+        quiz.stubs(context: Account.default.courses.new.tap { |c| c.id = 3 })
         expect(serializer.as_json[:quiz][:quiz_reports_url]).to eq(
           controller.send(:api_v1_course_quiz_reports_url, 3, quiz.id)
         )
@@ -336,7 +364,7 @@ describe Quizzes::QuizSerializer do
 
     describe "quiz_statistics" do
       it "sends the url" do
-        quiz.stubs(context: Course.new.tap { |c| c.id = 3 })
+        quiz.stubs(context: Account.default.courses.new.tap { |c| c.id = 3 })
         expect(serializer.as_json[:quiz]['links']['quiz_statistics']).to eq(
           controller.send(:api_v1_course_quiz_statistics_url, 3, quiz.id)
         )
@@ -344,7 +372,7 @@ describe Quizzes::QuizSerializer do
 
       it "sends the url in non-JSONAPI too" do
         controller.expects(:accepts_jsonapi?).at_least_once.returns false
-        quiz.stubs(context: Course.new.tap { |c| c.id = 3 })
+        quiz.stubs(context: Account.default.courses.new.tap { |c| c.id = 3 })
         expect(serializer.as_json[:quiz][:quiz_statistics_url]).to eq(
           controller.send(:api_v1_course_quiz_statistics_url, 3, quiz.id)
         )
@@ -525,8 +553,7 @@ describe Quizzes::QuizSerializer do
         course_quiz(true)
       end
 
-      it "returns the value when the feature flag is on" do
-        @quiz.context.stubs(:feature_enabled?).with(:differentiated_assignments).returns true
+      it "returns the value for DA" do
         @quiz.only_visible_to_overrides = true
         json = quiz_serializer(scope: @teacher).as_json
         expect(json[:quiz][:only_visible_to_overrides]).to be_truthy
@@ -535,12 +562,6 @@ describe Quizzes::QuizSerializer do
         json = quiz_serializer(scope: @teacher).as_json
         expect(json[:quiz]).to have_key :only_visible_to_overrides
         expect(json[:quiz][:only_visible_to_overrides]).to be_falsey
-      end
-
-      it "is not in the hash when the feature flag is off" do
-        @quiz.only_visible_to_overrides = true
-        json = quiz_serializer(scope: @teacher).as_json
-        expect(json[:quiz]).not_to have_key :only_visible_to_overrides
       end
     end
 

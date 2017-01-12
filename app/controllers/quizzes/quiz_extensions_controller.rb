@@ -64,7 +64,7 @@
 #       }
 #     }
 class Quizzes::QuizExtensionsController < ApplicationController
-  include Filters::Quizzes
+  include ::Filters::Quizzes
 
   before_filter :require_user, :require_context, :require_quiz
 

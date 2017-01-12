@@ -21,9 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe CanvadocSessionsController do
   before :once do
     course_with_teacher(:active_all => true)
+    student_in_course
 
     @attachment1 = attachment_model :content_type => 'application/pdf',
-      :context => @course
+      :context => @student
   end
 
   before :each do
@@ -65,9 +66,32 @@ describe CanvadocSessionsController do
       get :show, blob: @blob.to_json, hmac: hmac
       assert_status(401)
     end
+    it "should send o365 preferred render" do
+      Account.default.settings[:canvadocs_prefer_office_online] = true
+      Account.default.save!
 
+      Attachment.stubs(:find).returns(@attachment1)
+      @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
+        arg1 == 1 &&
+        arg2[:preferred_renders] == [Canvadocs::RENDER_O365]
+      end
+
+      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+    end
+
+    it "should not send o365 preferred render" do
+      Account.default.settings[:canvadocs_prefer_office_online] = false
+      Account.default.save!
+
+      Attachment.stubs(:find).returns(@attachment1)
+      @attachment1.expects(:submit_to_canvadocs).with do |arg1, arg2|
+        arg1 == 1 &&
+        arg2[:preferred_renders] == []
+      end
+
+      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+    end
     it "needs to be run by the blob user" do
-      student_in_course
       @blob[:user_id] = @student.global_id
       blob = @blob.to_json
       get :show, blob: blob, hmac: Canvas::Security.hmac_sha1(blob)
@@ -93,5 +117,28 @@ describe CanvadocSessionsController do
       get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
       assert_status(503)
     end
+
+    it "updates attachment.viewed_at if the owner views" do
+      last_viewed_at = @attachment1.viewed_at
+      @blob[:user_id] = @student.global_id
+      blob = @blob.to_json
+
+      user_session(@student)
+
+      get :show, blob: blob, hmac: Canvas::Security.hmac_sha1(blob)
+
+      @attachment1.reload
+      expect(@attachment1.viewed_at).not_to eq(last_viewed_at)
+    end
+
+    it "doesn't update attachment.viewed_at for non-owner views" do
+      last_viewed_at = @attachment1.viewed_at
+
+      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
+
+      @attachment1.reload
+      expect(@attachment1.viewed_at).to eq(last_viewed_at)
+    end
+
   end
 end

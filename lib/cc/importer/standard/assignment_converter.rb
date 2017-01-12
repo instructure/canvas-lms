@@ -24,7 +24,7 @@ module CC::Importer::Standard
         if doc = get_node_or_open_file(res, 'assignment')
           path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
           resource_dir = File.dirname(path) if path
-          
+
           asmnt = {:migration_id => res[:migration_id]}.with_indifferent_access
           if res[:intended_user_role] == 'Instructor'
             asmnt[:workflow_state] = 'unpublished'
@@ -88,6 +88,7 @@ module CC::Importer::Standard
       assignment["migration_id"] ||= get_node_att(meta_doc, 'assignment', 'identifier') || meta_doc['identifier']
       assignment["assignment_group_migration_id"] = get_node_val(meta_doc, "assignment_group_identifierref")
       assignment["grading_standard_migration_id"] = get_node_val(meta_doc, "grading_standard_identifierref")
+      assignment["group_category"] = get_node_val(meta_doc, "group_category")
       assignment["grading_standard_id"] = get_node_val(meta_doc, "grading_standard_external_identifier")
       assignment["rubric_migration_id"] = get_node_val(meta_doc, "rubric_identifierref")
       assignment["rubric_id"] = get_node_val(meta_doc, "rubric_external_identifier")
@@ -102,14 +103,14 @@ module CC::Importer::Standard
           assignment[:saved_rubric_comments][comment_node['criterion_id']] << comment_node.text.strip
         end
       end
-      ['title', "allowed_extensions", "grading_type", "submission_types", "external_tool_url"].each do |string_type|
+      ['title', "allowed_extensions", "grading_type", "submission_types", "external_tool_url", "turnitin_settings"].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end
       ["turnitin_enabled", "peer_reviews",
        "automatic_peer_reviews", "anonymous_peer_reviews", "freeze_on_copy",
-       "grade_group_students_individually", "external_tool_new_tab",
-       "rubric_use_for_grading", "rubric_hide_score_total", "muted"].each do |bool_val|
+       "grade_group_students_individually", "external_tool_new_tab", "moderated_grading",
+       "rubric_use_for_grading", "rubric_hide_score_total", "muted", "has_group_category"].each do |bool_val|
         val = get_bool_val(meta_doc, bool_val)
         assignment[bool_val] = val unless val.nil?
       end

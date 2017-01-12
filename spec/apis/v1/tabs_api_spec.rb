@@ -372,6 +372,64 @@ describe TabsController, type: :request do
       expect(@course.reload.tab_configuration[json['position'] - 1]['hidden']).to eq true
     end
 
+    it 'only unhides one tab and not all when first updating' do
+      course_with_teacher(:active_all => true)
+      tools = []
+
+      3.times do |i|
+        tool = @course.context_external_tools.new({
+                                                     :name => "Example #{i}",
+                                                     :url => 'http://www.example.com',
+                                                     :consumer_key => 'key',
+                                                     :shared_secret => 'secret'
+                                                 })
+        tool.settings.merge!({
+                                  :course_navigation => {
+                                      :default => 'disabled',
+                                      :url => 'http://www.example.com',
+                                  },
+                              })
+        tool.save!
+        tools << tool.reload
+      end
+
+      tab_id = "context_external_tool_#{tools.first.id}"
+      json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
+                                                                             :course_id => @course.to_param, :tab_id => tab_id,
+                                                                             :format => 'json', :hidden => false})
+      expect(json['hidden']).to be_nil
+      expect(@course.reload.tab_configuration[json['position'] - 1]['hidden']).to be_nil
+      expect(@course.reload.tab_configuration.select { |t| t['hidden'] }.count).to eql(tools.count - 1)
+    end
+
+    it 'allows updating new tabs not in the configuration yet' do
+      course_with_teacher(:active_all => true)
+      tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
+      @course.tab_configuration = tab_ids.map {|id| hash = {'id' => id} }
+      @course.save!
+
+      @tool = @course.context_external_tools.new({
+          :name => 'Example',
+          :url => 'http://www.example.com',
+          :consumer_key => 'key',
+          :shared_secret => 'secret',
+        })
+      @tool.settings.merge!({
+          :course_navigation => {
+            :enabled => 'true',
+            :url => 'http://www.example.com',
+          },
+        })
+      @tool.save!
+      tab_id = "context_external_tool_#{@tool.id}"
+
+      json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
+          :course_id => @course.to_param, :tab_id => tab_id,
+          :format => 'json', :hidden => true})
+      expect(json['hidden']).to eq true
+      expect(@course.reload.tab_configuration[json['position'] - 1]['hidden']).to eq true
+    end
+
     it 'changes the position of the people tab to 2' do
       tab_id = 'people'
       course_with_teacher(active_all: true)

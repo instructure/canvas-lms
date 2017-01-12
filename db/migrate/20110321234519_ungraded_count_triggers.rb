@@ -3,6 +3,8 @@
 # will be undone by the next auto-generated trigger migration.
 
 class UngradedCountTriggers < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_trigger("enrollments_after_insert_row_when_new_workflow_state_active__tr", :generated => true).
         on("enrollments").

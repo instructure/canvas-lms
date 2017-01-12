@@ -5,10 +5,11 @@ define [
   'compiled/views/PaginatedCollectionView'
   'compiled/views/groups/manage/GroupUserView'
   'compiled/views/groups/manage/EditGroupAssignmentView'
+  'compiled/views/groups/manage/GroupCategoryCloneView'
   'jst/groups/manage/groupUsers'
   'jqueryui/draggable'
   'jqueryui/droppable'
-], ($, _, GroupCollection, PaginatedCollectionView, GroupUserView, EditGroupAssignmentView, template) ->
+], ($, _, GroupCollection, PaginatedCollectionView, GroupUserView, EditGroupAssignmentView, GroupCategoryCloneView, template) ->
 
   class GroupUsersView extends PaginatedCollectionView
 
@@ -58,6 +59,24 @@ define [
       e.preventDefault()
       e.stopPropagation()
       $target = $(e.currentTarget)
+      user = @collection.get($target.data('user-id'))
+
+      if @model.get("has_submission")
+        @cloneCategoryView = new GroupCategoryCloneView
+          model: @model.collection.category,
+          openedFromCaution: true
+        @cloneCategoryView.open()
+        @cloneCategoryView.on "close", =>
+          if @cloneCategoryView.cloneSuccess
+            window.location.reload()
+          else if @cloneCategoryView.changeGroups
+            @moveUser(e, $target)
+          else
+            $("#group-#{@model.id}-user-#{user.id}-actions").focus()
+      else
+        @moveUser(e, $target)
+
+    moveUser: (e, $target) ->
       @collection.get($target.data('user-id')).save 'group', null
 
     removeLeader: (e) ->

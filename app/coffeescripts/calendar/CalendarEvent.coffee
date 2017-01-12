@@ -13,7 +13,8 @@ define [
 
     _filterAttributes: (obj) ->
       filtered = _(obj).pick 'start_at', 'end_at', 'title', 'description',
-        'context_code', 'remove_child_events', 'location_name', 'location_address'
+        'context_code', 'remove_child_events', 'location_name',
+        'location_address', 'duplicate', 'comments'
       if obj.use_section_dates && obj.child_event_data
         filtered.child_event_data = _.chain(obj.child_event_data)
           .compact()
@@ -61,6 +62,7 @@ define [
         .done(combinedSuccess)
 
     @mergeSectionsIntoCalendarEvent = (eventData = {}, sections) ->
+      eventData.recurring_calendar_events =  ENV.RECURRING_CALENDAR_EVENTS_ENABLED
       eventData.course_sections =  sections
       eventData.use_section_dates = !!eventData.child_events?.length
       _(eventData.child_events).each (child, index) ->
@@ -70,4 +72,3 @@ define [
         section = _(sections).find (section) -> section.id == sectionId
         section.event = child
       eventData
-

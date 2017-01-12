@@ -1,4 +1,6 @@
 class GenericSisStickinessRefactorColumns < ActiveRecord::Migration
+  tag :predeploy
+
 
   def self.up
     add_column :abstract_courses, :stuck_sis_fields, :text

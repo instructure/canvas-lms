@@ -22,7 +22,8 @@ module LtiOutbound
   class ToolLaunch
     attr_reader :url, :tool, :user, :context, :link_code, :return_url, :account,
                 :resource_type, :consumer_instance, :hash, :assignment,
-                :outgoing_email_address, :selected_html, :variable_expander
+                :outgoing_email_address, :selected_html, :variable_expander,
+                :post_only
 
     def initialize(options)
       @url = options[:url] || raise('URL required for generating LTI content')
@@ -42,13 +43,14 @@ module LtiOutbound
       @hash = {}
     end
 
-    def for_assignment!(assignment, outcome_service_url, legacy_outcome_service_url)
+    def for_assignment!(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
       @assignment = assignment
       hash['lis_result_sourcedid'] = assignment.source_id if user.learner?
       hash['lis_outcome_service_url'] = outcome_service_url
       hash['ext_ims_lis_basic_outcome_url'] = legacy_outcome_service_url
       hash['ext_outcome_data_values_accepted'] = assignment.return_types.join(',')
       hash['ext_outcome_result_total_score_accepted'] = true
+      hash['ext_outcomes_tool_placement_url'] = lti_turnitin_outcomes_placement_url
 
       add_assignment_substitutions!(assignment)
     end
@@ -124,8 +126,7 @@ module LtiOutbound
       hash['oauth_callback'] = 'about:blank'
 
       @variable_expander.expand_variables!(hash)
-
-      self.class.generate_params(hash, url, tool.consumer_key, tool.shared_secret)
+      hash
     end
 
     private
@@ -161,52 +162,5 @@ module LtiOutbound
       end
     end
 
-    def self.generate_params(params, url, key, secret)
-      uri = URI.parse(url)
-
-      if uri.port == uri.default_port
-        host = uri.host
-      else
-        host = "#{uri.host}:#{uri.port}"
-      end
-
-      consumer = OAuth::Consumer.new(key, secret, {
-                                            :site => "#{uri.scheme}://#{host}",
-                                            :signature_method => 'HMAC-SHA1'
-                                        })
-
-      path = uri.path
-      path = '/' if path.empty?
-      if uri.query && uri.query != ''
-        CGI.parse(uri.query).each do |query_key, query_values|
-          unless params[query_key]
-            params[query_key] = query_values.first
-          end
-        end
-      end
-      options = {
-          :scheme           => 'body',
-          :timestamp        => @timestamp,
-          :nonce            => @nonce
-      }
-
-      request = consumer.create_signed_request(:post, path, nil, options, stringify_hash(params))
-
-      # the request is made by a html form in the user's browser, so we
-      # want to revert the escapage and return the hash of post parameters ready
-      # for embedding in a html view
-      hash = {}
-      request.body.split(/&/).each do |param|
-        key, val = param.split(/=/).map{|v| CGI.unescape(v) }
-        hash[key] = val
-      end
-      hash
-    end
-
-    def self.stringify_hash(hash)
-      hash.dup.tap do |new_hash|
-        new_hash.keys.each { |k| new_hash[k.to_s] = new_hash.delete(k) unless k.is_a?(String) }
-      end
-    end
   end
 end

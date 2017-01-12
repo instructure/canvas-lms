@@ -17,12 +17,10 @@
 #
 
 class Progress < ActiveRecord::Base
-  include PolymorphicTypeOverride
-  override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics'}
-
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['ContentMigration', 'Course', 'User',
-    'Quizzes::QuizStatistics', 'Account', 'GroupCategory', 'ContentExport', 'Assignment', 'Attachment']
+  belongs_to :context, polymorphic:
+      [:content_migration, :course, :account, :group_category, :content_export,
+       :assignment, :attachment, :epub_export,
+       { context_user: 'User', quiz_statistics: 'Quizzes::QuizStatistics' }]
   belongs_to :user
   attr_accessible :context, :tag, :completion, :message
 
@@ -92,8 +90,11 @@ class Progress < ActiveRecord::Base
     end
 
     def perform
+      self.args[0] = @progress if self.args[0] == @progress # maintain the same object reference
       @progress.start
-      super.tap { @progress.complete }
+      super
+      @progress.reload
+      @progress.complete
     end
 
     def on_permanent_failure(error)
