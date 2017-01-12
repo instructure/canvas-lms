@@ -50,8 +50,9 @@ module DataFixup::PopulateScoresTable
         # compute and save score for each grading period of this course
         gc = GradeCalculator.new(user_ids, course, grading_period: GradingPeriod.find(grading_period))
         gc.send_later_if_production_enqueue_args(:compute_and_save_scores, {
-          priority: Delayed::LOW_PRIORITY,
-          max_attempts: 1
+          priority: Delayed::LOWER_PRIORITY,
+          max_attempts: 1,
+          n_strand: "scores_table_data_fixup:#{Shard.current.database_server.id}"
         })
       end
 
