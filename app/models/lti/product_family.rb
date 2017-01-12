@@ -19,7 +19,7 @@
 module Lti
   class ProductFamily < ActiveRecord::Base
 
-    attr_accessible :vendor_code, :product_code, :vendor_name, :vendor_description, :website, :vendor_email, :root_account
+    strong_params
 
     belongs_to :root_account, class_name: 'Account'
     has_many :tool_proxies, class_name: "Lti::ToolProxy", dependent: :destroy

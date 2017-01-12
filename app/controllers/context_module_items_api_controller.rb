@@ -503,7 +503,13 @@ class ContextModuleItemsApiController < ApplicationController
     assignment = @item.assignment
     return render json: { message: 'requested item is not an assignment' }, status: :bad_request unless assignment
 
-    response = ConditionalRelease::Service.select_mastery_path(@context, @current_user, @student, assignment.id, params[:assignment_set_id], session)
+    response = ConditionalRelease::Service.select_mastery_path(
+      @context,
+      @current_user,
+      @student,
+      assignment,
+      params[:assignment_set_id],
+      session)
 
     if response[:code] != '200'
       render json: response[:body], status: response[:code]

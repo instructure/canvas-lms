@@ -94,17 +94,18 @@ describe integration do
       oauth_start(integration)
 
       if integration == "LinkedIn"
-        LinkedIn::Connection.any_instance.expects(:get_service_user_info).with(instance_of(OAuth::AccessToken)).returns(["test_user_id", "test_user_name"])
-        # mock up the response from the 3rd party service, so we don't actually contact it
-        OAuth::Consumer.any_instance.expects(:token_request).with(anything, anything, anything, has_entry(:oauth_verifier, "test_verifier"), anything).returns({:oauth_token => "test_token", :oauth_token_secret => "test_secret"})
+        LinkedIn::Connection.expects(:from_request_token).returns(stub("LinkedInConnection",
+          access_token: stub("AccessToken", token: 'test_token', secret: 'test_secret'),
+          service_user_id: "test_user_id",
+          service_user_name: "test_user_name",
+          service_user_url: "test_user_url"
+        ))
       elsif integration == "Twitter"
         Twitter::Connection.expects(:from_request_token).returns(stub("TwitterConnection",
           access_token: stub("AccessToken", token: 'test_token', secret: 'test_secret'),
           service_user_id: "test_user_id",
           service_user_name: "test_user_name"
         ))
-      else
-        UsersController.any_instance.expects("#{integration.underscore}_get_service_user").with(instance_of(OAuth::AccessToken)).returns(["test_user_id", "test_user_name"])
       end
 
       get "/oauth_success?oauth_token=test_token&oauth_verifier=test_verifier&service=#{integration.underscore}"
@@ -125,12 +126,11 @@ describe integration do
       # pretend that somehow we think we got a valid auth token, but we actually didn't
       if integration == "LinkedIn"
         # mock up the response from the 3rd party service, so we don't actually contact it
-        OAuth::Consumer.any_instance.expects(:token_request).with(anything, anything, anything, has_entry(:oauth_verifier, "test_verifier"), anything).returns({:oauth_token => "test_token", :oauth_token_secret => "test_secret"})
-        LinkedIn::Connection.any_instance.expects(:get_service_user_info).with(instance_of(OAuth::AccessToken)).raises(RuntimeError, "Third-party service totally like, failed")
+        LinkedIn::Connection.expects(:from_request_token).
+          raises(RuntimeError, "Third-party service totally like, failed")
       elsif integration == "Twitter"
-        Twitter::Connection.expects(:from_request_token).raises(RuntimeError, "Third-party service totally like, failed")
-      else
-        UsersController.any_instance.expects("#{integration.underscore}_get_service_user").with(instance_of(OAuth::AccessToken)).raises(RuntimeError, "Third-party service totally like, failed")
+        Twitter::Connection.expects(:from_request_token).
+          raises(RuntimeError, "Third-party service totally like, failed")
       end
 
       get "/oauth_success?oauth_token=test_token&oauth_verifier=test_verifier&service=#{integration.underscore}"

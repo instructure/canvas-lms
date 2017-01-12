@@ -76,7 +76,6 @@ describe "gradebook - post grades to SIS" do
           }
         }
       )
-      post_grades_tool.context_external_tool_placements.create!(placement_type: 'post_grades')
       post_grades_tool
     end
 
@@ -90,7 +89,7 @@ describe "gradebook - post grades to SIS" do
     end
 
     it "should show post grades lti button when only one section available" do
-      course = Course.new(course_name: 'Math 201', account: @account, active_course: true, sis_source_id: 'xyz')
+      course = Course.new(name: 'Math 201', account: @account, sis_source_id: 'xyz')
       course.save
       course.enroll_teacher(@user).accept!
       course.assignments.create!(name: 'Assignment1', post_to_sis: true)

@@ -10,7 +10,7 @@ module Factories
       @message = @conversation.add_message('test')
     end
 
-    @conversation.update_attributes(options)
+    @conversation.update_attributes(options.slice(:subscribed, :starred, :workflow_state, :user))
     @conversation.reload
   end
 end

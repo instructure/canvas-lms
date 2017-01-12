@@ -17,7 +17,7 @@
 #
 
 class ExternalFeed < ActiveRecord::Base
-  attr_accessible :url, :verbosity, :header_match
+  strong_params
   belongs_to :user
   belongs_to :context, polymorphic: [:course, :group]
 

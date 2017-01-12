@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class UserProfileLink < ActiveRecord::Base
-  attr_accessible :url, :title
+  strong_params
 
   belongs_to :user_profile
 

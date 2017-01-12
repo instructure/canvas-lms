@@ -20,7 +20,7 @@ class Collaboration < ActiveRecord::Base
   include Workflow
   include SendToStream
 
-  attr_accessible :user, :title, :description
+  strong_params
   attr_readonly   :collaboration_type
 
   belongs_to :context, polymorphic: [:course, :group]

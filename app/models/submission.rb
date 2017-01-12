@@ -206,25 +206,24 @@ class Submission < ActiveRecord::Base
     !!(self.grader_id && self.grader_id < 0)
   end
 
-  def adjust_needs_grading_count(mode = :increment)
-    amount = mode == :increment ? 1 : -1
+  def touch_assignments
     Assignment.
       where(id: assignment_id, context_type: 'Course').
       where("EXISTS (?)",
         Enrollment.where(Enrollment.active_student_conditions).
         where(user_id: user_id).
         where("course_id=assignments.context_id")).
-      update_all(["needs_grading_count=needs_grading_count+?, updated_at=?", amount, Time.now.utc])
+      update_all(["updated_at=?", Time.now.utc])
     # TODO: add this to the SQL above when DA is on for everybody
     # and remove NeedsGradingCountQuery#manual_count
     # AND EXISTS (SELECT assignment_student_visibilities.* WHERE assignment_student_visibilities.user_id = NEW.user_id AND assignment_student_visibilities.assignment_id = NEW.assignment_id);
   end
 
-  after_create :update_needs_grading_count, if: :needs_grading?
-  after_update :update_needs_grading_count, if: :needs_grading_changed?
-  def update_needs_grading_count
+  after_create :needs_grading_count_updated, if: :needs_grading?
+  after_update :needs_grading_count_updated, if: :needs_grading_changed?
+  def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
-      adjust_needs_grading_count(needs_grading? ? :increment : :decrement)
+      touch_assignments
     end
   end
 
@@ -1448,8 +1447,10 @@ class Submission < ActiveRecord::Base
   end
   private :preferred_plugin_course_id
 
-  def grade_change_audit
-    return true unless (self.changed & %w(grade score excused)).present? || self.assignment_changed_not_sub
+  def grade_change_audit(force_audit = self.assignment_changed_not_sub)
+    newly_graded = self.workflow_state_changed? && self.workflow_state == 'graded'
+    grade_changed = (self.changed & %w(grade score excused)).present?
+    return true unless newly_graded || grade_changed || force_audit
     self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 
@@ -1977,6 +1978,10 @@ class Submission < ActiveRecord::Base
 
   def muted_assignment?
     self.assignment.muted?
+  end
+
+  def assignment_muted_changed
+    self.grade_change_audit(true)
   end
 
   def without_graded_submission?

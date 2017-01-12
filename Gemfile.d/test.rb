@@ -14,8 +14,6 @@ group :test do
   gem 'simplecov', '0.9.2', require: false
     gem 'docile', '1.1.5', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
-  gem 'bullet_instructure', '4.14.8', require: 'bullet'
-    gem 'redcarpet', '3.3.4', require: false
   gem 'mocha', github: 'maneframe/mocha', ref: 'bb8813fbb4cc589d7c58073d93983722d61b6919', require: false
     gem 'metaclass', '0.0.4', require: false
   gem 'thin', '1.7.0'

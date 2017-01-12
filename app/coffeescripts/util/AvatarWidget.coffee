@@ -39,5 +39,6 @@ define ['jquery', 'compiled/views/profiles/AvatarDialogView'], ($, AvatarDialogV
     # Returns nothing.
     _openAvatarDialog: (e) =>
       e?.preventDefault()
-      @avatarDialog = new AvatarDialogView
+      if(!@avatarDialog)
+        @avatarDialog = new AvatarDialogView
       @avatarDialog.show()

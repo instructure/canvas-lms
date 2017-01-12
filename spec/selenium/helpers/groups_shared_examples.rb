@@ -115,9 +115,9 @@ shared_examples 'pages_page' do |context|
   it "should only list in-group pages in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273620, teacher: 324928) do
     # create group and course announcements
     group_page = @testgroup.first.wiki.wiki_pages.create!(user: @teacher,
-                                                          title: 'Group Page', message: 'Group')
+                                                          title: 'Group Page')
     course_page = @course.wiki.wiki_pages.create!(user: @teacher,
-                                                  title: 'Course Page', message: 'Course')
+                                                  title: 'Course Page')
 
     get pages_page
     f('.btn-primary').click

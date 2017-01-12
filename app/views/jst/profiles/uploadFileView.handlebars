@@ -6,7 +6,7 @@
       </p>
     </div>
     <div class="span6 text-center avatar-preview-wrapper">
-      <img src="{{previewURL}}" alt="" class="avatar-preview" />
+      <div class="avatar-preview" />
     </div>
   </div>
 {{else}}
@@ -17,13 +17,3 @@
 
   <input id="selected-photo" type="file" class="hidden" accept="image/*" />
 {{/if}}
-
-<img src="{{previewURL}}"
-     alt=""
-     id="upload-fullsize-preview"
-     class="hidden fullsize" />
-
-<canvas id="upload-canvas"
-        class="hidden"
-        height="128"
-        width="128"></canvas>

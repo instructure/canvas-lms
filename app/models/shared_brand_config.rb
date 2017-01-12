@@ -4,7 +4,7 @@ class SharedBrandConfig < ActiveRecord::Base
 
   validates :brand_config, presence: true
 
-  attr_accessible :name, :account_id, :brand_config_md5
+  strong_params
 
   set_policy do
     given { |user, session| self.account.grants_right?(user, session, :manage_account_settings) }

@@ -635,9 +635,10 @@ class CoursesController < ApplicationController
     @account = params[:account_id] ? api_find(Account, params[:account_id]) : @domain_root_account.manually_created_courses_account
     if authorized_action(@account, @current_user, [:manage_courses, :create_courses])
       params[:course] ||= {}
+      params_for_create = course_params
 
-      if params[:course].has_key?(:syllabus_body)
-        params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
+      if params_for_create.has_key?(:syllabus_body)
+        params_for_create[:syllabus_body] = process_incoming_html_content(params_for_create[:syllabus_body])
       end
 
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
@@ -645,7 +646,7 @@ class CoursesController < ApplicationController
       end
 
       term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
-      params[:course][:enrollment_term] = api_find(@account.root_account.enrollment_terms, term_id) if term_id
+      params_for_create[:enrollment_term] = api_find(@account.root_account.enrollment_terms, term_id) if term_id
 
       sis_course_id = params[:course].delete(:sis_course_id)
       apply_assignment_group_weights = params[:course].delete(:apply_assignment_group_weights)
@@ -654,15 +655,15 @@ class CoursesController < ApplicationController
       # conclude_at for legacy support, and return conclude_at only if
       # the user uses that name.
       course_end = if params[:course][:end_at].present?
-                     params[:course][:conclude_at] = params[:course].delete(:end_at)
+                     params_for_create[:conclude_at] = params[:course].delete(:end_at)
                      :end_at
                    else
                      :conclude_at
                    end
 
       unless @account.grants_right? @current_user, session, :manage_storage_quotas
-        params[:course].delete :storage_quota
-        params[:course].delete :storage_quota_mb
+        params_for_create.delete :storage_quota
+        params_for_create.delete :storage_quota_mb
       end
 
       can_manage_sis = api_request? && @account.grants_right?(@current_user, :manage_sis)
@@ -674,7 +675,7 @@ class CoursesController < ApplicationController
           @course.account = @sub_account if @sub_account
         end
       end
-      @course ||= (@sub_account || @account).courses.build(params[:course])
+      @course ||= (@sub_account || @account).courses.build(params_for_create)
 
       if can_manage_sis
         @course.sis_source_id = sis_course_id
@@ -1211,7 +1212,7 @@ class CoursesController < ApplicationController
     return unless authorized_action(@course, @current_user, :update)
 
     old_settings = @course.settings
-    @course.attributes = params.slice(
+    @course.attributes = strong_params.permit(
       :allow_student_discussion_topics,
       :allow_student_forum_attachments,
       :allow_student_discussion_editing,
@@ -1909,7 +1910,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read) &&
       authorized_action(@context, @current_user, :read_as_admin)
-      args = params[:course].slice(:name, :course_code)
+      args = strong_params.require(:course).permit(:name, :course_code)
       account = @context.account
       if params[:course][:account_id]
         account = Account.find(params[:course][:account_id])
@@ -2115,6 +2116,7 @@ class CoursesController < ApplicationController
     logging_source = api_request? ? :api : :manual
 
     params[:course] ||= {}
+    params_for_update = course_params
     params[:course][:event] = :offer if params[:offer].present?
 
     if params[:course][:event] && params[:course].size == 1
@@ -2128,10 +2130,10 @@ class CoursesController < ApplicationController
       return render_update_success if params[:for_reload]
 
       unless @course.grants_right?(@current_user, :update)
-        params[:course] = params[:course].slice(:syllabus_body) # let users with :manage_content only update the body
+        params_for_update = params_for_update.slice(:syllabus_body) # let users with :manage_content only update the body
       end
-      if params[:course].has_key?(:syllabus_body)
-        params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
+      if params_for_update.has_key?(:syllabus_body)
+        params_for_update[:syllabus_body] = process_incoming_html_content(params_for_update[:syllabus_body])
       end
 
       account_id = params[:course].delete :account_id
@@ -2161,8 +2163,8 @@ class CoursesController < ApplicationController
         @course.enrollment_term = enrollment_term if enrollment_term && enrollment_term != @course.enrollment_term
       end
 
-      if params[:course].has_key? :grading_standard_id
-        standard_id = params[:course].delete :grading_standard_id
+      if params_for_update.has_key? :grading_standard_id
+        standard_id = params_for_update.delete :grading_standard_id
         grading_standard = GradingStandard.for(@course).where(id: standard_id).first if standard_id.present?
         if grading_standard != @course.grading_standard
           if authorized_action?(@course, @current_user, :manage_grades)
@@ -2177,13 +2179,13 @@ class CoursesController < ApplicationController
         end
       end
       unless @course.account.grants_right? @current_user, session, :manage_storage_quotas
-        params[:course].delete :storage_quota
-        params[:course].delete :storage_quota_mb
+        params_for_update.delete :storage_quota
+        params_for_update.delete :storage_quota_mb
       end
       unless @course.account.grants_right?(@current_user, session, :manage_courses)
         if @course.root_account.settings[:prevent_course_renaming_by_teachers]
-          params[:course].delete :name
-          params[:course].delete :course_code
+          params_for_update.delete :name
+          params_for_update.delete :course_code
         end
       end
       params[:course][:sis_source_id] = params[:course].delete(:sis_course_id) if api_request?
@@ -2207,8 +2209,8 @@ class CoursesController < ApplicationController
         end
       end
 
-      if params[:course].has_key?(:locale) && params[:course][:locale].blank?
-        params[:course][:locale] = nil
+      if params_for_update.has_key?(:locale) && params_for_update[:locale].blank?
+        params_for_update[:locale] = nil
       end
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
@@ -2244,10 +2246,10 @@ class CoursesController < ApplicationController
         @course.image_id = nil
       end
 
-      params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
+      params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
 
-      @course.attributes = params[:course]
+      @course.attributes = params_for_update
 
       if params[:course][:course_visibility].present?
         visibility_configuration(params[:course])
@@ -2778,5 +2780,18 @@ class CoursesController < ApplicationController
 
   def effective_due_dates_params
     strong_params.permit(assignment_ids: [])
+  end
+
+  def course_params
+    return {} unless strong_params[:course]
+    strong_params[:course].permit(:name, :group_weighting_scheme, :start_at, :conclude_at,
+      :grading_standard_id, :is_public, :is_public_to_auth_users, :allow_student_wiki_edits, :show_public_context_messages,
+      :syllabus_body, :public_description, :allow_student_forum_attachments, :allow_student_discussion_topics, :allow_student_discussion_editing,
+      :show_total_grade_as_points, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view,
+      :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed,
+      :abstract_course, :storage_quota, :storage_quota_mb, :restrict_enrollments_to_course_dates,
+      :restrict_student_past_view, :restrict_student_future_view, :grading_standard, :grading_standard_enabled,
+      :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :lock_all_announcements, :public_syllabus,
+      :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type)
   end
 end

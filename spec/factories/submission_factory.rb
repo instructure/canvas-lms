@@ -37,4 +37,11 @@ module Factories
     submission.save_without_callbacks
     submission
   end
+
+  def graded_submission_model(opts={})
+    submission_model(opts)
+    @submission.workflow_state = 'graded'
+    @submission.save!
+    @submission
+  end
 end

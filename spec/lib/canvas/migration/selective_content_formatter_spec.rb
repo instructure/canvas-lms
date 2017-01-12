@@ -238,11 +238,11 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @account_outcome.destroy
 
         @course.require_assignment_group
-        @course.assignments.create!(:name => "blah").destroy
+        @course.assignments.create!.destroy
         @course.assignment_groups.create!(:name => "blah").destroy
-        @course.quizzes.create!(:name => "blah").destroy
-        @course.calendar_events.create!(:name => "blah").destroy
-        @course.rubrics.create!(:name => "blah").destroy
+        @course.quizzes.create!.destroy
+        @course.calendar_events.create!.destroy
+        @course.rubrics.create!.destroy
       end
 
       it "should ignore in top-level list" do

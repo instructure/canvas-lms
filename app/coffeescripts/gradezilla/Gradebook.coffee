@@ -12,7 +12,6 @@ define [
   'jst/KeyboardNavDialog'
   'vendor/slickgrid'
   'compiled/api/gradingPeriodsApi'
-  'compiled/gradezilla/TotalColumnHeaderView'
   'compiled/util/round'
   'compiled/views/InputFilterView'
   'i18nObj'
@@ -30,11 +29,12 @@ define [
   'compiled/gradezilla/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
   'str/htmlEscape'
+  'jsx/gradezilla/default_gradebook/components/AssignmentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
+  'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
   'jsx/gradezilla/SISGradePassback/PostGradesApp'
   'jsx/gradezilla/SubmissionStateMap'
-  'jst/gradezilla/column_header'
   'jst/gradezilla/group_total_cell'
   'jst/gradezilla/row_student_name'
   'compiled/views/gradezilla/SectionMenuView'
@@ -57,15 +57,13 @@ define [
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
   'jsx/context_cards/StudentContextCardTrigger'
-], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor,
-  KeyboardNavDialog, KeyboardNavTemplate, Slick, GradingPeriodsAPI,
-  TotalColumnHeaderView, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
-  CourseGradeCalculator, GradingSchemeHelper, UserSettings, Spinner,
-  SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
-  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
-  GradebookHeaderMenu, NumberCompare, htmlEscape, StudentColumnHeader, PostGradesStore,
-  PostGradesApp, SubmissionStateMap, ColumnHeaderTemplate,
-  GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView,
+], (
+  $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
+  GradingPeriodsAPI, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
+  GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
+  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape,
+  AssignmentColumnHeader, StudentColumnHeader, TotalGradeColumnHeader, PostGradesStore, PostGradesApp,
+  SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView,
   GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
 ) ->
 
@@ -506,7 +504,7 @@ define [
     handleAssignmentMutingChange: (assignment) =>
       idx = @grid.getColumnIndex("assignment_#{assignment.id}")
       colDef = @grid.getColumns()[idx]
-      colDef.name = @assignmentHeaderHtml(assignment)
+      colDef.name = assignment.name
       @grid.setColumns(@grid.getColumns())
       @fixColumnReordering()
       @buildRows()
@@ -518,18 +516,8 @@ define [
         column.name = @assignmentGroupHtml(column.object.name, column.object.group_weight)
       @setAssignmentWarnings()
       @grid.setColumns(columns)
-      @renderTotalHeader()
       # TODO: don't buildRows?
       @buildRows()
-
-    renderTotalHeader: () =>
-      @totalHeader = new TotalColumnHeaderView
-        showingPoints: @displayPointTotals()
-        toggleShowingPoints: @togglePointsOrPercentTotals.bind(this)
-        weightedGroups: @weightedGroups
-        totalColumnInFront: @totalColumnInFront
-        moveTotalColumn: @moveTotalColumn.bind(this)
-      @totalHeader.render()
 
     moveTotalColumn: =>
       @totalColumnInFront = not @totalColumnInFront
@@ -756,7 +744,6 @@ define [
     # this is a workaroud to make it so only assignments are sortable but at the same time
     # so that the total and final grade columns don't dissapear after reordering columns
     fixColumnReordering: =>
-      @renderTotalHeader()
       $headers = $('#gradebook_grid .container_1').find('.slick-header-columns')
       originalItemsSelector = $headers.sortable 'option', 'items'
       onlyAssignmentColsSelector = '> *:not([id*="assignment_group"]):not([id*="total_grade"]):not([id*=student])'
@@ -765,7 +752,6 @@ define [
         $notAssignments = $(originalItemsSelector, $headers).not($(onlyAssignmentColsSelector, $headers))
         $notAssignments.data('sortable-item', null)
       )()
-      @initHeaderDropMenus()
       originalStopFn = $headers.sortable 'option', 'stop'
       (fixupStopCallback = ->
         $headers.sortable 'option', 'stop', (event, ui) ->
@@ -775,18 +761,9 @@ define [
           $headers.sortable 'option', 'items', originalItemsSelector
           returnVal = originalStopFn.apply(this, arguments)
           makeOnlyAssignmentsSortable() # set it back
-          @initHeaderDropMenus()
           fixupStopCallback() # originalStopFn re-creates sortable widget so we need to re-fix
           returnVal
       )()
-
-    initHeaderDropMenus: =>
-      $headers = $('#gradebook_grid .container_1').find('.slick-header-columns')
-      $headers.find('.assignment_header_drop').click (event) =>
-        $link = $(event.target)
-        unless $link.data('gradebookHeaderMenu')
-          $link.data('gradebookHeaderMenu', new GradebookHeaderMenu(@assignments[$link.data('assignmentId')], $link, this))
-        return false
 
     minimizeColumn: ($columnHeader) =>
       columnDef = $columnHeader.data('column')
@@ -1079,8 +1056,6 @@ define [
         for col in cols
           col.sortable = true unless col.neverSort
         @grid.setColumns(cols)
-        @renderTotalHeader()
-        @initHeaderDropMenus()
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
@@ -1089,6 +1064,26 @@ define [
 
     initStudentColumnHeader: (obj) =>
       component = React.createElement(StudentColumnHeader, {}, null)
+      ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
+
+    initTotalGradeColumnHeader: (obj) =>
+      component = React.createElement(TotalGradeColumnHeader, {}, null)
+      ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
+
+    initAssignmentColumnHeader: (obj) =>
+      original_assignment = obj.column.object
+
+      assignment = {
+        htmlUrl: original_assignment.html_url,
+        id: original_assignment.id,
+        invalid: original_assignment.invalid,
+        muted: original_assignment.muted,
+        name: original_assignment.name,
+        omitFromFinalGrade: original_assignment.omit_from_final_grade,
+        pointsPossible: original_assignment.points_possible
+      }
+
+      component = React.createElement(AssignmentColumnHeader, { assignment }, null)
       ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
 
     initGradebookExporter: () =>
@@ -1211,7 +1206,6 @@ define [
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
       $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @displayPointTotals()
       @grid.invalidate()
-      @totalHeader.switchTotalDisplay(@options.show_total_grade_as_points)
 
     switchTotalDisplayAndMarkUserAsWarned: =>
       UserSettings.contextSet('warned_about_totals_display', true)
@@ -1247,12 +1241,6 @@ define [
       columns = columns.concat(@aggregateColumns)
       headers = @parentColumns.concat(@customColumnDefinitions())
       headers.concat(columns)
-
-    assignmentHeaderHtml: (assignment) ->
-      ColumnHeaderTemplate
-        assignment: assignment
-        href: assignment.html_url
-        showPointsPossible: assignment.points_possible?
 
     customColumnDefinitions: ->
       @customColumns.map (c) ->
@@ -1317,7 +1305,7 @@ define [
         columnDef =
           id: fieldName
           field: fieldName
-          name: @assignmentHeaderHtml(assignment)
+          name: assignment.name
           object: assignment
           formatter: this.cellFormatter
           editor: outOfFormatter ||
@@ -1328,6 +1316,7 @@ define [
           width: assignmentWidth
           toolTip: assignment.name
           type: 'assignment'
+          neverSort: true
 
         if fieldName in @assignmentsToHide
           columnDef.width = 10
@@ -1364,9 +1353,9 @@ define [
             type: 'assignment_group'
           }
 
-        total = I18n.t "total", "Total"
+        label = I18n.t "Total"
 
-        totalWidth = testWidth("Total", columnWidths.total.min, columnWidths.total.max)
+        totalWidth = testWidth(label, columnWidths.total.min, columnWidths.total.max)
         if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
           totalWidth = parseInt(@gradebookColumnSizeSettings['total_grade'])
 
@@ -1374,16 +1363,13 @@ define [
           id: "total_grade"
           field: "total_grade"
           formatter: @groupTotalFormatter
-          name: """
-            #{htmlEscape total}
-            <div id=total_column_header></div>
-          """
-          toolTip: total
+          toolTip: label
           minWidth: columnWidths.total.min
           maxWidth: columnWidths.total.max
           width: totalWidth
           cssClass: if @totalColumnInFront then 'meta-cell' else 'total-cell'
           type: 'total_grade'
+          neverSort: true
 
         if @totalColumnInFront
           @parentColumns.push total_column
@@ -1444,6 +1430,10 @@ define [
     onHeaderCellRendered: (event, obj) =>
       if obj.column.id == 'student'
         @initStudentColumnHeader(obj)
+      else if obj.column.id == 'total_grade'
+        @initTotalGradeColumnHeader(obj)
+      else if obj.column.id.match(/^assignment_\d+$/)
+        @initAssignmentColumnHeader(obj)
 
     onColumnsResized: (event, obj) =>
       grid = obj.grid

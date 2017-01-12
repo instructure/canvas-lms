@@ -61,7 +61,7 @@ spec/dr_diff_spec.rb}
       end
 
       before :each do
-        expect(DiffParser).to receive(:new).with(git.diff).and_return(diff_parser)
+        expect(DiffParser).to receive(:new).with(git.diff, true, true).and_return(diff_parser)
         expect(CommandCapture).to receive(:run).with(format, command).and_return(command_capture_comments)
         allow(diff_parser).to receive(:relevant?).and_return(true)
       end

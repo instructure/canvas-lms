@@ -22,7 +22,7 @@ class NotificationPolicy < ActiveRecord::Base
   belongs_to :communication_channel
   has_many :delayed_messages, :dependent => :destroy
 
-  attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
+  strong_params
 
   validates_presence_of :communication_channel_id, :frequency
   validates_inclusion_of :frequency, in: [Notification::FREQ_IMMEDIATELY,

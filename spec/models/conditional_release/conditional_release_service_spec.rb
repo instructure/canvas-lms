@@ -277,25 +277,68 @@ describe ConditionalRelease::Service do
   describe 'select_mastery_path' do
     before do
       enable_service
+      course_with_student_submissions(active_all: true)
+      @assignment = Assignment.first
+      @submission = @assignment.submission_for_student(@student)
+      @submission.workflow_state = 'graded'
+      @submission.score = 10
+      @submission.save!
     end
 
-    before(:once) do
-      course_with_student(active_all: true)
+    def expect_select_mastery_path_request(expected_params = {})
+      CanvasHttp.expects(:post)
+                .with(Service.select_assignment_set_url, anything, anything) do |_url, _headers, body|
+                  expect(Rack::Utils.parse_query(body[:form_data])).to include(expected_params)
+                end
+                .returns(stub(code: '200', body: { key: 'value' }.to_json))
     end
 
     it 'make http request to service' do
-      CanvasHttp.expects(:post)
-                .with(Service.select_assignment_set_url, anything, anything)
-                .returns(stub(code: '200', body: { key: 'value' }.to_json))
-      result = Service.select_mastery_path(@course, @student, @student, 100, 200, nil)
+      expect_select_mastery_path_request
+      result = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
+      expect(result).to eq({ code: '200', body: { 'key' => 'value' } })
+    end
+
+    it 'includes assignment info in service request' do
+      @assignment.points_possible = 99
+      @assignment.save!
+      @submission.score = 20
+      @submission.save!
+      expect_select_mastery_path_request({
+        trigger_assignment: @assignment.id.to_s,
+        trigger_assignment_score: "20.0",
+        trigger_assignment_points_possible: "99.0"
+      }.stringify_keys)
+      result = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
       expect(result).to eq({ code: '200', body: { 'key' => 'value' } })
     end
 
     it 'clears rules cache' do
-      CanvasHttp.stubs(:post)
-                .returns(stub(code: '200', body: { key: 'value' }.to_json))
+      expect_select_mastery_path_request
       Service.expects(:clear_rules_cache_for).with(@course, @student)
-      Service.select_mastery_path(@course, @student, @student, 100, 200, nil)
+      Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
+    end
+
+    it 'fails for muted assignments' do
+      @assignment.mute!
+      CanvasHttp.expects(:post).never
+      response = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
+      expect(response[:code]).to eq '400'
+    end
+
+    it 'fails for partially graded assignments' do
+      @submission.workflow_state = :pending_review
+      @submission.save!
+      CanvasHttp.expects(:post).never
+      response = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
+      expect(response[:code]).to eq '400'
+    end
+
+    it 'fails if student has no submission' do
+      student_in_course
+      CanvasHttp.expects(:post).never
+      response = Service.select_mastery_path(@course, @student, @student, @assignment, 200, nil)
+      expect(response[:code]).to eq '400'
     end
   end
 
@@ -591,29 +634,55 @@ describe ConditionalRelease::Service do
         { submissions: all_the_submissions }
       end
 
+      def expect_request_rules(submissions)
+        Service.expects(:request_rules)
+          .with(anything(), submissions_hash_for(submissions))
+          .returns([])
+      end
+
+      before do
+        course_with_student(active_all: true)
+      end
+
       context 'for cross-shard users' do
         specs_require_sharding
 
         it 'selects submissions' do
-          course_with_student(active_all: true)
           @shard1.activate do
             course_with_student(account: Account.create!, user: @student)
-            sub = submission_model(course: @course, user: @student)
-            Service.expects(:request_rules)
-              .with(anything(), submissions_hash_for(sub))
+            sub = graded_submission_model(course: @course, user: @student)
+            expect_request_rules(sub)
             Service.rules_for(@course, @student, [], nil)
           end
         end
       end
 
       it 'includes only submissions for the course' do
-        course_with_student(active_all: true)
-        submission_model(course: @course, user: @student)
+        graded_submission_model(course: @course, user: @student)
         course_with_student(user: @student)
-        sub = submission_model(course: @course, user: @student)
-        Service.expects(:request_rules)
-          .with(anything(), submissions_hash_for(sub))
+        sub = graded_submission_model(course: @course, user: @student)
+        expect_request_rules(sub)
         Service.rules_for(@course, @student, [], nil)
+      end
+
+      it 'includes only completely graded submissions' do
+        s1 = graded_submission_model(course: @course, user: @student)
+        _s2 = submission_model(course: @course, user: @student)
+        expect_request_rules(s1)
+        Service.rules_for(@course, @student, [], nil)
+      end
+
+      it 'includes only non-muted assignments' do
+        graded_submission_model(course: @course, user: @student)
+        enable_cache do
+          @submission.assignment.mute!
+          expect_request_rules([])
+          Service.rules_for(@course, @student, [], nil)
+
+          @submission.assignment.unmute!
+          expect_request_rules(@submission)
+          Service.rules_for(@course, @student, [], nil)
+        end
       end
     end
   end

@@ -281,6 +281,8 @@ describe MasterCourses::MasterMigration do
       qq = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
       bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
       aq = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      file = @copy_from.attachments.create!(:filename => 'blah', :uploaded_data => default_uploaded_data)
+      event = @copy_from.calendar_events.create!(:title => 'thing', :description => 'blargh', :start_at => 1.day.from_now)
 
       # TODO: make sure that we skip the validations on each importer when we add the Restrictor and
       # probably add more content here
@@ -297,6 +299,8 @@ describe MasterCourses::MasterMigration do
       copied_qq = copied_quiz.quiz_questions.where(:migration_id => mig_id(qq)).first
       copied_bank = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank)).first
       copied_aq = copied_bank.assessment_questions.where(:migration_id => mig_id(aq)).first
+      copied_file = @copy_to.attachments.where(:migration_id => mig_id(file)).first
+      copied_event = @copy_to.calendar_events.where(:migration_id => mig_id(event)).first
 
       new_text = "<p>some text here</p>"
       assmt.update_attribute(:description, new_text)
@@ -304,6 +308,7 @@ describe MasterCourses::MasterMigration do
       ann.update_attribute(:message, new_text)
       page.update_attribute(:body, new_text)
       quiz.update_attribute(:description, new_text)
+      event.update_attribute(:description, new_text)
 
       plain_text = 'plain text'
       qq.question_data = qq.question_data.tap{|qd| qd['question_text'] = plain_text}
@@ -311,8 +316,9 @@ describe MasterCourses::MasterMigration do
       bank.update_attribute(:title, plain_text)
       aq.question_data['question_text'] = plain_text
       aq.save!
+      file.update_attribute(:display_name, plain_text)
 
-      [assmt, topic, ann, page, quiz, bank].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
+      [assmt, topic, ann, page, quiz, bank, file, event].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
 
       run_master_migration # re-copy all the content and overwrite the locked stuff
 
@@ -324,6 +330,8 @@ describe MasterCourses::MasterMigration do
       expect(copied_qq.reload.question_data['question_text']).to eq plain_text
       expect(copied_bank.reload.title).to eq plain_text
       expect(copied_aq.reload.question_data['question_text']).to eq plain_text
+      expect(copied_file.reload.display_name).to eq plain_text
+      expect(copied_event.reload.description).to eq new_text
     end
 
     it "should not overwrite downstream changes in child course unless locked" do

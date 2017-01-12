@@ -159,6 +159,7 @@ class GradeCalculator
 
     return if @current_updates.empty? && @final_updates.empty?
     return if joined_enrollment_ids.blank?
+    return if @grading_period && @grading_period.deleted?
 
     @course.touch
     updated_at = Score.sanitize(Time.now.utc)
@@ -184,10 +185,11 @@ class GradeCalculator
                 end.join(' ')}
                 ELSE final_score
               END,
-              updated_at = #{updated_at}
+              updated_at = #{updated_at},
+              -- if workflow_state was previously deleted for some reason, update it to active
+              workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), 'active')
             WHERE
               enrollment_id IN (#{joined_enrollment_ids}) AND
-              workflow_state <> 'deleted' AND
               grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'};
         INSERT INTO #{Score.quoted_table_name}
             (enrollment_id, grading_period_id, current_score, final_score, created_at, updated_at)
@@ -215,7 +217,6 @@ class GradeCalculator
             FROM #{Enrollment.quoted_table_name} enrollments
             LEFT OUTER JOIN #{Score.quoted_table_name} scores on
               scores.enrollment_id = enrollments.id AND
-              scores.workflow_state <> 'deleted' AND
               scores.grading_period_id #{@grading_period ? "= #{@grading_period.id}" : 'IS NULL'}
             WHERE
               enrollments.id IN (#{joined_enrollment_ids}) AND

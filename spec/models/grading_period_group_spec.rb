@@ -89,19 +89,6 @@ describe GradingPeriodGroup do
       expect(group).not_to be_valid
     end
 
-    it "is not able to mass-assign the account id" do
-      grading_period_group = GradingPeriodGroup.new(valid_attributes.merge(account_id: account.id))
-      expect(grading_period_group.account_id).to be_nil
-      expect(grading_period_group.root_account).to be_nil
-    end
-
-    it "is not able to mass-assign the course id" do
-      course = course_factory()
-      grading_period_group = GradingPeriodGroup.new(valid_attributes.merge(course_id: course.id))
-      expect(grading_period_group.course_id).to be_nil
-      expect(grading_period_group.course).to be_nil
-    end
-
     it "cannot be created for a soft-deleted account" do
       account.update_attribute(:workflow_state, 'deleted')
       group = account.grading_period_groups.build(title: "Example Group")

@@ -104,6 +104,28 @@ describe Enrollment do
     end
   end
 
+  describe '#restore' do
+    before(:once) do
+      @enrollment.save!
+      @enrollment.scores.create!
+      @enrollment.destroy
+    end
+
+    it 'restores associated scores that are deleted' do
+      expect { @enrollment.restore }.to change {
+        Score.find_by(enrollment_id: @enrollment, grading_period_id: nil).workflow_state
+      }.from('deleted').to('active')
+    end
+
+    it 'does not restore scores associated with other enrollments' do
+      new_enrollment = StudentEnrollment.create!(user: User.create!, course: @course)
+      new_score = new_enrollment.scores.new
+      new_score.workflow_state = :deleted
+      new_score.save!
+      expect { @enrollment.restore }.not_to change { new_score.reload.workflow_state }
+    end
+  end
+
   describe 'current scores and grades' do
     before(:once) do
       @enrollment.computed_current_score = 95.5

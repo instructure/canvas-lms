@@ -62,7 +62,7 @@ describe Canvas do
         Canvas.timeout_protection("spec") { ran = true }
         expect(ran).to eq false
         # verify the redis key has a ttl
-        key = "service:timeouts:spec"
+        key = "service:timeouts:spec:error_count"
         expect(Canvas.redis.get(key)).to eq "2"
         expect(Canvas.redis.ttl(key)).to be_present
         # delete the redis key and it'll try again
@@ -73,9 +73,17 @@ describe Canvas do
       end
 
       it "should raise on cutoff if raise_on_timeout option is specified" do
-        Canvas.redis.set("service:timeouts:spec", 42)
-        expect { Canvas.timeout_protection("spec", raise_on_timeout: true) {} }.to raise_error(Timeout::Error)
-        expect(Canvas.redis.get("service:timeouts:spec")).to eq "42"
+        key = "service:timeouts:spec:error_count"
+        Canvas.redis.set(key, 42)
+        expect { Canvas.timeout_protection("spec", raise_on_timeout: true) {} }.
+          to raise_error(Timeout::Error)
+        expect(Canvas.redis.get(key)).to eq "42"
+      end
+
+      it "calls percent_short_circuit_timeout when set to do so" do
+        Setting.set("service_spec_timeout_protection_method", "percentage")
+        Canvas.expects(:percent_short_circuit_timeout).once
+        Canvas.timeout_protection("spec") {}
       end
     end
   end
@@ -85,38 +93,104 @@ describe Canvas do
       it "should wrap the block in a timeout" do
         Timeout.expects(:timeout).with(15).yields
         ran = false
-        Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, 2, 1) { ran = true }
+        Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true }
         expect(ran).to eq true
       end
 
-      it "should raise Timeout::Error on timeout" do
-        Timeout.expects(:timeout).raises(Timeout::Error)
-        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, 2, 1) {} }.to raise_error(Timeout::Error)
-      end
-
       it "should skip calling the block after X failures" do
+        Setting.set("service_spec_cutoff", "2")
         Timeout.expects(:timeout).with(15).twice.raises(Timeout::Error)
-        expect { Canvas.short_circuit_timeout(Canvas.redis, "timeouts:spec", 15, 2, 1) {} }.to raise_error(Timeout::Error)
-        expect { Canvas.short_circuit_timeout(Canvas.redis, "timeouts:spec", 15, 2, 1) {} }.to raise_error(Timeout::Error)
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) {} }.
+          to raise_error(Timeout::Error)
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) {} }.
+          to raise_error(Timeout::Error)
         ran = false
         # third time, won't call timeout
-        expect { Canvas.short_circuit_timeout(Canvas.redis, "timeouts:spec", 15, 2, 1) { ran = true } }.to raise_error(Timeout::Error)
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true } }.
+          to raise_error(Timeout::Error)
         expect(ran).to eq false
         # verify the redis key has a ttl
-        key = "timeouts:spec"
+        key = "service:timeouts:spec:error_count"
         expect(Canvas.redis.get(key)).to eq "2"
         expect(Canvas.redis.ttl(key)).to be_present
         # delete the redis key and it'll try again
         Canvas.redis.del(key)
         Timeout.expects(:timeout).with(15).yields
-        Canvas.short_circuit_timeout(Canvas.redis, "timeouts:spec", 15, 2, 1) { ran = true }
+        Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true }
         expect(ran).to eq true
       end
 
       it "should raise TimeoutCutoff when the cutoff is reached" do
-        Canvas.redis.set("timeouts:spec", 42)
-        expect { Canvas.short_circuit_timeout(Canvas.redis, "timeouts:spec", 15, 2, 1) { ran = true} }.to raise_error(Canvas::TimeoutCutoff)
-        expect(Canvas.redis.get("timeouts:spec")).to eq "42"
+        Setting.set("service_spec_cutoff", "2")
+        key = "service:timeouts:spec:error_count"
+        Canvas.redis.set(key, 42)
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { } }.
+          to raise_error(Canvas::TimeoutCutoff)
+        expect(Canvas.redis.get(key)).to eq "42"
+      end
+    end
+
+    describe ".percent_short_circuit_timeout" do
+      it "should raise TimeoutCutoff when the protection key is present" do
+        Canvas.redis.set("service:timeouts:spec:percent_counter:protection_activated", "true")
+        Canvas.redis.expire("service:timeouts:spec:percent_counter:protection_activated", 1)
+        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) {}}.
+          to raise_error(Canvas::TimeoutCutoff)
+      end
+
+      it "raise TimeoutCutoff when the failure rate is too high" do
+        counter = Canvas::FailurePercentCounter.new(Canvas.redis,
+          "service:timeouts:spec:percent_counter")
+        counter.expects(:failure_rate).returns(0.2)
+        Canvas::FailurePercentCounter.expects(:new).returns(counter)
+        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) {}}.
+          to raise_error(Canvas::TimeoutCutoff)
+      end
+
+      it "wraps the block in a timeout" do
+        Timeout.expects(:timeout).with(15).yields
+        ran = false
+        Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true }
+        expect(ran).to eq true
+      end
+
+      it "increments the counter when the block is called" do
+        counter = Canvas::FailurePercentCounter.new(Canvas.redis,
+          "service:timeouts:spec:percent_counter")
+        counter.expects(:failure_rate).returns(0.0)
+        counter.expects(:increment_count)
+        Canvas::FailurePercentCounter.expects(:new).returns(counter)
+        Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) { }
+      end
+
+      it "raises Timeout::Error on timeout" do
+        Timeout.expects(:timeout).raises(Timeout::Error)
+        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) {} }.
+          to raise_error(Timeout::Error)
+      end
+
+      it "increments the failure count on timeout" do
+        Timeout.expects(:timeout).raises(Timeout::Error)
+        counter = Canvas::FailurePercentCounter.new(Canvas.redis,
+          "service:timeouts:spec:percent_counter")
+        counter.expects(:failure_rate).returns(0.0)
+        counter.expects(:increment_count)
+        counter.expects(:increment_failure)
+        Canvas::FailurePercentCounter.expects(:new).returns(counter)
+        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) {} }.
+          to raise_error(Timeout::Error)
+      end
+
+      it "sets the protection activated key if failure rate too high" do
+        counter = Canvas::FailurePercentCounter.new(Canvas.redis,
+          "service:timeouts:spec:percent_counter")
+        counter.expects(:failure_rate).returns(0.2)
+        Canvas::FailurePercentCounter.expects(:new).returns(counter)
+        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) {} }.
+          to raise_error(Timeout::Error)
+        key = "service:timeouts:spec:percent_counter:protection_activated"
+        expect(Canvas.redis.get(key)).to eq "true"
+        expect(Canvas.redis.ttl(key)).to be_present
       end
     end
   end

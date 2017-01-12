@@ -18,7 +18,7 @@
 
 class Eportfolio < ActiveRecord::Base
   include Workflow
-  attr_accessible :name, :public, :user
+  strong_params
 
   has_many :eportfolio_categories, -> { order(:position) }, dependent: :destroy
   has_many :eportfolio_entries, :dependent => :destroy

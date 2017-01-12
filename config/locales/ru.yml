@@ -11698,9 +11698,9 @@ ru:
         strip_insignificant_zeros: false
         unit: $
     format: 
-      delimiter: ","
+      delimiter: " "
       precision: 3
-      separator: "."
+      separator: " "
       significant: false
       strip_insignificant_zeros: false
     human: 

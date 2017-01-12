@@ -73,16 +73,19 @@ describe Autoextend do
   # be run in the same process as other specs
   describe "ActiveSupport" do
     it "should hook an autoloaded module" do
-      hooked = false
+      hooked = 0
       Autoextend.hook(:"AutoextendSpec::TestModule") do
-        hooked = true
+        hooked += 1
+      end
+      Autoextend.hook(:"AutoextendSpec::TestModule::Nested") do
+        hooked += 1
       end
       defined?(AutoextendSpec::TestModule).must_equal(nil)
-      hooked.must_equal(false)
+      hooked.must_equal(0)
       _x = AutoextendSpec::TestModule
       # this could have only been detected by Rails' autoloading
       defined?(AutoextendSpec::TestModule).must_equal('constant')
-      hooked.must_equal(true)
+      hooked.must_equal(2)
     end
   end
 end

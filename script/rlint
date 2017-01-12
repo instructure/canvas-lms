@@ -1,84 +1,30 @@
 #!/usr/bin/env ruby
-$:.push File.expand_path("../../gems/dr_diff/lib", __FILE__)
-require 'dr_diff'
-require 'json'
+require_relative './linter'
 require 'optparse'
-require 'rubocop'
 
-def pretty_comment(comment)
-  message = ""
-  message += "[#{comment[:severity]}]".colorize(:yellow)
-  message += " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
-  message += " => #{comment[:message].colorize(:green)}"
-  puts message
-end
-
-def gerrit_patchset?
-  !!ENV['GERRIT_PATCHSET_REVISION']
-end
-
-def run_heavy_mode(ruby_files)
-  args = ruby_files
-  args_index = ARGV.index('--')
-  if args_index
-    args.concat(ARGV[(args_index + 1)..-1])
+linter_options = {
+  linter_name: "Rubocop",
+  file_regex: /\.rb$/,
+  format: "rubocop",
+  command: "bundle exec rubocop",
+  append_files_to_command: true,
+  severe_levels: [],
+  default_boyscout_mode: false,
+  heavy_mode_proc: proc do |ruby_files|
+    args = ruby_files
+    args_index = ARGV.index('--')
+    if args_index
+      args.concat(ARGV[(args_index + 1)..-1])
+    end
+    RuboCop::CLI.new.run(args)
   end
-  RuboCop::CLI.new.run(args)
-end
-
-env_sha = ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION']
-heavy_mode = false
-boyscout_mode = false
-plugin = ENV['GERRIT_PROJECT']
-plugin = nil if plugin == 'canvas-lms'
+}
 
 OptionParser.new do |opts|
-  opts.on("--heavy") { heavy_mode = true }
-  opts.on("--boy-scout") { boyscout_mode = true }
-  opts.on("--plugin PLUGIN") { |v| plugin = v }
+  opts.on("--heavy") { linter_options[:heavy_mode] = true }
+  opts.on("--boy-scout") { linter_options[:boyscout_mode] = true }
+  opts.on("--plugin PLUGIN") { |v| linter_options[:plugin] = v }
 end.parse!
 
-git_dir = "gems/plugins/#{plugin}/" if plugin
-if git_dir && !Dir.exist?(git_dir)
-  puts "No plugin #{plugin} found"
-  exit 0
-end
-
-dr_diff = DrDiff::Manager.new(git_dir: git_dir, sha: env_sha)
-ruby_files = dr_diff.files(/\.rb$/)
-
-if ruby_files.size == 0
-  puts "No ruby file changes found, skipping Rubocop check!"
-  exit 0
-end
-
-if heavy_mode
-  run_heavy_mode(ruby_files)
-else
-  severe_levels = boyscout_mode ? %w(error warn info) : %w(error warn)
-  comments = dr_diff.comments(format: "rubocop",
-                              command: "bundle exec rubocop #{ruby_files.join(' ')}",
-                              include_git_dir_in_output: !gerrit_patchset?,
-                              severe_levels: severe_levels)
-
-  unless comments.size >  0
-    puts "-- -- -- -- -- -- -- -- -- -- --"
-    puts "No relevant rubocop errors found!"
-    puts "-- -- -- -- -- -- -- -- -- -- --"
-    exit(0)
-  end
-
-  if gerrit_patchset?
-    require "gergich"
-    draft = Gergich::Draft.new
-    comments.each do |comment|
-      draft.add_comment comment[:path],
-                        comment[:position],
-                        comment[:message],
-                        comment[:severity]
-    end
-  else
-    require 'colorize'
-    comments.each { |comment| pretty_comment(comment) }
-  end
-end
+rlint = Linter.new(linter_options)
+rlint.run

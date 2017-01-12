@@ -305,7 +305,8 @@ module QuizzesCommon
   end
 
   def start_quiz_question
-    quiz_model(course: @course)
+    @context = @course
+    quiz_model
     open_quiz_edit_form
     click_questions_tab
     click_new_question_button

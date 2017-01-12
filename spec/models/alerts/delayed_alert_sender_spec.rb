@@ -173,7 +173,7 @@ module Alerts
         @assignment.workflow_state = "published"
         @assignment.save
         @submission = @assignment.submit_homework(@user)
-        SubmissionComment.create!(:submission => @submission, :comment => 'some comment', :author => @teacher, :recipient => @user) do |sc|
+        SubmissionComment.create!(:submission => @submission, :comment => 'some comment', :author => @teacher) do |sc|
           sc.created_at = Time.zone.now - 30.days
         end
 

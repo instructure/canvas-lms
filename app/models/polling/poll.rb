@@ -18,7 +18,7 @@
 
 module Polling
   class Poll < ActiveRecord::Base
-    attr_accessible :user, :question, :description
+    strong_params
 
     belongs_to :user
     has_many :poll_choices, -> { order(:position) }, class_name: 'Polling::PollChoice', dependent: :destroy

@@ -30,14 +30,15 @@ class Quizzes::Quiz < ActiveRecord::Base
   include SearchTermHelper
   include Canvas::DraftStateValidations
 
-  attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
-    :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
-    :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
-    :hide_results, :locked, :ip_filter, :require_lockdown_browser,
-    :require_lockdown_browser_for_results, :context, :notify_of_update,
-    :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at,
-    :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
-    :one_time_results, :only_visible_to_overrides, :show_correct_answers_last_attempt
+  # attr_accessible :title, :description, :points_possible, :assignment_id, :shuffle_answers,
+  #   :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy, :quiz_type,
+  #   :lock_at, :unlock_at, :due_at, :access_code, :anonymous_submissions, :assignment_group_id,
+  #   :hide_results, :locked, :ip_filter, :require_lockdown_browser,
+  #   :require_lockdown_browser_for_results, :context, :notify_of_update,
+  #   :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at,
+  #   :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
+  #   :one_time_results, :only_visible_to_overrides, :show_correct_answers_last_attempt
+  strong_params
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update

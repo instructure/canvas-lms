@@ -17,7 +17,7 @@
 #
 
 class Collaborator < ActiveRecord::Base
-  attr_accessible :authorized_service_user_id, :collaboration, :group, :user
+  strong_params
 
   belongs_to :collaboration
   belongs_to :group

@@ -16,7 +16,7 @@ define([
     renderTitle () {
       if (this.props.isSelected) {
         return (
-          <a href={`/courses/${this.props.assignment.context_id}/assignments/${this.props.assignment.assignmentId}`} title={this.props.assignment.name} className='item_name cmp-assignment__title-link'>
+          <a href={`/courses/${this.props.assignment.course_id}/assignments/${this.props.assignment.assignmentId}`} title={this.props.assignment.name} className='item_name cmp-assignment__title-link'>
             {this.props.assignment.name}
           </a>
         )

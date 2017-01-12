@@ -18,7 +18,7 @@
 module Lti
   class ToolProxyBinding < ActiveRecord::Base
 
-    attr_accessible :context, :tool_proxy, :enabled
+    strong_params
 
     belongs_to :tool_proxy, class_name: 'Lti::ToolProxy'
 

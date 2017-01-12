@@ -23,7 +23,7 @@ class RubricAssessment < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
 
-  attr_accessible :rubric, :rubric_association, :user, :score, :data, :assessor, :artifact, :assessment_type
+  strong_params
   belongs_to :rubric
   belongs_to :rubric_association
   belongs_to :user

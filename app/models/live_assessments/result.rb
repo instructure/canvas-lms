@@ -18,7 +18,7 @@
 
 module LiveAssessments
   class Result < ActiveRecord::Base
-    attr_accessible :user, :assessor, :passed, :assessed_at
+    strong_params
 
     belongs_to :assessor, class_name: 'User'
     belongs_to :user

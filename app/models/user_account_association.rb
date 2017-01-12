@@ -22,5 +22,5 @@ class UserAccountAssociation < ActiveRecord::Base
 
   validates_presence_of :user_id, :account_id
 
-  attr_accessible :account_id, :depth
+  strong_params
 end

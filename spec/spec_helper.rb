@@ -235,12 +235,6 @@ end
 examples = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/shared_examples/*.rb"
 Dir.glob(examples).each { |file| require file }
 
-def pend_with_bullet
-  if defined?(Bullet) && Bullet.enable?
-    skip ('PENDING: Bullet')
-  end
-end
-
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition. This does not prevent 'context' from being

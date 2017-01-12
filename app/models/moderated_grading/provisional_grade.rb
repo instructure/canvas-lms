@@ -1,7 +1,7 @@
 class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   include Canvas::GradeValidations
 
-  attr_accessible :grade, :score, :final, :graded_anonymously
+  strong_params
   attr_writer :force_save
 
   belongs_to :submission, inverse_of: :provisional_grades

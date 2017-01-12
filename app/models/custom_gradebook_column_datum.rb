@@ -19,7 +19,7 @@
 class CustomGradebookColumnDatum < ActiveRecord::Base
   belongs_to :custom_gradebook_column
 
-  attr_accessible :content
+  strong_params
 
   validates_length_of :content, :maximum => maximum_string_length,
     :allow_nil => true

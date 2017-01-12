@@ -19,7 +19,7 @@
 class Pseudonym < ActiveRecord::Base
   include Workflow
 
-  attr_accessible :user, :account, :password, :password_confirmation, :path, :path_type, :password_auto_generated, :unique_id
+  strong_params
 
   has_many :session_persistence_tokens
   belongs_to :account

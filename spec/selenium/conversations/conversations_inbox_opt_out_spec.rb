@@ -26,7 +26,7 @@ describe "conversations new" do
         expect(@teacher.reload.disabled_inbox?).to be_falsey
         notification = Notification.create!(workflow_state: "active", name: "Conversation Message",
                              category: "Conversation Message", delay_for: 0)
-        policy = NotificationPolicy.create!(notification_id: notification.id, communication_channel_id: @teacher.email_channel.id, broadcast: true, frequency: "weekly")
+        policy = NotificationPolicy.create!(notification_id: notification.id, communication_channel_id: @teacher.email_channel.id, frequency: "weekly")
         @teacher.update_attribute(:unread_conversations_count, 3)
 
         get '/profile/communication'

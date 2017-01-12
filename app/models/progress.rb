@@ -22,7 +22,8 @@ class Progress < ActiveRecord::Base
        :assignment, :attachment, :epub_export,
        { context_user: 'User', quiz_statistics: 'Quizzes::QuizStatistics' }]
   belongs_to :user
-  attr_accessible :context, :tag, :completion, :message
+
+  strong_params
 
   validates_presence_of :context_id
   validates_presence_of :context_type

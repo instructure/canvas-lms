@@ -19,7 +19,8 @@
 class ContentParticipation < ActiveRecord::Base
   include Workflow
 
-  attr_accessible :content, :user, :workflow_state
+  ACCESSIBLE_ATTRIBUTES = [:content, :user, :workflow_state].freeze
+  strong_params
 
   belongs_to :content, polymorphic: [:submission]
   belongs_to :user
@@ -43,7 +44,7 @@ class ContentParticipation < ActiveRecord::Base
     unique_constraint_retry do
       participant = content.content_participations.where(:user_id => user).first
       participant ||= content.content_participations.build(:user => user, :workflow_state => "unread")
-      participant.attributes = opts.slice(*ContentParticipation.accessible_attributes.to_a)
+      participant.attributes = opts.slice(*ACCESSIBLE_ATTRIBUTES)
       participant.save if participant.new_record? || participant.changed?
     end
     participant

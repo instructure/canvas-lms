@@ -313,6 +313,19 @@ module SIS
                 msg += enrollment.errors.full_messages.join(",") + ")"
                 @messages << msg
                 next
+              rescue ActiveRecord::RecordNotUnique
+                if @retry == true
+                  msg = "An enrollment failed to save "
+                  msg += "(course: #{course_id}, section: #{section_id}, "
+                  msg += "user: #{user_id}, role: #{role_name}, error: " +
+                    msg += enrollment.errors.full_messages.join(",") + ")"
+                  @messages << msg
+                  @retry = false
+                else
+                  @enrollment_batch.unshift(enrollment)
+                  @retry = true
+                end
+                next
               end
             elsif @batch
               @enrollments_to_update_sis_batch_ids << enrollment.id

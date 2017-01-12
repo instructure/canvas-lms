@@ -43,7 +43,7 @@ describe "groups" do
       it_behaves_like 'announcements_page', :teacher
 
       it "should allow teachers to see announcements", priority: "1", test_id: 287049 do
-        @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @students.first)
+        @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @students.first)
         verify_member_sees_announcement
       end
 
@@ -55,7 +55,7 @@ describe "groups" do
       end
 
       it "should allow teachers to delete their own group announcements", priority: "1", test_id: 326522 do
-        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', User: @teacher)
+        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', user: @teacher)
 
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
@@ -64,7 +64,7 @@ describe "groups" do
       end
 
       it "should allow teachers to delete group member announcements", priority: "1", test_id: 326523 do
-        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', User: @students.first)
+        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', user: @students.first)
 
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
@@ -73,12 +73,12 @@ describe "groups" do
       end
 
       it "should let teachers edit their own announcements", priority: "1", test_id: 312865 do
-        @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'test message', User: @teacher)
+        @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'test message', user: @teacher)
         edit_group_announcement
       end
 
       it "should let teachers edit group member announcements", priority: "2", test_id: 323325 do
-        @testgroup.first.announcements.create!(title: 'Your Announcement', message: 'test message', User: @students.first)
+        @testgroup.first.announcements.create!(title: 'Your Announcement', message: 'test message', user: @students.first)
         edit_group_announcement
       end
     end

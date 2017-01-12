@@ -70,6 +70,7 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
 
 .ic-app-main-content__secondary {
   box-sizing: border-box;
+  min-width: 1px;
   padding: $ic-sp*2;
   position: relative; // note: this is also set for #right-side-wrapper in _#right-side.scss
   // prevent safari bug where content disappears on scroll

@@ -39,6 +39,9 @@ class Attachment < ActiveRecord::Base
   include HasContentTags
   include ContextModuleItem
   include SearchTermHelper
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:display_name, :uploaded_data]
+  restrict_columns :settings, [:folder_id, :locked, :lock_at, :unlock_at, :usage_rights_id]
 
   attr_accessor :podcast_associated_asset
 
@@ -272,6 +275,7 @@ class Attachment < ActiveRecord::Base
     end
     dup.context = context
     dup.migration_id = options[:migration_id] || CC::CCHelper.create_key(self)
+    dup.mark_as_importing!(options[:migration]) if options[:migration]
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
     end
@@ -643,11 +647,18 @@ class Attachment < ActiveRecord::Base
 
   def handle_duplicates(method, opts = {})
     return [] unless method.present? && self.folder
+
     if self.folder.for_submissions?
       method = :rename
     else
       method = method.to_sym
     end
+
+    if method == :overwrite
+      atts = self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id)
+      method = :rename if atts.any? { |att| att.editing_restricted?(:any) }
+    end
+
     deleted_attachments = []
     if method == :rename
       self.save! unless self.id
@@ -669,7 +680,6 @@ class Attachment < ActiveRecord::Base
         end
       end
     elsif method == :overwrite
-      atts = self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id)
       atts.update_all(:replacement_attachment_id => self) # so we can find the new file in content links
       copy_access_attributes!(atts.first) unless atts.empty?
       atts.each do |a|

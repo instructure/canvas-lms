@@ -148,6 +148,29 @@ module DrDiff
           expect(parser.relevant?("some_file.rb", 66, true)).to be(true)
           expect(parser.relevant?("some_file.rb", 67, true)).to be(false)
         end
+
+        context "with campsite mode turned off" do
+          let(:parser){ described_class.new(add_diff, true, false) }
+
+          it "is only true for touched lines" do
+            expect(parser.relevant?("some_file.rb", 60, true)).to be(true)
+            expect(parser.relevant?("some_file.rb", 61, true)).to be(true)
+            expect(parser.relevant?("some_file.rb", 62, true)).to be(true)
+          end
+
+          it "is not relevant for files in ranges that are not touched" do
+            expect(parser.relevant?("some_file.rb", 57, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 58, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 59, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 63, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 64, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 65, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 66, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 67, true)).to be(false)
+          end
+
+        end
+
       end
 
       context "for diffs with deletions" do
@@ -159,6 +182,18 @@ module DrDiff
           expect(parser.relevant?("some_file.rb", 60, true)).to be(true)
           expect(parser.relevant?("some_file.rb", 61, true)).to be(false)
         end
+
+        context "with campsite mode turned off" do
+          let(:parser){ described_class.new(subtractive_diff, true, false) }
+
+          it "does not count deletions as relevant" do
+            expect(parser.relevant?("some_file.rb", 55, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 56, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 60, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 61, true)).to be(false)
+          end
+        end
+
       end
     end
 

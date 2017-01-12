@@ -72,13 +72,13 @@
 
           <ul class="al-options">
             {{#if locked}}
-                {{#if can_unlock}}
+                {{#unless comments_disabled}}
                   <li>
                     <a href="#" class="icon-lock">
                       {{#t}}Open to Comments{{/t}}
                     </a>
                   </li>
-                {{/if}}
+                {{/unless}}
             {{else}}
               {{#if can_lock}}
                 <li>

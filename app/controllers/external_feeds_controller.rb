@@ -112,7 +112,7 @@ class ExternalFeedsController < ApplicationController
   # @returns ExternalFeed
   def create
     if authorized_action(@context.announcements.temp_record, @current_user, :create)
-      @feed = create_api_external_feed(@context, params, @current_user)
+      @feed = create_api_external_feed(@context, strong_params, @current_user)
       if @feed.save
         render :json => external_feed_api_json(@feed, @context, @current_user, session)
       else

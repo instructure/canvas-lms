@@ -1,9 +1,12 @@
 module DrDiff
   class DiffParser
     attr_reader :diff
+    attr_reader :campsite
 
-    def initialize(input, raw = true)
+    # campsite = true: consider relevant the severe linter errors near lines changed
+    def initialize(input, raw = true, campsite=true)
       @diff = (raw ? parse_raw_diff(input) : input)
+      @campsite = campsite
     end
 
     def relevant?(path, line_number, severe=false)
@@ -12,12 +15,10 @@ module DrDiff
         if severe
           diff[path][:change].include?(line_number)
         end
+      elsif campsite && severe
+        diff[path][:context].any?{|range| range.include?(line_number)}
       else
-        if severe
-          diff[path][:context].any?{|range| range.include?(line_number)}
-        else
-          diff[path][:change].include?(line_number)
-        end
+        diff[path][:change].include?(line_number)
       end
     end
 
@@ -38,7 +39,6 @@ module DrDiff
           parsed[key][:context] << range
           cur_line_number = range.first
         end
-
         if code_line?(line)
           if touched?(line)
             parsed[key][:change] << cur_line_number

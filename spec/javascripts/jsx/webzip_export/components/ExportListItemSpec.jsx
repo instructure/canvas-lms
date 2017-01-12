@@ -7,7 +7,7 @@ define([
   module('ExportListItem')
 
   test('renders the ExportListItem component', () => {
-    const date = 'Sept 11, 2001 @ 8:46 AM'
+    const date = 'Sept 11, 2001 at 8:46am'
     const link = 'https://example.com/neverforget'
 
     const tree = TestUtils.renderIntoDocument(<ExportListItem date={date} link={link} />)

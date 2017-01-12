@@ -19,7 +19,7 @@
 module Lti
   class ResourceHandler < ActiveRecord::Base
 
-    attr_accessible :resource_type_code, :name, :description, :icon_info, :tool_proxy
+    strong_params
     attr_readonly :created_at
 
     belongs_to :tool_proxy, class_name: 'Lti::ToolProxy'

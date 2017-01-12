@@ -895,7 +895,7 @@ class DiscussionTopicsController < ApplicationController
 
   def process_discussion_topic(is_new = false)
     @errors = {}
-    discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)
+    discussion_topic_hash = strong_params.permit(*API_ALLOWED_TOPIC_FIELDS)
     model_type = value_to_boolean(discussion_topic_hash.delete(:is_announcement)) && @context.announcements.temp_record.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
     if is_new
       @topic = @context.send(model_type).build

@@ -22,7 +22,7 @@ class RoleOverride < ActiveRecord::Base
   belongs_to :role
   include Role::AssociationHelper
 
-  attr_accessible :context, :permission, :role, :enabled, :locked, :applies_to_self, :applies_to_descendants
+  strong_params
   validates :enabled, inclusion: [true, false]
   validates :locked, inclusion: [true, false]
 

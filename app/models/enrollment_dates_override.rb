@@ -20,7 +20,7 @@ class EnrollmentDatesOverride < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account]
   belongs_to :enrollment_term
 
-  attr_accessible :context, :enrollment_type, :enrollment_term, :start_at, :end_at
+  strong_params
 
   after_save :update_courses_and_states_if_necessary
 

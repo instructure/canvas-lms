@@ -23,7 +23,7 @@ class GroupMembership < ActiveRecord::Base
   belongs_to :group
   belongs_to :user
 
-  attr_accessible :group, :user, :workflow_state, :moderator
+  strong_params
 
   validates :group_id, :user_id, :workflow_state, :uuid, presence: true
   before_validation :assign_uuid

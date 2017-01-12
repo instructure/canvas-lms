@@ -33,7 +33,7 @@ class MediaObject < ActiveRecord::Base
   after_save :update_title_on_kaltura_later
   serialize :data
 
-  attr_accessible :media_id, :title, :context, :user
+  strong_params
 
   attr_accessor :podcast_associated_asset
 
