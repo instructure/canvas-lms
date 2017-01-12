@@ -97,7 +97,9 @@ describe "gradebook - post grades to SIS" do
 
       get "/courses/#{course.id}/gradebook"
       expect(f('button.external-tools-dialog')).to be_displayed
-      f('button.external-tools-dialog').click
+
+      # Click with javascript to avoid some page load errors in chrome
+      driver.execute_script("$('button.external-tools-dialog').click()")
       expect(f('iframe.post-grades-frame')).to be_displayed
     end
 
@@ -166,7 +168,7 @@ describe "gradebook - post grades to SIS" do
 
       expect(f('#post_grades .icon-mini-arrow-down')).to be_displayed
       move_to_click('button#post_grades')
-      f('li.post-grades-placeholder > a').click
+      f('a#post-grades-button').click
       expect(f('.post-grades-dialog')).to be_displayed
       # close post grade dialog
       fj('.ui-icon-closethick:visible').click
