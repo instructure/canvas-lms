@@ -103,6 +103,10 @@ define(['jquery', 'jsx/shared/CheatDepaginator', 'underscore'], ($, cheaterDepag
 
   const loadGradebookData = (opts) => {
     const gotAssignmentGroups = getAssignmentGroups(opts.assignmentGroupsURL, opts.assignmentGroupsParams);
+    if (opts.onlyLoadAssignmentGroups) {
+      return { gotAssignmentGroups };
+    }
+
     const gotEffectiveDueDates = getEffectiveDueDates(opts.effectiveDueDatesURL);
     const gotCustomColumns = getCustomColumns(opts.customColumnsURL);
     const gotStudents = getStudents(opts.studentsURL, opts.studentsParams, opts.studentsPageCb);
