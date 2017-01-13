@@ -249,6 +249,7 @@ describe AccountsController do
       course_with_teacher(:account => @account)
       Account.any_instance.expects(:fast_all_courses).with(has_entry(order: "courses.created_at DESC"))
       get 'show', :id => @account.id, :courses_sort_order => "created_at_desc", :format => 'html'
+      expect(@admin.reload.preferences[:course_sort]).to eq 'created_at_desc'
     end
 
     it 'can search and sort simultaneously' do
@@ -259,6 +260,7 @@ describe AccountsController do
       @account.courses.create! name: 'bleh Z'
       get 'courses', :account_id => @account.id, :course => { :name => 'blah' }, :courses_sort_order => 'name_desc', :format => 'html'
       expect(assigns['courses'].map(&:name)).to eq(['blah C', 'blah B', 'blah A'])
+      expect(@admin.reload.preferences[:course_sort]).to eq 'name_desc'
     end
   end
 
