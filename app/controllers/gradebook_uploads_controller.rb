@@ -96,6 +96,6 @@ class GradebookUploadsController < ApplicationController
   end
 
   def gradebook_upload_params
-    strong_params.require(:gradebook_upload).permit(:uploaded_data)
+    params.require(:gradebook_upload).permit(:uploaded_data)
   end
 end

@@ -2,8 +2,6 @@ class Profile < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course], exhaustive: false
   belongs_to :root_account, :class_name => 'Account'
 
-  strong_params
-
   serialize :data
 
   validates_presence_of :root_account

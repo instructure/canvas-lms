@@ -19,8 +19,6 @@
 class DiscussionEntryParticipant < ActiveRecord::Base
   include Workflow
 
-  strong_params
-
   belongs_to :discussion_entry
   belongs_to :user
 

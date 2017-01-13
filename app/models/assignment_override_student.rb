@@ -25,8 +25,6 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   after_save :destroy_override_if_needed
   after_destroy :destroy_override_if_needed
 
-  strong_params
-
   validates_presence_of :assignment_override, :user
   validates_uniqueness_of :user_id, :scope => [:assignment_id, :quiz_id],
     :message => 'already belongs to an assignment override'

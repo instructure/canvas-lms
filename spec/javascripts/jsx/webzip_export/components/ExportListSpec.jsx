@@ -16,4 +16,11 @@ define([
     const node = tree.find('.webzipexport__list')
     ok(node.exists())
   })
+
+  test('renders empty text if there are no exports', () => {
+    const exports = []
+    const tree = enzyme.shallow(<ExportList exports={exports} />)
+    const node = tree.find('.webzipexport__list')
+    equal(node.text(), 'No exports to display')
+  })
 })

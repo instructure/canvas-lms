@@ -5,8 +5,6 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
   belongs_to :content, :polymorphic => true
   validates_with MasterCourses::TagValidator
 
-  strong_params
-
   serialize :restrictions, Hash
   validate :require_valid_restrictions
 

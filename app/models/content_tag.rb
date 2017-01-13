@@ -54,8 +54,6 @@ class ContentTag < ActiveRecord::Base
 
   acts_as_list :scope => :context_module
 
-  strong_params
-
   set_policy do
     given {|user, session| self.context && self.context.grants_right?(user, session, :manage_content)}
     can :delete

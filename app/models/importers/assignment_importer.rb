@@ -33,7 +33,7 @@ module Importers
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.assignments.temp_record #new(:context => context)
-      
+
       item.mark_as_importing!(migration)
 
       item.title = hash[:title]
@@ -149,6 +149,9 @@ module Importers
           migration.add_imported_item(override,
             key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
+        if hash.has_key?(:only_visible_to_overrides)
+          item.only_visible_to_overrides = hash[:only_visible_to_overrides]          
+        end
       end
 
       if hash[:grading_standard_migration_id]
@@ -193,8 +196,7 @@ module Importers
        :automatic_peer_reviews, :anonymous_peer_reviews,
        :grade_group_students_individually, :allowed_extensions,
        :position, :peer_review_count, :muted, :moderated_grading,
-       :omit_from_final_grade, :intra_group_peer_reviews,
-       :only_visible_to_overrides
+       :omit_from_final_grade, :intra_group_peer_reviews
       ].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end

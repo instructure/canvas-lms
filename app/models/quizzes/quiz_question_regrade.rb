@@ -1,7 +1,6 @@
 class Quizzes::QuizQuestionRegrade < ActiveRecord::Base
   self.table_name = 'quiz_question_regrades'
 
-  strong_params
   belongs_to :quiz_question, :class_name => 'Quizzes::QuizQuestion'
   belongs_to :quiz_regrade, class_name: 'Quizzes::QuizRegrade'
 

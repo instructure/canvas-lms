@@ -105,6 +105,6 @@ class EportfolioCategoriesController < ApplicationController
   end
 
   def eportfolio_category_params
-    strong_params.require(:eportfolio_category).permit(:name)
+    params.require(:eportfolio_category).permit(:name)
   end
 end

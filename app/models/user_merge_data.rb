@@ -20,8 +20,6 @@ class UserMergeData < ActiveRecord::Base
   belongs_to :from_user, class_name: 'User'
   has_many :user_merge_data_records
 
-  strong_params
-
   scope :active, -> { where.not(workflow_state: 'deleted') }
   scope :splitable, -> { where('created_at > ?', split_time) }
 

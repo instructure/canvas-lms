@@ -73,14 +73,6 @@ define([
     });
   }
 
-  function calculateGrades () {
-    return CourseGradeCalculator.calculate(
-      ENV.submissions,
-      listAssignmentGroupsForGradeCalculation(),
-      ENV.group_weighting_scheme
-    );
-  }
-
   function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme) {
     var showTotalGradeAsPoints = ENV.show_total_grade_as_points;
 

@@ -21,8 +21,6 @@ class PageComment < ActiveRecord::Base
   belongs_to :user
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
 
-  strong_params
-
   scope :for_user, lambda { |user| where(:user_id => user) }
 
   def user_name

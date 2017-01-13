@@ -86,6 +86,7 @@ define [
     #
     # Returns nothing.
     fetchCollaborators: ->
+      @userList.collection.url = ENV.POTENTIAL_COLLABORATORS_URL
       @userList.collection.fetch(@fetchOptions)
       @groupList.collection.fetch(@fetchOptions) if @includeGroups
       if @options.edit
@@ -133,4 +134,3 @@ define [
     updateListFilters: (type, models) =>
       list = if type is 'user' then @userList else @groupList
       list.updateFilter(models)
-

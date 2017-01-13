@@ -33,8 +33,6 @@ class MediaObject < ActiveRecord::Base
   after_save :update_title_on_kaltura_later
   serialize :data
 
-  strong_params
-
   attr_accessor :podcast_associated_asset
 
   def user_entered_title=(val)

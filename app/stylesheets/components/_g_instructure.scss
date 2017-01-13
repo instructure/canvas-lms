@@ -220,10 +220,9 @@
   table.summary {
     margin: 5px 0px;
     width: 100%;
-    td, tbody th {
-      background-color: $lightBackground;
+    tbody th {
+      font-weight: bold;
     }
-    tbody th { font-weight: bold; }
   }
   table.notifications {
     border-top: 2px solid #999;

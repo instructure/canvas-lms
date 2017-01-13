@@ -425,7 +425,7 @@ class GroupsController < ApplicationController
   #
   # @returns Group
   def create
-    attrs = api_request? ? strong_params : strong_params.require(:group)
+    attrs = api_request? ? params : params.require(:group)
     attrs = attrs.permit(:name, :description, :join_level, :is_public, :storage_quota_mb, :max_membership)
 
     if api_request?
@@ -512,10 +512,10 @@ class GroupsController < ApplicationController
   # @returns Group
   def update
     find_group
-    attrs = api_request? ? strong_params : strong_params.require(:group)
+    attrs = api_request? ? params : params.require(:group)
     attrs = attrs.permit(:name, :description, :join_level, :is_public, :avatar_id, :storage_quota_mb, :max_membership,
       :leader => strong_anything, :members => strong_anything)
-    
+
     if !api_request? && params[:group][:group_category_id]
       group_category_id = params[:group].delete :group_category_id
       group_category = @context.group_categories.where(id: group_category_id).first

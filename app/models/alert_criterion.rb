@@ -19,8 +19,6 @@
 class AlertCriterion < ActiveRecord::Base
   belongs_to :alert
 
-  strong_params
-
   validates_numericality_of :threshold, :only_integer => true, :greater_than_or_equal_to => 0
 
 end

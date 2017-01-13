@@ -6,7 +6,5 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
   belongs_to :content, :polymorphic => true
   validates_with MasterCourses::TagValidator
 
-  strong_params
-
   serialize :downstream_changes, Array # an array of changed columns
 end

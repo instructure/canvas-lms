@@ -197,7 +197,7 @@ module Polling
     end
 
     def get_poll_params
-      strong_params.require(:polls)[0].permit(:question, :description)
+      params.require(:polls)[0].permit(:question, :description)
     end
   end
 end

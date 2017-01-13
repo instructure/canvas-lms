@@ -22,8 +22,6 @@ class UserService < ActiveRecord::Base
   belongs_to :user
   attr_accessor :password
 
-  strong_params
-
   validates_presence_of :user_id, :service, :service_user_id, :workflow_state
 
   before_save :infer_defaults

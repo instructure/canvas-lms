@@ -81,8 +81,6 @@ module CanvasRails
     # Activate observers that should always be running
     config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer, :conditional_release_observer ]
 
-    config.active_record.whitelist_attributes = false if CANVAS_RAILS4_2
-
     config.active_record.raise_in_transactional_callbacks = true # may as well opt into the new behavior
 
     config.active_support.encode_big_decimal_as_string = false
@@ -195,7 +193,7 @@ module CanvasRails
       #
       # Easiest way to avoid the warning for now is to patch thor
       def validate_default_type!
-        return if switch_name == "--serializer" 
+        return if switch_name == "--serializer"
         super
       end
     end

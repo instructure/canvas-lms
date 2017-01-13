@@ -34,9 +34,6 @@ class SisBatch < ActiveRecord::Base
   validates_length_of :diffing_data_set_identifier, maximum: 128
 
   attr_accessor :zip_path
-  #attr_accessible :batch_mode, :batch_mode_term
-  strong_params
-
   def self.max_attempts
     5
   end

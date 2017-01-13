@@ -631,7 +631,7 @@ class ContextModulesController < ApplicationController
   end
 
   def context_module_params
-    strong_params.require(:context_module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade, :requirement_count,
+    params.require(:context_module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade, :requirement_count,
       :completion_requirements => strong_anything, :prerequisites => strong_anything)
   end
 end

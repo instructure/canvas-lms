@@ -19,8 +19,6 @@
 require 'aws-sdk'
 
 class NotificationEndpoint < ActiveRecord::Base
-  strong_params
-
   belongs_to :access_token
 
   validates_presence_of :token, :access_token

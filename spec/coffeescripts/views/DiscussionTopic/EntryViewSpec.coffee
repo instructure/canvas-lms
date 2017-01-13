@@ -64,3 +64,22 @@ define [
     spy.reset()
     entry.set('replies', [])
     ok !spy.called, 'should not renderTree when value is empty'
+
+  test 'mark deleted and childless entries with css classes', ->
+    $('#fixtures').append($('<div />').attr('id', 'e1'))
+    entry = new Entry(id: 1, message: 'a comment, wooper', deleted: true, replies: [{id: 2, message: 'a reply', parent_id: 1, deleted: true}])
+    view = new EntryView(model: entry, el: '#e1')
+    view.render()
+    ok view.$el.hasClass('no-replies')
+    ok view.$el.hasClass('deleted')
+
+  test 'checks for deeply nested replies when marking childless entries', ->
+    $('#fixtures').append($('<div />').attr('id', 'e1'))
+    entry = new Entry(id: 1, message: 'a comment, wooper', deleted: true, replies: [
+      {id: 2, message: 'a reply', parent_id: 1, deleted: true, replies: [
+        {id: 3, message: 'another reply', parent_id: 2, deleted: true, replies: []},
+        {id: 4, message: 'not deleted', parent_id: 2}]}])
+    view = new EntryView(model: entry, el: '#e1')
+    view.render()
+    ok !view.$el.hasClass('no-replies')
+    ok view.$el.hasClass('deleted')

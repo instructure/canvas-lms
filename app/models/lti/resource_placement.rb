@@ -62,8 +62,6 @@ module Lti
       'Canvas.placements.assignmentConfiguration' => ASSIGNMENT_CONFIGURATION,
     }.freeze
 
-    strong_params
-
     belongs_to :message_handler, class_name: 'Lti::MessageHandler'
     belongs_to :resource_handler, class_name: 'Lti::ResourceHandler'
     validates_presence_of :message_handler, :placement

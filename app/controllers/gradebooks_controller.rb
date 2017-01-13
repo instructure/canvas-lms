@@ -411,7 +411,7 @@ class GradebooksController < ApplicationController
       end
 
       submissions = if params[:submissions]
-                      params[:submissions].values
+                      params[:submissions].map{|k, v| v} # apparently .values doesn't pass on the params
                     else
                       [params[:submission]]
                     end
@@ -428,13 +428,17 @@ class GradebooksController < ApplicationController
       submissions.compact.each do |submission|
         @assignment = assignments[submission[:assignment_id].to_i]
         @user = users[submission[:user_id].to_i]
+
+        submission = submission.permit(:grade, :score, :excuse, :excused,
+          :graded_anonymously, :provisional, :final,
+          :comment, :media_comment_id)
+
         submission[:grader] = @current_user
-        submission.delete :comment_attachments
         submission.delete(:provisional) unless @assignment.moderated_grading?
         if params[:attachments]
           attachments = []
           params[:attachments].keys.each do |idx|
-            attachment = strong_params[:attachments][idx].permit(Attachment.permitted_attributes)
+            attachment = params[:attachments][idx].permit(Attachment.permitted_attributes)
             attachment[:user] = @current_user
             attachments << @assignment.attachments.create(attachment)
           end
@@ -462,6 +466,7 @@ class GradebooksController < ApplicationController
           if [:comment, :media_comment_id, :comment_attachments].any? { |k| submission.key? k }
             submission[:commenter] = @current_user
             submission[:hidden] = @assignment.muted?
+
             subs = @assignment.update_submission(@user, submission)
             if submission[:provisional]
               subs.each do |sub|
@@ -631,7 +636,7 @@ class GradebooksController < ApplicationController
         @current_user.preferences[:gradebook_column_order] = {}
       end
 
-      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order]
+      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order].to_hash.with_indifferent_access
       @current_user.save!
       render json: nil
     end

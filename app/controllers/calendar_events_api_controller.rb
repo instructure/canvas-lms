@@ -806,7 +806,7 @@ class CalendarEventsApiController < ApplicationController
   def set_course_timetable
     get_context
     if authorized_action(@context, @current_user, :manage_calendar)
-      timetable_data = params[:timetables]
+      timetable_data = params[:timetables].to_hash.with_indifferent_access
 
       builders = {}
       updated_section_ids = []
@@ -894,7 +894,7 @@ class CalendarEventsApiController < ApplicationController
       section = api_find(@context.active_course_sections, params[:course_section_id]) if params[:course_section_id]
       builder = Courses::TimetableEventBuilder.new(course: @context, course_section: section)
 
-      event_hashes = params[:events]
+      event_hashes = params[:events].map{|h| h.to_hash.with_indifferent_access}
       event_hashes.each do |hash|
         [:start_at, :end_at].each do |key|
           hash[key] = CanvasTime.try_parse(hash[key])
@@ -1270,7 +1270,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def calendar_event_params
-    strong_params.require(:calendar_event).
+    params.require(:calendar_event).
       permit(CalendarEvent.permitted_attributes + [:child_event_data => strong_anything])
   end
 end

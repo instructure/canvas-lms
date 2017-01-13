@@ -98,7 +98,7 @@ describe "submissions" do
       expect_new_page_load { f('#submit_file_button').click }
 
       expect(f('#sidebar_content .header')).to include_text "Turned In!"
-      expect(f('.details .file-big')).to include_text "testfile1"
+      expect(f('.details')).to include_text "testfile1"
       @submission = @assignment.reload.submissions.where(user_id: @student).first
       expect(@submission.submission_type).to eq 'online_upload'
       expect(@submission.attachments.length).to eq 1
@@ -315,7 +315,7 @@ describe "submissions" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
         # Enter Submission Details page
-        fj(".forward:contains('Submission Details')").click
+        fj("a:contains('Submission Details')").click
 
         # Expect preview link to exist
         driver.switch_to.frame(f('#preview_frame'))
@@ -356,7 +356,7 @@ describe "submissions" do
         expect_new_page_load { f('#submit_file_button').click }
 
         expect(f('.details .header')).to include_text "Turned In!"
-        expect(f('.details .file-big')).to include_text "html-editing-test.html"
+        expect(f('.details')).to include_text "html-editing-test.html"
       end
 
       it "should not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1", test_id: 237031 do

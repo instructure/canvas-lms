@@ -310,6 +310,6 @@ class OutcomesController < ApplicationController
   end
 
   def learning_outcome_params
-    strong_params.require(:learning_outcome).permit(:description, :short_description, :title, :display_name, :vendor_guid)
+    params.require(:learning_outcome).permit(:description, :short_description, :title, :display_name, :vendor_guid)
   end
 end

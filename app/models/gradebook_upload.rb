@@ -17,8 +17,6 @@
 #
 
 class GradebookUpload < ActiveRecord::Base
-  strong_params
-
   belongs_to :course
   belongs_to :user
   belongs_to :progress

@@ -22,7 +22,6 @@ require 'atom'
 require_dependency 'assignment_student_visibility'
 
 class WikiPage < ActiveRecord::Base
-  strong_params
   attr_readonly :wiki_id
   attr_accessor :saved_by
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true

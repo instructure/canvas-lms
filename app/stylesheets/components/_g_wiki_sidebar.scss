@@ -32,14 +32,7 @@
   .page_list {
     li a {
       display: block;
-      padding: 3px 0 3px 20px;
-      background-image: url(/images/tick.png);
-      background-position: left center;
-      background-repeat: no-repeat;
-      &:hover {
-        background-image: url(/images/back.png);
-        background-color: #eee;
-      }
+      padding: $ic-sp/2 0;
     }
   }
   #pages_accordion {

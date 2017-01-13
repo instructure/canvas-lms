@@ -96,8 +96,8 @@ class OriginalityReportsApiController < ApplicationController
   def create
     if authorized_action(@assignment.context, @current_user, :manage_grades) &&
       @assignment.context.root_account.feature_enabled?(:plagiarism_detection_platform)
-      report_attributes = strong_params.require(:originality_report).permit(create_attributes).to_hash.merge(
-        {submission_id: strong_params.require(:submission_id)})
+      report_attributes = params.require(:originality_report).permit(create_attributes).to_hash.merge(
+        {submission_id: params.require(:submission_id)})
 
       @report = OriginalityReport.new(report_attributes)
       begin
@@ -136,10 +136,10 @@ class OriginalityReportsApiController < ApplicationController
   #
   # @returns OriginalityReport
   def update
-    if authorized_action(@assignment.context, @current_user, :manage_grades)&&
+    if authorized_action(@assignment.context, @current_user, :manage_grades) &&
       @assignment.context.root_account.feature_enabled?(:plagiarism_detection_platform)
 
-      if @report.update_attributes(strong_params.require(:originality_report).permit(update_attributes))
+      if @report.update_attributes(params.require(:originality_report).permit(update_attributes))
         render json: api_json(@report, @current_user, session)
       else
         render json: @report.errors, status: :bad_request
@@ -178,7 +178,7 @@ class OriginalityReportsApiController < ApplicationController
 
   def attachment_in_context
     @assignment = Assignment.find(params[:assignment_id])
-    attachment = Attachment.find(strong_params.require(:originality_report)[:file_id])
+    attachment = Attachment.find(params.require(:originality_report)[:file_id])
     submission = Submission.find(params[:submission_id])
     verify_submission_attachment(attachment, submission)
   end

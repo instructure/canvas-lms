@@ -178,8 +178,9 @@ describe "threaded discussions" do
     @last_entry = f("#entry-#{entry.id}")
     reply_text = "this is a reply"
     add_reply(reply_text)
-    wait_for_ajaximations # Chrome sometimes gives NoSuchElementError without this wait
+    expect { DiscussionEntry.count }.to become(2)
     subentry = DiscussionEntry.last
+    refresh_page
 
     expect(f("#entry-#{entry.id} #entry-#{subentry.id}")).to be_truthy, "precondition"
     edit_entry(entry, edit_text)
@@ -190,6 +191,7 @@ describe "threaded discussions" do
     entry_text = 'new entry'
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
 
+    fj('label[for="showDeleted"]').click()
     add_reply(entry_text)
     entry = DiscussionEntry.last
     delete_entry(entry)

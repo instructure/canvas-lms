@@ -4,7 +4,6 @@ class AccessToken < ActiveRecord::Base
   belongs_to :developer_key
   belongs_to :user
   has_one :account, through: :developer_key
-  strong_params
 
   serialize :scopes, Array
   validate :must_only_include_valid_scopes

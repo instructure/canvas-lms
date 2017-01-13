@@ -21,8 +21,6 @@ class UserProfile < ActiveRecord::Base
 
   delegate :short_name, :name, :asset_string, :opaque_identifier, :to => :user
 
-  strong_params
-
   has_many :links, :class_name => 'UserProfileLink', :dependent => :destroy
 
   validates_length_of :title, :maximum => maximum_string_length, :allow_blank => true

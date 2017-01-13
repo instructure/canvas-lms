@@ -40,6 +40,44 @@ define([
     })
   })
 
+  test('renders empty webzip list text if there are no exports from API', (assert) => {
+    const done = assert.async()
+    const data = []
+    moxios.stubRequest('/api/v1/courses/2/web_zip_exports', {
+      status: 200,
+      responseText: data
+    })
+    ENV.context_asset_string = 'courses_2'
+    const wrapper = enzyme.shallow(<WebZipExportApp />)
+    wrapper.instance().componentDidMount()
+    moxios.wait(() => {
+      const node = wrapper.find('ExportList')
+      ok(node.exists())
+      done()
+    })
+  })
+
+  test('does not render empty webzip text if there is an export in progress', (assert) => {
+    const done = assert.async()
+    const data = [{
+      created_at: '1776-12-25T22:00:00Z',
+      zip_attachment: null,
+      workflow_state: 'generating'
+    }]
+    moxios.stubRequest('/api/v1/courses/2/web_zip_exports', {
+      status: 200,
+      responseText: data
+    })
+    ENV.context_asset_string = 'courses_2'
+    const wrapper = enzyme.shallow(<WebZipExportApp />)
+    wrapper.instance().componentDidMount()
+    moxios.wait(() => {
+      const node = wrapper.find('ExportList')
+      equal(node.length, 0)
+      done()
+    })
+  })
+
   test('renders errors', (assert) => {
     const done = assert.async()
     moxios.stubRequest('/api/v1/courses/2/web_zip_exports', {

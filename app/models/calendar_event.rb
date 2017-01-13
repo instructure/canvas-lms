@@ -26,7 +26,6 @@ class CalendarEvent < ActiveRecord::Base
   include CopyAuthorizedLinks
   include TextHelper
   include HtmlTextHelper
-  strong_params
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]

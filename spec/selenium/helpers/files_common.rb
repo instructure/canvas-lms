@@ -139,14 +139,14 @@ module FilesCommon
 
   def add_folder(name = 'new folder')
     click_new_folder_button
-    new_folder = f("input.ef-edit-name-form__input")
+    new_folder = f("input[aria-label='Folder Name']")
     new_folder.send_keys(name)
     new_folder.send_keys(:return)
     wait_for_ajaximations
   end
 
   def click_new_folder_button
-    f(".btn-add-folder").click
+    f("button[aria-label='Add Folder']").click
     wait_for_ajaximations
   end
 

@@ -41,7 +41,7 @@ class DiscussionEntriesController < ApplicationController
     params[:discussion_entry].delete :remove_attachment rescue nil
     parent_id = params[:discussion_entry].delete(:parent_id)
 
-    entry_params = strong_params.require(:discussion_entry).permit(:message, :plaintext_message)
+    entry_params = params.require(:discussion_entry).permit(:message, :plaintext_message)
 
     @entry = @topic.discussion_entries.temp_record(entry_params)
     @entry.current_user = @current_user
@@ -93,7 +93,7 @@ class DiscussionEntriesController < ApplicationController
   def update
     @topic = @context.all_discussion_topics.active.find(params[:topic_id]) if params[:topic_id].present?
 
-    entry_params = (strong_params[:discussion_entry] || strong_params).permit(:message, :plaintext_message, :remove_attachment)
+    entry_params = (params[:discussion_entry] || params).permit(:message, :plaintext_message, :remove_attachment)
     entry_params[:message] = process_incoming_html_content(entry_params[:message]) if entry_params[:message]
 
     @remove_attachment = entry_params.delete :remove_attachment
@@ -212,7 +212,7 @@ class DiscussionEntriesController < ApplicationController
   def save_attachment
     return unless can_attach?
 
-    attachment_params = strong_params.require(:attachment).
+    attachment_params = params.require(:attachment).
       permit(Attachment.permitted_attributes)
     @attachment = @context.attachments.create(attachment_params)
     @entry.attachment = @attachment

@@ -183,7 +183,7 @@ class GroupMembershipsController < ApplicationController
   def update
     find_membership
     if authorized_action(@membership, @current_user, :update)
-      attrs = strong_params.permit(*UPDATABLE_MEMBERSHIP_ATTRIBUTES)
+      attrs = params.permit(*UPDATABLE_MEMBERSHIP_ATTRIBUTES)
       attrs.delete(:workflow_state) unless attrs[:workflow_state] == 'accepted'
       if @membership.update_attributes(attrs)
         render :json => group_membership_json(@membership, @current_user, session)

@@ -19,7 +19,6 @@
 class ContextModuleProgression < ActiveRecord::Base
   include Workflow
 
-  strong_params
   belongs_to :context_module
   belongs_to :user
   before_save :set_completed_at

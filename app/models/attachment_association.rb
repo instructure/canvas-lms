@@ -19,5 +19,4 @@
 class AttachmentAssociation < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :context, polymorphic: [:conversation_message, :submission, :course, :group]
-  strong_params
 end

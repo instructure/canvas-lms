@@ -5,8 +5,9 @@ class PopulateScoresTable < ActiveRecord::Migration[4.2]
     DataFixup::PopulateScoresTable.send_later_if_production_enqueue_args(
       :run,
       {
-        priority: Delayed::LOW_PRIORITY,
-        max_attempts: 1
+        priority: Delayed::LOWER_PRIORITY,
+        max_attempts: 1,
+        n_strand: "DataFixup::PopulateScoresTable:#{Shard.current.database_server.id}"
       }
     )
   end

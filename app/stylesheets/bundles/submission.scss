@@ -3,11 +3,18 @@
 .submission-details-header {
   margin-bottom: $ic-sp;
 }
-
 .submission-details-header__grade-summary {
   float: right;
 }
+.SubmissionDetails__Text {
+  padding-right: $ic-sp/2;
+  @include fontSize(12px);
 
+  &.late {
+  color: $ic-color-danger;
+  font-weight: bold;
+  }
+}
 .submission-details-container {
   border: 1px solid $ic-border-light;
   box-sizing: border-box;

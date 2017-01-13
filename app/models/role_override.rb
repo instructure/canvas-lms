@@ -22,7 +22,6 @@ class RoleOverride < ActiveRecord::Base
   belongs_to :role
   include Role::AssociationHelper
 
-  strong_params
   validates :enabled, inclusion: [true, false]
   validates :locked, inclusion: [true, false]
 

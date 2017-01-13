@@ -19,7 +19,6 @@
 class UserNote < ActiveRecord::Base
   include Workflow
 
-  strong_params
   belongs_to :user
   belongs_to :creator, :class_name => 'User', :foreign_key => :created_by_id
 

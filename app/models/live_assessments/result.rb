@@ -18,8 +18,6 @@
 
 module LiveAssessments
   class Result < ActiveRecord::Base
-    strong_params
-
     belongs_to :assessor, class_name: 'User'
     belongs_to :user
     belongs_to :assessment, class_name: 'LiveAssessments::Assessment'

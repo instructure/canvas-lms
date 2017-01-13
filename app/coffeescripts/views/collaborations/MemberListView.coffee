@@ -56,11 +56,10 @@ define [
     # Returns nothing.
     attachEvents: ->
       @collection.on('add remove reset', @render)
-                 .on('reset',  @onFetch)
+                 .on('reset sync',  @onFetch)
                  .on('remove', @deselectCollaborator)
 
     render: =>
-      @removeCurrentUser() if @options.currentUser
       @updateElementVisibility()
       collaboratorsHtml = @collection.map (c) =>
         collaboratorTemplate(extend(c.toJSON(),
@@ -89,7 +88,7 @@ define [
     # Returns nothing.
     removeCollaborator: (e) ->
       e.preventDefault()
-      id = $(e.currentTarget).data('id')
+      id = $(e.currentTarget).attr('data-id')
       @currentIndex = $(e.target).parent().index()
       @hasFocus     = true
       @collection.remove(id)
@@ -155,10 +154,3 @@ define [
     getNextPage: (header) ->
       nextPage = filter(header.split(','), (l) -> l.match(/next/))[0]
       return if nextPage then nextPage.match(/http[^>]+/)[0] else false
-
-    # Internal: Filter out the current user from the collection.
-    #
-    # Returns nothing.
-    removeCurrentUser: ->
-      @collection.remove(@collection.where(id: @options.currentUser, type: 'user'), silent: true)
-

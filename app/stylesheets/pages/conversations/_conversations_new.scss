@@ -205,10 +205,10 @@
   }
 
   .messages > li {
-    background: #fff;
+    background: $ic-color-light;
     box-sizing: border-box;
     cursor: pointer;
-    height: 100px;
+    height: 90px;
     padding: 8px 12px 8px 32px;
     position: relative;
     border-bottom: 1px solid $ic-border-light;
@@ -217,7 +217,7 @@
       background: $ic-bg-light-primary;
     }
     &:hover {
-      background: $ic-bg-light-primary;
+      box-shadow: inset -4px 0px 0px $ic-brand-primary;
     }
     &:hover .message-actions a, .message-actions a:focus {
       left: 0;
@@ -230,13 +230,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  h2.author {
     @include fontSize(13px);
     font-weight: bold;
-    line-height: 20px;
-    margin: 0px;
+    margin: 0;
   }
 
   .date {
@@ -244,11 +240,12 @@
   }
 
   .summary {
-    color: #7f7f7f;
+    color: $ic-font-color-dark;
     height: 40px;
     margin: 0 24px 0 0;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   p {
@@ -259,26 +256,20 @@
 }
 
 .subject {
+  margin: 0;
+  @include fontSize(13px);
   display: block;
   max-width: 80%;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 
   &:focus {
     outline: 0;
   }
 }
-
-h3.subject {
- margin: 0px 0px 8px 0;
- @include fontSize(13px);
- line-height: 20px;
-}
-
 h2.subject {
-  @include fontSize(13px);
   font-weight: bold;
-  margin: 0px;
 }
 
 .message-full-participants {
@@ -425,8 +416,10 @@ h2.subject {
   }
 
   .message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     height: 40px;
-    line-height: 40px;
     padding: 0 12px;
     border-bottom: 1px solid $ic-border-light;
 
@@ -465,7 +458,7 @@ h2.subject {
   }
 
   .message-info {
-    margin-bottom: 12px;
+    margin-bottom: $ic-sp;
   }
 
   .user-info {

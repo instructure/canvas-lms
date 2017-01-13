@@ -32,7 +32,6 @@ class PluginSetting < ActiveRecord::Base
   serialize :settings
   attr_accessor :posted_settings
 
-  strong_params
   attr_writer :plugin
 
   before_save :encrypt_settings

@@ -12,8 +12,6 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   serialize :default_restrictions, Hash
   validate :require_valid_restrictions
 
-  strong_params
-
   attr_accessor :child_course_count
   attr_writer :last_export_completed_at
 

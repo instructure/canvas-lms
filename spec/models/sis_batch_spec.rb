@@ -55,7 +55,7 @@ describe SisBatch do
 
   def process_csv_data(data, opts = {})
     create_csv_data(data) do |batch|
-      batch.update_attributes(opts, without_protection: true) if opts.present?
+      batch.update_attributes(opts) if opts.present?
       batch.process_without_send_later
       batch
     end

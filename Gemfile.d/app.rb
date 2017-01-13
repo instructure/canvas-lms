@@ -1,7 +1,6 @@
 if CANVAS_RAILS4_2
   gem 'rails', '4.2.7.1'
   gem 'rack', '1.6.4'
-  gem 'protected_attributes', '1.1.3'
   gem 'rails-observers', '0.1.2'
   gem 'activesupport-json_encoder', '1.1.0'
   gem 'oauth2', '1.0.0', require: false

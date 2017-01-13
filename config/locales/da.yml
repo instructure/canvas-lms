@@ -7124,7 +7124,7 @@ da:
   grade_export_title: Karaktereksport
   grade_info_19fb9875: "Karakter information"
   grade_summary: 
-    graph_title: "Middel %{mean}, Høj %{high}, Lav %{low}"
+    graph_title: "Middelværdi %{mean}, Høj %{high}, Lav %{low}"
     ? "no"
     : nej
     outcome: 
@@ -7408,7 +7408,7 @@ da:
         final_grade_hidden: "Beregning af samlede score er blevet deaktiveret"
         high: Høj
         low: Lav
-        mean: Gennemsnit
+        mean: Middelværdi
         only_graded: "Beregn udelukkende på basis af bedømte opgaver"
         total: "I alt"
         your_score: "Din score"

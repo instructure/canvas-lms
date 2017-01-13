@@ -18,7 +18,7 @@ module DataFixup::AddRoleOverridesForNewPermission
         new_ro = RoleOverride.new
         new_ro.permission = new_permission
         attrs = ro.attributes.slice(*%w{context_type context_id role_id locked enabled applies_to_self applies_to_descendants applies_to_env})
-        new_ro.assign_attributes(attrs, :without_protection => true)
+        new_ro.assign_attributes(attrs)
         new_ro.save!
       end
     end

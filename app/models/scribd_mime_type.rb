@@ -19,7 +19,5 @@
 class ScribdMimeType < ActiveRecord::Base
   has_many :attachments
 
-  strong_params
-
   self.shard_category = :unsharded
 end

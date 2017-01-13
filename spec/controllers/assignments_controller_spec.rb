@@ -113,7 +113,7 @@ describe AssignmentsController do
       #controller.use_rails_error_handling!
       user_session(@student)
 
-      get 'show', :course_id => @course.id, :id => 5
+      get 'show', :course_id => @course.id, :id => Assignment.maximum(:id) + 100
       assert_status(404)
     end
 

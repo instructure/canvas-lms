@@ -29,7 +29,6 @@ class AccountUser < ActiveRecord::Base
   after_destroy :touch_user
   after_save :update_account_associations_if_changed
   after_destroy :update_account_associations_later
-  strong_params
 
   validate :valid_role?
 

@@ -57,7 +57,7 @@ class RubricsController < ApplicationController
   # instead of the old one.
   def update
     association_params = params[:rubric_association] ?
-      strong_params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :bookmarked) : {}
+      params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :bookmarked) : {}
 
     @association_object = RubricAssociation.get_association_object(params[:rubric_association])
     params[:rubric][:user] = @current_user if params[:rubric]

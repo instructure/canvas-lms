@@ -17,7 +17,6 @@
 #
 
 class GroupCategory < ActiveRecord::Base
-  strong_params
   attr_reader :create_group_count
   attr_accessor :assign_unassigned_members, :group_by_section
 

@@ -379,7 +379,7 @@ class ConferencesController < ApplicationController
   end
 
   def conference_params
-    strong_params.require(:web_conference).
+    params.require(:web_conference).
       permit(:title, :duration, :description, :conference_type, :user_settings => strong_anything)
   end
 end

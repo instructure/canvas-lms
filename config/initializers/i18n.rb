@@ -1,7 +1,21 @@
 # loading all the locales has a significant (>30%) impact on the speed of initializing canvas
 # so we skip it in situations where we don't need the locales, such as in development mode and in rails console
-skip_locale_loading = (Rails.env.development? || Rails.env.test? || $PROGRAM_NAME == 'irb') &&
-    !ENV['RAILS_LOAD_ALL_LOCALES']
+skip_locale_loading = (Rails.env.development? ||
+  Rails.env.test? ||
+  $0 == 'irb' ||
+  $PROGRAM_NAME == 'rails_console' ||
+  $0 =~ /rake$/)
+if ENV['RAILS_LOAD_ALL_LOCALES']
+  skip_locale_loading = ENV['RAILS_LOAD_ALL_LOCALES'] == '0'
+end
+# always load locales for rake tasks that we know need them
+if $0 =~ /rake$/ && !($ARGV & ["i18n:generate_js",
+                               "canvas:compile_assets",
+                               "canvas:compile_assets_dev",
+                               "js:test"]).empty?
+  skip_locale_loading = false
+end
+
 load_path = Rails.application.config.i18n.railties_load_path
 if skip_locale_loading
   load_path.replace(load_path.grep(%r{/(locales|en)\.yml\z}))

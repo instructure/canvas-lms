@@ -7,8 +7,6 @@ class BrandConfig < ActiveRecord::Base
   OVERRIDE_TYPES = [:js_overrides, :css_overrides, :mobile_js_overrides, :mobile_css_overrides].freeze
   ATTRS_TO_INCLUDE_IN_MD5 = ([:variables, :parent_md5] + OVERRIDE_TYPES).freeze
 
-  strong_params
-
   validates :variables, presence: true, unless: :overrides?
   validates :md5, length: {is: 32}
 

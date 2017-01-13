@@ -1212,7 +1212,7 @@ class CoursesController < ApplicationController
     return unless authorized_action(@course, @current_user, :update)
 
     old_settings = @course.settings
-    @course.attributes = strong_params.permit(
+    @course.attributes = params.permit(
       :allow_student_discussion_topics,
       :allow_student_forum_attachments,
       :allow_student_discussion_editing,
@@ -1910,7 +1910,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :read) &&
       authorized_action(@context, @current_user, :read_as_admin)
-      args = strong_params.require(:course).permit(:name, :course_code)
+      args = params.require(:course).permit(:name, :course_code)
       account = @context.account
       if params[:course][:account_id]
         account = Account.find(params[:course][:account_id])
@@ -1940,7 +1940,7 @@ class CoursesController < ApplicationController
       if (adjust_dates = params[:adjust_dates]) && Canvas::Plugin.value_to_boolean(adjust_dates[:enabled])
         params[:date_shift_options][adjust_dates[:operation]] = '1'
       end
-      @content_migration.set_date_shift_options(params[:date_shift_options])
+      @content_migration.set_date_shift_options(params[:date_shift_options].to_hash.with_indifferent_access)
 
       if Canvas::Plugin.value_to_boolean(params[:selective_import])
         @content_migration.migration_settings[:import_immediately] = false
@@ -2349,7 +2349,7 @@ class CoursesController < ApplicationController
       return render(:json => { :message => 'must specify course_ids[]' }, :status => :bad_request) unless params[:course_ids].is_a?(Array)
       @course_ids = Api.map_ids(params[:course_ids], Course, @domain_root_account, @current_user)
       return render(:json => { :message => 'course batch size limit (500) exceeded' }, :status => :forbidden) if @course_ids.size > 500
-      update_params = params.slice(:event).with_indifferent_access
+      update_params = params.slice(:event).to_hash.with_indifferent_access
       return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless update_params[:event]
       return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(offer conclude delete undelete).include? update_params[:event]
       progress = Course.batch_update(@account, @current_user, @course_ids, update_params, :api)
@@ -2779,12 +2779,12 @@ class CoursesController < ApplicationController
   private
 
   def effective_due_dates_params
-    strong_params.permit(assignment_ids: [])
+    params.permit(assignment_ids: [])
   end
 
   def course_params
-    return {} unless strong_params[:course]
-    strong_params[:course].permit(:name, :group_weighting_scheme, :start_at, :conclude_at,
+    return {} unless params[:course]
+    params[:course].permit(:name, :group_weighting_scheme, :start_at, :conclude_at,
       :grading_standard_id, :is_public, :is_public_to_auth_users, :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :public_description, :allow_student_forum_attachments, :allow_student_discussion_topics, :allow_student_discussion_editing,
       :show_total_grade_as_points, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view,

@@ -25,7 +25,7 @@ define([
     constructor (props) {
       super(props)
       this.finishedStates = ['generated', 'failed']
-      this.state = {exports: [], errors: []}
+      this.state = {exports: [], errors: [], loaded: false}
       this.getExports = this.getExports.bind(this)
     }
 
@@ -54,6 +54,7 @@ define([
       axios.get(`/api/v1/courses/${courseId}/web_zip_exports`)
         .then((response) => {
           this.setState({
+            loaded: true,
             exports: WebZipExportApp.webZipFormat(response.data),
             errors: [],
           })
@@ -62,6 +63,7 @@ define([
           this.setState({
             exports: [],
             errors: [response],
+            loaded: true
           })
         })
     }
@@ -69,17 +71,17 @@ define([
     render () {
       const webzipInProgress = this.getExportsInProgress()
       let app = null
-      if (this.state.exports.length === 0 && this.state.errors.length === 0) {
-        app = (<Spinner size="small" title={I18n.t('Loading')} />)
-      } else if (this.state.exports.length === 0) {
-        app = (<Errors errors={this.state.errors} />)
-      } else {
+      if (!this.state.loaded) {
+        app = <Spinner size="small" title={I18n.t('Loading')} />
+      } else if (this.state.errors.length > 0) {
+        app = <Errors errors={this.state.errors} />
+      } else if (webzipInProgress === undefined) {
         const finishedExports = this.getFinishedExports()
-        app = (<ExportList exports={finishedExports} />)
+        app = <ExportList exports={finishedExports} />
       }
       return (
         <div>
-          <h1>{I18n.t('Course Content Downloads')}</h1>
+          <h1>{I18n.t('Exported Package History')}</h1>
           {app}
           <ExportInProgress webzip={webzipInProgress} loadExports={this.getExports} />
         </div>

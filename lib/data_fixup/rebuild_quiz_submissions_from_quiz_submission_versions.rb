@@ -83,7 +83,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
 
       if qs
         persisted_qs = Quizzes::QuizSubmission.where(id: qs_id).first || Quizzes::QuizSubmission.new
-        persisted_qs.assign_attributes(qs.attributes, without_protection: true)
+        persisted_qs.assign_attributes(qs.attributes)
       else
         Rails.logger.error LOG_PREFIX + "No matching version \tsubmission_id: #{submission.id}"
         return false

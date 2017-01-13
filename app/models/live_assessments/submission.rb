@@ -18,8 +18,6 @@
 
 module LiveAssessments
   class Submission < ActiveRecord::Base
-    strong_params
-
     belongs_to :user
     belongs_to :assessment, class_name: 'LiveAssessments::Assessment'
 

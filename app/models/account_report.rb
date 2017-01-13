@@ -18,7 +18,7 @@
 
 class AccountReport < ActiveRecord::Base
   include Workflow
-  strong_params
+
   belongs_to :account
   belongs_to :user
   belongs_to :attachment
