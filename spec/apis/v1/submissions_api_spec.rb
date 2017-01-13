@@ -3615,6 +3615,73 @@ describe 'Submissions API', type: :request do
       end
     end
   end
+
+  describe "list_gradeable_students_for_multiple_assignments" do
+    before(:once) do
+      course_with_teacher :active_all => true
+      ta_in_course :active_all => true
+      @student1 = student_in_course(:active_all => true).user
+      @student2 = student_in_course(:active_all => true).user
+      @assignment1 = @course.assignments.build
+      @assignment1.moderated_grading = true
+      @assignment1.save!
+      @assignment2 = @course.assignments.build
+      @assignment2.save!
+      @assignment_ids = [@assignment1.id, @assignment2.id]
+      @path = "/api/v1/courses/#{@course.id}/assignments/gradeable_students"
+      @params = { :controller => 'submissions_api', :action => 'multiple_gradeable_students',
+                  :format => 'json', :course_id => @course.to_param,
+                  :assignment_ids => [@assignment1.to_param, @assignment2.to_param] }
+    end
+
+    it "requires grading rights" do
+      api_call_as_user(@student1, :get, @path, @params, {}, {}, { :expected_status => 401 })
+    end
+
+    it "lists students" do
+      json = api_call_as_user(@ta, :get, @path, @params)
+
+      expect(json.map {|el| el['id'] }).to match_array([@student1.id, @student2.id])
+      expect(json[0]['assignment_ids']).to match_array(@assignment_ids)
+      expect(json[1]['assignment_ids']).to match_array(@assignment_ids)
+    end
+
+    it "paginates" do
+      json = api_call_as_user(@teacher, :get, @path + "?per_page=1", @params.merge(:per_page => '1'))
+      expect(json.size).to eq 1
+      expect(response.headers).to include 'Link'
+      expect(response.headers['Link']).to match(/rel="next"/)
+    end
+
+    it "limits access to sections user is a part of" do
+      section = add_section('Test Section')
+      section_teacher = teacher_in_section(section, :active_all => true, :limit_privileges_to_course_section => true)
+      section_student = student_in_section(section, :active_all => true)
+
+      json = api_call_as_user(section_teacher, :get, @path, @params)
+
+      expect(json.size).to eq 1
+      expect(json[0]['id']).to eq section_student.id
+    end
+
+    it "respects differentiated assignments" do
+      assignment = @course.assignments.build
+      section = add_section('Test Section')
+      section_teacher = teacher_in_section(section, :active_all => true)
+      section_student = student_in_section(section, :active_all => true)
+      differentiated_assignment(:assignment => assignment, :course_section => section)
+
+      differentiated_params = { :controller => 'submissions_api', :action => 'multiple_gradeable_students',
+                  :format => 'json', :course_id => @course.to_param,
+                  :assignment_ids => [@assignment.id] }
+
+      json = api_call_as_user(section_teacher, :get, @path, differentiated_params)
+
+      expect(json.size).to eq 1
+      expect(json[0]['id']).to eq section_student.id
+    end
+  end
+
   describe '#index' do
     context 'grouped_submissions' do
       let(:test_course) { course_factory() }
