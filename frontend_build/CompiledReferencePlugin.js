@@ -16,7 +16,7 @@ function rewritePluginPath (requestString) {
   const pluginName = pluginTranspiledRegexp.exec(requestString)[1]
   const relativePath = requestString.replace(`${pluginName}/compiled/`, '')
   if (jsxRegexp.test(requestString)) {
-    // this references a JSX file which already has "jsx" in it's file path
+    // this references a JSX file which already has "jsx" in its file path
     return `${pluginName}/app/${relativePath}`
   } else {
     // this references a coffeescript file which needs "coffeescripts" to
@@ -28,18 +28,19 @@ function rewritePluginPath (requestString) {
 class CompiledReferencePlugin {
   apply (compiler) {
     compiler.plugin('normal-module-factory', nmf => {
-      nmf.plugin('before-resolve', (result, callback) => {
+      nmf.plugin('before-resolve', (input, callback) => {
+        const result = input
         const requestString = result.request
 
         if (/^jsx\//.test(requestString)) {
-          // this is a jsx file in canvas. We have to require it with it's full
+          // this is a jsx file in canvas. We have to require it with its full
           // extension while we still have a require-js build or we risk loading
-          // it's compiled js instead
+          // its compiled js instead
           result.request = `${requestString}.jsx`
         } else if (/^jst\//.test(requestString)) {
-          // this is a handlebars file in canvas. We have to require it with it's full
+          // this is a handlebars file in canvas. We have to require it with its full
           // extension while we still have a require-js build or we risk loading
-          // it's compiled js instead
+          // its compiled js instead
           result.request = `${requestString}.handlebars`
         } else if (/^compiled\//.test(requestString)) {
           // this references a coffesscript file in canvas
