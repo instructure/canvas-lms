@@ -100,6 +100,12 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       expect(json.first).to have_key('in_closed_grading_period')
     end
 
+    it "includes due_date_required in returned json" do
+      @course.assignments.create!(title: "Example Assignment")
+      json = api_get_assignments_index_from_course(@course)
+      expect(json.first).to have_key('due_date_required')
+    end
+
     it "sorts the returned list of assignments" do
       # the API returns the assignments sorted by
       # [assignment_groups.position, assignments.position]

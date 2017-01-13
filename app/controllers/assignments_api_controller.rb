@@ -301,6 +301,11 @@
 #           "example": 2,
 #           "type": "integer"
 #         },
+#         "due_date_required": {
+#           "description": "Boolean flag indicating whether the assignment requires a due date based on the account level setting",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "allowed_extensions": {
 #           "description": "Allowed file extensions, which take effect if submission_types includes 'online_upload'.",
 #           "example": ["docx", "ppt"],
