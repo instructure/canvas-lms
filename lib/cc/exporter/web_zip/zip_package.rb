@@ -31,6 +31,7 @@ module CC::Exporter::WebZip
       begin
         add_files
         add_course_data
+        pull_dist_package
       ensure
         zip_file&.close
       end
@@ -74,6 +75,32 @@ module CC::Exporter::WebZip
           size: is_dir ? nil : File.size(path),
           files: is_dir ? next_files : nil
         }
+      end
+    end
+
+    def dist_package_path
+      'node_modules/canvas_offline_course_viewer/dist'
+    end
+
+    def pull_dist_package
+      path = dist_package_path
+      config = ConfigFile.load('offline_web', Rails.env)
+      if config&.fetch('local')
+        path = config['path_to_dist']
+      end
+      add_dir_to_zip(path, path)
+    end
+
+    def add_dir_to_zip(dir, base_path)
+      Dir.foreach(dir) do |file|
+        path = File.join(dir, file)
+        next if ['.', '..'].include? file
+        if File.directory?(path)
+          add_dir_to_zip(path, base_path)
+        else
+          path_in_zip = path.sub(base_path, '')
+          zip_file.add("#{@filename_prefix}/#{path_in_zip}", path)
+        end
       end
     end
 

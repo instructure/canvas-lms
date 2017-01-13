@@ -1,0 +1,10 @@
+development:
+  local: false
+  path_to_dist: /Users/youruserhere/src/canvas_offline_course_viewer/dist
+
+test:
+  local: false
+  path_to_dist: /Users/youruserhere/src/canvas_offline_course_viewer/dist
+
+production:
+  local: false
