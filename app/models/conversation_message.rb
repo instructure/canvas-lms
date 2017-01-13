@@ -29,7 +29,7 @@ class ConversationMessage < ActiveRecord::Base
   belongs_to :author, :class_name => 'User'
   belongs_to :context, polymorphic: [:account]
   has_many :conversation_message_participants
-  has_many :attachment_associations, :as => :context, :inverse_of => :context
+  has_many :attachment_associations, :as => :context
   # we used to attach submission comments to conversations via this asset
   # TODO: remove this column when we're sure we don't want this relation anymore
   belongs_to :asset, polymorphic: [:submission]

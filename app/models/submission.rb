@@ -71,10 +71,10 @@ class Submission < ActiveRecord::Base
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
   has_many :rubric_assessments, :as => :artifact
-  has_many :attachment_associations, :as => :context, :inverse_of => :context
+  has_many :attachment_associations, :as => :context
   has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
   has_many :originality_reports
-  has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact, inverse_of: :artifact
+  has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful

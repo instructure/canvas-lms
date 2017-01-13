@@ -24,7 +24,7 @@ class GroupCategory < ActiveRecord::Base
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
   has_many :progresses, :as => 'context', :dependent => :destroy
-  has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: :context, inverse_of: :context, class_name: 'Progress'
+  has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: 'context', class_name: 'Progress'
 
   after_save :auto_create_groups
   after_update :update_groups_max_membership

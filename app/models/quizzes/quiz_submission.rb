@@ -50,7 +50,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   after_save :context_module_action
   before_create :assign_validation_token
 
-  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :attachments, :as => :context, :dependent => :destroy
   has_many :events, class_name: 'Quizzes::QuizSubmissionEvent'
 
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this

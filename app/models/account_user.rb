@@ -22,7 +22,7 @@ class AccountUser < ActiveRecord::Base
   belongs_to :role
   include Role::AssociationHelper
 
-  has_many :role_overrides, :as => :context, :inverse_of => :context
+  has_many :role_overrides, :as => :context
   has_a_broadcast_policy
   before_validation :infer_defaults
   after_save :touch_user

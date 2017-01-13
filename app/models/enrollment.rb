@@ -41,7 +41,7 @@ class Enrollment < ActiveRecord::Base
 
   has_one :enrollment_state, :dependent => :destroy
 
-  has_many :role_overrides, :as => :context, :inverse_of => :context
+  has_many :role_overrides, :as => :context
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
   has_many :scores, -> { active }, dependent: :destroy

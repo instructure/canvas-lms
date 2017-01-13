@@ -28,7 +28,7 @@ class ContentMigration < ActiveRecord::Base
   belongs_to :source_course, :class_name => 'Course'
   has_one :content_export
   has_many :migration_issues
-  has_one :job_progress, :class_name => 'Progress', :as => :context, :inverse_of => :context
+  has_one :job_progress, :class_name => 'Progress', :as => :context
   serialize :migration_settings
   cattr_accessor :export_file_path
   before_save :set_started_at_and_finished_at

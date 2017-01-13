@@ -93,7 +93,7 @@ class Profile < ActiveRecord::Base
 
   module Association
     def self.prepended(klass)
-      klass.has_one :profile, as: :context, inverse_of: :context
+      klass.has_one :profile, as: :context
     end
 
     def profile

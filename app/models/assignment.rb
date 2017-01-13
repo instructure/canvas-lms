@@ -53,14 +53,14 @@ class Assignment < ActiveRecord::Base
 
   has_many :submissions, :dependent => :destroy
   has_many :provisional_grades, :through => :submissions
-  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :attachments, :as => :context, :dependent => :destroy
   has_many :assignment_student_visibilities
   has_one :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :assignment_group
   has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }
   has_one :wiki_page
-  has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
-  has_one :rubric_association, -> { where(purpose: 'grading').order(:created_at).preload(:rubric) }, as: :association, inverse_of: :association_object
+  has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, class_name: 'ContentTag'
+  has_one :rubric_association, -> { where(purpose: 'grading').order(:created_at).preload(:rubric) }, as: :association
   has_one :rubric, :through => :rubric_association
   has_one :teacher_enrollment, -> { preload(:user).where(enrollments: { workflow_state: 'active', type: 'TeacherEnrollment' }) }, class_name: 'TeacherEnrollment', foreign_key: 'course_id', primary_key: 'context_id'
   has_many :ignores, :as => :asset
@@ -74,7 +74,7 @@ class Assignment < ActiveRecord::Base
   has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'ContextExternalTool'
   has_many :tool_settings_tool_proxies, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'Lti::MessageHandler'
 
-  has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
   validate :discussion_group_ok?
