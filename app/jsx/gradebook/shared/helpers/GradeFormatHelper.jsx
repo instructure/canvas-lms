@@ -33,6 +33,27 @@ define([
 
       return formattedGrade;
     }
+
+    /**
+     * Given a localized point or percentage grade string,
+     * returns delocalized point or percentage string.
+     * Otherwise, returns input.
+     */
+    delocalizeGrade (localizedGrade) {
+      if (localizedGrade === undefined ||
+          localizedGrade === null ||
+          typeof localizedGrade !== 'string') {
+        return localizedGrade;
+      }
+
+      const delocalizedGrade = numberHelper.parse(localizedGrade.replace('%', ''));
+
+      if (isNaN(delocalizedGrade)) {
+        return localizedGrade;
+      }
+
+      return delocalizedGrade + (/%/g.test(localizedGrade) ? '%' : '');
+    }
   }
 
   return new GradeFormatHelper();

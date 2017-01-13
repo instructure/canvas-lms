@@ -45,4 +45,36 @@ define([
     strictEqual(numberHelper.parse.notCalled, true);
     strictEqual(I18n.n.notCalled, true);
   });
+
+  module('GradeFormatHelper#delocalizeGrade');
+
+  test('should return input value when input is not a string', () => {
+    strictEqual(GradeFormatHelper.delocalizeGrade(1), 1);
+    ok(isNaN(GradeFormatHelper.delocalizeGrade(NaN)));
+    strictEqual(GradeFormatHelper.delocalizeGrade(null), null);
+    strictEqual(GradeFormatHelper.delocalizeGrade(undefined), undefined);
+    strictEqual(GradeFormatHelper.delocalizeGrade(true), true);
+  });
+
+  test('should return input value when input is not a percent or point value', () => {
+    strictEqual(GradeFormatHelper.delocalizeGrade('A+'), 'A+');
+    strictEqual(GradeFormatHelper.delocalizeGrade('F'), 'F');
+    strictEqual(GradeFormatHelper.delocalizeGrade('Pass'), 'Pass');
+  });
+
+  test('should return non-localized point value when given a point value', () => {
+    const sandbox = sinon.sandbox.create();
+    sandbox.stub(numberHelper, 'parse').returns(123.45);
+    equal(GradeFormatHelper.delocalizeGrade('123,45'), '123.45');
+    ok(numberHelper.parse.calledWith('123,45'));
+    sandbox.restore();
+  });
+
+  test('should return non-localized percent value when given a percent value', () => {
+    const sandbox = sinon.sandbox.create();
+    sandbox.stub(numberHelper, 'parse').returns(12.34);
+    equal(GradeFormatHelper.delocalizeGrade('12,34%'), '12.34%');
+    ok(numberHelper.parse.calledWith('12,34'));
+    sandbox.restore();
+  });
 });

@@ -321,7 +321,7 @@ define [
         percent = 0 if isNaN(percent)
         setProperties student,
           total_grade: result
-          total_percent: percent
+          total_percent: I18n.n(percent, percentage: true)
 
     calculateAllGrades: (->
       @get('students').forEach (student) => @calculateStudentGrade student

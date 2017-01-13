@@ -50,7 +50,7 @@ define [
     deepEqual @component.get('values'), groupScores.assignment_group_1
 
   test 'points', ->
-    expected = "85.12 / 1000.11"
+    expected = "85.12 / 1,000.11"
     equal @component.get('points'), expected
 
   test 'percent', ->
@@ -62,5 +62,5 @@ define [
     equal @component.get('letterGrade'), expected
 
   test 'scoreDetail', ->
-    expected = "(85.12 / 1000.11)"
+    expected = "(85.12 / 1,000.11)"
     equal @component.get('scoreDetail'), expected
