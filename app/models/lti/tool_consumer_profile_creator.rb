@@ -44,6 +44,12 @@ module Lti
         action: ['POST']
       },
       {
+        id: 'vnd.Canvas.authorization',
+        endpoint: ->(context) { "api/lti/authorize" },
+        format: ['application/json'],
+        action: ['POST']
+      },
+      {
         id: 'ToolProxy.item',
         endpoint: 'api/lti/tool_proxy/{tool_proxy_guid}',
         format: ['application/vnd.ims.lti.v2.toolproxy+json'],

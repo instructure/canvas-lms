@@ -68,6 +68,16 @@ module Lti
         expect(reg_srv.action).to include('POST')
       end
 
+      it 'creates the authorization service' do
+        profile = subject.create
+        reg_srv = profile.service_offered.find { |srv| srv.id.include? 'vnd.Canvas.authorization' }
+        expect(reg_srv.id).to eq "#{tcp_url}#vnd.Canvas.authorization"
+        expect(reg_srv.endpoint).to include('api/lti/authorize')
+        expect(reg_srv.type).to eq 'RestService'
+        expect(reg_srv.format).to eq ["application/json"]
+        expect(reg_srv.action).to include('POST')
+      end
+
       it 'includes restricted services when developer_credentials is set to true' do
         restricted_service_id = 'vnd.Canvas.OriginalityReport'
         profile = subject.create(true)
