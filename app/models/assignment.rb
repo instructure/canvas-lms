@@ -137,10 +137,8 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def due_date_ok?
-    if sis_require_assignment_due_date? && self.post_to_sis.present? && self.due_at.blank?
-      errors.add(:due_at, I18n.t("due_at", "The Due date cannot be blank when Post to Sis is checked"))
-    end
+  def due_date_required?
+    AssignmentUtil.due_date_required?(self)
   end
 
   def secure_params
@@ -2309,9 +2307,10 @@ class Assignment < ActiveRecord::Base
 
   private
 
-  def sis_require_assignment_due_date?
-    self.try(:context).try(:account).try(:sis_require_assignment_due_date).try(:[], :value) &&
-    self.try(:context).try(:feature_enabled?, 'new_sis_integrations').present?
+  def due_date_ok?
+    unless AssignmentUtil.due_date_ok?(self)
+      errors.add(:due_at, I18n.t("due_at", "cannot be blank when Post to Sis is checked"))
+    end
   end
 end
 

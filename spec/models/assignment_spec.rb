@@ -3416,44 +3416,33 @@ describe Assignment do
 
   describe "due_date" do
     let(:assignment) do
+      @course.assignments.new(assignment_valid_attributes)
+    end
+
+    it "is valid when due_date_ok? is true" do
+      AssignmentUtil.stubs(:due_date_ok?).returns(true)
+      expect(assignment.valid?).to eq(true)
+    end
+
+    it "is not valid when due_date_ok? is false" do
+      AssignmentUtil.stubs(:due_date_ok?).returns(false)
+      expect(assignment.valid?).to eq(false)
+    end
+  end
+
+  describe "due_date_required?" do
+    let(:assignment) do
       @course.assignments.create!(assignment_valid_attributes)
     end
 
-    describe "when sis_require_assignment_due_date is true" do
-      it "is required when post_to_sis is true and feature_enabled(post_grades) is true" do
-        assignment.post_to_sis = true
-        assignment.due_at = nil
-        assignment.context.account.stubs(:sis_require_assignment_due_date).returns({value: true})
-        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
-        expect(assignment.valid?).to eq(false)
-      end
+    it "is true when due_date_required? is true" do
+      AssignmentUtil.stubs(:due_date_required?).returns(true)
+      expect(assignment.due_date_required?).to eq(true)
     end
 
-    describe "when sis_require_assignment_due_date is false" do
-      before do
-        assignment.context.account.stubs(:sis_require_assignment_due_date).returns({value: false})
-      end
-
-      it "is not required when post_to_sis is true and feature_enabled(post_grades) is false" do
-        assignment.post_to_sis = true
-        assignment.due_at = nil
-        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(false)
-        expect(assignment.valid?).to eq(true)
-      end
-
-      it "is not required when post_to_sis is false and feature_enabled(post_grades) is true" do
-        assignment.post_to_sis = false
-        assignment.due_at = nil
-        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
-        expect(assignment.valid?).to eq(true)
-      end
-
-      it "is not required when post_to_sis is false and feature_enabled(post_grades) is false" do
-        assignment.post_to_sis = false
-        assignment.due_at = nil
-        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(false)
-        expect(assignment.valid?).to eq(true)
-      end
+    it "is false when due_date_required? is false" do
+      AssignmentUtil.stubs(:due_date_required?).returns(false)
+      expect(assignment.due_date_required?).to eq(false)
     end
   end
 
