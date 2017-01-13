@@ -57,6 +57,11 @@
 #           "description": "The state of the term. Can be 'active' or 'deleted'.",
 #           "example": "active",
 #           "type": "string"
+#         },
+#         "overrides": {
+#           "description": "Term date overrides for specific enrollment types",
+#           "example": {"StudentEnrollment": {"start_at": "2014-01-07T08:00:00-05:00", "end_at": "2014-05-14T05:00:00-04:0"}},
+#           "type": "object"
 #         }
 #       }
 #     }
@@ -74,8 +79,42 @@ class TermsApiController < ApplicationController
   #   If set, only returns terms that are in the given state.
   #   Defaults to 'active'.
   #
-  # @returns [EnrollmentTerm]
+  # @argument include[] [String, "overrides"]
+  #   Array of additional information to include.
   #
+  #   "overrides":: term start/end dates overridden for different enrollment types
+  #
+  # @example_request
+  #   curl -H 'Authorization: Bearer <token>' \
+  #   https://<canvas>/api/v1/accounts/1/terms?include[]=overrides
+  #
+  # @example_response
+  #   {
+  #     "enrollment_terms": [
+  #       {
+  #         "id": 1,
+  #         "name": "Fall 20X6"
+  #         "start_at": "2026-08-31T20:00:00Z",
+  #         "end_at": "2026-12-20T20:00:00Z",
+  #         "created_at": "2025-01-02T03:43:11Z",
+  #         "workflow_state": "active",
+  #         "grading_period_group_id": 1,
+  #         "sis_term_id": null,
+  #         "overrides": {
+  #           "StudentEnrollment": {
+  #             "start_at": "2026-09-03T20:00:00Z",
+  #             "end_at": "2026-12-19T20:00:00Z"
+  #           },
+  #           "TeacherEnrollment": {
+  #             "start_at": null,
+  #             "end_at": "2026-12-30T20:00:00Z"
+  #           }
+  #         }
+  #       }
+  #     ]
+  #   }
+  #
+  # @returns [EnrollmentTerm]
   def index
     terms = @context.enrollment_terms.order('start_at DESC, end_at DESC, id ASC')
 
@@ -85,6 +124,6 @@ class TermsApiController < ApplicationController
     terms = terms.where(workflow_state: state) if state.present?
 
     terms = Api.paginate(terms, self, api_v1_enrollment_terms_url)
-    render json: { enrollment_terms: enrollment_terms_json(terms, @current_user, session) }
+    render json: { enrollment_terms: enrollment_terms_json(terms, @current_user, session, nil, Array(params[:include])) }
   end
 end
