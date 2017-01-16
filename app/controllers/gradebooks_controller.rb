@@ -346,6 +346,8 @@ class GradebooksController < ApplicationController
       :course_is_concluded => @context.completed?,
       :course_name => @context.name,
       :gradebook_is_editable => @gradebook_is_editable,
+      :context_allows_gradebook_uploads => @context.allows_gradebook_uploads?,
+      :gradebook_import_url => new_course_gradebook_upload_path(@context),
       :setting_update_url => api_v1_course_settings_url(@context),
       :show_total_grade_as_points => @context.settings[:show_total_grade_as_points],
       :publish_to_sis_enabled => @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
