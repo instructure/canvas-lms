@@ -65,8 +65,10 @@ define [
         VALID_DATE_RANGE: {},
         COURSE_ID: 1,
       })
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       $(".ui-dialog").remove()
       $("ul[id^=ui-id-]").remove()
@@ -250,6 +252,12 @@ define [
     ok view.$el.find('#has_group_category').attr('readonly')
     equal view.$el.find('#has_group_category').attr('aria-readonly'), 'true'
 
+  test 'does not disable post to sis when inClosedGradingPeriod', ->
+    ENV.POST_TO_SIS = true
+    view = @editView(in_closed_grading_period: true)
+    view.$el.appendTo $('#fixtures')
+    notOk view.$el.find('#assignment_post_to_sis').attr('disabled')
+
   test 'disableCheckbox is called for a disabled checkbox', ->
     view = @editView(in_closed_grading_period: true)
     view.$el.appendTo $('#fixtures')
@@ -312,8 +320,10 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById('fixtures').innerHTML = ''
 
@@ -331,8 +341,10 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById("fixtures").innerHTML = ""
 
@@ -356,8 +368,10 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById('fixtures').innerHTML = ''
 
@@ -387,8 +401,10 @@ define [
       fakeENV.setup()
       ENV.COURSE_ID = 1
       @stub(userSettings, 'contextGet').returns {submission_types: "foo", peer_reviews: "1", assignment_group_id: 99}
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById("fixtures").innerHTML = ""
 
@@ -426,8 +442,10 @@ define [
       fakeENV.setup()
       ENV.COURSE_ID = 1
       @stub(userSettings, 'contextGet').returns null
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById("fixtures").innerHTML = ""
 
@@ -444,8 +462,10 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById("fixtures").innerHTML = ""
 
@@ -475,8 +495,10 @@ define [
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
       ENV.CONDITIONAL_RELEASE_ENV = { assignment: { id: 1 }, jwt: 'foo' }
       $(document).on 'submit', -> false
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       $(document).off 'submit'
       document.getElementById("fixtures").innerHTML = ""
@@ -541,8 +563,10 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.COURSE_ID = 1
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById("fixtures").innerHTML = ""
 
@@ -576,8 +600,10 @@ define [
       fakeENV.setup()
       ENV.COURSE_ID = 1
       ENV.PLAGIARISM_DETECTION_PLATFORM = true
+      @server = sinon.fakeServer.create()
 
     teardown: ->
+      @server.restore()
       fakeENV.teardown()
       document.getElementById("fixtures").innerHTML = ""
 
