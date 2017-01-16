@@ -149,6 +149,15 @@ module MasterCourses::Restrictor
     @master_course_restrictions ||= find_master_course_restrictions || {}
   end
 
+  def master_course_api_restriction_data
+    hash = {}
+    if self.is_child_content?
+      hash['is_master_course_content'] = true
+      hash['restricted_by_master_course'] = self.editing_restricted?
+    end
+    hash
+  end
+
   def find_master_course_restrictions
     if @importing_migration
       @importing_migration.master_course_subscription.master_template.find_preloaded_restriction(self.migration_id) # for extra speeds on import
