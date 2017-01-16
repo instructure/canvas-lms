@@ -69,7 +69,7 @@ define([
           }
           title= {I18n.t('Delete')}
           aria-label= {I18n.t('Delete')}
-          dataTooltip= ''
+          data-tooltip=""
         >
           <i className='icon-trash' />
         </button>
@@ -87,7 +87,7 @@ define([
           onClick= {this.openUsageRightsDialog}
           title= {I18n.t('Manage Usage Rights')}
           aria-label= {I18n.t('Manage Usage Rights')}
-          dataTooltip= ''
+          data-tooltip=""
         >
           <i className= 'icon-files-copyright' />
         </button>
@@ -112,7 +112,7 @@ define([
           }.bind(this)}
           title= {I18n.t('Move')}
           aria-label= {I18n.t('Move')}
-          dataTooltip= ''
+          data-tooltip=""
         >
           <i className='icon-updown' />
         </button>
@@ -130,7 +130,7 @@ define([
             download= {true}
             title= {this.downloadTitle}
             aria-label= {this.downloadTitle}
-            dataTooltip= ''
+            data-tooltip=""
           >
             <i className='icon-download' />
           </a>
@@ -144,7 +144,7 @@ define([
             onClick= {this.downloadSelectedAsZip}
             title= {this.downloadTitle}
             aria-label= {this.downloadTitle}
-            dataTooltip= ''
+            data-tooltip=""
           >
             <i className='icon-download'/>
           </button>
@@ -169,7 +169,7 @@ define([
           onClick= {this.openRestrictedDialog}
           title= {I18n.t('Manage Access')}
           aria-label= {I18n.t('Manage Access')}
-          dataTooltip= ''
+          data-tooltip=""
         >
           <i className= 'icon-cloud-lock' />
         </button>
@@ -253,7 +253,7 @@ define([
               title= {selectedItemIsFolder ? I18n.t('Viewing folders is not available') : I18n.t('View')}
               role= 'button'
               aria-label= {selectedItemIsFolder ? I18n.t('Viewing folders is not available') : I18n.t('View')}
-              dataTooltip= ''
+              data-tooltip=""
               disabled= {!this.showingButtons || selectedItemIsFolder}
               tabIndex= {selectedItemIsFolder ? -1 : 0}
             >
