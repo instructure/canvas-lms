@@ -388,6 +388,7 @@ class AssignmentsController < ApplicationController
     rce_js_env(:highrisk)
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
+      return render_unauthorized_action if !@assignment.new_record? && editing_restricted?(@assignment)
       @assignment.title = params[:title] if params[:title]
       @assignment.due_at = params[:due_at] if params[:due_at]
       @assignment.points_possible = params[:points_possible] if params[:points_possible]
@@ -530,6 +531,7 @@ class AssignmentsController < ApplicationController
   def destroy
     @assignment = @context.assignments.active.api_id(params[:id])
     if authorized_action(@assignment, @current_user, :delete)
+      return render_unauthorized_action if editing_restricted?(@assignment)
       @assignment.destroy
 
       respond_to do |format|

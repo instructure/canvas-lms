@@ -368,7 +368,10 @@ define [
         'inClosedGradingPeriod'
       ]
 
-      hash = id: @get 'id'
+      hash =
+        id: @get('id'),
+        is_master_course_content: @get('is_master_course_content'),
+        restricted_by_master_course: @get('restricted_by_master_course')
       for field in fields
         hash[field] = @[field]()
       hash

@@ -301,6 +301,11 @@ module Api::V1::Assignment
     if assignment.context.present?
       hash['submissions_download_url'] = submissions_download_url(assignment.context, assignment)
     end
+
+    if opts[:include_master_course_restrictions]
+      hash.merge!(assignment.master_course_api_restriction_data)
+    end
+
     hash
   end
 
