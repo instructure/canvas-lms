@@ -369,7 +369,9 @@ module QuizzesCommon
   end
 
   def submit_quiz
-    expect_new_page_load(true) { f('#submit_quiz_button').click }
+    f('#submit_quiz_button').click
+    accept_alert if alert_present?
+    wait_for_ajax_requests
 
     expect(f('.quiz-submission .quiz_score .score_value')).to be_truthy
   end
