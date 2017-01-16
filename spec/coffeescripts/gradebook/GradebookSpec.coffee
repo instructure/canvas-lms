@@ -1,20 +1,69 @@
+#
+# Copyright (C) 2014 - 2017 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 define [
+  'spec/jsx/gradebook/GradeCalculatorSpecHelper'
   'compiled/gradebook/Gradebook'
   'jsx/gradebook/DataLoader'
   'underscore'
   'timezone'
   'compiled/SubmissionDetailsDialog'
   'jsx/gradebook/CourseGradeCalculator'
-], (Gradebook, DataLoader, _, tz, SubmissionDetailsDialog, CourseGradeCalculator) ->
-  module "Gradebook#calculateStudentGrade",
+], (GradeCalculatorSpecHelper, Gradebook, DataLoader, _, tz, SubmissionDetailsDialog, CourseGradeCalculator) ->
+  exampleGradebookOptions =
+    settings:
+      show_concluded_enrollments: 'true'
+      show_inactive_enrollments: 'true'
+    sections: []
+
+  createExampleGrades = GradeCalculatorSpecHelper.createCourseGradesWithGradingPeriods
+
+  module 'Gradebook'
+
+  test 'normalizes the grading period set from the env', ->
+    options = _.extend {}, exampleGradebookOptions,
+      grading_period_set:
+        id: '1501'
+        grading_periods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }]
+        weighted: true
+    gradingPeriodSet = new Gradebook(options).gradingPeriodSet
+    deepEqual(gradingPeriodSet.id, '1501')
+    equal(gradingPeriodSet.gradingPeriods.length, 2)
+    deepEqual(_.map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702'])
+
+  test 'sets grading period set to null when not defined in the env', ->
+    gradingPeriodSet = new Gradebook(exampleGradebookOptions).gradingPeriodSet
+    deepEqual(gradingPeriodSet, null)
+
+  module 'Gradebook#calculateStudentGrade',
     setupThis:(options = {}) ->
       assignments = [{ id: 201, points_possible: 10, omit_from_final_grade: false }]
       submissions = [{ assignment_id: 201, score: 10 }]
       defaults = {
-        gradingPeriodsEnabled: true
+        gradingPeriodToShow: '0'
+        isAllGradingPeriods: Gradebook.prototype.isAllGradingPeriods
         assignmentGroups: [{ id: 301, group_weight: 60, rules: {}, assignments }]
         options: { group_weighting_scheme: 'points' }
         gradingPeriods: [{ id: 701, weight: 50 }, { id: 702, weight: 50 }]
+        gradingPeriodSet:
+          id: '1501'
+          gradingPeriods: [{ id: '701', weight: 50 }, { id: '702', weight: 50 }]
+          weighted: true
         effectiveDueDates: { 201: { 101: { grading_period_id: '701' } } }
         submissionsForStudent: () ->
           submissions
@@ -25,49 +74,92 @@ define [
     setup: ->
       @calculate = Gradebook.prototype.calculateStudentGrade
 
-  test "calculates grades using properties from the gradebook", ->
+  test 'calculates grades using properties from the gradebook', ->
     self = @setupThis()
-    @stub(CourseGradeCalculator, 'calculate').returns(group_sums: [])
+    @stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
     @calculate.call(self, id: '101', loaded: true, initialized: true)
     args = CourseGradeCalculator.calculate.getCall(0).args
     equal(args[0], self.submissionsForStudent())
     equal(args[1], self.assignmentGroups)
     equal(args[2], self.options.group_weighting_scheme)
-    equal(args[3], self.gradingPeriods)
+    equal(args[3], self.gradingPeriodSet)
 
-  test "scopes effective due dates to the user", ->
+  test 'scopes effective due dates to the user', ->
     self = @setupThis()
-    @stub(CourseGradeCalculator, 'calculate').returns(group_sums: [])
+    @stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
     @calculate.call(self, id: '101', loaded: true, initialized: true)
     dueDates = CourseGradeCalculator.calculate.getCall(0).args[4]
     deepEqual(dueDates, 201: { grading_period_id: '701' })
 
-  test "calculates grades without grading period data grading periods are disabled", ->
-    self = @setupThis(gradingPeriodsEnabled: false)
-    @stub(CourseGradeCalculator, 'calculate').returns(group_sums: [])
+  test 'calculates grades without grading period data when grading period set is null', ->
+    self = @setupThis(gradingPeriodSet: null)
+    @stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
     @calculate.call(self, id: '101', loaded: true, initialized: true)
     args = CourseGradeCalculator.calculate.getCall(0).args
     equal(args[0], self.submissionsForStudent())
     equal(args[1], self.assignmentGroups)
     equal(args[2], self.options.group_weighting_scheme)
-    equal(args[3], undefined)
-    equal(args[4], undefined)
+    equal(typeof args[3], 'undefined')
+    equal(typeof args[4], 'undefined')
 
-  test "does not calculate when the student is not loaded", ->
-    self = @setupThis(gradingPeriodsEnabled: false)
-    @stub(CourseGradeCalculator, 'calculate').returns(group_sums: [])
+  test 'calculates grades without grading period data when effective due dates are not defined', ->
+    self = @setupThis(effectiveDueDates: null)
+    @stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
+    @calculate.call(self, id: '101', loaded: true, initialized: true)
+    args = CourseGradeCalculator.calculate.getCall(0).args
+    equal(args[0], self.submissionsForStudent())
+    equal(args[1], self.assignmentGroups)
+    equal(args[2], self.options.group_weighting_scheme)
+    equal(typeof args[3], 'undefined')
+    equal(typeof args[4], 'undefined')
+
+  test 'stores the current grade on the student when not including ungraded assignments', ->
+    exampleGrades = createExampleGrades()
+    self = @setupThis(include_ungraded_assignments: false)
+    @stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
+    student = { id: '101', loaded: true, initialized: true }
+    @calculate.call(self, student)
+    equal(student.total_grade, exampleGrades.current)
+
+  test 'stores the final grade on the student when including ungraded assignments', ->
+    exampleGrades = createExampleGrades()
+    self = @setupThis(include_ungraded_assignments: true)
+    @stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
+    student = { id: '101', loaded: true, initialized: true }
+    @calculate.call(self, student)
+    equal(student.total_grade, exampleGrades.final)
+
+  test 'stores the current grade from the selected grading period when not including ungraded assignments', ->
+    exampleGrades = createExampleGrades()
+    self = @setupThis(gradingPeriodToShow: 701, include_ungraded_assignments: false)
+    @stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
+    student = { id: '101', loaded: true, initialized: true }
+    @calculate.call(self, student)
+    equal(student.total_grade, exampleGrades.gradingPeriods[701].current)
+
+  test 'stores the final grade from the selected grading period when including ungraded assignments', ->
+    exampleGrades = createExampleGrades()
+    self = @setupThis(gradingPeriodToShow: 701, include_ungraded_assignments: true)
+    @stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
+    student = { id: '101', loaded: true, initialized: true }
+    @calculate.call(self, student)
+    equal(student.total_grade, exampleGrades.gradingPeriods[701].final)
+
+  test 'does not calculate when the student is not loaded', ->
+    self = @setupThis()
+    @stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
     @calculate.call(self, id: '101', loaded: false, initialized: true)
     notOk(CourseGradeCalculator.calculate.called)
 
-  test "does not calculate when the student is not initialized", ->
-    self = @setupThis(gradingPeriodsEnabled: false)
-    @stub(CourseGradeCalculator, 'calculate').returns(group_sums: [])
+  test 'does not calculate when the student is not initialized', ->
+    self = @setupThis()
+    @stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
     @calculate.call(self, id: '101', loaded: true, initialized: false)
     notOk(CourseGradeCalculator.calculate.called)
 
-  module "Gradebook#gradeSort"
+  module 'Gradebook#gradeSort'
 
-  test "gradeSort - total_grade", ->
+  test 'gradeSort - total_grade', ->
     gradeSort = (showTotalGradeAsPoints, a, b, field, asc) ->
       asc = true unless asc?
 
@@ -79,31 +171,31 @@ define [
     , {total_grade: {score: 10, possible: 20}}
     , {total_grade: {score: 5, possible: 10}}
     , 'total_grade') == 0
-    , "total_grade sorts by percent (normally)"
+    , 'total_grade sorts by percent (normally)'
 
     ok gradeSort(true
     , {total_grade: {score: 10, possible: 20}}
     , {total_grade: {score: 5, possible: 10}}
     , 'total_grade') > 0
-    , "total_grade sorts by score when if show_total_grade_as_points"
+    , 'total_grade sorts by score when if show_total_grade_as_points'
 
     ok gradeSort(true
     , {assignment_group_1: {score: 10, possible: 20}}
     , {assignment_group_1: {score: 5, possible: 10}}
     , 'assignment_group_1') == 0
-    , "assignment groups are always sorted by percent"
+    , 'assignment groups are always sorted by percent'
 
     ok gradeSort(false
     , {assignment1: {score: 5, possible: 10}}
     , {assignment1: {score: 10, possible: 20}}
     , 'assignment1') < 0
-    , "other fields are sorted by score"
+    , 'other fields are sorted by score'
 
   gradebookStubs = ->
     indexedOverrides: Gradebook.prototype.indexedOverrides
     indexedGradingPeriods: _.indexBy(@gradingPeriods, 'id')
 
-  module "Gradebook#hideAggregateColumns",
+  module 'Gradebook#hideAggregateColumns',
     setupThis: (options) ->
       customOptions = options || {}
       defaults =
@@ -161,9 +253,9 @@ define [
       @getStoredSortOrder = Gradebook.prototype.getStoredSortOrder
       @defaultSortType = 'assignment_group'
       @allAssignmentColumns = [
-          { object: { assignment_group: { position: 1 }, position: 1, name: "first" } },
-          { object: { assignment_group: { position: 1 }, position: 2, name: "second" } },
-          { object: { assignment_group: { position: 1 }, position: 3, name: "third" } }
+          { object: { assignment_group: { position: 1 }, position: 1, name: 'first' } },
+          { object: { assignment_group: { position: 1 }, position: 2, name: 'second' } },
+          { object: { assignment_group: { position: 1 }, position: 3, name: 'third' } }
         ]
       @aggregateColumns = []
       @parentColumns = []
@@ -194,17 +286,17 @@ define [
     setup: ->
       @excludedFields = Gradebook.prototype.fieldsToExcludeFromAssignments
 
-  test "includes 'description' in the response", ->
+  test 'includes "description" in the response', ->
     ok _.contains(@excludedFields, 'description')
 
-  test "includes 'needs_grading_count' in the response", ->
+  test 'includes "needs_grading_count" in the response', ->
     ok _.contains(@excludedFields, 'needs_grading_count')
 
-  module "Gradebook#submissionsForStudent",
+  module 'Gradebook#submissionsForStudent',
     setupThis: (options = {}) ->
       effectiveDueDates = {
-        1: { 1: { grading_period_id: "1" } },
-        2: { 1: { grading_period_id: "2" } }
+        1: { 1: { grading_period_id: '1' } },
+        2: { 1: { grading_period_id: '2' } }
       }
 
       defaults = {
@@ -217,32 +309,32 @@ define [
 
     setup: ->
       @student =
-        id: "1"
-        assignment_1: { assignment_id: "1", user_id: "1", name: "yolo" }
-        assignment_2: { assignment_id: "2", user_id: "1", name: "froyo" }
+        id: '1'
+        assignment_1: { assignment_id: '1', user_id: '1', name: 'yolo' }
+        assignment_2: { assignment_id: '2', user_id: '1', name: 'froyo' }
       @submissionsForStudent = Gradebook.prototype.submissionsForStudent
 
-  test "returns all submissions for the student (multiple grading periods disabled)", ->
+  test 'returns all submissions for the student (multiple grading periods disabled)', ->
     self = @setupThis()
     submissions = @submissionsForStudent.call(self, @student)
-    propEqual _.pluck(submissions, "assignment_id"), ["1", "2"]
+    propEqual _.pluck(submissions, 'assignment_id'), ['1', '2']
 
-  test "returns all submissions if 'All Grading Periods' is selected", ->
+  test 'returns all submissions if "All Grading Periods" is selected', ->
     self = @setupThis(
       gradingPeriodsEnabled: true,
-      gradingPeriodToShow: "0",
+      gradingPeriodToShow: '0',
       isAllGradingPeriods: -> true
     )
     submissions = @submissionsForStudent.call(self, @student)
-    propEqual _.pluck(submissions, "assignment_id"), ["1", "2"]
+    propEqual _.pluck(submissions, 'assignment_id'), ['1', '2']
 
-  test "only returns submissions due for the student in the selected grading period", ->
+  test 'only returns submissions due for the student in the selected grading period', ->
     self = @setupThis(
       gradingPeriodsEnabled: true,
-      gradingPeriodToShow: "2"
+      gradingPeriodToShow: '2'
     )
     submissions = @submissionsForStudent.call(self, @student)
-    propEqual _.pluck(submissions, "assignment_id"), ["2"]
+    propEqual _.pluck(submissions, 'assignment_id'), ['2']
 
   module 'Gradebook#studentsUrl',
     setupThis:(options) ->
@@ -271,9 +363,61 @@ define [
     self = @setupThis(showConcludedEnrollments: true, showInactiveEnrollments: true)
     equal @studentsUrl.call(self), 'students_with_concluded_and_inactive_enrollments_url'
 
+  module 'Gradebook#weightedGroups',
+    setup: ->
+      @weightedGroups = Gradebook.prototype.weightedGroups
+
+  test 'returns true when group_weighting_scheme is "percent"', ->
+    equal @weightedGroups.call(options: { group_weighting_scheme: 'percent' }), true
+
+  test 'returns false when group_weighting_scheme is not "percent"', ->
+    equal @weightedGroups.call(options: { group_weighting_scheme: 'points' }), false
+    equal @weightedGroups.call(options: { group_weighting_scheme: null }), false
+
+  module 'Gradebook#weightedGrades',
+    setupThis:(group_weighting_scheme, gradingPeriodSet) ->
+      { options: { group_weighting_scheme }, gradingPeriodSet }
+    setup: ->
+      @weightedGrades = Gradebook.prototype.weightedGrades
+
+  test 'returns true when group_weighting_scheme is "percent"', ->
+    self = @setupThis('percent', { weighted: false })
+    equal @weightedGrades.call(self), true
+
+  test 'returns true when the gradingPeriodSet is weighted', ->
+    self = @setupThis('points', { weighted: true })
+    equal @weightedGrades.call(self), true
+
+  test 'returns false when group_weighting_scheme is not "percent" and gradingPeriodSet is not weighted', ->
+    self = @setupThis('points', { weighted: false })
+    equal @weightedGrades.call(self), false
+
+  test 'returns false when group_weighting_scheme is not "percent" and gradingPeriodSet is not defined', ->
+    self = @setupThis('points', null)
+    equal @weightedGrades.call(self), false
+
+  module 'Gradebook#displayPointTotals',
+    setupThis:(show_total_grade_as_points, weightedGrades) ->
+      options: { show_total_grade_as_points }
+      weightedGrades: () -> weightedGrades
+    setup: ->
+      @displayPointTotals = Gradebook.prototype.displayPointTotals
+
+  test 'returns true when grades are not weighted and show_total_grade_as_points is true', ->
+    self = @setupThis(true, false)
+    equal @displayPointTotals.call(self), true
+
+  test 'returns false when grades are weighted', ->
+    self = @setupThis(true, true)
+    equal @displayPointTotals.call(self), false
+
+  test 'returns false when show_total_grade_as_points is false', ->
+    self = @setupThis(false, false)
+    equal @displayPointTotals.call(self), false
+
   module 'Gradebook#showNotesColumn',
     setup: ->
-      @loadNotes = @stub(DataLoader, "getDataForColumn")
+      @loadNotes = @stub(DataLoader, 'getDataForColumn')
 
     setupShowNotesColumn: (opts) ->
       defaultOptions =
@@ -323,7 +467,7 @@ define [
       }
 
     teardown: ->
-      @fixtureParent.innerHTML = ""
+      @fixtureParent.innerHTML = ''
       @fixture = undefined
       @fakeSubmissionDetailsDialog.restore()
 

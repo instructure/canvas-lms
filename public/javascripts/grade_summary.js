@@ -24,6 +24,7 @@ define([
   'jsx/gradebook/CourseGradeCalculator',
   'jsx/gradebook/EffectiveDueDates',
   'jsx/gradebook/GradingSchemeHelper',
+  'compiled/api/gradingPeriodSetsApi',
   'compiled/util/round',
   'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -32,26 +33,55 @@ define([
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment, mediaCommentThumbnail */
-], function (INST, I18n, $, _, CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, round, htmlEscape) {
+], function (
+  INST, I18n, $, _, CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, gradingPeriodSetsApi, round,
+  htmlEscape
+) {
   /* eslint-disable vars-on-top */
   /* eslint-disable newline-per-chained-call */
 
+  var GradeSummary = {
+    getGradingPeriodIdFromUrl (url) {
+      var matches = url.match(/grading_period_id=(\d*)/);
+      if (matches && matches[1] !== '0') {
+        return matches[1];
+      }
+      return null;
+    }
+  };
+
+  function getGradingPeriodSet () {
+    if (ENV.grading_period_set) {
+      return gradingPeriodSetsApi.deserializeSet(ENV.grading_period_set);
+    }
+    return null;
+  }
+
   function calculateGrades () {
-    if (ENV.effective_due_dates) {
-      return CourseGradeCalculator.calculate(
+    var grades;
+
+    if (ENV.effective_due_dates && ENV.grading_period_set) {
+      grades = CourseGradeCalculator.calculate(
         ENV.submissions,
         ENV.assignment_groups,
         ENV.group_weighting_scheme,
-        ENV.grading_periods,
+        getGradingPeriodSet(),
         EffectiveDueDates.scopeToUser(ENV.effective_due_dates, ENV.student_id)
+      );
+    } else {
+      grades = CourseGradeCalculator.calculate(
+        ENV.submissions,
+        ENV.assignment_groups,
+        ENV.group_weighting_scheme
       );
     }
 
-    return CourseGradeCalculator.calculate(
-      ENV.submissions,
-      ENV.assignment_groups,
-      ENV.group_weighting_scheme
-    );
+    var selectedGradingPeriodId = GradeSummary.getGradingPeriodIdFromUrl(location.href);
+    if (selectedGradingPeriodId) {
+      return grades.gradingPeriods[selectedGradingPeriodId];
+    }
+
+    return grades;
   }
 
   var whatIfAssignments = [];
@@ -83,15 +113,20 @@ define([
       return round((score / possible) * 100, round.DEFAULT);
     };
 
-    for (var i = 0; i < calculatedGrades.group_sums.length; i++) {
-      var groupSum = calculatedGrades.group_sums[i];
-      var $groupRow = $('#submission_group-' + groupSum.group.id);
-      var groupGradeInfo = groupSum[currentOrFinal];
+    for (var i = 0; i < ENV.assignment_groups.length; i++) {
+      var assignmentGroupId = ENV.assignment_groups[i].id;
+      var grade = calculatedGrades.assignmentGroups[assignmentGroupId];
+      var $groupRow = $('#submission_group-' + assignmentGroupId);
+      if (grade) {
+        grade = grade[currentOrFinal];
+      } else {
+        grade = { score: 0, possible: 0 };
+      }
       $groupRow.find('.grade').text(
-        calculateGrade(groupGradeInfo.score, groupGradeInfo.possible) + '%'
+        calculateGrade(grade.score, grade.possible) + '%'
       );
       $groupRow.find('.score_teaser').text(
-        round(groupGradeInfo.score, round.DEFAULT) + ' / ' + round(groupGradeInfo.possible, round.DEFAULT)
+        round(grade.score, round.DEFAULT) + ' / ' + round(grade.possible, round.DEFAULT)
       );
     }
 
@@ -141,11 +176,13 @@ define([
 
     // mark dropped assignments
     $('.student_assignment').find('.points_possible').attr('aria-label', '');
-    _.chain(calculatedGrades.group_sums).map(function (groupSum) {
-      return groupSum[currentOrFinal].submissions;
-    }).flatten().each(function (s) {
-      $('#submission_' + s.submission.assignment_id).toggleClass('dropped', !!s.drop);
+
+    _.forEach(calculatedGrades.assignmentGroups, function (grades) {
+      _.forEach(grades[currentOrFinal].submissions, function (submission) {
+        $('#submission_' + submission.submission.assignment_id).toggleClass('dropped', !!submission.drop);
+      });
     });
+
     $('.dropped').attr('aria-label', droppedMessage);
     $('.dropped').attr('title', droppedMessage);
 
@@ -468,12 +505,15 @@ define([
     });
   }
 
-  return {
+  _.extend(GradeSummary, {
     setup: setup,
     addWhatIfAssignment: addWhatIfAssignment,
     removeWhatIfAssignment: removeWhatIfAssignment,
+    getGradingPeriodSet: getGradingPeriodSet,
     listAssignmentGroupsForGradeCalculation: listAssignmentGroupsForGradeCalculation,
     calculateGrades: calculateGrades,
     calculateTotals: calculateTotals
-  }
+  });
+
+  return GradeSummary;
 });

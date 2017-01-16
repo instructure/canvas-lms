@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Instructure, Inc.
+ * Copyright (C) 2016 - 2017 Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -31,13 +31,13 @@ define([
   }
 
   function getWeightedPercent ({ score, possible, weight }) {
-    return (score / possible) * weight;
+    return score ? (score / possible) * weight : 0;
   }
 
   function combineAssignmentGroupGrades (assignmentGroupGrades, includeUngraded, options) {
     const scopedAssignmentGroupGrades = _.map(assignmentGroupGrades, (assignmentGroupGrade) => {
-      const sumVersion = includeUngraded ? assignmentGroupGrade.final : assignmentGroupGrade.current;
-      return { ...sumVersion, weight: assignmentGroupGrade.group.group_weight };
+      const gradeVersion = includeUngraded ? assignmentGroupGrade.final : assignmentGroupGrade.current;
+      return { ...gradeVersion, weight: assignmentGroupGrade.assignmentGroupWeight };
     });
 
     if (options.weightAssignmentGroups) {
@@ -67,19 +67,13 @@ define([
 
   function combineGradingPeriodGrades (gradingPeriodGradesByPeriodId, includeUngraded) {
     const scopedGradingPeriodGrades = _.map(gradingPeriodGradesByPeriodId, (gradingPeriodGrade) => {
-      const gradesVersion = includeUngraded ? gradingPeriodGrade.final : gradingPeriodGrade.current;
-      return { ...gradesVersion, weight: gradingPeriodGrade.weight };
+      const gradeVersion = includeUngraded ? gradingPeriodGrade.final : gradingPeriodGrade.current;
+      return { ...gradeVersion, weight: gradingPeriodGrade.gradingPeriodWeight };
     });
 
-    const weightedScores = _.map(scopedGradingPeriodGrades, (gradingPeriodGrade) => {
-      if (gradingPeriodGrade.score) {
-        return getWeightedPercent(gradingPeriodGrade);
-      }
-      return 0;
-    });
-
+    const weightedScores = _.map(scopedGradingPeriodGrades, getWeightedPercent);
     const totalWeight = sumBy(scopedGradingPeriodGrades, 'weight');
-    const totalScore = (sum(weightedScores) * 100) / Math.min(totalWeight, 100);
+    const totalScore = totalWeight === 0 ? 0 : (sum(weightedScores) * 100) / Math.min(totalWeight, 100);
 
     return {
       score: round(totalScore, 2),
@@ -88,6 +82,12 @@ define([
   }
 
   function divideGroupByGradingPeriods (assignmentGroup, effectiveDueDates) {
+    // When using weighted grading periods, assignment groups must not contain assignments due in different grading
+    // periods. This allows for calculated assignment group grades in closed grading periods to be accidentally
+    // changed if a related assignment is considered to be in an open grading period.
+    //
+    // To avoid this, assignment groups meeting this criteria are "divided" (duplicated) in a way where each
+    // instance of the assignment group includes assignments only from one grading period.
     const assignmentsByGradingPeriodId = _.groupBy(assignmentGroup.assignments, assignment => (
       effectiveDueDates[assignment.id].grading_period_id
     ));
@@ -96,80 +96,110 @@ define([
     ));
   }
 
-  function extractUsableAssignmentGroups (assignmentGroups, effectiveDueDates) {
-    return _.reduce(assignmentGroups, (usableGroups, assignmentGroup) => {
+  function extractPeriodBasedAssignmentGroups (assignmentGroups, effectiveDueDates) {
+    return _.reduce(assignmentGroups, (periodBasedGroups, assignmentGroup) => {
       const assignedAssignments = _.filter(assignmentGroup.assignments, assignment => (
         effectiveDueDates[assignment.id]
       ));
       if (assignedAssignments.length > 0) {
         const groupWithAssignedAssignments = { ...assignmentGroup, assignments: assignedAssignments };
         return [
-          ...usableGroups,
+          ...periodBasedGroups,
           ...divideGroupByGradingPeriods(groupWithAssignedAssignments, effectiveDueDates)
         ];
       }
-      return usableGroups;
+      return periodBasedGroups;
     }, []);
   }
 
-  function calculateWithGradingPeriods (
-    submissions, assignmentGroups, gradingPeriods, effectiveDueDates, options
-  ) {
-    const usableGroups = extractUsableAssignmentGroups(assignmentGroups, effectiveDueDates);
+  function recombinePeriodBasedAssignmentGroupGrades (grades) {
+    const map = {};
+    _.forEach(grades, (grade) => {
+      const previousGrade = map[grade.assignmentGroupId];
+      if (previousGrade) {
+        map[grade.assignmentGroupId] = {
+          ...previousGrade,
+          current: {
+            score: previousGrade.current.score + grade.current.score,
+            possible: previousGrade.current.possible + grade.current.possible
+          },
+          final: {
+            score: previousGrade.final.score + grade.final.score,
+            possible: previousGrade.final.possible + grade.final.possible
+          }
+        };
+      } else {
+        map[grade.assignmentGroupId] = grade;
+      }
+    });
+    return map;
+  }
 
-    const assignmentGroupsByGradingPeriodId = _.groupBy(usableGroups, (assignmentGroup) => {
+  function calculateWithGradingPeriods (submissions, assignmentGroups, gradingPeriods, effectiveDueDates, options) {
+    const periodBasedGroups = extractPeriodBasedAssignmentGroups(assignmentGroups, effectiveDueDates);
+
+    const assignmentGroupsByGradingPeriodId = _.groupBy(periodBasedGroups, (assignmentGroup) => {
       const assignmentId = assignmentGroup.assignments[0].id;
       return effectiveDueDates[assignmentId].grading_period_id;
     });
 
     const gradingPeriodsById = _.indexBy(gradingPeriods, 'id');
     const gradingPeriodGradesByPeriodId = {};
-    const allAssignmentGroupGrades = [];
+    const periodBasedAssignmentGroupGrades = [];
 
     _.forEach(gradingPeriods, (gradingPeriod) => {
       const groupGrades = {};
 
       (assignmentGroupsByGradingPeriodId[gradingPeriod.id] || []).forEach((assignmentGroup) => {
         groupGrades[assignmentGroup.id] = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup);
-        allAssignmentGroupGrades.push(groupGrades[assignmentGroup.id]);
+        periodBasedAssignmentGroupGrades.push(groupGrades[assignmentGroup.id]);
       });
 
       const groupGradesList = _.values(groupGrades);
 
       gradingPeriodGradesByPeriodId[gradingPeriod.id] = {
-        weight: gradingPeriodsById[gradingPeriod.id].weight,
+        gradingPeriodId: gradingPeriod.id,
+        gradingPeriodWeight: gradingPeriodsById[gradingPeriod.id].weight || 0,
+        assignmentGroups: groupGrades,
         current: combineAssignmentGroupGrades(groupGradesList, false, options),
         final: combineAssignmentGroupGrades(groupGradesList, true, options),
-        assignmentGroups: groupGrades
+        scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points'
       };
     });
 
     if (options.weightGradingPeriods) {
       return {
+        assignmentGroups: recombinePeriodBasedAssignmentGroupGrades(periodBasedAssignmentGroupGrades),
         gradingPeriods: gradingPeriodGradesByPeriodId,
-        group_sums: allAssignmentGroupGrades,
         current: combineGradingPeriodGrades(gradingPeriodGradesByPeriodId, false, options),
-        final: combineGradingPeriodGrades(gradingPeriodGradesByPeriodId, true, options)
+        final: combineGradingPeriodGrades(gradingPeriodGradesByPeriodId, true, options),
+        scoreUnit: 'percentage'
       };
     }
 
+    const allAssignmentGroupGrades = _.map(assignmentGroups, assignmentGroup => (
+      AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
+    ));
+
     return {
+      assignmentGroups: _.indexBy(allAssignmentGroupGrades, grade => grade.assignmentGroupId),
       gradingPeriods: gradingPeriodGradesByPeriodId,
-      group_sums: allAssignmentGroupGrades,
       current: combineAssignmentGroupGrades(allAssignmentGroupGrades, false, options),
-      final: combineAssignmentGroupGrades(allAssignmentGroupGrades, true, options)
+      final: combineAssignmentGroupGrades(allAssignmentGroupGrades, true, options),
+      scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points'
     };
   }
 
   function calculateWithoutGradingPeriods (submissions, assignmentGroups, options) {
-    const assignmentGroupGrades = _.map(assignmentGroups, group => (
-      AssignmentGroupGradeCalculator.calculate(submissions, group)
+    const assignmentGroupGrades = _.map(assignmentGroups, assignmentGroup => (
+      AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
     ));
 
     return {
-      group_sums: assignmentGroupGrades,
+      assignmentGroups: _.indexBy(assignmentGroupGrades, grade => grade.assignmentGroupId),
       current: combineAssignmentGroupGrades(assignmentGroupGrades, false, options),
-      final: combineAssignmentGroupGrades(assignmentGroupGrades, true, options)
+      final: combineAssignmentGroupGrades(assignmentGroupGrades, true, options),
+      scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points'
     };
   }
 
@@ -203,8 +233,12 @@ define([
   // When weightingScheme is `percent`, assignment group weights are used.
   // Otherwise, no weighting is applied.
   //
-  // Grading periods and effective due dates are optional, but must be used
+  // Grading period set and effective due dates are optional, but must be used
   // together.
+  //
+  // `gradingPeriodSet` is an object with at least the following shape:
+  // * gradingPeriods: [array of grading periods *see below]
+  // * weight: non-negative number
   //
   // Each grading period requires the following properties:
   // * id: Canvas id
@@ -224,19 +258,30 @@ define([
   // would otherwise include more information about a student's relationship
   // with an assignment and related grading periods.
   //
-  // GradingPeriod Grade information has the following shape:
-  // {
-  //   <grading period id (Canvas id)>: {
-  //     assignmentGroups: {
-  //       <assignment group id (Canvas id)>: <AssignmentGroup Grade information>
-  //     }
-  //   }
-  // }
-  //
-  // Course Grade information has the following shape:
+  // Grades minimally have the following shape:
   // {
   //   score: number|null
   //   possible: number|null
+  // }
+  //
+  // AssignmentGroup Grade maps have the following shape:
+  // {
+  //   <assignment group id (Canvas id)>: <AssignmentGroup Grade Set *see below>
+  // }
+  //
+  // GradingPeriod Grade Sets have the following shape:
+  // {
+  //   gradingPeriodId: <Canvas id>
+  //   gradingPeriodWeight: number
+  //   assignmentGroups: <AssignmentGroup Grade map>
+  //   current: <AssignmentGroup Grade *see below>
+  //   final: <AssignmentGroup Grade *see below>
+  //   scoreUnit: 'points'|'percent'
+  // }
+  //
+  // GradingPeriod Grade maps have the following shape:
+  // {
+  //   <grading period id (Canvas id)>: <GradingPeriod Grade Set *see above>
   // }
   //
   // Each grading period will have a map for assignment group grades, keyed to
@@ -244,25 +289,27 @@ define([
   // call to `calculate` will include grading period grades, as some courses do
   // not use grading periods.
   //
-  // AssignmentGroup Grade information is the returned result from the
+  // An AssignmentGroup Grade Set is the returned result from the
   // AssignmentGroupGradeCalculator.calculate function.
   //
-  // Return value has the following shape:
+  // Return value is a Course Grade Set.
+  // A Course Grade Set has the following shape:
   // {
-  //   gradingPeriods: <GradingPeriod Grade information *see above>
-  //   group_sums: [array of AssignmentGroup Grade information *see above]
-  //   current: <Course Grade information *see above>
-  //   final: <Grade Grade information *see above>
+  //   assignmentGroups: <AssignmentGroup Grade map *see above>
+  //   gradingPeriods: <GradingPeriod Grade map *see above>
+  //   current: <AssignmentGroup Grade *see above>
+  //   final: <AssignmentGroup Grade *see above>
+  //   scoreUnit: 'points'|'percent'
   // }
-  function calculate (submissions, assignmentGroups, weightingScheme, gradingPeriods, effectiveDueDates) {
+  function calculate (submissions, assignmentGroups, weightingScheme, gradingPeriodSet, effectiveDueDates) {
     const options = {
-      weightGradingPeriods: _.some(gradingPeriods, 'weight'),
+      weightGradingPeriods: gradingPeriodSet && !!gradingPeriodSet.weighted,
       weightAssignmentGroups: weightingScheme === 'percent'
     };
 
-    if (gradingPeriods && effectiveDueDates) {
+    if (gradingPeriodSet && effectiveDueDates) {
       return calculateWithGradingPeriods(
-        submissions, assignmentGroups, gradingPeriods, effectiveDueDates, options
+        submissions, assignmentGroups, gradingPeriodSet.gradingPeriods, effectiveDueDates, options
       );
     }
 

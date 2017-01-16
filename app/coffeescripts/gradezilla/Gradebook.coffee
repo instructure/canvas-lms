@@ -1,4 +1,21 @@
-# This class both creates the slickgrid instance, and acts as the data source for that instance.
+#
+# Copyright (C) 2016 - 2017 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 define [
   'jquery'
   'underscore'
@@ -12,12 +29,14 @@ define [
   'jst/KeyboardNavDialog'
   'vendor/slickgrid'
   'compiled/api/gradingPeriodsApi'
+  'compiled/api/gradingPeriodSetsApi'
   'compiled/util/round'
   'compiled/views/InputFilterView'
   'i18nObj'
   'i18n!gradezilla'
   'compiled/gradezilla/GradebookTranslations'
   'jsx/gradebook/CourseGradeCalculator'
+  'jsx/gradebook/EffectiveDueDates'
   'jsx/gradebook/GradingSchemeHelper'
   'compiled/userSettings'
   'spin.js'
@@ -60,14 +79,15 @@ define [
   'jsx/context_cards/StudentContextCardTrigger'
 ], (
   $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
-  GradingPeriodsAPI, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
-  GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
-  GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, htmlEscape,
-  AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader, TotalGradeColumnHeader,
-  PostGradesStore, PostGradesApp, SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate,
-  SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
+  GradingPeriodsApi, GradingPeriodSetsApi, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS,
+  CourseGradeCalculator, EffectiveDueDates, GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog,
+  AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
+  GradebookHeaderMenu, NumberCompare, htmlEscape, AssignmentColumnHeader, AssignmentGroupColumnHeader,
+  StudentColumnHeader, TotalGradeColumnHeader, PostGradesStore, PostGradesApp, SubmissionStateMap,
+  GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav,
+  assignmentHelper
 ) ->
-
+  # This class both creates the slickgrid instance, and acts as the data source for that instance.
   class Gradebook
     columnWidths =
       assignment:
@@ -104,7 +124,11 @@ define [
       @totalColumnInFront = UserSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
       @gradingPeriodsEnabled = @options.multiple_grading_periods_enabled
-      @gradingPeriods = GradingPeriodsAPI.deserializePeriods(@options.active_grading_periods)
+      @gradingPeriods = GradingPeriodsApi.deserializePeriods(@options.active_grading_periods)
+      if @options.grading_period_set
+        @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
+      else
+        @gradingPeriodSet = null
       @gradingPeriodToShow = @getGradingPeriodToShow()
       @submissionStateMap = new SubmissionStateMap
         gradingPeriodsEnabled: @gradingPeriodsEnabled
@@ -694,7 +718,7 @@ define [
         templateOpts.warning = @totalGradeWarning
         templateOpts.lastColumn = true
         templateOpts.showPointsNotPercent = @displayPointTotals()
-        templateOpts.hideTooltip = @weightedGroups() and not @totalGradeWarning
+        templateOpts.hideTooltip = @weightedGrades() and not @totalGradeWarning
       GroupTotalCellTemplate templateOpts
 
     htmlContentFormatter: (row, col, val, columnDef, student) ->
@@ -716,17 +740,26 @@ define [
 
     calculateStudentGrade: (student) =>
       if student.loaded and student.initialized
-        finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
-        result = CourseGradeCalculator.calculate(
+        usingGradingPeriods = @gradingPeriodSet and @effectiveDueDates
+
+        grades = CourseGradeCalculator.calculate(
           @submissionsForStudent(student),
           @assignmentGroups,
-          @options.group_weighting_scheme
+          @options.group_weighting_scheme,
+          @gradingPeriodSet if usingGradingPeriods,
+          EffectiveDueDates.scopeToUser(@effectiveDueDates, student.id) if usingGradingPeriods
         )
-        for group in result.group_sums
-          student["assignment_group_#{group.group.id}"] = group[finalOrCurrent]
-          for submissionData in group[finalOrCurrent].submissions
+
+        if @gradingPeriodToShow && !@isAllGradingPeriods(@gradingPeriodToShow)
+          grades = grades.gradingPeriods[@gradingPeriodToShow]
+
+        finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
+
+        for assignmentGroupId, grade of grades.assignmentGroups
+          student["assignment_group_#{assignmentGroupId}"] = grade[finalOrCurrent]
+          for submissionData in grade[finalOrCurrent].submissions
             submissionData.submission.drop = submissionData.drop
-        student["total_grade"] = result[finalOrCurrent]
+        student["total_grade"] = grades[finalOrCurrent]
 
         @addDroppedClass(student)
 
@@ -1220,11 +1253,11 @@ define [
     weightedGroups: =>
       @options.group_weighting_scheme == "percent"
 
+    weightedGrades: =>
+      @options.group_weighting_scheme == "percent" || @gradingPeriodSet?.weighted || false
+
     displayPointTotals: =>
-      if @weightedGroups()
-        false
-      else
-        @options.show_total_grade_as_points
+      @options.show_total_grade_as_points and not @weightedGrades()
 
     switchTotalDisplay: =>
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points

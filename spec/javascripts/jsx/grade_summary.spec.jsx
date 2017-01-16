@@ -20,9 +20,14 @@ define([
   'lodash',
   'jquery',
   'helpers/fakeENV',
+  'spec/jsx/gradebook/GradeCalculatorSpecHelper',
   'jsx/gradebook/CourseGradeCalculator',
   'grade_summary'
-], (_, $, fakeENV, CourseGradeCalculator, grade_summary) => { // eslint-disable-line camelcase
+], (
+  _, $, fakeENV, GradeCalculatorSpecHelper, CourseGradeCalculator, grade_summary // eslint-disable-line camelcase
+) => {
+  let exampleGrades;
+
   function createAssignmentGroups () {
     return [
       { id: '301', assignments: [{ id: '201', muted: false }, { id: '202', muted: true }] },
@@ -37,9 +42,38 @@ define([
     ];
   }
 
-  module('grade_summary#calculateTotals', {
+  module('grade_summary.getGradingPeriodSet', {
     setup () {
       fakeENV.setup();
+    },
+
+    teardown () {
+      fakeENV.teardown();
+    }
+  });
+
+  test('normalizes the grading period set from the env', function () {
+    ENV.grading_period_set = {
+      id: 1501,
+      grading_periods: [{ id: 701, weight: 50 }, { id: 702, weight: 50 }],
+      weighted: true
+    };
+    const gradingPeriodSet = grade_summary.getGradingPeriodSet();
+    deepEqual(gradingPeriodSet.id, '1501');
+    equal(gradingPeriodSet.gradingPeriods.length, 2);
+    deepEqual(_.map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702']);
+  });
+
+  test('returns null when the grading period set is not defined in the env', function () {
+    ENV.grading_period_set = undefined;
+    const gradingPeriodSet = grade_summary.getGradingPeriodSet();
+    deepEqual(gradingPeriodSet, null);
+  });
+
+  module('grade_summary.calculateTotals', {
+    setup () {
+      fakeENV.setup();
+      ENV.assignment_groups = createAssignmentGroups();
 
       this.screenReaderFlashMessageExclusive = this.stub($, 'screenReaderFlashMessageExclusive');
       $('#fixtures').html('<div class="grade changed"></div>');
@@ -47,102 +81,9 @@ define([
       this.currentOrFinal = 'current';
       this.groupWeightingScheme = null;
       this.calculatedGrades = {
-        group_sums: [
-          {
-            group: {
-              id: '1',
-              rules: {},
-              group_weight: 0,
-              assignments: [
-                {
-                  id: '4',
-                  submission_types: ['none'],
-                  points_possible: 10,
-                  due_at: '2017-01-03T06:59:00Z',
-                  omit_from_final_grade: false
-                }, {
-                  id: '3',
-                  submission_types: ['none'],
-                  points_possible: 10,
-                  due_at: '2016-12-26T06:59:00Z',
-                  omit_from_final_grade: false
-                }
-              ]
-            },
-            current: {
-              possible: 0,
-              score: 0,
-              submission_count: 0,
-              submissions: [
-                {
-                  percent: 0,
-                  possible: 10,
-                  score: 0,
-                  submission: {
-                    assignment_id: '4',
-                    score: null,
-                    excused: false,
-                    workflow_state: 'unsubmitted'
-                  },
-                  submitted: false
-                },
-                {
-                  percent: 0,
-                  possible: 10,
-                  score: 0,
-                  submission: {
-                    assignment_id: '3',
-                    score: null,
-                    excused: false,
-                    workflow_state: 'unsubmitted'
-                  },
-                  submitted: false
-                }
-              ],
-              weight: 0
-            },
-            final: {
-              possible: 20,
-              score: 0,
-              submission_count: 0,
-              submissions: [
-                {
-                  percent: 0,
-                  possible: 10,
-                  score: 0,
-                  submission: {
-                    assignment_id: '4',
-                    score: null,
-                    excused: false,
-                    workflow_state: 'unsubmitted'
-                  },
-                  submitted: false
-                },
-                {
-                  percent: 0,
-                  possible: 10,
-                  score: 0,
-                  submission: {
-                    assignment_id: '3',
-                    score: null,
-                    excused: false,
-                    workflow_state: 'unsubmitted'
-                  },
-                  submitted: false
-                }
-              ],
-              weight: 0
-            }
-          }
-        ],
-        current: {
-          score: 0,
-          possible: 0
-        },
-        final: {
-          score: 0,
-          possible: 20
-        }
+        assignmentGroups: {},
+        current: { score: 0, possible: 0 },
+        final: { score: 0, possible: 20 }
       };
     },
 
@@ -153,14 +94,12 @@ define([
 
   test('generates a screenreader-only alert when grades have been changed', function () {
     grade_summary.calculateTotals(this.calculatedGrades, this.currentOrFinal, this.groupWeightingScheme);
-
     ok(this.screenReaderFlashMessageExclusive.calledOnce);
   });
 
   test('does not generate a screenreader-only alert when grades are unchanged', function () {
     $('#fixtures').html('');
     grade_summary.calculateTotals(this.calculatedGrades, this.currentOrFinal, this.groupWeightingScheme);
-
     notOk(this.screenReaderFlashMessageExclusive.called);
   });
 
@@ -211,10 +150,15 @@ define([
       ENV.submissions = createSubmissions();
       ENV.assignment_groups = createAssignmentGroups();
       ENV.group_weighting_scheme = 'points';
-      ENV.grading_periods = [{ id: 701, weight: 50 }, { id: 702, weight: 50 }];
+      ENV.grading_period_set = {
+        id: 1501,
+        grading_periods: [{ id: 701, weight: 50 }, { id: 702, weight: 50 }],
+        weighted: true
+      };
       ENV.effective_due_dates = { 201: { 101: { grading_period_id: '701' } } };
       ENV.student_id = '101';
-      this.stub(CourseGradeCalculator, 'calculate').returns('expected');
+      exampleGrades = GradeCalculatorSpecHelper.createCourseGradesWithGradingPeriods();
+      this.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades);
     },
 
     teardown () {
@@ -223,37 +167,47 @@ define([
   });
 
   test('calculates grades using data in the env', function () {
-    this.stub(CourseGradeCalculator, 'calculate').returns('expected');
     grade_summary.calculateGrades();
     const args = CourseGradeCalculator.calculate.getCall(0).args;
     equal(args[0], ENV.submissions);
     deepEqual(_.map(args[1], 'id'), ['301', '302']);
     equal(args[2], ENV.group_weighting_scheme);
-    equal(args[3], ENV.grading_periods);
   });
 
-  test('returns the result of grade calculation from the grade calculator', function () {
-    const grades = grade_summary.calculateGrades();
-    equal(grades, 'expected');
+  test('normalizes the grading period set before calculation', function () {
+    grade_summary.calculateGrades();
+    const gradingPeriodSet = CourseGradeCalculator.calculate.getCall(0).args[3];
+    deepEqual(gradingPeriodSet.id, '1501');
+    equal(gradingPeriodSet.gradingPeriods.length, 2);
+    deepEqual(_.map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702']);
   });
 
   test('scopes effective due dates to the user', function () {
-    this.stub(CourseGradeCalculator, 'calculate');
     grade_summary.calculateGrades();
     const dueDates = CourseGradeCalculator.calculate.getCall(0).args[4];
     deepEqual(dueDates, { 201: { grading_period_id: '701' } });
   });
 
-  test('calculates grades without grading period data when effective due dates are not defined', function () {
-    delete ENV.effective_due_dates;
-    this.stub(CourseGradeCalculator, 'calculate');
+  test('calculates grades without grading period data when the grading period set is not defined', function () {
+    delete ENV.grading_period_set;
     grade_summary.calculateGrades();
     const args = CourseGradeCalculator.calculate.getCall(0).args;
     equal(args[0], ENV.submissions);
     equal(args[1], ENV.assignment_groups);
     equal(args[2], ENV.group_weighting_scheme);
-    equal(args[3], undefined);
-    equal(args[4], undefined);
+    equal(typeof args[3], 'undefined');
+    equal(typeof args[4], 'undefined');
+  });
+
+  test('calculates grades without grading period data when effective due dates are not defined', function () {
+    delete ENV.effective_due_dates;
+    grade_summary.calculateGrades();
+    const args = CourseGradeCalculator.calculate.getCall(0).args;
+    equal(args[0], ENV.submissions);
+    equal(args[1], ENV.assignment_groups);
+    equal(args[2], ENV.group_weighting_scheme);
+    equal(typeof args[3], 'undefined');
+    equal(typeof args[4], 'undefined');
   });
 
   test('includes muted assignments where "What-If" grades exist', function () {
@@ -263,5 +217,34 @@ define([
     const assignmentGroups = CourseGradeCalculator.calculate.getCall(0).args[1];
     equal(assignmentGroups[0].assignments.length, 2);
     equal(assignmentGroups[1].assignments.length, 1);
+  });
+
+  test('returns course grades when no grading period id is provided', function () {
+    this.stub(grade_summary, 'getGradingPeriodIdFromUrl').returns(null);
+    const grades = grade_summary.calculateGrades();
+    equal(grades, exampleGrades);
+  });
+
+  test('scopes grades to the provided grading period id', function () {
+    this.stub(grade_summary, 'getGradingPeriodIdFromUrl').returns('701');
+    const grades = grade_summary.calculateGrades();
+    equal(grades, exampleGrades.gradingPeriods[701]);
+  });
+
+  module('grade_summary.getGradingPeriodIdFromUrl');
+
+  test('returns the value for grading_period_id in the url', function () {
+    const url = 'example.com/course/1/grades?grading_period_id=701';
+    equal(grade_summary.getGradingPeriodIdFromUrl(url), '701');
+  });
+
+  test('returns null when grading_period_id is set to "0"', function () {
+    const url = 'example.com/course/1/grades?grading_period_id=0';
+    deepEqual(grade_summary.getGradingPeriodIdFromUrl(url), null);
+  });
+
+  test('returns null when grading_period_id is not present in the url', function () {
+    const url = 'example.com/course/1/grades';
+    deepEqual(grade_summary.getGradingPeriodIdFromUrl(url), null);
   });
 });

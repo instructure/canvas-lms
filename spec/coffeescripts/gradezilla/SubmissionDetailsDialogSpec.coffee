@@ -13,7 +13,6 @@ define [
         current_user_roles: [ "teacher" ]
         GRADEBOOK_OPTIONS:
           multiple_grading_periods_enabled: true
-          latest_end_date_of_admin_created_grading_periods_in_the_past: 'Thu Jul 30 2015 00:00:00 GMT-0700 (PDT)'
       @previousWindowENV = window.ENV
 
       _.extend(window.ENV, defaults)
@@ -55,7 +54,6 @@ define [
         current_user_roles: [ "teacher" ]
         GRADEBOOK_OPTIONS:
           multiple_grading_periods_enabled: true
-          latest_end_date_of_admin_created_grading_periods_in_the_past: 'Thu Jul 30 2015 00:00:00 GMT-0700 (PDT)'
       @previousWindowENV = window.ENV
 
       _.extend(window.ENV, defaults)
@@ -87,7 +85,6 @@ define [
         current_user_roles: [ "teacher" ]
         GRADEBOOK_OPTIONS:
           multiple_grading_periods_enabled: true
-          latest_end_date_of_admin_created_grading_periods_in_the_past: '2013-10-01T10:00:00Z'
       @previousWindowENV = window.ENV
 
       _.extend(window.ENV, defaults)

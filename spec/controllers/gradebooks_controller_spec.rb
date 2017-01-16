@@ -316,8 +316,16 @@ describe GradebooksController do
     end
 
     context "Multiple Grading Periods" do
+      let(:group_helper)  { Factories::GradingPeriodGroupHelper.new }
+      let(:period_helper) { Factories::GradingPeriodHelper.new }
+
       before :once do
         @course.root_account.enable_feature!(:multiple_grading_periods)
+        @grading_period_group = group_helper.create_for_account(@course.root_account)
+        term = @course.enrollment_term
+        term.grading_period_group = @grading_period_group
+        term.save!
+        @grading_periods = period_helper.create_presets_for_group(@grading_period_group, :past, :current, :future)
       end
 
       it "does not display totals if 'All Grading Periods' is selected" do
@@ -333,11 +341,35 @@ describe GradebooksController do
         expect(assigns[:exclude_total]).to eq false
       end
 
-      it "assigns values for grade calculator to ENV" do
+      it "includes the grading period group (as 'set') in the ENV" do
         user_session(@teacher)
-        get 'grade_summary', :course_id => @course.id, :id => @student.id
-        expect(assigns[:js_env][:grading_periods]).not_to be_nil
-        expect(assigns[:js_env][:effective_due_dates]).not_to be_nil
+        get :grade_summary, { course_id: @course.id, id: @student.id }
+        grading_period_set = assigns[:js_env][:grading_period_set]
+        expect(grading_period_set[:id]).to eq @grading_period_group.id
+      end
+
+      it "includes grading periods within the group" do
+        user_session(@teacher)
+        get :grade_summary, { course_id: @course.id, id: @student.id }
+        grading_period_set = assigns[:js_env][:grading_period_set]
+        expect(grading_period_set[:grading_periods].count).to eq 3
+        period = grading_period_set[:grading_periods][0]
+        expect(period).to have_key(:is_closed)
+        expect(period).to have_key(:is_last)
+      end
+
+      it "includes necessary keys with each grading period" do
+        user_session(@teacher)
+        get :grade_summary, { course_id: @course.id, id: @student.id }
+        periods = assigns[:js_env][:grading_period_set][:grading_periods]
+        periods.each do |period|
+          expect(period).to have_key(:id)
+          expect(period).to have_key(:start_date)
+          expect(period).to have_key(:end_date)
+          expect(period).to have_key(:close_date)
+          expect(period).to have_key(:is_closed)
+          expect(period).to have_key(:is_last)
+        end
       end
     end
 
@@ -539,6 +571,50 @@ describe GradebooksController do
         @course.root_account.enable_feature! :student_context_cards
         get :show, course_id: @course.id
         expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
+      end
+    end
+
+    context "with multiple grading periods" do
+      let(:group_helper)  { Factories::GradingPeriodGroupHelper.new }
+      let(:period_helper) { Factories::GradingPeriodHelper.new }
+
+      before :once do
+        @course.root_account.enable_feature!(:multiple_grading_periods)
+        @grading_period_group = group_helper.create_for_account(@course.root_account)
+        term = @course.enrollment_term
+        term.grading_period_group = @grading_period_group
+        term.save!
+        @grading_periods = period_helper.create_presets_for_group(@grading_period_group, :past, :current, :future)
+      end
+
+      before { user_session(@teacher) }
+
+      it "includes the grading period group (as 'set') in the ENV" do
+        get :show, { course_id: @course.id }
+        grading_period_set = assigns[:js_env][:GRADEBOOK_OPTIONS][:grading_period_set]
+        expect(grading_period_set[:id]).to eq @grading_period_group.id
+      end
+
+      it "includes grading periods within the group" do
+        get :show, { course_id: @course.id }
+        grading_period_set = assigns[:js_env][:GRADEBOOK_OPTIONS][:grading_period_set]
+        expect(grading_period_set[:grading_periods].count).to eq 3
+        period = grading_period_set[:grading_periods][0]
+        expect(period).to have_key(:is_closed)
+        expect(period).to have_key(:is_last)
+      end
+
+      it "includes necessary keys with each grading period" do
+        get :show, { course_id: @course.id }
+        periods = assigns[:js_env][:GRADEBOOK_OPTIONS][:grading_period_set][:grading_periods]
+        periods.each do |period|
+          expect(period).to have_key(:id)
+          expect(period).to have_key(:start_date)
+          expect(period).to have_key(:end_date)
+          expect(period).to have_key(:close_date)
+          expect(period).to have_key(:is_closed)
+          expect(period).to have_key(:is_last)
+        end
       end
     end
   end

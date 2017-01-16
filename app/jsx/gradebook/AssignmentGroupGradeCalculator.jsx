@@ -248,18 +248,17 @@ define([
     const possible = sumBy(submissionsToKeep, 'total');
 
     return {
-      possible,
       score,
-      weight: group.group_weight,
+      possible,
       submission_count: _.filter(submissionData, 'submitted').length,
-      submissions: _.map(submissionData, submission => (
+      submissions: _.map(submissionData, submissionDatum => (
         {
-          drop: submission.drop,
-          percent: parseScore(submission.score / submission.total),
-          possible: submission.total,
-          score: parseScore(submission.score),
-          submission: submission.submission,
-          submitted: submission.submitted
+          drop: submissionDatum.drop,
+          percent: parseScore(submissionDatum.score / submissionDatum.total),
+          score: parseScore(submissionDatum.score),
+          possible: submissionDatum.total,
+          submission: submissionDatum.submission,
+          submitted: submissionDatum.submitted
         }
       ))
     };
@@ -268,8 +267,8 @@ define([
   // Each submission requires the following properties:
   // * score: number
   // * points_possible: non-negative integer
-  // * assignment_id: Canvas id
-  // * assignment_group_id: Canvas id
+  // * assignment_id: <Canvas id>
+  // * assignment_group_id: <Canvas id>
   // * excused: boolean
   //
   // Ungraded submissions will have a score of `null`.
@@ -286,31 +285,35 @@ define([
   // * never_drop: [array of assignment ids]
   //
   // `assignments` is an array of objects with the following properties:
-  // * id: Canvas id
+  // * id: <Canvas id>
   // * points_possible: non-negative number
   // * submission_types: [array of strings]
   //
-  // AssignmentGroup Grade information has the following shape:
+  // An AssignmentGroup Grade has the following shape:
   // {
   //   score: number|null
   //   possible: number|null
-  //   weight: non-negative number|null
   //   submission_count: non-negative number
   //   submissions: [array of Submissions]
   // }
   //
-  // Return value has the following shape:
+  // Return value is an AssignmentGroup Grade Set.
+  // An AssignmentGroup Grade Set has the following shape:
   // {
-  //   group: <assignment group (from input)>
-  //   current: <AssignmentGroup Grade information *see above>
-  //   final: <AssignmentGroup Grade information *see above>
+  //   assignmentGroupId: <Canvas id>
+  //   assignmentGroupWeight: number
+  //   current: <AssignmentGroup Grade *see above>
+  //   final: <AssignmentGroup Grade *see above>
+  //   scoreUnit: 'points'
   // }
   function calculate (allSubmissions, assignmentGroup) {
     const submissions = _.uniq(allSubmissions, 'assignment_id');
     return {
-      group: assignmentGroup,
+      assignmentGroupId: assignmentGroup.id,
+      assignmentGroupWeight: assignmentGroup.group_weight,
       current: calculateGroupGrade(assignmentGroup, submissions, false),
-      final: calculateGroupGrade(assignmentGroup, submissions, true)
+      final: calculateGroupGrade(assignmentGroup, submissions, true),
+      scoreUnit: 'points'
     };
   }
 

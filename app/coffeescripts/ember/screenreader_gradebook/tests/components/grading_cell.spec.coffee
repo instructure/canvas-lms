@@ -18,7 +18,6 @@ define [
       @component = App.GradingCellComponent.create()
 
       ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled = true
-      ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past = "2013-10-01T10:00:00Z"
       ENV.current_user_roles = []
 
       setType = (type) =>
