@@ -535,6 +535,7 @@ ConditionalRelease, deparam, AssignmentConfigurationsTools) ->
         "#assignment_peer_reviews_fields *"
         "#assignment_description"
         "#assignment_notify_of_update"
+        "#assignment_post_to_sis"
       ]
       ignoreFilter = ignoreFields.map((field) -> "not(#{field})").join(":")
 
