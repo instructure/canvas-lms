@@ -54,7 +54,7 @@ describe "master courses - child courses - wiki page locking" do
     expect(f('.al-options')).to_not contain_css('.delete_page')
   end
 
-  it "should show the edit/delete cog-menu options on the index when not locked" do
+  it "should show the edit/delete cog-menu options on the show page when not locked" do
     get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
     expect(f('#content')).to contain_css('.edit-wiki')
