@@ -367,6 +367,14 @@ describe AssignmentsController do
       post 'create', :course_id => @course.id, :assignment => {:title => "some assignment", :assignment_group_id => group2.to_param}
       expect(response).to be_not_found
     end
+
+    it 'should use the default post-to-SIS setting' do
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: true}
+      a.save!
+      post 'create', :course_id => @course.id, :assignment => {:title => "some assignment"}
+      expect(assigns[:assignment]).to be_post_to_sis
+    end
   end
 
   describe "GET 'edit'" do

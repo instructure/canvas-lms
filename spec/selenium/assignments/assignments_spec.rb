@@ -209,6 +209,22 @@ describe "assignments" do
       expect(@assignment.due_at.strftime('%b %d')).to eq expected_date
     end
 
+    it 'creates a simple assignment and defaults post_to_sis' do
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: true}
+      a.save!
+      assignment_name = "test_assignment_thing_#{rand(10000)}"
+      get "/courses/#{@course.id}/assignments"
+      group = @course.assignment_groups.first
+      f('.add_assignment').click
+      replace_content(f("#ag_#{group.id}_assignment_name"), assignment_name)
+      f('.create_assignment').click
+      wait_for_ajaximations
+      assignment = @course.assignments.where(title: assignment_name).last
+      expect(assignment).not_to be_nil
+      expect(assignment).to be_post_to_sis
+    end
+
     it "should create an assignment with more options", priority: "2", test_id: 622614 do
       enable_cache do
         expected_text = "Assignment 1"

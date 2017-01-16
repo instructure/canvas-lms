@@ -147,7 +147,7 @@ describe "eportfolios" do
       expect(f('.add_content_link.add_rich_content_link')).to be_displayed
       f('.add_content_link.add_rich_content_link').click
       expect(f('.mce-container')).to be_displayed
-      f("div[aria-label='Embed Image'] button").click
+      f(".mce-container div[aria-label='Embed Image']").click
       expect(f('a[href="#tabFlickr"]')).to be_displayed
       f('a[href="#tabFlickr"]').click
       expect(f('form.FindFlickrImageView')).to be_displayed

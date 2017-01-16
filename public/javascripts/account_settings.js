@@ -15,22 +15,6 @@ define([
   'jqueryui/tabs' // /\.tabs/
 ], function(I18n, $, EditorConfig, globalAnnouncements) {
 
-  EditorConfig.prototype.balanceButtonsOverride = function(instructure_buttons) {
-    var instBtnGroup = "table,instructure_links,unlink" + instructure_buttons;
-    var top_row_buttons = "";
-    var bottom_row_buttons = "";
-
-    top_row_buttons = this.formatBtnGroup + "," + this.positionBtnGroup;
-    bottom_row_buttons = instBtnGroup + "," + this.fontBtnGroup;
-
-    return [top_row_buttons, bottom_row_buttons];
-  };
-
-  EditorConfig.prototype.toolbar = function() {
-    var instructure_buttons = this.buildInstructureButtons();
-    return this.balanceButtonsOverride(instructure_buttons);
-  }
-
   $(document).ready(function() {
     checkFutureListingSetting = function() {
 

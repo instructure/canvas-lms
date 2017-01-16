@@ -923,12 +923,13 @@ class AccountsController < ApplicationController
 
   def courses
     if authorized_action(@context, @current_user, :read)
+      order = sort_order # must be done on master because it persists in user preferences
       Shackles.activate(:slave) do
         load_course_right_side
         @courses = []
         @query = (params[:course] && params[:course][:name]) || params[:term]
         if @context && @context.is_a?(Account) && @query
-          @courses = @context.courses_name_like(@query, :order => sort_order, :term => @term,
+          @courses = @context.courses_name_like(@query, :order => order, :term => @term,
             :hide_enrollmentless_courses => @hide_enrollmentless_courses,
             :only_master_courses => @only_master_courses)
         end

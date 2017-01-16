@@ -472,7 +472,7 @@ class ContextExternalTool < ActiveRecord::Base
     url = ContextExternalTool.standardize_url(url)
     host = Addressable::URI.parse(url).host
     if domain
-      domain == host
+      domain.downcase == host.downcase
     elsif standard_url
       Addressable::URI.parse(standard_url).host == host
     else

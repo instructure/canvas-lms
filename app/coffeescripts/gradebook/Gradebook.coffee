@@ -1138,7 +1138,7 @@ define [
                   document.getElementById('csv_download').src = response.url
 
                   updated_date = $.datetimeString(response.created_at)
-                  updated_previous_report = "#{I18n.t('Previous (%{timestamp})', timestamp: updated_date)}"
+                  updated_previous_report = "#{I18n.t('Previous CSV (%{timestamp})', timestamp: updated_date)}"
                   $previous_link = $('#csv_export_options .open_in_a_new_tab')
                   $previous_link.text(updated_previous_report)
                   $previous_link.attr('href', response.url)

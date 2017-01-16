@@ -106,6 +106,40 @@ Add a `resultData` node with a `url` node within it like this:
 </imsx_POXEnvelopeRequest>
 ```
 
+#### LTI Launch URL
+
+Add a `resultData` node with a `ltiLaunchUrl` node like this:
+
+```xml
+<?xml version = "1.0" encoding = "UTF-8"?>
+<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+  <imsx_POXHeader>
+    <imsx_POXRequestHeaderInfo>
+      <imsx_version>V1.0</imsx_version>
+      <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+    </imsx_POXRequestHeaderInfo>
+  </imsx_POXHeader>
+  <imsx_POXBody>
+    <replaceResultRequest>
+      <resultRecord>
+        <sourcedGUID>
+          <sourcedId>3124567</sourcedId>
+        </sourcedGUID>
+        <result>
+          <resultScore>
+            <language>en</language>
+            <textString>0.92</textString>
+          </resultScore>
+          <!-- Added element -->
+          <resultData>
+            <ltiLaunchUrl>https://some.launch.url/launch?lti_submission_id=42</ltiLaunchUrl>
+          </resultData>
+        </result>
+      </resultRecord>
+    </replaceResultRequest>
+  </imsx_POXBody>
+</imsx_POXEnvelopeRequest>
+```
 
 ## Total Score Return Extension
 

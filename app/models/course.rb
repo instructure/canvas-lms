@@ -192,6 +192,7 @@ class Course < ActiveRecord::Base
   prepend Profile::Association
 
   before_save :assign_uuid
+  before_save :assign_default_view
   before_validation :assert_defaults
   before_save :update_enrollments_later
   before_save :update_show_total_grade_as_on_weighting_scheme_change
@@ -2831,6 +2832,14 @@ class Course < ActiveRecord::Base
     end
     return :preferred if self.root_account.grants_right?(user, :manage_user_logins)
     :closed
+  end
+
+  def assign_default_view
+    self.default_view ||= default_home_page
+  end
+
+  def default_home_page
+    root_account.feature_enabled?(:modules_home_page) ? "modules" : "feed"
   end
 
   def participating_users(user_ids)

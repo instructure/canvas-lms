@@ -184,7 +184,8 @@ describe "course copy" do
       replace_content(f("input[type=text][id=newStartDate]"), date)
       submit_form('#copy_course_form')
       run_jobs
-      expect(f('div.progressStatus span')).to include_text 'Completed'
+      status = f('div.progressStatus span').text
+      keep_trying_until { expect(status == 'Completed') }
       get "/calendar#view_name=week"
       quick_jump_to_date(@date_to_use)
       f('.fc-event').click

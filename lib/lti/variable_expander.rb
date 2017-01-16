@@ -251,6 +251,16 @@ module Lti
                        -> { @context.start_at },
                        COURSE_GUARD
 
+    # returns the current course workflow state. Workflow states of "claimed" or "created"
+    # indicate an unpublished course.
+    # @example
+    #   ```
+    #   active
+    #   ```
+    register_expansion 'Canvas.course.workflowState', [],
+                       -> { @context.workflow_state },
+                       COURSE_GUARD
+
     # returns the current course's term start date.
     # @example
     #   ```

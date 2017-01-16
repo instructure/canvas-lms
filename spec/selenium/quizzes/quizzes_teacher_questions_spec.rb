@@ -195,7 +195,8 @@ describe "quizzes questions" do
       driver.execute_script <<-JS
       $('input[type=text]').trigger('change');
       JS
-      expect_new_page_load { f('#submit_quiz_button').click }
+      f('#submit_quiz_button').click
+      wait_for_ajax_requests
       expect(f('.score_value').text.strip).to eq '1'
       user_session(@user)
     end

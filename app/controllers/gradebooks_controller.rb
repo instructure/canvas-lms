@@ -219,7 +219,6 @@ class GradebooksController < ApplicationController
 
     tools = external_tools[0...tool_limit]
     tools.push(type: :post_grades) if @context.feature_enabled?(:post_grades)
-    tools.push(type: :ellip) if external_tools.length > tool_limit
     tools
   end
 

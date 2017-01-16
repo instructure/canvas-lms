@@ -4728,3 +4728,20 @@ describe Course, '#any_assignment_in_closed_grading_period?' do
     expect(test_course.any_assignment_in_closed_grading_period?).to eq(true)
   end
 end
+
+describe Course, "#default_home_page" do
+  let(:course) { Course.create! }
+
+  it "defaults to 'feed'" do
+    expect(course.default_home_page).to eq "feed"
+  end
+
+  it "is 'modules' if feature flag enabled" do
+    course.root_account.enable_feature! :modules_home_page
+    expect(course.default_home_page).to eq "modules"
+  end
+
+  it "is set assigned to 'default_view' on creation'" do
+    expect(course.default_view).to eq 'feed'
+  end
+end

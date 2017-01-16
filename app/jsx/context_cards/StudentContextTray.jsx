@@ -160,7 +160,9 @@ define([
           {StudentContextTray.renderQuickLink(
             I18n.t('Analytics'),
             `/courses/${this.props.courseId}/analytics/users/${this.props.studentId}`,
-            () => this.state.permissions.view_analytics
+            () => (
+              this.state.permissions.view_analytics && Object.keys(this.state.analytics).length > 0
+            )
           )}
         </section>
       ) : null
@@ -241,7 +243,7 @@ define([
                       {this.state.permissions.send_messages ? (
                         <div className="StudentContextTray-Header__Actions">
                           <Button
-                            variant="link" size="small"
+                            variant="icon" size="small"
                             onClick={this.handleMessageButtonClick}
                           >
                             <ScreenReaderContent>
