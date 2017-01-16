@@ -110,7 +110,7 @@ module Services
     class << self
       private
       def setting(key)
-        settings = Canvas::DynamicSettings.from_cache("address-book", expires_in: 5.minutes)
+        settings = Canvas::DynamicSettings.from_cache("address-book", expires_in: 5.minutes, use_env: false)
         settings[key]
       rescue Imperium::TimeoutError => e
         Canvas::Errors.capture_exception(:address_book, e)

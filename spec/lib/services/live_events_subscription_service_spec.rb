@@ -24,11 +24,9 @@ module Services
 
     context 'service unavailable' do
       before do
-        Canvas::DynamicSettings.stubs(:find).with('live-events-subscription-service').returns(nil)
-      end
-
-      after do
-        Canvas::DynamicSettings.unstub(:find)
+        allow(Canvas::DynamicSettings).to receive(:find)
+          .with('live-events-subscription-service', {use_env: false})
+          .and_return(nil)
       end
 
       describe '.available?' do
@@ -40,14 +38,17 @@ module Services
 
     context 'service available' do
       before do
-        Canvas::DynamicSettings.stubs(:find).with('live-events-subscription-service').returns({
-          "app-host" => "http://example.com",
-          "sad-panda" => nil
-        })
-        Canvas::DynamicSettings.stubs(:find).with('canvas').returns({
-          "signing-secret" => "astringthatisactually32byteslong",
-          "encryption-secret" => "astringthatisactually32byteslong"
-        })
+        allow(Canvas::DynamicSettings).to receive(:find)
+          .with('live-events-subscription-service', {use_env: false})
+          .and_return({
+            'app-host' => 'http://example.com',
+          })
+        allow(Canvas::DynamicSettings).to receive(:find)
+          .with('canvas', {use_env: false})
+          .and_return({
+            'signing-secret' => 'astringthatisactually32byteslong',
+            'encryption-secret' => 'astringthatisactually32byteslong'
+          })
       end
 
       after do

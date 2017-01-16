@@ -120,7 +120,6 @@ class Canvas::Security::ServicesJwt
       context: context)
   end
 
-  private
 
   def self.create_payload(payload_data)
     if payload_data[:sub].nil?
@@ -137,20 +136,22 @@ class Canvas::Security::ServicesJwt
     })
   end
 
+  def self.encryption_secret
+    Canvas::DynamicSettings.from_cache("canvas", use_env: false)["encryption-secret"]
+  end
+
+  def self.signing_secret
+    Canvas::DynamicSettings.from_cache("canvas", use_env: false)["signing-secret"]
+  end
+
+  private
+
   def encryption_secret
     self.class.encryption_secret
   end
 
   def signing_secret
     self.class.signing_secret
-  end
-
-  def self.encryption_secret
-    Canvas::DynamicSettings.from_cache("canvas")["encryption-secret"]
-  end
-
-  def self.signing_secret
-    Canvas::DynamicSettings.from_cache("canvas")["signing-secret"]
   end
 
   class << self

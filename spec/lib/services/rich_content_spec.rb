@@ -21,10 +21,12 @@ require_dependency "services/rich_content"
 module Services
   describe RichContent do
     before do
-      Canvas::DynamicSettings.stubs(:find).with("rich-content-service").returns({
-        "app-host" => "rce-app",
-        "cdn-host" => "rce-cdn"
-      })
+      allow(Canvas::DynamicSettings).to receive(:find)
+        .with('rich-content-service', use_env: false)
+        .and_return({
+          "app-host" => "rce-app",
+          "cdn-host" => "rce-cdn"
+        })
     end
 
     describe ".env_for" do
@@ -42,8 +44,9 @@ module Services
       end
 
       it "populates hosts with an error signal when consul is down" do
-        Canvas::DynamicSettings.stubs(:find).with("rich-content-service").
-          raises(Imperium::UnableToConnectError, "can't talk to consul")
+        allow(Canvas::DynamicSettings).to receive(:find)
+          .with('rich-content-service', use_env: false)
+          .and_raise(Imperium::UnableToConnectError, "can't talk to consul")
         root_account = stub("root_account", feature_enabled?: true)
         env = described_class.env_for(root_account)
         expect(env[:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
@@ -52,7 +55,7 @@ module Services
       end
 
       it "logs errors for later consideration" do
-        Canvas::DynamicSettings.stubs(:find).with("rich-content-service").
+        Canvas::DynamicSettings.stubs(:find).with("rich-content-service", use_env: false).
           raises(Canvas::DynamicSettings::ConsulError, "can't talk to consul")
         root_account = stub("root_account", feature_enabled?: true)
         Canvas::Errors.expects(:capture_exception).with do |type, e|

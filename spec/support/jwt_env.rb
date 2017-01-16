@@ -26,7 +26,7 @@ RSpec.shared_context "JWT setup" do
   }
 
   before do
-    Canvas::DynamicSettings.stubs(:find).with("canvas").returns(fake_secrets)
+    Canvas::DynamicSettings.stubs(:find).with("canvas", use_env: false).returns(fake_secrets)
   end
 
   after do

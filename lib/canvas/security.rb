@@ -342,11 +342,11 @@ module Canvas::Security
     end
 
     def services_encryption_secret
-      Canvas::DynamicSettings.from_cache("canvas")["encryption-secret"]
+      Canvas::DynamicSettings.from_cache("canvas", use_env: false)["encryption-secret"]
     end
 
     def services_signing_secret
-      Canvas::DynamicSettings.from_cache("canvas")["signing-secret"]
+      Canvas::DynamicSettings.from_cache("canvas", use_env: false)["signing-secret"]
     end
   end
 end

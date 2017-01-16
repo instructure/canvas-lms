@@ -72,7 +72,7 @@ module Services
       end
 
       def settings
-        Canvas::DynamicSettings.from_cache("live-events-subscription-service", expires_in: 5.minutes)
+        Canvas::DynamicSettings.from_cache("live-events-subscription-service", expires_in: 5.minutes, use_env: false)
       rescue Imperium::TimeoutError => e
         Canvas::Errors.capture_exception(:live_events_subscription, e)
         nil

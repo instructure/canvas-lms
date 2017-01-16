@@ -27,7 +27,7 @@ module Canvas
     KV_NAMESPACE = "config/canvas".freeze
 
     class << self
-      attr_accessor :config, :cache, :fallback_data
+      attr_accessor :config, :cache, :environment, :fallback_data
 
       def config=(conf_hash)
         @config = conf_hash
@@ -43,17 +43,19 @@ module Canvas
             config.receive_timeout = conf_hash['receive_timeout'] if conf_hash['receive_timeout']
           end
 
-          init_data = conf_hash.fetch("init_values", {})
-          init_values(init_data)
+          @environment = conf_hash['environment']
+
+          init_values(conf_hash.fetch("init_values", {}))
+          init_values(conf_hash.fetch("init_values_without_env", {}), use_env: false)
         end
       end
 
-      def find(key)
+      def find(key, use_env: true)
         if config.nil?
           return fallback_data.fetch(key) if fallback_data.present?
           raise(ConsulError, "Unable to contact consul without config")
         else
-          store_get(key)
+          store_get(key, use_env: use_env)
         end
       end
 
@@ -61,12 +63,12 @@ module Canvas
       # the first time they're asked for, and then can only be cleared with a SIGHUP
       # or restart of the process.  Make sure that's the behavior you want before
       # you use this method, or specify a timeout
-      def from_cache(key, expires_in: nil)
+      def from_cache(key, expires_in: nil, use_env: true)
         reset_cache! if cache.nil?
         cached_value = get_from_cache(key, expires_in)
         return cached_value if cached_value.present?
         # cache miss or timeout
-        value = self.find(key)
+        value = self.find(key, use_env: use_env)
         set_in_cache(key, value)
         value
       end
@@ -94,25 +96,27 @@ module Canvas
         cache[key] = {value: value, timestamp: Time.zone.now.to_i}
       end
 
-      def init_values(hash)
+      def init_values(hash, use_env: true)
         hash.each do |parent_key, settings|
           settings.each do |child_key, value|
-            store_put("#{parent_key}/#{child_key}", value)
+            store_put("#{parent_key}/#{child_key}", value, use_env: use_env)
           end
         end
       rescue Imperium::TimeoutError
         return false
       end
 
-      def store_get(key)
+      def store_get(key, use_env: true)
         # store all values that we get here to
         # kind-of recover in case of big failure
         @strategic_reserve ||= {}
-        consul_value = consul_get(key)
+        parent_key = add_prefix_to(key, use_env)
+        consul_response = kv_client.get(parent_key, *CONSUL_READ_OPTIONS)
+        consul_value = consul_response.values
 
         @strategic_reserve[key] = consul_value
         consul_value
-      rescue Imperium::TimeoutError
+      rescue Imperium::TimeoutError => exception
         if @strategic_reserve.key?(key)
           # we have an old value for this key, log the error but recover
           Canvas::Errors.capture_exception(:consul, exception)
@@ -123,14 +127,17 @@ module Canvas
         end
       end
 
-      def store_put(key, value)
-        kv_client.put("#{KV_NAMESPACE}/#{key}", value)
+      def store_put(key, value, use_env: true)
+        full_key = add_prefix_to(key, use_env)
+        kv_client.put(full_key, value)
       end
 
-      def consul_get(key)
-        parent_key = "#{KV_NAMESPACE}/#{key}"
-        consul_response = kv_client.get(parent_key, *CONSUL_READ_OPTIONS)
-        consul_response.values
+      def add_prefix_to(key, use_env)
+        if use_env && environment
+          "#{KV_NAMESPACE}/#{environment}/#{key}"
+        else
+          "#{KV_NAMESPACE}/#{key}"
+        end
       end
     end
   end
