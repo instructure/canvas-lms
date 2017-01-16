@@ -2528,6 +2528,18 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           expect(@assignment.reload.only_visible_to_overrides).to eql true
         end
 
+        it "allows disabling post_to_sis when due in a closed grading period" do
+          @assignment = create_assignment(due_at: 3.days.ago, post_to_sis: true)
+          call_update({ post_to_sis: false }, 201)
+          expect(@assignment.reload.post_to_sis).to eq(false)
+        end
+
+        it "allows enabling post_to_sis when due in a closed grading period" do
+          @assignment = create_assignment(due_at: 3.days.ago, post_to_sis: false)
+          call_update({ post_to_sis: true }, 201)
+          expect(@assignment.reload.post_to_sis).to eq(true)
+        end
+
         it "does not allow disabling only_visible_to_overrides when due in a closed grading period" do
           @assignment = create_assignment(due_at: 3.days.ago, only_visible_to_overrides: true)
           call_update({ only_visible_to_overrides: false }, 403)
