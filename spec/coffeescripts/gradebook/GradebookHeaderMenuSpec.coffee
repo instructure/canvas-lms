@@ -164,7 +164,7 @@ define [
     setup: ->
       fakeENV.setup({
         GRADEBOOK_OPTIONS: {
-          multiple_grading_periods_enabled: true
+          has_grading_periods: true
         }
       })
       @disableUnavailableMenuActions = GradebookHeaderMenu.prototype.disableUnavailableMenuActions
@@ -224,7 +224,7 @@ define [
     setup: ->
       fakeENV.setup({
         GRADEBOOK_OPTIONS: {
-          multiple_grading_periods_enabled: true
+          has_grading_periods: true
         },
         current_user_roles: ['admin']
       })
@@ -274,7 +274,7 @@ define [
     setup: ->
       fakeENV.setup({
         GRADEBOOK_OPTIONS: {
-          multiple_grading_periods_enabled: true
+          has_grading_periods: true
         },
         current_user_roles: ['admin']
       })

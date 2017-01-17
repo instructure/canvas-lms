@@ -97,7 +97,7 @@ define [
 
     submissionsUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.submissions_url')
 
-    mgpEnabled: get(window, 'ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled')
+    has_grading_periods: get(window, 'ENV.GRADEBOOK_OPTIONS.has_grading_periods')
 
     gradingPeriods:
       (->
@@ -305,19 +305,19 @@ define [
       gradingPeriodSet = @getGradingPeriodSet()
       effectiveDueDates = @get('effectiveDueDates.content')
 
-      usingGradingPeriods = gradingPeriodSet and effectiveDueDates
+      hasGradingPeriods = gradingPeriodSet and effectiveDueDates
 
       CourseGradeCalculator.calculate(
         submissions,
         assignmentGroups,
         weightingScheme,
-        gradingPeriodSet if usingGradingPeriods,
-        EffectiveDueDates.scopeToUser(effectiveDueDates, student.id) if usingGradingPeriods
+        gradingPeriodSet if hasGradingPeriods,
+        EffectiveDueDates.scopeToUser(effectiveDueDates, student.id) if hasGradingPeriods
       )
 
     submissionsForStudent: (student) ->
       allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)
-      return allSubmissions unless @get('mgpEnabled')
+      return allSubmissions unless @get('has_grading_periods')
       selectedPeriodID = @get('selectedGradingPeriod.id')
       return allSubmissions if !selectedPeriodID or selectedPeriodID == '0'
 
@@ -366,7 +366,7 @@ define [
     fetchAssignmentGroups: (->
       params = { exclude_response_fields: ['in_closed_grading_period'] }
       gpId = @get('selectedGradingPeriod.id')
-      if @get('mgpEnabled') && gpId != '0'
+      if @get('has_grading_periods') && gpId != '0'
         params.grading_period_id = gpId
       @set('assignment_groups', [])
       @set('assignmentsFromGroups', [])
@@ -694,7 +694,7 @@ define [
 
     populateSubmissionStateMap: (->
       map = new SubmissionStateMap(
-        gradingPeriodsEnabled: !!@mgpEnabled
+        hasGradingPeriods: !!@has_grading_periods
         selectedGradingPeriodID: @get('selectedGradingPeriod.id') || '0'
         isAdmin: ENV.current_user_roles && _.contains(ENV.current_user_roles, "admin")
       )

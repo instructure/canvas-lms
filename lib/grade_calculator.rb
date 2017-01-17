@@ -173,7 +173,7 @@ class GradeCalculator
   def compute_course_scores_from_weighted_grading_periods?
     return @compute_from_weighted_periods if @compute_from_weighted_periods.present?
 
-    if @grading_period || !@course.feature_enabled?(:multiple_grading_periods) || grading_periods_for_course.empty?
+    if @grading_period || grading_periods_for_course.empty?
       @compute_from_weighted_periods = false
     else
       @compute_from_weighted_periods = grading_periods_for_course.first.grading_period_group.weighted?

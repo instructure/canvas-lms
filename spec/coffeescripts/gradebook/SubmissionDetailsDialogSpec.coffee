@@ -12,7 +12,7 @@ define [
       defaults =
         current_user_roles: [ "teacher" ]
         GRADEBOOK_OPTIONS:
-          multiple_grading_periods_enabled: true
+          has_grading_periods: true
       @previousWindowENV = window.ENV
 
       _.extend(window.ENV, defaults)
@@ -53,7 +53,7 @@ define [
       defaults =
         current_user_roles: [ "teacher" ]
         GRADEBOOK_OPTIONS:
-          multiple_grading_periods_enabled: true
+          has_grading_periods: true
       @previousWindowENV = window.ENV
 
       _.extend(window.ENV, defaults)
@@ -84,7 +84,7 @@ define [
       defaults =
         current_user_roles: [ "teacher" ]
         GRADEBOOK_OPTIONS:
-          multiple_grading_periods_enabled: true
+          has_grading_periods: true
       @previousWindowENV = window.ENV
 
       _.extend(window.ENV, defaults)

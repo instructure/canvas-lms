@@ -104,7 +104,7 @@ define [
     filterResults: =>
       term = $('#search_term').val()
       gradingPeriod = null
-      if ENV.MULTIPLE_GRADING_PERIODS_ENABLED
+      if ENV.HAS_GRADING_PERIODS
         gradingPeriodIndex = $("#grading_period_selector").val()
         gradingPeriod = @gradingPeriods[parseInt(gradingPeriodIndex)] if gradingPeriodIndex != "all"
         @saveSelectedGradingPeriod(gradingPeriod)

@@ -2134,7 +2134,7 @@ class UsersController < ApplicationController
     grading_periods = {}
 
     courses.each do |course|
-      next unless course.feature_enabled?(:multiple_grading_periods)
+      next unless course.grading_periods?
 
       course_periods = GradingPeriod.for(course)
       grading_period_specified = grading_period_id &&

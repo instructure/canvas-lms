@@ -4,8 +4,7 @@ require [
   'jsx/grading/CourseTabContainer'
 ], (React, ReactDOM, CourseTabContainer) ->
   CourseTabContainerFactory = React.createFactory CourseTabContainer
-  mgpEnabled = ENV.MULTIPLE_GRADING_PERIODS
   ReactDOM.render(
-    CourseTabContainerFactory(multipleGradingPeriodsEnabled: mgpEnabled),
+    CourseTabContainerFactory(hasGradingPeriods: ENV.HAS_GRADING_PERIODS),
     document.getElementById("react_grading_tabs")
   )

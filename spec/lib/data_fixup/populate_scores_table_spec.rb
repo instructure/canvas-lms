@@ -65,17 +65,40 @@ describe DataFixup::PopulateScoresTable do
   it "creates Score object for each grading period, if one doesn't already exist" do
     grader1 = teacher_in_course(course: @course1, active_all: true).user
     grader2 = teacher_in_course(course: @course2, active_all: true).user
-    group1 = @course1.grading_period_groups.create!
-    gp1 = group1.grading_periods.create!(title: "Way long ago", start_date: 1.year.ago, end_date: 4.months.ago)
-    gp2 = group1.grading_periods.create!(title: "Long ago", start_date: 3.months.ago, end_date: 1.day.ago)
+    group1 = Factories::GradingPeriodGroupHelper.new.create_for_account(@course1.root_account)
+    group1.enrollment_terms << @course1.enrollment_term
+    gp1 = group1.grading_periods.create!(
+      title: "Way long ago",
+      start_date: 1.year.ago,
+      end_date: 4.months.ago,
+      close_date: 1.year.from_now
+    )
+    gp2 = group1.grading_periods.create!(
+      title: "Long ago",
+      start_date: 3.months.ago,
+      end_date: 1.day.ago,
+      close_date: 2.years.from_now
+    )
     assignment1 = @course1.assignments.create!(due_at: 7.months.ago, points_possible: 100)
     assignment1.grade_student(@student1_enrollment.user, grader: grader1, score: 47.4)
     assignment1.grade_student(@student2_enrollment.user, grader: grader1, score: 51.0)
     assignment2 = @course1.assignments.create!(due_at: 1.month.ago, points_possible: 100)
     assignment2.grade_student(@student1_enrollment.user, grader: grader1, score: 53.0)
-    group2 = @course2.grading_period_groups.create!
-    gp3 = group2.grading_periods.create!(title: "Way long ago", start_date: 1.year.ago, end_date: 4.months.ago)
-    group2.grading_periods.create!(title: "Long ago", start_date: 3.months.ago, end_date: 1.day.ago)
+    group2 = Factories::GradingPeriodGroupHelper.new.create_for_account_with_term(@course2.root_account, 'Another Term')
+    @course2.enrollment_term = group2.enrollment_terms.first
+    @course2.save!
+    gp3 = group2.grading_periods.create!(
+      title: "Way long ago",
+      start_date: 1.year.ago,
+      end_date: 4.months.ago,
+      close_date: 1.year.from_now
+    )
+    group2.grading_periods.create!(
+      title: "Long ago",
+      start_date: 3.months.ago,
+      end_date: 1.day.ago,
+      close_date: 2.years.from_now
+    )
     assignment3 = @course2.assignments.create!(due_at: 7.months.ago, points_possible: 100)
     assignment3.grade_student(@student3_enrollment.user, grader: grader2, score: 10)
     assignment3.grade_student(@student4_enrollment.user, grader: grader2, score: 20)

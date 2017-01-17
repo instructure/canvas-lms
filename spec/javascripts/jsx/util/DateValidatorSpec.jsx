@@ -60,7 +60,7 @@ define([
           date_context: "term"
         }
       },
-      multipleGradingPeriodsEnabled: true,
+      hasGradingPeriods: true,
       userIsAdmin,
       data,
       gradingPeriods
@@ -74,7 +74,7 @@ define([
     return Object.keys(errors).length === 0;
   }
 
-  module('#DateValidator -- Multiple Grading Periods');
+  module('#DateValidator with grading periods');
 
   test("it is invalid to add a new override with a date in a closed grading period", function() {
     const data = generateData({ due_at: DATE_IN_CLOSED_PERIOD, persisted: false });

@@ -176,6 +176,31 @@ describe Course do
     end
   end
 
+  describe "#grading_periods?" do
+    it "should return true if course has grading periods" do
+      @course.save!
+      Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
+      expect(@course.grading_periods?).to be true
+    end
+
+    it "should return true if account has grading periods for course term" do
+      @course.save!
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group.enrollment_terms << @course.enrollment_term
+      expect(@course.grading_periods?).to be true
+    end
+
+    it "should return false if account has grading periods without course term" do
+      @course.save!
+      Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      expect(@course.grading_periods?).to be false
+    end
+
+    it "should return false if neither course nor account have grading periods" do
+      expect(@course.grading_periods?).to be false
+    end
+  end
+
   describe "#time_zone" do
     it "should use provided value when set, regardless of root account setting" do
       @root_account = Account.default

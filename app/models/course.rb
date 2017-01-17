@@ -3086,6 +3086,18 @@ class Course < ActiveRecord::Base
     effective_due_dates.any_in_closed_grading_period?
   end
 
+  # Does this course have grading periods?
+  # checks for both legacy and account-level grading period groups
+  def grading_periods?
+    return @has_grading_periods unless @has_grading_periods.nil?
+
+    @has_grading_periods = shard.activate do
+      GradingPeriodGroup.active.
+        where("id = ? or course_id = ?", enrollment_term.grading_period_group_id, id).
+        exists?
+    end
+  end
+
   private
 
   def effective_due_dates

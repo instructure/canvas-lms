@@ -17,7 +17,7 @@ define [
       App = startApp()
       @component = App.GradingCellComponent.create()
 
-      ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled = true
+      ENV.GRADEBOOK_OPTIONS.has_grading_periods = true
       ENV.current_user_roles = []
 
       setType = (type) =>

@@ -95,7 +95,7 @@ require [
 
   # kick it all off
   assignmentGroups.fetch(reset: true).then ->
-    app.filterResults() if ENV.MULTIPLE_GRADING_PERIODS_ENABLED
+    app.filterResults() if ENV.HAS_GRADING_PERIODS
     if ENV.PERMISSIONS.manage
       assignmentGroups.loadModuleNames()
     else

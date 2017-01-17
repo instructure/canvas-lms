@@ -17,10 +17,10 @@ define([
     return _.contains(assignment.assignment_visibility, student.id);
   }
 
-  function cellMapForSubmission(assignment, student, gradingPeriodsEnabled, selectedGradingPeriodID, isAdmin) {
+  function cellMapForSubmission(assignment, student, hasGradingPeriods, selectedGradingPeriodID, isAdmin) {
     if (!visibleToStudent(assignment, student)) {
       return { locked: true, hideGrade: true, tooltip: TOOLTIP_KEYS.NONE };
-    } else if (gradingPeriodsEnabled) {
+    } else if (hasGradingPeriods) {
       return cellMappingsForMultipleGradingPeriods(assignment, student, selectedGradingPeriodID, isAdmin);
     } else {
       return { locked: false, hideGrade: false, tooltip: TOOLTIP_KEYS.NONE };
@@ -51,8 +51,8 @@ define([
   }
 
   class SubmissionState {
-    constructor({ gradingPeriodsEnabled, selectedGradingPeriodID, isAdmin }) {
-      this.gradingPeriodsEnabled = gradingPeriodsEnabled;
+    constructor({ hasGradingPeriods, selectedGradingPeriodID, isAdmin }) {
+      this.hasGradingPeriods = hasGradingPeriods;
       this.selectedGradingPeriodID = selectedGradingPeriodID;
       this.isAdmin = isAdmin;
       this.submissionCellMap = {};
@@ -74,7 +74,7 @@ define([
       const params = [
         assignment,
         student,
-        this.gradingPeriodsEnabled,
+        this.hasGradingPeriods,
         this.selectedGradingPeriodID,
         this.isAdmin
       ];

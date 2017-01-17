@@ -154,7 +154,7 @@ define [
       dateValidator = new DateValidator(
         date_range: _.extend({}, validRange)
         data: data
-        multipleGradingPeriodsEnabled: !!ENV.MULTIPLE_GRADING_PERIODS_ENABLED
+        hasGradingPeriods: !!ENV.HAS_GRADING_PERIODS
         gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)
         userIsAdmin: @currentUserIsAdmin()
       )

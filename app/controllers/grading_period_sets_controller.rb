@@ -1,9 +1,6 @@
 class GradingPeriodSetsController < ApplicationController
-  include ::Filters::GradingPeriods
-
   before_action :require_user
   before_action :get_context
-  before_action :check_feature_flag
   before_action :check_manage_rights, except: [:index]
   before_action :check_read_rights, except: [:update, :create, :destroy]
 

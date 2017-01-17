@@ -315,12 +315,11 @@ describe GradebooksController do
       end
     end
 
-    context "Multiple Grading Periods" do
+    context "with grading periods" do
       let(:group_helper)  { Factories::GradingPeriodGroupHelper.new }
       let(:period_helper) { Factories::GradingPeriodHelper.new }
 
       before :once do
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         @grading_period_group = group_helper.create_for_account(@course.root_account)
         term = @course.enrollment_term
         term.grading_period_group = @grading_period_group
@@ -574,12 +573,11 @@ describe GradebooksController do
       end
     end
 
-    context "with multiple grading periods" do
+    context "with grading periods" do
       let(:group_helper)  { Factories::GradingPeriodGroupHelper.new }
       let(:period_helper) { Factories::GradingPeriodHelper.new }
 
       before :once do
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         @grading_period_group = group_helper.create_for_account(@course.root_account)
         term = @course.enrollment_term
         term.grading_period_group = @grading_period_group

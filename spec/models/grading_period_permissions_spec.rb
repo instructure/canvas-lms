@@ -25,7 +25,6 @@ describe GradingPeriod, "permissions:" do
   context "course belonging to root account" do
     before(:once) do
       @root_account = Account.default
-      Account.default.enable_feature!(:multiple_grading_periods)
       @sub_account = @root_account.sub_accounts.create!
       course_with_teacher(account: @root_account, active_all: true)
       course_with_student(course: @course, active_all: true)
@@ -138,30 +137,11 @@ describe GradingPeriod, "permissions:" do
         })
       end
     end
-
-    context "multiple grading periods feature flag turned off" do
-      before(:once) do
-        account_admin_user(account: @root_account)
-        @root_account_admin = @admin
-        @root_account.disable_feature! :multiple_grading_periods
-      end
-
-      it "can not do anything" do
-        expect(@course_period.
-          rights_status(@root_account_admin, *permissions)).to eq({
-          read:   false,
-          create: false,
-          update: false,
-          delete: false
-        })
-      end
-    end
   end
 
   context "course belonging to sub-account" do
     before(:once) do
       @root_account = Account.default
-      Account.default.enable_feature!(:multiple_grading_periods)
       @sub_account = @root_account.sub_accounts.create!
       course_with_teacher(account: @sub_account, active_all: true)
       course_with_student(course: @course, active_all: true)
@@ -268,24 +248,6 @@ describe GradingPeriod, "permissions:" do
         expect(@course_period.
           rights_status(@student, *permissions)).to eq({
           read:   true,
-          create: false,
-          update: false,
-          delete: false
-        })
-      end
-    end
-
-    context "multiple grading periods feature flag turned off" do
-      before(:once) do
-        account_admin_user(account: @sub_account)
-        @sub_account_admin = @admin
-        @root_account.disable_feature! :multiple_grading_periods
-      end
-
-      it "cannot do anything with grading periods" do
-        expect(@course_period.
-          rights_status(@sub_account_admin, *permissions)).to eq({
-          read:   false,
           create: false,
           update: false,
           delete: false

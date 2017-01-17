@@ -11,7 +11,7 @@
 <div class="header-bar">
   <div class="header-bar-left ic-Form-control assignment-search">
     <div class="ic-Multi-input">
-      {{#if ENV.MULTIPLE_GRADING_PERIODS_ENABLED}}
+      {{#if ENV.HAS_GRADING_PERIODS}}
         <select class="ic-Input" id="grading_period_selector" aria-label="{{#t}}Select a Grading Period{{/t}}">
           <option value="all">{{#t}}All Grading Periods{{/t}}</option>
           {{#each ENV.active_grading_periods}}

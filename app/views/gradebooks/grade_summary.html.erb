@@ -54,7 +54,7 @@
 
 <div id="print-grades-container" class="grid-row middle-xs between-xs">
   <div class="col-xs-6" >
-    <% if multiple_grading_periods? %>
+    <% if grading_periods? %>
       <%= render partial: "shared/grading_periods_selector", locals: {selected_period_id: @current_grading_period_id, grading_periods: @grading_periods, enrollment_id: @presenter.student_enrollment.id, all_grading_periods_option: true} %>
     <% end %>
   </div>

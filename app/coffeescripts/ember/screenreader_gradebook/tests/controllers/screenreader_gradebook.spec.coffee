@@ -231,7 +231,7 @@ define [
       )
 
       defaults = {
-        mgpEnabled: false,
+        has_grading_periods: false,
         'selectedGradingPeriod.id': null,
         effectiveDueDates
       }
@@ -250,22 +250,22 @@ define [
     teardown: ->
       teardown.call this
 
-  test 'returns all submissions for the student (multiple grading periods disabled)', ->
+  test 'returns all submissions for the student when there are no grading periods', ->
     self = @setupThis()
     submissions = @srgb.submissionsForStudent.call(self, @student)
     propEqual _.pluck(submissions, 'assignment_id'), ['1', '2']
 
   test 'returns all submissions if "All Grading Periods" is selected', ->
     self = @setupThis(
-      mgpEnabled: true,
-      'selectedGradingPeriod.id': '0',
+      has_grading_periods: true,
+      'selectedGradingPeriod.id': '0'
     )
     submissions = @srgb.submissionsForStudent.call(self, @student)
     propEqual _.pluck(submissions, 'assignment_id'), ['1', '2']
 
   test 'only returns submissions due for the student in the selected grading period', ->
     self = @setupThis(
-      mgpEnabled: true,
+      has_grading_periods: true,
       'selectedGradingPeriod.id': '2'
     )
     submissions = @srgb.submissionsForStudent.call(self, @student)
@@ -292,7 +292,7 @@ define [
       strictEqual @srgb.get('selectedSubmission'), null
 
   test 'assignments excludes any due for the selected student in a different grading period', ->
-    @srgb.mgpEnabled = true
+    @srgb.has_grading_periods = true
     @completeSetup().then =>
       deepEqual(@srgb.get('assignments').mapBy('id'), ['3'])
 

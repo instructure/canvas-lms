@@ -30,12 +30,10 @@ describe "gradebook - logged in as a student" do
     expect(student_grades_page.final_grade).to include_text("10")
   end
 
-  context 'when testing multiple grading periods' do
-    # enable mgp
-    before(:each) do
+  context 'when testing grading periods' do
+    before do
       course_with_admin_logged_in
       student_in_course
-      @course.root_account.enable_feature!(:multiple_grading_periods)
     end
 
     context 'with one past and one current period' do
@@ -44,7 +42,7 @@ describe "gradebook - logged in as a student" do
       past_assignment_name = "Past Assignment"
       current_assignment_name = "Current Assignment"
 
-      before(:each) do
+      before do
         # create term
         term = @course.root_account.enrollment_terms.create!
         @course.update_attributes(enrollment_term: term)

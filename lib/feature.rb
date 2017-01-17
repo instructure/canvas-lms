@@ -243,17 +243,6 @@ END
       applies_to: 'RootAccount',
       state: 'hidden'
     },
-    'multiple_grading_periods' =>
-    {
-      display_name: -> { I18n.t('features.multiple_grading_periods', 'Multiple Grading Periods') },
-      description: -> { I18n.t('enable_multiple_grading_periods', <<-END) },
-      Multiple Grading Periods allows teachers and admins to create grading periods with set
-      cutoff dates. Assignments can be filtered by these grading periods in the gradebook.
-END
-      applies_to: 'Course',
-      state: 'allowed',
-      root_opt_in: true
-    },
     'course_catalog' =>
     {
       display_name: -> { I18n.t("Public Course Index") },
@@ -381,7 +370,7 @@ END
     'all_grading_periods_totals' =>
     {
       display_name: -> { I18n.t('Display Totals for "All Grading Periods"') },
-      description: -> { I18n.t('Display total grades when the "All Grading Periods" dropdown option is selected (Multiple Grading Periods must be enabled).') },
+      description: -> { I18n.t('Display total grades when the "All Grading Periods" dropdown option is selected (grading periods must exist).') },
       applies_to: 'Course',
       state: 'allowed',
       root_opt_in: true

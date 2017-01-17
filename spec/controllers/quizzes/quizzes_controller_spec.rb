@@ -151,7 +151,7 @@ describe Quizzes::QuizzesController do
   describe "GET 'edit'" do
     before(:once) { course_quiz }
 
-    include_context "multiple grading periods within controller" do
+    include_context "grading periods within controller" do
       let(:course) { @course }
       let(:teacher) { @teacher }
       let(:request_params) { [:edit, course_id: course, id: @quiz] }
@@ -996,7 +996,7 @@ describe Quizzes::QuizzesController do
       expect(@student.recent_stream_items.map {|item| item.data['notification_id']}).not_to include notification.id
     end
 
-    context "with multiple grading periods enabled" do
+    context "with grading periods" do
       def call_create(params)
         post('create', course_id: @course.id, quiz: {
           title: "Example Quiz", quiz_type: "assignment"
@@ -1007,7 +1007,6 @@ describe Quizzes::QuizzesController do
 
       before :once do
         teacher_in_course(active_all: true)
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
         term = @course.enrollment_term
         term.grading_period_group = grading_period_group
@@ -1338,7 +1337,7 @@ describe Quizzes::QuizzesController do
       end
     end
 
-    context "with multiple grading periods enabled" do
+    context "with grading periods" do
       def create_quiz(attr)
         @course.quizzes.create!({ title: "Example Quiz", quiz_type: "assignment" }.merge(attr))
       end
@@ -1361,7 +1360,6 @@ describe Quizzes::QuizzesController do
 
       before :once do
         teacher_in_course(active_all: true)
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
         term = @course.enrollment_term
         term.grading_period_group = grading_period_group

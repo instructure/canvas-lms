@@ -20,7 +20,7 @@ require_relative '../../common'
 require_relative '../page_objects/gradezilla_page'
 require_relative '../setup/gradebook_setup'
 
-describe "Gradezilla - multiple grading periods" do
+describe "Gradezilla with grading periods" do
   include_context "in-process server selenium tests"
   include GradebookSetup
 
@@ -30,7 +30,7 @@ describe "Gradezilla - multiple grading periods" do
 
     before(:once) do
       term_name = "First Term"
-      create_multiple_grading_periods(term_name, now)
+      create_grading_periods(term_name, now)
       add_teacher_and_student
       associate_course_to_term(term_name)
     end

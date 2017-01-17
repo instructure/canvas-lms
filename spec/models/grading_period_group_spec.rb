@@ -120,36 +120,6 @@ describe GradingPeriodGroup do
     end
   end
 
-  describe "#multiple_grading_periods_enabled?" do
-    context "when associated with an account" do
-      let(:term) { account.enrollment_terms.create! }
-      let(:group) { group_helper.create_for_account(account) }
-
-      it "returns false if the multiple grading periods feature flag has not been enabled" do
-        expect(group.multiple_grading_periods_enabled?).to eq(false)
-      end
-
-      it "returns true if the multiple grading periods feature flag has been enabled" do
-        account.enable_feature!(:multiple_grading_periods)
-        expect(group.multiple_grading_periods_enabled?).to eq(true)
-      end
-    end
-
-    context "when associated with a course" do
-      let(:course) { Course.create!(account: account) }
-      let(:group) { group_helper.legacy_create_for_course(course) }
-
-      it "returns false if the multiple grading periods feature flag has not been enabled" do
-        expect(group.multiple_grading_periods_enabled?).to eq(false)
-      end
-
-      it "returns true if the multiple grading periods feature flag has been enabled" do
-        course.root_account.enable_feature!(:multiple_grading_periods)
-        expect(group.multiple_grading_periods_enabled?).to eq(true)
-      end
-    end
-  end
-
   it_behaves_like "soft deletion" do
     let(:course) { Course.create!(account: account) }
     let(:creation_arguments) { {title: "A title"} }
@@ -188,7 +158,6 @@ describe GradingPeriodGroup do
     context "course belonging to root account" do
       before :once do
         @root_account = Account.default
-        @root_account.enable_feature!(:multiple_grading_periods)
         @sub_account = @root_account.sub_accounts.create!
         course_with_teacher(account: @root_account, active_all: true)
         course_with_student(course: @course, active_all: true)
@@ -297,30 +266,11 @@ describe GradingPeriodGroup do
           })
         end
       end
-
-      context "multiple grading periods feature flag turned off" do
-        before(:once) do
-          account_admin_user(account: @root_account)
-          @root_account_admin = @admin
-          @root_account.disable_feature! :multiple_grading_periods
-        end
-
-        it "cannot do anything with grading period groups" do
-          expect(@course_group.
-            rights_status(@root_account_admin, *permissions)).to eq({
-            read:   false,
-            create: false,
-            update: false,
-            delete: false
-          })
-        end
-      end
     end
 
     context "course belonging to sub-account" do
       before(:once) do
         @root_account = Account.default
-        @root_account.enable_feature!(:multiple_grading_periods)
         @sub_account = @root_account.sub_accounts.create!
         course_with_teacher(account: @sub_account, active_all: true)
         course_with_student(course: @course, active_all: true)
@@ -423,24 +373,6 @@ describe GradingPeriodGroup do
           expect(@course_group.
             rights_status(@student, *permissions)).to eq({
             read:   true,
-            create: false,
-            update: false,
-            delete: false
-          })
-        end
-      end
-
-      context "multiple grading periods feature flag turned off" do
-        before(:once) do
-          account_admin_user(account: @sub_account)
-          @sub_account_admin = @admin
-          @root_account.disable_feature! :multiple_grading_periods
-        end
-
-        it "cannot do anything with course grading period groups" do
-          expect(@course_group.
-            rights_status(@sub_account_admin, *permissions)).to eq({
-            read:   false,
             create: false,
             update: false,
             delete: false

@@ -574,14 +574,15 @@ describe DiscussionTopicsController do
       course_topic
     end
 
-    include_context "multiple grading periods within controller" do
+    include_context "grading periods within controller" do
       let(:course) { @course }
       let(:teacher) { @teacher }
       let(:request_params) { [:edit, course_id: course, id: @topic] }
     end
 
     it "should not explode with mgp and group context" do
-      @course.root_account.enable_feature!(:multiple_grading_periods)
+      group1 = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      group1.enrollment_terms << @course.enrollment_term
       user_session(@teacher)
       group = group_model(:context => @course)
       group_topic = group.discussion_topics.create!(:title => "title")
@@ -691,7 +692,6 @@ describe DiscussionTopicsController do
 
       specify { expect(topic).to be_a DiscussionTopic }
       specify { expect(topic.user).to eq @user }
-      specify { expect(topic.current_user).to eq @user }
       specify { expect(topic.delayed_post_at).to be_nil }
       specify { expect(topic.lock_at).to be_nil }
       specify { expect(topic.workflow_state).to eq 'active' }

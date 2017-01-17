@@ -123,7 +123,7 @@ define [
         @options.settings['show_inactive_enrollments'] == "true"
       @totalColumnInFront = UserSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
-      @gradingPeriodsEnabled = @options.multiple_grading_periods_enabled
+      @hasGradingPeriods = @options.has_grading_periods
       @gradingPeriods = GradingPeriodsApi.deserializePeriods(@options.active_grading_periods)
       if @options.grading_period_set
         @gradingPeriodSet = GradingPeriodSetsApi.deserializeSet(@options.grading_period_set)
@@ -131,7 +131,7 @@ define [
         @gradingPeriodSet = null
       @gradingPeriodToShow = @getGradingPeriodToShow()
       @submissionStateMap = new SubmissionStateMap
-        gradingPeriodsEnabled: @gradingPeriodsEnabled
+        hasGradingPeriods: @hasGradingPeriods
         selectedGradingPeriodID: @gradingPeriodToShow
         isAdmin: _.contains(ENV.current_user_roles, "admin")
       @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
@@ -145,7 +145,7 @@ define [
       $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
 
       assignmentGroupsParams = { exclude_response_fields: @fieldsToExcludeFromAssignments }
-      if @gradingPeriodsEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
+      if @hasGradingPeriods && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
         $.extend(assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
 
       $('li.external-tools-dialog > a[data-url], button.external-tools-dialog').on 'click keyclick', (event) ->
@@ -158,7 +158,7 @@ define [
       submissionParams =
         response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state', 'excused']
         exclude_response_fields: ['preview_url']
-      submissionParams['grading_period_id'] = @gradingPeriodToShow if @gradingPeriodsEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
+      submissionParams['grading_period_id'] = @gradingPeriodToShow if @hasGradingPeriods && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
       dataLoader = DataLoader.loadGradebookData(
         assignmentGroupsURL: @options.assignment_groups_url
         assignmentGroupsParams: assignmentGroupsParams
@@ -258,7 +258,7 @@ define [
       _.contains(activePeriodIds, gradingPeriodId)
 
     getGradingPeriodToShow: () =>
-      return null unless @gradingPeriodsEnabled
+      return null unless @hasGradingPeriods
       currentPeriodId = UserSettings.contextGet('gradebook_current_grading_period')
       if currentPeriodId && (@isAllGradingPeriods(currentPeriodId) || @gradingPeriodIsActive(currentPeriodId))
         currentPeriodId
@@ -731,7 +731,7 @@ define [
 
     submissionsForStudent: (student) =>
       allSubmissions = (value for key, value of student when key.match /^assignment_(?!group)/)
-      return allSubmissions unless @gradingPeriodsEnabled
+      return allSubmissions unless @hasGradingPeriods
       return allSubmissions if !@gradingPeriodToShow or @isAllGradingPeriods(@gradingPeriodToShow)
 
       _.filter allSubmissions, (submission) =>
@@ -740,14 +740,14 @@ define [
 
     calculateStudentGrade: (student) =>
       if student.loaded and student.initialized
-        usingGradingPeriods = @gradingPeriodSet and @effectiveDueDates
+        hasGradingPeriods = @gradingPeriodSet and @effectiveDueDates
 
         grades = CourseGradeCalculator.calculate(
           @submissionsForStudent(student),
           @assignmentGroups,
           @options.group_weighting_scheme,
-          @gradingPeriodSet if usingGradingPeriods,
-          EffectiveDueDates.scopeToUser(@effectiveDueDates, student.id) if usingGradingPeriods
+          @gradingPeriodSet if hasGradingPeriods,
+          EffectiveDueDates.scopeToUser(@effectiveDueDates, student.id) if hasGradingPeriods
         )
 
         if @gradingPeriodToShow && !@isAllGradingPeriods(@gradingPeriodToShow)
@@ -1043,7 +1043,7 @@ define [
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled
-      @drawGradingPeriodSelectButton() if @gradingPeriodsEnabled
+      @drawGradingPeriodSelectButton() if @hasGradingPeriods
 
       $settingsMenu = $('.gradebook_dropdown')
       showConcludedEnrollmentsEl = $settingsMenu.find("#show_concluded_enrollments")
@@ -1710,7 +1710,7 @@ define [
       currentPeriodId == "0"
 
     hideAggregateColumns: ->
-      return false unless @gradingPeriodsEnabled
+      return false unless @hasGradingPeriods
       return false if @options.all_grading_periods_totals
       selectedPeriodId = @getGradingPeriodToShow()
       @isAllGradingPeriods(selectedPeriodId)

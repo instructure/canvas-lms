@@ -9,8 +9,6 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
     let(:valid_session) { {} }
 
     before do
-      root_account.allow_feature!(:multiple_grading_periods)
-      root_account.enable_feature!(:multiple_grading_periods)
       request.accept = 'application/json'
       @root_user = root_account.users.create! do |user|
         user.accept_terms

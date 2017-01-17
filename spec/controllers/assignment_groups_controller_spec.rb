@@ -82,8 +82,6 @@ describe AssignmentGroupsController do
 
       context 'given an assignment group with and without integration data' do
         before(:once) do
-          root_account.allow_feature!(:multiple_grading_periods)
-          root_account.enable_feature!(:multiple_grading_periods)
           account_admin_user(account: root_account)
         end
 
@@ -127,8 +125,6 @@ describe AssignmentGroupsController do
 
       context 'given a root account with a grading period and a sub account with a grading period' do
         before(:once) do
-          root_account.allow_feature!(:multiple_grading_periods)
-          root_account.enable_feature!(:multiple_grading_periods)
           account_admin_user(account: root_account)
         end
 
@@ -238,18 +234,6 @@ describe AssignmentGroupsController do
           # ensures that check is not an N+1 from the gradebook
           Assignment.any_instance.expects(:students_with_visibility).never
           get 'index', :course_id => @course.id, :include => ['assignments','assignment_visibility'], :format => :json
-          expect(response).to be_success
-        end
-      end
-
-      context 'multiple grading periods feature enabled' do
-        before do
-          @course.root_account.enable_feature!(:multiple_grading_periods)
-        end
-
-        it 'does not throw an error when grading_period_id is passed in as empty string' do
-          user_session(@teacher)
-          get 'index', :course_id => @course.id, :include => ['assignments', 'assignment_visibility'], :grading_period_id => '', :format => :json
           expect(response).to be_success
         end
       end
@@ -365,9 +349,8 @@ describe AssignmentGroupsController do
       expect(@group1.assignments.count).to eq(3)
     end
 
-    context 'with multiple grading periods enabled' do
+    context 'with grading periods' do
       before :once do
-        @course.root_account.enable_feature!(:multiple_grading_periods)
         group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
         term = @course.enrollment_term
         term.grading_period_group = group

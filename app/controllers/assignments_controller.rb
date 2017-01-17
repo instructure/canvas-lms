@@ -434,7 +434,7 @@ class AssignmentsController < ApplicationController
         GROUP_CATEGORIES: group_categories,
         HAS_GRADED_SUBMISSIONS: @assignment.graded_submissions_exist?,
         KALTURA_ENABLED: !!feature_enabled?(:kaltura),
-        MULTIPLE_GRADING_PERIODS_ENABLED: @context.feature_enabled?(:multiple_grading_periods),
+        HAS_GRADING_PERIODS: @context.grading_periods?,
         PLAGIARISM_DETECTION_PLATFORM: @context.root_account.feature_enabled?(:plagiarism_detection_platform),
         POST_TO_SIS: post_to_sis,
         SECTION_LIST: @context.course_sections.active.map do |section|
@@ -462,7 +462,7 @@ class AssignmentsController < ApplicationController
       hash[:SELECTED_CONFIG_TOOL_ID] = selected_tool ? selected_tool.id : nil
       hash[:SELECTED_CONFIG_TOOL_TYPE] = selected_tool ? selected_tool.class.to_s : nil
 
-      if @context.feature_enabled?(:multiple_grading_periods)
+      if @context.grading_periods?
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
       end
       append_sis_data(hash)

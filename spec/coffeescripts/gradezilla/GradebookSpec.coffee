@@ -55,7 +55,6 @@ define [
       assignments = [{ id: 201, points_possible: 10, omit_from_final_grade: false }]
       submissions = [{ assignment_id: 201, score: 10 }]
       defaults = {
-        gradingPeriodsEnabled: true
         gradingPeriodToShow: '0'
         isAllGradingPeriods: Gradebook.prototype.isAllGradingPeriods
         assignmentGroups: [{ id: 301, group_weight: 60, rules: {}, assignments }]
@@ -147,13 +146,13 @@ define [
     equal(student.total_grade, exampleGrades.gradingPeriods[701].final)
 
   test 'does not calculate when the student is not loaded', ->
-    self = @setupThis(gradingPeriodsEnabled: false)
+    self = @setupThis()
     @stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
     @calculate.call(self, id: '101', loaded: false, initialized: true)
     notOk(CourseGradeCalculator.calculate.called)
 
   test 'does not calculate when the student is not initialized', ->
-    self = @setupThis(gradingPeriodsEnabled: false)
+    self = @setupThis()
     @stub(CourseGradeCalculator, 'calculate').returns(createExampleGrades())
     @calculate.call(self, id: '101', loaded: true, initialized: false)
     notOk(CourseGradeCalculator.calculate.called)
@@ -200,7 +199,7 @@ define [
     setupThis: (options) ->
       customOptions = options || {}
       defaults =
-        gradingPeriodsEnabled: true
+        hasGradingPeriods: true
         getGradingPeriodToShow: -> '1'
         options:
           all_grading_periods_totals: false
@@ -211,13 +210,13 @@ define [
       @hideAggregateColumns = Gradebook.prototype.hideAggregateColumns
     teardown: ->
 
-  test 'returns false if multiple grading periods is disabled', ->
-    self = @setupThis(gradingPeriodsEnabled: false, isAllGradingPeriods: -> false)
+  test 'returns false if there are no grading periods', ->
+    self = @setupThis(hasGradingPeriods: false, isAllGradingPeriods: -> false)
     notOk @hideAggregateColumns.call(self)
 
-  test 'returns false if multiple grading periods is disabled, even if isAllGradingPeriods is true', ->
+  test 'returns false if there are no grading periods, even if isAllGradingPeriods is true', ->
     self = @setupThis
-      gradingPeriodsEnabled: false
+      hasGradingPeriods: false
       getGradingPeriodToShow: -> '0'
       isAllGradingPeriods: -> true
 
@@ -301,7 +300,7 @@ define [
       }
 
       defaults = {
-        gradingPeriodsEnabled: false,
+        hasGradingPeriods: false,
         gradingPeriodToShow: null,
         isAllGradingPeriods: -> false,
         effectiveDueDates
@@ -315,14 +314,14 @@ define [
         assignment_2: { assignment_id: '2', user_id: '1', name: 'froyo' }
       @submissionsForStudent = Gradebook.prototype.submissionsForStudent
 
-  test 'returns all submissions for the student (multiple grading periods disabled)', ->
+  test 'returns all submissions for the student when there are no grading periods', ->
     self = @setupThis()
     submissions = @submissionsForStudent.call(self, @student)
     propEqual _.pluck(submissions, 'assignment_id'), ['1', '2']
 
   test 'returns all submissions if "All Grading Periods" is selected', ->
     self = @setupThis(
-      gradingPeriodsEnabled: true,
+      hasGradingPeriods: true,
       gradingPeriodToShow: '0',
       isAllGradingPeriods: -> true
     )
@@ -331,7 +330,7 @@ define [
 
   test 'only returns submissions due for the student in the selected grading period', ->
     self = @setupThis(
-      gradingPeriodsEnabled: true,
+      hasGradingPeriods: true,
       gradingPeriodToShow: '2'
     )
     submissions = @submissionsForStudent.call(self, @student)

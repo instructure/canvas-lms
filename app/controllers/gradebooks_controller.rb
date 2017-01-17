@@ -36,7 +36,7 @@ class GradebooksController < ApplicationController
   MAX_POST_GRADES_TOOLS = 10
 
   def grade_summary
-    set_current_grading_period if multiple_grading_periods?
+    set_current_grading_period if grading_periods?
     @presenter = grade_summary_presenter
     # do this as the very first thing, if the current user is a
     # teacher in the course and they are not trying to view another
@@ -59,7 +59,7 @@ class GradebooksController < ApplicationController
     add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url,
                                                          @presenter.student_id))
     gp_id = nil
-    if multiple_grading_periods?
+    if grading_periods?
       @grading_periods = active_grading_periods_json
       gp_id = @current_grading_period_id unless view_all_grading_periods?
       effective_due_dates = EffectiveDueDates.new(@context).to_hash
@@ -127,7 +127,7 @@ class GradebooksController < ApplicationController
     assignment_groups.map do |ag|
       visible_assignments = ag.visible_assignments(opts[:student] || @current_user).to_a
 
-      if multiple_grading_periods? && @current_grading_period_id && !view_all_grading_periods?
+      if grading_periods? && @current_grading_period_id && !view_all_grading_periods?
         current_period = GradingPeriod.for(@context).find_by(id: @current_grading_period_id)
         visible_assignments = current_period.assignments_for_student(visible_assignments, opts[:student])
       end
@@ -196,7 +196,7 @@ class GradebooksController < ApplicationController
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
-      set_current_grading_period if multiple_grading_periods?
+      set_current_grading_period if grading_periods?
       set_js_env
       @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
@@ -367,7 +367,7 @@ class GradebooksController < ApplicationController
       publish_to_sis_enabled: @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: 'tab-grade-publishing'),
       speed_grader_enabled: @context.allows_speed_grader?,
-      multiple_grading_periods_enabled: multiple_grading_periods?,
+      has_grading_periods: grading_periods?,
       active_grading_periods: active_grading_periods_json,
       grading_period_set: grading_period_group_json,
       current_grading_period_id: @current_grading_period_id,
@@ -750,7 +750,7 @@ class GradebooksController < ApplicationController
     return true if context.hide_final_grades
 
     all_grading_periods_selected =
-      multiple_grading_periods? && view_all_grading_periods?
+      grading_periods? && view_all_grading_periods?
     hide_all_grading_periods_totals = !context.feature_enabled?(:all_grading_periods_totals)
     all_grading_periods_selected && hide_all_grading_periods_totals
   end
@@ -785,7 +785,7 @@ class GradebooksController < ApplicationController
     options = {}
     return options unless @context.present?
 
-    if @current_grading_period_id.present? && !view_all_grading_periods? && multiple_grading_periods?
+    if @current_grading_period_id.present? && !view_all_grading_periods? && grading_periods?
       options[:grading_period_id] = @current_grading_period_id
     end
 

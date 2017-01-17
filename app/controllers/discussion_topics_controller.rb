@@ -447,7 +447,7 @@ class DiscussionTopicsController < ApplicationController
         GROUP_CATEGORIES: categories.
            reject(&:student_organized?).
            map { |category| { id: category.id, name: category.name } },
-        MULTIPLE_GRADING_PERIODS_ENABLED: @context.feature_enabled?(:multiple_grading_periods),
+        HAS_GRADING_PERIODS: @context.grading_periods?,
         SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } }
       }
 
@@ -470,7 +470,7 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:CANCEL_TO] = cancel_redirect_url
       append_sis_data(js_hash)
 
-      if @context.feature_enabled?(:multiple_grading_periods)
+      if @context.grading_periods?
         gp_context = @context.is_a?(Group) ? @context.context : @context
         js_hash[:active_grading_periods] = GradingPeriod.json_for(gp_context, @current_user)
       end

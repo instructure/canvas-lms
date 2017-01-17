@@ -157,9 +157,9 @@ describe 'Screenreader Gradebook grading' do
   end
 
   context 'with grading periods' do
-    before(:each) do
+    before do
       term_name = "First Term"
-      create_multiple_grading_periods(term_name)
+      create_grading_periods(term_name)
       add_teacher_and_student
       associate_course_to_term(term_name)
       user_session(@teacher)

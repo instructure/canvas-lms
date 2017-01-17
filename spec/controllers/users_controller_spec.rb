@@ -607,7 +607,6 @@ describe UsersController do
   describe "GET 'grades_for_student'" do
     let(:test_course) do
       test_course = course_factory(active_all: true)
-      test_course.root_account.enable_feature!(:multiple_grading_periods)
       test_course
     end
     let(:student) { user_factory(active_all: true) }
@@ -746,29 +745,7 @@ describe UsersController do
           observer
         end
 
-        context "with Multiple Grading periods disabled" do
-          it "returns grades of observees" do
-            user_session(observer)
-            get 'grades'
-
-            grades = assigns[:grades][:observed_enrollments][test_course.id]
-            expect(grades.length).to eq 2
-            expect(grades.key?(student1.id)).to eq true
-            expect(grades.key?(student2.id)).to eq true
-          end
-
-          it "returns an empty hash for grading periods" do
-            user_session(observer)
-            get 'grades'
-
-            grading_periods = assigns[:grading_periods]
-            expect(grading_periods).to be_empty
-          end
-        end
-
-        context "with Multiple Grading Periods enabled" do
-          before(:once) { course_factory.root_account.enable_feature!(:multiple_grading_periods) }
-
+        context "with grading periods" do
           it "returns the grading periods" do
             user_session(observer)
             get 'grades'
@@ -817,30 +794,8 @@ describe UsersController do
           course_with_user('StudentEnrollment', course: another_test_course, user: student, active_all: true)
           student
         end
-        context "with Multiple Grading periods disabled" do
-          it "returns grades" do
-            user_session(test_student)
-            get 'grades'
 
-            grades = assigns[:grades][:student_enrollments]
-
-            expect(grades.length).to eq 2
-            expect(grades.key?(test_course.id)).to eq true
-            expect(grades.key?(another_test_course.id)).to eq true
-          end
-
-          it "returns an empty hash for grading periods" do
-            user_session(test_student)
-            get 'grades'
-
-            grading_periods = assigns[:grading_periods]
-            expect(grading_periods).to be_empty
-          end
-        end
-
-        context "with Multiple Grading Periods enabled" do
-          before(:once) { course_factory.root_account.enable_feature!(:multiple_grading_periods) }
-
+        context "with grading periods" do
           it "returns the grading periods" do
             user_session(test_student)
             get 'grades'
@@ -910,7 +865,6 @@ describe UsersController do
                 course_with_user('StudentEnrollment', course: test_course, user: student1, active_all: true)
                 @shard1.activate do
                   account = Account.create!
-                  account.enable_feature!(:multiple_grading_periods)
                   @course2 = course_factory(active_all: true, account: account)
                   course_with_user('StudentEnrollment', course: @course2, user: student1, active_all: true)
                   grading_period_group2 = group_helper.legacy_create_for_course(@course2)

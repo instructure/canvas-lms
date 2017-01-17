@@ -31,7 +31,7 @@ define [
         groups: {1:{id: "1", name: "Reading Group One"}, 2: {id: "2", name: "Reading Group Two"}}
         overrideModel: AssignmentOverride
         syncWithBackbone: ->
-        multipleGradingPeriodsEnabled: false
+        hasGradingPeriods: false
         gradingPeriods: []
         isOnlyVisibleToOverrides: false
         dueAt: null
@@ -134,7 +134,7 @@ define [
     attributes = _.keys(@dueDates.getAllOverrides()[0].attributes)
     ok _.contains(attributes, "persisted")
 
-  module 'DueDates with Multiple Grading Periods enabled',
+  module 'DueDates with grading periods',
     setup: ->
       fakeENV.setup()
       @server = sinon.fakeServer.create()
@@ -246,7 +246,7 @@ define [
         sections: sections
         groups: {1:{id: "1", name: "Reading Group One"}, 2: {id: "2", name: "Reading Group Two"}}
         syncWithBackbone: ->
-        multipleGradingPeriodsEnabled: true
+        hasGradingPeriods: true
         gradingPeriods: gradingPeriods
         isOnlyVisibleToOverrides: true
         dueAt: null
@@ -305,7 +305,7 @@ define [
         students: {"1":{id: "1", name: "Scipio Africanus"}, "3":{id: 3, name: "Publius Publicoa"}}
         overrideModel: AssignmentOverride
         syncWithBackbone: ->
-        multipleGradingPeriodsEnabled: false
+        hasGradingPeriods: false
         gradingPeriods: []
         isOnlyVisibleToOverrides: false
         dueAt: null

@@ -285,7 +285,7 @@ define [
     equal errors["name"][0]["message"], "Name is required!"
 
   test "requires due_at to be in an open grading period if it is being changed and the user is a teacher", ->
-    ENV.MULTIPLE_GRADING_PERIODS_ENABLED = true
+    ENV.HAS_GRADING_PERIODS = true
     ENV.active_grading_periods = [{
       id: "1"
       start_date: "2103-07-01T06:00:00Z"

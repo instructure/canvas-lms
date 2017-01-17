@@ -766,9 +766,8 @@ describe Course do
         expect(result).to eq expected
       end
 
-      context 'with multiple grading periods' do
+      context 'with grading periods' do
         before(:once) do
-          @test_course.enable_feature! :multiple_grading_periods
           @gp_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@test_course.account)
           @gp_group.enrollment_terms << @test_course.enrollment_term
         end
@@ -1295,22 +1294,18 @@ describe Course do
     end
 
     describe '#any_in_closed_grading_period?' do
-      it 'returns false if multiple grading periods is disabled' do
+      it 'returns false if there are no grading periods' do
         @assignment2.due_at = 17.days.ago(@now)
         @assignment2.only_visible_to_overrides = false
         @assignment2.save!
 
-        @test_course.disable_feature! :multiple_grading_periods
+        @test_course.expects(:grading_periods?).returns false
         edd = EffectiveDueDates.for_course(@test_course)
         edd.expects(:to_hash).never
         expect(edd.any_in_closed_grading_period?).to eq(false)
       end
 
-      context 'with multiple grading periods' do
-        before(:once) do
-          @test_course.enable_feature! :multiple_grading_periods
-        end
-
+      context 'with grading periods' do
         it 'returns true if any students in any assignments have a due date in a closed grading period' do
           @assignment2.due_at = 1.day.ago(@now)
           @assignment2.only_visible_to_overrides = false
@@ -1376,12 +1371,12 @@ describe Course do
     end
 
     describe '#in_closed_grading_period?' do
-      it 'returns false if multiple grading periods is disabled' do
+      it 'returns false if there are no grading periods' do
         @assignment2.due_at = 17.days.ago(@now)
         @assignment2.only_visible_to_overrides = false
         @assignment2.save!
 
-        @test_course.disable_feature! :multiple_grading_periods
+        @test_course.expects(:grading_periods?).returns false
         edd = EffectiveDueDates.for_course(@test_course)
         edd.expects(:to_hash).never
         expect(edd.in_closed_grading_period?(@assignment2)).to eq(false)
@@ -1393,12 +1388,8 @@ describe Course do
         expect(edd.in_closed_grading_period?(nil)).to eq(false)
       end
 
-      context 'with multiple grading periods' do
-        before(:once) do
-          @test_course.enable_feature! :multiple_grading_periods
-        end
-
-        before(:each) do
+      context 'with grading periods' do
+        before do
           @assignment2.due_at = 1.day.ago(@now)
           @assignment2.only_visible_to_overrides = false
           @assignment2.save!
