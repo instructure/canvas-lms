@@ -72,7 +72,7 @@ define([
               ref='newName'
               className='ic-Input ef-edit-name-form__input'
               placeholder={I18n.t('name', 'Name')}
-              aria-label={I18n.t('folder_name', 'Folder Name')}
+              aria-label={(this.props.model instanceof Folder) ? I18n.t('folder_name', 'Folder Name') : I18n.t('File Name')}
               defaultValue={this.props.model.displayName()}
               maxLength='255'
               onKeyUp={function (event){ if (event.keyCode === 27) {this.cancelEditingName()} }.bind(this)}
