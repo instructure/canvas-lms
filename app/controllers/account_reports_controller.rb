@@ -176,7 +176,7 @@ class AccountReportsController < ApplicationController
 # @response_field parameters The parameters will vary for each report
 #
 # @example_request
-#     curl -H 'Authorization: Bearer <token>' \ 
+#     curl -H 'Authorization: Bearer <token>' \
 #          https://<canvas>/api/v1/accounts/<account_id>/reports/
 #
 # @example_response
@@ -242,7 +242,8 @@ class AccountReportsController < ApplicationController
     if authorized_action(@context, @current_user, :read_reports)
       available_reports = AccountReport.available_reports.keys
       raise ActiveRecord::RecordNotFound unless available_reports.include? params[:report]
-      report = @account.account_reports.build(:user=>@current_user, :report_type=>params[:report], :parameters=>params[:parameters])
+      parameters = params[:parameters]&.to_hash&.with_indifferent_access
+      report = @account.account_reports.build(:user=>@current_user, :report_type=>params[:report], :parameters=>parameters)
       report.workflow_state = :running
       report.progress = 0
       report.save
@@ -259,7 +260,7 @@ class AccountReportsController < ApplicationController
 # Shows all reports that have been run for the account of a specific type.
 #
 # @example_request
-#     curl -H 'Authorization: Bearer <token>' \ 
+#     curl -H 'Authorization: Bearer <token>' \
 #          https://<canvas>/api/v1/accounts/<account_id>/reports/<report_type>
 #
 # @returns [Report]
@@ -277,7 +278,7 @@ class AccountReportsController < ApplicationController
 # Returns the status of a report.
 #
 # @example_request
-#     curl -H 'Authorization: Bearer <token>' \ 
+#     curl -H 'Authorization: Bearer <token>' \
 #          https://<canvas>/api/v1/accounts/<account_id>/reports/<report_type>/<report_id>
 #
 # @returns Report
@@ -294,8 +295,8 @@ class AccountReportsController < ApplicationController
 #
 # Deletes a generated report instance.
 # @example_request
-#     curl -H 'Authorization: Bearer <token>' \ 
-#          -X DELETE \ 
+#     curl -H 'Authorization: Bearer <token>' \
+#          -X DELETE \
 #          https://<canvas>/api/v1/accounts/<account_id>/reports/<report_type>/<id>
 #
 # @returns Report

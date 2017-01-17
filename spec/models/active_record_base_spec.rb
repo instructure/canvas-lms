@@ -712,4 +712,18 @@ describe ActiveRecord::Base do
       expect(v).to be_valid
     end
   end
+
+  describe "temp_record" do
+    it "should not reload the base association for normal invertible associations" do
+      c = Course.create!(:name => "some name")
+      Course.where(:id => c).update_all(:name => "sadness")
+      expect(c.enrollments.temp_record.course.name).to eq c.name
+    end
+
+    it "should not reload the base association for polymorphic associations" do
+      c = Course.create!(:name => "some name")
+      Course.where(:id => c).update_all(:name => "sadness")
+      expect(c.discussion_topics.temp_record.course.name).to eq c.name
+    end
+  end
 end

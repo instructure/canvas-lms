@@ -26,7 +26,7 @@ class SubmissionComment < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course]
   belongs_to :provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
   has_many :submission_comment_participants, :dependent => :destroy
-  has_many :messages, :as => :context, :dependent => :destroy
+  has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
 
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true

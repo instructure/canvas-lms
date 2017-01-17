@@ -61,6 +61,7 @@ SafeYAML::OPTIONS.merge!(
         !ruby/object:OpenStruct
         !ruby/object:Scribd::Document
         !ruby/object:Mime::Type
+        !ruby/object:Mime::NullType
         !ruby/object:URI::HTTP
         !ruby/object:URI::HTTPS
         !ruby/object:OpenObject

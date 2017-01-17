@@ -126,6 +126,39 @@ describe "Announcements API", type: :request do
       expect(json[0]['context_code']).to eq "course_#{@course1.id}"
       expect(json.map { |thing| thing['id'] }).to eq @anns.map(&:id).reverse << @ann1.id
     end
+
+    describe "active_only" do
+      it "excludes delayed-post announcements" do
+        start_date = 10.days.ago.iso8601
+        end_date = 30.days.from_now.iso8601
+        json = api_call_as_user(@teacher, :get, "/api/v1/announcements",
+                        @params.merge(:context_codes => [ "course_#{@course1.id}", "course_#{@course2.id}" ],
+                                      :start_date => start_date, :end_date => end_date, :active_only => true))
+        expect(json.length).to eq 6
+        expect(json.map { |thing| thing['id'] }).to eq @anns.map(&:id).reverse << @ann1.id
+      end
+
+      it "includes 'active' announcements with past `delayed_post_at`" do
+        @ann1.update_attribute(:delayed_post_at, 7.days.ago)
+        expect(@ann1).to be_active
+        start_date = 10.days.ago.iso8601
+        end_date = 30.days.from_now.iso8601
+        json = api_call_as_user(@teacher, :get, "/api/v1/announcements",
+                        @params.merge(:context_codes => [ "course_#{@course1.id}", "course_#{@course2.id}" ],
+                                      :start_date => start_date, :end_date => end_date, :active_only => true))
+        expect(json.length).to eq 6
+        expect(json.map { |thing| thing['id'] }).to eq @anns.map(&:id).reverse << @ann1.id
+      end
+
+      it "excludes courses not in the context_ids list" do
+        start_date = 10.days.ago.iso8601
+        end_date = 30.days.from_now.iso8601
+        json = api_call_as_user(@teacher, :get, "/api/v1/announcements",
+                        @params.merge(:context_codes => [ "course_#{@course2.id}" ],
+                                      :start_date => start_date, :end_date => end_date, :active_only => true))
+        expect(json).to be_empty
+      end
+    end
   end
 
   context "as student" do

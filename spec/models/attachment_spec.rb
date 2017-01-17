@@ -749,11 +749,17 @@ describe Attachment do
       tag2 = mod.add_item(:id => @a2.id, :type => 'attachment')
       mod.save!
 
+      @a1.reload
+      expect(@a1.could_be_locked).to be_truthy
+
       @a.display_name = 'a1'
       @a.handle_duplicates(:overwrite)
       tag1.reload
       expect(tag1).to be_active
       expect(tag1.content_id).to eq @a.id
+
+      @a.reload
+      expect(@a.could_be_locked).to be_truthy
 
       @a2.destroy
       tag2.reload

@@ -49,7 +49,7 @@ define([
   }
 
   function createValidator({ data, gradingPeriods, userIsAdmin }) {
-    const params= {
+    const params = {
       date_range: {
         start_at: {
           date: "2015-03-02T07:00:00Z",
@@ -70,7 +70,7 @@ define([
   }
 
   function isValid(validator) {
-    const errors = validator.validateDates();
+    const errors = validator.validateDatetimes();
     return Object.keys(errors).length === 0;
   }
 
@@ -81,6 +81,20 @@ define([
     const gradingPeriods = generateGradingPeriods();
     const validator = createValidator({ data, gradingPeriods, userIsAdmin: false });
     notOk(isValid(validator));
+  });
+
+  test("it is invalid for lock_at (until date) to be before due_at on the same day", function() {
+    const data = generateData({ lock_at: "2015-09-23T03:00:00Z", persisted: false });
+    const gradingPeriods = generateGradingPeriods();
+    const validator = createValidator({ data, gradingPeriods, userIsAdmin: false });
+    notOk(isValid(validator));
+  });
+
+  test("it is valid for lock_at (until date) to be equal to due_at", function() {
+    const data = generateData({ lock_at: "2015-09-23T03:59:59Z", persisted: false });
+    const gradingPeriods = generateGradingPeriods();
+    const validator = createValidator({ data, gradingPeriods, userIsAdmin: false });
+    ok(isValid(validator));
   });
 
   test("it is valid to add a new override with a date in a closed grading period if you are admin", function() {

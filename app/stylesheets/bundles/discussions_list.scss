@@ -211,6 +211,10 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   .discussion-row {
     display: table-row;
 
+    .master-course-cell i {
+      margin-right: 10px;
+    }
+
     .mastery-path-icon {
       margin-right: 10px;
       padding: 2px 7px;
@@ -303,7 +307,7 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
   }
 
   .discussion-actions {
-    width: 45px;
+    width: 48px;
   }
 
   .title {

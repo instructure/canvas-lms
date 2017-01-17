@@ -20,6 +20,7 @@ module Lti
           Canvas.placements.assignmentConfiguration
           User.username
           Person.email.primary
+          vnd.Canvas.Person.email.sis
           Person.name.given
           Person.name.family
           Person.name.full

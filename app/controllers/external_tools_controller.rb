@@ -929,7 +929,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on this course with two custom fields and a course navigation tab
-  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools' \
+  #   curl -X POST 'https://<canvas>/api/v1/courses/<course_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \
   #        -F 'name=LTI Example' \
   #        -F 'consumer_key=asdfg' \
@@ -945,7 +945,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on the account with navigation for the user profile page
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \
   #        -F 'name=LTI Example' \
   #        -F 'consumer_key=asdfg' \
@@ -959,7 +959,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on the account with configuration pulled from an external URL
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \
   #        -F 'name=LTI Example' \
   #        -F 'consumer_key=asdfg' \

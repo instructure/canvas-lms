@@ -21,14 +21,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 describe Messages::PeerReviewsHelper do
 
   describe 'assessment requests' do
+    before :once do
+      assessment_request_model
+    end
 
     it 'should should return reviewee name' do
-      assessment_request_model
       expect(reviewee_name(@assessment_request, @user)).to eq(@assessment_request.asset.user.name)
     end
 
     it 'should return anonymous when anonymous peer reviews enabled' do
-      assessment_request_model
       assignment = @assessment_request.asset.assignment
       assignment.update_attribute(:anonymous_peer_reviews, true)
       @assessment_request.reload

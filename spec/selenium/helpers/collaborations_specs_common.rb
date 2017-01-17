@@ -85,11 +85,10 @@ module CollaborationsSpecsCommon
     move_to_click("label[for=groups-filter-btn-#{@collaboration.id}]")
     wait_for_ajaximations
 
-    groups = ffj('.available-groups:visible a')
-    expect(groups.count).to eq 1
-    groups.first.click
+    expect(ffj("ul[aria-label='Available groups']:visible a")).to have_size 1
+    fj("ul[aria-label='Available groups']:visible").click
     wait_for_ajaximations
-    expect(ff('.members-list li')).to have_size(2)
+    expect(ff('.members-list li')).to have_size 2
     expect_new_page_load do
       submit_form('.edit_collaboration')
     end

@@ -614,6 +614,35 @@ by the service should be scoped to the matching domain.
 </cartridge_basiclti_link>
 ```
 
+## Launch URL's containing query parameters
+By default, Canvas handles LTI launch URLs with query parameters by including the query parameters
+in the URL and the post body. This can result in a signature mismatch if not accounted for. The
+`oauth_compliant` parameter allows an external tool provider to specify how it wants Canvas to
+handle launch URLs with query parameters: if set to `true` LTI query parameters will not be copied
+to the POST body.
+
+### Do not move LTI query params to POST body
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+    xmlns:blti = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+    xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0"
+    xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0"
+    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation = "http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd
+    http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0.xsd
+    http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
+    http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
+    <blti:title>Protractor Tool</blti:title>
+    <blti:description>This tool provides an online, interactive protractor for students to use</blti:description>
+    <blti:launch_url>https://example.com/tool_redirect?query_param=some_value</blti:launch_url>
+    <blti:extensions platform="canvas.instructure.com">
+      <lticm:property name="oauth_compliant">true</lticm:property>
+      <lticm:property name="privacy_level">public</lticm:property>
+    </blti:extensions>
+</cartridge_basiclti_link>
+```
+
 ## Content Migrations support
 <h3 class='beta'>BETA: The following configurations and APIs are not finalized
 and may be subject to breaking changes before final release.</h3>

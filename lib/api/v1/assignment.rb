@@ -70,6 +70,7 @@ module Api::V1::Assignment
     allowed_extensions
     due_at
     only_visible_to_overrides
+    post_to_sis
   ].freeze
 
   def assignments_json(assignments, user, session, opts = {})
@@ -301,6 +302,11 @@ module Api::V1::Assignment
     if assignment.context.present?
       hash['submissions_download_url'] = submissions_download_url(assignment.context, assignment)
     end
+
+    if opts[:include_master_course_restrictions]
+      hash.merge!(assignment.master_course_api_restriction_data)
+    end
+
     hash
   end
 

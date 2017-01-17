@@ -301,6 +301,13 @@ Returns the primary email of the launching user. Only available when launched by
 john.doe@example.com
 ```
 
+## vnd.Canvas.Person.email.sis
+Returns the institution assigned email of the launching user. Only available when launched by a logged in user that was added via SIS.
+
+```
+john.doe@example.com
+```
+
 ## Person.address.timezone
 Returns the name of the timezone of the launching user. Only available when launched by a logged in user.
 ```

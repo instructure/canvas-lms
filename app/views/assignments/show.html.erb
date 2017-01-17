@@ -35,7 +35,7 @@
           data-id='<%= @assignment.id %>'
           class='btn <%= "published" if @assignment.published? %> <%= "disabled" unless assignment_publishing_enabled?(@assignment, @current_user) %>'>
         </button>
-        <% if can_do(@assignment, @current_user, :update) %>
+        <% if can_do(@assignment, @current_user, :update) && !editing_restricted?(@assignment) %>
           <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link'>
             <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
           </a>
