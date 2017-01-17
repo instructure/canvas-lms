@@ -27,15 +27,6 @@ if Canvas.redis_enabled?
       expect(counter.increment_count).to eq(3)
     end
 
-    it "has a functional rolling counter implementation" do
-      # This four calls in order is what makes a rolling counter
-      Canvas.redis.expects(:zadd)
-      Canvas.redis.expects(:expire)
-      Canvas.redis.expects(:zremrangebyscore)
-      Canvas.redis.expects(:zcount).returns(1)
-      counter.increment_count
-    end
-
     it "increments the failure counter" do
       counter.increment_failure
       expect(counter.increment_failure).to eq(2)
