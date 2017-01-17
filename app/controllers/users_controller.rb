@@ -486,10 +486,10 @@ class UsersController < ApplicationController
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
 
     if params[:login_success]
-      if @current_user.last_url && @current_user.last_url != ''
-        redirect_to @current_user.last_url
-      elsif @current_user.enrollments.active.count == 1
+      if @current_user.enrollments.active.count == 1
         redirect_to "/courses/#{@current_user.enrollments.active.first.course.id}"
+      elsif @current_user.last_url && @current_user.last_url != ''
+        redirect_to @current_user.last_url
       end
     end
   end
