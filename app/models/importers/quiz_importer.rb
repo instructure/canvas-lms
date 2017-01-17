@@ -176,6 +176,7 @@ module Importers
         end
       end
       item ||= context.quizzes.temp_record
+      item.mark_as_importing!(migration)
       new_record = item.new_record? || item.deleted?
 
       hash[:due_at] ||= hash[:due_date]
@@ -223,7 +224,8 @@ module Importers
       item.save!
       build_assignment = false
 
-      if question_data
+      skip_questions = migration.for_master_course_import? && item.edit_types_locked_for_overwrite_on_import.include?(:content)
+      if question_data && !skip_questions
         question_data[:qq_ids] ||= {}
         hash[:questions] ||= []
 

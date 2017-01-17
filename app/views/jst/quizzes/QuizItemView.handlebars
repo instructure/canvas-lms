@@ -46,9 +46,21 @@
       </span>
       {{/if}}
       <span class="sis-button" data-view="sis-button"></span>
+      <span class="master-course-cell">
+        {{#if is_master_course_content}}
+          {{#if restricted_by_master_course}}
+            <i class="icon-lock"></i>
+          {{else}}
+            <i class="icon-unlock icon-Line"></i>
+          {{/if}}
+        {{/if}}
+      </span>
       <span data-view="publish-icon" class="publish-icon"></span>
 
       <div class="inline-block">
+        {{#if restricted_by_master_course}}
+          <div class="options-spacer"></div>
+        {{else}}
         <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" href="#">
           <i class="icon-settings"></i>
           <i class="icon-mini-arrow-down"></i>
@@ -73,6 +85,7 @@
           </li>
           {{>ExternalTools/external_tools_menu quiz_menu_tools}}
         </ul>
+        {{/if}}
       </div>
     </div>
     {{/if}}

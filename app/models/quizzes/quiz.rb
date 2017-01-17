@@ -82,6 +82,17 @@ class Quizzes::Quiz < ActiveRecord::Base
   # simply_versioned callback updating the version.
   after_save :link_assignment_overrides, :if => :new_assignment_id?
 
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:title, :description]
+  restrict_columns :settings, [
+    :quiz_type, :assignment_group_id, :shuffle_answers, :time_limit,
+    :anonymous_submissions, :scoring_policy, :allowed_attempts, :hide_results,
+    :one_time_results, :show_correct_answers, :show_correct_answers_last_attempt,
+    :hide_correct_answers_at, :one_question_at_a_time, :cant_go_back, :access_code,
+    :ip_filter, :require_lockdown_browser, :require_lockdown_browser_for_results,
+    :lock_at, :unlock_at
+  ]
+
   # override has_one relationship provided by simply_versioned
   def current_version_unidirectional
     versions.limit(1)

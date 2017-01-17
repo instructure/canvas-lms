@@ -403,39 +403,51 @@ describe MasterCourses::MasterMigration do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
-      #TODO: quizzes and quiz questions
-      #quiz = @copy_from.quizzes.create!
-      #qq = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+      quiz = @copy_from.quizzes.create!
+      qq = quiz.quiz_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
       bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
       aq = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
 
       run_master_migration
 
-      #copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
-      #copied_qq = copied_quiz.quiz_questions.where(:migration_id => mig_id(qq)).first
+      copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      copied_qq = copied_quiz.quiz_questions.where(:migration_id => mig_id(qq)).first
       copied_bank = @copy_to.assessment_question_banks.where(:migration_id => mig_id(bank)).first
       copied_aq = copied_bank.assessment_questions.where(:migration_id => mig_id(aq)).first
 
       new_child_text = "some childish text"
       copied_aq.question_data['question_text'] = new_child_text
       copied_aq.save!
+      copied_qd = copied_qq.question_data
+      copied_qd['question_text'] = new_child_text
+      copied_qq.question_data = copied_qd
+      copied_qq.save!
 
       bank_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_bank).first
       expect(bank_child_tag.downstream_changes).to include("assessment_questions_content") # treats all assessment questions like a column
+      quiz_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_quiz).first
+      expect(quiz_child_tag.downstream_changes).to include("quiz_questions_content") # treats all assessment questions like a column
 
       new_master_text = "some mastery text"
       bank.update_attribute(:title, new_master_text)
       aq.question_data['question_text'] = new_master_text
       aq.save!
+      quiz.update_attribute(:title, new_master_text)
+      qd = qq.question_data
+      qd['question_text'] = new_master_text
+      qq.question_data = qd
+      qq.save!
 
-      [bank].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
+      [bank, quiz].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
 
       run_master_migration # re-copy all the content - but don't actually overwrite anything because it got changed downstream
 
       expect(copied_bank.reload.title).to_not eq new_master_text
       expect(copied_aq.reload.question_data['question_text']).to_not eq new_master_text
+      expect(copied_quiz.reload.title).to_not eq new_master_text
+      expect(copied_qq.reload.question_data['question_text']).to_not eq new_master_text
 
-      [bank].each do |c|
+      [bank, quiz].each do |c|
         mtag = @template.content_tag_for(c)
         Timecop.freeze(2.seconds.from_now) do
           mtag.update_attribute(:restrictions, {:content => true}) # should touch the content
@@ -446,6 +458,8 @@ describe MasterCourses::MasterMigration do
 
       expect(copied_bank.reload.title).to eq new_master_text
       expect(copied_aq.reload.question_data['question_text']).to eq new_master_text
+      expect(copied_quiz.reload.title).to eq new_master_text
+      expect(copied_qq.reload.question_data['question_text']).to eq new_master_text
     end
 
     context "master courses + external migrations" do

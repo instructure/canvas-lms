@@ -51,6 +51,10 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   serialize :question_data
   after_save :update_quiz
 
+  include MasterCourses::CollectionRestrictor
+  self.collection_owner_association = :quiz
+  restrict_columns :content, [:question_data, :position, :quiz_group_id]
+
   workflow do
     state :active
     state :deleted
