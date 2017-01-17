@@ -9,7 +9,8 @@
   </td>
 
   <td>{{ tDateToString created_at "date_at_time" }}</td>
-  <td>{{#if participated}}<img src="/images/checked.png" width=12 />{{/if}}</td>
+    <td>{{#if participated}}<i class="icon-check" aria-hidden="true"></i>
+    <span class="screenreader-only">{{t "checked" }}</span>{{/if}}</td>
   <td>{{ readableInteractionTime }}</td>
   <td title="{{ user_agent }}" class="user_agent">{{ summarizedUserAgent }}</td>
 </tr>
