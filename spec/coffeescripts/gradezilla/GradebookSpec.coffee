@@ -311,10 +311,35 @@ define [
     ok @fakeSubmissionDetailsDialog.called
     deepEqual expectedArguments, @submissionDialogArgs
 
-  test 'ViewOptionsMenu is rendered on init', ->
-    fixtures = document.getElementById("fixtures")
-    fixtures.innerHTML = '<span data-component="ViewOptionsMenu"></span>'
-    Gradebook.prototype.initViewOptionsMenu.call()
+  QUnit.module 'Menus',
+    setup: ->
+      @fixtures = document.getElementById("fixtures")
+    teardown: ->
+      @fixtures.innerHTML = ''
+      window.ENV = {}
+
+  test 'ViewOptionsMenu is rendered on renderViewOptionsMenu', ->
+    @fixtures.innerHTML = '<span data-component="ViewOptionsMenu"></span>'
+    Gradebook.prototype.renderViewOptionsMenu.call()
     buttonText = document.querySelector('[data-component="ViewOptionsMenu"] Button').innerText.trim()
     equal(buttonText, 'View')
-    document.getElementById("fixtures").innerHTML = ""
+
+  test 'ActionMenu is rendered on renderActionMenu', ->
+    @fixtures.innerHTML = '<span data-component="ActionMenu"></span>'
+    window.ENV = { current_user_id: '1' }
+    self = options:
+      gradebook_is_editable: true
+      context_allows_gradebook_uploads: true
+      gradebook_import_url: 'http://someUrl'
+      export_gradebook_csv_url: 'http://someUrl'
+    Gradebook.prototype.renderActionMenu.apply(self)
+    buttonText = document.querySelector('[data-component="ActionMenu"] Button').innerText.trim()
+    equal(buttonText, 'Actions')
+
+  test 'GradebookMenu is rendered on renderGradebookMenu', ->
+    @fixtures.innerHTML = '<span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>'
+    window.ENV = { GRADEBOOK_OPTIONS: { context_url: 'http://someUrl/', outcome_gradebook_enabled: true }}
+    self = options: { assignmentOrOutcome: 'assignment', navigate: -> }
+    Gradebook.prototype.renderGradebookMenu.apply(self)
+    buttonText = document.querySelector('[data-component="GradebookMenu"] Button').innerText.trim()
+    equal(buttonText, 'Gradebook')

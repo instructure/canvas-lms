@@ -47,10 +47,12 @@ describe "Gradezilla - post grades to SIS" do
 
     gradezilla_page.visit(@course)
 
-    f('a[data-id=outcome]').click
+    f('.gradebook-menus [data-component="GradebookMenu"]').click
+    f('[data-menu-item-id="learning-mastery"]').click
     expect(f('.post-grades-placeholder')).not_to be_displayed
 
-    f('a[data-id=assignment]').click
+    f('.outcome-menus [data-component="GradebookMenu"]').click
+    f('[data-menu-item-id="default-gradebook"]').click
 
     expect(f('.post-grades-placeholder')).to be_displayed
   end

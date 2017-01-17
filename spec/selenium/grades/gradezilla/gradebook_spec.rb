@@ -115,10 +115,11 @@ describe "Gradezilla" do
   end
 
   it "View Grading History menu item redirects to grading history page", priority: "2", test_id: 164218 do
+    @course.root_account.enable_feature!(:gradezilla)
     gradezilla_page.visit(@course)
 
-    f('#gradebook_settings').click
-    fj('.ui-menu-item a:contains("View Grading History")').click
+    f('.gradebook-menus [data-component="GradebookMenu"]').click
+    f('[data-menu-item-id="grade-history"]').click
     expect(driver.current_url).to include("/courses/#{@course.id}/gradebook/history")
   end
 

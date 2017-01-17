@@ -1,4 +1,21 @@
-# This class both creates the slickgrid instance, and acts as the data source for that instance.
+#
+# Copyright (C) 2016 - 2017 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 define [
   'jquery'
   'underscore'
@@ -34,6 +51,7 @@ define [
   'jsx/gradezilla/default_gradebook/components/AssignmentGroupColumnHeader'
   'jsx/gradezilla/default_gradebook/components/StudentColumnHeader'
   'jsx/gradezilla/default_gradebook/components/TotalGradeColumnHeader'
+  'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
   'jsx/gradezilla/SISGradePassback/PostGradesStore'
@@ -61,15 +79,18 @@ define [
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
   'jsx/context_cards/StudentContextCardTrigger'
-], (
-  $, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
+], ($, _, Backbone, tz, DataLoader, React, ReactDOM, LongTextEditor, KeyboardNavDialog, KeyboardNavTemplate, Slick,
   GradingPeriodsAPI, round, InputFilterView, i18nObj, I18n, GRADEBOOK_TRANSLATIONS, CourseGradeCalculator,
   GradingSchemeHelper, UserSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
   GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell, GradebookHeaderMenu, NumberCompare, natcompare,
   htmlEscape, AssignmentColumnHeader, AssignmentGroupColumnHeader, StudentColumnHeader, TotalGradeColumnHeader,
-  ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap, GroupTotalCellTemplate, RowStudentNameTemplate,
-  SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, assignmentHelper
-) ->
+  GradebookMenu, ViewOptionsMenu, ActionMenu, PostGradesStore, PostGradesApp, SubmissionStateMap,
+  GroupTotalCellTemplate, RowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView,  GradebookKeyboardNav,
+  assignmentHelper ) ->
+
+  renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
+    component = React.createElement(reactClass, props, children)
+    ReactDOM.render(component, mountPoint)
 
   class Gradebook
     columnWidths =
@@ -529,7 +550,7 @@ define [
     handleAssignmentMutingChange: (assignment) =>
       idx = @grid.getColumnIndex("assignment_#{assignment.id}")
       colDef = @grid.getColumns()[idx]
-      @initAssignmentColumnHeader(colDef)
+      @renderAssignmentColumnHeader(colDef)
       @grid.setColumns(@grid.getColumns())
       @fixColumnReordering()
       @buildRows()
@@ -649,7 +670,7 @@ define [
         @updateRowTotals student.row
 
       for idx, columnHeader of changedColumnHeaders
-        @initAssignmentColumnHeader(columnHeader, true)
+        @renderAssignmentColumnHeader(columnHeader, true)
 
     updateRowTotals: (rowIndex) ->
       columns = @grid.getColumns()
@@ -1035,7 +1056,7 @@ define [
       $('.post-grades-placeholder').toggle(showButton)
 
     initHeader: =>
-      @initGradebookMenus()
+      @renderGradebookMenus()
       @drawSectionSelectButton() if @sections_enabled
       @drawGradingPeriodSelectButton() if @gradingPeriodsEnabled
 
@@ -1097,7 +1118,27 @@ define [
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
 
-    initGradebookMenus: =>
+    renderGradebookMenus: =>
+      @renderGradebookMenu()
+      @renderViewOptionsMenu()
+      @renderActionMenu()
+
+    renderGradebookMenu: =>
+      mountPoints = document.querySelectorAll('[data-component="GradebookMenu"]')
+      props =
+        assignmentOrOutcome: @options.assignmentOrOutcome
+        courseUrl: ENV.GRADEBOOK_OPTIONS.context_url,
+        learningMasteryEnabled: ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled,
+        navigate: @options.navigate
+      for mountPoint in mountPoints
+        props.variant = mountPoint.getAttribute('data-variant')
+        renderComponent(GradebookMenu, mountPoint, props)
+
+    renderViewOptionsMenu: =>
+      mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
+      renderComponent(ViewOptionsMenu, mountPoint)
+
+    renderActionMenu: =>
       actionMenuProps =
         gradebookIsEditable: @options.gradebook_is_editable
         contextAllowsGradebookUploads: @options.context_allows_gradebook_uploads
@@ -1113,30 +1154,14 @@ define [
           workflowState: progressData.progress.workflow_state
 
         attachmentData = @options.attachment
-
         if attachmentData
           actionMenuProps.attachment =
             id: "#{attachmentData.attachment.id}"
             downloadUrl: @options.attachment_url
             updatedAt: attachmentData.attachment.updated_at
 
-      component = React.createElement(ActionMenu, actionMenuProps, null)
-      mountPoint = document.querySelectorAll("[data-component='ActionMenu']")[0]
-      ReactDOM.render(component, mountPoint)
-      @initViewOptionsMenu()
-
-    initStudentColumnHeader: (obj) =>
-      component = React.createElement(StudentColumnHeader, {}, null)
-      ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
-
-    initTotalGradeColumnHeader: (obj) =>
-      component = React.createElement(TotalGradeColumnHeader, {}, null)
-      ReactDOM.render(component, $(obj.node).find('.slick-column-name')[0])
-
-    initViewOptionsMenu: () =>
-      component = React.createElement(ViewOptionsMenu, {}, null)
-      mountPoint = document.querySelectorAll("[data-component='ViewOptionsMenu']")[0]
-      ReactDOM.render(component, mountPoint)
+      mountPoint = document.querySelector("[data-component='ActionMenu']")
+      renderComponent(ActionMenu, mountPoint, actionMenuProps)
 
     getAssignmentColumnHeaderProps: (originalAssignment, submissionsLoaded) =>
       assignment = {
@@ -1176,42 +1201,38 @@ define [
         students: students
         submissionsLoaded: submissionsLoaded
 
-    renderAssignmentColumnHeader: (mountPoint, assignment, submissionsLoaded) =>
-      props = @getAssignmentColumnHeaderProps(assignment, submissionsLoaded);
-
-      component = React.createElement(AssignmentColumnHeader, props, null)
-      ReactDOM.render(component, mountPoint)
-
-    initAssignmentColumnHeader: (columnDefinition, immediate = false) =>
+    renderAssignmentColumnHeader: (columnDefinition, immediate = false) =>
       mountPoint = $(columnDefinition.node).find('.slick-column-name')[0]
       assignment = columnDefinition.column.object
 
       # Mount the component immediately, assuming submissions have already been loaded.
       # This is used mainly to update column headers as the user changes data in the gradebook
-      return @renderAssignmentColumnHeader(mountPoint, assignment, true) if immediate
+      if immediate
+        props = @getAssignmentColumnHeaderProps(assignment, true)
+        renderComponent(AssignmentColumnHeader, mountPoint, props)
 
       # We're now in deferred mode => let's mount the component and indicate that the submissions
       # might not all be loaded and kick off a deferred mount once all the submissions are loaded
-      @renderAssignmentColumnHeader(mountPoint, assignment, false)
+      props = @getAssignmentColumnHeaderProps(assignment, false)
+      renderComponent(AssignmentColumnHeader, mountPoint, props)
 
       # Now let's wait for all submissions data to finish loading and re-mount this component so it
       # has all the data it needs to power its functionality
       @allSubmissionsLoaded.then =>
-        @renderAssignmentColumnHeader(mountPoint, assignment, true)
+        props = @getAssignmentColumnHeaderProps(assignment, true)
+        renderComponent(AssignmentColumnHeader, mountPoint, props)
 
-    initAssignmentGroupColumnHeader: (columnDefinition) =>
-      original_assignment_group = columnDefinition.column.object
+    renderAssignmentGroupColumnHeader: (columnDefinition, mountPoint) =>
+      originalAssignmentGroup = columnDefinition.column.object
 
-      assignment_group =
-        name: original_assignment_group.name
-        weight: original_assignment_group.group_weight
+      assignmentGroup =
+        name: originalAssignmentGroup.name
+        weight: originalAssignmentGroup.group_weight
 
-      header_props =
-        assignmentGroup: assignment_group
+      headerProps =
+        assignmentGroup: assignmentGroup
         weightedGroups: @weightedGroups()
-
-      component = React.createElement(AssignmentGroupColumnHeader, header_props, null)
-      ReactDOM.render(component, $(columnDefinition.node).find('.slick-column-name')[0])
+      renderComponent(AssignmentGroupColumnHeader, mountPoint, headerProps)
 
     checkForUploadComplete: () ->
       if UserSettings.contextGet('gradebookUploadComplete')
@@ -1464,14 +1485,15 @@ define [
       @onGridInit()
 
     onHeaderCellRendered: (event, obj) =>
+      mountPoint = obj.node.querySelector('.slick-column-name')
       if obj.column.id == 'student'
-        @initStudentColumnHeader(obj)
+        renderComponent(StudentColumnHeader, mountPoint)
       else if obj.column.id == 'total_grade'
-        @initTotalGradeColumnHeader(obj)
+        renderComponent(TotalGradeColumnHeader, mountPoint)
       else if obj.column.id.match(/^assignment_\d+$/)
-        @initAssignmentColumnHeader(obj)
+        @renderAssignmentColumnHeader(obj, mountPoint)
       else if obj.column.id.match(/^assignment_group_\d+$/)
-        @initAssignmentGroupColumnHeader(obj)
+        @renderAssignmentGroupColumnHeader(obj, mountPoint)
 
     onColumnsResized: (event, obj) =>
       grid = obj.grid

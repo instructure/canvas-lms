@@ -22,7 +22,7 @@ define([
       assignment: shape({
         htmlUrl: string.isRequired,
         id: string.isRequired,
-        invalid: bool.isRequired,
+        invalid: bool,
         muted: bool.isRequired,
         name: string.isRequired,
         omitFromFinalGrade: bool.isRequired,

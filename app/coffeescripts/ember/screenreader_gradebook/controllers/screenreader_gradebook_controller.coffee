@@ -1,4 +1,25 @@
+#
+# Copyright (C) 2013 - 2017 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 define [
+  'jquery'
+  'react'
+  'react-dom'
   'ic-ajax'
   'compiled/util/round'
   'compiled/userSettings'
@@ -17,15 +38,15 @@ define [
   'compiled/models/grade_summary/CalculationMethodContent'
   'jsx/gradebook/SubmissionStateMap'
   'compiled/api/gradingPeriodsApi'
+  'jsx/gradezilla/individual-gradebook/components/GradebookSelector'
   'jquery.instructure_date_and_time'
-], (
-  ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz,
-  AssignmentDetailsDialog, AssignmentMuter, CourseGradeCalculator, outcomeGrid,
-  ic_submission_download_dialog, htmlEscape, CalculationMethodContent, SubmissionStateMap,
-  GradingPeriodsAPI
-) ->
+], ($, React, ReactDOM, ajax, round, userSettings, fetchAllPages, parseLinkHeader,
+  I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter,
+  CourseGradeCalculator, outcomeGrid, ic_submission_download_dialog,
+  htmlEscape, CalculationMethodContent, SubmissionStateMap, GradingPeriodsAPI,
+  GradebookSelector) ->
 
-  {get, set, setProperties} = Ember
+  { get, set, setProperties } = Ember
 
   # http://emberjs.com/guides/controllers/
   # http://emberjs.com/api/classes/Ember.Controller.html
@@ -98,16 +119,15 @@ define [
 
     mgpEnabled: get(window, 'ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled')
 
-    gradingPeriods:
-      (->
-        periods = get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
-        deserializedPeriods = GradingPeriodsAPI.deserializePeriods(periods)
-        optionForAllPeriods =
-          id: '0', title: I18n.t("all_grading_periods", "All Grading Periods")
-        _.compact([optionForAllPeriods].concat(deserializedPeriods))
-      )()
+    gradingPeriods: (->
+      periods = get(window, 'ENV.GRADEBOOK_OPTIONS.active_grading_periods')
+      deserializedPeriods = GradingPeriodsAPI.deserializePeriods(periods)
+      optionForAllPeriods =
+        id: '0', title: I18n.t("all_grading_periods", "All Grading Periods")
+      _.compact([optionForAllPeriods].concat(deserializedPeriods))
+    )()
 
-    lastGeneratedCsvLabel:  do () =>
+    lastGeneratedCsvLabel: do () =>
       if get(window, 'ENV.GRADEBOOK_OPTIONS.gradebook_csv_progress')
         gradebook_csv_export_date = get(window, 'ENV.GRADEBOOK_OPTIONS.gradebook_csv_progress.progress.updated_at')
         I18n.t('Download Scores Generated on %{date}',
@@ -158,6 +178,14 @@ define [
 
     hideOutcomes: (->
       !get(window, 'ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled')
+    ).property()
+
+    gradezilla: (->
+      # returning false if version is srgb or 2 is part of the feature to help
+      # developers switch back and forth between views with gradezilla enabled
+      version = get window, 'ENV.GRADEBOOK_OPTIONS.version'
+      return false if version == 'srgb' || version == '2'
+      get window, 'ENV.GRADEBOOK_OPTIONS.gradezilla'
     ).property()
 
     showDownloadSubmissionsButton: (->
@@ -260,6 +288,17 @@ define [
 
     setupAssignmentWeightingScheme: (->
       @set 'weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
+    ).on('init')
+
+    renderGradebookMenu: (->
+      return unless @get('gradezilla')
+      mountPoint = document.querySelector('[data-component="GradebookSelector"]')
+      return unless mountPoint
+      props =
+        courseUrl: ENV.GRADEBOOK_OPTIONS.context_url
+        learningMasteryEnabled: ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled
+      component = React.createElement(GradebookSelector, props)
+      ReactDOM.render(component, mountPoint)
     ).on('init')
 
     willDestroy: ->

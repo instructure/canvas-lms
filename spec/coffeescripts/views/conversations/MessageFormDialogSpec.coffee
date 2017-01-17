@@ -63,3 +63,5 @@ define [
 
     dialog.recipientView.$el.find('.ac-result:eq(1)').trigger($.Event('mousedown', button: 0));
     deepEqual(dialog.recipientView.tokens, ['9010000000000003'])
+    parent = dialog.$el.parent()[0]
+    document.body.removeChild(parent)

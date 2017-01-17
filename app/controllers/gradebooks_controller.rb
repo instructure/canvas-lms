@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2017 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -199,13 +199,24 @@ class GradebooksController < ApplicationController
       @post_grades_tools = post_grades_tools
 
       version = @current_user.preferred_gradebook_version
-      if version == '2'
-        render :gradebook and return
-      elsif version == "gradezilla" && @context.root_account.feature_enabled?(:gradezilla)
-        render :gradezilla and return
-      elsif version == "srgb"
-        render :screenreader and return
+      if @context.root_account.feature_enabled?(:gradezilla)
+        # params[:version] is a temporary gradezilla feature to help devs flip back and forth
+        # between gradebook versions. This param should never be used in the UI.
+        case params[:version]
+        when 'srgb'
+          render :screenreader and return
+        when '2'
+          render :gradebook and return
+        when 'gradezilla-individual'
+          render 'gradebooks/gradezilla/individual' and return
+        when 'gradezilla-gradebook'
+          render 'gradebooks/gradezilla/gradebook' and return
+        else # fallback to the current user's preferences hash
+          render 'gradebooks/gradezilla/individual' and return if version == 'individual'
+          render 'gradebooks/gradezilla/gradebook' and return
+        end
       else
+        render :screenreader and return if version == 'srgb'
         render :gradebook and return
       end
     end
@@ -301,12 +312,13 @@ class GradebooksController < ApplicationController
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(:teacher_notes=> true).first
     ag_includes = [:assignments, :assignment_visibility]
     chunk_size = if @context.assignments.published.count < Setting.get('gradebook2.assignments_threshold', '20').to_i
-      Setting.get('gradebook2.submissions_chunk_size', '35').to_i
-    else
-      Setting.get('gradebook2.many_submissions_chunk_size', '10').to_i
-    end
+                   Setting.get('gradebook2.submissions_chunk_size', '35').to_i
+                 else
+                   Setting.get('gradebook2.many_submissions_chunk_size', '10').to_i
+                 end
     js_env STUDENT_CONTEXT_CARDS_ENABLED: @domain_root_account.feature_enabled?(:student_context_cards)
     js_env :GRADEBOOK_OPTIONS => {
+      :gradezilla => @context.root_account.feature_enabled?(:gradezilla),
       :chunk_size => chunk_size,
       :assignment_groups_url => api_v1_course_assignment_groups_url(
         @context,
@@ -380,6 +392,7 @@ class GradebooksController < ApplicationController
       :sections => sections_json(@context.active_course_sections, @current_user, session),
       :settings_update_url => api_v1_course_gradebook_settings_update_url(@context),
       :settings => @current_user.preferences.fetch(:gradebook_settings, {}).fetch(@context.id, {}),
+      :version => params.fetch(:version, nil)
     }
   end
 

@@ -50,7 +50,7 @@ define([
   });
 
   test('does not render the weight percentage when weightedGroups is false', function () {
-    const renderOutput = mount(<AssignmentGroupColumnHeader assignmentGroup={this.assignmentGroup} />);
+    const renderOutput = mount(<AssignmentGroupColumnHeader assignmentGroup={this.assignmentGroup} weightedGroups={false} />);
     const actualElements = renderOutput.find('.Gradebook__ColumnHeaderDetail Typography');
 
     equal(actualElements.length, 0);
