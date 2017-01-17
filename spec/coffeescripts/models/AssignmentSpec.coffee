@@ -190,12 +190,28 @@ define [
 
   module "Assignment#description as a setter"
 
-  test "sets the record's desciption", ->
+  test "sets the record's description", ->
     assignment = new Assignment name: 'foo'
     assignment.set 'description', null
     assignment.description('desc')
     equal assignment.description(), 'desc'
     equal assignment.get('description'), 'desc'
+
+  module "Assignment#dueDateRequired as a getter"
+
+  test "returns the record's dueDateRequired", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'dueDateRequired', true
+    equal assignment.dueDateRequired(), true
+
+  module "Assignment#dueDateRequired as a setter"
+
+  test "sets the record's dueDateRequired", ->
+    assignment = new Assignment name: 'foo'
+    assignment.set 'dueDateRequired', null
+    assignment.dueDateRequired(true)
+    equal assignment.dueDateRequired(), true
+    equal assignment.get('dueDateRequired'), true
 
   module "Assignment#name as a getter"
 
@@ -609,6 +625,13 @@ define [
     assignment.description description
     json = assignment.toView()
     equal json.description, description
+
+  test "includes the assignment's dueDateRequired", ->
+    dueDateRequired = false
+    assignment = new Assignment name: 'foo'
+    assignment.dueDateRequired dueDateRequired
+    json = assignment.toView()
+    equal json.dueDateRequired, dueDateRequired
 
   test "returns assignment's points possible", ->
     pointsPossible = 12
