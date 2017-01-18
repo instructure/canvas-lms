@@ -145,6 +145,11 @@ require 'securerandom'
 #           "example": "2012-09-01T00:00:00-06:00",
 #           "type": "datetime"
 #         },
+#         "locale": {
+#           "description": "the course-set locale, if applicable",
+#           "example": "en",
+#           "type": "string"
+#         },
 #         "enrollments": {
 #           "description": "A list of enrollments linking the current user to the course. for student enrollments, grading information may be included if include[]=total_scores",
 #           "type": "array",
