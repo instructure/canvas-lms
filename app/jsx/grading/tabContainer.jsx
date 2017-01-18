@@ -22,16 +22,18 @@ function(React, ReactDOM, GradingStandardCollection, GradingPeriodCollection, $,
     render: function () {
       if(this.props.multipleGradingPeriodsEnabled) {
         return (
-          <div className="ui-tabs-minimal">
-            <ul>
-              <li><a href="#grading-periods-tab" className="grading_periods_tab"> {I18n.t('Grading Periods')}</a></li>
-              <li><a href="#grading-standards-tab" className="grading_standards_tab"> {I18n.t('Grading Schemes')}</a></li>
-            </ul>
-            <div ref="gradingPeriods" id="grading-periods-tab">
-              <GradingPeriodCollection/>
-            </div>
-            <div ref="gradingStandards" id="grading-standards-tab">
-              <GradingStandardCollection/>
+          <div>
+            <div className="ui-tabs-minimal">
+              <ul>
+                <li><a href="#grading-periods-tab" className="grading_periods_tab"> {I18n.t('Grading Periods')}</a></li>
+                <li><a href="#grading-standards-tab" className="grading_standards_tab"> {I18n.t('Grading Schemes')}</a></li>
+              </ul>
+              <div ref="gradingPeriods" id="grading-periods-tab">
+                <GradingPeriodCollection/>
+              </div>
+              <div ref="gradingStandards" id="grading-standards-tab">
+                <GradingStandardCollection/>
+              </div>
             </div>
           </div>
         );
