@@ -1,8 +1,8 @@
 require_relative '../common'
 require_relative '../helpers/calendar2_common'
-include Calendar2Common
 
 describe "scheduler" do
+  include Calendar2Common
   include_context "in-process server selenium tests"
   include Calendar2Common
 

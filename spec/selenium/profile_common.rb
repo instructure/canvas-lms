@@ -1,12 +1,13 @@
 require_relative 'common'
 require_relative 'helpers/shared_examples_common'
-include SharedExamplesCommon
 
 # ======================================================================================================================
 # Shared Examples
 # ======================================================================================================================
 
 shared_examples 'profile_settings_page' do |context|
+  include SharedExamplesCommon
+
   it 'should give option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 68936, teacher: 352617, admin: 352618) do
     enable_avatars
     get "/profile/settings"
@@ -23,6 +24,8 @@ end
 
 
 shared_examples 'profile_user_about_page' do |context|
+  include SharedExamplesCommon
+
   it 'should give option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 358573, teacher: 358574, admin: 358575) do
     enable_avatars
     get "/about/#{@user.id}"
@@ -37,6 +40,8 @@ shared_examples 'profile_user_about_page' do |context|
 end
 
 shared_examples 'user settings page change pic window' do |context|
+  include SharedExamplesCommon
+
   it 'should allow user to click to change profile pic', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
     enable_avatars
     get '/profile/settings'
@@ -66,6 +71,8 @@ shared_examples 'user settings page change pic window' do |context|
 end
 
 shared_examples 'user settings change pic cancel' do |context|
+  include SharedExamplesCommon
+
   it 'closes window when cancel button is pressed', priority: "1", test_id: pick_test_id(context, student: 68939, teacher: 372132, admin: 372133) do
     enable_avatars
     get '/profile/settings'
