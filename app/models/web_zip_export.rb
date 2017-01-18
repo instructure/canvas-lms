@@ -1,7 +1,14 @@
 class WebZipExport < EpubExport
   include CC::Exporter::WebZip::Exportable
 
-  def export
+  # WebZipExport and the case of the mysteryous synchronous kwarg:
+  #
+  # We've had to add the synchronous flag here to satisify the API established
+  # by the prepended module from inst-jobs, the actual method definition that
+  # gets called by super here is defined by inst-job in a module called
+  # `EpubExport::DelayedMethods`, which is prepended to the parent class here
+  # but ends up being later in the lookup chain for this class.
+  def export(synchronous: false)
     MustViewModuleProgressor.new(user, course).make_progress
     super
   end
