@@ -81,6 +81,11 @@ define([
     equal(numberHelper.parse(obj), 2.3)
   })
 
+  test('parses positive numbers beginning with "+"', () => {
+    numberHelper._parseNumber.restore()
+    equal(numberHelper.parse('+4'), 4)
+  })
+
   test('validate returns false if parse returns NaN', () => {
     numberHelper._parseNumber.returns(NaN)
     equal(numberHelper.validate('1'), false)
