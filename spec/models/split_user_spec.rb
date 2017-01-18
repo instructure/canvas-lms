@@ -28,7 +28,7 @@ describe SplitUsers do
     it 'should not split if the data is too old' do
       pseudonym1 = user1.pseudonyms.create!(unique_id: 'sam1@example.com')
       pseudonym2 = user2.pseudonyms.create!(unique_id: 'sam2@example.com')
-      Timecop.travel(93.days.ago) do
+      Timecop.travel(183.days.ago) do
         UserMerge.from(user2).into(user1)
       end
 
