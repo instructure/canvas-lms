@@ -84,6 +84,7 @@ class Assignment < ActiveRecord::Base
   validate :discussion_group_ok?
   validate :positive_points_possible?
   validate :moderation_setting_ok?
+  validate :assignment_name_length_ok?
   validates :lti_context_id, presence: true, uniqueness: true
 
   after_save :clear_effective_due_dates_memo
@@ -142,6 +143,14 @@ class Assignment < ActiveRecord::Base
 
   def due_date_required?
     AssignmentUtil.due_date_required?(self)
+  end
+
+  def assignment_name_length_ok?
+    name_length = self.try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value) ||
+                  Assignment.maximum_string_length
+    if sis_require_assignment_name_length? && self.post_to_sis.present? && self.title.length > name_length
+      errors.add(:title, I18n.t('The title cannot be longer than %{length} characters', length: name_length))
+    end
   end
 
   def secure_params
@@ -2328,6 +2337,11 @@ class Assignment < ActiveRecord::Base
     unless AssignmentUtil.due_date_ok?(self)
       errors.add(:due_at, I18n.t("due_at", "cannot be blank when Post to Sis is checked"))
     end
+  end
+
+  def sis_require_assignment_name_length?
+    self.try(:context).try(:account).try(:sis_assignment_name_length).try(:[], :value) &&
+    self.try(:context).try(:feature_enabled?, 'new_sis_integrations').present?
   end
 end
 

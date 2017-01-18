@@ -3780,7 +3780,9 @@ describe Assignment do
   end
 
   describe 'title validation' do
-    let(:assignment) { Assignment.new }
+    let(:assignment) do
+      @course.assignments.create!(assignment_valid_attributes)
+    end
     let(:errors) {
       assignment.valid?
       assignment.errors
@@ -3797,7 +3799,6 @@ describe Assignment do
     end
 
     it 'must allow a blank title when it is unchanged and was previously blank' do
-      assignment = @course.assignments.create!(assignment_valid_attributes)
       assignment.title = ''
       assignment.save(validate: false)
 
@@ -3807,11 +3808,65 @@ describe Assignment do
     end
 
     it 'must not allow the title to be blank if changed' do
-      assignment = @course.assignments.create!(assignment_valid_attributes)
       assignment.title = ' '
       assignment.valid?
       errors = assignment.errors
       expect(errors[:title]).not_to be_empty
+    end
+
+    describe "when sis_assignment_name_length is true" do
+      it "is required when post_to_sis is true and feature_enabled(post_grades) is true" do
+        assignment.post_to_sis = true
+        assignment.title = "Too much tuna fish"
+        assignment.context.account.stubs(:sis_assignment_name_length).returns({value: true})
+        assignment.context.account.stubs(:sis_assignment_name_length_input).returns({value: 15})
+        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+        expect(assignment.valid?).to eq(false)
+      end
+
+      it "is valid when post_to_sis is true, feature_enabled(post_grades) is true and there is no name length value" do
+        assignment.post_to_sis = true
+        assignment.title = "Too much tuna fish"
+        assignment.context.account.stubs(:sis_assignment_name_length).returns({value: true})
+        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+        expect(assignment.valid?).to eq(true)
+      end
+    end
+
+    describe "when sis_assignment_name_length is false" do
+      before do
+        assignment.context.account.stubs(:sis_assignment_name_length).returns({value: false})
+      end
+
+      it "is not required when post_to_sis is true and feature_enabled(post_grades) is true" do
+        assignment.post_to_sis = true
+        assignment.title = "Too much tuna fish"
+        assignment.context.account.stubs(:sis_assignment_name_length).returns({value: false})
+        assignment.context.account.stubs(:sis_assignment_name_length_input).returns({value: 15})
+        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+        expect(assignment.valid?).to eq(true)
+      end
+
+      it "is not required when post_to_sis is true and feature_enabled(post_grades) is false" do
+        assignment.post_to_sis = true
+        assignment.title = "some new assignment"
+        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(false)
+        expect(assignment.valid?).to eq(true)
+      end
+
+      it "is not required when post_to_sis is false and feature_enabled(post_grades) is true" do
+        assignment.post_to_sis = false
+        assignment.title = "oh hello"
+        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(true)
+        expect(assignment.valid?).to eq(true)
+      end
+
+      it "is not required when post_to_sis is false and feature_enabled(post_grades) is false" do
+        assignment.post_to_sis = false
+        assignment.title = "tuna"
+        assignment.context.stubs(:feature_enabled?).with('new_sis_integrations').returns(false)
+        expect(assignment.valid?).to eq(true)
+      end
     end
   end
 
