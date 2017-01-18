@@ -181,6 +181,10 @@ define [
         userSettings.contextSet 'show_concluded_enrollments', isChecked
     ).observes('showConcludedEnrollments')
 
+    selectedAssignmentPointsPossible: ( ->
+      I18n.n @get('selectedAssignment.points_possible')
+    ).property('selectedAssignment')
+
     selectedStudent: null
 
     selectedSection: null

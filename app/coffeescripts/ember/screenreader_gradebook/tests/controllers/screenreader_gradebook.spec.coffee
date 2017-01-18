@@ -248,7 +248,7 @@ define [
       ad = @srgb.get('assignmentDetails')
       selectedAssignment = @srgb.get('selectedAssignment')
       strictEqual ad.assignment, selectedAssignment
-      strictEqual ad.cnt, 1
+      strictEqual ad.cnt, '1'
 
   test 'outcomeDetails is computed properly', ->
     @completeSetup().then =>

@@ -1,5 +1,6 @@
 define [
   'i18n!gradebook'
+  'jsx/shared/helpers/numberHelper'
   'jquery'
   'jst/CurveGradesDialog'
   'str/htmlEscape'
@@ -9,7 +10,7 @@ define [
   'jquery.instructure_misc_plugins'
   'compiled/jquery/fixDialogButtons'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, curveGradesDialogTemplate, htmlEscape) ->
+], (I18n, numberHelper, $, curveGradesDialogTemplate, htmlEscape) ->
 
   class CurveGradesDialog
     constructor: ({@assignment, @students, @context_url}) ->
@@ -19,8 +20,9 @@ define [
       locals =
         assignment: @assignment
         action: "#{@context_url}/gradebook/update_submission"
-        middleScore: parseInt((@assignment.points_possible || 0) * 0.6)
+        middleScore: I18n.n((@assignment.points_possible || 0) * 0.6)
         showOutOf: @assignment.points_possible >= 0
+        formattedOutOf: I18n.n @assignment.points_possible
       # the dialog will be shared across all instantiation, so make it a prototype property
       @$dialog = $(curveGradesDialogTemplate(locals))
       @$dialog
@@ -39,7 +41,7 @@ define [
               data[pre + "[user_id]"] = idx
               if @assignment.grading_type == "gpa_scale"
                 percent = (curves[idx]/@assignment.points_possible)*100
-                data[pre + "[grade]"] = "#{percent}%"
+                data[pre + "[grade]"] = "#{I18n.n percent, percentage: true}"
               else
                 data[pre + "[grade]"] = curves[idx]
               cnt++
@@ -53,7 +55,16 @@ define [
             #need to get rid of root object becuase it is coming from old, pre-api xhr
             submissions = (datum.submission for datum in data)
             $.publish 'submissions_updated', [submissions]
-            alert I18n.t("alerts.scores_updated", { one: "1 Student score updated", other: "%{count} Student scores updated"}, count: data.length)
+            alert I18n.t(
+              {
+                one: "1 Student score updated",
+                other: "%{studentCount} Student scores updated"
+              },
+              {
+                count: data.length,
+                studentCount: I18n.n(data.length)
+              }
+            )
             $("#set_default_grade").focus()
         .dialog
           width: 350
@@ -72,7 +83,7 @@ define [
       scores               = {}
       users_for_score      = []
       scoreCount           = 0
-      middleScore          = parseInt($("#middle_score").val(), 10)
+      middleScore          = numberHelper.parse($("#middle_score").val())
       middleScore          = (middleScore / @assignment.points_possible)
       should_assign_blanks = $('#assign_blanks').prop('checked')
 
@@ -138,12 +149,31 @@ define [
             pct = (users.length / maxCount)
             cnt = users.length
           color = (if idx == 0 then "#a03536" else "#007ab8")
-          $("#results_list").prepend "<td style='padding: 1px;'><div title='" + htmlEscape(I18n.t({one: "1 student will get %{num} points", other: "%{count} students will get %{num} points"}, {count: cnt, num: idx})) + "' style='border: 1px solid #888; background-color: " + htmlEscape(color) + "; width: " + htmlEscape(width) + "px; height: " + htmlEscape(100 * pct) + "px; margin-top: " + htmlEscape(100 * (1 - pct)) + "px;'>&nbsp;</div></td>"
-          $("#results_values").prepend "<td style='text-align: center;'>" + htmlEscape(idx) + "</td>"
+
+          title = I18n.t(
+            {
+              one: "1 student will get %{num} points",
+              other: "%{studentCount} students will get %{num} points"
+            },
+            {
+              count: cnt,
+              num: I18n.n(idx),
+              studentCount: I18n.n(cnt)
+            }
+          )
+          $("#results_list").prepend(
+            "<td style='padding: 1px;'><div title='" + htmlEscape(title) +
+            "' style='border: 1px solid #888; background-color: " + htmlEscape(color) +
+            "; width: " + htmlEscape(width) + "px; height: " + htmlEscape(100 * pct) +
+            "px; margin-top: " + htmlEscape(100 * (1 - pct)) + "px;'>&nbsp;</div></td>"
+          )
+          $("#results_values").prepend(
+            "<td style='text-align: center;'>" + htmlEscape(I18n.n idx) + "</td>"
+          )
           skipCount = 0
         else
           skipCount++
         idx--
-      $("#results_list").prepend "<td><div style='height: 100px; position: relative; width: 30px; font-size: 0.8em;'><img src='/images/number_of_students.png' alt='" + htmlEscape(I18n.t("# of students")) + "'/><div style='position: absolute; top: 0; right: 3px;'>" + htmlEscape(maxCount) + "</div><div style='position: absolute; bottom: 0; right: 3px;'>0</div></div></td>"
+      $("#results_list").prepend "<td><div style='height: 100px; position: relative; width: 30px; font-size: 0.8em;'><img src='/images/number_of_students.png' alt='" + htmlEscape(I18n.t("# of students")) + "'/><div style='position: absolute; top: 0; right: 3px;'>" + htmlEscape(I18n.n maxCount) + "</div><div style='position: absolute; bottom: 0; right: 3px;'>" + htmlEscape(I18n.n 0) + "</div></div></td>"
       $("#results_values").prepend "<td>&nbsp;</td>"
       finalScores
