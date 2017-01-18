@@ -566,6 +566,20 @@ describe User do
       expect(user2.courses_with_primary_enrollment.map(&:id)).to eq [c1.id, c2.id]
     end
 
+    it 'filters out enrollments for deleted courses' do
+      student_in_course(active_course: true)
+      expect(@user.current_and_invited_courses.count).to eq 1
+      Course.where(id: @course).update_all(workflow_state: 'deleted')
+      expect(@user.current_and_invited_courses.count).to eq 0
+    end
+
+    it 'excludes deleted courses in cached_invitations' do
+      student_in_course(active_course: true)
+      expect(@user.cached_invitations.count).to eq 1
+      Course.where(id: @course).update_all(workflow_state: 'deleted')
+      expect(@user.cached_invitations.count).to eq 0
+    end
+
     describe 'with cross sharding' do
       specs_require_sharding
 
