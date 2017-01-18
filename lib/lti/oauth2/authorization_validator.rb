@@ -38,6 +38,7 @@ module Lti
           validated_jwt
         end
       end
+      alias_method :validate!, :jwt
 
       def tool_proxy
         @_tool_proxy ||= begin

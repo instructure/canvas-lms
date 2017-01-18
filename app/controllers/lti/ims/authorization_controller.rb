@@ -78,9 +78,9 @@ module Lti
         raise InvalidGrant if params[:grant_type] != JWT_GRANT_TYPE
         raise InvalidGrant if params[:assertion].blank?
         jwt_validator = Lti::Oauth2::AuthorizationValidator.new(jwt: params[:assertion], authorization_url: lti_oauth2_authorize_url)
-        jwt_validator.jwt
+        jwt_validator.validate!
         render json: {
-          access_token: SecureRandom.uuid,
+          access_token: Lti::Oauth2::AccessToken.create_jwt(aud: request.host, sub: jwt_validator.tool_proxy.guid).to_s,
           token_type: 'bearer',
           expires_in: Setting.get('lti.oauth2.access_token.expiration', 1.hour.to_s)
         }

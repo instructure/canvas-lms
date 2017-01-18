@@ -77,7 +77,8 @@ module Lti
 
         it 'returns an access_token' do
           post auth_endpoint, params
-          expect(JSON.parse(response.body)['access_token']).not_to be_nil
+          access_token = Lti::Oauth2::AccessToken.create_jwt(aud: @request.host, sub: tool_proxy.guid)
+          expect{access_token.validate!}.not_to raise_error
         end
 
         it "allows the use of the 'OAuth.splitSecret'" do

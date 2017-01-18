@@ -326,7 +326,7 @@ module Canvas::Security
 
       if body[:nbf].present?
         if timestamp_is_future?(body[:nbf])
-          raise Canvas::Security::TokenInvalid
+          raise Canvas::Security::InvalidToken
         end
       end
     end
