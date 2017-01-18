@@ -70,7 +70,12 @@ function dynamicSyllabusUpload(module_id) {
             };
             req3.send("");
           } else if(req2.status == 200) {
-            var obj = JSON.parse(req2.responseText.substr(9));
+            var obj;
+            // jsonp, starting with while(1)
+            if(req2.responseText[0] == "w")
+              obj = JSON.parse(req2.responseText.substr(9));
+            else // normal json
+              obj = JSON.parse(req2.responseText);
             finalize(obj.url);
           } else {
             alert("Error 2: " + req2.status + " " + req2.responseText);
