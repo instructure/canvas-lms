@@ -532,6 +532,17 @@ describe MasterCourses::MasterMigration do
       expect(copied_topic_assmt.reload.due_at.to_i).to eq new_master_due_at.to_i
     end
 
+    it "should ignore course settings" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      @copy_from.update_attribute(:is_public, true)
+
+      run_master_migration
+
+      expect(@copy_to.reload.is_public).to_not be_truthy
+    end
+
     context "master courses + external migrations" do
       class TestExternalContentService
         cattr_reader :course, :imported_content
