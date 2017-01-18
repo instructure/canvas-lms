@@ -1940,7 +1940,7 @@ class User < ActiveRecord::Base
         due_between_with_overrides(now, opts[:end_at]).
         include_submitted_count.
         map {|a| a.overridden_for(self)},opts.merge(:time => now)).
-      first(opts[:limit]))
+      first(opts[:limit])) unless opts[:exclude_assignments]
     events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, Canvas::ICU.collation_key(e.title)] }.uniq.first(opts[:limit])
   end
 
