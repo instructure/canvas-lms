@@ -127,7 +127,7 @@
     <%= render :partial => 'assignments/syllabus_right_side', :locals => {:course_home => true} %>
 hi there
   <% else %>
-    <% locals = {:title => t("Coming Up"), :contexts_to_link_to => @context, :upcoming => true, :period => :one_week} %>
+    <% locals = {:title => t("Upcoming Events"), :contexts_to_link_to => @context, :upcoming => true, :period => :one_year} %>
     <% if @current_user %>
       <% cache(safe_cache_key([@current_user, @contexts, 'course_upcoming_events' ])) do %>
         <%= render :partial => "shared/event_list", :object => filter_other_sections_from_events(@current_user.upcoming_events(:contexts => @contexts)), :locals => locals %>
