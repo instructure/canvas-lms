@@ -352,23 +352,13 @@ class BzController < ApplicationController
 
     params[:module_id].each_with_index do |module_id, idx|
       mod = ContextModule.find(module_id)
-      mod.intro_text = params[:intro_text][idx]
 
-      # mod.image_url = params[:image_url][idx]
-
-      if params[:upload] && params[:upload]["image_file_#{mod.id}"]
-        file = params[:upload]["image_file_#{mod.id}"].read
-        dirname = Rails.root.to_s + '/public/bz_dynamic_syllabus_images/'
-        filename = dirname + module_id.to_s + '.png'
-        File.open(filename, 'wb') do |f|
-          f.write(file)
-        end
-
-        mod.image_url = "/bz_dynamic_syllabus_images/#{module_id.to_s}.png"
-      end
-
-      mod.part_id = (params[:part_id][idx] == '') ? nil : params[:part_id][idx]
-      mod.save
+      # Doing this instead of .save because running the callbacks
+      # takes forever and we only ever touch these few auxiliary fields
+      # here.
+      mod.update_column(:intro_text, params[:intro_text][idx])
+      mod.update_column(:image_url, params[:image_url][idx])
+      mod.update_column(:part_id, (params[:part_id][idx] == '') ? nil : params[:part_id][idx])
     end
 
     redirect_to "/courses/#{@course.id}/dynamic_syllabus"
