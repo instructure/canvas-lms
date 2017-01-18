@@ -8,8 +8,7 @@ class ChangeAuthOverTlsToString < ActiveRecord::Migration
   end
 
   def self.down
-    # technically it is reversible, but requires db specific syntax in postgres,
-    # and probably in mysql as well
+    # technically it is reversible, but requires db specific syntax in postgres
     raise ActiveRecord::IrreversibleMigration
   end
 end

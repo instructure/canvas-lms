@@ -50,6 +50,24 @@ define [
     equal btnView.$text.html().match(/Published/).length, 1
     equal btnView.$el.attr('aria-label').match(/can't unpublish/).length, 1
 
+  test 'should render the provided publish text when given', ->
+    testText = 'Test Publish Text'
+    btnView = new PublishButtonView({
+      model: @publish,
+      publishText: testText
+    }).render()
+
+    equal btnView.$('.screenreader-only.accessible_label').text(), testText
+
+  test 'should render the provided unpublish text when given', ->
+    testText = 'Test Unpublish Text'
+    btnView = new PublishButtonView({
+      model: @published,
+      unpublishText: testText
+    }).render()
+
+    equal btnView.$('.screenreader-only.accessible_label').text(), testText
+
   # state
   test 'disable should add disabled state', ->
     btnView = new PublishButtonView(model: @publish).render()

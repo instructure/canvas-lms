@@ -1,14 +1,11 @@
-/** @jsx React.DOM */
-
 define([
   'i18n!external_tools',
   'react',
-  'react-router',
   'jsx/external_apps/components/Header',
   'jsx/external_apps/components/ExternalToolsTable',
   'vendor/bootstrap/bootstrap-dropdown',
   'vendor/bootstrap-select/bootstrap-select'
-], function(I18n, React, {Link}, Header, ExternalToolsTable) {
+], function(I18n, React, Header, ExternalToolsTable) {
   return React.createClass({
     displayName: 'ConfigurationTypeSelector',
 
@@ -35,7 +32,7 @@ define([
                 <option value="manual">{I18n.t('Manual Entry')}</option>
                 <option value="url">{I18n.t('By URL')}</option>
                 <option value="xml">{I18n.t('Paste XML')}</option>
-                { ENV.ENABLE_LTI2 ? <option value="lti2">{I18n.t('By LTI 2 Registration URL')}</option> : null }
+                <option value="lti2">{I18n.t('By LTI 2 Registration URL')}</option>
               </select>
             </label>
           </div>

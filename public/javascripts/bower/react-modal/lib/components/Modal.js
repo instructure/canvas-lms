@@ -1,21 +1,31 @@
 var React = require('react');
+var ExecutionEnvironment = require('react/lib/ExecutionEnvironment');
 var ModalPortal = React.createFactory(require('./ModalPortal'));
 var ariaAppHider = require('../helpers/ariaAppHider');
-var injectCSS = require('../helpers/injectCSS');
+var elementClass = require('element-class');
+
+var SafeHTMLElement = ExecutionEnvironment.canUseDOM ? window.HTMLElement : {};
 
 var Modal = module.exports = React.createClass({
 
   displayName: 'Modal',
-
   statics: {
     setAppElement: ariaAppHider.setElement,
-    injectCSS: injectCSS
+    injectCSS : function() {
+      "production" !== process.env.NODE_ENV
+        && console.warn('React-Modal: injectCSS has been deprecated ' +
+                        'and no longer has any effect. It will be removed in a later version');
+    }
   },
 
   propTypes: {
     isOpen: React.PropTypes.bool.isRequired,
+    style : React.PropTypes.shape({
+      content: React.PropTypes.object,
+      overlay: React.PropTypes.object
+    }),
+    appElement: React.PropTypes.instanceOf(SafeHTMLElement),
     onRequestClose: React.PropTypes.func,
-    appElement: React.PropTypes.instanceOf(HTMLElement),
     closeTimeoutMS: React.PropTypes.number,
     ariaHideApp: React.PropTypes.bool
   },
@@ -45,6 +55,12 @@ var Modal = module.exports = React.createClass({
   },
 
   renderPortal: function(props) {
+    if (props.isOpen) {
+      elementClass(document.body).add('ReactModal__Body--open');
+    } else {
+      elementClass(document.body).remove('ReactModal__Body--open');
+    }
+
     if (props.ariaHideApp) {
       ariaAppHider.toggle(props.isOpen, props.appElement);
     }
@@ -56,7 +72,7 @@ var Modal = module.exports = React.createClass({
   },
 
   render: function () {
-    return null;
+    return React.DOM.noscript();
   }
 });
 

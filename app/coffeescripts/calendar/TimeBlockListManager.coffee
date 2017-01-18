@@ -1,4 +1,4 @@
-define ['jquery'], ($) ->
+define ['jquery', 'moment', 'compiled/util/fcUtil', 'bower/fullcalendar/dist/fullcalendar'], ($, moment, fcUtil) ->
 
   class TimeBlockListManager
     # takes an optional array of Date pairs
@@ -24,8 +24,7 @@ define ['jquery'], ($) ->
           continue
 
         lastBlock = consolidatedBlocks.last()
-        if lastBlock.end.getTime() == block.start.getTime() &&
-           !lastBlock.locked && !block.locked
+        if +lastBlock.end == +block.start && !lastBlock.locked && !block.locked
           lastBlock.end = block.end
         else
           consolidatedBlocks.push block
@@ -36,15 +35,13 @@ define ['jquery'], ($) ->
     split: (minutes) ->
       @consolidate()
 
-      splitBlockLength = minutes * 60 * 1000
-
       for block in @blocks
         continue if block.locked
-        while block.end - block.start > minutes * 60 * 1000
-          oldStart = block.start
-          newStart = new Date(block.start.getTime() + splitBlockLength)
-          block.start = new Date(block.start.getTime() + splitBlockLength)
-          @add(oldStart, newStart)
+        nextBreak = fcUtil.clone(block.start).add(minutes, 'minutes')
+        while block.end > nextBreak
+          @add(block.start, fcUtil.clone(nextBreak))
+          block.start = fcUtil.clone(nextBreak)
+          nextBreak.add(minutes, 'minutes')
 
       @sort()
 

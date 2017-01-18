@@ -23,7 +23,7 @@ describe PageView do
   before do
     # sets both @user and @course (@user is a teacher in @course)
     course_model
-    @page_view = PageView.new { |p| p.assign_attributes({ :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, :without_protection => true) }
+    @page_view = PageView.new { |p| p.assign_attributes({ :created_at => Time.now, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, :without_protection => true) }
   end
 
   describe "sharding" do
@@ -35,6 +35,16 @@ describe PageView do
           expect(PageView.new.shard).to eq @shard1
         end
       end
+  end
+
+  describe "token" do
+    it "should generate a valid jwt token" do
+      token = @page_view.token
+      data = Canvas::Security.decode_jwt(token)
+      expect(data[:i]).to eq @page_view.request_id
+      expect(data[:u]).to eq @user.global_id
+      expect(data[:c]).to eq @page_view.created_at.utc.iso8601(2)
+    end
   end
 
   describe "cassandra page views" do
@@ -243,6 +253,7 @@ describe PageView do
 
   describe "for_users" do
     before :once do
+      Setting.set('enable_page_views', 'db')
       course_model
       @page_view = PageView.new { |p| p.assign_attributes({ :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, :without_protection => true) }
       @page_view.save!
@@ -533,6 +544,34 @@ describe PageView do
           end
         end
       end
+    end
+  end
+
+  context "pv4" do
+    before do
+      PageView.stubs(:pv4?).returns(true)
+      PageView.stubs(:page_view_method).returns(:pv4)
+    end
+
+    it "store doesn't do anything" do
+      pv = PageView.new
+      pv.expects(:save).never
+      pv.expects(:store_page_view_to_user_counts)
+      pv.user = User.new
+      pv.store
+    end
+
+    it "do_update still updates fields" do
+      pv = PageView.new
+      pv.do_update('interaction_seconds' => 5)
+      expect(pv.is_update).to eq true
+      expect(pv.interaction_seconds).to eq 5
+    end
+
+    it "find_for_update returns a dummy record" do
+      pv = PageView.find_for_update('someuuid')
+      expect(pv).to_not be_nil
+      expect(pv.id).to eq 'someuuid'
     end
   end
 end

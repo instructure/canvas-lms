@@ -54,6 +54,16 @@ describe Api do
       expect(@api.api_find(User, "sis_login_id:sis_user_1@example.com")).to eq @user
     end
 
+    it 'looks for login ids case insensitively' do
+      @user = user_with_pseudonym :username => "sis_user_1@example.com"
+      expect(@api.api_find(User, "sis_login_id:SIS_USER_1@example.com")).to eq @user
+    end
+
+    it 'properly quotes login ids' do
+      @user = user_with_pseudonym :username => "user 'a'"
+      expect(@api.api_find(User, "sis_login_id:user 'a'")).to eq @user
+    end
+
     it 'should not find record from other account' do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
@@ -63,8 +73,8 @@ describe Api do
     it 'should find record from other root account explicitly' do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
-      Api.expects(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything).
-          returns(['pseudonyms.unique_id', ["sis_user_1@example.com", account]])
+      Api.expects(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything, anything).
+          returns(['LOWER(pseudonyms.unique_id)', [QuotedValue.new("LOWER('sis_user_1@example.com')"), account]])
       expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
     end
 
@@ -240,26 +250,12 @@ describe Api do
       expect(api2.api_find_all(User, ["sis_login_id:sis_user_1@example.com", "sis_login_id:sis_user_2@example.com", "sis_login_id:sis_user_3@example.com", user5.id, user6.id]).sort_by(&:id)).to eq [user2, user4, user5, user6].sort_by(&:id)
     end
 
-    it "should limit results if a limit is provided" do
-      collection = mock()
-      collection.stubs(:table_name).returns("courses")
-      collection.expects(:all).with({:conditions => { 'id' => [1, 2, 3]}}).returns("result")
-      expect(@api.api_find_all(collection, [1,2,3])).to eq "result"
-      collection.expects(:all).with({:conditions => { 'id' => [1, 2, 3]}, :limit => 3}).returns("result")
-      expect(@api.api_find_all(collection, [1,2,3], limit: 3)).to eq "result"
-    end
-
-    it 'should limit results if a limit is provided - unmocked' do
-      users = 0.upto(9).map{|x| user}
-      result = @api.api_find_all(User, 0.upto(9).map{|i| users[i].id}, limit: 5)
-      expect(result.count).to eq 5
-      result.each { |user| expect(users.include?(user)).to be_truthy}
-    end
-
     it "should not hit the database if no valid conditions were found" do
       collection = mock()
       collection.stubs(:table_name).returns("courses")
-      expect(@api.api_find_all(collection, ["sis_invalid:1"])).to eq []
+      collection.expects(:none).once
+      relation = @api.api_find_all(collection, ["sis_invalid:1"])
+      expect(relation.to_a).to eq []
     end
 
     context "sharding" do
@@ -334,29 +330,32 @@ describe Api do
 
     it 'should try and make params when non-ar_id columns have returned with ar_id columns' do
       collection = mock()
+      pluck_result = ["thing2", "thing3"]
+      relation_result = mock(eager_load_values: nil, pluck: pluck_result)
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
-      Api.expects(:sis_make_params_for_sis_mapping_and_columns).with({"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns({"find-params" => "test"})
-      collection.expects(:scoped).with("find-params" => "test").returns(collection)
-      collection.expects(:pluck).with(:id).returns(["thing2", "thing3"])
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
+      Api.expects(:relation_for_sis_mapping_and_columns).with(collection, {"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns(relation_result)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2", "thing3"]
     end
 
     it 'should try and make params when non-ar_id columns have returned without ar_id columns' do
       collection = mock()
+      pluck_result = ["thing2", "thing3"]
+      relation_result = mock(eager_load_values: nil, pluck: pluck_result)
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"other-lookup" => ["thing2", "thing3"]})
-      Api.expects(:sis_make_params_for_sis_mapping_and_columns).with({"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns({"find-params" => "test"})
-      collection.expects(:scoped).with("find-params" => "test").returns(collection)
-      collection.expects(:pluck).with(:id).returns(["thing2", "thing3"])
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({"other-lookup" => ["thing2", "thing3"]})
+      Api.expects(:relation_for_sis_mapping_and_columns).with(collection, {"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns(relation_result)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing2", "thing3"]
     end
 
     it 'should not try and make params when no non-ar_id columns have returned with ar_id columns' do
       collection = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"test-lookup" => ["thing1", "thing2"]})
-      Api.expects(:sis_make_params_for_sis_mapping_and_columns).at_most(0)
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({"test-lookup" => ["thing1", "thing2"]})
+      Api.expects(:relation_for_sis_mapping_and_columns).never
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2"]
     end
 
@@ -365,7 +364,8 @@ describe Api do
       object1 = mock()
       object2 = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).at_most(0)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq []
     end
@@ -388,7 +388,7 @@ describe Api do
     end
 
     it 'should handle hex_encoded sis_fields' do
-      expect(Api.sis_parse_id("hex:sis_login_id:7369737573657233406578616d706c652e636f6d", @lookups)).to eq ["pseudonyms.unique_id", "sisuser3@example.com"]
+      expect(Api.sis_parse_id("hex:sis_login_id:7369737573657233406578616d706c652e636f6d", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
       expect(Api.sis_parse_id("hex:sis_user_id:7369737573657234406578616d706c652e636f6d", @lookups)).to eq ["pseudonyms.sis_user_id", "sisuser4@example.com"]
     end
 
@@ -403,7 +403,7 @@ describe Api do
     end
 
     it 'should handle plain sis_fields' do
-      expect(Api.sis_parse_id("sis_login_id:sisuser3@example.com", @lookups)).to eq ["pseudonyms.unique_id", "sisuser3@example.com"]
+      expect(Api.sis_parse_id("sis_login_id:sisuser3@example.com", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
       expect(Api.sis_parse_id("sis_user_id:sisuser4", @lookups)).to eq ["pseudonyms.sis_user_id", "sisuser4"]
     end
 
@@ -421,8 +421,8 @@ describe Api do
     it 'should handle surrounding whitespace' do
       expect(Api.sis_parse_id("\t10  ", @lookups)).to eq ["users.id", 10]
       expect(Api.sis_parse_id("\t10\n", @lookups)).to eq ["users.id", 10]
-      expect(Api.sis_parse_id("  hex:sis_login_id:7369737573657233406578616d706c652e636f6d     ", @lookups)).to eq ["pseudonyms.unique_id", "sisuser3@example.com"]
-      expect(Api.sis_parse_id("  sis_login_id:sisuser3@example.com\t", @lookups)).to eq ["pseudonyms.unique_id", "sisuser3@example.com"]
+      expect(Api.sis_parse_id("  hex:sis_login_id:7369737573657233406578616d706c652e636f6d     ", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
+      expect(Api.sis_parse_id("  sis_login_id:sisuser3@example.com\t", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
     end
   end
 
@@ -448,7 +448,7 @@ describe Api do
     end
 
     it 'should work with mixed sis id types' do
-      expect(Api.sis_parse_ids([1,2,"sis_user_id:U1",3,"sis_user_id:U2","sis_user_id:U3","sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => ["U1", "U2", "U3"], "pseudonyms.unique_id" => ["A1"] })
+      expect(Api.sis_parse_ids([1,2,"sis_user_id:U1",3,"sis_user_id:U2","sis_user_id:U3","sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => ["U1", "U2", "U3"], "LOWER(pseudonyms.unique_id)" => ["LOWER('A1')"] })
     end
 
     it 'should skip invalid things' do
@@ -471,52 +471,52 @@ describe Api do
     end
   end
 
-  context 'sis_find_params_for_collection' do
+  context 'sis_relation_for_collection' do
     it 'should pass along the sis_mapping to sis_find_params_for_sis_mapping' do
       root_account = account_model
-      Api.expects(:sis_find_params_for_sis_mapping).with(Api::SIS_MAPPINGS['users'], [1,2,3], root_account, anything).returns(1234)
+      Api.expects(:relation_for_sis_mapping).with(User, Api::SIS_MAPPINGS['users'], [1,2,3], root_account, anything).returns(1234)
       Api.expects(:sis_find_sis_mapping_for_collection).with(User).returns(Api::SIS_MAPPINGS['users'])
-      expect(Api.sis_find_params_for_collection(User, [1,2,3], root_account)).to eq 1234
+      expect(Api.sis_relation_for_collection(User, [1,2,3], root_account)).to eq 1234
     end
   end
 
-  context 'sis_find_params_for_sis_mapping' do
+  context 'relation_for_sis_mapping' do
     it 'should pass along the parsed ids to sis_make_params_for_sis_mapping_and_columns' do
       root_account = account_model
-      Api.expects(:sis_parse_ids).with([1,2,3], "lookups", anything).returns({"users.id" => [4,5,6]})
-      Api.expects(:sis_make_params_for_sis_mapping_and_columns).with({"users.id" => [4,5,6]}, {:lookups => "lookups"}, root_account).returns("params")
-      expect(Api.sis_find_params_for_sis_mapping({:lookups => "lookups"}, [1,2,3], root_account)).to eq "params"
+      Api.expects(:sis_parse_ids).with([1,2,3], "lookups", anything, root_account: root_account).returns({"users.id" => [4,5,6]})
+      Api.expects(:relation_for_sis_mapping_and_columns).with(User, {"users.id" => [4,5,6]}, {:lookups => "lookups"}, root_account).returns("params")
+      expect(Api.relation_for_sis_mapping(User, {:lookups => "lookups"}, [1,2,3], root_account)).to eq "params"
     end
   end
 
-  context 'sis_make_params_for_sis_mapping_and_columns' do
+  context 'relation_for_sis_mapping_and_columns' do
     it 'should fail when not given a root account' do
-      expect(Api.sis_make_params_for_sis_mapping_and_columns({}, {}, Account.default)).to eq :not_found
-      expect(lambda {Api.sis_make_params_for_sis_mapping_and_columns({}, {}, user)}).to raise_error("sis_root_account required for lookups")
+      expect(Api.relation_for_sis_mapping_and_columns(User, {}, {}, Account.default)).to eq User.none
+      expect(lambda {Api.relation_for_sis_mapping_and_columns(User, {}, {}, user)}).to raise_error("sis_root_account required for lookups")
     end
 
     it 'should properly generate an escaped arg string' do
-      expect(Api.sis_make_params_for_sis_mapping_and_columns({"id" => ["1",2,3]}, {:scope => "scope"}, Account.default)).to eq({ :conditions => ["(scope = #{Account.default.id} AND id IN (?))", ["1", 2, 3]] })
+      expect(Api.relation_for_sis_mapping_and_columns(User, {"id" => ["1",2,3]}, {:scope => "scope"}, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
     end
 
     it 'should work with no columns' do
-      expect(Api.sis_make_params_for_sis_mapping_and_columns({}, {}, Account.default)).to eq :not_found
+      expect(Api.relation_for_sis_mapping_and_columns(User, {}, {}, Account.default)).to eq User.none
     end
 
     it 'should add in joins if the sis_mapping has some with columns' do
-      expect(Api.sis_make_params_for_sis_mapping_and_columns({"id" => ["1",2,3]}, {:scope => "scope", :joins => 'some joins'}, Account.default)).to eq({ :conditions => ["(scope = #{Account.default.id} AND id IN (?))", ["1", 2, 3]], :include => 'some joins' })
+      expect(Api.relation_for_sis_mapping_and_columns(User, {"id" => ["1",2,3]}, {:scope => "scope", :joins => 'some joins'}, Account.default).eager_load_values).to eq ['some joins']
     end
 
     it 'should work with a few different column types and account scopings' do
-      expect(Api.sis_make_params_for_sis_mapping_and_columns({"id1" => [1,2,3], "id2" => ["a","b","c"], "id3" => ["s1", "s2", "s3"]}, {:scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set}, Account.default)).to eq({ :conditions => ["(some_scope = #{Account.default.id} AND id1 IN (?)) OR (some_scope = #{Account.default.id} AND id2 IN (?)) OR id3 IN (?)", [1, 2, 3], ["a", "b", "c"], ["s1", "s2", "s3"]]})
+      expect(Api.relation_for_sis_mapping_and_columns(User, {"id1" => [1,2,3], "id2" => ["a","b","c"], "id3" => ["s1", "s2", "s3"]}, {:scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set}, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
     end
 
     it "should scope to accounts by default if :is_not_scoped_to_account doesn't exist" do
-      expect(Api.sis_make_params_for_sis_mapping_and_columns({"id" => ["1",2,3]}, {:scope => "scope"}, Account.default)).to eq({ :conditions => ["(scope = #{Account.default.id} AND id IN (?))", ["1", 2, 3]] })
+      expect(Api.relation_for_sis_mapping_and_columns(User, {"id" => ["1",2,3]}, {:scope => "scope"}, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
     end
 
     it "should fail if we're scoping to an account and the scope isn't provided" do
-      expect(lambda {Api.sis_make_params_for_sis_mapping_and_columns({"id" => ["1",2,3]}, {}, Account.default)}).to raise_error("missing scope for collection")
+      expect(lambda {Api.relation_for_sis_mapping_and_columns(User, {"id" => ["1",2,3]}, {}, Account.default)}).to raise_error("missing scope for collection")
     end
   end
 
@@ -546,7 +546,7 @@ describe Api do
     it 'should correctly capture user lookups' do
       lookups = Api.sis_find_sis_mapping_for_collection(User)[:lookups]
       expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq ["pseudonyms.sis_user_id", "1"]
-      expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq ["pseudonyms.unique_id", "1"]
+      expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('1')"]
       expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq [nil, nil]
@@ -578,27 +578,27 @@ describe Api do
 
     it 'should correctly query the course table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Course)
-      expect(Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default)).to eq({ :conditions => ["id IN (?) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", ["1"], ["1"]] })
+      expect(Api.relation_for_sis_mapping_and_columns(Course, {"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
     it 'should correctly query the enrollment_term table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(EnrollmentTerm)
-      expect(Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default)).to eq({ :conditions => ["id IN (?) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", ["1"], ["1"]] })
+      expect(Api.relation_for_sis_mapping_and_columns(EnrollmentTerm, {"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
     it 'should correctly query the user table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(User)
-      expect(Api.sis_make_params_for_sis_mapping_and_columns({"pseudonyms.sis_user_id" => ["1"], "pseudonyms.unique_id" => ["1"], "users.id" => ["1"]}, sis_mapping, Account.default)).to eq({ :include => [:pseudonym], :conditions => ["(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.sis_user_id IN (?)) OR (pseudonyms.account_id = #{Account.default.id} AND pseudonyms.unique_id IN (?)) OR users.id IN (?)", ["1"], ["1"], ["1"]]})
+      expect(Api.relation_for_sis_mapping_and_columns(User, {"pseudonyms.sis_user_id" => ["1"], "pseudonyms.unique_id" => ["1"], "users.id" => ["1"]}, sis_mapping, Account.default).to_sql).to match(/\(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.sis_user_id IN \('1'\)\) OR \(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.unique_id IN \('1'\)\) OR users.id IN \('1'\)/)
     end
 
     it 'should correctly query the account table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Account)
-      expect(Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default)).to eq({ :conditions => ["id IN (?) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", ["1"], ["1"]] })
+      expect(Api.relation_for_sis_mapping_and_columns(Account, {"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
     it 'should correctly query the course_section table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(CourseSection)
-      expect(Api.sis_make_params_for_sis_mapping_and_columns({"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default)).to eq({ :conditions => ["id IN (?) OR (root_account_id = #{Account.default.id} AND sis_source_id IN (?))", ["1"], ["1"]] })
+      expect(Api.relation_for_sis_mapping_and_columns(CourseSection, {"sis_source_id" => ["1"], "id" => ["1"]}, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
   end
@@ -644,16 +644,54 @@ describe Api do
   end
 
   context ".api_user_content" do
-    class T
-      extend Api
+    let(:klass) do
+      Class.new do
+        include Api
+      end
     end
+
     it "should ignore non-kaltura instructure_inline_media_comment links" do
       student_in_course
       html = %{<div>This is an awesome youtube:
 <a href="http://www.example.com/" class="instructure_inline_media_comment">here</a>
 </div>}
-      res = T.api_user_content(html, @course, @student)
+      res = klass.new.api_user_content(html, @course, @student)
       expect(res).to eq html
+    end
+
+    context "mobile css/js" do
+      before(:each) do
+        student_in_course
+        account = @course.root_account
+        account.enable_feature!(:use_new_styles)
+        bc = BrandConfig.create(mobile_css_overrides: 'somewhere.css')
+        account.brand_config_md5 = bc.md5
+        account.save!
+
+        @html = "<p>a</p><p>b</p>"
+
+        @k = klass.new
+      end
+
+      it 'prepends mobile css when not coming from a web browser' do
+        res = @k.api_user_content(@html, @course, @student)
+        expect(res).to eq <<-HTML.strip
+  <link rel="stylesheet" href="somewhere.css"><p>a</p><p>b</p>
+        HTML
+      end
+
+      it 'does not prepend mobile css when coming from a web browser' do
+        @k.stubs(:in_app?).returns(true)
+        res = @k.api_user_content(@html, @course, @student)
+        expect(res).to eq "<p>a</p><p>b</p>"
+      end
+
+      it 'does not prepend mobile css when coming from a web browser, even if it is a mobile browser' do
+        @k.stubs(:in_app?).returns(true)
+        @k.stubs(:mobile_device?).returns(true)
+        res = @k.api_user_content(@html, @course, @student)
+        expect(res).to eq "<p>a</p><p>b</p>"
+      end
     end
   end
 
@@ -699,7 +737,8 @@ describe Api do
       let(:collection) { [1, 2, 3] }
 
       it "should not raise Folio::InvalidPage for pages past the end" do
-        expect(Api.paginate(collection, controller, 'example.com', page: collection.size + 1, per_page: 1)).
+        controller = stub('controller', request: request, response: response, params: {per_page: 1})
+        expect(Api.paginate(collection, controller, 'example.com', page: collection.size + 1)).
           to eq []
       end
 
@@ -720,6 +759,68 @@ describe Api do
         expect{ Api.paginate(collection, controller, 'example.com', page: 'abc') }.
           to raise_error(Folio::InvalidPage)
       end
+    end
+
+    describe "page size limits" do
+      let(:collection) { (1..101).to_a }
+
+      context "with no max_per_page argument" do
+        it "should limit to the default max_per_page" do
+          controller = stub('controller', request: request, response: response, params: {per_page: Api.max_per_page + 5})
+          expect(Api.paginate(collection, controller, 'example.com').size).
+            to eq Api.max_per_page
+        end
+      end
+
+      context "with no per_page parameter" do
+        it "should limit to the default per_page" do
+          controller = stub('controller', request: request, response: response, params: {})
+          expect(Api.paginate(collection, controller, 'example.com').size).
+            to eq Api.per_page
+        end
+      end
+
+      context "with per_page parameter > max_per_page argument" do
+        let(:controller) { stub('controller', request: request, response: response, params: {per_page: 100}) }
+        it "should take the smaller of the max_per_page arugment and the per_page param" do
+          expect(Api.paginate(collection, controller, 'example.com', {max_per_page: 75}).size).
+            to eq 75
+        end
+      end
+
+      context "with per_page parameter < max_per_page argument" do
+        let(:controller) { stub('controller', request: request, response: response, params: {per_page: 75}) }
+        it "should take the smaller of the max_per_page arugment and the per_page param" do
+          expect(Api.paginate(collection, controller, 'example.com', {max_per_page: 100}).size).
+            to eq 75
+        end
+      end
+    end
+  end
+
+  context ".jsonapi_paginate" do
+    let(:request) { stub('request', query_parameters: {}) }
+    let(:response) { stub('response', headers: {}) }
+    let(:controller) { stub('controller', request: request, response: response, params: {}) }
+    let(:collection) { [1, 2, 3] }
+
+    it "should return the links in the headers" do
+      Api.jsonapi_paginate(collection, controller, 'example.com', page: 1, per_page: 1)
+      link = controller.response.headers['Link']
+      expect(link).not_to be_empty
+      expect(link).to include('<example.com?page=1&per_page=1>; rel="current"')
+      expect(link).to include(',<example.com?page=2&per_page=1>; rel="next"')
+      expect(link).to include(',<example.com?page=1&per_page=1>; rel="first"')
+      expect(link).to include(',<example.com?page=3&per_page=1>; rel="last"')
+    end
+
+    it "should return the links in the meta" do
+      (data, meta) = Api.jsonapi_paginate(collection, controller, 'example.com', page: 1, per_page: 1)
+      expect(meta).not_to be_empty
+      expect(meta[:pagination][:current]).to eq('example.com?page=1&per_page=1')
+      expect(meta[:pagination][:next]).to eq('example.com?page=2&per_page=1')
+      expect(meta[:pagination][:last]).to eq('example.com?page=3&per_page=1')
+      expect(data).to eq [1]
     end
   end
 

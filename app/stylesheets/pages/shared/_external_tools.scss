@@ -78,6 +78,10 @@ $app_height: 143px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    .tool-update-badge {
+      margin: 0 15px;
+      color: $ic-brand-primary;
+    }
   }
   .app-full-view {
     td {
@@ -94,7 +98,7 @@ $app_height: 143px;
       margin: 10px 0 5px;
     }
     .app_cancel {
-      font-size: 12px;
+      @include fontSize($ic-font-size--xsmall);
     }
   }
   .reviews {
@@ -109,7 +113,7 @@ $app_height: 143px;
     }
     .review-item-header {
       margin-top: 0px;
-      font-size: 12px;
+      @include fontSize($ic-font-size--xsmall);
       color: #a1a3a2;
       span {
         color: #666666;
@@ -156,13 +160,12 @@ $app_height: 143px;
             padding: 15px;
             .name {
               font-weight: bold;
-              font-size: 14px;
+              @include fontSize($ic-font-size--small);
               color: #d6ecfc;
             }
             .desc {
-              margin-top: 5px;
-              font-size: 11px;
-              line-height: 17px;
+              @include fontSize(11px);
+              line-height: $ic-line-height;
             }
           }
         }
@@ -235,7 +238,7 @@ $app_height: 143px;
       }
       &.review-content {
         .review-item-header {
-          font-size: 12px;
+          @include fontSize($ic-font-size--xsmall);
         }
       }
     }
@@ -302,7 +305,7 @@ fieldset.rate_app_wrapper {
     }
 
     .hint-text {
-      font-size: 12px;
+      @include fontSize($ic-font-size--xsmall);
       font-weight: normal;
       display: block;
     }

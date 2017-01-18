@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'underscore',
   'i18n!modules',

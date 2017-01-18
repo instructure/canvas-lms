@@ -2,10 +2,12 @@ define [
   'underscore'
   'Backbone'
   'compiled/models/WikiPageRevision'
+  'compiled/models/Assignment'
   'compiled/backbone-ext/DefaultUrlMixin'
   'compiled/str/splitAssetString'
   'i18n!pages'
-], (_, Backbone, WikiPageRevision, DefaultUrlMixin, splitAssetString, I18n) ->
+], (_, Backbone, WikiPageRevision, Assignment, DefaultUrlMixin,
+    splitAssetString, I18n) ->
 
   pageOptions = ['contextAssetString', 'revision']
 
@@ -55,12 +57,24 @@ define [
     parse: (response, options) ->
       if response.wiki_page
         response = _.extend _.omit(response, 'wiki_page'), response.wiki_page
+      response.set_assignment = response.assignment?
+      assign_attributes = response.assignment || {}
+      response.assignment = @createAssignment(assign_attributes)
       response
+
+    createAssignment: (attributes) ->
+      a = new Assignment(attributes)
+      a.alreadyScoped = true
+      a
 
     # Gives a json representation of the model
     toJSON: ->
+      json = super
+      delete json.assignment unless json.set_assignment
+      json.assignment = json.assignment?.toJSON()
+
       wiki_page:
-        super
+        json
 
     # Returns a json representation suitable for presenting
     present: ->

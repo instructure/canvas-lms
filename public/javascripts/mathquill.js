@@ -576,7 +576,7 @@ define([
         ]},
       { name: I18n.t('tabs.delimiters', 'Delimiters'),
         example: '{',
-        button_groups: [["lfloor", "rfloor", "lceil", "rceil", "slash", "opencurlybrace", "closecurlybrace"]
+        button_groups: [["lfloor", "rfloor", "lceil", "rceil", "slash", "lbrace", "rbrace"]
         ]},
       { name: I18n.t('tabs.miscellaneous', 'Misc'),
         example: '∞',
@@ -1181,7 +1181,7 @@ define([
     scale(this.bracketjQs, min(1 + .2*(height - 1), 1.2), 1.05*height);
   };
 
-  LatexCmds.lbrace = CharCmds['{'] = proto(Bracket, function(replacedFragment) {
+  CharCmds['{'] = proto(Bracket, function(replacedFragment) {
     Bracket.call(this, '{', '}', '\\{', '\\}', replacedFragment);
   });
   LatexCmds.langle = LatexCmds.lang = proto(Bracket, function(replacedFragment) {
@@ -1204,7 +1204,7 @@ define([
     }
   };
 
-  LatexCmds.rbrace = CharCmds['}'] = proto(CloseBracket, function(replacedFragment) {
+  CharCmds['}'] = proto(CloseBracket, function(replacedFragment) {
     CloseBracket.call(this, '{','}','\\{','\\}',replacedFragment);
   });
   LatexCmds.rangle = LatexCmds.rang = proto(CloseBracket, function(replacedFragment) {
@@ -2028,8 +2028,8 @@ define([
   LatexCmds.lceil = bind(VanillaSymbol, '\\lceil ', '&#8968;');
   LatexCmds.rceil = bind(VanillaSymbol, '\\rceil ', '&#8969;');
   LatexCmds.slash = bind(VanillaSymbol, '\\slash ', '&#47;');
-  LatexCmds.opencurlybrace = bind(VanillaSymbol, '\\opencurlybrace ', '&#123;');
-  LatexCmds.closecurlybrace = bind(VanillaSymbol, '\\closecurlybrace ', '&#125;');
+  LatexCmds.lbrace = bind(VanillaSymbol, '\\lbrace ', '&#123;');
+  LatexCmds.rbrace = bind(VanillaSymbol, '\\rbrace ', '&#125;');
 
   //various symbols
 

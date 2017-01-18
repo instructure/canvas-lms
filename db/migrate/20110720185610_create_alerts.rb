@@ -1,4 +1,6 @@
 class CreateAlerts < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_table :alerts do |t|
       t.integer :context_id, :limit => 8

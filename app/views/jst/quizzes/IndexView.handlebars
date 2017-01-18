@@ -21,7 +21,7 @@
       </a>
 
       <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
-        {{#ifAll permissions.manage flags.question_banks}}
+        {{#ifAll permissions.read_question_banks flags.question_banks}}
         <li role="presentation">
           <a href="{{urls.question_banks_url}}" class="icon-question" tabindex="-1" role="menuitem">
             {{#t "links.manage_question_banks"}}Manage Question Banks{{/t}}
@@ -39,6 +39,16 @@
       </ul>
     </div>
   </div>
+  {{else}}
+    {{#if permissions.read_question_banks}}
+      <div class="header-bar-right form-inline">
+        <a href="{{urls.question_banks_url}}" class="btn view_question_banks" role="button"
+           title='{{#t}}View Question Banks{{/t}}'
+           aria-label='{{#t}}View Question Banks{{/t}}'>
+          {{#t}}View Question Banks{{/t}}
+        </a>
+      </div>
+    {{/if}}
   {{/ifAny}}
 </div>
 

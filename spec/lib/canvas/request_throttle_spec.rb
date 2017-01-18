@@ -17,7 +17,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe 'Canvas::RequestThrottle' do
+describe 'RequestThrottle' do
   let(:base_req) { { 'QUERY_STRING' => '', 'PATH_INFO' => '/' } }
   let(:request_user_1) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'rack.session' => { user_id: 1 } }) }
   let(:request_user_2) { base_req.merge({ 'REMOTE_ADDR' => '4.3.2.1', 'rack.session' => { user_id: 2 } }) }
@@ -32,10 +32,10 @@ describe 'Canvas::RequestThrottle' do
   def response; [200, {'Content-Type' => 'text/plain'}, ['Hello']]; end
 
   let(:inner_app) { lambda { |env| response } }
-  let(:throttler) { Canvas::RequestThrottle.new(inner_app) }
+  let(:throttler) { RequestThrottle.new(inner_app) }
   let(:rate_limit_exceeded) { throttler.rate_limit_exceeded }
 
-  after { Canvas::RequestThrottle.reload! }
+  after { RequestThrottle.reload! }
 
   def strip_variable_headers(response)
     response[1].delete('X-Request-Cost')
@@ -68,7 +68,7 @@ describe 'Canvas::RequestThrottle' do
   describe "#call" do
     def set_blacklist(val)
       Setting.set('request_throttle.blacklist', val)
-      Canvas::RequestThrottle.reload!
+      RequestThrottle.reload!
     end
 
     it "should pass on other requests" do
@@ -104,13 +104,13 @@ describe 'Canvas::RequestThrottle' do
   describe ".list_from_setting" do
     it "should split the string and create a set" do
       Setting.set('list_test', 'a:x,b:y ,  z ')
-      expect(Canvas::RequestThrottle.list_from_setting('list_test')).to eq Set.new(%w[z b:y a:x])
+      expect(RequestThrottle.list_from_setting('list_test')).to eq Set.new(%w[z b:y a:x])
     end
   end
 
   describe "cost throttling" do
     describe "#calculate_cost" do
-      let(:throttle){ Canvas::RequestThrottle.new(nil) }
+      let(:throttle){ RequestThrottle.new(nil) }
 
       it "sums cpu and db time when extra cost is nil" do
         cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => nil})
@@ -160,7 +160,7 @@ describe 'Canvas::RequestThrottle' do
 
     def throttled_request
       bucket = mock('Bucket')
-      Canvas::RequestThrottle::LeakyBucket.expects(:new).with("user:1").returns(bucket)
+      RequestThrottle::LeakyBucket.expects(:new).with("user:1").returns(bucket)
       bucket.expects(:reserve_capacity).yields.returns(1)
       bucket.expects(:full?).returns(true)
       bucket.expects(:to_json) # in the logger.info line
@@ -176,7 +176,7 @@ describe 'Canvas::RequestThrottle' do
     end
 
     it "should not throttle if disabled" do
-      Canvas::RequestThrottle.stubs(:enabled?).returns(false)
+      RequestThrottle.stubs(:enabled?).returns(false)
       bucket = throttled_request
       # shouldn't even check these
       bucket.unstub(:full?)
@@ -189,7 +189,7 @@ describe 'Canvas::RequestThrottle' do
 
     it "should not throttle, but update, if bucket is not full" do
       bucket = mock('Bucket')
-      Canvas::RequestThrottle::LeakyBucket.expects(:new).with("user:1").returns(bucket)
+      RequestThrottle::LeakyBucket.expects(:new).with("user:1").returns(bucket)
       bucket.expects(:reserve_capacity).yields.returns(1)
       bucket.expects(:full?).returns(false)
       bucket.expects(:remaining).returns(599)
@@ -203,7 +203,7 @@ describe 'Canvas::RequestThrottle' do
     if Canvas.redis_enabled?
       it "should increment the bucket" do
         expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
-        bucket = Canvas::RequestThrottle::LeakyBucket.new("user:1")
+        bucket = RequestThrottle::LeakyBucket.new("user:1")
         count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
         expect(last_touched.to_f).to be > 0.0
       end
@@ -211,11 +211,11 @@ describe 'Canvas::RequestThrottle' do
   end
 
   if Canvas.redis_enabled?
-    describe Canvas::RequestThrottle::LeakyBucket do
+    describe RequestThrottle::LeakyBucket do
       before do
         @outflow = 15.5
         Setting.set('request_throttle.outflow', @outflow.to_s)
-        @bucket = Canvas::RequestThrottle::LeakyBucket.new("test", 150.0, 15.0)
+        @bucket = RequestThrottle::LeakyBucket.new("test", 150.0, 15.0)
         @current_time = 20.2
         # this magic number is @bucket.count - ((@current_time - @bucket.last_touched) * @outflow)
         @expected = 69.4
@@ -223,7 +223,7 @@ describe 'Canvas::RequestThrottle' do
 
       describe "#full?" do
         it "should compare to the hwm setting" do
-          bucket = Canvas::RequestThrottle::LeakyBucket.new("test", 5.0)
+          bucket = RequestThrottle::LeakyBucket.new("test", 5.0)
           Setting.set('request_throttle.hwm', '6.0')
           expect(bucket.full?).to eq false
           Setting.set('request_throttle.hwm', '4.0')
@@ -292,13 +292,18 @@ describe 'Canvas::RequestThrottle' do
         end
 
         it "clamps a negative increment to 0" do
-          Timecop.freeze('2013-01-01 3:00:00 UTC') do
+          now = Time.zone.now
+
+          # this is a hack to make the second Time.now call
+          # return 6 seconds in the future, which makes the
+          # final cost with leak < 0 (cuz the return is 5)
+          x = 0
+          Time.stubs(:now).returns { now + x.seconds; x += 6; }
+
+          Timecop.freeze(now) do
             @bucket.reserve_capacity(20) do
-              # finishing 6 seconds later, so final cost with leak is < 0
-              Timecop.freeze(Time.now + 6.seconds)
               5
             end
-            Timecop.return
           end
           expect(@bucket.count).to eq 0
           expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to eq 0

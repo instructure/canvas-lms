@@ -1,7 +1,9 @@
 define [
   'jquery'
   'underscore'
+  'compiled/util/fcUtil'
   'i18n!EditAppointmentGroupDetails'
+  'str/htmlEscape'
   'compiled/calendar/TimeBlockList'
   'jst/calendar/editAppointmentGroup'
   'jst/calendar/genericSelect'
@@ -11,19 +13,30 @@ define [
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], ($, _, I18n, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate, sectionCheckboxesTemplate, ContextSelector, preventDefault) ->
+], ($, _, fcUtil, I18n, htmlEscape, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate, sectionCheckboxesTemplate, ContextSelector, preventDefault) ->
 
   class EditAppointmentGroupDetails
     constructor: (selector, @apptGroup, @contexts, @closeCB) ->
       @currentContextInfo = null
+      @appointment_group = _.extend(
+        {use_group_signup: @apptGroup.participant_type is 'Group'}
+          @apptGroup
+      )
 
       $(selector).html editAppointmentGroupTemplate({
         title: @apptGroup.title
         contexts: @contexts
-        appointment_group: _.extend(
-          {use_group_signup: @apptGroup.participant_type is 'Group'}
-          @apptGroup
-        )
+        appointment_group: @appointment_group,
+        num_minutes: '<input type="number" name="duration" value="30" style="width: 40px"
+              aria-label="' + htmlEscape(I18n.t('Minutes per slot')) + '" />'
+        num_participants: '<input type="number" name="participants_per_appointment"
+                value="' + htmlEscape(@appointment_group.participants_per_appointment) + '" min="1"
+                style="width: 40px;"
+                aria-label="' + htmlEscape(I18n.t('Max users/groups per appointment')) + '" />'
+        num_appointments: '<input type="number" name="max_appointments_per_participant"
+              value="' + htmlEscape(@appointment_group.max_appointments_per_participant) +  '" min="1"
+              style="width: 40px"
+              aria-label="' + htmlEscape(I18n.t('Maximum number of appointments a participant can attend')) + '" />'
       })
 
       @contextsHash = {}
@@ -54,7 +67,8 @@ define [
 
       @form.find('.ag_contexts_selector').click preventDefault @toggleContextsMenu
 
-      timeBlocks = ([appt.start_at, appt.end_at, true] for appt in @apptGroup.appointments || [] )
+      # make sure this is the spot
+      timeBlocks = ([fcUtil.wrap(appt.start_at), fcUtil.wrap(appt.end_at), true] for appt in @apptGroup.appointments || [] )
       @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body"), @form.find(".splitter"), timeBlocks)
 
       @form.find('[name="slot_duration"]').change (e) =>

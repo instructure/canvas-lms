@@ -1,4 +1,6 @@
 class AddExternalToolFlags < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :context_external_tools, :has_user_navigation, :boolean
     add_column :context_external_tools, :has_course_navigation, :boolean

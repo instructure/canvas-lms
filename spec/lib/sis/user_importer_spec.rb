@@ -20,20 +20,22 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe SIS::UserImporter do
   context "time elapsed" do
-    after do
-      Timecop.return
-    end
-
     it "should split into transactions based on time elapsed" do
       account_model
-      messages = []
       Setting.set('sis_transaction_seconds', '1')
+      messages = []
       # this is the fun bit where we get to stub User.new to insert a sleep into
       # the transaction loop.
 
-      User.any_instance.expects(:save).times(3).returns { Timecop.travel(5.seconds) }
-      # two for each user
-      User.expects(:transaction).times(6).yields
+      # so it stays fast and skips the db
+      User.any_instance.expects(:save).times(3).returns(true)
+
+      # yes, enough time has passed for the transaction
+      Time.any_instance.stubs(:>).returns(true)
+
+      # two outer transactions (one per batch of 2)
+      # three inner transactions (one per user)
+      User.expects(:transaction).times(5).yields
 
       SIS::UserImporter.new(@account, {}).process(2, messages) do |importer|
         importer.add_user(*"U001,user1,active,User,One,user1@example.com".split(','))
@@ -41,6 +43,39 @@ describe SIS::UserImporter do
         importer.add_user(*"U003,user3,active,User,Three,user3@example.com".split(','))
       end
       # we don't actually save them, so don't bother checking the results
+    end
+  end
+
+  context "when the unique_id is invalid the error message reported to the user" do
+
+    before(:all) do
+      @user_id = 'sis_id1'
+      @login_id = '--*(&*(&%^&*%..-'
+      messages = []
+      account_model
+      Setting.set('sis_transaction_seconds', '1')
+
+      SIS::UserImporter.new(@account, {}).process(2, messages) do |importer|
+        importer.add_user(@user_id, @login_id, 'active','User','One','user1@example.com')
+      end
+
+      @message = messages.first
+    end
+
+    it 'must include the login_id' do
+      expect(@message).to include(@login_id)
+    end
+
+    it 'must include the user_id field' do
+      expect(@message).to include(@user_id)
+    end
+
+    it 'must include the developer error message' do
+      expect(@message).to include('#<SIS::ImportError: unique_id is invalid>')
+    end
+
+    it 'must include the text "Invalid login_id"' do
+      expect(@message).to include('Invalid login_id')
     end
   end
 

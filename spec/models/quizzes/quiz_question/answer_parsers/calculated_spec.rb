@@ -29,11 +29,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::Calculated do
           answer_text: 14
         },
         {
-          variables: {"variable_0" => {name: "x", value: "6"}},
-          answer_text: 11
-        },
-        {
-          variables: {"variable_0" => {name: "x", value: "7"}},
+          variables: {"variable_2" => {name: "z", value: "7"}},
           answer_text: 12
         }
       ]
@@ -47,7 +43,8 @@ describe Quizzes::QuizQuestion::AnswerParsers::Calculated do
         question_text: "What is 5 + [x]?",
         formulas: ["5+x"],
         variables: [
-          { name: "x", min: 5, max: 10, scale: 0 }
+          { name: "x", min: 5, max: 10, scale: 0 },
+          { name: "z", min: 5, max: 10, scale: 10 }
         ]
       }
     end
@@ -66,6 +63,14 @@ describe Quizzes::QuizQuestion::AnswerParsers::Calculated do
       @question.answers.each do |answer|
         expect(answer[:variables]).to be_kind_of(Array)
       end
+    end
+
+    it 'handles 0 scale answers without any decimal values' do
+      expect(@question.answers.first[:variables].first[:value]).to eq '9'
+    end
+
+    it 'handles 10 scale answers with the right number of decimal values' do
+      expect(@question.answers.to_a.last[:variables].first[:value]).to eq '7.0000000000'
     end
   end
 end

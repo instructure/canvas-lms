@@ -73,7 +73,7 @@ class ErrorsController < ApplicationController
 
   def index
     params[:page] = params[:page].to_i > 0 ? params[:page].to_i : 1
-    @reports = ErrorReport.includes(:user)
+    @reports = ErrorReport.preload(:user)
 
     @message = params[:message]
     if error_search_enabled? && @message.present?
@@ -133,7 +133,12 @@ class ErrorsController < ApplicationController
     # get quickly rate limited if hit repeatedly.
     increment_request_cost(200)
 
+    reporter = @current_user.try(:fake_student?) ? @real_current_user : @current_user
     error = params[:error] || {}
+
+    # this is a honeypot field to catch spambots. it's hidden via css and should always be empty.
+    return render(nothing: true, status: 400) if error.delete(:username).present?
+
     error[:user_agent] = request.headers['User-Agent']
     begin
       report_id = error.delete(:id)
@@ -141,7 +146,7 @@ class ErrorsController < ApplicationController
       report ||= ErrorReport.where(id: session.delete(:last_error_id)).first if session[:last_error_id].present?
       report ||= ErrorReport.new
       error.delete(:category) if report.category.present?
-      report.user = @current_user
+      report.user = reporter
       report.account ||= @domain_root_account
       backtrace = error.fetch(:backtrace, "")
       if report.backtrace
@@ -160,7 +165,7 @@ class ErrorsController < ApplicationController
         e,
         message: "Error Report Creation failed",
         user_email: error[:email],
-        user_id: @current_user.try(:id)
+        user_id: reporter.try(:id)
       )
     end
     respond_to do |format|

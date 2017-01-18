@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "course sections" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def add_enrollment(enrollment_state, section)
     enrollment = student_in_course(:workflow_state => enrollment_state, :course_section => section)

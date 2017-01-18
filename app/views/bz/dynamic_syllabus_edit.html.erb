@@ -1,0 +1,60 @@
+<%
+  jammit_css :tinymce
+  js_bundle :dynamic_syllabus
+%>
+
+<div class="bz-dynamic-syllabus-editor">
+  <h1>Dynamic Syllabus Editor</h1>
+  <hr />
+  <%= form_tag "/courses/#{@course.id}/dynamic_syllabus/edit", {:method => :post} do %>
+
+  <h3>Course Syllabus Info</h3>
+
+  <label><span>Course Intro Title:</span>
+    <input type="text" name="course_intro_title" value="<%= @course.intro_title %>" /></label>
+
+  <label><span>Course Intro Text:</span>
+    <textarea id="bz-course-intro-text-editor" class="rich-text-editor" style="width: 300px; height: 150px;" name="course_intro_text"><%= @course.intro_text %></textarea></label>
+
+  <h3>Course Syllabus Parts</h3>
+  <div class="dynamic-syllabus-parts-editor"><div>
+    <% def part_code(part, hidden = false) %>
+    <% if hidden %> <div id="bz_part_code_new" style="display: none;"> <% end %>
+    <fieldset class="bz_part_code" style="border: solid 1px #ccc; margin: 16px; padding: 16px;">
+      <input type="hidden" name="part_id[]" value="<%= part.id %>" />
+      <label><span>Part Title:</span>
+        <input type="text" name="part_title[]" value="<%= part.title %>" /></label>
+      <label><span>Part Intro:</span>
+        <textarea  class="rich-text-editor" style="width: 300px; height: 150px;" name="part_intro[]"><%= part.intro %></textarea></label>
+      <!--
+      <label><span>Task Box Title:</span>
+        <input type="text" name="task_box_title[]" value="<%= part.task_box_title %>" /></label>
+      <label><span>Task Box Intro:</span>
+        <textarea  class="rich-text-editor" style="width: 300px; height: 150px;" name="task_box_intro[]"><%= part.task_box_intro %></textarea></label>
+        -->
+    </fieldset>
+      <% if hidden %> </div> <% end %>
+    <% end %>
+    <% CoursePart.where(:course_id => @course.id).order(:position, :id).each do |part| %>
+      <% part_code(part) %>
+    <% end %>
+  </div>
+
+    <button type="button" onclick="
+      var p = this.parentNode.firstChild;
+      var i = document.getElementById('bz_part_code_new');
+      var d = document.createElement('div');
+      d.innerHTML = i.innerHTML;
+      p.appendChild(d);
+      $('textarea', d).editorBox();
+    ">Add Part</button>
+  </div>
+
+  <br />
+  <br />
+  <input type="submit" value="Save" />
+
+  <% end %>
+  <% part_code(CoursePart.new, true) %>
+</div>
+

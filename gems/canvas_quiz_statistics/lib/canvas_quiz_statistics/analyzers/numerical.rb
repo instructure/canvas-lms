@@ -35,12 +35,15 @@ module CanvasQuizStatistics::Analyzers
 
     inherit :responses, :full_credit, from: :essay
     inherit :correct, :incorrect, from: :fill_in_multiple_blanks
+    
+    RANGE_ANSWER = 'range_answer'.freeze
+    PRECISION_ANSWER = 'precision_answer'.freeze
 
     # Statistics for the pre-defined answers.
     #
     # @return [Array<Hash>]
     #
-    # Each entry could represent an "exact" answer, or a "range" answer.
+    # Each entry could represent an "exact" answer, a "precision" answer, or a "range" answer.
     # Exact answers can have margins.
     #
     # Output synopsis:
@@ -99,16 +102,16 @@ module CanvasQuizStatistics::Analyzers
     # }
     metric :answers do |responses|
       answers = parse_answers do |answer, answer_stats|
-        is_range = range_answer?(answer)
-        bounds = generate_answer_boundaries(answer, is_range)
-        text = generate_text_for_answer(answer, is_range)
+        answer_type = answer[:numerical_answer_type]
+        bounds = generate_answer_boundaries(answer, answer_type)
+        text = generate_text_for_answer(answer, answer_type)
 
         answer_stats.merge!({
           text: text,
           value: bounds,
           responses: 0,
           margin: answer[:margin].to_f,
-          is_range: is_range
+          is_range: answer_type == RANGE_ANSWER
         })
       end
 
@@ -123,18 +126,18 @@ module CanvasQuizStatistics::Analyzers
       }
     end
 
-    def range_answer?(answer)
-      answer[:numerical_answer_type] == 'range_answer'
-    end
-
     # Exact answers will look like this: "15.00"
     # Range answers will look like this: "[3.00..54.12]"
-    def generate_text_for_answer(answer, is_range)
+    # Precision answers will look like this: "1 (with precision: 2)"
+    def generate_text_for_answer(answer, answer_type)
       format = ->(value) { sprintf('%.2f', value) }
 
-      if is_range
+      case answer_type
+      when RANGE_ANSWER
         range = [ answer[:start], answer[:end] ].map(&format).join('..')
         "[#{range}]"
+      when PRECISION_ANSWER
+        "#{answer[:approximate]} (with precision: #{answer[:precision]})"
       else
         value = format.call(answer[:exact])
         "#{value}"
@@ -144,10 +147,13 @@ module CanvasQuizStatistics::Analyzers
     # Generates an array that represents the correct answer range.
     #
     # The range will be simulated for exact answers using the margin (if any).
-    def generate_answer_boundaries(answer, is_range)
-      if is_range
+    def generate_answer_boundaries(answer, answer_type)
+      case answer_type
+      when RANGE_ANSWER
         # there's no margin in range answers
         [ answer[:start].to_f, answer[:end].to_f ]
+      when PRECISION_ANSWER
+        [ answer[:approximate] - answer[:precision], answer[:approximate] + answer[:precision] ]
       else
         margin = answer[:margin].to_f
         [ answer[:exact] - margin, answer[:exact] + margin ]

@@ -69,6 +69,7 @@
                          aria-activedescendant="ac-result-list"
                          aria-owns="ac-result-list-1"
                          aria-autocomplete="list"
+                         aria-label="{{#t "comboboxInstructions"}}To: (Start typing to choose recipients. Press the down arrow to navigate results. If you don't find an acceptable option, you can enter an alternative.){{/t}}"
                          aria-describedby="ac-input-description"
                          autocomplete="off"
                          role="combobox" />
@@ -123,11 +124,7 @@
             <input type="hidden" name="bulk_message" value="0" />
             <label class="checkbox">
               <input id="bulk_message" type="checkbox" name="bulk_message" value="1" />
-              {{#t "send_individual_messages"}}Send individual messages{{/t}}
-
-              <i class="icon-question"
-                 data-tooltip
-                 title="{{#t "individual_message_explanation"}}This will send an individual message to each of the recipients{{/t}}"></i>
+              {{#t "send_individual_messages"}}Send an individual message to each recipient{{/t}}
             </label>
 
           </div>

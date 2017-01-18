@@ -3,6 +3,8 @@
 # will be undone by the next auto-generated trigger migration.
 
 class CreateTriggerSubmissionsInsert < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_trigger("submissions_after_insert_row_tr", :generated => true, :compatibility => 1).
         on("submissions").

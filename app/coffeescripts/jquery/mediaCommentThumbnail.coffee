@@ -15,7 +15,9 @@ define [
 
     $link = $(elem)
     try
-      url = new URL($link.attr('href'))
+      a = document.createElement('a');
+      a.href = $link.attr('href')
+      url = a
     return if url && deparam(url.search).no_preview
 
     dimensions = MEDIA_COMMENT_THUMBNAIL_SIZES[size] ? MEDIA_COMMENT_THUMBNAIL_SIZES.normal

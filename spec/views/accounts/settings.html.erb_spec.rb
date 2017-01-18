@@ -30,13 +30,13 @@ describe "accounts/settings.html.erb" do
       @account = Account.default.sub_accounts.create!
       @account.sis_source_id = "so_special_sis_id"
       @account.save!
-      
+
       assigns[:context] = @account
       assigns[:account] = @account
       assigns[:account_users] = []
       assigns[:root_account] = @account
       assigns[:associated_courses_count] = 0
-      assigns[:announcements] = []
+      assigns[:announcements] = AccountNotification.none.paginate
     end
 
     it "should show to sis admin" do
@@ -64,7 +64,7 @@ describe "accounts/settings.html.erb" do
       assigns[:account_users] = []
       assigns[:root_account] = @account
       assigns[:associated_courses_count] = 0
-      assigns[:announcements] = []
+      assigns[:announcements] = AccountNotification.none.paginate
       admin = account_admin_user
       view_context(@account, admin)
     end
@@ -76,7 +76,8 @@ describe "accounts/settings.html.erb" do
     end
 
     it "should show warning dialog when a delegated auth config is around" do
-      @account.account_authorization_configs.create!(:auth_type => 'cas')
+      @account.authentication_providers.create!(:auth_type => 'cas')
+      @account.authentication_providers.first.move_to_bottom
       render
       expect(response).to have_tag("input#account_settings_open_registration")
       expect(response).to have_tag("div#open_registration_delegated_warning_dialog")
@@ -90,7 +91,7 @@ describe "accounts/settings.html.erb" do
       assigns[:account_users] = []
       assigns[:root_account] = @account
       assigns[:associated_courses_count] = 0
-      assigns[:announcements] = []
+      assigns[:announcements] = AccountNotification.none.paginate
     end
 
     it "should show settings that can only be managed by site admins" do
@@ -111,7 +112,7 @@ describe "accounts/settings.html.erb" do
       expect(response).not_to have_tag("input#account_settings_enable_profiles")
     end
   end
-  
+
   describe "quotas" do
     before do
       @account = Account.default
@@ -119,16 +120,16 @@ describe "accounts/settings.html.erb" do
       assigns[:account_users] = []
       assigns[:root_account] = @account
       assigns[:associated_courses_count] = 0
-      assigns[:announcements] = []
+      assigns[:announcements] = AccountNotification.none.paginate
     end
-    
+
     context "with :manage_storage_quotas" do
       before do
         admin = account_admin_user
         view_context(@account, admin)
         assigns[:current_user] = admin
       end
-      
+
       it "should show quota options" do
         render
         expect(@controller.js_env.include?(:ACCOUNT)).to be_truthy
@@ -136,14 +137,14 @@ describe "accounts/settings.html.erb" do
         expect(response).to have_tag '#tab-quotas'
       end
     end
-    
+
     context "without :manage_storage_quotas" do
       before do
         admin = account_admin_user_with_role_changes(:account => @account, :role_changes => {'manage_storage_quotas' => false})
         view_context(@account, admin)
         assigns[:current_user] = admin
       end
-      
+
       it "should not show quota options" do
         render
         expect(@controller.js_env.include?(:ACCOUNT)).to be_falsey
@@ -162,9 +163,28 @@ describe "accounts/settings.html.erb" do
           :role_changes => {manage_account_memberships: true})
       view_context(Account.default, @user)
       assigns[:account] = Account.default
-      assigns[:announcements] = []
+      assigns[:announcements] = AccountNotification.none.paginate
       render
       expect(response).not_to have_tag '#enroll_users_form'
+    end
+  end
+
+  context "theme editor" do
+    before do
+      @account = Account.default
+      assigns[:account] = @account
+      assigns[:account_users] = []
+      assigns[:root_account] = @account
+      assigns[:associated_courses_count] = 0
+      assigns[:announcements] = AccountNotification.none.paginate
+    end
+
+    it "should show sub account theme editor option for non siteadmin admins" do
+      admin = account_admin_user
+      view_context(@account, admin)
+      assigns[:current_user] = admin
+      render
+      expect(response).to include("Let sub-accounts use the Theme Editor")
     end
   end
 end

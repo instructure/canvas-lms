@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_topic_id) %>
+  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_topic_id, anchor: "entry-#{asset.id}") %>
 <% end %>
 
 <% define_content :subject do %>
@@ -10,5 +10,4 @@
 
 <%= html_to_text(asset.message, :base_url => dashboard_url) %>
 
-<%= t :discussion_entry_reply_message, "Join the conversation using the link below, or comment by replying to this message." %>
-<%= content :link %>
+<%= t("Comment by replying to this message, or join the conversation using this link: %{link}.", link: content(:link)) %>

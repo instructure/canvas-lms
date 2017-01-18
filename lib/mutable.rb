@@ -20,12 +20,14 @@ module Mutable
   end
 
   def mute!
+    return if muted?
     self.update_attribute(:muted, true)
     clear_sent_messages
     hide_stream_items
   end
 
   def unmute!
+    return unless muted?
     self.update_attribute(:muted, false)
     broadcast_unmute_event
     show_stream_items
@@ -46,7 +48,7 @@ module Mutable
     if self.respond_to? :submissions
       stream_items = StreamItem.select([:id, :context_type, :context_id]).
           where(:asset_type => 'Submission', :asset_id => submissions).
-          includes(:context).to_a
+          preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
       associated_shards = stream_items.inject([]) { |result, si| result | si.associated_shards }
       Shard.with_each_shard(associated_shards) do
@@ -61,7 +63,7 @@ module Mutable
       submissions        = submissions(:include => {:hidden_submission_comments => :author})
       stream_items = StreamItem.select([:id, :context_type, :context_id]).
           where(:asset_type => 'Submission', :asset_id => submissions).
-          includes(:context).to_a
+          preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
       associated_shards = stream_items.inject([]) { |result, si| result | si.associated_shards }
       Shard.with_each_shard(associated_shards) do
@@ -70,7 +72,7 @@ module Mutable
       end
 
       outstanding = submissions.map{ |submission|
-        comments = submission.hidden_submission_comments.all
+        comments = submission.hidden_submission_comments.to_a
         next if comments.empty?
         [submission, comments.map(&:author_id).uniq.size == 1 ? [comments.last.author] : []]
       }.compact

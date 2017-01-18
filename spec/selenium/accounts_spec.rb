@@ -1,84 +1,20 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "account" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
-  before (:each) do
+  before(:each) do
     course_with_admin_logged_in
   end
 
-  describe "authentication configs" do
-
-    it "should allow setting up a secondary ldap server" do
-      get "/accounts/#{Account.default.id}/account_authorization_configs"
-      click_option('#add_auth_select', 'ldap', :value)
-      ldap_div = f('#ldap_form')
-      ldap_form = f('#ldap_form form')
-      expect(ldap_div).to be_displayed
-
-      ldap_form.find_element(:id, 'account_authorization_config_auth_host').send_keys('primary.host.example.com')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_port').send_keys('1')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_over_tls_simple_tls').click
-      ldap_form.find_element(:id, 'account_authorization_config_auth_base').send_keys('primary base')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_filter').send_keys('primary filter')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_username').send_keys('primary username')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_password').send_keys('primary password')
-      submit_form('#ldap_form form')
-
-      keep_trying_until { expect(Account.default.account_authorization_configs.length).to eq 1 }
-      config = Account.default.account_authorization_configs.first
-      expect(config.auth_host).to eq 'primary.host.example.com'
-      expect(config.auth_port).to eq 1
-      expect(config.auth_over_tls).to eq 'simple_tls'
-      expect(config.auth_base).to eq 'primary base'
-      expect(config.auth_filter).to eq 'primary filter'
-      expect(config.auth_username).to eq 'primary username'
-      expect(config.auth_decrypted_password).to eq 'primary password'
-
-      # now add a secondary ldap config
-      click_option('#add_auth_select', 'ldap', :value)
-      ldap_form = f('#ldap_form form')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_host').send_keys('secondary.host.example.com')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_port').send_keys('2')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_base').send_keys('secondary base')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_filter').send_keys('secondary filter')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_username').send_keys('secondary username')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_password').send_keys('secondary password')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_over_tls_start_tls').click
-      submit_form('#ldap_form form')
-
-      keep_trying_until { expect(Account.default.account_authorization_configs.length).to eq 2 }
-      config = Account.default.account_authorization_configs.first
-      expect(config.auth_host).to eq 'primary.host.example.com'
-      expect(config.auth_over_tls).to eq 'simple_tls'
-
-      config = Account.default.account_authorization_configs[1]
-      expect(config.auth_host).to eq 'secondary.host.example.com'
-      expect(config.auth_port).to eq 2
-      expect(config.auth_over_tls).to eq 'start_tls'
-      expect(config.auth_base).to eq 'secondary base'
-      expect(config.auth_filter).to eq 'secondary filter'
-      expect(config.auth_username).to eq 'secondary username'
-      expect(config.auth_decrypted_password).to eq 'secondary password'
-
-      # test removing the secondary config
-      config = Account.default.account_authorization_configs.last
-      scroll_page_to_bottom
-      delete_id = "#delete-aac-#{config.id}"
-      keep_trying_until { driver.find_element(css: delete_id).displayed? }
-      expect_new_page_load(true) do
-        f(delete_id).click
-      end
-
-      keep_trying_until { expect(Account.default.account_authorization_configs.length).to eq 1 }
-
-      # test removing the entire config
-      expect_new_page_load(true) do
-        f('.delete_auth_link').click
-      end
-
-      expect(Account.default.account_authorization_configs.length).to eq 0
+  def verify_displayed_term_dates(term, dates)
+    dates.each do |en_type, date|
+      expect(term.find_element(:css, ".#{en_type}_dates .start_date .show_term").text).to match(/#{date[0]}/)
+      expect(term.find_element(:css, ".#{en_type}_dates .end_date .show_term").text).to match(/#{date[1]}/)
     end
+  end
+
+  describe "course and term create/update" do
 
     it "should show Login and Email fields in add user dialog for delegated auth accounts" do
       get "/accounts/#{Account.default.id}/users"
@@ -87,7 +23,8 @@ describe "account" do
       expect(dialog.find_elements(:id, "pseudonym_path").length).to eq 0
       expect(dialog.find_element(:id, "pseudonym_unique_id")).to be_displayed
 
-      Account.default.account_authorization_configs.create(:auth_type => 'cas')
+      Account.default.authentication_providers.create(:auth_type => 'cas')
+      Account.default.authentication_providers.first.move_to_bottom
       get "/accounts/#{Account.default.id}/users"
       f(".add_user_link").click
       dialog = f("#add_user_dialog")
@@ -95,71 +32,24 @@ describe "account" do
       expect(dialog.find_element(:id, "pseudonym_unique_id")).to be_displayed
     end
 
-    it "should be able to set login labels for delegated auth accounts" do
-      get "/accounts/#{Account.default.id}/account_authorization_configs"
-      click_option('#add_auth_select', 'cas', :value)
-      f("#account_authorization_config_auth_base").send_keys("cas.example.com")
-      expect_new_page_load { submit_form('#cas_form form') }
-
-      expect(f("#sso_settings_login_handle_name")).to be_displayed
-      f("#sso_settings_login_handle_name").send_keys("CAS Username")
-      expect_new_page_load { submit_form('#sso_settings_form') }
-
-      get "/accounts/#{Account.default.id}/users"
-      f(".add_user_link").click
-      dialog = f("#add_user_dialog")
-      expect(dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text).to eq "CAS Username: *"
-    end
-
-    context "cas" do
-      it "should be able to set unknown user url option" do
-        get "/accounts/#{Account.default.id}/account_authorization_configs"
-        click_option('#add_auth_select', 'cas', :value)
-        expect(f("#account_authorization_config_unknown_user_url")).to be_displayed
-
-        unknown_user_url = 'https://example.com/unknown_user'
-        f("#account_authorization_config_unknown_user_url").send_keys(unknown_user_url)
-        expect_new_page_load { submit_form('#cas_form form') }
-
-        expect(Account.default.account_authorization_configs.first.unknown_user_url).to eq unknown_user_url
-      end
-    end
-
-    context "saml" do
-      it "should be able to set unknown user url option" do
-        get "/accounts/#{Account.default.id}/account_authorization_configs"
-        click_option('#add_auth_select', 'saml', :value)
-
-        saml_div = f('#saml_form')
-        expect(f("#account_authorization_config_idp_entity_id")).to be_displayed
-
-        unknown_user_url = 'https://example.com/unknown_user'
-        saml_div.find_element(:css, "#saml_form #account_authorization_config_unknown_user_url").
-          send_keys(unknown_user_url)
-        expect_new_page_load { submit_form('#saml_form form') }
-
-        expect(Account.default.account_authorization_configs.first.unknown_user_url).to eq unknown_user_url
-      end
-    end
-
     it "should be able to create a new course" do
       get "/accounts/#{Account.default.id}"
       f('.add_course_link').click
       f('#add_course_form input[type=text]:first-child').send_keys('Test Course')
       f('#course_course_code').send_keys('TEST001')
-      submit_form('#add_course_form')
+      submit_dialog_form('#add_course_form')
 
       wait_for_ajaximations
       expect(f('#add_course_dialog')).not_to be_displayed
-      assert_flash_notice_message /Test Course successfully added/
+      assert_flash_notice_message(/Test Course successfully added/)
     end
 
     it "should be able to create a new course when no other courses exist" do
       Account.default.courses.each do |c|
-        c.course_account_associations.scoped.delete_all
-        c.enrollments.scoped.delete_all
-        c.course_sections.scoped.delete_all
-        c.destroy!
+        c.course_account_associations.scope.delete_all
+        c.enrollments.scope.delete_all
+        c.course_sections.scope.delete_all
+        c.destroy_permanently!
       end
 
       get "/accounts/#{Account.default.to_param}"
@@ -189,130 +79,68 @@ describe "account" do
       expect(term.end_at).to eq Date.parse("2011-07-31")
     end
 
-    it "should be able to update term dates" do
-
-      def verify_displayed_term_dates(term, dates)
-        dates.each do |en_type, dates|
-          expect(term.find_element(:css, ".#{en_type}_dates .start_date .show_term").text).to match /#{dates[0]}/
-          expect(term.find_element(:css, ".#{en_type}_dates .end_date .show_term").text).to match /#{dates[1]}/
-        end
-      end
-
+    it 'general term dates', priority: 1, test_id: 1621631 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      term.find_element(:css, ".edit_term_link").click
-      term.find_element(:css, ".editing_term .general_dates .start_date .edit_term input").send_keys("2011-07-01")
-      term.find_element(:css, ".editing_term .general_dates .end_date .edit_term input").send_keys("2011-07-31")
-      submit_form(".enrollment_term_form")
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      f('.edit_term_link').click
+      f('.editing_term .general_dates .start_date .edit_term input').send_keys("2011-07-01")
+      f('.editing_term .general_dates .end_date .edit_term input').send_keys("2011-07-31")
+      f("button[type='submit']").click
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
           :general => ["Jul 1", "Jul 31"],
           :student_enrollment => ["term start", "term end"],
           :teacher_enrollment => ["term start", "term end"],
           :ta_enrollment => ["term start", "term end"]
       })
+    end
 
+    it 'student enrollment dates', priority: 1, test_id: 1621632 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      term.find_element(:css, ".edit_term_link").click
-      term.find_element(:css, ".editing_term .student_enrollment_dates .start_date .edit_term input").send_keys("2011-07-02")
-      term.find_element(:css, ".editing_term .student_enrollment_dates .end_date .edit_term input").send_keys("2011-07-30")
-      submit_form(".enrollment_term_form")
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      f('.edit_term_link').click
+      f('.editing_term .student_enrollment_dates .start_date .edit_term input').send_keys("2011-07-02")
+      f('.editing_term .student_enrollment_dates .end_date .edit_term input').send_keys("2011-07-30")
+      f("button[type='submit']").click
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
-          :general => ["Jul 1", "Jul 31"],
+          :general => ["whenever", "whenever"],
           :student_enrollment => ["Jul 2", "Jul 30"],
           :teacher_enrollment => ["term start", "term end"],
           :ta_enrollment => ["term start", "term end"]
       })
+    end
 
+    it 'teacher enrollment dates', priority: 1, test_id: 1621633 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      term.find_element(:css, ".edit_term_link").click
-      term.find_element(:css, ".editing_term .teacher_enrollment_dates .start_date .edit_term input").send_keys("2011-07-03")
-      term.find_element(:css, ".editing_term .teacher_enrollment_dates .end_date .edit_term input").send_keys("2011-07-29")
-      term.find_element(:css, ".editing_term .ta_enrollment_dates .start_date .edit_term input").send_keys("2011-07-04")
-      term.find_element(:css, ".editing_term .ta_enrollment_dates .end_date .edit_term input").send_keys("2011-07-28")
-      submit_form(".enrollment_term_form")
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      f('.edit_term_link').click
+      f('.editing_term .teacher_enrollment_dates .start_date .edit_term input').send_keys("2011-07-03")
+      f('.editing_term .teacher_enrollment_dates .end_date .edit_term input').send_keys("2011-07-29")
+      f("button[type='submit']").click
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
-          :general => ["Jul 1", "Jul 31"],
-          :student_enrollment => ["Jul 2", "Jul 30"],
+          :general => ["whenever", "whenever"],
+          :student_enrollment => ["term start", "term end"],
           :teacher_enrollment => ["Jul 3", "Jul 29"],
-          :ta_enrollment => ["Jul 4", "Jul 28"]
+          :ta_enrollment => ["term start", "term end"]
       })
+    end
 
+    it 'ta enrollment dates', priority: 1, test_id: 1621934 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      term.find_element(:css, ".edit_term_link").click
-      term.find_element(:css, ".editing_term .teacher_enrollment_dates .start_date .edit_term input").clear
-      term.find_element(:css, ".editing_term .teacher_enrollment_dates .end_date .edit_term input").clear
-      submit_form(".enrollment_term_form")
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      f('.edit_term_link').click
+      f('.editing_term .ta_enrollment_dates .start_date .edit_term input').send_keys("2011-07-04")
+      f('.editing_term .ta_enrollment_dates .end_date .edit_term input').send_keys("2011-07-28")
+      f("button[type='submit']").click
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
-          :general => ["Jul 1", "Jul 31"],
-          :student_enrollment => ["Jul 2", "Jul 30"],
+          :general => ["whenever", "whenever"],
+          :student_enrollment => ["term start", "term end"],
           :teacher_enrollment => ["term start", "term end"],
           :ta_enrollment => ["Jul 4", "Jul 28"]
       })
-    end
-
-    it "should load/refresh SAML debug info" do
-      enable_cache do
-        aac = Account.default.account_authorization_configs.create!(auth_type: 'saml')
-        get "/accounts/#{Account.default.id}/account_authorization_configs"
-
-        start = f("#start_saml_debugging")
-        refresh = f("#refresh_saml_debugging")
-        stop = f("#stop_saml_debugging")
-
-        start.click
-        wait_for_ajax_requests
-
-        debug_info = f("#saml_debug_info")
-        expect(debug_info.text).to match /Waiting for attempted login/
-
-        aac.debugging_keys.each_with_index do |key, i|
-          aac.debug_set(key, "testvalue#{i}")
-        end
-
-        refresh.click
-        wait_for_ajax_requests
-
-        debug_info = f("#saml_debug_info")
-
-        aac.debugging_keys.each_with_index do |key, i|
-          expect(debug_info.text).to match /testvalue#{i}/
-        end
-
-        stop.click
-        wait_for_ajax_requests
-        expect(aac.debugging?).to eq false
-
-        aac.debugging_keys.each do |key|
-          expect(aac.debug_get(key)).to eq nil
-        end
-      end
-    end
-
-    it "should configure discovery_url" do
-      auth_url = "http://example.com"
-      @account = Account.default
-      @account.account_authorization_configs.create!(auth_type: 'saml')
-      @account.account_authorization_configs.create!(auth_type: 'saml')
-      get "/accounts/#{Account.default.id}/account_authorization_configs"
-      f("#sso_settings_auth_discovery_url").send_keys(auth_url)
-      expect_new_page_load { submit_form("#sso_settings_form") }
-
-      @account.reload
-      expect(@account.auth_discovery_url).to eq auth_url
-
-      f("#sso_settings_auth_discovery_url").clear()
-      expect_new_page_load { submit_form("#sso_settings_form") }
-
-      expect(f("#sso_settings_auth_discovery_url").attribute(:value)).to eq ''
-      @account.reload
-      expect(@account.auth_discovery_url).to eq nil
     end
   end
 
@@ -327,7 +155,7 @@ describe "account" do
       end
     end
 
-    before (:each) do
+    before(:each) do
       @student_name = 'student@example.com'
       @course_name = 'new course'
       @error_text = 'No Results Found'
@@ -341,17 +169,15 @@ describe "account" do
     it "should search for an existing course" do
       find_course_form = f('#new_course')
       submit_input(find_course_form, '#course_name', @course_name)
-      expect(f('#section-tabs-header')).to include_text(@course_name)
+      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#breadcrumbs .home + li a' : '#section-tabs-header')).to include_text(@course_name)
     end
 
     it "should correctly autocomplete for courses" do
       get "/accounts/#{Account.default.id}"
       f('#course_name').send_keys(@course_name.chop)
 
-      keep_trying_until do
-        ui_auto_complete = f('.ui-autocomplete')
-        expect(ui_auto_complete).to be_displayed
-      end
+      ui_auto_complete = f('.ui-autocomplete')
+      expect(ui_auto_complete).to be_displayed
 
       elements = ff('.ui-autocomplete li:first-child a div')
       expect(elements[0].text).to eq @course_name
@@ -374,7 +200,7 @@ describe "account" do
       submit_input(find_course_form, '#course_name', 'some random course name that will not exist')
       wait_for_ajax_requests
       expect(f('#content')).to include_text(@error_text)
-      expect(f('#new_user').find_element(:id, 'user_name').text).to be_empty #verifies bug #5133 is fixed
+      expect(f('#new_user').find_element(:id, 'user_name').text).to be_empty # verifies bug #5133 is fixed
     end
 
     it "should behave correctly when searching for a user that does not exist" do
@@ -393,7 +219,7 @@ describe "account" do
       user_non_root = user
       create_sub_account.account_users.create!(user: user_non_root)
       get "/accounts/#{Account.default.id}/users/#{user_non_root.id}"
-      #verify user details displayed properly
+      # verify user details displayed properly
       expect(f('.accounts .unstyled_list li')).to include_text('sub_account')
     end
   end

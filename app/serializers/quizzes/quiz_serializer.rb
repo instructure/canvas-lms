@@ -22,7 +22,7 @@ module Quizzes
                 :quiz_submissions_zip_url, :preview_url, :quiz_submission_versions_html_url,
                 :assignment_id, :one_time_results, :only_visible_to_overrides,
                 :assignment_group_id, :show_correct_answers_last_attempt, :version_number,
-                :question_types, :has_access_code
+                :question_types, :has_access_code, :post_to_sis
 
     def_delegators :@controller,
       # :api_v1_course_assignment_group_url,
@@ -126,6 +126,14 @@ module Quizzes
       end
     end
 
+    def description
+      if @serializer_options[:description_formatter]
+        @serializer_options[:description_formatter].call(quiz.description)
+      else
+        quiz.description
+      end
+    end
+
     def unsubmitted_students_url
       api_v1_course_quiz_submission_users_url(context, quiz, submitted: 'false')
     end
@@ -155,7 +163,7 @@ module Quizzes
     end
 
     def section_count
-      context.active_course_sections.count
+      context.active_section_count
     end
 
     def locked_for_json_type
@@ -179,13 +187,13 @@ module Quizzes
         when :unpublishable, :can_unpublish
           include_unpublishable?
         when :section_count,
-             :access_code,
              :speed_grader_url,
              :message_students_url,
              :submitted_students,
              :only_visible_to_overrides
           user_may_grade?
-        when :unsubmitted_students
+        when :unsubmitted_students,
+             :access_code
           user_may_grade? || user_may_manage?
         when :quiz_extensions_url, :moderate_url, :deleted
           accepts_jsonapi? && user_may_manage?
@@ -252,7 +260,6 @@ module Quizzes
         hash['links']['quiz_statistics'] = hash.delete(:quiz_statistics_url)
         hash['links']['quiz_reports'] = hash.delete(:quiz_reports_url)
       end
-      hash.delete(:only_visible_to_overrides) unless quiz.context.feature_enabled?(:differentiated_assignments)
       hash
     end
 
@@ -342,6 +349,10 @@ module Quizzes
 
     def has_file_uploads?
       quiz.has_file_upload_question?
+    end
+
+    def post_to_sis
+      quiz.post_to_sis?
     end
   end
 end

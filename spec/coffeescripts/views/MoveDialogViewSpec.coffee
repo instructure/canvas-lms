@@ -42,11 +42,10 @@ define [
   module 'MoveDialogView',
     setup: ->
       genSetup.call @
-      @update_spy = sinon.spy MoveDialogView.prototype, 'updateListView'
+      @update_spy = @spy MoveDialogView.prototype, 'updateListView'
       createDialog.call @, true
     teardown: ->
       @moveDialog.remove()
-      @update_spy.restore()
 
   test 'child views don\'t exist on init', ->
     ok !@moveDialog.listView and !@moveDialog.parentListView
@@ -108,16 +107,13 @@ define [
     setup: ->
       genSetup.call @
       server = sinon.fakeServer.create()
-      @sort_spy = sinon.spy Assignments.prototype, 'sort'
-      @reset_spy = sinon.spy Assignments.prototype, 'reset'
+      @sort_spy = @spy Assignments.prototype, 'sort'
+      @reset_spy = @spy Assignments.prototype, 'reset'
 
     teardown: ->
       _.each server.requests, -> server.respond()
       server.restore()
-      @sort_spy.restore()
-      @reset_spy.restore()
       @moveDialog.remove()
-
 
   test '@saveURL as a string', ->
     saveURL = "/test"
@@ -153,7 +149,6 @@ define [
     ok @sort_spy.called
     ok @reset_spy.called
 
-
   test 'parentKey value on the model is updated on save success when the model moves collections', ->
     saveURL = "/test"
     createDialog.call @, true, saveURL
@@ -174,7 +169,6 @@ define [
     ]
 
     ok @model.has('assignment_group_id')
-
 
   test 'parentKey value on the model is updated on save success and is a string', ->
     saveURL = "/test"
@@ -197,4 +191,3 @@ define [
 
     ok @model.has('assignment_group_id')
     ok typeof @model.get('assignment_group_id') == 'string'
-

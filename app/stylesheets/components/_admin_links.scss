@@ -14,7 +14,7 @@ Admin dropdowns come in two flavors: If the dropdown is to be used in a header/t
 
 ```html
 <div style="text-align: center;">
-  
+
   <!-- Begin dropdown markup -->
   <div class="al-dropdown__container" style="position: relative;">
     <a class="al-trigger btn" role="button" href="#">
@@ -45,7 +45,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
 
 ```html
 <div style="text-align: center;">
-  
+
   <!-- Begin dropdown markup -->
   <div class="al-dropdown__container">
     <a class="al-trigger al-trigger-gray" role="button" href="#">
@@ -115,7 +115,7 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
     animation-name: al-slide-down;
     animation-fill-mode: forwards;
     animation-timing-function: cubic-bezier(0,1,0.5,1);
-  }    
+  }
 
   .ui-menu-item {
     a {
@@ -123,22 +123,33 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
       color: $ic-color-dark;
       white-space: nowrap;
       min-width: 180px;
-      padding: 6px 12px;
-      
-      &[class*=icon-]:before, 
+      padding: $ic-sp/2 $ic-sp;
+
+      &[class*=icon-]:before,
       &[class^=icon-]:before { margin-right: 8px; }
     }
 
-    &:first-of-type a { 
-      border-top-left-radius: 0; 
-      border-top-right-radius: 0; 
-    }
-    &:last-child a { 
-      border-bottom-left-radius: 0; 
-      border-bottom-right-radius: 0; 
+    a.disabled.ui-state-focus {
+      border: solid;
+      border-width: 1px;
+      border-color: darken($ic-border-light, 15%);
     }
 
-  } 
+    &:first-of-type a {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+    &:last-child a {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    &.ui-menu-item--helper-text {
+      color: $ic-font-color--subdued;
+      padding: 0 $ic-sp;
+      margin: $ic-sp/2 0;
+    }
+  }
 
   .ui-menu-item a.disabled,
   .ui-menu-item a.disabled.ui-state-focus {
@@ -179,9 +190,4 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
 
 .al-hover-container .al-trigger {
   position: relative;
-  z-index: -1;
-}
-
-.al-hover-container:hover, .al-hover-container-active {
-  .al-trigger { z-index: 0; }
 }

@@ -47,6 +47,7 @@ define [
       json.course_home = @course_home
       json.course_title = @course_title
       json.CAN =
+        VIEW_ALL_PAGES: !!@display_show_all_pages
         VIEW_PAGES: !!@WIKI_RIGHTS.read
         PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == 'courses'
         UPDATE_CONTENT: !!@PAGE_RIGHTS.update || !!@PAGE_RIGHTS.update_content

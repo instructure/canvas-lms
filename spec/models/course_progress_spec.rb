@@ -34,6 +34,11 @@ describe CourseProgress do
     course_with_teacher(:active_all => true)
   end
 
+  def submit_homework(assignment, user=nil)
+    user ||= @user
+    assignment.submit_homework(user, submission_type: 'online_text_entry', body: '42')
+  end
+
   it "should return nil for non module_based courses" do
     user = student_in_course(:active_all => true)
     progress = CourseProgress.new(@course, user).to_json
@@ -94,8 +99,8 @@ describe CourseProgress do
 
     it "should return correct progress for student who has completed some requirements" do
       # turn in first two assignments (module 1)
-      @module.update_for(@user, :submitted, @tag)
-      @module.update_for(@user, :submitted, @tag2)
+      submit_homework(@assignment)
+      submit_homework(@assignment2)
       progress = CourseProgress.new(@course, @user).to_json
       expect(progress).to eq({
           requirement_count: 5,
@@ -107,11 +112,12 @@ describe CourseProgress do
 
     it "should return correct progress for student who has completed all requirements" do
       # turn in all assignments
-      @module.update_for(@user, :submitted, @tag)
-      @module.update_for(@user, :submitted, @tag2)
-      @module2.update_for(@user, :submitted, @tag3)
-      @module2.update_for(@user, :submitted, @tag4)
-      @module3.update_for(@user, :submitted, @tag5)
+      submit_homework(@assignment)
+      submit_homework(@assignment2)
+      submit_homework(@assignment3)
+      submit_homework(@assignment4)
+      submit_homework(@assignment5)
+
       progress = CourseProgress.new(@course, @user).to_json
       expect(progress).to eq({
           requirement_count: 5,
@@ -135,8 +141,8 @@ describe CourseProgress do
 
     it "does not count obsolete requirements" do
       # turn in first two assignments
-      @module.update_for(@user, :submitted, @tag)
-      @module.update_for(@user, :submitted, @tag2)
+      submit_homework(@assignment)
+      submit_homework(@assignment2)
 
       # remove assignment 2 from the list of requirements
       @module.completion_requirements = [{id: @tag.id, type: 'must_submit'}]
@@ -149,6 +155,17 @@ describe CourseProgress do
 
       # assert that assignment 2 doesn't count toward the total (2 -> 1)
       expect(progress[:requirement_completed_count]).to eq 1
+    end
+
+    it "returns progress even after enrollment end date has passed" do
+      e = Enrollment.last
+      e.update_attribute(:end_at, 2.days.ago)
+      e.update_attribute(:start_at, 5.days.ago)
+
+      progress = CourseProgress.new(@course, @user).to_json
+
+      expect(progress[:requirement_count]).to eq 5
+      expect(progress[:error]).to be_nil
     end
 
     it "does not query destroyed ContentTags" do
@@ -165,7 +182,7 @@ describe CourseProgress do
 
     it "accounts for module items that have moved between modules" do
       # complete the requirement while it's in module 1
-      @module.update_for(@user, :submitted, @tag)
+      submit_homework(@assignment)
 
       # move the requirement to module 2
       @tag.context_module = @module2
@@ -192,10 +209,10 @@ describe CourseProgress do
         pend_with_bullet
 
         @shard1.activate { @shard_user = User.create!(name: 'outofshard') }
-        @course.enroll_student(@shard_user)
+        @course.enroll_student(@shard_user).accept!
 
-        @module.update_for(@shard_user, :submitted, @tag)
-        @module.update_for(@shard_user, :submitted, @tag2)
+        submit_homework(@assignment, @shard_user)
+        submit_homework(@assignment2, @shard_user)
         progress = CourseProgress.new(@course, @shard_user)
         expect(progress.requirement_completed_count).to eq 2
       end

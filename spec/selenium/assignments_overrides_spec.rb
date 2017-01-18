@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides
 
 describe "assignment groups" do
   include AssignmentOverridesSeleniumHelper
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "as a teacher" do
 
@@ -16,7 +16,7 @@ describe "assignment groups" do
       course_with_teacher_logged_in
     end
 
-    it "should create an assignment with default dates" do
+    it "should create an assignment with default dates", priority:"1", test_id: 216344 do
       visit_new_assignment_page
       fill_assignment_title 'vdd assignment'
       fill_assignment_overrides
@@ -27,32 +27,32 @@ describe "assignment groups" do
       compare_assignment_times(a)
     end
 
-    it "should load existing due data into the form" do
+    it "should load existing due data into the form", priority: "2", test_id: 216345 do
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
 
       expect(first_due_at_element.attribute(:value)).
-        to match due_at.strftime('%b %-d')
+        to match format_date_for_view(due_at)
       expect(first_unlock_at_element.attribute(:value)).
-        to match unlock_at.strftime('%b %-d')
+        to match format_date_for_view(unlock_at)
       expect(first_lock_at_element.attribute(:value)).
-        to match lock_at.strftime('%b %-d')
+        to match format_date_for_view(lock_at)
     end
 
-    it "should edit a due date" do
+    it "should edit a due date", priority: "2", test_id: 216346 do
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
 
       # set due_at, lock_at, unlock_at
       first_due_at_element.clear
-      first_due_at_element.send_keys(due_at.strftime('%b %-d, %y'))
+      first_due_at_element.send_keys(format_date_for_view(due_at, :medium))
       update_assignment!
 
-      expect(assignment.reload.due_at.strftime('%b %-d, %y')).
-        to eq due_at.to_date.strftime('%b %-d, %y')
+      expect(assignment.reload.due_at.to_date).
+        to eq due_at.to_date
     end
 
-    it "should clear a due date" do
+    it "should clear a due date", priority: "2", test_id: 216348 do
       assign = @course.assignments.create!(:title => "due tomorrow", :due_at => Time.zone.now + 2.days)
       get "/courses/#{@course.id}/assignments/#{assign.id}/edit"
 
@@ -62,7 +62,7 @@ describe "assignment groups" do
       expect(assign.reload.due_at).to be_nil
     end
 
-    it "should allow setting overrides" do
+    it "should allow setting overrides", priority: "1", test_id: 216349 do
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(:name => "other section")
       default_section_due = Time.zone.now + 1.days
@@ -76,27 +76,48 @@ describe "assignment groups" do
 
       first_due_at_element.clear
       first_due_at_element.
-        send_keys(default_section_due.strftime('%b %-d, %y'))
+        send_keys(format_date_for_view(default_section_due, :medium))
 
       add_override
       wait_for_ajaximations
       select_last_override_section(other_section.name)
 
       last_due_at_element.
-        send_keys(other_section_due.strftime('%b %-d, %y'))
+        send_keys(format_date_for_view(other_section_due, :medium))
 
       update_assignment!
       overrides = assign.reload.assignment_overrides
       expect(overrides.count).to eq 2
       default_override = overrides.detect{ |o| o.set_id == default_section.id }
-      expect(default_override.due_at.strftime('%b %-d, %y')).
-        to eq default_section_due.to_date.strftime('%b %-d, %y')
+      expect(default_override.due_at.to_date).
+        to eq default_section_due.to_date
       other_override = overrides.detect{ |o| o.set_id == other_section.id }
-      expect(other_override.due_at.strftime('%b %-d, %y')).
-        to eq other_section_due.to_date.strftime('%b %-d, %y')
+      expect(other_override.due_at.to_date).
+        to eq other_section_due.to_date
     end
 
-    it "should validate override dates against proper section" do
+    it "should not show inactive students when setting overrides" do
+      student_in_course(:course => @course, :name => "real student")
+      enrollment = student_in_course(:course => @course, :name => "inactive student")
+      enrollment.deactivate
+
+      assign = create_assignment!
+      visit_assignment_edit_page(assign)
+
+      wait_for_ajaximations
+
+      add_override
+      wait_for_ajaximations
+
+      driver.switch_to.default_content
+      fj('.ic-tokeninput-input:last').send_keys('student')
+      wait_for_ajaximations
+      students = ffj(".ic-tokeninput-option:visible")
+      expect(students.length).to eq 1
+      expect(students.first).to include_text("real")
+    end
+
+    it "should validate override dates against proper section", priority: "1", test_id: 216350 do
       date = Time.zone.now
       date2 = Time.zone.now - 10.days
       due_date = Time.zone.now + 5.days
@@ -113,16 +134,16 @@ describe "assignment groups" do
       first_unlock_at_element.clear
       first_lock_at_element.clear
       last_due_at_element.
-        send_keys(due_date.strftime('%b %-d, %y'))
+        send_keys(format_date_for_view(due_date, :medium))
       submit_form('#edit_assignment_form')
       wait_for_ajaximations
       overrides = assign.reload.assignment_overrides
       section_override = overrides.detect{ |o| o.set_id == section1.id }
-      expect(section_override.due_at.strftime('%b %-d, %y'))
-        .to eq due_date.strftime('%b %-d, %y')
+      expect(section_override.due_at.to_date)
+        .to eq due_date.to_date
     end
 
-    it "properly validates identical calendar dates when saving and editing" do
+    it "properly validates identical calendar dates when saving and editing", priority: "2", test_id: 216351 do
       shared_date = "October 12 2014"
       other_section = @course.course_sections.create!(:name => "Section 31", :restrict_enrollments_to_section_dates => true, :end_at => shared_date)
       visit_new_assignment_page
@@ -140,7 +161,7 @@ describe "assignment groups" do
       update_assignment!
     end
 
-    it "should show a vdd tooltip summary on the course assignments page" do
+    it "should show a vdd tooltip summary on the course assignments page", priority: "2", test_id: 216352 do
       assignment = create_assignment!
       get "/courses/#{@course.id}/assignments"
       expect(f('.assignment .assignment-date-due')).not_to include_text "Multiple Dates"
@@ -167,7 +188,7 @@ describe "assignment groups" do
       course_with_student_logged_in(:active_all => true)
     end
 
-    it "should show the available date range when overrides are set" do
+    it "should show the available date range when overrides are set", priority: "2", test_id: 216353 do
       assign = create_assignment!
       get "/courses/#{@course.id}/assignments/#{assign.id}"
       wait_for_ajaximations

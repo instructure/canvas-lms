@@ -1,4 +1,5 @@
 define ['str/pluralize'], (pluralize) ->
-  (assetString) ->
+  (assetString, toPlural = true) ->
     if match = assetString.match(/(.*)_(\d+)$/)
-      [pluralize(match[1]), match[2]]
+      contextType = if toPlural then pluralize(match[1]) else match[1]
+      [contextType, match[2]]

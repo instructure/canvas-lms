@@ -1,8 +1,6 @@
 require 'active_support'
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
-class Quizzes::SubmissionGrader; end
-
 describe Quizzes::QuizRegrader::Answer do
 
   let(:points) { 15 }

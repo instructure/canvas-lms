@@ -50,48 +50,5 @@ define(function(require) {
 
       expect(find('.sign').innerText).toEqual('-');
     });
-
-    describe('chart', function() {
-      beforeEach(function() {
-        setProps({
-          width: 270,
-          height: 14 * 3,
-          topStudentCount: 4,
-          middleStudentCount: 2,
-          bottomStudentCount: 2,
-          correctBottomStudentCount: 1,
-          correctMiddleStudentCount: 2,
-          correctTopStudentCount: 1,
-        });
-      });
-
-      it('renders the chart', function() {
-        expect(find('svg.chart')).toBeTruthy();
-      });
-
-      it('renders two bars, .correct and .incorrect, for each student bracket', function() {
-        expect(findAll('svg rect').length).toEqual(6);
-        expect(findAll('svg rect.correct').length).toEqual(3);
-        expect(findAll('svg rect.incorrect').length).toEqual(3);
-      });
-
-      it('positions the bars correctly', function() {
-        [
-          { coords: [ 135, 0 ], width: 33.75 }, // top correct
-          { coords: [ 135, 14 ], width: 135 }, // middle correct
-          { coords: [ 135, 28 ], width: 67.5 }, // bottom correct
-
-          { coords: [ 32.75, 0 ], width: 101.25 }, // top incorrect
-          { coords: [ 134, 14 ], width: 0 }, // middle incorrect
-          { coords: [ 66.5, 28 ], width: 67.5 }, // bottom incorrect
-        ].forEach(function(expected, index) {
-          var rect = find('rect:nth-of-type(' + (index+1) + ')');
-
-          expect(rect.x.baseVal.value).toEqual(expected.coords[0], 'rect[' + index + '][x]');
-          expect(rect.y.baseVal.value).toEqual(expected.coords[1], 'rect[' + index + '][y]');
-          expect(rect.width.baseVal.value).toEqual(expected.width, 'rect[' + index + '][w]');
-        });
-      });
-    });
   });
 });

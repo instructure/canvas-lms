@@ -80,6 +80,8 @@ define [
 
     onUploadComplete: (e)=>
       @resetUploader()
+      unless e.title?.length > 0
+        e.title = @file.name
       @addEntry(e)
       @dialogManager.hide()
 

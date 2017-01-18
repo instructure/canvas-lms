@@ -101,7 +101,7 @@ class GroupMembershipsController < ApplicationController
       only_states = ALLOWED_MEMBERSHIP_FILTER
       only_states = only_states & params[:filter_states] if params[:filter_states]
       scope = scope.where(:workflow_state => only_states)
-      scope = scope.includes(:group => :root_account)
+      scope = scope.preload(group: :root_account)
 
       @memberships = Api.paginate(scope, self, memberships_route)
       render :json => @memberships.map{ |gm| group_membership_json(gm, @current_user, session) }
@@ -225,11 +225,12 @@ class GroupMembershipsController < ApplicationController
 
   def find_membership
     if (params[:membership_id] && params[:membership_id] == 'self') || (params[:user_id] && params[:user_id] == 'self')
-      @membership = @group.group_memberships.where(:user_id => @current_user).first || not_found
+      @membership = @group.group_memberships.where(:user_id => @current_user).first!
     elsif params[:membership_id]
       @membership = @group.group_memberships.find(params[:membership_id])
     else
-      @membership = @group.group_memberships.where(:user_id => params[:user_id]).first || not_found
+      user_id = Api.map_ids([params[:user_id]], @group.users, @domain_root_account, @current_user).first
+      @membership = @group.group_memberships.where(user_id: user_id).first!
     end
   end
 end

@@ -5,6 +5,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/outcome_common')
 
 describe "account admin outcomes" do
   include_examples "in-process server selenium tests"
+  include OutcomeCommon
+
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
   let(:who_to_login) { 'admin' }
   let(:account) { Account.default }
@@ -31,51 +33,59 @@ describe "account admin outcomes" do
       @cm.save!
     end
 
-    it "should have state standards available for outcomes through find" do
+    def import_state_standards_to_account(outcome)
+      state_outcome_setup
+      goto_state_outcomes
+      traverse_nested_outcomes(outcome)
+      import_account_level_outcomes
+    end
+
+    it "should have state standards available for outcomes through find", priority: "2", test_id: 250008 do
       state_outcome_setup
       goto_state_outcomes
       expect(ffj(".outcome-level:last .outcome-group .ellipsis")[0]).to have_attribute("title", 'NGA Center/CCSSO')
     end
 
-    it "should import state standards to course groups and all nested outcomes" do
-      state_outcome_setup
-      goto_state_outcomes
-      outcome = ['NGA Center/CCSSO', 'Common Core State Standards', 'College- and Career-Readiness Standards and K-12 Mathematics',
-                 'First Grade', '1.DD - zééééééééééééééééééééééééééééééééééééééééééééééééé', 'Something else']
-      traverse_nested_outcomes(outcome)
-      import_account_level_outcomes
-      keep_trying_until do
-        expect(ffj(".outcome-level:first .outcome-group .ellipsis")[0]).to have_attribute("title", 'Something else')
-        expect(ffj(".outcome-level:last .outcome-link .ellipsis")[0]).to have_attribute("title", '1.DD.1')
-      end
+    it "should import state standards to course groups and all nested outcomes", priority: "2", test_id: 56584 do
+      import_state_standards_to_account(state_outcome)
+      el1 = fj(".outcome-level:first .outcome-group .ellipsis")
+      el2 = fj(".outcome-level:last .outcome-link .ellipsis")
+      expect(el1).to have_attribute("title", 'Something else')
+      expect(el2).to have_attribute("title", '1.DD.1')
     end
 
-    it "should delete state standards outcome groups from course listing" do
-      state_outcome_setup
-      goto_state_outcomes
+    it "should import a state standard into account level", priority: "2", test_id: 56017 do
+      outcome = ['NGA Center/CCSSO']
+      import_state_standards_to_account(outcome)
+      el = fj('.outcome-level:first .outcome-group .ellipsis')
+      expect(el).to have_attribute("title", 'NGA Center/CCSSO')
+    end
 
-      outcome = ['NGA Center/CCSSO', 'Common Core State Standards', 'College- and Career-Readiness Standards and K-12 Mathematics',
-                 'First Grade', '1.DD - zééééééééééééééééééééééééééééééééééééééééééééééééé', 'Something else']
+    it "should import account outcomes into course", priority: "1", test_id: 56585 do
+      import_state_standards_to_account(state_outcome)
+      outcome = ['Default Account', 'Something else']
+      goto_state_outcomes("/courses/#{@course.id}/outcomes")
       traverse_nested_outcomes(outcome)
-
       import_account_level_outcomes
+    end
 
+    it "should delete state standards outcome groups from course listing", priority: "2", test_id: 250009 do
+      import_state_standards_to_account(state_outcome)
       f(".ellipsis[title='Something else']").click
       wait_for_ajaximations
 
-      keep_trying_until do
-        f('.delete_button').click
-        expect(driver.switch_to.alert).not_to be nil
-        driver.switch_to.alert.accept
-        refresh_page
-        wait_for_ajaximations
-        expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
-      end
+      f('.delete_button').click
+      expect(driver.switch_to.alert).not_to be nil
+      driver.switch_to.alert.accept
+      refresh_page
+      wait_for_ajaximations
+      # validations
+      expect(f('.outcomes-sidebar')).not_to contain_jqcss('.outcome-level:first li')
       expect(f('.outcomes-content .title').text).to eq 'Setting up Outcomes'
     end
 
     describe "state standard pagination" do
-      it "should not fail while filtering the common core group" do
+      it "should not fail while filtering the common core group", priority: "2", test_id: 250010 do
         # setup fake state data, so that it has to paginate
         root_group = LearningOutcomeGroup.global_root_outcome_group
         fake_cc = root_group.child_outcome_groups.create!(:title => "Fake Common Core")
@@ -96,9 +106,8 @@ describe "account admin outcomes" do
         wait_for_ajaximations
 
         # make sure the last one is the Z guy
-        keep_trying_until do
-          expect(ffj(".outcome-level:last .outcome-group .ellipsis").last).to have_attribute("title", 'Z is last')
-        end
+        last_el = ffj(".outcome-level:last .outcome-group .ellipsis").last
+        expect(last_el).to have_attribute("title", 'Z is last')
       end
     end
   end

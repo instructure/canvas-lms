@@ -1,12 +1,11 @@
 define(function(require) {
   var RSVP = require('rsvp');
-  var config = require('../config');
   var singleton;
   var callbacks = {};
   var gActionIndex = 0;
 
-  var Dispatcher = function() {
-    return this;
+  var Dispatcher = function(inputConfig) {
+    this.config = inputConfig;
   };
 
   Dispatcher.prototype.dispatch = function(action, params) {
@@ -19,7 +18,7 @@ define(function(require) {
     }
     else {
       console.assert(false, 'No action handler registered to:', action);
-      config.onError('No action handler registered to:', action);
+      this.config.onError('No action handler registered to:', action);
       service.reject('Unknown action "' + action + '"');
     }
 
@@ -37,7 +36,5 @@ define(function(require) {
     callbacks[action] = callback;
   };
 
-  singleton = new Dispatcher();
-
-  return singleton;
+  return Dispatcher;
 });

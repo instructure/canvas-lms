@@ -1,12 +1,13 @@
 <div class="quiz-submission <%= "headless" if !@headers %>">
-<% if !(@current_submission || @submission).results_visible? %>
+<% if !(@current_submission || @submission).results_visible?(user: @current_user)%>
   <h4><%= render_result_protection(@quiz, @current_submission || @submission) %></h4>
 <% end %>
 
-<% if correct_answers_protected? %>
+<% js_env IS_SURVEY: @quiz.survey? %>
+<% unless show_correct_answers? %>
   <div class="alert">
-    <i class="icon-warning" aria-label="<%= render_correct_answer_protection(@quiz) %>"></i>
-    <span><%= render_correct_answer_protection(@quiz) %></span>
+    <i class="icon-warning" aria-label="<%= render_correct_answer_protection(@quiz, (@current_submission || @submission)) %>"></i>
+    <span><%= render_correct_answer_protection(@quiz, (@current_submission || @submission)) %></span>
   </div>
 <% end %>
 
@@ -16,7 +17,7 @@
   <% else %>
     <%= t(:quiz_not_yet_taken, "The quiz hasn't been taken yet.") %>
   <% end %>
-<% elsif !(@current_submission || @submission).results_visible? && !can_do(@quiz, @current_user, :grade) %>
+<% elsif !(@current_submission || @submission).results_visible?(user: @current_user) %>
   <div class="quiz_score" style="<%= hidden if @quiz.ungraded? %>">
     <% if @quiz.allowed_attempts != 1 %>
       <%= before_label(:score_for_attempt, "Score for this attempt") %>
@@ -50,10 +51,11 @@
 <% if @submission.pending_review? %>
   <% if editable %>
     <% if @quiz.changed_significantly_since?(@submission.quiz_version) %>
-      <%= image_tag "pending_review.png" %> <%= t(:quiz_submission_needs_review, "The quiz has changed significantly since this submission was made. This submission may need re-grading.") %><br/>
+      <%= image_tag "pending_review.png", :alt => '' %> <%= t(:quiz_submission_needs_review, "The quiz has changed significantly since this submission was made. This submission may need re-grading.") %><br/>
     <% end %>
     <% questions_needing_review = submission_data.find_all do |answer|
-         answer[:correct] == "undefined" && submission_questions_hash[answer[:question_id]]
+         question_data = submission_questions_hash[answer[:question_id]]
+         answer[:correct] == "undefined" && question_data && question_data[:question_type] != 'text_only_question'
        end %>
     <% if questions_needing_review.present? %>
       <div class="alert">
@@ -100,14 +102,14 @@
 <div class="quiz_duration" style="<%= hidden if @quiz.ungraded? %>">
   <%= t(:attempt_duration, "This attempt took %{duration}.", :duration => duration_in_minutes(@submission.duration)) %>
 </div>
-<% if @quiz.require_lockdown_browser && @quiz.require_lockdown_browser_for_results && !@lockdown_browser_authorized_to_view && !can_do(@quiz, @current_user, :grade) %>
+<% if @quiz.require_lockdown_browser && @quiz.require_lockdown_browser_for_results && !@lockdown_browser_authorized_to_view && !can_do(@quiz, @current_user, :review_grades) %>
 <p>
   <br /><br />
   <%= t(:requires_lockdown, "Respondus LockDown Browser is required to view your quiz results.") %>
   <%= link_to t('links.click_to_view_results', "Click here to view the results."), { :viewing => 1, :version => params[:version] }, :target => "_top" %>
 </p>
 <% else %>
-<% jammit_css :quizzes %>
+<% css_bundle :quizzes %>
 <% js_bundle 'legacy/quiz_submission' %>
 <div id="questions" class="assessment_results <%= 'survey_results' if @quiz.survey? %> <%= (show_correct_answers? ? 'show_correct_answers' : 'suppress_correct_answers') %>">
   <%= render :partial => "display_question", :collection => submission_questions, :locals => {:assessment_results => true, :user_answer_hash => submission_data_hash, :editable => editable} %>
@@ -121,10 +123,11 @@
 <% if editable %>
   <div class="update_scores_fudge">
     <label for="fudge_points_entry"><%= before_label(:fudge_points, "Fudge Points") %></label>
-    <input id="fudge_points_entry" type="text" name="fudge_points" value="<%= (!@submission.fudge_points || @submission.fudge_points == 0 ? '--' : @submission.fudge_points) %>"/>
+    <input type="hidden" name="fudge_points" value="<%= @submission.fudge_points || 0 %>">
+    <input id="fudge_points_entry" type="number" step="any" name="fudge_points" value="<%= (!@submission.fudge_points || @submission.fudge_points == 0 ? '' : @submission.fudge_points) %>" placeholder="--" autocomplete='off' />
     <%
       fudge_text = begin
-        if @submission.quiz_points_possible == @quiz.points_possible || !@submission.quiz_points_possible
+        if @submission.quiz_points_possible == @quiz.points_possible || !@submission.quiz_points_possible || !@quiz.points_possible
           t('labels.fudge_points_generic_explanation', "You can manually adjust the score by adding positive or negative points to this box.")
         elsif @quiz.survey?
           t('labels.fudge_points_changed_points_survey', <<-TEXT,

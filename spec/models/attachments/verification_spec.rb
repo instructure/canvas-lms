@@ -136,8 +136,10 @@ describe Attachments::Verification do
       token = v2.verifier_for_user(other_user, context: eportfolio.asset_string, permission_map_id: :r_rd)
       expect(v2.valid_verifier_for_permission?(token, :read)).to eq(false)
       expect(v2.valid_verifier_for_permission?(token, :download)).to eq(false)
-      expect(v2.valid_verifier_for_permission?(token, :read, {eportfolio_ids: [eportfolio.id]})).to eq(true)
-      expect(v2.valid_verifier_for_permission?(token, :download, {eportfolio_ids: [eportfolio.id]})).to eq(true)
+
+      mock_session = {eportfolio_ids: [eportfolio.id], permissions_key: SecureRandom.uuid}
+      expect(v2.valid_verifier_for_permission?(token, :read, mock_session)).to eq(true)
+      expect(v2.valid_verifier_for_permission?(token, :download, mock_session)).to eq(true)
     end
 
     it "should support custom permissions checks on nil (public) user" do
@@ -145,10 +147,12 @@ describe Attachments::Verification do
       eportfolio = student.eportfolios.create! public: false
       v2 = Attachments::Verification.new(att2)
       token = v2.verifier_for_user(nil, context: eportfolio.asset_string, permission_map_id: :r_rd)
+
       expect(v2.valid_verifier_for_permission?(token, :read)).to eq(false)
       expect(v2.valid_verifier_for_permission?(token, :download)).to eq(false)
-      expect(v2.valid_verifier_for_permission?(token, :read, {eportfolio_ids: [eportfolio.id]})).to eq(true)
-      expect(v2.valid_verifier_for_permission?(token, :download, {eportfolio_ids: [eportfolio.id]})).to eq(true)
+      mock_session = {eportfolio_ids: [eportfolio.id], permissions_key: SecureRandom.uuid}
+      expect(v2.valid_verifier_for_permission?(token, :read, mock_session)).to eq(true)
+      expect(v2.valid_verifier_for_permission?(token, :download, mock_session)).to eq(true)
     end
   end
 end

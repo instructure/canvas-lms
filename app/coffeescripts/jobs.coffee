@@ -21,13 +21,12 @@ define [
     constructor: (@options, @type_name, @grid_name) ->
       @data = []
       @$element = $(@grid_name)
-      @setTimer()
+      setTimeout @refresh, 0
+      @setTimer() if @options.refresh_rate
       @query = ''
 
     setTimer: () =>
-      setTimeout @refresh, 0
-      if @options.refresh_rate
-        setTimeout (=> @refresh(@setTimer)), @options.refresh_rate
+      setTimeout (=> @refresh(@setTimer)), @options.refresh_rate
 
     saveSelection: =>
       if @type_name == 'running'

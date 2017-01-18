@@ -33,7 +33,7 @@ describe "/quizzes/quizzes/show" do
     quiz = @course.quizzes.create
     quiz.workflow_state = "available"
     quiz.save!
-    quiz.assignment = @course.assignments.create(:title => quiz.title, :due_at => quiz.due_at, :submission_types => 'online_quiz')
+    quiz.reload
     quiz.assignment.mute!
     quiz.assignment.grade_student(@student, :grade => 5)
     submission = quiz.quiz_submissions.create
@@ -88,5 +88,63 @@ describe "/quizzes/quizzes/show" do
     expect(response).not_to have_tag ".unpublished_quiz_warning"
   end
 
+  it "should hide points possible for ungraded surveys" do
+    points = 5
+
+    course_with_teacher_logged_in(active_all: true)
+    @quiz = @course.quizzes.create!(quiz_type: "survey", points_possible: points)
+
+    assigns[:quiz] = @quiz
+    view_context
+    render "quizzes/quizzes/show"
+
+    doc = Nokogiri::HTML(response)
+    doc.css(".control-group .controls .value").each do |node|
+        expect(node.content).not_to include("#{points}") if node.parent.parent.content.include? "Points"
+    end
+  end
+
+  it 'should render teacher partial for teachers' do
+    course_with_teacher_logged_in(active_all: true)
+    view_context
+    assigns[:quiz] = @course.quizzes.create!
+    render 'quizzes/quizzes/show'
+    expect(view).to have_rendered '/quizzes/quizzes/_quiz_show_teacher'
+    expect(view).not_to have_rendered '/quizzes/quizzes/_quiz_show_student'
+  end
+
+  it 'should render student partial for students' do
+    course_with_student_logged_in(active_all: true)
+    quiz = @course.quizzes.build
+    quiz.publish!
+    assigns[:quiz] = quiz
+    view_context
+    render 'quizzes/quizzes/show'
+    expect(view).to have_rendered '/quizzes/quizzes/_quiz_show_student'
+    expect(view).not_to have_rendered '/quizzes/quizzes/_quiz_show_teacher'
+  end
+
+  it 'should render draft version warning' do
+    course_with_student_logged_in(active_all: true)
+    quiz = @course.quizzes.create
+    quiz.workflow_state = 'available'
+    quiz.save!
+    quiz.reload
+    quiz.assignment.mute!
+    quiz.assignment.grade_student(@student, grade: 5)
+    submission = quiz.quiz_submissions.create
+    submission.score = 5
+    submission.user = @student
+    submission.attempt = 1
+    submission.workflow_state = 'complete'
+    submission.save
+    assigns[:quiz] = quiz
+    assigns[:submission] = submission
+    params[:preview] = true
+    view_context
+    render 'quizzes/quizzes/show'
+
+    expect(response).to include 'preview of the draft version'
+  end
 end
 

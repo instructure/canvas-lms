@@ -1,6 +1,6 @@
 module Canvas::Migration
   module Worker
-    class QtiWorker < Struct.new(:migration_id)
+    class QtiWorker < Base
 
       def perform
         cm = ContentMigration.where(id: migration_id).first

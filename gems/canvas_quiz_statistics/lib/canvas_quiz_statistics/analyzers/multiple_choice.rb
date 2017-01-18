@@ -65,7 +65,8 @@ module CanvasQuizStatistics::Analyzers
     metric :answers do |responses|
       answers = parse_answers do |answer, answer_stats|
         stats = {
-          responses: 0
+          responses: 0,
+          user_names: []
         }
 
         if answer[:text].blank? && answer[:html].present?

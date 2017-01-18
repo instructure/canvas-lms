@@ -46,7 +46,11 @@ class BounceNotificationProcessor
   def process
     bounce_queue.poll(config.slice(*POLL_PARAMS)) do |message|
       bounce_notification = parse_message(message)
-      process_bounce_notification(bounce_notification) if bounce_notification
+      if bounce_notification
+        process_bounce_notification(bounce_notification)
+      else
+        CanvasStatsd::Statsd.increment('bounce_notification_processor.processed.no_bounce')
+      end
     end
   end
 
@@ -65,15 +69,36 @@ class BounceNotificationProcessor
   end
 
   def process_bounce_notification(bounce_notification)
-    return unless is_permanent_bounce?(bounce_notification)
+    type = if is_suppression_bounce?(bounce_notification)
+             'suppression'
+           elsif is_permanent_bounce?(bounce_notification)
+             'permanent'
+           else
+             'transient'
+           end
+    CanvasStatsd::Statsd.increment("bounce_notification_processor.processed.#{type}")
 
     bouncy_addresses(bounce_notification).each do |address|
-      CommunicationChannel.bounce_for_path(address)
+      CommunicationChannel.bounce_for_path(
+        path: address,
+        timestamp: bounce_timestamp(bounce_notification),
+        details: bounce_notification,
+        permanent_bounce: is_permanent_bounce?(bounce_notification),
+        suppression_bounce: is_suppression_bounce?(bounce_notification)
+      )
     end
   end
 
   def is_permanent_bounce?(bounce)
     bounce['bounceType'] == 'Permanent'
+  end
+
+  def is_suppression_bounce?(bounce)
+    bounce['bounceSubType'] == 'Suppressed'
+  end
+
+  def bounce_timestamp(bounce)
+    bounce['timestamp']
   end
 
   def bouncy_addresses(bounce)

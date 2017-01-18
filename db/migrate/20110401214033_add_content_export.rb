@@ -1,4 +1,6 @@
 class AddContentExport < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_table :content_exports do |t|
       t.integer :user_id, :limit => 8

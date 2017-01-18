@@ -50,7 +50,7 @@ module Polling
   #    }
   #
   class PollSubmissionsController < ApplicationController
-    include Filters::Polling
+    include ::Filters::Polling
 
     before_filter :require_user
     before_filter :require_poll

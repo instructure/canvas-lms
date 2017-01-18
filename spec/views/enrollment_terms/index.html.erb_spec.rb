@@ -25,11 +25,11 @@ describe "terms/_term.html.erb" do
       @account = Account.default
       @term = @account.enrollment_terms.create(:name=>"test term")
       @term.sis_source_id = "sis_this_fool"
-      
+
       assigns[:context] = @account
       assigns[:account] = @account
       assigns[:root_account] = @account
-      
+      assigns[:course_counts_by_term] = EnrollmentTerm.course_counts([@term])
     end
 
     it "should show to sis admin" do

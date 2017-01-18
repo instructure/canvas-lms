@@ -168,7 +168,7 @@ define([
       var $total = $("#after_fudge_points_total");
       var total = 0;
       $(".display_question .user_points:visible").each(function() {
-        var points = parseFloat($(this).find(":text:first").val(), 10) || 0;
+        var points = parseFloat($(this).find("input[type=number]").val(), 10) || 0;
         points = Math.round(points * 100.0) / 100.0;
         total = total + points;
       });
@@ -295,23 +295,18 @@ define([
       var qNum = 1;
       var qArray = gradingForm.questions();
       var docScroll = $(document).scrollTop();
-      var maxScroll = $(document).height() - $('body').height();
-      if (docScroll >= maxScroll) {
-        qNum = qArray.length;
-        quizNavBar.activateLink(qNum);
-      } else {
-        $questions = $('.question')
-        for(var t = 0; t <= qArray.length; t++) {
-          $question = $($questions[t])
-          qNum = t + 1;
-          if ( (docScroll > qArray[t] && docScroll < qArray[t+1])  || ( t == (qArray.length - 1) && docScroll > qArray[t])) {
-            parentWindow.set('active_question_index', qNum);
-            quizNavBar.activateLink(qNum);
-            $question.addClass('selected_single_question');
-          } else {
-            $('.q'+ qNum).removeClass('active');
-            $question.removeClass('selected_single_question');
-          }
+      $questions = $('.question')
+      for(var t = 0; t <= qArray.length; t++) {
+        $question = $($questions[t])
+        var currentQuestionNum = t + 1;
+        if ( (docScroll > qArray[t] && docScroll < qArray[t+1])  || ( t == (qArray.length - 1) && docScroll > qArray[t])) {
+          qNum = currentQuestionNum;
+          parentWindow.set('active_question_index', currentQuestionNum);
+          quizNavBar.activateLink(currentQuestionNum);
+          $question.addClass('selected_single_question');
+        } else {
+          $('.q'+ currentQuestionNum).removeClass('active');
+          $question.removeClass('selected_single_question');
         }
       }
       quizNavBar.setScrollWindowPosition(qNum);
@@ -397,7 +392,7 @@ define([
       gradingForm.setInitialSnapshot(data);
     }
 
-    $(".question_holder .user_points :text,.question_holder .question_neutral_comment .question_comment_text textarea").change(function() {
+    $(".question_holder .user_points input[type=number],.question_holder .question_neutral_comment .question_comment_text textarea").change(function() {
       var $question = $(this).parents(".display_question");
       var questionId = $question.attr('id');
       gradingForm.updateSnapshotFor($question);

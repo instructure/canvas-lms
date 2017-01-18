@@ -24,16 +24,16 @@ require 'hashery/dictionary'
 # a loop in a loop in a loop, it gets a little awkward for controllers
 # and views, so I contain it in a class with some helper methods.  The
 # dictionary comes from facets, a stable and mature library that's been
-# around for years.  A dictionary is just an ordered hash. 
-# 
-# To use this: 
-# 
+# around for years.  A dictionary is just an ordered hash.
+#
+# To use this:
+#
 # s = SubmissionList.new(course)
 # s.each {|e| # lists each submission hash in the right order }
 # s.each_day {|e| # lists each day with an array of submission hashes }
-# 
+#
 # The submission hash has some very useful meta data in there:
-# 
+#
 # :grader => printable name of the grader, or Graded on submission if unknown
 # :grader_id => user_id of the grader
 # :previous_grade => the grade previous to this one, or nil
@@ -46,8 +46,8 @@ require 'hashery/dictionary'
 # :student_name => a printable name of the student
 # :graded_on => the day (not the time) the submission was made
 # :score_before_regrade => the score prior to regrading
-# 
-# The version data is actually pulled from some yaml storage through 
+#
+# The version data is actually pulled from some yaml storage through
 # simply_versioned.
 class SubmissionList
 
@@ -61,7 +61,7 @@ class SubmissionList
       :published_score, :safe_grader_id, :score, :student_entered_score,
       :student_user_id, :submission_id, :student_name, :submission_type,
       :updated_at, :url, :user_id, :workflow_state, :score_before_regrade
-    ].freeze 
+    ].freeze
 
   class << self
     # Shortcut for SubmissionList.each(course) { ... }
@@ -69,20 +69,20 @@ class SubmissionList
       sl = new(course)
       sl.each(&block)
     end
-    
+
     def each_day(course, &block)
       sl = new(course)
       sl.each_day(&block)
     end
-    
+
     def days(course)
       new(course).days
     end
-    
+
     def submission_entries(course)
       new(course).submission_entries
     end
-    
+
     def list(course)
       new(course).list
     end
@@ -208,7 +208,7 @@ class SubmissionList
         end
         grader ||= I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission')
 
-        hash[submission.id] = OpenObject.new(:grade     => submission.grade,
+        hash[submission.id] = OpenObject.new(:grade     => translate_grade(submission),
                                              :graded_at => submission.graded_at,
                                              :grader    => grader)
         hash
@@ -241,12 +241,6 @@ class SubmissionList
       prior_submission_id, prior_grade, prior_score, prior_graded_at, prior_grader = nil
 
       @filtered_submissions = full_hash_list.inject([]) do |l, h|
-
-        # Don't update prior_grade or prior_submission unless there is a grade.
-        # Also don't add it to the list.  Just pass the list to the next
-        # iteration of the block.
-        next(l) unless h[:score]
-
         # If the submission is different (not null for the first one, or just
         # different than the last one), set the previous_grade to nil (this is
         # the first version that changes a grade), set the new_grade to this
@@ -255,8 +249,8 @@ class SubmissionList
           h[:previous_grade] = nil
           h[:previous_graded_at] = nil
           h[:previous_grader] = nil
-          h[:new_grade] = h[:grade]
-          h[:new_score] = h[:score]
+          h[:new_grade] = translate_grade(h)
+          h[:new_score] = translate_score(h)
           h[:new_graded_at] = h[:graded_at]
           h[:new_grader] = h[:grader]
           l << h
@@ -271,8 +265,8 @@ class SubmissionList
           h[:previous_grade] = prior_grade
           h[:previous_graded_at] = prior_graded_at
           h[:previous_grader] = prior_grader
-          h[:new_grade] = h[:grade]
-          h[:new_score] = h[:score]
+          h[:new_grade] = translate_grade(h)
+          h[:new_score] = translate_score(h)
           h[:new_graded_at] = h[:graded_at]
           h[:new_grader] = h[:grader]
           l << h
@@ -281,13 +275,21 @@ class SubmissionList
         # At this point, we are only working with versions that have changed a
         # grade.  Go ahead and save that grade and save this version as the
         # prior version and iterate.
-        prior_grade = h[:grade]
-        prior_score = h[:score]
+        prior_grade = translate_grade(h)
+        prior_score = translate_score(h)
         prior_graded_at = h[:graded_at]
         prior_grader = h[:grader]
         prior_submission_id = h[:submission_id]
         l
       end
+    end
+
+    def translate_grade(submission)
+      submission[:excused] ? "EX" : submission[:grade]
+    end
+
+    def translate_score(submission)
+      submission[:excused] ? "EX" : submission[:score]
     end
 
     # A list of all versions in YAML format
@@ -349,7 +351,7 @@ class SubmissionList
     # A complete list of all graders that have graded submissions for this
     # course as User models
     def graders
-      @graders ||= User.where(:id => all_grader_ids).all
+      @graders ||= User.where(:id => all_grader_ids).to_a
     end
 
     # A hash of graders by their ids, for easy lookup in full_hash_list
@@ -368,7 +370,7 @@ class SubmissionList
     # A complete list of all students that have submissions for this course
     # as User models
     def students
-      @students ||= User.where(:id => all_student_ids).all
+      @students ||= User.where(:id => all_student_ids).to_a
     end
 
     # A hash of students by their ids, for easy lookup in full_hash_list
@@ -386,7 +388,7 @@ class SubmissionList
 
     # A complete list of assignments that have submissions for this course
     def assignments
-      @assignments ||= Assignment.where(:id => all_assignment_ids).all
+      @assignments ||= Assignment.where(:id => all_assignment_ids).to_a
     end
 
     # A hash of assignments by their ids, for easy lookup in full_hash_list

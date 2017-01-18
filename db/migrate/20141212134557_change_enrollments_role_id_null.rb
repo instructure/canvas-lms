@@ -12,7 +12,7 @@ class ChangeEnrollmentsRoleIdNull < ActiveRecord::Migration
     Enrollment.find_ids_in_ranges(batch_size: 10000) do |start_id, end_id|
       Enrollment.where(<<-SQL, start_id, end_id, type, role.id).update_all(:role_id => role.id)
         (id BETWEEN ? AND ?) AND role_id IS NULL AND type=? AND NOT EXISTS
-        (SELECT 1 FROM enrollments AS e2 WHERE
+        (SELECT 1 FROM #{Enrollment.quoted_table_name} AS e2 WHERE
           e2.role_id=? AND
           e2.user_id=enrollments.user_id AND
           e2.type=enrollments.type AND

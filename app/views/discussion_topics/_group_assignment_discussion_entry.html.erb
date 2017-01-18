@@ -1,9 +1,0 @@
-<%= t :separated_conversation_notice, "The conversation for this topic has been separated into separate groups.  Below are all the group topics you have access to." %>
-<ul class="unstyled_list" style="line-height: 1.8em; margin: 5px 20px 10px;">
-<% @groups.select{|g| can_do(g, @current_user, :read) }.each do |group| %>
-  <li class="unstyled_list">
-    <% cnt = (@topics || []).find{|t| t.context_id == group.id && t.context_type == group.class.to_s}.discussion_entries.count rescue 0 %>
-    <b><a href="<%= context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) %>"><%= group.name %></a></b> - <%= t :posts, "Post", :count => cnt %>
-  </li>
-<% end %>
-</ul>

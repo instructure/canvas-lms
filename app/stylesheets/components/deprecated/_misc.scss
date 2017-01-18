@@ -28,7 +28,7 @@
 //this used to be in _layout.scss but for sure did not belong there, I didnt want to get rid of it
 //because I didnt know if anything actually uses it -RS
 .small {
-  font-size: 11px;
+  @include fontSize(11px);
 }
 
 // CLOSE ICONS
@@ -36,7 +36,7 @@
 a.x-close-link {
   float: right;
   color: black !important;
-  font-size: 20px;
+  @include fontSize(20px);
   font-weight: bold;
   line-height: 13.5px;
   text-shadow: 0 1px 0 white;

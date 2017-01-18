@@ -1,5 +1,5 @@
 class GradingPeriodGrade < ActiveRecord::Base
-  include Workflow
+  include Canvas::SoftDeletable
 
   #TODO: when we create a controller for this, remove attr_accessible and use strong params instead
   attr_accessible :enrollment_id, :grading_period_id, :current_grade, :final_grade
@@ -14,18 +14,5 @@ class GradingPeriodGrade < ActiveRecord::Base
       given { |user| grading_period.grants_right?(user, permission) }
       can permission
     end
-  end
-
-  workflow do
-    state :active
-    state :deleted
-  end
-
-  scope :active, -> { where workflow_state: "active" }
-
-  alias_method :destroy!, :destroy
-  def destroy
-    self.workflow_state = 'deleted'
-    save!
   end
 end

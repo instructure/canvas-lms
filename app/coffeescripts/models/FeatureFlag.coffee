@@ -92,6 +92,7 @@ define ['jquery', 'underscore', 'Backbone'], ($, _, Backbone) ->
       feature =
         appliesTo: json.applies_to.toLowerCase()
         id: json.feature
+        isExpanded: json.autoexpand
         title: json.display_name
         releaseOn: if json.enable_at then new Date(json.enable_at) else null
         releaseNotesUrl: json.release_notes_url

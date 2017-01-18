@@ -19,12 +19,8 @@
 class ContentParticipationCount < ActiveRecord::Base
   attr_accessible :context, :user, :content_type, :unread_count
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
+  belongs_to :context, polymorphic: [:course]
   belongs_to :user
-
-  EXPORTABLE_ATTRIBUTES = [:id, :content_type, :context_type, :context_id, :user_id, :unread_count, :created_at, :updated_at]
-  EXPORTABLE_ASSOCATIONS = [:context, :user]
 
   def self.create_or_update(opts={})
     opts = opts.with_indifferent_access
@@ -75,7 +71,7 @@ class ContentParticipationCount < ActiveRecord::Base
           submissions.user_id = ? AND
           assignments.context_type = ? AND
           assignments.context_id = ? AND
-          assignments.workflow_state <> 'deleted' AND
+          assignments.workflow_state NOT IN ('deleted', 'unpublished') AND
           (assignments.muted IS NULL OR NOT assignments.muted)
         SQL
         subs_with_grades = Submission.graded.
@@ -87,8 +83,9 @@ class ContentParticipationCount < ActiveRecord::Base
             joins(:assignment, :submission_comments).
             where(submission_conditions).
             where(<<-SQL, user).pluck(:id)
-            (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
-            AND submission_comments.author_id <> ?
+              (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
+              AND submission_comments.provisional_grade_id IS NULL
+              AND submission_comments.author_id <> ?
             SQL
         potential_ids = (subs_with_grades + subs_with_comments).uniq
         already_read_count = ContentParticipation.where(
@@ -104,7 +101,7 @@ class ContentParticipationCount < ActiveRecord::Base
   end
 
   def unread_count(refresh = true)
-    refresh_unread_count if refresh && !frozen? && ttl.present? && self.updated_at.utc < ttl.ago.utc
+    refresh_unread_count if refresh && !frozen? && ttl.present? && self.updated_at.utc < ttl.seconds.ago.utc
     read_attribute(:unread_count)
   end
 

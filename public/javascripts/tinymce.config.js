@@ -100,7 +100,7 @@ define([], function(){
       extended_valid_elements: "*[*]",
       valid_children: "+body[style|script|svg|textarea|img],+p[textarea|input]",
 
-      non_empty_elements: "td th iframe video audio object script a i area base basefont br col frame hr img input isindex link meta param embed source wbr track",
+      non_empty_elements: "textarea td th iframe video audio object script a i area base basefont br col frame hr img input isindex link meta param embed source wbr track",
       content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css + "," + window.bz_custom_css_url + ",/bz_editor.css",
       browser_spellcheck: true
     };
@@ -165,7 +165,7 @@ define([], function(){
    *   representing the buttons to appear on the n-th line of the toolbar
    */
   EditorConfig.prototype.balanceButtons = function(instructure_buttons){
-    var instBtnGroup = "table,instructure_links,unlink" + instructure_buttons;
+    var instBtnGroup = "table,instructure_links,link,unlink" + instructure_buttons;
     var buttons1 = "";
     var buttons2 = "";
     var buttons3 = "";

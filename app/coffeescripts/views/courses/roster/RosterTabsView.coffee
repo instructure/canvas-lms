@@ -20,6 +20,24 @@ define [
       if ENV.canManageCourse
         @collection.fetch()
 
+    render: ->
+      super
+      @refreshTabs()
+
+    refreshTabs: ->
+      $tabs = $('#group_categories_tabs')
+      $tabs.tabs().show()
+      $tabs.tabs
+        beforeActivate: (event, ui) ->
+          ui.newTab.hasClass('static')
+
+      $groupTabs = $tabs.find('li').not('.static')
+      $groupTabs.find('a').unbind()
+      $groupTabs.on 'keydown', (event) ->
+        event.stopPropagation()
+        if event.keyCode == 13 or event.keyCode == 32
+          window.location.href = $(this).find('a').attr('href')
+
     toJSON: ->
       json = {}
       json.collection = super

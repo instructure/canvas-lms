@@ -114,7 +114,7 @@
 #         },
 #         "required_settings": {
 #           "description": "A list of fields this system requires",
-#           "example": "\[\]",
+#           "example": ["source_course_id"],
 #           "type": "array",
 #           "items": {"type": "string"}
 #         }
@@ -154,7 +154,7 @@ class ContentMigrationsController < ApplicationController
 
       options = @plugins.map{|p| {:label => p.metadata(:select_text), :id => p.id}}
 
-      external_tools = ContextExternalTool.all_tools_for(@context, :type => :migration_selection, :root_account => @domain_root_account, :current_user => @current_user)
+      external_tools = ContextExternalTool.all_tools_for(@context, :placements => :migration_selection, :root_account => @domain_root_account, :current_user => @current_user)
       options.concat(external_tools.map do |et|
         {
           id: et.asset_string,
@@ -165,11 +165,11 @@ class ContentMigrationsController < ApplicationController
       js_env :EXTERNAL_TOOLS => external_tools_json(external_tools, @context, @current_user, session)
       js_env :UPLOAD_LIMIT => @context.storage_quota
       js_env :SELECT_OPTIONS => options
-      js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:includes).select([:title, :id]).active
+      js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:preload).select([:title, :id]).active
       js_env :COURSE_ID => @context.id
       js_env :CONTENT_MIGRATIONS => content_migration_json_hash
-      js_env(:OLD_START_DATE => unlocalized_datetime_string(@context.start_at, :verbose))
-      js_env(:OLD_END_DATE => unlocalized_datetime_string(@context.conclude_at, :verbose))
+      js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose))
+      js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose))
       js_env(:SHOW_SELECT => @current_user.manageable_courses.count <= 100)
     end
   end
@@ -489,6 +489,7 @@ class ContentMigrationsController < ApplicationController
           @content_migration.workflow_state = 'pre_process_error'
         end
         @content_migration.save!
+        @content_migration.reset_job_progress
       elsif !params.has_key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
         @content_migration.queue_migration(@plugin)
       end

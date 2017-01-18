@@ -220,6 +220,16 @@ define [
 
     onReady: (ready = true) ->
       $('.select_button').prop('disabled', !ready)
+      @checkFocus()
+
+    checkFocus: () ->
+      # deferring this makes it work more reliably because in some cases (like
+      # visibility updates) the focus isn't lost immediately.
+      _.defer(@checkFocusDeferred)
+
+    checkFocusDeferred: () =>
+      unless $.contains(@$el[0], document.activeElement) && $(document.activeElement).is(':visible')
+        $('.ui-dialog-titlebar-close').focus()
 
     teardown: ->
       _.each(@children, (child) -> child.teardown())

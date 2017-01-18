@@ -18,7 +18,7 @@
   }
   @else {
     font-family: georgia, serif;
-    font-size: 14px;
+    @include fontSize($ic-font-size--small);
     padding: 0 8px;
   }
   img {
@@ -49,7 +49,7 @@
     cursor: pointer;
     width: 14%;
     @if $use_new_styles {
-      font-size: 12px;
+      @include fontSize($ic-font-size--xsmall);
       border-radius: $baseBorderRadius;
       &.has_event { background-color: darken($lightBackground, 4%); }
       &.today { background-color: $ic-bg-light-alert; }

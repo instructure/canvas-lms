@@ -16,10 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path('../../sharding_spec_helper.rb', File.dirname(__FILE__))
 require File.expand_path('../../spec_helper.rb', File.dirname(__FILE__))
 
 describe IncomingMail::ReplyToAddress do
-  expect_secure_id = Canvas::Security.hmac_sha1("1000001")
+  let(:expect_secure_id) { Canvas::Security.hmac_sha1(Shard.short_id_for(@shard1.global_id_for(42))) }
 
   describe 'initialize' do
     it 'should persist the message argument' do
@@ -44,23 +45,31 @@ describe IncomingMail::ReplyToAddress do
       expect(IncomingMail::ReplyToAddress.new(message).address).to eq 'user@example.com'
     end
 
-    it 'should generate a reply-to address for email messages' do
-      message = mock()
+    context 'sharding' do
+      specs_require_sharding
 
-      message.expects(:path_type).returns('email')
-      message.expects(:context_type).returns('Course')
-      message.expects(:id).twice.returns(1)
-      message.expects(:global_id).twice.returns(1000001)
-      IncomingMail::ReplyToAddress.address_pool = %w{canvas@example.com}
+      it 'should generate a reply-to address for email messages' do
+        message = mock()
 
-      expect(IncomingMail::ReplyToAddress.new(message).address).to eq "canvas+#{expect_secure_id}-1000001@example.com"
+        message.expects(:path_type).returns('email')
+        message.expects(:context_type).returns('Course')
+        message.expects(:id).twice.returns(1)
+        message.expects(:global_id).twice.returns(@shard1.global_id_for(42))
+        IncomingMail::ReplyToAddress.address_pool = %w{canvas@example.com}
+
+        short_id = Shard.short_id_for(@shard1.global_id_for(42))
+
+        expect(IncomingMail::ReplyToAddress.new(message).address).to eq "canvas+#{expect_secure_id}-#{short_id}@example.com"
+      end
     end
   end
 
   describe 'secure_id' do
+    specs_require_sharding
+
     it 'should generate a unique hash for the message' do
       message       = mock()
-      message.expects(:global_id).returns(1000001)
+      message.expects(:global_id).returns(@shard1.global_id_for(42))
 
       expect(IncomingMail::ReplyToAddress.new(message).secure_id).to eq expect_secure_id
     end

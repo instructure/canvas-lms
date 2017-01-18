@@ -1,3 +1,5 @@
+require_dependency 'importers'
+
 module Importers
   class ContextModuleImporter < Importer
 
@@ -22,14 +24,27 @@ module Importers
       end
     end
 
-    def self.select_linked_module_items(data, migration)
+    def self.select_all_linked_module_items(data, migration)
       return if migration.import_everything?
       (data['modules'] || []).each do |mod|
-        if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
-          (mod['items'] || []).each do |item|
-            if resource_class = linked_resource_type_class(item['linked_resource_type'])
-              migration.import_object!(resource_class.table_name, item['linked_resource_id'])
-            end
+        self.select_linked_module_items(mod, migration)
+      end
+    end
+
+    def self.select_linked_module_items(mod, migration, select_all=false)
+      if select_all || migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
+        (mod['items'] || []).each do |item|
+          if item['type'] == 'submodule'
+            # recursively select content in submodules
+            self.select_linked_module_items(item, migration, true)
+          elsif resource_class = linked_resource_type_class(item['linked_resource_type'])
+            migration.import_object!(resource_class.table_name, item['linked_resource_id'])
+          end
+        end
+      else
+        (mod['items'] || []).each do |item|
+          if item['type'] == 'submodule'
+            self.select_linked_module_items(item, migration) # the parent may not be selected, but a sub-module may be
           end
         end
       end
@@ -38,29 +53,51 @@ module Importers
     def self.process_migration(data, migration)
       modules = data['modules'] ? data['modules'] : []
       modules.each do |mod|
-        if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
-          begin
-            self.import_from_migration(mod, migration.context, migration)
-          rescue
-            migration.add_import_warning(t('#migration.module_type', "Module"), mod[:title], $!)
-          end
-        end
+        self.process_module(mod, migration)
       end
       migration.context.context_modules.first.try(:fix_position_conflicts)
       migration.context.touch
     end
 
-    def self.import_from_migration(hash, context, migration=nil, item=nil)
+    def self.process_module(mod, migration)
+      if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
+        begin
+          self.import_from_migration(mod, migration.context, migration)
+        rescue
+          migration.add_import_warning(t('#migration.module_type', "Module"), mod[:title], $!)
+        end
+      else
+        # recursively find sub modules
+        (mod['items'] || []).each do |item|
+          next unless item['type'] == 'submodule'
+          self.process_module(item, migration)
+        end
+      end
+    end
+
+    def self.flatten_item(item, indent)
+      if item['type'] == 'submodule'
+        sub_items = []
+        sub_items << {:type => 'heading', :title => item['title'], :indent => indent, :migration_id => item['migration_id']}.with_indifferent_access
+        sub_items += (item['items'] || []).map{|item| self.flatten_item(item, indent + 1)}
+        sub_items
+      else
+        item[:indent] = (item[:indent] || 0) + indent
+        item
+      end
+    end
+
+    def self.import_from_migration(hash, context, migration, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:modules_to_import] && !hash[:modules_to_import][hash[:migration_id]]
       item ||= ContextModule.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= ContextModule.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= ContextModule.new(:context => context)
-      migration.add_imported_item(item) if migration
-      item.name = hash[:title] || hash[:description]
       item.migration_id = hash[:migration_id]
+      migration.add_imported_item(item)
+      item.name = hash[:title] || hash[:description]
       if hash[:workflow_state] == 'unpublished'
-        item.workflow_state = 'unpublished'
+        item.workflow_state = 'unpublished' if item.new_record? || item.deleted? # otherwise leave it alone
       else
         item.workflow_state = 'active'
       end
@@ -71,6 +108,7 @@ module Importers
       item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) if hash[:start_at]
       item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) if hash[:end_at]
       item.require_sequential_progress = hash[:require_sequential_progress] if hash[:require_sequential_progress]
+      item.requirement_count = hash[:requirement_count] if hash[:requirement_count]
 
       if hash[:prerequisites]
         preqs = []
@@ -83,20 +121,26 @@ module Importers
         end
         item.prerequisites = preqs if preqs.length > 0
       end
-
-      # Clear the old tags to be replaced by new ones
-      item.content_tags.destroy_all
       item.save!
 
       item_map = {}
       @item_migration_position = item.content_tags.not_deleted.map(&:position).compact.max || 0
-      (hash[:items] || []).each do |tag_hash|
+
+      items = hash[:items] || []
+      items = items.map{|item| self.flatten_item(item, 0)}.flatten
+
+      imported_migration_ids = []
+
+      items.each do |tag_hash|
         begin
-          self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
+          tag = self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
+          imported_migration_ids << tag.migration_id if tag
         rescue
-          migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!) if migration
+          migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
         end
       end
+
+      item.content_tags.where.not(:migration_id => imported_migration_ids).destroy_all # clear out missing items afterwards
 
       if hash[:completion_requirements]
         c_reqs = []
@@ -117,19 +161,14 @@ module Importers
     end
 
 
-    def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration=nil)
+    def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration)
       hash = hash.with_indifferent_access
       hash[:migration_id] ||= hash[:item_migration_id]
       hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
       existing_item = context_module.content_tags.where(id: hash[:id]).first if hash[:id].present?
       existing_item ||= context_module.content_tags.where(migration_id: hash[:migration_id]).first if hash[:migration_id]
       existing_item ||= ContentTag.new(:context_module => context_module, :context => context)
-      if hash[:workflow_state] == 'unpublished'
-        existing_item.workflow_state = 'unpublished'
-      else
-        existing_item.workflow_state = 'active'
-      end
-      migration.add_imported_item(existing_item) if migration
+      migration.add_imported_item(existing_item)
       existing_item.migration_id = hash[:migration_id]
       hash[:indent] = [hash[:indent] || 0, level].max
       resource_class = linked_resource_type_class(hash[:linked_resource_type])
@@ -137,14 +176,14 @@ module Importers
         wiki = context_module.context.wiki.wiki_pages.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if wiki
           item = context_module.add_item({
-            :title => hash[:title] || hash[:linked_resource_title],
+            :title => wiki.title.presence || hash[:title] || hash[:linked_resource_title],
             :type => 'wiki_page',
             :id => wiki.id,
             :indent => hash[:indent].to_i
           }, existing_item, :wiki_page => wiki, :position => context_module.migration_position)
         end
       elsif resource_class == Attachment
-        file = context_module.context.attachments.active.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
+        file = context_module.context.attachments.not_deleted.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if file
           title = hash[:title] || hash[:linked_resource_title]
           item = context_module.add_item({
@@ -158,7 +197,7 @@ module Importers
         ass = context_module.context.assignments.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if ass
           item = context_module.add_item({
-            :title => hash[:title] || hash[:linked_resource_title],
+            :title => ass.title.presence || hash[:title] || hash[:linked_resource_title],
             :type => 'assignment',
             :id => ass.id,
             :indent => hash[:indent].to_i
@@ -175,7 +214,7 @@ module Importers
         # external url
         if url = hash[:url]
           if (CanvasHttp.validate_url(hash[:url]) rescue nil)
-            url = migration.process_domain_substitutions(url) if migration
+            url = migration.process_domain_substitutions(url)
 
             item = context_module.add_item({
               :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
@@ -184,7 +223,7 @@ module Importers
               :url => url
             }, existing_item, :position => context_module.migration_position)
           else
-            migration.add_import_warning(t(:migration_module_item_type, "Module Item"), hash[:title], "#{hash[:url]} is not a valid URL") if migration
+            migration.add_import_warning(t(:migration_module_item_type, "Module Item"), hash[:title], "#{hash[:url]} is not a valid URL")
           end
         end
       elsif resource_class == ContextExternalTool
@@ -194,7 +233,7 @@ module Importers
 
         if hash[:linked_resource_global_id] && (!migration || !migration.cross_institution?)
           external_tool_id = hash[:linked_resource_global_id]
-        elsif migration && arr = migration.find_external_tool_translation(hash[:linked_resource_id])
+        elsif arr = migration.find_external_tool_translation(hash[:linked_resource_id])
           external_tool_id = arr[0]
           custom_fields = arr[1]
           if custom_fields.present?
@@ -206,14 +245,14 @@ module Importers
 
         if external_tool_url
           title = hash[:title] || hash[:linked_resource_title] || hash['description']
-          if migration
-            external_tool_url = migration.process_domain_substitutions(external_tool_url)
-            if external_tool_id.nil?
-              migration.add_warning(t(:foreign_lti_tool,
-                  %q{The account External Tool for module item "%{title}" must be configured before the item can be launched},
-                  :title => title))
-            end
+
+          external_tool_url = migration.process_domain_substitutions(external_tool_url)
+          if external_tool_id.nil?
+            migration.add_warning(t(:foreign_lti_tool,
+                %q{The account External Tool for module item "%{title}" must be configured before the item can be launched},
+                :title => title))
           end
+
           item = context_module.add_item({
             :title => title,
             :type => 'context_external_tool',
@@ -226,7 +265,7 @@ module Importers
         quiz = context_module.context.quizzes.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if quiz
           item = context_module.add_item({
-            :title => hash[:title] || hash[:linked_resource_title],
+            :title => quiz.title.presence || hash[:title] || hash[:linked_resource_title],
             :type => 'quiz',
             :indent => hash[:indent].to_i,
             :id => quiz.id
@@ -234,9 +273,11 @@ module Importers
         end
       elsif resource_class == DiscussionTopic
         topic = context_module.context.discussion_topics.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
-        if topic
+        if topic && topic.is_announcement
+          migration.add_warning(t("The announcement \"%{title}\" could not be linked to the module \"%{mod_title}\"", :title => hash[:title], :mod_title => context_module.name))
+        elsif topic
           item = context_module.add_item({
-            :title => hash[:title] || hash[:linked_resource_title],
+            :title => topic.title.presence || hash[:title] || hash[:linked_resource_title],
             :type => 'discussion_topic',
             :indent => hash[:indent].to_i,
             :id => topic.id
@@ -252,7 +293,9 @@ module Importers
         item.migration_id = hash[:migration_id]
         item.new_tab = hash[:new_tab]
         item.position = (context_module.item_migration_position ||= context_module.content_tags.not_deleted.map(&:position).compact.max || 0)
-        item.workflow_state = hash[:workflow_state] if hash[:workflow_state]
+        if hash[:workflow_state] && !['active', 'published'].include?(item.workflow_state)
+          item.workflow_state = hash[:workflow_state]
+        end
         context_module.item_migration_position += 1
         item.save!
       end

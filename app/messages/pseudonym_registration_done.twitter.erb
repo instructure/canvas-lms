@@ -1,0 +1,8 @@
+<% p = asset.is_a?(Pseudonym) ? asset : asset.pseudonym %>
+<% cc = asset.is_a?(CommunicationChannel) ? asset : (p.communication_channel || p.user.communication_channel) %>
+
+<% define_content :link do -%>
+  <%= p.user.registered? ? confirm_change_password_url(p, cc.confirmation_code) : registration_confirmation_url(cc.confirmation_code) %>
+<% end -%>
+
+<%= t :body, "Canvas Alert - You have been registered for a Canvas account at %{account}!  ", :account => p.account.display_name %>

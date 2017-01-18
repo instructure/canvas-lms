@@ -43,14 +43,14 @@ describe Message do
 
     it 'should sanitize html' do
       Message.any_instance.expects(:load_html_template).returns <<-ZOMGXSS
-        <b>Your content</b>: <%= "<script>alert('haha')</script>" %>
+        <b>Your content</b>: <%= "<script>alert()</script>" %>
       ZOMGXSS
       user         = user(:active_all => true)
       account_user = AccountUser.create!(:account => account_model, :user => user)
       message      = generate_message(:account_user_notification, :email, account_user)
 
       expect(message.html_body).not_to include "<script>"
-      expect(message.html_body).to include "<b>Your content</b>: &lt;script&gt;alert(&#x27;haha&#x27;)&lt;/script&gt;"
+      expect(message.html_body).to include "<b>Your content</b>: &lt;script&gt;alert()&lt;/script&gt;"
     end
   end
 
@@ -76,6 +76,31 @@ describe Message do
       expect(msg.subject).to include(@assignment.title)
     end
 
+    it "should allow over 255 char in the subject" do
+      assignment_model(title: 'this is crazy ridiculous '*10)
+      msg = generate_message(:assignment_created, :email, @assignment)
+      expect(msg.subject.length).to be > 255
+    end
+
+    it "should default to the account time zone if the user has no time zone" do
+      original_time_zone = Time.zone
+      Time.zone = 'UTC'
+      course_with_teacher
+      account = @course.account
+      account.default_time_zone = 'Pretoria'
+      account.save!
+      due_at = Time.zone.parse('2014-06-06 11:59:59')
+      assignment_model(course: @course, due_at: due_at)
+      msg = generate_message(:assignment_created, :email, @assignment)
+
+      presenter = Utils::DatetimeRangePresenter.new(due_at, nil, :event, ActiveSupport::TimeZone.new('Pretoria'))
+      due_at_string = presenter.as_string(shorten_midnight: false)
+
+      expect(msg.body.include?(due_at_string)).to eq true
+      expect(msg.html_body.include?(due_at_string)).to eq true
+      Time.zone = original_time_zone
+    end
+
     it "should not html escape the user_name" do
       course_with_teacher
       @teacher.name = "For some reason my parent's gave me a name with an apostrophe"
@@ -98,6 +123,37 @@ describe Message do
       @au = AccountUser.create(:account => account)
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.html_body).to include('awesomelogo.jpg')
+    end
+
+    describe "course nicknames" do
+      before(:once) do
+        course_with_student(:active_all => true, :course_name => 'badly-named-course')
+        @student.course_nicknames[@course.id] = 'student-course-nick'
+        @student.save!
+      end
+
+      def check_message(message, asset)
+        msg = generate_message(message, :email, asset, :user => @student)
+        expect(msg.html_body).not_to include 'badly-named-course'
+        expect(msg.html_body).to include 'student-course-nick'
+        expect(@course.name).to eq 'badly-named-course'
+
+        msg = generate_message(message, :email, asset, :user => @teacher)
+        expect(msg.html_body).to include 'badly-named-course'
+        expect(msg.html_body).not_to include 'student-course-nick'
+      end
+
+      it "applies nickname to asset" do
+        check_message(:grade_weight_changed, @course)
+      end
+
+      it "applies nickname to asset.course" do
+        check_message(:enrollment_registration, @student.enrollments.first)
+      end
+
+      it "applies nickname to asset.context" do
+        check_message(:assignment_changed, @course.assignments.create!)
+      end
     end
   end
 
@@ -188,6 +244,20 @@ describe Message do
       expect(@message.deliver).to eq false
     end
 
+    it "completes delivery without a user" do
+      message = message_model({
+        dispatch_at: Time.now,
+        to: 'somebody',
+        updated_at: Time.now.utc - 11.minutes,
+        user: nil,
+        path_type: 'email'
+      })
+      message.workflow_state = "staged"
+      Mailer.stubs(create_message: stub(deliver: "Response!"))
+      expect(message.workflow_state).to eq("staged")
+      expect{ message.deliver }.not_to raise_error
+    end
+
     context 'push' do
       before :once do
         user_model
@@ -197,7 +267,7 @@ describe Message do
         ne = mock()
         ne.expects(:push_json).returns(false)
         ne.expects(:destroy)
-        @user.expects(:notification_endpoints).returns(mock(all: [ne]))
+        @user.expects(:notification_endpoints).returns([ne])
 
         message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
         @message.deliver
@@ -207,10 +277,108 @@ describe Message do
         ne = mock()
         ne.expects(:push_json).twice.returns(true)
         ne.expects(:destroy).never
-        @user.expects(:notification_endpoints).returns(mock(all: [ne, ne]))
+        @user.expects(:notification_endpoints).returns([ne, ne])
 
         message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
         @message.deliver
+      end
+    end
+
+    context 'SMS' do
+      before :once do
+        user_model
+        @user.account.enable_feature!(:international_sms)
+      end
+
+      before do
+        Canvas::Twilio.stubs(:enabled?).returns(true)
+      end
+
+      it "uses Twilio for E.164 paths" do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver).with('+18015550100', @message.body, from_recipient_country: true)
+        @message.expects(:deliver_via_email).never
+        @message.deliver
+      end
+
+      it "sends as email for email-ish paths" do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: 'foo@example.com',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        @message.expects(:deliver_via_email)
+        Canvas::Twilio.expects(:deliver).never
+        @message.deliver
+      end
+
+      it "sends as email for paths that don't look like either email addresses or E.164 numbers" do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: 'bogus',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        @message.expects(:deliver_via_email)
+        Canvas::Twilio.expects(:deliver).never
+        @message.deliver
+      end
+
+      it 'completes dispatch when successful' do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver)
+        @message.deliver
+        @message.reload
+        expect(@message.workflow_state).to eq('sent')
+      end
+
+      it 'cancels when Twilio raises an exception' do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver).raises('some error')
+        @message.deliver
+        @message.reload
+        expect(@message.workflow_state).to eq('cancelled')
+      end
+
+      it 'sends from recipient country' do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver).with('+18015550100', anything, from_recipient_country: true)
+        @message.deliver
+        @message.reload
+        expect(@message.workflow_state).to eq('sent')
       end
     end
   end
@@ -306,63 +474,22 @@ describe Message do
 
       end
     end
-  end
 
-  describe '.context_type' do
-    it 'returns the correct representation of a quiz regrade run' do
-      message = message_model
-      regrade = Quizzes::QuizRegrade.create(:user_id => user_model.id, :quiz_id => quiz_model.id, :quiz_version => 1)
-      regrade_run = Quizzes::QuizRegradeRun.create(quiz_regrade_id: regrade.id)
+    describe "#translate" do
+      it "should work with an explicit key" do
+        message = message_model
+        message.get_template("new_discussion_entry.email.erb") # populate @i18n_scope
+        message = message.translate(:key, "value %{link}", link: 'hi')
+        expect(message).to eq "value hi"
+      end
 
-      message.context = regrade_run
-      message.save
-      expect(message.context_type).to eq "Quizzes::QuizRegradeRun"
-
-      Message.where(id: message).update_all(context_type: 'QuizRegradeRun')
-
-      expect(Message.find(message.id).context_type).to eq 'Quizzes::QuizRegradeRun'
+      it "should work with an implicit key" do
+        message = message_model
+        message.get_template("new_discussion_entry.email.erb") # populate @i18n_scope
+        message = message.translate("value %{link}", link: 'hi')
+        expect(message).to eq "value hi"
+      end
     end
-
-    it 'returns the correct representation of a quiz submission' do
-      message = message_model
-      submission = quiz_model.quiz_submissions.create!
-      message.context = submission
-      message.save
-      expect(message.context_type).to eq 'Quizzes::QuizSubmission'
-
-      Message.where(id: message).update_all(context_type: 'QuizSubmission')
-
-      expect(Message.find(message.id).context_type).to eq 'Quizzes::QuizSubmission'
-    end
-  end
-
-  describe '.asset_context_type' do
-    it 'returns the correct representation of a quiz regrade run' do
-      message = message_model
-      regrade = Quizzes::QuizRegrade.create(:user_id => user_model.id, :quiz_id => quiz_model.id, :quiz_version => 1)
-      regrade_run = Quizzes::QuizRegradeRun.create(quiz_regrade_id: regrade.id)
-
-      message.asset_context = regrade_run
-      message.save
-      expect(message.asset_context_type).to eq "Quizzes::QuizRegradeRun"
-
-      Message.where(id: message).update_all(asset_context_type: 'QuizRegradeRun')
-
-      expect(Message.find(message.id).asset_context_type).to eq 'Quizzes::QuizRegradeRun'
-    end
-
-    it 'returns the correct representation of a quiz submission' do
-      message = message_model
-      submission = quiz_model.quiz_submissions.create!
-      message.asset_context = submission
-      message.save
-      expect(message.asset_context_type).to eq 'Quizzes::QuizSubmission'
-
-      Message.where(id: message).update_all(asset_context_type: 'QuizSubmission')
-
-      expect(Message.find(message.id).asset_context_type).to eq 'Quizzes::QuizSubmission'
-    end
-
   end
 
   describe "author interface" do
@@ -458,4 +585,10 @@ describe Message do
     end
   end
 
+  it 'allows urls > 255 characters' do
+    url = "a" * 256
+    msg = Message.new
+    msg.url = url
+    msg.save!
+  end
 end

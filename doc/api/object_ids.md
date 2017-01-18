@@ -10,13 +10,14 @@ list of assignments for a course with SIS ID of `A1234`:
 
 The following objects support SIS IDs in the API:
 
+ * `sis_account_id`
  * `sis_course_id`
+ * `sis_group_id`
+ * `sis_integration_id` (for users)
  * `sis_login_id`
+ * `sis_section_id`
  * `sis_term_id`
  * `sis_user_id`
- * `sis_account_id`
- * `sis_section_id`
- * `sis_group_id`
 
 Additionally, some objects support special IDs:
 

@@ -1,4 +1,6 @@
 class DropSisSourceIdFromPseudonyms < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     remove_column :pseudonyms, :sis_source_id
   end

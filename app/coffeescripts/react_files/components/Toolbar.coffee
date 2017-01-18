@@ -2,48 +2,38 @@ define [
   'underscore'
   'i18n!react_files'
   'react'
-  'react-router'
-  'compiled/react/shared/utils/withReactElement'
-  './UploadButton'
-  './UsageRightsDialog'
-  '../utils/openMoveDialog'
+  'page'
+  'jsx/files/UsageRightsDialog'
   '../utils/downloadStuffAsAZip'
   '../utils/deleteStuff'
   '../modules/customPropTypes'
-  './RestrictedDialogForm'
+  'jsx/files/RestrictedDialogForm'
   'compiled/fn/preventDefault'
   '../modules/FocusStore'
+  'compiled/models/Folder'
+  'classnames'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, Router, withReactElement, UploadButtonComponent, UsageRightsDialogComponent, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogFormComponent, preventDefault, FocusStore, $) ->
+], (_, I18n, React, page, UsageRightsDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, preventDefault, FocusStore, Folder, classnames, $) ->
 
-  UploadButton = React.createFactory UploadButtonComponent
-  UsageRightsDialog = React.createFactory UsageRightsDialogComponent
-  RestrictedDialogForm = React.createFactory RestrictedDialogFormComponent
-  Link = React.createFactory Router.Link
-
-
-  Toolbar = React.createClass
+  Toolbar =
     displayName: 'Toolbar'
-
-    mixins: [Router.Navigation, Router.State]
 
     propTypes:
       currentFolder: customPropTypes.folder # not required as we don't have it on the first render
       contextType: customPropTypes.contextType.isRequired
       contextId: customPropTypes.contextId.isRequired
 
-    onSubmitSearch: (event) ->
-      event.preventDefault()
-      query = {search_term: @refs.searchTerm.getDOMNode().value}
-      @transitionTo 'search', {}, query
+    componentWillMount: ->
+      @downloadTitle = I18n.t('Download as Zip')
+      @tabIndex = null
 
     addFolder: (event) ->
       event.preventDefault()
       @props.currentFolder.folders.add({})
 
     getItemsToDownload: ->
-      itemsToDownload = @props.selectedItems.filter (item) ->
+      @props.selectedItems.filter (item) ->
         !item.get('locked_for_user')
 
     downloadSelectedAsZip: ->
@@ -54,9 +44,8 @@ define [
         contextId: @props.contextId
       })
 
-    componentDidUpdate: (prevProps) ->
-      if prevProps.selectedItems.length isnt @props.selectedItems.length
-        $.screenReaderFlashMessage(I18n.t({one: '%{count} item selected', other: '%{count} items selected'}, {count: @props.selectedItems.length}))
+    componentWillUpdate: (nextProps) ->
+      @showingButtons = nextProps.selectedItems.length
 
     # Function Summary
     # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
@@ -78,7 +67,8 @@ define [
           React.unmountComponentAtNode this
           $(this).remove()
 
-      React.render(RestrictedDialogForm({
+      # This should technically be in JSX land, but ¯\_(ツ)_/¯
+      React.render(React.createElement(RestrictedDialogForm, {
         models: @props.selectedItems
         usageRightsRequiredForContext: @props.usageRightsRequiredForContext
         closeDialog: -> $dialog.dialog('close')
@@ -87,158 +77,10 @@ define [
     openUsageRightsDialog: (event)->
       event.preventDefault()
 
-      contents = UsageRightsDialog(
-        closeModal: @props.modalOptions.closeModal
-        itemsToManage: @props.selectedItems
-      )
+      # This should technically be in JSX land, but ¯\_(ツ)_/¯
+      contents = React.createElement(UsageRightsDialog, {
+          closeModal: @props.modalOptions.closeModal
+          itemsToManage: @props.selectedItems
+      })
 
       @props.modalOptions.openModal(contents, => @refs.usageRightsBtn.getDOMNode().focus())
-
-    openPreview: ->
-      FocusStore.setItemToFocus(@refs.previewLink.getDOMNode())
-      @transitionTo(@props.getPreviewRoute(), {splat: @props.currentFolder?.urlPath()}, @props.getPreviewQuery())
-
-    render: withReactElement ->
-      showingButtons = @props.selectedItems.length
-      downloadTitle = if @props.selectedItems.length is 1
-        I18n.t('download', 'Download')
-      else
-        I18n.t('download_as_zip', 'Download as Zip')
-
-      header {
-        className:'ef-header grid-row between-xs'
-        role: 'region'
-        'aria-label': I18n.t('files_toolbar', 'Files Toolbar')
-      },
-        form {
-          className: "col-lg-3 #{ if showingButtons
-                                    'col-xs-4 col-sm-3 col-md-4'
-                                  else
-                                    'col-xs-7 col-sm-5 col-md-4'}"
-          onSubmit: @onSubmitSearch
-        },
-          input
-            placeholder:  I18n.t('search_for_files', 'Search for files')
-            'aria-label': I18n.t('search_for_files', 'Search for files')
-            type: 'search'
-            ref: 'searchTerm'
-            defaultValue: @getQuery().search_term
-
-        div className: "ui-buttonset col-xs #{'screenreader-only' unless showingButtons}",
-
-          a {
-              ref: 'previewLink'
-              href: '#'
-              onClick: preventDefault(@openPreview)
-              className: 'ui-button btn-view'
-              title: I18n.t('view', 'View')
-              role: 'button'
-              'aria-label': I18n.t('view', 'View')
-              'data-tooltip': ''
-              'aria-disabled': !showingButtons
-              disabled: !showingButtons
-              tabIndex: -1 unless showingButtons # This is to make it okay for keyboard-nav when hidden.
-            },
-            i className: 'icon-eye'
-
-          if @props.userCanManageFilesForContext
-            button {
-              type: 'button'
-              disabled: !showingButtons
-              className: 'ui-button btn-restrict',
-              onClick: @openRestrictedDialog
-              title: I18n.t('restrict_access', 'Restrict Access')
-              'aria-label': I18n.t('restrict_access', 'Restrict Access')
-              'data-tooltip': ''
-            },
-              i className: 'icon-cloud-lock'
-          if @getItemsToDownload().length
-            if (@props.selectedItems.length is 1) and @props.selectedItems[0].get('url')
-              a {
-                tabIndex: -1 unless showingButtons
-                className: 'ui-button btn-download'
-                href: @props.selectedItems[0].get('url')
-                download: true
-                title: downloadTitle
-                'aria-label': downloadTitle
-                'data-tooltip': ''
-              },
-                i className: 'icon-download'
-            else
-              button {
-                type: 'button'
-                disabled: !showingButtons
-                className: 'ui-button btn-download'
-                onClick: @downloadSelectedAsZip
-                title: downloadTitle
-                'aria-label': downloadTitle
-                'data-tooltip': ''
-              },
-                i className: 'icon-download'
-
-          if @props.userCanManageFilesForContext
-            button {
-              type: 'button'
-              disabled: !showingButtons
-              className: 'ui-button btn-move'
-              onClick: (event) =>
-                openMoveDialog(@props.selectedItems, {
-                  contextType: @props.contextType
-                  contextId: @props.contextId
-                  returnFocusTo: event.target
-                })
-              title: I18n.t('move', 'Move')
-              'aria-label': I18n.t('move', 'Move')
-              'data-tooltip': ''
-            },
-              i className: 'icon-copy-course'
-
-          if @props.userCanManageFilesForContext and @props.usageRightsRequiredForContext
-            button {
-              ref: 'usageRightsBtn'
-              type: 'button'
-              disabled: !showingButtons
-              className: 'Toolbar__ManageUsageRights ui-button btn-rights'
-              onClick: @openUsageRightsDialog
-              title: I18n.t('Manage Usage Rights')
-              'aria-label': I18n.t('Manage Usage Rights')
-              'data-tooltip': ''
-            },
-              i className: 'icon-files-copyright'
-
-          if @props.userCanManageFilesForContext
-            button {
-              type: 'button'
-              disabled: !showingButtons
-              className: 'ui-button btn-delete'
-              onClick: =>
-                @props.clearSelectedItems()
-                deleteStuff(@props.selectedItems)
-              title: I18n.t('delete', 'Delete')
-              'aria-label': I18n.t('delete', 'Delete')
-              'data-tooltip': ''
-            },
-              i className: 'icon-trash'
-
-          span className: 'hidden-tablet hidden-phone', style: {paddingLeft: 13},
-            I18n.t({one: '%{count} item selected', other: '%{count} items selected'}, {count: @props.selectedItems.length})
-
-        if @props.userCanManageFilesForContext
-          div className: 'text-right',
-            span className: 'ui-buttonset',
-              button {
-                type: 'button'
-                onClick: @addFolder
-                className:'btn btn-add-folder'
-                'aria-label': I18n.t('add_folder', 'Add Folder')
-              },
-                i(className:'icon-plus'),
-                span className: ('hidden-phone' if showingButtons),
-                  I18n.t('folder', 'Folder')
-
-            span className: 'ui-buttonset',
-              UploadButton
-                currentFolder: @props.currentFolder
-                showingButtons: showingButtons
-                contextId: @props.contextId
-                contextType: @props.contextType

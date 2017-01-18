@@ -1,74 +1,82 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../common')
 require File.expand_path(File.dirname(__FILE__) + '/../../helpers/outcome_common')
 
-describe "sub account outcomes", priority: 2 do
-  include_examples "in-process server selenium tests"
+describe "sub account outcomes" do
+  include_context "in-process server selenium tests"
+  include OutcomeCommon
 
     describe "account outcome specs" do
       let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
       let(:outcome_url) { "/accounts/#{account.id}/outcomes" }
       let(:who_to_login) { 'admin' }
 
-      before (:each) do
+      before(:each) do
         course_with_admin_logged_in
       end
 
       context "create/edit/delete outcomes" do
 
-        it "should create a learning outcome with a new rating (root level)" do
+        it "should create a learning outcome with a new rating (root level)", priority: "2", test_id: 263461 do
           should_create_a_learning_outcome_with_a_new_rating_root_level
         end
 
-        it "should create a learning outcome (nested)" do
+        it "should create a learning outcome (nested)", priority: "2", test_id: 263680 do
           should_create_a_learning_outcome_nested
         end
 
-        it "should edit a learning outcome and delete a rating" do
+        it "should edit a learning outcome and delete a rating", priority: "2", test_id: 263681 do
           should_edit_a_learning_outcome_and_delete_a_rating
         end
 
-        it "should delete a learning outcome" do
+        it "should delete a learning outcome", priority: "2", test_id: 263682 do
           should_delete_a_learning_outcome
         end
 
-        it "should validate mastery points" do
+        it "should validate mastery points", priority: "2", test_id: 263901 do
           should_validate_mastery_points
         end
 
-        it "should_validate_calculation_method_dropdown", test_id: 162376 do
+        it "should_validate_calculation_method_dropdown", priority: "2", test_id: 250517 do
           should_validate_calculation_method_dropdown
         end
 
-        it "should validate decaying average", test_id: 162377 do
-          should_validate_decaying_average
+        it "should validate decaying average_above_range", priority: "2", test_id: 250518 do
+          should_validate_decaying_average_above_range
         end
 
-        it "should validate n mastery", test_id: 162378 do
-          should_validate_n_mastery
+        it "should validate decaying average_below_range", priority: "2", test_id: 303713 do
+          should_validate_decaying_average_below_range
+        end
+
+        it "should validate n mastery_above_range", priority: "2", test_id: 250519 do
+          should_validate_n_mastery_above_range
+        end
+
+        it "should validate n mastery_below_range", priority: "2", test_id: 303714 do
+          should_validate_n_mastery_below_range
         end
       end
 
       context "create/edit/delete outcome groups" do
-
-        it "should create an outcome group (root level)" do
+        it "should create an outcome group (root level)", priority: "1", test_id: 263902 do
           should_create_an_outcome_group_root_level
         end
 
-        it "should create a learning outcome with a new rating (nested)" do
-          should_create_a_learning_outcome_with_a_new_rating_nested
+        it "should create an outcome group (nested)", priority: "1", test_id: 250521 do
+          should_create_an_outcome_group_nested
         end
 
-        it "should edit an outcome group" do
+        it "should edit an outcome group", priority: "1", test_id: 250522 do
           should_edit_an_outcome_group
         end
 
-        it "should delete an outcome group" do
+        it "should delete an outcome group", priority: "1", test_id: 250523 do
           should_delete_an_outcome_group
         end
       end
 
       describe "find/import dialog" do
-        it "should not allow importing top level groups" do
+        it "should not allow importing top level groups", priority: "1", test_id: 250524 do
           get outcome_url
           wait_for_ajaximations
 

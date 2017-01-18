@@ -97,6 +97,12 @@ describe IncomingMailProcessor::Pop3Mailbox do
     end
   end
 
+  describe '#unprocessed_message_count' do
+    it "should return nil" do
+      IncomingMailProcessor::Pop3Mailbox.new(default_config).unprocessed_message_count.should be_nil
+    end
+  end
+
   describe "#each_message" do
     before do
       mock_net_pop

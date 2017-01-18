@@ -1,27 +1,26 @@
 <td class='comm-event-option' data-selection='{{selected.code}}' data-category='{{category}}' data-channelId='{{channelId}}'>
   <div class='comm-event-option-contents'>
-    <div class='event-option-selection'>
-      <a href="#" class='change-selection' aria-hidden="true">
-        <i class="{{selected.icon}}"></i> <span class='img-text'>{{selected.text}}</span>
-        {{#if touch}}
-        <i class="{{selected.icon}}"></i>
-        <i class='icon-mini-arrow-down drop-arrow'></i>
-        {{/if}}
-      </a>
+    <div class="ui-buttonset event-option-selection grid-row center-xs">
+      {{#each allButtons}}
+      <input type="radio"
+             class="frequency ui-helper-hidden-accessible"
+             id="{{id}}"
+             data-tooltip
+             title="{{title}}"
+             data-value="{{code}}"
+             name="{{coordinate}}"
+             {{#if active}}checked{{/if}}>
+      <label for="{{id}}"
+             class="ui-button ui-widget col-xs-3 {{#if active}}ui-state-active{{else}}ui-state-default{{/if}}"
+             role="button"
+             aria-disabled="false"
+             {{#if active}}aria-pressed="true" aria-selected="true"{{else}}aria-pressed="false"{{/if}}
+             data-value="{{code}}"
+             data-tooltip
+             title="{{title}}">
+        <i class="{{icon}}"></i><span class="screenreader-only">{{title}}</span>
+      </label>
+      {{/each}}
     </div>
-    {{#if touch}}
-      <select value='{{selected.code}}' class='mobile-select'>
-        {{#each allButtons}}
-        <option value='{{code}}' {{#if active}}selected='selected'{{/if}}> {{text}}: {{title}}</option>
-        {{/each}}
-      </select>
-    {{else}}
-      <div class="btn-group-was event-option-buttons screenreader-only">
-        {{#each allButtons}}
-        <input type="radio" class="{{code}}-button frequency" id="{{id}}" name="{{coordinate}}" title="{{title}}" data-value='{{code}}' {{#if active}}checked='checked'{{/if}}>
-        <label for="{{id}}" class="{{code}}-label" data-tooltip title="{{title}}" ><i class="{{icon}}"></i><span class="screenreader-only">{{title}}</span></label>
-        {{/each}}
-      </div>
-    {{/if}}
   </div>
 </td>

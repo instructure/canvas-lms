@@ -21,12 +21,9 @@ class LearningOutcomeGroup < ActiveRecord::Base
   attr_accessible :context, :title, :description, :learning_outcome_group, :vendor_guid
   belongs_to :learning_outcome_group
   has_many :child_outcome_groups, :class_name => 'LearningOutcomeGroup', :foreign_key => "learning_outcome_group_id"
-  has_many :child_outcome_links, :class_name => 'ContentTag', :as => :associated_asset, :conditions => {:tag_type => 'learning_outcome_association', :content_type => 'LearningOutcome'}
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
+  has_many :child_outcome_links, -> { where(tag_type: 'learning_outcome_association', content_type: 'LearningOutcome') }, class_name: 'ContentTag', as: :associated_asset
+  belongs_to :context, polymorphic: [:account, :course]
 
-  EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :title, :learning_outcome_group_id, :root_learning_outcome_group_id, :workflow_state, :description, :created_at, :updated_at, :vendor_guid, :low_grade, :high_grade]
-  EXPORTABLE_ASSOCIATIONS = [:learning_outcome_group, :child_outcome_groups, :child_outcome_links]
   before_save :infer_defaults
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
@@ -48,7 +45,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     end
     true
   end
-  
+
   workflow do
     state :active
     state :deleted
@@ -90,46 +87,48 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
     # update outcome groups
     unless outcome_group_ids.empty?
-      sql = "UPDATE learning_outcome_groups SET learning_outcome_group_id=#{self.id} WHERE id IN (#{outcome_group_ids.join(",")}) AND context_type='#{self.context_type}' AND context_id='#{self.context_id}'"
-      ContentTag.connection.execute(sql)
+      LearningOutcomeGroup.
+          where(id: outcome_group_ids, context_type: context_type, context_id: context_id).
+          update_all(learning_outcome_group_id: self)
     end
 
     # update outcome links
     unless outcome_link_ids.empty?
-      sql = "UPDATE content_tags SET associated_asset_id=#{self.id} WHERE id IN (#{outcome_link_ids.join(",")}) AND context_type='#{self.context_type}' AND context_id='#{self.context_id}'"
-      ContentTag.connection.execute(sql)
+      ContentTag.
+          where(id: outcome_link_ids, context_type: context_type, context_id: context_id).
+          update_all(associated_asset_id: self)
     end
 
     orders
   end
-  
+
   def parent_ids
     [learning_outcome_group_id]
   end
-  
+
   # this finds all the ids of the ancestors avoiding relation loops
   # because of old broken behavior a group can have multiple parents, including itself
   def ancestor_ids
     if !@ancestor_ids
       @ancestor_ids = [self.id]
-      
+
       ids_to_check = parent_ids - @ancestor_ids
       until ids_to_check.empty?
         @ancestor_ids += ids_to_check
-        
+
         new_ids = []
         ids_to_check.each do |id|
           group = LearningOutcomeGroup.for_context(self.context).active.where(id: id).first
           new_ids += group.parent_ids if group
         end
-        
+
         ids_to_check = new_ids.uniq - @ancestor_ids
       end
     end
-    
+
     @ancestor_ids
   end
-  
+
   def is_ancestor?(id)
     ancestor_ids.member?(id)
   end
@@ -209,12 +208,12 @@ class LearningOutcomeGroup < ActiveRecord::Base
   end
 
   attr_accessor :skip_tag_touch
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     transaction do
       # delete the children of the group, both links and subgroups, then delete
       # the group itself
-      self.child_outcome_links.active.includes(:content).each do |outcome_link|
+      self.child_outcome_links.active.preload(:content).each do |outcome_link|
         outcome_link.skip_touch = true if @skip_tag_touch
         outcome_link.destroy
       end
@@ -227,7 +226,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
       save!
     end
   end
-  
+
   scope :active, -> { where("learning_outcome_groups.workflow_state<>'deleted'") }
 
   scope :global, -> { where(:context_id => nil) }
@@ -264,7 +263,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   def self.order_by_title
     scope = self
-    scope = scope.select("learning_outcome_groups.*") if !scoped.select_values.present?
+    scope = scope.select("learning_outcome_groups.*") if !all.select_values.present?
     scope.select(title_order_by_clause).order(title_order_by_clause)
   end
 end

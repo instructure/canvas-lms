@@ -28,9 +28,8 @@ module Quizzes
         end
       end
       @submission.score_before_regrade = nil
-      @submission.finished_at = Time.now
       @submission.manually_unlocked = nil
-      @submission.finished_at = opts[:finished_at] if opts[:finished_at]
+      @submission.finished_at ||= opts[:finished_at] || Time.zone.now
       if @submission.quiz.for_assignment? && @submission.user_id
         assignment_submission = @submission.assignment.find_or_create_submission(@submission.user_id)
         @submission.submission = assignment_submission
@@ -90,23 +89,17 @@ module Quizzes
 
       tagged_bank_ids = Set.new(alignments.map(&:content_id))
       question_ids = questions.select { |q| tagged_bank_ids.include?(q.assessment_question_bank_id) }
-      send_later_if_production(:update_outcomes_for_assessment_questions, question_ids, @submission.id, attempt) unless question_ids.empty?
+      send_later_if_production(:update_outcomes, question_ids, @submission.id, attempt) unless question_ids.empty?
     end
 
-    def update_outcomes_for_assessment_questions(question_ids, submission_id, attempt)
+    def update_outcomes(question_ids, submission_id, attempt)
       questions, alignments = questions_and_alignments(question_ids)
       return if questions.empty? || alignments.empty?
 
       submission = Quizzes::QuizSubmission.find(submission_id)
       versioned_submission = submission.attempt == attempt ? submission : submission.versions.sort_by(&:created_at).map(&:model).reverse.detect { |s| s.attempt == attempt }
-
-      questions.each do |question|
-        alignments.each do |alignment|
-          if alignment.content_id == question.assessment_question_bank_id
-            versioned_submission.create_outcome_result(question, alignment)
-          end
-        end
-      end
+      builder = Quizzes::QuizOutcomeResultBuilder.new(versioned_submission)
+      builder.build_outcome_results(questions, alignments)
     end
 
     private
@@ -122,7 +115,7 @@ module Quizzes
       return questions, ContentTag.learning_outcome_alignments.active.where(
           :content_type => 'AssessmentQuestionBank',
           :content_id => bank_ids).
-          includes(:learning_outcome, :context).all
+          preload(:learning_outcome, :context).to_a
     end
   end
 end

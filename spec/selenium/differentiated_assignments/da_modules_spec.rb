@@ -2,7 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/assignments_commo
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/differentiated_assignments')
 
 describe "interaction with differentiated assignments/quizzes/discusssions in modules" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include DifferentiatedAssignments
+  include AssignmentsCommon
 
   def expect_module_to_have_items(module_item)
     expect(f("#context_module_#{module_item.id}")).to include_text(@da_assignment.title)
@@ -47,11 +49,11 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
                                          @tag_quiz.id => {:type => 'must_view'}
                                          }
       @module.save
-      expect(@module.evaluate_for(@student).workflow_state).to include_text("unlocked")
+      expect(@module.evaluate_for(@student).workflow_state).to include("unlocked")
       get "/courses/#{@course.id}/modules/items/#{@tag_discussion.id}"
       get "/courses/#{@course.id}/modules/items/#{@tag_quiz.id}"
       #confirm canvas believes this module is now completed despite the invisible assignment not having been viewed
-      expect(@module.evaluate_for(@student).workflow_state).to include_text("completed")
+      expect(@module.evaluate_for(@student).workflow_state).to include("completed")
     end
   end
 
@@ -63,17 +65,17 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
         da_module_setup
       end
 
-      it "should not show inaccessible module items" do
+      it "should not show inaccessible module items", priority: "1", test_id: 135291 do
         create_section_overrides(@section1)
         get "/courses/#{@course.id}/modules"
         expect_module_to_not_have_items(@module)
       end
-      it "should display module items with overrides" do
+      it "should display module items with overrides", priority: "1", test_id: 135292 do
         create_section_overrides(@default_section)
         get "/courses/#{@course.id}/modules"
         expect_module_to_have_items(@module)
       end
-      it "should show module items with graded submissions" do
+      it "should show module items with graded submissions", priority: "1", test_id: 135293 do
         grade_da_assignments
         get "/courses/#{@course.id}/modules"
         expect_module_to_have_items(@module)

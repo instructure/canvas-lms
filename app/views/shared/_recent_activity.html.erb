@@ -2,7 +2,7 @@
   <% if @context.nil? || @context.is_a?(User) %>
     <%= t :recent_activity, "Recent Activity" %>
   <% else %>
-    <%= t :recent_activity_in_course, "Recent Activity in %{course_or_group}", :course_or_group => @context.short_name %>
+    <%= t :recent_activity_in_course, "Recent Activity in %{course_or_group}", :course_or_group => @context.nickname_for(@current_user, :short_name) %>
   <% end %>
 </h2>
 

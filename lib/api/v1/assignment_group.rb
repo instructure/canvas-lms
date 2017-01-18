@@ -19,17 +19,18 @@
 module Api::V1::AssignmentGroup
   include Api::V1::Json
   include Api::V1::Assignment
+  include Api::V1::Submission
 
   API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS = %w(
     name
     position
     group_weight
     rules
-  )
+  ).freeze
 
   def assignment_group_json(group, user, session, includes = [], opts = {})
     includes ||= []
-    opts.reverse_merge! override_assignment_dates: true
+    opts.reverse_merge!(override_assignment_dates: true, exclude_response_fields: [])
 
     hash = api_json(group, user, session,:only => %w(id name position group_weight))
     hash['rules'] = group.rules_hash(stringify_json_ids: opts[:stringify_json_ids])
@@ -37,14 +38,18 @@ module Api::V1::AssignmentGroup
     if includes.include?('assignments')
       assignments = opts[:assignments] || group.visible_assignments(user)
 
-      user_content_attachments   = opts[:preloaded_user_content_attachments]
-      unless opts[:exclude_descriptions]
-        user_content_attachments ||= api_bulk_load_user_content_attachments(
-          assignments.map(&:description),
-          group.context,
-          user
-        )
+      user_content_attachments = opts[:preloaded_user_content_attachments]
+      unless opts[:exclude_response_fields].include?('description')
+        user_content_attachments ||= api_bulk_load_user_content_attachments(assignments.map(&:description), group.context)
       end
+
+      needs_grading_course_proxy = group.context.grants_right?(user, session, :manage_grades) ?
+        Assignments::NeedsGradingCountQuery::CourseProxy.new(group.context, user) : nil
+
+      unless includes.include?('module_ids') || group.context.grants_right?(user, session, :read_as_admin)
+        Assignment.preload_context_module_tags(assignments) # running this again is fine
+      end
+
       hash['assignments'] = assignments.map { |a|
         overrides = opts[:overrides].select{|override| override.assignment_id == a.id } unless opts[:overrides].nil?
         a.context = group.context
@@ -56,9 +61,10 @@ module Api::V1::AssignmentGroup
           preloaded_user_content_attachments: user_content_attachments,
           include_visibility: includes.include?('assignment_visibility'),
           assignment_visibilities: opts[:assignment_visibilities].try(:[], a.id),
-          differentiated_assignments_enabled: opts[:differentiated_assignments_enabled],
-          exclude_description: opts[:exclude_descriptions],
-          overrides: overrides
+          exclude_response_fields: opts[:exclude_response_fields],
+          overrides: overrides,
+          needs_grading_course_proxy: needs_grading_course_proxy,
+          submission: includes.include?('submission') ? opts[:submissions][a.id] : nil
         )
       }
     end

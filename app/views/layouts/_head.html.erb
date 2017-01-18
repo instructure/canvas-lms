@@ -8,28 +8,20 @@
   yield :pre_html
 
 -%><!DOCTYPE html>
-<!--[if gte IE 9 ]><html class="ie ie9 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
-<!--[if !(IE)]><!--> <html class="not-ie scripts-not-loaded" lang=<%= @locale %>> <!--<![endif]-->
+<html class="scripts-not-loaded" lang=<%= @locale %>>
 <head>
   <meta charset="utf-8">
   <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
-  <!--[if lte IE 8]> <meta http-equiv=refresh content="0; URL=/ie-8-is-not-supported.html" /> <![endif]-->
-
-  <link rel="icon" type="image/x-icon" href="<%=
-    @domain_root_account.settings[:favicon].presence ||
-    (Rails.env.development? && "/favicon-green.ico") ||
-    (Rails.env.test? && "/favicon-green.ico") ||
-    "/favicon.ico" %>"
-  />
-  <link rel="apple-touch-icon" href="<%= @domain_root_account.settings[:apple_touch_icon].presence || "/apple-touch-icon.png"  %>">
-
-
+  <!--[if lte IE 9]> <meta http-equiv=refresh content="0; URL=/ie-9-is-not-supported.html" /> <![endif]-->
+  <%= favicon_link_tag(favicon) %>
+  <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
   <%= yield :auto_discovery %>
   <%= yield :head %>
   <%= yield :meta_tags %>
   <%= include_custom_meta_tags %>
   <% if use_new_styles? %>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
   <% end %>
   <%= include_css_bundles %>
   <%= yield :stylesheets %>
@@ -69,4 +61,3 @@
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700,300,600,400' rel='stylesheet' type='text/css'>
   <link href="/font/TradeGothicNo.20-CondBold.css" rel="stylesheet" type="text/css" />
 </head>
-

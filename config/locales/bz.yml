@@ -14521,7 +14521,7 @@ bz:
       titles:
         click_to_change_profile_pic: Click to change profile pic
       user_has_no_bio: "%{user} hasn't added a bio"
-      ways_to_contact_user: Ways to contact %{name}
+      ways_to_contact_user: Ways to contact
     recent_activity:
       date_column: Date
       message_column: Message

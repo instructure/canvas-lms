@@ -34,6 +34,11 @@ define [
     teardown: ->
       fakeENV.teardown()
 
+  test 'default params reflect aligned outcome', ->
+    collectionModel = new @outcomeResultCollection.model()
+    deepEqual collectionModel.get("mastery_points"), 8
+    deepEqual collectionModel.get("points_possible"), 10
+
   test '#parse', ->
     ok !@outcomeResultCollection.alignments, 'precondition'
 
@@ -54,9 +59,5 @@ define [
     )
 
     ok @outcomeResultCollection.length, 1
-    equal @outcome.get('mastery_points'),
-      @outcomeResultCollection.first().get('mastery_points')
-    equal @outcome.get('points_possible'),
-      @outcomeResultCollection.first().get('points_possible')
     equal @alignmentName, @outcomeResultCollection.first().get('alignment_name')
 

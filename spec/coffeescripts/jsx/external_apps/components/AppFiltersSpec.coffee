@@ -12,10 +12,10 @@ define [
     ok true, 'handleToolInstalled called successfully'
 
   createElement =  ->
-    AppFilters()
+    React.createElement(AppFilters)
 
   renderComponent = ->
-    React.renderComponent(createElement(), wrapper)
+    React.render(createElement(), wrapper)
 
   getDOMNodes = ->
     component = renderComponent()

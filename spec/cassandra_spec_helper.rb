@@ -23,7 +23,7 @@ shared_examples_for "cassandra page views" do
     if Canvas::Cassandra::DatabaseBuilder.configured?('page_views')
       Setting.set('enable_page_views', 'cassandra')
     else
-      pending "needs cassandra page_views configuration"
+      skip "needs cassandra page_views configuration"
     end
   end
 end
@@ -31,7 +31,7 @@ end
 shared_examples_for "cassandra audit logs" do
   before do
     unless Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
-      pending "needs cassandra auditors configuration"
+      skip "needs cassandra auditors configuration"
     end
   end
 end

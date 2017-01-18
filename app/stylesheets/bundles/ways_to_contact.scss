@@ -1,0 +1,68 @@
+@import "base/_environment.scss";
+
+.channel_list {
+  border-collapse: separate;
+}
+.channel_list .channel .default_link {
+  opacity: 0;
+  filter:alpha(opacity=0);
+}
+.channel_list.single .hidden_for_single {
+  display: none;
+}
+.channel_list .channel:hover .default_link {
+  display: block;
+  opacity: 0.5;
+}
+.channel_list .channel.unconfirmed .default_link {
+  display: none;
+}
+.channel_list .channel.unconfirmed .unconfirmed_text {
+    display: block;
+}
+.channel_list .unconfirmed_text {
+    display: none;
+}
+.channel_list .channel.default .default_link,
+.channel_list .channel.default:hover .default_link {
+  display: block;
+  opacity: 1.0;
+  cursor: default;
+}
+.channel_list .channel.default .delete_channel_link {
+  display: none;
+}
+.channel_list .channel.default .cant_delete_default_text {
+    display: block;
+}
+.channel_list .cant_delete_default_text {
+    display: none;
+}
+#right-side table.channel_list tr.channel.unconfirmed > td a {
+  color: $ic-color-dark;
+  font-style: italic;
+}
+.email_meta {
+  text-align: left;
+  width: 32px;
+  box-sizing: border-box;
+}
+.email_actions {
+  text-align: right;
+  white-space: nowrap;
+  width: 100%;
+}
+.email_channel {
+  max-width: 140px;
+  font-size: 0.8em;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#right-side p.email_channel {
+  margin: 0;
+  color: $ic-color-dark;
+}
+.intl_rates_may_apply {
+  font-size: 0.8em
+}

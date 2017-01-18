@@ -44,3 +44,7 @@ $usage-rights-alert-text: $ic-color-light;
   background-color: $usage-rights-alert-background;
   color: $usage-rights-alert-text;
 }
+
+.manage-access {
+  @include fontSize($ic-font-size--small);
+}

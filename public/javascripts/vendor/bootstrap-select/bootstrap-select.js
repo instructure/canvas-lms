@@ -128,7 +128,7 @@ define(['jquery'],function($) {
                 //Get the class and text for the option
                 var optionClass = $this.attr("class") || '';
                 var inline = $this.attr("style") || '';
-                var text =  $this.data('content') ? $this.data('content') : $this.html(); 
+                var text =  $this.data('content') ? $this.data('content') : $this.html();
                 var subtext = $this.data('subtext') !== undefined ? '<small class="muted">' + $this.data('subtext') + '</small>' : '';
                 var icon = $this.data('icon') !== undefined ? '<i class="'+$this.data('icon')+'"></i> ' : '';
                 if (icon !== '' && ($this.is(':disabled') || $this.parent().is(':disabled'))) {
@@ -145,7 +145,7 @@ define(['jquery'],function($) {
                 if (!$this.data('content')) {
                   //Prepend any icon and append any subtext to the main text.
                   text = icon + '<span class="text" data-value="'+value+'">' + text + subtext + '</span>';
-                } 
+                }
 
                 if (_this.options.hideDisabled && ($this.is(':disabled') || $this.parent().is(':disabled'))) {
                     _liA.push('<a style="min-height: 0; padding: 0"></a>');
@@ -195,7 +195,7 @@ define(['jquery'],function($) {
                   $.each(_subLiA, function(i, item) {
                       group += "<li rel='" + i + "' tabindex='0'>" + item + "</li>";
                   });
-                  group += '</ul></div>'; 
+                  group += '</ul></div>';
                   _liA.push(group);
                   _subLiA = [];
                 }
@@ -216,14 +216,13 @@ define(['jquery'],function($) {
 
         createA: function(text, classes, inline, index, $option) {
           // INSTRUCTURE: added role and aria-label and the $option parameter
-          var ariaLabel = ''
+          var $obj = $('<a class="'+classes+'">' + text + '<i class="icon-ok check-mark"></i>' + '</a>');
+
+          $obj.attr('tabindex', '-1').attr('role', 'menuitemcheckbox');
           if ($option.attr('aria-label') !== undefined) {
-            ariaLabel = ' aria-label="' + $option.attr('aria-label') + '"'
+            $obj.attr('aria-label', $option.attr('aria-label'));
           }
-         return '<a tabindex="-1" class="'+classes+'" style="'+inline+'" role="menuitemcheckbox"' + ariaLabel + '>' +
-                 text +
-                 '<i class="icon-ok check-mark"></i>' +
-                 '</a>';
+          return $('<div></div>').append($obj).html();
         },
 
         render: function(inUse) {
@@ -246,7 +245,7 @@ define(['jquery'],function($) {
                 }
                 if ($this.data('content') && _this.options.showContent) {
                     return $this.data('content');
-                } else if ($this.attr('title') != undefined) { 
+                } else if ($this.attr('title') != undefined) {
                     return $this.attr('title');
                 } else {
                     return icon + $this.html() + subtext;
@@ -623,7 +622,7 @@ define(['jquery'],function($) {
         show: function() {
             this.$newElement.show();
         },
-        
+
         destroy: function() {
             this.$newElement.remove();
             this.$element.remove();

@@ -228,6 +228,29 @@ describe CourseSection, "moving to new course" do
     expect(course3.workflow_state).to eq 'created'
   end
 
+  describe '#delete_enrollments_if_deleted' do
+    let(:account) { Account.create!(name: '1') }
+    let(:course) { account.courses.create! }
+    let(:section) { course.course_sections.create!(workflow_state: 'active') }
+
+    before do
+      student_in_section(section)
+    end
+
+    it "must not have any effect when the section's workflow_state is not 'deleted'" do
+      section.delete_enrollments_if_deleted
+      enrollment_states = section.enrollments.pluck(:workflow_state)
+      expect(enrollment_states).to_not include 'deleted'
+    end
+
+    it "must mark the enrollments as deleted if the section's workflow_state is 'deleted'" do
+      section.workflow_state = 'deleted'
+      section.delete_enrollments_if_deleted
+      enrollment_states = Enrollment.where(course_section_id: section.id).pluck(:workflow_state)
+      expect(enrollment_states.uniq).to contain_exactly 'deleted'
+    end
+  end
+
   it 'should update course account associations on save' do
     account1 = Account.create!(:name => "1")
     account2 = account1.sub_accounts.create!(:name => "2")

@@ -1,15 +1,16 @@
 module AccountServices
+  class AllowedServicesHash < Hash
+    def _dump(*args); ''; end
+    def self._load(*args); nil; end
+  end
+
   def self.allowable_services
-    {
-        :google_docs => {
-            :name => I18n.t("Google Docs"),
-            :description => "",
-            :expose_to_ui => (GoogleDocs::Connection.config ? :service : false)
-        },
+    AllowedServicesHash.new.merge({
         :google_drive => {
             :name => I18n.t("Google Drive"),
             :description => "",
-            :expose_to_ui => false
+            :expose_to_ui => :service,
+            :expose_to_ui_proc => proc { !!GoogleDrive::Connection.config }
         },
         :google_docs_previews => {
             :name => I18n.t("Google Docs Preview"),
@@ -24,17 +25,20 @@ module AccountServices
         :linked_in => {
             :name => I18n.t("LinkedIn"),
             :description => "",
-            :expose_to_ui => (LinkedIn::Connection.config ? :service : false)
+            :expose_to_ui => :service,
+            :expose_to_ui_proc => proc { !!LinkedIn::Connection.config }
         },
         :twitter => {
             :name => I18n.t("Twitter"),
             :description => "",
-            :expose_to_ui => (Twitter::Connection.config ? :service : false)
+            :expose_to_ui => :service,
+            :expose_to_ui_proc => proc { !!Twitter::Connection.config }
         },
         :yo => {
             :name => I18n.t("Yo"),
             :description => "",
-            :expose_to_ui => (Canvas::Plugin.find(:yo).try(:enabled?) ? :service : false)
+            :expose_to_ui => :service,
+            :expose_to_ui_proc => proc { !!Canvas::Plugin.find(:yo).try(:enabled?) }
         },
         :delicious => {
             :name => I18n.t("Delicious"),
@@ -44,7 +48,8 @@ module AccountServices
         :diigo => {
             :name => I18n.t("Diigo"),
             :description => "",
-            :expose_to_ui => (Diigo::Connection.config ? :service : false)
+            :expose_to_ui => :service,
+            :expose_to_ui_proc => proc { !!Diigo::Connection.config }
         },
         # TODO: move avatars to :settings hash, it makes more sense there
         # In the meantime, we leave it as a service but expose it in the
@@ -64,7 +69,7 @@ module AccountServices
               user && account && account.grants_right?(user, :manage_site_settings)
             end
         },
-    }.merge(@plugin_services || {}).freeze
+    }).merge(@plugin_services || {}).freeze
   end
 
   def self.register_service(service_name, info_hash)

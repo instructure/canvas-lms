@@ -31,6 +31,11 @@
 #           "type": "string",
 #           "format": "uuid"
 #         },
+#         "app_name": {
+#           "description": "If the request is from an API request, the app that generated the access token",
+#           "example": "Canvas for iOS",
+#           "type": "string"
+#         },
 #         "url": {
 #           "description": "The URL requested",
 #           "example": "https://canvas.instructure.com/conversations",
@@ -64,7 +69,7 @@
 #         "interaction_seconds": {
 #           "description": "An approximation of how long the user spent on the page, in seconds",
 #           "example": "7.21",
-#           "type": "float"
+#           "type": "number"
 #         },
 #         "created_at": {
 #           "description": "When the request was made",
@@ -80,7 +85,7 @@
 #         "render_time": {
 #           "description": "How long the response took to render, in seconds",
 #           "example": "0.369",
-#           "type": "float"
+#           "type": "number"
 #         },
 #         "user_agent": {
 #           "description": "The user-agent of the browser or program that made the request",
@@ -104,8 +109,8 @@
 #         },
 #         "links": {
 #           "description": "The page view links to define the relationships",
-#           "type": "PageViewLinks",
-#           "example": "{}"
+#           "$ref": "PageViewLinks",
+#           "example": {"user": 1234, "account": 1234}
 #         }
 #       }
 #     }
@@ -195,18 +200,14 @@ class PageViewsController < ApplicationController
       end
       format.csv do
         cancel_cache_buster
-        per_page = Setting.get('page_views_csv_export_rows', '300').to_i
-        page_views = @user.page_views.paginate(:page => 1, :per_page => per_page)
+
+        csv = PageView::CsvReport.new(@user).generate
+
         options = {
           type: 'text/csv',
           filename: t(:download_filename, 'Pageviews For %{user}',
           user: @user.name.to_s.gsub(/ /, '_')) + '.csv', disposition: 'attachment'
         }
-
-        header = Array(page_views.first.export_columns.to_csv)
-        rows   = Array(page_views.map { |view| view.to_row.to_csv })
-        csv    = (header + rows).join
-
         send_data(csv, options)
       end
     end

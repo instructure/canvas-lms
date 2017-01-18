@@ -8,14 +8,14 @@ define [
   wrapper = document.getElementById('fixtures')
 
   createElement = (data) ->
-    Lti2Permissions({
+    React.createElement(Lti2Permissions, {
       tool: data.tool
       handleCancelLti2: data.handleCancelLti2
       handleActivateLti2: data.handleActivateLti2
     })
 
   renderComponent = (data) ->
-    React.renderComponent(createElement(data), wrapper)
+    React.render(createElement(data), wrapper)
 
   module 'ExternalApps.Lti2Permissions',
     teardown: ->

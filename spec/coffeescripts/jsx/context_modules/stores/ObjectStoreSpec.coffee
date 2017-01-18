@@ -106,9 +106,13 @@ define ['jsx/context_modules/stores/ObjectStore'], (store) ->
                   '<http://page3>; rel="last"'
 
     @server.respondWith "GET", /\/folders/, [200, { "Content-Type": "application/json", "Link": linkHeaders }, JSON.stringify(@foldersPageOne)]
-    @server.respondWith "GET", /page2/, [200, { "Content-Type": "application/json", "Link": linkHeaders2 }, JSON.stringify(@foldersPageTwo)]
-    @server.respondWith "GET", /page3/, [200, { "Content-Type": "application/json"}, JSON.stringify(@foldersPageThree)]
     @testStore.fetch({fetchAll: true})
+    @server.respond()
+
+    @server.respondWith "GET", /page2/, [200, { "Content-Type": "application/json", "Link": linkHeaders2 }, JSON.stringify(@foldersPageTwo)]
+    @server.respond()
+
+    @server.respondWith "GET", /page3/, [200, { "Content-Type": "application/json"}, JSON.stringify(@foldersPageThree)]
     @server.respond()
     deepEqual @testStore.getState().items, @foldersPageOne.concat(@foldersPageTwo).concat(@foldersPageThree), "Should get all pages of items"
 

@@ -1,3 +1,5 @@
+require_dependency 'importers'
+
 module Importers
   class AccountContentImporter < Importer
 
@@ -9,6 +11,8 @@ module Importers
 
       Importers::AssessmentQuestionImporter.process_migration(data, migration)
       Importers::LearningOutcomeImporter.process_migration(data, migration)
+
+      migration.resolve_content_links!
 
       migration.progress = 100
       migration.workflow_state = :imported

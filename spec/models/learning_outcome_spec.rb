@@ -51,7 +51,7 @@ describe LearningOutcome do
               :id => 3
             }
           ],
-          :learning_outcome_id => @outcome.id
+          :learning_outcome_id => outcome.id
         }
       ]
       @rubric.save!
@@ -440,42 +440,12 @@ describe LearningOutcome do
       expect(@result.mastery).to eql(false)
     end
 
-    it "should not let you change calculation_method if it has been used to assess a student" do
-      @outcome.calculation_method = 'latest'
-      @outcome.save!
-      expect(@outcome.calculation_method).to eq('latest')
-      assess_with
-      expect(@outcome).to have(:no).errors_on(:calculation_method)
-      @outcome.calculation_method = 'n_mastery'
-      @outcome.save
-      expect(@outcome).to have(1).error_on(:calculation_method)
-      expect(@outcome).to have(1).error
-      expect(outcome_errors(:calculation_method).first).to include("outcome has been used to assess a student")
-      @outcome.reload
-      expect(@outcome.calculation_method).to eq('latest')
-    end
-
-    it "should not let you change calculation_int if it has been used to assess a student" do
-      @outcome.calculation_method = 'decaying_average'
-      @outcome.calculation_int = 24
-      @outcome.save!
-      expect(@outcome.calculation_int).to eq(24)
-      assess_with
-      expect(@outcome).to have(:no).errors
-      @outcome.calculation_int = 71
-      @outcome.save
-      expect(@outcome).to have(1).error_on(:calculation_int)
-      expect(@outcome).to have(1).error
-      expect(outcome_errors(:calculation_int).first).to include("outcome has been used to assess a student")
-      @outcome.reload
-      expect(@outcome.calculation_int).to eq(24)
-    end
-
     it "should not let you set the calculation_method to nil if it has been set to something else" do
       @outcome.calculation_method = 'latest'
       @outcome.save!
       expect(@outcome.calculation_method).to eq('latest')
       expect(@outcome).to have(:no).errors
+      @outcome.reload
       @outcome.calculation_method = nil
       @outcome.save
       expect(@outcome).to have(1).error_on(:calculation_method)
@@ -485,28 +455,34 @@ describe LearningOutcome do
       expect(@outcome.calculation_method).to eq('latest')
     end
 
-    context "should not let you set calculation_int to nil for certain calculation methods" do
+    context "should not let you set calculation_int to invalid values for certain calculation methods" do
       calc_method = [
         'decaying_average',
         'n_mastery'
       ]
+      invalid_values = {
+        decaying_average: [0, 100, 1000, nil],
+        n_mastery: [0, 10, nil]
+      }.with_indifferent_access
 
       calc_method.each do |method|
-        it "should not let you set calculation_int to nil if calculation_method is #{method}" do
-          @outcome.calculation_method = method
-          @outcome.calculation_int = 4
-          @outcome.save!
-          expect(@outcome.calculation_method).to eq(method)
-          expect(@outcome.calculation_int).to eq(4)
-          expect(@outcome).to have(:no).errors
-          @outcome.calculation_int = nil
-          @outcome.save
-          expect(@outcome).to have(1).error_on(:calculation_int)
-          expect(@outcome).to have(1).errors
-          expect(outcome_errors(:calculation_int).first).to include("is not a valid value for this calculation method")
-          @outcome.reload
-          expect(@outcome.calculation_method).to eq(method)
-          expect(@outcome.calculation_int).to eq(4)
+        invalid_values[method].each do |invalid_value|
+          it "should not let you set calculation_int to #{invalid_value} if calculation_method is #{method}" do
+            @outcome.calculation_method = method
+            @outcome.calculation_int = 4
+            @outcome.save!
+            expect(@outcome.calculation_method).to eq(method)
+            expect(@outcome.calculation_int).to eq(4)
+            expect(@outcome).to have(:no).errors
+            @outcome.calculation_int = invalid_value
+            @outcome.save
+            expect(@outcome).to have(1).error_on(:calculation_int)
+            expect(@outcome).to have(1).errors
+            expect(outcome_errors(:calculation_int).first).to include("is not a valid value for this calculation method")
+            @outcome.reload
+            expect(@outcome.calculation_method).to eq(method)
+            expect(@outcome.calculation_int).to eq(4)
+          end
         end
       end
     end
@@ -789,7 +765,6 @@ describe LearningOutcome do
         @outcome.calculation_method = nil
         @outcome.save
         expect(@outcome).to have(1).error
-        expect(@outcome).to have(1).error_on(:calculation_method)
         expect(outcome_errors(:calculation_method).first).to include("calculation_method must be one of")
         @outcome.reload
         expect(@outcome.calculation_method).not_to be_nil
@@ -867,6 +842,123 @@ describe LearningOutcome do
         expect(@outcome.description).to eq("foo bar baz qux")
         expect(@outcome.calculation_method).to eq('highest')
       end
+    end
+  end
+
+  context "learning outcome results" do
+    let(:outcome) do
+      LearningOutcome.create!(
+        context: account.call,
+        title: 'outcome',
+        calculation_method: 'highest'
+      )
+    end
+
+    let(:c1) { course_with_teacher; @course }
+    let(:c2) { course_with_teacher; @course }
+
+    let(:add_student) do
+      ->(*courses) { courses.each { |c| student_in_course(course: c) } }
+    end
+
+    let(:account) { ->{ Account.all.find{|a| !a.site_admin? && a.root_account?} } }
+
+    let(:create_rubric) do
+      ->(outcome) do
+        rubric = Rubric.create!(:context => outcome.context)
+        rubric.data = [{
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [
+            {
+              :points => 3,
+              :description => "Rockin'",
+              :criterion_id => 1,
+              :id => 2
+            },
+            {
+              :points => 0,
+              :description => "Lame",
+              :criterion_id => 1,
+              :id => 3
+            }
+          ],
+          :learning_outcome_id => outcome.id
+        }]
+        rubric.save!
+        rubric
+      end
+    end
+
+    let(:find_rubric) do
+      ->(outcome) do
+        # This is horribly inefficient, but there's not a good
+        # way to query by learning outcome id because it's stored
+        # in a serialized field :facepalm:.  When we do our outcomes
+        # refactor we should get rid of the serialized field here also
+        Rubric.all.each { |r| return r if r.data.first[:learning_outcome_id] == outcome.id }
+        nil
+      end
+    end
+
+    def add_or_get_rubric(outcome)
+      @add_or_get_rubric_cache ||= Hash.new do |h, key|
+        h[key] = find_rubric.call(outcome) || create_rubric.call(outcome)
+      end
+      @add_or_get_rubric_cache[outcome.id]
+    end
+
+    let(:assess_with) do
+      ->(outcome, context) do
+        assignment = assignment_model(context: context)
+        rubric = add_or_get_rubric(outcome)
+        user = user(:active_all => true)
+        context.enroll_student(user)
+        a = rubric.associate_with(assignment, context, :purpose => 'grading')
+        assignment.reload
+        submission = assignment.grade_student(user, :grade => "10").first
+        a.assess({
+          :user => user,
+          :assessor => user,
+          :artifact => submission,
+          :assessment => {
+            :assessment_type => 'grading',
+            :criterion_1 => {
+              :points => 2,
+              :comments => "cool, yo"
+            }
+          }
+        })
+        result = outcome.learning_outcome_results.first
+        assessment = a.assess({
+          :user => user,
+          :assessor => user,
+          :artifact => submission,
+          :assessment => {
+            :assessment_type => 'grading',
+            :criterion_1 => {
+              :points => 3,
+              :comments => "cool, yo"
+            }
+          }
+        })
+        result.reload
+        rubric.reload
+        { assignment: assignment, assessment: assessment, rubric: rubric }
+      end
+    end
+
+    it "properly reports whether assessed in a course" do
+      add_student.call(c1, c2)
+      add_or_get_rubric(outcome)
+      [c1, c2].each { |c| outcome.align(nil, c, :mastery_type => "points") }
+      assess_with.call(outcome, c1)
+
+      expect(outcome.alignments.length).to eq(3)
+      expect(outcome).to be_assessed
+      expect(outcome).to be_assessed(c1)
+      expect(outcome).not_to be_assessed(c2)
     end
   end
 end

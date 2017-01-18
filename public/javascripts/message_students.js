@@ -21,12 +21,19 @@ define([
   'jquery' /* $ */,
   'jquery.instructure_forms' /* formSubmit */,
   'jqueryui/dialog',
-  'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'jquery.instructure_misc_plugins' /* showIf */
 ], function(I18n, $) {
 
   var $message_students_dialog = $("#message_students_dialog");
+  var $sendButton = $message_students_dialog.find(".send_button");
   var currentSettings = {};
+  var checkSendable = function() {
+    disableSend(
+      $message_students_dialog.find("#body").val().length == 0 ||
+      $message_students_dialog.find(".student:not(.blank):visible").length == 0
+    );
+  }
+
   window.messageStudents = function(settings) {
     currentSettings = settings;
     $message_students_dialog.find(".message_types").empty();
@@ -49,6 +56,23 @@ define([
 
       $student.find('.name').text(settings.students[i].name);
       $student.find('.score').text(settings.students[i].score);
+      var remove_text = I18n.t("Remove %{student} from recipients", {student: settings.students[i].name});
+      var $remove_button = $student.find('.remove-button');
+      $remove_button.attr('title', remove_text).append($("<span class='screenreader-only'></span>").text(remove_text));
+      $remove_button.click(function(event) {
+        event.preventDefault();
+        // hide the selected student
+        var $s = $(this).closest('li');
+        $s.hide('fast', checkSendable);
+        // focus the next visible student, or the subject field if that was the last one in the list
+        var $next = $s.nextAll(':visible:first');
+        if ($next.length) {
+          $('button', $next).focus();
+        } else {
+          $('#message_assignment_recipients #subject').focus();
+        }
+      });
+
       $student.data('id', settings.students[i].id);
       $student.user_data = settings.students[i];
 
@@ -71,14 +95,16 @@ define([
     $message_students_dialog.dialog({
       width: 600,
       modal: true
-    }).fixDialogButtons().dialog('open').dialog('option', 'title', I18n.t("message_student", "Message Students for %{course_name}", {course_name: title}));
+    }).dialog('open').dialog('option', 'title', I18n.t("message_student", "Message Students for %{course_name}", {course_name: title}));
   };
+
   $(document).ready(function() {
-    $message_students_dialog.find(".cutoff_score").bind('change blur keyup', function() {
-      $message_students_dialog.find("select").change();
-    });
-    $message_students_dialog.find(".cancel_button").click(function() {
-      $message_students_dialog.dialog('close');
+    $message_students_dialog.find("button").click(function(e) {
+      var btn = $(e.target);
+      if (btn.hasClass("disabled")) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
     });
     $("#message_assignment_recipients").formSubmit({
       processData: function(data) {
@@ -91,22 +117,23 @@ define([
         return data;
       },
       beforeSubmit: function(data) {
-        $(this).find("button").attr('disabled', true).filter(".send_button").text(I18n.t("buttons.sending_message", "Sending Message..."));
+        disableButtons(true)
+        $(this).find(".send_button").text(I18n.t("Sending Message..."));
       },
       success: function(data) {
-        $(this).find(".send_button").text("Message Sent!");
-        var $form = $(this);
-        setTimeout(function() {
-          $form.find("button").attr('disabled', false).filter(".send_button").text(I18n.t("buttons.send_message", "Send Message"));
-          $("#message_students_dialog").dialog('close');
-        }, 2000);
+        $.flashMessage(I18n.t("Message sent!"));
+        disableButtons(false);
+        $(this).find(".send_button").text(I18n.t("Send Message"));
+        $("#message_students_dialog").dialog('close');
       },
       error: function(data) {
-        $(this).find("button").attr('disabled', false).filter(".send_button").text(I18n.t("buttons.send_message_failed", "Sending Message Failed, please try again"));
+        disableButtons(false);
+        $(this).find(".send_button").text(I18n.t("Sending Message Failed, please try again"));
       }
     });
-    $message_students_dialog.find("select").change(function() {
-      var idx = parseInt($(this).val(), 10) || 0;
+
+    var showStudentsMessageSentTo = function() {
+      var idx = parseInt($message_students_dialog.find("select").val(), 10) || 0;
       var option = currentSettings.options[idx];
       var students_hash = $message_students_dialog.data('students_hash'),
           cutoff = parseFloat($message_students_dialog.find(".cutoff_score").val(), 10);
@@ -133,7 +160,7 @@ define([
       $message_students_dialog.find(".cutoff_holder").showIf(option.cutoff);
 
       $message_students_dialog.find(".student_list").toggleClass('show_score', !!(option.cutoff || option.score));
-      $message_students_dialog.find("button").attr('disabled', student_ids.length == 0);
+      disableButtons(student_ids.length === 0);
 
       var student_ids_hash = {};
       for(var idx in student_ids) {
@@ -144,8 +171,41 @@ define([
       for(var idx in students_hash) {
         students_hash[idx].showIf(student_ids_hash[idx]);
       }
-    });
+    };
+
+    var focusOnCutoffScore = function() {
+      var idx = parseInt($message_students_dialog.find("select").val(), 10) || 0;
+      var option = currentSettings.options[idx];
+      if (option.cutoff) {
+        $(".cutoff_score").focus();
+      }
+    };
+
+    var closeDialog = function() {
+      $message_students_dialog.dialog('close');
+    };
+
+    $message_students_dialog.find(".cancel_button").click(closeDialog);
+    $message_students_dialog.find("select").change(showStudentsMessageSentTo)
+      .change(focusOnCutoffScore)
+      .change(checkSendable);
+    $message_students_dialog.find(".cutoff_score").bind('change blur keyup', showStudentsMessageSentTo)
+      .bind('change blur keyup', checkSendable);
+    $message_students_dialog.find("#body").bind('change blur keyup', checkSendable);
   });
+
+  function disableButtons(disabled, buttons) {
+    if (buttons == null) {
+      buttons = $message_students_dialog.find("button");
+    }
+    buttons
+      .toggleClass("disabled", disabled)
+      .attr("aria-disabled", disabled);
+  }
+
+  function disableSend(disabled) {
+    disableButtons(disabled, $sendButton);
+  }
 
   return messageStudents;
 });

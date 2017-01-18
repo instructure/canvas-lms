@@ -38,7 +38,7 @@ describe Api::V1::GradebookHistory do
   let(:yesterday) { (now - 24.hours).in_time_zone }
 
   before do
-    Submission.any_instance.stubs(:grants_right?).with(user, :read_grade).returns(true)
+    Submission.any_instance.stubs(:user_can_read_grade?).with(user, session).returns(true)
   end
 
   def submit(assignment, student, day, grader)
@@ -49,10 +49,10 @@ describe Api::V1::GradebookHistory do
     let_once(:course) { Course.create! }
 
     before :once do
-      students = (1..3).inject([]) do |memo, _idx|
+      students = (1..3).map do |_idx|
         student = User.create!
         course.enroll_student(student)
-        memo << student
+        student
       end
       @grader1 = User.create!(:name => 'grader 1')
       @grader2 = User.create!(:name => 'grader 2')
@@ -187,9 +187,8 @@ describe Api::V1::GradebookHistory do
 
     it 'should properly set pervious_* attributes' do
       # regrade to get a second version
-      @submission.score = 80
       @submission.score = '80'
-      @submission.save!
+      @submission.with_versioning(:explicit => true) { @submission.save! }
 
       harness = GradebookHistoryHarness.new
       submissions = harness.submissions_for(@course, api_context, now, @grader2.id, @assignment.id)

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,6 +22,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe SisBatch do
   before :once do
     account_model
+    Delayed::Job.destroy_all
+  end
+
+  def sis_jobs
+    Delayed::Job.where("tag ilike 'sis'")
   end
 
   def create_csv_data(data)
@@ -35,14 +40,14 @@ describe SisBatch do
         end
       end
 
-      old_job_count = Delayed::Job.count
+      old_job_count = sis_jobs.count
       batch = File.open(path, 'rb') do |tmp|
         # arrrgh attachment.rb
         def tmp.original_filename; File.basename(path); end
         SisBatch.create_with_attachment(@account, 'instructure_csv', tmp, @user || user)
       end
       # SisBatches shouldn't need any background processing
-      expect(Delayed::Job.count).to eq old_job_count
+      expect(sis_jobs.count).to eq old_job_count
       yield batch if block_given?
       batch
     end
@@ -118,18 +123,35 @@ describe SisBatch do
     expect(job.run_at.to_i).to be <= 150.minutes.from_now.to_i
   end
 
-  it "should fail itself if the jobs dies" do
-    batch = nil
-    track_jobs do
-      batch = create_csv_data(['abc'])
-      batch.process
-      batch.update_attribute(:workflow_state, 'importing')
+  describe 'when the job dies' do
+    let!(:batch) {
+      batch = nil
+      track_jobs do
+        batch = create_csv_data(['abc'])
+        batch.process
+        batch.update_attribute(:workflow_state, 'importing')
+        batch
+      end
       batch
+    }
+
+    let!(:job) {
+      created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
+    }
+
+    before do
+      expect(@account).to respond_to(:update_account_associations)
+      track_jobs { job.reschedule }
     end
 
-    job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
-    job.reschedule
-    expect(batch.reload).to be_failed
+    it 'enqueue a job to clean up the account associations' do
+      job = created_jobs.find{ |j| j.tag == 'Account#update_account_associations' }
+      expect(job).to_not be_nil
+    end
+
+    it 'must fail itself' do
+      expect(batch.reload).to be_failed
+    end
   end
 
   describe "batch mode" do
@@ -343,11 +365,12 @@ s2,test_1,section2,active},
       expect(@enrollment1).to be_active
 
       # only supply enrollments; course and section are left alone
-      process_csv_data(
-          [%{section_id,user_id,role,status
-          section_1,user_1,teacher,active}],
-          :batch_mode => true, :batch_mode_term => @term)
+      b = process_csv_data(
+        [%{section_id,user_id,role,status
+           section_1,user_1,teacher,active}],
+        :batch_mode => true, :batch_mode_term => @term)
 
+      expect(b.data[:counts][:batch_enrollments_deleted]).to eq 1
       expect(@user.reload).to be_registered
       expect(@section.reload).to be_active
       expect(@course.reload).to be_claimed
@@ -356,20 +379,22 @@ s2,test_1,section2,active},
       expect(@enrollment2).to be_active
 
       # only supply sections; course left alone
-      process_csv_data(
-          [%{section_id,course_id,name}],
-          :batch_mode => true, :batch_mode_term => @term)
+      b = process_csv_data(
+        [%{section_id,course_id,name}],
+        :batch_mode => true, :batch_mode_term => @term)
       expect(@user.reload).to be_registered
       expect(@section.reload).to be_deleted
       @section.enrollments.not_fake.each do |e|
         expect(e).to be_deleted
       end
       expect(@course.reload).to be_claimed
+      expect(b.data[:counts][:batch_sections_deleted]).to eq 1
 
       # only supply courses
-      process_csv_data(
-          [%{course_id,short_name,long_name,term_id}],
-          :batch_mode => true, :batch_mode_term => @term)
+      b = process_csv_data(
+        [%{course_id,short_name,long_name,term_id}],
+        :batch_mode => true, :batch_mode_term => @term)
+      expect(b.data[:counts][:batch_courses_deleted]).to eq 1
       expect(@course.reload).to be_deleted
     end
 

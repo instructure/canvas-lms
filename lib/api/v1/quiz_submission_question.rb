@@ -29,7 +29,8 @@ module Api::V1::QuizSubmissionQuestion
   # @param [Hash] meta[:session]
   # @param [Boolean] meta[:censored] if answer correctness should be censored out
   def quiz_submission_questions_json(quiz_questions, quiz_submission, meta = {})
-    quiz_questions = [ quiz_questions ] unless quiz_questions.kind_of?(Array)
+    meta[:censored] ||= true
+    quiz_questions = Array(quiz_questions) unless quiz_questions.kind_of?(Array)
     includes = (meta[:includes] || []) & INCLUDABLES
 
     data = {}
@@ -43,7 +44,8 @@ module Api::V1::QuizSubmissionQuestion
                                              meta[:session],
                                              nil, [],
                                              meta[:censored],
-                                             quiz_submission.quiz_data)
+                                             quiz_submission.quiz_data,
+                                             shuffle_answers: meta[:shuffle_answers])
     end
 
     unless includes.empty?
@@ -83,7 +85,16 @@ module Api::V1::QuizSubmissionQuestion
   def quiz_submission_question_json(qq, qs, meta={})
     answer_serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(qq)
     meta[:includes] ||= []
-    data = question_json(qq, meta[:user], meta[:session], nil, meta[:includes], meta[:censored], qs[:quiz_data] )
+    data = question_json(qq,
+      meta[:user],
+      meta[:session],
+      nil,
+      meta[:includes],
+      meta[:censored],
+      qs[:quiz_data],
+      shuffle_answers: meta[:shuffle_answers]
+    )
+
     if qs.submission_data.is_a? Hash #ungraded
       data[:flagged] = to_boolean(qs.submission_data["question_#{qq.id}_marked"])
       data[:answer] = answer_serializer.deserialize(qs.submission_data, true)

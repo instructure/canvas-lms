@@ -1,12 +1,13 @@
 define [
   'jquery'
   'underscore'
+  'timezone'
   'compiled/views/DialogBaseView'
   'compiled/util/deparam'
   'jst/conferences/editConferenceForm'
   'jst/conferences/userSettingOptions'
   'compiled/behaviors/authenticity_token'
-], ($, _, DialogBaseView, deparam, template, userSettingOptionsTemplate, authenticity_token) ->
+], ($, _, tz, DialogBaseView, deparam, template, userSettingOptionsTemplate, authenticity_token) ->
 
   class EditConferenceView extends DialogBaseView
 
@@ -74,6 +75,7 @@ define [
           auth_token: authenticity_token()
         conferenceData: conferenceData
         users: ENV.users
+        context_is_group: ENV.context_asset_string.split("_")[0] == "group"
         conferenceTypes: ENV.conference_type_details.map((type) ->
           {name: type.name, type: type.type, selected: (conferenceData.conference_type == type.type)}
         )
@@ -100,7 +102,7 @@ define [
             when 'date_picker'
               optionObj['isDatePicker'] = true
               if(currentVal)
-                optionObj['value'] = tz.format(currentVal, "%b %-d, %Y %l:%M%P")
+                optionObj['value'] = tz.format(currentVal, 'date.formats.full_with_weekday')
               else
                 optionObj['value'] = currentVal
               break

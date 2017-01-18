@@ -7,9 +7,8 @@
 <% end %>
 
 <% js_bundle :edit_rubric %>
-<% jammit_css :learning_outcomes %>
+<% css_bundle :learning_outcomes %>
 
-<% js_bundle :edit_rubric_user_index %>
 <h2><%= t 'headings.user_rubrics', 'User Rubrics' %></h2>
 <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;">&nbsp;</a>
 <div id="rubrics" class="raw_listing">
@@ -19,17 +18,17 @@
       <a href="<%= context_url(rubric.context, :context_rubric_url, rubric.id) %>" class="title"><%= rubric.title %></a>
       <span class="links">
         <% if can_do(rubric, @current_user, :update) %>
-          <a href="<%= context_url(rubric.context, :context_rubric_url, rubric.id) %>#edit" class="no-hover"><%= image_tag "edit.png" %></a>
+          <a href="<%= context_url(rubric.context, :context_rubric_url, rubric.id) %>#edit" class="no-hover"><%= image_tag "edit.png", :alt => t('Edit') %></a>
         <% end %>
         <% if rubric.context == @context %>
-          <a href="<%= context_url(@context, :context_rubric_url, rubric.id) %>" class="delete_rubric_link no-hover" title="<%= t('delete_rubric', 'Delete Rubric') %>"><%= image_tag "delete.png" %></a>
+          <a href="<%= context_url(@context, :context_rubric_url, rubric.id) %>" class="delete_rubric_link no-hover" title="<%= t('delete_rubric', 'Delete Rubric') %>"><%= image_tag "delete.png", :alt => t('Delete Rubric') %></a>
         <% elsif can_do(rubric, @current_user, :delete) %>
-          <a href="<%= context_url(@context, :context_rubric_url, rubric.id) %>" class="delete_rubric_link no-hover remove_link" title="<%= t('remove_rubric', 'Remove this Rubric from my list') %>"><%= image_tag "delete_circle.png" %></a>
+          <a href="<%= context_url(@context, :context_rubric_url, rubric.id) %>" class="delete_rubric_link no-hover remove_link" title="<%= t('remove_rubric', 'Remove this Rubric from my list') %>"><%= image_tag "delete_circle.png", :alt => t('Remove this Rubric from my list') %></a>
         <% end %>
       </span>
       <span class="details">
         <%= rubric.criteria.length %> <%= rubric.criteria.length == 1 ? 'criterion' : 'criteria' %><br/>
-        <%= t('points_possible', {:one => "point possible", :other => "points possible"}, :count => rubric.points_possible) %>
+        <%= t('points_possible', {:one => "point possible", :other => "points possible"}, :count => round_if_whole(rubric.points_possible)) %>
       </span>
     </li>
   <% end %>

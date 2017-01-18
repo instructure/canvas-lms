@@ -31,10 +31,6 @@
     padding-bottom: 3px;
     position: absolute;
     opacity: 0.9;
-    // ie puts the tooltips too low.
-    .ie & {
-      bottom: 25px;
-    }
   }
   .tooltip_text {
     background-color: #444;

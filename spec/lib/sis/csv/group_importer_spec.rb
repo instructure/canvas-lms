@@ -53,7 +53,7 @@ describe SIS::CSV::GroupImporter do
       "group_id,account_id,name,status",
       "G001,,Group 1,available",
       "G002,A002,Group 2,deleted")
-    groups = Group.order(:id).all
+    groups = Group.order(:id).to_a
     expect(groups.map(&:account_id)).to eq [@account.id, @sub.id]
     expect(groups.map(&:sis_source_id)).to eq %w(G001 G002)
     expect(groups.map(&:name)).to eq ["Group 1", "Group 2"]
@@ -65,7 +65,7 @@ describe SIS::CSV::GroupImporter do
     process_csv_data_cleanly(
       "group_id,name,status",
       "G001,Group 1,available")
-    groups = Group.order(:id).all
+    groups = Group.order(:id).to_a
     expect(groups.map(&:account_id)).to eq [@account.id]
     expect(groups.map(&:sis_source_id)).to eq %w(G001)
     expect(groups.map(&:name)).to eq ["Group 1"]
@@ -86,7 +86,7 @@ describe SIS::CSV::GroupImporter do
       "G001,,Group 1-b,available",
       "G002,A002,Group 2-b,deleted")
     # group 1's name won't change because it was manually changed
-    groups = Group.order(:id).all
+    groups = Group.order(:id).to_a
     expect(groups.map(&:name)).to eq ["Group 1-1", "Group 2-b"]
     expect(groups.map(&:root_account)).to eq [@account, @account]
     expect(groups.map(&:workflow_state)).to eq %w(available deleted)

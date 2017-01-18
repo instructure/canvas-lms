@@ -7,11 +7,11 @@
     :ACTIVE_EVENT => @active_event_id,
     :VIEW_START => @view_start,
     :CAL2_ONLY => true,
-    :SHOW_SCHEDULER => @domain_root_account.show_scheduler?
+    :SHOW_SCHEDULER => @domain_root_account.show_scheduler?,
+    :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size
   }
   js_bundle :calendar2
-  jammit_css :calendar2
-  jammit_css :agenda_view
+  css_bundle :calendar2, :agenda_view
   crumbs.clear
   @body_classes << "full-width no-page-block hide-content-while-scripts-not-loaded"
 %>
@@ -28,25 +28,23 @@
     <div id="minical" aria-hidden="true"></div>
   </div>
   <div class="rs-section">
-    <h3 class="element_toggler" aria-controls="context-list-holder" aria-expanded="true"
-        aria-label="<%= t(:toggle_calendars, "Toggle calendars") %>" tabindex="-1">
+    <span role="button" id="calendar-toggle-button" class="element_toggler" aria-controls="context-list-holder" aria-expanded="true"
+        aria-label="<%= t("Calendars toggle list visibility") %>" tabindex="0">
       <i class="icon-mini-arrow-down auto_rotate"></i> <%= t(:calendars, "Calendars") %>
-      <button class="screenreader-only" id="calendar-toggle-button"><%= t "Expand or Collapse Calendars" %></button>
-    </h3>
+    </span>
     <div id="context-list-holder"></div>
   </div>
   <div class="rs-section" id="undated-events-section">
-    <h3 class="element_toggler" aria-controls="undated-events" aria-expanded="false"
-        aria-label="<%= t(:toggle_undated_items, "Toggle undated items") %>" tabindex="-1">
+    <span href="#" role="button" id="undated-events-button" class="element_toggler" aria-controls="undated-events" aria-expanded="false"
+        aria-label="<%= t("Undated items toggle list visibility") %>" tabindex="0">
       <i class="icon-mini-arrow-right auto_rotate"></i> <%= t(:undated_items, "Undated items") %>
-      <button class="screenreader-only" id="undated-events-button"><%= t "Expand or collapse Undated items" %></button>
-    </h3>
+    </span>
     <div id="undated-events"></div>
   </div>
   <div class="rs-section" id="calendar-feed">
-    <a class="dialog_opener" aria-controls="calendar_feed_box" data-dialog-opts='{"resizable":false, "width": 400}' role="button" href="<%= @feed_url%>.ics">
+    <button class="dialog_opener Button Button--link" aria-controls="calendar_feed_box" data-dialog-opts='{"resizable":false, "width": 400}'>
       <i class="icon-calendar-days"></i> <%= t :calendar_feed, "Calendar Feed" %>
-    </a>
+    </button>
   </div>
 <% end %>
 <div style="display: none" id="calendar_feed_box" title="<%= t('feed_dialog_title', 'Calendar Feed') %>">
@@ -60,6 +58,6 @@
 </div>
 
 <div id="calendar_header"></div>
-<div id="calendar-app"></div>
+<div id="calendar-app" role="tabpanel" class="<%= 'wrap-calendar-event-titles' if @wrap_titles %>"></div>
 <div id="calendar-drag-and-drop-container"></div>
 

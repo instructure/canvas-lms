@@ -405,7 +405,7 @@ describe "LTI integration tests" do
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller, { current_user: @user, assignment: @assignment })
       adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
-      adapter.generate_post_payload_for_assignment(@assignment, "/my/test/url", "/my/other/test/url")
+      adapter.generate_post_payload_for_assignment(@assignment, "/my/test/url", "/my/other/test/url", "another/test/url")
     end
 
     it "should include assignment outcome service params for student" do
@@ -418,7 +418,7 @@ describe "LTI integration tests" do
       expect(hash['ext_ims_lis_basic_outcome_url']).to eq "/my/other/test/url"
       expect(hash['ext_outcome_data_values_accepted']).to eq 'url,text'
       expect(hash['custom_canvas_assignment_title']).to eq @assignment.title
-      expect(hash['custom_canvas_assignment_points_possible']).to eq @assignment.points_possible.to_s
+      expect(hash['custom_canvas_assignment_points_possible']).to eq "5"
       expect(hash['custom_canvas_assignment_id']).to eq @assignment.id.to_s
     end
 
@@ -429,7 +429,7 @@ describe "LTI integration tests" do
       expect(hash['ext_ims_lis_basic_outcome_url']).to eq "/my/other/test/url"
       expect(hash['ext_outcome_data_values_accepted']).to eq 'url,text'
       expect(hash['custom_canvas_assignment_title']).to eq @assignment.title
-      expect(hash['custom_canvas_assignment_points_possible']).to eq @assignment.points_possible.to_s
+      expect(hash['custom_canvas_assignment_points_possible']).to eq "5"
     end
   end
 

@@ -21,8 +21,9 @@ define [
       fakeENV.teardown()
       @contentView.remove()
 
-  test 'collectionView replaces text with warning on renderNoOutcomeWarning event', ->
+  test 'collectionView replaces text with warning and link on renderNoOutcomeWarning event', ->
     ok @contentView.$el?.text().match(/original_text/)
     $.publish "renderNoOutcomeWarning"
     ok @contentView.$el?.text().match(/You have no outcomes/)
     ok not @contentView.$el?.text().match(/original_text/)
+    ok @contentView.$el?.find('a')?.attr('href')?.search(@contentView._contextPath() + '/outcomes') > 0

@@ -19,15 +19,13 @@
 require [
   'i18n!outcomes'
   'jquery'
-  'compiled/models/OutcomeGroup'
-  'compiled/views/outcomes/FindDialog'
-  'compiled/views/rubrics/EditRubricPage'
-  'edit_rubric'
-], (I18n, $, OutcomeGroup, FindDialog, EditRubricPage, rubricEditing) ->
+  'rubricEditBinding' # event handler for rubricEditDataReady
+], (I18n, $) ->
 
   initEditRubricPage = ->
-    new EditRubricPage
-    rubricEditing.init()
+    event = document.createEvent('Event')
+    event.initEvent('rubricEditDataReady', true, true)
+    document.dispatchEvent(event)
 
   if $.isReady
     initEditRubricPage()

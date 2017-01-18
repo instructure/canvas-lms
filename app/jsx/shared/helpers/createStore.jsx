@@ -1,4 +1,3 @@
-/** @jsx */
 define(['underscore', 'Backbone'], function(_, Backbone) {
 
   /**
@@ -46,6 +45,11 @@ define(['underscore', 'Backbone'], function(_, Backbone) {
 
       getState () {
         return state;
+      },
+
+      clearState() {
+        state = {};
+        this.emitChange()
       },
 
       addChangeListener  (listener) {

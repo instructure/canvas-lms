@@ -1,4 +1,6 @@
 class AddMutedToAssignments < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :assignments, :muted, :boolean, :default => false
     Assignment.update_all :muted => false

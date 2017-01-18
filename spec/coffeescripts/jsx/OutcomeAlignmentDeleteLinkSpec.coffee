@@ -9,16 +9,18 @@ define [
       React.unmountComponentAtNode(@component.getDOMNode().parentNode)
 
   test 'should render span if hasRubricAssociation', ->
-    @component = TestUtils.renderIntoDocument(OutcomeAlignmentDeleteLink({
+    OutcomeAlignmentDeleteLinkElement = React.createElement(OutcomeAlignmentDeleteLink, {
       has_rubric_association: true
-    }))
+    })
+    @component = TestUtils.renderIntoDocument(OutcomeAlignmentDeleteLinkElement)
     $html = $(@component.getDOMNode())
     ok $html.prop('tagName') == 'SPAN'
 
   test 'should render a link if !hasRubricAssociation', ->
-    @component = TestUtils.renderIntoDocument(OutcomeAlignmentDeleteLink({
+    OutcomeAlignmentDeleteLinkElement = React.createElement(OutcomeAlignmentDeleteLink, {
       has_rubric_association: false
-    }))
+    })
+    @component = TestUtils.renderIntoDocument(OutcomeAlignmentDeleteLinkElement)
     $html = $(@component.getDOMNode())
     ok $html.prop('tagName') == 'A'
 

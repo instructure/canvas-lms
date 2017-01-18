@@ -2,8 +2,9 @@ require 'spec_helper'
 
 describe Quizzes::QuizRegrade do
 
-  before { Timecop.freeze(Time.local(2013)) }
-  after { Timecop.return }
+  around do |example|
+    Timecop.freeze(Time.zone.local(2013), &example)
+  end
 
   def quiz_regrade
     Quizzes::QuizRegrade.new(quiz_id: 1, user_id: 1, quiz_version: 1)

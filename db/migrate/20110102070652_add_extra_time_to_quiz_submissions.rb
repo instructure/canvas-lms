@@ -1,4 +1,6 @@
 class AddExtraTimeToQuizSubmissions < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :quiz_submissions, :extra_time, :integer
     add_column :quiz_submissions, :manually_unlocked, :boolean

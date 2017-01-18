@@ -33,7 +33,7 @@ define([
       ed.addButton('instructure_equation', {
         title: htmlEscape(I18n.t('Insert Math Equation')),
         cmd: 'instructureEquation',
-        image: url + '/img/button.gif',
+        icon: 'equation icon-equation',
         onPostRender: function(){
           var btn = this;
           ed.on('NodeChange', function(e){

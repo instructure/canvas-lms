@@ -6,11 +6,6 @@ environment_configuration(defined?(config) && config) do |config|
   # since you don't have to restart the webserver when you make code changes.
   config.cache_classes = false
 
-  if CANVAS_RAILS3
-    # Log error messages when you accidentally call methods on nil.
-    config.whiny_nils = true
-  end
-
   # Show full error reports and disable caching
   config.consider_all_requests_local = true
   config.action_controller.perform_caching = false
@@ -26,9 +21,6 @@ environment_configuration(defined?(config) && config) do |config|
   cache_store_rb = File.dirname(__FILE__) + "/cache_store.rb"
   eval(File.new(cache_store_rb).read, nil, cache_store_rb, 1)
 
-  # eval <env>-local.rb if it exists
-  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
-
   # allow debugging only in development environment by default
   #
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
@@ -37,6 +29,13 @@ environment_configuration(defined?(config) && config) do |config|
   unless ENV['DISABLE_RUBY_DEBUGGING']
     if RUBY_VERSION >= '2.0.0'
       require 'byebug'
+      if ENV['REMOTE_DEBUGGING_ENABLED']
+        require 'byebug/core'
+        Byebug.start_server('0.0.0.0', 0)
+        puts "Byebug listening on 0.0.0.0:#{Byebug.actual_port}" # rubocop:disable Rails/Output
+        byebug_port_file = File.join(Dir.tmpdir, 'byebug.port')
+        File.write(byebug_port_file, Byebug.actual_port)
+      end
     else
       require "debugger"
     end
@@ -52,7 +51,8 @@ environment_configuration(defined?(config) && config) do |config|
   # (it also takes forever)
   config.active_record.schema_format = :sql
 
-  unless CANVAS_RAILS3
-    config.eager_load = false
-  end
+  config.eager_load = false
+
+  # eval <env>-local.rb if it exists
+  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 end

@@ -51,6 +51,13 @@ describe CalendarEventsController do
       expect(response).to render_template('calendar_events/show')
     end
 
+    it "should redirect for course section events" do
+      section = @course.default_section
+      section_event = section.calendar_events.create!(title: "Sub event")
+      user_session(@student)
+      get 'show', course_section_id: section.id, id: section_event.id
+      expect(response).to be_redirect
+    end
   end
   
   describe "GET 'new'" do
@@ -71,7 +78,6 @@ describe CalendarEventsController do
       get 'new', :course_id => @course.id
       expect(@course.reload.calendar_events.count).to eq initial_count
     end
-
   end
   
   describe "POST 'create'" do

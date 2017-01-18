@@ -1,11 +1,17 @@
-tests = shuffle(__TESTS__);
-// tests = __TESTS__
+tests = __TESTS__;
 // tests = tests.slice(0,50);
 // console.log(tests);
 
 tests = tests.map(function(test) {
   return test.indexOf('spec/javascripts') === 0 ? '../../' + test : test;
 });
+
+// include the english translations by default, same as would happen in
+// production via common.js. this saves the test writer from having to stub
+// translations anytime they need to use code that uses a no-default
+// translation call (e.g. I18n.t('#date.formats.medium')) with the default
+// locale
+tests.push('translations/_core_en');
 
 window.addEventListener("DOMContentLoaded",function() {
   if(!document.getElementById('fixtures')) {
@@ -32,17 +38,4 @@ if(window.__karma__) {
       QUnit.start();
     }
   });
-}
-
-// Fisher-Yates shuffle
-// http://jsperf.com/fisher-yates-compare-shuffle/12
-function shuffle(array) {
-  var tmp, current, top = array.length;
-  if (top) while (top) {
-    current = (Math.random() * (top--)) | 0;
-    tmp = array[current];
-    array[current] = array[top];
-    array[top] = tmp;
-  }
-  return array;
 }

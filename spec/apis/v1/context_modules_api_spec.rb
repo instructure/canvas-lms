@@ -330,7 +330,7 @@ describe "Modules API", type: :request do
 
         @ids_to_update = @modules_to_update.map(&:id)
       end
-      
+
       it "should publish modules (and their tags)" do
         json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update })
         expect(json['completed'].sort).to eq @ids_to_update
@@ -359,7 +359,7 @@ describe "Modules API", type: :request do
         expect(json['completed'].sort).to eq @ids_to_update
         expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w(active active unpublished active)
       end
-      
+
       it "should not update soft-deleted modules" do
         @modules_to_update.each { |m| m.destroy }
         api_call(:put, @path, @path_opts, { :event => 'delete', :module_ids => @ids_to_update },
@@ -368,25 +368,25 @@ describe "Modules API", type: :request do
 
       it "should 404 if no modules exist with the given ids" do
         @modules_to_update.each do |m|
-          m.content_tags.scoped.delete_all
-          m.destroy!
+          m.content_tags.scope.delete_all
+          m.destroy_permanently!
         end
         api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update },
                  {}, { :expected_status => 404 })
       end
-      
+
       it "should 404 if only non-numeric ids are given" do
         api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update.map { |id| id.to_s + "abc" } },
                  {}, { :expected_status => 404})
       end
 
       it "should succeed if only some ids don't exist" do
-        @modules_to_update.first.destroy!
+        @modules_to_update.first.destroy_permanently!
         json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update })
         expect(json['completed']).to eq [@modules_to_update.last.id]
         expect(@modules_to_update.last.reload).to be_active
       end
-      
+
       it "should 400 if :module_ids is missing" do
         api_call(:put, @path, @path_opts, { :event => 'publish' }, {}, { :expected_status => 400 })
       end
@@ -403,7 +403,7 @@ describe "Modules API", type: :request do
       it "should scope to the course" do
         other_course = Course.create! :name => "Other Course"
         other_module = other_course.context_modules.create! :name => "Other Module"
-        
+
         json = api_call(:put, @path, @path_opts, { :event => 'unpublish',
           :module_ids => [@test_modules[1].id, other_module.id] })
         expect(json['completed']).to eq [@test_modules[1].id]
@@ -674,7 +674,7 @@ describe "Modules API", type: :request do
       expect(json['items'].find{|i| i["id"] == @assignment_tag.id}["completion_requirement"]["completed"]).to eq true
     end
   end
-  
+
   context "as a student" do
     before :once do
       course_with_student(:course => @course, :active_all => true)
@@ -831,6 +831,42 @@ describe "Modules API", type: :request do
               {}, {},
               {:expected_status => 401}
       )
+    end
+  end
+
+  context "differentiated assignments" do
+    before(:once) do
+      @assignment.only_visible_to_overrides = true; @assignment.save!
+      @other_section = @course.course_sections.create! name: "other section"
+      create_section_override_for_assignment(@assignment, {course_section: @other_section})
+    end
+
+    it "should exclude unassigned assignments" do
+      student_in_course(:active_all => true)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
+               { :controller => "context_modules_api", :action => "index", :format => "json",
+                 :course_id => "#{@course.id}", :include => ['items'] })
+      mod1_items = json.find { |m| m['id'] == @module1.id }['items'].map { |item| item['id'] }
+      expect(mod1_items).not_to include(@assignment_tag.id)
+    end
+
+    it "should include override assignments" do
+      student_in_course(:active_all => true, :section => @other_section)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
+                      { :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => ['items'] })
+      mod1_items = json.find { |m| m['id'] == @module1.id }['items'].map { |item| item['id'] }
+      expect(mod1_items).to include(@assignment_tag.id)
+    end
+
+    it "should include observed students' assigned assignment items" do
+      student_in_course(:active_all => true, :section => @other_section)
+      course_with_observer(:course => @course, :associated_user_id => @student.id)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
+                      { :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => ['items'] })
+      mod1_items = json.find { |m| m['id'] == @module1.id }['items'].map { |item| item['id'] }
+      expect(mod1_items).to include(@assignment_tag.id)
     end
   end
 

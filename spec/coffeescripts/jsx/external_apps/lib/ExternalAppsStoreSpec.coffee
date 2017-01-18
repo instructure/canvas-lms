@@ -5,7 +5,7 @@ define [
   module 'ExternalApps.ExternalAppsStore',
     setup: ->
       fakeENV.setup({
-        CONTEXT_BASE_URL: "/courses/1"
+        CONTEXT_BASE_URL: "/accounts/1"
       })
       @server = sinon.fakeServer.create()
       store.reset()
@@ -16,7 +16,9 @@ define [
           "description": "Talent provides an online, interactive video platform for professional development",
           "enabled": true,
           "installed_locally": true,
-          "name": "Talent"
+          "name": "Talent",
+          "context": "Course",
+          "context_id": 1
         },
         {
           "app_id": 2,
@@ -24,7 +26,9 @@ define [
           "description": null,
           "enabled": true,
           "installed_locally": true,
-          "name": "Twitter"
+          "name": "Twitter",
+          "context": "Course",
+          "context_id": 1
         },
         {
           "app_id": 3,
@@ -32,9 +36,22 @@ define [
           "description": null,
           "enabled": false,
           "installed_locally": true,
-          "name": "LinkedIn"
+          "name": "LinkedIn",
+          "context": "Course",
+          "context_id": 1
         }
       ]
+      @accountResponse = {
+        "id": 1,
+        "name": "root",
+        "workflow_state": "active",
+        "parent_account_id": null,
+        "root_account_id": null,
+        "default_storage_quota_mb": 500,
+        "default_user_storage_quota_mb": 50,
+        "default_group_storage_quota_mb": 50,
+        "default_time_zone": "America/Denver"
+      }
 
     teardown: ->
       @server.restore()
@@ -45,6 +62,15 @@ define [
     store.fetch()
     @server.respond()
     equal store.getState().externalTools.length, 3
+
+  test 'updateAccessToken', ->
+    @server.respondWith 'PUT', /\/accounts/, [200, { 'Content-Type': 'application/json' }, JSON.stringify(@accountResponse)]
+    success = (data, statusText, xhr) ->
+      equal statusText, 'success'
+    error = ->
+      ok false, 'Unable to update app center access token'
+    store.updateAccessToken('/accounts/1', '1234', success.bind(this), error.bind(this))
+    @server.respond()
 
   test 'fetchWithDetails with ContextExternalTool', ->
     expect 1
@@ -71,7 +97,7 @@ define [
         foo: 'bar'
       }
 
-    spy = sinon.spy(store, 'save')
+    spy = @spy(store, 'save')
     data = { some: 'data' }
 
     success = (data, statusText, xhr)->
@@ -87,7 +113,6 @@ define [
     equal spy.lastCall.args[0], 'manual'
     equal spy.lastCall.args[1], data
 
-    store.save.restore()
     store._generateParams = _generateParams
 
   test '_generateParams manual', ->

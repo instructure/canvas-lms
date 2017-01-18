@@ -67,12 +67,12 @@ class Notification < ActiveRecord::Base
 
   end
 
-  def self.all
-    @all ||= super.to_a.each(&:readonly!)
+  def self.all_cached
+    @all ||= self.all.to_a.each(&:readonly!)
   end
 
   def self.find(id, options = {})
-    (@all_by_id ||= all.index_by(&:id))[id.to_i] or raise ActiveRecord::RecordNotFound
+    (@all_by_id ||= all_cached.index_by(&:id))[id.to_i] or raise ActiveRecord::RecordNotFound
   end
 
   def self.reset_cache!
@@ -166,7 +166,7 @@ class Notification < ActiveRecord::Base
   def self.dashboard_categories(user = nil)
     seen_types = {}
     res = []
-    Notification.all.each do |n|
+    Notification.all_cached.each do |n|
       if !seen_types[n.category] && (user.nil? || n.relevant_to_user?(user))
         seen_types[n.category] = true
         res << n if n.category && n.dashboard?
@@ -176,16 +176,15 @@ class Notification < ActiveRecord::Base
   end
 
   # Return a hash with information for a related user option if one exists.
-  def related_user_setting(user)
-    case self.category
-      when 'Grading'
-        setting = {:name => :send_scores_in_emails, :value => user.preferences[:send_scores_in_emails],
-                   :label => t(:grading_notify_include_grade, 'Include scores when alerting about grade changes.')}
-      else
-        nil
+  def related_user_setting(user, root_account)
+    if self.category == 'Grading' && root_account.settings[:allow_sending_scores_in_emails] != false
+      {
+        name: :send_scores_in_emails,
+        value: user.preferences[:send_scores_in_emails],
+        label: t('Include scores when alerting about grades.'),
+        id: "cat_#{self.id}_option",
+      }
     end
-    setting[:id] = "cat_#{self.id}_option" if setting
-    setting
   end
 
   def default_frequency(_user = nil)
@@ -216,7 +215,7 @@ class Notification < ActiveRecord::Base
     when 'DiscussionEntry'
       FREQ_DAILY
     when 'Announcement Reply'
-        FREQ_NEVER
+      FREQ_NEVER
     when 'Due Date'
       FREQ_WEEKLY
     when 'Grading'
@@ -308,6 +307,7 @@ class Notification < ActiveRecord::Base
     t 'names.new_student_organized_group', 'New Student Organized Group'
     t 'names.new_user', 'New User'
     t 'names.pseudonym_registration', 'Pseudonym Registration'
+    t 'names.pseudonym_registration_done', 'Pseudonym Registration Done'
     t 'names.report_generated', 'Report Generated'
     t 'names.report_generation_failed', 'Report Generation Failed'
     t 'names.rubric_assessment_invitation', 'Rubric Assessment Invitation'
@@ -343,7 +343,7 @@ class Notification < ActiveRecord::Base
     t 'categories.student_appointment_signups', 'Student Appointment Signups'
     t 'categories.appointment_availability', 'Appointment Availability'
     t 'categories.appointment_signups', 'Appointment Signups'
-    t 'categories.appointment_cancelations', 'Appointment Cancelations'
+    t 'categories.appointment_cancelations', 'Appointment Cancellations'
     t 'categories.course_content', 'Course Content'
     t 'categories.discussion', 'Discussion'
     t 'categories.discussion_entry', 'DiscussionEntry'
@@ -404,7 +404,7 @@ class Notification < ActiveRecord::Base
     when 'Appointment Signups'
       t(:appointment_signups_display, 'Appointment Signups')
     when 'Appointment Cancelations'
-      t(:appointment_cancelations_display, 'Appointment Cancelations')
+      t(:appointment_cancelations_display, 'Appointment Cancellations')
     when 'Conversation Message'
       t(:conversation_message_display, 'Conversation Message')
     when 'Added To Conversation'
@@ -514,7 +514,7 @@ EOS
     when 'Appointment Signups'
       t(:appointment_signups_description, 'New appointment on your calendar')
     when 'Appointment Cancelations'
-      t(:appointment_cancelations_description, 'Appointment cancelation')
+      t(:appointment_cancelations_description, 'Appointment cancellation')
     when 'Conversation Message'
       t(:conversation_message_description, 'New Inbox messages')
     when 'Added To Conversation'

@@ -22,7 +22,7 @@ module CC
 
       # There can be multiple rubric associations to the same rubric, only export each rubric once
       imported_rubrics = {}
-      
+
       if document
         rubrics_file = nil
         rel_path = nil
@@ -42,9 +42,10 @@ module CC
           rubric = assoc.rubric
           next if rubric.nil? || !rubric.active? || imported_rubrics[rubric.id]
           if !export_object?(rubric)
-            if assoc.association_type != "Assignment" || !export_object?(assoc.association_object)
-              next
-            end
+            next if assoc.association_type != "Assignment"
+
+            assignment = assoc.association_object
+            next unless [assignment, assignment.quiz, assignment.discussion_topic, assignment.wiki_page].compact.any?{|o| export_object?(o)}
           end
           imported_rubrics[rubric.id] = true
           rubric.learning_outcome_alignments.each do |align|

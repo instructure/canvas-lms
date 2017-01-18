@@ -6,6 +6,28 @@
     value=value
   }}
 {{ else }}
-  {{input value=value id=input-id type="text"}}
+  {{
+    input
+    value=value
+    id=input-id
+    type="text"
+    disabled=isInPastGradingPeriodAndNotAdmin
+  }}
 {{/if}}
 {{outOfText}}
+
+{{#unless isPassFail}}
+<div class="checkbox">
+  <label class="checkbox">
+    {{
+      input
+      type="checkbox"
+      id="submission-excused"
+      name="submission-excused"
+      checked=excused
+      disabled=isInPastGradingPeriodAndNotAdmin
+    }}
+    {{#t}}Excuse This Assignment for the Selected Student{{/t}}
+  </label>
+</div>
+{{/unless}}

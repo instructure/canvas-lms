@@ -2,8 +2,9 @@
 # Handles getting the status for a file.
 #
 define [
+  'Backbone'
   'i18n!file_status'
-  ], (I18n) ->
+  ], (Backbone, I18n) ->
 
   #
   # Returns an internationalized string describing the status of a file.

@@ -1,10 +1,9 @@
 define [
   'jquery'
   'underscore'
-  'i18n!dicussions'
   'compiled/models/DiscussionTopic'
   'compiled/views/ToggleableSubscriptionIconView'
-], ($, _, I18n, DiscussionTopic, SubscriptionIconView) ->
+], ($, _, DiscussionTopic, SubscriptionIconView) ->
 
   module 'SubscriptionIconView',
     setup: ->
@@ -16,7 +15,7 @@ define [
       }))
 
   test 'hover', ->
-    spy = sinon.spy(@view, 'render')
+    spy = @spy(@view, 'render')
 
     @view.$el.trigger(@e('focus'))
     ok spy.called
@@ -38,11 +37,9 @@ define [
     ok !@view.hovering
     spy.reset()
 
-    @view.render.restore()
-
   test 'click', ->
-    unsubSpy = sinon.stub(@model, 'topicUnsubscribe')
-    subSpy = sinon.stub(@model, 'topicSubscribe')
+    unsubSpy = @stub(@model, 'topicUnsubscribe')
+    subSpy = @stub(@model, 'topicSubscribe')
     @model.set({
       subscribed: false
       subscription_hold: false
@@ -76,6 +73,3 @@ define [
     ok !subSpy.called
     ok !unsubSpy.called
     ok !@view.displayStateDuringHover
-
-    @model.topicSubscribe.restore()
-    @model.topicUnsubscribe.restore()

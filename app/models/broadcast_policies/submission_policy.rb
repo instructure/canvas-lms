@@ -58,10 +58,11 @@ module BroadcastPolicies
     private
     def broadcasting_grades?
       course.available? &&
+      !course.concluded? &&
       !assignment.muted? &&
       assignment.published? &&
       submission.quiz_submission.nil? &&
-      user_active_invited_or_concluded?
+      user_active_or_invited?
     end
 
     def assignment
@@ -98,15 +99,11 @@ module BroadcastPolicies
     end
 
     def user_has_visibility?
-      return true unless submission.context.feature_enabled?(:differentiated_assignments)
       AssignmentStudentVisibility.where(assignment_id: submission.assignment_id, user_id: submission.user_id).any?
     end
 
-    def user_active_invited_or_concluded?
-      course.all_student_enrollments.
-        where("enrollments.workflow_state NOT IN ('deleted','inactive','rejected')").
-        where(user_id: submission.user_id).
-        exists?
+    def user_active_or_invited?
+      course.student_enrollments.where(user_id: submission.user_id).to_a.any?{|e| e.active? || e.invited?}
     end
   end
 end

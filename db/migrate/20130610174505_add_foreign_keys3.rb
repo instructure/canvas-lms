@@ -7,8 +7,6 @@ class AddForeignKeys3 < ActiveRecord::Migration
     add_foreign_key_if_not_exists :content_tags, :context_modules, :delay_validation => true
     add_foreign_key_if_not_exists :context_external_tools, :cloned_items, :delay_validation => true
     add_foreign_key_if_not_exists :context_modules, :cloned_items, :delay_validation => true
-    add_foreign_key_if_not_exists :course_imports, :courses, :delay_validation => true
-    add_foreign_key_if_not_exists :course_imports, :courses, :column => :source_id, :delay_validation => true
     add_foreign_key_if_not_exists :course_sections, :enrollment_terms, :delay_validation => true
     add_foreign_key_if_not_exists :course_sections, :courses, :column => :nonxlist_course_id, :delay_validation => true
     add_foreign_key_if_not_exists :course_sections, :accounts, :column => :root_account_id, :delay_validation => true
@@ -28,8 +26,6 @@ class AddForeignKeys3 < ActiveRecord::Migration
     remove_foreign_key_if_exists :course_sections, :column => :root_account_id
     remove_foreign_key_if_exists :course_sections, :column => :nonxlist_course_id
     remove_foreign_key_if_exists :course_sections, :enrollment_terms
-    remove_foreign_key_if_exists :course_imports, :column => :source_id
-    remove_foreign_key_if_exists :course_imports, :courses
     remove_foreign_key_if_exists :context_modules, :cloned_items
     remove_foreign_key_if_exists :context_external_tools, :cloned_items
     remove_foreign_key_if_exists :content_tags, :context_modules

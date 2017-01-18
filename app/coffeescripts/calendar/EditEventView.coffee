@@ -6,13 +6,14 @@ define [
   'Backbone'
   'jst/calendar/editCalendarEventFull'
   'compiled/views/calendar/MissingDateDialogView'
-  'wikiSidebar'
+  'jsx/shared/rce/RichContentEditor'
   'compiled/object/unflatten'
   'compiled/util/deparam'
   'compiled/views/editor/KeyboardShortcuts'
-  'tinymce.editor_box'
-  'compiled/tinymce'
-], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, wikiSidebar, unflatten, deparam, KeyboardShortcuts) ->
+  'compiled/util/coupleTimeFields'
+], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, RichContentEditor, unflatten, deparam, KeyboardShortcuts, coupleTimeFields) ->
+
+  RichContentEditor.preloadRemoteModule()
 
   ##
   # View for editing a calendar event on it's own page
@@ -27,11 +28,17 @@ define [
       'change #use_section_dates': 'toggleUseSectionDates'
       'click .delete_link': 'destroyModel'
       'click .switch_event_description_view': 'toggleHtmlView'
+      'change "#duplicate_event': 'duplicateCheckboxChanged'
 
     initialize: ->
       super
       @model.fetch().done =>
-        picked_params = _.pick(deparam(), 'start_date', 'start_time', 'end_time', 'title', 'description', 'location_name', 'location_address')
+        picked_params = _.pick(deparam(),
+          'start_date', 'start_time', 'end_time',
+          'title', 'description', 'location_name', 'location_address',
+          'duplicate')
+        if picked_params.start_date
+          picked_params.start_date = $.dateString($.fudgeDateForProfileTimezone(picked_params.start_date), {format: 'medium'})
 
         attrs = @model.parse(picked_params)
         # if start and end are at the beginning of a day, assume it is an all day date
@@ -41,9 +48,23 @@ define [
         @render()
 
         # populate inputs with params passed through the url
+        if picked_params.duplicate
+          _.each _.keys(picked_params.duplicate), (key) =>
+            oldKey = key
+            key = "duplicate_#{key}" unless key is "append_iterator"
+            picked_params[key] = picked_params.duplicate[oldKey]
+            delete picked_params.duplicate[key]
+
+          picked_params.duplicate = !!picked_params.duplicate
+
         _.each _.keys(picked_params), (key) =>
-          $e = @$el.find("input[name='#{key}']")
-          $e.val(picked_params[key])
+          $e = @$el.find("input[name='#{key}'], select[name='#{key}']")
+          value = if $e.prop('type') is "checkbox"
+                    [picked_params[key]]
+                  else
+                    picked_params[key]
+          $e.val(value)
+          @enableDuplicateFields($e.val()) if key is "duplicate"
           $e.change()
 
       @model.on 'change:use_section_dates', @toggleUsingSectionClass
@@ -53,16 +74,25 @@ define [
 
       @$(".date_field").date_field()
       @$(".time_field").time_field()
-      $textarea = @$('textarea').editorBox()
-      wikiSidebar.init() unless wikiSidebar.inited
-      wikiSidebar.attachToEditor($textarea).show()
+      @$(".date_start_end_row").each (_, row) =>
+        date = $('.start_date', row).first()
+        start = $('.start_time', row).first()
+        end = $('.end_time', row).first()
+        coupleTimeFields(start, end, date)
+
+      $textarea = @$('textarea')
+      RichContentEditor.initSidebar()
+      RichContentEditor.loadNewEditor($textarea, { focus: true, manageParent: true })
 
       _.defer(@attachKeyboardShortcuts)
+      _.defer(@toggleDuplicateOptions)
       this
 
     attachKeyboardShortcuts: =>
       $('.switch_event_description_view').first().before((new KeyboardShortcuts()).render().$el)
 
+    toggleDuplicateOptions: =>
+      @$el.find(".duplicate_event_toggle_row").toggle(@model.isNew())
 
     destroyModel: =>
       msg = I18n.t "confirm_delete_calendar_event", "Are you sure you want to delete this calendar event?"
@@ -80,7 +110,7 @@ define [
       @updateRemoveChildEvents(e)
     toggleHtmlView: (event) ->
       event?.preventDefault()
-      $("textarea[name=description]").editorBox('toggle')
+      RichContentEditor.callOnRCE($("textarea[name=description]"), 'toggle')
       # hide the clicked link, and show the other toggle link.
       # todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(event.currentTarget).siblings('a').andSelf().toggle()
@@ -105,7 +135,6 @@ define [
             $fields = $('[name*=start_date]:visible').filter -> $(this).val() is ''
             if $fields.length > 0 then $fields else true
           labelFn   : (input) -> $(input).parents('tr').prev().find('label').text()
-          da_enabled: ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED
           success   : ($dialog) =>
             $dialog.dialog('close')
             @$el.disableWhileLoading @model.save eventData, success: =>
@@ -145,7 +174,24 @@ define [
         end_at += end_time.toString(' HH:mm') if end_time
         data[end_at_key] = tz.parse(end_at)
 
+      if @$el.find('#duplicate_event').prop('checked')
+        data.duplicate = {
+          count: @$el.find('#duplicate_count').val()
+          interval: @$el.find('#duplicate_interval').val()
+          frequency: @$el.find('#duplicate_frequency').val()
+          append_iterator: @$el.find('#append_iterator').is(":checked")
+        }
+
       data
 
     @type:  'event'
     @title: -> super 'event', 'Event'
+
+    enableDuplicateFields: (shouldEnable) =>
+      elts = @$el.find(".duplicate_fields").find('input')
+      disableValue = !shouldEnable
+      elts.prop("disabled", disableValue)
+      @$el.find('.duplicate_event_row').toggle(!disableValue)
+
+    duplicateCheckboxChanged: (jsEvent, propagate) =>
+      @enableDuplicateFields(jsEvent.target.checked)

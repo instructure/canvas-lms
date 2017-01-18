@@ -9,7 +9,7 @@
 #
 # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
 # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more 
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
 # details.
 #
 # You should have received a copy of the GNU Affero General Public License along
@@ -27,7 +27,7 @@ module CC
     include WebResources
     include WebLinks
     include BasicLTILinks
-    
+
     delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :to => :@manifest
     delegate :referenced_files, :to => :@html_exporter
 
@@ -44,16 +44,17 @@ module CC
       @html_exporter = CCHelper::HtmlContentExporter.new(@course,
                                                          @manifest.exporter.user,
                                                          :for_course_copy => for_course_copy,
+                                                         :for_epub_export => @manifest.exporter.epub_export?,
                                                          :track_referenced_files => true,
                                                          :media_object_flavor => Setting.get('exporter_media_object_flavor', nil).presence)
     end
-    
+
     def self.create_resources(manifest, manifest_node)
       r = new(manifest, manifest_node)
       r.create_resources
       r
     end
-    
+
     def create_resources
       @manifest_node.resources do |resources|
         @resources = resources
@@ -87,6 +88,6 @@ module CC
       set_progress(progress) if progress
       res
     end
-    
+
   end
 end

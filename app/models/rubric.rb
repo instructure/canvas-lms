@@ -21,18 +21,10 @@ class Rubric < ActiveRecord::Base
   attr_accessible :user, :rubric, :context, :points_possible, :title, :description, :reusable, :public, :free_form_criterion_comments, :hide_score_total
   belongs_to :user
   belongs_to :rubric # based on another rubric
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
+  belongs_to :context, polymorphic: [:course, :account]
   has_many :rubric_associations, :class_name => 'RubricAssociation', :dependent => :destroy
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
-  has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :user_id, :rubric_id, :context_id, :context_type, :data, :points_possible, :title, :description, :created_at, :updated_at, :reusable, :public, :read_only,
-    :association_count, :free_form_criterion_comments, :context_code, :hide_score_total, :workflow_state
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:user, :rubric, :context, :rubric_associations, :rubric_assessments, :learning_outcome_alignments]
+  has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, class_name: 'ContentTag'
 
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -94,7 +86,7 @@ class Rubric < ActiveRecord::Base
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     rubric_associations.update_all(:bookmarked => false, :updated_at => Time.now.utc)
     self.workflow_state = 'deleted'
@@ -215,7 +207,7 @@ class Rubric < ActiveRecord::Base
     return true if params[:free_form_criterion_comments] && !!self.free_form_criterion_comments != (params[:free_form_criterion_comments] == '1')
     data = generate_criteria(params)
     return true if data.title != self.title || data.points_possible != self.points_possible
-    return true if data.criteria != self.criteria
+    return true if Rubric.normalize(data.criteria) != Rubric.normalize(self.criteria)
     false
   end
 
@@ -264,5 +256,22 @@ class Rubric < ActiveRecord::Base
 
   def update_assessments_for_new_criteria(new_criteria)
     criteria = self.data
+    end
+
+  # undo innocuous changes introduced by migrations which break `will_change_with_update?`
+  def self.normalize(criteria)
+    case criteria
+    when Array
+      criteria.map { |criterion| Rubric.normalize(criterion) }
+    when Hash
+      h = criteria.reject { |k, v| v.blank? }.stringify_keys
+      h.delete('title') if h['title'] == h['description']
+      h.each do |k, v|
+        h[k] = Rubric.normalize(v) if v.is_a?(Hash) || v.is_a?(Array)
+      end
+      h
+    else
+      criteria
+    end
   end
 end

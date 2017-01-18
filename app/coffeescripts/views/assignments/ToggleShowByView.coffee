@@ -4,9 +4,10 @@ define [
   'underscore'
   'Backbone'
   'compiled/class/cache'
+  'compiled/util/hasLocalStorage'
   'compiled/models/AssignmentGroup'
   'jst/assignments/ToggleShowBy'
-], (I18n, $, _, Backbone, Cache, AssignmentGroup, template) ->
+], (I18n, $, _, Backbone, Cache, hasLocalStorage, AssignmentGroup, template) ->
 
   class ToggleShowByView extends Backbone.View
     @optionProperty 'course'
@@ -34,7 +35,7 @@ define [
     initializeCache: =>
       return unless @course.get('id')?
       $.extend true, @, Cache
-      @cache.use('localStorage') if ENV.current_user_id? # default: {}
+      @cache.use('localStorage') if hasLocalStorage && ENV.current_user_id? # default: {}
       @cache.set(@cacheKey(), true) if !@cache.get(@cacheKey())?
       @initialized = true
 

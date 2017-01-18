@@ -101,6 +101,9 @@ define [
     assignUnassignedMembers: ->
       $.ajaxJSON "/api/v1/group_categories/#{@id}/assign_unassigned_members", 'POST', {}, @setUpProgress
 
+    cloneGroupCategoryWithName: (name) ->
+      $.ajaxJSON "/group_categories/#{@id}/clone_with_name", 'POST', {name: name}
+
     setUpProgress: (response) =>
       @set progress_url: response.url
 

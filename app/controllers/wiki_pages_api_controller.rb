@@ -139,15 +139,20 @@ class WikiPagesApiController < ApplicationController
   before_filter :get_wiki_page, :except => [:create, :index]
   before_filter :require_wiki_page, :except => [:create, :update, :update_front_page, :index]
   before_filter :was_front_page, :except => [:index]
+  before_filter only: [:show, :update, :destroy, :revisions, :show_revision, :revert] do
+    check_differentiated_assignments(@page) if @context.feature_enabled?(:conditional_release)
+  end
 
   include Api::V1::WikiPage
+  include Api::V1::Assignment
+  include SubmittableHelper
 
   # @API Show front page
   #
   # Retrieve the content of the front page
   #
   # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
+  #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/123/front_page
   #
   # @returns Page
@@ -210,7 +215,7 @@ class WikiPagesApiController < ApplicationController
   #
   #
   # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
+  #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/123/pages?sort=title&order=asc
   #
   # @returns [Page]
@@ -218,14 +223,16 @@ class WikiPagesApiController < ApplicationController
     if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
-      scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
+      scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).preload(:user)
       if params.has_key?(:published)
         scope = value_to_boolean(params[:published]) ? scope.published : scope.unpublished
       else
         scope = scope.not_deleted
       end
-      # published parameter notwithstanding, hide unpublished items if the user doesn't have permission to see them
-      scope = scope.published unless @context.grants_right?(@current_user, session, :view_unpublished_items)
+
+      @context.shard.activate do
+        scope = WikiPages::ScopedToUser.new(@context.wiki, @current_user, scope).scope
+      end
 
       scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
 
@@ -276,7 +283,7 @@ class WikiPagesApiController < ApplicationController
   #   Set an unhidden page as the front page (if true)
   #
   # @example_request
-  #     curl -X POST -H 'Authorization: Bearer <token>' \ 
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
   #     https://<canvas>/api/v1/courses/123/pages \
   #     -d wiki_page[title]=New+page
   #     -d wiki_page[body]=New+body+text
@@ -293,6 +300,7 @@ class WikiPagesApiController < ApplicationController
 
       if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
+        apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
         render :json => wiki_page_json(@page, @current_user, session)
       else
         render :json => @page.errors, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
@@ -305,7 +313,7 @@ class WikiPagesApiController < ApplicationController
   # Retrieve the content of a wiki page
   #
   # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
+  #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/123/pages/my-page-url
   #
   # @returns Page
@@ -315,7 +323,7 @@ class WikiPagesApiController < ApplicationController
       render :json => wiki_page_json(@page, @current_user, session)
     end
   end
-  
+
   # @API Update/create page
   #
   # Update the title or contents of a wiki page
@@ -346,7 +354,7 @@ class WikiPagesApiController < ApplicationController
   #   Set an unhidden page as the front page (if true)
   #
   # @example_request
-  #     curl -X PUT -H 'Authorization: Bearer <token>' \ 
+  #     curl -X PUT -H 'Authorization: Bearer <token>' \
   #     https://<canvas>/api/v1/courses/123/pages/the-page-url \
   #     -d 'wiki_page[body]=Updated+body+text'
   #
@@ -364,6 +372,7 @@ class WikiPagesApiController < ApplicationController
       if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         @page.context_module_action(@current_user, @context, :contributed)
+        apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
         render :json => wiki_page_json(@page, @current_user, session)
       else
         render :json => @page.errors, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
@@ -376,7 +385,7 @@ class WikiPagesApiController < ApplicationController
   # Delete a wiki page
   #
   # @example_request
-  #     curl -X DELETE -H 'Authorization: Bearer <token>' \ 
+  #     curl -X DELETE -H 'Authorization: Bearer <token>' \
   #     https://<canvas>/api/v1/courses/123/pages/the-page-url
   #
   # @returns Page
@@ -482,7 +491,7 @@ class WikiPagesApiController < ApplicationController
   def is_front_page_action?
     !!action_name.match(/_front_page$/)
   end
-  
+
   def get_wiki_page
     @wiki = @context.wiki
 
@@ -521,7 +530,7 @@ class WikiPagesApiController < ApplicationController
     @was_front_page = false
     @was_front_page = @page.is_front_page? if @page
   end
-  
+
   def get_update_params(allowed_fields=Set[])
     # normalize parameters
     page_params = (params[:wiki_page] || {}).slice(*%w(title body notify_of_update published front_page editing_roles))
@@ -624,6 +633,10 @@ class WikiPagesApiController < ApplicationController
     end
 
     page_params
+  end
+
+  def assignment_params
+    params[:wiki_page] && params[:wiki_page][:assignment]
   end
 
   def process_front_page

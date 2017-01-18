@@ -2,6 +2,8 @@ module RuboCop
   module Cop
     module Migration
       class PrimaryKey < Cop
+        MSG = "Please always include a primary key"
+
         def on_send(node)
           _receiver, method_name, *args = *node
           if method_name == :create_table
@@ -16,8 +18,7 @@ module RuboCop
           return unless options.hash_type?
 
           if options.children.find { |pair| pair == NO_PK }
-            message = "Please always include a primary key"
-            add_offense(node, :expression, message)
+            add_offense(node, :expression, MSG, :warning)
           end
         end
       end

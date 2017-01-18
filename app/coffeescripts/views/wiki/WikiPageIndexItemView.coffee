@@ -77,6 +77,7 @@ define [
       indexView = @indexView
       collection = @collection
       editDialog.on 'success', ->
+        indexView.focusAfterRenderSelector = 'a#' + @model.get('page_id') + '.al-trigger';
         indexView.currentSortField = null
         indexView.renderSortHeaders()
 

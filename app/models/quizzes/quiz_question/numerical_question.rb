@@ -56,6 +56,18 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
         min = val - margin
         max = val + margin
         answer_number >= min && answer_number <= max
+      elsif answer[:numerical_answer_type] == "precision_answer"
+        submission = answer_number.split
+        expected = BigDecimal.new(answer[:approximate].to_s).split
+        precision = answer[:precision].to_i
+
+        # compare sign
+        submission[0] == expected[0] &&
+        # compare significant digits truncated to precision
+        submission[1][0, precision] == expected[1][0, precision] &&
+        # base is always 10
+        # compare exponent
+        submission[3] == expected[3]
       else
         FlexRange.new(answer[:start], answer[:end]).cover?(answer_number)
       end
@@ -74,9 +86,11 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
 
     @question_data.answers.each do |answer|
       if answer[:numerical_answer_type] == 'exact_answer'
-        answer[:text] = I18n.t('statistics.exact_answer', "%{exact_value} +/- %{margin}", :exact_value => answer[:exact], :margin => answer[:margin])
+        answer[:text] = I18n.t("%{exact_value} +/- %{margin}", :exact_value => answer[:exact], :margin => answer[:margin])
+      elsif answer[:numerical_answer_type] == 'precision_answer'
+        answer[:text] = I18n.t("%{approximate_value} with precision %{precision}", :approximate_value => answer[:approximate], :precision => answer[:precision])
       else
-        answer[:text] = I18n.t('statistics.inexact_answer', "%{lower_bound} to %{upper_bound}", :lower_bound => answer[:start], :upper_bound => answer[:end])
+        answer[:text] = I18n.t("%{lower_bound} to %{upper_bound}", :lower_bound => answer[:start], :upper_bound => answer[:end])
       end
     end
 

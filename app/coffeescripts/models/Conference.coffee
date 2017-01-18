@@ -18,7 +18,7 @@ define [
       multipleRecordings: @get('recordings').length > 1
 
     permissions_data: ->
-      has_actions: @get('permissions')['edit'] || @get('permissions')['delete']
+      has_actions: @get('permissions')['update'] || @get('permissions')['delete']
       show_end: @get('permissions')['close'] && @get('started_at') && !@get('ended_at')
 
     schedule_data: ->

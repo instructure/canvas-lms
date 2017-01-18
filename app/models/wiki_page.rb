@@ -18,37 +18,45 @@
 
 require 'atom'
 
+# Force loaded so that it will be in ActiveRecord::Base.descendants for switchman to use
+require_dependency 'assignment_student_visibility'
+
 class WikiPage < ActiveRecord::Base
-  attr_accessible :title, :body, :url, :user_id, :editing_roles, :notify_of_update
+  attr_accessible :title, :body, :url, :user_id, :user, :editing_roles, :notify_of_update
   attr_readonly :wiki_id
+  attr_accessor :saved_by
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :wiki_id
   include Workflow
   include HasContentTags
   include CopyAuthorizedLinks
   include ContextModuleItem
+  include Submittable
 
   include SearchTermHelper
 
   after_update :post_to_pandapub_when_revised
 
   belongs_to :wiki, :touch => true
+  belongs_to :course, foreign_key: 'wiki_id', primary_key: 'wiki_id'
+  belongs_to :group, foreign_key: 'wiki_id', primary_key: 'wiki_id'
   belongs_to :user
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :wiki_id, :title, :body, :workflow_state, :recent_editors, :user_id, :created_at, :updated_at, :url, :delayed_post_at, :protected_editing,
-    :editing_roles, :view_count, :revised_at, :could_be_locked, :cloned_item_id, :wiki_page_comments_count
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:wiki, :user]
 
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true
 
   validate :validate_front_page_visibility
 
+  before_save :default_submission_values,
+    if: proc { self.context.try(:feature_enabled?, :conditional_release) }
   before_save :set_revised_at
   before_validation :ensure_unique_title
-  after_save :touch_wiki_context
+  after_save  :touch_wiki_context
+  after_save  :update_assignment,
+    if: proc { self.context.try(:feature_enabled?, :conditional_release) }
+
+  scope :without_assignment_in_course, lambda { |course_ids|
+    where(assignment_id: nil).joins(:course).where(courses: {id: course_ids})
+  }
 
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update]
@@ -89,8 +97,8 @@ class WikiPage < ActiveRecord::Base
 
   def self.title_order_by_clause
     best_unicode_collation_key('wiki_pages.title')
-  end  
-  
+  end
+
   def ensure_unique_url
     url_attribute = self.class.url_attribute
     base_url = self.send(url_attribute)
@@ -112,11 +120,11 @@ class WikiPage < ActiveRecord::Base
         return unless send(scope)
         base_scope = base_scope.send(scope)
       else
-        conditions.first << " and #{connection.quote_column_name(scope)} = ?"
+        conditions.first << " and #{self.class.connection.quote_column_name(scope)} = ?"
         conditions << send(scope)
       end
     end
-    url_owners = base_scope.where(conditions).all
+    url_owners = base_scope.where(conditions).to_a
     # This is the part in stringex that messed us up, since it will never allow
     # a url of "front-page" once "front-page-1" or "front-page-2" is created
     # We modify it to allow "front-page" and start the indexing at "front-page-2"
@@ -171,14 +179,9 @@ class WikiPage < ActiveRecord::Base
   end
   alias_method :published?, :active?
 
-  def restore
-    self.workflow_state = 'unpublished'
-    self.save
-  end
-
   def set_revised_at
     self.revised_at ||= Time.now
-    self.revised_at = Time.now if self.body_changed?
+    self.revised_at = Time.now if self.body_changed? || self.title_changed?
     @page_changed = self.body_changed? || self.title_changed?
     true
   end
@@ -218,11 +221,11 @@ class WikiPage < ActiveRecord::Base
 
   def locked_for?(user, opts={})
     return false unless self.could_be_locked
-    Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
+    Rails.cache.fetch([locked_cache_key(user), opts[:deep_check_if_needed]].cache_key, :expires_in => 1.minute) do
       locked = false
       if item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
-        locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"]
+        locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"] && locked[:context_module]["unlock_at"] > Time.now.utc
       end
       locked
     end
@@ -256,9 +259,6 @@ class WikiPage < ActiveRecord::Base
     given {|user, session| self.can_read_page?(user, session)}
     can :read
 
-    given {|user| self.can_edit_page?(user)}
-    can :read
-
     given {|user| user && self.can_edit_page?(user)}
     can :update_content and can :read_revisions
 
@@ -279,12 +279,13 @@ class WikiPage < ActiveRecord::Base
   end
 
   def can_read_page?(user, session=nil)
-    return true if self.wiki.grants_right?(user, session, :manage)
     return true if self.unpublished? && self.wiki.grants_right?(user, session, :view_unpublished_items)
     self.published? && self.wiki.grants_right?(user, session, :read)
   end
 
   def can_edit_page?(user, session=nil)
+    return false unless can_read_page?(user, session)
+
     # wiki managers are always allowed to edit
     return true if wiki.grants_right?(user, session, :manage)
 
@@ -310,7 +311,7 @@ class WikiPage < ActiveRecord::Base
     return true if wiki.grants_right?(user, session, :manage)
 
     return false unless published? || (unpublished? && wiki.grants_right?(user, session, :view_unpublished_items))
-    return false if locked_for?(user)
+    return false if locked_for?(user, :deep_check_if_needed => true)
 
     true
   end
@@ -360,7 +361,7 @@ class WikiPage < ActiveRecord::Base
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{self.feed_code}_#{self.updated_at.strftime("%Y-%m-%d")}"
-      entry.links    << Atom::Link.new(:rel => 'alternate', 
+      entry.links    << Atom::Link.new(:rel => 'alternate',
                                     :href => "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/pages/#{self.url}")
       entry.content   = Atom::Content::Html.new(self.body || t('defaults.no_content', "no content"))
     end
@@ -391,7 +392,15 @@ class WikiPage < ActiveRecord::Base
   end
 
   def can_unpublish?
-    !is_front_page?
+    return @can_unpublish unless @can_unpublish.nil?
+    @can_unpublish = !is_front_page?
+  end
+  attr_writer :can_unpublish
+
+  def self.preload_can_unpublish(context, wiki_pages)
+    return unless wiki_pages.any?
+    front_page_url = context.wiki.get_front_page_url
+    wiki_pages.each{|wp| wp.can_unpublish = !(wp.url == front_page_url)}
   end
 
   def initialize_wiki_page(user)

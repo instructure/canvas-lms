@@ -1,0 +1,24 @@
+{
+  "@context": "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
+  "@graph": [
+    {
+      "@type": "LtiLinkItem",
+      "@id": "http://lti-tool-provider-example.dev/messages/blti",
+      "url": "http://lti-tool-provider-example.dev/messages/blti",
+      "title": "Its your computer",
+      "text": "Arch Linux",
+      "mediaType": "application/vnd.ims.lti.v1.ltilink",
+      "windowTarget": "",
+      "placementAdvice": {
+        "displayWidth": 800,
+        "presentationDocumentTarget": "iframe",
+        "displayHeight": 600
+      },
+      "thumbnail": {
+        "@id": "http://www.runeaudio.com/assets/img/banner-archlinux.png",
+        "height": 128,
+        "width": 128
+      }
+    }
+  ]
+}

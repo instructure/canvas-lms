@@ -80,6 +80,8 @@ require [
         return @detail.render()
       else if messages.length > 1
         delete @detail.model
+
+        messages[0].set('canArchive', @filters.type != 'sent')
         @detail.onModelChange(messages[0], null)
         @detail.render(batch: true)
         @header.onModelChange(messages[0], null)
@@ -96,6 +98,8 @@ require [
           @detail.$el.disableWhileLoading(@lastFetch)
 
     selectConversation: (model) =>
+      if model
+        model.set('canArchive', @filters.type != 'sent')
       @header.onModelChange(model, null)
       @detail.onModelChange(model, null)
       @detail.render()
@@ -197,7 +201,11 @@ require [
         @list.collection.remove(messages)
 
     onFilter: (filters) =>
-      @navigate('filter='+$.param(filters), {trigger: true})
+      # Update the hash. Replace if there isn't already a hash - we're in the
+      # process of loading the page if so, and we wouldn't want to create a
+      # spurious history entry by not doing so.
+      existingHash = window.location.hash && window.location.hash.substring(1)
+      @navigate('filter='+$.param(filters), {trigger: true, replace: !existingHash})
 
     onCourse: (course) =>
       @list.updateCourse(course)
@@ -265,10 +273,13 @@ require [
       $(window).keydown(@onKeyDown)
 
     onPageLoad: (e) ->
-      # we add the top style here instead of in the css because
-      # we want to accomodate custom css that changes the height
-      # of the header.
-      $('#main').css(display: 'block', top: $('#header').height())
+      if window.ENV.use_new_styles
+         $('#main').css(display: 'block')
+      else
+        # we add the top style here instead of in the css because
+        # we want to accomodate custom css that changes the height
+        # of the header.
+        $('#main').css(display: 'block', top: $('#header').height())
 
     onSubmit: (dfd) =>
       @_incrementSending(1)

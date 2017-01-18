@@ -30,10 +30,12 @@ class CourseLinkValidator
     progress.set_results({error_report_id: report_id, completed_at: Time.now.utc})
   end
 
-  attr_accessor :course, :issues, :visited_urls
+  attr_accessor :course, :domain_regex, :issues, :visited_urls
 
   def initialize(course)
     self.course = course
+    domain = course.root_account.domain
+    self.domain_regex = %r{\w+:?\/\/#{domain}\/} if domain
     self.issues = []
     self.visited_urls = {}
   end
@@ -50,12 +52,14 @@ class CourseLinkValidator
 
     # Assessment questions
     self.course.assessment_questions.active.each do |aq|
+      next if aq.assessment_question_bank.deleted?
       check_question(aq)
     end
     progress.update_completion! 15
 
     # Assignments
     self.course.assignments.active.each do |assignment|
+      next if assignment.quiz || assignment.discussion_topic
       find_invalid_links(assignment.description) do |links|
         self.issues << {:name => assignment.title, :type => :assignment,
                    :content_url => "/courses/#{self.course.id}/assignments/#{assignment.id}"}.merge(:invalid_links => links)
@@ -167,23 +171,42 @@ class CourseLinkValidator
     yield links if links.any?
   end
 
+  ITEM_CLASSES = {
+    'assignments' => Assignment,
+    'announcements' => Announcement,
+    'calendar_events' => CalendarEvent,
+    'discussion_topics' => DiscussionTopic,
+    'collaborations' => Collaboration,
+    'files' => Attachment,
+    'quizzes' => Quizzes::Quiz,
+    'groups' => Group,
+    'wiki' => WikiPage,
+    'pages' => WikiPage,
+    'modules' => ContextModule,
+    'items' => ContentTag
+  }
+
   # yields a hash containing the url and an error type if the url is invalid
   def find_invalid_link(url)
     unless result = self.visited_urls[url]
       begin
-        if ImportedHtmlConverter.relative_url?(url)
-          if url =~ /\/courses\/\d+\/file_contents\/(.*)/
-            rel_path = CGI.unescape($1)
-            unless Folder.find_attachment_in_context_with_path(self.course, rel_path)
-              result = :missing_file
+        if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
+
+          if valid_route?(url)
+            if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
+              result = :course_mismatch
+            else
+              result = check_object_status(url)
             end
+          else
+            result = :unreachable
           end
         elsif !url.start_with?('mailto:')
           unless reachable_url?(url)
             result = :unreachable
           end
         end
-      rescue URI::InvalidURIError
+      rescue URI::Error
         result = :unparsable
       end
       result ||= :success
@@ -196,12 +219,75 @@ class CourseLinkValidator
     end
   end
 
+  # checks against the Rails routes to see if the url matches anything
+  def valid_route?(url)
+    path = URI.parse(url).path
+    path = path.chomp("/")
+
+    @route_set ||= ::Rails.application.routes.set.routes.select{|r| r.verb === "GET"}
+    @route_set.any?{|r| r.path.match(path)} || (!Pathname(path).each_filename.include?('..') && File.exists?(File.join(Rails.root, "public", path)))
+  end
+
+  # makes sure that links to course objects exist and are in a visible state
+  def check_object_status(url)
+    result = nil
+    case url
+    when /\/courses\/\d+\/file_contents\/(.*)/
+      rel_path = CGI.unescape($1)
+      unless (att = Folder.find_attachment_in_context_with_path(self.course, rel_path)) && !att.deleted?
+        result = :missing_file
+      end
+    when /\/courses\/\d+\/(pages|wiki)\/([^\s"<'\?\/#]*)/
+      if obj = self.course.wiki.find_page(CGI.unescape($2))
+        if obj.workflow_state == 'unpublished'
+          result = :unpublished_item
+        end
+      else
+        result = :missing_item
+      end
+    when /\/courses\/\d+\/(.*)\/(\d+)/
+      obj_type =  $1
+      obj_id = $2
+
+      if obj_class = ITEM_CLASSES[obj_type]
+        if (obj_class == Attachment) && (obj = self.course.attachments.find_by_id(obj_id)) # attachments.find_by_id uses the replacement hackery
+          if obj.file_state == 'deleted'
+            result = :missing_item
+          elsif obj.locked?
+            result = :unpublished_item
+          end
+        elsif (obj = obj_class.where(:id => obj_id).first)
+          if obj.workflow_state == 'deleted'
+            result = :missing_item
+          elsif obj.workflow_state == 'unpublished'
+            result = :unpublished_item
+          end
+        else
+          result = :missing_item
+        end
+      end
+    end
+    result
+  end
+
   # ping the url and make sure we get a 200
   def reachable_url?(url)
     begin
-      CanvasHttp.get(url).is_a?(Net::HTTPOK)
-    rescue CanvasHttp::Error
-      false
+      response = CanvasHttp.head(url, { "Accept-Encoding" => "gzip" }, 9)
+      if %w{404 405}.include?(response.code)
+        response = CanvasHttp.get(url, { "Accept-Encoding" => "gzip" }, 9)
+      end
+
+      case response.code
+      when /^2/ # 2xx code
+        true
+      when "401", "403", "503"
+        # we accept unauthorized and forbidden codes here because sometimes servers refuse to serve our requests
+        # and someone can link to a site that requires authentication anyway - doesn't necessarily make it invalid
+        true
+      else
+        false
+      end
     rescue
       false
     end

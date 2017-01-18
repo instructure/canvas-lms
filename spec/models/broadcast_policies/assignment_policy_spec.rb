@@ -8,13 +8,13 @@ module BroadcastPolicies
       ctx.stubs(:concluded?).returns(false)
       ctx
     }
-    let(:prior_version) { stub(:due_at => 7.days.ago, :points_possible => 50) }
+    let(:prior_version) { stub(:due_at => 7.days.ago, :points_possible => 50, :workflow_state => 'published') }
     let(:assignment) do
       stub(:context => context, :prior_version => prior_version,
            :published? => true, :muted? => false, :created_at => 4.hours.ago,
            :changed_in_state => true, :due_at => Time.now,
            :points_possible => 100, :assignment_changed => false,
-           :just_created => true)
+           :just_created => true, :workflow_state => 'published')
     end
 
     let(:policy) { AssignmentPolicy.new(assignment) }
@@ -25,6 +25,11 @@ module BroadcastPolicies
       end
 
       it 'is true when an assignment is published' do
+        expect(policy.should_dispatch_assignment_created?).to be_truthy
+      end
+
+      it 'is true when the prior version was unpublished' do
+        prior_version.stubs(:workflow_state).returns 'unpublished'
         expect(policy.should_dispatch_assignment_created?).to be_truthy
       end
 

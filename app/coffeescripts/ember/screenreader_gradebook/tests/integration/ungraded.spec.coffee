@@ -7,9 +7,8 @@ define [
 
   App = null
 
-  fixtures.create()
-
   setup = (initialSetting) ->
+    fixtures.create()
     userSettings.contextSet 'include_ungraded_assignments', initialSetting
     App = startApp()
     visit('/')

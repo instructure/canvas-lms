@@ -78,7 +78,7 @@ require [
   # Add the loading indicator now that the collections are fetching
   $('#loading_indicator').replaceWith '<img src="/images/ajax-reload-animated.gif">'
 
-  # Binding to the mini calendar must take place after wikiSidebar initializes,
+  # Binding to the mini calendar must take place after sidebar initializes,
   # so this must be done on dom ready
   $ ->
     SyllabusBehaviors.bindToEditSyllabus()

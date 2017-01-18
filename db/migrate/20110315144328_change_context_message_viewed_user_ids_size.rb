@@ -1,4 +1,6 @@
 class ChangeContextMessageViewedUserIdsSize < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     change_column :context_messages, :viewed_user_ids, :text
   end

@@ -4,7 +4,7 @@ define [
   'compiled/views/ValidatedFormView'
   'underscore'
   'jquery'
-  'wikiSidebar'
+  'jsx/shared/rce/RichContentEditor'
   'jst/assignments/EditView'
   'compiled/userSettings'
   'compiled/models/TurnitinSettings'
@@ -15,14 +15,14 @@ define [
   'compiled/views/assignments/GroupCategorySelector'
   'compiled/jquery/toggleAccessibly'
   'compiled/views/editor/KeyboardShortcuts'
-  'compiled/tinymce'
-  'tinymce.editor_box'
   'jqueryui/dialog'
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
-], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
+], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, template,
 userSettings, TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
 AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts) ->
+
+  RichContentEditor.preloadRemoteModule()
 
   class EditView extends ValidatedFormView
 
@@ -53,6 +53,9 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
     ASSIGNMENT_POINTS_POSSIBLE = '#assignment_points_possible'
     ASSIGNMENT_POINTS_CHANGE_WARN = '#point_change_warning'
 
+    PEER_REVIEWS_BOX = '#assignment_peer_reviews'
+    GROUP_CATEGORY_BOX = '#has_group_category'
+    MODERATED_GRADING_BOX = '#assignment_moderated_grading'
 
     els: _.extend({}, @::els, do ->
       els = {}
@@ -78,6 +81,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       els["#{EXTERNAL_TOOLS_CONTENT_ID}"] = '$externalToolsContentId'
       els["#{ASSIGNMENT_POINTS_POSSIBLE}"] = '$assignmentPointsPossible'
       els["#{ASSIGNMENT_POINTS_CHANGE_WARN}"] = '$pointsChangeWarning'
+      els["#{MODERATED_GRADING_BOX}"] = '$moderatedGradingBox'
       els
     )
 
@@ -90,9 +94,11 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       events["click #{ADVANCED_TURNITIN_SETTINGS}"] = 'showTurnitinDialog'
       events["change #{TURNITIN_ENABLED}"] = 'toggleAdvancedTurnitinSettings'
       events["change #{ALLOW_FILE_UPLOADS}"] = 'toggleRestrictFileUploads'
-      events["click #{EXTERNAL_TOOLS_URL}"] = 'showExternalToolsDialog'
-      events["click #{EXTERNAL_TOOLS_URL}_screenreader_button"] = 'showExternalToolsDialogForScreenreader'
+      events["click #{EXTERNAL_TOOLS_URL}_find"] = 'showExternalToolsDialog'
       events["change #assignment_points_possible"] = 'handlePointsChange'
+      events["change #{PEER_REVIEWS_BOX}"] = 'handleModeratedGradingChange'
+      events["change #{GROUP_CATEGORY_BOX}"] = 'handleModeratedGradingChange'
+      events["change #{MODERATED_GRADING_BOX}"] = 'handleModeratedGradingChange'
       events
     )
 
@@ -124,6 +130,43 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       if @assignment.hasSubmittedSubmissions()
         @$pointsChangeWarning.toggleAccessibly(@$assignmentPointsPossible.val() != "#{@assignment.pointsPossible()}")
 
+    checkboxAccessibleAdvisory: (box) ->
+      label = box.parent()
+      advisory = label.find('span.screenreader-only.accessible_label')
+      advisory = $('<span class="screenreader-only accessible_label"></span>').appendTo(label) unless advisory.length
+      advisory
+
+    setImplicitCheckboxValue: (box, value) ->
+      $("input[type='hidden'][name='#{box.attr('name')}']", box.parent()).attr('value', value)
+
+    disableCheckbox: (box, message) ->
+      box.prop("disabled", true).parent().attr('data-tooltip', 'top').data('tooltip', {disabled: false}).attr('title', message)
+      @setImplicitCheckboxValue(box, if box.prop('checked') then '1' else '0')
+      @checkboxAccessibleAdvisory(box).text(message)
+
+    enableCheckbox: (box) ->
+      if box.prop("disabled")
+        box.removeProp("disabled").parent().timeoutTooltip().timeoutTooltip('disable').removeAttr('data-tooltip').removeAttr('title')
+        @setImplicitCheckboxValue(box, '0')
+        @checkboxAccessibleAdvisory(box).text('')
+
+    handleModeratedGradingChange: =>
+      if !ENV?.HAS_GRADED_SUBMISSIONS
+        if @$moderatedGradingBox.prop('checked')
+          @disableCheckbox(@$peerReviewsBox, I18n.t("Peer reviews cannot be enabled for moderated assignments"))
+          @disableCheckbox(@$groupCategoryBox, I18n.t("Group assignments cannot be enabled for moderated assignments"))
+          @enableCheckbox(@$moderatedGradingBox)
+        else
+          if @$groupCategoryBox.prop('checked')
+            @disableCheckbox(@$moderatedGradingBox,  I18n.t("Moderated grading cannot be enabled for group assignments"))
+          else if @$peerReviewsBox.prop('checked')
+            @disableCheckbox(@$moderatedGradingBox, I18n.t("Moderated grading cannot be enabled for peer reviewed assignments"))
+          else
+            @enableCheckbox(@$moderatedGradingBox)
+
+          @enableCheckbox(@$peerReviewsBox)
+          @enableCheckbox(@$groupCategoryBox)
+
     setDefaultsIfNew: =>
       if @assignment.isNew()
         if userSettings.contextGet('new_assignment_settings')
@@ -131,7 +174,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
             setting_from_cache = userSettings.contextGet('new_assignment_settings')[setting]
             if setting_from_cache == "1" || setting_from_cache == "0"
               setting_from_cache = parseInt setting_from_cache
-            if setting_from_cache && (!@assignment.get(setting) || @assignment.get(setting)?.length == 0)
+            if setting_from_cache && (!@assignment.get(setting)? || @assignment.get(setting)?.length == 0)
               @assignment.set(setting, setting_from_cache)
           )
         else
@@ -162,10 +205,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
           @$externalToolsUrl.val(data['item[url]'])
           @$externalToolsNewTab.prop('checked', data['item[new_tab]'] == '1')
 
-    showExternalToolsDialogForScreenreader: (ev) =>
-      ev.preventDefault()
-      @showExternalToolsDialog()
-
     toggleRestrictFileUploads: =>
       @$restrictFileUploadsOptions.toggleAccessibly @$allowFileUploads.prop('checked')
 
@@ -188,9 +227,15 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       @$peerReviewsFields.toggleAccessibly subVal != 'external_tool'
 
     afterRender: =>
+      # have to do these here because they're rendered by other things
+      @$peerReviewsBox = $("#{PEER_REVIEWS_BOX}")
+      @$groupCategoryBox = $("#{GROUP_CATEGORY_BOX}")
+
       @_attachEditorToDescription()
-      $ @_initializeWikiSidebar
       @addTinyMCEKeyboardShortcuts()
+      @handleModeratedGradingChange()
+      if ENV?.HAS_GRADED_SUBMISSIONS
+        @disableCheckbox(@$moderatedGradingBox, I18n.t("Moderated grading setting cannot be changed if graded submissions exist"))
       this
 
     toJSON: =>
@@ -200,22 +245,19 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
         postToSISEnabled: ENV?.POST_TO_SIS or false
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
-        differentiatedAssignmentsEnabled: @assignment.differentiatedAssignmentsEnabled()
+
+    # separated out so we can easily stub it
+    scrollSidebar: $.scrollSidebar
 
     _attachEditorToDescription: =>
-      @$description.editorBox()
+      RichContentEditor.initSidebar(show: @scrollSidebar)
+      RichContentEditor.loadNewEditor(@$description, { focus: true, manageParent: true })
+
       $('.rte_switch_views_link').click (e) =>
         e.preventDefault()
-        @$description.editorBox 'toggle'
+        RichContentEditor.callOnRCE(@$description, 'toggle')
         # hide the clicked link, and show the other toggle link.
         $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
-
-    _initializeWikiSidebar: =>
-      # $("#sidebar_content").hide()
-      unless wikiSidebar.inited
-        wikiSidebar.init()
-        $.scrollSidebar()
-      wikiSidebar.attachToEditor(@$description).show()
 
     addTinyMCEKeyboardShortcuts: =>
       keyboardShortcutsView = new RCEKeyboardShortcuts()
@@ -236,8 +278,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       data.lock_at = defaultDates?.get('lock_at') or null
       data.unlock_at = defaultDates?.get('unlock_at') or null
       data.due_at = defaultDates?.get('due_at') or null
-      if ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
-        data.only_visible_to_overrides = !@dueDateOverrideView.overridesContainDefault()
+      data.only_visible_to_overrides = !@dueDateOverrideView.overridesContainDefault()
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
       data.published = true if @shouldPublish
       return data
@@ -253,7 +294,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
         missingDateDialog = new MissingDateDialog
           validationFn: -> sections
           labelFn: (section) -> section.get 'name'
-          da_enabled: ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
           success: (dateDialog) =>
             dateDialog.dialog('close').remove()
             ValidatedFormView::submit.call(this)
@@ -332,11 +372,15 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       errors
 
     _validateTitle: (data, errors) =>
-      frozenTitle = _.contains(@model.frozenAttributes(), "title")
+      return errors if _.contains(@model.frozenAttributes(), "title")
 
-      if !frozenTitle and (!data.name or $.trim(data.name.toString()).length == 0)
+      if !data.name or $.trim(data.name.toString()).length == 0
         errors["name"] = [
           message: I18n.t 'name_is_required', 'Name is required!'
+        ]
+      else if $.trim(data.name.toString()).length > 255
+        errors["name"] = [
+          message: I18n.t 'name_too_long', 'Name is too long'
         ]
       errors
 
@@ -348,16 +392,16 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       errors
 
     _validateAllowedExtensions: (data, errors) =>
-      if data.allowed_extensions and data.allowed_extensions.length == 0
+      if (data.allowed_extensions and _.contains(data.submission_types, "online_upload")) and data.allowed_extensions.length == 0
         errors["allowed_extensions"] = [
           message: I18n.t 'at_least_one_file_type', 'Please specify at least one allowed file type'
         ]
       errors
 
     _validatePointsPossible: (data, errors) =>
-      frozenPoints = _.contains(@model.frozenAttributes(), "points_possible")
+      return errors if _.contains(@model.frozenAttributes(), "points_possible")
 
-      if !frozenPoints and data.points_possible and isNaN(parseFloat(data.points_possible))
+      if data.points_possible and isNaN(parseFloat(data.points_possible))
         errors["points_possible"] = [
           message: I18n.t 'points_possible_number', 'Points possible must be a number'
         ]

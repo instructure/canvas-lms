@@ -9,7 +9,7 @@ describe "Converting Canvas QTI" do
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq CanvasExpected::MULTIPLE_CHOICE
   end
-  
+
   it "should convert true false" do
     manifest_node=get_manifest_node('true_false')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
@@ -24,54 +24,60 @@ describe "Converting Canvas QTI" do
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq CanvasExpected::TRUE_FALSE
   end
-  
+
   it "should convert multiple answers" do
     manifest_node=get_manifest_node('multiple_answers')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq CanvasExpected::MULTIPLE_ANSWERS
   end
-  
+
   it "should convert essays" do
     manifest_node=get_manifest_node('essay')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     expect(hash).to eq CanvasExpected::ESSAY
   end
-  
+
+  it "should prefer extendedTextInteraction > prompt over empty div when convering essays" do
+    manifest_node=get_manifest_node('essay2')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
+    expect(hash[:question_text]).to include "What is the difference between a tree?"
+  end
+
   it "should convert short answer" do
     manifest_node=get_manifest_node('short_answer')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq CanvasExpected::SHORT_ANSWER
   end
-  
+
   it "should convert text only questions" do
     manifest_node=get_manifest_node('text_only')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     expect(hash).to eq CanvasExpected::TEXT_ONLY
   end
-  
+
   it "should convert fill in multiple blanks questions" do
     manifest_node=get_manifest_node('fimb', :question_type=>'fill_in_multiple_blanks_question')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq CanvasExpected::FIMB
   end
-  
+
   it "should convert fill in multiple drop downs questions" do
     manifest_node=get_manifest_node('multiple_dropdowns', :question_type=>'multiple_dropdowns_question')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq CanvasExpected::MULTIPLE_DROP_DOWNS
   end
-  
+
   it "should convert matching questions" do
     manifest_node=get_manifest_node('matching', :question_type=>'matching_question')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq CanvasExpected::MATCHING
   end
-  
+
   it "should convert calculated questions (simple)" do
     manifest_node=get_manifest_node('calculated_simple', :question_type=>'calculated_question', :interaction_type => 'extendedTextInteraction')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
@@ -85,14 +91,14 @@ describe "Converting Canvas QTI" do
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq CanvasExpected::CALCULATED_WITHOUT_FORMULA
   end
-  
+
   it "should convert calculated questions (complex)" do
     manifest_node=get_manifest_node('calculated', :question_type=>'calculated_question', :interaction_type => 'extendedTextInteraction')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq CanvasExpected::CALCULATED_COMPLEX
   end
-  
+
   it "should convert numerical questions" do
     manifest_node=get_manifest_node('numerical', :question_type=>'numerical_question', :interaction_type => 'extendedTextInteraction')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
@@ -131,6 +137,7 @@ describe "Converting Canvas QTI" do
 
   it "should convert links to external banks" do
     expect(get_quiz_data(CANVAS_FIXTURE_DIR, 'external_bank')[1][0][:questions]).to eq [{:pick_count => 3,
+                                                                                  :title => "group",
                                                                                   :questions => [],
                                                                                   :question_points => 5,
                                                                                   :question_type => "question_group",
@@ -139,6 +146,7 @@ describe "Converting Canvas QTI" do
                                                                                   :question_bank_migration_id => "4259",
                                                                                   :question_bank_is_external => true},
                                                                                  {:pick_count => 5,
+                                                                                  :title => "group2",
                                                                                   :questions => [],
                                                                                   :question_points => 2,
                                                                                   :question_type => "question_group",
@@ -218,12 +226,12 @@ module CanvasExpected
            :question_text=>"Why do we have so many types now‽ &lt;-- unicode character, you're screwed!",
            :migration_id=>"id79fb07bfd06d28f0c92a599116244f1",
            :incorrect_comments=>""}
-  
+
   SHORT_ANSWER = {:incorrect_comments=>"Incorrect overall feedback",
                   :question_type=>"short_answer_question",
                   :answers=>
-                          [{:comments=>"", :weight=>100, :text=>"short answer", :comments=>"correct feedback"},
-                           {:comments=>"", :weight=>100, :text=>"Something else", :comments=>"I guess that's technically true, but it's still wrong."}],
+                          [{:weight=>100, :text=>"short answer", :comments=>"correct feedback"},
+                           {:weight=>100, :text=>"Something else", :comments=>"I guess that's technically true, but it's still wrong."}],
                   :correct_comments=>"Correct overall Feedback",
                   :question_name=>"FIB",
                   :points_possible=>19,
@@ -292,7 +300,7 @@ module CanvasExpected
               :assessment_question_migration_id=>"i7ee7c77592c6cd4ac58509c3e41dace8",
               :question_type=>"matching_question",
               :incorrect_comments=>"How could you get this wrong?"}
-  
+
   MULTIPLE_DROP_DOWNS = {:question_type=>"multiple_dropdowns_question",
                          :migration_id=>"i36799979e4e9ad1be11a85889095e11c",
                          :incorrect_comments=>"",
@@ -351,7 +359,7 @@ module CanvasExpected
                                 :migration_id => "if0e253c3d288b8033db6673a656539df",
                                 :question_type => "calculated_question",
                                 :points_possible => 10}
-  
+
   CALCULATED_COMPLEX = {:migration_id=>"i0ee13510954fd805d707623ee2c46729",
           :question_type=>"calculated_question",
           :variables=>
@@ -428,7 +436,7 @@ module CanvasExpected
           :formula_decimal_places=>2,
           :question_text=>"1 + [x] + [x] + [y] + [brian]",
           :imported_formula=>"temp = 1   x"}
-  
+
   NUMERICAL = {:question_type=>"numerical_question",
                :incorrect_comments=>"So wrong!",
                :question_name=>"Numerical Answer",

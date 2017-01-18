@@ -87,7 +87,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       entry_ids = self.entry_ids_array
 
       if opts[:include_new_entries]
-        new_entries = all_entries.where("updated_at >= ?", (self.generation_started_at || self.updated_at)).all
+        new_entries = all_entries.where("updated_at >= ?", (self.generation_started_at || self.updated_at)).to_a
         participant_ids = (Set.new(participant_ids) + new_entries.map(&:user_id).compact + new_entries.map(&:editor_id).compact).to_a
         entry_ids = (Set.new(entry_ids) + new_entries.map(&:id)).to_a
         new_entries_json_structure = discussion_entry_api_json(new_entries, discussion_topic.context, nil, nil, [])
@@ -132,7 +132,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
         end
       end
     end
-    Api.recursively_stringify_json_ids(view)
+    StringifyIds.recursively_stringify_ids(view)
     return view.to_json, user_ids.to_a, entry_lookup.keys
   end
 end

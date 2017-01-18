@@ -36,7 +36,7 @@
 #         },
 #         "student_ids": {
 #           "description": "the IDs of the override's target students (present if the override targets an ad-hoc set of students)",
-#           "example": "[1, 2, 3]",
+#           "example": [1, 2, 3],
 #           "type": "array",
 #           "items": {"type": "integer"}
 #         },
@@ -102,7 +102,7 @@ class AssignmentOverridesController < ApplicationController
   # @returns [AssignmentOverride]
   def index
     @overrides = assignment_override_collection(@assignment, true)
-    render :json => assignment_overrides_json(@overrides)
+    render :json => assignment_overrides_json(@overrides, @current_user)
   end
 
   # @API Get a single assignment override
@@ -171,19 +171,19 @@ class AssignmentOverridesController < ApplicationController
   #   section of the assignment's course not already targetted by a different
   #   override.
   #
-  # @argument assignment_override[due_at] [Timestamp] The day/time
+  # @argument assignment_override[due_at] [DateTime] The day/time
   #   the overridden assignment is due. Accepts times in ISO 8601 format, e.g.
   #   2014-10-21T18:48:00Z. If absent, this override will not affect due date.
   #   May be present but null to indicate the override removes any previous due
   #   date.
   #
-  # @argument assignment_override[unlock_at] [Timestamp] The day/time
+  # @argument assignment_override[unlock_at] [DateTime] The day/time
   #   the overridden assignment becomes unlocked. Accepts times in ISO 8601
   #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
   #   affect the unlock date. May be present but null to indicate the override
   #   removes any previous unlock date.
   #
-  # @argument assignment_override[lock_at] [Timestamp] The day/time
+  # @argument assignment_override[lock_at] [DateTime] The day/time
   #   the overridden assignment becomes locked. Accepts times in ISO 8601
   #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
   #   affect the lock date. May be present but null to indicate the override
@@ -230,19 +230,19 @@ class AssignmentOverridesController < ApplicationController
   # @argument assignment_override[title] [String] The title of an adhoc
   #   assignment override. Ignored unless the override being updated is adhoc.
   #
-  # @argument assignment_override[due_at] [Timestamp] The day/time
+  # @argument assignment_override[due_at] [DateTime] The day/time
   #   the overridden assignment is due. Accepts times in ISO 8601 format, e.g.
   #   2014-10-21T18:48:00Z. If absent, this override will not affect due date.
   #   May be present but null to indicate the override removes any previous due
   #   date.
   #
-  # @argument assignment_override[unlock_at] [Timestamp] The day/time
+  # @argument assignment_override[unlock_at] [DateTime] The day/time
   #   the overridden assignment becomes unlocked. Accepts times in ISO 8601
   #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
   #   affect the unlock date. May be present but null to indicate the override
   #   removes any previous unlock date.
   #
-  # @argument assignment_override[lock_at] [Timestamp] The day/time
+  # @argument assignment_override[lock_at] [DateTime] The day/time
   #   the overridden assignment becomes locked. Accepts times in ISO 8601
   #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
   #   affect the lock date. May be present but null to indicate the override

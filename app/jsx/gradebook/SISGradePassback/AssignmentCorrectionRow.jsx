@@ -1,11 +1,10 @@
-/** @jsx React.DOM */
-
 define([
   'underscore',
   'i18n!modules',
   'react',
-  'jsx/gradebook/SISGradePassback/assignmentUtils'
-], (_, I18n, React, assignmentUtils) => {
+  'jsx/gradebook/SISGradePassback/assignmentUtils',
+  'classnames'
+], (_, I18n, React, assignmentUtils, classnames) => {
 
   var AssignmentCorrectionRow = React.createClass({
     componentDidMount() {
@@ -58,18 +57,36 @@ define([
       this.props.updateAssignment({name: e.target.value, please_ignore: false})
     },
 
-    updateAssignmentName(e) {
-      this.props.updateAssignment({name: e.target.value, please_ignore: false})
+    currentSectionforOverride(a) {
+      if(_.isEmpty(_.where(a.overrides, {course_section_id: a.currentlySelected.id.toString()})) || a.currentlySelected.type == 'course'){
+        return true
+      } else {
+        return false
+      }
+    },
+
+    validCheck(a) {
+      if(a.overrideForThisSection != undefined && a.currentlySelected.type == 'course'){
+        return a.due_at != null ? true : false
+      }
+      else if(a.overrideForThisSection != undefined && a.currentlySelected.type == 'section' && a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id){
+        return a.overrideForThisSection.due_at != null ? true : false
+      }
+      else{
+        return true
+      }
     },
 
     render() {
       var assignment = this.props.assignment;
       var assignmentList = this.props.assignmentList;
-      var rowClass = React.addons.classSet({
+      var rowClass = classnames({
         "row": true,
         "correction-row": true,
         "ignore-row": assignment.please_ignore
       })
+
+      var nameEmptyError = assignmentUtils.nameEmpty(assignment) && !assignment.please_ignore
       var nameTooLongError = assignmentUtils.nameTooLong(assignment) && !assignment.please_ignore
       var nameError = assignmentUtils.notUniqueName(assignmentList, assignment) && !assignment.please_ignore
       var dueAtError = !assignment.due_at && !assignment.please_ignore
@@ -84,21 +101,28 @@ define([
 
       //handles data being filled in the inputs if there are name issues on an assignment with an assignment override
       if(assignment.overrideForThisSection != undefined){
-        default_value = assignment.overrideForThisSection.due_at ? assignment.overrideForThisSection.due_at.toString($.datetime.defaultFormat) : null
+        default_value = $.datetimeString(assignment.overrideForThisSection.due_at, {format: 'medium'})
         place_holder = assignment.overrideForThisSection.due_at ? null : I18n.t('No Due Date')
       }
       else{
-        default_value = assignment.due_at ? assignment.due_at.toString($.datetime.defaultFormat) : null
+        default_value = $.datetimeString(assignment.due_at, {format: 'medium'})
         place_holder = assignment.due_at ? null : I18n.t("No Due Date")
       }
-      var anyError = nameError || dueAtError || nameTooLongError
+
+      //handles 'Everyone Else' scenario
+      if(assignmentUtils.noDueDateForEveryoneElseOverride(assignment) && this.currentSectionforOverride(assignment)){
+        default_value = $.datetimeString(assignment.due_at, {format: 'medium'})
+        dueAtError = true
+      }
+
+      var anyError = nameError || dueAtError || nameTooLongError || nameEmptyError
       return (
         <div className={rowClass}>
           <div className="span3 input-container">
             {anyError || assignment.please_ignore ? null : <i className="success-mark icon-check" />}
             <div
-              className={React.addons.classSet({
-                "error-circle": nameError || nameTooLongError
+              className={classnames({
+                "error-circle": nameError || nameTooLongError || nameEmptyError
               })}
             >
               <label className="screenreader-only">{I18n.t("Name Error")}</label>
@@ -109,16 +133,17 @@ define([
               aria-label={I18n.t("Assignment Name")}
               className="input-mlarge assignment-name"
               placeholder={assignment.name ? null : I18n.t("No Assignment Name")}
-              defaultValue={assignment.name}
+              defaultValue={_.unescape(assignment.name)}
               onChange={this.updateAssignmentName}
             />
             {nameError ? <div className="hint-text">The assignment name must be unique</div> : ""}
             {nameTooLongError ? <div className="hint-text">The name must be under 30 characters</div> : ""}
+            {nameEmptyError ? <div className="hint-text">The name must not be empty</div> : ""}
           </div>
 
           <div className="span2 date_field_container input-container assignment_correction_input">
             <div
-              className={React.addons.classSet({
+              className={classnames({
                 "error-circle": dueAtError
               })}
             >
