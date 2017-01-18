@@ -274,6 +274,5 @@ define([
       </header>
     );
   }
-
   return React.createClass(Toolbar);
 });
