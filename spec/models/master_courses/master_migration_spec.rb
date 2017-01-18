@@ -283,6 +283,8 @@ describe MasterCourses::MasterMigration do
       aq = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
       file = @copy_from.attachments.create!(:filename => 'blah', :uploaded_data => default_uploaded_data)
       event = @copy_from.calendar_events.create!(:title => 'thing', :description => 'blargh', :start_at => 1.day.from_now)
+      tool = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key",
+        :shared_secret => "secret", :custom_fields => {'a' => '1', 'b' => '2'}, :url => "http://www.example.com")
 
       # TODO: make sure that we skip the validations on each importer when we add the Restrictor and
       # probably add more content here
@@ -301,6 +303,7 @@ describe MasterCourses::MasterMigration do
       copied_aq = copied_bank.assessment_questions.where(:migration_id => mig_id(aq)).first
       copied_file = @copy_to.attachments.where(:migration_id => mig_id(file)).first
       copied_event = @copy_to.calendar_events.where(:migration_id => mig_id(event)).first
+      copied_tool = @copy_to.context_external_tools.where(:migration_id => mig_id(tool)).first
 
       new_text = "<p>some text here</p>"
       assmt.update_attribute(:description, new_text)
@@ -317,8 +320,9 @@ describe MasterCourses::MasterMigration do
       aq.question_data['question_text'] = plain_text
       aq.save!
       file.update_attribute(:display_name, plain_text)
+      tool.update_attribute(:name, plain_text)
 
-      [assmt, topic, ann, page, quiz, bank, file, event].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
+      [assmt, topic, ann, page, quiz, bank, file, event, tool].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
 
       run_master_migration # re-copy all the content and overwrite the locked stuff
 
@@ -332,6 +336,7 @@ describe MasterCourses::MasterMigration do
       expect(copied_aq.reload.question_data['question_text']).to eq plain_text
       expect(copied_file.reload.display_name).to eq plain_text
       expect(copied_event.reload.description).to eq new_text
+      expect(copied_tool.reload.name).to eq plain_text
     end
 
     it "should not overwrite downstream changes in child course unless locked" do

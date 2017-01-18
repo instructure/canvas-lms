@@ -33,13 +33,17 @@ module Lti
       )
     end
 
-    def app_definitions(collection)
+    def app_definitions(collection, opts={})
       collection.map do |o|
         case o
-          when ContextExternalTool
-            external_tool_definition(o)
-          when ToolProxy
-            tool_proxy_definition(o)
+        when ContextExternalTool
+          hash = external_tool_definition(o)
+          if opts[:include_master_course_restrictions]
+            hash.merge!(o.master_course_api_restriction_data)
+          end
+          hash
+        when ToolProxy
+          tool_proxy_definition(o)
         end
       end
     end

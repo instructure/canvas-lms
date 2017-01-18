@@ -438,9 +438,11 @@ table.full_assignment_table {
   }
 }
 
-.master-course-cell i {
-  margin-right: 12px;
-}
-.options-spacer {
-  width: 48px;
+.assignment .ig-row {
+  .master-course-cell i {
+    margin-right: 12px;
+  }
+  .options-spacer {
+    width: 48px;
+  }
 }

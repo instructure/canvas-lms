@@ -26,7 +26,9 @@ module Lti
 
         respond_to do |format|
           app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
-          format.json {render json: app_collator.app_definitions(app_defs)}
+          check_for_restrictions = master_courses?
+          MasterCourses::Restrictor.preload_restrictions(app_defs.select{|o| o.is_a?(ContextExternalTool)}) if check_for_restrictions
+          format.json {render json: app_collator.app_definitions(app_defs, :include_master_course_restrictions => check_for_restrictions)}
         end
       end
     end
