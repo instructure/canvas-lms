@@ -45,11 +45,14 @@ class Assignment < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
-  restrict_columns :settings, [:points_possible, :assignment_group_id,
+
+  RESTRICTED_SETTINGS = [:points_possible, :assignment_group_id,
     :grading_type, :omit_from_final_grade, :submission_types,
     :group_category, :group_category_id,
     :grade_group_students_individually, :peer_reviews,
-    :moderated_grading]
+    :moderated_grading,
+    :due_at, :lock_at, :unlock_at, :peer_reviews_due_at].freeze
+  restrict_columns :settings, RESTRICTED_SETTINGS
 
   has_many :submissions, :dependent => :destroy
   has_many :provisional_grades, :through => :submissions
@@ -1022,6 +1025,17 @@ class Assignment < ActiveRecord::Base
     ].include?(self.submission_types)
   end
 
+  def submittable_object
+    case self.submission_types
+    when 'online_quiz'
+      self.quiz
+    when 'discussion_topic'
+      self.discussion_topic
+    when 'wiki_page'
+      self.wiki_page
+    end
+  end
+
   def each_submission_type
     if block_given?
       submittable_types = %i(discussion_topic quiz)
@@ -1860,7 +1874,8 @@ class Assignment < ActiveRecord::Base
 
   scope :include_submittables, -> { preload(:quiz, :discussion_topic, :wiki_page) }
 
-  scope :no_submittables, -> { where.not(submission_types: %w(online_quiz discussion_topic wiki_page)) }
+  SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
+  scope :no_submittables, -> { where.not(submission_types: SUBMITTABLE_TYPES) }
 
   scope :with_submissions, -> { preload(:submissions) }
 

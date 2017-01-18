@@ -19,6 +19,10 @@ module MasterCourses::TagHelper
 
   def content_tag_for(content, defaults={})
     return unless MasterCourses::ALLOWED_CONTENT_TYPES.include?(content.class.base_class.name)
+    if content.is_a?(Assignment) && submittable = content.submittable_object
+      content = submittable # use one child tag
+    end
+
     if @content_tag_index
       tag = (@content_tag_index[content.class.base_class.name] || {})[content.id]
       unless tag
@@ -33,6 +37,7 @@ module MasterCourses::TagHelper
   end
 
   def create_content_tag_for!(content, defaults={})
+    return if content.is_a?(Assignment) && Assignment::SUBMITTABLE_TYPES.include?(content.submission_types)
     self.class.unique_constraint_retry do |retry_count|
       tag = nil
       tag = self.content_tags.polymorphic_where(:content => content).first if retry_count > 0

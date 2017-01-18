@@ -462,6 +462,76 @@ describe MasterCourses::MasterMigration do
       expect(copied_qq.reload.question_data['question_text']).to eq new_master_text
     end
 
+    it "should handle graded quizzes/discussions/etc better" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      old_due_at = 5.days.from_now
+
+      quiz_assmt = @copy_from.assignments.create!(:due_at => old_due_at, :submission_types => 'online_quiz').reload
+      quiz = quiz_assmt.quiz
+      topic = @copy_from.discussion_topics.new
+      topic.assignment = @copy_from.assignments.build(:due_at => old_due_at)
+      topic.save!
+      topic_assmt = topic.assignment
+
+      run_master_migration
+
+      copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      copied_quiz_assmt = copied_quiz.assignment
+      expect(copied_quiz_assmt.migration_id).to eq copied_quiz.migration_id # should use the same migration id = same restrictions
+      copied_topic = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
+      copied_topic_assmt = copied_topic.assignment
+      expect(copied_topic_assmt.migration_id).to eq copied_topic.migration_id # should use the same migration id = same restrictions
+
+      new_title = "new master title"
+      quiz.update_attribute(:title, new_title)
+      topic.update_attribute(:title, new_title)
+      [quiz, topic].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
+
+      run_master_migration
+
+      expect(copied_quiz_assmt.reload.title).to eq new_title # should carry the new title over to the assignments
+      expect(copied_topic_assmt.reload.title).to eq new_title
+
+      expect(sub.child_content_tags.count).to eq 2
+      quiz_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_quiz).first
+      topic_child_tag = sub.child_content_tags.polymorphic_where(:content => copied_topic).first
+      [quiz_child_tag, topic_child_tag].each do |tag|
+        expect(tag.downstream_changes).to be_empty
+      end
+
+      new_child_due_at = 7.days.from_now
+      copied_quiz.update_attribute(:due_at, new_child_due_at)
+      copied_topic_assmt.update_attribute(:due_at, new_child_due_at)
+
+      [quiz_child_tag, topic_child_tag].each do |tag|
+        expect(tag.reload.downstream_changes).to include('due_at') # store the downstream changes on
+      end
+
+      new_master_due_at = 10.days.from_now
+      quiz.update_attribute(:due_at, new_master_due_at)
+      topic_assmt.update_attribute(:due_at, new_master_due_at)
+      [quiz, topic].each {|c| c.class.where(:id => c).update_all(:updated_at => 2.seconds.from_now)} # ensure it gets copied
+
+      run_master_migration # re-copy all the content - but don't actually overwrite anything because it got changed downstream
+
+      expect(copied_quiz_assmt.reload.due_at.to_i).to eq new_child_due_at.to_i # didn't get overwritten
+      expect(copied_topic_assmt.reload.due_at.to_i).to eq new_child_due_at.to_i # didn't get overwritten
+
+      [quiz, topic].each do |c|
+        mtag = @template.content_tag_for(c)
+        Timecop.freeze(2.seconds.from_now) do
+          mtag.update_attribute(:restrictions, {:settings => true}) # lock the quiz/topic master tags
+        end
+      end
+
+      run_master_migration # now, overwrite the due_at's because the tags are locked
+
+      expect(copied_quiz_assmt.reload.due_at.to_i).to eq new_master_due_at.to_i # should have gotten overwritten
+      expect(copied_topic_assmt.reload.due_at.to_i).to eq new_master_due_at.to_i
+    end
+
     context "master courses + external migrations" do
       class TestExternalContentService
         cattr_reader :course, :imported_content

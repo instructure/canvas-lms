@@ -57,9 +57,6 @@ module Api::V1::AssignmentGroup
           EffectiveDueDates.for_course(group.context, assignments).to_hash([:in_closed_grading_period])
       end
 
-      check_for_restrictions = master_courses? && group.context.grants_right?(user, session, :manage_assignments)
-      MasterCourses::Restrictor.preload_restrictions(assignments) if check_for_restrictions
-
       hash['assignments'] = assignments.map { |a|
         overrides = opts[:overrides].select{|override| override.assignment_id == a.id } unless opts[:overrides].nil?
         a.context = group.context
@@ -77,7 +74,7 @@ module Api::V1::AssignmentGroup
           include_overrides: opts[:include_overrides],
           needs_grading_course_proxy: needs_grading_course_proxy,
           submission: includes.include?('submission') ? opts[:submissions][a.id] : nil,
-          include_master_course_restrictions: check_for_restrictions
+          include_master_course_restrictions: master_courses? && group.context.grants_right?(user, session, :manage_assignments)
         )
 
         unless opts[:exclude_response_fields].include?('in_closed_grading_period')

@@ -69,6 +69,9 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def migration_id_for(obj, prepend="")
+    if obj.is_a?(Assignment) && submittable = obj.submittable_object
+      obj = submittable # i.e. use the same migration id as the topic on a graded topic's assignment - same restrictions
+    end
     key = obj.is_a?(ActiveRecord::Base) ? obj.global_asset_string : obj.to_s
     "#{MasterCourses::MIGRATION_ID_PREFIX}#{self.shard.id}_#{self.id}_#{Digest::MD5.hexdigest(prepend + key)}"
   end
