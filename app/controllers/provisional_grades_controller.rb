@@ -226,6 +226,11 @@ class ProvisionalGradesController < ApplicationController
           selected_provisional_grade = provisional_grades.first if provisional_grades.count == 1
         end
 
+        # We still don't have a provisional grade.  Let's pick up the first blank provisional grade
+        # for this submission if it exists.  This will happen as a result of commenting on a
+        # submission without grading it
+        selected_provisional_grade ||= submission.provisional_grades.detect { |pg| pg.graded_at.nil? }
+
         unless selected_provisional_grade
           return render json: { message: "All submissions must have a selected grade" },
                         status: :unprocessable_entity
