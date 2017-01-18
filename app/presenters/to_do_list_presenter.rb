@@ -1,6 +1,6 @@
 class ToDoListPresenter
   ASSIGNMENT_LIMIT = 100
-  VISIBLE_LIMIT = 5
+  VISIBLE_LIMIT = 50
 
   attr_reader :needs_grading, :needs_moderation, :needs_submitting, :needs_reviewing
 
@@ -27,7 +27,7 @@ class ToDoListPresenter
 
   def assignments_needing(type)
     if @user
-      @user.send("assignments_needing_#{type}", contexts: @contexts, limit: ASSIGNMENT_LIMIT).map do |assignment|
+      @user.send("assignments_needing_#{type}", contexts: @contexts, limit: ASSIGNMENT_LIMIT, due_before: 1.year.from_now).map do |assignment|
         AssignmentPresenter.new(@view, assignment, @user, type)
       end
     else
